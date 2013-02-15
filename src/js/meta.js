@@ -102,8 +102,6 @@ Meta.prototype.getAffectedAccounts = function ()
     }
   });
 
-  console.log("AFFECTS", accounts);
-
   return accounts;
 };
 
