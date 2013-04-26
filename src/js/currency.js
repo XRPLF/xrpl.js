@@ -52,6 +52,10 @@ Currency.prototype.parse_json = function (j) {
   if ("" === j || "0" === j || "XRP" === j) {
     this._value	= 0;
   }
+  else if ('number' === typeof j) {
+    // XXX This is a hack
+    this._value	= j;
+  }
   else if ('string' != typeof j || 3 !== j.length) {
     this._value	= NaN;
   }
