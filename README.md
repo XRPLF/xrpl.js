@@ -1,18 +1,10 @@
-Ripple - P2P Payment Network
-============================
+Ripple JavaScript Library - ripple-lib
+======================================
 
-Some portions of this source code are currently closed source.
-
-This is the repository for Ripple's:
-* rippled - Reference P2P network server
-* ripple.js - Reference JavaScript client libraries for node.js and browsers.
+This library can connect to the Ripple network via the WebSocket protocol and runs in Node.js as well as in the browser.
 
 Build instructions:
-* https://ripple.com/wiki/Rippled_build_instructions
 * https://ripple.com/wiki/Ripple_JavaScript_library
-
-Setup instructions:
-* https://ripple.com/wiki/Rippled_setup_instructions
 
 For more information:
 * https://ripple.com
