@@ -37,7 +37,10 @@ UInt160.prototype.parse_json = function (j) {
   if (config.accounts && j in config.accounts)
     j = config.accounts[j].account;
 
-  if ('string' !== typeof j) {
+  if ('number' === typeof j) {
+    this._value  = new BigInteger(String(j));
+  }
+  else if ('string' !== typeof j) {
     this._value  = NaN;
   }
   else if (j[0] === "r") {

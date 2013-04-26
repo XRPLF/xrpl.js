@@ -12,6 +12,12 @@ var config      = require('../src/js/config').load(require('./config'));
 // XXX Add test cases that push XRP vs non-XRP behavior.
 
 buster.testCase("Amount", {
+  "from_number" : {
+    "Number 1" : function () {
+      buster.assert.equals("1/1/rrrrrrrrrrrrrrrrrrrrBZbvji", Amount.from_number(1).to_text_full());
+    },
+  },
+
   "UInt160" : {
     "Parse 0" : function () {
       buster.assert.equals(nbi(), UInt160.from_generic("0")._value);

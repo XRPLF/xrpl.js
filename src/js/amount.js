@@ -65,6 +65,10 @@ Amount.json_rewrite = function (j) {
   return Amount.from_json(j).to_json();
 };
 
+Amount.from_number = function (n) {
+  return (new Amount()).parse_number(n);
+};
+
 Amount.from_json = function (j) {
   return (new Amount()).parse_json(j);
 };
@@ -623,6 +627,19 @@ Amount.prototype.parse_quality = function (q, c, i) {
 
   return this;
 }
+
+Amount.prototype.parse_number = function (n) {
+  this._is_native   = false;
+  this._currency    = Currency.from_json(1);
+  this._issuer      = UInt160.from_json(1);
+  this._is_negative = n < 0 ? 1 : 0;
+  this._value       = new BigInteger(String(this._is_negative ? -n : n));
+  this._offset      = 0;
+
+  this.canonicalize();
+
+  return this;
+};
 
 // <-> j
 Amount.prototype.parse_json = function (j) {

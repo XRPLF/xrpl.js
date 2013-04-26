@@ -23,7 +23,7 @@ Currency.json_rewrite = function (j) {
 
 Currency.from_json = function (j) {
   if (j instanceof Currency) return j.clone();
-  else if ('string' === typeof j) return (new Currency()).parse_json(j);
+  else if ('string' === typeof j || 'number' === typeof j) return (new Currency()).parse_json(j);
   else return new Currency(); // NaN
 };
 
@@ -51,6 +51,10 @@ Currency.prototype.equals = function (d) {
 Currency.prototype.parse_json = function (j) {
   if ("" === j || "0" === j || "XRP" === j) {
     this._value	= 0;
+  }
+  else if ('number' === typeof j) {
+    // XXX This is a hack
+    this._value	= j;
   }
   else if ('string' != typeof j || 3 !== j.length) {
     this._value	= NaN;
