@@ -629,6 +629,7 @@ Amount.prototype.parse_quality = function (q, c, i) {
 }
 
 Amount.prototype.parse_number = function (n) {
+  this._is_native   = false;
   this._currency    = Currency.from_json(1);
   this._issuer      = UInt160.from_json(1);
   this._is_negative = n < 0 ? 1 : 0;
