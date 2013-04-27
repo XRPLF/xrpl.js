@@ -1,6 +1,6 @@
 #!/usr/bin/node
 
-var Transaction = require('ripple-lib').Transaction;
+var Transaction = require('../src/js/transaction').Transaction;
 
 var cursor      = 2;
 var verbose;
