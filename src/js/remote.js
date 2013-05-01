@@ -240,26 +240,41 @@ Request.prototype.books = function (books, snapshot) {
   return this;
 };
 
-//
-// Remote - access to a remote Ripple server via websocket.
-//
-// Events:
-// 'connect'
-// 'connected' (DEPRECATED)
-// 'disconnect'
-// 'disconnected' (DEPRECATED)
-// 'state':
-// - 'online'        : Connected and subscribed.
-// - 'offline'       : Not subscribed or not connected.
-// 'subscribed'      : This indicates stand-alone is available.
-//
-// Server events:
-// 'ledger_closed'   : A good indicate of ready to serve.
-// 'transaction'     : Transactions we receive based on current subscriptions.
-// 'transaction_all' : Listening triggers a subscribe to all transactions
-//                     globally in the network.
+//------------------------------------------------------------------------------
+/**
+    Interface to manage the connection to a Ripple server.
 
-// --> trusted: truthy, if remote is trusted
+    This implementation uses WebSockets.
+
+    Keys for opts:
+
+      trusted            : truthy, if remote is trusted
+      websocket_ip
+      websocket_port
+      websocket_ssl
+      trace
+      maxListeners
+
+    Events:
+      'connect'
+      'connected' (DEPRECATED)
+      'disconnect'
+      'disconnected' (DEPRECATED)
+      'state':
+      - 'online'        : Connected and subscribed.
+      - 'offline'       : Not subscribed or not connected.
+      'subscribed'      : This indicates stand-alone is available.
+
+    Server events:
+      'ledger_closed'   : A good indicate of ready to serve.
+      'transaction'     : Transactions we receive based on current subscriptions.
+      'transaction_all' : Listening triggers a subscribe to all transactions
+                          globally in the network.
+
+    @param opts      Connection options.
+    @param trace
+*/
+
 var Remote = function (opts, trace) {
   EventEmitter.call(this);
 
@@ -340,7 +355,17 @@ var Remote = function (opts, trace) {
   var url  = (this.websocket_ssl ? "wss://" : "ws://") +
         this.websocket_ip + ":" + this.websocket_port;
 
-  this.add_server(new Server(this, {url: url}));
+  var server = new Server (this, {url: url})
+
+  if ('maxListeners' in opts)
+  {
+    // This is used to remove Emitter warnings
+    //
+    server.setMaxListeners (opts.maxListeners) 
+    this.setMaxListeners (opts.maxListeners)
+  }
+
+  this.add_server(server)
 
   this.on('newListener', function (type, listener) {
       if ('transaction_all' === type)
