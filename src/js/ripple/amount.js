@@ -1,7 +1,7 @@
 // Represent Ripple amounts and currencies.
 // - Numbers in hex are big-endian.
 
-var sjcl    = require('../../build/sjcl');
+var sjcl    = require('../../../build/sjcl');
 var bn	    = sjcl.bn;
 var utils   = require('./utils');
 var jsbn    = require('./jsbn');

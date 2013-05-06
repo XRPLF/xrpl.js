@@ -1,5 +1,5 @@
 var binformat = require('./binformat'),
-    sjcl = require('../../build/sjcl'),
+    sjcl = require('../../../build/sjcl'),
     extend = require('extend'),
     stypes = require('./serializedtypes');
 

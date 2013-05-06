@@ -29,7 +29,7 @@ var OrderBook     = require('./orderbook').OrderBook;
 
 var utils         = require('./utils');
 var config        = require('./config');
-var sjcl          = require('../../build/sjcl');
+var sjcl          = require('../../../build/sjcl');
 
 // Request events emitted:
 // 'success' : Request successful.

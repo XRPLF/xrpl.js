@@ -47,7 +47,7 @@ module.exports = function(grunt) {
     },
     webpack: {
       options: {
-        entry: "./src/js/index.js",
+        entry: "./src/js/ripple/index.js",
         library: "ripple"
       },
       lib: {
@@ -86,7 +86,7 @@ module.exports = function(grunt) {
         options: {
           title: "Test"
         },
-        src: ['src/js/'],
+        src: ['src/js/ripple/'],
         dest: 'build/docs'
       }
     }

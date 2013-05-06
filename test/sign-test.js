@@ -1,8 +1,8 @@
 var buster      = require("buster");
 
-var Seed        = require("../src/js/seed").Seed;
+var Seed        = require("../src/js/ripple/seed").Seed;
 
-var config      = require('../src/js/config').load(require('./config'));
+var config      = require('../src/js/ripple/config').load(require('./config'));
 
 buster.testCase("Signing", {
   "Keys" : {

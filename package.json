@@ -3,11 +3,11 @@
   "version": "0.7.11",
   "description": "Ripple JavaScript client library",
   "files": [
-    "src/js/*.js",
+    "src/js/ripple/*.js",
     "build/sjcl.js",
     "bin/rsign.js"
   ],
-  "main": "src/js",
+  "main": "src/js/ripple",
   "directories": {
     "test": "test"
   },
