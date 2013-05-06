@@ -1,8 +1,11 @@
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-webpack');
+  grunt.loadNpmTasks('grunt-dox');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   grunt.initConfig({
-    pkg: '<json:package.json>',
+    pkg: grunt.file.readJSON('package.json'),
     meta: {
       banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
         '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -43,39 +46,53 @@ module.exports = function(grunt) {
       }
     },
     webpack: {
-      lib: {
-        src: "src/js/index.js",
-        dest: "build/ripple-<%= pkg.version %>.js",
-        libary: "ripple", // misspelling fixed in later versions of webpack
+      options: {
+        entry: "./src/js/index.js",
         library: "ripple"
       },
+      lib: {
+        output: {
+          filename: "build/ripple-<%= pkg.version %>.js"
+        }
+      },
       lib_debug: {
-        src: "src/js/index.js",
-        dest: "build/ripple-<%= pkg.version %>-debug.js",
-        libary: "ripple", // misspelling fixed in later versions of webpack
-        library: "ripple",
-        debug: true
+        output: {
+          filename: "build/ripple-<%= pkg.version %>-debug.js"
+        },
+        debug: true,
+        devtool: 'eval'
       },
       lib_min: {
-        src: "src/js/index.js",
-        dest: "build/ripple-<%= pkg.version %>-min.js",
-        libary: "ripple", // misspelling fixed in later versions of webpack
-        library: "ripple",
-        minimize: true
+        output: {
+          filename: "build/ripple-<%= pkg.version %>-min.js"
+        },
+        optimize: {
+          minimize: true
+        }
       }
     },
     watch: {
       sjcl: {
-        files: ['<config:concat.sjcl.src>'],
+        files: ['<%= concat.sjcl.src %>'],
         tasks: 'concat:sjcl'
       },
       lib: {
         files: 'src/js/*.js',
         tasks: 'webpack'
       }
+    },
+    dox: {
+      libdocs: {
+        options: {
+          title: "Test"
+        },
+        src: ['src/js/'],
+        dest: 'build/docs'
+      }
     }
   });
 
   // Tasks
-  grunt.registerTask('default', 'concat:sjcl webpack');
+  grunt.registerTask('default', ['concat:sjcl', 'webpack']);
+
 };
