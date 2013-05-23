@@ -370,6 +370,16 @@ var Remote = function (opts, trace) {
 
 util.inherits(Remote, EventEmitter);
 
+// Flags for ledger entries. In support of account_root().
+Remote.flags = {
+  'account_root' : {
+    'PasswordSpent'           : 0x00010000,
+    'RequireDestTag'          : 0x00020000,
+    'RequireAuth'             : 0x00040000,
+    'DisallowXRP'             : 0x00080000,
+  }
+};
+
 Remote.from_config = function (obj, trace) {
   var serverConfig = 'string' === typeof obj ? config.servers[obj] : obj;
 
@@ -1010,6 +1020,19 @@ Remote.prototype.request_account_balance = function (account, current) {
     .on('success', function (message) {
         // If the caller also waits for 'success', they might run before this.
         request.emit('account_balance', Amount.from_json(message.node.Balance));
+      });
+};
+
+// Return a request to return the account flags.
+Remote.prototype.request_account_flags = function (account, current) {
+  var request = this.request_ledger_entry('account_root');
+
+  return request
+    .account_root(account)
+    .ledger_choose(current)
+    .on('success', function (message) {
+        // If the caller also waits for 'success', they might run before this.
+        request.emit('account_flags', message.node.Flags);
       });
 };
 
