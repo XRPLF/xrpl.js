@@ -51,6 +51,8 @@ util.inherits(Server, EventEmitter);
  * us of changes.
  */
 Server.online_states = [
+  'syncing',
+  'tracking',
   'proposing',
   'validating',
   'full'
