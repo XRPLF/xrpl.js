@@ -116,7 +116,6 @@ Amount.prototype.add = function (v) {
   }
   else if (this.is_zero()) {
     result              = v.clone();
-    result._is_negative = false;
     result._is_native   = this._is_native;
     result._currency    = this._currency;
     result._issuer      = this._issuer;
@@ -987,7 +986,7 @@ Amount.prototype.to_json = function () {
 Amount.prototype.to_text_full = function (opts) {
   return this._value instanceof BigInteger
     ? this._is_native
-      ? this.to_text() + "/XRP"
+      ? this.to_human() + "/XRP"
       : this.to_text() + "/" + this._currency.to_json() + "/" + this._issuer.to_json(opts)
     : NaN;
 };
