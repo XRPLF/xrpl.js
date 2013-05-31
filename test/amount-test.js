@@ -12,6 +12,12 @@ var config      = require('../src/js/config').load(require('./config'));
 // XXX Add test cases that push XRP vs non-XRP behavior.
 
 buster.testCase("Amount", {
+  "negatives" : {
+    "Number 1" : function () {
+      buster.assert.equals("-1", Amount.from_human('0').add(Amount.from_human('-1')).to_human());
+    },
+  },
+
   "from_number" : {
     "Number 1" : function () {
       buster.assert.equals("1/1/rrrrrrrrrrrrrrrrrrrrBZbvji", Amount.from_number(1).to_text_full());
@@ -64,13 +70,13 @@ buster.testCase("Amount", {
       buster.assert.equals("0/XRP", Amount.from_json("-0.0").to_text_full());
     },
     "Parse native 1000" : function () {
-      buster.assert.equals("1000/XRP", Amount.from_json("1000").to_text_full());
+      buster.assert.equals("0.001/XRP", Amount.from_json("1000").to_text_full());
     },
     "Parse native 12.3" : function () {
-      buster.assert.equals("12300000/XRP", Amount.from_json("12.3").to_text_full());
+      buster.assert.equals("12.3/XRP", Amount.from_json("12.3").to_text_full());
     },
     "Parse native -12.3" : function () {
-      buster.assert.equals("-12300000/XRP", Amount.from_json("-12.3").to_text_full());
+      buster.assert.equals("-12.3/XRP", Amount.from_json("-12.3").to_text_full());
     },
     "Parse 123./USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh" : function () {
       buster.assert.equals("123/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", Amount.from_json("123./USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh").to_text_full());
@@ -93,10 +99,10 @@ buster.testCase("Amount", {
   },
   "Amount operations" : {
     "Negate native 123" : function () {
-      buster.assert.equals("-123/XRP", Amount.from_json("123").negate().to_text_full());
+      buster.assert.equals("-0.000123/XRP", Amount.from_json("123").negate().to_text_full());
     },
     "Negate native -123" : function () {
-      buster.assert.equals("123/XRP", Amount.from_json("-123").negate().to_text_full());
+      buster.assert.equals("0.000123/XRP", Amount.from_json("-123").negate().to_text_full());
     },
     "Negate non-native 123" : function () {
       buster.assert.equals("-123/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", Amount.from_json("123/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh").negate().to_text_full());
@@ -108,7 +114,7 @@ buster.testCase("Amount", {
       buster.assert.equals("-123/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", Amount.from_json("-123/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh").clone().to_text_full());
     },
     "Add XRP to XRP" : function () {
-      buster.assert.equals("200/XRP", Amount.from_json("150").add(Amount.from_json("50")).to_text_full());
+      buster.assert.equals("0.0002/XRP", Amount.from_json("150").add(Amount.from_json("50")).to_text_full());
     },
     "Add USD to USD" : function () {
       buster.assert.equals("200.52/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", Amount.from_json("150.02/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh").add(Amount.from_json("50.5/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
@@ -144,19 +150,19 @@ buster.testCase("Amount", {
       buster.assert.equals("2000/XRP", Amount.from_json("200").multiply(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Multiply XRP with USD" : function () {
-      buster.assert.equals("200000/XRP", Amount.from_json("20000").multiply(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("0.2/XRP", Amount.from_json("20000").multiply(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Multiply XRP with USD" : function () {
-      buster.assert.equals("20000000/XRP", Amount.from_json("2000000").multiply(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("20/XRP", Amount.from_json("2000000").multiply(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Multiply XRP with USD, neg" : function () {
-      buster.assert.equals("-2000/XRP", Amount.from_json("200").multiply(Amount.from_json("-10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("-0.002/XRP", Amount.from_json("200").multiply(Amount.from_json("-10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Multiply XRP with USD, neg, frac" : function () {
-      buster.assert.equals("-222000/XRP", Amount.from_json("-6000").multiply(Amount.from_json("37/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("-0.222/XRP", Amount.from_json("-6000").multiply(Amount.from_json("37/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Multiply USD with USD" : function () {
-      buster.assert.equals("20000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", Amount.from_json("2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh").multiply(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("0.020000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", Amount.from_json("2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh").multiply(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Multiply USD with USD" : function () {
       buster.assert.equals("200000000000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", Amount.from_json("2000000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh").multiply(Amount.from_json("100000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
@@ -180,22 +186,22 @@ buster.testCase("Amount", {
       buster.assert.equals("-100/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", Amount.from_json("-0.05/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh").multiply(Amount.from_json("2000")).to_text_full());
     },
     "Multiply XRP with XRP" : function () {
-      buster.assert.equals("100/XRP", Amount.from_json("10").multiply(Amount.from_json("10")).to_text_full());
+      buster.assert.equals("0.0001/XRP", Amount.from_json("10").multiply(Amount.from_json("10")).to_text_full());
     },
     "Divide XRP by USD" : function () {
-      buster.assert.equals("20/XRP", Amount.from_json("200").divide(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("0.00002/XRP", Amount.from_json("200").divide(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Divide XRP by USD" : function () {
-      buster.assert.equals("2000/XRP", Amount.from_json("20000").divide(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("0.002/XRP", Amount.from_json("20000").divide(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Divide XRP by USD" : function () {
-      buster.assert.equals("200000/XRP", Amount.from_json("2000000").divide(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("0.2/XRP", Amount.from_json("2000000").divide(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Divide XRP by USD, neg" : function () {
-      buster.assert.equals("-20/XRP", Amount.from_json("200").divide(Amount.from_json("-10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("-0.00002/XRP", Amount.from_json("200").divide(Amount.from_json("-10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Divide XRP by USD, neg, frac" : function () {
-      buster.assert.equals("-162/XRP", Amount.from_json("-6000").divide(Amount.from_json("37/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
+      buster.assert.equals("-0.000162/XRP", Amount.from_json("-6000").divide(Amount.from_json("37/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
     },
     "Divide USD by USD" : function () {
       buster.assert.equals("200/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", Amount.from_json("2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh").divide(Amount.from_json("10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh")).to_text_full());
