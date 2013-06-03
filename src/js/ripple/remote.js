@@ -286,7 +286,8 @@ var Remote = function (opts, trace) {
   this.websocket_ssl          = opts.websocket_ssl;
   this.local_sequence         = opts.local_sequence; // Locally track sequence numbers
   this.local_fee              = opts.local_fee;      // Locally set fees
-  this.local_signing          = opts.local_signing;
+  this.local_signing          = ("undefined" === typeof opts.local_signing)
+                                ? true : opts.local_signing;
   this.id                     = 0;
   this.trace                  = opts.trace || trace;
   this._server_fatal          = false;              // True, if we know server exited.
