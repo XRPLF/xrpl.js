@@ -3,6 +3,18 @@ var util          = require('util');
 
 var utils         = require('./utils');
 
+//------------------------------------------------------------------------------
+/**
+    Constructor
+
+    Keys for cfg:
+
+      url
+
+    @param  remote    The Remote object
+    @param  cfg       Configuration parameters.
+*/
+
 var Server = function (remote, cfg)
 {
   EventEmitter.call(this);
@@ -28,6 +40,8 @@ var Server = function (remote, cfg)
   this.on('response_subscribe', this._handle_response_subscribe.bind(this));
 };
 
+//------------------------------------------------------------------------------
+
 util.inherits(Server, EventEmitter);
 
 /**
@@ -37,6 +51,8 @@ util.inherits(Server, EventEmitter);
  * us of changes.
  */
 Server.online_states = [
+  'syncing',
+  'tracking',
   'proposing',
   'validating',
   'full'

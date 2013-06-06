@@ -1,7 +1,7 @@
 var fs      = require("fs");
 var buster  = require("buster");
 
-var utils   = require("../src/js/utils.js");
+var utils   = require("../src/js/ripple/utils.js");
 
 buster.testCase("Utils", {
   "hexToString and stringToHex" : {

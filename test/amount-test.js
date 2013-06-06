@@ -1,13 +1,13 @@
 var buster      = require("buster");
 
-var jsbn        = require('../src/js/jsbn');
+var jsbn        = require('../src/js/ripple/jsbn');
 var BigInteger  = jsbn.BigInteger;
 var nbi         = jsbn.nbi;
 
-var Amount      = require("../src/js/amount").Amount;
-var UInt160     = require("../src/js/uint160").UInt160;
+var Amount      = require("../src/js/ripple/amount").Amount;
+var UInt160     = require("../src/js/ripple/uint160").UInt160;
 
-var config      = require('../src/js/config').load(require('./config'));
+var config      = require('../src/js/ripple/config').load(require('./config'));
 
 // XXX Add test cases that push XRP vs non-XRP behavior.
 

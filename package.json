@@ -1,18 +1,16 @@
 {
   "name": "ripple-lib",
-  "version": "0.7.12",
+  "version": "0.7.14",
   "description": "Ripple JavaScript client library",
-
   "files": [
-    "src/js/*.js",
+    "src/js/ripple/*.js",
     "build/sjcl.js",
     "bin/rsign.js"
   ],
-  "main": "src/js",
+  "main": "src/js/ripple",
   "directories": {
     "test": "test"
   },
-
   "dependencies": {
     "async": "~0.1.22",
     "ws": "~0.4.22",
@@ -20,19 +18,19 @@
     "simple-jsonrpc": "~0.0.1"
   },
   "devDependencies": {
-    "grunt": "~0.3.17",
-    "buster": "~0.6.2",
-    "grunt-webpack": "~0.4.0"
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-watch": "~0.4.0",
+    "grunt-webpack": "~0.10.2",
+    "grunt-dox": "~0.4.1",
+    "buster": "~0.6.2"
   },
-
   "scripts": {
-    "test": "buster test"
+    "test": "node_modules/buster/bin/buster test"
   },
-
   "repository": {
     "type": "git",
     "url": "git://github.com/rippleFoundation/ripple-lib.git"
   },
-
   "readmeFilename": "README.md"
 }

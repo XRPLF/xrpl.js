@@ -1,5 +1,5 @@
 
-var sjcl    = require('../../build/sjcl');
+var sjcl    = require('../../../build/sjcl');
 var utils   = require('./utils');
 var jsbn    = require('./jsbn');
 var extend  = require('extend');

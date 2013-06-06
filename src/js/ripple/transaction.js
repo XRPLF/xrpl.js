@@ -46,7 +46,7 @@
 var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
 
-var sjcl             = require('../../build/sjcl');
+var sjcl             = require('../../../build/sjcl');
 
 var Amount           = require('./amount').Amount;
 var Currency         = require('./amount').Currency;
@@ -112,6 +112,15 @@ Transaction.fees = {
 };
 
 Transaction.flags = {
+  'AccountSet' : {
+    'RequireDestTag'          : 0x00010000,
+    'OptionalDestTag'         : 0x00020000,
+    'RequireAuth'             : 0x00040000,
+    'OptionalAuth'            : 0x00080000,
+    'DisallowXRP'             : 0x00100000,
+    'AllowXRP'                : 0x00200000,
+  },
+
   'OfferCreate' : {
     'Passive'                 : 0x00010000,
     'ImmediateOrCancel'       : 0x00020000,
@@ -545,6 +554,7 @@ Transaction.prototype._account_secret = function (account) {
 
 // Options:
 //  .domain()           NYI
+//  .flags()
 //  .message_key()      NYI
 //  .transfer_rate()
 //  .wallet_locator()   NYI

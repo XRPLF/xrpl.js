@@ -1,7 +1,7 @@
 // Represent Ripple amounts and currencies.
 // - Numbers in hex are big-endian.
 
-var sjcl    = require('../../build/sjcl');
+var sjcl    = require('../../../build/sjcl');
 var bn	    = sjcl.bn;
 var utils   = require('./utils');
 var jsbn    = require('./jsbn');
@@ -396,6 +396,11 @@ Amount.prototype.ratio_human = function (denominator) {
   var numerator = this;
   denominator = Amount.from_json(denominator);
 
+  // If either operand is NaN, the result is NaN.
+  if (!numerator.is_valid() || !denominator.is_valid()) {
+    return Amount.NaN();
+  }
+
   // Special case: The denominator is a native (XRP) amount.
   //
   // In that case, it's going to be expressed as base units (1 XRP =
@@ -439,6 +444,11 @@ Amount.prototype.product_human = function (factor) {
     factor = Amount.from_json("" + factor + ".0");
   } else {
     factor = Amount.from_json(factor);
+  }
+
+  // If either operand is NaN, the result is NaN.
+  if (!this.is_valid() || !factor.is_valid()) {
+    return Amount.NaN();
   }
 
   var product = this.multiply(factor);

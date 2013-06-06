@@ -29,7 +29,7 @@ var OrderBook     = require('./orderbook').OrderBook;
 
 var utils         = require('./utils');
 var config        = require('./config');
-var sjcl          = require('../../build/sjcl');
+var sjcl          = require('../../../build/sjcl');
 
 // Request events emitted:
 // 'success' : Request successful.
@@ -240,26 +240,41 @@ Request.prototype.books = function (books, snapshot) {
   return this;
 };
 
-//
-// Remote - access to a remote Ripple server via websocket.
-//
-// Events:
-// 'connect'
-// 'connected' (DEPRECATED)
-// 'disconnect'
-// 'disconnected' (DEPRECATED)
-// 'state':
-// - 'online'        : Connected and subscribed.
-// - 'offline'       : Not subscribed or not connected.
-// 'subscribed'      : This indicates stand-alone is available.
-//
-// Server events:
-// 'ledger_closed'   : A good indicate of ready to serve.
-// 'transaction'     : Transactions we receive based on current subscriptions.
-// 'transaction_all' : Listening triggers a subscribe to all transactions
-//                     globally in the network.
+//------------------------------------------------------------------------------
+/**
+    Interface to manage the connection to a Ripple server.
 
-// --> trusted: truthy, if remote is trusted
+    This implementation uses WebSockets.
+
+    Keys for opts:
+
+      trusted            : truthy, if remote is trusted
+      websocket_ip
+      websocket_port
+      websocket_ssl
+      trace
+      maxListeners
+
+    Events:
+      'connect'
+      'connected' (DEPRECATED)
+      'disconnect'
+      'disconnected' (DEPRECATED)
+      'state':
+      - 'online'        : Connected and subscribed.
+      - 'offline'       : Not subscribed or not connected.
+      'subscribed'      : This indicates stand-alone is available.
+
+    Server events:
+      'ledger_closed'   : A good indicate of ready to serve.
+      'transaction'     : Transactions we receive based on current subscriptions.
+      'transaction_all' : Listening triggers a subscribe to all transactions
+                          globally in the network.
+
+    @param opts      Connection options.
+    @param trace
+*/
+
 var Remote = function (opts, trace) {
   EventEmitter.call(this);
 
@@ -271,7 +286,8 @@ var Remote = function (opts, trace) {
   this.websocket_ssl          = opts.websocket_ssl;
   this.local_sequence         = opts.local_sequence; // Locally track sequence numbers
   this.local_fee              = opts.local_fee;      // Locally set fees
-  this.local_signing          = opts.local_signing;
+  this.local_signing          = ("undefined" === typeof opts.local_signing)
+                                ? true : opts.local_signing;
   this.id                     = 0;
   this.trace                  = opts.trace || trace;
   this._server_fatal          = false;              // True, if we know server exited.
@@ -340,7 +356,17 @@ var Remote = function (opts, trace) {
   var url  = (this.websocket_ssl ? "wss://" : "ws://") +
         this.websocket_ip + ":" + this.websocket_port;
 
-  this.add_server(new Server(this, {url: url}));
+  var server = new Server (this, {url: url})
+
+  if ('maxListeners' in opts)
+  {
+    // This is used to remove Emitter warnings
+    //
+    server.setMaxListeners (opts.maxListeners) 
+    this.setMaxListeners (opts.maxListeners)
+  }
+
+  this.add_server(server)
 
   this.on('newListener', function (type, listener) {
       if ('transaction_all' === type)
@@ -369,6 +395,16 @@ var Remote = function (opts, trace) {
 };
 
 util.inherits(Remote, EventEmitter);
+
+// Flags for ledger entries. In support of account_root().
+Remote.flags = {
+  'account_root' : {
+    'PasswordSpent'           : 0x00010000,
+    'RequireDestTag'          : 0x00020000,
+    'RequireAuth'             : 0x00040000,
+    'DisallowXRP'             : 0x00080000,
+  }
+};
 
 Remote.from_config = function (obj, trace) {
   var serverConfig = 'string' === typeof obj ? config.servers[obj] : obj;
@@ -1010,6 +1046,19 @@ Remote.prototype.request_account_balance = function (account, current) {
     .on('success', function (message) {
         // If the caller also waits for 'success', they might run before this.
         request.emit('account_balance', Amount.from_json(message.node.Balance));
+      });
+};
+
+// Return a request to return the account flags.
+Remote.prototype.request_account_flags = function (account, current) {
+  var request = this.request_ledger_entry('account_root');
+
+  return request
+    .account_root(account)
+    .ledger_choose(current)
+    .on('success', function (message) {
+        // If the caller also waits for 'success', they might run before this.
+        request.emit('account_flags', message.node.Flags);
       });
 };
 

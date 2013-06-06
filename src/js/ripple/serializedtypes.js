@@ -8,7 +8,7 @@
 
 var extend  = require('extend'),
     utils   = require('./utils'),
-    sjcl    = require('../../build/sjcl');
+    sjcl    = require('../../../build/sjcl');
 
 var amount  = require('./amount'),
     UInt160 = amount.UInt160,
