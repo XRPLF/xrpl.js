@@ -32,11 +32,11 @@ var config        = require('./config');
 var sjcl          = require('../../../build/sjcl');
 
 // Request events emitted:
-// 'success' : Request successful.
-// 'error'   : Request failed.
-//   'remoteError'
-//   'remoteUnexpected'
-//   'remoteDisconnected'
+//  'success' : Request successful.
+//  'error'   : Request failed.
+//  'remoteError'
+//  'remoteUnexpected'
+//  'remoteDisconnected'
 var Request = function (remote, command) {
   EventEmitter.call(this);
 
@@ -62,18 +62,17 @@ Request.prototype.request = function (remote) {
 };
 
 Request.prototype.build_path = function (build) {
-  if (build)
+  if (build) {
     this.message.build_path = true;
+  }
 
   return this;
 };
 
 Request.prototype.ledger_choose = function (current) {
-  if (current)
-  {
+  if (current) {
     this.message.ledger_index = this.remote._ledger_current_index;
-  }
-  else {
+  } else {
     this.message.ledger_hash  = this.remote._ledger_hash;
   }
 
@@ -98,20 +97,19 @@ Request.prototype.ledger_index = function (ledger_index) {
 };
 
 Request.prototype.ledger_select = function (ledger_spec) {
-  if (ledger_spec === 'current') {
-    this.message.ledger_index  = ledger_spec;
-
-  } else if (ledger_spec === 'closed') {
-    this.message.ledger_index  = ledger_spec;
-
-  } else if (ledger_spec === 'verified') {
-    this.message.ledger_index  = ledger_spec;
-
-  } else if (String(ledger_spec).length > 12) { // XXX Better test needed
-    this.message.ledger_hash  = ledger_spec;
-
-  } else {
-    this.message.ledger_index  = ledger_spec;
+  switch (ledger_spec) {
+    case 'current':
+    case 'closed':
+    case 'verified':
+      this.message.ledger_index = ledger_spec;
+      break;
+    default:
+      // XXX Better test needed
+      if (String(ledger_spec).length > 12) {
+        this.message.ledger_hash  = ledger_spec;
+      } else {
+        this.message.ledger_index  = ledger_spec;
+      }
   }
 
   return this;
@@ -149,8 +147,9 @@ Request.prototype.offer_index = function (index) {
 };
 
 Request.prototype.secret = function (s) {
-  if (s)
+  if (s) {
     this.message.secret  = s;
+  }
 
   return this;
 };
@@ -175,18 +174,18 @@ Request.prototype.tx_blob = function (j) {
 
 Request.prototype.ripple_state = function (account, issuer, currency) {
   this.message.ripple_state  = {
-      'accounts' : [
-        UInt160.json_rewrite(account),
-        UInt160.json_rewrite(issuer)
-      ],
-      'currency' : currency
-    };
+    'accounts' : [
+      UInt160.json_rewrite(account),
+      UInt160.json_rewrite(issuer)
+    ],
+    'currency' : currency
+  };
 
   return this;
 };
 
 Request.prototype.accounts = function (accounts, realtime) {
-  if ("object" !== typeof accounts) {
+  if (typeof accounts !== 'object') {
     accounts = [accounts];
   }
 
@@ -215,26 +214,27 @@ Request.prototype.books = function (books, snapshot) {
     var book = books[i];
     var json = {};
 
-    function process(side) {
-      if (!book[side]) throw new Error("Missing "+side);
+    function processSide(side) {
+      if (!book[side]) throw new Error('Missing '+side);
 
       var obj = {};
-      obj["currency"] = Currency.json_rewrite(book[side]["currency"]);
-      if (obj["currency"] !== "XRP") {
-        obj.issuer = UInt160.json_rewrite(book[side]["issuer"]);
+      obj['currency'] = Currency.json_rewrite(book[side]['currency']);
+      if (obj['currency'] !== 'XRP') {
+        obj.issuer = UInt160.json_rewrite(book[side]['issuer']);
       }
 
       json[side] = obj;
     }
 
-    process("taker_gets");
-    process("taker_pays");
+    processSide('taker_gets');
+    processSide('taker_pays');
 
-    if (snapshot || book["snapshot"]) json["snapshot"] = true;
-    if (book["both"]) json["both"] = true;
+    if (snapshot || book['snapshot']) json['snapshot'] = true;
+    if (book['both']) json['both'] = true;
 
     procBooks.push(json);
   }
+
   this.message.books = procBooks;
 
   return this;
@@ -286,29 +286,29 @@ var Remote = function (opts, trace) {
   this.websocket_ssl          = opts.websocket_ssl;
   this.local_sequence         = opts.local_sequence; // Locally track sequence numbers
   this.local_fee              = opts.local_fee;      // Locally set fees
-  this.local_signing          = ("undefined" === typeof opts.local_signing)
+  this.local_signing          = ('undefined' === typeof opts.local_signing)
                                 ? true : opts.local_signing;
   this.id                     = 0;
   this.trace                  = opts.trace || trace;
   this._server_fatal          = false;              // True, if we know server exited.
-  this._ledger_current_index  = undefined;
-  this._ledger_hash           = undefined;
-  this._ledger_time           = undefined;
-  this._stand_alone           = undefined;
-  this._testnet               = undefined;
+  this._ledger_current_index  = void(0);
+  this._ledger_hash           = void(0);
+  this._ledger_time           = void(0);
+  this._stand_alone           = void(0);
+  this._testnet               = void(0);
   this._transaction_subs      = 0;
   this.online_target          = false;
   this._online_state          = 'closed';         // 'open', 'closed', 'connecting', 'closing'
   this.state                  = 'offline';        // 'online', 'offline'
-  this.retry_timer            = undefined;
-  this.retry                  = undefined;
+  this.retry_timer            = void(0);
+  this.retry                  = void(0);
 
   this._load_base             = 256;
   this._load_factor           = 1.0;
-  this._fee_ref               = undefined;
-  this._fee_base              = undefined;
-  this._reserve_base          = undefined;
-  this._reserve_inc           = undefined;
+  this._fee_ref               = void(0);
+  this._fee_base              = void(0);
+  this._reserve_base          = void(0);
+  this._reserve_inc           = void(0);
   this._connection_count      = 0;
 
   this._last_tx               = null;
@@ -329,7 +329,7 @@ var Remote = function (opts, trace) {
 
     // account : { seq : __ }
 
-    };
+  };
 
   // Hash map of Account objects by AccountId.
   this._accounts = {};
@@ -353,15 +353,13 @@ var Remote = function (opts, trace) {
   };
 
   // XXX Add support for multiple servers
-  var url  = (this.websocket_ssl ? "wss://" : "ws://") +
-        this.websocket_ip + ":" + this.websocket_port;
+  var url  = (this.websocket_ssl ? 'wss://' : 'ws://') +
+  this.websocket_ip + ':' + this.websocket_port;
 
   var server = new Server (this, {url: url})
 
-  if ('maxListeners' in opts)
-  {
+  if ('maxListeners' in opts) {
     // This is used to remove Emitter warnings
-    //
     server.setMaxListeners (opts.maxListeners) 
     this.setMaxListeners (opts.maxListeners)
   }
@@ -369,29 +367,25 @@ var Remote = function (opts, trace) {
   this.add_server(server)
 
   this.on('newListener', function (type, listener) {
-      if ('transaction_all' === type)
-      {
-        if (!self._transaction_subs && 'open' === self._online_state)
-        {
-          self.request_subscribe([ 'transactions' ])
-            .request();
-        }
-        self._transaction_subs  += 1;
+    if ('transaction_all' === type) {
+      if (!self._transaction_subs && 'open' === self._online_state) {
+        self.request_subscribe([ 'transactions' ])
+        .request();
       }
-    });
+      self._transaction_subs  += 1;
+    }
+  });
 
   this.on('removeListener', function (type, listener) {
-      if ('transaction_all' === type)
-      {
-        self._transaction_subs  -= 1;
+    if ('transaction_all' === type) {
+      self._transaction_subs  -= 1;
 
-        if (!self._transaction_subs && 'open' === self._online_state)
-        {
-          self.request_unsubscribe([ 'transactions' ])
-            .request();
-        }
+      if (!self._transaction_subs && 'open' === self._online_state) {
+        self.request_unsubscribe([ 'transactions' ])
+        .request();
       }
-    });
+    }
+  });
 };
 
 util.inherits(Remote, EventEmitter);
@@ -413,7 +407,7 @@ Remote.from_config = function (obj, trace) {
 
   for (var account in config.accounts) {
     var accountInfo = config.accounts[account];
-    if ("object" === typeof accountInfo) {
+    if ('object' === typeof accountInfo) {
       if (accountInfo.secret) {
         // Index by nickname ...
         remote.set_secret(account, accountInfo.secret);
@@ -448,7 +442,9 @@ Remote.prototype.add_server = function (server) {
 
   server.on('disconnect', function () {
     self._connection_count--;
-    if (!self._connection_count) self._set_state('offline');
+    if (!self._connection_count) {
+      self._set_state('offline');
+    }
   });
 
   this._servers.push(server);
@@ -463,7 +459,7 @@ Remote.prototype.server_fatal = function () {
 
 // Set the emitted state: 'online' or 'offline'
 Remote.prototype._set_state = function (state) {
-  if (this.trace) console.log("remote: set_state: %s", state);
+  if (this.trace) console.log('remote: set_state: %s', state);
 
   if (this.state !== state) {
     this.state = state;
@@ -497,15 +493,17 @@ Remote.prototype.set_trace = function (trace) {
  */
 Remote.prototype.connect = function (online) {
   // Downwards compatibility
-  if ("undefined" !== typeof online && !online) {
+  if ('undefined' !== typeof online && !online) {
     return this.disconnect();
   }
 
   if (!this._servers.length) {
-    throw new Error("No servers available.");
+    throw new Error('No servers available.');
   } else {
     // XXX Add support for multiple servers
-    this._servers[0].connect();
+    for (var i=0; i<this._servers.length; i++) {
+      this._servers[i].connect();
+    }
   }
 
   return this;
@@ -567,7 +565,7 @@ Remote.prototype._handle_message = function (json) {
         if (this._last_tx === message.transaction.hash) break;
         this._last_tx = message.transaction.hash;
 
-        if (this.trace) utils.logObject("remote: tx: %s", message);
+        if (this.trace) utils.logObject('remote: tx: %s', message);
 
         // Process metadata
         message.mmeta = new Meta(message.meta);
@@ -594,8 +592,7 @@ Remote.prototype._handle_message = function (json) {
 
       // XXX Should be tracked by the Server object
       case 'serverStatus':
-        if ('load_base' in message &&
-            'load_factor' in message &&
+        if ('load_base' in message && 'load_factor' in message &&
             (message.load_base !== self._load_base || message.load_factor != self._load_factor))
         {
           self._load_base     = message.load_base;
@@ -607,7 +604,7 @@ Remote.prototype._handle_message = function (json) {
 
       // All other messages
       default:
-        if (this.trace) utils.logObject("remote: "+message.type+": %s", message);
+        if (this.trace) utils.logObject('remote: '+message.type+': %s', message);
         this.emit('net_'+message.type, message);
         break;
     }
@@ -615,7 +612,7 @@ Remote.prototype._handle_message = function (json) {
 
   // Unexpected response from remote.
   if (unexpected) {
-    console.log("unexpected message from trusted remote: %s", json);
+    console.log('unexpected message from trusted remote: %s', json);
 
     (request || this).emit('error', {
         'error' : 'remoteUnexpected',
@@ -628,7 +625,7 @@ Remote.prototype._handle_message = function (json) {
 // <-> request: what to send, consumed.
 Remote.prototype.request = function (request) {
   if (!this._servers.length) {
-    throw new Error("No servers available.");
+    throw new Error('No servers available.');
   } else {
     // XXX Add support for multiple servers
     this._servers[0].request(request);
@@ -646,10 +643,9 @@ Remote.prototype.request_ledger = function (ledger, opts) {
 
   var request = new Request(this, 'ledger');
 
-  if (ledger)
-  {
+  if (ledger) {
     // DEPRECATED: use .ledger_hash() or .ledger_index()
-    console.log("request_ledger: ledger parameter is deprecated");
+    console.log('request_ledger: ledger parameter is deprecated');
     request.message.ledger  = ledger;
   }
 
@@ -667,9 +663,8 @@ Remote.prototype.request_ledger = function (ledger, opts) {
       request.message.accounts      = true;
   }
   // DEPRECATED:
-  else if (opts)
-  {
-    console.log("request_ledger: full parameter is deprecated");
+  else if (opts) {
+    console.log('request_ledger: full parameter is deprecated');
     request.message.full    = true;
   }
 
@@ -729,8 +724,7 @@ Remote.prototype.request_ledger_entry = function (type) {
       else if ('account_root' === type) {
         var cache = self.ledgers.current.account_root;
 
-        if (!cache)
-        {
+        if (!cache) {
           cache = self.ledgers.current.account_root = {};
         }
 
@@ -740,9 +734,9 @@ Remote.prototype.request_ledger_entry = function (type) {
           // Emulate fetch of ledger entry.
           // console.log('request_ledger_entry: emulating');
           request.emit('success', {
-              // YYY Missing lots of fields.
-              'node' :  node,
-            });
+            // YYY Missing lots of fields.
+            'node' :  node,
+          });
 
           bDefault  = false;
         }
@@ -753,10 +747,10 @@ Remote.prototype.request_ledger_entry = function (type) {
           switch (type) {
             case 'account_root':
               request.on('success', function (message) {
-                  // Cache node.
-                  // console.log('request_ledger_entry: caching');
-                  self.ledgers.current.account_root[message.node.Account] = message.node;
-                });
+                // Cache node.
+                // console.log('request_ledger_entry: caching');
+                self.ledgers.current.account_root[message.node.Account] = message.node;
+              });
               break;
 
             default:
@@ -781,7 +775,7 @@ Remote.prototype.request_subscribe = function (streams) {
   var request = new Request(this, 'subscribe');
 
   if (streams) {
-    if ("object" !== typeof streams) {
+    if ('object' !== typeof streams) {
       streams = [streams];
     }
     request.message.streams = streams;
@@ -795,7 +789,7 @@ Remote.prototype.request_unsubscribe = function (streams) {
   var request = new Request(this, 'unsubscribe');
 
   if (streams) {
-    if ("object" !== typeof streams) {
+    if ('object' !== typeof streams) {
       streams = [streams];
     }
     request.message.streams = streams;
@@ -842,11 +836,11 @@ Remote.prototype.request_account_lines = function (accountID, account_index, cur
 
   request.message.account = UInt160.json_rewrite(accountID);
 
-  if (account_index)
+  if (account_index) {
     request.message.index   = account_index;
+  }
 
-  return request
-    .ledger_choose(current);
+  return request.ledger_choose(current);
 };
 
 // --> account_index: sub_account index (optional)
@@ -856,11 +850,11 @@ Remote.prototype.request_account_offers = function (accountID, account_index, cu
 
   request.message.account = UInt160.json_rewrite(accountID);
 
-  if (account_index)
+  if (account_index) {
     request.message.index   = account_index;
+  }
 
-  return request
-    .ledger_choose(current);
+  return request.ledger_choose(current);
 };
 
 
@@ -887,14 +881,15 @@ Remote.prototype.request_account_tx = function (obj) {
     //request.message.ledger      = ledger_min;
   }
   else {
-	if ("undefined" != typeof obj.ledger_index_min)	{request.message.ledger_index_min  = obj.ledger_index_min;}
-    if ("undefined" != typeof obj.ledger_index_max)	{request.message.ledger_index_max  = obj.ledger_index_max;}
-	if ("undefined" != typeof obj.binary)			{request.message.binary  = obj.binary;}
-	if ("undefined" != typeof obj.count)			{request.message.count  = obj.count;}
-	if ("undefined" != typeof obj.descending)		{request.message.descending  = obj.descending;}
-	if ("undefined" != typeof obj.offset)			{request.message.offset  = obj.offset;}
-	if ("undefined" != typeof obj.limit)			{request.message.limit  = obj.limit;}
+    if ('undefined' !== typeof obj.ledger_index_min)	{request.message.ledger_index_min  = obj.ledger_index_min;}
+    if ('undefined' !== typeof obj.ledger_index_max)	{request.message.ledger_index_max  = obj.ledger_index_max;}
+    if ('undefined' !== typeof obj.binary)			{request.message.binary  = obj.binary;}
+    if ('undefined' !== typeof obj.count)			{request.message.count  = obj.count;}
+    if ('undefined' !== typeof obj.descending)		{request.message.descending  = obj.descending;}
+    if ('undefined' !== typeof obj.offset)			{request.message.offset  = obj.offset;}
+    if ('undefined' !== typeof obj.limit)			{request.message.limit  = obj.limit;}
   }
+
   return request;
 };
 
@@ -979,7 +974,7 @@ Remote.prototype._server_prepare_subscribe = function ()
     self._stand_alone       = !!message.stand_alone;
     self._testnet           = !!message.testnet;
 
-    if ("string" === typeof message.random) {
+    if ('string' === typeof message.random) {
       var rand = message.random.match(/[0-9A-F]{8}/ig);
       while (rand && rand.length)
         sjcl.random.addEntropy(parseInt(rand.pop(), 16));
@@ -1096,7 +1091,7 @@ Remote.prototype.book = function (currency_gets, issuer_gets,
   var pays = currency_pays;
   if (pays !== 'XRP') pays += '/' + issuer_pays;
 
-  var key = gets + ":" + pays;
+  var key = gets + ':' + pays;
 
   if (!this._books[key]) {
     var book = new OrderBook(this,
@@ -1122,13 +1117,13 @@ Remote.prototype.account_seq = function (account, advance) {
   {
     seq = account_info.seq;
 
-    if (advance === "ADVANCE") account_info.seq += 1;
-    if (advance === "REWIND") account_info.seq -= 1;
+    if (advance === 'ADVANCE') account_info.seq += 1;
+    if (advance === 'REWIND') account_info.seq -= 1;
 
-    // console.log("cached: %s current=%d next=%d", account, seq, account_info.seq);
+    // console.log('cached: %s current=%d next=%d', account, seq, account_info.seq);
   }
   else {
-    // console.log("uncached: %s", account);
+    // console.log('uncached: %s', account);
   }
 
   return seq;
@@ -1153,7 +1148,7 @@ Remote.prototype.account_seq_cache = function (account, current) {
 
   request = account_info.caching_seq_request;
   if (!request) {
-    // console.log("starting: %s", account);
+    // console.log('starting: %s', account);
     request = self.request_ledger_entry('account_root')
       .account_root(account)
       .ledger_choose(current)
@@ -1164,12 +1159,12 @@ Remote.prototype.account_seq_cache = function (account, current) {
 
           account_info.seq  = seq;
 
-          // console.log("caching: %s %d", account, seq);
+          // console.log('caching: %s %d', account, seq);
           // If the caller also waits for 'success', they might run before this.
           request.emit('success_account_seq_cache', message);
         })
       .on('error', function (message) {
-          // console.log("error: %s", account);
+          // console.log('error: %s', account);
           delete account_info.caching_seq_request;
 
           request.emit('error_account_seq_cache', message);
