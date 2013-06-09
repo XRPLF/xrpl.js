@@ -32,5 +32,8 @@
     "type": "git",
     "url": "git://github.com/rippleFoundation/ripple-lib.git"
   },
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "engines": {
+    "node": ">=0.10.0"
+  }
 }
