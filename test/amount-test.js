@@ -7,7 +7,13 @@ var nbi         = jsbn.nbi;
 var Amount      = require("../src/js/ripple/amount").Amount;
 var UInt160     = require("../src/js/ripple/uint160").UInt160;
 
-var config      = require('../src/js/ripple/config').load(require('./config'));
+try {
+  var conf = require('./config');
+} catch(exception) {
+  var conf = require('./config-example');
+}
+
+var config = require('../src/js/ripple/config').load(conf);
 
 // XXX Add test cases that push XRP vs non-XRP behavior.
 
