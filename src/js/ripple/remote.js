@@ -45,8 +45,8 @@ var Request = function (remote, command) {
   this.remote     = remote;
   this.requested  = false;
   this.message    = {
-    'command' : command,
-    'id'      : void(0),
+    'command':  command,
+    'id':       void(0)
   };
 };
 
@@ -108,7 +108,7 @@ Request.prototype.ledger_select = function (ledger_spec) {
       if (String(ledger_spec).length > 12) {
         this.message.ledger_hash  = ledger_spec;
       } else {
-        this.message.ledger_index  = ledger_spec;
+        this.message.ledger_index = ledger_spec;
       }
   }
 
@@ -132,8 +132,8 @@ Request.prototype.index = function (hash) {
 // --> seq : sequence number of transaction creating offer (integer)
 Request.prototype.offer_id = function (account, seq) {
   this.message.offer = {
-    'account' : UInt160.json_rewrite(account),
-    'seq' : seq
+    'account':  UInt160.json_rewrite(account),
+    'seq':      seq
   };
 
   return this;
@@ -185,20 +185,19 @@ Request.prototype.ripple_state = function (account, issuer, currency) {
 };
 
 Request.prototype.accounts = function (accounts, realtime) {
-  if (typeof accounts !== 'object') {
-    accounts = [accounts];
+  if (!Array.isArray(accounts)) {
+    accounts = [ accounts ];
   }
 
   // Process accounts parameters
-  var procAccounts = [];
-  for (var i = 0, l = accounts.length; i < l; i++) {
-    procAccounts.push(UInt160.json_rewrite(accounts[i]));
-  }
+  var procAccounts = accounts.map(function(account) {
+    return UInt160.json_rewrite(account);
+  });
 
   if (realtime) {
     this.message.rt_accounts = procAccounts;
   } else {
-    this.message.accounts = procAccounts;
+    this.message.accounts    = procAccounts;
   }
 
   return this;
@@ -314,7 +313,7 @@ var Remote = function (opts, trace) {
   // Local signing implies local fees and sequences
   if (this.local_signing) {
     this.local_sequence = true;
-    this.local_fee = true;
+    this.local_fee      = true;
   }
 
   this._servers           = [];
@@ -327,7 +326,6 @@ var Remote = function (opts, trace) {
     // Otherwise, clear it to have it automatically refreshed from the network.
 
     // account : { seq : __ }
-
   };
 
   // Hash map of Account objects by AccountId.
@@ -351,33 +349,31 @@ var Remote = function (opts, trace) {
     }
   };
 
+  // Support old API
   if (!('servers' in opts)) {
-    opts.servers = [
-      {
-        host:     opts.websocket_ip,
-        port:     opts.websocket_port,
-        secure:   opts.websocket_ssl,
-        trusted:  opts.trusted
-      }
-    ]
+    opts.servers = [ {
+      host:     opts.websocket_ip,
+      port:     opts.websocket_port,
+      secure:   opts.websocket_ssl,
+      trusted:  opts.trusted
+    } ]
   }
 
-  for (var i=0; i<opts.servers.length; i++) {
-    this.add_server(opts.servers[i]);
-  }
+  // Initialize servers
+  opts.servers.forEach(function(server) {
+    self.add_server(server);
+  });
 
+  // This is used to remove EventEmitter warnings
   if ('maxListeners' in opts) {
-    // This is used to remove Emitter warnings
-    this.setMaxListeners(opts.maxListeners)
-    for (var i=0; i<this._servers.length; i++) {
-      this._servers[i].setMaxListeners(opts.maxListeners);
-    }
+    this._servers.concat(this).forEach(function(i) {
+      i.setMaxListeners(opts.maxListeners);
+    });
   }
 
-  // XXX Add support for multiple servers
   this.on('newListener', function (type, listener) {
     if ('transaction_all' === type) {
-      if (!self._transaction_subs && 'open' === self._online_state) {
+      if (!self._transaction_subs && self._online_state === 'open') {
         self.request_subscribe('transactions').request();
       }
       self._transaction_subs  += 1;
@@ -387,7 +383,7 @@ var Remote = function (opts, trace) {
   this.on('removeListener', function (type, listener) {
     if ('transaction_all' === type) {
       self._transaction_subs  -= 1;
-      if (!self._transaction_subs && 'open' === self._online_state) {
+      if (!self._transaction_subs && self._online_state === 'open') {
         self.request_unsubscribe('transactions').request();
       }
     }
@@ -407,13 +403,13 @@ Remote.flags = {
 };
 
 Remote.from_config = function (obj, trace) {
-  var serverConfig = 'string' === typeof obj ? config.servers[obj] : obj;
+  var serverConfig = typeof obj === 'string' ? config.servers[obj] : obj;
 
   var remote = new Remote(serverConfig, trace);
 
   for (var account in config.accounts) {
     var accountInfo = config.accounts[account];
-    if ('object' === typeof accountInfo) {
+    if (typeof accountInfo === 'object') {
       if (accountInfo.secret) {
         // Index by nickname ...
         remote.set_secret(account, accountInfo.secret);
@@ -512,7 +508,7 @@ Remote.prototype.set_trace = function (trace) {
  */
 Remote.prototype.connect = function (online) {
   // Downwards compatibility
-  if ('undefined' !== typeof online && !online) {
+  if (typeof online !== 'undefined' && !online) {
     return this.disconnect();
   }
 
@@ -547,14 +543,18 @@ Remote.prototype.ledger_hash = function () {
 // It is possible for messages to be dispatched after the connection is closed.
 Remote.prototype._handle_message = function (json) {
   var self        = this;
-  var message     = JSON.parse(json);
   var unexpected  = false;
-  var request;
+  var request, message;
 
-  if ('object' !== typeof message) {
-    unexpected  = true;
+  try {
+    message = JSON.parse(json);
+  } catch(exception) {
+    unexpected = true;
   }
-  else {
+
+  if (typeof message !== 'object') {
+    unexpected  = true;
+  } else {
     switch (message.type) {
       case 'response':
         // Handled by the server that sent the request
@@ -837,7 +837,6 @@ Remote.prototype.request_subscribe = function (streams) {
   return request;
 };
 
-// .accounts(accounts, realtime)
 Remote.prototype.request_unsubscribe = function (streams) {
   var request = new Request(this, 'unsubscribe');
 
@@ -1067,7 +1066,7 @@ Remote.prototype._server_prepare_subscribe = function () {
 Remote.prototype.ledger_accept = function () {
   if (this._stand_alone || undefined === this._stand_alone) {
     var request = new Request(this, 'ledger_accept');
-    request .request();
+    request.request();
   } else {
     this.emit('error', {
       'error' : 'notStandAlone'
