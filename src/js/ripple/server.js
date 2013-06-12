@@ -1,33 +1,27 @@
 var EventEmitter = require('events').EventEmitter;
 var util         = require('util');
 var WebSocket    = require('ws');
-
 var utils        = require('./utils');
 
-//------------------------------------------------------------------------------
 /**
-    Constructor
+ * Server
+ *
+ * @constructor
+ * @param {Object} remote
+ * @param {Object} opts
+ */
 
-    Keys for cfg:
-
-      url
-
-    @param  remote    The Remote object
-    @param  cfg       Configuration parameters.
-*/
-
-var Server = function (remote, cfg) {
+function Server(remote, opts) {
   EventEmitter.call(this);
 
-
-  if (typeof cfg !== 'object' || typeof cfg.url !== 'string') {
+  if (typeof opts !== 'object' || typeof opts.url !== 'string') {
     throw new Error('Invalid server configuration.');
   }
 
   var self = this;
 
   this._remote         = remote;
-  this._cfg            = cfg;
+  this._opts           = opts;
 
   this._ws             = void(0);
   this._connected      = false;
@@ -48,32 +42,27 @@ var Server = function (remote, cfg) {
   });
 };
 
-//------------------------------------------------------------------------------
-
 util.inherits(Server, EventEmitter);
 
-function to_set(list) {
-  var result = { };
-  for (var i=0; i<list.length; i++) {
-    result[list[i]] = true;
-  }
-  return result;
-}
 /**
  * Server states that we will treat as the server being online.
  *
  * Our requirements are that the server can process transactions and notify
  * us of changes.
  */
-Server.online_states = to_set([
-  'syncing',
-  'tracking',
-  'proposing',
-  'validating',
-  'full'
-]);
+Server.online_states = [ 
+    'syncing'
+  , 'tracking'
+  , 'proposing'
+  , 'validating'
+  , 'full'
+];
 
-Server.prototype.connect = function () {
+Server.prototype.is_online = function(status) {
+  return Server.online_states.indexOf(status) !== -1;
+};
+
+Server.prototype.connect = function() {
   var self = this;
 
   // We don't connect if we believe we're already connected. This means we have
@@ -83,7 +72,7 @@ Server.prototype.connect = function () {
   if (this._connected === true) return;
 
   if (this._remote.trace) {
-    console.log('server: connect: %s', this._cfg.url);
+    console.log('server: connect: %s', this._opts.url);
   }
 
   // Ensure any existing socket is given the command to close first.
@@ -91,13 +80,13 @@ Server.prototype.connect = function () {
     this._ws.close();
   }
 
-  var ws = this._ws = new WebSocket(this._cfg.url);
+  var ws = this._ws = new WebSocket(this._opts.url);
 
   this._should_connect = true;
 
   self.emit('connecting');
 
-  ws.onopen = function () {
+  ws.onopen = function() {
     // If we are no longer the active socket, simply ignore any event
     if (ws !== self._ws) return;
 
@@ -108,7 +97,7 @@ Server.prototype.connect = function () {
     self.request(request);
   };
 
-  ws.onerror = function (e) {
+  ws.onerror = function(e) {
     // If we are no longer the active socket, simply ignore any event
     if (ws !== self._ws) return;
 
@@ -134,7 +123,7 @@ Server.prototype.connect = function () {
   };
 
   // Failure to open.
-  ws.onclose = function () {
+  ws.onclose = function() {
     // If we are no longer the active socket, simply ignore any event
     if (ws !== self._ws) return;
 
@@ -159,7 +148,7 @@ Server.prototype.connect = function () {
     // Delay and retry.
     self._retry += 1;
 
-    self._retry_timer = setTimeout(function () {
+    self._retry_timer = setTimeout(function retryTimeout() {
       if (self._remote.trace) console.log('server: retry');
       if (!self._should_connect) return;
       self.connect();
@@ -172,23 +161,29 @@ Server.prototype.connect = function () {
             : 30*1000);     // Then: once every 30 seconds
   };
 
-  ws.onmessage = function (msg) {
+  ws.onmessage = function(msg) {
     self.emit('message', msg.data);
   };
 };
 
-Server.prototype.disconnect = function () {
+Server.prototype.disconnect = function() {
   this._should_connect = false;
   this._set_state('offline');
-  if (this.ws) {
-    this.ws.close();
+  if (this._ws) {
+    this._ws.close();
+  }
+};
+
+Server.prototype.send = function(message) {
+  if (this._ws) {
+    this._ws.send(JSON.stringify(message));
   }
 };
 
 /**
  * Submit a Request object to this server.
  */
-Server.prototype.request = function (request) {
+Server.prototype.request = function(request) {
   var self  = this;
 
   // Only bother if we are still connected.
@@ -200,20 +195,19 @@ Server.prototype.request = function (request) {
     // Advance message ID
     self._id++;
 
-    if (self._state === 'online' ||
-        (request.message.command === 'subscribe' && self._ws.readyState === 1)) {
+    if (self._connected || (request.message.command === 'subscribe' 
+                            && self._ws.readyState === 1)) {
       if (self._remote.trace) {
         utils.logObject('server: request: %s', request.message);
       }
-
-      self._ws.send(JSON.stringify(request.message));
+      self.send(request.message);
     } else {
       // XXX There are many ways to make self smarter.
       self.once('connect', function () {
         if (self._remote.trace) {
           utils.logObject('server: request: %s', request.message);
         }
-        self._ws.send(JSON.stringify(request.message));
+        self.send(request.message);
       });
     }
   } else {
@@ -223,7 +217,7 @@ Server.prototype.request = function (request) {
   }
 };
 
-Server.prototype._set_state = function (state) {
+Server.prototype._set_state = function(state) {
   if (state !== this._state) {
     this._state = state;
 
@@ -239,46 +233,69 @@ Server.prototype._set_state = function (state) {
   }
 };
 
-Server.prototype._handle_message = function (json) {
-  var self = this;
+Server.prototype._handle_message = function(json) {
+  var self       = this;
+  var unexpected = false;
+  var message;
+  
+  try { message = JSON.parse(json); } catch(exception) { }
 
-  var message = JSON.parse(json);
+  var unexpected = typeof message !== 'object' || typeof message.type !== 'string';
 
-  if (message.type === 'response') {
-    // A response to a request.
-    var request = self._requests[message.id];
+  if (unexpected) { 
+    // We received a malformed response from the server
+  }
 
-    delete self._requests[message.id];
+  if (!unexpected) {
+    switch (message.type) {
+      case 'response':
+        // A response to a request.
+        var request = self._requests[message.id];
 
-    if (!request) {
-      if (self._remote.trace) utils.logObject('server: UNEXPECTED: %s', message);
-    } else if ('success' === message.status) {
-      if (self._remote.trace) utils.logObject('server: response: %s', message);
+        delete self._requests[message.id];
 
-      request.emit('success', message.result);
-      self.emit('response_'+request.message.command, message.result, request, message);
-      self._remote.emit('response_'+request.message.command, message.result, request, message);
-    } else if (message.error) {
-      if (self._remote.trace) utils.logObject('server: error: %s', message);
+        if (!request) {
+          if (self._remote.trace) {
+            utils.logObject('server: UNEXPECTED: %s', message);
+          }
+        } else if (message.status === 'success') {
+          if (self._remote.trace) {
+            utils.logObject('server: response: %s', message);
+          }
 
-      request.emit('error', {
-        'error'         : 'remoteError',
-        'error_message' : 'Remote reported an error.',
-        'remote'        : message
-      });
+          request.emit('success', message.result);
+
+          [ self, self._remote ].forEach(function(emitter) {
+            emitter.emit('response_' + request.message.command, message.result, request, message);
+          });
+        } else if (message.error) {
+          if (self._remote.trace) {
+            utils.logObject('server: error: %s', message);
+          }
+
+          request.emit('error', {
+            'error'         : 'remoteError',
+            'error_message' : 'Remote reported an error.',
+            'remote'        : message
+          });
+        }
+        break;
+
+      case 'serverStatus':
+        // This message is only received when online. 
+        // As we are connected, it is the definitive final state.
+        self._set_state(self.is_online(message.server_status) ? 'online' : 'offline');
+        break;
     }
-  } else if (message.type === 'serverStatus') {
-    // This message is only received when online. As we are connected, it is the definative final state.
-    self._set_state(Server.online_states[message.server_status] ? 'online' : 'offline');
   }
 };
 
-Server.prototype._handle_response_subscribe = function (message) {
+Server.prototype._handle_response_subscribe = function(message) {
   var self = this;
 
   self._server_status = message.server_status;
 
-  if (Server.online_states[message.server_status]) {
+  if (self.is_online(message.server_status)) {
     self._set_state('online');
   }
 };
