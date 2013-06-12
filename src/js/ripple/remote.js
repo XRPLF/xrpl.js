@@ -361,7 +361,10 @@ var Remote = function (opts, trace) {
 
   // Initialize servers
   opts.servers.forEach(function(server) {
-    self.add_server(server);
+    var i = typeof server.pool === 'number' ? server.pool : 1;
+    while (i--) {
+      self.add_server(server); 
+    }
   });
 
   // This is used to remove EventEmitter warnings
@@ -376,13 +379,13 @@ var Remote = function (opts, trace) {
       if (!self._transaction_subs && self._online_state === 'open') {
         self.request_subscribe('transactions').request();
       }
-      self._transaction_subs  += 1;
+      self._transaction_subs += 1;
     }
   });
 
   this.on('removeListener', function (type, listener) {
     if ('transaction_all' === type) {
-      self._transaction_subs  -= 1;
+      self._transaction_subs -= 1;
       if (!self._transaction_subs && self._online_state === 'open') {
         self.request_unsubscribe('transactions').request();
       }
@@ -620,8 +623,8 @@ Remote.prototype._handle_message = function (json) {
 
       // All other messages
       default:
-        if (this.trace) utils.logObject('remote: '+message.type+': %s', message);
-        this.emit('net_'+message.type, message);
+        if (this.trace) utils.logObject('remote: ' + message.type+': %s', message);
+        this.emit('net_' + message.type, message);
         break;
     }
   }
@@ -631,8 +634,8 @@ Remote.prototype._handle_message = function (json) {
     console.log('unexpected message from trusted remote: %s', json);
 
     (request || this).emit('error', {
-      'error' : 'remoteUnexpected',
-      'error_message' : 'Unexpected response from remote.'
+      'error':          'remoteUnexpected',
+      'error_message':  'Unexpected response from remote.'
     });
   }
 };
@@ -1151,8 +1154,8 @@ Remote.prototype.book = function (currency_gets, issuer_gets, currency_pays, iss
 // Return the next account sequence if possible.
 // <-- undefined or Sequence
 Remote.prototype.account_seq = function (account, advance) {
-  account           = UInt160.json_rewrite(account);
-  var account_info  = this.accounts[account];
+  var account      = UInt160.json_rewrite(account);
+  var account_info = this.accounts[account];
   var seq;
 
   if (account_info && account_info.seq) {
@@ -1240,7 +1243,7 @@ Remote.prototype.set_secret = function (account, secret) {
 //
 // If does not exist: emit('error', 'error' : 'remoteError', 'remote' : { 'error' : 'entryNotFound' })
 Remote.prototype.request_ripple_balance = function (account, issuer, currency, current) {
-  var request       = this.request_ledger_entry('ripple_state');          // YYY Could be cached per ledger.
+  var request = this.request_ledger_entry('ripple_state');          // YYY Could be cached per ledger.
 
   return request
     .ripple_state(account, issuer, currency)
