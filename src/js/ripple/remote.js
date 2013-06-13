@@ -58,7 +58,9 @@ util.inherits(Request, EventEmitter);
 
 // Send the request to a remote.
 Request.prototype.request = function(remote) {
-  if (!this.requested) {
+  if (!this.remote._connected) {
+    this.remote._offline_queue.push(this);
+  } else if (!this.requested) {
     this.requested  = true;
     this.remote.request(this);
     this.emit('request', remote);
@@ -253,39 +255,72 @@ Request.prototype.books = function(books, snapshot) {
   return this;
 };
 
-//------------------------------------------------------------------------------
+
 /**
     Interface to manage the connection to a Ripple server.
-
     This implementation uses WebSockets.
 
-    Keys for opts:
+    Configuration options:
 
-      trusted            : truthy, if remote is trusted
-      websocket_ip
-      websocket_port
-      websocket_ssl
-      trace
-      maxListeners
+      + `trusted`  {Boolean}
+        if remote is trusted
+
+      + `trace` {Boolean}
+
+      + `maxListeners` {Number}
+          set maxListeners for EventEmitters to prevent
+          leak warnings. set to 0 for infinite
+
+      + `servers` {Array}
+          list of remote servers to use. each entry
+          has the form:
+
+            {
+              host:    <hostname>
+              port:    <port>
+              secure:  <use SSL>
+            }
 
     Events:
-      'connect'
-      'connected' (DEPRECATED)
-      'disconnect'
-      'disconnected' (DEPRECATED)
-      'state':
-      - 'online'        : Connected and subscribed.
-      - 'offline'       : Not subscribed or not connected.
-      'subscribed'      : This indicates stand-alone is available.
+
+      + 'connect' 
+          at least one server has connected. the remote
+          is ready to begin processing requests
+
+      + 'connected' (DEPRECATED)
+
+      + 'disconnect'
+          there are no more available servers. the
+          remote is unprepared to process requests
+
+      + 'disconnected' (DEPRECATED)
+
+      + 'state'
+          either 'online' or 'offline'
+
+      + 'online'
+          connected and subscribed
+
+      + 'offline'
+          not subscribed or not connected
+
+      + 'subscribed'
+          this indicates stand-alone is available
 
     Server events:
-      'ledger_closed'   : A good indicate of ready to serve.
-      'transaction'     : Transactions we receive based on current subscriptions.
-      'transaction_all' : Listening triggers a subscribe to all transactions
-                          globally in the network.
 
-    @param opts      Connection options.
-    @param trace
+      + 'ledger_closed'
+          a good indicate of ready to serve
+
+      + 'transaction'
+          transactions we receive based on current subscriptions
+
+      + 'transaction_all'
+          listening triggers a subscribe to all transactions
+          globally in the network
+
+    @param {Object} opts Connection options.
+    @param {Boolean} trace
 */
 
 var Remote = function(opts, trace) {
@@ -308,10 +343,12 @@ var Remote = function(opts, trace) {
   this._testnet               = void(0);
   this._transaction_subs      = 0;
   this.online_target          = false;
+  this._connected             = false;
   this._online_state          = 'closed';         // 'open', 'closed', 'connecting', 'closing'
   this.state                  = 'offline';        // 'online', 'offline'
   this.retry_timer            = void(0);
   this.retry                  = void(0);
+  this._offline_queue         = [ ];
 
   this._load_base             = 256;
   this._load_factor           = 1.0;
@@ -404,6 +441,14 @@ var Remote = function(opts, trace) {
       }
     }
   });
+
+  this.once('connect', function offlineQueueListener() {
+    var offline_queue = self._offline_queue;
+    var request;
+    while (request = offline_queue.shift()) {
+      request.request();
+    }
+  });
 };
 
 util.inherits(Remote, EventEmitter);
@@ -490,7 +535,9 @@ Remote.prototype.server_fatal = function() {
 
 // Set the emitted state: 'online' or 'offline'
 Remote.prototype._set_state = function(state) {
-  if (this.trace) console.log('remote: set_state: %s', state);
+  if (this.trace) {
+    console.log('remote: set_state: %s', state);
+  }
 
   if (this.state !== state) {
     this.state = state;
@@ -499,13 +546,15 @@ Remote.prototype._set_state = function(state) {
 
     switch (state) {
       case 'online':
-        this._online_state       = 'open';
+        this._online_state = 'open';
+        this._connected    = true;
         this.emit('connect');
         this.emit('connected');
         break;
 
       case 'offline':
-        this._online_state       = 'closed';
+        this._online_state = 'closed';
+        this._connected    = false;
         this.emit('disconnect');
         this.emit('disconnected');
         break;
@@ -522,7 +571,13 @@ Remote.prototype.set_trace = function(trace) {
 /**
  * Connect to the Ripple network.
  */
-Remote.prototype.connect = function(online) {
+Remote.prototype.connect = function(online, callback) {
+  if (typeof online === 'function') {
+    callback = online;
+    online   = void(0);
+    this.once('connect', callback);
+  }
+
   // Downwards compatibility
   if (typeof online !== 'undefined' && !online) {
     this.disconnect();
@@ -535,6 +590,7 @@ Remote.prototype.connect = function(online) {
       }
     }
   }
+
   return this;
 };
 
@@ -697,15 +753,11 @@ Remote.prototype._get_server = function() {
 // Send a request.
 // <-> request: what to send, consumed.
 Remote.prototype.request = function(request) {
-  if (!this._servers.length) {
-      request.emit('error', new Error('No servers available'));
+  var server = this._get_server();
+  if (server) {
+    server.request(request);
   } else {
-    var server = this._get_server();
-    if (server) {
-      server.request(request);
-    } else {
-      request.emit('error', new Error('No servers availale'));
-    }
+    request.emit('error', new Error('No servers availale'));
   }
 };
 
@@ -751,7 +803,7 @@ Remote.prototype.request_ledger = function(ledger, opts, callback) {
     request.message.full    = true;
   }
 
-  return request.callback(callback);;
+  return request.callback(callback);
 };
 
 // Only for unit testing.
@@ -787,7 +839,8 @@ Remote.prototype.request_ledger_entry = function(type, callback) {
   // If not found, listen, cache result, and emit it.
   //
   // Transparent caching:
-  if ('account_root' === type) {
+
+  if (type === 'account_root') {
     request.request_default = request.request;
 
     request.request         = function() {                        // Intercept default request.
@@ -804,7 +857,7 @@ Remote.prototype.request_ledger_entry = function(type, callback) {
       }
       // else if (req.ledger_index)
       // else if ('ripple_state' === request.type)         // YYY Could be cached per ledger.
-      else if ('account_root' === type) {
+      else if (type === 'account_root') {
         var cache = self.ledgers.current.account_root;
 
         if (!cache) {
@@ -857,10 +910,7 @@ Remote.prototype.request_subscribe = function(streams, callback) {
   var request = new Request(this, 'subscribe');
 
   if (streams) {
-    if ('object' !== typeof streams) {
-      streams = [streams];
-    }
-    request.message.streams = streams;
+    request.message.streams = Array.isArray(streams) ? streams : [ streams ];
   }
 
   return request.callback(callback);
@@ -870,10 +920,7 @@ Remote.prototype.request_unsubscribe = function(streams, callback) {
   var request = new Request(this, 'unsubscribe');
 
   if (streams) {
-    if ('object' !== typeof streams) {
-      streams = [streams];
-    }
-    request.message.streams = streams;
+    request.message.streams = Array.isArray(streams) ? streams : [ streams ];
   }
 
   return request.callback(callback);
@@ -885,7 +932,7 @@ Remote.prototype.request_unsubscribe = function(streams, callback) {
 Remote.prototype.request_transaction_entry = function(hash, callback) {
   //utils.assert(this.trusted);   // If not trusted, need to check proof, maybe talk packet protocol.
 
-  return (new Request(this, 'transaction_entry', callback)).tx_hash(hash);
+  return (new Request(this, 'transaction_entry')).tx_hash(hash).callback(callback);
 };
 
 // DEPRECATED: use request_transaction_entry
