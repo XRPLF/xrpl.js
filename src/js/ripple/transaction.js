@@ -588,8 +588,9 @@ Transaction.prototype.offer_cancel = function (src, sequence) {
 
 // Options:
 //  .set_flags()
-// --> expiration : Date or Number
-Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expiration) {
+// --> expiration : if not undefined, Date or Number
+// --> cancel_sequence : if not undefined, Sequence
+Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expiration, cancel_sequence) {
   this._secret                  = this._account_secret(src);
   this.tx_json.TransactionType  = 'OfferCreate';
   this.tx_json.Account          = UInt160.json_rewrite(src);
@@ -604,6 +605,9 @@ Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expi
     this.tx_json.Expiration  = Date === expiration.constructor
                                     ? expiration.getTime()
                                     : Number(expiration);
+
+  if (cancel_sequence)
+    this.tx_json.OfferSequence    = Number(cancel_sequence);
 
   return this;
 };
