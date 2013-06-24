@@ -1390,7 +1390,7 @@ Remote.prototype.request_ripple_path_find = function(src_account, dst_account, d
   request.message.destination_account = UInt160.json_rewrite(opts.dst_account);
   request.message.destination_amount  = Amount.json_rewrite(opts.dst_amount);
 
-  if (source_currencies) {
+  if (opts.src_currencies) {
     request.message.source_currencies = opts.src_currencies.map(function(ci) {
       var ci_new  = {};
 
