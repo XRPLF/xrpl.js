@@ -1380,7 +1380,7 @@ Remote.prototype.request_ripple_path_find = function(src_account, dst_account, d
   } else {
     opts.src_account    = src_account;
     opts.dst_account    = dst_account;
-    opts.dst_ammount    = dst_amount;
+    opts.dst_amount     = dst_amount;
     opts.src_currencies = src_currencies;
   }
 
