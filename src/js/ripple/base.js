@@ -64,6 +64,8 @@ Base.encode = function (input, alpha) {
 // --> input: String
 // <-- array of bytes or undefined.
 Base.decode = function (input, alpha) {
+  if ("string" !== typeof input) return undefined;
+
   var alphabet	= alphabets[alpha || 'ripple'];
   var bi_base	= new BigInteger(String(alphabet.length));
   var bi_value	= nbi();
@@ -105,6 +107,17 @@ Base.decode = function (input, alpha) {
   return [].concat(utils.arraySet(zeros, 0), bytes);
 };
 
+Base.verify_checksum = function (bytes) {
+  var computed	= sha256hash(bytes.slice(0, -4)).slice(0, 4);
+  var checksum	= bytes.slice(-4);
+
+  for (var i = 0; i < 4; i++)
+    if (computed[i] !== checksum[i])
+      return false;
+
+  return true;
+};
+
 // --> input: Array
 // <-- String
 Base.encode_check = function (version, input, alphabet) {
@@ -119,16 +132,24 @@ Base.encode_check = function (version, input, alphabet) {
 Base.decode_check = function (version, input, alphabet) {
   var buffer = Base.decode(input, alphabet);
 
-  if (!buffer || buffer[0] !== version || buffer.length < 5)
+  if (!buffer || buffer.length < 5)
     return NaN;
 
-  var computed	= sha256hash(buffer.slice(0, -4)).slice(0, 4);
-  var checksum	= buffer.slice(-4);
-  var i;
+  // Single valid version
+  if ("number" === typeof version && buffer[0] !== version)
+    return NaN;
 
-  for (i = 0; i != 4; i += 1)
-    if (computed[i] !== checksum[i])
-      return NaN;
+  // Multiple allowed versions
+  if ("object" === typeof version && Array.isArray(version)) {
+    var match = false;
+    for (var i = 0, l = version.length; i < l; i++) {
+      match |= version[i] === buffer[0];
+    }
+    if (!match) return NaN;
+  }
+
+  if (!Base.verify_checksum(buffer))
+    return NaN;
 
   // We'll use the version byte to add a leading zero, this ensures JSBN doesn't
   // intrepret the value as a negative number
