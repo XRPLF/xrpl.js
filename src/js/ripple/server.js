@@ -1,6 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
 var util         = require('util');
-var WebSocket    = require('ws');
 var utils        = require('./utils');
 
 /**
@@ -97,6 +96,9 @@ Server.prototype.connect = function() {
     this._ws.close();
   }
 
+  // We require this late, because websocket shims may be loaded after
+  // ripple-lib.
+  var WebSocket = require('ws');
   var ws = this._ws = new WebSocket(this._opts.url);
 
   this._should_connect = true;
