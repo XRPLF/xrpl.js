@@ -1274,44 +1274,23 @@ Remote.prototype.request_ripple_balance = function (account, issuer, currency, c
     });
 };
 
-Remote.prototype.request_ripple_path_find = function (src_account, dst_account, dst_amount, source_currencies) {
+Remote.prototype.request_ripple_path_find = function (src_account, dst_account, dst_amount, src_currencies) {
   var self    = this;
-<<<<<<< HEAD
-
-  var opts = { };
-
-  if (typeof src_account === 'object') {
-    opts = src_account;
-  } else {
-    opts.src_account    = src_account;
-    opts.dst_account    = dst_account;
-    opts.dst_amount     = dst_amount;
-    opts.src_currencies = src_currencies;
-  }
-
-=======
->>>>>>> parent of c2b03e9... Support callback style
   var request = new Request(this, 'ripple_path_find');
 
   request.message.source_account      = UInt160.json_rewrite(src_account);
   request.message.destination_account = UInt160.json_rewrite(dst_account);
   request.message.destination_amount  = Amount.json_rewrite(dst_amount);
 
-<<<<<<< HEAD
-  if (opts.src_currencies) {
-    request.message.source_currencies = opts.src_currencies.map(function(ci) {
-=======
   if (source_currencies) {
     request.message.source_currencies   = source_currencies.map(function (ci) {
->>>>>>> parent of c2b03e9... Support callback style
       var ci_new  = {};
 
-      if ('issuer' in ci) {
+      if ('issuer' in ci)
         ci_new.issuer   = UInt160.json_rewrite(ci.issuer);
-      }
-      if ('currency' in ci) {
+
+      if ('currency' in ci)
         ci_new.currency = Currency.json_rewrite(ci.currency);
-      }
 
       return ci_new;
     });
