@@ -358,13 +358,28 @@ var Remote = function (opts, trace) {
 
   var server = new Server (this, {url: url})
 
-  if ('maxListeners' in opts) {
-    // This is used to remove Emitter warnings
-    server.setMaxListeners (opts.maxListeners) 
-    this.setMaxListeners (opts.maxListeners)
+  if (!('servers' in opts)) {
+    opts.servers = [ 
+      {
+        host:     opts.websocket_ip,
+        port:     opts.websocket_port,
+        secure:   opts.websocket_ssl,
+        trusted:  opts.trusted
+      }
+    ]
   }
 
-  this.add_server(server)
+  opts.servers.forEach(function(server) {
+    var i = Number(server.pool) || 1;
+    while (i--) { self.add_server(server); }
+  });
+
+  if ('maxListeners' in opts) {
+    // This is used to remove Emitter warnings
+    opts.servers.concat(this).forEach(function(emitter) {
+      emitter.setMaxListeners(opts.maxListeners);
+    });
+  }
 
   this.on('newListener', function (type, listener) {
     if ('transaction_all' === type) {
@@ -428,8 +443,15 @@ var isTefFailure = function (engine_result_code) {
   return (engine_result_code >= -299 && engine_result_code <  199);
 };
 
-Remote.prototype.add_server = function (server) {
+Remote.prototype.add_server = function (opts) {
   var self = this;
+
+  var url  = (opts.secure || opts.websocket_ssl) ? 'wss://' : 'ws://'
+  + (opts.host || opts.websocket_ip) + ':'
+  + (opts.port || opts.websocket_port)
+  ;
+
+  var server = new Server(this, {url: url})
 
   server.on('message', function (data) {
     self._handle_message(data);
