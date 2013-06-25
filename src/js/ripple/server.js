@@ -158,8 +158,7 @@ Server.prototype.connect = function() {
     self._set_state('offline');
 
     // Prevent additional events from this socket
-    ws.removeAllListeners();
-    ws.on('error', function() {});
+    ws.onopen = ws.onerror = ws.onclose = ws.onmessage = function () {}; 
 
     // Should we be connected?
     if (!self._should_connect) return;
