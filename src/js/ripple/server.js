@@ -1,8 +1,7 @@
-var EventEmitter = require('events').EventEmitter;
-var util         = require('util');
-var WebSocket    = require('ws');
+var EventEmitter  = require('events').EventEmitter;
+var util          = require('util');
 
-var utils        = require('./utils');
+var utils         = require('./utils');
 
 //------------------------------------------------------------------------------
 /**
@@ -20,7 +19,7 @@ var Server = function (remote, cfg) {
   EventEmitter.call(this);
 
 
-  if (typeof cfg !== 'object' || typeof cfg.url !== 'string') {
+  if ('object' !== typeof cfg || 'string' !== typeof cfg.url) {
     throw new Error('Invalid server configuration.');
   }
 
@@ -82,15 +81,12 @@ Server.prototype.connect = function () {
   // we will automatically reconnect.
   if (this._connected === true) return;
 
-  if (this._remote.trace) {
-    console.log('server: connect: %s', this._cfg.url);
-  }
+  if (this._remote.trace) console.log('server: connect: %s', this._cfg.url);
 
   // Ensure any existing socket is given the command to close first.
-  if (this._ws) {
-    this._ws.close();
-  }
+  if (this._ws) this._ws.close();
 
+  var WebSocket = require('ws');
   var ws = this._ws = new WebSocket(this._cfg.url);
 
   this._should_connect = true;
@@ -112,9 +108,7 @@ Server.prototype.connect = function () {
     // If we are no longer the active socket, simply ignore any event
     if (ws !== self._ws) return;
 
-    if (self._remote.trace) {
-      console.log('server: onerror: %s', e.data || e);
-    }
+    if (self._remote.trace) console.log('server: onerror: %s', e.data || e);
 
     // Most connection errors for WebSockets are conveyed as 'close' events with
     // code 1006. This is done for security purposes and therefore unlikely to
@@ -138,9 +132,7 @@ Server.prototype.connect = function () {
     // If we are no longer the active socket, simply ignore any event
     if (ws !== self._ws) return;
 
-    if (self._remote.trace) {
-      console.log('server: onclose: %s', ws.readyState);
-    }
+    if (self._remote.trace) console.log('server: onclose: %s', ws.readyState);
 
     handleConnectionClose();
   };
@@ -150,17 +142,16 @@ Server.prototype.connect = function () {
     self._set_state('offline');
 
     // Prevent additional events from this socket
-    ws.removeAllListeners();
-    ws.on('error', function() {});
+    ws.onopen = ws.onerror = ws.onclose = ws.onmessage = function () {};
 
     // Should we be connected?
     if (!self._should_connect) return;
 
     // Delay and retry.
-    self._retry += 1;
-
+    self._retry      += 1;
     self._retry_timer = setTimeout(function () {
       if (self._remote.trace) console.log('server: retry');
+
       if (!self._should_connect) return;
       self.connect();
     }, self._retry < 40
@@ -170,7 +161,7 @@ Server.prototype.connect = function () {
           : self._retry < 40+60+60
             ? 10*1000       // Then, for 10 minutes: once every 10 seconds
             : 30*1000);     // Then: once every 30 seconds
-  };
+  }
 
   ws.onmessage = function (msg) {
     self.emit('message', msg.data);
