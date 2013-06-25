@@ -50,26 +50,39 @@ var Server = function (remote, opts) {
 
 util.inherits(Server, EventEmitter);
 
-function to_set(list) {
-  var result = { };
-  for (var i=0; i<list.length; i++) {
-    result[list[i]] = true;
-  }
-  return result;
-}
 /**
  * Server states that we will treat as the server being online.
  *
  * Our requirements are that the server can process transactions and notify
  * us of changes.
  */
-Server.online_states = to_set([
-  'syncing',
-  'tracking',
-  'proposing',
-  'validating',
-  'full'
-]);
+Server.online_states = [
+    'syncing'
+  , 'tracking'
+  , 'proposing'
+  , 'validating'
+  , 'full'
+];
+
+Server.prototype._is_online = function (status) {
+  return Server.online_states.indexOf(status) !== -1;
+};
+
+Server.prototype._set_state = function (state) {
+  if (state !== this._state) {
+    this._state = state;
+
+    this.emit('state', state);
+
+    if (state === 'online') {
+      this._connected = true;
+      this.emit('connect');
+    } else if (state === 'offline') {
+      this._connected = false;
+      this.emit('disconnect');
+    }
+  }
+};
 
 Server.prototype.connect = function () {
   var self = this;
@@ -172,8 +185,8 @@ Server.prototype.connect = function () {
 Server.prototype.disconnect = function () {
   this._should_connect = false;
   this._set_state('offline');
-  if (this.ws) {
-    this.ws.close();
+  if (this._ws) {
+    this._ws.close();
   }
 };
 
@@ -215,22 +228,6 @@ Server.prototype.request = function (request) {
   }
 };
 
-Server.prototype._set_state = function (state) {
-  if (state !== this._state) {
-    this._state = state;
-
-    this.emit('state', state);
-
-    if (state === 'online') {
-      this._connected = true;
-      this.emit('connect');
-    } else if (state === 'offline') {
-      this._connected = false;
-      this.emit('disconnect');
-    }
-  }
-};
-
 Server.prototype._handle_message = function (json) {
   var self = this;
 
@@ -261,7 +258,7 @@ Server.prototype._handle_message = function (json) {
     }
   } else if (message.type === 'serverStatus') {
     // This message is only received when online. As we are connected, it is the definative final state.
-    self._set_state(Server.online_states[message.server_status] ? 'online' : 'offline');
+    self._set_state(self._is_online(message.server_status) ? 'online' : 'offline');
   }
 };
 
@@ -270,7 +267,7 @@ Server.prototype._handle_response_subscribe = function (message) {
 
   self._server_status = message.server_status;
 
-  if (Server.online_states[message.server_status]) {
+  if (self._is_online(message.server_status)) {
     self._set_state('online');
   }
 };
