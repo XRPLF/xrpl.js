@@ -103,6 +103,7 @@ Request.prototype.ledger_select = function (ledger_spec) {
     case 'verified':
       this.message.ledger_index = ledger_spec;
       break;
+
     default:
       // XXX Better test needed
       if (String(ledger_spec).length > 12) {
@@ -110,6 +111,7 @@ Request.prototype.ledger_select = function (ledger_spec) {
       } else {
         this.message.ledger_index  = ledger_spec;
       }
+      break;
   }
 
   return this;
@@ -185,15 +187,15 @@ Request.prototype.ripple_state = function (account, issuer, currency) {
 };
 
 Request.prototype.accounts = function (accounts, realtime) {
-  if (typeof accounts !== 'object') {
-    accounts = [accounts];
+  if (!Array.isArray(accounts)) {
+    accounts = [ accounts ];
   }
 
   // Process accounts parameters
-  var procAccounts = [];
-  for (var i = 0, l = accounts.length; i < l; i++) {
-    procAccounts.push(UInt160.json_rewrite(accounts[i]));
-  }
+  var procAccounts = accounts.map(function(account) {
+    return UInt160.json_rewrite(account);
+  });
+  
   if (realtime) {
     this.message.rt_accounts = procAccounts;
   } else {
@@ -280,38 +282,38 @@ var Remote = function (opts, trace) {
 
   var self  = this;
 
-  this.trusted                = opts.trusted;
-  this.websocket_ip           = opts.websocket_ip;
-  this.websocket_port         = opts.websocket_port;
-  this.websocket_ssl          = opts.websocket_ssl;
-  this.local_sequence         = opts.local_sequence; // Locally track sequence numbers
-  this.local_fee              = opts.local_fee;      // Locally set fees
-  this.local_signing          = ('undefined' === typeof opts.local_signing)
+  this.trusted               = opts.trusted;
+  this.local_sequence        = opts.local_sequence; // Locally track sequence numbers
+  this.local_fee             = opts.local_fee;      // Locally set fees
+  this.local_signing         = ('undefined' === typeof opts.local_signing)
                                 ? true : opts.local_signing;
-  this.id                     = 0;
-  this.trace                  = opts.trace || trace;
-  this._server_fatal          = false;              // True, if we know server exited.
-  this._ledger_current_index  = void(0);
-  this._ledger_hash           = void(0);
-  this._ledger_time           = void(0);
-  this._stand_alone           = void(0);
-  this._testnet               = void(0);
-  this._transaction_subs      = 0;
-  this.online_target          = false;
-  this._online_state          = 'closed';         // 'open', 'closed', 'connecting', 'closing'
-  this.state                  = 'offline';        // 'online', 'offline'
-  this.retry_timer            = void(0);
-  this.retry                  = void(0);
 
-  this._load_base             = 256;
-  this._load_factor           = 1.0;
-  this._fee_ref               = void(0);
-  this._fee_base              = void(0);
-  this._reserve_base          = void(0);
-  this._reserve_inc           = void(0);
-  this._connection_count      = 0;
+  this.id                    = 0;
+  this.trace                 = opts.trace || trace;
+  this._server_fatal         = false;              // True, if we know server exited.
+  this._ledger_current_index = void(0);
+  this._ledger_hash          = void(0);
+  this._ledger_time          = void(0);
+  this._stand_alone          = void(0);
+  this._testnet              = void(0);
+  this._transaction_subs     = 0;
+  this.online_target         = false;
+  this._online_state         = 'closed';         // 'open', 'closed', 'connecting', 'closing'
+  this.state                 = 'offline';        // 'online', 'offline'
+  this.retry_timer           = void(0);
+  this.retry                 = void(0);
 
-  this._last_tx               = null;
+  this._load_base            = 256;
+  this._load_factor          = 1.0;
+  this._fee_ref              = void(0);
+  this._fee_base             = void(0);
+  this._reserve_base         = void(0);
+  this._reserve_inc          = void(0);
+  this._connection_count     = 0;
+  this._connected            = false;
+
+
+  this._last_tx              = null;
 
   // Local signing implies local fees and sequences
   if (this.local_signing) {
@@ -328,7 +330,6 @@ var Remote = function (opts, trace) {
     // Otherwise, clear it to have it automatically refreshed from the network.
 
     // account : { seq : __ }
-
   };
 
   // Hash map of Account objects by AccountId.
@@ -351,12 +352,6 @@ var Remote = function (opts, trace) {
       'account_root' : {}
     }
   };
-
-  // XXX Add support for multiple servers
-  var url  = (this.websocket_ssl ? 'wss://' : 'ws://') +
-  this.websocket_ip + ':' + this.websocket_port;
-
-  var server = new Server (this, {url: url})
 
   if (!('servers' in opts)) {
     opts.servers = [ 
@@ -383,21 +378,18 @@ var Remote = function (opts, trace) {
 
   this.on('newListener', function (type, listener) {
     if ('transaction_all' === type) {
-      if (!self._transaction_subs && 'open' === self._online_state) {
-        self.request_subscribe([ 'transactions' ])
-        .request();
+      if (!self._transaction_subs && self._connected) {
+        self.request_subscribe('transactions').request();
       }
-      self._transaction_subs  += 1;
+      self._transaction_subs += 1;
     }
   });
 
   this.on('removeListener', function (type, listener) {
     if ('transaction_all' === type) {
       self._transaction_subs  -= 1;
-
-      if (!self._transaction_subs && 'open' === self._online_state) {
-        self.request_unsubscribe([ 'transactions' ])
-        .request();
+      if (!self._transaction_subs && self._connected) {
+        self.request_unsubscribe('transactions').request();
       }
     }
   });
@@ -490,13 +482,15 @@ Remote.prototype._set_state = function (state) {
 
     switch (state) {
       case 'online':
-        this._online_state       = 'open';
+        this._online_state      = 'open';
+        this._connected         = true;
         this.emit('connect');
         this.emit('connected');
         break;
 
       case 'offline':
-        this._online_state       = 'closed';
+        this._online_state      = 'closed';
+        this._connected         = false;
         this.emit('disconnect');
         this.emit('disconnected');
         break;
@@ -637,9 +631,9 @@ Remote.prototype._handle_message = function (json) {
     console.log('unexpected message from trusted remote: %s', json);
 
     (request || this).emit('error', {
-        'error' : 'remoteUnexpected',
-        'error_message' : 'Unexpected response from remote.'
-      });
+      'error' : 'remoteUnexpected',
+      'error_message' : 'Unexpected response from remote.'
+    });
   }
 };
 
@@ -1037,17 +1031,14 @@ Remote.prototype._server_prepare_subscribe = function ()
 // A good way to be notified of the result of this is:
 //    remote.once('ledger_closed', function (ledger_closed, ledger_index) { ... } );
 Remote.prototype.ledger_accept = function () {
-  if (this._stand_alone || undefined === this._stand_alone)
-  {
+  if (this._stand_alone || undefined === this._stand_alone) {
     var request = new Request(this, 'ledger_accept');
-
-    request
-      .request();
+    request .request();
   }
   else {
     this.emit('error', {
-        'error' : 'notStandAlone'
-      });
+      'error' : 'notStandAlone'
+    });
   }
 
   return this;
@@ -1135,16 +1126,14 @@ Remote.prototype.account_seq = function (account, advance) {
   var account_info  = this.accounts[account];
   var seq;
 
-  if (account_info && account_info.seq)
-  {
+  if (account_info && account_info.seq) {
     seq = account_info.seq;
 
     if (advance === 'ADVANCE') account_info.seq += 1;
     if (advance === 'REWIND') account_info.seq -= 1;
 
     // console.log('cached: %s current=%d next=%d', account, seq, account_info.seq);
-  }
-  else {
+  } else {
     // console.log('uncached: %s', account);
   }
 
