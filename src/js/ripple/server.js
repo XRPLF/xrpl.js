@@ -6,9 +6,6 @@ var utils        = require('./utils');
 /**
  * Server
  *
- * Options must contain `url` to 
- * WebSocket server
- *
  * @constructor
  * @param {Object} remote
  * @param {Object} opts
@@ -53,7 +50,6 @@ util.inherits(Server, EventEmitter);
  * Our requirements are that the server can process transactions and notify
  * us of changes.
  */
-
 Server.online_states = [ 
     'syncing'
   , 'tracking'
@@ -62,22 +58,9 @@ Server.online_states = [
   , 'full'
 ];
 
-/**
- * Determine if a server status qualifies
- * as 'online'
- *
- * @param {String} status
- * @return {Boolean}
- * @api private
- */
-
 Server.prototype.is_online = function(status) {
   return Server.online_states.indexOf(status) !== -1;
 };
-
-/**
- * Connect to WebSocket server
- */
 
 Server.prototype.connect = function() {
   var self = this;
@@ -183,12 +166,6 @@ Server.prototype.connect = function() {
   };
 };
 
-/**
- * Disconnect from WebSocket server
- *
- * @api public
- */
-
 Server.prototype.disconnect = function() {
   this._should_connect = false;
   this._set_state('offline');
@@ -196,13 +173,6 @@ Server.prototype.disconnect = function() {
     this._ws.close();
   }
 };
-
-/**
- * Send stringified message to WebSocket server
- *
- * @param {Object} message
- * @api private
- */
 
 Server.prototype.send = function(message) {
   if (this._ws) {
@@ -212,11 +182,7 @@ Server.prototype.send = function(message) {
 
 /**
  * Submit a Request object to this server.
- *
- * @param {Object} request
- * @api public
  */
-
 Server.prototype.request = function(request) {
   var self  = this;
 
@@ -251,18 +217,6 @@ Server.prototype.request = function(request) {
   }
 };
 
-/**
- * Set server state
- *
- * Examples:
- *  
- *  set_state('online')
- *  set_state('offline')
- *
- * @param {String} state
- * @api private
- */
-
 Server.prototype._set_state = function(state) {
   if (state !== this._state) {
     this._state = state;
@@ -278,13 +232,6 @@ Server.prototype._set_state = function(state) {
     }
   }
 };
-
-/**
- * Handle WebSocket message
- *
- * @param {String} json
- * @api private
- */
 
 Server.prototype._handle_message = function(json) {
   var self       = this;
@@ -342,13 +289,6 @@ Server.prototype._handle_message = function(json) {
     }
   }
 };
-
-/**
- * Handle subscribe response
- *
- * @param {Object} message
- * @api private
- */
 
 Server.prototype._handle_response_subscribe = function(message) {
   var self = this;
