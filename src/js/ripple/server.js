@@ -1,7 +1,6 @@
 var EventEmitter  = require('events').EventEmitter;
 var util          = require('util');
-
-var utils         = require('./utils');
+var utils        = require('./utils');
 
 //------------------------------------------------------------------------------
 /**
@@ -15,18 +14,18 @@ var utils         = require('./utils');
     @param  cfg       Configuration parameters.
 */
 
-var Server = function (remote, cfg) {
+var Server = function (remote, opts) {
   EventEmitter.call(this);
 
 
-  if ('object' !== typeof cfg || 'string' !== typeof cfg.url) {
+  if ('object' !== typeof opts || 'string' !== typeof opts.url) {
     throw new Error('Invalid server configuration.');
   }
 
   var self = this;
 
   this._remote         = remote;
-  this._cfg            = cfg;
+  this._opts           = opts;
 
   this._ws             = void(0);
   this._connected      = false;
@@ -86,8 +85,10 @@ Server.prototype.connect = function () {
   // Ensure any existing socket is given the command to close first.
   if (this._ws) this._ws.close();
 
+  // We require this late, because websocket shims may be loaded after
+  // ripple-lib.
   var WebSocket = require('ws');
-  var ws = this._ws = new WebSocket(this._cfg.url);
+  var ws = this._ws = new WebSocket(this._opts.url);
 
   this._should_connect = true;
 
