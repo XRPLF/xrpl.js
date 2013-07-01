@@ -12,6 +12,7 @@ var extend  = require('extend'),
 
 var amount  = require('./amount'),
     UInt160 = amount.UInt160,
+    UInt256 = require('./uint256').UInt256,
     Amount  = amount.Amount,
     Currency= amount.Currency;
 
@@ -109,8 +110,8 @@ var STHash128 = exports.Hash128 = new SerializedType({
 
 var STHash256 = exports.Hash256 = new SerializedType({
   serialize: function (so, val) {
-    // XXX
-    throw new Error("Serializing Hash256 not implemented");
+    var hash = UInt256.from_json(val);
+    this.serialize_hex(so, hash.to_hex());
   },
   parse: function (so) {
     // XXX
