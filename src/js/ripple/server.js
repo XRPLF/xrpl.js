@@ -93,7 +93,7 @@ Server.prototype.connect = function () {
   // we will automatically reconnect.
   if (this._connected === true) return;
 
-  if (this._remote.trace) console.log('server: connect: %s', this._cfg.url);
+  if (this._remote.trace) console.log('server: connect: %s', this._opts.url);
 
   // Ensure any existing socket is given the command to close first.
   if (this._ws) this._ws.close();
