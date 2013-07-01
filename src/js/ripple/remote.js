@@ -438,7 +438,7 @@ var isTefFailure = function (engine_result_code) {
 Remote.prototype.add_server = function (opts) {
   var self = this;
 
-  var url  = (opts.secure || opts.websocket_ssl) ? 'wss://' : 'ws://'
+  var url  = ((opts.secure || opts.websocket_ssl) ? 'wss://' : 'ws://')
   + (opts.host || opts.websocket_ip) + ':'
   + (opts.port || opts.websocket_port)
   ;
