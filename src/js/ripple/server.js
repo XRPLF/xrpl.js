@@ -1,24 +1,20 @@
-var EventEmitter  = require('events').EventEmitter;
-var util          = require('util');
+var EventEmitter = require('events').EventEmitter;
+var util         = require('util');
 var utils        = require('./utils');
 
-//------------------------------------------------------------------------------
 /**
-    Constructor
-
-    Keys for cfg:
-
-      url
-
-    @param  remote    The Remote object
-    @param  cfg       Configuration parameters.
-*/
+ *  @constructor Server
+ *  @param  remote    The Remote object
+ *  @param  cfg       Configuration parameters.
+ *
+ *  Keys for cfg:
+ *  url
+ */ 
 
 var Server = function (remote, opts) {
   EventEmitter.call(this);
 
-
-  if ('object' !== typeof opts || 'string' !== typeof opts.url) {
+  if (typeof opts !== 'object' || typeof opts.url !== 'string') {
     throw new Error('Invalid server configuration.');
   }
 
@@ -45,8 +41,6 @@ var Server = function (remote, opts) {
     self._handle_response_subscribe(message);
   });
 };
-
-//------------------------------------------------------------------------------
 
 util.inherits(Server, EventEmitter);
 
@@ -231,34 +225,44 @@ Server.prototype.request = function (request) {
 Server.prototype._handle_message = function (json) {
   var self = this;
 
-  var message = JSON.parse(json);
+  var message;
+  
+  try {
+    message = JSON.parse(json);
+  } catch(exception) { return; }
 
-  if (message.type === 'response') {
-    // A response to a request.
-    var request = self._requests[message.id];
+  switch(message.type) {
+    case 'response':
+      // A response to a request.
+      var request = self._requests[message.id];
 
-    delete self._requests[message.id];
+      delete self._requests[message.id];
 
-    if (!request) {
-      if (self._remote.trace) utils.logObject('server: UNEXPECTED: %s', message);
-    } else if ('success' === message.status) {
-      if (self._remote.trace) utils.logObject('server: response: %s', message);
+      if (!request) {
+        if (self._remote.trace) utils.logObject('server: UNEXPECTED: %s', message);
+      } else if ('success' === message.status) {
+        if (self._remote.trace) utils.logObject('server: response: %s', message);
 
-      request.emit('success', message.result);
-      self.emit('response_'+request.message.command, message.result, request, message);
-      self._remote.emit('response_'+request.message.command, message.result, request, message);
-    } else if (message.error) {
-      if (self._remote.trace) utils.logObject('server: error: %s', message);
+        request.emit('success', message.result);
 
-      request.emit('error', {
-        'error'         : 'remoteError',
-        'error_message' : 'Remote reported an error.',
-        'remote'        : message
-      });
-    }
-  } else if (message.type === 'serverStatus') {
-    // This message is only received when online. As we are connected, it is the definative final state.
-    self._set_state(self._is_online(message.server_status) ? 'online' : 'offline');
+        [ self, self._remote ].forEach(function(emitter) {
+          emitter.emit('response_' + request.message.command, message.result, request, message);
+        });
+      } else if (message.error) {
+        if (self._remote.trace) utils.logObject('server: error: %s', message);
+
+        request.emit('error', {
+          'error'         : 'remoteError',
+          'error_message' : 'Remote reported an error.',
+          'remote'        : message
+        });
+      }
+      break;
+
+    case 'serverStatus':
+      // This message is only received when online. As we are connected, it is the definative final state.
+      self._set_state(self._is_online(message.server_status) ? 'online' : 'offline');
+      break;
   }
 };
 

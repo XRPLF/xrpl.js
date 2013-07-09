@@ -72,43 +72,46 @@ var Transaction = function (remote) {
   this.remote       = remote;
   this._secret      = undefined;
   this._build_path  = false;
-  this.tx_json      = {                 // Transaction data.
-    'Flags' : 0,                        // XXX Would be nice if server did not require this.
+
+  // Transaction data.
+  this.tx_json = {
+    'Flags' : 0, // XXX Would be nice if server did not require this.
   };
+
   this.hash         = undefined;
   this.submit_index = undefined;        // ledger_current_index was this when transaction was submited.
   this.state        = undefined;        // Under construction.
   this.finalized    = false;
 
   this.on('success', function (message) {
-      if (message.engine_result) {
-        self.hash       = message.tx_json.hash;
+    if (message.engine_result) {
+      self.hash       = message.tx_json.hash;
 
-        self.set_state('client_proposed');
+      self.set_state('client_proposed');
 
-        self.emit('proposed', {
-            'tx_json'         : message.tx_json,
-            'result'          : message.engine_result,
-            'result_code'     : message.engine_result_code,
-            'result_message'  : message.engine_result_message,
-            'rejected'        : self.isRejected(message.engine_result_code),      // If server is honest, don't expect a final if rejected.
-          });
-      }
-    });
+      self.emit('proposed', {
+        'tx_json'         : message.tx_json,
+        'result'          : message.engine_result,
+        'result_code'     : message.engine_result_code,
+        'result_message'  : message.engine_result_message,
+        'rejected'        : self.isRejected(message.engine_result_code),      // If server is honest, don't expect a final if rejected.
+      });
+    }
+  });
 
   this.on('error', function (message) {
-        // Might want to give more detailed information.
-        self.set_state('remoteError');
-    });
+    // Might want to give more detailed information.
+    self.set_state('remoteError');
+  });
 };
 
 util.inherits(Transaction, EventEmitter);
 
 // XXX This needs to be determined from the network.
 Transaction.fees = {
-  'default'         : Amount.from_json("10"),
-  'nickname_create' : Amount.from_json("1000"),
-  'offer'           : Amount.from_json("10"),
+  'default'         : Amount.from_json('10'),
+  'nickname_create' : Amount.from_json('1000'),
+  'offer'           : Amount.from_json('10'),
 };
 
 Transaction.flags = {
@@ -194,11 +197,11 @@ Transaction.prototype.set_state = function (state) {
 Transaction.prototype.complete = function () {
   var tx_json = this.tx_json;
 
-  if (undefined === tx_json.Fee && this.remote.local_fee) {
-    tx_json.Fee    = Transaction.fees['default'].to_json();
+  if (tx_json.Fee === undefined && this.remote.local_fee) {
+    tx_json.Fee = Transaction.fees['default'].to_json();
   }
 
-  if (undefined === tx_json.SigningPubKey && (!this.remote || this.remote.local_signing)) {
+  if (tx_json.SigningPubKey === undefined && (!this.remote || this.remote.local_signing)) {
     var seed = Seed.from_json(this._secret);
     var key = seed.get_key(this.tx_json.Account);
     tx_json.SigningPubKey = key.to_hex_pub();
@@ -211,21 +214,26 @@ Transaction.prototype.serialize = function () {
 
 Transaction.prototype.signing_hash = function () {
   var prefix = config.testnet
-        ? Transaction.HASH_SIGN_TESTNET
-        : Transaction.HASH_SIGN;
+    ? Transaction.HASH_SIGN_TESTNET
+    : Transaction.HASH_SIGN;
 
   return SerializedObject.from_json(this.tx_json).signing_hash(prefix);
 };
 
 Transaction.prototype.sign = function () {
-  var seed = Seed.from_json(this._secret),
-      hash = this.signing_hash();
-
-  var key = seed.get_key(this.tx_json.Account),
-      sig = key.sign(hash, 0),
-      hex = sjcl.codec.hex.fromBits(sig).toUpperCase();
+  var seed = Seed.from_json(this._secret);
+  var hash = this.signing_hash();
+  var key  = seed.get_key(this.tx_json.Account);
+  var sig  = key.sign(hash, 0);
+  var hex  = sjcl.codec.hex.fromBits(sig).toUpperCase();
 
   this.tx_json.TxnSignature = hex;
+};
+
+Transaction.prototype._hasTransactionListeners = function() {
+  return this.listeners('final').length
+      || this.listeners('lost').length
+      || this.listeners('pending').length
 };
 
 // Submit a transaction to the network.
@@ -248,12 +256,11 @@ Transaction.prototype.submit = function (callback) {
 
   this.callback = callback;
 
-  if ('string' !== typeof tx_json.Account)
-  {
+  if (typeof tx_json.Account !== 'string') {
     (this.callback || this.emit)('error', {
-        'error' : 'tejInvalidAccount',
-        'error_message' : 'Bad account.'
-      });
+      'error' :          'tejInvalidAccount',
+      'error_message' :  'Bad account.'
+    });
     return this;
   }
 
@@ -261,66 +268,62 @@ Transaction.prototype.submit = function (callback) {
 
   this.complete();
 
-  if (this.callback || this.listeners('final').length || this.listeners('lost').length || this.listeners('pending').length) {
+  if (this.callback || this._hasTransactionListeners()) {
     // There are listeners for callback, 'final', 'lost', or 'pending' arrange to emit them.
 
     this.submit_index = this.remote._ledger_current_index;
 
     // When a ledger closes, look for the result.
-    var on_ledger_closed = function (message) {
-        var ledger_hash   = message.ledger_hash;
-        var ledger_index  = message.ledger_index;
-        var stop          = false;
+    function on_ledger_closed(message) {
+      var ledger_hash   = message.ledger_hash;
+      var ledger_index  = message.ledger_index;
+      var stop          = false;
 
-// XXX make sure self.hash is available.
-        self.remote.request_transaction_entry(self.hash)
-          .ledger_hash(ledger_hash)
-          .on('success', function (message) {
-              if (self.finalized) return;
+      // XXX make sure self.hash is available.
+      var transaction_entry = self.remote.request_transaction_entry(self.hash)
+      transaction_entry.ledger_hash(ledger_hash)
+      transaction_entry.on('success', function (message) {
+        if (self.finalized) return;
+        self.set_state(message.metadata.TransactionResult);
+        self.remote.removeListener('ledger_closed', on_ledger_closed);
+        self.emit('final', message);
+        self.finalized = true;
+        if (self.callback) {
+          self.callback(message.metadata.TransactionResult, message);
+        }
+      });
+      transaction_entry.on('error', function (message) {
+        if (self.finalized) return;
 
-              self.set_state(message.metadata.TransactionResult);
-              self.remote.removeListener('ledger_closed', on_ledger_closed);
-              self.emit('final', message);
-              self.finalized = true;
+        if (message.error === 'remoteError' && message.remote.error === 'transactionNotFound') {
+          if (self.submit_index + SUBMIT_LOST < ledger_index) {
+            self.set_state('client_lost');        // Gave up.
+            self.emit('lost');
+            if (self.callback) {
+              self.callback('tejLost', message);
+            }
+            self.remote.removeListener('ledger_closed', on_ledger_closed);
+            self.emit('final', message);
+            self.finalized = true;
+          } else if (self.submit_index + SUBMIT_MISSING < ledger_index) {
+            self.set_state('client_missing');    // We don't know what happened to transaction, still might find.
+            self.emit('pending');
+          } else {
+            self.emit('pending');
+          }
+        }
+        // XXX Could log other unexpectedness.
+      });
 
-              if (self.callback)
-                self.callback(message.metadata.TransactionResult, message);
-            })
-          .on('error', function (message) {
-              if (self.finalized) return;
-
-              if ('remoteError' === message.error
-                && 'transactionNotFound' === message.remote.error) {
-                if (self.submit_index + SUBMIT_LOST < ledger_index) {
-                  self.set_state('client_lost');        // Gave up.
-                  self.emit('lost');
-
-                  if (self.callback)
-                    self.callback('tejLost', message);
-
-                  self.remote.removeListener('ledger_closed', on_ledger_closed);
-                  self.emit('final', message);
-                  self.finalized = true;
-                }
-                else if (self.submit_index + SUBMIT_MISSING < ledger_index) {
-                  self.set_state('client_missing');    // We don't know what happened to transaction, still might find.
-                  self.emit('pending');
-                }
-                else {
-                  self.emit('pending');
-                }
-              }
-              // XXX Could log other unexpectedness.
-            })
-          .request();
-      };
+      transaction_entry.request();
+    };
 
     this.remote.on('ledger_closed', on_ledger_closed);
 
     if (this.callback) {
-      this.on('error', function (message) {
-          self.callback(message.error, message);
-        });
+      this.once('error', function (message) {
+        self.callback(message.error, message);
+      });
     }
   }
 
@@ -332,69 +335,70 @@ Transaction.prototype.submit = function (callback) {
 
     if (!self.tx_json.Sequence) {
       // Look in the last closed ledger.
-      this.remote.account_seq_cache(self.tx_json.Account, false)
+      var account_seq = this.remote.account_seq_cache(self.tx_json.Account, false)
+
+      account_seq.on('success_account_seq_cache', function () {
+        // Try again.
+        self.submit();
+      })
+
+      account_seq.on('error_account_seq_cache', function (message) {
+        // XXX Maybe be smarter about this. Don't want to trust an untrusted server for this seq number.
+        // Look in the current ledger.
+        self.remote.account_seq_cache(self.tx_json.Account, 'CURRENT')
         .on('success_account_seq_cache', function () {
           // Try again.
           self.submit();
         })
         .on('error_account_seq_cache', function (message) {
-          // XXX Maybe be smarter about this. Don't want to trust an untrusted server for this seq number.
-
-          // Look in the current ledger.
-          self.remote.account_seq_cache(self.tx_json.Account, 'CURRENT')
-            .on('success_account_seq_cache', function () {
-              // Try again.
-              self.submit();
-            })
-            .on('error_account_seq_cache', function (message) {
-              // Forward errors.
-              self.emit('error', message);
-            })
-            .request();
+          // Forward errors.
+          self.emit('error', message);
         })
         .request();
+      })
+
+      account_seq.request();
+
       return this;
     }
 
     // If the transaction fails we want to either undo incrementing the sequence
     // or submit a noop transaction to consume the sequence remotely.
     this.on('success', function (res) {
-      if (!res || "string" !== typeof res.engine_result) return;
+      if (res && typeof res.engine_result === 'string') {
+        switch (res.engine_result.slice(0, 3)) {
+          // Synchronous local error
+          case 'tej':
+            self.remote.account_seq(self.tx_json.Account, 'REWIND');
+            break;
 
-      switch (res.engine_result.slice(0, 3)) {
-        // Synchronous local error
-        case 'tej':
-          self.remote.account_seq(self.tx_json.Account, 'REWIND');
-          break;
-        // XXX: What do we do in case of ter?
-        case 'tel':
-        case 'tem':
-        case 'tef':
-          // XXX Once we have a transaction submission manager class, we can
-          //     check if there are any other transactions pending. If there are,
-          //     we should submit a dummy transaction to ensure those
-          //     transactions are still valid.
-          //var noop = self.remote.transaction().account_set(self.tx_json.Account);
-          //noop.submit();
+          case 'ter':
+            // XXX: What do we do in case of ter?
+            break;
 
-          // XXX Hotfix. This only works if no other transactions are pending.
-          self.remote.account_seq(self.tx_json.Account, 'REWIND');
-          break;
+          case 'tel':
+          case 'tem':
+          case 'tef':
+            // XXX Once we have a transaction submission manager class, we can
+            //     check if there are any other transactions pending. If there are,
+            //     we should submit a dummy transaction to ensure those
+            //     transactions are still valid.
+            //var noop = self.remote.transaction().account_set(self.tx_json.Account);
+            //noop.submit();
+
+            // XXX Hotfix. This only works if no other transactions are pending.
+            self.remote.account_seq(self.tx_json.Account, 'REWIND');
+            break;
+        }
       }
     });
   }
 
   // Prepare request
-
   var request = this.remote.request_submit();
 
-  // Forward successes and errors.
-  request.on('success', function (message) {
-    self.emit('success', message);
-  });
-  request.on('error', function (message) {
-    self.emit('error', message);
-  });
+  // Forward events
+  request.emit = this.emit.bind(this);
 
   if (!this._secret && !this.tx_json.Signature) {
     this.emit('error', {
@@ -440,8 +444,9 @@ Transaction.prototype.build_path = function (build) {
 // tag should be undefined or a 32 bit integer.   
 // YYY Add range checking for tag.
 Transaction.prototype.destination_tag = function (tag) {
-  if (undefined !== tag)
-   this.tx_json.DestinationTag = tag;
+  if (tag !== undefined) {
+    this.tx_json.DestinationTag = tag;
+  }
 
   return this;
 }
@@ -491,8 +496,9 @@ Transaction.prototype.secret = function (secret) {
 }
 
 Transaction.prototype.send_max = function (send_max) {
-  if (send_max)
-      this.tx_json.SendMax = Amount.json_rewrite(send_max);
+  if (send_max) {
+    this.tx_json.SendMax = Amount.json_rewrite(send_max);
+  }
 
   return this;
 }
@@ -500,8 +506,9 @@ Transaction.prototype.send_max = function (send_max) {
 // tag should be undefined or a 32 bit integer.   
 // YYY Add range checking for tag.
 Transaction.prototype.source_tag = function (tag) {
-  if (undefined !== tag)
-   this.tx_json.SourceTag = tag;
+  if (tag) {
+    this.tx_json.SourceTag = tag;
+  }
 
   return this;
 }
@@ -510,8 +517,9 @@ Transaction.prototype.source_tag = function (tag) {
 Transaction.prototype.transfer_rate = function (rate) {
   this.tx_json.TransferRate = Number(rate);
 
-  if (this.tx_json.TransferRate < 1e9)
-    throw 'invalidTransferRate';
+  if (this.tx_json.TransferRate < 1e9) {
+    throw new Error('invalidTransferRate');
+  }
 
   return this;
 }
@@ -520,24 +528,26 @@ Transaction.prototype.transfer_rate = function (rate) {
 // --> flags: undefined, _flag_, or [ _flags_ ]
 Transaction.prototype.set_flags = function (flags) {
   if (flags) {
-      var transaction_flags = Transaction.flags[this.tx_json.TransactionType];
+    var transaction_flags = Transaction.flags[this.tx_json.TransactionType];
 
-      if (undefined == this.tx_json.Flags)      // We plan to not define this field on new Transaction.
-        this.tx_json.Flags        = 0;
+    // We plan to not define this field on new Transaction.
+    if (this.tx_json.Flags === undefined) {
+      this.tx_json.Flags = 0;
+    }
 
-      var flag_set = 'object' === typeof flags ? flags : [ flags ];
+    var flag_set = Array.isArray(flags) ? flags : [ flags ];
 
-      for (var index in flag_set) {
-        if (!flag_set.hasOwnProperty(index)) continue;
+    for (var index in flag_set) {
+      if (!flag_set.hasOwnProperty(index)) continue;
 
-        var flag = flag_set[index];
+      var flag = flag_set[index];
 
-        if (flag in transaction_flags) {
-          this.tx_json.Flags += transaction_flags[flag];
-        } else {
-          // XXX Immediately report an error or mark it.
-        }
+      if (flag in transaction_flags) {
+        this.tx_json.Flags += transaction_flags[flag];
+      } else {
+        // XXX Immediately report an error or mark it.
       }
+    }
   }
 
   return this;
@@ -598,16 +608,18 @@ Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expi
   this.tx_json.TakerGets        = Amount.json_rewrite(taker_gets);
 
   if (this.remote.local_fee) {
-    this.tx_json.Fee            = Transaction.fees.offer.to_json();
+    this.tx_json.Fee = Transaction.fees.offer.to_json();
   }
 
-  if (expiration)
-    this.tx_json.Expiration  = Date === expiration.constructor
-                                    ? expiration.getTime()
-                                    : Number(expiration);
+  if (expiration) {
+    this.tx_json.Expiration = expiration instanceof Date
+    ? expiration.getTime()
+    : Number(expiration);
+  }
 
-  if (cancel_sequence)
-    this.tx_json.OfferSequence    = Number(cancel_sequence);
+  if (cancel_sequence) {
+    this.tx_json.OfferSequence = Number(cancel_sequence);
+  }
 
   return this;
 };
@@ -664,7 +676,7 @@ Transaction.prototype.ripple_line_set = function (src, limit, quality_in, qualit
   this.tx_json.Account          = UInt160.json_rewrite(src);
 
   // Allow limit of 0 through.
-  if (undefined !== limit)
+  if (limit !== undefined)
     this.tx_json.LimitAmount  = Amount.json_rewrite(limit);
 
   if (quality_in)
