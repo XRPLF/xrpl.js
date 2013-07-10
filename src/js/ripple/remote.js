@@ -381,11 +381,10 @@ var Remote = function (opts, trace) {
   });
 
   // This is used to remove Node EventEmitter warnings
-  if (opts.hasOwnProperty('maxListeners')) {
-    opts.servers.concat(this).forEach(function(emitter) {
-      emitter.setMaxListeners(opts.maxListeners);
-    });
-  }
+  var maxListeners = opts.maxListeners || 0;
+  this._servers.concat(this).forEach(function(emitter) {
+    emitter.setMaxListeners(maxListeners);
+  });
 
   this.on('newListener', function (type, listener) {
     if (type === 'transaction_all') {
@@ -419,9 +418,7 @@ Remote.flags = {
 };
 
 Remote.from_config = function (obj, trace) {
-  var serverConfig = typeof obj === 'string' 
-  ? config.servers[obj] 
-  : obj;
+  var serverConfig = typeof obj === 'string' ? config.servers[obj] : obj;
 
   var remote = new Remote(serverConfig, trace);
 
@@ -456,7 +453,7 @@ Remote.prototype.add_server = function (opts) {
   + (opts.port || opts.websocket_port)
   ;
 
-  var server = new Server(this, {url: url})
+  var server = new Server(this, {url: url});
 
   server.on('message', function (data) {
     self._handle_message(data);
@@ -525,13 +522,12 @@ Remote.prototype.set_trace = function (trace) {
  */
 Remote.prototype.connect = function (online) {
   // Downwards compatibility
-  if (typeof online !== 'undefined' && !online) {
+  if (!online && typeof online !== 'undefined') {
     this.disconnect();
   } else {
     if (!this._servers.length) {
       throw new Error('No servers available.');
     } else {
-      // XXX Add support for multiple servers
       for (var i=0; i<this._servers.length; i++) {
         this._servers[i].connect();
       }
@@ -1042,8 +1038,8 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
   var request = this.request_subscribe(feeds);
 
   request.on('success', function (message) {
-    self._stand_alone       = !!message.stand_alone;
-    self._testnet           = !!message.testnet;
+    self._stand_alone = !!message.stand_alone;
+    self._testnet     = !!message.testnet;
 
     if (typeof message.random === 'string') {
       var rand = message.random.match(/[0-9A-F]{8}/ig);
@@ -1086,7 +1082,7 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
 // A good way to be notified of the result of this is:
 //    remote.once('ledger_closed', function (ledger_closed, ledger_index) { ... } );
 Remote.prototype.ledger_accept = function (callback) {
-  if (this._stand_alone || undefined === this._stand_alone) {
+  if (this._stand_alone) {
     var request = new Request(this, 'ledger_accept');
     request.request();
     request.callback(callback);
@@ -1141,7 +1137,7 @@ Remote.prototype.request_owner_count = function (account, current, callback) {
 };
 
 Remote.prototype.account = function (accountId, callback) {
-  accountId = UInt160.json_rewrite(accountId);
+  var accountId = UInt160.json_rewrite(accountId);
 
   if (!this._accounts[accountId]) {
     var account = new Account(this, accountId);
