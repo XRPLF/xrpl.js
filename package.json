@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.7.15",
+  "version": "0.7.16",
   "description": "Ripple JavaScript client library",
   "files": [
     "src/js/ripple/*.js",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "async": "~0.2.9",
-    "ws": "~0.4.25",
+    "ws": "~0.4.27",
     "extend": "~1.1.3",
     "simple-jsonrpc": "~0.0.2"
   },
