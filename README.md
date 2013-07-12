@@ -17,7 +17,8 @@ This library can connect to the Ripple network via the WebSocket protocol and ru
 [ripple-lib.remote](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/remote.js) is responsible for managing connections to rippled servers.
 
 ```js
-var remote = require('ripple-lib').Remote({
+var Remote = require('ripple-lib').Remote;
+var remote = new Remote({
   servers: [ 
     { 
         host: ''
