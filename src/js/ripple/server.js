@@ -184,6 +184,10 @@ Server.prototype.disconnect = function () {
   }
 };
 
+Server.prototype.send_message = function (message) {
+  this._ws.send(JSON.stringify(message));
+};
+
 /**
  * Submit a Request object to this server.
  */
@@ -199,20 +203,19 @@ Server.prototype.request = function (request) {
     // Advance message ID
     self._id++;
 
-    if (self._state === 'online' ||
-        (request.message.command === 'subscribe' && self._ws.readyState === 1)) {
+    if (self._connected || (request.message.command === 'subscribe' && self._ws.readyState === 1)) {
       if (self._remote.trace) {
         utils.logObject('server: request: %s', request.message);
       }
 
-      self._ws.send(JSON.stringify(request.message));
+      self.send_message(request.message);
     } else {
       // XXX There are many ways to make self smarter.
       self.once('connect', function () {
         if (self._remote.trace) {
           utils.logObject('server: request: %s', request.message);
         }
-        self._ws.send(JSON.stringify(request.message));
+        self.send_message(request.message);
       });
     }
   } else {

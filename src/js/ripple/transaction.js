@@ -206,6 +206,8 @@ Transaction.prototype.complete = function () {
     var key = seed.get_key(this.tx_json.Account);
     tx_json.SigningPubKey = key.to_hex_pub();
   }
+
+  return this.tx_json;
 };
 
 Transaction.prototype.serialize = function () {
@@ -250,14 +252,22 @@ Transaction.prototype._hasTransactionListeners = function() {
 //    case 'tejLost': locally gave up looking
 //    default: some other TER
 // }
+
 Transaction.prototype.submit = function (callback) {
   var self    = this;
   var tx_json = this.tx_json;
 
-  this.callback = callback;
+  this.callback = typeof callback === 'function' 
+    ? callback 
+    : function(){};
+
+  function finish(err) {
+    self.emit('error', err);
+    self.callback('error', err);
+  }
 
   if (typeof tx_json.Account !== 'string') {
-    (this.callback || this.emit)('error', {
+    finish({
       'error' :          'tejInvalidAccount',
       'error_message' :  'Bad account.'
     });
@@ -268,72 +278,72 @@ Transaction.prototype.submit = function (callback) {
 
   this.complete();
 
-  if (this.callback || this._hasTransactionListeners()) {
-    // There are listeners for callback, 'final', 'lost', or 'pending' arrange to emit them.
+    //console.log('Callback or has listeners');
 
-    this.submit_index = this.remote._ledger_current_index;
+  // There are listeners for callback, 'final', 'lost', or 'pending' arrange to emit them.
 
-    // When a ledger closes, look for the result.
-    function on_ledger_closed(message) {
-      var ledger_hash   = message.ledger_hash;
-      var ledger_index  = message.ledger_index;
-      var stop          = false;
+  this.submit_index = this.remote._ledger_current_index;
 
-      // XXX make sure self.hash is available.
-      var transaction_entry = self.remote.request_transaction_entry(self.hash)
-      transaction_entry.ledger_hash(ledger_hash)
-      transaction_entry.on('success', function (message) {
-        if (self.finalized) return;
-        self.set_state(message.metadata.TransactionResult);
-        self.remote.removeListener('ledger_closed', on_ledger_closed);
-        self.emit('final', message);
-        self.finalized = true;
-        if (self.callback) {
-          self.callback(message.metadata.TransactionResult, message);
+  // When a ledger closes, look for the result.
+  function on_ledger_closed(message) {
+    var ledger_hash   = message.ledger_hash;
+    var ledger_index  = message.ledger_index;
+    var stop          = false;
+
+    // XXX make sure self.hash is available.
+    var transaction_entry = self.remote.request_transaction_entry(self.hash)
+
+    transaction_entry.ledger_hash(ledger_hash)
+
+    transaction_entry.on('success', function (message) {
+      if (self.finalized) return;
+      self.set_state(message.metadata.TransactionResult);
+      self.remote.removeListener('ledger_closed', on_ledger_closed);
+      self.emit('final', message);
+      self.finalized = true;
+      self.callback(message.metadata.TransactionResult, message);
+    });
+
+    transaction_entry.on('error', function (message) {
+      if (self.finalized) return;
+
+      if (message.error === 'remoteError' && message.remote.error === 'transactionNotFound') {
+        if (self.submit_index + SUBMIT_LOST < ledger_index) {
+          self.set_state('client_lost');        // Gave up.
+          self.emit('lost');
+          self.callback('tejLost', message);
+          self.remote.removeListener('ledger_closed', on_ledger_closed);
+          self.emit('final', message);
+          self.finalized = true;
+        } else if (self.submit_index + SUBMIT_MISSING < ledger_index) {
+          self.set_state('client_missing');    // We don't know what happened to transaction, still might find.
+          self.emit('pending');
+        } else {
+          self.emit('pending');
         }
-      });
-      transaction_entry.on('error', function (message) {
-        if (self.finalized) return;
+      }
+      // XXX Could log other unexpectedness.
+    });
 
-        if (message.error === 'remoteError' && message.remote.error === 'transactionNotFound') {
-          if (self.submit_index + SUBMIT_LOST < ledger_index) {
-            self.set_state('client_lost');        // Gave up.
-            self.emit('lost');
-            if (self.callback) {
-              self.callback('tejLost', message);
-            }
-            self.remote.removeListener('ledger_closed', on_ledger_closed);
-            self.emit('final', message);
-            self.finalized = true;
-          } else if (self.submit_index + SUBMIT_MISSING < ledger_index) {
-            self.set_state('client_missing');    // We don't know what happened to transaction, still might find.
-            self.emit('pending');
-          } else {
-            self.emit('pending');
-          }
-        }
-        // XXX Could log other unexpectedness.
-      });
+    transaction_entry.request();
+  };
 
-      transaction_entry.request();
-    };
+  this.remote.on('ledger_closed', on_ledger_closed);
 
-    this.remote.on('ledger_closed', on_ledger_closed);
-
-    if (this.callback) {
-      this.once('error', function (message) {
-        self.callback(message.error, message);
-      });
-    }
-  }
+  this.once('error', function (message) {
+    self.callback(message.error, message);
+  });
 
   this.set_state('client_submitted');
 
   if (self.remote.local_sequence && !self.tx_json.Sequence) {
-    self.tx_json.Sequence      = this.remote.account_seq(self.tx_json.Account, 'ADVANCE');
+    
+    self.tx_json.Sequence = this.remote.account_seq(self.tx_json.Account, 'ADVANCE');
     // console.log("Sequence: %s", self.tx_json.Sequence);
 
     if (!self.tx_json.Sequence) {
+      //console.log('NO SEQUENCE');
+
       // Look in the last closed ledger.
       var account_seq = this.remote.account_seq_cache(self.tx_json.Account, false)
 
@@ -364,8 +374,8 @@ Transaction.prototype.submit = function (callback) {
 
     // If the transaction fails we want to either undo incrementing the sequence
     // or submit a noop transaction to consume the sequence remotely.
-    this.on('success', function (res) {
-      if (res && typeof res.engine_result === 'string') {
+    this.once('success', function (res) {
+      if (typeof res.engine_result === 'string') {
         switch (res.engine_result.slice(0, 3)) {
           // Synchronous local error
           case 'tej':
@@ -401,7 +411,7 @@ Transaction.prototype.submit = function (callback) {
   request.emit = this.emit.bind(this);
 
   if (!this._secret && !this.tx_json.Signature) {
-    this.emit('error', {
+    finish({
       'result'          : 'tejSecretUnknown',
       'result_message'  : "Could not sign transactions because we."
     });
@@ -411,11 +421,10 @@ Transaction.prototype.submit = function (callback) {
     request.tx_blob(this.serialize().to_hex());
   } else {
     if (!this.remote.trusted) {
-      this.emit('error', {
+      finish({
         'result'          : 'tejServerUntrusted',
         'result_message'  : "Attempt to give a secret to an untrusted server."
       });
-      return this;
     }
 
     request.secret(this._secret);

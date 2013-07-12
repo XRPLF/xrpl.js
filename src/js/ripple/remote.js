@@ -37,16 +37,13 @@ var sjcl          = require('../../../build/sjcl');
 //  'remoteError'
 //  'remoteUnexpected'
 //  'remoteDisconnected'
-var Request = function (remote, command) {
+function Request(remote, command) {
   EventEmitter.call(this);
-
-  var self  = this;
-
   this.remote     = remote;
   this.requested  = false;
   this.message    = {
-    'command' : command,
-    'id'      : undefined,
+    command : command,
+    id      : void(0)
   };
 };
 
@@ -67,6 +64,7 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
     this.once(errorEvent   || 'error', callback);
     this.request();
   }
+
   return this;
 };
 
@@ -143,8 +141,8 @@ Request.prototype.index = function (hash) {
 // --> seq : sequence number of transaction creating offer (integer)
 Request.prototype.offer_id = function (account, seq) {
   this.message.offer = {
-    'account' : UInt160.json_rewrite(account),
-    'seq' : seq
+    account:  UInt160.json_rewrite(account),
+    seq:      seq
   };
 
   return this;
@@ -228,20 +226,20 @@ Request.prototype.books = function (books, snapshot) {
     function processSide(side) {
       if (!book[side]) throw new Error('Missing '+side);
 
-      var obj = {};
-      obj['currency'] = Currency.json_rewrite(book[side]['currency']);
-      if (obj['currency'] !== 'XRP') {
-        obj.issuer = UInt160.json_rewrite(book[side]['issuer']);
+      var obj = json[side] = {
+        currency: Currency.json_rewrite(book[side].currency)
+      };
+      
+      if (obj.currency !== 'XRP') {
+        obj.issuer = UInt160.json_rewrite(book[side].issuer);
       }
-
-      json[side] = obj;
     }
 
     processSide('taker_gets');
     processSide('taker_pays');
 
-    if (snapshot || book['snapshot']) json['snapshot'] = true;
-    if (book['both']) json['both'] = true;
+    if (snapshot) json.snapshot = true;
+    if (book.both) json.both = true; 
 
     procBooks.push(json);
   }
@@ -286,7 +284,7 @@ Request.prototype.books = function (books, snapshot) {
     @param trace
 */
 
-var Remote = function (opts, trace) {
+function Remote(opts, trace) {
   EventEmitter.call(this);
 
   var self  = this;
@@ -320,7 +318,6 @@ var Remote = function (opts, trace) {
   this._reserve_inc          = void(0);
   this._connection_count     = 0;
   this._connected            = false;
-
 
   this._last_tx              = null;
 
@@ -661,6 +658,7 @@ Remote.prototype._server_is_available  = function (server) {
 
 Remote.prototype._next_server = function () {
   var result = null;
+
   for (var i=0; i<this._servers.length; i++) {
     var server = this._servers[i];
     if (this._server_is_available(server)) {
@@ -668,17 +666,20 @@ Remote.prototype._next_server = function () {
       break;
     }
   }
+
   return result;
 };
 
 Remote.prototype._get_server = function () {
   var server;
+
   if (this._server_is_available(this._primary_server)) {
     server = this._primary_server;
   } else {
     server = this._next_server();
     if (server) this._set_primary_server(server);
   }
+
   return server;
 };
 
@@ -716,7 +717,7 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
     request.message.ledger  = ledger;
   }
 
-  if ('object' == typeof opts) {
+  if (typeof opts === 'object') {
     if (opts.full)
       request.message.full          = true;
   
@@ -728,9 +729,7 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
 
     if (opts.accounts)
       request.message.accounts      = true;
-  }
-  // DEPRECATED:
-  else if (opts) {
+  } else if (opts) { // DEPRECATED:
     console.log('request_ledger: full parameter is deprecated');
     request.message.full    = true;
   }
@@ -841,10 +840,7 @@ Remote.prototype.request_subscribe = function (streams, callback) {
   var request = new Request(this, 'subscribe');
 
   if (streams) {
-    if (!Array.isArray(streams)) {
-      streams = [ streams ];
-    }
-    request.message.streams = streams;
+    request.message.streams = Array.isArray(streams) ? streams : [ streams ];
   }
 
   return request.callback(callback);
@@ -855,10 +851,7 @@ Remote.prototype.request_unsubscribe = function (streams, callback) {
   var request = new Request(this, 'unsubscribe');
 
   if (streams) {
-    if (!Array.isArray(streams)) {
-      streams = [ streams ];
-    }
-    request.message.streams = streams;
+    request.message.streams = Array.isArray(streams) ? streams : [ streams ];
   }
 
   return request.callback(callback);
@@ -1247,7 +1240,7 @@ Remote.prototype.account_seq_cache = function (account, current, callback) {
 
 // Mark an account's root node as dirty.
 Remote.prototype.dirty_account_root = function (account) {
-  var account       = UInt160.json_rewrite(account);
+  var account = UInt160.json_rewrite(account);
 
   delete this.ledgers.current.account_root[account];
 };
@@ -1349,8 +1342,8 @@ Remote.prototype.request_unl_delete = function (node, callback) {
   return request.callback(callback);
 };
 
-Remote.prototype.request_peers = function () {
-  return new Request(this, 'peers');
+Remote.prototype.request_peers = function (callback) {
+  return new Request(this, 'peers').callback(callback);
 };
 
 Remote.prototype.request_connect = function (ip, port, callback) {
