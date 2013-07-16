@@ -18,7 +18,9 @@ This library can connect to the Ripple network via the WebSocket protocol and ru
 
 ```js
 var Remote = require('ripple-lib').Remote;
+
 var remote = new Remote({
+  trusted: false,
   servers: [ 
     { 
         host: ''
@@ -27,6 +29,8 @@ var remote = new Remote({
     } 
   ]
 });
+
+remote.connect();
 ```
 
 ##Remote functions
@@ -34,22 +38,22 @@ var remote = new Remote({
 Each remote function returns a `Request` object. This object is an `EventEmitter`. You may listen for success or failure events from each request, or provide a callback. Example:
 
 ```js
-  var request = remote.request_server_info();
-  request.on('success', function(res) { 
-    //handle success conditions
-  });
-  request.on('error', function(err) { 
-    //handle error conditions
-  });
-  request.request();
+var request = remote.request_server_info();
+request.on('success', function(res) { 
+  //handle success conditions
+});
+request.on('error', function(err) { 
+  //handle error conditions
+});
+request.request();
 ```
 
 Or:
 
 ```js
-  remote.request_server_info(function(err, res) {
-    
-  });
+remote.request_server_info(function(err, res) {
+  
+});
 ```
 
 **remote.request_server_info([callback])**
@@ -84,7 +88,11 @@ Or:
 
 **remote.request_wallet_accounts(seed, [callback])**
 
++ requires trusted remote
+
 **remote.request_sign(secret, tx_json, [callback])**
+
++ requires trusted remote
 
 **remote.request_submit([callback])**
 
