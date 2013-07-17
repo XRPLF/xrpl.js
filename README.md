@@ -3,12 +3,7 @@ Ripple JavaScript Library - ripple-lib
 
 This library can connect to the Ripple network via the WebSocket protocol and runs in Node.js as well as in the browser.
 
-##Building
-
 * https://ripple.com/wiki/Ripple_JavaScript_library
-
-##See also
-
 * https://ripple.com
 * https://ripple.com/wiki
 
@@ -63,66 +58,66 @@ remote.request_server_info(function(err, res) {
 });
 ```
 
-###request_server_info([callback])
+**request_server_info([callback])**
 
-###request_ledger(ledger, [opts], [callback])
+**request_ledger(ledger, [opts], [callback])**
 
-###request_ledger_hash([callback])
+**request_ledger_hash([callback])**
 
-###request_ledger_header([callback])
+**request_ledger_header([callback])**
 
-###request_ledger_current([callback])
+**request_ledger_current([callback])**
 
-###request_ledger_entry(type, [callback])
+**request_ledger_entry(type, [callback])**
 
-###request_subscribe(streams, [callback])
+**request_subscribe(streams, [callback])**
 
-###request_unsubscribe(streams, [callback])
+**request_unsubscribe(streams, [callback])**
 
-###request_transaction_entry(hash, [callback])
+**request_transaction_entry(hash, [callback])**
 
-###request_tx(hash, [callback])
+**request_tx(hash, [callback])**
 
-###request_account_info(accountID, [callback])
+**request_account_info(accountID, [callback])**
 
-###request_account_lines(accountID, account_index, current, [callback])
+**request_account_lines(accountID, account_index, current, [callback])**
 
-###request_account_offers(accountID, account_index, current, [callback])
+**request_account_offers(accountID, account_index, current, [callback])**
 
-###request_account_tx(opts, [callback])
+**request_account_tx(opts, [callback])**
 
-###request_book_offers(gets, pays, taker, [callback])
+**request_book_offers(gets, pays, taker, [callback])**
 
-###request_wallet_accounts(seed, [callback])
+**request_wallet_accounts(seed, [callback])**
 
-+ requires trusted ###remote
++ requires trusted **remote
 
-###request_sign(secret, tx_json, [callback])
+**request_sign(secret, tx_json, [callback])**
 
-+ requires trusted ###remote
++ requires trusted **remote
 
-###request_submit([callback])
+**request_submit([callback])**
 
-###request_account_balance(account, current, [callback])
+**request_account_balance(account, current, [callback])**
 
-###request_account_flags(account, current, [callback])
+**request_account_flags(account, current, [callback])**
 
-###request_owner_count(account, current, [callback])
+**request_owner_count(account, current, [callback])**
 
-###request_ripple_balance(account, issuer, currency, current, [callback])
+**request_ripple_balance(account, issuer, currency, current, [callback])**
 
-###request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])
+**request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])**
 
-###request_unl_list([callback])
+**request_unl_list([callback])**
 
-###request_unl_add(addr, comment, [callback])
+**request_unl_add(addr, comment, [callback])**
 
-###request_unl_delete(node, [callback])
+**request_unl_delete(node, [callback])**
 
-###request_peers([callback])
+**request_peers([callback])**
 
-###request_connect(ip, port, [callback])
+**request_connect(ip, port, [callback])**
 
-###transaction()
+**transaction()**
 
 + returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) object
