@@ -33,9 +33,16 @@ var remote = new Remote({
 remote.connect();
 ```
 
+Once a connection is formed to any of the supplied servers, a `connect` event is emitted, indicating that the remote is ready to begin fulfilling requests. When there are no more connected servers to fulfill requests, a `disconnect` event is emitted. If you send requests before ripple-lib is connected to any servers, requests are deferred until the `connect` event is received.
+
+```js
+var remote = new Remote({ /* options */ }).connect();
+remote.request_server_info(function(err, info) { }); // will defer until connected
+```
+
 ##Remote functions
 
-Each remote function returns a `Request` object. This object is an `EventEmitter`. You may listen for success or failure events from each request, or provide a callback. Example:
+Each remote function returns a `Request` object. is object is an `EventEmitter`. You may listen for success or failure events from each request, or provide a callback. Example:
 
 ```js
 var request = remote.request_server_info();
@@ -56,64 +63,66 @@ remote.request_server_info(function(err, res) {
 });
 ```
 
-**remote.request_server_info([callback])**
+###remote.request_server_info([callback])
 
-**remote.request_ledger(ledger, [opts], [callback])**
+###remote.request_ledger(ledger, [opts], [callback])
 
-**remote.request_ledger_hash([callback])**
+###remote.request_ledger_hash([callback])
 
-**remote.request_ledger_header([callback])**
+###remote.request_ledger_header([callback])
 
-**remote.request_ledger_current([callback])**
+###remote.request_ledger_current([callback])
 
-**remote.request_ledger_entry(type, [callback])**
+###remote.request_ledger_entry(type, [callback])
 
-**remote.request_subscribe(streams, [callback])**
+###remote.request_subscribe(streams, [callback])
 
-**remote.request_unsubscribe(streams, [callback])**
+###remote.request_unsubscribe(streams, [callback])
 
-**remote.request_transaction_entry(hash, [callback])**
+###remote.request_transaction_entry(hash, [callback])
 
-**remote.request_tx(hash, [callback])**
+###remote.request_tx(hash, [callback])
 
-**remote.request_account_info(accountID, [callback])**
+###remote.request_account_info(accountID, [callback])
 
-**remote.request_account_lines(accountID, account_index, current, [callback])**
+###remote.request_account_lines(accountID, account_index, current, [callback])
 
-**remote.request_account_offers(accountID, account_index, current, [callback])**
+###remote.request_account_offers(accountID, account_index, current, [callback])
 
-**remote.request_account_tx(opts, [callback])**
+###remote.request_account_tx(opts, [callback])
 
-**remote.request_book_offers(gets, pays, taker, [callback])**
+###remote.request_book_offers(gets, pays, taker, [callback])
 
-**remote.request_wallet_accounts(seed, [callback])**
+###remote.request_wallet_accounts(seed, [callback])
 
-+ requires trusted remote
++ requires trusted ###remote
 
-**remote.request_sign(secret, tx_json, [callback])**
+###remote.request_sign(secret, tx_json, [callback])
 
-+ requires trusted remote
++ requires trusted ###remote
 
-**remote.request_submit([callback])**
+###remote.request_submit([callback])
 
-**remote.request_account_balance(account, current, [callback])**
+###remote.request_account_balance(account, current, [callback])
 
-**remote.request_account_flags(account, current, [callback])**
+###remote.request_account_flags(account, current, [callback])
 
-**remote.request_owner_count(account, current, [callback])**
+###remote.request_owner_count(account, current, [callback])
 
-**remote.request_ripple_balance(account, issuer, currency, current, [callback])**
+###remote.request_ripple_balance(account, issuer, currency, current, [callback])
 
-**remote.request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])**
+###remote.request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])
 
-**remote.request_unl_list([callback])**
+###remote.request_unl_list([callback])
 
-**remote.request_unl_add(addr, comment, [callback])**
+###remote.request_unl_add(addr, comment, [callback])
 
-**remote.request_unl_delete(node, [callback])**
+###remote.request_unl_delete(node, [callback])
 
-**remote.request_peers([callback])**
+###remote.request_peers([callback])
 
-**remote.request_connect(ip, port, [callback])**
+###remote.request_connect(ip, port, [callback])
 
-**remote.transaction()**
+###remote.transaction()
+
++ returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) object

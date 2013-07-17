@@ -1059,12 +1059,8 @@ Remote.prototype.request_sign = function (secret, tx_json, callback) {
 
 // Submit a transaction.
 Remote.prototype.request_submit = function (callback) {
-  var self  = this;
-
   var request = new Request(this, 'submit');
-
   request.callback(callback);
-
   return request;
 };
 
@@ -1409,10 +1405,8 @@ Remote.prototype.request_unl_add = function (addr, comment, callback) {
 // --> node: <domain> | <public_key>
 Remote.prototype.request_unl_delete = function (node, callback) {
   var request = new Request(this, 'unl_delete');
-
   request.message.node = node;
   request.callback(callback);
-
   return request;
 };
 
