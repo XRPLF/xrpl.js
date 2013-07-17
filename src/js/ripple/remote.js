@@ -61,7 +61,7 @@ Request.prototype.request = function (remote) {
 Request.prototype.callback = function(callback, successEvent, errorEvent) {
   if (callback && typeof callback === 'function') {
     this.once(successEvent || 'success', callback.bind(this, null));
-    this.once(errorEvent   || 'error', callback);
+    this.once(errorEvent   || 'error', callback.bind(this));
     this.request();
   }
 
@@ -509,8 +509,7 @@ Remote.prototype._set_state = function (state) {
 };
 
 Remote.prototype.set_trace = function (trace) {
-  this.trace  = undefined === trace || trace;
-
+  this.trace = trace === void(0) || trace;
   return this;
 };
 
@@ -519,15 +518,22 @@ Remote.prototype.set_trace = function (trace) {
  */
 Remote.prototype.connect = function (online) {
   // Downwards compatibility
-  if (!online && typeof online !== 'undefined') {
-    this.disconnect();
+  switch(typeof online) {
+    case 'undefined':
+      break;
+    case 'function':
+      this.once('connect', online);
+      break;
+    default:
+      if (!Boolean(online)) return this.disconnect()
+      break;
+  }
+
+  if (!this._servers.length) {
+    throw new Error('No servers available.');
   } else {
-    if (!this._servers.length) {
-      throw new Error('No servers available.');
-    } else {
-      for (var i=0; i<this._servers.length; i++) {
-        this._servers[i].connect();
-      }
+    for (var i=0; i<this._servers.length; i++) {
+      this._servers[i].connect();
     }
   }
 
@@ -717,21 +723,22 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
     request.message.ledger  = ledger;
   }
 
-  if (typeof opts === 'object') {
-    if (opts.full)
-      request.message.full          = true;
-  
-    if (opts.expand)
-      request.message.expand        = true;
-  
-    if (opts.transactions)
-      request.message.transactions  = true;
-
-    if (opts.accounts)
-      request.message.accounts      = true;
-  } else if (opts) { // DEPRECATED:
-    console.log('request_ledger: full parameter is deprecated');
-    request.message.full    = true;
+  switch(typeof opts) {
+    case 'object':
+      if (opts.full) request.message.full                 = true;
+      if (opts.expand) request.message.expand             = true;
+      if (opts.transactions) request.message.transactions = true;
+      if (opts.accounts) request.message.accounts         = true;
+      break;
+    case 'function':
+      callback = opts;
+      opts     = void(0);
+      break;
+    default:
+      //DEPRECATED
+      console.log('request_ledger: full parameter is deprecated');
+      request.message.full    = true;
+      break;
   }
 
   return request.callback(callback);
@@ -805,8 +812,7 @@ Remote.prototype.request_ledger_entry = function (type, callback) {
           });
 
           bDefault  = false;
-        } else {
-          // Was not cached.
+        } else { // Was not cached.
 
           // XXX Only allow with trusted mode.  Must sync response with advance.
           switch (type) {
@@ -882,8 +888,9 @@ Remote.prototype.request_account_info = function (accountID, callback) {
 
   request.message.ident   = UInt160.json_rewrite(accountID);  // DEPRECATED
   request.message.account = UInt160.json_rewrite(accountID);
+  request.callback(callback);
 
-  return request.callback(callback);
+  return request;
 };
 
 // --> account_index: sub_account index (optional)
@@ -1046,7 +1053,6 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
       self._ledger_time           = message.ledger_time;
       self._ledger_hash           = message.ledger_hash;
       self._ledger_current_index  = message.ledger_index+1;
-
       self.emit('ledger_closed', message);
     }
 
@@ -1091,8 +1097,7 @@ Remote.prototype.ledger_accept = function (callback) {
 Remote.prototype.request_account_balance = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
 
-  return request
-    .account_root(account)
+  return request.account_root(account)
     .ledger_choose(current)
     .on('success', function (message) {
       // If the caller also waits for 'success', they might run before this.
@@ -1105,8 +1110,7 @@ Remote.prototype.request_account_balance = function (account, current, callback)
 Remote.prototype.request_account_flags = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
 
-  return request
-    .account_root(account)
+  return request.account_root(account)
     .ledger_choose(current)
     .on('success', function (message) {
       // If the caller also waits for 'success', they might run before this.
@@ -1119,8 +1123,7 @@ Remote.prototype.request_account_flags = function (account, current, callback) {
 Remote.prototype.request_owner_count = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
 
-  return request
-    .account_root(account)
+  return request.account_root(account)
     .ledger_choose(current)
     .on('success', function (message) {
       // If the caller also waits for 'success', they might run before this.
@@ -1262,8 +1265,7 @@ Remote.prototype.set_secret = function (account, secret) {
 Remote.prototype.request_ripple_balance = function (account, issuer, currency, current, callback) {
   var request       = this.request_ledger_entry('ripple_state');          // YYY Could be cached per ledger.
 
-  return request
-    .ripple_state(account, issuer, currency)
+  return request.ripple_state(account, issuer, currency)
     .ledger_choose(current)
     .on('success', function (message) {
       var node            = message.node;
