@@ -61,9 +61,34 @@ Request.prototype.request = function (remote) {
 Request.prototype.callback = function(callback, successEvent, errorEvent) {
   if (callback && typeof callback === 'function') {
     this.once(successEvent || 'success', callback.bind(this, null));
-    this.once(errorEvent   || 'error', callback.bind(this));
+    this.once(errorEvent   || 'error'  , callback.bind(this));
     this.request();
   }
+
+  return this;
+};
+
+Request.prototype.timeout = function(duration) {
+  if (!this.requested) {
+    this.once('request', this.timeout.bind(this, duration));
+    return;
+  };
+
+  var self      = this;
+  var emit      = this.emit;
+  var timed_out = false;
+
+  var timeout = setTimeout(function() {
+    timed_out = true;
+    emit.call(self, 'error', new Error('Request timeout'));
+    emit.call(self, 'timeout');
+  }, duration);
+
+  this.emit = function() {
+    if (timed_out) return;
+    else clearTimeout(timeout);
+    emit.apply(self, arguments);
+  };
 
   return this;
 };
@@ -434,6 +459,12 @@ Remote.from_config = function (obj, trace) {
   return remote;
 };
 
+Remote.create_remote = function(options, callback) {
+  var remote = Remote.from_config(options);
+  remote.connect(callback);
+  return remote;
+};
+
 var isTemMalformed  = function (engine_result_code) {
   return (engine_result_code >= -299 && engine_result_code <  199);
 };
@@ -525,7 +556,8 @@ Remote.prototype.connect = function (online) {
       this.once('connect', online);
       break;
     default:
-      if (!Boolean(online)) return this.disconnect()
+      if (!Boolean(online)) 
+        return this.disconnect()
       break;
   }
 
@@ -692,10 +724,10 @@ Remote.prototype._get_server = function () {
 // Send a request.
 // <-> request: what to send, consumed.
 Remote.prototype.request = function (request) {
-  if (!this._connected) {
-    this.once('connect', this.request.bind(this, request));
-  } else if (!this._servers.length) {
+  if (!this._servers.length) {
     request.emit('error', new Error('No servers available'));
+  } else if (!this._connected) {
+    this.once('connect', this.request.bind(this, request));
   } else {
     var server = this._get_server();
     if (server) {
@@ -741,7 +773,9 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
       break;
   }
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 // Only for unit testing.
@@ -838,7 +872,9 @@ Remote.prototype.request_ledger_entry = function (type, callback) {
     }
   };
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 // .accounts(accounts, realtime)
@@ -849,7 +885,9 @@ Remote.prototype.request_subscribe = function (streams, callback) {
     request.message.streams = Array.isArray(streams) ? streams : [ streams ];
   }
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 // .accounts(accounts, realtime)
@@ -860,7 +898,9 @@ Remote.prototype.request_unsubscribe = function (streams, callback) {
     request.message.streams = Array.isArray(streams) ? streams : [ streams ];
   }
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 // .ledger_choose()
@@ -879,8 +919,9 @@ Remote.prototype.request_tx = function (hash, callback) {
   var request = new Request(this, 'tx');
 
   request.message.transaction  = hash;
+  request.callback(callback);
 
-  return request.callback(callback);
+  return request;
 };
 
 Remote.prototype.request_account_info = function (accountID, callback) {
@@ -907,7 +948,10 @@ Remote.prototype.request_account_lines = function (accountID, account_index, cur
     request.message.index   = account_index;
   }
 
-  return request.ledger_choose(current).callback(callback);
+  request.ledger_choose(current);
+  request.callback(callback);
+
+  return request;
 };
 
 // --> account_index: sub_account index (optional)
@@ -921,7 +965,10 @@ Remote.prototype.request_account_offers = function (accountID, account_index, cu
     request.message.index   = account_index;
   }
 
-  return request.ledger_choose(current).callback(callback);
+  request.ledger_choose(current);
+  request.callback(callback);
+
+  return request;
 };
 
 
@@ -957,7 +1004,9 @@ Remote.prototype.request_account_tx = function (obj, callback) {
     if (typeof obj.limit !== 'undefined')			{request.message.limit  = obj.limit;}
   }
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 Remote.prototype.request_book_offers = function (gets, pays, taker, callback) {
@@ -981,7 +1030,9 @@ Remote.prototype.request_book_offers = function (gets, pays, taker, callback) {
 
   request.message.taker = taker ? taker : UInt160.ACCOUNT_ONE;
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 Remote.prototype.request_wallet_accounts = function (seed, callback) {
@@ -1001,8 +1052,9 @@ Remote.prototype.request_sign = function (secret, tx_json, callback) {
 
   request.message.secret = secret;
   request.message.tx_json = tx_json;
-
-  return request.callback(callback);
+  request.callback(callback);
+  
+  return request;
 };
 
 // Submit a transaction.
@@ -1011,7 +1063,9 @@ Remote.prototype.request_submit = function (callback) {
 
   var request = new Request(this, 'submit');
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 //
@@ -1071,9 +1125,12 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
 
   self.emit('prepare_subscribe', request);
 
+  request.callback(callback);
+
+
   // XXX Could give error events, maybe even time out.
 
-  return request.callback(callback);
+  return request;
 };
 
 // For unit testing: ask the remote to accept the current ledger.
@@ -1090,6 +1147,7 @@ Remote.prototype.ledger_accept = function (callback) {
       'error' : 'notStandAlone'
     });
   }
+
   return this;
 };
 
@@ -1097,39 +1155,48 @@ Remote.prototype.ledger_accept = function (callback) {
 Remote.prototype.request_account_balance = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
 
-  return request.account_root(account)
+  request.account_root(account)
     .ledger_choose(current)
     .on('success', function (message) {
       // If the caller also waits for 'success', they might run before this.
       request.emit('account_balance', Amount.from_json(message.node.Balance));
     })
-    .callback(callback, 'account_balance');
+
+  request.callback(callback, 'account_balance');
+
+  return request;
 };
 
 // Return a request to return the account flags.
 Remote.prototype.request_account_flags = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
 
-  return request.account_root(account)
+  request.account_root(account)
     .ledger_choose(current)
     .on('success', function (message) {
       // If the caller also waits for 'success', they might run before this.
       request.emit('account_flags', message.node.Flags);
     })
-    .callback(callback, 'account_flags');
+
+  request.callback(callback, 'account_flags');
+
+  return request;
 };
 
 // Return a request to emit the owner count.
 Remote.prototype.request_owner_count = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
 
-  return request.account_root(account)
+  request.account_root(account)
     .ledger_choose(current)
     .on('success', function (message) {
       // If the caller also waits for 'success', they might run before this.
       request.emit('owner_count', message.node.OwnerCount);
     })
-    .callback(callback, 'owner_count');
+
+  request.callback(callback, 'owner_count');
+
+  return request;
 };
 
 Remote.prototype.account = function (accountId, callback) {
@@ -1144,10 +1211,6 @@ Remote.prototype.account = function (accountId, callback) {
   }
 
   var account = this._accounts[accountId];
-
-  if (typeof callback === 'function') {
-    callback(account);
-  }
 
   return account;
 };
@@ -1238,7 +1301,9 @@ Remote.prototype.account_seq_cache = function (account, current, callback) {
     account_info.caching_seq_request    = request;
   }
 
-  return request.callback(callback, 'success_account_seq_cache', 'error_account_seq_cache');
+  request.callback(callback, 'success_account_seq_cache', 'error_account_seq_cache');
+
+  return request;
 };
 
 // Mark an account's root node as dirty.
@@ -1316,11 +1381,15 @@ Remote.prototype.request_ripple_path_find = function (src_account, dst_account, 
     });
   }
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 Remote.prototype.request_unl_list = function (callback) {
-  return new Request(this, 'unl_list').callback(callback);
+  var request = new Request(this, 'unl_list');
+  request.callback(callback);
+  return request;
 };
 
 Remote.prototype.request_unl_add = function (addr, comment, callback) {
@@ -1332,7 +1401,9 @@ Remote.prototype.request_unl_add = function (addr, comment, callback) {
     request.message.comment = note;
   }
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 // --> node: <domain> | <public_key>
@@ -1340,12 +1411,15 @@ Remote.prototype.request_unl_delete = function (node, callback) {
   var request = new Request(this, 'unl_delete');
 
   request.message.node = node;
+  request.callback(callback);
 
-  return request.callback(callback);
+  return request;
 };
 
 Remote.prototype.request_peers = function (callback) {
-  return new Request(this, 'peers').callback(callback);
+  var request = new Request(this, 'peers');
+  request.callback(callback);
+  return request;
 };
 
 Remote.prototype.request_connect = function (ip, port, callback) {
@@ -1357,7 +1431,9 @@ Remote.prototype.request_connect = function (ip, port, callback) {
     request.message.port = port;
   }
 
-  return request.callback(callback);
+  request.callback(callback);
+
+  return request;
 };
 
 Remote.prototype.transaction = function () {
