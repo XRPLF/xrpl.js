@@ -63,66 +63,66 @@ remote.request_server_info(function(err, res) {
 });
 ```
 
-###remote.request_server_info([callback])
+###request_server_info([callback])
 
-###remote.request_ledger(ledger, [opts], [callback])
+###request_ledger(ledger, [opts], [callback])
 
-###remote.request_ledger_hash([callback])
+###request_ledger_hash([callback])
 
-###remote.request_ledger_header([callback])
+###request_ledger_header([callback])
 
-###remote.request_ledger_current([callback])
+###request_ledger_current([callback])
 
-###remote.request_ledger_entry(type, [callback])
+###request_ledger_entry(type, [callback])
 
-###remote.request_subscribe(streams, [callback])
+###request_subscribe(streams, [callback])
 
-###remote.request_unsubscribe(streams, [callback])
+###request_unsubscribe(streams, [callback])
 
-###remote.request_transaction_entry(hash, [callback])
+###request_transaction_entry(hash, [callback])
 
-###remote.request_tx(hash, [callback])
+###request_tx(hash, [callback])
 
-###remote.request_account_info(accountID, [callback])
+###request_account_info(accountID, [callback])
 
-###remote.request_account_lines(accountID, account_index, current, [callback])
+###request_account_lines(accountID, account_index, current, [callback])
 
-###remote.request_account_offers(accountID, account_index, current, [callback])
+###request_account_offers(accountID, account_index, current, [callback])
 
-###remote.request_account_tx(opts, [callback])
+###request_account_tx(opts, [callback])
 
-###remote.request_book_offers(gets, pays, taker, [callback])
+###request_book_offers(gets, pays, taker, [callback])
 
-###remote.request_wallet_accounts(seed, [callback])
-
-+ requires trusted ###remote
-
-###remote.request_sign(secret, tx_json, [callback])
+###request_wallet_accounts(seed, [callback])
 
 + requires trusted ###remote
 
-###remote.request_submit([callback])
+###request_sign(secret, tx_json, [callback])
 
-###remote.request_account_balance(account, current, [callback])
++ requires trusted ###remote
 
-###remote.request_account_flags(account, current, [callback])
+###request_submit([callback])
 
-###remote.request_owner_count(account, current, [callback])
+###request_account_balance(account, current, [callback])
 
-###remote.request_ripple_balance(account, issuer, currency, current, [callback])
+###request_account_flags(account, current, [callback])
 
-###remote.request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])
+###request_owner_count(account, current, [callback])
 
-###remote.request_unl_list([callback])
+###request_ripple_balance(account, issuer, currency, current, [callback])
 
-###remote.request_unl_add(addr, comment, [callback])
+###request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])
 
-###remote.request_unl_delete(node, [callback])
+###request_unl_list([callback])
 
-###remote.request_peers([callback])
+###request_unl_add(addr, comment, [callback])
 
-###remote.request_connect(ip, port, [callback])
+###request_unl_delete(node, [callback])
 
-###remote.transaction()
+###request_peers([callback])
+
+###request_connect(ip, port, [callback])
+
+###transaction()
 
 + returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) object
