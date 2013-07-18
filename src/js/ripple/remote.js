@@ -68,9 +68,9 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
   return this;
 };
 
-Request.prototype.timeout = function(duration) {
+Request.prototype.timeout = function(duration, callback) {
   if (!this.requested) {
-    this.once('request', this.timeout.bind(this, duration));
+    this.once('request', this.timeout.bind(this, duration, callback));
     return;
   };
 
@@ -80,7 +80,7 @@ Request.prototype.timeout = function(duration) {
 
   var timeout = setTimeout(function() {
     timed_out = true;
-    emit.call(self, 'error', new Error('Request timeout'));
+    if (typeof callback === 'function') callback();
     emit.call(self, 'timeout');
   }, duration);
 
