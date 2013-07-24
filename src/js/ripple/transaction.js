@@ -284,6 +284,8 @@ Transaction.prototype.submit = function (callback) {
 
   // When a ledger closes, look for the result.
   function on_ledger_closed(message) {
+    if (self.finalized) return;
+
     var ledger_hash   = message.ledger_hash;
     var ledger_index  = message.ledger_index;
     var stop          = false;
