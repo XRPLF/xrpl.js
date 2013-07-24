@@ -321,7 +321,7 @@ function Remote(opts, trace) {
   this.local_signing         = (typeof opts.local_signing === 'undefined')
                                 ? true : opts.local_signing;
   this.fee_cushion           = (typeof opts.fee_cushion === 'undefined')
-                                ? 1.05 : opts.fee_cushion;
+                                ? 1.5 : opts.fee_cushion;
 
   this.id                    = 0;
   this.trace                 = opts.trace || trace;
