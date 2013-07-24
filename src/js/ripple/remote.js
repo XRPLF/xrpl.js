@@ -288,6 +288,7 @@ Request.prototype.books = function (books, snapshot) {
       websocket_ssl
       trace
       maxListeners
+      fee_cushion       : Extra fee multiplier to account for async fee changes.
 
     Events:
       'connect'
@@ -319,6 +320,8 @@ function Remote(opts, trace) {
   this.local_fee             = opts.local_fee;      // Locally set fees
   this.local_signing         = (typeof opts.local_signing === 'undefined')
                                 ? true : opts.local_signing;
+  this.fee_cushion           = (typeof opts.fee_cushion === 'undefined')
+                                ? 1.05 : opts.fee_cushion;
 
   this.id                    = 0;
   this.trace                 = opts.trace || trace;
@@ -1432,6 +1435,37 @@ Remote.prototype.request_connect = function (ip, port, callback) {
 
 Remote.prototype.transaction = function () {
   return new Transaction(this);
+};
+
+/**
+ * Get the current recommended transaction fee unit.
+ *
+ * Multiply this value with the number of fee units in order to calculate the
+ * recommended fee for the transaction you are trying to submit.
+ *
+ * @return {Number} Recommended amount for one fee unit.
+ */
+Remote.prototype.fee_tx = function ()
+{
+  var fee_unit = this._fee_base / this._fee_ref;
+
+  // Apply load fees
+  fee_unit *= this._load_factor / this._load_base;
+
+  // Apply fee cushion (a safety margin in case fees rise since we were last updated
+  fee_unit *= this.fee_cushion;
+
+  return fee_unit;
+};
+
+/**
+ * Get the current recommended reserve base.
+ *
+ * Returns the base reserve with load fees and safety margin applied.
+ */
+Remote.prototype.fee_reserve_base = function ()
+{
+  // XXX
 };
 
 exports.Remote          = Remote;

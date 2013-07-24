@@ -109,9 +109,7 @@ util.inherits(Transaction, EventEmitter);
 
 // XXX This needs to be determined from the network.
 Transaction.fees = {
-  'default'         : Amount.from_json('10'),
-  'nickname_create' : Amount.from_json('1000'),
-  'offer'           : Amount.from_json('10'),
+  'default'         : 10,
 };
 
 Transaction.flags = {
@@ -197,11 +195,11 @@ Transaction.prototype.set_state = function (state) {
 Transaction.prototype.complete = function () {
   var tx_json = this.tx_json;
 
-  if (tx_json.Fee === undefined && this.remote.local_fee) {
-    tx_json.Fee = Transaction.fees['default'].to_json();
+  if ("undefined" === typeof tx_json.Fee && this.remote.local_fee) {
+    this.tx_json.Fee = "" + Math.ceil(this.remote.fee_tx() * this.fee_units());
   }
 
-  if (tx_json.SigningPubKey === undefined && (!this.remote || this.remote.local_signing)) {
+  if ("undefined" === typeof tx_json.SigningPubKey && (!this.remote || this.remote.local_signing)) {
     var seed = Seed.from_json(this._secret);
     var key = seed.get_key(this.tx_json.Account);
     tx_json.SigningPubKey = key.to_hex_pub();
@@ -257,8 +255,8 @@ Transaction.prototype.submit = function (callback) {
   var self    = this;
   var tx_json = this.tx_json;
 
-  this.callback = typeof callback === 'function' 
-    ? callback 
+  this.callback = typeof callback === 'function'
+    ? callback
     : function(){};
 
   function finish(err) {
@@ -616,10 +614,6 @@ Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expi
   this.tx_json.TakerPays        = Amount.json_rewrite(taker_pays);
   this.tx_json.TakerGets        = Amount.json_rewrite(taker_gets);
 
-  if (this.remote.local_fee) {
-    this.tx_json.Fee = Transaction.fees.offer.to_json();
-  }
-
   if (expiration) {
     this.tx_json.Expiration = expiration instanceof Date
     ? expiration.getTime()
@@ -708,6 +702,20 @@ Transaction.prototype.wallet_add = function (src, amount, authorized_key, public
   this.tx_json.Signature        = signature;
 
   return this;
+};
+
+/**
+ * Returns the number of fee units this transaction will cost.
+ *
+ * Each Ripple transaction based on its type and makeup costs a certain number
+ * of fee units. The fee units are calculated on a per-server basis based on the
+ * current load on both the network and the server.
+ *
+ * @see https://ripple.com/wiki/Transaction_Fee
+ */
+Transaction.prototype.fee_units = function ()
+{
+  return Transaction.fees["default"];
 };
 
 exports.Transaction     = Transaction;
