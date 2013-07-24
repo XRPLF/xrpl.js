@@ -882,6 +882,8 @@ Amount.prototype.to_text = function (allow_nan) {
  * @param opts.min_precision {Number} Min. number of digits after dec. point.
  * @param opts.skip_empty_fraction {Boolean} Don't show fraction if it is zero,
  *   even if min_precision is set.
+ * @param opts.max_sig_digits {Number} Maximum number of significant digits.
+ *   Will cut fractional part, but never integer part.
  * @param opts.group_sep {Boolean|String} Whether to show a separator every n
  *   digits, if a string, that value will be used as the separator. Default: ","
  * @param opts.group_width {Number} How many numbers will be grouped together,
@@ -914,10 +916,38 @@ Amount.prototype.to_human = function (opts)
   fraction_part = fraction_part.replace(/0*$/, '');
 
   if (fraction_part.length || !opts.skip_empty_fraction) {
+    // Enforce the maximum number of decimal digits (precision)
     if ("number" === typeof opts.precision) {
       fraction_part = fraction_part.slice(0, opts.precision);
     }
 
+    // Limit the number of significant digits (max_sig_digits)
+    if ("number" === typeof opts.max_sig_digits) {
+      // First, we count the significant digits we have.
+      // A zero in the integer part does not count.
+      var int_is_zero = +int_part === 0;
+      var digits = int_is_zero ? 0 : int_part.length;
+
+      // Don't count leading zeros in the fractional part if the integer part is
+      // zero.
+      var sig_frac = int_is_zero ? fraction_part.replace(/^0*/, '') : fraction_part;
+      digits += sig_frac.length;
+
+      // Now we calculate where we are compared to the maximum
+      var rounding = digits - opts.max_sig_digits;
+
+      // If we're under the maximum we want to cut no (=0) digits
+      rounding = Math.max(rounding, 0);
+
+      // If we're over the maximum we still only want to cut digits from the
+      // fractional part, not from the integer part.
+      rounding = Math.min(rounding, fraction_part.length);
+
+      // Now we cut `rounding` digits off the right.
+      if (rounding > 0) fraction_part = fraction_part.slice(0, -rounding);
+    }
+
+    // Enforce the minimum number of decimal digits (min_precision)
     if ("number" === typeof opts.min_precision) {
       while (fraction_part.length < opts.min_precision) {
         fraction_part += "0";
