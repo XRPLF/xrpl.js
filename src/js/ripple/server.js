@@ -5,13 +5,13 @@ var utils        = require('./utils');
 /**
  *  @constructor Server
  *  @param  remote    The Remote object
- *  @param  cfg       Configuration parameters.
+ *  @param  opts       Configuration parameters.
  *
  *  Keys for cfg:
  *  url
  */ 
 
-var Server = function (remote, opts) {
+function Server(remote, opts) {
   EventEmitter.call(this);
 
   if (typeof opts !== 'object' || typeof opts.url !== 'string') {
@@ -60,7 +60,7 @@ Server.online_states = [
 
 Server.prototype._is_online = function (status) {
   return Server.online_states.indexOf(status) !== -1;
-};
+}
 
 Server.prototype._set_state = function (state) {
   if (state !== this._state) {
@@ -76,7 +76,15 @@ Server.prototype._set_state = function (state) {
       this.emit('disconnect');
     }
   }
-};
+}
+
+Server.prototype._remote_address = function() {
+  var address = null;
+  if (this._ws) {
+    address = this._ws._socket.remoteAddress;
+  }
+  return address;
+}
 
 Server.prototype.connect = function () {
   var self = this;
@@ -174,7 +182,7 @@ Server.prototype.connect = function () {
   ws.onmessage = function (msg) {
     self.emit('message', msg.data);
   };
-};
+}
 
 Server.prototype.disconnect = function () {
   this._should_connect = false;
@@ -182,11 +190,13 @@ Server.prototype.disconnect = function () {
   if (this._ws) {
     this._ws.close();
   }
-};
+}
 
 Server.prototype.send_message = function (message) {
-  this._ws.send(JSON.stringify(message));
-};
+  if (this._ws) {
+    this._ws.send(JSON.stringify(message));
+  }
+}
 
 /**
  * Submit a Request object to this server.
@@ -195,31 +205,32 @@ Server.prototype.request = function (request) {
   var self  = this;
 
   // Only bother if we are still connected.
-  if (self._ws) {
-    request.message.id = self._id;
+  if (this._ws) {
+    request.server     = this;
+    request.message.id = this._id;
 
-    self._requests[request.message.id] = request;
+    this._requests[request.message.id] = request;
 
     // Advance message ID
-    self._id++;
+    this._id++;
 
-    if (self._connected || (request.message.command === 'subscribe' && self._ws.readyState === 1)) {
-      if (self._remote.trace) {
+    if (this._connected || (request.message.command === 'subscribe' && this._ws.readyState === 1)) {
+      if (this._remote.trace) {
         utils.logObject('server: request: %s', request.message);
       }
 
-      self.send_message(request.message);
+      this.send_message(request.message);
     } else {
-      // XXX There are many ways to make self smarter.
-      self.once('connect', function () {
-        if (self._remote.trace) {
+      // XXX There are many ways to make this smarter.
+      this.once('connect', function () {
+        if (this._remote.trace) {
           utils.logObject('server: request: %s', request.message);
         }
         self.send_message(request.message);
       });
     }
   } else {
-    if (self._remote.trace) {
+    if (this._remote.trace) {
       utils.logObject('server: request: DROPPING: %s', request.message);
     }
   }
@@ -227,12 +238,14 @@ Server.prototype.request = function (request) {
 
 Server.prototype._handle_message = function (json) {
   var self = this;
-
-  var message;
   
   try {
-    message = JSON.parse(json);
+    var message = JSON.parse(json);
   } catch(exception) { return; }
+
+  if (typeof message !== 'object' || typeof message.type === 'undefined') {
+    return;
+  }
 
   switch(message.type) {
     case 'response':
@@ -255,9 +268,9 @@ Server.prototype._handle_message = function (json) {
         if (self._remote.trace) utils.logObject('server: error: %s', message);
 
         request.emit('error', {
-          'error'         : 'remoteError',
-          'error_message' : 'Remote reported an error.',
-          'remote'        : message
+          error         : 'remoteError',
+          error_message : 'Remote reported an error.',
+          remote        : message
         });
       }
       break;
@@ -267,17 +280,14 @@ Server.prototype._handle_message = function (json) {
       self._set_state(self._is_online(message.server_status) ? 'online' : 'offline');
       break;
   }
-};
+}
 
 Server.prototype._handle_response_subscribe = function (message) {
-  var self = this;
-
-  self._server_status = message.server_status;
-
-  if (self._is_online(message.server_status)) {
-    self._set_state('online');
+  this._server_status = message.server_status;
+  if (this._is_online(message.server_status)) {
+    this._set_state('online');
   }
-};
+}
 
 exports.Server = Server;
 
