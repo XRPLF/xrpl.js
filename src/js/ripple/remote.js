@@ -319,9 +319,9 @@ function Remote(opts, trace) {
   this.local_sequence        = opts.local_sequence; // Locally track sequence numbers
   this.local_fee             = opts.local_fee;      // Locally set fees
   this.local_signing         = (typeof opts.local_signing === 'undefined')
-                                ? true : opts.local_signing;
+                                ? true : Boolean(opts.local_signing);
   this.fee_cushion           = (typeof opts.fee_cushion === 'undefined')
-                                ? 1.5 : opts.fee_cushion;
+                                ? 1.5 : Number(opts.fee_cushion);
 
   this.id                    = 0;
   this.trace                 = opts.trace || trace;
@@ -352,10 +352,10 @@ function Remote(opts, trace) {
   // Local signing implies local fees and sequences
   if (this.local_signing) {
     this.local_sequence = true;
-    this.local_fee = true;
+    this.local_fee      = true;
   }
 
-  this._servers = [ ];
+  this._servers        = [ ];
   this._primary_server = void(0);
 
   // Cache information for accounts.
@@ -367,13 +367,13 @@ function Remote(opts, trace) {
     // account : { seq : __ }
   };
 
-  // Hash map of Account objects by AccountId.
+  // Account objects by AccountId.
   this._accounts = {};
 
-  // Hash map of OrderBook objects
+  // OrderBook objects
   this._books = {};
 
-  // List of secrets that we know about.
+  // Secrets that we know about.
   this.secrets = {
     // Secrets can be set by calling set_secret(account, secret).
 
@@ -383,8 +383,8 @@ function Remote(opts, trace) {
   // Cache for various ledgers.
   // XXX Clear when ledger advances.
   this.ledgers = {
-    'current' : {
-      'account_root' : {}
+    current : {
+      account_root : {}
     }
   };
 
@@ -491,11 +491,14 @@ Remote.prototype.add_server = function (opts) {
   });
 
   server.on('connect', function () {
+    self._connection_count++;
+    self._set_state('online');
     if (opts.primary || !self._primary_server) {
       self._set_primary_server(server);
     }
-    self._connection_count++;
-    self._set_state('online');
+    if (self._connection_count === self._servers.length) {
+      self.emit('ready');
+    }
   });
 
   server.on('disconnect', function () {
@@ -555,9 +558,11 @@ Remote.prototype.connect = function (online) {
   switch(typeof online) {
     case 'undefined':
       break;
+
     case 'function':
       this.once('connect', online);
       break;
+
     default:
       if (!Boolean(online)) 
         return this.disconnect()
@@ -567,9 +572,15 @@ Remote.prototype.connect = function (online) {
   if (!this._servers.length) {
     throw new Error('No servers available.');
   } else {
-    for (var i=0; i<this._servers.length; i++) {
-      this._servers[i].connect();
-    }
+    var servers = this._servers;
+    ;(function nextServer(i) {
+      var server = servers[i];
+      server._sid = i;
+      server.connect();
+      if (++i < servers.length) {
+        setTimeout(nextServer.bind(this, i), 1000 * 5);
+      }
+    })(0);
   }
 
   return this;
@@ -579,7 +590,7 @@ Remote.prototype.connect = function (online) {
  * Disconnect from the Ripple network.
  */
 Remote.prototype.disconnect = function (online) {
-  for (var i = 0, l = this._servers.length; i < l; i++) {
+  for (var i=0, l=this._servers.length; i<l; i++) {
     this._servers[i].disconnect();
   }
 
