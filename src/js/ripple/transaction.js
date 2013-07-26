@@ -108,7 +108,7 @@ var Transaction = function (remote) {
 util.inherits(Transaction, EventEmitter);
 
 // XXX This needs to be determined from the network.
-Transaction.fees = {
+Transaction.fee_units = {
   'default'         : 10,
 };
 
@@ -196,7 +196,7 @@ Transaction.prototype.complete = function () {
   var tx_json = this.tx_json;
 
   if ("undefined" === typeof tx_json.Fee && this.remote.local_fee) {
-    this.tx_json.Fee = "" + Math.ceil(this.remote.fee_tx() * this.fee_units());
+    this.tx_json.Fee = this.remote.fee_tx(this.fee_units()).to_json();
   }
 
   if ("undefined" === typeof tx_json.SigningPubKey && (!this.remote || this.remote.local_signing)) {
@@ -714,10 +714,12 @@ Transaction.prototype.wallet_add = function (src, amount, authorized_key, public
  * current load on both the network and the server.
  *
  * @see https://ripple.com/wiki/Transaction_Fee
+ *
+ * @return {Number} Number of fee units for this transaction.
  */
 Transaction.prototype.fee_units = function ()
 {
-  return Transaction.fees["default"];
+  return Transaction.fee_units["default"];
 };
 
 exports.Transaction     = Transaction;

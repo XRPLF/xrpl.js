@@ -1438,14 +1438,28 @@ Remote.prototype.transaction = function () {
 };
 
 /**
+ * Calculate a transaction fee for a number of tx fee units.
+ *
+ * This takes into account the last known network and local load fees.
+ *
+ * @return {Amount} Final fee in XRP for specified number of fee units.
+ */
+Remote.prototype.fee_tx = function (units)
+{
+  var fee_unit = this.fee_tx_unit();
+
+  return Amount.from_json(""+Math.ceil(units * fee_unit));
+};
+
+/**
  * Get the current recommended transaction fee unit.
  *
  * Multiply this value with the number of fee units in order to calculate the
  * recommended fee for the transaction you are trying to submit.
  *
- * @return {Number} Recommended amount for one fee unit.
+ * @return {Number} Recommended amount for one fee unit as float.
  */
-Remote.prototype.fee_tx = function ()
+Remote.prototype.fee_tx_unit = function ()
 {
   var fee_unit = this._fee_base / this._fee_ref;
 
