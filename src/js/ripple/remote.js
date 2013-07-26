@@ -15,266 +15,24 @@
 //
 
 // npm
-var EventEmitter  = require('events').EventEmitter;
-var util          = require('util');
+var EventEmitter = require('events').EventEmitter;
+var util         = require('util');
 
-var Server        = require('./server').Server;
-var Amount        = require('./amount').Amount;
-var Currency      = require('./currency').Currency;
-var UInt160       = require('./uint160').UInt160;
-var Transaction   = require('./transaction').Transaction;
-var Account       = require('./account').Account;
-var Meta          = require('./meta').Meta;
-var OrderBook     = require('./orderbook').OrderBook;
+var Request      = require('./request').Request;
+var Server       = require('./server').Server;
+var Amount       = require('./amount').Amount;
+var Currency     = require('./currency').Currency;
+var UInt160      = require('./uint160').UInt160;
+var Transaction  = require('./transaction').Transaction;
+var Account      = require('./account').Account;
+var Meta         = require('./meta').Meta;
+var OrderBook    = require('./orderbook').OrderBook;
 
-var utils         = require('./utils');
-var config        = require('./config');
-var sjcl          = require('../../../build/sjcl');
+var utils        = require('./utils');
+var config       = require('./config');
+var sjcl         = require('../../../build/sjcl');
 
-// Request events emitted:
-//  'success' : Request successful.
-//  'error'   : Request failed.
-//  'remoteError'
-//  'remoteUnexpected'
-//  'remoteDisconnected'
-function Request(remote, command) {
-  EventEmitter.call(this);
-  this.remote     = remote;
-  this.requested  = false;
-  this.message    = {
-    command : command,
-    id      : void(0)
-  };
-};
 
-util.inherits(Request, EventEmitter);
-
-// Send the request to a remote.
-Request.prototype.request = function (remote) {
-  if (!this.requested) {
-    this.requested  = true;
-    this.remote.request(this);
-    this.emit('request', remote);
-  }
-};
-
-Request.prototype.callback = function(callback, successEvent, errorEvent) {
-  if (callback && typeof callback === 'function') {
-    this.once(successEvent || 'success', callback.bind(this, null));
-    this.once(errorEvent   || 'error'  , callback.bind(this));
-    this.request();
-  }
-
-  return this;
-};
-
-Request.prototype.timeout = function(duration, callback) {
-  if (!this.requested) {
-    this.once('request', this.timeout.bind(this, duration, callback));
-    return;
-  };
-
-  var self      = this;
-  var emit      = this.emit;
-  var timed_out = false;
-
-  var timeout = setTimeout(function() {
-    timed_out = true;
-    if (typeof callback === 'function') callback();
-    emit.call(self, 'timeout');
-  }, duration);
-
-  this.emit = function() {
-    if (timed_out) return;
-    else clearTimeout(timeout);
-    emit.apply(self, arguments);
-  };
-
-  return this;
-};
-
-Request.prototype.build_path = function (build) {
-  if (build) {
-    this.message.build_path = true;
-  }
-
-  return this;
-};
-
-Request.prototype.ledger_choose = function (current) {
-  if (current) {
-    this.message.ledger_index = this.remote._ledger_current_index;
-  } else {
-    this.message.ledger_hash  = this.remote._ledger_hash;
-  }
-
-  return this;
-};
-
-// Set the ledger for a request.
-// - ledger_entry
-// - transaction_entry
-Request.prototype.ledger_hash = function (h) {
-  this.message.ledger_hash  = h;
-
-  return this;
-};
-
-// Set the ledger_index for a request.
-// - ledger_entry
-Request.prototype.ledger_index = function (ledger_index) {
-  this.message.ledger_index  = ledger_index;
-
-  return this;
-};
-
-Request.prototype.ledger_select = function (ledger_spec) {
-  switch (ledger_spec) {
-    case 'current':
-    case 'closed':
-    case 'verified':
-      this.message.ledger_index = ledger_spec;
-      break;
-
-    default:
-      // XXX Better test needed
-      if (String(ledger_spec).length > 12) {
-        this.message.ledger_hash  = ledger_spec;
-      } else {
-        this.message.ledger_index  = ledger_spec;
-      }
-      break;
-  }
-
-  return this;
-};
-
-Request.prototype.account_root = function (account) {
-  this.message.account_root  = UInt160.json_rewrite(account);
-
-  return this;
-};
-
-Request.prototype.index = function (hash) {
-  this.message.index  = hash;
-
-  return this;
-};
-
-// Provide the information id an offer.
-// --> account
-// --> seq : sequence number of transaction creating offer (integer)
-Request.prototype.offer_id = function (account, seq) {
-  this.message.offer = {
-    account:  UInt160.json_rewrite(account),
-    seq:      seq
-  };
-
-  return this;
-};
-
-// --> index : ledger entry index.
-Request.prototype.offer_index = function (index) {
-  this.message.offer  = index;
-
-  return this;
-};
-
-Request.prototype.secret = function (s) {
-  if (s) {
-    this.message.secret  = s;
-  }
-
-  return this;
-};
-
-Request.prototype.tx_hash = function (h) {
-  this.message.tx_hash  = h;
-
-  return this;
-};
-
-Request.prototype.tx_json = function (j) {
-  this.message.tx_json  = j;
-
-  return this;
-};
-
-Request.prototype.tx_blob = function (j) {
-  this.message.tx_blob  = j;
-
-  return this;
-};
-
-Request.prototype.ripple_state = function (account, issuer, currency) {
-  this.message.ripple_state  = {
-    'accounts' : [
-      UInt160.json_rewrite(account),
-      UInt160.json_rewrite(issuer)
-    ],
-    'currency' : currency
-  };
-
-  return this;
-};
-
-Request.prototype.accounts = function (accounts, realtime) {
-  if (!Array.isArray(accounts)) {
-    accounts = [ accounts ];
-  }
-
-  // Process accounts parameters
-  var procAccounts = accounts.map(function(account) {
-    return UInt160.json_rewrite(account);
-  });
-  
-  if (realtime) {
-    this.message.rt_accounts = procAccounts;
-  } else {
-    this.message.accounts = procAccounts;
-  }
-
-  return this;
-};
-
-Request.prototype.rt_accounts = function (accounts) {
-  return this.accounts(accounts, true);
-};
-
-Request.prototype.books = function (books, snapshot) {
-  var procBooks = [];
-
-  for (var i = 0, l = books.length; i < l; i++) {
-    var book = books[i];
-    var json = {};
-
-    function processSide(side) {
-      if (!book[side]) throw new Error('Missing '+side);
-
-      var obj = json[side] = {
-        currency: Currency.json_rewrite(book[side].currency)
-      };
-      
-      if (obj.currency !== 'XRP') {
-        obj.issuer = UInt160.json_rewrite(book[side].issuer);
-      }
-    }
-
-    processSide('taker_gets');
-    processSide('taker_pays');
-
-    if (snapshot) json.snapshot = true;
-    if (book.both) json.both = true; 
-
-    procBooks.push(json);
-  }
-
-  this.message.books = procBooks;
-
-  return this;
-};
-
-//------------------------------------------------------------------------------
 /**
     Interface to manage the connection to a Ripple server.
 
@@ -606,93 +364,95 @@ Remote.prototype.ledger_hash = function () {
 // It is possible for messages to be dispatched after the connection is closed.
 Remote.prototype._handle_message = function (json) {
   var self        = this;
-  var message     = JSON.parse(json);
   var unexpected  = false;
-  var request;
+  var message
 
-  if (typeof message !== 'object') {
-    unexpected  = true;
-  } else {
-    switch (message.type) {
-      case 'response':
-        // Handled by the server that sent the request
-        break;
-
-      case 'ledgerClosed':
-        // XXX If not trusted, need to verify we consider ledger closed.
-        // XXX Also need to consider a slow server or out of order response.
-        // XXX Be more defensive fields could be missing or of wrong type.
-        // YYY Might want to do some cache management.
-
-        this._ledger_time           = message.ledger_time;
-        this._ledger_hash           = message.ledger_hash;
-        this._ledger_current_index  = message.ledger_index + 1;
-
-        this.emit('ledger_closed', message);
-        break;
-
-      case 'transaction':
-        // To get these events, just subscribe to them. A subscribes and
-        // unsubscribes will be added as needed.
-        // XXX If not trusted, need proof.
-
-        // De-duplicate transactions that are immediately following each other
-        // XXX Should have a cache of n txs so we can dedup out of order txs
-        if (this._last_tx === message.transaction.hash) break;
-        this._last_tx = message.transaction.hash;
-
-        if (this.trace) utils.logObject('remote: tx: %s', message);
-
-        // Process metadata
-        message.mmeta = new Meta(message.meta);
-
-        // Pass the event on to any related Account objects
-        var affected = message.mmeta.getAffectedAccounts();
-        for (var i = 0, l = affected.length; i < l; i++) {
-          var account = self._accounts[affected[i]];
-
-          if (account) account.notifyTx(message);
-        }
-
-        // Pass the event on to any related OrderBooks
-        affected = message.mmeta.getAffectedBooks();
-        for (i = 0, l = affected.length; i < l; i++) {
-          var book = self._books[affected[i]];
-
-          if (book) book.notifyTx(message);
-        }
-
-        this.emit('transaction', message);
-        this.emit('transaction_all', message);
-        break;
-
-      // XXX Should be tracked by the Server object
-      case 'serverStatus':
-        if ('load_base' in message && 'load_factor' in message &&
-            (message.load_base !== self._load_base || message.load_factor != self._load_factor))
-        {
-          self._load_base     = message.load_base;
-          self._load_factor   = message.load_factor;
-
-          self.emit('load', { 'load_base' : self._load_base, 'load_factor' : self.load_factor });
-        }
-        break;
-
-      // All other messages
-      default:
-        if (this.trace) utils.logObject('remote: '+message.type+': %s', message);
-        this.emit('net_' + message.type, message);
-        break;
-    }
+  try {
+    message = JSON.parse(json);
+    unexpected = typeof message !== 'object';
+  } catch(exception) {
+    unexpected = true;
   }
 
-  // Unexpected response from remote.
   if (unexpected) {
-    console.log('unexpected message from trusted remote: %s', json);
-    (request || this).emit('error', {
-      'error' : 'remoteUnexpected',
-      'error_message' : 'Unexpected response from remote.'
+    // Unexpected response from remote.
+    this.emit('error', {
+      error:          'remoteUnexpected',
+      error_message:  'Unexpected response from remote.'
     });
+    return;
+  }
+
+  switch (message.type) {
+    case 'response':
+      // Handled by the server that sent the request
+      break;
+
+    case 'ledgerClosed':
+      // XXX If not trusted, need to verify we consider ledger closed.
+      // XXX Also need to consider a slow server or out of order response.
+      // XXX Be more defensive fields could be missing or of wrong type.
+      // YYY Might want to do some cache management.
+
+      this._ledger_time           = message.ledger_time;
+      this._ledger_hash           = message.ledger_hash;
+      this._ledger_current_index  = message.ledger_index + 1;
+
+      this.emit('ledger_closed', message);
+      break;
+
+    case 'transaction':
+      // To get these events, just subscribe to them. A subscribes and
+      // unsubscribes will be added as needed.
+      // XXX If not trusted, need proof.
+
+      // De-duplicate transactions that are immediately following each other
+      // XXX Should have a cache of n txs so we can dedup out of order txs
+      if (this._last_tx === message.transaction.hash) break;
+      this._last_tx = message.transaction.hash;
+
+      if (this.trace) utils.logObject('remote: tx: %s', message);
+
+      // Process metadata
+      message.mmeta = new Meta(message.meta);
+
+      // Pass the event on to any related Account objects
+      var affected = message.mmeta.getAffectedAccounts();
+      for (var i=0, l=affected.length; i<l; i++) {
+        var account = self._accounts[affected[i]];
+        if (account) account.notifyTx(message);
+      }
+
+      // Pass the event on to any related OrderBooks
+      affected = message.mmeta.getAffectedBooks();
+      for (i=0, l=affected.length; i<l; i++) {
+        var book = self._books[affected[i]];
+        if (book) book.notifyTx(message);
+      }
+
+      this.emit('transaction', message);
+      this.emit('transaction_all', message);
+      break;
+
+    // XXX Should be tracked by the Server object
+    case 'serverStatus':
+      self.emit('server_status', message);
+
+      if ('load_base' in message && 'load_factor' in message &&
+          (message.load_base !== self._load_base || message.load_factor != self._load_factor))
+      {
+        self._load_base     = message.load_base;
+        self._load_factor   = message.load_factor;
+
+        self.emit('load', { 'load_base' : self._load_base, 'load_factor' : self.load_factor });
+      }
+      break;
+
+    // All other messages
+    default:
+      if (this.trace) utils.logObject('remote: '+message.type+': %s', message);
+      this.emit('net_' + message.type, message);
+      break;
   }
 };
 
@@ -776,10 +536,12 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
       if (opts.transactions) request.message.transactions = true;
       if (opts.accounts) request.message.accounts         = true;
       break;
+
     case 'function':
       callback = opts;
       opts     = void(0);
       break;
+
     default:
       //DEPRECATED
       console.log('request_ledger: full parameter is deprecated');
@@ -922,10 +684,12 @@ Remote.prototype.request_unsubscribe = function (streams, callback) {
 // .ledger_index()
 Remote.prototype.request_transaction_entry = function (hash, callback) {
   //utils.assert(this.trusted);   // If not trusted, need to check proof, maybe talk packet protocol.
+  var request = new Request(this, 'transaction_entry');
 
-  return (new Request(this, 'transaction_entry'))
-    .tx_hash(hash)
-    .callback(callback);
+  request.tx_hash(hash);
+  request.callback(callback);
+
+  return request;
 };
 
 // DEPRECATED: use request_transaction_entry
@@ -1209,18 +973,16 @@ Remote.prototype.request_owner_count = function (account, current, callback) {
   return request;
 };
 
-Remote.prototype.account = function (accountId, callback) {
+Remote.prototype.get_account =
+Remote.prototype.account = function (accountId) {
   var accountId = UInt160.json_rewrite(accountId);
+  var account   = this._accounts[accountId];
 
-  if (!this._accounts[accountId]) {
-    var account = new Account(this, accountId);
-
+  if (!account) {
+    account = new Account(this, accountId);
     if (!account.is_valid()) return account;
-
     this._accounts[accountId] = account;
   }
-
-  var account = this._accounts[accountId];
 
   return account;
 };
@@ -1444,6 +1206,7 @@ Remote.prototype.request_connect = function (ip, port, callback) {
   return request;
 };
 
+Remote.prototype.create_transaction = 
 Remote.prototype.transaction = function () {
   return new Transaction(this);
 };
@@ -1456,8 +1219,7 @@ Remote.prototype.transaction = function () {
  *
  * @return {Number} Recommended amount for one fee unit.
  */
-Remote.prototype.fee_tx = function ()
-{
+Remote.prototype.fee_tx = function () {
   var fee_unit = this._fee_base / this._fee_ref;
 
   // Apply load fees
@@ -1474,11 +1236,10 @@ Remote.prototype.fee_tx = function ()
  *
  * Returns the base reserve with load fees and safety margin applied.
  */
-Remote.prototype.fee_reserve_base = function ()
-{
+Remote.prototype.fee_reserve_base = function () {
   // XXX
 };
 
-exports.Remote          = Remote;
+exports.Remote = Remote;
 
 // vim:sw=2:sts=2:ts=8:et
