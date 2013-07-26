@@ -339,9 +339,9 @@ function Remote(opts, trace) {
   this.retry                 = void(0);
 
   this._load_base            = 256;
-  this._load_factor          = 1.0;
-  this._fee_ref              = void(0);
-  this._fee_base             = void(0);
+  this._load_factor          = 256;
+  this._fee_ref              = 10;
+  this._fee_base             = 10;
   this._reserve_base         = void(0);
   this._reserve_inc          = void(0);
   this._connection_count     = 0;
