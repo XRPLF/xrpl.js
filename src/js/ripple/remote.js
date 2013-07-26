@@ -1477,9 +1477,18 @@ Remote.prototype.fee_tx_unit = function ()
  *
  * Returns the base reserve with load fees and safety margin applied.
  */
-Remote.prototype.fee_reserve_base = function ()
+Remote.prototype.reserve = function (owner_count)
 {
-  // XXX
+  var reserve_base = Amount.from_json(""+this._reserve_base);
+  var reserve_inc  = Amount.from_json(""+this._reserve_inc);
+
+  owner_count = owner_count || 0;
+
+  if (owner_count < 0) {
+    throw new Error("Owner count must not be negative.");
+  }
+
+  return reserve_base.add(reserve_inc.product_human(owner_count));
 };
 
 exports.Remote          = Remote;
