@@ -28,7 +28,7 @@
     "buster": "~0.6.12"
   },
   "scripts": {
-    "test": "node_modules/buster/bin/buster test",
+    "test": "node_modules/buster/bin/buster-test",
     "build": "node_modules/.bin/grunt"
   },
   "repository": {
