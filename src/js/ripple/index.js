@@ -6,7 +6,9 @@ exports.UInt160     = require('./amount').UInt160;
 exports.Seed        = require('./amount').Seed;
 exports.Transaction = require('./transaction').Transaction;
 exports.Meta        = require('./meta').Meta;
+exports.SerializedObject = require('./serializedobject').SerializedObject;
 
+exports.binformat   = require('./binformat');
 exports.utils       = require('./utils');
 
 // Important: We do not guarantee any specific version of SJCL or for any
