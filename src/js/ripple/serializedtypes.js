@@ -24,9 +24,11 @@ var SerializedType = function (methods) {
   extend(this, methods);
 };
 
-SerializedType.prototype.serialize_hex = function (so, hexData) {
+SerializedType.prototype.serialize_hex = function (so, hexData, noLength) {
   var byteData = bytes.fromBits(hex.toBits(hexData));
-  this.serialize_varint(so, byteData.length);
+  if (!noLength) {
+	this.serialize_varint(so, byteData.length);
+  }
   so.append(byteData);
 };
 
@@ -111,7 +113,7 @@ var STHash128 = exports.Hash128 = new SerializedType({
 var STHash256 = exports.Hash256 = new SerializedType({
   serialize: function (so, val) {
     var hash = UInt256.from_json(val);
-    this.serialize_hex(so, hash.to_hex());
+    this.serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
   parse: function (so) {
     // XXX
