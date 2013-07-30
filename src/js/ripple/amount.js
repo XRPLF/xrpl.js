@@ -795,13 +795,7 @@ Amount.prototype.parse_value = function (j) {
 };
 
 Amount.prototype.set_currency = function (c) {
-  if ('string' === typeof c) {
-    this._currency  = Currency.from_json(c);  
-  }
-  else
-  {
-    this._currency  = c;
-  }
+  this._currency  = Currency.from_json(c);
   this._is_native = this._currency.is_native();
 
   return this;
