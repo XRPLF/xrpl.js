@@ -136,7 +136,9 @@ var STHash160 = exports.Hash160 = new SerializedType({
 var STCurrency = new SerializedType({
   serialize: function (so, val) {
     var currency = val.to_json();
-    if ("string" === typeof currency && currency.length === 3) {
+    if ("XRP" === currency) {
+      this.serialize_hex(so, UInt160.HEX_ZERO, true);
+    } else if ("string" === typeof currency && currency.length === 3) {
       var currencyCode = currency.toUpperCase(),
           currencyData = utils.arraySet(20, 0);
 
