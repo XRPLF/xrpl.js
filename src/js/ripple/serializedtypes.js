@@ -11,7 +11,8 @@ var extend  = require('extend'),
     sjcl    = require('../../../build/sjcl');
 
 var amount  = require('./amount'),
-    UInt160 = amount.UInt160,
+    UInt128 = require('./uint128').UInt128,
+    UInt160 = require('./uint160').UInt160,
     UInt256 = require('./uint256').UInt256,
     Amount  = amount.Amount,
     Currency= amount.Currency;
@@ -28,7 +29,7 @@ var SerializedType = function (methods) {
   extend(this, methods);
 };
 
-SerializedType.serialize_hex = function (so, hexData, noLength) {
+function serialize_hex(so, hexData, noLength) {
   var byteData = bytes.fromBits(hex.toBits(hexData));
   if (!noLength) {
     SerializedType.serialize_varint(so, byteData.length);
@@ -75,7 +76,7 @@ SerializedType.parse_varint = function (so) {
   } else if (b1 <= 254) {
     b2 = so.read(1)[0];
     b3 = so.read(1)[0];
-    return 12481 + (b1-241)*65536 + b2*256 + b3 
+    return 12481 + (b1-241)*65536 + b2*256 + b3
   }
   else {
     throw new Error("Invalid varint length indicator");
@@ -86,8 +87,15 @@ SerializedType.parse_varint = function (so) {
 
 // Helper functions for 1-, 2-, and 4-byte integers.
 
-// Convert an integer value into an array of bytes and append it to the serialized object ("so")
+/**
+ * Convert an integer value into an array of bytes.
+ *
+ * The result is appended to the serialized object ("so").
+ */
 function append_byte_array(so, val, bytes) {
+  if ("number" !== typeof val) {
+    throw new Error("Integer is not a number");
+  }
   if (val < 0 || val >= (Math.pow(256, bytes))) {
     throw new Error("Integer out of bounds");
   }
@@ -95,7 +103,7 @@ function append_byte_array(so, val, bytes) {
   for (var i=0; i<bytes; i++) {
     newBytes.unshift(val >>> (i*8) & 0xff);
   }
-  so.append(newBytes); 
+  so.append(newBytes);
 }
 
 // Convert a certain number of bytes from the serialized object ("so") into an integer.
@@ -111,11 +119,9 @@ function readAndSum(so, bytes) {
 var STInt8 = exports.Int8 = new SerializedType({
   serialize: function (so, val) {
     append_byte_array(so, val, 1);
-    //so.append([val & 0xff]);
   },
   parse: function (so) {
     return readAndSum(so, 1);
-    //return so.read(1)[0];
   }
 });
 
@@ -152,10 +158,20 @@ var STInt64 = exports.Int64 = new SerializedType({
   serialize: function (so, val) {
     var bigNumObject;
     if ("number" === typeof val) {
-      bigNumObject = new BigInteger(val);
+      val = Math.floor(val);
+      if (val < 0) {
+        throw new Error("Negative value for unsigned Int64 is invalid.");
+      }
+      bigNumObject = new BigInteger(""+val, 10);
     } else if ("string" === typeof val) {
+      if (!/^[0-9A-F]{0,16}$/i.test(val)) {
+        throw new Error("Not a valid hex Int64.");
+      }
       bigNumObject = new BigInteger(val, 16);
     } else if (val instanceof BigInteger) {
+      if (val.compareTo(BigInteger.ZERO) < 0) {
+        throw new Error("Negative value for unsigned Int64 is invalid.");
+      }
       bigNumObject = val;
     } else {
       throw new Error("Invalid type for Int64");
@@ -168,12 +184,12 @@ var STInt64 = exports.Int64 = new SerializedType({
     while (hex.length < 16) {
       hex = "0" + hex;
     }
-    return this.serialize_hex(so, hash.to_hex(), true); //noLength = true
+    return serialize_hex(so, hex, true); //noLength = true
   },
   parse: function (so) {
     var hi = readAndSum(so, 4);
     var lo = readAndSum(so, 4);
-    
+
     var result = new BigInteger(hi);
     result.shiftLeft(32);
     result.add(lo);
@@ -187,7 +203,7 @@ var STHash128 = exports.Hash128 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error("Invalid Hash128");
     }
-    this.serialize_hex(so, hash.to_hex(), true); //noLength = true
+    serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
   parse: function (so) {
     return UInt128.from_bytes(so.read(16));
@@ -200,7 +216,7 @@ var STHash256 = exports.Hash256 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error("Invalid Hash256");
     }
-    this.serialize_hex(so, hash.to_hex(), true); //noLength = true
+    serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
   parse: function (so) {
     return UInt256.from_bytes(so.read(32));
@@ -209,8 +225,11 @@ var STHash256 = exports.Hash256 = new SerializedType({
 
 var STHash160 = exports.Hash160 = new SerializedType({
   serialize: function (so, val) {
-    var hash = UInt160.from_json(val);  // XXX Will this work?
-    this.serialize_hex(so, hash.to_hex(), true); //noLength = true
+    var hash = UInt160.from_json(val);
+    if (!hash.is_valid()) {
+      throw new Error("Invalid Hash160");
+    }
+    serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
   parse: function (so) {
     return UInt160.from_bytes(so.read(20));
@@ -222,7 +241,7 @@ var STCurrency = new SerializedType({
   serialize: function (so, val) {
     var currency = val.to_json();
     if ("XRP" === currency) {
-      this.serialize_hex(so, UInt160.HEX_ZERO, true);
+      serialize_hex(so, UInt160.HEX_ZERO, true);
     } else if ("string" === typeof currency && currency.length === 3) {
       var currencyCode = currency.toUpperCase(),
           currencyData = utils.arraySet(20, 0);
@@ -316,26 +335,25 @@ var STAmount = exports.Amount = new SerializedType({
     }
     if (value_bytes[0] & 0x80) {
       //non-native
-      var currency_bytes = so.read(20);
+      var currency = STCurrency.parse(so);
       var issuer_bytes = so.read(20);
-      var currency = STCurrency.parse(currency_bytes);
       var issuer = UInt160.from_bytes(issuer_bytes);
-      
-      var offset = ((value_bytes[0] & 0x3f) << 2) + (value_bytes[1] >>> 6);
+
+      var offset = ((value_bytes[0] & 0x3f) << 2) + (value_bytes[1] >>> 6) - 97;
       var mantissa_bytes = value_bytes.slice(1);
       mantissa_bytes[0] &= 0x3f;
       var value = new BigInteger(mantissa_bytes, 256);
-      
+
       if (value.equals(BigInteger.ZERO) && !is_zero ) {
         throw new Error("Invalid zero representation");
       }
-      
+
       amount._value = value;
       amount._offset = offset;
       amount._currency    = currency;
       amount._issuer      = issuer;
       amount._is_native   = false;
-      
+
     } else {
       //native
       var integer_bytes = value_bytes.slice();
@@ -350,7 +368,7 @@ var STAmount = exports.Amount = new SerializedType({
 
 var STVL = exports.VariableLength = new SerializedType({
   serialize: function (so, val) {
-    if ("string" === typeof val) this.serialize_hex(so, val);
+    if ("string" === typeof val) serialize_hex(so, val);
     else throw new Error("Unknown datatype.");
   },
   parse: function (so) {
@@ -362,7 +380,7 @@ var STVL = exports.VariableLength = new SerializedType({
 var STAccount = exports.Account = new SerializedType({
   serialize: function (so, val) {
     var account = UInt160.from_json(val);
-    this.serialize_hex(so, account.to_hex());
+    serialize_hex(so, account.to_hex());
   },
   parse: function (so) {
     var len = this.parse_varint(so);

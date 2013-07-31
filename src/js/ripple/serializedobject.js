@@ -5,8 +5,16 @@ var binformat = require('./binformat'),
 
 var UInt256 = require('./uint256').UInt256;
 
-var SerializedObject = function () {
-  this.buffer = [];
+var SerializedObject = function (buf) {
+  if (Array.isArray(buf)) {
+    this.buffer = buf;
+  } else if ("string" === typeof buf) {
+    this.buffer = sjcl.codec.bytes.fromBits(sjcl.codec.hex.toBits(buf));
+  } else if (!buf) {
+    this.buffer = [];
+  } else {
+    throw new Error("Invalid buffer passed.");
+  }
   this.pointer = 0;
 };
 

@@ -739,7 +739,7 @@ Amount.prototype.parse_value = function (j) {
 
   if ('number' === typeof j) {
     this._is_negative = j < 0;
-    this._value	      = new BigInteger(this._is_negative ? -j : j);
+    this._value	      = new BigInteger(Math.abs(j));
     this._offset      = 0;
 
     this.canonicalize();

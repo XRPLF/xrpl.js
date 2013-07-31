@@ -82,32 +82,32 @@ Currency.prototype.parse_json = function (j) {
   return this;
 };
 
-Currency.prototype.parse_bytes = function (byteArray) {
-    if (Array.isArray(byteArray) && byteArray.length == 20) {
-        var result;
-            // is it 0 everywhere except 12, 13, 14?
-        var isZeroExceptInStandardPositions = true;
-        for (var i=0; i<20; i++) {
-            isZeroExceptInStandardPositions = isZeroExceptInStandardPositions && (i===12 || i===13 || i===14 || byteArray[0]===0)
-        }
-        if (isZeroExceptInStandardPositions) {
-            var currencyCode = String.fromCharCode(currency_data[12]) + String.fromCharCode(currency_data[13]) + String.fromCharCode(currency_data[14]);
-            if (/^[A-Z]{3}$/.test(currencyCode) && currencyCode !== "XRP" ) {
-                this._value = currencyCode;
-            } else if (currencyCode === "\0\0\0") {
-                this._value = 0;
-            } else {
-                this._value = NaN;
-            }
-        } else {
-            // XXX Should support non-standard currency codes
-            this._value = NaN;
-        }
-    } else {
-        this._value = NaN;
+Currency.prototype.parse_bytes = function (byte_array) {
+  if (Array.isArray(byte_array) && byte_array.length == 20) {
+    var result;
+    // is it 0 everywhere except 12, 13, 14?
+    var isZeroExceptInStandardPositions = true;
+    for (var i=0; i<20; i++) {
+      isZeroExceptInStandardPositions = isZeroExceptInStandardPositions && (i===12 || i===13 || i===14 || byte_array[0]===0)
     }
-
-}
+    if (isZeroExceptInStandardPositions) {
+      var currencyCode = String.fromCharCode(byte_array[12]) + String.fromCharCode(byte_array[13]) + String.fromCharCode(byte_array[14]);
+      if (/^[A-Z]{3}$/.test(currencyCode) && currencyCode !== "XRP" ) {
+        this._value = currencyCode;
+      } else if (currencyCode === "\0\0\0") {
+        this._value = 0;
+      } else {
+        this._value = NaN;
+      }
+    } else {
+      // XXX Should support non-standard currency codes
+      this._value = NaN;
+    }
+  } else {
+    this._value = NaN;
+  }
+  return this;
+};
 
 Currency.prototype.is_native = function () {
   return !isNaN(this._value) && !this._value;
