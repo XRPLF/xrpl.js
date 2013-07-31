@@ -126,10 +126,10 @@ function Remote(opts, trace) {
   };
 
   // Account objects by AccountId.
-  this._accounts = {};
+  this._accounts = { };
 
   // OrderBook objects
-  this._books = {};
+  this._books = { };
 
   // Secrets that we know about.
   this.secrets = {
@@ -192,11 +192,11 @@ util.inherits(Remote, EventEmitter);
 
 // Flags for ledger entries. In support of account_root().
 Remote.flags = {
-  'account_root' : {
-    'PasswordSpent'           : 0x00010000,
-    'RequireDestTag'          : 0x00020000,
-    'RequireAuth'             : 0x00040000,
-    'DisallowXRP'             : 0x00080000,
+  account_root : {
+    PasswordSpent: 0x00010000,
+    RequireDestTag: 0x00020000,
+    RequireAuth: 0x00040000,
+    DisallowXRP: 0x00080000
   }
 };
 
@@ -917,9 +917,7 @@ Remote.prototype.ledger_accept = function (callback) {
     request.request();
     request.callback(callback);
   } else {
-    this.emit('error', {
-      'error' : 'notStandAlone'
-    });
+    this.emit('error', { error : 'notStandAlone' });
   }
 
   return this;
@@ -1100,39 +1098,40 @@ Remote.prototype.set_secret = function (account, secret) {
 //
 // If does not exist: emit('error', 'error' : 'remoteError', 'remote' : { 'error' : 'entryNotFound' })
 Remote.prototype.request_ripple_balance = function (account, issuer, currency, current, callback) {
-  var request       = this.request_ledger_entry('ripple_state');          // YYY Could be cached per ledger.
+  var request = this.request_ledger_entry('ripple_state');          // YYY Could be cached per ledger.
 
-  return request.ripple_state(account, issuer, currency)
-    .ledger_choose(current)
-    .on('success', function (message) {
-      var node            = message.node;
+  request.ripple_state(account, issuer, currency);
+  request.ledger_choose(current);
+  request.once(success, function(message) {
+    var node            = message.node;
+    var lowLimit        = Amount.from_json(node.LowLimit);
+    var highLimit       = Amount.from_json(node.HighLimit);
+    // The amount the low account holds of issuer.
+    var balance         = Amount.from_json(node.Balance);
+    // accountHigh implies: for account: balance is negated, highLimit is the limit set by account.
+    var accountHigh     = UInt160.from_json(account).equals(highLimit.issuer());
 
-      var lowLimit        = Amount.from_json(node.LowLimit);
-      var highLimit       = Amount.from_json(node.HighLimit);
-      // The amount the low account holds of issuer.
-      var balance         = Amount.from_json(node.Balance);
-      // accountHigh implies: for account: balance is negated, highLimit is the limit set by account.
-      var accountHigh     = UInt160.from_json(account).equals(highLimit.issuer());
+    request.emit('ripple_state', {
+      account_balance     : ( accountHigh ? balance.negate() : balance.clone()).parse_issuer(account),
+      peer_balance        : (!accountHigh ? balance.negate() : balance.clone()).parse_issuer(issuer),
 
-      request.emit('ripple_state', {
-        'account_balance'     : ( accountHigh ? balance.negate() : balance.clone()).parse_issuer(account),
-        'peer_balance'        : (!accountHigh ? balance.negate() : balance.clone()).parse_issuer(issuer),
+      account_limit       : ( accountHigh ? highLimit : lowLimit).clone().parse_issuer(issuer),
+      peer_limit          : (!accountHigh ? highLimit : lowLimit).clone().parse_issuer(account),
 
-        'account_limit'       : ( accountHigh ? highLimit : lowLimit).clone().parse_issuer(issuer),
-        'peer_limit'          : (!accountHigh ? highLimit : lowLimit).clone().parse_issuer(account),
+      account_quality_in  : ( accountHigh ? node.HighQualityIn : node.LowQualityIn),
+      peer_quality_in     : (!accountHigh ? node.HighQualityIn : node.LowQualityIn),
 
-        'account_quality_in'  : ( accountHigh ? node.HighQualityIn : node.LowQualityIn),
-        'peer_quality_in'     : (!accountHigh ? node.HighQualityIn : node.LowQualityIn),
+      account_quality_out : ( accountHigh ? node.HighQualityOut : node.LowQualityOut),
+      peer_quality_out    : (!accountHigh ? node.HighQualityOut : node.LowQualityOut),
+    });
+  });
 
-        'account_quality_out' : ( accountHigh ? node.HighQualityOut : node.LowQualityOut),
-        'peer_quality_out'    : (!accountHigh ? node.HighQualityOut : node.LowQualityOut),
-      });
-    })
-    .callback(callback, 'ripple_state');
+  request.callback(callback, 'ripple_state');
+
+  return request;
 };
 
 Remote.prototype.request_ripple_path_find = function (src_account, dst_account, dst_amount, src_currencies, callback) {
-  var self    = this;
   var request = new Request(this, 'ripple_path_find');
 
   request.message.source_account      = UInt160.json_rewrite(src_account);
@@ -1140,14 +1139,16 @@ Remote.prototype.request_ripple_path_find = function (src_account, dst_account, 
   request.message.destination_amount  = Amount.json_rewrite(dst_amount);
 
   if (src_currencies) {
-    request.message.source_currencies   = src_currencies.map(function (ci) {
-      var ci_new  = {};
+    request.message.source_currencies = src_currencies.map(function (ci) {
+      var ci_new  = { };
 
-      if ('issuer' in ci)
+      if (ci.hasOwnProperty('issuer')) {
         ci_new.issuer   = UInt160.json_rewrite(ci.issuer);
+      }
 
-      if ('currency' in ci)
+      if (ci.hasOwnProperty('currency')) {
         ci_new.currency = Currency.json_rewrite(ci.currency);
+      }
 
       return ci_new;
     });
@@ -1212,14 +1213,26 @@ Remote.prototype.transaction = function () {
 };
 
 /**
+ * Calculate a transaction fee for a number of tx fee units.
+ *
+ * This takes into account the last known network and local load fees.
+ *
+ * @return {Amount} Final fee in XRP for specified number of fee units.
+ */
+Remote.prototype.fee_tx = function (units) {
+  var fee_unit = this.fee_tx_unit();
+  return Amount.from_json(String(Math.ceil(units * fee_unit)));
+};
+
+/**
  * Get the current recommended transaction fee unit.
  *
  * Multiply this value with the number of fee units in order to calculate the
  * recommended fee for the transaction you are trying to submit.
  *
- * @return {Number} Recommended amount for one fee unit.
+ * @return {Number} Recommended amount for one fee unit as float.
  */
-Remote.prototype.fee_tx = function () {
+Remote.prototype.fee_tx_unit = function () {
   var fee_unit = this._fee_base / this._fee_ref;
 
   // Apply load fees
@@ -1236,8 +1249,17 @@ Remote.prototype.fee_tx = function () {
  *
  * Returns the base reserve with load fees and safety margin applied.
  */
-Remote.prototype.fee_reserve_base = function () {
-  // XXX
+Remote.prototype.reserve = function (owner_count) {
+  var reserve_base = Amount.from_json(String(this._reserve_base));
+  var reserve_inc  = Amount.from_json(String(this._reserve_inc));
+
+  owner_count = owner_count || 0;
+
+  if (owner_count < 0) {
+    throw new Error('Owner count must not be negative.');
+  }
+
+  return reserve_base.add(reserve_inc.product_human(owner_count));
 };
 
 exports.Remote = Remote;

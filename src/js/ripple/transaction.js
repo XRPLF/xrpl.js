@@ -85,33 +85,31 @@ function Transaction(remote) {
 util.inherits(Transaction, EventEmitter);
 
 // XXX This needs to be determined from the network.
-Transaction.fees = {
-  default         : Amount.from_json('10'),
-  nickname_create : Amount.from_json('1000'),
-  offer           : Amount.from_json('10'),
+Transaction.fee_units = {
+  default: 10,
 };
 
 Transaction.flags = {
-  AccountSet : {
-    RequireDestTag          : 0x00010000,
-    OptionalDestTag         : 0x00020000,
-    RequireAuth             : 0x00040000,
-    OptionalAuth            : 0x00080000,
-    DisallowXRP             : 0x00100000,
-    AllowXRP                : 0x00200000,
+  AccountSet: {
+    RequireDestTag:     0x00010000,
+    OptionalDestTag:    0x00020000,
+    RequireAuth:        0x00040000,
+    OptionalAuth:       0x00080000,
+    DisallowXRP:        0x00100000,
+    AllowXRP:           0x00200000
   },
 
-  OfferCreate : {
-    Passive                 : 0x00010000,
-    ImmediateOrCancel       : 0x00020000,
-    FillOrKill              : 0x00040000,
-    Sell                    : 0x00080000,
+  OfferCreate: {
+    Passive:            0x00010000,
+    ImmediateOrCancel:  0x00020000,
+    FillOrKill:         0x00040000,
+    Sell:               0x00080000
   },
 
-  Payment : {
-    NoRippleDirect          : 0x00010000,
-    PartialPayment          : 0x00020000,
-    LimitQuality            : 0x00040000,
+  Payment: {
+    NoRippleDirect:     0x00010000,
+    PartialPayment:     0x00020000,
+    LimitQuality:       0x00040000
   },
 };
 
@@ -121,12 +119,12 @@ Transaction.HASH_SIGN         = 0x53545800;
 Transaction.HASH_SIGN_TESTNET = 0x73747800;
 
 Transaction.prototype.consts = {
-  'telLOCAL_ERROR'  : -399,
-  'temMALFORMED'    : -299,
-  'tefFAILURE'      : -199,
-  'terRETRY'        : -99,
-  'tesSUCCESS'      : 0,
-  'tecCLAIMED'      : 100,
+  telLOCAL_ERROR  : -399,
+  temMALFORMED    : -299,
+  tefFAILURE      : -199,
+  terRETRY        : -99,
+  tesSUCCESS      : 0,
+  tecCLAIMED      : 100,
 };
 
 Transaction.prototype.isTelLocal = function (ter) {
@@ -183,11 +181,11 @@ Transaction.prototype.get_fee = function() {
 Transaction.prototype.complete = function () {
   var tx_json = this.tx_json;
 
-  if (tx_json.Fee === void(0) && this.remote.local_fee) {
-    tx_json.Fee = Transaction.fees['default'].to_json();
+  if (typeof tx_json.Fee === 'undefined' && this.remote.local_fee === void(0)) {
+    this.tx_json.Fee = this.remote.fee_tx(this.fee_units()).to_json();
   }
 
-  if (tx_json.SigningPubKey === void(0) && (!this.remote || this.remote.local_signing)) {
+  if (typeof tx_json.SigningPubKey === 'undefined' && (!this.remote || this.remote.local_signing)) {
     var seed = Seed.from_json(this._secret);
     var key = seed.get_key(this.tx_json.Account);
     tx_json.SigningPubKey = key.to_hex_pub();
@@ -212,9 +210,10 @@ Transaction.prototype.sign = function () {
   var seed = Seed.from_json(this._secret);
   var hash = this.signing_hash();
 
-  if (this.tx_json.TxnSignature && hash === this._previous_signing_hash) {
-    return;
-  }
+  var previously_signed = this.tx_json.TxnSignature 
+    && hash === this._previous_signing_hash;
+
+  if (previously_signed) return;
 
   var key  = seed.get_key(this.tx_json.Account);
   var sig  = key.sign(hash, 0);
@@ -478,7 +477,7 @@ Transaction.prototype.ripple_line_set = function (src, limit, quality_in, qualit
   this.tx_json.Account         = UInt160.json_rewrite(src);
 
   // Allow limit of 0 through.
-  if (limit !== undefined)
+  if (limit !== void(0))
     this.tx_json.LimitAmount  = Amount.json_rewrite(limit);
 
   if (quality_in)
@@ -503,6 +502,21 @@ Transaction.prototype.wallet_add = function (src, amount, authorized_key, public
   return this;
 };
 
+/**
+ * Returns the number of fee units this transaction will cost.
+ *
+ * Each Ripple transaction based on its type and makeup costs a certain number
+ * of fee units. The fee units are calculated on a per-server basis based on the
+ * current load on both the network and the server.
+ *
+ * @see https://ripple.com/wiki/Transaction_Fee
+ *
+ * @return {Number} Number of fee units for this transaction.
+ */
+Transaction.prototype.fee_units = function () {
+  return Transaction.fee_units['default'];
+};
+
 // Submit a transaction to the network.
 // XXX Don't allow a submit without knowing ledger_index.
 // XXX Have a network canSubmit(), post events for following.
@@ -521,13 +535,13 @@ Transaction.prototype.wallet_add = function (src, amount, authorized_key, public
 Transaction.prototype.submit = function (callback) {
   var self = this;
 
-  this.callback = (typeof callback === 'function') ? callback : function(){};
+  this.callback = typeof callback === 'function' ? callback : function(){};
 
-  this.once('error', function transaction_error(error, message) {
+  this.once('error', function(error, message) {
     self.callback(error, message);
   });
 
-  this.once('success', function transaction_success(message) {
+  this.once('success', function(message) {
     self.callback(null, message);
   });
 
