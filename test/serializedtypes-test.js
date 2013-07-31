@@ -11,30 +11,28 @@ try {
 
 var config = require('../src/js/ripple/config').load(conf);
 
-
-
 buster.testCase("Serialized types", {
   "Int8" : {
     "Serialize 0" : function () {
-	  var so = new SerializedObject();
-	  types.Int8.serialize(so, 0);
-	  assert.equals(so.to_hex(), "00");
+      var so = new SerializedObject();
+      types.Int8.serialize(so, 0);
+      assert.equals(so.to_hex(), "00");
     },
     "Serialize 123" : function () {
-	  var so = new SerializedObject();
-	  types.Int8.serialize(so, 123);
-	  assert.equals(so.to_hex(), "7B");
+      var so = new SerializedObject();
+      types.Int8.serialize(so, 123);
+      assert.equals(so.to_hex(), "7B");
     },
     "Serialize 255" : function () {
-	  var so = new SerializedObject();
-	  types.Int8.serialize(so, 255);
-	  assert.equals(so.to_hex(), "FF");
+      var so = new SerializedObject();
+      types.Int8.serialize(so, 255);
+      assert.equals(so.to_hex(), "FF");
     },
     "Fail to serialize 256" : function () {
-	  var so = new SerializedObject();
-	  assert.exception(function () {
-	    types.Int8.serialize(so, 256);
-	  });
+      var so = new SerializedObject();
+      assert.exception(function () {
+        types.Int8.serialize(so, 256);
+      });
     },
   }
 });
