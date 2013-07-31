@@ -22,9 +22,19 @@ Currency.json_rewrite = function (j) {
 };
 
 Currency.from_json = function (j) {
-  if (j instanceof Currency) return j.clone();
-  else if ('string' === typeof j || 'number' === typeof j) return (new Currency()).parse_json(j);
-  else return new Currency(); // NaN
+  if (j instanceof Currency) {
+    return j.clone();
+  } else {
+    return new Currency().parse_json(j);
+  }
+};
+
+Currency.from_bytes = function (j) {
+  if (j instanceof Currency) {
+    return j.clone();
+  } else {
+    return new Currency().parse_bytes(j);
+  }
 };
 
 Currency.is_valid = function (j) {
@@ -49,20 +59,53 @@ Currency.prototype.equals = function (d) {
 
 // this._value = NaN on error.
 Currency.prototype.parse_json = function (j) {
-  if ("" === j || "0" === j || "XRP" === j) {
-    this._value	= 0;
-  }
-  else if ('number' === typeof j) {
+  if (j instanceof Currency) {
+    this._value = j;
+  } else if ('string' === typeof j) {
+    if (j === "" || j === "0" || j === "XRP") {
+      // XRP is never allowed as a Currency object
+      this._value = 0;
+    } else if (j.length === 3) {
+      this._value = j;
+    } else {
+      this._value = NaN;
+    }
+  } else if ('number' === typeof j) {
     // XXX This is a hack
-    this._value	= j;
-  }
-  else if ('string' != typeof j || 3 !== j.length) {
-    this._value	= NaN;
-  }
-  else {
-    this._value	= j;
+    this._value = j;
+  } else if ('string' != typeof j || 3 !== j.length) {
+    this._value = NaN;
+  } else {
+    this._value = j;
   }
 
+  return this;
+};
+
+Currency.prototype.parse_bytes = function (byte_array) {
+  if (Array.isArray(byte_array) && byte_array.length == 20) {
+    var result;
+    // is it 0 everywhere except 12, 13, 14?
+    var isZeroExceptInStandardPositions = true;
+    for (var i=0; i<20; i++) {
+      isZeroExceptInStandardPositions = isZeroExceptInStandardPositions && (i===12 || i===13 || i===14 || byte_array[0]===0)
+    }
+    if (isZeroExceptInStandardPositions) {
+      var currencyCode = String.fromCharCode(byte_array[12]) + String.fromCharCode(byte_array[13]) + String.fromCharCode(byte_array[14]);
+      if (/^[A-Z]{3}$/.test(currencyCode) && currencyCode !== "XRP" ) {
+        this._value = currencyCode;
+      } else if (currencyCode === "\0\0\0") {
+        this._value = 0;
+      } else {
+        this._value = NaN;
+      }
+    } else {
+      // XXX Should support non-standard currency codes
+      this._value = NaN;
+    }
+  } else {
+    this._value = NaN;
+  }
   return this;
 };
 

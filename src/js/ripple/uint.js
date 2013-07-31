@@ -61,6 +61,15 @@ UInt.from_bits = function (j) {
 };
 
 // Return a new UInt from j.
+UInt.from_bytes = function (j) {
+  if (j instanceof this) {
+    return j.clone();
+  } else {
+    return (new this()).parse_bytes(j);
+  }
+};
+
+// Return a new UInt from j.
 UInt.from_bn = function (j) {
   if (j instanceof this) {
     return j.clone();
@@ -157,7 +166,17 @@ UInt.prototype.parse_bits = function (j) {
     this._value = NaN;
   } else {
     var bytes = sjcl.codec.bytes.fromBits(j);
-	  this._value  = new BigInteger(bytes, 256);
+    this.parse_bytes(bytes);
+  }
+
+  return this;
+};
+
+UInt.prototype.parse_bytes = function (j) {
+  if (!Array.isArray(j) || j.length !== this.constructor.width) {
+    this._value = NaN;
+  } else {
+	  this._value  = new BigInteger(j, 256);
   }
 
   return this;

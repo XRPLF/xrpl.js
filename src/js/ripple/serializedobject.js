@@ -5,8 +5,16 @@ var binformat = require('./binformat'),
 
 var UInt256 = require('./uint256').UInt256;
 
-var SerializedObject = function () {
-  this.buffer = [];
+var SerializedObject = function (buf) {
+  if (Array.isArray(buf)) {
+    this.buffer = buf;
+  } else if ("string" === typeof buf) {
+    this.buffer = sjcl.codec.bytes.fromBits(sjcl.codec.hex.toBits(buf));
+  } else if (!buf) {
+    this.buffer = [];
+  } else {
+    throw new Error("Invalid buffer passed.");
+  }
   this.pointer = 0;
 };
 
@@ -44,6 +52,23 @@ SerializedObject.prototype.append = function (bytes) {
   this.buffer = this.buffer.concat(bytes);
   this.pointer += bytes.length;
 };
+
+SerializedObject.prototype.resetPointer = function () {
+  this.pointer = 0;
+};
+
+SerializedObject.prototype.read = function (numberOfBytes) {
+  var start = this.pointer;
+  var end = start+numberOfBytes;
+  if (end > this.buffer.length) {
+	throw new Error("There aren't that many bytes left to read.");
+  } else {
+	var result = this.buffer.slice(start,end);
+	this.pointer = end;
+	return result;
+  }
+};
+
 
 SerializedObject.prototype.to_bits = function ()
 {
