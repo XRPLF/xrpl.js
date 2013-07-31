@@ -19,20 +19,33 @@ var amount  = require('./amount'),
 // Shortcuts
 var hex    = sjcl.codec.hex,
     bytes  = sjcl.codec.bytes;
+    
+var jsbn    = require('./jsbn');
+var BigInteger = jsbn.BigInteger;
+
 
 var SerializedType = function (methods) {
   extend(this, methods);
 };
 
-SerializedType.prototype.serialize_hex = function (so, hexData, noLength) {
+SerializedType.serialize_hex = function (so, hexData, noLength) {
   var byteData = bytes.fromBits(hex.toBits(hexData));
   if (!noLength) {
-	this.serialize_varint(so, byteData.length);
+    SerializedType.serialize_varint(so, byteData.length);
   }
   so.append(byteData);
 };
 
-SerializedType.prototype.serialize_varint = function (so, val) {
+
+
+/**
+ * parses bytes as hex
+ */
+function convert_bytes_to_hex (byte_array) {
+    return sjcl.codec.hex.fromBits(sjcl.codec.bytes.toBits(byte_array));
+}
+
+SerializedType.serialize_varint = function (so, val) {
   if (val < 0) {
     throw new Error("Variable integers are unsigned.");
   }
@@ -51,84 +64,156 @@ SerializedType.prototype.serialize_varint = function (so, val) {
   } else throw new Error("Variable integer overflow.");
 };
 
+
+SerializedType.parse_varint = function (so) {
+  var b1 = so.read(1)[0], b2, b3;
+  if (b1 <= 192) {
+	return b1;
+  } else if (b1 <= 240) {
+	b2 = so.read(1)[0];
+	return 193 + (b1-193)*256 + b2;
+  } else if (b1 <= 254) {
+	b2 = so.read(1)[0];
+	b3 = so.read(1)[0];
+	return 12481 + (b1-241)*65536 + b2*256 + b3 
+  }
+  else {
+	throw new Error("Invalid varint length indicator");
+  }
+};
+
+// In the following, we assume that the inputs are in the proper range. Is this correct?
+
+// Helper functions for 1-, 2-, and 4-byte integers.
+
+// Convert an integer value into an array of bytes and append it to the serialized object ("so")
+function append_byte_array(so, val, bytes) {
+	if (val < 0 || val >= (Math.pow(256, bytes))) {
+		throw new Error("Integer out of bounds");
+	}
+    var newBytes = [];
+    for (var i=0; i<bytes; i++) {
+        newBytes.unshift(val >>> (i*8) & 0xff);
+    }
+    so.append(newBytes); 
+}
+
+// Convert a certain number of bytes from the serialized object ("so") into an integer.
+function readAndSum(so, bytes) {
+    var sum = 0;
+    for (var i = 0; i<bytes; i++) {
+        sum += (so.read(1)[0] << (8*(bytes-1-i)) );
+    }
+    return sum;
+}
+
+
 var STInt8 = exports.Int8 = new SerializedType({
   serialize: function (so, val) {
-    so.append([val & 0xff]);
+    append_byte_array(so, val, 1);
+    //so.append([val & 0xff]);
   },
   parse: function (so) {
-    return so.read(1)[0];
+    return readAndSum(so, 1);
+    //return so.read(1)[0];
   }
 });
 
 var STInt16 = exports.Int16 = new SerializedType({
   serialize: function (so, val) {
-    so.append([
+    append_byte_array(so, val, 2);
+    /*so.append([
       val >>> 8 & 0xff,
       val       & 0xff
-    ]);
+    ]);*/
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing Int16 not implemented");
+    return readAndSum(so, 2);
   }
 });
 
 var STInt32 = exports.Int32 = new SerializedType({
   serialize: function (so, val) {
-    so.append([
+    append_byte_array(so, val, 4)
+    /*so.append([
       val >>> 24 & 0xff,
       val >>> 16 & 0xff,
       val >>>  8 & 0xff,
       val        & 0xff
-    ]);
+    ]);*/
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing Int32 not implemented");
+    return readAndSum(so, 4);
   }
 });
 
+
 var STInt64 = exports.Int64 = new SerializedType({
   serialize: function (so, val) {
-    // XXX
-    throw new Error("Serializing Int64 not implemented");
+    var bigNumObject;
+    if ("number" === typeof val) {
+        bigNumObject = new BigInteger(val);
+    } else if ("string" === typeof val) {
+        bigNumObject = new BigInteger(val, 16);
+    } else if (val instanceof BigInteger) {
+        bigNumObject = val;
+    } else {
+        throw new Error("Invalid type for Int64");
+    }
+
+	var hex = bigNumObject.toString(16);
+	if (hex.length > 16) {
+		throw new Error("Int64 is too large");
+	}
+	while (hex.length < 16) {
+		hex = "0" + hex;
+	}
+	return this.serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing Int64 not implemented");
+	var hi = readAndSum(so, 4);
+	var lo = readAndSum(so, 4);
+	
+	var result = new BigInteger(hi);
+	result.shiftLeft(32);
+	result.add(lo);
+	return result;
   }
 });
 
 var STHash128 = exports.Hash128 = new SerializedType({
   serialize: function (so, val) {
-    // XXX
-    throw new Error("Serializing Hash128 not implemented");
+    var hash = UInt128.from_json(val);
+    if (!hash.is_valid()) {
+        throw new Error("Invalid Hash128");
+    }
+    this.serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing Hash128 not implemented");
+    return UInt128.from_bytes(so.read(16));
   }
 });
 
 var STHash256 = exports.Hash256 = new SerializedType({
   serialize: function (so, val) {
     var hash = UInt256.from_json(val);
+    if (!hash.is_valid()) {
+        throw new Error("Invalid Hash256");
+    }
     this.serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing Hash256 not implemented");
+    return UInt256.from_bytes(so.read(32));
   }
 });
 
 var STHash160 = exports.Hash160 = new SerializedType({
   serialize: function (so, val) {
-    // XXX
-    throw new Error("Serializing Hash160 not implemented");
+    var hash = UInt160.from_json(val);  // XXX Will this work?
+    this.serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing Hash160 not implemented");
+    return UInt160.from_bytes(so.read(20));
   }
 });
 
@@ -142,7 +227,7 @@ var STCurrency = new SerializedType({
       var currencyCode = currency.toUpperCase(),
           currencyData = utils.arraySet(20, 0);
 
-      if (!/^[A-Z]{3}$/.test(currencyCode)) {
+      if (!/^[A-Z]{3}$/.test(currencyCode) || currencyCode === "XRP" ) {
         throw new Error('Invalid currency code');
       }
 
@@ -156,8 +241,11 @@ var STCurrency = new SerializedType({
     }
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing Currency not implemented");
+	var currency = Currency.from_bytes(so.read(20));
+	if (!currency.is_valid()) {
+		throw new Error("Invalid currency");
+	}
+	return currency;
   }
 });
 
@@ -220,8 +308,43 @@ var STAmount = exports.Amount = new SerializedType({
     }
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing Amount not implemented");
+    var amount = new Amount();
+	var value_bytes = so.read(8);
+	var is_zero = !(value_bytes[0] & 0x7f);
+	for (var i=1; i<8; i++) {
+		is_zero = is_zero && !value_bytes[i];
+	}
+	if (value_bytes[0] & 0x80) {
+		//non-native
+		var currency_bytes = so.read(20);
+		var issuer_bytes = so.read(20);
+		var currency = STCurrency.parse(currency_bytes);
+		var issuer = UInt160.from_bytes(issuer_bytes);
+		
+		var offset = ((value_bytes[0] & 0x3f) << 2) + (value_bytes[1] >>> 6);
+		var mantissa_bytes = value_bytes.slice(1);
+		mantissa_bytes[0] &= 0x3f;
+		var value = new BigInteger(mantissa_bytes, 256);
+		
+		if (value.equals(BigInteger.ZERO) && !is_zero ) {
+			throw new Error("Invalid zero representation");
+		}
+		
+		amount._value = value;
+		amount._offset = offset;
+		amount._currency    = currency;
+		amount._issuer	    = issuer;
+		amount._is_native   = false;
+	
+	} else {
+		//native
+		var integer_bytes = value_bytes.slice();
+		integer_bytes[0] &= 0x3f;
+		amount._value = new BigInteger(integer_bytes, 256);
+		amount._is_native   = true;
+	}
+	amount._is_negative = !is_zero && !(value_bytes[0] & 0x40);
+	return amount;
   }
 });
 
@@ -231,8 +354,8 @@ var STVL = exports.VariableLength = new SerializedType({
     else throw new Error("Unknown datatype.");
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing VL not implemented");
+    var len = this.parse_varint(so);
+	return convert_bytes_to_hex(so.read(len));
   }
 });
 
@@ -242,8 +365,15 @@ var STAccount = exports.Account = new SerializedType({
     this.serialize_hex(so, account.to_hex());
   },
   parse: function (so) {
-    // XXX
-    throw new Error("Parsing Account not implemented");
+    var len = this.parse_varint(so);
+	if (len !== 20) {
+		throw new Error("Non-standard-length account ID");
+	}
+	var result = UInt160.from_bytes(so.read(len));
+	if (!result.is_valid()) {
+		throw new Error("Invalid Account");
+	}
+    return result;
   }
 });
 

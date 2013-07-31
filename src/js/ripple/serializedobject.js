@@ -45,6 +45,23 @@ SerializedObject.prototype.append = function (bytes) {
   this.pointer += bytes.length;
 };
 
+SerializedObject.prototype.resetPointer = function () {
+  this.pointer = 0;
+};
+
+SerializedObject.prototype.read = function (numberOfBytes) {
+  var start = this.pointer;
+  var end = start+numberOfBytes;
+  if (end > this.buffer.length) {
+	throw new Error("There aren't that many bytes left to read.");
+  } else {
+	var result = this.buffer.slice(start,end);
+	this.pointer = end;
+	return result;
+  }
+};
+
+
 SerializedObject.prototype.to_bits = function ()
 {
   return sjcl.codec.bytes.toBits(this.buffer);

@@ -29,6 +29,14 @@ Currency.from_json = function (j) {
   }
 };
 
+Currency.from_bytes = function (j) {
+  if (j instanceof Currency) {
+    return j.clone();
+  } else {
+    return new Currency().parse_bytes(j);
+  }
+};
+
 Currency.is_valid = function (j) {
   return Currency.from_json(j).is_valid();
 };
@@ -64,15 +72,42 @@ Currency.prototype.parse_json = function (j) {
     }
   } else if ('number' === typeof j) {
     // XXX This is a hack
-    this._value	= j;
+    this._value = j;
   } else if ('string' != typeof j || 3 !== j.length) {
-    this._value	= NaN;
+    this._value = NaN;
   } else {
-    this._value	= j;
+    this._value = j;
   }
 
   return this;
 };
+
+Currency.prototype.parse_bytes = function (byteArray) {
+    if (Array.isArray(byteArray) && byteArray.length == 20) {
+        var result;
+            // is it 0 everywhere except 12, 13, 14?
+        var isZeroExceptInStandardPositions = true;
+        for (var i=0; i<20; i++) {
+            isZeroExceptInStandardPositions = isZeroExceptInStandardPositions && (i===12 || i===13 || i===14 || byteArray[0]===0)
+        }
+        if (isZeroExceptInStandardPositions) {
+            var currencyCode = String.fromCharCode(currency_data[12]) + String.fromCharCode(currency_data[13]) + String.fromCharCode(currency_data[14]);
+            if (/^[A-Z]{3}$/.test(currencyCode) && currencyCode !== "XRP" ) {
+                this._value = currencyCode;
+            } else if (currencyCode === "\0\0\0") {
+                this._value = 0;
+            } else {
+                this._value = NaN;
+            }
+        } else {
+            // XXX Should support non-standard currency codes
+            this._value = NaN;
+        }
+    } else {
+        this._value = NaN;
+    }
+
+}
 
 Currency.prototype.is_native = function () {
   return !isNaN(this._value) && !this._value;
