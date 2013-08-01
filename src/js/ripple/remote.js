@@ -80,7 +80,8 @@ function Remote(opts, trace) {
                                 ? true : Boolean(opts.local_signing);
   this.fee_cushion           = (typeof opts.fee_cushion === 'undefined')
                                 ? 1.5 : Number(opts.fee_cushion);
-
+  this.max_fee               = (typeof opts.max_fee === 'undefined')
+                                ? Infinity: Number(opts.max_fee);
   this.id                    = 0;
   this.trace                 = opts.trace || trace;
   this._server_fatal         = false;              // True, if we know server exited.
@@ -1207,9 +1208,17 @@ Remote.prototype.request_connect = function (ip, port, callback) {
   return request;
 };
 
-Remote.prototype.create_transaction = 
-Remote.prototype.transaction = function () {
-  return new Transaction(this);
+Remote.prototype.transaction = function (source, destination, amount, callback) {
+  var tx = new Transaction(this);
+
+  if (arguments.length >= 3) {
+    tx = tx.payment(source, destination, amount);
+    if (typeof callback === 'function') {
+      tx.submit(callback);
+    }
+  }
+
+  return tx;
 };
 
 /**
