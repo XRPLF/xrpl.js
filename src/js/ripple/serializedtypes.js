@@ -128,10 +128,6 @@ var STInt8 = exports.Int8 = new SerializedType({
 var STInt16 = exports.Int16 = new SerializedType({
   serialize: function (so, val) {
     append_byte_array(so, val, 2);
-    /*so.append([
-     val >>> 8 & 0xff,
-     val       & 0xff
-     ]);*/
   },
   parse: function (so) {
     return readAndSum(so, 2);
@@ -141,12 +137,6 @@ var STInt16 = exports.Int16 = new SerializedType({
 var STInt32 = exports.Int32 = new SerializedType({
   serialize: function (so, val) {
     append_byte_array(so, val, 4)
-    /*so.append([
-     val >>> 24 & 0xff,
-     val >>> 16 & 0xff,
-     val >>>  8 & 0xff,
-     val        & 0xff
-     ]);*/
   },
   parse: function (so) {
     return readAndSum(so, 4);
@@ -434,7 +424,55 @@ var STPathSet = exports.PathSet = new SerializedType({
   },
   parse: function (so) {
     // XXX
-    throw new Error("Parsing PathSet not implemented");
+	// should return a list of lists:
+	/*
+	[
+		[entry, entry],
+		[entry, entry, entry]
+		[entry]
+		[]
+	]
+	
+	each entry has one or more of the following attributes: amount, currency, issuer.
+	*/
+	
+	var path_list = [];
+	var current_path = [];
+	
+	while (true) { //TODO: try/catch this loop, and catch when we run out of data without reaching the end of the data structure.
+		var tag_byte = so.read(1)[0];
+		//Now determine: is this an end, boundary, or entry-begin-tag?
+
+		if (tag_byte == typeEnd) { //We're done.
+			if (current_path) { //close the current path, if there is one,
+				path_list.push(current_path);
+			}
+			break; //and conclude.
+		} else if (tag_byte == typeBoundary {
+			if (current_path) { //close the current path, if there is one,
+				path_list.push(current_path);
+			}
+			current_path = []; //and start a new one.
+		} else {
+			//It's an entry-begin tag.
+			var entry = {};
+			if (tag_byte & typeAccount) {
+				entry.account = STAccount.parse(so.read(20))
+			}
+			if (tag_byte & typeCurrency) {
+				entry.currency = STCurrency.parse(so.read(20))
+			}
+			if (tag_byte & typeIssuer) {
+				entry.issuer = UInt160.parse(so.read(20)); //should know to use Base58?
+			}
+			if (entry.account || entry.currency || entry.issuer) {
+				current_path.push(entry);
+			} else {
+				throw new Error("Invalid path entry"); //It must have at least something in it.
+			}
+		}
+	}
+	return path_list;
   }
 });
 
