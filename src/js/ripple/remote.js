@@ -26,6 +26,7 @@ var Transaction   = require('./transaction').Transaction;
 var Account       = require('./account').Account;
 var Meta          = require('./meta').Meta;
 var OrderBook     = require('./orderbook').OrderBook;
+var PathFind      = require('./pathfind').PathFind;
 
 var utils         = require('./utils');
 var config        = require('./config');
@@ -348,6 +349,7 @@ function Remote(opts, trace) {
   this._connected            = false;
 
   this._last_tx              = null;
+  this._cur_path_find        = null;
 
   // Local signing implies local fees and sequences
   if (this.local_signing) {
@@ -653,6 +655,15 @@ Remote.prototype._handle_message = function (json) {
 
         this.emit('transaction', message);
         this.emit('transaction_all', message);
+        break;
+
+      case 'path_find':
+        // Pass the event to the currently open PathFind object
+        if (this._cur_path_find) {
+          this._cur_path_find.notify_update(message);
+        }
+
+        this.emit('path_find_all', message);
         break;
 
       // XXX Should be tracked by the Server object
@@ -1214,6 +1225,24 @@ Remote.prototype.account = function (accountId, callback) {
   return account;
 };
 
+Remote.prototype.path_find = function (src_account, dst_account,
+                                       dst_amount, src_currencies)
+{
+  var path_find = new PathFind(this,
+                               src_account, dst_account,
+                               dst_amount, src_currencies);
+
+  if (this._cur_path_find) {
+    this._cur_path_find.notify_superceded();
+  }
+
+  path_find.create();
+
+  this._cur_path_find = path_find;
+
+  return path_find;
+};
+
 Remote.prototype.book = function (currency_gets, issuer_gets,
                                   currency_pays, issuer_pays) {
   var gets = currency_gets;
@@ -1381,6 +1410,47 @@ Remote.prototype.request_ripple_path_find = function (src_account, dst_account, 
   }
 
   request.callback(callback);
+
+  return request;
+};
+
+Remote.prototype.request_path_find_create = function (src_account, dst_account,
+                                                      dst_amount,
+                                                      src_currencies, callback)
+{
+  var self    = this;
+  var request = new Request(this, 'path_find');
+
+  request.message.subcommand          = 'create';
+  request.message.source_account      = UInt160.json_rewrite(src_account);
+  request.message.destination_account = UInt160.json_rewrite(dst_account);
+  request.message.destination_amount  = Amount.json_rewrite(dst_amount);
+
+  if (src_currencies) {
+    request.message.source_currencies   = src_currencies.map(function (ci) {
+      var ci_new  = {};
+
+      if ('issuer' in ci)
+        ci_new.issuer   = UInt160.json_rewrite(ci.issuer);
+
+      if ('currency' in ci)
+        ci_new.currency = Currency.json_rewrite(ci.currency);
+
+      return ci_new;
+    });
+  }
+
+  request.callback(callback);
+
+  return request;
+};
+
+Remote.prototype.request_path_find_close = function ()
+{
+  var self    = this;
+  var request = new Request(this, 'path_find');
+
+  request.message.subcommand          = 'close';
 
   return request;
 };
