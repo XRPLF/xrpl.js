@@ -157,8 +157,8 @@ TransactionManager.prototype._request = function(tx) {
         result_message:         message.engine_result_message,
         engine_result_message:  message.engine_result_message,
 
-        rejected:               tx.isRejected(message.engine_result_code),
         // If server is honest, don't expect a final if rejected.
+        rejected:               tx.isRejected(message.engine_result_code),
       });
     }
   }
