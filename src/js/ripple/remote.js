@@ -199,10 +199,10 @@ util.inherits(Remote, EventEmitter);
 // Flags for ledger entries. In support of account_root().
 Remote.flags = {
   account_root : {
-    PasswordSpent: 0x00010000,
-    RequireDestTag: 0x00020000,
-    RequireAuth: 0x00040000,
-    DisallowXRP: 0x00080000
+    PasswordSpent:   0x00010000,
+    RequireDestTag:  0x00020000,
+    RequireAuth:     0x00040000,
+    DisallowXRP:     0x00080000
   }
 };
 
@@ -423,18 +423,16 @@ Remote.prototype._handle_message = function (json) {
       message.mmeta = new Meta(message.meta);
 
       // Pass the event on to any related Account objects
-      var affected = message.mmeta.getAffectedAccounts();
-      for (var i=0, l=affected.length; i<l; i++) {
-        var account = self._accounts[affected[i]];
+      message.mmeta.getAffectedAccounts().forEach(function(account) {
+        var account = self._accounts[account];
         if (account) account.notifyTx(message);
-      }
+      });
 
       // Pass the event on to any related OrderBooks
-      affected = message.mmeta.getAffectedBooks();
-      for (i=0, l=affected.length; i<l; i++) {
-        var book = self._books[affected[i]];
+      message.mmeta.getAffectedBooks().forEach(function(book) {
+        var book = self._books[book];
         if (book) book.notifyTx(message);
-      }
+      });
 
       this.emit('transaction', message);
       this.emit('transaction_all', message);
@@ -559,7 +557,7 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
     default:
       //DEPRECATED
       console.log('request_ledger: full parameter is deprecated');
-      request.message.full    = true;
+      request.message.full = true;
       break;
   }
 
@@ -1134,7 +1132,7 @@ Remote.prototype.request_ripple_balance = function (account, issuer, currency, c
 
   request.ripple_state(account, issuer, currency);
   request.ledger_choose(current);
-  request.once(success, function(message) {
+  request.once('success', function(message) {
     var node            = message.node;
     var lowLimit        = Amount.from_json(node.LowLimit);
     var highLimit       = Amount.from_json(node.HighLimit);
@@ -1333,8 +1331,7 @@ Remote.prototype.fee_tx_unit = function () {
 Remote.prototype.reserve = function (owner_count) {
   var reserve_base = Amount.from_json(String(this._reserve_base));
   var reserve_inc  = Amount.from_json(String(this._reserve_inc));
-
-  owner_count = owner_count || 0;
+  var owner_count  = owner_count || 0;
 
   if (owner_count < 0) {
     throw new Error('Owner count must not be negative.');
