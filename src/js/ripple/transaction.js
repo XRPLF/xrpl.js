@@ -181,7 +181,7 @@ Transaction.prototype.get_fee = function() {
 Transaction.prototype.complete = function () {
   var tx_json = this.tx_json;
 
-  if (typeof tx_json.Fee === 'undefined' && this.remote.local_fee === void(0)) {
+  if (typeof tx_json.Fee === 'undefined' && this.remote.local_fee) {
     this.tx_json.Fee = this.remote.fee_tx(this.fee_units()).to_json();
   }
 
@@ -409,7 +409,7 @@ Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expi
   this.tx_json.TakerGets       = Amount.json_rewrite(taker_gets);
 
   if (this.remote.local_fee) {
-    this.tx_json.Fee = Transaction.fees.offer.to_json();
+    //this.tx_json.Fee = Transaction.fees.offer.to_json();
   }
 
   if (expiration) {
@@ -537,13 +537,16 @@ Transaction.prototype.submit = function (callback) {
 
   this.callback = typeof callback === 'function' ? callback : function(){};
 
-  this.once('error', function(error, message) {
+  function submission_error(error, message) {
     self.callback(error, message);
-  });
+  }
 
-  this.once('success', function(message) {
+  function submission_success(message) {
     self.callback(null, message);
-  });
+  }
+
+  this.once('error', submission_error);
+  this.once('success', submission_success);
 
   var account = this.tx_json.Account;
 

@@ -19,7 +19,6 @@ var Amount             = require('./amount').Amount;
 var UInt160            = require('./uint160').UInt160;
 var TransactionManager = require('./transactionmanager').TransactionManager;
 
-
 function Account(remote, account) {
   EventEmitter.call(this);
 
@@ -83,7 +82,7 @@ util.inherits(Account, EventEmitter);
 /**
  * List of events that require a remote subscription to the account.
  */
-Account.subscribe_events = ['transaction', 'entry'];
+Account.subscribe_events = [ 'transaction', 'entry' ];
 
 Account.prototype.to_json = function () {
   return this._account.to_json();
