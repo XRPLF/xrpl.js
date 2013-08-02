@@ -80,12 +80,9 @@ function Remote(opts, trace) {
   this.trusted               = opts.trusted;
   this.local_sequence        = opts.local_sequence; // Locally track sequence numbers
   this.local_fee             = opts.local_fee;      // Locally set fees
-  this.local_signing         = (typeof opts.local_signing === 'undefined')
-                                ? true : Boolean(opts.local_signing);
-  this.fee_cushion           = (typeof opts.fee_cushion === 'undefined')
-                                ? 1.5 : Number(opts.fee_cushion);
-  this.max_fee               = (typeof opts.max_fee === 'undefined')
-                                ? Infinity: Number(opts.max_fee);
+  this.local_signing         = (typeof opts.local_signing === 'undefined') ? true : Boolean(opts.local_signing);
+  this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.5 : Number(opts.fee_cushion);
+  this.max_fee               = (typeof opts.max_fee === 'undefined') ? Infinity : Number(opts.max_fee);
   this.id                    = 0;
   this.trace                 = opts.trace || trace;
   this._server_fatal         = false;              // True, if we know server exited.
@@ -161,7 +158,7 @@ function Remote(opts, trace) {
         secure:   opts.websocket_ssl,
         trusted:  opts.trusted
       }
-    ]
+    ];
   }
 
   opts.servers.forEach(function(server) {
@@ -192,7 +189,7 @@ function Remote(opts, trace) {
       }
     }
   });
-};
+}
 
 util.inherits(Remote, EventEmitter);
 
@@ -211,7 +208,7 @@ Remote.from_config = function (obj, trace) {
 
   var remote = new Remote(serverConfig, trace);
 
-  for (var account in config.accounts) {
+  Object.keys(config.accounts).forEach(function(account) {
     var accountInfo = config.accounts[account];
     if (typeof accountInfo === 'object') {
       if (accountInfo.secret) {
@@ -221,7 +218,7 @@ Remote.from_config = function (obj, trace) {
         remote.set_secret(accountInfo.account, accountInfo.secret);
       }
     }
-  }
+  });
 
   return remote;
 };
@@ -243,9 +240,9 @@ var isTefFailure = function (engine_result_code) {
 Remote.prototype.add_server = function (opts) {
   var self = this;
 
-  var url  = ((opts.secure || opts.websocket_ssl) ? 'wss://' : 'ws://')
-  + (opts.host || opts.websocket_ip) + ':'
-  + (opts.port || opts.websocket_port)
+  var url  = ((opts.secure || opts.websocket_ssl) ? 'wss://' : 'ws://') +
+  (opts.host || opts.websocket_ip) + ':' +
+  (opts.port || opts.websocket_port)
   ;
 
   var server = new Server(this, {url: url});
@@ -284,7 +281,9 @@ Remote.prototype.server_fatal = function () {
 
 // Set the emitted state: 'online' or 'offline'
 Remote.prototype._set_state = function (state) {
-  if (this.trace) console.log('remote: set_state: %s', state);
+  if (this.trace) {
+    console.log('remote: set_state: %s', state);
+  }
 
   if (this.state !== state) {
     this.state = state;
@@ -328,8 +327,9 @@ Remote.prototype.connect = function (online) {
       break;
 
     default:
-      if (!Boolean(online)) 
-        return this.disconnect()
+      if (!Boolean(online)) {
+        return this.disconnect();
+      }
       break;
   }
 
@@ -371,7 +371,7 @@ Remote.prototype.ledger_hash = function () {
 Remote.prototype._handle_message = function (json) {
   var self        = this;
   var unexpected  = false;
-  var message
+  var message;
 
   try {
     message = JSON.parse(json);
@@ -414,24 +414,33 @@ Remote.prototype._handle_message = function (json) {
 
       // De-duplicate transactions that are immediately following each other
       // XXX Should have a cache of n txs so we can dedup out of order txs
-      if (this._last_tx === message.transaction.hash) break;
+      if (this._last_tx === message.transaction.hash) {
+        break;
+      }
+
       this._last_tx = message.transaction.hash;
 
-      if (this.trace) utils.logObject('remote: tx: %s', message);
+      if (this.trace) {
+        utils.logObject('remote: tx: %s', message);
+      }
 
       // Process metadata
       message.mmeta = new Meta(message.meta);
 
       // Pass the event on to any related Account objects
       message.mmeta.getAffectedAccounts().forEach(function(account) {
-        var account = self._accounts[account];
-        if (account) account.notifyTx(message);
+        account = self._accounts[account];
+        if (account) {
+          account.notifyTx(message);
+        }
       });
 
       // Pass the event on to any related OrderBooks
       message.mmeta.getAffectedBooks().forEach(function(book) {
-        var book = self._books[book];
-        if (book) book.notifyTx(message);
+        book = self._books[book];
+        if (book) {
+          book.notifyTx(message);
+        }
       });
 
       this.emit('transaction', message);
@@ -451,18 +460,23 @@ Remote.prototype._handle_message = function (json) {
       case 'serverStatus':
         self.emit('server_status', message);
 
-        if ('load_base' in message && 'load_factor' in message &&
-            (message.load_base !== self._load_base || message.load_factor != self._load_factor))
-        {
-          self._load_base     = message.load_base;
-          self._load_factor   = message.load_factor;
-        self.emit('load', { 'load_base' : self._load_base, 'load_factor' : self.load_factor });
-      }
+        var load_changed = message.hasOwnProperty('load_base')
+        && message.hasOwnProperty('load_factor')
+        && (message.load_base !== self._load_base || message.load_factor !== self._load_factor)
+        ;
+
+        if (load_changed) {
+          self._load_base   = message.load_base;
+          self._load_factor = message.load_factor;
+          self.emit('load', { 'load_base' : self._load_base, 'load_factor' : self.load_factor });
+        }
       break;
 
     // All other messages
     default:
-      if (this.trace) utils.logObject('remote: '+message.type+': %s', message);
+      if (this.trace) {
+        utils.logObject('remote: '+message.type+': %s', message);
+      }
       this.emit('net_' + message.type, message);
       break;
   }
@@ -501,7 +515,9 @@ Remote.prototype._get_server = function () {
     server = this._primary_server;
   } else {
     server = this._next_server();
-    if (server) this._set_primary_server(server);
+    if (server) {
+      this._set_primary_server(server);
+    }
   }
 
   return server;
@@ -541,12 +557,14 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
     request.message.ledger  = ledger;
   }
 
-  switch(typeof opts) {
+  switch (typeof opts) {
     case 'object':
-      if (opts.full) request.message.full                 = true;
-      if (opts.expand) request.message.expand             = true;
-      if (opts.transactions) request.message.transactions = true;
-      if (opts.accounts) request.message.accounts         = true;
+      var valid_properties = [ 'full', 'expand', 'transactions', 'accounts' ];
+      valid_properties.forEach(function(prop) {
+        if (opts.hasOwnProperty(prop)) {
+          request.message[prop] = true;
+        }
+      });
       break;
 
     case 'function':
@@ -602,21 +620,21 @@ Remote.prototype.request_ledger_entry = function (type, callback) {
   if (type === 'account_root') {
     request.request_default = request.request;
 
-    request.request         = function () {                        // Intercept default request.
+    request.request = function () {                        // Intercept default request.
       var bDefault  = true;
       // .self = Remote
       // this = Request
 
       // console.log('request_ledger_entry: caught');
 
-      if (self._ledger_hash) {
+      //if (self._ledger_hash) {
         // A specific ledger is requested.
-
         // XXX Add caching.
-      }
-      // else if (req.ledger_index)
-      // else if ('ripple_state' === request.type)         // YYY Could be cached per ledger.
-      else if (type === 'account_root') {
+        // else if (req.ledger_index)
+        // else if ('ripple_state' === request.type)         // YYY Could be cached per ledger.
+      //} 
+      
+      if (!self._ledger_hash && type === 'account_root') {
         var cache = self.ledgers.current.account_root;
 
         if (!cache) {
@@ -630,12 +648,11 @@ Remote.prototype.request_ledger_entry = function (type, callback) {
           // console.log('request_ledger_entry: emulating');
           request.emit('success', {
             // YYY Missing lots of fields.
-            'node' :  node,
+            node :  node
           });
 
           bDefault  = false;
         } else { // Was not cached.
-
           // XXX Only allow with trusted mode.  Must sync response with advance.
           switch (type) {
             case 'account_root':
@@ -657,8 +674,8 @@ Remote.prototype.request_ledger_entry = function (type, callback) {
         // console.log('request_ledger_entry: invoking');
         request.request_default();
       }
-    }
-  };
+    };
+  }
 
   request.callback(callback);
 
@@ -779,20 +796,15 @@ Remote.prototype.request_account_tx = function (obj, callback) {
 
   var request = new Request(this, 'account_tx');
 
-  request.message.account     = obj.account;
+  request.message.account = obj.account;
 
-  if (false && ledger_min === ledger_max) {
-    //request.message.ledger      = ledger_min;
-  }
-  else {
-    if (typeof obj.ledger_index_min !== 'undefined')	{request.message.ledger_index_min  = obj.ledger_index_min;}
-    if (typeof obj.ledger_index_max !== 'undefined')	{request.message.ledger_index_max  = obj.ledger_index_max;}
-    if (typeof obj.binary !== 'undefined')			{request.message.binary  = obj.binary;}
-    if (typeof obj.count !== 'undefined')			{request.message.count  = obj.count;}
-    if (typeof obj.descending !== 'undefined')		{request.message.descending  = obj.descending;}
-    if (typeof obj.offset !== 'undefined')			{request.message.offset  = obj.offset;}
-    if (typeof obj.limit !== 'undefined')			{request.message.limit  = obj.limit;}
-  }
+  if (typeof obj.ledger_index_min !== 'undefined')	{request.message.ledger_index_min  = obj.ledger_index_min;}
+  if (typeof obj.ledger_index_max !== 'undefined')	{request.message.ledger_index_max  = obj.ledger_index_max;}
+  if (typeof obj.binary !== 'undefined')			{request.message.binary  = obj.binary;}
+  if (typeof obj.count !== 'undefined')			{request.message.count  = obj.count;}
+  if (typeof obj.descending !== 'undefined')		{request.message.descending  = obj.descending;}
+  if (typeof obj.offset !== 'undefined')			{request.message.offset  = obj.offset;}
+  if (typeof obj.limit !== 'undefined')			{request.message.limit  = obj.limit;}
 
   request.callback(callback);
 
@@ -944,7 +956,7 @@ Remote.prototype.request_account_balance = function (account, current, callback)
     .on('success', function (message) {
       // If the caller also waits for 'success', they might run before this.
       request.emit('account_balance', Amount.from_json(message.node.Balance));
-    })
+    });
 
   request.callback(callback, 'account_balance');
 
@@ -960,7 +972,7 @@ Remote.prototype.request_account_flags = function (account, current, callback) {
     .on('success', function (message) {
       // If the caller also waits for 'success', they might run before this.
       request.emit('account_flags', message.node.Flags);
-    })
+    });
 
   request.callback(callback, 'account_flags');
 
@@ -976,7 +988,7 @@ Remote.prototype.request_owner_count = function (account, current, callback) {
     .on('success', function (message) {
       // If the caller also waits for 'success', they might run before this.
       request.emit('owner_count', message.node.OwnerCount);
-    })
+    });
 
   request.callback(callback, 'owner_count');
 
@@ -990,19 +1002,17 @@ Remote.prototype.account = function (accountId) {
 
   if (!account) {
     account = new Account(this, accountId);
-    if (!account.is_valid()) return account;
+    if (!account.is_valid()) {
+      return account;
+    }
     this._accounts[accountId] = account;
   }
 
   return account;
 };
 
-Remote.prototype.path_find = function (src_account, dst_account,
-                                       dst_amount, src_currencies)
-{
-  var path_find = new PathFind(this,
-                               src_account, dst_account,
-                               dst_amount, src_currencies);
+Remote.prototype.path_find = function (src_account, dst_account, dst_amount, src_currencies) {
+  var path_find = new PathFind(this, src_account, dst_account, dst_amount, src_currencies);
 
   if (this._cur_path_find) {
     this._cur_path_find.notify_superceded();
@@ -1015,12 +1025,16 @@ Remote.prototype.path_find = function (src_account, dst_account,
   return path_find;
 };
 
-Remote.prototype.book = function (currency_gets, issuer_gets,
-                                  currency_pays, issuer_pays) {
+Remote.prototype.book = function (currency_gets, issuer_gets, currency_pays, issuer_pays) {
   var gets = currency_gets;
-  if (gets !== 'XRP') gets += '/' + issuer_gets;
+  if (gets !== 'XRP') {
+    gets += '/' + issuer_gets;
+  }
+
   var pays = currency_pays;
-  if (pays !== 'XRP') pays += '/' + issuer_pays;
+  if (pays !== 'XRP') {
+    pays += '/' + issuer_pays;
+  }
 
   var key = gets + ':' + pays;
 
@@ -1030,13 +1044,15 @@ Remote.prototype.book = function (currency_gets, issuer_gets,
       currency_pays, issuer_pays
     );
 
-    if (!book.is_valid()) return book;
+    if (!book.is_valid()) {
+      return book;
+    }
 
     this._books[key] = book;
   }
 
   return this._books[key];
-}
+};
 
 // Return the next account sequence if possible.
 // <-- undefined or Sequence
@@ -1048,16 +1064,19 @@ Remote.prototype.account_seq = function (account, advance) {
   if (account_info && account_info.seq) {
     seq = account_info.seq;
 
-    if (advance === 'ADVANCE') account_info.seq += 1;
-    if (advance === 'REWIND') account_info.seq -= 1;
+    if (advance === 'ADVANCE') {
+      account_info.seq += 1;
+    }
+
+    if (advance === 'REWIND') {
+      account_info.seq -= 1;
+    }
 
     // console.log('cached: %s current=%d next=%d', account, seq, account_info.seq);
-  } else {
-    // console.log('uncached: %s', account);
   }
 
   return seq;
-}
+};
 
 Remote.prototype.set_account_seq = function (account, seq) {
   var account = UInt160.json_rewrite(account);
@@ -1098,7 +1117,7 @@ Remote.prototype.account_seq_cache = function (account, current, callback) {
         request.emit('error_account_seq_cache', message);
       });
 
-    account_info.caching_seq_request    = request;
+    account_info.caching_seq_request = request;
   }
 
   request.callback(callback, 'success_account_seq_cache', 'error_account_seq_cache');
@@ -1189,10 +1208,7 @@ Remote.prototype.request_ripple_path_find = function (src_account, dst_account, 
   return request;
 };
 
-Remote.prototype.request_path_find_create = function (src_account, dst_account,
-                                                      dst_amount,
-                                                      src_currencies, callback)
-{
+Remote.prototype.request_path_find_create = function (src_account, dst_account, dst_amount, src_currencies, callback) {
   var self    = this;
   var request = new Request(this, 'path_find');
 
@@ -1205,11 +1221,13 @@ Remote.prototype.request_path_find_create = function (src_account, dst_account,
     request.message.source_currencies   = src_currencies.map(function (ci) {
       var ci_new  = {};
 
-      if ('issuer' in ci)
-        ci_new.issuer   = UInt160.json_rewrite(ci.issuer);
+      if ('issuer' in ci) {
+        ci_new.issuer = UInt160.json_rewrite(ci.issuer);
+      }
 
-      if ('currency' in ci)
+      if ('currency' in ci) {
         ci_new.currency = Currency.json_rewrite(ci.currency);
+      }
 
       return ci_new;
     });
@@ -1220,8 +1238,7 @@ Remote.prototype.request_path_find_create = function (src_account, dst_account,
   return request;
 };
 
-Remote.prototype.request_path_find_close = function ()
-{
+Remote.prototype.request_path_find_close = function () {
   var self    = this;
   var request = new Request(this, 'path_find');
 
