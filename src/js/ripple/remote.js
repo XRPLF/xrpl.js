@@ -173,23 +173,26 @@ function Remote(opts, trace) {
     emitter.setMaxListeners(maxListeners);
   });
 
-  this.on('newListener', function (type, listener) {
+  function listener_added(type, listener) {
     if (type === 'transaction_all') {
       if (!self._transaction_subs && self._connected) {
         self.request_subscribe('transactions').request();
       }
       self._transaction_subs += 1;
     }
-  });
+  }
 
-  this.on('removeListener', function (type, listener) {
+  function listener_removed(type, listener) {
     if (type === 'transaction_all') {
       self._transaction_subs -= 1;
       if (!self._transaction_subs && self._connected) {
         self.request_unsubscribe('transactions').request();
       }
     }
-  });
+  }
+
+  this.on('newListener', listener_added);
+  this.on('removeListener', listener_removed);
 }
 
 util.inherits(Remote, EventEmitter);
@@ -711,11 +714,22 @@ Remote.prototype.request_unsubscribe = function (streams, callback) {
 // .ledger_choose()
 // .ledger_hash()
 // .ledger_index()
-Remote.prototype.request_transaction_entry = function (hash, callback) {
+Remote.prototype.request_transaction = 
+Remote.prototype.request_transaction_entry = function (tx_hash, ledger_hash, callback) {
   //utils.assert(this.trusted);   // If not trusted, need to check proof, maybe talk packet protocol.
   var request = new Request(this, 'transaction_entry');
 
-  request.tx_hash(hash);
+  request.tx_hash(tx_hash);
+
+  switch (typeof ledger_hash) {
+    case 'string':
+      request.ledger_hash(ledger_hash);
+      break;
+    case 'function':
+      callback = ledger_hash;
+      break;
+  }
+  
   request.callback(callback);
 
   return request;
@@ -1047,10 +1061,7 @@ Remote.prototype.book = function (currency_gets, issuer_gets, currency_pays, iss
   var key = gets + ':' + pays;
 
   if (!this._books[key]) {
-    var book = new OrderBook( this,
-      currency_gets, issuer_gets,
-      currency_pays, issuer_pays
-    );
+    var book = new OrderBook(this, currency_gets, issuer_gets, currency_pays, issuer_pays);
 
     if (!book.is_valid()) {
       return book;
@@ -1098,7 +1109,9 @@ Remote.prototype.set_account_seq = function (account, seq) {
 Remote.prototype.account_seq_cache = function (account, current, callback) {
   var self = this;
 
-  if (!self.accounts[account]) self.accounts[account] = {};
+  if (!self.accounts[account]) {
+    self.accounts[account] = {};
+  }
 
   var account_info = self.accounts[account];
   var request      = account_info.caching_seq_request;
@@ -1109,7 +1122,7 @@ Remote.prototype.account_seq_cache = function (account, current, callback) {
     request.account_root(account);
     request.ledger_choose(current);
 
-    request.once('success', function (message) {
+    function account_root_success(message) {
       delete account_info.caching_seq_request;
 
       var seq = message.node.Sequence;
@@ -1118,14 +1131,17 @@ Remote.prototype.account_seq_cache = function (account, current, callback) {
       // console.log('caching: %s %d', account, seq);
       // If the caller also waits for 'success', they might run before this.
       request.emit('success_account_seq_cache', message);
-    });
+    }
 
-    request.once('error', function (message) {
+    function account_root_error(message) {
       // console.log('error: %s', account);
       delete account_info.caching_seq_request;
 
       request.emit('error_account_seq_cache', message);
-    });
+    }
+
+    request.once('success', account_root_success);
+    request.once('error', account_root_error);
 
     account_info.caching_seq_request = request;
   }
@@ -1138,7 +1154,6 @@ Remote.prototype.account_seq_cache = function (account, current, callback) {
 // Mark an account's root node as dirty.
 Remote.prototype.dirty_account_root = function (account) {
   var account = UInt160.json_rewrite(account);
-
   delete this.ledgers.current.account_root[account];
 };
 
