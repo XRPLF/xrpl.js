@@ -19,6 +19,7 @@ var Amount             = require('./amount').Amount;
 var UInt160            = require('./uint160').UInt160;
 var TransactionManager = require('./transactionmanager').TransactionManager;
 
+
 function Account(remote, account) {
   EventEmitter.call(this);
 
@@ -34,45 +35,57 @@ function Account(remote, account) {
   // Important: This must never be overwritten, only extend()-ed
   this._entry = { };
 
-  this.on('newListener', function (type, listener) {
+  function listener_added(type, listener) {
     if (~Account.subscribe_events.indexOf(type)) {
       if (!self._subs && self._remote._connected) {
         self._remote.request_subscribe()
-          .accounts(self._account_id)
-          .request();
+        .accounts(self._account_id)
+        .request();
       }
       self._subs += 1;
     }
-  });
+  }
 
-  this.on('removeListener', function (type, listener) {
+  function listener_removed(type, listener) {
     if (~Account.subscribe_events.indexOf(type)) {
       self._subs -= 1;
       if (!self._subs && self._remote._connected) {
         self._remote.request_unsubscribe()
-          .accounts(self._account_id)
-          .request();
+        .accounts(self._account_id)
+        .request();
       }
     }
-  });
+  }
 
-  this._remote.on('prepare_subscribe', function (request) {
-    if (self._subs) request.accounts(self._account_id);
-  });
+  this.on('newListener', listener_added);
+  this.on('removeListener', listener_removed);
 
-  this.on('transaction', function (msg) {
+  function prepare_subscribe(request) {
+    if (self._subs) {
+      request.accounts(self._account_id);
+    }
+  }
+
+  this._remote.on('prepare_subscribe', prepare_subscribe);
+
+  function handle_transaction(transaction) {
     var changed = false;
-    msg.mmeta.each(function (an) {
-      if (an.entryType === 'AccountRoot' &&
-          an.fields.Account === self._account_id) {
+
+    transaction.mmeta.each(function(an) {
+      var isAccountRoot = an.entryType === 'AccountRoot' 
+      && an.fields.Account === self._account_id;
+      if (isAccountRoot) {
         extend(self._entry, an.fieldsNew, an.fieldsFinal);
         changed = true;
       }
     });
+
     if (changed) {
       self.emit('entry', self._entry);
     }
-  });
+  }
+
+  this.on('transaction', handle_transaction);
 
   return this;
 };
@@ -97,6 +110,11 @@ Account.prototype.is_valid = function () {
   return this._account.is_valid();
 };
 
+Account.prototype.get_account_info = function(callback) {
+  var callback = typeof callback === 'function' ? callback : function(){};
+  this._remote.request_account_info(this._account_id, callback);
+};
+
 /**
  * Retrieve the current AccountRoot entry.
  *
@@ -107,32 +125,33 @@ Account.prototype.is_valid = function () {
  */
 Account.prototype.entry = function (callback) {
   var self = this;
-  var callback = typeof callback === 'function' 
-    ? callback 
-    : function(){};
+  var callback = typeof callback === 'function' ? callback : function(){};
 
-  self._remote.request_account_info(this._account_id)
-    .on('success', function (e) {
-      extend(self._entry, e.account_data);
+  this.get_account_info(function account_info(err, info) {
+    if (err) {
+      callback(err);
+    } else {
+      extend(self._entry, info.account_data);
       self.emit('entry', self._entry);
-      callback(null, e);
-    })
-    .on('error', function (e) {
-      callback(e);
-    })
-    .request();
+      callback(null, info);
+    }
+  });
 
   return this;
 };
 
 Account.prototype.get_next_sequence = function(callback) {
-  this._remote.request_account_info(this._account_id, function(err, entry) {
+  var callback = typeof callback === 'function' ? callback : function(){};
+
+  this.get_account_info(function account_info(err, info) {
     if (err) {
       callback(err);
     } else {
-      callback(null, entry.account_data.Sequence); 
+      callback(null, info.account_data.Sequence); 
     }
   });
+
+  return this;
 };
 
 /**
@@ -157,6 +176,6 @@ Account.prototype.submit = function(tx) {
   this._tx_manager.submit(tx);
 };
 
-exports.Account	    = Account;
+exports.Account = Account;
 
 // vim:sw=2:sts=2:ts=8:et
