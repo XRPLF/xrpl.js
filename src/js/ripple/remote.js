@@ -27,6 +27,7 @@ var Transaction  = require('./transaction').Transaction;
 var Account      = require('./account').Account;
 var Meta         = require('./meta').Meta;
 var OrderBook    = require('./orderbook').OrderBook;
+var PathFind     = require('./pathfind').PathFind;
 
 var utils        = require('./utils');
 var config       = require('./config');
@@ -165,8 +166,8 @@ function Remote(opts, trace) {
   }
 
   opts.servers.forEach(function(server) {
-    var i = Number(server.pool) || 1;
-    while (i--) { self.add_server(server); }
+    var pool = Number(server.pool) || 1;
+    while (pool--) { self.add_server(server); };
   });
 
   // This is used to remove Node EventEmitter warnings
@@ -360,9 +361,8 @@ Remote.prototype.connect = function (online) {
 
     ;(function nextServer(i) {
       var server = self._servers[i];
-
-      server._sid = ++i;
       server.connect();
+      server._sid = ++i;
 
       if (i < self._servers.length) {
         setTimeout(function() {
