@@ -1,5 +1,6 @@
-var EventEmitter = require('events').EventEmitter;
-var util         = require('util');
+var EventEmitter     = require('events').EventEmitter;
+var util             = require('util');
+var RippleError      = require('./rippleerror').RippleError;
 
 /**
  * @constructor TransactionManager
@@ -11,11 +12,12 @@ function TransactionManager(account) {
 
   var self             = this;
 
-  this.account         = account;
-  this.remote          = account._remote;
-  this._timeout        = void(0);
-  this._next_sequence  = void(0);
-  this._config         = { max_fee: self.remote.max_fee };
+  this.account        = account;
+  this.remote         = account._remote;
+  this._timeout       = void(0);
+  this._resubmitting  = false;
+  this._next_sequence = void(0);
+  this._config        = { max_fee: self.remote.max_fee };
 
   function sequence_loaded(err, sequence) {
     self._next_sequence = sequence;
@@ -23,7 +25,7 @@ function TransactionManager(account) {
   }
 
   account.get_next_sequence(sequence_loaded);
-}
+};
 
 util.inherits(TransactionManager, EventEmitter);
 
@@ -31,6 +33,7 @@ util.inherits(TransactionManager, EventEmitter);
  * @param {Object} tx
  */
 
+//called whenever we get a transaction for an account whose transactions we're managing.
 //TransactionManager.prototype.update = function(tx) {
 //  this._next_sequence_number = Math.max(tx.meta.account_next_seq, this._next_sequence_number);
 //  var queued;
@@ -97,18 +100,12 @@ TransactionManager.prototype._request = function(tx) {
   var remote = this.remote;
 
   if (!tx._secret && !tx.tx_json.TxnSignature) {
-    tx.emit('error', {
-      result:          'tejSecretUnknown',
-      result_message:  'Could not sign transactions because we.'
-    });
+    tx.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
     return;
   }  
   
   if (!remote.trusted && !remote.local_signing) {
-    tx.emit('error', {
-      result:          'tejServerUntrusted',
-      result_message:  'Attempt to give a secret to an untrusted server.'
-    });
+    tx.emit('error', new RippleError('tejServerUntrusted', 'Attempt to give secret to untrusted server'));
     return;
   }
 
@@ -139,9 +136,10 @@ TransactionManager.prototype._request = function(tx) {
     submit_request.tx_json(tx.tx_json);
   }
   
+  // Handle insufficient fee
   function submission_success(message) {
     if (!message.engine_result) {
-      return submission_error(message);
+      submission_error(message);
     } else {
       tx.hash = message.tx_json.hash;
       tx.set_state('client_proposed');
@@ -165,15 +163,17 @@ TransactionManager.prototype._request = function(tx) {
 
   function submission_error(err) {
     tx.set_state('remoteError');
-    tx.emit('error', err);
+    tx.emit('error', new RippleError(err));
   }
 
   submit_request.once('success', submission_success);
   submit_request.once('error', submission_error);
 
-  //submit_request.timeout(1000 * 10, function() { 
-    //tx.emit('error', new Error('Timeout'));
-  //});
+//  submit_request.timeout(1000 * 2, function() { 
+//    tx.emit('error', new Error('Timeout'));
+//  });
+
+  //submit_request.emit = function() {}
 
   submit_request.request();
 
@@ -181,7 +181,7 @@ TransactionManager.prototype._request = function(tx) {
   tx.emit('submitted');
 
   return submit_request;
-}
+};
 
 TransactionManager.prototype._is_not_found = function(error) {
   return !!error && typeof error === 'object'
@@ -190,7 +190,7 @@ TransactionManager.prototype._is_not_found = function(error) {
       && (error.remote.error === 'transactionNotFound' 
        || error.remote.error === 'ledgerNotFound')
       ;
-}
+};
 
 TransactionManager.prototype._detect_ledger_entry = function(tx) {
   var self            = this;
@@ -215,9 +215,7 @@ TransactionManager.prototype._detect_ledger_entry = function(tx) {
 
     checked_ledgers[ledger_hash] = true;
 
-    var request_transaction = remote.request_transaction_entry(tx.hash);
-
-    request_transaction.ledger_hash(ledger_hash);
+    var request_transaction = remote.request_transaction_entry(tx.hash, ledger_hash);
 
     request_transaction.callback(function(err, message) {
       if (tx.finalized) return;
@@ -259,7 +257,7 @@ TransactionManager.prototype._detect_ledger_entry = function(tx) {
 
   tx.once('proposed', transaction_proposed);
   tx.once('final', transaction_finalized);
-}
+};
 
 /**
  * @param {Object} tx
@@ -282,6 +280,6 @@ TransactionManager.prototype.submit = function(tx) {
 
     this._request(tx);
   }
-}
+};
 
 exports.TransactionManager = TransactionManager;

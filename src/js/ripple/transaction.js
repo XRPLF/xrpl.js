@@ -52,6 +52,7 @@ var Currency         = require('./amount').Currency;
 var UInt160          = require('./amount').UInt160;
 var Seed             = require('./seed').Seed;
 var SerializedObject = require('./serializedobject').SerializedObject;
+var RippleError      = require('./rippleerror').RippleError;
 
 var config           = require('./config');
 
@@ -538,6 +539,9 @@ Transaction.prototype.submit = function (callback) {
   this.callback = typeof callback === 'function' ? callback : function(){};
 
   function submission_error(error, message) {
+    if (!(error instanceof RippleError)) {
+      error = new RippleError(error);
+    }
     self.callback(error, message);
   }
 
@@ -551,10 +555,7 @@ Transaction.prototype.submit = function (callback) {
   var account = this.tx_json.Account;
 
   if (typeof account !== 'string') {
-    this.emit('error', {
-      error:          'tejInvalidAccount',
-      error_message:  'Account is unspecified'
-    });
+    this.emit('error', new RippleError('tejInvalidAccount', 'Account is unspecified'));
   } else {
     // YYY Might check paths for invalid accounts.
     this.remote.get_account(account).submit(this);
