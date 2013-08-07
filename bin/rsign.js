@@ -10,7 +10,7 @@ var tx_json;
 var usage = function () {
   console.log(
     "Usage: rsign.js <secret> <json>\n"
-    + "  Example: rsign.js ssq55ueDob4yV3kPVnNQLHB6icwpC '{ \"TransactionType\" : \"Payment\", \"Account\" : \"r3P9vH81KBayazSTrQj6S25jW6kDb779Gi\", \"Destination\" : \"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\", \"Amount\" : \"200000000\", \"Fee\" : \"10\", \"Sequence\" : \"1\" }'"
+    + "  Example: rsign.js ssq55ueDob4yV3kPVnNQLHB6icwpC '{ \"TransactionType\" : \"Payment\", \"Account\" : \"r3P9vH81KBayazSTrQj6S25jW6kDb779Gi\", \"Destination\" : \"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\", \"Amount\" : \"200000000\", \"Fee\" : \"10\", \"Sequence\" : 1 }'"
     );
 };
 
