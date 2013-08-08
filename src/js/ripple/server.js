@@ -95,7 +95,7 @@ Server.prototype._remote_address = function() {
 // avoids the need to bind a websocket server to a port and allows a more
 // synchronous style of code to represent a client <-> server message sequence.
 // We can also use this to log a message sequence to a buffer.
-Server.prototype.websocketConstructor = function () {
+Server.prototype.websocket_constructor = function () {
   return require('ws');
 };
 
@@ -119,7 +119,7 @@ Server.prototype.connect = function () {
 
   // We require this late, because websocket shims may be loaded after
   // ripple-lib.
-  var WebSocket = this.websocketConstructor();
+  var WebSocket = this.websocket_constructor();
   var ws = this._ws = new WebSocket(this._opts.url);
 
   this._should_connect = true;
