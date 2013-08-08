@@ -89,6 +89,16 @@ Server.prototype._remote_address = function() {
   return address;
 };
 
+// This is the final interface between client code and a socket connection to a
+// `rippled` server. As such, this is a decent hook point to allow a WebSocket
+// interface conforming object to be used as a basis to mock rippled. This
+// avoids the need to bind a websocket server to a port and allows a more
+// synchronous style of code to represent a client <-> server message sequence.
+// We can also use this to log a message sequence to a buffer.
+Server.prototype.websocketConstructor = function () {
+  return require('ws');
+};
+
 Server.prototype.connect = function () {
   var self = this;
 
@@ -109,7 +119,7 @@ Server.prototype.connect = function () {
 
   // We require this late, because websocket shims may be loaded after
   // ripple-lib.
-  var WebSocket = require('ws');
+  var WebSocket = this.websocketConstructor();
   var ws = this._ws = new WebSocket(this._opts.url);
 
   this._should_connect = true;

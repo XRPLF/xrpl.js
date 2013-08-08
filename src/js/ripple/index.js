@@ -10,6 +10,7 @@ exports.SerializedObject = require('./serializedobject').SerializedObject;
 
 exports.binformat   = require('./binformat');
 exports.utils       = require('./utils');
+exports.Server      = require('./server').Server;
 
 // Important: We do not guarantee any specific version of SJCL or for any
 // specific features to be included. The version and configuration may change at
