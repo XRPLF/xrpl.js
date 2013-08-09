@@ -38,10 +38,21 @@ util.inherits(PathFind, EventEmitter);
  */
 PathFind.prototype.create = function ()
 {
+  var self = this;
+
   var req = this.remote.request_path_find_create(this.src_account,
                                                  this.dst_account,
                                                  this.dst_amount,
-                                                 this.src_currencies);
+                                                 this.src_currencies,
+                                                 handleInitialPath);
+
+  function handleInitialPath(err, msg) {
+    if (err) {
+      // XXX Handle error
+      return;
+    }
+    self.notify_update(msg);
+  }
 
   req.request();
 };
