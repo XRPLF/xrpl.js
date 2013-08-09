@@ -128,6 +128,35 @@ Account.prototype.entry = function (callback)
 };
 
 /**
+ * Retrieve this account's Ripple trust lines.
+ *
+ * To keep up-to-date with changes to the AccountRoot entry, subscribe to the
+ * "lines" event. (Not yet implemented.)
+ *
+ * @param {function (err, lines)} callback Called with the result
+ */
+Account.prototype.lines = function (callback)
+{
+  var self = this;
+
+  self._remote.request_account_lines(this._account_id)
+    .on('success', function (e) {
+      self._lines = e.lines;
+      self.emit('lines', self._lines);
+
+      if ("function" === typeof callback) {
+        callback(null, e);
+      }
+    })
+    .on('error', function (e) {
+      callback(e);
+    })
+    .request();
+
+  return this;
+};
+
+/**
  * Notify object of a relevant transaction.
  *
  * This is only meant to be called by the Remote class. You should never have to
