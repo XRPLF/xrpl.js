@@ -262,6 +262,10 @@ Server.prototype._handle_message = function (json) {
       }
       break;
 
+    case 'path_find':
+      if (self._remote.trace) utils.logObject('server: path_find: %s', message);
+      break;
+
     case 'serverStatus':
       // This message is only received when online. As we are connected, it is the definative final state.
       self._set_state(self._is_online(message.server_status) ? 'online' : 'offline');
