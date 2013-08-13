@@ -540,15 +540,19 @@ function parse_whatever(so) {
 	} else {
 		type = TYPES_MAP[type_bits];
 	}
-	if (field_bits === 0) {
-		field_name = FIELDS_MAP[type_bits][so.read(1)[0]];
+	if ("undefined" === typeof type) {
+		throw Error("Unknown type");
 	} else {
-		field_name = FIELDS_MAP[type_bits][field_bits];
-	}
-	if ("undefined" === typeof field_name) {
-		return;
-	} else {
-		return [field_name, type.parse(so)]; //key, value
+		if (field_bits === 0) {
+			field_name = FIELDS_MAP[type_bits][so.read(1)[0]];
+		} else {
+			field_name = FIELDS_MAP[type_bits][field_bits];
+		}
+		if ("undefined" === typeof field_name) {
+			throw Error("Unknown field");
+		} else {
+			return [field_name, type.parse(so)]; //key, value
+		}
 	}
 }
 
@@ -585,10 +589,10 @@ var STObject = exports.Object = new SerializedType({
   parse: function (so) {
     var output = {};
 	while (true) {
-		var key_and_value = parse_whatever(so);
-		if ("undefined" === typeof key_and_value) { //Careful: are there any legitimate cases where we'd get this?
+		if (so.peek(1)[0] === 0xe1) { //ending marker
 			break;
 		} else {
+			var key_and_value = parse_whatever(so);
 			output[key_and_value[0]] = key_and_value[1];
 		}
 	}
@@ -613,10 +617,10 @@ var STArray = exports.Array = new SerializedType({
   parse: function (so) {
     var output = [];
 	while (true) {
-		var key_and_value = parse_whatever(so);
-		if ("undefined" === typeof key_and_value) { //Careful: are there any legitimate cases where we'd get this?
+		if (so.peek(1)[0] === 0xf1) { //ending marker
 			break;
 		} else {
+			var key_and_value = parse_whatever(so);
 			var obj = {};
 			obj[key_and_value[0]] = key_and_value[1];
 			output.push(obj);

@@ -57,6 +57,7 @@ SerializedObject.prototype.resetPointer = function () {
   this.pointer = 0;
 };
 
+/*
 SerializedObject.prototype.read = function (numberOfBytes) {
   var start = this.pointer;
   var end = start+numberOfBytes;
@@ -68,6 +69,23 @@ SerializedObject.prototype.read = function (numberOfBytes) {
 	return result;
   }
 };
+*/
+
+var readOrPeek = function (advance) {
+  return function(numberOfBytes) {
+	  var start = this.pointer;
+	  var end = start+numberOfBytes;
+	  if (end > this.buffer.length) {
+		throw new Error("There aren't that many bytes left.");
+	  } else {
+		var result = this.buffer.slice(start,end);
+		if (advance) {this.pointer = end;}
+		return result;
+	  }
+   }
+}
+SerializedObject.prototype.read = readOrPeek(true);
+SerializedObject.prototype.peek = readOrPeek(false);
 
 
 SerializedObject.prototype.to_bits = function ()
