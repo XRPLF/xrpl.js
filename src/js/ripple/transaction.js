@@ -182,8 +182,10 @@ Transaction.prototype.get_fee = function() {
 Transaction.prototype.complete = function () {
   var tx_json = this.tx_json;
 
-  if (typeof tx_json.Fee === 'undefined' && this.remote.local_fee) {
-    this.tx_json.Fee = this.remote.fee_tx(this.fee_units()).to_json();
+  if (typeof tx_json.Fee === 'undefined') {
+    if (this.remote.local_fee || !this.remote.trusted) {
+      this.tx_json.Fee = this.remote.fee_tx(this.fee_units()).to_json();
+    }
   }
 
   if (typeof tx_json.SigningPubKey === 'undefined' && (!this.remote || this.remote.local_signing)) {
@@ -200,10 +202,7 @@ Transaction.prototype.serialize = function () {
 };
 
 Transaction.prototype.signing_hash = function () {
-  var prefix = config.testnet
-    ? Transaction.HASH_SIGN_TESTNET
-    : Transaction.HASH_SIGN;
-
+  var prefix = Transaction[config.testnet ? 'HASH_SIGN_TESTNET' : 'HASH_SIGN'];
   return SerializedObject.from_json(this.tx_json).signing_hash(prefix);
 };
 
@@ -223,13 +222,6 @@ Transaction.prototype.sign = function () {
   this.tx_json.TxnSignature = hex;
 };
 
-Transaction.prototype._hasTransactionListeners = function() {
-  return this.listeners('final').length
-      || this.listeners('lost').length
-      || this.listeners('pending').length
-};
-
-
 //
 // Set options for Transactions
 //
@@ -239,7 +231,6 @@ Transaction.prototype._hasTransactionListeners = function() {
 // "blindly" because the sender has no idea of the actual cost except that is must be less than send max.
 Transaction.prototype.build_path = function (build) {
   this._build_path = build;
-
   return this;
 }
 
@@ -249,28 +240,27 @@ Transaction.prototype.destination_tag = function (tag) {
   if (tag !== void(0)) {
     this.tx_json.DestinationTag = tag;
   }
-
   return this;
 }
 
 Transaction._path_rewrite = function (path) {
-  var path_new  = [];
+  var props = [
+      'account'
+    , 'issuer'
+    , 'currency'
+  ]
 
-  for (var i=0, l=path.length; i<l; i++) {
-    var node     = path[i];
-    var node_new = {};
+  var path_new = path.map(function(node) {
+    var node_new = { };
 
-    if ('account' in node)
-      node_new.account  = UInt160.json_rewrite(node.account);
+    for (var prop in node) {
+      if (~props.indexOf(prop)) {
+        node_new[prop] = UInt160.json_rewrite(node[prop]);
+      }
+    }
 
-    if ('issuer' in node)
-      node_new.issuer   = UInt160.json_rewrite(node.issuer);
-
-    if ('currency' in node)
-      node_new.currency = Currency.json_rewrite(node.currency);
-
-    path_new.push(node_new);
-  }
+    return node_new;
+  });
 
   return path_new;
 }
@@ -278,7 +268,6 @@ Transaction._path_rewrite = function (path) {
 Transaction.prototype.path_add = function (path) {
   this.tx_json.Paths  = this.tx_json.Paths || [];
   this.tx_json.Paths.push(Transaction._path_rewrite(path));
-
   return this;
 }
 
@@ -288,22 +277,20 @@ Transaction.prototype.paths = function (paths) {
   for (var i=0, l=paths.length; i<l; i++) {
     this.path_add(paths[i]);
   }
-
   return this;
-}
+};
 
 // If the secret is in the config object, it does not need to be provided.
 Transaction.prototype.secret = function (secret) {
   this._secret = secret;
-}
+};
 
 Transaction.prototype.send_max = function (send_max) {
   if (send_max) {
     this.tx_json.SendMax = Amount.json_rewrite(send_max);
   }
-
   return this;
-}
+};
 
 // tag should be undefined or a 32 bit integer.   
 // YYY Add range checking for tag.
@@ -311,9 +298,8 @@ Transaction.prototype.source_tag = function (tag) {
   if (tag) {
     this.tx_json.SourceTag = tag;
   }
-
   return this;
-}
+};
 
 // --> rate: In billionths.
 Transaction.prototype.transfer_rate = function (rate) {
@@ -324,7 +310,7 @@ Transaction.prototype.transfer_rate = function (rate) {
   }
 
   return this;
-}
+};
 
 // Add flags to a transaction.
 // --> flags: undefined, _flag_, or [ _flags_ ]
@@ -339,12 +325,9 @@ Transaction.prototype.set_flags = function (flags) {
 
     var flag_set = Array.isArray(flags) ? flags : [ flags ];
 
-    for (var index in flag_set) {
-      if (!flag_set.hasOwnProperty(index)) continue;
-
-      var flag = flag_set[index];
-
-      if (flag in transaction_flags) {
+    for (var i=0, l=flag_set.length; i<l; i++) {
+      var flag = flag_set[i];
+      if (transaction_flags.hasOwnProperty(flag)) {
         this.tx_json.Flags += transaction_flags[flag];
       } else {
         // XXX Immediately report an error or mark it.
@@ -353,7 +336,7 @@ Transaction.prototype.set_flags = function (flags) {
   }
 
   return this;
-}
+};
 
 //
 // Transactions
@@ -375,7 +358,6 @@ Transaction.prototype.account_set = function (src) {
   this._secret                  = this._account_secret(src);
   this.tx_json.TransactionType  = 'AccountSet';
   this.tx_json.Account          = UInt160.json_rewrite(src);
-
   return this;
 };
 
@@ -385,7 +367,6 @@ Transaction.prototype.claim = function (src, generator, public_key, signature) {
   this.tx_json.Generator       = generator;
   this.tx_json.PublicKey       = public_key;
   this.tx_json.Signature       = signature;
-
   return this;
 };
 
@@ -394,7 +375,6 @@ Transaction.prototype.offer_cancel = function (src, sequence) {
   this.tx_json.TransactionType = 'OfferCancel';
   this.tx_json.Account         = UInt160.json_rewrite(src);
   this.tx_json.OfferSequence   = Number(sequence);
-
   return this;
 };
 
@@ -430,7 +410,6 @@ Transaction.prototype.password_fund = function (src, dst) {
   this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'PasswordFund';
   this.tx_json.Destination     = UInt160.json_rewrite(dst);
-
   return this;
 }
 
@@ -441,7 +420,6 @@ Transaction.prototype.password_set = function (src, authorized_key, generator, p
   this.tx_json.Generator       = generator;
   this.tx_json.PublicKey       = public_key;
   this.tx_json.Signature       = signature;
-
   return this;
 }
 
@@ -463,6 +441,14 @@ Transaction.prototype.password_set = function (src, authorized_key, generator, p
 //  .set_flags()
 //  .source_tag()
 Transaction.prototype.payment = function (src, dst, deliver_amount) {
+  if (!UInt160.is_valid(src)) {
+    throw new Error('Payment source address invalid');
+  }
+
+  if (!UInt160.is_valid(dst)) {
+    throw new Error('Payment destination address invalid');
+  }
+
   this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'Payment';
   this.tx_json.Account         = UInt160.json_rewrite(src);
@@ -478,14 +464,17 @@ Transaction.prototype.ripple_line_set = function (src, limit, quality_in, qualit
   this.tx_json.Account         = UInt160.json_rewrite(src);
 
   // Allow limit of 0 through.
-  if (limit !== void(0))
-    this.tx_json.LimitAmount  = Amount.json_rewrite(limit);
+  if (limit !== void(0)) {
+    this.tx_json.LimitAmount = Amount.json_rewrite(limit);
+  }
+ 
+  if (quality_in) {
+    this.tx_json.QualityIn = quality_in;
+  }
 
-  if (quality_in)
-    this.tx_json.QualityIn    = quality_in;
-
-  if (quality_out)
-    this.tx_json.QualityOut   = quality_out;
+  if (quality_out) {
+    this.tx_json.QualityOut = quality_out;
+  }
 
   // XXX Throw an error if nothing is set.
 
@@ -499,7 +488,6 @@ Transaction.prototype.wallet_add = function (src, amount, authorized_key, public
   this.tx_json.RegularKey       = authorized_key;
   this.tx_json.PublicKey        = public_key;
   this.tx_json.Signature        = signature;
-
   return this;
 };
 
@@ -519,20 +507,6 @@ Transaction.prototype.fee_units = function () {
 };
 
 // Submit a transaction to the network.
-// XXX Don't allow a submit without knowing ledger_index.
-// XXX Have a network canSubmit(), post events for following.
-// XXX Also give broader status for tracking through network disconnects.
-// callback = function (status, info) {
-//   // status is final status.  Only works under a ledger_accepting conditions.
-//   switch status:
-//    case 'tesSUCCESS': all is well.
-//    case 'tejSecretUnknown': unable to sign transaction - secret unknown
-//    case 'tejServerUntrusted': sending secret to untrusted server.
-//    case 'tejInvalidAccount': locally detected error.
-//    case 'tejLost': locally gave up looking
-//    default: some other TER
-// }
-
 Transaction.prototype.submit = function (callback) {
   var self = this;
 
@@ -540,9 +514,9 @@ Transaction.prototype.submit = function (callback) {
 
   function submission_error(error, message) {
     if (!(error instanceof RippleError)) {
-      error = new RippleError(error);
+      error = new RippleError(error, message);
     }
-    self.callback(error, message);
+    self.callback(error);
   }
 
   function submission_success(message) {

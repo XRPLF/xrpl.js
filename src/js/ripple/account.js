@@ -110,7 +110,7 @@ Account.prototype.is_valid = function () {
   return this._account.is_valid();
 };
 
-Account.prototype.get_account_info = function(callback) {
+Account.prototype.get_info = function(callback) {
   var callback = typeof callback === 'function' ? callback : function(){};
   this._remote.request_account_info(this._account_id, callback);
 };
@@ -127,7 +127,7 @@ Account.prototype.entry = function (callback) {
   var self = this;
   var callback = typeof callback === 'function' ? callback : function(){};
 
-  this.get_account_info(function account_info(err, info) {
+  this.get_info(function account_info(err, info) {
     if (err) {
       callback(err);
     } else {
@@ -143,7 +143,7 @@ Account.prototype.entry = function (callback) {
 Account.prototype.get_next_sequence = function(callback) {
   var callback = typeof callback === 'function' ? callback : function(){};
 
-  this.get_account_info(function account_info(err, info) {
+  this.get_info(function account_info(err, info) {
     if (err) {
       callback(err);
     } else {

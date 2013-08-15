@@ -5,9 +5,9 @@ function RippleError(code, message) {
   if (typeof code === 'object') {
     extend(this, code);
   } else {
-    this.result = code;
+    this.result         = code;
+    this.message        = message;
     this.result_message = message;
-    this.message = message;
   }
 
   this.message = this.result_message || 'Error';

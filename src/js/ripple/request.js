@@ -6,6 +6,7 @@ var Transaction  = require('./transaction').Transaction;
 var Account      = require('./account').Account;
 var Meta         = require('./meta').Meta;
 var OrderBook    = require('./orderbook').OrderBook;
+var RippleError  = require('./rippleerror').RippleError;
 
 // Request events emitted:
 //  'success' : Request successful.
@@ -15,6 +16,7 @@ var OrderBook    = require('./orderbook').OrderBook;
 //  'remoteDisconnected'
 function Request(remote, command) {
   EventEmitter.call(this);
+
   this.remote     = remote;
   this.requested  = false;
   this.message    = {
@@ -28,7 +30,7 @@ util.inherits(Request, EventEmitter);
 // Send the request to a remote.
 Request.prototype.request = function (remote) {
   if (!this.requested) {
-    this.requested  = true;
+    this.requested = true;
     this.remote.request(this);
     this.emit('request', remote);
   }
@@ -36,8 +38,19 @@ Request.prototype.request = function (remote) {
 
 Request.prototype.callback = function(callback, successEvent, errorEvent) {
   if (callback && typeof callback === 'function') {
-    this.once(successEvent || 'success', callback.bind(this, null));
-    this.once(errorEvent   || 'error'  , callback.bind(this));
+    function request_success(message) {
+      callback.call(this, null, message);
+    }
+
+    function request_error(error) {
+      if (!(error instanceof RippleError)) {
+        error = new RippleError(error);
+      }
+      callback.call(this, error);
+    }
+
+    this.once(successEvent || 'success', request_success);
+    this.once(errorEvent   || 'error'  , request_error);
     this.request();
   }
 
@@ -45,12 +58,16 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
 };
 
 Request.prototype.timeout = function(duration, callback) {
-  if (!this.requested) {
-    this.once('request', this.timeout.bind(this, duration, callback));
-    return;
-  };
+  var self = this;
 
-  var self      = this;
+  if (!this.requested) {
+    function requested() {
+      self.timeout(duration, callback);
+    }
+    this.once('request', requested);
+    return;
+  }
+
   var emit      = this.emit;
   var timed_out = false;
 
@@ -61,19 +78,23 @@ Request.prototype.timeout = function(duration, callback) {
   }, duration);
 
   this.emit = function() {
-    if (timed_out) return;
-    else clearTimeout(timeout);
-    emit.apply(self, arguments);
+    if (!timed_out) {
+      clearTimeout(timeout);
+      emit.apply(self, arguments);
+    }
   };
 
   return this;
+};
+
+Request.prototype.set_server = function(server) {
+  this.server = server;
 };
 
 Request.prototype.build_path = function (build) {
   if (build) {
     this.message.build_path = true;
   }
-
   return this;
 };
 
@@ -83,16 +104,14 @@ Request.prototype.ledger_choose = function (current) {
   } else {
     this.message.ledger_hash  = this.remote._ledger_hash;
   }
-
   return this;
 };
 
 // Set the ledger for a request.
 // - ledger_entry
 // - transaction_entry
-Request.prototype.ledger_hash = function (h) {
-  this.message.ledger_hash  = h;
-
+Request.prototype.ledger_hash = function (hash) {
+  this.message.ledger_hash  = hash;
   return this;
 };
 
@@ -100,7 +119,6 @@ Request.prototype.ledger_hash = function (h) {
 // - ledger_entry
 Request.prototype.ledger_index = function (ledger_index) {
   this.message.ledger_index  = ledger_index;
-
   return this;
 };
 
@@ -114,10 +132,10 @@ Request.prototype.ledger_select = function (ledger_spec) {
 
     default:
       // XXX Better test needed
-      if (String(ledger_spec).length > 12) {
-        this.message.ledger_hash  = ledger_spec;
+      if (Number(ledger_spec)) {
+        this.message.ledger_index = ledger_spec;
       } else {
-        this.message.ledger_index  = ledger_spec;
+        this.message.ledger_hash  = ledger_spec;
       }
       break;
   }
@@ -127,13 +145,11 @@ Request.prototype.ledger_select = function (ledger_spec) {
 
 Request.prototype.account_root = function (account) {
   this.message.account_root  = UInt160.json_rewrite(account);
-
   return this;
 };
 
 Request.prototype.index = function (hash) {
   this.message.index  = hash;
-
   return this;
 };
 
@@ -145,52 +161,45 @@ Request.prototype.offer_id = function (account, seq) {
     account:  UInt160.json_rewrite(account),
     seq:      seq
   };
-
   return this;
 };
 
 // --> index : ledger entry index.
 Request.prototype.offer_index = function (index) {
   this.message.offer  = index;
-
   return this;
 };
 
-Request.prototype.secret = function (s) {
-  if (s) {
-    this.message.secret  = s;
+Request.prototype.secret = function (secret) {
+  if (secret) {
+    this.message.secret  = secret;
   }
-
   return this;
 };
 
-Request.prototype.tx_hash = function (h) {
-  this.message.tx_hash  = h;
-
+Request.prototype.tx_hash = function (hash) {
+  this.message.tx_hash  = hash;
   return this;
 };
 
-Request.prototype.tx_json = function (j) {
-  this.message.tx_json  = j;
-
+Request.prototype.tx_json = function (json) {
+  this.message.tx_json  = json;
   return this;
 };
 
-Request.prototype.tx_blob = function (j) {
-  this.message.tx_blob  = j;
-
+Request.prototype.tx_blob = function (json) {
+  this.message.tx_blob  = json;
   return this;
 };
 
 Request.prototype.ripple_state = function (account, issuer, currency) {
   this.message.ripple_state  = {
-    'accounts' : [
+    currency : currency,
+    accounts : [
       UInt160.json_rewrite(account),
       UInt160.json_rewrite(issuer)
-    ],
-    'currency' : currency
+    ]
   };
-
   return this;
 };
 
@@ -200,14 +209,14 @@ Request.prototype.accounts = function (accounts, realtime) {
   }
 
   // Process accounts parameters
-  var procAccounts = accounts.map(function(account) {
+  var processedAccounts = accounts.map(function(account) {
     return UInt160.json_rewrite(account);
   });
   
   if (realtime) {
-    this.message.rt_accounts = procAccounts;
+    this.message.rt_accounts = processedAccounts;
   } else {
-    this.message.accounts = procAccounts;
+    this.message.accounts = processedAccounts;
   }
 
   return this;
@@ -218,14 +227,16 @@ Request.prototype.rt_accounts = function (accounts) {
 };
 
 Request.prototype.books = function (books, snapshot) {
-  var procBooks = [];
+  var processedBooks = [ ];
 
   for (var i = 0, l = books.length; i < l; i++) {
     var book = books[i];
-    var json = {};
+    var json = { };
 
     function processSide(side) {
-      if (!book[side]) throw new Error('Missing '+side);
+      if (!book[side]) {
+        throw new Error('Missing ' + side);
+      }
 
       var obj = json[side] = {
         currency: Currency.json_rewrite(book[side].currency)
@@ -239,13 +250,18 @@ Request.prototype.books = function (books, snapshot) {
     processSide('taker_gets');
     processSide('taker_pays');
 
-    if (snapshot) json.snapshot = true;
-    if (book.both) json.both = true; 
+    if (snapshot) {
+      json.snapshot = true;
+    }
 
-    procBooks.push(json);
+    if (book.both) {
+      json.both = true; 
+    }
+
+    processedBooks.push(json);
   }
 
-  this.message.books = procBooks;
+  this.message.books = processedBooks;
 
   return this;
 };

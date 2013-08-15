@@ -28,6 +28,7 @@ var Account      = require('./account').Account;
 var Meta         = require('./meta').Meta;
 var OrderBook    = require('./orderbook').OrderBook;
 var PathFind     = require('./pathfind').PathFind;
+var RippleError  = require('./rippleerror').RippleError;
 
 var utils        = require('./utils');
 var config       = require('./config');
@@ -253,12 +254,11 @@ Remote.create_remote = function(options, callback) {
 Remote.prototype.add_server = function (opts) {
   var self = this;
 
-  var url  = ((opts.secure || opts.websocket_ssl) ? 'wss://' : 'ws://') +
-  (opts.host || opts.websocket_ip) + ':' +
-  (opts.port || opts.websocket_port)
-  ;
-
-  var server = new Server(this, { url: url });
+  var server = new Server(this, {
+    host   : opts.host || opts.websocket_ip,
+    port   : opts.port || opts.websocket_port,
+    secure : opts.secure || opts.websocket_ssl
+  });
 
   function server_message(data) {
     self._handle_message(data, server);
@@ -338,39 +338,36 @@ Remote.prototype._trace = function() {
  * Connect to the Ripple network.
  */
 Remote.prototype.connect = function (online) {
-  // Downwards compatibility
+  if (!this._servers.length) {
+    throw new Error('No servers available.');
+  }
+
   switch (typeof online) {
     case 'undefined':
       break;
-
     case 'function':
       this.once('connect', online);
       break;
-
     default:
+      // Downwards compatibility
       if (!Boolean(online)) {
         return this.disconnect();
       }
-      break;
   }
 
-  if (!this._servers.length) {
-    throw new Error('No servers available.');
-  } else {
-    var self = this;
+  var self = this;
 
-    ;(function nextServer(i) {
-      var server = self._servers[i];
-      server.connect();
-      server._sid = ++i;
+  ;(function nextServer(i) {
+    var server = self._servers[i];
+    server.connect();
+    server._sid = ++i;
 
-      if (i < self._servers.length) {
-        setTimeout(function() {
-          nextServer(i);
-        }, self._connection_offset);
-      }
-    })(0);
-  }
+    if (i < self._servers.length) {
+      setTimeout(function() {
+        nextServer(i);
+      }, self._connection_offset);
+    }
+  })(0);
 
   return this;
 };
@@ -379,6 +376,10 @@ Remote.prototype.connect = function (online) {
  * Disconnect from the Ripple network.
  */
 Remote.prototype.disconnect = function (online) {
+  if (!this._servers.length) {
+    throw new Error('No servers available, not disconnecting');
+  }
+
   this._servers.forEach(function(server) {
     server.disconnect();
   });
@@ -398,10 +399,7 @@ Remote.prototype._handle_message = function (message, server) {
 
   if (unexpected) {
     // Unexpected response from remote.
-    this.emit('error', {
-      error:          'remoteUnexpected',
-      error_message:  'Unexpected response from remote.'
-    });
+    this.emit('error', new RippleError('remoteUnexpected', 'Unexpected response from remote'));
     return;
   }
 
@@ -461,34 +459,34 @@ Remote.prototype._handle_message = function (message, server) {
       this.emit('transaction_all', message);
       break;
 
-      case 'path_find':
-        // Pass the event to the currently open PathFind object
-        if (this._cur_path_find) {
-          this._cur_path_find.notify_update(message);
-        }
+    case 'path_find':
+      // Pass the event to the currently open PathFind object
+      if (this._cur_path_find) {
+        this._cur_path_find.notify_update(message);
+      }
 
-        this.emit('path_find_all', message);
-        break;
-      case 'serverStatus':
-        self.emit('server_status', message);
+      this.emit('path_find_all', message);
+      break;
+    case 'serverStatus':
+      self.emit('server_status', message);
 
-        var load_changed = message.hasOwnProperty('load_base')
-        && message.hasOwnProperty('load_factor')
-        && (message.load_base !== self._load_base || message.load_factor !== self._load_factor)
-        ;
+      var load_changed = message.hasOwnProperty('load_base')
+      && message.hasOwnProperty('load_factor')
+      && (message.load_base !== self._load_base || message.load_factor !== self._load_factor)
+      ;
 
-        if (load_changed) {
-          self._load_base   = message.load_base;
-          self._load_factor = message.load_factor;
-          self.emit('load', { 'load_base' : self._load_base, 'load_factor' : self.load_factor });
-        }
-        break;
+      if (load_changed) {
+        self._load_base   = message.load_base;
+        self._load_factor = message.load_factor;
+        self.emit('load', { 'load_base' : self._load_base, 'load_factor' : self.load_factor });
+      }
+      break;
 
     // All other messages
-      default:
-        this._trace('remote: '+message.type+': %s', message);
-        this.emit('net_' + message.type, message);
-        break;
+    default:
+      this._trace('remote: ' + message.type + ': %s', message);
+      this.emit('net_' + message.type, message);
+      break;
   }
 };
 
@@ -544,8 +542,10 @@ Remote.prototype.request = function (request) {
     request.emit('error', new Error('No servers available'));
   } else if (!this._connected) {
     this.once('connect', this.request.bind(this, request));
+  } else if (request.server === null) {
+    this.emit('error', new Error('Server does not exist'));
   } else {
-    var server = this._get_server();
+    var server = request.server || this._get_server();
     if (server) {
       server.request(request);
     } else {
@@ -739,9 +739,9 @@ Remote.prototype.request_transaction_entry = function (tx_hash, ledger_hash, cal
     case 'string':
       request.ledger_hash(ledger_hash);
       break;
-    case 'function':
+    default:
+      request.ledger_index('validated');
       callback = ledger_hash;
-      break;
   }
   
   request.callback(callback);
@@ -752,20 +752,16 @@ Remote.prototype.request_transaction_entry = function (tx_hash, ledger_hash, cal
 // DEPRECATED: use request_transaction_entry
 Remote.prototype.request_tx = function (hash, callback) {
   var request = new Request(this, 'tx');
-
   request.message.transaction  = hash;
   request.callback(callback);
-
   return request;
 };
 
 Remote.prototype.request_account_info = function (accountID, callback) {
   var request = new Request(this, 'account_info');
-
   request.message.ident   = UInt160.json_rewrite(accountID);  // DEPRECATED
   request.message.account = UInt160.json_rewrite(accountID);
   request.callback(callback);
-
   return request;
 };
 
@@ -875,32 +871,23 @@ Remote.prototype.request_book_offers = function (gets, pays, taker, callback) {
 
 Remote.prototype.request_wallet_accounts = function (seed, callback) {
   utils.assert(this.trusted); // Don't send secrets.
-
   var request = new Request(this, 'wallet_accounts');
-
   request.message.seed = seed;
-
   return request.callback(callback);
 };
 
 Remote.prototype.request_sign = function (secret, tx_json, callback) {
   utils.assert(this.trusted); // Don't send secrets.
-
   var request = new Request(this, 'sign');
-
   request.message.secret  = secret;
   request.message.tx_json = tx_json;
-
   request.callback(callback);
-  
   return request;
 };
 
 // Submit a transaction.
 Remote.prototype.request_submit = function (callback) {
-  var request = new Request(this, 'submit');
-  request.callback(callback);
-  return request;
+  return new Request(this, 'submit').callback(callback);
 };
 
 //
@@ -926,7 +913,7 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
 
   var request = this.request_subscribe(feeds);
 
-  request.on('success', function (message) {
+  request.once('success', function (message) {
     self._stand_alone = !!message.stand_alone;
     self._testnet     = !!message.testnet;
 
@@ -949,7 +936,7 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
     // XXX When we have multiple server support, most of this should be tracked
     //     by the Server objects and then aggregated/interpreted by Remote.
     self._load_base     = message.load_base || 256;
-    self._load_factor   = message.load_factor || 1.0;
+    self._load_factor   = message.load_factor || 256;
     self._fee_ref       = message.fee_ref;
     self._fee_base      = message.fee_base;
     self._reserve_base  = message.reserve_base;
@@ -979,52 +966,42 @@ Remote.prototype.ledger_accept = function (callback) {
   } else {
     this.emit('error', { error : 'notStandAlone' });
   }
-
   return this;
 };
 
 // Return a request to refresh the account balance.
 Remote.prototype.request_account_balance = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
-
   request.account_root(account);
   request.ledger_choose(current);
   request.once('success', function (message) {
     request.emit('account_balance', Amount.from_json(message.node.Balance));
   });
-
   request.callback(callback, 'account_balance');
-
   return request;
 };
 
 // Return a request to return the account flags.
 Remote.prototype.request_account_flags = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
-
   request.account_root(account);
   request.ledger_choose(current);
   request.on('success', function (message) {
     request.emit('account_flags', message.node.Flags);
   });
-
   request.callback(callback, 'account_flags');
-
   return request;
 };
 
 // Return a request to emit the owner count.
 Remote.prototype.request_owner_count = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
-
   request.account_root(account);
   request.ledger_choose(current);
   request.on('success', function (message) {
     request.emit('owner_count', message.node.OwnerCount);
   });
-
   request.callback(callback, 'owner_count');
-
   return request;
 };
 
@@ -1082,7 +1059,7 @@ Remote.prototype.account_seq = function (account, advance) {
 
   if (account_info && account_info.seq) {
     seq = account_info.seq;
-    account_info.seq += { ADVANCE: 1, REWIND: -1 }[advance] || 0;
+    account_info.seq += { ADVANCE: 1, REWIND: -1 }[advance.toUpperCase()] || 0;
   }
 
   return seq;
@@ -1103,7 +1080,7 @@ Remote.prototype.account_seq_cache = function (account, current, callback) {
   var self = this;
 
   if (!this.accounts.hasOwnProperty(account)) {
-    self.accounts[account] = { };
+    this.accounts[account] = { };
   }
 
   var account_info = this.accounts[account];
@@ -1198,6 +1175,20 @@ Remote.prototype.request_ripple_balance = function (account, issuer, currency, c
   return request;
 };
 
+function prepare_currencies(ci) {
+  var ci_new  = { };
+
+  if (ci.hasOwnProperty('issuer')) {
+    ci_new.issuer = UInt160.json_rewrite(ci.issuer);
+  }
+
+  if (ci.hasOwnProperty('currency')) {
+    ci_new.currency = Currency.json_rewrite(ci.currency);
+  }
+
+  return ci_new;
+}
+
 Remote.prototype.request_ripple_path_find = function (src_account, dst_account, dst_amount, src_currencies, callback) {
   var request = new Request(this, 'ripple_path_find');
 
@@ -1206,19 +1197,7 @@ Remote.prototype.request_ripple_path_find = function (src_account, dst_account, 
   request.message.destination_amount  = Amount.json_rewrite(dst_amount);
 
   if (src_currencies) {
-    request.message.source_currencies = src_currencies.map(function (ci) {
-      var ci_new  = { };
-
-      if (ci.hasOwnProperty('issuer')) {
-        ci_new.issuer   = UInt160.json_rewrite(ci.issuer);
-      }
-
-      if (ci.hasOwnProperty('currency')) {
-        ci_new.currency = Currency.json_rewrite(ci.currency);
-      }
-
-      return ci_new;
-    });
+    request.message.source_currencies = src_currencies.map(prepare_currencies);
   }
 
   request.callback(callback);
@@ -1227,7 +1206,6 @@ Remote.prototype.request_ripple_path_find = function (src_account, dst_account, 
 };
 
 Remote.prototype.request_path_find_create = function (src_account, dst_account, dst_amount, src_currencies, callback) {
-  var self    = this;
   var request = new Request(this, 'path_find');
 
   request.message.subcommand          = 'create';
@@ -1236,19 +1214,7 @@ Remote.prototype.request_path_find_create = function (src_account, dst_account, 
   request.message.destination_amount  = Amount.json_rewrite(dst_amount);
 
   if (src_currencies) {
-    request.message.source_currencies = src_currencies.map(function (ci) {
-      var ci_new  = {};
-
-      if (ci.hasOwnProperty('issuer')) {
-        ci_new.issuer = UInt160.json_rewrite(ci.issuer);
-      }
-
-      if (ci.hasOwnProperty('currency')) {
-        ci_new.currency = Currency.json_rewrite(ci.currency);
-      }
-
-      return ci_new;
-    });
+    request.message.source_currencies = src_currencies.map(prepare_currencies);
   }
 
   request.callback(callback);
@@ -1263,9 +1229,7 @@ Remote.prototype.request_path_find_close = function () {
 };
 
 Remote.prototype.request_unl_list = function (callback) {
-  var request = new Request(this, 'unl_list');
-  request.callback(callback);
-  return request;
+  return new Request(this, 'unl_list').callback(callback);
 };
 
 Remote.prototype.request_unl_add = function (addr, comment, callback) {
@@ -1291,9 +1255,7 @@ Remote.prototype.request_unl_delete = function (node, callback) {
 };
 
 Remote.prototype.request_peers = function (callback) {
-  var request = new Request(this, 'peers');
-  request.callback(callback);
-  return request;
+  return new Request(this, 'peers').callback(callback);
 };
 
 Remote.prototype.request_connect = function (ip, port, callback) {
@@ -1370,6 +1332,36 @@ Remote.prototype.reserve = function (owner_count) {
   }
 
   return reserve_base.add(reserve_inc.product_human(owner_count));
+};
+
+Remote.prototype.ping = function(host, callback) {
+  var request = new Request(this, 'ping');
+
+  switch (typeof host) {
+    case 'function':
+      callback = host;
+      break;
+    case 'string':
+      var server = null;
+      for (var i=0, s; s=this._servers[i]; i++) {
+        if (s._host === host) {
+          server = s;
+          break;
+        }
+      }
+      request.set_server(server);
+      break;
+  }
+
+  var then = Date.now();
+
+  request.once('success', function() {
+    request.emit('pong', Date.now() - then);
+  });
+  
+  request.callback(callback, 'pong');
+
+  return request;
 };
 
 exports.Remote = Remote;
