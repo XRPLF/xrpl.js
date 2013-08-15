@@ -97,6 +97,95 @@ SerializedObject.prototype.to_hex = function () {
   return sjcl.codec.hex.fromBits(this.to_bits()).toUpperCase();
 };
 
+
+
+
+var TRANSACTION_TYPES = {
+	0:"Payment",
+	3:"AccountSet",
+	5:"SetRegularKey",
+	7:"OfferCreate",
+	8:"OfferCancel",
+	9:"Contract",
+	10:"RemoveContract",
+	20:"TrustSet",
+	100:"EnableFeature",
+	101:"SetFee"
+};
+
+SerializedObject.prototype.to_json = function() {
+	var old_pointer = this.pointer;
+	this.resetPointer();
+	var output = "{";
+	while (true) {
+		var key_and_value = stypes.parse_whatever(this);
+		var key = key_and_value[0];
+		var value = key_and_value[1];
+		output += ("\"" + key + "\":" + jsonify_structure(value,key));
+		output += ",";
+		if (this.pointer == this.buffer.length) {
+			break;
+		} else if (this.pointer > this.buffer.length) {
+			console.log("WARNING: Buffer length exceeded during SerializedObject.to_json");
+			break;
+		}
+	}
+	output = output.slice(0,-1);
+	output += "}";
+	this.pointer = old_pointer;
+	output = JSON.parse(output);
+	return output;
+}
+
+function jsonify_structure(thing,field_name) {
+	var output;
+	var typeof_thing = typeof thing;
+	if (typeof_thing === "number") { //Special codes
+		if (field_name) {
+			if (field_name === "LedgerEntryType") {
+				output = thing; //TODO: Do we have special codes for LedgerEntryType?
+			} else if (field_name === "TransactionType") {
+				output = "\""+TRANSACTION_TYPES[thing]+"\"" || thing;
+			} else {
+				output = thing;
+			}
+		} else {
+			output = thing;
+		}
+	} else if (typeof_thing === "boolean") {
+		output = thing;
+	} else if (typeof_thing === "string") {
+		output = "\"" + thing + "\"";
+	} else if ( "function" === typeof thing.to_json ) {
+		output = "\"" + thing.to_json() + "\"";
+	} else if (Array.isArray(thing)) {
+		//console.log("here2");
+		//iterate over array []
+		output = "[";
+		for (var i=0; i< thing.length; i++) {
+			output += jsonify_structure(thing[i]);
+			output += ",";
+		}
+		output = output.slice(0,-1);
+		output += "]";
+	} else {
+		//console.log("here1", thing);
+		//iterate over object {}
+		output = "{";
+		var keys = Object.keys(thing);
+		//console.log(keys);
+		for (var i=0; i<keys.length; i++) {
+			var key = keys[i];
+			var value = thing[key]
+			output += "\""+ key + "\":" + jsonify_structure(value);
+			output += ","
+		}
+		output = output.slice(0,-1);
+		output += "}";
+	}
+	return output;
+}
+
 SerializedObject.prototype.serialize = function (typedef, obj)
 {
   // Ensure canonical order
@@ -183,5 +272,6 @@ SerializedObject.lookup_type_tx = function (id) {
 
   return null;
 };
+
 
 exports.SerializedObject = SerializedObject;

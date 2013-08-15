@@ -43,7 +43,7 @@ function serialize_hex(so, hexData, noLength) {
  * parses bytes as hex
  */
 function convert_bytes_to_hex (byte_array) {
-  return sjcl.codec.hex.fromBits(sjcl.codec.bytes.toBits(byte_array));
+  return sjcl.codec.hex.fromBits(sjcl.codec.bytes.toBits(byte_array)).toUpperCase();
 }
 
 SerializedType.serialize_varint = function (so, val) {
@@ -82,6 +82,10 @@ SerializedType.prototype.parse_varint = function (so) {
     throw new Error("Invalid varint length indicator");
   }
 };
+
+
+
+
 
 // In the following, we assume that the inputs are in the proper range. Is this correct?
 
@@ -374,7 +378,7 @@ var STAccount = exports.Account = new SerializedType({
   },
   parse: function (so) {
     var len = this.parse_varint(so);
-	console.log("KKKKKKKKKKK",len);
+	//console.log("KKKKKKKKKKK",len);
     if (len !== 20) {
       throw new Error("Non-standard-length account ID");
     }
@@ -529,25 +533,26 @@ function serialize_whatever(so, field_name, value) {
 
 //What should this helper function be attached to?
 //Take the serialized object, figure out what type/field it is, and return the parsing of that.
-function parse_whatever(so) {
+var parse_whatever = exports.parse_whatever = function(so) {
 	var tag_byte = so.read(1)[0];
 	var type_bits = tag_byte >> 4;
 	var field_bits = tag_byte & 0x0f;
 	var type;
 	var field_name;
 	if (type_bits === 0) {
-		type = TYPES_MAP[so.read(1)[0]];
-	} else {
-		type = TYPES_MAP[type_bits];
+		type_bits = so.read(1)[0];
 	}
+	type = TYPES_MAP[type_bits];
 	if ("undefined" === typeof type) {
 		throw Error("Unknown type");
 	} else {
 		if (field_bits === 0) {
 			field_name = FIELDS_MAP[type_bits][so.read(1)[0]];
 		} else {
+			//console.log("!!!!!!!!!!IJOIOJIOJO", type_bits, field_bits);
 			field_name = FIELDS_MAP[type_bits][field_bits];
 		}
+		//console.log("PARSING WHATEVER!!!!", type_bits, type, field_name);
 		if ("undefined" === typeof field_name) {
 			throw Error("Unknown field");
 		} else {
@@ -587,13 +592,16 @@ var STObject = exports.Object = new SerializedType({
 	STInt8.serialize(so, 0xe1); //Object ending marker
   },
   parse: function (so) {
+	//console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", so.buffer, so.pointer);
     var output = {};
 	while (true) {
 		if (so.peek(1)[0] === 0xe1) { //ending marker
 			break;
 		} else {
+			//console.log("WTF M8");
 			var key_and_value = parse_whatever(so);
 			output[key_and_value[0]] = key_and_value[1];
+			//console.log("BBBBBBBBBBBBB", key_and_value, output);
 		}
 	}
 	return output;
@@ -722,4 +730,3 @@ for (var key1 in FIELDS_MAP) {
 		INVERSE_FIELDS_MAP[FIELDS_MAP[key1][key2]] = [key1, key2];
 	}
 }
-
