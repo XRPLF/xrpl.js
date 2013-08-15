@@ -14,7 +14,7 @@ var utils        = require('./utils');
 function Server(remote, opts) {
   EventEmitter.call(this);
 
-  if (typeof opts !== 'object' || typeof opts.url !== 'string') {
+  if (typeof opts !== 'object') {
     throw new Error('Invalid server configuration.');
   }
 
@@ -22,6 +22,9 @@ function Server(remote, opts) {
 
   this._remote         = remote;
   this._opts           = opts;
+  this._host           = opts.host;
+  this._port           = opts.port;
+  this._secure         = typeof opts.secure === Boolean ? opts.secure : true;
   this._ws             = void(0);
   this._connected      = false;
   this._should_connect = false;
@@ -29,6 +32,9 @@ function Server(remote, opts) {
   this._id             = 0;
   this._retry          = 0;
   this._requests       = { };
+
+  this._opts.url = (opts.secure ? 'wss://' : 'ws://') 
+                 + [ opts.host, opts.port ].join(':');
 
   this.on('message', function(message) {
     self._handle_message(message);
