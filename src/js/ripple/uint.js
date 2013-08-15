@@ -217,7 +217,6 @@ UInt.prototype.to_hex = function () {
     return null;
 
   var bytes = this.to_bytes();
-
   return sjcl.codec.hex.fromBits(sjcl.codec.bytes.toBits(bytes)).toUpperCase();
 };
 
