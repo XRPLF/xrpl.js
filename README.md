@@ -74,7 +74,7 @@ remote.request_server_info(function(err, res) {
 
 **request_unsubscribe(streams, [callback])**
 
-**request_transaction_entry(hash, [callback])**
+**request_transaction_entry(tx_hash, [ledger_hash], [callback])**
 
 **request_tx(hash, [callback])**
 
@@ -90,11 +90,11 @@ remote.request_server_info(function(err, res) {
 
 **request_wallet_accounts(seed, [callback])**
 
-+ requires trusted **remote
++ requires trusted remote
 
 **request_sign(secret, tx_json, [callback])**
 
-+ requires trusted **remote
++ requires trusted remote
 
 **request_submit([callback])**
 
@@ -118,6 +118,6 @@ remote.request_server_info(function(err, res) {
 
 **request_connect(ip, port, [callback])**
 
-**transaction()**
+**transaction([destination], [source], [amount], [callback])**
 
 + returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) object

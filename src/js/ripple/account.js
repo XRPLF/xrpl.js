@@ -11,67 +11,81 @@
 
 // var network = require("./network.js");
 
-var EventEmitter = require('events').EventEmitter;
-var util = require('util');
+var EventEmitter       = require('events').EventEmitter;
+var util               = require('util');
+var extend             = require('extend');
 
-var Amount = require('./amount').Amount;
-var UInt160 = require('./uint160').UInt160;
+var Amount             = require('./amount').Amount;
+var UInt160            = require('./uint160').UInt160;
+var TransactionManager = require('./transactionmanager').TransactionManager;
 
-var extend = require('extend');
 
-var Account = function (remote, account) {
+function Account(remote, account) {
   EventEmitter.call(this);
+
   var self = this;
 
-  this._remote = remote;
-  this._account = UInt160.from_json(account);
+  this._tx_manager = null;
+  this._remote     = remote;
+  this._account    = UInt160.from_json(account);
   this._account_id = this._account.to_json();
-  this._subs = 0;
+  this._subs       = 0;
 
   // Ledger entry object
   // Important: This must never be overwritten, only extend()-ed
-  this._entry = {};
+  this._entry = { };
 
-  this.on('newListener', function (type, listener) {
-    if (Account.subscribe_events.indexOf(type) !== -1) {
-      if (!self._subs && 'open' === self._remote._online_state) {
+  function listener_added(type, listener) {
+    if (~Account.subscribe_events.indexOf(type)) {
+      if (!self._subs && self._remote._connected) {
         self._remote.request_subscribe()
-          .accounts(self._account_id)
-          .request();
+        .accounts(self._account_id)
+        .request();
       }
-      self._subs  += 1;
+      self._subs += 1;
     }
-  });
+  }
 
-  this.on('removeListener', function (type, listener) {
-    if (Account.subscribe_events.indexOf(type) !== -1) {
-      self._subs  -= 1;
-
-      if (!self._subs && 'open' === self._remote._online_state) {
+  function listener_removed(type, listener) {
+    if (~Account.subscribe_events.indexOf(type)) {
+      self._subs -= 1;
+      if (!self._subs && self._remote._connected) {
         self._remote.request_unsubscribe()
-          .accounts(self._account_id)
-          .request();
+        .accounts(self._account_id)
+        .request();
       }
     }
-  });
+  }
 
-  this._remote.on('prepare_subscribe', function (request) {
-    if (self._subs) request.accounts(self._account_id);
-  });
+  this.on('newListener', listener_added);
+  this.on('removeListener', listener_removed);
 
-  this.on('transaction', function (msg) {
+  function prepare_subscribe(request) {
+    if (self._subs) {
+      request.accounts(self._account_id);
+    }
+  }
+
+  this._remote.on('prepare_subscribe', prepare_subscribe);
+
+  function handle_transaction(transaction) {
     var changed = false;
-    msg.mmeta.each(function (an) {
-      if (an.entryType === 'AccountRoot' &&
-          an.fields.Account === self._account_id) {
+
+    transaction.mmeta.each(function(an) {
+      var isAccountRoot = an.entryType === 'AccountRoot' 
+      && an.fields.Account === self._account_id;
+      if (isAccountRoot) {
         extend(self._entry, an.fieldsNew, an.fieldsFinal);
         changed = true;
       }
     });
+
     if (changed) {
       self.emit('entry', self._entry);
     }
-  });
+  }
+
+  this.on('transaction', handle_transaction);
 
   return this;
 };
@@ -81,10 +95,9 @@ util.inherits(Account, EventEmitter);
 /**
  * List of events that require a remote subscription to the account.
  */
-Account.subscribe_events = ['transaction', 'entry'];
+Account.subscribe_events = [ 'transaction', 'entry' ];
 
-Account.prototype.to_json = function ()
-{
+Account.prototype.to_json = function () {
   return this._account.to_json();
 };
 
@@ -93,9 +106,13 @@ Account.prototype.to_json = function ()
  *
  * Note: This does not tell you whether the account exists in the ledger.
  */
-Account.prototype.is_valid = function ()
-{
+Account.prototype.is_valid = function () {
   return this._account.is_valid();
+};
+
+Account.prototype.get_info = function(callback) {
+  var callback = typeof callback === 'function' ? callback : function(){};
+  this._remote.request_account_info(this._account_id, callback);
 };
 
 /**
@@ -106,14 +123,53 @@ Account.prototype.is_valid = function ()
  *
  * @param {function (err, entry)} callback Called with the result
  */
-Account.prototype.entry = function (callback)
+Account.prototype.entry = function (callback) {
+  var self = this;
+  var callback = typeof callback === 'function' ? callback : function(){};
+
+  this.get_info(function account_info(err, info) {
+    if (err) {
+      callback(err);
+    } else {
+      extend(self._entry, info.account_data);
+      self.emit('entry', self._entry);
+      callback(null, info);
+    }
+  });
+
+  return this;
+};
+
+Account.prototype.get_next_sequence = function(callback) {
+  var callback = typeof callback === 'function' ? callback : function(){};
+
+  this.get_info(function account_info(err, info) {
+    if (err) {
+      callback(err);
+    } else {
+      callback(null, info.account_data.Sequence); 
+    }
+  });
+
+  return this;
+};
+
+/**
+ * Retrieve this account's Ripple trust lines.
+ *
+ * To keep up-to-date with changes to the AccountRoot entry, subscribe to the
+ * "lines" event. (Not yet implemented.)
+ *
+ * @param {function (err, lines)} callback Called with the result
+ */
+Account.prototype.lines = function (callback)
 {
   var self = this;
 
-  self._remote.request_account_info(this._account_id)
+  self._remote.request_account_lines(this._account_id)
     .on('success', function (e) {
-      extend(self._entry, e.account_data);
-      self.emit('entry', self._entry);
+      self._lines = e.lines;
+      self.emit('lines', self._lines);
 
       if ("function" === typeof callback) {
         callback(null, e);
@@ -133,8 +189,7 @@ Account.prototype.entry = function (callback)
  * This is only meant to be called by the Remote class. You should never have to
  * call this yourself.
  */
-Account.prototype.notifyTx = function (message)
-{
+Account.prototype.notifyTx = function (message) {
   // Only trigger the event if the account object is actually
   // subscribed - this prevents some weird phantom events from
   // occurring.
@@ -143,6 +198,13 @@ Account.prototype.notifyTx = function (message)
   }
 };
 
-exports.Account	    = Account;
+Account.prototype.submit = function(tx) {
+  if (!this._tx_manager) {
+    this._tx_manager = new TransactionManager(this);
+  }
+  this._tx_manager.submit(tx);
+};
+
+exports.Account = Account;
 
 // vim:sw=2:sts=2:ts=8:et

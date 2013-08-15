@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.7.18",
+  "version": "0.7.19",
   "description": "Ripple JavaScript client library",
   "files": [
     "src/js/ripple/*.js",
@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/rippleFoundation/ripple-lib.git"
+    "url": "git://github.com/ripple/ripple-lib.git"
   },
   "readmeFilename": "README.md",
   "engines": {

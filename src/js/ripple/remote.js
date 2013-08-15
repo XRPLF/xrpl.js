@@ -15,266 +15,26 @@
 //
 
 // npm
-var EventEmitter  = require('events').EventEmitter;
-var util          = require('util');
+var EventEmitter = require('events').EventEmitter;
+var util         = require('util');
 
-var Server        = require('./server').Server;
-var Amount        = require('./amount').Amount;
-var Currency      = require('./currency').Currency;
-var UInt160       = require('./uint160').UInt160;
-var Transaction   = require('./transaction').Transaction;
-var Account       = require('./account').Account;
-var Meta          = require('./meta').Meta;
-var OrderBook     = require('./orderbook').OrderBook;
+var Request      = require('./request').Request;
+var Server       = require('./server').Server;
+var Amount       = require('./amount').Amount;
+var Currency     = require('./currency').Currency;
+var UInt160      = require('./uint160').UInt160;
+var Transaction  = require('./transaction').Transaction;
+var Account      = require('./account').Account;
+var Meta         = require('./meta').Meta;
+var OrderBook    = require('./orderbook').OrderBook;
+var PathFind     = require('./pathfind').PathFind;
+var RippleError  = require('./rippleerror').RippleError;
 
-var utils         = require('./utils');
-var config        = require('./config');
-var sjcl          = require('../../../build/sjcl');
+var utils        = require('./utils');
+var config       = require('./config');
+var sjcl         = require('../../../build/sjcl');
 
-// Request events emitted:
-//  'success' : Request successful.
-//  'error'   : Request failed.
-//  'remoteError'
-//  'remoteUnexpected'
-//  'remoteDisconnected'
-function Request(remote, command) {
-  EventEmitter.call(this);
-  this.remote     = remote;
-  this.requested  = false;
-  this.message    = {
-    command : command,
-    id      : void(0)
-  };
-};
 
-util.inherits(Request, EventEmitter);
-
-// Send the request to a remote.
-Request.prototype.request = function (remote) {
-  if (!this.requested) {
-    this.requested  = true;
-    this.remote.request(this);
-    this.emit('request', remote);
-  }
-};
-
-Request.prototype.callback = function(callback, successEvent, errorEvent) {
-  if (callback && typeof callback === 'function') {
-    this.once(successEvent || 'success', callback.bind(this, null));
-    this.once(errorEvent   || 'error'  , callback.bind(this));
-    this.request();
-  }
-
-  return this;
-};
-
-Request.prototype.timeout = function(duration, callback) {
-  if (!this.requested) {
-    this.once('request', this.timeout.bind(this, duration, callback));
-    return;
-  };
-
-  var self      = this;
-  var emit      = this.emit;
-  var timed_out = false;
-
-  var timeout = setTimeout(function() {
-    timed_out = true;
-    if (typeof callback === 'function') callback();
-    emit.call(self, 'timeout');
-  }, duration);
-
-  this.emit = function() {
-    if (timed_out) return;
-    else clearTimeout(timeout);
-    emit.apply(self, arguments);
-  };
-
-  return this;
-};
-
-Request.prototype.build_path = function (build) {
-  if (build) {
-    this.message.build_path = true;
-  }
-
-  return this;
-};
-
-Request.prototype.ledger_choose = function (current) {
-  if (current) {
-    this.message.ledger_index = this.remote._ledger_current_index;
-  } else {
-    this.message.ledger_hash  = this.remote._ledger_hash;
-  }
-
-  return this;
-};
-
-// Set the ledger for a request.
-// - ledger_entry
-// - transaction_entry
-Request.prototype.ledger_hash = function (h) {
-  this.message.ledger_hash  = h;
-
-  return this;
-};
-
-// Set the ledger_index for a request.
-// - ledger_entry
-Request.prototype.ledger_index = function (ledger_index) {
-  this.message.ledger_index  = ledger_index;
-
-  return this;
-};
-
-Request.prototype.ledger_select = function (ledger_spec) {
-  switch (ledger_spec) {
-    case 'current':
-    case 'closed':
-    case 'verified':
-      this.message.ledger_index = ledger_spec;
-      break;
-
-    default:
-      // XXX Better test needed
-      if (String(ledger_spec).length > 12) {
-        this.message.ledger_hash  = ledger_spec;
-      } else {
-        this.message.ledger_index  = ledger_spec;
-      }
-      break;
-  }
-
-  return this;
-};
-
-Request.prototype.account_root = function (account) {
-  this.message.account_root  = UInt160.json_rewrite(account);
-
-  return this;
-};
-
-Request.prototype.index = function (hash) {
-  this.message.index  = hash;
-
-  return this;
-};
-
-// Provide the information id an offer.
-// --> account
-// --> seq : sequence number of transaction creating offer (integer)
-Request.prototype.offer_id = function (account, seq) {
-  this.message.offer = {
-    account:  UInt160.json_rewrite(account),
-    seq:      seq
-  };
-
-  return this;
-};
-
-// --> index : ledger entry index.
-Request.prototype.offer_index = function (index) {
-  this.message.offer  = index;
-
-  return this;
-};
-
-Request.prototype.secret = function (s) {
-  if (s) {
-    this.message.secret  = s;
-  }
-
-  return this;
-};
-
-Request.prototype.tx_hash = function (h) {
-  this.message.tx_hash  = h;
-
-  return this;
-};
-
-Request.prototype.tx_json = function (j) {
-  this.message.tx_json  = j;
-
-  return this;
-};
-
-Request.prototype.tx_blob = function (j) {
-  this.message.tx_blob  = j;
-
-  return this;
-};
-
-Request.prototype.ripple_state = function (account, issuer, currency) {
-  this.message.ripple_state  = {
-    'accounts' : [
-      UInt160.json_rewrite(account),
-      UInt160.json_rewrite(issuer)
-    ],
-    'currency' : currency
-  };
-
-  return this;
-};
-
-Request.prototype.accounts = function (accounts, realtime) {
-  if (!Array.isArray(accounts)) {
-    accounts = [ accounts ];
-  }
-
-  // Process accounts parameters
-  var procAccounts = accounts.map(function(account) {
-    return UInt160.json_rewrite(account);
-  });
-  
-  if (realtime) {
-    this.message.rt_accounts = procAccounts;
-  } else {
-    this.message.accounts = procAccounts;
-  }
-
-  return this;
-};
-
-Request.prototype.rt_accounts = function (accounts) {
-  return this.accounts(accounts, true);
-};
-
-Request.prototype.books = function (books, snapshot) {
-  var procBooks = [];
-
-  for (var i = 0, l = books.length; i < l; i++) {
-    var book = books[i];
-    var json = {};
-
-    function processSide(side) {
-      if (!book[side]) throw new Error('Missing '+side);
-
-      var obj = json[side] = {
-        currency: Currency.json_rewrite(book[side].currency)
-      };
-      
-      if (obj.currency !== 'XRP') {
-        obj.issuer = UInt160.json_rewrite(book[side].issuer);
-      }
-    }
-
-    processSide('taker_gets');
-    processSide('taker_pays');
-
-    if (snapshot) json.snapshot = true;
-    if (book.both) json.both = true; 
-
-    procBooks.push(json);
-  }
-
-  this.message.books = procBooks;
-
-  return this;
-};
-
-//------------------------------------------------------------------------------
 /**
     Interface to manage the connection to a Ripple server.
 
@@ -282,13 +42,19 @@ Request.prototype.books = function (books, snapshot) {
 
     Keys for opts:
 
-      trusted            : truthy, if remote is trusted
-      websocket_ip
-      websocket_port
-      websocket_ssl
       trace
-      maxListeners
-      fee_cushion       : Extra fee multiplier to account for async fee changes.
+      max_listeners      : Set maxListeners for remote; prevents EventEmitter warnings
+      connection_offset  : Connect to remote servers on supplied interval (in seconds)
+      trusted            : truthy, if remote is trusted
+      max_fee            : Maximum acceptable transaction fee
+      fee_cushion        : Extra fee multiplier to account for async fee changes.
+      servers            : Array of server objects with the following form
+
+         { 
+              host:    <string>
+            , port:    <number>
+            , secure:  <boolean>
+         }
 
     Events:
       'connect'
@@ -318,14 +84,12 @@ function Remote(opts, trace) {
   this.trusted               = opts.trusted;
   this.local_sequence        = opts.local_sequence; // Locally track sequence numbers
   this.local_fee             = opts.local_fee;      // Locally set fees
-  this.local_signing         = (typeof opts.local_signing === 'undefined')
-                                ? true : opts.local_signing;
-  this.fee_cushion           = (typeof opts.fee_cushion === 'undefined')
-                                ? 1.5 : opts.fee_cushion;
-
+  this.local_signing         = (typeof opts.local_signing === 'undefined') ? true : Boolean(opts.local_signing);
+  this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.5 : Number(opts.fee_cushion);
+  this.max_fee               = (typeof opts.max_fee === 'undefined') ? Infinity : Number(opts.max_fee);
   this.id                    = 0;
-  this.trace                 = opts.trace || trace;
-  this._server_fatal         = false;              // True, if we know server exited.
+  this.trace                 = Boolean(opts.trace);
+  this._server_fatal         = false; // True, if we know server exited.
   this._ledger_current_index = void(0);
   this._ledger_hash          = void(0);
   this._ledger_time          = void(0);
@@ -333,8 +97,8 @@ function Remote(opts, trace) {
   this._testnet              = void(0);
   this._transaction_subs     = 0;
   this.online_target         = false;
-  this._online_state         = 'closed';         // 'open', 'closed', 'connecting', 'closing'
-  this.state                 = 'offline';        // 'online', 'offline'
+  this._online_state         = 'closed'; // 'open', 'closed', 'connecting', 'closing'
+  this.state                 = 'offline'; // 'online', 'offline'
   this.retry_timer           = void(0);
   this.retry                 = void(0);
 
@@ -346,16 +110,18 @@ function Remote(opts, trace) {
   this._reserve_inc          = void(0);
   this._connection_count     = 0;
   this._connected            = false;
+  this._connection_offset    = 1000 * (Number(opts.connection_offset) || 5);
 
   this._last_tx              = null;
+  this._cur_path_find        = null;
 
   // Local signing implies local fees and sequences
   if (this.local_signing) {
     this.local_sequence = true;
-    this.local_fee = true;
+    this.local_fee      = true;
   }
 
-  this._servers = [ ];
+  this._servers        = [ ];
   this._primary_server = void(0);
 
   // Cache information for accounts.
@@ -367,13 +133,13 @@ function Remote(opts, trace) {
     // account : { seq : __ }
   };
 
-  // Hash map of Account objects by AccountId.
-  this._accounts = {};
+  // Account objects by AccountId.
+  this._accounts = { };
 
-  // Hash map of OrderBook objects
-  this._books = {};
+  // OrderBook objects
+  this._books = { };
 
-  // List of secrets that we know about.
+  // Secrets that we know about.
   this.secrets = {
     // Secrets can be set by calling set_secret(account, secret).
 
@@ -383,8 +149,8 @@ function Remote(opts, trace) {
   // Cache for various ledgers.
   // XXX Clear when ledger advances.
   this.ledgers = {
-    'current' : {
-      'account_root' : {}
+    current : {
+      account_root : {}
     }
   };
 
@@ -397,49 +163,60 @@ function Remote(opts, trace) {
         secure:   opts.websocket_ssl,
         trusted:  opts.trusted
       }
-    ]
+    ];
   }
 
   opts.servers.forEach(function(server) {
-    var i = Number(server.pool) || 1;
-    while (i--) { self.add_server(server); }
+    var pool = Number(server.pool) || 1;
+    while (pool--) { self.add_server(server); };
   });
 
   // This is used to remove Node EventEmitter warnings
-  var maxListeners = opts.maxListeners || 0;
+  var maxListeners = opts.maxListeners || opts.max_listeners || 0;
   this._servers.concat(this).forEach(function(emitter) {
     emitter.setMaxListeners(maxListeners);
   });
 
-  this.on('newListener', function (type, listener) {
+  function listener_added(type, listener) {
     if (type === 'transaction_all') {
       if (!self._transaction_subs && self._connected) {
         self.request_subscribe('transactions').request();
       }
       self._transaction_subs += 1;
     }
-  });
+  }
 
-  this.on('removeListener', function (type, listener) {
+  function listener_removed(type, listener) {
     if (type === 'transaction_all') {
       self._transaction_subs -= 1;
       if (!self._transaction_subs && self._connected) {
         self.request_unsubscribe('transactions').request();
       }
     }
-  });
-};
+  }
+
+  this.on('newListener', listener_added);
+  this.on('removeListener', listener_removed);
+}
 
 util.inherits(Remote, EventEmitter);
 
 // Flags for ledger entries. In support of account_root().
 Remote.flags = {
-  'account_root' : {
-    'PasswordSpent'           : 0x00010000,
-    'RequireDestTag'          : 0x00020000,
-    'RequireAuth'             : 0x00040000,
-    'DisallowXRP'             : 0x00080000,
+  account_root : {
+    PasswordSpent:   0x00010000,
+    RequireDestTag:  0x00020000,
+    RequireAuth:     0x00040000,
+    DisallowXRP:     0x00080000
   }
+};
+
+function isTemMalformed(engine_result_code) {
+  return (engine_result_code >= -299 && engine_result_code <  199);
+};
+
+function isTefFailure(engine_result_code) {
+  return (engine_result_code >= -299 && engine_result_code <  199);
 };
 
 Remote.from_config = function (obj, trace) {
@@ -447,7 +224,7 @@ Remote.from_config = function (obj, trace) {
 
   var remote = new Remote(serverConfig, trace);
 
-  for (var account in config.accounts) {
+  function initialize_account(account) {
     var accountInfo = config.accounts[account];
     if (typeof accountInfo === 'object') {
       if (accountInfo.secret) {
@@ -456,6 +233,12 @@ Remote.from_config = function (obj, trace) {
         // ... and by account ID
         remote.set_secret(accountInfo.account, accountInfo.secret);
       }
+    }
+  }
+
+  if (typeof config.accounts === 'object') {
+    for (var account in config.accounts) {
+      initialize_account(account);
     }
   }
 
@@ -468,42 +251,40 @@ Remote.create_remote = function(options, callback) {
   return remote;
 };
 
-var isTemMalformed  = function (engine_result_code) {
-  return (engine_result_code >= -299 && engine_result_code <  199);
-};
-
-var isTefFailure = function (engine_result_code) {
-  return (engine_result_code >= -299 && engine_result_code <  199);
-};
-
 Remote.prototype.add_server = function (opts) {
   var self = this;
 
-  var url  = ((opts.secure || opts.websocket_ssl) ? 'wss://' : 'ws://')
-  + (opts.host || opts.websocket_ip) + ':'
-  + (opts.port || opts.websocket_port)
-  ;
-
-  var server = new Server(this, {url: url});
-
-  server.on('message', function (data) {
-    self._handle_message(data);
+  var server = new Server(this, {
+    host   : opts.host || opts.websocket_ip,
+    port   : opts.port || opts.websocket_port,
+    secure : opts.secure || opts.websocket_ssl
   });
 
-  server.on('connect', function () {
+  function server_message(data) {
+    self._handle_message(data, server);
+  }
+
+  function server_connect() {
+    self._connection_count++;
+    self._set_state('online');
     if (opts.primary || !self._primary_server) {
       self._set_primary_server(server);
     }
-    self._connection_count++;
-    self._set_state('online');
-  });
+    if (self._connection_count === self._servers.length) {
+      self.emit('ready');
+    }
+  }
 
-  server.on('disconnect', function () {
+  function server_disconnect() {
     self._connection_count--;
     if (!self._connection_count) {
       self._set_state('offline');
     }
-  });
+  }
+
+  server.on('message', server_message);
+  server.on('connect', server_connect);
+  server.on('disconnect', server_disconnect);
 
   this._servers.push(server);
 
@@ -517,7 +298,7 @@ Remote.prototype.server_fatal = function () {
 
 // Set the emitted state: 'online' or 'offline'
 Remote.prototype._set_state = function (state) {
-  if (this.trace) console.log('remote: set_state: %s', state);
+  this._trace('remote: set_state: %s', state);
 
   if (this.state !== state) {
     this.state = state;
@@ -547,30 +328,46 @@ Remote.prototype.set_trace = function (trace) {
   return this;
 };
 
+Remote.prototype._trace = function() {
+  if (this.trace) {
+    utils.logObject.apply(utils, arguments);
+  }
+};
+
 /**
  * Connect to the Ripple network.
  */
 Remote.prototype.connect = function (online) {
-  // Downwards compatibility
-  switch(typeof online) {
+  if (!this._servers.length) {
+    throw new Error('No servers available.');
+  }
+
+  switch (typeof online) {
     case 'undefined':
       break;
     case 'function':
       this.once('connect', online);
       break;
     default:
-      if (!Boolean(online)) 
-        return this.disconnect()
-      break;
+      // Downwards compatibility
+      if (!Boolean(online)) {
+        return this.disconnect();
+      }
   }
 
-  if (!this._servers.length) {
-    throw new Error('No servers available.');
-  } else {
-    for (var i=0; i<this._servers.length; i++) {
-      this._servers[i].connect();
+  var self = this;
+
+  ;(function nextServer(i) {
+    var server = self._servers[i];
+    server.connect();
+    server._sid = ++i;
+
+    if (i < self._servers.length) {
+      setTimeout(function() {
+        nextServer(i);
+      }, self._connection_offset);
     }
-  }
+  })(0);
 
   return this;
 };
@@ -579,110 +376,122 @@ Remote.prototype.connect = function (online) {
  * Disconnect from the Ripple network.
  */
 Remote.prototype.disconnect = function (online) {
-  for (var i = 0, l = this._servers.length; i < l; i++) {
-    this._servers[i].disconnect();
+  if (!this._servers.length) {
+    throw new Error('No servers available, not disconnecting');
   }
+
+  this._servers.forEach(function(server) {
+    server.disconnect();
+  });
 
   this._set_state('offline');
 
   return this;
 };
 
-Remote.prototype.ledger_hash = function () {
-  return this._ledger_hash;
+// It is possible for messages to be dispatched after the connection is closed.
+Remote.prototype._handle_message = function (message, server) {
+  var self = this;
+
+  try { message = JSON.parse(message); } catch(e) { }
+
+  var unexpected = typeof message !== 'object' || typeof message.type !== 'string';
+
+  if (unexpected) {
+    // Unexpected response from remote.
+    this.emit('error', new RippleError('remoteUnexpected', 'Unexpected response from remote'));
+    return;
+  }
+
+  switch (message.type) {
+    case 'response':
+      // Handled by the server that sent the request
+      break;
+
+    case 'ledgerClosed':
+      // XXX If not trusted, need to verify we consider ledger closed.
+      // XXX Also need to consider a slow server or out of order response.
+      // XXX Be more defensive fields could be missing or of wrong type.
+      // YYY Might want to do some cache management.
+
+      this._ledger_time           = message.ledger_time;
+      this._ledger_hash           = message.ledger_hash;
+      this._ledger_current_index  = message.ledger_index + 1;
+
+      this.emit('ledger_closed', message, server);
+      break;
+
+    case 'transaction':
+      // To get these events, just subscribe to them. A subscribes and
+      // unsubscribes will be added as needed.
+      // XXX If not trusted, need proof.
+
+      // De-duplicate transactions that are immediately following each other
+      // XXX Should have a cache of n txs so we can dedup out of order txs
+      if (this._last_tx === message.transaction.hash) {
+        break;
+      }
+
+      this._last_tx = message.transaction.hash;
+
+      this._trace('remote: tx: %s', message);
+
+      // Process metadata
+      message.mmeta = new Meta(message.meta);
+
+      // Pass the event on to any related Account objects
+      message.mmeta.getAffectedAccounts().forEach(function(account) {
+        account = self._accounts[account];
+        if (account) {
+          account.notifyTx(message);
+        }
+      });
+
+      // Pass the event on to any related OrderBooks
+      message.mmeta.getAffectedBooks().forEach(function(book) {
+        book = self._books[book];
+        if (book) {
+          book.notifyTx(message);
+        }
+      });
+
+      this.emit('transaction', message);
+      this.emit('transaction_all', message);
+      break;
+
+    case 'path_find':
+      // Pass the event to the currently open PathFind object
+      if (this._cur_path_find) {
+        this._cur_path_find.notify_update(message);
+      }
+
+      this.emit('path_find_all', message);
+      break;
+    case 'serverStatus':
+      self.emit('server_status', message);
+
+      var load_changed = message.hasOwnProperty('load_base')
+      && message.hasOwnProperty('load_factor')
+      && (message.load_base !== self._load_base || message.load_factor !== self._load_factor)
+      ;
+
+      if (load_changed) {
+        self._load_base   = message.load_base;
+        self._load_factor = message.load_factor;
+        self.emit('load', { 'load_base' : self._load_base, 'load_factor' : self.load_factor });
+      }
+      break;
+
+    // All other messages
+    default:
+      this._trace('remote: ' + message.type + ': %s', message);
+      this.emit('net_' + message.type, message);
+      break;
+  }
 };
 
-// It is possible for messages to be dispatched after the connection is closed.
-Remote.prototype._handle_message = function (json) {
-  var self        = this;
-  var message     = JSON.parse(json);
-  var unexpected  = false;
-  var request;
-
-  if (typeof message !== 'object') {
-    unexpected  = true;
-  } else {
-    switch (message.type) {
-      case 'response':
-        // Handled by the server that sent the request
-        break;
-
-      case 'ledgerClosed':
-        // XXX If not trusted, need to verify we consider ledger closed.
-        // XXX Also need to consider a slow server or out of order response.
-        // XXX Be more defensive fields could be missing or of wrong type.
-        // YYY Might want to do some cache management.
-
-        this._ledger_time           = message.ledger_time;
-        this._ledger_hash           = message.ledger_hash;
-        this._ledger_current_index  = message.ledger_index + 1;
-
-        this.emit('ledger_closed', message);
-        break;
-
-      case 'transaction':
-        // To get these events, just subscribe to them. A subscribes and
-        // unsubscribes will be added as needed.
-        // XXX If not trusted, need proof.
-
-        // De-duplicate transactions that are immediately following each other
-        // XXX Should have a cache of n txs so we can dedup out of order txs
-        if (this._last_tx === message.transaction.hash) break;
-        this._last_tx = message.transaction.hash;
-
-        if (this.trace) utils.logObject('remote: tx: %s', message);
-
-        // Process metadata
-        message.mmeta = new Meta(message.meta);
-
-        // Pass the event on to any related Account objects
-        var affected = message.mmeta.getAffectedAccounts();
-        for (var i = 0, l = affected.length; i < l; i++) {
-          var account = self._accounts[affected[i]];
-
-          if (account) account.notifyTx(message);
-        }
-
-        // Pass the event on to any related OrderBooks
-        affected = message.mmeta.getAffectedBooks();
-        for (i = 0, l = affected.length; i < l; i++) {
-          var book = self._books[affected[i]];
-
-          if (book) book.notifyTx(message);
-        }
-
-        this.emit('transaction', message);
-        this.emit('transaction_all', message);
-        break;
-
-      // XXX Should be tracked by the Server object
-      case 'serverStatus':
-        if ('load_base' in message && 'load_factor' in message &&
-            (message.load_base !== self._load_base || message.load_factor != self._load_factor))
-        {
-          self._load_base     = message.load_base;
-          self._load_factor   = message.load_factor;
-
-          self.emit('load', { 'load_base' : self._load_base, 'load_factor' : self.load_factor });
-        }
-        break;
-
-      // All other messages
-      default:
-        if (this.trace) utils.logObject('remote: '+message.type+': %s', message);
-        this.emit('net_' + message.type, message);
-        break;
-    }
-  }
-
-  // Unexpected response from remote.
-  if (unexpected) {
-    console.log('unexpected message from trusted remote: %s', json);
-    (request || this).emit('error', {
-      'error' : 'remoteUnexpected',
-      'error_message' : 'Unexpected response from remote.'
-    });
-  }
+Remote.prototype.ledger_hash = function () {
+  return this._ledger_hash;
 };
 
 Remote.prototype._set_primary_server = function (server) {
@@ -718,7 +527,9 @@ Remote.prototype._get_server = function () {
     server = this._primary_server;
   } else {
     server = this._next_server();
-    if (server) this._set_primary_server(server);
+    if (server) {
+      this._set_primary_server(server);
+    }
   }
 
   return server;
@@ -731,8 +542,10 @@ Remote.prototype.request = function (request) {
     request.emit('error', new Error('No servers available'));
   } else if (!this._connected) {
     this.once('connect', this.request.bind(this, request));
+  } else if (request.server === null) {
+    this.emit('error', new Error('Server does not exist'));
   } else {
-    var server = this._get_server();
+    var server = request.server || this._get_server();
     if (server) {
       server.request(request);
     } else {
@@ -758,21 +571,31 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
     request.message.ledger  = ledger;
   }
 
-  switch(typeof opts) {
+  var props = [
+      'full'
+    , 'expand'
+    , 'transactions'
+    , 'accounts' 
+  ];
+
+  switch (typeof opts) {
     case 'object':
-      if (opts.full) request.message.full                 = true;
-      if (opts.expand) request.message.expand             = true;
-      if (opts.transactions) request.message.transactions = true;
-      if (opts.accounts) request.message.accounts         = true;
+      for (var key in opts) {
+        if (~props.indexOf(key)) {
+          request.message[key] = true;
+        }
+      }
       break;
+
     case 'function':
       callback = opts;
-      opts     = void(0);
+      opts = void(0);
       break;
+
     default:
       //DEPRECATED
       console.log('request_ledger: full parameter is deprecated');
-      request.message.full    = true;
+      request.message.full = true;
       break;
   }
 
@@ -807,7 +630,7 @@ Remote.prototype.request_ledger_current = function (callback) {
 Remote.prototype.request_ledger_entry = function (type, callback) {
   //utils.assert(this.trusted);   // If not trusted, need to check proof, maybe talk packet protocol.
 
-  var self    = this;
+  var self = this;
   var request = new Request(this, 'ledger_entry');
 
   // Transparent caching. When .request() is invoked, look in the Remote object for the result.
@@ -817,21 +640,21 @@ Remote.prototype.request_ledger_entry = function (type, callback) {
   if (type === 'account_root') {
     request.request_default = request.request;
 
-    request.request         = function () {                        // Intercept default request.
+    request.request = function () {                        // Intercept default request.
       var bDefault  = true;
       // .self = Remote
       // this = Request
 
       // console.log('request_ledger_entry: caught');
 
-      if (self._ledger_hash) {
+      //if (self._ledger_hash) {
         // A specific ledger is requested.
-
         // XXX Add caching.
-      }
-      // else if (req.ledger_index)
-      // else if ('ripple_state' === request.type)         // YYY Could be cached per ledger.
-      else if (type === 'account_root') {
+        // else if (req.ledger_index)
+        // else if ('ripple_state' === request.type)         // YYY Could be cached per ledger.
+      //} 
+      
+      if (!self._ledger_hash && type === 'account_root') {
         var cache = self.ledgers.current.account_root;
 
         if (!cache) {
@@ -843,14 +666,10 @@ Remote.prototype.request_ledger_entry = function (type, callback) {
         if (node) {
           // Emulate fetch of ledger entry.
           // console.log('request_ledger_entry: emulating');
-          request.emit('success', {
-            // YYY Missing lots of fields.
-            'node' :  node,
-          });
-
+          // YYY Missing lots of fields.
+          request.emit('success', { node: node });
           bDefault  = false;
         } else { // Was not cached.
-
           // XXX Only allow with trusted mode.  Must sync response with advance.
           switch (type) {
             case 'account_root':
@@ -872,8 +691,8 @@ Remote.prototype.request_ledger_entry = function (type, callback) {
         // console.log('request_ledger_entry: invoking');
         request.request_default();
       }
-    }
-  };
+    };
+  }
 
   request.callback(callback);
 
@@ -909,31 +728,40 @@ Remote.prototype.request_unsubscribe = function (streams, callback) {
 // .ledger_choose()
 // .ledger_hash()
 // .ledger_index()
-Remote.prototype.request_transaction_entry = function (hash, callback) {
+Remote.prototype.request_transaction = 
+Remote.prototype.request_transaction_entry = function (tx_hash, ledger_hash, callback) {
   //utils.assert(this.trusted);   // If not trusted, need to check proof, maybe talk packet protocol.
+  var request = new Request(this, 'transaction_entry');
 
-  return (new Request(this, 'transaction_entry'))
-    .tx_hash(hash)
-    .callback(callback);
-};
+  request.tx_hash(tx_hash);
 
-// DEPRECATED: use request_transaction_entry
-Remote.prototype.request_tx = function (hash, callback) {
-  var request = new Request(this, 'tx');
-
-  request.message.transaction  = hash;
+  switch (typeof ledger_hash) {
+    case 'string':
+      request.ledger_hash(ledger_hash);
+      break;
+    default:
+      request.ledger_index('validated');
+      callback = ledger_hash;
+  }
+  
   request.callback(callback);
 
   return request;
 };
 
+// DEPRECATED: use request_transaction_entry
+Remote.prototype.request_tx = function (hash, callback) {
+  var request = new Request(this, 'tx');
+  request.message.transaction  = hash;
+  request.callback(callback);
+  return request;
+};
+
 Remote.prototype.request_account_info = function (accountID, callback) {
   var request = new Request(this, 'account_info');
-
   request.message.ident   = UInt160.json_rewrite(accountID);  // DEPRECATED
   request.message.account = UInt160.json_rewrite(accountID);
   request.callback(callback);
-
   return request;
 };
 
@@ -992,19 +820,22 @@ Remote.prototype.request_account_tx = function (obj, callback) {
 
   var request = new Request(this, 'account_tx');
 
-  request.message.account     = obj.account;
+  request.message.account = obj.account;
 
-  if (false && ledger_min === ledger_max) {
-    //request.message.ledger      = ledger_min;
-  }
-  else {
-    if (typeof obj.ledger_index_min !== 'undefined')	{request.message.ledger_index_min  = obj.ledger_index_min;}
-    if (typeof obj.ledger_index_max !== 'undefined')	{request.message.ledger_index_max  = obj.ledger_index_max;}
-    if (typeof obj.binary !== 'undefined')			{request.message.binary  = obj.binary;}
-    if (typeof obj.count !== 'undefined')			{request.message.count  = obj.count;}
-    if (typeof obj.descending !== 'undefined')		{request.message.descending  = obj.descending;}
-    if (typeof obj.offset !== 'undefined')			{request.message.offset  = obj.offset;}
-    if (typeof obj.limit !== 'undefined')			{request.message.limit  = obj.limit;}
+  var props = [
+      'ledger_index_min'
+    , 'ledger_index_max'
+    , 'binary'
+    , 'count'
+    , 'descending'
+    , 'offset'
+    , 'limit'
+  ];
+
+  for (var key in obj) {
+    if (~props.indexOf(key)) {
+      request.message[key] = obj[key];
+    }
   }
 
   request.callback(callback);
@@ -1039,32 +870,24 @@ Remote.prototype.request_book_offers = function (gets, pays, taker, callback) {
 };
 
 Remote.prototype.request_wallet_accounts = function (seed, callback) {
-  utils.assert(this.trusted);     // Don't send secrets.
-
+  utils.assert(this.trusted); // Don't send secrets.
   var request = new Request(this, 'wallet_accounts');
-
   request.message.seed = seed;
-
   return request.callback(callback);
 };
 
 Remote.prototype.request_sign = function (secret, tx_json, callback) {
-  utils.assert(this.trusted);     // Don't send secrets.
-
+  utils.assert(this.trusted); // Don't send secrets.
   var request = new Request(this, 'sign');
-
-  request.message.secret = secret;
+  request.message.secret  = secret;
   request.message.tx_json = tx_json;
   request.callback(callback);
-  
   return request;
 };
 
 // Submit a transaction.
 Remote.prototype.request_submit = function (callback) {
-  var request = new Request(this, 'submit');
-  request.callback(callback);
-  return request;
+  return new Request(this, 'submit').callback(callback);
 };
 
 //
@@ -1090,7 +913,7 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
 
   var request = this.request_subscribe(feeds);
 
-  request.on('success', function (message) {
+  request.once('success', function (message) {
     self._stand_alone = !!message.stand_alone;
     self._testnet     = !!message.testnet;
 
@@ -1113,7 +936,7 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
     // XXX When we have multiple server support, most of this should be tracked
     //     by the Server objects and then aggregated/interpreted by Remote.
     self._load_base     = message.load_base || 256;
-    self._load_factor   = message.load_factor || 1.0;
+    self._load_factor   = message.load_factor || 256;
     self._fee_ref       = message.fee_ref;
     self._fee_base      = message.fee_base;
     self._reserve_base  = message.reserve_base;
@@ -1125,7 +948,6 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
   self.emit('prepare_subscribe', request);
 
   request.callback(callback);
-
 
   // XXX Could give error events, maybe even time out.
 
@@ -1142,100 +964,91 @@ Remote.prototype.ledger_accept = function (callback) {
     request.request();
     request.callback(callback);
   } else {
-    this.emit('error', {
-      'error' : 'notStandAlone'
-    });
+    this.emit('error', { error : 'notStandAlone' });
   }
-
   return this;
 };
 
 // Return a request to refresh the account balance.
 Remote.prototype.request_account_balance = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
-
-  request.account_root(account)
-    .ledger_choose(current)
-    .on('success', function (message) {
-      // If the caller also waits for 'success', they might run before this.
-      request.emit('account_balance', Amount.from_json(message.node.Balance));
-    })
-
+  request.account_root(account);
+  request.ledger_choose(current);
+  request.once('success', function (message) {
+    request.emit('account_balance', Amount.from_json(message.node.Balance));
+  });
   request.callback(callback, 'account_balance');
-
   return request;
 };
 
 // Return a request to return the account flags.
 Remote.prototype.request_account_flags = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
-
-  request.account_root(account)
-    .ledger_choose(current)
-    .on('success', function (message) {
-      // If the caller also waits for 'success', they might run before this.
-      request.emit('account_flags', message.node.Flags);
-    })
-
+  request.account_root(account);
+  request.ledger_choose(current);
+  request.on('success', function (message) {
+    request.emit('account_flags', message.node.Flags);
+  });
   request.callback(callback, 'account_flags');
-
   return request;
 };
 
 // Return a request to emit the owner count.
 Remote.prototype.request_owner_count = function (account, current, callback) {
   var request = this.request_ledger_entry('account_root');
-
-  request.account_root(account)
-    .ledger_choose(current)
-    .on('success', function (message) {
-      // If the caller also waits for 'success', they might run before this.
-      request.emit('owner_count', message.node.OwnerCount);
-    })
-
+  request.account_root(account);
+  request.ledger_choose(current);
+  request.on('success', function (message) {
+    request.emit('owner_count', message.node.OwnerCount);
+  });
   request.callback(callback, 'owner_count');
-
   return request;
 };
 
-Remote.prototype.account = function (accountId, callback) {
+Remote.prototype.get_account =
+Remote.prototype.account = function (accountId) {
   var accountId = UInt160.json_rewrite(accountId);
+  var account   = this._accounts[accountId];
 
-  if (!this._accounts[accountId]) {
-    var account = new Account(this, accountId);
-
-    if (!account.is_valid()) return account;
-
-    this._accounts[accountId] = account;
+  if (!account) {
+    account = new Account(this, accountId);
+    if (account.is_valid()) {
+      this._accounts[accountId] = account;
+    }
   }
-
-  var account = this._accounts[accountId];
 
   return account;
 };
 
-Remote.prototype.book = function (currency_gets, issuer_gets,
-                                  currency_pays, issuer_pays) {
-  var gets = currency_gets;
-  if (gets !== 'XRP') gets += '/' + issuer_gets;
-  var pays = currency_pays;
-  if (pays !== 'XRP') pays += '/' + issuer_pays;
+Remote.prototype.path_find = function (src_account, dst_account, dst_amount, src_currencies) {
+  var path_find = new PathFind(this, src_account, dst_account, dst_amount, src_currencies);
 
-  var key = gets + ':' + pays;
-
-  if (!this._books[key]) {
-    var book = new OrderBook( this,
-      currency_gets, issuer_gets,
-      currency_pays, issuer_pays
-    );
-
-    if (!book.is_valid()) return book;
-
-    this._books[key] = book;
+  if (this._cur_path_find) {
+    this._cur_path_find.notify_superceded();
   }
 
-  return this._books[key];
-}
+  path_find.create();
+
+  this._cur_path_find = path_find;
+
+  return path_find;
+};
+
+Remote.prototype.book = function (currency_gets, issuer_gets, currency_pays, issuer_pays) {
+  var gets = currency_gets + (currency_gets === 'XRP' ? '' : ('/' + issuer_gets));
+  var pays = currency_pays + (currency_pays === 'XRP' ? '' : ('/' + issuer_pays));
+  var key = gets + ':' + pays;
+  var book;
+
+  if (!this._books.hasOwnProperty(key)) {
+    book = new OrderBook(this, currency_gets, issuer_gets, currency_pays, issuer_pays);
+    if (book.is_valid()) {
+      this._books[key] = book;
+    }
+  }
+
+  return book;
+};
 
 // Return the next account sequence if possible.
 // <-- undefined or Sequence
@@ -1246,22 +1059,18 @@ Remote.prototype.account_seq = function (account, advance) {
 
   if (account_info && account_info.seq) {
     seq = account_info.seq;
-
-    if (advance === 'ADVANCE') account_info.seq += 1;
-    if (advance === 'REWIND') account_info.seq -= 1;
-
-    // console.log('cached: %s current=%d next=%d', account, seq, account_info.seq);
-  } else {
-    // console.log('uncached: %s', account);
+    account_info.seq += { ADVANCE: 1, REWIND: -1 }[advance.toUpperCase()] || 0;
   }
 
   return seq;
-}
+};
 
 Remote.prototype.set_account_seq = function (account, seq) {
   var account = UInt160.json_rewrite(account);
 
-  if (!this.accounts[account]) this.accounts[account] = {};
+  if (!this.accounts.hasOwnProperty(account)) {
+    this.accounts[account] = { };
+  }
 
   this.accounts[account].seq = seq;
 }
@@ -1270,34 +1079,41 @@ Remote.prototype.set_account_seq = function (account, seq) {
 Remote.prototype.account_seq_cache = function (account, current, callback) {
   var self = this;
 
-  if (!self.accounts[account]) self.accounts[account] = {};
+  if (!this.accounts.hasOwnProperty(account)) {
+    this.accounts[account] = { };
+  }
 
-  var account_info = self.accounts[account];
+  var account_info = this.accounts[account];
   var request      = account_info.caching_seq_request;
 
   if (!request) {
     // console.log('starting: %s', account);
-    request = self.request_ledger_entry('account_root')
-      .account_root(account)
-      .ledger_choose(current)
-      .on('success', function (message) {
-        delete account_info.caching_seq_request;
+    request = this.request_ledger_entry('account_root');
+    request.account_root(account);
+    request.ledger_choose(current);
 
-        var seq = message.node.Sequence;
-        account_info.seq  = seq;
+    function account_root_success(message) {
+      delete account_info.caching_seq_request;
 
-        // console.log('caching: %s %d', account, seq);
-        // If the caller also waits for 'success', they might run before this.
-        request.emit('success_account_seq_cache', message);
-      })
-      .on('error', function (message) {
-        // console.log('error: %s', account);
-        delete account_info.caching_seq_request;
+      var seq = message.node.Sequence;
+      account_info.seq  = seq;
 
-        request.emit('error_account_seq_cache', message);
-      });
+      // console.log('caching: %s %d', account, seq);
+      // If the caller also waits for 'success', they might run before this.
+      request.emit('success_account_seq_cache', message);
+    }
 
-    account_info.caching_seq_request    = request;
+    function account_root_error(message) {
+      // console.log('error: %s', account);
+      delete account_info.caching_seq_request;
+
+      request.emit('error_account_seq_cache', message);
+    }
+
+    request.once('success', account_root_success);
+    request.once('error', account_root_error);
+
+    account_info.caching_seq_request = request;
   }
 
   request.callback(callback, 'success_account_seq_cache', 'error_account_seq_cache');
@@ -1308,7 +1124,6 @@ Remote.prototype.account_seq_cache = function (account, current, callback) {
 // Mark an account's root node as dirty.
 Remote.prototype.dirty_account_root = function (account) {
   var account = UInt160.json_rewrite(account);
-
   delete this.ledgers.current.account_root[account];
 };
 
@@ -1327,39 +1142,54 @@ Remote.prototype.set_secret = function (account, secret) {
 //
 // If does not exist: emit('error', 'error' : 'remoteError', 'remote' : { 'error' : 'entryNotFound' })
 Remote.prototype.request_ripple_balance = function (account, issuer, currency, current, callback) {
-  var request       = this.request_ledger_entry('ripple_state');          // YYY Could be cached per ledger.
+  var request = this.request_ledger_entry('ripple_state');          // YYY Could be cached per ledger.
 
-  return request.ripple_state(account, issuer, currency)
-    .ledger_choose(current)
-    .on('success', function (message) {
-      var node            = message.node;
+  request.ripple_state(account, issuer, currency);
+  request.ledger_choose(current);
+  request.once('success', function(message) {
+    var node            = message.node;
+    var lowLimit        = Amount.from_json(node.LowLimit);
+    var highLimit       = Amount.from_json(node.HighLimit);
+    // The amount the low account holds of issuer.
+    var balance         = Amount.from_json(node.Balance);
+    // accountHigh implies: for account: balance is negated, highLimit is the limit set by account.
+    var accountHigh     = UInt160.from_json(account).equals(highLimit.issuer());
 
-      var lowLimit        = Amount.from_json(node.LowLimit);
-      var highLimit       = Amount.from_json(node.HighLimit);
-      // The amount the low account holds of issuer.
-      var balance         = Amount.from_json(node.Balance);
-      // accountHigh implies: for account: balance is negated, highLimit is the limit set by account.
-      var accountHigh     = UInt160.from_json(account).equals(highLimit.issuer());
+    request.emit('ripple_state', {
+      account_balance     : ( accountHigh ? balance.negate() : balance.clone()).parse_issuer(account),
+      peer_balance        : (!accountHigh ? balance.negate() : balance.clone()).parse_issuer(issuer),
 
-      request.emit('ripple_state', {
-        'account_balance'     : ( accountHigh ? balance.negate() : balance.clone()).parse_issuer(account),
-        'peer_balance'        : (!accountHigh ? balance.negate() : balance.clone()).parse_issuer(issuer),
+      account_limit       : ( accountHigh ? highLimit : lowLimit).clone().parse_issuer(issuer),
+      peer_limit          : (!accountHigh ? highLimit : lowLimit).clone().parse_issuer(account),
 
-        'account_limit'       : ( accountHigh ? highLimit : lowLimit).clone().parse_issuer(issuer),
-        'peer_limit'          : (!accountHigh ? highLimit : lowLimit).clone().parse_issuer(account),
+      account_quality_in  : ( accountHigh ? node.HighQualityIn : node.LowQualityIn),
+      peer_quality_in     : (!accountHigh ? node.HighQualityIn : node.LowQualityIn),
 
-        'account_quality_in'  : ( accountHigh ? node.HighQualityIn : node.LowQualityIn),
-        'peer_quality_in'     : (!accountHigh ? node.HighQualityIn : node.LowQualityIn),
+      account_quality_out : ( accountHigh ? node.HighQualityOut : node.LowQualityOut),
+      peer_quality_out    : (!accountHigh ? node.HighQualityOut : node.LowQualityOut),
+    });
+  });
 
-        'account_quality_out' : ( accountHigh ? node.HighQualityOut : node.LowQualityOut),
-        'peer_quality_out'    : (!accountHigh ? node.HighQualityOut : node.LowQualityOut),
-      });
-    })
-    .callback(callback, 'ripple_state');
+  request.callback(callback, 'ripple_state');
+
+  return request;
 };
 
+function prepare_currencies(ci) {
+  var ci_new  = { };
+
+  if (ci.hasOwnProperty('issuer')) {
+    ci_new.issuer = UInt160.json_rewrite(ci.issuer);
+  }
+
+  if (ci.hasOwnProperty('currency')) {
+    ci_new.currency = Currency.json_rewrite(ci.currency);
+  }
+
+  return ci_new;
+}
+
 Remote.prototype.request_ripple_path_find = function (src_account, dst_account, dst_amount, src_currencies, callback) {
-  var self    = this;
   var request = new Request(this, 'ripple_path_find');
 
   request.message.source_account      = UInt160.json_rewrite(src_account);
@@ -1367,17 +1197,7 @@ Remote.prototype.request_ripple_path_find = function (src_account, dst_account, 
   request.message.destination_amount  = Amount.json_rewrite(dst_amount);
 
   if (src_currencies) {
-    request.message.source_currencies   = src_currencies.map(function (ci) {
-      var ci_new  = {};
-
-      if ('issuer' in ci)
-        ci_new.issuer   = UInt160.json_rewrite(ci.issuer);
-
-      if ('currency' in ci)
-        ci_new.currency = Currency.json_rewrite(ci.currency);
-
-      return ci_new;
-    });
+    request.message.source_currencies = src_currencies.map(prepare_currencies);
   }
 
   request.callback(callback);
@@ -1385,16 +1205,37 @@ Remote.prototype.request_ripple_path_find = function (src_account, dst_account, 
   return request;
 };
 
-Remote.prototype.request_unl_list = function (callback) {
-  var request = new Request(this, 'unl_list');
+Remote.prototype.request_path_find_create = function (src_account, dst_account, dst_amount, src_currencies, callback) {
+  var request = new Request(this, 'path_find');
+
+  request.message.subcommand          = 'create';
+  request.message.source_account      = UInt160.json_rewrite(src_account);
+  request.message.destination_account = UInt160.json_rewrite(dst_account);
+  request.message.destination_amount  = Amount.json_rewrite(dst_amount);
+
+  if (src_currencies) {
+    request.message.source_currencies = src_currencies.map(prepare_currencies);
+  }
+
   request.callback(callback);
+
   return request;
+};
+
+Remote.prototype.request_path_find_close = function () {
+  var request = new Request(this, 'path_find');
+  request.message.subcommand = 'close';
+  return request;
+};
+
+Remote.prototype.request_unl_list = function (callback) {
+  return new Request(this, 'unl_list').callback(callback);
 };
 
 Remote.prototype.request_unl_add = function (addr, comment, callback) {
   var request = new Request(this, 'unl_add');
 
-  request.message.node    = addr;
+  request.message.node = addr;
 
   if (comment) {
     request.message.comment = note;
@@ -1414,9 +1255,7 @@ Remote.prototype.request_unl_delete = function (node, callback) {
 };
 
 Remote.prototype.request_peers = function (callback) {
-  var request = new Request(this, 'peers');
-  request.callback(callback);
-  return request;
+  return new Request(this, 'peers').callback(callback);
 };
 
 Remote.prototype.request_connect = function (ip, port, callback) {
@@ -1433,8 +1272,17 @@ Remote.prototype.request_connect = function (ip, port, callback) {
   return request;
 };
 
-Remote.prototype.transaction = function () {
-  return new Transaction(this);
+Remote.prototype.transaction = function (source, destination, amount, callback) {
+  var tx = new Transaction(this);
+
+  if (arguments.length >= 3) {
+    tx = tx.payment(source, destination, amount);
+    if (typeof callback === 'function') {
+      tx.submit(callback);
+    }
+  }
+
+  return tx;
 };
 
 /**
@@ -1444,11 +1292,9 @@ Remote.prototype.transaction = function () {
  *
  * @return {Amount} Final fee in XRP for specified number of fee units.
  */
-Remote.prototype.fee_tx = function (units)
-{
+Remote.prototype.fee_tx = function (units) {
   var fee_unit = this.fee_tx_unit();
-
-  return Amount.from_json(""+Math.ceil(units * fee_unit));
+  return Amount.from_json(String(Math.ceil(units * fee_unit)));
 };
 
 /**
@@ -1459,8 +1305,7 @@ Remote.prototype.fee_tx = function (units)
  *
  * @return {Number} Recommended amount for one fee unit as float.
  */
-Remote.prototype.fee_tx_unit = function ()
-{
+Remote.prototype.fee_tx_unit = function () {
   var fee_unit = this._fee_base / this._fee_ref;
 
   // Apply load fees
@@ -1477,20 +1322,48 @@ Remote.prototype.fee_tx_unit = function ()
  *
  * Returns the base reserve with load fees and safety margin applied.
  */
-Remote.prototype.reserve = function (owner_count)
-{
-  var reserve_base = Amount.from_json(""+this._reserve_base);
-  var reserve_inc  = Amount.from_json(""+this._reserve_inc);
-
-  owner_count = owner_count || 0;
+Remote.prototype.reserve = function (owner_count) {
+  var reserve_base = Amount.from_json(String(this._reserve_base));
+  var reserve_inc  = Amount.from_json(String(this._reserve_inc));
+  var owner_count  = owner_count || 0;
 
   if (owner_count < 0) {
-    throw new Error("Owner count must not be negative.");
+    throw new Error('Owner count must not be negative.');
   }
 
   return reserve_base.add(reserve_inc.product_human(owner_count));
 };
 
-exports.Remote          = Remote;
+Remote.prototype.ping = function(host, callback) {
+  var request = new Request(this, 'ping');
+
+  switch (typeof host) {
+    case 'function':
+      callback = host;
+      break;
+    case 'string':
+      var server = null;
+      for (var i=0, s; s=this._servers[i]; i++) {
+        if (s._host === host) {
+          server = s;
+          break;
+        }
+      }
+      request.set_server(server);
+      break;
+  }
+
+  var then = Date.now();
+
+  request.once('success', function() {
+    request.emit('pong', Date.now() - then);
+  });
+  
+  request.callback(callback, 'pong');
+
+  return request;
+};
+
+exports.Remote = Remote;
 
 // vim:sw=2:sts=2:ts=8:et

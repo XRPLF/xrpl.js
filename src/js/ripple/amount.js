@@ -557,6 +557,21 @@ Amount.prototype.negate = function () {
 };
 
 /**
+ * Invert this amount and return the new value.
+ *
+ * Creates a new Amount object as a copy of the current one (including the same
+ * unit (currency & issuer), inverts it (1/x) and returns the result.
+ */
+Amount.prototype.invert = function () {
+  var one = this.clone();
+  one._value = BigInteger.ONE;
+  one._offset = 0;
+  one._is_negative = false;
+  one.canonicalize();
+  return one.ratio_human(this);
+};
+
+/**
  * Tries to correctly interpret an amount as entered by a user.
  *
  * Examples:

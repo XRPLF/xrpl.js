@@ -5,16 +5,16 @@ var utils        = require('./utils');
 /**
  *  @constructor Server
  *  @param  remote    The Remote object
- *  @param  cfg       Configuration parameters.
+ *  @param  opts       Configuration parameters.
  *
  *  Keys for cfg:
  *  url
  */ 
 
-var Server = function (remote, opts) {
+function Server(remote, opts) {
   EventEmitter.call(this);
 
-  if (typeof opts !== 'object' || typeof opts.url !== 'string') {
+  if (typeof opts !== 'object') {
     throw new Error('Invalid server configuration.');
   }
 
@@ -22,16 +22,19 @@ var Server = function (remote, opts) {
 
   this._remote         = remote;
   this._opts           = opts;
-
+  this._host           = opts.host;
+  this._port           = opts.port;
+  this._secure         = typeof opts.secure === Boolean ? opts.secure : true;
   this._ws             = void(0);
   this._connected      = false;
   this._should_connect = false;
   this._state          = void(0);
-
   this._id             = 0;
   this._retry          = 0;
-
   this._requests       = { };
+
+  this._opts.url = (opts.secure ? 'wss://' : 'ws://') 
+                 + [ opts.host, opts.port ].join(':');
 
   this.on('message', function(message) {
     self._handle_message(message);
@@ -40,7 +43,7 @@ var Server = function (remote, opts) {
   this.on('response_subscribe', function(message) {
     self._handle_response_subscribe(message);
   });
-};
+}
 
 util.inherits(Server, EventEmitter);
 
@@ -68,14 +71,38 @@ Server.prototype._set_state = function (state) {
 
     this.emit('state', state);
 
-    if (state === 'online') {
-      this._connected = true;
-      this.emit('connect');
-    } else if (state === 'offline') {
-      this._connected = false;
-      this.emit('disconnect');
+    switch (state) {
+      case 'online':
+        this._connected = true;
+        this.emit('connect');
+        break;
+      case 'offline':
+        this._connected = false;
+        this.emit('disconnect');
+        break;
     }
   }
+};
+
+Server.prototype._trace = function() {
+  if (this._remote.trace) {
+    utils.logObject.apply(utils, arguments);
+  }
+};
+
+Server.prototype._remote_address = function() {
+  try { var address = this._ws._socket.remoteAddress; } catch (e) { }
+  return address;
+};
+
+// This is the final interface between client code and a socket connection to a
+// `rippled` server. As such, this is a decent hook point to allow a WebSocket
+// interface conforming object to be used as a basis to mock rippled. This
+// avoids the need to bind a websocket server to a port and allows a more
+// synchronous style of code to represent a client <-> server message sequence.
+// We can also use this to log a message sequence to a buffer.
+Server.prototype.websocket_constructor = function () {
+  return require('ws');
 };
 
 Server.prototype.connect = function () {
@@ -85,16 +112,20 @@ Server.prototype.connect = function () {
   // recently received a message from the server and the WebSocket has not
   // reported any issues either. If we do fail to ping or the connection drops,
   // we will automatically reconnect.
-  if (this._connected === true) return;
+  if (this._connected) {
+    return;
+  }
 
-  if (this._remote.trace) console.log('server: connect: %s', this._opts.url);
+  this._trace('server: connect: %s', this._opts.url);
 
   // Ensure any existing socket is given the command to close first.
-  if (this._ws) this._ws.close();
+  if (this._ws) {
+    this._ws.close();
+  }
 
   // We require this late, because websocket shims may be loaded after
   // ripple-lib.
-  var WebSocket = require('ws');
+  var WebSocket = this.websocket_constructor();
   var ws = this._ws = new WebSocket(this._opts.url);
 
   this._should_connect = true;
@@ -103,46 +134,44 @@ Server.prototype.connect = function () {
 
   ws.onopen = function () {
     // If we are no longer the active socket, simply ignore any event
-    if (ws !== self._ws) return;
-
-    self.emit('socket_open');
-
-    // Subscribe to events
-    var request = self._remote._server_prepare_subscribe();
-    self.request(request);
+    if (ws === self._ws) {
+      self.emit('socket_open');
+      // Subscribe to events
+      var request = self._remote._server_prepare_subscribe();
+      self.request(request);
+    }
   };
 
   ws.onerror = function (e) {
     // If we are no longer the active socket, simply ignore any event
-    if (ws !== self._ws) return;
+    if (ws === self._ws) {
+      self._trace('server: onerror: %s', e.data || e);
 
-    if (self._remote.trace) console.log('server: onerror: %s', e.data || e);
+      // Most connection errors for WebSockets are conveyed as 'close' events with
+      // code 1006. This is done for security purposes and therefore unlikely to
+      // ever change.
 
-    // Most connection errors for WebSockets are conveyed as 'close' events with
-    // code 1006. This is done for security purposes and therefore unlikely to
-    // ever change.
+      // This means that this handler is hardly ever called in practice. If it is,
+      // it probably means the server's WebSocket implementation is corrupt, or
+      // the connection is somehow producing corrupt data.
 
-    // This means that this handler is hardly ever called in practice. If it is,
-    // it probably means the server's WebSocket implementation is corrupt, or
-    // the connection is somehow producing corrupt data.
+      // Most WebSocket applications simply log and ignore this error. Once we
+      // support for multiple servers, we may consider doing something like
+      // lowering this server's quality score.
 
-    // Most WebSocket applications simply log and ignore this error. Once we
-    // support for multiple servers, we may consider doing something like
-    // lowering this server's quality score.
-
-    // However, in Node.js this event may be triggered instead of the close
-    // event, so we need to handle it.
-    handleConnectionClose();
+      // However, in Node.js this event may be triggered instead of the close
+      // event, so we need to handle it.
+      handleConnectionClose();
+    }
   };
 
   // Failure to open.
   ws.onclose = function () {
     // If we are no longer the active socket, simply ignore any event
-    if (ws !== self._ws) return;
-
-    if (self._remote.trace) console.log('server: onclose: %s', ws.readyState);
-
-    handleConnectionClose();
+    if (ws === self._ws) {
+      self._trace('server: onclose: %s', ws.readyState);
+      handleConnectionClose();
+    }
   };
 
   function handleConnectionClose() {
@@ -153,14 +182,17 @@ Server.prototype.connect = function () {
     ws.onopen = ws.onerror = ws.onclose = ws.onmessage = function () {};
 
     // Should we be connected?
-    if (!self._should_connect) return;
+    if (!self._should_connect) {
+      return;
+    }
 
     // Delay and retry.
     self._retry      += 1;
     self._retry_timer = setTimeout(function () {
-      if (self._remote.trace) console.log('server: retry');
-
-      if (!self._should_connect) return;
+      self._trace('server: retry');
+      if (!self._should_connect) {
+        return;
+      }
       self.connect();
     }, self._retry < 40
         ? 1000/20           // First, for 2 seconds: 20 times per second
@@ -185,7 +217,9 @@ Server.prototype.disconnect = function () {
 };
 
 Server.prototype.send_message = function (message) {
-  this._ws.send(JSON.stringify(message));
+  if (this._ws) {
+    this._ws.send(JSON.stringify(message));
+  }
 };
 
 /**
@@ -195,56 +229,54 @@ Server.prototype.request = function (request) {
   var self  = this;
 
   // Only bother if we are still connected.
-  if (self._ws) {
-    request.message.id = self._id;
+  if (this._ws) {
+    request.server     = this;
+    request.message.id = this._id;
 
-    self._requests[request.message.id] = request;
+    this._requests[request.message.id] = request;
 
     // Advance message ID
-    self._id++;
+    this._id++;
 
-    if (self._connected || (request.message.command === 'subscribe' && self._ws.readyState === 1)) {
-      if (self._remote.trace) {
-        utils.logObject('server: request: %s', request.message);
-      }
-
-      self.send_message(request.message);
+    var is_connected = this._connected || (request.message.command === 'subscribe' && this._ws.readyState === 1);
+    
+    if (is_connected) {
+      this._trace('server: request: %s', request.message);
+      this.send_message(request.message);
     } else {
-      // XXX There are many ways to make self smarter.
-      self.once('connect', function () {
-        if (self._remote.trace) {
-          utils.logObject('server: request: %s', request.message);
-        }
+      // XXX There are many ways to make this smarter.
+      function server_reconnected() {
+        self._trace('server: request: %s', request.message);
         self.send_message(request.message);
-      });
+      }
+      this.once('connect', server_reconnected);
     }
   } else {
-    if (self._remote.trace) {
-      utils.logObject('server: request: DROPPING: %s', request.message);
-    }
+    this._trace('server: request: DROPPING: %s', request.message);
   }
 };
 
-Server.prototype._handle_message = function (json) {
+Server.prototype._handle_message = function (message) {
   var self = this;
 
-  var message;
-  
-  try {
-    message = JSON.parse(json);
-  } catch(exception) { return; }
+  try { message = JSON.parse(message); } catch(e) { }
 
-  switch(message.type) {
+  var unexpected = typeof message !== 'object' || typeof message.type !== 'string';
+
+  if (unexpected) {
+    return; 
+  }
+
+  switch (message.type) {
     case 'response':
       // A response to a request.
       var request = self._requests[message.id];
-
       delete self._requests[message.id];
 
       if (!request) {
-        if (self._remote.trace) utils.logObject('server: UNEXPECTED: %s', message);
+        this._trace('server: UNEXPECTED: %s', message);
       } else if ('success' === message.status) {
-        if (self._remote.trace) utils.logObject('server: response: %s', message);
+        this._trace('server: response: %s', message);
 
         request.emit('success', message.result);
 
@@ -252,32 +284,33 @@ Server.prototype._handle_message = function (json) {
           emitter.emit('response_' + request.message.command, message.result, request, message);
         });
       } else if (message.error) {
-        if (self._remote.trace) utils.logObject('server: error: %s', message);
+        this._trace('server: error: %s', message);
 
         request.emit('error', {
-          'error'         : 'remoteError',
-          'error_message' : 'Remote reported an error.',
-          'remote'        : message
+          error         : 'remoteError',
+          error_message : 'Remote reported an error.',
+          remote        : message
         });
       }
       break;
 
+    case 'path_find':
+      if (self._remote.trace) utils.logObject('server: path_find: %s', message);
+      break;
+
     case 'serverStatus':
       // This message is only received when online. As we are connected, it is the definative final state.
-      self._set_state(self._is_online(message.server_status) ? 'online' : 'offline');
+      this._set_state(this._is_online(message.server_status) ? 'online' : 'offline');
       break;
   }
-};
+}
 
 Server.prototype._handle_response_subscribe = function (message) {
-  var self = this;
-
-  self._server_status = message.server_status;
-
-  if (self._is_online(message.server_status)) {
-    self._set_state('online');
+  this._server_status = message.server_status;
+  if (this._is_online(message.server_status)) {
+    this._set_state('online');
   }
-};
+}
 
 exports.Server = Server;
 
