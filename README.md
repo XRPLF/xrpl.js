@@ -87,7 +87,11 @@ remote.request_server_info(function(err, res) {
 
 **request_transaction_entry(tx_hash, [ledger_hash], [callback])**
 
+Searches a particular ledger for a transaction hash. Default ledger is the open ledger.
+
 **request_tx(hash, [callback])**
+
+Searches ledger history for validated transaction hashes.
 
 **request_account_info(accountID, [callback])**
 
@@ -152,11 +156,11 @@ remote.once('connect', function() {
 
   var transaction = remote.transaction();
 
-  transaction.payment(MY_ADDRESS, RECIPIENT, AMOUNT, function(err, res) {
+  transaction.payment(MY_ADDRESS, RECIPIENT, AMOUNT);
+  
+  transaction.submit(function(err, res) {
     /* handle submission errors / success */
   });
-
-  transaction.submit();
 });
 ```
 
