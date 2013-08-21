@@ -162,23 +162,21 @@ Account.prototype.get_next_sequence = function(callback) {
  *
  * @param {function (err, lines)} callback Called with the result
  */
-Account.prototype.lines = function (callback)
-{
+Account.prototype.lines = function (callback) {
   var self = this;
+  var callback = typeof callback === 'function' ? callback : function(){};
 
-  self._remote.request_account_lines(this._account_id)
-    .on('success', function (e) {
+  function account_lines(err, lines) {
+    if (err) {
+      callback(err);
+    } else {
       self._lines = e.lines;
       self.emit('lines', self._lines);
+      callback(null, e);
+    }
+  }
 
-      if ("function" === typeof callback) {
-        callback(null, e);
-      }
-    })
-    .on('error', function (e) {
-      callback(e);
-    })
-    .request();
+  this._remote.request_account_lines(this._account_id, account_lines);
 
   return this;
 };
@@ -195,6 +193,14 @@ Account.prototype.notifyTx = function (message) {
   // occurring.
   if (this._subs) {
     this.emit('transaction', message);
+    try {
+      var account = message.transaction.Account;
+    } catch(exception) { }
+    if (account === this._account_id) {
+      this.emit('transaction-outbound');
+    } else {
+      this.emit('transaction-inbound');
+    }
   }
 };
 
