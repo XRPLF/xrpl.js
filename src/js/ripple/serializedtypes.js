@@ -184,7 +184,7 @@ var STInt64 = exports.Int64 = new SerializedType({
     var hi = readAndSum(so, 4);
     var lo = readAndSum(so, 4);
 
-    var result = new BigInteger(hi);
+    var result = new BigInteger(""+hi);
     result.shiftLeft(32);
     result.add(lo);
     return result;
