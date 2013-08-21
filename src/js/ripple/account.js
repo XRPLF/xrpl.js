@@ -61,7 +61,7 @@ function Account(remote, account) {
   this.on('removeListener', listener_removed);
 
   function prepare_subscribe(request) {
-    if (self._subs) {
+    if (self._account.is_valid() && self._subs) {
       request.accounts(self._account_id);
     }
   }
