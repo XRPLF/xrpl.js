@@ -843,6 +843,25 @@ Remote.prototype.request_account_tx = function (obj, callback) {
   return request;
 };
 
+/**
+ * Request the overall transaction history.
+ *
+ * Returns a list of transactions that happened recently on the network. The
+ * default number of transactions to be returned is 20.
+ */
+Remote.prototype.request_tx_history = function (start, callback) {
+  // XXX Does this require the server to be trusted?
+  //utils.assert(this.trusted);
+
+  var request = new Request(this, 'tx_history');
+
+  request.message.start = start;
+
+  request.callback(callback);
+
+  return request;
+};
+
 Remote.prototype.request_book_offers = function (gets, pays, taker, callback) {
   var request = new Request(this, 'book_offers');
 
