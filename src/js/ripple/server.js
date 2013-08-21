@@ -24,7 +24,7 @@ function Server(remote, opts) {
   this._opts           = opts;
   this._host           = opts.host;
   this._port           = opts.port;
-  this._secure         = typeof opts.secure === Boolean ? opts.secure : true;
+  this._secure         = typeof opts.secure === 'boolean' ? opts.secure : true;
   this._ws             = void(0);
   this._connected      = false;
   this._should_connect = false;
@@ -33,8 +33,7 @@ function Server(remote, opts) {
   this._retry          = 0;
   this._requests       = { };
 
-  this._opts.url = (opts.secure ? 'wss://' : 'ws://') 
-                 + [ opts.host, opts.port ].join(':');
+  this._opts.url = (opts.secure ? 'wss://' : 'ws://') + opts.host + ':' + opts.port;
 
   this.on('message', function(message) {
     self._handle_message(message);

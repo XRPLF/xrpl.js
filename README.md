@@ -1,5 +1,4 @@
-Ripple JavaScript Library - ripple-lib
-======================================
+#Ripple JavaScript Library
 
 This library can connect to the Ripple network via the WebSocket protocol and runs in Node.js as well as in the browser.
 
@@ -7,7 +6,7 @@ This library can connect to the Ripple network via the WebSocket protocol and ru
 * https://ripple.com
 * https://ripple.com/wiki
 
-##Initializing a remote connection
+##Getting started
 
 [ripple-lib.remote](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/remote.js) is responsible for managing connections to rippled servers.
 
@@ -15,37 +14,43 @@ This library can connect to the Ripple network via the WebSocket protocol and ru
 var Remote = require('ripple-lib').Remote;
 
 var remote = new Remote({
-  trusted: false,
+  trusted: true,
+  local_signing: true,
   servers: [ 
     { 
-        host: ''
-      , port: 1111,
+        host: 'my.hostname'
+      , port: 1337,
       , secure: true
     } 
   ]
 });
 
-remote.connect();
+remote.connect(function() {
+  /* remote connected */
+});
 ```
 
-Once a connection is formed to any of the supplied servers, a `connect` event is emitted, indicating that the remote is ready to begin fulfilling requests. When there are no more connected servers to fulfill requests, a `disconnect` event is emitted. If you send requests before ripple-lib is connected to any servers, requests are deferred until the `connect` event is received.
+Once a connection is formed to any of the supplied servers, a `connect` event is emitted, indicating that the remote is ready to begin fulfilling requests. When there are no more connected servers to fulfill requests, a `disconnect` event is emitted. If you send requests before ripple-lib is connected to any servers, requests are deferred until the `connect` event is emitted.
 
 ```js
 var remote = new Remote({ /* options */ }).connect();
-remote.request_server_info(function(err, info) { }); // will defer until connected
+
+remote.request_server_info(function(err, info) {
+ /* will defer until connected */
+}); 
 ```
 
-##Remote functions
+##Calling remote functions
 
-Each remote function returns a `Request` object. is object is an `EventEmitter`. You may listen for success or failure events from each request, or provide a callback. Example:
+Each remote function returns a `Request` object. This object is an `EventEmitter`. You may listen for success or failure events from each request, or provide a callback. Example:
 
 ```js
 var request = remote.request_server_info();
 request.on('success', function(res) { 
-  //handle success conditions
+  //handle success
 });
 request.on('error', function(err) { 
-  //handle error conditions
+  //handle error
 });
 request.request();
 ```
@@ -54,9 +59,15 @@ Or:
 
 ```js
 remote.request_server_info(function(err, res) {
-  
+  if (err) {
+    //handle error
+  } else {
+    //handle success
+  }
 });
 ```
+
+##Functions available
 
 **request_server_info([callback])**
 
@@ -76,7 +87,11 @@ remote.request_server_info(function(err, res) {
 
 **request_transaction_entry(tx_hash, [ledger_hash], [callback])**
 
+Searches a particular ledger for a transaction hash. Default ledger is the open ledger.
+
 **request_tx(hash, [callback])**
+
+Searches ledger history for validated transaction hashes.
 
 **request_account_info(accountID, [callback])**
 
@@ -121,3 +136,31 @@ remote.request_server_info(function(err, res) {
 **transaction([destination], [source], [amount], [callback])**
 
 + returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) object
+
+##Example
+
+Examples assume that a `remote` class has been initialized.
+
+**Submitting a transaction to the Ripple network**
+
+```js
+var Amount = require('ripple-lib').Amount;
+
+var MY_ADDRESS = 'rrrrrrrrrrrrrrrrr';
+var MY_SECRET  = 'secret';
+var RECIPIENT  = 'rrrrrrrrrrrrrrrr';
+var AMOUNT     = Amount.from_human('1XRP');
+
+remote.once('connect', function() {
+  remote.set_secret(MY_ADDRESS, MY_SECRET);
+
+  var transaction = remote.transaction();
+
+  transaction.payment(MY_ADDRESS, RECIPIENT, AMOUNT);
+  
+  transaction.submit(function(err, res) {
+    /* handle submission errors / success */
+  });
+});
+```
+
