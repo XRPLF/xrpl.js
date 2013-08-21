@@ -383,7 +383,7 @@ var STAccount = exports.Account = new SerializedType({
       throw new Error("Non-standard-length account ID");
     }
     var result = UInt160.from_bytes(so.read(len));
-    if (!result.is_valid()) {
+    if (false && !result.is_valid()) {
       throw new Error("Invalid Account");
     }
     return result;
@@ -549,12 +549,10 @@ var parse_whatever = exports.parse_whatever = function(so) {
 		if (field_bits === 0) {
 			field_name = FIELDS_MAP[type_bits][so.read(1)[0]];
 		} else {
-			//console.log("!!!!!!!!!!IJOIOJIOJO", type_bits, field_bits);
 			field_name = FIELDS_MAP[type_bits][field_bits];
 		}
-		//console.log("PARSING WHATEVER!!!!", type_bits, type, field_name);
 		if ("undefined" === typeof field_name) {
-			throw Error("Unknown field");
+			throw Error("Unknown field "+tag_byte);
 		} else {
 			return [field_name, type.parse(so)]; //key, value
 		}
@@ -596,6 +594,7 @@ var STObject = exports.Object = new SerializedType({
     var output = {};
 	while (true) {
 		if (so.peek(1)[0] === 0xe1) { //ending marker
+			so.read(1);
 			break;
 		} else {
 			//console.log("WTF M8");
@@ -626,6 +625,7 @@ var STArray = exports.Array = new SerializedType({
     var output = [];
 	while (true) {
 		if (so.peek(1)[0] === 0xf1) { //ending marker
+			so.read(1);
 			break;
 		} else {
 			var key_and_value = parse_whatever(so);

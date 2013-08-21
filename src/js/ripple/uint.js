@@ -172,15 +172,17 @@ UInt.prototype.parse_bits = function (j) {
   return this;
 };
 
+
 UInt.prototype.parse_bytes = function (j) {
   if (!Array.isArray(j) || j.length !== this.constructor.width) {
-    this._value = NaN;
+	this._value = NaN;
   } else {
 	  this._value  = new BigInteger(j, 256);
   }
 
   return this;
 };
+
 
 UInt.prototype.parse_json = UInt.prototype.parse_hex;
 

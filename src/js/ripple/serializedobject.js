@@ -6,7 +6,7 @@ var binformat = require('./binformat'),
 var UInt256 = require('./uint256').UInt256;
 
 var SerializedObject = function (buf) {
-  if (Array.isArray(buf)) {
+  if (Array.isArray(buf) || (Buffer && Buffer.isBuffer(buf)) ) {
     this.buffer = buf;
   } else if ("string" === typeof buf) {
     this.buffer = sjcl.codec.bytes.fromBits(sjcl.codec.hex.toBits(buf));
@@ -157,7 +157,7 @@ function jsonify_structure(thing,field_name) {
 	} else if (typeof_thing === "string") {
 		output = "\"" + thing + "\"";
 	} else if ( "function" === typeof thing.to_json ) {
-		output = "\"" + thing.to_json() + "\"";
+		output = JSON.stringify(thing.to_json());
 	} else if (Array.isArray(thing)) {
 		//console.log("here2");
 		//iterate over array []
@@ -183,6 +183,7 @@ function jsonify_structure(thing,field_name) {
 		output = output.slice(0,-1);
 		output += "}";
 	}
+
 	return output;
 }
 
