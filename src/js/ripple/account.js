@@ -197,9 +197,9 @@ Account.prototype.notifyTx = function (message) {
       var account = message.transaction.Account;
     } catch(exception) { }
     if (account === this._account_id) {
-      this.emit('transaction-outbound');
+      this.emit('transaction-outbound', message);
     } else {
-      this.emit('transaction-inbound');
+      this.emit('transaction-inbound', message);
     }
   }
 };
