@@ -38,15 +38,17 @@ Request.prototype.request = function (remote) {
 
 Request.prototype.callback = function(callback, successEvent, errorEvent) {
   if (callback && typeof callback === 'function') {
+    var self = this;
+
     function request_success(message) {
-      callback.call(this, null, message);
+      callback.call(self, null, message);
     }
 
     function request_error(error) {
       if (!(error instanceof RippleError)) {
         error = new RippleError(error);
       }
-      callback.call(this, error);
+      callback.call(self, error);
     }
 
     this.once(successEvent || 'success', request_success);
