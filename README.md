@@ -137,26 +137,62 @@ Searches ledger history for validated transaction hashes.
 
 + returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) object
 
-##Example
-
-Examples assume that a `remote` class has been initialized.
-
-**Submitting a transaction to the Ripple network**
+##Submitting a transaction
 
 ```js
+var Remote = require('ripple-lib').Remote;
 var Amount = require('ripple-lib').Amount;
 
-var MY_ADDRESS = 'rrrrrrrrrrrrrrrrr';
+var MY_ADDRESS = 'rrrMyAddress';
 var MY_SECRET  = 'secret';
-var RECIPIENT  = 'rrrrrrrrrrrrrrrr';
+var RECIPIENT  = 'rrrRecipient';
 var AMOUNT     = Amount.from_human('1XRP');
 
-remote.once('connect', function() {
+var remote = new Remote({ /* configuration */ });
+
+remote.connect(function() {
   remote.set_secret(MY_ADDRESS, MY_SECRET);
 
   var transaction = remote.transaction();
 
   transaction.payment(MY_ADDRESS, RECIPIENT, AMOUNT);
+
+  transaction.once('error', function(message) {
+    //Transaction failed. This is a final state
+  });
+
+  transaction.once('success', function(message) {
+    //Transaction succeeded. The transaction was
+    //validated to be contained within the ledger.
+    //This is a final state
+  });
+
+  transaction.once('submitted', function(err, res) {
+    //Transaction was submitted. The response may
+    //have been an error or success. This event 
+    //represents a response from the initial 
+    //submission of a tranaction to a server
+  });
+
+  transaction.once('proposed', function(err, res) {
+    //Transaction was submitted successfully
+  });
+
+  transaction.once('pending', function(message) {
+    //A ledger was checked for the transaction and
+    //the transaction is not yet validated i.e. pending
+  });
+
+  transaction.once('missing', function(message) {
+    //Four ledgers have passed without finding
+    //the transaction
+  });
+
+  transaction.once('lost', function(message) {
+    //Eight ledgers have passed without finding
+    //the transaction. At tis point the transaction
+    //is considered lost and failed
+  });
   
   transaction.submit(function(err, res) {
     /* handle submission errors / success */
