@@ -374,6 +374,9 @@ var STVL = exports.VariableLength = new SerializedType({
 var STAccount = exports.Account = new SerializedType({
   serialize: function (so, val) {
     var account = UInt160.from_json(val);
+    if (!account.is_valid()) {
+      throw new Error("Invalid account!");
+    }
     serialize_hex(so, account.to_hex());
   },
   parse: function (so) {

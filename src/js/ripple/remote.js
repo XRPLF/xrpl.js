@@ -963,6 +963,11 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
     self.emit('subscribed');
   });
 
+  request.on('error', function (err) {
+    // XXX We need a better global error handling
+    console.log(err);
+  });
+
   self.emit('prepare_subscribe', request);
 
   request.callback(callback);

@@ -48,11 +48,14 @@ PathFind.prototype.create = function ()
 
   function handleInitialPath(err, msg) {
     if (err) {
-      // XXX Handle error
+      self.emit('error', err);
       return;
     }
     self.notify_update(msg);
   }
+
+  // XXX We should add ourselves to prepare_subscribe or a similar mechanism so
+  //     that we can resubscribe after a reconnection.
 
   req.request();
 };
@@ -81,6 +84,9 @@ PathFind.prototype.notify_update = function (message)
 
 PathFind.prototype.notify_superceded = function ()
 {
+  // XXX If we're set to re-subscribe whenever we connect to a new server, then
+  //     we should cancel that behavior here. See PathFind#create.
+
   this.emit('end');
   this.emit('superceded');
 };
