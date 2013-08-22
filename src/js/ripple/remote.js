@@ -34,7 +34,6 @@ var utils        = require('./utils');
 var config       = require('./config');
 var sjcl         = require('../../../build/sjcl');
 
-
 /**
     Interface to manage the connection to a Ripple server.
 
@@ -307,15 +306,15 @@ Remote.prototype._set_state = function (state) {
 
     switch (state) {
       case 'online':
-        this._online_state      = 'open';
-        this._connected         = true;
+        this._online_state = 'open';
+        this._connected    = true;
         this.emit('connect');
         this.emit('connected');
         break;
 
       case 'offline':
-        this._online_state      = 'closed';
-        this._connected         = false;
+        this._online_state = 'closed';
+        this._connected    = false;
         this.emit('disconnect');
         this.emit('disconnected');
         break;
