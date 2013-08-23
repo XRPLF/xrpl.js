@@ -92,7 +92,7 @@ Currency.prototype.parse_bytes = function (byte_array) {
     }
     if (isZeroExceptInStandardPositions) {
       var currencyCode = String.fromCharCode(byte_array[12]) + String.fromCharCode(byte_array[13]) + String.fromCharCode(byte_array[14]);
-      if (/^[A-Z]{3}$/.test(currencyCode) && currencyCode !== "XRP" ) {
+      if (/^[A-Z0-9]{3}$/.test(currencyCode) && currencyCode !== "XRP" ) {
         this._value = currencyCode;
       } else if (currencyCode === "\0\0\0") {
         this._value = 0;
