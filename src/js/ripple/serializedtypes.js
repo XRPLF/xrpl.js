@@ -254,9 +254,10 @@ var STCurrency = new SerializedType({
     }
   },
   parse: function (so) {
-    var currency = Currency.from_bytes(so.read(20));
+    var bytes = so.read(20);
+    var currency = Currency.from_bytes(bytes);
     if (!currency.is_valid()) {
-      throw new Error("Invalid currency");
+      throw new Error("Invalid currency: "+convert_bytes_to_hex(bytes));
     }
     return currency;
   }
