@@ -254,10 +254,14 @@ var STCurrency = new SerializedType({
     }
   },
   parse: function (so) {
-    var currency = Currency.from_bytes(so.read(20));
-    if (!currency.is_valid()) {
-      throw new Error("Invalid currency");
-    }
+    var bytes = so.read(20);
+    var currency = Currency.from_bytes(bytes);
+    // XXX Disabled check. Theoretically, the Currency class should support any
+    //     UInt160 value and consider it valid. But it doesn't, so for the
+    //     deserialization to be usable, we need to allow invalid results for now.
+    //if (!currency.is_valid()) {
+    //  throw new Error("Invalid currency: "+convert_bytes_to_hex(bytes));
+    //}
     return currency;
   }
 });

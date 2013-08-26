@@ -116,13 +116,12 @@ var TRANSACTION_TYPES = {
 SerializedObject.prototype.to_json = function() {
 	var old_pointer = this.pointer;
 	this.resetPointer();
-	var output = "{";
+	var output = {};
 	while (true) {
 		var key_and_value = stypes.parse_whatever(this);
 		var key = key_and_value[0];
 		var value = key_and_value[1];
-		output += ("\"" + key + "\":" + jsonify_structure(value,key));
-		output += ",";
+		output[key] = jsonify_structure(value,key);
 		if (this.pointer == this.buffer.length) {
 			break;
 		} else if (this.pointer > this.buffer.length) {
@@ -130,59 +129,48 @@ SerializedObject.prototype.to_json = function() {
 			break;
 		}
 	}
-	output = output.slice(0,-1);
-	output += "}";
 	this.pointer = old_pointer;
-	output = JSON.parse(output);
 	return output;
 }
 
 function jsonify_structure(thing,field_name) {
 	var output;
 	var typeof_thing = typeof thing;
-	if (typeof_thing === "number") { //Special codes
+	if ("number" === typeof thing) { //Special codes
 		if (field_name) {
 			if (field_name === "LedgerEntryType") {
 				output = thing; //TODO: Do we have special codes for LedgerEntryType?
 			} else if (field_name === "TransactionType") {
-				output = "\""+TRANSACTION_TYPES[thing]+"\"" || thing;
+				output = TRANSACTION_TYPES[thing] || thing;
 			} else {
 				output = thing;
 			}
 		} else {
 			output = thing;
 		}
-	} else if (typeof_thing === "boolean") {
-		output = thing;
-	} else if (typeof_thing === "string") {
-		output = "\"" + thing + "\"";
-	} else if ( "function" === typeof thing.to_json ) {
-		output = JSON.stringify(thing.to_json());
+	} else if ("object" === typeof thing &&
+             "function" === typeof thing.to_json) {
+		output = thing.to_json();
 	} else if (Array.isArray(thing)) {
 		//console.log("here2");
 		//iterate over array []
-		output = "[";
+		output = [];
 		for (var i=0; i< thing.length; i++) {
-			output += jsonify_structure(thing[i]);
-			output += ",";
+			output.push(jsonify_structure(thing[i]));
 		}
-		output = output.slice(0,-1);
-		output += "]";
-	} else {
+	} else if ("object" === typeof thing) {
 		//console.log("here1", thing);
 		//iterate over object {}
-		output = "{";
+		output = {};
 		var keys = Object.keys(thing);
-		//console.log(keys);
 		for (var i=0; i<keys.length; i++) {
 			var key = keys[i];
-			var value = thing[key]
-			output += "\""+ key + "\":" + jsonify_structure(value);
-			output += ","
+			var value = thing[key];
+			output[key] = jsonify_structure(value);
 		}
-		output = output.slice(0,-1);
-		output += "}";
-	}
+	} else {
+    output = thing;
+  }
 
 	return output;
 }
