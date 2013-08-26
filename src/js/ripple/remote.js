@@ -80,9 +80,9 @@ function Remote(opts, trace) {
 
   var self  = this;
 
-  this.trusted               = opts.trusted;
-  this.local_sequence        = opts.local_sequence; // Locally track sequence numbers
-  this.local_fee             = opts.local_fee;      // Locally set fees
+  this.trusted               = Boolean(opts.trusted);
+  this.local_sequence        = Boolean(opts.local_sequence); // Locally track sequence numbers
+  this.local_fee             = (typeof opts.local_fee === 'undefined') ? true : Boolean(opts.local_fee); // Locally set fees
   this.local_signing         = (typeof opts.local_signing === 'undefined') ? true : Boolean(opts.local_signing);
   this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.5 : Number(opts.fee_cushion);
   this.max_fee               = (typeof opts.max_fee === 'undefined') ? Infinity : Number(opts.max_fee);
@@ -110,6 +110,7 @@ function Remote(opts, trace) {
   this._connection_count     = 0;
   this._connected            = false;
   this._connection_offset    = 1000 * (Number(opts.connection_offset) || 5);
+  this._submission_timeout   = 1000 * (Number(opts.submission_timeout) || 10);
 
   this._last_tx              = null;
   this._cur_path_find        = null;
@@ -477,7 +478,13 @@ Remote.prototype._handle_message = function (message, server) {
       if (load_changed) {
         self._load_base   = message.load_base;
         self._load_factor = message.load_factor;
-        self.emit('load', { 'load_base' : self._load_base, 'load_factor' : self.load_factor });
+        var obj = {
+          load_base:    self._load_base,
+          load_factor:  self._load_factor,
+          fee_units:    self.fee_tx_unit()
+        }
+        self.emit('load', obj);
+        self.emit('load_changed', obj);
       }
       break;
 

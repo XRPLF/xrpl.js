@@ -564,7 +564,7 @@ Transaction.prototype.submit = function (callback) {
   }
 
   return this;
-}
+};
 
 exports.Transaction = Transaction;
 
