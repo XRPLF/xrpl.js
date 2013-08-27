@@ -193,9 +193,8 @@ Account.prototype.notifyTx = function (message) {
   // occurring.
   if (this._subs) {
     this.emit('transaction', message);
-    try {
-      var account = message.transaction.Account;
-    } catch(exception) { }
+    if (!message.transaction.Account) return;
+    var account = message.transaction.Account;
     if (account === this._account_id) {
       this.emit('transaction-outbound', message);
     } else {
