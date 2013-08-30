@@ -40,7 +40,7 @@ remote.request_server_info(function(err, info) {
 }); 
 ```
 
-##Calling remote functions
+##Calling remote commands
 
 Each remote function returns a `Request` object. This object is an `EventEmitter`. You may listen for success or failure events from each request, or provide a callback. Example:
 
@@ -67,7 +67,7 @@ remote.request_server_info(function(err, res) {
 });
 ```
 
-##Functions available
+##Commands available
 
 **request_server_info([callback])**
 
