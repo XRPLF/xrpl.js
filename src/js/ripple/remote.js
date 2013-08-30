@@ -1077,7 +1077,7 @@ Remote.prototype.book = function (currency_gets, issuer_gets, currency_pays, iss
     }
   }
 
-  return book;
+  return this._books[key];
 };
 
 // Return the next account sequence if possible.
