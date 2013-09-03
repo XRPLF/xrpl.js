@@ -6,11 +6,12 @@ function RippleError(code, message) {
     extend(this, code);
   } else {
     this.result         = code;
-    this.message        = message;
     this.result_message = message;
   }
 
-  this.message = this.result_message || 'Error';
+  this.result = this.result || this.error || 'Error';
+  this.result_message = this.result_message || this.error_message || 'Error';
+  this.message = this.result_message;
 
   Error.captureStackTrace(this, code || this);
 }
