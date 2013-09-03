@@ -69,27 +69,40 @@ remote.request_server_info(function(err, res) {
 
 ##Commands available
 
-**request_server_info([callback])**
+**[request_server_info([callback])](https://ripple.com/wiki/RPC_API#server_info)**
 
-**request_ledger(ledger, [opts], [callback])**
+Returns information about the state of the server. If you are connected to multiple servers and want to select by a particular host, use `request.set_server`. Example:
 
-**request_ledger_hash([callback])**
+```js
+var request = remote.request_server_info();
+request.set_server('my.hostname');
+request.callback(function(err, res) {
 
-**request_ledger_header([callback])**
+});
+request.request();
+```
 
-**request_ledger_current([callback])**
+**[request_ledger(ledger, [opts], [callback])](https://ripple.com/wiki/RPC_API#ledger)**
 
-**request_ledger_entry(type, [callback])**
+**[request_ledger_header([callback])**
 
-**request_subscribe(streams, [callback])**
+**[request_ledger_current([callback])](https://ripple.com/wiki/RPC_API#ledger_current)**
 
-**request_unsubscribe(streams, [callback])**
+**[request_ledger_entry(type, [callback])](https://ripple.com/wiki/RPC_API#ledger_entry)**
 
-**request_transaction_entry(hash, [ledger_hash], [callback])**
+**[request_subscribe(streams, [callback])](https://ripple.com/wiki/RPC_API#subscribe)**
+
+Start receiving selected streams from the server.
+
+**[request_unsubscribe(streams, [callback])](https://ripple.com/wiki/RPC_API#unsubscribe)**
+
+Stop receiving selected streams from the server.
+
+**[request_transaction_entry(hash, [ledger_hash], [callback])](https://ripple.com/wiki/RPC_API#transaction_entry)**
 
 Searches a particular ledger for a transaction hash. Default ledger is the open ledger.
 
-**request_tx(hash, [callback])**
+**[request_tx(hash, [callback])](https://ripple.com/wiki/RPC_API#tx)**
 
 Searches ledger history for validated transaction hashes.
 
@@ -114,13 +127,13 @@ Return information about the specified account.
 }
 ```
 
-**request_account_lines(accountID, account_index, current, [callback])**
+**[request_account_lines(accountID, account_index, current, [callback])](https://ripple.com/wiki/RPC_API#account_lines)**
 
-**request_account_offers(accountID, account_index, current, [callback])**
+**[request_account_offers(accountID, account_index, current, [callback])](https://ripple.com/wiki/RPC_API#account_offers)**
 
 Return the specified account's outstanding offers.
 
-**request_account_tx(opts, [callback])**
+**[request_account_tx(opts, [callback])](https://ripple.com/wiki/RPC_API#account_tx)**
 
 Fetch a list of transactions that applied to this account.
 
@@ -134,41 +147,57 @@ Options:
 +  `offset`
 +  `limit`
 
-**request_book_offers(gets, pays, taker, [callback])**
+**[request_book_offers(gets, pays, taker, [callback])](https://ripple.com/wiki/RPC_API#book_offers)**
 
-**request_wallet_accounts(seed, [callback])**
+Return the offers for an order book as one or more pages.
+
+**[request_wallet_accounts(seed, [callback])](https://ripple.com/wiki/RPC_API#wallet_accounts)**
+
+Return a list of accounts for a wallet.
 
 + requires trusted remote
 
-**request_sign(secret, tx_json, [callback])**
+**[request_sign(secret, tx_json, [callback])](https://ripple.com/wiki/RPC_API#sign)**
+
+Sign a transaction.
 
 + requires trusted remote
 
-**request_submit([callback])**
+**[request_submit([callback])](https://ripple.com/wiki/RPC_API#submit)**
 
-**request_account_balance(account, current, [callback])**
+Submit a transaction to the network. This command is used internally to submit transactions with a greater degree of reliability. See [Submitting a transaction](https://github.com/ripple/ripple-lib#submitting-a-transaction) for details.
+
+**request_account_balance(account, ledger, [callback])**
+
+Get the balance for an account. Returns an [Amount](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/amount.js) object.
 
 **request_account_flags(account, current, [callback])**
 
+Return the flags for an account.
+
 **request_owner_count(account, current, [callback])**
+
+Return the owner count for an account.
 
 **request_ripple_balance(account, issuer, currency, current, [callback])**
 
-**request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])**
+Return a request to get a ripple balance
 
-**request_unl_list([callback])**
+**[request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])](https://ripple.com/wiki/RPC_API#path_find)**
 
-**request_unl_add(addr, comment, [callback])**
+**[request_unl_list([callback])](https://ripple.com/wiki/RPC_API#unl_list)**
 
-**request_unl_delete(node, [callback])**
+**[request_unl_add(addr, comment, [callback])](https://ripple.com/wiki/RPC_API#unl_add)**
 
-**request_peers([callback])**
+**[request_unl_delete(node, [callback])](https://ripple.com/wiki/RPC_API#unl_delete)**
 
-**request_connect(ip, port, [callback])**
+**[request_peers([callback])](https://ripple.com/wiki/RPC_API#peers)**
+
+**[request_connect(ip, port, [callback])](https://ripple.com/wiki/RPC_API#connect)**
 
 **transaction([destination], [source], [amount], [callback])**
 
-+ returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) object
+Returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) object
 
 ##Submitting a transaction
 
