@@ -93,13 +93,46 @@ Searches a particular ledger for a transaction hash. Default ledger is the open 
 
 Searches ledger history for validated transaction hashes.
 
-**request_account_info(accountID, [callback])**
+**[request_account_info(account, [callback])](https://ripple.com/wiki/RPC_API#account_info)**
+
+Return information about the specified account.
+
+```
+{
+  ledger_current_index: <number>,
+  account_data: {
+    Account:            <string>,
+    Balance:            <number>,
+    Flags:              <number>,
+    LedgerEntryType:    <string>,
+    OwnerCount:         <number>,
+    PreviousTxnID:      <string>,
+    PreviousTxnLgrSeq:  <number>,
+    Sequence:           <number> ,
+    index:              <string>
+  }
+}
+```
 
 **request_account_lines(accountID, account_index, current, [callback])**
 
 **request_account_offers(accountID, account_index, current, [callback])**
 
+Return the specified account's outstanding offers.
+
 **request_account_tx(opts, [callback])**
+
+Fetch a list of transactions that applied to this account.
+
+Options:
+
++ `ledger_index_min`
++ `ledger_index_max`
++  `binary`
++ `count`
++  `descending`
++  `offset`
++  `limit`
 
 **request_book_offers(gets, pays, taker, [callback])**
 
