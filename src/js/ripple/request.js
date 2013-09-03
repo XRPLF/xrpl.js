@@ -90,7 +90,23 @@ Request.prototype.timeout = function(duration, callback) {
 };
 
 Request.prototype.set_server = function(server) {
-  this.server = server;
+  var selected = null;
+
+  switch (typeof server) {
+    case 'object':
+      selected = server;
+      break;
+    case 'string':
+      for (var i=0, s; s=this.remote._servers[i]; i++) {
+        if (s._host === server) {
+          selected = s;
+          break;
+        }
+      }
+      break;
+  };
+
+  this.server = selected;
 };
 
 Request.prototype.build_path = function (build) {
@@ -214,7 +230,7 @@ Request.prototype.accounts = function (accounts, realtime) {
   var processedAccounts = accounts.map(function(account) {
     return UInt160.json_rewrite(account);
   });
-  
+
   if (realtime) {
     this.message.rt_accounts = processedAccounts;
   } else {
@@ -243,7 +259,6 @@ Request.prototype.books = function (books, snapshot) {
       var obj = json[side] = {
         currency: Currency.json_rewrite(book[side].currency)
       };
-      
       if (obj.currency !== 'XRP') {
         obj.issuer = UInt160.json_rewrite(book[side].issuer);
       }
@@ -257,7 +272,7 @@ Request.prototype.books = function (books, snapshot) {
     }
 
     if (book.both) {
-      json.both = true; 
+      json.both = true;
     }
 
     processedBooks.push(json);
