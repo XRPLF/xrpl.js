@@ -735,11 +735,11 @@ Remote.prototype.request_unsubscribe = function (streams, callback) {
 // .ledger_hash()
 // .ledger_index()
 Remote.prototype.request_transaction = 
-Remote.prototype.request_transaction_entry = function (tx_hash, ledger_hash, callback) {
+Remote.prototype.request_transaction_entry = function (hash, ledger_hash, callback) {
   //utils.assert(this.trusted);   // If not trusted, need to check proof, maybe talk packet protocol.
   var request = new Request(this, 'transaction_entry');
 
-  request.tx_hash(tx_hash);
+  request.tx_hash(hash);
 
   switch (typeof ledger_hash) {
     case 'string':

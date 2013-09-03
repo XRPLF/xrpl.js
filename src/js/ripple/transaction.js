@@ -180,18 +180,16 @@ Transaction.prototype.get_fee = function() {
  * information and other fields.
  */
 Transaction.prototype.complete = function () {
-  var tx_json = this.tx_json;
-
-  if (typeof tx_json.Fee === 'undefined') {
+  if (this.remote && typeof this.tx_json.Fee === 'undefined') {
     if (this.remote.local_fee || !this.remote.trusted) {
       this.tx_json.Fee = this.remote.fee_tx(this.fee_units()).to_json();
     }
   }
 
-  if (typeof tx_json.SigningPubKey === 'undefined' && (!this.remote || this.remote.local_signing)) {
+  if (typeof this.tx_json.SigningPubKey === 'undefined' && (!this.remote || this.remote.local_signing)) {
     var seed = Seed.from_json(this._secret);
-    var key = seed.get_key(this.tx_json.Account);
-    tx_json.SigningPubKey = key.to_hex_pub();
+    var key  = seed.get_key(this.tx_json.Account);
+    this.tx_json.SigningPubKey = key.to_hex_pub();
   }
 
   return this.tx_json;
@@ -551,6 +549,7 @@ Transaction.prototype.submit = function (callback) {
     self.callback(null, message);
   }
 
+  this.on('error', function(){});
   this.once('error', submission_error);
   this.once('success', submission_success);
 
@@ -564,6 +563,14 @@ Transaction.prototype.submit = function (callback) {
   }
 
   return this;
+};
+
+Transaction.prototype.abort = function(callback) {
+  if (!this.finalized) {
+    var callback = typeof callback === 'function' ? callback : function(){};
+    this.once('final', callback);
+    this.emit('abort');
+  }
 };
 
 exports.Transaction = Transaction;

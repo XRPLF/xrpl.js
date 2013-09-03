@@ -47,7 +47,21 @@ function TransactionManager(account) {
 
   this.account.get_next_sequence(sequence_loaded);
 
+  function adjust_fees() {
+    self._pending.forEach(function(pending) {
+      if (self.remote.local_fee && pending.tx_json.Fee) {
+        var old_fee = pending.tx_json.Fee;
+        var new_fee = self.remote.fee_tx(pending.fee_units()).to_json();
+        pending.tx_json.Fee = new_fee;
+        pending.emit('fee_adjusted', old_fee, new_fee);
+      }
+    });
+  }
+
+  this.remote.on('load_changed', adjust_fees);
+
   function cache_transaction(message) {
+    var hash = message.transaction.hash;
     var transaction = {
       ledger_hash:   message.ledger_hash,
       ledger_index:  message.ledger_index,
@@ -58,34 +72,29 @@ function TransactionManager(account) {
     transaction.tx_json.ledger_index = transaction.ledger_index;
     transaction.tx_json.inLedger     = transaction.ledger_index;
 
-    self._cache[message.transaction.Sequence] = transaction;
+    var pending = self._pending.get('hash', hash);
+
+    if (pending) {
+      pending.emit('success', transaction);
+    } else {
+      self._cache[hash] = transaction;
+    }
   }
 
   this.account.on('transaction-outbound', cache_transaction);
-
-  function adjust_fees() {
-    self._pending.forEach(function(pending) {
-      if (pending.tx_json.Fee) {
-        var newFee = self.remote.fee_tx(pending.fee_units()).to_json();
-        pending.tx_json.Fee = newFee;
-      }
-    });
-  }
-
-  this.remote.on('load_changed', adjust_fees);
 };
 
 util.inherits(TransactionManager, EventEmitter);
 
 // request_tx presents transactions in
-// a format slightly different from 
+// a format slightly different from
 // request_transaction_entry
 function rewrite_transaction(tx) {
   try {
     var result = {
       ledger_index: tx.ledger_index,
       metadata: tx.meta,
-      tx_json: { 
+      tx_json: {
         Account:          tx.Account,
         Amount:           tx.Amount,
         Destination:      tx.Destination,
@@ -107,31 +116,30 @@ TransactionManager.prototype._resubmit = function(wait_ledgers) {
   if (wait_ledgers) {
     var ledgers = Number(wait_ledgers) || 3;
     this._wait_ledgers(ledgers, function() {
-      self._pending.forEach(resubmit);
+      self._pending.forEach(resubmit_transaction);
     });
   } else {
-    self._pending.forEach(resubmit);
+    self._pending.forEach(resubmit_transaction);
   }
 
-  function resubmit(pending, index) {
-    if (pending.finalized) {
+  function resubmit_transaction(pending) {
+    if (!pending || pending.finalized) {
       // Transaction has been finalized, nothing to do
       return;
-    } 
-
-    var sequence = pending.tx_json.Sequence;
-    var cached   = self._cache[sequence];
+    }
 
     pending.emit('resubmit');
 
-    if (cached) {
-      // Transaction was received while waiting for
-      // resubmission
+    if (!pending.hash) {
+      self._request(pending);
+    } else if (self._cache[pending.hash]) {
+      var cached = self._cache[pending.hash];
       pending.emit('success', cached);
-      delete self._cache[sequence];
-    } else if (pending.hash) {
+      delete self._cache[pending.hash];
+    } else {
       // Transaction was successfully submitted, and
       // its hash discovered, but not validated
+      self.remote.request_tx(pending.hash, pending_check);
 
       function pending_check(err, res) {
         if (self._is_not_found(err)) {
@@ -141,16 +149,6 @@ TransactionManager.prototype._resubmit = function(wait_ledgers) {
           pending.emit('success', rewrite_transaction(res));
         }
       }
-
-      var request = self.remote.request_tx(pending.hash, pending_check);
-
-      request.timeout(self._submission_timeout, function() {
-        if (self.remote._connected) {
-          self._resubmit(1);
-        }
-      });
-    } else {
-      self._request(pending);
     }
   }
 };
@@ -173,11 +171,10 @@ TransactionManager.prototype._request = function(tx) {
   var self   = this;
   var remote = this.remote;
 
-  // Listen for 'ledger closed' events to verify
-  // that the transaction is discovered in the
-  // ledger before considering the transaction
-  // successful
-  this._detect_ledger_entry(tx);
+  if (tx.attempts > 5) {
+    tx.emit('error', new RippleError('tejAttemptsExceeded'));
+    return;
+  }
 
   var submit_request = remote.request_submit();
 
@@ -189,8 +186,6 @@ TransactionManager.prototype._request = function(tx) {
     submit_request.build_path(tx._build_path);
     submit_request.tx_json(tx.tx_json);
   }
-
-  tx.submit_index = remote._ledger_current_index;
 
   function transaction_proposed(message) {
     tx.hash = message.tx_json.hash;
@@ -206,8 +201,6 @@ TransactionManager.prototype._request = function(tx) {
   }
 
   function transaction_failed(message) {
-    if (!tx.hash) tx.hash = message.tx_json.hash;
-
     function transaction_requested(err, res) {
       if (self._is_not_found(err)) {
         self._resubmit(1);
@@ -239,16 +232,13 @@ TransactionManager.prototype._request = function(tx) {
   }
 
   function submission_success(message) {
-    tx.emit('submitted', message);
-
-    if (tx.attempts > 5) {
-      tx.emit('error', new RippleError(message));
-      return;
+    if (!tx.hash) {
+      tx.hash = message.tx_json.hash;
     }
 
-    var engine_result = message.engine_result || '';
+    tx.emit('submitted', message);
 
-    tx.hash = message.tx_json.hash;
+    var engine_result = message.engine_result || '';
 
     switch (engine_result.slice(0, 3)) {
       case 'tes':
@@ -271,6 +261,7 @@ TransactionManager.prototype._request = function(tx) {
   submit_request.request();
 
   submit_request.timeout(this._submission_timeout, function() {
+    tx.emit('timeout');
     if (self.remote._connected) {
       self._resubmit(1);
     }
@@ -290,74 +281,9 @@ TransactionManager.prototype._is_not_found = function(error) {
       && not_found_re.test(error.remote.error);
 };
 
-TransactionManager.prototype._detect_ledger_entry = function(tx) {
-  var self            = this;
-  var remote          = this.remote;
-  var checked_ledgers = { };
-
-  function entry_callback(err, message) {
-    if (typeof message !== 'object') return;
-
-    var ledger_hash  = message.ledger_hash;
-    var ledger_index = message.ledger_index;
-
-    if (tx.finalized || checked_ledgers[ledger_hash]) {
-      // Transaction submission has already erred or
-      // this ledger has already been checked for 
-      // transaction
-      return;
-    }
-
-    checked_ledgers[ledger_hash] = true;
-
-    if (self._is_not_found(err)) {
-      var dif = ledger_index - tx.submit_index;
-      if (dif >= 8) {
-        // Lost
-        tx.emit('error', message);
-        tx.emit('lost', message);
-      } else if (dif >= 4) {
-        // Missing
-        tx.set_state('client_missing');
-        tx.emit('missing', message);
-      } else {
-        // Pending
-        tx.emit('pending', message);
-      }
-    } else {
-      // Transaction was found in the ledger, 
-      // consider this transaction successful
-      if (message.metadata) {
-        tx.set_state(message.metadata.TransactionResult);
-      }
-      tx.emit('success', message);
-    }
-  }
-
-  function ledger_closed(message) {
-    if (!tx.finalized && !checked_ledgers[message.ledger_hash]) {
-      remote.request_transaction_entry(tx.hash, message.ledger_hash, entry_callback);
-    }
-  }
-
-  function transaction_proposed() {
-    // Check the ledger for transaction entry
-    remote.addListener('ledger_closed', ledger_closed);
-  }
-
-  function transaction_finalized() {
-    // Stop checking the ledger
-    remote.removeListener('ledger_closed', ledger_closed);
-    tx.removeListener('proposed', transaction_proposed);
-  }
-
-  tx.once('proposed', transaction_proposed);
-  tx.once('final', transaction_finalized);
-  tx.once('abort', transaction_finalized);
-  tx.once('resubmit', transaction_finalized);
-};
-
 /**
+ * Entry point for TransactionManager submission
+ *
  * @param {Object} tx
  */
 
@@ -367,14 +293,15 @@ TransactionManager.prototype.submit = function(tx) {
 
   if (!this._next_sequence) {
     function resubmit_transaction() {
-      self.submit(tx); 
+      self.submit(tx);
     }
     this.once('sequence_loaded', resubmit_transaction);
     return;
   }
 
   tx.tx_json.Sequence = this._next_sequence++;
-  tx.attempts = 0;
+  tx.submit_index     = this.remote._ledger_current_index;
+  tx.attempts         = 0;
   tx.complete();
 
   function finalize(message) {
@@ -385,8 +312,11 @@ TransactionManager.prototype.submit = function(tx) {
     }
   }
 
-  tx.once('error', finalize);
+  tx.on('error', finalize);
   tx.once('success', finalize);
+  tx.once('abort', function() {
+    tx.emit('error', new RippleError('tejAbort', 'Transaction aborted'));
+  });
 
   var fee = tx.tx_json.Fee;
   var remote = this.remote;
