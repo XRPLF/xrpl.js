@@ -25,7 +25,6 @@ function Account(remote, account) {
 
   var self = this;
 
-  this._tx_manager = null;
   this._remote     = remote;
   this._account    = UInt160.from_json(account);
   this._account_id = this._account.to_json();
@@ -112,7 +111,8 @@ Account.prototype.is_valid = function () {
 
 Account.prototype.get_info = function(callback) {
   var callback = typeof callback === 'function' ? callback : function(){};
-  this._remote.request_account_info(this._account_id, callback);
+  var request = this._remote.request_account_info(this._account_id, callback);
+  return request;
 };
 
 /**
@@ -166,13 +166,13 @@ Account.prototype.lines = function (callback) {
   var self = this;
   var callback = typeof callback === 'function' ? callback : function(){};
 
-  function account_lines(err, lines) {
+  function account_lines(err, res) {
     if (err) {
       callback(err);
     } else {
-      self._lines = e.lines;
+      self._lines = res.lines;
       self.emit('lines', self._lines);
-      callback(null, e);
+      callback(null, res);
     }
   }
 
@@ -193,8 +193,8 @@ Account.prototype.notifyTx = function (message) {
   // occurring.
   if (this._subs) {
     this.emit('transaction', message);
-    if (!message.transaction.Account) return;
     var account = message.transaction.Account;
+    if (!account) return;
     if (account === this._account_id) {
       this.emit('transaction-outbound', message);
     } else {
