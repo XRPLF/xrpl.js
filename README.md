@@ -16,12 +16,12 @@ var Remote = require('ripple-lib').Remote;
 var remote = new Remote({
   trusted: true,
   local_signing: true,
-  servers: [ 
-    { 
+  servers: [
+    {
         host: 'my.hostname'
       , port: 1337,
       , secure: true
-    } 
+    }
   ]
 });
 
@@ -85,7 +85,7 @@ remote.request_server_info(function(err, res) {
 
 **request_unsubscribe(streams, [callback])**
 
-**request_transaction_entry(tx_hash, [ledger_hash], [callback])**
+**request_transaction_entry(hash, [ledger_hash], [callback])**
 
 Searches a particular ledger for a transaction hash. Default ledger is the open ledger.
 
@@ -139,6 +139,26 @@ Searches ledger history for validated transaction hashes.
 
 ##Submitting a transaction
 
+[Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) objects are EventEmitters. They may emit the following events.
+
++ `final` Transaction has erred or succeeded. This event indicates that the transaction has finished processing.
+
++ `error` Transaction has erred. This event is a final state.
+
++ `success` Transaction succeeded. This event is a final state.
+
++ `submitted` Transaction has been submitted to the network. The submission may result in a remote error or success.
+
++ `proposed` Transaction has been submitted *successfully* to the network. The transaction at this point is awaiting validation in a ledger.
+
++ `timeout` Transaction submission timed out. The transaction will be resubmitted.
+
++ `resubmit` Transaction is beginning resubmission.
+
++ `fee_adjusted` Transaction fee has been adjusted during its pending state. The transaction fee will only be adjusted if the remote is configured for local fees, which it is by default.
+
++ `abort` Transaction has been aborted. Transactions are only aborted by manual calls to `#abort`.
+
 ```js
 var Remote = require('ripple-lib').Remote;
 var Amount = require('ripple-lib').Amount;
@@ -157,43 +177,6 @@ remote.connect(function() {
 
   transaction.payment(MY_ADDRESS, RECIPIENT, AMOUNT);
 
-  transaction.once('error', function(message) {
-    //Transaction failed. This is a final state
-  });
-
-  transaction.once('success', function(message) {
-    //Transaction succeeded. The transaction was
-    //validated to be contained within the ledger.
-    //This is a final state
-  });
-
-  transaction.once('submitted', function(err, res) {
-    //Transaction was submitted. The response may
-    //have been an error or success. This event 
-    //represents a response from the initial 
-    //submission of a tranaction to a server
-  });
-
-  transaction.once('proposed', function(err, res) {
-    //Transaction was submitted successfully
-  });
-
-  transaction.once('pending', function(message) {
-    //A ledger was checked for the transaction and
-    //the transaction is not yet validated i.e. pending
-  });
-
-  transaction.once('missing', function(message) {
-    //Four ledgers have passed without finding
-    //the transaction
-  });
-
-  transaction.once('lost', function(message) {
-    //Eight ledgers have passed without finding
-    //the transaction. At tis point the transaction
-    //is considered lost and failed
-  });
-  
   transaction.submit(function(err, res) {
     /* handle submission errors / success */
   });
