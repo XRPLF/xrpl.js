@@ -225,6 +225,8 @@ remote.connect(function() {
 });
 ```
 
+###Transaction events
+
 [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) objects are EventEmitters. They may emit the following events.
 
 + `final` Transaction has erred or succeeded. This event indicates that the transaction has finished processing.
