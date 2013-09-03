@@ -1000,10 +1000,10 @@ Remote.prototype.ledger_accept = function (callback) {
 };
 
 // Return a request to refresh the account balance.
-Remote.prototype.request_account_balance = function (account, current, callback) {
+Remote.prototype.request_account_balance = function (account, ledger, callback) {
   var request = this.request_ledger_entry('account_root');
   request.account_root(account);
-  request.ledger_choose(current);
+  request.ledger_choose(ledger);
   request.once('success', function (message) {
     request.emit('account_balance', Amount.from_json(message.node.Balance));
   });
@@ -1372,14 +1372,7 @@ Remote.prototype.ping = function(host, callback) {
       callback = host;
       break;
     case 'string':
-      var server = null;
-      for (var i=0, s; s=this._servers[i]; i++) {
-        if (s._host === host) {
-          server = s;
-          break;
-        }
-      }
-      request.set_server(server);
+      request.set_server(host);
       break;
   }
 
@@ -1388,7 +1381,7 @@ Remote.prototype.ping = function(host, callback) {
   request.once('success', function() {
     request.emit('pong', Date.now() - then);
   });
-  
+
   request.callback(callback, 'pong');
 
   return request;
