@@ -139,26 +139,6 @@ Searches ledger history for validated transaction hashes.
 
 ##Submitting a transaction
 
-[Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) objects are EventEmitters. They may emit the following events.
-
-+ `final` Transaction has erred or succeeded. This event indicates that the transaction has finished processing.
-
-+ `error` Transaction has erred. This event is a final state.
-
-+ `success` Transaction succeeded. This event is a final state.
-
-+ `submitted` Transaction has been submitted to the network. The submission may result in a remote error or success.
-
-+ `proposed` Transaction has been submitted *successfully* to the network. The transaction at this point is awaiting validation in a ledger.
-
-+ `timeout` Transaction submission timed out. The transaction will be resubmitted.
-
-+ `resubmit` Transaction is beginning resubmission.
-
-+ `fee_adjusted` Transaction fee has been adjusted during its pending state. The transaction fee will only be adjusted if the remote is configured for local fees, which it is by default.
-
-+ `abort` Transaction has been aborted. Transactions are only aborted by manual calls to `#abort`.
-
 ```js
 var Remote = require('ripple-lib').Remote;
 var Amount = require('ripple-lib').Amount;
@@ -183,3 +163,14 @@ remote.connect(function() {
 });
 ```
 
+[Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) objects are EventEmitters. They may emit the following events.
+
++ `final` Transaction has erred or succeeded. This event indicates that the transaction has finished processing.
++ `error` Transaction has erred. This event is a final state.
++ `success` Transaction succeeded. This event is a final state.
++ `submitted` Transaction has been submitted to the network. The submission may result in a remote error or success.
++ `proposed` Transaction has been submitted *successfully* to the network. The transaction at this point is awaiting validation in a ledger.
++ `timeout` Transaction submission timed out. The transaction will be resubmitted.
++ `resubmit` Transaction is beginning resubmission.
++ `fee_adjusted` Transaction fee has been adjusted during its pending state. The transaction fee will only be adjusted if the remote is configured for local fees, which it is by default.
++ `abort` Transaction has been aborted. Transactions are only aborted by manual calls to `#abort`.
