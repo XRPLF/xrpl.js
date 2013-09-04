@@ -581,7 +581,7 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
       'full'
     , 'expand'
     , 'transactions'
-    , 'accounts' 
+    , 'accounts'
   ];
 
   switch (typeof opts) {
@@ -828,18 +828,23 @@ Remote.prototype.request_account_tx = function (obj, callback) {
 
   request.message.account = obj.account;
 
-  var props = [
-      'ledger_index_min'
-    , 'ledger_index_max'
-    , 'binary'
-    , 'count'
-    , 'descending'
-    , 'offset'
+  var request_fields = [
+      'ledger_index_min'  //earliest
+    , 'ledger_index_max'  //latest
+    , 'binary'            //false
+    , 'count'             //false
+    , 'descending'        //false
+    , 'offset'            //0
     , 'limit'
+
+    //extended account_tx
+    , 'forward'           //false
+    , 'fwd_marker'
+    , 'rev_marker'
   ];
 
   for (var key in obj) {
-    if (~props.indexOf(key)) {
+    if (~request_fields.indexOf(key)) {
       request.message[key] = obj[key];
     }
   }
