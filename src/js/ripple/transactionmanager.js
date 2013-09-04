@@ -82,6 +82,24 @@ function TransactionManager(account) {
   }
 
   this.account.on('transaction-outbound', cache_transaction);
+
+  function update_pending_status(ledger) {
+    self._pending.forEach(function(pending) {
+      pending.last_ledger = ledger;
+      switch (ledger.ledger_index - pending.submit_index) {
+        case 8:
+          pending.emit('lost', ledger);
+          pending.emit('error', new RippleError('tejLost', 'Transaction lost'));
+          break;
+        case 4:
+          pending.set_state('client_missing');
+          pending.emit('missing', ledger);
+          break;
+      }
+    });
+  }
+
+  this.remote.on('ledger_closed', update_pending_status);
 };
 
 util.inherits(TransactionManager, EventEmitter);
@@ -288,9 +306,9 @@ TransactionManager.prototype._is_not_found = function(error) {
  */
 
 TransactionManager.prototype.submit = function(tx) {
-  // If sequence number is not yet known, defer until it is.
   var self = this;
 
+  // If sequence number is not yet known, defer until it is.
   if (!this._next_sequence) {
     function resubmit_transaction() {
       self.submit(tx);
@@ -301,11 +319,13 @@ TransactionManager.prototype.submit = function(tx) {
 
   tx.tx_json.Sequence = this._next_sequence++;
   tx.submit_index     = this.remote._ledger_current_index;
+  tx.last_ledger      = void(0);
   tx.attempts         = 0;
   tx.complete();
 
   function finalize(message) {
     if (!tx.finalized) {
+      //XX
       self._pending.removeSequence(tx.tx_json.Sequence);
       tx.finalized = true;
       tx.emit('final', message);
