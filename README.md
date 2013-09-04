@@ -1,5 +1,7 @@
 #Ripple JavaScript Library
 
+`npm install ripple-lib`
+
 This library can connect to the Ripple network via the WebSocket protocol and runs in Node.js as well as in the browser.
 
 * https://ripple.com/wiki/Ripple_JavaScript_library
@@ -14,13 +16,14 @@ This library can connect to the Ripple network via the WebSocket protocol and ru
 var Remote = require('ripple-lib').Remote;
 
 var remote = new Remote({
-  trusted: true,
-  local_signing: true,
+  trusted:        true,
+  local_signing:  true,
+  local_fee:      true,
   servers: [
     {
-        host: 'my.hostname'
-      , port: 1337,
-      , secure: true
+        host:    's1.ripple.com'
+      , port:    443,
+      , secure:  true
     }
   ]
 });
@@ -30,32 +33,22 @@ remote.connect(function() {
 });
 ```
 
-Once a connection is formed to any of the supplied servers, a `connect` event is emitted, indicating that the remote is ready to begin fulfilling requests. When there are no more connected servers to fulfill requests, a `disconnect` event is emitted. If you send requests before ripple-lib is connected to any servers, requests are deferred until the `connect` event is emitted.
-
-```js
-var remote = new Remote({ /* options */ }).connect();
-
-remote.request_server_info(function(err, info) {
- /* will defer until connected */
-}); 
-```
-
 ##Calling remote commands
 
 Each remote function returns a `Request` object. This object is an `EventEmitter`. You may listen for success or failure events from each request, or provide a callback. Example:
 
 ```js
 var request = remote.request_server_info();
-request.on('success', function(res) { 
+request.on('success', function(res) {
   //handle success
 });
-request.on('error', function(err) { 
+request.on('error', function(err) {
   //handle error
 });
 request.request();
 ```
 
-Or:
+*Or:*
 
 ```js
 remote.request_server_info(function(err, res) {
@@ -84,7 +77,7 @@ request.request();
 
 **[request_ledger(ledger, [opts], [callback])](https://ripple.com/wiki/RPC_API#ledger)**
 
-**[request_ledger_header([callback])**
+**request_ledger_header([callback])**
 
 **[request_ledger_current([callback])](https://ripple.com/wiki/RPC_API#ledger_current)**
 
@@ -238,3 +231,5 @@ remote.connect(function() {
 + `resubmit` Transaction is beginning resubmission.
 + `fee_adjusted` Transaction fee has been adjusted during its pending state. The transaction fee will only be adjusted if the remote is configured for local fees, which it is by default.
 + `abort` Transaction has been aborted. Transactions are only aborted by manual calls to `#abort`.
++ `missing` Four ledgers have closed without detecting validated transaction
++ `lost` Eight ledgers have closed without detecting validated transaction. Consider the transaction lost and err/finalize.
