@@ -260,9 +260,9 @@ TransactionManager.prototype._request = function(tx) {
 
     tx.emit('submitted', message);
 
-    var engine_result = message.engine_result || '';
+    message.result = message.engine_result || '';
 
-    switch (engine_result.slice(0, 3)) {
+    switch (message.result.slice(0, 3)) {
       case 'tec':
         tx.emit('error', message);
         break;
