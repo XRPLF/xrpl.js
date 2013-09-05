@@ -826,10 +826,9 @@ Remote.prototype.request_account_tx = function (obj, callback) {
 
   var request = new Request(this, 'account_tx');
 
-  request.message.account = obj.account;
-
   var request_fields = [
-      'ledger_index_min'  //earliest
+      'account'
+    , 'ledger_index_min'  //earliest
     , 'ledger_index_max'  //latest
     , 'binary'            //false
     , 'count'             //false
