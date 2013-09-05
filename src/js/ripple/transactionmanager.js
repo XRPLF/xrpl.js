@@ -259,6 +259,9 @@ TransactionManager.prototype._request = function(tx) {
     var engine_result = message.engine_result || '';
 
     switch (engine_result.slice(0, 3)) {
+      case 'tec':
+        tx.emit('error', message);
+        break;
       case 'tes':
         transaction_proposed(message);
         break;
