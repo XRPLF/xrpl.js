@@ -351,7 +351,7 @@ TransactionManager.prototype.submit = function(tx) {
     tx.emit('error', new RippleError('tejAbort', 'Transaction aborted'));
   });
 
-  var fee = tx.tx_json.Fee;
+  var fee = Number(tx.tx_json.Fee);
   var remote = this.remote;
 
   if (!tx._secret && !tx.tx_json.TxnSignature) {
