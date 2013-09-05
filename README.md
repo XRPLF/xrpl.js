@@ -132,13 +132,17 @@ Fetch a list of transactions that applied to this account.
 
 Options:
 
-+ `ledger_index_min`
-+ `ledger_index_max`
-+  `binary`
-+ `count`
-+  `descending`
-+  `offset`
++ `account`
++ `ledger_index_min` *deprecated, -1*
++ `ledger_index_max` *deprecated, -1*
++  `binary` *false*
++ `count` *false*
++  `descending` *false*
++  `offset` *0*
 +  `limit`
++ `forward` *false*
++ `fwd_marker`
++ `rev_marker`
 
 **[request_book_offers(gets, pays, taker, [callback])](https://ripple.com/wiki/RPC_API#book_offers)**
 
