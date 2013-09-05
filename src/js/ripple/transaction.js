@@ -74,10 +74,10 @@ function Transaction(remote) {
   this.hash                   = void(0);
 
   // ledger_current_index was this when transaction was submited.
-  this.submit_index           = void(0);  
+  this.submit_index           = void(0);
 
   // Under construction.
-  this.state                  = void(0);  
+  this.state                  = void(0);
 
   this.finalized              = false;
   this._previous_signing_hash = void(0);
@@ -208,7 +208,7 @@ Transaction.prototype.sign = function () {
   var seed = Seed.from_json(this._secret);
   var hash = this.signing_hash();
 
-  var previously_signed = this.tx_json.TxnSignature 
+  var previously_signed = this.tx_json.TxnSignature
     && hash === this._previous_signing_hash;
 
   if (previously_signed) return;
@@ -232,7 +232,7 @@ Transaction.prototype.build_path = function (build) {
   return this;
 }
 
-// tag should be undefined or a 32 bit integer.   
+// tag should be undefined or a 32 bit integer.
 // YYY Add range checking for tag.
 Transaction.prototype.destination_tag = function (tag) {
   if (tag !== void(0)) {
@@ -242,19 +242,19 @@ Transaction.prototype.destination_tag = function (tag) {
 }
 
 Transaction._path_rewrite = function (path) {
-  var props = [
-      'account'
-    , 'issuer'
-    , 'currency'
-  ]
-
   var path_new = path.map(function(node) {
     var node_new = { };
 
-    for (var prop in node) {
-      if (~props.indexOf(prop)) {
-        node_new[prop] = UInt160.json_rewrite(node[prop]);
-      }
+    if (node.hasOwnProperty('account')) {
+      node_new.account  = UInt160.json_rewrite(node.account);
+    }
+
+    if (node.hasOwnProperty('issuer')) {
+      node_new.issuer   = UInt160.json_rewrite(node.issuer);
+    }
+
+    if (node.hasOwnProperty('currency')) {
+      node_new.currency = Currency.json_rewrite(node.currency);
     }
 
     return node_new;
@@ -290,7 +290,7 @@ Transaction.prototype.send_max = function (send_max) {
   return this;
 };
 
-// tag should be undefined or a 32 bit integer.   
+// tag should be undefined or a 32 bit integer.
 // YYY Add range checking for tag.
 Transaction.prototype.source_tag = function (tag) {
   if (tag) {
