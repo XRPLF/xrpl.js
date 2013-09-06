@@ -31,6 +31,7 @@ util.inherits(Request, EventEmitter);
 Request.prototype.request = function (remote) {
   if (!this.requested) {
     this.requested = true;
+    this.on('error', new Function);
     this.remote.request(this);
     this.emit('request', remote);
   }
