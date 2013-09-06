@@ -3,6 +3,7 @@
 `ripple-lib` connects to the Ripple network via the WebSocket protocol and runs in Node.js as well as in the browser.
 
 This file contains installation and quickstart instructions. For the full documentation see:
+
 1. [The `ripple-lib` Guides](docs/REFERENCE.md)
 2. [The `ripple-lib` API Reference](docs/REFERENCE.md)
 3. Additional documentation resources can be found at:
@@ -28,7 +29,7 @@ var Remote = require('ripple-lib').Remote;
 // var Remote = ripple.Remote;
 
 var remote = new Remote({
-  // see next section for available options
+  // see the API Reference for available options
   trusted:        true,
   local_signing:  true,
   local_fee:      true,
@@ -43,5 +44,7 @@ var remote = new Remote({
 
 remote.connect(function() {
   /* remote connected */
+
+  // see the API Reference for available functions
 });
 ```

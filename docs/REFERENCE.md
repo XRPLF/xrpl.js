@@ -1,26 +1,36 @@
 #`ripple-lib` API Reference
 
-In this document:
+###In this document:
 
-1. [Remote options](REFERENCE.md#1-remote-options)
-2. [Remote functions](REFERENCE.md#2-remote-functions)
+1. [`Remote` options](REFERENCE.md#1-remote-options)
+2. [`Remote` functions](REFERENCE.md#2-remote-functions)
   + [Server info functions](REFERENCE.md#server-info-functions)
   + [Ledger query functions](REFERENCE.md#ledger-query-functions)
   + [Transaction query functions](REFERENCE.md#transaction-query-functions)
   + [Account query functions](REFERENCE.md#account-query-functions)
   + [Order book query functions](REFERENCE.md#order-book-query-functions)
   + [Transaction submission functions](REFERENCE.md#transaction-submission-functions)
-3. [Transaction events](REFERENCE.md#3-transaction-events)
-4. [Amount objects](REFERENCE.md#4-amount-objects)
+3. [`Transaction` events](REFERENCE.md#3-transaction-events)
+4. [`Amount` objects](REFERENCE.md#4-amount-objects)
 
 
-Also see:
+###Also see:
 
 1. [The `ripple-lib` README](../README.md)
 2. [The `ripple-lib` GUIDES](GUIDES.md)
 
 
 #1. `Remote` options
+
+```js
+/* Loading ripple-lib with Node.js */
+var Remote = require('ripple-lib').Remote;
+
+/* Loading ripple-lib in a webpage */
+// var Remote = ripple.Remote;
+
+var remote = new Remote({options});
+```
 
 A new `Remote` can be created with the following options:
 
