@@ -17,7 +17,7 @@ var Currency     = require('./currency').Currency;
 
 var extend       = require('extend');
 
-var OrderBook = function (remote, currency_gets, issuer_gets, currency_pays, issuer_pays) {
+function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pays) {
   EventEmitter.call(this);
 
   var self            = this;
@@ -34,11 +34,11 @@ var OrderBook = function (remote, currency_gets, issuer_gets, currency_pays, iss
   this._sync         = false;
 
   // Offers
-  this._offers       = [];
+  this._offers       = [ ];
 
   this.on('newListener', function (type, listener) {
     if (OrderBook.subscribe_events.indexOf(type) !== -1) {
-      if (!self._subs && 'open' === self._remote._online_state) {
+      if (!self._subs && self._remote._connected) {
         self._subscribe();
       }
       self._subs  += 1;
@@ -84,34 +84,36 @@ OrderBook.subscribe_events = ['transaction', 'model', 'trade'];
  */
 OrderBook.prototype._subscribe = function () {
   var self = this;
-  self._remote.request_subscribe()
-    .books([self.to_json()], true)
-    .on('error', function () {
+  var request = self._remote.request_subscribe()
+  request.books([ self.to_json() ], true)
+  request.callback(function(err, res) {
+    if (err) {
       // XXX What now?
-    })
-    .on('success', function (res) {
+    } else {
       self._sync   = true;
       self._offers = res.offers;
       self.emit('model', self._offers);
-    })
-    .request();
+    }
+  });
 };
 
 OrderBook.prototype.to_json = function () {
   var json = {
-    'taker_gets': {
-      'currency': this._currency_gets
+    taker_gets: {
+      currency: this._currency_gets
     },
-    'taker_pays': {
-      'currency': this._currency_pays
+    taker_pays: {
+      currency: this._currency_pays
     }
   };
 
-  if (this._currency_gets !== 'XRP')
+  if (this._currency_gets !== 'XRP') {
     json['taker_gets']['issuer'] = this._issuer_gets;
+  }
 
-  if (this._currency_pays !== 'XRP')
+  if (this._currency_pays !== 'XRP') {
     json['taker_pays']['issuer'] = this._issuer_pays;
+  }
 
   return json;
 };
@@ -147,6 +149,7 @@ OrderBook.prototype.trade = function(type) {
  * This is only meant to be called by the Remote class. You should never have to
  * call this yourself.
  */
+OrderBook.prototype.notify =
 OrderBook.prototype.notifyTx = function (message) {
   var self       = this;
   var changed    = false;
@@ -187,7 +190,7 @@ OrderBook.prototype.notifyTx = function (message) {
           trade_pays = trade_pays.subtract(an.fieldsFinal.TakerPays);
         }
         break;
-      
+
       case 'CreatedNode':
         var price = Amount.from_json(an.fields.TakerPays).ratio_human(an.fields.TakerGets);
 

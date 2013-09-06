@@ -559,7 +559,7 @@ Transaction.prototype.submit = function (callback) {
     this.emit('error', new RippleError('tejInvalidAccount', 'Account is unspecified'));
   } else {
     // YYY Might check paths for invalid accounts.
-    this.remote.get_account(account).submit(this);
+    this.remote.account(account).submit(this);
   }
 
   return this;
