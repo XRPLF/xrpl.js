@@ -364,7 +364,7 @@ Remote.prototype.connect = function (online) {
 
     if (i < self._servers.length) {
       setTimeout(function() {
-        nextServer(i);
+        next_server(i);
       }, self._connection_offset);
     }
   })(0);
