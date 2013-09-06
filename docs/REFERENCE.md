@@ -2,16 +2,16 @@
 
 In this document:
 
-1. [Remote options](reference.md#1-remote-options)
-2. [Remote functions](reference.md#2-remote-functions)
-  + [Server info functions](reference.md#server-info-functions)
-  + [Ledger query functions](reference.md#ledger-query-functions)
-  + [Transaction query functions](reference.md#transaction-query-functions)
-  + [Account query functions](reference.md#account-query-functions)
-  + [Order book query functions](reference.md#order-book-query-functions)
-  + [Transaction submission functions](reference.md#transaction-submission-functions)
-3. [Transaction events](reference.md#3-transaction-events)
-4. [Amount objects](reference.md#4-amount-objects)
+1. [Remote options](REFERENCE.md#1-remote-options)
+2. [Remote functions](REFERENCE.md#2-remote-functions)
+  + [Server info functions](REFERENCE.md#server-info-functions)
+  + [Ledger query functions](REFERENCE.md#ledger-query-functions)
+  + [Transaction query functions](REFERENCE.md#transaction-query-functions)
+  + [Account query functions](REFERENCE.md#account-query-functions)
+  + [Order book query functions](REFERENCE.md#order-book-query-functions)
+  + [Transaction submission functions](REFERENCE.md#transaction-submission-functions)
+3. [Transaction events](REFERENCE.md#3-transaction-events)
+4. [Amount objects](REFERENCE.md#4-amount-objects)
 
 
 #1. `Remote` options
