@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "async": "~0.2.9",
-    "ws": "~0.4.27",
-    "extend": "~1.1.3",
+    "ws": "~0.4.30",
+    "extend": "~1.2.0",
     "simple-jsonrpc": "~0.0.2",
     "jshint-loader": "~0.5.0"
   },
