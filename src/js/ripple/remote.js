@@ -838,8 +838,7 @@ Remote.prototype.request_account_tx = function (obj, callback) {
 
     //extended account_tx
     , 'forward'           //false
-    , 'fwd_marker'
-    , 'rev_marker'
+    , 'marker'
   ];
 
   for (var key in obj) {
