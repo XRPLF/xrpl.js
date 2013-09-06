@@ -57,19 +57,6 @@ SerializedObject.prototype.resetPointer = function () {
   this.pointer = 0;
 };
 
-/*
-SerializedObject.prototype.read = function (numberOfBytes) {
-  var start = this.pointer;
-  var end = start+numberOfBytes;
-  if (end > this.buffer.length) {
-	throw new Error("There aren't that many bytes left to read.");
-  } else {
-	var result = this.buffer.slice(start,end);
-	this.pointer = end;
-	return result;
-  }
-};
-*/
 
 var readOrPeek = function (advance) {
   return function(numberOfBytes) {
@@ -113,6 +100,45 @@ var TRANSACTION_TYPES = {
 	101:"SetFee"
 };
 
+var LEDGER_ENTRY_TYPES = {
+	97:"AccountRoot",
+	99:"Contract",
+	100:"DirectoryNode",
+	102:"Features",
+	103:"GeneratorMap",
+	104:"LedgerHashes",
+	110:"Nickname",
+	111:"Offer",
+	114:"RippleState",
+	115:"FeeSettings"
+};
+
+var TRANSACTION_RESULTS = {
+    0  :"tesSUCCESS",
+	100:"tecCLAIM",
+	101:"tecPATH_PARTIAL",
+	102:"tecUNFUNDED_ADD",
+	103:"tecUNFUNDED_OFFER",
+	104:"tecUNFUNDED_PAYMENT",
+	105:"tecFAILED_PROCESSING",
+	121:"tecDIR_FULL",
+	122:"tecINSUF_RESERVE_LINE",
+	123:"tecINSUF_RESERVE_OFFER",
+	124:"tecNO_DST",
+	125:"tecNO_DST_INSUF_XRP",
+	126:"tecNO_LINE_INSUF_RESERVE",
+	127:"tecNO_LINE_REDUNDANT",
+	128:"tecPATH_DRY",
+	129:"tecUNFUNDED", // Deprecated, old ambiguous unfunded.
+	130:"tecMASTER_DISABLED",
+	131:"tecNO_REGULAR_KEY",
+	132:"tecOWNERS"
+};
+
+
+
+
+
 SerializedObject.prototype.to_json = function() {
 	var old_pointer = this.pointer;
 	this.resetPointer();
@@ -139,7 +165,9 @@ function jsonify_structure(thing,field_name) {
 	if ("number" === typeof thing) { //Special codes
 		if (field_name) {
 			if (field_name === "LedgerEntryType") {
-				output = thing; //TODO: Do we have special codes for LedgerEntryType?
+				output = LEDGER_ENTRY_TYPES[thing] || thing;
+			} else if (field_name === "TransactionResult") {
+				output = TRANSACTION_RESULTS[thing] || thing;
 			} else if (field_name === "TransactionType") {
 				output = TRANSACTION_TYPES[thing] || thing;
 			} else {
@@ -166,7 +194,7 @@ function jsonify_structure(thing,field_name) {
 		for (var i=0; i<keys.length; i++) {
 			var key = keys[i];
 			var value = thing[key];
-			output[key] = jsonify_structure(value);
+			output[key] = jsonify_structure(value,key);
 		}
 	} else {
     output = thing;

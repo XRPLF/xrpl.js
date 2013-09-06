@@ -2,11 +2,14 @@ var util   = require('util');
 var extend = require('extend');
 
 function RippleError(code, message) {
-  if (typeof code === 'object') {
-    extend(this, code);
-  } else {
-    this.result         = code;
-    this.result_message = message;
+  switch (typeof code) {
+    case 'object':
+      extend(this, code);
+      break;
+    case 'string':
+      this.result         = code;
+      this.result_message = message;
+      break;
   }
 
   this.result = this.result || this.error || 'Error';

@@ -242,11 +242,15 @@ TransactionManager.prototype._request = function(tx) {
   }
 
   function submission_error(error) {
-    //Decrement sequence
-    self._next_sequence--;
-    tx.set_state('remoteError');
-    tx.emit('submitted', error);
-    tx.emit('error', new RippleError(error));
+    if (self._is_too_busy(error)) {
+      self._resubmit(1);
+    } else {
+      //Decrement sequence
+      self._next_sequence--;
+      tx.set_state('remoteError');
+      tx.emit('submitted', error);
+      tx.emit('error', new RippleError(error));
+    }
   }
 
   function submission_success(message) {
@@ -254,11 +258,11 @@ TransactionManager.prototype._request = function(tx) {
       tx.hash = message.tx_json.hash;
     }
 
+    message.result = message.engine_result || '';
+
     tx.emit('submitted', message);
 
-    var engine_result = message.engine_result || '';
-
-    switch (engine_result.slice(0, 3)) {
+    switch (message.result.slice(0, 3)) {
       case 'tec':
         tx.emit('error', message);
         break;
@@ -294,12 +298,18 @@ TransactionManager.prototype._request = function(tx) {
   return submit_request;
 };
 
-TransactionManager.prototype._is_not_found = function(error) {
-  var not_found_re = /^(txnNotFound|transactionNotFound)$/;
+TransactionManager.prototype._is_remote_error = function(error) {
   return error && typeof error === 'object'
       && error.error === 'remoteError'
       && typeof error.remote === 'object'
-      && not_found_re.test(error.remote.error);
+};
+
+TransactionManager.prototype._is_not_found = function(error) {
+  return this._is_remote_error(error) && /^(txnNotFound|transactionNotFound)$/.test(error.remote.error);
+};
+
+TransactionManager.prototype._is_too_busy = function(error) {
+  return this._is_remote_error(error) && error.remote.error === 'tooBusy';
 };
 
 /**
@@ -341,7 +351,7 @@ TransactionManager.prototype.submit = function(tx) {
     tx.emit('error', new RippleError('tejAbort', 'Transaction aborted'));
   });
 
-  var fee = tx.tx_json.Fee;
+  var fee = Number(tx.tx_json.Fee);
   var remote = this.remote;
 
   if (!tx._secret && !tx.tx_json.TxnSignature) {
