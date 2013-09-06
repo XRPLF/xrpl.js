@@ -9,7 +9,7 @@ var secret;
 var tx_json;
 
 if (~argv.indexOf('-v')){
-  argv.splice(argv.indexOf('-v'));
+  argv.splice(argv.indexOf('-v'), 1);
   verbose = true;
 }
 
@@ -63,7 +63,7 @@ function print_usage() {
       Destination: 'r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV',
       Amount: '200000000',
       Fee: '10',
-      Sequence: '1'
+      Sequence: 1
     })
     );
 };
