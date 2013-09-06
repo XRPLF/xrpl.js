@@ -14,6 +14,12 @@ In this document:
 4. [Amount objects](REFERENCE.md#4-amount-objects)
 
 
+Also see:
+
+1. [The `ripple-lib` README](../README.md)
+2. [The `ripple-lib` GUIDES](GUIDES.md)
+
+
 #1. `Remote` options
 
 A new `Remote` can be created with the following options:
