@@ -187,6 +187,7 @@ Account.prototype.lines = function (callback) {
  * This is only meant to be called by the Remote class. You should never have to
  * call this yourself.
  */
+Account.prototype.notify = 
 Account.prototype.notifyTx = function (message) {
   // Only trigger the event if the account object is actually
   // subscribed - this prevents some weird phantom events from
