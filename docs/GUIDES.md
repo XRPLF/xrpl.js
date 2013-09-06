@@ -1,5 +1,18 @@
+#`ripple-lib` Guides
 
-##Using `Remote` functions and `Request` objects
+##In this document:
+
+1. [Connecting to the Ripple network with the `Remote` module](GUIDES.md#connecting-to-the-ripple-network-with-the-remote-module)
+2. [Using `Remote` functions and `Request` objects](GUIDES.md#using-remote-functions-and-request-objects)
+3. [Submitting a transaction](GUIDES.md#submitting-a-transaction)
+4. [Listening to the network](GUIDES.md#listening-to-the-network)
+
+#Connecting to the Ripple network with the `Remote` module
+
+
+
+
+#Using `Remote` functions and `Request` objects
 
 Each remote function returns a `Request` object, which is an `EventEmitter`. You can listen for success or failure events from each request or, alternatively, you can provide a callback. 
 
@@ -28,12 +41,12 @@ remote.request_server_info(function(err, res) {
 });
 ```
 
-NOTE: See the [`Remote` functions reference](https://github.com/ripple/ripple-lib#Remote_functions_reference) section below for documentation on all of the available functions.
+NOTE: See the [`Remote` functions reference]() section below for documentation on all of the available functions.
 
 
 
 
-##Submitting a transaction
+#Submitting a transaction
 
 ```js
 var Remote = require('ripple-lib').Remote;
