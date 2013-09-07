@@ -1,5 +1,7 @@
 #`ripple-lib` API Reference
 
+__(More examples coming soon!)__
+
 ###In this document:
 
 1. [`Remote` options](REFERENCE.md#1-remote-options)
@@ -38,8 +40,9 @@ A new `Remote` can be created with the following options:
 + `max_listeners` Set maxListeners for remote; prevents EventEmitter warnings (number)
 + `connection_offset` Connect to remote servers on supplied interval (number in seconds)
 + `trusted` truthy, if remote is trusted (boolean)
-+ `max_fee` Maximum acceptable transaction fee (number in XRP or drops?)
-+ `fee_cushion` Extra fee multiplier to account for async fee changes (?)
++ `local_fee` Set whether the transaction fee range will be set locally (boolean, default is true, see [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees))
++ `fee_cushion` Extra fee multiplier to account for async fee changes (number, e.g. 1.5, see [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees))
++ `max_fee` Maximum acceptable transaction fee (number in [XRP drops](https://ripple.com/wiki/Ripple_credits#Notes_on_drops), see [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees))
 + `servers` Array of server objects of the following form:
 
 ```js
@@ -238,3 +241,4 @@ Returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js
 
 #4. Amount objects
 
+Coming Soon
