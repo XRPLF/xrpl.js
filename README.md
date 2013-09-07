@@ -2,16 +2,22 @@
 
 `ripple-lib` connects to the Ripple network via the WebSocket protocol and runs in Node.js as well as in the browser.
 
-This file contains installation and quickstart instructions. 
+###In this file:
 
-For additional documentation see:
+1. Overview
+2. [Getting `ripple-lib`](README.md#getting-ripple-lib)
+3. [Quickstart](README.md#quickstart)
+
+###For additional documentation see:
 
 1. [The `ripple-lib` Guides](docs/REFERENCE.md)
 2. [The `ripple-lib` API Reference](docs/REFERENCE.md)
-3. The Ripple Wiki:
-  + https://ripple.com/wiki/Ripple_JavaScript_library  
-  + https://ripple.com/wiki  
-  + https://ripple.com
+3. https://ripple.com/wiki/Ripple_JavaScript_library  
+
+###Also see:
+
++ https://ripple.com/wiki  
++ https://ripple.com
 
 ##Getting `ripple-lib`
 
