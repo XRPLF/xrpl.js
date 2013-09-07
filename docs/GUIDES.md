@@ -15,7 +15,24 @@
 
 ##1. Connecting to the Ripple network with `Remote`
 
-Coming Soon
+1. [Get `ripple-lib`](README.md#getting-ripple-lib)
+2. Load the `ripple-lib` module:
+  ```js
+  /* Loading ripple-lib with Node.js */
+  var Remote = require('ripple-lib').Remote;
+
+  /* Loading ripple-lib in a webpage */
+  // var Remote = ripple.Remote;
+  ```
+3. Create a new `Remote` and connect to the network:
+  ```js
+  var remote = new Remote({options});
+
+  remote.connect(function() {
+    /* remote connected */
+  });
+  ```
+  See the [`Remote` options](REFERENCE.md#1-remote-options) in the [The `ripple-lib` API Reference](REFERENCE.md)
 
 
 ##2. Using `Remote` functions and `Request` objects
