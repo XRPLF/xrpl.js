@@ -32,7 +32,8 @@
     /* remote connected */
   });
   ```
-  See the [`Remote` options](REFERENCE.md#1-remote-options) in the [The `ripple-lib` API Reference](REFERENCE.md)
+  See the API Reference for available [`Remote` options](REFERENCE.md#1-remote-options)
+4. You're connected! Read on to see what to do now.
 
 
 ##2. Using `Remote` functions and `Request` objects
