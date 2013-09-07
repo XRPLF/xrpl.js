@@ -10,8 +10,8 @@
 
 ###For additional documentation see:
 
-1. [The `ripple-lib` Guides](docs/GUIDES.md)
-2. [The `ripple-lib` API Reference](docs/REFERENCE.md)
+1. [The `ripple-lib` Guides (docs/GUIDES.md)](docs/GUIDES.md)
+2. [The `ripple-lib` API Reference (docs/REFERENCE.md)](docs/REFERENCE.md)
 3. https://ripple.com/wiki/Ripple_JavaScript_library  
 
 ###Also see:
@@ -58,4 +58,4 @@ remote.connect(function() {
 });
 ```
 
-See [The `ripple-lib` Guides](docs/REFERENCE.md) and [The `ripple-lib` API Reference](docs/REFERENCE.md) for walkthroughs and details about all of the available functions and options.
+See [The `ripple-lib` Guides](docs/GUIDES.md) and [The `ripple-lib` API Reference](docs/REFERENCE.md) for walkthroughs and details about all of the available functions and options.

@@ -38,7 +38,7 @@
 
 ##2. Using `Remote` functions and `Request` objects
 
-Each remote function returns a `Request` object, which is an `EventEmitter`. You can listen for success or failure events from each request or, alternatively, you can provide a callback. 
+Each remote function returns a `Request` object. A `Request` is an `EventEmitter`, meaning that you can listen for success or failure events or you can instead provide a callback to the `Remote` function. 
 
 Here is an example, using `request_server_info()`, of how `Remote` functions can be used with event listeners (the first code block) or with a callback (the second block):
 
