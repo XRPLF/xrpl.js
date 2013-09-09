@@ -6,10 +6,10 @@ This file provides step-by-step walkthroughs for some of the most common usages 
 
 1. [Connecting to the Ripple network with `Remote`](GUIDES.md#1-connecting-to-the-ripple-network-with-remote)
 2. [Using `Remote` functions and `Request` objects](GUIDES.md#2-using-remote-functions-and-request-objects)
-3. [Submitting a transaction](GUIDES.md#3-submitting-a-transaction)
-   + [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees)
-4. [Submitting a trade offer](GUIDES.md#3-submitting-a-trade-offer)
-5. [Listening to the network](GUIDES.md#4-listening-to-the-network)
+3. [Submitting a payment to the network](GUIDES.md#3-submitting-a-payment-to-the-network)
+   * [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees)
+4. [Submitting a trade offer to the network](GUIDES.md#3-submitting-a-trade-offer-to-the-network)
+5. [Listening to the network](GUIDES.md#5-listening-to-the-network)
 
 
 ###Also see:
@@ -76,7 +76,7 @@ __NOTE:__ See the API Reference for available [`Remote` functions](REFERENCE.md#
 
 
 
-##3. Submitting a payment
+##3. Submitting a payment to the network
 
 Submitting a payment transaction to the Ripple network involves connecting to a `Remote`, creating a transaction, signing it with the user's secret, and submitting it to the `rippled` server. Note that the `Amount` module is used to convert human-readable amounts like '1XRP' or '10.50USD' to the type of Amount object used by the Ripple network.
 
@@ -120,7 +120,7 @@ Since the fee required for a transaction may change between the time when the or
 The [`max_fee`](REFERENCE.md#1-remote-options) option can be used to avoid submitting a transaction to a server that is charging unreasonably high fees.
 
 
-##4. Submitting a trade offer
+##4. Submitting a trade offer to the network
 
 Submitting a trade offer to the network is similar to submitting a payment transaction. Here is an example for a trade that expires in 24 hours where you are offering to sell 1 USD in exchange for 100 XRP:
 
@@ -141,6 +141,7 @@ var MY_SECRET  = 'secret';
 var TAKER_PAYS = Amount.from_human('100XRP');
 var TAKER_GETS = Amount.from_human('1USD');
 
+// EXPIRATION must be a Date object, leave undefined to submit offer that won't expire
 var now = new Date();
 var tomorrow = new Date(now.getTime() + (24 * 60 * 60 * 1000));
 var EXPIRATION = tomorrow;
@@ -162,4 +163,3 @@ remote.connect(function() {
 
 ##5. Listening to the network
 
-Coming Soon
