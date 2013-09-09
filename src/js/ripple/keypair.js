@@ -2,24 +2,17 @@ var sjcl    = require('../../../build/sjcl');
 
 var UInt256 = require('./uint256').UInt256;
 
-var KeyPair = function ()
-{
-  this._curve = sjcl.ecc.curves['c256'];
+function KeyPair() {
+  this._curve  = sjcl.ecc.curves['c256'];
   this._secret = null;
   this._pubkey = null;
 };
 
-KeyPair.from_bn_secret = function (j)
-{
-  if (j instanceof this) {
-    return j.clone();
-  } else {
-    return (new this()).parse_bn_secret(j);
-  }
+KeyPair.from_bn_secret = function (j) {
+  return j instanceof this ? j.clone() : (new this()).parse_bn_secret(j);
 };
 
-KeyPair.prototype.parse_bn_secret = function (j)
-{
+KeyPair.prototype.parse_bn_secret = function (j) {
   this._secret = new sjcl.ecc.ecdsa.secretKey(sjcl.ecc.curves['c256'], j);
   return this;
 };
@@ -29,8 +22,7 @@ KeyPair.prototype.parse_bn_secret = function (j)
  *
  * @private
  */
-KeyPair.prototype._pub = function ()
-{
+KeyPair.prototype._pub = function () {
   var curve = this._curve;
 
   if (!this._pubkey && this._secret) {
@@ -46,21 +38,23 @@ KeyPair.prototype._pub = function ()
  *
  * Key will be returned as a compressed pubkey - 33 bytes converted to hex.
  */
-KeyPair.prototype.to_hex_pub = function ()
-{
+KeyPair.prototype.to_hex_pub = function () {
   var pub = this._pub();
-  if (!pub) return null;
+
+  if (!pub) {
+    return null;
+  }
 
   var point = pub._point, y_even = point.y.mod(2).equals(0);
+
   return sjcl.codec.hex.fromBits(sjcl.bitArray.concat(
     [sjcl.bitArray.partial(8, y_even ? 0x02 : 0x03)],
     point.x.toBits(this._curve.r.bitLength())
   )).toUpperCase();
 };
 
-KeyPair.prototype.sign = function (hash)
-{
-  hash = UInt256.from_json(hash);
+KeyPair.prototype.sign = function (hash) {
+  var hash = UInt256.from_json(hash);
   return this._secret.signDER(hash.to_bits(), 0);
 };
 

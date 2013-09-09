@@ -1,30 +1,40 @@
-var extend = require('extend');
-var utils = require('./utils');
+var extend  = require('extend');
+var utils   = require('./utils');
 var UInt160 = require('./uint160').UInt160;
-var Amount = require('./amount').Amount;
+var Amount  = require('./amount').Amount;
 
 /**
  * Meta data processing facility.
  */
-var Meta = function (raw_data)
-{
-  this.nodes = [];
+function Meta(raw_data) {
+  var self = this;
 
-  for (var i = 0, l = raw_data.AffectedNodes.length; i < l; i++) {
-    var an = raw_data.AffectedNodes[i],
-        result = {};
+  this.nodes = [ ];
 
-    ["CreatedNode", "ModifiedNode", "DeletedNode"].forEach(function (x) {
-      if (an[x]) result.diffType = x;
+  this.node_types = [
+      'CreatedNode'
+    , 'ModifiedNode'
+    , 'DeletedNode'
+  ];
+
+  for (var i=0, l=raw_data.AffectedNodes.length; i<l; i++) {
+    var an = raw_data.AffectedNodes[i];
+    var result = { };
+
+    self.node_types.forEach(function (x) {
+      if (an.hasOwnProperty(x)) {
+        result.diffType = x;
+      }
     });
 
-    if (!result.diffType) return null;
+    if (!result.diffType) {
+      return null;
+    }
 
     an = an[result.diffType];
 
     result.entryType = an.LedgerEntryType;
     result.ledgerIndex = an.LedgerIndex;
-
     result.fields = extend({}, an.PreviousFields, an.NewFields, an.FinalFields);
     result.fieldsPrev = an.PreviousFields || {};
     result.fieldsNew = an.NewFields || {};
@@ -69,29 +79,40 @@ var Meta = function (raw_data)
  * The second parameter to the callback is the index of the node in the metadata
  * (first entry is index 0).
  */
-Meta.prototype.each = function (fn)
-{
+Meta.prototype.each = function (fn) {
   for (var i = 0, l = this.nodes.length; i < l; i++) {
     fn(this.nodes[i], i);
   }
 };
 
+([ 'forEach'
+  , 'map'
+  , 'filter'
+  , 'every'
+  , 'reduce'
+]).forEach(function(fn) {
+  Meta.prototype[fn] = function() {
+    return Array.prototype[fn].apply(this.nodes, arguments);
+  }
+});
+
 var amountFieldsAffectingIssuer = [
-  "LowLimit", "HighLimit", "TakerPays", "TakerGets"
+    "LowLimit"
+  , "HighLimit"
+  , "TakerPays"
+  , "TakerGets"
 ];
-Meta.prototype.getAffectedAccounts = function ()
-{
-  var accounts = [];
+
+Meta.prototype.getAffectedAccounts = function () {
+  var accounts = [ ];
 
   // This code should match the behavior of the C++ method:
   // TransactionMetaSet::getAffectedAccounts
-  this.each(function (an) {
+  this.nodes.forEach(function (an) {
     var fields = (an.diffType === "CreatedNode") ? an.fieldsNew : an.fieldsFinal;
-
     for (var i in fields) {
       var field = fields[i];
-
-      if ("string" === typeof field && UInt160.is_valid(field)) {
+      if (typeof field === 'string' && UInt160.is_valid(field)) {
         accounts.push(field);
       } else if (amountFieldsAffectingIssuer.indexOf(i) !== -1) {
         var amount = Amount.from_json(field);
@@ -103,16 +124,13 @@ Meta.prototype.getAffectedAccounts = function ()
     }
   });
 
-  accounts = utils.arrayUnique(accounts);
-
-  return accounts;
+  return utils.arrayUnique(accounts);
 };
 
-Meta.prototype.getAffectedBooks = function ()
-{
-  var books = [];
+Meta.prototype.getAffectedBooks = function () {
+  var books = [ ];
 
-  this.each(function (an) {
+  this.nodes.forEach(function (an) {
     if (an.entryType !== 'Offer') return;
 
     var gets = Amount.from_json(an.fields.TakerGets);
@@ -129,9 +147,7 @@ Meta.prototype.getAffectedBooks = function ()
     books.push(key);
   });
 
-  books = utils.arrayUnique(books);
-
-  return books;
+  return utils.arrayUnique(books);
 };
 
 exports.Meta = Meta;
