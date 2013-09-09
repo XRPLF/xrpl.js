@@ -189,3 +189,6 @@ In some (relatively rare) cases you may want to subscribe to the network event f
     // see https://ripple.com/wiki/RPC_API#ledger_stream_messages for the format of ledger_data
   }
 ```
+* https://ripple.com/wiki/RPC_API#transactions_stream_messages
+* https://ripple.com/wiki/RPC_API#ledger_stream_messages
+
