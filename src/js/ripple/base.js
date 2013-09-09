@@ -166,6 +166,6 @@ Base.decode_check = function (version, input, alphabet) {
   buffer[0] = 0;
 
   return new BigInteger(buffer.slice(0, -4), 256);
-}:
+};
 
 exports.Base = Base;
