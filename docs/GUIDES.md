@@ -8,7 +8,7 @@ This file provides step-by-step walkthroughs for some of the most common usages 
 2. [Using `Remote` functions and `Request` objects](GUIDES.md#2-using-remote-functions-and-request-objects)
 3. [Submitting a payment to the network](GUIDES.md#3-submitting-a-payment-to-the-network)
    * [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees)
-4. [Submitting a trade offer to the network](GUIDES.md#3-submitting-a-trade-offer-to-the-network)
+4. [Submitting a trade offer to the network](GUIDES.md#4-submitting-a-trade-offer-to-the-network)
 5. [Listening to the network](GUIDES.md#5-listening-to-the-network)
 
 
