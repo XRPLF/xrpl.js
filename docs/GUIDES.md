@@ -1,6 +1,8 @@
 #`ripple-lib` Guides
 
-###In this document:
+This file provides step-by-step walkthroughs for some of the most common usages of `ripple-lib`.
+
+###Guides in this document:
 
 1. [Connecting to the Ripple network with `Remote`](GUIDES.md#1-connecting-to-the-ripple-network-with-remote)
 2. [Using `Remote` functions and `Request` objects](GUIDES.md#2-using-remote-functions-and-request-objects)
@@ -16,7 +18,7 @@
 ##1. Connecting to the Ripple network with `Remote`
 
 1. [Get `ripple-lib`](README.md#getting-ripple-lib)
-2. Load the `ripple-lib` module:
+2. Load the `ripple-lib` module into a Node.js file or webpage:
   ```js
   /* Loading ripple-lib with Node.js */
   var Remote = require('ripple-lib').Remote;
@@ -29,20 +31,22 @@
   var remote = new Remote({options});
 
   remote.connect(function() {
-    /* remote connected */
+    /* remote connected, use some remote functions here */
   });
   ```
-  See the API Reference for available [`Remote` options](REFERENCE.md#1-remote-options)
+  __NOTE:__ See the API Reference for available [`Remote` options](REFERENCE.md#1-remote-options)
 4. You're connected! Read on to see what to do now.
 
 
 ##2. Using `Remote` functions and `Request` objects
 
-Each remote function returns a `Request` object. A `Request` is an `EventEmitter`, meaning that you can listen for success or failure events or you can instead provide a callback to the `Remote` function. 
+All `Remote` functions return a `Request` object. 
+
+A `Request` is an `EventEmitter`, meaning that you can listen for success or failure events or you can instead provide a callback to the `Remote` function. 
 
 Here is an example, using `request_server_info()`, of how `Remote` functions can be used with event listeners (the first code block) or with a callback (the second block):
 
-`Remote` function with `Request` event listeners:
+Using a `Remote` function with `Request` event listeners:
 ```js
 var request = remote.request_server_info();
 request.on('success', function(res) {
@@ -54,7 +58,7 @@ request.on('error', function(err) {
 request.request(); // this triggers the request if it has not already been sent to the server
 ```
 
-`Remote` function with a callback:
+Using a `Remote` function with a callback:
 ```js
 remote.request_server_info(function(err, res) {
   if (err) {
@@ -65,7 +69,7 @@ remote.request_server_info(function(err, res) {
 });
 ```
 
-NOTE: See the [`Remote` functions reference]() section below for documentation on all of the available functions.
+__NOTE:__ See the API Reference for available [`Remote` functions](REFERENCE.md#2-remote-functions)
 
 
 
