@@ -1,97 +1,102 @@
-Function.prototype.method = function(name,func) {
+Function.prototype.method = function(name, func) {
   this.prototype[name] = func;
-
   return this;
 };
 
-var filterErr = function(code, done) {
+function filterErr(code, done) {
   return function(e) {
-      done(e.code !== code ? e : undefined);
-    };
+    done(e.code !== code ? e : void(0));
+  };
 };
 
-var throwErr = function(done) {
+function throwErr(done) {
   return function(e) {
-      if (e)
-	throw e;
-      
-      done();
-    };
+    if (e) {
+      throw e;
+    }
+    done();
+  };
 };
- 
-var trace = function(comment, func) {
+
+function trace(comment, func) {
   return function() {
-      console.log("%s: %s", trace, arguments.toString);
-      func(arguments);
-    };
+    console.log("%s: %s", trace, arguments.toString);
+    func(arguments);
+  };
 };
 
-var arraySet = function (count, value) {
-  var i, a = new Array(count);
+function arraySet(count, value) {
+  var a = new Array(count);
 
-  for (i = 0; i < count; i++) {
+  for (var i=0; i<count; i++) {
     a[i] = value;
   }
 
   return a;
 };
 
-var hexToString = function (h) {
-  var	a = [];
-  var	i = 0;
+function hexToString(h) {
+  var a = [];
+  var i = 0;
 
   if (h.length % 2) {
     a.push(String.fromCharCode(parseInt(h.substring(0, 1), 16)));
     i = 1;
   }
 
-  for (; i != h.length; i += 2) {
+  for (; i<h.length; i+=2) {
     a.push(String.fromCharCode(parseInt(h.substring(i, i+2), 16)));
   }
-  
-  return a.join("");
+
+  return a.join('');
 };
 
-var stringToHex = function (s) {
-  return Array.prototype.map.call(s, function (c) {
-      var b = c.charCodeAt(0);
-
-      return b < 16 ? "0" + b.toString(16) : b.toString(16);
-    }).join("");
+function stringToHex(s) {
+  var result = '';
+  for (var i=0; i<s.length; i++) {
+    var b = s.charCodeAt(i);
+    result += b < 16 ? '0' + b.toString(16) : b.toString(16);
+  }
+  return result;
 };
 
-var stringToArray = function (s) {
+function stringToArray(s) {
   var a = new Array(s.length);
-  var i;
 
-  for (i = 0; i != a.length; i += 1)
+  for (var i=0; i<a.length; i+=1) {
     a[i] = s.charCodeAt(i);
+  }
 
   return a;
 };
 
-var hexToArray = function (h) {
+function hexToArray(h) {
   return stringToArray(hexToString(h));
-}
+};
 
-var chunkString = function (str, n, leftAlign) {
+function chunkString(str, n, leftAlign) {
   var ret = [];
   var i=0, len=str.length;
+
   if (leftAlign) {
     i = str.length % n;
-    if (i) ret.push(str.slice(0, i));
+    if (i) {
+      ret.push(str.slice(0, i));
+    }
   }
-  for(; i < len; i += n) {
-    ret.push(str.slice(i, n+i));
+
+  for(; i<len; i+=n) {
+    ret.push(str.slice(i, n + i));
   }
+
   return ret;
 };
 
-var logObject = function (msg, obj) {
-  console.log(msg, JSON.stringify(obj, undefined, 2));
+function logObject(msg, obj) {
+  console.log(msg, JSON.stringify(obj, null, 2));
 };
 
-var assert = function (assertion, msg) {
+function assert(assertion, msg) {
   if (!assertion) {
     throw new Error("Assertion failed" + (msg ? ": "+msg : "."));
   }
@@ -100,15 +105,18 @@ var assert = function (assertion, msg) {
 /**
  * Return unique values in array.
  */
-var arrayUnique = function (arr) {
+function arrayUnique(arr) {
   var u = {}, a = [];
-  for (var i = 0, l = arr.length; i < l; ++i){
-    if (u.hasOwnProperty(arr[i])) {
+
+  for (var i=0, l=arr.length; i<l; i++){
+    var k = arr[i];
+    if (u[k]) {
       continue;
     }
-    a.push(arr[i]);
-    u[arr[i]] = 1;
+    a.push(k);
+    u[k] = true;
   }
+
   return a;
 };
 
@@ -117,7 +125,7 @@ var arrayUnique = function (arr) {
  *
  * JavaScript timestamps are unix epoch in milliseconds.
  */
-var toTimestamp = function (rpepoch) {
+function toTimestamp(rpepoch) {
   return (rpepoch + 0x386D4380) * 1000;
 };
 
