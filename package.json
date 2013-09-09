@@ -15,7 +15,7 @@
     "async": "~0.2.9",
     "ws": "~0.4.30",
     "extend": "~1.2.0",
-    "jshint-loader": "~0.5.0",
+    "jshint-loader": "~0.5.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -24,7 +24,6 @@
     "grunt-contrib-watch": "~0.4.4",
     "grunt-webpack": "~0.10.5",
     "grunt-dox": "~0.5.0",
-    "underscore": "~1.5.2",
     "mocha": "~1.12.1"
   },
   "scripts": {
