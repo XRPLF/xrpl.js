@@ -796,7 +796,7 @@ Remote.account_request = function(type, accountID, account_index, ledger, callba
 Remote.prototype.request_account_lines = function (accountID, account_index, ledger, callback) {
   // XXX Does this require the server to be trusted?
   //utils.assert(this.trusted);
-  var args = Array.prototype.arguments.slice(arguments);
+  var args = Array.prototype.slice.call(arguments);
   args.unshift('account_lines');
   return Remote.account_request.apply(this, args);
 };
@@ -804,7 +804,7 @@ Remote.prototype.request_account_lines = function (accountID, account_index, led
 // --> account_index: sub_account index (optional)
 // --> current: true, for the current ledger.
 Remote.prototype.request_account_offers = function (accountID, account_index, ledger, callback) {
-  var args = Array.prototype.arguments.slice(arguments);
+  var args = Array.prototype.slice.call(arguments);
   args.unshift('account_offers');
   return Remote.account_request.apply(this, args);
 };
