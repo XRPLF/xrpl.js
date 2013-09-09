@@ -173,6 +173,8 @@ function jsonify_structure(thing, field_name) {
     case 'object':
       if (typeof thing.to_json === 'function') {
         output = thing.to_json();
+      } else if (thing === null) {
+        break;
       } else {
         output = new thing.constructor;
         var keys = Object.keys(thing);
