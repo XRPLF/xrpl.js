@@ -211,7 +211,7 @@ Sign a transaction.
 
 **[request_submit([callback])](https://ripple.com/wiki/RPC_API#submit)**
 
-Submit a transaction to the network. This command is used internally to submit transactions with a greater degree of reliability. See [Submitting a transaction](https://github.com/ripple/ripple-lib#submitting-a-transaction) for details.
+Submit a transaction to the network. This command is used internally to submit transactions with a greater degree of reliability. See [Submitting a payment to the network](GUIDES.md#3-submitting-a-payment-to-the-network) for details.
 
 
 **[request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])](https://ripple.com/wiki/RPC_API#path_find)**
