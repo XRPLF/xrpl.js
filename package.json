@@ -15,8 +15,7 @@
     "async": "~0.2.9",
     "ws": "~0.4.30",
     "extend": "~1.2.0",
-    "simple-jsonrpc": "~0.0.2",
-    "jshint-loader": "~0.5.0"
+    "jshint-loader": "~0.5.0",
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -25,10 +24,11 @@
     "grunt-contrib-watch": "~0.4.4",
     "grunt-webpack": "~0.10.5",
     "grunt-dox": "~0.5.0",
-    "buster": "~0.6.12"
+    "underscore": "~1.5.2",
+    "mocha": "~1.12.1"
   },
   "scripts": {
-    "test": "node_modules/buster/bin/buster-test",
+    "test": "node_modules/.bin/mocha test/*-test.js",
     "build": "node_modules/.bin/grunt"
   },
   "repository": {
