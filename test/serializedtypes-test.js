@@ -572,7 +572,7 @@ describe('Serialized types', function() {
       var so = new SerializedObject('64400000000000007B6540000000000001C8684000000000000315F1');
       var parsed_object=types.Array.parse(so);
       //console.log('WE GOT:', parsed_object[0].TakerPays._value, parsed_object[1].TakerGets._value, parsed_object[2].Fee._value);
-      assert.strictEqual([123,456,789],[
+      assert.deepEqual([123,456,789],[
                          parsed_object[0].TakerPays._value,
                          parsed_object[1].TakerGets._value,
                          parsed_object[2].Fee._value]);
