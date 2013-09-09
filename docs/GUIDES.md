@@ -7,7 +7,7 @@ This file provides step-by-step walkthroughs for some of the most common usages 
 1. [Connecting to the Ripple network with `Remote`](GUIDES.md#1-connecting-to-the-ripple-network-with-remote)
 2. [Using `Remote` functions and `Request` objects](GUIDES.md#2-using-remote-functions-and-request-objects)
 3. [Submitting a transaction](GUIDES.md#3-submitting-a-transaction)
-+ [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees)
+   + [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees)
 4. [Submitting a trade offer](GUIDES.md#3-submitting-a-trade-offer)
 5. [Listening to the network](GUIDES.md#4-listening-to-the-network)
 
