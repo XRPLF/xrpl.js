@@ -163,3 +163,29 @@ remote.connect(function() {
 
 ##5. Listening to the network
 
+In some (relatively rare) cases you may want to subscribe to the network event feed and listen for transactions and the ledger closings. [Ripple.com](http://www.ripple.com) uses this feature of `ripple-lib` to display the live feed on the top of each page and the ledger closing visualization on the [Developers page](http://ripple.com/devs).
+
+```js
+ /* Loading ripple-lib with Node.js */
+  var Remote = require('ripple-lib').Remote;
+
+  /* Loading ripple-lib in a webpage */
+  // var Remote = ripple.Remote;
+
+  var remote = new Remote({options});
+
+  remote.connect(function() {
+    remote.on('transaction_all', transactionListener);
+    remote.on('ledger_closed', ledgerListener);
+  });
+
+  function transactionListener (transaction_data) {
+    // handle transaction_data
+    // see https://ripple.com/wiki/RPC_API#transactions_stream_messages for the format of transaction_data
+  }
+
+  function ledgerListener (ledger_data) {
+    // handle ledger_data
+    // see https://ripple.com/wiki/RPC_API#ledger_stream_messages for the format of ledger_data
+  }
+```
