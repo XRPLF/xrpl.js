@@ -2,7 +2,6 @@ var assert     = require('assert');
 
 var jsbn       = require('../src/js/ripple/jsbn');
 var BigInteger = jsbn.BigInteger;
-var _          = require('underscore');
 
 var Amount     = require('../src/js/ripple/amount').Amount;
 var UInt160    = require('../src/js/ripple/uint160').UInt160;
@@ -22,13 +21,13 @@ describe('Amount', function() {
   });
   describe('UInt160', function() {
     it('Parse 0', function () {
-      assert(_.isEqual(jsbn.nbi(), UInt160.from_generic('0')._value));
+      assert.deepEqual(jsbn.nbi(), UInt160.from_generic('0')._value);
     });
     it('Parse 0 export', function () {
       assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_generic('0').to_json());
     });
     it('Parse 1', function () {
-      assert(_.isEqual(new BigInteger([1]), UInt160.from_generic('1')._value));
+      assert.deepEqual(new BigInteger([1]), UInt160.from_generic('1')._value);
     });
     it('Parse rrrrrrrrrrrrrrrrrrrrrhoLvTp export', function () {
       assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrrhoLvTp').to_json());

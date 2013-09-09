@@ -1,5 +1,4 @@
 var assert           = require('assert');
-var _                = require('underscore');
 var SerializedObject = require('../src/js/ripple/serializedobject').SerializedObject;
 
 describe('Serialied object', function() {
@@ -32,7 +31,7 @@ describe('Serialied object', function() {
         TxnSignature: '30450221009DA3A42DD25E3B22EC45AD8BA8FC7A954264264A816D300B2DF69F814D7D4DD2022072C9627F97EEC6DA13DE841E06E2CD985EF06A0FBB15DDBF0800D0730C8986BF'
       };
       var output_json = SerializedObject.from_json(input_json).to_json();
-      assert(_.isEqual(input_json, output_json));
+      assert.deepEqual(input_json, output_json);
     });
   });
 });
