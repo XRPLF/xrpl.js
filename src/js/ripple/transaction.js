@@ -468,7 +468,7 @@ Transaction.prototype.password_set = function (src, authorized_key, generator, p
     public_key     = options.public_key;
     generator      = options.generator;
     authorized_key = options.authorized_key;
-    src            = options.src || options.from;
+    src            = options.source || options.from;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -517,6 +517,10 @@ Transaction.prototype.payment = function (src, dst, amount) {
     throw new Error('Payment destination address invalid');
   }
 
+  if (typeof amount === 'string' && !Number(amount)) {
+    amount = Amount.from_human(amount);
+  }
+
   this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'Payment';
   this.tx_json.Account         = UInt160.json_rewrite(src);
@@ -532,7 +536,7 @@ Transaction.prototype.ripple_line_set = function (src, limit, quality_in, qualit
     quality_out = options.quality_out;
     quality_in  = options.quality_in;
     limit       = options.limit;
-    src         = options.src || options.from;
+    src         = options.source || options.from;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -568,7 +572,7 @@ Transaction.prototype.wallet_add = function (src, amount, authorized_key, public
     public_key     = options.public_key;
     authorized_key = options.authorized_key;
     amount         = options.amount;
-    src            = options.src || options.from;
+    src            = options.source || options.from;
   }
 
   if (!UInt160.is_valid(src)) {
