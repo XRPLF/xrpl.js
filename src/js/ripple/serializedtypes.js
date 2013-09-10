@@ -306,10 +306,8 @@ var STAmount = exports.Amount = new SerializedType({
       if (!amount.is_zero()) {
         // Second bit: non-negative?
         if (!amount.is_negative()) hi |= 1 << 30;
-
         // Next eight bits: offset/exponent
         hi |= ((97 + amount._offset) & 0xff) << 22;
-
         // Remaining 52 bits: mantissa
         hi |= amount._value.shiftRight(32).intValue() & 0x3fffff;
         lo = amount._value.intValue() & 0xffffffff;
@@ -399,8 +397,7 @@ var STAccount = exports.Account = new SerializedType({
     }
 
     var result = UInt160.from_bytes(so.read(len));
-
-    //XX
+	//console.log("PARSED 160:", result.to_json());
     if (false && !result.is_valid()) {
       throw new Error("Invalid Account");
     }
@@ -416,7 +413,6 @@ var STPathSet = exports.PathSet = new SerializedType({
   typeCurrency:  0x10,
   typeIssuer:    0x20,
   serialize: function (so, val) {
-    // XXX
     for (var i=0, l=val.length; i<l; i++) {
       // Boundary
       if (i) {
@@ -433,7 +429,6 @@ var STPathSet = exports.PathSet = new SerializedType({
         if (entry.issuer) type |= this.typeIssuer;
 
         STInt8.serialize(so, type);
-
         if (entry.account) {
           so.append(UInt160.from_json(entry.account).to_bytes());
         }
@@ -451,14 +446,13 @@ var STPathSet = exports.PathSet = new SerializedType({
     STInt8.serialize(so, this.typeEnd);
   },
   parse: function (so) {
-    // XXX
     // should return a list of lists:
     /*
        [
-       [entry, entry],
-       [entry, entry, entry]
-       [entry]
-       []
+		   [entry, entry],
+		   [entry, entry, entry],
+		   [entry],
+		   []
        ]
 
        each entry has one or more of the following attributes: amount, currency, issuer.
@@ -541,8 +535,8 @@ function serialize_whatever(so, field_name, value) {
   //field_name: a string for the field name ("LedgerEntryType" etc.)
   //value: the value of that field.
   var field_coordinates = INVERSE_FIELDS_MAP[field_name];
-  var type_bits         = parseInt(field_coordinates[0]);
-  var field_bits        = parseInt(field_coordinates[1]);
+  var type_bits         = field_coordinates[0];
+  var field_bits        = field_coordinates[1];
   var tag_byte          = (type_bits < 16 ? type_bits << 4 : 0) | (field_bits < 16 ? field_bits : 0)
   STInt8.serialize(so, tag_byte)
 
@@ -562,7 +556,6 @@ function serialize_whatever(so, field_name, value) {
 //What should this helper function be attached to?
 //Take the serialized object, figure out what type/field it is, and return the parsing of that.
 exports.parse_whatever = parse_whatever;
-
 function parse_whatever(so) {
   var tag_byte   = so.read(1)[0];
   var type_bits  = tag_byte >> 4;
@@ -577,8 +570,9 @@ function parse_whatever(so) {
   type = TYPES_MAP[type_bits];
 
   if (typeof type === 'undefined') {
-    throw Error("Unknown type");
+    throw Error("Unknown type: "+type_bits);
   } else {
+	//console.log("FIELD OF TYPE:", type);
     if (field_bits === 0) {
       field_name = FIELDS_MAP[type_bits][so.read(1)[0]];
     } else {
@@ -587,6 +581,7 @@ function parse_whatever(so) {
     if (typeof field_name === 'undefined') {
       throw Error("Unknown field " + tag_byte);
     } else {
+	  //console.log("AND THE FIELD NAME IS:", field_name);
       return [field_name, type.parse(so)]; //key, value
     }
   }
@@ -597,26 +592,6 @@ var STObject = exports.Object = new SerializedType({
     var keys = Object.keys(val);
     for (var i=0; i<keys.length; i++) {
       serialize_whatever(so, keys[i], val[keys[i]]);
-      //make this a function called "serialize_whatever"
-      //figure out the type corresponding to field so named
-      /*
-         var field_coordinates = INVERSE_FIELDS_MAP[keys[i]];
-
-         var type_bits = parseInt(field_coordinates[0]);
-         var field_bits = parseInt(field_coordinates[1]);
-         console.log(type_bits, field_bits);
-         var tag_byte=(type_bits < 16 ? type_bits<<4 : 0) | (field_bits < 16 ? field_bits : 0)
-         STInt8.serialize(so, tag_byte)
-         if (type_bits >= 16) {
-         STInt8.serialize(so, type_bits)
-         }
-         if (field_bits >= 16) {
-         STInt8.serialize(so, field_bits)
-         }
-         var serialized_object_type = TYPES_MAP[type_bits];
-      //do something with val[keys] and val[keys[i]];
-      serialized_object_type.serialize(so, val[keys[i]]);
-      */
     }
     STInt8.serialize(so, 0xe1); //Object ending marker
   },
@@ -734,12 +709,12 @@ var FIELDS_MAP = {
     1:"Account",2:"Owner",3:"Destination",4:"Issuer",7:"Target",8:"RegularKey"
   },
   14: { //Object
-    1:undefined, //end of Object
+    1:void(0), //end of Object
     2:"TransactionMetaData",3:"CreatedNode",4:"DeletedNode",5:"ModifiedNode",
     6:"PreviousFields",7:"FinalFields",8:"NewFields",9:"TemplateEntry",
   },
   15: { //Array
-    1:undefined, //end of Array
+    1:void(0), //end of Array
     2:"SigningAccounts",3:"TxnSignatures",4:"Signatures",5:"Template",
     6:"Necessary",7:"Sufficient",8:"AffectedNodes",
   },
@@ -762,6 +737,6 @@ var FIELDS_MAP = {
 var INVERSE_FIELDS_MAP = {};
 for (var key1 in FIELDS_MAP) {
   for (var key2 in FIELDS_MAP[key1]) {
-    INVERSE_FIELDS_MAP[FIELDS_MAP[key1][key2]] = [key1, key2];
+    INVERSE_FIELDS_MAP[FIELDS_MAP[key1][key2]] = [parseInt(key1,10), parseInt(key2,10)];
   }
 }
