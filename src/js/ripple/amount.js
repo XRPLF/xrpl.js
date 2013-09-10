@@ -1,38 +1,38 @@
 // Represent Ripple amounts and currencies.
 // - Numbers in hex are big-endian.
 
-var sjcl    = require('../../../build/sjcl');
-var bn	    = sjcl.bn;
-var utils   = require('./utils');
-var jsbn    = require('./jsbn');
+var sjcl  = require('../../../build/sjcl');
+var bn    = sjcl.bn;
+var utils = require('./utils');
+var jsbn  = require('./jsbn');
 
 var BigInteger = jsbn.BigInteger;
 
-var UInt160  = require('./uint160').UInt160,
-    Seed     = require('./seed').Seed,
-    Currency = require('./currency').Currency;
+var UInt160  = require('./uint160').UInt160;
+var Seed     = require('./seed').Seed;
+var Currency = require('./currency').Currency;
 
 var consts = exports.consts = {
-  'currency_xns'          : 0,
-  'currency_one'          : 1,
-  'xns_precision'         : 6,
+  currency_xns:      0,
+  currency_one:      1,
+  xns_precision:     6,
 
   // BigInteger values prefixed with bi_.
-  'bi_5'	          : new BigInteger('5'),
-  'bi_7'	          : new BigInteger('7'),
-  'bi_10'	          : new BigInteger('10'),
-  'bi_1e14'               : new BigInteger(String(1e14)),
-  'bi_1e16'               : new BigInteger(String(1e16)),
-  'bi_1e17'               : new BigInteger(String(1e17)),
-  'bi_1e32'               : new BigInteger('100000000000000000000000000000000'),
-  'bi_man_max_value'      : new BigInteger('9999999999999999'),
-  'bi_man_min_value'      : new BigInteger('1000000000000000'),
-  'bi_xns_max'	          : new BigInteger("9000000000000000000"),	  // Json wire limit.
-  'bi_xns_min'	          : new BigInteger("-9000000000000000000"),	  // Json wire limit.
-  'bi_xns_unit'	          : new BigInteger('1000000'),
+  bi_5:              new BigInteger('5'),
+  bi_7:              new BigInteger('7'),
+  bi_10:             new BigInteger('10'),
+  bi_1e14:           new BigInteger(String(1e14)),
+  bi_1e16:           new BigInteger(String(1e16)),
+  bi_1e17:           new BigInteger(String(1e17)),
+  bi_1e32:           new BigInteger('100000000000000000000000000000000'),
+  bi_man_max_value:  new BigInteger('9999999999999999'),
+  bi_man_min_value:  new BigInteger('1000000000000000'),
+  bi_xns_max:        new BigInteger("9000000000000000000"), // Json wire limit.
+  bi_xns_min:        new BigInteger("-9000000000000000000"),// Json wire limit.
+  bi_xns_unit:       new BigInteger('1000000'),
 
-  'cMinOffset'            : -96,
-  'cMaxOffset'            : 80,
+  cMinOffset:        -96,
+  cMaxOffset:        80,
 };
 
 
@@ -41,24 +41,23 @@ var consts = exports.consts = {
 // http://docs.oracle.com/javase/1.3/docs/api/java/math/BigInteger.html
 //
 
-var Amount = function () {
+function Amount() {
   // Json format:
   //  integer : XRP
   //  { 'value' : ..., 'currency' : ..., 'issuer' : ...}
 
-  this._value	    = new BigInteger();	// NaN for bad value. Always positive.
-  this._offset	    = 0;	        // Always 0 for XRP.
-  this._is_native   = true;		// Default to XRP. Only valid if value is not NaN.
+  this._value       = new BigInteger(); // NaN for bad value. Always positive.
+  this._offset      = 0; // Always 0 for XRP.
+  this._is_native   = true; // Default to XRP. Only valid if value is not NaN.
   this._is_negative = false;
-
   this._currency    = new Currency();
-  this._issuer	    = new UInt160();
+  this._issuer      = new UInt160();
 };
 
 // Given "100/USD/mtgox" return the a string with mtgox remapped.
 Amount.text_full_rewrite = function (j) {
   return Amount.from_json(j).to_text_full();
-}
+};
 
 // Given "100/USD/mtgox" return the json.
 Amount.json_rewrite = function (j) {
@@ -91,9 +90,7 @@ Amount.is_valid_full = function (j) {
 
 Amount.NaN = function () {
   var result = new Amount();
-
   result._value = NaN;
-
   return result;
 };
 
@@ -110,17 +107,14 @@ Amount.prototype.add = function (v) {
 
   if (!this.is_comparable(v)) {
     result              = Amount.NaN();
-  }
-  else if (v.is_zero()) {
-    result              = this; 
-  }
-  else if (this.is_zero()) {
+  } else if (v.is_zero()) {
+    result              = this;
+  } else if (this.is_zero()) {
     result              = v.clone();
     result._is_native   = this._is_native;
     result._currency    = this._currency;
     result._issuer      = this._issuer;
-  }
-  else if (this._is_native) {
+  } else if (this._is_native) {
     result              = new Amount();
 
     var v1  = this._is_negative ? this._value.negate() : this._value;
@@ -131,9 +125,7 @@ Amount.prototype.add = function (v) {
     result._value       = result._is_negative ? s.negate() : s;
     result._currency    = this._currency;
     result._issuer      = this._issuer;
-  }
-  else
-  {
+  } else {
     var v1  = this._is_negative ? this._value.negate() : this._value;
     var o1  = this._offset;
     var v2  = v._is_negative ? v._value.negate() : v._value;
@@ -169,19 +161,15 @@ Amount.prototype.add = function (v) {
 };
 
 Amount.prototype.canonicalize = function () {
-  if (!(this._value instanceof BigInteger))
-  {
+  if (!(this._value instanceof BigInteger)) {
     // NaN.
     // nothing
-  }
-  else if (this._is_native) {
+  } else if (this._is_native) {
     // Native.
-
     if (this._value.equals(BigInteger.ZERO)) {
       this._offset      = 0;
       this._is_negative = false;
-    }
-    else {
+    } else {
       // Normalize _offset to 0.
 
       while (this._offset < 0) {
@@ -196,13 +184,10 @@ Amount.prototype.canonicalize = function () {
     }
 
     // XXX Make sure not bigger than supported. Throw if so.
-  }
-  else if (this.is_zero()) {
+  } else if (this.is_zero()) {
     this._offset      = -100;
     this._is_negative = false;
-  }
-  else
-  {
+  } else {
     // Normalize mantissa to valid range.
 
     while (this._value.compareTo(consts.bi_man_min_value) < 0) {
@@ -228,32 +213,26 @@ Amount.prototype.compareTo = function (v) {
 
   if (!this.is_comparable(v)) {
     result  = Amount.NaN();
-  }
-  else if (this._is_negative !== v._is_negative) {
+  } else if (this._is_negative !== v._is_negative) {
     // Different sign.
     result  = this._is_negative ? -1 : 1;
-  }
-  else if (this._value.equals(BigInteger.ZERO)) {
+  } else if (this._value.equals(BigInteger.ZERO)) {
     // Same sign: positive.
     result  = v._value.equals(BigInteger.ZERO) ? 0 : -1;
-  }
-  else if (v._value.equals(BigInteger.ZERO)) {
+  } else if (v._value.equals(BigInteger.ZERO)) {
     // Same sign: positive.
     result  = 1;
-  }
-  else if (!this._is_native && this._offset > v._offset) {
+  } else if (!this._is_native && this._offset > v._offset) {
     result  = this._is_negative ? -1 : 1;
-  }
-  else if (!this._is_native && this._offset < v._offset) {
+  } else if (!this._is_native && this._offset < v._offset) {
     result  = this._is_negative ? 1 : -1;
-  }
-  else {
+  } else {
     result  = this._value.compareTo(v._value);
-
-    if (result > 0)
+    if (result > 0) {
       result  = this._is_negative ? -1 : 1;
-    else if (result < 0)
+    } else if (result < 0) {
       result  = this._is_negative ? 1 : -1;
+    }
   }
 
   return result;
@@ -262,26 +241,25 @@ Amount.prototype.compareTo = function (v) {
 // Make d a copy of this. Returns d.
 // Modification of objects internally refered to is not allowed.
 Amount.prototype.copyTo = function (d, negate) {
-  if ('object' === typeof this._value)
-  {
+  if (typeof this._value === 'object') {
     this._value.copyTo(d._value);
-  }
-  else
-  {
+  } else {
     d._value   = this._value;
   }
 
-  d._offset	  = this._offset;
-  d._is_native	  = this._is_native;
+  d._offset = this._offset;
+  d._is_native = this._is_native;
   d._is_negative  = negate
-			? !this._is_negative    // Negating.
-			: this._is_negative;    // Just copying.
+    ? !this._is_negative    // Negating.
+    : this._is_negative;    // Just copying.
 
   d._currency     = this._currency;
   d._issuer       = this._issuer;
 
   // Prevent negative zero
-  if (d.is_zero()) d._is_negative = false;
+  if (d.is_zero()) {
+    d._is_negative = false;
+  }
 
   return d;
 };
@@ -291,28 +269,19 @@ Amount.prototype.currency = function () {
 };
 
 Amount.prototype.equals = function (d, ignore_issuer) {
-  if ("string" === typeof d) {
+  if (typeof d === 'string') {
     return this.equals(Amount.from_json(d));
   }
 
-  if (this === d) return true;
+  var result = true;
 
-  if (d instanceof Amount) {
-    if (!this.is_valid() || !d.is_valid()) return false;
-    if (this._is_native !== d._is_native) return false;
+  result = !((!this.is_valid() || !d.is_valid())
+             || (this._is_native !== d._is_native)
+             || (!this._value.equals(d._value) || this._offset !== d._offset)
+             || (this._is_negative !== d._is_negative)
+             || (!this._is_native && (!this._currency.equals(d._currency) || !ignore_issuer && !this._issuer.equals(d._issuer))))
 
-    if (!this._value.equals(d._value) || this._offset !== d._offset) {
-      return false;
-    }
-
-    if (this._is_negative !== d._is_negative) return false;
-
-    if (!this._is_native) {
-      if (!this._currency.equals(d._currency)) return false;
-      if (!ignore_issuer && !this._issuer.equals(d._issuer)) return false;
-    }
-    return true;
-  } else return false;
+  return result;
 };
 
 // Result in terms of this' currency and issuer.
@@ -386,7 +355,7 @@ Amount.prototype.divide = function (d) {
  * @return {Amount} The resulting ratio. Unit will be the same as numerator.
  */
 Amount.prototype.ratio_human = function (denominator) {
-  if ("number" === typeof denominator && parseInt(denominator) === denominator) {
+  if (typeof denominator === 'number' && parseInt(denominator, 10) === denominator) {
     // Special handling of integer arguments
     denominator = Amount.from_json("" + denominator + ".0");
   } else {
@@ -439,7 +408,7 @@ Amount.prototype.ratio_human = function (denominator) {
  * @return {Amount} The product. Unit will be the same as the first factor.
  */
 Amount.prototype.product_human = function (factor) {
-  if ("number" === typeof factor && parseInt(factor) === factor) {
+  if (typeof factor === 'number' && parseInt(factor, 10) === factor) {
     // Special handling of integer arguments
     factor = Amount.from_json("" + factor + ".0");
   } else {
