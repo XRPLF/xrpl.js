@@ -412,8 +412,8 @@ Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expi
     var options = src;
     cancel_sequence = options.cancel_sequence;
     expiration      = options.expiration;
-    taker_gets      = options.taker_gets;
-    taker_pays      = options.taker_pays;
+    taker_gets      = options.taker_gets || options.sell;
+    taker_pays      = options.taker_pays || options.buy;
     src             = options.source || options.from;
   }
 
