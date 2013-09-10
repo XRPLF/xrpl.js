@@ -1,7 +1,6 @@
 var assert = require('assert');
-
-var Seed   = require('../src/js/ripple/seed').Seed;
-
+var utils  = require('./testutils');
+var Seed   = utils.load_module('seed').Seed;
 var config = require('./testutils').get_config();
 
 describe('Base58', function() {

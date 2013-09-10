@@ -101,7 +101,11 @@ remote.connect(function() {
 
   var transaction = remote.transaction();
 
-  transaction.payment(MY_ADDRESS, RECIPIENT, AMOUNT);
+  transaction.payment({
+    from: MY_ADDRESS, 
+    to: RECIPIENT, 
+    amount: AMOUNT
+  });
 
   transaction.submit(function(err, res) {
     /* handle submission errors / success */
@@ -136,10 +140,8 @@ var Amount = require('ripple-lib').Amount;
 var MY_ADDRESS = 'rrrMyAddress';
 var MY_SECRET  = 'secret';
 
-// TAKER_PAYS is the amount that the other party will pay you
-// TAKER_GETS is the amount you are offering to them
-var TAKER_PAYS = Amount.from_human('100XRP');
-var TAKER_GETS = Amount.from_human('1USD');
+var BUY_AMOUNT = Amount.from_human('100XRP');
+var SELL_AMOUNT = Amount.from_human('1USD');
 
 // EXPIRATION must be a Date object, leave undefined to submit offer that won't expire
 var now = new Date();
@@ -153,7 +155,12 @@ remote.connect(function() {
 
   var transaction = remote.transaction();
 
-  transaction.offer_create(MY_ADDRESS, TAKER_PAYS, TAKER_GETS, EXPIRATION);
+  transaction.offer_create({
+    from: MY_ADDRESS, 
+    buy: BUY_AMOUNT, 
+    sell: SELL_AMOUNT, 
+    expiration: EXPIRATION
+  });
 
   transaction.submit(function(err, res) {
     /* handle submission errors / success */

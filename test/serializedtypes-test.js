@@ -1,11 +1,15 @@
-var assert = require('assert');
-var SerializedObject = require('../src/js/ripple/serializedobject').SerializedObject;
-var types = require('../src/js/ripple/serializedtypes');
-
-var jsbn    = require('../src/js/ripple/jsbn');
-var BigInteger = jsbn.BigInteger;
+var utils            = require('./testutils');
+var assert           = require('assert');
+var SerializedObject = utils.load_module('serializedobject').SerializedObject;
+var types            = utils.load_module('serializedtypes');
+var jsbn             = utils.load_module('jsbn');
+var BigInteger       = jsbn.BigInteger;
 
 var config = require('./testutils').get_config();
+
+
+
+
 
 describe('Serialized types', function() {
   describe('Int8', function() {
@@ -466,38 +470,18 @@ describe('Serialized types', function() {
     });
     it('Parse [[e],[e,e]]', function () {
       var so = new SerializedObject('31000000000000000000000000000000000000007B00000000000000000000000055534400000000000000000000000000000000000000000000000315FF31000000000000000000000000000000000000007B000000000000000000000000425443000000000000000000000000000000000000000000000003153100000000000000000000000000000000000003DB0000000000000000000000004555520000000000000000000000000000000000000000000000014100');
-      //console.log("NEW SO:", so); //001201
-	  var parsed_path = types.PathSet.parse(so);
-	  var internal_jsonification = internally_jsonify(parsed_path);
-	  //parsed_path = [];
-	  //console.log("AND FINALLY", JSON.stringify(parsed_path));
-	  //console.log("WHAT WE GOT?", JSON.stringify(so.to_json()));
-	  console.log("PARSED THING:", JSON.stringify(parsed_path));
-	  assert.deepEqual(parsed_path, 
-		[[{"account":{"_value":123},
-		"currency":{"_value":"USD"},
-		"issuer":{"_value":789}}],
-		[{"account":{"_value":123},
-		"currency":{"_value":"BTC"},
-		"issuer":{"_value":789}},
-		{"account":{"_value":987},
-		"currency":{"_value":"EUR"},
-		"issuer":{"_value":321}}]]
-	  );
-      /*assert.deepEqual(parsed_path, [[{
-        account :  {_value:   123 },
-        currency:  {_value:   'USD'},
-        issuer:    {_value:   789}}],
-        [{
-          account :  {_value:  123},
-          currency:  {_value:  'BTC'},
-          issuer:    {_value:  789}
-        },
-        {
-          account :  {_value:  987},
-          currency:  {_value:  'EUR'},
-          issuer:    {_value:  321}
-        }]]);*/
+
+      var parsed_path = types.PathSet.parse(so);
+	  var comp =[ [ { account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
+					  currency: 'USD',
+					  issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf' } ],
+				  [ { account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
+					  currency: 'BTC',
+					  issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf' },
+					{ account: 'rrrrrrrrrrrrrrrrrrrpvQsW3V3',
+					  currency: 'EUR',
+					  issuer: 'rrrrrrrrrrrrrrrrrrrdHRtqg2' } ] ];  
+      assert.deepEqual(SerializedObject.jsonify_structure(parsed_path, ""), comp);
     });
   });
 
@@ -522,41 +506,22 @@ describe('Serialized types', function() {
       assert.strictEqual(so.to_hex(), '64D65F241D335BF24E0000000000000000000000004555520000000000B5F762798A53D543A014CAF8B297CFF8F2F937E86540000000000000D5684000000000000315E1');
       //TODO: Check independently.
     });
-    /*it('Parse same object', function () {
+    it('Parse same object', function () {
       var so = new SerializedObject('64D65F241D335BF24E0000000000000000000000004555520000000000B5F762798A53D543A014CAF8B297CFF8F2F937E86540000000000000D5684000000000000315E1');
       var parsed_object=types.Object.parse(so);
-      assert.deepEqual(parsed_object, {
-        TakerPays: {
-          _value: { '0': 56357454, '1': 32653779, t: 2, s: 0 },
-          _offset: -8,
-          _is_native: false,
-          _is_negative: false,
-          _currency: { _value: 'EUR' },
-          _issuer: { _value:  -422657445385694440895149034202122766475892017176 } },
-          TakerGets: {
-            _value: { '0': 213, '1': 0, '2': 0, t: 1, s: 0 },
-            _offset: 0,
-            _is_native: true,
-            _is_negative: false,
-            _currency: { _value: NaN },
-            _issuer: { _value: NaN }
-          },
-          Fee: {
-            _value: { '0': 789, '1': 0, '2': 0, t: 1, s: 0 },
-            _offset: 0,
-            _is_native: true,
-            _is_negative: false,
-            _currency: { _value: NaN },
-            _issuer: { _value: NaN }
-          }
-      });
+	  var comp =  { TakerPays:
+					   { value: '87654321.12345678',
+						 currency: 'EUR',
+						 issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh' },
+					  TakerGets: '213',
+					  Fee: '789' };
+      assert.deepEqual(SerializedObject.jsonify_structure(parsed_object, ""), comp);
       //TODO: Check independently.
-    });*/
+    });
 
     it('Serialize simple object {DestinationTag:123, QualityIn:456, QualityOut:789}', function () {
       var so = new SerializedObject();
       types.Object.serialize(so, {DestinationTag:123, QualityIn:456, QualityOut:789});
-      //console.log('DOES THE JSON METHOD WORK?', so.to_json());
       assert.strictEqual(so.to_hex(), '2E0000007B2014000001C8201500000315E1');
       //TODO: Check independently.
     });
@@ -585,31 +550,25 @@ describe('Serialized types', function() {
       //TODO: Check this manually
       assert.strictEqual(so.to_hex(), '64400000000000007B6540000000000001C8684000000000000315F1');
     });
-    /*it('Parse the same array', function () {
+    it('Parse the same array', function () {
       var so = new SerializedObject('64400000000000007B6540000000000001C8684000000000000315F1');
       var parsed_object=types.Array.parse(so);
-      //console.log('WE GOT:', parsed_object[0].TakerPays._value, parsed_object[1].TakerGets._value, parsed_object[2].Fee._value);
-      assert.deepEqual([123,456,789],[
-                         parsed_object[0].TakerPays._value,
-                         parsed_object[1].TakerGets._value,
-                         parsed_object[2].Fee._value]);
-    });*/
+	  var comp = [ { TakerPays: '123' }, { TakerGets: '456' }, { Fee: '789' } ];
+      assert.deepEqual(SerializedObject.jsonify_structure(parsed_object, ""), comp);
+    });
     it('Serialize 3-length array [{DestinationTag:123}); {QualityIn:456}, {Fee:789}]', function () {
       var so = new SerializedObject();
       types.Array.serialize(so, [{DestinationTag:123}, {QualityIn:456}, {Fee:789}]);
       //TODO: Check this manually
-      //console.log('DOES THE JSON METHOD WORK2?', so.to_json());
       assert.strictEqual(so.to_hex(), '2E0000007B2014000001C8684000000000000315F1');
     });
-    /*it('Parse the same array 2', function () {
+    it('Parse the same array 2', function () {
       var so = new SerializedObject('2E0000007B2014000001C8684000000000000315F1');
-      var parsed_object=types.Array.parse(so);
+      var parsed_object = types.Array.parse(so);
+	  var comp = [ { DestinationTag: 123 }, { QualityIn: 456 }, { Fee: '789' } ];
       //TODO: Is this correct? Return some things as integers, and others as objects?
-      assert.deepEqual([123,456,789],[
-                       parsed_object[0].DestinationTag,
-                       parsed_object[1].QualityIn,
-                       parsed_object[2].Fee._value]);
-    });*/
+      assert.deepEqual( SerializedObject.jsonify_structure(parsed_object, ""), comp);
+    });
   });
 });
 

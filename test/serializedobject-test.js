@@ -1,5 +1,6 @@
+var utils            = require('./testutils');
 var assert           = require('assert');
-var SerializedObject = require('../src/js/ripple/serializedobject').SerializedObject;
+var SerializedObject = utils.load_module('serializedobject').SerializedObject;
 
 describe('Serialied object', function() {
   describe('Serialized object', function() {

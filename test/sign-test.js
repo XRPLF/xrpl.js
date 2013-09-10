@@ -1,5 +1,6 @@
 var assert = require('assert');
-var Seed   = require('../src/js/ripple/seed').Seed;
+var utils  = require('./testutils');
+var Seed   = utils.load_module('seed').Seed;
 
 describe('Signing', function() {
   describe('Keys', function() {

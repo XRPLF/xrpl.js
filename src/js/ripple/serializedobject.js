@@ -153,7 +153,6 @@ SerializedObject.prototype.to_json = function() {
 
 function jsonify_structure(thing, field_name) {
   var output;
-  console.log("JSONIFYING:", thing, field_name);
   switch (typeof thing) {
     case 'number':
       switch (field_name) {
@@ -167,9 +166,6 @@ function jsonify_structure(thing, field_name) {
           output = TRANSACTION_TYPES[thing] || thing;
           break;
         default:
-		  if (typeof thing.to_json === 'function') {
-			console.log("WE COULD HAVE DONE:", thing.to_json());
-		  }
           output = thing;
       }
       break;
@@ -190,9 +186,10 @@ function jsonify_structure(thing, field_name) {
     default:
       output = thing;
   }
-  console.log("AND THE RESULT WAS:", output);
   return output;
 };
+
+SerializedObject.jsonify_structure = jsonify_structure; //So that we can access it from elsewhere.
 
 SerializedObject.prototype.serialize = function (typedef, obj) {
   // Ensure canonical order
