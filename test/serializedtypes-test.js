@@ -1,9 +1,9 @@
-var assert = require('assert');
-var SerializedObject = require('../src/js/ripple/serializedobject').SerializedObject;
-var types = require('../src/js/ripple/serializedtypes');
-
-var jsbn    = require('../src/js/ripple/jsbn');
-var BigInteger = jsbn.BigInteger;
+var utils            = require('./testutils');
+var assert           = require('assert');
+var SerializedObject = utils.load_module('serializedobject').SerializedObject;
+var types            = utils.load_module('serializedtypes');
+var jsbn             = utils.load_module('jsbn');
+var BigInteger       = jsbn.BigInteger;
 
 var config = require('./testutils').get_config();
 
@@ -467,7 +467,8 @@ describe('Serialized types', function() {
     it('Parse [[e],[e,e]]', function () {
       var so = new SerializedObject('31000000000000000000000000000000000000007B00000000000000000000000055534400000000000000000000000000000000000000000000000315FF31000000000000000000000000000000000000007B000000000000000000000000425443000000000000000000000000000000000000000000000003153100000000000000000000000000000000000003DB0000000000000000000000004555520000000000000000000000000000000000000000000000014100');
       parsed_path = types.PathSet.parse(so);
-      assert.deepEqual(parsed_path, [[{
+
+      var comp = [[{
         account :  { _value:  123 },
         currency:  {_value:   'USD'},
         issuer:    {_value:   789}}],
@@ -480,7 +481,9 @@ describe('Serialized types', function() {
           account :  {_value:  987},
           currency:  {_value:  'EUR'},
           issuer:    {_value:  321}
-        }]]);
+      }]];
+
+      assert.deepEqual(parsed_path, comp);
     });
   });
 
@@ -586,7 +589,7 @@ describe('Serialized types', function() {
     });
     it('Parse the same array 2', function () {
       var so = new SerializedObject('2E0000007B2014000001C8684000000000000315F1');
-      var parsed_object=types.Array.parse(so);
+      var parsed_object = types.Array.parse(so);
       //TODO: Is this correct? Return some things as integers, and others as objects?
       assert.deepEqual([123,456,789],[
                        parsed_object[0].DestinationTag,

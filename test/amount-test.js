@@ -1,12 +1,10 @@
 var assert     = require('assert');
-
-var jsbn       = require('../src/js/ripple/jsbn');
+var utils      = require('./testutils');
+var jsbn       = utils.load_module('jsbn');
 var BigInteger = jsbn.BigInteger;
-
-var Amount     = require('../src/js/ripple/amount').Amount;
-var UInt160    = require('../src/js/ripple/uint160').UInt160;
-
-var config     = require('./testutils').get_config();
+var Amount     = utils.load_module('amount').Amount;
+var UInt160    = utils.load_module('uint160').UInt160;
+var config     = utils.get_config();
 
 describe('Amount', function() {
   describe('Negatives', function() {
