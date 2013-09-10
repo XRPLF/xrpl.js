@@ -553,7 +553,6 @@ function serialize_whatever(so, field_name, value) {
   serialized_object_type.serialize(so, value);
 }
 
-//What should this helper function be attached to?
 //Take the serialized object, figure out what type/field it is, and return the parsing of that.
 exports.parse_whatever = parse_whatever;
 function parse_whatever(so) {
@@ -572,7 +571,6 @@ function parse_whatever(so) {
   if (typeof type === 'undefined') {
     throw Error("Unknown type: "+type_bits);
   } else {
-	//console.log("FIELD OF TYPE:", type);
     if (field_bits === 0) {
       field_name = FIELDS_MAP[type_bits][so.read(1)[0]];
     } else {
@@ -581,7 +579,6 @@ function parse_whatever(so) {
     if (typeof field_name === 'undefined') {
       throw Error("Unknown field " + tag_byte);
     } else {
-	  //console.log("AND THE FIELD NAME IS:", field_name);
       return [field_name, type.parse(so)]; //key, value
     }
   }
