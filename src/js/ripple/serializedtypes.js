@@ -541,8 +541,8 @@ function serialize_whatever(so, field_name, value) {
   //field_name: a string for the field name ("LedgerEntryType" etc.)
   //value: the value of that field.
   var field_coordinates = INVERSE_FIELDS_MAP[field_name];
-  var type_bits         = parseInt(field_coordinates[0]);
-  var field_bits        = parseInt(field_coordinates[1]);
+  var type_bits         = parseInt(field_coordinates[0], 10);
+  var field_bits        = parseInt(field_coordinates[1], 10);
   var tag_byte          = (type_bits < 16 ? type_bits << 4 : 0) | (field_bits < 16 ? field_bits : 0)
   STInt8.serialize(so, tag_byte)
 
