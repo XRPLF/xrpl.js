@@ -353,6 +353,11 @@ Transaction.prototype._account_secret = function (account) {
 //  .wallet_locator()   NYI
 //  .wallet_size()      NYI
 Transaction.prototype.account_set = function (src) {
+  if (typeof src === 'object') {
+    var options = src;
+    src = options.source || options.from;
+  }
+
   if (!UInt160.is_valid(src)) {
     throw new Error('Source address invalid');
   }
@@ -364,6 +369,14 @@ Transaction.prototype.account_set = function (src) {
 };
 
 Transaction.prototype.claim = function (src, generator, public_key, signature) {
+  if (typeof src === 'object') {
+    var options = src;
+    signature  = options.signature;
+    public_key = options.public_key;
+    generator  = options.generator;
+    src        = options.source || options.from;
+  }
+
   this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'Claim';
   this.tx_json.Generator       = generator;
@@ -373,6 +386,12 @@ Transaction.prototype.claim = function (src, generator, public_key, signature) {
 };
 
 Transaction.prototype.offer_cancel = function (src, sequence) {
+  if (typeof src === 'object') {
+    var options = src;
+    sequence = options.sequence;
+    src      = options.source || options.from;
+  }
+
   if (!UInt160.is_valid(src)) {
     throw new Error('Source address invalid');
   }
@@ -389,6 +408,15 @@ Transaction.prototype.offer_cancel = function (src, sequence) {
 // --> expiration : if not undefined, Date or Number
 // --> cancel_sequence : if not undefined, Sequence
 Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expiration, cancel_sequence) {
+  if (typeof src === 'object') {
+    var options = src;
+    cancel_sequence = options.cancel_sequence;
+    expiration      = options.expiration;
+    taker_gets      = options.taker_gets;
+    taker_pays      = options.taker_pays;
+    src             = options.source || options.from;
+  }
+
   if (!UInt160.is_valid(src)) {
     throw new Error('Source address invalid');
   }
@@ -417,6 +445,12 @@ Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expi
 };
 
 Transaction.prototype.password_fund = function (src, dst) {
+  if (typeof src === 'object') {
+    var options = src;
+    dst = options.destination || options.to;
+    src = options.source || options.from;
+  }
+
   if (!UInt160.is_valid(dst)) {
     throw new Error('Destination address invalid');
   }
@@ -428,6 +462,15 @@ Transaction.prototype.password_fund = function (src, dst) {
 }
 
 Transaction.prototype.password_set = function (src, authorized_key, generator, public_key, signature) {
+  if (typeof src === 'object') {
+    var options = src;
+    signature      = options.signature;
+    public_key     = options.public_key;
+    generator      = options.generator;
+    authorized_key = options.authorized_key;
+    src            = options.src || options.from;
+  }
+
   if (!UInt160.is_valid(src)) {
     throw new Error('Source address invalid');
   }
@@ -458,7 +501,14 @@ Transaction.prototype.password_set = function (src, authorized_key, generator, p
 //  .send_max()
 //  .set_flags()
 //  .source_tag()
-Transaction.prototype.payment = function (src, dst, deliver_amount) {
+Transaction.prototype.payment = function (src, dst, amount) {
+  if (typeof src === 'object') {
+    var options = src;
+    amount = options.amount;
+    dst    = options.destination || options.to;
+    src    = options.source || options.from;
+  }
+
   if (!UInt160.is_valid(src)) {
     throw new Error('Payment source address invalid');
   }
@@ -470,13 +520,21 @@ Transaction.prototype.payment = function (src, dst, deliver_amount) {
   this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'Payment';
   this.tx_json.Account         = UInt160.json_rewrite(src);
-  this.tx_json.Amount          = Amount.json_rewrite(deliver_amount);
+  this.tx_json.Amount          = Amount.json_rewrite(amount);
   this.tx_json.Destination     = UInt160.json_rewrite(dst);
 
   return this;
 }
 
 Transaction.prototype.ripple_line_set = function (src, limit, quality_in, quality_out) {
+  if (typeof src === 'object') {
+    var options = src;
+    quality_out = options.quality_out;
+    quality_in  = options.quality_in;
+    limit       = options.limit;
+    src         = options.src || options.from;
+  }
+
   if (!UInt160.is_valid(src)) {
     throw new Error('Source address invalid');
   }
@@ -504,6 +562,15 @@ Transaction.prototype.ripple_line_set = function (src, limit, quality_in, qualit
 };
 
 Transaction.prototype.wallet_add = function (src, amount, authorized_key, public_key, signature) {
+  if (typeof src === 'object') {
+    var options = src;
+    signature      = options.signature;
+    public_key     = options.public_key;
+    authorized_key = options.authorized_key;
+    amount         = options.amount;
+    src            = options.src || options.from;
+  }
+
   if (!UInt160.is_valid(src)) {
     throw new Error('Source address invalid');
   }
