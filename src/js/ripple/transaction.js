@@ -45,7 +45,7 @@
 var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
 
-var sjcl             = require('../../../build/sjcl');
+var sjcl             = require('./utils').sjcl;
 
 var Amount           = require('./amount').Amount;
 var Currency         = require('./amount').Currency;

@@ -19,7 +19,7 @@ exports.Server      = require('./server').Server;
 // However, for programs that are tied to a specific version of ripple.js like
 // the official client, it makes sense to expose the SJCL instance so we don't
 // have to include it twice.
-exports.sjcl      = require('../../../build/sjcl');
+exports.sjcl      = require('./utils').sjcl;
 
 exports.config    = require('./config');
 

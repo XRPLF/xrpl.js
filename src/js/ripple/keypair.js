@@ -1,4 +1,4 @@
-var sjcl    = require('../../../build/sjcl');
+var sjcl    = require('./utils').sjcl;
 
 var UInt256 = require('./uint256').UInt256;
 

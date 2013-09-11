@@ -32,7 +32,7 @@ var RippleError  = require('./rippleerror').RippleError;
 
 var utils        = require('./utils');
 var config       = require('./config');
-var sjcl         = require('../../../build/sjcl');
+var sjcl         = require('./utils').sjcl;
 
 /**
     Interface to manage the connection to a Ripple server.
@@ -762,8 +762,9 @@ Remote.prototype.request_tx = function (hash, callback) {
 
 Remote.prototype.request_account_info = function (accountID, callback) {
   var request = new Request(this, 'account_info');
-  request.message.ident   = UInt160.json_rewrite(accountID);  // DEPRECATED
-  request.message.account = UInt160.json_rewrite(accountID);
+  var account = UInt160.json_rewrite(accountID);
+  request.message.ident   = account; //DEPRECATED;
+  request.message.account = account;
   request.callback(callback);
   return request;
 };

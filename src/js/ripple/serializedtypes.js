@@ -8,7 +8,7 @@
 
 var extend   = require('extend');
 var utils    = require('./utils');
-var sjcl     = require('../../../build/sjcl');
+var sjcl     = require('./utils').sjcl;
 
 var amount   = require('./amount');
 var UInt128  = require('./uint128').UInt128;

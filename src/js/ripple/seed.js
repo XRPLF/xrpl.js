@@ -2,17 +2,17 @@
 // Seed support
 //
 
-var sjcl    = require('../../../build/sjcl');
+var sjcl    = require('./utils').sjcl;
 var utils   = require('./utils');
 var jsbn    = require('./jsbn');
 var extend  = require('extend');
 
 var BigInteger = jsbn.BigInteger;
 
-var Base = require('./base').Base,
-    UInt = require('./uint').UInt,
-    UInt256 = require('./uint256').UInt256,
-    KeyPair = require('./keypair').KeyPair;
+var Base    = require('./base').Base;
+var UInt    = require('./uint').UInt;
+var UInt256 = require('./uint256').UInt256;
+var KeyPair = require('./keypair').KeyPair;
 
 var Seed = extend(function () {
   // Internal form: NaN or BigInteger
@@ -27,7 +27,7 @@ Seed.prototype.constructor = Seed;
 // value = NaN on error.
 // One day this will support rfc1751 too.
 Seed.prototype.parse_json = function (j) {
-  if ('string' === typeof j) {
+  if (typeof j === 'string') {
     if (!j.length) {
       this._value = NaN;
     // XXX Should actually always try and continue if it failed.
@@ -47,7 +47,7 @@ Seed.prototype.parse_json = function (j) {
 };
 
 Seed.prototype.parse_passphrase = function (j) {
-  if ("string" !== typeof j) {
+  if (typeof j !== 'string') {
     throw new Error("Passphrase must be a string");
   }
 
@@ -60,8 +60,9 @@ Seed.prototype.parse_passphrase = function (j) {
 };
 
 Seed.prototype.to_json = function () {
-  if (!(this._value instanceof BigInteger))
+  if (!(this._value instanceof BigInteger)) {
     return NaN;
+  }
 
   var output = Base.encode_check(Base.VER_FAMILY_SEED, this.to_bytes());
 
@@ -70,18 +71,18 @@ Seed.prototype.to_json = function () {
 
 function append_int(a, i) {
   return [].concat(a, i >> 24, (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff);
-}
+};
 
 function firstHalfOfSHA512(bytes) {
   return sjcl.bitArray.bitSlice(
     sjcl.hash.sha512.hash(sjcl.codec.bytes.toBits(bytes)),
     0, 256
   );
-}
+};
 
 function SHA256_RIPEMD160(bits) {
   return sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
-}
+};
 
 Seed.prototype.get_key = function (account_id) {
   if (!this.is_valid()) {
@@ -89,11 +90,10 @@ Seed.prototype.get_key = function (account_id) {
   }
   // XXX Should loop over keys until we find the right one
 
+  var private_gen, public_gen;
   var curve = this._curve;
+  var seq = 0, i = 0;
 
-  var seq = 0;
-
-  var private_gen, public_gen, i = 0;
   do {
     private_gen = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(this.to_bytes(), i)));
     i++;
@@ -103,6 +103,7 @@ Seed.prototype.get_key = function (account_id) {
 
   var sec;
   i = 0;
+
   do {
     sec = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(append_int(public_gen.toBytesCompressed(), seq), i)));
     i++;
