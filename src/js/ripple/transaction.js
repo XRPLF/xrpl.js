@@ -517,7 +517,7 @@ Transaction.prototype.payment = function (src, dst, amount) {
     throw new Error('Payment destination address invalid');
   }
 
-  if (typeof amount === 'string' && !Number(amount)) {
+  if (/^[\d]+[A-Z]{3}$/.test(amount)) {
     amount = Amount.from_human(amount);
   }
 
