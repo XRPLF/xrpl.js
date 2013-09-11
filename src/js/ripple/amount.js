@@ -28,8 +28,8 @@ var consts = exports.consts = {
   bi_1e32:           new BigInteger('100000000000000000000000000000000'),
   bi_man_max_value:  new BigInteger('9999999999999999'),
   bi_man_min_value:  new BigInteger('1000000000000000'),
-  bi_xns_max:        new BigInteger("9000000000000000000"), // Json wire limit.
-  bi_xns_min:        new BigInteger("-9000000000000000000"),// Json wire limit.
+  bi_xns_max:        new BigInteger('9000000000000000000'), // Json wire limit.
+  bi_xns_min:        new BigInteger('-9000000000000000000'),// Json wire limit.
   bi_xns_unit:       new BigInteger('1000000'),
 
   cMinOffset:        -96,
@@ -55,12 +55,12 @@ function Amount() {
   this._issuer      = new UInt160();
 };
 
-// Given "100/USD/mtgox" return the a string with mtgox remapped.
+// Given '100/USD/mtgox' return the a string with mtgox remapped.
 Amount.text_full_rewrite = function (j) {
   return Amount.from_json(j).to_text_full();
 };
 
-// Given "100/USD/mtgox" return the json.
+// Given '100/USD/mtgox' return the json.
 Amount.json_rewrite = function (j) {
   return Amount.from_json(j).to_json();
 };
@@ -290,16 +290,16 @@ Amount.prototype.divide = function (d) {
   var result;
 
   if (d.is_zero()) {
-    throw "divide by zero";
+    throw 'divide by zero';
   }
   else if (this.is_zero()) {
     result = this;
   }
   else if (!this.is_valid()) {
-    throw new Error("Invalid dividend");
+    throw new Error('Invalid dividend');
   }
   else if (!d.is_valid()) {
-    throw new Error("Invalid divisor");
+    throw new Error('Invalid divisor');
   }
   else {
     var _n = this;
@@ -358,7 +358,7 @@ Amount.prototype.divide = function (d) {
 Amount.prototype.ratio_human = function (denominator) {
   if (typeof denominator === 'number' && parseInt(denominator, 10) === denominator) {
     // Special handling of integer arguments
-    denominator = Amount.from_json("" + denominator + ".0");
+    denominator = Amount.from_json('' + denominator + '.0');
   } else {
     denominator = Amount.from_json(denominator);
   }
@@ -411,7 +411,7 @@ Amount.prototype.ratio_human = function (denominator) {
 Amount.prototype.product_human = function (factor) {
   if (typeof factor === 'number' && parseInt(factor, 10) === factor) {
     // Special handling of integer arguments
-    factor = Amount.from_json("" + factor + ".0");
+    factor = Amount.from_json(String(factor) + '.0');
   } else {
     factor = Amount.from_json(factor);
   }
@@ -466,9 +466,7 @@ Amount.prototype.is_valid_full = function () {
 };
 
 Amount.prototype.is_zero = function () {
-  return this._value instanceof BigInteger
-          ? this._value.equals(BigInteger.ZERO)
-          : false;
+  return this._value instanceof BigInteger ? this._value.equals(BigInteger.ZERO) : false;
 };
 
 Amount.prototype.issuer = function () {
@@ -482,12 +480,10 @@ Amount.prototype.multiply = function (v) {
 
   if (this.is_zero()) {
     result = this;
-  }
-  else if (v.is_zero()) {
+  } else if (v.is_zero()) {
     result = this.clone();
     result._value = BigInteger.ZERO;
-  }
-  else {
+  } else {
     var v1 = this._value;
     var o1 = this._offset;
     var v2 = v._value;
@@ -533,11 +529,13 @@ Amount.prototype.negate = function () {
  * unit (currency & issuer), inverts it (1/x) and returns the result.
  */
 Amount.prototype.invert = function () {
-  var one = this.clone();
-  one._value = BigInteger.ONE;
-  one._offset = 0;
+  var one          = this.clone();
+  one._value       = BigInteger.ONE;
+  one._offset      = 0;
   one._is_negative = false;
+
   one.canonicalize();
+
   return one.ratio_human(this);
 };
 
@@ -551,18 +549,16 @@ Amount.prototype.invert = function () {
  *   USD 100.40  => 100.4/USD/?
  *   100         => 100000000/XRP
  */
-Amount.prototype.parse_human = function (j) {
-  // Cast to string
-  j = ""+j;
+Amount.human_RE = /^\s*([a-z]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([a-z]{3})?\s*$/i;
 
-  // Parse
-  var m = j.match(/^\s*([a-z]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([a-z]{3})?\s*$/i);
+Amount.prototype.parse_human = function (j) {
+  var m = String(j).match(Amount.human_RE);
 
   if (m) {
-    var currency   = m[1] || m[5] || "XRP",
-        integer    = m[3] || "0",
-        fraction   = m[4] || "",
-        precision  = null;
+    var currency   = m[1] || m[5] || 'XRP';
+    var integer    = m[3] || '0';
+    var fraction   = m[4] || '';
+    var precision  = null;
 
     currency = currency.toUpperCase();
 
@@ -573,30 +569,26 @@ Amount.prototype.parse_human = function (j) {
     if (currency === 'XRP') {
       fraction = fraction.slice(0, 6);
       while (fraction.length < 6) {
-        fraction += "0";
+        fraction += '0';
       }
-      this._is_native   = true;
-      this._value       = this._value.multiply(consts.bi_xns_unit).add(new BigInteger(fraction));
-    }
-    // Other currencies have arbitrary precision
-    else {
-      while (fraction[fraction.length - 1] === "0") {
-        fraction = fraction.slice(0, fraction.length - 1);
-      }
-
+      this._is_native = true;
+      this._value     = this._value.multiply(consts.bi_xns_unit).add(new BigInteger(fraction));
+    } else {
+      // Other currencies have arbitrary precision
+      fraction  = fraction.replace(/0+$/, '');
       precision = fraction.length;
 
-      this._is_native   = false;
-      var multiplier    = consts.bi_10.clone().pow(precision);
-      this._value      	= this._value.multiply(multiplier).add(new BigInteger(fraction));
-      this._offset     	= -precision;
+      this._is_native = false;
+      var multiplier  = consts.bi_10.clone().pow(precision);
+      this._value     = this._value.multiply(multiplier).add(new BigInteger(fraction));
+      this._offset    = -precision;
 
       this.canonicalize();
     }
 
     this._is_negative = !!m[2];
   } else {
-    this._value	      = NaN;
+    this._value = NaN;
   }
 
   return this;
@@ -637,40 +629,47 @@ Amount.prototype.parse_number = function (n) {
 
 // <-> j
 Amount.prototype.parse_json = function (j) {
-  if ('string' === typeof j) {
-    // .../.../... notation is not a wire format.  But allowed for easier testing.
-    var m = j.match(/^([^/]+)\/(...)(?:\/(.+))?$/);
+  switch (typeof j) {
+    case 'string':
+      // .../.../... notation is not a wire format.  But allowed for easier testing.
+      var m = j.match(/^([^/]+)\/(...)(?:\/(.+))?$/);
 
-    if (m) {
-      this._currency  = Currency.from_json(m[2]);
-      if (m[3]) {
-        this._issuer  = UInt160.from_json(m[3]);
+      if (m) {
+        this._currency  = Currency.from_json(m[2]);
+        if (m[3]) {
+          this._issuer  = UInt160.from_json(m[3]);
+        } else {
+          this._issuer  = UInt160.from_json('1');
+        }
+        this.parse_value(m[1]);
       } else {
-        this._issuer  = UInt160.from_json('1');
+        this.parse_native(j);
+        this._currency  = Currency.from_json('0');
+        this._issuer    = UInt160.from_json('0');
       }
-      this.parse_value(m[1]);
-    }
-    else {
-      this.parse_native(j);
-      this._currency  = Currency.from_json("0");
-      this._issuer    = UInt160.from_json("0");
-    }
-  }
-  else if ('number' === typeof j) {
-    this.parse_json(""+j);
-  }
-  else if ('object' === typeof j && j instanceof Amount) {
-    j.copyTo(this);
-  }
-  else if ('object' === typeof j && 'value' in j) {
-    // Parse the passed value to sanitize and copy it.
+      break;
 
-    this._currency.parse_json(j.currency);     // Never XRP.
-    if ("string" === typeof j.issuer) this._issuer.parse_json(j.issuer);
-    this.parse_value(j.value);
-  }
-  else {
-    this._value	    = NaN;
+    case 'number':
+      this.parse_json(String(j));
+      break;
+
+    case 'object':
+      if (j instanceof Amount) {
+        j.copyTo(this);
+      } else if (j.hasOwnProperty('value')) {
+        // Parse the passed value to sanitize and copy it.
+        this._currency.parse_json(j.currency); // Never XRP.
+
+        if (typeof j.issuer === 'string') {
+          this._issuer.parse_json(j.issuer);
+        }
+
+        this.parse_value(j.value);
+      }
+      break;
+
+    default:
+      this._value = NaN;
   }
 
   return this;
@@ -683,35 +682,31 @@ Amount.prototype.parse_json = function (j) {
 Amount.prototype.parse_native = function (j) {
   var m;
 
-  if ('string' === typeof j)
+  if (typeof j === 'string') {
     m = j.match(/^(-?)(\d*)(\.\d{0,6})?$/);
+  }
 
   if (m) {
-    if (undefined === m[3]) {
+    if (m[3] === void(0)) {
       // Integer notation
-
-      this._value	  = new BigInteger(m[2]);
-    }
-    else {
+      this._value = new BigInteger(m[2]);
+    } else {
       // Float notation : values multiplied by 1,000,000.
+      var int_part      = (new BigInteger(m[2])).multiply(consts.bi_xns_unit);
+      var fraction_part = (new BigInteger(m[3])).multiply(new BigInteger(String(Math.pow(10, 1+consts.xns_precision-m[3].length))));
 
-      var   int_part	  = (new BigInteger(m[2])).multiply(consts.bi_xns_unit);
-      var   fraction_part = (new BigInteger(m[3])).multiply(new BigInteger(String(Math.pow(10, 1+consts.xns_precision-m[3].length))));
-
-      this._value	  = int_part.add(fraction_part);
+      this._value = int_part.add(fraction_part);
     }
 
     this._is_native   = true;
     this._offset      = 0;
     this._is_negative = !!m[1] && this._value.compareTo(BigInteger.ZERO) !== 0;
 
-    if (this._value.compareTo(consts.bi_xns_max) > 0)
-    {
-      this._value	  = NaN;
+    if (this._value.compareTo(consts.bi_xns_max) > 0) {
+      this._value = NaN;
     }
-  }
-  else {
-    this._value	      = NaN;
+  } else {
+    this._value = NaN;
   }
 
   return this;
@@ -722,58 +717,50 @@ Amount.prototype.parse_native = function (j) {
 Amount.prototype.parse_value = function (j) {
   this._is_native    = false;
 
-  if ('number' === typeof j) {
-    this._is_negative = j < 0;
-    this._value	      = new BigInteger(Math.abs(j));
-    this._offset      = 0;
-
-    this.canonicalize();
-  }
-  else if ('string' === typeof j) {
-    var	i = j.match(/^(-?)(\d+)$/);
-    var	d = !i && j.match(/^(-?)(\d*)\.(\d*)$/);
-    var	e = !e && j.match(/^(-?)(\d*)e(-?\d+)$/);
-
-    if (e) {
-      // e notation
-
-      this._value	= new BigInteger(e[2]);
-      this._offset 	= parseInt(e[3]);
-      this._is_negative	= !!e[1];
+  switch (typeof j) {
+    case 'number':
+      this._is_negative = j < 0;
+      this._value       = new BigInteger(Math.abs(j));
+      this._offset      = 0;
 
       this.canonicalize();
-    }
-    else if (d) {
-      // float notation
+      break;
+    case 'string':
+      var i = j.match(/^(-?)(\d+)$/);
+      var d = !i && j.match(/^(-?)(\d*)\.(\d*)$/);
+      var e = !e && j.match(/^(-?)(\d*)e(-?\d+)$/);
 
-      var integer	= new BigInteger(d[2]);
-      var fraction    	= new BigInteger(d[3]);
-      var precision	= d[3].length;
+      if (e) {
+        // e notation
+        this._value       = new BigInteger(e[2]);
+        this._offset      = parseInt(e[3]);
+        this._is_negative = !!e[1];
 
-      this._value      	= integer.multiply(consts.bi_10.clone().pow(precision)).add(fraction);
-      this._offset     	= -precision;
-      this._is_negative = !!d[1];
+        this.canonicalize();
+      } else if (d) {
+        // float notation
+        var integer   = new BigInteger(d[2]);
+        var fraction  = new BigInteger(d[3]);
+        var precision = d[3].length;
 
-      this.canonicalize();
-    }
-    else if (i) {
-      // integer notation
+        this._value       = integer.multiply(consts.bi_10.clone().pow(precision)).add(fraction);
+        this._offset      = -precision;
+        this._is_negative = !!d[1];
 
-      this._value	= new BigInteger(i[2]);
-      this._offset 	= 0;
-      this._is_negative  = !!i[1];
+        this.canonicalize();
+      } else if (i) {
+        // integer notation
+        this._value       = new BigInteger(i[2]);
+        this._offset      = 0;
+        this._is_negative = !!i[1];
 
-      this.canonicalize();
-    }
-    else {
-      this._value	= NaN;
-    }
-  }
-  else if (j instanceof BigInteger) {
-    this._value	      = j;
-  }
-  else {
-    this._value	      = NaN;
+        this.canonicalize();
+      } else {
+        this._value = NaN;
+      }
+      break;
+    default:
+      this._value = j instanceof BigInteger ? j : NaN;
   }
 
   return this;
@@ -804,50 +791,41 @@ Amount.prototype.subtract = function (v) {
 
 Amount.prototype.to_number = function (allow_nan) {
   var s = this.to_text(allow_nan);
-
-  return ('string' === typeof s) ? Number(s) : s;
-}
+  return typeof s === 'string' ? Number(s) : s;
+};
 
 // Convert only value to JSON wire format.
 Amount.prototype.to_text = function (allow_nan) {
-  if (!(this._value instanceof BigInteger)) {
+  var result = NaN;
+
+  if (this._is_native && this._value.compareTo(consts.bi_xns_max) <= 0) {
     // Never should happen.
-    return allow_nan ? NaN : "0";
-  }
-  else if (this._is_native) {
-    if (this._value.compareTo(consts.bi_xns_max) > 0)
-    {
-      // Never should happen.
-      return allow_nan ? NaN : "0";
-    }
-    else
-    {
-      return (this._is_negative ? "-" : "") + this._value.toString();
-    }
-  }
-  else if (this.is_zero())
-  {
-    return "0";
-  }
-  else if (this._offset && (this._offset < -25 || this._offset > -4))
-  {
+    result = this._value.toString();
+  } else if (this.is_zero()) {
+    result = '0';
+  } else if (this._offset && (this._offset < -25 || this._offset > -4)) {
     // Use e notation.
     // XXX Clamp output.
+    result = this._value.toString() + 'e' + this._offset;
+  } else {
+    var val    = '000000000000000000000000000' + this._value.toString() + '00000000000000000000000';
+    var pre    = val.substring(0, this._offset + 43);
+    var post   = val.substring(this._offset + 43);
+    var s_pre  = pre.match(/[1-9].*$/);  // Everything but leading zeros.
+    var s_post = post.match(/[1-9]0*$/); // Last non-zero plus trailing zeros.
 
-    return (this._is_negative ? "-" : "") + this._value.toString() + "e" + this._offset;
+    result = ''
+      + (s_pre ? s_pre[0] : '0')
+      + (s_post ? '.' + post.substring(0, 1 + post.length - s_post[0].length) : '');
   }
-  else
-  {
-    var val = "000000000000000000000000000" + this._value.toString() + "00000000000000000000000";
-    var	pre = val.substring(0, this._offset + 43);
-    var	post = val.substring(this._offset + 43);
-    var	s_pre = pre.match(/[1-9].*$/);	  // Everything but leading zeros.
-    var	s_post = post.match(/[1-9]0*$/);  // Last non-zero plus trailing zeros.
 
-    return (this._is_negative ? "-" : "")
-      + (s_pre ? s_pre[0] : "0")
-      + (s_post ? "." + post.substring(0, 1+post.length-s_post[0].length) : "");
+  if (!allow_nan && typeof result === 'number' && isNaN(result)) {
+    result = '0';
+  } else if (this._is_negative) {
+    result = '-' + result;
   }
+
+  return result;
 };
 
 /**
@@ -864,44 +842,44 @@ Amount.prototype.to_text = function (allow_nan) {
  * @param opts.max_sig_digits {Number} Maximum number of significant digits.
  *   Will cut fractional part, but never integer part.
  * @param opts.group_sep {Boolean|String} Whether to show a separator every n
- *   digits, if a string, that value will be used as the separator. Default: ","
+ *   digits, if a string, that value will be used as the separator. Default: ','
  * @param opts.group_width {Number} How many numbers will be grouped together,
  *   default: 3.
  * @param opts.signed {Boolean|String} Whether negative numbers will have a
- *   prefix. If String, that string will be used as the prefix. Default: "-"
+ *   prefix. If String, that string will be used as the prefix. Default: '-'
  */
-Amount.prototype.to_human = function (opts)
-{
-  opts = opts || {};
+Amount.prototype.to_human = function (opts) {
+  var opts = opts || {};
 
-  if (!this.is_valid()) return "";
+  if (!this.is_valid()) return '';
 
   // Default options
-  if ("undefined" === typeof opts.signed) opts.signed = true;
-  if ("undefined" === typeof opts.group_sep) opts.group_sep = true;
+  if (typeof opts.signed === 'undefined') opts.signed = true;
+  if (typeof opts.group_sep === 'undefined') opts.group_sep = true;
+
   opts.group_width = opts.group_width || 3;
 
-  var order = this._is_native ? consts.xns_precision : -this._offset;
-  var denominator = consts.bi_10.clone().pow(order);
-  var int_part = this._value.divide(denominator).toString(10);
+  var order         = this._is_native ? consts.xns_precision : -this._offset;
+  var denominator   = consts.bi_10.clone().pow(order);
+  var int_part      = this._value.divide(denominator).toString(10);
   var fraction_part = this._value.mod(denominator).toString(10);
 
   // Add leading zeros to fraction
   while (fraction_part.length < order) {
-    fraction_part = "0" + fraction_part;
+    fraction_part = '0' + fraction_part;
   }
 
-  int_part = int_part.replace(/^0*/, '');
+  int_part      = int_part.replace(/^0*/, '');
   fraction_part = fraction_part.replace(/0*$/, '');
 
   if (fraction_part.length || !opts.skip_empty_fraction) {
     // Enforce the maximum number of decimal digits (precision)
-    if ("number" === typeof opts.precision) {
+    if (typeof opts.precision === 'number') {
       fraction_part = fraction_part.slice(0, opts.precision);
     }
 
     // Limit the number of significant digits (max_sig_digits)
-    if ("number" === typeof opts.max_sig_digits) {
+    if (typeof opts.max_sig_digits === 'number') {
       // First, we count the significant digits we have.
       // A zero in the integer part does not count.
       var int_is_zero = +int_part === 0;
@@ -927,15 +905,15 @@ Amount.prototype.to_human = function (opts)
     }
 
     // Enforce the minimum number of decimal digits (min_precision)
-    if ("number" === typeof opts.min_precision) {
+    if (typeof opts.min_precision === 'number') {
       while (fraction_part.length < opts.min_precision) {
-        fraction_part += "0";
+        fraction_part += '0';
       }
     }
   }
 
   if (opts.group_sep) {
-    if ("string" !== typeof opts.group_sep) {
+    if (typeof opts.group_sep !== 'string') {
       opts.group_sep = ',';
     }
     int_part = utils.chunkString(int_part, opts.group_width, true).join(opts.group_sep);
@@ -943,98 +921,92 @@ Amount.prototype.to_human = function (opts)
 
   var formatted = '';
   if (opts.signed && this._is_negative) {
-    if ("string" !== typeof opts.signed) {
+    if (typeof opts.signed !== 'string') {
       opts.signed = '-';
     }
     formatted += opts.signed;
   }
+
   formatted += int_part.length ? int_part : '0';
-  formatted += fraction_part.length ? '.'+fraction_part : '';
+  formatted += fraction_part.length ? '.' + fraction_part : '';
 
   return formatted;
 };
 
 Amount.prototype.to_human_full = function (opts) {
-  opts = opts || {};
-
+  var opts = opts || {};
   var a = this.to_human(opts);
   var c = this._currency.to_human();
   var i = this._issuer.to_json(opts);
-
-  var o;
-
-  if (this._is_native)
-  {
-    o = a + "/" + c;
-  }
-  else
-  {
-    o = a + "/" + c + "/" + i;
-  }
-
+  var o = this.is_native ?  (o = a + '/' + c) : (o  = a + '/' + c + '/' + i);
   return o;
 };
 
 Amount.prototype.to_json = function () {
+  var result;
+
   if (this._is_native) {
-    return this.to_text();
-  }
-  else
-  {
+    result = this.to_text();
+  } else {
     var amount_json = {
-      'value' : this.to_text(),
-      'currency' : this._currency.to_json()
+      value : this.to_text(),
+      currency : this._currency.to_json()
     };
     if (this._issuer.is_valid()) {
       amount_json.issuer = this._issuer.to_json();
     }
-    return amount_json;
+    result = amount_json;
   }
+
+  return result;
 };
 
 Amount.prototype.to_text_full = function (opts) {
   return this._value instanceof BigInteger
     ? this._is_native
-      ? this.to_human() + "/XRP"
-      : this.to_text() + "/" + this._currency.to_json() + "/" + this._issuer.to_json(opts)
+      ? this.to_human() + '/XRP'
+      : this.to_text() + '/' + this._currency.to_json() + '/' + this._issuer.to_json(opts)
     : NaN;
 };
 
 // For debugging.
 Amount.prototype.not_equals_why = function (d, ignore_issuer) {
-  if ("string" === typeof d) {
-    return this.not_equals_why(Amount.from_json(d));
-  }
+  var result = false;
 
-  if (this === d) return false;
+  if (typeof d === 'string') {
+    result = this.not_equals_why(Amount.from_json(d));
+  } else if (d instanceof Amount) {
+    if (!this.is_valid() || !d.is_valid()) {
+      result = 'Invalid amount.';
+    } else if (this._is_native !== d._is_native) {
+      result = 'Native mismatch.';
+    } else {
+      var type = this._is_native ? 'XRP' : 'Non-XRP';
 
-  if (d instanceof Amount) {
-    if (!this.is_valid() || !d.is_valid()) return "Invalid amount.";
-    if (this._is_native !== d._is_native) return "Native mismatch.";
-
-    var type = this._is_native ? "XRP" : "Non-XRP";
-
-    if (!this._value.equals(d._value) || this._offset !== d._offset) {
-      return type+" value differs.";
-    }
-
-    if (this._is_negative !== d._is_negative) return type+" sign differs.";
-
-    if (!this._is_native) {
-      if (!this._currency.equals(d._currency)) return "Non-XRP currency differs.";
-      if (!ignore_issuer && !this._issuer.equals(d._issuer)) {
-        return "Non-XRP issuer differs: " + d._issuer.to_json() + "/" + this._issuer.to_json();
+      if (!this._value.equals(d._value) || this._offset !== d._offset) {
+        result = type + ' value differs.';
+      } else if (this._is_negative !== d._is_negative) {
+        result = type + ' sign differs.';
+      } else if (!this._is_native) {
+        if (!this._currency.equals(d._currency)) {
+          result = 'Non-XRP currency differs.';
+        } else if (!ignore_issuer && !this._issuer.equals(d._issuer)) {
+          result = 'Non-XRP issuer differs: ' + d._issuer.to_json() + '/' + this._issuer.to_json();
+        }
       }
     }
-    return false;
-  } else return "Wrong constructor.";
+  } else {
+    result = 'Wrong constructor.';
+  }
+
+  return result;
 };
 
-exports.Amount	      = Amount;
+exports.Amount   = Amount;
 
 // DEPRECATED: Include the corresponding files instead.
-exports.Currency      = Currency;
-exports.Seed          = Seed;
-exports.UInt160	      = UInt160;
+exports.Currency = Currency;
+exports.Seed     = Seed;
+exports.UInt160  = UInt160;
 
 // vim:sw=2:sts=2:ts=8:et
