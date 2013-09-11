@@ -140,12 +140,12 @@ Base.decode_check = function (version, input, alphabet) {
   }
 
   // Single valid version
-  if (typeof version && buffer[0] !== version === 'number') {
+  if (typeof version === 'number' && buffer[0] !== version) {
     return NaN;
   }
 
   // Multiple allowed versions
-  if (typeof version && Array.isArray(version) === 'object') {
+  if (Array.isArray(version)) {
     var match = false;
 
     for (var i=0, l=version.length; i<l; i++) {
