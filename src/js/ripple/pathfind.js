@@ -1,9 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
-var util = require('util');
-
-var Amount        = require('./amount').Amount;
-
-var extend = require('extend');
+var util         = require('util');
+var Amount       = require('./amount').Amount;
+var extend       = require('extend');
 
 /**
  * Represents a persistent path finding request.
@@ -12,9 +10,7 @@ var extend = require('extend');
  * find request is triggered it will supercede the existing one, making it emit
  * the 'end' and 'superceded' events.
  */
-var PathFind = function (remote, src_account, dst_account,
-                         dst_amount, src_currencies)
-{
+function PathFind(remote, src_account, dst_account, dst_amount, src_currencies) {
   EventEmitter.call(this);
 
   this.remote = remote;
@@ -36,8 +32,7 @@ util.inherits(PathFind, EventEmitter);
  * so you should only have to call it if the path find was closed or superceded
  * and you wish to restart it.
  */
-PathFind.prototype.create = function ()
-{
+PathFind.prototype.create = function () {
   var self = this;
 
   var req = this.remote.request_path_find_create(this.src_account,
@@ -49,26 +44,24 @@ PathFind.prototype.create = function ()
   function handleInitialPath(err, msg) {
     if (err) {
       self.emit('error', err);
-      return;
+    } else {
+      self.notify_update(msg);
     }
-    self.notify_update(msg);
   }
 
   // XXX We should add ourselves to prepare_subscribe or a similar mechanism so
-  //     that we can resubscribe after a reconnection.
+  // that we can resubscribe after a reconnection.
 
   req.request();
 };
 
-PathFind.prototype.close = function ()
-{
+PathFind.prototype.close = function () {
   this.remote.request_path_find_close().request();
   this.emit('end');
   this.emit('close');
 };
 
-PathFind.prototype.notify_update = function (message)
-{
+PathFind.prototype.notify_update = function (message) {
   var src_account = message.source_account;
   var dst_account = message.destination_account;
   var dst_amount  = Amount.from_json(message.destination_amount);
@@ -82,10 +75,9 @@ PathFind.prototype.notify_update = function (message)
   }
 };
 
-PathFind.prototype.notify_superceded = function ()
-{
+PathFind.prototype.notify_superceded = function () {
   // XXX If we're set to re-subscribe whenever we connect to a new server, then
-  //     we should cancel that behavior here. See PathFind#create.
+  // we should cancel that behavior here. See PathFind#create.
 
   this.emit('end');
   this.emit('superceded');
