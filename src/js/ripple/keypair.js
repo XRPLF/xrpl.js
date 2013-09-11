@@ -1,5 +1,6 @@
 var sjcl    = require('./utils').sjcl;
 
+var UInt160 = require('./uint160').UInt160;
 var UInt256 = require('./uint256').UInt256;
 
 function KeyPair() {
@@ -34,11 +35,11 @@ KeyPair.prototype._pub = function () {
 };
 
 /**
- * Returns public key as hex.
+ * Returns public key in compressed format as bit array.
  *
- * Key will be returned as a compressed pubkey - 33 bytes converted to hex.
+ * @private
  */
-KeyPair.prototype.to_hex_pub = function () {
+KeyPair.prototype._pub_bits = function () {
   var pub = this._pub();
 
   if (!pub) {
@@ -47,10 +48,41 @@ KeyPair.prototype.to_hex_pub = function () {
 
   var point = pub._point, y_even = point.y.mod(2).equals(0);
 
-  return sjcl.codec.hex.fromBits(sjcl.bitArray.concat(
+  return sjcl.bitArray.concat(
     [sjcl.bitArray.partial(8, y_even ? 0x02 : 0x03)],
     point.x.toBits(this._curve.r.bitLength())
-  )).toUpperCase();
+  );
+};
+
+/**
+ * Returns public key as hex.
+ *
+ * Key will be returned as a compressed pubkey - 33 bytes converted to hex.
+ */
+KeyPair.prototype.to_hex_pub = function () {
+  var bits = this._pub_bits();
+
+  if (!bits) {
+    return null;
+  }
+
+  return sjcl.codec.hex.fromBits(bits).toUpperCase();
+};
+
+function SHA256_RIPEMD160(bits) {
+  return sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
+}
+
+KeyPair.prototype.get_address = function () {
+  var bits = this._pub_bits();
+
+  if (!bits) {
+    return null;
+  }
+
+  var hash = SHA256_RIPEMD160(bits);
+
+  return UInt160.from_bits(hash);
 };
 
 KeyPair.prototype.sign = function (hash) {
