@@ -43,7 +43,29 @@ describe('Amount', function() {
       assert(!UInt160.is_valid('rrrrrrrrrrrrrrrrrrrrrhoLvT'));
     });
   });
+  describe('Amount validity', function() {
+    it('is_valid 1', function() {
+      assert(Amount.is_valid(1));
+    });
+    it('is_valid "1"', function() {
+      assert(Amount.is_valid('1'));
+    });
+    it('is_valid "1/XRP"', function() {
+      assert(Amount.is_valid('1/XRP'));
+    });
+    it('!is_valid NaN', function() {
+      assert(!Amount.is_valid(NaN));
+    });
+    it('!is_valid "xx"', function() {
+      assert(!Amount.is_valid('xx'));
+    });
+  });
   describe('Amount parsing', function() {
+    it('Parse invalid string', function() {
+      assert.strictEqual(Amount.from_json('x').to_text(), '0');
+      assert.strictEqual(typeof Amount.from_json('x').to_text(true), 'number');
+      assert(isNaN(Amount.from_json('x').to_text(true)));
+    });
     it('Parse 800/USD/mtgox', function () {
       assert.strictEqual('800/USD/'+config.accounts['mtgox'].account, Amount.from_json('800/USD/mtgox').to_text_full());
     });
