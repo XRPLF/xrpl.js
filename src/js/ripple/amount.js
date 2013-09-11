@@ -654,6 +654,7 @@ Amount.prototype.parse_json = function (j) {
       break;
 
     case 'object':
+      if (j === null) break;
       if (j instanceof Amount) {
         j.copyTo(this);
       } else if (j.hasOwnProperty('value')) {
@@ -725,6 +726,7 @@ Amount.prototype.parse_value = function (j) {
 
       this.canonicalize();
       break;
+
     case 'string':
       var i = j.match(/^(-?)(\d+)$/);
       var d = !i && j.match(/^(-?)(\d*)\.(\d*)$/);
@@ -759,6 +761,7 @@ Amount.prototype.parse_value = function (j) {
         this._value = NaN;
       }
       break;
+
     default:
       this._value = j instanceof BigInteger ? j : NaN;
   }
@@ -798,9 +801,10 @@ Amount.prototype.to_number = function (allow_nan) {
 Amount.prototype.to_text = function (allow_nan) {
   var result = NaN;
 
-  if (this._is_native && this._value.compareTo(consts.bi_xns_max) <= 0) {
-    // Never should happen.
-    result = this._value.toString();
+  if (this._is_native) {
+    if (this.is_valid() && this._value.compareTo(consts.bi_xns_max) <= 0){
+      result = this._value.toString();
+    }
   } else if (this.is_zero()) {
     result = '0';
   } else if (this._offset && (this._offset < -25 || this._offset > -4)) {
