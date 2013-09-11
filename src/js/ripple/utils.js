@@ -140,13 +140,11 @@ exports.logObject     = logObject;
 exports.assert        = assert;
 exports.arrayUnique   = arrayUnique;
 exports.toTimestamp   = toTimestamp;
-exports.sjcl = (function() {
-  try {
-    var sjcl = require('../../../build/sjcl');
-  } catch(e) {
-    var sjcl = require('../build/sjcl');
-  }
-  return sjcl;
-})();
+
+try {
+  exports.sjcl = require('../build/sjcl');
+} catch(e) {
+  exports.sjcl = require('../../../build/sjcl');
+}
 
 // vim:sw=2:sts=2:ts=8:et
