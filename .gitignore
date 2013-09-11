@@ -37,3 +37,7 @@ db/*.db-*
 rippled.cfg
 validators.txt
 test/config.js
+
+# Ignore coverage files
+/lib-cov
+/coverage.html
