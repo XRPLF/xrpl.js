@@ -51,25 +51,31 @@ Currency.prototype.equals = function (d) {
 
 // this._value = NaN on error.
 Currency.prototype.parse_json = function (j) {
-  if (j instanceof Currency) {
-    j.copyTo(this);
-  } else if (typeof j === 'string') {
-    if (j === "" || j === "0" || j === "XRP") {
-      // XRP is never allowed as a Currency object
-      this._value = 0;
-    } else if (j.length === 3) {
-      this._value = j;
-    } else {
-      this._value = NaN;
-    }
-  } else if (typeof j === 'number' && !isNaN(j)) {
-    // XXX This is a hack
-    this._value = j;
-  } else if (typeof j !== 'string'|| j.length !== 3) {
-    this._value = NaN;
-  } else {
-    this._value = j;
+  var result = NaN;
+
+  switch (typeof j) {
+    case 'string':
+      if (!j || /^(0|XRP)$/.test(j)) {
+        result = 0;
+      } else if (/^[a-zA-Z0-9]{3}$/.test(j)) {
+        result = j;
+      }
+      break;
+
+    case 'number':
+      if (!isNaN(j)) {
+        result = j;
+      }
+      break;
+
+    case 'object':
+      if (j instanceof Currency) {
+        result = j.copyTo({})._value;
+      }
+      break;
   }
+
+  this._value = result;
 
   return this;
 };
