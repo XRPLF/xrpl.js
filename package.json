@@ -27,7 +27,7 @@
     "mocha": "~1.12.1"
   },
   "scripts": {
-    "test": "mocha --reporter spec test/*-test.js",
+    "test": "mocha test/*-test.js",
     "build": "grunt"
   },
   "repository": {
