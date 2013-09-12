@@ -52,7 +52,7 @@ Currency.prototype.equals = function (d) {
 // this._value = NaN on error.
 Currency.prototype.parse_json = function (j) {
   if (j instanceof Currency) {
-    this._value = j;
+    j.copyTo(this);
   } else if (typeof j === 'string') {
     if (j === "" || j === "0" || j === "XRP") {
       // XRP is never allowed as a Currency object
