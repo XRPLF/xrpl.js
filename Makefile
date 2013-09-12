@@ -1,5 +1,5 @@
 test:
-	mocha test/*-test.js
+	mocha --reporter spec test/*-test.js
 
 coverage:
 	rm -rf lib-cov
