@@ -9,16 +9,18 @@ var extend       = require('extend');
  * Only one path find request is allowed per connection, so when another path
  * find request is triggered it will supercede the existing one, making it emit
  * the 'end' and 'superceded' events.
+ *
+ * Options:
+ *  src_account
+ *  dst_account
+ *  dst_amount,
+ *  src_currencies
  */
-function PathFind(remote, src_account, dst_account, dst_amount, src_currencies) {
+
+function PathFind(remote, options) {
   EventEmitter.call(this);
-
-  this.remote = remote;
-
-  this.src_account    = src_account;
-  this.dst_account    = dst_account;
-  this.dst_amount     = dst_amount;
-  this.src_currencies = src_currencies;
+  this.remote  = remote;
+  this.path_options = options;
 };
 
 util.inherits(PathFind, EventEmitter);
@@ -35,11 +37,7 @@ util.inherits(PathFind, EventEmitter);
 PathFind.prototype.create = function () {
   var self = this;
 
-  var req = this.remote.request_path_find_create(this.src_account,
-                                                 this.dst_account,
-                                                 this.dst_amount,
-                                                 this.src_currencies,
-                                                 handleInitialPath);
+  var req = this.remote.request_path_find_create(this.path_options, handleInitialPath);
 
   function handleInitialPath(err, msg) {
     if (err) {

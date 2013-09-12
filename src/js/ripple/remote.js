@@ -1083,15 +1083,20 @@ Remote.prototype.account = function (accountID) {
 };
 
 Remote.prototype.path_find = function (src_account, dst_account, dst_amount, src_currencies) {
+  var options;
+
   if (typeof src_account === 'object') {
-    var options = src_account;
-    src_currencies = options.src_currencies;
-    dst_amount     = options.dst_amount;
-    dst_account    = options.dst_account;
-    src_account    = options.src_account;
+    options = src_account;
+  } else {
+    options = {
+      src_currencies : options.src_currencies,
+      dst_amount     : options.dst_amount,
+      dst_account    : options.dst_account || options.destination || options.to,
+      src_account    : options.src_account || options.source || options.from
+    }
   }
 
-  var path_find = new PathFind(this, src_account, dst_account, dst_amount, src_currencies);
+  var path_find = new PathFind(this, options);
 
   if (this._cur_path_find) {
     this._cur_path_find.notify_superceded();
@@ -1277,6 +1282,10 @@ Remote.prototype.request_ripple_balance = function (account, issuer, currency, l
 Remote.prepare_currencies = function(ci) {
   var ci_new  = { };
 
+  if (typeof ci === 'string') {
+    ci = { currency: ci }
+  }
+
   if (ci.hasOwnProperty('issuer')) {
     ci_new.issuer = UInt160.json_rewrite(ci.issuer);
   }
@@ -1292,10 +1301,10 @@ Remote.prototype.request_ripple_path_find = function (src_account, dst_account, 
   if (typeof src_account === 'object') {
     var options = src_account;
     callback       = dst_account;
-    src_currencies = options.src_currencies;
-    dst_amount     = options.dst_amount;
-    dst_account    = options.dst_account;
-    src_account    = options.src_account;
+    src_currencies = options.src_currencies || options.currencies;
+    dst_amount     = options.dst_amount || options.amount;
+    dst_account    = options.dst_account || options.destination || options.to;
+    src_account    = options.src_account || options.source || options.from;
   }
 
   var request = new Request(this, 'ripple_path_find');
@@ -1317,10 +1326,10 @@ Remote.prototype.request_path_find_create = function (src_account, dst_account, 
   if (typeof src_account === 'object') {
     var options = src_account;
     callback       = dst_account;
-    src_currencies = options.src_currencies;
-    dst_amount     = options.dst_amount;
-    dst_account    = options.dst_account;
-    src_account    = options.src_account;
+    src_currencies = options.src_currencies || options.currencies;
+    dst_amount     = options.dst_amount || options.amount;
+    dst_account    = options.dst_account || options.destination || options.to;
+    src_account    = options.src_account || options.source || options.from;
   }
 
   var request = new Request(this, 'path_find');
