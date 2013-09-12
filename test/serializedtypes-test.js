@@ -7,10 +7,6 @@ var BigInteger       = jsbn.BigInteger;
 
 var config = require('./testutils').get_config();
 
-
-
-
-
 describe('Serialized types', function() {
   describe('Int8', function() {
     it('Serialize 0', function () {
