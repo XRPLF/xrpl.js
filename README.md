@@ -59,3 +59,19 @@ remote.connect(function() {
 ```
 
 See [The `ripple-lib` Guides](docs/GUIDES.md) and [The `ripple-lib` API Reference](docs/REFERENCE.md) for walkthroughs and details about all of the available functions and options.
+
+##Running tests
+
+1. Clone the repository
+
+```
+git clone https://github.com/ripple/ripple-lib
+```
+
+2. `cd` into the repository and install dependencies with `npm install`
+
+3. `npm test` or `make test
+
+**Generating code coverage**
+
+ripple-lib uses `jscoverage` to generate code coverage. To generate a file `coverage.html`, run `make coverage`
