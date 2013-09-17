@@ -64,13 +64,9 @@ See [The `ripple-lib` Guides](docs/GUIDES.md) and [The `ripple-lib` API Referenc
 
 1. Clone the repository
 
-```
-git clone https://github.com/ripple/ripple-lib
-```
-
 2. `cd` into the repository and install dependencies with `npm install`
 
-3. `npm test` or `make test
+3. `npm test` or `make test`
 
 **Generating code coverage**
 
