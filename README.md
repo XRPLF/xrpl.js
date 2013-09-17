@@ -7,6 +7,7 @@
 1. Overview
 2. [Getting `ripple-lib`](README.md#getting-ripple-lib)
 3. [Quickstart](README.md#quickstart)
+4. [Running tests](https://github.com/ripple/ripple-lib#running-tests)
 
 ###For additional documentation see:
 
