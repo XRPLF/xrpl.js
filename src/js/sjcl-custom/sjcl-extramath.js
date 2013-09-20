@@ -45,8 +45,8 @@ sjcl.bn.prototype.div = function (that) {
 };
 
 sjcl.bn.prototype.sign = function () {
-      return this.greaterEquals(sjcl.bn.ZERO) ? 1 : -1;
-    };
+  return this.greaterEquals(sjcl.bn.ZERO) ? 1 : -1;
+};
 
 /** -this */
 sjcl.bn.prototype.neg = function () {
@@ -58,4 +58,80 @@ sjcl.bn.prototype.abs = function () {
   if (this.sign() === -1) {
     return this.neg();
   } else return this;
+};
+
+/** this >> that */
+sjcl.bn.prototype.shiftRight = function (that) {
+  if ("number" !== typeof that) {
+    throw new Error("shiftRight expects a number");
+  }
+
+  that = +that;
+
+  if (that < 0) {
+    return this.shiftLeft(that);
+  }
+
+  var a = new sjcl.bn(this);
+
+  while (that--) {
+    a.halveM();
+  }
+
+  return a;
+};
+
+/** this >> that */
+sjcl.bn.prototype.shiftLeft = function (that) {
+  if ("number" !== typeof that) {
+    throw new Error("shiftLeft expects a number");
+  }
+
+  that = +that;
+
+  if (that < 0) {
+    return this.shiftRight(that);
+  }
+
+  var a = new sjcl.bn(this);
+
+  while (that--) {
+    a.doubleM();
+  }
+
+  return a;
+};
+
+/** (int)this */
+// NOTE Truncates to 32-bit integer
+sjcl.bn.prototype.toNumber = function () {
+  return this.limbs[0] | 0;
+};
+
+/** find n-th bit, 0 = LSB */
+sjcl.bn.prototype.testBit = function (bitIndex) {
+  var limbIndex = Math.floor(bitIndex / this.radix);
+  var bitIndexInLimb = bitIndex % this.radix;
+
+  if (limbIndex >= this.limbs.length) return 0;
+
+  return (this.limbs[limbIndex] >>> bitIndexInLimb) & 1;
+};
+
+/** set n-th bit, 0 = LSB */
+sjcl.bn.prototype.setBitM = function (bitIndex) {
+  var limbIndex = Math.floor(bitIndex / this.radix);
+  var bitIndexInLimb = bitIndex % this.radix;
+
+  while (limbIndex >= this.limbs.length) this.limbs.push(0);
+
+  this.limbs[limbIndex] |= 1 << bitIndexInLimb;
+
+  this.cnormalize();
+
+  return this;
+};
+
+sjcl.bn.prototype.modInt = function (n) {
+  return this.toNumber() % n;
 };
