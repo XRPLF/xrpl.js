@@ -1,10 +1,8 @@
 var sjcl    = require('./utils').sjcl;
 var utils   = require('./utils');
-var jsbn    = require('./jsbn');
 var extend  = require('extend');
 
-var BigInteger = jsbn.BigInteger;
-var nbi        = jsbn.nbi;
+var BigInteger = utils.jsbn.BigInteger;
 
 var Base = {};
 
@@ -38,8 +36,8 @@ function sha256hash(bytes) {
 Base.encode = function (input, alpha) {
   var alphabet = alphabets[alpha || 'ripple'];
   var bi_base  = new BigInteger(String(alphabet.length));
-  var bi_q     = nbi();
-  var bi_r     = nbi();
+  var bi_q     = new BigInteger();
+  var bi_r     = new BigInteger();
   var bi_value = new BigInteger(input);
   var buffer   = [];
 
@@ -65,7 +63,7 @@ Base.decode = function (input, alpha) {
 
   var alphabet = alphabets[alpha || 'ripple'];
   var bi_base  = new BigInteger(String(alphabet.length));
-  var bi_value = nbi();
+  var bi_value = new BigInteger();
   var i;
 
   for (i = 0; i != input.length && input[i] === alphabet[0]; i += 1)
@@ -78,7 +76,7 @@ Base.decode = function (input, alpha) {
       return void(0);
     }
 
-    var r = nbi();
+    var r = new BigInteger();
     r.fromInt(v);
     bi_value  = bi_value.multiply(bi_base).add(r);
   }

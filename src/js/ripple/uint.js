@@ -1,10 +1,8 @@
-var sjcl    = require('./utils').sjcl;
 var utils   = require('./utils');
+var sjcl    = utils.sjcl;
 var config  = require('./config');
-var jsbn    = require('./jsbn');
 
-var BigInteger = jsbn.BigInteger;
-var nbi        = jsbn.nbi;
+var BigInteger = utils.jsbn.BigInteger;
 
 var Base = require('./base').Base;
 
@@ -116,7 +114,7 @@ UInt.prototype.parse_generic = function (j) {
   case this.constructor.STR_ZERO:
   case this.constructor.ACCOUNT_ZERO:
   case this.constructor.HEX_ZERO:
-    this._value  = nbi();
+    this._value  = BigInteger.valueOf();
     break;
 
   case "1":

@@ -1,11 +1,9 @@
 var sjcl    = require('./utils').sjcl;
 var utils   = require('./utils');
 var config  = require('./config');
-var jsbn    = require('./jsbn');
 var extend  = require('extend');
 
-var BigInteger = jsbn.BigInteger;
-var nbi        = jsbn.nbi;
+var BigInteger = utils.jsbn.BigInteger;
 
 var UInt = require('./uint').UInt;
 var Base = require('./base').Base;

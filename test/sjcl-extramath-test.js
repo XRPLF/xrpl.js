@@ -21,17 +21,30 @@ describe('SJCL Extramath', function() {
     });
   });
   describe('testBit', function() {
-    it('0x03 test bit 0 => 1', function () {
+    it('0x03', function () {
       var val = new sjcl.bn("03");
       assert.strictEqual(val.testBit(0), 1);
-    });
-    it('0x03 test bit 1 => 1', function () {
-      var val = new sjcl.bn("03");
       assert.strictEqual(val.testBit(1), 1);
-    });
-    it('0x03 test bit 2 => 0', function () {
-      var val = new sjcl.bn("03");
       assert.strictEqual(val.testBit(2), 0);
+    });
+    it('0x1000000', function () {
+      var val = new sjcl.bn("1000000");
+      assert.strictEqual(val.testBit(25), 0);
+      assert.strictEqual(val.testBit(24), 1);
+      assert.strictEqual(val.testBit(23), 0);
+      assert.strictEqual(val.testBit( 1), 0);
+      assert.strictEqual(val.testBit( 0), 0);
+    });
+    it('0xff7fffffff', function () {
+      var val = new sjcl.bn("ff7fffffff");
+      assert.strictEqual(val.testBit(32), 1);
+      assert.strictEqual(val.testBit(31), 0);
+      assert.strictEqual(val.testBit(30), 1);
+      assert.strictEqual(val.testBit(24), 1);
+      assert.strictEqual(val.testBit(23), 1);
+      assert.strictEqual(val.testBit(22), 1);
+      assert.strictEqual(val.testBit( 1), 1);
+      assert.strictEqual(val.testBit( 0), 1);
     });
   });
 });

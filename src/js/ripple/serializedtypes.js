@@ -8,7 +8,7 @@
 
 var extend   = require('extend');
 var utils    = require('./utils');
-var sjcl     = require('./utils').sjcl;
+var sjcl     = utils.sjcl;
 
 var amount   = require('./amount');
 var UInt128  = require('./uint128').UInt128;
@@ -21,8 +21,7 @@ var Currency = amount.Currency;
 var hex    = sjcl.codec.hex;
 var bytes  = sjcl.codec.bytes;
 
-var jsbn    = require('./jsbn');
-var BigInteger = jsbn.BigInteger;
+var BigInteger = utils.jsbn.BigInteger;
 
 var SerializedType = function (methods) {
   extend(this, methods);

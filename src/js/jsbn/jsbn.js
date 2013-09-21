@@ -1,15 +1,8 @@
-// Derived from Tom Wu's jsbn code.
-//
-// Changes made for clean up and to package as a node.js module.
-
-// Copyright (c) 2005-2009  Tom Wu
+// Copyright (c) 2005  Tom Wu
 // All Rights Reserved.
 // See "LICENSE" for details.
 
 // Basic JavaScript BN library - subset useful for RSA encryption.
-// Extended JavaScript BN functions, required for RSA private ops.
-// Version 1.1: new BigInteger("0", 10) returns "proper" zero
-// Version 1.2: square() API, isProbablePrime fix
 
 // Bits per digit
 var dbits;
@@ -19,15 +12,15 @@ var canary = 0xdeadbeefcafe;
 var j_lm = ((canary&0xffffff)==0xefcafe);
 
 // (public) Constructor
-var BigInteger = function BigInteger(a,b,c) {
+function BigInteger(a,b,c) {
   if(a != null)
     if("number" == typeof a) this.fromNumber(a,b,c);
     else if(b == null && "string" != typeof a) this.fromString(a,256);
     else this.fromString(a,b);
-};
+}
 
 // return new, unset BigInteger
-var nbi	= function nbi() { return new BigInteger(null); };
+function nbi() { return new BigInteger(null); }
 
 // am: Compute w_j += (x*this_i), propagate carries,
 // c is initial carry, returns final carry.
@@ -74,7 +67,6 @@ function am3(i,x,w,j,c,n) {
   }
   return c;
 }
-
 if(j_lm && 'undefined' !== typeof navigator && (navigator.appName == "Microsoft Internet Explorer")) {
   BigInteger.prototype.am = am2;
   dbits = 30;
@@ -126,7 +118,7 @@ function bnpFromInt(x) {
   this.t = 1;
   this.s = (x<0)?-1:0;
   if(x > 0) this[0] = x;
-  else if(x < -1) this[0] = x+DV;
+  else if(x < -1) this[0] = x+this.DV;
   else this.t = 0;
 }
 
@@ -1122,6 +1114,7 @@ function bnpMillerRabin(t) {
   return true;
 }
 
+
 // protected
 BigInteger.prototype.chunkSize = bnpChunkSize;
 BigInteger.prototype.toRadix = bnpToRadix;
@@ -1137,7 +1130,31 @@ BigInteger.prototype.multiplyUpperTo = bnpMultiplyUpperTo;
 BigInteger.prototype.modInt = bnpModInt;
 BigInteger.prototype.millerRabin = bnpMillerRabin;
 
+BigInteger.prototype.copyTo = bnpCopyTo;
+BigInteger.prototype.fromInt = bnpFromInt;
+BigInteger.prototype.fromString = bnpFromString;
+BigInteger.prototype.clamp = bnpClamp;
+BigInteger.prototype.dlShiftTo = bnpDLShiftTo;
+BigInteger.prototype.drShiftTo = bnpDRShiftTo;
+BigInteger.prototype.lShiftTo = bnpLShiftTo;
+BigInteger.prototype.rShiftTo = bnpRShiftTo;
+BigInteger.prototype.subTo = bnpSubTo;
+BigInteger.prototype.multiplyTo = bnpMultiplyTo;
+BigInteger.prototype.squareTo = bnpSquareTo;
+BigInteger.prototype.divRemTo = bnpDivRemTo;
+BigInteger.prototype.invDigit = bnpInvDigit;
+BigInteger.prototype.isEven = bnpIsEven;
+BigInteger.prototype.exp = bnpExp;
+
 // public
+BigInteger.prototype.toString = bnToString;
+BigInteger.prototype.negate = bnNegate;
+BigInteger.prototype.abs = bnAbs;
+BigInteger.prototype.compareTo = bnCompareTo;
+BigInteger.prototype.bitLength = bnBitLength;
+BigInteger.prototype.mod = bnMod;
+BigInteger.prototype.modPowInt = bnModPowInt;
+
 BigInteger.prototype.clone = bnClone;
 BigInteger.prototype.intValue = bnIntValue;
 BigInteger.prototype.byteValue = bnByteValue;
@@ -1175,6 +1192,10 @@ BigInteger.prototype.isProbablePrime = bnIsProbablePrime;
 // JSBN-specific extension
 BigInteger.prototype.square = bnSquare;
 
+// "constants"
+BigInteger.ZERO = nbv(0);
+BigInteger.ONE = nbv(1);
+
 // BigInteger interfaces not implemented in jsbn:
 
 // BigInteger(int signum, byte[] magnitude)
@@ -1183,37 +1204,7 @@ BigInteger.prototype.square = bnSquare;
 // int hashCode()
 // long longValue()
 // static BigInteger valueOf(long val)
-// protected
-BigInteger.prototype.copyTo = bnpCopyTo;
-BigInteger.prototype.fromInt = bnpFromInt;
-BigInteger.prototype.fromString = bnpFromString;
-BigInteger.prototype.clamp = bnpClamp;
-BigInteger.prototype.dlShiftTo = bnpDLShiftTo;
-BigInteger.prototype.drShiftTo = bnpDRShiftTo;
-BigInteger.prototype.lShiftTo = bnpLShiftTo;
-BigInteger.prototype.rShiftTo = bnpRShiftTo;
-BigInteger.prototype.subTo = bnpSubTo;
-BigInteger.prototype.multiplyTo = bnpMultiplyTo;
-BigInteger.prototype.squareTo = bnpSquareTo;
-BigInteger.prototype.divRemTo = bnpDivRemTo;
-BigInteger.prototype.invDigit = bnpInvDigit;
-BigInteger.prototype.isEven = bnpIsEven;
-BigInteger.prototype.exp = bnpExp;
 
-// public
-BigInteger.prototype.toString = bnToString;
-BigInteger.prototype.negate = bnNegate;
-BigInteger.prototype.abs = bnAbs;
-BigInteger.prototype.compareTo = bnCompareTo;
-BigInteger.prototype.bitLength = bnBitLength;
-BigInteger.prototype.mod = bnMod;
-BigInteger.prototype.modPowInt = bnModPowInt;
+BigInteger.valueOf = nbi;
 
-// "constants"
-BigInteger.ZERO = nbv(0);
-BigInteger.ONE = nbv(1);
-
-exports.nbi	    = nbi;
-exports.BigInteger  = BigInteger;
-
-// vim:sw=2:sts=2:ts=8:et
+exports.BigInteger = BigInteger;

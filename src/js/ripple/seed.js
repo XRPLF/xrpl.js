@@ -2,12 +2,11 @@
 // Seed support
 //
 
-var sjcl    = require('./utils').sjcl;
 var utils   = require('./utils');
-var jsbn    = require('./jsbn');
+var sjcl    = utils.sjcl;
 var extend  = require('extend');
 
-var BigInteger = jsbn.BigInteger;
+var BigInteger = utils.jsbn.BigInteger;
 
 var Base    = require('./base').Base;
 var UInt    = require('./uint').UInt;

@@ -5,9 +5,7 @@ var utils = require('./utils');
 var sjcl  = utils.sjcl;
 var bn    = sjcl.bn;
 
-var jsbn  = require('./jsbn');
-
-var BigInteger = jsbn.BigInteger;
+var BigInteger = utils.jsbn.BigInteger;
 
 var UInt160  = require('./uint160').UInt160;
 var Seed     = require('./seed').Seed;

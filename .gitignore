@@ -40,4 +40,5 @@ test/config.js
 
 # Ignore coverage files
 /lib-cov
+/src-cov
 /coverage.html

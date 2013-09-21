@@ -141,10 +141,9 @@ exports.assert        = assert;
 exports.arrayUnique   = arrayUnique;
 exports.toTimestamp   = toTimestamp;
 
-try {
-  exports.sjcl = require('../build/sjcl');
-} catch(e) {
-  exports.sjcl = require('../../../build/sjcl');
-}
+// Going up three levels is needed to escape the src-cov folder used for the
+// test coverage stuff.
+exports.sjcl = require('../../../build/sjcl');
+exports.jsbn = require('../../../src/js/jsbn/jsbn');
 
 // vim:sw=2:sts=2:ts=8:et

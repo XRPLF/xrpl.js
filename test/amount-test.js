@@ -1,7 +1,6 @@
 var assert     = require('assert');
 var utils      = require('./testutils');
-var jsbn       = utils.load_module('jsbn');
-var BigInteger = jsbn.BigInteger;
+var BigInteger = require('../src/js/jsbn/jsbn').BigInteger;
 var Amount     = utils.load_module('amount').Amount;
 var UInt160    = utils.load_module('uint160').UInt160;
 var config     = utils.get_config();
@@ -34,7 +33,7 @@ describe('Amount', function() {
   });
   describe('UInt160', function() {
     it('Parse 0', function () {
-      assert.deepEqual(jsbn.nbi(), UInt160.from_generic('0')._value);
+      assert.deepEqual(new BigInteger(), UInt160.from_generic('0')._value);
     });
     it('Parse 0 export', function () {
       assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_generic('0').to_json());
@@ -49,6 +48,7 @@ describe('Amount', function() {
       assert.strictEqual(UInt160.ACCOUNT_ONE, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrBZbvji').to_json());
     });
     it('Parse mtgox export', function () {
+      console.log(UInt160.from_json('mtgox').to_json());
       assert.strictEqual(config.accounts['mtgox'].account, UInt160.from_json('mtgox').to_json());
     });
     it('is_valid rrrrrrrrrrrrrrrrrrrrrhoLvTp', function () {

@@ -14,11 +14,11 @@ function get_config() {
 exports.load_config = load_config;
 
 function load_config(config) {
-  return( require('../src/js/ripple/config')).load(config);
+  return load_module('config').load(config);
 }
 
 exports.load_module = load_module;
 
 function load_module(name) {
-  return require((process.env.RIPPLE_LIB_COV ? '../lib-cov/' : '../src/js/ripple/') + name);
+  return require((process.env.RIPPLE_LIB_COV ? '../src-cov/js/ripple/' : '../src/js/ripple/') + name);
 }

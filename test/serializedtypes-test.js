@@ -2,8 +2,7 @@ var utils            = require('./testutils');
 var assert           = require('assert');
 var SerializedObject = utils.load_module('serializedobject').SerializedObject;
 var types            = utils.load_module('serializedtypes');
-var jsbn             = utils.load_module('jsbn');
-var BigInteger       = jsbn.BigInteger;
+var BigInteger       = require('../src/js/jsbn/jsbn').BigInteger;
 
 var config = require('./testutils').get_config();
 
