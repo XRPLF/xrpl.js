@@ -39,6 +39,7 @@ module.exports = function(grunt) {
           "src/js/sjcl-custom/sjcl-secp256k1.js",
           "src/js/sjcl-custom/sjcl-ripemd160.js",
           "src/js/sjcl-custom/sjcl-extramath.js",
+          "src/js/sjcl-custom/sjcl-montgomery.js",
           "src/js/sjcl-custom/sjcl-validecc.js",
           "src/js/sjcl-custom/sjcl-ecdsa-der.js",
           "src/js/sjcl-custom/sjcl-jacobi.js"

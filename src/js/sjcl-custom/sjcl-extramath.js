@@ -6,11 +6,9 @@ sjcl.bn.prototype.divRem = function (that) {
   var thisa = this.abs(), thata = that.abs(), quot = new this._class(0),
       ci = 0;
   if (!thisa.greaterEquals(thata)) {
-    this.initWith(0);
-    return this;
+    return [new sjcl.bn(0), this.copy()];
   } else if (thisa.equals(thata)) {
-    this.initWith(1);
-    return this;
+    return [new sjcl.bn(1), new sjcl.bn(0)];
   }
 
   for (; thisa.greaterEquals(thata); ci++) {
@@ -74,6 +72,11 @@ sjcl.bn.prototype.shiftRight = function (that) {
 
   var a = new sjcl.bn(this);
 
+  while (that >= this.radix) {
+    a.limbs.shift();
+    that -= this.radix;
+  }
+
   while (that--) {
     a.halveM();
   }
@@ -94,6 +97,11 @@ sjcl.bn.prototype.shiftLeft = function (that) {
   }
 
   var a = new sjcl.bn(this);
+
+  while (that >= this.radix) {
+    a.limbs.unshift(0);
+    that -= this.radix;
+  }
 
   while (that--) {
     a.doubleM();
