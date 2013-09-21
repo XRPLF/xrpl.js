@@ -48,7 +48,6 @@ describe('Amount', function() {
       assert.strictEqual(UInt160.ACCOUNT_ONE, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrBZbvji').to_json());
     });
     it('Parse mtgox export', function () {
-      console.log(UInt160.from_json('mtgox').to_json());
       assert.strictEqual(config.accounts['mtgox'].account, UInt160.from_json('mtgox').to_json());
     });
     it('is_valid rrrrrrrrrrrrrrrrrrrrrhoLvTp', function () {
