@@ -68,10 +68,9 @@ Montgomery.prototype.reduce = function (x)
     while (x.limbs[j] >= radixMod) { x.limbs[j] -= radixMod; x.limbs[++j]++; }
   }
   x.trim();
-  x.fullReduce();
   x = x.shiftRight(this.mt * this.m.radix);
   if (x.greaterEquals(this.m)) x = x.sub(this.m);
-  return x;
+  return x.trim().normalize().reduce();
 };
 
 Montgomery.prototype.square = function (x)
@@ -112,6 +111,8 @@ sjcl.bn.prototype.powermodMontgomery = function (e, m)
   }
 
   var z = new Montgomery(m);
+
+  e.trim().normalize();
 
   // precomputation
   var g = new Array(), n = 3, k1 = k-1, km = (1<<k)-1;
