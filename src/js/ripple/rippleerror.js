@@ -16,7 +16,11 @@ function RippleError(code, message) {
   this.result_message = this.result_message || this.error_message || 'Error';
   this.message = this.result_message;
 
-  Error.captureStackTrace(this, code || this);
+  var stack;
+  if (!!Error.captureStackTrace)
+    Error.captureStackTrace(this, code || this);
+  else if (stack = new Error().stack)
+    this.stack = stack;
 }
 
 util.inherits(RippleError, Error);
