@@ -597,7 +597,7 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
 
     default:
       //DEPRECATED
-      console.log('request_ledger: full parameter is deprecated');
+      this._trace('request_ledger: full parameter is deprecated');
       request.message.full = true;
       break;
   }
