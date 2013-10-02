@@ -198,6 +198,20 @@ Return a request to get a ripple balance
 
 Return the offers for an order book as one or more pages.
 
+```js
+var request = remote.request_book_offers({
+  gets: {
+    'currency':'XRP'
+  },
+  pays: {
+    'currency':'USD',
+    'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+  }
+});
+
+request.request();
+```
+
 
 
 
