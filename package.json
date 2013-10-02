@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.7.23",
+  "version": "0.7.26",
   "description": "Ripple JavaScript client library",
   "files": [
     "src/js/*",
