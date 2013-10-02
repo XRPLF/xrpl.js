@@ -206,10 +206,11 @@ Transaction.prototype.signing_hash = function () {
 
 Transaction.prototype.sign = function () {
   var seed = Seed.from_json(this._secret);
-  var hash = this.signing_hash();
 
-  var previously_signed = this.tx_json.TxnSignature
-    && hash === this._previous_signing_hash;
+  delete this.tx_json.TxnSignature;
+
+  var hash = this.signing_hash();
+  var previously_signed = this.tx_json.TxnSignature && hash === this._previous_signing_hash;
 
   if (previously_signed) return;
 

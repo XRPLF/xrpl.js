@@ -21,7 +21,6 @@ function TransactionManager(account) {
   this._next_sequence = void(0);
   this._cache         = { };
 
-  //XX Fee units
   this._max_fee = this.remote.max_fee;
 
   this._submission_timeout = this.remote._submission_timeout;
@@ -31,19 +30,18 @@ function TransactionManager(account) {
       sequence_loaded(err, sequence);
       self._resubmit(3);
     });
-  }
+  };
 
   function remote_disconnected() {
     self.remote.once('connect', remote_reconnected);
-  }
+  };
 
   this.remote.on('disconnect', remote_disconnected);
 
   function sequence_loaded(err, sequence, callback) {
     self._next_sequence = sequence;
     self.emit('sequence_loaded', sequence);
-    callback && callback();
-  }
+  };
 
   this.account.get_next_sequence(sequence_loaded);
 
@@ -56,7 +54,7 @@ function TransactionManager(account) {
         pending.emit('fee_adjusted', old_fee, new_fee);
       }
     });
-  }
+  };
 
   this.remote.on('load_changed', adjust_fees);
 
@@ -79,7 +77,7 @@ function TransactionManager(account) {
     } else {
       self._cache[hash] = transaction;
     }
-  }
+  };
 
   this.account.on('transaction-outbound', cache_transaction);
 
@@ -97,7 +95,7 @@ function TransactionManager(account) {
           break;
       }
     });
-  }
+  };
 
   this.remote.on('ledger_closed', update_pending_status);
 };
@@ -166,7 +164,7 @@ TransactionManager.prototype._resubmit = function(wait_ledgers) {
         } else {
           pending.emit('success', rewrite_transaction(res));
         }
-      }
+      };
     }
   }
 };
@@ -180,10 +178,10 @@ TransactionManager.prototype._wait_ledgers = function(ledgers, callback) {
       callback();
       self.remote.removeListener('ledger_closed', ledger_closed);
     }
-  }
+  };
 
   this.remote.on('ledger_closed', ledger_closed);
-}
+};
 
 TransactionManager.prototype._request = function(tx) {
   var self   = this;
@@ -216,7 +214,7 @@ TransactionManager.prototype._request = function(tx) {
       // If server is honest, don't expect a final if rejected.
       rejected:               tx.isRejected(message.engine_result_code),
     });
-  }
+  };
 
   function transaction_failed(message) {
     function transaction_requested(err, res) {
@@ -226,10 +224,10 @@ TransactionManager.prototype._request = function(tx) {
         //XX
         tx.emit('error', new RippleError(message));
       }
-    }
+    };
 
     self.remote.request_tx(tx.hash, transaction_requested);
-  }
+  };
 
   function transaction_retry(message) {
     switch (message.engine_result) {
@@ -239,7 +237,7 @@ TransactionManager.prototype._request = function(tx) {
       default:
         submission_error(new RippleError(message));
     }
-  }
+  };
 
   function submission_error(error) {
     if (self._is_too_busy(error)) {
@@ -251,7 +249,7 @@ TransactionManager.prototype._request = function(tx) {
       tx.emit('submitted', error);
       tx.emit('error', new RippleError(error));
     }
-  }
+  };
 
   function submission_success(message) {
     if (!tx.hash) {
@@ -279,7 +277,7 @@ TransactionManager.prototype._request = function(tx) {
       default:
         submission_error(message);
     }
-  }
+  };
 
   submit_request.once('success', submission_success);
   submit_request.once('error', submission_error);
@@ -343,7 +341,7 @@ TransactionManager.prototype.submit = function(tx) {
       tx.finalized = true;
       tx.emit('final', message);
     }
-  }
+  };
 
   tx.on('error', finalize);
   tx.once('success', finalize);
