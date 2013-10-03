@@ -873,13 +873,6 @@ Remote.prototype.request_tx_history = function (start, callback) {
 };
 
 Remote.prototype.request_book_offers = function (gets, pays, taker, callback) {
-  if (typeof gets === 'object') {
-    var options = gets;
-    taker = options.taker;
-    pays  = options.pays;
-    gets  = options.gets;
-  }
-
   var request = new Request(this, 'book_offers');
 
   request.message.taker_gets = {
