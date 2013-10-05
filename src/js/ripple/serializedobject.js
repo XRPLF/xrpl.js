@@ -3,6 +3,7 @@ var sjcl      = require('./utils').sjcl;
 var extend    = require('extend');
 var stypes    = require('./serializedtypes');
 var UInt256   = require('./uint256').UInt256;
+var assert    = require('assert');
 
 var TRANSACTION_TYPES = {
   0:    'Payment',
@@ -51,6 +52,12 @@ var TRANSACTION_RESULTS = {
   131:  'tecNO_REGULAR_KEY',
   132:  'tecOWNERS'
 };
+
+var TX_ID_MAP = { };
+
+Object.keys(binformat.tx).forEach(function(key) {
+  TX_ID_MAP[key[0]] = key;
+});
 
 function SerializedObject(buf) {
   if (Array.isArray(buf) || (Buffer && Buffer.isBuffer(buf)) ) {
@@ -152,7 +159,7 @@ SerializedObject.prototype.to_json = function() {
     var key_and_value = stypes.parse_whatever(this);
     var key = key_and_value[0];
     var value = key_and_value[1];
-    output[key] = jsonify_structure(value, key);
+    output[key] = SerializedObject.jsonify_structure(value, key);
   }
 
   this.pointer = old_pointer;
@@ -160,7 +167,7 @@ SerializedObject.prototype.to_json = function() {
   return output;
 }
 
-function jsonify_structure(structure, field_name) {
+SerializedObject.jsonify_structure = function(structure, field_name) {
   var output;
 
   switch (typeof structure) {
@@ -188,7 +195,7 @@ function jsonify_structure(structure, field_name) {
         var keys = Object.keys(structure);
         for (var i=0, l=keys.length; i<l; i++) {
           var key = keys[i];
-          output[key] = jsonify_structure(structure[key], key);
+          output[key] = SerializedObject.jsonify_structure(structure[key], key);
         }
       }
       break;
@@ -199,11 +206,9 @@ function jsonify_structure(structure, field_name) {
   return output;
 };
 
-SerializedObject.jsonify_structure = jsonify_structure; //So that we can access it from elsewhere.
-
 SerializedObject.prototype.serialize = function (typedef, obj) {
   // Ensure canonical order
-  var typedef = SerializedObject._sort_typedef(typedef);
+  var typedef = SerializedObject.sort_typedef(typedef);
 
   // Serialize fields
   for (var i=0, l=typedef.length; i<l; i++) {
@@ -262,28 +267,20 @@ SerializedObject.get_field_header = function (type_id, field_id) {
   return buffer;
 };
 
-function sort_field_compare(a, b) {
-  // Sort by type id first, then by field id
-  return a[3].id !== b[3].id ? a[3].id - b[3].id : a[2] - b[2];
-};
+SerializedObject.sort_typedef = function (typedef) {
+  assert(Array.isArray(typedef));
 
-SerializedObject._sort_typedef = function (typedef) {
+  function sort_field_compare(a, b) {
+    // Sort by type id first, then by field id
+    return a[3].id !== b[3].id ? a[3].id - b[3].id : a[2] - b[2];
+  };
+
   return typedef.sort(sort_field_compare);
 };
 
 SerializedObject.lookup_type_tx = function (id) {
-  var keys = Object.keys(binformat.tx);
-  var result = null;
-
-  for (var i=0, l=keys.length; i<l; i++) {
-    var key = keys[i];
-    if (binformat.tx[key][0] === id) {
-      result = key;
-      break;
-    }
-  }
-
-  return result;
+  assert(typeof id === 'string');
+  return TX_ID_MAP[id];
 };
 
 exports.SerializedObject = SerializedObject;
