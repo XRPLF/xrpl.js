@@ -20,9 +20,7 @@ function TransactionManager(account) {
   this._pending       = new Queue;
   this._next_sequence = void(0);
   this._cache         = { };
-
   this._max_fee = this.remote.max_fee;
-
   this._submission_timeout = this.remote._submission_timeout;
 
   function remote_reconnected() {
@@ -38,7 +36,7 @@ function TransactionManager(account) {
 
   this.remote.on('disconnect', remote_disconnected);
 
-  function sequence_loaded(err, sequence, callback) {
+  function sequence_loaded(err, sequence) {
     self._next_sequence = sequence;
     self.emit('sequence_loaded', sequence);
   };
@@ -102,30 +100,6 @@ function TransactionManager(account) {
 
 util.inherits(TransactionManager, EventEmitter);
 
-// request_tx presents transactions in
-// a format slightly different from
-// request_transaction_entry
-function rewrite_transaction(tx) {
-  try {
-    var result = {
-      ledger_index: tx.ledger_index,
-      metadata: tx.meta,
-      tx_json: {
-        Account:          tx.Account,
-        Amount:           tx.Amount,
-        Destination:      tx.Destination,
-        Fee:              tx.Fee,
-        Flags:            tx.Flags,
-        Sequence:         tx.Sequence,
-        SigningPubKey:    tx.SigningPubKey,
-        TransactionType:  tx.TransactionType,
-        hash:             tx.hash
-      }
-    }
-  } catch(exception) { }
-  return result || { };
-};
-
 TransactionManager.prototype._resubmit = function(wait_ledgers) {
   var self = this;
 
@@ -146,25 +120,12 @@ TransactionManager.prototype._resubmit = function(wait_ledgers) {
 
     pending.emit('resubmit');
 
-    if (!pending.hash) {
-      self._request(pending);
-    } else if (self._cache[pending.hash]) {
+    if (self._cache[pending.hash]) {
       var cached = self._cache[pending.hash];
       pending.emit('success', cached);
       delete self._cache[pending.hash];
     } else {
-      // Transaction was successfully submitted, and
-      // its hash discovered, but not validated
-      self.remote.request_tx(pending.hash, pending_check);
-
-      function pending_check(err, res) {
-        if (self._is_not_found(err)) {
-          //XX
-          self._request(pending);
-        } else {
-          pending.emit('success', rewrite_transaction(res));
-        }
-      };
+      self._request(pending);
     }
   }
 };
@@ -217,16 +178,21 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   function transaction_failed(message) {
-    function transaction_requested(err, res) {
-      if (self._is_not_found(err)) {
-        self._resubmit(1);
-      } else {
-        //XX
-        tx.emit('error', new RippleError(message));
-      }
-    };
-
-    self.remote.request_tx(tx.hash, transaction_requested);
+    switch (message.engine_result) {
+      case 'tefPAST_SEQ':
+        self.remote.request_tx(tx.hash, transaction_requested);
+        function transaction_requested(err, res) {
+          if (self._is_not_found(err)) {
+            self._resubmit(1);
+          } else {
+            //XX
+            tx.emit('error', new RippleError(message));
+          }
+        };
+      break;
+      default:
+        tx.emit('error', message);
+    }
   };
 
   function transaction_retry(message) {
@@ -260,7 +226,15 @@ TransactionManager.prototype._request = function(tx) {
 
     tx.emit('submitted', message);
 
-    switch (message.result.slice(0, 3)) {
+    var prefix = message.result.slice(0, 3);
+
+    if (prefix !== 'tes') {
+      //Pause subsequent submissions until
+      //the sequence number has been reset
+      self._next_sequence = void(0);
+    }
+
+    switch (prefix) {
       case 'tec':
         tx.emit('error', message);
         break;
@@ -268,7 +242,6 @@ TransactionManager.prototype._request = function(tx) {
         transaction_proposed(message);
         break;
       case 'tef':
-        //tefPAST_SEQ
         transaction_failed(message);
         break;
       case 'ter':
@@ -321,10 +294,11 @@ TransactionManager.prototype.submit = function(tx) {
 
   // If sequence number is not yet known, defer until it is.
   if (!this._next_sequence) {
-    function resubmit_transaction() {
+    function sequence_loaded(err, sequence) {
+      self._next_sequence = sequence;
       self.submit(tx);
-    }
-    this.once('sequence_loaded', resubmit_transaction);
+    };
+    self.account.get_next_sequence(sequence_loaded);
     return;
   }
 
@@ -336,7 +310,6 @@ TransactionManager.prototype.submit = function(tx) {
 
   function finalize(message) {
     if (!tx.finalized) {
-      //XX
       self._pending.removeSequence(tx.tx_json.Sequence);
       tx.finalized = true;
       tx.emit('final', message);
