@@ -2,8 +2,55 @@ var binformat = require('./binformat');
 var sjcl      = require('./utils').sjcl;
 var extend    = require('extend');
 var stypes    = require('./serializedtypes');
+var UInt256   = require('./uint256').UInt256;
 
-var UInt256 = require('./uint256').UInt256;
+var TRANSACTION_TYPES = {
+  0:    'Payment',
+  3:    'AccountSet',
+  5:    'SetRegularKey',
+  7:    'OfferCreate',
+  8:    'OfferCancel',
+  9:    'Contract',
+  10:   'RemoveContract',
+  20:   'TrustSet',
+  100:  'EnableFeature',
+  101:  'SetFee'
+};
+
+var LEDGER_ENTRY_TYPES = {
+  97:   'AccountRoot',
+  99:   'Contract',
+  100:  'DirectoryNode',
+  102:  'Features',
+  103:  'GeneratorMap',
+  104:  'LedgerHashes',
+  110:  'Nickname',
+  111:  'Offer',
+  114:  'RippleState',
+  115:  'FeeSettings'
+};
+
+var TRANSACTION_RESULTS = {
+  0  :  'tesSUCCESS',
+  100:  'tecCLAIM',
+  101:  'tecPATH_PARTIAL',
+  102:  'tecUNFUNDED_ADD',
+  103:  'tecUNFUNDED_OFFER',
+  104:  'tecUNFUNDED_PAYMENT',
+  105:  'tecFAILED_PROCESSING',
+  121:  'tecDIR_FULL',
+  122:  'tecINSUF_RESERVE_LINE',
+  123:  'tecINSUF_RESERVE_OFFER',
+  124:  'tecNO_DST',
+  125:  'tecNO_DST_INSUF_XRP',
+  126:  'tecNO_LINE_INSUF_RESERVE',
+  127:  'tecNO_LINE_REDUNDANT',
+  128:  'tecPATH_DRY',
+  129:  'tecUNFUNDED', // Deprecated, old ambiguous unfunded.
+  130:  'tecMASTER_DISABLED',
+  131:  'tecNO_REGULAR_KEY',
+  132:  'tecOWNERS'
+};
 
 function SerializedObject(buf) {
   if (Array.isArray(buf) || (Buffer && Buffer.isBuffer(buf)) ) {
@@ -85,6 +132,7 @@ function readOrPeek(advance) {
 };
 
 SerializedObject.prototype.read = readOrPeek(true);
+
 SerializedObject.prototype.peek = readOrPeek(false);
 
 SerializedObject.prototype.to_bits = function () {
@@ -93,54 +141,6 @@ SerializedObject.prototype.to_bits = function () {
 
 SerializedObject.prototype.to_hex = function () {
   return sjcl.codec.hex.fromBits(this.to_bits()).toUpperCase();
-};
-
-var TRANSACTION_TYPES = {
-  0:    'Payment',
-  3:    'AccountSet',
-  5:    'SetRegularKey',
-  7:    'OfferCreate',
-  8:    'OfferCancel',
-  9:    'Contract',
-  10:   'RemoveContract',
-  20:   'TrustSet',
-  100:  'EnableFeature',
-  101:  'SetFee'
-};
-
-var LEDGER_ENTRY_TYPES = {
-  97:   'AccountRoot',
-  99:   'Contract',
-  100:  'DirectoryNode',
-  102:  'Features',
-  103:  'GeneratorMap',
-  104:  'LedgerHashes',
-  110:  'Nickname',
-  111:  'Offer',
-  114:  'RippleState',
-  115:  'FeeSettings'
-};
-
-var TRANSACTION_RESULTS = {
-  0  :  'tesSUCCESS',
-  100:  'tecCLAIM',
-  101:  'tecPATH_PARTIAL',
-  102:  'tecUNFUNDED_ADD',
-  103:  'tecUNFUNDED_OFFER',
-  104:  'tecUNFUNDED_PAYMENT',
-  105:  'tecFAILED_PROCESSING',
-  121:  'tecDIR_FULL',
-  122:  'tecINSUF_RESERVE_LINE',
-  123:  'tecINSUF_RESERVE_OFFER',
-  124:  'tecNO_DST',
-  125:  'tecNO_DST_INSUF_XRP',
-  126:  'tecNO_LINE_INSUF_RESERVE',
-  127:  'tecNO_LINE_REDUNDANT',
-  128:  'tecPATH_DRY',
-  129:  'tecUNFUNDED', // Deprecated, old ambiguous unfunded.
-  130:  'tecMASTER_DISABLED',
-  131:  'tecNO_REGULAR_KEY',
-  132:  'tecOWNERS'
 };
 
 SerializedObject.prototype.to_json = function() {
