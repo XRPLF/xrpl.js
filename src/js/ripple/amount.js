@@ -290,16 +290,14 @@ Amount.prototype.divide = function (d) {
   if (d.is_zero()) {
     throw 'divide by zero';
   }
-  else if (this.is_zero()) {
+
+  if (this.is_zero()) {
     result = this;
-  }
-  else if (!this.is_valid()) {
+  } else if (!this.is_valid()) {
     throw new Error('Invalid dividend');
-  }
-  else if (!d.is_valid()) {
+  } else if (!d.is_valid()) {
     throw new Error('Invalid divisor');
-  }
-  else {
+  } else {
     var _n = this;
 
     if (_n.is_native()) {
@@ -863,8 +861,8 @@ Amount.prototype.to_human = function (opts) {
 
   var order         = this._is_native ? consts.xns_precision : -this._offset;
   var denominator   = consts.bi_10.clone().pow(order);
-  var int_part      = this._value.divide(denominator).toString(10);
-  var fraction_part = this._value.mod(denominator).toString(10);
+  var int_part      = this._value.divide(denominator).toString();
+  var fraction_part = this._value.mod(denominator).toString();
 
   // Add leading zeros to fraction
   while (fraction_part.length < order) {
@@ -877,6 +875,9 @@ Amount.prototype.to_human = function (opts) {
   if (fraction_part.length || !opts.skip_empty_fraction) {
     // Enforce the maximum number of decimal digits (precision)
     if (typeof opts.precision === 'number') {
+      if (opts.precision === 0 && Number(fraction_part[0]) >= 5)  {
+        int_part = String(Number(int_part) + 1);
+      }
       fraction_part = fraction_part.slice(0, opts.precision);
     }
 
