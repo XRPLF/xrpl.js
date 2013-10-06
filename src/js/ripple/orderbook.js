@@ -137,9 +137,9 @@ OrderBook.prototype.is_valid = function () {
 
 OrderBook.prototype.trade = function(type) {
   var tradeStr = '0'
-  + (this['_currency_' + type] === 'XRP') ? '' : '/' 
+  + ((this['_currency_' + type] === 'XRP') ? '' : '/'
   + this['_currency_' + type ] + '/' 
-  + this['_issuer_' + type];
+  + this['_issuer_' + type]);
   return Amount.from_json(tradeStr);
 };
 
