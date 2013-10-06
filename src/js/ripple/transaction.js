@@ -210,15 +210,15 @@ Transaction.prototype.sign = function () {
   delete this.tx_json.TxnSignature;
 
   var hash = this.signing_hash();
-  var previously_signed = this.tx_json.TxnSignature && hash === this._previous_signing_hash;
 
-  if (previously_signed) return;
+  if (hash === this._previous_signing_hash) return;
 
   var key  = seed.get_key(this.tx_json.Account);
   var sig  = key.sign(hash, 0);
   var hex  = sjcl.codec.hex.fromBits(sig).toUpperCase();
 
   this.tx_json.TxnSignature = hex;
+  this._previous_signing_hash = hash;
 };
 
 //
@@ -231,7 +231,7 @@ Transaction.prototype.sign = function () {
 Transaction.prototype.build_path = function (build) {
   this._build_path = build;
   return this;
-}
+};
 
 // tag should be undefined or a 32 bit integer.
 // YYY Add range checking for tag.
@@ -240,7 +240,7 @@ Transaction.prototype.destination_tag = function (tag) {
     this.tx_json.DestinationTag = tag;
   }
   return this;
-}
+};
 
 Transaction._path_rewrite = function (path) {
   var path_new = path.map(function(node) {
@@ -262,13 +262,13 @@ Transaction._path_rewrite = function (path) {
   });
 
   return path_new;
-}
+};
 
 Transaction.prototype.path_add = function (path) {
   this.tx_json.Paths  = this.tx_json.Paths || [];
   this.tx_json.Paths.push(Transaction._path_rewrite(path));
   return this;
-}
+};
 
 // --> paths: undefined or array of path
 // A path is an array of objects containing some combination of: account, currency, issuer
@@ -460,7 +460,7 @@ Transaction.prototype.password_fund = function (src, dst) {
   this.tx_json.TransactionType = 'PasswordFund';
   this.tx_json.Destination     = UInt160.json_rewrite(dst);
   return this;
-}
+};
 
 Transaction.prototype.password_set = function (src, authorized_key, generator, public_key, signature) {
   if (typeof src === 'object') {
@@ -483,7 +483,7 @@ Transaction.prototype.password_set = function (src, authorized_key, generator, p
   this.tx_json.PublicKey       = public_key;
   this.tx_json.Signature       = signature;
   return this;
-}
+};
 
 // Construct a 'payment' transaction.
 //
