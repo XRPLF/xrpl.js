@@ -6,14 +6,16 @@
  * SerializedObject.parse() or SerializedObject.serialize().
  */
 
+var assert   = require('assert');
 var extend   = require('extend');
 var utils    = require('./utils');
 var sjcl     = utils.sjcl;
 
-var amount   = require('./amount');
 var UInt128  = require('./uint128').UInt128;
 var UInt160  = require('./uint160').UInt160;
 var UInt256  = require('./uint256').UInt256;
+
+var amount   = require('./amount');
 var Amount   = amount.Amount;
 var Currency = amount.Currency;
 
@@ -27,6 +29,26 @@ var SerializedType = function (methods) {
   extend(this, methods);
 };
 
+function isNumber(val) {
+  return typeof val === 'number' && isFinite(val);
+};
+
+function isString(val) {
+  return typeof val === 'string';
+};
+
+function isHexInt64String(val) {
+  return isString(val) && /^[0-9A-F]{0,16}$/i.test(val);
+};
+
+function isCurrencyString(val) {
+  return isString(val) && /^[A-Z]{3}$/.test(val);
+};
+
+function isBigInteger(val) {
+  return val instanceof BigInteger;
+};
+
 function serialize_hex(so, hexData, noLength) {
   var byteData = bytes.fromBits(hex.toBits(hexData));
   if (!noLength) {
@@ -35,18 +57,18 @@ function serialize_hex(so, hexData, noLength) {
   so.append(byteData);
 };
 
-
 /**
  * parses bytes as hex
  */
 function convert_bytes_to_hex (byte_array) {
   return sjcl.codec.hex.fromBits(sjcl.codec.bytes.toBits(byte_array)).toUpperCase();
-}
+};
 
 SerializedType.serialize_varint = function (so, val) {
   if (val < 0) {
-    throw new Error("Variable integers are unsigned.");
+    throw new Error('Variable integers are unsigned.');
   }
+
   if (val <= 192) {
     so.append([val]);
   } else if (val <= 12480) {
@@ -60,65 +82,68 @@ SerializedType.serialize_varint = function (so, val) {
               val & 0xff
     ]);
   } else {
-    throw new Error("Variable integer overflow.");
+    throw new Error('Variable integer overflow.');
   }
 };
-
 
 SerializedType.prototype.parse_varint = function (so) {
   var b1 = so.read(1)[0], b2, b3;
   var result;
+
+  if (b1 > 254) {
+    throw new Error('Invalid varint length indicator');
+  }
+
   if (b1 <= 192) {
     result = b1;
   } else if (b1 <= 240) {
     b2 = so.read(1)[0];
-    result = 193 + (b1-193)*256 + b2;
+    result = 193 + (b1 - 193) * 256 + b2;
   } else if (b1 <= 254) {
     b2 = so.read(1)[0];
     b3 = so.read(1)[0];
-    result = 12481 + (b1-241)*65536 + b2*256 + b3
+    result = 12481 + (b1 - 241) * 65536 + b2 * 256 + b3
   }
-  else {
-    throw new Error("Invalid varint length indicator");
-  }
+
   return result;
 };
 
-
-
-
 // In the following, we assume that the inputs are in the proper range. Is this correct?
-
 // Helper functions for 1-, 2-, and 4-byte integers.
 
 /**
  * Convert an integer value into an array of bytes.
  *
- * The result is appended to the serialized object ("so").
+ * The result is appended to the serialized object ('so').
  */
 function append_byte_array(so, val, bytes) {
-  if (isNaN(val) || val === null) {
-    throw new Error("Integer is not a number");
+  if (!isNumber(val)) {
+    throw new Error('Value is not a number');
   }
-  if (val < 0 || val >= (Math.pow(256, bytes))) {
-    throw new Error("Integer out of bounds");
-  }
-  var newBytes = [];
-  for (var i=0; i<bytes; i++) {
-    newBytes.unshift(val >>> (i*8) & 0xff);
-  }
-  so.append(newBytes);
-}
 
-// Convert a certain number of bytes from the serialized object ("so") into an integer.
+  if (val < 0 || val >= Math.pow(256, bytes)) {
+    throw new Error('Value out of bounds');
+  }
+
+  var newBytes = [ ];
+
+  for (var i=0; i<bytes; i++) {
+    newBytes.unshift(val >>> (i * 8) & 0xff);
+  }
+
+  so.append(newBytes);
+};
+
+// Convert a certain number of bytes from the serialized object ('so') into an integer.
 function readAndSum(so, bytes) {
   var sum = 0;
-  for (var i=0; i<bytes; i++) {
-    sum += (so.read(1)[0] << (8*(bytes-1-i)) );
-  }
-  return sum;
-}
 
+  for (var i=0; i<bytes; i++) {
+    sum += (so.read(1)[0] << (8 * (bytes - i - 1)));
+  }
+
+  return sum;
+};
 
 var STInt8 = exports.Int8 = new SerializedType({
   serialize: function (so, val) {
@@ -147,39 +172,38 @@ var STInt32 = exports.Int32 = new SerializedType({
   }
 });
 
-
 var STInt64 = exports.Int64 = new SerializedType({
   serialize: function (so, val) {
     var bigNumObject;
 
-    if (typeof val === 'number' & !isNaN(val)) {
+    if (isNumber(val)) {
       val = Math.floor(val);
       if (val < 0) {
-        throw new Error("Negative value for unsigned Int64 is invalid.");
+        throw new Error('Negative value for unsigned Int64 is invalid.');
       }
       bigNumObject = new BigInteger(String(val), 10);
-    } else if (typeof val === 'string') {
-      if (!/^[0-9A-F]{0,16}$/i.test(val)) {
-        throw new Error("Not a valid hex Int64.");
+    } else if (isString(val)) {
+      if (!isHexInt64String(val)) {
+        throw new Error('Not a valid hex Int64.');
       }
       bigNumObject = new BigInteger(val, 16);
-    } else if (val instanceof BigInteger) {
+    } else if (isBigInteger(val)) {
       if (val.compareTo(BigInteger.ZERO) < 0) {
-        throw new Error("Negative value for unsigned Int64 is invalid.");
+        throw new Error('Negative value for unsigned Int64 is invalid.');
       }
       bigNumObject = val;
     } else {
-      throw new Error("Invalid type for Int64");
+      throw new Error('Invalid type for Int64');
     }
 
     var hex = bigNumObject.toString(16);
 
     if (hex.length > 16) {
-      throw new Error("Int64 is too large");
+      throw new Error('Int64 is too large');
     }
 
     while (hex.length < 16) {
-      hex = "0" + hex;
+      hex = '0' + hex;
     }
 
     return serialize_hex(so, hex, true); //noLength = true
@@ -198,7 +222,7 @@ var STHash128 = exports.Hash128 = new SerializedType({
   serialize: function (so, val) {
     var hash = UInt128.from_json(val);
     if (!hash.is_valid()) {
-      throw new Error("Invalid Hash128");
+      throw new Error('Invalid Hash128');
     }
     serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
@@ -211,7 +235,7 @@ var STHash256 = exports.Hash256 = new SerializedType({
   serialize: function (so, val) {
     var hash = UInt256.from_json(val);
     if (!hash.is_valid()) {
-      throw new Error("Invalid Hash256");
+      throw new Error('Invalid Hash256');
     }
     serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
@@ -224,7 +248,7 @@ var STHash160 = exports.Hash160 = new SerializedType({
   serialize: function (so, val) {
     var hash = UInt160.from_json(val);
     if (!hash.is_valid()) {
-      throw new Error("Invalid Hash160");
+      throw new Error('Invalid Hash160');
     }
     serialize_hex(so, hash.to_hex(), true); //noLength = true
   },
@@ -237,23 +261,20 @@ var STHash160 = exports.Hash160 = new SerializedType({
 var STCurrency = new SerializedType({
   serialize: function (so, val) {
     var currency = val.to_json().toUpperCase();
+
+    if (!isCurrencyString(currency)) {
+      throw new Error('Tried to serialize invalid/unimplemented currency type.');
+    }
+
     if (currency === 'XRP') {
       serialize_hex(so, UInt160.HEX_ZERO, true);
-    } else if (typeof currency === 'string'&& currency.length === 3) {
+    } else {
       var currencyCode = currency.toUpperCase();
       var currencyData = utils.arraySet(20, 0);
-
-      if (!/^[A-Z]{3}$/.test(currencyCode)) {
-        throw new Error('Invalid currency code');
-      }
-
       currencyData[12] = currencyCode.charCodeAt(0) & 0xff;
       currencyData[13] = currencyCode.charCodeAt(1) & 0xff;
       currencyData[14] = currencyCode.charCodeAt(2) & 0xff;
-
       so.append(currencyData);
-    } else {
-      throw new Error('Tried to serialize invalid/unimplemented currency type.');
     }
   },
   parse: function (so) {
@@ -263,7 +284,7 @@ var STCurrency = new SerializedType({
     //     UInt160 value and consider it valid. But it doesn't, so for the
     //     deserialization to be usable, we need to allow invalid results for now.
     //if (!currency.is_valid()) {
-    //  throw new Error("Invalid currency: "+convert_bytes_to_hex(bytes));
+    //  throw new Error('Invalid currency: '+convert_bytes_to_hex(bytes));
     //}
     return currency;
   }
@@ -273,11 +294,12 @@ var STAmount = exports.Amount = new SerializedType({
   serialize: function (so, val) {
     var amount = Amount.from_json(val);
     if (!amount.is_valid()) {
-      throw new Error("Not a valid Amount object.");
+      throw new Error('Not a valid Amount object.');
     }
 
     // Amount (64-bit integer)
     var valueBytes = utils.arraySet(8, 0);
+
     if (amount.is_native()) {
       var valueHex = amount._value.toString(16);
 
@@ -287,7 +309,7 @@ var STAmount = exports.Amount = new SerializedType({
       }
 
       while (valueHex.length < 16) {
-        valueHex = "0" + valueHex;
+        valueHex = '0' + valueHex;
       }
 
       valueBytes = bytes.fromBits(hex.toBits(valueHex));
@@ -346,7 +368,7 @@ var STAmount = exports.Amount = new SerializedType({
       var value = new BigInteger(mantissa_bytes, 256);
 
       if (value.equals(BigInteger.ZERO) && !is_zero ) {
-        throw new Error("Invalid zero representation");
+        throw new Error('Invalid zero representation');
       }
 
       amount._value = value;
@@ -371,7 +393,7 @@ var STVL = exports.VariableLength = new SerializedType({
     if (typeof val === 'string') {
       serialize_hex(so, val);
     } else {
-      throw new Error("Unknown datatype.");
+      throw new Error('Unknown datatype.');
     }
   },
   parse: function (so) {
@@ -384,7 +406,7 @@ var STAccount = exports.Account = new SerializedType({
   serialize: function (so, val) {
     var account = UInt160.from_json(val);
     if (!account.is_valid()) {
-      throw new Error("Invalid account!");
+      throw new Error('Invalid account!');
     }
     serialize_hex(so, account.to_hex());
   },
@@ -392,13 +414,14 @@ var STAccount = exports.Account = new SerializedType({
     var len = this.parse_varint(so);
 
     if (len !== 20) {
-      throw new Error("Non-standard-length account ID");
+      throw new Error('Non-standard-length account ID');
     }
 
     var result = UInt160.from_bytes(so.read(len));
-	//console.log("PARSED 160:", result.to_json());
+
+    //console.log('PARSED 160:', result.to_json());
     if (false && !result.is_valid()) {
-      throw new Error("Invalid Account");
+      throw new Error('Invalid Account');
     }
 
     return result;
@@ -420,12 +443,12 @@ var STPathSet = exports.PathSet = new SerializedType({
 
       for (var j=0, l2=val[i].length; j<l2; j++) {
         var entry = val[i][j];
-        //if (entry.hasOwnProperty("_value")) {entry = entry._value;}
+        //if (entry.hasOwnProperty('_value')) {entry = entry._value;}
         var type = 0;
 
-        if (entry.account) type |= this.typeAccount;
+        if (entry.account)  type |= this.typeAccount;
         if (entry.currency) type |= this.typeCurrency;
-        if (entry.issuer) type |= this.typeIssuer;
+        if (entry.issuer)   type |= this.typeIssuer;
 
         STInt8.serialize(so, type);
         if (entry.account) {
@@ -448,10 +471,10 @@ var STPathSet = exports.PathSet = new SerializedType({
     // should return a list of lists:
     /*
        [
-		   [entry, entry],
-		   [entry, entry, entry],
-		   [entry],
-		   []
+       [entry, entry],
+       [entry, entry, entry],
+       [entry],
+       []
        ]
 
        each entry has one or more of the following attributes: amount, currency, issuer.
@@ -464,38 +487,38 @@ var STPathSet = exports.PathSet = new SerializedType({
     while ((tag_byte = so.read(1)[0]) !== this.typeEnd) {
       //TODO: try/catch this loop, and catch when we run out of data without reaching the end of the data structure.
       //Now determine: is this an end, boundary, or entry-begin-tag?
-      //console.log("Tag byte:", tag_byte);
-      if (tag_byte == this.typeBoundary) {
-        //console.log("Boundary");
+      //console.log('Tag byte:', tag_byte);
+      if (tag_byte === this.typeBoundary) {
+        //console.log('Boundary');
         if (current_path) { //close the current path, if there is one,
           path_list.push(current_path);
         }
         current_path = []; //and start a new one.
       } else {
         //It's an entry-begin tag.
-        //console.log("It's an entry-begin tag.");
+        //console.log('It's an entry-begin tag.');
         var entry = {};
 
         if (tag_byte & this.typeAccount) {
-          //console.log("entry.account");
+          //console.log('entry.account');
           /*var bta = so.read(20);
-            console.log("BTA:", bta);*/
+            console.log('BTA:', bta);*/
           entry.account = STHash160.parse(so);
         }
         if (tag_byte & this.typeCurrency) {
-          //console.log("entry.currency");
+          //console.log('entry.currency');
           entry.currency = STCurrency.parse(so)
         }
         if (tag_byte & this.typeIssuer) {
-          //console.log("entry.issuer");
+          //console.log('entry.issuer');
           entry.issuer = STHash160.parse(so); //should know to use Base58?
-          //console.log("DONE WITH ISSUER!");
+          //console.log('DONE WITH ISSUER!');
         }
 
         if (entry.account || entry.currency || entry.issuer) {
           current_path.push(entry);
         } else {
-          throw new Error("Invalid path entry"); //It must have at least something in it.
+          throw new Error('Invalid path entry'); //It must have at least something in it.
         }
       }
     }
@@ -507,36 +530,36 @@ var STPathSet = exports.PathSet = new SerializedType({
 
     return path_list;
   }
-
 });
 
 var STVector256 = exports.Vector256 = new SerializedType({
   serialize: function (so, val) { //Assume val is an array of STHash256 objects.
     var length_as_varint = SerializedType.serialize_varint(so, val.length);
-    for (var i = 0; i<val.length; i++){
+    for (var i=0, l=val.length; i<l; i++) {
       STHash256.serialize(so, val[i]);
     }
   },
   parse: function (so) {
-    var length_from_varint = this.parse_varint(so);
+    var length = this.parse_varint(so);
     var output = [];
-    for (var i=0; i<length_from_varint; i++) {
+    for (var i=0; i<length; i++) {
       output.push(STHash256.parse(so));
     }
     return output;
   }
 });
 
-exports.serialize_whatever = serialize_whatever;
+exports.serialize = exports.serialize_whatever = serialize;
 
-function serialize_whatever(so, field_name, value) {
+function serialize(so, field_name, value) {
   //so: a byte-stream to serialize into.
-  //field_name: a string for the field name ("LedgerEntryType" etc.)
+  //field_name: a string for the field name ('LedgerEntryType' etc.)
   //value: the value of that field.
   var field_coordinates = INVERSE_FIELDS_MAP[field_name];
   var type_bits         = field_coordinates[0];
   var field_bits        = field_coordinates[1];
   var tag_byte          = (type_bits < 16 ? type_bits << 4 : 0) | (field_bits < 16 ? field_bits : 0)
+
   STInt8.serialize(so, tag_byte)
 
   if (type_bits >= 16) {
@@ -553,41 +576,35 @@ function serialize_whatever(so, field_name, value) {
 }
 
 //Take the serialized object, figure out what type/field it is, and return the parsing of that.
-exports.parse_whatever = parse_whatever;
-function parse_whatever(so) {
+exports.parse = exports.parse_whatever = parse;
+
+function parse(so) {
   var tag_byte   = so.read(1)[0];
   var type_bits  = tag_byte >> 4;
-  var field_bits = tag_byte & 0x0f;
-  var type;
-  var field_name;
 
   if (type_bits === 0) {
     type_bits = so.read(1)[0];
   }
 
-  type = TYPES_MAP[type_bits];
+  var type = TYPES_MAP[type_bits];
 
-  if (typeof type === 'undefined') {
-    throw Error("Unknown type: "+type_bits);
-  } else {
-    if (field_bits === 0) {
-      field_name = FIELDS_MAP[type_bits][so.read(1)[0]];
-    } else {
-      field_name = FIELDS_MAP[type_bits][field_bits];
-    }
-    if (typeof field_name === 'undefined') {
-      throw Error("Unknown field " + tag_byte);
-    } else {
-      return [field_name, type.parse(so)]; //key, value
-    }
-  }
+  assert(type, 'Unknown type: ' + type_bits);
+
+  var field_bits = tag_byte & 0x0f;
+  var field_name = (field_bits === 0)
+  ? field_name = FIELDS_MAP[type_bits][so.read(1)[0]]
+  : field_name = FIELDS_MAP[type_bits][field_bits];
+
+  assert(field_name, 'Unknown field: ' + tag_byte);
+
+  return [ field_name, type.parse(so) ]; //key, value
 };
 
 var STObject = exports.Object = new SerializedType({
   serialize: function (so, val) {
     var keys = Object.keys(val);
     for (var i=0; i<keys.length; i++) {
-      serialize_whatever(so, keys[i], val[keys[i]]);
+      serialize(so, keys[i], val[keys[i]]);
     }
     STInt8.serialize(so, 0xe1); //Object ending marker
   },
@@ -595,8 +612,8 @@ var STObject = exports.Object = new SerializedType({
   parse: function (so) {
     var output = {};
     while (so.peek(1)[0] !== 0xe1) {
-      var key_and_value        = parse_whatever(so);
-      output[key_and_value[0]] = key_and_value[1];
+      var keyval = parse(so);
+      output[keyval[0]] = keyval[1];
     }
     so.read(1);
     return output;
@@ -605,15 +622,16 @@ var STObject = exports.Object = new SerializedType({
 
 var STArray = exports.Array = new SerializedType({
   serialize: function (so, val) {
-    for (var i=0; i<val.length; i++) {
+    for (var i=0, l=val.length; i<l; i++) {
       var keys = Object.keys(val[i]);
-      if (keys.length != 1) {
-        throw Error("Cannot serialize an array containing non-single-key objects");
-      } else {
-        var field_name = keys[0];
-        var value = val[i][field_name];
-        serialize_whatever(so, field_name, value);
+
+      if (keys.length !== 1) {
+        throw Error('Cannot serialize an array containing non-single-key objects');
       }
+
+      var field_name = keys[0];
+      var value = val[i][field_name];
+      serialize(so, field_name, value);
     }
     STInt8.serialize(so, 0xf1); //Array ending marker
   },
@@ -622,9 +640,9 @@ var STArray = exports.Array = new SerializedType({
     var output = [ ];
 
     while (so.peek(1)[0] !== 0xf1) {
-      var key_and_value = parse_whatever(so);
+      var keyval = parse(so);
       var obj = { };
-      obj[key_and_value[0]] = key_and_value[1];
+      obj[keyval[0]] = keyval[1];
       output.push(obj);
     }
 
@@ -633,7 +651,6 @@ var STArray = exports.Array = new SerializedType({
     return output;
   }
 });
-
 
 var TYPES_MAP = [
   void(0),
@@ -668,71 +685,73 @@ var TYPES_MAP = [
 var FIELDS_MAP = {
   //Common types
   1: { //Int16
-    1: "LedgerEntryType",2: "TransactionType"
+    1: 'LedgerEntryType',
+    2: 'TransactionType'
   },
   2: { //Int32
-    2:"Flags",3:"SourceTag",4:"Sequence",5:"PreviousTxnLgrSeq",6:"LedgerSequence",
-    7:"CloseTime",8:"ParentCloseTime",9:"SigningTime",10:"Expiration",11:"TransferRate",
-    12:"WalletSize",13:"OwnerCount",14:"DestinationTag",
+    2:'Flags', 3:'SourceTag',4:'Sequence',5:'PreviousTxnLgrSeq',6:'LedgerSequence',
+    7:'CloseTime', 8:'ParentCloseTime',9:'SigningTime',10:'Expiration',11:'TransferRate',
+    12:'WalletSize', 13:'OwnerCount',14:'DestinationTag',
     //Skip 15
-    16:"HighQualityIn",17:"HighQualityOut",18:"LowQualityIn",19:"LowQualityOut",
-    20:"QualityIn",21:"QualityOut",22:"StampEscrow",23:"BondAmount",24:"LoadFee",
-    25:"OfferSequence",26:"FirstLedgerSequence",27:"LastLedgerSequence",28:"TransactionIndex",
-    29:"OperationLimit",30:"ReferenceFeeUnits",31:"ReserveBase",32:"ReserveIncrement",
-    33:"SetFlag",34:"ClearFlag",
+    16:'HighQualityIn', 17:'HighQualityOut',18:'LowQualityIn',19:'LowQualityOut',
+    20:'QualityIn', 21:'QualityOut',22:'StampEscrow',23:'BondAmount',24:'LoadFee',
+    25:'OfferSequence', 26:'FirstLedgerSequence',27:'LastLedgerSequence',28:'TransactionIndex',
+    29:'OperationLimit', 30:'ReferenceFeeUnits',31:'ReserveBase',32:'ReserveIncrement',
+    33:'SetFlag', 34:'ClearFlag',
   },
   3: { // Int64
-    1:"IndexNext",2:"IndexPrevious",3:"BookNode",4:"OwnerNode",
-    5:"BaseFee",6:"ExchangeRate",7:"LowNode",8:"HighNode"
+    1:'IndexNext', 2:'IndexPrevious',3:'BookNode',4:'OwnerNode',
+    5:'BaseFee', 6:'ExchangeRate',7:'LowNode',8:'HighNode'
   },
   4: { //Hash128
-    1:"EmailHash"
+    1:'EmailHash'
   },
   5: { //Hash256
-    1:"LedgerHash",2:"ParentHash",3:"TransactionHash",4:"AccountHash",5:"PreviousTxnID",
-    6:"LedgerIndex",7:"WalletLocator",8:"RootIndex",16:"BookDirectory",17:"InvoiceID",
-    18:"Nickname",19:"Feature"
+    1:'LedgerHash', 2:'ParentHash',3:'TransactionHash',4:'AccountHash',5:'PreviousTxnID',
+    6:'LedgerIndex', 7:'WalletLocator',8:'RootIndex',16:'BookDirectory',17:'InvoiceID',
+    18:'Nickname', 19:'Feature'
   },
   6: { //Amount
-    1:"Amount",2:"Balance",3:"LimitAmount",4:"TakerPays",5:"TakerGets",6:"LowLimit",
-    7:"HighLimit",8:"Fee",9:"SendMax",16:"MinimumOffer",17:"RippleEscrow"
+    1:'Amount', 2:'Balance',3:'LimitAmount',4:'TakerPays',5:'TakerGets',6:'LowLimit',
+    7:'HighLimit', 8:'Fee',9:'SendMax',16:'MinimumOffer',17:'RippleEscrow'
   },
   7: { //VL
-    1:"PublicKey",2:"MessageKey",3:"SigningPubKey",4:"TxnSignature",5:"Generator",
-    6:"Signature",7:"Domain",8:"FundCode",9:"RemoveCode",10:"ExpireCode",11:"CreateCode"
+    1:'PublicKey', 2:'MessageKey',3:'SigningPubKey',4:'TxnSignature',5:'Generator',
+    6:'Signature', 7:'Domain',8:'FundCode',9:'RemoveCode',10:'ExpireCode',11:'CreateCode'
   },
   8: { //Account
-    1:"Account",2:"Owner",3:"Destination",4:"Issuer",7:"Target",8:"RegularKey"
+    1:'Account', 2:'Owner',3:'Destination',4:'Issuer',7:'Target',8:'RegularKey'
   },
   14: { //Object
-    1:void(0), //end of Object
-    2:"TransactionMetaData",3:"CreatedNode",4:"DeletedNode",5:"ModifiedNode",
-    6:"PreviousFields",7:"FinalFields",8:"NewFields",9:"TemplateEntry",
+    1:void(0),  //end of Object
+    2:'TransactionMetaData', 3:'CreatedNode',4:'DeletedNode',5:'ModifiedNode',
+    6:'PreviousFields', 7:'FinalFields',8:'NewFields',9:'TemplateEntry',
   },
   15: { //Array
-    1:void(0), //end of Array
-    2:"SigningAccounts",3:"TxnSignatures",4:"Signatures",5:"Template",
-    6:"Necessary",7:"Sufficient",8:"AffectedNodes",
+    1:void(0),  //end of Array
+    2:'SigningAccounts', 3:'TxnSignatures',4:'Signatures',5:'Template',
+    6:'Necessary', 7:'Sufficient',8:'AffectedNodes',
   },
 
   //Uncommon types
   16: { //Int8
-    1:"CloseResolution",2:"TemplateEntryType",3:"TransactionResult"
+    1:'CloseResolution', 2:'TemplateEntryType',3:'TransactionResult'
   },
   17: { //Hash160
-    1:"TakerPaysCurrency",2:"TakerPaysIssuer",3:"TakerGetsCurrency",4:"TakerGetsIssuer"
+    1:'TakerPaysCurrency', 2:'TakerPaysIssuer',3:'TakerGetsCurrency',4:'TakerGetsIssuer'
   },
   18: { //PathSet
-    1:"Paths"
+    1:'Paths'
   },
   19: { //Vector256
-    1:"Indexes",2:"Hashes",3:"Features"
+    1:'Indexes', 2:'Hashes', 3:'Features'
   }
 };
 
-var INVERSE_FIELDS_MAP = {};
-for (var key1 in FIELDS_MAP) {
-  for (var key2 in FIELDS_MAP[key1]) {
-    INVERSE_FIELDS_MAP[FIELDS_MAP[key1][key2]] = [parseInt(key1,10), parseInt(key2,10)];
-  }
-}
+var INVERSE_FIELDS_MAP = { };
+
+Object.keys(FIELDS_MAP).forEach(function(k1) {
+  Object.keys(FIELDS_MAP[k1]).forEach(function(k2) {
+    INVERSE_FIELDS_MAP[FIELDS_MAP[k1][k2]] = [ Number(k1), Number(k2) ];
+  });
+});

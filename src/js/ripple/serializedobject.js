@@ -156,7 +156,7 @@ SerializedObject.prototype.to_json = function() {
   var output = { };
 
   while (this.pointer < this.buffer.length) {
-    var key_and_value = stypes.parse_whatever(this);
+    var key_and_value = stypes.parse(this);
     var key = key_and_value[0];
     var value = key_and_value[1];
     output[key] = SerializedObject.jsonify_structure(value, key);
