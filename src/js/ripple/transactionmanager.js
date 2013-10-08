@@ -230,8 +230,8 @@ TransactionManager.prototype._request = function(tx) {
         self.account.get_next_sequence(function(err, sequence) {
           if (typeof sequence === 'number') {
             self._next_sequence = sequence;
-            self._resubmit(2);
           }
+          self._resubmit(2);
         });
       break;
       default:
