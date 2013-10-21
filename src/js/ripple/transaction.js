@@ -320,23 +320,22 @@ Transaction.prototype.transfer_rate = function (rate) {
 // Add flags to a transaction.
 // --> flags: undefined, _flag_, or [ _flags_ ]
 Transaction.prototype.set_flags = function (flags) {
-  if (flags) {
-    var transaction_flags = Transaction.flags[this.tx_json.TransactionType];
+  if (!flags) return this;
 
-    // We plan to not define this field on new Transaction.
-    if (this.tx_json.Flags === void(0)) {
-      this.tx_json.Flags = 0;
-    }
+  var transaction_flags = Transaction.flags[this.tx_json.TransactionType];
+  var flag_set = Array.isArray(flags) ? flags : Array.prototype.slice.call(arguments);
 
-    var flag_set = Array.isArray(flags) ? flags : [ flags ];
+  // We plan to not define this field on new Transaction.
+  if (this.tx_json.Flags === void(0)) {
+    this.tx_json.Flags = 0;
+  }
 
-    for (var i=0, l=flag_set.length; i<l; i++) {
-      var flag = flag_set[i];
-      if (transaction_flags.hasOwnProperty(flag)) {
-        this.tx_json.Flags += transaction_flags[flag];
-      } else {
-        // XXX Immediately report an error or mark it.
-      }
+  for (var i=0, l=flag_set.length; i<l; i++) {
+    var flag = flag_set[i];
+    if (transaction_flags.hasOwnProperty(flag)) {
+      this.tx_json.Flags += transaction_flags[flag];
+    } else {
+      // XXX Immediately report an error or mark it.
     }
   }
 
