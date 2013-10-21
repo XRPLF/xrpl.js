@@ -100,6 +100,12 @@ Transaction.flags = {
     AllowXRP:           0x00200000
   },
 
+  TrustSet: {
+    SetAuth:            0x00010000,
+    NoRipple:           0x00020000,
+    ClearNoRipple:      0x00040000
+  },
+
   OfferCreate: {
     Passive:            0x00010000,
     ImmediateOrCancel:  0x00020000,
@@ -111,7 +117,7 @@ Transaction.flags = {
     NoRippleDirect:     0x00010000,
     PartialPayment:     0x00020000,
     LimitQuality:       0x00040000
-  },
+  }
 };
 
 Transaction.formats = require('./binformat').tx;
@@ -434,7 +440,7 @@ Transaction.prototype.offer_create = function (src, taker_pays, taker_gets, expi
 
   if (expiration) {
     this.tx_json.Expiration = expiration instanceof Date
-    ? expiration.getTime()
+    ? expiration.getTime() //XX
     : Number(expiration);
   }
 
