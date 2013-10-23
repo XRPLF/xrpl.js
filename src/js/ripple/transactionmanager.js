@@ -246,7 +246,7 @@ TransactionManager.prototype._request = function(tx) {
         self._resubmit(3);
         break;
       default:
-        submission_error(message);
+        self._resubmit(1);
     }
   };
 
