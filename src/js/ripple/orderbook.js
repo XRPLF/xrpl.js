@@ -10,12 +10,10 @@
 
 var EventEmitter = require('events').EventEmitter;
 var util         = require('util');
-
+var extend       = require('extend');
 var Amount       = require('./amount').Amount;
 var UInt160      = require('./uint160').UInt160;
 var Currency     = require('./currency').Currency;
-
-var extend       = require('extend');
 
 function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pays) {
   EventEmitter.call(this);
@@ -37,11 +35,11 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
   this._offers       = [ ];
 
   this.on('newListener', function (type, listener) {
-    if (OrderBook.subscribe_events.indexOf(type) !== -1) {
+    if (~OrderBook.subscribe_events.indexOf(type)) {
       if (!self._subs && self._remote._connected) {
         self._subscribe();
       }
-      self._subs  += 1;
+      self._subs += 1;
     }
   });
 
@@ -51,8 +49,8 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
       if (!self._subs && self._remote._connected) {
         self._sync = false;
         self._remote.request_unsubscribe()
-          .books([self.to_json()])
-          .request();
+        .books([self.to_json()])
+        .request();
       }
     }
   });
@@ -84,8 +82,8 @@ OrderBook.subscribe_events = ['transaction', 'model', 'trade'];
  */
 OrderBook.prototype._subscribe = function () {
   var self = this;
-  var request = self._remote.request_subscribe()
-  request.books([ self.to_json() ], true)
+  var request = self._remote.request_subscribe();
+  request.books([ self.to_json() ], true);
   request.callback(function(err, res) {
     if (err) {
       // XXX What now?
@@ -138,9 +136,9 @@ OrderBook.prototype.is_valid = function () {
 OrderBook.prototype.trade = function(type) {
   var tradeStr = '0'
   + ((this['_currency_' + type] === 'XRP') ? '' : '/'
-  + this['_currency_' + type ] + '/' 
-  + this['_issuer_' + type]);
-  return Amount.from_json(tradeStr);
+     + this['_currency_' + type ] + '/'
+     + this['_issuer_' + type]);
+     return Amount.from_json(tradeStr);
 };
 
 /**
@@ -150,7 +148,7 @@ OrderBook.prototype.trade = function(type) {
  * call this yourself.
  */
 OrderBook.prototype.notify =
-OrderBook.prototype.notifyTx = function (message) {
+  OrderBook.prototype.notifyTx = function (message) {
   var self       = this;
   var changed    = false;
   var trade_gets = this.trade('gets');
