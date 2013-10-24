@@ -111,7 +111,6 @@ function TransactionManager(account) {
 
 util.inherits(TransactionManager, EventEmitter);
 
-
 //Normalize transactions received from account
 //transaction stream and account_tx
 TransactionManager.normalize_transaction = function(tx) {
@@ -202,26 +201,21 @@ TransactionManager.prototype._request = function(tx) {
 
   var submit_request = remote.request_submit();
 
+  submit_request.build_path(tx._build_path);
+
   if (remote.local_signing) {
     tx.sign();
     submit_request.tx_blob(tx.serialize().to_hex());
   } else {
     submit_request.secret(tx._secret);
-    submit_request.build_path(tx._build_path);
     submit_request.tx_json(tx.tx_json);
   }
 
   function transaction_proposed(message) {
-    tx.hash = message.tx_json.hash;
     tx.set_state('client_proposed');
-    tx.emit('proposed', {
-      tx_json:                message.tx_json,
-      engine_result:          message.engine_result,
-      engine_result_code:     message.engine_result_code,
-      engine_result_message:  message.engine_result_message,
-      // If server is honest, don't expect a final if rejected.
-      rejected:               tx.isRejected(message.engine_result_code),
-    });
+    // If server is honest, don't expect a final if rejected.
+    message.rejected = tx.isRejected(message.engine_result_code)
+    tx.emit('proposed', message);
   };
 
   function transaction_failed(message) {
@@ -257,7 +251,7 @@ TransactionManager.prototype._request = function(tx) {
       self._next_sequence--;
       tx.set_state('remoteError');
       tx.emit('submitted', error);
-      tx.emit('error', new RippleError(error));
+      tx.emit('error', error);
     }
   };
 
