@@ -84,7 +84,7 @@ function Remote(opts, trace) {
   this.local_sequence        = Boolean(opts.local_sequence); // Locally track sequence numbers
   this.local_fee             = (typeof opts.local_fee === 'undefined') ? true : Boolean(opts.local_fee); // Locally set fees
   this.local_signing         = (typeof opts.local_signing === 'undefined') ? true : Boolean(opts.local_signing);
-  this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.5 : Number(opts.fee_cushion);
+  this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.2 : Number(opts.fee_cushion);
   this.max_fee               = (typeof opts.max_fee === 'undefined') ? Infinity : Number(opts.max_fee);
   this.id                    = 0;
   this.trace                 = Boolean(opts.trace);
@@ -610,7 +610,6 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
 // Only for unit testing.
 Remote.prototype.request_ledger_hash = function (callback) {
   //utils.assert(this.trusted);   // If not trusted, need to check proof.
-
   return new Request(this, 'ledger_closed').callback(callback);
 };
 
@@ -885,7 +884,7 @@ Remote.prototype.request_book_offers = function (gets, pays, taker, callback) {
 
   request.message.taker_pays = {
     currency: Currency.json_rewrite(pays.currency)
-  };
+  }
 
   if (request.message.taker_pays.currency !== 'XRP') {
     request.message.taker_pays.issuer = UInt160.json_rewrite(pays.issuer);
@@ -900,17 +899,21 @@ Remote.prototype.request_book_offers = function (gets, pays, taker, callback) {
 
 Remote.prototype.request_wallet_accounts = function (seed, callback) {
   utils.assert(this.trusted); // Don't send secrets.
+
   var request = new Request(this, 'wallet_accounts');
   request.message.seed = seed;
+
   return request.callback(callback);
 };
 
 Remote.prototype.request_sign = function (secret, tx_json, callback) {
   utils.assert(this.trusted); // Don't send secrets.
+
   var request = new Request(this, 'sign');
   request.message.secret  = secret;
   request.message.tx_json = tx_json;
   request.callback(callback);
+
   return request;
 };
 
@@ -972,11 +975,6 @@ Remote.prototype._server_prepare_subscribe = function (callback) {
     self._reserve_inc   = message.reserve_inc;
 
     self.emit('subscribed');
-  });
-
-  request.on('error', function (err) {
-    // XXX We need a better global error handling
-    //console.log(err);
   });
 
   self.emit('prepare_subscribe', request);
@@ -1334,7 +1332,9 @@ Remote.prototype.request_path_find_create = function (src_account, dst_account, 
 
 Remote.prototype.request_path_find_close = function () {
   var request = new Request(this, 'path_find');
+
   request.message.subcommand = 'close';
+
   return request;
 };
 
@@ -1359,8 +1359,10 @@ Remote.prototype.request_unl_add = function (addr, comment, callback) {
 // --> node: <domain> | <public_key>
 Remote.prototype.request_unl_delete = function (node, callback) {
   var request = new Request(this, 'unl_delete');
+
   request.message.node = node;
   request.callback(callback);
+
   return request;
 };
 
