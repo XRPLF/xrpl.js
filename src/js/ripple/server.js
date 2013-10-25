@@ -203,6 +203,7 @@ Server.prototype.connect = function () {
   }
 
   ws.onmessage = function (msg) {
+    self.emit('before_message_for_non_mutators', msg.data);
     self.emit('message', msg.data);
   };
 };
@@ -217,6 +218,7 @@ Server.prototype.disconnect = function () {
 
 Server.prototype.send_message = function (message) {
   if (this._ws) {
+    this.emit('before_send_message_for_non_mutators', message)
     this._ws.send(JSON.stringify(message));
   }
 };
