@@ -109,8 +109,8 @@ function Remote(opts, trace) {
   this._reserve_inc          = void(0);
   this._connection_count     = 0;
   this._connected            = false;
-  this._connection_offset    = 1000 * (Number(opts.connection_offset) || 5);
-  this._submission_timeout   = 1000 * (Number(opts.submission_timeout) || 10);
+  this._connection_offset    = 1000 * (typeof opts.connection_offset === 'number' ? opts.connection_offset : 5)
+  this._submission_timeout   = 1000 * (typeof opts.submission_timeout === 'number' ? opts.submission_timeout : 10)
 
   this._received_tx          = { };
   this._cur_path_find        = null;
