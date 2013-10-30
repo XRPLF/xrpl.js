@@ -67,7 +67,7 @@ See [The `ripple-lib` Guides](docs/GUIDES.md) and [The `ripple-lib` API Referenc
 
 2. `cd` into the repository and install dependencies with `npm install`
 
-3. `npm test` or `make test`
+3. `npm test` or `make test` or `node_modules\.bin\mocha test\*-test.js` 
 
 **Generating code coverage**
 
