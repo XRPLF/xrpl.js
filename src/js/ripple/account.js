@@ -39,7 +39,7 @@ function Account(remote, account) {
       if (!self._subs && self._remote._connected) {
         self._remote.request_subscribe()
         .accounts(self._account_id)
-        .request();
+        .broadcast();
       }
       self._subs += 1;
     }
@@ -51,7 +51,7 @@ function Account(remote, account) {
       if (!self._subs && self._remote._connected) {
         self._remote.request_unsubscribe()
         .accounts(self._account_id)
-        .request();
+        .broadcast();
       }
     }
   }
