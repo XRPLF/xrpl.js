@@ -42,7 +42,7 @@ var remote = new Remote({
   trusted:        true,
   local_signing:  true,
   local_fee:      true,
-  fee_cusion:     1.5,
+  fee_cushion:     1.5,
   servers: [
     {
         host:    's1.ripple.com'
