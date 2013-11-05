@@ -61,7 +61,7 @@ function Account(remote, account) {
 
   function prepare_subscribe(request) {
     if (self._account.is_valid() && self._subs) {
-      request.accounts(self._account_id);
+      request.add_account(self._account_id);
     }
   }
 
