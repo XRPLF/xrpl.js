@@ -248,9 +248,21 @@ Request.prototype.accounts = function (accounts, realtime) {
   });
 
   if (realtime) {
-    this.message.rt_accounts = (this.message.rt_accounts || []).concat(processedAccounts);
+    this.message.rt_accounts = processedAccounts;
   } else {
-    this.message.accounts = (this.message.accounts || []).concat(processedAccounts);
+    this.message.accounts = processedAccounts;
+  }
+
+  return this;
+};
+
+Request.prototype.add_account  = function(account, realtime) {
+  var processedAccount = UInt160.json_rewrite(account);
+
+  if (realtime) {
+    this.message.rt_accounts = (this.message.rt_accounts || []).concat(processedAccount);
+  } else {
+    this.message.accounts = (this.message.accounts || []).concat(processedAccount);
   }
 
   return this;
