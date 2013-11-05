@@ -38,7 +38,7 @@ function Account(remote, account) {
     if (~Account.subscribe_events.indexOf(type)) {
       if (!self._subs && self._remote._connected) {
         self._remote.request_subscribe()
-        .accounts(self._account_id)
+        .add_account(self._account_id)
         .broadcast();
       }
       self._subs += 1;
@@ -50,7 +50,7 @@ function Account(remote, account) {
       self._subs -= 1;
       if (!self._subs && self._remote._connected) {
         self._remote.request_unsubscribe()
-        .accounts(self._account_id)
+        .add_account(self._account_id)
         .broadcast();
       }
     }
@@ -188,7 +188,7 @@ Account.prototype.lines = function (callback) {
  * call this yourself.
  */
 Account.prototype.notify = 
-Account.prototype.notifyTx = function (message) {
+  Account.prototype.notifyTx = function (message) {
   // Only trigger the event if the account object is actually
   // subscribed - this prevents some weird phantom events from
   // occurring.
