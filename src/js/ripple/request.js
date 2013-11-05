@@ -248,9 +248,9 @@ Request.prototype.accounts = function (accounts, realtime) {
   });
 
   if (realtime) {
-    this.message.rt_accounts = processedAccounts;
+    this.message.rt_accounts = (this.message.rt_accounts || []).concat(processedAccounts);
   } else {
-    this.message.accounts = processedAccounts;
+    this.message.accounts = (this.message.accounts || []).concat(processedAccounts);
   }
 
   return this;
