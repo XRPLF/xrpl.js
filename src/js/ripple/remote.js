@@ -156,7 +156,7 @@ function Remote(opts, trace) {
 
   // Fallback for previous API
   if (!opts.hasOwnProperty('servers')) {
-    opts.servers = [ 
+    opts.servers = [
       {
         host:     opts.websocket_ip,
         port:     opts.websocket_port,
@@ -246,13 +246,13 @@ Remote.from_config = function (obj, trace) {
     var accountInfo = config.accounts[account];
     if (typeof accountInfo === 'object') {
       if (accountInfo.secret) {
-        // Index by nickname ...
+        // Index by nickname
         remote.set_secret(account, accountInfo.secret);
-        // ... and by account ID
+        // Index by account ID
         remote.set_secret(accountInfo.account, accountInfo.secret);
       }
     }
-  }
+  };
 
   if (typeof config.accounts === 'object') {
     for (var account in config.accounts) {
@@ -530,7 +530,7 @@ Remote.prototype._server_is_available  = function (server) {
 Remote.prototype._next_server = function () {
   var result = null;
 
-  for (var i=0; i<this._servers.length; i++) {
+  for (var i=0, l=this._servers.length; i<l; i++) {
     var server = this._servers[i];
     if (this._server_is_available(server)) {
       result = server;
@@ -564,7 +564,7 @@ Remote.prototype.request = function (request) {
   } else if (!this._connected) {
     this.once('connect', this.request.bind(this, request));
   } else if (request.server === null) {
-    this.emit('error', new Error('Server does not exist'));
+    request.emit('error', new Error('Server does not exist'));
   } else {
     var server = request.server || this._get_server();
     if (server) {
@@ -592,7 +592,7 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
     request.message.ledger  = ledger;
   }
 
-  var props = [
+  var request_fields = [
       'full'
     , 'expand'
     , 'transactions'
@@ -602,7 +602,7 @@ Remote.prototype.request_ledger = function (ledger, opts, callback) {
   switch (typeof opts) {
     case 'object':
       for (var key in opts) {
-        if (~props.indexOf(key)) {
+        if (~request_fields.indexOf(key)) {
           request.message[key] = true;
         }
       }
@@ -772,17 +772,32 @@ Remote.prototype.request_transaction_entry = function (hash, ledger_hash, callba
 // DEPRECATED: use request_transaction_entry
 Remote.prototype.request_tx = function (hash, callback) {
   var request = new Request(this, 'tx');
+
   request.message.transaction  = hash;
   request.callback(callback);
+
   return request;
 };
 
 Remote.prototype.request_account_info = function (accountID, callback) {
   var request = new Request(this, 'account_info');
   var account = UInt160.json_rewrite(accountID);
+
   request.message.ident   = account; //DEPRECATED;
   request.message.account = account;
   request.callback(callback);
+
+  return request;
+};
+
+Remote.prototype.request_account_currencies = function (accountID, callback) {
+  var request = new Request(this, 'account_currencies');
+  var account = UInt160.json_rewrite(accountID);
+
+  request.message.ident   = account; //DEPRECATED;
+  request.message.account = account;
+  request.callback(callback);
+
   return request;
 };
 
@@ -883,7 +898,6 @@ Remote.prototype.request_tx_history = function (start, callback) {
   var request = new Request(this, 'tx_history');
 
   request.message.start = start;
-
   request.callback(callback);
 
   return request;
@@ -1016,6 +1030,7 @@ Remote.prototype.ledger_accept = function (callback) {
   } else {
     this.emit('error', new RippleError('notStandAlone'));
   }
+
   return this;
 };
 
@@ -1030,10 +1045,13 @@ Remote.prototype.request_account_balance = function (account, ledger, callback) 
   var request = this.request_ledger_entry('account_root');
   request.account_root(account);
   request.ledger_choose(ledger);
+
   request.once('success', function (message) {
     request.emit('account_balance', Amount.from_json(message.node.Balance));
   });
+
   request.callback(callback, 'account_balance');
+
   return request;
 };
 
@@ -1048,10 +1066,13 @@ Remote.prototype.request_account_flags = function (account, ledger, callback) {
   var request = this.request_ledger_entry('account_root');
   request.account_root(account);
   request.ledger_choose(ledger);
+
   request.once('success', function (message) {
     request.emit('account_flags', message.node.Flags);
   });
+
   request.callback(callback, 'account_flags');
+
   return request;
 };
 
@@ -1066,9 +1087,11 @@ Remote.prototype.request_owner_count = function (account, ledger, callback) {
   var request = this.request_ledger_entry('account_root');
   request.account_root(account);
   request.ledger_choose(ledger);
+
   request.once('success', function (message) {
     request.emit('owner_count', message.node.OwnerCount);
   });
+
   request.callback(callback, 'owner_count');
 
   return request;
@@ -1080,9 +1103,11 @@ Remote.prototype.get_account = function(accountID) {
 
 Remote.prototype.add_account = function(accountID) {
   var account = new Account(this, accountID);
+
   if (account.is_valid()) {
     this._accounts[accountID] = account;
   }
+
   return account;
 };
 
