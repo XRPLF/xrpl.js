@@ -24,12 +24,9 @@ function TransactionManager(account) {
   this._max_fee            = this.remote.max_fee;
   this._submission_timeout = this.remote._submission_timeout;
 
-  function sequence_loaded(err, sequence) {
-    self._next_sequence = sequence;
-    self.emit('sequence_loaded', sequence);
-  };
-
-  this.account.get_next_sequence(sequence_loaded);
+  // Query remote server for next account
+  // transaction sequence number
+  this._load_sequence();
 
   function cache_transaction(transaction) {
     var transaction = TransactionManager.normalize_transaction(transaction);
@@ -48,34 +45,6 @@ function TransactionManager(account) {
   };
 
   this.account.on('transaction-outbound', cache_transaction);
-
-  function remote_reconnected() {
-    //Load account transaction history
-    var options = {
-      account: self.account._account_id,
-      ledger_index_min: -1,
-      ledger_index_max: -1,
-      limit: 5
-    }
-
-    self.remote.request_account_tx(options, function(err, transactions) {
-      if (!err && transactions.transactions) {
-        transactions.transactions.forEach(cache_transaction);
-      }
-    });
-
-    //Load next transaction sequence
-    self.account.get_next_sequence(function(err, sequence) {
-      sequence_loaded(err, sequence);
-      self._resubmit(3);
-    });
-  };
-
-  function remote_disconnected() {
-    self.remote.once('connect', remote_reconnected);
-  };
-
-  this.remote.on('disconnect', remote_disconnected);
 
   function adjust_fees() {
     self._pending.forEach(function(pending) {
@@ -107,6 +76,35 @@ function TransactionManager(account) {
   };
 
   this.remote.on('ledger_closed', update_pending_status);
+
+  function remote_reconnected() {
+    //Load account transaction history
+    var options = {
+      account: self.account._account_id,
+      ledger_index_min: -1,
+      ledger_index_max: -1,
+      limit: 10
+    }
+
+    self.remote.request_account_tx(options, function(err, transactions) {
+      if (!err && transactions.transactions) {
+        transactions.transactions.forEach(cache_transaction);
+      }
+      self.remote.on('ledger_closed', update_pending_status);
+    });
+
+    //Load next transaction sequence
+    self._load_sequence(function() {
+      self._resubmit(3);
+    });
+  };
+
+  function remote_disconnected() {
+    self.remote.once('connect', remote_reconnected);
+    self.remote.removeListener('ledger_closed', update_pending_status);
+  };
+
+  this.remote.on('disconnect', remote_disconnected);
 };
 
 util.inherits(TransactionManager, EventEmitter);
@@ -136,23 +134,44 @@ TransactionManager.normalize_transaction = function(tx) {
 };
 
 //Fill an account transaction sequence
-TransactionManager.prototype._fill = function(tx) {
-  var account_id = this.account._account_id;
-  var fill = this.remote.transaction().account_set(account_id);
+TransactionManager.prototype._fill_sequence = function(tx, callback) {
+  var fill = this.remote.transaction();
+  fill.account_set(this.account._account_id);
   fill.tx_json.Sequence = tx.tx_json.Sequence - 1;
-  fill.submit();
+  fill.submit(callback);
 };
 
-TransactionManager.prototype._resubmit = function(wait_ledgers) {
+TransactionManager.prototype._load_sequence = function(callback) {
   var self = this;
+
+  function sequence_loaded(err, sequence) {
+    if (typeof sequence === 'number') {
+      self._next_sequence = sequence;
+      self.emit('sequence_loaded', sequence);
+    } else {
+      return setTimeout(function() {
+        self._load_sequence(callback);
+      }, 1000 * 3);
+    }
+    if (typeof callback === 'function') {
+      callback(err, sequence);
+    }
+  };
+
+  this.account.get_next_sequence(sequence_loaded);
+};
+
+TransactionManager.prototype._resubmit = function(wait_ledgers, pending) {
+  var self = this;
+  var pending = pending ? [ pending ] : this._pending;
 
   if (wait_ledgers) {
     var ledgers = Number(wait_ledgers) || 3;
     this._wait_ledgers(ledgers, function() {
-      self._pending.forEach(resubmit_transaction);
+      pending.forEach(resubmit_transaction);
     });
   } else {
-    self._pending.forEach(resubmit_transaction);
+    pending.forEach(resubmit_transaction);
   }
 
   function resubmit_transaction(pending) {
@@ -167,8 +186,12 @@ TransactionManager.prototype._resubmit = function(wait_ledgers) {
     if (hash_cached) {
       pending.emit('success', hash_cached);
     } else if (seq_cached) {
-      //Sequence number has been used
+      //Sequence number has been consumed by
+      //another transaction
       pending.tx_json.Sequence++;
+      pending.once('submitted', function() {
+        self._load_sequence();
+      });
       self._request(pending);
     } else {
       self._request(pending);
@@ -221,12 +244,7 @@ TransactionManager.prototype._request = function(tx) {
   function transaction_failed(message) {
     switch (message.engine_result) {
       case 'tefPAST_SEQ':
-        self.account.get_next_sequence(function(err, sequence) {
-          if (typeof sequence === 'number') {
-            self._next_sequence = sequence;
-          }
-          self._resubmit(2);
-        });
+        self._resubmit(2, tx);
       break;
       default:
         submission_error(message);
@@ -236,17 +254,18 @@ TransactionManager.prototype._request = function(tx) {
   function transaction_retry(message) {
     switch (message.engine_result) {
       case 'terPRE_SEQ':
-        self._fill(tx);
-        self._resubmit(3);
+        self._fill_sequence(tx, function() {
+          self._resubmit(2, tx);
+        });
         break;
       default:
-        self._resubmit(1);
+        self._resubmit(1, tx);
     }
   };
 
   function submission_error(error) {
     if (self._is_too_busy(error)) {
-      self._resubmit(1);
+      self._resubmit(1, tx);
     } else {
       self._next_sequence--;
       tx.set_state('remoteError');
@@ -256,7 +275,7 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   function submission_success(message) {
-    if (!tx.hash) {
+    if (message.tx_json.hash) {
       tx.hash = message.tx_json.hash;
     }
 
@@ -289,7 +308,7 @@ TransactionManager.prototype._request = function(tx) {
   submit_request.timeout(this._submission_timeout, function() {
     tx.emit('timeout');
     if (self.remote._connected) {
-      self._resubmit(1);
+      self._resubmit(1, tx);
     }
   });
 
@@ -334,9 +353,9 @@ TransactionManager.prototype.submit = function(tx) {
     tx.tx_json.Sequence = this._next_sequence++;
   }
 
-  tx.submit_index     = this.remote._ledger_current_index;
-  tx.last_ledger      = void(0);
-  tx.attempts         = 0;
+  tx.submit_index = this.remote._ledger_current_index;
+  tx.last_ledger  = void(0);
+  tx.attempts     = 0;
   tx.complete();
 
   function finalize(message) {
