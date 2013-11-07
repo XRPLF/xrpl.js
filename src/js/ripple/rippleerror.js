@@ -12,9 +12,9 @@ function RippleError(code, message) {
       break;
   }
 
-  this.result = this.result || this.engine_result || this.error || 'Error';
-  this.result_message = this.result_message || this.engine_result_message || this.error_message || 'Error';
-  this.message = this.result_message;
+  this.engine_result = this.result = (this.result || this.engine_result || this.error || 'Error');
+  this.engine_result_message = this.result_message = (this.result_message || this.engine_result_message || this.error_message || 'Error');
+  this.result_message = this.message = (this.result_message);
 
   var stack;
   if (!!Error.captureStackTrace)
