@@ -216,12 +216,15 @@ SerializedObject.prototype.serialize = function (typedef, obj) {
   }
 };
 
-SerializedObject.prototype.signing_hash = function (prefix) {
+SerializedObject.prototype.hash = function (prefix) {
   var sign_buffer = new SerializedObject();
   stypes.Int32.serialize(sign_buffer, prefix);
   sign_buffer.append(this.buffer);
   return sign_buffer.hash_sha512_half();
 };
+
+// DEPRECATED
+SerializedObject.prototype.signing_hash = SerializedObject.prototype.hash;
 
 SerializedObject.prototype.hash_sha512_half = function () {
   var bits = sjcl.codec.bytes.toBits(this.buffer);

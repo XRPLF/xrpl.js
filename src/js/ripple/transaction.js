@@ -71,8 +71,6 @@ function Transaction(remote) {
   // Transaction data.
   this.tx_json                = { Flags: 0 };
 
-  this.hash                   = void(0);
-
   // ledger_current_index was this when transaction was submited.
   this.submit_index           = void(0);
 
@@ -122,8 +120,12 @@ Transaction.flags = {
 
 Transaction.formats = require('./binformat').tx;
 
-Transaction.HASH_SIGN         = 0x53545800;
-Transaction.HASH_SIGN_TESTNET = 0x73747800;
+// transaction plus signature to give transaction ID
+Transaction.HASH_TXID         = 0x54584E00; // 'TXN'
+// inner transaction to sign
+Transaction.HASH_SIGN         = 0x53545800; // 'STX'
+// inner transaction to sign (TESTNET)
+Transaction.HASH_SIGN_TESTNET = 0x73747800; // 'stx'
 
 Transaction.prototype.consts = {
   telLOCAL_ERROR  : -399,
@@ -132,6 +134,10 @@ Transaction.prototype.consts = {
   terRETRY        : -99,
   tesSUCCESS      : 0,
   tecCLAIMED      : 100,
+};
+
+Transaction.from_json = function (j) {
+  return (new Transaction()).parse_json(j);
 };
 
 Transaction.prototype.isTelLocal = function (ter) {
@@ -206,8 +212,21 @@ Transaction.prototype.serialize = function () {
 };
 
 Transaction.prototype.signing_hash = function () {
-  var prefix = Transaction[config.testnet ? 'HASH_SIGN_TESTNET' : 'HASH_SIGN'];
-  return SerializedObject.from_json(this.tx_json).signing_hash(prefix);
+  return this.hash(config.testnet ? 'HASH_SIGN_TESTNET' : 'HASH_SIGN');
+};
+
+Transaction.prototype.hash = function (prefix, as_uint256) {
+  if ("string" === typeof prefix) {
+    if ("undefined" === typeof Transaction[prefix]) {
+      throw new Error("Unknown hashing prefix requested.");
+    }
+    prefix = Transaction[prefix];
+  } else if (!prefix) {
+    prefix = Transaction['HASH_TXID'];
+  }
+  var hash = SerializedObject.from_json(this.tx_json).hash(prefix);
+
+  return as_uint256 ? hash : hash.to_hex();
 };
 
 Transaction.prototype.sign = function () {
@@ -648,6 +667,12 @@ Transaction.prototype.abort = function(callback) {
     this.once('final', callback);
     this.emit('abort');
   }
+};
+
+Transaction.prototype.parse_json = function (v) {
+  this.tx_json = v;
+
+  return this;
 };
 
 exports.Transaction = Transaction;
