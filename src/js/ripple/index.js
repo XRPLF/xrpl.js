@@ -7,6 +7,7 @@ exports.Seed        = require('./amount').Seed;
 exports.Transaction = require('./transaction').Transaction;
 exports.Meta        = require('./meta').Meta;
 exports.SerializedObject = require('./serializedobject').SerializedObject;
+exports.RippleError = require('./rippleerror').RippleError;
 
 exports.binformat   = require('./binformat');
 exports.utils       = require('./utils');
