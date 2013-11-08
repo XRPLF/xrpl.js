@@ -46,7 +46,7 @@ TransactionQueue.prototype.removeHash = function(hash) {
   var result = [ ];
   for (var i=0, tx; tx=this._queue[i]; i++) {
     if (!tx.tx_json) continue;
-    if (tx.hash !== hash) result.push(tx);
+    if (tx._hash !== hash) result.push(tx);
   }
   this._queue = result;
 };

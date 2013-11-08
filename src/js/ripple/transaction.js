@@ -198,7 +198,7 @@ Transaction.prototype.complete = function () {
     }
   }
 
-  if (typeof this.tx_json.SigningPubKey === 'undefined' && (!this.remote || this.remote.local_signing)) {
+  if (typeof this.tx_json.SigningPubKey === 'undefined') {
     var seed = Seed.from_json(this._secret);
     var key  = seed.get_key(this.tx_json.Account);
     this.tx_json.SigningPubKey = key.to_hex_pub();

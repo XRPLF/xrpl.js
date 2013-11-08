@@ -35,7 +35,7 @@ function TransactionManager(account) {
 
     self._sequence_cache[sequence] = transaction;
 
-    var pending = self._pending.get('hash', hash);
+    var pending = self._pending.get('_hash', hash);
 
     if (pending) {
       pending.emit('success', transaction);
@@ -116,8 +116,8 @@ TransactionManager.normalize_transaction = function(tx) {
     tx.transaction = tx.tx;
   }
 
-  var hash        = tx.transaction.hash;
-  var sequence    = tx.transaction.Sequence;
+  var hash     = tx.transaction.hash;
+  var sequence = tx.transaction.Sequence;
 
   var transaction = {
     ledger_hash:   tx.ledger_hash || tx.transaction.ledger_hash,
@@ -127,6 +127,7 @@ TransactionManager.normalize_transaction = function(tx) {
   }
 
   transaction.hash = hash;
+  transaction._hash = hash;
   transaction.tx_json.ledger_index = transaction.ledger_index;
   transaction.tx_json.inLedger = transaction.ledger_index;
 
@@ -180,20 +181,23 @@ TransactionManager.prototype._resubmit = function(wait_ledgers, pending) {
       return;
     }
 
-    var hash_cached = self._cache[pending.hash];
-    var seq_cached  = self._sequence_cache[pending.tx_json.Sequence];
+    var hash_cached = self._cache[pending._hash];
 
     if (hash_cached) {
       pending.emit('success', hash_cached);
-    } else if (seq_cached) {
+    } else {
       //Sequence number has been consumed by
       //another transaction
-      pending.tx_json.Sequence++;
+
+      while (self._sequence_cache[pending.tx_json.Sequence]) {
+        pending.tx_json.Sequence += 1;
+      }
+
       pending.once('submitted', function() {
+        pending.emit('resubmitted');
         self._load_sequence();
       });
-      self._request(pending);
-    } else {
+
       self._request(pending);
     }
   }
@@ -228,6 +232,7 @@ TransactionManager.prototype._request = function(tx) {
 
   if (remote.local_signing) {
     tx.sign();
+    tx._hash = tx.hash();
     submit_request.tx_blob(tx.serialize().to_hex());
   } else {
     submit_request.secret(tx._secret);
@@ -244,7 +249,7 @@ TransactionManager.prototype._request = function(tx) {
   function transaction_failed(message) {
     switch (message.engine_result) {
       case 'tefPAST_SEQ':
-        self._resubmit(2, tx);
+        self._resubmit(3, tx);
       break;
       default:
         submission_error(message);
@@ -276,7 +281,7 @@ TransactionManager.prototype._request = function(tx) {
 
   function submission_success(message) {
     if (message.tx_json.hash) {
-      tx.hash = message.tx_json.hash;
+      tx._hash = message.tx_json.hash;
     }
 
     message.result = message.engine_result || '';
@@ -308,7 +313,7 @@ TransactionManager.prototype._request = function(tx) {
   submit_request.timeout(this._submission_timeout, function() {
     tx.emit('timeout');
     if (self.remote._connected) {
-      self._resubmit(1, tx);
+      self._resubmit(3, tx);
     }
   });
 
@@ -360,7 +365,7 @@ TransactionManager.prototype.submit = function(tx) {
 
   function finalize(message) {
     if (!tx.finalized) {
-      self._pending.removeHash(tx.hash);
+      self._pending.removeHash(tx._hash);
       tx.finalized = true;
       tx.emit('final', message);
     }
