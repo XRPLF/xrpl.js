@@ -6,24 +6,26 @@
  * SerializedObject.parse() or SerializedObject.serialize().
  */
 
-var assert   = require('assert');
-var extend   = require('extend');
-var utils    = require('./utils');
-var sjcl     = utils.sjcl;
+var assert    = require('assert');
+var extend    = require('extend');
+var binformat = require('./binformat');
+var utils     = require('./utils');
+var sjcl      = utils.sjcl;
 
-var UInt128  = require('./uint128').UInt128;
-var UInt160  = require('./uint160').UInt160;
-var UInt256  = require('./uint256').UInt256;
+var UInt128   = require('./uint128').UInt128;
+var UInt160   = require('./uint160').UInt160;
+var UInt256   = require('./uint256').UInt256;
 
-var amount   = require('./amount');
-var Amount   = amount.Amount;
-var Currency = amount.Currency;
+var amount    = require('./amount');
+var Amount    = amount.Amount;
+var Currency  = amount.Currency;
 
 // Shortcuts
-var hex    = sjcl.codec.hex;
-var bytes  = sjcl.codec.bytes;
+var hex       = sjcl.codec.hex;
+var bytes     = sjcl.codec.bytes;
 
 var BigInteger = utils.jsbn.BigInteger;
+
 
 var SerializedType = function (methods) {
   extend(this, methods);
@@ -154,6 +156,8 @@ var STInt8 = exports.Int8 = new SerializedType({
   }
 });
 
+STInt8.id = 16;
+
 var STInt16 = exports.Int16 = new SerializedType({
   serialize: function (so, val) {
     append_byte_array(so, val, 2);
@@ -163,6 +167,8 @@ var STInt16 = exports.Int16 = new SerializedType({
   }
 });
 
+STInt16.id = 1;
+
 var STInt32 = exports.Int32 = new SerializedType({
   serialize: function (so, val) {
     append_byte_array(so, val, 4)
@@ -171,6 +177,8 @@ var STInt32 = exports.Int32 = new SerializedType({
     return readAndSum(so, 4);
   }
 });
+
+STInt32.id = 2;
 
 var STInt64 = exports.Int64 = new SerializedType({
   serialize: function (so, val) {
@@ -206,17 +214,16 @@ var STInt64 = exports.Int64 = new SerializedType({
       hex = '0' + hex;
     }
 
-    return serialize_hex(so, hex, true); //noLength = true
+    serialize_hex(so, hex, true); //noLength = true
   },
   parse: function (so) {
-    var hi = readAndSum(so, 4);
-    var lo = readAndSum(so, 4);
-    var result = new BigInteger(String(hi));
-    result.shiftLeft(32);
-    result.add(lo);
+    var result = new BigInteger(so.read(8), 256);
+    assert(result instanceof BigInteger);
     return result;
   }
 });
+
+STInt64.id = 3;
 
 var STHash128 = exports.Hash128 = new SerializedType({
   serialize: function (so, val) {
@@ -231,6 +238,8 @@ var STHash128 = exports.Hash128 = new SerializedType({
   }
 });
 
+STHash128.id = 4;
+
 var STHash256 = exports.Hash256 = new SerializedType({
   serialize: function (so, val) {
     var hash = UInt256.from_json(val);
@@ -244,6 +253,8 @@ var STHash256 = exports.Hash256 = new SerializedType({
   }
 });
 
+STHash256.id = 5;
+
 var STHash160 = exports.Hash160 = new SerializedType({
   serialize: function (so, val) {
     var hash = UInt160.from_json(val);
@@ -256,6 +267,8 @@ var STHash160 = exports.Hash160 = new SerializedType({
     return UInt160.from_bytes(so.read(20));
   }
 });
+
+STHash160.id = 17;
 
 // Internal
 var STCurrency = new SerializedType({
@@ -388,6 +401,8 @@ var STAmount = exports.Amount = new SerializedType({
   }
 });
 
+STAmount.id = 6;
+
 var STVL = exports.VariableLength = new SerializedType({
   serialize: function (so, val) {
     if (typeof val === 'string') {
@@ -401,6 +416,8 @@ var STVL = exports.VariableLength = new SerializedType({
     return convert_bytes_to_hex(so.read(len));
   }
 });
+
+STVL.id = 7;
 
 var STAccount = exports.Account = new SerializedType({
   serialize: function (so, val) {
@@ -427,6 +444,8 @@ var STAccount = exports.Account = new SerializedType({
     return result;
   }
 });
+
+STAccount.id = 8;
 
 var STPathSet = exports.PathSet = new SerializedType({
   typeBoundary:  0xff,
@@ -532,6 +551,8 @@ var STPathSet = exports.PathSet = new SerializedType({
   }
 });
 
+STPathSet.id = 18;
+
 var STVector256 = exports.Vector256 = new SerializedType({
   serialize: function (so, val) { //Assume val is an array of STHash256 objects.
     var length_as_varint = SerializedType.serialize_varint(so, val.length);
@@ -549,6 +570,8 @@ var STVector256 = exports.Vector256 = new SerializedType({
   }
 });
 
+STVector256.id = 19;
+
 exports.serialize = exports.serialize_whatever = serialize;
 
 function serialize(so, field_name, value) {
@@ -558,16 +581,24 @@ function serialize(so, field_name, value) {
   var field_coordinates = INVERSE_FIELDS_MAP[field_name];
   var type_bits         = field_coordinates[0];
   var field_bits        = field_coordinates[1];
-  var tag_byte          = (type_bits < 16 ? type_bits << 4 : 0) | (field_bits < 16 ? field_bits : 0)
+  var tag_byte          = (type_bits < 16 ? type_bits << 4 : 0) | (field_bits < 16 ? field_bits : 0);
 
-  STInt8.serialize(so, tag_byte)
+  if (field_name === "LedgerEntryType" && "string" === typeof value) {
+    value = binformat.ledger[value][0];
+  }
+
+  if (field_name === "TransactionResult" && "string" === typeof value) {
+    value = binformat.ter[value];
+  }
+
+  STInt8.serialize(so, tag_byte);
 
   if (type_bits >= 16) {
-    STInt8.serialize(so, type_bits)
+    STInt8.serialize(so, type_bits);
   }
 
   if (field_bits >= 16) {
-    STInt8.serialize(so, field_bits)
+    STInt8.serialize(so, field_bits);
   }
 
   var serialized_object_type = TYPES_MAP[type_bits];
@@ -600,13 +631,39 @@ function parse(so) {
   return [ field_name, type.parse(so) ]; //key, value
 };
 
+function sort_fields(keys) {
+  function sort_field_compare(a, b) {
+    var a_field_coordinates = INVERSE_FIELDS_MAP[a];
+    var a_type_bits         = a_field_coordinates[0];
+    var a_field_bits        = a_field_coordinates[1];
+    var b_field_coordinates = INVERSE_FIELDS_MAP[b];
+    var b_type_bits         = b_field_coordinates[0];
+    var b_field_bits        = b_field_coordinates[1];
+
+    // Sort by type id first, then by field id
+    return a_type_bits !== b_type_bits ? a_type_bits - b_type_bits : a_field_bits - b_field_bits;
+  };
+
+  return keys.sort(sort_field_compare);
+}
+
 var STObject = exports.Object = new SerializedType({
-  serialize: function (so, val) {
+  serialize: function (so, val, no_marker) {
     var keys = Object.keys(val);
+
+    // Ignore lowercase field names - they're non-serializable fields by
+    // convention.
+    keys = keys.filter(function (key) {
+      return key[0] !== key[0].toLowerCase();
+    });
+
+    // Sort fields
+    keys = sort_fields(keys);
+
     for (var i=0; i<keys.length; i++) {
       serialize(so, keys[i], val[keys[i]]);
     }
-    STInt8.serialize(so, 0xe1); //Object ending marker
+    if (!no_marker) STInt8.serialize(so, 0xe1); //Object ending marker
   },
 
   parse: function (so) {
@@ -619,6 +676,8 @@ var STObject = exports.Object = new SerializedType({
     return output;
   }
 });
+
+STObject.id = 14;
 
 var STArray = exports.Array = new SerializedType({
   serialize: function (so, val) {
@@ -651,6 +710,8 @@ var STArray = exports.Array = new SerializedType({
     return output;
   }
 });
+
+STArray.id = 15;
 
 var TYPES_MAP = [
   void(0),
