@@ -54,6 +54,8 @@ var Seed             = require('./seed').Seed;
 var SerializedObject = require('./serializedobject').SerializedObject;
 var RippleError      = require('./rippleerror').RippleError;
 
+var hashprefixes     = require('./hashprefixes');
+
 var config           = require('./config');
 
 // A class to implement transactions.
@@ -119,13 +121,6 @@ Transaction.flags = {
 };
 
 Transaction.formats = require('./binformat').tx;
-
-// transaction plus signature to give transaction ID
-Transaction.HASH_TXID         = 0x54584E00; // 'TXN'
-// inner transaction to sign
-Transaction.HASH_SIGN         = 0x53545800; // 'STX'
-// inner transaction to sign (TESTNET)
-Transaction.HASH_SIGN_TESTNET = 0x73747800; // 'stx'
 
 Transaction.prototype.consts = {
   telLOCAL_ERROR  : -399,
@@ -212,17 +207,17 @@ Transaction.prototype.serialize = function () {
 };
 
 Transaction.prototype.signing_hash = function () {
-  return this.hash(config.testnet ? 'HASH_SIGN_TESTNET' : 'HASH_SIGN');
+  return this.hash(config.testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
 };
 
 Transaction.prototype.hash = function (prefix, as_uint256) {
   if ("string" === typeof prefix) {
-    if ("undefined" === typeof Transaction[prefix]) {
+    if ("undefined" === typeof hashprefixes[prefix]) {
       throw new Error("Unknown hashing prefix requested.");
     }
-    prefix = Transaction[prefix];
+    prefix = hashprefixes[prefix];
   } else if (!prefix) {
-    prefix = Transaction['HASH_TXID'];
+    prefix = hashprefixes['HASH_TX_ID'];
   }
   var hash = SerializedObject.from_json(this.tx_json).hash(prefix);
 

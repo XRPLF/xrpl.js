@@ -1,62 +1,29 @@
-var binformat = require('./binformat');
-var sjcl      = require('./utils').sjcl;
-var extend    = require('extend');
-var stypes    = require('./serializedtypes');
-var UInt256   = require('./uint256').UInt256;
-var assert    = require('assert');
+var binformat  = require('./binformat');
+var extend     = require('extend');
+var stypes     = require('./serializedtypes');
+var UInt256    = require('./uint256').UInt256;
+var assert     = require('assert');
 
-var TRANSACTION_TYPES = {
-  0:    'Payment',
-  3:    'AccountSet',
-  5:    'SetRegularKey',
-  7:    'OfferCreate',
-  8:    'OfferCancel',
-  9:    'Contract',
-  10:   'RemoveContract',
-  20:   'TrustSet',
-  100:  'EnableFeature',
-  101:  'SetFee'
-};
+var utils      = require('./utils');
+var sjcl       = utils.sjcl;
+var BigInteger = utils.jsbn.BigInteger;
 
-var LEDGER_ENTRY_TYPES = {
-  97:   'AccountRoot',
-  99:   'Contract',
-  100:  'DirectoryNode',
-  102:  'Features',
-  103:  'GeneratorMap',
-  104:  'LedgerHashes',
-  110:  'Nickname',
-  111:  'Offer',
-  114:  'RippleState',
-  115:  'FeeSettings'
-};
-
-var TRANSACTION_RESULTS = {
-  0  :  'tesSUCCESS',
-  100:  'tecCLAIM',
-  101:  'tecPATH_PARTIAL',
-  102:  'tecUNFUNDED_ADD',
-  103:  'tecUNFUNDED_OFFER',
-  104:  'tecUNFUNDED_PAYMENT',
-  105:  'tecFAILED_PROCESSING',
-  121:  'tecDIR_FULL',
-  122:  'tecINSUF_RESERVE_LINE',
-  123:  'tecINSUF_RESERVE_OFFER',
-  124:  'tecNO_DST',
-  125:  'tecNO_DST_INSUF_XRP',
-  126:  'tecNO_LINE_INSUF_RESERVE',
-  127:  'tecNO_LINE_REDUNDANT',
-  128:  'tecPATH_DRY',
-  129:  'tecUNFUNDED', // Deprecated, old ambiguous unfunded.
-  130:  'tecMASTER_DISABLED',
-  131:  'tecNO_REGULAR_KEY',
-  132:  'tecOWNERS'
-};
-
-var TX_ID_MAP = { };
+var TRANSACTION_TYPES = { };
 
 Object.keys(binformat.tx).forEach(function(key) {
-  TX_ID_MAP[key[0]] = key;
+  TRANSACTION_TYPES[binformat.tx[key][0]] = key;
+});
+
+var LEDGER_ENTRY_TYPES = {};
+
+Object.keys(binformat.ledger).forEach(function(key) {
+  LEDGER_ENTRY_TYPES[binformat.ledger[key][0]] = key;
+});
+
+var TRANSACTION_RESULTS = {};
+
+Object.keys(binformat.ter).forEach(function(key) {
+  TRANSACTION_RESULTS[binformat.ter[key]] = key;
 });
 
 function SerializedObject(buf) {
@@ -78,31 +45,31 @@ SerializedObject.from_json = function (obj) {
   var so  = new SerializedObject;
   var typedef;
 
-  switch (typeof obj.TransactionType)  {
-    case 'number':
-      obj.TransactionType = SerializedObject.lookup_type_tx(obj.TransactionType);
+  if ("number" === typeof obj.TransactionType) {
+    obj.TransactionType = SerializedObject.lookup_type_tx(obj.TransactionType);
 
-      if (!obj.TransactionType) {
-        throw new Error('Transaction type ID is invalid.');
-      }
-      break;
-    case 'string':
-      typedef = binformat.tx[obj.TransactionType];
-
-      if (!Array.isArray(typedef)) {
-        throw new Error('Transaction type is invalid');
-      }
-
-      typedef = typedef.slice();
-      obj.TransactionType = typedef.shift();
-      break;
-    default:
-      if (typeof obj.LedgerEntryType !== 'undefined') {
-      // XXX: TODO
-      throw new Error('Ledger entry binary format not yet implemented.');
-    } else {
-      throw new Error('Object to be serialized must contain either ' + 'TransactionType or LedgerEntryType.');
+    if (!obj.TransactionType) {
+      throw new Error('Transaction type ID is invalid.');
     }
+  }
+
+  if ("string" === typeof obj.TransactionType) {
+    typedef = binformat.tx[obj.TransactionType];
+
+    if (!Array.isArray(typedef)) {
+      throw new Error('Transaction type is invalid');
+    }
+
+    typedef = typedef.slice();
+    obj.TransactionType = typedef.shift();
+  } else if ("undefined" !== typeof obj.LedgerEntryType) {
+    // XXX: TODO
+    throw new Error('Ledger entry binary format not yet implemented.');
+  } else if ("object" === typeof obj.AffectedNodes) {
+    typedef = binformat.metadata;
+  } else {
+    throw new Error('Object to be serialized must contain either' +
+                    ' TransactionType, LedgerEntryType or AffectedNodes.');
   }
 
   so.serialize(typedef, obj);
@@ -111,6 +78,9 @@ SerializedObject.from_json = function (obj) {
 };
 
 SerializedObject.prototype.append = function (bytes) {
+  if (bytes instanceof SerializedObject) {
+    bytes = bytes.buffer;
+  }
   this.buffer = this.buffer.concat(bytes);
   this.pointer += bytes.length;
 };
@@ -174,13 +144,13 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
     case 'number':
       switch (field_name) {
         case 'LedgerEntryType':
-          output = LEDGER_ENTRY_TYPES[structure] || thing;
+          output = LEDGER_ENTRY_TYPES[structure];
           break;
         case 'TransactionResult':
-          output = TRANSACTION_RESULTS[structure] || thing;
+          output = TRANSACTION_RESULTS[structure];
           break;
         case 'TransactionType':
-          output = TRANSACTION_TYPES[structure] || thing;
+          output = TRANSACTION_TYPES[structure];
           break;
         default:
           output = structure;
@@ -190,6 +160,8 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
       if (!structure) break; //null
       if (typeof structure.to_json === 'function') {
         output = structure.to_json();
+      } else if (structure instanceof BigInteger) {
+        output = structure.toString(16).toUpperCase();
       } else {
         output = new structure.constructor; //new Array or Object
         var keys = Object.keys(structure);
@@ -207,13 +179,19 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
 };
 
 SerializedObject.prototype.serialize = function (typedef, obj) {
+  // Serialize object without end marker
+  stypes.Object.serialize(this, obj, true);
+
+  // ST: Old serialization
+  /*
   // Ensure canonical order
-  var typedef = SerializedObject.sort_typedef(typedef);
+  typedef = SerializedObject.sort_typedef(typedef);
 
   // Serialize fields
   for (var i=0, l=typedef.length; i<l; i++) {
     this.serialize_field(typedef[i], obj);
   }
+  */
 };
 
 SerializedObject.prototype.hash = function (prefix) {
@@ -236,12 +214,15 @@ SerializedObject.prototype.serialize_field = function (spec, obj) {
   var name     = spec[0];
   var presence = spec[1];
   var field_id = spec[2];
-  var Type     = spec[3];
+  var Type     = stypes[spec[3]];
 
   if (typeof obj[name] !== 'undefined') {
-    this.append(SerializedObject.get_field_header(Type.id, field_id));
+    // ST: Old serialization code
+    //this.append(SerializedObject.get_field_header(Type.id, field_id));
     try {
-      Type.serialize(this, obj[name]);
+      // ST: Old serialization code
+      //Type.serialize(this, obj[name]);
+      stypes.serialize(this, name, obj[name]);
     } catch (e) {
       // Add field name to message and rethrow
       e.message = 'Error serializing "' + name + '": ' + e.message;
@@ -275,15 +256,15 @@ SerializedObject.sort_typedef = function (typedef) {
 
   function sort_field_compare(a, b) {
     // Sort by type id first, then by field id
-    return a[3].id !== b[3].id ? a[3].id - b[3].id : a[2] - b[2];
+    return a[3] !== b[3] ? stypes[a[3]].id - stypes[b[3]].id : a[2] - b[2];
   };
 
   return typedef.sort(sort_field_compare);
 };
 
 SerializedObject.lookup_type_tx = function (id) {
-  assert(typeof id === 'string');
-  return TX_ID_MAP[id];
+  assert(typeof id === 'number');
+  return TRANSACTION_TYPES[id];
 };
 
 exports.SerializedObject = SerializedObject;
