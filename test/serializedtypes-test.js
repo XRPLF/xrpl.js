@@ -204,6 +204,24 @@ describe('Serialized types', function() {
         types.Int32.serialize(so, {});
       });
     });
+    it('Parse 0', function () {
+      var val = '00000000';
+      var so = new SerializedObject(val);
+      var num = types.Int32.parse(so);
+      assert.strictEqual(num, parseInt(val, 16));
+    });
+    it('Parse 1', function () {
+      var val = '00000001';
+      var so = new SerializedObject(val);
+      var num = types.Int32.parse(so);
+      assert.strictEqual(num, parseInt(val, 16));
+    });
+    it('Parse UINT32_MAX', function () {
+      var val = 'FFFFFFFF';
+      var so = new SerializedObject(val);
+      var num = types.Int32.parse(so);
+      assert.strictEqual(num, parseInt(val, 16));
+    });
   });
 
   describe('Int64', function() {
@@ -333,10 +351,28 @@ describe('Serialized types', function() {
       types.Hash128.serialize(so, '102030405060708090A0B0C0D0E0F000');
       assert.strictEqual(so.to_hex(), '102030405060708090A0B0C0D0E0F000');
     });
-    it('Serialize FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', function () {
+    it('Serialize HASH128_MAX', function () {
       var so = new SerializedObject();
       types.Hash128.serialize(so, 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
       assert.strictEqual(so.to_hex(), 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
+    });
+    it('Parse 0', function () {
+      var val = '00000000000000000000000000000000';
+      var so = new SerializedObject(val);
+      var num = types.Hash128.parse(so);
+      assert.strictEqual(num.to_hex(), val);
+    });
+    it('Parse 1', function () {
+      var val = '00000000000000000000000000000001';
+      var so = new SerializedObject(val);
+      var num = types.Hash128.parse(so);
+      assert.strictEqual(num.to_hex(), val);
+    });
+    it('Parse HASH128_MAX', function () {
+      var val = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
+      var so = new SerializedObject(val);
+      var num = types.Hash128.parse(so);
+      assert.strictEqual(num.to_hex(), val);
     });
   });
 
@@ -355,6 +391,24 @@ describe('Serialized types', function() {
       var so = new SerializedObject();
       types.Hash160.serialize(so, 'rQLbzfJH5BT1FS9apRLKV3G8dWEA5njaQi');
       assert.strictEqual(so.to_hex(), 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
+    });
+    it('Parse 0', function () {
+      var val = '0000000000000000000000000000000000000000';
+      var so = new SerializedObject(val);
+      var num = types.Hash160.parse(so);
+      assert.strictEqual(num.to_hex(), val);
+    });
+    it('Parse 1', function () {
+      var val = '0000000000000000000000000000000000000001';
+      var so = new SerializedObject(val);
+      var num = types.Hash160.parse(so);
+      assert.strictEqual(num.to_hex(), val);
+    });
+    it('Parse HASH160_MAX', function () {
+      var val = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
+      var so = new SerializedObject(val);
+      var num = types.Hash160.parse(so);
+      assert.strictEqual(num.to_hex(), val);
     });
   });
 

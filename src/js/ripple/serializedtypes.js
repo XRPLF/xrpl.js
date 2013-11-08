@@ -140,11 +140,17 @@ function append_byte_array(so, val, bytes) {
 function readAndSum(so, bytes) {
   var sum = 0;
 
-  for (var i=0; i<bytes; i++) {
-    sum += (so.read(1)[0] << (8 * (bytes - i - 1)));
+  if (bytes > 4) {
+    throw new Error("This function only supports up to four bytes.");
   }
 
-  return sum;
+  for (var i=0; i<bytes; i++) {
+    var byte = so.read(1)[0];
+    sum += (byte << (8 * (bytes - i - 1)));
+  }
+
+  // Convert to unsigned integer
+  return sum >>> 0;
 };
 
 var STInt8 = exports.Int8 = new SerializedType({
@@ -171,7 +177,7 @@ STInt16.id = 1;
 
 var STInt32 = exports.Int32 = new SerializedType({
   serialize: function (so, val) {
-    append_byte_array(so, val, 4)
+    append_byte_array(so, val, 4);
   },
   parse: function (so) {
     return readAndSum(so, 4);
