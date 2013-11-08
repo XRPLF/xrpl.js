@@ -1,17 +1,18 @@
-exports.Remote      = require('./remote').Remote;
-exports.Amount      = require('./amount').Amount;
-exports.Currency    = require('./currency').Currency;
-exports.Base        = require('./base').Base;
-exports.UInt160     = require('./amount').UInt160;
-exports.Seed        = require('./amount').Seed;
-exports.Transaction = require('./transaction').Transaction;
-exports.Meta        = require('./meta').Meta;
+exports.Remote           = require('./remote').Remote;
+exports.Request          = require('./request').Request;
+exports.Amount           = require('./amount').Amount;
+exports.Currency         = require('./currency').Currency;
+exports.Base             = require('./base').Base;
+exports.UInt160          = require('./amount').UInt160;
+exports.Seed             = require('./amount').Seed;
+exports.Transaction      = require('./transaction').Transaction;
+exports.Meta             = require('./meta').Meta;
 exports.SerializedObject = require('./serializedobject').SerializedObject;
-exports.RippleError = require('./rippleerror').RippleError;
+exports.RippleError      = require('./rippleerror').RippleError;
 
-exports.binformat   = require('./binformat');
-exports.utils       = require('./utils');
-exports.Server      = require('./server').Server;
+exports.binformat        = require('./binformat');
+exports.utils            = require('./utils');
+exports.Server           = require('./server').Server;
 
 // Important: We do not guarantee any specific version of SJCL or for any
 // specific features to be included. The version and configuration may change at
