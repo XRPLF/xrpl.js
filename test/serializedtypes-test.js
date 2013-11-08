@@ -315,6 +315,11 @@ describe('Serialized types', function() {
         types.Int64.serialize(so, {});
       });
     });
+    it('Parse "0123456789ABCDEF"', function () {
+      var so = new SerializedObject("0123456789ABCDEF");
+      var num = types.Int64.parse(so);
+      assert.strictEqual(num.toString(10), '81985529216486895');
+    });
   });
 
   describe('Hash128', function() {
