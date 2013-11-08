@@ -77,8 +77,7 @@ SHAMapTreeNodeInner.prototype.add_item = function (tag_segment, node) {
       new_inner_node.set_node(current_node.get_segment()[0], current_node);
 
       // Add the new node next to it
-      node.set_segment(tag_segment.slice(1));
-      new_inner_node.set_node(tag_segment[1], node);
+      new_inner_node.add_item(tag_segment.slice(1), node);
 
       // And place the newly created inner node in the slot
       this.set_node(tag_segment[0], new_inner_node);
