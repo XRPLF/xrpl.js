@@ -174,7 +174,7 @@ UInt.prototype.parse_bytes = function (j) {
   if (!Array.isArray(j) || j.length !== this.constructor.width) {
 	this._value = NaN;
   } else {
-	  this._value  = new BigInteger(j, 256);
+	  this._value  = new BigInteger([0].concat(j), 256);
   }
 
   return this;

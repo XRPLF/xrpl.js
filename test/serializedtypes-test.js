@@ -358,6 +358,42 @@ describe('Serialized types', function() {
     });
   });
 
+  describe('Hash256', function() {
+    it('Serialize 0', function () {
+      var so = new SerializedObject();
+      types.Hash256.serialize(so, '0000000000000000000000000000000000000000000000000000000000000000');
+      assert.strictEqual(so.to_hex(), '0000000000000000000000000000000000000000000000000000000000000000');
+    });
+    it('Serialize 1', function () {
+      var so = new SerializedObject();
+      types.Hash256.serialize(so, '0000000000000000000000000000000000000000000000000000000000000001');
+      assert.strictEqual(so.to_hex(), '0000000000000000000000000000000000000000000000000000000000000001');
+    });
+    it('Serialize HASH256_MAX', function () {
+      var so = new SerializedObject();
+      types.Hash256.serialize(so, 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
+      assert.strictEqual(so.to_hex(), 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
+    });
+    it('Parse 0', function () {
+      var val = '0000000000000000000000000000000000000000000000000000000000000000';
+      var so = new SerializedObject(val);
+      var num = types.Hash256.parse(so);
+      assert.strictEqual(num.to_hex(), val);
+    });
+    it('Parse 1', function () {
+      var val = '0000000000000000000000000000000000000000000000000000000000000000';
+      var so = new SerializedObject(val);
+      var num = types.Hash256.parse(so);
+      assert.strictEqual(num.to_hex(), val);
+    });
+    it('Parse HASH256_MAX', function () {
+      var val = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
+      var so = new SerializedObject(val);
+      var num = types.Hash256.parse(so);
+      assert.strictEqual(num.to_hex(), val);
+    });
+  });
+
   describe('Amount', function() {
     it('Serialize 0 XRP', function () {
       var so = new SerializedObject();
