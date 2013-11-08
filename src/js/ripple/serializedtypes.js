@@ -44,7 +44,7 @@ function isHexInt64String(val) {
 };
 
 function isCurrencyString(val) {
-  return isString(val) && /^[A-Z]{3}$/.test(val);
+  return isString(val) && /^[A-Z0-9]{3}$/.test(val);
 };
 
 function isBigInteger(val) {
