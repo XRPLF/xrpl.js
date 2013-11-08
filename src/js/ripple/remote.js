@@ -807,12 +807,14 @@ Remote.account_request = function(type, accountID, account_index, ledger, callba
     callback      = account_index;
     ledger        = options.ledger;
     account_index = options.account_index;
-    accoutID      = options.accountID;
+    accoutID      = options.accountID || options.account;
   }
 
   var request = new Request(this, type);
+  var account = UInt160.json_rewrite(accountID);
 
-  request.message.account = UInt160.json_rewrite(accountID);
+  request.message.ident   = account; //DEPRECATED;
+  request.message.account = account;
 
   if (account_index) {
     request.message.index = account_index;
