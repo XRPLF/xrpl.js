@@ -57,7 +57,7 @@ function SHAMapTreeNodeInner() {
 util.inherits(SHAMapTreeNodeInner, SHAMapTreeNode);
 
 SHAMapTreeNodeInner.prototype.add_item = function (tag_segment, node) {
-  var current_node = this.get_node(tag_segment);
+  var current_node = this.get_node(tag_segment[0]);
 
   if (current_node) {
     // A node already exists in this slot
