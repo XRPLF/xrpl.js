@@ -494,6 +494,17 @@ describe('Serialized types', function() {
       types.Amount.serialize(so, '-1/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(so.to_hex(), '94838D7EA4C680000000000000000000000000005553440000000000B5F762798A53D543A014CAF8B297CFF8F2F937E8');
     });
+    it('Serialize 15/XRP/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
+      // This actually appears in the ledger, so we need to be able to serialize
+      // Transaction #A2AD66C93C7B7277CD5AEB718A4E82D88C7099129948BC66A394EE38B34657A9
+      var so = new SerializedObject();
+      types.Amount.serialize(so, {
+        "value":"1000",
+        "currency":"XRP",
+        "issuer":"rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo"
+      });
+      assert.strictEqual(so.to_hex(), 'D5438D7EA4C680000000000000000000000000005852500000000000E4FE687C90257D3D2D694C8531CDEECBE84F3367');
+    });
     it('Parse 1 XRP', function () {
       var so = new SerializedObject('4000000000000001');
       assert.strictEqual(types.Amount.parse(so).to_json(), '1');

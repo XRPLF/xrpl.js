@@ -278,14 +278,14 @@ STHash160.id = 17;
 
 // Internal
 var STCurrency = new SerializedType({
-  serialize: function (so, val) {
+  serialize: function (so, val, xrp_as_ascii) {
     var currency = val.to_json().toUpperCase();
 
     if (!isCurrencyString(currency)) {
       throw new Error('Tried to serialize invalid/unimplemented currency type.');
     }
 
-    if (currency === 'XRP') {
+    if (currency === 'XRP' && !xrp_as_ascii) {
       serialize_hex(so, UInt160.HEX_ZERO, true);
     } else {
       var currencyCode = currency.toUpperCase();
@@ -361,7 +361,7 @@ var STAmount = exports.Amount = new SerializedType({
     if (!amount.is_native()) {
       // Currency (160-bit hash)
       var currency = amount.currency();
-      STCurrency.serialize(so, currency);
+      STCurrency.serialize(so, currency, true);
 
       // Issuer (160-bit hash)
       so.append(amount.issuer().to_bytes());
