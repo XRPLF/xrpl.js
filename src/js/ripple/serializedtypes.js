@@ -533,8 +533,9 @@ var STPathSet = exports.PathSet = new SerializedType({
         if (tag_byte & this.typeCurrency) {
           //console.log('entry.currency');
           entry.currency = STCurrency.parse(so);
-          if (entry.currency === "XRP") {
-            entry.non_native = !entry.currency.is_native();
+          if (entry.currency.to_json() === "XRP" &&
+              !entry.currency.is_native()) {
+            entry.non_native = true;
           }
         }
         if (tag_byte & this.typeIssuer) {
@@ -628,14 +629,14 @@ function parse(so) {
 
   var type = TYPES_MAP[type_bits];
 
-  assert(type, 'Unknown type: ' + type_bits);
+  assert(type, 'Unknown type - header byte is 0x' + tag_byte.toString(16));
 
   var field_bits = tag_byte & 0x0f;
   var field_name = (field_bits === 0)
   ? field_name = FIELDS_MAP[type_bits][so.read(1)[0]]
   : field_name = FIELDS_MAP[type_bits][field_bits];
 
-  assert(field_name, 'Unknown field: ' + tag_byte);
+  assert(field_name, 'Unknown field - header byte is 0x' + tag_byte.toString(16));
 
   return [ field_name, type.parse(so) ]; //key, value
 };
