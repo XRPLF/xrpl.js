@@ -482,7 +482,7 @@ var STPathSet = exports.PathSet = new SerializedType({
 
         if (entry.currency) {
           var currency = Currency.from_json(entry.currency);
-          STCurrency.serialize(so, currency);
+          STCurrency.serialize(so, currency, entry.non_native);
         }
 
         if (entry.issuer) {
@@ -532,7 +532,10 @@ var STPathSet = exports.PathSet = new SerializedType({
         }
         if (tag_byte & this.typeCurrency) {
           //console.log('entry.currency');
-          entry.currency = STCurrency.parse(so)
+          entry.currency = STCurrency.parse(so);
+          if (entry.currency === "XRP") {
+            entry.non_native = !entry.currency.is_native();
+          }
         }
         if (tag_byte & this.typeIssuer) {
           //console.log('entry.issuer');
