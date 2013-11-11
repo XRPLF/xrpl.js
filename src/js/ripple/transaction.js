@@ -227,11 +227,16 @@ Transaction.prototype.hash = function (prefix, as_uint256) {
 Transaction.prototype.sign = function () {
   var seed = Seed.from_json(this._secret);
 
+  var prev_sig = this.tx_json.TxnSignature;
   delete this.tx_json.TxnSignature;
 
   var hash = this.signing_hash();
 
-  if (hash === this._previous_signing_hash) return;
+  // If the hash is the same, we can re-use the previous signature
+  if (prev_sig && hash === this._previous_signing_hash) {
+    this.tx_json.TxnSignature = prev_sig;
+    return;
+  }
 
   var key  = seed.get_key(this.tx_json.Account);
   var sig  = key.sign(hash, 0);
