@@ -28,8 +28,8 @@ function TransactionManager(account) {
   // transaction sequence number
   this._load_sequence();
 
-  function cache_transaction(transaction) {
-    var transaction = TransactionManager.normalize_transaction(transaction);
+  function cache_transaction(res) {
+    var transaction = TransactionManager.normalize_transaction(res);
     var sequence = transaction.tx_json.Sequence;
     var hash = transaction.hash;
 
@@ -38,7 +38,7 @@ function TransactionManager(account) {
     var pending = self._pending.get('_hash', hash);
 
     if (pending) {
-      pending.emit('success', transaction);
+      pending.emit('success', res);
     } else {
       self._cache[hash] = transaction;
     }
