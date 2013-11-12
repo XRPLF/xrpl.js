@@ -1393,6 +1393,8 @@ Remote.prototype.request_unl_add = function (addr, comment, callback) {
   request.message.node = addr;
 
   if (comment) {
+    // note is not specified anywhere, should remove?
+    var note = undefined; 
     request.message.comment = note;
   }
 
