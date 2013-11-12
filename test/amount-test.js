@@ -36,7 +36,7 @@ describe('Amount', function() {
       assert.deepEqual(new BigInteger(), UInt160.from_generic('0')._value);
     });
     it('Parse 0 export', function () {
-      assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_generic('0').to_json());
+      assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_generic('0').set_version(0).to_json());
     });
     it('Parse 1', function () {
       assert.deepEqual(new BigInteger([1]), UInt160.from_generic('1')._value);

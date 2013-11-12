@@ -15,6 +15,7 @@ var Base = require('./base').Base;
 var UInt160 = extend(function () {
   // Internal form: NaN or BigInteger
   this._value  = NaN;
+  this._version_byte = void(0);
 }, UInt);
 
 UInt160.width = 20;
@@ -28,6 +29,16 @@ var HEX_ONE      = UInt160.HEX_ONE      = '0000000000000000000000000000000000000
 var STR_ZERO     = UInt160.STR_ZERO     = utils.hexToString(HEX_ZERO);
 var STR_ONE      = UInt160.STR_ONE      = utils.hexToString(HEX_ONE);
 
+UInt160.prototype.set_version = function (j) {
+  this._version_byte = j;
+
+  return this;
+};
+
+UInt160.prototype.get_version = function () {
+  return this._version_byte;
+};
+
 // value = NaN on error.
 UInt160.prototype.parse_json = function (j) {
   // Canonicalize and validate
@@ -36,13 +47,30 @@ UInt160.prototype.parse_json = function (j) {
   }
 
   if (typeof j === 'number' && !isNaN(j)) {
-    this._value  = new BigInteger(String(j));
+    // Allow raw numbers - DEPRECATED
+    // This is used mostly by the test suite and is supported
+    // as a legacy feature only. DO NOT RELY ON THIS BEHAVIOR.
+    this._value = new BigInteger(String(j));
+    this._version_byte = Base.VER_ACCOUNT_ID;
   } else if (typeof j !== 'string') {
     this._value = NaN;
   } else if (j[0] === 'r') {
-    this._value  = Base.decode_check(Base.VER_ACCOUNT_ID, j);
+    this._value = Base.decode_check(Base.VER_ACCOUNT_ID, j);
+    this._version_byte = Base.VER_ACCOUNT_ID;
   } else {
-    this._value = NaN;
+    this.parse_hex(j);
+  }
+
+  return this;
+};
+
+UInt160.prototype.parse_generic = function (j) {
+  UInt.prototype.parse_generic.call(this, j);
+
+  if (isNaN(this._value)) {
+    if ("string" === typeof j && j[0] === 'r') {
+      this._value = Base.decode_check(Base.VER_ACCOUNT_ID, j);
+    }
   }
 
   return this;
@@ -50,17 +78,22 @@ UInt160.prototype.parse_json = function (j) {
 
 // XXX Json form should allow 0 and 1, C++ doesn't currently allow it.
 UInt160.prototype.to_json = function (opts) {
-  var opts  = opts || {};
-  var output = NaN;
+  opts  = opts || {};
 
   if (this._value instanceof BigInteger) {
-    output = Base.encode_check(Base.VER_ACCOUNT_ID, this.to_bytes());
-    if (opts.gateways && output in opts.gateways) {
-      output = opts.gateways[output];
+    // If this value has a type, return a Base58 encoded string.
+    if ("number" === typeof this._version_byte) {
+      var output = Base.encode_check(this._version_byte, this.to_bytes());
+      if (opts.gateways && output in opts.gateways) {
+        output = opts.gateways[output];
+      }
+
+      return output;
+    } else {
+      return this.to_hex();
     }
   }
-   
-  return output;
+  return NaN;
 };
 
 exports.UInt160 = UInt160;
