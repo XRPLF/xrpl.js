@@ -2,7 +2,7 @@ var utils            = require('./testutils');
 var assert           = require('assert');
 var SerializedObject = utils.load_module('serializedobject').SerializedObject;
 
-describe('Serialied object', function() {
+describe('Serialized object', function() {
   describe('Serialized object', function() {
     it('From json and back', function() {
       var input_json = {
@@ -18,7 +18,7 @@ describe('Serialied object', function() {
             issuer:    'r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV'
           },
           {
-            currency:'XRP'
+            currency: 'XRP'
           }
         ]],
         SendMax: {

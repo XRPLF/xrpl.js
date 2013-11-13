@@ -129,9 +129,6 @@ UInt.prototype.parse_generic = function (j) {
     if ('string' !== typeof j) {
 	    this._value  = NaN;
     }
-    else if (j[0] === "r") {
-	    this._value  = Base.decode_check(Base.VER_ACCOUNT_ID, j);
-    }
     else if (this.constructor.width === j.length) {
 	    this._value  = new BigInteger(utils.stringToArray(j), 256);
     }

@@ -378,19 +378,37 @@ describe('Serialized types', function() {
 
   describe('Hash160', function() {
     it('Serialize 0', function () {
+      var hex = '0000000000000000000000000000000000000000';
+      var base58 = 'rrrrrrrrrrrrrrrrrrrrrhoLvTp';
       var so = new SerializedObject();
-      types.Hash160.serialize(so, 'rrrrrrrrrrrrrrrrrrrrrhoLvTp');
-      assert.strictEqual(so.to_hex(), '0000000000000000000000000000000000000000');
+      types.Hash160.serialize(so, base58);
+      assert.strictEqual(so.to_hex(), hex);
+
+      so = new SerializedObject();
+      types.Hash160.serialize(so, hex);
+      assert.strictEqual(so.to_hex(), hex);
     });
     it('Serialize 1', function () {
+      var hex = '0000000000000000000000000000000000000001';
+      var base58 = 'rrrrrrrrrrrrrrrrrrrrBZbvji';
       var so = new SerializedObject();
-      types.Hash160.serialize(so, 'rrrrrrrrrrrrrrrrrrrrBZbvji');
-      assert.strictEqual(so.to_hex(), '0000000000000000000000000000000000000001');
+      types.Hash160.serialize(so, base58);
+      assert.strictEqual(so.to_hex(), hex);
+
+      so = new SerializedObject();
+      types.Hash160.serialize(so, hex);
+      assert.strictEqual(so.to_hex(), hex);
     });
     it('Serialize FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', function () {
+      var hex = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
+      var base58 = 'rQLbzfJH5BT1FS9apRLKV3G8dWEA5njaQi';
       var so = new SerializedObject();
-      types.Hash160.serialize(so, 'rQLbzfJH5BT1FS9apRLKV3G8dWEA5njaQi');
-      assert.strictEqual(so.to_hex(), 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
+      types.Hash160.serialize(so, base58);
+      assert.strictEqual(so.to_hex(), hex);
+
+      so = new SerializedObject();
+      types.Hash160.serialize(so, hex);
+      assert.strictEqual(so.to_hex(), hex);
     });
     it('Parse 0', function () {
       var val = '0000000000000000000000000000000000000000';
@@ -409,6 +427,14 @@ describe('Serialized types', function() {
       var so = new SerializedObject(val);
       var num = types.Hash160.parse(so);
       assert.strictEqual(num.to_hex(), val);
+    });
+    it('Parse 0 as JSON', function () {
+      // Hash160 should be returned as hex in JSON, unlike
+      // addresses.
+      var val = '0000000000000000000000000000000000000000';
+      var so = new SerializedObject(val);
+      var num = types.Hash160.parse(so);
+      assert.strictEqual(num.to_json(), val);
     });
   });
 
@@ -539,6 +565,60 @@ describe('Serialized types', function() {
     });
   });
 
+  describe('Account', function() {
+    it('Serialize 0', function () {
+      var hex = '0000000000000000000000000000000000000000';
+      var base58 = 'rrrrrrrrrrrrrrrrrrrrrhoLvTp';
+      var so = new SerializedObject();
+      types.Account.serialize(so, base58);
+      assert.strictEqual(so.to_hex(), "14"+hex);
+
+      so = new SerializedObject();
+      types.Account.serialize(so, hex);
+      assert.strictEqual(so.to_hex(), "14"+hex);
+    });
+    it('Serialize 1', function () {
+      var hex = '0000000000000000000000000000000000000001';
+      var base58 = 'rrrrrrrrrrrrrrrrrrrrBZbvji';
+      var so = new SerializedObject();
+      types.Account.serialize(so, base58);
+      assert.strictEqual(so.to_hex(), "14"+hex);
+
+      so = new SerializedObject();
+      types.Account.serialize(so, hex);
+      assert.strictEqual(so.to_hex(), "14"+hex);
+    });
+    it('Serialize FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', function () {
+      var hex = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
+      var base58 = 'rQLbzfJH5BT1FS9apRLKV3G8dWEA5njaQi';
+      var so = new SerializedObject();
+      types.Account.serialize(so, base58);
+      assert.strictEqual(so.to_hex(), "14"+hex);
+
+      so = new SerializedObject();
+      types.Account.serialize(so, hex);
+      assert.strictEqual(so.to_hex(), "14"+hex);
+    });
+    it('Parse 0', function () {
+      var val = '140000000000000000000000000000000000000000';
+      var so = new SerializedObject(val);
+      var num = types.Account.parse(so);
+      assert.strictEqual(num.to_json(), 'rrrrrrrrrrrrrrrrrrrrrhoLvTp');
+    });
+    it('Parse 1', function () {
+      var val = '140000000000000000000000000000000000000001';
+      var so = new SerializedObject(val);
+      var num = types.Account.parse(so);
+      assert.strictEqual(num.to_json(), 'rrrrrrrrrrrrrrrrrrrrBZbvji');
+    });
+    it('Parse HASH160_MAX', function () {
+      var val = '14FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
+      var so = new SerializedObject(val);
+      var num = types.Account.parse(so);
+      assert.strictEqual(num.to_json(), 'rQLbzfJH5BT1FS9apRLKV3G8dWEA5njaQi');
+    });
+  });
+
   describe('PathSet', function() {
     it('Serialize single empty path [[]]', function () {
       var so = new SerializedObject();
@@ -564,24 +644,114 @@ describe('Serialized types', function() {
       }]]);
       assert.strictEqual(so.to_hex(), '31000000000000000000000000000000000000007B00000000000000000000000055534400000000000000000000000000000000000000000000000315FF31000000000000000000000000000000000000007B000000000000000000000000425443000000000000000000000000000000000000000000000003153100000000000000000000000000000000000003DB0000000000000000000000004555520000000000000000000000000000000000000000000000014100'); //TODO: Check this independently
     });
+    it('Serialize path through XRP', function () {
+      var hex = '31000000000000000000000000000000000000007B00000000000000000000000055534400000000000000000000000000000000000000000000000315FF1000000000000000000000000000000000000000003100000000000000000000000000000000000003DB0000000000000000000000004555520000000000000000000000000000000000000000000000014100';
+      var json = [
+        [ {
+          account:   "rrrrrrrrrrrrrrrrrrrrNxV3Xza",
+          currency:  'USD',
+          issuer:    "rrrrrrrrrrrrrrrrrrrpYnYCNYf"
+        }],
+        [{
+          currency: "XRP"
+        }, {
+          account:   "rrrrrrrrrrrrrrrrrrrpvQsW3V3",
+          currency:  'EUR',
+          issuer:    "rrrrrrrrrrrrrrrrrrrdHRtqg2"
+        }]
+      ];
+
+      var so = new SerializedObject();
+      types.PathSet.serialize(so, json);
+      assert.strictEqual(so.to_hex(), hex);
+
+      so = new SerializedObject(hex);
+      var parsed_path = SerializedObject.jsonify_structure(types.PathSet.parse(so));
+      assert.deepEqual(parsed_path, json);
+    });
+    it('Serialize path through XRP IOUs', function () {
+      // Appears in the history
+      // TX #0CBB429C456ED999CC691DFCC8E62E8C8C7E9522C2BEA967FED0D7E2A9B28D13
+      // Note that XRP IOUs are no longer allowed, so this functionality is
+      // for historic transactions only.
+
+      var hex = '31585E1F3BD02A15D6185F8BB9B57CC60DEDDB37C10000000000000000000000004254430000000000585E1F3BD02A15D6185F8BB9B57CC60DEDDB37C131E4FE687C90257D3D2D694C8531CDEECBE84F33670000000000000000000000004254430000000000E4FE687C90257D3D2D694C8531CDEECBE84F3367310A20B3C85F482532A9578DBB3950B85CA06594D100000000000000000000000042544300000000000A20B3C85F482532A9578DBB3950B85CA06594D13000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D1FF31585E1F3BD02A15D6185F8BB9B57CC60DEDDB37C10000000000000000000000004254430000000000585E1F3BD02A15D6185F8BB9B57CC60DEDDB37C131E4FE687C90257D3D2D694C8531CDEECBE84F33670000000000000000000000004254430000000000E4FE687C90257D3D2D694C8531CDEECBE84F33673115036E2D3F5437A83E5AC3CAEE34FF2C21DEB618000000000000000000000000425443000000000015036E2D3F5437A83E5AC3CAEE34FF2C21DEB6183000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D1FF31585E1F3BD02A15D6185F8BB9B57CC60DEDDB37C10000000000000000000000004254430000000000585E1F3BD02A15D6185F8BB9B57CC60DEDDB37C13157180C769B66D942EE69E6DCC940CA48D82337AD000000000000000000000000425443000000000057180C769B66D942EE69E6DCC940CA48D82337AD1000000000000000000000000058525000000000003000000000000000000000000055534400000000000A20B3C85F482532A9578DBB3950B85CA06594D100';
+      var json = [
+        [{
+          "account": "r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K",
+          "currency": "BTC",
+          "issuer": "r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K"
+        }, {
+          "account": "rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo",
+          "currency": "BTC",
+          "issuer": "rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo"
+        }, {
+          "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }, {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }],
+        [{
+          "account": "r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K",
+          "currency": "BTC",
+          "issuer": "r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K"
+        }, {
+          "account": "rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo",
+          "currency": "BTC",
+          "issuer": "rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo"
+        }, {
+          "account": "rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi",
+          "currency": "BTC",
+          "issuer": "rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi"
+        }, {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }],
+        [{
+          "account": "r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K",
+          "currency": "BTC",
+          "issuer": "r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K"
+        }, {
+          "account": "r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn",
+          "currency": "BTC",
+          "issuer": "r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn"
+        }, {
+          "currency": "XRP",
+          "non_native": true
+        }, {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }]
+      ];
+
+      var so = new SerializedObject();
+      types.PathSet.serialize(so, json);
+      assert.strictEqual(so.to_hex(), hex);
+
+      so = new SerializedObject(hex);
+      var parsed_path = SerializedObject.jsonify_structure(types.PathSet.parse(so));
+      assert.deepEqual(parsed_path, json);
+    });
     it('Parse single empty path [[]]', function () {
       var so = new SerializedObject('00');
-      var parsed_path = types.PathSet.parse(so)
+      var parsed_path = SerializedObject.jsonify_structure(types.PathSet.parse(so));
       assert.deepEqual(parsed_path, [[]]);
     });
     it('Parse [[e],[e,e]]', function () {
       var so = new SerializedObject('31000000000000000000000000000000000000007B00000000000000000000000055534400000000000000000000000000000000000000000000000315FF31000000000000000000000000000000000000007B000000000000000000000000425443000000000000000000000000000000000000000000000003153100000000000000000000000000000000000003DB0000000000000000000000004555520000000000000000000000000000000000000000000000014100');
 
       var parsed_path = types.PathSet.parse(so);
-	  var comp =[ [ { account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
-					  currency: 'USD',
-					  issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf' } ],
-				  [ { account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
-					  currency: 'BTC',
-					  issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf' },
-					{ account: 'rrrrrrrrrrrrrrrrrrrpvQsW3V3',
-					  currency: 'EUR',
-					  issuer: 'rrrrrrrrrrrrrrrrrrrdHRtqg2' } ] ];  
+      var comp = [ [ { account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
+                       currency: 'USD',
+                       issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf' } ],
+                   [ { account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
+                       currency: 'BTC',
+                       issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf' },
+                     { account: 'rrrrrrrrrrrrrrrrrrrpvQsW3V3',
+                       currency: 'EUR',
+                       issuer: 'rrrrrrrrrrrrrrrrrrrdHRtqg2' } ] ];
       assert.deepEqual(SerializedObject.jsonify_structure(parsed_path, ""), comp);
     });
   });

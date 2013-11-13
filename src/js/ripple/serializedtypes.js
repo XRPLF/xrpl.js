@@ -15,6 +15,7 @@ var sjcl      = utils.sjcl;
 var UInt128   = require('./uint128').UInt128;
 var UInt160   = require('./uint160').UInt160;
 var UInt256   = require('./uint256').UInt256;
+var Base      = require('./base').Base;
 
 var amount    = require('./amount');
 var Amount    = amount.Amount;
@@ -381,6 +382,7 @@ var STAmount = exports.Amount = new SerializedType({
       var currency = STCurrency.parse(so);
       var issuer_bytes = so.read(20);
       var issuer = UInt160.from_bytes(issuer_bytes);
+      issuer.set_version(Base.VER_ACCOUNT_ID);
       var offset = ((value_bytes[0] & 0x3f) << 2) + (value_bytes[1] >>> 6) - 97;
       var mantissa_bytes = value_bytes.slice(1);
       mantissa_bytes[0] &= 0x3f;
@@ -441,6 +443,7 @@ var STAccount = exports.Account = new SerializedType({
     }
 
     var result = UInt160.from_bytes(so.read(len));
+    result.set_version(Base.VER_ACCOUNT_ID);
 
     //console.log('PARSED 160:', result.to_json());
     if (false && !result.is_valid()) {
@@ -482,7 +485,7 @@ var STPathSet = exports.PathSet = new SerializedType({
 
         if (entry.currency) {
           var currency = Currency.from_json(entry.currency);
-          STCurrency.serialize(so, currency);
+          STCurrency.serialize(so, currency, entry.non_native);
         }
 
         if (entry.issuer) {
@@ -529,14 +532,20 @@ var STPathSet = exports.PathSet = new SerializedType({
           /*var bta = so.read(20);
             console.log('BTA:', bta);*/
           entry.account = STHash160.parse(so);
+          entry.account.set_version(Base.VER_ACCOUNT_ID);
         }
         if (tag_byte & this.typeCurrency) {
           //console.log('entry.currency');
-          entry.currency = STCurrency.parse(so)
+          entry.currency = STCurrency.parse(so);
+          if (entry.currency.to_json() === "XRP" &&
+              !entry.currency.is_native()) {
+            entry.non_native = true;
+          }
         }
         if (tag_byte & this.typeIssuer) {
           //console.log('entry.issuer');
           entry.issuer = STHash160.parse(so); //should know to use Base58?
+          entry.issuer.set_version(Base.VER_ACCOUNT_ID);
           //console.log('DONE WITH ISSUER!');
         }
 
@@ -625,14 +634,14 @@ function parse(so) {
 
   var type = TYPES_MAP[type_bits];
 
-  assert(type, 'Unknown type: ' + type_bits);
+  assert(type, 'Unknown type - header byte is 0x' + tag_byte.toString(16));
 
   var field_bits = tag_byte & 0x0f;
   var field_name = (field_bits === 0)
   ? field_name = FIELDS_MAP[type_bits][so.read(1)[0]]
   : field_name = FIELDS_MAP[type_bits][field_bits];
 
-  assert(field_name, 'Unknown field: ' + tag_byte);
+  assert(field_name, 'Unknown field - header byte is 0x' + tag_byte.toString(16));
 
   return [ field_name, type.parse(so) ]; //key, value
 };
