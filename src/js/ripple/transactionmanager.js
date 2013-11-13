@@ -37,6 +37,8 @@ function TransactionManager(account) {
 
     var pending = self._pending.get('_hash', hash);
 
+    self.remote._trace('transactionmanager: transaction_received: %s', transaction.tx_json);
+
     if (pending) {
       pending.emit('success', transaction);
     } else {
@@ -53,6 +55,7 @@ function TransactionManager(account) {
         var new_fee = self.remote.fee_tx(pending.fee_units()).to_json();
         pending.tx_json.Fee = new_fee;
         pending.emit('fee_adjusted', old_fee, new_fee);
+        self.remote._trace('transactionmanager: adjusting_fees: %s', pending, old_fee, new_fee);
       }
     });
   };
@@ -66,6 +69,7 @@ function TransactionManager(account) {
         case 8:
           pending.emit('lost', ledger);
           pending.emit('error', new RippleError('tejLost', 'Transaction lost'));
+          self.remote._trace('transactionmanager: update_pending: %s', pending.tx_json);
           break;
         case 4:
           pending.set_state('client_missing');
@@ -183,13 +187,15 @@ TransactionManager.prototype._resubmit = function(wait_ledgers, pending) {
 
     var hash_cached = self._cache[pending._hash];
 
+    self.remote._trace('transactionmanager: resubmit: %s', pending.tx_json);
+
     if (hash_cached) {
       pending.emit('success', hash_cached);
     } else {
-      //Sequence number has been consumed by
-      //another transaction
 
       while (self._sequence_cache[pending.tx_json.Sequence]) {
+        //Sequence number has been consumed by another transaction
+        self.remote._trace('transactionmanager: incrementing sequence: %s', pending);
         pending.tx_json.Sequence += 1;
       }
 
@@ -232,12 +238,15 @@ TransactionManager.prototype._request = function(tx) {
 
   if (remote.local_signing) {
     tx.sign();
-    tx._hash = tx.hash();
     submit_request.tx_blob(tx.serialize().to_hex());
   } else {
     submit_request.secret(tx._secret);
     submit_request.tx_json(tx.tx_json);
   }
+
+  tx._hash = tx.hash();
+
+  self.remote._trace('transactionmanager: submit: %s', tx.tx_json);
 
   function transaction_proposed(message) {
     tx.set_state('client_proposed');
@@ -284,6 +293,8 @@ TransactionManager.prototype._request = function(tx) {
       tx._hash = message.tx_json.hash;
     }
 
+    self.remote._trace('transactionmanager: submit_response: %s', message);
+
     message.result = message.engine_result || '';
 
     tx.emit('submitted', message);
@@ -308,14 +319,16 @@ TransactionManager.prototype._request = function(tx) {
 
   submit_request.once('success', submission_success);
   submit_request.once('error', submission_error);
-  submit_request.request();
 
   submit_request.timeout(this._submission_timeout, function() {
     tx.emit('timeout');
     if (self.remote._connected) {
+      self.remote._trace('transactionmanager: timeout: %s', tx.tx_json);
       self._resubmit(3, tx);
     }
   });
+
+  submit_request.broadcast();
 
   tx.set_state('client_submitted');
   tx.attempts++;
@@ -366,6 +379,7 @@ TransactionManager.prototype.submit = function(tx) {
   function finalize(message) {
     if (!tx.finalized) {
       self._pending.removeHash(tx._hash);
+      self.remote._trace('transactionmanager: finalize_transaction: %s', message.tx_json);
       tx.finalized = true;
       tx.emit('final', message);
     }
@@ -373,6 +387,7 @@ TransactionManager.prototype.submit = function(tx) {
 
   tx.on('error', finalize);
   tx.once('success', finalize);
+
   tx.once('abort', function() {
     tx.emit('error', new RippleError('tejAbort', 'Transaction aborted'));
   });
