@@ -42,7 +42,7 @@ function TransactionManager(account) {
     if (pending) {
       pending.emit('success', res);
     } else {
-      self._cache[hash] = transaction;
+      self._cache[hash] = res;
     }
   };
 
