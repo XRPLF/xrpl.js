@@ -1425,7 +1425,7 @@ Remote.prototype.requestPeers = function (callback) {
   return new Request(this, 'peers').callback(callback);
 };
 
-Remote.prototype.request_connect = function (ip, port, callback) {
+Remote.prototype.requestConnect = function (ip, port, callback) {
   var request = new Request(this, 'connect');
 
   request.message.ip = ip;
