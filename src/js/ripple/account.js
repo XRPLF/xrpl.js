@@ -3,9 +3,9 @@
 // You should not instantiate this class yourself, instead use Remote#account.
 //
 // Events:
-//   wallet_clean	: True, iff the wallet has been updated.
-//   wallet_dirty	: True, iff the wallet needs to be updated.
-//   balance		: The current stamp balance.
+//   wallet_clean :  True, iff the wallet has been updated.
+//   wallet_dirty :  True, iff the wallet needs to be updated.
+//   balance:        The current stamp balance.
 //   balance_proposed
 //
 
@@ -18,7 +18,6 @@ var extend             = require('extend');
 var Amount             = require('./amount').Amount;
 var UInt160            = require('./uint160').UInt160;
 var TransactionManager = require('./transactionmanager').TransactionManager;
-
 
 function Account(remote, account) {
   EventEmitter.call(this);
@@ -43,7 +42,7 @@ function Account(remote, account) {
       }
       self._subs += 1;
     }
-  }
+  };
 
   function listener_removed(type, listener) {
     if (~Account.subscribe_events.indexOf(type)) {
@@ -54,7 +53,7 @@ function Account(remote, account) {
         .broadcast();
       }
     }
-  }
+  };
 
   this.on('newListener', listener_added);
   this.on('removeListener', listener_removed);
@@ -63,7 +62,7 @@ function Account(remote, account) {
     if (self._account.is_valid() && self._subs) {
       request.add_account(self._account_id);
     }
-  }
+  };
 
   this._remote.on('prepare_subscribe', prepare_subscribe);
 
@@ -71,7 +70,7 @@ function Account(remote, account) {
     var changed = false;
 
     transaction.mmeta.each(function(an) {
-      var isAccountRoot = an.entryType === 'AccountRoot' 
+      var isAccountRoot = an.entryType === 'AccountRoot'
       && an.fields.Account === self._account_id;
       if (isAccountRoot) {
         extend(self._entry, an.fieldsNew, an.fieldsFinal);
@@ -82,9 +81,11 @@ function Account(remote, account) {
     if (changed) {
       self.emit('entry', self._entry);
     }
-  }
+  };
 
   this.on('transaction', handle_transaction);
+
+  this._tx_manager = new TransactionManager(this);
 
   return this;
 };
@@ -205,9 +206,6 @@ Account.prototype.notify =
 };
 
 Account.prototype.submit = function(tx) {
-  if (!this._tx_manager) {
-    this._tx_manager = new TransactionManager(this);
-  }
   this._tx_manager.submit(tx);
 };
 
