@@ -1525,18 +1525,13 @@ Remote.prototype.ping = function(host, callback) {
 };
 
 Object.keys(Remote.prototype).forEach(function(key) {
-  var UPPERCASE = /[A-Z]/;
+  var UPPERCASE = /[A-Z]{1}/g;
 
   if (!UPPERCASE.test(key)) return;
 
-  var underscored = '';
-
-  for (var i=0; i<key.length; i++) {
-    if (UPPERCASE.test(key[i])) {
-      underscored += '_';
-    }
-    underscored += key[i].toLowerCase();
-  }
+  var underscored = key.replace(UPPERCASE, function(c) {
+    return '_' + c.toLowerCase();
+  });
 
   Remote.prototype[underscored] = Remote.prototype[key];
 });
