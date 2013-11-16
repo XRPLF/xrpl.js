@@ -21,8 +21,28 @@ exports.Server           = require('./server').Server;
 // However, for programs that are tied to a specific version of ripple.js like
 // the official client, it makes sense to expose the SJCL instance so we don't
 // have to include it twice.
-exports.sjcl      = require('./utils').sjcl;
+exports.sjcl   = require('./utils').sjcl;
 
-exports.config    = require('./config');
+exports.config = require('./config');
+
+// camelCase to under_scored API conversion
+function attachUnderscored(o) {
+  Object.keys(o.prototype).forEach(function(key) {
+    var UPPERCASE = /([A-Z]{1})[a-z]+/g;
+
+    if (!UPPERCASE.test(key)) return;
+
+    var underscored = key.replace(UPPERCASE, function(c) {
+      return '_' + c.toLowerCase();
+    });
+
+    o.prototype[underscored] = o.prototype[key];
+  });
+};
+
+[ exports.Remote,
+  exports.Request,
+  exports.Transaction
+].forEach(attachUnderscored);
 
 // vim:sw=2:sts=2:ts=8:et
