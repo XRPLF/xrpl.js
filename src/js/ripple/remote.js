@@ -149,7 +149,7 @@ function Remote(opts, trace) {
   // XXX Clear when ledger advances.
   this.ledgers = {
     current : {
-      account_root : {}
+      account_root : { }
     }
   };
 
@@ -197,7 +197,7 @@ function Remote(opts, trace) {
   };
 
   this.on('removeListener', listenerRemoved);
-}
+};
 
 util.inherits(Remote, EventEmitter);
 
@@ -567,7 +567,7 @@ Remote.prototype.request = function(request) {
     } else {
       throw new Error('Command does not exist: ' + request);
     }
-  } else if (!request instanceof Request) {
+  } else if (!(request instanceof Request)) {
     throw new Error('Argument is not a Request');
   }
   if (!this._servers.length) {
@@ -816,7 +816,7 @@ Remote.accountRequest = function(type, account, accountIndex, ledger, callback) 
   }
 
   if (typeof ledger !== 'undefined') {
-    request.ledger_choose(ledger);
+    request.ledgerChoose(ledger);
   }
 
   request.callback(callback);
@@ -943,8 +943,9 @@ Remote.prototype.requestWalletAccounts = function(seed, callback) {
 
   var request = new Request(this, 'wallet_accounts');
   request.message.seed = seed;
+  request.callback(callback);
 
-  return request.callback(callback);
+  return request;
 };
 
 Remote.prototype.requestSign = function(secret, tx_json, callback) {
