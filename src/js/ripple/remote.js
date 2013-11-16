@@ -1387,6 +1387,8 @@ Remote.prototype.requestUnlAdd = function(addr, comment, callback) {
   request.message.node = addr;
 
   if (comment) {
+    // note is not specified anywhere, should remove?
+    var note = undefined; 
     request.message.comment = note;
   }
 
