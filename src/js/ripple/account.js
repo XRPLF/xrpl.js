@@ -19,6 +19,12 @@ var Amount             = require('./amount').Amount;
 var UInt160            = require('./uint160').UInt160;
 var TransactionManager = require('./transactionmanager').TransactionManager;
 
+/**
+ * @constructor Account
+ * @param {Remote} remote
+ * @param {String} account
+ */
+
 function Account(remote, account) {
   EventEmitter.call(this);
 
@@ -33,8 +39,8 @@ function Account(remote, account) {
   // Important: This must never be overwritten, only extend()-ed
   this._entry = { };
 
-  function listener_added(type, listener) {
-    if (~Account.subscribe_events.indexOf(type)) {
+  function listenerAdded(type, listener) {
+    if (~Account.subscribeEvents.indexOf(type)) {
       if (!self._subs && self._remote._connected) {
         self._remote.request_subscribe()
         .add_account(self._account_id)
@@ -44,8 +50,10 @@ function Account(remote, account) {
     }
   };
 
-  function listener_removed(type, listener) {
-    if (~Account.subscribe_events.indexOf(type)) {
+  this.on('newListener', listenerAdded);
+
+  function listenerRemoved(type, listener) {
+    if (~Account.subscribeEvents.indexOf(type)) {
       self._subs -= 1;
       if (!self._subs && self._remote._connected) {
         self._remote.request_unsubscribe()
@@ -55,23 +63,21 @@ function Account(remote, account) {
     }
   };
 
-  this.on('newListener', listener_added);
-  this.on('removeListener', listener_removed);
+  this.on('removeListener', listenerRemoved);
 
-  function prepare_subscribe(request) {
+  function attachAccount(request) {
     if (self._account.is_valid() && self._subs) {
       request.add_account(self._account_id);
     }
   };
 
-  this._remote.on('prepare_subscribe', prepare_subscribe);
+  this._remote.on('prepare_subscribe', attachAccount);
 
-  function handle_transaction(transaction) {
+  function handleTransaction(transaction) {
     var changed = false;
 
     transaction.mmeta.each(function(an) {
-      var isAccountRoot = an.entryType === 'AccountRoot'
-      && an.fields.Account === self._account_id;
+      var isAccountRoot = (an.entryType === 'AccountRoot') && an.fields.Account === self._account_id;
       if (isAccountRoot) {
         extend(self._entry, an.fieldsNew, an.fieldsFinal);
         changed = true;
@@ -83,9 +89,9 @@ function Account(remote, account) {
     }
   };
 
-  this.on('transaction', handle_transaction);
+  this.on('transaction', handleTransaction);
 
-  this._tx_manager = new TransactionManager(this);
+  this._transactionManager = new TransactionManager(this);
 
   return this;
 };
@@ -95,7 +101,8 @@ util.inherits(Account, EventEmitter);
 /**
  * List of events that require a remote subscription to the account.
  */
-Account.subscribe_events = [ 'transaction', 'entry' ];
+
+Account.subscribeEvents = [ 'transaction', 'entry' ];
 
 Account.prototype.to_json = function () {
   return this._account.to_json();
@@ -106,14 +113,19 @@ Account.prototype.to_json = function () {
  *
  * Note: This does not tell you whether the account exists in the ledger.
  */
+
 Account.prototype.is_valid = function () {
   return this._account.is_valid();
 };
 
-Account.prototype.get_info = function(callback) {
-  var callback = typeof callback === 'function' ? callback : function(){};
-  var request = this._remote.request_account_info(this._account_id, callback);
-  return request;
+/**
+ * Request account info
+ *
+ * @param {Function} callback
+ */
+
+Account.prototype.getInfo = function(callback) {
+  return this._remote.request_account_info(this._account_id, callback);
 };
 
 /**
@@ -122,13 +134,14 @@ Account.prototype.get_info = function(callback) {
  * To keep up-to-date with changes to the AccountRoot entry, subscribe to the
  * "entry" event.
  *
- * @param {function (err, entry)} callback Called with the result
+ * @param {Function} callback
  */
+
 Account.prototype.entry = function (callback) {
   var self = this;
   var callback = typeof callback === 'function' ? callback : function(){};
 
-  this.get_info(function account_info(err, info) {
+  function accountInfo(err, info) {
     if (err) {
       callback(err);
     } else {
@@ -136,21 +149,25 @@ Account.prototype.entry = function (callback) {
       self.emit('entry', self._entry);
       callback(null, info);
     }
-  });
+  };
+
+  this.getInfo(accountInfo);
 
   return this;
 };
 
-Account.prototype.get_next_sequence = function(callback) {
+Account.prototype.getNextSequence = function(callback) {
   var callback = typeof callback === 'function' ? callback : function(){};
 
-  this.get_info(function account_info(err, info) {
+  function accountInfo(err, info) {
     if (err) {
       callback(err);
     } else {
-      callback(null, info.account_data.Sequence); 
+      callback(null, info.account_data.Sequence);
     }
-  });
+  };
+
+  this.getInfo(accountInfo);
 
   return this;
 };
@@ -163,11 +180,12 @@ Account.prototype.get_next_sequence = function(callback) {
  *
  * @param {function (err, lines)} callback Called with the result
  */
+
 Account.prototype.lines = function (callback) {
   var self = this;
   var callback = typeof callback === 'function' ? callback : function(){};
 
-  function account_lines(err, res) {
+  function accountLines(err, res) {
     if (err) {
       callback(err);
     } else {
@@ -177,7 +195,7 @@ Account.prototype.lines = function (callback) {
     }
   }
 
-  this._remote.request_account_lines(this._account_id, account_lines);
+  this._remote.requestAccountLines(this._account_id, accountLines);
 
   return this;
 };
@@ -187,26 +205,36 @@ Account.prototype.lines = function (callback) {
  *
  * This is only meant to be called by the Remote class. You should never have to
  * call this yourself.
+ *
+ * @param {Object} message
  */
-Account.prototype.notify = 
-  Account.prototype.notifyTx = function (message) {
+
+Account.prototype.notify =
+Account.prototype.notifyTx = function (transaction) {
   // Only trigger the event if the account object is actually
   // subscribed - this prevents some weird phantom events from
   // occurring.
   if (this._subs) {
-    this.emit('transaction', message);
-    var account = message.transaction.Account;
+    this.emit('transaction', transaction);
+    var account = transaction.transaction.Account;
     if (!account) return;
     if (account === this._account_id) {
-      this.emit('transaction-outbound', message);
+      this.emit('transaction-outbound', transaction);
     } else {
-      this.emit('transaction-inbound', message);
+      this.emit('transaction-inbound', transaction);
     }
   }
 };
 
-Account.prototype.submit = function(tx) {
-  this._tx_manager.submit(tx);
+/**
+ * Submit a transaction to an account's
+ * transaction manager
+ *
+ * @param {Transaction} transaction
+ */
+
+Account.prototype.submit = function(transaction) {
+  this._transactionManager.submit(transaction);
 };
 
 exports.Account = Account;
