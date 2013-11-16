@@ -43,6 +43,15 @@ function Server(remote, opts) {
   this.on('response_subscribe', function(message) {
     self._handleResponseSubscribe(message);
   });
+
+  function checkServerActivity() {
+    var delta = Date.now() - self._lastLedgerClose;
+    if (delta > (1000 * 20)) {
+      self.reconnect();
+    }
+  };
+
+  setInterval(checkServerActivity, 1000);
 };
 
 util.inherits(Server, EventEmitter);
@@ -236,6 +245,15 @@ Server.prototype.disconnect = function() {
 };
 
 /**
+ * Reconnect to rippled WebSocket server
+ */
+
+Server.prototype.reconnect = function() {
+  this.disconnect();
+  this.connect();
+};
+
+/**
  * Submit a Request object.
  *
  * Requests are indexed by message ID, which is repeated
@@ -314,6 +332,10 @@ Server.prototype._handleMessage = function(message) {
       this._setState(~(Server._onlineStates.indexOf(message.server_status)) ? 'online' : 'offline');
       break;
 
+    case 'ledgerClosed':
+      this._lastLedgerClose = Date.now();
+      break;
+
     case 'path_find':
       this._remote._trace('server: path_find: %s', message);
       break;
@@ -352,7 +374,7 @@ Server.prototype._handleMessage = function(message) {
  */
 
 Server.prototype._handleResponseSubscribe = function(message) {
-  if (Server.onlineStates.indexOf(message.server_status)) {
+  if (~(Server.onlineStates.indexOf(message.server_status))) {
     this._setState('online');
   }
 };
