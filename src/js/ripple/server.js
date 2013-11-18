@@ -51,7 +51,9 @@ function Server(remote, opts) {
     }
   };
 
-  setInterval(checkServerActivity, 1000);
+  this.once('connect', function() {
+    setInterval(checkServerActivity, 1000);
+  });
 };
 
 util.inherits(Server, EventEmitter);
