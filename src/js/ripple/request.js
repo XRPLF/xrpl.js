@@ -33,7 +33,7 @@ Request.prototype.broadcast = function() {
 };
 
 // Send the request to a remote.
-Request.prototype.request = function (remote) {
+Request.prototype.request = function(remote) {
   if (this.requested) return;
 
   this.requested = true;
@@ -42,7 +42,7 @@ Request.prototype.request = function (remote) {
 
   if (this._broadcast) {
     this.remote._servers.forEach(function(server) {
-      this.set_server(server);
+      this.setServer(server);
       this.remote.request(this);
     }, this );
   } else {
@@ -86,7 +86,7 @@ Request.prototype.timeout = function(duration, callback) {
     return;
   }
 
-  var emit      = this.emit;
+  var emit = this.emit;
   var timed_out = false;
 
   var timeout = setTimeout(function() {
@@ -105,7 +105,7 @@ Request.prototype.timeout = function(duration, callback) {
   return this;
 };
 
-Request.prototype.set_server = function(server) {
+Request.prototype.setServer = function(server) {
   var selected = null;
 
   switch (typeof server) {
@@ -113,7 +113,8 @@ Request.prototype.set_server = function(server) {
       selected = server;
       break;
     case 'string':
-      for (var i=0, s; s=this.remote._servers[i]; i++) {
+      var servers = this.remote._servers;
+      for (var i=0, s; s=servers[i]; i++) {
         if (s._host === server) {
           selected = s;
           break;
@@ -123,16 +124,18 @@ Request.prototype.set_server = function(server) {
   };
 
   this.server = selected;
+
+  return this;
 };
 
-Request.prototype.build_path = function (build) {
+Request.prototype.buildPath = function(build) {
   if (build) {
     this.message.build_path = true;
   }
   return this;
 };
 
-Request.prototype.ledger_choose = function (current) {
+Request.prototype.ledgerChoose = function(current) {
   if (current) {
     this.message.ledger_index = this.remote._ledger_current_index;
   } else {
@@ -144,19 +147,19 @@ Request.prototype.ledger_choose = function (current) {
 // Set the ledger for a request.
 // - ledger_entry
 // - transaction_entry
-Request.prototype.ledger_hash = function (hash) {
-  this.message.ledger_hash  = hash;
+Request.prototype.ledgerHash = function(hash) {
+  this.message.ledger_hash = hash;
   return this;
 };
 
 // Set the ledger_index for a request.
 // - ledger_entry
-Request.prototype.ledger_index = function (ledger_index) {
-  this.message.ledger_index  = ledger_index;
+Request.prototype.ledgerIndex = function(ledger_index) {
+  this.message.ledger_index = ledger_index;
   return this;
 };
 
-Request.prototype.ledger_select = function (ledger_spec) {
+Request.prototype.ledgerSelect = function(ledger_spec) {
   switch (ledger_spec) {
     case 'current':
     case 'closed':
@@ -165,7 +168,6 @@ Request.prototype.ledger_select = function (ledger_spec) {
       break;
 
     default:
-      // XXX Better test needed
       if (Number(ledger_spec)) {
         this.message.ledger_index = ledger_spec;
       } else {
@@ -177,12 +179,12 @@ Request.prototype.ledger_select = function (ledger_spec) {
   return this;
 };
 
-Request.prototype.account_root = function (account) {
+Request.prototype.accountRoot = function(account) {
   this.message.account_root  = UInt160.json_rewrite(account);
   return this;
 };
 
-Request.prototype.index = function (hash) {
+Request.prototype.index = function(hash) {
   this.message.index  = hash;
   return this;
 };
@@ -190,43 +192,43 @@ Request.prototype.index = function (hash) {
 // Provide the information id an offer.
 // --> account
 // --> seq : sequence number of transaction creating offer (integer)
-Request.prototype.offer_id = function (account, seq) {
+Request.prototype.offerId = function(account, sequence) {
   this.message.offer = {
     account:  UInt160.json_rewrite(account),
-    seq:      seq
+    seq:      sequence
   };
   return this;
 };
 
 // --> index : ledger entry index.
-Request.prototype.offer_index = function (index) {
+Request.prototype.offerIndex = function(index) {
   this.message.offer  = index;
   return this;
 };
 
-Request.prototype.secret = function (secret) {
+Request.prototype.secret = function(secret) {
   if (secret) {
     this.message.secret  = secret;
   }
   return this;
 };
 
-Request.prototype.tx_hash = function (hash) {
+Request.prototype.txHash = function(hash) {
   this.message.tx_hash  = hash;
   return this;
 };
 
-Request.prototype.tx_json = function (json) {
+Request.prototype.txJson = function(json) {
   this.message.tx_json  = json;
   return this;
 };
 
-Request.prototype.tx_blob = function (json) {
+Request.prototype.txBlob = function(json) {
   this.message.tx_blob  = json;
   return this;
 };
 
-Request.prototype.ripple_state = function (account, issuer, currency) {
+Request.prototype.rippleState = function(account, issuer, currency) {
   this.message.ripple_state  = {
     currency : currency,
     accounts : [
@@ -237,7 +239,7 @@ Request.prototype.ripple_state = function (account, issuer, currency) {
   return this;
 };
 
-Request.prototype.accounts = function (accounts, realtime) {
+Request.prototype.accounts = function(accounts, realtime) {
   if (!Array.isArray(accounts)) {
     accounts = [ accounts ];
   }
@@ -248,7 +250,7 @@ Request.prototype.accounts = function (accounts, realtime) {
   });
 
   if (realtime) {
-    this.message.rt_accounts = processedAccounts;
+    this.message.rtAccounts = processedAccounts;
   } else {
     this.message.accounts = processedAccounts;
   }
@@ -256,11 +258,11 @@ Request.prototype.accounts = function (accounts, realtime) {
   return this;
 };
 
-Request.prototype.add_account  = function(account, realtime) {
+Request.prototype.addAccount = function(account, realtime) {
   var processedAccount = UInt160.json_rewrite(account);
 
   if (realtime) {
-    this.message.rt_accounts = (this.message.rt_accounts || []).concat(processedAccount);
+    this.message.rtAccounts = (this.message.rtAccounts || []).concat(processedAccount);
   } else {
     this.message.accounts = (this.message.accounts || []).concat(processedAccount);
   }
@@ -268,11 +270,11 @@ Request.prototype.add_account  = function(account, realtime) {
   return this;
 };
 
-Request.prototype.rt_accounts = function (accounts) {
+Request.prototype.rtAccounts = function(accounts) {
   return this.accounts(accounts, true);
 };
 
-Request.prototype.books = function (books, snapshot) {
+Request.prototype.books = function(books, snapshot) {
   var processedBooks = [ ];
 
   for (var i = 0, l = books.length; i < l; i++) {
