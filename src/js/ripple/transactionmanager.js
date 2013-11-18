@@ -194,7 +194,7 @@ TransactionManager.prototype._resubmit = function(waitLedgers, pending) {
     } else {
       while (self._sequenceCache[pending.tx_json.Sequence]) {
         //Sequence number has been consumed by another transaction
-        self._remote._trace('transactionmanager: incrementing sequence: %s', pending);
+        self._remote._trace('transactionmanager: incrementing sequence: %s', pending.tx_json);
         pending.tx_json.Sequence += 1;
       }
 
