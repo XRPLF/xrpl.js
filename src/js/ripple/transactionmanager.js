@@ -93,12 +93,13 @@ function TransactionManager(account) {
       if (!err && transactions.transactions) {
         transactions.transactions.forEach(transactionReceived);
       }
-      self._remote.on('ledger_closed', updatePendingStatus);
-    });
 
-    //Load next transaction sequence
-    self._loadSequence(function sequenceLoaded() {
-      self._resubmit(3);
+      self._remote.on('ledger_closed', updatePendingStatus);
+
+      //Load next transaction sequence
+      self._loadSequence(function sequenceLoaded() {
+        self._resubmit(3);
+      });
     });
 
     self.emit('reconnect');
@@ -130,6 +131,7 @@ TransactionManager.normalizeTransaction = function(tx) {
       type:                   'transaction',
       validated:              true
     }
+    transaction.tx_json        = transaction.transaction;
     transaction.result         = transaction.engine_result;
     transaction.result_message = transaction.engine_result_message;
   }
