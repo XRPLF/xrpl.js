@@ -269,37 +269,41 @@ Transaction.prototype.destinationTag = function (tag) {
 };
 
 Transaction._pathRewrite = function (path) {
-  var path_new = path.map(function(node) {
-    var node_new = { };
+  var pathProperties = {
+    account:   UInt160.json_rewrite,
+    issuer:    UInt160.json_rewrite,
+    currency:  Currency.json_rewrite
+  }
 
-    if (node.hasOwnProperty('account')) {
-      node_new.account  = UInt160.json_rewrite(node.account);
+  return path.map(function(node) {
+    var newNode = { };
+
+    for (var prop in node) {
+      if (pathProperties.hasOwnProperty(prop)) {
+        newNode[prop] = pathProperties[prop](node[prop]);
+      }
     }
 
-    if (node.hasOwnProperty('issuer')) {
-      node_new.issuer   = UInt160.json_rewrite(node.issuer);
-    }
-
-    if (node.hasOwnProperty('currency')) {
-      node_new.currency = Currency.json_rewrite(node.currency);
-    }
-
-    return node_new;
+    return newNode
   });
-
-  return path_new;
 };
 
 Transaction.prototype.pathAdd = function (path) {
-  this.tx_json.Paths = (this.tx_json.Paths || []).push(Transaction._pathRewrite(path));
+  if (Array.isArray(path)) {
+    this.tx_json.Paths  = this.tx_json.Paths || [];
+    this.tx_json.Paths.push(Transaction._pathRewrite(path));
+  }
   return this;
 };
 
 // --> paths: undefined or array of path
-// A path is an array of objects containing some combination of: account, currency, issuer
+// // A path is an array of objects containing some combination of: account, currency, issuer
+
 Transaction.prototype.paths = function (paths) {
-  for (var i=0, l=paths.length; i<l; i++) {
-    this.pathAdd(paths[i]);
+  if (Array.isArray(paths)) {
+    for (var i=0, l=paths.length; i<l; i++) {
+      this.pathAdd(paths[i]);
+    }
   }
   return this;
 };
@@ -326,7 +330,7 @@ Transaction.prototype.sourceTag = function (tag) {
 };
 
 // --> rate: In billionths.
-Transaction.prototype.transfer_rate = function (rate) {
+Transaction.prototype.transferRate = function (rate) {
   this.tx_json.TransferRate = Number(rate);
 
   if (this.tx_json.TransferRate < 1e9) {
@@ -360,10 +364,6 @@ Transaction.prototype.setFlags = function (flags) {
 
   return this;
 };
-
-//
-// Transactions
-//
 
 Transaction.prototype._accountSecret = function (account) {
   // Fill in secret from remote, if available.

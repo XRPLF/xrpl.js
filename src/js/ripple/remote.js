@@ -167,7 +167,7 @@ function Remote(opts, trace) {
 
   opts.servers.forEach(function(server) {
     var pool = Number(server.pool) || 1;
-    while (pool--) { self.add_server(server); };
+    while (pool--) { self.addServer(server); };
   });
 
   // This is used to remove Node EventEmitter warnings
@@ -227,14 +227,6 @@ Remote.flags = {
     LowNoRipple:        0x00100000,
     HighNoRipple:       0x00200000
   }
-};
-
-function isTemMalformed(engine_result_code) {
-  return (engine_result_code >= -299 && engine_result_code <  199);
-};
-
-function isTefFailure(engine_result_code) {
-  return (engine_result_code >= -299 && engine_result_code <  199);
 };
 
 Remote.from_config = function(obj, trace) {
@@ -561,7 +553,7 @@ Remote.prototype._getServer = function() {
 Remote.prototype.request = function(request) {
   if (typeof request === 'string') {
     if (!/^request_/.test(request)) request = 'request_' + request;
-    if (this[request]) {
+    if (typeof this[request] === 'function') {
       var args = Array.prototype.slice.call(arguments, 1);
       return this[request].apply(this, args);
     } else {
@@ -577,7 +569,7 @@ Remote.prototype.request = function(request) {
   } else if (request.server === null) {
     request.emit('error', new Error('Server does not exist'));
   } else {
-    var server = request.server || this._get_server();
+    var server = request.server || this._getServer();
     if (server) {
       server.request(request);
     } else {
@@ -1045,56 +1037,64 @@ Remote.prototype.ledgerAccept = function(callback) {
   return this;
 };
 
-Remote.accountRootRequest = function(account, ledger, callback) {
+Remote.accountRootRequest = function(type, responseFilter, account, ledger, callback) {
   if (typeof account === 'object') {
     callback = ledger;
     ledger   = account.ledger;
     account  = account.account;
   }
 
+  var lastArg = arguments[arguments.length - 1];
+
+  if (typeof lastArg === 'function') {
+    callback = lastArg;
+  }
+
   var request = this.requestLedgerEntry('account_root');
   request.accountRoot(account);
   request.ledgerChoose(ledger);
+
+  request.once('success', function(message) {
+    request.emit(type, responseFilter(message));
+  });
+
+  request.callback(callback, type);
 
   return request;
 };
 
 // Return a request to refresh the account balance.
 Remote.prototype.requestAccountBalance = function(account, ledger, callback) {
+  function responseFilter(message) {
+    return Amount.from_json(message.node.Balance);
+  };
 
-  var request = Remote.accountRootRequest.apply(this, arguments);
-
-  request.once('success', function(message) {
-    request.emit('account_balance', Amount.from_json(message.node.Balance));
-  });
-
-  request.callback(callback, 'account_balance');
+  var args    = Array.prototype.concat.apply(['account_balance', responseFilter], arguments);
+  var request = Remote.accountRootRequest.apply(this, args);
 
   return request;
 };
 
 // Return a request to return the account flags.
 Remote.prototype.requestAccountFlags = function(account, ledger, callback) {
-  var request = Remote.accountRootRequest.apply(this, arguments);
+  function responseFilter(message) {
+    return message.node.Flags;
+  };
 
-  request.once('success', function(message) {
-    request.emit('account_flags', message.node.Flags);
-  });
-
-  request.callback(callback, 'account_flags');
+  var args    = Array.prototype.concat.apply(['account_flags', responseFilter], arguments);
+  var request = Remote.accountRootRequest.apply(this, args);
 
   return request;
 };
 
 // Return a request to emit the owner count.
 Remote.prototype.requestOwnerCount = function(account, ledger, callback) {
-  var request = Remote.accountRootRequest.apply(this, arguments);
+  function responseFilter(message) {
+    return message.node.OwnerCount;
+  };
 
-  request.once('success', function(message) {
-    request.emit('owner_count', message.node.OwnerCount);
-  });
-
-  request.callback(callback, 'owner_count');
+  var args    = Array.prototype.concat.apply(['owner_count', responseFilter], arguments);
+  var request = Remote.accountRootRequest.apply(this, args);
 
   return request;
 };
@@ -1389,8 +1389,7 @@ Remote.prototype.requestUnlAdd = function(addr, comment, callback) {
 
   if (comment) {
     // note is not specified anywhere, should remove?
-    var note = undefined; 
-    request.message.comment = note;
+    request.message.comment = void(0);
   }
 
   request.callback(callback);
