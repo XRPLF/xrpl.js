@@ -131,39 +131,39 @@ Transaction.prototype.consts = {
   tecCLAIMED      : 100,
 };
 
-Transaction.from_json = function (j) {
+Transaction.from_json = function(j) {
   return (new Transaction()).parse_json(j);
 };
 
-Transaction.prototype.isTelLocal = function (ter) {
+Transaction.prototype.isTelLocal = function(ter) {
   return ter >= this.consts.telLOCAL_ERROR && ter < this.consts.temMALFORMED;
 };
 
-Transaction.prototype.isTemMalformed = function (ter) {
+Transaction.prototype.isTemMalformed = function(ter) {
   return ter >= this.consts.temMALFORMED && ter < this.consts.tefFAILURE;
 };
 
-Transaction.prototype.isTefFailure = function (ter) {
+Transaction.prototype.isTefFailure = function(ter) {
   return ter >= this.consts.tefFAILURE && ter < this.consts.terRETRY;
 };
 
-Transaction.prototype.isTerRetry = function (ter) {
+Transaction.prototype.isTerRetry = function(ter) {
   return ter >= this.consts.terRETRY && ter < this.consts.tesSUCCESS;
 };
 
-Transaction.prototype.isTepSuccess = function (ter) {
+Transaction.prototype.isTepSuccess = function(ter) {
   return ter >= this.consts.tesSUCCESS;
 };
 
-Transaction.prototype.isTecClaimed = function (ter) {
+Transaction.prototype.isTecClaimed = function(ter) {
   return ter >= this.consts.tecCLAIMED;
 };
 
-Transaction.prototype.isRejected = function (ter) {
+Transaction.prototype.isRejected = function(ter) {
   return this.isTelLocal(ter) || this.isTemMalformed(ter) || this.isTefFailure(ter);
 };
 
-Transaction.prototype.setState = function (state) {
+Transaction.prototype.setState = function(state) {
   if (this.state !== state) {
     this.state  = state;
     this.emit('state', state);
@@ -186,7 +186,7 @@ Transaction.prototype.getFee = function() {
  * SigningPubKey, which can be determined by the library based on network
  * information and other fields.
  */
-Transaction.prototype.complete = function () {
+Transaction.prototype.complete = function() {
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
     if (this.remote.local_fee || !this.remote.trusted) {
       this.tx_json.Fee = this.remote.fee_tx(this.fee_units()).to_json();
@@ -202,15 +202,15 @@ Transaction.prototype.complete = function () {
   return this.tx_json;
 };
 
-Transaction.prototype.serialize = function () {
+Transaction.prototype.serialize = function() {
   return SerializedObject.from_json(this.tx_json);
 };
 
-Transaction.prototype.signingHash = function () {
+Transaction.prototype.signingHash = function() {
   return this.hash(config.testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
 };
 
-Transaction.prototype.hash = function (prefix, as_uint256) {
+Transaction.prototype.hash = function(prefix, as_uint256) {
   if (typeof prefix === 'string') {
     if (typeof hashprefixes[prefix] === 'undefined') {
       throw new Error('Unknown hashing prefix requested.');
@@ -225,7 +225,7 @@ Transaction.prototype.hash = function (prefix, as_uint256) {
   return as_uint256 ? hash : hash.to_hex();
 };
 
-Transaction.prototype.sign = function () {
+Transaction.prototype.sign = function() {
   var seed = Seed.from_json(this._secret);
 
   var prev_sig = this.tx_json.TxnSignature;
@@ -254,41 +254,41 @@ Transaction.prototype.sign = function () {
 // --> build: true, to have server blindly construct a path.
 //
 // "blindly" because the sender has no idea of the actual cost except that is must be less than send max.
-Transaction.prototype.buildPath = function (build) {
+Transaction.prototype.buildPath = function(build) {
   this._build_path = build;
   return this;
 };
 
 // tag should be undefined or a 32 bit integer.
 // YYY Add range checking for tag.
-Transaction.prototype.destinationTag = function (tag) {
+Transaction.prototype.destinationTag = function(tag) {
   if (tag !== void(0)) {
     this.tx_json.DestinationTag = tag;
   }
   return this;
 };
 
-Transaction._pathRewrite = function (path) {
-  var pathProperties = {
-    account:   UInt160.json_rewrite,
-    issuer:    UInt160.json_rewrite,
-    currency:  Currency.json_rewrite
-  }
-
+Transaction._pathRewrite = function(path) {
   return path.map(function(node) {
     var newNode = { };
 
-    for (var prop in node) {
-      if (pathProperties.hasOwnProperty(prop)) {
-        newNode[prop] = pathProperties[prop](node[prop]);
-      }
+    if (node.hasOwnProperty('account')) {
+      newNode.account = UInt160.json_rewrite(node.account);
+    }
+
+    if (node.hasOwnProperty('issuer')) {
+      newNode.issuer = UInt160.json_rewrite(node.issuer);
+    }
+
+    if (node.hasOwnProperty('currency')) {
+      newNode.currency = Currency.json_rewrite(node.currency);
     }
 
     return newNode
   });
 };
 
-Transaction.prototype.pathAdd = function (path) {
+Transaction.prototype.pathAdd = function(path) {
   if (Array.isArray(path)) {
     this.tx_json.Paths  = this.tx_json.Paths || [];
     this.tx_json.Paths.push(Transaction._pathRewrite(path));
@@ -299,7 +299,7 @@ Transaction.prototype.pathAdd = function (path) {
 // --> paths: undefined or array of path
 // // A path is an array of objects containing some combination of: account, currency, issuer
 
-Transaction.prototype.paths = function (paths) {
+Transaction.prototype.paths = function(paths) {
   if (Array.isArray(paths)) {
     for (var i=0, l=paths.length; i<l; i++) {
       this.pathAdd(paths[i]);
@@ -309,11 +309,11 @@ Transaction.prototype.paths = function (paths) {
 };
 
 // If the secret is in the config object, it does not need to be provided.
-Transaction.prototype.secret = function (secret) {
+Transaction.prototype.secret = function(secret) {
   this._secret = secret;
 };
 
-Transaction.prototype.sendMax = function (send_max) {
+Transaction.prototype.sendMax = function(send_max) {
   if (send_max) {
     this.tx_json.SendMax = Amount.json_rewrite(send_max);
   }
@@ -322,7 +322,7 @@ Transaction.prototype.sendMax = function (send_max) {
 
 // tag should be undefined or a 32 bit integer.
 // YYY Add range checking for tag.
-Transaction.prototype.sourceTag = function (tag) {
+Transaction.prototype.sourceTag = function(tag) {
   if (tag) {
     this.tx_json.SourceTag = tag;
   }
@@ -330,7 +330,7 @@ Transaction.prototype.sourceTag = function (tag) {
 };
 
 // --> rate: In billionths.
-Transaction.prototype.transferRate = function (rate) {
+Transaction.prototype.transferRate = function(rate) {
   this.tx_json.TransferRate = Number(rate);
 
   if (this.tx_json.TransferRate < 1e9) {
@@ -342,7 +342,7 @@ Transaction.prototype.transferRate = function (rate) {
 
 // Add flags to a transaction.
 // --> flags: undefined, _flag_, or [ _flags_ ]
-Transaction.prototype.setFlags = function (flags) {
+Transaction.prototype.setFlags = function(flags) {
   if (!flags) return this;
 
   var transaction_flags = Transaction.flags[this.tx_json.TransactionType];
@@ -365,7 +365,7 @@ Transaction.prototype.setFlags = function (flags) {
   return this;
 };
 
-Transaction.prototype._accountSecret = function (account) {
+Transaction.prototype._accountSecret = function(account) {
   // Fill in secret from remote, if available.
   return this.remote.secrets[account];
 };
@@ -377,7 +377,7 @@ Transaction.prototype._accountSecret = function (account) {
 //  .transfer_rate()
 //  .wallet_locator()   NYI
 //  .wallet_size()      NYI
-Transaction.prototype.accountSet = function (src) {
+Transaction.prototype.accountSet = function(src) {
   if (typeof src === 'object') {
     var options = src;
     src = options.source || options.from;
@@ -393,7 +393,7 @@ Transaction.prototype.accountSet = function (src) {
   return this;
 };
 
-Transaction.prototype.claim = function (src, generator, public_key, signature) {
+Transaction.prototype.claim = function(src, generator, public_key, signature) {
   if (typeof src === 'object') {
     var options = src;
     signature  = options.signature;
@@ -410,7 +410,7 @@ Transaction.prototype.claim = function (src, generator, public_key, signature) {
   return this;
 };
 
-Transaction.prototype.offerCancel = function (src, sequence) {
+Transaction.prototype.offerCancel = function(src, sequence) {
   if (typeof src === 'object') {
     var options = src;
     sequence = options.sequence;
@@ -432,7 +432,7 @@ Transaction.prototype.offerCancel = function (src, sequence) {
 //  .set_flags()
 // --> expiration : if not undefined, Date or Number
 // --> cancel_sequence : if not undefined, Sequence
-Transaction.prototype.offerCreate = function (src, taker_pays, taker_gets, expiration, cancel_sequence) {
+Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expiration, cancel_sequence) {
   if (typeof src === 'object') {
     var options = src;
     cancel_sequence = options.cancel_sequence;
@@ -465,7 +465,7 @@ Transaction.prototype.offerCreate = function (src, taker_pays, taker_gets, expir
   return this;
 };
 
-Transaction.prototype.passwordFund = function (src, dst) {
+Transaction.prototype.passwordFund = function(src, dst) {
   if (typeof src === 'object') {
     var options = src;
     dst = options.destination || options.to;
@@ -482,7 +482,7 @@ Transaction.prototype.passwordFund = function (src, dst) {
   return this;
 };
 
-Transaction.prototype.passwordSet = function (src, authorized_key, generator, public_key, signature) {
+Transaction.prototype.passwordSet = function(src, authorized_key, generator, public_key, signature) {
   if (typeof src === 'object') {
     var options = src;
     signature      = options.signature;
@@ -522,7 +522,7 @@ Transaction.prototype.passwordSet = function (src, authorized_key, generator, pu
 //  .send_max()
 //  .set_flags()
 //  .source_tag()
-Transaction.prototype.payment = function (src, dst, amount) {
+Transaction.prototype.payment = function(src, dst, amount) {
   if (typeof src === 'object') {
     var options = src;
     amount = options.amount;
@@ -551,7 +551,7 @@ Transaction.prototype.payment = function (src, dst, amount) {
   return this;
 }
 
-Transaction.prototype.rippleLineSet = function (src, limit, quality_in, quality_out) {
+Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_out) {
   if (typeof src === 'object') {
     var options = src;
     quality_out = options.quality_out;
@@ -586,7 +586,7 @@ Transaction.prototype.rippleLineSet = function (src, limit, quality_in, quality_
   return this;
 };
 
-Transaction.prototype.walletAdd = function (src, amount, authorized_key, public_key, signature) {
+Transaction.prototype.walletAdd = function(src, amount, authorized_key, public_key, signature) {
   if (typeof src === 'object') {
     var options = src;
     signature      = options.signature;
@@ -620,12 +620,12 @@ Transaction.prototype.walletAdd = function (src, amount, authorized_key, public_
  *
  * @return {Number} Number of fee units for this transaction.
  */
-Transaction.prototype.feeUnits = function () {
+Transaction.prototype.feeUnits = function() {
   return Transaction.fee_units['default'];
 };
 
 // Submit a transaction to the network.
-Transaction.prototype.submit = function (callback) {
+Transaction.prototype.submit = function(callback) {
   var self = this;
 
   this.callback = typeof callback === 'function' ? callback : function(){};
@@ -635,11 +635,11 @@ Transaction.prototype.submit = function (callback) {
       error = new RippleError(error, message);
     }
     self.callback(error);
-  }
+  };
 
   function submission_success(message) {
     self.callback(null, message);
-  }
+  };
 
   this.on('error', function(){});
   this.once('error', submission_error);
@@ -665,7 +665,7 @@ Transaction.prototype.abort = function(callback) {
   }
 };
 
-Transaction.prototype.parseJson = function (v) {
+Transaction.prototype.parseJson = function(v) {
   this.tx_json = v;
   return this;
 };
