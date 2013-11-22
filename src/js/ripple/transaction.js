@@ -123,12 +123,12 @@ Transaction.flags = {
 Transaction.formats = require('./binformat').tx;
 
 Transaction.prototype.consts = {
-  telLOCAL_ERROR  : -399,
-  temMALFORMED    : -299,
-  tefFAILURE      : -199,
-  terRETRY        : -99,
-  tesSUCCESS      : 0,
-  tecCLAIMED      : 100,
+  telLOCAL_ERROR:  -399,
+  temMALFORMED:    -299,
+  tefFAILURE:      -199,
+  terRETRY:        -99,
+  tesSUCCESS:      0,
+  tecCLAIMED:      100,
 };
 
 Transaction.from_json = function(j) {
@@ -264,6 +264,14 @@ Transaction.prototype.buildPath = function(build) {
 Transaction.prototype.destinationTag = function(tag) {
   if (tag !== void(0)) {
     this.tx_json.DestinationTag = tag;
+  }
+  return this;
+};
+
+Transaction.prototype.invoiceID = function(id) {
+  if (typeof id === 'string') {
+    while (id.length < 64) id += '0';
+    this.tx_json.InvoiceID = id;
   }
   return this;
 };
@@ -630,20 +638,22 @@ Transaction.prototype.submit = function(callback) {
 
   this.callback = typeof callback === 'function' ? callback : function(){};
 
-  function submission_error(error, message) {
+  function submissionError(error, message) {
     if (!(error instanceof RippleError)) {
       error = new RippleError(error, message);
     }
     self.callback(error);
   };
 
-  function submission_success(message) {
+  this.once('error', submissionError);
+
+  function submissionSuccess(message) {
     self.callback(null, message);
   };
 
+  this.once('success', submissionSuccess);
+
   this.on('error', function(){});
-  this.once('error', submission_error);
-  this.once('success', submission_success);
 
   var account = this.tx_json.Account;
 
