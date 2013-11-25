@@ -131,12 +131,12 @@ TransactionManager.normalizeTransaction = function(tx) {
       type:                   'transaction',
       validated:              true
     }
-    transaction.tx_json        = transaction.transaction;
     transaction.result         = transaction.engine_result;
     transaction.result_message = transaction.engine_result_message;
   }
 
   transaction.metadata = transaction.meta;
+  transaction.tx_json  = transaction.transaction;
 
   return transaction;
 };
