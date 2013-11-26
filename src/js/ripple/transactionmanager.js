@@ -333,7 +333,7 @@ TransactionManager.prototype._request = function(tx) {
     }
   });
 
-  submitRequest.broadcast();
+  submitRequest.request();
 
   tx.set_state('client_submitted');
   tx.attempts++;

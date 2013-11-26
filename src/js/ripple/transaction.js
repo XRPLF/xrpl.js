@@ -461,9 +461,15 @@ Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expira
   this.tx_json.TakerGets       = Amount.json_rewrite(taker_gets);
 
   if (expiration) {
-    this.tx_json.Expiration = expiration instanceof Date
-    ? expiration.getTime() //XX
-    : Number(expiration);
+    switch (expiration.constructor) {
+      case Date:
+        var offset = (new Date(2000, 0, 1).getTime()) - (new Date(1970, 0, 1).getTime());
+        this.tx_json.Expiration = expiration.getTime() - offset;
+        break;
+      case Number:
+        this.tx_json.Expiration = expiration;
+        break;
+    }
   }
 
   if (cancel_sequence) {
@@ -536,6 +542,7 @@ Transaction.prototype.payment = function(src, dst, amount) {
     amount = options.amount;
     dst    = options.destination || options.to;
     src    = options.source || options.from;
+    if (options.invoiceID) this.invoiceID(options.invoiceID);
   }
 
   if (!UInt160.is_valid(src)) {
