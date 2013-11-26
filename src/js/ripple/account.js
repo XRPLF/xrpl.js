@@ -78,12 +78,8 @@ function Account(remote, account) {
 
     transaction.mmeta.each(function(an) {
       var isAccount = an.fields.Account === self._account_id;
+      var isAccountRoot = isAccount && (an.entryType === 'AccountRoot');
 
-      if (isAccount) {
-        self.emit('');
-      }
-
-      var isAccountRoot = (an.entryType === 'AccountRoot') && an.fields.Account === self._account_id;
       if (isAccountRoot) {
         extend(self._entry, an.fieldsNew, an.fieldsFinal);
         changed = true;
