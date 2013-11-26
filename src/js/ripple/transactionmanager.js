@@ -136,7 +136,10 @@ TransactionManager.normalizeTransaction = function(tx) {
   }
 
   transaction.metadata = transaction.meta;
-  transaction.tx_json  = transaction.transaction;
+
+  if (!transaction.tx_json) {
+    transaction.tx_json = transaction.transaction;
+  }
 
   return transaction;
 };
