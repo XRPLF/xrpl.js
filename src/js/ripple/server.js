@@ -366,8 +366,6 @@ Server.prototype._handleMessage = function(message) {
       } else if (message.error) {
         this._remote._trace('server: error: %s', message);
 
-        console.log('ERROR', message);
-
         request.emit('error', {
           error         : 'remoteError',
           error_message : 'Remote reported an error.',
