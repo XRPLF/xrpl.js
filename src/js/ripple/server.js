@@ -45,13 +45,16 @@ function Server(remote, opts) {
   });
 
   function checkServerActivity() {
+    if (isNaN(self._lastLedgerClose)) return;
+
     var delta = Date.now() - self._lastLedgerClose;
+
     if (delta > (1000 * 20)) {
       self.reconnect();
     }
   };
 
-  this.once('connect', function() {
+  this.once('ledger_closed', function() {
     setInterval(checkServerActivity, 1000);
   });
 };
@@ -251,8 +254,10 @@ Server.prototype.disconnect = function() {
  */
 
 Server.prototype.reconnect = function() {
-  this.disconnect();
-  this.connect();
+  if (this._ws) {
+    this._ws.once('close', this.connect.bind(this));
+    this.disconnect();
+  }
 };
 
 /**
@@ -336,6 +341,7 @@ Server.prototype._handleMessage = function(message) {
 
     case 'ledgerClosed':
       this._lastLedgerClose = Date.now();
+      this.emit('ledger_closed', message);
       break;
 
     case 'path_find':
@@ -359,6 +365,8 @@ Server.prototype._handleMessage = function(message) {
         });
       } else if (message.error) {
         this._remote._trace('server: error: %s', message);
+
+        console.log('ERROR', message);
 
         request.emit('error', {
           error         : 'remoteError',
