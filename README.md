@@ -22,8 +22,36 @@
 
 ##Getting `ripple-lib`
 
-1. Via npm for Node.js: `npm install ripple-lib`
-2. Build from the source using `grunt` and load the minified `ripple-#.#.#-min.js` into your webpage
+#### Via npm for Node.js
+```bash
+npm install ripple-lib
+```
+####Build from the source using `grunt`
+```bash
+# install dependencies
+npm install async
+npm install ws
+npm install extend
+npm install jshint-loader
+
+# install dev dependencies
+npm install grunt-cli # grunt-cli needs at least node 0.8  
+npm install grunt
+npm install grunt-contrib-concat 
+npm install grunt-contrib-watch 
+npm install grunt-webpack
+npm install grunt-dox
+npm install mocha
+
+# get the source
+git clone https://github.com/rebornix/ripple-lib.git
+
+# build
+cd ripple-lib/
+grunt # using grunt to build the source
+
+```
+Then load the minified `ripple-#.#.#-min.js` from `ripple-lib/build/` into your webpage
 
 
 ##Quickstart
