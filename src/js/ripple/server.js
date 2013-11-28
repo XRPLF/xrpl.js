@@ -55,7 +55,7 @@ function Server(remote, opts) {
   };
 
   this.once('ledger_closed', function() {
-    setInterval(checkServerActivity, 1000);
+    //setInterval(checkServerActivity, 1000);
   });
 };
 
