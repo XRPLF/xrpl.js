@@ -255,7 +255,7 @@ Server.prototype.disconnect = function() {
 
 Server.prototype.reconnect = function() {
   if (this._ws) {
-    this._ws.once('close', this.connect.bind(this));
+    this.once('disconnect', this.connect.bind(this));
     this.disconnect();
   }
 };
