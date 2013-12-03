@@ -21,18 +21,18 @@ function Server(remote, opts) {
 
   var self = this;
 
-  this._remote         = remote;
-  this._opts           = opts;
-  this._host           = opts.host;
-  this._port           = opts.port;
-  this._secure         = typeof opts.secure === 'boolean' ? opts.secure : true;
-  this._ws             = void(0);
-  this._connected      = false;
+  this._remote        = remote;
+  this._opts          = opts;
+  this._host          = opts.host;
+  this._port          = opts.port;
+  this._secure        = (typeof opts.secure === 'boolean') ? opts.secure : true;
+  this._ws            = void(0);
+  this._connected     = false;
   this._shouldConnect = false;
-  this._state          = void(0);
-  this._id             = 0;
-  this._retry          = 0;
-  this._requests       = { };
+  this._state         = void(0);
+  this._id            = 0;
+  this._retry         = 0;
+  this._requests      = { };
 
   this._opts.url = (opts.secure ? 'wss://' : 'ws://') + opts.host + ':' + opts.port;
 
@@ -47,15 +47,24 @@ function Server(remote, opts) {
   function checkServerActivity() {
     if (isNaN(self._lastLedgerClose)) return;
 
-    var delta = Date.now() - self._lastLedgerClose;
+    var delta = (Date.now() - self._lastLedgerClose);
 
     if (delta > (1000 * 20)) {
       self.reconnect();
     }
   };
 
+  function setActivityInterval() {
+    self._activityInterval = setInterval(checkServerActivity, 1000);
+  };
+
+  this.on('disconnect', function onDisconnect() {
+    clearInterval(self._activityInterval);
+    //self.once('ledger_closed', setActivityInterval);
+  });
+
   this.once('ledger_closed', function() {
-    //setInterval(checkServerActivity, 1000);
+    //setActiviyInterval();
   });
 };
 
@@ -309,7 +318,6 @@ Server.prototype.request = function(request) {
 Server.prototype.sendMessage = function(message) {
   if (this._ws) {
     this._remote._trace('server: request: %s', message);
-    this.emit('before_send_message', message)
     this._ws.send(JSON.stringify(message));
   }
 };

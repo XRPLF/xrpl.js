@@ -20,7 +20,7 @@
 
 1. [The `ripple-lib` Guides (docs/GUIDES.md)](docs/GUIDES.md)
 2. [The `ripple-lib` API Reference (docs/REFERENCE.md)](docs/REFERENCE.md)
-3. https://ripple.com/wiki/Ripple_JavaScript_library  
+3. https://ripple.com/wiki/Ripple_JavaScript_library
 
 ###Also see:
 
@@ -29,9 +29,21 @@
 
 ##Getting `ripple-lib`
 
-1. Via npm for Node.js: `npm install ripple-lib`
-2. Build from the source using `grunt` and load the minified `ripple-#.#.#-min.js` into your webpage
+** Via npm for Node.js**
 
+```
+  $ npm install ripple-lib
+```
+
+**Build from the source using `grunt`**
+
+```
+  $ git clone https://github.com/ripple/ripple-lib
+  $ npm install
+  $ grunt
+```
+
+Then use the minified `build/ripple-*-min.js` in your webpage
 
 ##Quickstart
 
