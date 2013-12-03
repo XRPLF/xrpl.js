@@ -29,7 +29,7 @@
 
 ##Getting `ripple-lib`
 
-** Via npm for Node.js**
+**Via npm for Node.js**
 
 ```
   $ npm install ripple-lib
