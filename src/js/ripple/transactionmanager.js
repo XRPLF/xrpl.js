@@ -265,7 +265,7 @@ TransactionManager.prototype._request = function(tx) {
         self._resubmit(3, tx);
       break;
       default:
-        submissionError(message);
+        tx.emit('error', message);
     }
   };
 
@@ -273,7 +273,7 @@ TransactionManager.prototype._request = function(tx) {
     switch (message.engine_result) {
       case 'terPRE_SEQ':
         self._fillSequence(tx, function() {
-          self._resubmit(2, tx);
+          self._resubmit(1, tx);
         });
         break;
       default:
@@ -291,19 +291,18 @@ TransactionManager.prototype._request = function(tx) {
     } else {
       self._nextSequence--;
       tx.set_state('remoteError');
-      tx.emit('submitted', error);
       tx.emit('error', error);
     }
   };
 
-  function submissionSuccess(message) {
-    if (message.tx_json.hash) {
+  function submitted(message) {
+    if (message.tx_json && message.tx_json.hash) {
       tx._hash = message.tx_json.hash;
     }
 
-    remote._trace('transactionmanager: submit_response: %s', message);
-
     message.result = message.engine_result || '';
+
+    remote._trace('transactionmanager: submit_response: %s', message);
 
     tx.emit('submitted', message);
 
@@ -325,9 +324,6 @@ TransactionManager.prototype._request = function(tx) {
     }
   };
 
-  submitRequest.once('success', submissionSuccess);
-  submitRequest.once('error', submissionError);
-
   submitRequest.timeout(this._submissionTimeout, function() {
     tx.emit('timeout');
     if (remote._connected) {
@@ -336,6 +332,8 @@ TransactionManager.prototype._request = function(tx) {
     }
   });
 
+  submitRequest.once('error', submitted);
+  submitRequest.once('success', submitted);
   submitRequest.request();
 
   tx.set_state('client_submitted');
