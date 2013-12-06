@@ -235,7 +235,7 @@ Remote.from_config = function(obj, trace) {
   var remote = new Remote(serverConfig, trace);
 
   function initializeAccount(account) {
-    var accountInfo = config.accounts[account];
+    var accountInfo = this.accounts[account];
     if (typeof accountInfo === 'object') {
       if (accountInfo.secret) {
         // Index by nickname
@@ -246,11 +246,7 @@ Remote.from_config = function(obj, trace) {
     }
   };
 
-  if (typeof config.accounts === 'object') {
-    for (var account in config.accounts) {
-      initializeAccount(account);
-    }
-  }
+  Object.keys(config.accounts || {}).forEach(initializeAccount, config);
 
   return remote;
 };
@@ -387,9 +383,13 @@ Remote.prototype.connect = function(online) {
 /**
  * Disconnect from the Ripple network.
  */
-Remote.prototype.disconnect = function(online) {
+Remote.prototype.disconnect = function(callback) {
   if (!this._servers.length) {
     throw new Error('No servers available, not disconnecting');
+  }
+
+  if (typeof callback === 'function') {
+    this.once('disconnect', callback);
   }
 
   this._servers.forEach(function(server) {
