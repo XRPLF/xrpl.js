@@ -87,7 +87,7 @@ util.inherits(Transaction, EventEmitter);
 
 // XXX This needs to be determined from the network.
 Transaction.fee_units = {
-  default: 10,
+  default: 10
 };
 
 Transaction.flags = {
@@ -128,7 +128,7 @@ Transaction.prototype.consts = {
   tefFAILURE:      -199,
   terRETRY:        -99,
   tesSUCCESS:      0,
-  tecCLAIMED:      100,
+  tecCLAIMED:      100
 };
 
 Transaction.from_json = function(j) {
@@ -564,7 +564,7 @@ Transaction.prototype.payment = function(src, dst, amount) {
   this.tx_json.Destination     = UInt160.json_rewrite(dst);
 
   return this;
-}
+};
 
 Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_out) {
   if (typeof src === 'object') {
