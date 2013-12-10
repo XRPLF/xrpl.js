@@ -286,6 +286,9 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   function submissionError(error) {
+    // Finalized (e.g. aborted) transactions must stop all activity
+    if (tx.finalized) return;
+
     if (self._is_too_busy(error)) {
       self._resubmit(1, tx);
     } else {
@@ -296,6 +299,9 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   function submitted(message) {
+    // Finalized (e.g. aborted) transactions must stop all activity
+    if (tx.finalized) return;
+
     if (message.tx_json && message.tx_json.hash) {
       tx._hash = message.tx_json.hash;
     }
@@ -325,6 +331,9 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   submitRequest.timeout(this._submissionTimeout, function() {
+    // Finalized (e.g. aborted) transactions must stop all activity
+    if (tx.finalized) return;
+
     tx.emit('timeout');
     if (remote._connected) {
       remote._trace('transactionmanager: timeout: %s', tx.tx_json);
@@ -368,6 +377,9 @@ TransactionManager.prototype.submit = function(tx) {
   // If sequence number is not yet known, defer until it is.
   if (typeof this._nextSequence === 'undefined') {
     function sequenceLoaded() {
+      // Finalized (e.g. aborted) transactions must stop all activity
+      if (tx.finalized) return;
+
       self.submit(tx);
     };
     this.once('sequence_loaded', sequenceLoaded);
