@@ -29,6 +29,7 @@
     "sinon":"~1.7.3"
   },
   "scripts": {
+    "pretest": "node_modules/.bin/grunt",
     "test": "mocha test/*-test.js",
     "build": "grunt"
   },
