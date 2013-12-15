@@ -19,6 +19,7 @@ function TransactionManager(account) {
   this._pending           = new PendingQueue;
   this._nextSequence      = void(0);
   this._cache             = { };
+  // ND: Do we ever clean this up?
   this._sequenceCache     = { };
   this._maxFee            = this._remote.max_fee;
   this._submissionTimeout = this._remote._submission_timeout;
