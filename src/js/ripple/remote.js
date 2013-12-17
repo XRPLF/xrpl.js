@@ -905,6 +905,20 @@ Remote.prototype.requestTxHistory = function(start, callback) {
 };
 
 Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
+  if (gets.hasOwnProperty('pays')) {
+    var options = gets;
+    callback = pays;
+    taker = options.taker;
+    pays = options.pays;
+    gets = options.gets;
+  }
+
+  var lastArg = arguments[arguments.length - 1];
+
+  if (typeof lastArg === 'function') {
+    callback = lastArg;
+  }
+  
   var request = new Request(this, 'book_offers');
 
   request.message.taker_gets = {
