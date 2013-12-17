@@ -81,6 +81,12 @@ function Transaction(remote) {
 
   this.finalized              = false;
   this._previous_signing_hash = void(0);
+
+  // We aren't clever enough to eschew preventative measures so we keep an array
+  // of all submitted transactionIDs (which can change due to load_factor
+  // effecting the Fee amount). This should be populated with a transactionID
+  // any time it goes on the network
+  this.submittedTxnIDs = []
 };
 
 util.inherits(Transaction, EventEmitter);
@@ -208,6 +214,12 @@ Transaction.prototype.serialize = function() {
 
 Transaction.prototype.signingHash = function() {
   return this.hash(config.testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
+};
+
+Transaction.prototype.addSubmittedTxnID = function(hash) {
+  if (-1 == this.submittedTxnIDs.indexOf(hash)) {
+    this.submittedTxnIDs.push(hash);
+  }
 };
 
 Transaction.prototype.hash = function(prefix, as_uint256) {

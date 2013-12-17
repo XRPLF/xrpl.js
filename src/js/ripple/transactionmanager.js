@@ -19,6 +19,7 @@ function TransactionManager(account) {
   this._pending           = new PendingQueue;
   this._nextSequence      = void(0);
   this._cache             = { };
+  // ND: Do we ever clean this up?
   this._sequenceCache     = { };
   this._maxFee            = this._remote.max_fee;
   this._submissionTimeout = this._remote._submission_timeout;
@@ -34,11 +35,14 @@ function TransactionManager(account) {
 
     self._sequenceCache[sequence] = transaction;
 
-    var pending = self._pending.get('_hash', hash);
+    // ND: we need to check against all submissions ids
+    var pending = self._pending.getBySubmissions(hash);
+    // var pending = self._pending.get('_hash', hash);
 
     self._remote._trace('transactionmanager: transaction_received: %s', transaction.transaction);
 
     if (pending) {
+      // ND: A `success` handler will `finalize` this later
       pending.emit('success', transaction);
     } else {
       self._cache[hash] = transaction;
@@ -48,6 +52,7 @@ function TransactionManager(account) {
   this._account.on('transaction-outbound', transactionReceived);
 
   function adjustFees() {
+    // ND: note, that `Fee` is a component of a transactionID
     self._pending.forEach(function(pending) {
       if (self._remote.local_fee && pending.tx_json.Fee) {
         var oldFee = pending.tx_json.Fee;
@@ -248,7 +253,11 @@ TransactionManager.prototype._request = function(tx) {
     submitRequest.tx_json(tx.tx_json);
   }
 
-  tx._hash = tx.hash();
+  // ND: We could consider sharing the work with tx_blob when doing
+  // local_signing
+
+  tx.addSubmittedTxnID(tx.hash());
+  // tx._hash = tx.hash();
 
   remote._trace('transactionmanager: submit: %s', tx.tx_json);
 
@@ -302,8 +311,11 @@ TransactionManager.prototype._request = function(tx) {
     // Finalized (e.g. aborted) transactions must stop all activity
     if (tx.finalized) return;
 
+
+    // ND: If for some unknown reason our hash wasn't computed correctly this is
+    // an extra measure.
     if (message.tx_json && message.tx_json.hash) {
-      tx._hash = message.tx_json.hash;
+      tx.addSubmittedTxnID(message.tx_json.hash);
     }
 
     message.result = message.engine_result || '';
@@ -331,6 +343,16 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   submitRequest.timeout(this._submissionTimeout, function() {
+    // ND: What if the response is just slow and we get a response that
+    // `submitted` above will cause to have concurrent resubmit logic streams?
+    // It's simpler to just mute handlers and look out for finalized
+    // `transaction` messages.
+
+    // ND: We should audit the code for other potential multiple resubmit
+    // streams. Connection/reconnection could be one? That's why it's imperative
+    // that ALL transactionIDs sent over network are tracked.
+    submitRequest.removeAllListeners();
+
     // Finalized (e.g. aborted) transactions must stop all activity
     if (tx.finalized) return;
 
@@ -397,7 +419,9 @@ TransactionManager.prototype.submit = function(tx) {
 
   function finalize(message) {
     if (!tx.finalized) {
-      self._pending.removeHash(tx._hash);
+      // ND: We can just remove this `tx` by identity
+      self._pending.remove(tx);
+      // self._pending.removeHash(tx._hash);
       remote._trace('transactionmanager: finalize_transaction: %s', tx.tx_json);
       tx.finalized = true;
       tx.emit('final', message);
@@ -421,6 +445,10 @@ TransactionManager.prototype.submit = function(tx) {
   } else if (fee && fee > this._maxFee) {
     tx.emit('error', new RippleError('tejMaxFeeExceeded', 'Max fee exceeded'));
   } else {
+    // ND: this is the ONLY place we put the tx into the queue. The
+    // TransactionQueue queue is merely a list, so any mutations to tx._hash
+    // will cause subsequent look ups (eg. inside 'transaction-outbound'
+    // validated transaction clearing) to fail.
     this._pending.push(tx);
     this._request(tx);
   }
