@@ -92,8 +92,16 @@ function chunkString(str, n, leftAlign) {
   return ret;
 };
 
-function logObject(msg, obj) {
-  console.log(msg, JSON.stringify(obj, null, 2));
+function logObject(msg) {
+  var args = Array.prototype.slice.call(arguments, 1);
+
+  args = args.map(function(arg) {
+    return JSON.stringify(arg, null, 2);
+  });
+
+  args.unshift(msg);
+
+  console.log.apply(console, args);
 };
 
 function assert(assertion, msg) {
