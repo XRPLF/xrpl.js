@@ -357,6 +357,7 @@ TransactionManager.prototype._request = function(tx) {
     if (tx.finalized) return;
 
     tx.emit('timeout');
+
     if (remote._connected) {
       remote._trace('transactionmanager: timeout: %s', tx.tx_json);
       self._resubmit(3, tx);

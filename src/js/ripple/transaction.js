@@ -217,7 +217,7 @@ Transaction.prototype.signingHash = function() {
 };
 
 Transaction.prototype.addSubmittedTxnID = function(hash) {
-  if (-1 == this.submittedTxnIDs.indexOf(hash)) {
+  if (this.submittedTxnIDs.indexOf(hash) === -1) {
     this.submittedTxnIDs.push(hash);
   }
 };
