@@ -267,13 +267,16 @@ Remote.prototype.addServer = function(opts) {
   server.on('message', serverMessage);
 
   function serverConnect() {
-    self._connection_count++;
-    self._set_state('online');
     if (opts.primary || !self._primary_server) {
       self._setPrimaryServer(server);
     }
-    if (self._connection_count === self._servers.length) {
-      self.emit('ready');
+    switch (++self._connection_count) {
+      case 1:
+        self._setState('online');
+        break;
+      case self._servers.length:
+        self.emit('ready');
+        break;
     }
   };
 
@@ -281,8 +284,8 @@ Remote.prototype.addServer = function(opts) {
 
   function serverDisconnect() {
     self._connection_count--;
-    if (!self._connection_count) {
-      self._set_state('offline');
+    if (self._connection_count === 0) {
+      self._setState('offline');
     }
   };
 
@@ -300,9 +303,9 @@ Remote.prototype.serverFatal = function() {
 
 // Set the emitted state: 'online' or 'offline'
 Remote.prototype._setState = function(state) {
-  this._trace('remote: set_state: %s', state);
-
   if (this.state !== state) {
+    this._trace('remote: set_state: %s', state);
+
     this.state = state;
 
     this.emit('state', state);
@@ -343,6 +346,8 @@ Remote.prototype._trace = function() {
 
 /**
  * Connect to the Ripple network.
+ *
+ * param {Function} callback
  */
 
 Remote.prototype.connect = function(online) {
@@ -353,9 +358,11 @@ Remote.prototype.connect = function(online) {
   switch (typeof online) {
     case 'undefined':
       break;
+
     case 'function':
       this.once('connect', online);
       break;
+
     default:
       // Downwards compatibility
       if (!Boolean(online)) {
@@ -762,6 +769,7 @@ Remote.prototype.requestTransactionEntry = function(hash, ledger_hash, callback)
     case 'string':
       request.ledgerHash(ledger_hash);
       break;
+
     default:
       request.ledgerIndex('validated');
       callback = ledger_hash;
@@ -918,7 +926,7 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
   if (typeof lastArg === 'function') {
     callback = lastArg;
   }
-  
+
   var request = new Request(this, 'book_offers');
 
   request.message.taker_gets = {

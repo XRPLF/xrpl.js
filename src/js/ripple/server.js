@@ -29,7 +29,7 @@ function Server(remote, opts) {
   this._ws            = void(0);
   this._connected     = false;
   this._shouldConnect = false;
-  this._state         = void(0);
+  this._state         = 'offline';
   this._id            = 0;
   this._retry         = 0;
   this._requests      = { };
@@ -110,6 +110,8 @@ Server.onlineStates = [
 
 Server.prototype._setState = function(state) {
   if (state !== this._state) {
+    this._remote._trace('server: set_state: %s', state);
+
     this._state = state;
 
     this.emit('state', state);
