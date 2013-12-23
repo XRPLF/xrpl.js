@@ -110,7 +110,7 @@ Server.onlineStates = [
 
 Server.prototype._setState = function(state) {
   if (state !== this._state) {
-    this._remote._trace('server: set_state: %s', state);
+    this._remote._trace('server: set_state:', state);
 
     this._state = state;
 
@@ -157,7 +157,7 @@ Server.prototype.connect = function() {
   // we will automatically reconnect.
   if (this._connected) return;
 
-  this._remote._trace('server: connect: %s', this._opts.url);
+  this._remote._trace('server: connect:', this._opts.url);
 
   // Ensure any existing socket is given the command to close first.
   if (this._ws) this._ws.close();
@@ -165,7 +165,7 @@ Server.prototype.connect = function() {
   var WebSocket = Server.websocketConstructor();
 
   if (!WebSocket) {
-    throw new Error("No websocket support detected!");
+    throw new Error('No websocket support detected!');
   }
 
   var ws = this._ws = new WebSocket(this._opts.url);
@@ -191,7 +191,7 @@ Server.prototype.connect = function() {
     // If we are no longer the active socket, simply ignore any event
     if (ws === self._ws) {
       self.emit('socket_error');
-      self._remote._trace('server: onerror: %s %s', self._opts.url, e.data || e);
+      self._remote._trace('server: onerror:', self._opts.url, e.data || e);
 
       // Most connection errors for WebSockets are conveyed as 'close' events with
       // code 1006. This is done for security purposes and therefore unlikely to
@@ -215,7 +215,7 @@ Server.prototype.connect = function() {
   ws.onclose = function() {
     // If we are no longer the active socket, simply ignore any event
     if (ws === self._ws) {
-      self._remote._trace('server: onclose: %s %s', self._opts.url, ws.readyState);
+      self._remote._trace('server: onclose:', self._opts.url, ws.readyState);
       handleConnectionClose();
     }
   };
@@ -244,7 +244,7 @@ Server.prototype.connect = function() {
 
     function connectionRetry() {
       if (self._shouldConnect) {
-        self._remote._trace('server: retry %s', self._opts.url);
+        self._remote._trace('server: retry', self._opts.url);
         self.connect();
       }
     };
@@ -291,7 +291,7 @@ Server.prototype.request = function(request) {
 
   // Only bother if we are still connected.
   if (!this._ws) {
-    this._remote._trace('server: request: DROPPING: %s %s', self._opts.url, request.message);
+    this._remote._trace('server: request: DROPPING:', self._opts.url, request.message);
     return;
   }
 
@@ -324,7 +324,7 @@ Server.prototype.request = function(request) {
 
 Server.prototype.sendMessage = function(message) {
   if (this._ws) {
-    this._remote._trace('server: request: %s, %s', this._opts.url, message);
+    this._remote._trace('server: request:', this._opts.url, message);
     this._ws.send(JSON.stringify(message));
   }
 };
@@ -360,7 +360,7 @@ Server.prototype._handleMessage = function(message) {
       break;
 
     case 'path_find':
-      this._remote._trace('server: path_find: %s %s', self._opts.url, message);
+      this._remote._trace('server: path_find:', self._opts.url, message);
       break;
 
     case 'response':
@@ -369,9 +369,9 @@ Server.prototype._handleMessage = function(message) {
       delete self._requests[message.id];
 
       if (!request) {
-        this._remote._trace('server: UNEXPECTED: %s %s', self._opts.url, message);
+        this._remote._trace('server: UNEXPECTED:', self._opts.url, message);
       } else if (message.status === 'success') {
-        this._remote._trace('server: response: %s %s', self._opts.url, message);
+        this._remote._trace('server: response:', self._opts.url, message);
 
         request.emit('success', message.result);
 
@@ -379,7 +379,7 @@ Server.prototype._handleMessage = function(message) {
           emitter.emit('response_' + request.message.command, message.result, request, message);
         });
       } else if (message.error) {
-        this._remote._trace('server: error: %s %s', self._opts.url, message);
+        this._remote._trace('server: error:', self._opts.url, message);
 
         request.emit('error', {
           error         : 'remoteError',
