@@ -475,8 +475,8 @@ Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expira
   if (expiration) {
     switch (expiration.constructor) {
       case Date:
-        var offset = (new Date(2000, 0, 1).getTime()) - (new Date(1970, 0, 1).getTime());
-        this.tx_json.Expiration = expiration.getTime() - offset;
+        //offset = (new Date(2000, 0, 1).getTime()) - (new Date(1970, 0, 1).getTime());
+        this.tx_json.Expiration = expiration.getTime() - 946684800000;
         break;
       case Number:
         this.tx_json.Expiration = expiration;
