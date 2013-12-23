@@ -163,6 +163,11 @@ Server.prototype.connect = function() {
   if (this._ws) this._ws.close();
 
   var WebSocket = Server.websocketConstructor();
+
+  if (!WebSocket) {
+    throw new Error("No websocket support detected!");
+  }
+
   var ws = this._ws = new WebSocket(this._opts.url);
 
   this._shouldConnect = true;
