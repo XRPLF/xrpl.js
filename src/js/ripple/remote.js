@@ -414,9 +414,7 @@ Remote.prototype._handleMessage = function(message, server) {
 
   try { message = JSON.parse(message); } catch(e) { }
 
-  var valid = (typeof message === 'object') && (typeof message.type === 'string');
-
-  if (!valid) {
+  if (!Remote.isValidMessage(message)) {
     // Unexpected response from remote.
     this.emit('error', new RippleError('remoteUnexpected', 'Unexpected response from remote'));
     return;
@@ -432,12 +430,14 @@ Remote.prototype._handleMessage = function(message, server) {
       // XXX Also need to consider a slow server or out of order response.
       // XXX Be more defensive fields could be missing or of wrong type.
       // YYY Might want to do some cache management.
+      if (!Remote.isValidLedgerData(message)) return;
 
-      this._ledger_time           = message.ledger_time;
-      this._ledger_hash           = message.ledger_hash;
-      this._ledger_current_index  = message.ledger_index + 1;
-
-      this.emit('ledger_closed', message, server);
+      if (message.ledger_index >= this._ledger_current_index) {
+        this._ledger_time           = message.ledger_time;
+        this._ledger_hash           = message.ledger_hash;
+        this._ledger_current_index  = message.ledger_index + 1;
+        this.emit('ledger_closed', message, server);
+      }
       break;
 
     case 'transaction':
@@ -481,6 +481,7 @@ Remote.prototype._handleMessage = function(message, server) {
 
       this.emit('path_find_all', message);
       break;
+
     case 'serverStatus':
       self.emit('server_status', message);
 
@@ -492,11 +493,13 @@ Remote.prototype._handleMessage = function(message, server) {
       if (loadChanged) {
         self._load_base   = message.load_base;
         self._load_factor = message.load_factor;
+
         var obj = {
           load_base:    self._load_base,
           load_factor:  self._load_factor,
           fee_units:    self.feeTxUnit()
         }
+
         self.emit('load', obj);
         self.emit('load_changed', obj);
       }
@@ -508,6 +511,24 @@ Remote.prototype._handleMessage = function(message, server) {
       this.emit('net_' + message.type, message);
       break;
   }
+};
+
+Remote.isValidMessage = function(message) {
+  return (typeof message === 'object')
+      && (typeof message.type === 'string');
+};
+
+Remote.isValidLedgerData = function(ledger) {
+  return (typeof ledger              === 'object')
+      && (typeof ledger.fee_base     === 'number')
+      && (typeof ledger.fee_ref      === 'number')
+      && (typeof ledger.fee_base     === 'number')
+      && (typeof ledger.ledger_hash  === 'string')
+      && (typeof ledger.ledger_index === 'number')
+      && (typeof ledger.ledger_time  === 'number')
+      && (typeof ledger.reserve_base === 'number')
+      && (typeof ledger.reserve_inc  === 'number')
+      && (typeof ledger.txn_count    === 'number')
 };
 
 Remote.prototype.ledgerHash = function() {
