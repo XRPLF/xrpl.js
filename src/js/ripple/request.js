@@ -275,42 +275,49 @@ Request.prototype.rtAccounts = function(accounts) {
 };
 
 Request.prototype.books = function(books, snapshot) {
-  var processedBooks = [ ];
+  // Reset list of books (this method overwrites the current list)
+  this.message.books = [ ];
 
   for (var i = 0, l = books.length; i < l; i++) {
     var book = books[i];
-    var json = { };
-
-    function processSide(side) {
-      if (!book[side]) {
-        throw new Error('Missing ' + side);
-      }
-
-      var obj = json[side] = {
-        currency: Currency.json_rewrite(book[side].currency)
-      };
-      if (obj.currency !== 'XRP') {
-        obj.issuer = UInt160.json_rewrite(book[side].issuer);
-      }
-    }
-
-    processSide('taker_gets');
-    processSide('taker_pays');
-
-    if (snapshot) {
-      json.snapshot = true;
-    }
-
-    if (book.both) {
-      json.both = true;
-    }
-
-    processedBooks.push(json);
+    this.addBook(book, snapshot);
   }
 
-  this.message.books = processedBooks;
-
   return this;
+};
+
+Request.prototype.addBook = function (book, snapshot) {
+  if (!Array.isArray(this.message.books)) {
+    this.message.books = [];
+  }
+
+  var json = { };
+
+  function processSide(side) {
+    if (!book[side]) {
+      throw new Error('Missing ' + side);
+    }
+
+    var obj = json[side] = {
+      currency: Currency.json_rewrite(book[side].currency)
+    };
+    if (obj.currency !== 'XRP') {
+      obj.issuer = UInt160.json_rewrite(book[side].issuer);
+    }
+  }
+
+  processSide('taker_gets');
+  processSide('taker_pays');
+
+  if (snapshot) {
+    json.snapshot = true;
+  }
+
+  if (book.both) {
+    json.both = true;
+  }
+
+  this.message.books.push(json);
 };
 
 exports.Request = Request;
