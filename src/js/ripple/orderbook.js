@@ -34,18 +34,20 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
   // Offers
   this._offers       = [ ];
 
-  this.on('newListener', function (type, listener) {
+  function listenerAdded(type, listener) {
     if (~OrderBook.subscribe_events.indexOf(type)) {
       if (!self._subs && self._remote._connected) {
         self._subscribe();
       }
       self._subs += 1;
     }
-  });
+  };
 
-  this.on('removeListener', function (type, listener) {
+  this.on('newListener', listenerAdded);
+
+  function listenerRemoved(type, listener) {
     if (~OrderBook.subscribe_events.indexOf(type)) {
-      self._subs  -= 1;
+      self._subs -= 1;
       if (!self._subs && self._remote._connected) {
         self._sync = false;
         self._remote.request_unsubscribe()
@@ -53,17 +55,23 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
         .request();
       }
     }
-  });
+  };
 
-  this._remote.on('connect', function () {
+  this.on('removeListener', listenerRemoved);
+
+  function remoteConnected() {
     if (self._subs) {
       self._subscribe();
     }
-  });
+  };
 
-  this._remote.on('disconnect', function () {
+  this._remote.on('connect', remoteConnected);
+
+  function remoteDisconnected() {
     self._sync = false;
-  });
+  };
+
+  this._remote.on('disconnect', remoteDisconnected);
 
   return this;
 };
@@ -138,7 +146,7 @@ OrderBook.prototype.trade = function(type) {
   + ((this['_currency_' + type] === 'XRP') ? '' : '/'
      + this['_currency_' + type ] + '/'
      + this['_issuer_' + type]);
-     return Amount.from_json(tradeStr);
+  return Amount.from_json(tradeStr);
 };
 
 /**
@@ -147,14 +155,13 @@ OrderBook.prototype.trade = function(type) {
  * This is only meant to be called by the Remote class. You should never have to
  * call this yourself.
  */
-OrderBook.prototype.notify =
-  OrderBook.prototype.notifyTx = function (message) {
+OrderBook.prototype.notify = function (message) {
   var self       = this;
   var changed    = false;
   var trade_gets = this.trade('gets');
   var trade_pays = this.trade('pays');
 
-  message.mmeta.each(function (an) {
+  function handleTransaction(an) {
     if (an.entryType !== 'Offer') return;
 
     var i, l, offer;
@@ -206,17 +213,25 @@ OrderBook.prototype.notify =
         }
         break;
     }
-  });
+  };
+
+  message.mmeta.each(handleTransaction);
 
   // Only trigger the event if the account object is actually
   // subscribed - this prevents some weird phantom events from
   // occurring.
   if (this._subs) {
     this.emit('transaction', message);
-    if (changed) this.emit('model', this._offers);
-    if (!trade_gets.is_zero()) this.emit('trade', trade_pays, trade_gets);
+    if (changed) {
+      this.emit('model', this._offers);
+    }
+    if (!trade_gets.is_zero()) {
+      this.emit('trade', trade_pays, trade_gets);
+    }
   }
 };
+
+OrderBook.prototype.notifyTx = OrderBook.prototype.notify;
 
 /**
  * Get offers model asynchronously.
