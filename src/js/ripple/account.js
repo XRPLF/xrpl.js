@@ -212,17 +212,20 @@ Account.prototype.lines = function (callback) {
  */
 
 Account.prototype.line = function (currency,address,callback) {
-  var self = this;
-  var callback = typeof callback === 'function' ? callback : function(){};
+  var self = this,
+      found,
+      callback = typeof callback === 'function' ? callback : function(){};
 
   self.lines(function(err,data){
     data.lines.forEach(function(line){
       if (address === line.account && currency === line.currency) {
         callback(null,line);
+        found = true;
       }
     });
 
-    callback();
+    if (!found)
+      callback();
   });
 
   return this;
