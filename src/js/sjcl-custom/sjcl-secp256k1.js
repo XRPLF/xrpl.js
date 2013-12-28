@@ -1,6 +1,6 @@
 // ----- for secp256k1 ------
 
-// Overwrite NIST-P256 with secp256k1 so we're on even footing
+// Overwrite NIST-P256 with secp256k1
 sjcl.ecc.curves.c256 = new sjcl.ecc.curve(
     sjcl.bn.pseudoMersennePrime(256, [[0,-1],[4,-1],[6,-1],[7,-1],[8,-1],[9,-1],[32,-1]]),
     "0x14551231950b75fc4402da1722fc9baee",
