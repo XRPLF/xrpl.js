@@ -215,7 +215,7 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
       return;
     }
 
-    var hashCached = self._cache[pending._hash];
+    var hashCached = pending.findResultInCache(self._cache); //[pending._hash];
     self._remote._trace('transactionmanager: resubmit: %s', pending.tx_json);
 
     if (hashCached) {

@@ -222,6 +222,20 @@ Transaction.prototype.addSubmittedTxnID = function(hash) {
   }
 };
 
+Transaction.prototype.findResultInCache = function(cache) {
+  var cached;
+
+  for (var i = this.submittedTxnIDs.length - 1; i >= 0; i--) {
+    var hash = this.submittedTxnIDs[i];
+    cached = cache[hash];
+    if (cached != null) {
+      break;
+    };
+  };
+
+  return cached;
+};
+
 Transaction.prototype.hash = function(prefix, as_uint256) {
   if (typeof prefix === 'string') {
     if (typeof hashprefixes[prefix] === 'undefined') {
