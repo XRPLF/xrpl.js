@@ -203,6 +203,35 @@ Account.prototype.lines = function (callback) {
 };
 
 /**
+ * Retrieve this account's single trust line.
+ *
+ * @param {string} currency Currency
+ * @param {string} address Ripple address
+ * @param {function (err, line)} callback Called with the result
+ * @returns {Account}
+ */
+
+Account.prototype.line = function (currency,address,callback) {
+  var self = this,
+      found,
+      callback = typeof callback === 'function' ? callback : function(){};
+
+  self.lines(function(err,data){
+    data.lines.forEach(function(line){
+      if (address === line.account && currency === line.currency) {
+        callback(null,line);
+        found = true;
+      }
+    });
+
+    if (!found)
+      callback();
+  });
+
+  return this;
+};
+
+/**
  * Notify object of a relevant transaction.
  *
  * This is only meant to be called by the Remote class. You should never have to

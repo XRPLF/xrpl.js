@@ -37,9 +37,11 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
   function listenerAdded(type, listener) {
     if (~OrderBook.subscribe_events.indexOf(type)) {
       if (!self._subs && self._remote._connected) {
+        self._subs += 1;
         self._subscribe();
+      } else {
+        self._subs += 1;
       }
-      self._subs += 1;
     }
   };
 
@@ -57,15 +59,8 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
     }
   };
 
-  this.on('removeListener', listenerRemoved);
-
-  function remoteConnected() {
-    if (self._subs) {
-      self._subscribe();
-    }
-  };
-
-  this._remote.on('connect', remoteConnected);
+  // ST: This *should* call _prepareSubscribe.
+  this._remote.on('prepare_subscribe', this._subscribe.bind(this));
 
   function remoteDisconnected() {
     self._sync = false;
@@ -90,18 +85,42 @@ OrderBook.subscribe_events = ['transaction', 'model', 'trade'];
  */
 OrderBook.prototype._subscribe = function () {
   var self = this;
-  var request = self._remote.request_subscribe();
-  request.books([ self.to_json() ], true);
-  request.callback(function(err, res) {
-    if (err) {
-      // XXX What now?
-    } else {
+  if (self.is_valid() && self._subs) {
+    var request = this._remote.request_subscribe();
+    request.addBook(self.to_json(), true);
+    request.once('success', function(res) {
       self._sync   = true;
       self._offers = res.offers;
       self.emit('model', self._offers);
-    }
-  });
+    });
+    request.once('error', function(err) {
+      // XXX What now?
+    });
+    request.request();
+  }
 };
+
+/**
+ * Adds this orderbook to a subscription request.
+
+// ST: Currently this is not working because the server cannot give snapshots
+//     for more than one order book in the same subscribe message.
+
+OrderBook.prototype._prepareSubscribe = function (request) {
+  var self = this;
+  if (self.is_valid() && self._subs) {
+    request.addBook(self.to_json(), true);
+    request.once('success', function(res) {
+      self._sync   = true;
+      self._offers = res.offers;
+      self.emit('model', self._offers);
+    });
+    request.once('error', function(err) {
+      // XXX What now?
+    });
+  }
+};
+ */
 
 OrderBook.prototype.to_json = function () {
   var json = {

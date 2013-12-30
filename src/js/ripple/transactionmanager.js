@@ -36,9 +36,8 @@ function TransactionManager(account) {
 
     self._sequenceCache[sequence] = transaction;
 
-    // ND: we need to check against all submissions ids
+    // ND: we need to check against all submissions IDs
     var pending = self._pending.getBySubmissions(hash);
-    // var pending = self._pending.get('_hash', hash);
 
     self._remote._trace('transactionmanager: transaction_received:', transaction.transaction);
 
@@ -215,7 +214,7 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
       return;
     }
 
-    var hashCached = self._cache[pending._hash];
+    var hashCached = pending.findResultInCache(self._cache);
     self._remote._trace('transactionmanager: resubmit:', pending.tx_json);
 
     if (hashCached) {
