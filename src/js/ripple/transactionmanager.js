@@ -34,6 +34,8 @@ function TransactionManager(account) {
     var sequence    = transaction.transaction.Sequence;
     var hash        = transaction.transaction.hash;
 
+    if (!transaction.validated) return;
+
     self._sequenceCache[sequence] = transaction;
 
     // ND: we need to check against all submissions IDs
@@ -312,7 +314,7 @@ TransactionManager.prototype._request = function(tx) {
     switch (message.engine_result) {
       case 'tefPAST_SEQ':
         self._resubmit(3, tx);
-      break;
+        break;
       default:
         tx.emit('error', message);
     }
@@ -388,7 +390,6 @@ TransactionManager.prototype._request = function(tx) {
     // ND: We should audit the code for other potential multiple resubmit
     // streams. Connection/reconnection could be one? That's why it's imperative
     // that ALL transactionIDs sent over network are tracked.
-    submitRequest.removeAllListeners();
 
     // Finalized (e.g. aborted) transactions must stop all activity
     if (tx.finalized) return;
@@ -403,6 +404,11 @@ TransactionManager.prototype._request = function(tx) {
 
   submitRequest.once('error', submitted);
   submitRequest.once('success', submitted);
+
+  if (tx._server) {
+    submitRequest.server = tx._server;
+  }
+
   submitRequest.request();
 
   tx.set_state('client_submitted');
@@ -442,14 +448,14 @@ TransactionManager.prototype.submit = function(tx) {
   // If sequence number is not yet known, defer until it is.
   if (typeof this._nextSequence === 'undefined') {
     function sequenceLoaded() {
-      // Finalized (e.g. aborted) transactions must stop all activity
-      if (tx.finalized) return;
-
       self.submit(tx);
     };
     this.once('sequence_loaded', sequenceLoaded);
     return;
   }
+
+  // Finalized (e.g. aborted) transactions must stop all activity
+  if (tx.finalized) return;
 
   if (typeof tx.tx_json.Sequence !== 'number') {
     tx.tx_json.Sequence = this._nextSequence++;

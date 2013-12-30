@@ -14,7 +14,6 @@
 var EventEmitter       = require('events').EventEmitter;
 var util               = require('util');
 var extend             = require('extend');
-
 var Amount             = require('./amount').Amount;
 var UInt160            = require('./uint160').UInt160;
 var TransactionManager = require('./transactionmanager').TransactionManager;
@@ -74,6 +73,8 @@ function Account(remote, account) {
   this._remote.on('prepare_subscribe', attachAccount);
 
   function handleTransaction(transaction) {
+    if (!transaction.mmeta) return;
+
     var changed = false;
 
     transaction.mmeta.each(function(an) {
@@ -106,7 +107,7 @@ util.inherits(Account, EventEmitter);
 
 Account.subscribeEvents = [ 'transaction', 'entry' ];
 
-Account.prototype.to_json = function () {
+Account.prototype.toJson = function() {
   return this._account.to_json();
 };
 
@@ -116,7 +117,7 @@ Account.prototype.to_json = function () {
  * Note: This does not tell you whether the account exists in the ledger.
  */
 
-Account.prototype.is_valid = function () {
+Account.prototype.isValid = function() {
   return this._account.is_valid();
 };
 
@@ -139,7 +140,7 @@ Account.prototype.getInfo = function(callback) {
  * @param {Function} callback
  */
 
-Account.prototype.entry = function (callback) {
+Account.prototype.entry = function(callback) {
   var self = this;
   var callback = typeof callback === 'function' ? callback : function(){};
 
@@ -180,10 +181,10 @@ Account.prototype.getNextSequence = function(callback) {
  * To keep up-to-date with changes to the AccountRoot entry, subscribe to the
  * "lines" event. (Not yet implemented.)
  *
- * @param {function (err, lines)} callback Called with the result
+ * @param {function(err, lines)} callback Called with the result
  */
 
-Account.prototype.lines = function (callback) {
+Account.prototype.lines = function(callback) {
   var self = this;
   var callback = typeof callback === 'function' ? callback : function(){};
 
@@ -207,25 +208,27 @@ Account.prototype.lines = function (callback) {
  *
  * @param {string} currency Currency
  * @param {string} address Ripple address
- * @param {function (err, line)} callback Called with the result
+ * @param {function(err, line)} callback Called with the result
  * @returns {Account}
  */
 
-Account.prototype.line = function (currency,address,callback) {
-  var self = this,
-      found,
-      callback = typeof callback === 'function' ? callback : function(){};
+Account.prototype.line = function(currency,address,callback) {
+  var self = this;
+  var found;
+  var callback = typeof callback === 'function' ? callback : function(){};
 
-  self.lines(function(err,data){
-    data.lines.forEach(function(line){
-      if (address === line.account && currency === line.currency) {
-        callback(null,line);
-        found = true;
-      }
-    });
+  self.lines(function(err, data) {
+    if (err) {
+      callback(err);
+    } else {
+      var line = data.lines.filter(function(line) {
+        if (line.account === address && line.currency === currency) {
+          return line;
+        }
+      })[0];
 
-    if (!found)
-      callback();
+      callback(null, line);
+    }
   });
 
   return this;
@@ -241,19 +244,20 @@ Account.prototype.line = function (currency,address,callback) {
  */
 
 Account.prototype.notify =
-Account.prototype.notifyTx = function (transaction) {
+Account.prototype.notifyTx = function(transaction) {
   // Only trigger the event if the account object is actually
   // subscribed - this prevents some weird phantom events from
   // occurring.
   if (this._subs) {
     this.emit('transaction', transaction);
+
     var account = transaction.transaction.Account;
+
     if (!account) return;
-    if (account === this._account_id) {
-      this.emit('transaction-outbound', transaction);
-    } else {
-      this.emit('transaction-inbound', transaction);
-    }
+
+    var isThisAccount = account === this._account_id;
+
+    this.emit(isThisAccount ? 'transaction-outbound' : 'transaction-inbound', transaction);
   }
 };
 

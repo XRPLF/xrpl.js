@@ -450,24 +450,35 @@ Remote.prototype._handleMessage = function(message, server) {
 
       if (this._received_tx.hasOwnProperty(hash)) break;
 
-      this._received_tx[hash] = true;
+      if (message.transaction.validated) {
+        this._received_tx[hash] = true;
+      }
 
       this._trace('remote: tx: %s', message);
 
-      // Process metadata
-      message.mmeta = new Meta(message.meta);
+      if (message.meta) {
+        // Process metadata
+        message.mmeta = new Meta(message.meta);
 
-      // Pass the event on to any related Account objects
-      message.mmeta.getAffectedAccounts().forEach(function(account) {
-        account = self._accounts[account];
-        if (account) account.notify(message);
-      });
+        // Pass the event on to any related Account objects
+        message.mmeta.getAffectedAccounts().forEach(function(account) {
+          account = self._accounts[account];
+          if (account) account.notify(message);
+        });
 
-      // Pass the event on to any related OrderBooks
-      message.mmeta.getAffectedBooks().forEach(function(book) {
-        book = self._books[book];
-        if (book) book.notify(message);
-      });
+        // Pass the event on to any related OrderBooks
+        message.mmeta.getAffectedBooks().forEach(function(book) {
+          book = self._books[book];
+          if (book) book.notify(message);
+        });
+      } else {
+        [ 'Account', 'Destination' ].forEach(function(prop) {
+          var account = message.transaction[prop];
+          if (account && (account = self.account(account))) {
+            account.notify(message);
+          }
+        });
+      }
 
       this.emit('transaction', message);
       this.emit('transaction_all', message);
