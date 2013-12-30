@@ -1,11 +1,12 @@
 exports.Remote           = require('./remote').Remote;
 exports.Request          = require('./request').Request;
 exports.Amount           = require('./amount').Amount;
+exports.Account          = require('./account').Account;
+exports.Transaction      = require('./transaction').Transaction;
 exports.Currency         = require('./currency').Currency;
 exports.Base             = require('./base').Base;
 exports.UInt160          = require('./amount').UInt160;
 exports.Seed             = require('./amount').Seed;
-exports.Transaction      = require('./transaction').Transaction;
 exports.Meta             = require('./meta').Meta;
 exports.SerializedObject = require('./serializedobject').SerializedObject;
 exports.RippleError      = require('./rippleerror').RippleError;
@@ -26,7 +27,9 @@ exports.sjcl   = require('./utils').sjcl;
 exports.config = require('./config');
 
 // camelCase to under_scored API conversion
-function attachUnderscored(o) {
+function attachUnderscored(c) {
+  var o = exports[c];
+
   Object.keys(o.prototype).forEach(function(key) {
     var UPPERCASE = /([A-Z]{1})[a-z]+/g;
 
@@ -40,9 +43,11 @@ function attachUnderscored(o) {
   });
 };
 
-[ exports.Remote,
-  exports.Request,
-  exports.Transaction
+[ 'Remote',
+  'Request',
+  'Transaction',
+  'Account',
+  'Server'
 ].forEach(attachUnderscored);
 
 // vim:sw=2:sts=2:ts=8:et
