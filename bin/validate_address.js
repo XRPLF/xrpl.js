@@ -17,10 +17,10 @@ function readInput(callback) {
     result += data;
   });
   process.stdin.on('end', function() {
-    callback(result.trim());
+    callback(result);
   });
 };
 
 function validateAddress(address) {
-  process.stdout.write((UInt160.is_valid(address) ? '0' : '1') + '\r\n');
+  process.stdout.write((UInt160.is_valid(address.trim()) ? '0' : '1') + '\r\n');
 };
