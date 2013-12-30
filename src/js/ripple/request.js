@@ -239,7 +239,7 @@ Request.prototype.rippleState = function(account, issuer, currency) {
   return this;
 };
 
-Request.prototype.accounts = function(accounts, realtime) {
+Request.prototype.accounts = function(accounts, proposed) {
   if (!Array.isArray(accounts)) {
     accounts = [ accounts ];
   }
@@ -249,8 +249,8 @@ Request.prototype.accounts = function(accounts, realtime) {
     return UInt160.json_rewrite(account);
   });
 
-  if (realtime) {
-    this.message.rtAccounts = processedAccounts;
+  if (proposed) {
+    this.message.accounts_proposed = processedAccounts;
   } else {
     this.message.accounts = processedAccounts;
   }
@@ -258,11 +258,11 @@ Request.prototype.accounts = function(accounts, realtime) {
   return this;
 };
 
-Request.prototype.addAccount = function(account, realtime) {
+Request.prototype.addAccount = function(account, proposed) {
   var processedAccount = UInt160.json_rewrite(account);
 
-  if (realtime) {
-    this.message.rtAccounts = (this.message.rtAccounts || []).concat(processedAccount);
+  if (proposed) {
+    this.message.accounts_proposed = (this.message.accounts_proposed || []).concat(processedAccount);
   } else {
     this.message.accounts = (this.message.accounts || []).concat(processedAccount);
   }
@@ -270,8 +270,13 @@ Request.prototype.addAccount = function(account, realtime) {
   return this;
 };
 
-Request.prototype.rtAccounts = function(accounts) {
+Request.prototype.rtAccounts =
+Request.prototype.accountsProposed = function(accounts) {
   return this.accounts(accounts, true);
+};
+
+Request.prototype.addAccountProposed = function(account) {
+  return this.addAccount(account, true);
 };
 
 Request.prototype.books = function(books, snapshot) {
@@ -301,13 +306,13 @@ Request.prototype.addBook = function (book, snapshot) {
     var obj = json[side] = {
       currency: Currency.json_rewrite(book[side].currency)
     };
+
     if (obj.currency !== 'XRP') {
       obj.issuer = UInt160.json_rewrite(book[side].issuer);
     }
   }
 
-  processSide('taker_gets');
-  processSide('taker_pays');
+  [ 'taker_gets', 'taker_pays' ].forEach(processSide);
 
   if (snapshot) {
     json.snapshot = true;
