@@ -304,7 +304,7 @@ Remote.prototype.serverFatal = function() {
 // Set the emitted state: 'online' or 'offline'
 Remote.prototype._setState = function(state) {
   if (this.state !== state) {
-    this._trace('remote: set_state: %s', state);
+    this._trace('remote: set_state:', state);
 
     this.state = state;
 
@@ -454,7 +454,7 @@ Remote.prototype._handleMessage = function(message, server) {
         this._received_tx[hash] = true;
       }
 
-      this._trace('remote: tx: %s', message);
+      this._trace('remote: tx:', message);
 
       if (message.meta) {
         // Process metadata
@@ -518,7 +518,7 @@ Remote.prototype._handleMessage = function(message, server) {
 
     // All other messages
     default:
-      this._trace('remote: ' + message.type + ': %s', message);
+      this._trace('remote: ' + message.type + ': ', message);
       this.emit('net_' + message.type, message);
       break;
   }
