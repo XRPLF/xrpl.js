@@ -1,5 +1,6 @@
-var util         = require('util');
+var Amount       = require('./amount').Amount;
 var utils        = require('./utils');
+var util         = require('util');
 var EventEmitter = require('events').EventEmitter;
 
 /**
@@ -33,6 +34,14 @@ function Server(remote, opts) {
   this._id            = 0;
   this._retry         = 0;
   this._requests      = { };
+
+  this._load_base    = 256;
+  this._load_factor  = 256;
+  this._fee_ref      = 10;
+  this._fee_base     = 10;
+  this._reserve_base = void(0);
+  this._reserve_inc  = void(0);
+  this._fee_cushion  = this._remote.fee_cushion;
 
   this._opts.url = (opts.secure ? 'wss://' : 'ws://') + opts.host + ':' + opts.port;
 
@@ -308,7 +317,7 @@ Server.prototype._handleMessage = function(message) {
   if (!this.isValidMessage(message)) return;
 
   switch (message.type) {
-    case 'server_status':
+    case 'serverStatus':
       // This message is only received when online.
       // As we are connected, it is the definitive final state.
       this._setState(~(Server._onlineStates.indexOf(message.server_status)) ? 'online' : 'offline');
@@ -429,6 +438,55 @@ Server.prototype.request = function(request) {
 
 Server.prototype._isConnected = function(request) {
   return this._connected || (request.message.command === 'subscribe' && this._ws.readyState === 1);
+};
+
+/**
+ * Calculate a transaction fee for a number of tx fee units.
+ *
+ * This takes into account the last known network and local load fees.
+ *
+ * @return {Amount} Final fee in XRP for specified number of fee units.
+ */
+Server.prototype.feeTx = function(units) {
+  var fee_unit = this.feeTxUnit();
+  return Amount.from_json(String(Math.ceil(units * fee_unit)));
+};
+
+/**
+ * Get the current recommended transaction fee unit.
+ *
+ * Multiply this value with the number of fee units in order to calculate the
+ * recommended fee for the transaction you are trying to submit.
+ *
+ * @return {Number} Recommended amount for one fee unit as float.
+ */
+Server.prototype.feeTxUnit = function() {
+  var fee_unit = this._fee_base / this._fee_ref;
+
+  // Apply load fees
+  fee_unit *= this._load_factor / this._load_base;
+
+  // Apply fee cushion (a safety margin in case fees rise since we were last updated
+  fee_unit *= this._fee_cushion;
+
+  return fee_unit;
+};
+
+/**
+ * Get the current recommended reserve base.
+ *
+ * Returns the base reserve with load fees and safety margin applied.
+ */
+Server.prototype.reserve = function(owner_count) {
+  var reserve_base = Amount.from_json(String(this._reserve_base));
+  var reserve_inc  = Amount.from_json(String(this._reserve_inc));
+  var owner_count  = owner_count || 0;
+
+  if (owner_count < 0) {
+    throw new Error('Owner count must not be negative.');
+  }
+
+  return reserve_base.add(reserve_inc.product_human(owner_count));
 };
 
 exports.Server = Server;
