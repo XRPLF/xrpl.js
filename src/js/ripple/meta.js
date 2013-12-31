@@ -4,44 +4,50 @@ var UInt160 = require('./uint160').UInt160;
 var Amount  = require('./amount').Amount;
 
 /**
- * Meta data processing facility.
+ * Meta data processing facility
  */
+
 function Meta(raw_data) {
   var self = this;
 
   this.nodes = [ ];
 
-  this.node_types = [
-      'CreatedNode'
-    , 'ModifiedNode'
-    , 'DeletedNode'
-  ];
-
-  for (var i=0, l=raw_data.AffectedNodes.length; i<l; i++) {
-    var an = raw_data.AffectedNodes[i];
+  raw_data.AffectedNodes.forEach(function(an) {
     var result = { };
 
-    self.node_types.forEach(function (x) {
-      if (an.hasOwnProperty(x)) {
-        result.diffType = x;
-      }
-    });
+    if (result.diffType = self.diffType(an)) {
+      an = an[result.diffType];
 
-    if (!result.diffType) {
-      return null;
+      result.entryType   = an.LedgerEntryType;
+      result.ledgerIndex = an.LedgerIndex;
+      result.fields      = extend({}, an.PreviousFields, an.NewFields, an.FinalFields);
+      result.fieldsPrev  = an.PreviousFields || {};
+      result.fieldsNew   = an.NewFields || {};
+      result.fieldsFinal = an.FinalFields || {};
+
+      self.nodes.push(result);
     }
+  });
+};
 
-    an = an[result.diffType];
+Meta.node_types = [
+  'CreatedNode',
+  'ModifiedNode',
+  'DeletedNode'
+];
 
-    result.entryType = an.LedgerEntryType;
-    result.ledgerIndex = an.LedgerIndex;
-    result.fields = extend({}, an.PreviousFields, an.NewFields, an.FinalFields);
-    result.fieldsPrev = an.PreviousFields || {};
-    result.fieldsNew = an.NewFields || {};
-    result.fieldsFinal = an.FinalFields || {};
+Meta.prototype.diffType = function(an) {
+  var result = false;
 
-    this.nodes.push(result);
+  for (var i=0; i<Meta.node_types.length; i++) {
+    var x = Meta.node_types[i];
+    if (an.hasOwnProperty(x)) {
+      result = x;
+      break;
+    }
   }
+
+  return result;
 };
 
 /**
@@ -85,11 +91,12 @@ Meta.prototype.each = function (fn) {
   }
 };
 
-([ 'forEach'
-  , 'map'
-  , 'filter'
-  , 'every'
-  , 'reduce'
+([
+ 'forEach',
+ 'map',
+ 'filter',
+ 'every',
+ 'reduce'
 ]).forEach(function(fn) {
   Meta.prototype[fn] = function() {
     return Array.prototype[fn].apply(this.nodes, arguments);
@@ -97,10 +104,10 @@ Meta.prototype.each = function (fn) {
 });
 
 var amountFieldsAffectingIssuer = [
-    "LowLimit"
-  , "HighLimit"
-  , "TakerPays"
-  , "TakerGets"
+  'LowLimit',
+  'HighLimit',
+  'TakerPays',
+  'TakerGets'
 ];
 
 Meta.prototype.getAffectedAccounts = function () {
@@ -109,7 +116,7 @@ Meta.prototype.getAffectedAccounts = function () {
   // This code should match the behavior of the C++ method:
   // TransactionMetaSet::getAffectedAccounts
   this.nodes.forEach(function (an) {
-    var fields = (an.diffType === "CreatedNode") ? an.fieldsNew : an.fieldsFinal;
+    var fields = (an.diffType === 'CreatedNode') ? an.fieldsNew : an.fieldsFinal;
     for (var i in fields) {
       var field = fields[i];
       if (typeof field === 'string' && UInt160.is_valid(field)) {
@@ -142,7 +149,7 @@ Meta.prototype.getAffectedBooks = function () {
     var paysKey = pays.currency().to_json();
     if (paysKey !== 'XRP') paysKey += '/' + pays.issuer().to_json();
 
-    var key = getsKey + ":" + paysKey;
+    var key = [ getsKey, paysKey ].join(':');
 
     books.push(key);
   });
