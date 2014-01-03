@@ -193,6 +193,11 @@ Transaction.prototype.getFee = function() {
  * information and other fields.
  */
 Transaction.prototype.complete = function() {
+  // Try to auto-fill the secret
+  if (!this._secret) {
+    this._secret = this._account_secret(this.tx_json.Account);
+  }
+
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
     if (this.remote.local_fee || !this.remote.trusted) {
       this.tx_json.Fee = this.remote.fee_tx(this.fee_units()).to_json();
@@ -421,7 +426,6 @@ Transaction.prototype.accountSet = function(src) {
     throw new Error('Source address invalid');
   }
 
-  this._secret                  = this._account_secret(src);
   this.tx_json.TransactionType  = 'AccountSet';
   this.tx_json.Account          = UInt160.json_rewrite(src);
   return this;
@@ -436,7 +440,6 @@ Transaction.prototype.claim = function(src, generator, public_key, signature) {
     src        = options.source || options.from;
   }
 
-  this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'Claim';
   this.tx_json.Generator       = generator;
   this.tx_json.PublicKey       = public_key;
@@ -455,7 +458,6 @@ Transaction.prototype.offerCancel = function(src, sequence) {
     throw new Error('Source address invalid');
   }
 
-  this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'OfferCancel';
   this.tx_json.Account         = UInt160.json_rewrite(src);
   this.tx_json.OfferSequence   = Number(sequence);
@@ -480,7 +482,6 @@ Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expira
     throw new Error('Source address invalid');
   }
 
-  this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'OfferCreate';
   this.tx_json.Account         = UInt160.json_rewrite(src);
   this.tx_json.TakerPays       = Amount.json_rewrite(taker_pays);
@@ -516,7 +517,6 @@ Transaction.prototype.passwordFund = function(src, dst) {
     throw new Error('Destination address invalid');
   }
 
-  this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'PasswordFund';
   this.tx_json.Destination     = UInt160.json_rewrite(dst);
   return this;
@@ -536,7 +536,6 @@ Transaction.prototype.passwordSet = function(src, authorized_key, generator, pub
     throw new Error('Source address invalid');
   }
 
-  this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'PasswordSet';
   this.tx_json.RegularKey      = authorized_key;
   this.tx_json.Generator       = generator;
@@ -583,7 +582,6 @@ Transaction.prototype.payment = function(src, dst, amount) {
     amount = Amount.from_human(amount);
   }
 
-  this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'Payment';
   this.tx_json.Account         = UInt160.json_rewrite(src);
   this.tx_json.Amount          = Amount.json_rewrite(amount);
@@ -605,7 +603,6 @@ Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_o
     throw new Error('Source address invalid');
   }
 
-  this._secret                 = this._account_secret(src);
   this.tx_json.TransactionType = 'TrustSet';
   this.tx_json.Account         = UInt160.json_rewrite(src);
 
@@ -641,7 +638,6 @@ Transaction.prototype.walletAdd = function(src, amount, authorized_key, public_k
     throw new Error('Source address invalid');
   }
 
-  this._secret                  = this._account_secret(src);
   this.tx_json.TransactionType  = 'WalletAdd';
   this.tx_json.Amount           = Amount.json_rewrite(amount);
   this.tx_json.RegularKey       = authorized_key;
