@@ -61,7 +61,7 @@ function TransactionManager(account) {
 
       if (shouldAdjust) {
         var oldFee = pending.tx_json.Fee;
-        var newFee = server.feeTx(pending.fee_units()).to_json();
+        var newFee = server.computeFee(pending);
 
         pending.tx_json.Fee = newFee;
         pending.emit('fee_adjusted', oldFee, newFee);
