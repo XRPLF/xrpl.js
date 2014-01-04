@@ -28,10 +28,9 @@ var Meta         = require('./meta').Meta;
 var OrderBook    = require('./orderbook').OrderBook;
 var PathFind     = require('./pathfind').PathFind;
 var RippleError  = require('./rippleerror').RippleError;
-
 var utils        = require('./utils');
-var config       = require('./config');
 var sjcl         = require('./utils').sjcl;
+var config       = require('./config');
 
 /**
     Interface to manage the connection to a Ripple server.
@@ -99,13 +98,6 @@ function Remote(opts, trace) {
   this.state                 = 'offline'; // 'online', 'offline'
   this.retry_timer           = void(0);
   this.retry                 = void(0);
-
-  this._load_base            = 256;
-  this._load_factor          = 256;
-  this._fee_ref              = 10;
-  this._fee_base             = 10;
-  this._reserve_base         = void(0);
-  this._reserve_inc          = void(0);
   this._connection_count     = 0;
   this._connected            = false;
   this._connection_offset    = 1000 * (typeof opts.connection_offset === 'number' ? opts.connection_offset : 5)
@@ -172,6 +164,7 @@ function Remote(opts, trace) {
 
   // This is used to remove Node EventEmitter warnings
   var maxListeners = opts.maxListeners || opts.max_listeners || 0;
+
   this._servers.concat(this).forEach(function(emitter) {
     emitter.setMaxListeners(maxListeners);
   });
@@ -440,6 +433,10 @@ Remote.prototype._handleMessage = function(message, server) {
       }
       break;
 
+    case 'serverStatus':
+      self.emit('server_status', message);
+      break;
+
     case 'transaction':
       // To get these events, just subscribe to them. A subscribes and
       // unsubscribes will be added as needed.
@@ -493,29 +490,6 @@ Remote.prototype._handleMessage = function(message, server) {
       this.emit('path_find_all', message);
       break;
 
-    case 'serverStatus':
-      self.emit('server_status', message);
-
-      var loadChanged = message.hasOwnProperty('load_base')
-      && message.hasOwnProperty('load_factor')
-      && (message.load_base !== self._load_base || message.load_factor !== self._load_factor)
-      ;
-
-      if (loadChanged) {
-        self._load_base   = message.load_base;
-        self._load_factor = message.load_factor;
-
-        var obj = {
-          load_base:    self._load_base,
-          load_factor:  self._load_factor,
-          fee_units:    self.feeTxUnit()
-        }
-
-        self.emit('load', obj);
-        self.emit('load_changed', obj);
-      }
-      break;
-
     // All other messages
     default:
       this._trace('remote: ' + message.type + ': ', message);
@@ -540,6 +514,11 @@ Remote.isValidLedgerData = function(ledger) {
       && (typeof ledger.reserve_base === 'number')
       && (typeof ledger.reserve_inc  === 'number')
       && (typeof ledger.txn_count    === 'number')
+};
+
+Remote.isLoadStatus = function(message) {
+  return (typeof message.load_base === 'number')
+      && (typeof message.load_factor === 'number');
 };
 
 Remote.prototype.ledgerHash = function() {
@@ -1010,10 +989,6 @@ Remote.prototype.requestSubmit = function(callback) {
   return new Request(this, 'submit').callback(callback);
 };
 
-//
-// Higher level functions.
-//
-
 /**
  * Create a subscribe request with current subscriptions.
  *
@@ -1034,15 +1009,17 @@ Remote.prototype._serverPrepareSubscribe = function(callback) {
 
   var request = this.requestSubscribe(feeds);
 
-  request.once('success', function(message) {
+  function serverSubscribed(message) {
     self._stand_alone = !!message.stand_alone;
     self._testnet     = !!message.testnet;
 
     if (typeof message.random === 'string') {
       var rand = message.random.match(/[0-9A-F]{8}/ig);
+
       while (rand && rand.length) {
         sjcl.random.addEntropy(parseInt(rand.pop(), 16));
       }
+
       self.emit('random', utils.hexToArray(message.random));
     }
 
@@ -1053,22 +1030,14 @@ Remote.prototype._serverPrepareSubscribe = function(callback) {
       self.emit('ledger_closed', message);
     }
 
-    // FIXME Use this to estimate fee.
-    // XXX When we have multiple server support, most of this should be tracked
-    //     by the Server objects and then aggregated/interpreted by Remote.
-    self._load_base     = message.load_base || 256;
-    self._load_factor   = message.load_factor || 256;
-    self._fee_ref       = message.fee_ref;
-    self._fee_base      = message.fee_base;
-    self._reserve_base  = message.reserve_base;
-    self._reserve_inc   = message.reserve_inc;
-
     self.emit('subscribed');
-  });
+  };
+
+  request.once('success', serverSubscribed);
 
   self.emit('prepare_subscribe', request);
 
-  request.callback(callback);
+  request.callback(callback, 'subscribed');
 
   // XXX Could give error events, maybe even time out.
 
@@ -1123,7 +1092,7 @@ Remote.prototype.requestAccountBalance = function(account, ledger, callback) {
     return Amount.from_json(message.node.Balance);
   };
 
-  var args    = Array.prototype.concat.apply(['account_balance', responseFilter], arguments);
+  var args = Array.prototype.concat.apply(['account_balance', responseFilter], arguments);
   var request = Remote.accountRootRequest.apply(this, args);
 
   return request;
@@ -1135,7 +1104,7 @@ Remote.prototype.requestAccountFlags = function(account, ledger, callback) {
     return message.node.Flags;
   };
 
-  var args    = Array.prototype.concat.apply(['account_flags', responseFilter], arguments);
+  var args = Array.prototype.concat.apply(['account_flags', responseFilter], arguments);
   var request = Remote.accountRootRequest.apply(this, args);
 
   return request;
@@ -1147,7 +1116,7 @@ Remote.prototype.requestOwnerCount = function(account, ledger, callback) {
     return message.node.OwnerCount;
   };
 
-  var args    = Array.prototype.concat.apply(['owner_count', responseFilter], arguments);
+  var args = Array.prototype.concat.apply(['owner_count', responseFilter], arguments);
   var request = Remote.accountRootRequest.apply(this, args);
 
   return request;
@@ -1330,7 +1299,8 @@ Remote.prototype.requestRippleBalance = function(account, issuer, currency, ledg
 
   request.rippleState(account, issuer, currency);
   request.ledgerChoose(ledger);
-  request.once('success', function(message) {
+
+  function rippleState(message) {
     var node            = message.node;
     var lowLimit        = Amount.from_json(node.LowLimit);
     var highLimit       = Amount.from_json(node.HighLimit);
@@ -1352,8 +1322,9 @@ Remote.prototype.requestRippleBalance = function(account, issuer, currency, ledg
       account_quality_out : ( accountHigh ? node.HighQualityOut : node.LowQualityOut),
       peer_quality_out    : (!accountHigh ? node.HighQualityOut : node.LowQualityOut),
     });
-  });
+  };
 
+  request.once('success', rippleState);
   request.callback(callback, 'ripple_state');
 
   return request;
@@ -1499,9 +1470,9 @@ Remote.prototype.transaction = function(source, destination, amount, callback) {
  *
  * @return {Amount} Final fee in XRP for specified number of fee units.
  */
+
 Remote.prototype.feeTx = function(units) {
-  var fee_unit = this.feeTxUnit();
-  return Amount.from_json(String(Math.ceil(units * fee_unit)));
+  return this._getServer().feeTx(units);
 };
 
 /**
@@ -1512,16 +1483,9 @@ Remote.prototype.feeTx = function(units) {
  *
  * @return {Number} Recommended amount for one fee unit as float.
  */
+
 Remote.prototype.feeTxUnit = function() {
-  var fee_unit = this._fee_base / this._fee_ref;
-
-  // Apply load fees
-  fee_unit *= this._load_factor / this._load_base;
-
-  // Apply fee cushion (a safety margin in case fees rise since we were last updated
-  fee_unit *= this.fee_cushion;
-
-  return fee_unit;
+  return this._getServer().feeTxUnit();
 };
 
 /**
@@ -1529,16 +1493,9 @@ Remote.prototype.feeTxUnit = function() {
  *
  * Returns the base reserve with load fees and safety margin applied.
  */
+
 Remote.prototype.reserve = function(owner_count) {
-  var reserve_base = Amount.from_json(String(this._reserve_base));
-  var reserve_inc  = Amount.from_json(String(this._reserve_inc));
-  var owner_count  = owner_count || 0;
-
-  if (owner_count < 0) {
-    throw new Error('Owner count must not be negative.');
-  }
-
-  return reserve_base.add(reserve_inc.product_human(owner_count));
+  return this._getServer().reserve(owner_count);
 };
 
 Remote.prototype.ping = function(host, callback) {

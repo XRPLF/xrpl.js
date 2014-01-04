@@ -1,7 +1,8 @@
-var Amount       = require('./amount').Amount;
-var utils        = require('./utils');
 var util         = require('util');
 var EventEmitter = require('events').EventEmitter;
+var Transaction = require('./transaction').Transaction;
+var Amount       = require('./amount').Amount;
+var utils        = require('./utils');
 
 /**
  *  @constructor Server
@@ -295,7 +296,7 @@ Server.prototype._handleClose = function() {
   this._setState('offline');
 
   // Prevent additional events from this socket
-  ws.onopen = ws.onerror = ws.onclose = ws.onmessage = function() {};
+  ws.onopen = ws.onerror = ws.onclose = ws.onmessage = function noOp() {};
 
   if (self._shouldConnect) {
     this._retryConnect();
@@ -314,22 +315,34 @@ Server.prototype._handleMessage = function(message) {
 
   try { message = JSON.parse(message); } catch(e) { }
 
-  if (!this.isValidMessage(message)) return;
+  if (!Server.isValidMessage(message)) return;
 
   switch (message.type) {
-    case 'serverStatus':
-      // This message is only received when online.
-      // As we are connected, it is the definitive final state.
-      this._setState(~(Server._onlineStates.indexOf(message.server_status)) ? 'online' : 'offline');
-      break;
-
     case 'ledgerClosed':
       this._lastLedgerClose = Date.now();
       this.emit('ledger_closed', message);
       break;
 
-    case 'path_find':
-      this._remote._trace('server: path_find:', self._opts.url, message);
+    case 'serverStatus':
+      // This message is only received when online.
+      // As we are connected, it is the definitive final state.
+
+      this._setState(~(Server.onlineStates.indexOf(message.server_status)) ? 'online' : 'offline');
+
+      if (Server.isLoadStatus(message)) {
+        self.emit('load', message, self);
+        self._remote.emit('load', message, self);
+
+        var loadChanged = ((message.load_base !== self._load_base) ||
+                           (message.load_factor !== self._load_factor));
+
+        if (loadChanged) {
+          self._load_base   = message.load_base;
+          self._load_factor = message.load_factor;
+          self.emit('load_changed', message, self);
+          self._remote.emit('load_changed', message, self);
+        }
+      }
       break;
 
     case 'response':
@@ -357,6 +370,11 @@ Server.prototype._handleMessage = function(message) {
         });
       }
       break;
+
+    case 'path_find':
+      this._remote._trace('server: path_find:', self._opts.url, message);
+      break;
+
   }
 };
 
@@ -366,9 +384,21 @@ Server.prototype._handleMessage = function(message) {
  * @api private
  */
 
-Server.prototype.isValidMessage = function(message) {
+Server.isValidMessage = function(message) {
   return (typeof message === 'object')
       && (typeof message.type === 'string');
+};
+
+/**
+ * Check that received serverStatus message contains
+ * load status information
+ *
+ * @api private
+ */
+
+Server.isLoadStatus = function(message) {
+  return (typeof message.load_base === 'number')
+      && (typeof message.load_factor === 'number');
 };
 
 /**
@@ -381,6 +411,14 @@ Server.prototype.isValidMessage = function(message) {
 Server.prototype._handleResponseSubscribe = function(message) {
   if (~(Server.onlineStates.indexOf(message.server_status))) {
     this._setState('online');
+  }
+  if (Server.isLoadStatus(message)) {
+    this._load_base     = message.load_base || 256;
+    this._load_factor   = message.load_factor || 256;
+    this._fee_ref       = message.fee_ref;
+    this._fee_base      = message.fee_base;
+    this._reserve_base  = message.reserve_base;
+    this._reserve_inc   = message.reserve_inc;
   }
 };
 
@@ -437,7 +475,33 @@ Server.prototype.request = function(request) {
 };
 
 Server.prototype._isConnected = function(request) {
-  return this._connected || (request.message.command === 'subscribe' && this._ws.readyState === 1);
+  var isSubscribeRequest = request
+  && request.message.command === 'subscribe'
+  && this._ws.readyState === 1;
+
+  return this._connected || (this._ws && isSubscribeRequest);
+};
+
+/**
+ * Calculate transaction fee
+ *
+ * @param {Transaction|Number} Fee units for a provided transaction
+ * @return {Number} Final fee in XRP for specified number of fee units
+ * @api private
+ */
+
+Server.prototype.computeFee = function(transaction) {
+  var units;
+
+  if (transaction instanceof Transaction) {
+    units = transaction.feeUnits();
+  } else if (typeof transaction === 'number') {
+    units = transaction;
+  } else {
+    throw new Error('Invalid argument');
+  }
+
+  return this.feeTx(units).to_json();
 };
 
 /**
@@ -445,8 +509,10 @@ Server.prototype._isConnected = function(request) {
  *
  * This takes into account the last known network and local load fees.
  *
+ * @param {Number} Fee units for a provided transaction
  * @return {Amount} Final fee in XRP for specified number of fee units.
  */
+
 Server.prototype.feeTx = function(units) {
   var fee_unit = this.feeTxUnit();
   return Amount.from_json(String(Math.ceil(units * fee_unit)));
@@ -460,13 +526,14 @@ Server.prototype.feeTx = function(units) {
  *
  * @return {Number} Recommended amount for one fee unit as float.
  */
+
 Server.prototype.feeTxUnit = function() {
   var fee_unit = this._fee_base / this._fee_ref;
 
   // Apply load fees
   fee_unit *= this._load_factor / this._load_base;
 
-  // Apply fee cushion (a safety margin in case fees rise since we were last updated
+  // Apply fee cushion (a safety margin in case fees rise since we were last updated)
   fee_unit *= this._fee_cushion;
 
   return fee_unit;
@@ -477,6 +544,7 @@ Server.prototype.feeTxUnit = function() {
  *
  * Returns the base reserve with load fees and safety margin applied.
  */
+
 Server.prototype.reserve = function(owner_count) {
   var reserve_base = Amount.from_json(String(this._reserve_base));
   var reserve_inc  = Amount.from_json(String(this._reserve_inc));

@@ -53,14 +53,19 @@ function TransactionManager(account) {
 
   this._account.on('transaction-outbound', transactionReceived);
 
-  function adjustFees() {
+  function adjustFees(loadData, server) {
     // ND: note, that `Fee` is a component of a transactionID
     self._pending.forEach(function(pending) {
-      if (self._remote.local_fee && pending.tx_json.Fee) {
+      var shouldAdjust = pending._server === server
+      && self._remote.local_fee && pending.tx_json.Fee;
+
+      if (shouldAdjust) {
         var oldFee = pending.tx_json.Fee;
-        var newFee = self._remote.feeTx(pending.fee_units()).to_json();
+        var newFee = server.feeTx(pending.fee_units()).to_json();
+
         pending.tx_json.Fee = newFee;
         pending.emit('fee_adjusted', oldFee, newFee);
+
         self._remote._trace('transactionmanager: adjusting_fees:', pending.tx_json, oldFee, newFee);
       }
     });
@@ -256,6 +261,9 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
   this._waitLedgers(ledgers, resubmitTransactions);
 };
 
+TransactionManager.prototype._selectServer = function() {
+};
+
 TransactionManager.prototype._waitLedgers = function(ledgers, callback) {
   if (ledgers < 1) {
     return callback();
@@ -297,9 +305,7 @@ TransactionManager.prototype._request = function(tx) {
 
   // ND: We could consider sharing the work with tx_blob when doing
   // local_signing
-
   tx.addSubmittedTxnID(tx.hash());
-  // tx._hash = tx.hash();
 
   remote._trace('transactionmanager: submit:', tx.tx_json);
 
@@ -321,7 +327,7 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   function transactionRetry(message) {
-    if (self._is_no_op(tx)) {
+    if (TransactionManager._isNoOp(tx)) {
       self._resubmit(1, tx);
     } else {
       self._fillSequence(tx, function() {
@@ -338,7 +344,7 @@ TransactionManager.prototype._request = function(tx) {
     // Finalized (e.g. aborted) transactions must stop all activity
     if (tx.finalized) return;
 
-    if (self._is_too_busy(error)) {
+    if (TransactionManager._isTooBusy(error)) {
       self._resubmit(1, tx);
     } else {
       self._nextSequence--;
@@ -417,23 +423,27 @@ TransactionManager.prototype._request = function(tx) {
   return submitRequest;
 };
 
-TransactionManager.prototype._is_no_op = function(transaction) {
-  return transaction.tx_json.TransactionType === 'AccountSet'
-      && transaction.tx_json.Flags === 0;
+TransactionManager._isNoOp = function(transaction) {
+  return (typeof transaction === 'object')
+      && (typeof transaction.tx_json === 'object')
+      && (transaction.tx_json.TransactionType === 'AccountSet')
+      && (transaction.tx_json.Flags === 0);
 };
 
-TransactionManager.prototype._is_remote_error = function(error) {
-  return error && typeof error === 'object'
-      && error.error === 'remoteError'
-      && typeof error.remote === 'object'
+TransactionManager._isRemoteError = function(error) {
+  return (typeof error === 'object')
+      && (error.error === 'remoteError')
+      && (typeof error.remote === 'object')
 };
 
-TransactionManager.prototype._is_not_found = function(error) {
-  return this._is_remote_error(error) && /^(txnNotFound|transactionNotFound)$/.test(error.remote.error);
+TransactionManager._isNotFound = function(error) {
+  return TransactionManager._isRemoteError(error)
+      && /^(txnNotFound|transactionNotFound)$/.test(error.remote.error);
 };
 
-TransactionManager.prototype._is_too_busy = function(error) {
-  return this._is_remote_error(error) && error.remote.error === 'tooBusy';
+TransactionManager._isTooBusy = function(error) {
+  return TransactionManager._isRemoteError(error)
+      && error.remote.error === 'tooBusy';
 };
 
 /**

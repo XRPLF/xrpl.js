@@ -44,18 +44,14 @@
 
 var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
-
 var sjcl             = require('./utils').sjcl;
-
 var Amount           = require('./amount').Amount;
 var Currency         = require('./amount').Currency;
 var UInt160          = require('./amount').UInt160;
 var Seed             = require('./seed').Seed;
 var SerializedObject = require('./serializedobject').SerializedObject;
 var RippleError      = require('./rippleerror').RippleError;
-
 var hashprefixes     = require('./hashprefixes');
-
 var config           = require('./config');
 
 // A class to implement transactions.
@@ -86,7 +82,7 @@ function Transaction(remote) {
   // of all submitted transactionIDs (which can change due to load_factor
   // effecting the Fee amount). This should be populated with a transactionID
   // any time it goes on the network
-  this.submittedTxnIDs = []
+  this.submittedTxnIDs = [ ]
 };
 
 util.inherits(Transaction, EventEmitter);
@@ -177,12 +173,43 @@ Transaction.prototype.setState = function(state) {
 };
 
 /**
- * TODO
- * Actually do this right
+ * Returns the number of fee units this transaction will cost.
+ *
+ * Each Ripple transaction based on its type and makeup costs a certain number
+ * of fee units. The fee units are calculated on a per-server basis based on the
+ * current load on both the network and the server.
+ *
+ * @see https://ripple.com/wiki/Transaction_Fee
+ *
+ * @return {Number} Number of fee units for this transaction.
  */
 
-Transaction.prototype.getFee = function() {
-  return Transaction.fees['default'].to_json();
+Transaction.prototype.getFee =
+Transaction.prototype.feeUnits = function() {
+  return Transaction.fee_units['default'];
+};
+
+/**
+ * Get the server whose fee is currently the lowest
+ */
+
+Transaction.prototype._getServer = function() {
+  var self    = this;
+  var servers = this.remote._servers;
+  var fee     = Infinity;
+  var result;
+
+  for (var i=0; i<servers.length; i++) {
+    var server = servers[i];
+    if (!server._connected) continue;
+    var n = server.computeFee(this);
+    if (n < fee) {
+      result = server;
+      fee = n;
+    }
+  }
+
+  return result;
 };
 
 /**
@@ -192,10 +219,12 @@ Transaction.prototype.getFee = function() {
  * SigningPubKey, which can be determined by the library based on network
  * information and other fields.
  */
+
 Transaction.prototype.complete = function() {
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
     if (this.remote.local_fee || !this.remote.trusted) {
-      this.tx_json.Fee = this.remote.fee_tx(this.fee_units()).to_json();
+      this._server = this._getServer();
+      this.tx_json.Fee = this._server.computeFee(this);
     }
   }
 
@@ -218,22 +247,19 @@ Transaction.prototype.signingHash = function() {
 
 Transaction.prototype.addSubmittedTxnID = function(hash) {
   if (this.submittedTxnIDs.indexOf(hash) === -1) {
-    this.submittedTxnIDs.push(hash);
+    this.submittedTxnIDs.unshift(hash);
   }
 };
 
 Transaction.prototype.findResultInCache = function(cache) {
-  var cached;
+  var result;
 
-  for (var i = this.submittedTxnIDs.length - 1; i >= 0; i--) {
+  for (var i=0; i<this.submittedTxnIDs.length; i++) {
     var hash = this.submittedTxnIDs[i];
-    cached = cache[hash];
-    if (cached != null) {
-      break;
-    };
-  };
+    if (result = cache[hash]) break;
+  }
 
-  return cached;
+  return result;
 };
 
 Transaction.prototype.hash = function(prefix, as_uint256) {
@@ -262,7 +288,7 @@ Transaction.prototype.sign = function() {
   // If the hash is the same, we can re-use the previous signature
   if (prev_sig && hash === this._previous_signing_hash) {
     this.tx_json.TxnSignature = prev_sig;
-    return;
+    return this;
   }
 
   var key  = seed.get_key(this.tx_json.Account);
@@ -271,6 +297,8 @@ Transaction.prototype.sign = function() {
 
   this.tx_json.TxnSignature = hex;
   this._previous_signing_hash = hash;
+
+  return this;
 };
 
 //
@@ -345,6 +373,7 @@ Transaction.prototype.paths = function(paths) {
 // If the secret is in the config object, it does not need to be provided.
 Transaction.prototype.secret = function(secret) {
   this._secret = secret;
+  return this;
 };
 
 Transaction.prototype.sendMax = function(send_max) {
@@ -568,7 +597,9 @@ Transaction.prototype.payment = function(src, dst, amount) {
     amount = options.amount;
     dst    = options.destination || options.to;
     src    = options.source || options.from;
-    if (options.invoiceID) this.invoiceID(options.invoiceID);
+    if (options.invoiceID) {
+      this.invoiceID(options.invoiceID);
+    }
   }
 
   if (!UInt160.is_valid(src)) {
@@ -609,7 +640,6 @@ Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_o
   this.tx_json.TransactionType = 'TrustSet';
   this.tx_json.Account         = UInt160.json_rewrite(src);
 
-  // Allow limit of 0 through.
   if (limit !== void(0)) {
     this.tx_json.LimitAmount = Amount.json_rewrite(limit);
   }
@@ -648,21 +678,6 @@ Transaction.prototype.walletAdd = function(src, amount, authorized_key, public_k
   this.tx_json.PublicKey        = public_key;
   this.tx_json.Signature        = signature;
   return this;
-};
-
-/**
- * Returns the number of fee units this transaction will cost.
- *
- * Each Ripple transaction based on its type and makeup costs a certain number
- * of fee units. The fee units are calculated on a per-server basis based on the
- * current load on both the network and the server.
- *
- * @see https://ripple.com/wiki/Transaction_Fee
- *
- * @return {Number} Number of fee units for this transaction.
- */
-Transaction.prototype.feeUnits = function() {
-  return Transaction.fee_units['default'];
 };
 
 // Submit a transaction to the network.
