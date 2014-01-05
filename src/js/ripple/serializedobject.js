@@ -72,10 +72,39 @@ SerializedObject.from_json = function (obj) {
                     ' TransactionType, LedgerEntryType or AffectedNodes.');
   }
 
+  // ND: This from_*json* seems a reasonable place to put validation of `json`
+  SerializedObject.check_no_missing_fields(typedef, obj);
   so.serialize(typedef, obj);
 
   return so;
 };
+
+SerializedObject.check_no_missing_fields = function (typedef, obj) {
+  var missing_fields = [];
+  
+  for (var i = typedef.length - 1; i >= 0; i--) {
+    var spec = typedef[i];
+    var field = spec[0]
+    var requirement = spec[1];
+
+    if (binformat.REQUIRED === requirement && obj[field] == null) {
+      missing_fields.push(field);
+    };
+  };
+  
+  if (missing_fields.length > 0) {
+    var object_name;
+    if (obj.TransactionType != null) {
+      object_name = SerializedObject.lookup_type_tx(obj.TransactionType);
+    } else {
+      object_name = "TransactionMetaData";
+    } /*else {
+      TODO: LedgerEntryType ... 
+    }*/
+    throw new Error(object_name + " is missing fields: " + 
+                    JSON.stringify(missing_fields));
+  };
+}
 
 SerializedObject.prototype.append = function (bytes) {
   if (bytes instanceof SerializedObject) {
