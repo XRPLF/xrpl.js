@@ -163,7 +163,10 @@ Account.prototype.getNextSequence = function(callback) {
   var callback = typeof callback === 'function' ? callback : function(){};
 
   function accountInfo(err, info) {
-    if (err) {
+    if (err && err.error === "actNotFound") {
+      // New accounts will start out as sequence zero
+      callback(null, 0);
+    } else if (err) {
       callback(err);
     } else {
       callback(null, info.account_data.Sequence);
