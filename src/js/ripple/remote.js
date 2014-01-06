@@ -1252,7 +1252,7 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
       request.emit('success_account_seq_cache', message);
     };
 
-    request.once('success', account_root_success);
+    request.once('success', accountRootSuccess);
 
     function accountRootError(message) {
       // console.log('error: %s', account);
@@ -1261,7 +1261,7 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
       request.emit('error_account_seq_cache', message);
     };
 
-    request.once('error', account_root_error);
+    request.once('error', accountRootError);
 
     account_info.caching_seq_request = request;
   }
