@@ -12,7 +12,7 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-------------------------------
+--------------------------------------
 
 Some code from Tom Wu:
 This software is covered under the following copyright:
@@ -20,33 +20,33 @@ This software is covered under the following copyright:
 Copyright (c) 2003-2005  Tom Wu
 All Rights Reserved.
 
-Permissionisherebygranted,freeofcharge,toanypersonobtaining
-acopyofthissoftwareandassociateddocumentationfiles(the
-"Software"),todealintheSoftwarewithoutrestriction,including
-withoutlimitationtherightstouse,copy,modify,merge,publish,
-distribute,sublicense,and/orsellcopiesoftheSoftware,andto
-permitpersonstowhomtheSoftwareisfurnishedtodoso,subjectto
-thefollowingconditions:
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-Theabovecopyrightnoticeandthispermissionnoticeshallbe
-includedinallcopiesorsubstantialportionsoftheSoftware.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THESOFTWAREISPROVIDED"AS-IS"ANDWITHOUTWARRANTYOFANYKIND,
-EXPRESS,IMPLIEDOROTHERWISE,INCLUDINGWITHOUTLIMITATION,ANY
-WARRANTYOFMERCHANTABILITYORFITNESSFORAPARTICULARPURPOSE.
+THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY 
+WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  
 
-INNOEVENTSHALLTOMWUBELIABLEFORANYSPECIAL,INCIDENTAL,
-INDIRECTORCONSEQUENTIALDAMAGESOFANYKIND,ORANYDAMAGESWHATSOEVER
-RESULTINGFROMLOSSOFUSE,DATAORPROFITS,WHETHERORNOTADVISEDOF
-THEPOSSIBILITYOFDAMAGE,ANDONANYTHEORYOFLIABILITY,ARISINGOUT
-OFORINCONNECTIONWITHTHEUSEORPERFORMANCEOFTHISSOFTWARE.
+IN NO EVENT SHALL TOM WU BE LIABLE FOR ANY SPECIAL, INCIDENTAL,
+INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND, OR ANY DAMAGES WHATSOEVER
+RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER OR NOT ADVISED OF
+THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF LIABILITY, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-Inaddition,thefollowingconditionapplies:
+In addition, the following condition applies:
 
-Allredistributionsmustretainanintactcopyofthiscopyrightnotice
-anddisclaimer.
+All redistributions must retain an intact copy of this copyright notice
+and disclaimer.
 
-Addressallquestionsregardingthislicenseto:
+Address all questions regarding this license to:
 
-TomWu
-tjw@cs.Stanford.EDU
+  Tom Wu
+  tjw@cs.Stanford.EDU
