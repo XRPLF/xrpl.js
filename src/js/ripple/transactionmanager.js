@@ -36,7 +36,7 @@ function TransactionManager(account) {
 
     if (!transaction.validated) return;
 
-    self._sequenceCache[sequence] = transaction;
+    self._sequenceCache[sequence] = true;
 
     // ND: we need to check against all submissions IDs
     var pending = self._pending.getBySubmissions(hash);
