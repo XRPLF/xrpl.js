@@ -289,12 +289,14 @@ Transaction.prototype.sign = function() {
     return this;
   }
 
-  var key  = seed.get_key(this.tx_json.Account);
-  var sig  = key.sign(hash, 0);
-  var hex  = sjcl.codec.hex.fromBits(sig).toUpperCase();
+  var key = seed.get_key(this.tx_json.Account);
+  var sig = key.sign(hash, 0);
+  var hex = sjcl.codec.hex.fromBits(sig).toUpperCase();
 
   this.tx_json.TxnSignature = hex;
   this.previousSigningHash = hash;
+
+  this.emit('signed', this.hash());
 
   return this;
 };
