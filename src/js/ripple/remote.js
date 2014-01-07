@@ -513,7 +513,7 @@ Remote.isValidLedgerData = function(ledger) {
       && (typeof ledger.ledger_time  === 'number')
       && (typeof ledger.reserve_base === 'number')
       && (typeof ledger.reserve_inc  === 'number')
-      && (typeof ledger.txn_count    === 'number')
+      && (typeof ledger.txn_count    === 'number');
 };
 
 Remote.isLoadStatus = function(message) {
@@ -781,6 +781,14 @@ Remote.prototype.requestTransactionEntry = function(hash, ledger_hash, callback)
       request.ledgerHash(ledger_hash);
       break;
 
+    case 'number':
+      request.ledgerIndex(ledger_hash);
+      break;
+
+    case 'function':
+      request.callback(ledger_hash);
+      break;
+
     default:
       request.ledgerIndex('validated');
       callback = ledger_hash;
@@ -795,7 +803,7 @@ Remote.prototype.requestTransactionEntry = function(hash, ledger_hash, callback)
 Remote.prototype.requestTx = function(hash, callback) {
   var request = new Request(this, 'tx');
 
-  request.message.transaction  = hash;
+  request.message.transaction = hash;
   request.callback(callback);
 
   return request;
@@ -1450,17 +1458,57 @@ Remote.prototype.requestConnect = function(ip, port, callback) {
   return request;
 };
 
-Remote.prototype.transaction = function(source, destination, amount, callback) {
-  var tx = new Transaction(this);
+Remote.prototype.createTransaction =
+Remote.prototype.transaction = function(source, options, callback) {
+  var transaction = new Transaction(this);
 
-  if (arguments.length >= 3) {
-    tx = tx.payment(source, destination, amount);
-    if (typeof callback === 'function') {
-      tx.submit(callback);
-    }
+  var transactionTypes = {
+    payment:      'payment',
+    accountset:   'accountSet',
+    trustset:     'trustSet',
+    offercreate:  'offerCreate',
+    offercancel:  'offerCancel',
+    sign:         'sign'
   }
 
-  return tx;
+  var transactionType;
+
+  switch (typeof source) {
+    case 'object':
+      if (typeof source.type !== 'string') {
+        throw new Error('Missing transaction type');
+      }
+
+      transactionType = transactionTypes[source.type.toLowerCase()];
+
+      if (!transactionType) {
+        throw new Error('Invalid transaction type: ' + transactionType);
+      }
+
+      transaction = transaction[transactionType](source);
+      break;
+
+    case 'string':
+      transactionType = source.toLowerCase();
+
+      if (!transactionType) {
+        throw new Error('Invalid transaction type: ' + transactionType);
+      }
+
+      transaction = transaction[transactionType](options);
+      break;
+
+    default:
+      throw new Error('Argument must be string or object: ' + source);
+  }
+
+  var lastArg = arguments[arguments.length - 1];
+
+  if (typeof lastArg === 'function') {
+    transaction.submit(lastArg);
+  }
+
+  return transaction;
 };
 
 /**

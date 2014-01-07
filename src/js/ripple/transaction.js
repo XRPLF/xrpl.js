@@ -621,6 +621,7 @@ Transaction.prototype.payment = function(src, dst, amount) {
   return this;
 };
 
+Transaction.prototype.trustSet =
 Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_out) {
   if (typeof src === 'object') {
     var options = src;
