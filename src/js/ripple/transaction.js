@@ -54,35 +54,36 @@ var RippleError      = require('./rippleerror').RippleError;
 var hashprefixes     = require('./hashprefixes');
 var config           = require('./config');
 
-// A class to implement transactions.
-// - Collects parameters
-// - Allow event listeners to be attached to determine the outcome.
+
 function Transaction(remote) {
   EventEmitter.call(this);
 
   var self  = this;
 
-  this.remote                 = remote;
-  this._secret                = void(0);
-  this._build_path            = false;
+  this.remote              = remote;
 
-  // Transaction data.
-  this.tx_json                = { Flags: 0 };
+  this._secret             = void(0);
 
-  // ledger_current_index was this when transaction was submited.
-  this.submit_index           = void(0);
+  // Transaction data
+  this.tx_json             = { Flags: 0 };
 
-  // Under construction.
-  this.state                  = void(0);
+  this._build_path         = false;
 
-  this.finalized              = false;
-  this._previous_signing_hash = void(0);
+  // Index at which transaction was submitted
+  this.submitIndex         = void(0);
+
+  this.state               = void(0);
+
+  this.finalized           = false;
+
+  this.previousSigningHash = void(0);
 
   // We aren't clever enough to eschew preventative measures so we keep an array
   // of all submitted transactionIDs (which can change due to load_factor
   // effecting the Fee amount). This should be populated with a transactionID
   // any time it goes on the network
-  this.submittedTxnIDs = [ ]
+  this.submittedTxnIDs     = [ ]
+
 };
 
 util.inherits(Transaction, EventEmitter);
@@ -137,6 +138,11 @@ Transaction.from_json = function(j) {
   return (new Transaction()).parse_json(j);
 };
 
+Transaction.prototype.parseJson = function(v) {
+  this.tx_json = v;
+  return this;
+};
+
 Transaction.prototype.isTelLocal = function(ter) {
   return ter >= this.consts.telLOCAL_ERROR && ter < this.consts.temMALFORMED;
 };
@@ -170,6 +176,10 @@ Transaction.prototype.setState = function(state) {
     this.state  = state;
     this.emit('state', state);
   }
+};
+
+Transaction.prototype._accountSecret = function(account) {
+  return this.remote.secrets[account];
 };
 
 /**
@@ -250,23 +260,6 @@ Transaction.prototype.signingHash = function() {
   return this.hash(config.testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
 };
 
-Transaction.prototype.addSubmittedTxnID = function(hash) {
-  if (this.submittedTxnIDs.indexOf(hash) === -1) {
-    this.submittedTxnIDs.unshift(hash);
-  }
-};
-
-Transaction.prototype.findResultInCache = function(cache) {
-  var result;
-
-  for (var i=0; i<this.submittedTxnIDs.length; i++) {
-    var hash = this.submittedTxnIDs[i];
-    if (result = cache[hash]) break;
-  }
-
-  return result;
-};
-
 Transaction.prototype.hash = function(prefix, as_uint256) {
   if (typeof prefix === 'string') {
     if (typeof hashprefixes[prefix] === 'undefined') {
@@ -291,7 +284,7 @@ Transaction.prototype.sign = function() {
   var hash = this.signing_hash();
 
   // If the hash is the same, we can re-use the previous signature
-  if (prev_sig && hash === this._previous_signing_hash) {
+  if (prev_sig && hash === this.previousSigningHash) {
     this.tx_json.TxnSignature = prev_sig;
     return this;
   }
@@ -301,9 +294,26 @@ Transaction.prototype.sign = function() {
   var hex  = sjcl.codec.hex.fromBits(sig).toUpperCase();
 
   this.tx_json.TxnSignature = hex;
-  this._previous_signing_hash = hash;
+  this.previousSigningHash = hash;
 
   return this;
+};
+
+Transaction.prototype.addSubmittedTxnID = function(hash) {
+  if (this.submittedTxnIDs.indexOf(hash) === -1) {
+    this.submittedTxnIDs.unshift(hash);
+  }
+};
+
+Transaction.prototype.findResultInCache = function(cache) {
+  var result;
+
+  for (var i=0; i<this.submittedTxnIDs.length; i++) {
+    var hash = this.submittedTxnIDs[i];
+    if (result = cache[hash]) break;
+  }
+
+  return result;
 };
 
 //
@@ -431,11 +441,6 @@ Transaction.prototype.setFlags = function(flags) {
   }
 
   return this;
-};
-
-Transaction.prototype._accountSecret = function(account) {
-  // Fill in secret from remote, if available.
-  return this.remote.secrets[account];
 };
 
 // Options:
@@ -718,11 +723,6 @@ Transaction.prototype.abort = function(callback) {
     this.once('final', callback);
     this.emit('abort');
   }
-};
-
-Transaction.prototype.parseJson = function(v) {
-  this.tx_json = v;
-  return this;
 };
 
 exports.Transaction = Transaction;

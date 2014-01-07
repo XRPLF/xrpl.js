@@ -79,7 +79,6 @@ function TransactionManager(account) {
       switch (ledger.ledger_index - pending.submitIndex) {
         case 8:
           pending.emit('lost', ledger);
-          pending.emit('error', new RippleError('tejLost', 'Transaction lost'));
           self._remote._trace('transactionmanager: update_pending:', pending.tx_json);
           break;
 
@@ -259,9 +258,6 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
   };
 
   this._waitLedgers(ledgers, resubmitTransactions);
-};
-
-TransactionManager.prototype._selectServer = function() {
 };
 
 TransactionManager.prototype._waitLedgers = function(ledgers, callback) {

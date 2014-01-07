@@ -1497,9 +1497,6 @@ Remote.prototype.transaction = function(source, options, callback) {
 
       transaction = transaction[transactionType](options);
       break;
-
-    default:
-      throw new Error('Argument must be string or object: ' + source);
   }
 
   var lastArg = arguments[arguments.length - 1];
