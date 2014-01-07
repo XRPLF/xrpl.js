@@ -719,6 +719,10 @@ Transaction.prototype.submit = function(callback) {
   return this;
 };
 
+Transaction.prototype.transactionManager = function() {
+  return this.remote.account(this.tx_json.Account)._transactionManager;
+};
+
 Transaction.prototype.abort = function(callback) {
   if (!this.finalized) {
     var callback = typeof callback === 'function' ? callback : function(){};
