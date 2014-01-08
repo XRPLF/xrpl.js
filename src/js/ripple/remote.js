@@ -785,13 +785,14 @@ Remote.prototype.requestTransactionEntry = function(hash, ledger_hash, callback)
       request.ledgerIndex(ledger_hash);
       break;
 
+    case 'undefined':
     case 'function':
-      request.callback(ledger_hash);
+      request.ledgerIndex('validated');
+      callback = ledger_hash;
       break;
 
     default:
-      request.ledgerIndex('validated');
-      callback = ledger_hash;
+      throw new Error('Invalid ledger_hash type');
   }
 
   request.callback(callback);
