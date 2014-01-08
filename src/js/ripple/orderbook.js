@@ -60,7 +60,9 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
   this.on('removeListener', listenerRemoved);
 
   // ST: This *should* call _prepareSubscribe.
-  this._remote.on('prepare_subscribe', this._subscribe.bind(this));
+  this._remote.on('prepare_subscribe', function(request) {
+    self._subscribe(request);
+  });
 
   function remoteDisconnected() {
     self._sync = false;
@@ -83,7 +85,7 @@ OrderBook.subscribe_events = ['transaction', 'model', 'trade'];
  *
  * @private
  */
-OrderBook.prototype._subscribe = function () {
+OrderBook.prototype._subscribe = function (request) {
   var self = this;
 
   if (self.is_valid() && self._subs) {
