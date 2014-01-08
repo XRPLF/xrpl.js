@@ -36,11 +36,9 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
 
   function listenerAdded(type, listener) {
     if (~OrderBook.subscribe_events.indexOf(type)) {
+      self._subs += 1;
       if (!self._subs && self._remote._connected) {
-        self._subs += 1;
         self._subscribe();
-      } else {
-        self._subs += 1;
       }
     }
   };
@@ -58,6 +56,8 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
       }
     }
   };
+
+  this.on('removeListener', listenerRemoved);
 
   // ST: This *should* call _prepareSubscribe.
   this._remote.on('prepare_subscribe', this._subscribe.bind(this));
@@ -85,17 +85,21 @@ OrderBook.subscribe_events = ['transaction', 'model', 'trade'];
  */
 OrderBook.prototype._subscribe = function () {
   var self = this;
+
   if (self.is_valid() && self._subs) {
     var request = this._remote.request_subscribe();
     request.addBook(self.to_json(), true);
+
     request.once('success', function(res) {
       self._sync   = true;
       self._offers = res.offers;
       self.emit('model', self._offers);
     });
+
     request.once('error', function(err) {
       // XXX What now?
     });
+
     request.request();
   }
 };
