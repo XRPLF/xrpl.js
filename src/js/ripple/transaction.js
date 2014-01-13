@@ -82,8 +82,7 @@ function Transaction(remote) {
   // of all submitted transactionIDs (which can change due to load_factor
   // effecting the Fee amount). This should be populated with a transactionID
   // any time it goes on the network
-  this.submittedTxnIDs     = [ ]
-
+  this.submittedIDs        = [ ]
 };
 
 util.inherits(Transaction, EventEmitter);
@@ -276,6 +275,8 @@ Transaction.prototype.hash = function(prefix, as_uint256) {
 };
 
 Transaction.prototype.sign = function() {
+  var then = Date.now();
+
   var seed = Seed.from_json(this._secret);
 
   var prev_sig = this.tx_json.TxnSignature;
@@ -296,22 +297,29 @@ Transaction.prototype.sign = function() {
   this.tx_json.TxnSignature = hex;
   this.previousSigningHash = hash;
 
-  this.emit('signed', this.hash());
-
   return this;
 };
 
-Transaction.prototype.addSubmittedTxnID = function(hash) {
-  if (this.submittedTxnIDs.indexOf(hash) === -1) {
-    this.submittedTxnIDs.unshift(hash);
+/**
+ * Add a ID to list of submitted IDs for this transaction
+ */
+
+Transaction.prototype.addId = function(hash) {
+  if (this.submittedIDs.indexOf(hash) === -1) {
+    this.submittedIDs.unshift(hash);
+    this.emit('signed', hash);
   }
 };
 
-Transaction.prototype.findResultInCache = function(cache) {
+/**
+ * Find ID within list of submitted IDs for this transaction
+ */
+
+Transaction.prototype.findId = function(cache) {
   var result;
 
-  for (var i=0; i<this.submittedTxnIDs.length; i++) {
-    var hash = this.submittedTxnIDs[i];
+  for (var i=0; i<this.submittedIDs.length; i++) {
+    var hash = this.submittedIDs[i];
     if (result = cache[hash]) break;
   }
 

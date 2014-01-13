@@ -1,39 +1,95 @@
+
+/**
+ * Manager for pending transactions
+ */
+
 function TransactionQueue() {
-  this._queue  = [ ];
+  this._queue         = [ ];
+  this._idCache       = { };
+  this._sequenceCache = { };
 }
 
-TransactionQueue.prototype.length = function() {
-  return this._queue.length;
+/**
+ * Store received (validated) sequence
+ */
+
+TransactionQueue.prototype.addReceivedSequence = function(sequence) {
+  this._sequenceCache[sequence] = true;
 };
 
-TransactionQueue.prototype.getBySubmissions = function(hash) {
+/**
+ * Store received (validated) ID transaction
+ */
+
+TransactionQueue.prototype.addReceivedId = function(id, transaction) {
+  this._idCache[id] = transaction;
+};
+
+/**
+ * Get received (validated) transaction by ID
+ */
+
+TransactionQueue.prototype.getReceived = function(id) {
+  return this._idCache[id];
+};
+
+/**
+ * Check that sequence number has been consumed by a validated
+ * transaction
+ */
+
+TransactionQueue.prototype.hasSequence = function(sequence) {
+  return this._sequenceCache[sequence] || false;
+};
+
+/**
+ * Get a submitted transaction by ID. Transactions
+ * may have multiple associated IDs.
+ */
+
+TransactionQueue.prototype.getSubmission = function(id) {
   var result = false;
 
-  top:
   for (var i=0, tx; tx=this._queue[i]; i++) {
-    for (var j=0, id; id=tx.submittedTxnIDs[j]; j++) {
-      if (hash === id) {
-        result = tx;
-        break top;
-      };
+    if (~tx.submittedIDs.indexOf(id)) {
+      result = tx;
+      break;
     }
   }
 
   return result;
 };
 
-// ND: We are just removing the Transaction by identity
-TransactionQueue.prototype.remove = function(removedTx) {
-  top:
-  for (var i = this._queue.length - 1; i >= 0; i--) {
-    if (this._queue[i] === removedTx) {
+/**
+ * Remove a transaction from the queue
+ */
+
+TransactionQueue.prototype.remove = function(tx) {
+  // ND: We are just removing the Transaction by identity
+  var i = this.length();
+  while (i--) {
+    if (this._queue[i] === tx) {
       this._queue.splice(i, 1);
-      break top;
-    };
-  };
+      break;
+    }
+  }
 };
 
-[ 'forEach', 'push', 'shift', 'unshift' ].forEach(function(fn) {
+/**
+ * Get pending length
+ */
+
+TransactionQueue.prototype.length = function() {
+  return this._queue.length;
+};
+
+[
+  'forEach',
+  'push',
+  'pop',
+  'shift',
+  'unshift'
+].forEach(function(fn) {
   TransactionQueue.prototype[fn] = function() {
     Array.prototype[fn].apply(this._queue, arguments);
   };

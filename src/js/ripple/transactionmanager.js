@@ -19,9 +19,7 @@ function TransactionManager(account) {
   this._remote            = account._remote;
   this._pending           = new PendingQueue;
   this._nextSequence      = void(0);
-  this._cache             = { };
   // ND: Do we ever clean this up?
-  this._sequenceCache     = { };
   this._maxFee            = this._remote.max_fee;
   this._submissionTimeout = this._remote._submission_timeout;
 
@@ -36,18 +34,18 @@ function TransactionManager(account) {
 
     if (!transaction.validated) return;
 
-    self._sequenceCache[sequence] = true;
+    self._pending.addReceivedSequence(sequence);
 
     // ND: we need to check against all submissions IDs
-    var pending = self._pending.getBySubmissions(hash);
+    var submission = self._pending.getSubmission(hash);
 
     self._remote._trace('transactionmanager: transaction_received:', transaction.transaction);
 
-    if (pending) {
+    if (submission) {
       // ND: A `success` handler will `finalize` this later
-      pending.emit('success', transaction);
+      submission.emit('success', transaction);
     } else {
-      self._cache[hash] = transaction;
+      self._pending.addReceivedId(hash, transaction);
     }
   };
 
@@ -83,7 +81,7 @@ function TransactionManager(account) {
           break;
 
         case 4:
-          pending.set_state('client_missing');
+          pending.setState('client_missing');
           pending.emit('missing', ledger);
           break;
       }
@@ -135,13 +133,13 @@ TransactionManager.normalizeTransaction = function(tx) {
   if (!tx.engine_result) {
     // account_tx
     transaction = {
-      engine_result:          tx.meta.TransactionResult,
-      transaction:            tx.tx,
-      hash:                   tx.tx.hash,
-      ledger_index:           tx.tx.ledger_index,
-      meta:                   tx.meta,
-      type:                   'transaction',
-      validated:              true
+      engine_result:  tx.meta.TransactionResult,
+      transaction:    tx.tx,
+      hash:           tx.tx.hash,
+      ledger_index:   tx.tx.ledger_index,
+      meta:           tx.meta,
+      type:           'transaction',
+      validated:      true
     }
     transaction.result         = transaction.engine_result;
     transaction.result_message = transaction.engine_result_message;
@@ -220,14 +218,15 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
       return;
     }
 
-    var hashCached = pending.findResultInCache(self._cache);
+    var hashCached = pending.findId(self._pending._idCache);
+
     self._remote._trace('transactionmanager: resubmit:', pending.tx_json);
 
     if (hashCached) {
       return pending.emit('success', hashCached);
     }
 
-    while (self._sequenceCache[pending.tx_json.Sequence]) {
+    while (self._pending.hasSequence(pending.tx_json.Sequence)) {
       //Sequence number has been consumed by another transaction
       self._remote._trace('transactionmanager: incrementing sequence:', pending.tx_json);
       pending.tx_json.Sequence += 1;
@@ -301,12 +300,12 @@ TransactionManager.prototype._request = function(tx) {
 
   // ND: We could consider sharing the work with tx_blob when doing
   // local_signing
-  tx.addSubmittedTxnID(tx.hash());
+  tx.addId(tx.hash());
 
   remote._trace('transactionmanager: submit:', tx.tx_json);
 
   function transactionProposed(message) {
-    tx.set_state('client_proposed');
+    tx.setState('client_proposed');
     // If server is honest, don't expect a final if rejected.
     message.rejected = tx.isRejected(message.engine_result_code)
     tx.emit('proposed', message);
@@ -344,7 +343,7 @@ TransactionManager.prototype._request = function(tx) {
       self._resubmit(1, tx);
     } else {
       self._nextSequence--;
-      tx.set_state('remoteError');
+      tx.setState('remoteError');
       tx.emit('error', error);
     }
   };
@@ -356,7 +355,7 @@ TransactionManager.prototype._request = function(tx) {
     // ND: If for some unknown reason our hash wasn't computed correctly this is
     // an extra measure.
     if (message.tx_json && message.tx_json.hash) {
-      tx.addSubmittedTxnID(message.tx_json.hash);
+      tx.addId(message.tx_json.hash);
     }
 
     message.result = message.engine_result || '';
@@ -413,7 +412,7 @@ TransactionManager.prototype._request = function(tx) {
 
   submitRequest.request();
 
-  tx.set_state('client_submitted');
+  tx.setState('client_submitted');
   tx.attempts++;
 
   return submitRequest;
@@ -429,7 +428,7 @@ TransactionManager._isNoOp = function(transaction) {
 TransactionManager._isRemoteError = function(error) {
   return (typeof error === 'object')
       && (error.error === 'remoteError')
-      && (typeof error.remote === 'object')
+      && (typeof error.remote === 'object');
 };
 
 TransactionManager._isNotFound = function(error) {
@@ -439,7 +438,7 @@ TransactionManager._isNotFound = function(error) {
 
 TransactionManager._isTooBusy = function(error) {
   return TransactionManager._isRemoteError(error)
-      && error.remote.error === 'tooBusy';
+      && (error.remote.error === 'tooBusy');
 };
 
 /**
