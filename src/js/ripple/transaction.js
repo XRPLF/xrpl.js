@@ -275,8 +275,6 @@ Transaction.prototype.hash = function(prefix, as_uint256) {
 };
 
 Transaction.prototype.sign = function() {
-  var then = Date.now();
-
   var seed = Seed.from_json(this._secret);
 
   var prev_sig = this.tx_json.TxnSignature;
