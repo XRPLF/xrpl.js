@@ -285,23 +285,42 @@ TransactionManager.prototype._request = function(tx) {
   if (tx.attempts > 10) {
     tx.emit('error', new RippleError('tejAttemptsExceeded'));
     return;
+  } else if (tx.attempts > 0 && !remote.local_signing
+             // && tx.submittedTxnIDs.length != tx.attempts
+
+            // ^^^ Above commented out intentionally
+
+            //  ^^^^ We might be a bit cleverer about allowing this in SOME cases, but
+            // it's not really worth it, and would be prone to error. Use
+            // `local_signing`
+
+             ) {
+    tx.emit('error', new RippleError('tejTxnResubmitWithoutLocalSigning',
+      'It\s not possible to resubmit transactions automatically safely without ' +
+      'synthesizing the transactionID locally. See `local_signing` config option'));
   }
 
   var submitRequest = remote.requestSubmit();
 
-  submitRequest.build_path(tx._build_path);
-
   if (remote.local_signing) {
     tx.sign();
+    // TODO: We are serializing twice, when we could/should be feeding the
+    // tx_blob to `tx.hash()` which rebuilds it to sign it.
     submitRequest.tx_blob(tx.serialize().to_hex());
+    // ND: ecdsa produces a random `TxnSignature` field value, a component of
+    // the hash. Attempting to identify a transaction via a hash synthesized
+    // locally while using remote signing is inherently flawed.
+    tx.addSubmittedTxnID(tx.hash());
   } else {
+    // ND: `build_path` is completely ignored when doing local signing as
+    // `Paths` is a component of the signed blob, the `tx_blob` is signed,
+    // sealed and delivered, and the txn unmodified.
+    // TODO: perhaps an exception should be raised if build_path is attempted
+    // while local signing
+    submitRequest.build_path(tx._build_path);
     submitRequest.secret(tx._secret);
     submitRequest.tx_json(tx.tx_json);
   }
-
-  // ND: We could consider sharing the work with tx_blob when doing
-  // local_signing
-  tx.addSubmittedTxnID(tx.hash());
 
   remote._trace('transactionmanager: submit:', tx.tx_json);
 
