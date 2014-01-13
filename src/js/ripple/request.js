@@ -129,8 +129,20 @@ Request.prototype.setServer = function(server) {
 };
 
 Request.prototype.buildPath = function(build) {
+
+  if (this.remote.local_signing) {
+    throw new Error(
+      '`build_path` is completely ignored when doing local signing as ' +
+      '`Paths` is a component of the signed blob. The `tx_blob` is signed,' +
+      'sealed and delivered, and the txn unmodified after' );
+  }
+
   if (build) {
     this.message.build_path = true;
+  } else {
+    // ND: rippled currently intreprets the mere presence of `build_path` as the
+    // value being `truthy`
+    delete this.message.build_path
   }
   return this;
 };
