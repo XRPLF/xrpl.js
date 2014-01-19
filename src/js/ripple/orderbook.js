@@ -37,7 +37,7 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
   function listenerAdded(type, listener) {
     if (~OrderBook.subscribe_events.indexOf(type)) {
       self._subs += 1;
-      if (!self._subs && self._remote._connected) {
+      if (self._subs == 1 && self._remote._connected) {
         self._subscribe();
       }
     }
