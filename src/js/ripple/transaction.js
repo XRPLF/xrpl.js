@@ -280,7 +280,7 @@ Transaction.prototype.sign = function() {
   var prev_sig = this.tx_json.TxnSignature;
   delete this.tx_json.TxnSignature;
 
-  var hash = this.signing_hash();
+  var hash = this.signingHash();
 
   // If the hash is the same, we can re-use the previous signature
   if (prev_sig && hash === this.previousSigningHash) {

@@ -76,6 +76,7 @@ function sign_transaction() {
   tx.complete();
 
   var unsigned_blob = tx.serialize().to_hex();
+  var unsigned_hash = tx.signingHash();
   tx.sign();
 
   if (verbose) {
@@ -83,7 +84,7 @@ function sign_transaction() {
 
     sim.tx_blob         = tx.serialize().to_hex();
     sim.tx_json         = tx.tx_json;
-    sim.tx_signing_hash = tx.signing_hash().to_hex();
+    sim.tx_signing_hash = unsigned_hash;
     sim.tx_unsigned     = unsigned_blob;
 
     console.log(JSON.stringify(sim, null, 2));
