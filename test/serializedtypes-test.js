@@ -520,7 +520,7 @@ describe('Serialized types', function() {
       types.Amount.serialize(so, '-1/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(so.to_hex(), '94838D7EA4C680000000000000000000000000005553440000000000B5F762798A53D543A014CAF8B297CFF8F2F937E8');
     });
-    it('Serialize 15/XRP/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
+    it('Serialize 15/XRP/rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo', function () {
       // This actually appears in the ledger, so we need to be able to serialize
       // Transaction #A2AD66C93C7B7277CD5AEB718A4E82D88C7099129948BC66A394EE38B34657A9
       var so = new SerializedObject();
@@ -680,6 +680,32 @@ describe('Serialized types', function() {
       assert.deepEqual(parsed_path, json);
     });
     it('Serialize path through XRP IOUs', function () {
+      var hex = '31000000000000000000000000000000000000007B00000000000000000000000055534400000000000000000000000000000000000000000000000315FF1000000000000000000000000058525000000000003100000000000000000000000000000000000003DB0000000000000000000000004555520000000000000000000000000000000000000000000000014100';
+      var json = [
+        [ {
+          account:   "rrrrrrrrrrrrrrrrrrrrNxV3Xza",
+          currency:  'USD',
+          issuer:    "rrrrrrrrrrrrrrrrrrrpYnYCNYf"
+        }],
+        [{
+          currency: "XRP",
+          non_native: true
+        }, {
+          account:   "rrrrrrrrrrrrrrrrrrrpvQsW3V3",
+          currency:  'EUR',
+          issuer:    "rrrrrrrrrrrrrrrrrrrdHRtqg2"
+        }]
+      ];
+
+      var so = new SerializedObject();
+      types.PathSet.serialize(so, json);
+      assert.strictEqual(so.to_hex(), hex);
+
+      so = new SerializedObject(hex);
+      var parsed_path = SerializedObject.jsonify_structure(types.PathSet.parse(so));
+      assert.deepEqual(parsed_path, json);
+    });
+    it('Serialize path through XRP IOUs (realistic example)', function () {
       // Appears in the history
       // TX #0CBB429C456ED999CC691DFCC8E62E8C8C7E9522C2BEA967FED0D7E2A9B28D13
       // Note that XRP IOUs are no longer allowed, so this functionality is
