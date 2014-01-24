@@ -75,6 +75,15 @@ UInt.from_bn = function (j) {
   }
 };
 
+// Return a new UInt from j.
+UInt.from_number = function (j) {
+  if (j instanceof this) {
+    return j.clone();
+  } else {
+    return (new this()).parse_number(j);
+  }
+};
+
 UInt.is_valid = function (j) {
   return this.from_json(j).is_valid();
 };
@@ -187,6 +196,19 @@ UInt.prototype.parse_bn = function (j) {
 	  this._value  = new BigInteger(bytes, 256);
   } else {
     this._value = NaN;
+  }
+
+  return this;
+};
+
+UInt.prototype.parse_number = function (j) {
+  this._value = NaN;
+
+  if ("number" === typeof j &&
+      j === +j &&
+      j > 0) {
+    // XXX Better, faster way to get BigInteger from JS int?
+    this._value = new BigInteger(""+j);
   }
 
   return this;

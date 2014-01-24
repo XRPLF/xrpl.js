@@ -628,7 +628,7 @@ Amount.prototype.parse_json = function (j) {
   switch (typeof j) {
     case 'string':
       // .../.../... notation is not a wire format.  But allowed for easier testing.
-      var m = j.match(/^([^/]+)\/(...)(?:\/(.+))?$/);
+      var m = j.match(/^([^/]+)\/([^/]+)(?:\/(.+))?$/);
 
       if (m) {
         this._currency  = Currency.from_json(m[2]);
@@ -655,7 +655,7 @@ Amount.prototype.parse_json = function (j) {
         j.copyTo(this);
       } else if (j.hasOwnProperty('value')) {
         // Parse the passed value to sanitize and copy it.
-        this._currency.parse_json(j.currency); // Never XRP.
+        this._currency.parse_json(j.currency, true); // Never XRP.
 
         if (typeof j.issuer === 'string') {
           this._issuer.parse_json(j.issuer);

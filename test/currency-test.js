@@ -19,8 +19,8 @@ describe('Currency', function() {
     });
     it('from_json("XRP").to_json() == "XRP"', function() {
       var r = currency.from_json('XRP');
-      assert.strictEqual(0, r._value);
       assert(r.is_valid());
+      assert(r.is_native());
       assert.strictEqual('XRP', r.to_json());
     });
   });

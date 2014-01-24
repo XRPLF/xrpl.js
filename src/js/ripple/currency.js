@@ -1,10 +1,14 @@
 
+var extend    = require('extend');
+
+var UInt160 = require('./uint160').UInt160;
+var utils = require('./utils');
+
 //
 // Currency support
 //
 
-// XXX Internal form should be UInt160.
-function Currency() {
+var Currency = extend(function () {
   // Internal form: 0 = XRP. 3 letter-code.
   // XXX Internal should be 0 or hex with three letter annotation when valid.
 
@@ -14,72 +18,63 @@ function Currency() {
   // XXX Should support hex, C++ doesn't currently allow it.
 
   this._value  = NaN;
-};
+}, UInt160);
 
-// Given "USD" return the json.
-Currency.json_rewrite = function (j) {
-  return Currency.from_json(j).to_json();
-};
+Currency.prototype = extend({}, UInt160.prototype);
+Currency.prototype.constructor = Currency;
 
-Currency.from_json = function (j) {
-  return j instanceof Currency ? j.clone() : new Currency().parse_json(j);
-};
+Currency.HEX_CURRENCY_BAD = "0000000000000000000000005852500000000000";
 
-Currency.from_bytes = function (j) {
-  return j instanceof Currency ? j.clone() : new Currency().parse_bytes(j);
-};
-
-Currency.is_valid = function (j) {
-  return Currency.from_json(j).is_valid();
-};
-
-Currency.prototype.clone = function() {
-  return this.copyTo(new Currency());
-};
-
-// Returns copy.
-Currency.prototype.copyTo = function (d) {
-  d._value = this._value;
-  return d;
-};
-
-Currency.prototype.equals = function (d) {
-  var equals = (typeof this._value !== 'string' && isNaN(this._value))
-    || (typeof d._value !== 'string' && isNaN(d._value));
-  return equals ? false: this._value === d._value;
+Currency.from_json = function (j, shouldInterpretXrpAsIou) {
+  if (j instanceof this) {
+    return j.clone();
+  } else {
+    return (new this()).parse_json(j, shouldInterpretXrpAsIou);
+  }
 };
 
 // this._value = NaN on error.
-Currency.prototype.parse_json = function (j) {
-  var result = NaN;
+Currency.prototype.parse_json = function (j, shouldInterpretXrpAsIou) {
+  this._value = NaN;
 
   switch (typeof j) {
     case 'string':
       if (!j || /^(0|XRP)$/.test(j)) {
-        result = 0;
+        if (shouldInterpretXrpAsIou) {
+          this.parse_hex(Currency.HEX_CURRENCY_BAD);
+        } else {
+          this.parse_hex(Currency.HEX_ZERO);
+        }
       } else if (/^[a-zA-Z0-9]{3}$/.test(j)) {
-        result = j;
+        var currencyCode = j.toUpperCase();
+        var currencyData = utils.arraySet(20, 0);
+        currencyData[12] = currencyCode.charCodeAt(0) & 0xff;
+        currencyData[13] = currencyCode.charCodeAt(1) & 0xff;
+        currencyData[14] = currencyCode.charCodeAt(2) & 0xff;
+        this.parse_bytes(currencyData);
+      } else {
+        this.parse_hex(j);
       }
       break;
 
     case 'number':
       if (!isNaN(j)) {
-        result = j;
+        this.parse_number(j);
       }
       break;
 
     case 'object':
       if (j instanceof Currency) {
-        result = j.copyTo({})._value;
+        this._value = j.copyTo({})._value;
       }
       break;
   }
 
-  this._value = result;
-
   return this;
 };
 
+// XXX Probably not needed anymore?
+/*
 Currency.prototype.parse_bytes = function (byte_array) {
   if (Array.isArray(byte_array) && byte_array.length === 20) {
     var result;
@@ -110,21 +105,62 @@ Currency.prototype.parse_bytes = function (byte_array) {
   }
   return this;
 };
+*/
 
 Currency.prototype.is_native = function () {
-  return !isNaN(this._value) && !this._value;
+  return !isNaN(this._value) && this.is_zero();
 };
 
-Currency.prototype.is_valid = function () {
-  return typeof this._value === 'string' || !isNaN(this._value);
-};
+// XXX Currently we inherit UInt.prototype.is_valid, which is mostly fine.
+//
+//     We could be doing further checks into the internal format of the
+//     currency data, since there are some values that are invalid.
+//
+//Currency.prototype.is_valid = function () {
+//  return this._value instanceof BigInteger && ...;
+//};
 
 Currency.prototype.to_json = function () {
-  return this._value ? this._value : "XRP";
+  var bytes = this.to_bytes();
+
+  // is it 0 everywhere except 12, 13, 14?
+  var isZeroExceptInStandardPositions = true;
+
+  if (!bytes) {
+    return "XRP";
+  }
+
+  for (var i=0; i<20; i++) {
+    isZeroExceptInStandardPositions = isZeroExceptInStandardPositions && (i===12 || i===13 || i===14 || bytes[i]===0);
+  }
+
+  if (isZeroExceptInStandardPositions) {
+    var currencyCode = String.fromCharCode(bytes[12])
+                     + String.fromCharCode(bytes[13])
+                     + String.fromCharCode(bytes[14]);
+    if (/^[A-Z0-9]{3}$/.test(currencyCode) && currencyCode !== "XRP" ) {
+      return currencyCode;
+    } else if (currencyCode === "\0\0\0") {
+      return "XRP";
+    } else {
+      return "XRP";
+    }
+  } else {
+    var currencyHex = this.to_hex();
+
+    // XXX This is to maintain backwards compatibility, but it is very, very odd
+    //     behavior, so we should deprecate it and get rid of it as soon as
+    //     possible.
+    if (currencyHex === Currency.HEX_ONE) {
+      return 1;
+    }
+
+    return currencyHex;
+  }
 };
 
 Currency.prototype.to_human = function () {
-  return this._value ? this._value : "XRP";
+  return this.to_json();
 };
 
 exports.Currency = Currency;

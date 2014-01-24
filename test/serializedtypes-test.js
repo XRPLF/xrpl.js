@@ -531,6 +531,16 @@ describe('Serialized types', function() {
       });
       assert.strictEqual(so.to_hex(), 'D5438D7EA4C680000000000000000000000000005852500000000000E4FE687C90257D3D2D694C8531CDEECBE84F3367');
     });
+    // Test support for 20-byte hex raw currency codes
+    it('Serialize 15/015841551A748AD23FEFFFFFFFEA028000000000/1', function () {
+      var so = new SerializedObject();
+      types.Amount.serialize(so, {
+        "value":"1000",
+        "currency":"015841551A748AD23FEFFFFFFFEA028000000000",
+        "issuer":"rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo"
+      });
+      assert.strictEqual(so.to_hex(), 'D5438D7EA4C68000015841551A748AD23FEFFFFFFFEA028000000000E4FE687C90257D3D2D694C8531CDEECBE84F3367');
+    });
     it('Parse 1 XRP', function () {
       var so = new SerializedObject('4000000000000001');
       assert.strictEqual(types.Amount.parse(so).to_json(), '1');

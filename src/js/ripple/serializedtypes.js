@@ -280,22 +280,13 @@ STHash160.id = 17;
 // Internal
 var STCurrency = new SerializedType({
   serialize: function (so, val, xrp_as_ascii) {
-    var currency = val.to_json().toUpperCase();
+    var currencyData = val.to_bytes();
 
-    if (!isCurrencyString(currency)) {
+    if (!currencyData) {
       throw new Error('Tried to serialize invalid/unimplemented currency type.');
     }
 
-    if (currency === 'XRP' && !xrp_as_ascii) {
-      serialize_hex(so, UInt160.HEX_ZERO, true);
-    } else {
-      var currencyCode = currency.toUpperCase();
-      var currencyData = utils.arraySet(20, 0);
-      currencyData[12] = currencyCode.charCodeAt(0) & 0xff;
-      currencyData[13] = currencyCode.charCodeAt(1) & 0xff;
-      currencyData[14] = currencyCode.charCodeAt(2) & 0xff;
-      so.append(currencyData);
-    }
+    so.append(currencyData);
   },
   parse: function (so) {
     var bytes = so.read(20);
@@ -484,8 +475,8 @@ var STPathSet = exports.PathSet = new SerializedType({
         }
 
         if (entry.currency) {
-          var currency = Currency.from_json(entry.currency);
-          STCurrency.serialize(so, currency, entry.non_native);
+          var currency = Currency.from_json(entry.currency, entry.non_native);
+          STCurrency.serialize(so, currency);
         }
 
         if (entry.issuer) {
@@ -544,7 +535,8 @@ var STPathSet = exports.PathSet = new SerializedType({
         }
         if (tag_byte & this.typeIssuer) {
           //console.log('entry.issuer');
-          entry.issuer = STHash160.parse(so); //should know to use Base58?
+          entry.issuer = STHash160.parse(so);
+          // Enable and set correct type of base-58 encoding
           entry.issuer.set_version(Base.VER_ACCOUNT_ID);
           //console.log('DONE WITH ISSUER!');
         }
