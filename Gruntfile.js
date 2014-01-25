@@ -52,7 +52,8 @@ module.exports = function(grunt) {
         entry: "./src/js/ripple/index.js",
         output: {
           library: "ripple"
-        }
+        },
+        cache: true
       },
       lib: {
         output: {
@@ -81,8 +82,8 @@ module.exports = function(grunt) {
         tasks: 'concat:sjcl'
       },
       lib: {
-        files: 'src/js/*.js',
-        tasks: 'webpack'
+        files: 'src/js/ripple/*.js',
+        tasks: 'webpack:lib_debug'
       }
     },
     dox: {
