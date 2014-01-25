@@ -847,9 +847,11 @@ Amount.prototype.to_text = function (allow_nan) {
  *   default: 3.
  * @param opts.signed {Boolean|String} Whether negative numbers will have a
  *   prefix. If String, that string will be used as the prefix. Default: '-'
+ * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
+ *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  */
 Amount.prototype.to_human = function (opts) {
-  var opts = opts || {};
+  opts = opts || {};
 
   if (!this.is_valid()) return '';
 
@@ -859,10 +861,29 @@ Amount.prototype.to_human = function (opts) {
 
   opts.group_width = opts.group_width || 3;
 
-  var order         = this._is_native ? consts.xns_precision : -this._offset;
+  // Apply demurrage/interest
+  var ref = this;
+  if (opts.reference_date && this._currency.has_interest()) {
+    var interest = this._currency.get_interest_at(opts.reference_date);
+
+    // XXX Because the Amount parsing routines don't support some of the things
+    //     that JavaScript can output when casting a float to a string, the
+    //     following call sometimes does not produce a valid Amount.
+    //
+    //     The correct way to solve this is probably to switch to a proper
+    //     BigDecimal for our internal representation and then use that across
+    //     the board instead of instantiating these dummy Amount objects.
+    var interestTempAmount = Amount.from_json(""+interest+"/1/1");
+
+    if (interestTempAmount.is_valid()) {
+      ref = this.multiply(interestTempAmount);
+    }
+  }
+
+  var order         = ref._is_native ? consts.xns_precision : -ref._offset;
   var denominator   = consts.bi_10.clone().pow(order);
-  var int_part      = this._value.divide(denominator).toString();
-  var fraction_part = this._value.mod(denominator).toString();
+  var int_part      = ref._value.divide(denominator).toString();
+  var fraction_part = ref._value.mod(denominator).toString();
 
   // Add leading zeros to fraction
   while (fraction_part.length < order) {

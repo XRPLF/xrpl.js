@@ -2,6 +2,7 @@
 var extend    = require('extend');
 
 var UInt160 = require('./uint160').UInt160;
+var Float = require('./float').Float;
 var utils = require('./utils');
 
 //
@@ -18,6 +19,8 @@ var Currency = extend(function () {
   // XXX Should support hex, C++ doesn't currently allow it.
 
   this._value  = NaN;
+
+  this._update();
 }, UInt160);
 
 Currency.prototype = extend({}, UInt160.prototype);
@@ -66,11 +69,62 @@ Currency.prototype.parse_json = function (j, shouldInterpretXrpAsIou) {
     case 'object':
       if (j instanceof Currency) {
         this._value = j.copyTo({})._value;
+        this._update();
       }
       break;
   }
 
   return this;
+};
+
+/**
+ * Recalculate internal representation.
+ *
+ * You should never need to call this.
+ */
+Currency.prototype._update = function () {
+  var bytes = this.to_bytes();
+
+  // is it 0 everywhere except 12, 13, 14?
+  var isZeroExceptInStandardPositions = true;
+
+  if (!bytes) {
+    return "XRP";
+  }
+
+  this._native = false;
+  this._type = -1;
+  this._interest_start = new Date();
+  this._interest_period = NaN;
+  this._iso_code = '';
+
+  for (var i=0; i<20; i++) {
+    isZeroExceptInStandardPositions = isZeroExceptInStandardPositions && (i===12 || i===13 || i===14 || bytes[i]===0);
+  }
+
+  if (isZeroExceptInStandardPositions) {
+    this._iso_code = String.fromCharCode(bytes[12])
+                   + String.fromCharCode(bytes[13])
+                   + String.fromCharCode(bytes[14]);
+
+    if (this._iso_code === "\0\0\0") {
+      this._native = true;
+      this._iso_code = "XRP";
+    }
+
+    this._type = 0;
+  } else if (bytes[0] === 0x01) { // Demurrage currency
+    this._iso_code = String.fromCharCode(bytes[1])
+                   + String.fromCharCode(bytes[2])
+                   + String.fromCharCode(bytes[3]);
+
+    this._type = 1;
+    this._interest_start = (bytes[4] << 24) +
+                           (bytes[5] << 16) +
+                           (bytes[6] <<  8) +
+                           (bytes[7]      );
+    this._interest_period = Float.fromBytes(bytes.slice(8, 16));
+  }
 };
 
 // XXX Probably not needed anymore?
@@ -108,7 +162,24 @@ Currency.prototype.parse_bytes = function (byte_array) {
 */
 
 Currency.prototype.is_native = function () {
-  return !isNaN(this._value) && this.is_zero();
+  return this._native;
+};
+
+/**
+ * Whether this currency is an interest-bearing/demurring currency.
+ */
+Currency.prototype.has_interest = function () {
+  return this._type === 1 && this._interest_start && !isNaN(this._interest_period);
+};
+
+Currency.prototype.get_interest_at = function (referenceDate) {
+  if (!this.has_interest) return 1;
+
+  if (referenceDate instanceof Date) {
+    referenceDate = utils.fromTimestamp(referenceDate.getTime());
+  }
+
+  return Math.pow(Math.E, (referenceDate - this._interest_start) / this._interest_period);
 };
 
 // XXX Currently we inherit UInt.prototype.is_valid, which is mostly fine.
@@ -121,42 +192,26 @@ Currency.prototype.is_native = function () {
 //};
 
 Currency.prototype.to_json = function () {
-  var bytes = this.to_bytes();
-
-  // is it 0 everywhere except 12, 13, 14?
-  var isZeroExceptInStandardPositions = true;
-
-  if (!bytes) {
+  if (!this.is_valid()) {
+    // XXX This backwards compatible behavior, but probably not very good.
     return "XRP";
   }
 
-  for (var i=0; i<20; i++) {
-    isZeroExceptInStandardPositions = isZeroExceptInStandardPositions && (i===12 || i===13 || i===14 || bytes[i]===0);
+  if (/^[A-Z0-9]{3}$/.test(this._iso_code)) {
+    return this._iso_code;
   }
 
-  if (isZeroExceptInStandardPositions) {
-    var currencyCode = String.fromCharCode(bytes[12])
-                     + String.fromCharCode(bytes[13])
-                     + String.fromCharCode(bytes[14]);
-    if (/^[A-Z0-9]{3}$/.test(currencyCode) && currencyCode !== "XRP" ) {
-      return currencyCode;
-    } else if (currencyCode === "\0\0\0") {
-      return "XRP";
-    } else {
-      return "XRP";
-    }
-  } else {
-    var currencyHex = this.to_hex();
+  // Fallback to returning the raw currency hex
+  var currencyHex = this.to_hex();
 
-    // XXX This is to maintain backwards compatibility, but it is very, very odd
-    //     behavior, so we should deprecate it and get rid of it as soon as
-    //     possible.
-    if (currencyHex === Currency.HEX_ONE) {
-      return 1;
-    }
-
-    return currencyHex;
+  // XXX This is to maintain backwards compatibility, but it is very, very odd
+  //     behavior, so we should deprecate it and get rid of it as soon as
+  //     possible.
+  if (currencyHex === Currency.HEX_ONE) {
+    return 1;
   }
+
+  return currencyHex;
 };
 
 Currency.prototype.to_human = function () {

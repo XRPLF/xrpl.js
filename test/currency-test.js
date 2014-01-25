@@ -10,6 +10,9 @@ describe('Currency', function() {
     it('json_rewrite("NaN") == "XRP"', function() {
       assert.strictEqual('XRP', currency.json_rewrite(NaN));
     });
+    it('json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000") == "XAU"', function() {
+      assert.strictEqual('XAU', currency.json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000"));
+    });
   });
   describe('from_json', function() {
     it('from_json(NaN).to_json() == "XRP"', function() {
@@ -50,6 +53,39 @@ describe('Currency', function() {
   describe('to_human', function() {
     it('should generate human string', function() {
       assert.strictEqual('XRP', currency.from_json('XRP').to_human());
+    });
+  });
+  describe('has_interest', function() {
+    it('should be true for type 1 currency codes', function() {
+      assert(currency.from_hex('015841551A748AD2C1F76FF6ECB0CCCD00000000').has_interest());
+      assert(currency.from_json('015841551A748AD2C1F76FF6ECB0CCCD00000000').has_interest());
+    });
+    it('should be false for type 0 currency codes', function() {
+      assert(!currency.from_hex('0000000000000000000000005553440000000000').has_interest());
+      assert(!currency.from_json('USD').has_interest());
+    });
+  });
+  function precision(num, precision) {
+    return +(Math.round(num + "e+"+precision)  + "e-"+precision);
+  }
+  describe('get_interest_at', function() {
+    it('returns demurred value for demurrage currency', function() {
+      var cur = currency.from_json('015841551A748AD2C1F76FF6ECB0CCCD00000000');
+
+      // At start, no demurrage should occur
+      assert.equal(1, cur.get_interest_at(443845330));
+
+      // After one year, 0.5% should have occurred
+      assert.equal(0.995, precision(cur.get_interest_at(443845330 + 31536000), 14));
+
+      // After one demurrage period, 1/e should have occurred
+      assert.equal(1/Math.E, cur.get_interest_at(443845330 + 6291418827.05));
+
+      // One year before start, it should be (roughly) 0.5% higher.
+      assert.equal(1.005, precision(cur.get_interest_at(443845330 - 31536000), 4));
+
+      // One demurrage period before start, rate should be e
+      assert.equal(Math.E, cur.get_interest_at(443845330 - 6291418827.05));
     });
   });
 });
