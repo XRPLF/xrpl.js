@@ -16,6 +16,8 @@ var UInt160 = extend(function () {
   // Internal form: NaN or BigInteger
   this._value  = NaN;
   this._version_byte = void(0);
+
+  this._update();
 }, UInt);
 
 UInt160.width = 20;
@@ -61,6 +63,8 @@ UInt160.prototype.parse_json = function (j) {
     this.parse_hex(j);
   }
 
+  this._update();
+
   return this;
 };
 
@@ -72,6 +76,8 @@ UInt160.prototype.parse_generic = function (j) {
       this._value = Base.decode_check(Base.VER_ACCOUNT_ID, j);
     }
   }
+
+  this._update();
 
   return this;
 };

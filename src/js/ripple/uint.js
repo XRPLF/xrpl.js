@@ -15,6 +15,8 @@ var Base = require('./base').Base;
 var UInt = function () {
   // Internal form: NaN or BigInteger
   this._value  = NaN;
+
+  this._update();
 };
 
 UInt.json_rewrite = function (j, opts) {
@@ -96,6 +98,8 @@ UInt.prototype.clone = function () {
 UInt.prototype.copyTo = function (d) {
   d._value = this._value;
 
+  if ("function" === typeof d._update) d._update();
+
   return d;
 };
 
@@ -109,6 +113,20 @@ UInt.prototype.is_valid = function () {
 
 UInt.prototype.is_zero = function () {
   return this._value.equals(BigInteger.ZERO);
+};
+
+/**
+ * Update any derivative values.
+ *
+ * This allows subclasses to maintain caches of any data that they derive from
+ * the main _value. For example, the Currency class keeps the currency type, the
+ * currency code and other information about the currency cached.
+ *
+ * The reason for keeping this mechanism in this class is so every subclass can
+ * call it whenever it modifies the internal state.
+ */
+UInt.prototype._update = function () {
+  // Nothing to do by default. Subclasses will override this.
 };
 
 // value = NaN on error.
@@ -150,6 +168,8 @@ UInt.prototype.parse_generic = function (j) {
     }
   }
 
+  this._update();
+
   return this;
 };
 
@@ -160,6 +180,8 @@ UInt.prototype.parse_hex = function (j) {
   } else {
     this._value  = NaN;
   }
+
+  this._update();
 
   return this;
 };
@@ -172,6 +194,8 @@ UInt.prototype.parse_bits = function (j) {
     this.parse_bytes(bytes);
   }
 
+  this._update();
+
   return this;
 };
 
@@ -182,6 +206,8 @@ UInt.prototype.parse_bytes = function (j) {
   } else {
 	  this._value  = new BigInteger([0].concat(j), 256);
   }
+
+  this._update();
 
   return this;
 };
@@ -198,6 +224,8 @@ UInt.prototype.parse_bn = function (j) {
     this._value = NaN;
   }
 
+  this._update();
+
   return this;
 };
 
@@ -210,6 +238,8 @@ UInt.prototype.parse_number = function (j) {
     // XXX Better, faster way to get BigInteger from JS int?
     this._value = new BigInteger(""+j);
   }
+
+  this._update();
 
   return this;
 };
