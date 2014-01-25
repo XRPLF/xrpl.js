@@ -137,6 +137,19 @@ function toTimestamp(rpepoch) {
   return (rpepoch + 0x386D4380) * 1000;
 };
 
+/**
+ * Convert a JavaScript timestamp or Date to a Ripple epoch.
+ *
+ * JavaScript timestamps are unix epoch in milliseconds.
+ */
+function fromTimestamp(rpepoch) {
+  if (rpepoch instanceof Date) {
+    rpepoch = rpepoch.getTime();
+  }
+
+  return Math.round(rpepoch/1000) - 0x386D4380;
+};
+
 exports.trace         = trace;
 exports.arraySet      = arraySet;
 exports.hexToString   = hexToString;
@@ -148,6 +161,7 @@ exports.logObject     = logObject;
 exports.assert        = assert;
 exports.arrayUnique   = arrayUnique;
 exports.toTimestamp   = toTimestamp;
+exports.fromTimestamp = fromTimestamp;
 
 // Going up three levels is needed to escape the src-cov folder used for the
 // test coverage stuff.
