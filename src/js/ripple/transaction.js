@@ -306,6 +306,7 @@ Transaction.prototype.addId = function(hash) {
   if (this.submittedIDs.indexOf(hash) === -1) {
     this.submittedIDs.unshift(hash);
     this.emit('signed', hash);
+    this.transactionManager()._pending.save();
   }
 };
 

@@ -17,14 +17,12 @@ function TransactionManager(account) {
   this._account           = account;
   this._accountID         = account._account_id;
   this._remote            = account._remote;
-  this._pending           = new PendingQueue;
   this._nextSequence      = void(0);
-  // ND: Do we ever clean this up?
   this._maxFee            = this._remote.max_fee;
   this._submissionTimeout = this._remote._submission_timeout;
+  this._pending           = new PendingQueue;
 
-  // Query remote server for next account
-  // transaction sequence number
+  // Query remote server for next account sequence number
   this._loadSequence();
 
   function transactionReceived(res) {
@@ -90,13 +88,13 @@ function TransactionManager(account) {
 
   this._remote.on('ledger_closed', updatePendingStatus);
 
-  function remoteReconnected() {
+  function remoteReconnected(callback) {
     //Load account transaction history
     var options = {
       account: self._accountID,
       ledger_index_min: -1,
       ledger_index_max: -1,
-      limit: 10
+      limit: 100
     }
 
     self._remote.requestAccountTx(options, function(err, transactions) {
@@ -110,6 +108,10 @@ function TransactionManager(account) {
       self._loadSequence(function sequenceLoaded() {
         self._resubmit();
       });
+
+      if (typeof callback === 'function') {
+        callback();
+      }
     });
 
     self.emit('reconnect');
@@ -121,6 +123,29 @@ function TransactionManager(account) {
   };
 
   this._remote.on('disconnect', remoteDisconnected);
+
+  function resendPending() {
+    self._remote.storage.loadAccount(self._accountID, function(err, data) {
+      if (err || !data) return;
+
+      (data || [ ]).forEach(function(tx) {
+        var transaction = self._remote.transaction();
+        transaction.parseJson(tx.tx_json);
+        transaction.submittedIDs = tx.submittedIDs;
+        self.submit(transaction);
+      });
+    });
+  };
+
+  function savePending(pending) {
+    // Save the current state of the pending transaction list
+    self._remote.storage.saveAccount(self._accountID, pending);
+  };
+
+  if (this._remote.storage) {
+    remoteReconnected(resendPending);
+    this._pending._save = savePending;
+  }
 };
 
 util.inherits(TransactionManager, EventEmitter);
@@ -232,11 +257,6 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
       pending.tx_json.Sequence += 1;
     }
 
-    pending.once('submitted', function(m) {
-      pending.emit('resubmitted', m);
-      self._loadSequence();
-    });
-
     self._request(pending);
   };
 
@@ -246,13 +266,17 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
 
       if (!(transaction instanceof Transaction)) return;
 
-      resubmitTransaction(transaction);
+      transaction.once('submitted', function(m) {
+        transaction.emit('resubmitted', m);
 
-      transaction.once('submitted', function() {
+        self._loadSequence();
+
         if (++i < pending.length) {
           nextTransaction(i);
         }
       });
+
+      resubmitTransaction(transaction);
     })(0);
   };
 
@@ -282,21 +306,21 @@ TransactionManager.prototype._request = function(tx) {
   var remote = this._remote;
 
   if (tx.attempts > 10) {
-    tx.emit('error', new RippleError('tejAttemptsExceeded'));
-    return;
-  } else if (tx.attempts > 0 && !remote.local_signing
-             // && tx.submittedTxnIDs.length != tx.attempts
+    return tx.emit('error', new RippleError('tejAttemptsExceeded'));
+  }
 
-            // ^^^ Above commented out intentionally
+  if (tx.attempts > 0 && !remote.local_signing) {
+    // && tx.submittedTxnIDs.length != tx.attempts
+    // ^^^ Above commented out intentionally
+    //  ^^^^ We might be a bit cleverer about allowing this in SOME cases, but
+    // it's not really worth it, and would be prone to error. Use
+    // `local_signing`
 
-            //  ^^^^ We might be a bit cleverer about allowing this in SOME cases, but
-            // it's not really worth it, and would be prone to error. Use
-            // `local_signing`
+    var message = ''
+    + 'It is not possible to resubmit transactions automatically safely without '
+    + 'synthesizing the transactionID locally. See `local_signing` config option';
 
-             ) {
-    tx.emit('error', new RippleError('tejTxnResubmitWithoutLocalSigning',
-      'It\s not possible to resubmit transactions automatically safely without ' +
-      'synthesizing the transactionID locally. See `local_signing` config option'));
+    return tx.emit('error', new RippleError('tejLocalSigning', message));
   }
 
   var submitRequest = remote.requestSubmit();
@@ -384,19 +408,20 @@ TransactionManager.prototype._request = function(tx) {
     tx.emit('submitted', message);
 
     switch (message.result.slice(0, 3)) {
-      case 'tec':
-        transactionFeeClaimed(message);
-        break;
       case 'tes':
         transactionProposed(message);
         break;
-      case 'tef':
-        transactionFailed(message);
+      case 'tec':
+        transactionFeeClaimed(message);
         break;
       case 'ter':
         transactionRetry(message);
         break;
+      case 'tef':
+        transactionFailed(message);
+        break;
       default:
+        //tel, tem
         submissionError(message);
     }
   };
@@ -486,6 +511,7 @@ TransactionManager.prototype.submit = function(tx) {
   }
 
   tx.submitIndex = this._remote._ledger_current_index;
+  //tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
   tx.lastLedger  = void(0);
   tx.attempts    = 0;
   tx.complete();
@@ -494,7 +520,6 @@ TransactionManager.prototype.submit = function(tx) {
     if (!tx.finalized) {
       // ND: We can just remove this `tx` by identity
       self._pending.remove(tx);
-      // self._pending.removeHash(tx._hash);
       remote._trace('transactionmanager: finalize_transaction:', tx.tx_json);
       tx.finalized = true;
       tx.emit('final', message);

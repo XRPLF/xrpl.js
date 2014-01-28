@@ -16,7 +16,6 @@
 // npm
 var EventEmitter = require('events').EventEmitter;
 var util         = require('util');
-
 var Request      = require('./request').Request;
 var Server       = require('./server').Server;
 var Amount       = require('./amount').Amount;
@@ -190,6 +189,19 @@ function Remote(opts, trace) {
   };
 
   this.on('removeListener', listenerRemoved);
+
+  function addPendingAccounts() {
+    opts.storage.loadAccounts(function(err, accounts) {
+      if (!err && Array.isArray(accounts)) {
+        accounts.forEach(self.account.bind(self));
+      }
+    });
+  };
+
+  if (opts.storage) {
+    this.storage = opts.storage;
+    this.once('connect', addPendingAccounts);
+  }
 };
 
 util.inherits(Remote, EventEmitter);
