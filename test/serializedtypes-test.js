@@ -793,6 +793,21 @@ describe('Serialized types', function() {
   });
 
   describe('Object', function() {
+    it('Can parse objects with VL encoded Vector256', function() {
+      var hex = '110064220000000058000360186E008422E06B72D5B275E29EE3BE9D87A370F424E0E7BF613C4659098214289D19799C892637306AAAF03805EDFCDF6C28B8011320081342A0AB45459A54D8E4FA1842339A102680216CF9A152BCE4F4CE467D8246';
+      var so  = new SerializedObject(hex);
+      var as_json = so.to_json();
+      var expected_json = {
+        "LedgerEntryType": "DirectoryNode", 
+        "Owner": "rh6kN9s7spSb3vdv6H8ZGYzsddSLeEUGmc", 
+        "Flags": 0, 
+        "Indexes": [
+          "081342A0AB45459A54D8E4FA1842339A102680216CF9A152BCE4F4CE467D8246"
+        ], 
+        "RootIndex": "000360186E008422E06B72D5B275E29EE3BE9D87A370F424E0E7BF613C465909"
+      }
+      assert.deepEqual(as_json, expected_json);
+    });
     it('Serialize empty object {}', function () {
       var so = new SerializedObject();
       types.Object.serialize(so, {});

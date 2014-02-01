@@ -570,7 +570,8 @@ var STVector256 = exports.Vector256 = new SerializedType({
   parse: function (so) {
     var length = this.parse_varint(so);
     var output = [];
-    for (var i=0; i<length; i++) {
+    // length is number of bytes not number of Hash256
+    for (var i=0; i<length / 32; i++) {
       output.push(STHash256.parse(so));
     }
     return output;
