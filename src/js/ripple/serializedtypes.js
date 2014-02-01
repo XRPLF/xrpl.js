@@ -562,7 +562,7 @@ STPathSet.id = 18;
 
 var STVector256 = exports.Vector256 = new SerializedType({
   serialize: function (so, val) { //Assume val is an array of STHash256 objects.
-    var length_as_varint = SerializedType.serialize_varint(so, val.length);
+    var length_as_varint = SerializedType.serialize_varint(so, val.length * 32);
     for (var i=0, l=val.length; i<l; i++) {
       STHash256.serialize(so, val[i]);
     }
