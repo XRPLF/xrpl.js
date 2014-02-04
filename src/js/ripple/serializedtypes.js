@@ -667,7 +667,7 @@ var STObject = exports.Object = new SerializedType({
 
     keys.forEach(function (key) {
       if ("undefined" === typeof INVERSE_FIELDS_MAP[key]) {
-        throw new Error("JSON contains unknown field.");
+        throw new Error("JSON contains unknown field: '" + key + "'");
       }
     });
 
