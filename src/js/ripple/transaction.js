@@ -134,7 +134,7 @@ Transaction.prototype.consts = {
 };
 
 Transaction.from_json = function(j) {
-  return (new Transaction()).parse_json(j);
+  return (new Transaction()).parseJson(j);
 };
 
 Transaction.prototype.parseJson = function(v) {
