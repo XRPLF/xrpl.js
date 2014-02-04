@@ -665,6 +665,12 @@ var STObject = exports.Object = new SerializedType({
       return key[0] !== key[0].toLowerCase();
     });
 
+    keys.forEach(function (key) {
+      if ("undefined" === typeof INVERSE_FIELDS_MAP[key]) {
+        throw new Error("JSON contains unknown field.");
+      }
+    });
+
     // Sort fields
     keys = sort_fields(keys);
 
