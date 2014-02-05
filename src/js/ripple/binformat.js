@@ -199,72 +199,72 @@ var REQUIRED = exports.REQUIRED = 0,
     DEFAULT  = exports.DEFAULT  = 2;
 
 var base = [
-  [ 'TransactionType'    , REQUIRED,  2, "Int16" ],
-  [ 'Flags'              , OPTIONAL,  2, "Int32" ],
-  [ 'SourceTag'          , OPTIONAL,  3, "Int32" ],
-  [ 'Account'            , REQUIRED,  1, "Account" ],
-  [ 'Sequence'           , REQUIRED,  4, "Int32" ],
-  [ 'Fee'                , REQUIRED,  8, "Amount" ],
-  [ 'OperationLimit'     , OPTIONAL, 29, "Int32" ],
-  [ 'SigningPubKey'      , REQUIRED,  3, "VariableLength" ],
-  [ 'TxnSignature'       , OPTIONAL,  4, "VariableLength" ]
+  [ 'TransactionType'    , REQUIRED ],
+  [ 'Flags'              , OPTIONAL ],
+  [ 'SourceTag'          , OPTIONAL ],
+  [ 'Account'            , REQUIRED ],
+  [ 'Sequence'           , REQUIRED ],
+  [ 'Fee'                , REQUIRED ],
+  [ 'OperationLimit'     , OPTIONAL ],
+  [ 'SigningPubKey'      , REQUIRED ],
+  [ 'TxnSignature'       , OPTIONAL ]
 ];
 
 exports.tx = {
   AccountSet: [3].concat(base, [
-    [ 'EmailHash'          , OPTIONAL,  1, "Hash128" ],
-    [ 'WalletLocator'      , OPTIONAL,  7, "Hash256" ],
-    [ 'WalletSize'         , OPTIONAL, 12, "Int32" ],
-    [ 'MessageKey'         , OPTIONAL,  2, "VariableLength" ],
-    [ 'Domain'             , OPTIONAL,  7, "VariableLength" ],
-    [ 'TransferRate'       , OPTIONAL, 11, "Int32" ]
+    [ 'EmailHash'          , OPTIONAL ],
+    [ 'WalletLocator'      , OPTIONAL ],
+    [ 'WalletSize'         , OPTIONAL ],
+    [ 'MessageKey'         , OPTIONAL ],
+    [ 'Domain'             , OPTIONAL ],
+    [ 'TransferRate'       , OPTIONAL ]
   ]),
   TrustSet: [20].concat(base, [
-    [ 'LimitAmount'        , OPTIONAL,  3, "Amount" ],
-    [ 'QualityIn'          , OPTIONAL, 20, "Int32" ],
-    [ 'QualityOut'         , OPTIONAL, 21, "Int32" ]
+    [ 'LimitAmount'        , OPTIONAL ],
+    [ 'QualityIn'          , OPTIONAL ],
+    [ 'QualityOut'         , OPTIONAL ]
   ]),
   OfferCreate: [7].concat(base, [
-    [ 'TakerPays'          , REQUIRED,  4, "Amount" ],
-    [ 'TakerGets'          , REQUIRED,  5, "Amount" ],
-    [ 'Expiration'         , OPTIONAL, 10, "Int32" ]
+    [ 'TakerPays'          , REQUIRED ],
+    [ 'TakerGets'          , REQUIRED ],
+    [ 'Expiration'         , OPTIONAL ]
   ]),
   OfferCancel: [8].concat(base, [
-    [ 'OfferSequence'      , REQUIRED, 25, "Int32" ]
+    [ 'OfferSequence'      , REQUIRED ]
   ]),
   SetRegularKey: [5].concat(base, [
-    [ 'RegularKey'         , REQUIRED,  8, "Account" ]
+    [ 'RegularKey'         , REQUIRED ]
   ]),
   Payment: [0].concat(base, [
-    [ 'Destination'        , REQUIRED,  3, "Account" ],
-    [ 'Amount'             , REQUIRED,  1, "Amount" ],
-    [ 'SendMax'            , OPTIONAL,  9, "Amount" ],
-    [ 'Paths'              , DEFAULT ,  1, "PathSet" ],
-    [ 'InvoiceID'          , OPTIONAL, 17, "Hash256" ],
-    [ 'DestinationTag'     , OPTIONAL, 14, "Int32" ]
+    [ 'Destination'        , REQUIRED ],
+    [ 'Amount'             , REQUIRED ],
+    [ 'SendMax'            , OPTIONAL ],
+    [ 'Paths'              , DEFAULT  ],
+    [ 'InvoiceID'          , OPTIONAL ],
+    [ 'DestinationTag'     , OPTIONAL ]
   ]),
   Contract: [9].concat(base, [
-    [ 'Expiration'         , REQUIRED, 10, "Int32" ],
-    [ 'BondAmount'         , REQUIRED, 23, "Int32" ],
-    [ 'StampEscrow'        , REQUIRED, 22, "Int32" ],
-    [ 'RippleEscrow'       , REQUIRED, 17, "Amount" ],
-    [ 'CreateCode'         , OPTIONAL, 11, "VariableLength" ],
-    [ 'FundCode'           , OPTIONAL,  8, "VariableLength" ],
-    [ 'RemoveCode'         , OPTIONAL,  9, "VariableLength" ],
-    [ 'ExpireCode'         , OPTIONAL, 10, "VariableLength" ]
+    [ 'Expiration'         , REQUIRED ],
+    [ 'BondAmount'         , REQUIRED ],
+    [ 'StampEscrow'        , REQUIRED ],
+    [ 'RippleEscrow'       , REQUIRED ],
+    [ 'CreateCode'         , OPTIONAL ],
+    [ 'FundCode'           , OPTIONAL ],
+    [ 'RemoveCode'         , OPTIONAL ],
+    [ 'ExpireCode'         , OPTIONAL ]
   ]),
   RemoveContract: [10].concat(base, [
-    [ 'Target'             , REQUIRED,  7, "Account" ]
+    [ 'Target'             , REQUIRED ]
   ]),
   EnableFeature: [100].concat(base, [
-    [ 'Feature'            , REQUIRED, 19, "Hash256" ]
+    [ 'Feature'            , REQUIRED ]
   ]),
   SetFee: [101].concat(base, [
-    [ 'Features'           , REQUIRED,  9, "Array" ],
-    [ 'BaseFee'            , REQUIRED,  5, "Int64" ],
-    [ 'ReferenceFeeUnits'  , REQUIRED, 30, "Int32" ],
-    [ 'ReserveBase'        , REQUIRED, 31, "Int32" ],
-    [ 'ReserveIncrement'   , REQUIRED, 32, "Int32" ]
+    [ 'Features'           , REQUIRED ],
+    [ 'BaseFee'            , REQUIRED ],
+    [ 'ReferenceFeeUnits'  , REQUIRED ],
+    [ 'ReserveBase'        , REQUIRED ],
+    [ 'ReserveIncrement'   , REQUIRED ]
   ])
 };
 
@@ -282,9 +282,9 @@ exports.ledger = {
 };
 
 exports.metadata = [
-  [ 'TransactionIndex'     , REQUIRED, 28, "Int32" ],
-  [ 'TransactionResult'    , REQUIRED,  3, "Int8" ],
-  [ 'AffectedNodes'        , REQUIRED,  8, "Array" ]
+  [ 'TransactionIndex'     , REQUIRED ],
+  [ 'TransactionResult'    , REQUIRED ],
+  [ 'AffectedNodes'        , REQUIRED ]
 ];
 
 exports.ter = {
