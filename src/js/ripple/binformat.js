@@ -102,6 +102,7 @@ var FIELDS_MAP = exports.fields = {
     6: 'LedgerIndex',
     7: 'WalletLocator',
     8: 'RootIndex',
+    9: 'AccountTxnID',
     16: 'BookDirectory',
     17: 'InvoiceID',
     18: 'Nickname',
@@ -118,7 +119,8 @@ var FIELDS_MAP = exports.fields = {
     8: 'Fee',
     9: 'SendMax',
     16: 'MinimumOffer',
-    17: 'RippleEscrow'
+    17: 'RippleEscrow',
+    18: 'DeliveredAmount'
   },
   7: { // VL
     1: 'PublicKey',
