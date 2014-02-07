@@ -37,7 +37,7 @@
 //   forwarded anyway.
 // - A malicous server can:
 //   - give any proposed result.
-//     - it may declare something correct as incorrect or something correct as incorrect.
+//     - it may declare something correct as incorrect or something incorrect as correct.
 //     - it may not communicate with the rest of the network.
 //   - may or may not forward.
 //
