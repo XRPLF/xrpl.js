@@ -13,7 +13,6 @@
 // YYY Will later provide js/network.js which will transparently use multiple
 // instances of this class for network access.
 
-// npm
 var EventEmitter = require('events').EventEmitter;
 var util         = require('util');
 var Request      = require('./request').Request;
@@ -201,6 +200,18 @@ function Remote(opts, trace) {
   if (opts.storage) {
     this.storage = opts.storage;
     this.once('connect', addPendingAccounts);
+  }
+
+  function pingServers() {
+    var pingRequest = self.requestPing();
+    pingRequest.on('error', function(){});
+    pingRequest.broadcast();
+  };
+
+  if (opts.ping) {
+    this.once('connect', function() {
+      self._pingInterval = setInterval(pingServers, Number(opts.ping));
+    });
   }
 };
 
@@ -920,6 +931,77 @@ Remote.prototype.requestAccountTx = function(options, callback) {
     }
   }
 
+  function accountTxFilter(fn) {
+    if (typeof fn !== 'function') {
+      throw new Error('Missing filter function');
+    }
+
+    var self = this;
+
+    function filterHandler() {
+      var listeners = self.listeners('success');
+
+      self.removeAllListeners('success');
+
+      self.once('success', function(res) {
+        res.transactions = res.transactions.filter(fn);
+
+        if (typeof options.map === 'function') {
+          res.transactions = res.transactions.map(options.map);
+        }
+
+        if (typeof options.reduce === 'function') {
+          res.transactions = res.transactions.reduce(options.reduce);
+        }
+
+        if (typeof options.pluck === 'string') {
+          res = res[options.pluck];
+        }
+
+        listeners.forEach(function(listener) {
+          listener.call(self, res);
+        });
+      });
+    };
+
+    this.once('request', filterHandler);
+
+    return this;
+  };
+
+  request.filter = accountTxFilter;
+
+  function propertiesFilter(obj, transaction) {
+    var properties = Object.keys(obj);
+    return function(transaction) {
+      var result = properties.every(function(property) {
+        return transaction.tx[property] === obj[property];
+      });
+      return result;
+    };
+  };
+
+  if (!options.filter && (options.map || options.reduce)) {
+    options.filter = Boolean;
+  }
+
+  if (options.filter) {
+    switch (options.filter) {
+      case 'inbound':
+        request.filter(propertiesFilter({ Destination: options.account }));
+        break;
+      case 'outbound':
+        request.filter(propertiesFilter({ Account: options.account }));
+        break;
+      default:
+        if (typeof options.filter === 'object') {
+          options.filter = propertiesFilter(options.filter);
+        }
+
+        request.filter(options.filter);
+    }
+  }
+
   request.callback(callback);
 
   return request;
@@ -1556,6 +1638,7 @@ Remote.prototype.reserve = function(owner_count) {
   return this._getServer().reserve(owner_count);
 };
 
+Remote.prototype.requestPing =
 Remote.prototype.ping = function(host, callback) {
   var request = new Request(this, 'ping');
 
