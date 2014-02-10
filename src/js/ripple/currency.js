@@ -193,11 +193,13 @@ Currency.prototype.get_interest_at = function (referenceDate) {
 
 Currency.prototype.to_json = function () {
   if (!this.is_valid()) {
-    // XXX This backwards compatible behavior, but probably not very good.
+    // XXX This is backwards compatible behavior, but probably not very good.
     return "XRP";
   }
 
-  if (/^[A-Z0-9]{3}$/.test(this._iso_code)) {
+  // Any currency with standard properties and a valid code can be abbreviated
+  // in the JSON wire format as the three character code.
+  if (/^[A-Z0-9]{3}$/.test(this._iso_code) && !this.has_interest()) {
     return this._iso_code;
   }
 
@@ -215,6 +217,11 @@ Currency.prototype.to_json = function () {
 };
 
 Currency.prototype.to_human = function () {
+  // to_human() will always print the human-readable currency code if available.
+  if (/^[A-Z0-9]{3}$/.test(this._iso_code)) {
+    return this._iso_code;
+  }
+
   return this.to_json();
 };
 

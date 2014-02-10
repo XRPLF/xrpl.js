@@ -10,8 +10,9 @@ describe('Currency', function() {
     it('json_rewrite("NaN") == "XRP"', function() {
       assert.strictEqual('XRP', currency.json_rewrite(NaN));
     });
-    it('json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000") == "XAU"', function() {
-      assert.strictEqual('XAU', currency.json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000"));
+    it('json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000") == "015841551A748AD2C1F76FF6ECB0CCCD00000000"', function() {
+      assert.strictEqual(currency.json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000"),
+                         '015841551A748AD2C1F76FF6ECB0CCCD00000000');
     });
   });
   describe('from_json', function() {
@@ -25,6 +26,18 @@ describe('Currency', function() {
       assert(r.is_valid());
       assert(r.is_native());
       assert.strictEqual('XRP', r.to_json());
+    });
+  });
+  describe('to_human', function() {
+    it('"USD".to_human() == "USD"', function() {
+      assert.strictEqual('USD', currency.from_json('USD').to_human());
+    });
+    it('"NaN".to_human() == "XRP"', function() {
+      assert.strictEqual('XRP', currency.from_json(NaN).to_human());
+    });
+    it('"015841551A748AD2C1F76FF6ECB0CCCD00000000") == "015841551A748AD2C1F76FF6ECB0CCCD00000000"', function() {
+      assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human(),
+                         'XAU');
     });
   });
   describe('parse_json(currency obj)', function() {
