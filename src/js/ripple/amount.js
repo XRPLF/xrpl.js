@@ -75,8 +75,8 @@ Amount.from_quality = function (q, c, i) {
   return (new Amount()).parse_quality(q, c, i);
 };
 
-Amount.from_human = function (j) {
-  return (new Amount()).parse_human(j);
+Amount.from_human = function (j, opts) {
+  return (new Amount()).parse_human(j, opts);
 };
 
 Amount.is_valid = function (j) {
@@ -545,9 +545,11 @@ Amount.prototype.invert = function () {
  *   USD 100.40  => 100.4/USD/?
  *   100         => 100000000/XRP
  */
-Amount.human_RE = /^\s*([a-z]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([a-z]{3})?\s*$/i;
+Amount.human_RE = /^\s*([a-z]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([a-f0-9]{40}|[a-z0-9]{3})?\s*$/i;
 
-Amount.prototype.parse_human = function (j) {
+Amount.prototype.parse_human = function (j, opts) {
+  opts = opts || {};
+
   var m = String(j).match(Amount.human_RE);
 
   if (m) {
@@ -583,6 +585,26 @@ Amount.prototype.parse_human = function (j) {
     }
 
     this._is_negative = !!m[2];
+
+    // Apply interest/demurrage
+    if (opts.reference_date && this._currency.has_interest()) {
+      var interest = this._currency.get_interest_at(opts.reference_date);
+
+      // XXX Because the Amount parsing routines don't support some of the things
+      //     that JavaScript can output when casting a float to a string, the
+      //     following call sometimes does not produce a valid Amount.
+      //
+      //     The correct way to solve this is probably to switch to a proper
+      //     BigDecimal for our internal representation and then use that across
+      //     the board instead of instantiating these dummy Amount objects.
+      var interestTempAmount = Amount.from_json(""+interest+"/1/1");
+
+      if (interestTempAmount.is_valid()) {
+        var ref = this.divide(interestTempAmount);
+        this._value = ref._value;
+        this._offset = ref._offset;
+      }
+    }
   } else {
     this._value = NaN;
   }
@@ -958,7 +980,7 @@ Amount.prototype.to_human = function (opts) {
 };
 
 Amount.prototype.to_human_full = function (opts) {
-  var opts = opts || {};
+  opts = opts || {};
   var a = this.to_human(opts);
   var c = this._currency.to_human();
   var i = this._issuer.to_json(opts);
