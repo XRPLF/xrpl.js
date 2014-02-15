@@ -811,7 +811,7 @@ describe('Serialized types', function() {
         // This is an encoded reminder/TODO:
         // Serializing ledger entries isn't currently supported, but when it
         // is, this should no longer throw, and the test will fail
-        assert.strictEqual(SerializedObject.from_json(expected_json).to_hex(), hex);
+        /*assert.strictEqual(*/SerializedObject.from_json(expected_json).to_hex()/*, hex)*/;
       })
     });
     it('Serialize empty object {}', function () {
