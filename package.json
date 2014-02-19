@@ -12,10 +12,11 @@
     "test": "test"
   },
   "dependencies": {
-    "async": "~0.2.9",
+    "async": "~0.2.10",
     "ws": "~0.4.31",
     "extend": "~1.2.1",
-    "jshint-loader": "~0.5.0"
+    "jshint-loader": "~0.5.0",
+    "lru-cache": "~2.5.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -26,7 +27,7 @@
     "grunt-dox": "~0.5.0",
     "mocha": "~1.14.0",
     "sinon-chai": "~2.4.0",
-    "sinon":"~1.7.3"
+    "sinon": "~1.7.3"
   },
   "scripts": {
     "pretest": "node_modules/.bin/grunt",
