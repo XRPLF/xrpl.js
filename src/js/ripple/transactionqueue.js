@@ -6,10 +6,17 @@
 var Transaction = require('./transaction').Transaction;
 
 function TransactionQueue() {
+  var self = this;
+
   this._queue         = [ ];
   this._idCache       = { };
   this._sequenceCache = { };
   this._save          = void(0);
+};
+
+TransactionQueue.prototype.clearCache = function() {
+  this._idCache       = { };
+  this._sequenceCache = { };
 };
 
 TransactionQueue.prototype.save = function() {
@@ -87,6 +94,10 @@ TransactionQueue.prototype.remove = function(tx) {
       this._queue.splice(i, 1);
       break;
     }
+  }
+
+  if (!this._queue.length) {
+    this.clearCache();
   }
 
   this.save();
