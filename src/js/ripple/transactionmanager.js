@@ -89,12 +89,19 @@ function TransactionManager(account) {
   this._remote.on('ledger_closed', updatePendingStatus);
 
   function remoteReconnected(callback) {
+    var callback = typeof callback === 'function' ? callback : function(){};
+
+    if (!self._pending.length) {
+      return callback();
+    }
+
     //Load account transaction history
     var options = {
       account: self._accountID,
       ledger_index_min: -1,
       ledger_index_max: -1,
-      limit: 100
+      limit: 100,
+      filter: 'outbound'
     }
 
     self._remote.requestAccountTx(options, function(err, transactions) {
@@ -109,9 +116,7 @@ function TransactionManager(account) {
         self._resubmit();
       });
 
-      if (typeof callback === 'function') {
-        callback();
-      }
+      callback();
     });
 
     self.emit('reconnect');
@@ -124,7 +129,7 @@ function TransactionManager(account) {
 
   this._remote.on('disconnect', remoteDisconnected);
 
-  function resendPending() {
+  function resendPending(callback) {
     self._remote.storage.loadAccount(self._accountID, function(err, data) {
       if (err || !data) return;
 
@@ -134,6 +139,10 @@ function TransactionManager(account) {
         transaction.submittedIDs = tx.submittedIDs;
         self.submit(transaction);
       });
+
+      if (typeof callback === 'function') {
+        callback();
+      }
     });
   };
 
@@ -143,7 +152,7 @@ function TransactionManager(account) {
   };
 
   if (this._remote.storage) {
-    remoteReconnected(resendPending);
+    resendPending(remoteReconnected);
     this._pending._save = savePending;
   }
 };
