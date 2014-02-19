@@ -104,8 +104,8 @@ function TransactionManager(account) {
       filter: 'outbound'
     }
 
-    self._remote.requestAccountTx(options, function(err, transactions) {
-      if (!err && transactions.transactions) {
+    function accountTx(err, transactions) {
+      if (!err && Array.isArray(transactions.transactions)) {
         transactions.transactions.forEach(transactionReceived);
       }
 
@@ -117,7 +117,9 @@ function TransactionManager(account) {
       });
 
       callback();
-    });
+    };
+
+    self._remote.requestAccountTx(options, accountTx);
 
     self.emit('reconnect');
   };
@@ -130,20 +132,22 @@ function TransactionManager(account) {
   this._remote.on('disconnect', remoteDisconnected);
 
   function resendPending(callback) {
-    self._remote.storage.loadAccount(self._accountID, function(err, data) {
-      if (err || !data) return;
+    var callback = typeof callback === 'function' ? callback : function(){};
 
-      (data || [ ]).forEach(function(tx) {
+    function accountLoaded(err, data) {
+      if (err || !(Array.isArray(data))) return;
+
+      data.forEach(function(tx) {
         var transaction = self._remote.transaction();
         transaction.parseJson(tx.tx_json);
         transaction.submittedIDs = tx.submittedIDs;
         self.submit(transaction);
       });
 
-      if (typeof callback === 'function') {
-        callback();
-      }
-    });
+      callback();
+    };
+
+    self._remote.storage.loadAccount(self._accountID, accountLoaded);
   };
 
   function savePending(pending) {
@@ -436,7 +440,20 @@ TransactionManager.prototype._request = function(tx) {
     }
   };
 
-  submitRequest.timeout(this._submissionTimeout, function requestTimeout() {
+
+  submitRequest.once('error', submitted);
+  submitRequest.once('success', submitted);
+
+  if (tx._server) {
+    submitRequest.server = tx._server;
+  }
+
+  submitRequest.request();
+
+  tx.setState('client_submitted');
+  tx.attempts++;
+
+  function requestTimeout() {
     // ND: What if the response is just slow and we get a response that
     // `submitted` above will cause to have concurrent resubmit logic streams?
     // It's simpler to just mute handlers and look out for finalized
@@ -455,19 +472,9 @@ TransactionManager.prototype._request = function(tx) {
       remote._trace('transactionmanager: timeout:', tx.tx_json);
       self._resubmit(3, tx);
     }
-  });
+  };
 
-  submitRequest.once('error', submitted);
-  submitRequest.once('success', submitted);
-
-  if (tx._server) {
-    submitRequest.server = tx._server;
-  }
-
-  submitRequest.request();
-
-  tx.setState('client_submitted');
-  tx.attempts++;
+  submitRequest.timeout(this._submissionTimeout, requestTimeout);
 
   return submitRequest;
 };

@@ -19,6 +19,31 @@ TransactionQueue.prototype.clearCache = function() {
   this._sequenceCache = { };
 };
 
+TransactionQueue.prototype.getMinLedger = function() {
+  var minLedger = Infinity;
+
+  for (var i=0; i<this._queue.length; i++) {
+    var submitIndex = this._queue[i].submitIndex;
+
+    if (typeof submitIndex !== 'number') {
+      // If any pending transactions don't have a submit index,
+      // return -1 for scanning all previous transactions
+      minLedger = -1;
+      break;
+    }
+
+    if (submitIndex < minLedger) {
+      minLedger = submitIndex;
+    }
+  };
+
+  if (!isFinite(minLedger)) minLedger = -1;
+
+  if (minLedger !== -1) minLedger -= 1;
+
+  return minLedger;
+};
+
 TransactionQueue.prototype.save = function() {
   if (typeof this._save !== 'function') return;
 
