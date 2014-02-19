@@ -210,7 +210,8 @@ function Remote(opts, trace) {
 
   if (opts.ping) {
     this.once('connect', function() {
-      self._pingInterval = setInterval(pingServers, Number(opts.ping));
+      var interval = Number(opts.ping) * 1000;
+      self._pingInterval = setInterval(pingServers, interval);
     });
   }
 };
