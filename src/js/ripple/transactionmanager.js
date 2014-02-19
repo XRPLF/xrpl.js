@@ -339,6 +339,7 @@ TransactionManager.prototype._request = function(tx) {
     // TODO: We are serializing twice, when we could/should be feeding the
     // tx_blob to `tx.hash()` which rebuilds it to sign it.
     submitRequest.tx_blob(tx.serialize().to_hex());
+
     // ND: ecdsa produces a random `TxnSignature` field value, a component of
     // the hash. Attempting to identify a transaction via a hash synthesized
     // locally while using remote signing is inherently flawed.
@@ -520,7 +521,7 @@ TransactionManager.prototype.submit = function(tx) {
   }
 
   tx.submitIndex = this._remote._ledger_current_index;
-  //tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
+  tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
   tx.lastLedger  = void(0);
   tx.attempts    = 0;
   tx.complete();
