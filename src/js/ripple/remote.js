@@ -102,7 +102,7 @@ function Remote(opts, trace) {
   this._connection_offset    = 1000 * (typeof opts.connection_offset === 'number' ? opts.connection_offset : 5)
   this._submission_timeout   = 1000 * (typeof opts.submission_timeout === 'number' ? opts.submission_timeout : 10)
 
-  this._received_tx          = LRU({ max: 10 });
+  this._received_tx          = LRU({ max: 100 });
   this._cur_path_find        = null;
 
   // Local signing implies local fees and sequences
