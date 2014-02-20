@@ -371,7 +371,8 @@ TransactionManager.prototype._request = function(tx) {
   function transactionFailed(message) {
     switch (message.engine_result) {
       case 'tefPAST_SEQ':
-        self._resubmit(3, tx);
+      case 'tefMAX_LEDGER':
+        self._resubmit(1, tx);
         break;
       default:
         tx.emit('error', message);
