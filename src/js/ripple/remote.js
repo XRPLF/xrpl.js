@@ -835,13 +835,14 @@ Remote.prototype.requestTx = function(hash, callback) {
   return request;
 };
 
-Remote.accountRequest = function(type, account, accountIndex, ledger, callback) {
+Remote.accountRequest = function(type, account, accountIndex, ledger, peer, callback) {
   if (typeof account === 'object') {
     var options  = account;
-    callback     = account_index;
+    callback     = accountIndex;
     ledger       = options.ledger;
-    accountIndex = options.account_index;
+    accountIndex = options.account_index || options.accountIndex;
     account      = options.accountID || options.account;
+    peer         = options.peer;
   }
 
   var lastArg = arguments[arguments.length - 1];
@@ -864,6 +865,10 @@ Remote.accountRequest = function(type, account, accountIndex, ledger, callback) 
     request.ledgerChoose(ledger);
   }
 
+  if (typeof peer !== 'undefined') {
+    request.message.peer = UInt160.json_rewrite(peer);
+  }
+
   request.callback(callback);
 
   return request;
@@ -881,7 +886,7 @@ Remote.prototype.requestAccountCurrencies = function(accountID, callback) {
 
 // --> account_index: sub_account index (optional)
 // --> current: true, for the current ledger.
-Remote.prototype.requestAccountLines = function(accountID, account_index, ledger, callback) {
+Remote.prototype.requestAccountLines = function(accountID, account_index, ledger, peer, callback) {
   // XXX Does this require the server to be trusted?
   //utils.assert(this.trusted);
   var args = Array.prototype.concat.apply(['account_lines'], arguments);
