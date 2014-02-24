@@ -277,7 +277,8 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
     ;(function nextTransaction(i) {
       var transaction = pending[i];
 
-      if (!(transaction instanceof Transaction)) return;
+      if (!(transaction instanceof Transaction))
+        return;
 
       transaction.once('submitted', function(m) {
         transaction.emit('resubmitted', m);
@@ -335,6 +336,9 @@ TransactionManager.prototype._request = function(tx) {
 
     return tx.emit('error', new RippleError('tejLocalSigning', message));
   }
+
+  tx.submitIndex = this._remote._ledger_current_index;
+  tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
 
   var submitRequest = remote.requestSubmit();
 
@@ -528,12 +532,6 @@ TransactionManager.prototype.submit = function(tx) {
     tx.tx_json.Sequence = this._nextSequence++;
   }
 
-  tx.submitIndex = this._remote._ledger_current_index;
-  tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
-  tx.lastLedger  = void(0);
-  tx.attempts    = 0;
-  tx.complete();
-
   function finalize(message) {
     if (!tx.finalized) {
       // ND: We can just remove this `tx` by identity
@@ -550,6 +548,10 @@ TransactionManager.prototype.submit = function(tx) {
   tx.once('abort', function() {
     tx.emit('error', new RippleError('tejAbort', 'Transaction aborted'));
   });
+
+  tx.lastLedger = void(0);
+  tx.attempts   = 0;
+  tx.complete();
 
   var fee = Number(tx.tx_json.Fee);
   var remote = this._remote;
