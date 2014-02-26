@@ -25,6 +25,9 @@ function Meta(raw_data) {
       result.fieldsNew   = an.NewFields || {};
       result.fieldsFinal = an.FinalFields || {};
 
+      // getAffectedBooks will set this
+      // result.bookKey   = undefined;
+
       self.nodes.push(result);
     }
   });
@@ -150,6 +153,11 @@ Meta.prototype.getAffectedBooks = function () {
     if (paysKey !== 'XRP') paysKey += '/' + pays.issuer().to_json();
 
     var key = [ getsKey, paysKey ].join(':');
+
+    // Hell of a lot of work, so we are going to cache this. We can use this
+    // later to good effect in OrderBook.notify to make sure we only process
+    // pertinent offers.
+    an.bookKey = key;
 
     books.push(key);
   });
