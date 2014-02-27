@@ -15,7 +15,7 @@ var Amount       = require('./amount').Amount;
 var UInt160      = require('./uint160').UInt160;
 var Currency     = require('./currency').Currency;
 
-function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pays) {
+function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pays, key) {
   EventEmitter.call(this);
 
   var self            = this;
@@ -26,6 +26,7 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
   this._currency_pays = currency_pays;
   this._issuer_pays   = issuer_pays;
   this._subs          = 0;
+  this._key           = key;
 
   // We consider ourselves synchronized if we have a current copy of the offers,
   // we are online and subscribed to updates.
@@ -187,7 +188,7 @@ OrderBook.prototype.notify = function (message) {
   var trade_pays = this.trade('pays');
 
   function handleTransaction(an) {
-    if (an.entryType !== 'Offer') return;
+    if (an.entryType !== 'Offer' || an.bookKey !== self._key) return;
 
     var i, l, offer;
 
@@ -202,6 +203,8 @@ OrderBook.prototype.notify = function (message) {
             if (deletedNode) {
               self._offers.splice(i, 1);
             } else {
+              // TODO: This assumes no fields are deleted, which is probably a
+              // safe assumption, but should be checked.
               extend(offer, an.fieldsFinal);
             }
             changed = true;

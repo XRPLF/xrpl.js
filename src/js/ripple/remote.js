@@ -1292,7 +1292,7 @@ Remote.prototype.book = function(currency_gets, issuer_gets, currency_pays, issu
   var book;
 
   if (!this._books.hasOwnProperty(key)) {
-    book = new OrderBook(this, currency_gets, issuer_gets, currency_pays, issuer_pays);
+    book = new OrderBook(this, currency_gets, issuer_gets, currency_pays, issuer_pays, key);
     if (book.is_valid()) {
       this._books[key] = book;
     }
