@@ -71,7 +71,6 @@ function TransactionManager(account) {
 
   function updatePendingStatus(ledger) {
     self._pending.forEach(function(pending) {
-      pending.lastLedger = ledger;
       switch (ledger.ledger_index - pending.submitIndex) {
         case 8:
           pending.emit('lost', ledger);
@@ -79,7 +78,6 @@ function TransactionManager(account) {
           break;
 
         case 4:
-          pending.setState('client_missing');
           pending.emit('missing', ledger);
           break;
       }
@@ -158,6 +156,7 @@ function TransactionManager(account) {
   if (this._remote.storage) {
     resendPending(remoteReconnected);
     this._pending._save = savePending;
+    this._saveTx = this._remote.storage.saveTx || function(){};
   }
 };
 
@@ -207,19 +206,8 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
   function sequenceLoaded(err, sequence) {
     if (typeof sequence !== 'number') {
       callback(new Error('Failed to fetch account transaction sequence'));
-      return;
-    }
-
-    var sequenceDif = tx.tx_json.Sequence - sequence;
-    var submitted = 0;
-
-    for (var i=sequence; i<tx.tx_json.Sequence; i++) {
-      submitFill(i, function() {
-        if (++submitted === sequenceDif) {
-          callback();
-        }
-      });
-    }
+    } else {
+      submitFill(tx.tx_json.Sequence, callback); }
   };
 
   this._loadSequence(sequenceLoaded);
@@ -277,8 +265,7 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
     ;(function nextTransaction(i) {
       var transaction = pending[i];
 
-      if (!(transaction instanceof Transaction))
-        return;
+      if (!(transaction instanceof Transaction)) return;
 
       transaction.once('submitted', function(m) {
         transaction.emit('resubmitted', m);
@@ -366,31 +353,25 @@ TransactionManager.prototype._request = function(tx) {
   remote._trace('transactionmanager: submit:', tx.tx_json);
 
   function transactionProposed(message) {
-    tx.setState('client_proposed');
     // If server is honest, don't expect a final if rejected.
     message.rejected = tx.isRejected(message.engine_result_code)
     tx.emit('proposed', message);
   };
 
   function transactionFailed(message) {
-    switch (message.engine_result) {
-      case 'tefPAST_SEQ':
-      case 'tefMAX_LEDGER':
-        self._resubmit(1, tx);
-        break;
-      default:
-        tx.emit('error', message);
-    }
+    self._fillSequence(tx, function() {
+      switch (message.engine_result) {
+        case 'tefPAST_SEQ':
+          self._resubmit(1, tx);
+          break;
+        default:
+          tx.emit('error', message);
+      }
+    });
   };
 
   function transactionRetry(message) {
-    if (TransactionManager._isNoOp(tx)) {
-      self._resubmit(1, tx);
-    } else {
-      self._fillSequence(tx, function() {
-        self._resubmit(1, tx);
-      });
-    }
+    self._resubmit(1, tx);
   };
 
   function transactionFeeClaimed(message) {
@@ -405,7 +386,6 @@ TransactionManager.prototype._request = function(tx) {
       self._resubmit(1, tx);
     } else {
       self._nextSequence--;
-      tx.setState('remoteError');
       tx.emit('error', error);
     }
   };
@@ -421,6 +401,7 @@ TransactionManager.prototype._request = function(tx) {
     }
 
     message.result = message.engine_result || '';
+    tx.result = message;
 
     remote._trace('transactionmanager: submit_response:', message);
 
@@ -445,7 +426,6 @@ TransactionManager.prototype._request = function(tx) {
     }
   };
 
-
   submitRequest.once('error', submitted);
   submitRequest.once('success', submitted);
 
@@ -453,33 +433,45 @@ TransactionManager.prototype._request = function(tx) {
     submitRequest.server = tx._server;
   }
 
-  submitRequest.request();
+  if (typeof tx._iff !== 'function') {
+    submitTransaction();
+  } else {
+    return tx._iff(tx.summary(), function(proceed) {
+      if (proceed) {
+        submitTransaction();
+      } else {
+        tx.emit('abort');
+      }
+    });
+  }
 
-  tx.setState('client_submitted');
-  tx.attempts++;
+  function submitTransaction() {
+    function requestTimeout() {
+      // ND: What if the response is just slow and we get a response that
+      // `submitted` above will cause to have concurrent resubmit logic streams?
+      // It's simpler to just mute handlers and look out for finalized
+      // `transaction` messages.
 
-  function requestTimeout() {
-    // ND: What if the response is just slow and we get a response that
-    // `submitted` above will cause to have concurrent resubmit logic streams?
-    // It's simpler to just mute handlers and look out for finalized
-    // `transaction` messages.
+      // ND: We should audit the code for other potential multiple resubmit
+      // streams. Connection/reconnection could be one? That's why it's imperative
+      // that ALL transactionIDs sent over network are tracked.
 
-    // ND: We should audit the code for other potential multiple resubmit
-    // streams. Connection/reconnection could be one? That's why it's imperative
-    // that ALL transactionIDs sent over network are tracked.
+      // Finalized (e.g. aborted) transactions must stop all activity
+      if (tx.finalized) return;
 
-    // Finalized (e.g. aborted) transactions must stop all activity
-    if (tx.finalized) return;
+      tx.emit('timeout');
 
-    tx.emit('timeout');
+      if (remote._connected) {
+        remote._trace('transactionmanager: timeout:', tx.tx_json);
+        self._resubmit(3, tx);
+      }
+    };
 
-    if (remote._connected) {
-      remote._trace('transactionmanager: timeout:', tx.tx_json);
-      self._resubmit(3, tx);
-    }
+    tx.attempts++;
+
+    submitRequest.timeout(self._submissionTimeout, requestTimeout);
+    submitRequest.request();
   };
-
-  submitRequest.timeout(this._submissionTimeout, requestTimeout);
 
   return submitRequest;
 };
@@ -532,25 +524,34 @@ TransactionManager.prototype.submit = function(tx) {
     tx.tx_json.Sequence = this._nextSequence++;
   }
 
-  function finalize(message) {
-    if (!tx.finalized) {
-      // ND: We can just remove this `tx` by identity
-      self._pending.remove(tx);
-      remote._trace('transactionmanager: finalize_transaction:', tx.tx_json);
-      tx.finalized = true;
-      tx.emit('final', message);
-    }
+  function cleanup(message) {
+    // ND: We can just remove this `tx` by identity
+    self._pending.remove(tx);
+    remote._trace('transactionmanager: finalize_transaction:', tx.tx_json);
+    tx.emit('final', message);
   };
 
-  tx.on('error', finalize);
-  tx.once('success', finalize);
+  tx.once('cleanup', cleanup);
+
+  tx.once('error', function(message) {
+    tx._errorHandler(message);
+  });
+
+  tx.once('success', function(message) {
+    tx._successHandler(message);
+  });
 
   tx.once('abort', function() {
     tx.emit('error', new RippleError('tejAbort', 'Transaction aborted'));
   });
 
-  tx.lastLedger = void(0);
-  tx.attempts   = 0;
+  if (typeof tx.clientID === 'string') {
+    tx.clientID = [ this._accountID, tx.clientID ].join(':');
+  }
+
+  tx.attempts = 0;
+
+  // Attach secret, associate transaction with a server, attach fee
   tx.complete();
 
   var fee = Number(tx.tx_json.Fee);

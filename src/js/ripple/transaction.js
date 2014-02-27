@@ -72,7 +72,7 @@ function Transaction(remote) {
   // Index at which transaction was submitted
   this.submitIndex         = void(0);
 
-  this.state               = void(0);
+  this.state               = 'unsubmitted';
 
   this.finalized           = false;
 
@@ -83,6 +83,35 @@ function Transaction(remote) {
   // effecting the Fee amount). This should be populated with a transactionID
   // any time it goes on the network
   this.submittedIDs        = [ ]
+
+  function finalize(message) {
+    if (!self.finalized) {
+      self.finalized = true;
+      self.emit('cleanup', message);
+    }
+  };
+
+  this.once('success', function(message) {
+    finalize(message);
+    self.setState('validated');
+  });
+
+  this.once('error', function(message) {
+    finalize(message);
+
+    var prefix = message.engine_result.substring(0, 3);
+    var offlineError = (prefix === 'tej' && message.engine_result !== 'tejLost');
+
+    self.setState(offlineError ? 'failed_offline' : 'failed');
+  });
+
+  this.once('submitted', function() {
+    self.setState('submitted');
+  });
+
+  this.once('proposed', function() {
+    self.setState('pending');
+  });
 };
 
 util.inherits(Transaction, EventEmitter);
@@ -172,7 +201,7 @@ Transaction.prototype.isRejected = function(ter) {
 
 Transaction.prototype.setState = function(state) {
   if (this.state !== state) {
-    this.state  = state;
+    this.state = state;
     this.emit('state', state);
   }
 };
@@ -697,20 +726,20 @@ Transaction.prototype.submit = function(callback) {
 
   this.callback = typeof callback === 'function' ? callback : function(){};
 
-  function submissionError(error, message) {
+  function transactionError(error, message) {
     if (!(error instanceof RippleError)) {
       error = new RippleError(error, message);
     }
     self.callback(error);
   };
 
-  this.once('error', submissionError);
+  this._errorHandler = transactionError;
 
-  function submissionSuccess(message) {
+  function transactionSuccess(message) {
     self.callback(null, message);
   };
 
-  this.once('success', submissionSuccess);
+  this._successHandler = transactionSuccess;
 
   this.on('error', function(){});
 
@@ -735,6 +764,26 @@ Transaction.prototype.abort = function(callback) {
     var callback = typeof callback === 'function' ? callback : function(){};
     this.once('final', callback);
     this.emit('abort');
+  }
+};
+
+Transaction.prototype.iff = function(fn) {
+  this._iff = fn;
+};
+
+Transaction.prototype.summary = function() {
+  return {
+    tx_json:             this.tx_json,
+    clientID:            this.clientID,
+    submittedIDs:        this.submittedIDs,
+    submissionAttempts:  this.attempts,
+    state:               this.state,
+    server:              this._server ? this._server._opts.url :  void(0),
+    finalized:           this.finalized,
+    result: {
+      engine_result: this.result ? this.result.engine_result: void(0),
+      engine_result_message: this.result ? this.result.engine_result_message: void(0),
+    }
   }
 };
 
