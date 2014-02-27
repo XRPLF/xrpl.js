@@ -55,15 +55,21 @@ function TransactionManager(account) {
       var shouldAdjust = pending._server === server
       && self._remote.local_fee && pending.tx_json.Fee;
 
-      if (shouldAdjust) {
-        var oldFee = pending.tx_json.Fee;
-        var newFee = server.computeFee(pending);
+      if (!shouldAdjust) return;
 
-        pending.tx_json.Fee = newFee;
-        pending.emit('fee_adjusted', oldFee, newFee);
+      var oldFee = pending.tx_json.Fee;
+      var newFee = server.computeFee(pending);
 
-        self._remote._trace('transactionmanager: adjusting_fees:', pending.tx_json, oldFee, newFee);
+      if (Number(newFee) > self._maxFee) {
+        return pending.once('presubmit', function() {
+          pending.emit('error', 'tejMaxFeeExceeded');
+        });
       }
+
+      pending.tx_json.Fee = newFee;
+      pending.emit('fee_adjusted', oldFee, newFee);
+
+      self._remote._trace('transactionmanager: adjusting_fees:', pending.tx_json, oldFee, newFee);
     });
   };
 
@@ -76,7 +82,6 @@ function TransactionManager(account) {
           pending.emit('lost', ledger);
           self._remote._trace('transactionmanager: update_pending:', pending.tx_json);
           break;
-
         case 4:
           pending.emit('missing', ledger);
           break;
@@ -130,7 +135,7 @@ function TransactionManager(account) {
   this._remote.on('disconnect', remoteDisconnected);
 
   function resendPending(callback) {
-    var callback = typeof callback === 'function' ? callback : function(){};
+    var callback = (typeof callback === 'function') ? callback : function(){};
 
     function accountLoaded(err, data) {
       if (err || !(Array.isArray(data))) return;
@@ -207,7 +212,8 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
     if (typeof sequence !== 'number') {
       callback(new Error('Failed to fetch account transaction sequence'));
     } else {
-      submitFill(tx.tx_json.Sequence, callback); }
+      submitFill(tx.tx_json.Sequence, callback);
+    }
   };
 
   this._loadSequence(sequenceLoaded);
@@ -254,8 +260,8 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
 
     while (self._pending.hasSequence(pending.tx_json.Sequence)) {
       //Sequence number has been consumed by another transaction
-      self._remote._trace('transactionmanager: incrementing sequence:', pending.tx_json);
       pending.tx_json.Sequence += 1;
+      self._remote._trace('transactionmanager: incrementing sequence:', pending.tx_json);
     }
 
     self._request(pending);
@@ -285,17 +291,15 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
 };
 
 TransactionManager.prototype._waitLedgers = function(ledgers, callback) {
-  if (ledgers < 1) {
-    return callback();
-  }
+  if (ledgers < 1) return callback();
 
   var self = this;
   var closes = 0;
 
   function ledgerClosed() {
     if (++closes === ledgers) {
-      callback();
       self._remote.removeListener('ledger_closed', ledgerClosed);
+      callback();
     }
   };
 
@@ -321,8 +325,10 @@ TransactionManager.prototype._request = function(tx) {
     + 'It is not possible to resubmit transactions automatically safely without '
     + 'synthesizing the transactionID locally. See `local_signing` config option';
 
-    return tx.emit('error', new RippleError('tejLocalSigning', message));
+    return tx.emit('error', new RippleError('tejLocalSigningRequired', message));
   }
+
+  tx.emit('presubmit');
 
   tx.submitIndex = this._remote._ledger_current_index;
   tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
@@ -354,7 +360,7 @@ TransactionManager.prototype._request = function(tx) {
 
   function transactionProposed(message) {
     // If server is honest, don't expect a final if rejected.
-    message.rejected = tx.isRejected(message.engine_result_code)
+    message.rejected = tx.isRejected(message.engine_result_code);
     tx.emit('proposed', message);
   };
 
@@ -527,8 +533,8 @@ TransactionManager.prototype.submit = function(tx) {
   function cleanup(message) {
     // ND: We can just remove this `tx` by identity
     self._pending.remove(tx);
-    remote._trace('transactionmanager: finalize_transaction:', tx.tx_json);
     tx.emit('final', message);
+    remote._trace('transactionmanager: finalize_transaction:', tx.tx_json);
   };
 
   tx.once('cleanup', cleanup);

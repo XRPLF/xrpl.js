@@ -44,6 +44,10 @@ function Server(remote, opts) {
   this._reserve_inc  = void(0);
   this._fee_cushion  = this._remote.fee_cushion;
 
+  if (/:/.test(opts.host)) {
+    throw new Error('Specified host is malformed, use "host" and "port" server configuration');
+  }
+
   this._opts.url = (opts.secure ? 'wss://' : 'ws://') + opts.host + ':' + opts.port;
 
   this.on('message', function(message) {
