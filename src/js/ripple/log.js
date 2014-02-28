@@ -101,16 +101,3 @@ module.exports.internal = module.exports.sub();
  * Expose the class as well.
  */
 module.exports.Log = Log;
-
-/**
- * An easy way to create a new logger for a namespace.
- *
- * Browser:
- *     var log = ripple.log.called('client.id');
- *     log.debug('My object is', myObj);
- *
- * Node.js:
- *     var log = require('ripple').log.called('gateway.main');
- *     log.debug('My object is', myObj);
- */
-module.exports.called = Log.makeLogger;
