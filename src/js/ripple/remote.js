@@ -30,6 +30,7 @@ var RippleError  = require('./rippleerror').RippleError;
 var utils        = require('./utils');
 var sjcl         = require('./utils').sjcl;
 var config       = require('./config');
+var log          = require('./log').internal.sub('remote');
 
 /**
     Interface to manage the connection to a Ripple server.
@@ -358,7 +359,7 @@ Remote.prototype.setSecret = function(account, secret) {
 
 Remote.prototype._trace = function() {
   if (this.trace) {
-    utils.logObject.apply(utils, arguments);
+    log.info.apply(log, arguments);
   }
 };
 
