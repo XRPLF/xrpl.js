@@ -54,7 +54,6 @@ var RippleError      = require('./rippleerror').RippleError;
 var hashprefixes     = require('./hashprefixes');
 var config           = require('./config');
 
-
 function Transaction(remote) {
   EventEmitter.call(this);
 
@@ -203,6 +202,7 @@ Transaction.prototype.setState = function(state) {
   if (this.state !== state) {
     this.state = state;
     this.emit('state', state);
+    this.emit('save');
   }
 };
 
@@ -335,7 +335,7 @@ Transaction.prototype.addId = function(hash) {
   if (this.submittedIDs.indexOf(hash) === -1) {
     this.submittedIDs.unshift(hash);
     this.emit('signed', hash);
-    this.transactionManager()._pending.save();
+    this.emit('save');
   }
 };
 
@@ -724,7 +724,7 @@ Transaction.prototype.walletAdd = function(src, amount, authorized_key, public_k
 Transaction.prototype.submit = function(callback) {
   var self = this;
 
-  this.callback = typeof callback === 'function' ? callback : function(){};
+  this.callback = (typeof callback === 'function') ? callback : function(){};
 
   function transactionError(error, message) {
     if (!(error instanceof RippleError)) {
@@ -761,7 +761,7 @@ Transaction.prototype.transactionManager = function() {
 
 Transaction.prototype.abort = function(callback) {
   if (!this.finalized) {
-    var callback = typeof callback === 'function' ? callback : function(){};
+    var callback = (typeof callback === 'function') ? callback : function(){};
     this.once('final', callback);
     this.emit('abort');
   }
@@ -772,14 +772,18 @@ Transaction.prototype.iff = function(fn) {
 };
 
 Transaction.prototype.summary = function() {
+  return Transaction.summary.call(this);
+};
+
+Transaction.summary = function() {
   return {
-    tx_json:             this.tx_json,
-    clientID:            this.clientID,
-    submittedIDs:        this.submittedIDs,
-    submissionAttempts:  this.attempts,
-    state:               this.state,
-    server:              this._server ? this._server._opts.url :  void(0),
-    finalized:           this.finalized,
+    tx_json: this.tx_json,
+    sourceID: this.sourceID,
+    submittedIDs: this.submittedIDs,
+    submissionAttempts: this.attempts,
+    state: this.state,
+    server: this._server ? this._server._opts.url :  void(0),
+    finalized: this.finalized,
     result: {
       engine_result: this.result ? this.result.engine_result: void(0),
       engine_result_message: this.result ? this.result.engine_result_message: void(0),

@@ -190,17 +190,32 @@ function Remote(opts, trace) {
 
   this.on('removeListener', listenerRemoved);
 
-  function addPendingAccounts() {
-    opts.storage.loadAccounts(function(err, accounts) {
-      if (!err && Array.isArray(accounts)) {
-        accounts.forEach(self.account.bind(self));
-      }
+  function getPendingTransactions() {
+    self.storage.getPendingTransactions(function(err, transactions) {
+      if (err || !Array.isArray(transactions)) return;
+
+      var properties = [
+        'submittedIDs',
+        'clientID',
+        'submitIndex'
+      ];
+
+      transactions.forEach(function(tx) {
+        var transaction = self.transaction();
+        transaction.parseJson(tx.tx_json);
+        properties.forEach(function(prop) {
+          if (typeof tx[prop] !== 'undefined') {
+            transaction[prop] = tx[prop];
+          }
+        });
+        transaction.submit();
+      });
     });
   };
 
   if (opts.storage) {
     this.storage = opts.storage;
-    this.once('connect', addPendingAccounts);
+    this.once('connect', getPendingTransactions);
   }
 
   function pingServers() {
