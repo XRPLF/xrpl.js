@@ -92,18 +92,6 @@ function chunkString(str, n, leftAlign) {
   return ret;
 };
 
-function logObject(msg) {
-  var args = Array.prototype.slice.call(arguments, 1);
-
-  args = args.map(function(arg) {
-    return JSON.stringify(arg, null, 2);
-  });
-
-  args.unshift(msg);
-
-  console.log.apply(console, args);
-};
-
 function assert(assertion, msg) {
   if (!assertion) {
     throw new Error("Assertion failed" + (msg ? ": "+msg : "."));
@@ -157,7 +145,6 @@ exports.hexToArray    = hexToArray;
 exports.stringToArray = stringToArray;
 exports.stringToHex   = stringToHex;
 exports.chunkString   = chunkString;
-exports.logObject     = logObject;
 exports.assert        = assert;
 exports.arrayUnique   = arrayUnique;
 exports.toTimestamp   = toTimestamp;

@@ -3,6 +3,7 @@ var EventEmitter = require('events').EventEmitter;
 var Transaction = require('./transaction').Transaction;
 var Amount       = require('./amount').Amount;
 var utils        = require('./utils');
+var log          = require('./log').internal.sub('server');
 
 /**
  *  @constructor Server
@@ -108,7 +109,7 @@ Server.onlineStates = [
 
 Server.prototype._setState = function(state) {
   if (state !== this._state) {
-    this._remote._trace('server: set_state:', state);
+    this._remote.trace && log.info('set_state:', state);
     this._state = state;
     this.emit('state', state);
 
@@ -193,7 +194,7 @@ Server.prototype.connect = function() {
   // we will automatically reconnect.
   if (this._connected) return;
 
-  this._remote._trace('server: connect:', this._opts.url);
+  this._remote.trace && log.info('connect:', this._opts.url);
 
   // Ensure any existing socket is given the command to close first.
   if (this._ws) this._ws.close();
@@ -227,7 +228,7 @@ Server.prototype.connect = function() {
     // If we are no longer the active socket, simply ignore any event
     if (ws === self._ws) {
       self.emit('socket_error');
-      self._remote._trace('server: onerror:', self._opts.url, e.data || e);
+      self._remote.trace && log.info('onerror:', self._opts.url, e.data || e);
 
       // Most connection errors for WebSockets are conveyed as 'close' events with
       // code 1006. This is done for security purposes and therefore unlikely to
@@ -251,7 +252,7 @@ Server.prototype.connect = function() {
   ws.onclose = function onClose() {
     // If we are no longer the active socket, simply ignore any event
     if (ws === self._ws) {
-      self._remote._trace('server: onclose:', self._opts.url, ws.readyState);
+      self._remote.trace && log.info('onclose:', self._opts.url, ws.readyState);
       self._handleClose();
     }
   };
@@ -278,7 +279,7 @@ Server.prototype._retryConnect = function() {
 
   function connectionRetry() {
     if (self._shouldConnect) {
-      self._remote._trace('server: retry', self._opts.url);
+      self._remote.trace && log.info('retry', self._opts.url);
       self.connect();
     }
   };
@@ -355,9 +356,9 @@ Server.prototype._handleMessage = function(message) {
       delete self._requests[message.id];
 
       if (!request) {
-        this._remote._trace('server: UNEXPECTED:', self._opts.url, message);
+        this._remote.trace && log.info('UNEXPECTED:', self._opts.url, message);
       } else if (message.status === 'success') {
-        this._remote._trace('server: response:', self._opts.url, message);
+        this._remote.trace && log.info('response:', self._opts.url, message);
 
         request.emit('success', message.result);
 
@@ -365,7 +366,7 @@ Server.prototype._handleMessage = function(message) {
           emitter.emit('response_' + request.message.command, message.result, request, message);
         });
       } else if (message.error) {
-        this._remote._trace('server: error:', self._opts.url, message);
+        this._remote.trace && log.info('error:', self._opts.url, message);
 
         request.emit('error', {
           error         : 'remoteError',
@@ -376,7 +377,7 @@ Server.prototype._handleMessage = function(message) {
       break;
 
     case 'path_find':
-      this._remote._trace('server: path_find:', self._opts.url, message);
+      this._remote.trace && log.info('path_find:', self._opts.url, message);
       break;
 
   }
@@ -435,7 +436,7 @@ Server.prototype._handleResponseSubscribe = function(message) {
 
 Server.prototype.sendMessage = function(message) {
   if (this._ws) {
-    this._remote._trace('server: request:', this._opts.url, message);
+    this._remote.trace && log.info('request:', this._opts.url, message);
     this._ws.send(JSON.stringify(message));
   }
 };
@@ -455,7 +456,7 @@ Server.prototype.request = function(request) {
 
   // Only bother if we are still connected.
   if (!this._ws) {
-    this._remote._trace('server: request: DROPPING:', self._opts.url, request.message);
+    this._remote.trace && log.info('request: DROPPING:', self._opts.url, request.message);
     return;
   }
 
