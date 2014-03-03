@@ -173,7 +173,7 @@ function Remote(opts, trace) {
     throw new TypeError('Remote "fee_cushion" configuration is not a Number');
   }
 
-  if (!/^(undefined|number)$/.test(typeof opts.trace)) {
+  if (!/^(undefined|boolean)$/.test(typeof opts.trace)) {
     throw new TypeError('Remote "trace" configuration is not a Boolean');
   }
 
