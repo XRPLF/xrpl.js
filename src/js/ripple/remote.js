@@ -488,8 +488,10 @@ Remote.prototype._handleMessage = function(message, server) {
 
       if (this._received_tx.hasOwnProperty(hash)) {
         break;
-      } else if (message.validated) {
-        this._received_tx[hash] = true;
+      }
+
+      if (message.validated) {
+        this._received_tx.set(hash, true);
       }
 
       this._trace('remote: tx:', message);
