@@ -2,6 +2,7 @@ var sjcl    = require('./utils').sjcl;
 
 var UInt160 = require('./uint160').UInt160;
 var UInt256 = require('./uint256').UInt256;
+var Base    = require('./base').Base;
 
 function KeyPair() {
   this._curve  = sjcl.ecc.curves['c256'];
@@ -82,7 +83,9 @@ KeyPair.prototype.get_address = function () {
 
   var hash = SHA256_RIPEMD160(bits);
 
-  return UInt160.from_bits(hash);
+  var address = UInt160.from_bits(hash);
+  address.set_version(Base.VER_ACCOUNT_ID);
+  return address;
 };
 
 KeyPair.prototype.sign = function (hash) {
