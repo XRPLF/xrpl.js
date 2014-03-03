@@ -19,7 +19,29 @@ function Server(remote, opts) {
   EventEmitter.call(this);
 
   if (typeof opts !== 'object') {
-    throw new Error('Invalid server configuration.');
+    throw new TypeError('Server configuration is not an Object');
+  }
+
+  if (!opts.host) opts.host     = opts.websocket_ip;
+  if (!opts.port) opts.host     = opts.websocket_port;
+  if (!opts.secure) opts.secure = opts.websocket_ssl;
+
+  if (typeof opts.secure === 'undefined') {
+    opts.secure = false;
+  }
+
+  var domainRE = /^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$/;
+
+  if (!domainRE.test(opts.host)) {
+    throw new Error('Server host is malformed, use "host" and "port" server configuration');
+  }
+
+  if (isNaN(opts.port)) {
+    throw new TypeError('Server configuration "port" is not a Number');
+  }
+
+  if (typeof opts.secure !== 'boolean') {
+    throw new TypeError('Server "secure" configuration is not a Boolean');
   }
 
   var self = this;
@@ -28,7 +50,7 @@ function Server(remote, opts) {
   this._opts          = opts;
   this._host          = opts.host;
   this._port          = opts.port;
-  this._secure        = (typeof opts.secure === 'boolean') ? opts.secure : true;
+  this._secure        = opts.secure;
   this._ws            = void(0);
   this._connected     = false;
   this._shouldConnect = false;
@@ -36,7 +58,6 @@ function Server(remote, opts) {
   this._id            = 0;
   this._retry         = 0;
   this._requests      = { };
-
   this._load_base    = 256;
   this._load_factor  = 256;
   this._fee_ref      = 10;
@@ -44,10 +65,6 @@ function Server(remote, opts) {
   this._reserve_base = void(0);
   this._reserve_inc  = void(0);
   this._fee_cushion  = this._remote.fee_cushion;
-
-  if (/:/.test(opts.host)) {
-    throw new Error('Specified host is malformed, use "host" and "port" server configuration');
-  }
 
   this._opts.url = (opts.secure ? 'wss://' : 'ws://') + opts.host + ':' + opts.port;
 

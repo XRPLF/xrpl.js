@@ -78,14 +78,14 @@ function Remote(opts, trace) {
 
   var self  = this;
 
-  this.trusted               = Boolean(opts.trusted);
-  this.local_sequence        = Boolean(opts.local_sequence); // Locally track sequence numbers
-  this.local_fee             = (typeof opts.local_fee === 'undefined') ? true : Boolean(opts.local_fee); // Locally set fees
-  this.local_signing         = (typeof opts.local_signing === 'undefined') ? true : Boolean(opts.local_signing);
-  this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.2 : Number(opts.fee_cushion);
-  this.max_fee               = (typeof opts.max_fee === 'undefined') ? Infinity : Number(opts.max_fee);
+  this.trusted               = opts.trusted;
+  this.local_sequence        = opts.local_sequence; // Locally track sequence numbers
+  this.local_fee             = (typeof opts.local_fee === 'undefined') ? true : opts.local_fee; // Locally set fees
+  this.local_signing         = (typeof opts.local_signing === 'undefined') ? true : opts.local_signing;
+  this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.2 : opts.fee_cushion;
+  this.max_fee               = (typeof opts.max_fee === 'undefined') ? Infinity : opts.max_fee;
   this.id                    = 0;
-  this.trace                 = Boolean(opts.trace);
+  this.trace                 = opts.trace;
   this._server_fatal         = false; // True, if we know server exited.
   this._ledger_current_index = void(0);
   this._ledger_hash          = void(0);
@@ -157,6 +157,50 @@ function Remote(opts, trace) {
     ];
   }
 
+  if (isNaN(this._connection_offset)) {
+    throw new TypeError('Remote "connection_offset" configuration is not a Number');
+  }
+
+  if (isNaN(this._submission_timeout)) {
+    throw new TypeError('Remote "submission_timeout" configuration is not a Number');
+  }
+
+  if (isNaN(this.max_fee)) {
+    throw new TypeError('Remote "max_fee" configuration is not a Number');
+  }
+
+  if (isNaN(this.fee_cushion)) {
+    throw new TypeError('Remote "fee_cushion" configuration is not a Number');
+  }
+
+  if (!/^(undefined|number)$/.test(typeof opts.trace)) {
+    throw new TypeError('Remote "trace" configuration is not a Boolean');
+  }
+
+  if (typeof this.local_signing !== 'boolean') {
+    throw new TypeError('Remote "local_signing" configuration is not a Boolean');
+  }
+
+  if (typeof this.local_fee !== 'boolean') {
+    throw new TypeError('Remote "local_fee" configuration is not a Boolean');
+  }
+
+  if (typeof this.local_sequence !== 'boolean') {
+    throw new TypeError('Remote "local_sequence" configuration is not a Boolean');
+  }
+
+  if (!Array.isArray(opts.servers)) {
+    throw new TypeError('Remote "servers" configuration is not an Array');
+  }
+
+  if (!/^(undefined|number)$/.test(typeof opts.ping)) {
+    throw new TypeError('Remote "ping" configuration is not a Number');
+  }
+
+  if (!/^(undefined|number)$/.test(typeof opts.storage)) {
+    throw new TypeError('Remote "storage" configuration is not an Object');
+  }
+
   opts.servers.forEach(function(server) {
     var pool = Number(server.pool) || 1;
     while (pool--) { self.addServer(server); };
@@ -201,7 +245,7 @@ function Remote(opts, trace) {
         'submitIndex'
       ];
 
-      transactions.forEach(function(tx) {
+      function resubmitTransaction(tx) {
         var transaction = self.transaction();
         transaction.parseJson(tx.tx_json);
         properties.forEach(function(prop) {
@@ -210,7 +254,9 @@ function Remote(opts, trace) {
           }
         });
         transaction.submit();
-      });
+      };
+
+      transactions.forEach(resubmitTransaction);
     });
   };
 
@@ -227,8 +273,7 @@ function Remote(opts, trace) {
 
   if (opts.ping) {
     this.once('connect', function() {
-      var interval = Number(opts.ping) * 1000;
-      self._pingInterval = setInterval(pingServers, interval);
+      self._pingInterval = setInterval(pingServers, opts.ping * 1000);
     });
   }
 };
@@ -280,7 +325,9 @@ Remote.from_config = function(obj, trace) {
     }
   };
 
-  Object.keys(config.accounts || {}).forEach(initializeAccount, config);
+  if (config.accounts) {
+    Object.keys(config.accounts).forEach(initializeAccount, config);
+  }
 
   return remote;
 };
@@ -288,11 +335,7 @@ Remote.from_config = function(obj, trace) {
 Remote.prototype.addServer = function(opts) {
   var self = this;
 
-  var server = new Server(this, {
-    host:    opts.host || opts.websocket_ip,
-    port:    opts.port || opts.websocket_port,
-    secure:  opts.secure || opts.websocket_ssl
-  });
+  var server = new Server(this, opts);
 
   function serverMessage(data) {
     self._handleMessage(data, server);
