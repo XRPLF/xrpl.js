@@ -197,7 +197,7 @@ function Remote(opts, trace) {
     throw new TypeError('Remote "ping" configuration is not a Number');
   }
 
-  if (!/^(undefined|number)$/.test(typeof opts.storage)) {
+  if (!/^(undefined|object)$/.test(typeof opts.storage)) {
     throw new TypeError('Remote "storage" configuration is not an Object');
   }
 
