@@ -23,7 +23,7 @@ function Server(remote, opts) {
   }
 
   if (!opts.host) opts.host     = opts.websocket_ip;
-  if (!opts.port) opts.host     = opts.websocket_port;
+  if (!opts.port) opts.port     = opts.websocket_port;
   if (!opts.secure) opts.secure = opts.websocket_ssl;
 
   if (typeof opts.secure === 'undefined') {

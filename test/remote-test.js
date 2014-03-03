@@ -8,25 +8,18 @@ var Request = utils.load_module('request').Request;
 
 var options, spy, mock, stub, remote, callback;
 
-describe("Remote", function () {
-  describe("initialing a remote with options", function () {
+describe('Remote', function () {
+  describe('initialing a remote with options', function () {
     beforeEach(function () {
       options = {
-        server: {
-          trace :         true,
-          trusted:        true,
-          local_signing:  true,
-          secure: true,
-          servers: [
-            { host: 's_west.ripple.com', port: 443, secure: true },
-            { host: 's_east.ripple.com', port: 443, secure: true }
-          ],
+        trace :         true,
+        trusted:        true,
+        local_signing:  true,
+        servers: [
+          { host: 's-west.ripple.com', port: 443, secure: true },
+          { host: 's-east.ripple.com', port: 443, secure: true }
+        ],
 
-          connection_offset: 0
-        },
-
-
-        host: 's_west.ripple.com', port: 443, secure: true,
         blobvault : 'https://blobvault.payward.com',
         persistent_auth : false,
         transactions_per_page: 50,
@@ -40,20 +33,20 @@ describe("Remote", function () {
 
       };
     })
-    it("should add a server for each specified", function (done) {
+    it('should add a server for each specified', function (done) {
       var remote = new Remote(options);
       done();
     })
   })
 
-  describe("functions that return request objects", function () {
+  describe('functions that return request objects', function () {
     beforeEach(function () {
       callback = function () {}
       remote = new Remote(options);
     });
 
-    describe("requesting a ledger", function () {
-      it("should return a request", function (done) {
+    describe('requesting a ledger', function () {
+      it('should return a request', function (done) {
         var request = remote.request_ledger(null, {}, callback);
         assert(request instanceof Request);
         done();
