@@ -4,8 +4,11 @@
   "description": "Ripple JavaScript client library",
   "files": [
     "src/js/*",
-    "build/sjcl.js",
-    "bin/rsign.js"
+    "bin/*",
+    "build/*",
+    "test/*",
+    "Makefile",
+    "Gruntfile.js"
   ],
   "main": "src/js/ripple",
   "directories": {
