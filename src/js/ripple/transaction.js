@@ -383,6 +383,13 @@ Transaction.prototype.invoiceID = function(id) {
   return this;
 };
 
+Transaction.prototype.lastLedger = function(sequence) {
+  if (typeof sequence === 'number') {
+    this.tx_json.LastLedgerSequence = sequence;
+  }
+  return this;
+};
+
 Transaction._pathRewrite = function(path) {
   return path.map(function(node) {
     var newNode = { };
@@ -397,6 +404,10 @@ Transaction._pathRewrite = function(path) {
 
     if (node.hasOwnProperty('currency')) {
       newNode.currency = Currency.json_rewrite(node.currency);
+    }
+
+    if (node.hasOwnProperty('type_hex')) {
+      newNode.type_hex = node.type_hex;
     }
 
     return newNode
