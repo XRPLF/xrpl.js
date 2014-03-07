@@ -157,19 +157,19 @@ function Remote(opts, trace) {
     ];
   }
 
-  if (isNaN(this._connection_offset)) {
+  if (typeof this._connection_offset !== 'number') {
     throw new TypeError('Remote "connection_offset" configuration is not a Number');
   }
 
-  if (isNaN(this._submission_timeout)) {
+  if (typeof this._submission_timeout !== 'number') {
     throw new TypeError('Remote "submission_timeout" configuration is not a Number');
   }
 
-  if (isNaN(this.max_fee)) {
+  if (typeof this.max_fee !== 'number') {
     throw new TypeError('Remote "max_fee" configuration is not a Number');
   }
 
-  if (isNaN(this.fee_cushion)) {
+  if (typeof this.fee_cushion !== 'number') {
     throw new TypeError('Remote "fee_cushion" configuration is not a Number');
   }
 
@@ -309,7 +309,7 @@ Remote.flags = {
 };
 
 Remote.from_config = function(obj, trace) {
-  var serverConfig = typeof obj === 'string' ? config.servers[obj] : obj;
+  var serverConfig = (typeof obj === 'string') ? config.servers[obj] : obj;
 
   var remote = new Remote(serverConfig, trace);
 
