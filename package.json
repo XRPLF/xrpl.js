@@ -35,8 +35,7 @@
   "scripts": {
     "pretest": "node_modules/.bin/grunt",
     "test": "mocha test/*-test.js",
-    "build": "grunt",
-    "postinstall": "grunt"
+    "build": "grunt"
   },
   "repository": {
     "type": "git",
