@@ -36,7 +36,7 @@ function Server(remote, opts) {
     throw new Error('Server host is malformed, use "host" and "port" server configuration');
   }
 
-  if (isNaN(opts.port)) {
+  if (typeof opts.port !== 'number') {
     throw new TypeError('Server configuration "port" is not a Number');
   }
 
