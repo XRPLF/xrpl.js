@@ -17,7 +17,7 @@
 
 # Ignore object files.
 *.o
-build
+build/ripple*.js
 tags
 bin/rippled
 Debug/*.*
