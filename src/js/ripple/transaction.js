@@ -86,6 +86,7 @@ function Transaction(remote) {
   function finalize(message) {
     if (!self.finalized) {
       self.finalized = true;
+      self.result.ledger = message.ledger_index;
       self.emit('cleanup', message);
     }
   };
@@ -386,6 +387,7 @@ Transaction.prototype.invoiceID = function(id) {
 Transaction.prototype.lastLedger = function(sequence) {
   if (typeof sequence === 'number') {
     this.tx_json.LastLedgerSequence = sequence;
+    this.never_change_last_ledger = true;
   }
   return this;
 };
@@ -798,6 +800,7 @@ Transaction.summary = function() {
     result: {
       engine_result: this.result ? this.result.engine_result: void(0),
       engine_result_message: this.result ? this.result.engine_result_message: void(0),
+      ledger: this.result ? this.result.ledger : void(0)
     }
   }
 };

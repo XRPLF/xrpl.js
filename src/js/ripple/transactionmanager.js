@@ -309,7 +309,10 @@ TransactionManager.prototype._request = function(tx) {
   tx.emit('presubmit');
 
   tx.submitIndex = this._remote._ledger_current_index;
-  tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
+  // Only update LastLedgerSequence if it was not explicitly set by the user
+  if (!tx.never_change_last_ledger) {
+    tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
+  }
 
   var submitRequest = remote.requestSubmit();
 
@@ -455,7 +458,6 @@ TransactionManager.prototype._request = function(tx) {
     submitRequest.timeout(self._submissionTimeout, requestTimeout);
     submitRequest.request();
     tx.attempts++;
-    tx.emit('save', tx.summary());
     tx.emit('postsubmit');
   };
 
@@ -514,7 +516,6 @@ TransactionManager.prototype.submit = function(tx) {
     // ND: We can just remove this `tx` by identity
     self._pending.remove(tx);
     tx.emit('final', message);
-    tx.emit('save');
     remote._trace('transactionmanager: finalize_transaction:', tx.tx_json);
   };
 
@@ -561,7 +562,6 @@ TransactionManager.prototype.submit = function(tx) {
     // validated transaction clearing) to fail.
     this._pending.push(tx);
     this._request(tx);
-    tx.emit('save');
   }
 };
 
