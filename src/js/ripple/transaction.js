@@ -59,49 +59,50 @@ function Transaction(remote) {
 
   var self  = this;
 
-  this.remote              = remote;
-
-  this._secret             = void(0);
+  this.remote = remote;
 
   // Transaction data
-  this.tx_json             = { Flags: 0 };
+  this.tx_json = { Flags: 0 };
 
-  this._build_path         = false;
+  this._secret = void(0);
+  this._build_path = false;
 
-  // Index at which transaction was submitted
-  this.submitIndex         = void(0);
-
-  this.state               = 'unsubmitted';
-
-  this.finalized           = false;
-
+  this.state = 'unsubmitted';
+  this.finalized = false;
   this.previousSigningHash = void(0);
+  // Index at which transaction was submitted
+  this.submitIndex = void(0);
 
   // We aren't clever enough to eschew preventative measures so we keep an array
   // of all submitted transactionIDs (which can change due to load_factor
   // effecting the Fee amount). This should be populated with a transactionID
   // any time it goes on the network
-  this.submittedIDs        = [ ]
+  this.submittedIDs = [ ]
 
   function finalize(message) {
     if (!self.finalized) {
       self.finalized = true;
+
+      if (self.result) {
+        self.result.ledger_index = message.ledger_index;
+        self.result.ledger_hash  = message.ledger_hash;
+      } else {
+        self.result = message;
+        self.result.tx_json = self.tx_json;
+      }
+
       self.emit('cleanup', message);
     }
   };
 
   this.once('success', function(message) {
-    finalize(message);
     self.setState('validated');
+    finalize(message);
   });
 
   this.once('error', function(message) {
+    self.setState('failed');
     finalize(message);
-
-    var prefix = message.engine_result.substring(0, 3);
-    var offlineError = (prefix === 'tej' && message.engine_result !== 'tejLost');
-
-    self.setState(offlineError ? 'failed_offline' : 'failed');
   });
 
   this.once('submitted', function() {
@@ -260,8 +261,8 @@ Transaction.prototype._getServer = function() {
 
 Transaction.prototype.complete = function() {
   // Try to auto-fill the secret
-  if (!this._secret) {
-    this._secret = this._account_secret(this.tx_json.Account);
+  if (!this._secret && !(this._secret = this._account_secret(this.tx_json.Account))) {
+    return this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
   }
 
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
@@ -383,8 +384,16 @@ Transaction.prototype.invoiceID = function(id) {
   return this;
 };
 
+Transaction.prototype.clientID = function(id) {
+  if (typeof id === 'string') {
+    this._clientID = id;
+  }
+  return this;
+};
+
 Transaction.prototype.lastLedger = function(sequence) {
   if (typeof sequence === 'number') {
+    this._setLastLedger = true;
     this.tx_json.LastLedgerSequence = sequence;
   }
   return this;
@@ -787,19 +796,27 @@ Transaction.prototype.summary = function() {
 };
 
 Transaction.summary = function() {
-  return {
-    tx_json: this.tx_json,
-    sourceID: this.sourceID,
-    submittedIDs: this.submittedIDs,
-    submissionAttempts: this.attempts,
-    state: this.state,
-    server: this._server ? this._server._opts.url :  void(0),
-    finalized: this.finalized,
-    result: {
-      engine_result: this.result ? this.result.engine_result: void(0),
-      engine_result_message: this.result ? this.result.engine_result_message: void(0),
+  var result = {
+    tx_json:             this.tx_json,
+    clientID:            this._clientID,
+    submittedIDs:        this.submittedIDs,
+    submissionAttempts:  this.attempts,
+    state:               this.state,
+    server:              this._server ? this._server._opts.url :  void(0),
+    finalized:           this.finalized
+  }
+
+  if (this.result) {
+    result.result = {
+      engine_result        : this.result.engine_result,
+      engine_result_message: this.result.engine_result_message,
+      ledger_hash          : this.result.ledger_hash,
+      ledger_index         : this.result.ledger_index,
+      transaction_hash     : this.result.tx_json.hash
     }
   }
+
+  return result;
 };
 
 exports.Transaction = Transaction;

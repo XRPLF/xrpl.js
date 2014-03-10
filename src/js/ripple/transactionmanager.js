@@ -189,8 +189,18 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
   function sequenceLoaded(err, sequence) {
     if (typeof sequence !== 'number') {
       callback(new Error('Failed to fetch account transaction sequence'));
-    } else {
-      submitFill(tx.tx_json.Sequence, callback);
+      return;
+    }
+
+    var sequenceDif = tx.tx_json.Sequence - sequence;
+    var submitted = 0;
+
+    for (var i=sequence; i<tx.tx_json.Sequence; i++) {
+      submitFill(i, function() {
+        if (++submitted === sequenceDif) {
+          callback();
+        }
+      });
     }
   };
 
@@ -256,9 +266,7 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
 
         self._loadSequence();
 
-        if (++i < pending.length) {
-          nextTransaction(i);
-        }
+        if (++i < pending.length) nextTransaction(i);
       });
 
       resubmitTransaction(transaction);
@@ -309,7 +317,12 @@ TransactionManager.prototype._request = function(tx) {
   tx.emit('presubmit');
 
   tx.submitIndex = this._remote._ledger_current_index;
-  tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
+
+  if (!tx._setLastLedger) {
+    // Honor LastLedgerSequence set by user of API. If
+    // left unset by API, bump LastLedgerSequence
+    tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
+  }
 
   var submitRequest = remote.requestSubmit();
 
@@ -343,19 +356,19 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   function transactionFailed(message) {
-    self._fillSequence(tx, function() {
-      switch (message.engine_result) {
-        case 'tefPAST_SEQ':
-          self._resubmit(1, tx);
-          break;
-        default:
-          tx.emit('error', message);
-      }
-    });
+    switch (message.engine_result) {
+      case 'tefPAST_SEQ':
+        self._resubmit(1, tx);
+        break;
+      default:
+        tx.emit('error', message);
+    }
   };
 
   function transactionRetry(message) {
-    self._resubmit(1, tx);
+    self._fillSequence(tx, function() {
+      self._resubmit(1, tx);
+    });
   };
 
   function transactionFeeClaimed(message) {
@@ -455,7 +468,6 @@ TransactionManager.prototype._request = function(tx) {
     submitRequest.timeout(self._submissionTimeout, requestTimeout);
     submitRequest.request();
     tx.attempts++;
-    tx.emit('save', tx.summary());
     tx.emit('postsubmit');
   };
 
@@ -493,6 +505,7 @@ TransactionManager._isTooBusy = function(error) {
 
 TransactionManager.prototype.submit = function(tx) {
   var self = this;
+  var remote = this._remote;
 
   // If sequence number is not yet known, defer until it is.
   if (typeof this._nextSequence === 'undefined') {
@@ -506,15 +519,10 @@ TransactionManager.prototype.submit = function(tx) {
   // Finalized (e.g. aborted) transactions must stop all activity
   if (tx.finalized) return;
 
-  if (typeof tx.tx_json.Sequence !== 'number') {
-    tx.tx_json.Sequence = this._nextSequence++;
-  }
-
   function cleanup(message) {
     // ND: We can just remove this `tx` by identity
     self._pending.remove(tx);
     tx.emit('final', message);
-    tx.emit('save');
     remote._trace('transactionmanager: finalize_transaction:', tx.tx_json);
   };
 
@@ -536,8 +544,8 @@ TransactionManager.prototype.submit = function(tx) {
     tx.emit('error', new RippleError('tejAbort', 'Transaction aborted'));
   });
 
-  if (typeof tx.clientID === 'string') {
-    tx.sourceID = [ this._accountID, tx.clientID ].join(':');
+  if (typeof tx.tx_json.Sequence !== 'number') {
+    tx.tx_json.Sequence = this._nextSequence++;
   }
 
   tx.attempts = 0;
@@ -546,7 +554,6 @@ TransactionManager.prototype.submit = function(tx) {
   tx.complete();
 
   var fee = Number(tx.tx_json.Fee);
-  var remote = this._remote;
 
   if (!tx._secret && !tx.tx_json.TxnSignature) {
     tx.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
@@ -561,7 +568,6 @@ TransactionManager.prototype.submit = function(tx) {
     // validated transaction clearing) to fail.
     this._pending.push(tx);
     this._request(tx);
-    tx.emit('save');
   }
 };
 
