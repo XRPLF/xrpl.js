@@ -133,7 +133,9 @@ var FIELDS_MAP = exports.fields = {
     8: 'FundCode',
     9: 'RemoveCode',
     10: 'ExpireCode',
-    11: 'CreateCode'
+    11: 'CreateCode',
+    12: 'MemoType',
+    13: 'MemoData'
   },
   8: { // Account
     1: 'Account',
@@ -152,7 +154,8 @@ var FIELDS_MAP = exports.fields = {
     6: 'PreviousFields',
     7: 'FinalFields',
     8: 'NewFields',
-    9: 'TemplateEntry'
+    9: 'TemplateEntry',
+    10: 'Memo'
   },
   15: { // Array
     1: void(0),  //end of Array
@@ -162,7 +165,8 @@ var FIELDS_MAP = exports.fields = {
     5: 'Template',
     6: 'Necessary',
     7: 'Sufficient',
-    8: 'AffectedNodes'
+    8: 'AffectedNodes',
+    9: 'Memos'
   },
 
   // Uncommon types
