@@ -350,12 +350,14 @@ TransactionManager.prototype._request = function(tx) {
   remote._trace('transactionmanager: submit:', tx.tx_json);
 
   function transactionProposed(message) {
+    if (tx.finalized) return;
     // If server is honest, don't expect a final if rejected.
     message.rejected = tx.isRejected(message.engine_result_code);
     tx.emit('proposed', message);
   };
 
   function transactionFailed(message) {
+    if (tx.finalized) return;
     switch (message.engine_result) {
       case 'tefPAST_SEQ':
         self._resubmit(1, tx);
@@ -366,13 +368,28 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   function transactionRetry(message) {
+    if (tx.finalized) return;
     self._fillSequence(tx, function() {
       self._resubmit(1, tx);
     });
   };
 
   function transactionFeeClaimed(message) {
+    if (tx.finalized) return;
     tx.emit('error', message);
+  };
+
+  function transactionFailedLocal(message) {
+    if (tx.finalized) return;
+
+    var shouldAdjustFee = self._remote.local_fee
+    && (message.engine_result === 'telINSUF_FEE_P');
+
+    if (shouldAdjustFee) {
+      self._resubmit(1, tx);
+    } else {
+      submissionError(message);
+    }
   };
 
   function submissionError(error) {
@@ -418,8 +435,10 @@ TransactionManager.prototype._request = function(tx) {
       case 'tef':
         transactionFailed(message);
         break;
+      case 'tel':
+        transactionFailedLocal(message);
       default:
-        //tel, tem
+        // tem
         submissionError(message);
     }
   };
