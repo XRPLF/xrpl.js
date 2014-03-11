@@ -437,6 +437,7 @@ TransactionManager.prototype._request = function(tx) {
         break;
       case 'tel':
         transactionFailedLocal(message);
+        break;
       default:
         // tem
         submissionError(message);
