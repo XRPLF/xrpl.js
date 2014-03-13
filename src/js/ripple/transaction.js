@@ -80,27 +80,25 @@ function Transaction(remote) {
   this.submittedIDs = [ ]
 
   function finalize(message) {
-    if (!self.finalized) {
-      self.finalized = true;
-
-      if (self.result) {
-        self.result.ledger_index = message.ledger_index;
-        self.result.ledger_hash  = message.ledger_hash;
-      } else {
-        self.result = message;
-        self.result.tx_json = self.tx_json;
-      }
-
-      self.emit('cleanup', message);
+    if (self.result) {
+      self.result.ledger_index = message.ledger_index;
+      self.result.ledger_hash  = message.ledger_hash;
+    } else {
+      self.result = message;
+      self.result.tx_json = self.tx_json;
     }
+
+    self.emit('cleanup', message);
   };
 
   this.once('success', function(message) {
+    self.finalized = true;
     self.setState('validated');
     finalize(message);
   });
 
   this.once('error', function(message) {
+    self.finalized = true;
     self.setState('failed');
     finalize(message);
   });
@@ -260,11 +258,8 @@ Transaction.prototype._getServer = function() {
  */
 
 Transaction.prototype.complete = function() {
-  // Try to auto-fill the secret
-  if (!this._secret && !(this._secret = this._account_secret(this.tx_json.Account))) {
-    return this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
-  }
-
+  // If the Fee hasn't been set, one needs to be computed by
+  // an assigned server
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
     if (this.remote.local_fee || !this.remote.trusted) {
       this._server = this._getServer();
@@ -273,6 +268,11 @@ Transaction.prototype.complete = function() {
   }
 
   if (typeof this.tx_json.SigningPubKey === 'undefined') {
+    // Try to auto-fill the secret
+    if (!this._secret && !(this._secret = this._account_secret(this.tx_json.Account))) {
+      return this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
+    }
+
     var seed = Seed.from_json(this._secret);
     var key  = seed.get_key(this.tx_json.Account);
     this.tx_json.SigningPubKey = key.to_hex_pub();
