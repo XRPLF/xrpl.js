@@ -258,6 +258,11 @@ Transaction.prototype._getServer = function() {
  */
 
 Transaction.prototype.complete = function() {
+  // Try to auto-fill the secret
+  if (!this._secret && !(this._secret = this._account_secret(this.tx_json.Account))) {
+    return this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
+  }
+
   // If the Fee hasn't been set, one needs to be computed by
   // an assigned server
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
@@ -268,11 +273,6 @@ Transaction.prototype.complete = function() {
   }
 
   if (typeof this.tx_json.SigningPubKey === 'undefined') {
-    // Try to auto-fill the secret
-    if (!this._secret && !(this._secret = this._account_secret(this.tx_json.Account))) {
-      return this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
-    }
-
     var seed = Seed.from_json(this._secret);
     var key  = seed.get_key(this.tx_json.Account);
     this.tx_json.SigningPubKey = key.to_hex_pub();
