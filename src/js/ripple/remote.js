@@ -999,6 +999,26 @@ Remote.prototype.requestAccountTx = function(options, callback) {
     }
   }
 
+  function propertiesFilter(obj, transaction) {
+    var properties = Object.keys(obj);
+    return function(transaction) {
+      var result = properties.every(function(property) {
+        return transaction.tx[property] === obj[property];
+      });
+      return result;
+    };
+  };
+
+  var SerializedObject = require('./serializedobject').SerializedObject;
+
+  function parseBinary(transaction) {
+    var tx = { validated: transaction.validated };
+    tx.meta = new SerializedObject(transaction.meta).to_json();
+    tx.tx = new SerializedObject(transaction.tx_blob).to_json();
+    tx.tx.ledger_index = transaction.ledger_index;
+    return tx;
+  };
+
   function accountTxFilter(fn) {
     if (typeof fn !== 'function') {
       throw new Error('Missing filter function');
@@ -1013,6 +1033,10 @@ Remote.prototype.requestAccountTx = function(options, callback) {
 
       self.once('success', function(res) {
         res.transactions = res.transactions.filter(fn);
+
+        if (options.binary) {
+          res.transactions = res.transactions.map(parseBinary);
+        }
 
         if (typeof options.map === 'function') {
           res.transactions = res.transactions.map(options.map);
@@ -1039,18 +1063,8 @@ Remote.prototype.requestAccountTx = function(options, callback) {
 
   request.filter = accountTxFilter;
 
-  function propertiesFilter(obj, transaction) {
-    var properties = Object.keys(obj);
-    return function(transaction) {
-      var result = properties.every(function(property) {
-        return transaction.tx[property] === obj[property];
-      });
-      return result;
-    };
-  };
-
-  if (!options.filter && (options.map || options.reduce)) {
-    options.filter = Boolean;
+  if (options.binary || (options.map || options.reduce)) {
+    options.filter = options.filter || Boolean;
   }
 
   if (options.filter) {
