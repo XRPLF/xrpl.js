@@ -103,6 +103,7 @@ function TransactionManager(account) {
       account: self._accountID,
       ledger_index_min: -1,
       ledger_index_max: -1,
+      binary: true,
       limit: 100,
       filter: 'outbound'
     }
@@ -316,6 +317,8 @@ TransactionManager.prototype._request = function(tx) {
 
   tx.emit('presubmit');
 
+  if (tx.finalized) return;
+
   tx.submitIndex = this._remote._ledger_current_index;
 
   if (!tx._setLastLedger) {
@@ -485,8 +488,11 @@ TransactionManager.prototype._request = function(tx) {
   };
 
   function submitTransaction() {
+    if (tx.finalized) return;
+
     submitRequest.timeout(self._submissionTimeout, requestTimeout);
     submitRequest.request();
+
     tx.attempts++;
     tx.emit('postsubmit');
   };
