@@ -1016,6 +1016,7 @@ Remote.prototype.requestAccountTx = function(options, callback) {
     tx.meta = new SerializedObject(transaction.meta).to_json();
     tx.tx = new SerializedObject(transaction.tx_blob).to_json();
     tx.tx.ledger_index = transaction.ledger_index;
+    tx.tx.hash = Transaction.from_json(tx.tx).hash();
     return tx;
   };
 
@@ -1032,10 +1033,12 @@ Remote.prototype.requestAccountTx = function(options, callback) {
       self.removeAllListeners('success');
 
       self.once('success', function(res) {
-        res.transactions = res.transactions.filter(fn);
-
         if (options.binary) {
           res.transactions = res.transactions.map(parseBinary);
+        }
+
+        if (fn !== Boolean) {
+          res.transactions = res.transactions.filter(fn);
         }
 
         if (typeof options.map === 'function') {
