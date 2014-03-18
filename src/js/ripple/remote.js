@@ -864,11 +864,8 @@ Remote.prototype.requestTransactionEntry = function(hash, ledger_hash, callback)
 
   switch (typeof ledger_hash) {
     case 'string':
-      request.ledgerHash(ledger_hash);
-      break;
-
     case 'number':
-      request.ledgerIndex(ledger_hash);
+      request.ledgerSelect(ledger_hash);
       break;
 
     case 'undefined':
