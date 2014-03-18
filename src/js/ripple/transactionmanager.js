@@ -321,11 +321,17 @@ TransactionManager.prototype._request = function(tx) {
 
   tx.submitIndex = this._remote._ledger_current_index;
 
+  if (tx.attempts === 0) {
+    tx.initialSubmitIndex = tx.submitIndex;
+  }
+
   if (!tx._setLastLedger) {
     // Honor LastLedgerSequence set by user of API. If
     // left unset by API, bump LastLedgerSequence
     tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
   }
+
+  tx.lastLedgerSequence = tx.tx_json.LastLedgerSequence;
 
   var submitRequest = remote.requestSubmit();
 

@@ -801,6 +801,9 @@ Transaction.summary = function() {
     clientID:            this._clientID,
     submittedIDs:        this.submittedIDs,
     submissionAttempts:  this.attempts,
+    submitIndex:         this.submitIndex,
+    initialSubmitIndex:  this.initialSubmitIndex,
+    lastLedgerSequence:  this.lastLedgerSequence,
     state:               this.state,
     server:              this._server ? this._server._opts.url :  void(0),
     finalized:           this.finalized
