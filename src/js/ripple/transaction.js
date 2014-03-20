@@ -62,7 +62,9 @@ function Transaction(remote) {
   this.remote = remote;
 
   // Transaction data
-  this.tx_json = { Flags: 0 };
+  this.tx_json = {
+    Flags: Transaction.defaultFlags
+  };
 
   this._secret = void(0);
   this._build_path = false;
@@ -80,15 +82,10 @@ function Transaction(remote) {
   this.submittedIDs = [ ]
 
   function finalize(message) {
-    if (self.result) {
-      self.result.ledger_index = message.ledger_index;
-      self.result.ledger_hash  = message.ledger_hash;
-    } else {
-      self.result = message;
-      self.result.tx_json = self.tx_json;
+    if (!self.finalized) {
+      self.finalized = true;
+      self.emit('cleanup', message);
     }
-
-    self.emit('cleanup', message);
   };
 
   this.once('success', function(message) {
@@ -120,6 +117,11 @@ Transaction.fee_units = {
 };
 
 Transaction.flags = {
+  // Universal flags can apply to any transaction type
+  Universal: {
+    FullyCanonicalSig:  0x80000000
+  },
+
   AccountSet: {
     RequireDestTag:     0x00010000,
     OptionalDestTag:    0x00020000,
@@ -148,6 +150,8 @@ Transaction.flags = {
     LimitQuality:       0x00040000
   }
 };
+
+Transaction.defaultFlags = 0 | Transaction.flags.Universal.FullyCanonicalSig;
 
 Transaction.formats = require('./binformat').tx;
 

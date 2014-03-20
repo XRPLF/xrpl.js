@@ -120,6 +120,8 @@ SerializedType.prototype.parse_varint = function (so) {
  * The result is appended to the serialized object ('so').
  */
 function append_byte_array(so, val, bytes) {
+  val = val >>> 0;
+
   if (!isNumber(val)) {
     throw new Error('Value is not a number');
   }

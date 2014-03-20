@@ -89,8 +89,10 @@ KeyPair.prototype.get_address = function () {
 };
 
 KeyPair.prototype.sign = function (hash) {
-  var hash = UInt256.from_json(hash);
-  return this._secret.signDER(hash.to_bits(), 0);
+  hash = UInt256.from_json(hash);
+  var sig = this._secret.sign(hash.to_bits(), 0);
+  sig = this._secret.canonicalizeSignature(sig);
+  return this._secret.encodeDER(sig);
 };
 
 exports.KeyPair = KeyPair;
