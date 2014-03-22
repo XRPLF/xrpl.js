@@ -62,9 +62,7 @@ function Transaction(remote) {
   this.remote = remote;
 
   // Transaction data
-  this.tx_json = {
-    Flags: Transaction.defaultFlags
-  };
+  this.tx_json = { Flags: 0 };
 
   this._secret = void(0);
   this._build_path = false;
@@ -75,11 +73,13 @@ function Transaction(remote) {
   // Index at which transaction was submitted
   this.submitIndex = void(0);
 
+  this.canonical = true;
+
   // We aren't clever enough to eschew preventative measures so we keep an array
   // of all submitted transactionIDs (which can change due to load_factor
   // effecting the Fee amount). This should be populated with a transactionID
   // any time it goes on the network
-  this.submittedIDs = [ ]
+  this.submittedIDs = [ ];
 
   function finalize(message) {
     if (!self.finalized) {
@@ -150,8 +150,6 @@ Transaction.flags = {
     LimitQuality:       0x00040000
   }
 };
-
-Transaction.defaultFlags = 0 | Transaction.flags.Universal.FullyCanonicalSig;
 
 Transaction.formats = require('./binformat').tx;
 
@@ -280,6 +278,15 @@ Transaction.prototype.complete = function() {
     var seed = Seed.from_json(this._secret);
     var key  = seed.get_key(this.tx_json.Account);
     this.tx_json.SigningPubKey = key.to_hex_pub();
+  }
+
+  // Set canonical flag - this enables canonicalized signature checking
+  if (this.canonical) {
+    this.tx_json.Flags |= Transaction.flags.Universal.FullyCanonicalSig;
+
+    // JavaScript converts operands to 32-bit signed ints before doing bitwise
+    // operations. We need to convert it back to an unsigned int.
+    this.tx_json.Flags = this.tx_json.Flags >>> 0;
   }
 
   return this.tx_json;
