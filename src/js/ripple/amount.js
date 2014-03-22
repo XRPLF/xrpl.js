@@ -159,6 +159,29 @@ Amount.prototype.add = function (v) {
   return result;
 };
 
+/**
+ * Turn this amount into its inverse.
+ *
+ * @private
+ */
+Amount.prototype._invert = function () {
+  this._value = consts.bi_1e32.divide(this._value);
+  this._offset = -32 - this._offset;
+  this.canonicalize();
+
+  return this;
+};
+
+/**
+ * Return the inverse of this amount.
+ *
+ * @return {Amount} New Amount object with same currency and issuer, but the
+ *   inverse of the value.
+ */
+Amount.prototype.invert = function () {
+  return this.copy()._invert();
+};
+
 Amount.prototype.canonicalize = function () {
   if (!(this._value instanceof BigInteger)) {
     // NaN.

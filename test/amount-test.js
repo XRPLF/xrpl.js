@@ -512,4 +512,16 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').ratio_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_text_full(), '201.0049931765529/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
   });
+
+  describe('_invert', function() {
+    it('Invert 1', function () {
+      assert.strictEqual(Amount.from_json('1/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').invert().to_text_full(), '1/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it('Invert 20', function () {
+      assert.strictEqual(Amount.from_json('20/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').invert().to_text_full(), '0.05/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it('Invert 0.02', function () {
+      assert.strictEqual(Amount.from_json('0.02/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').invert().to_text_full(), '50/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+  });
 });
