@@ -71,8 +71,8 @@ Amount.from_json = function (j) {
   return (new Amount()).parse_json(j);
 };
 
-Amount.from_quality = function (q, c, i) {
-  return (new Amount()).parse_quality(q, c, i);
+Amount.from_quality = function (quality, currency, issuer) {
+  return (new Amount()).parse_quality(quality, currency, issuer);
 };
 
 Amount.from_human = function (j, opts) {
@@ -645,12 +645,12 @@ Amount.prototype.parse_issuer = function (issuer) {
 };
 
 // --> h: 8 hex bytes quality or 32 hex bytes directory index.
-Amount.prototype.parse_quality = function (q, c, i) {
+Amount.prototype.parse_quality = function (quality, currency, issuer) {
   this._is_negative = false;
-  this._value       = new BigInteger(q.substring(q.length-14), 16);
-  this._offset      = parseInt(q.substring(q.length-16, q.length-14), 16)-100;
-  this._currency    = Currency.from_json(c);
-  this._issuer      = UInt160.from_json(i);
+  this._value       = new BigInteger(quality.substring(quality.length-14), 16);
+  this._offset      = parseInt(quality.substring(quality.length-16, quality.length-14), 16)-100;
+  this._currency    = Currency.from_json(currency);
+  this._issuer      = UInt160.from_json(issuer);
   this._is_native   = this._currency.is_native();
 
   this.canonicalize();
