@@ -349,9 +349,14 @@ Amount.prototype.divide = function (d) {
  *
  * @this {Amount} The numerator (top half) of the fraction.
  * @param {Amount} denominator The denominator (bottom half) of the fraction.
+ * @param opts Options for the calculation.
+ * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
+ *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  * @return {Amount} The resulting ratio. Unit will be the same as numerator.
  */
-Amount.prototype.ratio_human = function (denominator) {
+Amount.prototype.ratio_human = function (denominator, opts) {
+  opts = opts || {};
+
   if (typeof denominator === 'number' && parseInt(denominator, 10) === denominator) {
     // Special handling of integer arguments
     denominator = Amount.from_json('' + denominator + '.0');
@@ -365,6 +370,14 @@ Amount.prototype.ratio_human = function (denominator) {
   // If either operand is NaN, the result is NaN.
   if (!numerator.is_valid() || !denominator.is_valid()) {
     return Amount.NaN();
+  }
+
+  // Apply interest/demurrage
+  //
+  // We only need to apply it to the second factor, because the currency unit of
+  // the first factor will carry over into the result.
+  if (opts.reference_date) {
+    denominator = denominator.applyInterest(opts.reference_date);
   }
 
   // Special case: The denominator is a native (XRP) amount.
@@ -402,9 +415,14 @@ Amount.prototype.ratio_human = function (denominator) {
  *
  * @this {Amount} The first factor of the product.
  * @param {Amount} factor The second factor of the product.
+ * @param opts Options for the calculation.
+ * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
+ *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  * @return {Amount} The product. Unit will be the same as the first factor.
  */
-Amount.prototype.product_human = function (factor) {
+Amount.prototype.product_human = function (factor, opts) {
+  opts = opts || {};
+
   if (typeof factor === 'number' && parseInt(factor, 10) === factor) {
     // Special handling of integer arguments
     factor = Amount.from_json(String(factor) + '.0');
@@ -415,6 +433,14 @@ Amount.prototype.product_human = function (factor) {
   // If either operand is NaN, the result is NaN.
   if (!this.is_valid() || !factor.is_valid()) {
     return Amount.NaN();
+  }
+
+  // Apply interest/demurrage
+  //
+  // We only need to apply it to the second factor, because the currency unit of
+  // the first factor will carry over into the result.
+  if (opts.reference_date) {
+    factor = factor.applyInterest(opts.reference_date);
   }
 
   var product = this.multiply(factor);
@@ -851,6 +877,39 @@ Amount.prototype.to_text = function (allow_nan) {
 };
 
 /**
+ * Calculate present value based on currency and a reference date.
+ *
+ * This only affects demurraging and interest-bearing currencies.
+ *
+ * User should not store amount objects after the interest is applied. This is
+ * intended by display functions such as toHuman().
+ *
+ * @param referenceDate {Date|Number} Date based on which demurrage/interest
+ *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
+ * @return {Amount} The amount with interest applied.
+ */
+Amount.prototype.applyInterest = function (referenceDate) {
+  if (this._currency.has_interest()) {
+    var interest = this._currency.get_interest_at(referenceDate);
+
+    // XXX Because the Amount parsing routines don't support some of the things
+    //     that JavaScript can output when casting a float to a string, the
+    //     following call sometimes does not produce a valid Amount.
+    //
+    //     The correct way to solve this is probably to switch to a proper
+    //     BigDecimal for our internal representation and then use that across
+    //     the board instead of instantiating these dummy Amount objects.
+    var interestTempAmount = Amount.from_json(""+interest+"/1/1");
+
+    if (interestTempAmount.is_valid()) {
+      return this.multiply(interestTempAmount);
+    }
+  } else {
+    return this;
+  }
+};
+
+/**
  * Format only value in a human-readable format.
  *
  * @example
@@ -885,21 +944,8 @@ Amount.prototype.to_human = function (opts) {
 
   // Apply demurrage/interest
   var ref = this;
-  if (opts.reference_date && this._currency.has_interest()) {
-    var interest = this._currency.get_interest_at(opts.reference_date);
-
-    // XXX Because the Amount parsing routines don't support some of the things
-    //     that JavaScript can output when casting a float to a string, the
-    //     following call sometimes does not produce a valid Amount.
-    //
-    //     The correct way to solve this is probably to switch to a proper
-    //     BigDecimal for our internal representation and then use that across
-    //     the board instead of instantiating these dummy Amount objects.
-    var interestTempAmount = Amount.from_json(""+interest+"/1/1");
-
-    if (interestTempAmount.is_valid()) {
-      ref = this.multiply(interestTempAmount);
-    }
+  if (opts.reference_date) {
+    ref = this.applyInterest(opts.reference_date);
   }
 
   var order         = ref._is_native ? consts.xns_precision : -ref._offset;

@@ -431,4 +431,85 @@ describe('Amount', function() {
       assert.strictEqual(a.not_equals_why(b), 'Native mismatch.');
     });
   });
+
+  describe('product_human', function() {
+    it('Multiply 0 XRP with 0 XRP', function () {
+      assert.strictEqual('0/XRP', Amount.from_json('0').product_human(Amount.from_json('0')).to_text_full());
+    });
+    it('Multiply 0 USD with 0 XRP', function () {
+      assert.strictEqual('0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('0')).to_text_full());
+    });
+    it('Multiply 0 XRP with 0 USD', function () {
+      assert.strictEqual('0/XRP', Amount.from_json('0').product_human(Amount.from_json('0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply 1 XRP with 0 XRP', function () {
+      assert.strictEqual('0/XRP', Amount.from_json('1').product_human(Amount.from_json('0')).to_text_full());
+    });
+    it('Multiply 1 USD with 0 XRP', function () {
+      assert.strictEqual('0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('1/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('0')).to_text_full());
+    });
+    it('Multiply 1 XRP with 0 USD', function () {
+      assert.strictEqual('0/XRP', Amount.from_json('1').product_human(Amount.from_json('0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply 0 XRP with 1 XRP', function () {
+      assert.strictEqual('0/XRP', Amount.from_json('0').product_human(Amount.from_json('1')).to_text_full());
+    });
+    it('Multiply 0 USD with 1 XRP', function () {
+      assert.strictEqual('0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('1')).to_text_full());
+    });
+    it('Multiply 0 XRP with 1 USD', function () {
+      assert.strictEqual('0/XRP', Amount.from_json('0').product_human(Amount.from_json('1/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply XRP with USD', function () {
+      assert.equal('0.002/XRP', Amount.from_json('200').product_human(Amount.from_json('10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply XRP with USD', function () {
+      assert.strictEqual('0.2/XRP', Amount.from_json('20000').product_human(Amount.from_json('10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply XRP with USD', function () {
+      assert.strictEqual('20/XRP', Amount.from_json('2000000').product_human(Amount.from_json('10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply XRP with USD, neg', function () {
+      assert.strictEqual('-0.002/XRP', Amount.from_json('200').product_human(Amount.from_json('-10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply XRP with USD, neg, frac', function () {
+      assert.strictEqual('-0.222/XRP', Amount.from_json('-6000').product_human(Amount.from_json('37/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply USD with USD', function () {
+      assert.strictEqual('20000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('10/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply USD with USD', function () {
+      assert.strictEqual('200000000000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('2000000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('100000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply EUR with USD, result < 1', function () {
+      assert.strictEqual('100000/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('100/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('1000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
+    });
+    it('Multiply EUR with USD, neg', function () {
+      assert.strictEqual(Amount.from_json('-24000/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full(), '-48000000/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it('Multiply EUR with USD, neg, <1', function () {
+      assert.strictEqual(Amount.from_json('0.1/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('-1000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full(), '-100/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it('Multiply EUR with XRP, factor < 1', function () {
+      assert.strictEqual(Amount.from_json('0.05/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('2000')).to_text_full(), '0.0001/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it('Multiply EUR with XRP, neg', function () {
+      assert.strictEqual(Amount.from_json('-100/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('5')).to_text_full(), '-0.0005/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it('Multiply EUR with XRP, neg, <1', function () {
+      assert.strictEqual(Amount.from_json('-0.05/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('2000')).to_text_full(), '-0.0001/EUR/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it('Multiply XRP with XRP', function () {
+      assert.strictEqual(Amount.from_json('10000000').product_human(Amount.from_json('10')).to_text_full(), '0.0001/XRP');
+    });
+    it('Multiply USD with XAU (dem)', function () {
+      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_text_full(), '19900.00316303882/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+  });
+
+  describe('ratio_human', function() {
+    it('Divide USD by XAU (dem)', function () {
+      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').ratio_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_text_full(), '201.0049931765529/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+  });
 });
