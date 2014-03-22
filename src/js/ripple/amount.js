@@ -71,8 +71,8 @@ Amount.from_json = function (j) {
   return (new Amount()).parse_json(j);
 };
 
-Amount.from_quality = function (quality, currency, issuer) {
-  return (new Amount()).parse_quality(quality, currency, issuer);
+Amount.from_quality = function (quality, currency, issuer, opts) {
+  return (new Amount()).parse_quality(quality, currency, issuer, opts);
 };
 
 Amount.from_human = function (j, opts) {
@@ -667,16 +667,80 @@ Amount.prototype.parse_issuer = function (issuer) {
   return this;
 };
 
-// --> h: 8 hex bytes quality or 32 hex bytes directory index.
-Amount.prototype.parse_quality = function (quality, currency, issuer) {
+/**
+ * Decode a price from a BookDirectory index.
+ *
+ * BookDirectory ledger entries each encode the offer price in their index. This
+ * method can decode that information and populate an Amount object with it.
+ *
+ * It is possible not to provide a currency or issuer, but be aware that Amount
+ * objects behave differently based on the currency, so you may get incorrect
+ * results.
+ *
+ * Prices involving demurraging currencies are tricky, since they depend on the
+ * base and counter currencies.
+ *
+ * @param quality {String} 8 hex bytes quality or 32 hex bytes BookDirectory
+ *   index.
+ * @param counterCurrency {Currency|String} Currency of the resulting Amount
+ *   object.
+ * @param counterIssuer {Issuer|String} Issuer of the resulting Amount object.
+ * @param opts Additional options
+ * @param opts.inverse {Boolean} If true, return the inverse of the price
+ *   encoded in the quality.
+ * @param opts.base_currency {Currency|String} The other currency. This plays a
+ *   role with interest-bearing or demurrage currencies. In that case the
+ *   demurrage has to be applied when the quality is decoded, otherwise the
+ *   price will be false.
+ * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
+ *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
+ * @param opts.xrp_as_drops {Boolean} Whether XRP amount should be treated as
+ *   drops. When the base currency is XRP, the quality is calculated in drops.
+ *   For human use however, we want to think of 1000000 drops as 1 XRP and
+ *   prices as per-XRP instead of per-drop.
+ */
+Amount.prototype.parse_quality = function (quality, counterCurrency, counterIssuer, opts)
+{
+  opts = opts || {};
+
+  var baseCurrency = Currency.from_json(opts.base_currency);
+
   this._is_negative = false;
   this._value       = new BigInteger(quality.substring(quality.length-14), 16);
   this._offset      = parseInt(quality.substring(quality.length-16, quality.length-14), 16)-100;
-  this._currency    = Currency.from_json(currency);
-  this._issuer      = UInt160.from_json(issuer);
+  this._currency    = Currency.from_json(counterCurrency);
+  this._issuer      = UInt160.from_json(counterIssuer);
   this._is_native   = this._currency.is_native();
 
+  // Correct offset if xrp_as_drops option is not set and base currency is XRP
+  if (!opts.xrp_as_drops &&
+      baseCurrency.is_valid() &&
+      baseCurrency.is_native()) {
+    if (opts.inverse) {
+      this._offset -= 6;
+    } else {
+      this._offset += 6;
+    }
+  }
+
+  if (opts.inverse) {
+    this._invert();
+  }
+
   this.canonicalize();
+
+  if (opts.reference_date && baseCurrency.is_valid() && baseCurrency.has_interest()) {
+    var interest = baseCurrency.get_interest_at(opts.reference_date);
+
+    // XXX If we had better math utilities, we wouldn't need this hack.
+    var interestTempAmount = Amount.from_json(""+interest+"/1/1");
+
+    if (interestTempAmount.is_valid()) {
+      var v = this.divide(interestTempAmount);
+      this._value = v._value;
+      this._offset = v._offset;
+    }
+  }
 
   return this;
 }
