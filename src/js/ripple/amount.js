@@ -71,8 +71,8 @@ Amount.from_json = function (j) {
   return (new Amount()).parse_json(j);
 };
 
-Amount.from_quality = function (q, c, i) {
-  return (new Amount()).parse_quality(q, c, i);
+Amount.from_quality = function (quality, currency, issuer, opts) {
+  return (new Amount()).parse_quality(quality, currency, issuer, opts);
 };
 
 Amount.from_human = function (j, opts) {
@@ -157,6 +157,29 @@ Amount.prototype.add = function (v) {
   }
 
   return result;
+};
+
+/**
+ * Turn this amount into its inverse.
+ *
+ * @private
+ */
+Amount.prototype._invert = function () {
+  this._value = consts.bi_1e32.divide(this._value);
+  this._offset = -32 - this._offset;
+  this.canonicalize();
+
+  return this;
+};
+
+/**
+ * Return the inverse of this amount.
+ *
+ * @return {Amount} New Amount object with same currency and issuer, but the
+ *   inverse of the value.
+ */
+Amount.prototype.invert = function () {
+  return this.copy()._invert();
 };
 
 Amount.prototype.canonicalize = function () {
@@ -349,9 +372,14 @@ Amount.prototype.divide = function (d) {
  *
  * @this {Amount} The numerator (top half) of the fraction.
  * @param {Amount} denominator The denominator (bottom half) of the fraction.
+ * @param opts Options for the calculation.
+ * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
+ *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  * @return {Amount} The resulting ratio. Unit will be the same as numerator.
  */
-Amount.prototype.ratio_human = function (denominator) {
+Amount.prototype.ratio_human = function (denominator, opts) {
+  opts = opts || {};
+
   if (typeof denominator === 'number' && parseInt(denominator, 10) === denominator) {
     // Special handling of integer arguments
     denominator = Amount.from_json('' + denominator + '.0');
@@ -365,6 +393,14 @@ Amount.prototype.ratio_human = function (denominator) {
   // If either operand is NaN, the result is NaN.
   if (!numerator.is_valid() || !denominator.is_valid()) {
     return Amount.NaN();
+  }
+
+  // Apply interest/demurrage
+  //
+  // We only need to apply it to the second factor, because the currency unit of
+  // the first factor will carry over into the result.
+  if (opts.reference_date) {
+    denominator = denominator.applyInterest(opts.reference_date);
   }
 
   // Special case: The denominator is a native (XRP) amount.
@@ -402,9 +438,14 @@ Amount.prototype.ratio_human = function (denominator) {
  *
  * @this {Amount} The first factor of the product.
  * @param {Amount} factor The second factor of the product.
+ * @param opts Options for the calculation.
+ * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
+ *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  * @return {Amount} The product. Unit will be the same as the first factor.
  */
-Amount.prototype.product_human = function (factor) {
+Amount.prototype.product_human = function (factor, opts) {
+  opts = opts || {};
+
   if (typeof factor === 'number' && parseInt(factor, 10) === factor) {
     // Special handling of integer arguments
     factor = Amount.from_json(String(factor) + '.0');
@@ -415,6 +456,14 @@ Amount.prototype.product_human = function (factor) {
   // If either operand is NaN, the result is NaN.
   if (!this.is_valid() || !factor.is_valid()) {
     return Amount.NaN();
+  }
+
+  // Apply interest/demurrage
+  //
+  // We only need to apply it to the second factor, because the currency unit of
+  // the first factor will carry over into the result.
+  if (opts.reference_date) {
+    factor = factor.applyInterest(opts.reference_date);
   }
 
   var product = this.multiply(factor);
@@ -618,16 +667,80 @@ Amount.prototype.parse_issuer = function (issuer) {
   return this;
 };
 
-// --> h: 8 hex bytes quality or 32 hex bytes directory index.
-Amount.prototype.parse_quality = function (q, c, i) {
+/**
+ * Decode a price from a BookDirectory index.
+ *
+ * BookDirectory ledger entries each encode the offer price in their index. This
+ * method can decode that information and populate an Amount object with it.
+ *
+ * It is possible not to provide a currency or issuer, but be aware that Amount
+ * objects behave differently based on the currency, so you may get incorrect
+ * results.
+ *
+ * Prices involving demurraging currencies are tricky, since they depend on the
+ * base and counter currencies.
+ *
+ * @param quality {String} 8 hex bytes quality or 32 hex bytes BookDirectory
+ *   index.
+ * @param counterCurrency {Currency|String} Currency of the resulting Amount
+ *   object.
+ * @param counterIssuer {Issuer|String} Issuer of the resulting Amount object.
+ * @param opts Additional options
+ * @param opts.inverse {Boolean} If true, return the inverse of the price
+ *   encoded in the quality.
+ * @param opts.base_currency {Currency|String} The other currency. This plays a
+ *   role with interest-bearing or demurrage currencies. In that case the
+ *   demurrage has to be applied when the quality is decoded, otherwise the
+ *   price will be false.
+ * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
+ *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
+ * @param opts.xrp_as_drops {Boolean} Whether XRP amount should be treated as
+ *   drops. When the base currency is XRP, the quality is calculated in drops.
+ *   For human use however, we want to think of 1000000 drops as 1 XRP and
+ *   prices as per-XRP instead of per-drop.
+ */
+Amount.prototype.parse_quality = function (quality, counterCurrency, counterIssuer, opts)
+{
+  opts = opts || {};
+
+  var baseCurrency = Currency.from_json(opts.base_currency);
+
   this._is_negative = false;
-  this._value       = new BigInteger(q.substring(q.length-14), 16);
-  this._offset      = parseInt(q.substring(q.length-16, q.length-14), 16)-100;
-  this._currency    = Currency.from_json(c);
-  this._issuer      = UInt160.from_json(i);
+  this._value       = new BigInteger(quality.substring(quality.length-14), 16);
+  this._offset      = parseInt(quality.substring(quality.length-16, quality.length-14), 16)-100;
+  this._currency    = Currency.from_json(counterCurrency);
+  this._issuer      = UInt160.from_json(counterIssuer);
   this._is_native   = this._currency.is_native();
 
+  // Correct offset if xrp_as_drops option is not set and base currency is XRP
+  if (!opts.xrp_as_drops &&
+      baseCurrency.is_valid() &&
+      baseCurrency.is_native()) {
+    if (opts.inverse) {
+      this._offset -= 6;
+    } else {
+      this._offset += 6;
+    }
+  }
+
+  if (opts.inverse) {
+    this._invert();
+  }
+
   this.canonicalize();
+
+  if (opts.reference_date && baseCurrency.is_valid() && baseCurrency.has_interest()) {
+    var interest = baseCurrency.get_interest_at(opts.reference_date);
+
+    // XXX If we had better math utilities, we wouldn't need this hack.
+    var interestTempAmount = Amount.from_json(""+interest+"/1/1");
+
+    if (interestTempAmount.is_valid()) {
+      var v = this.divide(interestTempAmount);
+      this._value = v._value;
+      this._offset = v._offset;
+    }
+  }
 
   return this;
 }
@@ -851,6 +964,39 @@ Amount.prototype.to_text = function (allow_nan) {
 };
 
 /**
+ * Calculate present value based on currency and a reference date.
+ *
+ * This only affects demurraging and interest-bearing currencies.
+ *
+ * User should not store amount objects after the interest is applied. This is
+ * intended by display functions such as toHuman().
+ *
+ * @param referenceDate {Date|Number} Date based on which demurrage/interest
+ *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
+ * @return {Amount} The amount with interest applied.
+ */
+Amount.prototype.applyInterest = function (referenceDate) {
+  if (this._currency.has_interest()) {
+    var interest = this._currency.get_interest_at(referenceDate);
+
+    // XXX Because the Amount parsing routines don't support some of the things
+    //     that JavaScript can output when casting a float to a string, the
+    //     following call sometimes does not produce a valid Amount.
+    //
+    //     The correct way to solve this is probably to switch to a proper
+    //     BigDecimal for our internal representation and then use that across
+    //     the board instead of instantiating these dummy Amount objects.
+    var interestTempAmount = Amount.from_json(""+interest+"/1/1");
+
+    if (interestTempAmount.is_valid()) {
+      return this.multiply(interestTempAmount);
+    }
+  } else {
+    return this;
+  }
+};
+
+/**
  * Format only value in a human-readable format.
  *
  * @example
@@ -885,21 +1031,8 @@ Amount.prototype.to_human = function (opts) {
 
   // Apply demurrage/interest
   var ref = this;
-  if (opts.reference_date && this._currency.has_interest()) {
-    var interest = this._currency.get_interest_at(opts.reference_date);
-
-    // XXX Because the Amount parsing routines don't support some of the things
-    //     that JavaScript can output when casting a float to a string, the
-    //     following call sometimes does not produce a valid Amount.
-    //
-    //     The correct way to solve this is probably to switch to a proper
-    //     BigDecimal for our internal representation and then use that across
-    //     the board instead of instantiating these dummy Amount objects.
-    var interestTempAmount = Amount.from_json(""+interest+"/1/1");
-
-    if (interestTempAmount.is_valid()) {
-      ref = this.multiply(interestTempAmount);
-    }
+  if (opts.reference_date) {
+    ref = this.applyInterest(opts.reference_date);
   }
 
   var order         = ref._is_native ? consts.xns_precision : -ref._offset;

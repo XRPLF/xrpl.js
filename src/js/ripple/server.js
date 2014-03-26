@@ -36,8 +36,17 @@ function Server(remote, opts) {
     throw new Error('Server host is malformed, use "host" and "port" server configuration');
   }
 
-  if (typeof opts.port !== 'number') {
-    throw new TypeError('Server configuration "port" is not a Number');
+  // We want to allow integer strings as valid port numbers for backward
+  // compatibility.
+  if (typeof opts.port === 'string') {
+    opts.port = parseFloat(opts.port);
+  }
+
+  if (typeof opts.port !== 'number' ||
+      opts.port >>> 0 !== parseFloat(opts.port) || // is integer?
+      opts.port < 1 ||
+      opts.port > 65535) {
+    throw new TypeError('Server "port" must be an integer in range 1-65535');
   }
 
   if (typeof opts.secure !== 'boolean') {

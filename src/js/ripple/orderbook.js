@@ -225,11 +225,12 @@ OrderBook.prototype.notify = function (message) {
         break;
 
       case 'CreatedNode':
-        var price = Amount.from_json(an.fields.TakerPays).ratio_human(an.fields.TakerGets);
+        // XXX Should use Amount#from_quality
+        var price = Amount.from_json(an.fields.TakerPays).ratio_human(an.fields.TakerGets, {reference_date: new Date()});
 
         for (i = 0, l = self._offers.length; i < l; i++) {
           offer = self._offers[i];
-          var priceItem = Amount.from_json(offer.TakerPays).ratio_human(offer.TakerGets);
+          var priceItem = Amount.from_json(offer.TakerPays).ratio_human(offer.TakerGets, {reference_date: new Date()});
 
           if (price.compareTo(priceItem) <= 0) {
             var obj   = an.fields;

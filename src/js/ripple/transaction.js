@@ -73,22 +73,19 @@ function Transaction(remote) {
   // Index at which transaction was submitted
   this.submitIndex = void(0);
 
+  this.canonical = true;
+
   // We aren't clever enough to eschew preventative measures so we keep an array
   // of all submitted transactionIDs (which can change due to load_factor
   // effecting the Fee amount). This should be populated with a transactionID
   // any time it goes on the network
-  this.submittedIDs = [ ]
+  this.submittedIDs = [ ];
 
   function finalize(message) {
-    if (self.result) {
-      self.result.ledger_index = message.ledger_index;
-      self.result.ledger_hash  = message.ledger_hash;
-    } else {
-      self.result = message;
-      self.result.tx_json = self.tx_json;
+    if (!self.finalized) {
+      self.finalized = true;
+      self.emit('cleanup', message);
     }
-
-    self.emit('cleanup', message);
   };
 
   this.once('success', function(message) {
@@ -120,6 +117,11 @@ Transaction.fee_units = {
 };
 
 Transaction.flags = {
+  // Universal flags can apply to any transaction type
+  Universal: {
+    FullyCanonicalSig:  0x80000000
+  },
+
   AccountSet: {
     RequireDestTag:     0x00010000,
     OptionalDestTag:    0x00020000,
@@ -276,6 +278,15 @@ Transaction.prototype.complete = function() {
     var seed = Seed.from_json(this._secret);
     var key  = seed.get_key(this.tx_json.Account);
     this.tx_json.SigningPubKey = key.to_hex_pub();
+  }
+
+  // Set canonical flag - this enables canonicalized signature checking
+  if (this.canonical) {
+    this.tx_json.Flags |= Transaction.flags.Universal.FullyCanonicalSig;
+
+    // JavaScript converts operands to 32-bit signed ints before doing bitwise
+    // operations. We need to convert it back to an unsigned int.
+    this.tx_json.Flags = this.tx_json.Flags >>> 0;
   }
 
   return this.tx_json;

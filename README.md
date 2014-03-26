@@ -1,5 +1,7 @@
 #The Ripple JavaScript Library
 
+[![NPM](https://nodei.co/npm/ripple-lib.png)](https://www.npmjs.org/package/ripple-lib)
+
 `ripple-lib` connects to the Ripple network via the WebSocket protocol and runs in Node.js as well as in the browser.
 
 **Use ripple-lib for**
