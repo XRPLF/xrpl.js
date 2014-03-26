@@ -529,7 +529,7 @@ Remote.prototype._handleMessage = function(message, server) {
       // De-duplicate transactions that are immediately following each other
       var hash = message.transaction.hash;
 
-      if (this._received_tx.hasOwnProperty(hash)) {
+      if (this._received_tx.get(hash)) {
         break;
       }
 
