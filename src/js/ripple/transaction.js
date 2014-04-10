@@ -281,7 +281,7 @@ Transaction.prototype.complete = function() {
   }
 
   // Set canonical flag - this enables canonicalized signature checking
-  if (this.canonical) {
+  if (this.remote.local_signing && this.canonical) {
     this.tx_json.Flags |= Transaction.flags.Universal.FullyCanonicalSig;
 
     // JavaScript converts operands to 32-bit signed ints before doing bitwise
