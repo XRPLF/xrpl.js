@@ -81,23 +81,16 @@ function Transaction(remote) {
   // any time it goes on the network
   this.submittedIDs = [ ];
 
-  function finalize(message) {
-    if (!self.finalized) {
-      self.finalized = true;
-      self.emit('cleanup', message);
-    }
-  };
-
   this.once('success', function(message) {
-    self.finalized = true;
     self.setState('validated');
-    finalize(message);
+    self.finalize(message);
+    self.emit('cleanup', message);
   });
 
   this.once('error', function(message) {
-    self.finalized = true;
     self.setState('failed');
-    finalize(message);
+    self.finalize(message);
+    self.emit('cleanup', message);
   });
 
   this.once('submitted', function() {
@@ -205,6 +198,20 @@ Transaction.prototype.setState = function(state) {
     this.emit('state', state);
     this.emit('save');
   }
+};
+
+Transaction.prototype.finalize = function(message) {
+  this.finalized = true;
+
+  if (this.result) {
+    this.result.ledger_index = message.ledger_index;
+    this.result.ledger_hash  = message.ledger_hash;
+  } else {
+    this.result = message;
+    this.result.tx_json = this.tx_json;
+  }
+
+  return this;
 };
 
 Transaction.prototype._accountSecret = function(account) {
