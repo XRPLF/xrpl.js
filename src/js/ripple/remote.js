@@ -1666,7 +1666,7 @@ Remote.prototype.transaction = function(source, options, callback) {
       break;
 
     case 'string':
-      transactionType = source.toLowerCase();
+      transactionType = transactionTypes[source.toLowerCase()];
 
       if (!transactionType) {
         throw new Error('Invalid transaction type: ' + transactionType);
