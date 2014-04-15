@@ -529,7 +529,7 @@ Transaction.prototype.setFlags = function(flags) {
 Transaction.prototype.accountSet = function(src) {
   if (typeof src === 'object') {
     var options = src;
-    src = options.source || options.from;
+    src = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -538,6 +538,7 @@ Transaction.prototype.accountSet = function(src) {
 
   this.tx_json.TransactionType  = 'AccountSet';
   this.tx_json.Account          = UInt160.json_rewrite(src);
+
   return this;
 };
 
@@ -547,7 +548,7 @@ Transaction.prototype.claim = function(src, generator, public_key, signature) {
     signature  = options.signature;
     public_key = options.public_key;
     generator  = options.generator;
-    src        = options.source || options.from;
+    src        = options.source || options.from || options.account;
   }
 
   this.tx_json.TransactionType = 'Claim';
@@ -561,7 +562,7 @@ Transaction.prototype.offerCancel = function(src, sequence) {
   if (typeof src === 'object') {
     var options = src;
     sequence = options.sequence;
-    src      = options.source || options.from;
+    src      = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -571,6 +572,7 @@ Transaction.prototype.offerCancel = function(src, sequence) {
   this.tx_json.TransactionType = 'OfferCancel';
   this.tx_json.Account         = UInt160.json_rewrite(src);
   this.tx_json.OfferSequence   = Number(sequence);
+
   return this;
 };
 
@@ -585,7 +587,7 @@ Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expira
     expiration      = options.expiration;
     taker_gets      = options.taker_gets || options.sell;
     taker_pays      = options.taker_pays || options.buy;
-    src             = options.source || options.from;
+    src             = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -629,6 +631,7 @@ Transaction.prototype.passwordFund = function(src, dst) {
 
   this.tx_json.TransactionType = 'PasswordFund';
   this.tx_json.Destination     = UInt160.json_rewrite(dst);
+
   return this;
 };
 
@@ -639,7 +642,7 @@ Transaction.prototype.passwordSet = function(src, authorized_key, generator, pub
     public_key     = options.public_key;
     generator      = options.generator;
     authorized_key = options.authorized_key;
-    src            = options.source || options.from;
+    src            = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -651,6 +654,7 @@ Transaction.prototype.passwordSet = function(src, authorized_key, generator, pub
   this.tx_json.Generator       = generator;
   this.tx_json.PublicKey       = public_key;
   this.tx_json.Signature       = signature;
+
   return this;
 };
 
@@ -676,10 +680,11 @@ Transaction.prototype.payment = function(src, dst, amount) {
     var options = src;
     amount = options.amount;
     dst    = options.destination || options.to;
-    src    = options.source || options.from;
-    if (options.invoiceID) {
-      this.invoiceID(options.invoiceID);
-    }
+    src    = options.source || options.from || options.account;
+  }
+
+  if (options.invoiceID) {
+    this.invoiceID(options.invoiceID);
   }
 
   if (!UInt160.is_valid(src)) {
@@ -709,7 +714,7 @@ Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_o
     quality_out = options.quality_out;
     quality_in  = options.quality_in;
     limit       = options.limit;
-    src         = options.source || options.from;
+    src         = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -743,7 +748,7 @@ Transaction.prototype.walletAdd = function(src, amount, authorized_key, public_k
     public_key     = options.public_key;
     authorized_key = options.authorized_key;
     amount         = options.amount;
-    src            = options.source || options.from;
+    src            = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -755,6 +760,7 @@ Transaction.prototype.walletAdd = function(src, amount, authorized_key, public_k
   this.tx_json.RegularKey       = authorized_key;
   this.tx_json.PublicKey        = public_key;
   this.tx_json.Signature        = signature;
+
   return this;
 };
 
