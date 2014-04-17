@@ -683,8 +683,8 @@ Transaction.prototype.payment = function(src, dst, amount) {
     src    = options.source || options.from || options.account;
   }
 
-  if (options.invoiceID) {
-    this.invoiceID(options.invoiceID);
+  if (src.invoiceID) {
+    this.invoiceID(src.invoiceID);
   }
 
   if (!UInt160.is_valid(src)) {
