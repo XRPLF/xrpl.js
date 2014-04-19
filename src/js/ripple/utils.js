@@ -135,7 +135,12 @@ function fromTimestamp(rpepoch) {
     rpepoch = rpepoch.getTime();
   }
 
-  return Math.round(rpepoch/1000) - 0x386D4380;
+  return Math.round(rpepoch / 1000) - 0x386D4380;
+};
+
+exports.time = {
+  fromRipple:  toTimestamp,
+  toRipple:    fromTimestamp
 };
 
 exports.trace         = trace;
