@@ -1104,7 +1104,7 @@ Remote.prototype.requestTxHistory = function(start, callback) {
   return request;
 };
 
-Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
+Remote.prototype.requestBookOffers = function(gets, pays, taker, limit, callback) {
   if (gets.hasOwnProperty('pays')) {
     var options = gets;
     callback = pays;
@@ -1138,6 +1138,10 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
   }
 
   request.message.taker = taker ? taker : UInt160.ACCOUNT_ONE;
+
+  if (limit) {
+    request.message.limit = limit;
+  }
 
   request.callback(callback);
 
