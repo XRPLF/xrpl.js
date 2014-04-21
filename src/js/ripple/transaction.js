@@ -44,6 +44,7 @@
 
 var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
+var utils            = require('./utils');
 var sjcl             = require('./utils').sjcl;
 var Amount           = require('./amount').Amount;
 var Currency         = require('./amount').Currency;
@@ -555,6 +556,7 @@ Transaction.prototype.claim = function(src, generator, public_key, signature) {
   this.tx_json.Generator       = generator;
   this.tx_json.PublicKey       = public_key;
   this.tx_json.Signature       = signature;
+
   return this;
 };
 
@@ -600,15 +602,7 @@ Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expira
   this.tx_json.TakerGets       = Amount.json_rewrite(taker_gets);
 
   if (expiration) {
-    switch (expiration.constructor) {
-      case Date:
-        //offset = (new Date(2000, 0, 1).getTime()) - (new Date(1970, 0, 1).getTime());
-        this.tx_json.Expiration = expiration.getTime() - 946684800000;
-        break;
-      case Number:
-        this.tx_json.Expiration = expiration;
-        break;
-    }
+    this.tx_json.Expiration = utils.time.toRipple(expiration);
   }
 
   if (cancel_sequence) {
