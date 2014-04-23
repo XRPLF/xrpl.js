@@ -153,7 +153,7 @@ Transaction.set_clear_flags = {
     asfRequireDest:     1,
     asfRequireAuth:     2,
     asfDisallowXRP:     3,
-    asfDisableMaster:   4  
+    asfDisableMaster:   4
   }
 };
 
@@ -295,9 +295,13 @@ Transaction.prototype.complete = function() {
   }
 
   if (typeof this.tx_json.SigningPubKey === 'undefined') {
-    var seed = Seed.from_json(this._secret);
-    var key  = seed.get_key(this.tx_json.Account);
-    this.tx_json.SigningPubKey = key.to_hex_pub();
+    try {
+      var seed = Seed.from_json(this._secret);
+      var key  = seed.get_key(this.tx_json.Account);
+      this.tx_json.SigningPubKey = key.to_hex_pub();
+    } catch(e) {
+      return this.emit('error', new RippleError('tejSecretInvalid', 'Invalid secret'));
+    }
   }
 
   // Set canonical flag - this enables canonicalized signature checking
@@ -512,20 +516,16 @@ Transaction.prototype.transferRate = function(rate) {
 Transaction.prototype.setFlags = function(flags) {
   if (!flags) return this;
 
-  var transaction_flags = Transaction.flags[this.tx_json.TransactionType];
   var flag_set = Array.isArray(flags) ? flags : Array.prototype.slice.call(arguments);
-
-  // We plan to not define this field on new Transaction.
-  if (this.tx_json.Flags === void(0)) {
-    this.tx_json.Flags = 0;
-  }
+  var transaction_flags = Transaction.flags[this.tx_json.TransactionType] || { };
 
   for (var i=0, l=flag_set.length; i<l; i++) {
     var flag = flag_set[i];
+
     if (transaction_flags.hasOwnProperty(flag)) {
       this.tx_json.Flags += transaction_flags[flag];
     } else {
-      // XXX Immediately report an error or mark it.
+      return this.emit('error', new RippleError('tejInvalidFlag'));
     }
   }
 
@@ -561,8 +561,8 @@ Transaction.prototype.accountSet = function(src, set_flag, clear_flag) {
   if (typeof src === 'object') {
     var options = src;
     src = options.source || options.from || options.account;
-    set_flag = options.set_flag;
-    clear_flag = options.clear_flag;
+    set_flag = options.set_flag || options.set;
+    clear_flag = options.clear_flag || options.clear;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -571,15 +571,19 @@ Transaction.prototype.accountSet = function(src, set_flag, clear_flag) {
 
   this.tx_json.TransactionType  = 'AccountSet';
   this.tx_json.Account          = UInt160.json_rewrite(src);
-  if (set_flag && typeof set_flag === 'number') {
-    this.tx_json.SetFlag        = set_flag;
-  } else if (set_flag && typeof set_flag === 'string') {
-    this.tx_json.SetFlag        = Transaction.set_clear_flags.AccountSet[set_flag];
+
+  var SetClearFlags = Transaction.set_clear_flags.AccountSet;
+
+  function prepareFlag(flag) {
+    return (typeof flag === 'number') ? flag : (SetClearFlags[flag] || SetClearFlags['asf' + flag]);
+  };
+
+  if (set_flag && (set_flag = prepareFlag(set_flag))) {
+    this.tx_json.SetFlag = set_flag;
   }
-  if (clear_flag && typeof clear_flag === 'number') {
-    this.tx_json.ClearFlag      = clear_flag;
-  } else if (clear_flag && typeof clear_flag === 'string') {
-    this.tx_json.ClearFlag      = Transaction.set_clear_flags.AccountSet[clear_flag];
+
+  if (clear_flag && (clear_flag = prepareFlag(clear_flag))) {
+    this.tx_json.ClearFlag = clear_flag;
   }
 
   return this;
@@ -713,6 +717,7 @@ Transaction.prototype.setRegularKey = function(src, regular_key) {
   if (!UInt160.is_valid(src)) {
     throw new Error('Source address invalid');
   }
+
   if (!UInt160.is_valid(regular_key)) {
     throw new Error('RegularKey must be a valid Ripple Address (a Hash160 of the public key)');
   }
@@ -854,11 +859,11 @@ Transaction.prototype.submit = function(callback) {
   var account = this.tx_json.Account;
 
   if (typeof account !== 'string') {
-    this.emit('error', new RippleError('tejInvalidAccount', 'Account is unspecified'));
-  } else {
-    // YYY Might check paths for invalid accounts.
-    this.remote.account(account).submit(this);
+    return this.emit('error', new RippleError('tejInvalidAccount', 'Account is unspecified'));
   }
+
+  // YYY Might check paths for invalid accounts.
+  this.remote.account(account).submit(this);
 
   return this;
 };
