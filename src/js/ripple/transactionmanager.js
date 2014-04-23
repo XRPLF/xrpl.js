@@ -195,10 +195,23 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
 
   function sequenceLoaded(err, sequence) {
     if (typeof sequence !== 'number') {
-      callback(new Error('Failed to fetch account transaction sequence'));
-    } else {
-      submitFill(sequence, callback);
+      return callback(new Error('Failed to fetch account transaction sequence'));
     }
+
+    var sequenceDif = tx.tx_json.Sequence - sequence;
+    var submitted = 0;
+
+    ;(function nextFill(sequence) {
+      if (sequence >= tx.tx_json.Sequence) return;
+
+      submitFill(sequence, function() {
+        if (++submitted === sequenceDif) {
+          callback();
+        } else {
+          nextFill(++sequence);
+        }
+      });
+    })(sequence);
   };
 
   this._loadSequence(sequenceLoaded);
@@ -581,6 +594,7 @@ TransactionManager.prototype.submit = function(tx) {
   // If the transaction can't complete, decrement sequence so that
   // subsequent transactions
   if (!tx.complete()) {
+    this._nextSequence--;
     return;
   }
 
