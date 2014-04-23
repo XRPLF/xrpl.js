@@ -4,7 +4,7 @@
 
 `ripple-lib` connects to the Ripple network via the WebSocket protocol and runs in Node.js as well as in the browser.
 
-**Use ripple-lib for**
+###Use ripple-lib for:
 
 + Connecting to a local or remote rippled in JavaScript (Node.js or browser)
 + Issuing [rippled API](https://ripple.com/wiki/JSON_Messages) requests
