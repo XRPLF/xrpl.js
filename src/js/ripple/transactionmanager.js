@@ -208,7 +208,7 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
         if (++submitted === sequenceDif) {
           callback();
         } else {
-          nextFill(++sequence);
+          nextFill(sequence + 1);
         }
       });
     })(sequence);
