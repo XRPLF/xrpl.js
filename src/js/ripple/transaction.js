@@ -281,8 +281,25 @@ Transaction.prototype._getServer = function() {
 
 Transaction.prototype.complete = function() {
   // Try to auto-fill the secret
-  if (!this._secret && !(this._secret = this._account_secret(this.tx_json.Account))) {
-    return this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
+  if (!this._secret && !(this._secret = this._accountSecret(this.tx_json.Account))) {
+    this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
+    return false;
+  }
+
+  if (typeof this.tx_json.SigningPubKey === 'undefined') {
+    try {
+      var seed = Seed.from_json(this._secret);
+      var key  = seed.get_key(this.tx_json.Account);
+      this.tx_json.SigningPubKey = key.to_hex_pub();
+    } catch(e) {
+      this.emit('error', new RippleError('tejSecretInvalid', 'Invalid secret'));
+      return false;
+    }
+  }
+
+  if (!this.remote.trusted && !this.remote.local_signing) {
+    this.emit('error', new RippleError('tejServerUntrusted', 'Attempt to give secret to untrusted server'));
+    return false;
   }
 
   // If the Fee hasn't been set, one needs to be computed by
@@ -294,14 +311,9 @@ Transaction.prototype.complete = function() {
     }
   }
 
-  if (typeof this.tx_json.SigningPubKey === 'undefined') {
-    try {
-      var seed = Seed.from_json(this._secret);
-      var key  = seed.get_key(this.tx_json.Account);
-      this.tx_json.SigningPubKey = key.to_hex_pub();
-    } catch(e) {
-      return this.emit('error', new RippleError('tejSecretInvalid', 'Invalid secret'));
-    }
+  if (Number(this.tx_json.Fee) > this._maxFee) {
+    tx.emit('error', new RippleError('tejMaxFeeExceeded', 'Max fee exceeded'));
+    return false;
   }
 
   // Set canonical flag - this enables canonicalized signature checking

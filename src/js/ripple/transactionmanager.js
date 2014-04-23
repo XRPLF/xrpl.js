@@ -184,24 +184,20 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
     fill.account_set(self._accountID);
     fill.tx_json.Sequence = sequence;
     fill.once('submitted', callback);
+
+    // Secrets may be set on a per-transaction basis
+    if (tx._secret) {
+      fill.secret(tx._secret);
+    }
+
     fill.submit();
   };
 
   function sequenceLoaded(err, sequence) {
     if (typeof sequence !== 'number') {
       callback(new Error('Failed to fetch account transaction sequence'));
-      return;
-    }
-
-    var sequenceDif = tx.tx_json.Sequence - sequence;
-    var submitted = 0;
-
-    for (var i=sequence; i<tx.tx_json.Sequence; i++) {
-      submitFill(i, function() {
-        if (++submitted === sequenceDif) {
-          callback();
-        }
-      });
+    } else {
+      submitFill(sequence, callback);
     }
   };
 
@@ -378,7 +374,11 @@ TransactionManager.prototype._request = function(tx) {
 
   function transactionRetry(message) {
     if (tx.finalized) return;
+
+    console.log('TER, submitting fill');
+
     self._fillSequence(tx, function() {
+      console.log('FILL COMPLETE, resubmitting');
       self._resubmit(1, tx);
     });
   };
@@ -580,27 +580,21 @@ TransactionManager.prototype.submit = function(tx) {
     tx.tx_json.Sequence = this._nextSequence++;
   }
 
+  // Attach secret, associate transaction with a server, attach fee.
+  // If the transaction can't complete, decrement sequence so that
+  // subsequent transactions
+  if (!tx.complete()) {
+    return;
+  }
+
   tx.attempts = 0;
 
-  // Attach secret, associate transaction with a server, attach fee
-  tx.complete();
-
-  var fee = Number(tx.tx_json.Fee);
-
-  if (!tx._secret && !tx.tx_json.TxnSignature) {
-    tx.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
-  } else if (!remote.trusted && !remote.local_signing) {
-    tx.emit('error', new RippleError('tejServerUntrusted', 'Attempt to give secret to untrusted server'));
-  } else if (fee && fee > this._maxFee) {
-    tx.emit('error', new RippleError('tejMaxFeeExceeded', 'Max fee exceeded'));
-  } else {
-    // ND: this is the ONLY place we put the tx into the queue. The
-    // TransactionQueue queue is merely a list, so any mutations to tx._hash
-    // will cause subsequent look ups (eg. inside 'transaction-outbound'
-    // validated transaction clearing) to fail.
-    this._pending.push(tx);
-    this._request(tx);
-  }
+  // ND: this is the ONLY place we put the tx into the queue. The
+  // TransactionQueue queue is merely a list, so any mutations to tx._hash
+  // will cause subsequent look ups (eg. inside 'transaction-outbound'
+  // validated transaction clearing) to fail.
+  this._pending.push(tx);
+  this._request(tx);
 };
 
 exports.TransactionManager = TransactionManager;

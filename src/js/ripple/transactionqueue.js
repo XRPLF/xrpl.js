@@ -4,44 +4,15 @@
  */
 
 var Transaction = require('./transaction').Transaction;
+var LRU = require('lru-cache');
 
 function TransactionQueue() {
   var self = this;
 
   this._queue         = [ ];
-  this._idCache       = { };
-  this._sequenceCache = { };
+  this._idCache       = LRU({ max: 100 });
+  this._sequenceCache = LRU({ max: 100 });
   this._save          = void(0);
-};
-
-TransactionQueue.prototype.clearCache = function() {
-  this._idCache       = { };
-  this._sequenceCache = { };
-};
-
-TransactionQueue.prototype.getMinLedger = function() {
-  var minLedger = Infinity;
-
-  for (var i=0; i<this._queue.length; i++) {
-    var submitIndex = this._queue[i].submitIndex;
-
-    if (typeof submitIndex !== 'number') {
-      // If any pending transactions don't have a submit index,
-      // return -1 for scanning all previous transactions
-      minLedger = -1;
-      break;
-    }
-
-    if (submitIndex < minLedger) {
-      minLedger = submitIndex;
-    }
-  };
-
-  if (!isFinite(minLedger)) minLedger = -1;
-
-  if (minLedger !== -1) minLedger -= 1;
-
-  return minLedger;
 };
 
 TransactionQueue.prototype.save = function() {
@@ -60,7 +31,7 @@ TransactionQueue.prototype.save = function() {
  */
 
 TransactionQueue.prototype.addReceivedSequence = function(sequence) {
-  this._sequenceCache[sequence] = true;
+  this._sequenceCache.set(String(sequence), true);
 };
 
 /**
@@ -68,7 +39,7 @@ TransactionQueue.prototype.addReceivedSequence = function(sequence) {
  */
 
 TransactionQueue.prototype.addReceivedId = function(id, transaction) {
-  this._idCache[id] = transaction;
+  this._idCache.set(id, transaction);
 };
 
 /**
@@ -76,7 +47,7 @@ TransactionQueue.prototype.addReceivedId = function(id, transaction) {
  */
 
 TransactionQueue.prototype.getReceived = function(id) {
-  return this._idCache[id];
+  return this._idCache.get(id);
 };
 
 /**
@@ -85,7 +56,7 @@ TransactionQueue.prototype.getReceived = function(id) {
  */
 
 TransactionQueue.prototype.hasSequence = function(sequence) {
-  return this._sequenceCache[sequence] || false;
+  return this._sequenceCache.has(String(sequence));
 };
 
 /**
@@ -119,10 +90,6 @@ TransactionQueue.prototype.remove = function(tx) {
       this._queue.splice(i, 1);
       break;
     }
-  }
-
-  if (!this._queue.length) {
-    this.clearCache();
   }
 
   this.save();
