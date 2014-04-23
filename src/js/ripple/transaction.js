@@ -145,6 +145,18 @@ Transaction.flags = {
   }
 };
 
+// The following are integer (as opposed to bit) flags
+// that can be set for particular transactions in the
+// SetFlag or ClearFlag field
+Transaction.set_clear_flags = {
+  AccountSet: {
+    asfRequireDest:     1,
+    asfRequireAuth:     2,
+    asfDisallowXRP:     3,
+    asfDisableMaster:   4  
+  }
+};
+
 Transaction.formats = require('./binformat').tx;
 
 Transaction.prototype.consts = {
@@ -527,10 +539,30 @@ Transaction.prototype.setFlags = function(flags) {
 //  .transfer_rate()
 //  .wallet_locator()   NYI
 //  .wallet_size()      NYI
-Transaction.prototype.accountSet = function(src) {
+
+/**
+ *  Construct an 'AccountSet' transaction.
+ *
+ *  Note that bit flags can be set using the .setFlags() method
+ *  but for 'AccountSet' transactions there is an additional way to
+ *  modify AccountRoot flags. The values available for the SetFlag 
+ *  and ClearFlag are as follows:
+ *
+ *  "asfRequireDest"
+ *    Require a destination tag
+ *  "asfRequireAuth"
+ *    Authorization is required to extend trust
+ *  "asfDisallowXRP"
+ *    XRP should not be sent to this account
+ *  "asfDisableMaster"
+ *    Disallow use of the master key
+ */
+Transaction.prototype.accountSet = function(src, set_flag, clear_flag) {
   if (typeof src === 'object') {
     var options = src;
     src = options.source || options.from || options.account;
+    set_flag = options.set_flag;
+    clear_flag = options.clear_flag;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -539,6 +571,16 @@ Transaction.prototype.accountSet = function(src) {
 
   this.tx_json.TransactionType  = 'AccountSet';
   this.tx_json.Account          = UInt160.json_rewrite(src);
+  if (set_flag && typeof set_flag === 'number') {
+    this.tx_json.SetFlag        = set_flag;
+  } else if (set_flag && typeof set_flag === 'string') {
+    this.tx_json.SetFlag        = Transaction.set_clear_flags.AccountSet[set_flag];
+  }
+  if (clear_flag && typeof clear_flag === 'number') {
+    this.tx_json.ClearFlag      = clear_flag;
+  } else if (clear_flag && typeof clear_flag === 'string') {
+    this.tx_json.ClearFlag      = Transaction.set_clear_flags.AccountSet[clear_flag];
+  }
 
   return this;
 };
@@ -650,6 +692,34 @@ Transaction.prototype.passwordSet = function(src, authorized_key, generator, pub
   this.tx_json.Signature       = signature;
 
   return this;
+};
+
+
+/**
+ *  Construct a 'SetRegularKey' transaction.
+ *  If the RegularKey is set, the private key that corresponds to
+ *  it can be used to sign transactions instead of the master key
+ *
+ *  The RegularKey must be a valid Ripple Address, or a Hash160 of
+ *  the public key corresponding to the new private signing key.
+ */
+Transaction.prototype.setRegularKey = function(src, regular_key) {
+  if (typeof src === 'object') {
+    var options = src;
+    src = options.address || options.account || options.from;
+    regular_key = options.regular_key;
+  }
+
+  if (!UInt160.is_valid(src)) {
+    throw new Error('Source address invalid');
+  }
+  if (!UInt160.is_valid(regular_key)) {
+    throw new Error('RegularKey must be a valid Ripple Address (a Hash160 of the public key)');
+  }
+
+  this.tx_json.TransactionType = 'SetRegularKey';
+  this.tx_json.Account = UInt160.json_rewrite(src);
+  this.tx_json.RegularKey = UInt160.json_rewrite(regular_key);
 };
 
 // Construct a 'payment' transaction.
