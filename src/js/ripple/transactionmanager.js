@@ -375,10 +375,7 @@ TransactionManager.prototype._request = function(tx) {
   function transactionRetry(message) {
     if (tx.finalized) return;
 
-    console.log('TER, submitting fill');
-
     self._fillSequence(tx, function() {
-      console.log('FILL COMPLETE, resubmitting');
       self._resubmit(1, tx);
     });
   };
