@@ -234,7 +234,7 @@ UInt.prototype.parse_number = function (j) {
 
   if ("number" === typeof j &&
       j === +j &&
-      j > 0) {
+      j >= 0) {
     // XXX Better, faster way to get BigInteger from JS int?
     this._value = new BigInteger(""+j);
   }
