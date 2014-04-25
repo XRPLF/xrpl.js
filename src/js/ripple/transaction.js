@@ -83,14 +83,14 @@ function Transaction(remote) {
   this.submittedIDs = [ ];
 
   this.once('success', function(message) {
-    self.setState('validated');
     self.finalize(message);
+    self.setState('validated');
     self.emit('cleanup', message);
   });
 
   this.once('error', function(message) {
-    self.setState('failed');
     self.finalize(message);
+    self.setState('failed');
     self.emit('cleanup', message);
   });
 
