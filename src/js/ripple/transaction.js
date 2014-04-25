@@ -280,6 +280,13 @@ Transaction.prototype._getServer = function() {
  */
 
 Transaction.prototype.complete = function() {
+  if (this.remote) {
+    if (!this.remote.trusted && !this.remote.local_signing) {
+      this.emit('error', new RippleError('tejServerUntrusted', 'Attempt to give secret to untrusted server'));
+      return false;
+    }
+  }
+
   // Try to auto-fill the secret
   if (!this._secret && !(this._secret = this._accountSecret(this.tx_json.Account))) {
     this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
@@ -295,11 +302,6 @@ Transaction.prototype.complete = function() {
       this.emit('error', new RippleError('tejSecretInvalid', 'Invalid secret'));
       return false;
     }
-  }
-
-  if (!this.remote.trusted && !this.remote.local_signing) {
-    this.emit('error', new RippleError('tejServerUntrusted', 'Attempt to give secret to untrusted server'));
-    return false;
   }
 
   // If the Fee hasn't been set, one needs to be computed by
