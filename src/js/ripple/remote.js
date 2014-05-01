@@ -1311,7 +1311,7 @@ Remote.prototype.getAccount = function(accountID) {
 Remote.prototype.addAccount = function(accountID) {
   var account = new Account(this, accountID);
 
-  if (account.is_valid()) {
+  if (account.isValid()) {
     this._accounts[accountID] = account;
   }
 
