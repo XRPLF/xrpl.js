@@ -28,11 +28,13 @@ var REGEX_BASE64 = /^([A-Za-z0-9\+]{4})*([A-Za-z0-9\+]{2}==)|([A-Za-z0-9\+]{3}=)
  *
  *  @param {String} message
  *  @param {sjcl.ecc.ecdsa.secretKey|Any format accepted by Seed.from_json} secret_key
+ *  @param {RippleAddress} [The first key] account Field to specify the signing account. 
+ *    If this is omitted the first account produced by the secret generator will be used.
  *  @returns {Base64-encoded String} signature
  */
-Message.signMessage = function(message, secret_key) {
+Message.signMessage = function(message, secret_key, account) {
 
-  return Message.signHash(Message.HASH_FUNCTION(Message.MAGIC_BYTES + message), secret_key);
+  return Message.signHash(Message.HASH_FUNCTION(Message.MAGIC_BYTES + message), secret_key, account);
 
 };
 
@@ -47,9 +49,11 @@ Message.signMessage = function(message, secret_key) {
  *
  *  @param {bitArray|Hex-encoded String} hash
  *  @param {sjcl.ecc.ecdsa.secretKey|Any format accepted by Seed.from_json} secret_key
+ *  @param {RippleAddress} [The first key] account Field to specify the signing account. 
+ *    If this is omitted the first account produced by the secret generator will be used.
  *  @returns {Base64-encoded String} signature
  */
-Message.signHash = function(hash, secret_key) {
+Message.signHash = function(hash, secret_key, account) {
 
   if (typeof hash === 'string' && /^[0-9a-fA-F]+$/.test(hash)) {
     hash = sjcl.codec.hex.toBits(hash);
@@ -60,7 +64,7 @@ Message.signHash = function(hash, secret_key) {
   }
 
   if (!(secret_key instanceof sjcl.ecc.ecdsa.secretKey)) {
-    secret_key = Seed.from_json(secret_key).get_key()._secret;
+    secret_key = Seed.from_json(secret_key).get_key(account)._secret;
   }
 
   var signature_bits = secret_key.signWithRecoverablePublicKey(hash);
