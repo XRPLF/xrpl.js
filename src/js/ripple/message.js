@@ -4,7 +4,7 @@ var sjcl               = require('./utils').sjcl;
 var Remote             = require('./remote').Remote;
 var Seed               = require('./seed').Seed;
 var KeyPair            = require('./keypair').KeyPair;
-var PublicKeyValidator = require('./pubkeyvalidator');
+var Account            = require('./account').Account;
 var UInt160            = require('./uint160').UInt160;
 
 // Message class (static)
@@ -186,8 +186,8 @@ Message.verifyHashSignature = function(data, remote, callback) {
     key_pair._pubkey = public_key;
     var public_key_hex = key_pair.to_hex_pub();
 
-    var public_key_validator = new PublicKeyValidator(remote);
-    public_key_validator.validate(account, public_key_hex, async_callback);
+    var account_class_instance = new Account(remote, account);
+    account_class_instance.publicKeyIsActive(public_key_hex, async_callback);
 
   };
 
