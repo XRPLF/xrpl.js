@@ -74,7 +74,8 @@ function Transaction(remote) {
   // Index at which transaction was submitted
   this.submitIndex = void(0);
 
-  this.canonical = true;
+  // Canonical signing setting defaults to the Remote's configuration
+  this.canonical = "object" === typeof remote ? !!remote.canonical_signing : true;
 
   // We aren't clever enough to eschew preventative measures so we keep an array
   // of all submitted transactionIDs (which can change due to load_factor

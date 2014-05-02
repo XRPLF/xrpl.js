@@ -46,6 +46,7 @@ var log          = require('./log').internal.sub('remote');
       max_fee            : Maximum acceptable transaction fee
       fee_cushion        : Extra fee multiplier to account for async fee changes.
       servers            : Array of server objects with the following form
+      canonical_signing  : Signatures should be canonicalized and the "canonical" flag set
 
          {
               host:    <string>
@@ -82,6 +83,7 @@ function Remote(opts, trace) {
   this.local_sequence        = Boolean(opts.local_sequence); // Locally track sequence numbers
   this.local_fee             = (typeof opts.local_fee === 'undefined') ? true : opts.local_fee; // Locally set fees
   this.local_signing         = (typeof opts.local_signing === 'undefined') ? true : opts.local_signing;
+  this.canonical_signing     = (typeof opts.canonical_signing === 'undefined') ? true : opts.canonical_signing;
   this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.2 : opts.fee_cushion;
   this.max_fee               = (typeof opts.max_fee === 'undefined') ? Infinity : opts.max_fee;
   this.id                    = 0;
