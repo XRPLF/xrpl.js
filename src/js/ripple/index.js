@@ -11,6 +11,7 @@ exports.Seed             = require('./seed').Seed;
 exports.Meta             = require('./meta').Meta;
 exports.SerializedObject = require('./serializedobject').SerializedObject;
 exports.RippleError      = require('./rippleerror').RippleError;
+exports.Message          = require('./message');
 
 exports.binformat        = require('./binformat');
 exports.utils            = require('./utils');

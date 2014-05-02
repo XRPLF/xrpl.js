@@ -7,6 +7,7 @@ var Account      = require('./account').Account;
 var Meta         = require('./meta').Meta;
 var OrderBook    = require('./orderbook').OrderBook;
 var RippleError  = require('./rippleerror').RippleError;
+var Server       = require('./server').Server;
 
 // Request events emitted:
 //  'success' : Request successful.
@@ -17,12 +18,9 @@ var RippleError  = require('./rippleerror').RippleError;
 function Request(remote, command) {
   EventEmitter.call(this);
 
-  this.remote     = remote;
-  this.requested  = false;
-  this.message    = {
-    command : command,
-    id      : void(0)
-  };
+  this.remote    = remote;
+  this.requested = false;
+  this.message   = { command: command, id: void(0) };
 };
 
 util.inherits(Request, EventEmitter);
@@ -37,6 +35,7 @@ Request.prototype.request = function(remote) {
   if (this.requested) return;
 
   this.requested = true;
+
   this.on('error', new Function);
   this.emit('request', remote);
 
@@ -44,7 +43,7 @@ Request.prototype.request = function(remote) {
     this.remote._servers.forEach(function(server) {
       this.setServer(server);
       this.remote.request(this);
-    }, this );
+    }, this);
   } else {
     this.remote.request(this);
   }
@@ -53,24 +52,26 @@ Request.prototype.request = function(remote) {
 };
 
 Request.prototype.callback = function(callback, successEvent, errorEvent) {
-  if (callback && typeof callback === 'function') {
-    var self = this;
+  var self = this;
 
-    function request_success(message) {
-      callback.call(self, null, message);
-    }
-
-    function request_error(error) {
-      if (!(error instanceof RippleError)) {
-        error = new RippleError(error);
-      }
-      callback.call(self, error);
-    }
-
-    this.once(successEvent || 'success', request_success);
-    this.once(errorEvent   || 'error'  , request_error);
-    this.request();
+  if (this.requestsed || typeof callback !== 'function') {
+    return this;
   }
+
+  function requestSuccess(message) {
+    callback.call(self, null, message);
+  };
+
+  function requestError(error) {
+    if (!(error instanceof RippleError)) {
+      error = new RippleError(error);
+    }
+    callback.call(self, error);
+  };
+
+  this.once(successEvent || 'success', requestSuccess);
+  this.once(errorEvent   || 'error'  , requestError);
+  this.request();
 
   return this;
 };
@@ -78,12 +79,13 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
 Request.prototype.timeout = function(duration, callback) {
   var self = this;
 
+  function requested() {
+    self.timeout(duration, callback);
+  };
+
   if (!this.requested) {
-    function requested() {
-      self.timeout(duration, callback);
-    }
-    this.once('request', requested);
-    return;
+    // Defer until requested
+    return this.once('request', requested);
   }
 
   var emit = this.emit;
@@ -112,8 +114,11 @@ Request.prototype.setServer = function(server) {
     case 'object':
       selected = server;
       break;
+
     case 'string':
+      // Find server with hostname string
       var servers = this.remote._servers;
+
       for (var i=0, s; s=servers[i]; i++) {
         if (s._host === server) {
           selected = s;
@@ -123,18 +128,19 @@ Request.prototype.setServer = function(server) {
       break;
   };
 
-  this.server = selected;
+  if (selected instanceof Server) {
+    this.server = selected;
+  }
 
   return this;
 };
 
 Request.prototype.buildPath = function(build) {
-
   if (this.remote.local_signing) {
     throw new Error(
-      '`build_path` is completely ignored when doing local signing as ' +
-      '`Paths` is a component of the signed blob. The `tx_blob` is signed,' +
-      'sealed and delivered, and the txn unmodified after' );
+      '`build_path` is completely ignored when doing local signing as '
+      + '`Paths` is a component of the signed blob. The `tx_blob` is signed,'
+      + 'sealed and delivered, and the txn unmodified after' );
   }
 
   if (build) {
@@ -144,6 +150,7 @@ Request.prototype.buildPath = function(build) {
     // value being `truthy`
     delete this.message.build_path
   }
+
   return this;
 };
 
@@ -153,6 +160,7 @@ Request.prototype.ledgerChoose = function(current) {
   } else {
     this.message.ledger_hash  = this.remote._ledger_hash;
   }
+
   return this;
 };
 
@@ -171,8 +179,8 @@ Request.prototype.ledgerIndex = function(ledger_index) {
   return this;
 };
 
-Request.prototype.ledgerSelect = function(ledger_spec) {
-  switch (ledger_spec) {
+Request.prototype.ledgerSelect = function(ledger) {
+  switch (ledger) {
     case 'current':
     case 'closed':
     case 'verified':
@@ -180,10 +188,10 @@ Request.prototype.ledgerSelect = function(ledger_spec) {
       break;
 
     default:
-      if (Number(ledger_spec)) {
-        this.message.ledger_index = ledger_spec;
-      } else {
-        this.message.ledger_hash  = ledger_spec;
+      if (isNaN(ledger)) {
+        this.message.ledger_hash  = ledger;
+      } else if (ledger = Number(ledger)) {
+        this.message.ledger_index = ledger;
       }
       break;
   }
@@ -196,8 +204,8 @@ Request.prototype.accountRoot = function(account) {
   return this;
 };
 
-Request.prototype.index = function(hash) {
-  this.message.index  = hash;
+Request.prototype.index = function(index) {
+  this.message.index  = index;
   return this;
 };
 
@@ -305,7 +313,7 @@ Request.prototype.books = function(books, snapshot) {
 
 Request.prototype.addBook = function (book, snapshot) {
   if (!Array.isArray(this.message.books)) {
-    this.message.books = [];
+    this.message.books = [ ];
   }
 
   var json = { };

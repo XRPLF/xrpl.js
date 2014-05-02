@@ -62,7 +62,7 @@ sjcl.ecc.pointJac.prototype.doubl = function () {
   var f = e.square();
   var x = f.sub(d.copy().doubleM());
   var y = e.mul(d.sub(x)).subM(c.doubleM().doubleM().doubleM());
-  var z = this.y.mul(this.z).doubleM();
+  var z = this.z.mul(this.y).doubleM();
   return new sjcl.ecc.pointJac(this.curve, x, y, z);
 };
 

@@ -36,12 +36,15 @@ module.exports = function(grunt) {
           "src/js/sjcl/core/bn.js",
           "src/js/sjcl/core/ecc.js",
           "src/js/sjcl/core/srp.js",
+          "src/js/sjcl-custom/sjcl-ecc-pointextras.js",
           "src/js/sjcl-custom/sjcl-secp256k1.js",
           "src/js/sjcl-custom/sjcl-ripemd160.js",
           "src/js/sjcl-custom/sjcl-extramath.js",
           "src/js/sjcl-custom/sjcl-montgomery.js",
           "src/js/sjcl-custom/sjcl-validecc.js",
+          "src/js/sjcl-custom/sjcl-ecdsa-canonical.js",
           "src/js/sjcl-custom/sjcl-ecdsa-der.js",
+          "src/js/sjcl-custom/sjcl-ecdsa-recoverablepublickey.js",
           "src/js/sjcl-custom/sjcl-jacobi.js"
         ],
         dest: 'build/sjcl.js'

@@ -46,6 +46,7 @@ var log          = require('./log').internal.sub('remote');
       max_fee            : Maximum acceptable transaction fee
       fee_cushion        : Extra fee multiplier to account for async fee changes.
       servers            : Array of server objects with the following form
+      canonical_signing  : Signatures should be canonicalized and the "canonical" flag set
 
          {
               host:    <string>
@@ -78,10 +79,11 @@ function Remote(opts, trace) {
 
   var self  = this;
 
-  this.trusted               = opts.trusted;
-  this.local_sequence        = opts.local_sequence; // Locally track sequence numbers
+  this.trusted               = Boolean(opts.trusted);
+  this.local_sequence        = Boolean(opts.local_sequence); // Locally track sequence numbers
   this.local_fee             = (typeof opts.local_fee === 'undefined') ? true : opts.local_fee; // Locally set fees
   this.local_signing         = (typeof opts.local_signing === 'undefined') ? true : opts.local_signing;
+  this.canonical_signing     = (typeof opts.canonical_signing === 'undefined') ? true : opts.canonical_signing;
   this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.2 : opts.fee_cushion;
   this.max_fee               = (typeof opts.max_fee === 'undefined') ? Infinity : opts.max_fee;
   this.id                    = 0;
@@ -239,20 +241,20 @@ function Remote(opts, trace) {
     self.storage.getPendingTransactions(function(err, transactions) {
       if (err || !Array.isArray(transactions)) return;
 
-      var properties = [
-        'submittedIDs',
-        'clientID',
-        'submitIndex'
-      ];
-
       function resubmitTransaction(tx) {
         var transaction = self.transaction();
         transaction.parseJson(tx.tx_json);
-        properties.forEach(function(prop) {
-          if (typeof tx[prop] !== 'undefined') {
-            transaction[prop] = tx[prop];
+
+        Object.keys(tx).forEach(function(prop) {
+          switch (prop) {
+            case 'submittedIDs':
+            case 'clientID':
+            case 'submitIndex':
+              transaction[prop] = tx[prop];
+              break;
           }
         });
+
         transaction.submit();
       };
 
@@ -344,16 +346,16 @@ Remote.prototype.addServer = function(opts) {
   server.on('message', serverMessage);
 
   function serverConnect() {
+    self._connection_count += 1;
+
     if (opts.primary || !self._primary_server) {
       self._setPrimaryServer(server);
     }
-    switch (++self._connection_count) {
-      case 1:
-        self._setState('online');
-        break;
-      case self._servers.length:
-        self.emit('ready');
-        break;
+    if (self._connection_count === 1) {
+      self._setState('online');
+    }
+    if (self._connection_count === self._servers.length) {
+      self.emit('ready');
     }
   };
 
@@ -529,7 +531,7 @@ Remote.prototype._handleMessage = function(message, server) {
       // De-duplicate transactions that are immediately following each other
       var hash = message.transaction.hash;
 
-      if (this._received_tx.hasOwnProperty(hash)) {
+      if (this._received_tx.get(hash)) {
         break;
       }
 
@@ -699,20 +701,18 @@ Remote.prototype.requestLedger = function(ledger, options, callback) {
     request.message.ledger  = ledger;
   }
 
-  var requestFields = [
-    'full',
-    'expand',
-    'transactions',
-    'accounts'
-  ];
-
   switch (typeof options) {
     case 'object':
-      for (var key in options) {
-        if (~requestFields.indexOf(key)) {
-          request.message[key] = true;
+      Object.keys(options).forEach(function(o) {
+        switch (o) {
+          case 'full':
+          case 'expand':
+          case 'transactions':
+          case 'accounts':
+            request.message[o] = true;
+            break;
         }
-      }
+      }, options);
       break;
 
     case 'function':
@@ -732,7 +732,7 @@ Remote.prototype.requestLedger = function(ledger, options, callback) {
   return request;
 };
 
-// Only for unit testing.
+Remote.prototype.requestLedgerClosed =
 Remote.prototype.requestLedgerHash = function(callback) {
   //utils.assert(this.trusted);   // If not trusted, need to check proof.
   return new Request(this, 'ledger_closed').callback(callback);
@@ -975,26 +975,24 @@ Remote.prototype.requestAccountTx = function(options, callback) {
 
   var request = new Request(this, 'account_tx');
 
-  var requestFields = [
-    'account',
-    'ledger_index_min',  //earliest
-    'ledger_index_max',  //latest
-    'binary',            //false
-    'count',             //false
-    'descending',        //false
-    'offset',            //0
-    'limit',
+  Object.keys(options).forEach(function(o) {
+    switch (o) {
+      case 'account':
+      case 'ledger_index_min':  //earliest
+      case 'ledger_index_max':  //latest
+      case 'binary':            //false
+      case 'count':             //false
+      case 'descending':        //false
+      case 'offset':            //0
+      case 'limit':
 
-    //extended account_tx
-    'forward',           //false
-    'marker'
-  ];
-
-  for (var key in options) {
-    if (~requestFields.indexOf(key)) {
-      request.message[key] = options[key];
+      //extended account_tx
+      case 'forward':           //false
+      case 'marker':
+        request.message[o] = this[o];
+      break;
     }
-  }
+  }, options);
 
   function propertiesFilter(obj, transaction) {
     var properties = Object.keys(obj);
@@ -1259,6 +1257,7 @@ Remote.accountRootRequest = function(type, responseFilter, account, ledger, call
   }
 
   var request = this.requestLedgerEntry('account_root');
+
   request.accountRoot(account);
   request.ledgerChoose(ledger);
 
@@ -1314,7 +1313,7 @@ Remote.prototype.getAccount = function(accountID) {
 Remote.prototype.addAccount = function(accountID) {
   var account = new Account(this, accountID);
 
-  if (account.is_valid()) {
+  if (account.isValid()) {
     this._accounts[accountID] = account;
   }
 
@@ -1666,7 +1665,7 @@ Remote.prototype.transaction = function(source, options, callback) {
       break;
 
     case 'string':
-      transactionType = source.toLowerCase();
+      transactionType = transactionTypes[source.toLowerCase()];
 
       if (!transactionType) {
         throw new Error('Invalid transaction type: ' + transactionType);
