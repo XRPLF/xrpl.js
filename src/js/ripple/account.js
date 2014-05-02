@@ -10,13 +10,15 @@
 //
 
 // var network = require("./network.js");
-
+var async              = require('async');
 var EventEmitter       = require('events').EventEmitter;
 var util               = require('util');
 var extend             = require('extend');
 var Amount             = require('./amount').Amount;
 var UInt160            = require('./uint160').UInt160;
 var TransactionManager = require('./transactionmanager').TransactionManager;
+var sjcl               = require('./utils').sjcl;
+var Base               = require('./base').Base;
 
 /**
  * @constructor Account
@@ -277,6 +279,124 @@ Account.prototype.notifyTx = function(transaction) {
 Account.prototype.submit = function(transaction) {
   this._transactionManager.submit(transaction);
 };
+
+
+/**
+ *  Check whether the given public key is valid for this account
+ *
+ *  @param {Hex-encoded String|RippleAddress} public_key
+ *  @param {Function} callback
+ *  
+ *  @callback
+ *  @param {Error} err
+ *  @param {Boolean} true if the public key is valid and active, false otherwise
+ */
+Account.prototype.publicKeyIsActive = function(public_key, callback) {
+
+  var self = this;
+
+  var public_key_as_uint160;
+  try {
+    public_key_as_uint160 = Account._publicKeyToAddress(public_key);
+  } catch (err) {
+    return callback(err);
+  }
+
+  function getAccountInfo(async_callback) {
+    self.getInfo(function(err, account_info_res){
+
+      // If the remote responds with an Account Not Found error then the account
+      // is unfunded and thus we can assume that the master key is active
+      if (err && err.remote && err.remote.error === 'actNotFound') {
+        async_callback(null, null);
+      } else {
+        async_callback(err, account_info_res);
+      }
+    });
+  };
+
+  function publicKeyIsValid(account_info_res, async_callback) {
+    // Catch the case of unfunded accounts
+    if (!account_info_res) {
+
+      if (public_key_as_uint160 === self._account_id) {
+        async_callback(null, true);
+      } else {
+        async_callback(null, false);
+      }
+
+      return;
+    }
+
+    var account_info = account_info_res.account_data;
+
+    // Respond with true if the RegularKey is set and matches the given public key or
+    // if the public key matches the account address and the lsfDisableMaster is not set
+    if (account_info.RegularKey &&
+      account_info.RegularKey === public_key_as_uint160) {
+
+      async_callback(null, true);
+
+    } else if (account_info.Account === public_key_as_uint160 &&
+      ((account_info.Flags & 0x00100000) === 0)) {
+
+      async_callback(null, true);
+
+    } else {
+
+      async_callback(null, false);
+
+    }
+
+  };
+
+  var steps = [
+    getAccountInfo,
+    publicKeyIsValid
+  ];
+
+  async.waterfall(steps, callback);
+
+};
+
+/**
+ *  Convert a hex-encoded public key to a Ripple Address
+ *
+ *  @static
+ *
+ *  @param {Hex-encoded string|RippleAddress} public_key
+ *  @returns {RippleAddress}
+ */
+Account._publicKeyToAddress = function(public_key) {
+
+  // Based on functions in /src/js/ripple/keypair.js
+  function hexToUInt160(public_key) {
+
+    var bits = sjcl.codec.hex.toBits(public_key);
+    var hash = sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
+    var address = UInt160.from_bits(hash);
+    address.set_version(Base.VER_ACCOUNT_ID);
+
+    return address.to_json();
+
+  }
+
+  if (UInt160.is_valid(public_key)) {
+
+    return public_key;
+
+  } else if (/^[0-9a-fA-F]+$/.test(public_key)) {
+
+    return hexToUInt160(public_key);
+
+  } else {
+
+    throw(new Error('Public key is invalid. Must be a UInt160 or a hex string'));
+
+  }
+};
+
+
 
 exports.Account = Account;
 
