@@ -25,6 +25,8 @@ describe('PubKeyValidator', function(){
       assert('rLpq5RcRzA8FU1yUqEPW4xfsdwon7casuM' === pkv._parsePublicKey('03BFA879C00D58CF55F2B5975FF9B5293008FF49BEFB3EE6BEE2814247BF561A23'));
     
       assert('rP4yWwjoDGF2iZSBdAQAgpC449YDezEbT1' === pkv._parsePublicKey('02DF0AB18930B6410CA9F55CB37541F1FED891B8EDF8AB1D01D8F23018A4B204A7'));
+
+      assert('rLdfp6eoR948KVxfn6EpaaNTKwfwXhzSeQ' === pkv._parsePublicKey('0310C451A40CAFFD39D6B8A3BD61BF65BCA55246E9DABC3170EBE431D30655B61F'));
     });
 
   });
@@ -153,5 +155,47 @@ describe('PubKeyValidator', function(){
 
     });
 
+    it('should assume the master key is valid for unfunded accounts', function(){
+
+      var pkv = new PubKeyValidator({
+        account: function(address){
+          return {
+            getInfo: function(callback) {
+              if (address === 'rLdfp6eoR948KVxfn6EpaaNTKwfwXhzSeQ') {
+                callback({ error: 'remoteError',
+                  error_message: 'Remote reported an error.',
+                  remote:
+                   { account: 'rLdfp6eoR948KVxfn6EpaaNTKwfwXhzSeQ',
+                     error: 'actNotFound',
+                     error_code: 15,
+                     error_message: 'Account not found.',
+                     id: 3,
+                     ledger_current_index: 6391106,
+                     request:
+                      { account: 'rLdfp6eoR948KVxfn6EpaaNTKwfwXhzSeQ',
+                        command: 'account_info',
+                        id: 3,
+                        ident: 'rLdfp6eoR948KVxfn6EpaaNTKwfwXhzSeQ' },
+                     status: 'error',
+                     type: 'response' },
+                  result: 'remoteError',
+                  engine_result: 'remoteError',
+                  result_message: 'Remote reported an error.',
+                  engine_result_message: 'Remote reported an error.',
+                  message: 'Remote reported an error.'
+                });
+              }
+            }
+          }
+        }
+      });
+      pkv.validate('rLdfp6eoR948KVxfn6EpaaNTKwfwXhzSeQ', '0310C451A40CAFFD39D6B8A3BD61BF65BCA55246E9DABC3170EBE431D30655B61F', function(err, is_valid){
+        assert(!err);
+        assert(is_valid);
+      });
+
+    });
+
   });
+
 });

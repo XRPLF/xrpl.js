@@ -19,27 +19,6 @@ function PubKeyValidator(remote) {
     throw(new Error('Must instantiate the PubKeyValidator with a ripple-lib Remote'));
   }
 
-  // Convert hex string to UInt160
-  self._parsePublicKey = function(public_key) {
-
-    // Based on functions in /src/js/ripple/keypair.js
-    function hexToUInt160(public_key) {
-      var bits = sjcl.codec.hex.toBits(public_key);
-      var hash = sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
-      var address = UInt160.from_bits(hash);
-      address.set_version(Base.VER_ACCOUNT_ID);
-      return address.to_json();
-    }
-
-    if (UInt160.is_valid(public_key)) {
-      return public_key;
-    } else if (/^[0-9a-fA-F]+$/.test(public_key)) {
-      return hexToUInt160(public_key);
-    } else {
-      throw(new Error('Public key is invalid. Must be a UInt160 or a hex string'));
-    }
-  };
-
 }
 
 /**
@@ -60,16 +39,37 @@ PubKeyValidator.prototype.validate = function(address, public_key, callback) {
   var public_key_as_uint160;
   try {
     public_key_as_uint160 = self._parsePublicKey(public_key);
-  } catch (e) {
-    return callback(e);
+  } catch (err) {
+    return callback(err);
   }
 
 
   function getAccountInfo(async_callback) {
-    self._remote.account(address).getInfo(async_callback);
+    self._remote.account(address).getInfo(function(err, account_info_res){
+
+      // If the remote responds with an Account Not Found error then the account
+      // is unfunded and thus we can assume that the master key is active
+      if (err && err.remote && err.remote.error === 'actNotFound') {
+        async_callback(null, null);
+      } else {
+        async_callback(err, account_info_res);
+      }
+    });
   };
 
   function publicKeyIsValid(account_info_res, async_callback) {
+    // Catch the case of unfunded accounts
+    if (!account_info_res) {
+
+      if (public_key_as_uint160 === address) {
+        async_callback(null, true);
+      } else {
+        async_callback(null, false);
+      }
+
+      return;
+    }
+
     var account_info = account_info_res.account_data;
 
     // Respond with true if the RegularKey is set and matches the given public key or
@@ -99,6 +99,41 @@ PubKeyValidator.prototype.validate = function(address, public_key, callback) {
 
   async.waterfall(steps, callback);
 
+};
+
+/**
+ *  Convert a hex-encoded public key to a Ripple Address
+ *
+ *  @param {Hex-encoded string|RippleAddress} public_key
+ *  @returns {RippleAddress}
+ */
+PubKeyValidator.prototype._parsePublicKey = function(public_key) {
+
+  // Based on functions in /src/js/ripple/keypair.js
+  function hexToUInt160(public_key) {
+
+    var bits = sjcl.codec.hex.toBits(public_key);
+    var hash = sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
+    var address = UInt160.from_bits(hash);
+    address.set_version(Base.VER_ACCOUNT_ID);
+
+    return address.to_json();
+
+  }
+
+  if (UInt160.is_valid(public_key)) {
+
+    return public_key;
+
+  } else if (/^[0-9a-fA-F]+$/.test(public_key)) {
+
+    return hexToUInt160(public_key);
+
+  } else {
+
+    throw(new Error('Public key is invalid. Must be a UInt160 or a hex string'));
+
+  }
 };
 
 module.exports = PubKeyValidator;

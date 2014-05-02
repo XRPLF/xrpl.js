@@ -170,7 +170,12 @@ Message.verifyHashSignature = function(data, remote, callback) {
     } catch (err) {
       return async_callback(err);
     }
-    async_callback(null, public_key);
+
+    if (public_key) {
+      async_callback(null, public_key);
+    } else {
+      async_callback(new Error('Could not recover public key from signature'));
+    }
 
   };
 

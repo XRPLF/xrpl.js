@@ -70,8 +70,6 @@ sjcl.ecc.ecdsa.secretKey.prototype.signWithRecoverablePublicKey = function(hash,
  */
 sjcl.ecc.ecdsa.publicKey.recoverFromSignature = function(hash, signature, curve) {
 
-  var self = this;
-
   if (!signature || signature instanceof sjcl.ecc.curve) {
     throw new sjcl.exception.invalid('must supply hash and signature to recover public key');
   }
