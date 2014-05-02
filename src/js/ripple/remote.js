@@ -78,8 +78,8 @@ function Remote(opts, trace) {
 
   var self  = this;
 
-  this.trusted               = opts.trusted;
-  this.local_sequence        = opts.local_sequence; // Locally track sequence numbers
+  this.trusted               = Boolean(opts.trusted);
+  this.local_sequence        = Boolean(opts.local_sequence); // Locally track sequence numbers
   this.local_fee             = (typeof opts.local_fee === 'undefined') ? true : opts.local_fee; // Locally set fees
   this.local_signing         = (typeof opts.local_signing === 'undefined') ? true : opts.local_signing;
   this.fee_cushion           = (typeof opts.fee_cushion === 'undefined') ? 1.2 : opts.fee_cushion;
