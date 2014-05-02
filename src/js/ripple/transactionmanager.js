@@ -328,43 +328,6 @@ TransactionManager.prototype._request = function(tx) {
 
   if (tx.finalized) return;
 
-  tx.submitIndex = this._remote._ledger_current_index;
-
-  if (tx.attempts === 0) {
-    tx.initialSubmitIndex = tx.submitIndex;
-  }
-
-  if (!tx._setLastLedger) {
-    // Honor LastLedgerSequence set by user of API. If
-    // left unset by API, bump LastLedgerSequence
-    tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
-  }
-
-  tx.lastLedgerSequence = tx.tx_json.LastLedgerSequence;
-
-  var submitRequest = remote.requestSubmit();
-
-  if (remote.local_signing) {
-    tx.sign();
-    // TODO: We are serializing twice, when we could/should be feeding the
-    // tx_blob to `tx.hash()` which rebuilds it to sign it.
-    submitRequest.tx_blob(tx.serialize().to_hex());
-
-    // ND: ecdsa produces a random `TxnSignature` field value, a component of
-    // the hash. Attempting to identify a transaction via a hash synthesized
-    // locally while using remote signing is inherently flawed.
-    tx.addId(tx.hash());
-  } else {
-    // ND: `build_path` is completely ignored when doing local signing as
-    // `Paths` is a component of the signed blob, the `tx_blob` is signed,
-    // sealed and delivered, and the txn unmodified.
-    // TODO: perhaps an exception should be raised if build_path is attempted
-    // while local signing
-    submitRequest.build_path(tx._build_path);
-    submitRequest.secret(tx._secret);
-    submitRequest.tx_json(tx.tx_json);
-  }
-
   remote._trace('transactionmanager: submit:', tx.tx_json);
 
   function transactionProposed(message) {
@@ -463,24 +426,48 @@ TransactionManager.prototype._request = function(tx) {
     }
   };
 
+  var submitRequest = remote.requestSubmit();
+
   submitRequest.once('error', submitted);
   submitRequest.once('success', submitted);
 
-  if (tx._server) {
-    submitRequest.server = tx._server;
-  }
+  function prepareSubmit() {
+    if (remote.local_signing) {
+      // TODO: We are serializing twice, when we could/should be feeding the
+      // tx_blob to `tx.hash()` which rebuilds it to sign it.
+      submitRequest.tx_blob(tx.serialize().to_hex());
 
-  if (typeof tx._iff !== 'function') {
-    submitTransaction();
-  } else {
-    return tx._iff(tx.summary(), function(err, proceed) {
+      // ND: ecdsa produces a random `TxnSignature` field value, a component of
+      // the hash. Attempting to identify a transaction via a hash synthesized
+      // locally while using remote signing is inherently flawed.
+      tx.addId(tx.hash());
+    } else {
+      // ND: `build_path` is completely ignored when doing local signing as
+      // `Paths` is a component of the signed blob, the `tx_blob` is signed,
+      // sealed and delivered, and the txn unmodified.
+      // TODO: perhaps an exception should be raised if build_path is attempted
+      // while local signing
+      submitRequest.build_path(tx._build_path);
+      submitRequest.secret(tx._secret);
+      submitRequest.tx_json(tx.tx_json);
+    }
+
+    if (tx._server) {
+      submitRequest.server = tx._server;
+    }
+
+    if (typeof tx._iff !== 'function') {
+      return submitTransaction();
+    }
+
+    tx._iff(tx.summary(), function(err, proceed) {
       if (err || !proceed) {
         tx.emit('abort');
       } else {
         submitTransaction();
       }
     });
-  }
+  };
 
   function requestTimeout() {
     // ND: What if the response is just slow and we get a response that
@@ -512,6 +499,26 @@ TransactionManager.prototype._request = function(tx) {
     tx.attempts++;
     tx.emit('postsubmit');
   };
+
+  tx.submitIndex = this._remote._ledger_current_index;
+
+  if (tx.attempts === 0) {
+    tx.initialSubmitIndex = tx.submitIndex;
+  }
+
+  if (!tx._setLastLedger) {
+    // Honor LastLedgerSequence set by user of API. If
+    // left unset by API, bump LastLedgerSequence
+    tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
+  }
+
+  tx.lastLedgerSequence = tx.tx_json.LastLedgerSequence;
+
+  if (remote.local_signing) {
+    tx.sign(prepareSubmit);
+  } else {
+    prepareSubmit();
+  }
 
   return submitRequest;
 };

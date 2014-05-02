@@ -353,7 +353,8 @@ Transaction.prototype.hash = function(prefix, as_uint256) {
   return as_uint256 ? hash : hash.to_hex();
 };
 
-Transaction.prototype.sign = function() {
+Transaction.prototype.sign = function(callback) {
+  var callback = typeof callback === 'function' ? callback : function(){};
   var seed = Seed.from_json(this._secret);
 
   var prev_sig = this.tx_json.TxnSignature;
@@ -364,6 +365,7 @@ Transaction.prototype.sign = function() {
   // If the hash is the same, we can re-use the previous signature
   if (prev_sig && hash === this.previousSigningHash) {
     this.tx_json.TxnSignature = prev_sig;
+    callback();
     return this;
   }
 
@@ -373,6 +375,8 @@ Transaction.prototype.sign = function() {
 
   this.tx_json.TxnSignature = hex;
   this.previousSigningHash = hash;
+
+  callback();
 
   return this;
 };
