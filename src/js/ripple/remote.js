@@ -247,6 +247,7 @@ function Remote(opts, trace) {
 
         Object.keys(tx).forEach(function(prop) {
           switch (prop) {
+            case 'secret':
             case 'submittedIDs':
             case 'clientID':
             case 'submitIndex':
@@ -969,11 +970,20 @@ Remote.prototype.requestAccountOffers = function(accountID, account_index, ledge
   limit: integer                  // optional
 */
 
+Remote.prototype.requestAccountTransactions =
 Remote.prototype.requestAccountTx = function(options, callback) {
   // XXX Does this require the server to be trusted?
   //utils.assert(this.trusted);
 
   var request = new Request(this, 'account_tx');
+
+  if (options.min_ledger !== void(0)) {
+    options.ledger_index_min = options.min_ledger;
+  }
+
+  if (options.max_ledger !== void(0)) {
+    options.ledger_index_max = options.max_ledger;
+  }
 
   Object.keys(options).forEach(function(o) {
     switch (o) {
@@ -1006,7 +1016,7 @@ Remote.prototype.requestAccountTx = function(options, callback) {
 
   var SerializedObject = require('./serializedobject').SerializedObject;
 
-  function parseBinary(transaction) {
+  function parseBinaryTransaction(transaction) {
     var tx = { validated: transaction.validated };
     tx.meta = new SerializedObject(transaction.meta).to_json();
     tx.tx = new SerializedObject(transaction.tx_blob).to_json();
@@ -1028,8 +1038,8 @@ Remote.prototype.requestAccountTx = function(options, callback) {
       self.removeAllListeners('success');
 
       self.once('success', function(res) {
-        if (options.binary) {
-          res.transactions = res.transactions.map(parseBinary);
+        if (options.parseBinary) {
+          res.transactions = res.transactions.map(parseBinaryTransaction);
         }
 
         if (fn !== Boolean) {
@@ -1060,6 +1070,10 @@ Remote.prototype.requestAccountTx = function(options, callback) {
   };
 
   request.filter = accountTxFilter;
+
+  if (typeof options.parseBinary !== 'boolean') {
+    options.parseBinary = true;
+  }
 
   if (options.binary || (options.map || options.reduce)) {
     options.filter = options.filter || Boolean;
@@ -1419,32 +1433,30 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
   var account_info = this.accounts[account];
   var request      = account_info.caching_seq_request;
 
+  function accountRootSuccess(message) {
+    delete account_info.caching_seq_request;
+
+    var seq = message.node.Sequence;
+    account_info.seq  = seq;
+
+    // console.log('caching: %s %d', account, seq);
+    // If the caller also waits for 'success', they might run before this.
+    request.emit('success_account_seq_cache', message);
+  };
+
+  function accountRootError(message) {
+    // console.log('error: %s', account);
+    delete account_info.caching_seq_request;
+
+    request.emit('error_account_seq_cache', message);
+  };
+
   if (!request) {
     // console.log('starting: %s', account);
     request = this.requestLedgerEntry('account_root');
     request.accountRoot(account);
     request.ledgerChoose(ledger);
-
-    function accountRootSuccess(message) {
-      delete account_info.caching_seq_request;
-
-      var seq = message.node.Sequence;
-      account_info.seq  = seq;
-
-      // console.log('caching: %s %d', account, seq);
-      // If the caller also waits for 'success', they might run before this.
-      request.emit('success_account_seq_cache', message);
-    };
-
     request.once('success', accountRootSuccess);
-
-    function accountRootError(message) {
-      // console.log('error: %s', account);
-      delete account_info.caching_seq_request;
-
-      request.emit('error_account_seq_cache', message);
-    };
-
     request.once('error', accountRootError);
 
     account_info.caching_seq_request = request;
