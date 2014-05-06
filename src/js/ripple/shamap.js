@@ -7,7 +7,7 @@ var UInt256 = require('./uint256').UInt256;
 var SerializedObject = require('./serializedobject').SerializedObject;
 
 function SHAMap() {
-  this.root = new SHAMapTreeNodeInner();
+  this.root = new SHAMapTreeNodeInner(0);
 };
 
 SHAMap.prototype.add_item = function (tag, node, type) {
@@ -50,45 +50,43 @@ function SHAMapTreeNodeInner(depth) {
   this.leaves = {};
 
   this.type = SHAMapTreeNode.INNER;
-
-  // TODO
-  this.depth == depth == null ? 0 : depth;
+  this.depth = depth == null ? 0 : depth;
 
   this.empty = true;
 }
 
 util.inherits(SHAMapTreeNodeInner, SHAMapTreeNode);
 
+/*
+* @param tag_segment {String} (equates to a ledger entries `index`)
+*/
 SHAMapTreeNodeInner.prototype.add_item = function (tag_segment, node) {
-  var current_node = this.get_node(tag_segment[0]);
+  var depth = this.depth;
+  var existing_node = this.get_node(tag_segment[depth]);
 
-  if (current_node) {
+  if (existing_node) {
     // A node already exists in this slot
-
-    if (current_node instanceof SHAMapTreeNodeInner) {
+    if (existing_node instanceof SHAMapTreeNodeInner) {
       // There is an inner node, so we need to go deeper
-      current_node.add_item(tag_segment.slice(1), node);
-    } else if (current_node.get_segment() === tag_segment) {
+      existing_node.add_item(tag_segment, node);
+    } else if (existing_node.get_segment() === tag_segment) {
       // Collision
       throw new Error("Tried to add a node to a SHAMap that was already in there.");
     } else {
       // Turn it into an inner node
-      var new_inner_node = new SHAMapTreeNodeInner();
+      var new_inner_node = new SHAMapTreeNodeInner(depth + 1);
 
-      // Move the existing leaf node down one level
-      current_node.set_segment(current_node.get_segment().slice(1));
-      new_inner_node.set_node(current_node.get_segment()[0], current_node);
-
-      // Add the new node next to it
-      new_inner_node.add_item(tag_segment.slice(1), node);
+      // Parent new and existing node
+      new_inner_node.add_item(existing_node.get_segment(), existing_node);
+      new_inner_node.add_item(tag_segment, node);
 
       // And place the newly created inner node in the slot
-      this.set_node(tag_segment[0], new_inner_node);
+      this.set_node(tag_segment[depth], new_inner_node);
     }
   } else {
     // Neat, we have a nice open spot for the new node
     node.set_segment(tag_segment);
-    this.set_node(tag_segment[0], node);
+    this.set_node(tag_segment[depth], node);
   }
 };
 
