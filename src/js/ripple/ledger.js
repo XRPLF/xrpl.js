@@ -37,11 +37,22 @@ Ledger.prototype.calc_tx_hash = function () {
   return tx_map.hash();
 };
 
-Ledger.prototype.calc_account_hash = function () {
+Ledger.prototype.calc_account_hash = function (hardcore) {
   var account_map = new SHAMap();
 
   this.ledger_json.accountState.forEach(function (le) {
     var data = SerializedObject.from_json(le);
+
+    if (hardcore) {
+      try {
+        var json = data.to_json();
+        data = SerializedObject.from_json(json);
+      } catch (e) {
+        console.log("erred on", le);
+        console.log("to_json() was", json);
+        console.log("e", e);
+      }
+    };
 
     account_map.add_item(le.index, data, SHAMapTreeNode.TYPE_ACCOUNT_STATE);
   });
