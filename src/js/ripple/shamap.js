@@ -33,7 +33,10 @@ SHAMapTreeNode.TYPE_TRANSACTION_NM = 2;
 SHAMapTreeNode.TYPE_TRANSACTION_MD = 3;
 SHAMapTreeNode.TYPE_ACCOUNT_STATE = 4;
 
-SHAMapTreeNode.prototype.add_item = function (tag_segment, node) {
+/**
+* @param tag {String} 64 hexadecimal characters
+*/
+SHAMapTreeNode.prototype.add_item = function (tag, node) {
   throw new Error("Called unimplemented virtual method SHAMapTreeNode#add_item.");
 };
 
@@ -58,18 +61,18 @@ function SHAMapTreeNodeInner(depth) {
 util.inherits(SHAMapTreeNodeInner, SHAMapTreeNode);
 
 /*
-* @param tag_segment {String} (equates to a ledger entries `index`)
+* @param tag {String} (equates to a ledger entries `index`)
 */
-SHAMapTreeNodeInner.prototype.add_item = function (tag_segment, node) {
+SHAMapTreeNodeInner.prototype.add_item = function (tag, node) {
   var depth = this.depth;
-  var existing_node = this.get_node(tag_segment[depth]);
+  var existing_node = this.get_node(tag[depth]);
 
   if (existing_node) {
     // A node already exists in this slot
     if (existing_node instanceof SHAMapTreeNodeInner) {
       // There is an inner node, so we need to go deeper
-      existing_node.add_item(tag_segment, node);
-    } else if (existing_node.get_segment() === tag_segment) {
+      existing_node.add_item(tag, node);
+    } else if (existing_node.tag === tag) {
       // Collision
       throw new Error("Tried to add a node to a SHAMap that was already in there.");
     } else {
@@ -77,16 +80,15 @@ SHAMapTreeNodeInner.prototype.add_item = function (tag_segment, node) {
       var new_inner_node = new SHAMapTreeNodeInner(depth + 1);
 
       // Parent new and existing node
-      new_inner_node.add_item(existing_node.get_segment(), existing_node);
-      new_inner_node.add_item(tag_segment, node);
+      new_inner_node.add_item(existing_node.tag, existing_node);
+      new_inner_node.add_item(tag, node);
 
       // And place the newly created inner node in the slot
-      this.set_node(tag_segment[depth], new_inner_node);
+      this.set_node(tag[depth], new_inner_node);
     }
   } else {
     // Neat, we have a nice open spot for the new node
-    node.set_segment(tag_segment);
-    this.set_node(tag_segment[depth], node);
+    this.set_node(tag[depth], node);
   }
 };
 
@@ -129,43 +131,30 @@ SHAMapTreeNodeInner.prototype.hash = function () {
 function SHAMapTreeNodeLeaf(tag, node, type) {
   SHAMapTreeNode.call(this);
 
-  if ("string" === typeof tag) {
-    tag = UInt256.from_hex(tag);
-  } else if (tag instanceof UInt256) {
-    // Type is already the right one
-  } else {
+  if ("string" !== typeof tag) {
     throw new Error("Tag is unexpected type.");
   }
 
   this.tag = tag;
-  this.tag_segment = null;
-
+  this.tag_bytes = UInt256.from_hex(this.tag).to_bytes();
   this.type = type;
 
   this.node = node;
 }
 util.inherits(SHAMapTreeNodeLeaf, SHAMapTreeNode);
 
-SHAMapTreeNodeLeaf.prototype.get_segment = function (segment) {
-  return this.tag_segment;
-};
-
-SHAMapTreeNodeLeaf.prototype.set_segment = function (segment) {
-  this.tag_segment = segment;
-};
-
 SHAMapTreeNodeLeaf.prototype.hash = function () {
   var buffer = new SerializedObject();
   switch (this.type) {
     case SHAMapTreeNode.TYPE_ACCOUNT_STATE:
       buffer.append(this.node);
-      buffer.append(this.tag.to_bytes());
+      buffer.append(this.tag_bytes);
       return buffer.hash(hashprefixes.HASH_LEAF_NODE);
     case SHAMapTreeNode.TYPE_TRANSACTION_NM:
-      return this.tag;
+      return this.tag_bytes;
     case SHAMapTreeNode.TYPE_TRANSACTION_MD:
       buffer.append(this.node);
-      buffer.append(this.tag.to_bytes());
+      buffer.append(this.tag_bytes);
       return buffer.hash(hashprefixes.HASH_TX_NODE);
     default:
       throw new Error("Tried to hash a SHAMap node of unknown type.");
