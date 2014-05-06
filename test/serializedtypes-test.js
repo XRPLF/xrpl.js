@@ -807,12 +807,7 @@ describe('Serialized types', function() {
         "RootIndex": "000360186E008422E06B72D5B275E29EE3BE9D87A370F424E0E7BF613C465909"
       }
       assert.deepEqual(as_json, expected_json);
-      assert.throws(function () {
-        // This is an encoded reminder/TODO:
-        // Serializing ledger entries isn't currently supported, but when it
-        // is, this should no longer throw, and the test will fail
-        /*assert.strictEqual(*/SerializedObject.from_json(expected_json).to_hex()/*, hex)*/;
-      })
+      assert.strictEqual(SerializedObject.from_json(expected_json).to_hex(), hex)
     });
     it('Serialize empty object {}', function () {
       var so = new SerializedObject();
