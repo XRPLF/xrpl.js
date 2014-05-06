@@ -44,12 +44,15 @@ SHAMapTreeNode.prototype.hash = function () {
 /**
  * Inner (non-leaf) node in a SHAMap tree.
  */
-function SHAMapTreeNodeInner() {
+function SHAMapTreeNodeInner(depth) {
   SHAMapTreeNode.call(this);
 
   this.leaves = {};
 
   this.type = SHAMapTreeNode.INNER;
+
+  // TODO
+  this.depth == depth == null ? 0 : depth;
 
   this.empty = true;
 }
@@ -156,6 +159,10 @@ SHAMapTreeNodeLeaf.prototype.set_segment = function (segment) {
 SHAMapTreeNodeLeaf.prototype.hash = function () {
   var buffer = new SerializedObject();
   switch (this.type) {
+    case SHAMapTreeNode.TYPE_ACCOUNT_STATE:
+      buffer.append(this.node);
+      buffer.append(this.tag.to_bytes());
+      return buffer.hash(hashprefixes.HASH_LEAF_NODE);
     case SHAMapTreeNode.TYPE_TRANSACTION_NM:
       return this.tag;
     case SHAMapTreeNode.TYPE_TRANSACTION_MD:

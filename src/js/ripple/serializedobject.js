@@ -53,6 +53,14 @@ SerializedObject.from_json = function (obj) {
     }
   }
 
+  if ("number" === typeof obj.TransactionType) {
+    obj.LedgerEntryType = SerializedObject.lookup_type_le(obj.LedgerEntryType);
+
+    if (!obj.LedgerEntryType) {
+      throw new Error('LedgerEntryType ID is invalid.');
+    }
+  }
+
   if ("string" === typeof obj.TransactionType) {
     typedef = binformat.tx[obj.TransactionType];
 
@@ -62,9 +70,16 @@ SerializedObject.from_json = function (obj) {
 
     typedef = typedef.slice();
     obj.TransactionType = typedef.shift();
-  } else if ("undefined" !== typeof obj.LedgerEntryType) {
-    // XXX: TODO
-    throw new Error('Ledger entry binary format not yet implemented.');
+  } else if ("string" === typeof obj.LedgerEntryType) {
+    typedef = binformat.ledger[obj.LedgerEntryType];
+
+    if (!Array.isArray(typedef)) {
+      throw new Error('LedgerEntryType is invalid');
+    }
+
+    typedef = typedef.slice();
+    obj.LedgerEntryType = typedef.shift();
+
   } else if ("object" === typeof obj.AffectedNodes) {
     typedef = binformat.metadata;
   } else {
@@ -81,7 +96,7 @@ SerializedObject.from_json = function (obj) {
 
 SerializedObject.check_no_missing_fields = function (typedef, obj) {
   var missing_fields = [];
-  
+
   for (var i = typedef.length - 1; i >= 0; i--) {
     var spec = typedef[i];
     var field = spec[0]
@@ -91,17 +106,18 @@ SerializedObject.check_no_missing_fields = function (typedef, obj) {
       missing_fields.push(field);
     };
   };
-  
+
   if (missing_fields.length > 0) {
     var object_name;
+
     if (obj.TransactionType != null) {
       object_name = SerializedObject.lookup_type_tx(obj.TransactionType);
+    } else if (obj.LedgerEntryType != null){
+      object_name = SerializedObject.lookup_type_le(obj.LedgerEntryType);
     } else {
       object_name = "TransactionMetaData";
-    } /*else {
-      TODO: LedgerEntryType ... 
-    }*/
-    throw new Error(object_name + " is missing fields: " + 
+    }
+    throw new Error(object_name + " is missing fields: " +
                     JSON.stringify(missing_fields));
   };
 }
@@ -294,6 +310,11 @@ SerializedObject.sort_typedef = function (typedef) {
 SerializedObject.lookup_type_tx = function (id) {
   assert(typeof id === 'number');
   return TRANSACTION_TYPES[id];
+};
+
+SerializedObject.lookup_type_le = function (id) {
+  assert(typeof id === 'number');
+  return LEDGER_ENTRY_TYPES[id];
 };
 
 exports.SerializedObject = SerializedObject;
