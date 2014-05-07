@@ -85,21 +85,26 @@ function SHA256_RIPEMD160(bits) {
 };
 
 /**
-* @param account_id {String|UInt160} a ripple address
-* @param account_id {Number} the nth `seq`uenced {KeyPair} for the seed
+* @param account
+*        {undefined}                 take first, default, KeyPair
+*
+*        {Number}                    specifies the account number of the KeyPair
+*                                    desired.
+*
+*        {Uint160} (from_json able), specifies the address matching the KeyPair
+*                                    that is desired.
 */
-Seed.prototype.get_key = function (account_id) {
-  var account_number = 0;
+Seed.prototype.get_key = function (account) {
+  var account_number = 0, address;
 
   if (!this.is_valid()) {
     throw new Error("Cannot generate keys from invalid seed!");
   }
-  if (account_id) {
-    if (typeof account_id === 'number') {
-      account_number = account_id;
-      account_id = undefined;
+  if (account) {
+    if (typeof account === 'number') {
+      account_number = account;
     } else {
-      account_id = UInt160.from_json(account_id);
+      address = UInt160.from_json(account);
     }
   }
 
@@ -120,24 +125,23 @@ Seed.prototype.get_key = function (account_id) {
 
   do {
     i = 0;
+
     do {
       sec = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(append_int(public_gen.toBytesCompressed(), account_number), i)));
       i++;
     } while (!curve.r.greaterEquals(sec));
+
     account_number++;
     sec = sec.add(private_gen).mod(curve.r);
     key_pair = KeyPair.from_bn_secret(sec);
+
     if (--max_loops <= 0) {
-      // We are almost certainly looking for an account_id that would take
-      // same value of $too_long {forever, ...}
+      // We are almost certainly looking for an account that would take same
+      // value of $too_long {forever, ...}
       throw new Error("Too many loops looking for KeyPair yielding "+
-                      account_id.to_json() +" from " + this.to_json())
+                      address.to_json() +" from " + this.to_json());
     };
-  } while (
-    // we need to keep looking for an
-    account_id && // from a
-    !key_pair /* that can */.get_address() /* that*/
-       .equals(/* the */ account_id /*we were looking for*/) )
+  } while (address && !key_pair.get_address().equals(address));
 
    return key_pair;
 };
