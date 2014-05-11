@@ -179,7 +179,7 @@ Currency.prototype.get_interest_at = function (referenceDate) {
     referenceDate = utils.fromTimestamp(referenceDate.getTime());
   }
 
-  return Math.pow(Math.E, (referenceDate - this._interest_start) / this._interest_period);
+  return Math.exp((referenceDate - this._interest_start) / this._interest_period);
 };
 
 // XXX Currently we inherit UInt.prototype.is_valid, which is mostly fine.
