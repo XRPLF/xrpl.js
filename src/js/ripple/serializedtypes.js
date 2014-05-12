@@ -224,7 +224,10 @@ var STInt64 = exports.Int64 = new SerializedType({
     serialize_hex(so, hex, true); //noLength = true
   },
   parse: function (so) {
-    var result = new BigInteger(so.read(8), 256);
+    var bytes = so.read(8);
+    // We need to add a 0, so if the high bit is set it won't think it's a
+    // pessimistic numeric fraek. What doth lief?
+    var result = new BigInteger([0].concat(bytes), 256);
     assert(result instanceof BigInteger);
     return result;
   }

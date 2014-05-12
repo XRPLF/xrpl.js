@@ -282,6 +282,15 @@ describe('Serialized types', function() {
       types.Int64.serialize(so, 4294967295.5);
       assert.strictEqual(so.to_hex(), '00000000FFFFFFFF');
     });
+    it('Does not get confused when the high bit is set', function () {
+      var so = new SerializedObject();
+      types.Int64.serialize(so, "8B2386F26F8E232B");
+      assert.strictEqual(so.to_hex(), '8B2386F26F8E232B');
+      var so = new SerializedObject("8B2386F26F8E232B");
+      var num = types.Int64.parse(so);
+      // We get a positive number
+      assert.strictEqual(num.toString(16), '8b2386f26f8e232b');
+    });
     it('Serialize "0123456789ABCDEF"', function () {
       var so = new SerializedObject();
       types.Int64.serialize(so, '0123456789ABCDEF');
@@ -798,21 +807,16 @@ describe('Serialized types', function() {
       var so  = new SerializedObject(hex);
       var as_json = so.to_json();
       var expected_json = {
-        "LedgerEntryType": "DirectoryNode", 
-        "Owner": "rh6kN9s7spSb3vdv6H8ZGYzsddSLeEUGmc", 
-        "Flags": 0, 
+        "LedgerEntryType": "DirectoryNode",
+        "Owner": "rh6kN9s7spSb3vdv6H8ZGYzsddSLeEUGmc",
+        "Flags": 0,
         "Indexes": [
           "081342A0AB45459A54D8E4FA1842339A102680216CF9A152BCE4F4CE467D8246"
-        ], 
+        ],
         "RootIndex": "000360186E008422E06B72D5B275E29EE3BE9D87A370F424E0E7BF613C465909"
       }
       assert.deepEqual(as_json, expected_json);
-      assert.throws(function () {
-        // This is an encoded reminder/TODO:
-        // Serializing ledger entries isn't currently supported, but when it
-        // is, this should no longer throw, and the test will fail
-        /*assert.strictEqual(*/SerializedObject.from_json(expected_json).to_hex()/*, hex)*/;
-      })
+      assert.strictEqual(SerializedObject.from_json(expected_json).to_hex(), hex)
     });
     it('Serialize empty object {}', function () {
       var so = new SerializedObject();
