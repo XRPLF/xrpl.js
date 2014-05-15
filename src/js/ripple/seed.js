@@ -11,6 +11,7 @@ var BigInteger = utils.jsbn.BigInteger;
 var Base    = require('./base').Base;
 var UInt    = require('./uint').UInt;
 var UInt256 = require('./uint256').UInt256;
+var UInt160 = require('./uint160').UInt160;
 var KeyPair = require('./keypair').KeyPair;
 
 var Seed = extend(function () {
@@ -83,16 +84,33 @@ function SHA256_RIPEMD160(bits) {
   return sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
 };
 
-Seed.prototype.get_key = function (account_id) {
+/**
+* @param account
+*        {undefined}                 take first, default, KeyPair
+*
+*        {Number}                    specifies the account number of the KeyPair
+*                                    desired.
+*
+*        {Uint160} (from_json able), specifies the address matching the KeyPair
+*                                    that is desired.
+*/
+Seed.prototype.get_key = function (account) {
+  var account_number = 0, address;
+
   if (!this.is_valid()) {
     throw new Error('Cannot generate keys from invalid seed!');
   }
-
-  // XXX Should loop over keys until we find the right one
+  if (account) {
+    if (typeof account === 'number') {
+      account_number = account;
+    } else {
+      address = UInt160.from_json(account);
+    }
+  }
 
   var private_gen, public_gen;
   var curve = this._curve;
-  var seq = 0, i = 0;
+  var i = 0;
 
   do {
     private_gen = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(this.to_bytes(), i)));
@@ -102,16 +120,30 @@ Seed.prototype.get_key = function (account_id) {
   public_gen = curve.G.mult(private_gen);
 
   var sec;
-  i = 0;
+  var key_pair;
+  var max_loops = 1000; // TODO
 
   do {
-    sec = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(append_int(public_gen.toBytesCompressed(), seq), i)));
-    i++;
-  } while (!curve.r.greaterEquals(sec));
+    i = 0;
 
-  sec = sec.add(private_gen).mod(curve.r);
+    do {
+      sec = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(append_int(public_gen.toBytesCompressed(), account_number), i)));
+      i++;
+    } while (!curve.r.greaterEquals(sec));
 
-  return KeyPair.from_bn_secret(sec);
+    account_number++;
+    sec = sec.add(private_gen).mod(curve.r);
+    key_pair = KeyPair.from_bn_secret(sec);
+
+    if (--max_loops <= 0) {
+      // We are almost certainly looking for an account that would take same
+      // value of $too_long {forever, ...}
+      throw new Error('Too many loops looking for KeyPair yielding '+
+                      address.to_json() +' from ' + this.to_json());
+    };
+  } while (address && !key_pair.get_address().equals(address));
+
+   return key_pair;
 };
 
 exports.Seed = Seed;
