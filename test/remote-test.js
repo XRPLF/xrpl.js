@@ -1,6 +1,5 @@
 var assert = require('assert');
 var utils  = require('./testutils');
-var sinon = require('sinon');
 
 var Remote = utils.load_module('remote').Remote;
 var Server = utils.load_module('server').Server;
