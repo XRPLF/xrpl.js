@@ -1,3 +1,6 @@
+all:
+	./node_modules/.bin/gulp
+
 test:
 	mocha --reporter spec test/*-test.js
 
@@ -9,4 +12,5 @@ coverage:
 	RIPPLE_LIB_COV=1 mocha --reporter html-cov test/*-test.js > coverage.html
 	rm -rf src-cov
 
-.PHONY: test
+
+.PHONY: test coverage all

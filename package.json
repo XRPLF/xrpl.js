@@ -8,34 +8,29 @@
     "build/*",
     "test/*",
     "Makefile",
-    "Gruntfile.js"
+    "Gulpfile.js"
   ],
   "main": "src/js/ripple",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "async": "~0.2.10",
+    "async": "~0.8.0",
     "ws": "~0.4.31",
     "extend": "~1.2.1",
-    "jshint-loader": "~0.5.0",
     "lru-cache": "~2.5.0"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-cli": "~0.1.9",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-watch": "~0.4.4",
-    "grunt-webpack": "~0.10.5",
-    "grunt-dox": "~0.5.0",
     "mocha": "~1.14.0",
-    "sinon-chai": "~2.4.0",
-    "sinon": "~1.7.3"
+    "gulp": "~3.6.2",
+    "gulp-concat": "~2.2.0",
+    "gulp-jshint": "~1.5.5",
+    "webpack": "~1.1.10",
+    "map-stream": "~0.1.0"
   },
   "scripts": {
-    "pretest": "node_modules/.bin/grunt",
-    "test": "mocha test/*-test.js",
-    "build": "grunt"
+    "pretest": "node_modules/.bin/gulp concat-sjcl",
+    "test": "mocha test/*-test.js"
   },
   "repository": {
     "type": "git",

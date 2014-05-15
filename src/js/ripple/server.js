@@ -24,7 +24,7 @@ function Server(remote, opts) {
       host: parsedUrl.hostname,
       port: parsedUrl.port,
       secure: (parsedUrl.protocol === 'ws:') ? false : true
-    }
+    };
   }
 
   if (typeof opts !== 'object') {
