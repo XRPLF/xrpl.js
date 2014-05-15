@@ -56,19 +56,29 @@ Request.prototype.request = function(remote) {
 Request.prototype.callback = function(callback, successEvent, errorEvent) {
   var self = this;
 
-  if (this.requestsed || typeof callback !== 'function') {
+  if (this.requested || typeof callback !== 'function') {
     return this;
   }
 
+  var called = false;
+
   function requestSuccess(message) {
-    callback.call(self, null, message);
+    if (!called) {
+      called = true;
+      callback.call(self, null, message);
+    }
   };
 
   function requestError(error) {
-    if (!(error instanceof RippleError)) {
-      error = new RippleError(error);
+    if (!called) {
+      called = true;
+
+      if (!(error instanceof RippleError)) {
+        error = new RippleError(error);
+      }
+
+      callback.call(self, error);
     }
-    callback.call(self, error);
   };
 
   this.once(successEvent || 'success', requestSuccess);
