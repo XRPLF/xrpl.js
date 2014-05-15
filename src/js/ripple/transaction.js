@@ -71,11 +71,12 @@ function Transaction(remote) {
   this.state = 'unsubmitted';
   this.finalized = false;
   this.previousSigningHash = void(0);
+
   // Index at which transaction was submitted
   this.submitIndex = void(0);
 
   // Canonical signing setting defaults to the Remote's configuration
-  this.canonical = "object" === typeof remote ? !!remote.canonical_signing : true;
+  this.canonical = (typeof remote === 'object') ? !!remote.canonical_signing : true;
 
   // We aren't clever enough to eschew preventative measures so we keep an array
   // of all submitted transactionIDs (which can change due to load_factor
@@ -261,11 +262,16 @@ Transaction.prototype._getServer = function() {
 
   for (var i=0; i<servers.length; i++) {
     var server = servers[i];
-    if (!server._connected) continue;
-    var n = server.computeFee(this);
-    if (n < fee) {
+
+    if (!server._connected) {
+      continue;
+    }
+
+    var serverFee = server._computeFee(this);
+
+    if (serverFee < fee) {
       result = server;
-      fee = n;
+      fee = serverFee;
     }
   }
 
@@ -310,12 +316,12 @@ Transaction.prototype.complete = function() {
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
     if (this.remote.local_fee || !this.remote.trusted) {
       this._server = this._getServer();
-      this.tx_json.Fee = this._server.computeFee(this);
+      this.tx_json.Fee = this._server._computeFee(this);
     }
   }
 
   if (Number(this.tx_json.Fee) > this._maxFee) {
-    tx.emit('error', new RippleError('tejMaxFeeExceeded', 'Max fee exceeded'));
+    this.emit('error', new RippleError('tejMaxFeeExceeded', 'Max fee exceeded'));
     return false;
   }
 
@@ -346,7 +352,7 @@ Transaction.prototype.hash = function(prefix, as_uint256) {
     }
     prefix = hashprefixes[prefix];
   } else if (!prefix) {
-    prefix = hashprefixes['HASH_TX_ID'];
+    prefix = hashprefixes.HASH_TX_ID;
   }
 
   var hash = SerializedObject.from_json(this.tx_json).hash(prefix);
@@ -403,7 +409,9 @@ Transaction.prototype.findId = function(cache) {
 
   for (var i=0; i<this.submittedIDs.length; i++) {
     var hash = this.submittedIDs[i];
-    if (result = cache[hash]) break;
+    if ((result = cache[hash])) {
+      break;
+    }
   }
 
   return result;
@@ -432,7 +440,9 @@ Transaction.prototype.destinationTag = function(tag) {
 
 Transaction.prototype.invoiceID = function(id) {
   if (typeof id === 'string') {
-    while (id.length < 64) id += '0';
+    while (id.length < 64) {
+      id += '0';
+    }
     this.tx_json.InvoiceID = id;
   }
   return this;
@@ -473,7 +483,7 @@ Transaction._pathRewrite = function(path) {
       newNode.type_hex = node.type_hex;
     }
 
-    return newNode
+    return newNode;
   });
 };
 
@@ -533,7 +543,14 @@ Transaction.prototype.transferRate = function(rate) {
 // Add flags to a transaction.
 // --> flags: undefined, _flag_, or [ _flags_ ]
 Transaction.prototype.setFlags = function(flags) {
-  if (!flags) return this;
+  if (flags === void(0)) {
+    return this;
+  }
+
+  if (typeof flags === 'number') {
+    this.tx_json.Flags = flags;
+    return this;
+  }
 
   var flag_set = Array.isArray(flags) ? flags : Array.prototype.slice.call(arguments);
   var transaction_flags = Transaction.flags[this.tx_json.TransactionType] || { };
@@ -919,7 +936,7 @@ Transaction.summary = function() {
     state:               this.state,
     server:              this._server ? this._server._opts.url :  void(0),
     finalized:           this.finalized
-  }
+  };
 
   if (this.result) {
     result.result = {
@@ -928,7 +945,7 @@ Transaction.summary = function() {
       ledger_hash          : this.result.ledger_hash,
       ledger_index         : this.result.ledger_index,
       transaction_hash     : this.result.tx_json.hash
-    }
+    };
   }
 
   return result;

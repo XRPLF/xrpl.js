@@ -1,6 +1,4 @@
-
 var extend    = require('extend');
-
 var UInt160 = require('./uint160').UInt160;
 var Float = require('./float').Float;
 var utils = require('./utils');
@@ -9,7 +7,7 @@ var utils = require('./utils');
 // Currency support
 //
 
-var Currency = extend(function () {
+var Currency = extend(function() {
   // Internal form: 0 = XRP. 3 letter-code.
   // XXX Internal should be 0 or hex with three letter annotation when valid.
 
@@ -26,9 +24,9 @@ var Currency = extend(function () {
 Currency.prototype = extend({}, UInt160.prototype);
 Currency.prototype.constructor = Currency;
 
-Currency.HEX_CURRENCY_BAD = "0000000000000000000000005852500000000000";
+Currency.HEX_CURRENCY_BAD = '0000000000000000000000005852500000000000';
 
-Currency.from_json = function (j, shouldInterpretXrpAsIou) {
+Currency.from_json = function(j, shouldInterpretXrpAsIou) {
   if (j instanceof this) {
     return j.clone();
   } else {
@@ -37,7 +35,7 @@ Currency.from_json = function (j, shouldInterpretXrpAsIou) {
 };
 
 // this._value = NaN on error.
-Currency.prototype.parse_json = function (j, shouldInterpretXrpAsIou) {
+Currency.prototype.parse_json = function(j, shouldInterpretXrpAsIou) {
   this._value = NaN;
 
   switch (typeof j) {
@@ -82,14 +80,14 @@ Currency.prototype.parse_json = function (j, shouldInterpretXrpAsIou) {
  *
  * You should never need to call this.
  */
-Currency.prototype._update = function () {
+Currency.prototype._update = function() {
   var bytes = this.to_bytes();
 
   // is it 0 everywhere except 12, 13, 14?
   var isZeroExceptInStandardPositions = true;
 
   if (!bytes) {
-    return "XRP";
+    return 'XRP';
   }
 
   this._native = false;
@@ -107,9 +105,9 @@ Currency.prototype._update = function () {
                    + String.fromCharCode(bytes[13])
                    + String.fromCharCode(bytes[14]);
 
-    if (this._iso_code === "\0\0\0") {
+    if (this._iso_code === '\0\0\0') {
       this._native = true;
-      this._iso_code = "XRP";
+      this._iso_code = 'XRP';
     }
 
     this._type = 0;
@@ -129,7 +127,7 @@ Currency.prototype._update = function () {
 
 // XXX Probably not needed anymore?
 /*
-Currency.prototype.parse_bytes = function (byte_array) {
+Currency.prototype.parse_bytes = function(byte_array) {
   if (Array.isArray(byte_array) && byte_array.length === 20) {
     var result;
     // is it 0 everywhere except 12, 13, 14?
@@ -143,9 +141,9 @@ Currency.prototype.parse_bytes = function (byte_array) {
       var currencyCode = String.fromCharCode(byte_array[12])
       + String.fromCharCode(byte_array[13])
       + String.fromCharCode(byte_array[14]);
-      if (/^[A-Z0-9]{3}$/.test(currencyCode) && currencyCode !== "XRP" ) {
+      if (/^[A-Z0-9]{3}$/.test(currencyCode) && currencyCode !== 'XRP' ) {
         this._value = currencyCode;
-      } else if (currencyCode === "\0\0\0") {
+      } else if (currencyCode === '\0\0\0') {
         this._value = 0;
       } else {
         this._value = NaN;
@@ -161,19 +159,21 @@ Currency.prototype.parse_bytes = function (byte_array) {
 };
 */
 
-Currency.prototype.is_native = function () {
+Currency.prototype.is_native = function() {
   return this._native;
 };
 
 /**
  * Whether this currency is an interest-bearing/demurring currency.
  */
-Currency.prototype.has_interest = function () {
+Currency.prototype.has_interest = function() {
   return this._type === 1 && this._interest_start && !isNaN(this._interest_period);
 };
 
-Currency.prototype.get_interest_at = function (referenceDate) {
-  if (!this.has_interest) return 1;
+Currency.prototype.get_interest_at = function(referenceDate) {
+  if (!this.has_interest) {
+    return 1;
+  }
 
   if (referenceDate instanceof Date) {
     referenceDate = utils.fromTimestamp(referenceDate.getTime());
@@ -187,14 +187,14 @@ Currency.prototype.get_interest_at = function (referenceDate) {
 //     We could be doing further checks into the internal format of the
 //     currency data, since there are some values that are invalid.
 //
-//Currency.prototype.is_valid = function () {
+//Currency.prototype.is_valid = function() {
 //  return this._value instanceof BigInteger && ...;
 //};
 
-Currency.prototype.to_json = function () {
+Currency.prototype.to_json = function() {
   if (!this.is_valid()) {
     // XXX This is backwards compatible behavior, but probably not very good.
-    return "XRP";
+    return 'XRP';
   }
 
   // Any currency with standard properties and a valid code can be abbreviated
@@ -216,7 +216,7 @@ Currency.prototype.to_json = function () {
   return currencyHex;
 };
 
-Currency.prototype.to_human = function () {
+Currency.prototype.to_human = function() {
   // to_human() will always print the human-readable currency code if available.
   if (/^[A-Z0-9]{3}$/.test(this._iso_code)) {
     return this._iso_code;

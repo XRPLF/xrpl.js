@@ -1,8 +1,8 @@
 var util         = require('util');
+var url          = require('url');
 var EventEmitter = require('events').EventEmitter;
-var Transaction = require('./transaction').Transaction;
 var Amount       = require('./amount').Amount;
-var utils        = require('./utils');
+var Transaction  = require('./transaction').Transaction;
 var log          = require('./log').internal.sub('server');
 
 /**
@@ -18,34 +18,47 @@ var log          = require('./log').internal.sub('server');
 function Server(remote, opts) {
   EventEmitter.call(this);
 
+  if (typeof opts === 'string') {
+    var parsedUrl = url.parse(opts);
+    opts = {
+      host: parsedUrl.hostname,
+      port: parsedUrl.port,
+      secure: (parsedUrl.protocol === 'ws:') ? false : true
+    }
+  }
+
   if (typeof opts !== 'object') {
     throw new TypeError('Server configuration is not an Object');
   }
 
-  if (!opts.host) opts.host     = opts.websocket_ip;
-  if (!opts.port) opts.port     = opts.websocket_port;
-  if (!opts.secure) opts.secure = opts.websocket_ssl;
-
-  if (typeof opts.secure === 'undefined') {
-    opts.secure = false;
+  if (!opts.host) {
+    opts.host = opts.websocket_ip;
+  }
+  if (!opts.port) {
+    opts.port = opts.websocket_port;
+  }
+  if (!opts.secure) {
+    opts.secure = opts.websocket_ssl;
   }
 
-  var domainRE = /^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$/;
+  if (isNaN(opts.port)) {
+    throw new TypeError('Server port must be a number');
+  }
 
-  if (!domainRE.test(opts.host)) {
+  if (!Server.domainRE.test(opts.host)) {
     throw new Error('Server host is malformed, use "host" and "port" server configuration');
   }
 
-  // We want to allow integer strings as valid port numbers for backward
-  // compatibility.
-  if (typeof opts.port === 'string') {
-    opts.port = parseFloat(opts.port);
+  if (typeof opts.secure !== 'boolean') {
+    opts.secure = false;
   }
 
-  if (typeof opts.port !== 'number' ||
-      opts.port >>> 0 !== parseFloat(opts.port) || // is integer?
-      opts.port < 1 ||
-      opts.port > 65535) {
+  // We want to allow integer strings as valid port numbers for backward compatibility
+  if (typeof opts.port !== 'number') {
+    opts.port = Number(opts.port);
+  }
+
+  if (opts.port < 1 || opts.port > 65535) {
     throw new TypeError('Server "port" must be an integer in range 1-65535');
   }
 
@@ -86,7 +99,9 @@ function Server(remote, opts) {
   });
 
   function checkServerActivity() {
-    if (isNaN(self._lastLedgerClose)) return;
+    if (isNaN(self._lastLedgerClose)) {
+      return;
+    }
 
     var delta = (Date.now() - self._lastLedgerClose);
 
@@ -110,6 +125,8 @@ function Server(remote, opts) {
 };
 
 util.inherits(Server, EventEmitter);
+
+Server.domainRE = /^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|[-_]){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|[-_]){0,61}[0-9A-Za-z])?)*\.?$/;
 
 /**
  * Server states that we will treat as the server being online.
@@ -135,7 +152,10 @@ Server.onlineStates = [
 
 Server.prototype._setState = function(state) {
   if (state !== this._state) {
-    this._remote.trace && log.info('set_state:', state);
+    if (this._remote.trace) {
+      log.info('set_state:', state);
+    }
+
     this._state = state;
     this.emit('state', state);
 
@@ -158,7 +178,11 @@ Server.prototype._setState = function(state) {
  */
 
 Server.prototype._remoteAddress = function() {
-  try { var address = this._ws._socket.remoteAddress; } catch (e) { }
+  var address;
+  try {
+    address = this._ws._socket.remoteAddress;
+  } catch (e) {
+  }
   return address;
 };
 
@@ -187,7 +211,9 @@ Server.websocketConstructor = function() {
 Server.prototype.disconnect = function() {
   this._shouldConnect = false;
   this._setState('offline');
-  if (this._ws) this._ws.close();
+  if (this._ws) {
+    this._ws.close();
+  }
 };
 
 /**
@@ -218,12 +244,18 @@ Server.prototype.connect = function() {
   // recently received a message from the server and the WebSocket has not
   // reported any issues either. If we do fail to ping or the connection drops,
   // we will automatically reconnect.
-  if (this._connected) return;
+  if (this._connected) {
+    return;
+  }
 
-  this._remote.trace && log.info('connect:', this._opts.url);
+  if (this._remote.trace) {
+    log.info('connect:', this._opts.url);
+  }
 
   // Ensure any existing socket is given the command to close first.
-  if (this._ws) this._ws.close();
+  if (this._ws) {
+    this._ws.close();
+  }
 
   var WebSocket = Server.websocketConstructor();
 
@@ -246,7 +278,7 @@ Server.prototype.connect = function() {
     if (ws === self._ws) {
       self.emit('socket_open');
       // Subscribe to events
-      self.request(self._remote._serverPrepareSubscribe());
+      self._request(self._remote._serverPrepareSubscribe());
     }
   };
 
@@ -254,7 +286,10 @@ Server.prototype.connect = function() {
     // If we are no longer the active socket, simply ignore any event
     if (ws === self._ws) {
       self.emit('socket_error');
-      self._remote.trace && log.info('onerror:', self._opts.url, e.data || e);
+
+      if (self._remote.trace) {
+        log.info('onerror:', self._opts.url, e.data || e);
+      }
 
       // Most connection errors for WebSockets are conveyed as 'close' events with
       // code 1006. This is done for security purposes and therefore unlikely to
@@ -278,7 +313,9 @@ Server.prototype.connect = function() {
   ws.onclose = function onClose() {
     // If we are no longer the active socket, simply ignore any event
     if (ws === self._ws) {
-      self._remote.trace && log.info('onclose:', self._opts.url, ws.readyState);
+      if (self._remote.trace) {
+        log.info('onclose:', self._opts.url, ws.readyState);
+      }
       self._handleClose();
     }
   };
@@ -305,7 +342,9 @@ Server.prototype._retryConnect = function() {
 
   function connectionRetry() {
     if (self._shouldConnect) {
-      self._remote.trace && log.info('retry', self._opts.url);
+      if (self._remote.trace) {
+        log.info('retry', self._opts.url);
+      }
       self.connect();
     }
   };
@@ -344,9 +383,14 @@ Server.prototype._handleClose = function() {
 Server.prototype._handleMessage = function(message) {
   var self = this;
 
-  try { message = JSON.parse(message); } catch(e) { }
+  try {
+    message = JSON.parse(message);
+  } catch(e) {
+  }
 
-  if (!Server.isValidMessage(message)) return;
+  if (!Server.isValidMessage(message)) {
+    return;
+  }
 
   switch (message.type) {
     case 'ledgerClosed':
@@ -364,10 +408,8 @@ Server.prototype._handleMessage = function(message) {
         self.emit('load', message, self);
         self._remote.emit('load', message, self);
 
-        var loadChanged = ((message.load_base !== self._load_base) ||
-                           (message.load_factor !== self._load_factor));
-
-        if (loadChanged) {
+        if (message.load_base !== self._load_base || message.load_factor !== self._load_factor) {
+          // Load changed
           self._load_base   = message.load_base;
           self._load_factor = message.load_factor;
           self.emit('load_changed', message, self);
@@ -382,9 +424,16 @@ Server.prototype._handleMessage = function(message) {
       delete self._requests[message.id];
 
       if (!request) {
-        this._remote.trace && log.info('UNEXPECTED:', self._opts.url, message);
-      } else if (message.status === 'success') {
-        this._remote.trace && log.info('response:', self._opts.url, message);
+        if (this._remote.trace) {
+          log.info('UNEXPECTED:', self._opts.url, message);
+        }
+        return;
+      }
+
+      if (message.status === 'success') {
+        if (this._remote.trace) {
+          log.info('response:', self._opts.url, message);
+        }
 
         request.emit('success', message.result);
 
@@ -392,20 +441,23 @@ Server.prototype._handleMessage = function(message) {
           emitter.emit('response_' + request.message.command, message.result, request, message);
         });
       } else if (message.error) {
-        this._remote.trace && log.info('error:', self._opts.url, message);
+        if (this._remote.trace) {
+          log.info('error:', self._opts.url, message);
+        }
 
         request.emit('error', {
-          error         : 'remoteError',
-          error_message : 'Remote reported an error.',
-          remote        : message
+          error: 'remoteError',
+          error_message: 'Remote reported an error.',
+          remote: message
         });
       }
       break;
 
     case 'path_find':
-      this._remote.trace && log.info('path_find:', self._opts.url, message);
+      if (this._remote.trace) {
+        log.info('path_find:', self._opts.url, message);
+      }
       break;
-
   }
 };
 
@@ -460,9 +512,11 @@ Server.prototype._handleResponseSubscribe = function(message) {
  * @api private
  */
 
-Server.prototype.sendMessage = function(message) {
+Server.prototype._sendMessage = function(message) {
   if (this._ws) {
-    this._remote.trace && log.info('request:', this._opts.url, message);
+    if (this._remote.trace) {
+      log.info('request:', this._opts.url, message);
+    }
     this._ws.send(JSON.stringify(message));
   }
 };
@@ -477,12 +531,14 @@ Server.prototype.sendMessage = function(message) {
  * @api private
  */
 
-Server.prototype.request = function(request) {
+Server.prototype._request = function(request) {
   var self  = this;
 
   // Only bother if we are still connected.
   if (!this._ws) {
-    this._remote.trace && log.info('request: DROPPING:', self._opts.url, request.message);
+    if (this._remote.trace) {
+      log.info('request: DROPPING:', self._opts.url, request.message);
+    }
     return;
   }
 
@@ -494,14 +550,15 @@ Server.prototype.request = function(request) {
   // Advance message ID
   this._id++;
 
+  function sendRequest() {
+    self._sendMessage(request.message);
+  };
+
   if (this._isConnected(request)) {
-    this.sendMessage(request.message);
+    sendRequest();
   } else {
     // XXX There are many ways to make this smarter.
-    function serverReconnected() {
-      self.sendMessage(request.message);
-    }
-    this.once('connect', serverReconnected);
+    this.once('connect', sendRequest);
   }
 };
 
@@ -521,7 +578,7 @@ Server.prototype._isConnected = function(request) {
  * @api private
  */
 
-Server.prototype.computeFee = function(transaction) {
+Server.prototype._computeFee = function(transaction) {
   var units;
 
   if (transaction instanceof Transaction) {
@@ -532,7 +589,7 @@ Server.prototype.computeFee = function(transaction) {
     throw new Error('Invalid argument');
   }
 
-  return this.feeTx(units).to_json();
+  return this._feeTx(units).to_json();
 };
 
 /**
@@ -544,8 +601,8 @@ Server.prototype.computeFee = function(transaction) {
  * @return {Amount} Final fee in XRP for specified number of fee units.
  */
 
-Server.prototype.feeTx = function(units) {
-  var fee_unit = this.feeTxUnit();
+Server.prototype._feeTx = function(units) {
+  var fee_unit = this._feeTxUnit();
   return Amount.from_json(String(Math.ceil(units * fee_unit)));
 };
 
@@ -558,7 +615,7 @@ Server.prototype.feeTx = function(units) {
  * @return {Number} Recommended amount for one fee unit as float.
  */
 
-Server.prototype.feeTxUnit = function() {
+Server.prototype._feeTxUnit = function() {
   var fee_unit = this._fee_base / this._fee_ref;
 
   // Apply load fees
@@ -576,10 +633,10 @@ Server.prototype.feeTxUnit = function() {
  * Returns the base reserve with load fees and safety margin applied.
  */
 
-Server.prototype.reserve = function(owner_count) {
+Server.prototype._reserve = function(ownerCount) {
   var reserve_base = Amount.from_json(String(this._reserve_base));
   var reserve_inc  = Amount.from_json(String(this._reserve_inc));
-  var owner_count  = owner_count || 0;
+  var owner_count  = ownerCount || 0;
 
   if (owner_count < 0) {
     throw new Error('Owner count must not be negative.');

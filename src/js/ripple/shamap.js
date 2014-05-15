@@ -10,12 +10,12 @@ function SHAMap() {
   this.root = new SHAMapTreeNodeInner();
 };
 
-SHAMap.prototype.add_item = function (tag, node, type) {
+SHAMap.prototype.add_item = function(tag, node, type) {
   var node = new SHAMapTreeNodeLeaf(tag, node, type);
   this.root.add_item(tag, node);
 };
 
-SHAMap.prototype.hash = function () {
+SHAMap.prototype.hash = function() {
   return this.root.hash();
 };
 
@@ -24,21 +24,19 @@ SHAMap.prototype.hash = function () {
  *
  * Can be either SHAMapTreeNodeInner or SHAMapTreeNodeLeaf.
  */
-function SHAMapTreeNode() {
-
-};
+function SHAMapTreeNode() { };
 
 SHAMapTreeNode.TYPE_INNER = 1;
 SHAMapTreeNode.TYPE_TRANSACTION_NM = 2;
 SHAMapTreeNode.TYPE_TRANSACTION_MD = 3;
 SHAMapTreeNode.TYPE_ACCOUNT_STATE = 4;
 
-SHAMapTreeNode.prototype.add_item = function (tag_segment, node) {
-  throw new Error("Called unimplemented virtual method SHAMapTreeNode#add_item.");
+SHAMapTreeNode.prototype.add_item = function(tag_segment, node) {
+  throw new Error('Called unimplemented virtual method SHAMapTreeNode#add_item.');
 };
 
-SHAMapTreeNode.prototype.hash = function () {
-  throw new Error("Called unimplemented virtual method SHAMapTreeNode#hash.");
+SHAMapTreeNode.prototype.hash = function() {
+  throw new Error('Called unimplemented virtual method SHAMapTreeNode#hash.');
 };
 
 /**
@@ -56,7 +54,7 @@ function SHAMapTreeNodeInner() {
 
 util.inherits(SHAMapTreeNodeInner, SHAMapTreeNode);
 
-SHAMapTreeNodeInner.prototype.add_item = function (tag_segment, node) {
+SHAMapTreeNodeInner.prototype.add_item = function(tag_segment, node) {
   var current_node = this.get_node(tag_segment[0]);
 
   if (current_node) {
@@ -67,7 +65,7 @@ SHAMapTreeNodeInner.prototype.add_item = function (tag_segment, node) {
       current_node.add_item(tag_segment.slice(1), node);
     } else if (current_node.get_segment() === tag_segment) {
       // Collision
-      throw new Error("Tried to add a node to a SHAMap that was already in there.");
+      throw new Error('Tried to add a node to a SHAMap that was already in there.');
     } else {
       // Turn it into an inner node
       var new_inner_node = new SHAMapTreeNodeInner();
@@ -92,28 +90,31 @@ SHAMapTreeNodeInner.prototype.add_item = function (tag_segment, node) {
 /**
  * Overwrite the node that is currently in a given slot.
  */
-SHAMapTreeNodeInner.prototype.set_node = function (slot, node) {
+SHAMapTreeNodeInner.prototype.set_node = function(slot, node) {
   this.leaves[slot] = node;
   this.empty = false;
 };
 
-SHAMapTreeNodeInner.prototype.get_node = function (slot) {
+SHAMapTreeNodeInner.prototype.get_node = function(slot) {
   return this.leaves[slot];
 };
 
-SHAMapTreeNodeInner.prototype.hash = function () {
+SHAMapTreeNodeInner.prototype.hash = function() {
   if (this.empty) {
     return UInt256.from_hex(UInt256.HEX_ZERO);
   }
 
   var hash_buffer = new SerializedObject();
-  var buffer = [];
-  for (var i = 0; i < 16; i++) {
+  var buffer = [ ];
+
+  for (var i=0; i<16; i++) {
     var leafHash = UInt256.from_hex(UInt256.HEX_ZERO);
     var slot = i.toString(16).toUpperCase();
-    if ("object" === typeof this.leaves[slot]) {
+
+    if (typeof this.leaves[slot] === 'object') {
       leafHash = this.leaves[slot].hash();
     }
+
     hash_buffer.append(leafHash.to_bytes());
   }
 
@@ -128,32 +129,30 @@ SHAMapTreeNodeInner.prototype.hash = function () {
 function SHAMapTreeNodeLeaf(tag, node, type) {
   SHAMapTreeNode.call(this);
 
-  if ("string" === typeof tag) {
+  if (typeof tag === 'string') {
     tag = UInt256.from_hex(tag);
-  } else if (tag instanceof UInt256) {
-    // Type is already the right one
-  } else {
-    throw new Error("Tag is unexpected type.");
+  } else if (!(tag instanceof UInt256)){
+    throw new Error('Tag is unexpected type.');
   }
 
   this.tag = tag;
   this.tag_segment = null;
 
   this.type = type;
-
   this.node = node;
-}
+};
+
 util.inherits(SHAMapTreeNodeLeaf, SHAMapTreeNode);
 
-SHAMapTreeNodeLeaf.prototype.get_segment = function (segment) {
+SHAMapTreeNodeLeaf.prototype.get_segment = function(segment) {
   return this.tag_segment;
 };
 
-SHAMapTreeNodeLeaf.prototype.set_segment = function (segment) {
+SHAMapTreeNodeLeaf.prototype.set_segment = function(segment) {
   this.tag_segment = segment;
 };
 
-SHAMapTreeNodeLeaf.prototype.hash = function () {
+SHAMapTreeNodeLeaf.prototype.hash = function() {
   var buffer = new SerializedObject();
   switch (this.type) {
     case SHAMapTreeNode.TYPE_TRANSACTION_NM:
@@ -163,7 +162,7 @@ SHAMapTreeNodeLeaf.prototype.hash = function () {
       buffer.append(this.tag.to_bytes());
       return buffer.hash(hashprefixes.HASH_TX_NODE);
     default:
-      throw new Error("Tried to hash a SHAMap node of unknown type.");
+      throw new Error('Tried to hash a SHAMap node of unknown type.');
   }
 };
 

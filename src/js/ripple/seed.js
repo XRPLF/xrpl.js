@@ -2,9 +2,9 @@
 // Seed support
 //
 
-var utils   = require('./utils');
-var sjcl    = utils.sjcl;
-var extend  = require('extend');
+var extend = require('extend');
+var utils  = require('./utils');
+var sjcl   = utils.sjcl;
 
 var BigInteger = utils.jsbn.BigInteger;
 
@@ -15,7 +15,7 @@ var KeyPair = require('./keypair').KeyPair;
 
 var Seed = extend(function () {
   // Internal form: NaN or BigInteger
-  this._curve = sjcl.ecc.curves['c256'];
+  this._curve = sjcl.ecc.curves.c256;
   this._value = NaN;
 }, UInt);
 
@@ -30,7 +30,7 @@ Seed.prototype.parse_json = function (j) {
     if (!j.length) {
       this._value = NaN;
     // XXX Should actually always try and continue if it failed.
-    } else if (j[0] === "s") {
+    } else if (j[0] === 's') {
       this._value = Base.decode_check(Base.VER_FAMILY_SEED, j);
     } else if (j.length === 32) {
       this._value = this.parse_hex(j);
@@ -47,7 +47,7 @@ Seed.prototype.parse_json = function (j) {
 
 Seed.prototype.parse_passphrase = function (j) {
   if (typeof j !== 'string') {
-    throw new Error("Passphrase must be a string");
+    throw new Error('Passphrase must be a string');
   }
 
   var hash = sjcl.hash.sha512.hash(sjcl.codec.utf8String.toBits(j));
@@ -85,8 +85,9 @@ function SHA256_RIPEMD160(bits) {
 
 Seed.prototype.get_key = function (account_id) {
   if (!this.is_valid()) {
-    throw new Error("Cannot generate keys from invalid seed!");
+    throw new Error('Cannot generate keys from invalid seed!');
   }
+
   // XXX Should loop over keys until we find the right one
 
   var private_gen, public_gen;

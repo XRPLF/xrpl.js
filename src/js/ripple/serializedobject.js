@@ -1,11 +1,11 @@
-var binformat  = require('./binformat');
-var extend     = require('extend');
-var stypes     = require('./serializedtypes');
-var UInt256    = require('./uint256').UInt256;
-var assert     = require('assert');
+var assert    = require('assert');
+var extend    = require('extend');
+var binformat = require('./binformat');
+var stypes    = require('./serializedtypes');
+var UInt256   = require('./uint256').UInt256;
+var utils     = require('./utils');
 
-var utils      = require('./utils');
-var sjcl       = utils.sjcl;
+var sjcl = utils.sjcl;
 var BigInteger = utils.jsbn.BigInteger;
 
 var TRANSACTION_TYPES = { };
@@ -39,33 +39,31 @@ function SerializedObject(buf) {
   this.pointer = 0;
 };
 
-SerializedObject.from_json = function (obj) {
+SerializedObject.from_json = function(obj) {
   // Create a copy of the object so we don't modify it
   var obj = extend({}, obj);
-  var so  = new SerializedObject;
+  var so  = new SerializedObject();
   var typedef;
 
-  if ("number" === typeof obj.TransactionType) {
+  if (typeof obj.TransactionType === 'number') {
     obj.TransactionType = SerializedObject.lookup_type_tx(obj.TransactionType);
-
     if (!obj.TransactionType) {
       throw new Error('Transaction type ID is invalid.');
     }
   }
 
-  if ("string" === typeof obj.TransactionType) {
+  if (typeof obj.TransactionType === 'string') {
     typedef = binformat.tx[obj.TransactionType];
-
     if (!Array.isArray(typedef)) {
       throw new Error('Transaction type is invalid');
     }
 
     typedef = typedef.slice();
     obj.TransactionType = typedef.shift();
-  } else if ("undefined" !== typeof obj.LedgerEntryType) {
+  } else if (typeof obj.LedgerEntryType !== 'undefined') {
     // XXX: TODO
     throw new Error('Ledger entry binary format not yet implemented.');
-  } else if ("object" === typeof obj.AffectedNodes) {
+  } else if (typeof obj.AffectedNodes === 'object') {
     typedef = binformat.metadata;
   } else {
     throw new Error('Object to be serialized must contain either' +
@@ -79,49 +77,51 @@ SerializedObject.from_json = function (obj) {
   return so;
 };
 
-SerializedObject.check_no_missing_fields = function (typedef, obj) {
+SerializedObject.check_no_missing_fields = function(typedef, obj) {
   var missing_fields = [];
-  
-  for (var i = typedef.length - 1; i >= 0; i--) {
+
+  for (var i=typedef.length - 1; i>=0; i--) {
     var spec = typedef[i];
-    var field = spec[0]
+    var field = spec[0];
     var requirement = spec[1];
 
-    if (binformat.REQUIRED === requirement && obj[field] == null) {
+    if (binformat.REQUIRED === requirement && obj[field] === void(0)) {
       missing_fields.push(field);
     };
   };
-  
+
   if (missing_fields.length > 0) {
     var object_name;
-    if (obj.TransactionType != null) {
+
+    if (obj.TransactionType !== void(0)) {
       object_name = SerializedObject.lookup_type_tx(obj.TransactionType);
     } else {
-      object_name = "TransactionMetaData";
+      object_name = 'TransactionMetaData';
     } /*else {
-      TODO: LedgerEntryType ... 
+      TODO: LedgerEntryType ...
     }*/
-    throw new Error(object_name + " is missing fields: " + 
-                    JSON.stringify(missing_fields));
-  };
-}
 
-SerializedObject.prototype.append = function (bytes) {
+    throw new Error(object_name + ' is missing fields: ' + JSON.stringify(missing_fields));
+  };
+};
+
+SerializedObject.prototype.append = function(bytes) {
   if (bytes instanceof SerializedObject) {
     bytes = bytes.buffer;
   }
+
   this.buffer = this.buffer.concat(bytes);
   this.pointer += bytes.length;
 };
 
-SerializedObject.prototype.resetPointer = function () {
+SerializedObject.prototype.resetPointer = function() {
   this.pointer = 0;
 };
 
 function readOrPeek(advance) {
   return function(bytes) {
     var start = this.pointer;
-    var end   = start + bytes;
+    var end = start + bytes;
 
     if (end > this.buffer.length) {
       throw new Error('Buffer length exceeded');
@@ -134,18 +134,18 @@ function readOrPeek(advance) {
     }
 
     return result;
-  }
+  };
 };
 
 SerializedObject.prototype.read = readOrPeek(true);
 
 SerializedObject.prototype.peek = readOrPeek(false);
 
-SerializedObject.prototype.to_bits = function () {
+SerializedObject.prototype.to_bits = function() {
   return sjcl.codec.bytes.toBits(this.buffer);
 };
 
-SerializedObject.prototype.to_hex = function () {
+SerializedObject.prototype.to_hex = function() {
   return sjcl.codec.hex.fromBits(this.to_bits()).toUpperCase();
 };
 
@@ -164,7 +164,7 @@ SerializedObject.prototype.to_json = function() {
   this.pointer = old_pointer;
 
   return output;
-}
+};
 
 SerializedObject.jsonify_structure = function(structure, field_name) {
   var output;
@@ -186,14 +186,20 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
       }
       break;
     case 'object':
-      if (!structure) break; //null
+      if (structure === null) {
+        break;
+      }
+
       if (typeof structure.to_json === 'function') {
         output = structure.to_json();
       } else if (structure instanceof BigInteger) {
         output = structure.toString(16).toUpperCase();
       } else {
-        output = new structure.constructor; //new Array or Object
+        //new Array or Object
+        output = new structure.constructor();
+
         var keys = Object.keys(structure);
+
         for (var i=0, l=keys.length; i<l; i++) {
           var key = keys[i];
           output[key] = SerializedObject.jsonify_structure(structure[key], key);
@@ -207,7 +213,7 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
   return output;
 };
 
-SerializedObject.prototype.serialize = function (typedef, obj) {
+SerializedObject.prototype.serialize = function(typedef, obj) {
   // Serialize object without end marker
   stypes.Object.serialize(this, obj, true);
 
@@ -223,7 +229,7 @@ SerializedObject.prototype.serialize = function (typedef, obj) {
   */
 };
 
-SerializedObject.prototype.hash = function (prefix) {
+SerializedObject.prototype.hash = function(prefix) {
   var sign_buffer = new SerializedObject();
   stypes.Int32.serialize(sign_buffer, prefix);
   sign_buffer.append(this.buffer);
@@ -233,13 +239,13 @@ SerializedObject.prototype.hash = function (prefix) {
 // DEPRECATED
 SerializedObject.prototype.signing_hash = SerializedObject.prototype.hash;
 
-SerializedObject.prototype.hash_sha512_half = function () {
+SerializedObject.prototype.hash_sha512_half = function() {
   var bits = sjcl.codec.bytes.toBits(this.buffer);
   var hash = sjcl.bitArray.bitSlice(sjcl.hash.sha512.hash(bits), 0, 256);
   return UInt256.from_hex(sjcl.codec.hex.fromBits(hash));
 };
 
-SerializedObject.prototype.serialize_field = function (spec, obj) {
+SerializedObject.prototype.serialize_field = function(spec, obj) {
   var name     = spec[0];
   var presence = spec[1];
   var field_id = spec[2];
@@ -262,7 +268,7 @@ SerializedObject.prototype.serialize_field = function (spec, obj) {
   }
 };
 
-SerializedObject.get_field_header = function (type_id, field_id) {
+SerializedObject.get_field_header = function(type_id, field_id) {
   var buffer = [ 0 ];
 
   if (type_id > 0xF) {
@@ -280,7 +286,7 @@ SerializedObject.get_field_header = function (type_id, field_id) {
   return buffer;
 };
 
-SerializedObject.sort_typedef = function (typedef) {
+SerializedObject.sort_typedef = function(typedef) {
   assert(Array.isArray(typedef));
 
   function sort_field_compare(a, b) {
@@ -291,8 +297,8 @@ SerializedObject.sort_typedef = function (typedef) {
   return typedef.sort(sort_field_compare);
 };
 
-SerializedObject.lookup_type_tx = function (id) {
-  assert(typeof id === 'number');
+SerializedObject.lookup_type_tx = function(id) {
+  assert.strictEqual(typeof id, 'number');
   return TRANSACTION_TYPES[id];
 };
 

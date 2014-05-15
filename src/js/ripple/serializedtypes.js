@@ -22,8 +22,8 @@ var Amount    = amount.Amount;
 var Currency  = amount.Currency;
 
 // Shortcuts
-var hex       = sjcl.codec.hex;
-var bytes     = sjcl.codec.bytes;
+var hex = sjcl.codec.hex;
+var bytes = sjcl.codec.bytes;
 
 var BigInteger = utils.jsbn.BigInteger;
 
@@ -79,11 +79,7 @@ SerializedType.serialize_varint = function (so, val) {
     so.append([193 + (val >>> 8), val & 0xff]);
   } else if (val <= 918744) {
     val -= 12481;
-    so.append([
-              241 + (val >>> 16),
-              val >>> 8 & 0xff,
-              val & 0xff
-    ]);
+    so.append([ 241 + (val >>> 16), val >>> 8 & 0xff, val & 0xff ]);
   } else {
     throw new Error('Variable integer overflow.');
   }
@@ -105,7 +101,7 @@ SerializedType.prototype.parse_varint = function (so) {
   } else if (b1 <= 254) {
     b2 = so.read(1)[0];
     b3 = so.read(1)[0];
-    result = 12481 + (b1 - 241) * 65536 + b2 * 256 + b3
+    result = 12481 + (b1 - 241) * 65536 + b2 * 256 + b3;
   }
 
   return result;
@@ -142,7 +138,7 @@ function readAndSum(so, bytes) {
   var sum = 0;
 
   if (bytes > 4) {
-    throw new Error("This function only supports up to four bytes.");
+    throw new Error('This function only supports up to four bytes.');
   }
 
   for (var i=0; i<bytes; i++) {
@@ -328,7 +324,10 @@ var STAmount = exports.Amount = new SerializedType({
       // Amount enforces the range correctly, but we'll clear them anyway just
       // so this code can make certain guarantees about the encoded value.
       valueBytes[0] &= 0x3f;
-      if (!amount.is_negative()) valueBytes[0] |= 0x40;
+
+      if (!amount.is_negative()) {
+        valueBytes[0] |= 0x40;
+      }
     } else {
       var hi = 0, lo = 0;
 
@@ -337,7 +336,10 @@ var STAmount = exports.Amount = new SerializedType({
 
       if (!amount.is_zero()) {
         // Second bit: non-negative?
-        if (!amount.is_negative()) hi |= 1 << 30;
+        if (!amount.is_negative()) {
+          hi |= 1 << 30;
+        }
+
         // Next eight bits: offset/exponent
         hi |= ((97 + amount._offset) & 0xff) << 22;
         // Remaining 52 bits: mantissa
@@ -465,11 +467,18 @@ var STPathSet = exports.PathSet = new SerializedType({
         //if (entry.hasOwnProperty('_value')) {entry = entry._value;}
         var type = 0;
 
-        if (entry.account)  type |= this.typeAccount;
-        if (entry.currency) type |= this.typeCurrency;
-        if (entry.issuer)   type |= this.typeIssuer;
+        if (entry.account) {
+          type |= this.typeAccount;
+        }
+        if (entry.currency) {
+          type |= this.typeCurrency;
+        }
+        if (entry.issuer) {
+          type |= this.typeIssuer;
+        }
 
         STInt8.serialize(so, type);
+
         if (entry.account) {
           so.append(UInt160.from_json(entry.account).to_bytes());
         }
@@ -484,6 +493,7 @@ var STPathSet = exports.PathSet = new SerializedType({
         }
       }
     }
+
     STInt8.serialize(so, this.typeEnd);
   },
   parse: function (so) {
@@ -512,40 +522,40 @@ var STPathSet = exports.PathSet = new SerializedType({
         if (current_path) { //close the current path, if there is one,
           path_list.push(current_path);
         }
-        current_path = []; //and start a new one.
+        current_path = [ ]; //and start a new one.
+        continue;
+      }
+
+      //It's an entry-begin tag.
+      //console.log('It's an entry-begin tag.');
+      var entry = {};
+
+      if (tag_byte & this.typeAccount) {
+        //console.log('entry.account');
+        /*var bta = so.read(20);
+          console.log('BTA:', bta);*/
+        entry.account = STHash160.parse(so);
+        entry.account.set_version(Base.VER_ACCOUNT_ID);
+      }
+      if (tag_byte & this.typeCurrency) {
+        //console.log('entry.currency');
+        entry.currency = STCurrency.parse(so);
+        if (entry.currency.to_json() === 'XRP' && !entry.currency.is_native()) {
+          entry.non_native = true;
+        }
+      }
+      if (tag_byte & this.typeIssuer) {
+        //console.log('entry.issuer');
+        entry.issuer = STHash160.parse(so);
+        // Enable and set correct type of base-58 encoding
+        entry.issuer.set_version(Base.VER_ACCOUNT_ID);
+        //console.log('DONE WITH ISSUER!');
+      }
+
+      if (entry.account || entry.currency || entry.issuer) {
+        current_path.push(entry);
       } else {
-        //It's an entry-begin tag.
-        //console.log('It's an entry-begin tag.');
-        var entry = {};
-
-        if (tag_byte & this.typeAccount) {
-          //console.log('entry.account');
-          /*var bta = so.read(20);
-            console.log('BTA:', bta);*/
-          entry.account = STHash160.parse(so);
-          entry.account.set_version(Base.VER_ACCOUNT_ID);
-        }
-        if (tag_byte & this.typeCurrency) {
-          //console.log('entry.currency');
-          entry.currency = STCurrency.parse(so);
-          if (entry.currency.to_json() === "XRP" &&
-              !entry.currency.is_native()) {
-            entry.non_native = true;
-          }
-        }
-        if (tag_byte & this.typeIssuer) {
-          //console.log('entry.issuer');
-          entry.issuer = STHash160.parse(so);
-          // Enable and set correct type of base-58 encoding
-          entry.issuer.set_version(Base.VER_ACCOUNT_ID);
-          //console.log('DONE WITH ISSUER!');
-        }
-
-        if (entry.account || entry.currency || entry.issuer) {
-          current_path.push(entry);
-        } else {
-          throw new Error('Invalid path entry'); //It must have at least something in it.
-        }
+        throw new Error('Invalid path entry'); //It must have at least something in it.
       }
     }
 
@@ -591,11 +601,11 @@ function serialize(so, field_name, value) {
   var field_bits        = field_coordinates[1];
   var tag_byte          = (type_bits < 16 ? type_bits << 4 : 0) | (field_bits < 16 ? field_bits : 0);
 
-  if (field_name === "LedgerEntryType" && "string" === typeof value) {
+  if (field_name === 'LedgerEntryType' && 'string' === typeof value) {
     value = binformat.ledger[value][0];
   }
 
-  if (field_name === "TransactionResult" && "string" === typeof value) {
+  if (field_name === 'TransactionResult' && 'string' === typeof value) {
     value = binformat.ter[value];
   }
 
@@ -668,8 +678,8 @@ var STObject = exports.Object = new SerializedType({
     });
 
     keys.forEach(function (key) {
-      if ("undefined" === typeof binformat.fieldsInverseMap[key]) {
-        throw new Error("JSON contains unknown field: '" + key + "'");
+      if (typeof binformat.fieldsInverseMap[key] === 'undefined') {
+        throw new Error('JSON contains unknown field: "' + key + '"');
       }
     });
 
@@ -679,7 +689,11 @@ var STObject = exports.Object = new SerializedType({
     for (var i=0; i<keys.length; i++) {
       serialize(so, keys[i], val[keys[i]]);
     }
-    if (!no_marker) STInt8.serialize(so, 0xe1); //Object ending marker
+
+    if (!no_marker) {
+      //Object ending marker
+      STInt8.serialize(so, 0xe1);
+    }
   },
 
   parse: function (so) {
@@ -708,7 +722,9 @@ var STArray = exports.Array = new SerializedType({
       var value = val[i][field_name];
       serialize(so, field_name, value);
     }
-    STInt8.serialize(so, 0xf1); //Array ending marker
+
+    //Array ending marker
+    STInt8.serialize(so, 0xf1);
   },
 
   parse: function (so) {

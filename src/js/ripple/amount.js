@@ -54,52 +54,52 @@ function Amount() {
 };
 
 // Given '100/USD/mtgox' return the a string with mtgox remapped.
-Amount.text_full_rewrite = function (j) {
+Amount.text_full_rewrite = function(j) {
   return Amount.from_json(j).to_text_full();
 };
 
 // Given '100/USD/mtgox' return the json.
-Amount.json_rewrite = function (j) {
+Amount.json_rewrite = function(j) {
   return Amount.from_json(j).to_json();
 };
 
-Amount.from_number = function (n) {
+Amount.from_number = function(n) {
   return (new Amount()).parse_number(n);
 };
 
-Amount.from_json = function (j) {
+Amount.from_json = function(j) {
   return (new Amount()).parse_json(j);
 };
 
-Amount.from_quality = function (quality, currency, issuer, opts) {
+Amount.from_quality = function(quality, currency, issuer, opts) {
   return (new Amount()).parse_quality(quality, currency, issuer, opts);
 };
 
-Amount.from_human = function (j, opts) {
+Amount.from_human = function(j, opts) {
   return (new Amount()).parse_human(j, opts);
 };
 
-Amount.is_valid = function (j) {
+Amount.is_valid = function(j) {
   return Amount.from_json(j).is_valid();
 };
 
-Amount.is_valid_full = function (j) {
+Amount.is_valid_full = function(j) {
   return Amount.from_json(j).is_valid_full();
 };
 
-Amount.NaN = function () {
+Amount.NaN = function() {
   var result = new Amount();
   result._value = NaN;
   return result;
 };
 
 // Returns a new value which is the absolute value of this.
-Amount.prototype.abs = function () {
+Amount.prototype.abs = function() {
   return this.clone(this.is_negative());
 };
 
 // Result in terms of this' currency and issuer.
-Amount.prototype.add = function (v) {
+Amount.prototype.add = function(v) {
   var result;
 
   v = Amount.from_json(v);
@@ -140,18 +140,18 @@ Amount.prototype.add = function (v) {
       o2  += 1;
     }
 
-    result              = new Amount();
-    result._is_native   = false;
-    result._offset      = o1;
-    result._value       = v1.add(v2);
+    result = new Amount();
+    result._is_native = false;
+    result._offset = o1;
+    result._value = v1.add(v2);
     result._is_negative = result._value.compareTo(BigInteger.ZERO) < 0;
 
     if (result._is_negative) {
-      result._value       = result._value.negate();
+      result._value = result._value.negate();
     }
 
-    result._currency    = this._currency;
-    result._issuer      = this._issuer;
+    result._currency = this._currency;
+    result._issuer = this._issuer;
 
     result.canonicalize();
   }
@@ -164,7 +164,7 @@ Amount.prototype.add = function (v) {
  *
  * @private
  */
-Amount.prototype._invert = function () {
+Amount.prototype._invert = function() {
   this._value = consts.bi_1e32.divide(this._value);
   this._offset = -32 - this._offset;
   this.canonicalize();
@@ -178,11 +178,11 @@ Amount.prototype._invert = function () {
  * @return {Amount} New Amount object with same currency and issuer, but the
  *   inverse of the value.
  */
-Amount.prototype.invert = function () {
+Amount.prototype.invert = function() {
   return this.copy()._invert();
 };
 
-Amount.prototype.canonicalize = function () {
+Amount.prototype.canonicalize = function() {
   if (!(this._value instanceof BigInteger)) {
     // NaN.
     // nothing
@@ -226,11 +226,11 @@ Amount.prototype.canonicalize = function () {
   return this;
 };
 
-Amount.prototype.clone = function (negate) {
+Amount.prototype.clone = function(negate) {
   return this.copyTo(new Amount(), negate);
 };
 
-Amount.prototype.compareTo = function (v) {
+Amount.prototype.compareTo = function(v) {
   var result;
 
   if (!this.is_comparable(v)) {
@@ -262,7 +262,7 @@ Amount.prototype.compareTo = function (v) {
 
 // Make d a copy of this. Returns d.
 // Modification of objects internally refered to is not allowed.
-Amount.prototype.copyTo = function (d, negate) {
+Amount.prototype.copyTo = function(d, negate) {
   if (typeof this._value === 'object') {
     this._value.copyTo(d._value);
   } else {
@@ -286,11 +286,11 @@ Amount.prototype.copyTo = function (d, negate) {
   return d;
 };
 
-Amount.prototype.currency = function () {
+Amount.prototype.currency = function() {
   return this._currency;
 };
 
-Amount.prototype.equals = function (d, ignore_issuer) {
+Amount.prototype.equals = function(d, ignore_issuer) {
   if (typeof d === 'string') {
     return this.equals(Amount.from_json(d));
   }
@@ -301,17 +301,17 @@ Amount.prototype.equals = function (d, ignore_issuer) {
              || (this._is_native !== d._is_native)
              || (!this._value.equals(d._value) || this._offset !== d._offset)
              || (this._is_negative !== d._is_negative)
-             || (!this._is_native && (!this._currency.equals(d._currency) || !ignore_issuer && !this._issuer.equals(d._issuer))))
+             || (!this._is_native && (!this._currency.equals(d._currency) || !ignore_issuer && !this._issuer.equals(d._issuer))));
 
   return result;
 };
 
 // Result in terms of this' currency and issuer.
-Amount.prototype.divide = function (d) {
+Amount.prototype.divide = function(d) {
   var result;
 
   if (d.is_zero()) {
-    throw 'divide by zero';
+    throw new Error('divide by zero');
   }
 
   if (this.is_zero()) {
@@ -377,7 +377,7 @@ Amount.prototype.divide = function (d) {
  *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  * @return {Amount} The resulting ratio. Unit will be the same as numerator.
  */
-Amount.prototype.ratio_human = function (denominator, opts) {
+Amount.prototype.ratio_human = function(denominator, opts) {
   opts = opts || {};
 
   if (typeof denominator === 'number' && parseInt(denominator, 10) === denominator) {
@@ -443,7 +443,7 @@ Amount.prototype.ratio_human = function (denominator, opts) {
  *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  * @return {Amount} The product. Unit will be the same as the first factor.
  */
-Amount.prototype.product_human = function (factor, opts) {
+Amount.prototype.product_human = function(factor, opts) {
   opts = opts || {};
 
   if (typeof factor === 'number' && parseInt(factor, 10) === factor) {
@@ -478,49 +478,49 @@ Amount.prototype.product_human = function (factor, opts) {
   }
 
   return product;
-}
+};
 
 // True if Amounts are valid and both native or non-native.
-Amount.prototype.is_comparable = function (v) {
+Amount.prototype.is_comparable = function(v) {
   return this._value instanceof BigInteger
     && v._value instanceof BigInteger
     && this._is_native === v._is_native;
 };
 
-Amount.prototype.is_native = function () {
+Amount.prototype.is_native = function() {
   return this._is_native;
 };
 
-Amount.prototype.is_negative = function () {
+Amount.prototype.is_negative = function() {
   return this._value instanceof BigInteger
           ? this._is_negative
           : false;                          // NaN is not negative
 };
 
-Amount.prototype.is_positive = function () {
+Amount.prototype.is_positive = function() {
   return !this.is_zero() && !this.is_negative();
 };
 
 // Only checks the value. Not the currency and issuer.
-Amount.prototype.is_valid = function () {
+Amount.prototype.is_valid = function() {
   return this._value instanceof BigInteger;
 };
 
-Amount.prototype.is_valid_full = function () {
+Amount.prototype.is_valid_full = function() {
   return this.is_valid() && this._currency.is_valid() && this._issuer.is_valid();
 };
 
-Amount.prototype.is_zero = function () {
+Amount.prototype.is_zero = function() {
   return this._value instanceof BigInteger ? this._value.equals(BigInteger.ZERO) : false;
 };
 
-Amount.prototype.issuer = function () {
+Amount.prototype.issuer = function() {
   return this._issuer;
 };
 
 // Result in terms of this' currency and issuer.
 // XXX Diverges from cpp.
-Amount.prototype.multiply = function (v) {
+Amount.prototype.multiply = function(v) {
   var result;
 
   if (this.is_zero()) {
@@ -563,7 +563,7 @@ Amount.prototype.multiply = function (v) {
 };
 
 // Return a new value.
-Amount.prototype.negate = function () {
+Amount.prototype.negate = function() {
   return this.clone('NEGATE');
 };
 
@@ -573,7 +573,7 @@ Amount.prototype.negate = function () {
  * Creates a new Amount object as a copy of the current one (including the same
  * unit (currency & issuer), inverts it (1/x) and returns the result.
  */
-Amount.prototype.invert = function () {
+Amount.prototype.invert = function() {
   var one          = this.clone();
   one._value       = BigInteger.ONE;
   one._offset      = 0;
@@ -596,7 +596,7 @@ Amount.prototype.invert = function () {
  */
 Amount.human_RE = /^\s*([a-z]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([a-f0-9]{40}|[a-z0-9]{3})?\s*$/i;
 
-Amount.prototype.parse_human = function (j, opts) {
+Amount.prototype.parse_human = function(j, opts) {
   opts = opts || {};
 
   var m = String(j).match(Amount.human_RE);
@@ -646,7 +646,7 @@ Amount.prototype.parse_human = function (j, opts) {
       //     The correct way to solve this is probably to switch to a proper
       //     BigDecimal for our internal representation and then use that across
       //     the board instead of instantiating these dummy Amount objects.
-      var interestTempAmount = Amount.from_json(""+interest+"/1/1");
+      var interestTempAmount = Amount.from_json(''+interest+'/1/1');
 
       if (interestTempAmount.is_valid()) {
         var ref = this.divide(interestTempAmount);
@@ -661,7 +661,7 @@ Amount.prototype.parse_human = function (j, opts) {
   return this;
 };
 
-Amount.prototype.parse_issuer = function (issuer) {
+Amount.prototype.parse_issuer = function(issuer) {
   this._issuer  = UInt160.from_json(issuer);
 
   return this;
@@ -699,7 +699,7 @@ Amount.prototype.parse_issuer = function (issuer) {
  *   For human use however, we want to think of 1000000 drops as 1 XRP and
  *   prices as per-XRP instead of per-drop.
  */
-Amount.prototype.parse_quality = function (quality, counterCurrency, counterIssuer, opts)
+Amount.prototype.parse_quality = function(quality, counterCurrency, counterIssuer, opts)
 {
   opts = opts || {};
 
@@ -733,7 +733,7 @@ Amount.prototype.parse_quality = function (quality, counterCurrency, counterIssu
     var interest = baseCurrency.get_interest_at(opts.reference_date);
 
     // XXX If we had better math utilities, we wouldn't need this hack.
-    var interestTempAmount = Amount.from_json(""+interest+"/1/1");
+    var interestTempAmount = Amount.from_json(''+interest+'/1/1');
 
     if (interestTempAmount.is_valid()) {
       var v = this.divide(interestTempAmount);
@@ -743,9 +743,9 @@ Amount.prototype.parse_quality = function (quality, counterCurrency, counterIssu
   }
 
   return this;
-}
+};
 
-Amount.prototype.parse_number = function (n) {
+Amount.prototype.parse_number = function(n) {
   this._is_native   = false;
   this._currency    = Currency.from_json(1);
   this._issuer      = UInt160.from_json(1);
@@ -759,7 +759,7 @@ Amount.prototype.parse_number = function (n) {
 };
 
 // <-> j
-Amount.prototype.parse_json = function (j) {
+Amount.prototype.parse_json = function(j) {
   switch (typeof j) {
     case 'string':
       // .../.../... notation is not a wire format.  But allowed for easier testing.
@@ -785,7 +785,10 @@ Amount.prototype.parse_json = function (j) {
       break;
 
     case 'object':
-      if (j === null) break;
+      if (j === null) {
+        break;
+      }
+
       if (j instanceof Amount) {
         j.copyTo(this);
       } else if (j.hasOwnProperty('value')) {
@@ -811,7 +814,7 @@ Amount.prototype.parse_json = function (j) {
 // - integer = raw units
 // - float = with precision 6
 // XXX Improvements: disallow leading zeros.
-Amount.prototype.parse_native = function (j) {
+Amount.prototype.parse_native = function(j) {
   var m;
 
   if (typeof j === 'string') {
@@ -846,7 +849,7 @@ Amount.prototype.parse_native = function (j) {
 
 // Parse a non-native value for the json wire format.
 // Requires _currency to be set!
-Amount.prototype.parse_value = function (j) {
+Amount.prototype.parse_value = function(j) {
   this._is_native    = false;
 
   switch (typeof j) {
@@ -900,14 +903,14 @@ Amount.prototype.parse_value = function (j) {
   return this;
 };
 
-Amount.prototype.set_currency = function (c) {
+Amount.prototype.set_currency = function(c) {
   this._currency  = Currency.from_json(c);
   this._is_native = this._currency.is_native();
 
   return this;
 };
 
-Amount.prototype.set_issuer = function (issuer) {
+Amount.prototype.set_issuer = function(issuer) {
   if (issuer instanceof UInt160) {
     this._issuer  = issuer;
   } else {
@@ -918,18 +921,18 @@ Amount.prototype.set_issuer = function (issuer) {
 };
 
 // Result in terms of this' currency and issuer.
-Amount.prototype.subtract = function (v) {
+Amount.prototype.subtract = function(v) {
   // Correctness over speed, less code has less bugs, reuse add code.
   return this.add(Amount.from_json(v).negate());
 };
 
-Amount.prototype.to_number = function (allow_nan) {
+Amount.prototype.to_number = function(allow_nan) {
   var s = this.to_text(allow_nan);
   return typeof s === 'string' ? Number(s) : s;
 };
 
 // Convert only value to JSON wire format.
-Amount.prototype.to_text = function (allow_nan) {
+Amount.prototype.to_text = function(allow_nan) {
   var result = NaN;
 
   if (this._is_native) {
@@ -975,7 +978,7 @@ Amount.prototype.to_text = function (allow_nan) {
  *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  * @return {Amount} The amount with interest applied.
  */
-Amount.prototype.applyInterest = function (referenceDate) {
+Amount.prototype.applyInterest = function(referenceDate) {
   if (this._currency.has_interest()) {
     var interest = this._currency.get_interest_at(referenceDate);
 
@@ -986,7 +989,7 @@ Amount.prototype.applyInterest = function (referenceDate) {
     //     The correct way to solve this is probably to switch to a proper
     //     BigDecimal for our internal representation and then use that across
     //     the board instead of instantiating these dummy Amount objects.
-    var interestTempAmount = Amount.from_json(""+interest+"/1/1");
+    var interestTempAmount = Amount.from_json(String(interest) + '/1/1');
 
     if (interestTempAmount.is_valid()) {
       return this.multiply(interestTempAmount);
@@ -1018,14 +1021,20 @@ Amount.prototype.applyInterest = function (referenceDate) {
  * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
  *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  */
-Amount.prototype.to_human = function (opts) {
+Amount.prototype.to_human = function(opts) {
   opts = opts || {};
 
-  if (!this.is_valid()) return '';
+  if (!this.is_valid()) {
+    return '';
+  }
 
   // Default options
-  if (typeof opts.signed === 'undefined') opts.signed = true;
-  if (typeof opts.group_sep === 'undefined') opts.group_sep = true;
+  if (typeof opts.signed === 'undefined') {
+    opts.signed = true;
+  }
+  if (typeof opts.group_sep === 'undefined') {
+    opts.group_sep = true;
+  }
 
   opts.group_width = opts.group_width || 3;
 
@@ -1045,7 +1054,7 @@ Amount.prototype.to_human = function (opts) {
     fraction_part = '0' + fraction_part;
   }
 
-  int_part      = int_part.replace(/^0*/, '');
+  int_part = int_part.replace(/^0*/, '');
   fraction_part = fraction_part.replace(/0*$/, '');
 
   if (fraction_part.length || !opts.skip_empty_fraction) {
@@ -1080,7 +1089,9 @@ Amount.prototype.to_human = function (opts) {
       rounding = Math.min(rounding, fraction_part.length);
 
       // Now we cut `rounding` digits off the right.
-      if (rounding > 0) fraction_part = fraction_part.slice(0, -rounding);
+      if (rounding > 0) {
+        fraction_part = fraction_part.slice(0, -rounding);
+      }
     }
 
     // Enforce the minimum number of decimal digits (min_precision)
@@ -1112,7 +1123,7 @@ Amount.prototype.to_human = function (opts) {
   return formatted;
 };
 
-Amount.prototype.to_human_full = function (opts) {
+Amount.prototype.to_human_full = function(opts) {
   opts = opts || {};
   var a = this.to_human(opts);
   var c = this._currency.to_human();
@@ -1121,7 +1132,7 @@ Amount.prototype.to_human_full = function (opts) {
   return o;
 };
 
-Amount.prototype.to_json = function () {
+Amount.prototype.to_json = function() {
   var result;
 
   if (this._is_native) {
@@ -1140,7 +1151,7 @@ Amount.prototype.to_json = function () {
   return result;
 };
 
-Amount.prototype.to_text_full = function (opts) {
+Amount.prototype.to_text_full = function(opts) {
   return this._value instanceof BigInteger
     ? this._is_native
       ? this.to_human() + '/XRP'
@@ -1149,33 +1160,35 @@ Amount.prototype.to_text_full = function (opts) {
 };
 
 // For debugging.
-Amount.prototype.not_equals_why = function (d, ignore_issuer) {
+Amount.prototype.not_equals_why = function(d, ignore_issuer) {
+  if (typeof d === 'string') {
+    return this.not_equals_why(Amount.from_json(d));
+  }
+
+  if (!(d instanceof Amount)) {
+    return 'Not an Amount';
+  }
+
   var result = false;
 
-  if (typeof d === 'string') {
-    result = this.not_equals_why(Amount.from_json(d));
-  } else if (d instanceof Amount) {
-    if (!this.is_valid() || !d.is_valid()) {
-      result = 'Invalid amount.';
-    } else if (this._is_native !== d._is_native) {
-      result = 'Native mismatch.';
-    } else {
-      var type = this._is_native ? 'XRP' : 'Non-XRP';
+  if (!this.is_valid() || !d.is_valid()) {
+    result = 'Invalid amount.';
+  } else if (this._is_native !== d._is_native) {
+    result = 'Native mismatch.';
+  } else {
+    var type = this._is_native ? 'XRP' : 'Non-XRP';
 
-      if (!this._value.equals(d._value) || this._offset !== d._offset) {
-        result = type + ' value differs.';
-      } else if (this._is_negative !== d._is_negative) {
-        result = type + ' sign differs.';
-      } else if (!this._is_native) {
-        if (!this._currency.equals(d._currency)) {
-          result = 'Non-XRP currency differs.';
-        } else if (!ignore_issuer && !this._issuer.equals(d._issuer)) {
-          result = 'Non-XRP issuer differs: ' + d._issuer.to_json() + '/' + this._issuer.to_json();
-        }
+    if (!this._value.equals(d._value) || this._offset !== d._offset) {
+      result = type + ' value differs.';
+    } else if (this._is_negative !== d._is_negative) {
+      result = type + ' sign differs.';
+    } else if (!this._is_native) {
+      if (!this._currency.equals(d._currency)) {
+        result = 'Non-XRP currency differs.';
+      } else if (!ignore_issuer && !this._issuer.equals(d._issuer)) {
+        result = 'Non-XRP issuer differs: ' + d._issuer.to_json() + '/' + this._issuer.to_json();
       }
     }
-  } else {
-    result = 'Wrong constructor.';
   }
 
   return result;

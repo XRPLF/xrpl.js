@@ -3,27 +3,12 @@
  * Manager for pending transactions
  */
 
-var Transaction = require('./transaction').Transaction;
 var LRU = require('lru-cache');
 
 function TransactionQueue() {
-  var self = this;
-
-  this._queue         = [ ];
-  this._idCache       = LRU({ max: 100 });
-  this._sequenceCache = LRU({ max: 100 });
-  this._save          = void(0);
-};
-
-TransactionQueue.prototype.save = function() {
-  if (typeof this._save !== 'function') return;
-
-  this._save(this._queue.map(function(tx) {
-    return {
-      tx_json: tx.tx_json,
-      submittedIDs: tx.submittedIDs
-    }
-  }));
+  this._queue = [ ];
+  this._idCache = LRU();
+  this._sequenceCache = LRU();
 };
 
 /**
@@ -64,10 +49,10 @@ TransactionQueue.prototype.hasSequence = function(sequence) {
  * may have multiple associated IDs.
  */
 
-TransactionQueue.prototype.getSubmission = function(id, callback) {
+TransactionQueue.prototype.getSubmission = function(id) {
   var result = false;
 
-  for (var i=0, tx; tx=this._queue[i]; i++) {
+  for (var i=0, tx; (tx=this._queue[i]); i++) {
     if (~tx.submittedIDs.indexOf(id)) {
       result = tx;
       break;
@@ -91,20 +76,18 @@ TransactionQueue.prototype.remove = function(tx) {
       break;
     }
   }
-
-  this.save();
 };
 
 TransactionQueue.prototype.push = function(tx) {
   this._queue.push(tx);
-  this.save();
 };
 
 TransactionQueue.prototype.forEach = function(fn) {
   this._queue.forEach(fn);
 };
 
-TransactionQueue.prototype.length = function() {
+TransactionQueue.prototype.length =
+TransactionQueue.prototype.getLength = function() {
   return this._queue.length;
 };
 

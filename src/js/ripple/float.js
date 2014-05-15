@@ -8,12 +8,17 @@ var Float = exports.Float = {};
 var allZeros = /^0+$/;
 var allOnes = /^1+$/;
 
-Float.fromBytes = function (bytes) {
+Float.fromBytes = function(bytes) {
   // Render in binary.  Hackish.
-  var b = "";
+  var b = '';
+
   for (var i = 0, n = bytes.length; i < n; i++) {
     var bits = (bytes[i] & 0xff).toString(2);
-    while (bits.length < 8) bits = "0" + bits;
+
+    while (bits.length < 8) {
+      bits = '0' + bits;
+    }
+
     b += bits;
   }
 
@@ -29,13 +34,11 @@ Float.fromBytes = function (bytes) {
   var m = b.substring(exponentBits + 1);
 
   var value = 0;
-  var multiplier = (s === "0" ? 1 : -1);
+  var multiplier = (s === '0' ? 1 : -1);
 
   if (allZeros.test(e)) {
     // Zero or denormalized
-    if (allZeros.test(m)) {
-      // Value is zero
-    } else {
+    if (!allZeros.test(m)) {
       value = parseInt(m, 2) * Math.pow(2, minExponent);
     }
   } else if (allOnes.test(e)) {

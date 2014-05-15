@@ -1,8 +1,3 @@
-Function.prototype.method = function(name, func) {
-  this.prototype[name] = func;
-  return this;
-};
-
 function filterErr(code, done) {
   return function(e) {
     done(e.code !== code ? e : void(0));
@@ -20,7 +15,7 @@ function throwErr(done) {
 
 function trace(comment, func) {
   return function() {
-    console.log("%s: %s", trace, arguments.toString);
+    console.log('%s: %s', trace, arguments.toString);
     func(arguments);
   };
 };
@@ -94,7 +89,7 @@ function chunkString(str, n, leftAlign) {
 
 function assert(assertion, msg) {
   if (!assertion) {
-    throw new Error("Assertion failed" + (msg ? ": "+msg : "."));
+    throw new Error('Assertion failed' + (msg ? ': ' + msg : '.'));
   }
 };
 
@@ -139,8 +134,8 @@ function fromTimestamp(rpepoch) {
 };
 
 exports.time = {
-  fromRipple:  toTimestamp,
-  toRipple:    fromTimestamp
+  fromRipple: toTimestamp,
+  toRipple: fromTimestamp
 };
 
 exports.trace         = trace;

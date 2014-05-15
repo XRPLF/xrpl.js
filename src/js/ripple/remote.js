@@ -102,8 +102,8 @@ function Remote(opts, trace) {
   this.retry                 = void(0);
   this._connection_count     = 0;
   this._connected            = false;
-  this._connection_offset    = 1000 * (typeof opts.connection_offset === 'number' ? opts.connection_offset : 5)
-  this._submission_timeout   = 1000 * (typeof opts.submission_timeout === 'number' ? opts.submission_timeout : 10)
+  this._connection_offset    = 1000 * (typeof opts.connection_offset === 'number' ? opts.connection_offset : 5);
+  this._submission_timeout   = 1000 * (typeof opts.submission_timeout === 'number' ? opts.submission_timeout : 10);
 
   this._received_tx          = LRU({ max: 100 });
   this._cur_path_find        = null;
@@ -239,7 +239,9 @@ function Remote(opts, trace) {
 
   function getPendingTransactions() {
     self.storage.getPendingTransactions(function(err, transactions) {
-      if (err || !Array.isArray(transactions)) return;
+      if (err || !Array.isArray(transactions)) {
+        return;
+      }
 
       function resubmitTransaction(tx) {
         var transaction = self.transaction();
@@ -510,7 +512,9 @@ Remote.prototype._handleMessage = function(message, server) {
       // XXX Also need to consider a slow server or out of order response.
       // XXX Be more defensive fields could be missing or of wrong type.
       // YYY Might want to do some cache management.
-      if (!Remote.isValidLedgerData(message)) return;
+      if (!Remote.isValidLedgerData(message)) {
+        return;
+      }
 
       if (message.ledger_index >= this._ledger_current_index) {
         this._ledger_time           = message.ledger_time;
@@ -549,13 +553,17 @@ Remote.prototype._handleMessage = function(message, server) {
         // Pass the event on to any related Account objects
         message.mmeta.getAffectedAccounts().forEach(function(account) {
           account = self._accounts[account];
-          if (account) account.notify(message);
+          if (account) {
+            account.notify(message);
+          }
         });
 
         // Pass the event on to any related OrderBooks
         message.mmeta.getAffectedBooks().forEach(function(book) {
           book = self._books[book];
-          if (book) book.notify(message);
+          if (book) {
+            book.notify(message);
+          }
         });
       } else {
         [ 'Account', 'Destination' ].forEach(function(prop) {
@@ -659,7 +667,9 @@ Remote.prototype._getServer = function() {
 // <-> request: what to send, consumed.
 Remote.prototype.request = function(request) {
   if (typeof request === 'string') {
-    if (!/^request_/.test(request)) request = 'request_' + request;
+    if (!/^request_/.test(request)) {
+      request = 'request_' + request;
+    }
     if (typeof this[request] === 'function') {
       var args = Array.prototype.slice.call(arguments, 1);
       return this[request].apply(this, args);
@@ -678,7 +688,7 @@ Remote.prototype.request = function(request) {
   } else {
     var server = request.server || this._getServer();
     if (server) {
-      server.request(request);
+      server._request(request);
     } else {
       request.emit('error', new Error('No servers available'));
     }
@@ -1147,7 +1157,7 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
 
   request.message.taker_pays = {
     currency: Currency.json_rewrite(pays.currency)
-  }
+  };
 
   if (request.message.taker_pays.currency !== 'XRP') {
     request.message.taker_pays.issuer = UInt160.json_rewrite(pays.issuer);
@@ -1396,7 +1406,7 @@ Remote.prototype.accountSeq = function(account, advance) {
   var accountInfo = this.accounts[account];
   var seq;
 
-  if (account_info && account_info.seq) {
+  if (accountInfo && accountInfo.seq) {
     seq = accountInfo.seq;
     var change = { ADVANCE: 1, REWIND: -1 }[advance.toUpperCase()] || 0;
     accountInfo.seq += change;
@@ -1657,7 +1667,7 @@ Remote.prototype.transaction = function(source, options, callback) {
     offercreate:  'offerCreate',
     offercancel:  'offerCancel',
     sign:         'sign'
-  }
+  };
 
   var transactionType;
 
@@ -1705,7 +1715,13 @@ Remote.prototype.transaction = function(source, options, callback) {
  */
 
 Remote.prototype.feeTx = function(units) {
-  return this._getServer().feeTx(units);
+  var server = this._getServer();
+
+  if (!server) {
+    throw new Error('No connected servers');
+  }
+
+  return server._feeTx(units);
 };
 
 /**
@@ -1718,7 +1734,13 @@ Remote.prototype.feeTx = function(units) {
  */
 
 Remote.prototype.feeTxUnit = function() {
-  return this._getServer().feeTxUnit();
+  var server = this._getServer();
+
+  if (!server) {
+    throw new Error('No connected servers');
+  }
+
+  return server._feeTxUnit();
 };
 
 /**
@@ -1728,7 +1750,13 @@ Remote.prototype.feeTxUnit = function() {
  */
 
 Remote.prototype.reserve = function(owner_count) {
-  return this._getServer().reserve(owner_count);
+  var server = this._getServer();
+
+  if (!server) {
+    throw new Error('No connected servers');
+  }
+
+  return server._reserve(owner_count);
 };
 
 Remote.prototype.requestPing =
