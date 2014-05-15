@@ -30,7 +30,7 @@
   },
   "scripts": {
     "pretest": "node_modules/.bin/gulp concat-sjcl",
-    "test": "mocha test/*-test.js"
+    "test": "mocha --reporter spec test/*-test.js"
   },
   "repository": {
     "type": "git",
