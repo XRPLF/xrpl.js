@@ -4,3 +4,6 @@ node_js:
 notifications:
   email:
     false
+script: npm test --coverage
+after_success:
+- npm run coveralls

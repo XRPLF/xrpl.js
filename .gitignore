@@ -42,3 +42,4 @@ test/config.js
 /lib-cov
 /src-cov
 /coverage.html
+/coverage

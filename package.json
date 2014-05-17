@@ -26,11 +26,14 @@
     "gulp-concat": "~2.2.0",
     "gulp-jshint": "~1.5.5",
     "webpack": "~1.1.10",
-    "map-stream": "~0.1.0"
+    "map-stream": "~0.1.0",
+    "istanbul": "~0.2.10",
+    "coveralls": "~2.10.0"
   },
   "scripts": {
     "pretest": "node_modules/.bin/gulp concat-sjcl",
-    "test": "mocha --reporter spec test/*-test.js"
+    "test": "./node_modules/.bin/istanbul test -x build/sjcl.js -x src/js/jsbn/* ./node_modules/.bin/_mocha -- --reporter spec test/*-test.js",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },
   "repository": {
     "type": "git",
