@@ -1,5 +1,7 @@
 #The Ripple JavaScript Library
 
+[![Build Status](https://travis-ci.org/ripple/ripple-lib.svg?branch=develop)](https://travis-ci.org/ripple/ripple-lib) [![Coverage Status](https://coveralls.io/repos/ripple/ripple-lib/badge.png?branch=develop)](https://coveralls.io/r/ripple/ripple-lib?branch=develop)
+
 [![NPM](https://nodei.co/npm/ripple-lib.png)](https://www.npmjs.org/package/ripple-lib)
 
 `ripple-lib` connects to the Ripple network via the WebSocket protocol and runs in Node.js as well as in the browser.
@@ -92,4 +94,4 @@ See [The `ripple-lib` Guides](docs/GUIDES.md) and [The `ripple-lib` API Referenc
 
 **Generating code coverage**
 
-ripple-lib uses `jscoverage` to generate code coverage. To generate a file `coverage.html`, run `make coverage`
+ripple-lib uses `istanbul` to generate code coverage. To create a code coverage report, run `npm test --coverage`. The report will be created in `coverage/lcov-report/`.
