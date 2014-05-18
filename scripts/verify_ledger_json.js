@@ -1,25 +1,49 @@
 var fs = require('fs');
 var Ledger = require('../src/js/ripple/ledger').Ledger;
 
-if (process.argc < 1) {
+function parse_options(from, flags) {
+  var argv = from.slice(2), // remove `node` and `this.js`
+      opts = {argv:argv};
+
+  flags.forEach(function(f) {
+    // Do we have the flag?
+    var flag_index = argv.indexOf('--' + f);
+    // normalize the name of the flag
+    f = f.replace('-', '_');
+    // opts has Boolean value for normalized flag key
+    opts[f] = !!~flag_index;
+    if (opts[f]) {
+      // remove the flag from the argv
+      argv.splice(flag_index, 1);
+    }
+  });
+  return opts;
+}
+
+var opts = parse_options(process.argv, ['sanity-test']);
+
+if (opts.argv.length < 1) {
   console.error("Usage: scripts/verify_ledger_json path/to/ledger.json");
+  console.error("       optional: --sanity-test (json>binary>json>binary)");
   process.exit(1);
 }
 
-var json = fs.readFileSync(process.argv[2], 'utf-8');
+var json = fs.readFileSync(opts.argv[0], 'utf-8');
 var ledger = Ledger.from_json(JSON.parse(json));
 
 // This will serialize each accountState object to binary and then back to json
-// before finally serializing for hashing. This is mostly for verifying that
-// ripple-libs binary codecs are working.
-// Must obviously go after process.argv[2] used to specify ledger json
-var hardcore = ~process.argv.indexOf('--hardcore')
+// before finally serializing for hashing. This is mostly to expose any issues
+// with ripple-libs binary <--> json codecs.
 
-console.log("Transaction hash in header:  "+ledger.ledger_json.transaction_hash);
-console.log("Calculated transaction hash: "+ledger.calc_tx_hash().to_hex());
+if (opts.sanity_test) {
+    console.log("All accountState nodes will be processed from " +
+                "json->binary->json->binary. This may take some time " +
+                "with large ledgers.");
+}
 
-
-
-console.log("Account state hash in header:  "+ledger.ledger_json.account_hash);
-hardcore && console.log("Standby, we are going hardcore!, this may take some time");
-console.log("Calculated account state hash: "+ledger.calc_account_hash(hardcore).to_hex());
+console.log("Transaction hash in header:    " + ledger.ledger_json.transaction_hash);
+console.log("Calculated transaction hash:   " + ledger.calc_tx_hash().to_hex());
+console.log("Account state hash in header:  " + ledger.ledger_json.account_hash);
+console.log("Calculated account state hash: " + ledger.calc_account_hash(
+                                                 {sanity_test:opts.sanity_test})
+                                                   .to_hex());

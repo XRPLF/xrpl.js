@@ -53,7 +53,7 @@ SerializedObject.from_json = function (obj) {
     }
   }
 
-  if ("number" === typeof obj.TransactionType) {
+  if ("number" === typeof obj.LedgerEntryType) {
     obj.LedgerEntryType = SerializedObject.lookup_type_le(obj.LedgerEntryType);
 
     if (!obj.LedgerEntryType) {

@@ -60,9 +60,9 @@ function SHAMapTreeNodeInner(depth) {
 
 util.inherits(SHAMapTreeNodeInner, SHAMapTreeNode);
 
-/*
-* @param tag {String} (equates to a ledger entries `index`)
-*/
+/**
+ * @param tag {String} (equates to a ledger entries `index`)
+ */
 SHAMapTreeNodeInner.prototype.add_item = function (tag, node) {
   var depth = this.depth;
   var existing_node = this.get_node(tag[depth]);
