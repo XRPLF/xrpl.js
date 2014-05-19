@@ -5,7 +5,12 @@ function AuthInfo () {
   this.rippleTxt = new RippleTxt;
 }
 
-//Can I cache the auth info for later use?
+/**
+ * Get auth info for a given username
+ * @param {string}    domain - Domain which hosts the user's info
+ * @param {string}    username - Username who's info we are retreiving
+ * @param {function}  fn - Callback function
+ */
 AuthInfo.prototype.get = function (domain, username, fn) {
   var self = this;
   

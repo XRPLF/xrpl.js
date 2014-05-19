@@ -1,14 +1,15 @@
 var request = require('superagent');
 
 
-function RippleTxt(opts) {
+function RippleTxt() {
   this.txts = {};
 };
 
 
-/*
+/**
  * Gets the ripple.txt file for the given domain
- * 
+ * @param {string}    domain - Domain to retrieve file from
+ * @param {function}  fn - Callback function
  */
 RippleTxt.prototype.get = function (domain, fn) {
   var self = this;
@@ -40,9 +41,9 @@ RippleTxt.prototype.get = function (domain, fn) {
 }    
 
 
-/*
- * parse a ripple.txt file
- * 
+/**
+ * Parse a ripple.txt file
+ * @param {string}  txt - Unparsed ripple.txt data
  */    
 RippleTxt.prototype.parse = function (txt) {
   
