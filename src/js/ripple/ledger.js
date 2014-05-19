@@ -37,4 +37,41 @@ Ledger.prototype.calc_tx_hash = function () {
   return tx_map.hash();
 };
 
+/**
+* @param options.sanity_test {Boolean}
+*
+*   If `true`, will serialize each accountState item to binary and then back to
+*   json before finally serializing for hashing. This is mostly to expose any
+*   issues with ripple-lib's binary <--> json codecs.
+*
+*/
+Ledger.prototype.calc_account_hash = function (options) {
+  var account_map = new SHAMap();
+  var erred;
+
+  this.ledger_json.accountState.forEach(function (le) {
+    var data = SerializedObject.from_json(le);
+
+    if (options != null && options.sanity_test) {
+      try {
+        var json = data.to_json();
+        data = SerializedObject.from_json(json);
+      } catch (e) {
+        console.log("account state item: ", le);
+        console.log("to_json() ",json);
+        console.log("exception: ", e);
+        erred = true;
+      }
+    };
+
+    account_map.add_item(le.index, data, SHAMapTreeNode.TYPE_ACCOUNT_STATE);
+  });
+
+  if (erred) {
+    throw new Error("There were errors with sanity_test"); // all logged above
+  }
+
+  return account_map.hash();
+};
+
 exports.Ledger = Ledger;

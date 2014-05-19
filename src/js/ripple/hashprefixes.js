@@ -17,6 +17,8 @@ exports.HASH_TX_ID           = 0x54584E00; // 'TXN'
 exports.HASH_TX_NODE         = 0x534E4400; // 'TND'
 // inner node in tree
 exports.HASH_INNER_NODE      = 0x4D494E00; // 'MIN'
+// leaf node in tree
+exports.HASH_LEAF_NODE       = 0x4D4C4E00; // 'MLN'
 // inner transaction to sign
 exports.HASH_TX_SIGN         = 0x53545800; // 'STX'
 // inner transaction to sign (TESTNET)

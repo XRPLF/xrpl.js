@@ -3497,10 +3497,10 @@ sjcl.ecc.point.prototype.isOnCurve = function() {
   var component_b = self.curve.b;
   var field_modulus = self.curve.field.modulus;
 
-  var y_squared_mod_field_order = self.y.mul(self.y).mod(field_modulus);
-  var x_cubed_plus_ax_plus_b = self.x.mul(self.x).mul(self.x).add(component_a.mul(self.x)).add(component_b).mod(field_modulus);
+  var left_hand_side = self.y.mul(self.y).mod(field_modulus);
+  var right_hand_side = self.x.mul(self.x).mul(self.x).add(component_a.mul(self.x)).add(component_b).mod(field_modulus);
 
-  return y_squared_mod_field_order.equals(x_cubed_plus_ax_plus_b);
+  return left_hand_side.equals(right_hand_side);
 
 };
 
