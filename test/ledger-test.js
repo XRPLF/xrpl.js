@@ -1,7 +1,7 @@
-var assert           = require('assert');
-var fs               = require('fs');
+var assert = require('assert');
+var fs     = require('fs');
 
-var utils            = require('./testutils');
+var utils  = require('./testutils');
 var Ledger = utils.load_module('ledger').Ledger;
 var config = require('./testutils').get_config();
 
@@ -10,7 +10,7 @@ var config = require('./testutils').get_config();
 * Expects a corresponding ledger dump in $repo/test/fixtures/ folder
 */
 create_ledger_test = function (ledger_index) {
-  describe(String(ledger_index), function () {
+  describe(String(ledger_index), function() {
 
     var path = __dirname + '/fixtures/ledger-full-'+ledger_index+'.json';
 
