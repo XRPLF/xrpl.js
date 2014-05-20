@@ -2,6 +2,7 @@ var AuthInfo   = require('./authinfo');
 var blobClient = require('./blob');
 var crypt      = require('./crypt');
 
+
 function VaultClient(opts) {
   if (!opts) opts = {};  
   else if (typeof opts === "string") opts = {domain:opts};
@@ -12,10 +13,10 @@ function VaultClient(opts) {
 };
   
   
-/* 
- * normalizeUsername - 
+/**
  * Reduce username to standardized form.
  * Strips whitespace at beginning and end.
+ * @param {string} username - Username to normalize
  */
 VaultClient.prototype.normalizeUsername = function (username) {
   username = ""+username;
@@ -24,10 +25,10 @@ VaultClient.prototype.normalizeUsername = function (username) {
 };
 
 
-/*
- * normalizePassword - 
+/**
  * Reduce password to standardized form.
  * Strips whitespace at beginning and end.
+ * @param {string} password - password to normalize
  */
 VaultClient.prototype.normalizePassword = function (password) {
   password = ""+password;
@@ -35,18 +36,25 @@ VaultClient.prototype.normalizePassword = function (password) {
   return password;
 };    
 
+
+/**
+ * Get a ripple name from a given account address, if it has one
+ * @param {string} address - Account address to query
+ * @param {string} url     - Url of blob vault
+ */
 VaultClient.prototype.getRippleName = function(address, url, fn) {
 
   //use the url from previously retrieved authInfo, if necessary
-  if (!url && this.infos[id]) url = this.infos[id].blobvault;
   if (!url) return fn(new Error("Blob vault URL is required"));
   blobClient.getRippleName(url, address, fn);
 };
 
-/*
- * Login -
- * authenticate and retrieve a decrypted blob using a ripple name and password
- * 
+
+/**
+ * Authenticate and retrieve a decrypted blob using a ripple name and password
+ * @param {string}    username
+ * @param {string}    password
+ * @param {function}  fn - Callback function
  */
 VaultClient.prototype.login = function(username, password, fn) {
   var self = this;
@@ -91,19 +99,21 @@ VaultClient.prototype.login = function(username, password, fn) {
 };
 
 
-/*
- * Relogin -
- * retreive and decrypt blob using a blob url, id and crypt derived previously.
- * 
+/**
+ * Retreive and decrypt blob using a blob url, id and crypt derived previously.
+ * @param {string}   url - Blob vault url
+ * @param {string}   id  - Blob id from previously retreived blob
+ * @param {string}   key - Blob decryption key
+ * @param {function} fn  - Callback function
  */
-VaultClient.prototype.relogin = function(url, id, cryptKey, fn) {
+VaultClient.prototype.relogin = function(url, id, key, fn) {
   
   //use the url from previously retrieved authInfo, if necessary
   if (!url && this.infos[id]) url = this.infos[id].blobvault;
   
   if (!url) return fn(new Error("Blob vault URL is required"));
   
-  blobClient.get(url, id, cryptKey, function (err, blob) {
+  blobClient.get(url, id, key, function (err, blob) {
     if (err) return fn(err);
     
     fn (null, {
@@ -113,9 +123,12 @@ VaultClient.prototype.relogin = function(url, id, cryptKey, fn) {
 };
 
 
-/*
- * Unlock - 
- * decrypt the secret key using a username and password
+/**
+ * Decrypt the secret key using a username and password
+ * @param {string}    username
+ * @param {string}    password
+ * @param {string}    encryptSecret
+ * @param {function}  fn - Callback function
  */
 VaultClient.prototype.unlock = function(username, password, encryptSecret, fn) {
   var self = this;
@@ -136,11 +149,12 @@ VaultClient.prototype.unlock = function(username, password, encryptSecret, fn) {
 };
 
 
-/*
- * LoginAndUnlock
- * retrieve the decrypted blob and secret key in one step using
+/**
+ * Retrieve the decrypted blob and secret key in one step using
  * the username and password
- * 
+ * @param {string}    username
+ * @param {string}    password
+ * @param {function}  fn - Callback function
  */
 VaultClient.prototype.loginAndUnlock = function(username, password, fn) {
   var self = this;
@@ -174,10 +188,10 @@ VaultClient.prototype.loginAndUnlock = function(username, password, fn) {
 };
 
 
-/*
- * Exists -
- * check blobvault for existance of username
- * 
+/**
+ * Check blobvault for existance of username
+ * @param {string}    username
+ * @param {function}  fn - Callback function
  */
 VaultClient.prototype.exists = function (username, fn) {
   this.authInfo.get(this.domain, username.toLowerCase(), function(err, authInfo){
@@ -188,9 +202,10 @@ VaultClient.prototype.exists = function (username, fn) {
 
 
 /*
- * Verify -
- * verify an email address for an existing user
- * 
+ * Verify an email address for an existing user
+ * @param {string}    username
+ * @param {string}    token - Verification token
+ * @param {function}  fn - Callback function 
  */
 VaultClient.prototype.verify = function (username, token, fn) {
   
@@ -205,9 +220,9 @@ VaultClient.prototype.verify = function (username, token, fn) {
   });    
 }
 
+
 /*
- * Register -
- * register a new user and save to the blob vault
+ * Register a new user and save to the blob vault
  * 
  * @param {object} options
  * @param {string} options.username
@@ -265,5 +280,6 @@ VaultClient.prototype.register = function (options, fn) {
     });
   });
 };
+
 
 module.exports = VaultClient;
