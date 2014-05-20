@@ -1,5 +1,6 @@
 var sjcl  = require('./utils').sjcl,
   base    = require('./base').Base,
+  UInt160 = require('./uint160').UInt160,
   message = require('./message'),
   request = require('superagent'), 
   extend  = require("extend"),
@@ -15,7 +16,9 @@ var cryptConfig = {
 
 var Crypt = {};
 
-// Full domain hash based on SHA512
+/**
+ * Full domain hash based on SHA512
+ */ 
 function fdh(data, bytelen)
 {
   var bitlen = bytelen << 3;
@@ -38,9 +41,12 @@ function fdh(data, bytelen)
   return output;
 }
 
-
-// This is a function to derive different hashes from the same key. Each hash
-// is derived as HMAC-SHA512HALF(key, token).
+/**
+ * This is a function to derive different hashes from the same key. 
+ * Each hash is derived as HMAC-SHA512HALF(key, token).
+ * @param {string} key
+ * @param {string} hash
+ */ 
 function keyHash(key, token) {
   var hmac = new sjcl.misc.hmac(key, sjcl.hash.sha512);
   return sjcl.codec.hex.fromBits(sjcl.bitArray.bitSlice(hmac.encrypt(token), 0, 256));
@@ -57,6 +63,11 @@ function keyHash(key, token) {
  * This service takes care of the key derivation, i.e. converting low-entropy
  * secret into higher entropy secret via either computationally expensive
  * processes or peer-assisted key derivation (PAKDF).
+ * @param {object}    opts
+ * @param {string}    purpose - Key type/purpose
+ * @param {string}    username 
+ * @param {string}    secret - Also known as passphrase/password
+ * @param {function}  fn
  */
 Crypt.derive = function (opts, purpose, username, secret, fn) {
 
@@ -123,7 +134,10 @@ Crypt.derive = function (opts, purpose, username, secret, fn) {
   }); 
 }
 
-
+/**
+ * Imported from ripple-client
+ * 
+ */
 Crypt.RippleAddress = (function () {
   function append_int(a, i) {
     return [].concat(a, i >> 24, (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff)
@@ -172,6 +186,11 @@ Crypt.RippleAddress = (function () {
   };
 })();
 
+/**
+ * Encrypt data
+ * @params {string} key
+ * @params {string} data
+ */
 Crypt.encrypt = function(key, data)
 {
   key = sjcl.codec.hex.toBits(key);
@@ -190,6 +209,11 @@ Crypt.encrypt = function(key, data)
 }
 
 
+/**
+ * Decrypt data
+ * @params {string} key
+ * @params {string} data
+ */
 Crypt.decrypt = function(key, data)
 {
   key = sjcl.codec.hex.toBits(key);
@@ -209,33 +233,66 @@ Crypt.decrypt = function(key, data)
   return sjcl.decrypt(key, JSON.stringify(encrypted));
 } 
 
+
+/**
+ * Validate a ripple address
+ * @param {string} address
+ */
 Crypt.isValidAddress = function (address) {
-  return ripple.UInt160.is_valid(address);
+  return UInt160.is_valid(address);
 }
 
-Crypt.createSecret = function (words) {
-  return sjcl.codec.hex.fromBits(sjcl.random.randomWords(words));
+
+/**
+ * Validate a ripple address
+ * @param {integer} nWords - number of words
+ */
+Crypt.createSecret = function (nWords) {
+  return sjcl.codec.hex.fromBits(sjcl.random.randomWords(nWords));
 }
 
+
+/**
+ * Create a new master key
+ */
 Crypt.createMaster = function () {
   return base.encode_check(33, sjcl.codec.bytes.fromBits(sjcl.random.randomWords(4)));
 }
 
 
+/**
+ * Create a ripple address from a master key
+ * @param {string} masterkey
+ */
 Crypt.getAddress = function (masterkey) {
   return new Crypt.RippleAddress(masterkey).getAddress();
 }
 
 
+/**
+ * Hash data
+ * @param {string} data
+ */
 Crypt.hashSha512 = function (data) {
   return sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(data)); 
 }
 
-Crypt.signature = function (secret, data) {
+
+/**
+ * Sign a data string with a secret key
+ * @param {string} secret
+ * @param {string} data
+ */
+Crypt.signString = function (secret, data) {
   var hmac = new sjcl.misc.hmac(sjcl.codec.hex.toBits(secret), sjcl.hash.sha512);
   return sjcl.codec.hex.fromBits(hmac.mac(data));
 }
 
+
+/**
+ * Create an an accout recovery key
+ * @param {string} secret
+ */
 Crypt.deriveRecoveryEncryptionKeyFromSecret = function(secret) {
   var seed = ripple.Seed.from_json(secret).to_bits();
   var hmac = new sjcl.misc.hmac(seed, sjcl.hash.sha512);
@@ -246,7 +303,6 @@ Crypt.deriveRecoveryEncryptionKeyFromSecret = function(secret) {
 
 /**
  * Convert base64 encoded data into base64url encoded data.
- *
  * @param {String} base64 Data
  */
 Crypt.base64ToBase64Url = function (encodedData) {
@@ -255,7 +311,6 @@ Crypt.base64ToBase64Url = function (encodedData) {
 
 /**
  * Convert base64url encoded data into base64 encoded data.
- *
  * @param {String} base64 Data
  */
 Crypt.base64UrlToBase64 = function (encodedData) {
@@ -267,7 +322,14 @@ Crypt.base64UrlToBase64 = function (encodedData) {
 };
 
 
-//methods for signed requests
+/**
+ * Create a string from request parameters that
+ * will be used to sign a request
+ * @param {Object} config - request params
+ * @param {Object} parsed - parsed url
+ * @param {Object} date 
+ * @param {Object} mechanism - type of signing
+ */
 Crypt.getStringToSign = function (config, parsed, date, mechanism) {
   // XXX This method doesn't handle signing GET requests correctly. The data
   //     field will be merged into the search string, not the request body.
@@ -300,17 +362,22 @@ Crypt.getStringToSign = function (config, parsed, date, mechanism) {
   ].join('\n');
 }
 
+
+/**
+ * HMAC signed request
+ * @param {Object} config
+ * @param {Object} auth_secret
+ * @param {Object} blob_id
+ */
 Crypt.signRequestHmac = function (config, auth_secret, blob_id) {
   config = extend(true, {}, config);
 
   // Parse URL
-  var parsed = parser.parse(config.url);
-
-  var date = dateAsIso8601();
+  var parsed        = parser.parse(config.url);
+  var date          = dateAsIso8601();
   var signatureType = 'RIPPLE1-HMAC-SHA512';
-
-  var stringToSign = Crypt.getStringToSign(config, parsed, date, signatureType);
-  var signature = Crypt.signature(auth_secret, stringToSign);
+  var stringToSign  = Crypt.getStringToSign(config, parsed, date, signatureType);
+  var signature     = Crypt.signString(auth_secret, stringToSign);
   
   config.url += (parsed.search ? "&" : "?") +
     'signature='+Crypt.base64ToBase64Url(signature)+
@@ -321,13 +388,18 @@ Crypt.signRequestHmac = function (config, auth_secret, blob_id) {
   return config;
 }; 
   
-  
+/**
+ * Asymmetric signed request
+ * @param {Object} config
+ * @param {Object} secretKey
+ * @param {Object} account
+ * @param {Object} blob_id
+ */
 Crypt.signRequestAsymmetric = function (config, secretKey, account, blob_id) {
   config = extend(true, {}, config);
 
   // Parse URL
-  var parsed = parser.parse(config.url);
-  
+  var parsed        = parser.parse(config.url);
   var date          = dateAsIso8601();
   var signatureType = 'RIPPLE1-ECDSA-SHA512';
   var stringToSign  = Crypt.getStringToSign(config, parsed, date, signatureType);
@@ -344,6 +416,7 @@ Crypt.signRequestAsymmetric = function (config, secretKey, account, blob_id) {
 };
 
 
+//prepare for signing
 function copyObjectWithSortedKeys(object) {
   if (isPlainObject(object)) {
     var newObj = {};
