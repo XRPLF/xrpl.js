@@ -6,19 +6,18 @@ var assert    = require('assert'),
   UInt256     = require('../src/js/ripple/uint256').UInt256;
 
 var exampleData = {
-  id       : "57d6ed12d3b98ca91b61afac2fb30212f642daabefd9c7cda623f145f384830c",
-  crypt    : "1733480ceea2970e5f979c8d8e508d79e446b42d54f593e640814ea91deb53ef",
-  unlock   : "452b02b80469a6a2ad692264c04d2a3794ea0ab11d8c902ef774190294db2ce2",
+  id       : "ef203d3e76552c0592384f909e6f61f1d1f02f61f07643ce015d8b0c9710dd2f",
+  crypt    : "f0cc91a7c1091682c245cd8e13c246cc150b2cf98b17dd6ef092019c99dc9d82",
+  unlock   : "3e15fe3218a9c664835a6f585582e14480112110ddbe50e5028d05fc5bd9b5f4",
   blobURL  : "https://id.staging.ripple.com",
-  username : "testUser",
+  username : "exampleUser",
   password : "pass word",
   domain   : "staging.ripple.com",
-  encrypted_secret : "QUh5dnBqR0pTTVpjcjVoY0FhN1cxcEdTdW1XS1hLS2VzNlpQT2ZvQkFJWmg1UHRYS1RobUhKTkZUcWNyNlZEVlZYZDNhS1l0"
+  encrypted_secret : "APYqtqvjJk/J324rx2BGGzUiQ3mtmMMhMsbrUmgxb00W2aFVQzCC2mqd58Z17gzeUUcjtjAm"
 };
 
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";  //must be set for self signed certs
-
 
 
 describe('Ripple Txt', function() {
