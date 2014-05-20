@@ -37,9 +37,8 @@ for (var name in BlobObj.ops) {
 
 
 /*
- * Init -
- * initialize a new blob object
- * 
+ * Initialize a new blob object
+ * @param {function} fn - Callback function
  */
 BlobObj.prototype.init = function (fn) {
   var self = this, url;
@@ -78,7 +77,7 @@ BlobObj.prototype.init = function (fn) {
 /*
  * Consolidate -
  * Consolidate patches as a new revision
- * 
+ * @param {function} fn - Callback function
  */
 BlobObj.prototype.consolidate = function (fn) {
   
@@ -116,7 +115,7 @@ BlobObj.prototype.consolidate = function (fn) {
 /*
  * ApplyEncryptedPatch -
  * save changes from a downloaded patch to the blob
- * 
+ * @param {string} patch - encrypted patch string
  */
 BlobObj.prototype.applyEncryptedPatch = function (patch)
 {
@@ -138,19 +137,27 @@ BlobObj.prototype.applyEncryptedPatch = function (patch)
 }
 
 
-//decrypt secret with unlock key
-BlobObj.prototype.decryptSecret = function (secretUnlockKey) {
-  return crypt.decrypt(secretUnlockKey, this.data.encrypted_secret);
-};
-
-
-//encrypt secret with unlock key
+/**
+ * Encrypt secret with unlock key
+ * @param {string} secretUnlockkey
+ */
 BlobObj.prototype.encryptSecret = function (secretUnlockKey, secret) {
   return crypt.encrypt(secretUnlockKey, secret);
 };
+
+/**
+ * Decrypt secret with unlock key
+ * @param {string} secretUnlockkey
+ */
+BlobObj.prototype.decryptSecret = function (secretUnlockKey) {
+  return crypt.decrypt(secretUnlockKey, this.encrypted_secret);
+};
    
 
-//decrypt blob with crypt key   
+/**
+ * Decrypt blob with crypt key   
+ * @param {string} data - encrypted blob data
+ */
 BlobObj.prototype.decrypt = function (data) {
   
   try {
@@ -164,7 +171,9 @@ BlobObj.prototype.decrypt = function (data) {
 };
 
 
-//encrypt blob data with crypt key
+/**
+ * Encrypt blob with crypt key   
+ */
 BlobObj.prototype.encrypt = function()
 {
   
@@ -176,43 +185,62 @@ BlobObj.prototype.encrypt = function()
   return crypt.encrypt(this.key, JSON.stringify(this.data));
 };
 
-BlobObj.prototype.decryptBlobCrypt = function (secret) {
-  var recoveryEncryptionKey = crypt.deriveRecoveryEncryptionKeyFromSecret(secret);
-  return crypt.decrypt(recoveryEncryptionKey, this.encrypted_blobdecrypt_key);
-};
 
+/**
+ * Encrypt recovery key  
+ * @param {string} secret
+ * @param {string} blobDecryptKey
+ */
 BlobObj.prototype.encryptBlobCrypt = function (secret, blobDecryptKey) {
   var recoveryEncryptionKey = crypt.deriveRecoveryEncryptionKeyFromSecret(secret);
   return crypt.encrypt(recoveryEncryptionKey, blobDecryptKey);
 };
 
+/**
+ * Decrypt recovery key
+ * @param {string} secret
+ */
+BlobObj.prototype.decryptBlobCrypt = function (secret) {
+  var recoveryEncryptionKey = crypt.deriveRecoveryEncryptionKeyFromSecret(secret);
+  return crypt.decrypt(recoveryEncryptionKey, this.encrypted_blobdecrypt_key);
+};
 
 
-/**** Blob updating ****/
 
 
-//set blob element
+/**** Blob updating functions ****/
+
+
+/**
+ * Set blob element
+ */
 BlobObj.prototype.set = function (pointer, value, fn) {
   this.applyUpdate('set', pointer, [value]);
   this.postUpdate('set', pointer, [value], fn);
 };
 
 
-//get remove blob element
+/**
+ * Remove blob element
+ */
 BlobObj.prototype.unset = function (pointer, fn) {
   this.applyUpdate('unset', pointer, []);
   this.postUpdate('unset', pointer, [], fn);
 };
 
 
-//extend blob element
+/**
+ * Extend blob object
+ */
 BlobObj.prototype.extend = function (pointer, value, fn) {
   this.applyUpdate('extend', pointer, [value]);
   this.postUpdate('extend', pointer, [value], fn);
 };
 
 
-//Prepend an entry to an array.
+/**
+ * Prepend blob array
+ */
 BlobObj.prototype.unshift = function (pointer, value, fn) {
   this.applyUpdate('unshift', pointer, [value]);
   this.postUpdate('unshift', pointer, [value], fn);
@@ -242,7 +270,9 @@ BlobObj.prototype.filter = function (pointer, field, value, subcommands, callbac
 };
 
 
-//apply new update to the blob data
+/**
+ * Apply udpdate to the blob
+ */
 BlobObj.prototype.applyUpdate = function (op, path, params) {
   
   // Exchange from numeric op code to string
@@ -363,7 +393,9 @@ BlobObj.prototype.unescapeToken = function(str) {
 };
 
 
-//sumbit update to blob vault
+/**
+ * Sumbit update to blob vault
+ */
 BlobObj.prototype.postUpdate = function (op, pointer, params, fn) {
   // Callback is optional
   if ("function" !== typeof fn) fn = function(){};
@@ -460,10 +492,14 @@ function normalizeSubcommands(subcommands, compress) {
 /***** blob client methods ****/
 
 
-//blob object class
+/**
+ * Blob object class
+ */ 
 module.exports.Blob = BlobObj
 
-//get ripple name for a given address 
+/**
+ * Get ripple name for a given address 
+ */
 module.exports.getRippleName = function (url, address, fn) {
   
   if (!crypt.isValidAddress(address)) return fn (new Error("Invalid ripple address"));
@@ -475,15 +511,19 @@ module.exports.getRippleName = function (url, address, fn) {
   }); 
 } 
 
-//retrive a blob with url, id and key  
-module.exports.get = function (url, id, crypt, fn) {
 
+/*
+ * Retrive a blob with url, id and key   
+ */
+module.exports.get = function (url, id, crypt, fn) {
   var blob = new BlobObj(url, id, crypt);
   blob.init(fn);
 }
 
 
-//verify email address
+/*
+ * Verify email address
+ */
 module.exports.verify = function (url, username, token, fn) {
   url += '/v1/user/' + username + '/verify/' + token;
   request.get(url, function(err, resp){
@@ -521,8 +561,6 @@ module.exports.create = function (options, fn)
     created     : (new Date()).toJSON()
   };
   
-  console.log(options.masterkey, crypt.getAddress(options.masterkey));
-  
   blob.encrypted_secret = blob.encryptSecret(options.unlock, options.masterkey);
 
   // Migration
@@ -546,10 +584,8 @@ module.exports.create = function (options, fn)
       encrypted_secret          : blob.encrypted_secret
     }
   };
-  
-  
+   
   var signed = crypt.signRequestAsymmetric(config, options.masterkey, blob.data.account_id, options.id);
-  
   
   request.post(signed)
     .send(signed.data)
