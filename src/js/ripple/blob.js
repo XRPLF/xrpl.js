@@ -1,5 +1,4 @@
 var crypt = require('./crypt'),
-  message = require('./message'),
   request = require('superagent'),
   extend  = require("extend");
 
@@ -521,6 +520,8 @@ module.exports.create = function (options, fn)
     contacts    : [],
     created     : (new Date()).toJSON()
   };
+  
+  console.log(options.masterkey, crypt.getAddress(options.masterkey));
   
   blob.encrypted_secret = blob.encryptSecret(options.unlock, options.masterkey);
 

@@ -1,4 +1,6 @@
 var sjcl  = require('./utils').sjcl,
+  base    = require('./base').Base,
+  message = require('./message'),
   request = require('superagent'), 
   extend  = require("extend"),
   parser  = require("url");
@@ -43,7 +45,8 @@ function keyHash(key, token) {
   var hmac = new sjcl.misc.hmac(key, sjcl.hash.sha512);
   return sjcl.codec.hex.fromBits(sjcl.bitArray.bitSlice(hmac.encrypt(token), 0, 256));
 }
-  
+
+
 
 /****** exposed functions ******/
 
@@ -121,6 +124,54 @@ Crypt.derive = function (opts, purpose, username, secret, fn) {
 }
 
 
+Crypt.RippleAddress = (function () {
+  function append_int(a, i) {
+    return [].concat(a, i >> 24, (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff)
+  }
+
+  function firstHalfOfSHA512(bytes) {
+    return sjcl.bitArray.bitSlice(
+      sjcl.hash.sha512.hash(sjcl.codec.bytes.toBits(bytes)),
+      0, 256
+    );
+  }
+
+  function SHA256_RIPEMD160(bits) {
+    return sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
+  }
+
+  return function (seed) {
+    this.seed = base.decode_check(33, seed);
+
+    if (!this.seed) {
+      throw "Invalid seed."
+    }
+
+    this.getAddress = function (seq) {
+      seq = seq || 0;
+
+      var private_gen, public_gen, i = 0;
+      do {
+        private_gen = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(this.seed, i)));
+        i++;
+      } while (!sjcl.ecc.curves.c256.r.greaterEquals(private_gen));
+
+      public_gen = sjcl.ecc.curves.c256.G.mult(private_gen);
+
+      var sec;
+      i = 0;
+      do {
+        sec = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(append_int(public_gen.toBytesCompressed(), seq), i)));
+        i++;
+      } while (!sjcl.ecc.curves.c256.r.greaterEquals(sec));
+
+      var pubKey = sjcl.ecc.curves.c256.G.mult(sec).toJac().add(public_gen).toAffine();
+
+      return base.encode_check(0, sjcl.codec.bytes.fromBits(SHA256_RIPEMD160(sjcl.codec.bytes.toBits(pubKey.toBytesCompressed()))));
+    };
+  };
+})();
+
 Crypt.encrypt = function(key, data)
 {
   key = sjcl.codec.hex.toBits(key);
@@ -167,14 +218,14 @@ Crypt.createSecret = function (words) {
 }
 
 Crypt.createMaster = function () {
-  return ripple.Base.encode_base_check(33, sjcl.codec.bytes.fromBits(sjcl.random.randomWords(4)));
+  return base.encode_check(33, sjcl.codec.bytes.fromBits(sjcl.random.randomWords(4)));
 }
 
-/*
+
 Crypt.getAddress = function (masterkey) {
-  return new RippleAddress(masterkey).getAddress();
+  return new Crypt.RippleAddress(masterkey).getAddress();
 }
-*/
+
 
 Crypt.hashSha512 = function (data) {
   return sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(data)); 
