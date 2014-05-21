@@ -12,6 +12,7 @@ exports.Meta             = require('./meta').Meta;
 exports.SerializedObject = require('./serializedobject').SerializedObject;
 exports.RippleError      = require('./rippleerror').RippleError;
 exports.Message          = require('./message');
+exports.VaultClient      = require('./vaultclient');
 exports.binformat        = require('./binformat');
 exports.utils            = require('./utils');
 exports.Server           = require('./server').Server;
