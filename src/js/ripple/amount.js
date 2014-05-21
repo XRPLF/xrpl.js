@@ -594,7 +594,7 @@ Amount.prototype.invert = function() {
  *   USD 100.40  => 100.4/USD/?
  *   100         => 100000000/XRP
  */
-Amount.human_RE = /^\s*([a-z]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([a-f0-9]{40}|[a-z0-9]{3})?\s*$/i;
+Amount.human_RE = /^\s*([a-z]{3})?\s*(-)?(\d+)(\.(\d*))?\s*([a-f0-9]{40}|[a-z0-9]{3})?\s*$/i;
 
 Amount.prototype.parse_human = function(j, opts) {
   opts = opts || {};
