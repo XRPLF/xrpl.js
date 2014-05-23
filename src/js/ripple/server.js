@@ -7,16 +7,18 @@ var log          = require('./log').internal.sub('server');
 
 /**
  *  @constructor Server
+ *
  *  @param {Remote} Reference to a Remote object
  *  @param {Object} Options
- *
- *    host:   String
- *    port:   String or Number
- *    secure: Boolean
+ *    @param {String} host
+ *    @param {Number|String} port
+ *    @param [Boolean] securec
  */
 
 function Server(remote, opts) {
   EventEmitter.call(this);
+
+  var self = this;
 
   if (typeof opts === 'string') {
     var parsedUrl = url.parse(opts);
@@ -31,16 +33,6 @@ function Server(remote, opts) {
     throw new TypeError('Server configuration is not an Object');
   }
 
-  if (!opts.host) {
-    opts.host = opts.websocket_ip;
-  }
-  if (!opts.port) {
-    opts.port = opts.websocket_port;
-  }
-  if (!opts.secure) {
-    opts.secure = opts.websocket_ssl;
-  }
-
   if (isNaN(opts.port)) {
     throw new TypeError('Server port must be a number');
   }
@@ -50,7 +42,7 @@ function Server(remote, opts) {
   }
 
   if (typeof opts.secure !== 'boolean') {
-    opts.secure = false;
+    opts.secure = true;
   }
 
   // We want to allow integer strings as valid port numbers for backward compatibility
@@ -66,52 +58,59 @@ function Server(remote, opts) {
     throw new TypeError('Server "secure" configuration is not a Boolean');
   }
 
-  var self = this;
+  this._remote = remote;
+  this._opts   = opts;
+  this._ws     = void(0);
 
-  this._remote        = remote;
-  this._opts          = opts;
-  this._host          = opts.host;
-  this._port          = opts.port;
-  this._secure        = opts.secure;
-  this._ws            = void(0);
   this._connected     = false;
   this._shouldConnect = false;
   this._state         = 'offline';
-  this._id            = 0;
-  this._retry         = 0;
-  this._requests      = { };
-  this._load_base    = 256;
-  this._load_factor  = 256;
+
+  this._id       = 0;
+  this._retry    = 0;
+  this._requests = { };
+
+  this._load_base   = 256;
+  this._load_factor = 256;
+
+  this._fee          = 10;
   this._fee_ref      = 10;
   this._fee_base     = 10;
   this._reserve_base = void(0);
   this._reserve_inc  = void(0);
   this._fee_cushion  = this._remote.fee_cushion;
 
-  this._opts.url = (opts.secure ? 'wss://' : 'ws://') + opts.host + ':' + opts.port;
+  this._lastLedgerIndex = NaN;
+  this._lastLedgerClose = NaN;
 
-  this.on('message', function(message) {
+  this._score = 0;
+
+  this._scoreWeights = {
+    ledgerclose: 5,
+    response: 1
+  };
+
+  this._url = this._opts.url = url.format({
+    hostname: self._opts.host,
+    port: self._opts.port,
+    protocol: (self._opts.secure ? 'wss://' : 'ws://')
+  });
+
+  this.on('message', onMessage);
+
+  function onMessage(message) {
     self._handleMessage(message);
-  });
+  };
 
-  this.on('response_subscribe', function(message) {
+  this.on('response_subscribe', onSubscribeResponse);
+
+  function onSubscribeResponse(message) {
     self._handleResponseSubscribe(message);
-  });
-
-  function checkServerActivity() {
-    if (isNaN(self._lastLedgerClose)) {
-      return;
-    }
-
-    var delta = (Date.now() - self._lastLedgerClose);
-
-    if (delta > (1000 * 20)) {
-      self.reconnect();
-    }
   };
 
   function setActivityInterval() {
-    self._activityInterval = setInterval(checkServerActivity, 1000);
+    var interval = self._checkActivity.bind(self);
+    self._activityInterval = setInterval(interval, 1000);
   };
 
   this.on('disconnect', function onDisconnect() {
@@ -119,8 +118,18 @@ function Server(remote, opts) {
     //self.once('ledger_closed', setActivityInterval);
   });
 
-  this.once('ledger_closed', function() {
-    //setActiviyInterval();
+  //this.once('ledger_closed', setActivityInterval);
+
+  this._remote.on('ledger_closed', function(ledger) {
+    self._updateScore('ledgerclose', ledger);
+  });
+
+  this.on('response_ping', function(message, request) {
+    self._updateScore('response', request);
+  });
+
+  this.on('load_changed', function(load) {
+    self._updateScore('loadchange', load);
   });
 };
 
@@ -142,6 +151,23 @@ Server.onlineStates = [
   'validating',
   'full'
 ];
+
+/**
+ * This is the final interface between client code and a socket connection to a
+ * `rippled` server. As such, this is a decent hook point to allow a WebSocket
+ * interface conforming object to be used as a basis to mock rippled. This
+ * avoids the need to bind a websocket server to a port and allows a more
+ * synchronous style of code to represent a client <-> server message sequence.
+ * We can also use this to log a message sequence to a buffer.
+ *
+ * @api private
+ */
+
+Server.websocketConstructor = function() {
+  // We require this late, because websocket shims may be loaded after
+  // ripple-lib in the browser
+  return require('ws');
+};
 
 /**
  * Set server state
@@ -173,6 +199,76 @@ Server.prototype._setState = function(state) {
 };
 
 /**
+ * Check that server is still active.
+ *
+ * Server activity is determined by ledger_closed events.
+ * Maximum delay to receive a ledger_closed event is 20s.
+ *
+ * If server is inactive, reconnect
+ *
+ * @api private
+ */
+
+Server.prototype._checkActivity = function() {
+  if (!this._connected) {
+    return;
+  }
+
+  if (isNaN(this._lastLedgerClose)) {
+    return;
+  }
+
+  var delta = (Date.now() - this._lastLedgerClose);
+
+  if (delta > (1000 * 25)) {
+    //this.reconnect();
+  }
+};
+
+/**
+ * Server maintains a score for request prioritization.
+ *
+ * The score is determined by various data including
+ * this server's lag to receive ledger_closed events,
+ * ping response time, and load(fee) change
+ *
+ * @param {String} type
+ * @param {Object} data
+ * @api private
+ */
+
+Server.prototype._updateScore = function(type, data) {
+  if (!this._connected) {
+    return;
+  }
+
+  var weight = this._scoreWeights[type] || 1;
+
+  switch (type) {
+    case 'ledgerclose':
+      // Ledger lag
+      var delta = data.ledger_index - this._lastLedgerIndex;
+      if (delta > 0) {
+        this._score += weight * delta;
+      }
+      break;
+    case 'response':
+      // Ping lag
+      var delta = Math.floor((Date.now() - data.time) / 200);
+      this._score += weight * delta;
+      break;
+    case 'loadchange':
+      // Load/fee change
+      this._fee = Number(this._computeFee(10));
+      break;
+  }
+
+  if (this._score > 1e3) {
+    //this.reconnect();
+  }
+};
+
+/**
  * Get the remote address for a server.
  * Incompatible with ripple-lib client build
  */
@@ -184,22 +280,6 @@ Server.prototype._remoteAddress = function() {
   } catch (e) {
   }
   return address;
-};
-
-/** This is the final interface between client code and a socket connection to a
- * `rippled` server. As such, this is a decent hook point to allow a WebSocket
- * interface conforming object to be used as a basis to mock rippled. This
- * avoids the need to bind a websocket server to a port and allows a more
- * synchronous style of code to represent a client <-> server message sequence.
- * We can also use this to log a message sequence to a buffer.
- *
- * @api private
- */
-
-Server.websocketConstructor = function() {
-  // We require this late, because websocket shims may be loaded after
-  // ripple-lib in the browser
-  return require('ws');
 };
 
 /**
@@ -274,7 +354,6 @@ Server.prototype.connect = function() {
   };
 
   ws.onopen = function onOpen() {
-    // If we are no longer the active socket, simply ignore any event
     if (ws === self._ws) {
       self.emit('socket_open');
       // Subscribe to events
@@ -283,7 +362,6 @@ Server.prototype.connect = function() {
   };
 
   ws.onerror = function onError(e) {
-    // If we are no longer the active socket, simply ignore any event
     if (ws === self._ws) {
       self.emit('socket_error');
 
@@ -309,9 +387,7 @@ Server.prototype.connect = function() {
     }
   };
 
-  // Failure to open.
   ws.onclose = function onClose() {
-    // If we are no longer the active socket, simply ignore any event
     if (ws === self._ws) {
       if (self._remote.trace) {
         log.info('onclose:', self._opts.url, ws.readyState);
@@ -333,12 +409,16 @@ Server.prototype._retryConnect = function() {
   this._retry += 1;
 
   var retryTimeout = (this._retry < 40)
-  ? (1000 / 20)           // First, for 2 seconds: 20 times per second
+  // First, for 2 seconds: 20 times per second
+  ? (1000 / 20)
   : (this._retry < 40 + 60)
-  ? (1000)                // Then, for 1 minute: once per second
+  // Then, for 1 minute: once per second
+  ? (1000)
   : (this._retry < 40 + 60 + 60)
-  ? (10 * 1000)           // Then, for 10 minutes: once every 10 seconds
-  : (30 * 1000);          // Then: once every 30 seconds
+  // Then, for 10 minutes: once every 10 seconds
+  ? (10 * 1000)
+  // Then: once every 30 seconds
+  : (30 * 1000);
 
   function connectionRetry() {
     if (self._shouldConnect) {
@@ -365,8 +445,10 @@ Server.prototype._handleClose = function() {
   this.emit('socket_close');
   this._setState('offline');
 
+  function noOp() {};
+
   // Prevent additional events from this socket
-  ws.onopen = ws.onerror = ws.onclose = ws.onmessage = function noOp() {};
+  ws.onopen = ws.onerror = ws.onclose = ws.onmessage = noOp;
 
   if (self._shouldConnect) {
     this._retryConnect();
@@ -389,75 +471,122 @@ Server.prototype._handleMessage = function(message) {
   }
 
   if (!Server.isValidMessage(message)) {
+    this.emit('unexpected', message);
     return;
   }
 
   switch (message.type) {
     case 'ledgerClosed':
-      this._lastLedgerClose = Date.now();
-      this.emit('ledger_closed', message);
+      this._handleLedgerClosed(message);
       break;
-
     case 'serverStatus':
-      // This message is only received when online.
-      // As we are connected, it is the definitive final state.
-
-      this._setState(~(Server.onlineStates.indexOf(message.server_status)) ? 'online' : 'offline');
-
-      if (Server.isLoadStatus(message)) {
-        self.emit('load', message, self);
-        self._remote.emit('load', message, self);
-
-        if (message.load_base !== self._load_base || message.load_factor !== self._load_factor) {
-          // Load changed
-          self._load_base   = message.load_base;
-          self._load_factor = message.load_factor;
-          self.emit('load_changed', message, self);
-          self._remote.emit('load_changed', message, self);
-        }
-      }
+      this._handleServerStatus(message);
       break;
-
     case 'response':
-      // A response to a request.
-      var request = self._requests[message.id];
-      delete self._requests[message.id];
-
-      if (!request) {
-        if (this._remote.trace) {
-          log.info('UNEXPECTED:', self._opts.url, message);
-        }
-        return;
-      }
-
-      if (message.status === 'success') {
-        if (this._remote.trace) {
-          log.info('response:', self._opts.url, message);
-        }
-
-        request.emit('success', message.result);
-
-        [ self, self._remote ].forEach(function(emitter) {
-          emitter.emit('response_' + request.message.command, message.result, request, message);
-        });
-      } else if (message.error) {
-        if (this._remote.trace) {
-          log.info('error:', self._opts.url, message);
-        }
-
-        request.emit('error', {
-          error: 'remoteError',
-          error_message: 'Remote reported an error.',
-          remote: message
-        });
-      }
+      this._handleResponse(message);
       break;
-
     case 'path_find':
-      if (this._remote.trace) {
-        log.info('path_find:', self._opts.url, message);
-      }
+      this._handlePathFind(message);
       break;
+  }
+};
+
+Server.prototype._handleLedgerClosed = function(message) {
+  this._lastLedgerIndex = message.ledger_index;
+  this._lastLedgerClose = Date.now();
+  this.emit('ledger_closed', message);
+};
+
+Server.prototype._handleServerStatus = function(message) {
+  // This message is only received when online.
+  // As we are connected, it is the definitive final state.
+  var isOnline = ~Server.onlineStates.indexOf(message.server_status);
+  this._setState(isOnline ? 'online' : 'offline');
+
+  if (!Server.isLoadStatus(message)) {
+    return;
+  }
+
+  this.emit('load', message, this);
+  this._remote.emit('load', message, this);
+
+  var loadChanged = message.load_base !== this._load_base
+  || message.load_factor !== this._load_factor
+
+  if (loadChanged) {
+    this._load_base = message.load_base;
+    this._load_factor = message.load_factor;
+    this.emit('load_changed', message, this);
+    this._remote.emit('load_changed', message, this);
+  }
+};
+
+Server.prototype._handleResponse = function(message) {
+  // A response to a request.
+  var request = this._requests[message.id];
+
+  delete this._requests[message.id];
+
+  if (!request) {
+    if (this._remote.trace) {
+      log.info('UNEXPECTED:', this._opts.url, message);
+    }
+    return;
+  }
+
+  if (message.status === 'success') {
+    if (this._remote.trace) {
+      log.info('response:', this._opts.url, message);
+    }
+
+    var command = request.message.command;
+    var result = message.result;
+    var responseEvent = 'response_' + command;
+
+    request.emit('success', result);
+
+    [ this, this._remote ].forEach(function(emitter) {
+      emitter.emit(responseEvent, result, request, message);
+    });
+  } else if (message.error) {
+    if (this._remote.trace) {
+      log.info('error:', this._opts.url, message);
+    }
+
+    var error = {
+      error: 'remoteError',
+      error_message: 'Remote reported an error.',
+      remote: message
+    };
+
+    request.emit('error', error);
+  }
+};
+
+Server.prototype._handlePathFind = function(message) {
+  if (this._remote.trace) {
+    log.info('path_find:', this._opts.url, message);
+  }
+};
+
+/**
+ * Handle subscription response messages. Subscription response
+ * messages indicate that a connection to the server is ready
+ *
+ * @api private
+ */
+
+Server.prototype._handleResponseSubscribe = function(message) {
+  if (~(Server.onlineStates.indexOf(message.server_status))) {
+    this._setState('online');
+  }
+  if (Server.isLoadStatus(message)) {
+    this._load_base    = message.load_base || 256;
+    this._load_factor  = message.load_factor || 256;
+    this._fee_ref      = message.fee_ref;
+    this._fee_base     = message.fee_base;
+    this._reserve_base = message.reserve_base;
+    this._reserve_inc  = message.reserve_inc;
   }
 };
 
@@ -482,27 +611,6 @@ Server.isValidMessage = function(message) {
 Server.isLoadStatus = function(message) {
   return (typeof message.load_base === 'number')
       && (typeof message.load_factor === 'number');
-};
-
-/**
- * Handle subscription response messages. Subscription response
- * messages indicate that a connection to the server is ready
- *
- * @api private
- */
-
-Server.prototype._handleResponseSubscribe = function(message) {
-  if (~(Server.onlineStates.indexOf(message.server_status))) {
-    this._setState('online');
-  }
-  if (Server.isLoadStatus(message)) {
-    this._load_base     = message.load_base || 256;
-    this._load_factor   = message.load_factor || 256;
-    this._fee_ref       = message.fee_ref;
-    this._fee_base      = message.fee_base;
-    this._reserve_base  = message.reserve_base;
-    this._reserve_inc   = message.reserve_inc;
-  }
 };
 
 /**
@@ -544,6 +652,7 @@ Server.prototype._request = function(request) {
 
   request.server = this;
   request.message.id = this._id;
+  request.time = Date.now();
 
   this._requests[request.message.id] = request;
 
@@ -564,8 +673,8 @@ Server.prototype._request = function(request) {
 
 Server.prototype._isConnected = function(request) {
   var isSubscribeRequest = request
-  && request.message.command === 'subscribe'
-  && this._ws.readyState === 1;
+    && request.message.command === 'subscribe'
+    && this._ws.readyState === 1;
 
   return this._connected || (this._ws && isSubscribeRequest);
 };
