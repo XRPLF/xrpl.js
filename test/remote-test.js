@@ -164,7 +164,7 @@ describe('Remote', function () {
         }
       }
     })
-    it.only('should set transaction members correct ', function(done) {
+    it('should set transaction members correct ', function(done) {
       remote = new Remote(options);
       remote.storage = database;
       remote.transaction = function() {
