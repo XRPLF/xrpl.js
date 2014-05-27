@@ -10,9 +10,9 @@ describe('Currency', function() {
     it('json_rewrite("NaN") == "XRP"', function() {
       assert.strictEqual('XRP', currency.json_rewrite(NaN));
     });
-    it('json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000") == "015841551A748AD2C1F76FF6ECB0CCCD00000000"', function() {
+    it('json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000") == "XAU (-0.5%pa)"', function() {
       assert.strictEqual(currency.json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000"),
-                         '015841551A748AD2C1F76FF6ECB0CCCD00000000');
+                         "XAU (-0.5%pa)");
     });
   });
   describe('from_json', function() {
@@ -28,6 +28,29 @@ describe('Currency', function() {
       assert.strictEqual('XRP', r.to_json());
     });
   });
+
+  describe('from_human', function() {
+    it('From human "USD - Gold (-25%pa)"', function() {
+      var cur = currency.from_human('USD - Gold (-25%pa)');
+      assert.strictEqual(cur.to_json(), 'USD (-25%pa)');
+      assert.strictEqual(cur.to_hex(), '0155534400000000C19A22BC51297F0B00000000');
+      assert.strictEqual(cur.to_json(), cur.to_human());
+    });
+
+    it('From human "EUR (-0.5%pa)', function() {
+      var cur = currency.from_human('EUR (-0.5%pa)');
+      assert.strictEqual(cur.to_json(), 'EUR (-0.5%pa)');
+    });
+
+    it('From human "EUR (0.5361%pa)", test decimals', function() {
+      var cur = currency.from_human('EUR (0.5361%pa)');
+      assert.strictEqual(cur.to_json(), 'EUR (0.54%pa)');
+      assert.strictEqual(cur.to_json(4), 'EUR (0.5361%pa)');
+      assert.strictEqual(cur.get_interest_percentage_at(undefined, 4), 0.5361);
+    });
+
+  });
+
   describe('to_human', function() {
     it('"USD".to_human() == "USD"', function() {
       assert.strictEqual('USD', currency.from_json('USD').to_human());
@@ -37,12 +60,24 @@ describe('Currency', function() {
     });
     it('"015841551A748AD2C1F76FF6ECB0CCCD00000000") == "015841551A748AD2C1F76FF6ECB0CCCD00000000"', function() {
       assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human(),
-                         'XAU');
+                         'XAU (-0.5%pa)');
+    });
+  });
+
+  describe('from_hex', function() {
+    it('"015841551A748AD2C1F76FF6ECB0CCCD00000000" === "XAU (-0.5%pa)"', function() {
+      var cur = currency.from_hex('015841551A748AD2C1F76FF6ECB0CCCD00000000');
+      assert.strictEqual(cur.to_json(), 'XAU (-0.5%pa)');
+      assert.strictEqual(cur.to_hex(), '015841551A748AD2C1F76FF6ECB0CCCD00000000');
+      assert.strictEqual(cur.to_json(), cur.to_human());
     });
   });
   describe('parse_json(currency obj)', function() {
     assert.strictEqual('USD', new currency().parse_json(currency.from_json('USD')).to_json());
+
+    assert.strictEqual('USD (0.5%pa)', new currency().parse_json(currency.from_json('USD (0.5%pa)')).to_json());
   });
+
   describe('is_valid', function() {
     it('Currency.is_valid("XRP")', function() {
       assert(currency.is_valid('XRP'));
