@@ -8,6 +8,7 @@ var BlobObj = function (url, id, key) {
   this.id   = id;
   this.key  = key;
   this.data = {};  
+  this.identity = new Identity;
 };
 
 // Blob operations
@@ -487,10 +488,44 @@ function normalizeSubcommands(subcommands, compress) {
     return subcommands;
   }
 }
+
+
+/***** identity ****/
+
+/** 
+ * Identity class
+ * 
+ */
+var Identity = function() {} 
+
+
+/**
+ * getAll
+ * get and decrypt all identity fields
+ * @param {string} password to derive crypt key
+ */
+Identity.prototype.getAll = function(password) {
   
+}
+
+
+Identity.prototype.get = function(key, password) {
+  
+}
+
+
+Identity.prototype.set = function(key, password, data) {
+  
+}
+
+
+Identity.prototype.unset = function (key, password) {
+  
+}
+
+
 
 /***** blob client methods ****/
-
 
 /**
  * Blob object class
