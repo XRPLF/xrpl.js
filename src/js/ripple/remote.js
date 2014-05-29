@@ -421,12 +421,11 @@ Remote.prototype.getPendingTransactions = function() {
 
     var transaction = self.transaction();
     transaction.parseJson(tx.tx_json);
-
+    transaction.clientID(tx.clientID);
     Object.keys(tx).forEach(function(prop) {
       switch (prop) {
         case 'secret':
           case 'submittedIDs':
-          case 'clientID':
           case 'submitIndex':
           transaction[prop] = tx[prop];
         break;
