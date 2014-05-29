@@ -1,6 +1,7 @@
-var crypt = require('./crypt'),
-  request = require('superagent'),
-  extend  = require("extend");
+var crypt   = require('./crypt');
+var request = require('superagent');
+var async   = require('async');
+var extend  = require("extend");
 
 //Blob object class
 var BlobObj = function (url, id, key) {
@@ -8,8 +9,10 @@ var BlobObj = function (url, id, key) {
   this.id   = id;
   this.key  = key;
   this.data = {};  
-  this.identity = new Identity;
+  this.identity = new Identity(this);
 };
+
+var identityRoot = '/identityVault';
 
 // Blob operations
 // Do NOT change the mapping of existing ops
@@ -496,30 +499,107 @@ function normalizeSubcommands(subcommands, compress) {
  * Identity class
  * 
  */
-var Identity = function() {} 
+var Identity = function(blob) {
+  var self  = this;
+  self.blob = blob;
+  
+  //make sure the identity setup is valid
+  self.validate = function(fn) {
+    if (!self.blob) return fn(new Error("Identity must be associated with a blob"));
+    else if (!self.blob.data) return fn(new Error("Invalid Blob"));  
+    else if (!self.blob.data.identityVault) {
+      self.blob.set(identityRoot, {}, function(err, res){
+        if (err) return fn(err);
+        else     return fn(null, true);
+      }); 
+    } else return fn(null, true);
+  }
+} 
 
 
 /**
  * getAll
  * get and decrypt all identity fields
- * @param {string} password to derive crypt key
+ * @param {string} key  - Encryption key
+ * @param {function} fn - Callback function
  */
-Identity.prototype.getAll = function(password) {
+Identity.prototype.getAll = function(key) {
   
 }
 
 
-Identity.prototype.get = function(key, password) {
+/**
+ * get
+ * get and decrypt a single identity field
+ * @param {string} pointer - Field to retrieve
+ * @param {string} key     - Encryption key
+ */
+Identity.prototype.get = function(pointer, key) {
+  if (!this.blob || !this.blob.data || !this.blob.data.identityVault) {
+    return null;
+  }
   
+  var data = this.blob.data.identityVault[pointer];
+  if (data && data.encrypted) {
+
+    return {
+      encrypted : data.encrypted,
+      value     : decrypt(key, data.value)
+    }
+  } else if (data) {
+    return data;
+  }
+  
+  function decrypt (key, value) {
+    value = crypt.decrypt(key, value);
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      return value;
+    }
+  }
 }
 
 
-Identity.prototype.set = function(key, password, data) {
+/**
+ * set
+ * set and encrypt a single identity field
+ * @param {string} pointer - Field to set
+ * @param {string} key     - Encryption key
+ * @param {string} value   - Unencrypted data
+ * @param {function} fn    - Callback function
+ */
+Identity.prototype.set = function(pointer, key, value, fn) {
+  var self = this;
+
+  this.validate(function(err, res){
+    if (err) return fn(err);
+    
+    var data = {};
+    data[pointer] = {
+      encrypted : key ? true : false,
+      value     : key ? encrypt(key, value) : value  
+    }
+    
+    self.blob.extend(identityRoot, data, fn);
+  });
   
+  function encrypt (key, value) {
+    if (typeof value === 'object') value = JSON.stringify(value);
+    return crypt.encrypt(key, value);
+  }
 }
 
 
-Identity.prototype.unset = function (key, password) {
+/**
+ * unset
+ * remove a single identity field - will only be removed
+ * with a valid decryption key
+ * @param {string} pointer - Field to remove
+ * @param {string} key     - Encryption key
+ * @param {function} fn    - Callback function
+ */
+Identity.prototype.unset = function (pointer, key, fn) {
   
 }
 
