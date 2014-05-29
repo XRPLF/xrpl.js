@@ -36,17 +36,31 @@ describe('Currency', function() {
       assert.strictEqual(cur.to_hex(), '0155534400000000C19A22BC51297F0B00000000');
       assert.strictEqual(cur.to_json(), cur.to_human());
     });
-
     it('From human "EUR (-0.5%pa)', function() {
       var cur = currency.from_human('EUR (-0.5%pa)');
       assert.strictEqual(cur.to_json(), 'EUR (-0.5%pa)');
     });
-
     it('From human "EUR (0.5361%pa)", test decimals', function() {
       var cur = currency.from_human('EUR (0.5361%pa)');
       assert.strictEqual(cur.to_json(), 'EUR (0.54%pa)');
       assert.strictEqual(cur.to_json(4), 'EUR (0.5361%pa)');
       assert.strictEqual(cur.get_interest_percentage_at(undefined, 4), 0.5361);
+    });
+    it('From human "TYX - 30-Year Treasuries (1.5%pa)"', function() {
+      var cur = currency.from_human('TYX - 30-Year Treasuries (1.5%pa)');
+      assert.strictEqual(cur.to_json(), 'TYX (1.5%pa)');
+    });
+    it('From human "TYX - 30-Year Treasuries"', function() {
+      var cur = currency.from_human('TYX - 30-Year Treasuries');
+      assert.strictEqual(cur.to_json(), 'TYX');
+    });
+    it('From human "INR - Indian Rupees (-0.5%)"', function() {
+      var cur = currency.from_human('INR - Indian Rupees (-0.5%pa)');
+      assert.strictEqual(cur.to_json(), 'INR (-0.5%pa)');
+    });
+    it('From human "INR - 30 Indian Rupees"', function() {
+      var cur = currency.from_human('INR - 30 Indian Rupees');
+      assert.strictEqual(cur.to_json(), 'INR');
     });
 
   });

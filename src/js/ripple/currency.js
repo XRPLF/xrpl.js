@@ -31,22 +31,26 @@ Currency.HEX_CURRENCY_BAD = '0000000000000000000000005852500000000000';
  *
  * Examples:
  *
- *  USD                   => currency
- *  USD - Dollar          => currency with optional full currency name
- *  XAU (-0.5%pa)         => XAU with 0.5% effective demurrage rate per year
- *  XAU - Gold (-0.5%pa)  => Optionally allowed full currency name
- *  USD (1%pa)            => US dollars with 1% effective interest per year
+ *  USD                               => currency
+ *  USD - Dollar                      => currency with optional full currency name
+ *  XAU (-0.5%pa)                     => XAU with 0.5% effective demurrage rate per year
+ *  XAU - Gold (-0.5%pa)              => Optionally allowed full currency name
+ *  USD (1%pa)                        => US dollars with 1% effective interest per year
+ *  INR - Indian Rupees               => Optional full currency name with spaces
+ *  TYX - 30-Year Treasuries          => Optional full currency with numbers and a dash
+ *  TYX - 30-Year Treasuries (1.5%pa) => Optional full currency with numbers, dash and interest rate
  *
  *  The regular expression below matches above cases, broken down for better understanding:
  *
  *  ^\s*                      // start with any amount of whitespace
  *  ([a-zA-Z]{3})             // any 3 letter currency code
- *  (\s*-\s*[a-zA-z]+)?       // optional full currency name following the dash after currency code
+ *  (\s*-\s*[- \w]+)          // optional full currency name following the dash after currency code,
+ *                               full currency code can contain letters, numbers and dashes
  *  (\s*\(-?\d+\.?\d*%pa\))?  // optional demurrage rate, has optional - and . notation (-0.5%pa)
  *  \s*$                      // end with any amount of whitespace
  *
  */
-Currency.prototype.human_RE = /^\s*([a-zA-Z]{3})(\s*-\s*[a-zA-z]+)?(\s*\(-?\d+\.?\d*%pa\))?\s*$/;
+Currency.prototype.human_RE = /^\s*([a-zA-Z]{3})(\s*-\s*[- \w]+)?(\s*\(-?\d+\.?\d*%pa\))?\s*$/;
 
 Currency.from_json = function(j, shouldInterpretXrpAsIou) {
   if (j instanceof this) {
