@@ -132,11 +132,11 @@ BlobObj.prototype.consolidate = function(fn) {
 
 BlobObj.prototype.applyEncryptedPatch = function(patch) {
   try {
-    var params = JSON.parse(crypt.decrypt(this.key, patch));
-    var op     = params.shift();
-    var path   = params.shift();
+    var args = JSON.parse(crypt.decrypt(this.key, patch));
+    var op   = args.shift();
+    var path = args.shift();
 
-    this.applyUpdate(op, path, params);
+    this.applyUpdate(op, path, args);
     this.revision++;
 
     return true;
@@ -266,19 +266,21 @@ BlobObj.prototype.unshift = function(pointer, value, fn) {
  *
  * The subcommands can be any commands with the pointer parameter left out.
  */
+
 BlobObj.prototype.filter = function(pointer, field, value, subcommands, callback) {
-  var params = Array.prototype.slice.apply(arguments);
-  if (typeof params[params.length - 1] === 'function') {
-    callback = params.pop();
+  var args = Array.prototype.slice.apply(arguments);
+
+  if (typeof args[args.length - 1] === 'function') {
+    callback = args.pop();
   }
 
-  params.shift();
+  args.shift();
 
   // Normalize subcommands to minimize the patch size
-  params = params.slice(0, 2).concat(normalizeSubcommands(params.slice(2), true));
+  args = args.slice(0, 2).concat(normalizeSubcommands(args.slice(2), true));
 
-  this.applyUpdate('filter', pointer, params);
-  this.postUpdate('filter', pointer, params, callback);
+  this.applyUpdate('filter', pointer, args);
+  this.postUpdate('filter', pointer, args, callback);
 };
 
 /**
@@ -457,7 +459,7 @@ function normalizeSubcommands(subcommands, compress) {
   if (/(number|string)/.test(typeof subcommands[0])) {
     // Case 1: Single subcommand inline
     subcommands = [subcommands];
-  } else if (subcommands.length === 1 && Array.isArray(subcommands[0]) && /(number|string)/.test(subcommands[0][0])) {
+  } else if (subcommands.length === 1 && Array.isArray(subcommands[0]) && /(number|string)/.test(typeof subcommands[0][0])) {
     // Case 2: Single subcommand as array
     // (nothing to do)
   } else if (Array.isArray(subcommands[0])) {

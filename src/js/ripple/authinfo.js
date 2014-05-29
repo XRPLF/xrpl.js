@@ -2,7 +2,7 @@ var request   = require('superagent');
 var RippleTxt = require('./rippletxt').RippleTxt;
 
 function AuthInfo() {
-  this.rippleTxt = new RippleTxt;
+  this.rippleTxt = new RippleTxt();
 };
 
 /**
@@ -30,9 +30,10 @@ AuthInfo.prototype.get = function(domain, username, fn) {
     }
 
     var url = Array.isArray(txt.authinfo_url) ? txt.authinfo_url[0] : txt.authinfo_url;
-    url += '?domain='+domain+'&username='+username;
 
-    request.get(url, function(err, resp){
+    url += '?domain=' + domain + '&username='+username;
+
+    request.get(url, function(err, resp) {
       if (err || resp.error) {
         fn(new Error('Authentication info server unreachable'));
       } else {

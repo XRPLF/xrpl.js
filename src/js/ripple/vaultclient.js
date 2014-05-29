@@ -5,7 +5,7 @@ var crypt      = require('./crypt').Crypt;
 
 function VaultClient(opts) {
   if (!opts) {
-    opts = {};
+    opts = { };
   }
 
   if (typeof opts === 'string') {
