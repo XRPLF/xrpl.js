@@ -1,7 +1,7 @@
 var assert    = require('assert'),
-  RippleTxt   = require('../src/js/ripple/rippletxt'),
-  AuthInfo    = require('../src/js/ripple/authinfo'),
-  VaultClient = require('../src/js/ripple/vaultclient'),
+  RippleTxt   = require('../src/js/ripple/rippletxt').RippleTxt,
+  AuthInfo    = require('../src/js/ripple/authinfo').AuthInfo,
+  VaultClient = require('../src/js/ripple/vaultclient').VaultClient,
   Blob        = require('../src/js/ripple/blob').Blob,
   UInt256     = require('../src/js/ripple/uint256').UInt256;
 
@@ -22,6 +22,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";  //must be set for self signed c
 
 describe('Ripple Txt', function() {
   it('should get the context of a ripple.txt file from a given domain', function(done){
+    this.timeout(10000);
     var rt = new RippleTxt();
     rt.get(exampleData.domain, function(err, resp){
       assert.ifError(err);
@@ -36,6 +37,7 @@ describe('AuthInfo', function() {
   var auth = new AuthInfo();
   
   it ('should', function(done){
+    this.timeout(10000);
     auth.get(exampleData.domain, exampleData.user, function(err, resp){
       assert.ifError(err);
       assert.equal(typeof resp, 'object');
