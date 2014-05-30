@@ -20,10 +20,10 @@ var exampleData = {
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";  //must be set for self signed certs
 
 
-describe('Ripple Txt', function() {
-  it('should get the context of a ripple.txt file from a given domain', function(done){
+describe('Ripple Txt', function () {
+  it('should get the context of a ripple.txt file from a given domain', function (done){
     var rt = new RippleTxt();
-    rt.get(exampleData.domain, function(err, resp){
+    rt.get(exampleData.domain, function (err, resp){
       assert.ifError(err);
       assert.equal(typeof resp, 'object');
       done();
@@ -32,11 +32,11 @@ describe('Ripple Txt', function() {
 });
 
 
-describe('AuthInfo', function() {
+describe('AuthInfo', function () {
   var auth = new AuthInfo();
   
-  it ('should', function(done){
-    auth.get(exampleData.domain, exampleData.user, function(err, resp){
+  it ('should get authinfo given a domain and username', function (done){
+    auth.get(exampleData.domain, exampleData.user, function (err, resp){
       assert.ifError(err);
       assert.equal(typeof resp, 'object');
       done();
@@ -44,23 +44,23 @@ describe('AuthInfo', function() {
   }); 
 });
 
-describe('VaultClient', function() {
+describe('VaultClient', function () {
   var client = new VaultClient(exampleData.domain);
   
-  describe('initialization', function() {
-    it('should be initialized with a domain', function() {
+  describe('initialization', function () {
+    it('should be initialized with a domain', function () {
       var client = new VaultClient({ domain: exampleData.domain });
       assert.strictEqual(client.domain, exampleData.domain);
     });
 
-    it('should default to ripple.com without a domain', function() {
+    it('should default to ripple.com without a domain', function () {
       var client = new VaultClient();
       assert.strictEqual(client.domain, 'ripple.com');
     });
   });
   
-  describe('#exists', function() {
-    it('should determine if a username exists on the domain', function(done) {
+  describe('#exists', function () {
+    it('should determine if a username exists on the domain', function (done) {
       this.timeout(10000);
       client.exists(exampleData.username, function(err, resp) {
         
@@ -71,10 +71,10 @@ describe('VaultClient', function() {
     });
   });
   
-  describe('#login', function() {
-    it('with username and password should retrive the blob, crypt key, and id', function(done) {
+  describe('#login', function () {
+    it('with username and password should retrive the blob, crypt key, and id', function (done) {
       this.timeout(10000);
-      client.login(exampleData.username, exampleData.password, function(err, resp) {
+      client.login(exampleData.username, exampleData.password, function (err, resp) {
         
         assert.ifError(err);
         assert.equal(typeof resp, 'object');
@@ -91,8 +91,8 @@ describe('VaultClient', function() {
   });
   
   
-  describe('#relogin', function() {
-    it('should retrieve the decrypted blob with blob vault url, id, and crypt key', function(done) {
+  describe('#relogin', function () {
+    it('should retrieve the decrypted blob with blob vault url, id, and crypt key', function (done) {
       this.timeout(10000);
       client.relogin(exampleData.blobURL, exampleData.id, exampleData.crypt, function(err, resp) {
         
@@ -105,9 +105,9 @@ describe('VaultClient', function() {
   });
 
   describe('#unlock', function() {
-    it('should access the wallet secret using encryption secret, username and password', function(done) {
+    it('should access the wallet secret using encryption secret, username and password', function (done) {
       this.timeout(10000);
-      client.unlock(exampleData.username, exampleData.password, exampleData.encrypted_secret, function(err, resp) {
+      client.unlock(exampleData.username, exampleData.password, exampleData.encrypted_secret, function (err, resp) {
         
         assert.ifError(err);
         assert.equal(typeof resp, 'object');
@@ -119,10 +119,10 @@ describe('VaultClient', function() {
     });
   });
 
-  describe('#loginAndUnlock', function() {
-    it('should get the decrypted blob and decrypted secret given name and password', function(done) {
+  describe('#loginAndUnlock', function () {
+    it('should get the decrypted blob and decrypted secret given name and password', function (done) {
       this.timeout(10000);
-      client.loginAndUnlock(exampleData.username, exampleData.password, function(err, resp) {
+      client.loginAndUnlock(exampleData.username, exampleData.password, function (err, resp) {
 
         assert.ifError(err);
         assert.equal(typeof resp, 'object'); 
@@ -143,18 +143,18 @@ describe('VaultClient', function() {
 });
 
 
-describe('Blob', function() {
+describe('Blob', function () {
   var vaultClient;
   
   vaultClient = new VaultClient({ domain: exampleData.domain });
-  vaultClient.login(exampleData.username, exampleData.password, function(err,resp){
+  vaultClient.login(exampleData.username, exampleData.password, function (err,resp){
     assert.ifError(err);
     var blob = resp.blob;
 
 
-    describe('#set', function() {
-      it('should set a new property in the blob', function(done) {
-        this.timeout(10000)
+    describe('#set', function () {
+      it('should set a new property in the blob', function (done) {
+        this.timeout(10000);
   
         blob.extend("/testObject", {
           foo    : [],
@@ -166,9 +166,9 @@ describe('Blob', function() {
       });
     }); 
     
-    describe('#extend', function() {
-      it('should extend an object in the blob', function(done) {
-        this.timeout(10000)
+    describe('#extend', function () {
+      it('should extend an object in the blob', function (done) {
+        this.timeout(10000);
   
         blob.extend("/testObject", {
           foobar : "baz",
@@ -180,9 +180,9 @@ describe('Blob', function() {
       });
     }); 
 
-    describe('#unset', function() {
-      it('should remove a property from the blob', function(done) {
-        this.timeout(10000)
+    describe('#unset', function () {
+      it('should remove a property from the blob', function (done) {
+        this.timeout(10000);
   
         blob.unset("/testObject", function(err, resp){
           assert.ifError(err);
@@ -192,9 +192,9 @@ describe('Blob', function() {
       });
     }); 
         
-    describe('#unshift', function() {
-      it('should prepend an item to an array in the blob', function(done) {
-        this.timeout(10000)
+    describe('#unshift', function () {
+      it('should prepend an item to an array in the blob', function (done) {
+        this.timeout(10000);
   
         blob.unshift("/testArray", {
           name    : "bob",
@@ -207,9 +207,9 @@ describe('Blob', function() {
       });
     });
     
-    describe('#filter', function() {
+    describe('#filter', function () {
       it('should find a specific entity in an array and apply subcommands to it', function(done) {
-        this.timeout(10000)
+        this.timeout(10000);
   
         blob.filter('/testArray', 'name', 'bob', 'extend', '', {description:"Alice"}, function(err, resp){
           assert.ifError(err);
@@ -219,9 +219,9 @@ describe('Blob', function() {
       });
     });    
 
-    describe('#consolidate', function() {
-      it('should consolidate and save changes to the blob', function(done) {
-        this.timeout(10000)
+    describe('#consolidate', function () {
+      it('should consolidate and save changes to the blob', function (done) {
+        this.timeout(10000);
         
         blob.unset('/testArray', function(err, resp){
           assert.ifError(err);
@@ -234,7 +234,59 @@ describe('Blob', function() {
           });          
         }); 
       });
-    });    
+    });
+    
+    
+    /********* Identity tests ***********/
+    describe('#identity_set', function () {
+      it('should set an identity property', function (done) {
+        this.timeout(10000);
+        
+        blob.identity.set('address', exampleData.unlock, {city:"San Francisco", region:"CA"}, function (err, resp) {
+          assert.ifError(err);
+          assert.equal(resp.result, 'success');
+          done();          
+        });
+      });      
+    });  
+
+    describe('#identity_get', function () {
+      it('should retreive an identity property given the property name and encryption key', function () {
+        
+        var property = blob.identity.get('address', exampleData.unlock);
+        assert.ifError(property.error);   
+        assert.equal(typeof property.encrypted, 'boolean');     
+        assert.notEqual(typeof property.value, 'undefined');  
+      });      
+    }); 
+
+    describe('#identity_getAll', function () {
+      it('should retreive all identity properties given the encryption key', function () {
+        
+        var obj = blob.identity.getAll(exampleData.unlock);  
+        assert.equal(typeof obj, 'object');       
+      });      
+    }); 
+
+    describe('#identity_getFullAddress', function () {
+      it('should retreive the address as a string', function () {
+        
+        var address = blob.identity.getFullAddress(exampleData.unlock);  
+        assert.equal(typeof address, 'string');       
+      });      
+    }); 
+                
+    describe('#identity_unset', function () {
+      it('should remove an identity property', function (done) {
+        this.timeout(10000);
+        
+        blob.identity.unset('name', exampleData.unlock, function (err, resp) {
+          assert.ifError(err);
+          assert.equal(resp.result, 'success');
+          done();          
+        });
+      });      
+    });        
   });
 }); 
    
