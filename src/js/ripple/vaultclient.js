@@ -1,6 +1,6 @@
 var AuthInfo   = require('./authinfo').AuthInfo;
 var blobClient = require('./blob').BlobClient;
-var crypt      = require('./crypt');
+var crypt      = require('./crypt').Crypt;
 
 
 function VaultClient(opts) {

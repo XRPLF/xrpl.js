@@ -1,4 +1,4 @@
-var crypt   = require('./crypt');
+var crypt   = require('./crypt').Crypt;
 var request = require('superagent');
 var async   = require('async');
 var extend  = require("extend");

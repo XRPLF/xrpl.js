@@ -477,4 +477,4 @@ var dateAsIso8601 = (function () {
 })();
 
 
-module.exports = Crypt;
+module.exports.Crypt = Crypt;
