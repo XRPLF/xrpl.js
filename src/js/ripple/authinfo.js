@@ -1,8 +1,17 @@
-var request   = require('superagent');
-var RippleTxt = require('./rippletxt').RippleTxt;
+var async      = require('async');
+var superagent = require('superagent');
+var RippleTxt  = require('./rippletxt').RippleTxt;
 
 function AuthInfo() {
   this.rippleTxt = new RippleTxt();
+};
+
+AuthInfo.prototype._getRippleTxt = function(domain, callback) {
+  this.rippleTxt.get(domain, callback);
+};
+
+AuthInfo.prototype._getUser = function(url, callback) {
+  superagent.get(url, callback);
 };
 
 /**
@@ -13,34 +22,38 @@ function AuthInfo() {
  * @param {function}  fn - Callback function
  */
 
-AuthInfo.prototype.get = function(domain, username, fn) {
+AuthInfo.prototype.get = function(domain, username, callback) {
   var self = this;
 
-  self.rippleTxt.get(domain, function(err, txt) {
-    if (err) {
-      fn(err);
-    } else {
-      processTxt(txt)
-    }
-  });
+  function getRippleTxt(callback) {
+    self._getRippleTxt(domain, function(err, txt) {
+      if (err) {
+        return callback(err);
+      }
 
-  function processTxt(txt) {
-    if (!txt.authinfo_url) {
-      return fn(new Error('Authentication is not supported on ' + domain));
-    }
+      if (!txt.authinfo_url) {
+        return callback(new Error('Authentication is not supported on ' + domain));
+      }
 
-    var url = Array.isArray(txt.authinfo_url) ? txt.authinfo_url[0] : txt.authinfo_url;
+      var url = Array.isArray(txt.authinfo_url) ? txt.authinfo_url[0] : txt.authinfo_url;
 
-    url += '?domain=' + domain + '&username='+username;
+      url += '?domain=' + domain + '&username=' + username;
 
-    request.get(url, function(err, resp) {
-      if (err || resp.error) {
-        fn(new Error('Authentication info server unreachable'));
+      callback(null, url);
+    });
+  };
+
+  function getUser(url, callback) {
+    self._getUser(url, function(err, res) {
+      if (err || res.error) {
+        callback(new Error('Authentication info server unreachable'));
       } else {
-        fn(null, resp.body);
+        callback(null, res.body);
       }
     });
   };
+
+  async.waterfall([ getRippleTxt, getUser ], callback);
 };
 
 exports.AuthInfo = AuthInfo;

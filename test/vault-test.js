@@ -39,11 +39,6 @@ var rippleTxtRes = {
 var authInfoRes = {
   body: {
     version: 3,
-    exists: true,
-    username: 'exampleUser',
-    address: 'raVUps4RghLYkVBcpMaRbVKRTTzhesPXd',
-    emailVerified: true,
-    reserved: false,
     blobvault: 'https://id.staging.ripple.com',
     pakdf: {
       modulus: 'c7f1bc1dfb1be82d244aef01228c1409c1988943ca9e21431f1669b4aa3864c9f37f3d51b2b4ba1ab9e80f59d267fda1521e88b05117993175e004543c6e3611242f24432ce8efa3b81f0ff660b4f91c5d52f2511a6f38181a7bf9abeef72db056508bbb4eeb5f65f161dd2d5b439655d2ae7081fcc62fdcb281520911d96700c85cdaf12e7d1f15b55ade867240722425198d4ce39019550c4c8a921fc231d3e94297688c2d77cd68ee8fdeda38b7f9a274701fef23b4eaa6c1a9c15b2d77f37634930386fc20ec291be95aed9956801e1c76601b09c413ad915ff03bfdc0b6b233686ae59e8caf11750b509ab4e57ee09202239baee3d6e392d1640185e1cd',
@@ -51,7 +46,12 @@ var authInfoRes = {
       url: 'https://auth1.ripple.com/api/sign',
       exponent: '010001',
       host: 'auth1.ripple.com'
-    }
+    },
+    exists: true,
+    username: 'exampleUser',
+    address: 'raVUps4RghLYkVBcpMaRbVKRTTzhesPXd',
+    emailVerified: true,
+    reserved: false
   },
 };
 
@@ -98,7 +98,9 @@ describe('AuthInfo', function() {
 
     auth.get(exampleData.domain, exampleData.username, function(err, resp) {
       assert.ifError(err);
-      assert.deepEqual(resp, authInfoRes.body);
+      Object.keys(authInfoRes.body).forEach(function(prop) {
+        assert(resp.hasOwnProperty(prop));
+      });
       done();
     });
   });
@@ -180,14 +182,14 @@ describe('VaultClient', function() {
       this.timeout(10000);
       client.loginAndUnlock(exampleData.username, exampleData.password, function(err, resp) {
         assert.ifError(err);
-        assert.equal(typeof resp, 'object'); 
+        assert.equal(typeof resp, 'object');
         assert(resp.blob instanceof Blob);
         assert.equal(typeof resp.blob.id, 'string');
         assert(UInt256.from_json(resp.blob.id).is_valid(), true);
         assert.equal(typeof resp.blob.key, 'string');
         assert(UInt256.from_json(resp.blob.key).is_valid(), true);
         assert.equal(typeof resp.unlock, 'string');
-        assert(UInt256.from_json(resp.unlock).is_valid(), true);  
+        assert(UInt256.from_json(resp.unlock).is_valid(), true);
         assert.equal(typeof resp.secret, 'string');
         assert.equal(typeof resp.username, 'string');
         assert.equal(typeof resp.verified, 'boolean');
