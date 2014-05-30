@@ -8,9 +8,9 @@ function VaultClient(opts) {
   else if (typeof opts === "string") opts = {domain:opts};
   
   this.domain    = opts.domain || 'ripple.com';
-  this.authInfo  = new AuthInfo;
+  this.authInfo  = new AuthInfo();
   this.infos     = {};
-};
+}
   
   
 /**
@@ -198,7 +198,7 @@ VaultClient.prototype.exists = function (username, fn) {
     if (err) return fn(err);
     return fn(null, !!authInfo.exists);
   });
-}
+};
 
 
 /*
@@ -218,7 +218,7 @@ VaultClient.prototype.verify = function (username, token, fn) {
 
     blobClient.verify(authInfo.blobvault, username.toLowerCase(), token, fn);
   });    
-}
+};
 
 
 /*
@@ -270,7 +270,7 @@ VaultClient.prototype.register = function (options, fn) {
           'masterkey'    : options.masterkey || crypt.createMaster(),
           'activateLink' : options.activateLink,
           'oldUserBlob'  : options.oldUserBlob 
-        }
+        };
         
         blobClient.create(params, function(err, blob){
           if (err) return fn(err);
