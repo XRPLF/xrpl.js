@@ -53,6 +53,12 @@ var identityFields = [
   'birthplace'
 ];
 
+var entityTypes = [
+  'individual',
+  'organization',
+  'corporation'
+]
+
 var addressFields = [
   'contact',
   'line1',
@@ -691,7 +697,13 @@ Identity.prototype.set = function (pointer, key, value, fn) {
           }  
         }      
       }
-    }    
+    }   
+    
+  //validate entity type   
+  } else if (pointer === 'entityType') {
+    if (entityTypes.indexOf(value) === -1) {
+      return fn(new Error("invalid entity type"));   
+    }     
   }
   
   this.validate(function(err, res){
