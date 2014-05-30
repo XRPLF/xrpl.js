@@ -3,6 +3,8 @@ var request = require('superagent');
 var async   = require('async');
 var extend  = require("extend");
 
+var BlobClient = {};
+
 //Blob object class
 var BlobObj = function (url, id, key) {
   this.url  = url;
@@ -746,7 +748,7 @@ Identity.prototype.unset = function (pointer, key, fn) {
 /**
  * Blob object class
  */ 
-module.exports.Blob = BlobObj
+BlobClient.Blob = BlobObj
 
 /**
  * Get ripple name for a given address 
@@ -766,7 +768,7 @@ module.exports.getRippleName = function (url, address, fn) {
 /*
  * Retrive a blob with url, id and key   
  */
-module.exports.get = function (url, id, crypt, fn) {
+BlobClient.get = function (url, id, crypt, fn) {
   var blob = new BlobObj(url, id, crypt);
   blob.init(fn);
 }
@@ -775,7 +777,7 @@ module.exports.get = function (url, id, crypt, fn) {
 /*
  * Verify email address
  */
-module.exports.verify = function (url, username, token, fn) {
+BlobClient.verify = function (url, username, token, fn) {
   url += '/v1/user/' + username + '/verify/' + token;
   request.get(url, function(err, resp){
     if (err) return fn(err);
@@ -798,7 +800,7 @@ module.exports.verify = function (url, username, token, fn) {
  * @param {object} options.oldUserBlob
  * @param {function} fn
  */
-module.exports.create = function (options, fn) {
+BlobClient.create = function (options, fn) {
   
   var blob      = new BlobObj(options.url, options.id, options.crypt);
   
@@ -845,3 +847,5 @@ module.exports.create = function (options, fn) {
       else return fn(new Error("Could not create blob"));
   }); 
 }
+
+module.exports.BlobClient = BlobClient;
