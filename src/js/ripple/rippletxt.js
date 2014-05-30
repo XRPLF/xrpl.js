@@ -3,7 +3,7 @@ var request = require('superagent');
 
 function RippleTxt() {
   this.txts = {};
-};
+}
 
 
 /**
@@ -14,7 +14,9 @@ function RippleTxt() {
 RippleTxt.prototype.get = function (domain, fn) {
   var self = this;
   
-  if (self.txts[domain]) return fn(null, self.txts[domain]);
+  if (self.txts[domain]) {
+    return fn(null, self.txts[domain]);
+  }
   
   var urls = [
     'https://ripple.'+domain+'/ripple.txt',
@@ -38,7 +40,7 @@ RippleTxt.prototype.get = function (domain, fn) {
       fn(null, sections);            
     });         
   } 
-}    
+};   
 
 
 /**
@@ -68,6 +70,6 @@ RippleTxt.prototype.parse = function (txt) {
   }
 
   return sections;
-}
+};
 
 module.exports.RippleTxt = RippleTxt;
