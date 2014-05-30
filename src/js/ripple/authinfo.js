@@ -1,36 +1,60 @@
-var RippleTxt = require('./rippletxt').RippleTxt;
-var request   = require('superagent');
+var async      = require('async');
+var superagent = require('superagent');
+var RippleTxt  = require('./rippletxt').RippleTxt;
 
-function AuthInfo () {
+function AuthInfo() {
   this.rippleTxt = new RippleTxt();
-}
+};
+
+AuthInfo.prototype._getRippleTxt = function(domain, callback) {
+  this.rippleTxt.get(domain, callback);
+};
+
+AuthInfo.prototype._getUser = function(url, callback) {
+  superagent.get(url, callback);
+};
+
 
 /**
  * Get auth info for a given username
+ *
  * @param {string}    domain - Domain which hosts the user's info
  * @param {string}    username - Username who's info we are retreiving
  * @param {function}  fn - Callback function
  */
-AuthInfo.prototype.get = function (domain, username, fn) {
+
+AuthInfo.prototype.get = function(domain, username, callback) {
   var self = this;
-  
-  self.rippleTxt.get(domain, function(err, txt){
-    if (err) return fn(err);
-    
-    processTxt(txt);
-  });
-  
-  
-  function processTxt(txt) {
-    if (!txt.authinfo_url) return fn(new Error("Authentication is not supported on "+domain));
-    var url = Array.isArray(txt.authinfo_url) ? txt.authinfo_url[0] : txt.authinfo_url;
-    url += "?domain="+domain+"&username="+username;
-    
-    request.get(url, function(err, resp){
-      if (err || resp.error) return fn(new Error("Authentication info server unreachable"));
-      fn(null, resp.body);
-    }); 
-  }  
+
+  function getRippleTxt(callback) {
+    self._getRippleTxt(domain, function(err, txt) {
+      if (err) {
+        return callback(err);
+      }
+
+      if (!txt.authinfo_url) {
+        return callback(new Error('Authentication is not supported on ' + domain));
+      }
+
+      var url = Array.isArray(txt.authinfo_url) ? txt.authinfo_url[0] : txt.authinfo_url;
+
+      url += '?domain=' + domain + '&username=' + username;
+
+      callback(null, url);
+    });
+  };
+
+  function getUser(url, callback) {
+    self._getUser(url, function(err, res) {
+      if (err || res.error) {
+        callback(new Error('Authentication info server unreachable'));
+      } else {
+        callback(null, res.body);
+      }
+    });
+  };
+
+  async.waterfall([ getRippleTxt, getUser ], callback);
 };
 
-module.exports.AuthInfo = AuthInfo;
+exports.AuthInfo = AuthInfo;
