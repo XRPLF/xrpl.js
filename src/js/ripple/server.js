@@ -91,7 +91,7 @@ function Server(remote, opts) {
   };
 
   this._url = this._opts.url = (this._opts.secure ? 'wss://' : 'ws://')
-      + this._opts.host + ':' + this._opts.port,
+      + this._opts.host + ':' + this._opts.port;
 
   this.on('message', onMessage);
 
