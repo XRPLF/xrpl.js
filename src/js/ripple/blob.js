@@ -671,7 +671,9 @@ Identity.prototype.get = function (pointer, key) {
 
 Identity.prototype.set = function (pointer, key, value, fn) {
   var self = this;
-
+  
+  if (!fn) fn = function(){ };
+  
   //check fields for validity
   if (identityFields.indexOf(pointer) === -1) {
     return fn(new Error("invalid identity field"));   
@@ -700,10 +702,8 @@ Identity.prototype.set = function (pointer, key, value, fn) {
       }
       
       if (idField === 'type') {
-        for (var idType in value.type) {
-          if (idTypeFields.indexOf(idType) === -1) {
-            return fn(new Error("invalid nationalID type"));   
-          }  
+        if (idTypeFields.indexOf(value[idField]) === -1) {
+          return fn(new Error("invalid nationalID type"));   
         }      
       }
     }   
@@ -751,6 +751,8 @@ Identity.prototype.set = function (pointer, key, value, fn) {
  */
 
 Identity.prototype.unset = function (pointer, key, fn) {
+  
+  if (!fn) fn = function(){ };
   
   //NOTE: this is rather useless since you can overwrite
   //without an encryption key
