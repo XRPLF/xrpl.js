@@ -1,10 +1,11 @@
-var sjcl  = require('./utils').sjcl,
-  base    = require('./base').Base,
-  UInt160 = require('./uint160').UInt160,
-  message = require('./message'),
-  request = require('superagent'), 
-  extend  = require("extend"),
-  parser  = require("url");
+var sjcl    = require('./utils').sjcl;
+var base    = require('./base').Base;
+var UInt160 = require('./uint160').UInt160;
+var message = require('./message');
+var request = require('superagent'); 
+var extend  = require("extend");
+var parser  = require("url");
+var Crypt   = {};
   
 var cryptConfig = {
   cipher : "aes",
@@ -14,7 +15,6 @@ var cryptConfig = {
   iter   : 1000  // iterations (key derivation)
 };
 
-var Crypt = {};
 
 /**
  * Full domain hash based on SHA512
@@ -104,9 +104,9 @@ Crypt.derive = function (opts, purpose, username, secret, fn) {
       break;
   }
 
-  var iBlind   = iRandom.powermodMontgomery(iPublic.mul(iExponent), iModulus),
-      iSignreq = iSecret.mulmod(iBlind, iModulus),
-      signreq  = sjcl.codec.hex.fromBits(iSignreq.toBits());
+  var iBlind   = iRandom.powermodMontgomery(iPublic.mul(iExponent), iModulus);
+  var iSignreq = iSecret.mulmod(iBlind, iModulus);
+  var signreq  = sjcl.codec.hex.fromBits(iSignreq.toBits());
   
   request.post(opts.url)
     .send({
@@ -118,13 +118,13 @@ Crypt.derive = function (opts, purpose, username, secret, fn) {
     
     var data = resp.body || resp.text ? JSON.parse(resp.text) : {};
     
-    if (!data.result=='success') return fn(new Error("Could not query PAKDF server "+opts.host)); 
+    if (data.result !== 'success') return fn(new Error("Could not query PAKDF server "+opts.host)); 
     
     var iSignres = new sjcl.bn(String(data.signres));
-      iRandomInv = iRandom.inverseMod(iModulus),
-      iSigned    = iSignres.mulmod(iRandomInv, iModulus),
-      key        = iSigned.toBits(),
-      result     = {};
+    var iRandomInv = iRandom.inverseMod(iModulus);
+    var iSigned    = iSignres.mulmod(iRandomInv, iModulus);
+    var key        = iSigned.toBits();
+    var result     = {};
     
     tokens.forEach(function (token) {
       result[token] = keyHash(key, token);
@@ -132,7 +132,7 @@ Crypt.derive = function (opts, purpose, username, secret, fn) {
                         
     fn (null, result);     
   }); 
-}
+};
 
 /**
  * Imported from ripple-client
@@ -140,7 +140,7 @@ Crypt.derive = function (opts, purpose, username, secret, fn) {
  */
 Crypt.RippleAddress = (function () {
   function append_int(a, i) {
-    return [].concat(a, i >> 24, (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff)
+    return [].concat(a, i >> 24, (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff);
   }
 
   function firstHalfOfSHA512(bytes) {
@@ -158,7 +158,7 @@ Crypt.RippleAddress = (function () {
     this.seed = base.decode_check(33, seed);
 
     if (!this.seed) {
-      throw "Invalid seed."
+      throw "Invalid seed.";
     }
 
     this.getAddress = function (seq) {
@@ -206,7 +206,7 @@ Crypt.encrypt = function(key, data)
   encryptedBits = sjcl.bitArray.concat(encryptedBits, ciphertext);
 
   return sjcl.codec.base64.fromBits(encryptedBits);
-}
+};
 
 
 /**
@@ -214,8 +214,8 @@ Crypt.encrypt = function(key, data)
  * @params {string} key
  * @params {string} data
  */
-Crypt.decrypt = function(key, data)
-{
+Crypt.decrypt = function (key, data) {
+  
   key = sjcl.codec.hex.toBits(key);
   var encryptedBits = sjcl.codec.base64.toBits(data);
 
@@ -231,7 +231,7 @@ Crypt.decrypt = function(key, data)
   });
 
   return sjcl.decrypt(key, JSON.stringify(encrypted));
-} 
+}; 
 
 
 /**
@@ -240,7 +240,7 @@ Crypt.decrypt = function(key, data)
  */
 Crypt.isValidAddress = function (address) {
   return UInt160.is_valid(address);
-}
+};
 
 
 /**
@@ -249,7 +249,7 @@ Crypt.isValidAddress = function (address) {
  */
 Crypt.createSecret = function (nWords) {
   return sjcl.codec.hex.fromBits(sjcl.random.randomWords(nWords));
-}
+};
 
 
 /**
@@ -257,7 +257,7 @@ Crypt.createSecret = function (nWords) {
  */
 Crypt.createMaster = function () {
   return base.encode_check(33, sjcl.codec.bytes.fromBits(sjcl.random.randomWords(4)));
-}
+};
 
 
 /**
@@ -266,7 +266,7 @@ Crypt.createMaster = function () {
  */
 Crypt.getAddress = function (masterkey) {
   return new Crypt.RippleAddress(masterkey).getAddress();
-}
+};
 
 
 /**
@@ -275,7 +275,7 @@ Crypt.getAddress = function (masterkey) {
  */
 Crypt.hashSha512 = function (data) {
   return sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(data)); 
-}
+};
 
 
 /**
@@ -286,7 +286,7 @@ Crypt.hashSha512 = function (data) {
 Crypt.signString = function (secret, data) {
   var hmac = new sjcl.misc.hmac(sjcl.codec.hex.toBits(secret), sjcl.hash.sha512);
   return sjcl.codec.hex.fromBits(hmac.mac(data));
-}
+};
 
 
 /**
@@ -299,7 +299,7 @@ Crypt.deriveRecoveryEncryptionKeyFromSecret = function(secret) {
   var key  = hmac.mac("ripple/hmac/recovery_encryption_key/v1");
   key      = sjcl.bitArray.bitSlice(key, 0, 256);
   return sjcl.codec.hex.fromBits(key);
-}
+};
 
 /**
  * Convert base64 encoded data into base64url encoded data.
@@ -355,12 +355,12 @@ Crypt.getStringToSign = function (config, parsed, date, mechanism) {
   // We don't have a credential scope, so we skip it.
   //
   // But that modifies the format, so the format ID is RIPPLE1, instead of AWS4.
-  return stringToSign = [
+  return [
     mechanism,
     date,
     Crypt.hashSha512(canonicalRequest).toLowerCase()
   ].join('\n');
-}
+};
 
 
 /**
@@ -383,7 +383,7 @@ Crypt.signRequestHmac = function (config, auth_secret, blob_id) {
     'signature='+Crypt.base64ToBase64Url(signature)+
     '&signature_date='+date+
     '&signature_blob_id='+blob_id+
-    '&signature_type='+signatureType
+    '&signature_type='+signatureType;
 
   return config;
 }; 
@@ -457,7 +457,7 @@ function isPlainObject(obj) {
   for ( key in obj ) {}
 
   return key === undefined || hasOwn.call( obj, key );
-};
+}
 
 
 var dateAsIso8601 = (function () {
@@ -467,14 +467,14 @@ var dateAsIso8601 = (function () {
 
   return function dateAsIso8601() {
     var date = new Date();
-    return date.getUTCFullYear() + "-"
-      + pad(date.getUTCMonth() + 1) + "-"
-      + pad(date.getUTCDate()) + "T"
-      + pad(date.getUTCHours()) + ":"
-      + pad(date.getUTCMinutes()) + ":"
-      + pad(date.getUTCSeconds()) + ".000Z";
+    return date.getUTCFullYear() + "-" +
+      pad(date.getUTCMonth() + 1) + "-" +
+      pad(date.getUTCDate()) + "T" +
+      pad(date.getUTCHours()) + ":" +
+      pad(date.getUTCMinutes()) + ":" +
+      pad(date.getUTCSeconds()) + ".000Z";
   };
 })();
 
 
-module.exports = Crypt;
+module.exports.Crypt = Crypt;

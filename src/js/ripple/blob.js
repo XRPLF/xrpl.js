@@ -1,4 +1,4 @@
-var crypt   = require('./crypt');
+var crypt   = require('./crypt').Crypt;
 var request = require('superagent');
 var async   = require('async');
 var extend  = require("extend");
@@ -67,7 +67,7 @@ var nationalIDFields = [
   'number',
   'type',
   'country',
-]
+];
 
 var idTypeFields = [
   'ssn',
@@ -75,7 +75,7 @@ var idTypeFields = [
   'passport',
   'driversLicense',
   'other'
-]
+];
 
 /*
  * Initialize a new blob object
@@ -112,7 +112,7 @@ BlobObj.prototype.init = function (fn) {
       fn(null, self);//return with newly decrypted blob      
     
   }).timeout(8000);  
-} 
+};
 
 
 /*
@@ -175,7 +175,7 @@ BlobObj.prototype.applyEncryptedPatch = function (patch)
     console.log(err.stack);
     return false;
   }
-}
+};
 
 
 /**
@@ -550,8 +550,8 @@ var Identity = function (blob) {
         else     return fn(null, true);
       }); 
     } else return fn(null, true);
-  }
-} 
+  };
+}; 
 
 
 /**
@@ -578,7 +578,7 @@ Identity.prototype.getFullAddress = function (key) {
   if (address.value.postalCode) text += " " + address.value.postalCode;
   if (address.value.country)    text += " " + address.value.country;
   return text;
-}
+};
 
 /**
  * getAll
@@ -598,7 +598,7 @@ Identity.prototype.getAll = function (key) {
   }
   
   return result;
-}
+};
 
 
 /**
@@ -643,7 +643,7 @@ Identity.prototype.get = function (pointer, key) {
     
     return result;
   }
-}
+};
 
 
 /**
@@ -709,7 +709,7 @@ Identity.prototype.set = function (pointer, key, value, fn) {
     data[pointer] = {
       encrypted : key ? true : false,
       value     : key ? encrypt(key, value) : value  
-    }
+    };
     
     self.blob.extend("/" + identityRoot, data, fn);
   });
@@ -718,7 +718,7 @@ Identity.prototype.set = function (pointer, key, value, fn) {
     if (typeof value === 'object') value = JSON.stringify(value);
     return crypt.encrypt(key, value);
   }
-}
+};
 
 
 /**
@@ -739,7 +739,7 @@ Identity.prototype.unset = function (pointer, key, fn) {
   }
   
   this.blob.unset("/" + identityRoot+"/" + pointer, fn);
-}
+};
 
 
 
@@ -748,7 +748,7 @@ Identity.prototype.unset = function (pointer, key, fn) {
 /**
  * Blob object class
  */ 
-BlobClient.Blob = BlobObj
+BlobClient.Blob = BlobObj;
 
 /**
  * Get ripple name for a given address 
@@ -762,7 +762,7 @@ module.exports.getRippleName = function (url, address, fn) {
     else if (resp.body && resp.body.exists === false) return fn (new Error("No ripple name for this address"));
     else return fn(new Error("Unable to determine if ripple name exists"));
   }); 
-} 
+}; 
 
 
 /*
@@ -771,7 +771,7 @@ module.exports.getRippleName = function (url, address, fn) {
 BlobClient.get = function (url, id, crypt, fn) {
   var blob = new BlobObj(url, id, crypt);
   blob.init(fn);
-}
+};
 
 
 /*
@@ -784,7 +784,7 @@ BlobClient.verify = function (url, username, token, fn) {
     else if (resp.body && resp.body.result === 'success') return fn(null, data);
     else return fn(new Error("Failed to verify the account"));  
   }); 
-}
+};
 
 
 /**
@@ -846,6 +846,6 @@ BlobClient.create = function (options, fn) {
       else if (resp.body && resp.body.result === 'success') return fn(null, blob,resp.body);
       else return fn(new Error("Could not create blob"));
   }); 
-}
+};
 
 module.exports.BlobClient = BlobClient;

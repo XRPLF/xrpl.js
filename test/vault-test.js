@@ -1,8 +1,8 @@
 var assert    = require('assert'),
-  RippleTxt   = require('../src/js/ripple/rippletxt'),
-  AuthInfo    = require('../src/js/ripple/authinfo'),
-  VaultClient = require('../src/js/ripple/vaultclient'),
-  Blob        = require('../src/js/ripple/blob').Blob,
+  RippleTxt   = require('../src/js/ripple/rippletxt').RippleTxt,
+  AuthInfo    = require('../src/js/ripple/authinfo').AuthInfo,
+  VaultClient = require('../src/js/ripple/vaultclient').VaultClient,
+  Blob        = require('../src/js/ripple/blob').BlobClient.Blob,
   UInt256     = require('../src/js/ripple/uint256').UInt256;
 
 var exampleData = {
@@ -47,7 +47,7 @@ describe('AuthInfo', function () {
 describe('VaultClient', function () {
   var client = new VaultClient(exampleData.domain);
   
-  describe('initialization', function () {
+  describe('#initialization', function () {
     it('should be initialized with a domain', function () {
       var client = new VaultClient({ domain: exampleData.domain });
       assert.strictEqual(client.domain, exampleData.domain);
