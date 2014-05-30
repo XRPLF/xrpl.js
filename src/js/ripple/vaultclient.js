@@ -1,5 +1,5 @@
 var AuthInfo   = require('./authinfo');
-var blobClient = require('./blob');
+var blobClient = require('./blob').BlobClient;
 var crypt      = require('./crypt');
 
 
@@ -282,4 +282,4 @@ VaultClient.prototype.register = function (options, fn) {
 };
 
 
-module.exports = VaultClient;
+module.exports.VaultClient = VaultClient;
