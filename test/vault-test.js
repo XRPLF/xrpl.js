@@ -121,6 +121,7 @@ describe('VaultClient', function() {
 
   describe('#exists', function() {
     it('should determine if a username exists on the domain', function(done) {
+      this.timeout(10000);
       client.exists(exampleData.username, function(err, resp) {
         assert.ifError(err);
         assert.strictEqual(typeof resp, 'boolean');

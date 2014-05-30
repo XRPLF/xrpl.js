@@ -76,6 +76,7 @@ function Remote(opts, trace) {
   EventEmitter.call(this);
 
   var self = this;
+  var opts = opts || { };
 
   this.trusted = Boolean(opts.trusted);
   this.state = 'offline'; // 'online', 'offline'
@@ -142,18 +143,6 @@ function Remote(opts, trace) {
     }
   };
 
-  // Fallback for previous API
-  if (!opts.hasOwnProperty('servers')) {
-    opts.servers = [
-      {
-        host:     opts.websocket_ip,
-        port:     opts.websocket_port,
-        secure:   opts.websocket_ssl,
-        trusted:  opts.trusted
-      }
-    ];
-  }
-
   if (typeof this._connection_offset !== 'number') {
     throw new TypeError('Remote "connection_offset" configuration is not a Number');
   }
@@ -194,16 +183,32 @@ function Remote(opts, trace) {
     throw new TypeError('Remote "storage" configuration is not an Object');
   }
 
-  opts.servers.forEach(function(server) {
+  // Fallback for previous API
+  if (!opts.hasOwnProperty('servers') && opts.websocket_ip) {
+    opts.servers = [
+      {
+        host:     opts.websocket_ip,
+        port:     opts.websocket_port,
+        secure:   opts.websocket_ssl,
+        trusted:  opts.trusted
+      }
+    ];
+  }
+
+  (opts.servers || []).forEach(function(server) {
     var pool = Number(server.pool) || 1;
-    while (pool--) { self.addServer(server); };
+    while (pool--) {
+      self.addServer(server);
+    };
   });
 
   // This is used to remove Node EventEmitter warnings
   var maxListeners = opts.maxListeners || opts.max_listeners || 0;
 
   this._servers.concat(this).forEach(function(emitter) {
-    emitter.setMaxListeners(maxListeners);
+    if (emitter instanceof EventEmitter) {
+      emitter.setMaxListeners(maxListeners);
+    }
   });
 
   function listenerAdded(type, listener) {

@@ -90,11 +90,8 @@ function Server(remote, opts) {
     response: 1
   };
 
-  this._url = this._opts.url = url.format({
-    hostname: self._opts.host,
-    port: self._opts.port,
-    protocol: (self._opts.secure ? 'wss://' : 'ws://')
-  });
+  this._url = this._opts.url = (this._opts.secure ? 'wss://' : 'ws://')
+      + this._opts.host + ':' + this._opts.port,
 
   this.on('message', onMessage);
 

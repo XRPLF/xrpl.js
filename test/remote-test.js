@@ -13,6 +13,7 @@ describe('Remote', function () {
       trace :         true,
       trusted:        true,
       local_signing:  true,
+
       servers: [
         { host: 's-west.ripple.com', port: 443, secure: true },
         { host: 's-east.ripple.com', port: 443, secure: true }
@@ -24,26 +25,162 @@ describe('Remote', function () {
 
       bridge: {
         out: {
-    //    'bitcoin': 'localhost:3000'
-    //    'bitcoin': 'https://www.bitstamp.net/ripple/bridge/out/bitcoin/'
+          //    'bitcoin': 'localhost:3000'
+          //    'bitcoin': 'https://www.bitstamp.net/ripple/bridge/out/bitcoin/'
         }
       },
 
     };
   })
-  describe('initialing a remote with options', function () {
-    it('should add a server for each specified', function (done) {
-      var remote = new Remote(options);
+
+  describe('remote server initialization - url object', function() {
+    it('should construct url', function (done) {
+      var remote = new Remote({
+        servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ],
+      });
+      assert(Array.isArray(remote._servers));
+      assert(remote._servers[0] instanceof Server);
+      assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
       done();
     })
-    
-    
-    
-    
-    
-  })
+  });
 
-  describe('functions that return request objects', function () {
+  describe('remote server initialization - url object - no secure property', function() {
+    it('should construct url', function (done) {
+      var remote = new Remote({
+        servers: [ { host: 's-west.ripple.com', port: 443 } ]
+      });
+      assert(Array.isArray(remote._servers));
+      assert(remote._servers[0] instanceof Server);
+      assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
+      done();
+    })
+  });
+
+  describe('remote server initialization - url object - secure: false', function() {
+    it('should construct url', function (done) {
+      var remote = new Remote({
+        servers: [ { host: 's-west.ripple.com', port: 443, secure: false } ]
+      });
+      assert(Array.isArray(remote._servers));
+      assert(remote._servers[0] instanceof Server);
+      assert.strictEqual(remote._servers[0]._url, 'ws://s-west.ripple.com:443');
+      done();
+    })
+  });
+
+  describe('remote server initialization - url object - string port', function() {
+    it('should construct url', function (done) {
+      var remote = new Remote({
+        servers: [ { host: 's-west.ripple.com', port: '443', secure: true } ]
+      });
+      assert(Array.isArray(remote._servers));
+      assert(remote._servers[0] instanceof Server);
+      assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
+      done();
+    })
+  });
+
+  describe('remote server initialization - url object - invalid host', function() {
+    it('should construct url', function (done) {
+      assert.throws(
+        function() {
+          var remote = new Remote({
+            servers: [ { host: '+', port: 443, secure: true } ]
+          });
+      }, Error);
+      done();
+    })
+  });
+
+  describe('remote server initialization - url object - invalid port', function() {
+    it('should construct url', function (done) {
+      assert.throws(
+        function() {
+          var remote = new Remote({
+            servers: [ { host: 's-west.ripple.com', port: null, secure: true } ]
+          });
+      }, TypeError);
+      done();
+    })
+  });
+
+  describe('remote server initialization - url object - port out of range', function() {
+    it('should construct url', function (done) {
+      assert.throws(
+        function() {
+          var remote = new Remote({
+            servers: [ { host: 's-west.ripple.com', port: 65537, secure: true } ]
+          });
+      }, Error);
+      done();
+    })
+  });
+
+  describe('remote server initialization - url string', function() {
+    it('should construct url', function (done) {
+      var remote = new Remote({
+        servers: [ 'wss://s-west.ripple.com:443' ]
+      });
+      assert(Array.isArray(remote._servers));
+      assert(remote._servers[0] instanceof Server);
+      assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
+      done();
+    })
+  });
+
+  describe('remote server initialization - url string - ws://', function() {
+    it('should construct url', function (done) {
+      var remote = new Remote({
+        servers: [ 'ws://s-west.ripple.com:443' ]
+      });
+      assert(Array.isArray(remote._servers));
+      assert(remote._servers[0] instanceof Server);
+      assert.strictEqual(remote._servers[0]._url, 'ws://s-west.ripple.com:443');
+      done();
+    })
+  });
+
+  describe('remote server initialization - url string - invalid host', function() {
+    it('should construct url', function (done) {
+      assert.throws(
+        function() {
+          var remote = new Remote({
+            servers: [ 'ws://+:443' ]
+          });
+        }, Error
+      );
+      done();
+    })
+  });
+
+  describe('remote server initialization - url string - invalid port', function() {
+    it('should construct url', function (done) {
+      assert.throws(
+        function() {
+          var remote = new Remote({
+            servers: [ 'ws://s-west.ripple.com:null' ]
+          });
+        }, Error
+      );
+      done();
+    })
+  });
+
+  describe('remote server initialization - url string - port out of range', function() {
+    it('should construct url', function (done) {
+      assert.throws(
+        function() {
+          var remote = new Remote({
+            servers: [ 'ws://s-west.ripple.com:65537:' ]
+          });
+        }, Error
+      );
+      done();
+    })
+  });
+
+  describe('request constructors', function () {
     beforeEach(function () {
       callback = function () {}
       remote = new Remote(options);
@@ -105,6 +242,7 @@ describe('Remote', function () {
       });
     });
   })
+
   describe('create remote and get pending transactions', function() {
     before(function() {
       tx =  [{
@@ -121,26 +259,26 @@ describe('Remote', function () {
           Paths : [
             [
               {
-                account : "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-                currency : "USD",
-                issuer : "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-                type : 49,
-                type_hex : "0000000000000031"
-              },
-              {
-                currency : "LTC",
-                issuer : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
-                type : 48,
-                type_hex : "0000000000000030"
-              },
-              {
-                account : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
-                currency : "LTC",
-                issuer : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
-                type : 49,
-                type_hex : "0000000000000031"
-              }
-            ]
+            account : "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+            currency : "USD",
+            issuer : "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+            type : 49,
+            type_hex : "0000000000000031"
+          },
+          {
+            currency : "LTC",
+            issuer : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+            type : 48,
+            type_hex : "0000000000000030"
+          },
+          {
+            account : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+            currency : "LTC",
+            issuer : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+            type : 49,
+            type_hex : "0000000000000031"
+          }
+          ]
           ],
           SendMax : {
             currency : "USD",
@@ -164,6 +302,7 @@ describe('Remote', function () {
         }
       }
     })
+
     it('should set transaction members correct ', function(done) {
       remote = new Remote(options);
       remote.storage = database;
@@ -181,13 +320,13 @@ describe('Remote', function () {
             assert.equal(this.submitIndex, tx[0].submitIndex);
             assert.equal(this.secret, tx[0].secret);
             done();
-            
+
           },
           parseJson: function(json) {}
         }
       }
       remote.getPendingTransactions();
-      
+
     })
   })
 })
