@@ -14,6 +14,7 @@ AuthInfo.prototype._getUser = function(url, callback) {
   superagent.get(url, callback);
 };
 
+
 /**
  * Get auth info for a given username
  *

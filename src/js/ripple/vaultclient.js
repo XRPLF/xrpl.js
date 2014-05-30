@@ -1,5 +1,5 @@
 var async      = require('async');
-var blobClient = require('./blob');
+var blobClient = require('./blob').BlobClient;
 var AuthInfo   = require('./authinfo').AuthInfo;
 var crypt      = require('./crypt').Crypt;
 

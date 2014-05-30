@@ -1,13 +1,16 @@
+var crypt   = require('./crypt').Crypt;
 var request = require('superagent');
-var extend  = require('extend');
-var crypt = require('./crypt').Crypt;
+var extend  = require("extend");
+
+var BlobClient = {};
 
 //Blob object class
 function BlobObj(url, id, key) {
-  this.url  = url;
-  this.id   = id;
-  this.key  = key;
-  this.data = { };
+  this.url      = url;
+  this.id       = id;
+  this.key      = key; 
+  this.identity = new Identity(this);
+  this.data     = { };
 };
 
 // Blob operations
@@ -35,6 +38,49 @@ BlobObj.opsReverseMap = [ ];
 for (var name in BlobObj.ops) {
   BlobObj.opsReverseMap[BlobObj.ops[name]] = name;
 }
+
+//Identity fields
+var identityRoot   = 'identityVault';
+var identityFields = [
+  'name',
+  'entityType',
+  'email',
+  'phone',
+  'address',
+  'nationalID',
+  'birthday',
+  'birthplace'
+];
+
+var entityTypes = [
+  'individual',
+  'organization',
+  'corporation'
+]
+
+var addressFields = [
+  'contact',
+  'line1',
+  'line2',
+  'city',
+  'region',  //state/province/region
+  'postalCode',
+  'country'
+];
+
+var nationalIDFields = [
+  'number',
+  'type',
+  'country',
+];
+
+var idTypeFields = [
+  'ssn',
+  'taxID',
+  'passport',
+  'driversLicense',
+  'other'
+];
 
 /**
  * Initialize a new blob object
@@ -494,15 +540,237 @@ function normalizeSubcommands(subcommands, compress) {
   } else {
     return subcommands;
   }
+}
+
+
+/***** identity ****/
+
+/** 
+ * Identity class
+ * 
+ */
+
+var Identity = function (blob) {
+  var self  = this;
+  self.blob = blob;
+  
+  //make sure the identity setup is valid
+  self.validate = function(fn) {
+    if (!self.blob) return fn(new Error("Identity must be associated with a blob"));
+    else if (!self.blob.data) return fn(new Error("Invalid Blob"));  
+    else if (!self.blob.data[identityRoot]) {
+      self.blob.set(identityRoot, {}, function(err, res){
+        if (err) return fn(err);
+        else     return fn(null, true);
+      }); 
+    } else return fn(null, true);
+  };
+}; 
+
+/**
+ * getFullAddress
+ * returns the address formed into a text string
+ * @param {string} key - Encryption key
+ */
+
+Identity.prototype.getFullAddress = function (key) {
+  if (!this.blob || 
+      !this.blob.data || 
+      !this.blob.data[identityRoot] ||
+      !this.blob.data[identityRoot].address) {
+    return "";
+  }     
+  
+  var address = this.get('address', key);
+  var text    = "";
+  
+  if (address.value.contact)    text += address.value.contact;
+  if (address.value.line1)      text += " " + address.value.line1;
+  if (address.value.line2)      text += " " + address.value.line2;
+  if (address.value.city)       text += " " + address.value.city;
+  if (address.value.region)     text += " " + address.value.region;
+  if (address.value.postalCode) text += " " + address.value.postalCode;
+  if (address.value.country)    text += " " + address.value.country;
+  return text;
+};
+
+/**
+ * getAll
+ * get and decrypt all identity fields
+ * @param {string} key  - Encryption key
+ * @param {function} fn - Callback function
+ */
+
+Identity.prototype.getAll = function (key) {
+
+  if (!this.blob || !this.blob.data || !this.blob.data[identityRoot]) {
+    return {};
+  }   
+  
+  var result = {}, identity = this.blob.data[identityRoot];
+  for (var i in identity) {
+    result[i] = this.get(i, key);
+  }
+  
+  return result;
+};
+
+/**
+ * get
+ * get and decrypt a single identity field
+ * @param {string} pointer - Field to retrieve
+ * @param {string} key     - Encryption key
+ */
+
+Identity.prototype.get = function (pointer, key) {
+  if (!this.blob || !this.blob.data || !this.blob.data[identityRoot]) {
+    return null;
+  }
+  
+  var data = this.blob.data[identityRoot][pointer];
+  if (data && data.encrypted) {
+    return decrypt(key, data);
+    
+  } else if (data) {
+    return data;
+    
+  } else {
+    return null;
+  }
+  
+  function decrypt (key, data) {
+    var value;
+    var result = {encrypted : true};
+    
+    try {
+      value = crypt.decrypt(key, data.value);
+    } catch (e) {
+      result.value  = data.value;
+      result.error  = e; 
+      return result;
+    }
+    
+    try {
+      result.value = JSON.parse(value);
+    } catch (e) {
+      result.value = value;
+    }
+    
+    return result;
+  }
+};
+
+/**
+ * set
+ * set and encrypt a single identity field.
+ * @param {string} pointer - Field to set
+ * @param {string} key     - Encryption key
+ * @param {string} value   - Unencrypted data
+ * @param {function} fn    - Callback function
+ */
+
+Identity.prototype.set = function (pointer, key, value, fn) {
+  var self = this;
+  
+  if (!fn) fn = function(){ };
+  
+  //check fields for validity
+  if (identityFields.indexOf(pointer) === -1) {
+    return fn(new Error("invalid identity field"));   
+  
+  //validate address fields  
+  } else if (pointer === 'address') {
+    if (typeof value !== 'object') {
+      return fn(new Error("address must be an object"));   
+    }
+    
+    for (var addressField in value) {
+      if (addressFields.indexOf(addressField) === -1) {
+        return fn(new Error("invalid address field"));   
+      }
+    }
+  
+  //validate nationalID fields  
+  } else if (pointer === 'nationalID') {
+    if (typeof value !== 'object') {
+      return fn(new Error("nationalID must be an object"));   
+    }
+    
+    for (var idField in value) {
+      if (nationalIDFields.indexOf(idField) === -1) {
+        return fn(new Error("invalid nationalID field"));   
+      }
+      
+      if (idField === 'type') {
+        if (idTypeFields.indexOf(value[idField]) === -1) {
+          return fn(new Error("invalid nationalID type"));   
+        }      
+      }
+    }   
+    
+  //validate entity type   
+  } else if (pointer === 'entityType') {
+    if (entityTypes.indexOf(value) === -1) {
+      return fn(new Error("invalid entity type"));   
+    }     
+  }
+  
+  this.validate(function(err, res){
+    if (err) return fn(err);
+    
+    //NOTE: currently we will overwrite if it already exists
+    //the other option would be to require decrypting with the
+    //existing key as a form of authorization
+    //var current = self.get(pointer, key);  
+    //if (current && current.error) {
+    //  return fn ? fn(current.error) : undefined;
+    //}
+    
+    var data = {};
+    data[pointer] = {
+      encrypted : key ? true : false,
+      value     : key ? encrypt(key, value) : value  
+    };
+    
+    self.blob.extend("/" + identityRoot, data, fn);
+  });
+  
+  function encrypt (key, value) {
+    if (typeof value === 'object') value = JSON.stringify(value);
+    return crypt.encrypt(key, value);
+  }
+};
+
+/**
+ * unset
+ * remove a single identity field - will only be removed
+ * with a valid decryption key
+ * @param {string} pointer - Field to remove
+ * @param {string} key     - Encryption key
+ * @param {function} fn    - Callback function
+ */
+
+Identity.prototype.unset = function (pointer, key, fn) {
+  
+  if (!fn) fn = function(){ };
+  
+  //NOTE: this is rather useless since you can overwrite
+  //without an encryption key
+  var data = this.get(pointer, key);
+  if (data && data.error) {
+    return fn(data.error);
+  }
+  
+  this.blob.unset("/" + identityRoot+"/" + pointer, fn);
 };
 
 /***** blob client methods ****/
 
 /**
  * Blob object class
- */
-
-exports.Blob = BlobObj
+ */ 
+ 
+exports.Blob = BlobObj;
 
 /**
  * Get ripple name for a given address
@@ -530,7 +798,7 @@ exports.getRippleName = function(url, address, fn) {
  * Retrive a blob with url, id and key
  */
 
-exports.get = function(url, id, crypt, fn) {
+BlobClient.get = function (url, id, crypt, fn) {
   var blob = new BlobObj(url, id, crypt);
   blob.init(fn);
 };
@@ -539,7 +807,7 @@ exports.get = function(url, id, crypt, fn) {
  * Verify email address
  */
 
-exports.verify = function(url, username, token, fn) {
+BlobClient.verify = function(url, username, token, fn) {
   url += '/v1/user/' + username + '/verify/' + token;
   request.get(url, function(err, resp){
     if (err) {
@@ -566,7 +834,7 @@ exports.verify = function(url, username, token, fn) {
  * @param {function} fn
  */
 
-exports.create = function(options, fn) {
+BlobClient.create = function(options, fn) {
   var blob = new BlobObj(options.url, options.id, options.crypt);
 
   blob.revision = 0;
@@ -617,3 +885,5 @@ exports.create = function(options, fn) {
       }
     });
 };
+
+exports.BlobClient = BlobClient;

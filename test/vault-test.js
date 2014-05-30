@@ -106,16 +106,16 @@ describe('AuthInfo', function() {
   });
 });
 
-describe('VaultClient', function() {
+describe('VaultClient', function () {
   var client = new VaultClient(exampleData.domain);
 
-  describe('initialization', function() {
+  describe('#initialization', function() {
     it('should be initialized with a domain', function() {
       var client = new VaultClient({ domain: exampleData.domain });
       assert.strictEqual(client.domain, exampleData.domain);
     });
 
-    it('should default to ripple.com without a domain', function() {
+    it('should default to ripple.com without a domain', function () {
       var client = new VaultClient();
       assert.strictEqual(client.domain, 'ripple.com');
     });
@@ -131,7 +131,7 @@ describe('VaultClient', function() {
       });
     });
   });
-
+  
   describe('#login', function() {
     it('with username and password should retrive the blob, crypt key, and id', function(done) {
       this.timeout(10000);
@@ -150,7 +150,6 @@ describe('VaultClient', function() {
     });
   });
 
-
   describe('#relogin', function() {
     it('should retrieve the decrypted blob with blob vault url, id, and crypt key', function(done) {
       this.timeout(10000);
@@ -164,7 +163,7 @@ describe('VaultClient', function() {
   });
 
   describe('#unlock', function() {
-    it('should access the wallet secret using encryption secret, username and password', function(done) {
+    it('should access the wallet secret using encryption secret, username and password', function (done) {
       this.timeout(10000);
       client.unlock(exampleData.username, exampleData.password, exampleData.encrypted_secret, function(err, resp) {
         assert.ifError(err);
@@ -177,8 +176,8 @@ describe('VaultClient', function() {
     });
   });
 
-  describe('#loginAndUnlock', function() {
-    it('should get the decrypted blob and decrypted secret given name and password', function(done) {
+  describe('#loginAndUnlock', function () {
+    it('should get the decrypted blob and decrypted secret given name and password', function (done) {
       this.timeout(10000);
       client.loginAndUnlock(exampleData.username, exampleData.password, function(err, resp) {
         assert.ifError(err);
@@ -200,7 +199,7 @@ describe('VaultClient', function() {
 });
 
 
-describe('Blob', function() {
+describe('Blob', function () {
   var vaultClient;
 
   vaultClient = new VaultClient({ domain: exampleData.domain });
@@ -284,6 +283,57 @@ describe('Blob', function() {
           });
         });
       });
-    });
+    });  
+    
+    /********* Identity tests ***********/
+    describe('#identity_set', function () {
+      it('should set an identity property', function (done) {
+        this.timeout(10000);
+        
+        blob.identity.set('address', exampleData.unlock, {city:"San Francisco", region:"CA"}, function (err, resp) {
+          assert.ifError(err);
+          assert.equal(resp.result, 'success');
+          done();          
+        });
+      });      
+    });  
+
+    describe('#identity_get', function () {
+      it('should retreive an identity property given the property name and encryption key', function () {
+        
+        var property = blob.identity.get('address', exampleData.unlock);
+        assert.ifError(property.error);   
+        assert.equal(typeof property.encrypted, 'boolean');     
+        assert.notEqual(typeof property.value, 'undefined');  
+      });      
+    }); 
+
+    describe('#identity_getAll', function () {
+      it('should retreive all identity properties given the encryption key', function () {
+        
+        var obj = blob.identity.getAll(exampleData.unlock);  
+        assert.equal(typeof obj, 'object');       
+      });      
+    }); 
+
+    describe('#identity_getFullAddress', function () {
+      it('should retreive the address as a string', function () {
+        
+        var address = blob.identity.getFullAddress(exampleData.unlock);  
+        assert.equal(typeof address, 'string');       
+      });      
+    }); 
+                
+    describe('#identity_unset', function () {
+      it('should remove an identity property', function (done) {
+        this.timeout(10000);
+        
+        blob.identity.unset('name', exampleData.unlock, function (err, resp) {
+          assert.ifError(err);
+          assert.equal(resp.result, 'success');
+          done();          
+        });
+      });      
+    });        
   });
 });

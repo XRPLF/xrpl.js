@@ -1,21 +1,20 @@
-var parser      = require('url');
-var querystring = require('querystring');
-var extend      = require('extend');
-var request     = require('superagent');
 var sjcl        = require('./utils').sjcl;
 var base        = require('./base').Base;
 var UInt160     = require('./uint160').UInt160;
 var message     = require('./message');
+var request     = require('superagent'); 
+var querystring = require('querystring');
+var extend      = require("extend");
+var parser      = require("url");
+var Crypt       = { };
 
 var cryptConfig = {
-  cipher: 'aes',
-  mode: 'ccm',
-  ts: 64,   // tag length
-  ks: 256,  // key size
-  iter: 1000  // iterations (key derivation)
+  cipher : 'aes',
+  mode   : 'ccm',
+  ts     : 64,   // tag length
+  ks     : 256,  // key size
+  iter   : 1000  // iterations (key derivation)
 };
-
-var Crypt = { };
 
 /**
  * Full domain hash based on SHA512
@@ -145,9 +144,10 @@ Crypt.derive = function(opts, purpose, username, secret, fn) {
  */
 
 Crypt.RippleAddress = (function() {
+  
   function append_int(a, i) {
-    return [].concat(a, i >> 24, (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff)
-  };
+    return [].concat(a, i >> 24, (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff);
+  }
 
   function firstHalfOfSHA512(bytes) {
     return sjcl.bitArray.bitSlice(
@@ -224,7 +224,8 @@ Crypt.encrypt = function(key, data) {
  * @param {string} data
  */
 
-Crypt.decrypt = function(key, data) {
+Crypt.decrypt = function (key, data) {
+  
   key = sjcl.codec.hex.toBits(key);
   var encryptedBits = sjcl.codec.base64.toBits(data);
 
@@ -242,13 +243,14 @@ Crypt.decrypt = function(key, data) {
   return sjcl.decrypt(key, JSON.stringify(encrypted));
 };
 
+
 /**
  * Validate a ripple address
  *
  * @param {string} address
  */
 
-Crypt.isValidAddress = function(address) {
+Crypt.isValidAddress = function (address) {
   return UInt160.is_valid(address);
 };
 
@@ -258,7 +260,7 @@ Crypt.isValidAddress = function(address) {
  * @param {integer} nWords - number of words
  */
 
-Crypt.createSecret = function(nWords) {
+Crypt.createSecret = function (nWords) {
   return sjcl.codec.hex.fromBits(sjcl.random.randomWords(nWords));
 };
 
@@ -266,9 +268,10 @@ Crypt.createSecret = function(nWords) {
  * Create a new master key
  */
 
-Crypt.createMaster = function() {
+Crypt.createMaster = function () {
   return base.encode_check(33, sjcl.codec.bytes.fromBits(sjcl.random.randomWords(4)));
 };
+
 
 /**
  * Create a ripple address from a master key
@@ -276,7 +279,7 @@ Crypt.createMaster = function() {
  * @param {string} masterkey
  */
 
-Crypt.getAddress = function(masterkey) {
+Crypt.getAddress = function (masterkey) {
   return new Crypt.RippleAddress(masterkey).getAddress();
 };
 
@@ -286,7 +289,7 @@ Crypt.getAddress = function(masterkey) {
  * @param {string} data
  */
 
-Crypt.hashSha512 = function(data) {
+Crypt.hashSha512 = function (data) {
   return sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(data)); 
 };
 
@@ -376,7 +379,7 @@ Crypt.getStringToSign = function(config, parsed, date, mechanism) {
   // We don't have a credential scope, so we skip it.
   //
   // But that modifies the format, so the format ID is RIPPLE1, instead of AWS4.
-  return stringToSign = [
+  return [
     mechanism,
     date,
     Crypt.hashSha512(canonicalRequest).toLowerCase()
@@ -409,7 +412,6 @@ Crypt.signRequestHmac = function(config, auth_secret, blob_id) {
   });
 
   config.url += (parsed.search ? '&' : '?') + query;
-
   return config;
 };
 
@@ -491,7 +493,7 @@ function isPlainObject(obj) {
   for ( key in obj ) {}
 
   return key === void(0) || hasOwn.call( obj, key );
-};
+}
 
 var dateAsIso8601 = (function() {
   function pad(n) {
@@ -500,13 +502,14 @@ var dateAsIso8601 = (function() {
 
   return function dateAsIso8601() {
     var date = new Date();
-    return date.getUTCFullYear() + '-'
-      + pad(date.getUTCMonth() + 1) + '-'
-      + pad(date.getUTCDate()) + 'T'
-      + pad(date.getUTCHours()) + ':'
-      + pad(date.getUTCMinutes()) + ':'
-      + pad(date.getUTCSeconds()) + '.000Z';
+    return date.getUTCFullYear() + "-" +
+      pad(date.getUTCMonth() + 1) + "-" +
+      pad(date.getUTCDate()) + "T" +
+      pad(date.getUTCHours()) + ":" +
+      pad(date.getUTCMinutes()) + ":" +
+      pad(date.getUTCSeconds()) + ".000Z";
   };
 })();
 
 exports.Crypt = Crypt;
+
