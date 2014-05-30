@@ -1,6 +1,6 @@
 var assert    = require('assert'),
-  RippleTxt   = require('../src/js/ripple/rippletxt'),
-  AuthInfo    = require('../src/js/ripple/authinfo'),
+  RippleTxt   = require('../src/js/ripple/rippletxt').RippleTxt,
+  AuthInfo    = require('../src/js/ripple/authinfo').AuthInfo,
   VaultClient = require('../src/js/ripple/vaultclient').VaultClient,
   Blob        = require('../src/js/ripple/blob').BlobClient.Blob,
   UInt256     = require('../src/js/ripple/uint256').UInt256;

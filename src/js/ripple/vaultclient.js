@@ -1,4 +1,4 @@
-var AuthInfo   = require('./authinfo');
+var AuthInfo   = require('./authinfo').AuthInfo;
 var blobClient = require('./blob').BlobClient;
 var crypt      = require('./crypt');
 

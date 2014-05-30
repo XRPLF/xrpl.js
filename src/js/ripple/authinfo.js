@@ -1,4 +1,4 @@
-var RippleTxt = require('./rippletxt');
+var RippleTxt = require('./rippletxt').RippleTxt;
 var request   = require('superagent');
 
 function AuthInfo () {
@@ -33,4 +33,4 @@ AuthInfo.prototype.get = function (domain, username, fn) {
   }  
 }
 
-module.exports = AuthInfo;
+module.exports.AuthInfo = AuthInfo;

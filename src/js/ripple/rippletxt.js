@@ -70,4 +70,4 @@ RippleTxt.prototype.parse = function (txt) {
   return sections;
 }
 
-module.exports = RippleTxt;
+module.exports.RippleTxt = RippleTxt;
