@@ -307,40 +307,43 @@ Currency.prototype.get_interest_percentage_at = function(referenceDate, decimals
 //  return this._value instanceof BigInteger && ...;
 //};
 
-Currency.prototype.to_json = function(percentageDecimals) {
+Currency.prototype.to_json = function(opts) {
   if (!this.is_valid()) {
     // XXX This is backwards compatible behavior, but probably not very good.
     return 'XRP';
   }
 
+  var currency;
+  var fullName = opts && opts.full_name ? " - " + opts.full_name : "";
+
   // Any currency with standard properties and a valid code can be abbreviated
   // in the JSON wire format as the three character code.
   if (/^[A-Z0-9]{3}$/.test(this._iso_code) && !this.has_interest()) {
-    return this._iso_code;
+    currency = this._iso_code + fullName;
+
+  // If there is interest, append the annual interest to the full currency name
   } else if (this.has_interest()) {
-    return this._iso_code + " (" + this.get_interest_percentage_at(this._interest_start + 3600 * 24 * 365, percentageDecimals) + "%pa)";
+    var decimals = opts ? opts.decimals : undefined;
+    currency = this._iso_code + fullName + " (" + this.get_interest_percentage_at(this._interest_start + 3600 * 24 * 365, decimals) + "%pa)";
+  } else {
+
+    // Fallback to returning the raw currency hex
+    currency = this.to_hex();
+
+    // XXX This is to maintain backwards compatibility, but it is very, very odd
+    //     behavior, so we should deprecate it and get rid of it as soon as
+    //     possible.
+    if (currency === Currency.HEX_ONE) {
+      currency = 1;
+    }
   }
 
-  // Fallback to returning the raw currency hex
-  var currencyHex = this.to_hex();
-
-  // XXX This is to maintain backwards compatibility, but it is very, very odd
-  //     behavior, so we should deprecate it and get rid of it as soon as
-  //     possible.
-  if (currencyHex === Currency.HEX_ONE) {
-    return 1;
-  }
-
-  return currencyHex;
+  return currency;
 };
 
-Currency.prototype.to_human = function(percentageDecimals) {
+Currency.prototype.to_human = function(opts) {
   // to_human() will always print the human-readable currency code if available.
-  if (/^[A-Z0-9]{3}$/.test(this._iso_code) && !this.has_interest()) {
-    return this._iso_code;
-  }
-
-  return this.to_json(percentageDecimals);
+  return this.to_json(opts);
 };
 
 exports.Currency = Currency;

@@ -43,7 +43,13 @@ describe('Currency', function() {
     it('From human "EUR (0.5361%pa)", test decimals', function() {
       var cur = currency.from_human('EUR (0.5361%pa)');
       assert.strictEqual(cur.to_json(), 'EUR (0.54%pa)');
-      assert.strictEqual(cur.to_json(4), 'EUR (0.5361%pa)');
+      assert.strictEqual(cur.to_json({decimals:4}), 'EUR (0.5361%pa)');
+      assert.strictEqual(cur.get_interest_percentage_at(undefined, 4), 0.5361);
+    });
+    it('From human "EUR - Euro (0.5361%pa)", test decimals and full_name', function() {
+      var cur = currency.from_human('EUR (0.5361%pa)');
+      assert.strictEqual(cur.to_json(), 'EUR (0.54%pa)');
+      assert.strictEqual(cur.to_json({decimals:4, full_name:'Euro'}), 'EUR - Euro (0.5361%pa)');
       assert.strictEqual(cur.get_interest_percentage_at(undefined, 4), 0.5361);
     });
     it('From human "TYX - 30-Year Treasuries (1.5%pa)"', function() {
@@ -75,6 +81,12 @@ describe('Currency', function() {
     it('"015841551A748AD2C1F76FF6ECB0CCCD00000000") == "015841551A748AD2C1F76FF6ECB0CCCD00000000"', function() {
       assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human(),
                          'XAU (-0.5%pa)');
+    });
+    it('to_human with full_name "USD - US Dollar"', function() {
+      assert.strictEqual('USD - US Dollar', currency.from_json('USD').to_human({full_name:'US Dollar'}));
+    });
+    it('to_human with full_name "XRP - Ripples"', function() {
+      assert.strictEqual('XRP - Ripples', currency.from_json('XRP').to_human({full_name:'Ripples'}));
     });
   });
 
