@@ -764,7 +764,7 @@ Amount.prototype.parse_number = function(n) {
   this._is_native   = false;
   this._currency    = Currency.from_json(1);
   this._issuer      = UInt160.from_json(1);
-  this._is_negative = n < 0 ? 1 : 0;
+  this._is_negative = n < 0 ? true : false;
   this._value       = new BigInteger(String(this._is_negative ? -n : n));
   this._offset      = 0;
 

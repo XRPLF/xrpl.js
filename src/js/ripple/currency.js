@@ -1,7 +1,7 @@
 var extend    = require('extend');
 var UInt160 = require('./uint160').UInt160;
-var Float = require('./float').Float;
 var utils = require('./utils');
+var Float = require('./ieee754').Float;
 
 //
 // Currency support
@@ -26,6 +26,32 @@ Currency.prototype.constructor = Currency;
 
 Currency.HEX_CURRENCY_BAD = '0000000000000000000000005852500000000000';
 
+/**
+ * Tries to correctly interpret a Currency as entered by a user.
+ *
+ * Examples:
+ *
+ *  USD                               => currency
+ *  USD - Dollar                      => currency with optional full currency name
+ *  XAU (-0.5%pa)                     => XAU with 0.5% effective demurrage rate per year
+ *  XAU - Gold (-0.5%pa)              => Optionally allowed full currency name
+ *  USD (1%pa)                        => US dollars with 1% effective interest per year
+ *  INR - Indian Rupees               => Optional full currency name with spaces
+ *  TYX - 30-Year Treasuries          => Optional full currency with numbers and a dash
+ *  TYX - 30-Year Treasuries (1.5%pa) => Optional full currency with numbers, dash and interest rate
+ *
+ *  The regular expression below matches above cases, broken down for better understanding:
+ *
+ *  ^\s*                      // start with any amount of whitespace
+ *  ([a-zA-Z]{3})             // any 3 letter currency code
+ *  (\s*-\s*[- \w]+)          // optional full currency name following the dash after currency code,
+ *                               full currency code can contain letters, numbers and dashes
+ *  (\s*\(-?\d+\.?\d*%pa\))?  // optional demurrage rate, has optional - and . notation (-0.5%pa)
+ *  \s*$                      // end with any amount of whitespace
+ *
+ */
+Currency.prototype.human_RE = /^\s*([a-zA-Z]{3})(\s*-\s*[- \w]+)?(\s*\(-?\d+\.?\d*%pa\))?\s*$/;
+
 Currency.from_json = function(j, shouldInterpretXrpAsIou) {
   if (j instanceof this) {
     return j.clone();
@@ -34,24 +60,85 @@ Currency.from_json = function(j, shouldInterpretXrpAsIou) {
   }
 };
 
+Currency.from_human = function(j, opts) {
+  return (new Currency().parse_human(j, opts));
+}
+
 // this._value = NaN on error.
 Currency.prototype.parse_json = function(j, shouldInterpretXrpAsIou) {
   this._value = NaN;
 
   switch (typeof j) {
     case 'string':
+
       if (!j || /^(0|XRP)$/.test(j)) {
         if (shouldInterpretXrpAsIou) {
           this.parse_hex(Currency.HEX_CURRENCY_BAD);
         } else {
           this.parse_hex(Currency.HEX_ZERO);
         }
-      } else if (/^[a-zA-Z0-9]{3}$/.test(j)) {
-        var currencyCode = j.toUpperCase();
+        break;
+      }
+
+      // match the given string to see if it's in an allowed format
+      var matches = String(j).match(this.human_RE);
+
+      if (matches) {
+
+        var currencyCode = matches[1];
+        // the full currency is matched as it is part of the valid currency format, but not stored
+        // var full_currency = matches[2] || '';
+        var interest = matches[3] || '';
+
+        // interest is defined as interest per year, per annum (pa)
+        var percentage = interest.match(/(-?\d+\.?\d+)/);
+
+        currencyCode = currencyCode.toUpperCase();
+
         var currencyData = utils.arraySet(20, 0);
-        currencyData[12] = currencyCode.charCodeAt(0) & 0xff;
-        currencyData[13] = currencyCode.charCodeAt(1) & 0xff;
-        currencyData[14] = currencyCode.charCodeAt(2) & 0xff;
+
+        if (percentage) {
+          /*
+           * 20 byte layout of a interest bearing currency
+           *
+           * 01 __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
+           *    CURCODE- DATE------- RATE------------------- RESERVED---
+           */
+
+          // byte 1 for type, use '1' to denote demurrage currency
+          currencyData[0] = 1;
+
+          // byte 2-4 for currency code
+          currencyData[1] = currencyCode.charCodeAt(0) & 0xff;
+          currencyData[2] = currencyCode.charCodeAt(1) & 0xff;
+          currencyData[3] = currencyCode.charCodeAt(2) & 0xff;
+
+          // byte 5-8 are for reference date, but should always be 0 so we won't fill it
+
+          // byte 9-16 are for the interest
+          percentage = parseFloat(percentage[0]);
+
+          // the interest or demurrage is expressed as a yearly (per annum) value
+          var secondsPerYear = 31536000; // 60 * 60 * 24 * 365
+
+          // Calculating the interest e-fold
+          // 0.5% demurrage is expressed 0.995, 0.005 less than 1
+          // 0.5% interest is expressed as 1.005, 0.005 more than 1
+          var interestEfold = secondsPerYear / Math.log(1 + percentage/100);
+          var bytes = Float.toIEEE754Double(interestEfold);
+
+          for (var i=0; i<=bytes.length; i++) {
+            currencyData[8 + i] = bytes[i] & 0xff;
+          }
+
+          // the last 4 bytes are reserved for future use, so we won't fill those
+
+        } else {
+          currencyData[12] = currencyCode.charCodeAt(0) & 0xff;
+          currencyData[13] = currencyCode.charCodeAt(1) & 0xff;
+          currencyData[14] = currencyCode.charCodeAt(2) & 0xff;
+        }
+
         this.parse_bytes(currencyData);
       } else {
         this.parse_hex(j);
@@ -75,6 +162,11 @@ Currency.prototype.parse_json = function(j, shouldInterpretXrpAsIou) {
   return this;
 };
 
+
+Currency.prototype.parse_human = function(j) {
+  return this.parse_json(j);
+};
+
 /**
  * Recalculate internal representation.
  *
@@ -92,7 +184,7 @@ Currency.prototype._update = function() {
 
   this._native = false;
   this._type = -1;
-  this._interest_start = new Date();
+  this._interest_start = NaN;
   this._interest_period = NaN;
   this._iso_code = '';
 
@@ -121,7 +213,7 @@ Currency.prototype._update = function() {
                            (bytes[5] << 16) +
                            (bytes[6] <<  8) +
                            (bytes[7]      );
-    this._interest_period = Float.fromBytes(bytes.slice(8, 16));
+    this._interest_period = Float.fromIEEE754Double(bytes.slice(8, 16));
   }
 };
 
@@ -167,19 +259,43 @@ Currency.prototype.is_native = function() {
  * Whether this currency is an interest-bearing/demurring currency.
  */
 Currency.prototype.has_interest = function() {
-  return this._type === 1 && this._interest_start && !isNaN(this._interest_period);
+  return this._type === 1 && !isNaN(this._interest_start) && !isNaN(this._interest_period);
 };
 
-Currency.prototype.get_interest_at = function(referenceDate) {
+/**
+ *
+ * @param referenceDate - number of seconds since the Ripple Epoch (0:00 on January 1, 2000 UTC)
+ *                        used to calculate the interest over provided interval
+ *                        pass in one years worth of seconds to ge the yearly interest
+ * @returns {number} - interest for provided interval, can be negative for demurred currencies
+ */
+Currency.prototype.get_interest_at = function(referenceDate, decimals) {
   if (!this.has_interest) {
-    return 1;
+    return 0;
+  }
+
+  // use one year as a default period
+  if (!referenceDate) {
+    referenceDate = this._interest_start + 3600 * 24 * 365;
   }
 
   if (referenceDate instanceof Date) {
     referenceDate = utils.fromTimestamp(referenceDate.getTime());
   }
 
+  // calculate interest by e-fold number
   return Math.exp((referenceDate - this._interest_start) / this._interest_period);
+};
+
+Currency.prototype.get_interest_percentage_at = function(referenceDate, decimals) {
+  var interest = this.get_interest_at(referenceDate, decimals);
+
+  // convert to percentage
+  var interest = (interest*100)-100;
+  var decimalMultiplier = decimals ? Math.pow(10,decimals) : 100;
+
+  // round to two decimals behind the dot
+  return Math.round(interest*decimalMultiplier) / decimalMultiplier;
 };
 
 // XXX Currently we inherit UInt.prototype.is_valid, which is mostly fine.
@@ -191,38 +307,43 @@ Currency.prototype.get_interest_at = function(referenceDate) {
 //  return this._value instanceof BigInteger && ...;
 //};
 
-Currency.prototype.to_json = function() {
+Currency.prototype.to_json = function(opts) {
   if (!this.is_valid()) {
     // XXX This is backwards compatible behavior, but probably not very good.
     return 'XRP';
   }
 
+  var currency;
+  var fullName = opts && opts.full_name ? " - " + opts.full_name : "";
+
   // Any currency with standard properties and a valid code can be abbreviated
   // in the JSON wire format as the three character code.
   if (/^[A-Z0-9]{3}$/.test(this._iso_code) && !this.has_interest()) {
-    return this._iso_code;
+    currency = this._iso_code + fullName;
+
+  // If there is interest, append the annual interest to the full currency name
+  } else if (this.has_interest()) {
+    var decimals = opts ? opts.decimals : undefined;
+    currency = this._iso_code + fullName + " (" + this.get_interest_percentage_at(this._interest_start + 3600 * 24 * 365, decimals) + "%pa)";
+  } else {
+
+    // Fallback to returning the raw currency hex
+    currency = this.to_hex();
+
+    // XXX This is to maintain backwards compatibility, but it is very, very odd
+    //     behavior, so we should deprecate it and get rid of it as soon as
+    //     possible.
+    if (currency === Currency.HEX_ONE) {
+      currency = 1;
+    }
   }
 
-  // Fallback to returning the raw currency hex
-  var currencyHex = this.to_hex();
-
-  // XXX This is to maintain backwards compatibility, but it is very, very odd
-  //     behavior, so we should deprecate it and get rid of it as soon as
-  //     possible.
-  if (currencyHex === Currency.HEX_ONE) {
-    return 1;
-  }
-
-  return currencyHex;
+  return currency;
 };
 
-Currency.prototype.to_human = function() {
+Currency.prototype.to_human = function(opts) {
   // to_human() will always print the human-readable currency code if available.
-  if (/^[A-Z0-9]{3}$/.test(this._iso_code)) {
-    return this._iso_code;
-  }
-
-  return this.to_json();
+  return this.to_json(opts);
 };
 
 exports.Currency = Currency;
