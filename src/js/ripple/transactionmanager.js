@@ -509,17 +509,7 @@ TransactionManager.prototype._request = function(tx) {
       submitRequest.server = tx._server;
     }
 
-    if (typeof tx._iff === 'function') {
-      tx._iff(function(err, proceed) {
-        if (err || !proceed) {
-          tx.emit('abort');
-        } else {
-          submitTransaction();
-        }
-      });
-    } else {
-      submitTransaction();
-    }
+    submitTransaction();
   };
 
   function requestTimeout() {

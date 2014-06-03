@@ -925,13 +925,6 @@ Transaction.prototype.abort = function(callback) {
   }
 };
 
-Transaction.prototype.iff = function(fn) {
-  var self = this;
-  this._iff = function(callback) {
-    fn(self.summary(), callback);
-  };
-};
-
 Transaction.prototype.summary = function() {
   return Transaction.summary.call(this);
 };
