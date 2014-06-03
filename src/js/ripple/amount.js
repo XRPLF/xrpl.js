@@ -598,7 +598,7 @@ Amount.prototype.invert = function() {
  * The regular expression below matches above cases, broken down for better understanding:
  *
  * ^\s*                         // start with any amount of whitespace
- * ([a-z]{3})?                  // optional any 3 letters
+ * ([a-zA-Z]{3}|[0-9]{3})       // either 3 letter alphabetic currency-code or 3 digit numeric currency-code. See ISO 4217
  * \s*                          // any amount of whitespace
  * (-)?                         // optional dash
  * (\d+)                        // 1 or more digits
@@ -609,7 +609,7 @@ Amount.prototype.invert = function() {
  * $                            // end of string
  *
  */
-Amount.human_RE = /^\s*([a-z]{3})?\s*(-)?(\d+)(\.(\d*))?\s*([a-f0-9]{40}|[a-z0-9]{3})?\s*$/i;
+Amount.human_RE = /^\s*([a-z]{3}|[0-9]{3})?\s*(-)?(\d+)(\.(\d*))?\s*([a-f0-9]{40}|[a-z0-9]{3})?\s*$/i;
 
 Amount.prototype.parse_human = function(j, opts) {
   opts = opts || {};
@@ -764,7 +764,7 @@ Amount.prototype.parse_number = function(n) {
   this._is_native   = false;
   this._currency    = Currency.from_json(1);
   this._issuer      = UInt160.from_json(1);
-  this._is_negative = n < 0 ? 1 : 0;
+  this._is_negative = n < 0 ? true : false;
   this._value       = new BigInteger(String(this._is_negative ? -n : n));
   this._offset      = 0;
 
