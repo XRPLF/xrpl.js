@@ -200,4 +200,4 @@ Message.verifyHashSignature = function(data, remote, callback) {
 
 };
 
-module.exports = Message;
+exports.Message = Message;
