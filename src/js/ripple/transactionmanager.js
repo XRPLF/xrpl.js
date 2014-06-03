@@ -41,10 +41,10 @@ function TransactionManager(account) {
     var submission = self._pending.getSubmission(hash);
 
     if (self._remote.trace) {
-      log.info('transaction received:', transaction.transaction);
+      log.info('transaction received:', transaction.tx_json);
     }
 
-    if (submission) {
+    if (submission instanceof Transaction) {
       // ND: A `success` handler will `finalize` this later
       submission.emit('success', transaction);
     } else {
@@ -54,36 +54,7 @@ function TransactionManager(account) {
 
   this._account.on('transaction-outbound', transactionReceived);
 
-  function adjustFees(loadData, server) {
-    // ND: note, that `Fee` is a component of a transactionID
-    self._pending.forEach(function(pending) {
-      if (pending._server !== server) {
-        return;
-      }
-
-      if (!(self._remote.local_fee && pending.tx_json.Fee)) {
-        return;
-      }
-
-      var oldFee = pending.tx_json.Fee;
-      var newFee = server.computeFee(pending);
-
-      if (Number(newFee) > self._maxFee) {
-        return pending.once('presubmit', function() {
-          pending.emit('error', 'tejMaxFeeExceeded');
-        });
-      }
-
-      pending.tx_json.Fee = newFee;
-      pending.emit('fee_adjusted', oldFee, newFee);
-
-      if (self._remote.trace) {
-        log.info('fee adjusted:', pending.tx_json, oldFee, newFee);
-      }
-    });
-  };
-
-  this._remote.on('load_changed', adjustFees);
+  this._remote.on('load_changed', this._adjustFees.bind(this));
 
   function updatePendingStatus(ledger) {
     self._pending.forEach(function(pending) {
@@ -113,6 +84,7 @@ function TransactionManager(account) {
       ledger_index_min: -1,
       ledger_index_max: -1,
       binary: true,
+      parseBinary: true,
       limit: 100,
       filter: 'outbound'
     };
@@ -191,6 +163,38 @@ TransactionManager.normalizeTransaction = function(tx) {
   delete transaction.meta;
 
   return transaction;
+};
+
+// Transaction fees are adjusted in real-time
+TransactionManager.prototype._adjustFees = function(loadData) {
+  // ND: note, that `Fee` is a component of a transactionID
+  var self = this;
+
+  if (!this._remote.local_fee) {
+    return;
+  }
+
+  this._pending.forEach(function(pending) {
+    var oldFee = pending.tx_json.Fee;
+    var newFee = pending._computeFee();
+
+    function maxFeeExceeded() {
+      pending.once('presubmit', function() {
+        pending.emit('error', 'tejMaxFeeExceeded');
+      });
+    };
+
+    if (Number(newFee) > self._maxFee) {
+      return maxFeeExceeded();
+    }
+
+    pending.tx_json.Fee = newFee;
+    pending.emit('fee_adjusted', oldFee, newFee);
+
+    if (self._remote.trace) {
+      log.info('fee adjusted:', pending.tx_json, oldFee, newFee);
+    }
+  });
 };
 
 //Fill an account transaction sequence
@@ -281,6 +285,7 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
     while (self._pending.hasSequence(pending.tx_json.Sequence)) {
       //Sequence number has been consumed by another transaction
       pending.tx_json.Sequence += 1;
+
       if (self._remote.trace) {
         log.info('incrementing sequence:', pending.tx_json);
       }
@@ -328,6 +333,7 @@ TransactionManager.prototype._waitLedgers = function(ledgers, callback) {
     }
 
     self._remote.removeListener('ledger_closed', ledgerClosed);
+
     callback();
   };
 
@@ -343,12 +349,6 @@ TransactionManager.prototype._request = function(tx) {
   }
 
   if (tx.attempts > 0 && !remote.local_signing) {
-    // && tx.submittedTxnIDs.length != tx.attempts
-    // ^^^ Above commented out intentionally
-    //  ^^^^ We might be a bit cleverer about allowing this in SOME cases, but
-    // it's not really worth it, and would be prone to error. Use
-    // `local_signing`
-
     var message = ''
     + 'It is not possible to resubmit transactions automatically safely without '
     + 'synthesizing the transactionID locally. See `local_signing` config option';
@@ -415,7 +415,7 @@ TransactionManager.prototype._request = function(tx) {
     }
 
     if (self._remote.local_fee && (message.engine_result === 'telINSUF_FEE_P')) {
-      self._resubmit(1, tx);
+      self._resubmit(2, tx);
     } else {
       submissionError(message);
     }
@@ -509,17 +509,17 @@ TransactionManager.prototype._request = function(tx) {
       submitRequest.server = tx._server;
     }
 
-    if (typeof tx._iff !== 'function') {
-      return submitTransaction();
+    if (typeof tx._iff === 'function') {
+      tx._iff(function(err, proceed) {
+        if (err || !proceed) {
+          tx.emit('abort');
+        } else {
+          submitTransaction();
+        }
+      });
+    } else {
+      submitTransaction();
     }
-
-    tx._iff(tx.summary(), function(err, proceed) {
-      if (err || !proceed) {
-        tx.emit('abort');
-      } else {
-        submitTransaction();
-      }
-    });
   };
 
   function requestTimeout() {
@@ -553,7 +553,7 @@ TransactionManager.prototype._request = function(tx) {
     }
 
     submitRequest.timeout(self._submissionTimeout, requestTimeout);
-    submitRequest.request();
+    submitRequest.broadcast();
 
     tx.attempts++;
     tx.emit('postsubmit');
@@ -608,7 +608,7 @@ TransactionManager._isTooBusy = function(error) {
 /**
  * Entry point for TransactionManager submission
  *
- * @param {Object} tx
+ * @param {Transaction} tx
  */
 
 TransactionManager.prototype.submit = function(tx) {

@@ -688,7 +688,7 @@ Server.prototype._computeFee = function(transaction) {
   var units;
 
   if (transaction instanceof Transaction) {
-    units = transaction.feeUnits();
+    units = transaction._getFeeUnits();
   } else if (typeof transaction === 'number') {
     units = transaction;
   } else {
