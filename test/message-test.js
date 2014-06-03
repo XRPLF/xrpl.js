@@ -1,6 +1,6 @@
 var assert  = require('assert');
 var sjcl    = require('../build/sjcl');
-var Message = require('../src/js/ripple/message');
+var Message = require('../src/js/ripple/message').Message;
 var Seed    = require('../src/js/ripple/seed').Seed;
 var Remote  = require('../src/js/ripple/remote').Remote;
 

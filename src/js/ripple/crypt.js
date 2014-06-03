@@ -1,8 +1,8 @@
 var sjcl        = require('./utils').sjcl;
 var base        = require('./base').Base;
 var UInt160     = require('./uint160').UInt160;
-var message     = require('./message');
-var request     = require('superagent'); 
+var UInt256     = require('./uint256').UInt256;
+var request     = require('superagent');
 var querystring = require('querystring');
 var extend      = require("extend");
 var parser      = require("url");
@@ -284,14 +284,27 @@ Crypt.getAddress = function (masterkey) {
 };
 
 /**
- * Hash data
+ * Hash data using SHA-512.
  *
- * @param {string} data
+ * @param {string|bitArray} data
+ * @return {string} Hash of the data
  */
 
 Crypt.hashSha512 = function (data) {
+  // XXX Should return a UInt512
   return sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(data)); 
+}
+
+/**
+ * Hash data using SHA-512 and return the first 256 bits.
+ *
+ * @param {string|bitArray} data
+ * @return {UInt256} Hash of the data
+ */
+Crypt.hashSha512Half = function (data) {
+  return UInt256.from_hex(Crypt.hashSha512(data).substr(0, 64));
 };
+
 
 /**
  * Sign a data string with a secret key
@@ -345,171 +358,5 @@ Crypt.base64UrlToBase64 = function(encodedData) {
   return encodedData;
 };
 
-/**
- * Create a string from request parameters that
- * will be used to sign a request
- *
- * @param {Object} config - request params
- * @param {Object} parsed - parsed url
- * @param {Object} date 
- * @param {Object} mechanism - type of signing
- */
-
-Crypt.getStringToSign = function(config, parsed, date, mechanism) {
-  // XXX This method doesn't handle signing GET requests correctly. The data
-  //     field will be merged into the search string, not the request body.
-  // Sort the properties of the JSON object into canonical form
-  var canonicalData = JSON.stringify(copyObjectWithSortedKeys(config.data));
-
-  // Canonical request using Amazon's v4 signature format
-  // See: http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
-  var canonicalRequest = [
-    config.method || 'GET',
-    parsed.pathname || '',
-    parsed.search || '',
-    // XXX Headers signing not supported
-    '',
-    '',
-    Crypt.hashSha512(canonicalData).toLowerCase()
-  ].join('\n');
-
-  // String to sign inspired by Amazon's v4 signature format
-  // See: http://docs.aws.amazon.com/general/latest/gr/sigv4-create-string-to-sign.html
-  //
-  // We don't have a credential scope, so we skip it.
-  //
-  // But that modifies the format, so the format ID is RIPPLE1, instead of AWS4.
-  return [
-    mechanism,
-    date,
-    Crypt.hashSha512(canonicalRequest).toLowerCase()
-  ].join('\n');
-};
-
-/**
- * HMAC signed request
- *
- * @param {Object} config
- * @param {Object} auth_secret
- * @param {Object} blob_id
- */
-
-Crypt.signRequestHmac = function(config, auth_secret, blob_id) {
-  config = extend(true, {}, config);
-
-  // Parse URL
-  var parsed        = parser.parse(config.url);
-  var date          = dateAsIso8601();
-  var signatureType = 'RIPPLE1-HMAC-SHA512';
-  var stringToSign  = Crypt.getStringToSign(config, parsed, date, signatureType);
-  var signature     = Crypt.signString(auth_secret, stringToSign);
-
-  var query = querystring.stringify({
-    signature: Crypt.base64ToBase64Url(signature),
-    signature_date: date,
-    signature_blob_id: blob_id,
-    signature_type: signatureType
-  });
-
-  config.url += (parsed.search ? '&' : '?') + query;
-  return config;
-};
-
-/**
- * Asymmetric signed request
- *
- * @param {Object} config
- * @param {Object} secretKey
- * @param {Object} account
- * @param {Object} blob_id
- */
-
-Crypt.signRequestAsymmetric = function(config, secretKey, account, blob_id) {
-  config = extend(true, {}, config);
-
-  // Parse URL
-  var parsed        = parser.parse(config.url);
-  var date          = dateAsIso8601();
-  var signatureType = 'RIPPLE1-ECDSA-SHA512';
-  var stringToSign  = Crypt.getStringToSign(config, parsed, date, signatureType);
-  var signature     = message.signMessage(stringToSign, secretKey);
-
-  var query = querystring.stringify({
-    signature: Crypt.base64ToBase64Url(signature),
-    signature_date: date,
-    signature_blob_id: blob_id,
-    signature_account: account,
-    signature_type: signatureType
-  })
-
-  config.url += (parsed.search ? '&' : '?') + query;
-
-  return config;
-};
-
-//prepare for signing
-function copyObjectWithSortedKeys(object) {
-  if (isPlainObject(object)) {
-    var newObj = {};
-    var keysSorted = Object.keys(object).sort();
-    var key;
-
-    for (var i in keysSorted) {
-      key = keysSorted[i];
-      if (Object.prototype.hasOwnProperty.call(object, key)) {
-        newObj[key] = copyObjectWithSortedKeys(object[key]);
-      }
-    }
-
-    return newObj;
-  } else if (Array.isArray(object)) {
-    return object.map(copyObjectWithSortedKeys);
-  } else {
-    return object;
-  }
-};
-
-//from npm extend
-function isPlainObject(obj) {
-  var hasOwn = Object.prototype.hasOwnProperty;
-  var toString = Object.prototype.toString;
-
-  if (!obj || toString.call(obj) !== '[object Object]' || obj.nodeType || obj.setInterval) {
-    return false;
-  }
-
-  var has_own_constructor = hasOwn.call(obj, 'constructor');
-  var has_is_property_of_method = hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-
-  // Not own constructor property must be Object
-  if (obj.constructor && !has_own_constructor && !has_is_property_of_method) {
-    return false;
-  }
-
-  // Own properties are enumerated firstly, so to speed up,
-  // if last one is own, then all properties are own.
-  var key;
-
-  for ( key in obj ) {}
-
-  return key === void(0) || hasOwn.call( obj, key );
-}
-
-var dateAsIso8601 = (function() {
-  function pad(n) {
-    return (n < 0 || n > 9 ? '' : '0') + n;
-  };
-
-  return function dateAsIso8601() {
-    var date = new Date();
-    return date.getUTCFullYear() + "-" +
-      pad(date.getUTCMonth() + 1) + "-" +
-      pad(date.getUTCDate()) + "T" +
-      pad(date.getUTCHours()) + ":" +
-      pad(date.getUTCMinutes()) + ":" +
-      pad(date.getUTCSeconds()) + ".000Z";
-  };
-})();
 
 exports.Crypt = Crypt;
-

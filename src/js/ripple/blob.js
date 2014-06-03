@@ -1,4 +1,5 @@
 var crypt   = require('./crypt').Crypt;
+var SignedRequest = require('./signedrequest').SignedRequest;
 var request = require('superagent');
 var extend  = require("extend");
 
@@ -34,7 +35,6 @@ BlobObj.ops = {
 
 
 BlobObj.opsReverseMap = [ ];
-
 for (var name in BlobObj.ops) {
   BlobObj.opsReverseMap[BlobObj.ops[name]] = name;
 }
@@ -153,7 +153,9 @@ BlobObj.prototype.consolidate = function(fn) {
     },
   };
 
-  var signed = crypt.signRequestHmac(config, this.data.auth_secret, this.id);
+  var signedRequest = new SignedRequest(config);
+
+  var signed = signedRequest.signHmac(this.data.auth_secret, this.id);
 
   request.post(signed.url)
     .send(signed.data)
@@ -198,8 +200,7 @@ BlobObj.prototype.applyEncryptedPatch = function(patch) {
  *
  * @param {string} secretUnlockkey
  */
-
-BlobObj.prototype.encryptSecret = function(secretUnlockKey, secret) {
+BlobObj.prototype.encryptSecret = function (secretUnlockKey, secret) {
   return crypt.encrypt(secretUnlockKey, secret);
 };
 
@@ -483,7 +484,10 @@ BlobObj.prototype.postUpdate = function(op, pointer, params, fn) {
     }
   };
 
-  var signed = crypt.signRequestHmac(config, this.data.auth_secret, this.id);
+
+  var signedRequest = new SignedRequest(config);
+
+  var signed = signedRequest.signHmac(this.data.auth_secret, this.id);
 
   request.post(signed.url)
   .send(signed.data)
@@ -781,6 +785,7 @@ exports.getRippleName = function(url, address, fn) {
     return fn (new Error('Invalid ripple address'));
   }
 
+  if (!crypt.isValidAddress(address)) return fn (new Error("Invalid ripple address"));
   request.get(url + '/v1/user/' + address, function(err, resp){
     if (err) {
       fn(new Error('Unable to access vault sever'));
@@ -871,7 +876,9 @@ BlobClient.create = function(options, fn) {
     }
   };
 
-  var signed = crypt.signRequestAsymmetric(config, options.masterkey, blob.data.account_id, options.id);
+  var signedRequest = new SignedRequest(config);
+
+  var signed = signedRequest.signAsymmetric(options.masterkey, blob.data.account_id, options.id);
 
   request.post(signed)
     .send(signed.data)
