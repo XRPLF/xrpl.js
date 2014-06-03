@@ -346,6 +346,10 @@ Currency.prototype.to_human = function(opts) {
   return this.to_json(opts);
 };
 
+Currency.prototype.get_iso = function() {
+  return this._iso_code;
+};
+
 exports.Currency = Currency;
 
 // vim:sw=2:sts=2:ts=8:et

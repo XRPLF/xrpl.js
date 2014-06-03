@@ -172,4 +172,15 @@ describe('Currency', function() {
       assert.equal(Math.E, cur.get_interest_at(443845330 - 6291418827.05));
     });
   });
+  describe('get_iso', function() {
+    it('should get "XRP" iso_code', function() {
+      assert.strictEqual('XRP', currency.from_json('XRP').get_iso());
+    });
+    it('should get iso_code', function() {
+      assert.strictEqual('USD', currency.from_json('USD - US Dollar').get_iso());
+    });
+    it('should get iso_code', function() {
+      assert.strictEqual('USD', currency.from_json('USD (0.5%pa)').get_iso());
+    });
+  });
 });
