@@ -43,14 +43,14 @@ Currency.HEX_CURRENCY_BAD = '0000000000000000000000005852500000000000';
  *  The regular expression below matches above cases, broken down for better understanding:
  *
  *  ^\s*                      // start with any amount of whitespace
- *  ([a-zA-Z]{3})             // any 3 letter currency code
+ *  ([a-zA-Z]{3}|[0-9]{3})    // either 3 letter alphabetic currency-code or 3 digit numeric currency-code. See ISO 4217
  *  (\s*-\s*[- \w]+)          // optional full currency name following the dash after currency code,
  *                               full currency code can contain letters, numbers and dashes
  *  (\s*\(-?\d+\.?\d*%pa\))?  // optional demurrage rate, has optional - and . notation (-0.5%pa)
  *  \s*$                      // end with any amount of whitespace
  *
  */
-Currency.prototype.human_RE = /^\s*([a-zA-Z]{3})(\s*-\s*[- \w]+)?(\s*\(-?\d+\.?\d*%pa\))?\s*$/;
+Currency.prototype.human_RE = /^\s*([a-zA-Z]{3}|[0-9]{3})(\s*-\s*[- \w]+)?(\s*\(-?\d+\.?\d*%pa\))?\s*$/;
 
 Currency.from_json = function(j, shouldInterpretXrpAsIou) {
   if (j instanceof this) {

@@ -27,6 +27,16 @@ describe('Currency', function() {
       assert(r.is_native());
       assert.strictEqual('XRP', r.to_json());
     });
+    it('from_json("111").to_human()', function() {
+      var r = currency.from_json("111");
+      assert(r.is_valid());
+      assert.strictEqual('111', r.to_json());
+    });
+    it('from_json("1D2").to_human()', function() {
+      var r = currency.from_json("1D2");
+      assert(!r.is_valid());
+      assert.strictEqual('XRP', r.to_json());
+    });
   });
 
   describe('from_human', function() {

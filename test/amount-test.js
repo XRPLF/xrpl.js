@@ -143,6 +143,12 @@ describe('Amount', function() {
     it('Parse -0.0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
       assert.strictEqual('0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('-0.0/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full());
     });
+    it('Parse 0.0/111/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
+      assert.strictEqual('0/111/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/111/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full());
+    });
+    it('Parse 0.0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
+      assert.strictEqual('0/XRP/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full());
+    });
   });
   describe('Amount operations', function() {
     it('Negate native 123', function () {
