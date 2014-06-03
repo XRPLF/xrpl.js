@@ -251,23 +251,41 @@ Transaction.prototype.feeUnits = function() {
 };
 
 /**
- * Compute average server fee
+ * Compute median server fee
  */
 
 Transaction.prototype._computeFee = function() {
   var servers = this.remote._servers;
-  var serverCount = 0;
-  var fee = 0;
+  var fees = [ ];
 
   for (var i=0; i<servers.length; i++) {
     var server = servers[i];
     if (server._connected) {
-      serverCount += 1;
-      fee += Number(server._computeFee(this));
+      fees.push(Number(server._computeFee(this)));
     }
   }
 
-  return String(Math.floor(fee / serverCount));
+  if (fees.length === 1) {
+    return String(fees[0]);
+  }
+
+  fees.sort(function ascending(a, b) {
+    if (a > b) {
+      return 1;
+    } else if (a < b) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
+
+  var midInd = Math.floor(fees.length / 2);
+
+  var median = fees.length % 2 === 0
+  ? (fees[midInd] + fees[midInd - 1]) / 2
+  : fees[midInd];
+
+  return String(median);
 };
 
 /**
