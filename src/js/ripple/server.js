@@ -112,10 +112,10 @@ function Server(remote, opts) {
 
   this.on('disconnect', function onDisconnect() {
     clearInterval(self._activityInterval);
-    //self.once('ledger_closed', setActivityInterval);
+    self.once('ledger_closed', setActivityInterval);
   });
 
-  //this.once('ledger_closed', setActivityInterval);
+  this.once('ledger_closed', setActivityInterval);
 
   this._remote.on('ledger_closed', function(ledger) {
     self._updateScore('ledgerclose', ledger);
@@ -218,7 +218,7 @@ Server.prototype._checkActivity = function() {
   var delta = (Date.now() - this._lastLedgerClose);
 
   if (delta > (1000 * 25)) {
-    //this.reconnect();
+    this.reconnect();
   }
 };
 
@@ -261,7 +261,7 @@ Server.prototype._updateScore = function(type, data) {
   }
 
   if (this._score > 1e3) {
-    //this.reconnect();
+    this.reconnect();
   }
 };
 
@@ -285,7 +285,7 @@ Server.prototype._remoteAddress = function() {
  * @api public
  */
 
-Server.prototype.disconnect = function() {
+Server.prototype.disconnect = function(callback) {
   this._shouldConnect = false;
   this._setState('offline');
   if (this._ws) {
@@ -300,8 +300,14 @@ Server.prototype.disconnect = function() {
  */
 
 Server.prototype.reconnect = function() {
+  var self = this;
+
+  function disconnected() {
+    self.connect();
+  };
+
   if (this._ws) {
-    this.once('disconnect', this.connect.bind(this));
+    this.once('disconnect', disconnected);
     this.disconnect();
   }
 };
@@ -688,7 +694,7 @@ Server.prototype._computeFee = function(transaction) {
   var units;
 
   if (transaction instanceof Transaction) {
-    units = transaction._getFeeUnits();
+    units = transaction.feeUnits();
   } else if (typeof transaction === 'number') {
     units = transaction;
   } else {
