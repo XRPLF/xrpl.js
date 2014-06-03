@@ -1,4 +1,5 @@
 var crypt   = require('./crypt').Crypt;
+var SignedRequest = require('./signedrequest').SignedRequest;
 var request = require('superagent');
 var extend  = require("extend");
 
@@ -34,7 +35,6 @@ BlobObj.ops = {
 
 
 BlobObj.opsReverseMap = [ ];
-
 for (var name in BlobObj.ops) {
   BlobObj.opsReverseMap[BlobObj.ops[name]] = name;
 }
@@ -56,7 +56,7 @@ var entityTypes = [
   'individual',
   'organization',
   'corporation'
-]
+];
 
 var addressFields = [
   'contact',
@@ -153,7 +153,9 @@ BlobObj.prototype.consolidate = function(fn) {
     },
   };
 
-  var signed = crypt.signRequestHmac(config, this.data.auth_secret, this.id);
+  var signedRequest = new SignedRequest(config);
+
+  var signed = signedRequest.signHmac(this.data.auth_secret, this.id);
 
   request.post(signed.url)
     .send(signed.data)
@@ -198,8 +200,7 @@ BlobObj.prototype.applyEncryptedPatch = function(patch) {
  *
  * @param {string} secretUnlockkey
  */
-
-BlobObj.prototype.encryptSecret = function(secretUnlockKey, secret) {
+BlobObj.prototype.encryptSecret = function (secretUnlockKey, secret) {
   return crypt.encrypt(secretUnlockKey, secret);
 };
 
@@ -483,7 +484,10 @@ BlobObj.prototype.postUpdate = function(op, pointer, params, fn) {
     }
   };
 
-  var signed = crypt.signRequestHmac(config, this.data.auth_secret, this.id);
+
+  var signedRequest = new SignedRequest(config);
+
+  var signed = signedRequest.signHmac(this.data.auth_secret, this.id);
 
   request.post(signed.url)
   .send(signed.data)
@@ -781,6 +785,7 @@ exports.getRippleName = function(url, address, fn) {
     return fn (new Error('Invalid ripple address'));
   }
 
+  if (!crypt.isValidAddress(address)) return fn (new Error("Invalid ripple address"));
   request.get(url + '/v1/user/' + address, function(err, resp){
     if (err) {
       fn(new Error('Unable to access vault sever'));
@@ -840,11 +845,11 @@ BlobClient.create = function(options, fn) {
   blob.revision = 0;
 
   blob.data = {
-    auth_secret: crypt.createSecret(8),
-    account_id: crypt.getAddress(options.masterkey),
-    email: options.email,
-    contacts: [],
-    created: (new Date()).toJSON()
+    auth_secret : crypt.createSecret(8),
+    account_id  : crypt.getAddress(options.masterkey),
+    email       : options.email,
+    contacts    : [],
+    created     : (new Date()).toJSON()
   };
 
   blob.encrypted_secret = blob.encryptSecret(options.unlock, options.masterkey);
@@ -856,30 +861,33 @@ BlobClient.create = function(options, fn) {
 
   //post to the blob vault to create
   var config = {
-    method: 'POST',
-    url: options.url + '/v1/user',
-    data: {
-      blob_id: options.id,
-      username: options.username,
-      address: blob.data.account_id,
-      auth_secret: blob.data.auth_secret,
-      data: blob.encrypt(),
-      email: options.email,
-      hostlink: options.activateLink,
-      encrypted_blobdecrypt_key: blob.encryptBlobCrypt(options.masterkey, options.crypt),
-      encrypted_secret: blob.encrypted_secret
+    method : 'POST',
+    url    : options.url + '/v1/user',
+    data   : {
+      blob_id     : options.id,
+      username    : options.username,
+      address     : blob.data.account_id,
+      auth_secret : blob.data.auth_secret,
+      data        : blob.encrypt(),
+      email       : options.email,
+      hostlink    : options.activateLink,
+      encrypted_blobdecrypt_key : blob.encryptBlobCrypt(options.masterkey, options.crypt),
+      encrypted_secret : blob.encrypted_secret
     }
   };
 
-  var signed = crypt.signRequestAsymmetric(config, options.masterkey, blob.data.account_id, options.id);
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(options.masterkey, blob.data.account_id, options.id);
 
-  request.post(signed)
+  request.post(signed.url)
     .send(signed.data)
     .end(function(err, resp) {
       if (err) {
         fn(err);
       } else if (resp.body && resp.body.result === 'success') {
         fn(null, blob,resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
       } else {
         fn(new Error('Could not create blob'));
       }

@@ -3,6 +3,7 @@ var extend    = require('extend');
 var binformat = require('./binformat');
 var stypes    = require('./serializedtypes');
 var UInt256   = require('./uint256').UInt256;
+var Crypt     = require('./crypt').Crypt;
 var utils     = require('./utils');
 
 var sjcl = utils.sjcl;
@@ -247,19 +248,22 @@ SerializedObject.prototype.serialize = function(typedef, obj) {
 
 SerializedObject.prototype.hash = function(prefix) {
   var sign_buffer = new SerializedObject();
-  stypes.Int32.serialize(sign_buffer, prefix);
+  
+  // Add hashing prefix
+  if ("undefined" !== typeof prefix) {
+    stypes.Int32.serialize(sign_buffer, prefix);
+  }
+
+  // Copy buffer to temporary buffer
   sign_buffer.append(this.buffer);
-  return sign_buffer.hash_sha512_half();
+  
+  // XXX We need a proper Buffer class then Crypt could accept that
+  var bits = sjcl.codec.bytes.toBits(sign_buffer.buffer);
+  return Crypt.hashSha512Half(bits);
 };
 
 // DEPRECATED
 SerializedObject.prototype.signing_hash = SerializedObject.prototype.hash;
-
-SerializedObject.prototype.hash_sha512_half = function() {
-  var bits = sjcl.codec.bytes.toBits(this.buffer);
-  var hash = sjcl.bitArray.bitSlice(sjcl.hash.sha512.hash(bits), 0, 256);
-  return UInt256.from_hex(sjcl.codec.hex.fromBits(hash));
-};
 
 SerializedObject.prototype.serialize_field = function(spec, obj) {
   var name     = spec[0];

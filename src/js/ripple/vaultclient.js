@@ -323,29 +323,29 @@ VaultClient.prototype.register = function(options, fn) {
     });
   };
 
-  function create(authInfo, keys) {
+  function create(authInfo, keys, callback) {
     var params = {
       url: authInfo.blobvault,
-      id: keys.loginKeys.id,
-      crypt: keys.loginKeys.crypt,
-      unlock: keys.unlockKeys.unlock,
+      id: keys.login.id,
+      crypt: keys.login.crypt,
+      unlock: keys.unlock.unlock,
       username: username,
       email: options.email,
       masterkey: options.masterkey || crypt.createMaster(),
       activateLink: options.activateLink,
       oldUserBlob: options.oldUserBlob
     };
-
+        
     blobClient.create(params, function(err, blob) {
       if (err) {
         callback(err);
       } else {
-        callback(null, blob, loginKeys, authInfo.username);
+        callback(null, blob, keys, authInfo.username);
       }
     });
   };
 
-  async.waterfall([ getAuthInfo, deriveKeys ], create);
+  async.waterfall([ getAuthInfo, deriveKeys, create], fn);
 };
 
 exports.VaultClient = VaultClient;
