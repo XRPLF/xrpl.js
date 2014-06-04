@@ -566,7 +566,7 @@ function normalizeSubcommands(subcommands, compress) {
 var Identity = function (blob) {
   this._getBlob = function() {
     return blob;
-  }
+  };
 }; 
 
 /**

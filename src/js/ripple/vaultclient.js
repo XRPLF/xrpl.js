@@ -155,9 +155,9 @@ VaultClient.prototype.unlock = function(username, password, encryptSecret, callb
 
       var secret;
       try {
-        secret = crypt.decrypt(keys.unlock, encryptSecret)
-      } catch (err) {
-        return callback(err);
+        secret = crypt.decrypt(keys.unlock, encryptSecret);
+      } catch (error) {
+        return callback(error);
       } 
            
       callback(null, {
@@ -197,9 +197,9 @@ VaultClient.prototype.loginAndUnlock = function(username, password, callback) {
 
       var secret;
       try {
-        secret = crypt.decrypt(keys.unlock, blob.encrypted_secret)
-      } catch (err) {
-        return callback(err);
+        secret = crypt.decrypt(keys.unlock, blob.encrypted_secret);
+      } catch (error) {
+        return callback(error);
       } 
             
       callback(null, {
