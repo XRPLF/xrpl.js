@@ -245,37 +245,47 @@ Transaction.prototype._accountSecret = function(account) {
  * @return {Number} Number of fee units for this transaction.
  */
 
-Transaction.prototype.getFee =
+Transaction.prototype._getFeeUnits =
 Transaction.prototype.feeUnits = function() {
   return Transaction.fee_units['default'];
 };
 
 /**
- * Get the server whose fee is currently the lowest
+ * Compute median server fee
  */
 
-Transaction.prototype._getServer = function() {
-  var self    = this;
+Transaction.prototype._computeFee = function() {
   var servers = this.remote._servers;
-  var fee     = Infinity;
-  var result;
+  var fees = [ ];
 
   for (var i=0; i<servers.length; i++) {
     var server = servers[i];
-
-    if (!server._connected) {
-      continue;
-    }
-
-    var serverFee = server._computeFee(this);
-
-    if (serverFee < fee) {
-      result = server;
-      fee = serverFee;
+    if (server._connected) {
+      fees.push(Number(server._computeFee(this)));
     }
   }
 
-  return result;
+  if (fees.length === 1) {
+    return String(fees[0]);
+  }
+
+  fees.sort(function ascending(a, b) {
+    if (a > b) {
+      return 1;
+    } else if (a < b) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
+
+  var midInd = Math.floor(fees.length / 2);
+
+  var median = fees.length % 2 === 0
+  ? (fees[midInd] + fees[midInd - 1]) / 2
+  : fees[midInd];
+
+  return String(median);
 };
 
 /**
@@ -315,8 +325,7 @@ Transaction.prototype.complete = function() {
   // an assigned server
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
     if (this.remote.local_fee || !this.remote.trusted) {
-      this._server = this._getServer();
-      this.tx_json.Fee = this._server._computeFee(this);
+      this.tx_json.Fee = this._computeFee();
     }
   }
 
@@ -909,15 +918,11 @@ Transaction.prototype.transactionManager = function() {
 };
 
 Transaction.prototype.abort = function(callback) {
+  var callback = (typeof callback === 'function') ? callback : function(){};
   if (!this.finalized) {
-    var callback = (typeof callback === 'function') ? callback : function(){};
     this.once('final', callback);
     this.emit('abort');
   }
-};
-
-Transaction.prototype.iff = function(fn) {
-  this._iff = fn;
 };
 
 Transaction.prototype.summary = function() {
@@ -934,7 +939,7 @@ Transaction.summary = function() {
     initialSubmitIndex:  this.initialSubmitIndex,
     lastLedgerSequence:  this.lastLedgerSequence,
     state:               this.state,
-    server:              this._server ? this._server._opts.url :  void(0),
+    server:              this._server ? this._server._opts.url : void(0),
     finalized:           this.finalized
   };
 
