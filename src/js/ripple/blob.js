@@ -829,14 +829,50 @@ BlobClient.get = function (url, id, crypt, fn) {
 BlobClient.verify = function(url, username, token, fn) {
   url += '/v1/user/' + username + '/verify/' + token;
   request.get(url, function(err, resp){
-    if (err) {
-      fn(err);
+    if (err) {    
+      fn(new Error("Failed to verify the account - XHR error"));
     } else if (resp.body && resp.body.result === 'success') {
-      fn(null, data);
+      fn(null, resp.body);
     } else {
       fn(new Error('Failed to verify the account'));
     }
   });
+};
+
+/**
+ * ResendEmail
+ * resend verification email
+ */
+BlobClient.resendEmail = function (opts, fn) {
+  var config = {
+    method : 'POST',
+    url    : opts.url + '/v1/user/email',
+    data   : {
+      blob_id  : opts.id,
+      username : opts.username,
+      email    : opts.email,
+      hostlink : opts.activateLink
+    }
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(opts.masterkey, opts.account_id, opts.id);
+
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      if (err) {
+        console.log("blob: could not resend the token:", err);
+        fn(new Error("Failed to resend the token"));
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        console.log("blob: could not resend the token:", resp.body.message);
+        fn(new Error("Failed to resend the token"));
+      } else {
+        fn(new Error("Failed to resend the token")); 
+      }
+    });
 };
 
 /**

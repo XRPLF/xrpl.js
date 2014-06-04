@@ -153,9 +153,16 @@ VaultClient.prototype.unlock = function(username, password, encryptSecret, callb
         return callback(err);
       }
 
+      var secret;
+      try {
+        secret = crypt.decrypt(keys.unlock, encryptSecret)
+      } catch (err) {
+        return callback(err);
+      } 
+           
       callback(null, {
-        keys: keys,
-        secret: crypt.decrypt(keys.unlock, encryptSecret)
+        keys   : keys,
+        secret : secret
       });
     });
   };
@@ -188,12 +195,19 @@ VaultClient.prototype.loginAndUnlock = function(username, password, callback) {
         return callback(err);
       }
 
+      var secret;
+      try {
+        secret = crypt.decrypt(keys.unlock, blob.encrypted_secret)
+      } catch (err) {
+        return callback(err);
+      } 
+            
       callback(null, {
-        blob: blob,
-        unlock: keys.unlock,
-        secret: crypt.decrypt(keys.unlock, blob.encrypted_secret),
-        username: authInfo.username,
-        verified: authInfo.emailVerified
+        blob     : blob,
+        unlock   : keys.unlock,
+        secret   : secret,
+        username : authInfo.username,
+        verified : authInfo.emailVerified
       });
     });
   };
@@ -261,6 +275,16 @@ VaultClient.prototype.verify = function(username, token, callback) {
 
     blobClient.verify(authInfo.blobvault, username.toLowerCase(), token, callback);
   });
+};
+
+/**
+ * resendEmail
+ * send a new verification email
+ * @param {object}   options
+ * @param {function} callback
+ */
+VaultClient.prototype.resendEmail = function (options, callback) {
+  blobClient.resendEmail(options, callback);  
 };
 
 /**
