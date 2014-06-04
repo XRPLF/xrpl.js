@@ -245,7 +245,7 @@ Crypt.getAddress = function (masterkey) {
 Crypt.hashSha512 = function (data) {
   // XXX Should return a UInt512
   return sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(data)); 
-}
+};
 
 /**
  * Hash data using SHA-512 and return the first 256 bits.

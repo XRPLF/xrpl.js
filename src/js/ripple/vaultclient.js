@@ -340,7 +340,10 @@ VaultClient.prototype.register = function(options, fn) {
       if (err) {
         callback(err);
       } else {
-        callback(null, blob, keys, authInfo.username);
+        callback(null, {
+          blob     : blob, 
+          username : authInfo.username
+        });
       }
     });
   };
