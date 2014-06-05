@@ -16,6 +16,22 @@ describe('Amount', function() {
       assert(Amount.from_json('1').is_positive());
     });
   });
+  describe('from_human', function() {
+    it('1 XRP', function() {
+      assert.strictEqual(Amount.from_human("1 XRP").to_text_full(), '1/XRP');
+    });
+    it('0.1 XRP', function() {
+      assert.strictEqual(Amount.from_human("0.1 XRP").to_text_full(), '0.1/XRP');
+    });
+    it('0.1 USD', function() {
+      assert.strictEqual(Amount.from_human("0.1 USD").to_text_full(), '0.1/USD/NaN');
+    });
+  });
+  describe('from_json', function() {
+    it('1 XRP', function() {
+      assert.strictEqual(Amount.from_json("1/XRP").to_text_full(), "1/XRP/NaN");
+    });
+  });
   describe('from_number', function() {
     it('Number 1', function() {
       assert.strictEqual(Amount.from_number(1).to_text_full(), '1/1/rrrrrrrrrrrrrrrrrrrrBZbvji');

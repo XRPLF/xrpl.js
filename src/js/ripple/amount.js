@@ -602,14 +602,14 @@ Amount.prototype.invert = function() {
  * \s*                          // any amount of whitespace
  * (-)?                         // optional dash
  * (\d+)                        // 1 or more digits
- * (\.(\d*))?                   // optional . character with any amount of digits
+ * (?:\.(\d*))?                 // optional . character with any amount of digits
  * \s*                          // any amount of whitespace
  * ([a-f0-9]{40}|[a-z0-9]{3})?  // optional 40 character hex string OR 3 letters
  * \s*                          // any amount of whitespace
  * $                            // end of string
  *
  */
-Amount.human_RE = /^\s*([a-z]{3}|[0-9]{3})?\s*(-)?(\d+)(\.(\d*))?\s*([a-f0-9]{40}|[a-z0-9]{3})?\s*$/i;
+Amount.human_RE = /^\s*([a-z]{3}|[0-9]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([a-f0-9]{40}|[a-z0-9]{3})?\s*$/i;
 
 Amount.prototype.parse_human = function(j, opts) {
   opts = opts || {};
