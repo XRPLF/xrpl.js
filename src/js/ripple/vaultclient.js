@@ -153,9 +153,16 @@ VaultClient.prototype.unlock = function(username, password, encryptSecret, callb
         return callback(err);
       }
 
+      var secret;
+      try {
+        secret = crypt.decrypt(keys.unlock, encryptSecret);
+      } catch (error) {
+        return callback(error);
+      } 
+           
       callback(null, {
-        keys: keys,
-        secret: crypt.decrypt(keys.unlock, encryptSecret)
+        keys   : keys,
+        secret : secret
       });
     });
   };
@@ -188,12 +195,19 @@ VaultClient.prototype.loginAndUnlock = function(username, password, callback) {
         return callback(err);
       }
 
+      var secret;
+      try {
+        secret = crypt.decrypt(keys.unlock, blob.encrypted_secret);
+      } catch (error) {
+        return callback(error);
+      } 
+            
       callback(null, {
-        blob: blob,
-        unlock: keys.unlock,
-        secret: crypt.decrypt(keys.unlock, blob.encrypted_secret),
-        username: authInfo.username,
-        verified: authInfo.emailVerified
+        blob     : blob,
+        unlock   : keys.unlock,
+        secret   : secret,
+        username : authInfo.username,
+        verified : authInfo.emailVerified
       });
     });
   };
@@ -264,6 +278,16 @@ VaultClient.prototype.verify = function(username, token, callback) {
 };
 
 /**
+ * resendEmail
+ * send a new verification email
+ * @param {object}   options
+ * @param {function} callback
+ */
+VaultClient.prototype.resendEmail = function (options, callback) {
+  blobClient.resendEmail(options, callback);  
+};
+
+/**
  * Register a new user and save to the blob vault
  *
  * @param {object} options
@@ -323,29 +347,32 @@ VaultClient.prototype.register = function(options, fn) {
     });
   };
 
-  function create(authInfo, keys) {
+  function create(authInfo, keys, callback) {
     var params = {
       url: authInfo.blobvault,
-      id: keys.loginKeys.id,
-      crypt: keys.loginKeys.crypt,
-      unlock: keys.unlockKeys.unlock,
+      id: keys.login.id,
+      crypt: keys.login.crypt,
+      unlock: keys.unlock.unlock,
       username: username,
       email: options.email,
       masterkey: options.masterkey || crypt.createMaster(),
       activateLink: options.activateLink,
       oldUserBlob: options.oldUserBlob
     };
-
+        
     blobClient.create(params, function(err, blob) {
       if (err) {
         callback(err);
       } else {
-        callback(null, blob, loginKeys, authInfo.username);
+        callback(null, {
+          blob     : blob, 
+          username : authInfo.username
+        });
       }
     });
   };
 
-  async.waterfall([ getAuthInfo, deriveKeys ], create);
+  async.waterfall([ getAuthInfo, deriveKeys, create], fn);
 };
 
 exports.VaultClient = VaultClient;

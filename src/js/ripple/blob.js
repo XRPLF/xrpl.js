@@ -2,6 +2,7 @@ var crypt   = require('./crypt').Crypt;
 var SignedRequest = require('./signedrequest').SignedRequest;
 var request = require('superagent');
 var extend  = require("extend");
+var async   = require("async");
 
 var BlobClient = {};
 
@@ -56,7 +57,7 @@ var entityTypes = [
   'individual',
   'organization',
   'corporation'
-]
+];
 
 var addressFields = [
   'contact',
@@ -274,6 +275,10 @@ BlobObj.prototype.decryptBlobCrypt = function(secret) {
  */
 
 BlobObj.prototype.set = function(pointer, value, fn) {
+  if (pointer == "/" + identityRoot && this.data[identityRoot]) {
+    return fn(new Error('Cannot overwrite Identity Vault')); 
+  }
+    
   this.applyUpdate('set', pointer, [value]);
   this.postUpdate('set', pointer, [value], fn);
 };
@@ -283,6 +288,10 @@ BlobObj.prototype.set = function(pointer, value, fn) {
  */
 
 BlobObj.prototype.unset = function(pointer, fn) {
+  if (pointer == "/" + identityRoot) {
+    return fn(new Error('Cannot remove Identity Vault')); 
+  }
+  
   this.applyUpdate('unset', pointer, []);
   this.postUpdate('unset', pointer, [], fn);
 };
@@ -300,7 +309,7 @@ BlobObj.prototype.extend = function(pointer, value, fn) {
  * Prepend blob array
  */
 
-BlobObj.prototype.unshift = function(pointer, value, fn) {
+BlobObj.prototype.unshift = function(pointer, value, fn) {    
   this.applyUpdate('unshift', pointer, [value]);
   this.postUpdate('unshift', pointer, [value], fn);
 };
@@ -555,19 +564,8 @@ function normalizeSubcommands(subcommands, compress) {
  */
 
 var Identity = function (blob) {
-  var self  = this;
-  self.blob = blob;
-  
-  //make sure the identity setup is valid
-  self.validate = function(fn) {
-    if (!self.blob) return fn(new Error("Identity must be associated with a blob"));
-    else if (!self.blob.data) return fn(new Error("Invalid Blob"));  
-    else if (!self.blob.data[identityRoot]) {
-      self.blob.set(identityRoot, {}, function(err, res){
-        if (err) return fn(err);
-        else     return fn(null, true);
-      }); 
-    } else return fn(null, true);
+  this._getBlob = function() {
+    return blob;
   };
 }; 
 
@@ -578,10 +576,11 @@ var Identity = function (blob) {
  */
 
 Identity.prototype.getFullAddress = function (key) {
-  if (!this.blob || 
-      !this.blob.data || 
-      !this.blob.data[identityRoot] ||
-      !this.blob.data[identityRoot].address) {
+  var blob = this._getBlob();
+  if (!blob || 
+      !blob.data || 
+      !blob.data[identityRoot] ||
+      !blob.data[identityRoot].address) {
     return "";
   }     
   
@@ -606,12 +605,12 @@ Identity.prototype.getFullAddress = function (key) {
  */
 
 Identity.prototype.getAll = function (key) {
-
-  if (!this.blob || !this.blob.data || !this.blob.data[identityRoot]) {
+  var blob = this._getBlob();
+  if (!blob || !blob.data || !blob.data[identityRoot]) {
     return {};
   }   
   
-  var result = {}, identity = this.blob.data[identityRoot];
+  var result = {}, identity = blob.data[identityRoot];
   for (var i in identity) {
     result[i] = this.get(i, key);
   }
@@ -627,11 +626,12 @@ Identity.prototype.getAll = function (key) {
  */
 
 Identity.prototype.get = function (pointer, key) {
-  if (!this.blob || !this.blob.data || !this.blob.data[identityRoot]) {
+  var blob = this._getBlob();
+  if (!blob || !blob.data || !blob.data[identityRoot]) {
     return null;
   }
   
-  var data = this.blob.data[identityRoot][pointer];
+  var data = blob.data[identityRoot][pointer];
   if (data && data.encrypted) {
     return decrypt(key, data);
     
@@ -674,7 +674,7 @@ Identity.prototype.get = function (pointer, key) {
  */
 
 Identity.prototype.set = function (pointer, key, value, fn) {
-  var self = this;
+  var self = this, blob = this._getBlob();
   
   if (!fn) fn = function(){ };
   
@@ -718,10 +718,24 @@ Identity.prototype.set = function (pointer, key, value, fn) {
       return fn(new Error("invalid entity type"));   
     }     
   }
-  
-  this.validate(function(err, res){
-    if (err) return fn(err);
+
+  async.waterfall([ validate, set ], fn);
     
+  //make sure the identity setup is valid
+  function validate (callback) {
+   
+    if (!blob) return fn(new Error("Identity must be associated with a blob"));
+    else if (!blob.data) return fn(new Error("Invalid Blob"));  
+    else if (!blob.data[identityRoot]) {
+      blob.set("/" + identityRoot, {}, function(err, res){
+        if (err) return callback (err);
+        else     return callback (null);
+      }); 
+    } else return callback (null);
+  };
+    
+  function set (callback) {
+
     //NOTE: currently we will overwrite if it already exists
     //the other option would be to require decrypting with the
     //existing key as a form of authorization
@@ -736,8 +750,8 @@ Identity.prototype.set = function (pointer, key, value, fn) {
       value     : key ? encrypt(key, value) : value  
     };
     
-    self.blob.extend("/" + identityRoot, data, fn);
-  });
+    self._getBlob().extend("/" + identityRoot, data, callback);
+  };
   
   function encrypt (key, value) {
     if (typeof value === 'object') value = JSON.stringify(value);
@@ -765,7 +779,7 @@ Identity.prototype.unset = function (pointer, key, fn) {
     return fn(data.error);
   }
   
-  this.blob.unset("/" + identityRoot+"/" + pointer, fn);
+  this._getBlob().unset("/" + identityRoot+"/" + pointer, fn);
 };
 
 /***** blob client methods ****/
@@ -815,14 +829,50 @@ BlobClient.get = function (url, id, crypt, fn) {
 BlobClient.verify = function(url, username, token, fn) {
   url += '/v1/user/' + username + '/verify/' + token;
   request.get(url, function(err, resp){
-    if (err) {
-      fn(err);
+    if (err) {    
+      fn(new Error("Failed to verify the account - XHR error"));
     } else if (resp.body && resp.body.result === 'success') {
-      fn(null, data);
+      fn(null, resp.body);
     } else {
       fn(new Error('Failed to verify the account'));
     }
   });
+};
+
+/**
+ * ResendEmail
+ * resend verification email
+ */
+BlobClient.resendEmail = function (opts, fn) {
+  var config = {
+    method : 'POST',
+    url    : opts.url + '/v1/user/email',
+    data   : {
+      blob_id  : opts.id,
+      username : opts.username,
+      email    : opts.email,
+      hostlink : opts.activateLink
+    }
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(opts.masterkey, opts.account_id, opts.id);
+
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      if (err) {
+        console.log("blob: could not resend the token:", err);
+        fn(new Error("Failed to resend the token"));
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        console.log("blob: could not resend the token:", resp.body.message);
+        fn(new Error("Failed to resend the token"));
+      } else {
+        fn(new Error("Failed to resend the token")); 
+      }
+    });
 };
 
 /**
@@ -845,11 +895,11 @@ BlobClient.create = function(options, fn) {
   blob.revision = 0;
 
   blob.data = {
-    auth_secret: crypt.createSecret(8),
-    account_id: crypt.getAddress(options.masterkey),
-    email: options.email,
-    contacts: [],
-    created: (new Date()).toJSON()
+    auth_secret : crypt.createSecret(8),
+    account_id  : crypt.getAddress(options.masterkey),
+    email       : options.email,
+    contacts    : [],
+    created     : (new Date()).toJSON()
   };
 
   blob.encrypted_secret = blob.encryptSecret(options.unlock, options.masterkey);
@@ -861,32 +911,33 @@ BlobClient.create = function(options, fn) {
 
   //post to the blob vault to create
   var config = {
-    method: 'POST',
-    url: options.url + '/v1/user',
-    data: {
-      blob_id: options.id,
-      username: options.username,
-      address: blob.data.account_id,
-      auth_secret: blob.data.auth_secret,
-      data: blob.encrypt(),
-      email: options.email,
-      hostlink: options.activateLink,
-      encrypted_blobdecrypt_key: blob.encryptBlobCrypt(options.masterkey, options.crypt),
-      encrypted_secret: blob.encrypted_secret
+    method : 'POST',
+    url    : options.url + '/v1/user',
+    data   : {
+      blob_id     : options.id,
+      username    : options.username,
+      address     : blob.data.account_id,
+      auth_secret : blob.data.auth_secret,
+      data        : blob.encrypt(),
+      email       : options.email,
+      hostlink    : options.activateLink,
+      encrypted_blobdecrypt_key : blob.encryptBlobCrypt(options.masterkey, options.crypt),
+      encrypted_secret : blob.encrypted_secret
     }
   };
 
   var signedRequest = new SignedRequest(config);
-
   var signed = signedRequest.signAsymmetric(options.masterkey, blob.data.account_id, options.id);
 
-  request.post(signed)
+  request.post(signed.url)
     .send(signed.data)
     .end(function(err, resp) {
       if (err) {
         fn(err);
       } else if (resp.body && resp.body.result === 'success') {
         fn(null, blob,resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
       } else {
         fn(new Error('Could not create blob'));
       }

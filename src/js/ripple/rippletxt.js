@@ -64,9 +64,10 @@ RippleTxt.prototype.get = function(domain, fn) {
  */
 
 RippleTxt.prototype.parse = function(txt) {
-  var txt = txt.replace(/\r?\n/g, '\n').split('\n')
   var currentSection = '';
   var sections = { };
+  
+  txt = txt.replace(/\r?\n/g, '\n').split('\n');
 
   for (var i = 0, l = txt.length; i < l; i++) {
     var line = txt[i];
