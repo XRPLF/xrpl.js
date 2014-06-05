@@ -1,5 +1,5 @@
-var utils            = require('./testutils');
-var assert           = require('assert');
+var utils       = require('./testutils');
+var assert      = require('assert');
 var Transaction = utils.load_module('transaction').Transaction;
 
 describe('Transaction', function() {
