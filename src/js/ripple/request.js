@@ -199,7 +199,7 @@ Request.prototype.ledgerSelect = function(ledger) {
   switch (ledger) {
     case 'current':
     case 'closed':
-    case 'verified':
+    case 'validated':
       this.message.ledger_index = ledger;
       break;
 
@@ -327,7 +327,7 @@ Request.prototype.books = function(books, snapshot) {
   return this;
 };
 
-Request.prototype.addBook = function (book, snapshot) {
+Request.prototype.addBook = function(book, snapshot) {
   if (!Array.isArray(this.message.books)) {
     this.message.books = [ ];
   }

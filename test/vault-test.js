@@ -131,7 +131,7 @@ describe('VaultClient', function () {
       });
     });
   });
-  
+
   describe('#login', function() {
     it('with username and password should retrive the blob, crypt key, and id', function(done) {
       this.timeout(10000);
@@ -198,142 +198,125 @@ describe('VaultClient', function () {
   });
 });
 
-
 describe('Blob', function () {
   var vaultClient;
+  var resp;
+  var blob;
 
   vaultClient = new VaultClient({ domain: exampleData.domain });
 
-  vaultClient.login(exampleData.username, exampleData.password, function(err,resp) {
-    assert.ifError(err);
-    var blob = resp.blob;
-    describe('#set', function() {
-      it('should set a new property in the blob', function(done) {
-        this.timeout(10000)
-        blob.extend('/testObject', {
-          foo: [],
-        }, function(err, resp){
-          assert.ifError(err);
-          assert.equal(resp.result, 'success');
-          done();
-        });
+  before(function(done) {
+    this.timeout(10000);
+
+    vaultClient.login(exampleData.username, exampleData.password, function(err, res) {
+      resp = res;
+      blob = res.blob;
+      done();
+    });
+  });
+
+  it('#set', function(done) {
+    this.timeout(10000)
+    blob.extend('/testObject', {
+      foo: [],
+    }, function(err, resp){
+      assert.ifError(err);
+      assert.equal(resp.result, 'success');
+      done();
+    });
+  });
+
+  it('#extend', function(done) {
+    this.timeout(10000)
+    blob.extend('/testObject', {
+      foobar: 'baz',
+    }, function(err, resp){
+      assert.ifError(err);
+      assert.equal(resp.result, 'success');
+      done();
+    });
+  });
+
+  it('#unset', function(done) {
+    this.timeout(10000)
+    blob.unset('/testObject', function(err, resp){
+      assert.ifError(err);
+      assert.equal(resp.result, 'success');
+      done();
+    });
+  });
+
+  it('#unshift', function(done) {
+    this.timeout(10000)
+    blob.unshift('/testArray', {
+      name: 'bob',
+      address: '1234'
+    }, function(err, resp){
+      assert.ifError(err);
+      assert.equal(resp.result, 'success');
+      done();
+    });
+  });
+
+  it('#filter', function(done) {
+    this.timeout(10000)
+
+    blob.filter('/testArray', 'name', 'bob', 'extend', '', {description:'Alice'}, function(err, resp){
+      assert.ifError(err);
+      assert.equal(resp.result, 'success');
+      done();
+    });
+  });
+
+  it('#consolidate', function(done) {
+    this.timeout(10000)
+    blob.unset('/testArray', function(err, resp){
+      assert.ifError(err);
+      assert.equal(resp.result, 'success');
+      blob.consolidate(function(err, resp){
+        assert.ifError(err);
+        assert.equal(resp.result, 'success');
+        done();
       });
     });
+  });  
 
-    describe('#extend', function() {
-      it('should extend an object in the blob', function(done) {
-        this.timeout(10000)
-        blob.extend('/testObject', {
-          foobar: 'baz',
-        }, function(err, resp){
-          assert.ifError(err);
-          assert.equal(resp.result, 'success');
-          done();
-        });
-      });
-    });
+  describe('identity', function() {
+    it('#identity_set', function (done) {
+      this.timeout(10000);
 
-    describe('#unset', function() {
-      it('should remove a property from the blob', function(done) {
-        this.timeout(10000)
-        blob.unset('/testObject', function(err, resp){
-          assert.ifError(err);
-          assert.equal(resp.result, 'success');
-          done();
-        });
-      });
-    });
-
-    describe('#unshift', function() {
-      it('should prepend an item to an array in the blob', function(done) {
-        this.timeout(10000)
-        blob.unshift('/testArray', {
-          name: 'bob',
-          address: '1234'
-        }, function(err, resp){
-          assert.ifError(err);
-          assert.equal(resp.result, 'success');
-          done();
-        });
-      });
-    });
-
-    describe('#filter', function() {
-      it('should find a specific entity in an array and apply subcommands to it', function(done) {
-        this.timeout(10000)
-
-        blob.filter('/testArray', 'name', 'bob', 'extend', '', {description:'Alice'}, function(err, resp){
-          assert.ifError(err);
-          assert.equal(resp.result, 'success');
-          done();
-        });
-      });
-    });
-
-    describe('#consolidate', function() {
-      it('should consolidate and save changes to the blob', function(done) {
-        this.timeout(10000)
-        blob.unset('/testArray', function(err, resp){
-          assert.ifError(err);
-          assert.equal(resp.result, 'success');
-          blob.consolidate(function(err, resp){
-            assert.ifError(err);
-            assert.equal(resp.result, 'success');
-            done();
-          });
-        });
+      blob.identity.set('address', exampleData.unlock, {city:"San Francisco", region:"CA"}, function (err, resp) {
+        assert.ifError(err);
+        assert.equal(resp.result, 'success');
+        done();          
       });
     });  
-    
-    /********* Identity tests ***********/
-    describe('#identity_set', function () {
-      it('should set an identity property', function (done) {
-        this.timeout(10000);
-        
-        blob.identity.set('address', exampleData.unlock, {city:"San Francisco", region:"CA"}, function (err, resp) {
-          assert.ifError(err);
-          assert.equal(resp.result, 'success');
-          done();          
-        });
-      });      
-    });  
 
-    describe('#identity_get', function () {
-      it('should retreive an identity property given the property name and encryption key', function () {
-        
-        var property = blob.identity.get('address', exampleData.unlock);
-        assert.ifError(property.error);   
-        assert.equal(typeof property.encrypted, 'boolean');     
-        assert.notEqual(typeof property.value, 'undefined');  
-      });      
+    it('#identity_get', function () {
+      var property = blob.identity.get('address', exampleData.unlock);
+      assert.ifError(property.error);   
+      assert.equal(typeof property.encrypted, 'boolean');     
+      assert.notEqual(typeof property.value, 'undefined');  
+    });      
+
+    it('#identity_getAll', function () {
+      var obj = blob.identity.getAll(exampleData.unlock);  
+      assert.equal(typeof obj, 'object');       
     }); 
 
-    describe('#identity_getAll', function () {
-      it('should retreive all identity properties given the encryption key', function () {
-        
-        var obj = blob.identity.getAll(exampleData.unlock);  
-        assert.equal(typeof obj, 'object');       
-      });      
-    }); 
+    it('#identity_getFullAddress', function () {
+      var address = blob.identity.getFullAddress(exampleData.unlock);  
+      assert.equal(typeof address, 'string');       
+    });      
 
-    describe('#identity_getFullAddress', function () {
-      it('should retreive the address as a string', function () {
-        
-        var address = blob.identity.getFullAddress(exampleData.unlock);  
-        assert.equal(typeof address, 'string');       
-      });      
-    }); 
-                
-    describe('#identity_unset', function () {
-      it('should remove an identity property', function (done) {
-        this.timeout(10000);
-        
-        blob.identity.unset('name', exampleData.unlock, function (err, resp) {
-          assert.ifError(err);
-          assert.equal(resp.result, 'success');
-          done();          
-        });
-      });      
-    });        
+    it('#identity_unset', function (done) {
+      this.timeout(10000);
+
+      blob.identity.unset('name', exampleData.unlock, function (err, resp) {
+        assert.ifError(err);
+        assert.equal(resp.result, 'success');
+        done();          
+      });
+    });      
   });
 });

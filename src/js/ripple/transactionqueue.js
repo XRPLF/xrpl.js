@@ -4,6 +4,7 @@
  */
 
 var LRU = require('lru-cache');
+var Transaction = require('./transaction').Transaction;
 
 function TransactionQueue() {
   this._queue = [ ];
@@ -17,6 +18,15 @@ function TransactionQueue() {
 
 TransactionQueue.prototype.addReceivedSequence = function(sequence) {
   this._sequenceCache.set(String(sequence), true);
+};
+
+/**
+ * Check that sequence number has been consumed by a validated
+ * transaction
+ */
+
+TransactionQueue.prototype.hasSequence = function(sequence) {
+  return this._sequenceCache.has(String(sequence));
 };
 
 /**
@@ -36,21 +46,12 @@ TransactionQueue.prototype.getReceived = function(id) {
 };
 
 /**
- * Check that sequence number has been consumed by a validated
- * transaction
- */
-
-TransactionQueue.prototype.hasSequence = function(sequence) {
-  return this._sequenceCache.has(String(sequence));
-};
-
-/**
  * Get a submitted transaction by ID. Transactions
  * may have multiple associated IDs.
  */
 
 TransactionQueue.prototype.getSubmission = function(id) {
-  var result = false;
+  var result = void(0);
 
   for (var i=0, tx; (tx=this._queue[i]); i++) {
     if (~tx.submittedIDs.indexOf(id)) {
@@ -69,6 +70,14 @@ TransactionQueue.prototype.getSubmission = function(id) {
 TransactionQueue.prototype.remove = function(tx) {
   // ND: We are just removing the Transaction by identity
   var i = this._queue.length;
+
+  if (typeof tx === 'string') {
+    tx = this.getSubmission(tx);
+  }
+
+  if (!(tx instanceof Transaction)) {
+    return;
+  }
 
   while (i--) {
     if (this._queue[i] === tx) {
