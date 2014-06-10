@@ -286,7 +286,7 @@ describe('Server', function() {
         remoteAddress: '127.0.0.1'
       }
     };
-    assert.strictEqual(server.getRemoteAddress(), '127.0.0.1');
+    assert.strictEqual(server._remoteAddress(), '127.0.0.1');
   });
 
   it('Disconnect', function(done) {
@@ -433,12 +433,14 @@ describe('Server', function() {
 
     server._handleClose();
 
-    function noOp() {};
+    var noOp = (function noOp(){}).toString();
 
-    assert.strictEqual(server._ws.onopen.toString(), noOp.toString());
-    assert.strictEqual(server._ws.onclose.toString(), noOp.toString());
-    assert.strictEqual(server._ws.onmessage.toString(), noOp.toString());
-    assert.strictEqual(server._ws.onerror.toString(), noOp.toString());
+    var coverageRE = /__cov_.+;/;
+
+    assert.strictEqual(server._ws.onopen.toString().replace(coverageRE, ''), noOp);
+    assert.strictEqual(server._ws.onclose.toString().replace(coverageRE, ''), noOp);
+    assert.strictEqual(server._ws.onmessage.toString().replace(coverageRE, ''), noOp);
+    assert.strictEqual(server._ws.onerror.toString().replace(coverageRE, ''), noOp);
     assert.strictEqual(server._state, 'offline');
   });
 
