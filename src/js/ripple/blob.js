@@ -876,6 +876,49 @@ BlobClient.resendEmail = function (opts, fn) {
 };
 
 /**
+ * Rename a ripple account
+ *
+ * @param opts
+ * @param fn
+ */
+BlobClient.rename = function (opts, fn) {
+  opts.blob.key = opts.crypt;
+  opts.blob.encrypted_blobdecrypt_key = opts.blob.encryptBlobCrypt(opts.masterkey, opts.crypt);
+  opts.blob.encryptedSecret = opts.blob.encryptSecret(opts.unlock, opts.masterkey);
+
+  var config = {
+    method: 'POST',
+    url: opts.url + '/v1/user/' + opts.username,
+    data: {
+      blob_id: opts.new_blob_id,
+      username: opts.new_username,
+      data: opts.blob.encrypt(),
+      encrypted_secret: opts.blob.encryptedSecret,
+      revision: opts.blob.revision
+    }
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(opts.masterkey, opts.blob.data.account_id, opts.blob.id);
+
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      if (err) {
+        console.log("blob: could not rename:", err);
+        fn(new Error("Failed to rename"));
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        console.log("blob: could not rename:", resp.body.message);
+        fn(new Error("Failed to rename"));
+      } else {
+        fn(new Error("Failed to rename"));
+      }
+    });
+};
+
+/**
  * Create a blob object
  *
  * @param {object} options

@@ -288,6 +288,87 @@ VaultClient.prototype.resendEmail = function (options, callback) {
 };
 
 /**
+ * rename
+ * rename a ripple account
+ * @param {object}   options
+ * @param {function} callback
+ */
+VaultClient.prototype.rename = function (options, callback) {
+  var self = this;
+  var new_username = options.new_username;
+  var password = options.password;
+
+  // TODO duplicate function
+  function getAuthInfo(callback) {
+    self.authInfo.get(self.domain, new_username, function(err, authInfo) {
+      if (err) {
+        return callback(err);
+      }
+
+      if (authInfo.version !== 3) {
+        return callback(new Error('This wallet is incompatible with this version of the vault-client.'));
+      }
+
+      if (!authInfo.pakdf) {
+        return callback(new Error('No settings for PAKDF in auth packet.'));
+      }
+
+      /*if (!authInfo.exists) {
+        return callback(new Error('User does not exist.'));
+      }*/
+
+      if (typeof authInfo.blobvault !== 'string') {
+        return callback(new Error('No blobvault specified in the authinfo.'));
+      }
+
+      callback(null, authInfo);
+    });
+  }
+
+  // TODO duplicate function
+  function deriveLoginKeys(authInfo, callback) {
+    //derive login keys
+    crypt.derive(authInfo.pakdf, 'login', new_username.toLowerCase(), password, function(err, keys) {
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, authInfo, keys);
+      }
+    });
+  }
+
+  // TODO duplicate function
+  function deriveUnlockKey(authInfo, callback) {
+    //derive unlock key
+    crypt.derive(authInfo.pakdf, 'unlock', new_username.toLowerCase(), password, function(err, keys) {
+      if (err) {
+        console.log('Error',err);
+        return callback(err);
+      }
+
+      callback(null, keys.unlock);
+    });
+  }
+
+  getAuthInfo(function(err, authInfo){
+    deriveLoginKeys(authInfo, function(err, authInfo, loginKeys){
+      deriveUnlockKey(authInfo, function(err, unlockKeys){
+        if (err) {
+          console.log('Error', err);
+          return;
+        }
+
+        options.crypt = loginKeys.crypt;
+        options.new_blob_id = loginKeys.id;
+        options.unlock = unlockKeys;
+
+        blobClient.rename(options, callback);
+      })
+    })
+  });
+};
+
+/**
  * Register a new user and save to the blob vault
  *
  * @param {object} options
