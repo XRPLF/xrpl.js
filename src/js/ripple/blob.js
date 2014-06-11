@@ -962,7 +962,7 @@ BlobClient.updateKeys = function (opts, fn) {
       blob_id  : opts.blob.id,
       data     : opts.blob.encrypt(),
       revision : opts.blob.revision,
-      encrypted_secret : opts.blob.encryptedSecret,
+      encrypted_secret : opts.blob.encrypted_secret,
       encrypted_blobdecrypt_key : opts.blob.encryptBlobCrypt(opts.masterkey, opts.keys.crypt),
     }
   };
