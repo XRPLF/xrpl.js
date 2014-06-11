@@ -90,9 +90,9 @@ VaultClient.prototype.login = function(username, password, callback) {
       self.infos[keys.id] = authInfo;
 
       callback(null, {
-        blob: blob,
-        username: authInfo.username,
-        verified: authInfo.emailVerified
+        blob      : blob,
+        username  : authInfo.username,
+        verified  : authInfo.emailVerified
       });
     });
   };
@@ -203,11 +203,11 @@ VaultClient.prototype.loginAndUnlock = function(username, password, callback) {
       } 
             
       callback(null, {
-        blob     : blob,
-        unlock   : keys.unlock,
-        secret   : secret,
-        username : authInfo.username,
-        verified : authInfo.emailVerified
+        blob      : blob,
+        unlock    : keys.unlock,
+        secret    : secret,
+        username  : authInfo.username,
+        verified  : authInfo.emailVerified
       });
     });
   };
@@ -231,7 +231,7 @@ VaultClient.prototype.loginAndUnlock = function(username, password, callback) {
     if (!authInfo) {
       return callback(new Error('Unable to find authInfo'));
     }
-
+  
     deriveUnlockKey(authInfo, resp.blob, callback);
   });
 };
@@ -281,10 +281,117 @@ VaultClient.prototype.verify = function(username, token, callback) {
  * resendEmail
  * send a new verification email
  * @param {object}   options
+ * @param {function} fn - Callback
+ */
+VaultClient.prototype.resendEmail = function (options, fn) {
+  blobClient.resendEmail(options, fn);  
+};
+
+/**
+ * recoverBlob
+ * recover blob with account secret
+ * @param {object} options
+ * @param {string} options.url
+ * @param {string} options.username
+ * @param {string} options.masterkey
+ * @param {function} 
+ */
+
+VaultClient.prototype.recoverBlob = function (options, fn) {
+  blobClient.recoverBlob(options, fn);    
+};
+
+VaultClient.prototype.updateBlobKeys = function (options, fn) {
+  var username = String(options.username).trim();
+  
+  this.authInfo.get(this.domain, username.toLowerCase(), function(err, authInfo) {
+    if (err) {
+      return callback(err);
+    } 
+    options.pakdf = authInfo.pakdf;
+    options.blob.updateKeys(options, fn);
+  });
+}
+
+/**
+ * rename
+ * rename a ripple account
+ * @param {object}   options
  * @param {function} callback
  */
-VaultClient.prototype.resendEmail = function (options, callback) {
-  blobClient.resendEmail(options, callback);  
+VaultClient.prototype.rename = function (options, callback) {
+  var self = this;
+  var new_username = options.new_username;
+  var password = options.password;
+
+  // TODO duplicate function
+  function getAuthInfo(callback) {
+    self.authInfo.get(self.domain, new_username, function(err, authInfo) {
+      if (err) {
+        return callback(err);
+      }
+
+      if (authInfo.version !== 3) {
+        return callback(new Error('This wallet is incompatible with this version of the vault-client.'));
+      }
+
+      if (!authInfo.pakdf) {
+        return callback(new Error('No settings for PAKDF in auth packet.'));
+      }
+
+      /*if (!authInfo.exists) {
+        return callback(new Error('User does not exist.'));
+      }*/
+
+      if (typeof authInfo.blobvault !== 'string') {
+        return callback(new Error('No blobvault specified in the authinfo.'));
+      }
+
+      callback(null, authInfo);
+    });
+  }
+
+  // TODO duplicate function
+  function deriveLoginKeys(authInfo, callback) {
+    //derive login keys
+    crypt.derive(authInfo.pakdf, 'login', new_username.toLowerCase(), password, function(err, keys) {
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, authInfo, keys);
+      }
+    });
+  }
+
+  // TODO duplicate function
+  function deriveUnlockKey(authInfo, callback) {
+    //derive unlock key
+    crypt.derive(authInfo.pakdf, 'unlock', new_username.toLowerCase(), password, function(err, keys) {
+      if (err) {
+        console.log('Error',err);
+        return callback(err);
+      }
+
+      callback(null, keys.unlock);
+    });
+  }
+
+  getAuthInfo(function(err, authInfo){
+    deriveLoginKeys(authInfo, function(err, authInfo, loginKeys){
+      deriveUnlockKey(authInfo, function(err, unlockKeys){
+        if (err) {
+          console.log('Error', err);
+          return;
+        }
+
+        options.crypt = loginKeys.crypt;
+        options.new_blob_id = loginKeys.id;
+        options.unlock = unlockKeys;
+
+        blobClient.rename(options, callback);
+      })
+    })
+  });
 };
 
 /**

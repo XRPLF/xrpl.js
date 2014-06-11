@@ -8,6 +8,7 @@ var SignedRequest = function (config) {
   // XXX Constructor should be generalized and constructing from an Angular.js
   //     $http config should be a SignedRequest.from... utility method.
   this.config = extend(true, {}, config);
+  if (!this.config.data) this.config.data = {};
 };
 
 
@@ -142,6 +143,34 @@ SignedRequest.prototype.signAsymmetric = function (secretKey, account, blob_id) 
     signature_date: date,
     signature_blob_id: blob_id,
     signature_account: account,
+    signature_type: signatureType
+  });
+
+  config.url += (parsed.search ? '&' : '?') + query;
+
+  return config;
+};
+
+/**
+ * Asymmetric signed request for vault recovery
+ * @param {Object} config
+ * @param {Object} secretKey
+ * @param {Object} username
+ */
+SignedRequest.prototype.signAsymmetricRecovery = function (secretKey, username) {
+  var config = extend(true, {}, this.config);
+
+  // Parse URL
+  var parsed        = parser.parse(config.url);
+  var date          = dateAsIso8601();
+  var signatureType = 'RIPPLE1-ECDSA-SHA512';
+  var stringToSign  = this.getStringToSign(parsed, date, signatureType);
+  var signature     = Message.signMessage(stringToSign, secretKey);
+ 
+  var query = querystring.stringify({
+    signature: Crypt.base64ToBase64Url(signature),
+    signature_date: date,
+    signature_username: username,
     signature_type: signatureType
   });
 
