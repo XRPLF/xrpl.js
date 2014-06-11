@@ -1,8 +1,8 @@
 var crypt   = require('./crypt').Crypt;
 var SignedRequest = require('./signedrequest').SignedRequest;
-var request = require('superagent');
-var extend  = require("extend");
-var async   = require("async");
+var request  = require('superagent');
+var extend   = require("extend");
+var async    = require("async");
 
 var BlobClient = {};
 
@@ -261,11 +261,12 @@ BlobObj.prototype.encryptBlobCrypt = function(secret, blobDecryptKey) {
  * Decrypt recovery key
  *
  * @param {string} secret
+ * @param {string} encryptedKey
  */
 
-BlobObj.prototype.decryptBlobCrypt = function(secret) {
+function decryptBlobCrypt (secret, encryptedKey) {
   var recoveryEncryptionKey = crypt.deriveRecoveryEncryptionKeyFromSecret(secret);
-  return crypt.decrypt(recoveryEncryptionKey, this.encrypted_blobdecrypt_key);
+  return crypt.decrypt(recoveryEncryptionKey, encryptedKey);
 };
 
 /**** Blob updating functions ****/
@@ -843,6 +844,7 @@ BlobClient.verify = function(url, username, token, fn) {
  * ResendEmail
  * resend verification email
  */
+
 BlobClient.resendEmail = function (opts, fn) {
   var config = {
     method : 'POST',
@@ -876,30 +878,145 @@ BlobClient.resendEmail = function (opts, fn) {
 };
 
 /**
- * Rename a ripple account
- *
- * @param opts
- * @param fn
+ * RecoverBlob
+ * recover a blob using the account secret
+ * @param {object} opts
+ * @param {string} opts.url
+ * @param {string} opts.username
+ * @param {string} opts.masterkey
+ * @param {function} fn
  */
-BlobClient.rename = function (opts, fn) {
-  opts.blob.key = opts.crypt;
-  opts.blob.encrypted_blobdecrypt_key = opts.blob.encryptBlobCrypt(opts.masterkey, opts.crypt);
-  opts.blob.encryptedSecret = opts.blob.encryptSecret(opts.unlock, opts.masterkey);
 
+BlobClient.recoverBlob = function (opts, fn) {
+  var username = String(opts.username).trim();
+  var config   = {
+    method : 'GET',
+    url    : opts.url + '/v1/user/recov/' + username,
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetricRecovery(opts.masterkey, username);  
+
+  request.get(signed.url)
+    .end(function(err, resp) {
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        handleRecovery(resp);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Could not recover blob'));
+      }
+    });
+    
+  function handleRecovery (resp) {
+    //decrypt crypt key
+    var crypt = decryptBlobCrypt(opts.masterkey, resp.body.encrypted_blobdecrypt_key);
+    var blob  = new BlobObj(opts.url, resp.body.blob_id, crypt);
+    
+    blob.revision = resp.body.revision;
+    blob.encrypted_secret = resp.body.encrypted_secret;
+
+    if (!blob.decrypt(resp.body.blob)) {
+      return fn(new Error('Error while decrypting blob'));
+    }
+
+    //Apply patches
+    if (resp.body.patches && resp.body.patches.length) {
+      var successful = true;
+      resp.body.patches.forEach(function(patch) {
+        successful = successful && blob.applyEncryptedPatch(patch);
+      });
+
+      if (successful) {
+        blob.consolidate();
+      }
+    }
+
+    //return with newly decrypted blob
+    fn(null, blob);
+  };
+};
+
+/**
+ * updateKeys
+ * Change the blob encryption keys
+ * @param {object} opts
+ * @param {string} opts.username
+ * @param {object} opts.keys
+ * @param {object} opts.blob
+ * @param {string} masterkey
+ */
+
+BlobClient.updateKeys = function (opts, fn) {
+  var old_id    = opts.blob.id;
+  opts.blob.id  = opts.keys.id;
+  opts.blob.key = opts.keys.crypt;
+  opts.blob.encrypted_secret = opts.blob.encryptSecret(opts.keys.unlock, opts.masterkey);
+  
   var config = {
-    method: 'POST',
-    url: opts.url + '/v1/user/' + opts.username,
-    data: {
-      blob_id: opts.new_blob_id,
-      username: opts.new_username,
-      data: opts.blob.encrypt(),
-      encrypted_secret: opts.blob.encryptedSecret,
-      revision: opts.blob.revision
+    method : 'POST',
+    url    : opts.blob.url + '/v1/user/' + opts.username + '/updatekeys',
+    data   : {
+      blob_id  : opts.blob.id,
+      data     : opts.blob.encrypt(),
+      revision : opts.blob.revision,
+      encrypted_secret : opts.blob.encryptedSecret,
+      encrypted_blobdecrypt_key : opts.blob.encryptBlobCrypt(opts.masterkey, opts.keys.crypt),
     }
   };
 
   var signedRequest = new SignedRequest(config);
-  var signed = signedRequest.signAsymmetric(opts.masterkey, opts.blob.data.account_id, opts.blob.id);
+  var signed = signedRequest.signAsymmetric(opts.masterkey, opts.blob.data.account_id, old_id); 
+
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      if (err) {
+        console.log("blob: could not update blob:", err);
+        fn(new Error('Failed to update blob - XHR error'));
+      } else if (!resp.body || resp.body.result !== 'success') {
+        console.log("blob: could not update blob:", resp.body ? resp.body.message : null);
+        fn(new Error('Failed to update blob - bad result')); 
+      } else {
+        fn(null, resp.body);
+      }
+    });     
+}; 
+ 
+/**
+ * rename
+ * Change the username
+ * @param {object} opts
+ * @param {string} opts.username
+ * @param {string} opts.new_username
+ * @param {object} opts.keys
+ * @param {object} opts.blob
+ * @param {string} masterkey
+ */
+
+BlobClient.rename = function (opts, fn) {
+  var old_id    = opts.blob.id;
+  opts.blob.id  = opts.keys.id;
+  opts.blob.key = opts.keys.crypt;
+  opts.blob.encryptedSecret = opts.blob.encryptSecret(opts.keys.unlock, opts.masterkey);
+
+  var config = {
+    method: 'POST',
+    url: opts.blob.url + '/v1/user/' + opts.username + '/rename',
+    data: {
+      blob_id  : opts.blob.id,
+      username : opts.new_username,
+      data     : opts.blob.encrypt(),
+      revision : opts.blob.revision,
+      encrypted_secret : opts.blob.encryptedSecret,
+      encrypted_blobdecrypt_key : opts.blob.encryptBlobCrypt(opts.masterkey, opts.keys.crypt)
+    }
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(opts.masterkey, opts.blob.data.account_id, old_id);
 
   request.post(signed.url)
     .send(signed.data)
@@ -978,7 +1095,7 @@ BlobClient.create = function(options, fn) {
       if (err) {
         fn(err);
       } else if (resp.body && resp.body.result === 'success') {
-        fn(null, blob,resp.body);
+        fn(null, blob, resp.body);
       } else if (resp.body && resp.body.result === 'error') {
         fn(new Error(resp.body.message)); 
       } else {

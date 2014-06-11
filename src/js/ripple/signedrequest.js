@@ -8,6 +8,7 @@ var SignedRequest = function (config) {
   // XXX Constructor should be generalized and constructing from an Angular.js
   //     $http config should be a SignedRequest.from... utility method.
   this.config = extend(true, {}, config);
+  if (!this.config.data) this.config.data = {};
 };
 
 
@@ -49,7 +50,7 @@ SignedRequest.prototype.getStringToSign = function (parsed, date, mechanism) {
     date,
     Crypt.hashSha512(canonicalRequest).toLowerCase()
   ].join('\n');
-}
+};
 
 //prepare for signing
 function copyObjectWithSortedKeys(object) {
@@ -150,6 +151,34 @@ SignedRequest.prototype.signAsymmetric = function (secretKey, account, blob_id) 
   return config;
 };
 
+/**
+ * Asymmetric signed request for vault recovery
+ * @param {Object} config
+ * @param {Object} secretKey
+ * @param {Object} username
+ */
+SignedRequest.prototype.signAsymmetricRecovery = function (secretKey, username) {
+  var config = extend(true, {}, this.config);
+
+  // Parse URL
+  var parsed        = parser.parse(config.url);
+  var date          = dateAsIso8601();
+  var signatureType = 'RIPPLE1-ECDSA-SHA512';
+  var stringToSign  = this.getStringToSign(parsed, date, signatureType);
+  var signature     = Message.signMessage(stringToSign, secretKey);
+ 
+  var query = querystring.stringify({
+    signature: Crypt.base64ToBase64Url(signature),
+    signature_date: date,
+    signature_username: username,
+    signature_type: signatureType
+  });
+
+  config.url += (parsed.search ? '&' : '?') + query;
+
+  return config;
+};
+
 var dateAsIso8601 = (function () {
   function pad(n) {
     return (n < 0 || n > 9 ? "" : "0") + n;
@@ -157,12 +186,12 @@ var dateAsIso8601 = (function () {
 
   return function dateAsIso8601() {
     var date = new Date();
-    return date.getUTCFullYear() + "-"
-      + pad(date.getUTCMonth() + 1) + "-"
-      + pad(date.getUTCDate()) + "T"
-      + pad(date.getUTCHours()) + ":"
-      + pad(date.getUTCMinutes()) + ":"
-      + pad(date.getUTCSeconds()) + ".000Z";
+    return date.getUTCFullYear() + "-" +
+      pad(date.getUTCMonth()     + 1)  + "-" +
+      pad(date.getUTCDate())     + "T" +
+      pad(date.getUTCHours())    + ":" +
+      pad(date.getUTCMinutes())  + ":" +
+      pad(date.getUTCSeconds())  + ".000Z";
   };
 })();
 
