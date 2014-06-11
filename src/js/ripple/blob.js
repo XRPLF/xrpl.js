@@ -941,107 +941,82 @@ BlobClient.recoverBlob = function (opts, fn) {
 
 /**
  * updateKeys
+ * Change the blob encryption keys
  * @param {object} opts
  * @param {string} opts.username
- * @param {string} opts.password
- * @param {string} opts.masterkey
- * @param {object} opts.pakdf 
+ * @param {object} opts.keys
+ * @param {object} opts.blob
+ * @param {string} masterkey
  */
 
-BlobObj.prototype.updateKeys = function (opts, fn) {
-  var self     = this;
-  var username = String(opts.username).trim();
-  var password = String(opts.password).trim(); 
-
-  function deriveKeys(callback) {
-    // derive unlock and login keys
-    var keys = { };
-
-    function deriveKey(keyType, callback) {
-      crypt.derive(opts.pakdf, keyType, username.toLowerCase(), password, function(err, key) {
-        if (err) {
-          callback(err);
-        } else {
-          keys[keyType] = key;
-          callback();
-        }
-      });
-    };
-
-    async.eachSeries([ 'login', 'unlock' ], deriveKey, function(err) {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, keys);
-      }
-    });
-  };
+BlobClient.updateKeys = function (opts, fn) {
+  var old_id    = opts.blob.id;
+  opts.blob.id  = opts.keys.id;
+  opts.blob.key = opts.keys.crypt;
+  opts.blob.encrypted_secret = opts.blob.encryptSecret(opts.keys.unlock, opts.masterkey);
   
-  function updateBlob (keys, callback) {
-    var old_id = self.id;
-    
-    self.id  = keys.login.id;
-    self.key = keys.login.crypt;
-    self.encrypted_secret = self.encryptSecret(keys.unlock.unlock, opts.masterkey);
-    
-    //post to the blob vault to create
-    var config = {
-      method : 'POST',
-      url    : self.url + '/v1/user/' + username,
-      data   : {
-        blob_id  : self.id,
-        data     : self.encrypt(),
-        revision : self.revision,
-        encrypted_blobdecrypt_key : self.encryptBlobCrypt(opts.masterkey, self.key),
-        encrypted_secret : self.encrypted_secret
-      }
-    };
-
-    var signedRequest = new SignedRequest(config);
-    var signed = signedRequest.signAsymmetric(opts.masterkey, self.data.account_id, old_id); 
-  
-    request.post(signed.url)
-      .send(signed.data)
-      .end(function(err, resp) {
-        if (err) {
-          fn(new Error('Updated blob could not be saved - XHR error'));
-        } else if (!resp.body || resp.body.result !== 'success') {
-          fn(new Error('Updated blob could not be saved - bad result')); 
-        } else {
-          fn(null, resp.body);
-        }
-      }); 
-  };
-  
-  async.waterfall([ deriveKeys, updateBlob ], fn);
-};
-  
-/**
- * Rename a ripple account
- *
- * @param opts
- * @param fn
- */
-BlobClient.rename = function (opts, fn) {
-  opts.blob.key = opts.crypt;
-  opts.blob.encrypted_blobdecrypt_key = opts.blob.encryptBlobCrypt(opts.masterkey, opts.crypt);
-  opts.blob.encryptedSecret = opts.blob.encryptSecret(opts.unlock, opts.masterkey);
-
   var config = {
-    method: 'POST',
-    url: opts.url + '/v1/user/' + opts.username,
-    data: {
-      blob_id: opts.new_blob_id,
-      username: opts.new_username,
-      data: opts.blob.encrypt(),
-      encrypted_secret: opts.blob.encryptedSecret,
-      encrypted_blobdecrypt_key: opts.blob.encrypted_blobdecrypt_key,
-      revision: opts.blob.revision
+    method : 'POST',
+    url    : opts.blob.url + '/v1/user/' + opts.username + '/updatekeys',
+    data   : {
+      blob_id  : opts.blob.id,
+      data     : opts.blob.encrypt(),
+      revision : opts.blob.revision,
+      encrypted_secret : opts.blob.encryptedSecret,
+      encrypted_blobdecrypt_key : opts.blob.encryptBlobCrypt(opts.masterkey, opts.keys.crypt),
     }
   };
 
   var signedRequest = new SignedRequest(config);
-  var signed = signedRequest.signAsymmetric(opts.masterkey, opts.blob.data.account_id, opts.blob.id);
+  var signed = signedRequest.signAsymmetric(opts.masterkey, opts.blob.data.account_id, old_id); 
+
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      if (err) {
+        console.log("blob: could not update blob:", err);
+        fn(new Error('Failed to update blob - XHR error'));
+      } else if (!resp.body || resp.body.result !== 'success') {
+        console.log("blob: could not update blob:", resp.body ? resp.body.message : null);
+        fn(new Error('Failed to update blob - bad result')); 
+      } else {
+        fn(null, resp.body);
+      }
+    });     
+}; 
+ 
+/**
+ * rename
+ * Change the username
+ * @param {object} opts
+ * @param {string} opts.username
+ * @param {string} opts.new_username
+ * @param {object} opts.keys
+ * @param {object} opts.blob
+ * @param {string} masterkey
+ */
+
+BlobClient.rename = function (opts, fn) {
+  var old_id    = opts.blob.id;
+  opts.blob.id  = opts.keys.id;
+  opts.blob.key = opts.keys.crypt;
+  opts.blob.encryptedSecret = opts.blob.encryptSecret(opts.keys.unlock, opts.masterkey);
+
+  var config = {
+    method: 'POST',
+    url: opts.blob.url + '/v1/user/' + opts.username + '/rename',
+    data: {
+      blob_id  : opts.blob.id,
+      username : opts.new_username,
+      data     : opts.blob.encrypt(),
+      revision : opts.blob.revision,
+      encrypted_secret : opts.blob.encryptedSecret,
+      encrypted_blobdecrypt_key : opts.blob.encryptBlobCrypt(opts.masterkey, opts.keys.crypt)
+    }
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(opts.masterkey, opts.blob.data.account_id, old_id);
 
   request.post(signed.url)
     .send(signed.data)
@@ -1130,7 +1105,3 @@ BlobClient.create = function(options, fn) {
 };
 
 exports.BlobClient = BlobClient;
-
-
-
-

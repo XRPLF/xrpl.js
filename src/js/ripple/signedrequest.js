@@ -50,7 +50,7 @@ SignedRequest.prototype.getStringToSign = function (parsed, date, mechanism) {
     date,
     Crypt.hashSha512(canonicalRequest).toLowerCase()
   ].join('\n');
-}
+};
 
 //prepare for signing
 function copyObjectWithSortedKeys(object) {
@@ -186,12 +186,12 @@ var dateAsIso8601 = (function () {
 
   return function dateAsIso8601() {
     var date = new Date();
-    return date.getUTCFullYear() + "-"
-      + pad(date.getUTCMonth() + 1) + "-"
-      + pad(date.getUTCDate()) + "T"
-      + pad(date.getUTCHours()) + ":"
-      + pad(date.getUTCMinutes()) + ":"
-      + pad(date.getUTCSeconds()) + ".000Z";
+    return date.getUTCFullYear() + "-" +
+      pad(date.getUTCMonth()     + 1)  + "-" +
+      pad(date.getUTCDate())     + "T" +
+      pad(date.getUTCHours())    + ":" +
+      pad(date.getUTCMinutes())  + ":" +
+      pad(date.getUTCSeconds())  + ".000Z";
   };
 })();
 

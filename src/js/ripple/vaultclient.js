@@ -4,6 +4,9 @@ var AuthInfo   = require('./authinfo').AuthInfo;
 var crypt      = require('./crypt').Crypt;
 
 function VaultClient(opts) {
+  
+  var self = this;
+  
   if (!opts) {
     opts = { };
   }
@@ -17,6 +20,76 @@ function VaultClient(opts) {
   this.infos    = { };
 };
 
+/**
+ * getAuthInfo
+ * gets auth info for a username. returns authinfo
+ * even if user does not exists (with exist set to false)
+ * @param {string} username
+ * @param {function} callback
+ */
+VaultClient.prototype.getAuthInfo = function (username, callback) {
+
+  this.authInfo.get(this.domain, username, function(err, authInfo) {
+    if (err) {
+      return callback(err);
+    }
+
+    if (authInfo.version !== 3) {
+      return callback(new Error('This wallet is incompatible with this version of the vault-client.'));
+    }
+
+    if (!authInfo.pakdf) {
+      return callback(new Error('No settings for PAKDF in auth packet.'));
+    }
+
+    if (typeof authInfo.blobvault !== 'string') {
+      return callback(new Error('No blobvault specified in the authinfo.'));
+    }
+
+    callback(null, authInfo);
+  });  
+};
+
+/**
+ * _deriveLoginKeys
+ * method designed for asnyc waterfall
+ */
+
+VaultClient.prototype._deriveLoginKeys = function (authInfo, password, callback) {
+  //derive login keys
+  crypt.derive(authInfo.pakdf, 'login', authInfo.username.toLowerCase(), password, function(err, keys) {
+    if (err) {
+      callback(err);
+    } else {
+      callback(null, authInfo, password, keys);
+    }
+  });
+};
+
+
+
+/**
+ * _deriveUnlockKey
+ * method designed for asnyc waterfall
+ */
+
+VaultClient.prototype._deriveUnlockKey = function (authInfo, password, keys, callback) {
+  //derive unlock key
+  crypt.derive(authInfo.pakdf, 'unlock', authInfo.username.toLowerCase(), password, function(err, unlock) {
+    if (err) {
+      console.log('Error',err);
+      return callback(err);
+    }
+
+    if (!keys) {
+      keys = { };
+    }
+    
+    keys.unlock = unlock.unlock;
+    callback(null, authInfo, keys);
+  });
+};
+  
 /**
  * Get a ripple name from a given account address, if it has one
  * @param {string} address - Account address to query
@@ -42,45 +115,27 @@ VaultClient.prototype.getRippleName = function(address, url, callback) {
 
 VaultClient.prototype.login = function(username, password, callback) {
   var self = this;
+  
+  var steps = [
+    getAuthInfo,
+    self._deriveLoginKeys,
+    getBlob
+  ];
 
+  async.waterfall(steps, callback);
+    
   function getAuthInfo(callback) {
-    self.authInfo.get(self.domain, username, function(err, authInfo) {
-      if (err) {
-        return callback(err);
-      }
-
-      if (authInfo.version !== 3) {
-        return callback(new Error('This wallet is incompatible with this version of the vault-client.'));
-      }
-
-      if (!authInfo.pakdf) {
-        return callback(new Error('No settings for PAKDF in auth packet.'));
-      }
-
-      if (!authInfo.exists) {
+    self.getAuthInfo(username, function(err, authInfo){
+      
+      if (authInfo && !authInfo.exists) {
         return callback(new Error('User does not exist.'));
       }
-
-      if (typeof authInfo.blobvault !== 'string') {
-        return callback(new Error('No blobvault specified in the authinfo.'));
-      }
-
-      callback(null, authInfo);
-    });
-  };
-
-  function deriveLoginKeys(authInfo, callback) {
-    //derive login keys
-    crypt.derive(authInfo.pakdf, 'login', username.toLowerCase(), password, function(err, keys) {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, authInfo, keys);
-      }
-    });
-  };
-
-  function getBlob(authInfo, keys, callback) {
+            
+      return callback (err, authInfo, password);
+    });  
+  }
+  
+  function getBlob(authInfo, password, keys, callback) {
     blobClient.get(authInfo.blobvault, keys.id, keys.crypt, function(err, blob) {
       if (err) {
         return callback(err);
@@ -96,14 +151,6 @@ VaultClient.prototype.login = function(username, password, callback) {
       });
     });
   };
-
-  var steps = [
-    getAuthInfo,
-    deriveLoginKeys,
-    getBlob
-  ];
-
-  async.waterfall(steps, callback);
 };
 
 /**
@@ -143,37 +190,42 @@ VaultClient.prototype.relogin = function(url, id, key, callback) {
  * @param {function}  fn - Callback function
  */
 
-VaultClient.prototype.unlock = function(username, password, encryptSecret, callback) {
+VaultClient.prototype.unlock = function(username, password, encryptSecret, fn) {
   var self = this;
+  
+  var steps = [
+    getAuthInfo,
+    self._deriveUnlockKey,
+    unlockSecret
+  ];
 
-  function deriveUnlockKey(authInfo, callback) {
-    //derive unlock key
-    crypt.derive(authInfo.pakdf, 'unlock', username.toLowerCase(), password, function(err, keys) {
-      if (err) {
-        return callback(err);
+  async.waterfall(steps, fn);
+  
+  function getAuthInfo(callback) {
+    self.getAuthInfo(username, function(err, authInfo){
+      
+      if (authInfo && !authInfo.exists) {
+        return callback(new Error('User does not exist.'));
       }
+            
+      return callback (err, authInfo, password, {});
+    });  
+  }
+  
+  function unlockSecret (authinfo, keys, callback) {
 
-      var secret;
-      try {
-        secret = crypt.decrypt(keys.unlock, encryptSecret);
-      } catch (error) {
-        return callback(error);
-      } 
-           
-      callback(null, {
-        keys   : keys,
-        secret : secret
-      });
-    });
-  };
-
-  self.authInfo.get(self.domain, username, function(err, authInfo) {
-    if (err) {
-      callback(err);
-    } else {
-      deriveUnlockKey(authInfo, callback);
-    }
-  });
+    var secret;
+    try {
+      secret = crypt.decrypt(keys.unlock, encryptSecret);
+    } catch (error) {
+      return callback(error);
+    }  
+    
+    callback(null, {
+      keys   : keys,
+      secret : secret
+    });      
+  }
 };
 
 /**
@@ -185,55 +237,65 @@ VaultClient.prototype.unlock = function(username, password, encryptSecret, callb
  * @param {function}  fn - Callback function
  */
 
-VaultClient.prototype.loginAndUnlock = function(username, password, callback) {
+VaultClient.prototype.loginAndUnlock = function(username, password, fn) {
   var self = this;
 
-  function deriveUnlockKey(authInfo, blob, callback) {
-    //derive unlock key
-    crypt.derive(authInfo.pakdf, 'unlock', username.toLowerCase(), password, function(err, keys) {
+  var steps = [
+    login,
+    deriveUnlockKey,
+    unlockSecret
+  ];
+
+  async.waterfall(steps, fn);  
+  
+  function login (callback) {
+    self.login(username, password, function(err, resp) {
+
       if (err) {
         return callback(err);
       }
-
-      var secret;
-      try {
-        secret = crypt.decrypt(keys.unlock, blob.encrypted_secret);
-      } catch (error) {
-        return callback(error);
-      } 
-            
-      callback(null, {
-        blob      : blob,
-        unlock    : keys.unlock,
-        secret    : secret,
-        username  : authInfo.username,
-        verified  : authInfo.emailVerified
-      });
-    });
+  
+      if (!resp.blob || !resp.blob.encrypted_secret) {
+        return callback(new Error('Unable to retrieve blob and secret.'));
+      }
+  
+      if (!resp.blob.id || !resp.blob.key) {
+        return callback(new Error('Unable to retrieve keys.'));
+      }
+  
+      //get authInfo via id - would have been saved from login
+      var authInfo = self.infos[resp.blob.id];
+  
+      if (!authInfo) {
+        return callback(new Error('Unable to find authInfo'));
+      }
+    
+      callback(null, authInfo, password, resp.blob);
+    });    
   };
 
-  this.login(username, password, function(err, resp) {
-    if (err) {
-      return callback(err);
-    }
-
-    if (!resp.blob || !resp.blob.encrypted_secret) {
-      return callback(new Error('Unable to retrieve blob and secret.'));
-    }
-
-    if (!resp.blob.id || !resp.blob.key) {
-      return callback(new Error('Unable to retrieve keys.'));
-    }
-
-    //get authInfo via id - would have been saved from login
-    var authInfo = self.infos[resp.blob.id];
-
-    if (!authInfo) {
-      return callback(new Error('Unable to find authInfo'));
-    }
+  function deriveUnlockKey (authInfo, password, blob, callback) {
+    self._deriveUnlockKey(authInfo, password, null, function(err, authInfo, keys){
+      callback(err, keys.unlock, authInfo, blob);
+    });
+  };
   
-    deriveUnlockKey(authInfo, resp.blob, callback);
-  });
+  function unlockSecret (unlock, authInfo, blob, callback) {
+    var secret;
+    try {
+      secret = crypt.decrypt(unlock, blob.encrypted_secret);
+    } catch (error) {
+      return callback(error);
+    }     
+    
+    callback(null, {
+      blob      : blob,
+      unlock    : unlock,
+      secret    : secret,
+      username  : authInfo.username,
+      verified  : authInfo.emailVerified
+    });    
+  };  
 };
 
 /**
@@ -264,16 +326,12 @@ VaultClient.prototype.exists = function(username, callback) {
 VaultClient.prototype.verify = function(username, token, callback) {
   var self = this;
 
-  this.authInfo.get(this.domain, username.toLowerCase(), function(err, authInfo) {
+  self.getAuthInfo(username, function (err, authinfo){
     if (err) {
       return callback(err);
     }
-
-    if (typeof authInfo.blobvault !== 'string') {
-      return callback(new Error('No blobvault specified in the authinfo.'));
-    }
-
-    blobClient.verify(authInfo.blobvault, username.toLowerCase(), token, callback);
+    
+    blobClient.verify(authInfo.blobvault, username.toLowerCase(), token, callback);     
   });
 };
 
@@ -283,6 +341,7 @@ VaultClient.prototype.verify = function(username, token, callback) {
  * @param {object}   options
  * @param {function} fn - Callback
  */
+
 VaultClient.prototype.resendEmail = function (options, fn) {
   blobClient.resendEmail(options, fn);  
 };
@@ -301,178 +360,81 @@ VaultClient.prototype.recoverBlob = function (options, fn) {
   blobClient.recoverBlob(options, fn);    
 };
 
-VaultClient.prototype.updateBlobKeys = function (options, fn) {
-  var username = String(options.username).trim();
-  
-  this.authInfo.get(this.domain, username.toLowerCase(), function(err, authInfo) {
-    if (err) {
-      return callback(err);
-    } 
-    options.pakdf = authInfo.pakdf;
-    options.blob.updateKeys(options, fn);
-  });
-}
-
-/**
- * rename
- * rename a ripple account
- * @param {object}   options
- * @param {function} callback
+/*
+ * changePassword
+ * @param {object} options
+ * @param {string} options.username
+ * @param {string} options.password
+ * @param {string} options.masterkey
+ * @param {object} options.blob
  */
-VaultClient.prototype.rename = function (options, callback) {
-  var self = this;
-  var new_username = options.new_username;
-  var password = options.password;
 
-  // TODO duplicate function
+VaultClient.prototype.changePassword = function (options, fn) {
+  var self     = this;
+  var password = String(options.password).trim();
+  
+  var steps = [
+    getAuthInfo,
+    self._deriveLoginKeys,
+    self._deriveUnlockKey,
+    changePassword
+  ];
+  
+  async.waterfall(steps, fn);
+    
   function getAuthInfo(callback) {
-    self.authInfo.get(self.domain, new_username, function(err, authInfo) {
-      if (err) {
-        return callback(err);
-      }
-
-      if (authInfo.version !== 3) {
-        return callback(new Error('This wallet is incompatible with this version of the vault-client.'));
-      }
-
-      if (!authInfo.pakdf) {
-        return callback(new Error('No settings for PAKDF in auth packet.'));
-      }
-
-      /*if (!authInfo.exists) {
-        return callback(new Error('User does not exist.'));
-      }*/
-
-      if (typeof authInfo.blobvault !== 'string') {
-        return callback(new Error('No blobvault specified in the authinfo.'));
-      }
-
-      callback(null, authInfo);
+    self.getAuthInfo(options.username, function(err, authInfo) { 
+      return callback (err, authInfo, password);      
     });
-  }
-
-  // TODO duplicate function
-  function deriveLoginKeys(authInfo, callback) {
-    //derive login keys
-    crypt.derive(authInfo.pakdf, 'login', new_username.toLowerCase(), password, function(err, keys) {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, authInfo, keys);
-      }
-    });
-  }
-
-  // TODO duplicate function
-  function deriveUnlockKey(authInfo, callback) {
-    //derive unlock key
-    crypt.derive(authInfo.pakdf, 'unlock', new_username.toLowerCase(), password, function(err, keys) {
-      if (err) {
-        console.log('Error',err);
-        return callback(err);
-      }
-
-      callback(null, keys.unlock);
-    });
-  }
-
-  getAuthInfo(function(err, authInfo){
-    deriveLoginKeys(authInfo, function(err, authInfo, loginKeys){
-      deriveUnlockKey(authInfo, function(err, unlockKeys){
-        if (err) {
-          console.log('Error', err);
-          return;
-        }
-
-        options.crypt = loginKeys.crypt;
-        options.new_blob_id = loginKeys.id;
-        options.unlock = unlockKeys;
-
-        blobClient.rename(options, callback);
-      })
-    })
-  });
+  };
+  
+  function changePassword (authInfo, keys, callback) {
+    options.keys = keys;
+    blobClient.updateKeys(options, callback); 
+  };
 };
 
 /**
  * rename
  * rename a ripple account
- * @param {object}   options
- * @param {function} callback
+ * @param {object} options
+ * @param {string} options.username
+ * @param {string} options.new_username
+ * @param {string} options.password
+ * @param {string} options.masterkey
+ * @param {object} options.blob
+ * @param {function} fn
  */
-VaultClient.prototype.rename = function (options, callback) {
-  var self = this;
-  var new_username = options.new_username;
-  var password = options.password;
 
-  // TODO duplicate function
+VaultClient.prototype.rename = function (options, fn) {
+  var self         = this;
+  var new_username = String(options.new_username).trim();
+  var password     = String(options.password).trim();
+  
+  var steps = [
+    getAuthInfo,
+    self._deriveLoginKeys,
+    self._deriveUnlockKey,
+    renameBlob
+  ];
+
+  async.waterfall(steps, fn);
+    
   function getAuthInfo(callback) {
-    self.authInfo.get(self.domain, new_username, function(err, authInfo) {
-      if (err) {
-        return callback(err);
+    self.getAuthInfo(new_username, function(err, authInfo){
+      
+      if (authInfo && authInfo.exists) {
+        return callback(new Error('username already taken.'));
       }
-
-      if (authInfo.version !== 3) {
-        return callback(new Error('This wallet is incompatible with this version of the vault-client.'));
-      }
-
-      if (!authInfo.pakdf) {
-        return callback(new Error('No settings for PAKDF in auth packet.'));
-      }
-
-      /*if (!authInfo.exists) {
-        return callback(new Error('User does not exist.'));
-      }*/
-
-      if (typeof authInfo.blobvault !== 'string') {
-        return callback(new Error('No blobvault specified in the authinfo.'));
-      }
-
-      callback(null, authInfo);
-    });
-  }
-
-  // TODO duplicate function
-  function deriveLoginKeys(authInfo, callback) {
-    //derive login keys
-    crypt.derive(authInfo.pakdf, 'login', new_username.toLowerCase(), password, function(err, keys) {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, authInfo, keys);
-      }
-    });
-  }
-
-  // TODO duplicate function
-  function deriveUnlockKey(authInfo, callback) {
-    //derive unlock key
-    crypt.derive(authInfo.pakdf, 'unlock', new_username.toLowerCase(), password, function(err, keys) {
-      if (err) {
-        console.log('Error',err);
-        return callback(err);
-      }
-
-      callback(null, keys.unlock);
-    });
-  }
-
-  getAuthInfo(function(err, authInfo){
-    deriveLoginKeys(authInfo, function(err, authInfo, loginKeys){
-      deriveUnlockKey(authInfo, function(err, unlockKeys){
-        if (err) {
-          console.log('Error', err);
-          return;
-        }
-
-        options.crypt = loginKeys.crypt;
-        options.new_blob_id = loginKeys.id;
-        options.unlock = unlockKeys;
-
-        blobClient.rename(options, callback);
-      })
-    })
-  });
+            
+      return callback (err, authInfo, password);
+    });  
+  };
+  
+  function renameBlob (authInfo, keys, callback) {
+    options.keys = keys;
+    blobClient.rename(options, callback);    
+  };
 };
 
 /**
@@ -489,63 +451,37 @@ VaultClient.prototype.rename = function (options, callback) {
  */
 
 VaultClient.prototype.register = function(options, fn) {
-  var self = this;
+  var self     = this;
   var username = String(options.username).trim();
   var password = String(options.password).trim();
-
+  
+  var steps = [
+    getAuthInfo,
+    self._deriveLoginKeys,
+    self._deriveUnlockKey,
+    create    
+  ];
+  
+  async.waterfall(steps, fn);
+  
   function getAuthInfo(callback) {
-    self.authInfo.get(self.domain, username, function(err, authInfo) {
-      if (err) {
-        return callback(err);
-      }
-
-      if (typeof authInfo.blobvault !== 'string') {
-        return callback(new Error('No blobvault specified in the authinfo.'));
-      }
-
-      if (!authInfo.pakdf) {
-        return callback(new Error('No settings for PAKDF in auth packet.'));
-      }
-
-      callback(null, authInfo);
-    });
-  };
-
-  function deriveKeys(authInfo, callback) {
-    // derive unlock and login keys
-    var keys = { };
-
-    function deriveKey(keyType, callback) {
-      crypt.derive(authInfo.pakdf, keyType, username.toLowerCase(), password, function(err, key) {
-        if (err) {
-          callback(err);
-        } else {
-          keys[keyType] = key;
-          callback();
-        }
-      });
-    };
-
-    async.eachSeries([ 'login', 'unlock' ], deriveKey, function(err) {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, authInfo, keys);
-      }
-    });
+    self.getAuthInfo(username, function(err, authInfo){
+                  
+      return callback (err, authInfo, password);
+    });  
   };
 
   function create(authInfo, keys, callback) {
     var params = {
-      url: authInfo.blobvault,
-      id: keys.login.id,
-      crypt: keys.login.crypt,
-      unlock: keys.unlock.unlock,
-      username: username,
-      email: options.email,
-      masterkey: options.masterkey || crypt.createMaster(),
-      activateLink: options.activateLink,
-      oldUserBlob: options.oldUserBlob
+      url          : authInfo.blobvault,
+      id           : keys.id,
+      crypt        : keys.crypt,
+      unlock       : keys.unlock,
+      username     : authInfo.username,
+      email        : options.email,
+      masterkey    : options.masterkey || crypt.createMaster(),
+      activateLink : options.activateLink,
+      oldUserBlob  : options.oldUserBlob
     };
         
     blobClient.create(params, function(err, blob) {
@@ -559,8 +495,6 @@ VaultClient.prototype.register = function(options, fn) {
       }
     });
   };
-
-  async.waterfall([ getAuthInfo, deriveKeys, create], fn);
 };
 
 exports.VaultClient = VaultClient;
