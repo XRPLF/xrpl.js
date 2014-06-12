@@ -773,20 +773,12 @@ Transaction.prototype.payment = function(src, dst, amount) {
     src    = options.source || options.from || options.account;
   }
 
-  if (src.invoiceID) {
-    this.invoiceID(src.invoiceID);
-  }
-
   if (!UInt160.is_valid(src)) {
     throw new Error('Payment source address invalid');
   }
 
   if (!UInt160.is_valid(dst)) {
     throw new Error('Payment destination address invalid');
-  }
-
-  if (/^[\d]+[A-Z]{3}$/.test(amount)) {
-    amount = Amount.from_human(amount);
   }
 
   this.tx_json.TransactionType = 'Payment';
@@ -856,18 +848,14 @@ Transaction.prototype.submit = function(callback) {
 
   var account = this.tx_json.Account;
 
-  if (typeof account !== 'string') {
-    return this.emit('error', new RippleError('tejInvalidAccount', 'Account is unspecified'));
+  if (!UInt160.is_valid(account)) {
+    return this.emit('error', new RippleError('tejInvalidAccount', 'Account is missing or invalid'));
   }
 
   // YYY Might check paths for invalid accounts.
   this.remote.account(account).submit(this);
 
   return this;
-};
-
-Transaction.prototype.transactionManager = function() {
-  return this.remote.account(this.tx_json.Account)._transactionManager;
 };
 
 Transaction.prototype.abort = function(callback) {

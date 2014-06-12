@@ -7,6 +7,12 @@ var Request = utils.load_module('request').Request;
 var Transaction = utils.load_module('transaction').Transaction;
 
 describe('Server', function() {
+  it('Server constructor - invalid options', function() {
+    assert.throws(function() {
+      var server = new Server(new Remote());
+    });
+  });
+
   it('Message listener', function(done) {
     var server = new Server(new Remote(), 'wss://localhost:5006');
 
@@ -78,16 +84,16 @@ describe('Server', function() {
     var server = new Server(new Remote(), 'wss://localhost:5006');
 
     var ledger = {
-      "type": "ledgerClosed",
-      "fee_base": 10,
-      "fee_ref": 10,
-      "ledger_hash": "D29E1F2A2617A88E9DAA14F468B169E6875092ECA0B3B1FA2BE1BC5524DE7CB2",
-      "ledger_index": 7035609,
-      "ledger_time": 455327690,
-      "reserve_base": 20000000,
-      "reserve_inc": 5000000,
-      "txn_count": 1,
-      "validated_ledgers": "32570-7035609"
+      'type': 'ledgerClosed',
+      'fee_base': 10,
+      'fee_ref': 10,
+      'ledger_hash': 'D29E1F2A2617A88E9DAA14F468B169E6875092ECA0B3B1FA2BE1BC5524DE7CB2',
+      'ledger_index': 7035609,
+      'ledger_time': 455327690,
+      'reserve_base': 20000000,
+      'reserve_inc': 5000000,
+      'txn_count': 1,
+      'validated_ledgers': '32570-7035609'
     };
 
     server._updateScore = function(type, data) {
@@ -119,8 +125,8 @@ describe('Server', function() {
     var server = new Server(new Remote(), 'wss://localhost:5006');
 
     var load = {
-      "fee_base": 10,
-      "fee_ref": 10
+      'fee_base': 10,
+      'fee_ref': 10
     };
 
     server._updateScore = function(type, data) {
@@ -204,6 +210,21 @@ describe('Server', function() {
     });
   });
 
+  it('Check activity - uninitialized', function(done) {
+    var server = new Server(new Remote(), 'wss://localhost:5006');
+    server._connected = false;
+
+    server.reconnect = function() {
+      assert(false, 'Should not reconnect');
+    };
+
+    //server._lastLedgerClose = Date.now() - 1000 * 30;
+    server._checkActivity();
+    setImmediate(function() {
+      done();
+    });
+  });
+
   it('Check activity - sufficient ledger close', function(done) {
     var server = new Server(new Remote(), 'wss://localhost:5006');
     server._connected = false;
@@ -278,6 +299,28 @@ describe('Server', function() {
     assert.strictEqual(server._fee, 100);
   });
 
+  it('Update score - reaching reconnect threshold', function(done) {
+    var server = new Server(new Remote(), 'wss://localhost:5006');
+    server._lastLedgerIndex = 1;
+    server._connected = true;
+
+    server.reconnect = function() {
+      done();
+    };
+
+    assert.deepEqual(server._scoreWeights, {
+      ledgerclose: 5,
+      response: 1
+    });
+
+    assert.strictEqual(server._score, 0);
+
+    server._updateScore('ledgerclose', { ledger_index: 250 });
+
+    // Four ledgers behind the leading ledger * weight of 5
+    assert.strictEqual(server._score, 1245);
+  });
+
   it('Get remote address', function() {
     var server = new Server(new Remote(), 'wss://localhost:5006');
     server._connected = true;
@@ -318,31 +361,36 @@ describe('Server', function() {
         });
 
         ws.send(JSON.stringify({
-          "id": 0,
-          "status": "success",
-          "type": "response",
-          "result": {
-            "fee_base": 10,
-            "fee_ref": 10,
-            "ledger_hash": "1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776",
-            "ledger_index": 7053695,
-            "ledger_time": 455414390,
-            "load_base": 256,
-            "load_factor": 256,
-            "random": "E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A",
-            "reserve_base": 20000000,
-            "reserve_inc": 5000000,
-            "server_status": "full",
-            "validated_ledgers": "32570-7053695"
+          'id': 0,
+          'status': 'success',
+          'type': 'response',
+          'result': {
+            'fee_base': 10,
+            'fee_ref': 10,
+            'ledger_hash': '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
+            'ledger_index': 7053695,
+            'ledger_time': 455414390,
+            'load_base': 256,
+            'load_factor': 256,
+            'random': 'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
+            'reserve_base': 20000000,
+            'reserve_inc': 5000000,
+            'server_status': 'full',
+            'validated_ledgers': '32570-7053695'
           }
         }));
+
+        wss.close();
       });
     });
 
     var server = new Server(new Remote(), 'ws://localhost:5748');
 
     server.once('connect', function() {
-      done();
+      server.once('disconnect', function() {
+        done();
+      });
+      server.disconnect();
     });
 
     server.connect();
@@ -380,6 +428,8 @@ describe('Server', function() {
     var server = new Server(new Remote(), 'ws://localhost:5748');
     server._connected = false;
 
+    var websocketConstructor = Server.websocketConstructor;
+
     Server.websocketConstructor = function() {
       return void(0);
     };
@@ -387,11 +437,15 @@ describe('Server', function() {
     assert.throws(function() {
       server.connect();
     }, Error);
+
+    Server.websocketConstructor = websocketConstructor;
   });
 
-  it('Reconnect', function() {
+  it('Reconnect', function(done) {
     var server = new Server(new Remote(), 'ws://localhost:5748');
     server._connected = true;
+
+    server._ws = { };
 
     var disconnected = false;
 
@@ -442,6 +496,54 @@ describe('Server', function() {
     assert.strictEqual(server._ws.onmessage.toString().replace(coverageRE, ''), noOp);
     assert.strictEqual(server._ws.onerror.toString().replace(coverageRE, ''), noOp);
     assert.strictEqual(server._state, 'offline');
+  });
+
+  it('Handle error', function(done) {
+    var wss = new ws.Server({ port: 5748  });
+
+    wss.once('connection', function(ws) {
+      ws.once('message', function(message) {
+        var m = JSON.parse(message);
+
+        assert.deepEqual(m, {
+          command: 'subscribe',
+          id: 0,
+          streams: [ 'ledger', 'server' ]
+        });
+
+        ws.send(JSON.stringify({
+          'id': 0,
+          'status': 'success',
+          'type': 'response',
+          'result': {
+            'fee_base': 10,
+            'fee_ref': 10,
+            'ledger_hash': '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
+            'ledger_index': 7053695,
+            'ledger_time': 455414390,
+            'load_base': 256,
+            'load_factor': 256,
+            'random': 'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
+            'reserve_base': 20000000,
+            'reserve_inc': 5000000,
+            'server_status': 'full',
+            'validated_ledgers': '32570-7053695'
+          }
+        }));
+      });
+    });
+
+    var server = new Server(new Remote(), 'ws://localhost:5748');
+
+    server.once('connect', function() {
+      server._retryConnect = function(){
+        wss.close();
+        done();
+      };
+      server._ws.emit('error', new Error());
+    });
+
+    server.connect();
   });
 
   it('Handle message - ledgerClosed', function(done) {
@@ -604,6 +706,30 @@ describe('Server', function() {
     server.emit('message', response);
   });
 
+  it('Handle message - response - no request', function(done) {
+    var remote = new Remote();
+    var server = new Server(remote, 'ws://localhost:5748');
+
+    var response = {
+      id: 1,
+      type: 'response',
+      status: 'success',
+      result: { }
+    };
+
+    Object.defineProperty(response, 'status', {
+      get: function() {
+        assert(false, 'Response status should not be checked');
+      }
+    });
+
+    server.emit('message', response);
+
+    setImmediate(function() {
+      done();
+    });
+  });
+
   it('Handle message - path_find', function(done) {
     var server = new Server(new Remote(), 'ws://localhost:5748');
 
@@ -686,6 +812,29 @@ describe('Server', function() {
     });
   });
 
+  it('Request - no WebSocket', function(done) {
+    var server = new Server(new Remote(), 'ws://localhost:5748');
+    server._connected = true;
+
+    server._ws = void(0);
+
+    var request = {
+      message: {
+        command: 'server_info'
+      }
+    };
+
+    server._sendMessage = function(message) {
+      assert(false, 'Should not send message if WebSocket does not exist');
+    };
+
+    server._request(request);
+
+    setImmediate(function() {
+      done();
+    });
+  });
+
   it('Check connectivity', function() {
     var server = new Server(new Remote(), 'ws://localhost:5748');
     server._connected = false;
@@ -728,5 +877,12 @@ describe('Server', function() {
 
     var transaction = new Transaction();
     assert.strictEqual(server._computeFee(transaction), '48');
+  });
+
+  it('Compute reserve', function() {
+    var server = new Server(new Remote(), 'ws://localhost:5748');
+    server._reserve_base = 20000000;
+    server._reserve_inc =  5000000;
+    assert.strictEqual(server._reserve().to_json(), '20000000');
   });
 });
