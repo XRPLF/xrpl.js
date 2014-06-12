@@ -11,28 +11,28 @@ function makeServer(url) {
 };
 
 const SERVER_INFO = {
-  "info": {
-    "build_version": "0.25.2-rc1",
-    "complete_ledgers": "32570-7016339",
-    "hostid": "LIED",
-    "io_latency_ms": 1,
-    "last_close": {
-      "converge_time_s": 2.013,
-      "proposers": 5
+  'info': {
+    'build_version': '0.25.2-rc1',
+    'complete_ledgers': '32570-7016339',
+    'hostid': 'LIED',
+    'io_latency_ms': 1,
+    'last_close': {
+      'converge_time_s': 2.013,
+      'proposers': 5
     },
-    "load_factor": 1,
-    "peers": 42,
-    "pubkey_node": "n9LpxYuMx4Epz4Wz8Kg2kH3eBTx1mUtHnYwtCdLoj3HC85L2pvBm",
-    "server_state": "full",
-    "validated_ledger": {
-      "age": 0,
-      "base_fee_xrp": 0.00001,
-      "hash": "E43FD49087B18031721D9C3C4743FE1692C326AFF7084A2C01B355CE65A4C699",
-      "reserve_base_xrp": 20,
-      "reserve_inc_xrp": 5,
-      "seq": 7016339
+    'load_factor': 1,
+    'peers': 42,
+    'pubkey_node': 'n9LpxYuMx4Epz4Wz8Kg2kH3eBTx1mUtHnYwtCdLoj3HC85L2pvBm',
+    'server_state': 'full',
+    'validated_ledger': {
+      'age': 0,
+      'base_fee_xrp': 0.00001,
+      'hash': 'E43FD49087B18031721D9C3C4743FE1692C326AFF7084A2C01B355CE65A4C699',
+      'reserve_base_xrp': 20,
+      'reserve_inc_xrp': 5,
+      'seq': 7016339
     },
-    "validation_quorum": 3
+    'validation_quorum': 3
   }
 };
 
@@ -49,6 +49,9 @@ describe('Request', function() {
 
     var request = new Request(remote, 'server_info');
 
+    request.request();
+
+    // Should only request once
     request.request();
   });
 
@@ -159,6 +162,42 @@ describe('Request', function() {
     });
   });
 
+  it('Timeout - satisfied', function(done) {
+    var server = makeServer('wss://localhost:5006');
+    var successEmited = false;
+
+    server._request = function(req) {
+      assert(req instanceof Request);
+      assert.strictEqual(typeof req.message, 'object');
+      assert.strictEqual(req.message.command, 'server_info');
+      setTimeout(function() {
+        successEmitted = true;
+        req.emit('success', SERVER_INFO);
+      }, 200);
+    };
+
+    var remote = new Remote();
+    remote._connected = true;
+    remote._servers = [ server ];
+
+    var request = new Request(remote, 'server_info');
+
+    var timedOut = false;
+
+    request.once('timeout', function() {
+      timedOut = true;
+    });
+
+    request.timeout(1000);
+
+    request.callback(function(err, res) {
+      assert(!timedOut);
+      assert.ifError(err);
+      assert.deepEqual(res, SERVER_INFO);
+      done();
+    });
+  });
+
   it('Set server', function(done) {
     var servers = [
       makeServer('wss://localhost:5006'),
@@ -182,6 +221,35 @@ describe('Request', function() {
 
     var request = new Request(remote, 'server_info');
     request.setServer(servers[1]);
+
+    assert.strictEqual(request.server, servers[1]);
+
+    request.request();
+  });
+
+  it('Set server - by URL', function(done) {
+    var servers = [
+      makeServer('wss://localhost:5006'),
+      makeServer('wss://127.0.0.1:5007')
+    ];
+
+    servers[1]._request = function(req) {
+      assert(req instanceof Request);
+      assert.strictEqual(typeof req.message, 'object');
+      assert.strictEqual(req.message.command, 'server_info');
+      done();
+    };
+
+    var remote = new Remote();
+    remote._connected = true;
+    remote._servers = servers;
+
+    remote.getServer = function() {
+      return servers[0];
+    };
+
+    var request = new Request(remote, 'server_info');
+    request.setServer('wss://127.0.0.1:5007');
 
     assert.strictEqual(request.server, servers[1]);
 
@@ -237,7 +305,29 @@ describe('Request', function() {
     assert.strictEqual(request.message.ledger_index, 7016915);
   });
 
-  it('Select ledger (identifier)', function() {
+  it('Select cached ledger - index', function() {
+    var remote = new Remote();
+    remote._connected = true;
+    remote._ledger_current_index = 1;
+    remote._ledger_hash = 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
+
+    var request = new Request(remote, 'server_info');
+    request.ledgerChoose(true);
+    assert.strictEqual(request.message.ledger_index, 1);
+  });
+
+  it('Select cached ledger - hash', function() {
+    var remote = new Remote();
+    remote._connected = true;
+    remote._ledger_current_index = 1;
+    remote._ledger_hash = 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
+
+    var request = new Request(remote, 'server_info');
+    request.ledgerChoose();
+    assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+  });
+
+  it('Select ledger - identifier', function() {
     var remote = new Remote();
     remote._connected = true;
 
@@ -246,7 +336,7 @@ describe('Request', function() {
     assert.strictEqual(request.message.ledger_index, 'validated');
   });
 
-  it('Select ledger (index)', function() {
+  it('Select ledger - index', function() {
     var remote = new Remote();
     remote._connected = true;
 
@@ -255,7 +345,7 @@ describe('Request', function() {
     assert.strictEqual(request.message.ledger_index, 7016915);
   });
 
-  it('Select ledger (hash)', function() {
+  it('Select ledger - hash', function() {
     var remote = new Remote();
     remote._connected = true;
 
@@ -264,13 +354,31 @@ describe('Request', function() {
     assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
   });
 
-  it('Select ledger (hash)', function() {
+  it('Select ledger - hash', function() {
     var remote = new Remote();
     remote._connected = true;
 
     var request = new Request(remote, 'server_info');
     request.ledgerSelect('B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
     assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+  });
+
+  it('Set account_root', function() {
+    var remote = new Remote();
+    remote._connected = true;
+
+    var request = new Request(remote, 'server_info');
+    request.accountRoot('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59');
+    assert.strictEqual(request.message.account_root, 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59');
+  });
+
+  it('Set index', function() {
+    var remote = new Remote();
+    remote._connected = true;
+
+    var request = new Request(remote, 'server_info');
+    request.index(1);
+    assert.strictEqual(request.message.index, 1);
   });
 
   it('Set offer ID', function() {
@@ -348,6 +456,7 @@ describe('Request', function() {
     remote._connected = true;
 
     var request = new Request(remote, 'server_info');
+
     request.accounts([
         'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
         'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
@@ -356,6 +465,19 @@ describe('Request', function() {
     assert.deepEqual(request.message.accounts, [
         'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
         'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+    ]);
+  });
+
+  it('Set accounts - string', function() {
+    var remote = new Remote();
+    remote._connected = true;
+
+    var request = new Request(remote, 'server_info');
+
+    request.accounts('rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun');
+
+    assert.deepEqual(request.message.accounts, [
+        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun'
     ]);
   });
 
@@ -419,13 +541,13 @@ describe('Request', function() {
 
     var books = [
       {
-      "taker_gets": {
-        "currency": "EUR",
-        "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+      'taker_gets': {
+        'currency': 'EUR',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       },
-      "taker_pays": {
-        "currency": "USD",
-        "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+      'taker_pays': {
+        'currency': 'USD',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       }
     }
     ];
@@ -441,54 +563,114 @@ describe('Request', function() {
 
     var request = new Request(remote, 'server_info');
 
+    request.addBook({
+      'taker_gets': {
+        'currency': 'CNY',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'taker_pays': {
+        'currency': 'USD',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      }
+    });
+
+    assert.deepEqual(request.message.books, [
+      {
+        'taker_gets': {
+          'currency': 'CNY',
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+        },
+        'taker_pays': {
+          'currency': 'USD',
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+        }
+      }
+    ]);
+
     var books = [
       {
-        "taker_gets": {
-          "currency": "EUR",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        'taker_gets': {
+          'currency': 'EUR',
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
-        "taker_pays": {
-          "currency": "USD",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        'taker_pays': {
+          'currency': 'USD',
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         }
       }
     ];
 
     request.books(books);
 
-    request.addBook({
-      "taker_gets": {
-        "currency": "CNY",
-        "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-      },
-      "taker_pays": {
-        "currency": "USD",
-        "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-      }
-    });
-
     assert.deepEqual(request.message.books, [
       {
-        "taker_gets": {
-          "currency": "EUR",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        'taker_gets': {
+          'currency': 'EUR',
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
-        "taker_pays": {
-          "currency": "USD",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        'taker_pays': {
+          'currency': 'USD',
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         }
       },
+    ]);
+  });
 
+  it('Add book - missing side', function() {
+    var remote = new Remote();
+    remote._connected = true;
+
+    var request = new Request(remote, 'server_info');
+
+    request.message.books = void(0);
+
+    var books = [
       {
-        "taker_gets": {
-          "currency": "CNY",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-        },
-        "taker_pays": {
-          "currency": "USD",
-          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        'taker_gets': {
+          'currency': 'EUR',
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         }
       }
-    ]);
+    ];
+
+    assert.throws(function() {
+      request.books(books);
+    });
+  });
+
+  it('Add book - with snapshot', function() {
+    var remote = new Remote();
+    remote._connected = true;
+
+    var request = new Request(remote, 'server_info');
+
+    request.message.books = void(0);
+
+    var book = {
+      'taker_gets': {
+        'currency': 'EUR',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'taker_pays': {
+        'currency': 'USD',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'both': true
+    };
+
+    request.addBook(book, true);
+
+    assert.deepEqual(request.message.books, [{
+      'taker_gets': {
+        'currency': 'EUR',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'taker_pays': {
+        'currency': 'USD',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'snapshot': true,
+      'both': true
+    }]);
   });
 });
