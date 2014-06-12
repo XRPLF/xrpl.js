@@ -433,7 +433,7 @@ describe('Server', function() {
 
     server._handleClose();
 
-    var noOp = (function noOp() {}).toString();
+    var noOp = (function noOp(){}).toString();
 
     var coverageRE = /__cov_.+;/;
 

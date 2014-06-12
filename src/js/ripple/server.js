@@ -440,7 +440,7 @@ Server.prototype._handleClose = function() {
   this.emit('socket_close');
   this._setState('offline');
 
-  function noOp() {};
+  function noOp(){};
 
   // Prevent additional events from this socket
   ws.onopen = ws.onerror = ws.onclose = ws.onmessage = noOp;
