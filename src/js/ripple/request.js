@@ -132,11 +132,11 @@ Request.prototype.setServer = function(server) {
       break;
 
     case 'string':
-      // Find server with hostname string
+      // Find server by URL
       var servers = this.remote._servers;
 
       for (var i=0, s; (s=servers[i]); i++) {
-        if (s._host === server) {
+        if (s._url === server) {
           selected = s;
           break;
         }
