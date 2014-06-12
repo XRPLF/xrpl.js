@@ -279,6 +279,49 @@ describe('Transaction', function() {
     assert.strictEqual(transaction._computeFee(), '96');
   });
 
+  it('Does not compute a median fee with floating point', function() {
+    var remote = new Remote();
+
+    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    s1._connected = true;
+
+    var s2 = new Server(remote, 'wss://s-west.ripple.com:443');
+    s2._connected = true;
+    s2._load_factor = 256 * 4;
+
+    var s3 = new Server(remote, 'wss://s-west.ripple.com:443');
+    s3._connected = true;
+
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    s3._load_factor = (256 * 7) + 1;
+    // Is this ever possible? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    var s4 = new Server(remote, 'wss://s-west.ripple.com:443');
+    s4._connected = true;
+    s4._load_factor = 256 * 16;
+
+    remote._servers = [ s1, s2, s3, s4  ];
+
+    assert.strictEqual(s1._computeFee(10), '12');
+    assert.strictEqual(s2._computeFee(10), '48');
+    // 66.5
+    assert.strictEqual(s3._computeFee(10), '85');
+    assert.strictEqual(s4._computeFee(10), '192');
+
+    var transaction = new Transaction(remote);
+    transaction.tx_json.Sequence = 1;
+    var src = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
+    var dst = 'rGihwhaqU8g7ahwAvTq6iX5rvsfcbgZw6v';
+    
+    transaction.payment(src, dst, '100');
+    remote.set_secret(src, 'masterpassphrase');
+
+    assert(transaction.complete());
+    var json = transaction.serialize().to_json();
+    assert(json.Fee != '66500000', 'Fee == 66500000, i.e. 66.5 XRP!');
+  });
+
+
   it('Compute fee - even server count', function() {
     var remote = new Remote();
 
