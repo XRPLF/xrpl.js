@@ -286,7 +286,7 @@ Transaction.prototype._computeFee = function() {
   var midInd = Math.floor(fees.length / 2);
 
   var median = fees.length % 2 === 0
-  ? (fees[midInd] + fees[midInd - 1]) / 2
+  ? Math.floor(0.5 + (fees[midInd] + fees[midInd - 1]) / 2)
   : fees[midInd];
 
   return String(median);

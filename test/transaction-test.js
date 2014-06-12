@@ -318,7 +318,7 @@ describe('Transaction', function() {
 
     assert(transaction.complete());
     var json = transaction.serialize().to_json();
-    assert(json.Fee != '66500000', 'Fee == 66500000, i.e. 66.5 XRP!');
+    assert.notStrictEqual(json.Fee, '66500000', 'Fee == 66500000, i.e. 66.5 XRP!');
   });
 
 
