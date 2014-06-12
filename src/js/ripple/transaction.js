@@ -58,7 +58,9 @@ var config           = require('./config');
 function Transaction(remote) {
   EventEmitter.call(this);
 
-  var self  = this;
+  var self = this;
+
+  var remote = remote || { };
 
   this.remote = remote;
 
@@ -67,6 +69,7 @@ function Transaction(remote) {
 
   this._secret = void(0);
   this._build_path = false;
+  this._maxFee = this.remote.max_fee;
 
   this.state = 'unsubmitted';
   this.finalized = false;
@@ -152,10 +155,10 @@ Transaction.flags = {
 // SetFlag or ClearFlag field
 Transaction.set_clear_flags = {
   AccountSet: {
-    asfRequireDest:     1,
-    asfRequireAuth:     2,
-    asfDisallowXRP:     3,
-    asfDisableMaster:   4
+    asfRequireDest:    1,
+    asfRequireAuth:    2,
+    asfDisallowXRP:    3,
+    asfDisableMaster:  4
   }
 };
 
@@ -265,8 +268,9 @@ Transaction.prototype._computeFee = function() {
     }
   }
 
-  if (fees.length === 1) {
-    return String(fees[0]);
+  switch (fees.length) {
+    case 0: return;
+    case 1: return String(fees[0]);
   }
 
   fees.sort(function ascending(a, b) {
@@ -325,7 +329,10 @@ Transaction.prototype.complete = function() {
   // an assigned server
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
     if (this.remote.local_fee || !this.remote.trusted) {
-      this.tx_json.Fee = this._computeFee();
+      if (!(this.tx_json.Fee = this._computeFee())) {
+        this.emit('error', new RippleError('tejUnconnected'));
+        return;
+      }
     }
   }
 
@@ -473,7 +480,11 @@ Transaction.prototype.lastLedger = function(sequence) {
 };
 
 Transaction._pathRewrite = function(path) {
-  return path.map(function(node) {
+  if (!Array.isArray(path)) {
+    return;
+  }
+
+  var newPath = path.map(function(node) {
     var newNode = { };
 
     if (node.hasOwnProperty('account')) {
@@ -494,6 +505,8 @@ Transaction._pathRewrite = function(path) {
 
     return newNode;
   });
+
+  return newPath;
 };
 
 Transaction.prototype.pathAdd = function(path) {
@@ -602,6 +615,7 @@ Transaction.prototype.setFlags = function(flags) {
  *  "asfDisableMaster"
  *    Disallow use of the master key
  */
+
 Transaction.prototype.accountSet = function(src, set_flag, clear_flag) {
   if (typeof src === 'object') {
     var options = src;
@@ -703,47 +717,6 @@ Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expira
   return this;
 };
 
-Transaction.prototype.passwordFund = function(src, dst) {
-  if (typeof src === 'object') {
-    var options = src;
-    dst = options.destination || options.to;
-    src = options.source || options.from;
-  }
-
-  if (!UInt160.is_valid(dst)) {
-    throw new Error('Destination address invalid');
-  }
-
-  this.tx_json.TransactionType = 'PasswordFund';
-  this.tx_json.Destination     = UInt160.json_rewrite(dst);
-
-  return this;
-};
-
-Transaction.prototype.passwordSet = function(src, authorized_key, generator, public_key, signature) {
-  if (typeof src === 'object') {
-    var options = src;
-    signature      = options.signature;
-    public_key     = options.public_key;
-    generator      = options.generator;
-    authorized_key = options.authorized_key;
-    src            = options.source || options.from || options.account;
-  }
-
-  if (!UInt160.is_valid(src)) {
-    throw new Error('Source address invalid');
-  }
-
-  this.tx_json.TransactionType = 'PasswordSet';
-  this.tx_json.RegularKey      = authorized_key;
-  this.tx_json.Generator       = generator;
-  this.tx_json.PublicKey       = public_key;
-  this.tx_json.Signature       = signature;
-
-  return this;
-};
-
-
 /**
  *  Construct a 'SetRegularKey' transaction.
  *  If the RegularKey is set, the private key that corresponds to
@@ -752,6 +725,7 @@ Transaction.prototype.passwordSet = function(src, authorized_key, generator, pub
  *  The RegularKey must be a valid Ripple Address, or a Hash160 of
  *  the public key corresponding to the new private signing key.
  */
+
 Transaction.prototype.setRegularKey = function(src, regular_key) {
   if (typeof src === 'object') {
     var options = src;
@@ -770,6 +744,8 @@ Transaction.prototype.setRegularKey = function(src, regular_key) {
   this.tx_json.TransactionType = 'SetRegularKey';
   this.tx_json.Account = UInt160.json_rewrite(src);
   this.tx_json.RegularKey = UInt160.json_rewrite(regular_key);
+
+  return this;
 };
 
 // Construct a 'payment' transaction.
@@ -851,29 +827,6 @@ Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_o
   }
 
   // XXX Throw an error if nothing is set.
-
-  return this;
-};
-
-Transaction.prototype.walletAdd = function(src, amount, authorized_key, public_key, signature) {
-  if (typeof src === 'object') {
-    var options = src;
-    signature      = options.signature;
-    public_key     = options.public_key;
-    authorized_key = options.authorized_key;
-    amount         = options.amount;
-    src            = options.source || options.from || options.account;
-  }
-
-  if (!UInt160.is_valid(src)) {
-    throw new Error('Source address invalid');
-  }
-
-  this.tx_json.TransactionType  = 'WalletAdd';
-  this.tx_json.Amount           = Amount.json_rewrite(amount);
-  this.tx_json.RegularKey       = authorized_key;
-  this.tx_json.PublicKey        = public_key;
-  this.tx_json.Signature        = signature;
 
   return this;
 };

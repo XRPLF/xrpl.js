@@ -33,21 +33,13 @@ function Server(remote, opts) {
     throw new TypeError('Server configuration is not an Object');
   }
 
-  if (isNaN(opts.port)) {
-    throw new TypeError('Server port must be a number');
-  }
-
   if (!Server.domainRE.test(opts.host)) {
     throw new Error('Server host is malformed, use "host" and "port" server configuration');
   }
 
-  if (typeof opts.secure !== 'boolean') {
-    opts.secure = true;
-  }
-
   // We want to allow integer strings as valid port numbers for backward compatibility
-  if (typeof opts.port !== 'number') {
-    opts.port = Number(opts.port);
+  if (!(opts.port = Number(opts.port))) {
+    throw new TypeError('Server port must be a number');
   }
 
   if (opts.port < 1 || opts.port > 65535) {
@@ -55,7 +47,7 @@ function Server(remote, opts) {
   }
 
   if (typeof opts.secure !== 'boolean') {
-    throw new TypeError('Server "secure" configuration is not a Boolean');
+    opts.secure = true;
   }
 
   this._remote = remote;
@@ -285,7 +277,7 @@ Server.prototype._remoteAddress = function() {
  * @api public
  */
 
-Server.prototype.disconnect = function(callback) {
+Server.prototype.disconnect = function() {
   this._shouldConnect = false;
   this._setState('offline');
   if (this._ws) {
