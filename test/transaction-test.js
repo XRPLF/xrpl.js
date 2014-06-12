@@ -73,6 +73,61 @@ describe('Transaction', function() {
     assert.strictEqual(transaction.state, 'pending');
   });
 
+  it('Check response code is tel', function() {
+    var transaction = new Transaction();
+    assert(!transaction.isTelLocal(-400));
+    assert(transaction.isTelLocal(-399));
+    assert(transaction.isTelLocal(-300));
+    assert(!transaction.isTelLocal(-299));
+  });
+
+  it('Check response code is tem', function() {
+    var transaction = new Transaction();
+    assert(!transaction.isTemMalformed(-300));
+    assert(transaction.isTemMalformed(-299));
+    assert(transaction.isTemMalformed(-200));
+    assert(!transaction.isTemMalformed(-199));
+  });
+
+  it('Check response code is tef', function() {
+    var transaction = new Transaction();
+    assert(!transaction.isTefFailure(-200));
+    assert(transaction.isTefFailure(-199));
+    assert(transaction.isTefFailure(-100));
+    assert(!transaction.isTefFailure(-99));
+  });
+
+  it('Check response code is ter', function() {
+    var transaction = new Transaction();
+    assert(!transaction.isTerRetry(-100));
+    assert(transaction.isTerRetry(-99));
+    assert(transaction.isTerRetry(-1));
+    assert(!transaction.isTerRetry(0));
+  });
+
+  it('Check response code is tep', function() {
+    var transaction = new Transaction();
+    assert(!transaction.isTepSuccess(-1));
+    assert(transaction.isTepSuccess(0));
+    assert(transaction.isTepSuccess(1e3));
+  });
+
+  it('Check response code is tec', function() {
+    var transaction = new Transaction();
+    assert(!transaction.isTecClaimed(99));
+    assert(transaction.isTecClaimed(100));
+    assert(transaction.isTecClaimed(1e3));
+  });
+
+  it('Check response code is rejected', function() {
+    var transaction = new Transaction();
+    assert(!transaction.isRejected(0));
+    assert(!transaction.isRejected(-99));
+    assert(transaction.isRejected(-100));
+    assert(transaction.isRejected(-399));
+    assert(!transaction.isRejected(-400));
+  });
+
   it('Set state', function(done) {
     var transaction = new Transaction();
     transaction.state = 'pending';
@@ -153,15 +208,25 @@ describe('Transaction', function() {
     s3._connected = true;
     s3._load_factor = 256 * 8;
 
-    remote._servers = [ s1, s2, s3 ];
+    var s4 = new Server(remote, 'wss://s-west.ripple.com:443');
+    s4._connected = true;
+    s4._load_factor = 256 * 8;
+
+    var s5 = new Server(remote, 'wss://s-west.ripple.com:443');
+    s5._connected = true;
+    s5._load_factor = 256 * 7;
+
+    remote._servers = [ s2, s3, s1, s4 ];
 
     assert.strictEqual(s1._computeFee(10), '12');
     assert.strictEqual(s2._computeFee(10), '48');
     assert.strictEqual(s3._computeFee(10), '96');
+    assert.strictEqual(s4._computeFee(10), '96');
+    assert.strictEqual(s5._computeFee(10), '84');
 
     var transaction = new Transaction(remote);
 
-    assert.strictEqual(transaction._computeFee(), '48');
+    assert.strictEqual(transaction._computeFee(), '72');
   });
 
   it('Compute fee - no connected server', function() {
@@ -243,6 +308,26 @@ describe('Transaction', function() {
     var transaction = new Transaction(remote);
 
     assert.strictEqual(transaction._computeFee(), '72');
+  });
+
+  it('Complete transaction', function(done) {
+    var remote = new Remote();
+
+    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    s1._connected = true;
+
+    remote._servers = [ s1 ];
+    remote.trusted = true;
+    remote.local_signing = true;
+
+    var transaction = new Transaction(remote);
+    transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
+    transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
+    transaction.tx_json.Flags = 0;
+
+    assert(transaction.complete());
+
+    done();
   });
 
   it('Complete transaction - untrusted', function(done) {
@@ -426,6 +511,23 @@ describe('Transaction', function() {
 
     assert.strictEqual(transaction.hash('HASH_TX_SIGN'), 'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE')
     assert.strictEqual(transaction.hash('HASH_TX_SIGN_TESTNET'), '9FE7D27FC5B9891076B66591F99A683E01E0912986A629235459A3BD1961F341');
+
+    done();
+  });
+
+  it('Get hash - invalid prefix', function(done) {
+    var transaction = new Transaction();
+    transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
+    transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
+    transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
+    transaction.tx_json.Flags = 0;
+    transaction.tx_json.Fee = 10;
+    transaction.tx_json.Sequence = 1;
+    transaction.tx_json.TransactionType = 'AccountSet';
+
+    assert.throws(function() {
+      transaction.hash('HASH_TX_SIGNZ');
+    });
 
     done();
   });
@@ -686,7 +788,7 @@ describe('Transaction', function() {
       {
         account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
         issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
-        currency: 'USD'
+        type_hex: '0000000000000001'
       },
       {
         account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
@@ -705,7 +807,7 @@ describe('Transaction', function() {
       {
         account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
         issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
-        currency: 'USD'
+        type_hex: '0000000000000001'
       },
       {
         account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
@@ -713,6 +815,10 @@ describe('Transaction', function() {
         currency: 'USD'
       }
     ]);
+  });
+
+  it('Rewrite transaction path - invalid path', function() {
+    assert.strictEqual(Transaction._pathRewrite(1), void(0));
   });
 
   it('Add transaction path', function() {
@@ -1231,7 +1337,6 @@ describe('Transaction', function() {
 
   it('Submit transaction', function(done) {
     var remote = new Remote();
-
     var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
 
     assert.strictEqual(transaction.callback, void(0));
@@ -1271,6 +1376,84 @@ describe('Transaction', function() {
     assert.strictEqual(transaction.callback, submitCallback);
     assert.strictEqual(typeof transaction._errorHandler, 'function');
     assert.strictEqual(typeof transaction._successHandler, 'function');
+  });
+
+  it('Submit transaction - submission error', function(done) {
+    var remote = new Remote();
+
+    var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+
+    var account = remote.addAccount('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+
+    account._transactionManager._nextSequence = 1;
+
+    account._transactionManager._request = function(tx) {
+      tx.emit('error', new Error('Test error'));
+    };
+
+    transaction.complete = function() {
+      return this;
+    };
+
+    var receivedError = false;
+
+    transaction.once('error', function() {
+      receivedError = true;
+    });
+
+    function submitCallback(err, res) {
+      setImmediate(function() {
+        assert(err);
+        assert.strictEqual(err.constructor.name, 'RippleError');
+        assert(receivedError);
+        done();
+      });
+    };
+
+    transaction.submit(submitCallback);
+  });
+
+  it('Submit transaction - invalid account', function(done) {
+    var remote = new Remote();
+    var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+
+    transaction.tx_json.Account += 'z';
+
+    transaction.once('error', function(err) {
+      assert.strictEqual(err.result, 'tejInvalidAccount');
+      done();
+    });
+
+    transaction.submit();
+  });
+
+  it.skip('Abort submission', function(done) {
+    var remote = new Remote();
+    var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+    var account = remote.addAccount('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+
+    account._transactionManager._nextSequence = 1;
+
+    account._transactionManager._request = function(tx) {
+      setTimeout(function() {
+        tx.emit('success', { });
+      }, 20);
+    };
+
+    transaction.complete = function() {
+      return this;
+    };
+
+    function submitCallback(err, res) {
+      setImmediate(function() {
+        assert(err);
+        assert.strictEqual(err.result, 'tejAbort');
+        done();
+      });
+    };
+
+    transaction.submit(submitCallback);
+    transaction.abort();
   });
 });
 
