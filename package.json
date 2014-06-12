@@ -22,14 +22,15 @@
     "superagent": "^0.18.0"
   },
   "devDependencies": {
-    "mocha": "~1.14.0",
+    "coveralls": "~2.10.0",
     "gulp": "~3.6.2",
     "gulp-concat": "~2.2.0",
     "gulp-jshint": "~1.5.5",
-    "webpack": "~1.1.10",
-    "map-stream": "~0.1.0",
     "istanbul": "~0.2.10",
-    "coveralls": "~2.10.0"
+    "map-stream": "~0.1.0",
+    "mocha": "~1.14.0",
+    "require-directory": "^1.2.0",
+    "webpack": "~1.1.10"
   },
   "scripts": {
     "pretest": "node_modules/.bin/gulp concat-sjcl",
