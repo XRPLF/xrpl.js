@@ -25,7 +25,8 @@ AuthInfo.prototype._getUser = function(url, callback) {
 
 AuthInfo.prototype.get = function(domain, username, callback) {
   var self = this;
-
+  username = username.toLowerCase();
+  
   function getRippleTxt(callback) {
     self._getRippleTxt(domain, function(err, txt) {
       if (err) {
