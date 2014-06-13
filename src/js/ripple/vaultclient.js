@@ -56,6 +56,7 @@ VaultClient.prototype.getAuthInfo = function (username, callback) {
  */
 
 VaultClient.prototype._deriveLoginKeys = function (authInfo, password, callback) {
+
   //derive login keys
   crypt.derive(authInfo.pakdf, 'login', authInfo.username.toLowerCase(), password, function(err, keys) {
     if (err) {
@@ -326,7 +327,7 @@ VaultClient.prototype.exists = function(username, callback) {
 VaultClient.prototype.verify = function(username, token, callback) {
   var self = this;
 
-  self.getAuthInfo(username, function (err, authinfo){
+  self.getAuthInfo(username, function (err, authInfo){
     if (err) {
       return callback(err);
     }
@@ -339,6 +340,11 @@ VaultClient.prototype.verify = function(username, token, callback) {
  * resendEmail
  * send a new verification email
  * @param {object}   options
+ * @param {string}   options.id
+ * @param {string}   options.username
+ * @param {string}   options.account_id
+ * @param {string}   options.email
+ * @param {string}   options.activateLink
  * @param {function} fn - Callback
  */
 
@@ -425,6 +431,8 @@ VaultClient.prototype.rename = function (options, fn) {
       
       if (authInfo && authInfo.exists) {
         return callback(new Error('username already taken.'));
+      } else {
+        authInfo.username = new_username;
       }
             
       return callback (err, authInfo, password);

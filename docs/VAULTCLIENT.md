@@ -24,14 +24,15 @@ data stored using credentials originally obtained at ripple.com
     
     vaultClient.register(options, callback);
     
-
-# Blob Client Methods
+    vaultClient.rename(options, callback);
     
-    blobClient.get(url, id, crypt, callback);
+    vaultClient.changePassword(options, callback);
     
-    blobClient.create(options, callback);
+    vaultClient.recoverBlob(options, callback);
     
-    blobClient.verify(url, username, token, callback);
+    vaultClient.verify(username, token, callback);
+    
+    vaultClient.resendEmail(options, callback);
     
 
 # Blob Methods

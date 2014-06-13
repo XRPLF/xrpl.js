@@ -29,7 +29,8 @@
     "webpack": "~1.1.10",
     "map-stream": "~0.1.0",
     "istanbul": "~0.2.10",
-    "coveralls": "~2.10.0"
+    "coveralls": "~2.10.0",
+    "nock": "^0.34.1"
   },
   "scripts": {
     "pretest": "node_modules/.bin/gulp concat-sjcl",
