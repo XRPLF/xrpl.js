@@ -117,12 +117,14 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var mockRippleTxt;
 var mockAuthSign;
+var mockRegister;
 var mockBlob;
 var mockRename;
 var mockUpdate;
 var mockRecover;
 var mockVerify;
 var mockEmail;
+
 
 if (!online) {
   mockRippleTxt = nock('https://' + exampleData.domain)
@@ -131,7 +133,21 @@ if (!online) {
     .reply(200, rippleTxtRes, {
       'Content-Type': 'text/plain'
     }); 
-      
+    
+  mockAuthSign = nock('https://auth1.ripple.com')
+    .persist()
+    .post('/api/sign')
+    .reply(200, signRes, {
+      'Content-Type': 'text/plain'
+    });   
+ 
+  mockRegister = nock('https://id.staging.ripple.com').persist();
+  mockRegister.filteringPath(/(v1\/user\?signature(.+))/g, 'register/')
+    .post('/register/')
+    .reply(200, { result: 'error', message: 'User already exists' }, {
+      'Content-Type': 'application/json'
+    });   
+        
   mockBlob = nock('https://id.staging.ripple.com').persist();
   mockBlob.get('/v1/authinfo?domain=' + exampleData.domain + '&username=' + exampleData.username.toLowerCase())
     .reply(200, JSON.stringify(authInfoRes.body), {
@@ -183,14 +199,6 @@ if (!online) {
     .reply(200, {result:'success'}, {
       'Content-Type': 'application/json'
     });  
-                    
-  mockAuthSign = nock('https://auth1.ripple.com')
-    .persist()
-    .post('/api/sign')
-    .reply(200, signRes, {
-      'Content-Type': 'text/plain'
-    });  
-    
 }
 
 describe('Ripple Txt', function () {
@@ -219,7 +227,6 @@ describe('AuthInfo', function() {
   });
 });
 
-
 describe('VaultClient', function () {
   var client = new VaultClient(exampleData.domain);
 
@@ -245,7 +252,6 @@ describe('VaultClient', function () {
       });
     });
   });
-
 
   describe('#login', function() {
     it('with username and password should retrive the blob, crypt key, and id', function(done) {
@@ -328,7 +334,26 @@ describe('VaultClient', function () {
       });
     });
   });
+ 
+  describe('#register', function () {
+    it('should create a new blob', function (done) {
+      this.timeout(10000);
+      var options = {
+        username     : exampleData.username,
+        password     : exampleData.password,
+        email        : exampleData.blob.data.email,
+        activateLink : exampleData.activateLink
+      }
+      
+      client.register(options, function(err, resp) {
+        assert(err instanceof Error);
+        assert.strictEqual(resp, void(0));
+        done();
+      });
+    });
+  });
 });
+
 
 describe('Blob', function () {
   var client;
