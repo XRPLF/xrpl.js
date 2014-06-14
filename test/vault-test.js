@@ -207,7 +207,7 @@ describe('Ripple Txt', function () {
 
     rt.get(exampleData.domain, function(err, resp) {
       assert.ifError(err);
-      assert.equal(typeof resp, 'object');
+      assert.strictEqual(typeof resp, 'object');
       done();
     });
   });
@@ -259,14 +259,14 @@ describe('VaultClient', function () {
       client.login(exampleData.username, exampleData.password, function(err, resp) {
         if (online) {
           assert.ifError(err);
-          assert.equal(typeof resp, 'object');
+          assert.strictEqual(typeof resp, 'object');
           assert(resp.blob instanceof Blob);
-          assert.equal(typeof resp.blob.id, 'string');
-          assert(UInt256.from_json(resp.blob.id).is_valid(), true);
-          assert.equal(typeof resp.blob.key, 'string');
-          assert(UInt256.from_json(resp.blob.key).is_valid(), true);
-          assert.equal(typeof resp.username, 'string');
-          assert.equal(typeof resp.verified, 'boolean');
+          assert.strictEqual(typeof resp.blob.id, 'string');
+          assert(UInt256.from_json(resp.blob.id).is_valid());
+          assert.strictEqual(typeof resp.blob.key, 'string');
+          assert(UInt256.from_json(resp.blob.key).is_valid());
+          assert.strictEqual(typeof resp.username, 'string');
+          assert.strictEqual(typeof resp.verified, 'boolean');
         } else {
           assert(err instanceof Error);
           assert.strictEqual(resp, void(0));
@@ -282,7 +282,7 @@ describe('VaultClient', function () {
       this.timeout(10000);
       client.relogin(exampleData.blob.url, exampleData.id, exampleData.crypt, function(err, resp) {
         assert.ifError(err);
-        assert.equal(typeof resp, 'object');
+        assert.strictEqual(typeof resp, 'object');
         assert(resp.blob instanceof Blob);
         done();
       });
@@ -295,12 +295,12 @@ describe('VaultClient', function () {
       client.unlock(exampleData.username, exampleData.password, exampleData.blob.data.encrypted_secret, function(err, resp) {
         if (online) {
           assert.ifError(err);
-          assert.equal(typeof resp, 'object');
-          assert.equal(typeof resp.keys, 'object');
-          assert.equal(typeof resp.keys.unlock, 'string');
-          assert(UInt256.from_json(resp.keys.unlock).is_valid(), true);
+          assert.strictEqual(typeof resp, 'object');
+          assert.strictEqual(typeof resp.keys, 'object');
+          assert.strictEqual(typeof resp.keys.unlock, 'string');
+          assert(UInt256.from_json(resp.keys.unlock).is_valid());
         } else {
-          assert.equal(err.toString(), 'CORRUPT: ccm: tag doesn\'t match');
+          assert.strictEqual(err.toString(), 'CORRUPT: ccm: tag doesn\'t match');
           assert.strictEqual(resp, void(0));
         }
         
@@ -315,17 +315,17 @@ describe('VaultClient', function () {
       client.loginAndUnlock(exampleData.username, exampleData.password, function(err, resp) {
         if (online) {
           assert.ifError(err);
-          assert.equal(typeof resp, 'object');
+          assert.strictEqual(typeof resp, 'object');
           assert(resp.blob instanceof Blob);
-          assert.equal(typeof resp.blob.id, 'string');
-          assert(UInt256.from_json(resp.blob.id).is_valid(), true);
-          assert.equal(typeof resp.blob.key, 'string');
-          assert(UInt256.from_json(resp.blob.key).is_valid(), true);
-          assert.equal(typeof resp.unlock, 'string');
-          assert(UInt256.from_json(resp.unlock).is_valid(), true);
-          assert.equal(typeof resp.secret, 'string');
-          assert.equal(typeof resp.username, 'string');
-          assert.equal(typeof resp.verified, 'boolean');
+          assert.strictEqual(typeof resp.blob.id, 'string');
+          assert(UInt256.from_json(resp.blob.id).is_valid());
+          assert.strictEqual(typeof resp.blob.key, 'string');
+          assert(UInt256.from_json(resp.blob.key).is_valid());
+          assert.strictEqual(typeof resp.unlock, 'string');
+          assert(UInt256.from_json(resp.unlock).is_valid());
+          assert.strictEqual(typeof resp.secret, 'string');
+          assert.strictEqual(typeof resp.username, 'string');
+          assert.strictEqual(typeof resp.verified, 'boolean');
         } else {
           assert(err instanceof Error);
           assert.strictEqual(resp, void(0));
@@ -346,6 +346,8 @@ describe('VaultClient', function () {
       }
       
       client.register(options, function(err, resp) {
+        
+        //fails, user already exists
         assert(err instanceof Error);
         assert.strictEqual(resp, void(0));
         done();
@@ -397,9 +399,9 @@ describe('Blob', function () {
        
       client.rename(options, function(err, resp) {
         assert.ifError(err);
-        assert.equal(typeof resp, 'object');
-        assert.equal(typeof resp.result,  'string');
-        assert.equal(typeof resp.message, 'string');
+        assert.strictEqual(typeof resp, 'object');
+        assert.strictEqual(typeof resp.result,  'string');
+        assert.strictEqual(typeof resp.message, 'string');
         
         if (online) {  
           options.username     = exampleData.new_username;
@@ -408,9 +410,9 @@ describe('Blob', function () {
           //change it back
           client.rename(options, function(err,resp){
             assert.ifError(err);
-            assert.equal(typeof resp, 'object');
-            assert.equal(typeof resp.result,  'string');
-            assert.equal(typeof resp.message, 'string');
+            assert.strictEqual(typeof resp, 'object');
+            assert.strictEqual(typeof resp.result,  'string');
+            assert.strictEqual(typeof resp.message, 'string');
             done();
           });
           
@@ -434,9 +436,9 @@ describe('Blob', function () {
         
       client.changePassword(options, function(err, resp) {
         assert.ifError(err);
-        assert.equal(typeof resp, 'object');
-        assert.equal(typeof resp.result,  'string');
-        assert.equal(typeof resp.message, 'string');    
+        assert.strictEqual(typeof resp, 'object');
+        assert.strictEqual(typeof resp.result,  'string');
+        assert.strictEqual(typeof resp.message, 'string');    
         done();
       });
     });
@@ -488,8 +490,8 @@ describe('Blob', function () {
       }
       client.resendEmail(options, function(err, resp) {
         assert.ifError(err);  
-        assert.equal(typeof resp, 'object');
-        assert.equal(typeof resp.result,  'string');
+        assert.strictEqual(typeof resp, 'object');
+        assert.strictEqual(typeof resp.result,  'string');
         done();
       });
     });
@@ -502,7 +504,7 @@ describe('Blob', function () {
     }, function(err, resp) {
 
       assert.ifError(err);
-      assert.equal(resp.result, 'success');
+      assert.strictEqual(resp.result, 'success');
       done();
     });
   });
@@ -513,7 +515,7 @@ describe('Blob', function () {
       foobar: 'baz',
     }, function(err, resp){
       assert.ifError(err);
-      assert.equal(resp.result, 'success');
+      assert.strictEqual(resp.result, 'success');
       done();
     });
   });
@@ -522,7 +524,7 @@ describe('Blob', function () {
     this.timeout(10000)
     blob.unset('/testObject', function(err, resp){
       assert.ifError(err);
-      assert.equal(resp.result, 'success');
+      assert.strictEqual(resp.result, 'success');
       done();
     });
   });
@@ -534,7 +536,7 @@ describe('Blob', function () {
       address: '1234'
     }, function(err, resp){
       assert.ifError(err);
-      assert.equal(resp.result, 'success');
+      assert.strictEqual(resp.result, 'success');
       done();
     });
   });
@@ -544,7 +546,7 @@ describe('Blob', function () {
 
     blob.filter('/testArray', 'name', 'bob', 'extend', '', {description:'Alice'}, function(err, resp){
       assert.ifError(err);
-      assert.equal(resp.result, 'success');
+      assert.strictEqual(resp.result, 'success');
       done();
     });
   });
@@ -553,10 +555,10 @@ describe('Blob', function () {
     this.timeout(10000)
     blob.unset('/testArray', function(err, resp){
       assert.ifError(err);
-      assert.equal(resp.result, 'success');
+      assert.strictEqual(resp.result, 'success');
       blob.consolidate(function(err, resp){
         assert.ifError(err);
-        assert.equal(resp.result, 'success');
+        assert.strictEqual(resp.result, 'success');
         done();
       });
     });
@@ -568,7 +570,7 @@ describe('Blob', function () {
 
       blob.identity.set('address', exampleData.unlock, {city:"San Francisco", region:"CA"}, function (err, resp) {
         assert.ifError(err);
-        assert.equal(resp.result, 'success');
+        assert.strictEqual(resp.result, 'success');
         done();          
       });
     });  
@@ -576,18 +578,18 @@ describe('Blob', function () {
     it('#identity_get', function () {
       var property = blob.identity.get('address', exampleData.unlock);
       assert.ifError(property.error);   
-      assert.equal(typeof property.encrypted, 'boolean');     
+      assert.strictEqual(typeof property.encrypted, 'boolean');     
       assert.notEqual(typeof property.value, 'undefined');  
     });      
 
     it('#identity_getAll', function () {
       var obj = blob.identity.getAll(exampleData.unlock);  
-      assert.equal(typeof obj, 'object');       
+      assert.strictEqual(typeof obj, 'object');       
     }); 
 
     it('#identity_getFullAddress', function () {
       var address = blob.identity.getFullAddress(exampleData.unlock);  
-      assert.equal(typeof address, 'string');       
+      assert.strictEqual(typeof address, 'string');       
     });      
 
     it('#identity_unset', function (done) {
@@ -595,7 +597,7 @@ describe('Blob', function () {
 
       blob.identity.unset('name', exampleData.unlock, function (err, resp) {
         assert.ifError(err);
-        assert.equal(resp.result, 'success');
+        assert.strictEqual(resp.result, 'success');
         done();          
       });
     });      
