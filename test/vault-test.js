@@ -5,11 +5,10 @@ var VaultClient = require('../src/js/ripple/vaultclient').VaultClient;
 var Blob        = require('../src/js/ripple/blob').Blob;
 var UInt256     = require('../src/js/ripple/uint256').UInt256;
 var sjcl        = require('../build/sjcl');
-var random      = require('crypto').randomBytes(2048);
+var random      = require('crypto').randomBytes(256);
 var nock        = require('nock');
 var online      = process.argv.indexOf('--online-blobvault') !== -1 ? true : false; 
 
-sjcl.random.addEntropy(random.toString()); 
 var exampleData = {
   id: 'ef203d3e76552c0592384f909e6f61f1d1f02f61f07643ce015d8b0c9710dd2f',
   crypt: 'f0cc91a7c1091682c245cd8e13c246cc150b2cf98b17dd6ef092019c99dc9d82',
@@ -114,6 +113,7 @@ var blob = new Blob();
   
 //must be set for self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+sjcl.random.addEntropy(random.toString()); //add entropy to seed the generator
 
 var mockRippleTxt;
 var mockAuthSign;
