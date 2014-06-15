@@ -829,7 +829,7 @@ BlobClient.get = function (url, id, crypt, fn) {
 
 BlobClient.verify = function(url, username, token, fn) {
   url += '/v1/user/' + username + '/verify/' + token;
-  request.get(url, function(err, resp){
+  request.get(url, function(err, resp) {
     if (err) {    
       fn(new Error("Failed to verify the account - XHR error"));
     } else if (resp.body && resp.body.result === 'success') {

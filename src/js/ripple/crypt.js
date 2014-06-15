@@ -277,7 +277,7 @@ Crypt.signString = function(secret, data) {
  */
 
 Crypt.deriveRecoveryEncryptionKeyFromSecret = function(secret) {
-  var seed = ripple.Seed.from_json(secret).to_bits();
+  var seed = Seed.from_json(secret).to_bits();
   var hmac = new sjcl.misc.hmac(seed, sjcl.hash.sha512);
   var key  = hmac.mac('ripple/hmac/recovery_encryption_key/v1');
   key      = sjcl.bitArray.bitSlice(key, 0, 256);

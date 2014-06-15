@@ -5,12 +5,12 @@ function RippleTxt() {
 };
 
 RippleTxt.urlTemplates = [
-  'https://ripple.{{domain}}/ripple.txt',
-  'https://www.{{domain}}/ripple.txt',
   'https://{{domain}}/ripple.txt',
-  'http://ripple.{{domain}}/ripple.txt',
+  'https://www.{{domain}}/ripple.txt',
+  'https://ripple.{{domain}}/ripple.txt',
+  'http://{{domain}}/ripple.txt',
   'http://www.{{domain}}/ripple.txt',
-  'http://{{domain}}/ripple.txt'
+  'http://ripple.{{domain}}/ripple.txt'
 ];
 
 RippleTxt.request = function() {
@@ -37,13 +37,13 @@ RippleTxt.prototype.get = function(domain, fn) {
 
   ;(function nextUrl(i) {
     var url = RippleTxt.urlTemplates[i];
-
+    
     if (!url) {
       return fn(new Error('No ripple.txt found'));
     }
 
     url = url.replace('{{domain}}', domain);
-
+    
     self.request(url, function(err, resp) {
       if (err || !resp.text) {
         return nextUrl(++i);
