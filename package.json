@@ -35,6 +35,7 @@
     "nock": "^0.34.1"
   },
   "scripts": {
+    "build": "node_modules/.bin/gulp",
     "pretest": "node_modules/.bin/gulp concat-sjcl",
     "test": "./node_modules/.bin/istanbul test -x build/sjcl.js -x src/js/jsbn/* ./node_modules/.bin/_mocha -- --reporter spec test/*-test.js",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
