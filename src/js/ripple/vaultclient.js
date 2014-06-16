@@ -467,7 +467,7 @@ VaultClient.prototype.register = function(options, fn) {
     getAuthInfo,
     self._deriveLoginKeys,
     self._deriveUnlockKey,
-    create    
+    create
   ];
   
   async.waterfall(steps, fn);
@@ -489,7 +489,8 @@ VaultClient.prototype.register = function(options, fn) {
       email        : options.email,
       masterkey    : options.masterkey || crypt.createMaster(),
       activateLink : options.activateLink,
-      oldUserBlob  : options.oldUserBlob
+      oldUserBlob  : options.oldUserBlob,
+      domain       : options.domain
     };
         
     blobClient.create(params, function(err, blob) {

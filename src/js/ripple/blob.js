@@ -1081,6 +1081,7 @@ BlobClient.create = function(options, fn) {
       data        : blob.encrypt(),
       email       : options.email,
       hostlink    : options.activateLink,
+      domain      : options.domain,
       encrypted_blobdecrypt_key : blob.encryptBlobCrypt(options.masterkey, options.crypt),
       encrypted_secret : blob.encrypted_secret
     }
