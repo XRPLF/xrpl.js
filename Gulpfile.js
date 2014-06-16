@@ -1,5 +1,7 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
+var rename = require('gulp-rename');
 var webpack = require('webpack');
 var jshint = require('gulp-jshint');
 var map = require('map-stream');
@@ -64,6 +66,13 @@ gulp.task('build', [ 'concat-sjcl' ], function(callback) {
   }, callback);
 });
 
+gulp.task('build-min', [ 'build' ], function(callback) {
+  return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
+  .pipe(uglify())
+  .pipe(rename([ 'ripple-', '-min.js' ].join(pkg.version)))
+  .pipe(gulp.dest('./build/'));
+});
+
 gulp.task('build-debug', [ 'concat-sjcl' ], function(callback) {
   webpack({
     cache: true,
@@ -75,22 +84,6 @@ gulp.task('build-debug', [ 'concat-sjcl' ], function(callback) {
     },
     debug: true,
     devtool: 'eval'
-  }, callback);
-});
-
-gulp.task('build-min', [ 'concat-sjcl' ], function(callback) {
-  webpack({
-    cache: true,
-    entry: './src/js/ripple/index.js',
-    output: {
-      library: 'ripple',
-      path: './build/',
-      filename: [ 'ripple-', '-min.js' ].join(pkg.version)
-    },
-    plugins: [
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.UglifyJsPlugin()
-    ]
   }, callback);
 });
 
