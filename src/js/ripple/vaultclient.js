@@ -159,7 +159,7 @@ VaultClient.prototype.login = function(username, password, callback) {
               } 
               
               options = {
-                username  : authInfo.username.toLowerCase(),
+                username  : authInfo.username,
                 blob      : blob,
                 masterkey : secret,
                 keys : {
@@ -494,6 +494,11 @@ VaultClient.prototype.register = function(options, fn) {
   var self     = this;
   var username = String(options.username).trim();
   var password = String(options.password).trim();
+  var result   = self.validateUsername(username);
+  
+  if (!result.valid) {
+    return fn(new Error('invalid username.'))  
+  }
   
   var steps = [
     getAuthInfo,
@@ -505,8 +510,7 @@ VaultClient.prototype.register = function(options, fn) {
   async.waterfall(steps, fn);
   
   function getAuthInfo(callback) {
-    self.getAuthInfo(username, function(err, authInfo){
-      if (!authInfo.username) authInfo.username = username;           
+    self.getAuthInfo(username, function(err, authInfo){      
       return callback (err, authInfo, password);
     });  
   };
@@ -517,7 +521,7 @@ VaultClient.prototype.register = function(options, fn) {
       id           : keys.id,
       crypt        : keys.crypt,
       unlock       : keys.unlock,
-      username     : authInfo.username,
+      username     : username,
       email        : options.email,
       masterkey    : options.masterkey || crypt.createMaster(),
       activateLink : options.activateLink,
@@ -531,11 +535,36 @@ VaultClient.prototype.register = function(options, fn) {
       } else {
         callback(null, {
           blob     : blob, 
-          username : authInfo.username
+          username : username
         });
       }
     });
   };
 };
 
+VaultClient.prototype.validateUsername = function (username) {
+  username   = String(username).trim();
+  var result = {
+    valid  : false,
+    reason : ""
+  };
+  
+  if (username.length < 2) {
+    result.reason = 'tooshort';
+  } else if (username.length > 20) {
+    result.reason = 'toolong'; 
+  } else if (!/^[a-zA-Z0-9\-]+$/.exec(username)) {
+    result.reason = 'charset'; 
+  } else if (/^-/.exec(username)) {
+    result.reason = 'starthyphen'; 
+  } else if (/-$/.exec(username)) {
+    result.reason = 'endhyphen'; 
+  } else if (/--/.exec(username)) {
+    result.reason = 'multhyphen'; 
+  } else {
+    result.valid = true;
+  }
+  
+  return result;
+}
 exports.VaultClient = VaultClient;
