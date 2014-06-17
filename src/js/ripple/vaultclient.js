@@ -145,6 +145,38 @@ VaultClient.prototype.login = function(username, password, callback) {
       //save for relogin
       self.infos[keys.id] = authInfo;
 
+      //migrate missing fields
+      if (blob.missing_fields) {
+        if (blob.missing_fields.encrypted_blobdecrypt_key) {
+          console.log("migration: saving encrypted blob decrypt key");
+          self._deriveUnlockKey(authInfo, password, {}, function(err, authInfo, unlock) {
+            if (unlock.unlock) {
+              var secret;
+              try {
+                secret = crypt.decrypt(unlock.unlock, blob.encrypted_secret);
+              } catch (error) {
+                return console.log(error);
+              } 
+              
+              options = {
+                username  : authInfo.username.toLowerCase(),
+                blob      : blob,
+                masterkey : secret,
+                keys : {
+                  id     : keys.id,
+                  crypt  : keys.crypt,
+                  unlock : unlock.unlock
+                }
+              };
+              
+              blobClient.updateKeys(options, function(err, resp){
+                console.log(err, resp);
+              });     
+            }
+          });
+        }
+      }
+      
       callback(null, {
         blob      : blob,
         username  : authInfo.username,
@@ -474,7 +506,7 @@ VaultClient.prototype.register = function(options, fn) {
   
   function getAuthInfo(callback) {
     self.getAuthInfo(username, function(err, authInfo){
-                  
+      if (!authInfo.username) authInfo.username = username;           
       return callback (err, authInfo, password);
     });  
   };
