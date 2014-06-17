@@ -5,7 +5,7 @@ var VaultClient = require('../src/js/ripple/vaultclient').VaultClient;
 var Blob        = require('../src/js/ripple/blob').Blob;
 var UInt256     = require('../src/js/ripple/uint256').UInt256;
 var sjcl        = require('../build/sjcl');
-var random      = require('crypto').randomBytes(256);
+var random      = require('crypto').randomBytes(512);
 var nock        = require('nock');
 var online      = process.argv.indexOf('--online-blobvault') !== -1 ? true : false; 
 
