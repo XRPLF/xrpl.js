@@ -16,7 +16,6 @@ function VaultClient(opts) {
   }
 
   this.domain   = opts.domain || 'ripple.com';
-  this.authInfo = new AuthInfo();
   this.infos    = { };
 };
 
@@ -29,7 +28,7 @@ function VaultClient(opts) {
  */
 VaultClient.prototype.getAuthInfo = function (username, callback) {
 
-  this.authInfo.get(this.domain, username, function(err, authInfo) {
+  AuthInfo.get(this.domain, username, function(err, authInfo) {
     if (err) {
       return callback(err);
     }
@@ -147,36 +146,14 @@ VaultClient.prototype.login = function(username, password, callback) {
 
       //migrate missing fields
       if (blob.missing_fields) {
-        if (blob.missing_fields.encrypted_blobdecrypt_key) {
+        if (blob.missing_fields.encrypted_blobdecrypt_key) {     
           console.log("migration: saving encrypted blob decrypt key");
-          self._deriveUnlockKey(authInfo, password, {}, function(err, authInfo, unlock) {
-            if (unlock.unlock) {
-              var secret;
-              try {
-                secret = crypt.decrypt(unlock.unlock, blob.encrypted_secret);
-              } catch (error) {
-                return console.log(error);
-              } 
-              
-              options = {
-                username  : authInfo.username,
-                blob      : blob,
-                masterkey : secret,
-                keys : {
-                  id     : keys.id,
-                  crypt  : keys.crypt,
-                  unlock : unlock.unlock
-                }
-              };
-              
-              blobClient.updateKeys(options, function(err, resp){
-                console.log(err, resp);
-              });     
-            }
-          });
+          authInfo.blob = blob;
+          //get the key to unlock the secret, then update the blob keys          
+          self._deriveUnlockKey(authInfo, password, keys, updateKeys);
         }
       }
-      
+         
       callback(null, {
         blob      : blob,
         username  : authInfo.username,
@@ -184,6 +161,32 @@ VaultClient.prototype.login = function(username, password, callback) {
       });
     });
   };
+  
+  function updateKeys (err, params, keys) {
+    if (err || !keys.unlock) {
+      return; //unable to unlock
+    }
+    
+    var secret;
+    try {
+      secret = crypt.decrypt(keys.unlock, params.blob.encrypted_secret);
+    } catch (error) {
+      return console.log(error);
+    } 
+    
+    options = {
+      username  : params.username,
+      blob      : params.blob,
+      masterkey : secret,
+      keys      : keys
+    };
+    
+    blobClient.updateKeys(options, function(err, resp){
+      if (err) {
+        console.log(err);
+      }
+    });     
+  } 
 };
 
 /**
@@ -339,7 +342,7 @@ VaultClient.prototype.loginAndUnlock = function(username, password, fn) {
  */
 
 VaultClient.prototype.exists = function(username, callback) {
-  this.authInfo.get(this.domain, username.toLowerCase(), function(err, authInfo) {
+  AuthInfo.get(this.domain, username.toLowerCase(), function(err, authInfo) {
     if (err) {
       callback(err);
     } else {

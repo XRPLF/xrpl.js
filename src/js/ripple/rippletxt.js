@@ -1,7 +1,7 @@
-var superagent = require('superagent');
+var request = require('superagent');
 
-function RippleTxt() {
-  this.txts = { };
+var RippleTxt = {
+  txts : { }
 };
 
 RippleTxt.urlTemplates = [
@@ -13,22 +13,13 @@ RippleTxt.urlTemplates = [
   'http://ripple.{{domain}}/ripple.txt'
 ];
 
-RippleTxt.request = function() {
-  return request;
-};
-
-RippleTxt.prototype.request = function(url, callback) {
-  return superagent.get(url, callback);
-};
-
 /**
  * Gets the ripple.txt file for the given domain
- *
  * @param {string}    domain - Domain to retrieve file from
  * @param {function}  fn - Callback function
  */
 
-RippleTxt.prototype.get = function(domain, fn) {
+RippleTxt.get = function(domain, fn) {
   var self = this;
 
   if (self.txts[domain]) {
@@ -44,7 +35,7 @@ RippleTxt.prototype.get = function(domain, fn) {
 
     url = url.replace('{{domain}}', domain);
     
-    self.request(url, function(err, resp) {
+    request.get(url, function(err, resp) {
       if (err || !resp.text) {
         return nextUrl(++i);
       }
@@ -59,11 +50,10 @@ RippleTxt.prototype.get = function(domain, fn) {
 
 /**
  * Parse a ripple.txt file
- *
  * @param {string}  txt - Unparsed ripple.txt data
  */
 
-RippleTxt.prototype.parse = function(txt) {
+RippleTxt.parse = function(txt) {
   var currentSection = '';
   var sections = { };
   
