@@ -113,7 +113,7 @@ var blob = new Blob();
 //must be set for self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 while(!sjcl.random.isReady()) {
-  sjcl.random.addEntropy(require('crypto').randomBytes(256).toString()); //add entropy to seed the generator
+  sjcl.random.addEntropy(require('crypto').randomBytes(128).toString()); //add entropy to seed the generator
 }
 
 var mockRippleTxt;
@@ -204,18 +204,29 @@ if (!online) {
 
 describe('Ripple Txt', function () {
   it('should get the content of a ripple.txt file from a given domain', function(done) {
-
     RippleTxt.get(exampleData.domain, function(err, resp) {
       assert.ifError(err);
       assert.strictEqual(typeof resp, 'object');
       done();
     });
   });
+  
+  it('should get currencies from a ripple.txt file for a given domain', function(done) {
+    RippleTxt.getCurrencies(exampleData.domain, function(err, currencies) {
+      assert.ifError(err);
+      assert(Array.isArray(currencies));
+      done();
+    });
+  });
+  
+  it('should get the domain from a given url', function() {
+    var domain = RippleTxt.extractDomain("http://www.example.com");
+    assert.strictEqual(typeof domain, 'string');
+  });  
 });
 
 describe('AuthInfo', function() {  
   it('should get auth info', function(done) {
-
     AuthInfo.get(exampleData.domain, exampleData.username, function(err, resp) {
       assert.ifError(err);
       Object.keys(authInfoRes.body).forEach(function(prop) {
