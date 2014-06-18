@@ -1,4 +1,5 @@
-var request = require('superagent');
+var request   = require('superagent');
+var Currency  = require('./currency').Currency;
 
 var RippleTxt = {
   txts : { }
@@ -79,5 +80,54 @@ RippleTxt.parse = function(txt) {
 
   return sections;
 };
+
+/**
+ * extractDomain
+ * attempt to extract the domain from a given url
+ * returns the url if unsuccessful
+ * @param {Object} url
+ */
+
+RippleTxt.extractDomain = function (url) {
+  match = /[^.]*\.[^.]{2,3}(?:\.[^.]{2,3})?([^.\?][^\?.]+?)?$/.exec(url);
+  return match && match[0] ? match[0] : url;
+};
+
+/**
+ * getCurrencies
+ * returns domain, issuer account and currency object
+ * for each currency found in the domain's ripple.txt file
+ * @param {Object} domain
+ * @param {Object} fn
+ */
+
+RippleTxt.getCurrencies = function(domain, fn) {
+  domain = RippleTxt.extractDomain(domain);
+  this.get(domain, function(err, txt) {
+    if (err) {
+      return fn(err);  
+    }
+    
+    if (err || !txt.currencies || !txt.accounts) {
+      return fn(null, []);
+    }
+    
+    //NOTE: this won't be accurate if there are
+    //multiple issuer accounts with different 
+    //currencies associated with each.
+    var issuer     = txt.accounts[0];
+    var currencies = [];
+    
+    txt.currencies.forEach(function(currency) {
+      currencies.push({
+        issuer   : issuer,
+        currency : Currency.from_json(currency),
+        domain   : domain
+      });
+    });
+    
+    fn(null, currencies);
+  });
+}; 
 
 exports.RippleTxt = RippleTxt;

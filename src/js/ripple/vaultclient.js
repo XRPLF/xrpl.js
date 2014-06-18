@@ -2,7 +2,7 @@ var async      = require('async');
 var blobClient = require('./blob').BlobClient;
 var AuthInfo   = require('./authinfo').AuthInfo;
 var crypt      = require('./crypt').Crypt;
-
+var log        = require('./log').sub('vault');
 function VaultClient(opts) {
   
   var self = this;
@@ -77,7 +77,7 @@ VaultClient.prototype._deriveUnlockKey = function (authInfo, password, keys, cal
   //derive unlock key
   crypt.derive(authInfo.pakdf, 'unlock', authInfo.username.toLowerCase(), password, function(err, unlock) {
     if (err) {
-      console.log('Error',err);
+      log.error('derive:', err);
       return callback(err);
     }
 
@@ -147,7 +147,7 @@ VaultClient.prototype.login = function(username, password, callback) {
       //migrate missing fields
       if (blob.missing_fields) {
         if (blob.missing_fields.encrypted_blobdecrypt_key) {     
-          console.log("migration: saving encrypted blob decrypt key");
+          log.info('migration: saving encrypted blob decrypt key');
           authInfo.blob = blob;
           //get the key to unlock the secret, then update the blob keys          
           self._deriveUnlockKey(authInfo, password, keys, updateKeys);
@@ -171,7 +171,7 @@ VaultClient.prototype.login = function(username, password, callback) {
     try {
       secret = crypt.decrypt(keys.unlock, params.blob.encrypted_secret);
     } catch (error) {
-      return console.log(error);
+      return log.error('decrypt:', error);
     } 
     
     options = {
@@ -183,7 +183,7 @@ VaultClient.prototype.login = function(username, password, callback) {
     
     blobClient.updateKeys(options, function(err, resp){
       if (err) {
-        console.log(err);
+        log.error('updateKeys:', err);
       }
     });     
   } 
@@ -500,7 +500,7 @@ VaultClient.prototype.register = function(options, fn) {
   var result   = self.validateUsername(username);
   
   if (!result.valid) {
-    return fn(new Error('invalid username.'))  
+    return fn(new Error('invalid username.'));  
   }
   
   var steps = [
@@ -549,7 +549,7 @@ VaultClient.prototype.validateUsername = function (username) {
   username   = String(username).trim();
   var result = {
     valid  : false,
-    reason : ""
+    reason : ''
   };
   
   if (username.length < 2) {
@@ -569,5 +569,6 @@ VaultClient.prototype.validateUsername = function (username) {
   }
   
   return result;
-}
+};
+
 exports.VaultClient = VaultClient;
