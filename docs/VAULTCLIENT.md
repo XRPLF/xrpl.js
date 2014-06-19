@@ -11,6 +11,14 @@ data stored using credentials originally obtained at ripple.com
 ## Vault Client Usage
 
     vaultClient = new ripple.VaultClient(domain);
+    
+    vaultClient.getAuthInfo(username, callback);
+    
+    vaultClient.getRippleName(address, url, callback);
+
+    vaultClient.exists(username, callback);
+    
+        
 
     vaultClient.login(username, password, callback);
 
@@ -20,19 +28,23 @@ data stored using credentials originally obtained at ripple.com
 
     vaultClient.loginAndUnlock(username, password, callback);
     
-    vaultClient.exists(username, callback);
+    
     
     vaultClient.register(options, callback);
     
+    vaultClient.deleteBlob(options, callback);
+    
+    vaultClient.recoverBlob(options, callback);
+        
     vaultClient.rename(options, callback);
     
     vaultClient.changePassword(options, callback);
-    
-    vaultClient.recoverBlob(options, callback);
-    
+     
     vaultClient.verify(username, token, callback);
     
     vaultClient.resendEmail(options, callback);
+    
+    vaultClient.updateProfile(options, fn);
     
 
 # Blob Methods
@@ -102,48 +114,55 @@ data stored using credentials originally obtained at ripple.com
 
 Run `npm test` to test the high-level behavior specs 
 
-    Ripple Txt
-      ✓ should get the context of a ripple.txt file from a given domain
+  Ripple Txt
+    ✓ should get the content of a ripple.txt file from a given domain 
+    ✓ should get currencies from a ripple.txt file for a given domain
+    ✓ should get the domain from a given url 
 
-    AuthInfo
-      ✓ should get authinfo given a domain and username
+  AuthInfo
+    ✓ should get auth info 
 
-    Ripple Vault Client
-      #initialization
-        ✓ should be initialized with a domain 
-        ✓ should default to ripple.com without a domain 
-      #login
-        ✓ with username and password should retrive the blob, crypt key, and id 
-      #relogin
-        ✓ should retrieve the decrypted blob with id and crypt key 
-      #unlock
-        ✓ should access the wallet secret using encryption secret, username and password 
-      #loginAndUnlock
-        ✓ should get the decrypted blob and decrypted secret given name and password 
+  VaultClient
+    #initialization
+      ✓ should be initialized with a domain 
+      ✓ should default to ripple.com without a domain 
+    #exists
+      ✓ should determine if a username exists on the domain 
+    #login
+      ✓ with username and password should retrive the blob, crypt key, and id
+    #relogin
+      ✓ should retrieve the decrypted blob with blob vault url, id, and crypt key 
+    #unlock
+      ✓ should access the wallet secret using encryption secret, username and password
+    #loginAndUnlock
+      ✓ should get the decrypted blob and decrypted secret given name and password
+    #register
+      ✓ should create a new blob
+    #deleteBlob
+      ✓ should remove an existing blob
+    #updateProfile
+      ✓ should update profile parameters associated with a blob 
 
-
-    Blob
-      #set
-        ✓ should set a new property in the blob
-      #extend
-        ✓ should extend an object in the blob 
-      #unset
-        ✓ should remove a property from the blob 
-      #unshift
-        ✓ should prepend an item to an array in the blob 
-      #filter
-        ✓ should find a specific entity in an array and apply subcommands to it 
-      #consolidate
-        ✓ should consolidate and save changes to the blob     
-    
-        
-      #identity_set
-        ✓ should set an identity property
-      #identity_get
-        ✓ should retreive an identity property given the property name and encryption key 
-      #identity_getAll
-        ✓ should retreive all identity properties given the encryption key 
-      #identity_getFullAddress
-        ✓ should retreive the address as a string 
-      #identity_unset
-        ✓ should remove an identity property
+  Blob
+    ✓ #set 
+    ✓ #extend 
+    ✓ #unset 
+    ✓ #unshift 
+    ✓ #filter 
+    ✓ #consolidate 
+    #rename
+      ✓ should change the username of a blob
+    #changePassword
+      ✓ should change the password and keys of a blob
+    #recoverBlob
+      ✓ should recover the blob given a username and secret
+    #verifyEmail
+      ✓ should verify an email given a username and token 
+    #resendVerifcationEmail
+      ✓ should resend a verification given options
+    identity
+      ✓ #identity_set 
+      ✓ #identity_get 
+      ✓ #identity_getAll 
+      ✓ #identity_getFullAddress 
+      ✓ #identity_unset 
