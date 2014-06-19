@@ -903,7 +903,11 @@ BlobClient.recoverBlob = function (opts, fn) {
       if (err) {
         fn(err);
       } else if (resp.body && resp.body.result === 'success') {
-        handleRecovery(resp);
+        if (!resp.body.encrypted_blobdecrypt_key) {
+          fn(new Error('Missing encrypted blob decrypt key.'));      
+        } else {
+          handleRecovery(resp);  
+        }       
       } else if (resp.body && resp.body.result === 'error') {
         fn(new Error(resp.body.message)); 
       } else {
