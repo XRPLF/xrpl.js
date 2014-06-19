@@ -5,7 +5,6 @@ var VaultClient = require('../src/js/ripple/vaultclient').VaultClient;
 var Blob        = require('../src/js/ripple/blob').Blob;
 var UInt256     = require('../src/js/ripple/uint256').UInt256;
 var sjcl        = require('../build/sjcl');
-var random      = require('crypto').randomBytes(256);
 var nock        = require('nock');
 var online      = process.argv.indexOf('--online-blobvault') !== -1 ? true : false; 
 
@@ -113,7 +112,9 @@ var blob = new Blob();
   
 //must be set for self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-sjcl.random.addEntropy(random.toString()); //add entropy to seed the generator
+while(!sjcl.random.isReady()) {
+  sjcl.random.addEntropy(require('crypto').randomBytes(128).toString()); //add entropy to seed the generator
+}
 
 var mockRippleTxt;
 var mockAuthSign;
@@ -203,21 +204,30 @@ if (!online) {
 
 describe('Ripple Txt', function () {
   it('should get the content of a ripple.txt file from a given domain', function(done) {
-    var rt = new RippleTxt();
-
-    rt.get(exampleData.domain, function(err, resp) {
+    RippleTxt.get(exampleData.domain, function(err, resp) {
       assert.ifError(err);
       assert.strictEqual(typeof resp, 'object');
       done();
     });
   });
+  
+  it('should get currencies from a ripple.txt file for a given domain', function(done) {
+    RippleTxt.getCurrencies(exampleData.domain, function(err, currencies) {
+      assert.ifError(err);
+      assert(Array.isArray(currencies));
+      done();
+    });
+  });
+  
+  it('should get the domain from a given url', function() {
+    var domain = RippleTxt.extractDomain("http://www.example.com");
+    assert.strictEqual(typeof domain, 'string');
+  });  
 });
 
 describe('AuthInfo', function() {  
   it('should get auth info', function(done) {
-    var auth = new AuthInfo();
-
-    auth.get(exampleData.domain, exampleData.username, function(err, resp) {
+    AuthInfo.get(exampleData.domain, exampleData.username, function(err, resp) {
       assert.ifError(err);
       Object.keys(authInfoRes.body).forEach(function(prop) {
         assert(resp.hasOwnProperty(prop));

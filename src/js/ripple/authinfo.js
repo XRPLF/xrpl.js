@@ -2,15 +2,13 @@ var async      = require('async');
 var superagent = require('superagent');
 var RippleTxt  = require('./rippletxt').RippleTxt;
 
-function AuthInfo() {
-  this.rippleTxt = new RippleTxt();
+var AuthInfo = { };
+
+AuthInfo._getRippleTxt = function(domain, callback) {
+  RippleTxt.get(domain, callback);
 };
 
-AuthInfo.prototype._getRippleTxt = function(domain, callback) {
-  this.rippleTxt.get(domain, callback);
-};
-
-AuthInfo.prototype._getUser = function(url, callback) {
+AuthInfo._getUser = function(url, callback) {
   superagent.get(url, callback);
 };
 
@@ -23,7 +21,7 @@ AuthInfo.prototype._getUser = function(url, callback) {
  * @param {function}  fn - Callback function
  */
 
-AuthInfo.prototype.get = function(domain, username, callback) {
+AuthInfo.get = function(domain, username, callback) {
   var self = this;
   username = username.toLowerCase();
   

@@ -2,7 +2,7 @@ var async      = require('async');
 var blobClient = require('./blob').BlobClient;
 var AuthInfo   = require('./authinfo').AuthInfo;
 var crypt      = require('./crypt').Crypt;
-
+var log        = require('./log').sub('vault');
 function VaultClient(opts) {
   
   var self = this;
@@ -16,7 +16,6 @@ function VaultClient(opts) {
   }
 
   this.domain   = opts.domain || 'ripple.com';
-  this.authInfo = new AuthInfo();
   this.infos    = { };
 };
 
@@ -29,7 +28,7 @@ function VaultClient(opts) {
  */
 VaultClient.prototype.getAuthInfo = function (username, callback) {
 
-  this.authInfo.get(this.domain, username, function(err, authInfo) {
+  AuthInfo.get(this.domain, username, function(err, authInfo) {
     if (err) {
       return callback(err);
     }
@@ -78,7 +77,7 @@ VaultClient.prototype._deriveUnlockKey = function (authInfo, password, keys, cal
   //derive unlock key
   crypt.derive(authInfo.pakdf, 'unlock', authInfo.username.toLowerCase(), password, function(err, unlock) {
     if (err) {
-      console.log('Error',err);
+      log.error('derive:', err);
       return callback(err);
     }
 
@@ -145,6 +144,16 @@ VaultClient.prototype.login = function(username, password, callback) {
       //save for relogin
       self.infos[keys.id] = authInfo;
 
+      //migrate missing fields
+      if (blob.missing_fields) {
+        if (blob.missing_fields.encrypted_blobdecrypt_key) {     
+          log.info('migration: saving encrypted blob decrypt key');
+          authInfo.blob = blob;
+          //get the key to unlock the secret, then update the blob keys          
+          self._deriveUnlockKey(authInfo, password, keys, updateKeys);
+        }
+      }
+         
       callback(null, {
         blob      : blob,
         username  : authInfo.username,
@@ -152,6 +161,32 @@ VaultClient.prototype.login = function(username, password, callback) {
       });
     });
   };
+  
+  function updateKeys (err, params, keys) {
+    if (err || !keys.unlock) {
+      return; //unable to unlock
+    }
+    
+    var secret;
+    try {
+      secret = crypt.decrypt(keys.unlock, params.blob.encrypted_secret);
+    } catch (error) {
+      return log.error('decrypt:', error);
+    } 
+    
+    options = {
+      username  : params.username,
+      blob      : params.blob,
+      masterkey : secret,
+      keys      : keys
+    };
+    
+    blobClient.updateKeys(options, function(err, resp){
+      if (err) {
+        log.error('updateKeys:', err);
+      }
+    });     
+  } 
 };
 
 /**
@@ -307,7 +342,7 @@ VaultClient.prototype.loginAndUnlock = function(username, password, fn) {
  */
 
 VaultClient.prototype.exists = function(username, callback) {
-  this.authInfo.get(this.domain, username.toLowerCase(), function(err, authInfo) {
+  AuthInfo.get(this.domain, username.toLowerCase(), function(err, authInfo) {
     if (err) {
       callback(err);
     } else {
@@ -462,6 +497,11 @@ VaultClient.prototype.register = function(options, fn) {
   var self     = this;
   var username = String(options.username).trim();
   var password = String(options.password).trim();
+  var result   = self.validateUsername(username);
+  
+  if (!result.valid) {
+    return fn(new Error('invalid username.'));  
+  }
   
   var steps = [
     getAuthInfo,
@@ -473,8 +513,7 @@ VaultClient.prototype.register = function(options, fn) {
   async.waterfall(steps, fn);
   
   function getAuthInfo(callback) {
-    self.getAuthInfo(username, function(err, authInfo){
-                  
+    self.getAuthInfo(username, function(err, authInfo){      
       return callback (err, authInfo, password);
     });  
   };
@@ -485,7 +524,7 @@ VaultClient.prototype.register = function(options, fn) {
       id           : keys.id,
       crypt        : keys.crypt,
       unlock       : keys.unlock,
-      username     : authInfo.username,
+      username     : username,
       email        : options.email,
       masterkey    : options.masterkey || crypt.createMaster(),
       activateLink : options.activateLink,
@@ -499,11 +538,37 @@ VaultClient.prototype.register = function(options, fn) {
       } else {
         callback(null, {
           blob     : blob, 
-          username : authInfo.username
+          username : username
         });
       }
     });
   };
+};
+
+VaultClient.prototype.validateUsername = function (username) {
+  username   = String(username).trim();
+  var result = {
+    valid  : false,
+    reason : ''
+  };
+  
+  if (username.length < 2) {
+    result.reason = 'tooshort';
+  } else if (username.length > 20) {
+    result.reason = 'toolong'; 
+  } else if (!/^[a-zA-Z0-9\-]+$/.exec(username)) {
+    result.reason = 'charset'; 
+  } else if (/^-/.exec(username)) {
+    result.reason = 'starthyphen'; 
+  } else if (/-$/.exec(username)) {
+    result.reason = 'endhyphen'; 
+  } else if (/--/.exec(username)) {
+    result.reason = 'multhyphen'; 
+  } else {
+    result.valid = true;
+  }
+  
+  return result;
 };
 
 exports.VaultClient = VaultClient;

@@ -102,10 +102,11 @@ BlobObj.prototype.init = function(fn) {
     if (err || !resp.body || resp.body.result !== 'success') {
       return fn(new Error('Could not retrieve blob'));
     }
-
-    self.revision = resp.body.revision;
+    
+    self.revision         = resp.body.revision;
     self.encrypted_secret = resp.body.encrypted_secret;
-
+    self.missing_fields   = resp.body.missing_fields;
+    
     if (!self.decrypt(resp.body.blob)) {
       return fn(new Error('Error while decrypting blob'));
     }
@@ -902,7 +903,11 @@ BlobClient.recoverBlob = function (opts, fn) {
       if (err) {
         fn(err);
       } else if (resp.body && resp.body.result === 'success') {
-        handleRecovery(resp);
+        if (!resp.body.encrypted_blobdecrypt_key) {
+          fn(new Error('Missing encrypted blob decrypt key.'));      
+        } else {
+          handleRecovery(resp);  
+        }       
       } else if (resp.body && resp.body.result === 'error') {
         fn(new Error(resp.body.message)); 
       } else {
