@@ -42,3 +42,7 @@ test/config.js
 /lib-cov
 /src-cov
 /coverage.html
+/coverage
+
+# Ignore IntelliJ files
+.idea

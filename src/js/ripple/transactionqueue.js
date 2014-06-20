@@ -3,27 +3,13 @@
  * Manager for pending transactions
  */
 
-var Transaction = require('./transaction').Transaction;
 var LRU = require('lru-cache');
+var Transaction = require('./transaction').Transaction;
 
 function TransactionQueue() {
-  var self = this;
-
-  this._queue         = [ ];
-  this._idCache       = LRU({ max: 100 });
-  this._sequenceCache = LRU({ max: 100 });
-  this._save          = void(0);
-};
-
-TransactionQueue.prototype.save = function() {
-  if (typeof this._save !== 'function') return;
-
-  this._save(this._queue.map(function(tx) {
-    return {
-      tx_json: tx.tx_json,
-      submittedIDs: tx.submittedIDs
-    }
-  }));
+  this._queue = [ ];
+  this._idCache = LRU();
+  this._sequenceCache = LRU();
 };
 
 /**
@@ -32,6 +18,15 @@ TransactionQueue.prototype.save = function() {
 
 TransactionQueue.prototype.addReceivedSequence = function(sequence) {
   this._sequenceCache.set(String(sequence), true);
+};
+
+/**
+ * Check that sequence number has been consumed by a validated
+ * transaction
+ */
+
+TransactionQueue.prototype.hasSequence = function(sequence) {
+  return this._sequenceCache.has(String(sequence));
 };
 
 /**
@@ -51,23 +46,14 @@ TransactionQueue.prototype.getReceived = function(id) {
 };
 
 /**
- * Check that sequence number has been consumed by a validated
- * transaction
- */
-
-TransactionQueue.prototype.hasSequence = function(sequence) {
-  return this._sequenceCache.has(String(sequence));
-};
-
-/**
  * Get a submitted transaction by ID. Transactions
  * may have multiple associated IDs.
  */
 
-TransactionQueue.prototype.getSubmission = function(id, callback) {
-  var result = false;
+TransactionQueue.prototype.getSubmission = function(id) {
+  var result = void(0);
 
-  for (var i=0, tx; tx=this._queue[i]; i++) {
+  for (var i=0, tx; (tx=this._queue[i]); i++) {
     if (~tx.submittedIDs.indexOf(id)) {
       result = tx;
       break;
@@ -85,26 +71,32 @@ TransactionQueue.prototype.remove = function(tx) {
   // ND: We are just removing the Transaction by identity
   var i = this._queue.length;
 
+  if (typeof tx === 'string') {
+    tx = this.getSubmission(tx);
+  }
+
+  if (!(tx instanceof Transaction)) {
+    return;
+  }
+
   while (i--) {
     if (this._queue[i] === tx) {
       this._queue.splice(i, 1);
       break;
     }
   }
-
-  this.save();
 };
 
 TransactionQueue.prototype.push = function(tx) {
   this._queue.push(tx);
-  this.save();
 };
 
 TransactionQueue.prototype.forEach = function(fn) {
   this._queue.forEach(fn);
 };
 
-TransactionQueue.prototype.length = function() {
+TransactionQueue.prototype.length =
+TransactionQueue.prototype.getLength = function() {
   return this._queue.length;
 };
 

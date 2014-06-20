@@ -5,17 +5,17 @@ var UInt256 = require('./uint256').UInt256;
 var Base    = require('./base').Base;
 
 function KeyPair() {
-  this._curve  = sjcl.ecc.curves['c256'];
+  this._curve  = sjcl.ecc.curves.c256;
   this._secret = null;
   this._pubkey = null;
 };
 
-KeyPair.from_bn_secret = function (j) {
-  return j instanceof this ? j.clone() : (new this()).parse_bn_secret(j);
+KeyPair.from_bn_secret = function(j) {
+  return (j instanceof this) ? j.clone() : (new this()).parse_bn_secret(j);
 };
 
-KeyPair.prototype.parse_bn_secret = function (j) {
-  this._secret = new sjcl.ecc.ecdsa.secretKey(sjcl.ecc.curves['c256'], j);
+KeyPair.prototype.parse_bn_secret = function(j) {
+  this._secret = new sjcl.ecc.ecdsa.secretKey(sjcl.ecc.curves.c256, j);
   return this;
 };
 
@@ -24,7 +24,7 @@ KeyPair.prototype.parse_bn_secret = function (j) {
  *
  * @private
  */
-KeyPair.prototype._pub = function () {
+KeyPair.prototype._pub = function() {
   var curve = this._curve;
 
   if (!this._pubkey && this._secret) {
@@ -40,7 +40,7 @@ KeyPair.prototype._pub = function () {
  *
  * @private
  */
-KeyPair.prototype._pub_bits = function () {
+KeyPair.prototype._pub_bits = function() {
   var pub = this._pub();
 
   if (!pub) {
@@ -60,7 +60,7 @@ KeyPair.prototype._pub_bits = function () {
  *
  * Key will be returned as a compressed pubkey - 33 bytes converted to hex.
  */
-KeyPair.prototype.to_hex_pub = function () {
+KeyPair.prototype.to_hex_pub = function() {
   var bits = this._pub_bits();
 
   if (!bits) {
@@ -74,7 +74,7 @@ function SHA256_RIPEMD160(bits) {
   return sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
 }
 
-KeyPair.prototype.get_address = function () {
+KeyPair.prototype.get_address = function() {
   var bits = this._pub_bits();
 
   if (!bits) {
@@ -88,7 +88,7 @@ KeyPair.prototype.get_address = function () {
   return address;
 };
 
-KeyPair.prototype.sign = function (hash) {
+KeyPair.prototype.sign = function(hash) {
   hash = UInt256.from_json(hash);
   var sig = this._secret.sign(hash.to_bits(), 0);
   sig = this._secret.canonicalizeSignature(sig);

@@ -7,9 +7,9 @@ var BigInteger = utils.jsbn.BigInteger;
 var Base = {};
 
 var alphabets = Base.alphabets = {
-  ripple  :  "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz",
-  tipple  :  "RPShNAF39wBUDnEGHJKLM4pQrsT7VWXYZ2bcdeCg65jkm8ofqi1tuvaxyz",
-  bitcoin :  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+  ripple:  'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
+  tipple:  'RPShNAF39wBUDnEGHJKLM4pQrsT7VWXYZ2bcdeCg65jkm8ofqi1tuvaxyz',
+  bitcoin:  '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 };
 
 extend(Base, {
@@ -33,7 +33,7 @@ function sha256hash(bytes) {
 
 // --> input: big-endian array of bytes.
 // <-- string at least as long as input.
-Base.encode = function (input, alpha) {
+Base.encode = function(input, alpha) {
   var alphabet = alphabets[alpha || 'ripple'];
   var bi_base  = new BigInteger(String(alphabet.length));
   var bi_q     = new BigInteger();
@@ -56,7 +56,7 @@ Base.encode = function (input, alpha) {
 
 // --> input: String
 // <-- array of bytes or undefined.
-Base.decode = function (input, alpha) {
+Base.decode = function(input, alpha) {
   if (typeof input !== 'string') {
     return void(0);
   }
@@ -66,8 +66,8 @@ Base.decode = function (input, alpha) {
   var bi_value = new BigInteger();
   var i;
 
-  for (i = 0; i != input.length && input[i] === alphabet[0]; i += 1)
-  ;
+  for (i = 0; i !== input.length && input[i] === alphabet[0]; i += 1) {
+  }
 
   for (; i !== input.length; i += 1) {
     var v = alphabet.indexOf(input[i]);
@@ -84,10 +84,10 @@ Base.decode = function (input, alpha) {
   // toByteArray:
   // - Returns leading zeros!
   // - Returns signed bytes!
-  var bytes =  bi_value.toByteArray().map(function (b) { return b ? b < 0 ? 256+b : b : 0; });
+  var bytes =  bi_value.toByteArray().map(function(b) { return b ? b < 0 ? 256+b : b : 0; });
   var extra = 0;
 
-  while (extra != bytes.length && !bytes[extra]) {
+  while (extra !== bytes.length && !bytes[extra]) {
     extra += 1;
   }
 
@@ -104,7 +104,7 @@ Base.decode = function (input, alpha) {
   return [].concat(utils.arraySet(zeros, 0), bytes);
 };
 
-Base.verify_checksum = function (bytes) {
+Base.verify_checksum = function(bytes) {
   var computed = sha256hash(bytes.slice(0, -4)).slice(0, 4);
   var checksum = bytes.slice(-4);
   var result = true;
@@ -121,7 +121,7 @@ Base.verify_checksum = function (bytes) {
 
 // --> input: Array
 // <-- String
-Base.encode_check = function (version, input, alphabet) {
+Base.encode_check = function(version, input, alphabet) {
   var buffer = [].concat(version, input);
   var check  = sha256(sha256(buffer)).slice(0, 4);
 
@@ -130,7 +130,7 @@ Base.encode_check = function (version, input, alphabet) {
 
 // --> input : String
 // <-- NaN || BigInteger
-Base.decode_check = function (version, input, alphabet) {
+Base.decode_check = function(version, input, alphabet) {
   var buffer = Base.decode(input, alphabet);
 
   if (!buffer || buffer.length < 5) {

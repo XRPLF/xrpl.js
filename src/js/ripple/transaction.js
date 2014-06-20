@@ -58,7 +58,9 @@ var config           = require('./config');
 function Transaction(remote) {
   EventEmitter.call(this);
 
-  var self  = this;
+  var self = this;
+
+  var remote = remote || { };
 
   this.remote = remote;
 
@@ -67,15 +69,17 @@ function Transaction(remote) {
 
   this._secret = void(0);
   this._build_path = false;
+  this._maxFee = this.remote.max_fee;
 
   this.state = 'unsubmitted';
   this.finalized = false;
   this.previousSigningHash = void(0);
+
   // Index at which transaction was submitted
   this.submitIndex = void(0);
 
   // Canonical signing setting defaults to the Remote's configuration
-  this.canonical = "object" === typeof remote ? !!remote.canonical_signing : true;
+  this.canonical = (typeof remote === 'object') ? !!remote.canonical_signing : true;
 
   // We aren't clever enough to eschew preventative measures so we keep an array
   // of all submitted transactionIDs (which can change due to load_factor
@@ -151,10 +155,10 @@ Transaction.flags = {
 // SetFlag or ClearFlag field
 Transaction.set_clear_flags = {
   AccountSet: {
-    asfRequireDest:     1,
-    asfRequireAuth:     2,
-    asfDisallowXRP:     3,
-    asfDisableMaster:   4
+    asfRequireDest:    1,
+    asfRequireAuth:    2,
+    asfDisallowXRP:    3,
+    asfDisableMaster:  4
   }
 };
 
@@ -244,32 +248,48 @@ Transaction.prototype._accountSecret = function(account) {
  * @return {Number} Number of fee units for this transaction.
  */
 
-Transaction.prototype.getFee =
+Transaction.prototype._getFeeUnits =
 Transaction.prototype.feeUnits = function() {
   return Transaction.fee_units['default'];
 };
 
 /**
- * Get the server whose fee is currently the lowest
+ * Compute median server fee
  */
 
-Transaction.prototype._getServer = function() {
-  var self    = this;
+Transaction.prototype._computeFee = function() {
   var servers = this.remote._servers;
-  var fee     = Infinity;
-  var result;
+  var fees = [ ];
 
   for (var i=0; i<servers.length; i++) {
     var server = servers[i];
-    if (!server._connected) continue;
-    var n = server.computeFee(this);
-    if (n < fee) {
-      result = server;
-      fee = n;
+    if (server._connected) {
+      fees.push(Number(server._computeFee(this)));
     }
   }
 
-  return result;
+  switch (fees.length) {
+    case 0: return;
+    case 1: return String(fees[0]);
+  }
+
+  fees.sort(function ascending(a, b) {
+    if (a > b) {
+      return 1;
+    } else if (a < b) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
+
+  var midInd = Math.floor(fees.length / 2);
+
+  var median = fees.length % 2 === 0
+  ? Math.floor(0.5 + (fees[midInd] + fees[midInd - 1]) / 2)
+  : fees[midInd];
+
+  return String(median);
 };
 
 /**
@@ -309,13 +329,15 @@ Transaction.prototype.complete = function() {
   // an assigned server
   if (this.remote && typeof this.tx_json.Fee === 'undefined') {
     if (this.remote.local_fee || !this.remote.trusted) {
-      this._server = this._getServer();
-      this.tx_json.Fee = this._server.computeFee(this);
+      if (!(this.tx_json.Fee = this._computeFee())) {
+        this.emit('error', new RippleError('tejUnconnected'));
+        return;
+      }
     }
   }
 
   if (Number(this.tx_json.Fee) > this._maxFee) {
-    tx.emit('error', new RippleError('tejMaxFeeExceeded', 'Max fee exceeded'));
+    this.emit('error', new RippleError('tejMaxFeeExceeded', 'Max fee exceeded'));
     return false;
   }
 
@@ -346,7 +368,7 @@ Transaction.prototype.hash = function(prefix, as_uint256) {
     }
     prefix = hashprefixes[prefix];
   } else if (!prefix) {
-    prefix = hashprefixes['HASH_TX_ID'];
+    prefix = hashprefixes.HASH_TX_ID;
   }
 
   var hash = SerializedObject.from_json(this.tx_json).hash(prefix);
@@ -403,7 +425,9 @@ Transaction.prototype.findId = function(cache) {
 
   for (var i=0; i<this.submittedIDs.length; i++) {
     var hash = this.submittedIDs[i];
-    if (result = cache[hash]) break;
+    if ((result = cache[hash])) {
+      break;
+    }
   }
 
   return result;
@@ -432,7 +456,9 @@ Transaction.prototype.destinationTag = function(tag) {
 
 Transaction.prototype.invoiceID = function(id) {
   if (typeof id === 'string') {
-    while (id.length < 64) id += '0';
+    while (id.length < 64) {
+      id += '0';
+    }
     this.tx_json.InvoiceID = id;
   }
   return this;
@@ -454,7 +480,11 @@ Transaction.prototype.lastLedger = function(sequence) {
 };
 
 Transaction._pathRewrite = function(path) {
-  return path.map(function(node) {
+  if (!Array.isArray(path)) {
+    return;
+  }
+
+  var newPath = path.map(function(node) {
     var newNode = { };
 
     if (node.hasOwnProperty('account')) {
@@ -473,8 +503,10 @@ Transaction._pathRewrite = function(path) {
       newNode.type_hex = node.type_hex;
     }
 
-    return newNode
+    return newNode;
   });
+
+  return newPath;
 };
 
 Transaction.prototype.pathAdd = function(path) {
@@ -533,7 +565,14 @@ Transaction.prototype.transferRate = function(rate) {
 // Add flags to a transaction.
 // --> flags: undefined, _flag_, or [ _flags_ ]
 Transaction.prototype.setFlags = function(flags) {
-  if (!flags) return this;
+  if (flags === void(0)) {
+    return this;
+  }
+
+  if (typeof flags === 'number') {
+    this.tx_json.Flags = flags;
+    return this;
+  }
 
   var flag_set = Array.isArray(flags) ? flags : Array.prototype.slice.call(arguments);
   var transaction_flags = Transaction.flags[this.tx_json.TransactionType] || { };
@@ -576,6 +615,7 @@ Transaction.prototype.setFlags = function(flags) {
  *  "asfDisableMaster"
  *    Disallow use of the master key
  */
+
 Transaction.prototype.accountSet = function(src, set_flag, clear_flag) {
   if (typeof src === 'object') {
     var options = src;
@@ -677,47 +717,6 @@ Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expira
   return this;
 };
 
-Transaction.prototype.passwordFund = function(src, dst) {
-  if (typeof src === 'object') {
-    var options = src;
-    dst = options.destination || options.to;
-    src = options.source || options.from;
-  }
-
-  if (!UInt160.is_valid(dst)) {
-    throw new Error('Destination address invalid');
-  }
-
-  this.tx_json.TransactionType = 'PasswordFund';
-  this.tx_json.Destination     = UInt160.json_rewrite(dst);
-
-  return this;
-};
-
-Transaction.prototype.passwordSet = function(src, authorized_key, generator, public_key, signature) {
-  if (typeof src === 'object') {
-    var options = src;
-    signature      = options.signature;
-    public_key     = options.public_key;
-    generator      = options.generator;
-    authorized_key = options.authorized_key;
-    src            = options.source || options.from || options.account;
-  }
-
-  if (!UInt160.is_valid(src)) {
-    throw new Error('Source address invalid');
-  }
-
-  this.tx_json.TransactionType = 'PasswordSet';
-  this.tx_json.RegularKey      = authorized_key;
-  this.tx_json.Generator       = generator;
-  this.tx_json.PublicKey       = public_key;
-  this.tx_json.Signature       = signature;
-
-  return this;
-};
-
-
 /**
  *  Construct a 'SetRegularKey' transaction.
  *  If the RegularKey is set, the private key that corresponds to
@@ -726,6 +725,7 @@ Transaction.prototype.passwordSet = function(src, authorized_key, generator, pub
  *  The RegularKey must be a valid Ripple Address, or a Hash160 of
  *  the public key corresponding to the new private signing key.
  */
+
 Transaction.prototype.setRegularKey = function(src, regular_key) {
   if (typeof src === 'object') {
     var options = src;
@@ -744,6 +744,8 @@ Transaction.prototype.setRegularKey = function(src, regular_key) {
   this.tx_json.TransactionType = 'SetRegularKey';
   this.tx_json.Account = UInt160.json_rewrite(src);
   this.tx_json.RegularKey = UInt160.json_rewrite(regular_key);
+
+  return this;
 };
 
 // Construct a 'payment' transaction.
@@ -771,20 +773,12 @@ Transaction.prototype.payment = function(src, dst, amount) {
     src    = options.source || options.from || options.account;
   }
 
-  if (src.invoiceID) {
-    this.invoiceID(src.invoiceID);
-  }
-
   if (!UInt160.is_valid(src)) {
     throw new Error('Payment source address invalid');
   }
 
   if (!UInt160.is_valid(dst)) {
     throw new Error('Payment destination address invalid');
-  }
-
-  if (/^[\d]+[A-Z]{3}$/.test(amount)) {
-    amount = Amount.from_human(amount);
   }
 
   this.tx_json.TransactionType = 'Payment';
@@ -829,29 +823,6 @@ Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_o
   return this;
 };
 
-Transaction.prototype.walletAdd = function(src, amount, authorized_key, public_key, signature) {
-  if (typeof src === 'object') {
-    var options = src;
-    signature      = options.signature;
-    public_key     = options.public_key;
-    authorized_key = options.authorized_key;
-    amount         = options.amount;
-    src            = options.source || options.from || options.account;
-  }
-
-  if (!UInt160.is_valid(src)) {
-    throw new Error('Source address invalid');
-  }
-
-  this.tx_json.TransactionType  = 'WalletAdd';
-  this.tx_json.Amount           = Amount.json_rewrite(amount);
-  this.tx_json.RegularKey       = authorized_key;
-  this.tx_json.PublicKey        = public_key;
-  this.tx_json.Signature        = signature;
-
-  return this;
-};
-
 // Submit a transaction to the network.
 Transaction.prototype.submit = function(callback) {
   var self = this;
@@ -877,8 +848,8 @@ Transaction.prototype.submit = function(callback) {
 
   var account = this.tx_json.Account;
 
-  if (typeof account !== 'string') {
-    return this.emit('error', new RippleError('tejInvalidAccount', 'Account is unspecified'));
+  if (!UInt160.is_valid(account)) {
+    return this.emit('error', new RippleError('tejInvalidAccount', 'Account is missing or invalid'));
   }
 
   // YYY Might check paths for invalid accounts.
@@ -887,20 +858,12 @@ Transaction.prototype.submit = function(callback) {
   return this;
 };
 
-Transaction.prototype.transactionManager = function() {
-  return this.remote.account(this.tx_json.Account)._transactionManager;
-};
-
 Transaction.prototype.abort = function(callback) {
+  var callback = (typeof callback === 'function') ? callback : function(){};
   if (!this.finalized) {
-    var callback = (typeof callback === 'function') ? callback : function(){};
     this.once('final', callback);
     this.emit('abort');
   }
-};
-
-Transaction.prototype.iff = function(fn) {
-  this._iff = fn;
 };
 
 Transaction.prototype.summary = function() {
@@ -917,9 +880,9 @@ Transaction.summary = function() {
     initialSubmitIndex:  this.initialSubmitIndex,
     lastLedgerSequence:  this.lastLedgerSequence,
     state:               this.state,
-    server:              this._server ? this._server._opts.url :  void(0),
+    server:              this._server ? this._server._opts.url : void(0),
     finalized:           this.finalized
-  }
+  };
 
   if (this.result) {
     result.result = {
@@ -928,7 +891,7 @@ Transaction.summary = function() {
       ledger_hash          : this.result.ledger_hash,
       ledger_index         : this.result.ledger_index,
       transaction_hash     : this.result.tx_json.hash
-    }
+    };
   }
 
   return result;

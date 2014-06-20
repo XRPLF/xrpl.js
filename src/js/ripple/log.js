@@ -1,13 +1,13 @@
 /**
  * Logging functionality for ripple-lib and any applications built on it.
  */
-var Log = function (namespace) {
+function Log(namespace) {
   if (!namespace) {
     this._namespace = [];
   } else if (Array.isArray(namespace)) {
     this._namespace = namespace;
   } else {
-    this._namespace = [""+namespace];
+    this._namespace = [''+namespace];
   }
 
   this._prefix = this._namespace.concat(['']).join(': ');
@@ -23,25 +23,29 @@ var Log = function (namespace) {
  *   var log = require('ripple').log.sub('server');
  *
  *   log.info('connection successful');
- *   // prints: "server: connection successful"
+ *   // prints: 'server: connection successful'
  */
-Log.prototype.sub = function (namespace) {
+Log.prototype.sub = function(namespace) {
   var subNamespace = this._namespace.slice();
-  if (namespace && "string" === typeof namespace) subNamespace.push(namespace);
+
+  if (namespace && typeof namespace === 'string') {
+    subNamespace.push(namespace);
+  }
+
   var subLogger = new Log(subNamespace);
   subLogger._setParent(this);
   return subLogger;
 };
 
-Log.prototype._setParent = function (parentLogger) {
+Log.prototype._setParent = function(parentLogger) {
   this._parent = parentLogger;
 };
 
-Log.makeLevel = function (level) {
-  return function () {
-    arguments[0] = this._prefix + arguments[0];
-
-    Log.engine.logObject.apply(Log, Array.prototype.slice.call(arguments));
+Log.makeLevel = function(level) {
+  return function() {
+    var args = Array.prototype.slice.call(arguments);
+    args[0] = this._prefix + args[0];
+    Log.engine.logObject.apply(Log, args);
   };
 };
 
@@ -53,7 +57,7 @@ Log.prototype.error = Log.makeLevel(4);
 /**
  * Basic logging connector.
  *
- * This engine has no formatting and works with the most basic of "console.log"
+ * This engine has no formatting and works with the most basic of 'console.log'
  * implementations. This is the logging engine used in Node.js.
  */
 var BasicLogEngine = {
@@ -77,12 +81,14 @@ var BasicLogEngine = {
  * available.
  */
 var NullLogEngine = {
-  logObject: function () {}
+  logObject: function() {}
 };
 
 Log.engine = NullLogEngine;
 
-if (console && console.log) Log.engine = BasicLogEngine;
+if (console && console.log) {
+  Log.engine = BasicLogEngine;
+}
 
 /**
  * Provide a root logger as our main export.

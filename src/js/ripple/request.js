@@ -2,10 +2,6 @@ var EventEmitter = require('events').EventEmitter;
 var util         = require('util');
 var UInt160      = require('./uint160').UInt160;
 var Currency     = require('./currency').Currency;
-var Transaction  = require('./transaction').Transaction;
-var Account      = require('./account').Account;
-var Meta         = require('./meta').Meta;
-var OrderBook    = require('./orderbook').OrderBook;
 var RippleError  = require('./rippleerror').RippleError;
 var Server       = require('./server').Server;
 
@@ -18,9 +14,13 @@ var Server       = require('./server').Server;
 function Request(remote, command) {
   EventEmitter.call(this);
 
-  this.remote    = remote;
+  this.remote = remote;
   this.requested = false;
-  this.message   = { command: command, id: void(0) };
+
+  this.message = {
+    command: command,
+    id: void(0)
+  };
 };
 
 util.inherits(Request, EventEmitter);
@@ -32,11 +32,13 @@ Request.prototype.broadcast = function() {
 
 // Send the request to a remote.
 Request.prototype.request = function(remote) {
-  if (this.requested) return;
+  if (this.requested) {
+    return;
+  }
 
   this.requested = true;
 
-  this.on('error', new Function);
+  this.on('error', function(){});
   this.emit('request', remote);
 
   if (this._broadcast) {
@@ -54,19 +56,29 @@ Request.prototype.request = function(remote) {
 Request.prototype.callback = function(callback, successEvent, errorEvent) {
   var self = this;
 
-  if (this.requestsed || typeof callback !== 'function') {
+  if (this.requested || typeof callback !== 'function') {
     return this;
   }
 
+  var called = false;
+
   function requestSuccess(message) {
-    callback.call(self, null, message);
+    if (!called) {
+      called = true;
+      callback.call(self, null, message);
+    }
   };
 
   function requestError(error) {
-    if (!(error instanceof RippleError)) {
-      error = new RippleError(error);
+    if (!called) {
+      called = true;
+
+      if (!(error instanceof RippleError)) {
+        error = new RippleError(error);
+      }
+
+      callback.call(self, error);
     }
-    callback.call(self, error);
   };
 
   this.once(successEvent || 'success', requestSuccess);
@@ -93,7 +105,11 @@ Request.prototype.timeout = function(duration, callback) {
 
   var timeout = setTimeout(function() {
     timed_out = true;
-    if (typeof callback === 'function') callback();
+
+    if (typeof callback === 'function') {
+      callback();
+    }
+
     emit.call(self, 'timeout');
   }, duration);
 
@@ -116,11 +132,11 @@ Request.prototype.setServer = function(server) {
       break;
 
     case 'string':
-      // Find server with hostname string
+      // Find server by URL
       var servers = this.remote._servers;
 
-      for (var i=0, s; s=servers[i]; i++) {
-        if (s._host === server) {
+      for (var i=0, s; (s=servers[i]); i++) {
+        if (s._url === server) {
           selected = s;
           break;
         }
@@ -148,7 +164,7 @@ Request.prototype.buildPath = function(build) {
   } else {
     // ND: rippled currently intreprets the mere presence of `build_path` as the
     // value being `truthy`
-    delete this.message.build_path
+    delete this.message.build_path;
   }
 
   return this;
@@ -183,14 +199,14 @@ Request.prototype.ledgerSelect = function(ledger) {
   switch (ledger) {
     case 'current':
     case 'closed':
-    case 'verified':
-      this.message.ledger_index = ledger_spec;
+    case 'validated':
+      this.message.ledger_index = ledger;
       break;
 
     default:
       if (isNaN(ledger)) {
         this.message.ledger_hash  = ledger;
-      } else if (ledger = Number(ledger)) {
+      } else if ((ledger = Number(ledger))) {
         this.message.ledger_index = ledger;
       }
       break;
@@ -222,34 +238,34 @@ Request.prototype.offerId = function(account, sequence) {
 
 // --> index : ledger entry index.
 Request.prototype.offerIndex = function(index) {
-  this.message.offer  = index;
+  this.message.offer = index;
   return this;
 };
 
 Request.prototype.secret = function(secret) {
   if (secret) {
-    this.message.secret  = secret;
+    this.message.secret = secret;
   }
   return this;
 };
 
 Request.prototype.txHash = function(hash) {
-  this.message.tx_hash  = hash;
+  this.message.tx_hash = hash;
   return this;
 };
 
 Request.prototype.txJson = function(json) {
-  this.message.tx_json  = json;
+  this.message.tx_json = json;
   return this;
 };
 
 Request.prototype.txBlob = function(json) {
-  this.message.tx_blob  = json;
+  this.message.tx_blob = json;
   return this;
 };
 
 Request.prototype.rippleState = function(account, issuer, currency) {
-  this.message.ripple_state  = {
+  this.message.ripple_state = {
     currency : currency,
     accounts : [
       UInt160.json_rewrite(account),
@@ -303,7 +319,7 @@ Request.prototype.books = function(books, snapshot) {
   // Reset list of books (this method overwrites the current list)
   this.message.books = [ ];
 
-  for (var i = 0, l = books.length; i < l; i++) {
+  for (var i=0, l=books.length; i<l; i++) {
     var book = books[i];
     this.addBook(book, snapshot);
   }
@@ -311,7 +327,7 @@ Request.prototype.books = function(books, snapshot) {
   return this;
 };
 
-Request.prototype.addBook = function (book, snapshot) {
+Request.prototype.addBook = function(book, snapshot) {
   if (!Array.isArray(this.message.books)) {
     this.message.books = [ ];
   }

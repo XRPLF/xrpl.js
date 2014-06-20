@@ -8,8 +8,8 @@
 
 // var network = require("./network.js");
 
-var EventEmitter = require('events').EventEmitter;
 var util         = require('util');
+var EventEmitter = require('events').EventEmitter;
 var extend       = require('extend');
 var Amount       = require('./amount').Amount;
 var UInt160      = require('./uint160').UInt160;
@@ -18,7 +18,7 @@ var Currency     = require('./currency').Currency;
 function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pays, key) {
   EventEmitter.call(this);
 
-  var self            = this;
+  var self = this;
 
   this._remote        = remote;
   this._currency_gets = currency_gets;
@@ -30,15 +30,15 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
 
   // We consider ourselves synchronized if we have a current copy of the offers,
   // we are online and subscribed to updates.
-  this._sync         = false;
+  this._sync = false;
 
   // Offers
-  this._offers       = [ ];
+  this._offers = [ ];
 
   function listenerAdded(type, listener) {
     if (~OrderBook.subscribe_events.indexOf(type)) {
       self._subs += 1;
-      if (self._subs == 1 && self._remote._connected) {
+      if (self._subs === 1 && self._remote._connected) {
         self._subscribe();
       }
     }
@@ -140,11 +140,11 @@ OrderBook.prototype.to_json = function () {
   };
 
   if (this._currency_gets !== 'XRP') {
-    json['taker_gets']['issuer'] = this._issuer_gets;
+    json.taker_gets.issuer = this._issuer_gets;
   }
 
   if (this._currency_pays !== 'XRP') {
-    json['taker_pays']['issuer'] = this._issuer_pays;
+    json.taker_pays.issuer = this._issuer_pays;
   }
 
   return json;
@@ -188,7 +188,9 @@ OrderBook.prototype.notify = function (message) {
   var trade_pays = this.trade('pays');
 
   function handleTransaction(an) {
-    if (an.entryType !== 'Offer' || an.bookKey !== self._key) return;
+    if (an.entryType !== 'Offer' || an.bookKey !== self._key) {
+      return;
+    }
 
     var i, l, offer;
 
@@ -197,8 +199,9 @@ OrderBook.prototype.notify = function (message) {
       case 'ModifiedNode':
         var deletedNode = an.diffType === 'DeletedNode';
 
-        for (i = 0, l = self._offers.length; i < l; i++) {
+        for (i=0, l=self._offers.length; i<l; i++) {
           offer = self._offers[i];
+
           if (offer.index === an.ledgerIndex) {
             if (deletedNode) {
               self._offers.splice(i, 1);
@@ -207,13 +210,16 @@ OrderBook.prototype.notify = function (message) {
               // safe assumption, but should be checked.
               extend(offer, an.fieldsFinal);
             }
+
             changed = true;
             break;
           }
         }
 
         // We don't want to count a OfferCancel as a trade
-        if (message.transaction.TransactionType === 'OfferCancel') return;
+        if (message.transaction.TransactionType === 'OfferCancel') {
+          return;
+        }
 
         trade_gets = trade_gets.add(an.fieldsPrev.TakerGets);
         trade_pays = trade_pays.add(an.fieldsPrev.TakerPays);
@@ -272,6 +278,7 @@ OrderBook.prototype.notifyTx = OrderBook.prototype.notify;
  */
 OrderBook.prototype.offers = function (callback) {
   var self = this;
+
   if (typeof callback === 'function') {
     if (this._sync) {
       callback(this._offers);
@@ -279,6 +286,7 @@ OrderBook.prototype.offers = function (callback) {
       this.once('model', callback);
     }
   }
+
   return this;
 };
 

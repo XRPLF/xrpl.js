@@ -1,6 +1,6 @@
 var assert  = require('assert');
 var sjcl    = require('../build/sjcl');
-var Message = require('../src/js/ripple/message');
+var Message = require('../src/js/ripple/message').Message;
 var Seed    = require('../src/js/ripple/seed').Seed;
 var Remote  = require('../src/js/ripple/remote').Remote;
 
@@ -184,14 +184,12 @@ describe('Message', function(){
         account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz'
       };
 
-      Remote.prototype.addServer = function(){};
-      var test_remote = new Remote({});
+      //Remote.prototype.addServer = function(){};
+      var test_remote = new Remote();
 
       assert.throws(function(){
         Message.verifyHashSignature(data);
       }, /(?=.*callback\ function).*/);
-
-
     });
 
     it('should respond with an error if the hash is missing or invalid', function(done){
@@ -202,8 +200,8 @@ describe('Message', function(){
         account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz'
       };
 
-      Remote.prototype.addServer = function(){};
-      var test_remote = new Remote({});
+      //Remote.prototype.addServer = function(){};
+      var test_remote = new Remote();
       test_remote.state = 'online';
 
       Message.verifyHashSignature(data, test_remote, function(err, valid){
@@ -221,8 +219,8 @@ describe('Message', function(){
         signature: 'AAAAHOUJQzG/7BO82fGNt1TNE+GGVXKuQQ0N2nTO+iJETE69PiHnaAkkOzovM177OosxbKjpt3KvwuJflgUB2YGvgjk='
       };
 
-      Remote.prototype.addServer = function(){};
-      var test_remote = new Remote({});
+      //Remote.prototype.addServer = function(){};
+      var test_remote = new Remote();
       test_remote.state = 'online';
 
       Message.verifyHashSignature(data, test_remote, function(err, valid){
@@ -240,8 +238,8 @@ describe('Message', function(){
         account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz'
       };
 
-      Remote.prototype.addServer = function(){};
-      var test_remote = new Remote({});
+      //Remote.prototype.addServer = function(){};
+      var test_remote = new Remote();
       test_remote.state = 'online';
 
       Message.verifyHashSignature(data, test_remote, function(err, valid){
@@ -260,8 +258,8 @@ describe('Message', function(){
         signature: 'AAAAHMIPCQGLgdnpX1Ccv1wHb56H4NggxIM6U08Qkb9mUjN2Vn9pZ3CHvq1yWLBi6NqpW+7kedLnmfu4VG2+y43p4Xs='
       };
 
-      Remote.prototype.addServer = function(){};
-      var test_remote = new Remote({});
+      //Remote.prototype.addServer = function(){};
+      var test_remote = new Remote();
       test_remote.state = 'online';
       test_remote.request_account_info = function(account, callback) {
         if (account === data.account) {
@@ -296,8 +294,8 @@ describe('Message', function(){
         signature: 'AAAAG+dB/rAjZ5m8eQ/opcqQOJsFbKxOu9jq9KrOAlNO4OdcBDXyCBlkZqS9Xr8oZI2uh0boVsgYOS3pOLJz+Dh3Otk='
       };
 
-      Remote.prototype.addServer = function(){};
-      var test_remote = new Remote({});
+      //Remote.prototype.addServer = function(){};
+      var test_remote = new Remote();
       test_remote.state = 'online';
       test_remote.request_account_info = function(account, callback) {
         if (account === data.account) {

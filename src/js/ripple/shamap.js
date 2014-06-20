@@ -7,15 +7,15 @@ var UInt256 = require('./uint256').UInt256;
 var SerializedObject = require('./serializedobject').SerializedObject;
 
 function SHAMap() {
-  this.root = new SHAMapTreeNodeInner();
+  this.root = new SHAMapTreeNodeInner(0);
 };
 
-SHAMap.prototype.add_item = function (tag, node, type) {
+SHAMap.prototype.add_item = function(tag, node, type) {
   var node = new SHAMapTreeNodeLeaf(tag, node, type);
   this.root.add_item(tag, node);
 };
 
-SHAMap.prototype.hash = function () {
+SHAMap.prototype.hash = function() {
   return this.root.hash();
 };
 
@@ -24,96 +24,100 @@ SHAMap.prototype.hash = function () {
  *
  * Can be either SHAMapTreeNodeInner or SHAMapTreeNodeLeaf.
  */
-function SHAMapTreeNode() {
-
-};
+function SHAMapTreeNode() { };
 
 SHAMapTreeNode.TYPE_INNER = 1;
 SHAMapTreeNode.TYPE_TRANSACTION_NM = 2;
 SHAMapTreeNode.TYPE_TRANSACTION_MD = 3;
 SHAMapTreeNode.TYPE_ACCOUNT_STATE = 4;
 
-SHAMapTreeNode.prototype.add_item = function (tag_segment, node) {
-  throw new Error("Called unimplemented virtual method SHAMapTreeNode#add_item.");
+/**
+* @param tag {String} 64 hexadecimal characters
+*/
+SHAMapTreeNode.prototype.add_item = function(tag, node) {
+  throw new Error('Called unimplemented virtual method SHAMapTreeNode#add_item.');
 };
 
-SHAMapTreeNode.prototype.hash = function () {
-  throw new Error("Called unimplemented virtual method SHAMapTreeNode#hash.");
+SHAMapTreeNode.prototype.hash = function() {
+  throw new Error('Called unimplemented virtual method SHAMapTreeNode#hash.');
 };
 
 /**
  * Inner (non-leaf) node in a SHAMap tree.
  */
-function SHAMapTreeNodeInner() {
+function SHAMapTreeNodeInner(depth) {
   SHAMapTreeNode.call(this);
 
   this.leaves = {};
 
   this.type = SHAMapTreeNode.INNER;
+  this.depth = depth == null ? 0 : depth;
 
   this.empty = true;
 }
 
 util.inherits(SHAMapTreeNodeInner, SHAMapTreeNode);
 
-SHAMapTreeNodeInner.prototype.add_item = function (tag_segment, node) {
-  var current_node = this.get_node(tag_segment[0]);
+/**
+ * @param tag {String} (equates to a ledger entries `index`)
+ */
+SHAMapTreeNodeInner.prototype.add_item = function (tag, node) {
+  var depth = this.depth;
+  var existing_node = this.get_node(tag[depth]);
 
-  if (current_node) {
+  if (existing_node) {
     // A node already exists in this slot
-
-    if (current_node instanceof SHAMapTreeNodeInner) {
+    if (existing_node instanceof SHAMapTreeNodeInner) {
       // There is an inner node, so we need to go deeper
-      current_node.add_item(tag_segment.slice(1), node);
-    } else if (current_node.get_segment() === tag_segment) {
+      existing_node.add_item(tag, node);
+    } else if (existing_node.tag === tag) {
       // Collision
-      throw new Error("Tried to add a node to a SHAMap that was already in there.");
+      throw new Error('Tried to add a node to a SHAMap that was already in there.');
     } else {
       // Turn it into an inner node
-      var new_inner_node = new SHAMapTreeNodeInner();
+      var new_inner_node = new SHAMapTreeNodeInner(depth + 1);
 
-      // Move the existing leaf node down one level
-      current_node.set_segment(current_node.get_segment().slice(1));
-      new_inner_node.set_node(current_node.get_segment()[0], current_node);
-
-      // Add the new node next to it
-      new_inner_node.add_item(tag_segment.slice(1), node);
+      // Parent new and existing node
+      new_inner_node.add_item(existing_node.tag, existing_node);
+      new_inner_node.add_item(tag, node);
 
       // And place the newly created inner node in the slot
-      this.set_node(tag_segment[0], new_inner_node);
+      this.set_node(tag[depth], new_inner_node);
     }
   } else {
     // Neat, we have a nice open spot for the new node
-    node.set_segment(tag_segment);
-    this.set_node(tag_segment[0], node);
+    this.set_node(tag[depth], node);
   }
 };
 
 /**
  * Overwrite the node that is currently in a given slot.
  */
-SHAMapTreeNodeInner.prototype.set_node = function (slot, node) {
+SHAMapTreeNodeInner.prototype.set_node = function(slot, node) {
   this.leaves[slot] = node;
   this.empty = false;
 };
 
-SHAMapTreeNodeInner.prototype.get_node = function (slot) {
+SHAMapTreeNodeInner.prototype.get_node = function(slot) {
   return this.leaves[slot];
 };
 
-SHAMapTreeNodeInner.prototype.hash = function () {
+SHAMapTreeNodeInner.prototype.hash = function() {
   if (this.empty) {
     return UInt256.from_hex(UInt256.HEX_ZERO);
   }
 
   var hash_buffer = new SerializedObject();
-  var buffer = [];
-  for (var i = 0; i < 16; i++) {
+  var buffer = [ ];
+
+  for (var i=0; i<16; i++) {
     var leafHash = UInt256.from_hex(UInt256.HEX_ZERO);
     var slot = i.toString(16).toUpperCase();
-    if ("object" === typeof this.leaves[slot]) {
+
+    if (typeof this.leaves[slot] === 'object') {
       leafHash = this.leaves[slot].hash();
     }
+
     hash_buffer.append(leafHash.to_bytes());
   }
 
@@ -128,42 +132,33 @@ SHAMapTreeNodeInner.prototype.hash = function () {
 function SHAMapTreeNodeLeaf(tag, node, type) {
   SHAMapTreeNode.call(this);
 
-  if ("string" === typeof tag) {
-    tag = UInt256.from_hex(tag);
-  } else if (tag instanceof UInt256) {
-    // Type is already the right one
-  } else {
-    throw new Error("Tag is unexpected type.");
+  if (typeof tag !== 'string') {
+    throw new Error('Tag is unexpected type.');
   }
 
   this.tag = tag;
-  this.tag_segment = null;
-
+  this.tag_bytes = UInt256.from_hex(this.tag).to_bytes();
   this.type = type;
-
   this.node = node;
-}
+};
+
 util.inherits(SHAMapTreeNodeLeaf, SHAMapTreeNode);
-
-SHAMapTreeNodeLeaf.prototype.get_segment = function (segment) {
-  return this.tag_segment;
-};
-
-SHAMapTreeNodeLeaf.prototype.set_segment = function (segment) {
-  this.tag_segment = segment;
-};
 
 SHAMapTreeNodeLeaf.prototype.hash = function () {
   var buffer = new SerializedObject();
   switch (this.type) {
+    case SHAMapTreeNode.TYPE_ACCOUNT_STATE:
+      buffer.append(this.node);
+      buffer.append(this.tag_bytes);
+      return buffer.hash(hashprefixes.HASH_LEAF_NODE);
     case SHAMapTreeNode.TYPE_TRANSACTION_NM:
-      return this.tag;
+      return this.tag_bytes;
     case SHAMapTreeNode.TYPE_TRANSACTION_MD:
       buffer.append(this.node);
-      buffer.append(this.tag.to_bytes());
+      buffer.append(this.tag_bytes);
       return buffer.hash(hashprefixes.HASH_TX_NODE);
     default:
-      throw new Error("Tried to hash a SHAMap node of unknown type.");
+      throw new Error('Tried to hash a SHAMap node of unknown type.');
   }
 };
 

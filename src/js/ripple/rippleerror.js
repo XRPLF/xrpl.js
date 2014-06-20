@@ -6,8 +6,9 @@ function RippleError(code, message) {
     case 'object':
       extend(this, code);
       break;
+
     case 'string':
-      this.result         = code;
+      this.result = code;
       this.result_message = message;
       break;
   }
@@ -17,11 +18,13 @@ function RippleError(code, message) {
   this.result_message = this.message = (this.result_message);
 
   var stack;
-  if (!!Error.captureStackTrace)
+
+  if (!!Error.captureStackTrace) {
     Error.captureStackTrace(this, code || this);
-  else if (stack = new Error().stack)
+  } else if ((stack = new Error().stack)) {
     this.stack = stack;
-}
+  }
+};
 
 util.inherits(RippleError, Error);
 

@@ -11,8 +11,10 @@ exports.Seed             = require('./seed').Seed;
 exports.Meta             = require('./meta').Meta;
 exports.SerializedObject = require('./serializedobject').SerializedObject;
 exports.RippleError      = require('./rippleerror').RippleError;
-exports.Message          = require('./message');
-
+exports.Message          = require('./message').Message;
+exports.VaultClient      = require('./vaultclient').VaultClient;
+exports.AuthInfo         = require('./authinfo').AuthInfo;
+exports.RippleTxt        = require('./rippletxt').RippleTxt;
 exports.binformat        = require('./binformat');
 exports.utils            = require('./utils');
 exports.Server           = require('./server').Server;
@@ -35,7 +37,9 @@ function attachUnderscored(c) {
   Object.keys(o.prototype).forEach(function(key) {
     var UPPERCASE = /([A-Z]{1})[a-z]+/g;
 
-    if (!UPPERCASE.test(key)) return;
+    if (!UPPERCASE.test(key)) {
+      return;
+    }
 
     var underscored = key.replace(UPPERCASE, function(c) {
       return '_' + c.toLowerCase();

@@ -15,7 +15,7 @@ function Meta(raw_data) {
   raw_data.AffectedNodes.forEach(function(an) {
     var result = { };
 
-    if (result.diffType = self.diffType(an)) {
+    if ((result.diffType = self.diffType(an))) {
       an = an[result.diffType];
 
       result.entryType   = an.LedgerEntryType;
@@ -88,7 +88,7 @@ Meta.prototype.diffType = function(an) {
  * The second parameter to the callback is the index of the node in the metadata
  * (first entry is index 0).
  */
-Meta.prototype.each = function (fn) {
+Meta.prototype.each = function(fn) {
   for (var i = 0, l = this.nodes.length; i < l; i++) {
     fn(this.nodes[i], i);
   }
@@ -103,7 +103,7 @@ Meta.prototype.each = function (fn) {
 ]).forEach(function(fn) {
   Meta.prototype[fn] = function() {
     return Array.prototype[fn].apply(this.nodes, arguments);
-  }
+  };
 });
 
 var amountFieldsAffectingIssuer = [
@@ -113,12 +113,12 @@ var amountFieldsAffectingIssuer = [
   'TakerGets'
 ];
 
-Meta.prototype.getAffectedAccounts = function () {
+Meta.prototype.getAffectedAccounts = function() {
   var accounts = [ ];
 
   // This code should match the behavior of the C++ method:
   // TransactionMetaSet::getAffectedAccounts
-  this.nodes.forEach(function (an) {
+  this.nodes.forEach(function(an) {
     var fields = (an.diffType === 'CreatedNode') ? an.fieldsNew : an.fieldsFinal;
     for (var i in fields) {
       var field = fields[i];
@@ -137,20 +137,26 @@ Meta.prototype.getAffectedAccounts = function () {
   return utils.arrayUnique(accounts);
 };
 
-Meta.prototype.getAffectedBooks = function () {
+Meta.prototype.getAffectedBooks = function() {
   var books = [ ];
 
-  this.nodes.forEach(function (an) {
-    if (an.entryType !== 'Offer') return;
+  this.nodes.forEach(function(an) {
+    if (an.entryType !== 'Offer') {
+      return;
+    }
 
     var gets = Amount.from_json(an.fields.TakerGets);
     var pays = Amount.from_json(an.fields.TakerPays);
 
     var getsKey = gets.currency().to_json();
-    if (getsKey !== 'XRP') getsKey += '/' + gets.issuer().to_json();
+    if (getsKey !== 'XRP') {
+      getsKey += '/' + gets.issuer().to_json();
+    }
 
     var paysKey = pays.currency().to_json();
-    if (paysKey !== 'XRP') paysKey += '/' + pays.issuer().to_json();
+    if (paysKey !== 'XRP') {
+      paysKey += '/' + pays.issuer().to_json();
+    }
 
     var key = [ getsKey, paysKey ].join(':');
 
