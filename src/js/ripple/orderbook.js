@@ -233,18 +233,26 @@ OrderBook.prototype.notify = function (message) {
       case 'CreatedNode':
         // XXX Should use Amount#from_quality
         var price = Amount.from_json(an.fields.TakerPays).ratio_human(an.fields.TakerGets, {reference_date: new Date()});
+        var obj   = an.fields;
+        obj.index = an.ledgerIndex;
 
         for (i = 0, l = self._offers.length; i < l; i++) {
           offer = self._offers[i];
           var priceItem = Amount.from_json(offer.TakerPays).ratio_human(offer.TakerGets, {reference_date: new Date()});
 
           if (price.compareTo(priceItem) <= 0) {
-            var obj   = an.fields;
-            obj.index = an.ledgerIndex;
-            self._offers.splice(i, 0, an.fields);
-            changed = true;
-            break;
+            self._offers.splice(i, 0, obj);
+          } else {
+            if (i === l-1) { // last item in offer
+              self._offers.splice(i+1, 0, obj);
+            }
           }
+          changed = true;
+          break;
+        }
+        if (l===0) { // if offer is empty list
+          self._offers.splice(0, 0, obj);
+          changed = true;
         }
         break;
     }
