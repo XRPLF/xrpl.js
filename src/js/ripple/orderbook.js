@@ -5,7 +5,6 @@
 //
 // Events:
 //  - transaction   A transaction that affects the order book.
-
 // var network = require("./network.js");
 
 var util         = require('util');
@@ -245,6 +244,9 @@ OrderBook.prototype.notify = function (message) {
             changed = true;
             break;
           }
+        }
+        if (l === 0) {
+          changed = true;
         }
         break;
     }
