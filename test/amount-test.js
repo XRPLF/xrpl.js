@@ -117,6 +117,12 @@ describe('Amount', function() {
       assert.strictEqual(typeof Amount.from_json('x').to_text(true), 'number');
       assert(isNaN(Amount.from_json('x').to_text(true)));
     });
+    it('parse dem', function() {
+      assert.strictEqual(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it('parse dem', function() {
+      assert.strictEqual(Amount.from_json('10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
     it('Parse 800/USD/mtgox', function () {
       assert.strictEqual('800/USD/'+config.accounts['mtgox'].account, Amount.from_json('800/USD/mtgox').to_text_full());
     });
