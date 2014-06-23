@@ -113,7 +113,7 @@ var blob = new Blob();
 //must be set for self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 while(!sjcl.random.isReady()) {
-  sjcl.random.addEntropy(require('crypto').randomBytes(128).toString()); //add entropy to seed the generator
+  sjcl.random.addEntropy(require('crypto').randomBytes(128).toString('base64')); //add entropy to seed the generator
 }
 
 var mockRippleTxt;
