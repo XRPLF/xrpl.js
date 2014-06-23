@@ -113,10 +113,11 @@ var blob = new Blob();
 //must be set for self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 while(!sjcl.random.isReady()) {
-  sjcl.random.addEntropy(require('crypto').randomBytes(128).toString()); //add entropy to seed the generator
+  sjcl.random.addEntropy(require('crypto').randomBytes(128).toString('base64')); //add entropy to seed the generator
 }
 
 var mockRippleTxt;
+var mockRippleTxt2;
 var mockAuthSign;
 var mockRegister;
 var mockBlob;
@@ -129,7 +130,14 @@ var mockProfile;
 var mockDelete;
 
 if (!online) {
-  mockRippleTxt = nock('https://' + exampleData.domain)
+  mockRippleTxt = nock('https://ripple.com')
+    .persist()
+    .get('/ripple.txt')
+    .reply(200, rippleTxtRes, {
+      'Content-Type': 'text/plain'
+    }); 
+      
+  mockRippleTxt2 = nock('https://' + exampleData.domain)
     .persist()
     .get('/ripple.txt')
     .reply(200, rippleTxtRes, {

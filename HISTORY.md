@@ -21,8 +21,14 @@
         parseBinary: false
       }
     ```
++ Added full currency name support, e.g. `Currency.from_json('XRP').to_human({full_name:'Ripples'})` will return `XRP - Ripples`
+
++ Improved interest bearing currency support, e.g. `Currency.from_human('USD - US Dollar (2.5%pa)')`
 
 + Improve test coverage
+
++ Added blob vault client.  The vault client facilitates interaction with ripple's namespace and blob vault or 3rd party blob vaults using ripple's blob vault software (https://github.com/ripple/ripple-blobvault). A list of the available functions can be found at [docs/VAULTCLIENT.md](docs/VAULTCLIENT.md)
+
 
 ##0.7.35
 
