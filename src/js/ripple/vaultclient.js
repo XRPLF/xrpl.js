@@ -106,6 +106,23 @@ VaultClient.prototype.getRippleName = function(address, url, callback) {
 };
 
 /**
+ * Check blobvault for existance of username
+ *
+ * @param {string}    username
+ * @param {function}  fn - Callback function
+ */
+
+VaultClient.prototype.exists = function(username, callback) {
+  AuthInfo.get(this.domain, username.toLowerCase(), function(err, authInfo) {
+    if (err) {
+      callback(err);
+    } else {
+      callback(null, !!authInfo.exists);
+    }
+  });
+};
+
+/**
  * Authenticate and retrieve a decrypted blob using a ripple name and password
  *
  * @param {string}    username
@@ -335,23 +352,6 @@ VaultClient.prototype.loginAndUnlock = function(username, password, fn) {
 };
 
 /**
- * Check blobvault for existance of username
- *
- * @param {string}    username
- * @param {function}  fn - Callback function
- */
-
-VaultClient.prototype.exists = function(username, callback) {
-  AuthInfo.get(this.domain, username.toLowerCase(), function(err, authInfo) {
-    if (err) {
-      callback(err);
-    } else {
-      callback(null, !!authInfo.exists);
-    }
-  });
-};
-
-/**
  * Verify an email address for an existing user
  *
  * @param {string}    username
@@ -385,6 +385,39 @@ VaultClient.prototype.verify = function(username, token, callback) {
 
 VaultClient.prototype.resendEmail = function (options, fn) {
   blobClient.resendEmail(options, fn);  
+};
+
+/**
+ * deleteBlob
+ * @param {object} options
+ * @param {string} options.url
+ * @param {string} options.username
+ * @param {string} options.blob_id
+ * @param {string} options.account_id
+ * @param {string} options.masterkey 
+ */
+
+VaultClient.prototype.deleteBlob = function (options, fn) {
+  blobClient.deleteBlob(options, fn); 
+};
+
+/**
+ * updateProfile
+ * update information stored outside the blob
+ * @param {object}
+ * @param {string} options.url
+ * @param {string} options.username
+ * @param {string} options.auth_secret
+ * @param {srring} options.blob_id
+ * @param {object} options.profile
+ * @param {string} options.profile.phone - optional
+ * @param {string} options.profile.country - optional
+ * @param {string} options.profile.region - optional
+ * @param {string} options.profile.city - optional
+ */
+
+VaultClient.prototype.updateProfile = function (options, fn) {
+  blobClient.updateProfile(options, fn);  
 };
 
 /**
