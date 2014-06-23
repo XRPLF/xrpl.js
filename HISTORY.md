@@ -1,3 +1,28 @@
+##0.7.37
+
++ **Deprecations**
+
+    1. Removed humanistic amount detection in `transaction.payment`. Passing `1XRP` as the payment amount no longer works.
+    2. `remote.setServer` uses full server URL rather than hostname. Example: `remote.setServer('wss://s`.ripple.com:443')`
+    3. Removed constructors for deprecated transaction types from `transaction.js`.
+    4. Removed `invoiceID` option from `transaction.payment`. Instead, use the `transaction.invoiceID` method.
+    5. Removed `transaction.transactionManager` getter.
+
++ Improved multi-server support. Servers are now ranked dynamically, and transactions are broadcasted to all connected servers.
+
++ Automatically ping connected servers. Client configuration now should contain `ping: <seconds>` to specify the ping interval.
+
++ Added `transaction.lastLedger` to specify `LastLedgerSequence`. Setting it this way also ensures that the sequence is not bumped on subsequent requests.
+
++ Added optional `remote.accountTx` binary parsing.
+    ```js
+      {
+        binary: true,
+        parseBinary: false
+      }
+    ```
+
++ Improve test coverage
 
 ##0.7.35
 
