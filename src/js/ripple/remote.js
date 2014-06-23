@@ -1436,7 +1436,7 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
   var request = new Request(this, 'book_offers');
 
   request.message.taker_gets = {
-    currency: Currency.json_rewrite(gets.currency)
+    currency: Currency.json_rewrite(gets.currency, {force_hex:true})
   };
 
   if (request.message.taker_gets.currency !== 'XRP') {
@@ -1444,7 +1444,7 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
   }
 
   request.message.taker_pays = {
-    currency: Currency.json_rewrite(pays.currency)
+    currency: Currency.json_rewrite(pays.currency, {force_hex:true})
   };
 
   if (request.message.taker_pays.currency !== 'XRP') {

@@ -340,7 +340,7 @@ Request.prototype.addBook = function(book, snapshot) {
     }
 
     var obj = json[side] = {
-      currency: Currency.json_rewrite(book[side].currency)
+      currency: Currency.json_rewrite(book[side].currency, {force_hex: true})
     };
 
     if (obj.currency !== 'XRP') {
