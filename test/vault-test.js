@@ -117,6 +117,7 @@ while(!sjcl.random.isReady()) {
 }
 
 var mockRippleTxt;
+var mockRippleTxt2;
 var mockAuthSign;
 var mockRegister;
 var mockBlob;
@@ -129,7 +130,14 @@ var mockProfile;
 var mockDelete;
 
 if (!online) {
-  mockRippleTxt = nock('https://' + exampleData.domain)
+  mockRippleTxt = nock('https://ripple.com')
+    .persist()
+    .get('/ripple.txt')
+    .reply(200, rippleTxtRes, {
+      'Content-Type': 'text/plain'
+    }); 
+      
+  mockRippleTxt2 = nock('https://' + exampleData.domain)
     .persist()
     .get('/ripple.txt')
     .reply(200, rippleTxtRes, {
