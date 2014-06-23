@@ -1,9 +1,9 @@
 var crypt   = require('./crypt').Crypt;
 var SignedRequest = require('./signedrequest').SignedRequest;
-var request  = require('superagent');
-var extend   = require("extend");
-var async    = require("async");
-
+var request = require('superagent');
+var extend  = require("extend");
+var async   = require("async");
+var log     = require('./log').sub('blob');
 var BlobClient = {};
 
 //Blob object class
@@ -865,12 +865,12 @@ BlobClient.resendEmail = function (opts, fn) {
     .send(signed.data)
     .end(function(err, resp) {
       if (err) {
-        console.log("blob: could not resend the token:", err);
+        log.error("resendEmail:", err);
         fn(new Error("Failed to resend the token"));
       } else if (resp.body && resp.body.result === 'success') {
         fn(null, resp.body);
       } else if (resp.body && resp.body.result === 'error') {
-        console.log("blob: could not resend the token:", resp.body.message);
+        log.error("resendEmail:", resp.body.message);
         fn(new Error("Failed to resend the token"));
       } else {
         fn(new Error("Failed to resend the token")); 
@@ -945,6 +945,39 @@ BlobClient.recoverBlob = function (opts, fn) {
 };
 
 /**
+ * updateProfile
+ * update information stored outside the blob
+ */ 
+
+BlobClient.updateProfile = function (opts, fn) {
+  var config = {
+    method: 'POST',
+    url: opts.url + '/v1/user/' + opts.username + '/profile',
+    dataType: 'json',
+    data: opts.profile
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
+  
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      if (err) {
+        log.error('updateProfile:', err);
+        fn(new Error('Failed to update profile - XHR error'));
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body) {
+        log.error('updateProfile:', resp.body);
+      } else {
+        fn(new Error('Failed to update profile'));
+      }
+    });
+  
+};
+
+/**
  * updateKeys
  * Change the blob encryption keys
  * @param {object} opts
@@ -979,10 +1012,10 @@ BlobClient.updateKeys = function (opts, fn) {
     .send(signed.data)
     .end(function(err, resp) {
       if (err) {
-        console.log("blob: could not update blob:", err);
+        log.error("updateKeys:", err);
         fn(new Error('Failed to update blob - XHR error'));
       } else if (!resp.body || resp.body.result !== 'success') {
-        console.log("blob: could not update blob:", resp.body ? resp.body.message : null);
+        log.error("updateKeys:", resp.body ? resp.body.message : null);
         fn(new Error('Failed to update blob - bad result')); 
       } else {
         fn(null, resp.body);
@@ -1027,12 +1060,12 @@ BlobClient.rename = function (opts, fn) {
     .send(signed.data)
     .end(function(err, resp) {
       if (err) {
-        console.log("blob: could not rename:", err);
+        log.error("rename:", err);
         fn(new Error("Failed to rename"));
       } else if (resp.body && resp.body.result === 'success') {
         fn(null, resp.body);
       } else if (resp.body && resp.body.result === 'error') {
-        console.log("blob: could not rename:", resp.body.message);
+        log.error("rename:", resp.body.message);
         fn(new Error("Failed to rename"));
       } else {
         fn(new Error("Failed to rename"));
@@ -1108,6 +1141,34 @@ BlobClient.create = function(options, fn) {
         fn(new Error('Could not create blob'));
       }
     });
+};
+
+/**
+ * deleteBlob 
+ */
+
+BlobClient.deleteBlob = function(options, fn) {
+  
+  var config = {
+    method : 'DELETE',
+    url    : options.url + '/v1/user/' + options.username,
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(options.masterkey, options.account_id, options.blob_id);
+
+  request.del(signed.url)
+    .end(function(err, resp) {
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Could not delete blob'));
+      }
+    });  
 };
 
 exports.BlobClient = BlobClient;

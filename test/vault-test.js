@@ -125,7 +125,8 @@ var mockUpdate;
 var mockRecover;
 var mockVerify;
 var mockEmail;
-
+var mockProfile;
+var mockDelete;
 
 if (!online) {
   mockRippleTxt = nock('https://' + exampleData.domain)
@@ -148,7 +149,14 @@ if (!online) {
     .reply(200, { result: 'error', message: 'User already exists' }, {
       'Content-Type': 'application/json'
     });   
-        
+
+  mockDelete = nock('https://id.staging.ripple.com').persist();
+  mockDelete.filteringPath(/(v1\/user\/(.+))/g, 'delete/')
+    .delete('/delete/')
+    .reply(200, { result: 'success' }, {
+      'Content-Type': 'application/json'
+    });  
+            
   mockBlob = nock('https://id.staging.ripple.com').persist();
   mockBlob.get('/v1/authinfo?domain=' + exampleData.domain + '&username=' + exampleData.username.toLowerCase())
     .reply(200, JSON.stringify(authInfoRes.body), {
@@ -200,6 +208,13 @@ if (!online) {
     .reply(200, {result:'success'}, {
       'Content-Type': 'application/json'
     });  
+
+  mockProfile = nock('https://id.staging.ripple.com/v1/user').persist();
+  mockProfile.filteringPath(/((.+)\/profile(.+))/g, 'profile/')
+    .post('profile/')
+    .reply(200, {result:'success'}, {
+      'Content-Type': 'application/json'
+    });     
 }
 
 describe('Ripple Txt', function () {
@@ -364,6 +379,60 @@ describe('VaultClient', function () {
       });
     });
   });
+
+
+  describe('#deleteBlob', function () {
+    it('should remove an existing blob', function (done) {
+      this.timeout(10000);
+      
+      var options = {
+        url         : exampleData.blob.url,
+        blob_id     : exampleData.blob.id,
+        username    : online ? "" : exampleData.username,
+        account_id  : exampleData.blob.data.account_id,
+        masterkey   : exampleData.masterkey
+      }
+      
+      client.deleteBlob(options, function(err, resp) {
+        if (online) {
+          //removing the username will result in an error from the server
+          assert(err instanceof Error);
+          assert.strictEqual(resp, void(0));  
+        } else {
+          assert.ifError(err);  
+          assert.strictEqual(typeof resp, 'object');
+          assert.strictEqual(typeof resp.result,  'string');          
+        }
+        done();
+      });
+    });
+  });
+
+  describe('#updateProfile', function () {
+    it('should update profile parameters associated with a blob', function (done) {
+      this.timeout(10000);
+      
+      var options = {
+        url         : exampleData.blob.url,
+        blob_id     : exampleData.blob.id,
+        username    : exampleData.username,
+        auth_secret : exampleData.blob.data.auth_secret,
+        profile : {
+          city : "San Francisco",
+          phone : "555-555-5555"
+        }
+      }
+      
+      client.updateProfile(options, function(err, resp) {
+        assert.ifError(err);  
+        assert.strictEqual(typeof resp, 'object');
+        assert.strictEqual(typeof resp.result,  'string');
+        done();
+      });
+    });
+  });  
+    
+  
 });
 
 
