@@ -37,6 +37,22 @@ describe('Currency', function() {
       assert(!r.is_valid());
       assert.strictEqual('XRP', r.to_json());
     });
+    it('from_json("XAU").to_json() hex', function() {
+      var r = currency.from_json("XAU");
+      assert.strictEqual('0000000000000000000000005841550000000000', r.to_json({force_hex: true}));
+    });
+    it('from_json("XAU (0.5%pa").to_json() hex', function() {
+      var r = currency.from_json("XAU (0.5%pa)");
+      assert.strictEqual('015841550000000041F78E0A28CBF19200000000', r.to_json({force_hex: true}));
+    });
+    it('json_rewrite("015841550000000041F78E0A28CBF19200000000").to_json() hex', function() {
+      var r = currency.json_rewrite('015841550000000041F78E0A28CBF19200000000');
+      assert.strictEqual('XAU (0.5%pa)', r);
+    });
+    it('json_rewrite("015841550000000041F78E0A28CBF19200000000") hex', function() {
+      var r = currency.json_rewrite('015841550000000041F78E0A28CBF19200000000', {force_hex: true});
+      assert.strictEqual('015841550000000041F78E0A28CBF19200000000', r);
+    });
   });
 
   describe('from_human', function() {
