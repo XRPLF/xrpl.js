@@ -114,6 +114,14 @@ describe('Currency', function() {
     it('to_human with full_name "XRP - Ripples"', function() {
       assert.strictEqual('XRP - Ripples', currency.from_json('XRP').to_human({full_name:'Ripples'}));
     });
+    it('to_human human "TIM" without full_name', function() {
+      var cur = currency.from_json("TIM");
+      assert.strictEqual(cur.to_human(), "TIM");
+    });
+    it('to_human "TIM" with null full_name', function() {
+      var cur = currency.from_json("TIM");
+      assert.strictEqual(cur.to_human({full_name: null}), "TIM");
+    });
   });
 
   describe('from_hex', function() {
