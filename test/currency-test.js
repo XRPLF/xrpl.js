@@ -27,6 +27,12 @@ describe('Currency', function() {
       assert(r.is_native());
       assert.strictEqual('XRP', r.to_json());
     });
+    it('from_json("0000000000000000000000000000000000000000").to_json() == "XRP"', function() {
+      var r = currency.from_json('0000000000000000000000000000000000000000');
+      assert(r.is_valid());
+      assert(r.is_native());
+      assert.strictEqual('XRP', r.to_json());
+    });
     it('from_json("111").to_human()', function() {
       var r = currency.from_json("111");
       assert(r.is_valid());
