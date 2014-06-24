@@ -617,8 +617,8 @@ Amount.prototype.parse_human = function(j, opts) {
   var m = String(j).match(Amount.human_RE);
 
   if (m) {
-    var currency   = m[1] || m[5] || 'XRP';
-    var integer    = m[3] || '0';
+    var currency   = m[5] || m[1] || 'XRP';
+    var integer    = m[5] && m[1] ? m[1] + '' + m[3] : (m[3] || '0');
     var fraction   = m[4] || '';
     var precision  = null;
 
