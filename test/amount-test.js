@@ -26,6 +26,24 @@ describe('Amount', function() {
     it('0.1 USD', function() {
       assert.strictEqual(Amount.from_human("0.1 USD").to_text_full(), '0.1/USD/NaN');
     });
+    it('10000 USD', function() {
+      assert.strictEqual(Amount.from_human("10000 USD").to_text_full(), '10000/USD/NaN');
+    });
+    it('USD 10000', function() {
+      assert.strictEqual(Amount.from_human("USD 10000").to_text_full(), '10000/USD/NaN');
+    });
+    it('12345.6789 XAU', function() {
+      assert.strictEqual(Amount.from_human("12345.6789 XAU").to_text_full(), '12345.6789/XAU/NaN');
+    });
+    it('XAU 12345.6789', function() {
+      assert.strictEqual(Amount.from_human("XAU 12345.6789").to_text_full(), '12345.6789/XAU/NaN');
+    });
+    it('101 12345.6789', function() {
+      assert.strictEqual(Amount.from_human("101 12345.6789").to_text_full(), '12345.6789/101/NaN');
+    });
+    it('12345.6789 101', function() {
+      assert.strictEqual(Amount.from_human("12345.6789 101").to_text_full(), '12345.6789/101/NaN');
+    });
   });
   describe('from_json', function() {
     it('1 XRP', function() {
