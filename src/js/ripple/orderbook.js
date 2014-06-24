@@ -21,9 +21,9 @@ function OrderBook(remote, currency_gets, issuer_gets, currency_pays, issuer_pay
   var self = this;
 
   this._remote        = remote;
-  this._currency_gets = currency_gets;
+  this._currency_gets = Currency.from_json(currency_gets);
   this._issuer_gets   = issuer_gets;
-  this._currency_pays = currency_pays;
+  this._currency_pays = Currency.from_json(currency_pays);
   this._issuer_pays   = issuer_pays;
   this._subs          = 0;
   this._key           = key;
@@ -132,18 +132,18 @@ OrderBook.prototype._prepareSubscribe = function (request) {
 OrderBook.prototype.to_json = function () {
   var json = {
     taker_gets: {
-      currency: this._currency_gets
+      currency: this._currency_gets.to_hex()
     },
     taker_pays: {
-      currency: this._currency_pays
+      currency: this._currency_pays.to_hex()
     }
   };
 
-  if (this._currency_gets !== 'XRP') {
+  if (!this._currency_gets.is_native()) {
     json.taker_gets.issuer = this._issuer_gets;
   }
 
-  if (this._currency_pays !== 'XRP') {
+  if (!this._currency_pays.is_native()) {
     json.taker_pays.issuer = this._issuer_pays;
   }
 
@@ -159,17 +159,19 @@ OrderBook.prototype.to_json = function () {
 OrderBook.prototype.is_valid = function () {
   // XXX Should check for same currency (non-native) && same issuer
   return (
-    Currency.is_valid(this._currency_pays) &&
-    (this._currency_pays === 'XRP' || UInt160.is_valid(this._issuer_pays)) &&
-    Currency.is_valid(this._currency_gets) &&
-    (this._currency_gets === 'XRP' || UInt160.is_valid(this._issuer_gets)) &&
-    !(this._currency_pays === 'XRP' && this._currency_gets === 'XRP')
+    this._currency_pays && this._currency_pays.is_valid() &&
+    (this._currency_pays.is_native() || UInt160.is_valid(this._issuer_pays)) &&
+
+    this._currency_gets && this._currency_gets.is_valid() &&
+    (this._currency_gets.is_native() || UInt160.is_valid(this._issuer_gets)) &&
+
+    !(this._currency_pays.is_native() && this._currency_gets.is_native())
   );
 };
 
 OrderBook.prototype.trade = function(type) {
   var tradeStr = '0'
-  + ((this['_currency_' + type] === 'XRP') ? '' : '/'
+  + ((Currency.from_json(this['_currency_' + type]).is_native()) ? '' : '/'
      + this['_currency_' + type ] + '/'
      + this['_issuer_' + type]);
   return Amount.from_json(tradeStr);
