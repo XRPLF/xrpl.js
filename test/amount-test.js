@@ -35,6 +35,30 @@ describe('Amount', function() {
     it('12345.6789 XAU', function() {
       assert.strictEqual(Amount.from_human("12345.6789 XAU").to_text_full(), '12345.6789/XAU/NaN');
     });
+    it('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000', function() {
+      assert.strictEqual(Amount.from_human("12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000").to_text_full(), '12345.6789/XAU (-0.5%pa)/NaN');
+    });
+    it('12345.6789 0000000000000000000000005553440000000000', function() {
+      assert.strictEqual(Amount.from_human("12345.6789 0000000000000000000000005553440000000000").to_text_full(), '12345.6789/USD/NaN');
+    });
+    it('10 0000000000000000000000005553440000000000', function() {
+      assert.strictEqual(Amount.from_human("10 0000000000000000000000005553440000000000").to_text_full(), '10/USD/NaN');
+    });
+    it('100 0000000000000000000000005553440000000000', function() {
+      assert.strictEqual(Amount.from_human("100 0000000000000000000000005553440000000000").to_text_full(), '100/USD/NaN');
+    });
+    it('1000 0000000000000000000000005553440000000000', function() {
+      assert.strictEqual(Amount.from_human("1000 0000000000000000000000005553440000000000").to_text_full(), '1000/USD/NaN');
+    });
+    it('-100 0000000000000000000000005553440000000000', function() {
+      assert.strictEqual(Amount.from_human("-100 0000000000000000000000005553440000000000").to_text_full(), '-100/USD/NaN');
+    });
+    it('-1000 0000000000000000000000005553440000000000', function() {
+      assert.strictEqual(Amount.from_human("-1000 0000000000000000000000005553440000000000").to_text_full(), '-1000/USD/NaN');
+    });
+    it('-1000.001 0000000000000000000000005553440000000000', function() {
+      assert.strictEqual(Amount.from_human("-1000.001 0000000000000000000000005553440000000000").to_text_full(), '-1000.001/USD/NaN');
+    });
     it('XAU 12345.6789', function() {
       assert.strictEqual(Amount.from_human("XAU 12345.6789").to_text_full(), '12345.6789/XAU/NaN');
     });
@@ -188,6 +212,23 @@ describe('Amount', function() {
     });
     it('Parse 0.0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
       assert.strictEqual('0/XRP/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full());
+    });
+  });
+  describe('Amount to_json', function() {
+    it('10 USD', function() {
+      var amount = Amount.from_human("10 USD").to_json();
+      assert.strictEqual("10", amount.value);
+      assert.strictEqual("USD", amount.currency);
+    });
+    it('10 0000000000000000000000005553440000000000', function() {
+      var amount = Amount.from_human("10 0000000000000000000000005553440000000000").to_json();
+      assert.strictEqual("10", amount.value);
+      assert.strictEqual("USD", amount.currency);
+    });
+    it('10 015841551A748AD2C1F76FF6ECB0CCCD00000000', function() {
+      var amount = Amount.from_human("10 015841551A748AD2C1F76FF6ECB0CCCD00000000").to_json();
+      assert.strictEqual("10", amount.value);
+      assert.strictEqual("015841551A748AD2C1F76FF6ECB0CCCD00000000", amount.currency);
     });
   });
   describe('Amount operations', function() {
