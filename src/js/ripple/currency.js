@@ -313,16 +313,18 @@ Currency.prototype.to_json = function(opts) {
     return 'XRP';
   }
 
+  var opts = opts || {};
+
   var currency;
   var fullName = opts && opts.full_name ? " - " + opts.full_name : "";
 
   // Any currency with standard properties and a valid code can be abbreviated
   // in the JSON wire format as the three character code.
-  if (/^[A-Z0-9]{3}$/.test(this._iso_code) && !this.has_interest()) {
+  if (!opts.force_hex && /^[A-Z0-9]{3}$/.test(this._iso_code) && !this.has_interest()) {
     currency = this._iso_code + fullName;
 
   // If there is interest, append the annual interest to the full currency name
-  } else if (this.has_interest()) {
+  } else if (!opts.force_hex && this.has_interest()) {
     var decimals = opts ? opts.decimals : undefined;
     currency = this._iso_code + fullName + " (" + this.get_interest_percentage_at(this._interest_start + 3600 * 24 * 365, decimals) + "%pa)";
   } else {

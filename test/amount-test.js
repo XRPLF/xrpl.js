@@ -26,6 +26,24 @@ describe('Amount', function() {
     it('0.1 USD', function() {
       assert.strictEqual(Amount.from_human("0.1 USD").to_text_full(), '0.1/USD/NaN');
     });
+    it('10000 USD', function() {
+      assert.strictEqual(Amount.from_human("10000 USD").to_text_full(), '10000/USD/NaN');
+    });
+    it('USD 10000', function() {
+      assert.strictEqual(Amount.from_human("USD 10000").to_text_full(), '10000/USD/NaN');
+    });
+    it('12345.6789 XAU', function() {
+      assert.strictEqual(Amount.from_human("12345.6789 XAU").to_text_full(), '12345.6789/XAU/NaN');
+    });
+    it('XAU 12345.6789', function() {
+      assert.strictEqual(Amount.from_human("XAU 12345.6789").to_text_full(), '12345.6789/XAU/NaN');
+    });
+    it('101 12345.6789', function() {
+      assert.strictEqual(Amount.from_human("101 12345.6789").to_text_full(), '12345.6789/101/NaN');
+    });
+    it('12345.6789 101', function() {
+      assert.strictEqual(Amount.from_human("12345.6789 101").to_text_full(), '12345.6789/101/NaN');
+    });
   });
   describe('from_json', function() {
     it('1 XRP', function() {
@@ -116,6 +134,12 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_json('x').to_text(), '0');
       assert.strictEqual(typeof Amount.from_json('x').to_text(true), 'number');
       assert(isNaN(Amount.from_json('x').to_text(true)));
+    });
+    it('parse dem', function() {
+      assert.strictEqual(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it('parse dem', function() {
+      assert.strictEqual(Amount.from_json('10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
     it('Parse 800/USD/mtgox', function () {
       assert.strictEqual('800/USD/'+config.accounts['mtgox'].account, Amount.from_json('800/USD/mtgox').to_text_full());

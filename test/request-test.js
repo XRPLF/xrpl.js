@@ -3,6 +3,7 @@ var utils = require('./testutils');
 var Request = utils.load_module('request').Request;
 var Remote = utils.load_module('remote').Remote;
 var Server = utils.load_module('server').Server;
+var Currency = utils.load_module('currency').Currency;
 
 function makeServer(url) {
   var server = new Server(new process.EventEmitter(), url);
@@ -554,6 +555,9 @@ describe('Request', function() {
 
     request.books(books);
 
+    books[0]['taker_gets'].currency = Currency.from_json('EUR').to_hex();
+    books[0]['taker_pays'].currency = Currency.from_json('USD').to_hex();
+
     assert.deepEqual(request.message.books, books);
   });
 
@@ -577,11 +581,11 @@ describe('Request', function() {
     assert.deepEqual(request.message.books, [
       {
         'taker_gets': {
-          'currency': 'CNY',
+          'currency': Currency.from_json('CNY').to_hex(),
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
         'taker_pays': {
-          'currency': 'USD',
+          'currency': Currency.from_json('USD').to_hex(),
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         }
       }
@@ -605,11 +609,11 @@ describe('Request', function() {
     assert.deepEqual(request.message.books, [
       {
         'taker_gets': {
-          'currency': 'EUR',
+          'currency': '0000000000000000000000004555520000000000', // EUR hex
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
         'taker_pays': {
-          'currency': 'USD',
+          'currency': '0000000000000000000000005553440000000000', // USD hex
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         }
       },
@@ -662,11 +666,11 @@ describe('Request', function() {
 
     assert.deepEqual(request.message.books, [{
       'taker_gets': {
-        'currency': 'EUR',
+        'currency': Currency.from_json('EUR').to_hex(),
         'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       },
       'taker_pays': {
-        'currency': 'USD',
+        'currency': Currency.from_json('USD').to_hex(),
         'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       },
       'snapshot': true,

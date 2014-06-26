@@ -27,6 +27,12 @@ describe('Currency', function() {
       assert(r.is_native());
       assert.strictEqual('XRP', r.to_json());
     });
+    it('from_json("0000000000000000000000000000000000000000").to_json() == "XRP"', function() {
+      var r = currency.from_json('0000000000000000000000000000000000000000');
+      assert(r.is_valid());
+      assert(r.is_native());
+      assert.strictEqual('XRP', r.to_json());
+    });
     it('from_json("111").to_human()', function() {
       var r = currency.from_json("111");
       assert(r.is_valid());
@@ -36,6 +42,22 @@ describe('Currency', function() {
       var r = currency.from_json("1D2");
       assert(!r.is_valid());
       assert.strictEqual('XRP', r.to_json());
+    });
+    it('from_json("XAU").to_json() hex', function() {
+      var r = currency.from_json("XAU");
+      assert.strictEqual('0000000000000000000000005841550000000000', r.to_json({force_hex: true}));
+    });
+    it('from_json("XAU (0.5%pa").to_json() hex', function() {
+      var r = currency.from_json("XAU (0.5%pa)");
+      assert.strictEqual('015841550000000041F78E0A28CBF19200000000', r.to_json({force_hex: true}));
+    });
+    it('json_rewrite("015841550000000041F78E0A28CBF19200000000").to_json() hex', function() {
+      var r = currency.json_rewrite('015841550000000041F78E0A28CBF19200000000');
+      assert.strictEqual('XAU (0.5%pa)', r);
+    });
+    it('json_rewrite("015841550000000041F78E0A28CBF19200000000") hex', function() {
+      var r = currency.json_rewrite('015841550000000041F78E0A28CBF19200000000', {force_hex: true});
+      assert.strictEqual('015841550000000041F78E0A28CBF19200000000', r);
     });
   });
 
@@ -97,6 +119,14 @@ describe('Currency', function() {
     });
     it('to_human with full_name "XRP - Ripples"', function() {
       assert.strictEqual('XRP - Ripples', currency.from_json('XRP').to_human({full_name:'Ripples'}));
+    });
+    it('to_human human "TIM" without full_name', function() {
+      var cur = currency.from_json("TIM");
+      assert.strictEqual(cur.to_human(), "TIM");
+    });
+    it('to_human "TIM" with null full_name', function() {
+      var cur = currency.from_json("TIM");
+      assert.strictEqual(cur.to_human({full_name: null}), "TIM");
     });
   });
 
