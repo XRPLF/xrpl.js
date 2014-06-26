@@ -55,9 +55,10 @@ VaultClient.prototype.getAuthInfo = function (username, callback) {
  */
 
 VaultClient.prototype._deriveLoginKeys = function (authInfo, password, callback) {
-
+  var normalizedUsername = authInfo.username.toLowerCase().replace(/-/g, '');
+  
   //derive login keys
-  crypt.derive(authInfo.pakdf, 'login', authInfo.username.toLowerCase(), password, function(err, keys) {
+  crypt.derive(authInfo.pakdf, 'login', normalizedUsername, password, function(err, keys) {
     if (err) {
       callback(err);
     } else {
@@ -74,8 +75,10 @@ VaultClient.prototype._deriveLoginKeys = function (authInfo, password, callback)
  */
 
 VaultClient.prototype._deriveUnlockKey = function (authInfo, password, keys, callback) {
+  var normalizedUsername = authInfo.username.toLowerCase().replace(/-/g, '');
+  
   //derive unlock key
-  crypt.derive(authInfo.pakdf, 'unlock', authInfo.username.toLowerCase(), password, function(err, unlock) {
+  crypt.derive(authInfo.pakdf, 'unlock', normalizedUsername, password, function(err, unlock) {
     if (err) {
       log.error('derive:', err);
       return callback(err);
