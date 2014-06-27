@@ -242,13 +242,15 @@ OrderBook.prototype.notify = function (message) {
 
           if (price.compareTo(priceItem) <= 0) {
             self._offers.splice(i, 0, obj);
+            changed = true;
+            break;
           } else {
             if (i === l-1) { // last item in offer
               self._offers.splice(i+1, 0, obj);
+              changed = true;
+              break;
             }
           }
-          changed = true;
-          break;
         }
         if (l===0) { // if offer is empty list
           self._offers.splice(0, 0, obj);
