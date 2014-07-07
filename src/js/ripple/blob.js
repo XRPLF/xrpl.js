@@ -100,13 +100,15 @@ BlobObj.prototype.init = function(fn) {
   }
 
   url  = self.url + '/v1/blob/' + self.id;
-  url += '?'
+  if (this.device_id) url += '?device_id=' + this.device_id;
   
   request.get(url, function(err, resp) {
     if (err) {
       return fn(new Error(err.message || 'Could not retrieve blob'));
     } else if (!resp.body) {
       return fn(new Error('Could not retrieve blob'));
+      
+    //if (failed 2fa)  handle response
     } else if (resp.body.result !== 'success') {
       return fn(new Error('Incorrect username or password'));
     }
@@ -563,6 +565,60 @@ BlobObj.prototype.set2FA = function(options, fn) {
         fn(new Error('Unable to update settings.'));
       }
     }); 
+};
+
+/**
+ * requestToken
+ * request new token to be sent for 2FA
+ */
+
+BlobObj.prototype.requestToken = function (fn) {
+  var config = {
+    method : 'POST',
+    url    : this.url + '/v1/blob/' + this.id + '/2FA/requestToken'
+  };
+  
+  request.post(config.url)
+    .end(function(err, resp) { 
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Unable to request authentication token.'));
+      }
+    }); 
+}; 
+
+/**
+ * verifyToken
+ * verify a device token for 2FA  
+ */
+BlobObj.prototype.verifyToken = function (device_id, token, fn) {
+  var config = {
+    method : 'POST',
+    url    : this.url + '/v1/blob/' + this.id + '/2FA/verifyToken',
+    data   : {
+      device_id : device_id,
+      token     : token
+    }
+  };
+  
+  request.post(config.url)
+    .send(config.data)
+    .end(function(err, resp) { 
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Unable to verify authentication token.'));
+      }
+    });   
 };
 
 /***** helper functions *****/
