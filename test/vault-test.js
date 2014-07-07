@@ -19,6 +19,7 @@ var exampleData = {
   masterkey : 'ssize4HrSYZShMWBtK6BhALGEk8VH',
   email_token : '77825040-9096-4695-9cbc-76720f6a8649',
   activateLink : 'https://staging.ripple.com/client/#/register/activate/',
+  device_id : "",
   blob: { 
     url: 'https://id.staging.ripple.com',
     id: 'ef203d3e76552c0592384f909e6f61f1d1f02f61f07643ce015d8b0c9710dd2f',
@@ -289,7 +290,7 @@ describe('VaultClient', function () {
   describe('#login', function() {
     it('with username and password should retrive the blob, crypt key, and id', function(done) {
       this.timeout(10000);
-      client.login(exampleData.username, exampleData.password, function(err, resp) {
+      client.login(exampleData.username, exampleData.password, exampleData.device_id, function(err, resp) {
         if (online) {
           assert.ifError(err);
           assert.strictEqual(typeof resp, 'object');
@@ -313,7 +314,7 @@ describe('VaultClient', function () {
   describe('#relogin', function() {
     it('should retrieve the decrypted blob with blob vault url, id, and crypt key', function(done) {
       this.timeout(10000);
-      client.relogin(exampleData.blob.url, exampleData.id, exampleData.crypt, function(err, resp) {
+      client.relogin(exampleData.blob.url, exampleData.id, exampleData.crypt, exampleData.device_id, function(err, resp) {
         assert.ifError(err);
         assert.strictEqual(typeof resp, 'object');
         assert(resp.blob instanceof Blob);
@@ -345,7 +346,7 @@ describe('VaultClient', function () {
   describe('#loginAndUnlock', function () {
     it('should get the decrypted blob and decrypted secret given name and password', function (done) {
       this.timeout(10000);
-      client.loginAndUnlock(exampleData.username, exampleData.password, function(err, resp) {
+      client.loginAndUnlock(exampleData.username, exampleData.password, exampleData.device_id, function(err, resp) {
         if (online) {
           assert.ifError(err);
           assert.strictEqual(typeof resp, 'object');
@@ -454,7 +455,7 @@ describe('Blob', function () {
     if (online) {
       this.timeout(10000);
   
-      client.login(exampleData.username, exampleData.password, function(err, res) {
+      client.login(exampleData.username, exampleData.password, exampleData.device_id, function(err, res) {
         resp = res;
         blob = res.blob;
         done();

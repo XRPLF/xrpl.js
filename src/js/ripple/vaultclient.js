@@ -133,7 +133,7 @@ VaultClient.prototype.exists = function(username, callback) {
  * @param {function}  fn - Callback function
  */
 
-VaultClient.prototype.login = function(username, password, callback) {
+VaultClient.prototype.login = function(username, password, device_id, callback) {
   var self = this;
   
   var steps = [
@@ -156,7 +156,14 @@ VaultClient.prototype.login = function(username, password, callback) {
   }
   
   function getBlob(authInfo, password, keys, callback) {
-    blobClient.get(authInfo.blobvault, keys.id, keys.crypt, function(err, blob) {
+    var options = {
+      url       : authInfo.blobvault,
+      blob_id   : keys.id,
+      key       : keys.crypt,
+      device_id : device_id
+    };
+    
+    blobClient.get(options, function(err, blob) {
       if (err) {
         return callback(err);
       }
@@ -218,7 +225,7 @@ VaultClient.prototype.login = function(username, password, callback) {
  * @param {function} fn  - Callback function
  */
 
-VaultClient.prototype.relogin = function(url, id, key, callback) {
+VaultClient.prototype.relogin = function(url, id, key, device_id, callback) {
   //use the url from previously retrieved authInfo, if necessary
   if (!url && this.infos[id]) {
     url = this.infos[id].blobvault;
@@ -228,7 +235,14 @@ VaultClient.prototype.relogin = function(url, id, key, callback) {
     return callback(new Error('Blob vault URL is required'));
   }
 
-  blobClient.get(url, id, key, function(err, blob) {
+  var options = {
+    url       : url,
+    blob_id   : id,
+    key       : key,
+    device_id : device_id
+  };
+    
+  blobClient.get(options, function(err, blob) {
     if (err) {
       callback(err);
     } else {
@@ -293,7 +307,7 @@ VaultClient.prototype.unlock = function(username, password, encryptSecret, fn) {
  * @param {function}  fn - Callback function
  */
 
-VaultClient.prototype.loginAndUnlock = function(username, password, fn) {
+VaultClient.prototype.loginAndUnlock = function(username, password, device_id, fn) {
   var self = this;
 
   var steps = [
@@ -305,7 +319,7 @@ VaultClient.prototype.loginAndUnlock = function(username, password, fn) {
   async.waterfall(steps, fn);  
   
   function login (callback) {
-    self.login(username, password, function(err, resp) {
+    self.login(username, password, device_id, function(err, resp) {
 
       if (err) {
         return callback(err);
@@ -372,69 +386,6 @@ VaultClient.prototype.verify = function(username, token, callback) {
     
     blobClient.verify(authInfo.blobvault, username.toLowerCase(), token, callback);     
   });
-};
-
-/**
- * resendEmail
- * send a new verification email
- * @param {object}   options
- * @param {string}   options.id
- * @param {string}   options.username
- * @param {string}   options.account_id
- * @param {string}   options.email
- * @param {string}   options.activateLink
- * @param {function} fn - Callback
- */
-
-VaultClient.prototype.resendEmail = function (options, fn) {
-  blobClient.resendEmail(options, fn);  
-};
-
-/**
- * deleteBlob
- * @param {object} options
- * @param {string} options.url
- * @param {string} options.username
- * @param {string} options.blob_id
- * @param {string} options.account_id
- * @param {string} options.masterkey 
- */
-
-VaultClient.prototype.deleteBlob = function (options, fn) {
-  blobClient.deleteBlob(options, fn); 
-};
-
-/**
- * updateProfile
- * update information stored outside the blob
- * @param {object}
- * @param {string} options.url
- * @param {string} options.username
- * @param {string} options.auth_secret
- * @param {srring} options.blob_id
- * @param {object} options.profile
- * @param {string} options.profile.phone - optional
- * @param {string} options.profile.country - optional
- * @param {string} options.profile.region - optional
- * @param {string} options.profile.city - optional
- */
-
-VaultClient.prototype.updateProfile = function (options, fn) {
-  blobClient.updateProfile(options, fn);  
-};
-
-/**
- * recoverBlob
- * recover blob with account secret
- * @param {object} options
- * @param {string} options.url
- * @param {string} options.username
- * @param {string} options.masterkey
- * @param {function} 
- */
-
-VaultClient.prototype.recoverBlob = function (options, fn) {
-  blobClient.recoverBlob(options, fn);    
 };
 
 /*
@@ -581,6 +532,11 @@ VaultClient.prototype.register = function(options, fn) {
   };
 };
 
+/**
+ * validateUsername
+ * check username for validity 
+ */
+
 VaultClient.prototype.validateUsername = function (username) {
   username   = String(username).trim();
   var result = {
@@ -607,4 +563,24 @@ VaultClient.prototype.validateUsername = function (username) {
   return result;
 };
 
+/**
+ * generateDeviceID
+ * create a new random device ID for 2FA
+ */
+VaultClient.prototype.generateDeviceID = function () {
+  return crypt.createSecret(4);
+};
+
+/*** pass thru some blob client function ***/
+
+VaultClient.prototype.resendEmail   = blobClient.resendEmail;
+
+VaultClient.prototype.updateProfile = blobClient.updateProfile;
+
+VaultClient.prototype.recoverBlob   = blobClient.recoverBlob;
+
+VaultClient.prototype.deleteBlob    = blobClient.deleteBlob;
+
+
+//export by name
 exports.VaultClient = VaultClient;
