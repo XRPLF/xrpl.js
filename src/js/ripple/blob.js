@@ -524,6 +524,33 @@ BlobObj.prototype.postUpdate = function(op, pointer, params, fn) {
 };
 
 /**
+ * get2FA - ECDSA signed request
+ */
+
+BlobObj.prototype.get2FA = function (masterkey, fn) {
+  var config = {
+    method : 'GET',
+    url    : this.url + '/v1/blob/' + this.id + '/2FA?device_id=' + this.device_id,
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(masterkey, this.data.account_id, this.id);
+
+  request.get(signed.url)
+    .end(function(err, resp) { 
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Unable to retrieve settings.'));
+      }
+    });   
+}
+
+/**
  * set2FA
  * modify 2 factor auth settings
  * @params {object}  options
@@ -596,6 +623,7 @@ BlobObj.prototype.requestToken = function (fn) {
  * verifyToken
  * verify a device token for 2FA  
  */
+
 BlobObj.prototype.verifyToken = function (device_id, token, fn) {
   var config = {
     method : 'POST',
