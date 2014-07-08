@@ -84,16 +84,16 @@ describe('Server', function() {
     var server = new Server(new Remote(), 'wss://localhost:5006');
 
     var ledger = {
-      'type': 'ledgerClosed',
-      'fee_base': 10,
-      'fee_ref': 10,
-      'ledger_hash': 'D29E1F2A2617A88E9DAA14F468B169E6875092ECA0B3B1FA2BE1BC5524DE7CB2',
-      'ledger_index': 7035609,
-      'ledger_time': 455327690,
-      'reserve_base': 20000000,
-      'reserve_inc': 5000000,
-      'txn_count': 1,
-      'validated_ledgers': '32570-7035609'
+      type: 'ledgerClosed',
+      fee_base: 10,
+      fee_ref: 10,
+      ledger_hash: 'D29E1F2A2617A88E9DAA14F468B169E6875092ECA0B3B1FA2BE1BC5524DE7CB2',
+      ledger_index: 7035609,
+      ledger_time: 455327690,
+      reserve_base: 20000000,
+      reserve_inc: 5000000,
+      txn_count: 1,
+      validated_ledgers: '32570-7035609'
     };
 
     server._updateScore = function(type, data) {
@@ -125,8 +125,8 @@ describe('Server', function() {
     var server = new Server(new Remote(), 'wss://localhost:5006');
 
     var load = {
-      'fee_base': 10,
-      'fee_ref': 10
+      fee_base: 10,
+      fee_ref: 10
     };
 
     server._updateScore = function(type, data) {
@@ -361,22 +361,22 @@ describe('Server', function() {
         });
 
         ws.send(JSON.stringify({
-          'id': 0,
-          'status': 'success',
-          'type': 'response',
-          'result': {
-            'fee_base': 10,
-            'fee_ref': 10,
-            'ledger_hash': '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
-            'ledger_index': 7053695,
-            'ledger_time': 455414390,
-            'load_base': 256,
-            'load_factor': 256,
-            'random': 'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
-            'reserve_base': 20000000,
-            'reserve_inc': 5000000,
-            'server_status': 'full',
-            'validated_ledgers': '32570-7053695'
+          id: 0,
+          status: 'success',
+          type: 'response',
+          result: {
+            fee_base: 10,
+            fee_ref: 10,
+            ledger_hash: '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
+            ledger_index: 7053695,
+            ledger_time: 455414390,
+            load_base: 256,
+            load_factor: 256,
+            random: 'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
+            reserve_base: 20000000,
+            reserve_inc: 5000000,
+            server_status: 'full',
+            validated_ledgers: '32570-7053695'
           }
         }));
 
@@ -512,22 +512,22 @@ describe('Server', function() {
         });
 
         ws.send(JSON.stringify({
-          'id': 0,
-          'status': 'success',
-          'type': 'response',
-          'result': {
-            'fee_base': 10,
-            'fee_ref': 10,
-            'ledger_hash': '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
-            'ledger_index': 7053695,
-            'ledger_time': 455414390,
-            'load_base': 256,
-            'load_factor': 256,
-            'random': 'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
-            'reserve_base': 20000000,
-            'reserve_inc': 5000000,
-            'server_status': 'full',
-            'validated_ledgers': '32570-7053695'
+          id: 0,
+          status: 'success',
+          type: 'response',
+          result: {
+            fee_base: 10,
+            fee_ref: 10,
+            ledger_hash: '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
+            ledger_index: 7053695,
+            ledger_time: 455414390,
+            load_base: 256,
+            load_factor: 256,
+            random: 'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
+            reserve_base: 20000000,
+            reserve_inc: 5000000,
+            server_status: 'full',
+            validated_ledgers: '32570-7053695'
           }
         }));
       });
@@ -642,7 +642,29 @@ describe('Server', function() {
       type: 'response',
       status: 'success',
       result: {
-        test: 'property'
+        info: {
+          build_version: "0.25.2-rc1",
+          complete_ledgers: "32570-7623483",
+          hostid: "MAC",
+          io_latency_ms: 1,
+          last_close: {
+            converge_time_s: 2.052,
+            proposers: 5
+          },
+          load_factor: 1,
+          peers: 50,
+          pubkey_node: "n94pSqypSfddzAVj9qoezHyUoetsrMnwgNuBqRJ3WHvM8aMMf7rW",
+          server_state: "full",
+          validated_ledger: {
+            age: 5,
+            base_fee_xrp: 0.00001,
+            hash: "AB575193C623179078BE7CC42965FD4262EE8611D1CE7F839CEEBFFEF4B653B6",
+            reserve_base_xrp: 20,
+            reserve_inc_xrp: 5,
+            seq: 7623483
+          },
+          validation_quorum: 3
+        }
       }
     };
 
@@ -841,8 +863,6 @@ describe('Server', function() {
     server._ws = { readyState: 1 };
 
     assert(!server._isConnected());
-    assert(!server._isConnected({ message: { command: 'ping' } }));
-    assert(server._isConnected({ message: { command: 'subscribe' } }));
 
     server._connected = true;
 
@@ -884,5 +904,103 @@ describe('Server', function() {
     server._reserve_base = 20000000;
     server._reserve_inc =  5000000;
     assert.strictEqual(server._reserve().to_json(), '20000000');
+  });
+
+  it('Cache hostid', function(done) {
+    var wss = new ws.Server({ port: 5748  });
+
+    wss.once('connection', function(ws) {
+      function sendServerInfo(message) {
+        ws.send(JSON.stringify({
+          id: message.id,
+          status: 'success',
+          type: 'response',
+          result: {
+            info: {
+              build_version: "0.25.2-rc1",
+              complete_ledgers: "32570-7623483",
+              hostid: "MAC",
+              io_latency_ms: 1,
+              last_close: {
+                converge_time_s: 2.052,
+                proposers: 5
+              },
+              load_factor: 1,
+              peers: 50,
+              pubkey_node: "n94pSqypSfddzAVj9qoezHyUoetsrMnwgNuBqRJ3WHvM8aMMf7rW",
+              server_state: "full",
+              validated_ledger: {
+                age: 5,
+                base_fee_xrp: 0.00001,
+                hash: "AB575193C623179078BE7CC42965FD4262EE8611D1CE7F839CEEBFFEF4B653B6",
+                reserve_base_xrp: 20,
+                reserve_inc_xrp: 5,
+                seq: 7623483
+              },
+              validation_quorum: 3
+            }
+          }
+        }));
+      };
+
+      function sendSubscribe(message) {
+        ws.send(JSON.stringify({
+          id: message.id,
+          status: 'success',
+          type: 'response',
+          result: {
+            fee_base: 10,
+            fee_ref: 10,
+            ledger_hash: '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
+            ledger_index: 7053695,
+            ledger_time: 455414390,
+            load_base: 256,
+            load_factor: 256,
+            random: 'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
+            reserve_base: 20000000,
+            reserve_inc: 5000000,
+            server_status: 'full',
+            validated_ledgers: '32570-7053695'
+          }
+        }));
+      };
+
+      ws.on('message', function(message) {
+        var m = JSON.parse(message);
+
+        switch (m.command) {
+          case 'subscribe':
+            assert.strictEqual(m.command, 'subscribe');
+            assert.deepEqual(m.streams, [ 'ledger', 'server' ]);
+            sendSubscribe(m);
+            break;
+          case 'server_info':
+            assert.strictEqual(m.command, 'server_info');
+            sendServerInfo(m);
+            wss.close();
+            break;
+        }
+      });
+    });
+
+    var server = new Server(new Remote(), 'ws://localhost:5748');
+
+    server.once('connect', function() {
+      var receivedSubscribe = false;
+
+      assert.strictEqual(server._hostid, '');
+
+      server.once('response_server_info', function() {
+        receivedSubscribe = true;
+      });
+
+      server.once('disconnect', function() {
+        assert(receivedSubscribe);
+        assert.strictEqual(server.getHostID(), 'MAC');
+        done();
+      });
+    });
+
+    server.connect();
   });
 });
