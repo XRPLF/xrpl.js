@@ -85,17 +85,19 @@ function Server(remote, opts) {
   this._url = this._opts.url = (this._opts.secure ? 'wss://' : 'ws://')
       + this._opts.host + ':' + this._opts.port;
 
-  this.on('message', onMessage);
+  this._hostid = '';
 
   function onMessage(message) {
     self._handleMessage(message);
   };
 
-  this.on('response_subscribe', onSubscribeResponse);
+  this.on('message', onMessage);
 
   function onSubscribeResponse(message) {
     self._handleResponseSubscribe(message);
   };
+
+  this.on('response_subscribe', onSubscribeResponse);
 
   function setActivityInterval() {
     var interval = self._checkActivity.bind(self);
@@ -119,6 +121,16 @@ function Server(remote, opts) {
 
   this.on('load_changed', function(load) {
     self._updateScore('loadchange', load);
+  });
+
+  this.once('response_server_info', function(message) {
+    if (message.info.hostid) {
+      self._hostid = message.info.hostid;
+    }
+  });
+
+  this.once('connect', function() {
+    self._request(self._remote.requestServerInfo());
   });
 };
 
@@ -168,7 +180,7 @@ Server.websocketConstructor = function() {
 Server.prototype._setState = function(state) {
   if (state !== this._state) {
     if (this._remote.trace) {
-      log.info('set_state:', state);
+      log.info('set_state:', this._hostid, state);
     }
 
     this._state = state;
@@ -258,10 +270,12 @@ Server.prototype._updateScore = function(type, data) {
 };
 
 /**
- * Get the remote address for a server.
+ * Get the server's remote address
+ *
  * Incompatible with ripple-lib client build
  */
 
+Server.prototype.getRemoteAddress =
 Server.prototype._remoteAddress = function() {
   var address;
   try {
@@ -269,6 +283,14 @@ Server.prototype._remoteAddress = function() {
   } catch (e) {
   }
   return address;
+};
+
+/**
+ * Get the server's hostid
+ */
+
+Server.prototype.getHostID = function() {
+  return this._hostid;
 };
 
 /**
@@ -324,7 +346,7 @@ Server.prototype.connect = function() {
   }
 
   if (this._remote.trace) {
-    log.info('connect:', this._opts.url);
+    log.info('connect:', this._hostid, this._opts.url);
   }
 
   // Ensure any existing socket is given the command to close first.
@@ -361,7 +383,7 @@ Server.prototype.connect = function() {
       self.emit('socket_error');
 
       if (self._remote.trace) {
-        log.info('onerror:', self._opts.url, e.data || e);
+        log.info('onerror:', self._hostid, self._opts.url, e.data || e);
       }
 
       // Most connection errors for WebSockets are conveyed as 'close' events with
@@ -385,7 +407,7 @@ Server.prototype.connect = function() {
   ws.onclose = function onClose() {
     if (ws === self._ws) {
       if (self._remote.trace) {
-        log.info('onclose:', self._opts.url, ws.readyState);
+        log.info('onclose:', self._hostid, self._opts.url, ws.readyState);
       }
       self._handleClose();
     }
@@ -418,7 +440,7 @@ Server.prototype._retryConnect = function() {
   function connectionRetry() {
     if (self._shouldConnect) {
       if (self._remote.trace) {
-        log.info('retry', self._opts.url);
+        log.info('retry', self._hostid, self._opts.url);
       }
       self.connect();
     }
@@ -524,14 +546,14 @@ Server.prototype._handleResponse = function(message) {
 
   if (!request) {
     if (this._remote.trace) {
-      log.info('UNEXPECTED:', this._opts.url, message);
+      log.info('UNEXPECTED:', this._hostid, this._opts.url, message);
     }
     return;
   }
 
   if (message.status === 'success') {
     if (this._remote.trace) {
-      log.info('response:', this._opts.url, message);
+      log.info('response:', this._hostid, this._opts.url, message);
     }
 
     var command = request.message.command;
@@ -545,7 +567,7 @@ Server.prototype._handleResponse = function(message) {
     });
   } else if (message.error) {
     if (this._remote.trace) {
-      log.info('error:', this._opts.url, message);
+      log.info('error:', this._hostid, this._opts.url, message);
     }
 
     var error = {
@@ -560,7 +582,7 @@ Server.prototype._handleResponse = function(message) {
 
 Server.prototype._handlePathFind = function(message) {
   if (this._remote.trace) {
-    log.info('path_find:', this._opts.url, message);
+    log.info('path_find:', this._hostid, this._opts.url, message);
   }
 };
 
@@ -618,7 +640,7 @@ Server.isLoadStatus = function(message) {
 Server.prototype._sendMessage = function(message) {
   if (this._ws) {
     if (this._remote.trace) {
-      log.info('request:', this._opts.url, message);
+      log.info('request:', this._hostid, this._opts.url, message);
     }
     this._ws.send(JSON.stringify(message));
   }
@@ -640,7 +662,7 @@ Server.prototype._request = function(request) {
   // Only bother if we are still connected.
   if (!this._ws) {
     if (this._remote.trace) {
-      log.info('request: DROPPING:', self._opts.url, request.message);
+      log.info('request: DROPPING:', self._hostid, self._opts.url, request.message);
     }
     return;
   }
@@ -658,20 +680,17 @@ Server.prototype._request = function(request) {
     self._sendMessage(request.message);
   };
 
-  if (this._isConnected(request)) {
+  var isSubscribeRequest = request && request.message.command === 'subscribe' && this._ws.readyState === 1;
+
+  if (this._isConnected() || isSubscribeRequest) {
     sendRequest();
   } else {
-    // XXX There are many ways to make this smarter.
     this.once('connect', sendRequest);
   }
 };
 
-Server.prototype._isConnected = function(request) {
-  var isSubscribeRequest = request
-    && request.message.command === 'subscribe'
-    && this._ws.readyState === 1;
-
-  return this._connected || (this._ws && isSubscribeRequest);
+Server.prototype._isConnected = function() {
+  return this._connected;
 };
 
 /**

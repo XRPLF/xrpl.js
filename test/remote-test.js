@@ -33,217 +33,160 @@ describe('Remote', function () {
     };
   })
 
-  describe('remote server initialization - url object', function() {
-    it('should construct url', function (done) {
+  it('remote server initialization - url object', function() {
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ],
+    });
+    assert(Array.isArray(remote._servers));
+    assert(remote._servers[0] instanceof Server);
+    assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
+  })
+
+  it('remote server initialization - url object - no secure property', function() {
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443 } ]
+    });
+    assert(Array.isArray(remote._servers));
+    assert(remote._servers[0] instanceof Server);
+    assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
+  })
+
+  it('remote server initialization - url object - secure: false', function() {
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: false } ]
+    });
+    assert(Array.isArray(remote._servers));
+    assert(remote._servers[0] instanceof Server);
+    assert.strictEqual(remote._servers[0]._url, 'ws://s-west.ripple.com:443');
+  });
+
+  it('remote server initialization - url object - string port', function() {
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: '443', secure: true } ]
+    });
+    assert(Array.isArray(remote._servers));
+    assert(remote._servers[0] instanceof Server);
+    assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
+  })
+
+  it('remote server initialization - url object - invalid host', function() {
+    assert.throws(
+      function() {
       var remote = new Remote({
-        servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ],
+        servers: [ { host: '+', port: 443, secure: true } ]
       });
-      assert(Array.isArray(remote._servers));
-      assert(remote._servers[0] instanceof Server);
-      assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
-      done();
-    })
-  });
+    }, Error);
+  })
 
-  describe('remote server initialization - url object - no secure property', function() {
-    it('should construct url', function (done) {
+  it('remote server initialization - url object - invalid port', function() {
+    assert.throws(
+      function() {
       var remote = new Remote({
-        servers: [ { host: 's-west.ripple.com', port: 443 } ]
+        servers: [ { host: 's-west.ripple.com', port: null, secure: true } ]
       });
-      assert(Array.isArray(remote._servers));
-      assert(remote._servers[0] instanceof Server);
-      assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
-      done();
-    })
+    }, TypeError);
   });
 
-  describe('remote server initialization - url object - secure: false', function() {
-    it('should construct url', function (done) {
+  it('remote server initialization - url object - port out of range', function() {
+    assert.throws(
+      function() {
       var remote = new Remote({
-        servers: [ { host: 's-west.ripple.com', port: 443, secure: false } ]
+        servers: [ { host: 's-west.ripple.com', port: 65537, secure: true } ]
       });
-      assert(Array.isArray(remote._servers));
-      assert(remote._servers[0] instanceof Server);
-      assert.strictEqual(remote._servers[0]._url, 'ws://s-west.ripple.com:443');
-      done();
-    })
+    }, Error);
   });
 
-  describe('remote server initialization - url object - string port', function() {
-    it('should construct url', function (done) {
+  it('remote server initialization - url string', function() {
+    var remote = new Remote({
+      servers: [ 'wss://s-west.ripple.com:443' ]
+    });
+    assert(Array.isArray(remote._servers));
+    assert(remote._servers[0] instanceof Server);
+    assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
+  });
+
+  it('remote server initialization - url string - ws://', function() {
+    var remote = new Remote({
+      servers: [ 'ws://s-west.ripple.com:443' ]
+    });
+    assert(Array.isArray(remote._servers));
+    assert(remote._servers[0] instanceof Server);
+    assert.strictEqual(remote._servers[0]._url, 'ws://s-west.ripple.com:443');
+  });
+
+  it('remote server initialization - url string - invalid host', function() {
+    assert.throws(
+      function() {
       var remote = new Remote({
-        servers: [ { host: 's-west.ripple.com', port: '443', secure: true } ]
+        servers: [ 'ws://+:443' ]
       });
-      assert(Array.isArray(remote._servers));
-      assert(remote._servers[0] instanceof Server);
-      assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
-      done();
-    })
+    }, Error
+    );
   });
 
-  describe('remote server initialization - url object - invalid host', function() {
-    it('should construct url', function (done) {
-      assert.throws(
-        function() {
-          var remote = new Remote({
-            servers: [ { host: '+', port: 443, secure: true } ]
-          });
-      }, Error);
-      done();
-    })
-  });
-
-  describe('remote server initialization - url object - invalid port', function() {
-    it('should construct url', function (done) {
-      assert.throws(
-        function() {
-          var remote = new Remote({
-            servers: [ { host: 's-west.ripple.com', port: null, secure: true } ]
-          });
-      }, TypeError);
-      done();
-    })
-  });
-
-  describe('remote server initialization - url object - port out of range', function() {
-    it('should construct url', function (done) {
-      assert.throws(
-        function() {
-          var remote = new Remote({
-            servers: [ { host: 's-west.ripple.com', port: 65537, secure: true } ]
-          });
-      }, Error);
-      done();
-    })
-  });
-
-  describe('remote server initialization - url string', function() {
-    it('should construct url', function (done) {
+  it('remote server initialization - url string - invalid port', function() {
+    assert.throws(
+      function() {
       var remote = new Remote({
-        servers: [ 'wss://s-west.ripple.com:443' ]
+        servers: [ 'ws://s-west.ripple.com:null' ]
       });
-      assert(Array.isArray(remote._servers));
-      assert(remote._servers[0] instanceof Server);
-      assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
-      done();
-    })
+    }, Error
+    );
   });
 
-  describe('remote server initialization - url string - ws://', function() {
-    it('should construct url', function (done) {
+  it('remote server initialization - url string - port out of range', function() {
+    assert.throws(
+      function() {
       var remote = new Remote({
-        servers: [ 'ws://s-west.ripple.com:443' ]
+        servers: [ 'ws://s-west.ripple.com:65537:' ]
       });
-      assert(Array.isArray(remote._servers));
-      assert(remote._servers[0] instanceof Server);
-      assert.strictEqual(remote._servers[0]._url, 'ws://s-west.ripple.com:443');
-      done();
-    })
+    }, Error
+    );
   });
 
-  describe('remote server initialization - url string - invalid host', function() {
-    it('should construct url', function (done) {
-      assert.throws(
-        function() {
-          var remote = new Remote({
-            servers: [ 'ws://+:443' ]
-          });
-        }, Error
-      );
-      done();
-    })
-  });
-
-  describe('remote server initialization - url string - invalid port', function() {
-    it('should construct url', function (done) {
-      assert.throws(
-        function() {
-          var remote = new Remote({
-            servers: [ 'ws://s-west.ripple.com:null' ]
-          });
-        }, Error
-      );
-      done();
-    })
-  });
-
-  describe('remote server initialization - url string - port out of range', function() {
-    it('should construct url', function (done) {
-      assert.throws(
-        function() {
-          var remote = new Remote({
-            servers: [ 'ws://s-west.ripple.com:65537:' ]
-          });
-        }, Error
-      );
-      done();
-    })
-  });
-
-  describe('request constructors', function () {
+  it('request constructors', function () {
     beforeEach(function () {
       callback = function () {}
       remote = new Remote(options);
     });
 
-    describe('requesting a ledger', function () {
-      it('should return a request', function (done) {
-        var request = remote.request_ledger(null, {}, callback);
-        assert(request instanceof Request);
-        done();
-      })
+    it('requesting a ledger', function () {
+      var request = remote.request_ledger(null, {}, callback);
+      assert(request instanceof Request);
     });
 
-    describe('requesting server info', function () {
-      it('should return a request object', function (done) {
-        var request = remote.request_server_info(null, {}, callback);
-        assert(request instanceof Request);
-        done();
-      })
+    it('requesting server info', function () {
+      var request = remote.request_server_info(null, {}, callback);
+      assert(request instanceof Request);
     })
 
-    describe('requesting peers', function () {
-      it('should return a request object', function (done) {
-        var request = remote.request_peers(null, {}, callback);
-        assert(request instanceof Request);
-        done();
-      });
+    it('requesting peers', function () {
+      var request = remote.request_peers(null, {}, callback);
+      assert(request instanceof Request);
     });
 
-    describe('requesting a connection', function () {
-      it('should return a request object', function (done) {
-        var request = remote.request_connect(null, {}, callback);
-        assert(request instanceof Request);
-        done();
-      });
+    it('requesting a connection', function () {
+      var request = remote.request_connect(null, {}, callback);
+      assert(request instanceof Request);
     });
 
-    describe('making a unique node list add request', function () {
-      it('should return a request object', function (done) {
-        var request = remote.request_unl_add(null, {}, callback);
-        assert(request instanceof Request);
-        done();
-      });
+    it('making a unique node list add request', function () {
+      var request = remote.request_unl_add(null, {}, callback);
+      assert(request instanceof Request);
     });
 
-    describe('making a unique node list request', function () {
-      it('should return a request object', function (done) {
-        var request = remote.request_unl_list(null, {}, callback);
-        assert(request instanceof Request);
-        done();
-      });
+    it('making a unique node list request', function () {
+      var request = remote.request_unl_list(null, {}, callback);
+      assert(request instanceof Request);
     });
 
-    describe('making a unique node list delete request', function () {
-      it('should return a request object', function (done) {
-        var request = remote.request_unl_delete(null, {}, callback);
-        assert(request instanceof Request);
-        done();
-      });
+    it('making a unique node list delete request', function () {
+      var request = remote.request_unl_delete(null, {}, callback);
+      assert(request instanceof Request);
     });
   })
 
-  describe('create remote and get pending transactions', function() {
+  it('create remote and get pending transactions', function() {
     before(function() {
       tx =  [{
         tx_json: {

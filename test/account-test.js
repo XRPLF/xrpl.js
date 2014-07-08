@@ -3,7 +3,7 @@ var Account = require('../src/js/ripple/account').Account;
 
 describe('Account', function(){
 
-  describe('._publicKeyToAddress()', function(){
+  describe('#_publicKeyToAddress()', function(){
 
     it('should throw an error if the key is invalid', function(){
       try {
@@ -29,7 +29,7 @@ describe('Account', function(){
 
   });
 
-  describe('.publicKeyIsActive()', function(){
+  describe('#publicKeyIsActive()', function(){
 
     it('should respond true if the public key corresponds to the account address and the master key IS NOT disabled', function(){
 
