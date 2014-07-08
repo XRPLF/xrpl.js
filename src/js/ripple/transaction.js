@@ -79,7 +79,7 @@ function Transaction(remote) {
   this.submitIndex = void(0);
 
   // Canonical signing setting defaults to the Remote's configuration
-  this.canonical = (typeof remote === 'object') ? !!remote.canonical_signing : true;
+  this.canonical = (typeof remote === 'object') ? Boolean(remote.canonical_signing) : true;
 
   // We aren't clever enough to eschew preventative measures so we keep an array
   // of all submitted transactionIDs (which can change due to load_factor
@@ -133,7 +133,9 @@ Transaction.flags = {
   TrustSet: {
     SetAuth:            0x00010000,
     NoRipple:           0x00020000,
-    ClearNoRipple:      0x00040000
+    ClearNoRipple:      0x00040000,
+    SetFreeze:          0x00100000,
+    ClearFreeze:        0x00200000
   },
 
   OfferCreate: {
@@ -158,7 +160,9 @@ Transaction.set_clear_flags = {
     asfRequireDest:    1,
     asfRequireAuth:    2,
     asfDisallowXRP:    3,
-    asfDisableMaster:  4
+    asfDisableMaster:  4,
+    asfNoFreeze:       6,
+    asfGlobalFreeze:   7
   }
 };
 
