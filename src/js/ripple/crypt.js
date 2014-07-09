@@ -213,7 +213,7 @@ Crypt.isValidAddress = function (address) {
  */
 
 Crypt.createSecret = function (nWords) {
-  return sjcl.codec.hex.fromBits(sjcl.random.randomWords(nWords));
+  return sjcl.codec.hex.fromBits(sjcl.random.randomWords(nWords, 0));
 };
 
 /**
@@ -221,7 +221,7 @@ Crypt.createSecret = function (nWords) {
  */
 
 Crypt.createMaster = function () {
-  return base.encode_check(33, sjcl.codec.bytes.fromBits(sjcl.random.randomWords(4)));
+  return base.encode_check(33, sjcl.codec.bytes.fromBits(sjcl.random.randomWords(4, 0)));
 };
 
 
