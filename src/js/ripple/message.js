@@ -67,13 +67,12 @@ Message.signHash = function(hash, secret_key, account) {
     secret_key = Seed.from_json(secret_key).get_key(account)._secret;
   }
 
-  var signature_bits = secret_key.signWithRecoverablePublicKey(hash);
+  var signature_bits = secret_key.signWithRecoverablePublicKey(hash, 0);
   var signature_base64 = sjcl.codec.base64.fromBits(signature_bits);
 
   return signature_base64;
 
 };
-
 
 /**
  *  Verify the signature on a given message.
