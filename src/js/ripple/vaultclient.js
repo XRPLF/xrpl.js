@@ -581,6 +581,9 @@ VaultClient.prototype.recoverBlob   = blobClient.recoverBlob;
 
 VaultClient.prototype.deleteBlob    = blobClient.deleteBlob;
 
+VaultClient.prototype.requestToken  = blobClient.requestToken;
+
+VaultClient.prototype.verifyToken   = blobClient.verifyToken;
 
 //export by name
 exports.VaultClient = VaultClient;
