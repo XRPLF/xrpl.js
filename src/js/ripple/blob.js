@@ -107,8 +107,12 @@ BlobObj.prototype.init = function(fn) {
       return fn(new Error(err.message || 'Could not retrieve blob'));
     } else if (!resp.body) {
       return fn(new Error('Could not retrieve blob'));
-      
-    //if (failed 2fa)  handle response
+    } else if (resp.body.twofactor) {
+      resp.body.twofactor.blob_id   = self.id;
+      resp.body.twofactor.blob_url  = self.url;
+      resp.body.twofactor.device_id = self.device_id;
+      resp.body.twofactor.blob_key  = self.key
+      return fn(resp.body);
     } else if (resp.body.result !== 'success') {
       return fn(new Error('Incorrect username or password'));
     }
@@ -507,7 +511,6 @@ BlobObj.prototype.postUpdate = function(op, pointer, params, fn) {
 
 
   var signedRequest = new SignedRequest(config);
-
   var signed = signedRequest.signHmac(this.data.auth_secret, this.id);
 
   request.post(signed.url)
@@ -532,7 +535,7 @@ BlobObj.prototype.get2FA = function (masterkey, fn) {
     method : 'GET',
     url    : this.url + '/v1/blob/' + this.id + '/2FA?device_id=' + this.device_id,
   };
-
+  
   var signedRequest = new SignedRequest(config);
   var signed = signedRequest.signAsymmetric(masterkey, this.data.account_id, this.id);
 
@@ -554,8 +557,7 @@ BlobObj.prototype.get2FA = function (masterkey, fn) {
  * set2FA
  * modify 2 factor auth settings
  * @params {object}  options
- * @params {string}
- * @params {boolean} options.remember_me //remember for 30 days
+ * @params {string}  options.masterkey
  * @params {boolean} options.enabled
  * @params {string}  options.phone
  * @params {string}  options.country_code
@@ -568,7 +570,6 @@ BlobObj.prototype.set2FA = function(options, fn) {
     method : 'POST',
     url    : this.url + '/v1/blob/' + this.id + '/2FA',
     data   : {
-      remember_me  : options.remember_me,
       enabled      : options.enabled,
       phone        : options.phone,
       country_code : options.country_code,
@@ -587,66 +588,11 @@ BlobObj.prototype.set2FA = function(options, fn) {
       } else if (resp.body && resp.body.result === 'success') {
         fn(null, resp.body);
       } else if (resp.body && resp.body.result === 'error') {
-        fn(new Error(resp.body.message)); 
+        fn(resp.body); 
       } else {
         fn(new Error('Unable to update settings.'));
       }
     }); 
-};
-
-/**
- * requestToken
- * request new token to be sent for 2FA
- */
-
-BlobObj.prototype.requestToken = function (fn) {
-  var config = {
-    method : 'POST',
-    url    : this.url + '/v1/blob/' + this.id + '/2FA/requestToken'
-  };
-  
-  request.post(config.url)
-    .end(function(err, resp) { 
-      if (err) {
-        fn(err);
-      } else if (resp.body && resp.body.result === 'success') {
-        fn(null, resp.body);
-      } else if (resp.body && resp.body.result === 'error') {
-        fn(new Error(resp.body.message)); 
-      } else {
-        fn(new Error('Unable to request authentication token.'));
-      }
-    }); 
-}; 
-
-/**
- * verifyToken
- * verify a device token for 2FA  
- */
-
-BlobObj.prototype.verifyToken = function (device_id, token, fn) {
-  var config = {
-    method : 'POST',
-    url    : this.url + '/v1/blob/' + this.id + '/2FA/verifyToken',
-    data   : {
-      device_id : device_id,
-      token     : token
-    }
-  };
-  
-  request.post(config.url)
-    .send(config.data)
-    .end(function(err, resp) { 
-      if (err) {
-        fn(err);
-      } else if (resp.body && resp.body.result === 'success') {
-        fn(null, resp.body);
-      } else if (resp.body && resp.body.result === 'error') {
-        fn(new Error(resp.body.message)); 
-      } else {
-        fn(new Error('Unable to verify authentication token.'));
-      }
-    });   
 };
 
 /***** helper functions *****/
@@ -963,6 +909,70 @@ BlobClient.getRippleName = function(url, address, fn) {
 BlobClient.get = function (options, fn) {
   var blob = new BlobObj(options);
   blob.init(fn);
+};
+
+/**
+ * requestToken
+ * request new token to be sent for 2FA
+ * @param {string} url
+ * @param {string} id
+ */
+
+BlobClient.requestToken = function (url, id, fn) {
+  var config = {
+    method : 'GET',
+    url    : url + '/v1/blob/' + id + '/2FA/requestToken'
+  };
+  
+  request.get(config.url)
+    .end(function(err, resp) { 
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Unable to request authentication token.'));
+      }
+    }); 
+}; 
+
+/**
+ * verifyToken
+ * verify a device token for 2FA  
+ * @param {object} options
+ * @param {string} options.url
+ * @param {string} options.id 
+ * @param {string} options.device_id 
+ * @param {string} options.token
+ * @param {boolean} options.remember_me
+ */
+
+BlobClient.verifyToken = function (options, fn) {
+  var config = {
+    method : 'POST',
+    url    : options.url + '/v1/blob/' + options.id + '/2FA/verifyToken',
+    data   : {
+      device_id   : options.device_id,
+      token       : options.token,
+      remember_me : options.remember_me
+    }
+  };
+  
+  request.post(config.url)
+    .send(config.data)
+    .end(function(err, resp) { 
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Unable to verify authentication token.'));
+      }
+    });   
 };
 
 /**
