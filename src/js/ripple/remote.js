@@ -101,7 +101,8 @@ function Remote(opts, trace) {
   this._transaction_subs = 0;
   this._connection_count = 0;
   this._connected = false;
-
+  this._persist = false;
+  
   this._connection_offset = 1000 * (typeof opts.connection_offset === 'number' ? opts.connection_offset : 0);
   this._submission_timeout = 1000 * (typeof opts.submission_timeout === 'number' ? opts.submission_timeout : 10);
 
@@ -248,6 +249,32 @@ function Remote(opts, trace) {
     this.once('connect', function() {
       self._pingInterval = setInterval(pingServers, opts.ping * 1000);
     });
+  }
+  
+  //if we are using a browser, reconnect
+  //the servers whenever the network comes online
+  if (typeof window !== 'undefined') {
+    if (window.addEventListener) {  // W3C DOM
+      window.addEventListener('online', reconnect);
+    } else if (window.attachEvent) { // IE DOM
+      window.attachEvent('ononline', reconnect);
+    }
+  }
+
+  function reconnect() {
+    if (!self._persist) {
+      return;
+    }
+    
+    log.info('reconnecting');
+    
+    ;(function nextServer(i) {
+      self._servers[i].reconnect();
+      var next = nextServer.bind(this, ++i);
+      if (i < self._servers.length) {
+        setTimeout(next, self._connection_offset);
+      }
+    })(0);
   }
 };
 
@@ -514,7 +541,8 @@ Remote.prototype.connect = function(online) {
   }
 
   var self = this;
-
+  this._persist = true;
+  
   ;(function nextServer(i) {
     self._servers[i].connect();
     var next = nextServer.bind(this, ++i);
@@ -542,6 +570,7 @@ Remote.prototype.disconnect = function(callback) {
     this.once('disconnect', callback);
   }
 
+  this._persist = false;
   this._servers.forEach(function(server) {
     server.disconnect();
   });
