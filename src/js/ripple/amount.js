@@ -600,30 +600,48 @@ Amount.prototype.invert = function() {
  * The regular expression below matches above cases, broken down for better understanding:
  *
  * ^\s*                         // start with any amount of whitespace
- * ([a-zA-Z]{3}|[0-9]{3})       // either 3 letter alphabetic currency-code or 3 digit numeric currency-code. See ISO 4217
+ * ([A-z]{3}|[0-9]{3})          // either 3 letter alphabetic currency-code or 3 digit numeric currency-code. See ISO 4217
  * \s*                          // any amount of whitespace
  * (-)?                         // optional dash
  * (\d+)                        // 1 or more digits
  * (?:\.(\d*))?                 // optional . character with any amount of digits
  * \s*                          // any amount of whitespace
- * ([a-f0-9]{40}|[a-z0-9]{3})?  // optional 40 character hex string OR 3 letters
+ * ([A-z]{3}|[0-9]{3})?         // either 3 letter alphabetic currency-code or 3 digit numeric currency-code. See ISO 4217
  * \s*                          // any amount of whitespace
  * $                            // end of string
  *
  */
-Amount.human_RE = /^\s*([a-z]{3}|[0-9]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([a-f0-9]{40}|[a-z0-9]{3})?\s*$/i;
+Amount.human_RE_hex = /^\s*(-)?(\d+)(?:\.(\d*))?\s*([a-fA-F0-9]{40})\s*$/;
+Amount.human_RE = /^\s*([A-z]{3}|[0-9]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([A-z]{3}|[0-9]{3})?\s*$/;
 
 Amount.prototype.parse_human = function(j, opts) {
   opts = opts || {};
 
-  var m = String(j).match(Amount.human_RE);
+  var integer;
+  var fraction;
+  var currency;
+  var precision  = null;
 
-  if (m) {
-    var currency   = m[5] || m[1] || 'XRP';
-    var integer    = m[5] && m[1] ? m[1] + '' + m[3] : (m[3] || '0');
-    var fraction   = m[4] || '';
-    var precision  = null;
+  // first check if it's a hex formatted currency
+  var matches = String(j).match(Amount.human_RE_hex);
+  if (matches && matches.length === 5 && matches[4]) {
+    integer  = matches[2];
+    fraction = matches[3] || '';
+    currency = matches[4];
+    this._is_negative = Boolean(matches[1]);
+  }
 
+  if (integer === void(0) && currency === void(0)) {
+    var m = String(j).match(Amount.human_RE);
+    if (m) {
+      currency = m[5] || m[1] || 'XRP';
+      integer = m[5] && m[1] ? m[1] + '' + m[3] : (m[3] || '0');
+      fraction = m[4] || '';
+      this._is_negative = Boolean(m[2]);
+    }
+  }
+
+  if (integer) {
     currency = currency.toUpperCase();
 
     this._value = new BigInteger(integer);
@@ -649,8 +667,6 @@ Amount.prototype.parse_human = function(j, opts) {
 
       this.canonicalize();
     }
-
-    this._is_negative = !!m[2];
 
     // Apply interest/demurrage
     if (opts.reference_date && this._currency.has_interest()) {
@@ -1157,7 +1173,7 @@ Amount.prototype.to_json = function() {
   } else {
     var amount_json = {
       value : this.to_text(),
-      currency : this._currency.to_json()
+      currency : this._currency.has_interest() ? this._currency.to_hex() : this._currency.to_json()
     };
     if (this._issuer.is_valid()) {
       amount_json.issuer = this._issuer.to_json();
