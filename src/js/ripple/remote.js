@@ -783,6 +783,10 @@ Remote.prototype.getServer = function() {
     return this._primary_server;
   }
 
+  if (!this._servers.length) {
+    return void(0);
+  }
+
   function sortByScore(a, b) {
     var aScore = a._score + a._fee;
     var bScore = b._score + b._fee;
