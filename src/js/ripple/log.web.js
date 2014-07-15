@@ -20,6 +20,7 @@ var InteractiveLogEngine = {
     });
 
     args.unshift(msg);
+    args.unshift('[' + new Date().toISOString() + ']');
 
     console.log.apply(console, args);
   }
