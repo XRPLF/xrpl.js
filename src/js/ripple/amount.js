@@ -1,6 +1,7 @@
 // Represent Ripple amounts and currencies.
 // - Numbers in hex are big-endian.
 
+var extend = require('extend');
 var utils = require('./utils');
 var sjcl  = utils.sjcl;
 var bn    = sjcl.bn;
@@ -377,8 +378,9 @@ Amount.prototype.divide = function(d) {
  *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  * @return {Amount} The resulting ratio. Unit will be the same as numerator.
  */
+
 Amount.prototype.ratio_human = function(denominator, opts) {
-  opts = opts || {};
+  opts = extend({ }, opts);
 
   if (typeof denominator === 'number' && parseInt(denominator, 10) === denominator) {
     // Special handling of integer arguments
