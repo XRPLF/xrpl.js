@@ -156,8 +156,8 @@ Fetch a list of transactions that applied to this account.
 Options:
 
 + `account`
-+ `ledger_index_min` *deprecated, -1*
-+ `ledger_index_max` *deprecated, -1*
++ `ledger_index_min`
++ `ledger_index_max`
 +  `binary` *false*
 + `count` *false*
 +  `descending` *false*
