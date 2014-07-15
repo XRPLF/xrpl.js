@@ -102,10 +102,9 @@ function Remote(opts, trace) {
   this._transaction_subs = 0;
   this._connection_count = 0;
   this._connected = false;
-  this._persist = false;
-  
-  this._connection_offset = 1000 * (typeof opts.connection_offset === 'number' ? opts.connection_offset : 0);
-  this._submission_timeout = 1000 * (typeof opts.submission_timeout === 'number' ? opts.submission_timeout : 10);
+  this._should_connect = true;
+
+  this._submission_timeout = 1000 * (typeof opts.submission_timeout === 'number' ? opts.submission_timeout : 20);
 
   this._received_tx = LRU({ max: 100 });
   this._cur_path_find = null;
@@ -144,10 +143,6 @@ function Remote(opts, trace) {
       account_root : { }
     }
   };
-
-  if (typeof this._connection_offset !== 'number') {
-    throw new TypeError('Remote "connection_offset" configuration is not a Number');
-  }
 
   if (typeof this._submission_timeout !== 'number') {
     throw new TypeError('Remote "submission_timeout" configuration is not a Number');
@@ -198,10 +193,7 @@ function Remote(opts, trace) {
   }
 
   (opts.servers || []).forEach(function(server) {
-    var pool = Number(server.pool) || 1;
-    while (pool--) {
-      self.addServer(server);
-    };
+    self.addServer(server);
   });
 
   // This is used to remove Node EventEmitter warnings
@@ -241,41 +233,31 @@ function Remote(opts, trace) {
   }
 
   function pingServers() {
-    var pingRequest = self.requestPing();
-    pingRequest.on('error', function(){});
-    pingRequest.broadcast();
+    self._pingInterval = setInterval(function() {
+      var pingRequest = self.requestPing();
+      pingRequest.on('error', function(){});
+      pingRequest.broadcast();
+    }, opts.ping * 1000);
   };
 
   if (opts.ping) {
-    this.once('connect', function() {
-      self._pingInterval = setInterval(pingServers, opts.ping * 1000);
-    });
-  }
-  
-  //if we are using a browser, reconnect
-  //the servers whenever the network comes online
-  if (typeof window !== 'undefined') {
-    if (window.addEventListener) {  // W3C DOM
-      window.addEventListener('online', reconnect);
-    } else if (window.attachEvent) { // IE DOM
-      window.attachEvent('ononline', reconnect);
-    }
+    this.once('connect', pingServers);
   }
 
   function reconnect() {
-    if (!self._persist) {
-      return;
+    self.reconnect();
+  };
+
+  //if we are using a browser, reconnect
+  //the servers whenever the network comes online
+  if (typeof window !== 'undefined') {
+    if (window.addEventListener) {
+      // W3C DOM
+      window.addEventListener('online', reconnect);
+    } else if (window.attachEvent) {
+      // IE DOM
+      window.attachEvent('ononline', reconnect);
     }
-    
-    log.info('reconnecting');
-    
-    ;(function nextServer(i) {
-      self._servers[i].reconnect();
-      var next = nextServer.bind(this, ++i);
-      if (i < self._servers.length) {
-        setTimeout(next, self._connection_offset);
-      }
-    })(0);
   }
 };
 
@@ -518,7 +500,30 @@ Remote.prototype.addServer = function(opts) {
 };
 
 /**
- * Connect to the Ripple network.
+ * Reconnect to Ripple network
+ */
+
+Remote.prototype.reconnect = function() {
+  var self = this;
+
+  if (!this._should_connect) {
+    return;
+  }
+
+  log.info('reconnecting');
+
+  ;(function nextServer(i) {
+    self._servers[i].reconnect();
+    if (++i < self._servers.length) {
+      nextServer(i);
+    }
+  })(0);
+
+  return this;
+};
+
+/**
+ * Connect to the Ripple network
  *
  * @param {Function} callback
  * @api public
@@ -543,15 +548,13 @@ Remote.prototype.connect = function(online) {
   }
 
   var self = this;
-  this._persist = true;
-  
+
+  this._should_connect = true;
+
   ;(function nextServer(i) {
     self._servers[i].connect();
-
-    var next = nextServer.bind(this, ++i);
-
-    if (i < self._servers.length) {
-      setTimeout(next, self._connection_offset);
+    if (++i < self._servers.length) {
+      nextServer(i);
     }
   })(0);
 
@@ -574,7 +577,8 @@ Remote.prototype.disconnect = function(callback) {
     this.once('disconnect', callback);
   }
 
-  this._persist = false;
+  this._should_connect = false;
+
   this._servers.forEach(function(server) {
     server.disconnect();
   });
