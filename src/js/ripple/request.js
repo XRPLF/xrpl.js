@@ -11,12 +11,19 @@ var Server       = require('./server').Server;
 //  'remoteError'
 //  'remoteUnexpected'
 //  'remoteDisconnected'
+
+/**
+ * Request
+ *
+ * @param {Remote} remote
+ * @param {String} command
+ */
+
 function Request(remote, command) {
   EventEmitter.call(this);
 
   this.remote = remote;
   this.requested = false;
-
   this.message = {
     command: command,
     id: void(0)
@@ -31,15 +38,15 @@ Request.prototype.broadcast = function() {
 };
 
 // Send the request to a remote.
-Request.prototype.request = function(remote) {
+Request.prototype.request = function(callback) {
   if (this.requested) {
-    return;
+    return this;
   }
 
   this.requested = true;
 
   this.on('error', function(){});
-  this.emit('request', remote);
+  this.emit('request', this.remote);
 
   if (this._broadcast) {
     this.remote._servers.forEach(function(server) {
@@ -50,13 +57,15 @@ Request.prototype.request = function(remote) {
     this.remote.request(this);
   }
 
+  this.callback(callback);
+
   return this;
 };
 
 Request.prototype.callback = function(callback, successEvent, errorEvent) {
   var self = this;
 
-  if (this.requested || typeof callback !== 'function') {
+  if (typeof callback !== 'function') {
     return this;
   }
 
@@ -359,6 +368,29 @@ Request.prototype.addBook = function(book, snapshot) {
   }
 
   this.message.books.push(json);
+
+  return this;
+};
+
+Request.prototype.addStream = function(stream) {
+  var self = this;
+
+  if (arguments.length > 1) {
+    for (arg in arguments) {
+      this.addStream(arguments[arg]);
+    }
+    return;
+  }
+
+  switch (stream) {
+    case 'ledger':
+    case 'server':
+    case 'transactions':
+    case 'transactions_proposed':
+      this.message.streams = (this.message.streams || []).concat(stream);
+  }
+
+  return this;
 };
 
 exports.Request = Request;
