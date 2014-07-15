@@ -13,24 +13,25 @@
 // YYY Will later provide js/network.js which will transparently use multiple
 // instances of this class for network access.
 
-var EventEmitter = require('events').EventEmitter;
-var util         = require('util');
-var LRU          = require('lru-cache');
-var Request      = require('./request').Request;
-var Server       = require('./server').Server;
-var Amount       = require('./amount').Amount;
-var Currency     = require('./currency').Currency;
-var UInt160      = require('./uint160').UInt160;
-var Transaction  = require('./transaction').Transaction;
-var Account      = require('./account').Account;
-var Meta         = require('./meta').Meta;
-var OrderBook    = require('./orderbook').OrderBook;
-var PathFind     = require('./pathfind').PathFind;
-var RippleError  = require('./rippleerror').RippleError;
-var utils        = require('./utils');
-var sjcl         = require('./utils').sjcl;
-var config       = require('./config');
-var log          = require('./log').internal.sub('remote');
+var EventEmitter     = require('events').EventEmitter;
+var util             = require('util');
+var LRU              = require('lru-cache');
+var Request          = require('./request').Request;
+var Server           = require('./server').Server;
+var Amount           = require('./amount').Amount;
+var Currency         = require('./currency').Currency;
+var UInt160          = require('./uint160').UInt160;
+var Transaction      = require('./transaction').Transaction;
+var Account          = require('./account').Account;
+var Meta             = require('./meta').Meta;
+var OrderBook        = require('./orderbook').OrderBook;
+var PathFind         = require('./pathfind').PathFind;
+var SerializedObject = require('./serializedobject').SerializedObject;
+var RippleError      = require('./rippleerror').RippleError;
+var utils            = require('./utils');
+var sjcl             = require('./utils').sjcl;
+var config           = require('./config');
+var log              = require('./log').internal.sub('remote');
 
 /**
  *    Interface to manage the connection to a Ripple server.
@@ -185,7 +186,7 @@ function Remote(opts, trace) {
   }
 
   // Fallback for previous API
-  if (!opts.hasOwnProperty('servers') && opts.websocket_ip) {
+  if (!opts.hasOwnProperty('servers') && opts.hasOwnProperty('websocket_ip')) {
     opts.servers = [
       {
         host:     opts.websocket_ip,
@@ -454,13 +455,14 @@ Remote.prototype.getPendingTransactions = function() {
     var transaction = self.transaction();
     transaction.parseJson(tx.tx_json);
     transaction.clientID(tx.clientID);
+
     Object.keys(tx).forEach(function(prop) {
       switch (prop) {
         case 'secret':
-          case 'submittedIDs':
-          case 'submitIndex':
+        case 'submittedIDs':
+        case 'submitIndex':
           transaction[prop] = tx[prop];
-        break;
+          break;
       }
     });
 
@@ -545,7 +547,9 @@ Remote.prototype.connect = function(online) {
   
   ;(function nextServer(i) {
     self._servers[i].connect();
+
     var next = nextServer.bind(this, ++i);
+
     if (i < self._servers.length) {
       setTimeout(next, self._connection_offset);
     }
@@ -1313,7 +1317,7 @@ Remote.prototype.requestAccountTx = function(options, callback) {
       case 'forward':           //false
       case 'marker':
         request.message[o] = this[o];
-      break;
+        break;
     }
   }, options);
 
@@ -1326,8 +1330,6 @@ Remote.prototype.requestAccountTx = function(options, callback) {
       return result;
     };
   };
-
-  var SerializedObject = require('./serializedobject').SerializedObject;
 
   function parseBinaryTransaction(transaction) {
     var tx = { validated: transaction.validated };
@@ -1425,6 +1427,7 @@ Remote.prototype.requestAccountTx = function(options, callback) {
  * @return {Request}
  */
 
+Remote.prototype.requestTransactionHistory =
 Remote.prototype.requestTxHistory = function(start, callback) {
   // XXX Does this require the server to be trusted?
   //utils.assert(this.trusted);
@@ -1856,6 +1859,7 @@ Remote.prototype.getAccountSequence = function(account, advance) {
  * @param {Number} sequence
  */
 
+Remote.prototype.setAccountSequence =
 Remote.prototype.setAccountSeq = function(account, sequence) {
   var account = UInt160.json_rewrite(account);
 
@@ -1964,26 +1968,25 @@ Remote.prototype.requestRippleBalance = function(account, issuer, currency, ledg
   request.ledgerChoose(ledger);
 
   function rippleState(message) {
-    var node            = message.node;
-    var lowLimit        = Amount.from_json(node.LowLimit);
-    var highLimit       = Amount.from_json(node.HighLimit);
+    var node = message.node;
+    var lowLimit = Amount.from_json(node.LowLimit);
+    var highLimit = Amount.from_json(node.HighLimit);
+
     // The amount the low account holds of issuer.
-    var balance         = Amount.from_json(node.Balance);
+    var balance = Amount.from_json(node.Balance);
+
     // accountHigh implies: for account: balance is negated, highLimit is the limit set by account.
-    var accountHigh     = UInt160.from_json(account).equals(highLimit.issuer());
+    var accountHigh = UInt160.from_json(account).equals(highLimit.issuer());
 
     request.emit('ripple_state', {
-      account_balance     : ( accountHigh ? balance.negate() : balance.clone()).parse_issuer(account),
-      peer_balance        : (!accountHigh ? balance.negate() : balance.clone()).parse_issuer(issuer),
-
-      account_limit       : ( accountHigh ? highLimit : lowLimit).clone().parse_issuer(issuer),
-      peer_limit          : (!accountHigh ? highLimit : lowLimit).clone().parse_issuer(account),
-
-      account_quality_in  : ( accountHigh ? node.HighQualityIn : node.LowQualityIn),
-      peer_quality_in     : (!accountHigh ? node.HighQualityIn : node.LowQualityIn),
-
-      account_quality_out : ( accountHigh ? node.HighQualityOut : node.LowQualityOut),
-      peer_quality_out    : (!accountHigh ? node.HighQualityOut : node.LowQualityOut),
+      account_balance:      ( accountHigh ? balance.negate() :     balance.clone()).parse_issuer(account),
+      peer_balance:         (!accountHigh ? balance.negate() :     balance.clone()).parse_issuer(issuer),
+      account_limit:        ( accountHigh ? highLimit :            lowLimit).clone().parse_issuer(issuer),
+      peer_limit:           (!accountHigh ? highLimit :            lowLimit).clone().parse_issuer(account),
+      account_quality_in:   ( accountHigh ? node.HighQualityIn :   node.LowQualityIn),
+      peer_quality_in:      (!accountHigh ? node.HighQualityIn :   node.LowQualityIn),
+      account_quality_out:  ( accountHigh ? node.HighQualityOut :  node.LowQualityOut),
+      peer_quality_out:     (!accountHigh ? node.HighQualityOut :  node.LowQualityOut),
     });
   };
 
