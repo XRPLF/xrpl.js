@@ -123,13 +123,13 @@ function Server(remote, opts) {
     self._updateScore('loadchange', load);
   });
 
-  this.once('response_server_info', function(message) {
+  this.on('response_server_info', function(message) {
     if (message.info.hostid) {
       self._hostid = message.info.hostid;
     }
   });
 
-  this.once('connect', function() {
+  this.on('connect', function() {
     self._request(self._remote.requestServerInfo());
   });
 };
