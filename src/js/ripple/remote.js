@@ -16,6 +16,7 @@
 var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
 var LRU              = require('lru-cache');
+var Server           = require('./server').Server;
 var Request          = require('./request').Request;
 var Server           = require('./server').Server;
 var Amount           = require('./amount').Amount;
@@ -779,12 +780,14 @@ Remote.prototype.setPrimaryServer = function(server) {
 
 Remote.prototype._getServer =
 Remote.prototype.getServer = function() {
+  var result = void(0);
+
   if (this._primary_server && this._primary_server._connected) {
     return this._primary_server;
   }
 
   if (!this._servers.length) {
-    return void(0);
+    return result;
   }
 
   function sortByScore(a, b) {
@@ -802,14 +805,16 @@ Remote.prototype.getServer = function() {
   // Sort servers by score
   this._servers.sort(sortByScore);
 
-  var index = 0;
-  var server = this._servers[index];
-
-  while (!server._connected) {
-    server = this._servers[++index];
+  // First connected server
+  for (var i=0; i<this._servers.length; i++) {
+    var server = this._servers[i];
+    if ((server instanceof Server) && server._connected) {
+      result = server;
+      break;
+    }
   }
 
-  return server;
+  return result;
 };
 
 /**
