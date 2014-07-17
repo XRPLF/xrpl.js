@@ -348,6 +348,12 @@ Server.prototype.reconnect = function() {
 Server.prototype.connect = function() {
   var self = this;
 
+  var WebSocket = Server.websocketConstructor();
+
+  if (!WebSocket) {
+    throw new Error('No websocket support detected!');
+  }
+
   // We don't connect if we believe we're already connected. This means we have
   // recently received a message from the server and the WebSocket has not
   // reported any issues either. If we do fail to ping or the connection drops,
@@ -356,19 +362,30 @@ Server.prototype.connect = function() {
     return;
   }
 
-  if (this._remote.trace) {
-    log.info('connect:', this._hostid, this._opts.url);
-  }
-
   // Ensure any existing socket is given the command to close first.
   if (this._ws) {
-    this._ws.close();
+    switch (this._ws.readyState) {
+      case 0:
+        // Connecting
+        return;
+      case 1:
+        // Open
+        this.once('socket_close', function() {
+          self.connect();
+        });
+        this._ws.close();
+        return;
+      case 2:
+        // Closing
+        this.once('socket_close', function() {
+          self.connect();
+        });
+        return;
+    }
   }
 
-  var WebSocket = Server.websocketConstructor();
-
-  if (!WebSocket) {
-    throw new Error('No websocket support detected!');
+  if (this._remote.trace) {
+    log.info('connect:', this._hostid, this._opts.url);
   }
 
   var ws = this._ws = new WebSocket(this._opts.url);
