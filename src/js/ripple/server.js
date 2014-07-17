@@ -364,24 +364,7 @@ Server.prototype.connect = function() {
 
   // Ensure any existing socket is given the command to close first.
   if (this._ws) {
-    switch (this._ws.readyState) {
-      case 0:
-        // Connecting
-        return;
-      case 1:
-        // Open
-        this.once('socket_close', function() {
-          self.connect();
-        });
-        this._ws.close();
-        return;
-      case 2:
-        // Closing
-        this.once('socket_close', function() {
-          self.connect();
-        });
-        return;
-    }
+    this._ws.close();
   }
 
   if (this._remote.trace) {

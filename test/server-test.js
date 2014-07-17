@@ -411,7 +411,7 @@ describe('Server', function() {
     });
   });
 
-  it('Connect - prior WebSocket connection exists', function(done) {
+  it.skip('Connect - prior WebSocket connection exists', function(done) {
     var wss = new ws.Server({ port: 5748  });
 
     wss.once('connection', function(ws) {
