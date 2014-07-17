@@ -300,8 +300,18 @@ Server.prototype.getHostID = function() {
  */
 
 Server.prototype.disconnect = function() {
+  var self = this;
+
+  if (!this._connected) {
+    this.once('socket_open', function() {
+      self.disconnect();
+    });
+    return;
+  }
+
   this._shouldConnect = false;
   this._setState('offline');
+
   if (this._ws) {
     this._ws.close();
   }
@@ -317,6 +327,7 @@ Server.prototype.reconnect = function() {
   var self = this;
 
   function disconnected() {
+    self._shouldConnect = true;
     self.connect();
   };
 
@@ -459,15 +470,15 @@ Server.prototype._handleClose = function() {
   var self = this;
   var ws = this._ws;
 
-  this.emit('socket_close');
-  this._setState('offline');
-
   function noOp(){};
 
   // Prevent additional events from this socket
   ws.onopen = ws.onerror = ws.onclose = ws.onmessage = noOp;
 
-  if (self._shouldConnect) {
+  this.emit('socket_close');
+  this._setState('offline');
+
+  if (this._shouldConnect) {
     this._retryConnect();
   }
 };
@@ -682,13 +693,14 @@ Server.prototype._request = function(request) {
 
   var isSubscribeRequest = request && request.message.command === 'subscribe' && this._ws.readyState === 1;
 
-  if (this._isConnected() || isSubscribeRequest) {
+  if (this.isConnected() || isSubscribeRequest) {
     sendRequest();
   } else {
     this.once('connect', sendRequest);
   }
 };
 
+Server.prototype.isConnected =
 Server.prototype._isConnected = function() {
   return this._connected;
 };
