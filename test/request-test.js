@@ -555,10 +555,19 @@ describe('Request', function() {
 
     request.books(books);
 
-    books[0]['taker_gets'].currency = Currency.from_json('EUR').to_hex();
-    books[0]['taker_pays'].currency = Currency.from_json('USD').to_hex();
-
-    assert.deepEqual(request.message.books, books);
+    assert.deepEqual(request.message.books, [
+      {
+      'taker_gets': {
+        'currency': Currency.from_json('EUR').to_hex(),
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'taker_pays': {
+        'currency': Currency.from_json('USD').to_hex(),
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'snapshot': true
+    }
+    ]);
   });
 
   it('Add book', function() {
@@ -587,7 +596,8 @@ describe('Request', function() {
         'taker_pays': {
           'currency': Currency.from_json('USD').to_hex(),
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-        }
+        },
+        'snapshot': true
       }
     ]);
 
@@ -615,7 +625,8 @@ describe('Request', function() {
         'taker_pays': {
           'currency': '0000000000000000000000005553440000000000', // USD hex
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-        }
+        },
+        'snapshot': true
       },
     ]);
   });
@@ -642,7 +653,7 @@ describe('Request', function() {
     });
   });
 
-  it('Add book - with snapshot', function() {
+  it('Add book - without snapshot', function() {
     var remote = new Remote();
     remote._connected = true;
 
@@ -673,8 +684,98 @@ describe('Request', function() {
         'currency': Currency.from_json('USD').to_hex(),
         'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       },
-      'snapshot': true,
+      'both': true,
+      'snapshot': true
+    }]);
+  });
+
+  it('Add book -  no snapshot', function() {
+    var remote = new Remote();
+    remote._connected = true;
+
+    var request = new Request(remote, 'server_info');
+
+    request.message.books = void(0);
+
+    var book = {
+      'taker_gets': {
+        'currency': 'EUR',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'taker_pays': {
+        'currency': 'USD',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'both': true
+    };
+
+    request.addBook(book, false);
+
+    assert.deepEqual(request.message.books, [{
+      'taker_gets': {
+        'currency': Currency.from_json('EUR').to_hex(),
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'taker_pays': {
+        'currency': Currency.from_json('USD').to_hex(),
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
       'both': true
     }]);
+  });
+
+  it('Add stream', function() {
+    var remote = new Remote();
+    remote._connected = true;
+
+    var request = new Request(remote, 'subscribe');
+
+    request.addStream('server', 'ledger');
+    request.addStream('transactions', 'transactions_proposed');
+    request.addStream('accounts', [ 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' ]);
+    request.addStream('accounts_proposed', [ 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59' ]);
+    request.addStream('books', [{
+      'taker_gets': {
+        'currency': 'EUR',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      'taker_pays': {
+        'currency': 'USD',
+        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      }
+    }]);
+
+    assert.deepEqual(request.message, {
+      'command': 'subscribe',
+      'id': void(0),
+      'streams': [
+        'server',
+        'ledger',
+        'transactions',
+        'transactions_proposed',
+        'accounts',
+        'accounts_proposed',
+        'books'
+      ],
+      'accounts': [
+        'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      ],
+      'accounts_proposed': [
+        'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59'
+      ],
+      'books': [
+        {
+          'taker_gets': {
+            'currency': '0000000000000000000000004555520000000000',
+            'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+          },
+          'taker_pays': {
+            'currency': '0000000000000000000000005553440000000000',
+            'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+          },
+          'snapshot': true
+        }
+      ]
+    });
   });
 });
