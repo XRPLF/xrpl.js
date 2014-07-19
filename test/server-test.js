@@ -1033,7 +1033,7 @@ describe('Server', function() {
 
       server.once('disconnect', function() {
         assert(receivedSubscribe);
-        assert.strictEqual(server.getHostID(), 'MAC');
+        assert.strictEqual(server.getHostID(), '(n94pSqypSfddzAVj9qoezHyUoetsrMnwgNuBqRJ3WHvM8aMMf7rW)');
         done();
       });
     });
