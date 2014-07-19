@@ -124,8 +124,9 @@ function Server(remote, opts) {
   });
 
   this.on('response_server_info', function(message) {
-    if (message.info.hostid) {
-      self._hostid = message.info.hostid;
+    try {
+      self._hostid = '(' +  message.info.pubkey_node + ')';
+    } catch (e) {
     }
   });
 
@@ -180,7 +181,7 @@ Server.websocketConstructor = function() {
 Server.prototype._setState = function(state) {
   if (state !== this._state) {
     if (this._remote.trace) {
-      log.info('set_state:', this._hostid, state);
+      log.info('set_state:', this._opts.url, this._hostid, state);
     }
 
     this._state = state;
@@ -368,7 +369,7 @@ Server.prototype.connect = function() {
   }
 
   if (this._remote.trace) {
-    log.info('connect:', this._hostid, this._opts.url);
+    log.info('connect:', this._opts.url, this._hostid);
   }
 
   var ws = this._ws = new WebSocket(this._opts.url);
@@ -394,7 +395,7 @@ Server.prototype.connect = function() {
       self.emit('socket_error');
 
       if (self._remote.trace) {
-        log.info('onerror:', self._hostid, self._opts.url, e.data || e);
+        log.info('onerror:', self._opts.url, self._hostid, e.data || e);
       }
 
       // Most connection errors for WebSockets are conveyed as 'close' events with
@@ -418,7 +419,7 @@ Server.prototype.connect = function() {
   ws.onclose = function onClose() {
     if (ws === self._ws) {
       if (self._remote.trace) {
-        log.info('onclose:', self._hostid, self._opts.url, ws.readyState);
+        log.info('onclose:', self._opts.url, self._hostid, ws.readyState);
       }
       self._handleClose();
     }
@@ -451,7 +452,7 @@ Server.prototype._retryConnect = function() {
   function connectionRetry() {
     if (self._shouldConnect) {
       if (self._remote.trace) {
-        log.info('retry', self._hostid, self._opts.url);
+        log.info('retry', self._opts.url, self._hostid);
       }
       self.connect();
     }
@@ -557,14 +558,14 @@ Server.prototype._handleResponse = function(message) {
 
   if (!request) {
     if (this._remote.trace) {
-      log.info('UNEXPECTED:', this._hostid, this._opts.url, message);
+      log.info('UNEXPECTED:', this._opts.url, this._hostid, message);
     }
     return;
   }
 
   if (message.status === 'success') {
     if (this._remote.trace) {
-      log.info('response:', this._hostid, this._opts.url, message);
+      log.info('response:', this._opts.url, this._hostid, message);
     }
 
     var command = request.message.command;
@@ -578,7 +579,7 @@ Server.prototype._handleResponse = function(message) {
     });
   } else if (message.error) {
     if (this._remote.trace) {
-      log.info('error:', this._hostid, this._opts.url, message);
+      log.info('error:', this._opts.url, this._hostid,  message);
     }
 
     var error = {
@@ -593,7 +594,7 @@ Server.prototype._handleResponse = function(message) {
 
 Server.prototype._handlePathFind = function(message) {
   if (this._remote.trace) {
-    log.info('path_find:', this._hostid, this._opts.url, message);
+    log.info('path_find:', this._opts.url, this._hostid,  message);
   }
 };
 
@@ -651,7 +652,7 @@ Server.isLoadStatus = function(message) {
 Server.prototype._sendMessage = function(message) {
   if (this._ws) {
     if (this._remote.trace) {
-      log.info('request:', this._hostid, this._opts.url, message);
+      log.info('request:', this._opts.url, this._hostid, message);
     }
     this._ws.send(JSON.stringify(message));
   }
@@ -673,7 +674,7 @@ Server.prototype._request = function(request) {
   // Only bother if we are still connected.
   if (!this._ws) {
     if (this._remote.trace) {
-      log.info('request: DROPPING:', self._hostid, self._opts.url, request.message);
+      log.info('request: DROPPING:', self._opts.url, self._hostid, request.message);
     }
     return;
   }
@@ -691,9 +692,10 @@ Server.prototype._request = function(request) {
     self._sendMessage(request.message);
   };
 
-  var isSubscribeRequest = request && request.message.command === 'subscribe' && this._ws.readyState === 1;
+  var isOpen = this._ws.readyState === 1;
+  var isSubscribeRequest = request && request.message.command === 'subscribe';
 
-  if (this.isConnected() || isSubscribeRequest) {
+  if (this.isConnected() || (isOpen && isSubscribeRequest)) {
     sendRequest();
   } else {
     this.once('connect', sendRequest);
