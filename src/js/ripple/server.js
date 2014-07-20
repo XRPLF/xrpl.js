@@ -190,6 +190,7 @@ Server.prototype._setState = function(state) {
     switch (state) {
       case 'online':
         this._connected = true;
+        this._retry = 0;
         this.emit('connect');
         break;
       case 'offline':
@@ -310,6 +311,12 @@ Server.prototype.disconnect = function() {
     return;
   }
 
+  //these need to be reset so that updateScore 
+  //and checkActivity do not trigger reconnect
+  this._lastLedgerIndex = NaN;
+  this._lastLedgerClose = NaN;
+  this._score = 0;
+  
   this._shouldConnect = false;
   this._setState('offline');
 
@@ -327,14 +334,19 @@ Server.prototype.disconnect = function() {
 Server.prototype.reconnect = function() {
   var self = this;
 
-  function disconnected() {
+  function reconnect() {
     self._shouldConnect = true;
+    self._retry = 0;
     self.connect();
   };
 
-  if (this._ws) {
-    this.once('disconnect', disconnected);
-    this.disconnect();
+  if (this._ws && this._shouldConnect) {
+    if (this._connected) {
+      this.once('disconnect', reconnect);
+      this.disconnect();
+    } else  {
+    reconnect();
+    }
   }
 };
 

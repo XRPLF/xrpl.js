@@ -481,7 +481,7 @@ describe('Server', function() {
   it('Reconnect', function(done) {
     var server = new Server(new Remote(), 'ws://localhost:5748');
     server._connected = true;
-
+    server._shouldConnect = true;
     server._ws = { };
 
     var disconnected = false;
