@@ -7,12 +7,15 @@ var log     = require('./log').sub('blob');
 var BlobClient = {};
 
 //Blob object class
-function BlobObj(url, id, key) {
-  this.url      = url;
-  this.id       = id;
-  this.key      = key; 
-  this.identity = new Identity(this);
-  this.data     = { };
+function BlobObj(options) {
+  if (!options) options = { };
+  
+  this.device_id = options.device_id;
+  this.url       = options.url;
+  this.id        = options.blob_id;
+  this.key       = options.key; 
+  this.identity  = new Identity(this);
+  this.data      = { };
 };
 
 // Blob operations
@@ -96,11 +99,22 @@ BlobObj.prototype.init = function(fn) {
     self.url = 'http://' + url;
   }
 
-  url = self.url + '/v1/blob/' + self.id;
-
+  url  = self.url + '/v1/blob/' + self.id;
+  if (this.device_id) url += '?device_id=' + this.device_id;
+  
   request.get(url, function(err, resp) {
-    if (err || !resp.body || resp.body.result !== 'success') {
+    if (err) {
+      return fn(new Error(err.message || 'Could not retrieve blob'));
+    } else if (!resp.body) {
       return fn(new Error('Could not retrieve blob'));
+    } else if (resp.body.twofactor) {
+      resp.body.twofactor.blob_id   = self.id;
+      resp.body.twofactor.blob_url  = self.url;
+      resp.body.twofactor.device_id = self.device_id;
+      resp.body.twofactor.blob_key  = self.key
+      return fn(resp.body);
+    } else if (resp.body.result !== 'success') {
+      return fn(new Error('Incorrect username or password'));
     }
     
     self.revision         = resp.body.revision;
@@ -497,7 +511,6 @@ BlobObj.prototype.postUpdate = function(op, pointer, params, fn) {
 
 
   var signedRequest = new SignedRequest(config);
-
   var signed = signedRequest.signHmac(this.data.auth_secret, this.id);
 
   request.post(signed.url)
@@ -511,6 +524,75 @@ BlobObj.prototype.postUpdate = function(op, pointer, params, fn) {
       fn(null, resp.body);
     }
   });
+};
+
+/**
+ * get2FA - ECDSA signed request
+ */
+
+BlobObj.prototype.get2FA = function (masterkey, fn) {
+  var config = {
+    method : 'GET',
+    url    : this.url + '/v1/blob/' + this.id + '/2FA?device_id=' + this.device_id,
+  };
+  
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(masterkey, this.data.account_id, this.id);
+
+  request.get(signed.url)
+    .end(function(err, resp) { 
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Unable to retrieve settings.'));
+      }
+    });   
+}
+
+/**
+ * set2FA
+ * modify 2 factor auth settings
+ * @params {object}  options
+ * @params {string}  options.masterkey
+ * @params {boolean} options.enabled
+ * @params {string}  options.phone
+ * @params {string}  options.country_code
+ * @params {string}  options.via    //sms, etc
+ */
+
+BlobObj.prototype.set2FA = function(options, fn) {
+  
+  var config = {
+    method : 'POST',
+    url    : this.url + '/v1/blob/' + this.id + '/2FA',
+    data   : {
+      enabled      : options.enabled,
+      phone        : options.phone,
+      country_code : options.country_code,
+      via          : options.via
+    }
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signAsymmetric(options.masterkey, this.data.account_id, this.id);
+
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) { 
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(resp.body); 
+      } else {
+        fn(new Error('Unable to update settings.'));
+      }
+    }); 
 };
 
 /***** helper functions *****/
@@ -796,7 +878,7 @@ exports.Blob = BlobObj;
  * Get ripple name for a given address
  */
 
-exports.getRippleName = function(url, address, fn) {
+BlobClient.getRippleName = function(url, address, fn) {
   if (!crypt.isValidAddress(address)) {
     return fn (new Error('Invalid ripple address'));
   }
@@ -817,11 +899,80 @@ exports.getRippleName = function(url, address, fn) {
 
 /**
  * Retrive a blob with url, id and key
+ * @params {object} options
+ * @params {string} options.url
+ * @params {string} options.blob_id
+ * @params {string} options.key
+ * @params {string} options.device_id //optional
  */
 
-BlobClient.get = function (url, id, crypt, fn) {
-  var blob = new BlobObj(url, id, crypt);
+BlobClient.get = function (options, fn) {
+  var blob = new BlobObj(options);
   blob.init(fn);
+};
+
+/**
+ * requestToken
+ * request new token to be sent for 2FA
+ * @param {string} url
+ * @param {string} id
+ */
+
+BlobClient.requestToken = function (url, id, fn) {
+  var config = {
+    method : 'GET',
+    url    : url + '/v1/blob/' + id + '/2FA/requestToken'
+  };
+  
+  request.get(config.url)
+    .end(function(err, resp) { 
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Unable to request authentication token.'));
+      }
+    }); 
+}; 
+
+/**
+ * verifyToken
+ * verify a device token for 2FA  
+ * @param {object} options
+ * @param {string} options.url
+ * @param {string} options.id 
+ * @param {string} options.device_id 
+ * @param {string} options.token
+ * @param {boolean} options.remember_me
+ */
+
+BlobClient.verifyToken = function (options, fn) {
+  var config = {
+    method : 'POST',
+    url    : options.url + '/v1/blob/' + options.id + '/2FA/verifyToken',
+    data   : {
+      device_id   : options.device_id,
+      token       : options.token,
+      remember_me : options.remember_me
+    }
+  };
+  
+  request.post(config.url)
+    .send(config.data)
+    .end(function(err, resp) { 
+      if (err) {
+        fn(err);
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body && resp.body.result === 'error') {
+        fn(new Error(resp.body.message)); 
+      } else {
+        fn(new Error('Unable to verify authentication token.'));
+      }
+    });   
 };
 
 /**
@@ -842,8 +993,15 @@ BlobClient.verify = function(url, username, token, fn) {
 };
 
 /**
- * ResendEmail
- * resend verification email
+ * resendEmail
+ * send a new verification email
+ * @param {object}   opts
+ * @param {string}   opts.id
+ * @param {string}   opts.username
+ * @param {string}   opts.account_id
+ * @param {string}   opts.email
+ * @param {string}   opts.activateLink
+ * @param {function} fn - Callback
  */
 
 BlobClient.resendEmail = function (opts, fn) {
@@ -916,9 +1074,14 @@ BlobClient.recoverBlob = function (opts, fn) {
     });
     
   function handleRecovery (resp) {
-    //decrypt crypt key
-    var crypt = decryptBlobCrypt(opts.masterkey, resp.body.encrypted_blobdecrypt_key);
-    var blob  = new BlobObj(opts.url, resp.body.blob_id, crypt);
+
+    var params = {
+      url     : opts.url,
+      blob_id : resp.body.blob_id,
+      key     : decryptBlobCrypt(opts.masterkey, resp.body.encrypted_blobdecrypt_key)
+    }
+    
+    var blob  = new BlobObj(params);
     
     blob.revision = resp.body.revision;
     blob.encrypted_secret = resp.body.encrypted_secret;
@@ -946,8 +1109,18 @@ BlobClient.recoverBlob = function (opts, fn) {
 
 /**
  * updateProfile
- * update information stored outside the blob
- */ 
+ * update information stored outside the blob - HMAC signed
+ * @param {object}
+ * @param {string} opts.url
+ * @param {string} opts.username
+ * @param {string} opts.auth_secret
+ * @param {srring} opts.blob_id
+ * @param {object} opts.profile
+ * @param {string} opts.profile.phone - optional
+ * @param {string} opts.profile.country - optional
+ * @param {string} opts.profile.region - optional
+ * @param {string} opts.profile.city - optional
+ */
 
 BlobClient.updateProfile = function (opts, fn) {
   var config = {
@@ -1088,7 +1261,12 @@ BlobClient.rename = function (opts, fn) {
  */
 
 BlobClient.create = function(options, fn) {
-  var blob = new BlobObj(options.url, options.id, options.crypt);
+  var params = {
+    url     : options.url,
+    blob_id : options.id,
+    key     : options.crypt
+  }
+  var blob = new BlobObj(params);
 
   blob.revision = 0;
 
@@ -1144,7 +1322,13 @@ BlobClient.create = function(options, fn) {
 };
 
 /**
- * deleteBlob 
+ * deleteBlob
+ * @param {object} options
+ * @param {string} options.url
+ * @param {string} options.username
+ * @param {string} options.blob_id
+ * @param {string} options.account_id
+ * @param {string} options.masterkey 
  */
 
 BlobClient.deleteBlob = function(options, fn) {
