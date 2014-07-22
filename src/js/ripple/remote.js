@@ -574,11 +574,16 @@ Remote.prototype.disconnect = function(callback) {
     throw new Error('No servers available, not disconnecting');
   }
 
-  if (typeof callback === 'function') {
-    this.once('disconnect', callback);
+  var callback = (typeof callback === 'function') ? callback : function(){};
+
+  if (!this._connected) {
+    callback();
+    return this;
   }
 
   this._should_connect = false;
+
+  this.once('disconnect', callback);
 
   this._servers.forEach(function(server) {
     server.disconnect();
@@ -774,6 +779,16 @@ Remote.prototype.setPrimaryServer = function(server) {
 };
 
 /**
+ * Get connected state
+ *
+ * @return {Boolean} connected
+ */
+
+Remote.prototype.isConnected = function() {
+  return this._connected;
+};
+
+/**
  * Select a server to handle a request. Servers are
  * automatically prioritized
  */
@@ -782,7 +797,7 @@ Remote.prototype._getServer =
 Remote.prototype.getServer = function() {
   var result = void(0);
 
-  if (this._primary_server && this._primary_server._connected) {
+  if (this._primary_server && this._primary_server.isConnected()) {
     return this._primary_server;
   }
 

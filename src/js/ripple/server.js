@@ -316,7 +316,6 @@ Server.prototype.disconnect = function() {
   this._lastLedgerIndex = NaN;
   this._lastLedgerClose = NaN;
   this._score = 0;
-  
   this._shouldConnect = false;
   this._setState('offline');
 
@@ -341,11 +340,11 @@ Server.prototype.reconnect = function() {
   };
 
   if (this._ws && this._shouldConnect) {
-    if (this._connected) {
+    if (this.isConnected()) {
       this.once('disconnect', reconnect);
       this.disconnect();
     } else  {
-    reconnect();
+      reconnect();
     }
   }
 };
