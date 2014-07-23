@@ -224,6 +224,7 @@ Server.prototype._checkActivity = function() {
   var delta = (Date.now() - this._lastLedgerClose);
 
   if (delta > (1000 * 25)) {
+    log.info('reconnect: activity delta:', delta);
     this.reconnect();
   }
 };
@@ -267,6 +268,7 @@ Server.prototype._updateScore = function(type, data) {
   }
 
   if (this._score > 1e3) {
+    log.info('reconnect: score:', this._score);
     this.reconnect();
   }
 };
