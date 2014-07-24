@@ -19,6 +19,7 @@ var exampleData = {
   masterkey : 'ssize4HrSYZShMWBtK6BhALGEk8VH',
   email_token : '77825040-9096-4695-9cbc-76720f6a8649',
   activateLink : 'https://staging.ripple.com/client/#/register/activate/',
+  device_id : "ac1b6f6dbca98190eb9687ba06f0e066",
   blob: { 
     url: 'https://id.staging.ripple.com',
     id: 'ef203d3e76552c0592384f909e6f61f1d1f02f61f07643ce015d8b0c9710dd2f',
@@ -104,11 +105,12 @@ var recoverRes = {
   }
   
 var blob = new Blob();
-  blob.url  = exampleData.blob.url;
-  blob.id   = exampleData.blob.id;
-  blob.key  = exampleData.blob.key;
-  blob.data = exampleData.blob.data;
-  blob.revision = exampleData.blob.data.revision;
+  blob.url       = exampleData.blob.url;
+  blob.id        = exampleData.blob.id;
+  blob.device_id = exampleData.device_id;
+  blob.key       = exampleData.blob.key;
+  blob.data      = exampleData.blob.data;
+  blob.revision  = exampleData.blob.data.revision;
   
 //must be set for self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -177,6 +179,7 @@ if (!online) {
     });   
     
   mockBlob.filteringPath(/(blob\/.+)/g, 'blob/')
+    .persist()
     .get('/v1/blob/')
     .reply(200, JSON.stringify(blobRes.body), {
       'Content-Type': 'application/json'
@@ -289,7 +292,7 @@ describe('VaultClient', function () {
   describe('#login', function() {
     it('with username and password should retrive the blob, crypt key, and id', function(done) {
       this.timeout(10000);
-      client.login(exampleData.username, exampleData.password, function(err, resp) {
+      client.login(exampleData.username, exampleData.password, exampleData.device_id, function(err, resp) {
         if (online) {
           assert.ifError(err);
           assert.strictEqual(typeof resp, 'object');
@@ -313,7 +316,7 @@ describe('VaultClient', function () {
   describe('#relogin', function() {
     it('should retrieve the decrypted blob with blob vault url, id, and crypt key', function(done) {
       this.timeout(10000);
-      client.relogin(exampleData.blob.url, exampleData.id, exampleData.crypt, function(err, resp) {
+      client.relogin(exampleData.blob.url, exampleData.id, exampleData.crypt, exampleData.device_id, function(err, resp) {
         assert.ifError(err);
         assert.strictEqual(typeof resp, 'object');
         assert(resp.blob instanceof Blob);
@@ -345,7 +348,7 @@ describe('VaultClient', function () {
   describe('#loginAndUnlock', function () {
     it('should get the decrypted blob and decrypted secret given name and password', function (done) {
       this.timeout(10000);
-      client.loginAndUnlock(exampleData.username, exampleData.password, function(err, resp) {
+      client.loginAndUnlock(exampleData.username, exampleData.password, exampleData.device_id, function(err, resp) {
         if (online) {
           assert.ifError(err);
           assert.strictEqual(typeof resp, 'object');
@@ -454,7 +457,7 @@ describe('Blob', function () {
     if (online) {
       this.timeout(10000);
   
-      client.login(exampleData.username, exampleData.password, function(err, res) {
+      client.login(exampleData.username, exampleData.password, exampleData.device_id, function(err, res) {
         resp = res;
         blob = res.blob;
         done();
@@ -462,6 +465,7 @@ describe('Blob', function () {
     } else { 
        
       mockBlob.filteringPath(/(blob\/.+)/g, 'blob/')
+        .persist()
         .post('/v1/blob/')
         .reply(200, {result:'success'}, {
           'Content-Type': 'application/json'
@@ -689,6 +693,57 @@ describe('Blob', function () {
       });
     });      
   });
+  
+  //only do these offline
+  if (!online) {
+  
+    describe('2FA', function() {
+
+    it('#2FA_set2FA', function (done) {
+      blob.set2FA({masterkey:exampleData.masterkey}, function(err, resp){
+        assert.ifError(err);  
+        assert.strictEqual(typeof resp, 'object');
+        assert.strictEqual(typeof resp.result,  'string');
+        done();    
+      });  
+    }); 
+    
+    it('#2FA_get2FA', function (done) {
+      blob.get2FA(exampleData.masterkey, function(err, resp) {
+        assert.ifError(err);  
+        assert.strictEqual(typeof resp, 'object');
+        assert.strictEqual(typeof resp.result,  'string');
+        done();
+      });
+    }); 
+    
+      it('#2FA_requestToken', function (done) {
+        client.requestToken(exampleData.blob.url, exampleData.blob.id, function(err, resp){
+          assert.ifError(err);  
+          assert.strictEqual(typeof resp, 'object');
+          assert.strictEqual(typeof resp.result,  'string');
+          done();
+        });
+      });       
+
+      it('#2FA_verifyToken', function (done) {
+        var options = {
+          url         : exampleData.blob.url,
+          id          : exampleData.blob.id,
+          device_id   : client.generateDeviceID(),
+          token       : "5555",
+          remember_me : true
+         }
+
+        client.verifyToken(options, function(err, resp){
+          assert.ifError(err);  
+          assert.strictEqual(typeof resp, 'object');
+          assert.strictEqual(typeof resp.result,  'string');
+          done();          
+        });
+      });     
+    });
+  }
   
   if (!online) {
     after(function () {
