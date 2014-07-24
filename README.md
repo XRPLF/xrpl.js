@@ -39,7 +39,7 @@
   $ npm install ripple-lib
 ```
 
-**Build from the source using `grunt`**
+**Building ripple-lib for browser client**
 
 ```
   $ git clone https://github.com/ripple/ripple-lib
