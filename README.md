@@ -44,7 +44,7 @@
 ```
   $ git clone https://github.com/ripple/ripple-lib
   $ npm install
-  $ grunt
+  $ npm run build
 ```
 
 Then use the minified `build/ripple-*-min.js` in your webpage
