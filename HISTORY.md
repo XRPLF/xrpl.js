@@ -1,4 +1,4 @@
-##0.7.38
+##0.7.39
 
 + Improvements to multi-server support. Fixed an issue where a server's score was not reset and connections would keep dropping after being connected for a significant amount of time.
 
