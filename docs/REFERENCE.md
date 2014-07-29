@@ -52,7 +52,7 @@ A new `Remote` can be created with the following options:
   , secure:  <boolean>
 }
 ```
-
++ `local_signing`
 
 #2. `Remote` functions
 
@@ -60,7 +60,7 @@ A new `Remote` can be created with the following options:
 
 ##Server info functions
 
-**[request_server_info([callback])](https://ripple.com/wiki/RPC_API#server_info)**
+**[requestServerInfo([callback])](https://ripple.com/wiki/RPC_API#server_info)**
 
 Returns information about the state of the server. If you are connected to multiple servers and want to select by a particular host, use `request.set_server`. Example:
 
@@ -73,34 +73,34 @@ request.callback(function(err, res) {
 request.request();
 ```
 
-**[request_unl_list([callback])](https://ripple.com/wiki/RPC_API#unl_list)**
+**[requestUnlList([callback])](https://ripple.com/wiki/RPC_API#unl_list)**
 
-**[request_unl_add(addr, comment, [callback])](https://ripple.com/wiki/RPC_API#unl_add)**
+**[requestUnlAdd(addr, comment, [callback])](https://ripple.com/wiki/RPC_API#unl_add)**
 
-**[request_unl_delete(node, [callback])](https://ripple.com/wiki/RPC_API#unl_delete)**
+**[requestUnlDelete(node, [callback])](https://ripple.com/wiki/RPC_API#unl_delete)**
 
-**[request_peers([callback])](https://ripple.com/wiki/RPC_API#peers)**
+**[requestPeers([callback])](https://ripple.com/wiki/RPC_API#peers)**
 
 
-**[request_connect(ip, port, [callback])](https://ripple.com/wiki/RPC_API#connect)**
+**[requestConnect(ip, port, [callback])](https://ripple.com/wiki/RPC_API#connect)**
 
 
 
 ##Ledger query functions
 
-**[request_ledger(ledger, [opts], [callback])](https://ripple.com/wiki/RPC_API#ledger)**
+**[requestLedger(ledger, [opts], [callback])](https://ripple.com/wiki/RPC_API#ledger)**
 
-**request_ledger_header([callback])**
+**requestLedgerHeader([callback])**
 
-**[request_ledger_current([callback])](https://ripple.com/wiki/RPC_API#ledger_current)**
+**[requestLedgerCurrent([callback])](https://ripple.com/wiki/RPC_API#ledger_current)**
 
-**[request_ledger_entry(type, [callback])](https://ripple.com/wiki/RPC_API#ledger_entry)**
+**[requestLedgerEntry(type, [callback])](https://ripple.com/wiki/RPC_API#ledger_entry)**
 
-**[request_subscribe(streams, [callback])](https://ripple.com/wiki/RPC_API#subscribe)**
+**[requestSubscribe(streams, [callback])](https://ripple.com/wiki/RPC_API#subscribe)**
 
 Start receiving selected streams from the server.
 
-**[request_unsubscribe(streams, [callback])](https://ripple.com/wiki/RPC_API#unsubscribe)**
+**[requestUnsubscribe(streams, [callback])](https://ripple.com/wiki/RPC_API#unsubscribe)**
 
 Stop receiving selected streams from the server.
 
@@ -109,11 +109,11 @@ Stop receiving selected streams from the server.
 
 ##Transaction query functions
 
-**[request_transaction_entry(hash, [ledger_hash], [callback])](https://ripple.com/wiki/RPC_API#transaction_entry)**
+**[requestTransactionEntry(hash, [ledger_hash], [callback])](https://ripple.com/wiki/RPC_API#transaction_entry)**
 
 Searches a particular ledger for a transaction hash. Default ledger is the open ledger.
 
-**[request_tx(hash, [callback])](https://ripple.com/wiki/RPC_API#tx)**
+**[requestTx(hash, [callback])](https://ripple.com/wiki/RPC_API#tx)**
 
 Searches ledger history for validated transaction hashes.
 
@@ -122,7 +122,7 @@ Searches ledger history for validated transaction hashes.
 
 ##Account query functions
 
-**[request_account_info(account, [callback])](https://ripple.com/wiki/RPC_API#account_info)**
+**[requestAccountInfo(account, [callback])](https://ripple.com/wiki/RPC_API#account_info)**
 
 Return information about the specified account.
 
@@ -143,13 +143,13 @@ Return information about the specified account.
 }
 ```
 
-**[request_account_lines(accountID, account_index, current, [callback])](https://ripple.com/wiki/RPC_API#account_lines)**
+**[requestAccountLines(accountID, account_index, current, [callback])](https://ripple.com/wiki/RPC_API#account_lines)**
 
-**[request_account_offers(accountID, account_index, current, [callback])](https://ripple.com/wiki/RPC_API#account_offers)**
+**[requestAccountOffers(accountID, account_index, current, [callback])](https://ripple.com/wiki/RPC_API#account_offers)**
 
 Return the specified account's outstanding offers.
 
-**[request_account_tx(opts, [callback])](https://ripple.com/wiki/RPC_API#account_tx)**
+**[requestAccountTx(opts, [callback])](https://ripple.com/wiki/RPC_API#account_tx)**
 
 Fetch a list of transactions that applied to this account.
 
@@ -167,25 +167,25 @@ Options:
 + `fwd_marker`
 + `rev_marker`
 
-**[request_wallet_accounts(seed, [callback])](https://ripple.com/wiki/RPC_API#wallet_accounts)**
+**[requestWalletAccounts(seed, [callback])](https://ripple.com/wiki/RPC_API#wallet_accounts)**
 
 Return a list of accounts for a wallet.
 
 + requires trusted remote
 
-**request_account_balance(account, ledger, [callback])**
+**requestAccountBalance(account, ledger, [callback])**
 
 Get the balance for an account. Returns an [Amount](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/amount.js) object.
 
-**request_account_flags(account, current, [callback])**
+**requestAccountFlags(account, current, [callback])**
 
 Return the flags for an account.
 
-**request_owner_count(account, current, [callback])**
+**requestOwnerCount(account, current, [callback])**
 
 Return the owner count for an account.
 
-**request_ripple_balance(account, issuer, currency, current, [callback])**
+**requestRippleBalance(account, issuer, currency, current, [callback])**
 
 Return a request to get a ripple balance
 
@@ -194,7 +194,7 @@ Return a request to get a ripple balance
 
 ##Order book query functions
 
-**[request_book_offers(gets, pays, taker, [callback])](https://ripple.com/wiki/RPC_API#book_offers)**
+**[requestBookOffers(gets, pays, taker, [callback])](https://ripple.com/wiki/RPC_API#book_offers)**
 
 Return the offers for an order book as one or more pages.
 
@@ -217,18 +217,18 @@ request.request();
 
 ##Transaction submission functions
 
-**[request_sign(secret, tx_json, [callback])](https://ripple.com/wiki/RPC_API#sign)**
+**[requestSign(secret, tx_json, [callback])](https://ripple.com/wiki/RPC_API#sign)**
 
 Sign a transaction.
 
 + requires trusted remote
 
-**[request_submit([callback])](https://ripple.com/wiki/RPC_API#submit)**
+**[requestSubmit([callback])](https://ripple.com/wiki/RPC_API#submit)**
 
 Submit a transaction to the network. This command is used internally to submit transactions with a greater degree of reliability. See [Submitting a payment to the network](GUIDES.md#3-submitting-a-payment-to-the-network) for details.
 
 
-**[request_ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])](https://ripple.com/wiki/RPC_API#path_find)**
+**[requestRipplePathFind(src_account, dst_account, dst_amount, src_currencies, [callback])](https://ripple.com/wiki/RPC_API#path_find)**
 
 
 **transaction([destination], [source], [amount], [callback])**
