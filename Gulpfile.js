@@ -5,6 +5,7 @@ var rename = require('gulp-rename');
 var webpack = require('webpack');
 var jshint = require('gulp-jshint');
 var map = require('map-stream');
+var bump = require('gulp-bump');
 //var header = require('gulp-header');
 
 var pkg = require('./package.json');
@@ -84,6 +85,12 @@ gulp.task('bower-build-debug', [ 'build-debug' ], function(callback) {
   .pipe(gulp.dest('./dist/'));
 });
 
+gulp.task('bower-version', function() {
+  gulp.src('./dist/bower.json')
+  .pipe(bump({version: pkg.version}))
+  .pipe(gulp.dest('./dist/'));
+});
+
 gulp.task('build-min', [ 'build' ], function(callback) {
   return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
   .pipe(uglify())
@@ -137,4 +144,4 @@ gulp.task('watch', function() {
 
 gulp.task('default', [ 'concat-sjcl', 'build', 'build-debug', 'build-min' ]);
 
-gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug']);
+gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug', 'bower-version']);
