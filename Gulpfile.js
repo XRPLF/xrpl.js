@@ -66,6 +66,24 @@ gulp.task('build', [ 'concat-sjcl' ], function(callback) {
   }, callback);
 });
 
+gulp.task('bower-build', [ 'build' ], function(callback) {
+  return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
+  .pipe(rename('ripple.js'))
+  .pipe(gulp.dest('./dist/'));
+});
+
+gulp.task('bower-build-min', [ 'build-min' ], function(callback) {
+  return gulp.src([ './build/ripple-', '-min.js' ].join(pkg.version))
+  .pipe(rename('ripple-min.js'))
+  .pipe(gulp.dest('./dist/'));
+});
+
+gulp.task('bower-build-debug', [ 'build-debug' ], function(callback) {
+  return gulp.src([ './build/ripple-', '-debug.js' ].join(pkg.version))
+  .pipe(rename('ripple-debug.js'))
+  .pipe(gulp.dest('./dist/'));
+});
+
 gulp.task('build-min', [ 'build' ], function(callback) {
   return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
   .pipe(uglify())
@@ -118,3 +136,5 @@ gulp.task('watch', function() {
 });
 
 gulp.task('default', [ 'concat-sjcl', 'build', 'build-debug', 'build-min' ]);
+
+gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug']);
