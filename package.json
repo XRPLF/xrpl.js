@@ -19,7 +19,8 @@
     "ws": "~0.4.31",
     "extend": "~1.2.1",
     "lru-cache": "~2.5.0",
-    "superagent": "^0.18.0"
+    "superagent": "^0.18.0",
+    "gulp-bump": "~0.1.10"
   },
   "devDependencies": {
     "mocha": "~1.14.0",

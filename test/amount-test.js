@@ -659,4 +659,25 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_quality('CDFD3AFB2F8C5DBEF75B081F7C957FF5509563266F28F36C5704A0FB0BAD8800', '015841551A748AD2C1F76FF6ECB0CCCD00000000', 'rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN', {inverse: true, base_currency: 'USD', reference_date: 443845330 + 31535000}).to_text_full(), '0.007675186123263489/XAU (-0.5%pa)/rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN');
     });
   });
+
+  describe('apply interest', function() {
+    it ('from_json apply interest 10 XAU', function() {
+      var demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(demAmount.to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      demAmount = demAmount.applyInterest(459990264);
+      assert.strictEqual(demAmount.to_text_full(), '9.294949401870435/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+
+    });
+    it ('from_json apply interest XAU', function() {
+      var demAmount = Amount.from_json('1235.5/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(demAmount.to_text_full(), '1235.5/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      demAmount = demAmount.applyInterest(459990264);
+      assert.strictEqual(demAmount.to_text_full(), '1148.390998601092/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+    it ('from_human with reference date', function() {
+      var demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date:459990264});
+      demAmount.set_issuer("rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh");
+      assert.strictEqual(demAmount.to_text_full(), '10.75853086191915/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+  });
 });

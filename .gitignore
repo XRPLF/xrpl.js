@@ -49,3 +49,6 @@ test/config.js
 
 # Ignore npm-debug
 npm-debug.log
+
+# Ignore dist folder, build for bower
+dist/
