@@ -416,7 +416,7 @@ Remote.prototype._trace = function() {
 };
 
 /**
- * Store a secret - allows the Remote to automatically fill 
+ * Store a secret - allows the Remote to automatically fill
  * out auth information.
  *
  * @param {String} account
@@ -1479,18 +1479,16 @@ Remote.prototype.requestTxHistory = function(start, callback) {
  */
 
 Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
+  // Set lastArg before `arguments` is mutated.
+  var lastArg = arguments[arguments.length - 1];
+
   if (gets.hasOwnProperty('pays')) {
     var options = gets;
-    // This would mutate the `lastArg` in `arguments` to be `null` and is
-    // redundant. Once upon a time, some awkward code was written f(g, null,
-    // null, cb) ...
-    // callback = pays;
+    callback = pays;
     taker = options.taker;
     pays = options.pays;
     gets = options.gets;
   }
-
-  var lastArg = arguments[arguments.length - 1];
 
   if (typeof lastArg === 'function') {
     callback = lastArg;
