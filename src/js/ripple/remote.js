@@ -826,6 +826,7 @@ Remote.prototype.getServer = function() {
     var bScore = _server._score + _server._fee;
     if (bScore < cScore) {
       server = _server;
+      cScore = bScore;
     }
   }
 
