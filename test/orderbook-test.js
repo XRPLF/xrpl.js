@@ -176,6 +176,49 @@ describe('OrderBook', function() {
     });
   });
 
+  it('Increment offer count', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    assert.strictEqual(book.incrementOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 1);
+    assert.strictEqual(book.getOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 1);
+  });
+
+  it('Increment offer count - invalid address', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    assert.throws(function() {
+      book.incrementOfferCount('zrrrrrrrrrrrrrrrrrrrBZbvji');
+    });
+  });
+
+  it('Decrement offer count', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    book.incrementOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji');
+    assert.strictEqual(book.decrementOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 0);
+    assert.strictEqual(book.getOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 0);
+  });
+
+  it('Decrement offer count - invalid address', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    assert.throws(function() {
+      book.decrementOfferCount('zrrrrrrrrrrrrrrrrrrrBZbvji');
+    });
+  });
+
   it('Apply transfer rate', function() {
     var book = new Remote().createOrderBook({
       currency_gets: 'BTC',

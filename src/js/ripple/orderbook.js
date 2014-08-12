@@ -44,6 +44,7 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
   this._listeners = 0;
   this._offers = [ ];
   this._ownerFunds = { };
+  this._offerCounts = { };
 
   // We consider ourselves synchronized if we have a current
   // copy of the offers, we are online and subscribed to updates.
@@ -225,6 +226,37 @@ OrderBook.prototype.getCachedFunds = function(account) {
 OrderBook.prototype.removeCachedFunds = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
   delete this._ownerFunds[account];
+};
+
+/**
+ * Get offer count for offer owner
+ */
+
+OrderBook.prototype.getOfferCount = function(account) {
+  assert(UInt160.is_valid(account), 'Account is invalid');
+  return this._offerCounts[account] || 0;
+};
+
+/**
+ * Decrement offer count for offer owner
+ */
+
+OrderBook.prototype.incrementOfferCount = function(account) {
+  assert(UInt160.is_valid(account), 'Account is invalid');
+  var result = (this._offerCounts[account] || 0) + 1;
+  this._offerCounts[account] = result;
+  return result;
+};
+
+/**
+ * Increment offer count for offer owner
+ */
+
+OrderBook.prototype.decrementOfferCount = function(account) {
+  assert(UInt160.is_valid(account), 'Account is invalid');
+  var result = (this._offerCounts[account] || 1) - 1;
+  this._offerCounts[account] = result;
+  return result;
 };
 
 /**
@@ -640,6 +672,7 @@ OrderBook.prototype.requestOffers = function() {
       }
 
       self.setFundedAmount(offer, fundedAmount);
+      self.incrementOfferCount(offer.Account);
 
       return offer;
     });
@@ -902,8 +935,6 @@ OrderBook.prototype.notify = function(message) {
            : ('/' + this._currencyPays + '/' + this._issuerPays))
   );
 
-  var insertedOffers = [ ];
-
   function handleNode(node, callback) {
     var isDeletedNode = node.nodeType === 'DeletedNode';
     var isOfferCancel = message.transaction.TransactionType === 'OfferCancel';
@@ -919,7 +950,9 @@ OrderBook.prototype.notify = function(message) {
           tradePays = tradePays.add(node.fieldsPrev.TakerPays);
 
           if (isDeletedNode) {
-            self.removeCachedFunds(node.fields.Account);
+            if (self.decrementOfferCount(node.fields.Account) < 1) {
+              self.removeCachedFunds(node.fields.Account);
+            }
           } else {
             tradeGets = tradeGets.subtract(node.fieldsFinal.TakerGets);
             tradePays = tradePays.subtract(node.fieldsFinal.TakerPays);
@@ -929,6 +962,8 @@ OrderBook.prototype.notify = function(message) {
         break;
 
       case 'CreatedNode':
+        self.incrementOfferCount(node.fields.Account);
+
         if (self.hasCachedFunds(node.fields.Account)) {
           // Account's balance is already cached. Use cached balance to
           // set funding status on this offer
