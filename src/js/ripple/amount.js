@@ -160,149 +160,54 @@ Amount.prototype.add = function(v) {
   return result;
 };
 
-/**
- * Turn this amount into its inverse.
- *
- * @private
- */
-Amount.prototype._invert = function() {
-  this._value = consts.bi_1e32.divide(this._value);
-  this._offset = -32 - this._offset;
-  this.canonicalize();
-
-  return this;
+// Result in terms of this currency and issuer.
+Amount.prototype.subtract = function(v) {
+  // Correctness over speed, less code has less bugs, reuse add code.
+  return this.add(Amount.from_json(v).negate());
 };
 
-/**
- * Return the inverse of this amount.
- *
- * @return {Amount} New Amount object with same currency and issuer, but the
- *   inverse of the value.
- */
-Amount.prototype.invert = function() {
-  return this.copy()._invert();
-};
-
-Amount.prototype.canonicalize = function() {
-  if (!(this._value instanceof BigInteger)) {
-    // NaN.
-    // nothing
-  } else if (this._is_native) {
-    // Native.
-    if (this._value.equals(BigInteger.ZERO)) {
-      this._offset      = 0;
-      this._is_negative = false;
-    } else {
-      // Normalize _offset to 0.
-
-      while (this._offset < 0) {
-        this._value  = this._value.divide(consts.bi_10);
-        this._offset += 1;
-      }
-
-      while (this._offset > 0) {
-        this._value  = this._value.multiply(consts.bi_10);
-        this._offset -= 1;
-      }
-    }
-
-    // XXX Make sure not bigger than supported. Throw if so.
-  } else if (this.is_zero()) {
-    this._offset      = -100;
-    this._is_negative = false;
-  } else {
-    // Normalize mantissa to valid range.
-
-    while (this._value.compareTo(consts.bi_man_min_value) < 0) {
-      this._value  = this._value.multiply(consts.bi_10);
-      this._offset -= 1;
-    }
-
-    while (this._value.compareTo(consts.bi_man_max_value) > 0) {
-      this._value  = this._value.divide(consts.bi_10);
-      this._offset += 1;
-    }
-  }
-
-  return this;
-};
-
-Amount.prototype.clone = function(negate) {
-  return this.copyTo(new Amount(), negate);
-};
-
-Amount.prototype.compareTo = function(v) {
+// Result in terms of this' currency and issuer.
+// XXX Diverges from cpp.
+Amount.prototype.multiply = function(v) {
   var result;
 
-  if (!this.is_comparable(v)) {
-    result  = Amount.NaN();
-  } else if (this._is_negative !== v._is_negative) {
-    // Different sign.
-    result  = this._is_negative ? -1 : 1;
-  } else if (this._value.equals(BigInteger.ZERO)) {
-    // Same sign: positive.
-    result  = v._value.equals(BigInteger.ZERO) ? 0 : -1;
-  } else if (v._value.equals(BigInteger.ZERO)) {
-    // Same sign: positive.
-    result  = 1;
-  } else if (!this._is_native && this._offset > v._offset) {
-    result  = this._is_negative ? -1 : 1;
-  } else if (!this._is_native && this._offset < v._offset) {
-    result  = this._is_negative ? 1 : -1;
+  v = Amount.from_json(v);
+
+  if (this.is_zero()) {
+    result = this;
+  } else if (v.is_zero()) {
+    result = this.clone();
+    result._value = BigInteger.ZERO;
   } else {
-    result  = this._value.compareTo(v._value);
-    if (result > 0) {
-      result  = this._is_negative ? -1 : 1;
-    } else if (result < 0) {
-      result  = this._is_negative ? 1 : -1;
+    var v1 = this._value;
+    var o1 = this._offset;
+    var v2 = v._value;
+    var o2 = v._offset;
+
+    if (this.is_native()) {
+      while (v1.compareTo(consts.bi_man_min_value) < 0) {
+        v1 = v1.multiply(consts.bi_10);
+        o1 -= 1;
+      }
     }
+
+    if (v.is_native()) {
+      while (v2.compareTo(consts.bi_man_min_value) < 0) {
+        v2 = v2.multiply(consts.bi_10);
+        o2 -= 1;
+      }
+    }
+
+    result              = new Amount();
+    result._offset      = o1 + o2 + 14;
+    result._value       = v1.multiply(v2).divide(consts.bi_1e14).add(consts.bi_7);
+    result._is_native   = this._is_native;
+    result._is_negative = this._is_negative !== v._is_negative;
+    result._currency    = this._currency;
+    result._issuer      = this._issuer;
+
+    result.canonicalize();
   }
-
-  return result;
-};
-
-// Make d a copy of this. Returns d.
-// Modification of objects internally refered to is not allowed.
-Amount.prototype.copyTo = function(d, negate) {
-  if (typeof this._value === 'object') {
-    this._value.copyTo(d._value);
-  } else {
-    d._value   = this._value;
-  }
-
-  d._offset = this._offset;
-  d._is_native = this._is_native;
-  d._is_negative  = negate
-    ? !this._is_negative    // Negating.
-    : this._is_negative;    // Just copying.
-
-  d._currency     = this._currency;
-  d._issuer       = this._issuer;
-
-  // Prevent negative zero
-  if (d.is_zero()) {
-    d._is_negative = false;
-  }
-
-  return d;
-};
-
-Amount.prototype.currency = function() {
-  return this._currency;
-};
-
-Amount.prototype.equals = function(d, ignore_issuer) {
-  if (typeof d === 'string') {
-    return this.equals(Amount.from_json(d));
-  }
-
-  var result = true;
-
-  result = !((!this.is_valid() || !d.is_valid())
-             || (this._is_native !== d._is_native)
-             || (!this._value.equals(d._value) || this._offset !== d._offset)
-             || (this._is_negative !== d._is_negative)
-             || (!this._is_native && (!this._currency.equals(d._currency) || !ignore_issuer && !this._issuer.equals(d._issuer))));
 
   return result;
 };
@@ -310,6 +215,8 @@ Amount.prototype.equals = function(d, ignore_issuer) {
 // Result in terms of this' currency and issuer.
 Amount.prototype.divide = function(d) {
   var result;
+
+  d = Amount.from_json(d);
 
   if (d.is_zero()) {
     throw new Error('divide by zero');
@@ -359,8 +266,6 @@ Amount.prototype.divide = function(d) {
 };
 
 /**
- * Calculate a ratio between two amounts.
- *
  * This function calculates a ratio - such as a price - between two Amount
  * objects.
  *
@@ -382,18 +287,23 @@ Amount.prototype.divide = function(d) {
 Amount.prototype.ratio_human = function(denominator, opts) {
   opts = extend({ }, opts);
 
+  var numerator = this;
+
   if (typeof denominator === 'number' && parseInt(denominator, 10) === denominator) {
     // Special handling of integer arguments
-    denominator = Amount.from_json('' + denominator + '.0');
+    denominator = Amount.from_json(String(denominator) + '.0');
   } else {
     denominator = Amount.from_json(denominator);
   }
 
-  var numerator = this;
   denominator = Amount.from_json(denominator);
 
   // If either operand is NaN, the result is NaN.
   if (!numerator.is_valid() || !denominator.is_valid()) {
+    return Amount.NaN();
+  }
+
+  if (denominator.is_zero()) {
     return Amount.NaN();
   }
 
@@ -482,6 +392,155 @@ Amount.prototype.product_human = function(factor, opts) {
   return product;
 };
 
+/**
+ * Turn this amount into its inverse.
+ *
+ * @private
+ */
+Amount.prototype._invert = function() {
+  this._value = consts.bi_1e32.divide(this._value);
+  this._offset = -32 - this._offset;
+  this.canonicalize();
+
+  return this;
+};
+
+/**
+ * Return the inverse of this amount.
+ *
+ * @return {Amount} New Amount object with same currency and issuer, but the
+ *   inverse of the value.
+ */
+Amount.prototype.invert = function() {
+  return this.copy()._invert();
+};
+
+Amount.prototype.canonicalize = function() {
+  if (!(this._value instanceof BigInteger)) {
+    // NaN.
+    // nothing
+  } else if (this._is_native) {
+    // Native.
+    if (this._value.equals(BigInteger.ZERO)) {
+      this._offset      = 0;
+      this._is_negative = false;
+    } else {
+      // Normalize _offset to 0.
+
+      while (this._offset < 0) {
+        this._value  = this._value.divide(consts.bi_10);
+        this._offset += 1;
+      }
+
+      while (this._offset > 0) {
+        this._value  = this._value.multiply(consts.bi_10);
+        this._offset -= 1;
+      }
+    }
+
+    // XXX Make sure not bigger than supported. Throw if so.
+  } else if (this.is_zero()) {
+    this._offset      = -100;
+    this._is_negative = false;
+  } else {
+    // Normalize mantissa to valid range.
+
+    while (this._value.compareTo(consts.bi_man_min_value) < 0) {
+      this._value  = this._value.multiply(consts.bi_10);
+      this._offset -= 1;
+    }
+
+    while (this._value.compareTo(consts.bi_man_max_value) > 0) {
+      this._value  = this._value.divide(consts.bi_10);
+      this._offset += 1;
+    }
+  }
+
+  return this;
+};
+
+Amount.prototype.clone = function(negate) {
+  return this.copyTo(new Amount(), negate);
+};
+
+Amount.prototype.compareTo = function(v) {
+  var result;
+
+  v = Amount.from_json(v);
+
+  if (!this.is_comparable(v)) {
+    result  = Amount.NaN();
+  } else if (this._is_negative !== v._is_negative) {
+    // Different sign.
+    result  = this._is_negative ? -1 : 1;
+  } else if (this._value.equals(BigInteger.ZERO)) {
+    // Same sign: positive.
+    result  = v._value.equals(BigInteger.ZERO) ? 0 : -1;
+  } else if (v._value.equals(BigInteger.ZERO)) {
+    // Same sign: positive.
+    result  = 1;
+  } else if (!this._is_native && this._offset > v._offset) {
+    result  = this._is_negative ? -1 : 1;
+  } else if (!this._is_native && this._offset < v._offset) {
+    result  = this._is_negative ? 1 : -1;
+  } else {
+    result  = this._value.compareTo(v._value);
+    if (result > 0) {
+      result  = this._is_negative ? -1 : 1;
+    } else if (result < 0) {
+      result  = this._is_negative ? 1 : -1;
+    }
+  }
+
+  return result;
+};
+
+// Make d a copy of this. Returns d.
+// Modification of objects internally refered to is not allowed.
+Amount.prototype.copyTo = function(d, negate) {
+  if (typeof this._value === 'object') {
+    this._value.copyTo(d._value);
+  } else {
+    d._value   = this._value;
+  }
+
+  d._offset = this._offset;
+  d._is_native = this._is_native;
+  d._is_negative  = negate
+    ? !this._is_negative    // Negating.
+    : this._is_negative;    // Just copying.
+
+  d._currency     = this._currency;
+  d._issuer       = this._issuer;
+
+  // Prevent negative zero
+  if (d.is_zero()) {
+    d._is_negative = false;
+  }
+
+  return d;
+};
+
+Amount.prototype.currency = function() {
+  return this._currency;
+};
+
+Amount.prototype.equals = function(d, ignore_issuer) {
+  if (typeof d === 'string') {
+    return this.equals(Amount.from_json(d));
+  }
+
+  var result = true;
+
+  result = !((!this.is_valid() || !d.is_valid())
+             || (this._is_native !== d._is_native)
+             || (!this._value.equals(d._value) || this._offset !== d._offset)
+             || (this._is_negative !== d._is_negative)
+             || (!this._is_native && (!this._currency.equals(d._currency) || !ignore_issuer && !this._issuer.equals(d._issuer))));
+
+  return result;
+};
+
 // True if Amounts are valid and both native or non-native.
 Amount.prototype.is_comparable = function(v) {
   return this._value instanceof BigInteger
@@ -518,50 +577,6 @@ Amount.prototype.is_zero = function() {
 
 Amount.prototype.issuer = function() {
   return this._issuer;
-};
-
-// Result in terms of this' currency and issuer.
-// XXX Diverges from cpp.
-Amount.prototype.multiply = function(v) {
-  var result;
-
-  if (this.is_zero()) {
-    result = this;
-  } else if (v.is_zero()) {
-    result = this.clone();
-    result._value = BigInteger.ZERO;
-  } else {
-    var v1 = this._value;
-    var o1 = this._offset;
-    var v2 = v._value;
-    var o2 = v._offset;
-
-    if (this.is_native()) {
-      while (v1.compareTo(consts.bi_man_min_value) < 0) {
-        v1 = v1.multiply(consts.bi_10);
-        o1 -= 1;
-      }
-    }
-
-    if (v.is_native()) {
-      while (v2.compareTo(consts.bi_man_min_value) < 0) {
-        v2 = v2.multiply(consts.bi_10);
-        o2 -= 1;
-      }
-    }
-
-    result              = new Amount();
-    result._offset      = o1 + o2 + 14;
-    result._value       = v1.multiply(v2).divide(consts.bi_1e14).add(consts.bi_7);
-    result._is_native   = this._is_native;
-    result._is_negative = this._is_negative !== v._is_negative;
-    result._currency    = this._currency;
-    result._issuer      = this._issuer;
-
-    result.canonicalize();
-  }
-
-  return result;
 };
 
 // Return a new value.
@@ -951,12 +966,6 @@ Amount.prototype.set_issuer = function(issuer) {
   }
 
   return this;
-};
-
-// Result in terms of this' currency and issuer.
-Amount.prototype.subtract = function(v) {
-  // Correctness over speed, less code has less bugs, reuse add code.
-  return this.add(Amount.from_json(v).negate());
 };
 
 Amount.prototype.to_number = function(allow_nan) {
