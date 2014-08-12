@@ -748,7 +748,6 @@ OrderBook.prototype.getOffersSync = function() {
  * Insert an offer into the orderbook
  *
  * @param {Object} node
- * @return {Boolean} inserted
  */
 
 OrderBook.prototype.insertOffer = function(node, fundedAmount) {
@@ -797,7 +796,6 @@ OrderBook.prototype.insertOffer = function(node, fundedAmount) {
  *
  * @param {Object} node
  * @param {Boolean} isDeletedNode
- * @return {Boolean} modified
  */
 
 OrderBook.prototype.modifyOffer = function(node, isDeletedNode) {
