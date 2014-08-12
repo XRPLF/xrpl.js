@@ -303,7 +303,7 @@ describe('OrderBook', function() {
 
     assert.deepEqual(offer, {
       TakerGets: offer.TakerGets,
-      taker_gets_funded: '100.1234',
+      taker_gets_funded: '100',
       is_fully_funded: true
     });
   });

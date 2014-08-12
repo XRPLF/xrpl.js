@@ -320,20 +320,23 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
   assert.strictEqual(typeof offer, 'object', 'Offer is invalid');
   assert(!isNaN(fundedAmount), 'Funds is invalid');
 
-  offer.taker_gets_funded = fundedAmount;
-
   var iouSuffix = '/USD/rrrrrrrrrrrrrrrrrrrrBZbvji';
 
-  var takerGets = Amount.from_json(
-    (typeof offer.TakerGets === 'object'
-     ? offer.TakerGets.value
-     : offer.TakerGets)
-     + iouSuffix
-  );
+  var takerGetsValue = (typeof offer.TakerGets === 'object')
+  ? offer.TakerGets.value
+  : offer.TakerGets;
+
+  var takerGets = Amount.from_json(takerGetsValue + iouSuffix);
 
   offer.is_fully_funded = Amount.from_json(
-    offer.taker_gets_funded + iouSuffix
+    fundedAmount + iouSuffix
   ).compareTo(takerGets) >= 0;
+
+  if (offer.is_fully_funded) {
+    offer.taker_gets_funded = takerGetsValue;
+  } else {
+    offer.taker_gets_funded = fundedAmount;
+  }
 
   return offer;
 };
