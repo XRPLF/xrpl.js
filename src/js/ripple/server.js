@@ -51,26 +51,26 @@ function Server(remote, opts) {
   }
 
   this._remote = remote;
-  this._opts   = opts;
-  this._ws     = void(0);
+  this._opts = opts;
+  this._ws = void(0);
 
-  this._connected     = false;
+  this._connected = false;
   this._shouldConnect = false;
-  this._state         = 'offline';
+  this._state = 'offline';
 
-  this._id       = 0;
-  this._retry    = 0;
+  this._id = 0; // request ID
+  this._retry = 0;
   this._requests = { };
 
-  this._load_base   = 256;
+  this._load_base = 256;
   this._load_factor = 256;
 
-  this._fee          = 10;
-  this._fee_ref      = 10;
-  this._fee_base     = 10;
+  this._fee = 10;
+  this._fee_ref = 10;
+  this._fee_base = 10;
   this._reserve_base = void(0);
-  this._reserve_inc  = void(0);
-  this._fee_cushion  = this._remote.fee_cushion;
+  this._reserve_inc = void(0);
+  this._fee_cushion = this._remote.fee_cushion;
 
   this._lastLedgerIndex = NaN;
   this._lastLedgerClose = NaN;
@@ -82,22 +82,18 @@ function Server(remote, opts) {
     response: 1
   };
 
+  this._pubkey_node = '';
+
   this._url = this._opts.url = (this._opts.secure ? 'wss://' : 'ws://')
       + this._opts.host + ':' + this._opts.port;
 
-  this._hostid = '';
-
-  function onMessage(message) {
+  this.on('message', function onMessage(message) {
     self._handleMessage(message);
-  };
+  });
 
-  this.on('message', onMessage);
-
-  function onSubscribeResponse(message) {
+  this.on('response_subscribe', function onSubscribe(message) {
     self._handleResponseSubscribe(message);
-  };
-
-  this.on('response_subscribe', onSubscribeResponse);
+  });
 
   function setActivityInterval() {
     var interval = self._checkActivity.bind(self);
@@ -111,26 +107,34 @@ function Server(remote, opts) {
 
   this.once('ledger_closed', setActivityInterval);
 
-  this._remote.on('ledger_closed', function(ledger) {
+  this._remote.on('ledger_closed', function onRemoteLedgerClose(ledger) {
     self._updateScore('ledgerclose', ledger);
   });
 
-  this.on('response_ping', function(message, request) {
+  this.on('response_ping', function onPingResponse(message, request) {
     self._updateScore('response', request);
   });
 
-  this.on('load_changed', function(load) {
+  this.on('load_changed', function onLoadChange(load) {
     self._updateScore('loadchange', load);
   });
 
-  this.on('response_server_info', function(message) {
-    try {
-      self._hostid = '(' +  message.info.pubkey_node + ')';
-    } catch (e) {
+  // If server is not up-to-date, request server_info
+  // for getting pubkey_node & hostid information.
+  // Otherwise this information is available on the
+  // initial server subscribe response
+  this.on('connect', function requestServerID() {
+    if (self._pubkey_node) {
+      return;
     }
-  });
 
-  this.on('connect', function() {
+    self.on('response_server_info', function setServerID(message) {
+      try {
+        self._pubkey_node = message.info.pubkey_node;
+      } catch (e) {
+      }
+    });
+
     self._request(self._remote.requestServerInfo());
   });
 };
@@ -181,7 +185,7 @@ Server.websocketConstructor = function() {
 Server.prototype._setState = function(state) {
   if (state !== this._state) {
     if (this._remote.trace) {
-      log.info('set_state:', this._opts.url, this._hostid, state);
+      log.info(this.getHostID(), 'set_state:', state);
     }
 
     this._state = state;
@@ -213,7 +217,7 @@ Server.prototype._setState = function(state) {
  */
 
 Server.prototype._checkActivity = function() {
-  if (!this._connected) {
+  if (!this.isConnected()) {
     return;
   }
 
@@ -224,7 +228,9 @@ Server.prototype._checkActivity = function() {
   var delta = (Date.now() - this._lastLedgerClose);
 
   if (delta > (1000 * 25)) {
-    log.info('reconnect: activity delta:', delta);
+    if (this._remote.trace) {
+      log.info(this.getHostID(), 'reconnect: activity delta:', delta);
+    }
     this.reconnect();
   }
 };
@@ -242,7 +248,7 @@ Server.prototype._checkActivity = function() {
  */
 
 Server.prototype._updateScore = function(type, data) {
-  if (!this._connected) {
+  if (!this.isConnected()) {
     return;
   }
 
@@ -268,7 +274,9 @@ Server.prototype._updateScore = function(type, data) {
   }
 
   if (this._score > 1e3) {
-    log.info('reconnect: score:', this._score);
+    if (this._remote.trace) {
+      log.info(this.getHostID(), 'reconnect: score:', this._score);
+    }
     this.reconnect();
   }
 };
@@ -293,8 +301,9 @@ Server.prototype._remoteAddress = function() {
  * Get the server's hostid
  */
 
-Server.prototype.getHostID = function() {
-  return this._hostid;
+Server.prototype.getHostID =
+Server.prototype.getServerID = function() {
+  return this._url + ' (' + (this._pubkey_node ? this._pubkey_node : '') + ')';
 };
 
 /**
@@ -306,7 +315,7 @@ Server.prototype.getHostID = function() {
 Server.prototype.disconnect = function() {
   var self = this;
 
-  if (!this._connected) {
+  if (!this.isConnected()) {
     this.once('socket_open', function() {
       self.disconnect();
     });
@@ -372,7 +381,7 @@ Server.prototype.connect = function() {
   // recently received a message from the server and the WebSocket has not
   // reported any issues either. If we do fail to ping or the connection drops,
   // we will automatically reconnect.
-  if (this._connected) {
+  if (this.isConnected()) {
     return;
   }
 
@@ -382,7 +391,7 @@ Server.prototype.connect = function() {
   }
 
   if (this._remote.trace) {
-    log.info('connect:', this._opts.url, this._hostid);
+    log.info(this.getServerID(), 'connect');
   }
 
   var ws = this._ws = new WebSocket(this._opts.url);
@@ -408,7 +417,7 @@ Server.prototype.connect = function() {
       self.emit('socket_error');
 
       if (self._remote.trace) {
-        log.info('onerror:', self._opts.url, self._hostid, e.data || e);
+        log.info(self.getServerID(), 'onerror:',  e.data || e);
       }
 
       // Most connection errors for WebSockets are conveyed as 'close' events with
@@ -432,7 +441,7 @@ Server.prototype.connect = function() {
   ws.onclose = function onClose() {
     if (ws === self._ws) {
       if (self._remote.trace) {
-        log.info('onclose:', self._opts.url, self._hostid, ws.readyState);
+        log.info(self.getServerID(), 'onclose:', ws.readyState);
       }
       self._handleClose();
     }
@@ -465,7 +474,7 @@ Server.prototype._retryConnect = function() {
   function connectionRetry() {
     if (self._shouldConnect) {
       if (self._remote.trace) {
-        log.info('retry', self._opts.url, self._hostid);
+        log.info(self.getServerID(), 'retry', self._retry);
       }
       self.connect();
     }
@@ -543,6 +552,7 @@ Server.prototype._handleServerStatus = function(message) {
   // This message is only received when online.
   // As we are connected, it is the definitive final state.
   var isOnline = ~Server.onlineStates.indexOf(message.server_status);
+
   this._setState(isOnline ? 'online' : 'offline');
 
   if (!Server.isLoadStatus(message)) {
@@ -571,14 +581,14 @@ Server.prototype._handleResponse = function(message) {
 
   if (!request) {
     if (this._remote.trace) {
-      log.info('UNEXPECTED:', this._opts.url, this._hostid, message);
+      log.info(this.getServerID(), 'UNEXPECTED:', message);
     }
     return;
   }
 
   if (message.status === 'success') {
     if (this._remote.trace) {
-      log.info('response:', this._opts.url, this._hostid, message);
+      log.info(this.getServerID(), 'response:', message);
     }
 
     var command = request.message.command;
@@ -592,22 +602,20 @@ Server.prototype._handleResponse = function(message) {
     });
   } else if (message.error) {
     if (this._remote.trace) {
-      log.info('error:', this._opts.url, this._hostid,  message);
+      log.info(this.getServerID(), 'error:', message);
     }
 
-    var error = {
+    request.emit('error', {
       error: 'remoteError',
       error_message: 'Remote reported an error.',
       remote: message
-    };
-
-    request.emit('error', error);
+    });
   }
 };
 
 Server.prototype._handlePathFind = function(message) {
   if (this._remote.trace) {
-    log.info('path_find:', this._opts.url, this._hostid,  message);
+    log.info(this.getServerID(), 'path_find:', message);
   }
 };
 
@@ -619,9 +627,6 @@ Server.prototype._handlePathFind = function(message) {
  */
 
 Server.prototype._handleResponseSubscribe = function(message) {
-  if (~(Server.onlineStates.indexOf(message.server_status))) {
-    this._setState('online');
-  }
   if (Server.isLoadStatus(message)) {
     this._load_base    = message.load_base || 256;
     this._load_factor  = message.load_factor || 256;
@@ -629,6 +634,12 @@ Server.prototype._handleResponseSubscribe = function(message) {
     this._fee_base     = message.fee_base;
     this._reserve_base = message.reserve_base;
     this._reserve_inc  = message.reserve_inc;
+  }
+  if (message.pubkey_node) {
+    this._pubkey_node = message.pubkey_node;
+  }
+  if (~(Server.onlineStates.indexOf(message.server_status))) {
+    this._setState('online');
   }
 };
 
@@ -665,7 +676,7 @@ Server.isLoadStatus = function(message) {
 Server.prototype._sendMessage = function(message) {
   if (this._ws) {
     if (this._remote.trace) {
-      log.info('request:', this._opts.url, this._hostid, message);
+      log.info(this.getServerID(), 'request:', message);
     }
     this._ws.send(JSON.stringify(message));
   }
@@ -687,7 +698,7 @@ Server.prototype._request = function(request) {
   // Only bother if we are still connected.
   if (!this._ws) {
     if (this._remote.trace) {
-      log.info('request: DROPPING:', self._opts.url, self._hostid, request.message);
+      log.info(this.getServerID(), 'request: DROPPING:', request.message);
     }
     return;
   }
