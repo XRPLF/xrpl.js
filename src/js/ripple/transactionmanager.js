@@ -389,6 +389,8 @@ TransactionManager.prototype._request = function(tx) {
       case 'tefALREADY':
         if (tx.responses === tx.submissions) {
           tx.emit('error', message);
+        } else {
+          submitRequest.once('success', submitted);
         }
         break;
       default:
