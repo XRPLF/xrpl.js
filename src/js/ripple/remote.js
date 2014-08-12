@@ -814,7 +814,7 @@ Remote.prototype.getServer = function() {
   }
 
   if (!this._servers.length) {
-    return result;
+    return null;
   }
 
   var connectedServers = this.getConnectedServers();
