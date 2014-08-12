@@ -966,7 +966,7 @@ OrderBook.prototype.notify = function(message) {
 
         var fundedAmount = message.transaction.owner_funds;
 
-        if (!isNaN(fundedAmount)) {{
+        if (!isNaN(fundedAmount)) {
           self.insertOffer(node, fundedAmount);
           return callback();
         }
