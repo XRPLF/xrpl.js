@@ -789,14 +789,26 @@ Remote.prototype.isConnected = function() {
 };
 
 /**
+ * Get array of connected servers
+ */
+
+Remote.prototype.getConnectedServers = function() {
+  var servers = [ ];
+  for (var i=0; i<this._servers.length; i++) {
+    if (this._servers[i].isConnected()) {
+      servers.push(this._servers[i]);
+    }
+  }
+  return servers;
+};
+
+/**
  * Select a server to handle a request. Servers are
  * automatically prioritized
  */
 
 Remote.prototype._getServer =
 Remote.prototype.getServer = function() {
-  var result = void(0);
-
   if (this._primary_server && this._primary_server.isConnected()) {
     return this._primary_server;
   }
@@ -805,31 +817,19 @@ Remote.prototype.getServer = function() {
     return result;
   }
 
-  function sortByScore(a, b) {
-    var aScore = a._score + a._fee;
-    var bScore = b._score + b._fee;
-    if (aScore > bScore) {
-      return 1;
-    } else if (aScore < bScore) {
-      return -1;
-    } else {
-      return 0;
-    }
-  };
+  var connectedServers = this.getConnectedServers();
+  var server = connectedServers[0];
+  var cScore = server._score + server._fee;
 
-  // Sort servers by score
-  this._servers.sort(sortByScore);
-
-  // First connected server
-  for (var i=0; i<this._servers.length; i++) {
-    var server = this._servers[i];
-    if ((server instanceof Server) && server._connected) {
-      result = server;
-      break;
+  for (var i=1; i<connectedServers.length; i++) {
+    var _server = connectedServers[i];
+    var bScore = _server._score + _server._fee;
+    if (bScore < cScore) {
+      server = _server;
     }
   }
 
-  return result;
+  return server;
 };
 
 /**
@@ -1479,15 +1479,15 @@ Remote.prototype.requestTxHistory = function(start, callback) {
  */
 
 Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
-  if (gets.hasOwnProperty('pays')) {
+  if (gets.hasOwnProperty('gets') || gets.hasOwnProperty('taker_gets')) {
     var options = gets;
     // This would mutate the `lastArg` in `arguments` to be `null` and is
     // redundant. Once upon a time, some awkward code was written f(g, null,
     // null, cb) ...
     // callback = pays;
     taker = options.taker;
-    pays = options.pays;
-    gets = options.gets;
+    pays = options.pays || options.taker_pays;
+    gets = options.gets || options.taker_gets;
   }
 
   var lastArg = arguments[arguments.length - 1];

@@ -386,6 +386,11 @@ TransactionManager.prototype._request = function(tx) {
       case 'tefPAST_SEQ':
         self._resubmit(1, tx);
         break;
+      case 'tefALREADY':
+        if (tx.responses === tx.submissions) {
+          tx.emit('error', message);
+        }
+        break;
       default:
         tx.emit('error', message);
     }
@@ -450,6 +455,7 @@ TransactionManager.prototype._request = function(tx) {
     message.result = message.engine_result || '';
 
     tx.result = message;
+    tx.responses += 1;
 
     if (remote.trace) {
       log.info('submit response:', message);
@@ -543,7 +549,7 @@ TransactionManager.prototype._request = function(tx) {
     }
 
     submitRequest.timeout(self._submissionTimeout, requestTimeout);
-    submitRequest.broadcast();
+    tx.submissions = submitRequest.broadcast();
 
     tx.attempts++;
     tx.emit('postsubmit');
@@ -656,6 +662,8 @@ TransactionManager.prototype.submit = function(tx) {
   }
 
   tx.attempts = 0;
+  tx.submissions = 0;
+  tx.responses = 0;
 
   // ND: this is the ONLY place we put the tx into the queue. The
   // TransactionQueue queue is merely a list, so any mutations to tx._hash
