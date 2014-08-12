@@ -964,10 +964,10 @@ OrderBook.prototype.notify = function(message) {
       case 'CreatedNode':
         self.incrementOfferCount(node.fields.Account);
 
-        if (self.hasCachedFunds(node.fields.Account)) {
-          // Account's balance is already cached. Use cached balance to
-          // set funding status on this offer
-          self.insertOffer(node, self.getCachedFunds(node.fields.Account));
+        var fundedAmount = message.transaction.owner_funds;
+
+        if (!isNaN(fundedAmount)) {{
+          self.insertOffer(node, fundedAmount);
           return callback();
         }
 
