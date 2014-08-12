@@ -33,23 +33,27 @@ function Request(remote, command) {
 util.inherits(Request, EventEmitter);
 
 Request.prototype.broadcast = function() {
-  this._broadcast = true;
-  return this.request();
+  var connectedServers = this.remote.getConnectedServers();
+  this.request(connectedServers);
+  return connectedServers.length;
 };
 
 // Send the request to a remote.
-Request.prototype.request = function(callback) {
+Request.prototype.request = function(servers, callback) {
   if (this.requested) {
     return this;
   }
 
-  this.requested = true;
+  if (typeof servers === 'function') {
+    callback = servers;
+  }
 
+  this.requested = true;
   this.on('error', function(){});
   this.emit('request', this.remote);
 
-  if (this._broadcast) {
-    this.remote._servers.forEach(function(server) {
+  if (Array.isArray(servers)) {
+    servers.forEach(function(server) {
       this.setServer(server);
       this.remote.request(this);
     }, this);
