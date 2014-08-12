@@ -1025,15 +1025,13 @@ describe('Server', function() {
     server.once('connect', function() {
       var receivedSubscribe = false;
 
-      assert.strictEqual(server._hostid, '');
-
       server.once('response_server_info', function() {
         receivedSubscribe = true;
       });
 
       server.once('disconnect', function() {
         assert(receivedSubscribe);
-        assert.strictEqual(server.getHostID(), '(n94pSqypSfddzAVj9qoezHyUoetsrMnwgNuBqRJ3WHvM8aMMf7rW)');
+        assert.strictEqual(server.getServerID(), 'ws://localhost:5748 (n94pSqypSfddzAVj9qoezHyUoetsrMnwgNuBqRJ3WHvM8aMMf7rW)');
         done();
       });
     });
