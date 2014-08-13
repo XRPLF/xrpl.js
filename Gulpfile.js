@@ -6,6 +6,7 @@ var webpack = require('webpack');
 var jshint = require('gulp-jshint');
 var map = require('map-stream');
 var bump = require('gulp-bump');
+var argv = require('yargs').argv;
 //var header = require('gulp-header');
 
 var pkg = require('./package.json');
@@ -89,6 +90,21 @@ gulp.task('bower-version', function() {
   gulp.src('./dist/bower.json')
   .pipe(bump({version: pkg.version}))
   .pipe(gulp.dest('./dist/'));
+});
+
+gulp.task('version-bump', function() {
+  if (!argv.type) {
+    throw new Error("No type found, pass it in using the --type argument");
+  }
+  gulp.src('./package.json')
+  .pipe(bump({type:argv.type}))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('version-beta', function() {
+  gulp.src('./package.json')
+  .pipe(bump({version: pkg.version+'-beta'}))
+  .pipe(gulp.dest('./'));
 });
 
 gulp.task('build-min', [ 'build' ], function(callback) {
