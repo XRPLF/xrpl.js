@@ -190,7 +190,7 @@ OrderBook.prototype.unsubscribe = function() {
 
 OrderBook.prototype.hasCachedFunds = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  return this._ownerFunds.hasOwnProperty(account);
+  return this._ownerFunds[account] !== void(0);
 };
 
 /**
@@ -225,7 +225,7 @@ OrderBook.prototype.getCachedFunds = function(account) {
 
 OrderBook.prototype.removeCachedFunds = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  delete this._ownerFunds[account];
+  this._ownerFunds[account] = void(0);
 };
 
 /**
@@ -238,7 +238,7 @@ OrderBook.prototype.getOfferCount = function(account) {
 };
 
 /**
- * Decrement offer count for offer owner
+ * Increment offer count for offer owner
  */
 
 OrderBook.prototype.incrementOfferCount = function(account) {
@@ -249,7 +249,7 @@ OrderBook.prototype.incrementOfferCount = function(account) {
 };
 
 /**
- * Increment offer count for offer owner
+ * Decrement offer count for offer owner
  */
 
 OrderBook.prototype.decrementOfferCount = function(account) {
