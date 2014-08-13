@@ -5,52 +5,113 @@ var Amount  = require('./amount').Amount;
 
 /**
  * Meta data processing facility
+ *
+ * @constructor
+ * @param {Object} transaction metadata
  */
 
-function Meta(raw_data) {
+function Meta(data) {
   var self = this;
 
   this.nodes = [ ];
 
-  raw_data.AffectedNodes.forEach(function(an) {
-    var result = { };
+  if (typeof data !== 'object') {
+    throw new TypeError('Missing metadata');
+  }
 
-    if ((result.diffType = self.diffType(an))) {
-      an = an[result.diffType];
+  if (!Array.isArray(data.AffectedNodes)) {
+    throw new TypeError('Metadata missing AffectedNodes');
+  }
 
-      result.entryType   = an.LedgerEntryType;
-      result.ledgerIndex = an.LedgerIndex;
-      result.fields      = extend({}, an.PreviousFields, an.NewFields, an.FinalFields);
-      result.fieldsPrev  = an.PreviousFields || {};
-      result.fieldsNew   = an.NewFields || {};
-      result.fieldsFinal = an.FinalFields || {};
-
-      // getAffectedBooks will set this
-      // result.bookKey   = undefined;
-
-      self.nodes.push(result);
-    }
-  });
+  data.AffectedNodes.forEach(this.addNode, this);
 };
 
-Meta.node_types = [
+Meta.nodeTypes = [
   'CreatedNode',
   'ModifiedNode',
   'DeletedNode'
 ];
 
-Meta.prototype.diffType = function(an) {
-  var result = false;
+Meta.amountFieldsAffectingIssuer = [
+  'LowLimit',
+  'HighLimit',
+  'TakerPays',
+  'TakerGets'
+];
 
-  for (var i=0; i<Meta.node_types.length; i++) {
-    var x = Meta.node_types[i];
-    if (an.hasOwnProperty(x)) {
-      result = x;
+/**
+ * @api private
+ */
+
+Meta.prototype.getNodeType = function(node) {
+  var result = null;
+
+  for (var i=0; i<Meta.nodeTypes.length; i++) {
+    var type = Meta.nodeTypes[i];
+    if (node.hasOwnProperty(type)) {
+      result = type;
       break;
     }
   }
 
   return result;
+};
+
+/**
+ * Add node to metadata
+ *
+ * @param {Object} node
+ * @api private
+ */
+
+Meta.prototype.addNode = function(node) {
+  this._affectedAccounts = void(0);
+  this._affectedBooks = void(0);
+
+  var result = { };
+
+  if ((result.nodeType = this.getNodeType(node))) {
+    node = node[result.nodeType];
+
+    result.diffType    = result.nodeType;
+    result.entryType   = node.LedgerEntryType;
+    result.ledgerIndex = node.LedgerIndex;
+    result.fields      = extend({ }, node.PreviousFields, node.NewFields, node.FinalFields);
+    result.fieldsPrev  = node.PreviousFields || { };
+    result.fieldsNew   = node.NewFields || { };
+    result.fieldsFinal = node.FinalFields || { };
+
+    // getAffectedBooks will set this
+    // result.bookKey   = undefined;
+
+    this.nodes.push(result);
+  }
+};
+
+/**
+ * Get affected nodes array
+ *
+ * @param {Object} filter options
+ * @return {Array} nodes
+ */
+
+Meta.prototype.getNodes = function(options) {
+  if (typeof options === 'object') {
+    return this.nodes.filter(function(node) {
+      if (options.nodeType && options.nodeType !== node.nodeType) {
+        return false;
+      }
+      if (options.entryType && options.entryType !== node.entryType) {
+        return false;
+      }
+      if (options.bookKey && options.bookKey !== node.bookKey) {
+        return false;
+      }
+      return true;
+    });
+  } else {
+    return this.nodes;
+  }
 };
 
 /**
@@ -61,7 +122,7 @@ Meta.prototype.diffType = function(an) {
  *
  *   {
  *     // Type of diff, e.g. CreatedNode, ModifiedNode
- *     diffType: 'CreatedNode'
+ *     nodeType: 'CreatedNode'
  *
  *     // Type of node affected, e.g. RippleState, AccountRoot
  *     entryType: 'RippleState',
@@ -72,7 +133,7 @@ Meta.prototype.diffType = function(an) {
  *     // Contains all fields with later versions taking precedence
  *     //
  *     // This is a shorthand for doing things like checking which account
- *     // this affected without having to check the diffType.
+ *     // this affected without having to check the nodeType.
  *     fields: {...},
  *
  *     // Old fields (before the change)
@@ -88,43 +149,39 @@ Meta.prototype.diffType = function(an) {
  * The second parameter to the callback is the index of the node in the metadata
  * (first entry is index 0).
  */
-Meta.prototype.each = function(fn) {
-  for (var i = 0, l = this.nodes.length; i < l; i++) {
-    fn(this.nodes[i], i);
-  }
-};
 
-([
+[
  'forEach',
  'map',
  'filter',
  'every',
+ 'some',
  'reduce'
-]).forEach(function(fn) {
+].forEach(function(fn) {
   Meta.prototype[fn] = function() {
     return Array.prototype[fn].apply(this.nodes, arguments);
   };
 });
 
-var amountFieldsAffectingIssuer = [
-  'LowLimit',
-  'HighLimit',
-  'TakerPays',
-  'TakerGets'
-];
+Meta.prototype.each = Meta.prototype.forEach;
 
-Meta.prototype.getAffectedAccounts = function() {
+Meta.prototype.getAffectedAccounts = function(from) {
+  if (this._affectedAccounts) {
+    return this._affectedAccounts;
+  }
+
   var accounts = [ ];
 
   // This code should match the behavior of the C++ method:
   // TransactionMetaSet::getAffectedAccounts
-  this.nodes.forEach(function(an) {
-    var fields = (an.diffType === 'CreatedNode') ? an.fieldsNew : an.fieldsFinal;
-    for (var i in fields) {
-      var field = fields[i];
+  for (var i=0; i<this.nodes.length; i++) {
+    var node = this.nodes[i];
+    var fields = (node.nodeType === 'CreatedNode') ? node.fieldsNew : node.fieldsFinal;
+    for (var fieldName in fields) {
+      var field = fields[fieldName];
       if (typeof field === 'string' && UInt160.is_valid(field)) {
         accounts.push(field);
-      } else if (amountFieldsAffectingIssuer.indexOf(i) !== -1) {
+      } else if (~Meta.amountFieldsAffectingIssuer.indexOf(fieldName)) {
         var amount = Amount.from_json(field);
         var issuer = amount.issuer();
         if (issuer.is_valid() && !issuer.is_zero()) {
@@ -132,43 +189,53 @@ Meta.prototype.getAffectedAccounts = function() {
         }
       }
     }
-  });
+  }
 
-  return utils.arrayUnique(accounts);
+  this._affectedAccounts = utils.arrayUnique(accounts);
+
+  return  this._affectedAccounts;
 };
 
 Meta.prototype.getAffectedBooks = function() {
+  if (this._affectedBooks) {
+    return this._affectedBooks;
+  }
+
   var books = [ ];
 
-  this.nodes.forEach(function(an) {
-    if (an.entryType !== 'Offer') {
-      return;
+  for (var i=0; i<this.nodes.length; i++) {
+    var node = this.nodes[i];
+
+    if (node.entryType !== 'Offer') {
+      continue;
     }
 
-    var gets = Amount.from_json(an.fields.TakerGets);
-    var pays = Amount.from_json(an.fields.TakerPays);
-
+    var gets = Amount.from_json(node.fields.TakerGets);
+    var pays = Amount.from_json(node.fields.TakerPays);
     var getsKey = gets.currency().to_json();
+    var paysKey = pays.currency().to_json();
+
     if (getsKey !== 'XRP') {
       getsKey += '/' + gets.issuer().to_json();
     }
 
-    var paysKey = pays.currency().to_json();
     if (paysKey !== 'XRP') {
       paysKey += '/' + pays.issuer().to_json();
     }
 
-    var key = [ getsKey, paysKey ].join(':');
+    var key = getsKey + ':' + paysKey;
 
     // Hell of a lot of work, so we are going to cache this. We can use this
     // later to good effect in OrderBook.notify to make sure we only process
     // pertinent offers.
-    an.bookKey = key;
+    node.bookKey = key;
 
     books.push(key);
-  });
+  }
 
-  return utils.arrayUnique(books);
+  this._affectedBooks = utils.arrayUnique(books);
+
+  return this._affectedBooks;
 };
 
 exports.Meta = Meta;
