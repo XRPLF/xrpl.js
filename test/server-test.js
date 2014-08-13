@@ -572,10 +572,13 @@ describe('Server', function() {
 
     var server = new Server(new Remote(), 'ws://localhost:5748');
 
+    server.once('disconnect', function() {
+      done();
+    });
+
     server.once('connect', function() {
       server._retryConnect = function(){
         wss.close();
-        done();
       };
       server._ws.emit('error', new Error());
     });
