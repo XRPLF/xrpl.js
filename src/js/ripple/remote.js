@@ -1480,18 +1480,18 @@ Remote.prototype.requestTxHistory = function(start, callback) {
  */
 
 Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
+  var lastArg = arguments[arguments.length - 1];
+
   if (gets.hasOwnProperty('gets') || gets.hasOwnProperty('taker_gets')) {
     var options = gets;
     // This would mutate the `lastArg` in `arguments` to be `null` and is
     // redundant. Once upon a time, some awkward code was written f(g, null,
     // null, cb) ...
-    // callback = pays;
+    callback = pays;
     taker = options.taker;
     pays = options.pays || options.taker_pays;
     gets = options.gets || options.taker_gets;
   }
-
-  var lastArg = arguments[arguments.length - 1];
 
   if (typeof lastArg === 'function') {
     callback = lastArg;
