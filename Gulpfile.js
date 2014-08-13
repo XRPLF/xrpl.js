@@ -94,7 +94,7 @@ gulp.task('bower-version', function() {
 
 gulp.task('version-bump', function() {
   if (!argv.type) {
-    throw "No type found, pass it in using the --type argument";
+    throw new Error("No type found, pass it in using the --type argument");
   }
   gulp.src('./package.json')
   .pipe(bump({type:argv.type}))
