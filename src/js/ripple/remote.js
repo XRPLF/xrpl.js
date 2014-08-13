@@ -2036,7 +2036,7 @@ Remote.prepareCurrencies = function(currency) {
   }
 
   if (currency.hasOwnProperty('currency')) {
-    newCurrency.currency = Currency.json_rewrite(currency.currency);
+    newCurrency.currency = Currency.json_rewrite(currency.currency, {force_hex:true});
   }
 
   return newCurrency;
