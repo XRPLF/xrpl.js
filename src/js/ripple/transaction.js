@@ -602,8 +602,8 @@ Transaction.prototype.setFlags = function(flags) {
  * Add a Memo to transaction. Memos can be used as key-value,
  * using the MemoType as a key
  *
- * @param {String} data
  * @param {String} type
+ * @param {String} data
  */
 
 Transaction.prototype.addMemo = function(type, data) {
