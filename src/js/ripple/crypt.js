@@ -56,6 +56,18 @@ function keyHash(key, token) {
   return sjcl.codec.hex.fromBits(sjcl.bitArray.bitSlice(hmac.encrypt(token), 0, 256));
 };
 
+/**
+ * add entropy at each call to get random words
+ * @param {number} nWords
+ */
+function randomWords (nWords) {
+  for (var i = 0; i < 8; i++) {
+    sjcl.random.addEntropy(Math.random(), 32, "Math.random()");
+  }  
+  
+  return sjcl.random.randomWords(nWords);  
+}
+
 /****** exposed functions ******/
 
 /**
@@ -213,7 +225,7 @@ Crypt.isValidAddress = function (address) {
  */
 
 Crypt.createSecret = function (nWords) {
-  return sjcl.codec.hex.fromBits(sjcl.random.randomWords(nWords));
+  return sjcl.codec.hex.fromBits(randomWords(nWords));
 };
 
 /**
@@ -221,7 +233,7 @@ Crypt.createSecret = function (nWords) {
  */
 
 Crypt.createMaster = function () {
-  return base.encode_check(33, sjcl.codec.bytes.fromBits(sjcl.random.randomWords(4)));
+  return base.encode_check(33, sjcl.codec.bytes.fromBits(randomWords(4)));
 };
 
 
