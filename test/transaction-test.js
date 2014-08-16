@@ -1050,7 +1050,7 @@ describe('Transaction', function() {
 
     assert.throws(function() {
       transaction.addMemo(1);
-    }, 'MemoType must be a string');
+    }, /^Error: MemoType must be a string$/);
   });
 
   it('Add Memo - invalid MemoData', function() {
@@ -1059,7 +1059,7 @@ describe('Transaction', function() {
 
     assert.throws(function() {
       transaction.addMemo('key', 1);
-    }, 'MemoData must be a string');
+    }, /^Error: MemoData must be a string$/);
   });
 
   it('Construct AccountSet transaction', function() {

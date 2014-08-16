@@ -612,7 +612,7 @@ Transaction.prototype.addMemo = function(type, data) {
   }
 
   if (!/(undefined|string)/.test(typeof data)) {
-    throw new Error('MemoData must be string');
+    throw new Error('MemoData must be a string');
   }
 
   function toHex(str) {
