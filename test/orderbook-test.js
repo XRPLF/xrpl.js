@@ -339,15 +339,18 @@ describe('OrderBook', function() {
         value: '100',
         currency: 'BTC',
         issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-      }
+      },
+      TakerPays: '123456'
     };
 
     book.setFundedAmount(offer, '100.1234');
 
     assert.deepEqual(offer, {
       TakerGets: offer.TakerGets,
+      TakerPays: offer.TakerPays,
+      is_fully_funded: true,
       taker_gets_funded: '100',
-      is_fully_funded: true
+      taker_pays_funded: '123456'
     });
   });
 
@@ -364,15 +367,18 @@ describe('OrderBook', function() {
         value: '100',
         currency: 'BTC',
         issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-      }
+      },
+      TakerPays: '123456'
     };
 
     book.setFundedAmount(offer, '99');
 
     assert.deepEqual(offer, {
       TakerGets: offer.TakerGets,
+      TakerPays: offer.TakerPays,
+      is_fully_funded: false,
       taker_gets_funded: '99',
-      is_fully_funded: false
+      taker_pays_funded: '122166'
     });
   });
 
@@ -385,16 +391,25 @@ describe('OrderBook', function() {
     });
 
     var offer = {
-      TakerGets: '100'
+      TakerGets: '100',
+      TakerPays: {
+        value: '100.1234',
+        currency: 'USD',
+        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+      }
     };
 
     book.setFundedAmount(offer, '100');
 
-    assert.deepEqual(offer, {
-      TakerGets: '100',
+    var expected = {
+      TakerGets: offer.TakerGets,
+      TakerPays: offer.TakerPays,
+      is_fully_funded: true,
       taker_gets_funded: '100',
-      is_fully_funded: true
-    });
+      taker_pays_funded: '100.1234'
+    };
+
+    assert.deepEqual(offer, expected);
   });
 
   it('Set funded amount - native currency - unfunded', function() {
@@ -406,15 +421,22 @@ describe('OrderBook', function() {
     });
 
     var offer = {
-      TakerGets: '100'
+      TakerGets: '100',
+      TakerPays: {
+        value: '100.1234',
+        currency: 'USD',
+        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+      }
     };
 
     book.setFundedAmount(offer, '99');
 
     assert.deepEqual(offer, {
-      TakerGets: '100',
+      TakerGets: offer.TakerGets,
+      TakerPays: offer.TakerPays,
+      is_fully_funded: false,
       taker_gets_funded: '99',
-      is_fully_funded: false
+      taker_pays_funded: '99.122166'
     });
   });
 
