@@ -153,8 +153,6 @@ OrderBook.prototype.subscribe = function() {
     log.info('subscribing', this._key);
   }
 
-  this.requestTransferRate();
-
   this.requestOffers().once('success', function() {
     self.subscribeTransactions();
   });
@@ -302,7 +300,6 @@ OrderBook.prototype.applyTransferRate = function(balance, transferRate) {
 
 OrderBook.prototype.requestTransferRate = function(callback) {
   var self = this;
-
   var issuer = this._issuerGets;
 
   this.once('transfer_rate', function(rate) {
@@ -587,6 +584,8 @@ OrderBook.prototype.updateFundedAmounts = function(message) {
     this.once('transfer_rate', function() {
       self.updateFundedAmounts(message);
     });
+
+    this.requestTransferRate();
     return;
   }
 
@@ -654,6 +653,20 @@ OrderBook.prototype.requestOffers = function() {
     return;
   }
 
+  if (!this._currencyGets.is_native() && !this._issuerTransferRate) {
+    // Defer until transfer rate is requested
+    if (this._remote.trace) {
+      log.info('waiting for transfer rate');
+    }
+
+    this.once('transfer_rate', function() {
+      self.requestOffers();
+    });
+
+    this.requestTransferRate();
+    return;
+  }
+
   if (this._remote.trace) {
     log.info('requesting offers', this._key);
   }
@@ -661,18 +674,6 @@ OrderBook.prototype.requestOffers = function() {
   function handleOffers(res) {
     if (!Array.isArray(res.offers)) {
       // XXX What now?
-      return;
-    }
-
-    if (!self._currencyGets.is_native() && !self._issuerTransferRate) {
-      // Defer until transfer rate is requested
-      if (self._remote.trace) {
-        log.info('waiting for transfer rate');
-      }
-
-      self.once('transfer_rate', function() {
-        handleOffers(res);
-      });
       return;
     }
 
