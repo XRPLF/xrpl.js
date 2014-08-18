@@ -683,8 +683,13 @@ OrderBook.prototype.requestOffers = function(callback) {
       log.info('requested offers', self._key, 'offers: ' + res.offers.length);
     }
 
-    self._offers = res.offers.map(function addOffer(offer) {
+    for (var i=0, l=res.offers.length; i<l; i++) {
+      var offer = res.offers[i];
       var fundedAmount;
+
+      if (Amount.from_json(offer.TakerGets).to_text() === '0') {
+        continue;
+      }
 
       if (self.hasCachedFunds(offer.Account)) {
         fundedAmount = self.getCachedFunds(offer.Account);
@@ -695,9 +700,8 @@ OrderBook.prototype.requestOffers = function(callback) {
 
       self.setFundedAmount(offer, fundedAmount);
       self.incrementOfferCount(offer.Account);
-
-      return offer;
-    });
+      self._offers.push(offer);
+    }
 
     self._synchronized = true;
 
@@ -1007,6 +1011,10 @@ OrderBook.prototype.notify = function(message) {
         break;
 
       case 'CreatedNode':
+        if (Amount.from_json(node.fields.TakerGets).to_text() === '0') {
+          return callback();
+        }
+
         self.incrementOfferCount(node.fields.Account);
 
         var fundedAmount = message.transaction.owner_funds;
