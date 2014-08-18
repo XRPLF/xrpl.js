@@ -153,8 +153,6 @@ OrderBook.prototype.subscribe = function() {
     log.info('subscribing', this._key);
   }
 
-  this.requestTransferRate();
-
   this.requestOffers().once('success', function() {
     self.subscribeTransactions();
   });
@@ -284,10 +282,8 @@ OrderBook.prototype.applyTransferRate = function(balance, transferRate) {
     return balance;
   }
 
-  var adjustedBalance = Amount.from_json(balance
-   + '/' + this._currencyGets.to_json()
-   + '/' + this._issuerGets
-  )
+  var iouSuffix = '/USD/rrrrrrrrrrrrrrrrrrrrBZbvji';
+  var adjustedBalance = Amount.from_json(balance + iouSuffix)
   .divide(transferRate)
   .multiply(Amount.from_json(OrderBook.DEFAULT_TRANSFER_RATE))
   .to_json()
@@ -304,7 +300,6 @@ OrderBook.prototype.applyTransferRate = function(balance, transferRate) {
 
 OrderBook.prototype.requestTransferRate = function(callback) {
   var self = this;
-
   var issuer = this._issuerGets;
 
   this.once('transfer_rate', function(rate) {
@@ -352,22 +347,43 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
   assert.strictEqual(typeof offer, 'object', 'Offer is invalid');
   assert(!isNaN(fundedAmount), 'Funds is invalid');
 
-  var iouSuffix = '/USD/rrrrrrrrrrrrrrrrrrrrBZbvji';
+  if (fundedAmount === '0') {
+    offer.taker_gets_funded = '0';
+    offer.taker_pays_funded = '0';
+    offer.is_fully_funded = false;
+    return offer;
+  }
 
   var takerGetsValue = (typeof offer.TakerGets === 'object')
   ? offer.TakerGets.value
   : offer.TakerGets;
 
-  var takerGets = Amount.from_json(takerGetsValue + iouSuffix);
+  var takerPaysValue = (typeof offer.TakerPays === 'object')
+  ? offer.TakerPays.value
+  : offer.TakerPays;
 
-  offer.is_fully_funded = Amount.from_json(
-    fundedAmount + iouSuffix
-  ).compareTo(takerGets) >= 0;
+  var iouSuffix = '/USD/rrrrrrrrrrrrrrrrrrrrBZbvji';
+  var fundedTakerGets = Amount.from_json(fundedAmount + iouSuffix);
+  var takerGets = Amount.from_json(takerGetsValue + iouSuffix);
+  var takerPays = Amount.from_json(takerPaysValue + iouSuffix);
+
+  offer.is_fully_funded = fundedTakerGets.compareTo(takerGets) >= 0;
 
   if (offer.is_fully_funded) {
     offer.taker_gets_funded = takerGetsValue;
+    offer.taker_pays_funded = takerPaysValue;
+    return offer;
+  }
+
+  offer.taker_gets_funded = fundedAmount;
+
+  var rate = Amount.from_json(offer.TakerPays).divide(offer.TakerGets);
+  var takerPaysFunded = fundedTakerGets.multiply(rate);
+
+  if (takerPaysFunded.compareTo(takerPays) <= 0) {
+    offer.taker_pays_funded = takerPaysFunded.to_text();
   } else {
-    offer.taker_gets_funded = fundedAmount;
+    offer.taker_pays_funded = takerPaysValue;
   }
 
   return offer;
@@ -568,6 +584,8 @@ OrderBook.prototype.updateFundedAmounts = function(message) {
     this.once('transfer_rate', function() {
       self.updateFundedAmounts(message);
     });
+
+    this.requestTransferRate();
     return;
   }
 
@@ -635,6 +653,20 @@ OrderBook.prototype.requestOffers = function() {
     return;
   }
 
+  if (!this._currencyGets.is_native() && !this._issuerTransferRate) {
+    // Defer until transfer rate is requested
+    if (this._remote.trace) {
+      log.info('waiting for transfer rate');
+    }
+
+    this.once('transfer_rate', function() {
+      self.requestOffers();
+    });
+
+    this.requestTransferRate();
+    return;
+  }
+
   if (this._remote.trace) {
     log.info('requesting offers', this._key);
   }
@@ -642,18 +674,6 @@ OrderBook.prototype.requestOffers = function() {
   function handleOffers(res) {
     if (!Array.isArray(res.offers)) {
       // XXX What now?
-      return;
-    }
-
-    if (!self._currencyGets.is_native() && !self._issuerTransferRate) {
-      // Defer until transfer rate is requested
-      if (self._remote.trace) {
-        log.info('waiting for transfer rate');
-      }
-
-      self.once('transfer_rate', function() {
-        handleOffers(res);
-      });
       return;
     }
 
@@ -882,15 +902,25 @@ OrderBook.prototype.updateOfferFunds = function(account, fundedAmount) {
   for (var i=0; i<this._offers.length; i++) {
     var offer = this._offers[i];
 
-    if (offer.Account === account) {
-      // Update funds for account's offer
-      var previousOffer = extend({}, offer);
-      var previousAmount = offer.taker_gets_funded;
+    if (offer.Account !== account) {
+      continue;
+    }
 
-      this.setFundedAmount(offer, fundedAmount);
+    var previousOffer = extend({}, offer);
+    var previousFundedGets = Amount.from_json(offer.taker_gets_funded);
 
+    this.setFundedAmount(offer, fundedAmount);
+
+    var hasChangedFunds = !previousFundedGets.equals(
+      Amount.from_json(offer.taker_gets_funded));
+
+    if (hasChangedFunds) {
       this.emit('offer_changed', previousOffer, offer);
-      this.emit('offer_funds_changed', offer, previousAmount, fundedAmount);
+      this.emit(
+        'offer_funds_changed', offer,
+        previousOffer.taker_gets_funded,
+        fundedAmount
+      );
     }
   }
 };
