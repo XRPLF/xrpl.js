@@ -687,10 +687,6 @@ OrderBook.prototype.requestOffers = function(callback) {
       var offer = res.offers[i];
       var fundedAmount;
 
-      if (Amount.from_json(offer.TakerGets).to_text() === '0') {
-        continue;
-      }
-
       if (self.hasCachedFunds(offer.Account)) {
         fundedAmount = self.getCachedFunds(offer.Account);
       } else if (offer.hasOwnProperty('owner_funds')) {
@@ -1011,10 +1007,6 @@ OrderBook.prototype.notify = function(message) {
         break;
 
       case 'CreatedNode':
-        if (Amount.from_json(node.fields.TakerGets).to_text() === '0') {
-          return callback();
-        }
-
         self.incrementOfferCount(node.fields.Account);
 
         var fundedAmount = message.transaction.owner_funds;
