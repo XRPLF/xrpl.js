@@ -292,9 +292,7 @@ describe('Transaction', function() {
     var s3 = new Server(remote, 'wss://s-west.ripple.com:443');
     s3._connected = true;
 
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     s3._load_factor = (256 * 7) + 1;
-    // Is this ever possible? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     var s4 = new Server(remote, 'wss://s-west.ripple.com:443');
     s4._connected = true;
@@ -1015,6 +1013,53 @@ describe('Transaction', function() {
     });
 
     transaction.setFlags('test');
+  });
+
+  it('Add Memo', function() {
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+
+    transaction.addMemo('testkey', 'testvalue');
+    transaction.addMemo('testkey2', 'testvalue2');
+    transaction.addMemo('testkey3');
+    transaction.addMemo(void(0), 'testvalue4');
+
+    var expected = [
+      { Memo: {
+        MemoType: new Buffer('testkey').toString('hex'),
+        MemoData: new Buffer('testvalue').toString('hex')
+      }},
+      { Memo: {
+        MemoType: new Buffer('testkey2').toString('hex'),
+        MemoData: new Buffer('testvalue2').toString('hex')
+      }},
+      { Memo: {
+        MemoType: new Buffer('testkey3').toString('hex')
+      }},
+      { Memo: {
+        MemoData: new Buffer('testvalue4').toString('hex')
+      } }
+    ];
+
+    assert.deepEqual(transaction.tx_json.Memos, expected);
+  });
+
+  it('Add Memo - invalid MemoType', function() {
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+
+    assert.throws(function() {
+      transaction.addMemo(1);
+    }, /^Error: MemoType must be a string$/);
+  });
+
+  it('Add Memo - invalid MemoData', function() {
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+
+    assert.throws(function() {
+      transaction.addMemo('key', 1);
+    }, /^Error: MemoData must be a string$/);
   });
 
   it('Construct AccountSet transaction', function() {

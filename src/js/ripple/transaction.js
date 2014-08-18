@@ -167,6 +167,9 @@ Transaction.set_clear_flags = {
   }
 };
 
+Transaction.MEMO_TYPES = {
+};
+
 Transaction.formats = require('./binformat').tx;
 
 Transaction.prototype.consts = {
@@ -591,6 +594,48 @@ Transaction.prototype.setFlags = function(flags) {
       return this.emit('error', new RippleError('tejInvalidFlag'));
     }
   }
+
+  return this;
+};
+
+/**
+ * Add a Memo to transaction. Memos can be used as key-value,
+ * using the MemoType as a key
+ *
+ * @param {String} type
+ * @param {String} data
+ */
+
+Transaction.prototype.addMemo = function(type, data) {
+  if (!/(undefined|string)/.test(typeof type)) {
+    throw new Error('MemoType must be a string');
+  }
+
+  if (!/(undefined|string)/.test(typeof data)) {
+    throw new Error('MemoData must be a string');
+  }
+
+  function toHex(str) {
+    return sjcl.codec.hex.fromBits(sjcl.codec.utf8String.toBits(str));
+  };
+
+  var memo = { };
+
+  if (type) {
+    if (Transaction.MEMO_TYPES[type]) {
+      //XXX Maybe in the future we want a schema validator for
+      //memo types
+      memo.MemoType = Transaction.MEMO_TYPES[type];
+    } else {
+      memo.MemoType = toHex(type);
+    }
+  }
+
+  if (data) {
+    memo.MemoData = toHex(data);
+  }
+
+  this.tx_json.Memos = (this.tx_json.Memos || []).concat({ Memo: memo });
 
   return this;
 };

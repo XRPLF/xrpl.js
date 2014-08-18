@@ -916,13 +916,21 @@ BlobClient.get = function (options, fn) {
  * request new token to be sent for 2FA
  * @param {string} url
  * @param {string} id
+ * @param {string} force_sms
  */
 
-BlobClient.requestToken = function (url, id, fn) {
+BlobClient.requestToken = function (url, id, force_sms, fn) {
   var config = {
     method : 'GET',
     url    : url + '/v1/blob/' + id + '/2FA/requestToken'
   };
+  
+  
+  if (force_sms && force_sms instanceof Function) {
+    fn = force_sms;
+  } else if (force_sms) {
+    config.url += "?force_sms=true";
+  }
   
   request.get(config.url)
     .end(function(err, resp) { 
