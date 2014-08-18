@@ -72,13 +72,9 @@ describe('OrderBook', function() {
       done();
     };
 
-    book.requestOffers = function() {
+    book.requestOffers = function(callback) {
       requestedOffers = true;
-      var em = new process.EventEmitter();
-      setImmediate(function() {
-        em.emit('success', { offers: [ ] });
-      });
-      return em;
+      callback();
     };
 
     book.subscribe();
