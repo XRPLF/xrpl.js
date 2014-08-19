@@ -153,8 +153,20 @@ OrderBook.prototype.subscribe = function() {
     log.info('subscribing', this._key);
   }
 
-  this.requestOffers().once('success', function() {
-    self.subscribeTransactions();
+  var steps = [
+    function(callback) {
+      self.requestTransferRate(callback);
+    },
+    function(callback) {
+      self.requestOffers(callback);
+    },
+    function(callback) {
+      self.subscribeTransactions(callback);
+    }
+  ];
+
+  async.series(steps, function(err) {
+    //XXX What now?
   });
 };
 
@@ -174,8 +186,10 @@ OrderBook.prototype.unsubscribe = function() {
   this._shouldSubscribe = false;
 
   OrderBook.EVENTS.forEach(function(event) {
-    this.removeAllListeners(event);
-  }, this);
+    if (self.listeners(event).length > 0) {
+      self.removeAllListeners(event);
+    }
+  });
 
   this.emit('unsubscribe');
 };
@@ -353,6 +367,10 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
     offer.is_fully_funded = false;
     return offer;
   }
+
+  function sixFigures(str) {
+    return str.substring(0, str.indexOf('.') + 7);
+  };
 
   var takerGetsValue = (typeof offer.TakerGets === 'object')
   ? offer.TakerGets.value
@@ -646,25 +664,15 @@ OrderBook.prototype.updateTransferRate = function(message) {
  * Request orderbook entries from server
  */
 
-OrderBook.prototype.requestOffers = function() {
+OrderBook.prototype.requestOffers = function(callback) {
   var self = this;
 
-  if (!this._shouldSubscribe) {
-    return;
+  if (typeof callback !== 'function') {
+    callback = function(){};
   }
 
-  if (!this._currencyGets.is_native() && !this._issuerTransferRate) {
-    // Defer until transfer rate is requested
-    if (this._remote.trace) {
-      log.info('waiting for transfer rate');
-    }
-
-    this.once('transfer_rate', function() {
-      self.requestOffers();
-    });
-
-    this.requestTransferRate();
-    return;
+  if (!this._shouldSubscribe) {
+    return callback(new Error('Should not request offers'));
   }
 
   if (this._remote.trace) {
@@ -674,14 +682,15 @@ OrderBook.prototype.requestOffers = function() {
   function handleOffers(res) {
     if (!Array.isArray(res.offers)) {
       // XXX What now?
-      return;
+      return callback(new Error('Invalid response'));
     }
 
     if (self._remote.trace) {
       log.info('requested offers', self._key, 'offers: ' + res.offers.length);
     }
 
-    self._offers = res.offers.map(function addOffer(offer) {
+    for (var i=0, l=res.offers.length; i<l; i++) {
+      var offer = res.offers[i];
       var fundedAmount;
 
       if (self.hasCachedFunds(offer.Account)) {
@@ -693,13 +702,14 @@ OrderBook.prototype.requestOffers = function() {
 
       self.setFundedAmount(offer, fundedAmount);
       self.incrementOfferCount(offer.Account);
-
-      return offer;
-    });
+      self._offers.push(offer);
+    }
 
     self._synchronized = true;
 
     self.emit('model', self._offers);
+
+    callback(null, self._offers);
   };
 
   function handleError(err) {
@@ -707,6 +717,8 @@ OrderBook.prototype.requestOffers = function() {
     if (self._remote.trace) {
       log.info('failed to request offers', self._key, err);
     }
+
+    callback(err);
   };
 
   var request = this._remote.requestBookOffers(this.toJSON());
@@ -721,28 +733,37 @@ OrderBook.prototype.requestOffers = function() {
  * Subscribe to transactions stream
  */
 
-OrderBook.prototype.subscribeTransactions = function() {
+OrderBook.prototype.subscribeTransactions = function(callback) {
   var self = this;
 
+  if (typeof callback !== 'function') {
+    callback = function(){};
+  }
+
   if (!this._shouldSubscribe) {
-    return;
+    return callback('Should not subscribe');
   }
 
   if (this._remote.trace) {
     log.info('subscribing to transactions');
   }
 
-  function handleSubscribed() {
-    self._subscribed = true;
+  function handleSubscribed(res) {
     if (self._remote.trace) {
       log.info('subscribed to transactions');
     }
+
+    self._subscribed = true;
+
+    callback(null, res);
   };
 
   function handleError(err) {
     if (self._remote.trace) {
       log.info('failed to subscribe to transactions', self._key, err);
     }
+
+    callback(err);
   };
 
   var request = this._remote.requestSubscribe();
