@@ -89,6 +89,7 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
 
   this._remote.on('disconnect', function() {
     self._ownerFunds = { };
+    self._offerCounts = { };
     self._synchronized = false;
   });
 
@@ -940,7 +941,7 @@ OrderBook.prototype.updateOfferFunds = function(account, fundedAmount) {
       this.emit(
         'offer_funds_changed', offer,
         previousOffer.taker_gets_funded,
-        fundedAmount
+        offer.taker_gets_funded
       );
     }
   }
