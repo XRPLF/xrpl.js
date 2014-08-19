@@ -928,13 +928,15 @@ OrderBook.prototype.updateOfferFunds = function(account, fundedAmount) {
       continue;
     }
 
+    var suffix = '/USD/rrrrrrrrrrrrrrrrrrrrBZbvji';
     var previousOffer = extend({}, offer);
-    var previousFundedGets = Amount.from_json(offer.taker_gets_funded);
+    var previousFundedGets = Amount.from_json(offer.taker_gets_funded + suffix);
 
     this.setFundedAmount(offer, fundedAmount);
 
     var hasChangedFunds = !previousFundedGets.equals(
-      Amount.from_json(offer.taker_gets_funded));
+      Amount.from_json(offer.taker_gets_funded + suffix)
+    );
 
     if (hasChangedFunds) {
       this.emit('offer_changed', previousOffer, offer);
