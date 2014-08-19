@@ -186,8 +186,10 @@ OrderBook.prototype.unsubscribe = function() {
   this._shouldSubscribe = false;
 
   OrderBook.EVENTS.forEach(function(event) {
-    this.removeAllListeners(event);
-  }, this);
+    if (self.listeners(event).length > 0) {
+      self.removeAllListeners(event);
+    }
+  });
 
   this.emit('unsubscribe');
 };
@@ -365,6 +367,10 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
     offer.is_fully_funded = false;
     return offer;
   }
+
+  function sixFigures(str) {
+    return str.substring(0, str.indexOf('.') + 7);
+  };
 
   var takerGetsValue = (typeof offer.TakerGets === 'object')
   ? offer.TakerGets.value
