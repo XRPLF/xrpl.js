@@ -996,7 +996,7 @@ describe('OrderBook', function() {
 
     book.on('offer_funds_changed', function(offer, previousFunds, newFunds) {
       assert.strictEqual(previousFunds, '100');
-      assert.strictEqual(newFunds, '10');
+      assert.strictEqual(newFunds, '4.9656112525');
       switch (++receivedFundsChangedEvents) {
         case 1:
           assert(!offer.is_fully_funded);
@@ -1130,7 +1130,7 @@ describe('OrderBook', function() {
 
     book.on('offer_funds_changed', function(offer, previousFunds, newFunds) {
       assert.strictEqual(previousFunds, '100');
-      assert.strictEqual(newFunds, '25');
+      assert.strictEqual(newFunds, '10');
       switch (++receivedFundsChangedEvents) {
         case 1:
           assert(!offer.is_fully_funded);
