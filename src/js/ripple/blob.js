@@ -119,7 +119,9 @@ BlobObj.prototype.init = function(fn) {
     
     self.revision         = resp.body.revision;
     self.encrypted_secret = resp.body.encrypted_secret;
+    self.identity_id      = resp.body.identity_id;
     self.missing_fields   = resp.body.missing_fields;
+    //self.attestations     = resp.body.attestation_summary;
     
     if (!self.decrypt(resp.body.blob)) {
       return fn(new Error('Error while decrypting blob'));
@@ -1115,48 +1117,6 @@ BlobClient.recoverBlob = function (opts, fn) {
   };
 };
 
-/**
- * updateProfile
- * update information stored outside the blob - HMAC signed
- * @param {object}
- * @param {string} opts.url
- * @param {string} opts.username
- * @param {string} opts.auth_secret
- * @param {srring} opts.blob_id
- * @param {object} opts.profile
- * @param {string} opts.profile.phone - optional
- * @param {string} opts.profile.country - optional
- * @param {string} opts.profile.region - optional
- * @param {string} opts.profile.city - optional
- */
-
-BlobClient.updateProfile = function (opts, fn) {
-  var config = {
-    method: 'POST',
-    url: opts.url + '/v1/user/' + opts.username + '/profile',
-    dataType: 'json',
-    data: opts.profile
-  };
-
-  var signedRequest = new SignedRequest(config);
-  var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
-  
-  request.post(signed.url)
-    .send(signed.data)
-    .end(function(err, resp) {
-      if (err) {
-        log.error('updateProfile:', err);
-        fn(new Error('Failed to update profile - XHR error'));
-      } else if (resp.body && resp.body.result === 'success') {
-        fn(null, resp.body);
-      } else if (resp.body) {
-        log.error('updateProfile:', resp.body);
-      } else {
-        fn(new Error('Failed to update profile'));
-      }
-    });
-  
-};
 
 /**
  * updateKeys
@@ -1320,6 +1280,7 @@ BlobClient.create = function(options, fn) {
       if (err) {
         fn(err);
       } else if (resp.body && resp.body.result === 'success') {
+        blob.identity_id = resp.body.identity_id;
         fn(null, blob, resp.body);
       } else if (resp.body && resp.body.result === 'error') {
         fn(new Error(resp.body.message)); 
@@ -1361,6 +1322,165 @@ BlobClient.deleteBlob = function(options, fn) {
         fn(new Error('Could not delete blob'));
       }
     });  
+};
+
+
+/*** identity related functions ***/
+
+/**
+ * updateProfile
+ * update information stored outside the blob - HMAC signed
+ * @param {object}
+ * @param {string} opts.url
+ * @param {string} opts.auth_secret
+ * @param {srring} opts.blob_id
+ * @param {srring} opts.identity_id
+ * @param {object} opts.profile 
+ * @param {array}  opts.profile.attributes (optional, array of attribute objects)
+ * @param {array}  opts.profile.addresses (optional, array of address objects)
+ * 
+ * @param {string} attribute.id ... id of existing attribute
+ * @param {string} attribute.name ... attribute name i.e. ripple_address
+ * @param {string} attribute.type ... optional, sub-type of attribute
+ * @param {string} attribute.value ... value of attribute
+ * @param {string} attribute.domain ... corresponding domain
+ * @param {string} attribute.status ... “current”, “removed”, etc.
+ * @param {string} attribute.visibitlity ... “public”, ”private”
+
+ */
+
+BlobClient.updateProfile = function (opts, fn) {
+  var config = {
+    method: 'POST',
+    url: opts.url + '/v1/profile/' + opts.identity_id,
+    dataType: 'json',
+    data: opts.profile
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
+  
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      
+      if (err) {
+        log.error('updateProfile:', err);
+        fn(new Error('Failed to update profile - XHR error'));
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body) {
+        log.error('updateProfile:', resp.body);
+      } else {
+        fn(new Error('Failed to update profile'));
+      } 
+    });
+};
+
+/**
+ * getProfile
+ * @param {Object} opts
+ * @param {string} opts.url
+ * @param {string} opts.auth_secret
+ * @param {srring} opts.blob_id
+ * @param {srring} opts.identity_id
+ */
+BlobClient.getProfile = function (opts, fn) {
+  var config = {
+    method: 'GET',
+    url: opts.url + '/v1/profile/' + opts.identity_id,
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
+  
+  request.get(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      
+      if (err) {
+        log.error('getProfile:', err);
+        fn(new Error('Failed to get profile - XHR error'));
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body) {
+        log.error('getProfile:', resp.body);
+      } else {
+        fn(new Error('Failed to get profile'));
+      } 
+    });
+};
+
+/**
+ * getAttestations
+ * @param {Object} opts
+ * @param {string} opts.url
+ * @param {string} opts.auth_secret
+ * @param {srring} opts.blob_id
+ * @param {srring} opts.identity_id
+ */
+BlobClient.getAttestations = function (opts, fn) {
+  var config = {
+    method: 'GET',
+    url: opts.url + '/v1/profile/' + opts.identity_id + '/attestations',
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
+  
+  request.get(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      
+      if (err) {
+        log.error('getAttestations:', err);
+        fn(new Error('Failed to get attestations - XHR error'));
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body) {
+        log.error('getAttestations:', resp.body);
+      } else {
+        fn(new Error('Failed to get attestations'));
+      } 
+    });
+};
+
+/**
+ * attest
+ * @param {Object} opts
+ * @param {string} opts.url
+ * @param {string} opts.auth_secret
+ * @param {srring} opts.blob_id
+ * @param {srring} opts.identity_id
+ * @param {srring} opts.type (email,phone,basic_identity)
+ */
+BlobClient.attest = function (opts, fn) {
+  var config = {
+    method: 'POST',
+    url: opts.url + '/v1/profile/' + opts.identity_id + '/attest',
+    dataType: 'json',
+    data: opts.profile
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
+  
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      console.log(err, resp);
+      
+      if (err) {
+        log.error('attest:', err);
+        fn(new Error('Failed to attest - XHR error'));
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body) {
+        log.error('attest:', resp.body);
+      } else {
+        fn(new Error('Failed to attest'));
+      } 
+    });
 };
 
 exports.BlobClient = BlobClient;

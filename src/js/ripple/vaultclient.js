@@ -575,8 +575,6 @@ VaultClient.prototype.generateDeviceID = function () {
 
 VaultClient.prototype.resendEmail   = blobClient.resendEmail;
 
-VaultClient.prototype.updateProfile = blobClient.updateProfile;
-
 VaultClient.prototype.recoverBlob   = blobClient.recoverBlob;
 
 VaultClient.prototype.deleteBlob    = blobClient.deleteBlob;
@@ -584,6 +582,14 @@ VaultClient.prototype.deleteBlob    = blobClient.deleteBlob;
 VaultClient.prototype.requestToken  = blobClient.requestToken;
 
 VaultClient.prototype.verifyToken   = blobClient.verifyToken;
+
+VaultClient.prototype.updateProfile = blobClient.updateProfile;
+
+VaultClient.prototype.getProfile    = blobClient.getProfile;
+
+VaultClient.prototype.attest        = blobClient.attest;
+
+VaultClient.prototype.getAttestations = blobClient.getAttestations;
 
 //export by name
 exports.VaultClient = VaultClient;
