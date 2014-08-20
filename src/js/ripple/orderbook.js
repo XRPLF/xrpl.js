@@ -385,11 +385,13 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
     var rate = Amount.from_json(offer.TakerPays)
     .divide(Amount.from_json(offer.TakerGets));
 
-    var fundedPays = Amount.from_json(offer.TakerGets).multiply(rate);
+    var fundedPays = Amount.from_json(
+      this._currencyPays.is_native()
+      ? fundedAmount
+      : fundedAmount + '/' + this._currencyPays.to_json() + '/' + this._issuerPays
+    ).multiply(rate);
 
-    fundedPays.set_issuer(Amount.from_json(offer.TakerPays).issuer());
-
-    if (fundedPays.compareTo(Amount.from_json(offer.TakerPays)) < 0) {
+    if (fundedPays.compareTo(Amount.from_json(offer.TakerPays)) <= 0) {
       offer.taker_pays_funded = fundedPays.to_text();
     } else {
       offer.taker_pays_funded = Amount.from_json(offer.TakerPays).to_text();
