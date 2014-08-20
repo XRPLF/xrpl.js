@@ -6,359 +6,359 @@ var Amount = utils.load_module('amount').Amount;
 var Meta = utils.load_module('meta').Meta;
 
 describe('OrderBook', function() {
-//  it('toJSON', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//    assert.deepEqual(book.toJSON(), {
-//      taker_gets: {
-//        currency: Currency.from_json('XRP').to_hex()
-//      },
-//      taker_pays: {
-//        currency: Currency.from_json('BTC').to_hex(),
-//        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-//      }
-//    });
-//    book = new Remote().createOrderBook({
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_gets: 'BTC',
-//      currency_pays: 'XRP'
-//    });
-//    assert.deepEqual(book.toJSON(), {
-//      taker_gets: {
-//        currency: Currency.from_json('BTC').to_hex(),
-//        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-//      },
-//      taker_pays: {
-//        currency: Currency.from_json('XRP').to_hex()
-//      },
-//    });
-//  });
-//
-//  it('Check orderbook validity', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//    assert(book.isValid());
-//  });
-//
-//  it('Automatic subscription (based on listeners)', function(done) {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//    book.subscribe = function() {
-//      done();
-//    };
-//    book.on('model', function(){});
-//  });
-//
-//  it('Subscribe', function(done) {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//
-//    var requestedOffers = false;
-//
-//    book.subscribeTransactions = function() {
-//      assert(requestedOffers);
-//      done();
-//    };
-//
-//    book.requestOffers = function(callback) {
-//      requestedOffers = true;
-//      callback();
-//    };
-//
-//    book.subscribe();
-//  });
-//
-//  it('Unsubscribe', function(done) {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//
-//    book.once('unsubscribe', function() {
-//      done();
-//    });
-//
-//    book.on('model', function(){});
-//
-//    book.unsubscribe();
-//
-//    assert(!book._subscribed);
-//    assert(!book._shouldConnect);
-//    assert.deepEqual(book.listeners(), []);
-//  });
-//
-//  it('Automatic unsubscription (based on listeners)', function(done) {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//    book.unsubscribe = function() {
-//      done();
-//    };
-//    book.on('model', function(){});
-//    book.removeAllListeners('model');
-//  });
-//
-//  it('Add cached owner funds', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//    book.addCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
-//    assert.strictEqual(book.getCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'), '1');
-//  });
-//
-//  it('Add cached owner funds - invalid account', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//    assert.throws(function() {
-//      book.addCachedFunds('0rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
-//    });
-//  });
-//
-//  it('Has cached owner funds', function() {
-//    var book =  new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//    book.addCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
-//    assert(book.hasCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'));
-//  });
-//
-//  it('Has cached owner funds - invalid account', function() {
-//    var book =  new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//    assert.throws(function() {
-//      book.addCachedFunds('0rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
-//    });
-//  });
-//
-//  it('Remove cached owner funds', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//    book.addCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
-//    assert(book.hasCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'));
-//    book.removeCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji');
-//    assert(!book.hasCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'));
-//  });
-//
-//  it('Remove cached owner funds', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//    book.addCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
-//    assert(book.hasCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'));
-//    assert.throws(function() {
-//      book.removeCachedFunds('0rrrrrrrrrrrrrrrrrrrrBZbvji');
-//    });
-//  });
-//
-//  it('Increment offer count', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//    assert.strictEqual(book.incrementOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 1);
-//    assert.strictEqual(book.getOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 1);
-//  });
-//
-//  it('Increment offer count - invalid address', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//    assert.throws(function() {
-//      book.incrementOfferCount('zrrrrrrrrrrrrrrrrrrrBZbvji');
-//    });
-//  });
-//
-//  it('Decrement offer count', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//    book.incrementOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji');
-//    assert.strictEqual(book.decrementOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 0);
-//    assert.strictEqual(book.getOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 0);
-//  });
-//
-//  it('Decrement offer count - invalid address', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//    assert.throws(function() {
-//      book.decrementOfferCount('zrrrrrrrrrrrrrrrrrrrBZbvji');
-//    });
-//  });
-//
-//  it('Apply transfer rate', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//    assert.strictEqual(book.applyTransferRate('1', 1002000000), '0.9980039920159681');
-//  });
-//
-//  it('Apply transfer rate - cached transfer rate', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//    book._issuerTransferRate = 1002000000;
-//    assert.strictEqual(book.applyTransferRate('1'), '0.9980039920159681');
-//  });
-//
-//  it('Apply transfer rate - invalid balance', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//    assert.throws(function() {
-//      book.applyTransferRate('asdf');
-//    });
-//  });
-//
-//  it('Apply transfer rate - invalid transfer rate', function() {
-//    var book = new Remote().createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//    assert.throws(function() {
-//      book.applyTransferRate('1', 'asdf');
-//    });
-//  });
-//
-//  it('Request transfer rate', function() {
-//    var remote = new Remote();
-//    var book = remote.createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//
-//    remote.request = function(request) {
-//      assert.deepEqual(request.message, {
-//        command: 'account_info',
-//        id: void(0),
-//        ident: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//        account: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-//      });
-//      request.emit('success', {
-//        account_data: {
-//          TransferRate: 1002000000
-//        }
-//      });
-//    };
-//
-//    book.requestTransferRate(function(err, rate) {
-//      assert.ifError(err);
-//      assert.strictEqual(rate, 1002000000);
-//    });
-//  });
-//
-//  it('Request transfer rate - cached transfer rate', function() {
-//    var remote = new Remote();
-//    var book = remote.createOrderBook({
-//      currency_gets: 'BTC',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'XRP'
-//    });
-//
-//    book._issuerTransferRate = 1002000000;
-//
-//    remote.request = function(request) {
-//      assert(false);
-//    };
-//
-//    book.requestTransferRate(function(err, rate) {
-//      assert.ifError(err);
-//      assert.strictEqual(rate, 1002000000);
-//    });
-//  });
-//
-//  it('Request transfer rate - native currency', function() {
-//    var remote = new Remote();
-//    var book = remote.createOrderBook({
-//      currency_gets: 'XRP',
-//      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_pays: 'BTC'
-//    });
-//
-//    remote.request = function(request) {
-//      assert(false);
-//    };
-//
-//    book.requestTransferRate(function(err, rate) {
-//      assert.ifError(err);
-//      assert.strictEqual(rate, 1000000000);
-//    });
-//  });
-//
-//  it('Set funded amount - funded', function() {
-//    var remote = new Remote();
-//    var book = remote.createOrderBook({
-//      currency_pays: 'XRP',
-//      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-//      currency_gets: 'BTC'
-//    });
-//
-//    var offer = {
-//      TakerGets: {
-//        value: '100',
-//        currency: 'BTC',
-//        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-//      },
-//      TakerPays: '123456'
-//    };
-//
-//    book.setFundedAmount(offer, '100.1234');
-//
-//    var expected = {
-//      TakerGets: offer.TakerGets,
-//      TakerPays: offer.TakerPays,
-//      is_fully_funded: true,
-//      taker_gets_funded: '100',
-//      taker_pays_funded: '123456'
-//    };
-//
-//    assert.deepEqual(offer, expected);
-//  });
+  it('toJSON', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+    assert.deepEqual(book.toJSON(), {
+      taker_gets: {
+        currency: Currency.from_json('XRP').to_hex()
+      },
+      taker_pays: {
+        currency: Currency.from_json('BTC').to_hex(),
+        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+      }
+    });
+    book = new Remote().createOrderBook({
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_gets: 'BTC',
+      currency_pays: 'XRP'
+    });
+    assert.deepEqual(book.toJSON(), {
+      taker_gets: {
+        currency: Currency.from_json('BTC').to_hex(),
+        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+      },
+      taker_pays: {
+        currency: Currency.from_json('XRP').to_hex()
+      },
+    });
+  });
+
+  it('Check orderbook validity', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+    assert(book.isValid());
+  });
+
+  it('Automatic subscription (based on listeners)', function(done) {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+    book.subscribe = function() {
+      done();
+    };
+    book.on('model', function(){});
+  });
+
+  it('Subscribe', function(done) {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+
+    var requestedOffers = false;
+
+    book.subscribeTransactions = function() {
+      assert(requestedOffers);
+      done();
+    };
+
+    book.requestOffers = function(callback) {
+      requestedOffers = true;
+      callback();
+    };
+
+    book.subscribe();
+  });
+
+  it('Unsubscribe', function(done) {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+
+    book.once('unsubscribe', function() {
+      done();
+    });
+
+    book.on('model', function(){});
+
+    book.unsubscribe();
+
+    assert(!book._subscribed);
+    assert(!book._shouldConnect);
+    assert.deepEqual(book.listeners(), []);
+  });
+
+  it('Automatic unsubscription (based on listeners)', function(done) {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+    book.unsubscribe = function() {
+      done();
+    };
+    book.on('model', function(){});
+    book.removeAllListeners('model');
+  });
+
+  it('Add cached owner funds', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+    book.addCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
+    assert.strictEqual(book.getCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'), '1');
+  });
+
+  it('Add cached owner funds - invalid account', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+    assert.throws(function() {
+      book.addCachedFunds('0rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
+    });
+  });
+
+  it('Has cached owner funds', function() {
+    var book =  new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+    book.addCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
+    assert(book.hasCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'));
+  });
+
+  it('Has cached owner funds - invalid account', function() {
+    var book =  new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+    assert.throws(function() {
+      book.addCachedFunds('0rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
+    });
+  });
+
+  it('Remove cached owner funds', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+    book.addCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
+    assert(book.hasCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'));
+    book.removeCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji');
+    assert(!book.hasCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'));
+  });
+
+  it('Remove cached owner funds', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    book.addCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji', '1');
+    assert(book.hasCachedFunds('rrrrrrrrrrrrrrrrrrrrBZbvji'));
+    assert.throws(function() {
+      book.removeCachedFunds('0rrrrrrrrrrrrrrrrrrrrBZbvji');
+    });
+  });
+
+  it('Increment offer count', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    assert.strictEqual(book.incrementOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 1);
+    assert.strictEqual(book.getOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 1);
+  });
+
+  it('Increment offer count - invalid address', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    assert.throws(function() {
+      book.incrementOfferCount('zrrrrrrrrrrrrrrrrrrrBZbvji');
+    });
+  });
+
+  it('Decrement offer count', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    book.incrementOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji');
+    assert.strictEqual(book.decrementOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 0);
+    assert.strictEqual(book.getOfferCount('rrrrrrrrrrrrrrrrrrrrBZbvji'), 0);
+  });
+
+  it('Decrement offer count - invalid address', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    assert.throws(function() {
+      book.decrementOfferCount('zrrrrrrrrrrrrrrrrrrrBZbvji');
+    });
+  });
+
+  it('Apply transfer rate', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    assert.strictEqual(book.applyTransferRate('1', 1002000000), '0.9980039920159681');
+  });
+
+  it('Apply transfer rate - cached transfer rate', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    book._issuerTransferRate = 1002000000;
+    assert.strictEqual(book.applyTransferRate('1'), '0.9980039920159681');
+  });
+
+  it('Apply transfer rate - invalid balance', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    assert.throws(function() {
+      book.applyTransferRate('asdf');
+    });
+  });
+
+  it('Apply transfer rate - invalid transfer rate', function() {
+    var book = new Remote().createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+    assert.throws(function() {
+      book.applyTransferRate('1', 'asdf');
+    });
+  });
+
+  it('Request transfer rate', function() {
+    var remote = new Remote();
+    var book = remote.createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+
+    remote.request = function(request) {
+      assert.deepEqual(request.message, {
+        command: 'account_info',
+        id: void(0),
+        ident: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+        account: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+      });
+      request.emit('success', {
+        account_data: {
+          TransferRate: 1002000000
+        }
+      });
+    };
+
+    book.requestTransferRate(function(err, rate) {
+      assert.ifError(err);
+      assert.strictEqual(rate, 1002000000);
+    });
+  });
+
+  it('Request transfer rate - cached transfer rate', function() {
+    var remote = new Remote();
+    var book = remote.createOrderBook({
+      currency_gets: 'BTC',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'XRP'
+    });
+
+    book._issuerTransferRate = 1002000000;
+
+    remote.request = function(request) {
+      assert(false);
+    };
+
+    book.requestTransferRate(function(err, rate) {
+      assert.ifError(err);
+      assert.strictEqual(rate, 1002000000);
+    });
+  });
+
+  it('Request transfer rate - native currency', function() {
+    var remote = new Remote();
+    var book = remote.createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+
+    remote.request = function(request) {
+      assert(false);
+    };
+
+    book.requestTransferRate(function(err, rate) {
+      assert.ifError(err);
+      assert.strictEqual(rate, 1000000000);
+    });
+  });
+
+  it('Set funded amount - funded', function() {
+    var remote = new Remote();
+    var book = remote.createOrderBook({
+      currency_pays: 'XRP',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_gets: 'BTC'
+    });
+
+    var offer = {
+      TakerGets: {
+        value: '100',
+        currency: 'BTC',
+        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+      },
+      TakerPays: '123456'
+    };
+
+    book.setFundedAmount(offer, '100.1234');
+
+    var expected = {
+      TakerGets: offer.TakerGets,
+      TakerPays: offer.TakerPays,
+      is_fully_funded: true,
+      taker_gets_funded: '100',
+      taker_pays_funded: '123456'
+    };
+
+    assert.deepEqual(offer, expected);
+  });
 
   it('Set funded amount - unfunded', function() {
     var remote = new Remote();
@@ -1378,7 +1378,7 @@ describe('OrderBook', function() {
           Sequence: 561,
           TransferRate: 1002000000,
           index: 'B7D526FDDF9E3B3F95C3DC97C353065B0482302500BBB8051A5C090B596C6133',
-          urlgravatar: 'http://www.gravatar.com/avatar/5b33b93c7ffe384d53450fc666bb11fb'
+          urlgravatar: 'http:www.gravatar.com/avatar/5b33b93c7ffe384d53450fc666bb11fb'
         }
       });
 
