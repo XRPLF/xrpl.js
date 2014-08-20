@@ -349,13 +349,15 @@ describe('OrderBook', function() {
 
     book.setFundedAmount(offer, '100.1234');
 
-    assert.deepEqual(offer, {
+    var expected = {
       TakerGets: offer.TakerGets,
       TakerPays: offer.TakerPays,
       is_fully_funded: true,
       taker_gets_funded: '100',
       taker_pays_funded: '123456'
-    });
+    };
+
+    assert.deepEqual(offer, expected);
   });
 
   it('Set funded amount - unfunded', function() {
@@ -367,23 +369,25 @@ describe('OrderBook', function() {
     });
 
     var offer = {
-      TakerGets: {
-        value: '100',
+      TakerPays: {
+        value: '123456',
         currency: 'BTC',
         issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
       },
-      TakerPays: '123456'
+      TakerGets: '100'
     };
 
     book.setFundedAmount(offer, '99');
 
-    assert.deepEqual(offer, {
+    var expected = {
       TakerGets: offer.TakerGets,
       TakerPays: offer.TakerPays,
       is_fully_funded: false,
       taker_gets_funded: '99',
-      taker_pays_funded: '122166'
-    });
+      taker_pays_funded: '122221.44'
+    };
+
+    assert.deepEqual(offer, expected);
   });
 
   it('Set funded amount - native currency - funded', function() {
@@ -421,7 +425,7 @@ describe('OrderBook', function() {
     var book = remote.createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-      currency_pays: 'BTC'
+      currency_pays: 'USD'
     });
 
     var offer = {
@@ -435,13 +439,15 @@ describe('OrderBook', function() {
 
     book.setFundedAmount(offer, '99');
 
-    assert.deepEqual(offer, {
+    var expected = {
       TakerGets: offer.TakerGets,
       TakerPays: offer.TakerPays,
       is_fully_funded: false,
       taker_gets_funded: '99',
       taker_pays_funded: '99.122166'
-    });
+    };
+
+    assert.deepEqual(offer, expected);
   });
 
   it('Set funded amount - zero funds', function() {
@@ -1372,7 +1378,7 @@ describe('OrderBook', function() {
           Sequence: 561,
           TransferRate: 1002000000,
           index: 'B7D526FDDF9E3B3F95C3DC97C353065B0482302500BBB8051A5C090B596C6133',
-          urlgravatar: 'http://www.gravatar.com/avatar/5b33b93c7ffe384d53450fc666bb11fb'
+          urlgravatar: 'http:www.gravatar.com/avatar/5b33b93c7ffe384d53450fc666bb11fb'
         }
       });
 
@@ -1484,9 +1490,8 @@ describe('OrderBook', function() {
 
   book._issuerTransferRate = 1002000000;
 
-  book.once('model', function(model) {
-    assert.deepEqual(model, [
-      { Account: 'rGCHV41NxoK7wHQJhmao2RqjWZvBrTUhW1',
+  var expected = [
+    { Account: 'rGCHV41NxoK7wHQJhmao2RqjWZvBrTUhW1',
       BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711A3A4254F5000',
       BookNode: '0000000000000000',
       Flags: 131072,
@@ -1537,9 +1542,14 @@ describe('OrderBook', function() {
         is_fully_funded: true,
         taker_gets_funded: '0.2',
         taker_pays_funded: '99.72233516476456'
-      }])
-      assert.strictEqual(book._synchronized, true);
-      done();
+      }
+  ]
+
+
+  book.once('model', function(model) {
+    assert.deepEqual(model, expected);
+    assert.strictEqual(book._synchronized, true);
+    done();
   });
   });
 });
