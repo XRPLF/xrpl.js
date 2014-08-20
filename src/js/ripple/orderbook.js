@@ -369,40 +369,31 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
     return offer;
   }
 
-  function sixFigures(str) {
-    return str.substring(0, str.indexOf('.') + 7);
-  };
+  var iouSuffix = '/' + this._currencyGets.to_json()
+  + '/' + this._issuerGets;
 
-  var takerGetsValue = (typeof offer.TakerGets === 'object')
-  ? offer.TakerGets.value
-  : offer.TakerGets;
-
-  var takerPaysValue = (typeof offer.TakerPays === 'object')
-  ? offer.TakerPays.value
-  : offer.TakerPays;
-
-  var iouSuffix = '/USD/rrrrrrrrrrrrrrrrrrrrBZbvji';
-  var fundedTakerGets = Amount.from_json(fundedAmount + iouSuffix);
-  var takerGets = Amount.from_json(takerGetsValue + iouSuffix);
-  var takerPays = Amount.from_json(takerPaysValue + iouSuffix);
-
-  offer.is_fully_funded = fundedTakerGets.compareTo(takerGets) >= 0;
+  offer.is_fully_funded = Amount.from_json(
+    this._currencyGets.is_native() ? fundedAmount : fundedAmount + iouSuffix
+  ).compareTo(Amount.from_json(offer.TakerGets)) >= 0;
 
   if (offer.is_fully_funded) {
-    offer.taker_gets_funded = takerGetsValue;
-    offer.taker_pays_funded = takerPaysValue;
-    return offer;
-  }
-
-  offer.taker_gets_funded = fundedAmount;
-
-  var rate = Amount.from_json(offer.TakerPays).divide(offer.TakerGets);
-  var takerPaysFunded = fundedTakerGets.multiply(rate);
-
-  if (takerPaysFunded.compareTo(takerPays) <= 0) {
-    offer.taker_pays_funded = takerPaysFunded.to_text();
+    offer.taker_gets_funded = Amount.from_json(offer.TakerGets).to_text();
+    offer.taker_pays_funded = Amount.from_json(offer.TakerPays).to_text();
   } else {
-    offer.taker_pays_funded = takerPaysValue;
+    offer.taker_gets_funded = fundedAmount;
+
+    var rate = Amount.from_json(offer.TakerPays)
+    .divide(Amount.from_json(offer.TakerGets));
+
+    var fundedPays = Amount.from_json(offer.TakerGets).multiply(rate);
+
+    fundedPays.set_issuer(Amount.from_json(offer.TakerPays).issuer());
+
+    if (fundedPays.compareTo(Amount.from_json(offer.TakerPays)) < 0) {
+      offer.taker_pays_funded = fundedPays.to_text();
+    } else {
+      offer.taker_pays_funded = Amount.from_json(offer.TakerPays).to_text();
+    }
   }
 
   return offer;
