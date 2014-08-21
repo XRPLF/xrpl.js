@@ -370,7 +370,7 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
   }
 
   var iouSuffix = '/' + this._currencyGets.to_json()
-  + '/' + this._issuerGets;
+                + '/' + this._issuerGets;
 
   offer.is_fully_funded = Amount.from_json(
     this._currencyGets.is_native() ? fundedAmount : fundedAmount + iouSuffix
@@ -379,23 +379,29 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
   if (offer.is_fully_funded) {
     offer.taker_gets_funded = Amount.from_json(offer.TakerGets).to_text();
     offer.taker_pays_funded = Amount.from_json(offer.TakerPays).to_text();
+    return offer;
+  }
+
+  offer.taker_gets_funded = fundedAmount;
+
+  var rate = Amount.from_json(offer.TakerPays)
+  .divide(Amount.from_json(offer.TakerGets));
+
+  var takerPays = Amount.from_json(offer.TakerPays);
+
+  takerPays.set_currency('XXX');
+  takerPays.set_issuer('rrrrrrrrrrrrrrrrrrrrBZbvji');
+
+  var fundedPays = Amount.from_json(
+    fundedAmount + '/XXX/rrrrrrrrrrrrrrrrrrrrBZbvji'
+  );
+
+  fundedPays = fundedPays.multiply(rate);
+
+  if (fundedPays.compareTo(takerPays) < 0) {
+    offer.taker_pays_funded = fundedPays.to_text();
   } else {
-    offer.taker_gets_funded = fundedAmount;
-
-    var rate = Amount.from_json(offer.TakerPays)
-    .divide(Amount.from_json(offer.TakerGets));
-
-    var fundedPays = Amount.from_json(
-      this._currencyPays.is_native()
-      ? fundedAmount
-      : fundedAmount + '/' + this._currencyPays.to_json() + '/' + this._issuerPays
-    ).multiply(rate);
-
-    if (fundedPays.compareTo(Amount.from_json(offer.TakerPays)) <= 0) {
-      offer.taker_pays_funded = fundedPays.to_text();
-    } else {
-      offer.taker_pays_funded = Amount.from_json(offer.TakerPays).to_text();
-    }
+    offer.taker_pays_funded = Amount.from_json(offer.TakerPays).to_text();
   }
 
   return offer;
