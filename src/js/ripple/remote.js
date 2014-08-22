@@ -83,6 +83,7 @@ function Remote(opts, trace) {
   this.trusted = Boolean(opts.trusted);
   this.state = 'offline'; // 'online', 'offline'
   this._server_fatal = false; // True, if we know server exited.
+  this._allow_partial_history = (typeof opts.allow_partial_history === 'boolean') ? opts.allow_partial_history : true;
 
   this.local_sequence = Boolean(opts.local_sequence); // Locally track sequence numbers
   this.local_fee = (typeof opts.local_fee === 'boolean') ? opts.local_fee : true;// Locally set fees
