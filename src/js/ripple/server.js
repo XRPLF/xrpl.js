@@ -76,7 +76,6 @@ function Server(remote, opts) {
   this._lastLedgerClose = NaN;
 
   this._score = 0;
-
   this._scoreWeights = {
     ledgerclose: 5,
     response: 1
@@ -354,7 +353,7 @@ Server.prototype.reconnect = function() {
     if (this.isConnected()) {
       this.once('disconnect', reconnect);
       this.disconnect();
-    } else  {
+    } else {
       reconnect();
     }
   }
@@ -627,6 +626,12 @@ Server.prototype._handlePathFind = function(message) {
  */
 
 Server.prototype._handleResponseSubscribe = function(message) {
+  if (!this._remote._allow_partial_history
+      && !Server.hasFullLedgerHistory(message)) {
+    // Server has partial history and Remote has been configured to disallow
+    // servers with incomplete history
+    return this.reconnect();
+  }
   if (Server.isLoadStatus(message)) {
     this._load_base    = message.load_base || 256;
     this._load_factor  = message.load_factor || 256;
@@ -644,9 +649,24 @@ Server.prototype._handleResponseSubscribe = function(message) {
 };
 
 /**
+ * Check that server message indicates that server has complete ledger history
+ *
+ * @param {Object} message
+ * @return {Boolean}
+ */
+
+Server.hasFullLedgerHistory = function(message) {
+  return (typeof message === 'object')
+  && (message.server_status === 'full')
+  && (typeof message.validated_ledgers === 'string')
+  && (message.validated_ledgers.split('-').length === 2);
+};
+
+/**
  * Check that received message from rippled is valid
  *
- * @api private
+ * @param {Object} message
+ * @return {Boolean}
  */
 
 Server.isValidMessage = function(message) {
@@ -655,14 +675,15 @@ Server.isValidMessage = function(message) {
 };
 
 /**
- * Check that received serverStatus message contains
- * load status information
+ * Check that received serverStatus message contains load status information
  *
- * @api private
+ * @param {Object} message
+ * @return {Boolean}
  */
 
 Server.isLoadStatus = function(message) {
-  return (typeof message.load_base === 'number')
+  return (typeof message === 'object')
+      && (typeof message.load_base === 'number')
       && (typeof message.load_factor === 'number');
 };
 
@@ -683,10 +704,10 @@ Server.prototype._sendMessage = function(message) {
 };
 
 /**
- * Submit a Request object.
+ * Submit a Request object
  *
- * Requests are indexed by message ID, which is repeated
- * in the response from rippled WebSocket server
+ * Requests are indexed by message ID, which is repeated in the response from
+ * rippled WebSocket server
  *
  * @param {Request} request
  * @api private
