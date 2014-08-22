@@ -1459,7 +1459,7 @@ BlobClient.attest = function (opts, fn) {
     method: 'POST',
     url: opts.url + '/v1/profile/' + opts.identity_id + '/attest',
     dataType: 'json',
-    data: opts.profile
+    data: {type:opts.type}
   };
 
   var signedRequest = new SignedRequest(config);
@@ -1468,7 +1468,6 @@ BlobClient.attest = function (opts, fn) {
   request.post(signed.url)
     .send(signed.data)
     .end(function(err, resp) {
-      console.log(err, resp);
       
       if (err) {
         log.error('attest:', err);
