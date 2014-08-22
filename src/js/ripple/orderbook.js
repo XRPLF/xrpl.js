@@ -384,24 +384,34 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
 
   offer.taker_gets_funded = fundedAmount;
 
-  var rate = Amount.from_json(offer.TakerPays)
-  .divide(Amount.from_json(offer.TakerGets));
+  var takerPaysValue = typeof offer.TakerPays === 'object'
+  ? offer.TakerPays.value
+  : offer.TakerPays;
 
-  var takerPays = Amount.from_json(offer.TakerPays);
+  var takerGetsValue = typeof offer.TakerGets === 'object'
+  ? offer.TakerGets.value
+  : offer.TakerGets;
 
-  takerPays.set_currency('XXX');
-  takerPays.set_issuer('rrrrrrrrrrrrrrrrrrrrBZbvji');
+  var takerPays = Amount.from_json(
+    takerPaysValue + '/000/rrrrrrrrrrrrrrrrrrrrBZbvji'
+  );
+
+  var takerGets = Amount.from_json(
+    takerGetsValue + '/000/rrrrrrrrrrrrrrrrrrrrBZbvji'
+  );
 
   var fundedPays = Amount.from_json(
-    fundedAmount + '/XXX/rrrrrrrrrrrrrrrrrrrrBZbvji'
+    fundedAmount + '/000/rrrrrrrrrrrrrrrrrrrrBZbvji'
   );
+
+  var rate = takerPays.divide(takerGets);
 
   fundedPays = fundedPays.multiply(rate);
 
   if (fundedPays.compareTo(takerPays) < 0) {
-    offer.taker_pays_funded = fundedPays.to_text();
+    offer.taker_pays_funded = fundedPays.to_json().value;
   } else {
-    offer.taker_pays_funded = Amount.from_json(offer.TakerPays).to_text();
+    offer.taker_pays_funded = takerPays.to_json().value;
   }
 
   return offer;
