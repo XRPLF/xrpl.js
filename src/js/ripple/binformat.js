@@ -106,7 +106,8 @@ var FIELDS_MAP = exports.fields = {
     16: 'BookDirectory',
     17: 'InvoiceID',
     18: 'Nickname',
-    19: 'Feature'
+    19: 'Feature',
+    20: 'TicketID'
   },
   6: { // Amount
     1: 'Amount',
@@ -272,6 +273,13 @@ exports.tx = {
     [ 'ReferenceFeeUnits'  , REQUIRED ],
     [ 'ReserveBase'        , REQUIRED ],
     [ 'ReserveIncrement'   , REQUIRED ]
+  ]),
+  TicketCreate: [10].concat(base, [
+    [ 'Target'             , OPTIONAL ],
+    [ 'Expiration'         , OPTIONAL ],
+  ]),
+  TicketCancel: [11].concat(base, [
+    [ 'TicketID'           , REQUIRED ],
   ])
 };
 
@@ -358,6 +366,12 @@ exports.ledger = {
     ['TakerPays',           REQUIRED],
     ['TakerGets',           REQUIRED],
     ['Account',             REQUIRED]]),
+  Ticket: [84].concat(sleBase,[
+    ['Account',             REQUIRED],
+    ['Sequence',            REQUIRED],
+    ['OwnerNode',           REQUIRED],
+    ['Target',              OPTIONAL],
+    ['Expiration',          OPTIONAL]]),
   RippleState: [114].concat(sleBase,[
     ['LedgerEntryType',     REQUIRED],
     ['Flags',               REQUIRED],
@@ -397,8 +411,15 @@ exports.ter = {
   tecNO_LINE_INSUF_RESERVE: 126,
   tecNO_LINE_REDUNDANT: 127,
   tecPATH_DRY: 128,
-  tecUNFUNDED: 129,
+  tecUNFUNDED: 129,  // Deprecated, old ambiguous unfunded.
   tecMASTER_DISABLED: 130,
   tecNO_REGULAR_KEY: 131,
-  tecOWNERS: 132
+  tecOWNERS: 132,
+  tecNO_ISSUER: 133,
+  tecNO_AUTH: 134,
+  tecNO_LINE: 135,
+  tecINSUFF_FEE: 136,
+  tecFROZEN: 137,
+  tecNO_TARGET: 138,
+  tecNO_TICKET: 139
 };

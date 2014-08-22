@@ -18,5 +18,6 @@ module.exports = {
   contract       : 'c',
   skipList       : 's',
   amendment      : 'f',
-  feeSettings    : 'e'
+  feeSettings    : 'e',
+  ticket         : 'T'
 };
