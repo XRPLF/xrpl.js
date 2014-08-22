@@ -369,12 +369,12 @@ describe('OrderBook', function() {
     });
 
     var offer = {
+      TakerGets: '100',
       TakerPays: {
         value: '123456',
         currency: 'BTC',
         issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-      },
-      TakerGets: '100'
+      }
     };
 
     book.setFundedAmount(offer, '99');
@@ -429,22 +429,22 @@ describe('OrderBook', function() {
     });
 
     var offer = {
-      TakerGets: '100',
-      TakerPays: {
+      TakerGets: {
         value: '100.1234',
         currency: 'USD',
         issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-      }
+      },
+      TakerPays: '123'
     };
 
-    book.setFundedAmount(offer, '99');
+    book.setFundedAmount(offer, '100');
 
     var expected = {
       TakerGets: offer.TakerGets,
       TakerPays: offer.TakerPays,
       is_fully_funded: false,
-      taker_gets_funded: '99',
-      taker_pays_funded: '99.122166'
+      taker_gets_funded: '100',
+      taker_pays_funded: '122.8484050681459'
     };
 
     assert.deepEqual(offer, expected);
