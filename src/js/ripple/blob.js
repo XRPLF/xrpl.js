@@ -527,17 +527,17 @@ BlobObj.prototype.postUpdate = function(op, pointer, params, fn) {
 };
 
 /**
- * get2FA - ECDSA signed request
+ * get2FA - HMAC signed request
  */
 
-BlobObj.prototype.get2FA = function (masterkey, fn) {
+BlobObj.prototype.get2FA = function (fn) {
   var config = {
     method : 'GET',
     url    : this.url + '/v1/blob/' + this.id + '/2FA?device_id=' + this.device_id,
   };
   
   var signedRequest = new SignedRequest(config);
-  var signed = signedRequest.signAsymmetric(masterkey, this.data.account_id, this.id);
+  var signed = signedRequest.signHmac(this.data.auth_secret, this.id);  
 
   request.get(signed.url)
     .end(function(err, resp) { 
