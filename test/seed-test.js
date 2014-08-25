@@ -7,55 +7,45 @@ describe('Seed', function() {
   it('can generate many addresses', function () {
     var seed = Seed.from_json("masterpassphrase");
 
-    // Note: Created with jRippleAPI code
-    // Link: https://github.com/pmarches/jRippleAPI/blob/master/src/jrippleapi/keys/RippleDeterministicKeyGenerator.java
+    var test_data = [
+      // Format:
+      // [passphrase, address, nth-for-seed, expected-public-key]
+      ["masterpassphrase", "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", 0,
+       "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020"],
+      ["masterpassphrase", "r4bYF7SLUMD7QgSLLpgJx38WJSY12ViRjP", 1,
+       "02CD8C4CE87F86AAD1D9D18B03DE28E6E756F040BD72A9C127862833EB90D60BAD"],
+      ["masterpassphrase", "rLpAd4peHUMBPbVJASMYK5GTBUSwXRD9nx", 2,
+       "0259A57642A6F4AEFC9B8062AF453FDEEEAC5572BA602BB1DBD5EF011394C6F9FC"],
+      ["otherpassphrase", "rpe3YWSVwGU2PmUzebAPg2deBXHtmba7hJ", 0,
+       "022235A3DB2CAE57C60B7831929611D58867F86D28C0AD3C82473CC4A84990D01B"],
+      ["otherpassphrase", "raAPC2gALSmsTkXR4wUwQcPgX66kJuLv2S", 5,
+       "03F0619AFABE08D22D98C8721895FE3673B6174168949976F2573CE1138C124994"],
+      ["yetanotherpassphrase", "rKnM44fS48qrGiDxB5fB5u64vHVJwjDPUo", 0,
+       "0385AD049327EF7E5EC429350A15CEB23955037DE99660F6E70C11C5ABF4407036"],
+      ["yetanotherpassphrase", "rMvkT1RHPfsZwTFbKDKBEisa5U4d2a9V8n", 1,
+       "023A2876EA130CBE7BBA0573C2DB4C4CEB9A7547666915BD40366CDC6150CF54DC"]
+    ];
 
-    // To reviewer/merger: Even generating keypairs for thi this small amount of
-    // addresses makes the test suite run SO SLOW. Consider cutting at the tail.
-    var first_nth_addresses = [
-          // 0th implied
-          "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
-          // 1th implied
-          "r4bYF7SLUMD7QgSLLpgJx38WJSY12ViRjP",
-          // 2th implied
-          "rLpAd4peHUMBPbVJASMYK5GTBUSwXRD9nx",
-          // ...
-          "rN9HWHPAftXC6xNxJRqgVr1HexpUi6FBUa",
-          "rhwPfeEkeQh2vqoKGPBpPyS9nKmKZdpypu",
-          "rKdNfPfrzfisDCPCqK67YhDLezuVKGKXNm",
-          "rsn4NeGzMRvMn5ABQxmt9VNEkSknVneBK4",
-          "rUSJGFH1kQnaKpoAhkArfyw6HZVe8GT5w3",
-          "r3EYp6isx2Row5pu19C4Ujvp68oEEabhuA",
-          "rGiYpnAn9DTXiM78CCJcYAuL6QHEDdazHA",
-          "rVrRVeqqEJHAove5B9TqBAHEXBTzMi5eu",
-          "rJbarThDXYXxtCgDxRoTCDf2NoYdgSjuVk",
-          "rfuWNJ1TkQzoZZcc4K8wmtsUiGwURFbed1",
-          "rpuTqebfbZZdKEUV3bjecoViNL4W4gepWZ",
-          "r42ywHUco4C2AjgaSmYM7uX13Kbz6GdDKp",
-          "rnWb45MLd5hQiB6Arr94DdY2z95quL7XNf",
-          "rMukaQ87bfAeddcT16RtgS3RbFmaQWrSGu",
-          "rN6dMHU51K9y8eVMhjQMsQVp5gPwt3eYYx",
-          "rfRFyeJDNqpfZVFmjNj9tNzFVsCNAWKtNc",
-          "rMoGSX48KrT31HKx9KfMSnYhjvRw3YYzQW",
-          "rfTiEfbeVsYU7QEe1Zfogiz7h43x6ChKGC"
-    ]
-
-    function assert_helper(account_id, expected) {
-      var keypair = seed.get_key(account_id);
-      assert.strictEqual(keypair.get_address().to_json(),
+    function assert_helper(seed_json, address_or_nth, expected) {
+      var seed = Seed.from_json(seed_json);
+      var keypair = seed.get_key(address_or_nth);
+      assert.strictEqual(keypair.to_hex_pub(),
                          expected);
     }
-    for (var nth = 0; nth < first_nth_addresses.length; nth++) {
-      var expected = first_nth_addresses[nth], looking_for;
+    for (var nth = 0; nth < test_data.length; nth++) {
+      var seed_json = test_data[nth][0];
+      var address = test_data[nth][1];
+      var nth_for_seed = test_data[nth][2];
+      var expected = test_data[nth][3];
 
       //`seed.get_key($ripple_address)` is arguably an ill concieved feature
       // as it needs to generate `nth` many keypairs and generate hashed public
       // keys (addresses) for equality tests ??
       // Would need remote.set_secret(address, private_key_not_seed) ??
-      assert_helper((looking_for = expected), expected)
+      assert_helper(seed_json, address, expected);
 
       // This isn't too bad as it only needs to generate one keypair `seq`
-      assert_helper((looking_for = nth), expected)
+      assert_helper(seed_json, nth_for_seed, expected);
     };
   });
 });
