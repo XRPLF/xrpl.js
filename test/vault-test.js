@@ -709,7 +709,7 @@ describe('Blob', function () {
     }); 
     
     it('#2FA_get2FA', function (done) {
-      blob.get2FA(exampleData.masterkey, function(err, resp) {
+      blob.get2FA(function(err, resp) {
         assert.ifError(err);  
         assert.strictEqual(typeof resp, 'object');
         assert.strictEqual(typeof resp.result,  'string');

@@ -478,6 +478,58 @@ describe('Server', function() {
     Server.websocketConstructor = websocketConstructor;
   });
 
+  it('Connect - partial history disabled', function(done) {
+    var wss = new ws.Server({ port: 5748  });
+
+    wss.once('connection', function(ws) {
+      ws.once('message', function(message) {
+        var m = JSON.parse(message);
+
+        assert.deepEqual(m, {
+          command: 'subscribe',
+          id: 0,
+          streams: [ 'ledger', 'server' ]
+        });
+
+        ws.send(JSON.stringify({
+          id: 0,
+          status: 'success',
+          type: 'response',
+          result: {
+            fee_base: 10,
+            fee_ref: 10,
+            ledger_hash: '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
+            ledger_index: 7053695,
+            ledger_time: 455414390,
+            load_base: 256,
+            load_factor: 256,
+            random: 'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
+            reserve_base: 20000000,
+            reserve_inc: 5000000,
+            server_status: 'syncing',
+            validated_ledgers: '3175520-3176615'
+          }
+        }));
+
+        wss.close();
+      });
+    });
+
+    var server = new Server(new Remote({ allow_partial_history: false }), 'ws://localhost:5748');
+
+    server.reconnect = function() {
+      setImmediate(function() {
+        done();
+      });
+    };
+
+    server.once('connect', function() {
+      assert(false, 'Should not connect');
+    });
+
+    server.connect();
+  });
+
   it('Reconnect', function(done) {
     var server = new Server(new Remote(), 'ws://localhost:5748');
     server._connected = true;
