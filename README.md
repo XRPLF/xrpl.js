@@ -1,10 +1,10 @@
 #ripple-lib
 
+JavaScript client for [rippled](https://github.com/ripple/rippled)
+
 [![Build Status](https://travis-ci.org/ripple/ripple-lib.svg?branch=develop)](https://travis-ci.org/ripple/ripple-lib) [![Coverage Status](https://coveralls.io/repos/ripple/ripple-lib/badge.png?branch=develop)](https://coveralls.io/r/ripple/ripple-lib?branch=develop)
 
 [![NPM](https://nodei.co/npm/ripple-lib.png)](https://www.npmjs.org/package/ripple-lib)
-
-JavaScript client for [rippled](https://github.com/ripple/rippled)
 
 ###Features
 
@@ -15,10 +15,9 @@ JavaScript client for [rippled](https://github.com/ripple/rippled)
 
 ###In this file
 
-1. Overview
-2. [Installation](README.md#installation)
-3. [Quickstart](README.md#quickstart)
-4. [Running tests](https://github.com/ripple/ripple-lib#running-tests)
+1. [Installation](README.md#installation)
+2. [Quickstart](README.md#quickstart)
+3. [Running tests](https://github.com/ripple/ripple-lib#running-tests)
 
 ###Additional documentation
 
