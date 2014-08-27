@@ -632,12 +632,8 @@ OrderBook.prototype.updateFundedAmounts = function(message) {
     var result = this.getBalanceChange(node);
 
     if (result.isValid) {
-      var account = result.account;
-      var balance = result.balance;
-
-      if (this.hasCachedFunds(account)) {
-        var fundedAmount = this.applyTransferRate(balance);
-        this.updateOfferFunds(account, fundedAmount);
+      if (this.hasCachedFunds(result.account)) {
+        this.updateOfferFunds(result.account, result.balance);
       }
     }
   }
@@ -919,13 +915,15 @@ OrderBook.prototype.modifyOffer = function(node, isDeletedNode) {
  * @param {String|Object} offer funds
  */
 
-OrderBook.prototype.updateOfferFunds = function(account, fundedAmount) {
+OrderBook.prototype.updateOfferFunds = function(account, balance) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  assert(!isNaN(fundedAmount), 'Funded amount is invalid');
+  assert(!isNaN(balance), 'Funded amount is invalid');
 
   if (this._remote.trace) {
     log.info('updating offer funds', this._key, account, fundedAmount);
   }
+
+  var fundedAmount = this.applyTransferRate(balance);
 
   // Update cached account funds
   this.addCachedFunds(account, fundedAmount);
@@ -941,6 +939,7 @@ OrderBook.prototype.updateOfferFunds = function(account, fundedAmount) {
     var previousOffer = extend({}, offer);
     var previousFundedGets = Amount.from_json(offer.taker_gets_funded + suffix);
 
+    offer.owner_funds = balance;
     this.setFundedAmount(offer, fundedAmount);
 
     var hasChangedFunds = !previousFundedGets.equals(

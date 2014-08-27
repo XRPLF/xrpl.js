@@ -1,28 +1,26 @@
-#`ripple-lib` API Reference
+#API Reference
 
 __(More examples coming soon!)__
 
 ###In this document:
 
-1. [`Remote` options](REFERENCE.md#1-remote-options)
-2. [`Remote` functions](REFERENCE.md#2-remote-functions)
-  + [Server info functions](REFERENCE.md#server-info-functions)
-  + [Ledger query functions](REFERENCE.md#ledger-query-functions)
-  + [Transaction query functions](REFERENCE.md#transaction-query-functions)
-  + [Account query functions](REFERENCE.md#account-query-functions)
-  + [Order book query functions](REFERENCE.md#order-book-query-functions)
-  + [Transaction submission functions](REFERENCE.md#transaction-submission-functions)
-3. [`Transaction` events](REFERENCE.md#3-transaction-events)
-4. [`Amount` objects](REFERENCE.md#4-amount-objects)
-
+1. [`Remote` options](REFERENCE.md#remote-options)
+2. [`Request` constructors](REFERENCE.md#request-constructor-functions)
+  + [Server requests](REFERENCE.md#server-requests)
+  + [Ledger requests](REFERENCE.md#ledger-requests)
+  + [Transaction requests](REFERENCE.md#transaction-requests)
+  + [Account requests](REFERENCE.md#account-requests)
+  + [Orderbook requests](REFERENCE.md#orderbook-requests)
+  + [Transaction requests](REFERENCE.md#transaction-requests)
+3. [`Transaction` constructors](REFERENCE.md#transaction-constructors)
+  + [Transaction events](REFERENCE.md#transaction-events)
 
 ###Also see:
 
-1. [The `ripple-lib` README](../README.md)
-2. [The `ripple-lib` GUIDES](GUIDES.md)
+1. [The ripple-lib README](../README.md)
+2. [The ripple-lib GUIDES](GUIDES.md)
 
-
-#1. `Remote` options
+#Remote options
 
 ```js
 /* Loading ripple-lib with Node.js */
@@ -31,98 +29,86 @@ var Remote = require('ripple-lib').Remote;
 /* Loading ripple-lib in a webpage */
 // var Remote = ripple.Remote;
 
-var remote = new Remote({options});
+var options = { };
+
+var remote = new Remote(options);
 ```
 
 A new `Remote` can be created with the following options:
 
-+ `trace` Log all of the events emitted (boolean)
-+ `max_listeners` Set maxListeners for remote; prevents EventEmitter warnings (number)
-+ `connection_offset` Connect to remote servers on supplied interval (number in seconds)
-+ `trusted` truthy, if remote is trusted (boolean)
-+ `local_fee` Set whether the transaction fee range will be set locally (boolean, default is true, see [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees))
-+ `fee_cushion` Extra fee multiplier to account for async fee changes (number, e.g. 1.5, see [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees))
-+ `max_fee` Maximum acceptable transaction fee (number in [XRP drops](https://ripple.com/wiki/Ripple_credits#Notes_on_drops), see [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees))
-+ `servers` Array of server objects of the following form:
++ `trace` *boolean default: false* Log all of the events emitted
++ `max_listeners` *number default: 0* Set maxListeners for servers
++ `trusted` *boolean default: false*, if remote is trusted (boolean)
++ `local_signing` *boolean default: true*
++ `local_fee` *boolean default: true* Set whether the transaction fee range will be set locally, see [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees))
++ `fee_cushion` *number default: 1.2* Extra fee multiplier to account for async fee changes, see [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees))
++ `max_fee` *number default: Infinity* Maximum acceptable transaction fee, see [A note on transaction fees](GUIDES.md#a-note-on-transaction-fees)
++ `servers` *array* Array of server objects of the following form:
 
 ```js
-{ 
-  host:    <string>
-  , port:    <number>
-  , secure:  <boolean>
+{
+  host:    <string>,
+  port:    <number>,
+  secure:  <boolean>
 }
 ```
-+ `local_signing`
 
-#2. `Remote` functions
-
-
-
-##Server info functions
-
-**[requestServerInfo([callback])](https://ripple.com/wiki/RPC_API#server_info)**
-
-Returns information about the state of the server. If you are connected to multiple servers and want to select by a particular host, use `request.set_server`. Example:
+or
 
 ```js
-var request = remote.request_server_info();
-request.set_server('my.hostname');
-request.callback(function(err, res) {
-
-});
-request.request();
+ 'wss://host:port'
 ```
 
-**[requestUnlList([callback])](https://ripple.com/wiki/RPC_API#unl_list)**
+#Request constructor functions
 
-**[requestUnlAdd(addr, comment, [callback])](https://ripple.com/wiki/RPC_API#unl_add)**
+##Server requests
 
-**[requestUnlDelete(node, [callback])](https://ripple.com/wiki/RPC_API#unl_delete)**
+**[server_info([callback])](https://ripple.com/wiki/JSON_Messages#server_info)**
 
-**[requestPeers([callback])](https://ripple.com/wiki/RPC_API#peers)**
+Returns information about the state of the server. If you are connected to multiple servers and want to select by a particular host, use `request.setServer`. Example:
+
+```js
+var request = remote.request('server_info');
+
+request.setServer('wss://s1.ripple.com');
+
+request.request(function(err, res) {
+
+});
+```
+
+**[unl_list([callback])](https://ripple.com/wiki/JSON_Messages#unl_list)**
+
+**[unl_add(addr, comment, [callback])](https://ripple.com/wiki/JSON_Messages#unl_add)**
+
+**[unl_delete(node, [callback])](https://ripple.com/wiki/JSON_Messages#unl_delete)**
+
+**[requestPeers([callback])](https://ripple.com/wiki/JSON_Messages#peers)**
 
 
-**[requestConnect(ip, port, [callback])](https://ripple.com/wiki/RPC_API#connect)**
+**[connect(ip, port, [callback])](https://ripple.com/wiki/JSON_Messages#connect)**
 
+##Ledger requests
 
+**[ledger(ledger, [opts], [callback])](https://ripple.com/wiki/JSON_Messages#ledger)**
 
-##Ledger query functions
+**ledger_header([callback])**
 
-**[requestLedger(ledger, [opts], [callback])](https://ripple.com/wiki/RPC_API#ledger)**
+**[ledger_current([callback])](https://ripple.com/wiki/JSON_Messages#ledger_current)**
 
-**requestLedgerHeader([callback])**
+**[ledger_entry(type, [callback])](https://ripple.com/wiki/JSON_Messages#ledger_entry)**
 
-**[requestLedgerCurrent([callback])](https://ripple.com/wiki/RPC_API#ledger_current)**
-
-**[requestLedgerEntry(type, [callback])](https://ripple.com/wiki/RPC_API#ledger_entry)**
-
-**[requestSubscribe(streams, [callback])](https://ripple.com/wiki/RPC_API#subscribe)**
+**[subscribe([streams], [callback])](https://ripple.com/wiki/JSON_Messages#subscribe)**
 
 Start receiving selected streams from the server.
 
-**[requestUnsubscribe(streams, [callback])](https://ripple.com/wiki/RPC_API#unsubscribe)**
+**[unsubscribe([streams], [callback])](https://ripple.com/wiki/JSON_Messages#unsubscribe)**
 
 Stop receiving selected streams from the server.
 
+##Account requests
 
-
-
-##Transaction query functions
-
-**[requestTransactionEntry(hash, [ledger_hash], [callback])](https://ripple.com/wiki/RPC_API#transaction_entry)**
-
-Searches a particular ledger for a transaction hash. Default ledger is the open ledger.
-
-**[requestTx(hash, [callback])](https://ripple.com/wiki/RPC_API#tx)**
-
-Searches ledger history for validated transaction hashes.
-
-
-
-
-##Account query functions
-
-**[requestAccountInfo(account, [callback])](https://ripple.com/wiki/RPC_API#account_info)**
+**[account_info(account, [callback])](https://ripple.com/wiki/JSON_Messages#account_info)**
 
 Return information about the specified account.
 
@@ -143,13 +129,13 @@ Return information about the specified account.
 }
 ```
 
-**[requestAccountLines(accountID, account_index, current, [callback])](https://ripple.com/wiki/RPC_API#account_lines)**
+**[account_lines(accountID, [account_index], [ledger], [callback])](https://ripple.com/wiki/JSON_Messages#account_lines)**
 
-**[requestAccountOffers(accountID, account_index, current, [callback])](https://ripple.com/wiki/RPC_API#account_offers)**
+**[account_offers(accountID, [account_index], [ledger], [callback])](https://ripple.com/wiki/JSON_Messages#account_offers)**
 
 Return the specified account's outstanding offers.
 
-**[requestAccountTx(opts, [callback])](https://ripple.com/wiki/RPC_API#account_tx)**
+**[account_tx(options, [callback])](https://ripple.com/wiki/JSON_Messages#account_tx)**
 
 Fetch a list of transactions that applied to this account.
 
@@ -167,92 +153,150 @@ Options:
 + `fwd_marker`
 + `rev_marker`
 
-**[requestWalletAccounts(seed, [callback])](https://ripple.com/wiki/RPC_API#wallet_accounts)**
+**[wallet_accounts(seed, [callback])](https://ripple.com/wiki/JSON_Messages#wallet_accounts)**
 
-Return a list of accounts for a wallet.
+Return a list of accounts for a wallet. *Requires trusted remote*
 
-+ requires trusted remote
-
-**requestAccountBalance(account, ledger, [callback])**
+**account_balance(account, [ledger], [callback])**
 
 Get the balance for an account. Returns an [Amount](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/amount.js) object.
 
-**requestAccountFlags(account, current, [callback])**
+**account_flags(account, [ledger], [callback])**
 
 Return the flags for an account.
 
-**requestOwnerCount(account, current, [callback])**
+**owner_count(account, [ledger], [callback])**
 
 Return the owner count for an account.
 
-**requestRippleBalance(account, issuer, currency, current, [callback])**
+**ripple_balance(account, issuer, currency, [ledger], [callback])**
 
 Return a request to get a ripple balance
 
+##Orderbook requests
 
+**[book_offers(options, [callback])](https://ripple.com/wiki/JSON_Messages#book_offers)**
 
-
-##Order book query functions
-
-**[requestBookOffers(gets, pays, taker, [callback])](https://ripple.com/wiki/RPC_API#book_offers)**
-
-Return the offers for an order book as one or more pages.
+Return the offers for an order book, also called a *snapshot*
 
 ```js
-var request = remote.request_book_offers({
-  gets: {
+var request = remote.request('book_offers', {
+  taker_gets: {
     'currency':'XRP'
   },
-  pays: {
+  taker_pays: {
     'currency':'USD',
     'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
   }
 });
 
-request.request();
+request.request(function(err, offers) {
+  //handle offers
+});
 ```
 
+##Transaction requests
 
+**[transaction_entry(hash, [ledger_hash], [callback])](https://ripple.com/wiki/JSON_Messages#transaction_entry)**
 
+Searches a particular ledger for a transaction hash. Default ledger is the open ledger.
 
-##Transaction submission functions
+**[tx(hash, [callback])](https://ripple.com/wiki/JSON_Messages#tx)**
 
-**[requestSign(secret, tx_json, [callback])](https://ripple.com/wiki/RPC_API#sign)**
+Searches ledger history for validated transaction hashes.
 
-Sign a transaction.
+**[sign(secret, tx_json, [callback])](https://ripple.com/wiki/JSON_Messages#sign)**
 
-+ requires trusted remote
+Sign a transaction. *Requires trusted remote*
 
-**[requestSubmit([callback])](https://ripple.com/wiki/RPC_API#submit)**
+**[submit([callback])](https://ripple.com/wiki/JSON_Messages#submit)**
 
 Submit a transaction to the network. This command is used internally to submit transactions with a greater degree of reliability. See [Submitting a payment to the network](GUIDES.md#3-submitting-a-payment-to-the-network) for details.
 
+**[ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])](https://ripple.com/wiki/JSON_Messages#path_find)**
 
-**[requestRipplePathFind(src_account, dst_account, dst_amount, src_currencies, [callback])](https://ripple.com/wiki/RPC_API#path_find)**
+#Transaction constructors
 
+Use `remote.createTransaction('TransactionType', [options])` to construct a transaction. To submit, use `transaction.submit([callback])`.
 
-**transaction([destination], [source], [amount], [callback])**
+**Payment**
 
-Returns a [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) object
+```js
+var transaction = remote.createTransaction('Payment', {
+  account: MY_ADDRESS,
+  destination: DEST_ADDRESS,
+  amount: AMOUNT
+});
+```
 
+**AccountSet**
 
-#3. Transaction events
+```js
+var transaction = remote.createTransaction('AccountSet', {
+  account: MY_ADDRESS,
+  set: 'RequireDest',
+  clear: 'RequireAuth'
+});
+```
+
+**TrustSet**
+
+```js
+var transaction = remote.createTransaction('TrustSet', {
+  account: MY_ADDRESS,
+  limit: '1/USD/rrrrrrrrrrrrrrrrrrrrBZbvji'
+});
+```
+
+**OfferCreate**
+
+```js
+var transaction = remote.createTransaction('OfferCreate', {
+  account: MY_ADDRESS,
+  taker_pays: '1',
+  taker_gets: '1/USD/rrrrrrrrrrrrrrrrrrrrBZbvji'
+});
+```
+
+##Transaction events
 
 [Transaction](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/transaction.js) objects are EventEmitters. They may emit the following events.
 
 + `final` Transaction has erred or succeeded. This event indicates that the transaction has finished processing.
 + `error` Transaction has erred. This event is a final state.
 + `success` Transaction succeeded. This event is a final state.
++ `presubmit` Immediately before transaction is submitted
++ `postsubmit` Immediately after transaction is submitted
 + `submitted` Transaction has been submitted to the network. The submission may result in a remote error or success.
++ `resubmitted` Transaction is beginning resubmission.
 + `proposed` Transaction has been submitted *successfully* to the network. The transaction at this point is awaiting validation in a ledger.
 + `timeout` Transaction submission timed out. The transaction will be resubmitted.
-+ `resubmit` Transaction is beginning resubmission.
 + `fee_adjusted` Transaction fee has been adjusted during its pending state. The transaction fee will only be adjusted if the remote is configured for local fees, which it is by default.
 + `abort` Transaction has been aborted. Transactions are only aborted by manual calls to `#abort`.
 + `missing` Four ledgers have closed without detecting validated transaction
 + `lost` Eight ledgers have closed without detecting validated transaction. Consider the transaction lost and err/finalize.
 
+##Complete payment example
 
-#4. Amount objects
+```js
+remote.setSecret(MY_ADDRESS, MY_SECRET);
+
+var transaction = remote.createTransaction('Payment', {
+  account: MY_ADDRESS,
+  destination: DEST_ADDRESS,
+  amount: AMOUNT
+});
+
+transaction.on('resubmitted', function() {
+  // initial submission failed, resubmitting
+});
+
+transaction.submit(function(err, res) {
+ // submission has finalized with either an error or success.
+ // the transaction will not be retried after this point
+});
+```
+
+#Amount objects
 
 Coming Soon
