@@ -563,7 +563,6 @@ BlobObj.prototype.get2FA = function (fn) {
  * @params {boolean} options.enabled
  * @params {string}  options.phone
  * @params {string}  options.country_code
- * @params {string}  options.via    //sms, etc
  */
 
 BlobObj.prototype.set2FA = function(options, fn) {
@@ -574,8 +573,7 @@ BlobObj.prototype.set2FA = function(options, fn) {
     data   : {
       enabled      : options.enabled,
       phone        : options.phone,
-      country_code : options.country_code,
-      via          : options.via
+      country_code : options.country_code
     }
   };
 
@@ -1371,6 +1369,7 @@ BlobClient.updateProfile = function (opts, fn) {
         fn(null, resp.body);
       } else if (resp.body) {
         log.error('updateProfile:', resp.body);
+        fn(new Error('Failed to update profile'));
       } else {
         fn(new Error('Failed to update profile'));
       } 
@@ -1405,6 +1404,7 @@ BlobClient.getProfile = function (opts, fn) {
         fn(null, resp.body);
       } else if (resp.body) {
         log.error('getProfile:', resp.body);
+        fn(new Error('Failed to get profile'));
       } else {
         fn(new Error('Failed to get profile'));
       } 
@@ -1439,6 +1439,7 @@ BlobClient.getAttestations = function (opts, fn) {
         fn(null, resp.body);
       } else if (resp.body) {
         log.error('getAttestations:', resp.body);
+        fn(new Error('Failed to get attestations'));
       } else {
         fn(new Error('Failed to get attestations'));
       } 
@@ -1450,16 +1451,31 @@ BlobClient.getAttestations = function (opts, fn) {
  * @param {Object} opts
  * @param {string} opts.url
  * @param {string} opts.auth_secret
- * @param {srring} opts.blob_id
- * @param {srring} opts.identity_id
- * @param {srring} opts.type (email,phone,basic_identity)
+ * @param {string} opts.blob_id
+ * @param {string} opts.identity_id
+ * @param {string} opts.type (email,phone,basic_identity)
+ * @param {object} opts.phone (required for type 'phone')
+ * @param {object} opts.identity (optional)
+ * @param {string} opts.email (required for type 'email')
+ * @param {string} opts.attestation_id (required for completing email or phone attestations)
+ * @param {string} opts.token (required for completing email or phone attestations)
  */
 BlobClient.attest = function (opts, fn) {
+  var params = {
+    type: opts.type
+  };
+  
+  if (opts.phone)          params.phone          = opts.phone;
+  if (opts.identity)       params.identity       = opts.identity;
+  if (opts.email)          params.email          = opts.email;
+  if (opts.attestation_id) params.attestation_id = opts.attestation_id;
+  if (opts.token)          params.token          = opts.token;
+  
   var config = {
     method: 'POST',
     url: opts.url + '/v1/profile/' + opts.identity_id + '/attest',
     dataType: 'json',
-    data: {type:opts.type}
+    data: params
   };
 
   var signedRequest = new SignedRequest(config);
@@ -1476,6 +1492,7 @@ BlobClient.attest = function (opts, fn) {
         fn(null, resp.body);
       } else if (resp.body) {
         log.error('attest:', resp.body);
+        fn(new Error('Failed to get attest'));
       } else {
         fn(new Error('Failed to attest'));
       } 

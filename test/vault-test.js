@@ -20,6 +20,7 @@ var exampleData = {
   email_token : '77825040-9096-4695-9cbc-76720f6a8649',
   activateLink : 'https://staging.ripple.com/client/#/register/activate/',
   device_id : "ac1b6f6dbca98190eb9687ba06f0e066",
+  identity_id : "17fddb71-a5c2-44ce-8b50-4b381339d4f2",
   blob: { 
     url: 'https://id.staging.ripple.com',
     id: 'ef203d3e76552c0592384f909e6f61f1d1f02f61f07643ce015d8b0c9710dd2f',
@@ -103,12 +104,29 @@ var recoverRes = {
     result: 'success' 
     }
   }
-  
+ 
+var getProfileRes = {
+  "result":"success",
+  "addresses":[],
+  "attributes":[{
+    "attribute_id":"4034e477-ffc9-48c4-bcbc-058293f081d8",
+    "identity_id":"17fddb71-a5c2-44ce-8b50-4b381339d4f2",
+    "name":"email",
+    "type":"default",
+    "domain":null,
+    "value":"example@example.com",
+    "visibility":"public",
+    "updated":null
+    }
+  ]
+};
+
 var blob = new Blob();
   blob.url       = exampleData.blob.url;
   blob.id        = exampleData.blob.id;
   blob.device_id = exampleData.device_id;
   blob.key       = exampleData.blob.key;
+  blob.identity_id = exampleData.blob.identity_id;
   blob.data      = exampleData.blob.data;
   blob.revision  = exampleData.blob.data.revision;
   
@@ -693,7 +711,43 @@ describe('Blob', function () {
       });
     });      
   });
-  
+
+  describe('identityVault', function() {
+    it('#identity-getProfile', function (done) {
+      var options = {
+        url : blob.url,
+        auth_secret : blob.data.auth_secret,
+        blob_id :blob.id,
+        identity_id : blob.identity_id,      
+      };
+      
+      options.profile = { 
+        attributes : [{
+          name : 'email',
+          value : 'example@example.com',
+          visibility : 'public'
+        }]
+      };
+      
+      client.getProfile(options, function(err, resp) {
+        console.log(err, resp); 
+        done();
+      });
+    });
+    
+    it('#identity-updateProfile', function (done) {
+      done();
+    }); 
+        
+    it('#identity-getAttestations', function (done) {
+      done();
+    });     
+
+    it('#identity-attest', function (done) {
+      done();
+    });         
+  });
+    
   //only do these offline
   if (!online) {
   
