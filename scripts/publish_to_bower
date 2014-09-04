@@ -1,0 +1,12 @@
+rm -rf dist
+git clone git@github.com:ripple/bower-ripple.git dist
+gulp bower
+cd dist
+version=$(cat bower.json | grep -Eo '([0-9]\.?)+(-rc[0-9])?')
+echo "version: $version"
+git add ripple.js ripple-debug.js ripple-min.js bower.json
+git commit -m "[TASK] add v$version"
+git tag "v$version"
+git push origin master
+git push --tags origin master
+cd ..
