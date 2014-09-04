@@ -345,7 +345,7 @@ var STAmount = exports.Amount = new SerializedType({
 
         // Next eight bits: offset/exponent
         hi |= ((97 + amount._offset) & 0xff) << 22;
-        // Remaining 52 bits: mantissa
+        // Remaining 54 bits: mantissa
         hi |= amount._value.shiftRight(32).intValue() & 0x3fffff;
         lo = amount._value.intValue() & 0xffffffff;
       }
