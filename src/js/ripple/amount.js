@@ -33,6 +33,10 @@ var consts = exports.consts = {
 
   cMinOffset:        -96,
   cMaxOffset:        80,
+
+  // Maximum possible amount for non-XRP currencies using the maximum mantissa
+  // with maximum exponent. Corresponds to hex 0xEC6386F26FC0FFFF.
+  max_value:         '9999999999999999e80'
 };
 
 
