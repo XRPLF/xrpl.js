@@ -4,6 +4,8 @@
 
 + Orderbook: Added tests
 
++ Orderbook: Update owner funds
+
 + Transactions: If transaction errs with `tefALREADY`, wait until all possible submissions err with the same before emitting `error`. Fixes a client "Transaction malformed" bug.
 
 + Transactions: Track submissions, don't bother submitting to unconnected servers
@@ -13,6 +15,9 @@
 + Request: `request.broadcast()` now returns the number of servers request was sent to
 
 + Server: Acquire host information from server without additional request
+
++ Amount: Add a constant for the maximum canonical value that can be expressed as a Ripple value
+
 
 ##0.7.39
 
