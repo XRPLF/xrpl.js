@@ -18,6 +18,8 @@
 
 + Amount: Add a constant for the maximum canonical value that can be expressed as a Ripple value
 
++ Amount: Make Constants static fields on the class, instead of a seperate export
+
 
 ##0.7.39
 
