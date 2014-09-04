@@ -78,7 +78,7 @@ remote.connect(function() {
 
 2. `cd` into the repository and install dependencies with `npm install`
 
-3. `npm test` or `node_modules\.bin\mocha test\*-test.js`
+3. `npm test` or `node_modules/.bin/mocha test/*-test.js`
 
 **Generating code coverage**
 
