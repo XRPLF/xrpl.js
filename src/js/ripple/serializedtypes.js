@@ -117,7 +117,7 @@ SerializedType.prototype.parse_varint = function (so) {
  */
 function append_byte_array(so, val, bytes) {
   if (!isNumber(val)) {
-    throw new Error('Value is not a number');
+    throw new Error('Value is not a number', bytes);
   }
 
   if (val < 0 || val >= Math.pow(256, bytes)) {
@@ -625,7 +625,13 @@ function serialize(so, field_name, value) {
   // Get the serializer class (ST...) for a field based on the type bits.
   var serialized_object_type = exports[binformat.types[type_bits]];
   //do something with val[keys] and val[keys[i]];
-  serialized_object_type.serialize(so, value);
+
+  try {
+    serialized_object_type.serialize(so, value);
+  } catch (e) {
+    e.message += ' (' + field_name + ')';
+    throw e;
+  }
 }
 
 //Take the serialized object, figure out what type/field it is, and return the parsing of that.
