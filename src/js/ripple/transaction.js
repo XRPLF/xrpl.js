@@ -480,7 +480,7 @@ Transaction.prototype.clientID = function(id) {
 };
 
 Transaction.prototype.lastLedger = function(sequence) {
-  if (typeof sequence === 'number') {
+  if (typeof sequence === 'number' && isFinite(sequence)) {
     this._setLastLedger = true;
     this.tx_json.LastLedgerSequence = sequence;
   }

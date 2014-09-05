@@ -811,6 +811,10 @@ describe('Transaction', function() {
     assert.strictEqual(transaction.tx_json.LastLedgerSequence, void(0));
     assert(!transaction._setLastLedger);
 
+    transaction.lastLedger(NaN);
+    assert.strictEqual(transaction.tx_json.LastLedgerSequence, void(0));
+    assert(!transaction._setLastLedger);
+
     transaction.lastLedger(12);
     assert.strictEqual(transaction.tx_json.LastLedgerSequence, 12);
     assert(transaction._setLastLedger);
