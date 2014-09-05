@@ -210,7 +210,7 @@ function Remote(opts, trace) {
 
   function listenerAdded(type, listener) {
     if (type === 'transaction_all') {
-      if (!self._transaction_subs && self._connected) {
+      if (!self._transaction_subs && self.isConnected()) {
         self.request_subscribe('transactions').request();
       }
       self._transaction_subs += 1;
@@ -222,7 +222,7 @@ function Remote(opts, trace) {
   function listenerRemoved(type, listener) {
     if (type === 'transaction_all') {
       self._transaction_subs -= 1;
-      if (!self._transaction_subs && self._connected) {
+      if (!self._transaction_subs && self.isConnected()) {
         self.request_unsubscribe('transactions').request();
       }
     }
@@ -244,7 +244,7 @@ function Remote(opts, trace) {
   };
 
   if (opts.ping) {
-    this.once('connect', pingServers);
+    this.on('connect', pingServers);
   }
 
   function reconnect() {
@@ -513,12 +513,9 @@ Remote.prototype.reconnect = function() {
 
   log.info('reconnecting');
 
-  ;(function nextServer(i) {
-    self._servers[i].reconnect();
-    if (++i < self._servers.length) {
-      nextServer(i);
-    }
-  })(0);
+  this._servers.forEach(function(server) {
+    server.reconnect();
+  });
 
   return this;
 };
@@ -552,12 +549,9 @@ Remote.prototype.connect = function(online) {
 
   this._should_connect = true;
 
-  ;(function nextServer(i) {
-    self._servers[i].connect();
-    if (++i < self._servers.length) {
-      nextServer(i);
-    }
-  })(0);
+  this._servers.forEach(function(server) {
+    server.connect();
+  });
 
   return this;
 };
@@ -576,7 +570,7 @@ Remote.prototype.disconnect = function(callback) {
 
   var callback = (typeof callback === 'function') ? callback : function(){};
 
-  if (!this._connected) {
+  if (!this.isConnected()) {
     callback();
     return this;
   }
@@ -664,7 +658,7 @@ Remote.prototype._handleLedgerClosed = function(message) {
     this._ledger_hash = message.ledger_hash;
     this._ledger_current_index = message.ledger_index + 1;
 
-    if (this._connected) {
+    if (this.isConnected()) {
       this.emit('ledger_closed', message);
     } else {
       this.once('connect', function() {
@@ -868,7 +862,7 @@ Remote.prototype.request = function(request) {
 
   if (!this._servers.length) {
     request.emit('error', new Error('No servers available'));
-  } else if (!this._connected) {
+  } else if (!this.isConnected()) {
     this.once('connect', this.request.bind(this, request));
   } else if (request.server === null) {
     request.emit('error', new Error('Server does not exist'));
