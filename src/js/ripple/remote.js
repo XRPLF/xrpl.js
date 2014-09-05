@@ -15,6 +15,7 @@
 
 var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
+var assert           = require('assert');
 var LRU              = require('lru-cache');
 var Server           = require('./server').Server;
 var Request          = require('./request').Request;
@@ -338,13 +339,11 @@ Remote.isValidLedgerData = function(message) {
   return (typeof message === 'object')
     && (typeof message.fee_base === 'number')
     && (typeof message.fee_ref === 'number')
-    && (typeof message.fee_base === 'number')
     && (typeof message.ledger_hash === 'string')
     && (typeof message.ledger_index === 'number')
     && (typeof message.ledger_time === 'number')
     && (typeof message.reserve_base === 'number')
-    && (typeof message.reserve_inc === 'number')
-    && (typeof message.txn_count === 'number');
+    && (typeof message.reserve_inc === 'number');
 };
 
 /**
@@ -660,11 +659,19 @@ Remote.prototype._handleLedgerClosed = function(message) {
 
   var ledgerAdvanced = message.ledger_index >= this._ledger_current_index;
 
-  if (ledgerAdvanced) {
+  if (isNaN(this._ledger_current_index) || ledgerAdvanced) {
     this._ledger_time = message.ledger_time;
     this._ledger_hash = message.ledger_hash;
     this._ledger_current_index = message.ledger_index + 1;
-    this.emit('ledger_closed', message);
+
+    if (this._connected) {
+      this.emit('ledger_closed', message);
+    } else {
+      this.once('connect', function() {
+        // Delay until server is 'online'
+        self.emit('ledger_closed', message);
+      });
+    }
   }
 };
 
@@ -1608,12 +1615,7 @@ Remote.prototype._serverPrepareSubscribe = function(callback) {
       self.emit('random', utils.hexToArray(message.random));
     }
 
-    if (message.ledger_hash && message.ledger_index) {
-      self._ledger_time = message.ledger_time;
-      self._ledger_hash = message.ledger_hash;
-      self._ledger_current_index = message.ledger_index+1;
-      self.emit('ledger_closed', message);
-    }
+    self._handleLedgerClosed(message);
 
     self.emit('subscribed');
   };
@@ -2215,65 +2217,40 @@ Remote.prototype.requestConnect = function(ip, port, callback) {
 /**
  * Create a Transaction
  *
- * @param {String} source
+ * @param {String} TransactionType
  * @param {Object} options
- * @param [Function] callback
- * @return {Request}
+ * @return {Transaction}
  */
 
 Remote.prototype.transaction =
-Remote.prototype.createTransaction = function(source, options, callback) {
+Remote.prototype.createTransaction = function(type, options) {
+  if (arguments.length === 0) {
+    // Fallback
+    return new Transaction(this);
+  }
+
+  assert.strictEqual(typeof type, 'string', 'TransactionType must be a string');
+  assert.strictEqual(typeof options, 'object', 'Transaction options must be an object');
+
   var transaction = new Transaction(this);
 
   var transactionTypes = {
-    payment:        'payment',
-    accountset:     'accountSet',
-    trustset:       'trustSet',
-    offercreate:    'offerCreate',
-    offercancel:    'offerCancel',
-    claim:          'claim',
-    passwordfund:   'passwordFund',
-    passwordset:    'passwordSet',
-    setregularkey:  'setRegularKey',
-    walletadd:      'walletAdd',
-    sign:           'sign'
+    payment: 'payment',
+    accountset: 'accountSet',
+    trustset: 'trustSet',
+    offercreate: 'offerCreate',
+    offercancel: 'offerCancel',
+    setregularkey: 'setRegularKey',
+    sign: 'sign'
   };
 
-  var transactionType;
+  var transactionConstructor = transactionTypes[type.toLowerCase()];
 
-  switch (typeof source) {
-    case 'object':
-      if (typeof source.type !== 'string') {
-        throw new Error('Missing transaction type');
-      }
-
-      transactionType = transactionTypes[source.type.toLowerCase()];
-
-      if (!transactionType) {
-        throw new Error('Invalid transaction type: ' + transactionType);
-      }
-
-      transaction = transaction[transactionType](source);
-      break;
-
-    case 'string':
-      transactionType = transactionTypes[source.toLowerCase()];
-
-      if (!transactionType) {
-        throw new Error('Invalid transaction type: ' + transactionType);
-      }
-
-      transaction = transaction[transactionType](options);
-      break;
+  if (!transactionConstructor) {
+    throw new Error('Invalid transaction type: ' + type);
   }
 
-  var lastArg = arguments[arguments.length - 1];
-
-  if (typeof lastArg === 'function') {
-    transaction.submit(lastArg);
-  }
-
-  return transaction;
+  return transaction[transactionConstructor](options);
 };
 
 /**
