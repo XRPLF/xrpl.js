@@ -16,6 +16,17 @@ This file provides step-by-step walkthroughs for some of the most common usages 
 1. [The ripple-lib README](../README.md)
 2. [The ripple-lib API Reference](REFERENCE.md)
 
+##Generating a new Ripple Wallet
+
+  ```js
+    var Wallet = require('ripple-lib').Wallet;
+
+    var wallet = Wallet.generate();
+    console.log(wallet);
+    // { address: 'rEf4sbVobiiDGExrNj2PkNHGMA8eS6jWh3',
+    //   secret: 'shFh4a38EZpEdZxrLifEnVPAoBRce' }
+  ```
+
 ##Connecting to the Ripple network
 
 1. [Get ripple-lib](README.md#getting-ripple-lib)
