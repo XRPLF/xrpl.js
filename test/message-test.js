@@ -82,8 +82,17 @@ describe('Message', function(){
     });
 
     it('should throw an error if given an invalid secret key', function(){
+      // Annoyingly non hex can be fed to the BigInteger(s, 16) constructor and
+      // it will parse as a number. Before the commit of this comment, this test
+      // involved a fixture of 32 chars, which was assumed to be hex. The test
+      // passed, but for the wrong wreasons. There was a bug in Seed.parse_json.
 
-      var secret_string = 'badsafRpB5euNL52PZPTSqrE9gvuFwTC';
+      // Seed.from_json only creates invalid seeds from empty strings or invalid
+      // base58 starting with an s, which it tries to base 58 decode/check sum.
+      // The rest will be assumed to be a passphrase.
+
+      // This is a bad b58 seed
+      var secret_string = 'sbadsafRpB5euNL52PZPTSqrE9gvuFwTC';
       var hash = 'e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778';
 
       assert.throws(function(){

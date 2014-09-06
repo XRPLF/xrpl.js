@@ -33,8 +33,8 @@ Seed.prototype.parse_json = function (j) {
     // XXX Should actually always try and continue if it failed.
     } else if (j[0] === 's') {
       this._value = Base.decode_check(Base.VER_FAMILY_SEED, j);
-    } else if (j.length === 32) {
-      this._value = this.parse_hex(j);
+    } else if (/^[0-9a-fA-f]{32}$/.test(j)) {
+      this.parse_hex(j);
     // XXX Should also try 1751
     } else {
       this.parse_passphrase(j);
