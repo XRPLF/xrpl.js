@@ -26,8 +26,9 @@ describe('Signing', function() {
       assert(_isNaN(new Seed().parse_json('').to_json()));
     });
     it('hex string', function() {
+      // 32 0s is a valid hex repr of seed bytes
       var str = new Array(33).join('0');
-      assert(_isNaN(new Seed().parse_json(str).to_json()));
+      assert.strictEqual((new Seed().parse_json(str).to_json()), 'sp6JS7f14BuwFY8Mw6bTtLKWauoUs');
     });
     it('passphrase', function() {
       var str = new Array(60).join('0');
