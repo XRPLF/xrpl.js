@@ -20,7 +20,8 @@
     "extend": "~1.2.1",
     "lru-cache": "~2.5.0",
     "superagent": "^0.18.0",
-    "gulp-bump": "~0.1.10"
+    "gulp-bump": "~0.1.10",
+    "ripple-wallet-generator": "1.0.0"
   },
   "devDependencies": {
     "mocha": "~1.14.0",
