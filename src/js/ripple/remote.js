@@ -820,6 +820,10 @@ Remote.prototype.getServer = function() {
   }
 
   var connectedServers = this.getConnectedServers();
+  if (connectedServers.length === 0 || !connectedServers[0]) {
+    return null;
+  }
+
   var server = connectedServers[0];
   var cScore = server._score + server._fee;
 
