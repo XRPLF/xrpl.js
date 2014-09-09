@@ -82,10 +82,10 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
     self._remote.removeListener('transaction', updateFundedAmounts);
     self._remote.removeListener('transaction', updateTransferRate);
   });
-
-  this._remote.on('prepare_subscribe', function() {
-    self.subscribe();
-  });
+  // XXX .subscribe() will be called twice
+  // this._remote.on('prepare_subscribe', function() {
+  //   self.subscribe();
+  // });
 
   this._remote.on('disconnect', function() {
     self._ownerFunds = { };
