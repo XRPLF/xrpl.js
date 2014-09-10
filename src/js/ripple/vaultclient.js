@@ -589,6 +589,8 @@ VaultClient.prototype.getProfile    = blobClient.getProfile;
 
 VaultClient.prototype.attest        = blobClient.attest;
 
+VaultClient.prototype.attestation   = blobClient.attestation;
+
 VaultClient.prototype.getAttestations = blobClient.getAttestations;
 
 //export by name

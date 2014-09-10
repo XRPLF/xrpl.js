@@ -1332,7 +1332,6 @@ BlobClient.deleteBlob = function(options, fn) {
  * @param {string} opts.url
  * @param {string} opts.auth_secret
  * @param {srring} opts.blob_id
- * @param {srring} opts.identity_id
  * @param {object} opts.profile 
  * @param {array}  opts.profile.attributes (optional, array of attribute objects)
  * @param {array}  opts.profile.addresses (optional, array of address objects)
@@ -1350,7 +1349,7 @@ BlobClient.deleteBlob = function(options, fn) {
 BlobClient.updateProfile = function (opts, fn) {
   var config = {
     method: 'POST',
-    url: opts.url + '/v1/profile/' + opts.identity_id,
+    url: opts.url + '/v1/profile/',
     dataType: 'json',
     data: opts.profile
   };
@@ -1382,12 +1381,11 @@ BlobClient.updateProfile = function (opts, fn) {
  * @param {string} opts.url
  * @param {string} opts.auth_secret
  * @param {srring} opts.blob_id
- * @param {srring} opts.identity_id
  */
 BlobClient.getProfile = function (opts, fn) {
   var config = {
     method: 'GET',
-    url: opts.url + '/v1/profile/' + opts.identity_id,
+    url: opts.url + '/v1/profile/'
   };
 
   var signedRequest = new SignedRequest(config);
@@ -1417,12 +1415,11 @@ BlobClient.getProfile = function (opts, fn) {
  * @param {string} opts.url
  * @param {string} opts.auth_secret
  * @param {srring} opts.blob_id
- * @param {srring} opts.identity_id
  */
 BlobClient.getAttestations = function (opts, fn) {
   var config = {
     method: 'GET',
-    url: opts.url + '/v1/profile/' + opts.identity_id + '/attestations',
+    url: opts.url + '/v1/profile/attestations',
   };
 
   var signedRequest = new SignedRequest(config);
@@ -1452,7 +1449,6 @@ BlobClient.getAttestations = function (opts, fn) {
  * @param {string} opts.url
  * @param {string} opts.auth_secret
  * @param {string} opts.blob_id
- * @param {string} opts.identity_id
  * @param {string} opts.type (email,phone,basic_identity)
  * @param {object} opts.phone (required for type 'phone')
  * @param {object} opts.identity (optional)
@@ -1460,20 +1456,26 @@ BlobClient.getAttestations = function (opts, fn) {
  * @param {string} opts.attestation_id (required for completing email or phone attestations)
  * @param {string} opts.token (required for completing email or phone attestations)
  */
+/*
 BlobClient.attest = function (opts, fn) {
   var params = {
     type: opts.type
   };
   
-  if (opts.phone)          params.phone          = opts.phone;
-  if (opts.identity)       params.identity       = opts.identity;
-  if (opts.email)          params.email          = opts.email;
-  if (opts.attestation_id) params.attestation_id = opts.attestation_id;
-  if (opts.token)          params.token          = opts.token;
+  console.log(opts);
   
+  if (opts.phone)           params.phone           = opts.phone;
+  if (opts.profile)         params.profile         = opts.profile;
+  if (opts.email)           params.email           = opts.email;
+  if (opts.attestation_id)  params.attestation_id  = opts.attestation_id;
+  if (opts.verification_id) params.verification_id = opts.verification_id;
+  if (opts.token)           params.token           = opts.token;
+  if (opts.questions_id)    params.questions_id    = opts.questions_id;
+  if (opts.answers)         params.answers         = opts.answers;
+      
   var config = {
     method: 'POST',
-    url: opts.url + '/v1/profile/' + opts.identity_id + '/attest',
+    url: opts.url + '/v1/profile/attest',
     dataType: 'json',
     data: params
   };
@@ -1492,9 +1494,63 @@ BlobClient.attest = function (opts, fn) {
         fn(null, resp.body);
       } else if (resp.body) {
         log.error('attest:', resp.body);
-        fn(new Error('Failed to get attest'));
+        fn(new Error('Failed to attest: ' + resp.body.message || ""));
       } else {
         fn(new Error('Failed to attest'));
+      } 
+    });
+};
+*/
+
+/**
+ * attestation
+ * @param {Object} opts
+ * @param {string} opts.url
+ * @param {string} opts.auth_secret
+ * @param {string} opts.blob_id
+ * @param {string} opts.type (email,phone,basic_identity)
+ * @param {object} opts.phone (required for type 'phone')
+ * @param {object} opts.identity (optional)
+ * @param {string} opts.email (required for type 'email')
+ * @param {string} opts.attestation_id (required for completing email or phone attestations)
+ * @param {string} opts.token (required for completing email or phone attestations)
+ */
+BlobClient.attestation = function (opts, fn) {
+  var params = { };
+  
+  if (opts.phone)           params.phone           = opts.phone;
+  if (opts.profile)         params.profile         = opts.profile;
+  if (opts.email)           params.email           = opts.email;
+  if (opts.attestation_id)  params.attestation_id  = opts.attestation_id;
+  if (opts.verification_id) params.verification_id = opts.verification_id;
+  if (opts.token)           params.token           = opts.token;
+  if (opts.questions_id)    params.questions_id    = opts.questions_id;
+  if (opts.answers)         params.answers         = opts.answers;
+      
+  var config = {
+    method: 'POST',
+    url: opts.url + '/v1/profile/attestation/' + opts.type,
+    dataType: 'json',
+    data: params
+  };
+
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
+  
+  request.post(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      
+      if (err) {
+        log.error('attest:', err);
+        fn(new Error('attestation error - XHR error'));
+      } else if (resp.body && resp.body.result === 'success') {
+        fn(null, resp.body);
+      } else if (resp.body) {
+        log.error('attestation:', resp.body);
+        fn(new Error('attestation error: ' + resp.body.message || ""));
+      } else {
+        fn(new Error('attestation error'));
       } 
     });
 };
