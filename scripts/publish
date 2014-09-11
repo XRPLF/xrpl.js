@@ -1,3 +1,5 @@
+echo "PUBLISH"
+
 function exit_on_error {
   res=$?
   [[ ${res:-99} -eq 0 ]] || exit $res
@@ -5,6 +7,7 @@ function exit_on_error {
 
 rm -rf build
 
+npm install
 gulp
 npm test
 exit_on_error
