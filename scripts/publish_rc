@@ -1,0 +1,40 @@
+function exit_on_error {
+  res=$?
+  [[ ${res:-99} -eq 0 ]] || exit $res
+}
+
+rm -rf build
+
+gulp
+npm test
+exit_on_error
+
+echo ""
+echo "publish rc to npm"
+npm publish --tag beta
+exit_on_error
+
+rm -rf dist
+echo ""
+echo "publish to bower"
+
+git clone git@github.com:ripple/bower-ripple.git dist
+gulp bower
+exit_on_error
+
+cd dist
+version=$(cat bower.json | grep -Eo '([0-9]\.?)+(-rc[0-9])?')
+echo "version: $version"
+git add ripple.js ripple-debug.js ripple-min.js bower.json
+exit_on_error
+
+git commit -m "[TASK] add v$version"
+exit_on_error
+
+git tag "v$version"
+exit_on_error
+
+git push origin master
+git push --tags origin master
+
+cd ..
