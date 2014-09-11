@@ -38,7 +38,16 @@ JavaScript client for [rippled](https://github.com/ripple/rippled)
   $ npm install ripple-lib
 ```
 
-**Building ripple-lib for browser use**
+**Via bower (for browser use)**
+
+```
+  $ bower install ripple
+```
+
+See the [bower-ripple repo](https://github.com/ripple/bower-ripple) for additional bower instructions
+
+
+**Building ripple-lib from github**
 
 ```
   $ git clone https://github.com/ripple/ripple-lib
@@ -46,7 +55,7 @@ JavaScript client for [rippled](https://github.com/ripple/rippled)
   $ npm run build
 ```
 
-Then use the minified `build/ripple-*-min.js` in your webpage
+Then use the minified `build/ripple-*-min.js`
 
 ##Quickstart
 
