@@ -1179,7 +1179,7 @@ Amount.prototype.to_human_full = function(opts) {
   var a = this.to_human(opts);
   var c = this._currency.to_human();
   var i = this._issuer.to_json(opts);
-  var o = this.is_native ?  (o = a + '/' + c) : (o  = a + '/' + c + '/' + i);
+  var o = this.is_native() ?  (o = a + '/' + c) : (o  = a + '/' + c + '/' + i);
   return o;
 };
 
