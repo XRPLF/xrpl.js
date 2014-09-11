@@ -1,3 +1,11 @@
+##0.8.1
+
++ Wallet: Add Wallet class that generates wallets
+
++ Make npm test runnable in Windows.
+
++ Fix several stability issues, see merged PR's for details
+
 ##0.8.0
 
 + Orderbook: Added tracking of offer funds for determining when offers are not funded
