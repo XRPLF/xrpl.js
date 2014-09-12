@@ -530,6 +530,51 @@ describe('Server', function() {
     server.connect();
   });
 
+  it('Connect - syncing state', function(done) {
+    // Test that fee and load defaults are not overwritten by
+    // undefined properties on server subscribe response
+    var wss = new ws.Server({ port: 5748  });
+
+    wss.once('connection', function(ws) {
+      ws.once('message', function(message) {
+        var m = JSON.parse(message);
+
+        assert.deepEqual(m, {
+          command: 'subscribe',
+          id: 0,
+          streams: [ 'ledger', 'server' ]
+        });
+
+        ws.send(JSON.stringify({
+          id: 0,
+          status: 'success',
+          type: 'response',
+          result: {
+            load_base: 256,
+            load_factor: 256,
+            server_status: 'syncing'
+          }
+        }));
+
+        wss.close();
+      });
+    });
+
+    var server = new Server(new Remote(), 'ws://localhost:5748');
+
+    server.once('connect', function() {
+      assert(server.isConnected());
+      assert.strictEqual(server._load_base, 256);
+      assert.strictEqual(server._load_factor, 256);
+      assert.strictEqual(server._fee_base, 10);
+      assert.strictEqual(server._fee_ref, 10);
+      done();
+    });
+
+    server.connect();
+  });
+
+
   it('Reconnect', function(done) {
     var server = new Server(new Remote(), 'ws://localhost:5748');
     server._connected = true;

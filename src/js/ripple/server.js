@@ -184,7 +184,7 @@ Server.websocketConstructor = function() {
 Server.prototype._setState = function(state) {
   if (state !== this._state) {
     if (this._remote.trace) {
-      log.info(this.getHostID(), 'set_state:', state);
+      log.info(this.getServerID(), 'set_state:', state);
     }
 
     this._state = state;
@@ -228,7 +228,7 @@ Server.prototype._checkActivity = function() {
 
   if (delta > (1000 * 25)) {
     if (this._remote.trace) {
-      log.info(this.getHostID(), 'reconnect: activity delta:', delta);
+      log.info(this.getServerID(), 'reconnect: activity delta:', delta);
     }
     this.reconnect();
   }
@@ -274,7 +274,7 @@ Server.prototype._updateScore = function(type, data) {
 
   if (this._score > 1e3) {
     if (this._remote.trace) {
-      log.info(this.getHostID(), 'reconnect: score:', this._score);
+      log.info(this.getServerID(), 'reconnect: score:', this._score);
     }
     this.reconnect();
   }
@@ -622,6 +622,7 @@ Server.prototype._handlePathFind = function(message) {
  * Handle subscription response messages. Subscription response
  * messages indicate that a connection to the server is ready
  *
+ * @param {Object} message
  * @api private
  */
 
@@ -632,18 +633,19 @@ Server.prototype._handleResponseSubscribe = function(message) {
     // servers with incomplete history
     return this.reconnect();
   }
-  if (Server.isLoadStatus(message)) {
-    this._load_base    = message.load_base || 256;
-    this._load_factor  = message.load_factor || 256;
-    this._fee_ref      = message.fee_ref;
-    this._fee_base     = message.fee_base;
-    this._reserve_base = message.reserve_base;
-    this._reserve_inc  = message.reserve_inc;
-  }
   if (message.pubkey_node) {
+    // pubkey_node is used to identify the server
     this._pubkey_node = message.pubkey_node;
   }
-  if (~(Server.onlineStates.indexOf(message.server_status))) {
+  if (Server.isLoadStatus(message)) {
+    this._load_base = message.load_base || 256;
+    this._load_factor = message.load_factor || 256;
+    this._fee_ref = message.fee_ref || 10;
+    this._fee_base = message.fee_base || 10;
+    this._reserve_base = message.reserve_base;
+    this._reserve_inc = message.reserve_inc;
+  }
+  if (~Server.onlineStates.indexOf(message.server_status)) {
     this._setState('online');
   }
 };
