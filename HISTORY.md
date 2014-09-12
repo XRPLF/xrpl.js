@@ -6,6 +6,10 @@
 
 + Fix several stability issues, see merged PR's for details
 
++ Fix bug in Amount.to_human_full()
+
++ Fix undefined fee states when connecting to a rippled that is syncing
+
 ##0.8.0
 
 + Orderbook: Added tracking of offer funds for determining when offers are not funded
