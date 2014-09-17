@@ -1546,7 +1546,7 @@ describe('OrderBook', function() {
   ]
 
 
-  book.once('model', function(model) {
+  book.on('model', function(model) {
     assert.deepEqual(model, expected);
     assert.strictEqual(book._synchronized, true);
     done();

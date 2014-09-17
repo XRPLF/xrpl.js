@@ -78,19 +78,20 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
   });
 
   this.on('unsubscribe', function() {
-    self._ownerFunds = { };
+    self.resetCache();
     self._remote.removeListener('transaction', updateFundedAmounts);
     self._remote.removeListener('transaction', updateTransferRate);
   });
 
-  this._remote.on('prepare_subscribe', function() {
+  this._remote.once('prepare_subscribe', function() {
     self.subscribe();
   });
 
   this._remote.on('disconnect', function() {
-    self._ownerFunds = { };
-    self._offerCounts = { };
-    self._synchronized = false;
+    self.resetCache();
+    self._remote.once('prepare_subscribe', function() {
+      self.subscribe();
+    });
   });
 
   function updateFundedAmounts(message) {
@@ -193,6 +194,16 @@ OrderBook.prototype.unsubscribe = function() {
   });
 
   this.emit('unsubscribe');
+};
+
+/**
+ * Reset cached owner funds, offer counts
+ */
+
+OrderBook.prototype.resetCache = function() {
+  this._ownerFunds = { };
+  this._offerCounts = { };
+  this._synchronized = false;
 };
 
 /**
@@ -694,6 +705,9 @@ OrderBook.prototype.requestOffers = function(callback) {
     if (self._remote.trace) {
       log.info('requested offers', self._key, 'offers: ' + res.offers.length);
     }
+
+    // Reset offers
+    self._offers = [ ];
 
     for (var i=0, l=res.offers.length; i<l; i++) {
       var offer = res.offers[i];
