@@ -134,7 +134,9 @@ function Server(remote, opts) {
       }
     });
 
-    self._request(self._remote.requestServerInfo());
+    var serverInfoRequest = self._remote.requestServerInfo();
+    serverInfoRequest.on('error', function() { });
+    self._request(serverInfoRequest);
   });
 };
 

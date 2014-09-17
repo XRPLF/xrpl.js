@@ -1618,6 +1618,12 @@ Remote.prototype._serverPrepareSubscribe = function(callback) {
     self.emit('subscribed');
   };
 
+  request.on('error', function(err) {
+    if (self.trace) {
+      log.info('Initial server subscribe failed', err);
+    }
+  });
+
   request.once('success', serverSubscribed);
 
   self.emit('prepare_subscribe', request);
