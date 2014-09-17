@@ -50,7 +50,7 @@ Currency.HEX_CURRENCY_BAD = '0000000000000000000000005852500000000000';
  *  \s*$                      // end with any amount of whitespace
  *
  */
-Currency.prototype.human_RE = /^\s*([a-zA-Z]{3}|[0-9]{3})(\s*-\s*[- \w]+)?(\s*\(-?\d+\.?\d*%pa\))?\s*$/;
+Currency.prototype.human_RE = /^\s*([a-zA-Z0-9]{3})(\s*-\s*[- \w]+)?(\s*\(-?\d+\.?\d*%pa\))?\s*$/;
 
 Currency.from_json = function(j, shouldInterpretXrpAsIou) {
   if (j instanceof this) {

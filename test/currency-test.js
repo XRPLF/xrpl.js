@@ -40,8 +40,8 @@ describe('Currency', function() {
     });
     it('from_json("1D2").to_human()', function() {
       var r = currency.from_json("1D2");
-      assert(!r.is_valid());
-      assert.strictEqual('XRP', r.to_json());
+      assert(r.is_valid());
+      assert.strictEqual('1D2', r.to_json());
     });
     it('from_json("XAU").to_json() hex', function() {
       var r = currency.from_json("XAU");

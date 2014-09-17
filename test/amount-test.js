@@ -292,7 +292,7 @@ describe('Amount', function() {
       assert.strictEqual('0/111/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/111/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full());
     });
     it('Parse 0.0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
-      assert.strictEqual('0/XRP/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full());
+      assert.strictEqual('0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full());
     });
     it('Parse native 0 human', function () {
       assert.strictEqual('0/XRP', Amount.from_json('0').to_human_full());
@@ -337,7 +337,7 @@ describe('Amount', function() {
       assert.strictEqual('0/111/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/111/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_human_full());
     });
     it('Parse 0.0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh human', function () {
-      assert.strictEqual('0/XRP/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_human_full());
+      assert.strictEqual('0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('0/12D/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_human_full());
     });
   });
   describe('Amount to_json', function() {
