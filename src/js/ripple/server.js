@@ -409,7 +409,7 @@ Server.prototype.connect = function() {
     if (ws === self._ws) {
       self.emit('socket_open');
       // Subscribe to events
-      self._request(self._remote._serverPrepareSubscribe());
+      self._request(self._remote._serverPrepareSubscribe(self));
     }
   };
 

@@ -615,16 +615,16 @@ Remote.prototype._handleMessage = function(message, server) {
 
   switch (message.type) {
     case 'ledgerClosed':
-      this._handleLedgerClosed(message);
+      this._handleLedgerClosed(message, server);
       break;
     case 'serverStatus':
-      this._handleServerStatus(message);
+      this._handleServerStatus(message, server);
       break;
     case 'transaction':
-      this._handleTransaction(message);
+      this._handleTransaction(message, server);
       break;
     case 'path_find':
-      this._handlePathFind(message);
+      this._handlePathFind(message, server);
       break;
     default:
       if (this.trace) {
@@ -640,7 +640,7 @@ Remote.prototype._handleMessage = function(message, server) {
  * @param {Object} message
  */
 
-Remote.prototype._handleLedgerClosed = function(message) {
+Remote.prototype._handleLedgerClosed = function(message, server) {
   var self = this;
 
   // XXX If not trusted, need to verify we consider ledger closed.
@@ -659,11 +659,11 @@ Remote.prototype._handleLedgerClosed = function(message) {
     this._ledger_current_index = message.ledger_index + 1;
 
     if (this.isConnected()) {
-      this.emit('ledger_closed', message);
+      this.emit('ledger_closed', message, server);
     } else {
       this.once('connect', function() {
         // Delay until server is 'online'
-        self.emit('ledger_closed', message);
+        self.emit('ledger_closed', message, server);
       });
     }
   }
@@ -675,8 +675,8 @@ Remote.prototype._handleLedgerClosed = function(message) {
  * @param {Object} message
  */
 
-Remote.prototype._handleServerStatus = function(message) {
-  this.emit('server_status', message);
+Remote.prototype._handleServerStatus = function(message, server) {
+  this.emit('server_status', message, server);
 };
 
 /**
@@ -685,7 +685,7 @@ Remote.prototype._handleServerStatus = function(message) {
  * @param {Object} message
  */
 
-Remote.prototype._handleTransaction = function(message) {
+Remote.prototype._handleTransaction = function(message, server) {
   var self = this;
 
   // XXX If not trusted, need proof.
@@ -732,8 +732,8 @@ Remote.prototype._handleTransaction = function(message) {
     });
   }
 
-  this.emit('transaction', message);
-  this.emit('transaction_all', message);
+  this.emit('transaction', message, server);
+  this.emit('transaction_all', message, server);
 };
 
 /**
@@ -742,7 +742,7 @@ Remote.prototype._handleTransaction = function(message) {
  * @param {Object} message
  */
 
-Remote.prototype._handlePathFind = function(message) {
+Remote.prototype._handlePathFind = function(message, server) {
   var self = this;
 
   // Pass the event to the currently open PathFind object
@@ -750,7 +750,7 @@ Remote.prototype._handlePathFind = function(message) {
     this._cur_path_find.notify_update(message);
   }
 
-  this.emit('path_find_all', message);
+  this.emit('path_find_all', message, server);
 };
 
 /**
@@ -1524,9 +1524,13 @@ Remote.prototype.requestSubmit = function(callback) {
  * @api private
  */
 
-Remote.prototype._serverPrepareSubscribe = function(callback) {
+Remote.prototype._serverPrepareSubscribe = function(server, callback) {
   var self  = this;
   var feeds = [ 'ledger', 'server' ];
+
+  if (typeof server === 'function') {
+    callback = server;
+  }
 
   if (this._transaction_subs) {
     feeds.push('transactions');
@@ -1548,7 +1552,7 @@ Remote.prototype._serverPrepareSubscribe = function(callback) {
       self.emit('random', utils.hexToArray(message.random));
     }
 
-    self._handleLedgerClosed(message);
+    self._handleLedgerClosed(message, server);
 
     self.emit('subscribed');
   };
@@ -2202,7 +2206,7 @@ Remote.prototype.createTransaction = function(type, options) {
  */
 
 Remote.prototype.feeTx = function(units) {
-  var server = this._getServer();
+  var server = this.getServer();
 
   if (!server) {
     throw new Error('No connected servers');
@@ -2221,7 +2225,7 @@ Remote.prototype.feeTx = function(units) {
  */
 
 Remote.prototype.feeTxUnit = function() {
-  var server = this._getServer();
+  var server = this.getServer();
 
   if (!server) {
     throw new Error('No connected servers');
@@ -2240,7 +2244,7 @@ Remote.prototype.feeTxUnit = function() {
  */
 
 Remote.prototype.reserve = function(owner_count) {
-  var server = this._getServer();
+  var server = this.getServer();
 
   if (!server) {
     throw new Error('No connected servers');
