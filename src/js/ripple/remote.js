@@ -1337,6 +1337,10 @@ Remote.prototype.requestAccountTx = function(options, callback) {
     options.ledger_index_max = options.max_ledger;
   }
 
+  if (options.binary && options.parseBinary === void(0)) {
+    options.parseBinary = true;
+  }
+
   Object.keys(options).forEach(function(o) {
     switch (o) {
       case 'account':
@@ -1356,99 +1360,30 @@ Remote.prototype.requestAccountTx = function(options, callback) {
     }
   }, options);
 
-  function propertiesFilter(obj, transaction) {
-    var properties = Object.keys(obj);
-    return function(transaction) {
-      var result = properties.every(function(property) {
-        return transaction.tx[property] === obj[property];
-      });
-      return result;
-    };
-  };
-
-  function parseBinaryTransaction(transaction) {
-    var tx = { validated: transaction.validated };
-    tx.meta = new SerializedObject(transaction.meta).to_json();
-    tx.tx = new SerializedObject(transaction.tx_blob).to_json();
-    tx.tx.ledger_index = transaction.ledger_index;
-    tx.tx.hash = Transaction.from_json(tx.tx).hash();
-    return tx;
-  };
-
-  function accountTxFilter(fn) {
-    if (typeof fn !== 'function') {
-      throw new Error('Missing filter function');
+  request.once('success', function(res) {
+    if (options.parseBinary) {
+      res.transactions = res.transactions.map(Remote.parseBinaryTransaction);
     }
+    request.emit('transactions', res);
+  });
 
-    var self = this;
-
-    function filterHandler() {
-      var listeners = self.listeners('success');
-
-      self.removeAllListeners('success');
-
-      self.once('success', function(res) {
-        if (options.parseBinary) {
-          res.transactions = res.transactions.map(parseBinaryTransaction);
-        }
-
-        if (fn !== Boolean) {
-          res.transactions = res.transactions.filter(fn);
-        }
-
-        if (typeof options.map === 'function') {
-          res.transactions = res.transactions.map(options.map);
-        }
-
-        if (typeof options.reduce === 'function') {
-          res.transactions = res.transactions.reduce(options.reduce);
-        }
-
-        if (typeof options.pluck === 'string') {
-          res = res[options.pluck];
-        }
-
-        listeners.forEach(function(listener) {
-          listener.call(self, res);
-        });
-      });
-    };
-
-    this.once('request', filterHandler);
-
-    return this;
-  };
-
-  request.filter = accountTxFilter;
-
-  if (typeof options.parseBinary !== 'boolean') {
-    options.parseBinary = true;
-  }
-
-  if (options.binary || (options.map || options.reduce)) {
-    options.filter = options.filter || Boolean;
-  }
-
-  if (options.filter) {
-    switch (options.filter) {
-      case 'inbound':
-        request.filter(propertiesFilter({ Destination: options.account }));
-        break;
-      case 'outbound':
-        request.filter(propertiesFilter({ Account: options.account }));
-        break;
-      default:
-        if (typeof options.filter === 'object') {
-          options.filter = propertiesFilter(options.filter);
-        }
-
-        request.filter(options.filter);
-    }
-  }
-
-  request.callback(callback);
+  request.callback(callback, 'transactions');
 
   return request;
+};
+
+/**
+ * @param {Object} transaction
+ * @return {Transaction}
+ */
+
+Remote.parseBinaryTransaction = function(transaction) {
+  var tx = { validated: transaction.validated };
+  tx.meta = new SerializedObject(transaction.meta).to_json();
+  tx.tx = new SerializedObject(transaction.tx_blob).to_json();
+  tx.tx.ledger_index = transaction.ledger_index;
+  tx.tx.hash = Transaction.from_json(tx.tx).hash();
+  return tx;
 };
 
 /**
