@@ -929,20 +929,19 @@ Remote.prototype.requestServerInfo = function(callback) {
  * @return {Request} request
  */
 
-Remote.prototype.requestLedger = function(ledger, options, callback) {
+Remote.prototype.requestLedger = function(options, callback) {
   // XXX This is a bad command. Some variants don't scale.
   // XXX Require the server to be trusted.
   //utils.assert(this.trusted);
 
   var request = new Request(this, 'ledger');
 
-  if (ledger) {
-    // DEPRECATED: use .ledger_hash() or .ledger_index()
-    //console.log('request_ledger: ledger parameter is deprecated');
-    request.message.ledger = ledger;
-  }
-
   switch (typeof options) {
+    case 'undefined': break;
+    case 'function':
+      callback = options;
+      break;
+
     case 'object':
       Object.keys(options).forEach(function(o) {
         switch (o) {
@@ -950,23 +949,16 @@ Remote.prototype.requestLedger = function(ledger, options, callback) {
           case 'expand':
           case 'transactions':
           case 'accounts':
+          case 'ledger_index':
+          case 'ledger_hash':
             request.message[o] = true;
             break;
         }
       }, options);
       break;
 
-    case 'function':
-      callback = options;
-      options = void(0);
-      break;
-
     default:
-      //DEPRECATED
-      if (this.trace) {
-        log.info('request_ledger: full parameter is deprecated');
-      }
-      request.message.full = true;
+      request.ledgerSelect(options);
       break;
   }
 
