@@ -2,6 +2,12 @@
 
 + Currency: Allow mixed letters and numbers in currencies
 
++ Deprecate account_tx map/reduce/filter
+
++ Fix: correct requestLedger arguments
+
++ Fix: missing subscription on error events for some server methods
+
 + Fix: orderbook reset on reconnect
 
 + Fix: ripple-lib crashing. Add potential missing error handlers
