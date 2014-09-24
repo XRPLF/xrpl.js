@@ -145,12 +145,11 @@ Request.prototype.filter = function(fn) {
   };
 
   function iterator(server, callback) {
-    self.on('proposed', handleResponse);
+    self.once('proposed', handleResponse);
     server._request(self);
 
     function handleResponse(res) {
       callback(fn(result = res));
-      self.removeListener('proposed', handleResponse);
     };
   };
 
