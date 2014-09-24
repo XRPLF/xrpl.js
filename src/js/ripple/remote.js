@@ -16,6 +16,7 @@
 var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
 var assert           = require('assert');
+var async            = require('async');
 var LRU              = require('lru-cache');
 var Server           = require('./server').Server;
 var Request          = require('./request').Request;
@@ -321,6 +322,7 @@ Remote.from_config = function(obj, trace) {
  * Check that server message is valid
  *
  * @param {Object} message
+ * @return {Boolean}
  */
 
 Remote.isValidMessage = function(message) {
@@ -329,10 +331,10 @@ Remote.isValidMessage = function(message) {
 };
 
 /**
- * Check that server message contains valid
- * ledger data
+ * Check that server message contains valid ledger data
  *
  * @param {Object} message
+ * @return {Boolean}
  */
 
 Remote.isValidLedgerData = function(message) {
@@ -347,10 +349,23 @@ Remote.isValidLedgerData = function(message) {
 };
 
 /**
- * Check that server message contains valid
- * load status data
+ * Check that provided ledger is validated, according to closed=true
+ *
+ * @param {Object} ledger
+ * @return {Boolean}
+ */
+
+Remote.isLedgerValidated = function(ledger) {
+  return (ledger && typeof ledger === 'object')
+  && (typeof ledger.ledger === 'object')
+  && (ledger.ledger.closed === true);
+};
+
+/**
+ * Check that server message contains valid load status data
  *
  * @param {Object} message
+ * @return {Boolean}
  */
 
 Remote.isValidLoadStatus = function(message) {
@@ -926,6 +941,8 @@ Remote.prototype.requestServerInfo = function(callback) {
 /**
  * Request ledger
  *
+ * @param {String|Number|Object} options
+ * @param [Function] callback
  * @return {Request} request
  */
 
@@ -934,13 +951,12 @@ Remote.prototype.requestLedger = function(options, callback) {
   // XXX Require the server to be trusted.
   //utils.assert(this.trusted);
 
+  var self = this;
   var request = new Request(this, 'ledger');
 
   switch (typeof options) {
     case 'undefined': break;
-    case 'function':
-      callback = options;
-      break;
+    case 'function': callback = options; break;
 
     case 'object':
       Object.keys(options).forEach(function(o) {
@@ -949,17 +965,21 @@ Remote.prototype.requestLedger = function(options, callback) {
           case 'expand':
           case 'transactions':
           case 'accounts':
+            request.message[o] = true;
+            break;
           case 'ledger_index':
           case 'ledger_hash':
-            request.message[o] = true;
+            request.message[o] = this[o];
             break;
         }
       }, options);
       break;
 
-    default:
-      request.ledgerSelect(options);
-      break;
+    default: request.ledgerSelect(options);
+  }
+
+  if (!options.allow_invalidated) {
+    request.filter(Remote.isLedgerValidated);
   }
 
   request.callback(callback);
