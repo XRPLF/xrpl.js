@@ -978,7 +978,7 @@ Remote.prototype.requestLedger = function(options, callback) {
     default: request.ledgerSelect(options);
   }
 
-  if (!options.allow_invalidated) {
+  if (options && !options.allow_invalidated) {
     request.filter(Remote.isLedgerValidated);
   }
 
