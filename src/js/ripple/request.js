@@ -1,5 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var util         = require('util');
+var assert       = require('assert');
+var async        = require('async');
 var UInt160      = require('./uint160').UInt160;
 var Currency     = require('./currency').Currency;
 var RippleError  = require('./rippleerror').RippleError;
@@ -24,10 +26,8 @@ function Request(remote, command) {
 
   this.remote = remote;
   this.requested = false;
-  this.message = {
-    command: command,
-    id: void(0)
-  };
+  this.message = { command: command, id: void(0) };
+  this.on('error', function(){});
 };
 
 util.inherits(Request, EventEmitter);
@@ -40,6 +40,8 @@ Request.prototype.broadcast = function() {
 
 // Send the request to a remote.
 Request.prototype.request = function(servers, callback) {
+  this.emit('before');
+
   if (this.requested) {
     return this;
   }
@@ -49,7 +51,6 @@ Request.prototype.request = function(servers, callback) {
   }
 
   this.requested = true;
-  this.on('error', function(){});
   this.emit('request', this.remote);
 
   if (Array.isArray(servers)) {
@@ -97,6 +98,70 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
   this.once(successEvent || 'success', requestSuccess);
   this.once(errorEvent   || 'error'  , requestError);
   this.request();
+
+  return this;
+};
+
+/**
+ * Broadcast request to all connected servers, filter responses. Return first
+ * response that satisfies the filter
+ *
+ * @param {Function} fn
+ */
+
+Request.prototype.filter = function(fn) {
+  assert.strictEqual(typeof fn, 'function');
+
+  var self = this;
+
+  if (!this.requested) {
+    // Defer until requested, and prevent the normal request from executing
+    return this.once('before', function() {
+      self.requested = true;
+      self.filter(fn);
+    });
+  }
+
+  if (this._filtering) {
+    // XXX Consider multiple response filters (?)
+    throw new Error('request.filter() called more than once');
+  }
+
+  this._filtering = true;
+
+  var result;
+  var emit = this.emit;
+
+  // Proxy success/error events
+  this.emit = function(event, a, b) {
+    switch (event) {
+      case 'success':
+      case 'error':
+        emit.call(self, 'proposed', a, b);
+        break;
+      default:
+        emit.apply(self, arguments);
+    }
+  };
+
+  function iterator(server, callback) {
+    self.once('proposed', handleResponse);
+    server._request(self);
+
+    function handleResponse(res) {
+      callback(fn(result = res));
+    };
+  };
+
+  function complete(success) {
+    emit.call(self, success ? 'success' : 'error', result);
+  };
+
+  var servers = this.remote.getConnectedServers();
+
+  // Apply iterator in parallel to connected servers, complete when the
+  // supplied filter function is satisfied once by a server's response
+  async.some(servers, iterator, complete);
 
   return this;
 };
