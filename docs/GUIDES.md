@@ -111,14 +111,14 @@ See the [wiki](https://ripple.com/wiki/JSON_Messages#subscribe) for details on s
 	//handle ledger
     });
 
-    remote.on('transaction', function onTransacstion(transaction) {
+    request.on('transaction', function onTransacstion(transaction) {
 	//handle transaction
     });
 
-    remote.request(function(err) {
+    request.request(function(err) {
       	if (err) {
-	} else {
-	}
+        } else {
+        }
     });
   });
 ```
@@ -186,14 +186,7 @@ var Amount = require('ripple-lib').Amount;
 
 var MY_ADDRESS = 'rrrMyAddress';
 var MY_SECRET  = 'secret';
-
-var BUY_AMOUNT = Amount.from_human('100XRP');
-var SELL_AMOUNT = Amount.from_human('1USD');
-
-// EXPIRATION must be a Date object, leave undefined to submit offer that won't expire
-var now = new Date();
-var tomorrow = new Date(now.getTime() + (24 * 60 * 60 * 1000));
-var EXPIRATION = tomorrow;
+var GATEWAY = 'rrrGateWay';
 
 var remote = new Remote({ /* Remote options */ });
 
@@ -201,10 +194,9 @@ remote.connect(function() {
   remote.setSecret(MY_ADDRESS, MY_SECRET);
 
   var transaction = remote.createTransaction('OfferCreate', {
-    account: MY_ADDRESS, 
-    buy: BUY_AMOUNT, 
-    sell: SELL_AMOUNT, 
-    expiration: EXPIRATION
+    account: MY_ADDRESS,
+    taker_pays: '1',
+    taker_gets: '1/USD/' + GATEWAY
   });
 
   transaction.submit(function(err, res) {
