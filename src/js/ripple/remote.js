@@ -92,7 +92,7 @@ function Remote(opts, trace) {
   this.canonical_signing = (typeof opts.canonical_signing === 'boolean') ? opts.canonical_signing : true;
 
   this.fee_cushion = (typeof opts.fee_cushion === 'number') ? opts.fee_cushion : 1.2;
-  this.max_fee = (typeof opts.max_fee === 'number') ? opts.max_fee : Infinity;
+  this.max_fee = (typeof opts.max_fee === 'number') ? opts.max_fee : 10000;
 
   this._ledger_current_index = void(0);
   this._ledger_hash = void(0);
@@ -108,6 +108,7 @@ function Remote(opts, trace) {
   this._should_connect = true;
 
   this._submission_timeout = 1000 * (typeof opts.submission_timeout === 'number' ? opts.submission_timeout : 20);
+  this._lastLedgerOffset = (typeof opts.lastLedgerOffset === 'number') ? opts.lastLedgerOffset : 8;
 
   this._received_tx = LRU({ max: 100 });
   this._cur_path_find = null;

@@ -21,6 +21,7 @@ function TransactionManager(account) {
   this._nextSequence      = void(0);
   this._maxFee            = this._remote.max_fee;
   this._submissionTimeout = this._remote._submission_timeout;
+  this._lastLedgerOffset  = this._remote._lastLedgerOffset;
   this._pending           = new PendingQueue();
 
   // Query remote server for next account sequence number
@@ -58,11 +59,12 @@ function TransactionManager(account) {
 
   function updatePendingStatus(ledger) {
     self._pending.forEach(function(pending) {
-      switch (ledger.ledger_index - pending.submitIndex) {
-        case 8:
+      switch (true) {
+        case (ledger.ledger_index > pending.lastLedgerSequence):
           pending.emit('lost', ledger);
+          pending.emit('error', new RippleError('tejTransactionLost', 'Transaction not seen by lastLedgerSequence.'));
           break;
-        case 4:
+        case ( (ledger.ledger_index - pending.submitIndex) > 0.5*(pending.lastLedgerSequence - pending.submitIndex) ):
           pending.emit('missing', ledger);
           break;
       }
@@ -566,7 +568,7 @@ TransactionManager.prototype._request = function(tx) {
   if (!tx._setLastLedger) {
     // Honor LastLedgerSequence set by user of API. If
     // left unset by API, bump LastLedgerSequence
-    tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
+    tx.tx_json.LastLedgerSequence = tx.submitIndex + this._lastLedgerOffset;
   }
 
   tx.lastLedgerSequence = tx.tx_json.LastLedgerSequence;
