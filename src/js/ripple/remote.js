@@ -949,10 +949,19 @@ Remote.prototype.requestLedger = function(options, callback) {
           case 'expand':
           case 'transactions':
           case 'accounts':
-          case 'ledger_index':
-          case 'ledger_hash':
             request.message[o] = true;
             break;
+            
+          case 'ledger_index':
+          case 'ledger_hash':
+            request.message[o] = options[o];
+            break;  
+            
+          case 'closed' :
+          case 'current' :
+          case 'validated' :
+            request.message.ledger_index = o;
+            break;  
         }
       }, options);
       break;
