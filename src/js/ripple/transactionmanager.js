@@ -20,6 +20,7 @@ function TransactionManager(account) {
   this._remote            = account._remote;
   this._nextSequence      = void(0);
   this._maxFee            = this._remote.max_fee;
+  this._maxAttempts       = this._remote.max_attempts;
   this._submissionTimeout = this._remote._submission_timeout;
   this._pending           = new PendingQueue();
 
@@ -344,7 +345,7 @@ TransactionManager.prototype._request = function(tx) {
   var self   = this;
   var remote = this._remote;
 
-  if (tx.attempts > 10) {
+  if (tx.attempts > this._maxAttempts) {
     return tx.emit('error', new RippleError('tejAttemptsExceeded'));
   }
 

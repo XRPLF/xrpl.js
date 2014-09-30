@@ -94,6 +94,8 @@ function Remote(opts, trace) {
   this.fee_cushion = (typeof opts.fee_cushion === 'number') ? opts.fee_cushion : 1.2;
   this.max_fee = (typeof opts.max_fee === 'number') ? opts.max_fee : Infinity;
 
+  this.max_attempts = (typeof opts.max_attempts === 'number') ? opts.max_attempts : 10;
+
   this._ledger_current_index = void(0);
   this._ledger_hash = void(0);
   this._ledger_time = void(0);
