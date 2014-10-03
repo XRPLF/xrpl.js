@@ -5,7 +5,6 @@ var config = require('./testutils').get_config();
 
 describe('Seed', function() {
   it('can generate many addresses', function () {
-    var seed = Seed.from_json("masterpassphrase");
 
     var test_data = [
       // Format:
@@ -28,10 +27,10 @@ describe('Seed', function() {
 
     function assert_helper(seed_json, address_or_nth, expected) {
       var seed = Seed.from_json(seed_json);
-      var keypair = seed.get_key(address_or_nth);
-      assert.strictEqual(keypair.to_hex_pub(),
-                         expected);
+      var keypair = seed.get_key(address_or_nth, 500);
+      assert.strictEqual(keypair.to_hex_pub(), expected);
     }
+
     for (var nth = 0; nth < test_data.length; nth++) {
       var seed_json = test_data[nth][0];
       var address = test_data[nth][1];
@@ -47,7 +46,30 @@ describe('Seed', function() {
       // This isn't too bad as it only needs to generate one keypair `seq`
       assert_helper(seed_json, nth_for_seed, expected);
     };
+
   });
+
+  it('should return the key_pair for a valid account and secret pair', function() {
+    var address = 'r3GgMwvgvP8h4yVWvjH1dPZNvC37TjzBBE';
+    var seed = Seed.from_json('shsWGZcmZz6YsWWmcnpfr6fLTdtFV');
+    var keyPair = seed.get_key(address);
+    assert.strictEqual(keyPair.get_address().to_json(), address);
+    assert.strictEqual(keyPair.to_hex_pub(), '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8');
+  });
+
+  it('should not find a KeyPair for a secret that does not belong to the given account', function() {
+    var address = 'r3GgMwvgvP8h4yVWvjH1dPZNvC37TjzBBE';
+    var secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+    var seed = Seed.from_json('snoPBrXtMeMyMHUVTgbuqAfg1SUTb');
+    try {
+      seed.get_key(address);
+      assert(false, 'should throw an error');
+    } catch(e) {
+      assert.strictEqual(e.message, 'Too many loops looking for KeyPair yielding '+address+' from '+secret);
+    }
+
+  });
+
 });
 
 // vim:sw=2:sts=2:ts=8:et
