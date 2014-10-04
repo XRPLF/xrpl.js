@@ -583,15 +583,11 @@ VaultClient.prototype.requestToken  = blobClient.requestToken;
 
 VaultClient.prototype.verifyToken   = blobClient.verifyToken;
 
-VaultClient.prototype.updateProfile = blobClient.updateProfile;
+VaultClient.prototype.getAttestation = blobClient.getAttestation;
 
-VaultClient.prototype.getProfile    = blobClient.getProfile;
+VaultClient.prototype.updateAttestation = blobClient.updateAttestation;
 
-VaultClient.prototype.attest        = blobClient.attest;
-
-VaultClient.prototype.attestation   = blobClient.attestation;
-
-VaultClient.prototype.getAttestations = blobClient.getAttestations;
+VaultClient.prototype.getAttestationSummary = blobClient.getAttestationSummary;
 
 //export by name
 exports.VaultClient = VaultClient;

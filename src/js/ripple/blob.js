@@ -1343,7 +1343,6 @@ BlobClient.deleteBlob = function(options, fn) {
  * @param {string} attribute.domain ... corresponding domain
  * @param {string} attribute.status ... “current”, “removed”, etc.
  * @param {string} attribute.visibitlity ... “public”, ”private”
-
  */
 
 BlobClient.updateProfile = function (opts, fn) {
@@ -1410,76 +1409,28 @@ BlobClient.getProfile = function (opts, fn) {
 };
 
 /**
- * getAttestations
- * @param {Object} opts
- * @param {string} opts.url
- * @param {string} opts.auth_secret
- * @param {srring} opts.blob_id
- */
-BlobClient.getAttestations = function (opts, fn) {
-  var config = {
-    method: 'GET',
-    url: opts.url + '/v1/profile/attestations',
-  };
-
-  var signedRequest = new SignedRequest(config);
-  var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
-  
-  request.get(signed.url)
-    .send(signed.data)
-    .end(function(err, resp) {
-      
-      if (err) {
-        log.error('getAttestations:', err);
-        fn(new Error('Failed to get attestations - XHR error'));
-      } else if (resp.body && resp.body.result === 'success') {
-        fn(null, resp.body);
-      } else if (resp.body) {
-        log.error('getAttestations:', resp.body);
-        fn(new Error('Failed to get attestations'));
-      } else {
-        fn(new Error('Failed to get attestations'));
-      } 
-    });
-};
-
-/**
- * attest
+ * getAttestation
  * @param {Object} opts
  * @param {string} opts.url
  * @param {string} opts.auth_secret
  * @param {string} opts.blob_id
  * @param {string} opts.type (email,phone,basic_identity)
  * @param {object} opts.phone (required for type 'phone')
- * @param {object} opts.identity (optional)
  * @param {string} opts.email (required for type 'email')
- * @param {string} opts.attestation_id (required for completing email or phone attestations)
- * @param {string} opts.token (required for completing email or phone attestations)
  */
-/*
-BlobClient.attest = function (opts, fn) {
-  var params = {
-    type: opts.type
-  };
+BlobClient.getAttestation = function (opts, fn) {
+  var params = { };
   
-  console.log(opts);
-  
-  if (opts.phone)           params.phone           = opts.phone;
-  if (opts.profile)         params.profile         = opts.profile;
-  if (opts.email)           params.email           = opts.email;
-  if (opts.attestation_id)  params.attestation_id  = opts.attestation_id;
-  if (opts.verification_id) params.verification_id = opts.verification_id;
-  if (opts.token)           params.token           = opts.token;
-  if (opts.questions_id)    params.questions_id    = opts.questions_id;
-  if (opts.answers)         params.answers         = opts.answers;
+  if (opts.phone) params.phone = opts.phone;
+  if (opts.email) params.email = opts.email;
       
   var config = {
     method: 'POST',
-    url: opts.url + '/v1/profile/attest',
+    url: opts.url + '/v1/attestation/' + opts.type,
     dataType: 'json',
     data: params
   };
-
+  
   var signedRequest = new SignedRequest(config);
   var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
   
@@ -1489,47 +1440,89 @@ BlobClient.attest = function (opts, fn) {
       
       if (err) {
         log.error('attest:', err);
-        fn(new Error('Failed to attest - XHR error'));
+        fn(new Error('attestation error - XHR error'));
       } else if (resp.body && resp.body.result === 'success') {
+        if (resp.body.attestation) {
+          resp.body.decoded = BlobClient.parseAttestation(resp.body.attestation);
+        }
+        
         fn(null, resp.body);
       } else if (resp.body) {
-        log.error('attest:', resp.body);
-        fn(new Error('Failed to attest: ' + resp.body.message || ""));
+        log.error('attestation:', resp.body);
+        fn(new Error('attestation error: ' + resp.body.message || ""));
       } else {
-        fn(new Error('Failed to attest'));
+        fn(new Error('attestation error'));
       } 
     });
-};
-*/
+};  
 
 /**
- * attestation
+ * getAttestationSummary
  * @param {Object} opts
  * @param {string} opts.url
  * @param {string} opts.auth_secret
  * @param {string} opts.blob_id
- * @param {string} opts.type (email,phone,basic_identity)
+ */
+BlobClient.getAttestationSummary = function (opts, fn) {
+
+
+  var config = {
+    method: 'GET',
+    url: opts.url + '/v1/attestation/summary',
+    dataType: 'json'
+  };
+  
+  var signedRequest = new SignedRequest(config);
+  var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
+  
+  request.get(signed.url)
+    .send(signed.data)
+    .end(function(err, resp) {
+      
+      if (err) {
+        log.error('attest:', err);
+        fn(new Error('attestation error - XHR error'));
+      } else if (resp.body && resp.body.result === 'success') {
+        if (resp.body.attestation) {
+          resp.body.decoded = BlobClient.parseAttestation(resp.body.attestation);
+        }
+        
+        fn(null, resp.body);
+      } else if (resp.body) {
+        log.error('attestation:', resp.body);
+        fn(new Error('attestation error: ' + resp.body.message || ""));
+      } else {
+        fn(new Error('attestation error'));
+      } 
+    });
+};  
+
+/**
+ * updateAttestation
+ * @param {Object} opts
+ * @param {string} opts.url
+ * @param {string} opts.auth_secret
+ * @param {string} opts.blob_id
+ * @param {string} opts.type (email,phone,profile,identity)
  * @param {object} opts.phone (required for type 'phone')
- * @param {object} opts.identity (optional)
+ * @param {object} opts.profile (required for type 'profile')
  * @param {string} opts.email (required for type 'email')
- * @param {string} opts.attestation_id (required for completing email or phone attestations)
+ * @param {string} opts.answers (required for type 'identity')
  * @param {string} opts.token (required for completing email or phone attestations)
  */
-BlobClient.attestation = function (opts, fn) {
+BlobClient.updateAttestation = function (opts, fn) {
+
   var params = { };
   
-  if (opts.phone)           params.phone           = opts.phone;
-  if (opts.profile)         params.profile         = opts.profile;
-  if (opts.email)           params.email           = opts.email;
-  if (opts.attestation_id)  params.attestation_id  = opts.attestation_id;
-  if (opts.verification_id) params.verification_id = opts.verification_id;
-  if (opts.token)           params.token           = opts.token;
-  if (opts.questions_id)    params.questions_id    = opts.questions_id;
-  if (opts.answers)         params.answers         = opts.answers;
+  if (opts.phone)    params.phone   = opts.phone;
+  if (opts.profile)  params.profile = opts.profile;
+  if (opts.email)    params.email   = opts.email;
+  if (opts.token)    params.token   = opts.token;
+  if (opts.answers)  params.answers = opts.answers;
       
   var config = {
     method: 'POST',
-    url: opts.url + '/v1/profile/attestation/' + opts.type,
+    url: opts.url + '/v1/attestation/' + opts.type + '/update',
     dataType: 'json',
     data: params
   };
@@ -1545,6 +1538,10 @@ BlobClient.attestation = function (opts, fn) {
         log.error('attest:', err);
         fn(new Error('attestation error - XHR error'));
       } else if (resp.body && resp.body.result === 'success') {
+        if (resp.body.attestation) {
+          resp.body.decoded = BlobClient.parseAttestation(resp.body.attestation);
+        }
+        
         fn(null, resp.body);
       } else if (resp.body) {
         log.error('attestation:', resp.body);
@@ -1553,6 +1550,29 @@ BlobClient.attestation = function (opts, fn) {
         fn(new Error('attestation error'));
       } 
     });
+};
+
+/**
+ * parseAttestation
+ * @param {Object} attestation
+ */
+BlobClient.parseAttestation = function (attestation) {
+  var segments =  attestation.split('.');
+  var decoded;
+  
+  // base64 decode and parse JSON
+  try {
+    decoded = {
+      header    : JSON.parse(atob(segments[0])),
+      payload   : JSON.parse(atob(segments[1])),
+      signature : segments[2]
+    }; 
+    
+  } catch (e) {
+    console.log("invalid attestation:", e);
+  }
+  
+  return decoded;
 };
 
 exports.BlobClient = BlobClient;
