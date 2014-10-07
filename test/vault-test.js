@@ -151,14 +151,12 @@ var mockDelete;
 
 if (!online) {
   mockRippleTxt = nock('https://ripple.com')
-    .persist()
     .get('/ripple.txt')
     .reply(200, rippleTxtRes, {
       'Content-Type': 'text/plain'
     }); 
       
   mockRippleTxt2 = nock('https://' + exampleData.domain)
-    .persist()
     .get('/ripple.txt')
     .reply(200, rippleTxtRes, {
       'Content-Type': 'text/plain'
@@ -171,21 +169,21 @@ if (!online) {
       'Content-Type': 'text/plain'
     });   
  
-  mockRegister = nock('https://id.staging.ripple.com').persist();
+  mockRegister = nock('https://id.staging.ripple.com');
   mockRegister.filteringPath(/(v1\/user\?signature(.+))/g, 'register/')
     .post('/register/')
     .reply(200, { result: 'error', message: 'User already exists' }, {
       'Content-Type': 'application/json'
     });   
 
-  mockDelete = nock('https://id.staging.ripple.com').persist();
+  mockDelete = nock('https://id.staging.ripple.com');
   mockDelete.filteringPath(/(v1\/user\/(.+))/g, 'delete/')
     .delete('/delete/')
     .reply(200, { result: 'success' }, {
       'Content-Type': 'application/json'
     });  
             
-  mockBlob = nock('https://id.staging.ripple.com').persist();
+  mockBlob = nock('https://id.staging.ripple.com');
   mockBlob.get('/v1/authinfo?domain=' + exampleData.domain + '&username=' + exampleData.username.toLowerCase())
     .reply(200, JSON.stringify(authInfoRes.body), {
       'Content-Type': 'application/json'
@@ -203,47 +201,40 @@ if (!online) {
       'Content-Type': 'application/json'
     });    
 
-  mockRename = nock('https://id.staging.ripple.com/v1/user/').persist();
+  mockRename = nock('https://id.staging.ripple.com/v1/user/');
   mockRename.filteringPath(/((.+)\/rename(.+))/g, 'rename/')
     .post('rename/')
     .reply(200, {result:'success',message:'rename'}, {
       'Content-Type': 'application/json'
     });  
   
-  mockUpdate = nock('https://id.staging.ripple.com/v1/user/').persist();
-  mockUpdate.filteringPath(/((.+)\/update(.+))/g, 'update/')
+  mockUpdate = nock('https://id.staging.ripple.com/v1/user/');
+  mockUpdate.filteringPath(/((.+)\/updatekeys(.+))/g, 'update/')
     .post('update/')
     .reply(200, {result:'success',message:'updateKeys'}, {
       'Content-Type': 'application/json'
     });  
     
-  mockRecover = nock('https://id.staging.ripple.com/').persist();
+  mockRecover = nock('https://id.staging.ripple.com/')
   mockRecover.filteringPath(/((.+)user\/recov\/(.+))/g, 'recov/')
     .get('recov/')
     .reply(200, recoverRes.body, {
       'Content-Type': 'application/json'
     });  
-        
-  mockVerify = nock('https://id.staging.ripple.com/v1/user/').persist();
+       
+  mockVerify = nock('https://id.staging.ripple.com/v1/user/');
   mockVerify.filteringPath(/((.+)\/verify(.+))/g, 'verify/')
     .get('verify/')
     .reply(200, {result:'error', message:'invalid token'}, {
       'Content-Type': 'application/json'
     });                     
 
-  mockEmail = nock('https://id.staging.ripple.com/v1/user').persist();
+  mockEmail = nock('https://id.staging.ripple.com/v1/user');
   mockEmail.filteringPath(/((.+)\/email(.+))/g, 'email/')
     .post('email/')
     .reply(200, {result:'success'}, {
       'Content-Type': 'application/json'
     });  
-
-  mockProfile = nock('https://id.staging.ripple.com/v1/user').persist();
-  mockProfile.filteringPath(/((.+)\/profile(.+))/g, 'profile/')
-    .post('profile/')
-    .reply(200, {result:'success'}, {
-      'Content-Type': 'application/json'
-    });     
 }
 
 describe('Ripple Txt', function () {
@@ -437,6 +428,7 @@ describe('VaultClient', function () {
     });
   });
 
+/*  
   describe('#updateProfile', function () {
     it('should update profile parameters associated with a blob', function (done) {
       this.timeout(10000);
@@ -460,7 +452,7 @@ describe('VaultClient', function () {
       });
     });
   });  
-    
+*/    
   
 });
 
@@ -713,39 +705,89 @@ describe('Blob', function () {
   });
 
   describe('identityVault', function() {
-    it('#identity-getProfile', function (done) {
+    it('#identity - Get Attestation', function (done) {
       var options = {
-        url : blob.url,
+        url         : blob.url,
         auth_secret : blob.data.auth_secret,
-        blob_id :blob.id,
-        identity_id : blob.identity_id,      
+        blob_id     : blob.id,
       };
       
-      options.profile = { 
-        attributes : [{
-          name : 'email',
-          value : 'example@example.com',
-          visibility : 'public'
-        }]
-      };
+      options.type = 'identity';
       
-      client.getProfile(options, function(err, resp) {
-        console.log(err, resp); 
+      nock('https://id.staging.ripple.com')
+        .filteringPath(/(v1\/attestation\/identity(.+))/g, '')
+        .post('/')
+        .reply(200, {
+          result: 'success', 
+          status: 'verified', 
+          attestation: 'eyJ6IjoieiJ9.eyJ6IjoieiJ9.sig', 
+          blinded:'eyJ6IjoieiJ9.eyJ6IjoieiJ9.sig'
+        },  {'Content-Type': 'application/json'}); 
+      
+      client.getAttestation(options, function(err, resp) {
+        assert.ifError(err);
+        assert.strictEqual(resp.result, 'success');
+        assert.strictEqual(typeof resp.attestation, 'string'); 
+        assert.strictEqual(typeof resp.blinded, 'string'); 
+        assert.deepEqual(resp.decoded, {"header":{"z":"z"},"payload":{"z":"z"},"signature":"sig"})
         done();
       });
     });
     
-    it('#identity-updateProfile', function (done) {
-      done();
+    it('#identity - Update Attestation', function (done) {
+
+      var options = {
+        url         : blob.url,
+        auth_secret : blob.data.auth_secret,
+        blob_id     : blob.id,
+      };
+      
+      options.type = 'identity';
+      
+      nock('https://id.staging.ripple.com')
+        .filteringPath(/(v1\/attestation\/identity\/update(.+))/g, '')
+        .post('/')
+        .reply(200, {
+          result: 'success', 
+          status: 'verified', 
+          attestation: 'eyJ6IjoieiJ9.eyJ6IjoieiJ9.sig', 
+          blinded:'eyJ6IjoieiJ9.eyJ6IjoieiJ9.sig'
+        },  {'Content-Type': 'application/json'});       
+      
+      client.updateAttestation(options, function(err, resp) {
+        assert.ifError(err);
+        assert.strictEqual(resp.result, 'success');
+        assert.strictEqual(typeof resp.attestation, 'string'); 
+        assert.strictEqual(typeof resp.blinded, 'string'); 
+        assert.deepEqual(resp.decoded, {"header":{"z":"z"},"payload":{"z":"z"},"signature":"sig"})
+        done();
+      });
     }); 
         
-    it('#identity-getAttestations', function (done) {
-      done();
-    });     
+    it('#identity - Get Attestation Summary', function (done) {
 
-    it('#identity-attest', function (done) {
-      done();
-    });         
+      var options = {
+        url         : blob.url,
+        auth_secret : blob.data.auth_secret,
+        blob_id     : blob.id,
+      };
+      
+      nock('https://id.staging.ripple.com')
+        .filteringPath(/(v1\/attestation\/summary(.+))/g, '')
+        .get('/')
+        .reply(200, {
+          result: 'success', 
+          attestation: 'eyJ6IjoieiJ9.eyJ6IjoieiJ9.sig', 
+        },  {'Content-Type': 'application/json'});       
+      
+      client.getAttestationSummary(options, function(err, resp) {
+        assert.ifError(err);
+        assert.strictEqual(resp.result, 'success');
+        assert.strictEqual(typeof resp.attestation, 'string'); 
+        assert.deepEqual(resp.decoded, {"header":{"z":"z"},"payload":{"z":"z"},"signature":"sig"})
+        done();
+      });
+    });            
   });
     
   //only do these offline

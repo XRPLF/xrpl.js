@@ -322,4 +322,12 @@ Crypt.base64UrlToBase64 = function(encodedData) {
   return encodedData;
 };
 
+/**
+ * base64 to UTF8
+ */
+
+Crypt.decodeBase64 = function (data) {
+  return sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(data));
+}
+
 exports.Crypt = Crypt;

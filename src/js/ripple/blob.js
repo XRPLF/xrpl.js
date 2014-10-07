@@ -1322,7 +1322,6 @@ BlobClient.deleteBlob = function(options, fn) {
     });  
 };
 
-
 /*** identity related functions ***/
 
 /**
@@ -1381,6 +1380,7 @@ BlobClient.updateProfile = function (opts, fn) {
  * @param {string} opts.auth_secret
  * @param {srring} opts.blob_id
  */
+
 BlobClient.getProfile = function (opts, fn) {
   var config = {
     method: 'GET',
@@ -1418,6 +1418,7 @@ BlobClient.getProfile = function (opts, fn) {
  * @param {object} opts.phone (required for type 'phone')
  * @param {string} opts.email (required for type 'email')
  */
+
 BlobClient.getAttestation = function (opts, fn) {
   var params = { };
   
@@ -1463,6 +1464,7 @@ BlobClient.getAttestation = function (opts, fn) {
  * @param {string} opts.auth_secret
  * @param {string} opts.blob_id
  */
+
 BlobClient.getAttestationSummary = function (opts, fn) {
 
 
@@ -1471,6 +1473,8 @@ BlobClient.getAttestationSummary = function (opts, fn) {
     url: opts.url + '/v1/attestation/summary',
     dataType: 'json'
   };
+  
+  if (opts.full) config.url += '?full=true';
   
   var signedRequest = new SignedRequest(config);
   var signed = signedRequest.signHmac(opts.auth_secret, opts.blob_id);  
@@ -1510,6 +1514,7 @@ BlobClient.getAttestationSummary = function (opts, fn) {
  * @param {string} opts.answers (required for type 'identity')
  * @param {string} opts.token (required for completing email or phone attestations)
  */
+
 BlobClient.updateAttestation = function (opts, fn) {
 
   var params = { };
@@ -1556,6 +1561,7 @@ BlobClient.updateAttestation = function (opts, fn) {
  * parseAttestation
  * @param {Object} attestation
  */
+
 BlobClient.parseAttestation = function (attestation) {
   var segments =  attestation.split('.');
   var decoded;
@@ -1563,8 +1569,8 @@ BlobClient.parseAttestation = function (attestation) {
   // base64 decode and parse JSON
   try {
     decoded = {
-      header    : JSON.parse(atob(segments[0])),
-      payload   : JSON.parse(atob(segments[1])),
+      header    : JSON.parse(crypt.decodeBase64(segments[0])),
+      payload   : JSON.parse(crypt.decodeBase64(segments[1])),
       signature : segments[2]
     }; 
     
