@@ -93,9 +93,14 @@ function SHA256_RIPEMD160(bits) {
 *
 *        {Uint160} (from_json able), specifies the address matching the KeyPair
 *                                    that is desired.
+*
+* @param maxLoops (optional)
+*        {Number}                    specifies the amount of attempts taken to generate
+*                                    a matching KeyPair
 */
-Seed.prototype.get_key = function (account) {
+Seed.prototype.get_key = function (account, maxLoops) {
   var account_number = 0, address;
+  var max_loops = maxLoops || 1;
 
   if (!this.is_valid()) {
     throw new Error('Cannot generate keys from invalid seed!');
@@ -103,6 +108,7 @@ Seed.prototype.get_key = function (account) {
   if (account) {
     if (typeof account === 'number') {
       account_number = account;
+      max_loops = account_number+1;
     } else {
       address = UInt160.from_json(account);
     }
@@ -121,9 +127,9 @@ Seed.prototype.get_key = function (account) {
 
   var sec;
   var key_pair;
-  var max_loops = 1000; // TODO
 
   do {
+
     i = 0;
 
     do {
@@ -135,15 +141,15 @@ Seed.prototype.get_key = function (account) {
     sec = sec.add(private_gen).mod(curve.r);
     key_pair = KeyPair.from_bn_secret(sec);
 
-    if (--max_loops <= 0) {
+    if (max_loops-- <= 0) {
       // We are almost certainly looking for an account that would take same
       // value of $too_long {forever, ...}
       throw new Error('Too many loops looking for KeyPair yielding '+
                       address.to_json() +' from ' + this.to_json());
-    };
-  } while (address && !key_pair.get_address().equals(address));
+    }
 
-   return key_pair;
+  } while (address && !key_pair.get_address().equals(address));
+    return key_pair;
 };
 
 exports.Seed = Seed;
