@@ -777,14 +777,16 @@ describe('Blob', function () {
         .get('/')
         .reply(200, {
           result: 'success', 
-          attestation: 'eyJ6IjoieiJ9.eyJ6IjoieiJ9.sig', 
+          attestation: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjY2ZGI3MzgxIn0%3D.eyJwcm9maWxlX3ZlcmlmaWVkIjpmYWxzZSwiaWRlbnRpdHlfdmVyaWZpZWQiOmZhbHNlLCJpc3MiOiJodHRwczovL2lkLnJpcHBsZS5jb20iLCJzdWIiOiIwNDMzNTA0ZS0yYTRmLTQ1NjktODQwMi1lYWI2YTU0YTgzYjUiLCJleHAiOjE0MTI4MTc2NjksImlhdCI6MTQxMjgxNTgwOX0%3D.Jt14Y2TsM7fKqGWn0j16cPldlYqRr7%2F2dptBsdZuZhRGRTREO4TSpZZhBaU95WL3M9eXIfaoSs8f2pTOa%2BBGAYHZSZK4%2FLqeWdDH8zz8Bx9YFqGije1KmHQR%2FeoWSp1GTEfcq5Oho4nSHozHhGNN8IrDkl8woMvWb%2FE1938Y5Zl2vyv7wjlNUF4ND33XWzJkvQjzIK15uYfaB%2FUIsNW32udfHAdkigesdMDNm%2BRGBqHMDZeAMdVxzrDzE3m8oWKDMJXbcaLmk75COfJrLWYiZCHd7VcReyPEZegwEucetZJ9uDnoBcvw0%2B6hIRmjTN6Gy1eeBoJaiDYsWuOwInbIlw%3D%3D', 
         },  {'Content-Type': 'application/json'});       
       
       client.getAttestationSummary(options, function(err, resp) {
         assert.ifError(err);
         assert.strictEqual(resp.result, 'success');
         assert.strictEqual(typeof resp.attestation, 'string'); 
-        assert.deepEqual(resp.decoded, {"header":{"z":"z"},"payload":{"z":"z"},"signature":"sig"})
+        assert.strictEqual(typeof resp.decoded.header, 'object'); 
+        assert.strictEqual(typeof resp.decoded.payload, 'object'); 
+        assert.strictEqual(typeof resp.decoded.signature, 'string'); 
         done();
       });
     });            
