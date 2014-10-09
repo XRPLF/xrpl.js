@@ -1796,6 +1796,7 @@ Remote.prototype.createOrderBook = function(currency_gets, issuer_gets, currency
   var key = gets + ':' + pays;
 
   if (this._books.hasOwnProperty(key)) {
+    this._books[key].init();
     return this._books[key];
   }
 

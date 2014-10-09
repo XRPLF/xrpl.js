@@ -79,33 +79,12 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
 
   this.on('unsubscribe', function() {
     self.resetCache();
-    self._remote.removeListener('transaction', updateFundedAmounts);
-    self._remote.removeListener('transaction', updateTransferRate);
+    self._remote.removeListener('transaction', self.updateFundedAmounts);
+    self._remote.removeListener('transaction', self.updateTransferRate);
   });
-
-  this._remote.once('prepare_subscribe', function() {
-    self.subscribe();
-  });
-
-  this._remote.on('disconnect', function() {
-    self.resetCache();
-    self._remote.once('prepare_subscribe', function() {
-      self.subscribe();
-    });
-  });
-
-  function updateFundedAmounts(message) {
-    self.updateFundedAmounts(message);
-  };
-
-  this._remote.on('transaction', updateFundedAmounts);
-
-  function updateTransferRate(message) {
-    self.updateTransferRate(message);
-  };
-
-  this._remote.on('transaction', updateTransferRate);
-
+  
+  this.init();
+  
   return this;
 };
 
@@ -141,7 +120,32 @@ OrderBook.prototype.is_valid = function() {
 };
 
 /**
- * Initialize orderbook. Get orderbook offers and subscribe to transactions
+ * Initialize orderbook. 
+ */
+
+OrderBook.prototype.init = function () {
+  var self = this;
+  
+  this._subscribed = false;
+  this._shouldSubscribe = true;
+  
+  this._remote.once('prepare_subscribe', function() {
+    self.subscribe();
+  });
+
+  this._remote.on('disconnect', function() {
+    self.resetCache();
+    self._remote.once('prepare_subscribe', function() {
+      self.subscribe();
+    });
+  });
+
+  this._remote.on('transaction', self.updateFundedAmounts);
+  this._remote.on('transaction', self.updateTransferRate);
+};
+
+/**
+ * Get orderbook offers and subscribe to transactions
  */
 
 OrderBook.prototype.subscribe = function() {
