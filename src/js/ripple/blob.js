@@ -1563,7 +1563,7 @@ BlobClient.updateAttestation = function (opts, fn) {
  */
 
 BlobClient.parseAttestation = function (attestation) {
-  var segments =  attestation.split('.');
+  var segments =  decodeURIComponent(attestation).split('.');
   var decoded;
   
   // base64 decode and parse JSON
