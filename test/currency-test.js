@@ -82,6 +82,9 @@ describe('Currency', function() {
       var cur = currency.from_human('EUR (0.5361%pa)');
       assert.strictEqual(cur.to_json(), 'EUR (0.54%pa)');
       assert.strictEqual(cur.to_json({decimals:4, full_name:'Euro'}), 'EUR - Euro (0.5361%pa)');
+      assert.strictEqual(cur.to_json({decimals:void(0), full_name:'Euro'}), 'EUR - Euro (0.54%pa)');
+      assert.strictEqual(cur.to_json({decimals:undefined, full_name:'Euro'}), 'EUR - Euro (0.54%pa)');
+      assert.strictEqual(cur.to_json({decimals:'henk', full_name:'Euro'}), 'EUR - Euro (0.54%pa)');
       assert.strictEqual(cur.get_interest_percentage_at(undefined, 4), 0.5361);
     });
     it('From human "TYX - 30-Year Treasuries (1.5%pa)"', function() {
@@ -111,8 +114,28 @@ describe('Currency', function() {
       assert.strictEqual('XRP', currency.from_json(NaN).to_human());
     });
     it('"015841551A748AD2C1F76FF6ECB0CCCD00000000") == "015841551A748AD2C1F76FF6ECB0CCCD00000000"', function() {
-      assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human(),
-                         'XAU (-0.5%pa)');
+      assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human(), 'XAU (-0.5%pa)');
+    });
+    it('"015841551A748AD2C1F76FF6ECB0CCCD00000000") == "015841551A748AD2C1F76FF6ECB0CCCD00000000"', function() {
+      assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human({full_name:'Gold'}), 'XAU - Gold (-0.5%pa)');
+    });
+    it('to_human interest XAU with full name, do not show interest', function() {
+      assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human({full_name:'Gold', show_interest:false}), 'XAU - Gold');
+    });
+    it('to_human interest XAU with full name, show interest', function() {
+      assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human({full_name:'Gold', show_interest:true}), 'XAU - Gold (-0.5%pa)');
+    });
+    it('to_human interest XAU, do show interest', function() {
+      assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human({show_interest:true}), 'XAU (-0.5%pa)');
+    });
+    it('to_human interest XAU, do not show interest', function() {
+      assert.strictEqual(currency.from_json("015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human({show_interest:false}), 'XAU');
+    });
+    it('to_human with full_name "USD - US Dollar show interest"', function() {
+      assert.strictEqual(currency.from_json('USD').to_human({full_name:'US Dollar', show_interest:true}), 'USD - US Dollar (0%pa)');
+    });
+    it('to_human with full_name "USD - US Dollar do not show interest"', function() {
+      assert.strictEqual(currency.from_json('USD').to_human({full_name:'US Dollar', show_interest:false}), 'USD - US Dollar');
     });
     it('to_human with full_name "USD - US Dollar"', function() {
       assert.strictEqual('USD - US Dollar', currency.from_json('USD').to_human({full_name:'US Dollar'}));
@@ -128,6 +151,7 @@ describe('Currency', function() {
       var cur = currency.from_json("TIM");
       assert.strictEqual(cur.to_human({full_name: null}), "TIM");
     });
+
   });
 
   describe('from_hex', function() {
