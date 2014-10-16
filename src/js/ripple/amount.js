@@ -1113,7 +1113,7 @@ Amount.prototype.to_human = function(opts) {
     if (typeof opts.precision === 'number') {
       if (opts.precision <= 0 && fraction_part.charCodeAt(0) >= 53) {
         int_part = (Number(int_part) + 1).toString();
-        fraction_part = [];
+        fraction_part = '';
       } else {
         fraction_part = Math.round(fraction_part / Math.pow(10, fraction_part.length - opts.precision)).toString();
       }
