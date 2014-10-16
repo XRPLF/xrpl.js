@@ -16,6 +16,41 @@ describe('Amount', function() {
       assert(Amount.from_json('1').is_positive());
     });
   });
+  describe('Positives', function() {
+    it('Number 1', function() {
+      assert(Amount.from_json('1').is_positive());
+    });
+  });
+  // also tested extensively in other cases
+  describe('to_human', function() {
+    it('12345.6789 XAU', function() {
+      assert.strictEqual(Amount.from_human("12345.6789 XAU").to_human(), '12,345.6789');
+    });
+    it('12345.678901234 XAU', function() {
+      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human(), '12,345.678901234');
+    });
+    it('to human, precision -1, should be ignored, precision needs to be >= 0', function() {
+      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:-1}), '12,346');
+    });
+    it('to human, precision 0', function() {
+      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:0}), '12,346');
+    });
+    it('to human, precision 1', function() {
+      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:1}), '12,345.7');
+    });
+    it('to human, precision 2', function() {
+      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:2}), '12,345.68');
+    });
+    it('to human, precision 3', function() {
+      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:3}), '12,345.679');
+    });
+    it('to human, precision 4', function() {
+      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:4}), '12,345.6789');
+    });
+    it('to human, precision 5', function() {
+      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:5}), '12,345.67890');
+    });
+  });
   describe('from_human', function() {
     it('1 XRP', function() {
       assert.strictEqual(Amount.from_human("1 XRP").to_text_full(), '1/XRP');
