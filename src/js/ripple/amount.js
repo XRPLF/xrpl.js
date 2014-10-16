@@ -1111,10 +1111,12 @@ Amount.prototype.to_human = function(opts) {
   if (fraction_part.length || !opts.skip_empty_fraction) {
     // Enforce the maximum number of decimal digits (precision)
     if (typeof opts.precision === 'number') {
-      if (opts.precision === 0 && fraction_part.charCodeAt(0) >= 53) {
+      if (opts.precision <= 0 && fraction_part.charCodeAt(0) >= 53) {
         int_part = (Number(int_part) + 1).toString();
+        fraction_part = [];
+      } else {
+        fraction_part = Math.round(fraction_part / Math.pow(10, fraction_part.length - opts.precision)).toString();
       }
-      fraction_part = fraction_part.slice(0, opts.precision);
     }
 
     // Limit the number of significant digits (max_sig_digits)
