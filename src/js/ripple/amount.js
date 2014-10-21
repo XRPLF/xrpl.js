@@ -1109,13 +1109,24 @@ Amount.prototype.to_human = function(opts) {
   fraction_part = fraction_part.replace(/0*$/, '');
 
   if (fraction_part.length || !opts.skip_empty_fraction) {
+
     // Enforce the maximum number of decimal digits (precision)
     if (typeof opts.precision === 'number') {
-      if (opts.precision <= 0 && fraction_part.charCodeAt(0) >= 53) {
-        int_part = (Number(int_part) + 1).toString();
+      if (opts.precision <= 0) {
+
+        // increment the int_part if the first decimal is 5 or higher
+        if (fraction_part.charCodeAt(0) >= 53) {
+          int_part = (Number(int_part) + 1).toString();
+        }
         fraction_part = '';
       } else {
         fraction_part = Math.round(fraction_part / Math.pow(10, fraction_part.length - opts.precision)).toString();
+
+        // because the division above will cut off the leading 0's we have to add them back again
+        // XXX look for a more elegant alternative
+        while (fraction_part.length < opts.precision) {
+          fraction_part = '0' + fraction_part;
+        }
       }
     }
 
