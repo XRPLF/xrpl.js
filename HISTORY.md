@@ -8,7 +8,7 @@
 
 + Binformat: added missing TransactionResult options ([6abed8d](https://github.com/ripple/ripple-lib/commit/6abed8dd5311765b2eb70505dadbdf5121439ca8))
 
-+ Fix: Amount.to_human() round when given precision ([033257b](https://github.com/ripple/ripple-lib/commit/033257b03bcdd1548234c914f43cd1ef4a2bf44c))
++ Fix: Amount.to_human() precision bugs ([4be209e](https://github.com/ripple/ripple-lib/commit/4be209e286b5b209bec7bcd1212098985e15ff2f))
 
 + Fix: change handling of requestLedger options ([57b7030](https://github.com/ripple/ripple-lib/commit/57b70300f5f0c7534ede118ddbb5d8762668a4f8))
 
