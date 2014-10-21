@@ -50,6 +50,36 @@ describe('Amount', function() {
     it('to human, precision 5', function() {
       assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:5}), '12,345.67890');
     });
+    it('to human, precision -1, should be ignored, precision needs to be >= 0', function() {
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:-1}), '0');
+    });
+    it('to human, precision 0', function() {
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:0}), '0');
+    });
+    it('to human, precision 1', function() {
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:1}), '0.0');
+    });
+    it('to human, precision 2', function() {
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:2}), '0.00');
+    });
+    it('to human, precision 5', function() {
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:5}), '0.00012');
+    });
+    it('to human, precision 6', function() {
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:6}), '0.000123');
+    });
+    it('to human, precision 16', function() {
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:16}), '0.0001234500000000');
+    });
+    it('to human, precision 0, first decimal 4', function() {
+      assert.strictEqual(Amount.from_human("0.4 XAU").to_human({precision:0}), '0');
+    });
+    it('to human, precision 0, first decimal 5', function() {
+      assert.strictEqual(Amount.from_human("0.5 XAU").to_human({precision:0}), '1');
+    });
+    it('to human, precision 0, first decimal 8', function() {
+      assert.strictEqual(Amount.from_human("0.8 XAU").to_human({precision:0}), '1');
+    });
   });
   describe('from_human', function() {
     it('1 XRP', function() {
