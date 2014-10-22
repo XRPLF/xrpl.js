@@ -20,7 +20,6 @@
     "extend": "~1.2.1",
     "lru-cache": "~2.5.0",
     "superagent": "^0.18.0",
-    "gulp-bump": "~0.1.10",
     "ripple-wallet-generator": "1.0.1"
   },
   "devDependencies": {
@@ -30,6 +29,7 @@
     "gulp-jshint": "~1.5.5",
     "gulp-uglify": "~0.3.0",
     "gulp-rename": "~1.2.0",
+    "gulp-bump": "~0.1.10",
     "webpack": "~1.1.11",
     "map-stream": "~0.1.0",
     "istanbul": "~0.2.10",
