@@ -60,7 +60,7 @@ function Transaction(remote) {
 
   var self = this;
 
-  var remote = remote || { };
+  var remote = remote || void(0);
 
   this.remote = remote;
 
@@ -69,7 +69,7 @@ function Transaction(remote) {
 
   this._secret = void(0);
   this._build_path = false;
-  this._maxFee = this.remote.max_fee;
+  this._maxFee = (typeof remote === 'object') ? this.remote.max_fee : void(0);
 
   this.state = 'unsubmitted';
   this.finalized = false;
@@ -241,7 +241,7 @@ Transaction.prototype.finalize = function(message) {
 };
 
 Transaction.prototype._accountSecret = function(account) {
-  return this.remote.secrets[account];
+  return this.remote ? this.remote.secrets[account] : void(0);
 };
 
 /**
@@ -266,6 +266,10 @@ Transaction.prototype.feeUnits = function() {
  */
 
 Transaction.prototype._computeFee = function() {
+  if (!this.remote) {
+    return void(0);
+  }
+
   var servers = this.remote._servers;
   var fees = [ ];
 
@@ -897,6 +901,10 @@ Transaction.prototype.submit = function(callback) {
   this.on('error', function(){});
 
   var account = this.tx_json.Account;
+
+  if (!this.remote) {
+    return this.emit('error', new Error('No remote found'));
+  }
 
   if (!UInt160.is_valid(account)) {
     return this.emit('error', new RippleError('tejInvalidAccount', 'Account is missing or invalid'));
