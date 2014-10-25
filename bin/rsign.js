@@ -56,7 +56,7 @@ function ready() {
 function print_usage() {
   console.log(
     'Usage: rsign.js <secret> <json>\n\n',
-    'Example: rsign.js ssq55ueDob4yV3kPVnNQLHB6icwpC',
+    'Example: rsign.js ssq55ueDob4yV3kPVnNQLHB6icwpC','\''+
     JSON.stringify({
       TransactionType: 'Payment',
       Account: 'r3P9vH81KBayazSTrQj6S25jW6kDb779Gi',
@@ -64,7 +64,7 @@ function print_usage() {
       Amount: '200000000',
       Fee: '10',
       Sequence: 1
-    })
+    })+'\''
     );
 };
 
