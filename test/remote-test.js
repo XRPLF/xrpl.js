@@ -144,7 +144,7 @@ describe('Remote', function () {
     );
   });
 
-  it('request constructors', function () {
+  describe('request constructors', function () {
     beforeEach(function () {
       callback = function () {}
       remote = new Remote(options);
@@ -183,6 +183,13 @@ describe('Remote', function () {
     it('making a unique node list delete request', function () {
       var request = remote.request_unl_delete(null, {}, callback);
       assert(request instanceof Request);
+    });
+
+    it('request account balance with ledger', function() {
+      var request = remote.requestAccountBalance('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 9592219);
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.account_root, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.ledger_index, 9592219);
     });
   })
 

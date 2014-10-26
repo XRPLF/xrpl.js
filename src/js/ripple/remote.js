@@ -945,6 +945,8 @@ Remote.prototype.requestLedger = function(options, callback) {
       break;
 
     case 'object':
+      if (!options) break;
+
       Object.keys(options).forEach(function(o) {
         switch (o) {
           case 'full':
@@ -953,17 +955,15 @@ Remote.prototype.requestLedger = function(options, callback) {
           case 'accounts':
             request.message[o] = true;
             break;
-            
           case 'ledger_index':
           case 'ledger_hash':
             request.message[o] = options[o];
-            break;  
-            
+            break;
           case 'closed' :
           case 'current' :
           case 'validated' :
             request.message.ledger_index = o;
-            break;  
+            break;
         }
       }, options);
       break;
@@ -1625,7 +1625,7 @@ Remote.accountRootRequest = function(type, responseFilter, account, ledger, call
   var request = this.requestLedgerEntry('account_root');
 
   request.accountRoot(account);
-  request.ledgerChoose(ledger);
+  request.ledgerSelect(ledger);
 
   request.once('success', function(message) {
     request.emit(type, responseFilter(message));
