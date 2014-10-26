@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var Transaction = require('../src/js/ripple/transaction').Transaction;
+var Seed = require('../src/js/ripple/seed').Seed;
 
 var argv = process.argv.slice(2);
 
@@ -73,6 +74,18 @@ function sign_transaction() {
 
   tx.tx_json = tx_json;
   tx._secret = secret;
+
+  if (typeof tx.tx_json.SigningPubKey === 'undefined') {
+    try {
+      var seed = Seed.from_json(tx._secret);
+      var key  = seed.get_key(tx.tx_json.Account);
+      tx.tx_json.SigningPubKey = key.to_hex_pub();
+    } catch(e) {
+      console.log(e);
+      return false;
+    }
+  }
+
   tx.complete();
 
   var unsigned_blob = tx.serialize().to_hex();
