@@ -1120,11 +1120,12 @@ Amount.prototype.to_human = function(opts) {
         }
         fraction_part = '';
       } else {
-        fraction_part = Math.round(fraction_part / Math.pow(10, fraction_part.length - opts.precision)).toString();
+        var precision = Math.min(opts.precision, fraction_part.length);
+        fraction_part = Math.round(fraction_part / Math.pow(10, fraction_part.length - precision)).toString();
 
         // because the division above will cut off the leading 0's we have to add them back again
         // XXX look for a more elegant alternative
-        while (fraction_part.length < opts.precision) {
+        while (fraction_part.length < precision) {
           fraction_part = '0' + fraction_part;
         }
       }

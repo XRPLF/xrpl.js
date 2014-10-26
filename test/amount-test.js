@@ -69,7 +69,13 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:6}), '0.000123');
     });
     it('to human, precision 16', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:16}), '0.0001234500000000');
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:16}), '0.00012345');
+    });
+    it('to human, precision 16, min_precision 16', function() {
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:16, min_precision:16}), '0.0001234500000000');
+    });
+    it('to human, precision 16, min_precision 12', function() {
+      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:16, min_precision:12}), '0.000123450000');
     });
     it('to human, precision 0, first decimal 4', function() {
       assert.strictEqual(Amount.from_human("0.4 XAU").to_human({precision:0}), '0');
@@ -79,6 +85,21 @@ describe('Amount', function() {
     });
     it('to human, precision 0, first decimal 8', function() {
       assert.strictEqual(Amount.from_human("0.8 XAU").to_human({precision:0}), '1');
+    });
+    it('to human, precision 0, precision 16', function() {
+      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision:16}), '0.0');
+    });
+    it('to human, precision 0, precision 8, min_precision 16', function() {
+      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision:8, min_precision:16}), '0.0000000000000000');
+    });
+    it('to human, precision 0, first decimal 8', function() {
+      assert.strictEqual(Amount.from_human("0.8 XAU").to_human({precision:0}), '1');
+    });
+    it('to human, precision 6, min_precision 6, max_sig_digits 20', function() {
+      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision: 6, min_precision: 6, max_sig_digits: 20}), '0.000000');
+    });
+    it('to human, precision 16, min_precision 6, max_sig_digits 20', function() {
+      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision: 16, min_precision: 6, max_sig_digits: 20}), '0.000000');
     });
   });
   describe('from_human', function() {
