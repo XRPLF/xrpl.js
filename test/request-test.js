@@ -355,13 +355,20 @@ describe('Request', function() {
     assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
   });
 
-  it('Select ledger - hash', function() {
+  it('Select ledger - undefined', function() {
     var remote = new Remote();
     remote._connected = true;
 
     var request = new Request(remote, 'server_info');
-    request.ledgerSelect('B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
-    assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    request.ledgerSelect();
+    assert.strictEqual(request.message.ledger_hash, void(0));
+    assert.strictEqual(request.message.ledger_index, void(0));
+    request.ledgerSelect(null);
+    assert.strictEqual(request.message.ledger_hash, void(0));
+    assert.strictEqual(request.message.ledger_index, void(0));
+    request.ledgerSelect(NaN);
+    assert.strictEqual(request.message.ledger_hash, void(0));
+    assert.strictEqual(request.message.ledger_index, void(0));
   });
 
   it('Set account_root', function() {

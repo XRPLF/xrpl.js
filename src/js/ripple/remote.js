@@ -1200,16 +1200,16 @@ Remote.prototype.requestTx = function(hash, callback) {
 /**
  * Account request abstraction
  *
+ * @this Remote
  * @api private
  */
 
-Remote.accountRequest = function(type, account, accountIndex, ledger, peer, callback) {
+Remote.accountRequest = function(type, account, ledger, peer, callback) {
   if (typeof account === 'object') {
     var options  = account;
-    callback     = accountIndex;
+    callback     = ledger;
     ledger       = options.ledger;
-    accountIndex = options.account_index || options.accountIndex;
-    account      = options.accountID || options.account;
+    account      = options.account || options.accountID;
     peer         = options.peer;
   }
 
@@ -1222,18 +1222,10 @@ Remote.accountRequest = function(type, account, accountIndex, ledger, peer, call
   var request = new Request(this, type);
   var account = UInt160.json_rewrite(account);
 
-  request.message.ident   = account; //DEPRECATED;
   request.message.account = account;
+  request.ledgerSelect(ledger);
 
-  if (typeof accountIndex === 'number') {
-    request.message.index = accountIndex;
-  }
-
-  if (!/^(undefined|function)$/.test(typeof ledger)) {
-    request.ledgerChoose(ledger);
-  }
-
-  if (!/^(undefined|function)$/.test(typeof peer)) {
+  if (UInt160.is_valid(peer)) {
     request.message.peer = UInt160.json_rewrite(peer);
   }
 
@@ -1246,6 +1238,7 @@ Remote.accountRequest = function(type, account, accountIndex, ledger, peer, call
  * Request account_info
  *
  * @param {String} ripple address
+ * @param [String|Number] ledger identifier
  * @param [Function] callback
  * @return {Request}
  */
@@ -1259,6 +1252,7 @@ Remote.prototype.requestAccountInfo = function(account, callback) {
  * Request account_currencies
  *
  * @param {String} ripple address
+ * @param [String|Number] ledger identifier
  * @param [Function] callback
  * @return {Request}
  */
@@ -1272,14 +1266,13 @@ Remote.prototype.requestAccountCurrencies = function(account, callback) {
  * Request account_lines
  *
  * @param {String} ripple address
- * @param {Number] sub-account index
- * @param [String|Number] ledger
+ * @param [String|Number] ledger identifier
  * @param [String] peer
  * @param [Function] callback
  * @return {Request}
  */
 
-Remote.prototype.requestAccountLines = function(account, accountIndex, ledger, peer, callback) {
+Remote.prototype.requestAccountLines = function(account, peer, callback) {
   // XXX Does this require the server to be trusted?
   //utils.assert(this.trusted);
   var args = Array.prototype.concat.apply(['account_lines'], arguments);
@@ -1290,18 +1283,15 @@ Remote.prototype.requestAccountLines = function(account, accountIndex, ledger, p
  * Request account_offers
  *
  * @param {String} ripple address
- * @param {Number] sub-account index
- * @param [String|Number] ledger
- * @param [String] peer
+ * @param [String|Number] ledger identifier
  * @param [Function] callback
  * @return {Request}
  */
 
-Remote.prototype.requestAccountOffers = function(account, accountIndex, ledger, callback) {
+Remote.prototype.requestAccountOffers = function(account, callback) {
   var args = Array.prototype.concat.apply(['account_offers'], arguments);
   return Remote.accountRequest.apply(this, args);
 };
-
 
 /**
  * Request account_tx
@@ -1318,9 +1308,6 @@ Remote.prototype.requestAccountOffers = function(account, accountIndex, ledger, 
  *    @param [Number] offset, defaults to 0
  *    @param [Number] limit
  *
- * @param [Function] filter
- * @param [Function] map
- * @param [Function] reduce
  * @param [Function] callback
  * @return {Request}
  */
@@ -1606,6 +1593,7 @@ Remote.prototype.requestLedgerAccept = function(callback) {
 /**
  * Account root request abstraction
  *
+ * @this Remote
  * @api private
  */
 
