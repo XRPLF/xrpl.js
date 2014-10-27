@@ -8,17 +8,20 @@
 
 + Binformat: added missing TransactionResult options ([6abed8d](https://github.com/ripple/ripple-lib/commit/6abed8dd5311765b2eb70505dadbdf5121439ca8))
 
-+ Fix: Amount.to_human() precision bugs ([4be209e](https://github.com/ripple/ripple-lib/commit/4be209e286b5b209bec7bcd1212098985e15ff2f))
++ **Breaking change:** make maxLoops in seed.get_key optional. [Example use in tests](https://github.com/ripple/ripple-lib/blob/23e473b6886c457781949c825b3ff48b3984e51f/test/seed-test.js) ([23e473b](https://github.com/ripple/ripple-lib/commit/23e473b6886c457781949c825b3ff48b3984e51f))
+
++ Shrinkwrap packages for dependency locking ([2dcd5f9](2dcd5f94fbc71200eb08a5044c76ef94f7971913))
+
++ Fix: Amount.to_human() precision bugs ([4be209e](https://github.com/ripple/ripple-lib/commit/4be209e286b5b209bec7bcd1212098985e15ff2f) and [7708c64](https://github.com/ripple/ripple-lib/commit/7708c64576e70ce3ac190442daceb30e4446aab7))
 
 + Fix: change handling of requestLedger options ([57b7030](https://github.com/ripple/ripple-lib/commit/57b70300f5f0c7534ede118ddbb5d8762668a4f8))
 
-+ **Breaking change:** make maxLoops in seed.get_key optional. [Example use in tests](https://github.com/ripple/ripple-lib/blob/23e473b6886c457781949c825b3ff48b3984e51f/test/seed-test.js) ([23e473b](https://github.com/ripple/ripple-lib/commit/23e473b6886c457781949c825b3ff48b3984e51f))
 
 ##0.8.2
 
 + Currency: Allow mixed letters and numbers in currencies
 
-+ Deprecate account_tx map/reduce/filter
++ Deprecate account_tx map/reduce/filterg
 
 + Fix: correct requestLedger arguments
 
