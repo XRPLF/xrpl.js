@@ -1,3 +1,16 @@
+##0.9.1
+
++ Switch account requests to use ledgerSelect rather than ledgerChoose ([278df90](https://github.com/ripple/ripple-lib/commit/278df9025a20228de22379a53c76ca12d40fa591))
+
++ **Deprecated** setting `ident` and `account_index` on account requests ([278df90](https://github.com/ripple/ripple-lib/commit/278df9025a20228de22379a53c76ca12d40fa591))
+
++ Fix: instance transaction withoute remote ([d3b6b81](https://github.com/ripple/ripple-lib/commit/d3b6b8127c7b01e416b400c25abf1719bdd008ca))
+
++ Fix: account root request ledger argument ([bc1f9f8](https://github.com/ripple/ripple-lib/commit/bc1f9f8a286b187d36ebaf552694e31e73742293))
+
++ Fix: rsign.js local signing and example ([d3b6b81](https://github.com/ripple/ripple-lib/commit/d3b6b8127c7b01e416b400c25abf1719bdd008ca) and [f1004c6](https://github.com/ripple/ripple-lib/commit/f1004c6db2a0ce59bbabbb8f2b355a9fd9995fd8))
+
+
 ##0.9.0
 
 + Add routes to the vault client for KYC attestations ([ed2da574](https://github.com/ripple/ripple-lib/commit/ed2da57475acf5e9d2cf3373858f4274832bd83f))
