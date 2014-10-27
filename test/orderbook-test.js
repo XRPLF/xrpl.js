@@ -276,7 +276,6 @@ describe('OrderBook', function() {
       assert.deepEqual(request.message, {
         command: 'account_info',
         id: void(0),
-        ident: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
         account: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
       });
       request.emit('success', {
@@ -1360,7 +1359,6 @@ describe('OrderBook', function() {
       assert.deepEqual(request.message, {
         command: 'account_info',
         id: undefined,
-        ident: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
         account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       });
 

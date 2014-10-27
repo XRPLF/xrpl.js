@@ -208,6 +208,13 @@ Request.prototype.ledgerIndex = function(ledger_index) {
   return this;
 };
 
+/**
+ * Set either ledger_index or ledger_hash based on heuristic
+ *
+ * @param {Number|String} ledger identifier
+ */
+
+Request.prototype.selectLedger =
 Request.prototype.ledgerSelect = function(ledger) {
   switch (ledger) {
     case 'current':
@@ -217,10 +224,10 @@ Request.prototype.ledgerSelect = function(ledger) {
       break;
 
     default:
-      if (isNaN(ledger)) {
-        this.message.ledger_hash  = ledger;
-      } else if ((ledger = Number(ledger))) {
-        this.message.ledger_index = ledger;
+      if (Number(ledger)) {
+        this.message.ledger_index = Number(ledger);
+      } if (/^[A-F0-9]+$/.test(ledger)) {
+        this.message.ledger_hash = ledger;
       }
       break;
   }

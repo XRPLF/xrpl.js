@@ -185,11 +185,42 @@ describe('Remote', function () {
       assert(request instanceof Request);
     });
 
-    it('request account balance with ledger', function() {
+    it('request account info with ledger index', function() {
+      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 9592219);
+      assert.strictEqual(request.message.command, 'account_info');
+      assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.ledger_index, 9592219);
+    });
+    it('request account info with ledger hash', function() {
+      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+      assert.strictEqual(request.message.command, 'account_info');
+      assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    });
+    it('request account info with ledger identifier', function() {
+      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 'validated');
+      assert.strictEqual(request.message.command, 'account_info');
+      assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.ledger_index, 'validated');
+    });
+
+    it('request account balance with ledger index', function() {
       var request = remote.requestAccountBalance('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 9592219);
       assert.strictEqual(request.message.command, 'ledger_entry');
       assert.strictEqual(request.message.account_root, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
       assert.strictEqual(request.message.ledger_index, 9592219);
+    });
+    it('request account balance with ledger hash', function() {
+      var request = remote.requestAccountBalance('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.account_root, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    });
+    it('request account balance with ledger identifier', function() {
+      var request = remote.requestAccountBalance('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 'validated');
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.account_root, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.ledger_index, 'validated');
     });
   })
 
