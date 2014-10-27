@@ -229,6 +229,11 @@ describe('Transaction', function() {
     assert.strictEqual(transaction._computeFee(), '72');
   });
 
+  it('Compute fee, no remote', function() {
+    var transaction = new Transaction();
+    assert.strictEqual(transaction._computeFee(10), void(0));
+  });
+
   it('Compute fee - no connected server', function() {
     var remote = new Remote();
 
@@ -365,6 +370,16 @@ describe('Transaction', function() {
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction.tx_json.Flags = 0;
+
+    assert(transaction.complete());
+
+    done();
+  });
+
+  it('Complete transaction, local signing, no remote', function(done) {
+    var transaction = new Transaction();
+    transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
+    transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
 
     assert(transaction.complete());
 
@@ -1503,6 +1518,18 @@ describe('Transaction', function() {
     };
 
     transaction.submit(submitCallback);
+  });
+
+  it('Submit transaction - submission error, no remote', function(done) {
+    var transaction = new Transaction();
+
+    transaction.once('error', function(error) {
+      assert(error);
+      assert.strictEqual(error.message, 'No remote found');
+      done();
+    });
+
+    transaction.submit();
   });
 
   it('Submit transaction - invalid account', function(done) {
