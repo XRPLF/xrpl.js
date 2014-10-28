@@ -4,6 +4,8 @@
 
 + **Deprecated** setting `ident` and `account_index` on account requests ([278df90](https://github.com/ripple/ripple-lib/commit/278df9025a20228de22379a53c76ca12d40fa591))
 
++ Change initial account transaction sequence to 1 ([a3c1d06](https://github.com/ripple/ripple-lib/commit/a3c1d06eba883dc84fe2bfe700e4309795c84cac))
+
 + Fix: instance transaction withoute remote ([d3b6b81](https://github.com/ripple/ripple-lib/commit/d3b6b8127c7b01e416b400c25abf1719bdd008ca))
 
 + Fix: account root request ledger argument ([bc1f9f8](https://github.com/ripple/ripple-lib/commit/bc1f9f8a286b187d36ebaf552694e31e73742293))
