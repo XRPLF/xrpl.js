@@ -174,8 +174,8 @@ Account.prototype.getNextSequence = function(callback) {
 
   function accountInfo(err, info) {
     if (isNotFound(err)) {
-      // New accounts will start out as sequence zero
-      callback(null, 0);
+      // New accounts will start out as sequence one
+      callback(null, 1);
     } else if (err) {
       callback(err);
     } else {
