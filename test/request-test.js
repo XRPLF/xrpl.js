@@ -326,6 +326,7 @@ describe('Request', function() {
     var request = new Request(remote, 'server_info');
     request.ledgerChoose();
     assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    assert.strictEqual(request.message.ledger_index, void(0));
   });
 
   it('Select ledger - identifier', function() {
@@ -335,6 +336,7 @@ describe('Request', function() {
     var request = new Request(remote, 'server_info');
     request.ledgerSelect('validated');
     assert.strictEqual(request.message.ledger_index, 'validated');
+    assert.strictEqual(request.message.ledger_hash, void(0));
   });
 
   it('Select ledger - index', function() {
@@ -344,6 +346,7 @@ describe('Request', function() {
     var request = new Request(remote, 'server_info');
     request.ledgerSelect(7016915);
     assert.strictEqual(request.message.ledger_index, 7016915);
+    assert.strictEqual(request.message.ledger_hash, void(0));
   });
 
   it('Select ledger - hash', function() {
@@ -353,6 +356,7 @@ describe('Request', function() {
     var request = new Request(remote, 'server_info');
     request.ledgerSelect('B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
     assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    assert.strictEqual(request.message.ledger_index, void(0));
   });
 
   it('Select ledger - undefined', function() {

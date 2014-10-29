@@ -226,7 +226,7 @@ Request.prototype.ledgerSelect = function(ledger) {
     default:
       if (Number(ledger)) {
         this.message.ledger_index = Number(ledger);
-      } if (/^[A-F0-9]+$/.test(ledger)) {
+      } else if (/^[A-F0-9]+$/.test(ledger)) {
         this.message.ledger_hash = ledger;
       }
       break;
