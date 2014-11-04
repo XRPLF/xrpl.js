@@ -835,6 +835,23 @@ describe('Transaction', function() {
     assert(transaction._setLastLedger);
   });
 
+  it('Set Max Fee', function() {
+    var transaction = new Transaction();
+
+    transaction.maxFee('a');
+    assert.strictEqual(transaction.tx_json.Fee, void(0));
+    assert(!transaction._setLastLedger);
+
+    transaction.maxFee(NaN);
+    assert.strictEqual(transaction.tx_json.Fee, void(0));
+    assert(!transaction._setLastLedger);
+
+    transaction.maxFee(1000);
+    assert.strictEqual(transaction.tx_json.Fee, '1000');
+    assert.strictEqual(transaction._maxFee, 1000);
+    assert.strictEqual(transaction._setMaxFee, true);
+  });
+
   it('Rewrite transaction path', function() {
     var transaction = new Transaction();
 
