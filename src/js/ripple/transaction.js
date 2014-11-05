@@ -491,6 +491,24 @@ Transaction.prototype.lastLedger = function(sequence) {
   return this;
 };
 
+/*
+ * Set the transaction's proposed fee. No op when fee parameter
+ * is not 0 or a positive number
+ *
+ * @param {Number} fee The proposed fee
+ *
+ * @returns {Transaction} calling instance for chaining
+ */
+Transaction.prototype.maxFee = function(fee) {
+  if (typeof fee === 'number' && fee >= 0) {
+    this._setMaxFee = true;
+    this.tx_json.Fee = String(fee);
+    this._maxFee = fee;
+  }
+
+  return this;
+};
+
 Transaction._pathRewrite = function(path) {
   if (!Array.isArray(path)) {
     return;
