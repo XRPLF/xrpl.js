@@ -1,3 +1,7 @@
+##0.9.2
+
++ Add max_fee setter to transactions to set max fee the submitter is willing to pay ([24587fa](https://github.com/ripple/ripple-lib/commit/24587fab9c8ad3840d7aa345a7037b48839e09d7))
+
 ##0.9.1
 
 + Switch account requests to use ledgerSelect rather than ledgerChoose ([278df90](https://github.com/ripple/ripple-lib/commit/278df9025a20228de22379a53c76ca12d40fa591))
