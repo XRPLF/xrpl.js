@@ -502,7 +502,6 @@ Transaction.prototype.lastLedger = function(sequence) {
 Transaction.prototype.maxFee = function(fee) {
   if (typeof fee === 'number' && fee >= 0) {
     this._setMaxFee = true;
-    this.tx_json.Fee = String(fee);
     this._maxFee = fee;
   }
 

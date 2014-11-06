@@ -839,15 +839,12 @@ describe('Transaction', function() {
     var transaction = new Transaction();
 
     transaction.maxFee('a');
-    assert.strictEqual(transaction.tx_json.Fee, void(0));
-    assert(!transaction._setLastLedger);
+    assert(!transaction._setMaxFee);
 
     transaction.maxFee(NaN);
-    assert.strictEqual(transaction.tx_json.Fee, void(0));
-    assert(!transaction._setLastLedger);
+    assert(!transaction._setMaxFee);
 
     transaction.maxFee(1000);
-    assert.strictEqual(transaction.tx_json.Fee, '1000');
     assert.strictEqual(transaction._maxFee, 1000);
     assert.strictEqual(transaction._setMaxFee, true);
   });
