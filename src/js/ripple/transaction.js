@@ -801,47 +801,56 @@ Transaction.prototype.setFlags = function(flags) {
 };
 
 /**
- * Add a Memo to transaction
+ * Add a Memo to transaction.
  *
  * @param {String} memoType
  * - describes what the data represents, needs to be valid ASCII
+ * * @param {String} memoFormat
+ * - describes what format the data is in, MIME type, needs to be valid ASCII
  * @param {String} memoData
  * - data for the memo, can be any JS object. Any object other than string will
  *   be stringified (JSON) for transport
  */
 
-Transaction.prototype.addMemo = function(memoType, memoData) {
+Transaction.prototype.addMemo = function(memoType, memoFormat, memoData) {
+
   if (typeof memoType === 'object') {
     var opts = memoType;
     memoType = opts.memoType;
+    memoFormat = opts.memoFormat;
     memoData = opts.memoData;
   }
 
   if (!/(undefined|string)/.test(typeof memoType)) {
     throw new Error('MemoType must be a string');
+  } else if (!Transaction.ASCII_REGEX.test(memoType)) {
+    throw new Error('MemoType must be valid ASCII');
   }
 
-  if (!/(undefined|string)/.test(typeof memoData)) {
-    throw new Error('MemoData must be a string');
+  if (!/(undefined|string)/.test(typeof memoFormat)) {
+    throw new Error('MemoFormat must be a string');
+  } else if (!Transaction.ASCII_REGEX.test(memoFormat)) {
+    throw new Error('MemoFormat must be valid ASCII');
   }
 
-  function toHex(str) {
-    return sjcl.codec.hex.fromBits(sjcl.codec.utf8String.toBits(str));
-  };
-
-  var memo = { };
+  var memo = {};
 
   if (memoType) {
     if (Transaction.MEMO_TYPES[memoType]) {
-      //XXX Maybe in the future we want a schema validator for memo types
+      //XXX Maybe in the future we want a schema validator for
+      //memo types
       memo.MemoType = Transaction.MEMO_TYPES[memoType];
     } else {
-      memo.MemoType = toHex(memoType);
+      memo.MemoType = memoType;
     }
   }
 
+  if (memoFormat) {
+    memo.MemoFormat = memoFormat;
+  }
+
   if (memoData) {
-    memo.MemoData = toHex(memoData);
+    memo.MemoData = memoData;
   }
 
   this.tx_json.Memos = (this.tx_json.Memos || []).concat({ Memo: memo });

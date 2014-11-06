@@ -42,7 +42,7 @@ function SerializedObject(buf) {
 
 SerializedObject.from_json = function(obj) {
   // Create a copy of the object so we don't modify it
-  var obj = extend({}, obj);
+  var obj = extend(true, {}, obj);
   var so  = new SerializedObject();
   var typedef;
 
