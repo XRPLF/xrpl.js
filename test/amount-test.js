@@ -1162,4 +1162,80 @@ describe('Amount', function() {
       assert.strictEqual(demAmount.to_human_full(), '10.75853086191915/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
   });
+
+  describe('amount limits', function() {
+    it ('max JSON wire limite', function() {
+      assert.strictEqual(Amount.bi_xns_max.toString(), '9000000000000000000');
+    });
+
+    it ('max JSON wire limite', function() {
+      assert.strictEqual(Amount.bi_xns_min.toString(), '-9000000000000000000');
+    });
+
+    it('max mantissa value', function() {
+      assert.strictEqual(Amount.bi_man_max_value.toString(), '9999999999999999');
+    });
+
+    it('min mantissa value', function() {
+      assert.strictEqual(Amount.bi_man_min_value.toString(), '1000000000000000');
+    });
+
+    it ('from_json minimum XRP', function() {
+      console.log('max', Amount.bi_xns_max.toString());
+      var amt = Amount.from_json('-9000000000000000000');
+      assert.strictEqual(amt.to_json(), '-9000000000000000000');
+    });
+
+    it ('from_json maximum XRP', function() {
+      var amt = Amount.from_json('-9000000000000000000');
+      assert.strictEqual(amt.to_json(), '-9000000000000000000');
+    });
+
+    it ('from_json less than minimum XRP', function() {
+      var amt = Amount.from_json('-9000000000000000001');
+      assert.strictEqual(amt.to_json(), '0');
+    });
+
+    it ('from_json more than maximum XRP', function() {
+      var amt = Amount.from_json('9000000000000000001');
+      assert.strictEqual(amt.to_json(), '0');
+    });
+
+    it ('from_json minimum IOU', function() {
+      var amt = Amount.from_json('-1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(amt._value.toString(), Amount.bi_man_min_value.toString());
+      assert.strictEqual(amt.to_text(), '-1000000000000000e-96');
+      assert.strictEqual(amt.to_text(), Amount.min_value);
+    });
+
+    it('from_json exceed minimum IOU', function() {
+      assert.throws(function() {
+        Amount.from_json('-1e-82/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')
+      }, 'Exceeding min value of ' + Amount.min_value);
+    });
+
+    it ('from_json maximum IOU', function() {
+      var amt = Amount.from_json('9999999999999999e80/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(amt._value.toString(), Amount.bi_man_max_value.toString());
+      assert.strictEqual(amt.to_text(), '9999999999999999e80');
+    });
+
+    it ('from_json exceed maximum IOU', function() {
+      assert.throws(function() {
+        Amount.from_json('9999999999999999e81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')
+        }, 'Exceeding max value of ' + Amount.max_value);
+    });
+
+    it ('from_json normalize mantissa to valid max range, lost significant digits', function() {
+      var amt = Amount.from_json('99999999999999999999999999999999/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(amt._value.toString(), Amount.bi_man_max_value.toString());
+      assert.strictEqual(amt.to_text(), '9999999999999999e16');
+    });
+
+    it ('from_json normalize mantissa to min valid range, lost significant digits', function() {
+      var amt = Amount.from_json('-0.0000000000000000000000001/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(amt._value.toString(), Amount.bi_man_min_value.toString());
+      assert.strictEqual(amt.to_text(), '-1000000000000000e-40');
+    });
+  });
 });
