@@ -1052,26 +1052,84 @@ describe('Transaction', function() {
     var transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
-    transaction.addMemo('testkey', 'testvalue');
-    transaction.addMemo('testkey2', 'testvalue2');
-    transaction.addMemo('testkey3');
-    transaction.addMemo(void(0), 'testvalue4');
+    var memoType = 'message';
+    var memoFormat = 'application/json';
+    var memoData = {
+      string: 'value',
+      bool: true,
+      integer: 1
+    };
+
+    transaction.addMemo(memoType, memoFormat, memoData);
+
+    var expected = [
+      {
+        Memo:
+        {
+          MemoType: memoType,
+          MemoFormat: memoFormat,
+          MemoData: memoData
+        }
+      }
+    ];
+
+    assert.deepEqual(transaction.tx_json.Memos, expected);
+  });
+
+  it('Add Memo - by object', function() {
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+
+    var memo = {
+      memoType: 'type',
+      memoData: 'data'
+    };
+
+    transaction.addMemo(memo);
+
+    var expected = [
+      {
+        Memo: {
+          MemoType: memo.memoType,
+          MemoData: memo.memoData
+        }
+      }
+    ];
+
+    assert.deepEqual(transaction.tx_json.Memos, expected);
+  });
+
+  it('Add Memos', function() {
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+
+    transaction.addMemo('testkey', void(0), 'testvalue');
+    transaction.addMemo('testkey2', void(0), 'testvalue2');
+    transaction.addMemo('testkey3', 'text/html');
+    transaction.addMemo(void(0), void(0), 'testvalue4');
+    transaction.addMemo('testkey4', 'text/html', '<html>');
 
     var expected = [
       { Memo: {
-        MemoType: new Buffer('testkey').toString('hex'),
-        MemoData: new Buffer('testvalue').toString('hex')
+        MemoType: 'testkey',
+        MemoData: 'testvalue'
       }},
       { Memo: {
-        MemoType: new Buffer('testkey2').toString('hex'),
-        MemoData: new Buffer('testvalue2').toString('hex')
+        MemoType: 'testkey2',
+        MemoData: 'testvalue2'
       }},
       { Memo: {
-        MemoType: new Buffer('testkey3').toString('hex')
+        MemoType: 'testkey3',
+        MemoFormat: 'text/html'
       }},
       { Memo: {
-        MemoData: new Buffer('testvalue4').toString('hex')
-      } }
+        MemoData: 'testvalue4'
+      }},
+      { Memo: {
+        MemoType: 'testkey4',
+        MemoFormat: 'text/html',
+        MemoData: '<html>'
+      }}
     ];
 
     assert.deepEqual(transaction.tx_json.Memos, expected);
@@ -1086,13 +1144,76 @@ describe('Transaction', function() {
     }, /^Error: MemoType must be a string$/);
   });
 
-  it('Add Memo - invalid MemoData', function() {
+  it('Add Memo - invalid ASCII MemoType', function() {
     var transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
     assert.throws(function() {
-      transaction.addMemo('key', 1);
-    }, /^Error: MemoData must be a string$/);
+      transaction.addMemo('한국어');
+    }, /^Error: MemoType must be valid ASCII$/);
+  });
+
+  it('Add Memo - invalid MemoFormat', function() {
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+
+    assert.throws(function() {
+      transaction.addMemo(void(0), 1);
+    }, /^Error: MemoFormat must be a string$/);
+  });
+
+  it('Add Memo - invalid ASCII MemoFormat', function() {
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+
+    assert.throws(function() {
+      transaction.addMemo(void(0), 'России');
+    }, /^Error: MemoFormat must be valid ASCII$/);
+  });
+
+  it('Add Memo - MemoData string', function() {
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+
+    transaction.addMemo({memoData:'some_string'});
+
+    assert.deepEqual(transaction.tx_json.Memos, [
+      {
+        Memo: {
+          MemoData: 'some_string'
+        }
+      }
+    ]);
+  });
+
+  it('Add Memo - MemoData complex object', function() {
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+
+    var memo = {
+      memoData: {
+        string: 'string',
+        int: 1,
+        array: [
+          {
+            string: 'string'
+          }
+        ],
+        object: {
+          string: 'string'
+        }
+      }
+    };
+
+    transaction.addMemo(memo);
+
+    assert.deepEqual(transaction.tx_json.Memos, [
+      {
+        Memo: {
+          MemoData: memo.memoData
+        }
+      }
+    ]);
   });
 
   it('Construct AccountSet transaction', function() {
@@ -1269,7 +1390,7 @@ describe('Transaction', function() {
     var bid = '1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
     var ask = '1/EUR/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
     assert.throws(function() {
-      var transaction = new Transaction().offerCreate('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', bid, ask);
+      new Transaction().offerCreate('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', bid, ask);
     });
   });
 
@@ -1302,13 +1423,13 @@ describe('Transaction', function() {
 
   it('Construct SetRegularKey transaction - invalid account', function() {
     assert.throws(function() {
-      var transaction = new Transaction().setRegularKey('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+      new Transaction().setRegularKey('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
     });
   });
 
   it('Construct SetRegularKey transaction - invalid regularKey', function() {
     assert.throws(function() {
-      var transaction = new Transaction().setRegularKey('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'xr36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+      new Transaction().setRegularKey('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'xr36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
     });
   });
 

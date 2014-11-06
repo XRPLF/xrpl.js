@@ -181,6 +181,8 @@ Transaction.prototype.consts = {
   tecCLAIMED:      100
 };
 
+Transaction.prototype.ascii_regex = /^[\x00-\x7F]*$/;
+
 Transaction.from_json = function(j) {
   return (new Transaction()).parseJson(j);
 };
@@ -620,40 +622,52 @@ Transaction.prototype.setFlags = function(flags) {
 };
 
 /**
- * Add a Memo to transaction. Memos can be used as key-value,
- * using the MemoType as a key
+ * Add a Memo to transaction.
  *
- * @param {String} type
- * @param {String} data
+ * @param {String} memoType - describes what the data represents, needs to be valid ASCII
+ * @param {String} memoFormat - describes what format the data is in, MIME type, needs to be valid ASCII
+ * @param {String} memoData - data for the memo, can be any JS object. Any object other than string will be stringified (JSON) for transport
  */
 
-Transaction.prototype.addMemo = function(type, data) {
-  if (!/(undefined|string)/.test(typeof type)) {
+Transaction.prototype.addMemo = function(memoType, memoFormat, memoData) {
+
+  if (typeof memoType === 'object') {
+    var opts = memoType;
+    memoType = opts.memoType;
+    memoFormat = opts.memoFormat;
+    memoData = opts.memoData;
+  }
+
+  if (!/(undefined|string)/.test(typeof memoType)) {
     throw new Error('MemoType must be a string');
+  } else if (!this.ascii_regex.test(memoType)) {
+    throw new Error('MemoType must be valid ASCII');
   }
 
-  if (!/(undefined|string)/.test(typeof data)) {
-    throw new Error('MemoData must be a string');
+  if (!/(undefined|string)/.test(typeof memoFormat)) {
+    throw new Error('MemoFormat must be a string');
+  } else if (!this.ascii_regex.test(memoFormat)) {
+    throw new Error('MemoFormat must be valid ASCII');
   }
 
-  function toHex(str) {
-    return sjcl.codec.hex.fromBits(sjcl.codec.utf8String.toBits(str));
-  };
+  var memo = {};
 
-  var memo = { };
-
-  if (type) {
-    if (Transaction.MEMO_TYPES[type]) {
+  if (memoType) {
+    if (Transaction.MEMO_TYPES[memoType]) {
       //XXX Maybe in the future we want a schema validator for
       //memo types
-      memo.MemoType = Transaction.MEMO_TYPES[type];
+      memo.MemoType = Transaction.MEMO_TYPES[memoType];
     } else {
-      memo.MemoType = toHex(type);
+      memo.MemoType = memoType;
     }
   }
 
-  if (data) {
-    memo.MemoData = toHex(data);
+  if (memoFormat) {
+    memo.MemoFormat = memoFormat;
+  }
+
+  if (memoData) {
+    memo.MemoData = memoData;
   }
 
   this.tx_json.Memos = (this.tx_json.Memos || []).concat({ Memo: memo });
