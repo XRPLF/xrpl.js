@@ -16,9 +16,20 @@ describe('Currency', function() {
     });
   });
   describe('from_json', function() {
+    it('from_json().to_json() == "XRP"', function() {
+      var r = currency.from_json();
+      assert(!r.is_valid());
+      assert.strictEqual('XRP', r.to_json());
+    });
     it('from_json(NaN).to_json() == "XRP"', function() {
       var r = currency.from_json(NaN);
       assert(!r.is_valid());
+      assert.strictEqual('XRP', r.to_json());
+    });
+    it('from_json().to_json("") == "XRP"', function() {
+      var r = currency.from_json('');
+      assert(r.is_valid());
+      assert(r.is_native());
       assert.strictEqual('XRP', r.to_json());
     });
     it('from_json("XRP").to_json() == "XRP"', function() {
@@ -102,6 +113,16 @@ describe('Currency', function() {
     it('From human "INR - 30 Indian Rupees"', function() {
       var cur = currency.from_human('INR - 30 Indian Rupees');
       assert.strictEqual(cur.to_json(), 'INR');
+    });
+    it('From human "XRP"', function() {
+      var cur = currency.from_human('XRP');
+      assert.strictEqual(cur.to_json(), 'XRP');
+      assert(cur.is_native(), true);
+    });
+    it('From human "XRP - Ripples"', function() {
+      var cur = currency.from_human('XRP - Ripples');
+      assert.strictEqual(cur.to_json(), 'XRP');
+      assert(cur.is_native(), true);
     });
 
   });
