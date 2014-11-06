@@ -28,10 +28,10 @@ describe('Remote', function () {
           //    'bitcoin': 'localhost:3000'
           //    'bitcoin': 'https://www.bitstamp.net/ripple/bridge/out/bitcoin/'
         }
-      },
+      }
 
     };
-  })
+  });
 
   it('remote server initialization - url object', function() {
     var remote = new Remote({
@@ -222,7 +222,155 @@ describe('Remote', function () {
       assert.strictEqual(request.message.account_root, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
       assert.strictEqual(request.message.ledger_index, 'validated');
     });
-  })
+  });
+
+  it('pagingAccountRequest', function() {
+    var request = Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+    assert.deepEqual(request.message, {
+      command: 'account_lines',
+      id: undefined,
+      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS'
+    });
+  });
+
+  it('pagingAccountRequest - limit', function() {
+    var request = Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 100});
+    assert.deepEqual(request.message, {
+      command: 'account_lines',
+      id: undefined,
+      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      limit: 100
+    });
+  });
+
+  it('pagingAccountRequest - limit, marker', function() {
+    var request = Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 100, marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'});
+    assert.deepEqual(request.message, {
+      command: 'account_lines',
+      id: undefined,
+      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      limit: 100,
+      marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+    });
+
+    assert(!request.requested);
+  });
+
+  it('pagingAccountRequest - limit min', function() {
+    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 0}).message.limit, 0);
+    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1}).message.limit, 0);
+    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1e9}).message.limit, 0);
+    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1e24}).message.limit, 0);
+  });
+
+  it('pagingAccountRequest - limit max', function() {
+    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e9}).message.limit, 1e9);
+    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e9+1}).message.limit, 1e9);
+    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e10}).message.limit, 1e9);
+    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e24}).message.limit, 1e9);
+  });
+
+  it('requestAccountLines, account and callback', function() {
+    var callback = function() {};
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestAccountLines(
+      'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'account_lines',
+      id: undefined,
+      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS'
+    });
+
+    assert(request.requested);
+  });
+
+  it('requestAccountLines, ledger, peer', function() {
+    var callback = function() {};
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestAccountLines(
+      'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      {
+        ledger: 'validated',
+        peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX'
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'account_lines',
+      id: undefined,
+      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      ledger_index: 'validated',
+      peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX'
+    });
+
+    assert(request.requested);
+  });
+
+  it('requestAccountLines, ledger, peer, limit and marker', function() {
+    var callback = function() {};
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestAccountLines(
+      'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      {
+        ledger: 'validated',
+        peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        limit: 200,
+        marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'account_lines',
+      id: undefined,
+      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      ledger_index: 'validated',
+      peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+      limit: 200,
+      marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+    });
+
+    assert(request.requested);
+  });
+
+  it('requestAccountOffers, ledger, peer, limit and marker', function() {
+    var callback = function() {};
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestAccountOffers(
+      'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      {
+        ledger: 'validated',
+        peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        limit: 32,
+        marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'account_offers',
+      id: undefined,
+      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      ledger_index: 'validated',
+      peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+      limit: 32,
+      marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+    });
+
+    assert(request.requested);
+  });
 
   it('create remote and get pending transactions', function() {
     before(function() {
@@ -282,7 +430,7 @@ describe('Remote', function () {
           callback(null, tx);
         }
       }
-    })
+    });
 
     it('should set transaction members correct ', function(done) {
       remote = new Remote(options);

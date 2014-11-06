@@ -1235,6 +1235,70 @@ Remote.accountRequest = function(type, account, ledger, peer, callback) {
 };
 
 /**
+ * Account Request for paging request
+ *
+ * @param {String} type - request name, e.g. 'account_lines'
+ * @param {String} account - ripple address
+ * @param {Object} options
+ *   @param {String} peer - ripple address
+ *   @param [String|Number] ledger identifier
+ *   @param [Number] limit - max results per response
+ *   @param {String} marker - start position in response paging
+ * @param [Function] callback
+ * @return {Request}
+ */
+Remote.pagingAccountRequest = function(type, account, options, callback) {
+  var ledger, peer, limit, marker;
+
+  if (typeof options === 'object') {
+    ledger = options.ledger;
+    peer = options.peer;
+    limit = options.limit;
+    marker = options.marker;
+  }
+
+  var lastArg = arguments[arguments.length - 1];
+
+  if (typeof lastArg === 'function') {
+    callback = lastArg;
+  }
+
+  var request = new Request(this, type);
+  var account = UInt160.json_rewrite(account);
+
+  request.message.account = account;
+  request.ledgerSelect(ledger);
+
+  if (UInt160.is_valid(peer)) {
+    request.message.peer = UInt160.json_rewrite(peer);
+  }
+
+  if (!isNaN(Number(limit))) {
+    limit = Number(limit);
+
+    // max for 32-bit unsigned int is 4294967295
+    // we'll clamp to 1e9
+    if (limit > 1e9) {
+      limit = 1e9;
+    }
+    // min for 32-bit unsigned int is 0
+    // we'll clamp to 0
+    if (limit < 0) {
+      limit = 0;
+    }
+
+    request.message.limit = limit;
+  }
+
+  if (marker) {
+    request.message.marker = marker;
+  }
+
+  request.callback(callback);
+  return request;
+};
+
+/**
  * Request account_info
  *
  * @param {String} ripple address
@@ -1265,32 +1329,38 @@ Remote.prototype.requestAccountCurrencies = function(account, callback) {
 /**
  * Request account_lines
  *
- * @param {String} ripple address
- * @param [String|Number] ledger identifier
- * @param [String] peer
+ * @param {String} account - ripple address
+ * @param {Object} options
+ *   @param {String} peer - ripple address
+ *   @param [String|Number] ledger identifier
+ *   @param [Number] limit - max results per response
+ *   @param {String} marker - start position in response paging
  * @param [Function] callback
  * @return {Request}
  */
 
-Remote.prototype.requestAccountLines = function(account, peer, callback) {
+Remote.prototype.requestAccountLines = function(account, options, callback) {
   // XXX Does this require the server to be trusted?
   //utils.assert(this.trusted);
   var args = Array.prototype.concat.apply(['account_lines'], arguments);
-  return Remote.accountRequest.apply(this, args);
+  return Remote.pagingAccountRequest.apply(this, args);
 };
 
 /**
  * Request account_offers
  *
- * @param {String} ripple address
- * @param [String|Number] ledger identifier
+ * @param {String} account - ripple address
+ * @param {Object} options
+ *   @param [String|Number] ledger identifier
+ *   @param [Number] limit - max results per response
+ *   @param {String} marker - start position in response paging
  * @param [Function] callback
  * @return {Request}
  */
 
-Remote.prototype.requestAccountOffers = function(account, callback) {
+Remote.prototype.requestAccountOffers = function(account, options, callback) {
   var args = Array.prototype.concat.apply(['account_offers'], arguments);
-  return Remote.accountRequest.apply(this, args);
+  return Remote.pagingAccountRequest.apply(this, args);
 };
 
 /**
