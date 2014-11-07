@@ -270,7 +270,7 @@ Currency.prototype.has_interest = function() {
  * @returns {number} - interest for provided interval, can be negative for demurred currencies
  */
 Currency.prototype.get_interest_at = function(referenceDate, decimals) {
-  if (!this.has_interest) {
+  if (!this.has_interest()) {
     return 0;
   }
 
