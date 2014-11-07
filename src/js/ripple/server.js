@@ -564,7 +564,7 @@ Server.prototype._handleServerStatus = function(message) {
   this._remote.emit('load', message, this);
 
   var loadChanged = message.load_base !== this._load_base
-  || message.load_factor !== this._load_factor
+  || message.load_factor !== this._load_factor;
 
   if (loadChanged) {
     this._load_base = message.load_base;

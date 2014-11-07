@@ -458,10 +458,11 @@ OrderBook.prototype.requestFundedAmount = function(account, callback) {
 
   function requestLineBalance(callback) {
     var request = self._remote.requestAccountLines(
-      account, // account
-      void(0), // account index
-      'VALIDATED', // ledger
-      self._issuerGets //peer
+      account,
+      {
+        ledger: 'validated',
+        peer: self._issuerGets
+      }
     );
 
     request.request(function(err, res) {
