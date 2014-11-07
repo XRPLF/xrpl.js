@@ -54,7 +54,9 @@ var consts = {
 
   // Maximum possible amount for non-XRP currencies using the maximum mantissa
   // with maximum exponent. Corresponds to hex 0xEC6386F26FC0FFFF.
-  max_value:         '9999999999999999e80'
+  max_value:         '9999999999999999e80',
+  // Minimum possible amount for non-XRP currencies.
+  min_value:         '-1000000000000000e-96'
 };
 
 // Add constants to Amount class
@@ -424,6 +426,33 @@ Amount.prototype.invert = function() {
   return this.copy()._invert();
 };
 
+/**
+ * Canonicalize amount value
+ *
+ * Mirrors rippled's internal Amount representation
+ * From https://github.com/ripple/rippled/blob/develop/src/ripple/data/protocol/STAmount.h#L31-L40
+ *
+ * Internal form:
+ * 1: If amount is zero, then value is zero and offset is -100
+ * 2: Otherwise:
+ *    legal offset range is -96 to +80 inclusive
+ *    value range is 10^15 to (10^16 - 1) inclusive
+ *    amount = value * [10 ^ offset]
+ *
+ * -------------------
+ *
+ * The amount can be epxresses as A x 10^B
+ * Where:
+ * - A must be an integer between 10^15 and (10^16)-1 inclusive
+ * - B must be between -96 and 80 inclusive
+ *
+ * This results
+ * - minumum: 10^15 x 10^-96 -> 10^-81 -> -1e-81
+ * - maximum: (10^16)-1 x 10^80 -> 9999999999999999e80
+ *
+ * @returns {Amount}
+ * @throws {Error} if offset exceeds legal ranges, meaning the amount value is bigger than supported
+ */
 Amount.prototype.canonicalize = function() {
   if (!(this._value instanceof BigInteger)) {
     // NaN.
@@ -447,9 +476,8 @@ Amount.prototype.canonicalize = function() {
       }
     }
 
-    // XXX Make sure not bigger than supported. Throw if so.
   } else if (this.is_zero()) {
-    this._offset      = -100;
+    this._offset      = Amount.cMinOffset;
     this._is_negative = false;
   } else {
     // Normalize mantissa to valid range.
@@ -463,6 +491,16 @@ Amount.prototype.canonicalize = function() {
       this._value  = this._value.divide(Amount.bi_10);
       this._offset += 1;
     }
+  }
+
+  // Make sure not bigger than supported. Throw if so.
+  if (this.is_negative() && this._offset < Amount.cMinOffset) {
+    throw new Error('Exceeding min value of ' + Amount.min_value);
+  }
+
+  // Make sure not smaller than supported. Throw if so.
+  if (!this.is_negative() && this._offset > Amount.cMaxOffset) {
+    throw new Error('Exceeding max value of ' + Amount.max_value);
   }
 
   return this;
@@ -539,9 +577,7 @@ Amount.prototype.equals = function(d, ignore_issuer) {
     return this.equals(Amount.from_json(d));
   }
 
-  var result = true;
-
-  result = !((!this.is_valid() || !d.is_valid())
+  var result = !((!this.is_valid() || !d.is_valid())
              || (this._is_native !== d._is_native)
              || (!this._value.equals(d._value) || this._offset !== d._offset)
              || (this._is_negative !== d._is_negative)
