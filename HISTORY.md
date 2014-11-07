@@ -1,6 +1,10 @@
 ##0.9.2
 
-+ Add max_fee setter to transactions to set max fee the submitter is willing to pay ([24587fa](https://github.com/ripple/ripple-lib/commit/24587fab9c8ad3840d7aa345a7037b48839e09d7))
++ [Add paging behavior for requesting account lines and offers](https://github.com/ripple/ripple-lib/commit/722f4e175dbbf378e51b49142d0285f87acb22d7)
+
++ [Add max_fee setter to transactions to set max fee the submitter is willing to pay] (https://github.com/ripple/ripple-lib/commit/24587fab9c8ad3840d7aa345a7037b48839e09d7)
+
++ [Fix: cap IOU Amounts to their max and min value] (https://github.com/ripple/ripple-lib/commit/f05941fbc46fdb7c6fe7ad72927af02d527ffeed)
 
 ##0.9.1
 
