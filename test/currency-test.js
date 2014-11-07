@@ -162,10 +162,20 @@ describe('Currency', function() {
       assert.strictEqual(cur.to_json(), cur.to_human());
     });
   });
-  describe('parse_json(currency obj)', function() {
-    assert.strictEqual('USD', new currency().parse_json(currency.from_json('USD')).to_json());
+  describe('parse_json', function() {
+    it('should parse a currency object', function() {
+      assert.strictEqual('USD', new currency().parse_json(currency.from_json('USD')).to_json());
+      assert.strictEqual('USD (0.5%pa)', new currency().parse_json(currency.from_json('USD (0.5%pa)')).to_json());
+    });
+    it('should clone for parse_json on itself', function() {
+      var cur = currency.from_json('USD');
+      var cur2 = currency.from_json(cur);
+      assert.strictEqual(cur.to_json(), cur2.to_json());
 
-    assert.strictEqual('USD (0.5%pa)', new currency().parse_json(currency.from_json('USD (0.5%pa)')).to_json());
+      cur = currency.from_hex('015841551A748AD2C1F76FF6ECB0CCCD00000000');
+      cur2 = currency.from_json(cur);
+      assert.strictEqual(cur.to_json(), cur2.to_json());
+    });
   });
 
   describe('is_valid', function() {
