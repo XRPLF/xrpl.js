@@ -71,12 +71,9 @@ Currency.prototype.parse_json = function(j, shouldInterpretXrpAsIou) {
   switch (typeof j) {
     case 'string':
 
-      if (!j || /^(0|XRP)$/.test(j)) {
-        if (shouldInterpretXrpAsIou) {
-          this.parse_hex(Currency.HEX_CURRENCY_BAD);
-        } else {
-          this.parse_hex(Currency.HEX_ZERO);
-        }
+      // if an empty string is given, fall back to XRP
+      if (!j) {
+        this.parse_hex(shouldInterpretXrpAsIou ? Currency.HEX_CURRENCY_BAD : Currency.HEX_ZERO);
         break;
       }
 
@@ -86,6 +83,17 @@ Currency.prototype.parse_json = function(j, shouldInterpretXrpAsIou) {
       if (matches) {
 
         var currencyCode = matches[1];
+
+        // for the currency 'XRP' case
+        // we drop everything else that could have been provided
+        // e.g. 'XRP - Ripple'
+        if (!currencyCode || /^(0|XRP)$/.test(currencyCode)) {
+          this.parse_hex(shouldInterpretXrpAsIou ? Currency.HEX_CURRENCY_BAD : Currency.HEX_ZERO);
+
+          // early break, we can't have interest on XRP
+          break;
+        }
+
         // the full currency is matched as it is part of the valid currency format, but not stored
         // var full_currency = matches[2] || '';
         var interest = matches[3] || '';
