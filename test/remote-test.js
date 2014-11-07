@@ -185,20 +185,26 @@ describe('Remote', function () {
       assert(request instanceof Request);
     });
 
+    it('request account currencies with ledger index', function() {
+      var request = remote.requestAccountCurrencies('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.command, 'account_currencies');
+      assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+    });
+
     it('request account info with ledger index', function() {
-      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 9592219);
+      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {ledger: 9592219});
       assert.strictEqual(request.message.command, 'account_info');
       assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
       assert.strictEqual(request.message.ledger_index, 9592219);
     });
     it('request account info with ledger hash', function() {
-      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {ledger: 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE'});
       assert.strictEqual(request.message.command, 'account_info');
       assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
       assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
     });
     it('request account info with ledger identifier', function() {
-      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 'validated');
+      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {ledger: 'validated'});
       assert.strictEqual(request.message.command, 'account_info');
       assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
       assert.strictEqual(request.message.ledger_index, 'validated');
@@ -225,7 +231,7 @@ describe('Remote', function () {
   });
 
   it('pagingAccountRequest', function() {
-    var request = Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+    var request = Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
@@ -234,7 +240,7 @@ describe('Remote', function () {
   });
 
   it('pagingAccountRequest - limit', function() {
-    var request = Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 100});
+    var request = Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 100});
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
@@ -244,7 +250,7 @@ describe('Remote', function () {
   });
 
   it('pagingAccountRequest - limit, marker', function() {
-    var request = Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 100, marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'});
+    var request = Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 100, marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'});
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
@@ -257,17 +263,17 @@ describe('Remote', function () {
   });
 
   it('pagingAccountRequest - limit min', function() {
-    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 0}).message.limit, 0);
-    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1}).message.limit, 0);
-    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1e9}).message.limit, 0);
-    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1e24}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 0}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1e9}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1e24}).message.limit, 0);
   });
 
   it('pagingAccountRequest - limit max', function() {
-    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e9}).message.limit, 1e9);
-    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e9+1}).message.limit, 1e9);
-    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e10}).message.limit, 1e9);
-    assert.strictEqual(Remote.pagingAccountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e24}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e9}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e9+1}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e10}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e24}).message.limit, 1e9);
   });
 
   it('requestAccountLines, account and callback', function() {
