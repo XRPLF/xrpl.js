@@ -1,6 +1,7 @@
 var assert   = require('assert');
 var utils    = require('./testutils');
 var currency = utils.load_module('currency').Currency;
+var timeUtil = utils.load_module('utils').time;
 
 describe('Currency', function() {
   describe('json_rewrite', function() {
@@ -217,14 +218,16 @@ describe('Currency', function() {
     return +(Math.round(num + "e+"+precision)  + "e-"+precision);
   }
   describe('get_interest_at', function() {
-    it('returns demurred value for demurrage currency', function() {
+    it('should return demurred value for demurrage currency', function() {
       var cur = currency.from_json('015841551A748AD2C1F76FF6ECB0CCCD00000000');
 
       // At start, no demurrage should occur
       assert.equal(1, cur.get_interest_at(443845330));
+      assert.equal(1, precision(cur.get_interest_at(new Date(timeUtil.fromRipple(443845330))), 14));
 
       // After one year, 0.5% should have occurred
       assert.equal(0.995, precision(cur.get_interest_at(443845330 + 31536000), 14));
+      assert.equal(0.995, precision(cur.get_interest_at(new Date(timeUtil.fromRipple(443845330 + 31536000))), 14));
 
       // After one demurrage period, 1/e should have occurred
       assert.equal(1/Math.E, cur.get_interest_at(443845330 + 6291418827.05));
@@ -234,6 +237,11 @@ describe('Currency', function() {
 
       // One demurrage period before start, rate should be e
       assert.equal(Math.E, cur.get_interest_at(443845330 - 6291418827.05));
+    });
+    it('should return 0 for currency without interest', function() {
+      var cur = currency.from_json('USD - US Dollar');
+      assert.equal(0, cur.get_interest_at(443845330));
+      assert.equal(0, cur.get_interest_at(443845330  + 31536000));
     });
   });
   describe('get_iso', function() {
