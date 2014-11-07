@@ -62,10 +62,6 @@ Currency.from_human = function(j, opts) {
 
 // this._value = NaN on error.
 Currency.prototype.parse_json = function(j, shouldInterpretXrpAsIou) {
-  if (j instanceof Currency) {
-    return j.clone();
-  }
-
   this._value = NaN;
 
   switch (typeof j) {
