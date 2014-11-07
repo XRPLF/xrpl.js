@@ -5,7 +5,14 @@ var Remote = utils.load_module('remote').Remote;
 var Server = utils.load_module('server').Server;
 var Request = utils.load_module('request').Request;
 
-var options, spy, mock, stub, remote, callback, database, tx;
+var options, remote, callback, database, tx;
+
+var ADDRESS       = 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS';
+var PEER_ADDRESS  = 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX';
+var LEDGER_INDEX  = 9592219;
+var LEDGER_HASH   = 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
+var PAGING_MARKER = '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73';
+
 
 describe('Remote', function () {
   beforeEach(function () {
@@ -186,94 +193,117 @@ describe('Remote', function () {
     });
 
     it('request account currencies with ledger index', function() {
-      var request = remote.requestAccountCurrencies('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      var request = remote.requestAccountCurrencies(ADDRESS);
       assert.strictEqual(request.message.command, 'account_currencies');
-      assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.account, ADDRESS);
     });
 
     it('request account info with ledger index', function() {
-      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {ledger: 9592219});
+      var request = remote.requestAccountInfo(ADDRESS, {ledger: 9592219});
       assert.strictEqual(request.message.command, 'account_info');
-      assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.account, ADDRESS);
       assert.strictEqual(request.message.ledger_index, 9592219);
     });
     it('request account info with ledger hash', function() {
-      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {ledger: 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE'});
+      var request = remote.requestAccountInfo(ADDRESS, {ledger: LEDGER_HASH});
       assert.strictEqual(request.message.command, 'account_info');
-      assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
-      assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+      assert.strictEqual(request.message.account, ADDRESS);
+      assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
     });
     it('request account info with ledger identifier', function() {
-      var request = remote.requestAccountInfo('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {ledger: 'validated'});
+      var request = remote.requestAccountInfo(ADDRESS, {ledger: 'validated'});
       assert.strictEqual(request.message.command, 'account_info');
-      assert.strictEqual(request.message.account, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.account, ADDRESS);
       assert.strictEqual(request.message.ledger_index, 'validated');
     });
 
     it('request account balance with ledger index', function() {
-      var request = remote.requestAccountBalance('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 9592219);
+      var request = remote.requestAccountBalance(ADDRESS, 9592219);
       assert.strictEqual(request.message.command, 'ledger_entry');
-      assert.strictEqual(request.message.account_root, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.account_root, ADDRESS);
       assert.strictEqual(request.message.ledger_index, 9592219);
     });
     it('request account balance with ledger hash', function() {
-      var request = remote.requestAccountBalance('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+      var request = remote.requestAccountBalance(ADDRESS, LEDGER_HASH);
       assert.strictEqual(request.message.command, 'ledger_entry');
-      assert.strictEqual(request.message.account_root, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
-      assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+      assert.strictEqual(request.message.account_root, ADDRESS);
+      assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
     });
     it('request account balance with ledger identifier', function() {
-      var request = remote.requestAccountBalance('r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', 'validated');
+      var request = remote.requestAccountBalance(ADDRESS, 'validated');
       assert.strictEqual(request.message.command, 'ledger_entry');
-      assert.strictEqual(request.message.account_root, 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+      assert.strictEqual(request.message.account_root, ADDRESS);
       assert.strictEqual(request.message.ledger_index, 'validated');
     });
   });
 
   it('pagingAccountRequest', function() {
-    var request = Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS');
+    var request = Remote.accountRequest('account_lines', ADDRESS);
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
-      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS'
+      account: ADDRESS
     });
   });
 
   it('pagingAccountRequest - limit', function() {
-    var request = Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 100});
+    var request = Remote.accountRequest('account_lines', ADDRESS, {limit: 100});
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
-      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      account: ADDRESS,
       limit: 100
     });
   });
 
   it('pagingAccountRequest - limit, marker', function() {
-    var request = Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 100, marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'});
+    var request = Remote.accountRequest('account_lines', ADDRESS, {limit: 100, marker: PAGING_MARKER, ledger: 9592219});
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
-      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      account: ADDRESS,
       limit: 100,
-      marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+      marker: PAGING_MARKER,
+      ledger_index: 9592219
     });
 
     assert(!request.requested);
   });
 
-  it('pagingAccountRequest - limit min', function() {
-    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 0}).message.limit, 0);
-    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1}).message.limit, 0);
-    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1e9}).message.limit, 0);
-    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: -1e24}).message.limit, 0);
+  it('accountRequest - limit min', function() {
+    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 0}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: -1}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: -1e9}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: -1e24}).message.limit, 0);
   });
 
-  it('pagingAccountRequest - limit max', function() {
-    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e9}).message.limit, 1e9);
-    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e9+1}).message.limit, 1e9);
-    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e10}).message.limit, 1e9);
-    assert.strictEqual(Remote.accountRequest('account_lines', 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS', {limit: 1e24}).message.limit, 1e9);
+  it('accountRequest - limit max', function() {
+    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 1e9}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 1e9+1}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 1e10}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 1e24}).message.limit, 1e9);
+  });
+
+  it('accountRequest - a valid ledger is required when using a marker', function() {
+    assert.throws(function() {
+      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER})
+    },'A ledger_index or ledger_hash must be provided when using a marker');
+
+    assert.throws(function() {
+      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER, ledger:'validated'})
+    },'A ledger_index or ledger_hash must be provided when using a marker');
+
+    assert.throws(function() {
+      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER, ledger:NaN})
+    },'A ledger_index or ledger_hash must be provided when using a marker');
+
+    assert.throws(function() {
+      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER, ledger:LEDGER_HASH.substr(0,63)})
+    },'A ledger_index or ledger_hash must be provided when using a marker');
+
+    assert.throws(function() {
+      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER, ledger:LEDGER_HASH+'F'})
+    },'A ledger_index or ledger_hash must be provided when using a marker');
   });
 
   it('requestAccountLines, account and callback', function() {
@@ -282,14 +312,14 @@ describe('Remote', function () {
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
     var request = remote.requestAccountLines(
-      'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      ADDRESS,
       callback
     );
 
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
-      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS'
+      account: ADDRESS
     });
 
     assert(request.requested);
@@ -301,10 +331,10 @@ describe('Remote', function () {
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
     var request = remote.requestAccountLines(
-      'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      ADDRESS,
       {
-        ledger: 'validated',
-        peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX'
+        ledger: LEDGER_HASH,
+        peer: PEER_ADDRESS
       },
       callback
     );
@@ -312,9 +342,9 @@ describe('Remote', function () {
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
-      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-      ledger_index: 'validated',
-      peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX'
+      account: ADDRESS,
+      ledger_hash: LEDGER_HASH,
+      peer: PEER_ADDRESS
     });
 
     assert(request.requested);
@@ -326,12 +356,12 @@ describe('Remote', function () {
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
     var request = remote.requestAccountLines(
-      'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      ADDRESS,
       {
-        ledger: 'validated',
-        peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        ledger: LEDGER_INDEX,
+        peer: PEER_ADDRESS,
         limit: 200,
-        marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+        marker: PAGING_MARKER
       },
       callback
     );
@@ -339,11 +369,11 @@ describe('Remote', function () {
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
-      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-      ledger_index: 'validated',
-      peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+      account: ADDRESS,
+      ledger_index: LEDGER_INDEX,
+      peer: PEER_ADDRESS,
       limit: 200,
-      marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+      marker: PAGING_MARKER
     });
 
     assert(request.requested);
@@ -355,12 +385,12 @@ describe('Remote', function () {
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
     var request = remote.requestAccountOffers(
-      'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      ADDRESS,
       {
-        ledger: 'validated',
-        peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        ledger: LEDGER_HASH,
+        peer: PEER_ADDRESS,
         limit: 32,
-        marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+        marker: PAGING_MARKER
       },
       callback
     );
@@ -368,11 +398,11 @@ describe('Remote', function () {
     assert.deepEqual(request.message, {
       command: 'account_offers',
       id: undefined,
-      account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-      ledger_index: 'validated',
-      peer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+      account: ADDRESS,
+      ledger_hash: LEDGER_HASH,
+      peer: PEER_ADDRESS,
       limit: 32,
-      marker: '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73'
+      marker: PAGING_MARKER
     });
 
     assert(request.requested);

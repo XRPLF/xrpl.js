@@ -23,6 +23,7 @@ var Server           = require('./server').Server;
 var Amount           = require('./amount').Amount;
 var Currency         = require('./currency').Currency;
 var UInt160          = require('./uint160').UInt160;
+var UInt256          = require('./uint256').UInt256;
 var Transaction      = require('./transaction').Transaction;
 var Account          = require('./account').Account;
 var Meta             = require('./meta').Meta;
@@ -1203,6 +1204,10 @@ Remote.prototype.requestTx = function(hash, callback) {
  * Optional paging with limit and marker options
  * supported in rippled for 'account_lines' and 'account_offers'
  *
+ * The paged responses aren't guaranteed to be reliable between
+ * ledger closes. You have to supply a ledger_index or ledger_hash
+ * when paging to ensure a complete response
+ *
  * @param {String} type - request name, e.g. 'account_lines'
  * @param {String} account - ripple address
  * @param {Object} options - all optional
@@ -1221,6 +1226,14 @@ Remote.accountRequest = function(type, account, options, callback) {
     peer = options.peer;
     limit = options.limit;
     marker = options.marker;
+  }
+
+  // if a marker is given, we need a ledger
+  // check if a valid ledger_index or ledger_hash is provided
+  if (marker) {
+    if(!(Number(ledger) > 0) && !UInt256.is_valid(ledger)) {
+      throw new Error('A ledger_index or ledger_hash must be provided when using a marker');
+    }
   }
 
   var lastArg = arguments[arguments.length - 1];
@@ -1299,6 +1312,13 @@ Remote.prototype.requestAccountCurrencies = function(account, options, callback)
 /**
  * Request account_lines
  *
+ * Requests for account_lines support paging, provide a limit and marker
+ * to page through responses.
+ *
+ * The paged responses aren't guaranteed to be reliable between
+ * ledger closes. You have to supply a ledger_index or ledger_hash
+ * when paging to ensure a complete response
+ *
  * @param {String} account - ripple address
  * @param {Object} options
  *   @param {String} peer - ripple address
@@ -1318,6 +1338,13 @@ Remote.prototype.requestAccountLines = function(account, options, callback) {
 
 /**
  * Request account_offers
+ *
+ * Requests for account_offers support paging, provide a limit and marker
+ * to page through responses.
+ *
+ * The paged responses aren't guaranteed to be reliable between
+ * ledger closes. You have to supply a ledger_index or ledger_hash
+ * when paging to ensure a complete response
  *
  * @param {String} account - ripple address
  * @param {Object} options
