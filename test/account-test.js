@@ -29,13 +29,15 @@ describe('Account', function(){
 
   });
 
+  // XXX: clean up the stubbed out remote methods
+
   describe('#publicKeyIsActive()', function(){
 
     it('should respond true if the public key corresponds to the account address and the master key IS NOT disabled', function(){
 
       var account = new Account({
             on: function(){},
-            request_account_info: function(address, callback) {
+            requestAccountInfo: function(address, callback) {
               if (address === 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz') {
                 callback(null, { account_data: { 
                   Account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz',
@@ -56,7 +58,7 @@ describe('Account', function(){
 
       var account = new Account({
             on: function(){},
-            request_account_info: function(address, callback) {
+            requestAccountInfo: function(address, callback) {
               if (address === 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz') {
                 callback(null, { account_data: { 
                   Account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz',
@@ -77,7 +79,7 @@ describe('Account', function(){
 
       var account = new Account({
             on: function(){},
-            request_account_info: function(address, callback) {
+            requestAccountInfo: function(address, callback) {
               if (address === 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz') {
                 callback(null, { account_data: { 
                   Account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz',
@@ -99,7 +101,7 @@ describe('Account', function(){
 
       var account = new Account({
             on: function(){},
-            request_account_info: function(address, callback) {
+            requestAccountInfo: function(address, callback) {
               if (address === 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz') {
                 callback(null, { account_data: { 
                   Account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz',
@@ -121,7 +123,7 @@ describe('Account', function(){
 
       var account = new Account({
             on: function(){},
-            request_account_info: function(address, callback) {
+            requestAccountInfo: function(address, callback) {
               if (address === 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz') {
                 callback(null, { account_data: { 
                   Account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz',
@@ -142,7 +144,7 @@ describe('Account', function(){
 
       var account = new Account({
             on: function(){},
-            request_account_info: function(address, callback) {
+            requestAccountInfo: function(address, callback) {
               if (address === 'rLdfp6eoR948KVxfn6EpaaNTKwfwXhzSeQ') {
                 callback({ error: 'remoteError',
                   error_message: 'Remote reported an error.',

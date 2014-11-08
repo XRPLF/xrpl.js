@@ -270,7 +270,8 @@ describe('Message', function(){
       //Remote.prototype.addServer = function(){};
       var test_remote = new Remote();
       test_remote.state = 'online';
-      test_remote.request_account_info = function(account, callback) {
+      test_remote.requestAccountInfo = function(options, callback) {
+        var account = options.account;
         if (account === data.account) {
           callback(null, {
             "account_data": {
@@ -306,7 +307,8 @@ describe('Message', function(){
       //Remote.prototype.addServer = function(){};
       var test_remote = new Remote();
       test_remote.state = 'online';
-      test_remote.request_account_info = function(account, callback) {
+      test_remote.requestAccountInfo = function(options, callback) {
+        var account = options.account;
         if (account === data.account) {
           callback(null, {
             "account_data": {
