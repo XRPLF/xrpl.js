@@ -1,10 +1,34 @@
 ##0.9.2
 
-+ [Add paging behavior for requesting account lines and offers](https://github.com/ripple/ripple-lib/commit/722f4e175dbbf378e51b49142d0285f87acb22d7)
++ [**Breaking change**: Change accountRequest method signature](https://github.com/ripple/ripple-lib/commit/6f5d1104aa3eb440c518ec4f39e264fdce15fa15)
+
++ [Add paging behavior for account requests, `account_lines` and `account_offers`](https://github.com/ripple/ripple-lib/commit/722f4e175dbbf378e51b49142d0285f87acb22d7) 
 
 + [Add max_fee setter to transactions to set max fee the submitter is willing to pay] (https://github.com/ripple/ripple-lib/commit/24587fab9c8ad3840d7aa345a7037b48839e09d7)
 
 + [Fix: cap IOU Amounts to their max and min value] (https://github.com/ripple/ripple-lib/commit/f05941fbc46fdb7c6fe7ad72927af02d527ffeed)
+
+Example on how to use paging with `account_offers`:
+```
+// A valid `ledger_index` or `ledger_hash` is required to provide a reliable result.
+// Results can change between ledger closes, so the provided ledger will be used as base.
+var options = {
+    account: < rippleAccount >,
+    limit: < Number between 10 and 400 >,
+    ledger: < valid ledger_index or ledger_hash >
+}
+
+// The `marker` comes back in an account request if there are more results than are returned 
+// in the current response. The amount of results per response are determined by the `limit`.
+if (marker) {
+    options.marker = < marker >;
+}
+
+var request = remote.requestAccountOffers(options);
+```
+
+[Full working example](https://github.com/geertweening/ripple-lib-scripts/blob/master/account_offers_paging.js)
+
 
 ##0.9.1
 
