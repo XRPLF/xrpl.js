@@ -132,7 +132,7 @@ Account.prototype.isValid = function() {
  */
 
 Account.prototype.getInfo = function(callback) {
-  return this._remote.request_account_info(this._account_id, callback);
+  return this._remote.requestAccountInfo({account: this._account_id}, callback);
 };
 
 /**
