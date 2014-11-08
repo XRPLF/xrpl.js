@@ -193,25 +193,25 @@ describe('Remote', function () {
     });
 
     it('request account currencies with ledger index', function() {
-      var request = remote.requestAccountCurrencies(ADDRESS);
+      var request = remote.requestAccountCurrencies({account: ADDRESS});
       assert.strictEqual(request.message.command, 'account_currencies');
       assert.strictEqual(request.message.account, ADDRESS);
     });
 
     it('request account info with ledger index', function() {
-      var request = remote.requestAccountInfo(ADDRESS, {ledger: 9592219});
+      var request = remote.requestAccountInfo({account: ADDRESS, ledger: 9592219});
       assert.strictEqual(request.message.command, 'account_info');
       assert.strictEqual(request.message.account, ADDRESS);
       assert.strictEqual(request.message.ledger_index, 9592219);
     });
     it('request account info with ledger hash', function() {
-      var request = remote.requestAccountInfo(ADDRESS, {ledger: LEDGER_HASH});
+      var request = remote.requestAccountInfo({account: ADDRESS, ledger: LEDGER_HASH});
       assert.strictEqual(request.message.command, 'account_info');
       assert.strictEqual(request.message.account, ADDRESS);
       assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
     });
     it('request account info with ledger identifier', function() {
-      var request = remote.requestAccountInfo(ADDRESS, {ledger: 'validated'});
+      var request = remote.requestAccountInfo({account: ADDRESS, ledger: 'validated'});
       assert.strictEqual(request.message.command, 'account_info');
       assert.strictEqual(request.message.account, ADDRESS);
       assert.strictEqual(request.message.ledger_index, 'validated');
@@ -238,7 +238,7 @@ describe('Remote', function () {
   });
 
   it('pagingAccountRequest', function() {
-    var request = Remote.accountRequest('account_lines', ADDRESS);
+    var request = Remote.accountRequest('account_lines', {account: ADDRESS});
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
@@ -247,7 +247,7 @@ describe('Remote', function () {
   });
 
   it('pagingAccountRequest - limit', function() {
-    var request = Remote.accountRequest('account_lines', ADDRESS, {limit: 100});
+    var request = Remote.accountRequest('account_lines', {account: ADDRESS, limit: 100});
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
@@ -257,7 +257,7 @@ describe('Remote', function () {
   });
 
   it('pagingAccountRequest - limit, marker', function() {
-    var request = Remote.accountRequest('account_lines', ADDRESS, {limit: 100, marker: PAGING_MARKER, ledger: 9592219});
+    var request = Remote.accountRequest('account_lines', {account: ADDRESS, limit: 100, marker: PAGING_MARKER, ledger: 9592219});
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
@@ -271,38 +271,38 @@ describe('Remote', function () {
   });
 
   it('accountRequest - limit min', function() {
-    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 0}).message.limit, 0);
-    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: -1}).message.limit, 0);
-    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: -1e9}).message.limit, 0);
-    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: -1e24}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', {account: ADDRESS, limit: 0}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', {account: ADDRESS, limit: -1}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', {account: ADDRESS, limit: -1e9}).message.limit, 0);
+    assert.strictEqual(Remote.accountRequest('account_lines', {account: ADDRESS, limit: -1e24}).message.limit, 0);
   });
 
   it('accountRequest - limit max', function() {
-    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 1e9}).message.limit, 1e9);
-    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 1e9+1}).message.limit, 1e9);
-    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 1e10}).message.limit, 1e9);
-    assert.strictEqual(Remote.accountRequest('account_lines', ADDRESS, {limit: 1e24}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', {account: ADDRESS, limit: 1e9}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', {account: ADDRESS, limit: 1e9+1}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', {account: ADDRESS, limit: 1e10}).message.limit, 1e9);
+    assert.strictEqual(Remote.accountRequest('account_lines', {account: ADDRESS, limit: 1e24}).message.limit, 1e9);
   });
 
   it('accountRequest - a valid ledger is required when using a marker', function() {
     assert.throws(function() {
-      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER})
+      Remote.accountRequest('account_lines', {account: ADDRESS, marker: PAGING_MARKER})
     },'A ledger_index or ledger_hash must be provided when using a marker');
 
     assert.throws(function() {
-      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER, ledger:'validated'})
+      Remote.accountRequest('account_lines', {account: ADDRESS, marker: PAGING_MARKER, ledger:'validated'})
     },'A ledger_index or ledger_hash must be provided when using a marker');
 
     assert.throws(function() {
-      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER, ledger:NaN})
+      Remote.accountRequest('account_lines', {account: ADDRESS, marker: PAGING_MARKER, ledger:NaN})
     },'A ledger_index or ledger_hash must be provided when using a marker');
 
     assert.throws(function() {
-      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER, ledger:LEDGER_HASH.substr(0,63)})
+      Remote.accountRequest('account_lines', {account: ADDRESS, marker: PAGING_MARKER, ledger:LEDGER_HASH.substr(0,63)})
     },'A ledger_index or ledger_hash must be provided when using a marker');
 
     assert.throws(function() {
-      Remote.accountRequest('account_lines', ADDRESS, {marker: PAGING_MARKER, ledger:LEDGER_HASH+'F'})
+      Remote.accountRequest('account_lines', {account: ADDRESS, marker: PAGING_MARKER, ledger:LEDGER_HASH+'F'})
     },'A ledger_index or ledger_hash must be provided when using a marker');
   });
 
@@ -312,7 +312,7 @@ describe('Remote', function () {
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
     var request = remote.requestAccountLines(
-      ADDRESS,
+      {account: ADDRESS},
       callback
     );
 
@@ -331,8 +331,8 @@ describe('Remote', function () {
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
     var request = remote.requestAccountLines(
-      ADDRESS,
       {
+        account: ADDRESS,
         ledger: LEDGER_HASH,
         peer: PEER_ADDRESS
       },
@@ -356,8 +356,8 @@ describe('Remote', function () {
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
     var request = remote.requestAccountLines(
-      ADDRESS,
       {
+        account: ADDRESS,
         ledger: LEDGER_INDEX,
         peer: PEER_ADDRESS,
         limit: 200,
@@ -385,8 +385,8 @@ describe('Remote', function () {
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
     var request = remote.requestAccountOffers(
-      ADDRESS,
       {
+        account: ADDRESS,
         ledger: LEDGER_HASH,
         peer: PEER_ADDRESS,
         limit: 32,

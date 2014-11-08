@@ -1218,10 +1218,11 @@ Remote.prototype.requestTx = function(hash, callback) {
  * @param [Function] callback
  * @return {Request}
  */
-Remote.accountRequest = function(type, account, options, callback) {
-  var ledger, peer, limit, marker;
+Remote.accountRequest = function(type, options, callback) {
+  var account, ledger, peer, limit, marker;
 
   if (typeof options === 'object') {
+    account = options.account;
     ledger = options.ledger;
     peer = options.peer;
     limit = options.limit;
@@ -1231,7 +1232,7 @@ Remote.accountRequest = function(type, account, options, callback) {
   // if a marker is given, we need a ledger
   // check if a valid ledger_index or ledger_hash is provided
   if (marker) {
-    if(!(Number(ledger) > 0) && !UInt256.is_valid(ledger)) {
+    if (!(Number(ledger) > 0) && !UInt256.is_valid(ledger)) {
       throw new Error('A ledger_index or ledger_hash must be provided when using a marker');
     }
   }
@@ -1243,9 +1244,12 @@ Remote.accountRequest = function(type, account, options, callback) {
   }
 
   var request = new Request(this, type);
-  var account = UInt160.json_rewrite(account);
 
-  request.message.account = account;
+  if (account) {
+    account = UInt160.json_rewrite(account);
+    request.message.account = account;
+  }
+
   request.ledgerSelect(ledger);
 
   if (UInt160.is_valid(peer)) {
@@ -1280,15 +1284,15 @@ Remote.accountRequest = function(type, account, options, callback) {
 /**
  * Request account_info
  *
- * @param {String} account - ripple address
  * @param {Object} options
+ *   @param {String} account - ripple address
  *   @param {String} peer - ripple address
  *   @param [String|Number] ledger identifier
  * @param [Function] callback
  * @return {Request}
  */
 
-Remote.prototype.requestAccountInfo = function(account, options, callback) {
+Remote.prototype.requestAccountInfo = function(options, callback) {
   var args = Array.prototype.concat.apply(['account_info'], arguments);
   return Remote.accountRequest.apply(this, args);
 };
@@ -1296,15 +1300,15 @@ Remote.prototype.requestAccountInfo = function(account, options, callback) {
 /**
  * Request account_currencies
  *
- * @param {String} account - ripple address
  * @param {Object} options
+ *   @param {String} account - ripple address
  *   @param {String} peer - ripple address
  *   @param [String|Number] ledger identifier
  * @param [Function] callback
  * @return {Request}
  */
 
-Remote.prototype.requestAccountCurrencies = function(account, options, callback) {
+Remote.prototype.requestAccountCurrencies = function(options, callback) {
   var args = Array.prototype.concat.apply(['account_currencies'], arguments);
   return Remote.accountRequest.apply(this, args);
 };
@@ -1319,8 +1323,8 @@ Remote.prototype.requestAccountCurrencies = function(account, options, callback)
  * ledger closes. You have to supply a ledger_index or ledger_hash
  * when paging to ensure a complete response
  *
- * @param {String} account - ripple address
  * @param {Object} options
+ *   @param {String} account - ripple address
  *   @param {String} peer - ripple address
  *   @param [String|Number] ledger identifier
  *   @param [Number] limit - max results per response
@@ -1329,7 +1333,7 @@ Remote.prototype.requestAccountCurrencies = function(account, options, callback)
  * @return {Request}
  */
 
-Remote.prototype.requestAccountLines = function(account, options, callback) {
+Remote.prototype.requestAccountLines = function(options, callback) {
   // XXX Does this require the server to be trusted?
   //utils.assert(this.trusted);
   var args = Array.prototype.concat.apply(['account_lines'], arguments);
@@ -1346,8 +1350,8 @@ Remote.prototype.requestAccountLines = function(account, options, callback) {
  * ledger closes. You have to supply a ledger_index or ledger_hash
  * when paging to ensure a complete response
  *
- * @param {String} account - ripple address
  * @param {Object} options
+ *   @param {String} account - ripple address
  *   @param [String|Number] ledger identifier
  *   @param [Number] limit - max results per response
  *   @param {String} marker - start position in response paging
@@ -1355,7 +1359,7 @@ Remote.prototype.requestAccountLines = function(account, options, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestAccountOffers = function(account, options, callback) {
+Remote.prototype.requestAccountOffers = function(options, callback) {
   var args = Array.prototype.concat.apply(['account_offers'], arguments);
   return Remote.accountRequest.apply(this, args);
 };

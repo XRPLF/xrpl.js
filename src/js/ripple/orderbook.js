@@ -344,7 +344,7 @@ OrderBook.prototype.requestTransferRate = function(callback) {
     return this.emit('transfer_rate', this._issuerTransferRate);
   }
 
-  this._remote.requestAccountInfo(issuer, function(err, info) {
+  this._remote.requestAccountInfo({account: issuer}, function(err, info) {
     if (err) {
       // XXX What now?
       return callback(err);
@@ -447,7 +447,7 @@ OrderBook.prototype.requestFundedAmount = function(account, callback) {
   }
 
   function requestNativeBalance(callback) {
-    self._remote.requestAccountInfo(account, function(err, info) {
+    self._remote.requestAccountInfo({account: account}, function(err, info) {
       if (err) {
         callback(err);
       } else {
@@ -458,8 +458,8 @@ OrderBook.prototype.requestFundedAmount = function(account, callback) {
 
   function requestLineBalance(callback) {
     var request = self._remote.requestAccountLines(
-      account,
       {
+        account: account,
         ledger: 'validated',
         peer: self._issuerGets
       }

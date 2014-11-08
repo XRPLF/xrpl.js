@@ -211,7 +211,7 @@ Account.prototype.lines = function(callback) {
     }
   }
 
-  this._remote.requestAccountLines(this._account_id, accountLines);
+  this._remote.requestAccountLines({account: this._account_id}, accountLines);
 
   return this;
 };
