@@ -18,7 +18,7 @@ __(More examples coming soon!)__
 ###Also see:
 
 1. [The ripple-lib README](../README.md)
-2. [The ripple-lib GUIDES](GUIDES.md)
+2. [The ripple-lib GUIDES](GUIDES.md)a
 
 #Remote options
 
@@ -61,14 +61,34 @@ or
 
 #Request constructor functions
 
+Some requests have helper methods to construct the requests object and set properties on the message object. These will often be the more used requests and the helper methods is the preferred way of constructing these requests.
+Other request can still be made, but the type will have to be passed in directly to request constructor. See examples below.
+
+If the method is camelCased and starts with `request`, it's a helper method that wraps the request constructor.
+
 ##Server requests
 
-**[server_info([callback])](https://ripple.com/wiki/JSON_Messages#server_info)**
+**[requestServerInfo([callback])](https://ripple.com/wiki/JSON_Messages#server_info)**
 
 Returns information about the state of the server. If you are connected to multiple servers and want to select by a particular host, use `request.setServer`. Example:
 
 ```js
-var request = remote.request('server_info');
+var request = remote.requestServerInfo();
+
+request.setServer('wss://s1.ripple.com');
+
+request.request(function(err, res) {
+
+});
+```
+**[requestPeers([callback])](https://ripple.com/wiki/JSON_Messages#peers)**
+
+**[requestConnect(ip, port, [callback])](https://ripple.com/wiki/JSON_Messages#connect)**
+
+**[unl_list([callback])](https://ripple.com/wiki/JSON_Messages#unl_list)**
+
+```js
+var request = remote.request('un_list');
 
 request.setServer('wss://s1.ripple.com');
 
@@ -77,42 +97,48 @@ request.request(function(err, res) {
 });
 ```
 
-**[unl_list([callback])](https://ripple.com/wiki/JSON_Messages#unl_list)**
-
 **[unl_add(addr, comment, [callback])](https://ripple.com/wiki/JSON_Messages#unl_add)**
 
 **[unl_delete(node, [callback])](https://ripple.com/wiki/JSON_Messages#unl_delete)**
 
-**[requestPeers([callback])](https://ripple.com/wiki/JSON_Messages#peers)**
 
-
-**[connect(ip, port, [callback])](https://ripple.com/wiki/JSON_Messages#connect)**
 
 ##Ledger requests
 
-**[ledger(ledger, [opts], [callback])](https://ripple.com/wiki/JSON_Messages#ledger)**
+**[requestLedger([opts], [callback])](https://ripple.com/wiki/JSON_Messages#ledger)**
 
-**ledger_header([callback])**
+**[requestLedgerHeader([callback])](https://wiki.ripple.com/JSON_Messages#ledger_data)**
 
-**[ledger_current([callback])](https://ripple.com/wiki/JSON_Messages#ledger_current)**
+**[requestLedgerCurrent([callback])](https://ripple.com/wiki/JSON_Messages#ledger_current)**
 
-**[ledger_entry(type, [callback])](https://ripple.com/wiki/JSON_Messages#ledger_entry)**
+**[requestLedgerEntry(type, [callback])](https://ripple.com/wiki/JSON_Messages#ledger_entry)**
 
-**[subscribe([streams], [callback])](https://ripple.com/wiki/JSON_Messages#subscribe)**
+**[requestSubscribe([streams], [callback])](https://ripple.com/wiki/JSON_Messages#subscribe)**
 
 Start receiving selected streams from the server.
 
-**[unsubscribe([streams], [callback])](https://ripple.com/wiki/JSON_Messages#unsubscribe)**
+**[requestUnsubscribe([streams], [callback])](https://ripple.com/wiki/JSON_Messages#unsubscribe)**
 
 Stop receiving selected streams from the server.
 
 ##Account requests
 
-**[account_info(account, [callback])](https://ripple.com/wiki/JSON_Messages#account_info)**
+**[requestAccountInfo(options, [callback])](https://ripple.com/wiki/JSON_Messages#account_info)**
 
 Return information about the specified account.
 
 ```
+var options = {
+  account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+  ledger: 'validated'
+};
+
+var request = remote.requestAccountInfo(options, function(err, info) {
+  /* process info */
+});
+
+
+// response
 {
   ledger_current_index: <number>,
   account_data: {
@@ -129,13 +155,35 @@ Return information about the specified account.
 }
 ```
 
-**[account_lines(accountID, [account_index], [ledger], [callback])](https://ripple.com/wiki/JSON_Messages#account_lines)**
+**[requestAccountLines(options, [callback])](https://ripple.com/wiki/JSON_Messages#account_lines)**
 
-**[account_offers(accountID, [account_index], [ledger], [callback])](https://ripple.com/wiki/JSON_Messages#account_offers)**
+**[requestAccountOffers(options, [callback])](https://ripple.com/wiki/JSON_Messages#account_offers)**
 
 Return the specified account's outstanding offers.
 
-**[account_tx(options, [callback])](https://ripple.com/wiki/JSON_Messages#account_tx)**
+Requests for both `account_lines` and `account_offers` support paging. The amount of results per response can be configured with the `limit`.
+The responses can be paged through by using the `marker`.
+
+```
+// A valid `ledger_index` or `ledger_hash` is required to provide a reliable result.
+// Results can change between ledger closes, so the provided ledger will be used as base.
+var options = {
+    account: < rippleAccount >,
+    limit: < Number between 10 and 400 >,
+    ledger: < valid ledger_index or ledger_hash >
+}
+
+// The `marker` comes back in an account request if there are more results than are returned 
+// in the current response. The amount of results per response are determined by the `limit`.
+if (marker) {
+    options.marker = < marker >;
+}
+
+var request = remote.requestAccountOffers(options);
+```
+
+
+**[requestAccountTransactions(options, [callback])](https://ripple.com/wiki/JSON_Messages#account_tx)**
 
 Fetch a list of transactions that applied to this account.
 
@@ -153,42 +201,46 @@ Options:
 + `fwd_marker`
 + `rev_marker`
 
-**[wallet_accounts(seed, [callback])](https://ripple.com/wiki/JSON_Messages#wallet_accounts)**
+**[requestWalletAccounts(seed, [callback])](https://ripple.com/wiki/JSON_Messages#wallet_accounts)**
 
 Return a list of accounts for a wallet. *Requires trusted remote*
 
-**account_balance(account, [ledger], [callback])**
+**requestAccountBalance(account, [ledger], [callback])**
 
 Get the balance for an account. Returns an [Amount](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/amount.js) object.
 
-**account_flags(account, [ledger], [callback])**
+**requestAccountFlags(account, [ledger], [callback])**
 
 Return the flags for an account.
 
-**owner_count(account, [ledger], [callback])**
+**requestOwnerCount(account, [ledger], [callback])**
 
 Return the owner count for an account.
 
-**ripple_balance(account, issuer, currency, [ledger], [callback])**
+**requestRippleBalance(account, issuer, currency, [ledger], [callback])**
 
 Return a request to get a ripple balance
 
 ##Orderbook requests
 
-**[book_offers(options, [callback])](https://ripple.com/wiki/JSON_Messages#book_offers)**
+**[requestBookOffers(options, [callback])](https://ripple.com/wiki/JSON_Messages#book_offers)**
 
 Return the offers for an order book, also called a *snapshot*
 
 ```js
-var request = remote.request('book_offers', {
-  taker_gets: {
-    'currency':'XRP'
+var options = {
+  gets: {
+    issuer: < issuer >,
+    currency: < currency >
   },
-  taker_pays: {
-    'currency':'USD',
-    'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-  }
-});
+  pays: {
+    issuer: < issuer >,
+    currency: < currency >
+  },
+  limit: < limit >
+};
+
+var request = remote.requestBookOffers(options);
 
 request.request(function(err, offers) {
   //handle offers
@@ -197,23 +249,23 @@ request.request(function(err, offers) {
 
 ##Transaction requests
 
-**[transaction_entry(hash, [ledger_hash], [callback])](https://ripple.com/wiki/JSON_Messages#transaction_entry)**
+**[requestTransactionEntry(hash, [ledger_hash], [callback])](https://ripple.com/wiki/JSON_Messages#transaction_entry)**
 
 Searches a particular ledger for a transaction hash. Default ledger is the open ledger.
 
-**[tx(hash, [callback])](https://ripple.com/wiki/JSON_Messages#tx)**
+**[requestTransaction(hash, [callback])](https://ripple.com/wiki/JSON_Messages#tx)**
 
 Searches ledger history for validated transaction hashes.
 
-**[sign(secret, tx_json, [callback])](https://ripple.com/wiki/JSON_Messages#sign)**
+**[requestSign(secret, tx_json, [callback])](https://ripple.com/wiki/JSON_Messages#sign)**
 
 Sign a transaction. *Requires trusted remote*
 
-**[submit([callback])](https://ripple.com/wiki/JSON_Messages#submit)**
+**[requestSubmit([callback])](https://ripple.com/wiki/JSON_Messages#submit)**
 
 Submit a transaction to the network. This command is used internally to submit transactions with a greater degree of reliability. See [Submitting a payment to the network](GUIDES.md#3-submitting-a-payment-to-the-network) for details.
 
-**[ripple_path_find(src_account, dst_account, dst_amount, src_currencies, [callback])](https://ripple.com/wiki/JSON_Messages#path_find)**
+**[pathFind(src_account, dst_account, dst_amount, src_currencies)](https://ripple.com/wiki/JSON_Messages#path_find)**
 
 #Transaction constructors
 
