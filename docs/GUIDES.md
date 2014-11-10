@@ -40,9 +40,19 @@ This file provides step-by-step walkthroughs for some of the most common usages 
   ```
 3. Create a new `Remote` and connect to the network:
   ```js
+
+  var options = {
+    trace :         false,
+    trusted:        true,
+    local_signing:  true,
+    servers: [
+      { host: 's-west.ripple.com', port: 443, secure: true }
+    ]
+  }
+
   var remote = new Remote({options});
 
-  remote.connect(function() {
+  remote.connect(function(err, res) {
     /* remote connected, use some remote functions here */
   });
   ```
@@ -57,11 +67,11 @@ This file provides step-by-step walkthroughs for some of the most common usages 
 
 A `Request` is an `EventEmitter` so you can listen for success or failure events -- or, instead, you can provide a callback.
 
-Here is an example, using [request_server_info](https://ripple.com/wiki/JSON_Messages#server_info).
+Here is an example, using [requestServerInfo](https://ripple.com/wiki/JSON_Messages#server_info).
 
 + Constructing a `Request` with event listeners
 ```js
-var request = remote.request('server_info');
+var request = remote.requestServerInfo();
 
 request.on('success', function onSuccess(res) {
   //handle success
@@ -102,23 +112,43 @@ See the [wiki](https://ripple.com/wiki/JSON_Messages#subscribe) for details on s
   var remote = new Remote({options});
 
   remote.connect(function() {
-    var request = remote.request('subscribe');
-
-    request.addStream('ledger'); //remote will emit `ledger_closed`
-    request.addStream('transactions'); //remote will emit `transaction`
-
-    request.on('ledger_closed', function onLedgerClosed(ledgerData) {
-	//handle ledger
+    var remote = new Remote({
+      // see the API Reference for available options
+      servers: [ 'wss://s1.ripple.com:443' ]
     });
 
-    request.on('transaction', function onTransacstion(transaction) {
-	//handle transaction
-    });
+    remote.connect(function() {
+      console.log('Remote connected');
 
-    request.request(function(err) {
-      	if (err) {
-        } else {
-        }
+      var streams = [
+        'ledger',
+        'transactions'
+      ];
+    
+      var request = remote.requestSubscribe(streams);
+    
+      request.on('error', function(error) {
+        console.log('request error: ', error);
+      });
+    
+    
+      // the `ledger_closed` and `transaction` will come in on the remote
+      // since the request for subscribe is finalized after the success return
+      // the streaming events will still come in, but not on the initial request
+      remote.on('ledger_closed', function(ledger) {
+        console.log('ledger_closed: ', JSON.stringify(ledger, null, 2));
+      });
+    
+      remote.on('transaction', function(transaction) {
+        console.log('transaction: ', JSON.stringify(transaction, null, 2));
+      });
+    
+      remote.on('error', function(error) {
+        console.log('remote error: ', error);
+      });
+    
+      // fire the request
+      request.request();
     });
   });
 ```

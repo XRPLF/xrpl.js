@@ -1,6 +1,6 @@
 #ripple-lib
 
-JavaScript client for [rippled](https://github.com/ripple/rippled)
+A JavaScript API for interacting with Ripple in Node.js and the browser
 
 [![Build Status](https://travis-ci.org/ripple/ripple-lib.svg?branch=develop)](https://travis-ci.org/ripple/ripple-lib) [![Coverage Status](https://coveralls.io/repos/ripple/ripple-lib/badge.png?branch=develop)](https://coveralls.io/r/ripple/ripple-lib?branch=develop)
 
@@ -75,8 +75,8 @@ var remote = new Remote({
 
 remote.connect(function() {
   /* remote connected */
-  remote.request('server_info', function(err, info) {
-
+  remote.requestServerInfo(function(err, info) {
+    // process err and info
   });
 });
 ```
@@ -87,7 +87,7 @@ remote.connect(function() {
 
 2. `cd` into the repository and install dependencies with `npm install`
 
-3. `npm test` or `node_modules/.bin/mocha test/*-test.js`
+3. `npm test`
 
 **Generating code coverage**
 
