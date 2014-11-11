@@ -68,6 +68,53 @@ gulp.task('build', [ 'concat-sjcl' ], function(callback) {
   }, callback);
 });
 
+gulp.task('build-min', [ 'build' ], function(callback) {
+  return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
+  .pipe(uglify())
+  .pipe(rename([ 'ripple-', '-min.js' ].join(pkg.version)))
+  .pipe(gulp.dest('./build/'));
+});
+
+gulp.task('build-debug', [ 'concat-sjcl' ], function(callback) {
+  webpack({
+    cache: true,
+    entry: './src/js/ripple/index.js',
+    output: {
+      library: 'ripple',
+      path: './build/',
+      filename: [ 'ripple-', '-debug.js' ].join(pkg.version)
+    },
+    debug: true,
+    devtool: 'eval'
+  }, callback);
+});
+
+gulp.task('build-core', [ 'concat-sjcl' ], function(callback) {
+  const NONE = 'var {}';
+
+  webpack({
+    entry: [
+      './src/js/ripple/remote.js'
+    ],
+    externals: [
+      {
+        './transaction': NONE,
+        './orderbook': NONE,
+        './account': NONE,
+        './serializedobject': NONE
+      }
+    ],
+    output: {
+      library: 'ripple',
+      path: './build/',
+      filename: [ 'ripple-', '-core.js' ].join(pkg.version)
+    },
+    plugins: [
+      new webpack.optimize.UglifyJsPlugin()
+    ]
+  }, callback);
+});
+
 gulp.task('bower-build', [ 'build' ], function(callback) {
   return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
   .pipe(rename('ripple.js'))
@@ -92,41 +139,7 @@ gulp.task('bower-version', function() {
   .pipe(gulp.dest('./dist/'));
 });
 
-gulp.task('version-bump', function() {
-  if (!argv.type) {
-    throw new Error("No type found, pass it in using the --type argument");
-  }
-  gulp.src('./package.json')
-  .pipe(bump({type:argv.type}))
-  .pipe(gulp.dest('./'));
-});
-
-gulp.task('version-beta', function() {
-  gulp.src('./package.json')
-  .pipe(bump({version: pkg.version+'-beta'}))
-  .pipe(gulp.dest('./'));
-});
-
-gulp.task('build-min', [ 'build' ], function(callback) {
-  return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
-  .pipe(uglify())
-  .pipe(rename([ 'ripple-', '-min.js' ].join(pkg.version)))
-  .pipe(gulp.dest('./build/'));
-});
-
-gulp.task('build-debug', [ 'concat-sjcl' ], function(callback) {
-  webpack({
-    cache: true,
-    entry: './src/js/ripple/index.js',
-    output: {
-      library: 'ripple',
-      path: './build/',
-      filename: [ 'ripple-', '-debug.js' ].join(pkg.version)
-    },
-    debug: true,
-    devtool: 'eval'
-  }, callback);
-});
+gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug', 'bower-version']);
 
 gulp.task('lint', function() {
   gulp.src('src/js/ripple/*.js')
@@ -158,6 +171,20 @@ gulp.task('watch', function() {
   gulp.watch('src/js/ripple/*', [ 'build-debug' ]);
 });
 
-gulp.task('default', [ 'concat-sjcl', 'build', 'build-debug', 'build-min' ]);
+gulp.task('version-bump', function() {
+  if (!argv.type) {
+    throw new Error("No type found, pass it in using the --type argument");
+  }
 
-gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug', 'bower-version']);
+  gulp.src('./package.json')
+  .pipe(bump({ type: argv.type }))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('version-beta', function() {
+  gulp.src('./package.json')
+  .pipe(bump({ version: pkg.version + '-beta' }))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('default', [ 'concat-sjcl', 'build', 'build-debug', 'build-min' ]);
