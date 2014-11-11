@@ -89,19 +89,27 @@ gulp.task('build-debug', [ 'concat-sjcl' ], function(callback) {
   }, callback);
 });
 
-gulp.task('build-core', [ 'concat-sjcl' ], function(callback) {
-  const NONE = 'var {}';
+/**
+ * Generate a WebPack external for a given unavailable module which replaces
+ * that module's constructor with an error-thrower
+ */
 
+function buildUseError(cons) {
+  return 'var {<CONS>:function(){throw new Error("Class is unavailable in this build: <CONS>")}}'
+  .replace(new RegExp('<CONS>', 'g'), cons);
+};
+
+gulp.task('build-core', [ 'concat-sjcl' ], function(callback) {
   webpack({
     entry: [
       './src/js/ripple/remote.js'
     ],
     externals: [
       {
-        './transaction': NONE,
-        './orderbook': NONE,
-        './account': NONE,
-        './serializedobject': NONE
+        './transaction': buildUseError('Transaction'),
+        './orderbook': buildUseError('OrderBook'),
+        './account': buildUseError('Account'),
+        './serializedobject': buildUseError('SerializedObject')
       }
     ],
     output: {
@@ -135,7 +143,7 @@ gulp.task('bower-build-debug', [ 'build-debug' ], function(callback) {
 
 gulp.task('bower-version', function() {
   gulp.src('./dist/bower.json')
-  .pipe(bump({version: pkg.version}))
+  .pipe(bump({ version: pkg.version }))
   .pipe(gulp.dest('./dist/'));
 });
 
