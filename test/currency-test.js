@@ -198,6 +198,16 @@ describe('Currency', function() {
       cur2 = currency.from_json(cur);
       assert.strictEqual(cur.to_json(), cur2.to_json());
     });
+    it('should parse json 0', function() {
+      var cur = currency.from_json(0);
+      assert.strictEqual(cur.to_json(), 'XRP');
+      assert.strictEqual(cur.get_iso(), 'XRP');
+    });
+    it('should parse json 0', function() {
+      var cur = currency.from_json('0');
+      assert.strictEqual(cur.to_json(), 'XRP');
+      assert.strictEqual(cur.get_iso(), 'XRP');
+    });
   });
 
   describe('is_valid', function() {

@@ -68,7 +68,7 @@ Currency.prototype.parse_json = function(j, shouldInterpretXrpAsIou) {
     case 'string':
 
       // if an empty string is given, fall back to XRP
-      if (!j) {
+      if (!j || j === '0') {
         this.parse_hex(shouldInterpretXrpAsIou ? Currency.HEX_CURRENCY_BAD : Currency.HEX_ZERO);
         break;
       }
