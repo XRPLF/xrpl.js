@@ -276,7 +276,7 @@ Transaction.prototype._computeFee = function() {
   for (var i=0; i<servers.length; i++) {
     var server = servers[i];
     if (server._connected) {
-      fees.push(Number(server._computeFee(this)));
+      fees.push(Number(server._computeFee(this._getFeeUnits())));
     }
   }
 

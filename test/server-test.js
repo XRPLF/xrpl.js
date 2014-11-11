@@ -1006,12 +1006,6 @@ describe('Server', function() {
     assert(server._isConnected());
   });
 
-  it('Compute fee - transaction', function() {
-    var server = new Server(new Remote(), 'ws://localhost:5748');
-    var transaction = new Transaction();
-    assert.strictEqual(server._computeFee(transaction), '12');
-  });
-
   it('Compute fee - fee units', function() {
     var server = new Server(new Remote(), 'ws://localhost:5748');
     var transaction = new Transaction();
@@ -1033,7 +1027,7 @@ describe('Server', function() {
     server._load_factor = 256 * 4;
 
     var transaction = new Transaction();
-    assert.strictEqual(server._computeFee(transaction), '48');
+    assert.strictEqual(server._computeFee(10), '48');
   });
 
   it('Compute reserve', function() {
