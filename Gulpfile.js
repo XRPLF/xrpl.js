@@ -68,45 +68,6 @@ gulp.task('build', [ 'concat-sjcl' ], function(callback) {
   }, callback);
 });
 
-gulp.task('bower-build', [ 'build' ], function(callback) {
-  return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
-  .pipe(rename('ripple.js'))
-  .pipe(gulp.dest('./dist/'));
-});
-
-gulp.task('bower-build-min', [ 'build-min' ], function(callback) {
-  return gulp.src([ './build/ripple-', '-min.js' ].join(pkg.version))
-  .pipe(rename('ripple-min.js'))
-  .pipe(gulp.dest('./dist/'));
-});
-
-gulp.task('bower-build-debug', [ 'build-debug' ], function(callback) {
-  return gulp.src([ './build/ripple-', '-debug.js' ].join(pkg.version))
-  .pipe(rename('ripple-debug.js'))
-  .pipe(gulp.dest('./dist/'));
-});
-
-gulp.task('bower-version', function() {
-  gulp.src('./dist/bower.json')
-  .pipe(bump({version: pkg.version}))
-  .pipe(gulp.dest('./dist/'));
-});
-
-gulp.task('version-bump', function() {
-  if (!argv.type) {
-    throw new Error("No type found, pass it in using the --type argument");
-  }
-  gulp.src('./package.json')
-  .pipe(bump({type:argv.type}))
-  .pipe(gulp.dest('./'));
-});
-
-gulp.task('version-beta', function() {
-  gulp.src('./package.json')
-  .pipe(bump({version: pkg.version+'-beta'}))
-  .pipe(gulp.dest('./'));
-});
-
 gulp.task('build-min', [ 'build' ], function(callback) {
   return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
   .pipe(uglify())
@@ -127,6 +88,66 @@ gulp.task('build-debug', [ 'concat-sjcl' ], function(callback) {
     devtool: 'eval'
   }, callback);
 });
+
+/**
+ * Generate a WebPack external for a given unavailable module which replaces
+ * that module's constructor with an error-thrower
+ */
+
+function buildUseError(cons) {
+  return 'var {<CONS>:function(){throw new Error("Class is unavailable in this build: <CONS>")}}'
+  .replace(new RegExp('<CONS>', 'g'), cons);
+};
+
+gulp.task('build-core', [ 'concat-sjcl' ], function(callback) {
+  webpack({
+    entry: [
+      './src/js/ripple/remote.js'
+    ],
+    externals: [
+      {
+        './transaction': buildUseError('Transaction'),
+        './orderbook': buildUseError('OrderBook'),
+        './account': buildUseError('Account'),
+        './serializedobject': buildUseError('SerializedObject')
+      }
+    ],
+    output: {
+      library: 'ripple',
+      path: './build/',
+      filename: [ 'ripple-', '-core.js' ].join(pkg.version)
+    },
+    plugins: [
+      new webpack.optimize.UglifyJsPlugin()
+    ]
+  }, callback);
+});
+
+gulp.task('bower-build', [ 'build' ], function(callback) {
+  return gulp.src([ './build/ripple-', '.js' ].join(pkg.version))
+  .pipe(rename('ripple.js'))
+  .pipe(gulp.dest('./dist/'));
+});
+
+gulp.task('bower-build-min', [ 'build-min' ], function(callback) {
+  return gulp.src([ './build/ripple-', '-min.js' ].join(pkg.version))
+  .pipe(rename('ripple-min.js'))
+  .pipe(gulp.dest('./dist/'));
+});
+
+gulp.task('bower-build-debug', [ 'build-debug' ], function(callback) {
+  return gulp.src([ './build/ripple-', '-debug.js' ].join(pkg.version))
+  .pipe(rename('ripple-debug.js'))
+  .pipe(gulp.dest('./dist/'));
+});
+
+gulp.task('bower-version', function() {
+  gulp.src('./dist/bower.json')
+  .pipe(bump({ version: pkg.version }))
+  .pipe(gulp.dest('./dist/'));
+});
+
+gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug', 'bower-version']);
 
 gulp.task('lint', function() {
   gulp.src('src/js/ripple/*.js')
@@ -158,6 +179,20 @@ gulp.task('watch', function() {
   gulp.watch('src/js/ripple/*', [ 'build-debug' ]);
 });
 
-gulp.task('default', [ 'concat-sjcl', 'build', 'build-debug', 'build-min' ]);
+gulp.task('version-bump', function() {
+  if (!argv.type) {
+    throw new Error("No type found, pass it in using the --type argument");
+  }
 
-gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug', 'bower-version']);
+  gulp.src('./package.json')
+  .pipe(bump({ type: argv.type }))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('version-beta', function() {
+  gulp.src('./package.json')
+  .pipe(bump({ version: pkg.version + '-beta' }))
+  .pipe(gulp.dest('./'));
+});
+
+gulp.task('default', [ 'concat-sjcl', 'build', 'build-debug', 'build-min' ]);

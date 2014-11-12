@@ -16,7 +16,7 @@ A JavaScript API for interacting with Ripple in Node.js and the browser
 ###In this file
 
 1. [Installation](README.md#installation)
-2. [Quickstart](README.md#quickstart)
+2. [Quick start](README.md#quick+start)
 3. [Running tests](https://github.com/ripple/ripple-lib#running-tests)
 
 ###Additional documentation
@@ -47,7 +47,9 @@ A JavaScript API for interacting with Ripple in Node.js and the browser
 See the [bower-ripple repo](https://github.com/ripple/bower-ripple) for additional bower instructions
 
 
-**Building ripple-lib from github**
+**Building ripple-lib for browser environments**
+
+ripple-lib uses Gulp to generate browser builds. These steps will generate minified and non-minified builds of ripple-lib in the `build/` directory.
 
 ```
   $ git clone https://github.com/ripple/ripple-lib
@@ -55,9 +57,13 @@ See the [bower-ripple repo](https://github.com/ripple/bower-ripple) for addition
   $ npm run build
 ```
 
-Then use the minified `build/ripple-*-min.js`
+**Restricted browser builds**
 
-##Quickstart
+You may generate browser builds that contain a subset of features. To do this, run `./node_modules/.bin/gulp build-<name>`
+
++ `build-core` Contains the functionality to make requests and listen for events such as `ledgerClose`. Only `ripple.Remote` is currently exposed. Advanced features like transaction submission and orderbook tracking are excluded from this build.
+
+##Quick start
 
 `Remote.js` ([remote.js](https://github.com/ripple/ripple-lib/blob/develop/src/js/ripple/remote.js)) is the point of entry for interacting with rippled
 

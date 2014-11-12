@@ -2,7 +2,6 @@ var util         = require('util');
 var url          = require('url');
 var EventEmitter = require('events').EventEmitter;
 var Amount       = require('./amount').Amount;
-var Transaction  = require('./transaction').Transaction;
 var log          = require('./log').internal.sub('server');
 
 /**
@@ -760,22 +759,16 @@ Server.prototype._isConnected = function() {
  * Calculate transaction fee
  *
  * @param {Transaction|Number} Fee units for a provided transaction
- * @return {Number} Final fee in XRP for specified number of fee units
+ * @return {String} Final fee in XRP for specified number of fee units
  * @api private
  */
 
-Server.prototype._computeFee = function(transaction) {
-  var units;
-
-  if (transaction instanceof Transaction) {
-    units = transaction._getFeeUnits();
-  } else if (typeof transaction === 'number') {
-    units = transaction;
-  } else {
+Server.prototype._computeFee = function(feeUnits) {
+  if (isNaN(feeUnits)) {
     throw new Error('Invalid argument');
   }
 
-  return this._feeTx(units).to_json();
+  return this._feeTx(Number(feeUnits)).to_json();
 };
 
 /**
