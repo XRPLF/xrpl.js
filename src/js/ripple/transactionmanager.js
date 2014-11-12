@@ -46,8 +46,16 @@ function TransactionManager(account) {
     }
 
     if (submission instanceof Transaction) {
+
       // ND: A `success` handler will `finalize` this later
-      submission.emit('success', transaction);
+      switch (transaction.engine_result) {
+        case 'tesSUCCESS':
+          submission.emit('success', transaction);
+          break;
+        default:
+          submission.emit('error', transaction);
+      }
+
     } else {
       self._pending.addReceivedId(hash, transaction);
     }
@@ -413,8 +421,6 @@ TransactionManager.prototype._request = function(tx) {
     if (tx.finalized) {
       return;
     }
-
-    tx.emit('error', message);
   };
 
   function transactionFailedLocal(message) {
