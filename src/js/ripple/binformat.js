@@ -106,7 +106,8 @@ var FIELDS_MAP = exports.fields = {
     16: 'BookDirectory',
     17: 'InvoiceID',
     18: 'Nickname',
-    19: 'Feature'
+    19: 'Amendment',
+    20: 'TicketID'
   },
   6: { // Amount
     1: 'Amount',
@@ -135,7 +136,8 @@ var FIELDS_MAP = exports.fields = {
     10: 'ExpireCode',
     11: 'CreateCode',
     12: 'MemoType',
-    13: 'MemoData'
+    13: 'MemoData',
+    14: 'MemoFormat'
   },
   8: { // Account
     1: 'Account',
@@ -187,7 +189,7 @@ var FIELDS_MAP = exports.fields = {
   19: { // Vector256
     1: 'Indexes',
     2: 'Hashes',
-    3: 'Features'
+    3: 'Amendments'
   }
 };
 
