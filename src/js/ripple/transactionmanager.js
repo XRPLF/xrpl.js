@@ -365,8 +365,6 @@ TransactionManager.prototype._request = function(tx) {
     return tx.emit('error', new RippleError('tejLocalSigningRequired', message));
   }
 
-  tx.emit('presubmit');
-
   if (tx.finalized) {
     return;
   }
@@ -557,9 +555,11 @@ TransactionManager.prototype._request = function(tx) {
       return;
     }
 
-    submitRequest.timeout(self._submissionTimeout, requestTimeout);
-    tx.submissions = submitRequest.broadcast();
+    tx.emit('presubmit');
 
+    submitRequest.timeout(self._submissionTimeout, requestTimeout);
+
+    tx.submissions = submitRequest.broadcast();
     tx.attempts++;
     tx.emit('postsubmit');
   };
