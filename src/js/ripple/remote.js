@@ -1217,6 +1217,7 @@ Remote.prototype.requestTx = function(hash, callback) {
  *   @param {String} marker - start position in response paging
  * @param [Function] callback
  * @return {Request}
+ * @throws {Error} if a marker is provided, but no ledger_index or ledger_hash
  */
 Remote.accountRequest = function(type, options, callback) {
   var account, ledger, peer, limit, marker;
