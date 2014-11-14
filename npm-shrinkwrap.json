@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.9.0-rc5",
+  "version": "0.9.3-rc2",
   "dependencies": {
     "async": {
       "version": "0.8.0",
