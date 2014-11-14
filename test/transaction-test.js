@@ -1560,33 +1560,34 @@ describe('Transaction', function() {
     transaction.submit();
   });
 
-  it.skip('Abort submission', function(done) {
+  it('Abort submission on presubmit', function(done) {
     var remote = new Remote();
-    var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
-    var account = remote.addAccount('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+    remote.setSecret('rJaT8TafQfYJqDm8aC5n3Yx5yWEL2Ery79', 'snPwFATthTkKnGjEW73q3TL4yci1Q');
+
+    var server = new Server(remote, 'wss://s1.ripple.com:443');
+    server._computeFee = function() { return '12'; };
+    server._connected = true;
+
+    remote._servers.push(server);
+    remote._connected = true;
+    remote._ledger_current_index = 1;
+
+    var transaction = new Transaction(remote).accountSet('rJaT8TafQfYJqDm8aC5n3Yx5yWEL2Ery79');
+    var account = remote.account('rJaT8TafQfYJqDm8aC5n3Yx5yWEL2Ery79');
 
     account._transactionManager._nextSequence = 1;
 
-    account._transactionManager._request = function(tx) {
-      setTimeout(function() {
-        tx.emit('success', { });
-      }, 20);
-    };
+    transaction.once('presubmit', function() {
+      transaction.abort();
+    });
 
-    transaction.complete = function() {
-      return this;
-    };
-
-    function submitCallback(err, res) {
+    transaction.submit(function(err, res) {
       setImmediate(function() {
         assert(err);
         assert.strictEqual(err.result, 'tejAbort');
         done();
       });
-    };
-
-    transaction.submit(submitCallback);
-    transaction.abort();
+    });
   });
 });
 
