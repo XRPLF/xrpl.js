@@ -1659,7 +1659,7 @@ Remote.prototype.requestLedgerAccept = function(callback) {
   request.callback(callback, 'ledger_closed');
   request.request();
 
-  return this;
+  return request;
 };
 
 /**
