@@ -42,12 +42,12 @@ describe('Remote', function () {
 
   it('remote server initialization - url object', function() {
     var remote = new Remote({
-      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ],
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
     assert(Array.isArray(remote._servers));
     assert(remote._servers[0] instanceof Server);
     assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
-  })
+  });
 
   it('remote server initialization - url object - no secure property', function() {
     var remote = new Remote({
@@ -56,7 +56,7 @@ describe('Remote', function () {
     assert(Array.isArray(remote._servers));
     assert(remote._servers[0] instanceof Server);
     assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
-  })
+  });
 
   it('remote server initialization - url object - secure: false', function() {
     var remote = new Remote({
@@ -74,7 +74,7 @@ describe('Remote', function () {
     assert(Array.isArray(remote._servers));
     assert(remote._servers[0] instanceof Server);
     assert.strictEqual(remote._servers[0]._url, 'wss://s-west.ripple.com:443');
-  })
+  });
 
   it('remote server initialization - url object - invalid host', function() {
     assert.throws(
@@ -83,7 +83,7 @@ describe('Remote', function () {
         servers: [ { host: '+', port: 443, secure: true } ]
       });
     }, Error);
-  })
+  });
 
   it('remote server initialization - url object - invalid port', function() {
     assert.throws(
@@ -149,6 +149,34 @@ describe('Remote', function () {
       });
     }, Error
     );
+  });
+
+  it('remote server initialization - set max_fee - number', function() {
+    var remote = new Remote({
+      max_fee: 10
+    });
+    assert.strictEqual(remote.max_fee, 10);
+
+    remote = new Remote({
+      max_fee: 1234567890
+    });
+    assert.strictEqual(remote.max_fee, 1234567890);
+  });
+
+  it('remote server initialization - set max_fee - string fails, should be number', function() {
+    var remote = new Remote({
+      max_fee: '1234567890'
+    });
+    assert.strictEqual(remote.max_fee, 1e6);
+  });
+
+  it('remote server initialization - max_fee - default', function() {
+    var remote = new Remote({
+      max_fee: void(0)
+    });
+    assert.strictEqual(remote.max_fee, 1e6);
+    assert.strictEqual(remote.max_fee, 1000000);
+    assert.strictEqual((new Remote()).max_fee, 1e6);
   });
 
   describe('request constructors', function () {
@@ -489,9 +517,9 @@ describe('Remote', function () {
           },
           parseJson: function(json) {}
         }
-      }
+      };
       remote.getPendingTransactions();
 
     })
   })
-})
+});

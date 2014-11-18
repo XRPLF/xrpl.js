@@ -93,7 +93,7 @@ function Remote(opts, trace) {
   this.canonical_signing = (typeof opts.canonical_signing === 'boolean') ? opts.canonical_signing : true;
 
   this.fee_cushion = (typeof opts.fee_cushion === 'number') ? opts.fee_cushion : 1.2;
-  this.max_fee = (typeof opts.max_fee === 'number') ? opts.max_fee : Infinity;
+  this.max_fee = (typeof opts.max_fee === 'number') ? opts.max_fee : 1000000; // default max fee is 1 XRP, 10^6 drops
 
   this.max_attempts = (typeof opts.max_attempts === 'number') ? opts.max_attempts : 10;
 
