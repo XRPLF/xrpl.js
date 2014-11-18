@@ -8,6 +8,10 @@
 
 + [Wait for transaction validation before returning `tec` error](https://github.com/ripple/ripple-lib/commit/6bdd4b2670906588852fc4dda457607b4aac08e4)
 
++ [Change default `max_fee` on `Remote` to `1 XRP`](https://github.com/ripple/ripple-lib/commit/d6b1728c23ff85c3cc791bed6982a750641fd95f)
+
++ [Fix: Request ledger_accept should return the Remote](https://github.com/ripple/ripple-lib/pull/209)
+
 ##0.9.2
 
 + [**Breaking change**: Change accountRequest method signature](https://github.com/ripple/ripple-lib/commit/6f5d1104aa3eb440c518ec4f39e264fdce15fa15)
