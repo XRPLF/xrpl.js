@@ -1,5 +1,11 @@
 ##0.9.3
 
++ [Change `presubmit` to emit immediately before transaction submit](https://github.com/ripple/ripple-lib/commit/7a1feaa89701bf861ab31ebd8ffdc8d8d1474e29)
+
++ [Add a "core" browser build of ripple-lib which has a subset of features and smaller file size](https://github.com/ripple/ripple-lib/pull/205)
+
++ [Update binformat with missing fields from rippled](https://github.com/ripple/ripple-lib/commit/cae980788efb00191bfd0988ed836d60cdf7a9a2)
+
 + [Wait for transaction validation before returning `tec` error](https://github.com/ripple/ripple-lib/commit/6bdd4b2670906588852fc4dda457607b4aac08e4)
 
 ##0.9.2
