@@ -15,9 +15,9 @@ A JavaScript API for interacting with Ripple in Node.js and the browser
 
 ###In this file
 
-1. [Installation](README.md#installation)
-2. [Quick start](README.md#quick+start)
-3. [Running tests](https://github.com/ripple/ripple-lib#running-tests)
+1. [Installation](#installation)
+2. [Quick start](#quick-start)
+3. [Running tests](#running-tests)
 
 ###Additional documentation
 
