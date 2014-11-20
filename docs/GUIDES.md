@@ -63,7 +63,7 @@ This file provides step-by-step walkthroughs for some of the most common usages 
 
 ##Sending rippled API requests
 
-`Remote` contains functions for constructing a `Request` object. 
+`Remote` contains functions for constructing a `Request` object.
 
 A `Request` is an `EventEmitter` so you can listen for success or failure events -- or, instead, you can provide a callback.
 
@@ -124,29 +124,29 @@ See the [wiki](https://ripple.com/wiki/JSON_Messages#subscribe) for details on s
         'ledger',
         'transactions'
       ];
-    
+
       var request = remote.requestSubscribe(streams);
-    
+
       request.on('error', function(error) {
         console.log('request error: ', error);
       });
-    
-    
+
+
       // the `ledger_closed` and `transaction` will come in on the remote
       // since the request for subscribe is finalized after the success return
       // the streaming events will still come in, but not on the initial request
       remote.on('ledger_closed', function(ledger) {
         console.log('ledger_closed: ', JSON.stringify(ledger, null, 2));
       });
-    
+
       remote.on('transaction', function(transaction) {
         console.log('transaction: ', JSON.stringify(transaction, null, 2));
       });
-    
+
       remote.on('error', function(error) {
         console.log('remote error: ', error);
       });
-    
+
       // fire the request
       request.request();
     });
@@ -160,7 +160,7 @@ See the [wiki](https://ripple.com/wiki/JSON_Messages#subscribe) for details on s
 Submitting a payment transaction to the Ripple network involves connecting to a `Remote`, creating a transaction, signing it with the user's secret, and submitting it to the `rippled` server. Note that the `Amount` module is used to convert human-readable amounts like '1XRP' or '10.50USD' to the type of Amount object used by the Ripple network.
 
 ```js
-/* Loading ripple-lib Remote and Amount modules in Node.js */ 
+/* Loading ripple-lib Remote and Amount modules in Node.js */
 var Remote = require('ripple-lib').Remote;
 var Amount = require('ripple-lib').Amount;
 
@@ -179,8 +179,8 @@ remote.connect(function() {
   remote.setSecret(MY_ADDRESS, MY_SECRET);
 
   var transaction = remote.createTransaction('Payment', {
-    account: MY_ADDRESS, 
-    destination: RECIPIENT, 
+    account: MY_ADDRESS,
+    destination: RECIPIENT,
     amount: AMOUNT
   });
 
@@ -201,12 +201,12 @@ Since the fee required for a transaction may change between the time when the or
 The [`max_fee`](REFERENCE.md#1-remote-options) option can be used to avoid submitting a transaction to a server that is charging unreasonably high fees.
 
 
-##4. Submitting a trade offer to the network
+##Submitting a trade offer to the network
 
-Submitting a trade offer to the network is similar to submitting a payment transaction. Here is an example for a trade that expires in 24 hours where you are offering to sell 1 USD in exchange for 100 XRP:
+Submitting a trade offer to the network is similar to submitting a payment transaction. Here is an example offering to sell 1 USD in exchange for 100 XRP:
 
 ```js
-/* Loading ripple-lib Remote and Amount modules in Node.js */ 
+/* Loading ripple-lib Remote and Amount modules in Node.js */
 var Remote = require('ripple-lib').Remote;
 var Amount = require('ripple-lib').Amount;
 
@@ -225,7 +225,7 @@ remote.connect(function() {
 
   var transaction = remote.createTransaction('OfferCreate', {
     account: MY_ADDRESS,
-    taker_pays: '1',
+    taker_pays: '100',
     taker_gets: '1/USD/' + GATEWAY
   });
 
