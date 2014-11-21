@@ -1399,6 +1399,10 @@ Remote.prototype.requestAccountTx = function(options, callback) {
     options.ledger_index_max = options.max_ledger;
   }
 
+  if (options.binary === void(0)) {
+    options.binary = true;
+  }
+
   if (options.binary && options.parseBinary === void(0)) {
     options.parseBinary = true;
   }
