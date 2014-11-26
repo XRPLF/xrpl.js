@@ -329,12 +329,12 @@ describe('OrderBook', function() {
     });
   });
 
-  it('Set funded amount - funded', function() {
+  it('Set funded amount - iou/xrp - funded', function() {
     var remote = new Remote();
     var book = remote.createOrderBook({
+      currency_gets: 'BTC',
       currency_pays: 'XRP',
-      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-      currency_gets: 'BTC'
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
     });
 
     var offer = {
@@ -359,7 +359,37 @@ describe('OrderBook', function() {
     assert.deepEqual(offer, expected);
   });
 
-  it('Set funded amount - unfunded', function() {
+  it('Set funded amount - iou/xrp - unfunded', function() {
+    var remote = new Remote();
+    var book = remote.createOrderBook({
+      currency_gets: 'BTC',
+      currency_pays: 'XRP',
+      issuer_gets: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+    });
+
+    var offer = {
+      TakerGets: {
+        value: '100',
+        currency: 'BTC',
+        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+      },
+      TakerPays: '123456'
+    };
+
+    book.setFundedAmount(offer, '99');
+
+    var expected = {
+      TakerGets: offer.TakerGets,
+      TakerPays: offer.TakerPays,
+      is_fully_funded: false,
+      taker_gets_funded: '99',
+      taker_pays_funded: '122221'
+    };
+
+    assert.deepEqual(offer, expected);
+  });
+
+  it('Set funded amount - xrp/iou - funded', function() {
     var remote = new Remote();
     var book = remote.createOrderBook({
       currency_gets: 'XRP',
@@ -370,7 +400,37 @@ describe('OrderBook', function() {
     var offer = {
       TakerGets: '100',
       TakerPays: {
-        value: '123456',
+        value: '123.456',
+        currency: 'BTC',
+        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+      }
+    };
+
+    book.setFundedAmount(offer, '100.1');
+
+    var expected = {
+      TakerGets: offer.TakerGets,
+      TakerPays: offer.TakerPays,
+      is_fully_funded: true,
+      taker_gets_funded: '100',
+      taker_pays_funded: '123.456'
+    };
+
+    assert.deepEqual(offer, expected);
+  });
+
+  it('Set funded amount - xrp/iou - unfunded', function() {
+    var remote = new Remote();
+    var book = remote.createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
+      currency_pays: 'BTC'
+    });
+
+    var offer = {
+      TakerGets: '100',
+      TakerPays: {
+        value: '123.456',
         currency: 'BTC',
         issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
       }
@@ -383,67 +443,7 @@ describe('OrderBook', function() {
       TakerPays: offer.TakerPays,
       is_fully_funded: false,
       taker_gets_funded: '99',
-      taker_pays_funded: '122221.44'
-    };
-
-    assert.deepEqual(offer, expected);
-  });
-
-  it('Set funded amount - native currency - funded', function() {
-    var remote = new Remote();
-    var book = remote.createOrderBook({
-      currency_gets: 'XRP',
-      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-      currency_pays: 'BTC'
-    });
-
-    var offer = {
-      TakerGets: '100',
-      TakerPays: {
-        value: '100.1234',
-        currency: 'USD',
-        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-      }
-    };
-
-    book.setFundedAmount(offer, '100');
-
-    var expected = {
-      TakerGets: offer.TakerGets,
-      TakerPays: offer.TakerPays,
-      is_fully_funded: true,
-      taker_gets_funded: '100',
-      taker_pays_funded: '100.1234'
-    };
-
-    assert.deepEqual(offer, expected);
-  });
-
-  it('Set funded amount - native currency - unfunded', function() {
-    var remote = new Remote();
-    var book = remote.createOrderBook({
-      currency_gets: 'XRP',
-      issuer_pays: 'rrrrrrrrrrrrrrrrrrrrBZbvji',
-      currency_pays: 'USD'
-    });
-
-    var offer = {
-      TakerGets: {
-        value: '100.1234',
-        currency: 'USD',
-        issuer: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
-      },
-      TakerPays: '123'
-    };
-
-    book.setFundedAmount(offer, '100');
-
-    var expected = {
-      TakerGets: offer.TakerGets,
-      TakerPays: offer.TakerPays,
-      is_fully_funded: false,
-      taker_gets_funded: '100',
-      taker_pays_funded: '122.8484050681459'
+      taker_pays_funded: '122.22144'
     };
 
     assert.deepEqual(offer, expected);
