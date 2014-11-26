@@ -1145,25 +1145,21 @@ Amount.prototype.to_human = function(opts) {
   fraction_part = fraction_part.replace(/0*$/, '');
 
   if (fraction_part.length || !opts.skip_empty_fraction) {
-
     // Enforce the maximum number of decimal digits (precision)
     if (typeof opts.precision === 'number') {
-      if (opts.precision <= 0) {
+      var precision = Math.max(0, opts.precision);
+      precision = Math.min(precision, fraction_part.length);
+      var rounded = Number('0.' + fraction_part).toFixed(precision);
 
-        // increment the int_part if the first decimal is 5 or higher
-        if (fraction_part.charCodeAt(0) >= 53) {
-          int_part = (Number(int_part) + 1).toString();
-        }
-        fraction_part = '';
+      if (rounded < 1) {
+        fraction_part = rounded.substring(2);
       } else {
-        var precision = Math.min(opts.precision, fraction_part.length);
-        fraction_part = Math.round(fraction_part / Math.pow(10, fraction_part.length - precision)).toString();
+        int_part = (Number(int_part) + 1).toString();
+        fraction_part = '';
+      }
 
-        // because the division above will cut off the leading 0's we have to add them back again
-        // XXX look for a more elegant alternative
-        while (fraction_part.length < precision) {
-          fraction_part = '0' + fraction_part;
-        }
+      while (fraction_part.length < precision) {
+        fraction_part = '0' + fraction_part;
       }
     }
 
@@ -1171,7 +1167,7 @@ Amount.prototype.to_human = function(opts) {
     if (typeof opts.max_sig_digits === 'number') {
       // First, we count the significant digits we have.
       // A zero in the integer part does not count.
-      var int_is_zero = +int_part === 0;
+      var int_is_zero = Number(int_part) === 0;
       var digits = int_is_zero ? 0 : int_part.length;
 
       // Don't count leading zeros in the fractional part if the integer part is
@@ -1197,6 +1193,7 @@ Amount.prototype.to_human = function(opts) {
 
     // Enforce the minimum number of decimal digits (min_precision)
     if (typeof opts.min_precision === 'number') {
+      opts.min_precision = Math.max(0, opts.min_precision);
       while (fraction_part.length < opts.min_precision) {
         fraction_part += '0';
       }

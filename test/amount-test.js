@@ -87,7 +87,7 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_human("0.8 XAU").to_human({precision:0}), '1');
     });
     it('to human, precision 0, precision 16', function() {
-      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision:16}), '0.0');
+      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision:16}), '0');
     });
     it('to human, precision 0, precision 8, min_precision 16', function() {
       assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision:8, min_precision:16}), '0.0000000000000000');
@@ -100,6 +100,21 @@ describe('Amount', function() {
     });
     it('to human, precision 16, min_precision 6, max_sig_digits 20', function() {
       assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision: 16, min_precision: 6, max_sig_digits: 20}), '0.000000');
+    });
+    it('to human rounding edge case, precision 2, 1', function() {
+      assert.strictEqual(Amount.from_human("0.99 XAU").to_human({precision:1}), '1.0');
+    });
+    it('to human rounding edge case, precision 2, 2', function() {
+      assert.strictEqual(Amount.from_human("0.99 XAU").to_human({precision:2}), '0.99');
+    });
+    it('to human rounding edge case, precision 2, 3', function() {
+      assert.strictEqual(Amount.from_human("0.99 XAU").to_human({precision:3}), '0.99');
+    });
+    it('to human rounding edge case, precision 2, 3 min precision 3', function() {
+      assert.strictEqual(Amount.from_human("0.99 XAU").to_human({precision:3, min_precision:3}), '0.990');
+    });
+    it('to human rounding edge case, precision 3, 2', function() {
+      assert.strictEqual(Amount.from_human("0.999 XAU").to_human({precision:2}), '1.00');
     });
   });
   describe('from_human', function() {
