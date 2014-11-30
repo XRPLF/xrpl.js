@@ -1495,8 +1495,6 @@ describe('OrderBook', function() {
       Flags: 131072,
       LedgerEntryType: 'Offer',
       OwnerNode: '0000000000000000',
-      PreviousTxnID: '9BB337CC8B34DC8D1A3FFF468556C8BA70977C37F7436439D8DA19610F214AD1',
-      PreviousTxnLgrSeq: 8342933,
       Sequence: 195,
       TakerGets: { currency: 'BTC',
         issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
@@ -1509,7 +1507,6 @@ describe('OrderBook', function() {
       },
       index: 'B6BC3B0F87976370EE11F5575593FE63AA5DC1D602830DC96F04B2D597F044BF',
       owner_funds: '0.1129267125000245',
-      quality: '496.5',
       taker_gets_funded: '0.1127013098802639',
       taker_pays_funded: '55.95620035555102',
       is_fully_funded: false },
@@ -1521,8 +1518,6 @@ describe('OrderBook', function() {
         Flags: 131072,
         LedgerEntryType: 'Offer',
         OwnerNode: '0000000000000144',
-        PreviousTxnID: 'C8296B9CCA6DC594C7CD271C5D8FD11FEE380021A07768B25935642CDB37048A',
-        PreviousTxnLgrSeq: 8342469,
         Sequence: 29354,
         TakerGets: {
           currency: 'BTC',
@@ -1536,7 +1531,6 @@ describe('OrderBook', function() {
         },
         index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
         owner_funds: '0.950363009783092',
-        quality: '498.6116758238228',
         is_fully_funded: true,
         taker_gets_funded: '0.2',
         taker_pays_funded: '99.72233516476456'
