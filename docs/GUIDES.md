@@ -16,17 +16,6 @@ This file provides step-by-step walkthroughs for some of the most common usages 
 1. [The ripple-lib README](../README.md)
 2. [The ripple-lib API Reference](REFERENCE.md)
 
-##Generating a new Ripple Wallet
-
-  ```js
-    var Wallet = require('ripple-lib').Wallet;
-
-    var wallet = Wallet.generate();
-    console.log(wallet);
-    // { address: 'rEf4sbVobiiDGExrNj2PkNHGMA8eS6jWh3',
-    //   secret: 'shFh4a38EZpEdZxrLifEnVPAoBRce' }
-  ```
-
 ##Connecting to the Ripple network
 
 1. [Get ripple-lib](README.md#getting-ripple-lib)
@@ -59,6 +48,33 @@ This file provides step-by-step walkthroughs for some of the most common usages 
   __NOTE:__ See the API Reference for available [`Remote` options](REFERENCE.md#1-remote-options)
 
 4. You're connected! Read on to see what to do now.
+
+##Generating a new Ripple Wallet
+
+  ```js
+    var ripple = require('ripple-lib');
+
+    // subscribing to a server allows for more entropy
+    var remote = new ripple.Remote({
+      servers: [
+        { host: 's1.ripple.com', port: 443, secure: true }
+      ]
+    });
+
+    remote.connect(function(err, res) {
+     /* remote connected */
+    });
+
+    // Wait for randomness to have been added.
+    // The entropy of the random generator is increased
+    // by random data received from a rippled
+    remote.once('random', function(err, info) {
+      var wallet = ripple.Wallet.generate();
+      console.log(wallet);
+      // { address: 'rEf4sbVobiiDGExrNj2PkNHGMA8eS6jWh3',
+      //   secret: 'shFh4a38EZpEdZxrLifEnVPAoBRce' }
+    });
+  ```
 
 
 ##Sending rippled API requests
