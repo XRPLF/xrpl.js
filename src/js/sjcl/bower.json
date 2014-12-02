@@ -1,0 +1,12 @@
+{
+	"name": "sjcl",
+	"version": "1.0.0",
+	"main": ["./sjcl.js"],
+	"ignore": [
+		"**/*",
+		"!README.md",
+		"!README/*",
+		"!bower.json",
+		"!sjcl.js"
+	]
+}

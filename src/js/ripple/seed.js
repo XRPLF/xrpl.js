@@ -16,7 +16,7 @@ var KeyPair = require('./keypair').KeyPair;
 
 var Seed = extend(function () {
   // Internal form: NaN or BigInteger
-  this._curve = sjcl.ecc.curves.c256;
+  this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;
 }, UInt);
 
