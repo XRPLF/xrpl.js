@@ -19,7 +19,7 @@ sjcl.bn.prototype = {
    * Initializes this with it, either as a bn, a number, or a hex string.
    */
   initWith: function(it) {
-    var i=0, k, n, l;
+    var i=0, k;
     switch(typeof it) {
     case "object":
       this.limbs = it.limbs.slice(0);
@@ -328,7 +328,7 @@ sjcl.bn.prototype = {
       carry = (l-m)*ipv;
     }
     if (carry === -1) {
-      limbs[i-1] -= this.placeVal;
+      limbs[i-1] -= pv;
     }
     return this;
   },
@@ -370,7 +370,9 @@ sjcl.bn.prototype = {
   }
 };
 
-/** @this { sjcl.bn } */
+/** @memberOf sjcl.bn
+* @this { sjcl.bn }
+*/
 sjcl.bn.fromBits = function(bits) {
   var Class = this, out = new Class(), words=[], w=sjcl.bitArray, t = this.prototype,
       l = Math.min(this.bitLength || 0x100000000, w.bitLength(bits)), e = l % t.radix || t.radix;
@@ -394,7 +396,9 @@ sjcl.bn.prototype.radixMask = (1 << sjcl.bn.prototype.radix) - 1;
  * i.e. a prime of the form 2^e + sum(a * 2^b),where the sum is negative and sparse.
  */
 sjcl.bn.pseudoMersennePrime = function(exponent, coeff) {
-  /** @constructor */
+  /** @constructor 
+  * @private
+  */
   function p(it) {
     this.initWith(it);
     /*if (this.limbs[this.modOffset]) {
@@ -427,10 +431,11 @@ sjcl.bn.pseudoMersennePrime = function(exponent, coeff) {
   ppr.modulus.cnormalize();
 
   /** Approximate reduction mod p.  May leave a number which is negative or slightly larger than p.
-   * @this {sjcl.bn}
+   * @memberof sjcl.bn
+   * @this { sjcl.bn }
    */
   ppr.reduce = function() {
-    var i, k, l, mo = this.modOffset, limbs = this.limbs, aff, off = this.offset, ol = this.offset.length, fac = this.factor, ll;
+    var i, k, l, mo = this.modOffset, limbs = this.limbs, off = this.offset, ol = this.offset.length, fac = this.factor, ll;
 
     i = this.minOffset;
     while (limbs.length > mo) {
@@ -452,7 +457,9 @@ sjcl.bn.pseudoMersennePrime = function(exponent, coeff) {
     return this;
   };
   
-  /** @this {sjcl.bn} */
+  /** @memberof sjcl.bn
+  * @this { sjcl.bn }
+  */
   ppr._strongReduce = (ppr.fullMask === -1) ? ppr.reduce : function() {
     var limbs = this.limbs, i = limbs.length - 1, k, l;
     this.reduce();
@@ -467,7 +474,8 @@ sjcl.bn.pseudoMersennePrime = function(exponent, coeff) {
   };
 
   /** mostly constant-time, very expensive full reduction.
-   * @this {sjcl.bn}
+   * @memberof sjcl.bn
+   * @this { sjcl.bn }
    */
   ppr.fullReduce = function() {
     var greater, i;
@@ -501,7 +509,9 @@ sjcl.bn.pseudoMersennePrime = function(exponent, coeff) {
   };
 
 
-  /** @this {sjcl.bn} */
+  /** @memberof sjcl.bn
+  * @this { sjcl.bn }
+  */
   ppr.inverse = function() {
     return (this.power(this.modulus.sub(2)));
   };
@@ -512,18 +522,24 @@ sjcl.bn.pseudoMersennePrime = function(exponent, coeff) {
 };
 
 // a small Mersenne prime
+var sbp = sjcl.bn.pseudoMersennePrime;
 sjcl.bn.prime = {
-  p127: sjcl.bn.pseudoMersennePrime(127, [[0,-1]]),
+  p127: sbp(127, [[0,-1]]),
 
   // Bernstein's prime for Curve25519
-  p25519: sjcl.bn.pseudoMersennePrime(255, [[0,-19]]),
+  p25519: sbp(255, [[0,-19]]),
+
+  // Koblitz primes
+  p192k: sbp(192, [[32,-1],[12,-1],[8,-1],[7,-1],[6,-1],[3,-1],[0,-1]]),
+  p224k: sbp(224, [[32,-1],[12,-1],[11,-1],[9,-1],[7,-1],[4,-1],[1,-1],[0,-1]]),
+  p256k: sbp(256, [[32,-1],[9,-1],[8,-1],[7,-1],[6,-1],[4,-1],[0,-1]]),
 
   // NIST primes
-  p192: sjcl.bn.pseudoMersennePrime(192, [[0,-1],[64,-1]]),
-  p224: sjcl.bn.pseudoMersennePrime(224, [[0,1],[96,-1]]),
-  p256: sjcl.bn.pseudoMersennePrime(256, [[0,-1],[96,1],[192,1],[224,-1]]),
-  p384: sjcl.bn.pseudoMersennePrime(384, [[0,-1],[32,1],[96,-1],[128,-1]]),
-  p521: sjcl.bn.pseudoMersennePrime(521, [[0,-1]])
+  p192: sbp(192, [[0,-1],[64,-1]]),
+  p224: sbp(224, [[0,1],[96,-1]]),
+  p256: sbp(256, [[0,-1],[96,1],[192,1],[224,-1]]),
+  p384: sbp(384, [[0,-1],[32,1],[96,-1],[128,-1]]),
+  p521: sbp(521, [[0,-1]])
 };
 
 sjcl.bn.random = function(modulus, paranoia) {

@@ -65,7 +65,7 @@ sjcl.ecc.ecdsa.secretKey.prototype.signWithRecoverablePublicKey = function(hash,
  *
  *  @param {bitArray} hash
  *  @param {bitArray} signature
- *  @param {sjcl.ecc.curve} [sjcl.ecc.curves['c256']] curve
+ *  @param {sjcl.ecc.curve} [sjcl.ecc.curves['k256']] curve
  *  @returns {sjcl.ecc.ecdsa.publicKey} Public key
  */
 sjcl.ecc.ecdsa.publicKey.recoverFromSignature = function(hash, signature, curve) {
@@ -75,7 +75,7 @@ sjcl.ecc.ecdsa.publicKey.recoverFromSignature = function(hash, signature, curve)
   }
 
   if (!curve) {
-    curve = sjcl.ecc.curves['c256'];
+    curve = sjcl.ecc.curves['k256'];
   }
 
   // Convert hash to bits and determine encoding for output

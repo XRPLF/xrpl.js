@@ -5,7 +5,7 @@ var UInt256 = require('./uint256').UInt256;
 var Base    = require('./base').Base;
 
 function KeyPair() {
-  this._curve  = sjcl.ecc.curves.c256;
+  this._curve  = sjcl.ecc.curves.k256;
   this._secret = null;
   this._pubkey = null;
 };
@@ -15,7 +15,7 @@ KeyPair.from_bn_secret = function(j) {
 };
 
 KeyPair.prototype.parse_bn_secret = function(j) {
-  this._secret = new sjcl.ecc.ecdsa.secretKey(sjcl.ecc.curves.c256, j);
+  this._secret = new sjcl.ecc.ecdsa.secretKey(sjcl.ecc.curves.k256, j);
   return this;
 };
 
