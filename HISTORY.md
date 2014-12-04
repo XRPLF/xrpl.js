@@ -1,3 +1,13 @@
+##0.9.4
+
++ [Improve memo support](https://github.com/ripple/ripple-lib/commit/89adcf4f4eebe1a5cc92a1b24b53f637422b96da) 
+
++ [Normalize offers from book_offers and transaction stream](https://github.com/ripple/ripple-lib/commit/86ed24b94cf7c8929c87db3a63e9bbea7f767e9c)
+
++ [Fix: Amount.to_human() precision rounding](https://github.com/ripple/ripple-lib/commit/e371cc2c3ceccb3c1cfdf18b98d80093147dd8b2)
+
++ [Fix: fractional drops in funded taker_pays setter](https://github.com/ripple/ripple-lib/commit/0d7fc0a573a144caac15dd13798b23eeb1f95fb4)
+
 ##0.9.3
 
 + [Change `presubmit` to emit immediately before transaction submit](https://github.com/ripple/ripple-lib/commit/7a1feaa89701bf861ab31ebd8ffdc8d8d1474e29)
