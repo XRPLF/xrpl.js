@@ -2,9 +2,6 @@
  * Data type map.
  *
  * Mapping of type ids to data types. The type id is specified by the high
- *
- * For reference, see rippled's definition:
- * https://github.com/ripple/rippled/blob/develop/src/ripple/data/protocol/SField.cpp
  */
 var TYPES_MAP = exports.types = [
   void(0),
@@ -378,7 +375,7 @@ exports.ledger = {
     ['Balance',             REQUIRED],
     ['LowLimit',            REQUIRED],
     ['HighLimit',           REQUIRED]])
-};
+}
 
 exports.metadata = [
   [ 'TransactionIndex'     , REQUIRED ],
