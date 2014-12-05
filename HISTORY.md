@@ -1,7 +1,5 @@
 ##0.9.4
 
-+ [Improve memo support](https://github.com/ripple/ripple-lib/commit/89adcf4f4eebe1a5cc92a1b24b53f637422b96da) 
-
 + [Normalize offers from book_offers and transaction stream](https://github.com/ripple/ripple-lib/commit/86ed24b94cf7c8929c87db3a63e9bbea7f767e9c)
 
 + [Fix: Amount.to_human() precision rounding](https://github.com/ripple/ripple-lib/commit/e371cc2c3ceccb3c1cfdf18b98d80093147dd8b2)
