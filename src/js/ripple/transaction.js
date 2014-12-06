@@ -1,5 +1,4 @@
 var util             = require('util');
-var assert           = require('assert');
 var EventEmitter     = require('events').EventEmitter;
 var utils            = require('./utils');
 var sjcl             = require('./utils').sjcl;
@@ -12,6 +11,7 @@ var RippleError      = require('./rippleerror').RippleError;
 var hashprefixes     = require('./hashprefixes');
 var config           = require('./config');
 var log              = require('./log').internal.sub('transaction');
+var Meta             = require('./meta').Meta;
 
 /**
  * @constructor Transaction
@@ -48,6 +48,7 @@ function Transaction(remote) {
   this.attempts = 0;
   this.submissions = 0;
   this.responses = 0;
+  this.mmeta = void(0);
 
   this.once('success', function(message) {
     // Transaction definitively succeeded
@@ -213,6 +214,10 @@ Transaction.prototype.setState = function(state) {
 
 Transaction.prototype.finalize = function(message) {
   this.finalized = true;
+
+  if (typeof message.metadata === 'object') {
+    this.mmeta = new Meta(message.metadata);
+  }
 
   if (this.result) {
     this.result.ledger_index = message.ledger_index;
@@ -909,7 +914,7 @@ Transaction.prototype.accountSet = function(src, set_flag, clear_flag) {
     return (typeof flag === 'number')
     ?  flag
     : (SetClearFlags[flag] || SetClearFlags['asf' + flag]);
-  };
+  }
 
   if (set_flag && (set_flag = prepareFlag(set_flag))) {
     this.tx_json.SetFlag = set_flag;
@@ -1196,6 +1201,13 @@ Transaction.prototype.summary = function() {
   }
 
   return result;
+};
+
+Transaction.prototype.getBalanceChanges = function() {
+  if (!this.finalized || this.mmeta === void(0)) {
+    return [ ];
+  }
+  return this.mmeta.parseBalanceChanges();
 };
 
 exports.Transaction = Transaction;
