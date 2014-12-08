@@ -1,17 +1,16 @@
 // ----- for secp256k1 ------
 
-// Overwrite NIST-P256 with secp256k1
-sjcl.ecc.curves.c256 = new sjcl.ecc.curve(
-    sjcl.bn.pseudoMersennePrime(256, [[0,-1],[4,-1],[6,-1],[7,-1],[8,-1],[9,-1],[32,-1]]),
-    "0x14551231950b75fc4402da1722fc9baee",
-    0,
-    7,
-    "0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-    "0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
-);
+sjcl.ecc.point.prototype.toBytesCompressed = function () {
+  var header = this.y.mod(2).toString() == "0x0" ? 0x02 : 0x03;
+  return [header].concat(sjcl.codec.bytes.fromBits(this.x.toBits()))
+};
 
 // Replace point addition and doubling algorithms
 // NIST-P256 is a=-3, we need algorithms for a=0
+//
+// This is a custom point addition formula that
+// only works for a=-3 Jacobian curve. It's much
+// faster than the generic implementation
 sjcl.ecc.pointJac.prototype.add = function(T) {
   var S = this;
   if (S.curve !== T.curve) {
@@ -43,7 +42,7 @@ sjcl.ecc.pointJac.prototype.add = function(T) {
   var j = h.mul(i);
   var r = s2.sub(S.y).doubleM();
   var v = S.x.mul(i);
-  
+
   var x = r.square().subM(j).subM(v.copy().doubleM());
   var y = r.mul(v.sub(x)).subM(S.y.mul(j).doubleM());
   var z = S.z.add(h).square().subM(z1z1).subM(hh);
@@ -51,6 +50,9 @@ sjcl.ecc.pointJac.prototype.add = function(T) {
   return new sjcl.ecc.pointJac(this.curve,x,y,z);
 };
 
+// This is a custom doubling algorithm that
+// only works for a=-3 Jacobian curve. It's much
+// faster than the generic implementation
 sjcl.ecc.pointJac.prototype.doubl = function () {
   if (this.isIdentity) { return this; }
 
@@ -66,7 +68,9 @@ sjcl.ecc.pointJac.prototype.doubl = function () {
   return new sjcl.ecc.pointJac(this.curve, x, y, z);
 };
 
-sjcl.ecc.point.prototype.toBytesCompressed = function () {
-  var header = this.y.mod(2).toString() == "0x0" ? 0x02 : 0x03;
-  return [header].concat(sjcl.codec.bytes.fromBits(this.x.toBits()))
-};
+// DEPRECATED:
+// previously the c256 curve was overridden with the secp256k1 curve
+// since then, sjcl has been updated to support k256
+// this override exist to keep supporting the old c256 with k256 behavior
+// this will be removed in future release
+sjcl.ecc.curves.c256 = sjcl.ecc.curves.k256;

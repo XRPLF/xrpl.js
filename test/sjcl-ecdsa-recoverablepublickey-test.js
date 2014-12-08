@@ -30,7 +30,7 @@ describe('ECDSA signing with recoverable public key', function(){
         // signature: 'AAAAG8L/yOA3nNqK4aOiQWJmOaWvkvr3NoTk6wCdX97U3qowdgFd98UK3evWV16qO3RHgFMEnUW/Vt4+kcidqW6hMo0='
       }];
 
-      var curve = sjcl.ecc.curves['c256'];
+      var curve = sjcl.ecc.curves['k256'];
 
       for (var m = 0; m < messages.length; m++) {
 
@@ -64,7 +64,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
     // // TODO: figure out why bitcoinjs-lib and this produce different signature values
 
-    //   var curve = sjcl.ecc.curves['c256'];
+    //   var curve = sjcl.ecc.curves['k256'];
 
     //   var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
     //   var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
@@ -85,7 +85,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
     it('should produce an error if the hash is not given as a bitArray', function(){
 
-      var curve = sjcl.ecc.curves['c256'];
+      var curve = sjcl.ecc.curves['k256'];
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
@@ -100,7 +100,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
     it('should return a bitArray', function(){
 
-      var curve = sjcl.ecc.curves['c256'];
+      var curve = sjcl.ecc.curves['k256'];
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
@@ -114,7 +114,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
     it('should return a bitArray where the first word contains the recovery factor', function(){
 
-      var curve = sjcl.ecc.curves['c256'];
+      var curve = sjcl.ecc.curves['k256'];
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
@@ -145,7 +145,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
     it('should produce an error if the signature given does not have the recovery factor prefix', function(){
 
-      var curve = sjcl.ecc.curves['c256'];
+      var curve = sjcl.ecc.curves['k256'];
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
@@ -162,7 +162,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
     it('should produce an error if it is not given both the hash and the signature', function(){
 
-      var curve = sjcl.ecc.curves['c256'];
+      var curve = sjcl.ecc.curves['k256'];
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
@@ -183,7 +183,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
     it('should produce an error if it cannot generate a valid public key from the the signature', function(){
 
-      var curve = sjcl.ecc.curves['c256'];
+      var curve = sjcl.ecc.curves['k256'];
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
@@ -203,7 +203,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
     it('should return a publicKey object', function(){
 
-      var curve = sjcl.ecc.curves['c256'];
+      var curve = sjcl.ecc.curves['k256'];
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
@@ -219,7 +219,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
     it('tampering with the signature should produce a different public key, if it produces a valid one at all', function(){
 
-      var curve = sjcl.ecc.curves['c256'];
+      var curve = sjcl.ecc.curves['k256'];
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
@@ -235,6 +235,22 @@ describe('ECDSA signing with recoverable public key', function(){
 
       assert.notDeepEqual(original_public_key.get().x, recovered_public_key.get().x);
       assert.notDeepEqual(original_public_key.get().y, recovered_public_key.get().y);
+
+    });
+
+    it('should return a publicKey object, while using the overridden c256 curve', function(){
+
+      var curve = sjcl.ecc.curves['c256'];
+      var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
+      var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
+      var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
+      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
+      var hash = sjcl.codec.hex.toBits('e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778');
+      var signature = secret_key.signWithRecoverablePublicKey(hash, 0, random_value);
+
+      var key = sjcl.ecc.ecdsa.publicKey.recoverFromSignature(hash, signature);
+
+      assert(key instanceof sjcl.ecc.ecdsa.publicKey);
 
     });
 
