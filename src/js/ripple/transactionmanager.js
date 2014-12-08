@@ -588,9 +588,9 @@ TransactionManager.prototype._request = function(tx) {
   }
 
   if (!tx._setLastLedger) {
-    // Honor LastLedgerSequence set by user of API. If left unset by API, bump
-    // LastLedgerSequence
-    tx.tx_json.LastLedgerSequence = tx.submitIndex + this._lastLedgerOffset;
+    // Honor LastLedgerSequence set with tx.lastLedger()
+    tx.tx_json.LastLedgerSequence = tx.initialSubmitIndex
+    + this._lastLedgerOffset;
   }
 
   tx.lastLedgerSequence = tx.tx_json.LastLedgerSequence;
