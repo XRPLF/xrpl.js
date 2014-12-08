@@ -41,12 +41,17 @@ function TransactionManager(account) {
 
   this._remote.on('ledger_closed', updatePendingStatus);
 
+  function handleReconnect() {
+    self._handleReconnect(function() {
+      // Handle reconnect, account_tx procedure first, before
+      // hooking back into ledger_closed
+      self._remote.on('ledger_closed', updatePendingStatus);
+    });
+  };
+
   this._remote.on('disconnect', function() {
     self._remote.removeListener('ledger_closed', updatePendingStatus);
-    self._remote.once('connect', function() {
-      self._remote.on('ledger_closed', updatePendingStatus);
-      self._handleReconnect();
-    });
+    self._remote.once('connect', handleReconnect);
   });
 
   // Query server for next account transaction sequence
@@ -54,6 +59,29 @@ function TransactionManager(account) {
 };
 
 util.inherits(TransactionManager, EventEmitter);
+
+TransactionManager._isNoOp = function(transaction) {
+  return (typeof transaction === 'object')
+      && (typeof transaction.tx_json === 'object')
+      && (transaction.tx_json.TransactionType === 'AccountSet')
+      && (transaction.tx_json.Flags === 0);
+};
+
+TransactionManager._isRemoteError = function(error) {
+  return (typeof error === 'object')
+      && (error.error === 'remoteError')
+      && (typeof error.remote === 'object');
+};
+
+TransactionManager._isNotFound = function(error) {
+  return TransactionManager._isRemoteError(error)
+      && /^(txnNotFound|transactionNotFound)$/.test(error.remote.error);
+};
+
+TransactionManager._isTooBusy = function(error) {
+  return TransactionManager._isRemoteError(error)
+      && (error.remote.error === 'tooBusy');
+};
 
 /**
  * Normalize transactions received from account transaction stream and
@@ -220,6 +248,16 @@ TransactionManager.prototype._updatePendingStatus = function(ledger) {
         transaction.emit('lost', ledger);
         break;
     }
+
+    if (transaction.finalized) {
+      return;
+    }
+
+    if (ledger.ledger_index > transaction.tx_json.LastLedgerSequence) {
+      // Transaction must fail
+      transaction.emit('error', new RippleError(
+        'tejMaxLedger', 'Transaction LastLedgerSequence exceeded'));
+    }
   });
 };
 
@@ -297,11 +335,13 @@ TransactionManager.prototype._loadSequence = function(callback) {
  * On reconnect, load account_tx in case a pending transaction succeeded while
  * disconnected
  *
+ * @param [Function] callback
  * @api private
  */
 
-TransactionManager.prototype._handleReconnect = function() {
+TransactionManager.prototype._handleReconnect = function(callback) {
   var self = this;
+  var callback = (typeof callback === 'function') ? callback : function(){};
 
   if (!this._pending.length) {
     return callback();
@@ -312,6 +352,7 @@ TransactionManager.prototype._handleReconnect = function() {
       if (self._remote.trace) {
         log.info('error requesting account_tx', err);
       }
+      callback();
       return;
     }
 
@@ -319,6 +360,8 @@ TransactionManager.prototype._handleReconnect = function() {
       // Treat each transaction in account transaction history as received
       transactions.transactions.forEach(self._transactionReceived, self);
     }
+
+    callback();
 
     self._loadSequence(function() {
       // Resubmit pending transactions after sequence is loaded
@@ -480,37 +523,30 @@ TransactionManager.prototype._request = function(tx) {
   }
 
   function transactionFailed(message) {
-    switch (message.engine_result) {
-      case 'tefPAST_SEQ':
-        self._resubmit(1, tx);
-        break;
-      case 'tefALREADY':
-        if (tx.responses === tx.submissions) {
-          tx.emit('error', message);
-        } else {
-          submitRequest.once('success', submitted);
-        }
-        break;
-      default:
-        tx.emit('error', message);
+    if (message.engine_result === 'tefPAST_SEQ') {
+      // Transaction may succeed after Sequence is updated
+      self._resubmit(1, tx);
     }
   };
 
   function transactionRetry(message) {
+    // XXX This may no longer be necessary. Instead, update sequence numbers
+    // after a transaction fails definitively
     self._fillSequence(tx, function() {
       self._resubmit(1, tx);
     });
   };
 
   function transactionFailedLocal(message) {
-    if (!self._remote.local_fee) {
-      submissionError(message);
-    } else if (message.engine_result === 'telINSUF_FEE_P') {
-      self._resubmit(2, tx);
+    if (message.engine_result === 'telINSUF_FEE_P') {
+      // Transaction may succeed after Fee is updated
+      self._resubmit(1, tx);
     }
   };
 
   function submissionError(error) {
+    // Either a tem-class error or generic server error such as tooBusy. This
+    // should be a definitive failure
     if (TransactionManager._isTooBusy(error)) {
       self._resubmit(1, tx);
     } else {
@@ -577,7 +613,7 @@ TransactionManager.prototype._request = function(tx) {
       if (remote.trace) {
         log.info('timeout:', tx.tx_json);
       }
-      self._resubmit(3, tx);
+      self._resubmit(1, tx);
     }
   };
 
@@ -614,29 +650,6 @@ TransactionManager.prototype._request = function(tx) {
   submitRequest.timeout(self._submissionTimeout, requestTimeout);
 
   return submitRequest;
-};
-
-TransactionManager._isNoOp = function(transaction) {
-  return (typeof transaction === 'object')
-      && (typeof transaction.tx_json === 'object')
-      && (transaction.tx_json.TransactionType === 'AccountSet')
-      && (transaction.tx_json.Flags === 0);
-};
-
-TransactionManager._isRemoteError = function(error) {
-  return (typeof error === 'object')
-      && (error.error === 'remoteError')
-      && (typeof error.remote === 'object');
-};
-
-TransactionManager._isNotFound = function(error) {
-  return TransactionManager._isRemoteError(error)
-      && /^(txnNotFound|transactionNotFound)$/.test(error.remote.error);
-};
-
-TransactionManager._isTooBusy = function(error) {
-  return TransactionManager._isRemoteError(error)
-      && (error.remote.error === 'tooBusy');
 };
 
 /**
