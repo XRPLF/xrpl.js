@@ -111,6 +111,7 @@ function Remote(opts, trace) {
   this._should_connect = true;
 
   this._submission_timeout = 1000 * (typeof opts.submission_timeout === 'number' ? opts.submission_timeout : 20);
+  this._last_ledger_offset = (typeof opts.last_ledger_offset === 'number') ? opts.last_ledger_offset : 3;
 
   this._received_tx = LRU({ max: 100 });
   this._cur_path_find = null;

@@ -24,6 +24,7 @@ function TransactionManager(account) {
   this._maxFee = this._remote.max_fee;
   this._maxAttempts = this._remote.max_attempts;
   this._submissionTimeout = this._remote._submission_timeout;
+  this._lastLedgerOffset = this._remote._last_ledger_offset;
   this._pending = new PendingQueue();
 
   this._account.on('transaction-outbound', function(res) {
@@ -589,7 +590,7 @@ TransactionManager.prototype._request = function(tx) {
   if (!tx._setLastLedger) {
     // Honor LastLedgerSequence set by user of API. If left unset by API, bump
     // LastLedgerSequence
-    tx.tx_json.LastLedgerSequence = tx.submitIndex + 8;
+    tx.tx_json.LastLedgerSequence = tx.submitIndex + this._lastLedgerOffset;
   }
 
   tx.lastLedgerSequence = tx.tx_json.LastLedgerSequence;
