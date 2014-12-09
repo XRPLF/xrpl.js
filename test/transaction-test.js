@@ -828,6 +828,23 @@ describe('Transaction', function() {
     assert.strictEqual(transaction._setMaxFee, true);
   });
 
+  it('Set Fixed Fee', function() {
+    var transaction = new Transaction();
+
+    transaction.setFixedFee('a');
+    assert(!transaction._setFixedFee);
+
+    transaction.setFixedFee(-1000);
+    assert(!transaction._setFixedFee);
+
+    transaction.setFixedFee(NaN);
+    assert(!transaction._setFixedFee);
+
+    transaction.setFixedFee(1000);
+    assert.strictEqual(transaction._setFixedFee, true);
+    assert.strictEqual(transaction.tx_json.Fee, '1000');
+  });
+
   it('Rewrite transaction path', function() {
     var transaction = new Transaction();
 

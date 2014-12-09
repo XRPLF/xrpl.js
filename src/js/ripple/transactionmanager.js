@@ -200,6 +200,10 @@ TransactionManager.prototype._adjustFees = function() {
   };
 
   this._pending.forEach(function(transaction) {
+    if (transaction._setFixedFee === true) {
+      return;
+    }
+    
     var oldFee = transaction.tx_json.Fee;
     var newFee = transaction._computeFee();
 
@@ -239,7 +243,7 @@ TransactionManager.prototype._updatePendingStatus = function(ledger) {
   assert.strictEqual(typeof ledger, 'object');
   assert.strictEqual(typeof ledger.ledger_index, 'number');
 
-  this._pending.forEach(function(transaction) {
+  this._pending.forEach(function(transaction) {    
     switch (ledger.ledger_index - transaction.submitIndex) {
       case 4:
         transaction.emit('missing', ledger);

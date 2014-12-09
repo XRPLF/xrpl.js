@@ -612,7 +612,7 @@ Transaction.prototype.lastLedger = function(sequence) {
 
 /**
  * Set max fee. Submission will abort if this is exceeded. Specified fee must
- * be >= 0
+ * be >= 0.
  *
  * @param {Number} fee The proposed fee
  */
@@ -622,6 +622,23 @@ Transaction.prototype.maxFee = function(fee) {
     this._setMaxFee = true;
     this._maxFee = fee;
   }
+  return this;
+};
+
+/*
+ * Set the fee user will pay to the network for submitting this transaction. 
+ * Specified fee must be >= 0.
+ *
+ * @param {Number} fee The proposed fee
+ *
+ * @returns {Transaction} calling instance for chaining
+ */
+Transaction.prototype.setFixedFee = function(fee) {
+  if (typeof fee === 'number' && fee >= 0) {
+    this._setFixedFee = true;
+    this.tx_json.Fee = String(fee);
+  }
+
   return this;
 };
 
