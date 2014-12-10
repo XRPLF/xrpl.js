@@ -2,7 +2,16 @@
 
 + [Transaction changes](https://github.com/ripple/ripple-lib/pull/221)
 
-+ [Allow per transaction fees to be set, `transactions.setFixedFee()`](https://github.com/ripple/ripple-lib/commit/9b22f279bcbe60ee6bcf4b7fa60a48e9c197a828)
++ **Important** `tef*` and `tel*` and errors will no longer be presented as
+final. Rather than considering these errors final, ripple-lib will wait until
+the `LastLedgerSequence` specified in the transaction is exceeded.  This makes
+failures more definitive, and ensures that no transaction will resubmit
+indefinitely.
+
++ A new, final tej-class error is introduced to account for transactions that
+are locally determined to have expired: `tejMaxLedger`.
+
++ [Allow per transaction fees to be set, `transaction.setFixedFee()`](https://github.com/ripple/ripple-lib/commit/9b22f279bcbe60ee6bcf4b7fa60a48e9c197a828)
 
 + [Improve memo support](https://github.com/ripple/ripple-lib/commit/1704ac4ae144c0ce54afad86f644c75a632080b1)
     - Add `MemoFormat` property for memo
