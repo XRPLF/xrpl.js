@@ -1,3 +1,19 @@
+##0.10.0
+
++ [Transaction changes](https://github.com/ripple/ripple-lib/pull/221)
+
++ [Allow per transaction fees to be set, `transactions.setFixedFee()`](https://github.com/ripple/ripple-lib/commit/9b22f279bcbe60ee6bcf4b7fa60a48e9c197a828)
+
++ [Improve memo support](https://github.com/ripple/ripple-lib/commit/1704ac4ae144c0ce54afad86f644c75a632080b1)
+    - Add `MemoFormat` property for memo
+    - Enforce `MemoFormat` and `MemoType` to be valid ASCII
+    - Support `text` and `json` MemoFormat 
+
++ [Update jscl library](https://github.com/ripple/ripple-lib/commit/3204998fcb6f31d6c90532a737a4adb8a1e420f6)
+    - Improved entropy by taking advantage of platform crypto
+    - Use jscl's k256 curve instead of altering the c256 curve with k256 configuration
+    - **deprecated:** the c256 curve is linked to the k256 curve to provide backwards compatibility, this link will be removed in the future 
+
 ##0.9.4
 
 + [Normalize offers from book_offers and transaction stream](https://github.com/ripple/ripple-lib/commit/86ed24b94cf7c8929c87db3a63e9bbea7f767e9c)
