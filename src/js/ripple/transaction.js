@@ -1160,7 +1160,7 @@ Transaction.prototype.abort = function() {
  * @return {Object} transaction summary
  */
 
-Transaction.summary = function() {
+Transaction.prototype.summary = function() {
   var result = {
     tx_json: this.tx_json,
     clientID: this._clientID,
