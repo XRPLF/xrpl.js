@@ -1,9 +1,10 @@
-var utils       = require('./testutils');
-var assert      = require('assert');
-var Amount      = utils.load_module('amount').Amount;
-var Transaction = utils.load_module('transaction').Transaction;
-var Remote      = utils.load_module('remote').Remote;
-var Server      = utils.load_module('server').Server;
+var utils            = require('./testutils');
+var assert           = require('assert');
+var Amount           = utils.load_module('amount').Amount;
+var Transaction      = utils.load_module('transaction').Transaction;
+var TransactionQueue = utils.load_module('transactionqueue').TransactionQueue;
+var Remote           = utils.load_module('remote').Remote;
+var Server           = utils.load_module('server').Server;
 
 var transactionResult = {
   engine_result: 'tesSUCCESS',
@@ -38,7 +39,7 @@ describe('Transaction', function() {
   it('Success listener', function(done) {
     var transaction = new Transaction();
 
-    transaction.once('cleanup', function(message) {
+    transaction.once('final', function(message) {
       assert.deepEqual(message, transactionResult);
       assert(transaction.finalized);
       assert.strictEqual(transaction.state, 'validated');
@@ -51,7 +52,7 @@ describe('Transaction', function() {
   it('Error listener', function(done) {
     var transaction = new Transaction();
 
-    transaction.once('cleanup', function(message) {
+    transaction.once('final', function(message) {
       assert.deepEqual(message, transactionResult);
       assert(transaction.finalized);
       assert.strictEqual(transaction.state, 'failed');
@@ -130,25 +131,29 @@ describe('Transaction', function() {
 
   it('Set state', function(done) {
     var transaction = new Transaction();
-    transaction.state = 'pending';
+
+    assert.strictEqual(transaction.state, 'unsubmitted');
 
     var receivedEvents = 0;
-    var events = 2;
+    var events = [
+      'submitted',
+      'pending',
+      'validated'
+    ];
 
-    transaction.once('state', function(state) {
-      assert.strictEqual(state, 'validated');
-      if (++receivedEvents === events) {
-        done();
-      }
+    transaction.on('state', function(state) {
+      receivedEvents++;
+      assert(events.indexOf(state) > -1, 'Invalid state: ' + state);
     });
 
-    transaction.once('save', function() {
-      if (++receivedEvents === events) {
-        done();
-      }
-    });
+    transaction.setState(events[0]);
+    transaction.setState(events[1]);
+    transaction.setState(events[1]);
+    transaction.setState(events[2]);
 
-    transaction.setState('validated');
+    assert.strictEqual(receivedEvents, 3);
+    assert.strictEqual(transaction.state, events[2]);
+    done();
   });
 
   it('Finalize submission', function() {
@@ -720,47 +725,20 @@ describe('Transaction', function() {
     done();
   });
 
-  it('Sign transaction - with callback', function(done) {
-    var transaction = new Transaction();
-    transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
-    transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
-    transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
-    transaction.tx_json.Flags = 0;
-    transaction.tx_json.Fee = 10;
-    transaction.tx_json.Sequence = 1;
-    transaction.tx_json.TransactionType = 'AccountSet';
-
-    transaction.sign(function() {
-      var signature = transaction.tx_json.TxnSignature;
-      assert.strictEqual(transaction.previousSigningHash, 'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
-      assert(/^[A-Z0-9]+$/.test(signature));
-      done();
-    });
-  });
-
   it('Add transaction ID', function(done) {
     var transaction = new Transaction();
-    var saved = 0;
-
-    transaction.on('save', function() {
-      ++saved;
-    });
-
-    transaction.once('save', function() {
-      setImmediate(function() {
-        assert.strictEqual(saved, 2);
-        assert.deepEqual(
-          transaction.submittedIDs,
-          [ 'F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE',
-            'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE' ]
-        );
-        done();
-      });
-    });
 
     transaction.addId('D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
     transaction.addId('F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
     transaction.addId('F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
+
+    assert.deepEqual(
+      transaction.submittedIDs,
+      [ 'F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE',
+        'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE' ]
+    );
+
+    done();
   });
 
   it('Find transaction IDs in cache', function(done) {
@@ -791,9 +769,10 @@ describe('Transaction', function() {
 
   it('Set DestinationTag', function() {
     var transaction = new Transaction();
-    transaction.destinationTag();
     transaction.destinationTag('tag');
-    assert.strictEqual(transaction.tx_json.DestinationTag, 'tag');
+    assert.strictEqual(transaction.tx_json.DestinationTag, void(0));
+    transaction.destinationTag(1);
+    assert.strictEqual(transaction.tx_json.DestinationTag, 1);
   });
 
   it('Set InvoiceID', function() {
@@ -872,7 +851,7 @@ describe('Transaction', function() {
       }
     ];
 
-    assert.deepEqual(Transaction._pathRewrite(path), [
+    assert.deepEqual(Transaction._rewritePath(path), [
       {
         account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
         issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
@@ -892,7 +871,9 @@ describe('Transaction', function() {
   });
 
   it('Rewrite transaction path - invalid path', function() {
-    assert.strictEqual(Transaction._pathRewrite(1), void(0));
+    assert.throws(function() {
+      assert.strictEqual(Transaction._rewritePath(1), void(0));
+    });
   });
 
   it('Add transaction path', function() {
@@ -1001,51 +982,52 @@ describe('Transaction', function() {
   it('Set SourceTag', function() {
     var transaction = new Transaction();
     transaction.sourceTag('tag');
-    assert.strictEqual(transaction.tx_json.SourceTag, 'tag');
+    assert.strictEqual(transaction.tx_json.SourceTag, void(0));
+    transaction.sourceTag(1);
+    assert.strictEqual(transaction.tx_json.SourceTag, 1);
   });
 
   it('Set TransferRate', function() {
     var transaction = new Transaction();
-
-    assert.throws(function() {
-      transaction.transferRate(1);
-    });
-
-    assert.throws(function() {
-      transaction.transferRate('1');
-    });
-
+    transaction.transferRate(1);
+    assert.strictEqual(transaction.tx_json.TransferRate, void(0));
     transaction.transferRate(1.5 * 1e9);
-
     assert.strictEqual(transaction.tx_json.TransferRate, 1.5 * 1e9);
   });
 
   it('Set Flags', function(done) {
     var transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
-
     transaction.setFlags();
-
     assert.strictEqual(transaction.tx_json.Flags, 0);
 
-    transaction.setFlags(1);
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+    transaction.setFlags(Transaction.flags.Payment.PartialPayment);
+    assert.strictEqual(transaction.tx_json.Flags, 131072);
 
-    assert.strictEqual(transaction.tx_json.Flags, 1);
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+    transaction.setFlags('NoRippleDirect');
+    assert.strictEqual(transaction.tx_json.Flags, 65536);
 
-    transaction.setFlags('PartialPayment');
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
+    transaction.setFlags('PartialPayment', 'NoRippleDirect');
+    assert.strictEqual(transaction.tx_json.Flags, 196608);
 
-    assert.strictEqual(transaction.tx_json.Flags, 131073);
-
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
     transaction.setFlags([ 'LimitQuality', 'PartialPayment' ]);
+    assert.strictEqual(transaction.tx_json.Flags, 393216);
 
-    assert.strictEqual(transaction.tx_json.Flags, 524289);
-
+    var transaction = new Transaction();
+    transaction.tx_json.TransactionType = 'Payment';
     transaction.once('error', function(err) {
       assert.strictEqual(err.result, 'tejInvalidFlag');
       done();
     });
-
-    transaction.setFlags('test');
+    transaction.setFlags('asdf');
   });
 
   it('Add Memo', function() {
@@ -1548,16 +1530,10 @@ describe('Transaction', function() {
 
   it('Submit transaction - invalid account', function(done) {
     var remote = new Remote();
-    var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
-
-    transaction.tx_json.Account += 'z';
-
-    transaction.once('error', function(err) {
-      assert.strictEqual(err.result, 'tejInvalidAccount');
-      done();
+    assert.throws(function() {
+      var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWeZ');
     });
-
-    transaction.submit();
+    done();
   });
 
   it('Abort submission on presubmit', function(done) {
@@ -1589,6 +1565,39 @@ describe('Transaction', function() {
       });
     });
   });
+
+  it('Get min ledger', function() {
+    var queue = new TransactionQueue();
+
+    // Randomized submit indexes
+    [
+      28093,
+      456944,
+      347213,
+      165662,
+      729760,
+      808990,
+      927393,
+      925550,
+      872298,
+      543305
+    ]
+    .forEach(function(index){
+      var tx = new Transaction();
+      tx.initialSubmitIndex = index;
+      queue.push(tx);
+    });
+
+    // Pending queue sorted by submit index
+    var sorted = queue._queue.slice().sort(function(a, b) {
+      return a.initialSubmitIndex - b.initialSubmitIndex;
+    });
+
+    sorted.forEach(function(tx){
+      assert.strictEqual(queue.getMinLedger(), tx.initialSubmitIndex);
+      queue.remove(tx);
+    });
+  });
 });
 
-// vim:sw=2:sts=2:ts=8:et
+//vim:sw=2:sts=2:ts=8:et

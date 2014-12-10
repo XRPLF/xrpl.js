@@ -1,49 +1,6 @@
-// Transactions
-//
-//  Construction:
-//    remote.transaction()  // Build a transaction object.
-//     .offer_create(...)   // Set major parameters.
-//     .set_flags()         // Set optional parameters.
-//     .on()                // Register for events.
-//     .submit();           // Send to network.
-//
-//  Events:
-// 'success' : Transaction submitted without error.
-// 'error' : Error submitting transaction.
-// 'proposed' : Advisory proposed status transaction.
-// - A client should expect 0 to multiple results.
-// - Might not get back. The remote might just forward the transaction.
-// - A success could be reverted in final.
-// - local error: other remotes might like it.
-// - malformed error: local server thought it was malformed.
-// - The client should only trust this when talking to a trusted server.
-// 'final' : Final status of transaction.
-// - Only expect a final from dishonest servers after a tesSUCCESS or ter*.
-// 'lost' : Gave up looking for on ledger_closed.
-// 'pending' : Transaction was not found on ledger_closed.
-// 'state' : Follow the state of a transaction.
-//    'client_submitted'     - Sent to remote
-//     |- 'remoteError'      - Remote rejected transaction.
-//      \- 'client_proposed' - Remote provisionally accepted transaction.
-//       |- 'client_missing' - Transaction has not appeared in ledger as expected.
-//       | |\- 'client_lost' - No longer monitoring missing transaction.
-//       |/
-//       |- 'tesSUCCESS'     - Transaction in ledger as expected.
-//       |- 'ter...'         - Transaction failed.
-//       \- 'tec...'         - Transaction claimed fee only.
-//
-// Notes:
-// - All transactions including those with local and malformed errors may be
-//   forwarded anyway.
-// - A malicous server can:
-//   - give any proposed result.
-//     - it may declare something correct as incorrect or something incorrect as correct.
-//     - it may not communicate with the rest of the network.
-//   - may or may not forward.
-//
-
-var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
+var assert           = require('assert');
+var EventEmitter     = require('events').EventEmitter;
 var utils            = require('./utils');
 var sjcl             = require('./utils').sjcl;
 var Amount           = require('./amount').Amount;
@@ -55,55 +12,67 @@ var RippleError      = require('./rippleerror').RippleError;
 var hashprefixes     = require('./hashprefixes');
 var config           = require('./config');
 
+/**
+ * @constructor Transaction
+ *
+ * Notes:
+ * All transactions including those with local and malformed errors may be
+ * forwarded anyway.
+ *
+ * A malicous server can:
+ *  - may or may not forward
+ *  - give any result
+ *    + it may declare something correct as incorrect or something incorrect
+ *      as correct
+ *    + it may not communicate with the rest of the network
+ */
+
 function Transaction(remote) {
   EventEmitter.call(this);
 
   var self = this;
-
-  var remote = remote || void(0);
+  var remoteExists = (typeof remote === 'object');
 
   this.remote = remote;
-
-  // Transaction data
   this.tx_json = { Flags: 0 };
-
   this._secret = void(0);
   this._build_path = false;
-  this._maxFee = (typeof remote === 'object') ? this.remote.max_fee : void(0);
-
+  this._maxFee = remoteExists ? this.remote.max_fee : void(0);
   this.state = 'unsubmitted';
   this.finalized = false;
   this.previousSigningHash = void(0);
-
-  // Index at which transaction was submitted
   this.submitIndex = void(0);
-
-  // Canonical signing setting defaults to the Remote's configuration
-  this.canonical = (typeof remote === 'object') ? Boolean(remote.canonical_signing) : true;
-
-  // We aren't clever enough to eschew preventative measures so we keep an array
-  // of all submitted transactionIDs (which can change due to load_factor
-  // effecting the Fee amount). This should be populated with a transactionID
-  // any time it goes on the network
+  this.canonical = remoteExists ? this.remote.canonical_signing : true;
   this.submittedIDs = [ ];
+  this.attempts = 0;
+  this.submissions = 0;
+  this.responses = 0;
 
   this.once('success', function(message) {
-    self.finalize(message);
+    // Transaction definitively succeeded
     self.setState('validated');
-    self.emit('cleanup', message);
+    self.finalize(message);
+    if (self._successHandler) {
+      self._successHandler(message);
+    }
   });
 
   this.once('error', function(message) {
-    self.finalize(message);
+    // Transaction definitively failed
     self.setState('failed');
-    self.emit('cleanup', message);
+    self.finalize(message);
+    if (self._errorHandler) {
+      self._errorHandler(message);
+    }
   });
 
   this.once('submitted', function() {
+    // Transaction was submitted to the network
     self.setState('submitted');
   });
 
   this.once('proposed', function() {
+    // Transaction was submitted successfully to the network
     self.setState('pending');
   });
 };
@@ -170,6 +139,8 @@ Transaction.set_clear_flags = {
 Transaction.MEMO_TYPES = {
 };
 
+Transaction.ASCII_REGEX = /^[\x00-\x7F]*$/;
+
 Transaction.formats = require('./binformat').tx;
 
 Transaction.prototype.consts = {
@@ -179,15 +150,6 @@ Transaction.prototype.consts = {
   terRETRY:        -99,
   tesSUCCESS:      0,
   tecCLAIMED:      100
-};
-
-Transaction.from_json = function(j) {
-  return (new Transaction()).parseJson(j);
-};
-
-Transaction.prototype.parseJson = function(v) {
-  this.tx_json = v;
-  return this;
 };
 
 Transaction.prototype.isTelLocal = function(ter) {
@@ -218,13 +180,34 @@ Transaction.prototype.isRejected = function(ter) {
   return this.isTelLocal(ter) || this.isTemMalformed(ter) || this.isTefFailure(ter);
 };
 
+Transaction.from_json = function(j) {
+  return (new Transaction()).parseJson(j);
+};
+
+Transaction.prototype.parseJson = function(v) {
+  this.tx_json = v;
+  return this;
+};
+
+/**
+ * Set state on the condition that the state is different
+ *
+ * @param {String} state
+ */
+
 Transaction.prototype.setState = function(state) {
   if (this.state !== state) {
     this.state = state;
     this.emit('state', state);
-    this.emit('save');
   }
 };
+
+/**
+ * Finalize transaction. This will prevent future activity
+ *
+ * @param {Object} message
+ * @api private
+ */
 
 Transaction.prototype.finalize = function(message) {
   this.finalized = true;
@@ -237,11 +220,73 @@ Transaction.prototype.finalize = function(message) {
     this.result.tx_json = this.tx_json;
   }
 
+  this.emit('cleanup');
+  this.emit('final', message);
+
+  if (this.remote && this.remote.trace) {
+    log.info('transaction finalized:',
+             this.tx_json, this.getManager()._pending.getLength());
+  }
+
   return this;
 };
 
+/**
+ * Get transaction Account
+ *
+ * @return {Account}
+ */
+
+Transaction.prototype.getAccount = function() {
+  return this.tx_json.Account;
+};
+
+/**
+ * Get TransactionType
+ *
+ * @return {String}
+ */
+
+Transaction.prototype.getTransactionType = function() {
+  return this.tx_json.TransactionType;
+};
+
+/**
+ * Get transaction TransactionManager
+ *
+ * @param [String] account
+ * @return {TransactionManager]
+ */
+
+Transaction.prototype.getManager = function(account) {
+  if (!this.remote) {
+    return void(0);
+  }
+
+  if (!account) {
+    account = this.tx_json.Account;
+  }
+
+  return this.remote.account(account)._transactionManager;
+};
+
+/**
+ * Get transaction secret
+ *
+ * @param [String] account
+ */
+
+Transaction.prototype.getSecret =
 Transaction.prototype._accountSecret = function(account) {
-  return this.remote ? this.remote.secrets[account] : void(0);
+  if (!this.remote) {
+    return void(0);
+  }
+
+  if (!account) {
+    account = this.tx_json.Account;
+  }
+
+  return this.remote.secrets[account];
 };
 
 /**
@@ -263,6 +308,8 @@ Transaction.prototype.feeUnits = function() {
 
 /**
  * Compute median server fee
+ *
+ * @return {String} median fee
  */
 
 Transaction.prototype._computeFee = function() {
@@ -310,18 +357,22 @@ Transaction.prototype._computeFee = function() {
  * This function seeks to fill out certain fields, such as Fee and
  * SigningPubKey, which can be determined by the library based on network
  * information and other fields.
+ *
+ * @return {Boolean|Transaction} If succeeded, return transaction. Otherwise
+ * return `false`
  */
 
 Transaction.prototype.complete = function() {
   if (this.remote) {
     if (!this.remote.trusted && !this.remote.local_signing) {
-      this.emit('error', new RippleError('tejServerUntrusted', 'Attempt to give secret to untrusted server'));
+      this.emit('error', new RippleError(
+        'tejServerUntrusted', 'Attempt to give secret to untrusted server'));
       return false;
     }
   }
 
   // Try to auto-fill the secret
-  if (!this._secret && !(this._secret = this._accountSecret(this.tx_json.Account))) {
+  if (!this._secret && !(this._secret = this.getSecret())) {
     this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
     return false;
   }
@@ -332,7 +383,8 @@ Transaction.prototype.complete = function() {
       var key  = seed.get_key(this.tx_json.Account);
       this.tx_json.SigningPubKey = key.to_hex_pub();
     } catch(e) {
-      this.emit('error', new RippleError('tejSecretInvalid', 'Invalid secret'));
+      this.emit('error', new RippleError(
+        'tejSecretInvalid', 'Invalid secret'));
       return false;
     }
   }
@@ -343,13 +395,14 @@ Transaction.prototype.complete = function() {
     if (this.remote.local_fee || !this.remote.trusted) {
       if (!(this.tx_json.Fee = this._computeFee())) {
         this.emit('error', new RippleError('tejUnconnected'));
-        return;
+        return false;
       }
     }
   }
 
   if (Number(this.tx_json.Fee) > this._maxFee) {
-    this.emit('error', new RippleError('tejMaxFeeExceeded', 'Max fee exceeded'));
+    this.emit('error', new RippleError(
+      'tejMaxFeeExceeded', 'Max fee exceeded'));
     return false;
   }
 
@@ -373,7 +426,7 @@ Transaction.prototype.signingHash = function() {
   return this.hash(config.testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
 };
 
-Transaction.prototype.hash = function(prefix, as_uint256) {
+Transaction.prototype.hash = function(prefix, asUINT256, serialized) {
   if (typeof prefix === 'string') {
     if (typeof hashprefixes[prefix] === 'undefined') {
       throw new Error('Unknown hashing prefix requested.');
@@ -383,13 +436,12 @@ Transaction.prototype.hash = function(prefix, as_uint256) {
     prefix = hashprefixes.HASH_TX_ID;
   }
 
-  var hash = SerializedObject.from_json(this.tx_json).hash(prefix);
+  var hash = (serialized || this.serialize()).hash(prefix);
 
-  return as_uint256 ? hash : hash.to_hex();
+  return asUINT256 ? hash : hash.to_hex();
 };
 
-Transaction.prototype.sign = function(callback) {
-  var callback = typeof callback === 'function' ? callback : function(){};
+Transaction.prototype.sign = function() {
   var seed = Seed.from_json(this._secret);
 
   var prev_sig = this.tx_json.TxnSignature;
@@ -400,7 +452,6 @@ Transaction.prototype.sign = function(callback) {
   // If the hash is the same, we can re-use the previous signature
   if (prev_sig && hash === this.previousSigningHash) {
     this.tx_json.TxnSignature = prev_sig;
-    callback();
     return this;
   }
 
@@ -411,25 +462,30 @@ Transaction.prototype.sign = function(callback) {
   this.tx_json.TxnSignature = hex;
   this.previousSigningHash = hash;
 
-  callback();
-
   return this;
 };
 
 /**
- * Add a ID to list of submitted IDs for this transaction
+ * Add an ID to cached list of submitted IDs
+ *
+ * @param {String} transaction id
+ * @api private
  */
 
-Transaction.prototype.addId = function(hash) {
-  if (this.submittedIDs.indexOf(hash) === -1) {
-    this.submittedIDs.unshift(hash);
-    this.emit('signed', hash);
-    this.emit('save');
+Transaction.prototype.addId = function(id) {
+  if (this.submittedIDs.indexOf(id) === -1) {
+    this.submittedIDs.unshift(id);
   }
 };
 
 /**
- * Find ID within list of submitted IDs for this transaction
+ * Find ID within cached received (validated) IDs. If this transaction has
+ * an ID that is within the cache, it has been seen validated, so return the
+ * received message
+ *
+ * @param {Object} cache
+ * @return {Object} message
+ * @api private
  */
 
 Transaction.prototype.findId = function(cache) {
@@ -445,27 +501,67 @@ Transaction.prototype.findId = function(cache) {
   return result;
 };
 
-//
-// Set options for Transactions
-//
+/**
+ * Set build_path to have server blindly construct a path for Payment
+ *
+ *  "blindly" because the sender has no idea of the actual cost must be less
+ *  than send max.
+ *
+ * XXX Abort if not a Payment
+ *
+ *  @param {Boolean} build path
+ */
 
-// --> build: true, to have server blindly construct a path.
-//
-// "blindly" because the sender has no idea of the actual cost except that is must be less than send max.
+Transaction.prototype.setBuildPath =
 Transaction.prototype.buildPath = function(build) {
   this._build_path = build;
   return this;
 };
 
-// tag should be undefined or a 32 bit integer.
-// YYY Add range checking for tag.
+/**
+ * Set SourceTag
+ *
+ * tag should be undefined or a 32 bit integer.
+ * YYY Add range checking for tag
+ *
+ * @param {Number} source tag
+ */
+
+Transaction.prototype.sourceTag = function(tag) {
+  if (typeof tag === 'number' && isFinite(tag)) {
+    this.tx_json.SourceTag = tag;
+  }
+  return this;
+};
+
+/**
+ * Set DestinationTag for Payment transaction
+ *
+ * tag should be undefined or a 32 bit integer.
+ * YYY Add range checking for tag.
+ *
+ * XXX Abort if not a Payment
+ *
+ * @param {Number} destination tag
+ */
+
+Transaction.prototype.setDestinationTag =
 Transaction.prototype.destinationTag = function(tag) {
-  if (tag !== void(0)) {
+  if (typeof tag === 'number' && isFinite(tag)) {
     this.tx_json.DestinationTag = tag;
   }
   return this;
 };
 
+/**
+ * Set InvoiceID for Payment transaction
+ *
+ * XXX Abort if not a Payment
+ *
+ * @param {String} id
+ */
+
+Transaction.prototype.setInvoiceID =
 Transaction.prototype.invoiceID = function(id) {
   if (typeof id === 'string') {
     while (id.length < 64) {
@@ -476,6 +572,19 @@ Transaction.prototype.invoiceID = function(id) {
   return this;
 };
 
+/**
+ * Set client ID. This is an identifier specified by the user of the API to
+ * identify a transaction in the event of a disconnect. It is not currently
+ * persisted in the transaction itself, but used offline for identification.
+ * In applications that require high reliability, client-specified ID should
+ * be persisted such that one could map it to submitted transactions. Use
+ * .summary() for a consistent transaction summary output for persisitng. In
+ * the future, this ID may be stored in the transaction itself (in the ledger)
+ *
+ * @param {String} id
+ */
+
+Transaction.prototype.setClientID =
 Transaction.prototype.clientID = function(id) {
   if (typeof id === 'string') {
     this._clientID = id;
@@ -483,34 +592,55 @@ Transaction.prototype.clientID = function(id) {
   return this;
 };
 
+/**
+ * Set LastLedgerSequence as the absolute last ledger sequence the transaction
+ * is valid for. LastLedgerSequence is set automatically if not set using this
+ * method
+ *
+ * @param {Number} ledger index
+ */
+
+Transaction.prototype.setLastLedger =
 Transaction.prototype.lastLedger = function(sequence) {
   if (typeof sequence === 'number' && isFinite(sequence)) {
     this._setLastLedger = true;
     this.tx_json.LastLedgerSequence = sequence;
   }
+
   return this;
 };
 
-/*
- * Set the transaction's proposed fee. No op when fee parameter
- * is not 0 or a positive number
+/**
+ * Set max fee. Submission will abort if this is exceeded. Specified fee must
+ * be >= 0
  *
  * @param {Number} fee The proposed fee
- *
- * @returns {Transaction} calling instance for chaining
  */
+
 Transaction.prototype.maxFee = function(fee) {
   if (typeof fee === 'number' && fee >= 0) {
     this._setMaxFee = true;
     this._maxFee = fee;
   }
-
   return this;
 };
 
-Transaction._pathRewrite = function(path) {
+/**
+ * Filter invalid properties from path objects in a path array
+ *
+ * Valid properties are:
+ * - account
+ * - currency
+ * - issuer
+ * - type_hex
+ *
+ * @param {Array} path
+ * @return {Array} filtered path
+ */
+
+Transaction._rewritePath = function(path) {
   if (!Array.isArray(path)) {
-    return;
+    throw new Error('Path must be an array');
   }
 
   var newPath = path.map(function(node) {
@@ -538,32 +668,63 @@ Transaction._pathRewrite = function(path) {
   return newPath;
 };
 
+/**
+ * Add a path for Payment transaction
+ *
+ * XXX Abort if not a Payment
+ *
+ * @param {Array} path
+ */
+
+Transaction.prototype.addPath =
 Transaction.prototype.pathAdd = function(path) {
   if (Array.isArray(path)) {
-    this.tx_json.Paths  = this.tx_json.Paths || [];
-    this.tx_json.Paths.push(Transaction._pathRewrite(path));
+    this.tx_json.Paths = this.tx_json.Paths || [ ];
+    this.tx_json.Paths.push(Transaction._rewritePath(path));
   }
   return this;
 };
 
-// --> paths: undefined or array of path
-// // A path is an array of objects containing some combination of: account, currency, issuer
+/**
+ * Set paths for Payment transaction
+ *
+ * XXX Abort if not a Payment
+ *
+ * @param {Array} paths
+ */
 
+Transaction.prototype.setPaths =
 Transaction.prototype.paths = function(paths) {
   if (Array.isArray(paths)) {
     for (var i=0, l=paths.length; i<l; i++) {
-      this.pathAdd(paths[i]);
+      this.addPath(paths[i]);
     }
   }
   return this;
 };
 
-// If the secret is in the config object, it does not need to be provided.
+/**
+ * Set secret If the secret has been set with Remote.setSecret, it does not
+ * need to be provided
+ *
+ * @param {String} secret
+ */
+
+Transaction.prototype.setSecret =
 Transaction.prototype.secret = function(secret) {
-  this._secret = secret;
+  if (typeof secret === 'string') {
+    this._secret = secret;
+  }
   return this;
 };
 
+/**
+ * Set SendMax for Payment
+ *
+ * @param {String|Object} send max amount
+ */
+
+Transaction.prototype.setSendMax =
 Transaction.prototype.sendMax = function(send_max) {
   if (send_max) {
     this.tx_json.SendMax = Amount.json_rewrite(send_max);
@@ -571,28 +732,31 @@ Transaction.prototype.sendMax = function(send_max) {
   return this;
 };
 
-// tag should be undefined or a 32 bit integer.
-// YYY Add range checking for tag.
-Transaction.prototype.sourceTag = function(tag) {
-  if (tag) {
-    this.tx_json.SourceTag = tag;
-  }
-  return this;
-};
+/**
+ * Set TransferRate for AccountSet
+ *
+ * @param {Number} transfer raate
+ */
 
-// --> rate: In billionths.
 Transaction.prototype.transferRate = function(rate) {
-  this.tx_json.TransferRate = Number(rate);
-
-  if (this.tx_json.TransferRate < 1e9) {
-    throw new Error('invalidTransferRate');
+  if (typeof rate === 'number' && rate >= 1e9) {
+    this.tx_json.TransferRate = rate;
   }
-
   return this;
 };
 
-// Add flags to a transaction.
-// --> flags: undefined, _flag_, or [ _flags_ ]
+/**
+ * Set Flags. You may specify flags as a number, as the string name of the
+ * flag, or as an array of strings.
+ *
+ * setFlags(Transaction.flags.AccountSet.RequireDestTag)
+ * setFlags('RequireDestTag')
+ * setFlags('RequireDestTag', 'RequireAuth')
+ * setFlags([ 'RequireDestTag', 'RequireAuth' ])
+ *
+ * @param {Number|String|Array} flags
+ */
+
 Transaction.prototype.setFlags = function(flags) {
   if (flags === void(0)) {
     return this;
@@ -603,8 +767,8 @@ Transaction.prototype.setFlags = function(flags) {
     return this;
   }
 
-  var flag_set = Array.isArray(flags) ? flags : Array.prototype.slice.call(arguments);
-  var transaction_flags = Transaction.flags[this.tx_json.TransactionType] || { };
+  var transaction_flags = Transaction.flags[this.getTransactionType()] || { };
+  var flag_set = Array.isArray(flags) ? flags : [].slice.call(arguments);
 
   for (var i=0, l=flag_set.length; i<l; i++) {
     var flag = flag_set[i];
@@ -620,19 +784,27 @@ Transaction.prototype.setFlags = function(flags) {
 };
 
 /**
- * Add a Memo to transaction. Memos can be used as key-value,
- * using the MemoType as a key
+ * Add a Memo to transaction
  *
- * @param {String} type
- * @param {String} data
+ * @param {String} memoType
+ * - describes what the data represents, needs to be valid ASCII
+ * @param {String} memoData
+ * - data for the memo, can be any JS object. Any object other than string will
+ *   be stringified (JSON) for transport
  */
 
-Transaction.prototype.addMemo = function(type, data) {
-  if (!/(undefined|string)/.test(typeof type)) {
+Transaction.prototype.addMemo = function(memoType, memoData) {
+  if (typeof memoType === 'object') {
+    var opts = memoType;
+    memoType = opts.memoType;
+    memoData = opts.memoData;
+  }
+
+  if (!/(undefined|string)/.test(typeof memoType)) {
     throw new Error('MemoType must be a string');
   }
 
-  if (!/(undefined|string)/.test(typeof data)) {
+  if (!/(undefined|string)/.test(typeof memoData)) {
     throw new Error('MemoData must be a string');
   }
 
@@ -642,18 +814,17 @@ Transaction.prototype.addMemo = function(type, data) {
 
   var memo = { };
 
-  if (type) {
-    if (Transaction.MEMO_TYPES[type]) {
-      //XXX Maybe in the future we want a schema validator for
-      //memo types
-      memo.MemoType = Transaction.MEMO_TYPES[type];
+  if (memoType) {
+    if (Transaction.MEMO_TYPES[memoType]) {
+      //XXX Maybe in the future we want a schema validator for memo types
+      memo.MemoType = Transaction.MEMO_TYPES[memoType];
     } else {
-      memo.MemoType = toHex(type);
+      memo.MemoType = toHex(memoType);
     }
   }
 
-  if (data) {
-    memo.MemoData = toHex(data);
+  if (memoData) {
+    memo.MemoData = toHex(memoData);
   }
 
   this.tx_json.Memos = (this.tx_json.Memos || []).concat({ Memo: memo });
@@ -661,30 +832,23 @@ Transaction.prototype.addMemo = function(type, data) {
   return this;
 };
 
-// Options:
-//  .domain()           NYI
-//  .flags()
-//  .message_key()      NYI
-//  .transfer_rate()
-//  .wallet_locator()   NYI
-//  .wallet_size()      NYI
-
 /**
- *  Construct an 'AccountSet' transaction.
+ * Construct an 'AccountSet' transaction
  *
- *  Note that bit flags can be set using the .setFlags() method
- *  but for 'AccountSet' transactions there is an additional way to
- *  modify AccountRoot flags. The values available for the SetFlag 
- *  and ClearFlag are as follows:
+ * Note that bit flags can be set using the .setFlags() method but for
+ * 'AccountSet' transactions there is an additional way to modify AccountRoot
+ * flags. The values available for the SetFlag and ClearFlag are as follows:
  *
- *  "asfRequireDest"
- *    Require a destination tag
- *  "asfRequireAuth"
- *    Authorization is required to extend trust
- *  "asfDisallowXRP"
- *    XRP should not be sent to this account
- *  "asfDisableMaster"
- *    Disallow use of the master key
+ * asfRequireDest:    Require a destination tag
+ * asfRequireAuth:    Authorization is required to extend trust
+ * asfDisallowXRP:    XRP should not be sent to this account
+ * asfDisableMaster:  Disallow use of the master key
+ * asfNoFreeze:       Permanently give up the ability to freeze individual
+ *                    trust lines. This flag can never be cleared.
+ * asfGlobalFreeze:   Freeze all assets issued by this account
+ *
+ * @param [String] set flag
+ * @param [String] clear flag
  */
 
 Transaction.prototype.accountSet = function(src, set_flag, clear_flag) {
@@ -699,13 +863,15 @@ Transaction.prototype.accountSet = function(src, set_flag, clear_flag) {
     throw new Error('Source address invalid');
   }
 
-  this.tx_json.TransactionType  = 'AccountSet';
-  this.tx_json.Account          = UInt160.json_rewrite(src);
+  this.tx_json.TransactionType= 'AccountSet';
+  this.tx_json.Account = UInt160.json_rewrite(src);
 
   var SetClearFlags = Transaction.set_clear_flags.AccountSet;
 
   function prepareFlag(flag) {
-    return (typeof flag === 'number') ? flag : (SetClearFlags[flag] || SetClearFlags['asf' + flag]);
+    return (typeof flag === 'number')
+    ?  flag
+    : (SetClearFlags[flag] || SetClearFlags['asf' + flag]);
   };
 
   if (set_flag && (set_flag = prepareFlag(set_flag))) {
@@ -719,28 +885,39 @@ Transaction.prototype.accountSet = function(src, set_flag, clear_flag) {
   return this;
 };
 
+/**
+ * Construct a 'Claim' transaction
+ */
+
 Transaction.prototype.claim = function(src, generator, public_key, signature) {
   if (typeof src === 'object') {
     var options = src;
-    signature  = options.signature;
+    signature = options.signature;
     public_key = options.public_key;
-    generator  = options.generator;
-    src        = options.source || options.from || options.account;
+    generator = options.generator;
+    src = options.source || options.from || options.account;
   }
 
   this.tx_json.TransactionType = 'Claim';
-  this.tx_json.Generator       = generator;
-  this.tx_json.PublicKey       = public_key;
-  this.tx_json.Signature       = signature;
+  this.tx_json.Generator = generator;
+  this.tx_json.PublicKey = public_key;
+  this.tx_json.Signature = signature;
 
   return this;
 };
+
+/**
+ * Construct an 'OfferCancel' transaction
+ *
+ * @param {String} account
+ * @param [Number] sequence of an existing offer
+ */
 
 Transaction.prototype.offerCancel = function(src, sequence) {
   if (typeof src === 'object') {
     var options = src;
     sequence = options.sequence;
-    src      = options.source || options.from || options.account;
+    src = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -748,24 +925,30 @@ Transaction.prototype.offerCancel = function(src, sequence) {
   }
 
   this.tx_json.TransactionType = 'OfferCancel';
-  this.tx_json.Account         = UInt160.json_rewrite(src);
-  this.tx_json.OfferSequence   = Number(sequence);
+  this.tx_json.Account = UInt160.json_rewrite(src);
+  this.tx_json.OfferSequence = Number(sequence);
 
   return this;
 };
 
-// Options:
-//  .set_flags()
-// --> expiration : if not undefined, Date or Number
-// --> cancel_sequence : if not undefined, Sequence
+/**
+ * Construct an 'OfferCreate transaction
+ *
+ * @param {String} account
+ * @param {Amount} taker pays amount
+ * @param {Amount} taker gets amount
+ * @param [Number|Date]
+ * @param [Number] sequence of an existing offer to replace
+ */
+
 Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expiration, cancel_sequence) {
   if (typeof src === 'object') {
     var options = src;
-    cancel_sequence = options.cancel_sequence;
-    expiration      = options.expiration;
-    taker_gets      = options.taker_gets || options.sell;
-    taker_pays      = options.taker_pays || options.buy;
-    src             = options.source || options.from || options.account;
+    cancel_sequence = options.cancel_sequence || options.sequence;
+    expiration = options.expiration;
+    taker_gets = options.taker_gets || options.sell;
+    taker_pays = options.taker_pays || options.buy;
+    src = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -773,9 +956,9 @@ Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expira
   }
 
   this.tx_json.TransactionType = 'OfferCreate';
-  this.tx_json.Account         = UInt160.json_rewrite(src);
-  this.tx_json.TakerPays       = Amount.json_rewrite(taker_pays);
-  this.tx_json.TakerGets       = Amount.json_rewrite(taker_gets);
+  this.tx_json.Account = UInt160.json_rewrite(src);
+  this.tx_json.TakerPays = Amount.json_rewrite(taker_pays);
+  this.tx_json.TakerGets = Amount.json_rewrite(taker_gets);
 
   if (expiration) {
     this.tx_json.Expiration = utils.time.toRipple(expiration);
@@ -789,12 +972,16 @@ Transaction.prototype.offerCreate = function(src, taker_pays, taker_gets, expira
 };
 
 /**
- *  Construct a 'SetRegularKey' transaction.
- *  If the RegularKey is set, the private key that corresponds to
- *  it can be used to sign transactions instead of the master key
+ * Construct a 'SetRegularKey' transaction
  *
- *  The RegularKey must be a valid Ripple Address, or a Hash160 of
- *  the public key corresponding to the new private signing key.
+ * If the RegularKey is set, the private key that corresponds to it can be
+ * used to sign transactions instead of the master key
+ *
+ * The RegularKey must be a valid Ripple Address, or a Hash160 of the public
+ * key corresponding to the new private signing key.
+ *
+ * @param {String} account
+ * @param {String} regular key
  */
 
 Transaction.prototype.setRegularKey = function(src, regular_key) {
@@ -809,7 +996,7 @@ Transaction.prototype.setRegularKey = function(src, regular_key) {
   }
 
   if (!UInt160.is_valid(regular_key)) {
-    throw new Error('RegularKey must be a valid Ripple Address (a Hash160 of the public key)');
+    throw new Error('RegularKey must be a valid Ripple Address');
   }
 
   this.tx_json.TransactionType = 'SetRegularKey';
@@ -819,29 +1006,29 @@ Transaction.prototype.setRegularKey = function(src, regular_key) {
   return this;
 };
 
-// Construct a 'payment' transaction.
-//
-// When a transaction is submitted:
-// - If the connection is reliable and the server is not merely forwarding and is not malicious,
-// --> src : UInt160 or String
-// --> dst : UInt160 or String
-// --> deliver_amount : Amount or String.
-//
-// Options:
-//  .paths()
-//  .build_path()
-//  .destination_tag()
-//  .path_add()
-//  .secret()
-//  .send_max()
-//  .set_flags()
-//  .source_tag()
+/**
+ * Construct a 'Payment' transaction
+ *
+ * Relevant setters:
+ *  - setPaths()
+ *  - setBuildPath()
+ *  - addPath()
+ *  - setSourceTag()
+ *  - setDestinationTag()
+ *  - setSendMax()
+ *  - setFlags()
+ *
+ *  @param {String} source account
+ *  @param {StrinG} destination account
+ *  @param {Amount} payment amount
+ */
+
 Transaction.prototype.payment = function(src, dst, amount) {
   if (typeof src === 'object') {
     var options = src;
     amount = options.amount;
-    dst    = options.destination || options.to;
-    src    = options.source || options.from || options.account;
+    dst = options.destination || options.to;
+    src = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -853,21 +1040,30 @@ Transaction.prototype.payment = function(src, dst, amount) {
   }
 
   this.tx_json.TransactionType = 'Payment';
-  this.tx_json.Account         = UInt160.json_rewrite(src);
-  this.tx_json.Amount          = Amount.json_rewrite(amount);
-  this.tx_json.Destination     = UInt160.json_rewrite(dst);
+  this.tx_json.Account = UInt160.json_rewrite(src);
+  this.tx_json.Amount = Amount.json_rewrite(amount);
+  this.tx_json.Destination = UInt160.json_rewrite(dst);
 
   return this;
 };
+
+/**
+ * Construct a 'TrustSet' transaction
+ *
+ * @param {String} account
+ * @param {Amount} limit
+ * @param {Number} quality in
+ * @param {Number} quality out
+ */
 
 Transaction.prototype.trustSet =
 Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_out) {
   if (typeof src === 'object') {
     var options = src;
     quality_out = options.quality_out;
-    quality_in  = options.quality_in;
-    limit       = options.limit;
-    src         = options.source || options.from || options.account;
+    quality_in = options.quality_in;
+    limit = options.limit;
+    src = options.source || options.from || options.account;
   }
 
   if (!UInt160.is_valid(src)) {
@@ -875,7 +1071,7 @@ Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_o
   }
 
   this.tx_json.TransactionType = 'TrustSet';
-  this.tx_json.Account         = UInt160.json_rewrite(src);
+  this.tx_json.Account = UInt160.json_rewrite(src);
 
   if (limit !== void(0)) {
     this.tx_json.LimitAmount = Amount.json_rewrite(limit);
@@ -894,78 +1090,71 @@ Transaction.prototype.rippleLineSet = function(src, limit, quality_in, quality_o
   return this;
 };
 
-// Submit a transaction to the network.
+/**
+ * Submit transaction to the network
+ *
+ * @param [Function] callback
+ */
+
 Transaction.prototype.submit = function(callback) {
   var self = this;
 
   this.callback = (typeof callback === 'function') ? callback : function(){};
 
-  function transactionError(error, message) {
+  this._errorHandler = function transactionError(error, message) {
     if (!(error instanceof RippleError)) {
       error = new RippleError(error, message);
     }
     self.callback(error);
   };
 
-  this._errorHandler = transactionError;
-
-  function transactionSuccess(message) {
+  this._successHandler = function transactionSuccess(message) {
     self.callback(null, message);
   };
 
-  this._successHandler = transactionSuccess;
-
-  this.on('error', function(){});
-
-  var account = this.tx_json.Account;
-
   if (!this.remote) {
-    return this.emit('error', new Error('No remote found'));
+    this.emit('error', new Error('No remote found'));
+    return;
   }
 
-  if (!UInt160.is_valid(account)) {
-    return this.emit('error', new RippleError('tejInvalidAccount', 'Account is missing or invalid'));
-  }
-
-  // YYY Might check paths for invalid accounts.
-  this.remote.account(account).submit(this);
+  this.getManager().submit(this);
 
   return this;
 };
 
-Transaction.prototype.abort = function(callback) {
-  var callback = (typeof callback === 'function') ? callback : function(){};
+Transaction.prototype.abort = function() {
   if (!this.finalized) {
-    this.once('final', callback);
-    this.emit('abort');
+    this.emit('error', new RippleError('tejAbort', 'Transaction aborted'));
   }
 };
 
-Transaction.prototype.summary = function() {
-  return Transaction.summary.call(this);
-};
+/**
+ * Return summary object containing important information for persistence
+ *
+ * @return {Object} transaction summary
+ */
 
 Transaction.summary = function() {
   var result = {
-    tx_json:             this.tx_json,
-    clientID:            this._clientID,
-    submittedIDs:        this.submittedIDs,
-    submissionAttempts:  this.attempts,
-    submitIndex:         this.submitIndex,
-    initialSubmitIndex:  this.initialSubmitIndex,
-    lastLedgerSequence:  this.lastLedgerSequence,
-    state:               this.state,
-    server:              this._server ? this._server._opts.url : void(0),
-    finalized:           this.finalized
+    tx_json: this.tx_json,
+    clientID: this._clientID,
+    submittedIDs: this.submittedIDs,
+    submissionAttempts: this.attempts,
+    submitIndex: this.submitIndex,
+    initialSubmitIndex: this.initialSubmitIndex,
+    lastLedgerSequence: this.lastLedgerSequence,
+    state: this.state,
+    server: this._server ? this._server._opts.url : void(0),
+    finalized: this.finalized
   };
 
   if (this.result) {
     result.result = {
-      engine_result        : this.result.engine_result,
+      engine_result: this.result.engine_result,
       engine_result_message: this.result.engine_result_message,
-      ledger_hash          : this.result.ledger_hash,
-      ledger_index         : this.result.ledger_index,
-      transaction_hash     : this.result.tx_json.hash
+      ledger_hash: this.result.ledger_hash,
+      ledger_index: this.result.ledger_index,
+      transaction_hash: this.result.tx_json.hash
     };
   }
 
