@@ -12,19 +12,17 @@ AuthInfo._getUser = function(url, callback) {
   superagent.get(url, callback);
 };
 
-
 /**
- * Get auth info for a given username
+ * Get auth info for a given username or ripple address
  *
  * @param {string}    domain - Domain which hosts the user's info
- * @param {string}    username - Username who's info we are retreiving
+ * @param {string}    address - Username or ripple address who's info we are retreiving
  * @param {function}  fn - Callback function
  */
 
-AuthInfo.get = function(domain, username, callback) {
+AuthInfo.get = function(domain, address, callback) {
   var self = this;
-  username = username.toLowerCase();
-  
+
   function getRippleTxt(callback) {
     self._getRippleTxt(domain, function(err, txt) {
       if (err) {
@@ -37,7 +35,7 @@ AuthInfo.get = function(domain, username, callback) {
 
       var url = Array.isArray(txt.authinfo_url) ? txt.authinfo_url[0] : txt.authinfo_url;
 
-      url += '?domain=' + domain + '&username=' + username;
+      url += '?domain=' + domain + '&username=' + address;
 
       callback(null, url);
     });
