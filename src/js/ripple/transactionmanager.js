@@ -200,10 +200,10 @@ TransactionManager.prototype._adjustFees = function() {
   };
 
   this._pending.forEach(function(transaction) {
-    if (transaction._setFixedFee === true) {
+    if (transaction._setFixedFee) {
       return;
     }
-    
+
     var oldFee = transaction.tx_json.Fee;
     var newFee = transaction._computeFee();
 
@@ -243,7 +243,7 @@ TransactionManager.prototype._updatePendingStatus = function(ledger) {
   assert.strictEqual(typeof ledger, 'object');
   assert.strictEqual(typeof ledger.ledger_index, 'number');
 
-  this._pending.forEach(function(transaction) {    
+  this._pending.forEach(function(transaction) {
     switch (ledger.ledger_index - transaction.submitIndex) {
       case 4:
         transaction.emit('missing', ledger);
@@ -313,6 +313,7 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
  * Load account transaction sequence
  *
  * @param [Function] callback
+ * @api private
  */
 
 TransactionManager.prototype._loadSequence = function(callback) {
@@ -347,7 +348,7 @@ TransactionManager.prototype._handleReconnect = function(callback) {
   var self = this;
   var callback = (typeof callback === 'function') ? callback : function(){};
 
-  if (!this._pending.length) {
+  if (!this._pending.length()) {
     return callback();
   }
 
@@ -390,6 +391,7 @@ TransactionManager.prototype._handleReconnect = function(callback) {
  *
  * @param {Number} ledgers
  * @param {Function} callback
+ * @api private
  */
 
 TransactionManager.prototype._waitLedgers = function(ledgers, callback) {
@@ -419,6 +421,7 @@ TransactionManager.prototype._waitLedgers = function(ledgers, callback) {
  *
  * @param [Number] ledgers to wait before resubmitting
  * @param [Transaction] pending transactions to resubmit
+ * @api private
  */
 
 TransactionManager.prototype._resubmit = function(ledgers, pending) {
@@ -470,6 +473,7 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
  *
  * @param {Transaction} transaction to submit
  * @return {Request} submit request
+ * @api private
  */
 
 TransactionManager.prototype._prepareRequest = function(tx) {
@@ -501,6 +505,7 @@ TransactionManager.prototype._prepareRequest = function(tx) {
  * Send `submit` request, handle response
  *
  * @param {Transaction} transaction to submit
+ * @api private
  */
 
 TransactionManager.prototype._request = function(tx) {
