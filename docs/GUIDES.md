@@ -39,7 +39,7 @@ This file provides step-by-step walkthroughs for some of the most common usages 
     ]
   }
 
-  var remote = new Remote({options});
+  var remote = new Remote(options);
 
   remote.connect(function(err, res) {
     /* remote connected, use some remote functions here */
