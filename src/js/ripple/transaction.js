@@ -11,6 +11,7 @@ var SerializedObject = require('./serializedobject').SerializedObject;
 var RippleError      = require('./rippleerror').RippleError;
 var hashprefixes     = require('./hashprefixes');
 var config           = require('./config');
+var log              = require('./log').internal.sub('transaction');
 
 /**
  * @constructor Transaction
