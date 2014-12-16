@@ -1215,14 +1215,15 @@ describe('Transaction', function() {
     ]);
   });
 
-  it('Construct AccountSet transaction', function() {
-    var transaction = new Transaction().accountSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm');
-
+  it('Set AccountTxnID', function() {
+    var transaction = new Transaction();
     assert(transaction instanceof Transaction);
+
+    transaction.accountTxnID('75C5A92212AA82A89C3824F6F071FE49C95C45DE9113EB51763A217DBACB5B4F');
+
     assert.deepEqual(transaction.tx_json, {
       Flags: 0,
-      TransactionType: 'AccountSet',
-      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm'
+      AccountTxnID: '75C5A92212AA82A89C3824F6F071FE49C95C45DE9113EB51763A217DBACB5B4F'
     });
   });
 
@@ -1234,6 +1235,18 @@ describe('Transaction', function() {
       Flags: 0,
       SetFlag: 1,
       ClearFlag: 2,
+      TransactionType: 'AccountSet',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm'
+    });
+  });
+
+  it('Construct AccountSet transaction - with AccountTxnID SetFlag', function() {
+    var transaction = new Transaction().accountSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'asfAccountTxnID');
+
+    assert(transaction instanceof Transaction);
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      SetFlag: 5,
       TransactionType: 'AccountSet',
       Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm'
     });
