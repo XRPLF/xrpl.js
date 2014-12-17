@@ -132,6 +132,7 @@ Transaction.set_clear_flags = {
     asfRequireAuth:    2,
     asfDisallowXRP:    3,
     asfDisableMaster:  4,
+    asfAccountTxnID:   5,
     asfNoFreeze:       6,
     asfGlobalFreeze:   7
   }
@@ -855,6 +856,15 @@ Transaction.prototype.addMemo = function(memoType, memoFormat, memoData) {
   }
 
   this.tx_json.Memos = (this.tx_json.Memos || []).concat({ Memo: memo });
+
+  return this;
+};
+
+Transaction.prototype.setAccountTxnID =
+Transaction.prototype.accountTxnID = function(id) {
+  if (typeof id === 'string') {
+    this.tx_json.AccountTxnID = id;
+  }
 
   return this;
 };
