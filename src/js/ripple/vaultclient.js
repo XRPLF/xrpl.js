@@ -126,6 +126,23 @@ VaultClient.prototype.exists = function(username, callback) {
 };
 
 /**
+ * Check blobvault for existance of address
+ *
+ * @param {string}    address
+ * @param {function}  fn - Callback function
+ */
+
+VaultClient.prototype.addressExists = function(address, callback) {
+  AuthInfo.getAddress(this.domain, address, function(err, authInfo) {
+    if (err) {
+      callback(err);
+    } else {
+      callback(null, !!authInfo.addressExists);
+    }
+  });
+};
+
+/**
  * Authenticate and retrieve a decrypted blob using a ripple name and password
  *
  * @param {string}    username

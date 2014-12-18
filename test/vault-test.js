@@ -192,7 +192,12 @@ if (!online) {
   mockBlob.get('/v1/authinfo?domain=' + exampleData.domain + '&username=' + exampleData.new_username.toLowerCase())
     .reply(200, JSON.stringify(authInfoNewUsernameRes.body), {
       'Content-Type': 'application/json'
-    });   
+    });
+
+  mockBlob.get('/v1/authinfo?domain=' + exampleData.domain + '&username=' + exampleData.blob.data.account_id)
+    .reply(200, JSON.stringify(authInfoNewUsernameRes.body), {
+      'Content-Type': 'application/json'
+    });    
     
   mockBlob.filteringPath(/(blob\/.+)/g, 'blob/')
     .persist()
@@ -291,6 +296,17 @@ describe('VaultClient', function () {
     it('should determine if a username exists on the domain', function(done) {
       this.timeout(10000);
       client.exists(exampleData.username, function(err, resp) {
+        assert.ifError(err);
+        assert.strictEqual(typeof resp, 'boolean');
+        done();
+      });
+    });
+  });
+
+  describe('#addressExists', function() {
+    it('should determine if an address exists on the domain', function(done) {
+      this.timeout(10000);
+      client.addressExists(exampleData.blob.data.account_id, function(err, resp) {
         assert.ifError(err);
         assert.strictEqual(typeof resp, 'boolean');
         done();
