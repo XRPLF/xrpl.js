@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Account = require('../src/js/ripple/account').Account;
+var Account = require('ripple-lib').Account;
 
 describe('Account', function(){
 

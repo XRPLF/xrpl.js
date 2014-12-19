@@ -1,7 +1,5 @@
 var assert  = require('assert');
-var utils   = require('./testutils');
-var UInt128 = utils.load_module('uint128').UInt128;
-var config  = require('./testutils').get_config();
+var UInt128 = require('ripple-lib').UInt128;
 
 describe('UInt', function() {
   describe('128', function() {

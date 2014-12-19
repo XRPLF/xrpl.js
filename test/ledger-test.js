@@ -1,9 +1,7 @@
 var assert = require('assert');
 var fs     = require('fs');
 
-var utils  = require('./testutils');
-var Ledger = utils.load_module('ledger').Ledger;
-var config = require('./testutils').get_config();
+var Ledger = require('ripple-lib').Ledger;
 
 /**
 * @param ledger_index {Number}

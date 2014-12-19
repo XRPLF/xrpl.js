@@ -1,7 +1,6 @@
 var assert = require('assert');
-var utils = require('./testutils');
-var Transaction = utils.load_module('transaction').Transaction;
-var TransactionQueue = utils.load_module('transactionqueue').TransactionQueue;
+var Transaction = require('ripple-lib').Transaction;
+var TransactionQueue = require('ripple-lib').TransactionQueue;
 
 describe('Transaction queue', function() {
   it('Push transaction', function() {

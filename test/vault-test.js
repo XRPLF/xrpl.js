@@ -1,11 +1,11 @@
 var assert      = require('assert');
-var RippleTxt   = require('../src/js/ripple/rippletxt').RippleTxt;
-var AuthInfo    = require('../src/js/ripple/authinfo').AuthInfo;
-var VaultClient = require('../src/js/ripple/vaultclient').VaultClient;
-var Blob        = require('../src/js/ripple/blob').Blob;
-var UInt256     = require('../src/js/ripple/uint256').UInt256;
-var sjcl        = require('../build/sjcl');
 var nock        = require('nock');
+var RippleTxt   = require('ripple-lib').RippleTxt;
+var AuthInfo    = require('ripple-lib').AuthInfo;
+var VaultClient = require('ripple-lib').VaultClient;
+var Blob        = require('ripple-lib').Blob;
+var UInt256     = require('ripple-lib').UInt256;
+var sjcl        = require('ripple-lib').sjcl;
 var online      = process.argv.indexOf('--online-blobvault') !== -1 ? true : false; 
 
 var exampleData = {

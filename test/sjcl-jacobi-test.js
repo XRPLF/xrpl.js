@@ -1,6 +1,5 @@
 var assert = require('assert');
-var utils  = require('./testutils');
-var sjcl   = require('../build/sjcl');
+var sjcl   = require('ripple-lib').sjcl;
 
 describe('SJCL Jacobi', function() {
   it('(15/13) = -1', function () {

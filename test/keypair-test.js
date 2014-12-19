@@ -1,7 +1,5 @@
 var assert = require('assert');
-var utils  = require('./testutils');
-var Seed   = utils.load_module('seed').Seed;
-var config = require('./testutils').get_config();
+var Seed   = require('ripple-lib').Seed;
 
 describe('KeyPair', function() {
   it('can generate an address', function () {

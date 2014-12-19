@@ -1,6 +1,5 @@
 var assert            = require('assert');
-var utils             = require('./testutils');
-var sjcl              = require('../build/sjcl');
+var sjcl              = require('ripple-lib').sjcl;
 
 describe('ECDSA signing with recoverable public key', function(){
 

@@ -1,11 +1,8 @@
-var utils            = require('./testutils');
 var assert           = require('assert');
-var SerializedObject = utils.load_module('serializedobject').SerializedObject;
-var types            = utils.load_module('serializedtypes');
-var amountConstants  = require('../src/js/ripple/amount').consts;
-var BigInteger       = require('../src/js/jsbn/jsbn').BigInteger;
-
-var config = require('./testutils').get_config();
+var SerializedObject = require('ripple-lib').SerializedObject;
+var types            = require('ripple-lib').types;
+var Amount           = require('ripple-lib').Amount;
+var BigInteger       = require('ripple-lib').jsbn.BigInteger;
 
 describe('Serialized types', function() {
   describe('Int8', function() {
@@ -553,7 +550,7 @@ describe('Serialized types', function() {
     });
     it('Serialize max_value/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
       var so = new SerializedObject();
-      types.Amount.serialize(so, amountConstants.max_value+'/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      types.Amount.serialize(so, Amount.max_value+'/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(so.to_hex(), 'EC6386F26FC0FFFF0000000000000000000000005553440000000000B5F762798A53D543A014CAF8B297CFF8F2F937E8');
     });
     it('Parse 1 XRP', function () {
@@ -590,7 +587,7 @@ describe('Serialized types', function() {
     });
     it('Parse max_value/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
       var so = new SerializedObject('EC6386F26FC0FFFF0000000000000000000000005553440000000000B5F762798A53D543A014CAF8B297CFF8F2F937E8');
-      assert.strictEqual(types.Amount.parse(so).to_text_full(), amountConstants.max_value+'/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(types.Amount.parse(so).to_text_full(), Amount.max_value+'/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
   });
 
