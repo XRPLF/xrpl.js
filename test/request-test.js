@@ -1,9 +1,8 @@
 var assert = require('assert');
-var utils = require('./testutils');
-var Request = utils.load_module('request').Request;
-var Remote = utils.load_module('remote').Remote;
-var Server = utils.load_module('server').Server;
-var Currency = utils.load_module('currency').Currency;
+var Request = require('ripple-lib').Request;
+var Remote = require('ripple-lib').Remote;
+var Server = require('ripple-lib').Server;
+var Currency = require('ripple-lib').Currency;
 
 function makeServer(url) {
   var server = new Server(new process.EventEmitter(), url);

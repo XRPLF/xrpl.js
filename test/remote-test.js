@@ -1,9 +1,7 @@
 var assert = require('assert');
-var utils  = require('./testutils');
-
-var Remote = utils.load_module('remote').Remote;
-var Server = utils.load_module('server').Server;
-var Request = utils.load_module('request').Request;
+var Remote = require('ripple-lib').Remote;
+var Server = require('ripple-lib').Server;
+var Request = require('ripple-lib').Request;
 
 var options, remote, callback, database, tx;
 

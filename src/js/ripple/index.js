@@ -5,6 +5,7 @@ exports.Account          = require('./account').Account;
 exports.Transaction      = require('./transaction').Transaction;
 exports.Currency         = require('./currency').Currency;
 exports.Base             = require('./base').Base;
+exports.UInt128          = require('./uint128').UInt128;
 exports.UInt160          = require('./uint160').UInt160;
 exports.UInt256          = require('./uint256').UInt256;
 exports.Seed             = require('./seed').Seed;
@@ -19,6 +20,10 @@ exports.binformat        = require('./binformat');
 exports.utils            = require('./utils');
 exports.Server           = require('./server').Server;
 exports.Wallet           = require('./wallet');
+exports.Ledger           = require('./ledger').Ledger;
+exports.TransactionQueue = require('./transactionqueue').TransactionQueue;
+exports.VaultClient      = require('./vaultclient').VaultClient;
+exports.Blob             = require('./blob').Blob;
 
 // Important: We do not guarantee any specific version of SJCL or for any
 // specific features to be included. The version and configuration may change at
@@ -28,6 +33,8 @@ exports.Wallet           = require('./wallet');
 // the official client, it makes sense to expose the SJCL instance so we don't
 // have to include it twice.
 exports.sjcl   = require('./utils').sjcl;
+exports.jsbn   = require('./utils').jsbn;
+exports.types  = require('./serializedtypes');
 
 exports.config = require('./config');
 

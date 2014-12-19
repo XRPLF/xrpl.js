@@ -1,7 +1,6 @@
-var utils            = require('./testutils');
 var assert           = require('assert');
-var SerializedObject = utils.load_module('serializedobject').SerializedObject;
-var sjcl             = require('./../src/js/ripple/utils').sjcl;
+var SerializedObject = require('ripple-lib').SerializedObject;
+var sjcl             = require('ripple-lib').sjcl;
 
 // Shortcuts
 var hex = sjcl.codec.hex;

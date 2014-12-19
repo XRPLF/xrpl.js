@@ -1,6 +1,5 @@
 var assert = require('assert');
-var utils  = require('./testutils');
-var Seed   = utils.load_module('seed').Seed;
+var Seed   = require('ripple-lib').Seed;
 
 function _isNaN(n) {
   return typeof n === 'number' && isNaN(n);

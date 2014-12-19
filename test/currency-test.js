@@ -1,7 +1,6 @@
 var assert   = require('assert');
-var utils    = require('./testutils');
-var currency = utils.load_module('currency').Currency;
-var timeUtil = utils.load_module('utils').time;
+var currency = require('ripple-lib').Currency;
+var timeUtil = require('ripple-lib').utils.time;
 
 describe('Currency', function() {
   describe('json_rewrite', function() {

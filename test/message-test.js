@@ -1,8 +1,8 @@
 var assert  = require('assert');
-var sjcl    = require('../build/sjcl');
-var Message = require('../src/js/ripple/message').Message;
-var Seed    = require('../src/js/ripple/seed').Seed;
-var Remote  = require('../src/js/ripple/remote').Remote;
+var sjcl    = require('ripple-lib').sjcl;
+var Message = require('ripple-lib').Message;
+var Seed    = require('ripple-lib').Seed;
+var Remote  = require('ripple-lib').Remote;
 
 describe('Message', function(){
 

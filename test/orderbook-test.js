@@ -1,9 +1,8 @@
 var assert = require('assert');
-var utils = require('./testutils');
-var Remote  = utils.load_module('remote').Remote;
-var Currency = utils.load_module('currency').Currency;
-var Amount = utils.load_module('amount').Amount;
-var Meta = utils.load_module('meta').Meta;
+var Remote  = require('ripple-lib').Remote;
+var Currency = require('ripple-lib').Currency;
+var Amount = require('ripple-lib').Amount;
+var Meta = require('ripple-lib').Meta;
 
 describe('OrderBook', function() {
   it('toJSON', function() {

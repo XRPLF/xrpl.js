@@ -1,10 +1,9 @@
-var utils            = require('./testutils');
 var assert           = require('assert');
-var Amount           = utils.load_module('amount').Amount;
-var Transaction      = utils.load_module('transaction').Transaction;
-var TransactionQueue = utils.load_module('transactionqueue').TransactionQueue;
-var Remote           = utils.load_module('remote').Remote;
-var Server           = utils.load_module('server').Server;
+var Amount           = require('ripple-lib').Amount;
+var Transaction      = require('ripple-lib').Transaction;
+var TransactionQueue = require('ripple-lib').TransactionQueue;
+var Remote           = require('ripple-lib').Remote;
+var Server           = require('ripple-lib').Server;
 
 var transactionResult = {
   engine_result: 'tesSUCCESS',
