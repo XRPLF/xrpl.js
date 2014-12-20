@@ -2,6 +2,8 @@ var assert = require('assert');
 var Remote = require('ripple-lib').Remote;
 var Server = require('ripple-lib').Server;
 var Request = require('ripple-lib').Request;
+var UInt160 = require('ripple-lib').UInt160;
+var Currency = require('ripple-lib').Currency;
 
 var options, remote, callback, database, tx;
 
@@ -433,6 +435,43 @@ describe('Remote', function () {
 
     assert(request.requested);
   });
+
+  it('requestBookOffers, ledger', function() {
+    var callback = function() {};
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestBookOffers(
+      {
+        gets: {
+          currency: 'USD',
+          issuer: ADDRESS
+        },
+        pays: {
+          currency: 'XRP'
+        },
+        ledger: LEDGER_HASH
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'book_offers',
+      id: undefined,
+      taker_gets: {
+        currency: Currency.from_human('USD').to_hex(),
+        issuer: ADDRESS
+      },
+      taker_pays: {
+        currency: '0000000000000000000000000000000000000000'
+      },
+      taker: UInt160.ACCOUNT_ONE,
+      ledger_hash: LEDGER_HASH
+    });
+
+    assert(request.requested);
+  });
+
 
   it('create remote and get pending transactions', function() {
     before(function() {
