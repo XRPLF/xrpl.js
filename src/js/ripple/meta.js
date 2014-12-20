@@ -243,130 +243,131 @@ function bignum(x) {
   return Amount.from_json({value: x.toString()});
 };
 
-// Merge balance changes that have the same account, issuer, and currency
-// by summing them together
-function mergeBalanceChanges(balanceChanges) {
-  var grouped = _.groupBy(balanceChanges, function(change) {
-    return (change.address + '-' +
-            change.balance_change.issuer().to_json().toString() + '-' +
-            change.balance_change.currency().to_json().toString());
-  });
-  return _.compact(Object.keys(grouped).map(function(key) {
-    var group = grouped[key];
-    var valueSum = bignum(0);
-    group.forEach(function(change) {
-      valueSum = valueSum.add(bignum(change.balance_change.to_text()));
-    });
-    if (valueSum.is_zero()) {
-      return null;      // do not report balance change if there was no change
-    }
-    var currency = group[0].balance_change.currency().to_json();
-    var balanceChange = currency === 'XRP' ?
-      Amount.from_json(valueSum.to_text()) :
-      Amount.from_json({
-        issuer:  group[0].balance_change.issuer().to_json(),
-        currency: currency,
-        value: valueSum.to_text()
-      });
-    return {
-      address: group[0].address,
-      balance_change: balanceChange
-    };
-  }));
-};
-
 function parseAccountRootBalanceChange(node, address) {
-  if (!_.isEmpty(node.fieldsNew)) {
+  // We don't need the second operand here usually, but there's some strange
+  // deformed ledger entries now and then.
+  if (node.diffType == 'CreatedNode' && node.fieldsNew.Balance) {
     return {
-      address: node.fieldsNew.Account,
+      address: node.fields.Account,
       balance_change: Amount.from_json(node.fieldsNew.Balance)
     };
-  } else if (!_.isEmpty(node.fieldsFinal)) {
-    var finalBal = bignum(node.fieldsFinal.Balance);
-    var prevBal = (typeof node.fieldsPrev.Balance === 'string') ?
-      bignum(node.fieldsPrev.Balance) : bignum(0);
+  }
+  else if (node.fieldsFinal.Balance &&
+           node.fieldsPrev.Balance) {
 
+    var finalBalance = bignum(node.fieldsFinal.Balance);
+    var previousBalance = (typeof node.fieldsPrev.Balance === 'string') ?
+                           bignum(node.fieldsPrev.Balance) : bignum(0);
     return {
-      address: node.fieldsFinal.Account,
-      balance_change: Amount.from_json(finalBal.subtract(prevBal).to_text())
+      address: node.fields.Account,
+      balance_change: Amount.from_json(finalBalance.subtract(previousBalance)
+                                        .to_text())
     };
   }
-
-  return null;
-};
-
-function isHighNodeIssuer(trustBalFinal, trustBalPrev, trustHigh, trustLow) {
-  if (trustBalFinal.is_positive()) {
-    return true;
-  } else if (trustBalFinal.is_negative()) {
-    return false;
-  } else if (trustBalPrev.is_positive()) {
-    return true;
-  } else if (trustBalPrev.is_negative()) {
-    return false;
-  } else if (trustLow.is_zero() && trustHigh.is_positive()) {
-    return false;    // high node cannot issue
-  } else if (trustHigh.is_zero() && trustLow.is_positive()) {
-    return true;     // low node cannot issue
-  } else {
-    return false;    // totally arbitrary
-  }
-};
-
-function parseTrustlineBalanceChange(node, address) {
-  if (!_.isEmpty(node.fieldsFinal)) {
-    if (!(node.fieldsPrev.Balance)) {
-      return null;    // setting a trustline limit, no balance change
-    }
-  }
-  var finalFields = _.isEmpty(node.fieldsNew) ?
-    node.fieldsFinal : node.fieldsNew;
-  var trustHighIssuer = finalFields.HighLimit.issuer;
-  var trustLowIssuer = finalFields.LowLimit.issuer;
-  if (address !== trustLowIssuer && address !== trustHighIssuer) {
+  else {
     return null;
   }
-  var trustHigh = bignum(finalFields.HighLimit.value);
-  var trustLow = bignum(finalFields.LowLimit.value);
-  var trustBalFinal = bignum(finalFields.Balance.value);
-  var trustBalPrev = node.fieldsPrev.Balance ?
-    bignum(node.fieldsPrev.Balance.value) : bignum(0);
-  var trustBalChange = trustBalFinal.subtract(trustBalPrev);
-  var issuer = isHighNodeIssuer(trustBalFinal, trustBalPrev, trustHigh,
-    trustLow) ? trustHighIssuer : trustLowIssuer;
-  var balanceChange = (address === trustHighIssuer) ?
-    trustBalChange.negate() : trustBalChange;
-
-  return {
-    address: address,
-    balance_change: Amount.from_json({
-      value: balanceChange.to_text(),
-      currency: finalFields.Balance.currency,
-      issuer: issuer
-    })
-  };
 };
 
-function parseTrustlineBalanceChanges(node) {
-  var fields = _.isEmpty(node.fieldsNew) ? node.fieldsFinal : node.fieldsNew;
-  return [parseTrustlineBalanceChange(node, fields.HighLimit.issuer),
-          parseTrustlineBalanceChange(node, fields.LowLimit.issuer)];
+/*
+* Determines which is the `issuer` on a trustline by inspecting the Balance
+* and limits. The issuer is determined by having a negative balance.
+*
+* @param {Amount} finalBalance
+* @param {Amount} previousBalance
+* @param {Amount} highLimit
+* @param {Amount} lowLimit
+*
+* TODO: We only have test cases exercising returns 1,2,3 and 6
+*/
+function isHighNodeIssuer(finalBalance, previousBalance, highLimit, lowLimit) {
+  // A positive balance means the low limit is in the negative, which is the
+  // indication of issuance.
+  if (finalBalance.is_positive()) {
+    /*1*/ return true;
+  } else if (finalBalance.is_negative()) { // && not zero
+    /*2*/ return false;
+  } else if (previousBalance.is_positive()) {
+    /*3*/ return true;
+  } else if (previousBalance.is_negative()) {
+    /*4*/ return false;
+  } else if (lowLimit.is_zero() && highLimit.is_positive()) {
+    /*5*/ return false;    // high node cannot issue
+  } else if (highLimit.is_zero() && lowLimit.is_positive()) {
+    /*6*/ return true;     // low node cannot issue
+  } else {
+    /*7*/ return false;    // totally arbitrary
+  }
+};
+
+function parseTrustlineBalanceChange(node) {
+  var isNewLine = node.diffType == 'CreatedNode';
+
+  // Was existing node, and no balance change
+  if (!isNewLine && node.fieldsPrev.Balance == null) {
+      return null;
+  }
+
+  // A CreatedNode will have fields in fieldsNew
+  var finalFields = isNewLine ? node.fieldsNew : node.fieldsFinal;
+
+  // The accounts on each side of a trust line are sorted as uint160 numbers, to
+  // find a low and high. The *Limit amounts pack in how much the `issuer`
+  // account trusts the opposing account.
+  var highAccount = finalFields.HighLimit.issuer;
+  var lowAccount = finalFields.LowLimit.issuer;
+
+  // Trust Limits
+  var lowLimit = bignum(finalFields.HighLimit.value);
+  var highLimit = bignum(finalFields.LowLimit.value);
+
+  // Final Balance
+  var finalBalance = bignum(finalFields.Balance.value);
+
+  // Balance either didn't change, or it's a new node.
+  var previousBalance = isNewLine ? bignum(0):
+                                    bignum(node.fieldsPrev.Balance.value);
+
+  // The `issuer` is dependent on who has/had a negative balance
+  var highAccountIsIssuer = isHighNodeIssuer(finalBalance, previousBalance,
+                                             lowLimit, highLimit)
+  var issuer = highAccountIsIssuer ? highAccount : lowAccount;
+  var address = highAccountIsIssuer ? lowAccount : highAccount;
+
+  // Change = After - before
+  var trustBalChange = finalBalance.subtract(previousBalance);
+
+  // Orient the balance change to the `address` as a RippleState Balance is
+  // always from the lowAccount's perspective.
+  var balanceChange = (address === highAccount) ?
+                          trustBalChange.negate() :
+                          trustBalChange;
+
+  return trustBalChange.is_zero() ? null :
+    {
+      address: address,
+      balance_change: Amount.from_json({
+        value: balanceChange.to_text(),
+        currency: finalFields.Balance.currency,
+        issuer: issuer
+      })
+    };
 };
 
 Meta.prototype.parseBalanceChanges = function() {
   var balanceChanges = this.nodes.map(function(node) {
     if (node.entryType === 'AccountRoot') {
       // Look for XRP balance change in AccountRoot node
-      return [parseAccountRootBalanceChange(node)];
+      return parseAccountRootBalanceChange(node);
     } else if (node.entryType === 'RippleState') {
       // Look for trustline balance change in RippleState node
-      return parseTrustlineBalanceChanges(node);
+      return parseTrustlineBalanceChange(node);
     } else {
-      return [ ];
+      return null;
     }
   });
 
-  return mergeBalanceChanges(_.compact(_.flatten(balanceChanges)));
+  return balanceChanges.filter(function(o){return o != null});
 };
 
 exports.Meta = Meta;
