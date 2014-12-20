@@ -1476,10 +1476,12 @@ Remote.prototype.requestTxHistory = function(start, callback) {
 /**
  * Request book_offers
  *
- * @param {Object} gets
- * @param {Object} pays
- * @param {String} taker
- * @param [Function] calback
+ * @param {Object} options - taker_options or can be an options object with the following properties
+ *   @param {Object} options.gets - taker_options
+ *   @param {Object} options.pays - taker_pays
+ *   @param {String} [options.taker]
+ *   @param {String} [options.ledger]
+ * @param [Function] callback
  * @return {Request}
  */
 
@@ -1488,6 +1490,7 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
 
   if (gets.hasOwnProperty('gets') || gets.hasOwnProperty('taker_gets')) {
     var options = gets;
+    var ledger;
     // This would mutate the `lastArg` in `arguments` to be `null` and is
     // redundant. Once upon a time, some awkward code was written f(g, null,
     // null, cb) ...
@@ -1495,6 +1498,7 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
     taker = options.taker;
     pays = options.pays || options.taker_pays;
     gets = options.gets || options.taker_gets;
+    ledger = options.ledger;
   }
 
   if (typeof lastArg === 'function') {
@@ -1521,8 +1525,9 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
 
   request.message.taker = taker ? taker : UInt160.ACCOUNT_ONE;
 
-  request.callback(callback);
+  request.ledgerSelect(ledger);
 
+  request.callback(callback);
   return request;
 };
 
