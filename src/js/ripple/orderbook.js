@@ -43,8 +43,9 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
   this._shouldSubscribe = true;
   this._listeners = 0;
   this._offers = [ ];
-  this._ownerFunds = { };
   this._offerCounts = { };
+  this._ownerFunds = { };
+  this._ownerOffers = { };
 
   // We consider ourselves synchronized if we have a current
   // copy of the offers, we are online and subscribed to updates.
@@ -180,6 +181,7 @@ OrderBook.prototype.unsubscribe = function() {
 
 OrderBook.prototype.resetCache = function() {
   this._ownerFunds = { };
+  this._ownerOffers = { };
   this._offerCounts = { };
   this._synchronized = false;
 };
@@ -232,6 +234,8 @@ OrderBook.prototype.removeCachedFunds = function(account) {
 
 /**
  * Get offer count for offer owner
+ *
+ * @param {String} account address
  */
 
 OrderBook.prototype.getOfferCount = function(account) {
@@ -241,6 +245,8 @@ OrderBook.prototype.getOfferCount = function(account) {
 
 /**
  * Increment offer count for offer owner
+ *
+ * @param {String} account address
  */
 
 OrderBook.prototype.incrementOfferCount = function(account) {
@@ -252,6 +258,8 @@ OrderBook.prototype.incrementOfferCount = function(account) {
 
 /**
  * Decrement offer count for offer owner
+ *
+ * @param {String} account address
  */
 
 OrderBook.prototype.decrementOfferCount = function(account) {
@@ -259,6 +267,56 @@ OrderBook.prototype.decrementOfferCount = function(account) {
   var result = (this._offerCounts[account] || 1) - 1;
   this._offerCounts[account] = result;
   return result;
+};
+
+/**
+ * Add offer amount to sum amount being offered by an account
+ *
+ * @param {String} account address
+ * @param {Object|String} offer amount
+ * @return sum
+ */
+
+OrderBook.prototype.addOwnerOffer = function(account, amount) {
+  assert(UInt160.is_valid(account), 'Account is invalid');
+  var previousAmount = this.getOwnerOfferSum(account);
+  var newAmount = previousAmount.add(Amount.from_json(amount));
+  this._ownerOffers[account] = newAmount;
+  return newAmount;
+};
+
+/**
+ * Subtract offer amount from sum amount being offered by an account
+ *
+ * @param {String} account address
+ * @param {Object|String} offer amount
+ * @return sum
+ */
+
+OrderBook.prototype.subtractOwnerOffer = function(account, amount) {
+  assert(UInt160.is_valid(account), 'Account is invalid');
+  this._ownerOffers[account].subtract(Amount.from_json(amount));
+  return this._ownerOffers[account];
+};
+
+/**
+ * Get sum amount for offers by an account
+ *
+ * @param {String} account address
+ * @return sum
+ */
+
+OrderBook.prototype.getOwnerOfferSum = function(account) {
+  assert(UInt160.is_valid(account), 'Account is invalid');
+  var amount = this._ownerOffers[account];
+  if (!amount) {
+    if (typeof amount === 'string') {
+      amount = Amount.from_json('0');
+    } else {
+      amount = Amount.from_json('0' + OrderBook.IOU_SUFFIX);
+    }
+  }
+  return amount;
 };
 
 /**
@@ -358,11 +416,20 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
     return offer;
   }
 
+  // Sum of offer amounts by an account
+  var offerSum = this.getOwnerOfferSum(offer.Account);
+
+  if (offerSum.is_zero()) {
+    // If there are no cached offer amounts for the account, default to
+    // TakerGets of this offer
+    offerSum = Amount.from_json(offer.TakerGets);
+  }
+
   offer.is_fully_funded = Amount.from_json(
     this._currencyGets.is_native()
     ? fundedAmount
     : fundedAmount + OrderBook.IOU_SUFFIX
-  ).compareTo(Amount.from_json(offer.TakerGets)) >= 0;
+  ).compareTo(offerSum) >= 0;
 
   if (offer.is_fully_funded) {
     offer.taker_gets_funded = Amount.from_json(offer.TakerGets).to_text();
@@ -376,12 +443,8 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
   ? offer.TakerPays.value
   : offer.TakerPays;
 
-  var takerGetsValue = (typeof offer.TakerGets === 'object')
-  ? offer.TakerGets.value
-  : offer.TakerGets;
-
   var takerPays = Amount.from_json(takerPaysValue +  OrderBook.IOU_SUFFIX);
-  var takerGets = Amount.from_json(takerGetsValue + OrderBook.IOU_SUFFIX);
+  var takerGets = Amount.from_json(offerSum);
   var fundedPays = Amount.from_json(fundedAmount + OrderBook.IOU_SUFFIX);
   var rate = takerPays.divide(takerGets);
 
@@ -662,9 +725,16 @@ OrderBook.offerRewrite = function(offer) {
 OrderBook.prototype.setOffers = function(offers) {
   assert(Array.isArray(offers));
 
+  var l = offers.length;
   var newOffers = [ ];
 
-  for (var i=0, l=offers.length; i<l; i++) {
+  for (var i=0; i<l; i++) {
+    var offer = offers[i];
+    // Add offer amount to sum for account
+    this.addOwnerOffer(offer.Account, offer.TakerGets);
+  }
+
+  for (var i=0; i<l; i++) {
     var offer = OrderBook.offerRewrite(offers[i]);
     var fundedAmount;
 
@@ -675,8 +745,8 @@ OrderBook.prototype.setOffers = function(offers) {
       this.addCachedFunds(offer.Account, fundedAmount);
     }
 
-    this.setFundedAmount(offer, fundedAmount);
     this.incrementOfferCount(offer.Account);
+    this.setFundedAmount(offer, fundedAmount);
 
     newOffers.push(offer);
   }
@@ -888,6 +958,9 @@ OrderBook.prototype.insertOffer = function(node, fundedAmount) {
     log.info('inserting offer', this._key, node.fields);
   }
 
+  // Add offer amount to sum for account
+  this.addOwnerOffer(node.fields.Account, node.fields.TakerGets);
+
   var nodeFields = OrderBook.offerRewrite(node.fields);
   nodeFields.LedgerEntryType = node.entryType;
   nodeFields.index = node.ledgerIndex;
@@ -904,7 +977,7 @@ OrderBook.prototype.insertOffer = function(node, fundedAmount) {
   // XXX Should use Amount#from_quality
   var price = Amount.from_json(
     nodeFields.TakerPays
-  ).ratio_human(node.fields.TakerGets, DATE_REF);
+  ).ratio_human(nodeFields.TakerGets, DATE_REF);
 
   for (var i=0, l=this._offers.length; i<l; i++) {
     var offer = this._offers[i];
@@ -944,14 +1017,21 @@ OrderBook.prototype.modifyOffer = function(node, isDeletedNode) {
     var offer = this._offers[i];
     if (offer.index === node.ledgerIndex) {
       if (isDeletedNode) {
-        // Multiple offers same account?
+        // Remove offer amount from sum for account
+        this.subtractOwnerOffer(offer.Account, offer.TakerGets);
         this._offers.splice(i, 1);
         this.emit('offer_removed', offer);
       } else {
         // TODO: This assumes no fields are deleted, which is
         // probably a safe assumption, but should be checked.
-        var previousOffer = extend({}, offer);
+        var previousOffer = extend({ }, offer);
         extend(offer, node.fieldsFinal);
+
+        // Remove offer amount from sum for account
+        this.subtractOwnerOffer(offer.Account, previousOffer.TakerGets);
+        // Add offer amount from sum for account
+        this.addOwnerOffer(offer.Account, offer.TakerGets);
+
         this.emit('offer_changed', previousOffer, offer);
       }
       break;

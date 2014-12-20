@@ -337,6 +337,7 @@ describe('OrderBook', function() {
     });
 
     var offer = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: {
         value: '100',
         currency: 'BTC',
@@ -348,6 +349,7 @@ describe('OrderBook', function() {
     book.setFundedAmount(offer, '100.1234');
 
     var expected = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: offer.TakerGets,
       TakerPays: offer.TakerPays,
       is_fully_funded: true,
@@ -367,6 +369,7 @@ describe('OrderBook', function() {
     });
 
     var offer = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: {
         value: '100',
         currency: 'BTC',
@@ -378,6 +381,7 @@ describe('OrderBook', function() {
     book.setFundedAmount(offer, '99');
 
     var expected = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: offer.TakerGets,
       TakerPays: offer.TakerPays,
       is_fully_funded: false,
@@ -397,6 +401,7 @@ describe('OrderBook', function() {
     });
 
     var offer = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: '100',
       TakerPays: {
         value: '123.456',
@@ -408,6 +413,7 @@ describe('OrderBook', function() {
     book.setFundedAmount(offer, '100.1');
 
     var expected = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: offer.TakerGets,
       TakerPays: offer.TakerPays,
       is_fully_funded: true,
@@ -427,6 +433,7 @@ describe('OrderBook', function() {
     });
 
     var offer = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: '100',
       TakerPays: {
         value: '123.456',
@@ -438,6 +445,7 @@ describe('OrderBook', function() {
     book.setFundedAmount(offer, '99');
 
     var expected = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: offer.TakerGets,
       TakerPays: offer.TakerPays,
       is_fully_funded: false,
@@ -457,6 +465,7 @@ describe('OrderBook', function() {
     });
 
     var offer = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: {
         value: '100',
         currency: 'BTC',
@@ -468,6 +477,7 @@ describe('OrderBook', function() {
     book.setFundedAmount(offer, '0');
 
     assert.deepEqual(offer, {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
       TakerGets: offer.TakerGets,
       TakerPays: offer.TakerPays,
       is_fully_funded: false,
@@ -1450,6 +1460,56 @@ describe('OrderBook', function() {
       index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
       owner_funds: '0.950363009783092',
       quality: '498.6116758238228'
+    },
+    {
+      Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
+      BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+      BookNode: '0000000000000000',
+      Expiration: 461498565,
+      Flags: 131072,
+      LedgerEntryType: 'Offer',
+      OwnerNode: '0000000000000144',
+      PreviousTxnID: 'C8296B9CCA6DC594C7CD271C5D8FD11FEE380021A07768B25935642CDB37048A',
+      PreviousTxnLgrSeq: 8342469,
+      Sequence: 29356,
+      TakerGets: {
+        currency: 'BTC',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '0.5'
+      },
+      TakerPays: {
+        currency: 'USD',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '99.72233516476456'
+      },
+      index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+      owner_funds: '0.950363009783092',
+      quality: '498.6116758238228'
+    },
+    {
+      Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
+      BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+      BookNode: '0000000000000000',
+      Expiration: 461498565,
+      Flags: 131078,
+      LedgerEntryType: 'Offer',
+      OwnerNode: '0000000000000144',
+      PreviousTxnID: 'C8296B9CCA6DC594C7CD271C5D8FD11FEE380021A07768B25935642CDB37048A',
+      PreviousTxnLgrSeq: 8342469,
+      Sequence: 29354,
+      TakerGets: {
+        currency: 'BTC',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '0.5'
+      },
+      TakerPays: {
+        currency: 'USD',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '99.72233516476456'
+      },
+      index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+      owner_funds: '0.950363009783092',
+      quality: '498.6116758238228'
     }
     ]
   };
@@ -1533,7 +1593,53 @@ describe('OrderBook', function() {
         is_fully_funded: true,
         taker_gets_funded: '0.2',
         taker_pays_funded: '99.72233516476456'
-      }
+      },
+      { Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
+        BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+        BookNode: '0000000000000000',
+        Expiration: 461498565,
+        Flags: 131072,
+        LedgerEntryType: 'Offer',
+        OwnerNode: '0000000000000144',
+        Sequence: 29356,
+        TakerGets: { currency: 'BTC',
+          issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+          value: '0.5'
+        },
+        TakerPays: {
+          currency: 'USD',
+          issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+          value: '99.72233516476456'
+        },
+        index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+        owner_funds: '0.950363009783092',
+        is_fully_funded: false,
+        taker_gets_funded: '0.9484660776278363',
+        taker_pays_funded: '94.58325208561269' },
+        { Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
+          BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+          BookNode: '0000000000000000',
+          Expiration: 461498565,
+          Flags: 131078,
+          LedgerEntryType: 'Offer',
+          OwnerNode: '0000000000000144',
+          Sequence: 29354,
+          TakerGets: {
+            currency: 'BTC',
+            issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+            value: '0.5'
+          },
+          TakerPays: {
+            currency: 'USD',
+            issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+            value: '99.72233516476456'
+          },
+          index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+          owner_funds: '0.950363009783092',
+          is_fully_funded: false,
+          taker_gets_funded: '0.9484660776278363',
+          taker_pays_funded: '94.58325208561269'
+        }
   ]
 
 
