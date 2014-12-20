@@ -1,7 +1,6 @@
 var assert = require('assert');
 var fs = require('fs');
-var utils  = require('./testutils');
-var Meta = utils.load_module('meta').Meta;
+var Meta = require('ripple-lib').Meta;
 
 // Pay 100 XRP from rKmB to rLDY to create rLDY account
 var createAccountBalanceChanges = [
