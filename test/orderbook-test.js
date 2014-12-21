@@ -1649,4 +1649,206 @@ describe('OrderBook', function() {
     done();
   });
   });
+
+  it('Request offers -- native currency', function(done) {
+    var remote = new Remote();
+
+    var offers = {
+      offers: [
+        {
+      Account: 'rGCHV41NxoK7wHQJhmao2RqjWZvBrTUhW1',
+      BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711A3A4254F5000',
+      BookNode: '0000000000000000',
+      Flags: 131072,
+      LedgerEntryType: 'Offer',
+      OwnerNode: '0000000000000000',
+      Sequence: 195,
+      TakerGets: '1000',
+      TakerPays: {
+        currency: 'USD',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '56.06639660617357'
+      },
+      index: 'B6BC3B0F87976370EE11F5575593FE63AA5DC1D602830DC96F04B2D597F044BF',
+      owner_funds: '600'
+    },
+    {
+      Account: 'raudnGKfTK23YKfnS7ixejHrqGERTYNFXk',
+      BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+      BookNode: '0000000000000000',
+      Expiration: 461498565,
+      Flags: 131072,
+      LedgerEntryType: 'Offer',
+      OwnerNode: '0000000000000144',
+      Sequence: 29354,
+      TakerGets: '2000',
+      TakerPays: {
+        currency: 'USD',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '99.72233516476456'
+      },
+      index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+      owner_funds: '4000',
+    },
+    {
+      Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
+      BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+      BookNode: '0000000000000000',
+      Expiration: 461498565,
+      Flags: 131072,
+      LedgerEntryType: 'Offer',
+      OwnerNode: '0000000000000144',
+      Sequence: 29356,
+      TakerGets: '2000',
+      TakerPays: {
+        currency: 'USD',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '99.72233516476456'
+      },
+      index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+      owner_funds: '3900',
+    },
+    {
+      Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
+      BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+      BookNode: '0000000000000000',
+      Expiration: 461498565,
+      Flags: 131078,
+      LedgerEntryType: 'Offer',
+      OwnerNode: '0000000000000144',
+      PreviousTxnID: 'C8296B9CCA6DC594C7CD271C5D8FD11FEE380021A07768B25935642CDB37048A',
+      PreviousTxnLgrSeq: 8342469,
+      Sequence: 29354,
+      TakerGets: '2000',
+      TakerPays: {
+        currency: 'USD',
+        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '99.72233516476456'
+      },
+      index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+      quality: '498.6116758238228'
+    }
+    ]
+  };
+
+  var expected = [
+    {
+    Account: 'rGCHV41NxoK7wHQJhmao2RqjWZvBrTUhW1',
+    BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711A3A4254F5000',
+    BookNode: '0000000000000000',
+    Flags: 131072,
+    LedgerEntryType: 'Offer',
+    OwnerNode: '0000000000000000',
+    Sequence: 195,
+    TakerGets: '1000',
+    TakerPays: {
+      currency: 'USD',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      value: '56.06639660617357'
+    },
+    index: 'B6BC3B0F87976370EE11F5575593FE63AA5DC1D602830DC96F04B2D597F044BF',
+    owner_funds: '600',
+    is_fully_funded: false,
+    taker_gets_funded: '600',
+    taker_pays_funded: '33.63983796370414'
+  },
+  {
+    Account: 'raudnGKfTK23YKfnS7ixejHrqGERTYNFXk',
+    BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+    BookNode: '0000000000000000',
+    Expiration: 461498565,
+    Flags: 131072,
+    LedgerEntryType: 'Offer',
+    OwnerNode: '0000000000000144',
+    Sequence: 29354,
+    TakerGets: '2000',
+    TakerPays: {
+      currency: 'USD',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      value: '99.72233516476456'
+    },
+    index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+    owner_funds: '4000',
+    is_fully_funded: true,
+    taker_gets_funded: '2000',
+    taker_pays_funded: '99.72233516476456'
+  },
+  {
+    Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
+    BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+    BookNode: '0000000000000000',
+    Expiration: 461498565,
+    Flags: 131072,
+    LedgerEntryType: 'Offer',
+    OwnerNode: '0000000000000144',
+    Sequence: 29356,
+    TakerGets: '2000',
+    TakerPays: {
+      currency: 'USD',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      value: '99.72233516476456'
+    },
+    index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+    owner_funds: '3900',
+    is_fully_funded: false,
+    taker_gets_funded: '3900',
+    taker_pays_funded: '97.22927678564545'
+  },
+  {
+    Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
+    BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
+    BookNode: '0000000000000000',
+    Expiration: 461498565,
+    Flags: 131078,
+    LedgerEntryType: 'Offer',
+    OwnerNode: '0000000000000144',
+    Sequence: 29354,
+    TakerGets: '2000',
+    TakerPays: {
+      currency: 'USD',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      value: '99.72233516476456'
+    },
+    index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
+    is_fully_funded: false,
+    taker_gets_funded: '3900',
+    taker_pays_funded: '97.22927678564545'
+  }
+  ]
+
+  remote.request = function(request) {
+    switch (request.message.command) {
+      case 'book_offers':
+        assert.deepEqual(request.message, {
+          command: 'book_offers',
+          id: void(0),
+          taker_gets: {
+            currency: '0000000000000000000000000000000000000000',
+          },
+          taker_pays: {
+            currency: '0000000000000000000000005553440000000000',
+            issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+          },
+          taker: 'rrrrrrrrrrrrrrrrrrrrBZbvji'
+        });
+
+        setImmediate(function() {
+          request.emit('success', offers);
+        });
+      break;
+    }
+  };
+
+  var book = remote.createOrderBook({
+    currency_gets: 'XRP',
+    currency_pays: 'USD',
+    issuer_pays: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+  });
+
+  book.on('model', function(model) {
+    assert.deepEqual(model, expected);
+    assert.strictEqual(book._synchronized, true);
+    done();
+  });
+  });
 });
