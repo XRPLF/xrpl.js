@@ -1476,9 +1476,9 @@ Remote.prototype.requestTxHistory = function(start, callback) {
 /**
  * Request book_offers
  *
- * @param {Object} options - taker_options or can be an options object with the following properties
- *   @param {Object} options.gets - taker_options
- *   @param {Object} options.pays - taker_pays
+ * @param {Object} options
+ *   @param {Object} options.gets - taker_gets with issuer and currency
+ *   @param {Object} options.pays - taker_pays with issuer and currency
  *   @param {String} [options.taker]
  *   @param {String} [options.ledger]
  * @param [Function] callback
