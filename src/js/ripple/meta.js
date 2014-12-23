@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var extend  = require('extend');
-var utils   = require('./utils');
+var utils = require('./utils');
 var UInt160 = require('./uint160').UInt160;
 var Amount  = require('./amount').Amount;
 
@@ -25,28 +25,37 @@ function Meta(data) {
   data.AffectedNodes.forEach(this.addNode, this);
 };
 
-Meta.nodeTypes = [
+Meta.NODE_TYPES = [
   'CreatedNode',
   'ModifiedNode',
   'DeletedNode'
 ];
 
-Meta.amountFieldsAffectingIssuer = [
+Meta.AMOUNT_FIELDS_AFFECTING_ISSUER = [
   'LowLimit',
   'HighLimit',
   'TakerPays',
   'TakerGets'
 ];
 
+Meta.ACCOUNT_FIELDS = [
+  'Account',
+  'Owner',
+  'Destination',
+  'Issuer',
+  'Target'
+];
+
 /**
+ * @param {Object} node
  * @api private
  */
 
 Meta.prototype.getNodeType = function(node) {
   var result = null;
 
-  for (var i=0; i<Meta.nodeTypes.length; i++) {
-    var type = Meta.nodeTypes[i];
+  for (var i=0; i<Meta.NODE_TYPES.length; i++) {
+    var type = Meta.NODE_TYPES[i];
     if (node.hasOwnProperty(type)) {
       result = type;
       break;
@@ -54,6 +63,15 @@ Meta.prototype.getNodeType = function(node) {
   }
 
   return result;
+};
+
+/**
+ * @param {String} field
+ * @api private
+ */
+
+Meta.prototype.isAccountField = function(field) {
+  return Meta.ACCOUNT_FIELDS.indexOf(field) !== -1;
 };
 
 /**
@@ -71,7 +89,6 @@ Meta.prototype.addNode = function(node) {
 
   if ((result.nodeType = this.getNodeType(node))) {
     node = node[result.nodeType];
-
     result.diffType    = result.nodeType;
     result.entryType   = node.LedgerEntryType;
     result.ledgerIndex = node.LedgerIndex;
@@ -113,56 +130,6 @@ Meta.prototype.getNodes = function(options) {
   }
 };
 
-/**
- * Execute a function on each affected node.
- *
- * The callback is passed two parameters. The first is a node object which looks
- * like this:
- *
- *   {
- *     // Type of diff, e.g. CreatedNode, ModifiedNode
- *     nodeType: 'CreatedNode'
- *
- *     // Type of node affected, e.g. RippleState, AccountRoot
- *     entryType: 'RippleState',
- *
- *     // Index of the ledger this change occurred in
- *     ledgerIndex: '01AB01AB...',
- *
- *     // Contains all fields with later versions taking precedence
- *     //
- *     // This is a shorthand for doing things like checking which account
- *     // this affected without having to check the nodeType.
- *     fields: {...},
- *
- *     // Old fields (before the change)
- *     fieldsPrev: {...},
- *
- *     // New fields (that have been added)
- *     fieldsNew: {...},
- *
- *     // Changed fields
- *     fieldsFinal: {...}
- *   }
- *
- * The second parameter to the callback is the index of the node in the metadata
- * (first entry is index 0).
- */
-
-[
- 'forEach',
- 'map',
- 'filter',
- 'every',
- 'some',
- 'reduce'
-].forEach(function(fn) {
-  Meta.prototype[fn] = function() {
-    return Array.prototype[fn].apply(this.nodes, arguments);
-  };
-});
-
-Meta.prototype.each = Meta.prototype.forEach;
 
 Meta.prototype.getAffectedAccounts = function(from) {
   if (this._affectedAccounts) {
@@ -175,12 +142,16 @@ Meta.prototype.getAffectedAccounts = function(from) {
   // TransactionMetaSet::getAffectedAccounts
   for (var i=0; i<this.nodes.length; i++) {
     var node = this.nodes[i];
-    var fields = (node.nodeType === 'CreatedNode') ? node.fieldsNew : node.fieldsFinal;
+    var fields = (node.nodeType === 'CreatedNode')
+    ? node.fieldsNew
+    : node.fieldsFinal;
+
     for (var fieldName in fields) {
       var field = fields[fieldName];
-      if (typeof field === 'string' && UInt160.is_valid(field)) {
+
+      if (this.isAccountField(fieldName) && UInt160.is_valid(field)) {
         accounts.push(field);
-      } else if (~Meta.amountFieldsAffectingIssuer.indexOf(fieldName)) {
+      } else if (~Meta.AMOUNT_FIELDS_AFFECTING_ISSUER.indexOf(fieldName)) {
         var amount = Amount.from_json(field);
         var issuer = amount.issuer();
         if (issuer.is_valid() && !issuer.is_zero()) {
@@ -368,5 +339,53 @@ Meta.prototype.parseBalanceChanges = function() {
 
   return mergeBalanceChanges(_.compact(_.flatten(balanceChanges)));
 };
+
+/**
+ * Execute a function on each affected node.
+ *
+ * The callback is passed two parameters. The first is a node object which looks
+ * like this:
+ *
+ *   {
+ *     // Type of diff, e.g. CreatedNode, ModifiedNode
+ *     nodeType: 'CreatedNode'
+ *
+ *     // Type of node affected, e.g. RippleState, AccountRoot
+ *     entryType: 'RippleState',
+ *
+ *     // Index of the ledger this change occurred in
+ *     ledgerIndex: '01AB01AB...',
+ *
+ *     // Contains all fields with later versions taking precedence
+ *     //
+ *     // This is a shorthand for doing things like checking which account
+ *     // this affected without having to check the nodeType.
+ *     fields: {...},
+ *
+ *     // Old fields (before the change)
+ *     fieldsPrev: {...},
+ *
+ *     // New fields (that have been added)
+ *     fieldsNew: {...},
+ *
+ *     // Changed fields
+ *     fieldsFinal: {...}
+ *   }
+ */
+
+[
+ 'forEach',
+ 'map',
+ 'filter',
+ 'every',
+ 'some',
+ 'reduce'
+].forEach(function(fn) {
+  Meta.prototype[fn] = function() {
+    return Array.prototype[fn].apply(this.nodes, arguments);
+  };
+});
+
+Meta.prototype.each = Meta.prototype.forEach;
 
 exports.Meta = Meta;
