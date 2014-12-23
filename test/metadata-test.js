@@ -132,7 +132,7 @@ function parseBalanceChanges(metadata) {
   return JSON.parse(JSON.stringify(meta.parseBalanceChanges()));
 }
 
-describe('parseBalanceChanges', function() {
+describe('parseBalanceChanges()', function() {
   it('XRP create account', function() {
     var paymentResponse = loadFixture('payment-xrp-create-account.json');
     var result = parseBalanceChanges(paymentResponse.metadata);
@@ -173,5 +173,22 @@ describe('parseBalanceChanges', function() {
     var paymentResponse = loadFixture('trustline-delete.json');
     var result = parseBalanceChanges(paymentResponse.metadata);
     assert.deepEqual(result, deleteTrustlineBalanceChanges);
+  });
+});
+
+describe('getAffectedAccounts()', function() {
+  it('Payment with extraneous hex accounts', function() {
+    var metadata = loadFixture('metadata-with-hex-accounts.json');
+    var affectedAccounts = new Meta(metadata).getAffectedAccounts();
+
+    assert.deepEqual(affectedAccounts, [
+     'rNGySgyyEdRJ6MKmzsZwyhhVeFKdENRGQ6',
+     'rQ3qJZwtzi4Zo3nWbmX9gwCke6S8jmHRCn',
+     'rabVnHuo1eq747GbnLDAJfE9GpsGwcL9Hy',
+     'rGa3Tb6vaMVU5RQMjxk4nsMGSArbu8epGG',
+     'rPofp4ruTavGuFnb9AYN2vRPBFxHB7RRsH',
+     'rP5VvumKn5qqn4RYTMGipmPE9965ARVQNT',
+     'rauAjp7gUp8xqHnPFDSo72Nc6aMx2k9yDk'
+    ]);
   });
 });
