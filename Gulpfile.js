@@ -151,25 +151,29 @@ gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug', 'bowe
 
 gulp.task('lint', function() {
   gulp.src('src/js/ripple/*.js')
-  .pipe(jshint())
+  .pipe(jshint('./jshintrc'))
   .pipe(map(function(file, callback) {
-    if (!file.jshint.success) {
-      console.log('\nIn', file.path);
-
-      file.jshint.results.forEach(function(err) {
-        if (err && err.error) {
-          var col1 = err.error.line + ':' + err.error.character;
-          var col2 = '[' + err.error.reason + ']';
-          var col3 = '(' + err.error.code + ')';
-
-          while (col1.length < 8) {
-            col1 += ' ';
-          }
-
-          console.log('  ' + [ col1, col2, col3 ].join(' '));
-        }
-      });
+    if (file.jshint.success) {
+      return callback(null, file);
     }
+
+    console.log('\n>' + file.path.substring(file.base.length) + '\n');
+
+    file.jshint.results.forEach(function(err) {
+      if (err && err.error) {
+        var col1 = err.error.line + ':' + err.error.character;
+        var col2 = err.error.reason;
+        var col3 = '(' + err.error.code + ')';
+
+        while (col1.length < 8) {
+          col1 = ' ' + col1;
+        }
+
+        col1 += ' |';
+
+        console.log([ col1, col2, col3 ].join(' '));
+      }
+    });
 
     callback(null, file);
   }));
