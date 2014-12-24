@@ -335,7 +335,7 @@ describe('Remote', function () {
   });
 
   it('requestAccountLines, account and callback', function() {
-    var callback = function() {};
+    function callback() {}
     var remote = new Remote({
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
@@ -354,7 +354,7 @@ describe('Remote', function () {
   });
 
   it('requestAccountLines, ledger, peer', function() {
-    var callback = function() {};
+    function callback() {}
     var remote = new Remote({
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
@@ -379,7 +379,7 @@ describe('Remote', function () {
   });
 
   it('requestAccountLines, ledger, peer, limit and marker', function() {
-    var callback = function() {};
+    function callback() {}
     var remote = new Remote({
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
@@ -408,7 +408,7 @@ describe('Remote', function () {
   });
 
   it('requestAccountOffers, ledger, peer, limit and marker', function() {
-    var callback = function() {};
+    function callback() {}
     var remote = new Remote({
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
@@ -437,7 +437,7 @@ describe('Remote', function () {
   });
 
   it('requestBookOffers, ledger', function() {
-    var callback = function() {};
+    function callback() {}
     var remote = new Remote({
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
@@ -472,6 +472,44 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
+  it('requestBookOffers, ledger and limit', function() {
+    function callback() {}
+
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestBookOffers(
+      {
+        gets: {
+          currency: 'USD',
+          issuer: ADDRESS
+        },
+        pays: {
+          currency: 'XRP'
+        },
+        ledger: LEDGER_HASH,
+        limit: 10
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'book_offers',
+      id: undefined,
+      taker_gets: {
+        currency: Currency.from_human('USD').to_hex(),
+        issuer: ADDRESS
+      },
+      taker_pays: {
+        currency: Currency.from_human('XRP').to_hex()
+      },
+      taker: UInt160.ACCOUNT_ONE,
+      ledger_hash: LEDGER_HASH,
+      limit: 10
+    });
+
+    assert(request.requested);
+  });
 
   it('create remote and get pending transactions', function() {
     before(function() {

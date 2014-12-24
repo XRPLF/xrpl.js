@@ -1258,7 +1258,7 @@ Remote.accountRequest = function(type, options, callback) {
     request.message.peer = UInt160.json_rewrite(peer);
   }
 
-  if (!isNaN(Number(limit))) {
+  if (!isNaN(limit)) {
     limit = Number(limit);
 
     // max for 32-bit unsigned int is 4294967295
@@ -1481,16 +1481,18 @@ Remote.prototype.requestTxHistory = function(start, callback) {
  *   @param {Object} options.pays - taker_pays with issuer and currency
  *   @param {String} [options.taker]
  *   @param {String} [options.ledger]
+ *   @param {String|Number} [options.limit]
  * @param [Function] callback
  * @return {Request}
  */
 
 Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
+  var ledger;
+  var limit;
   var lastArg = arguments[arguments.length - 1];
 
   if (gets.hasOwnProperty('gets') || gets.hasOwnProperty('taker_gets')) {
     var options = gets;
-    var ledger;
     // This would mutate the `lastArg` in `arguments` to be `null` and is
     // redundant. Once upon a time, some awkward code was written f(g, null,
     // null, cb) ...
@@ -1499,6 +1501,7 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
     pays = options.pays || options.taker_pays;
     gets = options.gets || options.taker_gets;
     ledger = options.ledger;
+    limit = options.limit;
   }
 
   if (typeof lastArg === 'function') {
@@ -1524,8 +1527,24 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
   }
 
   request.message.taker = taker ? taker : UInt160.ACCOUNT_ONE;
-
   request.ledgerSelect(ledger);
+
+  if (!isNaN(limit)) {
+    limit = Number(limit);
+
+    // max for 32-bit unsigned int is 4294967295
+    // we'll clamp to 1e9
+    if (limit > 1e9) {
+      limit = 1e9;
+    }
+    // min for 32-bit unsigned int is 0
+    // we'll clamp to 0
+    if (limit < 0) {
+      limit = 0;
+    }
+
+    request.message.limit = limit;
+  }
 
   request.callback(callback);
   return request;
