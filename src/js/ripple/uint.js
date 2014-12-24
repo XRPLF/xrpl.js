@@ -13,7 +13,6 @@ var BigInteger = utils.jsbn.BigInteger;
 var UInt = function() {
   // Internal form: NaN or BigInteger
   this._value  = NaN;
-
   this._update();
 };
 
@@ -96,6 +95,10 @@ UInt.prototype.clone = function() {
 UInt.prototype.copyTo = function(d) {
   d._value = this._value;
 
+  if (this._version_byte !== void(0)) {
+    d._version_byte = this._version_byte;
+  }
+
   if (typeof d._update === 'function') {
     d._update();
   }
@@ -104,7 +107,9 @@ UInt.prototype.copyTo = function(d) {
 };
 
 UInt.prototype.equals = function(d) {
-  return this._value instanceof BigInteger && d._value instanceof BigInteger && this._value.equals(d._value);
+  return this._value instanceof BigInteger
+  && d._value instanceof BigInteger
+  && this._value.equals(d._value);
 };
 
 UInt.prototype.is_valid = function() {
