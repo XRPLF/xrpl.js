@@ -295,8 +295,10 @@ OrderBook.prototype.addOwnerOffer = function(account, amount) {
 
 OrderBook.prototype.subtractOwnerOffer = function(account, amount) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  this._ownerOffers[account].subtract(Amount.from_json(amount));
-  return this._ownerOffers[account];
+  var previousAmount = this.getOwnerOfferSum(account);
+  var newAmount = previousAmount.subtract(Amount.from_json(amount));
+  this._ownerOffers[account] = newAmount;
+  return newAmount;
 };
 
 /**
@@ -310,7 +312,7 @@ OrderBook.prototype.getOwnerOfferSum = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
   var amount = this._ownerOffers[account];
   if (!amount) {
-    if (typeof amount === 'string') {
+    if (this._currencyGets.is_native()) {
       amount = Amount.from_json('0');
     } else {
       amount = Amount.from_json('0' + OrderBook.IOU_SUFFIX);
