@@ -9,7 +9,7 @@ A JavaScript API for interacting with Ripple in Node.js and the browser
 ###Features
 
 + Connect to a rippled server in JavaScript (Node.js or browser)
-+ Issue [rippled API](https://ripple.com/wiki/JSON_Messages) requests
++ Issue [rippled API](https://ripple.com/build/rippled-apis/) requests
 + Listen to events on the Ripple network (transaction, ledger, etc.)
 + Sign and submit transactions to the Ripple network
 
