@@ -250,11 +250,3 @@ remote.connect(function() {
   });
 });
 ```
-
-##Transaction Metadata##
-
-The following is a supplement to https://wiki.ripple.com/Ledger_Format#RippleState
-
-The HighNode/LowNode fields in the transaction metadata are deletion hints to allow trustline deletion in constant time. Trustlines for a node are stored in a linked list of pages containing at most 32 trustlines each. A node may have a very large number of trustlines, so if you had to delete a trustline with only the addresses of the two nodes, you would have to iterate through all the pages in each node looking for the trustline that links to the other node. The HighNode/LowNode fields contain pointers to the relevant page so that rippled does not have to iterate through all the pages. If there is only one page, then HighNode/LowNode will be set to a string of zeros.
-
-For more information about what a HighNode and LowNode are, see the Trust Line section in rippled/app/ledger/README.md

@@ -17,14 +17,6 @@ var Currency = require('./currency').Currency;
 // http://docs.oracle.com/javase/1.3/docs/api/java/math/BigInteger.html
 //
 
-function bignum(x) {
-  return Amount.from_json({value: x.toString()});
-};
-
-function dropsToXrp(drops) {
-  return bignum(drops).divide(1000000).to_text();
-};
-
 function Amount() {
   // Json format:
   //  integer : XRP
@@ -1255,23 +1247,6 @@ Amount.prototype.to_json = function() {
   }
 
   return result;
-};
-
-Amount.prototype.toJSON = function() {
-  if (this._is_native) {
-    return {
-      issuer: '',
-      currency: 'XRP',
-      value: dropsToXrp(this.to_text())
-    };
-  } else {
-    return {
-      issuer: this._issuer.to_json(),
-      currency: this._currency.has_interest() ?
-        this._currency.to_hex() : this._currency.to_json().toString(),
-      value: this.to_text()
-    };
-  }
 };
 
 Amount.prototype.to_text_full = function(opts) {

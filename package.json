@@ -15,7 +15,6 @@
     "test": "test"
   },
   "dependencies": {
-    "lodash": "~2.4.1",
     "async": "~0.8.0",
     "ws": "~0.4.31",
     "extend": "~1.2.1",
