@@ -17,6 +17,7 @@ var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
 var assert           = require('assert');
 var LRU              = require('lru-cache');
+var async            = require('async');
 var Server           = require('./server').Server;
 var Request          = require('./request').Request;
 var Server           = require('./server').Server;
@@ -1424,10 +1425,19 @@ Remote.prototype.requestAccountTx = function(options, callback) {
   }, options);
 
   request.once('success', function(res) {
-    if (options.parseBinary) {
-      res.transactions = res.transactions.map(Remote.parseBinaryTransaction);
+    if (!options.parseBinary) {
+      request.emit('transactions', res);
+      return;
     }
-    request.emit('transactions', res);
+
+    async.mapSeries(res.transactions, function(transaction, next) {
+      async.setImmediate(function() {
+        next(null, Remote.parseBinaryTransaction(transaction));
+      });
+    }, function(err, transactions) {
+      res.transactions = transactions;
+      request.emit('transactions', res);
+    });
   });
 
   request.callback(callback, 'transactions');
