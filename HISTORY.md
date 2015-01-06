@@ -21,7 +21,9 @@ are locally determined to have expired: `tejMaxLedger`.
 + [Update jscl library](https://github.com/ripple/ripple-lib/commit/3204998fcb6f31d6c90532a737a4adb8a1e420f6)
     - Improved entropy by taking advantage of platform crypto
     - Use jscl's k256 curve instead of altering the c256 curve with k256 configuration
-    - **deprecated:** the c256 curve is linked to the k256 curve to provide backwards compatibility, this link will be removed in the future 
+    - **deprecated:** the c256 curve is linked to the k256 curve to provide backwards compatibility, this link will be removed in the future
+     
++ [Fix empty queue check on reconnect](https://github.com/ripple/ripple-lib/commit/3c21994adcf72d1fbd87d453ceb917f9ad6df4ec)
 
 ##0.9.4
 
