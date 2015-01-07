@@ -8,6 +8,8 @@
 
 + [Fix metadata account check](https://github.com/ripple/ripple-lib/commit/3f61598d6c87e3cc877af60e2d515f9eff73dfe1)
 
++ [Decrease redundancy in binary account_tx parsing](https://github.com/ripple/ripple-lib/commit/0aba638e6e7f4f6e22cb6424eed3897ebad90a5a)
+
 
 ##0.10.0
 
