@@ -34,6 +34,7 @@ var SerializedObject = require('./serializedobject').SerializedObject;
 var RippleError      = require('./rippleerror').RippleError;
 var utils            = require('./utils');
 var sjcl             = require('./utils').sjcl;
+var hashprefixes     = require('./hashprefixes');
 var config           = require('./config');
 var log              = require('./log').internal.sub('remote');
 
@@ -1451,12 +1452,19 @@ Remote.prototype.requestAccountTx = function(options, callback) {
  */
 
 Remote.parseBinaryTransaction = function(transaction) {
-  var tx = { validated: transaction.validated };
-  tx.meta = new SerializedObject(transaction.meta).to_json();
-  tx.tx = new SerializedObject(transaction.tx_blob).to_json();
-  tx.tx.ledger_index = transaction.ledger_index;
-  tx.tx.hash = Transaction.from_json(tx.tx).hash();
-  return tx;
+  var tx_obj = new SerializedObject(transaction.tx_blob);
+  var meta = new SerializedObject(transaction.meta);
+
+  var tx_result = {
+    validated: transaction.validated,
+    ledger_index: transaction.ledger_index
+  };
+
+  tx_result.meta = meta.to_json();
+  tx_result.tx = tx_obj.to_json();
+  tx_result.tx.hash = tx_obj.hash(hashprefixes.HASH_TX_ID).to_hex();
+
+  return tx_result;
 };
 
 /**

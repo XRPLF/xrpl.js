@@ -79,28 +79,28 @@ describe('Remote', function () {
   it('remote server initialization - url object - invalid host', function() {
     assert.throws(
       function() {
-      var remote = new Remote({
-        servers: [ { host: '+', port: 443, secure: true } ]
-      });
-    }, Error);
+        var remote = new Remote({
+          servers: [ { host: '+', port: 443, secure: true } ]
+        });
+      }, Error);
   });
 
   it('remote server initialization - url object - invalid port', function() {
     assert.throws(
       function() {
-      var remote = new Remote({
-        servers: [ { host: 's-west.ripple.com', port: null, secure: true } ]
-      });
-    }, TypeError);
+        var remote = new Remote({
+          servers: [ { host: 's-west.ripple.com', port: null, secure: true } ]
+        });
+      }, TypeError);
   });
 
   it('remote server initialization - url object - port out of range', function() {
     assert.throws(
       function() {
-      var remote = new Remote({
-        servers: [ { host: 's-west.ripple.com', port: 65537, secure: true } ]
-      });
-    }, Error);
+        var remote = new Remote({
+          servers: [ { host: 's-west.ripple.com', port: 65537, secure: true } ]
+        });
+      }, Error);
   });
 
   it('remote server initialization - url string', function() {
@@ -124,30 +124,30 @@ describe('Remote', function () {
   it('remote server initialization - url string - invalid host', function() {
     assert.throws(
       function() {
-      var remote = new Remote({
-        servers: [ 'ws://+:443' ]
-      });
-    }, Error
+        var remote = new Remote({
+          servers: [ 'ws://+:443' ]
+        });
+      }, Error
     );
   });
 
   it('remote server initialization - url string - invalid port', function() {
     assert.throws(
       function() {
-      var remote = new Remote({
-        servers: [ 'ws://s-west.ripple.com:null' ]
-      });
-    }, Error
+        var remote = new Remote({
+          servers: [ 'ws://s-west.ripple.com:null' ]
+        });
+      }, Error
     );
   });
 
   it('remote server initialization - url string - port out of range', function() {
     assert.throws(
       function() {
-      var remote = new Remote({
-        servers: [ 'ws://s-west.ripple.com:65537:' ]
-      });
-    }, Error
+        var remote = new Remote({
+          servers: [ 'ws://s-west.ripple.com:65537:' ]
+        });
+      }, Error
     );
   });
 
@@ -177,92 +177,6 @@ describe('Remote', function () {
     assert.strictEqual(remote.max_fee, 1e6);
     assert.strictEqual(remote.max_fee, 1000000);
     assert.strictEqual((new Remote()).max_fee, 1e6);
-  });
-
-  describe('request constructors', function () {
-    beforeEach(function () {
-      callback = function () {}
-      remote = new Remote(options);
-    });
-
-    it('requesting a ledger', function () {
-      var request = remote.request_ledger(null, {}, callback);
-      assert(request instanceof Request);
-    });
-
-    it('requesting server info', function () {
-      var request = remote.request_server_info(null, {}, callback);
-      assert(request instanceof Request);
-    })
-
-    it('requesting peers', function () {
-      var request = remote.request_peers(null, {}, callback);
-      assert(request instanceof Request);
-    });
-
-    it('requesting a connection', function () {
-      var request = remote.request_connect(null, {}, callback);
-      assert(request instanceof Request);
-    });
-
-    it('making a unique node list add request', function () {
-      var request = remote.request_unl_add(null, {}, callback);
-      assert(request instanceof Request);
-    });
-
-    it('making a unique node list request', function () {
-      var request = remote.request_unl_list(null, {}, callback);
-      assert(request instanceof Request);
-    });
-
-    it('making a unique node list delete request', function () {
-      var request = remote.request_unl_delete(null, {}, callback);
-      assert(request instanceof Request);
-    });
-
-    it('request account currencies with ledger index', function() {
-      var request = remote.requestAccountCurrencies({account: ADDRESS});
-      assert.strictEqual(request.message.command, 'account_currencies');
-      assert.strictEqual(request.message.account, ADDRESS);
-    });
-
-    it('request account info with ledger index', function() {
-      var request = remote.requestAccountInfo({account: ADDRESS, ledger: 9592219});
-      assert.strictEqual(request.message.command, 'account_info');
-      assert.strictEqual(request.message.account, ADDRESS);
-      assert.strictEqual(request.message.ledger_index, 9592219);
-    });
-    it('request account info with ledger hash', function() {
-      var request = remote.requestAccountInfo({account: ADDRESS, ledger: LEDGER_HASH});
-      assert.strictEqual(request.message.command, 'account_info');
-      assert.strictEqual(request.message.account, ADDRESS);
-      assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
-    });
-    it('request account info with ledger identifier', function() {
-      var request = remote.requestAccountInfo({account: ADDRESS, ledger: 'validated'});
-      assert.strictEqual(request.message.command, 'account_info');
-      assert.strictEqual(request.message.account, ADDRESS);
-      assert.strictEqual(request.message.ledger_index, 'validated');
-    });
-
-    it('request account balance with ledger index', function() {
-      var request = remote.requestAccountBalance(ADDRESS, 9592219);
-      assert.strictEqual(request.message.command, 'ledger_entry');
-      assert.strictEqual(request.message.account_root, ADDRESS);
-      assert.strictEqual(request.message.ledger_index, 9592219);
-    });
-    it('request account balance with ledger hash', function() {
-      var request = remote.requestAccountBalance(ADDRESS, LEDGER_HASH);
-      assert.strictEqual(request.message.command, 'ledger_entry');
-      assert.strictEqual(request.message.account_root, ADDRESS);
-      assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
-    });
-    it('request account balance with ledger identifier', function() {
-      var request = remote.requestAccountBalance(ADDRESS, 'validated');
-      assert.strictEqual(request.message.command, 'ledger_entry');
-      assert.strictEqual(request.message.account_root, ADDRESS);
-      assert.strictEqual(request.message.ledger_index, 'validated');
-    });
   });
 
   it('pagingAccountRequest', function() {
@@ -527,26 +441,26 @@ describe('Remote', function () {
           Paths : [
             [
               {
-            account : "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            currency : "USD",
-            issuer : "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            type : 49,
-            type_hex : "0000000000000031"
-          },
-          {
-            currency : "LTC",
-            issuer : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
-            type : 48,
-            type_hex : "0000000000000030"
-          },
-          {
-            account : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
-            currency : "LTC",
-            issuer : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
-            type : 49,
-            type_hex : "0000000000000031"
-          }
-          ]
+                account : "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+                currency : "USD",
+                issuer : "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
+                type : 49,
+                type_hex : "0000000000000031"
+              },
+              {
+                currency : "LTC",
+                issuer : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+                type : 48,
+                type_hex : "0000000000000030"
+              },
+              {
+                account : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+                currency : "LTC",
+                issuer : "rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX",
+                type : 49,
+                type_hex : "0000000000000031"
+              }
+            ]
           ],
           SendMax : {
             currency : "USD",
@@ -597,4 +511,96 @@ describe('Remote', function () {
 
     })
   })
+
+  it('Remote.parseBinaryTransaction()', function() {
+    var binaryTransaction = require('./fixtures/binary-transaction.json');
+    var parsed = Remote.parseBinaryTransaction(binaryTransaction.binary);
+    assert.deepEqual(parsed, binaryTransaction.parsed);
+  });
+
+  describe('request constructors', function () {
+    beforeEach(function () {
+      callback = function () {}
+      remote = new Remote(options);
+    });
+
+    it('requesting a ledger', function () {
+      var request = remote.request_ledger(null, {}, callback);
+      assert(request instanceof Request);
+    });
+
+    it('requesting server info', function () {
+      var request = remote.request_server_info(null, {}, callback);
+      assert(request instanceof Request);
+    })
+
+    it('requesting peers', function () {
+      var request = remote.request_peers(null, {}, callback);
+      assert(request instanceof Request);
+    });
+
+    it('requesting a connection', function () {
+      var request = remote.request_connect(null, {}, callback);
+      assert(request instanceof Request);
+    });
+
+    it('making a unique node list add request', function () {
+      var request = remote.request_unl_add(null, {}, callback);
+      assert(request instanceof Request);
+    });
+
+    it('making a unique node list request', function () {
+      var request = remote.request_unl_list(null, {}, callback);
+      assert(request instanceof Request);
+    });
+
+    it('making a unique node list delete request', function () {
+      var request = remote.request_unl_delete(null, {}, callback);
+      assert(request instanceof Request);
+    });
+
+    it('request account currencies with ledger index', function() {
+      var request = remote.requestAccountCurrencies({account: ADDRESS});
+      assert.strictEqual(request.message.command, 'account_currencies');
+      assert.strictEqual(request.message.account, ADDRESS);
+    });
+
+    it('request account info with ledger index', function() {
+      var request = remote.requestAccountInfo({account: ADDRESS, ledger: 9592219});
+      assert.strictEqual(request.message.command, 'account_info');
+      assert.strictEqual(request.message.account, ADDRESS);
+      assert.strictEqual(request.message.ledger_index, 9592219);
+    });
+    it('request account info with ledger hash', function() {
+      var request = remote.requestAccountInfo({account: ADDRESS, ledger: LEDGER_HASH});
+      assert.strictEqual(request.message.command, 'account_info');
+      assert.strictEqual(request.message.account, ADDRESS);
+      assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
+    });
+    it('request account info with ledger identifier', function() {
+      var request = remote.requestAccountInfo({account: ADDRESS, ledger: 'validated'});
+      assert.strictEqual(request.message.command, 'account_info');
+      assert.strictEqual(request.message.account, ADDRESS);
+      assert.strictEqual(request.message.ledger_index, 'validated');
+    });
+
+    it('request account balance with ledger index', function() {
+      var request = remote.requestAccountBalance(ADDRESS, 9592219);
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.account_root, ADDRESS);
+      assert.strictEqual(request.message.ledger_index, 9592219);
+    });
+    it('request account balance with ledger hash', function() {
+      var request = remote.requestAccountBalance(ADDRESS, LEDGER_HASH);
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.account_root, ADDRESS);
+      assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
+    });
+    it('request account balance with ledger identifier', function() {
+      var request = remote.requestAccountBalance(ADDRESS, 'validated');
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.account_root, ADDRESS);
+      assert.strictEqual(request.message.ledger_index, 'validated');
+    });
+  });
 });
