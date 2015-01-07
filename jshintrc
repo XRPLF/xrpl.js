@@ -2,7 +2,7 @@
   "browser": true,
   "jquery": true,
   "node": true,
-  "camelcase": false,
+
   "eqeqeq": true,
   "eqnull": true,
   "latedef": true,
@@ -13,10 +13,8 @@
   "curly": true,
   "freeze": true,
   "nonbsp": true,
-  "boss": true,
-  "laxbreak": true,
   "maxparams": 4,
   "maxdepth": 3,
-  "esnext": true,
-  "-W004": true
+
+  "laxbreak": true
 }
