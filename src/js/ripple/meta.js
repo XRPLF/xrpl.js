@@ -209,4 +209,53 @@ Meta.prototype.getAffectedBooks = function() {
   return this._affectedBooks;
 };
 
+
+/**
+ * Execute a function on each affected node.
+ *
+ * The callback is passed two parameters. The first is a node object which looks
+ * like this:
+ *
+ *   {
+ *     // Type of diff, e.g. CreatedNode, ModifiedNode
+ *     nodeType: 'CreatedNode'
+ *
+ *     // Type of node affected, e.g. RippleState, AccountRoot
+ *     entryType: 'RippleState',
+ *
+ *     // Index of the ledger this change occurred in
+ *     ledgerIndex: '01AB01AB...',
+ *
+ *     // Contains all fields with later versions taking precedence
+ *     //
+ *     // This is a shorthand for doing things like checking which account
+ *     // this affected without having to check the nodeType.
+ *     fields: {...},
+ *
+ *     // Old fields (before the change)
+ *     fieldsPrev: {...},
+ *
+ *     // New fields (that have been added)
+ *     fieldsNew: {...},
+ *
+ *     // Changed fields
+ *     fieldsFinal: {...}
+ *   }
+ */
+
+[
+ 'forEach',
+ 'map',
+ 'filter',
+ 'every',
+ 'some',
+ 'reduce'
+].forEach(function(fn) {
+  Meta.prototype[fn] = function() {
+    return Array.prototype[fn].apply(this.nodes, arguments);
+  };
+});
+
+Meta.prototype.each = Meta.prototype.forEach;
+
 exports.Meta = Meta;
