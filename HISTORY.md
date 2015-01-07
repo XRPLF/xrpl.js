@@ -1,3 +1,14 @@
+##0.10.1
+
++ [Track the funded status of an order based on cumulative account orders](https://github.com/ripple/ripple-lib/commit/67d39737a4d5e0fcd9d9b47b9083ee00e5a9e652) and [67d3973](https://github.com/ripple/ripple-lib/commit/b6b99dde022e1e14c4797e454b1d7fca50e49482)
+
++ [Add support for `ledger` option in requestBookOffers](https://github.com/ripple/ripple-lib/commit/34c0677c453c409ef0a5b351959abdc176d3bacb)
+
++ [Add support for `limit` option in requestBookOffers](https://github.com/ripple/ripple-lib/commit/d1d4452217c878d0b377d24830b4cd8b3162f6e0)
+
++ [Fix metadata account check](https://github.com/ripple/ripple-lib/commit/3f61598d6c87e3cc877af60e2d515f9eff73dfe1)
+
+
 ##0.10.0
 
 + [Transaction changes](https://github.com/ripple/ripple-lib/pull/221)
