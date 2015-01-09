@@ -2,8 +2,6 @@ var utils   = require('./utils');
 var config  = require('./config');
 var extend  = require('extend');
 
-var BigInteger = utils.jsbn.BigInteger;
-
 var UInt = require('./uint').UInt;
 var Base = require('./base').Base;
 
@@ -12,7 +10,6 @@ var Base = require('./base').Base;
 //
 
 var UInt160 = extend(function() {
-  // Internal form: NaN or BigInteger
   this._value  = NaN;
   this._version_byte = void(0);
   this._update();
@@ -49,7 +46,7 @@ UInt160.prototype.parse_json = function(j) {
     // Allow raw numbers - DEPRECATED
     // This is used mostly by the test suite and is supported
     // as a legacy feature only. DO NOT RELY ON THIS BEHAVIOR.
-    this._value = new BigInteger(String(j));
+    this.parse_number(j);
     this._version_byte = Base.VER_ACCOUNT_ID;
   } else if (typeof j !== 'string') {
     this._value = NaN;
@@ -83,7 +80,7 @@ UInt160.prototype.parse_generic = function(j) {
 UInt160.prototype.to_json = function(opts) {
   opts  = opts || {};
 
-  if (this._value instanceof BigInteger) {
+  if (this.is_valid()) {
     // If this value has a type, return a Base58 encoded string.
     if (typeof this._version_byte === 'number') {
       var output = Base.encode_check(this._version_byte, this.to_bytes());

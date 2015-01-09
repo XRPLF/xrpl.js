@@ -6,8 +6,6 @@ var extend = require('extend');
 var utils  = require('./utils');
 var sjcl   = utils.sjcl;
 
-var BigInteger = utils.jsbn.BigInteger;
-
 var Base    = require('./base').Base;
 var UInt    = require('./uint').UInt;
 var UInt256 = require('./uint256').UInt256;
@@ -15,7 +13,6 @@ var UInt160 = require('./uint160').UInt160;
 var KeyPair = require('./keypair').KeyPair;
 
 var Seed = extend(function () {
-  // Internal form: NaN or BigInteger
   this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;
 }, UInt);
@@ -60,7 +57,7 @@ Seed.prototype.parse_passphrase = function (j) {
 };
 
 Seed.prototype.to_json = function () {
-  if (!(this._value instanceof BigInteger)) {
+  if (!(this.is_valid())) {
     return NaN;
   }
 

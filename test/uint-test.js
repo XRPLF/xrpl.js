@@ -9,8 +9,8 @@ describe('UInt', function() {
         assert.strictEqual(val.to_hex(), '00000000000000000000000000000000');
       });
       it('should create 00000000000000000000000000000001 when called with 1', function () {
-        var val = UInt128.from_number(0);
-        assert.strictEqual(val.to_hex(), '00000000000000000000000000000000');
+        var val = UInt128.from_number(1);
+        assert.strictEqual(val.to_hex(), '00000000000000000000000000000001');
       });
       it('should create 000000000000000000000000FFFFFFFF when called with 0xFFFFFFFF', function () {
         var val = UInt128.from_number(0xFFFFFFFF);

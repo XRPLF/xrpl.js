@@ -2,8 +2,6 @@ var sjcl    = require('./utils').sjcl;
 var utils   = require('./utils');
 var extend  = require('extend');
 
-var BigInteger = utils.jsbn.BigInteger;
-
 var Base = {};
 
 var alphabets = Base.alphabets = {
@@ -25,33 +23,142 @@ extend(Base, {
 
 function sha256(bytes) {
   return sjcl.codec.bytes.fromBits(sjcl.hash.sha256.hash(sjcl.codec.bytes.toBits(bytes)));
-};
+}
 
 function sha256hash(bytes) {
   return sha256(sha256(bytes));
-};
+}
+
+function divmod58(number, startAt) {
+    var remainder = 0;
+    for (var i = startAt; i < number.length; i++) {
+        var digit256 = number[i] & 0xFF;
+        var temp = remainder * 256 + digit256;
+        number[i] = (temp / 58);
+        remainder = temp % 58;
+    }
+    return remainder;
+}
+
+function  divmod256(number58, startAt) {
+    var remainder = 0;
+    for (var i = startAt; i < number58.length; i++) {
+        var digit58 = number58[i] & 0xFF;
+        var temp = remainder * 58 + digit58;
+        number58[i] = (temp / 256);
+        remainder = temp % 256;
+    }
+    return remainder;
+}
+
+function encodeString (alphabet, input) {
+  if (input.length == 0) {
+    return [];
+  }
+
+  // we need to copy the buffer for calc
+  scratch = input.slice();
+
+  // Count leading zeroes.
+  var zeroCount = 0;
+  while (zeroCount < scratch.length &&
+           scratch[zeroCount] == 0)
+    ++zeroCount;
+
+  // The actual encoding.
+  var out = new Array(scratch.length * 2);
+  var j = out.length;
+  var startAt = zeroCount;
+
+  while (startAt < scratch.length) {
+    var mod = divmod58(scratch, startAt);
+    if (scratch[startAt] == 0) {
+      ++startAt;
+    }
+    out[--j] = alphabet[mod];
+  }
+
+  // Strip extra 'r' if there are some after decoding.
+  while (j < out.length && out[j] == alphabet[0]) ++j;
+  // Add as many leading 'r' as there were leading zeros.
+  while (--zeroCount >= 0) out[--j] = alphabet[0];
+  while(j--) out.shift();
+
+  return out.join('');
+}
+
+function decodeString(indexes, input)  {
+  var isString = typeof input === 'string';
+
+  if (input.length == 0) {
+    return [];
+  }
+
+  input58 = new Array(input.length);
+
+  // Transform the String to a base58 byte sequence
+  for (var i = 0; i < input.length; ++i) {
+    if (isString) {
+      var c = input.charCodeAt(i);
+    }
+
+    var digit58 = -1;
+    if (c >= 0 && c < 128) {
+      digit58 = indexes[c];
+    }
+    if (digit58 < 0) {
+      throw new Error("Illegal character " + c + " at " + i);
+    }
+
+    input58[i] = digit58;
+  }
+  // Count leading zeroes
+  var zeroCount = 0;
+  while (zeroCount < input58.length && input58[zeroCount] == 0) {
+    ++zeroCount;
+  }
+  // The encoding
+  out = utils.arraySet(input.length, 0);
+  var j = out.length;
+
+  var startAt = zeroCount;
+  while (startAt < input58.length) {
+    var mod = divmod256(input58, startAt);
+    if (input58[startAt] == 0) {
+      ++startAt;
+    }
+    out[--j] = mod;
+  }
+
+  // Do no add extra leading zeroes, move j to first non null byte.
+  while (j < out.length && (out[j] == 0)) ++j;
+
+  j -= zeroCount;
+  while(j--) out.shift();
+
+  return out;
+}
+
+function Base58(alphabet) {
+  var indexes = utils.arraySet(128, -1);
+  for (var i = 0; i < alphabet.length; i++) {
+    indexes[alphabet.charCodeAt(i)] = i;
+  }
+  return {
+    decode: decodeString.bind(null, indexes),
+    encode: encodeString.bind(null, alphabet)
+  };
+}
+
+Base.encoders = {};
+Object.keys(alphabets).forEach(function(alphabet){
+  Base.encoders[alphabet] = Base58(alphabets[alphabet]);
+});
 
 // --> input: big-endian array of bytes.
 // <-- string at least as long as input.
 Base.encode = function(input, alpha) {
-  var alphabet = alphabets[alpha || 'ripple'];
-  var bi_base  = new BigInteger(String(alphabet.length));
-  var bi_q     = new BigInteger();
-  var bi_r     = new BigInteger();
-  var bi_value = new BigInteger(input);
-  var buffer   = [];
-
-  while (bi_value.compareTo(BigInteger.ZERO) > 0) {
-    bi_value.divRemTo(bi_base, bi_q, bi_r);
-    bi_q.copyTo(bi_value);
-    buffer.push(alphabet[bi_r.intValue()]);
-  }
-
-  for (var i=0; i !== input.length && !input[i]; i += 1) {
-    buffer.push(alphabet[0]);
-  }
-
-  return buffer.reverse().join('');
+  return this.encoders[alpha || 'ripple'].encode(input);
 };
 
 // --> input: String
@@ -60,48 +167,12 @@ Base.decode = function(input, alpha) {
   if (typeof input !== 'string') {
     return void(0);
   }
-
-  var alphabet = alphabets[alpha || 'ripple'];
-  var bi_base  = new BigInteger(String(alphabet.length));
-  var bi_value = new BigInteger();
-  var i;
-
-  for (i = 0; i !== input.length && input[i] === alphabet[0]; i += 1) {
+  try {
+    return this.encoders[alpha || 'ripple'].decode(input);
   }
-
-  for (; i !== input.length; i += 1) {
-    var v = alphabet.indexOf(input[i]);
-
-    if (v < 0) {
-      return void(0);
-    }
-
-    var r = new BigInteger();
-    r.fromInt(v);
-    bi_value  = bi_value.multiply(bi_base).add(r);
+  catch(e) {
+    return (void 0);
   }
-
-  // toByteArray:
-  // - Returns leading zeros!
-  // - Returns signed bytes!
-  var bytes =  bi_value.toByteArray().map(function(b) { return b ? b < 0 ? 256+b : b : 0; });
-  var extra = 0;
-
-  while (extra !== bytes.length && !bytes[extra]) {
-    extra += 1;
-  }
-
-  if (extra) {
-    bytes = bytes.slice(extra);
-  }
-
-  var zeros = 0;
-
-  while (zeros !== input.length && input[zeros] === alphabet[0]) {
-    zeros += 1;
-  }
-
-  return [].concat(utils.arraySet(zeros, 0), bytes);
 };
 
 Base.verify_checksum = function(bytes) {
@@ -129,7 +200,7 @@ Base.encode_check = function(version, input, alphabet) {
 };
 
 // --> input : String
-// <-- NaN || BigInteger
+// <-- NaN || sjcl.bn
 Base.decode_check = function(version, input, alphabet) {
   var buffer = Base.decode(input, alphabet);
 
@@ -163,7 +234,8 @@ Base.decode_check = function(version, input, alphabet) {
   // intrepret the value as a negative number
   buffer[0] = 0;
 
-  return new BigInteger(buffer.slice(0, -4), 256);
+  return sjcl.bn.fromBits (
+      sjcl.codec.bytes.toBits(buffer.slice(0, -4)));
 };
 
 exports.Base = Base;

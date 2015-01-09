@@ -1,53 +1,45 @@
 // Represent Ripple amounts and currencies.
 // - Numbers in hex are big-endian.
 
-var extend = require('extend');
-var utils = require('./utils');
-var sjcl  = utils.sjcl;
-var bn    = sjcl.bn;
-
-var BigInteger = utils.jsbn.BigInteger;
-
-var UInt160  = require('./uint160').UInt160;
-var Seed     = require('./seed').Seed;
-var Currency = require('./currency').Currency;
-
-//
-// Amount class in the style of Java's BigInteger class
-// http://docs.oracle.com/javase/1.3/docs/api/java/math/BigInteger.html
-//
+var assert    = require('assert');
+var extend    = require('extend');
+var utils     = require('./utils');
+var UInt160   = require('./uint160').UInt160;
+var Seed      = require('./seed').Seed;
+var Currency  = require('./currency').Currency;
+var BigNumber = require('./bignumber');
 
 function Amount() {
   // Json format:
   //  integer : XRP
   //  { 'value' : ..., 'currency' : ..., 'issuer' : ...}
 
-  this._value       = new BigInteger(); // NaN for bad value. Always positive.
-  this._offset      = 0; // Always 0 for XRP.
+  this._value       = new BigNumber(NaN);
   this._is_native   = true; // Default to XRP. Only valid if value is not NaN.
-  this._is_negative = false;
   this._currency    = new Currency();
   this._issuer      = new UInt160();
-};
+}
 
 var consts = {
   currency_xns:      0,
   currency_one:      1,
   xns_precision:     6,
 
-  // BigInteger values prefixed with bi_.
-  bi_5:              new BigInteger('5'),
-  bi_7:              new BigInteger('7'),
-  bi_10:             new BigInteger('10'),
-  bi_1e14:           new BigInteger(String(1e14)),
-  bi_1e16:           new BigInteger(String(1e16)),
-  bi_1e17:           new BigInteger(String(1e17)),
-  bi_1e32:           new BigInteger('100000000000000000000000000000000'),
-  bi_man_max_value:  new BigInteger('9999999999999999'),
-  bi_man_min_value:  new BigInteger('1000000000000000'),
-  bi_xns_max:        new BigInteger('9000000000000000000'), // Json wire limit.
-  bi_xns_min:        new BigInteger('-9000000000000000000'),// Json wire limit.
-  bi_xns_unit:       new BigInteger('1000000'),
+  // bi_ prefix refers to "big integer"
+  bi_5:              new BigNumber('5'),
+  bi_7:              new BigNumber('7'),
+  bi_10:             new BigNumber('10'),
+  bi_1e14:           new BigNumber(String(1e14)),
+  bi_1e16:           new BigNumber(String(1e16)),
+  bi_1e17:           new BigNumber(String(1e17)),
+  bi_1e32:           new BigNumber('100000000000000000000000000000000'),
+  bi_man_max_value:  new BigNumber('9999999999999999'),
+  bi_man_min_value:  new BigNumber('1000000000000000'),
+  bi_xns_max:        new BigNumber('9000000000000000000'), // Json wire limit.
+  bi_xns_min:        new BigNumber('-9000000000000000000'),// Json wire limit.
+  bi_xrp_max:        new BigNumber('9000000000000'),
+  bi_xrp_min:        new BigNumber('-9000000000000'),
+  bi_xns_unit:       new BigNumber('1000000'),
 
   cMinOffset:        -96,
   cMaxOffset:        80,
@@ -101,8 +93,16 @@ Amount.is_valid_full = function(j) {
 
 Amount.NaN = function() {
   var result = new Amount();
-  result._value = NaN;
-  return result;
+  result._value = new BigNumber(NaN); // should have no effect
+  return result;                      // but let's be careful
+};
+
+// be sure that _is_native is set properly BEFORE calling _set_value
+Amount.prototype._set_value = function(value, roundingMode) {
+  assert(value instanceof BigNumber);
+  this._value = value.isZero() && value.isNegative() ? value.negated() : value;
+  this.canonicalize(roundingMode);
+  this._check_limits();
 };
 
 // Returns a new value which is the absolute value of this.
@@ -110,170 +110,47 @@ Amount.prototype.abs = function() {
   return this.clone(this.is_negative());
 };
 
-// Result in terms of this' currency and issuer.
-Amount.prototype.add = function(v) {
-  var result;
+Amount.prototype.add = function(addend) {
+  var addendAmount = Amount.from_json(addend);
 
-  v = Amount.from_json(v);
-
-  if (!this.is_comparable(v)) {
-    result              = Amount.NaN();
-  } else if (v.is_zero()) {
-    result              = this;
-  } else if (this.is_zero()) {
-    result              = v.clone();
-    result._is_native   = this._is_native;
-    result._currency    = this._currency;
-    result._issuer      = this._issuer;
-  } else if (this._is_native) {
-    result              = new Amount();
-
-    var v1  = this._is_negative ? this._value.negate() : this._value;
-    var v2  = v._is_negative ? v._value.negate() : v._value;
-    var s   = v1.add(v2);
-
-    result._is_negative = s.compareTo(BigInteger.ZERO) < 0;
-    result._value       = result._is_negative ? s.negate() : s;
-    result._currency    = this._currency;
-    result._issuer      = this._issuer;
-  } else {
-    var v1  = this._is_negative ? this._value.negate() : this._value;
-    var o1  = this._offset;
-    var v2  = v._is_negative ? v._value.negate() : v._value;
-    var o2  = v._offset;
-
-    while (o1 < o2) {
-      v1  = v1.divide(Amount.bi_10);
-      o1  += 1;
-    }
-
-    while (o2 < o1) {
-      v2  = v2.divide(Amount.bi_10);
-      o2  += 1;
-    }
-
-    result = new Amount();
-    result._is_native = false;
-    result._offset = o1;
-    result._value = v1.add(v2);
-    result._is_negative = result._value.compareTo(BigInteger.ZERO) < 0;
-
-    if (result._is_negative) {
-      result._value = result._value.negate();
-    }
-
-    result._currency = this._currency;
-    result._issuer = this._issuer;
-
-    result.canonicalize();
+  if (!this.is_comparable(addendAmount)) {
+    return Amount.NaN();
   }
 
-  return result;
+  return this._copy(this._value.plus(addendAmount._value));
 };
 
-// Result in terms of this currency and issuer.
-Amount.prototype.subtract = function(v) {
+Amount.prototype.subtract = function(subtrahend) {
   // Correctness over speed, less code has less bugs, reuse add code.
-  return this.add(Amount.from_json(v).negate());
+  return this.add(Amount.from_json(subtrahend).negate());
 };
 
-// Result in terms of this' currency and issuer.
 // XXX Diverges from cpp.
-Amount.prototype.multiply = function(v) {
-  var result;
-
-  v = Amount.from_json(v);
-
-  if (this.is_zero()) {
-    result = this;
-  } else if (v.is_zero()) {
-    result = this.clone();
-    result._value = BigInteger.ZERO;
-  } else {
-    var v1 = this._value;
-    var o1 = this._offset;
-    var v2 = v._value;
-    var o2 = v._offset;
-
-    if (this.is_native()) {
-      while (v1.compareTo(Amount.bi_man_min_value) < 0) {
-        v1 = v1.multiply(Amount.bi_10);
-        o1 -= 1;
-      }
-    }
-
-    if (v.is_native()) {
-      while (v2.compareTo(Amount.bi_man_min_value) < 0) {
-        v2 = v2.multiply(Amount.bi_10);
-        o2 -= 1;
-      }
-    }
-
-    result              = new Amount();
-    result._offset      = o1 + o2 + 14;
-    result._value       = v1.multiply(v2).divide(Amount.bi_1e14).add(Amount.bi_7);
-    result._is_native   = this._is_native;
-    result._is_negative = this._is_negative !== v._is_negative;
-    result._currency    = this._currency;
-    result._issuer      = this._issuer;
-
-    result.canonicalize();
-  }
-
-  return result;
+Amount.prototype.multiply = function(multiplicand) {
+  var multiplicandAmount = Amount.from_json(multiplicand);
+  // TODO: probably should just multiply by multiplicandAmount._value
+  var multiplyBy = multiplicandAmount.is_native() ?
+    multiplicandAmount._value.times(Amount.bi_xns_unit)
+    : multiplicandAmount._value;
+  return this._copy(this._value.times(multiplyBy));
 };
 
-// Result in terms of this' currency and issuer.
-Amount.prototype.divide = function(d) {
-  var result;
-
-  d = Amount.from_json(d);
-
-  if (d.is_zero()) {
+Amount.prototype.divide = function(divisor) {
+  var divisorAmount = Amount.from_json(divisor);
+  if (!this.is_valid()) {
+    throw new Error('Invalid dividend');
+  }
+  if (!divisorAmount.is_valid()) {
+    throw new Error('Invalid divisor');
+  }
+  if (divisorAmount.is_zero()) {
     throw new Error('divide by zero');
   }
-
-  if (this.is_zero()) {
-    result = this;
-  } else if (!this.is_valid()) {
-    throw new Error('Invalid dividend');
-  } else if (!d.is_valid()) {
-    throw new Error('Invalid divisor');
-  } else {
-    var _n = this;
-
-    if (_n.is_native()) {
-      _n  = _n.clone();
-
-      while (_n._value.compareTo(Amount.bi_man_min_value) < 0) {
-        _n._value  = _n._value.multiply(Amount.bi_10);
-        _n._offset -= 1;
-      }
-    }
-
-    var _d = d;
-
-    if (_d.is_native()) {
-      _d = _d.clone();
-
-      while (_d._value.compareTo(Amount.bi_man_min_value) < 0) {
-        _d._value  = _d._value.multiply(Amount.bi_10);
-        _d._offset -= 1;
-      }
-    }
-
-    result              = new Amount();
-    result._offset      = _n._offset - _d._offset - 17;
-    result._value       = _n._value.multiply(Amount.bi_1e17).divide(_d._value).add(Amount.bi_5);
-    result._is_native   = _n._is_native;
-    result._is_negative = _n._is_negative !== _d._is_negative;
-    result._currency    = _n._currency;
-    result._issuer      = _n._issuer;
-
-    result.canonicalize();
-  }
-
-  return result;
+  // TODO: probably should just divide by divisorAmount._value
+  var divideBy = divisorAmount.is_native() ?
+    divisorAmount._value.times(Amount.bi_xns_unit)
+    : divisorAmount._value;
+  return this._copy(this._value.dividedBy(divideBy));
 };
 
 /**
@@ -307,8 +184,6 @@ Amount.prototype.ratio_human = function(denominator, opts) {
     denominator = Amount.from_json(denominator);
   }
 
-  denominator = Amount.from_json(denominator);
-
   // If either operand is NaN, the result is NaN.
   if (!numerator.is_valid() || !denominator.is_valid()) {
     return Amount.NaN();
@@ -337,9 +212,7 @@ Amount.prototype.ratio_human = function(denominator, opts) {
   //
   // To compensate, we multiply the numerator by 10^xns_precision.
   if (denominator._is_native) {
-    numerator = numerator.clone();
-    numerator._value = numerator._value.multiply(Amount.bi_xns_unit);
-    numerator.canonicalize();
+    numerator._set_value(numerator._value.times(Amount.bi_xns_unit));
   }
 
   return numerator.divide(denominator);
@@ -396,8 +269,7 @@ Amount.prototype.product_human = function(factor, opts) {
   //
   // See also Amount#ratio_human.
   if (factor._is_native) {
-    product._value = product._value.divide(Amount.bi_xns_unit);
-    product.canonicalize();
+    product._set_value(product._value.dividedBy(Amount.bi_xns_unit));
   }
 
   return product;
@@ -409,10 +281,7 @@ Amount.prototype.product_human = function(factor, opts) {
  * @private
  */
 Amount.prototype._invert = function() {
-  this._value = Amount.bi_1e32.divide(this._value);
-  this._offset = -32 - this._offset;
-  this.canonicalize();
-
+  this._set_value((new BigNumber(1)).dividedBy(this._value));
   return this;
 };
 
@@ -423,7 +292,7 @@ Amount.prototype._invert = function() {
  *   inverse of the value.
  */
 Amount.prototype.invert = function() {
-  return this.copy()._invert();
+  return this.clone()._invert();
 };
 
 /**
@@ -453,56 +322,35 @@ Amount.prototype.invert = function() {
  * @returns {Amount}
  * @throws {Error} if offset exceeds legal ranges, meaning the amount value is bigger than supported
  */
-Amount.prototype.canonicalize = function() {
-  if (!(this._value instanceof BigInteger)) {
-    // NaN.
-    // nothing
-  } else if (this._is_native) {
-    // Native.
-    if (this._value.equals(BigInteger.ZERO)) {
-      this._offset      = 0;
-      this._is_negative = false;
-    } else {
-      // Normalize _offset to 0.
 
-      while (this._offset < 0) {
-        this._value  = this._value.divide(Amount.bi_10);
-        this._offset += 1;
-      }
-
-      while (this._offset > 0) {
-        this._value  = this._value.multiply(Amount.bi_10);
-        this._offset -= 1;
-      }
-    }
-
-  } else if (this.is_zero()) {
-    this._offset      = Amount.cMinOffset;
-    this._is_negative = false;
+Amount.prototype.canonicalize = function(roundingMode) {
+  if (this._is_native) {
+    this._value = this._value.round(6, BigNumber.ROUND_DOWN);
   } else {
-    // Normalize mantissa to valid range.
-
-    while (this._value.compareTo(Amount.bi_man_min_value) < 0) {
-      this._value  = this._value.multiply(Amount.bi_10);
-      this._offset -= 1;
-    }
-
-    while (this._value.compareTo(Amount.bi_man_max_value) > 0) {
-      this._value  = this._value.divide(Amount.bi_10);
-      this._offset += 1;
+    if (roundingMode) {
+      var value = this._value;
+      this._value = BigNumber.withRoundingMode(roundingMode, function() {
+        return new BigNumber(value.toPrecision(16));
+      });
+    } else {
+      this._value = new BigNumber(this._value.toPrecision(16));
     }
   }
+};
 
-  // Make sure not bigger than supported. Throw if so.
-  if (this.is_negative() && this._offset < Amount.cMinOffset) {
-    throw new Error('Exceeding min value of ' + Amount.min_value);
+Amount.prototype._check_limits = function() {
+  if (this._value.isNaN() || this._value.isZero()) {
+    return this;
   }
-
-  // Make sure not smaller than supported. Throw if so.
-  if (!this.is_negative() && this._offset > Amount.cMaxOffset) {
-    throw new Error('Exceeding max value of ' + Amount.max_value);
+  if (!this._is_native) {
+    var absval = this._value.absoluteValue();
+    if (absval.lessThan((new BigNumber(Amount.min_value)).absoluteValue())) {
+      throw new Error('Exceeding min value of ' + Amount.min_value);
+    }
+    if (absval.greaterThan(new BigNumber(Amount.max_value))) {
+      throw new Error('Exceeding max value of ' + Amount.max_value);
+    }
   }
-
   return this;
 };
 
@@ -510,61 +358,27 @@ Amount.prototype.clone = function(negate) {
   return this.copyTo(new Amount(), negate);
 };
 
-Amount.prototype.compareTo = function(v) {
-  var result;
+Amount.prototype._copy = function(value) {
+  var copy = this.clone();
+  copy._set_value(value);
+  return copy;
+};
 
-  v = Amount.from_json(v);
-
-  if (!this.is_comparable(v)) {
-    result  = Amount.NaN();
-  } else if (this._is_negative !== v._is_negative) {
-    // Different sign.
-    result  = this._is_negative ? -1 : 1;
-  } else if (this._value.equals(BigInteger.ZERO)) {
-    // Same sign: positive.
-    result  = v._value.equals(BigInteger.ZERO) ? 0 : -1;
-  } else if (v._value.equals(BigInteger.ZERO)) {
-    // Same sign: positive.
-    result  = 1;
-  } else if (!this._is_native && this._offset > v._offset) {
-    result  = this._is_negative ? -1 : 1;
-  } else if (!this._is_native && this._offset < v._offset) {
-    result  = this._is_negative ? 1 : -1;
-  } else {
-    result  = this._value.compareTo(v._value);
-    if (result > 0) {
-      result  = this._is_negative ? -1 : 1;
-    } else if (result < 0) {
-      result  = this._is_negative ? 1 : -1;
-    }
+Amount.prototype.compareTo = function(to) {
+  var toAmount = Amount.from_json(to);
+  if (!this.is_comparable(toAmount)) {
+    return Amount.NaN();
   }
-
-  return result;
+  return this._value.comparedTo(toAmount._value);
 };
 
 // Make d a copy of this. Returns d.
 // Modification of objects internally refered to is not allowed.
 Amount.prototype.copyTo = function(d, negate) {
-  if (typeof this._value === 'object') {
-    this._value.copyTo(d._value);
-  } else {
-    d._value   = this._value;
-  }
-
-  d._offset = this._offset;
+  d._value     = negate ? this._value.negated() : this._value;
   d._is_native = this._is_native;
-  d._is_negative  = negate
-    ? !this._is_negative    // Negating.
-    : this._is_negative;    // Just copying.
-
-  d._currency     = this._currency;
-  d._issuer       = this._issuer;
-
-  // Prevent negative zero
-  if (d.is_zero()) {
-    d._is_negative = false;
-  }
-
+  d._currency  = this._currency;
+  d._issuer    = this._issuer;
   return d;
 };
 
@@ -577,20 +391,16 @@ Amount.prototype.equals = function(d, ignore_issuer) {
     return this.equals(Amount.from_json(d));
   }
 
-  var result = !((!this.is_valid() || !d.is_valid())
-             || (this._is_native !== d._is_native)
-             || (!this._value.equals(d._value) || this._offset !== d._offset)
-             || (this._is_negative !== d._is_negative)
-             || (!this._is_native && (!this._currency.equals(d._currency) || !ignore_issuer && !this._issuer.equals(d._issuer))));
-
-  return result;
+  return this.is_valid() && d.is_valid()
+         && this._is_native === d._is_native
+         && this._value.equals(d._value)
+         && (this._is_native || (this._currency.equals(d._currency)
+              && (ignore_issuer || this._issuer.equals(d._issuer))));
 };
 
 // True if Amounts are valid and both native or non-native.
 Amount.prototype.is_comparable = function(v) {
-  return this._value instanceof BigInteger
-    && v._value instanceof BigInteger
-    && this._is_native === v._is_native;
+  return this.is_valid() && v.is_valid() && this._is_native === v._is_native;
 };
 
 Amount.prototype.is_native = function() {
@@ -598,9 +408,7 @@ Amount.prototype.is_native = function() {
 };
 
 Amount.prototype.is_negative = function() {
-  return this._value instanceof BigInteger
-          ? this._is_negative
-          : false;                          // NaN is not negative
+  return this._value.isNegative();
 };
 
 Amount.prototype.is_positive = function() {
@@ -609,7 +417,7 @@ Amount.prototype.is_positive = function() {
 
 // Only checks the value. Not the currency and issuer.
 Amount.prototype.is_valid = function() {
-  return this._value instanceof BigInteger;
+  return !this._value.isNaN();
 };
 
 Amount.prototype.is_valid_full = function() {
@@ -617,7 +425,7 @@ Amount.prototype.is_valid_full = function() {
 };
 
 Amount.prototype.is_zero = function() {
-  return this._value instanceof BigInteger ? this._value.equals(BigInteger.ZERO) : false;
+  return this._value.isZero();
 };
 
 Amount.prototype.issuer = function() {
@@ -627,23 +435,6 @@ Amount.prototype.issuer = function() {
 // Return a new value.
 Amount.prototype.negate = function() {
   return this.clone('NEGATE');
-};
-
-/**
- * Invert this amount and return the new value.
- *
- * Creates a new Amount object as a copy of the current one (including the same
- * unit (currency & issuer), inverts it (1/x) and returns the result.
- */
-Amount.prototype.invert = function() {
-  var one          = this.clone();
-  one._value       = BigInteger.ONE;
-  one._offset      = 0;
-  one._is_negative = false;
-
-  one.canonicalize();
-
-  return one.ratio_human(this);
 };
 
 /**
@@ -659,96 +450,71 @@ Amount.prototype.invert = function() {
  *
  * The regular expression below matches above cases, broken down for better understanding:
  *
- * ^\s*                         // start with any amount of whitespace
  * ([A-z]{3}|[0-9]{3})          // either 3 letter alphabetic currency-code or 3 digit numeric currency-code. See ISO 4217
- * \s*                          // any amount of whitespace
- * (-)?                         // optional dash
- * (\d+)                        // 1 or more digits
- * (?:\.(\d*))?                 // optional . character with any amount of digits
- * \s*                          // any amount of whitespace
- * ([A-z]{3}|[0-9]{3})?         // either 3 letter alphabetic currency-code or 3 digit numeric currency-code. See ISO 4217
- * \s*                          // any amount of whitespace
  * $                            // end of string
  *
  */
-Amount.human_RE_hex = /^\s*(-)?(\d+)(?:\.(\d*))?\s*([a-fA-F0-9]{40})\s*$/;
-Amount.human_RE = /^\s*([A-z]{3}|[0-9]{3})?\s*(-)?(\d+)(?:\.(\d*))?\s*([A-z]{3}|[0-9]{3})?\s*$/;
 
 Amount.prototype.parse_human = function(j, opts) {
   opts = opts || {};
 
-  var integer;
-  var fraction;
+  var hex_RE = /^[a-fA-F0-9]{40}$/;
+  var currency_RE = /^([a-zA-Z]{3}|[0-9]{3})$/;
+
+  var value;
   var currency;
-  var precision  = null;
 
-  // first check if it's a hex formatted currency
-  var matches = String(j).match(Amount.human_RE_hex);
-  if (matches && matches.length === 5 && matches[4]) {
-    integer  = matches[2];
-    fraction = matches[3] || '';
-    currency = matches[4];
-    this._is_negative = Boolean(matches[1]);
-  }
+  var words = j.split(' ').filter(function(word) { return word !== ''; });
 
-  if (integer === void(0) && currency === void(0)) {
-    var m = String(j).match(Amount.human_RE);
-    if (m) {
-      currency = m[5] || m[1] || 'XRP';
-      integer = m[5] && m[1] ? m[1] + '' + m[3] : (m[3] || '0');
-      fraction = m[4] || '';
-      this._is_negative = Boolean(m[2]);
-    }
-  }
-
-  if (integer) {
-    currency = currency.toUpperCase();
-
-    this._value = new BigInteger(integer);
-    this.set_currency(currency);
-
-    // XRP have exactly six digits of precision
-    if (currency === 'XRP') {
-      fraction = fraction.slice(0, 6);
-      while (fraction.length < 6) {
-        fraction += '0';
-      }
-      this._is_native = true;
-      this._value     = this._value.multiply(Amount.bi_xns_unit).add(new BigInteger(fraction));
+  if (words.length === 1) {
+    if (isFinite(words[0])) {
+      value = words[0];
+      currency = 'XRP';
     } else {
-      // Other currencies have arbitrary precision
-      fraction  = fraction.replace(/0+$/, '');
-      precision = fraction.length;
-
-      this._is_native = false;
-      var multiplier  = Amount.bi_10.clone().pow(precision);
-      this._value     = this._value.multiply(multiplier).add(new BigInteger(fraction));
-      this._offset    = -precision;
-
-      this.canonicalize();
-    }
-
-    // Apply interest/demurrage
-    if (opts.reference_date && this._currency.has_interest()) {
-      var interest = this._currency.get_interest_at(opts.reference_date);
-
-      // XXX Because the Amount parsing routines don't support some of the things
-      //     that JavaScript can output when casting a float to a string, the
-      //     following call sometimes does not produce a valid Amount.
-      //
-      //     The correct way to solve this is probably to switch to a proper
-      //     BigDecimal for our internal representation and then use that across
-      //     the board instead of instantiating these dummy Amount objects.
-      var interestTempAmount = Amount.from_json(''+interest+'/1/1');
-
-      if (interestTempAmount.is_valid()) {
-        var ref = this.divide(interestTempAmount);
-        this._value = ref._value;
-        this._offset = ref._offset;
+      value = words[0].slice(0, -3);
+      currency = words[0].slice(-3);
+      if (!(isFinite(value) && currency.match(currency_RE))) {
+        return Amount.NaN();
       }
+    }
+  } else if (words.length === 2) {
+    if (isFinite(words[0]) && words[1].match(hex_RE)) {
+      value = words[0];
+      currency = words[1];
+    } else if (words[0].match(currency_RE) && isFinite(words[1])) {
+      value = words[1];
+      currency = words[0];
+    } else if (isFinite(words[0]) && words[1].match(currency_RE)) {
+      value = words[0];
+      currency = words[1];
+    } else {
+      return Amount.NaN();
     }
   } else {
-    this._value = NaN;
+    return Amount.NaN();
+  }
+
+  currency = currency.toUpperCase();
+  this.set_currency(currency);
+  this._is_native = (currency === 'XRP');
+  this._set_value(new BigNumber(value));
+
+  // Apply interest/demurrage
+  if (opts.reference_date && this._currency.has_interest()) {
+    var interest = this._currency.get_interest_at(opts.reference_date);
+
+    // XXX Because the Amount parsing routines don't support some of the things
+    //     that JavaScript can output when casting a float to a string, the
+    //     following call sometimes does not produce a valid Amount.
+    //
+    //     The correct way to solve this is probably to switch to a proper
+    //     BigDecimal for our internal representation and then use that across
+    //     the board instead of instantiating these dummy Amount objects.
+    var interestTempAmount = Amount.from_json(''+interest+'/1/1');
+
+    if (interestTempAmount.is_valid()) {
+      this._set_value(this.divide(interestTempAmount)._value);
+    }
   }
 
   return this;
@@ -756,7 +522,6 @@ Amount.prototype.parse_human = function(j, opts) {
 
 Amount.prototype.parse_issuer = function(issuer) {
   this._issuer  = UInt160.from_json(issuer);
-
   return this;
 };
 
@@ -798,29 +563,41 @@ Amount.prototype.parse_quality = function(quality, counterCurrency, counterIssue
 
   var baseCurrency = Currency.from_json(opts.base_currency);
 
-  this._is_negative = false;
-  this._value       = new BigInteger(quality.substring(quality.length-14), 16);
-  this._offset      = parseInt(quality.substring(quality.length-16, quality.length-14), 16)-100;
+  var mantissa_hex  = quality.substring(quality.length-14);
+  var offset_hex    = quality.substring(quality.length-16, quality.length-14);
+  var mantissa      = new BigNumber(mantissa_hex, 16);
+  var offset        = parseInt(offset_hex, 16) - 100;
+
+  var value = new BigNumber(mantissa.toString() + 'e' + offset.toString());
+
   this._currency    = Currency.from_json(counterCurrency);
   this._issuer      = UInt160.from_json(counterIssuer);
   this._is_native   = this._currency.is_native();
+
+  var power = 0;
+  if (this._is_native) {
+    if (opts.inverse) {
+      power += 1;
+    } else {
+      power -= 1;
+    }
+  }
 
   // Correct offset if xrp_as_drops option is not set and base currency is XRP
   if (!opts.xrp_as_drops &&
       baseCurrency.is_valid() &&
       baseCurrency.is_native()) {
     if (opts.inverse) {
-      this._offset -= 6;
+      power -= 1;
     } else {
-      this._offset += 6;
+      power += 1;
     }
   }
 
-  if (opts.inverse) {
-    this._invert();
-  }
-
-  this.canonicalize();
+  var one = new BigNumber(1);
+  var adjusted = value.times(Amount.bi_xns_unit.toPower(power));
+  var newValue = opts.inverse ? one.dividedBy(adjusted) : adjusted;
+  this._set_value(newValue);
 
   if (opts.reference_date && baseCurrency.is_valid() && baseCurrency.has_interest()) {
     var interest = baseCurrency.get_interest_at(opts.reference_date);
@@ -829,9 +606,7 @@ Amount.prototype.parse_quality = function(quality, counterCurrency, counterIssue
     var interestTempAmount = Amount.from_json(''+interest+'/1/1');
 
     if (interestTempAmount.is_valid()) {
-      var v = this.divide(interestTempAmount);
-      this._value = v._value;
-      this._offset = v._offset;
+      this._set_value(this.divide(interestTempAmount)._value);
     }
   }
 
@@ -842,12 +617,7 @@ Amount.prototype.parse_number = function(n) {
   this._is_native   = false;
   this._currency    = Currency.from_json(1);
   this._issuer      = UInt160.from_json(1);
-  this._is_negative = n < 0 ? true : false;
-  this._value       = new BigInteger(String(this._is_negative ? -n : n));
-  this._offset      = 0;
-
-  this.canonicalize();
-
+  this._set_value(new BigNumber(n));
   return this;
 };
 
@@ -897,7 +667,7 @@ Amount.prototype.parse_json = function(j) {
       break;
 
     default:
-      this._value = NaN;
+      this._set_value(new BigNumber(NaN));
   }
 
   return this;
@@ -908,33 +678,20 @@ Amount.prototype.parse_json = function(j) {
 // - float = with precision 6
 // XXX Improvements: disallow leading zeros.
 Amount.prototype.parse_native = function(j) {
-  var m;
-
-  if (typeof j === 'string') {
-    m = j.match(/^(-?)(\d*)(\.\d{0,6})?$/);
-  }
-
-  if (m) {
-    if (m[3] === void(0)) {
-      // Integer notation
-      this._value = new BigInteger(m[2]);
+  if (typeof j === 'string' && j.match(/^-?\d*(\.\d{0,6})?$/)) {
+    var value = new BigNumber(j);
+    this._is_native = true;
+    if (j.indexOf('.') >= 0) {
+      this._set_value(value);
     } else {
-      // Float notation : values multiplied by 1,000,000.
-      var int_part      = (new BigInteger(m[2])).multiply(Amount.bi_xns_unit);
-      var fraction_part = (new BigInteger(m[3])).multiply(new BigInteger(String(Math.pow(10, 1+Amount.xns_precision-m[3].length))));
-
-      this._value = int_part.add(fraction_part);
+      this._set_value(value.dividedBy(Amount.bi_xns_unit));
     }
-
-    this._is_native   = true;
-    this._offset      = 0;
-    this._is_negative = !!m[1] && this._value.compareTo(BigInteger.ZERO) !== 0;
-
-    if (this._value.compareTo(Amount.bi_xns_max) > 0) {
-      this._value = NaN;
+    // TODO: move this overflow check to canonicalize
+    if (this._value.abs().greaterThan(Amount.bi_xrp_max)) {
+      this._set_value(new BigNumber(NaN));
     }
   } else {
-    this._value = NaN;
+    this._set_value(new BigNumber(NaN));
   }
 
   return this;
@@ -943,63 +700,14 @@ Amount.prototype.parse_native = function(j) {
 // Parse a non-native value for the json wire format.
 // Requires _currency to be set!
 Amount.prototype.parse_value = function(j) {
-  this._is_native    = false;
-
-  switch (typeof j) {
-    case 'number':
-      this._is_negative = j < 0;
-      this._value       = new BigInteger(Math.abs(j));
-      this._offset      = 0;
-
-      this.canonicalize();
-      break;
-
-    case 'string':
-      var i = j.match(/^(-?)(\d+)$/);
-      var d = !i && j.match(/^(-?)(\d*)\.(\d*)$/);
-      var e = !e && j.match(/^(-?)(\d*)e(-?\d+)$/);
-
-      if (e) {
-        // e notation
-        this._value       = new BigInteger(e[2]);
-        this._offset      = parseInt(e[3]);
-        this._is_negative = !!e[1];
-
-        this.canonicalize();
-      } else if (d) {
-        // float notation
-        var integer   = new BigInteger(d[2]);
-        var fraction  = new BigInteger(d[3]);
-        var precision = d[3].length;
-
-        this._value       = integer.multiply(Amount.bi_10.clone().pow(precision)).add(fraction);
-        this._offset      = -precision;
-        this._is_negative = !!d[1];
-
-        this.canonicalize();
-      } else if (i) {
-        // integer notation
-        this._value       = new BigInteger(i[2]);
-        this._offset      = 0;
-        this._is_negative = !!i[1];
-
-        this.canonicalize();
-      } else {
-        this._value = NaN;
-      }
-      break;
-
-    default:
-      this._value = j instanceof BigInteger ? j : NaN;
-  }
-
+  this._is_native = false;
+  this._set_value(new BigNumber(j), BigNumber.ROUND_DOWN);
   return this;
 };
 
 Amount.prototype.set_currency = function(c) {
   this._currency  = Currency.from_json(c);
   this._is_native = this._currency.is_native();
-
   return this;
 };
 
@@ -1020,37 +728,43 @@ Amount.prototype.to_number = function(allow_nan) {
 
 // Convert only value to JSON wire format.
 Amount.prototype.to_text = function(allow_nan) {
-  var result = NaN;
+  if (this._is_native && this._value.abs().greaterThan(Amount.bi_xrp_max)) {
+    return '0';
+  }
+  if (this._value.isNaN() && !allow_nan) {
+    return '0';
+  } else if (this._value.isNaN()) {
+    return NaN;   // TODO: why does to_text return NaN? return 'NaN'?
+  }
 
   if (this._is_native) {
-    if (this.is_valid() && this._value.compareTo(Amount.bi_xns_max) <= 0){
-      result = this._value.toString();
+    if (this.is_valid() && this._value.lessThanOrEqualTo(Amount.bi_xns_max)){
+      return this._value.times(Amount.bi_xns_unit).toString();
+    } else {
+      return NaN;   // TODO: why does to_text return NaN? return 'NaN'?
     }
-  } else if (this.is_zero()) {
-    result = '0';
-  } else if (this._offset && (this._offset < -25 || this._offset > -4)) {
+  }
+
+  // not native
+  var offset = this._value.e - 15;
+  var sign = this._value.isNegative() ? '-' : '';
+  var mantissa = utils.getMantissaDecimalString(this._value.absoluteValue());
+  if (offset !== 0 && (offset < -25 || offset > -4)) {
     // Use e notation.
     // XXX Clamp output.
-    result = this._value.toString() + 'e' + this._offset;
+    return sign + mantissa.toString() + 'e' + offset.toString();
   } else {
-    var val    = '000000000000000000000000000' + this._value.toString() + '00000000000000000000000';
-    var pre    = val.substring(0, this._offset + 43);
-    var post   = val.substring(this._offset + 43);
+    var val    = '000000000000000000000000000' + mantissa.toString()
+               + '00000000000000000000000';
+    var pre    = val.substring(0, offset + 43);
+    var post   = val.substring(offset + 43);
     var s_pre  = pre.match(/[1-9].*$/);  // Everything but leading zeros.
     var s_post = post.match(/[1-9]0*$/); // Last non-zero plus trailing zeros.
 
-    result = ''
-      + (s_pre ? s_pre[0] : '0')
+    return sign + (s_pre ? s_pre[0] : '0')
       + (s_post ? '.' + post.substring(0, 1 + post.length - s_post[0].length) : '');
   }
 
-  if (!allow_nan && typeof result === 'number' && isNaN(result)) {
-    result = '0';
-  } else if (this._is_negative) {
-    result = '-' + result;
-  }
-
-  return result;
 };
 
 /**
@@ -1131,15 +845,11 @@ Amount.prototype.to_human = function(opts) {
     ref = this.applyInterest(opts.reference_date);
   }
 
-  var order         = ref._is_native ? Amount.xns_precision : -ref._offset;
-  var denominator   = Amount.bi_10.clone().pow(order);
-  var int_part      = ref._value.divide(denominator).toString();
-  var fraction_part = ref._value.mod(denominator).toString();
-
-  // Add leading zeros to fraction
-  while (fraction_part.length < order) {
-    fraction_part = '0' + fraction_part;
-  }
+  var isNegative    = ref._value.isNegative();
+  var valueString   = ref._value.abs().toString();
+  var parts         = valueString.split('.');
+  var int_part      = parts[0];
+  var fraction_part = parts.length === 2 ? parts[1] : '';
 
   int_part = int_part.replace(/^0*/, '');
   fraction_part = fraction_part.replace(/0*$/, '');
@@ -1208,7 +918,7 @@ Amount.prototype.to_human = function(opts) {
   }
 
   var formatted = '';
-  if (opts.signed && this._is_negative) {
+  if (opts.signed && isNegative) {
     if (typeof opts.signed !== 'string') {
       opts.signed = '-';
     }
@@ -1250,11 +960,9 @@ Amount.prototype.to_json = function() {
 };
 
 Amount.prototype.to_text_full = function(opts) {
-  return this._value instanceof BigInteger
-    ? this._is_native
+  return this._is_native
       ? this.to_human() + '/XRP'
-      : this.to_text() + '/' + this._currency.to_json() + '/' + this._issuer.to_json(opts)
-    : NaN;
+      : this.to_text() + '/' + this._currency.to_json() + '/' + this._issuer.to_json(opts);
 };
 
 // For debugging.
@@ -1276,10 +984,10 @@ Amount.prototype.not_equals_why = function(d, ignore_issuer) {
   } else {
     var type = this._is_native ? 'XRP' : 'Non-XRP';
 
-    if (!this._value.equals(d._value) || this._offset !== d._offset) {
-      result = type + ' value differs.';
-    } else if (this._is_negative !== d._is_negative) {
+    if (!this._value.isZero() && this._value.negated().equals(d._value)) {
       result = type + ' sign differs.';
+    } else if (!this._value.equals(d._value)) {
+      result = type + ' value differs.';
     } else if (!this._is_native) {
       if (!this._currency.equals(d._currency)) {
         result = 'Non-XRP currency differs.';

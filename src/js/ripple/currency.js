@@ -308,7 +308,7 @@ Currency.prototype.get_interest_percentage_at = function(referenceDate, decimals
 //     currency data, since there are some values that are invalid.
 //
 //Currency.prototype.is_valid = function() {
-//  return this._value instanceof BigInteger && ...;
+//  return UInt.prototype.is_valid() && ...;
 //};
 
 Currency.prototype.to_json = function(opts) {
