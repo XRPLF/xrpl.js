@@ -1,3 +1,4 @@
+var _         = require('lodash');
 var assert    = require('assert');
 var extend    = require('extend');
 var binformat = require('./binformat');
@@ -7,7 +8,6 @@ var Crypt     = require('./crypt').Crypt;
 var utils     = require('./utils');
 
 var sjcl = utils.sjcl;
-var BigInteger = utils.jsbn.BigInteger;
 
 var TRANSACTION_TYPES = { };
 
@@ -26,6 +26,13 @@ var TRANSACTION_RESULTS = {};
 Object.keys(binformat.ter).forEach(function(key) {
   TRANSACTION_RESULTS[binformat.ter[key]] = key;
 });
+
+function normalize_sjcl_bn_hex(string) {
+  var hex = string.slice(2);    // remove '0x' prefix
+  // now strip leading zeros
+  var i = _.findIndex(hex, function(c) { return c != '0'; });
+  return i >= 0 ? hex.slice(i) : '0';
+}
 
 function SerializedObject(buf) {
   if (Array.isArray(buf) || (Buffer && Buffer.isBuffer(buf)) ) {
@@ -209,8 +216,8 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
 
       if (typeof structure.to_json === 'function') {
         output = structure.to_json();
-      } else if (structure instanceof BigInteger) {
-        output = ('0000000000000000' + structure.toString(16).toUpperCase()).slice(-16);
+      } else if (structure instanceof sjcl.bn) {
+        output = ('0000000000000000' + normalize_sjcl_bn_hex(structure.toString()).toUpperCase()).slice(-16);
       } else {
         //new Array or Object
         output = new structure.constructor();

@@ -2,7 +2,7 @@ var assert           = require('assert');
 var SerializedObject = require('ripple-lib').SerializedObject;
 var types            = require('ripple-lib').types;
 var Amount           = require('ripple-lib').Amount;
-var BigInteger       = require('ripple-lib').jsbn.BigInteger;
+var sjcl             = require('ripple-lib').sjcl;
 
 describe('Serialized types', function() {
   describe('Int8', function() {
@@ -287,7 +287,7 @@ describe('Serialized types', function() {
       var so = new SerializedObject("8B2386F26F8E232B");
       var num = types.Int64.parse(so);
       // We get a positive number
-      assert.strictEqual(num.toString(16), '8b2386f26f8e232b');
+      assert.strictEqual(num.toString(), '0x8b2386f26f8e232b');
     });
     it('Serialize "0123456789ABCDEF"', function () {
       var so = new SerializedObject();
@@ -299,15 +299,15 @@ describe('Serialized types', function() {
       types.Int64.serialize(so, 'F0E1D2C3B4A59687');
       assert.strictEqual(so.to_hex(), 'F0E1D2C3B4A59687');
     });
-    it('Serialize BigInteger("FFEEDDCCBBAA9988")', function () {
+    it('Serialize bn("FFEEDDCCBBAA9988")', function () {
       var so = new SerializedObject();
-      types.Int64.serialize(so, new BigInteger('FFEEDDCCBBAA9988', 16));
+      types.Int64.serialize(so, new sjcl.bn('FFEEDDCCBBAA9988', 16));
       assert.strictEqual(so.to_hex(), 'FFEEDDCCBBAA9988');
     });
-    it('Fail to serialize BigInteger("-1")', function () {
+    it('Fail to serialize BigNumber("-1")', function () {
       var so = new SerializedObject();
       assert.throws(function () {
-        types.Int64.serialize(so, new BigInteger('-1', 10));
+        types.Int64.serialize(so, new BigNumber('-1', 10));
       });
     });
     it('Fail to serialize "10000000000000000"', function () {
@@ -343,7 +343,7 @@ describe('Serialized types', function() {
     it('Parse "0123456789ABCDEF"', function () {
       var so = new SerializedObject("0123456789ABCDEF");
       var num = types.Int64.parse(so);
-      assert.strictEqual(num.toString(10), '81985529216486895');
+      assert.strictEqual(num.toString(), '0x123456789abcdef');
     });
   });
 

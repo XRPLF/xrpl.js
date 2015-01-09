@@ -1566,8 +1566,8 @@ describe('OrderBook', function() {
       },
       index: 'B6BC3B0F87976370EE11F5575593FE63AA5DC1D602830DC96F04B2D597F044BF',
       owner_funds: '0.1129267125000245',
-      taker_gets_funded: '0.1127013098802639',
-      taker_pays_funded: '55.95620035555102',
+      taker_gets_funded: '0.112701309880264',
+      taker_pays_funded: '55.95620035555106',
       is_fully_funded: false },
 
       { Account: 'raudnGKfTK23YKfnS7ixejHrqGERTYNFXk',

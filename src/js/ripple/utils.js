@@ -1,3 +1,21 @@
+
+function configureBigNumber(BigNumber) {
+  // this configuration applies in all source files
+  BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_HALF_UP,
+                     DECIMAL_PLACES: 40 });
+}
+
+function getMantissaDecimalString(num) {
+  var mantissa = num.toString()
+    .replace(/\./, '')      // remove decimal point
+    .replace(/e.*/, '')     // remove scientific notation
+    .replace(/^0*/, '');    // remove leading zeroes
+  while (mantissa.length < 16) {
+    mantissa += '0';        // add trailing zeroes until length is 16
+  }
+  return mantissa;
+}
+
 function filterErr(code, done) {
   return function(e) {
     done(e.code !== code ? e : void(0));
@@ -68,6 +86,13 @@ function stringToArray(s) {
 function hexToArray(h) {
   return stringToArray(hexToString(h));
 };
+
+function arrayToHex(a) {
+  return a.map(function(byteValue) {
+    var hex = byteValue.toString(16);
+    return hex.length > 1 ? hex : '0' + hex;
+  }).join('');
+}
 
 function chunkString(str, n, leftAlign) {
   var ret = [];
@@ -144,15 +169,17 @@ exports.hexToString   = hexToString;
 exports.hexToArray    = hexToArray;
 exports.stringToArray = stringToArray;
 exports.stringToHex   = stringToHex;
+exports.arrayToHex    = arrayToHex;
 exports.chunkString   = chunkString;
 exports.assert        = assert;
 exports.arrayUnique   = arrayUnique;
 exports.toTimestamp   = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
+exports.configureBigNumber = configureBigNumber;
+exports.getMantissaDecimalString = getMantissaDecimalString;
 
 // Going up three levels is needed to escape the src-cov folder used for the
 // test coverage stuff.
 exports.sjcl = require('../../../build/sjcl');
-exports.jsbn = require('../../../src/js/jsbn/jsbn');
 
 // vim:sw=2:sts=2:ts=8:et

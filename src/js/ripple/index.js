@@ -29,7 +29,6 @@ exports.RangeSet         = require('./rangeset').RangeSet;
 // the official client, it makes sense to expose the SJCL instance so we don't
 // have to include it twice.
 exports.sjcl   = require('./utils').sjcl;
-exports.jsbn   = require('./utils').jsbn;
 exports.types  = require('./serializedtypes');
 
 exports.config = require('./config');

@@ -7,6 +7,11 @@
       "from": "async@>=0.8.0 <0.9.0",
       "resolved": "https://registry.npmjs.org/async/-/async-0.8.0.tgz"
     },
+    "bignumber.js": {
+      "version": "2.0.0",
+      "from": "bignumber.js@>=2.0.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.0.0.tgz"
+    },
     "extend": {
       "version": "1.2.1",
       "from": "extend@>=1.2.1 <1.3.0",
