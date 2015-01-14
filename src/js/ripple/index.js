@@ -13,17 +13,12 @@ exports.Meta             = require('./meta').Meta;
 exports.SerializedObject = require('./serializedobject').SerializedObject;
 exports.RippleError      = require('./rippleerror').RippleError;
 exports.Message          = require('./message').Message;
-exports.VaultClient      = require('./vaultclient').VaultClient;
-exports.AuthInfo         = require('./authinfo').AuthInfo;
-exports.RippleTxt        = require('./rippletxt').RippleTxt;
 exports.binformat        = require('./binformat');
 exports.utils            = require('./utils');
 exports.Server           = require('./server').Server;
 exports.Wallet           = require('./wallet');
 exports.Ledger           = require('./ledger').Ledger;
 exports.TransactionQueue = require('./transactionqueue').TransactionQueue;
-exports.VaultClient      = require('./vaultclient').VaultClient;
-exports.Blob             = require('./blob').Blob;
 exports.RangeSet         = require('./rangeset').RangeSet;
 
 // Important: We do not guarantee any specific version of SJCL or for any
