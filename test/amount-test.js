@@ -1199,7 +1199,6 @@ describe('Amount', function() {
     });
 
     it ('from_json minimum XRP', function() {
-      console.log('max', Amount.bi_xns_max.toString());
       var amt = Amount.from_json('-9000000000000000000');
       assert.strictEqual(amt.to_json(), '-9000000000000000000');
     });
