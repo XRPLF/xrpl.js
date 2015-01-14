@@ -35,24 +35,23 @@ util.inherits(PathFind, EventEmitter);
 PathFind.prototype.create = function () {
   var self = this;
 
-  var req = this.remote.request_path_find_create(this.src_account,
-                                                 this.dst_account,
-                                                 this.dst_amount,
-                                                 this.src_currencies,
-                                                 handleInitialPath);
+  var req = this.remote.request_path_find_create(
+    this.src_account,
+    this.dst_account,
+    this.dst_amount,
+    this.src_currencies);
 
-  function handleInitialPath(err, msg) {
-    if (err) {
-      self.emit('error', err);
-    } else {
-      self.notify_update(msg);
-    }
-  }
+  req.once('error', function(err) {
+    self.emit('error', err);
+  });
+  req.once('success', function(msg) {
+    self.notify_update(msg);
+  });
 
   // XXX We should add ourselves to prepare_subscribe or a similar mechanism so
   // that we can resubscribe after a reconnection.
 
-  req.request();
+  req.broadcast().request();
 };
 
 PathFind.prototype.close = function () {

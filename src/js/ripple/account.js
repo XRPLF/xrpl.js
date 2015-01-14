@@ -45,7 +45,7 @@ function Account(remote, account) {
       if (!self._subs && self._remote._connected) {
         self._remote.request_subscribe()
         .add_account(self._account_id)
-        .broadcast();
+        .broadcast().request();
       }
       self._subs += 1;
     }
@@ -59,7 +59,7 @@ function Account(remote, account) {
       if (!self._subs && self._remote._connected) {
         self._remote.request_unsubscribe()
         .add_account(self._account_id)
-        .broadcast();
+        .broadcast().request();
       }
     }
   };

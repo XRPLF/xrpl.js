@@ -16,11 +16,12 @@
   },
   "dependencies": {
     "async": "~0.8.0",
-    "ws": "~0.4.31",
     "extend": "~1.2.1",
+    "lodash": "^2.4.1",
     "lru-cache": "~2.5.0",
+    "ripple-wallet-generator": "1.0.1",
     "superagent": "^0.18.0",
-    "ripple-wallet-generator": "1.0.1"
+    "ws": "~0.4.31"
   },
   "devDependencies": {
     "coveralls": "~2.10.0",

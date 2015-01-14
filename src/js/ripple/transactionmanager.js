@@ -650,7 +650,7 @@ TransactionManager.prototype._request = function(tx) {
 
   tx.emit('presubmit');
 
-  tx.submissions = submitRequest.broadcast();
+  submitRequest.broadcast().request();
   tx.attempts++;
 
   tx.emit('postsubmit');

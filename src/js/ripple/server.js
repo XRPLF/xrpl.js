@@ -1,7 +1,9 @@
 var util         = require('util');
 var url          = require('url');
+var LRU          = require('lru-cache');
 var EventEmitter = require('events').EventEmitter;
 var Amount       = require('./amount').Amount;
+var RangeSet     = require('./rangeset').RangeSet;
 var log          = require('./log').internal.sub('server');
 
 /**
@@ -56,6 +58,8 @@ function Server(remote, opts) {
   this._connected = false;
   this._shouldConnect = false;
   this._state = 'offline';
+  this._ledgerRanges = new RangeSet();
+  this._ledgerMap = LRU({ max: 200 });
 
   this._id = 0; // request ID
   this._retry = 0;
@@ -117,25 +121,8 @@ function Server(remote, opts) {
     self._updateScore('loadchange', load);
   });
 
-  // If server is not up-to-date, request server_info
-  // for getting pubkey_node & hostid information.
-  // Otherwise this information is available on the
-  // initial server subscribe response
-  this.on('connect', function requestServerID() {
-    if (self._pubkey_node) {
-      return;
-    }
-
-    self.on('response_server_info', function setServerID(message) {
-      try {
-        self._pubkey_node = message.info.pubkey_node;
-      } catch (e) {
-      }
-    });
-
-    var serverInfoRequest = self._remote.requestServerInfo();
-    serverInfoRequest.on('error', function() { });
-    self._request(serverInfoRequest);
+  this.on('connect', function() {
+    self.requestServerID();
   });
 };
 
@@ -236,6 +223,31 @@ Server.prototype._checkActivity = function() {
 };
 
 /**
+ * If server is not up-to-date, request server_info for getting pubkey_node
+ * & hostid information. Otherwise this information is available on the
+ * initial server subscribe response
+ */
+
+Server.prototype.requestServerID = function() {
+  var self = this;
+
+  if (this._pubkey_node) {
+    return;
+  }
+
+  this.on('response_server_info', function setServerID(message) {
+    try {
+      self._pubkey_node = message.info.pubkey_node;
+    } catch (e) {
+    }
+  });
+
+  var serverInfoRequest = this._remote.requestServerInfo();
+  serverInfoRequest.on('error', function() { });
+  this._request(serverInfoRequest);
+};
+
+/**
  * Server maintains a score for request prioritization.
  *
  * The score is determined by various data including
@@ -328,6 +340,8 @@ Server.prototype.disconnect = function() {
   this._lastLedgerClose = NaN;
   this._score = 0;
   this._shouldConnect = false;
+  this._ledgerRanges.reset();
+  this._ledgerMap.reset();
   this._setState('offline');
 
   if (this._ws) {
@@ -545,6 +559,8 @@ Server.prototype._handleMessage = function(message) {
 Server.prototype._handleLedgerClosed = function(message) {
   this._lastLedgerIndex = message.ledger_index;
   this._lastLedgerClose = Date.now();
+  this._ledgerRanges.add(message.ledger_index);
+  this._ledgerMap.set(message.ledger_hash, message.ledger_index);
   this.emit('ledger_closed', message);
 };
 
@@ -634,10 +650,12 @@ Server.prototype._handleResponseSubscribe = function(message) {
     // servers with incomplete history
     return this.reconnect();
   }
+
   if (message.pubkey_node) {
     // pubkey_node is used to identify the server
     this._pubkey_node = message.pubkey_node;
   }
+
   if (Server.isLoadStatus(message)) {
     this._load_base = message.load_base || 256;
     this._load_factor = message.load_factor || 256;
@@ -646,6 +664,12 @@ Server.prototype._handleResponseSubscribe = function(message) {
     this._reserve_base = message.reserve_base;
     this._reserve_inc = message.reserve_inc;
   }
+
+  if (message.validated_ledgers) {
+    // Add validated ledgers to ledger range set
+    this._ledgerRanges.add(message.validated_ledgers);
+  }
+
   if (~Server.onlineStates.indexOf(message.server_status)) {
     this._setState('online');
   }
@@ -750,6 +774,12 @@ Server.prototype._request = function(request) {
   }
 };
 
+/**
+ * Get server connected status
+ *
+ * @return boolean
+ */
+
 Server.prototype.isConnected =
 Server.prototype._isConnected = function() {
   return this._connected;
@@ -822,6 +852,36 @@ Server.prototype._reserve = function(ownerCount) {
   }
 
   return reserve_base.add(reserve_inc.product_human(owner_count));
+};
+
+/**
+ * Check that server has seen closed ledger
+ *
+ * @param {string|number} ledger hash or index
+ * @return boolean
+ */
+
+Server.prototype.hasLedger = function(ledger) {
+  var result = false;
+
+  if (typeof ledger === 'string' && /^[A-F0-9]{64}$/.test(ledger)) {
+    result = this._ledgerMap.has(ledger);
+  } else if (ledger != null && !isNaN(ledger)) {
+    result = this._ledgerRanges.has(ledger);
+  }
+
+  return result;
+};
+
+/**
+ * Get ledger index of last seen validated ledger
+ *
+ * @return number
+ */
+
+Server.prototype.getLastLedger =
+Server.prototype.getLastLedgerIndex = function() {
+  return this._lastLedgerIndex;
 };
 
 exports.Server = Server;
