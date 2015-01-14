@@ -20,7 +20,6 @@
     "lodash": "^2.4.1",
     "lru-cache": "~2.5.0",
     "ripple-wallet-generator": "1.0.1",
-    "superagent": "^0.18.0",
     "ws": "~0.4.31"
   },
   "devDependencies": {
