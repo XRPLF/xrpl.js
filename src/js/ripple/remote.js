@@ -327,6 +327,7 @@ Remote.from_config = function(obj, trace) {
  * Check that server message is valid
  *
  * @param {Object} message
+ * @return Boolean
  */
 
 Remote.isValidMessage = function(message) {
@@ -339,6 +340,7 @@ Remote.isValidMessage = function(message) {
  * ledger data
  *
  * @param {Object} message
+ * @return {Boolean}
  */
 
 Remote.isValidLedgerData = function(message) {
@@ -357,11 +359,24 @@ Remote.isValidLedgerData = function(message) {
  * load status data
  *
  * @param {Object} message
+ * @return {Boolean}
  */
 
 Remote.isValidLoadStatus = function(message) {
   return (typeof message.load_base === 'number')
       && (typeof message.load_factor === 'number');
+};
+
+/**
+ * Check that provided ledger is validated
+ *
+ * @param {Object} ledger
+ * @return {Boolean}
+ */
+
+Remote.isValidated = function(message) {
+  return (message && typeof message === 'object')
+      && (message.validated === true);
 };
 
 /**

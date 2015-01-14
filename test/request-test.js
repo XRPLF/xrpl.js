@@ -3,6 +3,7 @@ var Request = require('ripple-lib').Request;
 var Remote = require('ripple-lib').Remote;
 var Server = require('ripple-lib').Server;
 var Currency = require('ripple-lib').Currency;
+var RippleError = require('ripple-lib').RippleError;
 
 function makeServer(url) {
   var server = new Server(new process.EventEmitter(), url);
@@ -55,7 +56,7 @@ describe('Request', function() {
     request.request();
   });
 
-  it('Broadcast request', function(done) {
+  it('Send request -- filterRequest', function(done) {
     var servers = [
       makeServer('wss://localhost:5006'),
       makeServer('wss://localhost:5007')
@@ -63,24 +64,401 @@ describe('Request', function() {
 
     var requests = 0;
 
-    servers.forEach(function(server, index, arr) {
-      server._request = function(req) {
-        assert(req instanceof Request);
-        assert.strictEqual(typeof req.message, 'object');
-        assert.strictEqual(req.message.command, 'server_info');
-        if (++requests === arr.length) {
-          done();
-        }
-      };
-    });
+    var successResponse = {
+      account_data: {
+        Account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+        Balance: '13188802787',
+        Flags: 0,
+        LedgerEntryType: 'AccountRoot',
+        OwnerCount: 17,
+        PreviousTxnID: 'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
+        PreviousTxnLgrSeq: 8828020,
+        Sequence: 1406,
+        index: '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
+      },
+      ledger_current_index: 9022821,
+      validated: false
+    };
+    var errorResponse = {
+      error: 'remoteError',
+      error_message: 'Remote reported an error.',
+      remote: {
+        id: 3,
+        status: 'error',
+        type: 'response',
+        account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+        error: 'actNotFound',
+        error_code: 15,
+        error_message: 'Account not found.',
+        ledger_current_index: 9022856,
+        request: {
+          account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+          command: 'account_info',
+          id: 3
+        },
+        validated: false
+      }
+    };
+
+    function checkRequest(req) {
+      assert(req instanceof Request);
+      assert.strictEqual(typeof req.message, 'object');
+      assert.strictEqual(req.message.command, 'account_info');
+    };
+
+    servers[0]._request = function(req) {
+      ++requests;
+      checkRequest(req);
+      req.emit('error', errorResponse);
+    };
+
+    servers[1]._request = function(req) {
+      ++requests;
+      checkRequest(req);
+      setImmediate(function() {
+        req.emit('success', successResponse);
+      });
+    };
 
     var remote = new Remote();
     remote._connected = true;
     remote._servers = servers;
 
-    var request = new Request(remote, 'server_info');
+    var request = new Request(remote, 'account_info');
 
-    request.broadcast();
+    request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
+
+    request.filter(function(res) {
+      return res
+      && typeof res === 'object'
+      && !res.hasOwnProperty('error');
+    });
+
+    request.callback(function(err, res) {
+      assert.ifError(err);
+      assert.strictEqual(requests, 2, 'Failed to broadcast');
+      assert.deepEqual(res, successResponse);
+      done();
+    });
+  });
+
+  it('Send request -- filterRequest -- no success', function(done) {
+    var servers = [
+      makeServer('wss://localhost:5006'),
+      makeServer('wss://localhost:5007')
+    ];
+
+    var requests = 0;
+
+    var errorResponse = {
+      error: 'remoteError',
+      error_message: 'Remote reported an error.',
+      remote: {
+        id: 3,
+        status: 'error',
+        type: 'response',
+        account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+        error: 'actNotFound',
+        error_code: 15,
+        error_message: 'Account not found.',
+        ledger_current_index: 9022856,
+        request: {
+          account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+          command: 'account_info',
+          id: 3
+        },
+        validated: false
+      }
+    };
+
+    function checkRequest(req) {
+      assert(req instanceof Request);
+      assert.strictEqual(typeof req.message, 'object');
+      assert.strictEqual(req.message.command, 'account_info');
+    };
+
+    function sendError(req) {
+      ++requests;
+      checkRequest(req);
+      req.emit('error', errorResponse);
+    };
+    servers[0]._request = sendError;
+    servers[1]._request = sendError;
+
+    var remote = new Remote();
+    remote._connected = true;
+    remote._servers = servers;
+
+    var request = new Request(remote, 'account_info');
+
+    request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
+
+    request.filter(function(res) {
+      return res
+      && typeof res === 'object'
+      && !res.hasOwnProperty('error');
+    });
+
+    request.callback(function(err, res) {
+      setImmediate(function() {
+        assert.strictEqual(requests, 2, 'Failed to broadcast');
+        assert.deepEqual(err, new RippleError(errorResponse));
+        done();
+      });
+    });
+  });
+
+  it('Send request -- filterRequest -- ledger prefilter', function(done) {
+    var servers = [
+      makeServer('wss://localhost:5006'),
+      makeServer('wss://localhost:5007')
+    ];
+
+    var requests = 0;
+
+    var successResponse = {
+      account_data: {
+        Account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+        Balance: '13188802787',
+        Flags: 0,
+        LedgerEntryType: 'AccountRoot',
+        OwnerCount: 17,
+        PreviousTxnID: 'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
+        PreviousTxnLgrSeq: 8828020,
+        Sequence: 1406,
+        index: '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
+      },
+      ledger_current_index: 9022821,
+      validated: false
+    };
+
+    function checkRequest(req) {
+      assert(req instanceof Request);
+      assert.strictEqual(typeof req.message, 'object');
+      assert.strictEqual(req.message.command, 'account_info');
+    };
+
+    servers[0]._request = function(req) {
+      assert(false, 'Should not request; server does not have ledger');
+    };
+
+    servers[1]._request = function(req) {
+      ++requests;
+      checkRequest(req);
+      setImmediate(function() {
+        req.emit('success', successResponse);
+      });
+    };
+
+    servers[0]._ledgerRanges.add('5-6');
+    servers[1]._ledgerRanges.add('1-4');
+
+    var remote = new Remote();
+    remote._connected = true;
+    remote._servers = servers;
+
+    var request = new Request(remote, 'account_info');
+    request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
+    request.selectLedger(4);
+
+    request.filter(function(res) {
+      return res
+      && typeof res === 'object'
+      && !res.hasOwnProperty('error');
+    });
+
+    request.callback(function(err, res) {
+      assert.ifError(err);
+      assert.deepEqual(res, successResponse);
+      done();
+    });
+  });
+
+  it('Send request -- filterRequest -- server reconnects', function(done) {
+    var servers = [
+      makeServer('wss://localhost:5006'),
+      makeServer('wss://localhost:5007')
+    ];
+
+    var requests = 0;
+
+    var successResponse = {
+      account_data: {
+        Account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+        Balance: '13188802787',
+        Flags: 0,
+        LedgerEntryType: 'AccountRoot',
+        OwnerCount: 17,
+        PreviousTxnID: 'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
+        PreviousTxnLgrSeq: 8828020,
+        Sequence: 1406,
+        index: '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
+      },
+      ledger_current_index: 9022821,
+      validated: false
+    };
+    var errorResponse = {
+      error: 'remoteError',
+      error_message: 'Remote reported an error.',
+      remote: {
+        id: 3,
+        status: 'error',
+        type: 'response',
+        account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+        error: 'actNotFound',
+        error_code: 15,
+        error_message: 'Account not found.',
+        ledger_current_index: 9022856,
+        request: {
+          account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+          command: 'account_info',
+          id: 3
+        },
+        validated: false
+      }
+    };
+
+    function checkRequest(req) {
+      assert(req instanceof Request);
+      assert.strictEqual(typeof req.message, 'object');
+      assert.strictEqual(req.message.command, 'account_info');
+    };
+
+    servers[0]._connected = false;
+    servers[0]._shouldConnect = true;
+    servers[0].removeAllListeners('connect');
+
+    servers[0]._request = function(req) {
+      ++requests;
+      checkRequest(req);
+      req.emit('success', successResponse);
+    };
+    servers[1]._request = function(req) {
+      ++requests;
+      checkRequest(req);
+
+      req.emit('error', errorResponse);
+
+      servers[0]._connected = true;
+      servers[0].emit('connect');
+    };
+
+    var remote = new Remote();
+    remote._connected = true;
+    remote._servers = servers;
+
+    var request = new Request(remote, 'account_info');
+
+    request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
+
+    request.filter(function(res) {
+      return res
+      && typeof res === 'object'
+      && !res.hasOwnProperty('error');
+    });
+
+    request.callback(function(err, res) {
+      assert.ifError(err);
+      setImmediate(function() {
+        assert.strictEqual(requests, 2, 'Failed to broadcast');
+        assert.deepEqual(res, successResponse);
+        done();
+      });
+    });
+  });
+
+  it('Send request -- filterRequest -- server fails to reconnect', function(done) {
+    var servers = [
+      makeServer('wss://localhost:5006'),
+      makeServer('wss://localhost:5007')
+    ];
+
+    var requests = 0;
+
+    var successResponse = {
+      account_data: {
+        Account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+        Balance: '13188802787',
+        Flags: 0,
+        LedgerEntryType: 'AccountRoot',
+        OwnerCount: 17,
+        PreviousTxnID: 'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
+        PreviousTxnLgrSeq: 8828020,
+        Sequence: 1406,
+        index: '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
+      },
+      ledger_current_index: 9022821,
+      validated: false
+    };
+    var errorResponse = {
+      error: 'remoteError',
+      error_message: 'Remote reported an error.',
+      remote: {
+        id: 3,
+        status: 'error',
+        type: 'response',
+        account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+        error: 'actNotFound',
+        error_code: 15,
+        error_message: 'Account not found.',
+        ledger_current_index: 9022856,
+        request: {
+          account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
+          command: 'account_info',
+          id: 3
+        },
+        validated: false
+      }
+    };
+
+    function checkRequest(req) {
+      assert(req instanceof Request);
+      assert.strictEqual(typeof req.message, 'object');
+      assert.strictEqual(req.message.command, 'account_info');
+    };
+
+    servers[0]._connected = false;
+    servers[0]._shouldConnect = true;
+    servers[0].removeAllListeners('connect');
+
+    setTimeout(function() {
+      servers[0]._connected = true;
+      servers[0].emit('connect');
+    }, 20);
+
+    servers[0]._request = function(req) {
+      ++requests;
+      checkRequest(req);
+      req.emit('success', successResponse);
+    };
+    servers[1]._request = function(req) {
+      ++requests;
+      checkRequest(req);
+      req.emit('error', errorResponse);
+    };
+
+    var remote = new Remote();
+    remote._connected = true;
+    remote._servers = servers;
+
+    var request = new Request(remote, 'account_info');
+    request.setReconnectTimeout(10);
+    request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
+
+    request.filter(function(res) {
+      return res
+      && typeof res === 'object'
+      && !res.hasOwnProperty('error');
+    });
+
+    request.callback(function(err, res) {
+      setTimeout(function() {
+        // Wait for the request that would emit 'success' to time out
+        assert.deepEqual(err, new RippleError(errorResponse));
+        assert.deepEqual(servers[0].listeners('connect'), [ ]);
+        done();
+      }, 20);
+    });
   });
 
   it('Events API', function(done) {

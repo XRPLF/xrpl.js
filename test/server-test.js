@@ -1131,4 +1131,74 @@ describe('Server', function() {
 
     server.connect();
   });
+
+  it('Track ledger ranges', function(done) {
+    var wss = new ws.Server({ port: 5748  });
+
+    wss.once('connection', function(ws) {
+      function sendSubscribe(message) {
+        ws.send(JSON.stringify({
+          id: message.id,
+          status: 'success',
+          type: 'response',
+          result: {
+            fee_base: 10,
+            fee_ref: 10,
+            ledger_hash: '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
+            ledger_index: 7053695,
+            ledger_time: 455414390,
+            load_base: 256,
+            load_factor: 256,
+            random: 'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
+            reserve_base: 20000000,
+            reserve_inc: 5000000,
+            server_status: 'full',
+            validated_ledgers: '32570-7053695',
+            pubkey_node: 'n94pSqypSfddzAVj9qoezHyUoetsrMnwgNuBqRJ3WHvM8aMMf7rW',
+          }
+        }));
+      };
+
+      ws.on('message', function(message) {
+        var m = JSON.parse(message);
+
+        switch (m.command) {
+          case 'subscribe':
+            assert.strictEqual(m.command, 'subscribe');
+            assert.deepEqual(m.streams, [ 'ledger', 'server' ]);
+            sendSubscribe(m);
+            break;
+        }
+      });
+    });
+
+    var server = new Server(new Remote(), 'ws://localhost:5748');
+
+    server.once('connect', function() {
+      assert.strictEqual(server.hasLedger(32569), false);
+      assert.strictEqual(server.hasLedger(32570), true);
+      assert.strictEqual(server.hasLedger(7053695), true);
+      assert.strictEqual(server.hasLedger(7053696), false);
+
+      server.emit('message', {
+        type: 'ledgerClosed',
+        fee_base: 10,
+        fee_ref: 10,
+        ledger_hash: 'F29E1F2A2617A88E9DAA14F468B169E6875092ECA0B3B1FA2BE1BC5524DE7CB2',
+        ledger_index: 7053696,
+        ledger_time: 455327690,
+        reserve_base: 20000000,
+        reserve_inc: 5000000,
+        txn_count: 1
+      });
+
+      assert.strictEqual(server.hasLedger(7053696), true);
+      assert.strictEqual(server.hasLedger('F29E1F2A2617A88E9DAA14F468B169E6875092ECA0B3B1FA2BE1BC5524DE7CB2'), true);
+
+      server.once('disconnect', done);
+      wss.close();
+    });
+
+    server.connect();
+  });
 });
