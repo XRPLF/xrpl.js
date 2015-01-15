@@ -636,14 +636,21 @@ Server.prototype._handlePathFind = function(message) {
 };
 
 /**
- * Handle subscription response messages. Subscription response
- * messages indicate that a connection to the server is ready
+ * Handle initial subscription response message. The server is considered
+ * `connected` after it has received a response to initial subscription to
+ * ledger and server streams
  *
  * @param {Object} message
  * @api private
  */
 
 Server.prototype._handleResponseSubscribe = function(message) {
+  if (this.isConnected()) {
+    // This function only concerns initializing the server's internal
+    // state after a connection
+    return;
+  }
+
   if (!this._remote._allow_partial_history
       && !Server.hasFullLedgerHistory(message)) {
     // Server has partial history and Remote has been configured to disallow
