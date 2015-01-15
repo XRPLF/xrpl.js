@@ -1,6 +1,8 @@
-##0.10.1
+##0.11.0
 
 + [Track the funded status of an order based on cumulative account orders](https://github.com/ripple/ripple-lib/commit/67d39737a4d5e0fcd9d9b47b9083ee00e5a9e652) and [67d3973](https://github.com/ripple/ripple-lib/commit/b6b99dde022e1e14c4797e454b1d7fca50e49482)
+
++ Remove blobvault client from ripple-lib, use the [`ripple-vault-client`](https://github.com/ripple/ripple-vault-client) instead [9b3d62b7](https://github.com/ripple/ripple-lib/commit/9b3d62b765c4c25beae6eb0fa57ef3a07f2581b1) 
 
 + [Add support for `ledger` option in requestBookOffers](https://github.com/ripple/ripple-lib/commit/34c0677c453c409ef0a5b351959abdc176d3bacb)
 
@@ -9,6 +11,10 @@
 + [Fix metadata account check](https://github.com/ripple/ripple-lib/commit/3f61598d6c87e3cc877af60e2d515f9eff73dfe1)
 
 + [Decrease redundancy in binary account_tx parsing](https://github.com/ripple/ripple-lib/commit/0aba638e6e7f4f6e22cb6424eed3897ebad90a5a)
+
++ [Abort server connection on unrecoverable TLS error](https://github.com/ripple/ripple-lib/commit/000a2ea00c57157044aeca0fb3f24b37669b163c)
+
++ [Fix complete ledgers check on subscription that is not initial](https://github.com/ripple/ripple-lib/commit/89de91301e682a46dc60aaacc7ae152e8fe1b7c7)
 
 
 ##0.10.0
