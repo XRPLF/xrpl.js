@@ -210,7 +210,7 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
       if (typeof structure.to_json === 'function') {
         output = structure.to_json();
       } else if (structure instanceof BigInteger) {
-        output = structure.toString(16).toUpperCase();
+        output = ('0000000000000000' + structure.toString(16).toUpperCase()).slice(-16);
       } else {
         //new Array or Object
         output = new structure.constructor();

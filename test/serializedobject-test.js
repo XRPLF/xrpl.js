@@ -29,10 +29,14 @@ describe('Serialized object', function() {
           {
             account:   'r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV',
             currency:  'USD',
-            issuer:    'r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV'
+            issuer:    'r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV',
+            type: 49,
+            type_hex: "0000000000000031"
           },
           {
-            currency: 'XRP'
+            currency: 'XRP',
+            type: 16,
+            type_hex: "0000000000000010"
           }
         ]],
         SendMax: {
