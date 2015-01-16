@@ -30,13 +30,13 @@
     "gulp-concat": "~2.2.0",
     "gulp-filelog": "^0.4.1",
     "gulp-flowtype": "^0.4.1",
-    "gulp-jshint": "~1.5.5",
     "gulp-plumber": "^0.6.6",
     "gulp-react": "^2.0.0",
     "gulp-rename": "~1.2.0",
     "gulp-uglify": "~0.3.0",
     "gulp-util": "^3.0.2",
     "gulp-watch": "^3.0.0",
+    "gulp-eslint": "^0.2.0",
     "istanbul": "~0.2.10",
     "map-stream": "~0.1.0",
     "mocha": "~1.14.0",
@@ -48,7 +48,8 @@
     "build": "node_modules/.bin/gulp",
     "pretest": "node_modules/.bin/gulp concat-sjcl",
     "test": "./node_modules/.bin/istanbul test -x build/sjcl.js -x src/js/jsbn/* ./node_modules/mocha/bin/_mocha -- --reporter tap test/*-test.js",
-    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "lint": "./node_modules/.bin/gulp lint"
   },
   "repository": {
     "type": "git",

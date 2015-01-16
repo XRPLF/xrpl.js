@@ -8,7 +8,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var webpack = require('webpack');
-var jshint = require('gulp-jshint');
+var eslint = require('gulp-eslint');
 var map = require('map-stream');
 var bump = require('gulp-bump');
 var react = require('gulp-react');
@@ -161,33 +161,9 @@ gulp.task('bower-version', function() {
 gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug', 'bower-version']);
 
 gulp.task('lint', function() {
-  gulp.src('src/js/ripple/*.js')
-  .pipe(jshint('./jshintrc'))
-  .pipe(map(function(file, callback) {
-    if (file.jshint.success) {
-      return callback(null, file);
-    }
-
-    console.log('\n>' + file.path.substring(file.base.length) + '\n');
-
-    file.jshint.results.forEach(function(err) {
-      if (err && err.error) {
-        var col1 = err.error.line + ':' + err.error.character;
-        var col2 = err.error.reason;
-        var col3 = '(' + err.error.code + ')';
-
-        while (col1.length < 8) {
-          col1 = ' ' + col1;
-        }
-
-        col1 += ' |';
-
-        console.log([ col1, col2, col3 ].join(' '));
-      }
-    });
-
-    callback(null, file);
-  }));
+  return gulp.src('src/js/ripple/*.js')
+  .pipe(eslint({ reset: true, configFile: './eslint.json' }))
+  .pipe(eslint.format());
 });
 
 gulp.task('watch', function() {
@@ -197,20 +173,20 @@ gulp.task('watch', function() {
 // To use this, each javascript file must have /* @flow */ on the first line
 gulp.task('typecheck', function() {
   return gulp.src('src/js/ripple/*.js')
-    .pipe(flow({      // note: do not set the 'all' option, it is broken
-        weak: true,   // remove this after all errors are addressed
-        killFlow: true
-    }));
+  .pipe(flow({      // note: do not set the 'all' option, it is broken
+    weak: true,   // remove this after all errors are addressed
+    killFlow: true
+  }));
 });
 
 gulp.task('strip', function() {
   return gulp.src('src/js/ripple/*.js')
-    .pipe(watch('src/js/ripple/*.js'))
-    .pipe(cleanDest('out'))   // delete outdated output file before stripping
-    .pipe(plumber())        // prevent an error in one file from ending build
-    .pipe(react({ stripTypes: true }).on('error', logPluginError))
-    .pipe(filelog())
-    .pipe(gulp.dest('out'));
+  .pipe(watch('src/js/ripple/*.js'))
+  .pipe(cleanDest('out'))   // delete outdated output file before stripping
+  .pipe(plumber())        // prevent an error in one file from ending build
+  .pipe(react({ stripTypes: true }).on('error', logPluginError))
+  .pipe(filelog())
+  .pipe(gulp.dest('out'));
 });
 
 gulp.task('version-bump', function() {
