@@ -439,7 +439,13 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
     var received = transaction.findId(self._pending._idCache);
 
     if (received) {
-      return transaction.emit('success', received);
+      switch (received.engine_result) {
+        case 'tesSUCCESS':
+          transaction.emit('success', received);
+          break;
+        default:
+          transaction.emit('error', received);
+      }
     }
 
     while (self._pending.hasSequence(transaction.tx_json.Sequence)) {
