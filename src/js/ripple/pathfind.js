@@ -55,7 +55,7 @@ PathFind.prototype.create = function () {
 };
 
 PathFind.prototype.close = function () {
-  this.remote.request_path_find_close().request();
+  this.remote.request_path_find_close().broadcast().request();
   this.emit('end');
   this.emit('close');
 };
