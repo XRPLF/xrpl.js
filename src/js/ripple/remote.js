@@ -1038,6 +1038,52 @@ Remote.prototype.requestLedgerCurrent = function(callback) {
 };
 
 /**
+ * Request ledger_data
+ *
+ * Get the contents of a specified ledger
+ *
+ * @param {Object} options
+ * @property {Boolean} [options.binary]       - Flag which determines if rippled returns binary or parsed JSON
+ * @property {String|Number} [options.ledger] - Hash or sequence of a ledger to get contents for
+ * @property {Number} [options.limit]         - Number of contents to retrieve from the ledger
+ * @property {Function} callback
+ *
+ * @callback
+ * @param {Error} error
+ * @param {LedgerData} ledgerData
+ *
+ * @return {Request} request
+ */
+
+Remote.prototype.requestLedgerData = function(options, callback) {
+  var request = new Request(this, 'ledger_data');
+
+  request.message.binary = options.binary !== false;
+  request.selectLedger(options.ledger);
+  request.message.limit = options.limit;
+
+  request.once('success', function(res) {
+    if (options.binary === false) {
+      request.emit('state', res);
+      return;
+    }
+
+    async.mapSeries(res.state, function(ledgerData, next) {
+      async.setImmediate(function() {
+        next(null, Remote.parseBinaryLedgerData(ledgerData));
+      });
+    }, function(err, state) {
+      res.state = state;
+      request.emit('state', res);
+    });
+  });
+
+  request.callback(callback, 'state');
+
+  return request;
+};
+
+/**
  * Request ledger_entry
  *
  * @param [String] type
@@ -1201,17 +1247,40 @@ Remote.prototype.requestTransactionEntry = function(hash, ledgerHash, callback) 
 /**
  * Request tx
  *
- * @param {String} transaction hash
+ * @param {Object|String} hash
+ * @property {String} hash.hash           - Transaction hash
+ * @property {Boolean} [hash.binary=true] - Flag which determines if rippled returns binary or parsed JSON
  * @param [Function] callback
  * @return {Request} request
  */
 
 Remote.prototype.requestTransaction =
 Remote.prototype.requestTx = function(hash, callback) {
+  var options;
+
+  if (typeof hash === 'string') {
+    options = {
+      hash: hash
+    }
+  } else {
+    options = hash;
+  }
+
   var request = new Request(this, 'tx');
 
-  request.message.transaction = hash;
-  request.callback(callback);
+  request.message.binary = options.binary !== false;
+  request.message.transaction = options.hash;
+
+  request.once('success', function(res) {
+    if (options.binary === false) {
+      request.emit('transaction', res);
+      return;
+    }
+
+    request.emit('transaction', Remote.parseBinaryTransaction(res));
+  });
+
+  request.callback(callback, 'transaction');
 
   return request;
 };
@@ -1387,16 +1456,15 @@ Remote.prototype.requestAccountOffers = function(options, callback) {
  * Request account_tx
  *
  * @param {Object} options
- *
- *    @param {String} account
- *    @param [Number] ledger_index_min defaults to -1 if ledger_index_max is specified.
- *    @param [Number] ledger_index_max defaults to -1 if ledger_index_min is specified.
- *    @param [Boolean] binary, defaults to false
- *    @param [Boolean] parseBinary, defaults to true
- *    @param [Boolean] count, defaults to false
- *    @param [Boolean] descending, defaults to false
- *    @param [Number] offset, defaults to 0
- *    @param [Number] limit
+ * @property {String} options.account
+ * @property {Number} options.ledger_index_min - Defaults to -1 if ledger_index_max is specified.
+ * @property {Number} options.ledger_index_max - Defaults to -1 if ledger_index_min is specified.
+ * @property {Boolean} options.binary          - Defaults to true
+ * @property {Boolean} options.parseBinary     - Defaults to true
+ * @property {Boolean} options.count           - Defaults to false
+ * @property {Boolean} options.descending      - Defaults to false
+ * @property {Number} options.offset           - Defaults to 0
+ * @property {Number} options.limit
  *
  * @param [Function] callback
  * @return {Request}
@@ -1408,6 +1476,8 @@ Remote.prototype.requestAccountTx = function(options, callback) {
   //utils.assert(this.trusted);
 
   var request = new Request(this, 'account_tx');
+
+  options.binary = options.binary !== false;
 
   if (options.min_ledger !== void(0)) {
     options.ledger_index_min = options.min_ledger;
@@ -1448,7 +1518,7 @@ Remote.prototype.requestAccountTx = function(options, callback) {
 
     async.mapSeries(res.transactions, function(transaction, next) {
       async.setImmediate(function() {
-        next(null, Remote.parseBinaryTransaction(transaction));
+        next(null, Remote.parseBinaryAccountTransaction(transaction));
       });
     }, function(err, transactions) {
       res.transactions = transactions;
@@ -1466,20 +1536,69 @@ Remote.prototype.requestAccountTx = function(options, callback) {
  * @return {Transaction}
  */
 
-Remote.parseBinaryTransaction = function(transaction) {
+Remote.parseBinaryAccountTransaction = function(transaction) {
   var tx_obj = new SerializedObject(transaction.tx_blob);
-  var meta = new SerializedObject(transaction.meta);
+  var tx_obj_json = tx_obj.to_json();
+  var meta = new SerializedObject(transaction.meta).to_json();
 
   var tx_result = {
-    validated: transaction.validated,
-    ledger_index: transaction.ledger_index
+    validated: transaction.validated
   };
 
-  tx_result.meta = meta.to_json();
-  tx_result.tx = tx_obj.to_json();
+  tx_result.meta = meta;
+  tx_result.tx = tx_obj_json;
   tx_result.tx.hash = tx_obj.hash(hashprefixes.HASH_TX_ID).to_hex();
+  tx_result.tx.ledger_index = transaction.ledger_index;
+  tx_result.tx.inLedger = transaction.ledger_index;
+
+  if (typeof meta.DeliveredAmount === 'object') {
+    tx_result.meta.delivered_amount = meta.DeliveredAmount;
+  } else if (typeof tx_obj_json.Amount === 'string' || typeof tx_obj_json.Amount === 'object') {
+    tx_result.meta.delivered_amount = tx_obj_json.Amount;
+  }
 
   return tx_result;
+};
+
+Remote.parseBinaryTransaction = function(transaction) {
+  var tx_obj = new SerializedObject(transaction.tx).to_json();
+  var meta = new SerializedObject(transaction.meta).to_json();
+
+  var tx_result = tx_obj;
+
+  tx_result.date = transaction.date;
+  tx_result.hash = transaction.hash;
+  tx_result.inLedger = transaction.inLedger;
+  tx_result.ledger_index = transaction.ledger_index;
+  tx_result.meta = meta;
+  tx_result.validated = transaction.validated;
+
+  if (typeof meta.DeliveredAmount === 'object') {
+    tx_result.meta.delivered_amount = meta.DeliveredAmount;
+  } else if (typeof tx_obj.Amount === 'string' || typeof tx_obj.Amount === 'object') {
+    tx_result.meta.delivered_amount = tx_obj.Amount;
+  }
+
+  return tx_result;
+};
+
+/**
+ * Parse binary ledger state data
+ *
+ * @param {Object} ledgerData
+ * @property {String} ledgerData.data
+ * @property {String} ledgerData.index
+ *
+ * @return {State}
+ */
+
+Remote.parseBinaryLedgerData = function(ledgerData) {
+  var data = new SerializedObject(ledgerData.data);
+
+  var state = data.to_json();
+  state.index = ledgerData.index;
+
+  return state;
 };
 
 /**

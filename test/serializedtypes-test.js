@@ -673,7 +673,7 @@ describe('Serialized types', function() {
     it('Serialize path through XRP', function () {
       var hex = '31000000000000000000000000000000000000007B00000000000000000000000055534400000000000000000000000000000000000000000000000315FF1000000000000000000000000000000000000000003100000000000000000000000000000000000003DB0000000000000000000000004555520000000000000000000000000000000000000000000000014100';
       var json = [
-        [ {
+        [{
           account:   "rrrrrrrrrrrrrrrrrrrrNxV3Xza",
           currency:  'USD',
           issuer:    "rrrrrrrrrrrrrrrrrrrpYnYCNYf"
@@ -687,18 +687,39 @@ describe('Serialized types', function() {
         }]
       ];
 
+      var result_json = [ 
+        [{ 
+          account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
+          currency: 'USD',
+          issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }],
+        [{ 
+          currency: 'XRP', 
+          type: 16, 
+          type_hex: '0000000000000010' 
+        }, { 
+          account: 'rrrrrrrrrrrrrrrrrrrpvQsW3V3',
+          currency: 'EUR',
+          issuer: 'rrrrrrrrrrrrrrrrrrrdHRtqg2',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }] 
+      ];
+
       var so = new SerializedObject();
       types.PathSet.serialize(so, json);
       assert.strictEqual(so.to_hex(), hex);
 
       so = new SerializedObject(hex);
       var parsed_path = SerializedObject.jsonify_structure(types.PathSet.parse(so));
-      assert.deepEqual(parsed_path, json);
+      assert.deepEqual(parsed_path, result_json);
     });
     it('Serialize path through XRP IOUs', function () {
       var hex = '31000000000000000000000000000000000000007B00000000000000000000000055534400000000000000000000000000000000000000000000000315FF1000000000000000000000000058525000000000003100000000000000000000000000000000000003DB0000000000000000000000004555520000000000000000000000000000000000000000000000014100';
       var json = [
-        [ {
+        [{
           account:   "rrrrrrrrrrrrrrrrrrrrNxV3Xza",
           currency:  'USD',
           issuer:    "rrrrrrrrrrrrrrrrrrrpYnYCNYf"
@@ -713,13 +734,35 @@ describe('Serialized types', function() {
         }]
       ];
 
+      var result_json = [ 
+        [{ 
+          account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
+          currency: 'USD',
+          issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }],
+        [{ 
+          currency: 'XRP',
+          non_native: true,
+          type: 16,
+          type_hex: '0000000000000010' 
+        }, { 
+          account: 'rrrrrrrrrrrrrrrrrrrpvQsW3V3',
+          currency: 'EUR',
+          issuer: 'rrrrrrrrrrrrrrrrrrrdHRtqg2',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }] 
+      ];
+
       var so = new SerializedObject();
       types.PathSet.serialize(so, json);
       assert.strictEqual(so.to_hex(), hex);
 
       so = new SerializedObject(hex);
       var parsed_path = SerializedObject.jsonify_structure(types.PathSet.parse(so));
-      assert.deepEqual(parsed_path, json);
+      assert.deepEqual(parsed_path, result_json);
     });
     it('Serialize path through XRP IOUs (realistic example)', function () {
       // Appears in the history
@@ -778,13 +821,87 @@ describe('Serialized types', function() {
         }]
       ];
 
+      var result_json = [ 
+        [{ 
+          account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+          currency: 'BTC',
+          issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }, { 
+          account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+          currency: 'BTC',
+          issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }, { 
+          account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+          currency: 'BTC',
+          issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }, { 
+          currency: 'USD',
+          issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+          type: 48,
+          type_hex: '0000000000000030' 
+        }],
+        [{ 
+          account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+          currency: 'BTC',
+          issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }, { 
+          account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+          currency: 'BTC',
+          issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }, { 
+          account: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi',
+          currency: 'BTC',
+          issuer: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }, { 
+          currency: 'USD',
+          issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+          type: 48,
+          type_hex: '0000000000000030' 
+        }],
+        [{ 
+          account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+          currency: 'BTC',
+          issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }, { 
+          account: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn',
+          currency: 'BTC',
+          issuer: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn',
+          type: 49,
+          type_hex: '0000000000000031' 
+        }, { 
+          currency: 'XRP',
+          non_native: true,
+          type: 16,
+          type_hex: '0000000000000010' 
+        }, { 
+          currency: 'USD',
+          issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+          type: 48,
+          type_hex: '0000000000000030' 
+        }] 
+      ];
+
       var so = new SerializedObject();
       types.PathSet.serialize(so, json);
       assert.strictEqual(so.to_hex(), hex);
 
       so = new SerializedObject(hex);
       var parsed_path = SerializedObject.jsonify_structure(types.PathSet.parse(so));
-      assert.deepEqual(parsed_path, json);
+      assert.deepEqual(parsed_path, result_json);
     });
     it('Parse single empty path [[]]', function () {
       var so = new SerializedObject('00');
@@ -797,13 +914,20 @@ describe('Serialized types', function() {
       var parsed_path = types.PathSet.parse(so);
       var comp = [ [ { account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
                        currency: 'USD',
-                       issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf' } ],
+                       issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf',
+                       type: 49,
+                       type_hex: '0000000000000031' } ],
                    [ { account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
                        currency: 'BTC',
-                       issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf' },
+                       issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf',
+                       type: 49,
+                       type_hex: '0000000000000031' },
                      { account: 'rrrrrrrrrrrrrrrrrrrpvQsW3V3',
                        currency: 'EUR',
-                       issuer: 'rrrrrrrrrrrrrrrrrrrdHRtqg2' } ] ];
+                       issuer: 'rrrrrrrrrrrrrrrrrrrdHRtqg2',
+                       type: 49,
+                       type_hex: '0000000000000031' } ] ];
+
       assert.deepEqual(SerializedObject.jsonify_structure(parsed_path, ""), comp);
     });
   });

@@ -7,12 +7,12 @@ var Currency = require('ripple-lib').Currency;
 
 var options, remote, callback, database, tx;
 
-var ADDRESS       = 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS';
-var PEER_ADDRESS  = 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX';
-var LEDGER_INDEX  = 9592219;
-var LEDGER_HASH   = 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
-var PAGING_MARKER = '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73';
-
+var ADDRESS          = 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS';
+var PEER_ADDRESS     = 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX';
+var LEDGER_INDEX     = 9592219;
+var LEDGER_HASH      = 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
+var PAGING_MARKER    = '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73';
+var TRANSACTION_HASH = '14576FFD5D59FFA73CAA90547BE4DE09926AAB59E981306C32CCE04408CBF8EA';
 
 describe('Remote', function () {
   beforeEach(function () {
@@ -425,6 +425,203 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
+  it ('requestAccountTransactions', function () {
+    function callback() {}
+
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestAccountTransactions(
+      {
+        account: UInt160.ACCOUNT_ONE,
+        min_ledger: -1,
+        max_ledger: -1,
+        limit: 5,
+        forward: true,
+        marker: PAGING_MARKER
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'account_tx',
+      id: undefined,
+      account: UInt160.ACCOUNT_ONE,
+      ledger_index_min: -1,
+      ledger_index_max: -1,
+      binary: true,
+      forward: true,
+      limit: 5,
+      marker: PAGING_MARKER
+    });
+
+    assert(request.requested);
+  });
+
+  it ('requestAccountTransactions - binary false', function () {
+    function callback() {}
+
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestAccountTransactions(
+      {
+        binary: false
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'account_tx',
+      id: undefined,
+      binary: false
+    });
+
+    assert(request.requested);
+  });
+
+  it ('requestTransaction', function () {
+    function callback() {}
+
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestTransaction(
+      {
+        hash: TRANSACTION_HASH
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'tx',
+      id: undefined,
+      binary: true,
+      transaction: TRANSACTION_HASH
+    });
+
+    assert(request.requested);
+  });
+
+  it ('requestTransaction - hash', function () {
+    function callback() {}
+
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestTransaction(TRANSACTION_HASH, callback);
+
+    assert.deepEqual(request.message, {
+      command: 'tx',
+      id: undefined,
+      binary: true,
+      transaction: TRANSACTION_HASH
+    });
+
+    assert(request.requested);
+  });
+
+  it ('requestTransaction - binary false', function () {
+    function callback() {}
+
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestTransaction(
+      {
+        hash: TRANSACTION_HASH,
+        binary: false
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'tx',
+      id: undefined,
+      binary: false,
+      transaction: TRANSACTION_HASH
+    });
+
+    assert(request.requested);
+  });
+
+  it ('requestLedgerData', function () {
+    function callback() {}
+
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestLedgerData(
+      {
+        ledger: LEDGER_HASH,
+        limit: 5
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'ledger_data',
+      id: undefined,
+      binary: true,
+      ledger_hash: LEDGER_HASH,
+      limit: 5
+    });
+
+    assert(request.requested);
+  });
+
+  it ('requestLedgerData - ledger index', function () {
+    function callback() {}
+
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestLedgerData(
+      {
+        ledger: LEDGER_INDEX,
+        limit: 5,
+        binary: false
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'ledger_data',
+      id: undefined,
+      binary: false,
+      ledger_index: LEDGER_INDEX,
+      limit: 5,
+    });
+
+    assert(request.requested);
+  });
+
+  it ('requestLedgerData - binary false', function () {
+    function callback() {}
+
+    var remote = new Remote({
+      servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
+    });
+    var request = remote.requestLedgerData(
+      {
+        ledger: LEDGER_HASH,
+        limit: 5,
+        binary: false
+      },
+      callback
+    );
+
+    assert.deepEqual(request.message, {
+      command: 'ledger_data',
+      id: undefined,
+      binary: false,
+      ledger_hash: LEDGER_HASH,
+      limit: 5,
+    });
+
+    assert(request.requested);
+  });
+
   it('create remote and get pending transactions', function() {
     before(function() {
       tx =  [{
@@ -512,10 +709,49 @@ describe('Remote', function () {
     })
   })
 
-  it('Remote.parseBinaryTransaction()', function() {
+  it('Remote.parseBinaryAccountTransaction()', function() {
+    var binaryAccountTransaction = require('./fixtures/binary-account-transaction.json');
+
+    var parsed = Remote.parseBinaryAccountTransaction(binaryAccountTransaction.OfferCreate.binary);
+    assert.deepEqual(parsed, binaryAccountTransaction.OfferCreate.parsed);
+
+    var parsedPartialPayment = Remote.parseBinaryAccountTransaction(binaryAccountTransaction.PartialPayment.binary);
+    assert.deepEqual(parsedPartialPayment, binaryAccountTransaction.PartialPayment.parsed);
+
+    var parsedPayment = Remote.parseBinaryAccountTransaction(binaryAccountTransaction.Payment.binary);
+    assert.deepEqual(parsedPayment, binaryAccountTransaction.Payment.parsed);        
+  });
+
+  it('Remote.parseBinaryTransaction()', function () {
     var binaryTransaction = require('./fixtures/binary-transaction.json');
-    var parsed = Remote.parseBinaryTransaction(binaryTransaction.binary);
-    assert.deepEqual(parsed, binaryTransaction.parsed);
+    
+    var parsedSourceTag = Remote.parseBinaryTransaction(binaryTransaction.PaymentWithSourceTag.binary);
+    assert.deepEqual(parsedSourceTag, binaryTransaction.PaymentWithSourceTag.parsed);
+
+    var parsedMemosAndPaths = Remote.parseBinaryTransaction(binaryTransaction.PaymentWithMemosAndPaths.binary);
+    assert.deepEqual(parsedMemosAndPaths, binaryTransaction.PaymentWithMemosAndPaths.parsed);
+
+    var parsedPartialPayment = Remote.parseBinaryTransaction(binaryTransaction.PartialPayment.binary);
+    assert.deepEqual(parsedPartialPayment, binaryTransaction.PartialPayment.parsed);
+
+    var parsedOfferCreate = Remote.parseBinaryTransaction(binaryTransaction.OfferCreate.binary);
+    assert.deepEqual(parsedOfferCreate, binaryTransaction.OfferCreate.parsed);
+  });
+
+  it('Remote.parseBinaryLedgerData()', function () {
+    var binaryLedgerData = require('./fixtures/binary-ledger-data.json');
+
+    var parsedAccountRoot = Remote.parseBinaryLedgerData(binaryLedgerData.AccountRoot.binary);
+    assert.deepEqual(parsedAccountRoot, binaryLedgerData.AccountRoot.parsed);
+
+    var parsedOffer = Remote.parseBinaryLedgerData(binaryLedgerData.Offer.binary);
+    assert.deepEqual(parsedOffer, binaryLedgerData.Offer.parsed);
+
+    var parsedDirectoryNode = Remote.parseBinaryLedgerData(binaryLedgerData.DirectoryNode.binary);
+    assert.deepEqual(parsedDirectoryNode, binaryLedgerData.DirectoryNode.parsed);
+
+    var parsedRippleState = Remote.parseBinaryLedgerData(binaryLedgerData.RippleState.binary);
+    assert.deepEqual(parsedRippleState, binaryLedgerData.RippleState.parsed);
   });
 
   describe('request constructors', function () {

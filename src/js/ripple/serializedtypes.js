@@ -234,6 +234,7 @@ var STInt64 = exports.Int64 = new SerializedType({
     // pessimistic numeric fraek. What doth lief?
     var result = new BigInteger([0].concat(bytes), 256);
     assert(result instanceof BigInteger);
+
     return result;
   }
 });
@@ -541,6 +542,7 @@ var STPathSet = exports.PathSet = new SerializedType({
       //It's an entry-begin tag.
       //console.log('It's an entry-begin tag.');
       var entry = {};
+      var type = 0;
 
       if (tag_byte & this.typeAccount) {
         //console.log('entry.account');
@@ -548,6 +550,7 @@ var STPathSet = exports.PathSet = new SerializedType({
           console.log('BTA:', bta);*/
         entry.account = STHash160.parse(so);
         entry.account.set_version(Base.VER_ACCOUNT_ID);
+        type = type | this.typeAccount;
       }
       if (tag_byte & this.typeCurrency) {
         //console.log('entry.currency');
@@ -555,6 +558,7 @@ var STPathSet = exports.PathSet = new SerializedType({
         if (entry.currency.to_json() === 'XRP' && !entry.currency.is_native()) {
           entry.non_native = true;
         }
+        type = type | this.typeCurrency;
       }
       if (tag_byte & this.typeIssuer) {
         //console.log('entry.issuer');
@@ -562,9 +566,14 @@ var STPathSet = exports.PathSet = new SerializedType({
         // Enable and set correct type of base-58 encoding
         entry.issuer.set_version(Base.VER_ACCOUNT_ID);
         //console.log('DONE WITH ISSUER!');
+
+        type = type | this.typeIssuer;
       }
 
       if (entry.account || entry.currency || entry.issuer) {
+        entry.type = type;
+        entry.type_hex = ("000000000000000" + type.toString(16)).slice(-16);
+
         current_path.push(entry);
       } else {
         throw new Error('Invalid path entry'); //It must have at least something in it.
@@ -674,7 +683,11 @@ var STMemo = exports.STMemo = new SerializedType({
     }
 
     if (output['MemoType'] !== void(0)) {
-      output['parsed_memo_type'] = convertHexToString(output['MemoType']);
+      var parsedType = convertHexToString(output['MemoType']);
+
+      if (parsedType !== 'unformatted_memo') {
+        output['parsed_memo_type'] = convertHexToString(output['MemoType']);
+      }
     }
 
     if (output['MemoFormat'] !== void(0)) {
