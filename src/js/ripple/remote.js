@@ -13,6 +13,7 @@
 // YYY Will later provide js/network.js which will transparently use multiple
 // instances of this class for network access.
 
+var _                = require('lodash');
 var EventEmitter     = require('events').EventEmitter;
 var util             = require('util');
 var assert           = require('assert');
@@ -1475,6 +1476,7 @@ Remote.prototype.requestAccountTx = function(options, callback) {
   // XXX Does this require the server to be trusted?
   //utils.assert(this.trusted);
 
+  var self = this;
   var request = new Request(this, 'account_tx');
 
   options.binary = options.binary !== false;
@@ -1516,12 +1518,37 @@ Remote.prototype.requestAccountTx = function(options, callback) {
       return;
     }
 
-    async.mapSeries(res.transactions, function(transaction, next) {
-      async.setImmediate(function() {
-        next(null, Remote.parseBinaryAccountTransaction(transaction));
+    var ledgerRequests = {};
+    var ledgerData = {};
+
+    async.each(res.transactions, function(transaction, next) {
+      // Prevent duplicate ledger requests
+      if (ledgerRequests[transaction.ledger_index] instanceof Request) {
+        return next(null);
+      } 
+
+      ledgerRequests[transaction.ledger_index] = self.requestLedger({
+        ledger_index: transaction.ledger_index
+      }, function (err, data) {
+        if (err) {
+          return next(err);
+        }
+
+        ledgerData[transaction.ledger_index] = data.ledger;
+
+        next(null);
       });
-    }, function(err, transactions) {
-      res.transactions = transactions;
+    }, function (err) {
+      res.transactions = _.map(res.transactions, function (transaction) {
+        var parsedAccountTransaction = Remote.parseBinaryAccountTransaction(transaction);
+
+        if (_.isObject(ledgerData[transaction.ledger_index])) {
+          parsedAccountTransaction.tx.date = ledgerData[transaction.ledger_index].close_time;
+        }
+
+        return parsedAccountTransaction;
+      });
+
       request.emit('transactions', res);
     });
   });

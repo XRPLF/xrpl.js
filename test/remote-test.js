@@ -4,6 +4,7 @@ var Server = require('ripple-lib').Server;
 var Request = require('ripple-lib').Request;
 var UInt160 = require('ripple-lib').UInt160;
 var Currency = require('ripple-lib').Currency;
+var MockServer = require('./utils/mock_server');
 
 var options, remote, callback, database, tx;
 
@@ -14,8 +15,8 @@ var LEDGER_HASH      = 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B59
 var PAGING_MARKER    = '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73';
 var TRANSACTION_HASH = '14576FFD5D59FFA73CAA90547BE4DE09926AAB59E981306C32CCE04408CBF8EA';
 
-describe('Remote', function () {
-  beforeEach(function () {
+describe('Remote', function() {
+  beforeEach(function() {
     options = {
       trace :         true,
       trusted:        true,
@@ -425,12 +426,13 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
-  it ('requestAccountTransactions', function () {
+  it('requestAccountTransactions', function() {
     function callback() {}
 
     var remote = new Remote({
       servers: [ { host: 's-west.ripple.com', port: 443, secure: true } ]
     });
+
     var request = remote.requestAccountTransactions(
       {
         account: UInt160.ACCOUNT_ONE,
@@ -458,7 +460,7 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
-  it ('requestAccountTransactions - binary false', function () {
+  it('requestAccountTransactions - binary false', function() {
     function callback() {}
 
     var remote = new Remote({
@@ -480,7 +482,93 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
-  it ('requestTransaction', function () {
+  it('requestAccountTransactions - binary true -- populate date', function(done) {
+    var binaryAccountTransaction = require('./fixtures/binary-account-transaction.json');
+    var ledger = require('./fixtures/ledger-non-full-1000000');
+
+    var server = MockServer.makeServer('wss://localhost:5006');
+
+    server._request = function(req) {
+      if (req.message.command === 'account_tx') {
+        req.emit('success', {
+          account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+          ledger_index_max: 11253992,
+          ledger_index_min: 32570,
+          limit: 1,
+          marker: {
+            ledger: 10555014,
+            seq: 4
+          },
+          transactions: [
+            binaryAccountTransaction.Payment.binary
+          ]
+        });
+      } else if (req.message.command === 'ledger') {
+        req.emit('success', ledger);
+      }
+    };
+
+    function callback(err, data) {
+      assert.strictEqual(err, null);
+      assert.strictEqual(data.transactions[0].tx.date, 424159320);
+
+      done();
+    }
+
+    var remote = new Remote();
+    remote._servers = [server];
+    remote._connected = true;
+
+    var request = remote.requestAccountTransactions({}, callback);
+  });
+
+  it('requestAccountTransactions - binary true -- duplicate ledger_index', function(done) {
+    var binaryAccountTransaction = require('./fixtures/binary-account-transaction.json');
+    var ledger = require('./fixtures/ledger-non-full-1000000');
+
+    var server = MockServer.makeServer('wss://localhost:5006');
+    var ledgerCommandCount = 0;
+
+    server._request = function(req) {
+      if (req.message.command === 'account_tx') {
+        req.emit('success', {
+          account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+          ledger_index_max: 11253992,
+          ledger_index_min: 32570,
+          limit: 1,
+          marker: {
+            ledger: 10555014,
+            seq: 4
+          },
+          transactions: [
+            binaryAccountTransaction.Payment.binary,
+            binaryAccountTransaction.Payment.binary,
+            binaryAccountTransaction.OfferCreate.binary,
+            binaryAccountTransaction.OfferCreate.binary,
+            binaryAccountTransaction.PartialPayment.binary
+          ]
+        });
+      } else if (req.message.command === 'ledger') {
+        ledgerCommandCount += 1;
+
+        req.emit('success', ledger);
+      }
+    };
+
+    function callback(err, data) {
+      assert.strictEqual(ledgerCommandCount, 3);
+
+      done();
+    }
+
+    var remote = new Remote();
+    remote._servers = [server];
+    remote._connected = true;
+
+    var request = remote.requestAccountTransactions({}, callback);
+  });
+
+  it('requestTransaction', function() {
     function callback() {}
 
     var remote = new Remote({
@@ -503,7 +591,7 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
-  it ('requestTransaction - hash', function () {
+  it('requestTransaction - hash', function() {
     function callback() {}
 
     var remote = new Remote({
@@ -521,7 +609,7 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
-  it ('requestTransaction - binary false', function () {
+  it('requestTransaction - binary false', function() {
     function callback() {}
 
     var remote = new Remote({
@@ -545,7 +633,7 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
-  it ('requestLedgerData', function () {
+  it('requestLedgerData', function() {
     function callback() {}
 
     var remote = new Remote({
@@ -570,7 +658,7 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
-  it ('requestLedgerData - ledger index', function () {
+  it('requestLedgerData - ledger index', function() {
     function callback() {}
 
     var remote = new Remote({
@@ -596,7 +684,7 @@ describe('Remote', function () {
     assert(request.requested);
   });
 
-  it ('requestLedgerData - binary false', function () {
+  it('requestLedgerData - binary false', function() {
     function callback() {}
 
     var remote = new Remote({
@@ -722,7 +810,7 @@ describe('Remote', function () {
     assert.deepEqual(parsedPayment, binaryAccountTransaction.Payment.parsed);        
   });
 
-  it('Remote.parseBinaryTransaction()', function () {
+  it('Remote.parseBinaryTransaction()', function() {
     var binaryTransaction = require('./fixtures/binary-transaction.json');
     
     var parsedSourceTag = Remote.parseBinaryTransaction(binaryTransaction.PaymentWithSourceTag.binary);
@@ -738,7 +826,7 @@ describe('Remote', function () {
     assert.deepEqual(parsedOfferCreate, binaryTransaction.OfferCreate.parsed);
   });
 
-  it('Remote.parseBinaryLedgerData()', function () {
+  it('Remote.parseBinaryLedgerData()', function() {
     var binaryLedgerData = require('./fixtures/binary-ledger-data.json');
 
     var parsedAccountRoot = Remote.parseBinaryLedgerData(binaryLedgerData.AccountRoot.binary);
@@ -754,7 +842,7 @@ describe('Remote', function () {
     assert.deepEqual(parsedRippleState, binaryLedgerData.RippleState.parsed);
   });
 
-  describe('request constructors', function () {
+  describe('request constructors', function() {
     beforeEach(function () {
       callback = function () {}
       remote = new Remote(options);
