@@ -2160,6 +2160,44 @@ Remote.prototype.dirtyAccountRoot = function(account) {
 };
 
 /**
+ * Get an Offer from the ledger
+ *
+ * @param {Object} options
+ *   @param {String|Number} options.ledger
+ *   @param {String} [options.account]  - Required unless using options.index
+ *   @param {Number} [options.sequence] - Required unless using options.index
+ *   @param {String} [options.index]    - Required only if options.account and options.sequence not provided
+ *
+ * @callback
+ * @param {Error} error
+ * @param {Object} message
+ *
+ * @return {Request}
+ */
+
+Remote.prototype.requestOffer = function(options, callback) {
+
+  var request = this.requestLedgerEntry('offer');
+
+  if (options.account && options.sequence) {
+    request.offerId(options.account, options.sequence);
+  } else if (options.index) {
+    request.offerIndex(options.index);
+  }
+
+  request.ledgerSelect(options.ledger);
+
+  request.once('success', function(res) {
+    request.emit('offer',res);
+  });
+
+  request.callback(callback, 'offer');
+
+  return request;
+};
+
+
+/**
  * Get an account's balance
  *
  * @param {String} account

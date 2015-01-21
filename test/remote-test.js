@@ -838,5 +838,33 @@ describe('Remote', function () {
       assert.strictEqual(request.message.account_root, ADDRESS);
       assert.strictEqual(request.message.ledger_index, 'validated');
     });
+
+    it('request offer with ledger index', function() {
+      var request = remote.requestOffer({account: ADDRESS, ledger: LEDGER_INDEX, sequence: 5});
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.offer.account, ADDRESS);
+      assert.strictEqual(request.message.offer.seq, 5);
+      assert.strictEqual(request.message.ledger_index, LEDGER_INDEX);
+    });
+    it('request offer with ledger hash', function() {
+      var request = remote.requestOffer({account: ADDRESS, ledger: LEDGER_HASH, sequence: 5});
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.offer.account, ADDRESS);
+      assert.strictEqual(request.message.offer.seq, 5);
+      assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
+    });
+    it('request account balance with ledger identifier', function() {
+      var request = remote.requestOffer({account: ADDRESS, ledger: 'validated', sequence: 5});
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.offer.account, ADDRESS);
+      assert.strictEqual(request.message.offer.seq, 5);
+      assert.strictEqual(request.message.ledger_index, 'validated');
+    });
+    it('request account balance with offer index', function() {
+      var request = remote.requestOffer({ index: TRANSACTION_HASH, ledger: LEDGER_INDEX});
+      assert.strictEqual(request.message.command, 'ledger_entry');
+      assert.strictEqual(request.message.offer, TRANSACTION_HASH);
+      assert.strictEqual(request.message.ledger_index, LEDGER_INDEX);
+    });
   });
 });
