@@ -726,6 +726,16 @@ describe('Request', function() {
     assert.strictEqual(request.message.ledger_hash, void(0));
   });
 
+  it('Select ledger - index (String)', function() {
+    var remote = new Remote();
+    remote._connected = true;
+
+    var request = new Request(remote, 'server_info');
+    request.ledgerSelect('7016915');
+    assert.strictEqual(request.message.ledger_index, 7016915);
+    assert.strictEqual(request.message.ledger_hash, void(0));
+  });
+
   it('Select ledger - hash', function() {
     var remote = new Remote();
     remote._connected = true;

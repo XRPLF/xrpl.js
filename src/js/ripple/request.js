@@ -355,8 +355,8 @@ Request.prototype.ledgerSelect = function(ledger) {
       this.message.ledger_index = ledger;
       break;
     default:
-      if (typeof ledger === 'number' && isFinite(ledger)) {
-        this.message.ledger_index = ledger;
+      if (Number(ledger) && isFinite(Number(ledger))) {
+        this.message.ledger_index = Number(ledger);
       } else if (/^[A-F0-9]{64}$/.test(ledger)) {
         this.message.ledger_hash = ledger;
       }
