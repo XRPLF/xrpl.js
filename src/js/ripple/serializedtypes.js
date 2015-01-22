@@ -38,10 +38,6 @@ function isHexInt64String(val) {
   return isString(val) && /^[0-9A-F]{0,16}$/i.test(val);
 }
 
-function isBigNumber(val) {
-  return val instanceof sjcl.bn;
-}
-
 function serializeBits(so, bits, noLength) {
   var byteData = sjcl.codec.bytes.fromBits(bits);
   if (!noLength) {
@@ -201,7 +197,7 @@ var STInt64 = exports.Int64 = new SerializedType({
         throw new Error('Not a valid hex Int64.');
       }
       bigNumObject = new sjcl.bn(val, 16);
-    } else if (isBigNumber(val)) {
+    } else if (val instanceof sjcl.bn) {
       if (!val.greaterEquals(0)) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
@@ -340,6 +336,9 @@ var STAmount = exports.Amount = new SerializedType({
         // Remaining 54 bits: mantissa
         var mantissaDecimal = utils.getMantissaDecimalString(value.abs());
         var mantissaHex = (new BigNumber(mantissaDecimal)).toString(16);
+        assert(mantissaHex.length <= 16,
+          'Mantissa hex representation ' + mantissaHex +
+          ' exceeds the maximum length of 16');
         hi |= parseInt(mantissaHex.slice(0, -8), 16) & 0x3fffff;
         lo = parseInt(mantissaHex.slice(-8), 16);
       }
@@ -554,7 +553,7 @@ var STPathSet = exports.PathSet = new SerializedType({
 
       if (entry.account || entry.currency || entry.issuer) {
         entry.type = type;
-        entry.type_hex = ("000000000000000" + type.toString(16)).slice(-16);
+        entry.type_hex = ('000000000000000' + type.toString(16)).slice(-16);
 
         current_path.push(entry);
       } else {

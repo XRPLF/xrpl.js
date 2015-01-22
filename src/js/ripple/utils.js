@@ -5,8 +5,8 @@ function configureBigNumber(BigNumber) {
                      DECIMAL_PLACES: 40 });
 }
 
-function getMantissaDecimalString(num) {
-  var mantissa = num.toString()
+function getMantissaDecimalString(bignum) {
+  var mantissa = bignum.toPrecision(16)
     .replace(/\./, '')      // remove decimal point
     .replace(/e.*/, '')     // remove scientific notation
     .replace(/^0*/, '');    // remove leading zeroes

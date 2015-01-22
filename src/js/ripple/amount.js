@@ -587,12 +587,12 @@ Amount.prototype.parse_quality = function(quality, counterCurrency, counterIssue
   this._issuer      = UInt160.from_json(counterIssuer);
   this._is_native   = this._currency.is_native();
 
-  var exponent = 0;
+  var power = 0;
   if (this._is_native) {
     if (opts.inverse) {
-      exponent += 1;
+      power += 1;
     } else {
-      exponent -= 1;
+      power -= 1;
     }
   }
 
@@ -601,14 +601,14 @@ Amount.prototype.parse_quality = function(quality, counterCurrency, counterIssue
       baseCurrency.is_valid() &&
       baseCurrency.is_native()) {
     if (opts.inverse) {
-      exponent -= 1;
+      power -= 1;
     } else {
-      exponent += 1;
+      power += 1;
     }
   }
 
   var one = new BigNumber(1);
-  var adjusted = value.times(Amount.bi_xns_unit.toPower(exponent));
+  var adjusted = value.times(Amount.bi_xns_unit.toPower(power));
   var newValue = opts.inverse ? one.dividedBy(adjusted) : adjusted;
   this._set_value(newValue);
 

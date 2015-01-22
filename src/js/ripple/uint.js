@@ -113,8 +113,7 @@ UInt.prototype.is_valid = function() {
 };
 
 UInt.prototype.is_zero = function() {
-  var val = this._value;
-  return val.limbs.length == 1 && val.limbs[0] == 0;
+  return this.is_valid() && this._value.equals(new sjcl.bn(0));
 };
 
 /**

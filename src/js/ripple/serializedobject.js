@@ -3,7 +3,6 @@ var assert    = require('assert');
 var extend    = require('extend');
 var binformat = require('./binformat');
 var stypes    = require('./serializedtypes');
-var UInt256   = require('./uint256').UInt256;
 var Crypt     = require('./crypt').Crypt;
 var utils     = require('./utils');
 
@@ -30,7 +29,7 @@ Object.keys(binformat.ter).forEach(function(key) {
 function normalize_sjcl_bn_hex(string) {
   var hex = string.slice(2);    // remove '0x' prefix
   // now strip leading zeros
-  var i = _.findIndex(hex, function(c) { return c != '0'; });
+  var i = _.findIndex(hex, function(c) { return c !== '0'; });
   return i >= 0 ? hex.slice(i) : '0';
 }
 
@@ -45,11 +44,11 @@ function SerializedObject(buf) {
     throw new Error('Invalid buffer passed.');
   }
   this.pointer = 0;
-};
+}
 
 SerializedObject.from_json = function(obj) {
   // Create a copy of the object so we don't modify it
-  var obj = extend(true, {}, obj);
+  obj = extend(true, {}, obj);
   var so  = new SerializedObject();
   var typedef;
 
@@ -110,8 +109,8 @@ SerializedObject.check_no_missing_fields = function(typedef, obj) {
 
     if (binformat.REQUIRED === requirement && obj[field] === void(0)) {
       missing_fields.push(field);
-    };
-  };
+    }
+  }
 
   if (missing_fields.length > 0) {
     var object_name;
@@ -121,12 +120,12 @@ SerializedObject.check_no_missing_fields = function(typedef, obj) {
     } else if (obj.LedgerEntryType != null){
       object_name = SerializedObject.lookup_type_le(obj.LedgerEntryType);
     } else {
-      object_name = "TransactionMetaData";
+      object_name = 'TransactionMetaData';
     }
 
-    throw new Error(object_name + " is missing fields: " +
+    throw new Error(object_name + ' is missing fields: ' +
                     JSON.stringify(missing_fields));
-  };
+  }
 };
 
 SerializedObject.prototype.append = function(bytes) {
@@ -159,7 +158,7 @@ function readOrPeek(advance) {
 
     return result;
   };
-};
+}
 
 SerializedObject.prototype.read = readOrPeek(true);
 
@@ -255,15 +254,15 @@ SerializedObject.prototype.serialize = function(typedef, obj) {
 
 SerializedObject.prototype.hash = function(prefix) {
   var sign_buffer = new SerializedObject();
-  
+
   // Add hashing prefix
-  if ("undefined" !== typeof prefix) {
+  if ('undefined' !== typeof prefix) {
     stypes.Int32.serialize(sign_buffer, prefix);
   }
 
   // Copy buffer to temporary buffer
   sign_buffer.append(this.buffer);
-  
+
   // XXX We need a proper Buffer class then Crypt could accept that
   var bits = sjcl.codec.bytes.toBits(sign_buffer.buffer);
   return Crypt.hashSha512Half(bits);
@@ -319,7 +318,7 @@ SerializedObject.sort_typedef = function(typedef) {
   function sort_field_compare(a, b) {
     // Sort by type id first, then by field id
     return a[3] !== b[3] ? stypes[a[3]].id - stypes[b[3]].id : a[2] - b[2];
-  };
+  }
 
   return typedef.sort(sort_field_compare);
 };
