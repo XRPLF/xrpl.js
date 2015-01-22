@@ -472,7 +472,6 @@ Amount.prototype.parse_human = function(j, opts) {
 
   var hex_RE = /^[a-fA-F0-9]{40}$/;
   var currency_RE = /^([a-zA-Z]{3}|[0-9]{3})$/;
-  function isNum(x) { return !isNaN(x); }
 
   var value;
   var currency;
@@ -480,24 +479,24 @@ Amount.prototype.parse_human = function(j, opts) {
   var words = j.split(' ').filter(function(word) { return word !== ''; });
 
   if (words.length === 1) {
-    if (isNum(words[0])) {
+    if (isFinite(words[0])) {
       value = words[0];
       currency = 'XRP';
     } else {
       value = words[0].slice(0, -3);
       currency = words[0].slice(-3);
-      if (!(isNum(value) && currency.match(currency_RE))) {
+      if (!(isFinite(value) && currency.match(currency_RE))) {
         return Amount.NaN();
       }
     }
   } else if (words.length === 2) {
-    if (isNum(words[0]) && words[1].match(hex_RE)) {
+    if (isFinite(words[0]) && words[1].match(hex_RE)) {
       value = words[0];
       currency = words[1];
-    } else if (words[0].match(currency_RE) && isNum(words[1])) {
+    } else if (words[0].match(currency_RE) && isFinite(words[1])) {
       value = words[1];
       currency = words[0];
-    } else if (isNum(words[0]) && words[1].match(currency_RE)) {
+    } else if (isFinite(words[0]) && words[1].match(currency_RE)) {
       value = words[0];
       currency = words[1];
     } else {
