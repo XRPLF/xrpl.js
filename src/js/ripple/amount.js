@@ -37,8 +37,8 @@ var consts = {
   bi_man_min_value:  new BigNumber('1000000000000000'),
   bi_xns_max:        new BigNumber('9000000000000000000'), // Json wire limit.
   bi_xns_min:        new BigNumber('-9000000000000000000'),// Json wire limit.
-  bi_xrp_max:        new BigNumber('9000000000000'),  // Json wire limit.
-  bi_xrp_min:        new BigNumber('-9000000000000'), // Json wire limit.
+  bi_xrp_max:        new BigNumber('9000000000000'),
+  bi_xrp_min:        new BigNumber('-9000000000000'),
   bi_xns_unit:       new BigNumber('1000000'),
 
   cMinOffset:        -96,
