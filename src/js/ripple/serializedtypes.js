@@ -11,7 +11,7 @@ var extend    = require('extend');
 var binformat = require('./binformat');
 var utils     = require('./utils');
 var sjcl      = utils.sjcl;
-var BigNumber = require('bignumber.js');
+var BigNumber = require('./bignumber');
 
 var UInt128   = require('./uint128').UInt128;
 var UInt160   = require('./uint160').UInt160;

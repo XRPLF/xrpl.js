@@ -1,10 +1,4 @@
 
-function configureBigNumber(BigNumber) {
-  // this configuration applies in all source files
-  BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_HALF_UP,
-                     DECIMAL_PLACES: 40 });
-}
-
 function getMantissaDecimalString(bignum) {
   var mantissa = bignum.toPrecision(16)
     .replace(/\./, '')      // remove decimal point
@@ -175,7 +169,6 @@ exports.assert        = assert;
 exports.arrayUnique   = arrayUnique;
 exports.toTimestamp   = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
-exports.configureBigNumber = configureBigNumber;
 exports.getMantissaDecimalString = getMantissaDecimalString;
 
 // Going up three levels is needed to escape the src-cov folder used for the

@@ -2,22 +2,12 @@
 // - Numbers in hex are big-endian.
 
 var assert    = require('assert');
-var BigNumber = require('bignumber.js');
 var extend    = require('extend');
 var utils     = require('./utils');
 var UInt160   = require('./uint160').UInt160;
 var Seed      = require('./seed').Seed;
 var Currency  = require('./currency').Currency;
-
-utils.configureBigNumber(BigNumber);
-
-function setRoundingMode(roundingMode) {
-  var config = BigNumber.config();
-  var oldRoundingMode = config.ROUNDING_MODE;
-  config.ROUNDING_MODE = roundingMode;
-  BigNumber.config(config);
-  return oldRoundingMode;
-}
+var BigNumber = require('./bignumber');
 
 function Amount() {
   // Json format:
@@ -341,11 +331,11 @@ Amount.prototype.canonicalize = function(roundingMode) {
   } else {
     var oldRoundingMode;
     if (roundingMode) {
-      oldRoundingMode = setRoundingMode(roundingMode);
+      oldRoundingMode = BigNumber.setRoundingMode(roundingMode);
     }
     this._value = new BigNumber(this._value.toPrecision(16));
     if (oldRoundingMode) {
-      setRoundingMode(oldRoundingMode);
+      BigNumber.setRoundingMode(oldRoundingMode);
     }
   }
 };
