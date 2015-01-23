@@ -325,9 +325,7 @@ Amount.prototype.invert = function() {
 
 Amount.prototype.canonicalize = function(roundingMode) {
   if (this._is_native) {
-    var value = this._value.round(6, BigNumber.ROUND_DOWN);
-    this._value = value.absoluteValue().greaterThan(Amount.bi_xrp_max)
-                ? new BigNumber(0) : value;
+    this._value = this._value.round(6, BigNumber.ROUND_DOWN);
   } else {
     var oldRoundingMode;
     if (roundingMode) {
@@ -726,6 +724,9 @@ Amount.prototype.to_number = function(allow_nan) {
 
 // Convert only value to JSON wire format.
 Amount.prototype.to_text = function(allow_nan) {
+  if (this._is_native && this._value.abs().greaterThan(Amount.bi_xrp_max)) {
+    return '0';
+  }
   if (this._value.isNaN() && !allow_nan) {
     return '0';
   } else if (this._value.isNaN()) {
