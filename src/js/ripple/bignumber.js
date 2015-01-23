@@ -22,10 +22,12 @@ BigNumberWrapper.withRoundingMode = function(roundingMode, func) {
   var oldRoundingMode = config.ROUNDING_MODE;
   config.ROUNDING_MODE = roundingMode;
   BigNumber.config(config);
-  var result = func();
-  config.ROUNDING_MODE = oldRoundingMode;
-  BigNumber.config(config);
-  return result;
+  try {
+    return func();
+  } finally {
+    config.ROUNDING_MODE = oldRoundingMode;
+    BigNumber.config(config);
+  }
 };
 
 module.exports = BigNumberWrapper;
