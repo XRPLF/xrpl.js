@@ -17,12 +17,15 @@ BigNumberWrapper.config = function() {
   throw new Error('BigNumber.config may only be called from bignumber.js');
 };
 
-BigNumberWrapper.setRoundingMode = function(roundingMode) {
+BigNumberWrapper.withRoundingMode = function(roundingMode, func) {
   var config = BigNumber.config();
   var oldRoundingMode = config.ROUNDING_MODE;
   config.ROUNDING_MODE = roundingMode;
   BigNumber.config(config);
-  return oldRoundingMode;
+  var result = func();
+  config.ROUNDING_MODE = oldRoundingMode;
+  BigNumber.config(config);
+  return result;
 };
 
 module.exports = BigNumberWrapper;

@@ -327,13 +327,13 @@ Amount.prototype.canonicalize = function(roundingMode) {
   if (this._is_native) {
     this._value = this._value.round(6, BigNumber.ROUND_DOWN);
   } else {
-    var oldRoundingMode;
     if (roundingMode) {
-      oldRoundingMode = BigNumber.setRoundingMode(roundingMode);
-    }
-    this._value = new BigNumber(this._value.toPrecision(16));
-    if (oldRoundingMode) {
-      BigNumber.setRoundingMode(oldRoundingMode);
+      var value = this._value;
+      this._value = BigNumber.withRoundingMode(roundingMode, function() {
+        return new BigNumber(value.toPrecision(16));
+      });
+    } else {
+      this._value = new BigNumber(this._value.toPrecision(16));
     }
   }
 };
