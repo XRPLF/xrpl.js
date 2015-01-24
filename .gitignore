@@ -56,3 +56,6 @@ dist/
 
 # Ignore flow output directory
 out/
+
+# Ignore perf test cache
+scripts/cache
