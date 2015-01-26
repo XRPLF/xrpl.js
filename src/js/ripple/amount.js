@@ -686,6 +686,10 @@ Amount.prototype.parse_native = function(j) {
     } else {
       this._set_value(value.dividedBy(Amount.bi_xns_unit));
     }
+    // TODO: move this overflow check to canonicalize
+    if (this._value.abs().greaterThan(Amount.bi_xrp_max)) {
+      this._set_value(new BigNumber(NaN));
+    }
   } else {
     this._set_value(new BigNumber(NaN));
   }
