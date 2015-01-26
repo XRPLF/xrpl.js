@@ -8,7 +8,13 @@
 
 + [Add support for `limit` option in requestBookOffers](https://github.com/ripple/ripple-lib/commit/d1d4452217c878d0b377d24830b4cd8b3162f6e0)
 
++ [Add `ledgerSelect` request constructor in `Remote`](https://github.com/ripple/ripple-lib/commit/98f40abfc3aa74dec5067a2d90002756cc8acd01)
+
++ [Default to binary data for commands that accept the binary flag](https://github.com/ripple/ripple-lib/commit/7cb113fcbcfc1e3e9830a999148b3e78df3387cc)
+
 + [Fix metadata account check](https://github.com/ripple/ripple-lib/commit/3f61598d6c87e3cc877af60e2d515f9eff73dfe1)
+
++ [Double check `tes` code before emitting `success`](https://github.com/ripple/ripple-lib/commit/97a8c874903eb7309d8f755955ac80872f670582)
 
 + [Decrease redundancy in binary account_tx parsing](https://github.com/ripple/ripple-lib/commit/0aba638e6e7f4f6e22cb6424eed3897ebad90a5a)
 
