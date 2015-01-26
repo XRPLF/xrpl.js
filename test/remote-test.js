@@ -164,16 +164,15 @@ describe('Remote', function () {
   });
 
   it('remote server initialization - set max_fee - string fails, should be number', function() {
-    var remote = new Remote({
-      max_fee: '1234567890'
+    assert.throws(function() {
+      var remote = new Remote({
+        max_fee: '1234567890'
+      });
     });
-    assert.strictEqual(remote.max_fee, 1e6);
   });
 
   it('remote server initialization - max_fee - default', function() {
-    var remote = new Remote({
-      max_fee: void(0)
-    });
+    var remote = new Remote({ });
     assert.strictEqual(remote.max_fee, 1e6);
     assert.strictEqual(remote.max_fee, 1000000);
     assert.strictEqual((new Remote()).max_fee, 1e6);

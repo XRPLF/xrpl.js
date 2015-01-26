@@ -23,8 +23,8 @@ function TransactionManager(account) {
   this._nextSequence = void(0);
   this._maxFee = this._remote.max_fee;
   this._maxAttempts = this._remote.max_attempts;
-  this._submissionTimeout = this._remote._submission_timeout;
-  this._lastLedgerOffset = this._remote._last_ledger_offset;
+  this._submissionTimeout = this._remote.submission_timeout;
+  this._lastLedgerOffset = this._remote.last_ledger_offset;
   this._pending = new PendingQueue();
 
   this._account.on('transaction-outbound', function(res) {
