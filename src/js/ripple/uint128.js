@@ -7,7 +7,6 @@ var UInt   = require('./uint').UInt;
 //
 
 var UInt128 = extend(function () {
-  // Internal form: NaN or BigInteger
   this._value  = NaN;
 }, UInt);
 

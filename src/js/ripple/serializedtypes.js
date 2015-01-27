@@ -11,6 +11,7 @@ var extend    = require('extend');
 var binformat = require('./binformat');
 var utils     = require('./utils');
 var sjcl      = utils.sjcl;
+var BigNumber = require('./bignumber');
 
 var UInt128   = require('./uint128').UInt128;
 var UInt160   = require('./uint160').UInt160;
@@ -21,59 +22,48 @@ var amount    = require('./amount');
 var Amount    = amount.Amount;
 var Currency  = amount.Currency;
 
-// Shortcuts
-var hex = sjcl.codec.hex;
-var bytes = sjcl.codec.bytes;
-var utf8 = sjcl.codec.utf8String;
-
-var BigInteger = utils.jsbn.BigInteger;
-
-
 var SerializedType = function (methods) {
   extend(this, methods);
 };
 
 function isNumber(val) {
   return typeof val === 'number' && isFinite(val);
-};
+}
 
 function isString(val) {
   return typeof val === 'string';
-};
+}
 
 function isHexInt64String(val) {
   return isString(val) && /^[0-9A-F]{0,16}$/i.test(val);
-};
+}
 
-function isCurrencyString(val) {
-  return isString(val) && /^[A-Z0-9]{3}$/.test(val);
-};
-
-function isBigInteger(val) {
-  return val instanceof BigInteger;
-};
-
-function serializeHex(so, hexData, noLength) {
-  var byteData = bytes.fromBits(hex.toBits(hexData));
+function serializeBits(so, bits, noLength) {
+  var byteData = sjcl.codec.bytes.fromBits(bits);
   if (!noLength) {
     SerializedType.serialize_varint(so, byteData.length);
   }
   so.append(byteData);
-};
+}
+
+function serializeHex(so, hexData, noLength) {
+  serializeBits(so, sjcl.codec.hex.toBits(hexData), noLength);
+}
 
 /**
  * parses bytes as hex
  */
 function convertByteArrayToHex (byte_array) {
   return sjcl.codec.hex.fromBits(sjcl.codec.bytes.toBits(byte_array)).toUpperCase();
-};
+}
 
 function convertStringToHex(string) {
-  return hex.fromBits(utf8.toBits(string)).toUpperCase();
+  var utf8String = sjcl.codec.utf8String.toBits(string);
+  return sjcl.codec.hex.fromBits(utf8String).toUpperCase();
 }
 
 function convertHexToString(hexString) {
-  return utf8.fromBits(hex.toBits(hexString));
+  return sjcl.codec.utf8String.fromBits(sjcl.codec.hex.toBits(hexString));
 }
 
 SerializedType.serialize_varint = function (so, val) {
@@ -130,7 +120,7 @@ function convertIntegerToByteArray(val, bytes) {
   }
 
   if (val < 0 || val >= Math.pow(256, bytes)) {
-    throw new Error('Value out of bounds');
+    throw new Error('Value out of bounds ');
   }
 
   var newBytes = [ ];
@@ -140,7 +130,7 @@ function convertIntegerToByteArray(val, bytes) {
   }
 
   return newBytes;
-};
+}
 
 // Convert a certain number of bytes from the serialized object ('so') into an integer.
 function readAndSum(so, bytes) {
@@ -157,7 +147,7 @@ function readAndSum(so, bytes) {
 
   // Convert to unsigned integer
   return sum >>> 0;
-};
+}
 
 var STInt8 = exports.Int8 = new SerializedType({
   serialize: function (so, val) {
@@ -201,41 +191,25 @@ var STInt64 = exports.Int64 = new SerializedType({
       if (val < 0) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
-      bigNumObject = new BigInteger(String(val), 10);
+      bigNumObject = new sjcl.bn(val, 10);
     } else if (isString(val)) {
       if (!isHexInt64String(val)) {
         throw new Error('Not a valid hex Int64.');
       }
-      bigNumObject = new BigInteger(val, 16);
-    } else if (isBigInteger(val)) {
-      if (val.compareTo(BigInteger.ZERO) < 0) {
+      bigNumObject = new sjcl.bn(val, 16);
+    } else if (val instanceof sjcl.bn) {
+      if (!val.greaterEquals(0)) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
       bigNumObject = val;
     } else {
       throw new Error('Invalid type for Int64');
     }
-
-    var hex = bigNumObject.toString(16);
-
-    if (hex.length > 16) {
-      throw new Error('Int64 is too large');
-    }
-
-    while (hex.length < 16) {
-      hex = '0' + hex;
-    }
-
-    serializeHex(so, hex, true); //noLength = true
+    serializeBits(so, bigNumObject.toBits(64), true); //noLength = true
   },
   parse: function (so) {
     var bytes = so.read(8);
-    // We need to add a 0, so if the high bit is set it won't think it's a
-    // pessimistic numeric fraek. What doth lief?
-    var result = new BigInteger([0].concat(bytes), 256);
-    assert(result instanceof BigInteger);
-
-    return result;
+    return sjcl.bn.fromBits(sjcl.codec.bytes.toBits(bytes));
   }
 });
 
@@ -247,7 +221,7 @@ var STHash128 = exports.Hash128 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash128');
     }
-    serializeHex(so, hash.to_hex(), true); //noLength = true
+    serializeBits(so, hash.to_bits(), true); //noLength = true
   },
   parse: function (so) {
     return UInt128.from_bytes(so.read(16));
@@ -262,7 +236,7 @@ var STHash256 = exports.Hash256 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash256');
     }
-    serializeHex(so, hash.to_hex(), true); //noLength = true
+    serializeBits(so, hash.to_bits(), true); //noLength = true
   },
   parse: function (so) {
     return UInt256.from_bytes(so.read(32));
@@ -277,7 +251,7 @@ var STHash160 = exports.Hash160 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash160');
     }
-    serializeHex(so, hash.to_hex(), true); //noLength = true
+    serializeBits(so, hash.to_bits(), true); //noLength = true
   },
   parse: function (so) {
     return UInt160.from_bytes(so.read(20));
@@ -288,7 +262,7 @@ STHash160.id = 17;
 
 // Internal
 var STCurrency = new SerializedType({
-  serialize: function (so, val, xrp_as_ascii) {
+  serialize: function (so, val) {
     var currencyData = val.to_bytes();
 
     if (!currencyData) {
@@ -317,11 +291,14 @@ var STAmount = exports.Amount = new SerializedType({
       throw new Error('Not a valid Amount object.');
     }
 
+    var value = new BigNumber(amount.to_text());
+    var offset = value.e - 15;
+
     // Amount (64-bit integer)
     var valueBytes = utils.arraySet(8, 0);
 
     if (amount.is_native()) {
-      var valueHex = amount._value.toString(16);
+      var valueHex = value.absoluteValue().toString(16);
 
       // Enforce correct length (64 bits)
       if (valueHex.length > 16) {
@@ -332,7 +309,7 @@ var STAmount = exports.Amount = new SerializedType({
         valueHex = '0' + valueHex;
       }
 
-      valueBytes = bytes.fromBits(hex.toBits(valueHex));
+      valueBytes = sjcl.codec.bytes.fromBits(sjcl.codec.hex.toBits(valueHex));
       // Clear most significant two bits - these bits should already be 0 if
       // Amount enforces the range correctly, but we'll clear them anyway just
       // so this code can make certain guarantees about the encoded value.
@@ -354,10 +331,16 @@ var STAmount = exports.Amount = new SerializedType({
         }
 
         // Next eight bits: offset/exponent
-        hi |= ((97 + amount._offset) & 0xff) << 22;
+        hi |= ((97 + offset) & 0xff) << 22;
+
         // Remaining 54 bits: mantissa
-        hi |= amount._value.shiftRight(32).intValue() & 0x3fffff;
-        lo = amount._value.intValue() & 0xffffffff;
+        var mantissaDecimal = utils.getMantissaDecimalString(value.abs());
+        var mantissaHex = (new BigNumber(mantissaDecimal)).toString(16);
+        assert(mantissaHex.length <= 16,
+          'Mantissa hex representation ' + mantissaHex +
+          ' exceeds the maximum length of 16');
+        hi |= parseInt(mantissaHex.slice(0, -8), 16) & 0x3fffff;
+        lo = parseInt(mantissaHex.slice(-8), 16);
       }
 
       valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
@@ -375,13 +358,14 @@ var STAmount = exports.Amount = new SerializedType({
     }
   },
   parse: function (so) {
-    var amount = new Amount();
     var value_bytes = so.read(8);
     var is_zero = !(value_bytes[0] & 0x7f);
 
     for (var i=1; i<8; i++) {
       is_zero = is_zero && !value_bytes[i];
     }
+
+    var is_negative = !is_zero && !(value_bytes[0] & 0x40);
 
     if (value_bytes[0] & 0x80) {
       //non-native
@@ -392,26 +376,23 @@ var STAmount = exports.Amount = new SerializedType({
       var offset = ((value_bytes[0] & 0x3f) << 2) + (value_bytes[1] >>> 6) - 97;
       var mantissa_bytes = value_bytes.slice(1);
       mantissa_bytes[0] &= 0x3f;
-      var value = new BigInteger(mantissa_bytes, 256);
+      var mantissa = new BigNumber(utils.arrayToHex(mantissa_bytes), 16);
+      var sign = is_negative ? '-' : '';
+      var valueString = sign + mantissa.toString() + 'e' + offset.toString();
 
-      if (value.equals(BigInteger.ZERO) && !is_zero ) {
-        throw new Error('Invalid zero representation');
-      }
-
-      amount._value = value;
-      amount._offset = offset;
-      amount._currency    = currency;
-      amount._issuer      = issuer;
-      amount._is_native   = false;
+      return Amount.from_json({
+        currency: currency,
+        issuer: issuer.to_json(),
+        value: valueString
+      });
     } else {
       //native
       var integer_bytes = value_bytes.slice();
       integer_bytes[0] &= 0x3f;
-      amount._value = new BigInteger(integer_bytes, 256);
-      amount._is_native   = true;
+      var integer_hex = utils.arrayToHex(integer_bytes);
+      var value = new BigNumber(integer_hex, 16);
+      return Amount.from_json((is_negative ? '-' : '') + value.toString());
     }
-    amount._is_negative = !is_zero && !(value_bytes[0] & 0x40);
-    return amount;
   }
 });
 
@@ -440,7 +421,7 @@ var STAccount = exports.Account = new SerializedType({
     if (!account.is_valid()) {
       throw new Error('Invalid account!');
     }
-    serializeHex(so, account.to_hex());
+    serializeBits(so, account.to_bits());
   },
   parse: function (so) {
     var len = this.parse_varint(so);
@@ -493,7 +474,7 @@ var STPathSet = exports.PathSet = new SerializedType({
         STInt8.serialize(so, type);
 
         if (entry.account) {
-          so.append(UInt160.from_json(entry.account).to_bytes());
+          STHash160.serialize(so, entry.account);
         }
 
         if (entry.currency) {
@@ -502,7 +483,7 @@ var STPathSet = exports.PathSet = new SerializedType({
         }
 
         if (entry.issuer) {
-          so.append(UInt160.from_json(entry.issuer).to_bytes());
+          STHash160.serialize(so, entry.issuer);
         }
       }
     }
@@ -572,7 +553,7 @@ var STPathSet = exports.PathSet = new SerializedType({
 
       if (entry.account || entry.currency || entry.issuer) {
         entry.type = type;
-        entry.type_hex = ("000000000000000" + type.toString(16)).slice(-16);
+        entry.type_hex = ('000000000000000' + type.toString(16)).slice(-16);
 
         current_path.push(entry);
       } else {
@@ -593,7 +574,7 @@ STPathSet.id = 18;
 
 var STVector256 = exports.Vector256 = new SerializedType({
   serialize: function (so, val) { //Assume val is an array of STHash256 objects.
-    var length_as_varint = SerializedType.serialize_varint(so, val.length * 32);
+    SerializedType.serialize_varint(so, val.length * 32);
     for (var i=0, l=val.length; i<l; i++) {
       STHash256.serialize(so, val[i]);
     }
@@ -612,7 +593,7 @@ var STVector256 = exports.Vector256 = new SerializedType({
 STVector256.id = 19;
 
 // Internal
-var STMemo = exports.STMemo = new SerializedType({
+exports.STMemo = new SerializedType({
   serialize: function(so, val, no_marker) {
 
     var keys = [];
@@ -682,29 +663,29 @@ var STMemo = exports.STMemo = new SerializedType({
       output[keyval[0]] = keyval[1];
     }
 
-    if (output['MemoType'] !== void(0)) {
-      var parsedType = convertHexToString(output['MemoType']);
+    if (output.MemoType !== void(0)) {
+      var parsedType = convertHexToString(output.MemoType);
 
       if (parsedType !== 'unformatted_memo') {
-        output['parsed_memo_type'] = convertHexToString(output['MemoType']);
+        output.parsed_memo_type = convertHexToString(output.MemoType);
       }
     }
 
-    if (output['MemoFormat'] !== void(0)) {
-      output['parsed_memo_format'] = convertHexToString(output['MemoFormat']);
+    if (output.MemoFormat !== void(0)) {
+      output.parsed_memo_format = convertHexToString(output.MemoFormat);
     }
 
-    if (output['MemoData'] !== void(0)) {
+    if (output.MemoData !== void(0)) {
 
       // see if we can parse JSON
-      if (output['parsed_memo_format'] === 'json') {
+      if (output.parsed_memo_format === 'json') {
         try {
-          output['parsed_memo_data'] = JSON.parse(convertHexToString(output['MemoData']));
+          output.parsed_memo_data = JSON.parse(convertHexToString(output.MemoData));
         } catch(e) {
           // fail, which is fine, we just won't add the memo_data field
         }
-      } else if(output['parsed_memo_format'] === 'text') {
-        output['parsed_memo_data'] = convertHexToString(output['MemoData']);
+      } else if(output.parsed_memo_format === 'text') {
+        output.parsed_memo_data = convertHexToString(output.MemoData);
       }
     }
 
@@ -788,7 +769,7 @@ function parse(so) {
   assert(type, 'Unknown type - header byte is 0x' + tag_byte.toString(16));
 
   return [ field_name, type.parse(so) ]; //key, value
-};
+}
 
 function sort_fields(keys) {
   function sort_field_compare(a, b) {
@@ -801,7 +782,7 @@ function sort_fields(keys) {
 
     // Sort by type id first, then by field id
     return a_type_bits !== b_type_bits ? a_type_bits - b_type_bits : a_field_bits - b_field_bits;
-  };
+  }
 
   return keys.sort(sort_field_compare);
 }

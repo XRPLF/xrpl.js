@@ -1,5 +1,4 @@
 var assert      = require('assert');
-var BigInteger  = require('ripple-lib').jsbn.BigInteger;
 var Amount      = require('ripple-lib').Amount;
 var UInt160     = require('ripple-lib').UInt160;
 var load_config = require('ripple-lib').config.load;
@@ -126,6 +125,9 @@ describe('Amount', function() {
     });
     it('1 XRP human', function() {
       assert.strictEqual(Amount.from_human("1 XRP").to_human_full(), '1/XRP');
+    });
+    it('1XRP human', function() {
+      assert.strictEqual(Amount.from_human('1XRP').to_human_full(), '1/XRP');
     });
     it('0.1 XRP', function() {
       assert.strictEqual(Amount.from_human("0.1 XRP").to_text_full(), '0.1/XRP');
@@ -281,14 +283,11 @@ describe('Amount', function() {
     });
   });
   describe('UInt160', function() {
-    it('Parse 0', function () {
-      assert.deepEqual(new BigInteger(), UInt160.from_generic('0')._value);
-    });
     it('Parse 0 export', function () {
       assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_generic('0').set_version(0).to_json());
     });
     it('Parse 1', function () {
-      assert.deepEqual(new BigInteger([1]), UInt160.from_generic('1')._value);
+      assert.deepEqual(UInt160.ACCOUNT_ONE, UInt160.from_generic('1').set_version(0).to_json());
     });
     it('Parse rrrrrrrrrrrrrrrrrrrrrhoLvTp export', function () {
       assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrrhoLvTp').to_json());
@@ -973,7 +972,7 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_json('10000000').product_human(Amount.from_json('10')).to_text_full(), '0.0001/XRP');
     });
     it('Multiply USD with XAU (dem)', function () {
-      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_text_full(), '19900.00316303882/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_text_full(), '19900.00316303883/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
     it('Multiply 0 XRP with 0 XRP human', function () {
       assert.strictEqual('0/XRP', Amount.from_json('0').product_human(Amount.from_json('0')).to_human_full());
@@ -1045,7 +1044,7 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_json('10000000').product_human(Amount.from_json('10')).to_human_full(), '0.0001/XRP');
     });
     it('Multiply USD with XAU (dem) human', function () {
-      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_human_full(), '19,900.00316303882/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_human_full(), '19,900.00316303883/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
   });
 
@@ -1220,7 +1219,6 @@ describe('Amount', function() {
 
     it ('from_json minimum IOU', function() {
       var amt = Amount.from_json('-1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(amt._value.toString(), Amount.bi_man_min_value.toString());
       assert.strictEqual(amt.to_text(), '-1000000000000000e-96');
       assert.strictEqual(amt.to_text(), Amount.min_value);
     });
@@ -1233,7 +1231,6 @@ describe('Amount', function() {
 
     it ('from_json maximum IOU', function() {
       var amt = Amount.from_json('9999999999999999e80/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(amt._value.toString(), Amount.bi_man_max_value.toString());
       assert.strictEqual(amt.to_text(), '9999999999999999e80');
     });
 
@@ -1245,13 +1242,11 @@ describe('Amount', function() {
 
     it ('from_json normalize mantissa to valid max range, lost significant digits', function() {
       var amt = Amount.from_json('99999999999999999999999999999999/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(amt._value.toString(), Amount.bi_man_max_value.toString());
       assert.strictEqual(amt.to_text(), '9999999999999999e16');
     });
 
     it ('from_json normalize mantissa to min valid range, lost significant digits', function() {
       var amt = Amount.from_json('-0.0000000000000000000000001/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(amt._value.toString(), Amount.bi_man_min_value.toString());
       assert.strictEqual(amt.to_text(), '-1000000000000000e-40');
     });
   });
