@@ -9,6 +9,19 @@ var Seed      = require('./seed').Seed;
 var Currency  = require('./currency').Currency;
 var BigNumber = require('./bignumber');
 
+
+function isInteger(number) {
+  return parseInt(number) === number;
+}
+
+function ensureDecimalPoint(value) {
+  return isInteger(value) ? String(value) + '.0' : value;
+}
+
+function inverse(number) {
+  return (new BigNumber(number)).toPower(-1);
+}
+
 function Amount() {
   // Json format:
   //  integer : XRP
@@ -26,20 +39,19 @@ var consts = {
   xns_precision:     6,
 
   // bi_ prefix refers to "big integer"
-  bi_5:              new BigNumber('5'),
-  bi_7:              new BigNumber('7'),
-  bi_10:             new BigNumber('10'),
-  bi_1e14:           new BigNumber(String(1e14)),
-  bi_1e16:           new BigNumber(String(1e16)),
-  bi_1e17:           new BigNumber(String(1e17)),
-  bi_1e32:           new BigNumber('100000000000000000000000000000000'),
+  // TODO: we shouldn't expose our BigNumber library publicly
+  bi_5:              new BigNumber(5),
+  bi_7:              new BigNumber(7),
+  bi_10:             new BigNumber(10),
+  bi_1e14:           new BigNumber(1e14),
+  bi_1e16:           new BigNumber(1e16),
+  bi_1e17:           new BigNumber(1e17),
+  bi_1e32:           new BigNumber(1e32),
   bi_man_max_value:  new BigNumber('9999999999999999'),
-  bi_man_min_value:  new BigNumber('1000000000000000'),
-  bi_xns_max:        new BigNumber('9000000000000000000'), // Json wire limit.
-  bi_xns_min:        new BigNumber('-9000000000000000000'),// Json wire limit.
-  bi_xrp_max:        new BigNumber('9000000000000'),
-  bi_xrp_min:        new BigNumber('-9000000000000'),
-  bi_xns_unit:       new BigNumber('1000000'),
+  bi_man_min_value:  new BigNumber(1e15),
+  bi_xns_max:        new BigNumber(1e17),
+  bi_xns_min:        new BigNumber(-1e17),
+  bi_xns_unit:       new BigNumber(1e6),
 
   cMinOffset:        -96,
   cMaxOffset:        80,
@@ -51,18 +63,22 @@ var consts = {
   min_value:         '-1000000000000000e-96'
 };
 
+var MAX_XRP_VALUE = new BigNumber(1e11);
+var MAX_IOU_VALUE = new BigNumber(consts.max_value);
+var MIN_IOU_VALUE = (new BigNumber(consts.min_value)).abs();
+
 // Add constants to Amount class
 extend(Amount, consts);
 
 // DEPRECATED: Use Amount instead, e.g. Amount.currency_xns
 exports.consts = consts;
 
-// Given '100/USD/mtgox' return the a string with mtgox remapped.
+// Given '100/USD/ISSUER' return the a string with ISSUER remapped.
 Amount.text_full_rewrite = function(j) {
   return Amount.from_json(j).to_text_full();
 };
 
-// Given '100/USD/mtgox' return the json.
+// Given '100/USD/ISSUER' return the json.
 Amount.json_rewrite = function(j) {
   return Amount.from_json(j).to_json();
 };
@@ -176,13 +192,7 @@ Amount.prototype.ratio_human = function(denominator, opts) {
   opts = extend({ }, opts);
 
   var numerator = this;
-
-  if (typeof denominator === 'number' && parseInt(denominator, 10) === denominator) {
-    // Special handling of integer arguments
-    denominator = Amount.from_json(String(denominator) + '.0');
-  } else {
-    denominator = Amount.from_json(denominator);
-  }
+  denominator = Amount.from_json(ensureDecimalPoint(denominator));
 
   // If either operand is NaN, the result is NaN.
   if (!numerator.is_valid() || !denominator.is_valid()) {
@@ -242,12 +252,7 @@ Amount.prototype.ratio_human = function(denominator, opts) {
 Amount.prototype.product_human = function(factor, opts) {
   opts = opts || {};
 
-  if (typeof factor === 'number' && parseInt(factor, 10) === factor) {
-    // Special handling of integer arguments
-    factor = Amount.from_json(String(factor) + '.0');
-  } else {
-    factor = Amount.from_json(factor);
-  }
+  factor = Amount.from_json(ensureDecimalPoint(factor));
 
   // If either operand is NaN, the result is NaN.
   if (!this.is_valid() || !factor.is_valid()) {
@@ -281,7 +286,7 @@ Amount.prototype.product_human = function(factor, opts) {
  * @private
  */
 Amount.prototype._invert = function() {
-  this._set_value((new BigNumber(1)).dividedBy(this._value));
+  this._set_value(inverse(this._value));
   return this;
 };
 
@@ -342,13 +347,17 @@ Amount.prototype._check_limits = function() {
   if (this._value.isNaN() || this._value.isZero()) {
     return this;
   }
-  if (!this._is_native) {
-    var absval = this._value.absoluteValue();
-    if (absval.lessThan((new BigNumber(Amount.min_value)).absoluteValue())) {
-      throw new Error('Exceeding min value of ' + Amount.min_value);
+  var absval = this._value.absoluteValue();
+  if (this._is_native) {
+    if (absval.greaterThan(MAX_XRP_VALUE)) {
+      throw new Error('Exceeding max value of ' + MAX_XRP_VALUE.toString());
     }
-    if (absval.greaterThan(new BigNumber(Amount.max_value))) {
-      throw new Error('Exceeding max value of ' + Amount.max_value);
+  } else {
+    if (absval.lessThan(MIN_IOU_VALUE)) {
+      throw new Error('Exceeding min value of ' + MIN_IOU_VALUE.toString());
+    }
+    if (absval.greaterThan(MAX_IOU_VALUE)) {
+      throw new Error('Exceeding max value of ' + MAX_IOU_VALUE.toString());
     }
   }
   return this;
@@ -387,7 +396,7 @@ Amount.prototype.currency = function() {
 };
 
 Amount.prototype.equals = function(d, ignore_issuer) {
-  if (typeof d === 'string') {
+  if (!(d instanceof Amount)) {
     return this.equals(Amount.from_json(d));
   }
 
@@ -506,19 +515,7 @@ Amount.prototype.parse_human = function(j, opts) {
   // Apply interest/demurrage
   if (opts.reference_date && this._currency.has_interest()) {
     var interest = this._currency.get_interest_at(opts.reference_date);
-
-    // XXX Because the Amount parsing routines don't support some of the things
-    //     that JavaScript can output when casting a float to a string, the
-    //     following call sometimes does not produce a valid Amount.
-    //
-    //     The correct way to solve this is probably to switch to a proper
-    //     BigDecimal for our internal representation and then use that across
-    //     the board instead of instantiating these dummy Amount objects.
-    var interestTempAmount = Amount.from_json(''+interest+'/1/1');
-
-    if (interestTempAmount.is_valid()) {
-      this._set_value(this.divide(interestTempAmount)._value);
-    }
+    this._set_value(this._value.dividedBy(interest.toString()));
   }
 
   return this;
@@ -578,40 +575,48 @@ Amount.prototype.parse_quality = function(quality, counterCurrency, counterIssue
   this._issuer      = UInt160.from_json(counterIssuer);
   this._is_native   = this._currency.is_native();
 
-  var power = 0;
-  if (this._is_native) {
-    if (opts.inverse) {
-      power += 1;
-    } else {
-      power -= 1;
+  if (this._is_native && baseCurrency.is_native()) {
+    throw new Error('XRP/XRP quality is not allowed');
+  }
+
+  /*
+  The quality, as stored in the last 64 bits of a directory index, is stored as
+  the quotient of TakerPays/TakerGets.
+
+  When `opts.inverse` is true we are looking at a quality used for determining a
+  `bid` price and it must first be inverted, before our declared base/counter
+  currencies are in line with the price.
+
+  For example:
+
+    quality as stored :  5 USD          /  3000000 drops
+    inverted          :  3000000 drops  /          5 USD
+  */
+  var adjusted = opts.inverse ? inverse(value) : value;
+  var nativeAdjusted = adjusted;
+
+  if (!opts.xrp_as_drops) {
+    // `In a currency exchange, the exchange rate is quoted as the units of the
+    //  counter currency in terms of a single unit of a base currency`. A
+    //  quality is how much taker must `pay` to get ONE `gets` unit thus:
+    //    pays ~= counterCurrency
+    //    gets ~= baseCurrency.
+    if (this._is_native) {
+      // pay:$price              drops  get:1 X
+      // pay:($price / 1,000,000)  XRP  get:1 X
+      nativeAdjusted = adjusted.div(Amount.bi_xns_unit);
+    } else if (baseCurrency.is_valid() && baseCurrency.is_native()) {
+      // pay:$price X                   get:1 drop
+      // pay:($price * 1,000,000) X     get:1 XRP
+      nativeAdjusted = adjusted.times(Amount.bi_xns_unit);
     }
   }
 
-  // Correct offset if xrp_as_drops option is not set and base currency is XRP
-  if (!opts.xrp_as_drops &&
-      baseCurrency.is_valid() &&
-      baseCurrency.is_native()) {
-    if (opts.inverse) {
-      power -= 1;
-    } else {
-      power += 1;
-    }
-  }
-
-  var one = new BigNumber(1);
-  var adjusted = value.times(Amount.bi_xns_unit.toPower(power));
-  var newValue = opts.inverse ? one.dividedBy(adjusted) : adjusted;
-  this._set_value(newValue);
+  this._set_value(nativeAdjusted);
 
   if (opts.reference_date && baseCurrency.is_valid() && baseCurrency.has_interest()) {
     var interest = baseCurrency.get_interest_at(opts.reference_date);
-
-    // XXX If we had better math utilities, we wouldn't need this hack.
-    var interestTempAmount = Amount.from_json(''+interest+'/1/1');
-
-    if (interestTempAmount.is_valid()) {
-      this._set_value(this.divide(interestTempAmount)._value);
-    }
+    this._set_value(this._value.dividedBy(interest.toString()));
   }
 
   return this;
@@ -690,10 +695,6 @@ Amount.prototype.parse_native = function(j) {
     } else {
       this._set_value(value.dividedBy(Amount.bi_xns_unit));
     }
-    // TODO: move this overflow check to canonicalize
-    if (this._value.abs().greaterThan(Amount.bi_xrp_max)) {
-      this._set_value(new BigNumber(NaN));
-    }
   } else {
     this._set_value(new BigNumber(NaN));
   }
@@ -717,36 +718,26 @@ Amount.prototype.set_currency = function(c) {
 
 Amount.prototype.set_issuer = function(issuer) {
   if (issuer instanceof UInt160) {
-    this._issuer  = issuer;
+    this._issuer = issuer;
   } else {
-    this._issuer  = UInt160.from_json(issuer);
+    this._issuer = UInt160.from_json(issuer);
   }
 
   return this;
 };
 
-Amount.prototype.to_number = function(allow_nan) {
-  var s = this.to_text(allow_nan);
-  return typeof s === 'string' ? Number(s) : s;
+Amount.prototype.to_number = function() {
+  return Number(this.to_text());
 };
 
 // Convert only value to JSON wire format.
-Amount.prototype.to_text = function(allow_nan) {
-  if (this._is_native && this._value.abs().greaterThan(Amount.bi_xrp_max)) {
-    return '0';
-  }
-  if (this._value.isNaN() && !allow_nan) {
-    return '0';
-  } else if (this._value.isNaN()) {
-    return NaN;   // TODO: why does to_text return NaN? return 'NaN'?
+Amount.prototype.to_text = function() {
+  if (!this.is_valid()) {
+    return 'NaN';
   }
 
   if (this._is_native) {
-    if (this.is_valid() && this._value.lessThanOrEqualTo(Amount.bi_xns_max)){
-      return this._value.times(Amount.bi_xns_unit).toString();
-    } else {
-      return NaN;   // TODO: why does to_text return NaN? return 'NaN'?
-    }
+    return this._value.times(Amount.bi_xns_unit).toString();
   }
 
   // not native
@@ -784,24 +775,11 @@ Amount.prototype.to_text = function(allow_nan) {
  * @return {Amount} The amount with interest applied.
  */
 Amount.prototype.applyInterest = function(referenceDate) {
-  if (this._currency.has_interest()) {
-    var interest = this._currency.get_interest_at(referenceDate);
-
-    // XXX Because the Amount parsing routines don't support some of the things
-    //     that JavaScript can output when casting a float to a string, the
-    //     following call sometimes does not produce a valid Amount.
-    //
-    //     The correct way to solve this is probably to switch to a proper
-    //     BigDecimal for our internal representation and then use that across
-    //     the board instead of instantiating these dummy Amount objects.
-    var interestTempAmount = Amount.from_json(String(interest) + '/1/1');
-
-    if (interestTempAmount.is_valid()) {
-      return this.multiply(interestTempAmount);
-    }
-  } else {
+  if (!this._currency.has_interest()) {
     return this;
   }
+  var interest = this._currency.get_interest_at(referenceDate);
+  return this._copy(this._value.times(interest.toString()));
 };
 
 /**
@@ -832,16 +810,6 @@ Amount.prototype.to_human = function(opts) {
   if (!this.is_valid()) {
     return 'NaN';
   }
-
-  // Default options
-  if (typeof opts.signed === 'undefined') {
-    opts.signed = true;
-  }
-  if (typeof opts.group_sep === 'undefined') {
-    opts.group_sep = true;
-  }
-
-  opts.group_width = opts.group_width || 3;
 
   // Apply demurrage/interest
   var ref = this;
@@ -914,19 +882,15 @@ Amount.prototype.to_human = function(opts) {
     }
   }
 
-  if (opts.group_sep) {
-    if (typeof opts.group_sep !== 'string') {
-      opts.group_sep = ',';
-    }
-    int_part = utils.chunkString(int_part, opts.group_width, true).join(opts.group_sep);
+  if (opts.group_sep !== false) {
+    var sep = (typeof opts.group_sep === 'string') ? opts.group_sep : ',';
+    var groups = utils.chunkString(int_part, opts.group_width || 3, true);
+    int_part = groups.join(sep);
   }
 
   var formatted = '';
-  if (opts.signed && isNegative) {
-    if (typeof opts.signed !== 'string') {
-      opts.signed = '-';
-    }
-    formatted += opts.signed;
+  if(isNegative && opts.signed !== false) {
+    formatted += '-';
   }
 
   formatted += int_part.length ? int_part : '0';
@@ -937,30 +901,27 @@ Amount.prototype.to_human = function(opts) {
 
 Amount.prototype.to_human_full = function(opts) {
   opts = opts || {};
-  var a = this.to_human(opts);
-  var c = this._currency.to_human();
-  var i = this._issuer.to_json(opts);
-  var o = this.is_native() ?  (o = a + '/' + c) : (o  = a + '/' + c + '/' + i);
-  return o;
+  var value = this.to_human(opts);
+  var currency = this._currency.to_human();
+  var issuer = this._issuer.to_json(opts);
+  var base = value + '/' + currency;
+  return this.is_native() ? base : (base + '/' + issuer);
 };
 
 Amount.prototype.to_json = function() {
-  var result;
-
   if (this._is_native) {
-    result = this.to_text();
+    return this.to_text();
   } else {
     var amount_json = {
       value : this.to_text(),
-      currency : this._currency.has_interest() ? this._currency.to_hex() : this._currency.to_json()
+      currency : this._currency.has_interest() ?
+        this._currency.to_hex() : this._currency.to_json()
     };
     if (this._issuer.is_valid()) {
       amount_json.issuer = this._issuer.to_json();
     }
-    result = amount_json;
+    return amount_json;
   }
-
-  return result;
 };
 
 Amount.prototype.to_text_full = function(opts) {
@@ -969,7 +930,8 @@ Amount.prototype.to_text_full = function(opts) {
   }
   return this._is_native
       ? this.to_human() + '/XRP'
-      : this.to_text() + '/' + this._currency.to_json() + '/' + this._issuer.to_json(opts);
+      : this.to_text() + '/' + this._currency.to_json()
+        + '/' + this._issuer.to_json(opts);
 };
 
 // For debugging.
@@ -977,34 +939,31 @@ Amount.prototype.not_equals_why = function(d, ignore_issuer) {
   if (typeof d === 'string') {
     return this.not_equals_why(Amount.from_json(d));
   }
-
   if (!(d instanceof Amount)) {
     return 'Not an Amount';
   }
-
-  var result = false;
-
   if (!this.is_valid() || !d.is_valid()) {
-    result = 'Invalid amount.';
-  } else if (this._is_native !== d._is_native) {
-    result = 'Native mismatch.';
-  } else {
-    var type = this._is_native ? 'XRP' : 'Non-XRP';
-
-    if (!this._value.isZero() && this._value.negated().equals(d._value)) {
-      result = type + ' sign differs.';
-    } else if (!this._value.equals(d._value)) {
-      result = type + ' value differs.';
-    } else if (!this._is_native) {
-      if (!this._currency.equals(d._currency)) {
-        result = 'Non-XRP currency differs.';
-      } else if (!ignore_issuer && !this._issuer.equals(d._issuer)) {
-        result = 'Non-XRP issuer differs: ' + d._issuer.to_json() + '/' + this._issuer.to_json();
-      }
-    }
+    return 'Invalid amount.';
+  }
+  if (this._is_native !== d._is_native) {
+    return 'Native mismatch.';
   }
 
-  return result;
+  var type = this._is_native ? 'XRP' : 'Non-XRP';
+  if (!this._value.isZero() && this._value.negated().equals(d._value)) {
+    return type + ' sign differs.';
+  }
+  if (!this._value.equals(d._value)) {
+    return type + ' value differs.';
+  }
+  if (!this._is_native) {
+    if (!this._currency.equals(d._currency)) {
+      return 'Non-XRP currency differs.';
+    }
+    if (!ignore_issuer && !this._issuer.equals(d._issuer)) {
+      return 'Non-XRP issuer differs: ' + d._issuer.to_json() + '/' + this._issuer.to_json();
+    }
+  }
 };
 
 exports.Amount   = Amount;

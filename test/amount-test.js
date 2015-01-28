@@ -336,9 +336,9 @@ describe('Amount', function() {
   });
   describe('Amount parsing', function() {
     it('Parse invalid string', function() {
-      assert.strictEqual(Amount.from_json('x').to_text(), '0');
-      assert.strictEqual(typeof Amount.from_json('x').to_text(true), 'number');
-      assert(isNaN(Amount.from_json('x').to_text(true)));
+      assert.strictEqual(Amount.from_json('x').to_text(), 'NaN');
+      assert.strictEqual(typeof Amount.from_json('x').to_text(), 'string');
+      assert(isNaN(Amount.from_json('x').to_text()));
     });
     it('parse dem', function() {
       assert.strictEqual(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
@@ -1085,6 +1085,11 @@ describe('Amount', function() {
   });
 
   describe('from_quality', function() {
+    it('XRP/XRP', function () {
+      assert.throws(function() {
+        Amount.from_quality('7B73A610A009249B0CC0D4311E8BA7927B5A34D86634581C5F0FF9FF678E1000', 'XRP', NaN, {base_currency: 'XRP'}).to_text_full()
+      });
+    });
     it('BTC/XRP', function () {
       assert.strictEqual(Amount.from_quality('7B73A610A009249B0CC0D4311E8BA7927B5A34D86634581C5F0FF9FF678E1000', 'XRP', NaN, {base_currency: 'BTC'}).to_text_full(), '44,970/XRP');
     });
@@ -1188,11 +1193,11 @@ describe('Amount', function() {
 
   describe('amount limits', function() {
     it ('max JSON wire limite', function() {
-      assert.strictEqual(Amount.bi_xns_max.toString(), '9000000000000000000');
+      assert.strictEqual(Amount.bi_xns_max.toString(), '100000000000000000');
     });
 
     it ('max JSON wire limite', function() {
-      assert.strictEqual(Amount.bi_xns_min.toString(), '-9000000000000000000');
+      assert.strictEqual(Amount.bi_xns_min.toString(), '-100000000000000000');
     });
 
     it('max mantissa value', function() {
@@ -1204,23 +1209,25 @@ describe('Amount', function() {
     });
 
     it ('from_json minimum XRP', function() {
-      var amt = Amount.from_json('-9000000000000000000');
-      assert.strictEqual(amt.to_json(), '-9000000000000000000');
+      var amt = Amount.from_json('-100000000000000000');
+      assert.strictEqual(amt.to_json(), '-100000000000000000');
     });
 
     it ('from_json maximum XRP', function() {
-      var amt = Amount.from_json('-9000000000000000000');
-      assert.strictEqual(amt.to_json(), '-9000000000000000000');
+      var amt = Amount.from_json('100000000000000000');
+      assert.strictEqual(amt.to_json(), '100000000000000000');
     });
 
     it ('from_json less than minimum XRP', function() {
-      var amt = Amount.from_json('-9000000000000000001');
-      assert.strictEqual(amt.to_json(), '0');
+      assert.throws(function() {
+        Amount.from_json('-100000000000000001');
+      });
     });
 
     it ('from_json more than maximum XRP', function() {
-      var amt = Amount.from_json('9000000000000000001');
-      assert.strictEqual(amt.to_json(), '0');
+      assert.throws(function() {
+        Amount.from_json('100000000000000001');
+      });
     });
 
     it ('from_json minimum IOU', function() {

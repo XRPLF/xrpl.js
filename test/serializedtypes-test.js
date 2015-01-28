@@ -509,8 +509,10 @@ describe('Serialized types', function() {
     });
     it('Serialize 1161981756646125568 XRP', function () {
       var so = new SerializedObject();
-      types.Amount.serialize(so, '1161981756646125696');
-      assert.strictEqual(so.to_hex(), '5020304050607080');
+      assert.throws(function() {
+        var amt = Amount.from_json('1161981756646125696');
+        types.Amount.serialize(so, amt);
+      });
     });
     it('Serialize 1/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
       var so = new SerializedObject();
@@ -570,8 +572,11 @@ describe('Serialized types', function() {
       assert.strictEqual(types.Amount.parse(so).to_json(), '270544960');
     });
     it('Parse 1161981756646125568 XRP', function () {
-      var so = new SerializedObject('5020304050607080');
-      assert.strictEqual(types.Amount.parse(so).to_json(), '1161981756646125696');
+      assert.throws(function() {
+        // hex(1161981756646125568) = 1020304050607000
+        var so = new SerializedObject('1020304050607000');
+        types.Amount.parse(so).to_json();
+      })
     });
     it('Parse 1/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
       var so = new SerializedObject('D4838D7EA4C680000000000000000000000000005553440000000000B5F762798A53D543A014CAF8B297CFF8F2F937E8');
@@ -687,25 +692,25 @@ describe('Serialized types', function() {
         }]
       ];
 
-      var result_json = [ 
-        [{ 
+      var result_json = [
+        [{
           account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
           currency: 'USD',
           issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf',
           type: 49,
-          type_hex: '0000000000000031' 
+          type_hex: '0000000000000031'
         }],
-        [{ 
-          currency: 'XRP', 
-          type: 16, 
-          type_hex: '0000000000000010' 
-        }, { 
+        [{
+          currency: 'XRP',
+          type: 16,
+          type_hex: '0000000000000010'
+        }, {
           account: 'rrrrrrrrrrrrrrrrrrrpvQsW3V3',
           currency: 'EUR',
           issuer: 'rrrrrrrrrrrrrrrrrrrdHRtqg2',
           type: 49,
-          type_hex: '0000000000000031' 
-        }] 
+          type_hex: '0000000000000031'
+        }]
       ];
 
       var so = new SerializedObject();
@@ -734,26 +739,26 @@ describe('Serialized types', function() {
         }]
       ];
 
-      var result_json = [ 
-        [{ 
+      var result_json = [
+        [{
           account: 'rrrrrrrrrrrrrrrrrrrrNxV3Xza',
           currency: 'USD',
           issuer: 'rrrrrrrrrrrrrrrrrrrpYnYCNYf',
           type: 49,
-          type_hex: '0000000000000031' 
+          type_hex: '0000000000000031'
         }],
-        [{ 
+        [{
           currency: 'XRP',
           non_native: true,
           type: 16,
-          type_hex: '0000000000000010' 
-        }, { 
+          type_hex: '0000000000000010'
+        }, {
           account: 'rrrrrrrrrrrrrrrrrrrpvQsW3V3',
           currency: 'EUR',
           issuer: 'rrrrrrrrrrrrrrrrrrrdHRtqg2',
           type: 49,
-          type_hex: '0000000000000031' 
-        }] 
+          type_hex: '0000000000000031'
+        }]
       ];
 
       var so = new SerializedObject();
@@ -821,78 +826,78 @@ describe('Serialized types', function() {
         }]
       ];
 
-      var result_json = [ 
-        [{ 
+      var result_json = [
+        [{
           account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
           currency: 'BTC',
           issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
           type: 49,
-          type_hex: '0000000000000031' 
-        }, { 
+          type_hex: '0000000000000031'
+        }, {
           account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
           currency: 'BTC',
           issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
           type: 49,
-          type_hex: '0000000000000031' 
-        }, { 
+          type_hex: '0000000000000031'
+        }, {
           account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
           currency: 'BTC',
           issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
           type: 49,
-          type_hex: '0000000000000031' 
-        }, { 
+          type_hex: '0000000000000031'
+        }, {
           currency: 'USD',
           issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
           type: 48,
-          type_hex: '0000000000000030' 
+          type_hex: '0000000000000030'
         }],
-        [{ 
+        [{
           account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
           currency: 'BTC',
           issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
           type: 49,
-          type_hex: '0000000000000031' 
-        }, { 
+          type_hex: '0000000000000031'
+        }, {
           account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
           currency: 'BTC',
           issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
           type: 49,
-          type_hex: '0000000000000031' 
-        }, { 
+          type_hex: '0000000000000031'
+        }, {
           account: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi',
           currency: 'BTC',
           issuer: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi',
           type: 49,
-          type_hex: '0000000000000031' 
-        }, { 
+          type_hex: '0000000000000031'
+        }, {
           currency: 'USD',
           issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
           type: 48,
-          type_hex: '0000000000000030' 
+          type_hex: '0000000000000030'
         }],
-        [{ 
+        [{
           account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
           currency: 'BTC',
           issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
           type: 49,
-          type_hex: '0000000000000031' 
-        }, { 
+          type_hex: '0000000000000031'
+        }, {
           account: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn',
           currency: 'BTC',
           issuer: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn',
           type: 49,
-          type_hex: '0000000000000031' 
-        }, { 
+          type_hex: '0000000000000031'
+        }, {
           currency: 'XRP',
           non_native: true,
           type: 16,
-          type_hex: '0000000000000010' 
-        }, { 
+          type_hex: '0000000000000010'
+        }, {
           currency: 'USD',
           issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
           type: 48,
-          type_hex: '0000000000000030' 
-        }] 
+          type_hex: '0000000000000030'
+        }]
       ];
 
       var so = new SerializedObject();
