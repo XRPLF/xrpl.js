@@ -8,6 +8,7 @@
 //  - trade
 //  - transaction
 
+var _            = require('lodash');
 var util         = require('util');
 var extend       = require('extend');
 var assert       = require('assert');
@@ -43,18 +44,22 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
   this._shouldSubscribe = true;
   this._listeners = 0;
   this._offers = [ ];
-  this._offerCounts = { };
-  this._ownerFunds = { };
-  this._ownerOffers = { };
+  this._offerCounts = {};
+  this._ownerFundsUnadjusted = {};
+  this._ownerFunds = {};
+  this._ownerOffersTotal = {};
 
   // We consider ourselves synchronized if we have a current
-  // copy of the offers, we are online and subscribed to updates.
+  // copy of the offers, we are online and subscribed to updates
   this._synchronized = false;
+
+  // Transfer rate of the taker gets currency issuer
+  this._issuerTransferRate = null;
 
   function listenersModified(action, event) {
     // Automatically subscribe and unsubscribe to orderbook
     // on the basis of existing event listeners
-    if (~OrderBook.EVENTS.indexOf(event)) {
+    if (_.contains(OrderBook.EVENTS, event)) {
       switch (action) {
         case 'add':
           if (++self._listeners === 1) {
@@ -70,6 +75,10 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
     }
   };
 
+  function updateFundedAmountsWrapper (transaction) {
+    self.updateFundedAmounts(transaction);
+  };
+
   this.on('newListener', function(event) {
     listenersModified('add', event);
   });
@@ -78,15 +87,12 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
     listenersModified('remove', event);
   });
 
-  function updateFundedAmounts(transaction) {
-    self.updateFundedAmounts(transaction);
-  };
-
-  this._remote.on('transaction', updateFundedAmounts);
+  this._remote.on('transaction', updateFundedAmountsWrapper);
 
   this.on('unsubscribe', function() {
     self.resetCache();
-    self._remote.removeListener('transaction', updateFundedAmounts);
+
+    self._remote.removeListener('transaction', updateFundedAmountsWrapper);
   });
 
   this._remote.once('prepare_subscribe', function() {
@@ -118,6 +124,36 @@ OrderBook.EVENTS = [
 OrderBook.DEFAULT_TRANSFER_RATE = 1000000000;
 
 OrderBook.IOU_SUFFIX = '/000/rrrrrrrrrrrrrrrrrrrrrhoLvTp';
+
+/**
+ * Normalize offers from book_offers and transaction stream
+ *
+ * @param {Object} offer
+ * @return {Object} normalized
+ */
+
+OrderBook.offerRewrite = function(offer) {
+  var result = {};
+  var keys = Object.keys(offer);
+
+  for (var i=0, l=keys.length; i<l; i++) {
+    var key = keys[i];
+    switch (key) {
+      case 'PreviousTxnID':
+      case 'PreviousTxnLgrSeq':
+      case 'quality':
+        break;
+      default:
+        result[key] = offer[key];
+    }
+  }
+
+  result.Flags = result.Flags || 0;
+  result.OwnerNode = result.OwnerNode || new Array(16 + 1).join('0');
+  result.BookNode = result.BookNode || new Array(16 + 1).join('0');
+
+  return result;
+};
 
 /**
  * Initialize orderbook. Get orderbook offers and subscribe to transactions
@@ -176,80 +212,200 @@ OrderBook.prototype.unsubscribe = function() {
 };
 
 /**
- * Reset cached owner funds, offer counts
+ * Request orderbook entries from server
+ *
+ * @param {Function} callback
+ */
+
+OrderBook.prototype.requestOffers = function(callback) {
+  var self = this;
+
+  if (typeof callback !== 'function') {
+    callback = function(){};
+  }
+
+  if (!this._shouldSubscribe) {
+    return callback(new Error('Should not request offers'));
+  }
+
+  if (this._remote.trace) {
+    log.info('requesting offers', this._key);
+  }
+
+  function handleOffers(res) {
+    if (!Array.isArray(res.offers)) {
+      // XXX What now?
+      return callback(new Error('Invalid response'));
+    }
+
+    if (self._remote.trace) {
+      log.info('requested offers', self._key, 'offers: ' + res.offers.length);
+    }
+
+    self.setOffers(res.offers);
+    self._synchronized = true;
+    self.emit('model', self._offers);
+
+    callback(null, self._offers);
+  };
+
+  function handleError(err) {
+    // XXX What now?
+    if (self._remote.trace) {
+      log.info('failed to request offers', self._key, err);
+    }
+
+    callback(err);
+  };
+
+  var request = this._remote.requestBookOffers(this.toJSON());
+  request.once('success', handleOffers);
+  request.once('error', handleError);
+  request.request();
+
+  return request;
+};
+
+/**
+ * Subscribe to transactions stream
+ *
+ * @param {Function} callback
+ */
+
+OrderBook.prototype.subscribeTransactions = function(callback) {
+  var self = this;
+
+  if (typeof callback !== 'function') {
+    callback = function(){};
+  }
+
+  if (!this._shouldSubscribe) {
+    return callback('Should not subscribe');
+  }
+
+  if (this._remote.trace) {
+    log.info('subscribing to transactions');
+  }
+
+  function handleSubscribed(res) {
+    if (self._remote.trace) {
+      log.info('subscribed to transactions');
+    }
+
+    self._subscribed = true;
+
+    callback(null, res);
+  };
+
+  function handleError(err) {
+    if (self._remote.trace) {
+      log.info('failed to subscribe to transactions', self._key, err);
+    }
+
+    callback(err);
+  };
+
+  var request = this._remote.requestSubscribe();
+  request.addStream('transactions');
+  request.once('success', handleSubscribed);
+  request.once('error', handleError);
+  request.request();
+
+  return request;
+};
+
+/**
+ * Reset cached owner's funds, offer counts, and offer sums
  */
 
 OrderBook.prototype.resetCache = function() {
-  this._ownerFunds = { };
-  this._ownerOffers = { };
-  this._offerCounts = { };
+  this._ownerFunds = {};
+  this._ownerOffersTotal = {};
+  this._offerCounts = {};
   this._synchronized = false;
 };
 
 /**
- * Check that the funds for offer owner have been cached
+ * Check whether owner's funds have been cached
  *
- * @param {String} account address
+ * @param {String} account - owner's account address
  */
 
-OrderBook.prototype.hasCachedFunds = function(account) {
+OrderBook.prototype.hasOwnerFunds = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
   return this._ownerFunds[account] !== void(0);
 };
 
 /**
- * Add cached offer owner funds
+ * Set owner's, transfer rate adjusted, funds in cache
  *
- * @param {String} account address
- * @param {String} funded amount
+ * @param {String} account - owner's account address
+ * @param {String} fundedAmount
  */
 
-OrderBook.prototype.addCachedFunds = function(account, fundedAmount) {
+OrderBook.prototype.setOwnerFunds = function(account, fundedAmount) {
   assert(UInt160.is_valid(account), 'Account is invalid');
   assert(!isNaN(fundedAmount), 'Funded amount is invalid');
-  this._ownerFunds[account] = fundedAmount;
+
+  this._ownerFundsUnadjusted[account] = fundedAmount;
+  this._ownerFunds[account] = this.applyTransferRate(fundedAmount);
 };
 
 /**
- * Get cached offer owner funds
+ * Get owner's cached, transfer rate adjusted, funds
  *
- * @param {String} account address
+ * @param {String} account - owner's account address
+ * @return {String}
  */
 
-OrderBook.prototype.getCachedFunds = function(account) {
+OrderBook.prototype.getOwnerFunds = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
   return this._ownerFunds[account];
 };
 
 /**
- * Remove cached offer owner funds
+ * Get owner's cached unadjusted funds
  *
- * @param {String} account address
+ * @param {String} account - owner's account address
+ * @return {String}
  */
 
-OrderBook.prototype.removeCachedFunds = function(account) {
+OrderBook.prototype.getUnadjustedOwnerFunds = function(account) {
+  assert(UInt160.is_valid(account), 'Account is invalid');
+  return this._ownerFundsUnadjusted[account];
+};
+
+/**
+ * Remove cached owner's funds
+ *
+ * @param {String} account - owner's account address
+ */
+
+OrderBook.prototype.deleteOwnerFunds = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
   this._ownerFunds[account] = void(0);
 };
 
 /**
- * Get offer count for offer owner
+ * Get offer count for owner
  *
- * @param {String} account address
+ * @param {String} account - owner's account address
+ * @return {Number}
  */
 
-OrderBook.prototype.getOfferCount = function(account) {
+OrderBook.prototype.getOwnerOfferCount = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
   return this._offerCounts[account] || 0;
 };
 
 /**
- * Increment offer count for offer owner
+ * Increment offer count for owner
  *
- * @param {String} account address
+ * @param {String} account - owner's account address
+ * @return {Number}
  */
 
-OrderBook.prototype.incrementOfferCount = function(account) {
+OrderBook.prototype.incrementOwnerOfferCount = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
   var result = (this._offerCounts[account] || 0) + 1;
   this._offerCounts[account] = result;
@@ -257,60 +413,72 @@ OrderBook.prototype.incrementOfferCount = function(account) {
 };
 
 /**
- * Decrement offer count for offer owner
+ * Decrement offer count for owner
+ * When an account has no more orders, we also stop tracking their account funds
  *
- * @param {String} account address
+ * @param {String} account - owner's account address
+ * @return {Number}
  */
 
-OrderBook.prototype.decrementOfferCount = function(account) {
+OrderBook.prototype.decrementOwnerOfferCount = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
   var result = (this._offerCounts[account] || 1) - 1;
   this._offerCounts[account] = result;
+
+  if (result < 1) {
+    this.deleteOwnerFunds(account);
+  }
+
   return result;
 };
 
 /**
- * Add offer amount to sum amount being offered by an account
+ * Add amount sum being offered for owner
  *
- * @param {String} account address
- * @param {Object|String} offer amount
- * @return sum
+ * @param {String} account - owner's account address
+ * @param {Object|String} amount - offer amount as native string or IOU currency format
+ * @return {Amount}
  */
 
-OrderBook.prototype.addOwnerOffer = function(account, amount) {
+OrderBook.prototype.addOwnerOfferTotal = function(account, amount) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  var previousAmount = this.getOwnerOfferSum(account);
+  var previousAmount = this.getOwnerOfferTotal(account);
   var newAmount = previousAmount.add(Amount.from_json(amount));
-  this._ownerOffers[account] = newAmount;
+  this._ownerOffersTotal[account] = newAmount;
   return newAmount;
 };
 
 /**
- * Subtract offer amount from sum amount being offered by an account
+ * Subtract amount sum being offered for owner
  *
- * @param {String} account address
- * @param {Object|String} offer amount
- * @return sum
+ * @param {String} account - owner's account address
+ * @param {Object|String} amount - offer amount as native string or IOU currency format
+ * @return {Amount}
  */
 
-OrderBook.prototype.subtractOwnerOffer = function(account, amount) {
+OrderBook.prototype.subtractOwnerOfferTotal = function(account, amount) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  var previousAmount = this.getOwnerOfferSum(account);
+  var previousAmount = this.getOwnerOfferTotal(account);
   var newAmount = previousAmount.subtract(Amount.from_json(amount));
-  this._ownerOffers[account] = newAmount;
+  this._ownerOffersTotal[account] = newAmount;
+
+  assert(!newAmount.is_negative(), 'Offer total cannot be negative');
+
   return newAmount;
 };
 
 /**
- * Get sum amount for offers by an account
+ * Get offers amount sum for owner
  *
- * @param {String} account address
- * @return sum
+ * @param {String} account - owner's account address
+ * @return {Amount}
  */
 
-OrderBook.prototype.getOwnerOfferSum = function(account) {
+OrderBook.prototype.getOwnerOfferTotal = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  var amount = this._ownerOffers[account];
+
+  var amount = this._ownerOffersTotal[account];
+  
   if (!amount) {
     if (this._currencyGets.is_native()) {
       amount = Amount.from_json('0');
@@ -318,36 +486,23 @@ OrderBook.prototype.getOwnerOfferSum = function(account) {
       amount = Amount.from_json('0' + OrderBook.IOU_SUFFIX);
     }
   }
+
   return amount;
 };
 
 /**
- * Compute funded amount for a balance/transferRate
+ * Compute adjusted balance that would be left after issuer's transfer fee is deducted
  *
  * @param {String} balance
- * @param [String] transferRate
- * @return {Amount} funded amount
+ * @return {Amount}
  */
 
-OrderBook.prototype.applyTransferRate = function(balance, transferRate) {
+OrderBook.prototype.applyTransferRate = function(balance) {
   assert(!isNaN(balance), 'Balance is invalid');
-
-  if (this._currencyGets.is_native()) {
-    return balance;
-  }
-
-  if (transferRate === void(0)) {
-    transferRate = this._issuerTransferRate;
-  }
-
-  assert(!isNaN(transferRate), 'Transfer rate is invalid');
-
-  if (transferRate === OrderBook.DEFAULT_TRANSFER_RATE) {
-    return balance;
-  }
+  assert(!_.isNull(this._issuerTransferRate) && !isNaN(this._issuerTransferRate), 'Transfer rate is invalid');
 
   var adjustedBalance = Amount.from_json(balance + OrderBook.IOU_SUFFIX)
-  .divide(transferRate)
+  .divide(this._issuerTransferRate)
   .multiply(Amount.from_json(OrderBook.DEFAULT_TRANSFER_RATE))
   .to_json()
   .value;
@@ -365,51 +520,50 @@ OrderBook.prototype.requestTransferRate = function(callback) {
   assert.strictEqual(typeof callback, 'function');
 
   var self = this;
-  var issuer = this._issuerGets;
 
   if (this._currencyGets.is_native()) {
-    // Transfer rate is default (native currency)
-    callback(null, OrderBook.DEFAULT_TRANSFER_RATE);
-    return;
+    // Transfer rate is default for the native currency
+    this._issuerTransferRate = OrderBook.DEFAULT_TRANSFER_RATE;
+
+    return callback(null, OrderBook.DEFAULT_TRANSFER_RATE);
   }
 
   if (this._issuerTransferRate) {
     // Transfer rate has already been cached
-    callback(null, this._issuerTransferRate);
-    return;
+    return callback(null, this._issuerTransferRate);
   }
 
-  this._remote.requestAccountInfo({ account: issuer }, function(err, info) {
+  this._remote.requestAccountInfo({ account: this._issuerGets }, function(err, info) {
     if (err) {
-      // XXX What now?
       return callback(err);
     }
 
-    var transferRate = info.account_data.TransferRate;
+    // When transfer rate is not explicitly set on account, it implies the default transfer rate
+    self._issuerTransferRate = info.account_data.TransferRate || OrderBook.DEFAULT_TRANSFER_RATE;
 
-    if (!transferRate) {
-      transferRate = OrderBook.DEFAULT_TRANSFER_RATE;
-    }
-
-    self._issuerTransferRate = transferRate;
-    callback(null, transferRate);
+    callback(null, self._issuerTransferRate);
   });
 };
 
 /**
- * Set funded amount on offer. All offers have taker_gets_funded property,
- * which reflects the amount this account can afford to offer. All offers have
- * is_fully_funded property, indicating whether these funds are sufficient for
- * the offer placed.
+ * Set funded amount on offer with its owner's cached funds
+ * 
+ * Offers have taker_gets_funded, reflecting the amount this account can afford to offer.
+ * Offers have is_fully_funded, indicating whether these funds are sufficient for the offer placed.
+ * Offers have taker_pays_funded, reflecting an adjusted TakerPays in the case of a partially funded order.
  *
  * @param {Object} offer
  * @param {String} funds
  * @return offer
  */
 
-OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
+OrderBook.prototype.setOfferFundedAmount = function(offer) {
   assert.strictEqual(typeof offer, 'object', 'Offer is invalid');
-  assert(!isNaN(fundedAmount), 'Funds is invalid');
+  assert(!isNaN(this.getOwnerFunds(offer.Account)), 'Funds is invalid');
+
+  var fundedAmount = this.getOwnerFunds(offer.Account);
+
+  offer.owner_funds = this.getUnadjustedOwnerFunds(offer.Account);
 
   if (fundedAmount === '0') {
     offer.taker_gets_funded = '0';
@@ -418,12 +572,9 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
     return offer;
   }
 
-  // Sum of offer amounts by an account
-  var offerSum = this.getOwnerOfferSum(offer.Account);
+  var offerSum = this.getOwnerOfferTotal(offer.Account);
 
   if (offerSum.is_zero()) {
-    // If there are no cached offer amounts for the account, default to
-    // TakerGets of this offer
     offerSum = Amount.from_json(offer.TakerGets);
   }
 
@@ -478,109 +629,12 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
 };
 
 /**
- * DEPRECATED:
- * Should only be called for old versions of rippled
+ * Get account and final balance of a meta node
  *
- * Determine what an account is funded to offer for orderbook's
- * currency/issuer
- *
- * @param {String} account
- * @param {Function} callback
+ * @param {Object} node - RippleState or AccountRoot meta node
+ * @return {Object}
  */
-
-OrderBook.prototype.requestFundedAmount = function(account, callback) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
-  assert.strictEqual(typeof callback, 'function', 'Callback is invalid');
-
-  var self = this;
-
-  if (self._remote.trace) {
-    log.info('requesting funds', account);
-  }
-
-  function requestNativeBalance(callback) {
-    self._remote.requestAccountInfo({ account: account }, function(err, info) {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null, String(info.account_data.Balance));
-      }
-    });
-  };
-
-  function requestLineBalance(callback) {
-    var request = self._remote.requestAccountLines({
-      account: account,
-      ledger: 'validated',
-      peer: self._issuerGets
-    });
-
-    request.request(function(err, res) {
-      if (err) {
-        return callback(err);
-      }
-
-      var currency = self._currencyGets.to_json();
-      var balance = '0';
-
-      for (var i=0, line; (line=res.lines[i]); i++) {
-        if (line.currency === currency) {
-          balance = line.balance;
-          break;
-        }
-      }
-
-      callback(null, balance);
-    });
-  };
-
-  function computeFundedAmount(err, results) {
-    if (err) {
-      if (self._remote.trace) {
-        log.info('failed to request funds', err);
-      }
-      //XXX What now?
-      return callback(err);
-    }
-
-    if (self._remote.trace) {
-      log.info('requested funds', account, results);
-    }
-
-    var balance;
-    var fundedAmount;
-
-    if (self._currencyGets.is_native()) {
-      balance = results[0];
-      fundedAmount = balance;
-    } else {
-      balance = results[1];
-      fundedAmount = self.applyTransferRate(balance, results[0]);
-    }
-
-    callback(null, fundedAmount);
-  };
-
-  var steps = [ ];
-
-  if (this._currencyGets.is_native()) {
-    steps.push(requestNativeBalance);
-  } else {
-    steps.push(this.requestTransferRate.bind(this));
-    steps.push(requestLineBalance);
-  }
-
-  async.parallel(steps, computeFundedAmount);
-};
-
-/**
- * Get changed balance of an affected node
- *
- * @param {Object} RippleState or AccountRoot node
- * @return {Object} { account, balance }
- */
-
-OrderBook.prototype.getBalanceChange = function(node) {
+OrderBook.prototype.parseAccountBalanceFromNode = function(node) {
   var result = {
     account: void(0),
     balance: void(0)
@@ -597,8 +651,9 @@ OrderBook.prototype.getBalanceChange = function(node) {
         result.account = node.fields.LowLimit.issuer;
         result.balance = node.fieldsFinal.Balance.value;
       } else if (node.fields.LowLimit.issuer === this._issuerGets) {
-        // Negate balance
         result.account = node.fields.HighLimit.issuer;
+
+        // Negate balance on the trust line
         result.balance = Amount.from_json(
           node.fieldsFinal.Balance
         ).negate().to_json().value;
@@ -606,72 +661,65 @@ OrderBook.prototype.getBalanceChange = function(node) {
       break;
   }
 
-  result.isValid = !isNaN(result.balance)
-                && UInt160.is_valid(result.account);
+  assert(!isNaN(result.balance), 'node has an invalid balance');
+  assert(UInt160.is_valid(result.account), 'node has an invalid account');
 
   return result;
 };
 
 /**
- * Check that affected node represents a balance change
+ * Check that affected meta node represents a balance change
  *
- * @param {Object} RippleState or AccountRoot node
+ * @param {Object} node - RippleState or AccountRoot meta node
  * @return {Boolean}
  */
 
-OrderBook.prototype.isBalanceChange = function(node) {
-  // Check balance change
+OrderBook.prototype.isBalanceChangeNode = function(node) {
+  // Check meta node has balance, previous balance, and final balance
   if (!(node.fields && node.fields.Balance
   && node.fieldsPrev && node.fieldsFinal
   && node.fieldsPrev.Balance && node.fieldsFinal.Balance)) {
     return false;
   }
 
-  // Check currency
+  // Check if taker gets currency is native and balance is not a number
   if (this._currencyGets.is_native()) {
     return !isNaN(node.fields.Balance);
   }
 
+  // Check if balance change is not for taker gets currency
   if (node.fields.Balance.currency !== this._currencyGets.to_json()) {
     return false;
   }
 
-  // Check issuer
+  // Check if trustline does not refer to the taker gets currency issuer
   if (!(node.fields.HighLimit.issuer === this._issuerGets
      || node.fields.LowLimit.issuer === this._issuerGets)) {
-     return false;
-   }
+    return false;
+  }
 
-   return true;
+  return true;
 };
 
 /**
- * Update funded amounts for offers in the orderbook as new transactions are
- * streamed from server
+ * Updates funded amounts/balances using ModifiedNode
  *
- * @param {Object} transaction
+ * Update owner funds using modified AccountRoot and RippleState nodes.
+ * Update funded amounts for offers in the orderbook using owner funds.
+ *
+ * @param {Object} transaction - transaction that holds meta nodes
  */
 
 OrderBook.prototype.updateFundedAmounts = function(transaction) {
   var self = this;
 
-  var affectedAccounts = transaction.mmeta.getAffectedAccounts();
-
-  var isOwnerAffected = affectedAccounts.some(function(account) {
-    return self.hasCachedFunds(account);
-  });
-
-  if (!isOwnerAffected) {
-    return;
-  }
-
   if (!this._currencyGets.is_native() && !this._issuerTransferRate) {
-    // Defer until transfer rate is requested
     if (this._remote.trace) {
       log.info('waiting for transfer rate');
     }
 
     this.requestTransferRate(function() {
+      // Defer until transfer rate is requested
       self.updateFundedAmounts(transaction);
     });
     return;
@@ -682,49 +730,233 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
     entryType: this._currencyGets.is_native() ? 'AccountRoot' : 'RippleState'
   });
 
-  for (var i=0, l=affectedNodes.length; i<l; i++) {
-    var node = affectedNodes[i];
+  _.each(affectedNodes, function (node) {
+    if (self.isBalanceChangeNode(node)) {
+      var result = self.parseAccountBalanceFromNode(node);
 
-    if (!this.isBalanceChange(node)) {
-      continue;
+      if (self.hasOwnerFunds(result.account)) {
+        // We are only updating owner funds that are already cached
+        self.setOwnerFunds(result.account, result.balance);
+
+        self.updateOwnerOffersFundedAmount(result.account);
+      }
+    }
+  });
+};
+
+/**
+ * Update offers' funded amount with their owner's funds
+ *
+ * @param {String} account - owner's account address
+ */
+
+OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
+  assert(UInt160.is_valid(account), 'Account is invalid');
+  assert(!isNaN(this.getOwnerFunds(account)), 'Funded amount is invalid');
+
+  var self = this;
+
+  if (this._remote.trace) {
+    log.info('updating offer funds', this._key, account, this.getOwnerFunds(account));
+  }
+
+  _.each(this._offers, function (offer) {
+    if (offer.Account !== account) {
+      return;
     }
 
-    var result = this.getBalanceChange(node);
+    // Save a copy of the old offer so we can show how the offer has changed
+    var previousOffer = extend({}, offer);
+    var previousFundedGets = Amount.from_json(
+      offer.taker_gets_funded + OrderBook.IOU_SUFFIX
+    );
 
-    if (result.isValid && this.hasCachedFunds(result.account)) {
-      this.updateAccountFunds(result.account, result.balance);
+    self.setOfferFundedAmount(offer);
+
+    var areFundsChanged = !previousFundedGets.equals(
+      Amount.from_json(offer.taker_gets_funded + OrderBook.IOU_SUFFIX)
+    );
+
+    if (areFundsChanged) {
+      self.emit('offer_changed', previousOffer, offer);
+      self.emit('offer_funds_changed', 
+        offer,
+        previousOffer.taker_gets_funded,
+        offer.taker_gets_funded
+      );
     }
+  });
+};
+
+/**
+ * Notify orderbook of a relevant transaction
+ *
+ * @param {Object} transaction
+ * @api private
+ */
+
+OrderBook.prototype.notify = function(transaction) {
+  var self = this;
+
+  if (!this._subscribed) {
+    return;
+  }
+
+  if (this._remote.trace) {
+    log.info('notifying', this._key, transaction.transaction.hash);
+  }
+
+  var affectedNodes = transaction.mmeta.getNodes({
+    entryType: 'Offer',
+    bookKey: this._key
+  });
+
+  if (affectedNodes.length < 1) {
+    return;
+  }
+
+  var takerGetsTotal = Amount.from_json(
+    '0' + ((Currency.from_json(this._currencyGets).is_native())
+           ? ''
+           : ('/' + this._currencyGets + '/' + this._issuerGets))
+  );
+
+  var takerPaysTotal = Amount.from_json(
+    '0' + ((Currency.from_json(this._currencyPays).is_native())
+           ? ''
+           : ('/' + this._currencyPays + '/' + this._issuerPays))
+  );
+
+  function handleNode(node) {
+    var isDeletedNode = node.nodeType === 'DeletedNode';
+    var isOfferCancel = transaction.transaction.TransactionType === 'OfferCancel';
+
+    switch (node.nodeType) {
+      case 'DeletedNode':
+      case 'ModifiedNode':
+        self.modifyOffer(node);
+
+        // We don't want to count an OfferCancel as a trade
+        if (!isOfferCancel) {
+          if (isDeletedNode) {
+            takerGetsTotal = takerGetsTotal.add(node.fieldsFinal.TakerGets);
+            takerPaysTotal = takerPaysTotal.add(node.fieldsFinal.TakerPays);
+          } else {
+            takerGetsTotal = takerGetsTotal.add(node.fieldsPrev.TakerGets).subtract(node.fieldsFinal.TakerGets);
+            takerPaysTotal = takerPaysTotal.add(node.fieldsPrev.TakerPays).subtract(node.fieldsFinal.TakerPays);
+          }
+        }
+        break;
+
+      case 'CreatedNode':
+        self.setOwnerFunds(node.fields.Account, transaction.transaction.owner_funds);
+        self.insertOffer(node);
+        break;
+    }
+  };
+
+  _.each(affectedNodes, handleNode);
+
+  this.emit('transaction', transaction);
+  this.emit('model', this._offers);
+  if (!takerGetsTotal.is_zero()) {
+    this.emit('trade', takerPaysTotal, takerGetsTotal);
   }
 };
 
 /**
- * Normalize offers from book_offers and transaction stream
+ * Insert an offer into the orderbook
  *
- * @param {Object} offer
- * @return {Object} normalized
+ * @param {Object} node - Offer node
  */
 
-OrderBook.offerRewrite = function(offer) {
-  var result = { };
-  var keys = Object.keys(offer);
+OrderBook.prototype.insertOffer = function(node) {
+  if (this._remote.trace) {
+    log.info('inserting offer', this._key, node.fields);
+  }
 
-  for (var i=0, l=keys.length; i<l; i++) {
-    var key = keys[i];
-    switch (key) {
-      case 'PreviousTxnID':
-      case 'PreviousTxnLgrSeq':
-      case 'quality':
+  var offer = OrderBook.offerRewrite(node.fields);
+
+  this.addOwnerOfferTotal(offer.Account, offer.TakerGets);
+  this.incrementOwnerOfferCount(offer.Account);
+
+  offer.LedgerEntryType = node.entryType;
+  offer.index = node.ledgerIndex;
+
+  this.setOfferFundedAmount(offer);
+
+  var DATE_REF = {
+    reference_date: new Date()
+  };
+
+  // XXX Should use Amount#from_quality
+  var price = Amount.from_json(
+    offer.TakerPays
+  ).ratio_human(offer.TakerGets, DATE_REF);
+
+  for (var i=0, offersLength=this._offers.length; i<offersLength + 1; i++) {
+    if (i === offersLength) {
+      this._offers.push(offer);
+    } else {
+      var currentOffer = this._offers[i];
+
+      var priceItem = Amount.from_json(
+        currentOffer.TakerPays
+      ).ratio_human(currentOffer.TakerGets, DATE_REF);
+
+      if (price.compareTo(priceItem) <= 0) {
+        this._offers.splice(i, 0, offer);
         break;
-      default:
-        result[key] = offer[key];
+      }
     }
   }
 
-  result.Flags = result.Flags || 0;
-  result.OwnerNode = result.OwnerNode || new Array(16 + 1).join('0');
-  result.BookNode = result.BookNode || new Array(16 + 1).join('0');
+  this.emit('offer_added', offer);
+};
 
-  return result;
+/**
+ * Modify an existing offer in the orderbook
+ *
+ * @param {Object} node - Offer node
+ */
+
+OrderBook.prototype.modifyOffer = function(node) {
+  if (this._remote.trace) {
+    if (node.nodeType === 'DeletedNode') {
+      log.info('deleting offer', this._key, node.fields);
+    } else {
+      log.info('modifying offer', this._key, node.fields);
+    }
+  }
+
+  for (var i=0, l=this._offers.length; i<l; i++) {
+    var offer = this._offers[i];
+
+    if (offer.index === node.ledgerIndex) {
+      if (node.nodeType === 'DeletedNode') {
+        // Remove offer amount from sum for account
+        this.subtractOwnerOfferTotal(offer.Account, offer.TakerGets);
+        this._offers.splice(i, 1);
+        this.decrementOwnerOfferCount(offer.Account);
+
+        this.emit('offer_removed', offer);
+      } else {
+        // TODO: This assumes no fields are deleted, which is
+        // probably a safe assumption, but should be checked.
+        var previousOffer = extend({}, offer);
+        extend(offer, node.fieldsFinal);
+
+        // Remove offer amount from sum for account
+        this.subtractOwnerOfferTotal(offer.Account, previousOffer.TakerGets);
+        // Add offer amount from sum for account
+        this.addOwnerOfferTotal(offer.Account, offer.TakerGets);
+
+        this.emit('offer_changed', previousOffer, offer);
+      }
+
+      break;
+    }
+  }
 };
 
 /**
@@ -735,144 +967,40 @@ OrderBook.offerRewrite = function(offer) {
  */
 
 OrderBook.prototype.setOffers = function(offers) {
-  assert(Array.isArray(offers));
+  assert(Array.isArray(offers), '');
 
-  var l = offers.length;
-  var newOffers = [ ];
+  var self = this;
 
-  for (var i=0; i<l; i++) {
-    var offer = offers[i];
-    // Add offer amount to sum for account
-    this.addOwnerOffer(offer.Account, offer.TakerGets);
-  }
+  // Must calculate offer totals before we can set funded amounts on offers
+  _.each(offers, function (rawOffer) {
+    self.addOwnerOfferTotal(rawOffer.Account, rawOffer.TakerGets);
+  });
 
-  for (var i=0; i<l; i++) {
-    var offer = OrderBook.offerRewrite(offers[i]);
-    var fundedAmount;
+  var newOffers = _.map(offers, function (rawOffer) {
+    var offer = OrderBook.offerRewrite(rawOffer);
 
-    if (this.hasCachedFunds(offer.Account)) {
-      fundedAmount = this.getCachedFunds(offer.Account);
-    } else if (offer.hasOwnProperty('owner_funds')) {
-      fundedAmount = this.applyTransferRate(offer.owner_funds);
-      this.addCachedFunds(offer.Account, fundedAmount);
+    if (offer.hasOwnProperty('owner_funds')) {
+      // The first offer from book_offers contains owner balance of offer's output
+      self.setOwnerFunds(offer.Account, offer.owner_funds);
     }
 
-    this.incrementOfferCount(offer.Account);
-    this.setFundedAmount(offer, fundedAmount);
+    self.incrementOwnerOfferCount(offer.Account);
+    self.setOfferFundedAmount(offer);
 
-    newOffers.push(offer);
-  }
+    return offer;
+  });
 
   this._offers = newOffers;
 };
 
 /**
- * Request orderbook entries from server
- */
-
-OrderBook.prototype.requestOffers = function(callback) {
-  var self = this;
-
-  if (typeof callback !== 'function') {
-    callback = function(){};
-  }
-
-  if (!this._shouldSubscribe) {
-    return callback(new Error('Should not request offers'));
-  }
-
-  if (this._remote.trace) {
-    log.info('requesting offers', this._key);
-  }
-
-  function handleOffers(res) {
-    if (!Array.isArray(res.offers)) {
-      // XXX What now?
-      return callback(new Error('Invalid response'));
-    }
-
-    if (self._remote.trace) {
-      log.info('requested offers', self._key, 'offers: ' + res.offers.length);
-    }
-
-    self.setOffers(res.offers);
-    self._synchronized = true;
-    self.emit('model', self._offers);
-
-    callback(null, self._offers);
-  };
-
-  function handleError(err) {
-    // XXX What now?
-    if (self._remote.trace) {
-      log.info('failed to request offers', self._key, err);
-    }
-
-    callback(err);
-  };
-
-  var request = this._remote.requestBookOffers(this.toJSON());
-  request.once('success', handleOffers);
-  request.once('error', handleError);
-  request.request();
-
-  return request;
-};
-
-/**
- * Subscribe to transactions stream
- */
-
-OrderBook.prototype.subscribeTransactions = function(callback) {
-  var self = this;
-
-  if (typeof callback !== 'function') {
-    callback = function(){};
-  }
-
-  if (!this._shouldSubscribe) {
-    return callback('Should not subscribe');
-  }
-
-  if (this._remote.trace) {
-    log.info('subscribing to transactions');
-  }
-
-  function handleSubscribed(res) {
-    if (self._remote.trace) {
-      log.info('subscribed to transactions');
-    }
-
-    self._subscribed = true;
-
-    callback(null, res);
-  };
-
-  function handleError(err) {
-    if (self._remote.trace) {
-      log.info('failed to subscribe to transactions', self._key, err);
-    }
-
-    callback(err);
-  };
-
-  var request = this._remote.requestSubscribe();
-  request.addStream('transactions');
-  request.once('success', handleSubscribed);
-  request.once('error', handleError);
-  request.request();
-
-  return request;
-};
-
-/**
- * Get offers model asynchronously.
+ * Get offers model asynchronously
  *
  * This function takes a callback and calls it with an array containing the
  * current set of offers in this order book.
  *
  * If the data is available immediately, the callback may be called
- * synchronously.
+ * synchronously
  *
  * @param {Function} callback
  */
@@ -909,248 +1037,6 @@ OrderBook.prototype.getOffersSync = function() {
 };
 
 /**
- * Update offers whose account's funds have changed
- *
- * @param {String} account address
- * @param {String|Object} offer funds
- */
-
-OrderBook.prototype.updateAccountFunds = function(account, balance) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
-  assert(!isNaN(balance), 'Funded amount is invalid');
-
-  if (this._remote.trace) {
-    log.info('updating offer funds', this._key, account, fundedAmount);
-  }
-
-  var fundedAmount = this.applyTransferRate(balance);
-
-  // Update cached account funds
-  this.addCachedFunds(account, fundedAmount);
-
-  for (var i=0, l=this._offers.length; i<l; i++) {
-    var offer = this._offers[i];
-
-    if (offer.Account !== account) {
-      continue;
-    }
-
-    var previousOffer = extend({ }, offer);
-    var previousFundedGets = Amount.from_json(
-      offer.taker_gets_funded + OrderBook.IOU_SUFFIX
-    );
-
-    offer.owner_funds = balance;
-    this.setFundedAmount(offer, fundedAmount);
-
-    var hasChangedFunds = !previousFundedGets.equals(
-      Amount.from_json(offer.taker_gets_funded + OrderBook.IOU_SUFFIX)
-    );
-
-    if (!hasChangedFunds) {
-      continue;
-    }
-
-    this.emit('offer_changed', previousOffer, offer);
-    this.emit('offer_funds_changed', offer,
-      previousOffer.taker_gets_funded,
-      offer.taker_gets_funded
-    );
-  }
-};
-
-/**
- * Insert an offer into the orderbook
- *
- * @param {Object} node
- */
-
-OrderBook.prototype.insertOffer = function(node, fundedAmount) {
-  if (this._remote.trace) {
-    log.info('inserting offer', this._key, node.fields);
-  }
-
-  // Add offer amount to sum for account
-  this.addOwnerOffer(node.fields.Account, node.fields.TakerGets);
-
-  var nodeFields = OrderBook.offerRewrite(node.fields);
-  nodeFields.LedgerEntryType = node.entryType;
-  nodeFields.index = node.ledgerIndex;
-
-  if (!isNaN(fundedAmount)) {
-    this.setFundedAmount(nodeFields, fundedAmount);
-    this.addCachedFunds(nodeFields.Account, fundedAmount);
-  }
-
-  var DATE_REF = {
-    reference_date: new Date()
-  };
-
-  // XXX Should use Amount#from_quality
-  var price = Amount.from_json(
-    nodeFields.TakerPays
-  ).ratio_human(nodeFields.TakerGets, DATE_REF);
-
-  for (var i=0, l=this._offers.length; i<l; i++) {
-    var offer = this._offers[i];
-
-    var priceItem = Amount.from_json(
-      offer.TakerPays
-    ).ratio_human(offer.TakerGets, DATE_REF);
-
-    if (price.compareTo(priceItem) <= 0) {
-      this._offers.splice(i, 0, nodeFields);
-      break;
-    } else if (i === (l - 1)) {
-      this._offers.push(nodeFields);
-    }
-  }
-
-  this.emit('offer_added', nodeFields);
-};
-
-/**
- * Modify an existing offer in the orderbook
- *
- * @param {Object} node
- * @param {Boolean} isDeletedNode
- */
-
-OrderBook.prototype.modifyOffer = function(node, isDeletedNode) {
-  if (this._remote.trace) {
-    if (isDeletedNode) {
-      log.info('deleting offer', this._key, node.fields);
-    } else {
-      log.info('modifying offer', this._key, node.fields);
-    }
-  }
-
-  for (var i=0, l=this._offers.length; i<l; i++) {
-    var offer = this._offers[i];
-    if (offer.index === node.ledgerIndex) {
-      if (isDeletedNode) {
-        // Remove offer amount from sum for account
-        this.subtractOwnerOffer(offer.Account, offer.TakerGets);
-        this._offers.splice(i, 1);
-        this.emit('offer_removed', offer);
-      } else {
-        // TODO: This assumes no fields are deleted, which is
-        // probably a safe assumption, but should be checked.
-        var previousOffer = extend({ }, offer);
-        extend(offer, node.fieldsFinal);
-
-        // Remove offer amount from sum for account
-        this.subtractOwnerOffer(offer.Account, previousOffer.TakerGets);
-        // Add offer amount from sum for account
-        this.addOwnerOffer(offer.Account, offer.TakerGets);
-
-        this.emit('offer_changed', previousOffer, offer);
-      }
-      break;
-    }
-  }
-};
-
-/**
- * Notify orderbook of a relevant transaction
- *
- * @param {Object} transaction
- * @api private
- */
-
-OrderBook.prototype.notify = function(transaction) {
-  var self = this;
-
-  // Unsubscribed from OrderBook
-  if (!this._subscribed) {
-    return;
-  }
-
-  var affectedNodes = transaction.mmeta.getNodes({
-    entryType: 'Offer',
-    bookKey: this._key
-  });
-
-  if (affectedNodes.length < 1) {
-    return;
-  }
-
-  if (this._remote.trace) {
-    log.info('notifying', this._key, transaction.transaction.hash);
-  }
-
-  var tradeGets = Amount.from_json(
-    '0' + ((Currency.from_json(this._currencyGets).is_native())
-           ? ''
-           : ('/' + this._currencyGets + '/' + this._issuerGets))
-  );
-
-  var tradePays = Amount.from_json(
-    '0' + ((Currency.from_json(this._currencyPays).is_native())
-           ? ''
-           : ('/' + this._currencyPays + '/' + this._issuerPays))
-  );
-
-  function handleNode(node, callback) {
-    var isDeletedNode = node.nodeType === 'DeletedNode';
-    var isOfferCancel = transaction.transaction.TransactionType === 'OfferCancel';
-
-    switch (node.nodeType) {
-      case 'DeletedNode':
-      case 'ModifiedNode':
-         self.modifyOffer(node, isDeletedNode);
-
-        // We don't want to count an OfferCancel as a trade
-        if (!isOfferCancel) {
-          tradeGets = tradeGets.add(node.fieldsPrev.TakerGets);
-          tradePays = tradePays.add(node.fieldsPrev.TakerPays);
-
-          if (isDeletedNode) {
-            if (self.decrementOfferCount(node.fields.Account) < 1) {
-              self.removeCachedFunds(node.fields.Account);
-            }
-          } else {
-            tradeGets = tradeGets.subtract(node.fieldsFinal.TakerGets);
-            tradePays = tradePays.subtract(node.fieldsFinal.TakerPays);
-          }
-        }
-        callback();
-        break;
-
-      case 'CreatedNode':
-        self.incrementOfferCount(node.fields.Account);
-
-        var fundedAmount = transaction.transaction.owner_funds;
-
-        if (!isNaN(fundedAmount)) {
-          self.insertOffer(node, fundedAmount);
-          return callback();
-        }
-
-        // Get the offer account's balance from server
-        self.requestFundedAmount(
-          node.fields.Account, function(err, fundedAmount) {
-          if (err) {
-            // XXX Now what?
-          } else {
-            self.insertOffer(node, fundedAmount);
-          }
-          callback();
-        });
-        break;
-    }
-  };
-
-  async.eachSeries(affectedNodes, handleNode, function() {
-    self.emit('transaction', transaction);
-    self.emit('model', self._offers);
-    if (!tradeGets.is_zero()) {
-      self.emit('trade', tradePays, tradeGets);
-    }
-  });
-};
-
-/**
  * Get request-representation of orderbook
  *
  * @return {Object} json
@@ -1179,7 +1065,7 @@ OrderBook.prototype.to_json = function() {
 };
 
 /**
- * Whether the OrderBook is valid.
+ * Whether the OrderBook is valid
  *
  * Note: This only checks whether the parameters (currencies and issuer) are
  *       syntactically valid. It does not check anything against the ledger.
@@ -1200,5 +1086,3 @@ OrderBook.prototype.is_valid = function() {
 };
 
 exports.OrderBook = OrderBook;
-
-// vim:sw=2:sts=2:ts=8:et
