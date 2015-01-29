@@ -1573,7 +1573,7 @@ Remote.parseBinaryTransaction = function(transaction) {
   tx_result.meta = meta;
   tx_result.validated = transaction.validated;
 
-  if (typeof meta.DeliveredAmount === 'object') {
+  if (typeof meta.DeliveredAmount === 'string' || typeof meta.DeliveredAmount === 'object') {
     tx_result.meta.delivered_amount = meta.DeliveredAmount;
   } else if (typeof tx_obj.Amount === 'string' || typeof tx_obj.Amount === 'object') {
     tx_result.meta.delivered_amount = tx_obj.Amount;

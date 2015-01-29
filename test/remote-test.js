@@ -736,6 +736,9 @@ describe('Remote', function () {
 
     var parsedOfferCreate = Remote.parseBinaryTransaction(binaryTransaction.OfferCreate.binary);
     assert.deepEqual(parsedOfferCreate, binaryTransaction.OfferCreate.parsed);
+
+    var parsedPartialPaymentWithXRPDelieveredAmount = Remote.parseBinaryTransaction(binaryTransaction.PartialPaymentWithXRPDeliveredAmount.binary);
+    assert.deepEqual(parsedPartialPaymentWithXRPDelieveredAmount, binaryTransaction.PartialPaymentWithXRPDeliveredAmount.parsed);
   });
 
   it('Remote.parseBinaryLedgerData()', function () {
