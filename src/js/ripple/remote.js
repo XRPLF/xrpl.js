@@ -40,14 +40,22 @@ var log = require('./log').internal.sub('remote');
 /**
  * Interface to manage connections to rippled servers
  *
- * @param {Object} Connection options.
+ * @param {Object} Options
  */
 
 function Remote(opts) {
   EventEmitter.call(this);
 
   var self = this;
-  var opts = lodash.extend(this, Remote.DEFAULTS, opts);
+  var opts = opts || { };
+
+  Object.keys(Remote.DEFAULTS).forEach(function(config) {
+    if (opts.hasOwnProperty(config)) {
+      this[config] = opts[config];
+    } else {
+      this[config] = Remote.DEFAULTS[config];
+    }
+  }, this);
 
   this.state = 'offline'; // 'online', 'offline'
   this._server_fatal = false; // server exited
@@ -102,13 +110,13 @@ function Remote(opts) {
     }
   };
 
-  if (typeof opts.trusted !== 'boolean') {
+  if (typeof this.trusted !== 'boolean') {
     throw new TypeError('trusted must be a boolean');
   }
-  if (typeof opts.trace !== 'boolean') {
+  if (typeof this.trace !== 'boolean') {
     throw new TypeError('trace must be a boolean');
   }
-  if (typeof opts.allow_partial_history !== 'boolean') {
+  if (typeof this.allow_partial_history !== 'boolean') {
     throw new TypeError('allow_partial_history must be a boolean');
   }
   if (typeof this.max_fee !== 'number') {
@@ -138,21 +146,21 @@ function Remote(opts) {
   if (typeof this.last_ledger_offset !== 'number') {
     throw new TypeError('last_ledger_offset must be a number');
   }
-  if (!Array.isArray(opts.servers)) {
+  if (!Array.isArray(this.servers)) {
     throw new TypeError('servers must be an array');
   }
 
   this.setMaxListeners(this.max_listeners);
 
-  this.servers.forEach(function(server) {
-    var connection = self.addServer(server);
-    connection.setMaxListeners(self.max_listeners);
+  this.servers.forEach(function(serverOptions) {
+    var server = self.addServer(serverOptions);
+    server.setMaxListeners(self.max_listeners);
   });
 
   function listenersModified(action, event) {
     // Automatically subscribe and unsubscribe to orderbook
     // on the basis of existing event listeners
-    if (~Remote.TRANSACTION_EVENTS.indexOf(event)) {
+    if (lodash.contains(Remote.TRANSACTION_EVENTS, event)) {
       switch (action) {
         case 'add':
           if (++self._transaction_listeners === 1) {
@@ -441,22 +449,13 @@ Remote.prototype.reconnect = function() {
  * @api public
  */
 
-Remote.prototype.connect = function(online) {
+Remote.prototype.connect = function(callback) {
   if (!this._servers.length) {
     throw new Error('No servers available.');
   }
 
-  switch (typeof online) {
-    case 'undefined':
-      break;
-    case 'function':
-      this.once('connect', online);
-      break;
-    default:
-      // Downwards compatibility
-      if (!Boolean(online)) {
-        return this.disconnect();
-      }
+  if (typeof callback === 'function') {
+    this.once('connect', callback);
   }
 
   this._should_connect = true;
@@ -482,12 +481,12 @@ Remote.prototype.disconnect = function(callback) {
 
   var callback = (typeof callback === 'function') ? callback : function(){};
 
+  this._should_connect = false;
+
   if (!this.isConnected()) {
     callback();
     return this;
   }
-
-  this._should_connect = false;
 
   this.once('disconnect', callback);
 
@@ -865,6 +864,9 @@ Remote.prototype.requestLedger = function(options, callback) {
           case 'accounts':
             request.message[o] = true;
             break;
+          case 'ledger':
+            request.selectLedger(options.ledger);
+            break;
           case 'ledger_index':
           case 'ledger_hash':
             request.message[o] = options[o];
@@ -1113,6 +1115,14 @@ Remote.prototype.requestTransactionEntry = function(hash, ledgerHash, callback) 
   // utils.assert(this.trusted);
   var request = new Request(this, 'transaction_entry');
 
+  if (typeof hash === 'object') {
+    ledgerHash = hash.ledger || hash.ledger_hash || hash.ledger_index;
+    hash = hash.hash || hash.tx || hash.transaction;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
+  }
+
   request.txHash(hash);
 
   switch (typeof ledgerHash) {
@@ -1152,6 +1162,8 @@ Remote.prototype.requestTx = function(hash, callback) {
 
   if (typeof hash === 'string') {
     options = { hash: hash };
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   } else {
     options = hash;
   }
@@ -1206,6 +1218,9 @@ Remote.accountRequest = function(type, options, callback) {
     peer = options.peer;
     limit = options.limit;
     marker = options.marker;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   }
 
   // if a marker is given, we need a ledger
@@ -1530,6 +1545,13 @@ Remote.prototype.requestTxHistory = function(start, callback) {
 
   var request = new Request(this, 'tx_history');
 
+  if (typeof start === 'object') {
+    start = start.start;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
+  }
+
   request.message.start = start;
   request.callback(callback);
 
@@ -1565,6 +1587,9 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
     gets = options.gets || options.taker_gets;
     ledger = options.ledger;
     limit = options.limit;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   }
 
   if (typeof lastArg === 'function') {
@@ -1625,6 +1650,14 @@ Remote.prototype.requestWalletAccounts = function(seed, callback) {
   utils.assert(this.trusted); // Don't send secrets.
 
   var request = new Request(this, 'wallet_accounts');
+
+  if (typeof seed === 'object') {
+    seed = seed.seed;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
+  }
+
   request.message.seed = seed;
   request.callback(callback);
 
@@ -1644,6 +1677,15 @@ Remote.prototype.requestSign = function(secret, tx_json, callback) {
   utils.assert(this.trusted); // Don't send secrets.
 
   var request = new Request(this, 'sign');
+
+  if (typeof secret === 'object') {
+    tx_json = secret.tx_json;
+    secret = secret.secret;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
+  }
+
   request.message.secret = secret;
   request.message.tx_json = tx_json;
   request.callback(callback);
@@ -1762,6 +1804,9 @@ Remote.accountRootRequest = function(type, responseFilter, account, ledger, call
     callback = ledger;
     ledger = account.ledger;
     account = account.account;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   }
 
   var lastArg = arguments[arguments.length - 1];
@@ -1911,6 +1956,9 @@ Remote.prototype.createPathFind = function(src_account, dst_account, dst_amount,
     dst_amount = options.dst_amount;
     dst_account = options.dst_account;
     src_account = options.src_account;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   }
 
   var pathFind = new PathFind(this,
@@ -1949,6 +1997,9 @@ Remote.prototype.createOrderBook = function(currency_gets, issuer_gets, currency
     currency_pays = options.currency_pays;
     issuer_gets = options.issuer_gets;
     currency_gets = options.currency_gets;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   }
 
   var gets = Remote.prepareTrade(currency_gets, issuer_gets);
@@ -2029,6 +2080,9 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
     callback = ledger;
     ledger = options.ledger;
     account = options.account;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   }
 
   if (!this.accounts.hasOwnProperty(account)) {
@@ -2135,6 +2189,9 @@ Remote.prototype.requestRippleBalance = function(account, issuer, currency, ledg
     currency = options.currency;
     issuer = options.issuer;
     account = options.account;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   }
 
   // YYY Could be cached per ledger.
@@ -2189,6 +2246,7 @@ Remote.prototype.requestRippleBalance = function(account, issuer, currency, ledg
   return request;
 };
 
+Remote.prepareCurrency =
 Remote.prepareCurrencies = function(currency) {
   var newCurrency = { };
 
@@ -2220,6 +2278,9 @@ Remote.prototype.requestRipplePathFind = function(src_account, dst_account, dst_
     dst_amount = options.dst_amount;
     dst_account = options.dst_account;
     src_account = options.src_account;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   }
 
   var request = new Request(this, 'ripple_path_find');
@@ -2254,6 +2315,9 @@ Remote.prototype.requestPathFindCreate = function(src_account, dst_account, dst_
     dst_amount = options.dst_amount;
     dst_account = options.dst_account;
     src_account = options.src_account;
+  } else {
+    console.error('DEPRECATED: First argument to request constructor should be'
+      + ' an object containing request properties');
   }
 
   var request = new Request(this, 'path_find');
