@@ -289,9 +289,7 @@ Request.prototype.setServer = function(server) {
       break;
   };
 
-  if (selected instanceof Server) {
-    this.server = selected;
-  }
+  this.server = selected;
 
   return this;
 };

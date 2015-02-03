@@ -671,7 +671,7 @@ Server.prototype._handleResponseSubscribe = function(message) {
     return;
   }
 
-  if (!this._remote._allow_partial_history
+  if (!this._remote.allow_partial_history
       && !Server.hasFullLedgerHistory(message)) {
     // Server has partial history and Remote has been configured to disallow
     // servers with incomplete history
