@@ -25,11 +25,13 @@
     "superagent": "^0.18.0"
   },
   "devDependencies": {
+    "assert-diff": "0.0.4",
     "coveralls": "~2.10.0",
     "gulp": "~3.6.2",
     "gulp-bump": "~0.1.10",
     "gulp-clean-dest": "^0.1.0",
     "gulp-concat": "~2.2.0",
+    "gulp-eslint": "^0.2.0",
     "gulp-filelog": "^0.4.1",
     "gulp-flowtype": "^0.4.1",
     "gulp-plumber": "^0.6.6",
@@ -38,7 +40,6 @@
     "gulp-uglify": "~0.3.0",
     "gulp-util": "^3.0.2",
     "gulp-watch": "^3.0.0",
-    "gulp-eslint": "^0.2.0",
     "istanbul": "~0.2.10",
     "map-stream": "~0.1.0",
     "mocha": "~1.14.0",
