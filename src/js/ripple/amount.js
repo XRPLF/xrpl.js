@@ -467,7 +467,7 @@ Amount.prototype.parse_human = function(j, opts) {
   var words = j.split(' ').filter(function(word) { return word !== ''; });
 
   function isNumber(s) {
-    return isFinite(s) && s !== '';
+    return isFinite(s) && s !== '' && s !== null;
   }
 
   if (words.length === 1) {
