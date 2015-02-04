@@ -298,7 +298,11 @@ var STAmount = exports.Amount = new SerializedType({
     var valueBytes = utils.arraySet(8, 0);
 
     if (amount.is_native()) {
-      var valueHex = value.absoluteValue().toString(16);
+      var valueHex = value.abs().toString(16);
+
+      if (value.abs().greaterThan(Amount.bi_xns_max)) {
+        throw new Error('Value out of bounds');
+      }
 
       // Enforce correct length (64 bits)
       if (valueHex.length > 16) {

@@ -858,7 +858,7 @@ describe('Remote', function() {
   it('Get reserve', function() {
     remote._connected = true;
     remote._servers[0]._connected = true;
-    assert.strictEqual(remote.reserve(1).to_json(), '0');
+    assert.strictEqual(remote.reserve(1).to_json(), 'NaN');
     remote._servers = [ ];
     assert.throws(function() {
       remote.reserve(10).to_json();
