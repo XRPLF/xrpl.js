@@ -120,6 +120,12 @@ describe('Amount', function() {
     });
   });
   describe('from_human', function() {
+    it('empty string', function() {
+      assert.strictEqual(Amount.from_human('').to_text_full(), 'NaN');
+    });
+    it('missing value', function() {
+      assert.strictEqual(Amount.from_human('USD').to_text_full(), 'NaN');
+    });
     it('1 XRP', function() {
       assert.strictEqual(Amount.from_human("1 XRP").to_text_full(), '1/XRP');
     });
