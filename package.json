@@ -27,11 +27,11 @@
   "devDependencies": {
     "assert-diff": "0.0.4",
     "coveralls": "~2.10.0",
+    "eslint": "^0.13.0",
     "gulp": "~3.6.2",
     "gulp-bump": "~0.1.10",
     "gulp-clean-dest": "^0.1.0",
     "gulp-concat": "~2.2.0",
-    "gulp-eslint": "^0.2.0",
     "gulp-filelog": "^0.4.1",
     "gulp-flowtype": "^0.4.1",
     "gulp-plumber": "^0.6.6",
@@ -52,7 +52,7 @@
     "pretest": "node_modules/.bin/gulp concat-sjcl",
     "test": "./node_modules/.bin/istanbul test -x build/sjcl.js -x src/js/jsbn/* ./node_modules/mocha/bin/_mocha -- --reporter tap test/*-test.js",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "lint": "./node_modules/.bin/gulp lint",
+    "lint": "eslint --reset -c eslint.json src/js/ripple/*.js",
     "perf": "./scripts/perf_test.sh"
   },
   "repository": {

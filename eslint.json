@@ -61,7 +61,6 @@
     "no-space-before-semi": 1,
     "no-spaced-func": 1,
     "space-after-keywords": [ 1, "always" ],
-    "space-in-brackets": [ 1, "always" ],
     "space-infix-ops": 1,
     "space-return-throw-case": 1,
     "spaced-line-comment": 1,

@@ -8,7 +8,6 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var webpack = require('webpack');
-var eslint = require('gulp-eslint');
 var map = require('map-stream');
 var bump = require('gulp-bump');
 var react = require('gulp-react');
@@ -159,12 +158,6 @@ gulp.task('bower-version', function() {
 });
 
 gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug', 'bower-version']);
-
-gulp.task('lint', function() {
-  return gulp.src('src/js/ripple/*.js')
-  .pipe(eslint({ reset: true, configFile: './eslint.json' }))
-  .pipe(eslint.format());
-});
 
 gulp.task('watch', function() {
   gulp.watch('src/js/ripple/*', [ 'build-debug' ]);
