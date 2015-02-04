@@ -466,25 +466,29 @@ Amount.prototype.parse_human = function(j, opts) {
 
   var words = j.split(' ').filter(function(word) { return word !== ''; });
 
+  function isNumber(s) {
+    return isFinite(s) && s !== '';
+  }
+
   if (words.length === 1) {
-    if (isFinite(words[0])) {
+    if (isNumber(words[0])) {
       value = words[0];
       currency = 'XRP';
     } else {
       value = words[0].slice(0, -3);
       currency = words[0].slice(-3);
-      if (!(isFinite(value) && currency.match(currency_RE))) {
+      if (!(isNumber(value) && currency.match(currency_RE))) {
         return Amount.NaN();
       }
     }
   } else if (words.length === 2) {
-    if (isFinite(words[0]) && words[1].match(hex_RE)) {
+    if (isNumber(words[0]) && words[1].match(hex_RE)) {
       value = words[0];
       currency = words[1];
-    } else if (words[0].match(currency_RE) && isFinite(words[1])) {
+    } else if (words[0].match(currency_RE) && isNumber(words[1])) {
       value = words[1];
       currency = words[0];
-    } else if (isFinite(words[0]) && words[1].match(currency_RE)) {
+    } else if (isNumber(words[0]) && words[1].match(currency_RE)) {
       value = words[0];
       currency = words[1];
     } else {
@@ -826,7 +830,7 @@ Amount.prototype.to_human = function(opts) {
   opts = opts || {};
 
   if (!this.is_valid()) {
-    return '';
+    return 'NaN';
   }
 
   // Default options
@@ -960,6 +964,9 @@ Amount.prototype.to_json = function() {
 };
 
 Amount.prototype.to_text_full = function(opts) {
+  if (!this.is_valid()) {
+    return 'NaN';
+  }
   return this._is_native
       ? this.to_human() + '/XRP'
       : this.to_text() + '/' + this._currency.to_json() + '/' + this._issuer.to_json(opts);
