@@ -439,7 +439,14 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
     return offer;
   }
 
-  offer.taker_gets_funded = fundedAmount;
+  var isOfferGetsExceeded = Amount.from_json(fundedAmount)
+  .compareTo(offer.TakerGets) > 0;
+
+  if (isOfferGetsExceeded) {
+    offer.taker_gets_funded = offer.TakerGets;
+  } else {
+    offer.taker_gets_funded = fundedAmount;
+  }
 
   var takerPaysValue = (typeof offer.TakerPays === 'object')
   ? offer.TakerPays.value
