@@ -378,8 +378,6 @@ describe('Server', function() {
             validated_ledgers: '32570-7053695'
           }
         }));
-
-        wss.close();
       });
     });
 
@@ -387,6 +385,7 @@ describe('Server', function() {
 
     server.once('connect', function() {
       server.once('disconnect', function() {
+        wss.close();
         done();
       });
       server.disconnect();
@@ -442,8 +441,6 @@ describe('Server', function() {
             validated_ledgers: '32570-7053695'
           }
         }));
-
-        wss.close();
       });
     });
 
@@ -451,6 +448,7 @@ describe('Server', function() {
 
     server.once('connect', function() {
       server.once('disconnect', function() {
+        wss.close();
         done();
       });
       server.disconnect();
@@ -509,15 +507,16 @@ describe('Server', function() {
             validated_ledgers: '3175520-3176615'
           }
         }));
-
-        wss.close();
       });
     });
 
-    var server = new Server(new Remote({ allow_partial_history: false }), 'ws://localhost:5748');
+    var server = new Server(new Remote({
+      allow_partial_history: false
+    }), 'ws://localhost:5748');
 
     server.reconnect = function() {
       setImmediate(function() {
+        wss.close();
         done();
       });
     };
@@ -554,8 +553,6 @@ describe('Server', function() {
             server_status: 'syncing'
           }
         }));
-
-        wss.close();
       });
     });
 
@@ -567,6 +564,7 @@ describe('Server', function() {
       assert.strictEqual(server._load_factor, 256);
       assert.strictEqual(server._fee_base, 10);
       assert.strictEqual(server._fee_ref, 10);
+      wss.close();
       done();
     });
 
@@ -1102,12 +1100,15 @@ describe('Server', function() {
           case 'subscribe':
             assert.strictEqual(m.command, 'subscribe');
             assert.deepEqual(m.streams, [ 'ledger', 'server' ]);
-            sendSubscribe(m);
+            setImmediate(function() {
+              sendSubscribe(m);
+            });
             break;
           case 'server_info':
             assert.strictEqual(m.command, 'server_info');
-            sendServerInfo(m);
-            wss.close();
+            setImmediate(function() {
+              sendServerInfo(m);
+            });
             break;
         }
       });
@@ -1116,16 +1117,13 @@ describe('Server', function() {
     var server = new Server(new Remote(), 'ws://localhost:5748');
 
     server.once('connect', function() {
-      var receivedSubscribe = false;
-
       server.once('response_server_info', function() {
-        receivedSubscribe = true;
-      });
-
-      server.once('disconnect', function() {
-        assert(receivedSubscribe);
         assert.strictEqual(server.getServerID(), 'ws://localhost:5748 (n94pSqypSfddzAVj9qoezHyUoetsrMnwgNuBqRJ3WHvM8aMMf7rW)');
-        done();
+        server.once('disconnect', function() {
+          wss.close();
+          done();
+        });
+        server.disconnect();
       });
     });
 
