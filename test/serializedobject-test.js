@@ -130,10 +130,10 @@ describe('Serialized object', function() {
       it('should serialize and parse - full memo, all strings text/plain ', function() {
         input_json.Memos = [
           {
-            "Memo": {
-              "MemoType": "test",
-              "MemoFormat": "text",
-              "MemoData": "some data"
+            Memo: {
+              MemoType: '74657374',
+              MemoFormat: '74657874',
+              MemoData: '736F6D652064617461'
             }
           }
         ];
@@ -152,10 +152,11 @@ describe('Serialized object', function() {
       it('should serialize and parse - full memo, all strings, invalid MemoFormat', function() {
         input_json.Memos = [
           {
-            "Memo": {
-              "MemoType": "test",
-              "MemoFormat": "application/json",
-              "MemoData": "some data"
+            "Memo":
+            {
+              MemoType: '74657374',
+              MemoFormat: '6170706C69636174696F6E2F6A736F6E',
+              MemoData: '736F6D652064617461'
             }
           }
         ];
@@ -171,36 +172,14 @@ describe('Serialized object', function() {
         assert.strictEqual(input_json.Memos[0].Memo.parsed_memo_data, void(0));
       });
 
-      it('should throw an error - full memo, json data, invalid MemoFormat', function() {
-        input_json.Memos = [
-          {
-            "Memo": {
-              "MemoType": "test",
-              "MemoFormat": "text",
-              "MemoData": {
-                "string" : "some_string",
-                "boolean" : true
-              }
-            }
-          }
-        ];
-
-        assert.throws(function() {
-          SerializedObject.from_json(input_json);
-        }, /^Error: MemoData can only be a JSON object with a valid json MemoFormat \(Memo\) \(Memos\)/);
-      });
-
       it('should serialize and parse - full memo, json data, valid MemoFormat, ignored field', function() {
         input_json.Memos = [
           {
-            "Memo": {
-              "MemoType": "test",
-              "MemoFormat": "json",
-              "ignored" : "ignored",
-              "MemoData": {
-                "string" : "some_string",
-                "boolean" : true
-              }
+            Memo: {
+              MemoType: '74657374',
+              MemoFormat: '6A736F6E',
+              ignored : 'ignored',
+              MemoData: '7B22737472696E67223A22736F6D655F737472696E67222C22626F6F6C65616E223A747275657D'
             }
           }
         ];
@@ -225,74 +204,20 @@ describe('Serialized object', function() {
         assert.deepEqual(so, input_json);
       });
 
-      it('should serialize and parse - full memo, json data, valid MemoFormat', function() {
-        input_json.Memos = [
-          {
-            "Memo": {
-              "MemoType": "test",
-              "MemoFormat": "json",
-              "MemoData": {
-                "string" : "some_string",
-                "boolean" : true
-              }
-            }
-          }
-        ];
-
-        var so = SerializedObject.from_json(input_json).to_json();
-        input_json.Memos[0].Memo.parsed_memo_type = 'test';
-        input_json.Memos[0].Memo.parsed_memo_format = 'json';
-        input_json.Memos[0].Memo.parsed_memo_data = {
-          "string" : "some_string",
-          "boolean" : true
-        };
-        input_json.Memos[0].Memo.MemoType = convertStringToHex('test');
-        input_json.Memos[0].Memo.MemoFormat = convertStringToHex('json');
-        input_json.Memos[0].Memo.MemoData = convertStringToHex(JSON.stringify(
-          {
-            "string" : "some_string",
-            "boolean" : true
-          }
-        ));
-
-        assert.deepEqual(so, input_json);
-      });
-
-      it('should serialize and parse - full memo, json data, valid MemoFormat, integer', function() {
-        input_json.Memos = [
-          {
-            "Memo": {
-              "MemoType": "test",
-              "MemoFormat": "json",
-              "MemoData": 3
-            }
-          }
-        ];
-
-        var so = SerializedObject.from_json(input_json).to_json();
-        input_json.Memos[0].Memo.parsed_memo_type = 'test';
-        input_json.Memos[0].Memo.parsed_memo_format = 'json';
-        input_json.Memos[0].Memo.parsed_memo_data = 3;
-        input_json.Memos[0].Memo.MemoType = convertStringToHex('test');
-        input_json.Memos[0].Memo.MemoFormat = convertStringToHex('json');
-        input_json.Memos[0].Memo.MemoData = convertStringToHex(JSON.parse(3));
-        assert.deepEqual(so, input_json);
-      });
-
       it('should throw an error - invalid Memo field', function() {
         input_json.Memos = [
           {
-            "Memo": {
-              "MemoType": "test",
-              "MemoParty": "json",
-              "MemoData": 3
+            Memo: {
+              MemoType: '74657374',
+              MemoField: '6A736F6E',
+              MemoData: '7B22737472696E67223A22736F6D655F737472696E67222C22626F6F6C65616E223A747275657D'
             }
           }
         ];
 
         assert.throws(function() {
           SerializedObject.from_json(input_json);
-        }, /^Error: JSON contains unknown field: "MemoParty" \(Memo\) \(Memos\)/);
+        }, /^Error: JSON contains unknown field: "MemoField" \(Memo\) \(Memos\)/);
       });
 
 
@@ -306,7 +231,7 @@ describe('Serialized object', function() {
           Memos: [
             {
               Memo: {
-                MemoType: 'image'
+                MemoType: '696D616765'
               }
             }
           ],

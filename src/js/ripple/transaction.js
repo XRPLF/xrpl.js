@@ -835,24 +835,40 @@ Transaction.prototype.addMemo = function(memoType, memoFormat, memoData) {
     throw new Error('MemoFormat must be valid ASCII');
   }
 
+  function convertStringToHex(string) {
+    var utf8String = sjcl.codec.utf8String.toBits(string);
+    return sjcl.codec.hex.fromBits(utf8String).toUpperCase();
+  }
+
   var memo = {};
 
   if (memoType) {
     if (Transaction.MEMO_TYPES[memoType]) {
       //XXX Maybe in the future we want a schema validator for
       //memo types
-      memo.MemoType = Transaction.MEMO_TYPES[memoType];
-    } else {
-      memo.MemoType = memoType;
+      memoType = Transaction.MEMO_TYPES[memoType];
     }
+    memo.MemoType = convertStringToHex(memoType);
   }
 
   if (memoFormat) {
-    memo.MemoFormat = memoFormat;
+    memo.MemoFormat = convertStringToHex(memoFormat);
   }
 
   if (memoData) {
-    memo.MemoData = memoData;
+    if (typeof memoData !== 'string') {
+      if (memoFormat === 'json') {
+        try {
+          memoData = JSON.stringify(memoData);
+        } catch (e) {
+          throw new Error('MemoFormat json with invalid JSON in MemoData field');
+        }
+      } else {
+        throw new Error('MemoData can only be a JSON object with a valid json MemoFormat');
+      }
+    }
+
+    memo.MemoData = convertStringToHex(memoData);
   }
 
   this.tx_json.Memos = (this.tx_json.Memos || []).concat({ Memo: memo });
