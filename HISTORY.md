@@ -1,3 +1,33 @@
+##0.12.0
+
+**Breaking Changes**
+
++ REMOVED Remote storage interface
++ REMOVED Remote `ping` configuration
++ REMOVED Old/deprecated Remote server configuration (websocket_ip, websocket_port)
++ REMOVED browser `online` reconnect listener
+    - [2833a7b6](https://github.com/ripple/ripple-lib/commit/2833a7b66e696dab427464625077f9b93092d0d5)
+
++ Remove `jsbn` and use `bignumber.js` instead for big number math
++ The `allow_nan` flag has been removed. Results for invalid amounts will always be `NaN`
+    - [d025b4a0](https://github.com/ripple/ripple-lib/commit/d025b4a0c3a98a6de27a1bee9573c85347bcd66b)
+    - [c8f18c8c](https://github.com/ripple/ripple-lib/commit/c8f18c8c8590b7b48e370e0325b6677b7720294f)
+    - [b86790c8](https://github.com/ripple/ripple-lib/commit/b86790c8543c239a532fd7697d4652829019d385)
+    - [d0fb291c](https://github.com/ripple/ripple-lib/commit/d0fb291c4e330193a244902156f1d74730da357d)
+ 
+ 
+**Changes**
+
++ [Add deprecation warnings to request constructors. The first argument to request constructor functions should be an object containing request properties](https://github.com/ripple/ripple-lib/commit/35d76b3520934285f80059c1badd6c522539104c)
+
++ [Fix taker_gets_funded exceeding offer.TakerGets](https://github.com/ripple/ripple-lib/commit/b19ecb4482b589d575382b7a5d0480b963383bb1)
+
++ [Update transaction binary parsing to account for XRP delivered amounts](https://github.com/ripple/ripple-lib/commit/35a346a674e6ee1e1e495db93700d55984efc7dd)
+
++ [Bumped dependencies](https://github.com/ripple/ripple-lib/commit/f9bc7cc746b44b24b61bbe260ae2e9d9617286da)
+
+ 
+
 ##0.11.0
 
 + [Track the funded status of an order based on cumulative account orders](https://github.com/ripple/ripple-lib/commit/67d39737a4d5e0fcd9d9b47b9083ee00e5a9e652) and [67d3973](https://github.com/ripple/ripple-lib/commit/b6b99dde022e1e14c4797e454b1d7fca50e49482)
