@@ -644,6 +644,83 @@ describe('Transaction', function() {
     assert.deepEqual(transaction.hash(), expected_hash);
   });
 
+  it('Get hash - complex transaction including Memo', function() {
+    var input_json = {
+      Account: 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT',
+      Amount: '1',
+      Destination: 'r9kiSEUEw6iSCNksDVKf9k3AyxjW3r1qPf',
+      Fee: '10',
+      Flags: 2147483648,
+      Memos: [
+        {
+          Memo: {
+            MemoData: '61BAF845AF6D4FB1AC08A58D817261457034F1431FB9997B3460EB355DCA98D9382181A0E0125B4B0D6DAAF9A460D09C9EFDEFB2BE49E545036028A04DDFCFE8CBDD03DA844EEF9235B708574319A0F1186ADA054D2A4E970E73C67BE3232662726CD59C53CA2EF1DC0939C4793B1794932832D08B9B830AA917BB7CADA5B76C93DC5E0C928B93D8C336D6722E4757332A61DEB7E2A601E8D3766D5285A26A8DFAFFFDDED8BD49D471B9D885F3DF0CC031D522197BC248A5E2BEFAB12BC4A8D77BAB1555C8B38C26254C7BE8563D97EDD806EB7BE3872C750F28B41F693CB179849E6E2105B627F63D390FDDEFE863D3E7C28D6465AA158E7D96920E0EEF0BCB7993EC652C97F876F1666DBA9DA0A612FF9FE0A00AF03B2D5DADFC71984CBC93CA5EAE4C50BDDC839C1C6C3EEAAB44E8493BB7940C0C9ACA0BFEC2999DF5109A3EC40E62280E252712CC91476FB45E40EE314A26F3259027349E47FDD1C21A8DBDF58635943A13B7E2690B4CD153E2FA147A035E979BBDD814635BAB79683D7F62A7D7FF433F9DD35D0967F591D6D3776FC8ADF53E04EAB1DBC5863CBB85FC6F8E5C8B75037DEA9FEEB6A4D5FDF0AEE3F1BDD42EB1B976E98784A15C851E4F3B6234BAFFD11204CB2B76A3CBAA02E3B21051FAF012504DF33CAF9567A333DCE2BB5F454D4BA4B319DF43ECBC86DE214A712A4E214E874092DC84E05B',
+            MemoType: 'D723898B3DB828F061BCE8DA8F3068B31E527CBDB4D0D22F3D4F5F2C6A961A84EF1189E9CBE2741FEC5C7A46011316D6F9A7769C8E8157E5209FED2D3F950E2763BEF07254327B0EDE9C3CFEB248997EDF148BA36E9D1167C87D73FE9F047FF167DF37B0EF30ABF8E5FD0DCC7E7B964EA0E60E8B2C27E2C7C214BD8334CE830B66BBD724172F7ADCEF491B9B495A979819944DF8EB3A13E4F03B2A8D6FFF332E5C9980A540BEDF659DFDDA03EC78F4F0279F90C8BFD494C15708197C2BAE5CA661EC75FB6E6097E7C5435F374332B7A066FBBC14C629E8EE6042A64226B075B9309BF5FE227CEEEB9CEC7A6B79E724BFBA2BA706F28EC9F3702FB3AFB4C74F0411C7EFDE7927D1ED0670C4F426B8C40F09EB715713788902A4374D8CC7E5111BCA39A97D1F9BD3BD56E28E6167E4DC97A7DEF5428B809D03AE72CB5BA1D25DE3523BC182E3B8905666A972A949B20C30C4FBD1D0A2D9AD8E46EFDBE4E46F4E340FE39F4AD315F5D9EBF7ED9BDC6D577375B56E0CD9FAF0BFA02453F90290E0962D6362048F737BEE3E0E1C46ECE61CCAF4C317B4135B2C5B5D5C4EE728002B2116BB1AF21903AB3F2E4E1A4FE4C5D76507C71C50670281DAB334C37503FB851FC25EC85C757976450004EC642E217D7F4B2E4B6DD820B5E3968B79CB9D7706F28714003C63F4B89AD1B6208A56DF5AFF02E5327A8EAA532BD3ED1ED0'
+          }
+        }
+      ],
+      Sequence: 74519,
+      SigningPubKey: '02BA5A9F27C34830542D7AA460B82D68AB34B410470108EE2DFFD9D280B49DB161',
+      TransactionType: 'Payment',
+      TxnSignature: '3045022100EA99CD20B47AB1C7AEF348102B515DB2FA26F1C9E7DC8FCAE72A763CEC37F21102206190F16F509A088E6303ACB66E9A6C1B9886C20B23F55C3B0721F2B97DC0926E',
+      date: 455562850,
+      hash: '4907745B5254B1093E037BA3250B95CFAF35C11CC2CA5E538A68FCE39D16F402',
+      inLedger: 7085699,
+      ledger_index: 7085699,
+      meta: {
+        AffectedNodes: [
+          {
+            ModifiedNode: {
+              FinalFields: {
+                Account: 'r9kiSEUEw6iSCNksDVKf9k3AyxjW3r1qPf',
+                Balance: '40900380802',
+                Flags: 0,
+                OwnerCount: 6,
+                Sequence: 98
+              },
+              LedgerEntryType: 'AccountRoot',
+              LedgerIndex: '0EB37649FDF753A78DACB689057E827296F47AB7D04A7CB273C971A207E17960',
+              PreviousFields: {
+                Balance: '40900380801'
+              },
+              PreviousTxnID: '42C003842B5188E860B087DD509880C82263B31DE3DD6B5E4AC89AF541CF486E',
+              PreviousTxnLgrSeq: 5088491
+            }
+          },
+          {
+            ModifiedNode: {
+              FinalFields: {
+                Account: 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT',
+                Balance: '35339588',
+                Domain: '9888A596C489373CF5C40858A66C8922C54A2BE9521E39CFFD0EF7A9906DAF298CDA4ADA16111A020C8B940CBABC4D39406381E0DE791147FAD0A5729F3546BF47D515FCDC80A85A52701CF9120C64DD6D41D0CF3DF2B56AEF6DBB463BB69F153BEEAC31D5300B8A3AE558122E192D7211DC0E4F547AD96B2E2F30F46AF8B5D76A58A75D764BA6FDC8E748EEC7A29C2F2A71784B8141D1A9E66544FF7C07025827C3BBCD66FA121D5E50407A622C803B33FCFBA4B2A7454BF86C32628DE0259EC0014783871BD3ADAF2E9F4E0FA421A68AFE1EF3ADEDD9CB24E783D284666BA8ABC2428F77D5550BE76751AA500A90E648CF7524CFC8E8785CB1ACBFB5F0AA50',
+                EmailHash: 'A9527827303A62DA5DB83FE47ACC1B62',
+                Flags: 1048576,
+                OwnerCount: 0,
+                RegularKey: 'rDLNuE5hfxbRzuXaNn7iUQBftoKfYQQtFA',
+                Sequence: 74520,
+                WalletLocator: 'D091F672A5A6FCE5AD3CD35BDD7E6FA15D4205D22E5EB36CBFB961D6E355EF9A'
+              },
+              LedgerEntryType: 'AccountRoot',
+              LedgerIndex: 'A85F8FD83E579C50AF595482824E2AC8C747E4673E83537E8CACCE595AA0C590',
+              PreviousFields: {
+                Balance: '35339599',
+                Sequence: 74519
+              },
+              PreviousTxnID: '3CB97C94E76F3A26C083DCA702E91446EB51D4DE62B25D8B7BA10F24FDA2F4E2',
+              PreviousTxnLgrSeq: 7085699
+            }
+          }
+        ],
+        TransactionIndex: 13,
+        TransactionResult: 'tesSUCCESS',
+        delivered_amount: '1'
+      },
+      validated: true
+    };
+
+    assert.deepEqual(Transaction.from_json(input_json).hash(), input_json.hash);
+  });
+
   it('Serialize transaction', function() {
     var input_json = {
       Account : 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
@@ -1051,7 +1128,7 @@ describe('Transaction', function() {
     transaction.tx_json.TransactionType = 'Payment';
 
     var memoType = 'message';
-    var memoFormat = 'application/json';
+    var memoFormat = 'json';
     var memoData = {
       string: 'value',
       bool: true,
@@ -1064,9 +1141,9 @@ describe('Transaction', function() {
       {
         Memo:
         {
-          MemoType: memoType,
-          MemoFormat: memoFormat,
-          MemoData: memoData
+          MemoType: '6D657373616765',
+          MemoFormat: '6A736F6E',
+          MemoData: '7B22737472696E67223A2276616C7565222C22626F6F6C223A747275652C22696E7465676572223A317D'
         }
       }
     ];
@@ -1087,9 +1164,10 @@ describe('Transaction', function() {
 
     var expected = [
       {
-        Memo: {
-          MemoType: memo.memoType,
-          MemoData: memo.memoData
+        Memo:
+        {
+          MemoType: '74797065',
+          MemoData: '64617461'
         }
       }
     ];
@@ -1108,26 +1186,36 @@ describe('Transaction', function() {
     transaction.addMemo('testkey4', 'text/html', '<html>');
 
     var expected = [
-      { Memo: {
-        MemoType: 'testkey',
-        MemoData: 'testvalue'
-      }},
-      { Memo: {
-        MemoType: 'testkey2',
-        MemoData: 'testvalue2'
-      }},
-      { Memo: {
-        MemoType: 'testkey3',
-        MemoFormat: 'text/html'
-      }},
-      { Memo: {
-        MemoData: 'testvalue4'
-      }},
-      { Memo: {
-        MemoType: 'testkey4',
-        MemoFormat: 'text/html',
-        MemoData: '<html>'
-      }}
+      {
+        Memo: {
+          MemoType: '746573746B6579',
+          MemoData: '7465737476616C7565'
+        }
+      },
+      {
+        Memo: {
+          MemoType: '746573746B657932',
+          MemoData: '7465737476616C756532'
+        }
+      },
+      {
+        Memo: {
+          MemoType: '746573746B657933',
+          MemoFormat: '746578742F68746D6C'
+        }
+      },
+      {
+        Memo: {
+          MemoData: '7465737476616C756534'
+        }
+      },
+      {
+        Memo: {
+          MemoType: '746573746B657934',
+          MemoFormat: '746578742F68746D6C',
+          MemoData: '3C68746D6C3E'
+        }
+      }
     ];
 
     assert.deepEqual(transaction.tx_json.Memos, expected);
@@ -1178,7 +1266,7 @@ describe('Transaction', function() {
     assert.deepEqual(transaction.tx_json.Memos, [
       {
         Memo: {
-          MemoData: 'some_string'
+          MemoData: '736F6D655F737472696E67'
         }
       }
     ]);
@@ -1189,6 +1277,7 @@ describe('Transaction', function() {
     transaction.tx_json.TransactionType = 'Payment';
 
     var memo = {
+      memoFormat: 'json',
       memoData: {
         string: 'string',
         int: 1,
@@ -1208,7 +1297,8 @@ describe('Transaction', function() {
     assert.deepEqual(transaction.tx_json.Memos, [
       {
         Memo: {
-          MemoData: memo.memoData
+          MemoFormat: '6A736F6E',
+          MemoData: '7B22737472696E67223A22737472696E67222C22696E74223A312C226172726179223A5B7B22737472696E67223A22737472696E67227D5D2C226F626A656374223A7B22737472696E67223A22737472696E67227D7D'
         }
       }
     ]);
