@@ -57,13 +57,9 @@ function convertByteArrayToHex (byte_array) {
   return sjcl.codec.hex.fromBits(sjcl.codec.bytes.toBits(byte_array)).toUpperCase();
 }
 
-function convertStringToHex(string) {
-  var utf8String = sjcl.codec.utf8String.toBits(string);
-  return sjcl.codec.hex.fromBits(utf8String).toUpperCase();
-}
-
 function convertHexToString(hexString) {
-  return sjcl.codec.utf8String.fromBits(sjcl.codec.hex.toBits(hexString));
+  var bits = sjcl.codec.hex.toBits(hexString);
+  return sjcl.codec.utf8String.fromBits(bits);
 }
 
 SerializedType.serialize_varint = function (so, val) {
@@ -619,38 +615,9 @@ exports.STMemo = new SerializedType({
     // Sort fields
     keys = sort_fields(keys);
 
-    // store that we're dealing with json
-    var isJson = val.MemoFormat === 'json';
-
     for (var i=0; i<keys.length; i++) {
       var key = keys[i];
       var value = val[key];
-      switch (key) {
-
-        // MemoType and MemoFormat are always ASCII strings
-        case 'MemoType':
-        case 'MemoFormat':
-          value = convertStringToHex(value);
-          break;
-
-        // MemoData can be a JSON object, otherwise it's a string
-        case 'MemoData':
-          if (typeof value !== 'string') {
-            if (isJson) {
-              try {
-                value = convertStringToHex(JSON.stringify(value));
-              } catch (e) {
-                throw new Error('MemoFormat json with invalid JSON in MemoData field');
-              }
-            } else {
-              throw new Error('MemoData can only be a JSON object with a valid json MemoFormat');
-            }
-          } else if (isString(value)) {
-            value = convertStringToHex(value);
-          }
-          break;
-      }
-
       serialize(so, key, value);
     }
 
@@ -668,28 +635,41 @@ exports.STMemo = new SerializedType({
     }
 
     if (output.MemoType !== void(0)) {
-      var parsedType = convertHexToString(output.MemoType);
+      try {
+        var parsedType = convertHexToString(output.MemoType);
 
-      if (parsedType !== 'unformatted_memo') {
-        output.parsed_memo_type = convertHexToString(output.MemoType);
+        if (parsedType !== 'unformatted_memo') {
+          output.parsed_memo_type = parsedType;
+        }
+      } catch (e) {
+        // we don't know what's in the binary, apparently it's not a UTF-8 string
+        // this is fine, we won't add the parsed_memo_type field
       }
     }
 
     if (output.MemoFormat !== void(0)) {
-      output.parsed_memo_format = convertHexToString(output.MemoFormat);
+      try {
+        output.parsed_memo_format = convertHexToString(output.MemoFormat);
+      } catch (e) {
+        // we don't know what's in the binary, apparently it's not a UTF-8 string
+        // this is fine, we won't add the parsed_memo_format field
+      }
     }
 
     if (output.MemoData !== void(0)) {
 
-      // see if we can parse JSON
-      if (output.parsed_memo_format === 'json') {
-        try {
+      try {
+        if (output.parsed_memo_format === 'json') {
+          // see if we can parse JSON
           output.parsed_memo_data = JSON.parse(convertHexToString(output.MemoData));
-        } catch(e) {
-          // fail, which is fine, we just won't add the memo_data field
+
+        } else if(output.parsed_memo_format === 'text') {
+          // otherwise see if we can parse text
+          output.parsed_memo_data = convertHexToString(output.MemoData);
         }
-      } else if(output.parsed_memo_format === 'text') {
-        output.parsed_memo_data = convertHexToString(output.MemoData);
+      } catch(e) {
+        // we'll fail in case the content does not match what the MemoFormat described
+        // this is fine, we won't add the parsed_memo_data, the user has to parse themselves
       }
     }
 
