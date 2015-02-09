@@ -362,22 +362,26 @@ describe('Amount', function() {
       assert.strictEqual('0/XRP', Amount.from_json('0').to_text_full());
     });
     it('Parse native 0.0', function () {
-      assert.strictEqual('0/XRP', Amount.from_json('0.0').to_text_full());
+      assert.throws(function() {
+        Amount.from_json('0.0');
+      });
     });
     it('Parse native -0', function () {
       assert.strictEqual('0/XRP', Amount.from_json('-0').to_text_full());
     });
     it('Parse native -0.0', function () {
-      assert.strictEqual('0/XRP', Amount.from_json('-0.0').to_text_full());
+      assert.throws(function() {
+        Amount.from_json('-0.0');
+      });
     });
     it('Parse native 1000', function () {
       assert.strictEqual('0.001/XRP', Amount.from_json('1000').to_text_full());
     });
-    it('Parse native 12.3', function () {
-      assert.strictEqual('12.3/XRP', Amount.from_json('12.3').to_text_full());
+    it('Parse native 12300000', function () {
+      assert.strictEqual('12.3/XRP', Amount.from_json('12300000').to_text_full());
     });
-    it('Parse native -12.3', function () {
-      assert.strictEqual('-12.3/XRP', Amount.from_json('-12.3').to_text_full());
+    it('Parse native -12300000', function () {
+      assert.strictEqual('-12.3/XRP', Amount.from_json('-12300000').to_text_full());
     });
     it('Parse 123./USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function () {
       assert.strictEqual('123/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('123./USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full());
@@ -406,23 +410,17 @@ describe('Amount', function() {
     it('Parse native 0 human', function () {
       assert.strictEqual('0/XRP', Amount.from_json('0').to_human_full());
     });
-    it('Parse native 0.0 human', function () {
-      assert.strictEqual('0/XRP', Amount.from_json('0.0').to_human_full());
-    });
     it('Parse native -0 human', function () {
       assert.strictEqual('0/XRP', Amount.from_json('-0').to_human_full());
-    });
-    it('Parse native -0.0 human', function () {
-      assert.strictEqual('0/XRP', Amount.from_json('-0.0').to_human_full());
     });
     it('Parse native 1000 human', function () {
       assert.strictEqual('0.001/XRP', Amount.from_json('1000').to_human_full());
     });
-    it('Parse native 12.3 human', function () {
-      assert.strictEqual('12.3/XRP', Amount.from_json('12.3').to_human_full());
+    it('Parse native 12300000 human', function () {
+      assert.strictEqual('12.3/XRP', Amount.from_json('12300000').to_human_full());
     });
-    it('Parse native -12.3 human', function () {
-      assert.strictEqual('-12.3/XRP', Amount.from_json('-12.3').to_human_full());
+    it('Parse native -12300000 human', function () {
+      assert.strictEqual('-12.3/XRP', Amount.from_json('-12300000').to_human_full());
     });
     it('Parse 123./USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh human', function () {
       assert.strictEqual('123/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('123./USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_human_full());
@@ -790,7 +788,7 @@ describe('Amount', function() {
     });
     it('0 XRP == 0 XRP', function () {
       var a = Amount.from_json('0');
-      var b = Amount.from_json('0.0');
+      var b = Amount.from_json('0');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });
@@ -819,8 +817,8 @@ describe('Amount', function() {
       assert(!a.not_equals_why(b));
     });
     it('1.1 XRP == 1.1 XRP', function () {
-      var a = Amount.from_json('1.1');
-      var b = Amount.from_json('11.0').ratio_human(10);
+      var a = Amount.from_json('1100000');
+      var b = Amount.from_json('11000000').ratio_human('10/XRP');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });

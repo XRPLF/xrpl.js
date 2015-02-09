@@ -630,7 +630,7 @@ describe('OrderBook', function() {
       }
     };
 
-    book.setOwnerFunds(addresses.ACCOUNT, '100.1');
+    book.setOwnerFunds(addresses.ACCOUNT, '100100000');
     book.setOfferFundedAmount(offer);
 
     var expected = {
@@ -640,7 +640,7 @@ describe('OrderBook', function() {
       is_fully_funded: true,
       taker_gets_funded: '100',
       taker_pays_funded: '123.456',
-      owner_funds: '100.1'
+      owner_funds: '100100000'
     };
 
     assert.deepEqual(offer, expected);
