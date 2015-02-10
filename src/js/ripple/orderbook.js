@@ -439,19 +439,22 @@ OrderBook.prototype.setFundedAmount = function(offer, fundedAmount) {
     return offer;
   }
 
-  var isOfferGetsExceeded = Amount.from_json(fundedAmount)
+  var isOfferGetsExceeded = Amount.from_json(
+    this._currencyGets.is_native()
+    ? fundedAmount
+    : fundedAmount + OrderBook.IOU_SUFFIX
+  )
   .compareTo(offer.TakerGets) > 0;
 
   if (isOfferGetsExceeded) {
-    offer.taker_gets_funded = offer.TakerGets;
+    offer.taker_gets_funded = Amount.from_json(offer.TakerGets).to_text();
   } else {
     offer.taker_gets_funded = fundedAmount;
   }
 
-  var takerPaysValue = (typeof offer.TakerPays === 'object')
-  ? offer.TakerPays.value
-  : offer.TakerPays;
-
+  var takerPaysValue = this._currencyPays.is_native()
+  ? offer.TakerPays
+  : offer.TakerPays.value;
   var takerPays = Amount.from_json(takerPaysValue +  OrderBook.IOU_SUFFIX);
   var takerGets = Amount.from_json(offerSum);
   var fundedPays = Amount.from_json(fundedAmount + OrderBook.IOU_SUFFIX);

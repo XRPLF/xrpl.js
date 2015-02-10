@@ -1594,6 +1594,7 @@ describe('OrderBook', function() {
           taker_gets_funded: '0.2',
           taker_pays_funded: '99.72233516476456'
         },
+
         { Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
           BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
           BookNode: '0000000000000000',
@@ -1614,8 +1615,9 @@ describe('OrderBook', function() {
           index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
           owner_funds: '0.950363009783092',
           is_fully_funded: false,
-          taker_gets_funded: '0.9484660776278363',
+          taker_gets_funded: '0.5',
           taker_pays_funded: '94.58325208561269' },
+
           { Account: 'rwBG69mujDoD5yQfL3Sf7Yuh7rUNYdxe9Y',
             BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
             BookNode: '0000000000000000',
@@ -1637,7 +1639,7 @@ describe('OrderBook', function() {
             index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
             owner_funds: '0.950363009783092',
             is_fully_funded: false,
-            taker_gets_funded: '0.9484660776278363',
+            taker_gets_funded: '0.5',
             taker_pays_funded: '94.58325208561269'
           }
     ]
