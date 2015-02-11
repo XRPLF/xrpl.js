@@ -6,14 +6,14 @@
 + REMOVED Remote `ping` configuration
 + REMOVED Old/deprecated Remote server configuration (websocket_ip, websocket_port)
 + REMOVED browser `online` reconnect listener
-    - [2833a7b6](https://github.com/ripple/ripple-lib/commit/2833a7b66e696dab427464625077f9b93092d0d5)
+    - [Cleanup, deprecations - 2833a7b6](https://github.com/ripple/ripple-lib/commit/2833a7b66e696dab427464625077f9b93092d0d5)
 
 + Remove `jsbn` and use `bignumber.js` instead for big number math
 + The `allow_nan` flag has been removed. Results for invalid amounts will always be `NaN`
-    - [d025b4a0](https://github.com/ripple/ripple-lib/commit/d025b4a0c3a98a6de27a1bee9573c85347bcd66b)
-    - [c8f18c8c](https://github.com/ripple/ripple-lib/commit/c8f18c8c8590b7b48e370e0325b6677b7720294f)
-    - [b86790c8](https://github.com/ripple/ripple-lib/commit/b86790c8543c239a532fd7697d4652829019d385)
-    - [d0fb291c](https://github.com/ripple/ripple-lib/commit/d0fb291c4e330193a244902156f1d74730da357d)
+    - [Refactor to use bignumber.js - d025b4a0](https://github.com/ripple/ripple-lib/commit/d025b4a0c3a98a6de27a1bee9573c85347bcd66b)
+    - [Handle invalid input in parse_human - c8f18c8c](https://github.com/ripple/ripple-lib/commit/c8f18c8c8590b7b48e370e0325b6677b7720294f)
+    - [Check for null in isNumber - b86790c8](https://github.com/ripple/ripple-lib/commit/b86790c8543c239a532fd7697d4652829019d385)
+    - [Cleanup amount.js - d0fb291c](https://github.com/ripple/ripple-lib/commit/d0fb291c4e330193a244902156f1d74730da357d)
  
  
 **Changes**
