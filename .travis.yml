@@ -5,6 +5,7 @@ script: MOCHA_REPORTER=tap npm test --coverage
 after_success:
 - npm run coveralls
 notifications:
+  email: false
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/d1ec4245f90231619d30
