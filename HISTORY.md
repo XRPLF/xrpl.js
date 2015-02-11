@@ -24,6 +24,8 @@
 
 + [Fix unsymmetric memo serializing](https://github.com/ripple/ripple-lib/commit/1ed36fabdbd54f4d31078c2b0eaa3becc0fe2821)
 
++ [Fix IOU value passed to `Amount.from_json()`](https://github.com/ripple/ripple-lib/commit/fd1b64393dffb3d1819cd40b8d43df43a4db042d)
+
 + [Update transaction binary parsing to account for XRP delivered amounts](https://github.com/ripple/ripple-lib/commit/35a346a674e6ee1e1e495db93700d55984efc7dd)
 
 + [Bumped dependencies](https://github.com/ripple/ripple-lib/commit/f9bc7cc746b44b24b61bbe260ae2e9d9617286da)
