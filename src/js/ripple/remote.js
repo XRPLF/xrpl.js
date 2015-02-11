@@ -862,7 +862,7 @@ Remote.prototype.requestLedger = function(options, callback) {
           case 'expand':
           case 'transactions':
           case 'accounts':
-            request.message[o] = true;
+            request.message[o] = options[o] ? true : false;
             break;
           case 'ledger':
             request.selectLedger(options.ledger);
