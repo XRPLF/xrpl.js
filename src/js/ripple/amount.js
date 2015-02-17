@@ -10,14 +10,6 @@ var Currency  = require('./currency').Currency;
 var BigNumber = require('./bignumber');
 
 
-function isInteger(number) {
-  return parseInt(number) === number;
-}
-
-function ensureDecimalPoint(value) {
-  return isInteger(value) ? String(value) + '.0' : value;
-}
-
 function inverse(number) {
   return (new BigNumber(number)).toPower(-1);
 }
@@ -192,7 +184,7 @@ Amount.prototype.ratio_human = function(denominator, opts) {
   opts = extend({ }, opts);
 
   var numerator = this;
-  denominator = Amount.from_json(ensureDecimalPoint(denominator));
+  denominator = Amount.from_json(denominator);
 
   // If either operand is NaN, the result is NaN.
   if (!numerator.is_valid() || !denominator.is_valid()) {
@@ -252,7 +244,7 @@ Amount.prototype.ratio_human = function(denominator, opts) {
 Amount.prototype.product_human = function(factor, opts) {
   opts = opts || {};
 
-  factor = Amount.from_json(ensureDecimalPoint(factor));
+  factor = Amount.from_json(factor);
 
   // If either operand is NaN, the result is NaN.
   if (!this.is_valid() || !factor.is_valid()) {
@@ -687,14 +679,13 @@ Amount.prototype.parse_json = function(j) {
 // - float = with precision 6
 // XXX Improvements: disallow leading zeros.
 Amount.prototype.parse_native = function(j) {
-  if (typeof j === 'string' && j.match(/^-?\d*(\.\d{0,6})?$/)) {
+  if (typeof j === 'string' && !isNaN(parseInt(j))) {
+    if (j.indexOf('.') >= 0) {
+      throw new Error('Native amounts must be specified in integer drops')
+    }
     var value = new BigNumber(j);
     this._is_native = true;
-    if (j.indexOf('.') >= 0) {
-      this._set_value(value);
-    } else {
-      this._set_value(value.dividedBy(Amount.bi_xns_unit));
-    }
+    this._set_value(value.dividedBy(Amount.bi_xns_unit));
   } else {
     this._set_value(new BigNumber(NaN));
   }
