@@ -33,5 +33,4 @@ describe('Meta', function() {
       assert.strictEqual(meta.nodes[idx], curr);
     }, []);
   });
-
 });

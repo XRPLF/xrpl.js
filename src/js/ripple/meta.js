@@ -131,7 +131,6 @@ Meta.prototype.getNodes = function(options) {
   }
 };
 
-
 Meta.prototype.getAffectedAccounts = function(from) {
   if (this._affectedAccounts) {
     return this._affectedAccounts;
@@ -164,7 +163,7 @@ Meta.prototype.getAffectedAccounts = function(from) {
 
   this._affectedAccounts = utils.arrayUnique(accounts);
 
-  return  this._affectedAccounts;
+  return this._affectedAccounts;
 };
 
 Meta.prototype.getAffectedBooks = function() {
