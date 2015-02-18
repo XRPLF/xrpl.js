@@ -20,74 +20,82 @@ module.exports.OTHER_LEDGER_INDEX = 'D3338DA77BA23122FB5647B74B53636AB54BE246D4B
 
 module.exports.TRANSFER_RATE = 1002000000;
 
-module.exports.FIAT_OFFERS = [
-  {
-    Account: addresses.ACCOUNT,
-    BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F15E821839FB',
-    BookNode: '0000000000000000',
-    Flags: 0,
-    LedgerEntryType: 'Offer',
-    OwnerNode: '0000000000001897',
-    PreviousTxnID: '11BA57676711A42C2FC2191EAEE98023B04627DFA84926B0C8E9D61A9CAF13AD',
-    PreviousTxnLgrSeq: 8265601,
-    Sequence: 531927,
-    TakerGets: {
-      currency: 'USD',
-      issuer: addresses.ISSUER,
-      value: module.exports.TAKER_GETS
+module.exports.fiatOffers = function (options) {
+  options = options || {};
+  _.defaults(options, {
+    account_funds: '318.3643710638508',
+    other_account_funds: '235.0194163432668'
+  });
+
+  return [
+    {
+      Account: addresses.ACCOUNT,
+      BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F15E821839FB',
+      BookNode: '0000000000000000',
+      Flags: 0,
+      LedgerEntryType: 'Offer',
+      OwnerNode: '0000000000001897',
+      PreviousTxnID: '11BA57676711A42C2FC2191EAEE98023B04627DFA84926B0C8E9D61A9CAF13AD',
+      PreviousTxnLgrSeq: 8265601,
+      Sequence: 531927,
+      TakerGets: {
+        currency: 'USD',
+        issuer: addresses.ISSUER,
+        value: module.exports.TAKER_GETS
+      },
+      taker_gets_funded: '100',
+      is_fully_funded: true,
+      TakerPays: module.exports.TAKER_PAYS,
+      index: module.exports.LEDGER_INDEX,
+      owner_funds: options.account_funds,
+      quality: '195423807.2109563'
     },
-    taker_gets_funded: '100',
-    is_fully_funded: true,
-    TakerPays: module.exports.TAKER_PAYS,
-    index: module.exports.LEDGER_INDEX,
-    owner_funds: '318.3643710638508',
-    quality: '195423807.2109563'
-  },
-  {
-    Account: addresses.ACCOUNT,
-    BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F4C3362FE1D0',
-    BookNode: '0000000000000000',
-    Flags: 0,
-    LedgerEntryType: 'Offer',
-    OwnerNode: '00000000000063CC',
-    PreviousTxnID: 'CD77500EF28984BFC123E8A257C10E44FF486EA8FC43E1356C42BD6DB853A602',
-    PreviousTxnLgrSeq: 8265523,
-    Sequence: 1139002,
-    TakerGets: {
-      currency: 'USD',
-      issuer: addresses.ISSUER,
-      value: '4.9656112525'
+    {
+      Account: addresses.ACCOUNT,
+      BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F4C3362FE1D0',
+      BookNode: '0000000000000000',
+      Flags: 0,
+      LedgerEntryType: 'Offer',
+      OwnerNode: '00000000000063CC',
+      PreviousTxnID: 'CD77500EF28984BFC123E8A257C10E44FF486EA8FC43E1356C42BD6DB853A602',
+      PreviousTxnLgrSeq: 8265523,
+      Sequence: 1139002,
+      TakerGets: {
+        currency: 'USD',
+        issuer: addresses.ISSUER,
+        value: '4.9656112525'
+      },
+      taker_gets_funded: '100',
+      is_fully_funded: true,
+      TakerPays: '972251352',
+      index: 'X2K98DB77BA23122FB5647B74B53636AB54BE246D4B21707C9D6887DEB334252',
+      owner_funds: options.account_funds,
+      quality: '195796912.5171664'
     },
-    taker_gets_funded: '100',
-    is_fully_funded: true,
-    TakerPays: '972251352',
-    index: 'X2K98DB77BA23122FB5647B74B53636AB54BE246D4B21707C9D6887DEB334252',
-    owner_funds: '318.3643710638508',
-    quality: '195796912.5171664'
-  },
-  {
-    Account: addresses.OTHER_ACCOUNT,
-    BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F4C3362FE1D0',
-    BookNode: '0000000000000000',
-    Flags: 0,
-    LedgerEntryType: 'Offer',
-    OwnerNode: '00000000000063CC',
-    PreviousTxnID: 'CD77500EF28984BFC123E8A257C10E44FF486EA8FC43E1356C42BD6DB853A602',
-    PreviousTxnLgrSeq: 8265523,
-    Sequence: 1139002,
-    TakerGets: {
-      currency: 'USD',
-      issuer: addresses.ISSUER,
-      value: module.exports.OTHER_TAKER_GETS
+    {
+      Account: addresses.OTHER_ACCOUNT,
+      BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F4C3362FE1D0',
+      BookNode: '0000000000000000',
+      Flags: 0,
+      LedgerEntryType: 'Offer',
+      OwnerNode: '00000000000063CC',
+      PreviousTxnID: 'CD77500EF28984BFC123E8A257C10E44FF486EA8FC43E1356C42BD6DB853A602',
+      PreviousTxnLgrSeq: 8265523,
+      Sequence: 1139002,
+      TakerGets: {
+        currency: 'USD',
+        issuer: addresses.ISSUER,
+        value: module.exports.OTHER_TAKER_GETS
+      },
+      taker_gets_funded: '100',
+      is_fully_funded: true,
+      TakerPays: module.exports.OTHER_TAKER_PAYS,
+      index: module.exports.OTHER_LEDGER_INDEX,
+      owner_funds: options.other_account_funds,
+      quality: '195796912.5171664'
     },
-    taker_gets_funded: '100',
-    is_fully_funded: true,
-    TakerPays: module.exports.OTHER_TAKER_PAYS,
-    index: module.exports.OTHER_LEDGER_INDEX,
-    owner_funds: '235.0194163432668',
-    quality: '195796912.5171664'
-  },
-];
+  ];
+};
 
 module.exports.NATIVE_OFFERS = [
   {
@@ -179,17 +187,7 @@ module.exports.REQUEST_OFFERS = [
     },
     index: 'B6BC3B0F87976370EE11F5575593FE63AA5DC1D602830DC96F04B2D597F044BF',
     owner_funds: '0.1129267125000245',
-    quality: '496.5',
-    taker_gets_funded: {
-      currency: 'BTC',
-      issuer: addresses.ISSUER,
-      value: '0.1127013098802639'
-    },
-    taker_pays_funded: {
-      currency: 'USD',
-      issuer: addresses.ISSUER,
-      value: '55.95620035555103'
-    }
+    quality: '496.5'
   },
   {
     Account: addresses.OTHER_ACCOUNT,
@@ -344,114 +342,124 @@ module.exports.REQUEST_OFFERS_NATIVE = [
   }
 ];
 
-module.exports.BOOK_OFFERS_RESPONSE = {
-  offers: [
-    {
-      Account: addresses.ACCOUNT,
-      BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C188F5B29EE1C14',
-      BookNode: '0000000000000000',
-      Flags: 0,
-      LedgerEntryType: 'Offer',
-      OwnerNode: '0000000000006762',
-      PreviousTxnID: '5F08192C82CD3A598D29B51FCCDE29B6709EBCB454A3CD540C32F7A79EE7CB26',
-      PreviousTxnLgrSeq: 11558364,
-      Sequence: 1689777,
-      TakerGets: {
-        currency: 'USD',
-        issuer: addresses.ISSUER,
-        value: '79.39192374'
+module.exports.bookOffersResponse = function (options) {
+  options = options || {};
+  _.defaults(options, {
+    account_funds: '2010.027702881682',
+    other_account_funds: '24.06086596039299',
+    third_account_funds: '9071.40090264774',
+    fourth_account_funds: '7244.053477923128'
+  });
+
+  return {
+    offers: [
+      {
+        Account: addresses.ACCOUNT,
+        BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C188F5B29EE1C14',
+        BookNode: '0000000000000000',
+        Flags: 0,
+        LedgerEntryType: 'Offer',
+        OwnerNode: '0000000000006762',
+        PreviousTxnID: '5F08192C82CD3A598D29B51FCCDE29B6709EBCB454A3CD540C32F7A79EE7CB26',
+        PreviousTxnLgrSeq: 11558364,
+        Sequence: 1689777,
+        TakerGets: {
+          currency: 'USD',
+          issuer: addresses.ISSUER,
+          value: '79.39192374'
+        },
+        TakerPays: '5488380479',
+        index: 'D9F821C8687E0D0EDEFF05EBB53CFDC81C5F9C4C354DAACB11F6676B5E14AEF5',
+        owner_funds: options.account_funds,
+        quality: '69130211.4932226'
       },
-      TakerPays: '5488380479',
-      index: 'D9F821C8687E0D0EDEFF05EBB53CFDC81C5F9C4C354DAACB11F6676B5E14AEF5',
-      owner_funds: '2010.027702881682',
-      quality: '69130211.4932226'
-    },
-    {
-      Account: addresses.OTHER_ACCOUNT,
-      BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C18949C72B26C2A',
-      BookNode: '0000000000000000',
-      Flags: 0,
-      LedgerEntryType: 'Offer',
-      OwnerNode: '0000000000000001',
-      PreviousTxnID: '038ED9ACC10211A8F6768729F36B74729CECCD33057837E160131675B272E532',
-      PreviousTxnLgrSeq: 11558374,
-      Sequence: 931088,
-      TakerGets: {
-        currency: 'USD',
-        issuer: addresses.ISSUER,
-        value: '24.060765960393'
+      {
+        Account: addresses.OTHER_ACCOUNT,
+        BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C18949C72B26C2A',
+        BookNode: '0000000000000000',
+        Flags: 0,
+        LedgerEntryType: 'Offer',
+        OwnerNode: '0000000000000001',
+        PreviousTxnID: '038ED9ACC10211A8F6768729F36B74729CECCD33057837E160131675B272E532',
+        PreviousTxnLgrSeq: 11558374,
+        Sequence: 931088,
+        TakerGets: {
+          currency: 'USD',
+          issuer: addresses.ISSUER,
+          value: '24.060765960393'
+        },
+        TakerPays: '1664716059',
+        index: '8845F212A8B53004A14C8C029FAF51B53266C66B49281A72F6A8F41CD92FDE99',
+        owner_funds: options.other_account_funds,
+        quality: '69187991.0116049',
+        taker_gets_funded: {
+          currency: 'USD',
+          issuer: addresses.ISSUER,
+          value: '24.01284027983332'
+        },
+        taker_pays_funded: '1661400177'
       },
-      TakerPays: '1664716059',
-      index: '8845F212A8B53004A14C8C029FAF51B53266C66B49281A72F6A8F41CD92FDE99',
-      owner_funds: '24.06086596039299',
-      quality: '69187991.0116049',
-      taker_gets_funded: {
-        currency: 'USD',
-        issuer: addresses.ISSUER,
-        value: '24.01284027983332'
+      {
+        Account: addresses.THIRD_ACCOUNT,
+        BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C18949C764EA14E',
+        BookNode: '0000000000000000',
+        Flags: 0,
+        LedgerEntryType: 'Offer',
+        OwnerNode: '0000000000000009',
+        PreviousTxnID: '62B96C0E0D86827BCE59ABDCAD146CC0B09404FE5BC86E712FB6F4E473016C63',
+        PreviousTxnLgrSeq: 11558234,
+        Sequence: 617872,
+        TakerGets: {
+          currency: 'USD',
+          issuer: addresses.ISSUER,
+          value: '712.60995'
+        },
+        TakerPays: '49304051247',
+        index: '9E5C13908F67146AC35A711A17E5EB75771FDDA816C9532891DC90F29A6A4C10',
+        owner_funds: options.third_account_funds,
+        quality: '69187991.61729358'
       },
-      taker_pays_funded: '1661400177'
-    },
-    {
-      Account: addresses.THIRD_ACCOUNT,
-      BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C18949C764EA14E',
-      BookNode: '0000000000000000',
-      Flags: 0,
-      LedgerEntryType: 'Offer',
-      OwnerNode: '0000000000000009',
-      PreviousTxnID: '62B96C0E0D86827BCE59ABDCAD146CC0B09404FE5BC86E712FB6F4E473016C63',
-      PreviousTxnLgrSeq: 11558234,
-      Sequence: 617872,
-      TakerGets: {
-        currency: 'USD',
-        issuer: addresses.ISSUER,
-        value: '712.60995'
+      {
+        Account: addresses.FOURTH_ACCOUNT,
+        BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C18AA2E761B7EE6',
+        BookNode: '0000000000000000',
+        Flags: 0,
+        LedgerEntryType: 'Offer',
+        OwnerNode: '0000000000000511',
+        PreviousTxnID: 'F18AED5EC1E7529EF03AF23ADA85F7625AA308278BACE1851F336443AA3DAAEA',
+        PreviousTxnLgrSeq: 11558336,
+        Sequence: 662712,
+        TakerGets: {
+          currency: 'USD',
+          issuer: addresses.ISSUER,
+          value: '288.08'
+        },
+        TakerPays: '20000000000',
+        index: '606B3FC9199D5122F1DCC73EC1629E40C8A838D58AC67315A78D76699D960705',
+        owner_funds: options.fourth_account_funds,
+        quality: '69425159.67786726'
       },
-      TakerPays: '49304051247',
-      index: '9E5C13908F67146AC35A711A17E5EB75771FDDA816C9532891DC90F29A6A4C10',
-      owner_funds: '9071.40090264774',
-      quality: '69187991.61729358'
-    },
-    {
-      Account: addresses.FOURTH_ACCOUNT,
-      BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C18AA2E761B7EE6',
-      BookNode: '0000000000000000',
-      Flags: 0,
-      LedgerEntryType: 'Offer',
-      OwnerNode: '0000000000000511',
-      PreviousTxnID: 'F18AED5EC1E7529EF03AF23ADA85F7625AA308278BACE1851F336443AA3DAAEA',
-      PreviousTxnLgrSeq: 11558336,
-      Sequence: 662712,
-      TakerGets: {
-        currency: 'USD',
-        issuer: addresses.ISSUER,
-        value: '288.08'
-      },
-      TakerPays: '20000000000',
-      index: '606B3FC9199D5122F1DCC73EC1629E40C8A838D58AC67315A78D76699D960705',
-      owner_funds: '7244.053477923128',
-      quality: '69425159.67786726'
-    },
-    {
-      Account: addresses.ACCOUNT,
-      BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C18C3D9EF58005A',
-      BookNode: '0000000000000000',
-      Flags: 0,
-      LedgerEntryType: 'Offer',
-      OwnerNode: '0000000000006762',
-      PreviousTxnID: 'E3A0240001B03E4F16C4BA6C2B0CB00C01413BE331ABE9E782B6A975DC936618',
-      PreviousTxnLgrSeq: 11558318,
-      Sequence: 1689755,
-      TakerGets: {
-        currency: 'USD',
-        issuer: addresses.ISSUER,
-        value: '196.460002'
-      },
-      TakerPays: '13694716399',
-      index: '9A5D0AA37EA0889B876E9A3E552CACDB28BA5A3CD482A528992CD0CCFC09F6E8',
-      quality: '69707402.31897178'
-    }
-  ]
+      {
+        Account: addresses.ACCOUNT,
+        BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C18C3D9EF58005A',
+        BookNode: '0000000000000000',
+        Flags: 0,
+        LedgerEntryType: 'Offer',
+        OwnerNode: '0000000000006762',
+        PreviousTxnID: 'E3A0240001B03E4F16C4BA6C2B0CB00C01413BE331ABE9E782B6A975DC936618',
+        PreviousTxnLgrSeq: 11558318,
+        Sequence: 1689755,
+        TakerGets: {
+          currency: 'USD',
+          issuer: addresses.ISSUER,
+          value: '196.460002'
+        },
+        TakerPays: '13694716399',
+        index: '9A5D0AA37EA0889B876E9A3E552CACDB28BA5A3CD482A528992CD0CCFC09F6E8',
+        quality: '69707402.31897178'
+      }
+    ]
+  };
 };
 
 module.exports.MODIFIED_NODES = [
