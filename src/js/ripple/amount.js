@@ -7,7 +7,12 @@ var utils     = require('./utils');
 var UInt160   = require('./uint160').UInt160;
 var Seed      = require('./seed').Seed;
 var Currency  = require('./currency').Currency;
-var BigNumber = require('./bignumber');
+var GlobalBigNumber = require('bignumber.js');
+
+var BigNumber = GlobalBigNumber.another({
+  ROUNDING_MODE: GlobalBigNumber.ROUND_HALF_UP,
+  DECIMAL_PLACES: 40
+});
 
 
 function inverse(number) {
@@ -325,10 +330,7 @@ Amount.prototype.canonicalize = function(roundingMode) {
     this._value = this._value.round(6, BigNumber.ROUND_DOWN);
   } else {
     if (roundingMode) {
-      var value = this._value;
-      this._value = BigNumber.withRoundingMode(roundingMode, function() {
-        return new BigNumber(value.toPrecision(16));
-      });
+      this._value = new BigNumber(this._value.toPrecision(16, roundingMode));
     } else {
       this._value = new BigNumber(this._value.toPrecision(16));
     }
