@@ -1,3 +1,18 @@
+##0.12.1
+
+**Breaking Changes**
+
++ [Removed support for parsing native amounts in floating point format](https://github.com/ripple/ripple-lib/commit/e80cd1ff55deae9cd5b0ae85be957f86856b887e)
+
+**Changes**
+
++ [Fix handling of false parameters in requestLedger](https://github.com/ripple/ripple-lib/commit/6023efed41b7812b3bab660a1c0dc9f0a21000b9)
+
++ [Fix order funded amount calculation](https://github.com/ripple/ripple-lib/commit/b2cdb1a6aed968b1f306e8dadbd4b7ca37e5aa03)
+
++ [Remove `Features` field requirements from `SetFee` transaction format](https://github.com/ripple/ripple-lib/commit/a20a649013646710c078d4ce1e210f87c7fe74fe)
+
+
 ##0.12.0
 
 **Breaking Changes**
