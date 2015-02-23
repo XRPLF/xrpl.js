@@ -272,7 +272,6 @@ exports.tx = {
     [ 'Feature'            , REQUIRED ]
   ]),
   SetFee: [101].concat(base, [
-    [ 'Features'           , REQUIRED ],
     [ 'BaseFee'            , REQUIRED ],
     [ 'ReferenceFeeUnits'  , REQUIRED ],
     [ 'ReserveBase'        , REQUIRED ],
