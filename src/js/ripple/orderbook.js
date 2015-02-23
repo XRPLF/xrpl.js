@@ -491,6 +491,26 @@ OrderBook.prototype.getOwnerOfferTotal = function(account) {
 };
 
 /**
+ * Reset offers amount sum for owner to 0
+ *
+ * @param {String} account - owner's account address
+ * @return {Amount}
+ */
+OrderBook.prototype.resetOwnerOfferTotal = function(account) {
+  var amount;
+
+  if (this._currencyGets.is_native()) {
+    amount = Amount.from_json('0');
+  } else {
+    amount = Amount.from_json('0' + OrderBook.IOU_SUFFIX);
+  }
+
+  this._ownerOffersTotal[account] = amount;
+
+  return amount;
+};
+
+/**
  * Compute adjusted balance that would be left after issuer's transfer fee is deducted
  *
  * @param {String} balance
@@ -545,85 +565,58 @@ OrderBook.prototype.requestTransferRate = function(callback) {
   });
 };
 
+
 /**
  * Set funded amount on offer with its owner's cached funds
  * 
- * Offers have taker_gets_funded, reflecting the amount this account can afford to offer.
  * Offers have is_fully_funded, indicating whether these funds are sufficient for the offer placed.
+ * Offers have taker_gets_funded, reflecting the amount this account can afford to offer.
  * Offers have taker_pays_funded, reflecting an adjusted TakerPays in the case of a partially funded order.
  *
  * @param {Object} offer
- * @param {String} funds
  * @return offer
  */
-
 OrderBook.prototype.setOfferFundedAmount = function(offer) {
   assert.strictEqual(typeof offer, 'object', 'Offer is invalid');
   assert(!isNaN(this.getOwnerFunds(offer.Account)), 'Funds is invalid');
 
-  var fundedAmount = this.getOwnerFunds(offer.Account);
+  var fundedAmount = Amount.from_json(
+    this._currencyGets.is_native()
+    ? this.getOwnerFunds(offer.Account)
+    : this.getOwnerFunds(offer.Account) + OrderBook.IOU_SUFFIX
+  );
+  var previousOfferSum = this.getOwnerOfferTotal(offer.Account);
+  var currentOfferSum = Amount.from_json(offer.TakerGets).add(previousOfferSum);
 
   offer.owner_funds = this.getUnadjustedOwnerFunds(offer.Account);
 
-  if (fundedAmount === '0') {
-    offer.taker_gets_funded = '0';
-    offer.taker_pays_funded = '0';
-    offer.is_fully_funded = false;
-    return offer;
-  }
-
-  var offerSum = this.getOwnerOfferTotal(offer.Account);
-
-  if (offerSum.is_zero()) {
-    offerSum = Amount.from_json(offer.TakerGets);
-  }
-
-  offer.is_fully_funded = Amount.from_json(
-    this._currencyGets.is_native()
-    ? fundedAmount
-    : fundedAmount + OrderBook.IOU_SUFFIX
-  ).compareTo(offerSum) >= 0;
+  offer.is_fully_funded = fundedAmount.compareTo(currentOfferSum) >= 0;
 
   if (offer.is_fully_funded) {
     offer.taker_gets_funded = Amount.from_json(offer.TakerGets).to_text();
     offer.taker_pays_funded = Amount.from_json(offer.TakerPays).to_text();
-    return offer;
-  }
+  } else if (previousOfferSum.compareTo(fundedAmount) < 0) {
+    var takerGetsFunded = fundedAmount.subtract(previousOfferSum);
 
-  var isOfferGetsExceeded = Amount.from_json(
-    this._currencyGets.is_native()
-    ? fundedAmount
-    : fundedAmount + OrderBook.IOU_SUFFIX
-  )
-  .compareTo(offer.TakerGets) > 0;
+    var takerPaysValue = this._currencyPays.is_native()
+    ? offer.TakerPays
+    : offer.TakerPays.value;
+    var takerPays = Amount.from_json(takerPaysValue + OrderBook.IOU_SUFFIX);
 
-  if (isOfferGetsExceeded) {
-    offer.taker_gets_funded = Amount.from_json(offer.TakerGets).to_text();
+    var takerGetsValue = this._currencyGets.is_native()
+    ? offer.TakerGets
+    : offer.TakerGets.value;
+    var takerGets = Amount.from_json(takerGetsValue + OrderBook.IOU_SUFFIX);
+
+    var quality = takerPays.divide(takerGets);
+    var takerPaysFunded = Amount.from_json(takerGetsFunded.to_text() + OrderBook.IOU_SUFFIX).multiply(quality);
+
+    offer.taker_gets_funded = takerGetsFunded.to_text();
+    offer.taker_pays_funded = this._currencyPays.is_native() ? String(parseInt(takerPaysFunded.to_json().value, 10)) : takerPaysFunded.to_json().value;
   } else {
-    offer.taker_gets_funded = fundedAmount;
+    offer.taker_gets_funded = '0';
+    offer.taker_pays_funded = '0';
   }
-
-  var takerPaysValue = this._currencyPays.is_native()
-  ? offer.TakerPays
-  : offer.TakerPays.value;
-  var takerPays = Amount.from_json(takerPaysValue +  OrderBook.IOU_SUFFIX);
-  var takerGets = Amount.from_json(offerSum);
-  var fundedPays = Amount.from_json(fundedAmount + OrderBook.IOU_SUFFIX);
-  var rate = takerPays.divide(takerGets);
-
-  fundedPays = fundedPays.multiply(rate);
-
-  if (fundedPays.compareTo(takerPays) < 0) {
-    if (this._currencyPays.is_native()) {
-      fundedPays = String(parseInt(fundedPays.to_json().value, 10));
-    } else {
-      fundedPays = fundedPays.to_json().value;
-    }
-  } else {
-    fundedPays = takerPays.to_json().value;
-  }
-
-  offer.taker_pays_funded = fundedPays;
 
   return offer;
 };
@@ -752,13 +745,14 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
 
 OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  assert(!isNaN(this.getOwnerFunds(account)), 'Funded amount is invalid');
 
   var self = this;
 
   if (this._remote.trace) {
     log.info('updating offer funds', this._key, account, this.getOwnerFunds(account));
   }
+
+  this.resetOwnerOfferTotal(account);
 
   _.each(this._offers, function (offer) {
     if (offer.Account !== account) {
@@ -767,19 +761,25 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
 
     // Save a copy of the old offer so we can show how the offer has changed
     var previousOffer = extend({}, offer);
-    var previousFundedGets = Amount.from_json(
-      offer.taker_gets_funded + OrderBook.IOU_SUFFIX
-    );
+    var previousFundedGetsValue = offer.taker_gets_funded;
+    var previousFundedGets;
+
+    if (_.isString(previousFundedGetsValue)) {
+      previousFundedGets = Amount.from_json(
+        offer.taker_gets_funded + OrderBook.IOU_SUFFIX
+      );
+    }
 
     self.setOfferFundedAmount(offer);
+    self.addOwnerOfferTotal(offer.Account, offer.TakerGets);
 
-    var areFundsChanged = !previousFundedGets.equals(
+    var areFundsChanged = previousFundedGets && !previousFundedGets.equals(
       Amount.from_json(offer.taker_gets_funded + OrderBook.IOU_SUFFIX)
     );
 
     if (areFundsChanged) {
       self.emit('offer_changed', previousOffer, offer);
-      self.emit('offer_funds_changed', 
+      self.emit('offer_funds_changed',
         offer,
         previousOffer.taker_gets_funded,
         offer.taker_gets_funded
@@ -828,24 +828,24 @@ OrderBook.prototype.notify = function(transaction) {
   );
 
   function handleNode(node) {
-    var isDeletedNode = node.nodeType === 'DeletedNode';
     var isOfferCancel = transaction.transaction.TransactionType === 'OfferCancel';
 
     switch (node.nodeType) {
       case 'DeletedNode':
-      case 'ModifiedNode':
-        self.modifyOffer(node);
+        self.deleteOffer(node, isOfferCancel);
 
         // We don't want to count an OfferCancel as a trade
         if (!isOfferCancel) {
-          if (isDeletedNode) {
-            takerGetsTotal = takerGetsTotal.add(node.fieldsFinal.TakerGets);
-            takerPaysTotal = takerPaysTotal.add(node.fieldsFinal.TakerPays);
-          } else {
-            takerGetsTotal = takerGetsTotal.add(node.fieldsPrev.TakerGets).subtract(node.fieldsFinal.TakerGets);
-            takerPaysTotal = takerPaysTotal.add(node.fieldsPrev.TakerPays).subtract(node.fieldsFinal.TakerPays);
-          }
+          takerGetsTotal = takerGetsTotal.add(node.fieldsFinal.TakerGets);
+          takerPaysTotal = takerPaysTotal.add(node.fieldsFinal.TakerPays);
         }
+        break;
+
+      case 'ModifiedNode':
+        self.modifyOffer(node);
+
+        takerGetsTotal = takerGetsTotal.add(node.fieldsPrev.TakerGets).subtract(node.fieldsFinal.TakerGets);
+        takerPaysTotal = takerPaysTotal.add(node.fieldsPrev.TakerPays).subtract(node.fieldsFinal.TakerPays);
         break;
 
       case 'CreatedNode':
@@ -867,6 +867,9 @@ OrderBook.prototype.notify = function(transaction) {
 /**
  * Insert an offer into the orderbook
  *
+ * NOTE: We *MUST* update offers' funded amounts when a new offer is placed because funds go
+ *       to the highest quality offers first.
+ *
  * @param {Object} node - Offer node
  */
 
@@ -877,13 +880,8 @@ OrderBook.prototype.insertOffer = function(node) {
 
   var offer = OrderBook.offerRewrite(node.fields);
 
-  this.addOwnerOfferTotal(offer.Account, offer.TakerGets);
-  this.incrementOwnerOfferCount(offer.Account);
-
   offer.LedgerEntryType = node.entryType;
   offer.index = node.ledgerIndex;
-
-  this.setOfferFundedAmount(offer);
 
   var DATE_REF = {
     reference_date: new Date()
@@ -894,22 +892,29 @@ OrderBook.prototype.insertOffer = function(node) {
     offer.TakerPays
   ).ratio_human(offer.TakerGets, DATE_REF);
 
-  for (var i=0, offersLength=this._offers.length; i<offersLength + 1; i++) {
-    if (i === offersLength) {
-      this._offers.push(offer);
-    } else {
-      var currentOffer = this._offers[i];
+  var originalLength = this._offers.length;
 
-      var priceItem = Amount.from_json(
-        currentOffer.TakerPays
-      ).ratio_human(currentOffer.TakerGets, DATE_REF);
+  for (var i=0; i<originalLength; i++) {
+    var currentOffer = this._offers[i];
+    
+    var priceItem = Amount.from_json(
+      currentOffer.TakerPays
+    ).ratio_human(currentOffer.TakerGets, DATE_REF);
 
-      if (price.compareTo(priceItem) <= 0) {
-        this._offers.splice(i, 0, offer);
-        break;
-      }
-    }
+    if (price.compareTo(priceItem) <= 0) {
+      this._offers.splice(i, 0, offer);
+
+      break;
+    } 
   }
+
+  if (this._offers.length === originalLength) {
+    this._offers.push(offer);
+  }
+
+  this.incrementOwnerOfferCount(offer.Account);
+
+  this.updateOwnerOffersFundedAmount(offer.Account);
 
   this.emit('offer_added', offer);
 };
@@ -922,40 +927,58 @@ OrderBook.prototype.insertOffer = function(node) {
 
 OrderBook.prototype.modifyOffer = function(node) {
   if (this._remote.trace) {
-    if (node.nodeType === 'DeletedNode') {
-      log.info('deleting offer', this._key, node.fields);
-    } else {
-      log.info('modifying offer', this._key, node.fields);
-    }
+    log.info('modifying offer', this._key, node.fields);
   }
 
-  for (var i=0, l=this._offers.length; i<l; i++) {
+  for (var i=0; i<this._offers.length; i++) {
     var offer = this._offers[i];
 
     if (offer.index === node.ledgerIndex) {
-      if (node.nodeType === 'DeletedNode') {
-        // Remove offer amount from sum for account
-        this.subtractOwnerOfferTotal(offer.Account, offer.TakerGets);
-        this._offers.splice(i, 1);
-        this.decrementOwnerOfferCount(offer.Account);
-
-        this.emit('offer_removed', offer);
-      } else {
-        // TODO: This assumes no fields are deleted, which is
-        // probably a safe assumption, but should be checked.
-        var previousOffer = extend({}, offer);
-        extend(offer, node.fieldsFinal);
-
-        // Remove offer amount from sum for account
-        this.subtractOwnerOfferTotal(offer.Account, previousOffer.TakerGets);
-        // Add offer amount from sum for account
-        this.addOwnerOfferTotal(offer.Account, offer.TakerGets);
-
-        this.emit('offer_changed', previousOffer, offer);
-      }
+      // TODO: This assumes no fields are deleted, which is
+      // probably a safe assumption, but should be checked.
+      extend(offer, node.fieldsFinal);
 
       break;
     }
+  }
+
+  this.updateOwnerOffersFundedAmount(node.fields.Account);
+};
+
+/** 
+ * Delete an existing offer in the orderbook
+ *
+ * NOTE: We only update funded amounts when the node comes from an OfferCancel
+ *       transaction because when offers are deleted, it frees up funds to fund
+ *       other existing offers in the book
+ *
+ * @param {Object} node - Offer node
+ * @param {Boolean} isOfferCancel - whether node came from an OfferCancel transaction
+ */
+
+OrderBook.prototype.deleteOffer = function(node, isOfferCancel) {
+  if (this._remote.trace) {
+    log.info('deleting offer', this._key, node.fields);
+  }
+
+  for (var i=0; i<this._offers.length; i++) {
+    var offer = this._offers[i];
+
+    if (offer.index === node.ledgerIndex) {
+      // Remove offer amount from sum for account
+      this.subtractOwnerOfferTotal(offer.Account, offer.TakerGets);
+
+      this._offers.splice(i, 1);
+      this.decrementOwnerOfferCount(offer.Account);
+
+      this.emit('offer_removed', offer);
+
+      break;
+    }
+  }
+
+  if (isOfferCancel) {
+    this.updateOwnerOffersFundedAmount(node.fields.Account);
   }
 };
 
@@ -971,10 +994,7 @@ OrderBook.prototype.setOffers = function(offers) {
 
   var self = this;
 
-  // Must calculate offer totals before we can set funded amounts on offers
-  _.each(offers, function (rawOffer) {
-    self.addOwnerOfferTotal(rawOffer.Account, rawOffer.TakerGets);
-  });
+  this.resetCache();
 
   var newOffers = _.map(offers, function (rawOffer) {
     var offer = OrderBook.offerRewrite(rawOffer);
@@ -985,7 +1005,9 @@ OrderBook.prototype.setOffers = function(offers) {
     }
 
     self.incrementOwnerOfferCount(offer.Account);
+      
     self.setOfferFundedAmount(offer);
+    self.addOwnerOfferTotal(rawOffer.Account, rawOffer.TakerGets);
 
     return offer;
   });
