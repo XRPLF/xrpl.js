@@ -204,7 +204,6 @@ Object.keys(FIELDS_MAP).forEach(function(k1) {
   });
 });
 
-
 var REQUIRED = exports.REQUIRED = 0,
     OPTIONAL = exports.OPTIONAL = 1,
     DEFAULT  = exports.DEFAULT  = 2;
@@ -245,7 +244,7 @@ exports.tx = {
     [ 'OfferSequence'      , REQUIRED ]
   ]),
   SetRegularKey: [5].concat(base, [
-    [ 'RegularKey'         , REQUIRED ]
+    [ 'RegularKey'         , OPTIONAL ]
   ]),
   Payment: [0].concat(base, [
     [ 'Destination'        , REQUIRED ],
