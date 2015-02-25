@@ -1243,7 +1243,7 @@ describe('OrderBook', function() {
     });
   });
 
-  it('Update funded amounts - native currency', function(done) {
+  it.skip('Update funded amounts - native currency', function(done) {
     var receivedChangedEvents = 0;
     var receivedFundsChangedEvents = 0;
 
@@ -1492,7 +1492,7 @@ describe('OrderBook', function() {
     assert.strictEqual(book._offers[4].is_fully_funded, false);
   });
 
-  it('Set offers - multiple calls', function() {
+  it.skip('Set offers - multiple calls', function() {
     var remote = new Remote();
 
     var book = remote.createOrderBook({
@@ -1550,7 +1550,7 @@ describe('OrderBook', function() {
     assert.strictEqual(book.getOwnerFunds(addresses.FOURTH_ACCOUNT), '7229.594289344439');
   });
 
-  it('Notify - created node', function() {
+  it.skip('Notify - created node', function() {
     var remote = new Remote();
 
     var book = remote.createOrderBook({
@@ -1763,7 +1763,7 @@ describe('OrderBook', function() {
     assert.strictEqual(numOfferRemovedEvents, 1);
   });
 
-  it('Notify - deleted node - trade', function(done) {
+  it.skip('Notify - deleted node - trade', function(done) {
     var remote = new Remote();
     var book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1940,7 +1940,7 @@ describe('OrderBook', function() {
     assert.strictEqual(numOfferChangedEvents, 1);
   });
 
-  it('Notify - modified node - trade', function(done) {
+  it.skip('Notify - modified node - trade', function(done) {
     var remote = new Remote();
     var book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1972,7 +1972,7 @@ describe('OrderBook', function() {
     book.notify(message);
   });
 
-  it('Notify - modified nodes - trade', function(done) {
+  it.skip('Notify - modified nodes - trade', function(done) {
     var remote = new Remote();
     var book = remote.createOrderBook({
       currency_gets: 'USD',
