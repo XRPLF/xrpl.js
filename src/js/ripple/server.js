@@ -5,7 +5,6 @@ var EventEmitter = require('events').EventEmitter;
 var Amount       = require('./amount').Amount;
 var RangeSet     = require('./rangeset').RangeSet;
 var log          = require('./log').internal.sub('server');
-var utils        = require('./utils');
 
 /**
  *  @constructor Server
@@ -424,9 +423,7 @@ Server.prototype.connect = function() {
     log.info(this.getServerID(), 'connect');
   }
 
-  var ws = this._ws = new WebSocket(this._opts.url, {
-    headers: { 'User-Agent': 'ripple-lib/' + utils.getPackageVersion() }
-  });
+  var ws = this._ws = new WebSocket(this._opts.url);
 
   this._shouldConnect = true;
 
