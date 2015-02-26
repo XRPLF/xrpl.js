@@ -149,7 +149,7 @@ describe('OrderBook', function() {
     book._issuerTransferRate = 1000000000;
     book.setOwnerFunds(addresses.ACCOUNT, '1');
 
-    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), '1');
+    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT).to_text(), '1');
   });
 
   it('Set owner funds - unadjusted funds', function() {
@@ -276,7 +276,7 @@ describe('OrderBook', function() {
 
     assert.strictEqual(book.decrementOwnerOfferCount(addresses.ACCOUNT), 0);
     assert.strictEqual(book.getOwnerOfferCount(addresses.ACCOUNT), 0);
-    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT, undefined));
+    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), undefined);
   });
 
   it('Decrement owner offer count - invalid address', function() {
@@ -577,7 +577,8 @@ describe('OrderBook', function() {
         currency: 'BTC',
         issuer: addresses.ISSUER
       },
-      TakerPays: '123456'
+      TakerPays: '123456',
+      quality: '1234.56'
     };
 
     book.setOwnerFunds(addresses.ACCOUNT, '99');
@@ -590,7 +591,8 @@ describe('OrderBook', function() {
       is_fully_funded: false,
       taker_gets_funded: '99',
       taker_pays_funded: '122221',
-      owner_funds: '99'
+      owner_funds: '99',
+      quality: '1234.56'
     };
 
     assert.deepEqual(offer, expected);
@@ -649,7 +651,8 @@ describe('OrderBook', function() {
         value: '123.456',
         currency: 'BTC',
         issuer: addresses.ISSUER
-      }
+      },
+      quality: '1.23456'
     };
 
     book.setOwnerFunds(addresses.ACCOUNT, '99');
@@ -662,7 +665,8 @@ describe('OrderBook', function() {
       is_fully_funded: false,
       taker_gets_funded: '99',
       taker_pays_funded: '122.22144',
-      owner_funds: '99'
+      owner_funds: '99',
+      quality: '1.23456'
     };
 
     assert.deepEqual(offer, expected);
@@ -1138,7 +1142,7 @@ describe('OrderBook', function() {
     book.updateFundedAmounts(message);
 
     setImmediate(function() {
-      assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), fixtures.FIAT_BALANCE);
+      assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT).to_text(), fixtures.FIAT_BALANCE);
       assert.strictEqual(receivedChangedEvents, 2);
       assert.strictEqual(receivedFundsChangedEvents, 2);
       done();
@@ -1237,7 +1241,7 @@ describe('OrderBook', function() {
     book.updateFundedAmounts(message);
 
     setImmediate(function() {
-      assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), '9.980039920159681');
+      assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT).to_text(), '9.980039920159681');
 
       done();
     });
@@ -1270,10 +1274,10 @@ describe('OrderBook', function() {
       assert.notStrictEqual(previousFunds, newFunds);
       switch (++receivedFundsChangedEvents) {
         case 1:
-          assert(!offer.is_fully_funded);
+          assert(offer.is_fully_funded);
           break;
         case 2:
-          assert(offer.is_fully_funded);
+          assert(!offer.is_fully_funded);
           break;
       }
     });
@@ -1413,10 +1417,10 @@ describe('OrderBook', function() {
     assert.strictEqual(book.getOwnerOfferCount(addresses.THIRD_ACCOUNT), 1);
     assert.strictEqual(book.getOwnerOfferCount(addresses.FOURTH_ACCOUNT), 1);
 
-    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), '2006.015671538605');
-    assert.strictEqual(book.getOwnerFunds(addresses.OTHER_ACCOUNT), '24.01284027983332');
-    assert.strictEqual(book.getOwnerFunds(addresses.THIRD_ACCOUNT), '9053.294314019701');
-    assert.strictEqual(book.getOwnerFunds(addresses.FOURTH_ACCOUNT), '7229.594289344439');
+    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT).to_text(), '2006.015671538605');
+    assert.strictEqual(book.getOwnerFunds(addresses.OTHER_ACCOUNT).to_text(), '24.01284027983332');
+    assert.strictEqual(book.getOwnerFunds(addresses.THIRD_ACCOUNT).to_text(), '9053.294314019701');
+    assert.strictEqual(book.getOwnerFunds(addresses.FOURTH_ACCOUNT).to_text(), '7229.594289344439');
   });
 
   it('Set offers - issuer transfer rate set - iou/xrp - funded amounts', function() {
@@ -1510,44 +1514,20 @@ describe('OrderBook', function() {
 
     assert.strictEqual(book._offers.length, 5);
 
-    var accountOfferTotal = Amount.from_json({
-      value: 275.85192574,
-      currency: 'USD',
-      issuer: addresses.ISSUER
-    });
-
-    var otherAccountOfferTotal = Amount.from_json({
-      value: 24.060765960393,
-      currency: 'USD',
-      issuer: addresses.ISSUER
-    });
-
-    var thirdAccountOfferTotal = Amount.from_json({
-      value: 712.60995,
-      currency: 'USD',
-      issuer: addresses.ISSUER
-    });
-
-    var fourthAccountOfferTotal = Amount.from_json({
-      value: 288.08,
-      currency: 'USD',
-      issuer: addresses.ISSUER
-    });
-
-    assert(book.getOwnerOfferTotal(addresses.ACCOUNT).equals(accountOfferTotal));
-    assert(book.getOwnerOfferTotal(addresses.OTHER_ACCOUNT).equals(otherAccountOfferTotal));
-    assert(book.getOwnerOfferTotal(addresses.THIRD_ACCOUNT).equals(thirdAccountOfferTotal));
-    assert(book.getOwnerOfferTotal(addresses.FOURTH_ACCOUNT).equals(fourthAccountOfferTotal));
+    assert.strictEqual(book.getOwnerOfferTotal(addresses.ACCOUNT).to_text(), '275.85192574');
+    assert.strictEqual(book.getOwnerOfferTotal(addresses.OTHER_ACCOUNT).to_text(), '24.060765960393');
+    assert.strictEqual(book.getOwnerOfferTotal(addresses.THIRD_ACCOUNT).to_text(), '712.60995');
+    assert.strictEqual(book.getOwnerOfferTotal(addresses.FOURTH_ACCOUNT).to_text(), '288.08');
 
     assert.strictEqual(book.getOwnerOfferCount(addresses.ACCOUNT), 2);
     assert.strictEqual(book.getOwnerOfferCount(addresses.OTHER_ACCOUNT), 1);
     assert.strictEqual(book.getOwnerOfferCount(addresses.THIRD_ACCOUNT), 1);
     assert.strictEqual(book.getOwnerOfferCount(addresses.FOURTH_ACCOUNT), 1);
 
-    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), '2006.015671538605');
-    assert.strictEqual(book.getOwnerFunds(addresses.OTHER_ACCOUNT), '24.01284027983332');
-    assert.strictEqual(book.getOwnerFunds(addresses.THIRD_ACCOUNT), '9053.294314019701');
-    assert.strictEqual(book.getOwnerFunds(addresses.FOURTH_ACCOUNT), '7229.594289344439');
+    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT).to_text(), '2006.015671538605');
+    assert.strictEqual(book.getOwnerFunds(addresses.OTHER_ACCOUNT).to_text(), '24.01284027983332');
+    assert.strictEqual(book.getOwnerFunds(addresses.THIRD_ACCOUNT).to_text(), '9053.294314019701');
+    assert.strictEqual(book.getOwnerFunds(addresses.FOURTH_ACCOUNT).to_text(), '7229.594289344439');
   });
 
   it.skip('Notify - created node', function() {
@@ -1573,16 +1553,10 @@ describe('OrderBook', function() {
 
     book.notify(message);
 
-    var accountOfferTotal = Amount.from_json({
-      value: 1.9951,
-      currency: 'USD',
-      issuer: addresses.ISSUER
-    });
-
     assert.strictEqual(book._offers.length, 1);
-    assert(book.getOwnerOfferTotal(addresses.ACCOUNT).equals(accountOfferTotal));
+    assert.strictEqual(book.getOwnerOfferTotal(addresses.ACCOUNT).to_text(), '1.9951');
     assert.strictEqual(book.getOwnerOfferCount(addresses.ACCOUNT), 1);
-    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), '2006.015671538605');
+    assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT).to_text(), '2006.015671538605');
   });
 
   it('Notify - created nodes - correct sorting', function() {
@@ -1771,7 +1745,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book.on('trade', function(tradeGets, tradePays) {
+    book.on('trade', function(tradePays, tradeGets) {
       var expectedTradePays = Amount.from_json(fixtures.TAKER_PAYS);
       var expectedTradeGets = Amount.from_json({
         value: fixtures.TAKER_GETS,
@@ -2104,6 +2078,30 @@ describe('OrderBook', function() {
     assert.strictEqual(book._offers[0].taker_pays_funded, '881086106');
   });
 
+  it('Insert offer - best quality', function() {
+    var remote = new Remote();
+    var book = remote.createOrderBook({
+      currency_gets: 'USD',
+      issuer_gets: addresses.ISSUER,
+      currency_pays: 'XRP'
+    });
+
+    book._subscribed = true;
+    book._issuerTransferRate = 1000000000;
+
+    book.setOffers(fixtures.QUALITY_OFFERS);
+
+    book.insertOffer(fixtures.transactionWithCreatedOffer({
+      amount: '51.04587961502088'
+    }).mmeta.getNodes()[0]);
+    
+    assert.strictEqual(book._offers.length, 2);
+
+    assert.strictEqual(book._offers[0].taker_gets_funded, '51.04587961502088');
+    assert.strictEqual(book._offers[0].taker_pays_funded, fixtures.TAKER_PAYS);
+    assert.strictEqual(book._offers[0].quality, '75977580.74206542');
+  });
+
   it('Insert offer - best quality - insufficient funds for all offers', function() {
     var remote = new Remote();
     var book = remote.createOrderBook({
@@ -2275,7 +2273,8 @@ describe('OrderBook', function() {
         owner_funds: '0.1129267125000245',
         taker_gets_funded: '0.112701309880264',
         taker_pays_funded: '55.95620035555106',
-        is_fully_funded: false
+        is_fully_funded: false,
+        quality: '496.4999999999999'
       },
       {
         Account: addresses.OTHER_ACCOUNT,
@@ -2300,7 +2299,8 @@ describe('OrderBook', function() {
         owner_funds: '0.950363009783092',
         is_fully_funded: true,
         taker_gets_funded: '0.2',
-        taker_pays_funded: '99.72233516476456'
+        taker_pays_funded: '99.72233516476456',
+        quality: '498.6116758238228'
       },
       { 
         Account: addresses.THIRD_ACCOUNT,
@@ -2324,7 +2324,8 @@ describe('OrderBook', function() {
         owner_funds: '0.950363009783092',
         is_fully_funded: true,
         taker_gets_funded: '0.5',
-        taker_pays_funded: '99.72233516476456' 
+        taker_pays_funded: '99.72233516476456',
+        quality: '498.6116758238228'
       },
       { 
         Account: addresses.THIRD_ACCOUNT,
@@ -2349,7 +2350,8 @@ describe('OrderBook', function() {
         owner_funds: '0.950363009783092',
         is_fully_funded: false,
         taker_gets_funded: '0.4484660776278363',
-        taker_pays_funded: '89.44416900646082'
+        taker_pays_funded: '89.44416900646082',
+        quality: '199.4446703295291'
       }
     ];
 
@@ -2386,7 +2388,8 @@ describe('OrderBook', function() {
         owner_funds: '600',
         is_fully_funded: false,
         taker_gets_funded: '600',
-        taker_pays_funded: '33.63983796370414'
+        taker_pays_funded: '33.6398379637041',
+        quality: '.0560663966061735'
       },
       {
         Account: addresses.OTHER_ACCOUNT,
@@ -2407,7 +2410,8 @@ describe('OrderBook', function() {
         owner_funds: '4000',
         is_fully_funded: true,
         taker_gets_funded: '2000',
-        taker_pays_funded: '99.72233516476456'
+        taker_pays_funded: '99.72233516476456',
+        quality: '0.049861167582382'
       },
       {
         Account: addresses.THIRD_ACCOUNT,
@@ -2428,7 +2432,8 @@ describe('OrderBook', function() {
         owner_funds: '3900',
         is_fully_funded: true,
         taker_gets_funded: '2000',
-        taker_pays_funded: '99.72233516476456'
+        taker_pays_funded: '99.72233516476456',
+        quality: '0.049861167582382'
       },
       {
         Account: addresses.THIRD_ACCOUNT,
@@ -2448,8 +2453,9 @@ describe('OrderBook', function() {
         index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
         is_fully_funded: false,
         taker_gets_funded: '1900',
-        taker_pays_funded: '94.73621840652633',
-        owner_funds: '3900'
+        taker_pays_funded: '94.7362184065258',
+        owner_funds: '3900',
+        quality: '0.049861167582382'
       }
     ];
 

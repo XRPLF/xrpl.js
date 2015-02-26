@@ -3,7 +3,7 @@ var addresses = require('./addresses');
 var Meta      = require('ripple-lib').Meta;
 
 module.exports.FIAT_BALANCE = '10';
-module.exports.NATIVE_BALANCE = '25';
+module.exports.NATIVE_BALANCE = '55';
 module.exports.NATIVE_BALANCE_PREVIOUS = '100';
 
 module.exports.TAKER_GETS = '19.84580331';
@@ -187,7 +187,7 @@ module.exports.REQUEST_OFFERS = [
     },
     index: 'B6BC3B0F87976370EE11F5575593FE63AA5DC1D602830DC96F04B2D597F044BF',
     owner_funds: '0.1129267125000245',
-    quality: '496.5'
+    quality: '496.4999999999999'
   },
   {
     Account: addresses.OTHER_ACCOUNT,
@@ -262,7 +262,7 @@ module.exports.REQUEST_OFFERS = [
     },
     index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
     owner_funds: '0.950363009783092',
-    quality: '498.6116758238228'
+    quality: '199.4446703295291'
   }
 ];
 
@@ -282,7 +282,8 @@ module.exports.REQUEST_OFFERS_NATIVE = [
       value: '56.06639660617357'
     },
     index: 'B6BC3B0F87976370EE11F5575593FE63AA5DC1D602830DC96F04B2D597F044BF',
-    owner_funds: '600'
+    owner_funds: '600',
+    quality: '.0560663966061735'
   },
   {
     Account: addresses.OTHER_ACCOUNT,
@@ -301,6 +302,7 @@ module.exports.REQUEST_OFFERS_NATIVE = [
     },
     index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
     owner_funds: '4000',
+    quality: '0.049861167582382'
   },
   {
     Account: addresses.THIRD_ACCOUNT,
@@ -319,6 +321,7 @@ module.exports.REQUEST_OFFERS_NATIVE = [
     },
     index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
     owner_funds: '3900',
+    quality: '0.049861167582382'
   },
   {
     Account: addresses.THIRD_ACCOUNT,
@@ -338,7 +341,30 @@ module.exports.REQUEST_OFFERS_NATIVE = [
       value: '99.72233516476456'
     },
     index: 'A437D85DF80D250F79308F2B613CF5391C7CF8EE9099BC4E553942651CD9FA86',
-    quality: '498.6116758238228'
+    quality: '0.049861167582382'
+  }
+];
+
+module.exports.QUALITY_OFFERS = [
+  {
+    Account: addresses.ACCOUNT,
+    BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5C1AFE1EE71A605F',
+    BookNode: '0000000000000000',
+    Flags: 0,
+    LedgerEntryType: 'Offer',
+    OwnerNode: '0000000000000009',
+    PreviousTxnID: 'BCA728C17DBA10F100C41D4EF8B37318F33BC6156E94DB16703D2A1EE43DCCE6',
+    PreviousTxnLgrSeq: 11929146,
+    Sequence: 668643,
+    TakerGets: {
+      currency: 'USD',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      value: '301.3426005599325'
+    },
+    TakerPays: '22895281765',
+    index: '79B34D7DF703580B86099EFD6B2E419AA39A585A50C82A3F9B446721B7C1490C',
+    owner_funds: '5910.437716613066',
+    quality: '75977580.74216543'
   }
 ];
 
