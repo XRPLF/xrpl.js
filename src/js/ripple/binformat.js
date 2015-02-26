@@ -1,13 +1,19 @@
+'use strict';
+
+/*eslint no-multi-spaces:0,space-in-brackets:0,key-spacing:0,comma-spacing:0*/
+
 /**
  * Data type map.
  *
  * Mapping of type ids to data types. The type id is specified by the high
  *
  * For reference, see rippled's definition:
- * https://github.com/ripple/rippled/blob/develop/src/ripple/data/protocol/SField.cpp
+ * https://github.com/ripple/rippled/blob/develop/src/ripple/data/protocol
+ *                                                              /SField.cpp
  */
-var TYPES_MAP = exports.types = [
-  void(0),
+
+exports.types = [
+  undefined,
 
   // Common
   'Int16',    // 1
@@ -20,11 +26,11 @@ var TYPES_MAP = exports.types = [
   'Account',  // 8
 
   // 9-13 reserved
-  void(0),    // 9
-  void(0),    // 10
-  void(0),    // 11
-  void(0),    // 12
-  void(0),    // 13
+  undefined,    // 9
+  undefined,    // 10
+  undefined,    // 11
+  undefined,    // 12
+  undefined,    // 13
 
   'Object',   // 14
   'Array',    // 15
@@ -151,7 +157,7 @@ var FIELDS_MAP = exports.fields = {
     8: 'RegularKey'
   },
   14: { // Object
-    1: void(0),  //end of Object
+    1: undefined,  // end of Object
     2: 'TransactionMetaData',
     3: 'CreatedNode',
     4: 'DeletedNode',
@@ -163,7 +169,7 @@ var FIELDS_MAP = exports.fields = {
     10: 'Memo'
   },
   15: { // Array
-    1: void(0),  //end of Array
+    1: undefined,  // end of Array
     2: 'SigningAccounts',
     3: 'TxnSignatures',
     4: 'Signatures',
@@ -228,7 +234,9 @@ exports.tx = {
     [ 'WalletSize'         , OPTIONAL ],
     [ 'MessageKey'         , OPTIONAL ],
     [ 'Domain'             , OPTIONAL ],
-    [ 'TransferRate'       , OPTIONAL ]
+    [ 'TransferRate'       , OPTIONAL ],
+    [ 'SetFlag'            , OPTIONAL ],
+    [ 'ClearFlag'          , OPTIONAL ]
   ]),
   TrustSet: [20].concat(base, [
     [ 'LimitAmount'        , OPTIONAL ],
@@ -238,7 +246,8 @@ exports.tx = {
   OfferCreate: [7].concat(base, [
     [ 'TakerPays'          , REQUIRED ],
     [ 'TakerGets'          , REQUIRED ],
-    [ 'Expiration'         , OPTIONAL ]
+    [ 'Expiration'         , OPTIONAL ],
+    [ 'OfferSequence'      , OPTIONAL ]
   ]),
   OfferCancel: [8].concat(base, [
     [ 'OfferSequence'      , REQUIRED ]
@@ -270,11 +279,21 @@ exports.tx = {
   EnableFeature: [100].concat(base, [
     [ 'Feature'            , REQUIRED ]
   ]),
+  EnableAmendment: [100].concat(base, [
+    [ 'Amendment'          , REQUIRED ]
+  ]),
   SetFee: [101].concat(base, [
     [ 'BaseFee'            , REQUIRED ],
     [ 'ReferenceFeeUnits'  , REQUIRED ],
     [ 'ReserveBase'        , REQUIRED ],
     [ 'ReserveIncrement'   , REQUIRED ]
+  ]),
+  TicketCreate: [10].concat(base, [
+    [ 'Target'             , OPTIONAL ],
+    [ 'Expiration'         , OPTIONAL ]
+  ]),
+  TicketCancel: [11].concat(base, [
+    [ 'TicketID'           , REQUIRED ]
   ])
 };
 
@@ -412,5 +431,8 @@ exports.ter = {
   tecNO_TARGET             : 138,
   tecNO_PERMISSION         : 139,
   tecNO_ENTRY              : 140,
-  tecINSUFFICIENT_RESERVE  : 141
+  tecINSUFFICIENT_RESERVE  : 141,
+  tecNEED_MASTER_KEY       : 142,
+  tecDST_TAG_NEEDED        : 143,
+  tecINTERNAL              : 144
 };
