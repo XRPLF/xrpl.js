@@ -1,5 +1,9 @@
+/*eslint-disable max-len */
+
+'use strict';
+
 var assert = require('assert-diff');
-var Remote  = require('ripple-lib').Remote;
+var Remote = require('ripple-lib').Remote;
 var Currency = require('ripple-lib').Currency;
 var Amount = require('ripple-lib').Amount;
 var Meta = require('ripple-lib').Meta;
@@ -64,7 +68,7 @@ describe('OrderBook', function() {
       done();
     };
 
-    book.on('model', function(){});
+    book.on('model', function() {});
   });
 
   it('Subscribe', function(done) {
@@ -100,7 +104,7 @@ describe('OrderBook', function() {
       done();
     });
 
-    book.on('model', function(){});
+    book.on('model', function() {});
 
     book.unsubscribe();
 
@@ -120,7 +124,7 @@ describe('OrderBook', function() {
       done();
     };
 
-    book.on('model', function(){});
+    book.on('model', function() {});
     book.removeAllListeners('model');
   });
 
@@ -135,7 +139,7 @@ describe('OrderBook', function() {
       done();
     };
 
-    book.once('model', function(){});
+    book.once('model', function() {});
     book.emit('model', {});
   });
 
@@ -190,7 +194,7 @@ describe('OrderBook', function() {
   });
 
   it('Has owner funds', function() {
-    var book =  new Remote().createOrderBook({
+    var book = new Remote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -441,7 +445,7 @@ describe('OrderBook', function() {
     remote.request = function(request) {
       assert.deepEqual(request.message, {
         command: 'account_info',
-        id: void(0),
+        id: undefined,
         account: addresses.ISSUER
       });
 
@@ -469,7 +473,7 @@ describe('OrderBook', function() {
     remote.request = function(request) {
       assert.deepEqual(request.message, {
         command: 'account_info',
-        id: void(0),
+        id: undefined,
         account: addresses.ISSUER
       });
 
@@ -495,7 +499,7 @@ describe('OrderBook', function() {
 
     book._issuerTransferRate = 1002000000;
 
-    remote.request = function(request) {
+    remote.request = function() {
       assert(false);
     };
 
@@ -513,7 +517,7 @@ describe('OrderBook', function() {
       currency_pays: 'BTC'
     });
 
-    remote.request = function(request) {
+    remote.request = function() {
       assert(false);
     };
 
@@ -1116,7 +1120,7 @@ describe('OrderBook', function() {
 
     book._offers = fixtures.fiatOffers();
 
-    book.on('offer_changed', function(offer) {
+    book.on('offer_changed', function() {
       receivedChangedEvents += 1;
     });
 
@@ -1150,7 +1154,6 @@ describe('OrderBook', function() {
   });
 
   it('Update funded amounts - increase funds', function() {
-    var receivedChangedEvents = 0;
     var receivedFundsChangedEvents = 0;
 
     var remote = new Remote();
@@ -1252,7 +1255,7 @@ describe('OrderBook', function() {
     var receivedFundsChangedEvents = 0;
 
     var remote = new Remote();
-    
+
     var message = fixtures.transactionWithAccountRoot();
 
     var book = remote.createOrderBook({
@@ -1264,7 +1267,7 @@ describe('OrderBook', function() {
     book._synchronized = true;
     book._offers = fixtures.NATIVE_OFFERS;
 
-    book.on('offer_changed', function(offer) {
+    book.on('offer_changed', function() {
       receivedChangedEvents += 1;
     });
 
@@ -1295,7 +1298,7 @@ describe('OrderBook', function() {
 
   it('Update funded amounts - no affected account', function(done) {
     var remote = new Remote();
-    
+
     var message = fixtures.transactionWithAccountRoot({
       account: addresses.ACCOUNT
     });
@@ -1538,13 +1541,6 @@ describe('OrderBook', function() {
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
     });
-    var remote = new Remote();
-
-    var book = remote.createOrderBook({
-      currency_gets: 'USD',
-      issuer_gets: addresses.ISSUER,
-      currency_pays: 'XRP'
-    });
 
     book._issuerTransferRate = 1002000000;
     book._subscribed = true;
@@ -1642,13 +1638,6 @@ describe('OrderBook', function() {
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
     });
-    var remote = new Remote();
-
-    var book = remote.createOrderBook({
-      currency_gets: 'USD',
-      issuer_gets: addresses.ISSUER,
-      currency_pays: 'XRP'
-    });
 
     book._subscribed = true;
     book._issuerTransferRate = 1000000000;
@@ -1665,13 +1654,6 @@ describe('OrderBook', function() {
   });
 
   it('Notify - deleted node - last offer', function() {
-    var remote = new Remote();
-
-    var book = remote.createOrderBook({
-      currency_gets: 'USD',
-      issuer_gets: addresses.ISSUER,
-      currency_pays: 'XRP'
-    });
     var remote = new Remote();
 
     var book = remote.createOrderBook({
@@ -1777,13 +1759,6 @@ describe('OrderBook', function() {
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
     });
-    var remote = new Remote();
-
-    var book = remote.createOrderBook({
-      currency_gets: 'USD',
-      issuer_gets: addresses.ISSUER,
-      currency_pays: 'XRP'
-    });
 
     book._subscribed = true;
     book._issuerTransferRate = 1000000000;
@@ -1809,13 +1784,6 @@ describe('OrderBook', function() {
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
     });
-    var remote = new Remote();
-
-    var book = remote.createOrderBook({
-      currency_gets: 'USD',
-      issuer_gets: addresses.ISSUER,
-      currency_pays: 'XRP'
-    });
 
     book._subscribed = true;
     book._issuerTransferRate = 1000000000;
@@ -1833,13 +1801,6 @@ describe('OrderBook', function() {
   });
 
   it('Notify - modified node', function() {
-    var remote = new Remote();
-
-    var book = remote.createOrderBook({
-      currency_gets: 'USD',
-      issuer_gets: addresses.ISSUER,
-      currency_pays: 'XRP'
-    });
     var remote = new Remote();
 
     var book = remote.createOrderBook({
@@ -2094,7 +2055,7 @@ describe('OrderBook', function() {
     book.insertOffer(fixtures.transactionWithCreatedOffer({
       amount: '51.04587961502088'
     }).mmeta.getNodes()[0]);
-    
+
     assert.strictEqual(book._offers.length, 2);
 
     assert.strictEqual(book._offers[0].taker_gets_funded, '51.04587961502088');
@@ -2223,7 +2184,7 @@ describe('OrderBook', function() {
         case 'book_offers':
           assert.deepEqual(request.message, {
             command: 'book_offers',
-            id: void(0),
+            id: undefined,
             taker_gets: {
               currency: '0000000000000000000000004254430000000000',
               issuer: addresses.ISSUER
@@ -2252,7 +2213,7 @@ describe('OrderBook', function() {
     book._issuerTransferRate = 1002000000;
 
     var expected = [
-      { 
+      {
         Account: addresses.ACCOUNT,
         BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711A3A4254F5000',
         BookNode: '0000000000000000',
@@ -2260,7 +2221,8 @@ describe('OrderBook', function() {
         LedgerEntryType: 'Offer',
         OwnerNode: '0000000000000000',
         Sequence: 195,
-        TakerGets: { currency: 'BTC',
+        TakerGets: {
+          currency: 'BTC',
           issuer: addresses.ISSUER,
           value: '0.1129232560043778'
         },
@@ -2302,7 +2264,7 @@ describe('OrderBook', function() {
         taker_pays_funded: '99.72233516476456',
         quality: '498.6116758238228'
       },
-      { 
+      {
         Account: addresses.THIRD_ACCOUNT,
         BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
         BookNode: '0000000000000000',
@@ -2311,7 +2273,8 @@ describe('OrderBook', function() {
         LedgerEntryType: 'Offer',
         OwnerNode: '0000000000000144',
         Sequence: 29356,
-        TakerGets: { currency: 'BTC',
+        TakerGets: {
+          currency: 'BTC',
           issuer: addresses.ISSUER,
           value: '0.5'
         },
@@ -2327,7 +2290,7 @@ describe('OrderBook', function() {
         taker_pays_funded: '99.72233516476456',
         quality: '498.6116758238228'
       },
-      { 
+      {
         Account: addresses.THIRD_ACCOUNT,
         BookDirectory: '6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC985711B6D8C62EF414',
         BookNode: '0000000000000000',
@@ -2464,9 +2427,9 @@ describe('OrderBook', function() {
         case 'book_offers':
           assert.deepEqual(request.message, {
             command: 'book_offers',
-            id: void(0),
+            id: undefined,
             taker_gets: {
-              currency: '0000000000000000000000000000000000000000',
+              currency: '0000000000000000000000000000000000000000'
             },
             taker_pays: {
               currency: '0000000000000000000000005553440000000000',

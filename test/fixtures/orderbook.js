@@ -1,6 +1,10 @@
-var _         = require('lodash');
+/*eslint-disable max-len */
+
+'use strict';
+
+var _ = require('lodash');
 var addresses = require('./addresses');
-var Meta      = require('ripple-lib').Meta;
+var Meta = require('ripple-lib').Meta;
 
 module.exports.FIAT_BALANCE = '10';
 module.exports.NATIVE_BALANCE = '55';
@@ -93,7 +97,7 @@ module.exports.fiatOffers = function (options) {
       index: module.exports.OTHER_LEDGER_INDEX,
       owner_funds: options.other_account_funds,
       quality: '195796912.5171664'
-    },
+    }
   ];
 };
 
@@ -161,7 +165,7 @@ module.exports.NATIVE_OFFERS = [
     index: 'D3338DA77BA23122FB5647B74B53636AB54BE246D4B21707C9D6887DEB334252',
     owner_funds: '235.0194163432668',
     quality: '195796912.5171664'
-  },
+  }
 ];
 
 module.exports.REQUEST_OFFERS = [
@@ -638,7 +642,7 @@ module.exports.transactionWithInvalidAccountRoot = function(options) {
   options = options || {};
   _.defaults(options, {
     account: addresses.ACCOUNT,
-    balance: module.exports.NATIVE_BALANCE,
+    balance: module.exports.NATIVE_BALANCE
   });
 
   return {
@@ -700,7 +704,7 @@ module.exports.transactionWithCreatedOffer = function(options) {
       TransactionType: 'OfferCreate',
       owner_funds: '2010.027702881682'
     }
-  }
+  };
 };
 
 module.exports.transactionWithDeletedOffer = function(options) {
@@ -745,7 +749,7 @@ module.exports.transactionWithDeletedOffer = function(options) {
       TransactionType: options.transaction_type,
       owner_funds: '2010.027702881682'
     }
-  }
+  };
 };
 
 module.exports.transactionWithModifiedOffer = function() {
@@ -761,7 +765,7 @@ module.exports.transactionWithModifiedOffer = function() {
       TransactionType: 'OfferCreate',
       owner_funds: '2010.027702881682'
     }
-  }
+  };
 };
 
 module.exports.transactionWithModifiedOffers = function() {
@@ -777,7 +781,7 @@ module.exports.transactionWithModifiedOffers = function() {
       TransactionType: 'OfferCreate',
       owner_funds: '2010.027702881682'
     }
-  }
+  };
 };
 
 module.exports.transactionWithNoNodes = function() {
@@ -793,7 +797,7 @@ module.exports.transactionWithNoNodes = function() {
       TransactionType: 'OfferCreate',
       owner_funds: '2010.027702881682'
     }
-  }
+  };
 };
 
 module.exports.accountInfoResponse = function(options) {
