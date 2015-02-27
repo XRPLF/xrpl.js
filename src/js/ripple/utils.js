@@ -1,8 +1,3 @@
-var packageJson = require('../../../package.json');
-
-function getPackageVersion() {
-  return packageJson.version;
-}
 
 function getMantissaDecimalString(bignum) {
   var mantissa = bignum.toPrecision(16)
@@ -175,7 +170,6 @@ exports.arrayUnique   = arrayUnique;
 exports.toTimestamp   = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
-exports.getPackageVersion = getPackageVersion;
 
 // Going up three levels is needed to escape the src-cov folder used for the
 // test coverage stuff.
