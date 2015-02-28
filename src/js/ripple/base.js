@@ -1,142 +1,67 @@
-var sjcl    = require('./utils').sjcl;
-var utils   = require('./utils');
-var extend  = require('extend');
+'use strict';
+var _ = require('lodash');
+var sjcl = require('./utils').sjcl;
+var utils = require('./utils');
+var extend = require('extend');
+var convertBase = require('./baseconverter');
 
 var Base = {};
 
 var alphabets = Base.alphabets = {
-  ripple:  'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
-  tipple:  'RPShNAF39wBUDnEGHJKLM4pQrsT7VWXYZ2bcdeCg65jkm8ofqi1tuvaxyz',
-  bitcoin:  '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+  ripple: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
+  tipple: 'RPShNAF39wBUDnEGHJKLM4pQrsT7VWXYZ2bcdeCg65jkm8ofqi1tuvaxyz',
+  bitcoin: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 };
 
 extend(Base, {
-  VER_NONE              : 1,
-  VER_NODE_PUBLIC       : 28,
-  VER_NODE_PRIVATE      : 32,
-  VER_ACCOUNT_ID        : 0,
-  VER_ACCOUNT_PUBLIC    : 35,
-  VER_ACCOUNT_PRIVATE   : 34,
-  VER_FAMILY_GENERATOR  : 41,
-  VER_FAMILY_SEED       : 33
+  VER_NONE: 1,
+  VER_NODE_PUBLIC: 28,
+  VER_NODE_PRIVATE: 32,
+  VER_ACCOUNT_ID: 0,
+  VER_ACCOUNT_PUBLIC: 35,
+  VER_ACCOUNT_PRIVATE: 34,
+  VER_FAMILY_GENERATOR: 41,
+  VER_FAMILY_SEED: 33
 });
 
 function sha256(bytes) {
-  return sjcl.codec.bytes.fromBits(sjcl.hash.sha256.hash(sjcl.codec.bytes.toBits(bytes)));
+  return sjcl.codec.bytes.fromBits(
+    sjcl.hash.sha256.hash(sjcl.codec.bytes.toBits(bytes)));
 }
 
-function sha256hash(bytes) {
-  return sha256(sha256(bytes));
-}
-
-function divmod58(number, startAt) {
-    var remainder = 0;
-    for (var i = startAt; i < number.length; i++) {
-        var digit256 = number[i] & 0xFF;
-        var temp = remainder * 256 + digit256;
-        number[i] = (temp / 58);
-        remainder = temp % 58;
-    }
-    return remainder;
-}
-
-function  divmod256(number58, startAt) {
-    var remainder = 0;
-    for (var i = startAt; i < number58.length; i++) {
-        var digit58 = number58[i] & 0xFF;
-        var temp = remainder * 58 + digit58;
-        number58[i] = (temp / 256);
-        remainder = temp % 256;
-    }
-    return remainder;
-}
-
-function encodeString (alphabet, input) {
-  if (input.length == 0) {
+function encodeString(alphabet, input) {
+  if (input.length === 0) {
     return [];
   }
 
-  // we need to copy the buffer for calc
-  scratch = input.slice();
-
-  // Count leading zeroes.
-  var zeroCount = 0;
-  while (zeroCount < scratch.length &&
-           scratch[zeroCount] == 0)
-    ++zeroCount;
-
-  // The actual encoding.
-  var out = new Array(scratch.length * 2);
-  var j = out.length;
-  var startAt = zeroCount;
-
-  while (startAt < scratch.length) {
-    var mod = divmod58(scratch, startAt);
-    if (scratch[startAt] == 0) {
-      ++startAt;
-    }
-    out[--j] = alphabet[mod];
-  }
-
-  // Strip extra 'r' if there are some after decoding.
-  while (j < out.length && out[j] == alphabet[0]) ++j;
-  // Add as many leading 'r' as there were leading zeros.
-  while (--zeroCount >= 0) out[--j] = alphabet[0];
-  while(j--) out.shift();
-
-  return out.join('');
+  var leadingZeros = _.takeWhile(input, function(d) {
+    return d === 0;
+  });
+  var out = convertBase(input, 256, 58).map(function(digit) {
+    return alphabet[digit];
+  });
+  var prefix = leadingZeros.map(function() {
+    return alphabet[0];
+  });
+  return prefix.concat(out).join('');
 }
 
-function decodeString(indexes, input)  {
-  var isString = typeof input === 'string';
-
-  if (input.length == 0) {
+function decodeString(indexes, input) {
+  if (input.length === 0) {
     return [];
   }
 
-  input58 = new Array(input.length);
-
-  // Transform the String to a base58 byte sequence
-  for (var i = 0; i < input.length; ++i) {
-    if (isString) {
-      var c = input.charCodeAt(i);
-    }
-
-    var digit58 = -1;
-    if (c >= 0 && c < 128) {
-      digit58 = indexes[c];
-    }
-    if (digit58 < 0) {
-      throw new Error("Illegal character " + c + " at " + i);
-    }
-
-    input58[i] = digit58;
-  }
-  // Count leading zeroes
-  var zeroCount = 0;
-  while (zeroCount < input58.length && input58[zeroCount] == 0) {
-    ++zeroCount;
-  }
-  // The encoding
-  out = utils.arraySet(input.length, 0);
-  var j = out.length;
-
-  var startAt = zeroCount;
-  while (startAt < input58.length) {
-    var mod = divmod256(input58, startAt);
-    if (input58[startAt] == 0) {
-      ++startAt;
-    }
-    out[--j] = mod;
-  }
-
-  // Do no add extra leading zeroes, move j to first non null byte.
-  while (j < out.length && (out[j] == 0)) ++j;
-
-  j -= zeroCount;
-  while(j--) out.shift();
-
-  return out;
+  var input58 = input.split('').map(function(c) {
+    return indexes[c.charCodeAt(0)];
+  });
+  var leadingZeros = _.takeWhile(input58, function(d) {
+    return d === 0;
+  });
+  var out = convertBase(input58, 58, 256);
+  var prefix = leadingZeros.map(function() {
+    return 0;
+  });
+  return prefix.concat(out);
 }
 
 function Base58(alphabet) {
@@ -151,8 +76,8 @@ function Base58(alphabet) {
 }
 
 Base.encoders = {};
-Object.keys(alphabets).forEach(function(alphabet){
-  Base.encoders[alphabet] = Base58(alphabets[alphabet]);
+Object.keys(alphabets).forEach(function(alphabet) {
+  Base.encoders[alphabet] = new Base58(alphabets[alphabet]);
 });
 
 // --> input: big-endian array of bytes.
@@ -165,22 +90,21 @@ Base.encode = function(input, alpha) {
 // <-- array of bytes or undefined.
 Base.decode = function(input, alpha) {
   if (typeof input !== 'string') {
-    return void(0);
+    return undefined;
   }
   try {
     return this.encoders[alpha || 'ripple'].decode(input);
-  }
-  catch(e) {
-    return (void 0);
+  } catch (e) {
+    return undefined;
   }
 };
 
 Base.verify_checksum = function(bytes) {
-  var computed = sha256hash(bytes.slice(0, -4)).slice(0, 4);
+  var computed = sha256(sha256(bytes.slice(0, -4))).slice(0, 4);
   var checksum = bytes.slice(-4);
   var result = true;
 
-  for (var i=0; i<4; i++) {
+  for (var i = 0; i < 4; i++) {
     if (computed[i] !== checksum[i]) {
       result = false;
       break;
@@ -194,7 +118,7 @@ Base.verify_checksum = function(bytes) {
 // <-- String
 Base.encode_check = function(version, input, alphabet) {
   var buffer = [].concat(version, input);
-  var check  = sha256(sha256(buffer)).slice(0, 4);
+  var check = sha256(sha256(buffer)).slice(0, 4);
 
   return Base.encode([].concat(buffer, check), alphabet);
 };
@@ -217,7 +141,7 @@ Base.decode_check = function(version, input, alphabet) {
   if (Array.isArray(version)) {
     var match = false;
 
-    for (var i=0, l=version.length; i<l; i++) {
+    for (var i = 0, l = version.length; i < l; i++) {
       match |= version[i] === buffer[0];
     }
 
@@ -234,7 +158,7 @@ Base.decode_check = function(version, input, alphabet) {
   // intrepret the value as a negative number
   buffer[0] = 0;
 
-  return sjcl.bn.fromBits (
+  return sjcl.bn.fromBits(
       sjcl.codec.bytes.toBits(buffer.slice(0, -4)));
 };
 
