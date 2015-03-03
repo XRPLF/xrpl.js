@@ -38,6 +38,9 @@ function encodeString(alphabet, input) {
     return d === 0;
   });
   var out = convertBase(input, 256, 58).map(function(digit) {
+    if (digit < 0 || digit >= alphabet.length) {
+      throw new Error('Value ' + digit + ' is out of bounds for encoding');
+    }
     return alphabet[digit];
   });
   var prefix = leadingZeros.map(function() {
@@ -52,7 +55,11 @@ function decodeString(indexes, input) {
   }
 
   var input58 = input.split('').map(function(c) {
-    return indexes[c.charCodeAt(0)];
+    var charCode = c.charCodeAt(0);
+    if (charCode >= indexes.length) {
+      throw new Error('Character ' + c + ' is not valid for encoding');
+    }
+    return indexes[charCode];
   });
   var leadingZeros = _.takeWhile(input58, function(d) {
     return d === 0;
