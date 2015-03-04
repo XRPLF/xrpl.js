@@ -1533,6 +1533,27 @@ describe('OrderBook', function() {
     assert.strictEqual(book.getOwnerFunds(addresses.FOURTH_ACCOUNT).to_text(), '7229.594289344439');
   });
 
+  it('Set offers - incorrect taker pays funded', function() {
+    var remote = new Remote();
+
+    var book = remote.createOrderBook({
+      currency_gets: 'USD',
+      issuer_gets: addresses.ISSUER,
+      currency_pays: 'XRP'
+    });
+
+    book._issuerTransferRate = 1002000000;
+
+    var offers = fixtures.DECIMAL_TAKER_PAYS_FUNDED_OFFERS;
+
+    book.setOffers(offers);
+
+    assert.strictEqual(book._offers.length, 1);
+
+    assert.strictEqual(book._offers[0].taker_gets_funded, '9261.514125778347');
+    assert.strictEqual(book._offers[0].taker_pays_funded, '1704050437125');
+  });
+
   it('Notify - created node', function() {
     var remote = new Remote();
 

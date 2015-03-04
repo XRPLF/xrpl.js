@@ -640,7 +640,7 @@ OrderBook.prototype.setOfferFundedAmount = function(offer) {
     );
 
     offer.taker_pays_funded = this._currencyPays.is_native()
-      ? String(parseInt(takerPaysFunded.to_json().value, 10))
+      ? String(Math.floor(takerPaysFunded.to_number()))
       : takerPaysFunded.to_json().value;
   } else {
     offer.taker_gets_funded = '0';
