@@ -372,6 +372,37 @@ module.exports.QUALITY_OFFERS = [
   }
 ];
 
+// This fixture is to exercise a bug where taker_pays_funded = taker_gets_funded * quality
+// has decimal amounts.
+module.exports.DECIMAL_TAKER_PAYS_FUNDED_OFFERS = [
+  {
+    Account: addresses.ACCOUNT,
+    BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D0689673FA9094A',
+    BookNode: '0000000000000000',
+    Flags: 0,
+    LedgerEntryType: 'Offer',
+    OwnerNode: '0000000000000006',
+    PreviousTxnID: 'C1BB04CE39E30BF5982B7660793723E9B3A832F5B458DB1C5938F4737E0E9ABF',
+    PreviousTxnLgrSeq: 11631257,
+    Sequence: 2936,
+    TakerGets: {
+      currency: 'USD',
+      issuer: addresses.ISSUER,
+      value: '9280.04'
+    },
+    TakerPays: '1707459061637',
+    index: '89D85BBE91E0F419953EB89CE62E194922ED930EE57BE0C62FCC3B22DDB20852',
+    owner_funds: '9280.037154029904',
+    quality: '183992640.2943306',
+    taker_gets_funded: {
+      currency: 'USD',
+      issuer: addresses.ISSUER,
+      value: '9261.514125778347'
+    },
+    taker_pays_funded: '1704050437125'
+  }
+];
+
 module.exports.bookOffersResponse = function (options) {
   options = options || {};
   _.defaults(options, {
