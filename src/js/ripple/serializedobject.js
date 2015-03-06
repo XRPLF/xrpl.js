@@ -46,9 +46,10 @@ function SerializedObject(buf) {
   this.pointer = 0;
 }
 
-SerializedObject.from_json = function(obj) {
+SerializedObject.from_json = function(obj, options) {
   // Create a copy of the object so we don't modify it
   obj = extend(true, {}, obj);
+  options = _.extend({strict: true}, options);
   var so  = new SerializedObject();
   var typedef;
 
@@ -94,7 +95,7 @@ SerializedObject.from_json = function(obj) {
 
   // ND: This from_*json* seems a reasonable place to put validation of `json`
   SerializedObject.check_no_missing_fields(typedef, obj);
-  so.serialize(typedef, obj);
+  so.serialize(typedef, obj, options);
 
   return so;
 };
@@ -236,9 +237,9 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
   return output;
 };
 
-SerializedObject.prototype.serialize = function(typedef, obj) {
+SerializedObject.prototype.serialize = function(typedef, obj, options) {
   // Serialize object without end marker
-  stypes.Object.serialize(this, obj, true);
+  stypes.Object.serialize(this, obj, options, true);
 
   // ST: Old serialization
   /*

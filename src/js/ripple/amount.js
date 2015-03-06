@@ -1,12 +1,16 @@
+ 'use strict';
+
+ /*eslint-disable new-cap*/
+
 // Represent Ripple amounts and currencies.
 // - Numbers in hex are big-endian.
 
-var assert    = require('assert');
-var extend    = require('extend');
-var utils     = require('./utils');
-var UInt160   = require('./uint160').UInt160;
-var Seed      = require('./seed').Seed;
-var Currency  = require('./currency').Currency;
+var assert = require('assert');
+var extend = require('extend');
+var utils = require('./utils');
+var UInt160 = require('./uint160').UInt160;
+var Seed = require('./seed').Seed;
+var Currency = require('./currency').Currency;
 var GlobalBigNumber = require('bignumber.js');
 
 var BigNumber = GlobalBigNumber.another({
@@ -24,10 +28,10 @@ function Amount() {
   //  integer : XRP
   //  { 'value' : ..., 'currency' : ..., 'issuer' : ...}
 
-  this._value       = new BigNumber(NaN);
-  this._is_native   = true; // Default to XRP. Only valid if value is not NaN.
-  this._currency    = new Currency();
-  this._issuer      = new UInt160();
+  this._value = new BigNumber(NaN);
+  this._is_native = true; // Default to XRP. Only valid if value is not NaN.
+  this._currency = new Currency();
+  this._issuer = new UInt160();
 }
 
 /**
@@ -37,33 +41,33 @@ function Amount() {
 Amount.strict_mode = true;
 
 var consts = {
-  currency_xns:      0,
-  currency_one:      1,
-  xns_precision:     6,
+  currency_xns: 0,
+  currency_one: 1,
+  xns_precision: 6,
 
   // bi_ prefix refers to "big integer"
   // TODO: we shouldn't expose our BigNumber library publicly
-  bi_5:              new BigNumber(5),
-  bi_7:              new BigNumber(7),
-  bi_10:             new BigNumber(10),
-  bi_1e14:           new BigNumber(1e14),
-  bi_1e16:           new BigNumber(1e16),
-  bi_1e17:           new BigNumber(1e17),
-  bi_1e32:           new BigNumber(1e32),
-  bi_man_max_value:  new BigNumber('9999999999999999'),
-  bi_man_min_value:  new BigNumber(1e15),
-  bi_xns_max:        new BigNumber(1e17),
-  bi_xns_min:        new BigNumber(-1e17),
-  bi_xns_unit:       new BigNumber(1e6),
+  bi_5: new BigNumber(5),
+  bi_7: new BigNumber(7),
+  bi_10: new BigNumber(10),
+  bi_1e14: new BigNumber(1e14),
+  bi_1e16: new BigNumber(1e16),
+  bi_1e17: new BigNumber(1e17),
+  bi_1e32: new BigNumber(1e32),
+  bi_man_max_value: new BigNumber('9999999999999999'),
+  bi_man_min_value: new BigNumber(1e15),
+  bi_xns_max: new BigNumber(1e17),
+  bi_xns_min: new BigNumber(-1e17),
+  bi_xns_unit: new BigNumber(1e6),
 
-  cMinOffset:        -96,
-  cMaxOffset:        80,
+  cMinOffset: -96,
+  cMaxOffset: 80,
 
   // Maximum possible amount for non-XRP currencies using the maximum mantissa
   // with maximum exponent. Corresponds to hex 0xEC6386F26FC0FFFF.
-  max_value:         '9999999999999999e80',
+  max_value: '9999999999999999e80',
   // Minimum possible amount for non-XRP currencies.
-  min_value:         '-1000000000000000e-96'
+  min_value: '-1000000000000000e-96'
 };
 
 var MAX_XRP_VALUE = new BigNumber(1e11);
@@ -186,15 +190,19 @@ Amount.prototype.divide = function(divisor) {
  * @this {Amount} The numerator (top half) of the fraction.
  * @param {Amount} denominator The denominator (bottom half) of the fraction.
  * @param opts Options for the calculation.
- * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
- *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
+ * @param opts.reference_date {Date|Number} Date based on which
+ * demurrage/interest should be applied. Can be given as JavaScript Date or int
+ * for Ripple epoch.
  * @return {Amount} The resulting ratio. Unit will be the same as numerator.
  */
 
 Amount.prototype.ratio_human = function(denominator, opts) {
   opts = extend({ }, opts);
 
+  /*eslint-disable consistent-this */
   var numerator = this;
+  /*eslint-enable consistent-this */
+
   denominator = Amount.from_json(denominator);
 
   // If either operand is NaN, the result is NaN.
@@ -245,11 +253,11 @@ Amount.prototype.ratio_human = function(denominator, opts) {
  *
  * @see Amount#ratio_human
  *
- * @this {Amount} The first factor of the product.
  * @param {Amount} factor The second factor of the product.
- * @param opts Options for the calculation.
- * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
- *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
+ * @param {Object} opts Options for the calculation.
+ * @param {Date|Number} opts.reference_date Date based on which
+ * demurrage/interest should be applied. Can be given as JavaScript Date or int
+ * for Ripple epoch.
  * @return {Amount} The product. Unit will be the same as the first factor.
  */
 Amount.prototype.product_human = function(factor, opts) {
@@ -286,6 +294,7 @@ Amount.prototype.product_human = function(factor, opts) {
 /**
  * Turn this amount into its inverse.
  *
+ * @return {Amount} self
  * @private
  */
 Amount.prototype._invert = function() {
@@ -307,7 +316,8 @@ Amount.prototype.invert = function() {
  * Canonicalize amount value
  *
  * Mirrors rippled's internal Amount representation
- * From https://github.com/ripple/rippled/blob/develop/src/ripple/data/protocol/STAmount.h#L31-L40
+ * From https://github.com/ripple/rippled/blob/develop/src/ripple/data
+ * /protocol/STAmount.h#L31-L40
  *
  * Internal form:
  * 1: If amount is zero, then value is zero and offset is -100
@@ -328,18 +338,17 @@ Amount.prototype.invert = function() {
  * - maximum: (10^16)-1 x 10^80 -> 9999999999999999e80
  *
  * @returns {Amount}
- * @throws {Error} if offset exceeds legal ranges, meaning the amount value is bigger than supported
+ * @throws {Error} if offset exceeds legal ranges, meaning the amount value is
+ * bigger than supported
  */
 
 Amount.prototype.canonicalize = function(roundingMode) {
   if (this._is_native) {
     this._value = this._value.round(6, BigNumber.ROUND_DOWN);
+  } else if (roundingMode) {
+    this._value = new BigNumber(this._value.toPrecision(16, roundingMode));
   } else {
-    if (roundingMode) {
-      this._value = new BigNumber(this._value.toPrecision(16, roundingMode));
-    } else {
-      this._value = new BigNumber(this._value.toPrecision(16));
-    }
+    this._value = new BigNumber(this._value.toPrecision(16));
   }
 };
 
@@ -387,10 +396,10 @@ Amount.prototype.compareTo = function(to) {
 // Make d a copy of this. Returns d.
 // Modification of objects internally refered to is not allowed.
 Amount.prototype.copyTo = function(d, negate) {
-  d._value     = negate ? this._value.negated() : this._value;
+  d._value = negate ? this._value.negated() : this._value;
   d._is_native = this._is_native;
-  d._currency  = this._currency;
-  d._issuer    = this._issuer;
+  d._currency = this._currency;
+  d._issuer = this._issuer;
   return d;
 };
 
@@ -433,7 +442,9 @@ Amount.prototype.is_valid = function() {
 };
 
 Amount.prototype.is_valid_full = function() {
-  return this.is_valid() && this._currency.is_valid() && this._issuer.is_valid();
+  return this.is_valid()
+  && this._currency.is_valid()
+  && this._issuer.is_valid();
 };
 
 Amount.prototype.is_zero = function() {
@@ -460,11 +471,15 @@ Amount.prototype.negate = function() {
  *   100         => 100000000/XRP
  *
  *
- * The regular expression below matches above cases, broken down for better understanding:
+ * The regular expression below matches above cases, broken down for better
+ * understanding:
  *
- * ([A-z]{3}|[0-9]{3})          // either 3 letter alphabetic currency-code or 3 digit numeric currency-code. See ISO 4217
- * $                            // end of string
+ * // either 3 letter alphabetic currency-code or 3 digit numeric currency-code.
+ * // See ISO 4217
+ * ([A-z]{3}|[0-9]{3})
  *
+ * // end of string
+ * $
  */
 
 Amount.prototype.parse_human = function(j, opts) {
@@ -476,7 +491,9 @@ Amount.prototype.parse_human = function(j, opts) {
   var value;
   var currency;
 
-  var words = j.split(' ').filter(function(word) { return word !== ''; });
+  var words = j.split(' ').filter(function(word) {
+    return word !== '';
+  });
 
   function isNumber(s) {
     return isFinite(s) && s !== '' && s !== null;
@@ -525,7 +542,7 @@ Amount.prototype.parse_human = function(j, opts) {
 };
 
 Amount.prototype.parse_issuer = function(issuer) {
-  this._issuer  = UInt160.from_json(issuer);
+  this._issuer = UInt160.from_json(issuer);
   return this;
 };
 
@@ -542,41 +559,43 @@ Amount.prototype.parse_issuer = function(issuer) {
  * Prices involving demurraging currencies are tricky, since they depend on the
  * base and counter currencies.
  *
- * @param quality {String} 8 hex bytes quality or 32 hex bytes BookDirectory
+ * @param {String} quality 8 hex bytes quality or 32 hex bytes BookDirectory
  *   index.
- * @param counterCurrency {Currency|String} Currency of the resulting Amount
+ * @param {Currency|String} counterCurrency currency of the resulting Amount
  *   object.
- * @param counterIssuer {Issuer|String} Issuer of the resulting Amount object.
- * @param opts Additional options
- * @param opts.inverse {Boolean} If true, return the inverse of the price
+ * @param {Issuer|String} counterIssuer Issuer of the resulting Amount object.
+ * @param {Object} opts Additional options
+ * @param {Boolean} opts.inverse If true, return the inverse of the price
  *   encoded in the quality.
- * @param opts.base_currency {Currency|String} The other currency. This plays a
+ * @param {Currency|String} opts.base_currency The other currency. This plays a
  *   role with interest-bearing or demurrage currencies. In that case the
  *   demurrage has to be applied when the quality is decoded, otherwise the
  *   price will be false.
- * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
- *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
- * @param opts.xrp_as_drops {Boolean} Whether XRP amount should be treated as
+ * @param {Date|Number} opts.reference_date Date based on which
+ * demurrage/interest should be applied. Can be given as JavaScript Date or int
+ * for Ripple epoch.
+ * @param {Boolean} opts.xrp_as_drops Whether XRP amount should be treated as
  *   drops. When the base currency is XRP, the quality is calculated in drops.
  *   For human use however, we want to think of 1000000 drops as 1 XRP and
  *   prices as per-XRP instead of per-drop.
+ * @return {Amount} self
  */
-Amount.prototype.parse_quality = function(quality, counterCurrency, counterIssuer, opts)
-{
+Amount.prototype.parse_quality =
+function(quality, counterCurrency, counterIssuer, opts) {
   opts = opts || {};
 
   var baseCurrency = Currency.from_json(opts.base_currency);
 
-  var mantissa_hex  = quality.substring(quality.length-14);
-  var offset_hex    = quality.substring(quality.length-16, quality.length-14);
-  var mantissa      = new BigNumber(mantissa_hex, 16);
-  var offset        = parseInt(offset_hex, 16) - 100;
+  var mantissa_hex = quality.substring(quality.length - 14);
+  var offset_hex = quality.substring(quality.length - 16, quality.length - 14);
+  var mantissa = new BigNumber(mantissa_hex, 16);
+  var offset = parseInt(offset_hex, 16) - 100;
 
   var value = new BigNumber(mantissa.toString() + 'e' + offset.toString());
 
-  this._currency    = Currency.from_json(counterCurrency);
-  this._issuer      = UInt160.from_json(counterIssuer);
-  this._is_native   = this._currency.is_native();
+  this._currency = Currency.from_json(counterCurrency);
+  this._issuer = UInt160.from_json(counterIssuer);
+  this._is_native = this._currency.is_native();
 
   if (this._is_native && baseCurrency.is_native()) {
     throw new Error('XRP/XRP quality is not allowed');
@@ -617,7 +636,8 @@ Amount.prototype.parse_quality = function(quality, counterCurrency, counterIssue
 
   this._set_value(nativeAdjusted);
 
-  if (opts.reference_date && baseCurrency.is_valid() && baseCurrency.has_interest()) {
+  if (opts.reference_date && baseCurrency.is_valid()
+    && baseCurrency.has_interest()) {
     var interest = baseCurrency.get_interest_at(opts.reference_date);
     this._set_value(this._value.dividedBy(interest.toString()));
   }
@@ -626,9 +646,9 @@ Amount.prototype.parse_quality = function(quality, counterCurrency, counterIssue
 };
 
 Amount.prototype.parse_number = function(n) {
-  this._is_native   = false;
-  this._currency    = Currency.from_json(1);
-  this._issuer      = UInt160.from_json(1);
+  this._is_native = false;
+  this._currency = Currency.from_json(1);
+  this._issuer = UInt160.from_json(1);
   this._set_value(new BigNumber(n));
   return this;
 };
@@ -637,21 +657,22 @@ Amount.prototype.parse_number = function(n) {
 Amount.prototype.parse_json = function(j) {
   switch (typeof j) {
     case 'string':
-      // .../.../... notation is not a wire format.  But allowed for easier testing.
+      // .../.../... notation is not a wire format.  But allowed for easier
+      // testing.
       var m = j.match(/^([^/]+)\/([^/]+)(?:\/(.+))?$/);
 
       if (m) {
-        this._currency  = Currency.from_json(m[2]);
+        this._currency = Currency.from_json(m[2]);
         if (m[3]) {
-          this._issuer  = UInt160.from_json(m[3]);
+          this._issuer = UInt160.from_json(m[3]);
         } else {
-          this._issuer  = UInt160.from_json('1');
+          this._issuer = UInt160.from_json('1');
         }
         this.parse_value(m[1]);
       } else {
         this.parse_native(j);
-        this._currency  = Currency.from_json('0');
-        this._issuer    = UInt160.from_json('0');
+        this._currency = Currency.from_json('0');
+        this._issuer = UInt160.from_json('0');
       }
       break;
 
@@ -690,7 +711,7 @@ Amount.prototype.parse_json = function(j) {
 // - float = with precision 6
 // XXX Improvements: disallow leading zeros.
 Amount.prototype.parse_native = function(j) {
-  if (typeof j === 'string' && !isNaN(parseInt(j))) {
+  if (j && typeof j === 'string' && !isNaN(j)) {
     if (j.indexOf('.') >= 0) {
       throw new Error('Native amounts must be specified in integer drops')
     }
@@ -713,7 +734,7 @@ Amount.prototype.parse_value = function(j) {
 };
 
 Amount.prototype.set_currency = function(c) {
-  this._currency  = Currency.from_json(c);
+  this._currency = Currency.from_json(c);
   this._is_native = this._currency.is_native();
   return this;
 };
@@ -750,18 +771,18 @@ Amount.prototype.to_text = function() {
     // Use e notation.
     // XXX Clamp output.
     return sign + mantissa.toString() + 'e' + offset.toString();
-  } else {
-    var val    = '000000000000000000000000000' + mantissa.toString()
-               + '00000000000000000000000';
-    var pre    = val.substring(0, offset + 43);
-    var post   = val.substring(offset + 43);
-    var s_pre  = pre.match(/[1-9].*$/);  // Everything but leading zeros.
-    var s_post = post.match(/[1-9]0*$/); // Last non-zero plus trailing zeros.
-
-    return sign + (s_pre ? s_pre[0] : '0')
-      + (s_post ? '.' + post.substring(0, 1 + post.length - s_post[0].length) : '');
   }
 
+  var val = '000000000000000000000000000'
+  + mantissa.toString()
+  + '00000000000000000000000';
+  var pre = val.substring(0, offset + 43);
+  var post = val.substring(offset + 43);
+  var s_pre = pre.match(/[1-9].*$/);  // Everything but leading zeros.
+  var s_post = post.match(/[1-9]0*$/); // Last non-zero plus trailing zeros.
+
+  return sign + (s_pre ? s_pre[0] : '0')
+  + (s_post ? '.' + post.substring(0, 1 + post.length - s_post[0].length) : '');
 };
 
 /**
@@ -772,7 +793,7 @@ Amount.prototype.to_text = function() {
  * User should not store amount objects after the interest is applied. This is
  * intended by display functions such as toHuman().
  *
- * @param referenceDate {Date|Number} Date based on which demurrage/interest
+ * @param {Date|Number} referenceDate Date based on which demurrage/interest
  *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
  * @return {Amount} The amount with interest applied.
  */
@@ -790,21 +811,23 @@ Amount.prototype.applyInterest = function(referenceDate) {
  * @example
  *   var pretty = amount.to_human({precision: 2});
  *
- * @param opts Options for formatter.
- * @param opts.precision {Number} Max. number of digits after decimal point.
- * @param opts.min_precision {Number} Min. number of digits after dec. point.
- * @param opts.skip_empty_fraction {Boolean} Don't show fraction if it is zero,
+ * @param {Object} opts Options for formatter.
+ * @param {Number} opts.precision Max. number of digits after decimal point.
+ * @param {Number} opts.min_precision Min. number of digits after dec. point.
+ * @param {Boolean} opts.skip_empty_fraction Don't show fraction if it is zero,
  *   even if min_precision is set.
- * @param opts.max_sig_digits {Number} Maximum number of significant digits.
+ * @param {Number} opts.max_sig_digits Maximum number of significant digits.
  *   Will cut fractional part, but never integer part.
- * @param opts.group_sep {Boolean|String} Whether to show a separator every n
+ * @param {Boolean|String} opts.group_sep Whether to show a separator every n
  *   digits, if a string, that value will be used as the separator. Default: ','
- * @param opts.group_width {Number} How many numbers will be grouped together,
+ * @param {Number} opts.group_width How many numbers will be grouped together,
  *   default: 3.
- * @param opts.signed {Boolean|String} Whether negative numbers will have a
+ * @param {Boolean|String} opts.signed Whether negative numbers will have a
  *   prefix. If String, that string will be used as the prefix. Default: '-'
- * @param opts.reference_date {Date|Number} Date based on which demurrage/interest
- *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
+ * @param {Date|Number} opts.reference_date Date based on which
+ * demurrage/interest should be applied. Can be given as JavaScript Date or int
+ * for Ripple epoch.
+ * @return {String} amount string
  */
 Amount.prototype.to_human = function(opts) {
   opts = opts || {};
@@ -813,16 +836,19 @@ Amount.prototype.to_human = function(opts) {
     return 'NaN';
   }
 
+  /* eslint-disable consistent-this */
   // Apply demurrage/interest
   var ref = this;
+  /* eslint-enable consistent-this */
+
   if (opts.reference_date) {
     ref = this.applyInterest(opts.reference_date);
   }
 
-  var isNegative    = ref._value.isNegative();
-  var valueString   = ref._value.abs().toString();
-  var parts         = valueString.split('.');
-  var int_part      = parts[0];
+  var isNegative = ref._value.isNegative();
+  var valueString = ref._value.abs().toString();
+  var parts = valueString.split('.');
+  var int_part = parts[0];
   var fraction_part = parts.length === 2 ? parts[1] : '';
 
   int_part = int_part.replace(/^0*/, '');
@@ -856,7 +882,9 @@ Amount.prototype.to_human = function(opts) {
 
       // Don't count leading zeros in the fractional part if the integer part is
       // zero.
-      var sig_frac = int_is_zero ? fraction_part.replace(/^0*/, '') : fraction_part;
+      var sig_frac = int_is_zero
+      ? fraction_part.replace(/^0*/, '')
+      : fraction_part;
       digits += sig_frac.length;
 
       // Now we calculate where we are compared to the maximum
@@ -891,7 +919,7 @@ Amount.prototype.to_human = function(opts) {
   }
 
   var formatted = '';
-  if(isNegative && opts.signed !== false) {
+  if (isNegative && opts.signed !== false) {
     formatted += '-';
   }
 
@@ -913,17 +941,19 @@ Amount.prototype.to_human_full = function(opts) {
 Amount.prototype.to_json = function() {
   if (this._is_native) {
     return this.to_text();
-  } else {
-    var amount_json = {
-      value : this.to_text(),
-      currency : this._currency.has_interest() ?
-        this._currency.to_hex() : this._currency.to_json()
-    };
-    if (this._issuer.is_valid()) {
-      amount_json.issuer = this._issuer.to_json();
-    }
-    return amount_json;
   }
+
+  var amount_json = {
+    value: this.to_text(),
+    currency: this._currency.has_interest() ?
+    this._currency.to_hex() : this._currency.to_json()
+  };
+
+  if (this._issuer.is_valid()) {
+    amount_json.issuer = this._issuer.to_json();
+  }
+
+  return amount_json;
 };
 
 Amount.prototype.to_text_full = function(opts) {
@@ -963,16 +993,19 @@ Amount.prototype.not_equals_why = function(d, ignore_issuer) {
       return 'Non-XRP currency differs.';
     }
     if (!ignore_issuer && !this._issuer.equals(d._issuer)) {
-      return 'Non-XRP issuer differs: ' + d._issuer.to_json() + '/' + this._issuer.to_json();
+      return 'Non-XRP issuer differs: '
+      + d._issuer.to_json()
+      + '/'
+      + this._issuer.to_json();
     }
   }
 };
 
-exports.Amount   = Amount;
+exports.Amount = Amount;
 
 // DEPRECATED: Include the corresponding files instead.
 exports.Currency = Currency;
-exports.Seed     = Seed;
-exports.UInt160  = UInt160;
+exports.Seed = Seed;
+exports.UInt160 = UInt160;
 
 // vim:sw=2:sts=2:ts=8:et
