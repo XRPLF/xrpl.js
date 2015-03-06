@@ -1,3 +1,5 @@
+/*eslint-disable */
+
 var assert   = require('assert');
 var currency = require('ripple-lib').Currency;
 var timeUtil = require('ripple-lib').utils.time;
@@ -53,6 +55,16 @@ describe('Currency', function() {
       var r = currency.from_json("1D2");
       assert(r.is_valid());
       assert.strictEqual('1D2', r.to_json());
+    });
+    it('from_json("1").to_human()', function() {
+      var r = currency.from_json('1');
+      assert(r.is_valid());
+      assert.strictEqual(1, r.to_json());
+    });
+    it('from_json("#$%").to_human()', function() {
+      var r = currency.from_json('#$%');
+      assert(r.is_valid());
+      assert.strictEqual('0000000000000000000000002324250000000000', r.to_json());
     });
     it('from_json("XAU").to_json() hex', function() {
       var r = currency.from_json("XAU");
