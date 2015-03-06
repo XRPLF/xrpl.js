@@ -713,7 +713,7 @@ Amount.prototype.parse_json = function(j) {
 Amount.prototype.parse_native = function(j) {
   if (j && typeof j === 'string' && !isNaN(j)) {
     if (j.indexOf('.') >= 0) {
-      throw new Error('Native amounts must be specified in integer drops')
+      throw new Error('Native amounts must be specified in integer drops');
     }
     var value = new BigNumber(j);
     this._is_native = true;

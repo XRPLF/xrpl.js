@@ -1,3 +1,15 @@
+'use strict';
+
+/* eslint-disable max-len*/
+/* eslint-disable key-spacing*/
+/* eslint-disable no-spaced-func*/
+/* eslint-disable space-before-blocks*/
+/* eslint-disable space-unary-ops*/
+/* eslint-disable no-void*/
+/* eslint-disable semi*/
+/* eslint-disable no-unused-vars*/
+/* eslint-disable quotes*/
+
 var assert = require('assert');
 var SerializedObject = require('ripple-lib').SerializedObject;
 var Amount = require('ripple-lib').Amount;
@@ -160,7 +172,6 @@ describe('Serialized object', function() {
     });
 
     describe('Memos', function() {
-
       var input_json;
 
       beforeEach(function()  {
@@ -273,7 +284,7 @@ describe('Serialized object', function() {
 
 
       it('should serialize json with memo - match hex output', function() {
-        var input_json = {
+        input_json = {
           Flags: 2147483648,
           TransactionType: 'Payment',
           Account: 'rhXzSyt1q9J8uiFXpK3qSugAAPJKXLtnrF',
