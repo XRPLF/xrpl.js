@@ -8,10 +8,11 @@
 
 var assert    = require('assert');
 var extend    = require('extend');
+var GlobalBigNumber = require('bignumber.js');
 var binformat = require('./binformat');
 var utils     = require('./utils');
+var Amount = require('./amount');
 var sjcl      = utils.sjcl;
-var GlobalBigNumber = require('bignumber.js');
 
 var UInt128   = require('./uint128').UInt128;
 var UInt160   = require('./uint160').UInt160;
@@ -288,6 +289,7 @@ var STCurrency = new SerializedType({
 var STAmount = exports.Amount = new SerializedType({
   serialize: function (so, val) {
     var amount = Amount.from_json(val);
+
     if (!amount.is_valid()) {
       throw new Error('Not a valid Amount object.');
     }
@@ -301,12 +303,12 @@ var STAmount = exports.Amount = new SerializedType({
     if (amount.is_native()) {
       var valueHex = value.abs().toString(16);
 
-      if (value.abs().greaterThan(Amount.bi_xns_max)) {
+      if (Amount.strict_mode && value.abs().greaterThan(Amount.bi_xns_max)) {
         throw new Error('Value out of bounds');
       }
 
       // Enforce correct length (64 bits)
-      if (valueHex.length > 16) {
+      if (Amount.strict_mode && valueHex.length > 16) {
         throw new Error('Value out of bounds');
       }
 

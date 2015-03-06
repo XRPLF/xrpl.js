@@ -1,6 +1,7 @@
-var assert           = require('assert');
+var assert = require('assert');
 var SerializedObject = require('ripple-lib').SerializedObject;
-var sjcl             = require('ripple-lib').sjcl;
+var Amount = require('ripple-lib').Amount;
+var sjcl = require('ripple-lib').sjcl;
 
 // Shortcuts
 var hex = sjcl.codec.hex;
@@ -51,6 +52,56 @@ describe('Serialized object', function() {
       };
       var output_json = SerializedObject.from_json(input_json).to_json();
       assert.deepEqual(input_json, output_json);
+    });
+  });
+
+  describe('#from_json(v).to_json() == v -- invalid amount', function(){
+    it('outputs same as passed to from_json', function() {
+      var input_json = {
+        Account: 'rUR9gTCcrUY9fMkz9rwcM9urPREh3LKXoW',
+        Fee: '10',
+        Flags: 0,
+        Sequence: 65,
+        SigningPubKey: '033D0B1FB932E0408C119107483190B61561DCE8529E29CB5D1C69128DA54DA715',
+        TakerGets: '2188313981504612096',
+        TakerPays: {
+          currency: 'USD',
+          issuer: 'r9rp9MUFRJVCVLRm3MTmUvSPNBSL3BuEFx',
+          value: '99999999999'
+        },
+        TransactionType: 'OfferCreate',
+        TxnSignature: '304602210085C6AE945643150E6D450CF796E45D74FB24B4E03E964A29CC6AFFEB346C77C80221009BE1B6678CF6C2E61F8F2696144C75AFAF66DF4FC0733DF9118EDEFEEFE33243'
+      };
+
+      assert.throws(function() {
+        SerializedObject.from_json(input_json).to_json();
+      });
+    });
+  });
+
+  describe('#from_json(v).to_json() == v -- invalid amount, strict_mode = false', function(){
+    it('outputs same as passed to from_json', function() {
+      var input_json = {
+        Account: 'rUR9gTCcrUY9fMkz9rwcM9urPREh3LKXoW',
+        Fee: '10',
+        Flags: 0,
+        Sequence: 65,
+        SigningPubKey: '033D0B1FB932E0408C119107483190B61561DCE8529E29CB5D1C69128DA54DA715',
+        TakerGets: '2188313981504612096',
+        TakerPays: {
+          currency: 'USD',
+          issuer: 'r9rp9MUFRJVCVLRm3MTmUvSPNBSL3BuEFx',
+          value: '99999999999'
+        },
+        TransactionType: 'OfferCreate',
+        TxnSignature: 'FFFFFF210085C6AE945643150E6D450CF796E45D74FB24B4E03E964A29CC6AFFEB346C77C80221009BE1B6678CF6C2E61F8F2696144C75AFAF66DF4FC0733DF9118EDEFEEFE33243'
+      };
+
+      var strictMode = Amount.strict_mode;
+      Amount.strict_mode = false;
+      var output_json = SerializedObject.from_json(input_json).to_json();
+      assert.deepEqual(input_json, output_json);
+      Amount.strict_mode = strictMode;
     });
   });
 

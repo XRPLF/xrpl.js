@@ -30,6 +30,12 @@ function Amount() {
   this._issuer      = new UInt160();
 }
 
+/**
+ * Set strict_mode = false to disable amount range checking
+ */
+
+Amount.strict_mode = true;
+
 var consts = {
   currency_xns:      0,
   currency_one:      1,
@@ -338,6 +344,9 @@ Amount.prototype.canonicalize = function(roundingMode) {
 };
 
 Amount.prototype._check_limits = function() {
+  if (!Amount.strict_mode) {
+    return this;
+  }
   if (this._value.isNaN() || this._value.isZero()) {
     return this;
   }
