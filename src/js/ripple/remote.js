@@ -1119,7 +1119,7 @@ Remote.prototype.requestTransactionEntry = function(hash, ledgerHash, callback) 
     ledgerHash = hash.ledger || hash.ledger_hash || hash.ledger_index;
     hash = hash.hash || hash.tx || hash.transaction;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1162,7 +1162,7 @@ Remote.prototype.requestTx = function(hash, callback) {
 
   if (typeof hash === 'string') {
     options = { hash: hash };
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   } else {
     options = hash;
@@ -1219,7 +1219,7 @@ Remote.accountRequest = function(type, options, callback) {
     limit = options.limit;
     marker = options.marker;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1548,7 +1548,7 @@ Remote.prototype.requestTxHistory = function(start, callback) {
   if (typeof start === 'object') {
     start = start.start;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1588,7 +1588,7 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
     ledger = options.ledger;
     limit = options.limit;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1654,7 +1654,7 @@ Remote.prototype.requestWalletAccounts = function(seed, callback) {
   if (typeof seed === 'object') {
     seed = seed.seed;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1682,7 +1682,7 @@ Remote.prototype.requestSign = function(secret, tx_json, callback) {
     tx_json = secret.tx_json;
     secret = secret.secret;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1805,7 +1805,7 @@ Remote.accountRootRequest = function(type, responseFilter, account, ledger, call
     ledger = account.ledger;
     account = account.account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1957,7 +1957,7 @@ Remote.prototype.createPathFind = function(src_account, dst_account, dst_amount,
     dst_account = options.dst_account;
     src_account = options.src_account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1998,7 +1998,7 @@ Remote.prototype.createOrderBook = function(currency_gets, issuer_gets, currency
     issuer_gets = options.issuer_gets;
     currency_gets = options.currency_gets;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -2081,7 +2081,7 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
     ledger = options.ledger;
     account = options.account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -2190,7 +2190,7 @@ Remote.prototype.requestRippleBalance = function(account, issuer, currency, ledg
     issuer = options.issuer;
     account = options.account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -2279,7 +2279,7 @@ Remote.prototype.requestRipplePathFind = function(src_account, dst_account, dst_
     dst_account = options.dst_account;
     src_account = options.src_account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -2316,7 +2316,7 @@ Remote.prototype.requestPathFindCreate = function(src_account, dst_account, dst_
     dst_account = options.dst_account;
     src_account = options.src_account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 

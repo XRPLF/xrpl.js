@@ -11,7 +11,7 @@ function Log(namespace) {
   }
 
   this._prefix = this._namespace.concat(['']).join(': ');
-};
+}
 
 /**
  * Create a sub-logger.
@@ -43,9 +43,9 @@ Log.prototype._setParent = function(parentLogger) {
 
 Log.makeLevel = function(level) {
   return function() {
-    var args = Array.prototype.slice.call(arguments);
+    var args = Array.prototype.slice.apply(arguments);
     args[0] = this._prefix + args[0];
-    Log.engine.logObject.apply(Log, args);
+    Log.engine.logObject.apply(Log, [level].concat(args[0], [args.slice(2)]));
   };
 };
 
@@ -55,26 +55,77 @@ Log.prototype.warn  = Log.makeLevel(3);
 Log.prototype.error = Log.makeLevel(4);
 
 /**
+ * @param {String} message
+ * @param {Array} details
+ * @return {Array} prepared log info
+ */
+
+function getLogInfo(message, args) {
+  return [
+    // Timestamp
+    '[' + new Date().toISOString() + ']',
+    message,
+    '--',
+    // Location
+    (new Error()).stack.split('\n')[4].replace(/^\s+/, ''),
+    '\n'
+  ].concat(args);
+}
+
+/**
+ * @param {Number} log level
+ * @param {Array} log info
+ */
+
+function logMessage(logLevel, args) {
+  switch (logLevel) {
+    case 1:
+    case 2:
+      console.log.apply(console, args);
+      break;
+    case 3:
+      console.warn.apply(console, args);
+      break;
+    case 4:
+      console.error.apply(console, args);
+      break;
+  }
+}
+
+/**
  * Basic logging connector.
  *
  * This engine has no formatting and works with the most basic of 'console.log'
  * implementations. This is the logging engine used in Node.js.
  */
 var BasicLogEngine = {
-  logObject: function logObject(msg) {
-    var args = Array.prototype.slice.call(arguments, 1);
-
+  logObject: function logObject(level, message, args) {
     args = args.map(function(arg) {
       return JSON.stringify(arg, null, 2);
     });
 
-    args.unshift(msg);
-    args.unshift('[' + new Date().toISOString() + ']');
-
-    console.log.apply(console, args);
+    logMessage(level, getLogInfo(message, args));
   }
 };
 
+/**
+ * Log engine for browser consoles.
+ *
+ * Browsers tend to have better consoles that support nicely formatted
+ * JavaScript objects. This connector passes objects through to the logging
+ * function without any stringification.
+ */
+var InteractiveLogEngine = {
+  logObject: function(level, message, args) {
+    args = args.map(function(arg) {
+      return /MSIE/.test(navigator.userAgent)
+      ? JSON.stringify(arg, null, 2)
+      : arg;
+    });
+
+    logMessage(level, getLogInfo(message, args));
+  }
+};
 /**
  * Null logging connector.
  *
@@ -85,10 +136,12 @@ var NullLogEngine = {
   logObject: function() {}
 };
 
-Log.engine = NullLogEngine;
-
-if (console && console.log) {
+if (typeof window !== 'undefined' && typeof console !== 'undefined') {
+  Log.engine = InteractiveLogEngine;
+} else if (typeof console !== 'undefined' && console.log) {
   Log.engine = BasicLogEngine;
+} else {
+  Log.engine = NullLogEngine;
 }
 
 /**
