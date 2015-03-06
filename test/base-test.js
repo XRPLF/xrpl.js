@@ -1,11 +1,20 @@
 'use strict';
 var assert = require('assert');
 var Base = require('ripple-lib').Base;
+var fixtures = require('./fixtures/base58.json');
 
 function digitArray(str) {
   return str.split('').map(function(d) {
     return parseInt(d, 10);
   });
+}
+
+function hexToByteArray(hex) {
+  var byteArray = [];
+  for (var i = 0; i < hex.length / 2; i++) {
+    byteArray.push(parseInt(hex.slice(2 * i, 2 * i + 2), 16));
+  }
+  return byteArray;
 }
 
 describe('Base', function() {
@@ -34,6 +43,24 @@ describe('Base', function() {
       var decoded = Base.decode('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       var encoded = Base.encode(decoded);
       assert.strictEqual(encoded, 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+    });
+  });
+  describe('encode', function() {
+    it('fixtures', function() {
+      for (var i = 0; i < fixtures.ripple.length; i++) {
+        var testCase = fixtures.ripple[i];
+        var encoded = Base.encode(hexToByteArray(testCase.hex));
+        assert.strictEqual(encoded, testCase.string);
+      }
+    });
+  });
+  describe('decode', function() {
+    it('fixtures', function() {
+      for (var i = 0; i < fixtures.ripple.length; i++) {
+        var testCase = fixtures.ripple[i];
+        var decoded = Base.decode(testCase.string);
+        assert.deepEqual(decoded, hexToByteArray(testCase.hex));
+      }
     });
   });
 });

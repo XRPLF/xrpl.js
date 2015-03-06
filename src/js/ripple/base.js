@@ -31,7 +31,7 @@ function sha256(bytes) {
 
 function encodeString(alphabet, input) {
   if (input.length === 0) {
-    return [];
+    return '';
   }
 
   var leadingZeros = _.takeWhile(input, function(d) {
@@ -65,10 +65,7 @@ function decodeString(indexes, input) {
     return d === 0;
   });
   var out = convertBase(input58, 58, 256);
-  var prefix = leadingZeros.map(function() {
-    return 0;
-  });
-  return prefix.concat(out);
+  return leadingZeros.concat(out);
 }
 
 function Base58(alphabet) {
@@ -109,16 +106,7 @@ Base.decode = function(input, alpha) {
 Base.verify_checksum = function(bytes) {
   var computed = sha256(sha256(bytes.slice(0, -4))).slice(0, 4);
   var checksum = bytes.slice(-4);
-  var result = true;
-
-  for (var i = 0; i < 4; i++) {
-    if (computed[i] !== checksum[i]) {
-      result = false;
-      break;
-    }
-  }
-
-  return result;
+  return _.isEqual(computed, checksum);
 };
 
 // --> input: Array
@@ -145,16 +133,10 @@ Base.decode_check = function(version, input, alphabet) {
   }
 
   // Multiple allowed versions
-  if (Array.isArray(version)) {
-    var match = false;
-
-    for (var i = 0, l = version.length; i < l; i++) {
-      match |= version[i] === buffer[0];
-    }
-
-    if (!match) {
-      return NaN;
-    }
+  if (Array.isArray(version) && _.every(version, function(v) {
+          return v !== buffer[0];
+      })) {
+    return NaN;
   }
 
   if (!Base.verify_checksum(buffer)) {
