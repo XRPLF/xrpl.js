@@ -3,7 +3,8 @@ node_js:
   - "0.10"
 before_script:
   - npm install -g eslint
-  - eslint --reset -c ./eslintrc $(git --no-pager diff --name-only --relative FETCH_HEAD $(git merge-base FETCH_HEAD origin/HEAD) | grep "\.js$")
+  - curl 'https://raw.githubusercontent.com/ripple/javascript-style-guide/master/eslintrc' > ./eslintrc
+  - eslint --reset -c ./eslintrc $(git --no-pager diff --name-only --diff-filter=AM --relative FETCH_HEAD $(git merge-base FETCH_HEAD origin/HEAD) | grep "\.js$")
 script: MOCHA_REPORTER=tap npm test --coverage
 after_success:
 - npm run coveralls
