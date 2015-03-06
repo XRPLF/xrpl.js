@@ -5,6 +5,7 @@
 /* eslint-disable no-spaced-func*/
 /* eslint-disable space-before-blocks*/
 /* eslint-disable space-unary-ops*/
+/* eslint-disable no-multi-spaces*/
 /* eslint-disable no-void*/
 /* eslint-disable semi*/
 /* eslint-disable no-unused-vars*/

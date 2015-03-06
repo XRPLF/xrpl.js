@@ -1,7 +1,5 @@
  'use strict';
 
- /*eslint-disable new-cap*/
-
 // Represent Ripple amounts and currencies.
 // - Numbers in hex are big-endian.
 
@@ -137,7 +135,7 @@ Amount.prototype.add = function(addend) {
   var addendAmount = Amount.from_json(addend);
 
   if (!this.is_comparable(addendAmount)) {
-    return Amount.NaN();
+    return new Amount(NaN);
   }
 
   return this._copy(this._value.plus(addendAmount._value));
@@ -207,11 +205,11 @@ Amount.prototype.ratio_human = function(denominator, opts) {
 
   // If either operand is NaN, the result is NaN.
   if (!numerator.is_valid() || !denominator.is_valid()) {
-    return Amount.NaN();
+    return new Amount(NaN);
   }
 
   if (denominator.is_zero()) {
-    return Amount.NaN();
+    return new Amount(NaN);
   }
 
   // Apply interest/demurrage
@@ -267,7 +265,7 @@ Amount.prototype.product_human = function(factor, opts) {
 
   // If either operand is NaN, the result is NaN.
   if (!this.is_valid() || !factor.is_valid()) {
-    return Amount.NaN();
+    return new Amount(NaN);
   }
 
   // Apply interest/demurrage
@@ -388,7 +386,7 @@ Amount.prototype._copy = function(value) {
 Amount.prototype.compareTo = function(to) {
   var toAmount = Amount.from_json(to);
   if (!this.is_comparable(toAmount)) {
-    return Amount.NaN();
+    return new Amount(NaN);
   }
   return this._value.comparedTo(toAmount._value);
 };
@@ -507,7 +505,7 @@ Amount.prototype.parse_human = function(j, opts) {
       value = words[0].slice(0, -3);
       currency = words[0].slice(-3);
       if (!(isNumber(value) && currency.match(currency_RE))) {
-        return Amount.NaN();
+        return new Amount(NaN);
       }
     }
   } else if (words.length === 2) {
@@ -521,10 +519,10 @@ Amount.prototype.parse_human = function(j, opts) {
       value = words[0];
       currency = words[1];
     } else {
-      return Amount.NaN();
+      return new Amount(NaN);
     }
   } else {
-    return Amount.NaN();
+    return new Amount(NaN);
   }
 
   currency = currency.toUpperCase();

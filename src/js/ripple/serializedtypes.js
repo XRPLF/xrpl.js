@@ -242,6 +242,37 @@ function serialize(so, field_name, value) {
 
 exports.serialize = exports.serialize_whatever = serialize;
 
+// Take the serialized object, figure out what type/field it is, and return the
+// parsing of that.
+
+function parse(so) {
+  var tag_byte = so.read(1)[0];
+  var type_bits = tag_byte >> 4;
+
+  if (type_bits === 0) {
+    type_bits = so.read(1)[0];
+  }
+
+  var field_bits = tag_byte & 0x0f;
+  var field_name = (field_bits === 0)
+    ? field_name = binformat.fields[type_bits][so.read(1)[0]]
+    : field_name = binformat.fields[type_bits][field_bits];
+
+  assert(field_name, 'Unknown field - header byte is 0x'
+    + tag_byte.toString(16));
+
+  // Get the parser class (ST...) for a field based on the type bits.
+  var type = (field_name === 'Memo')
+    ? exports.STMemo
+    : exports[binformat.types[type_bits]];
+
+  assert(type, 'Unknown type - header byte is 0x' + tag_byte.toString(16));
+
+  return [field_name, type.parse(so)]; // key, value
+}
+
+exports.parse = exports.parse_whatever = parse;
+
 var STInt16 = exports.Int16 = new SerializedType({
   serialize: function (so, val) {
     so.append(convertIntegerToByteArray(val, 2));
@@ -764,37 +795,6 @@ exports.STMemo = new SerializedType({
   }
 
 });
-
-// Take the serialized object, figure out what type/field it is, and return the
-// parsing of that.
-
-function parse(so) {
-  var tag_byte = so.read(1)[0];
-  var type_bits = tag_byte >> 4;
-
-  if (type_bits === 0) {
-    type_bits = so.read(1)[0];
-  }
-
-  var field_bits = tag_byte & 0x0f;
-  var field_name = (field_bits === 0)
-    ? field_name = binformat.fields[type_bits][so.read(1)[0]]
-    : field_name = binformat.fields[type_bits][field_bits];
-
-  assert(field_name, 'Unknown field - header byte is 0x'
-    + tag_byte.toString(16));
-
-  // Get the parser class (ST...) for a field based on the type bits.
-  var type = (field_name === 'Memo')
-    ? exports.STMemo
-    : exports[binformat.types[type_bits]];
-
-  assert(type, 'Unknown type - header byte is 0x' + tag_byte.toString(16));
-
-  return [field_name, type.parse(so)]; // key, value
-}
-
-exports.parse = exports.parse_whatever = parse;
 
 var STObject = exports.Object = new SerializedType({
   serialize: function (so, val, no_marker) {
