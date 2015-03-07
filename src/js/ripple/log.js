@@ -1,5 +1,10 @@
+'use strict';
+
 /**
  * Logging functionality for ripple-lib and any applications built on it.
+ *
+ * @param {String} namespace logging prefix
+ * @return {Void} this function does not return...
  */
 function Log(namespace) {
   if (!namespace) {
@@ -7,7 +12,7 @@ function Log(namespace) {
   } else if (Array.isArray(namespace)) {
     this._namespace = namespace;
   } else {
-    this._namespace = [''+namespace];
+    this._namespace = [String(namespace)];
   }
 
   this._prefix = this._namespace.concat(['']).join(': ');
@@ -24,6 +29,9 @@ function Log(namespace) {
  *
  *   log.info('connection successful');
  *   // prints: 'server: connection successful'
+ *
+ * @param {String} namespace logging prefix
+ * @return {Log} sub logger
  */
 Log.prototype.sub = function(namespace) {
   var subNamespace = this._namespace.slice();
@@ -50,8 +58,8 @@ Log.makeLevel = function(level) {
 };
 
 Log.prototype.debug = Log.makeLevel(1);
-Log.prototype.info  = Log.makeLevel(2);
-Log.prototype.warn  = Log.makeLevel(3);
+Log.prototype.info = Log.makeLevel(2);
+Log.prototype.warn = Log.makeLevel(3);
 Log.prototype.error = Log.makeLevel(4);
 
 /**
