@@ -1,3 +1,5 @@
+ 'use strict';
+
 // Interface to manage connections to rippled servers
 //
 // - We never send binary data.
@@ -19,7 +21,6 @@ var async = require('async');
 var lodash = require('lodash');
 var Server = require('./server').Server;
 var Request = require('./request').Request;
-var Server = require('./server').Server;
 var Amount = require('./amount').Amount;
 var Currency = require('./currency').Currency;
 var UInt160 = require('./uint160').UInt160;
@@ -47,31 +48,31 @@ function Remote(opts) {
   EventEmitter.call(this);
 
   var self = this;
-  var opts = opts || { };
+  opts = opts || { };
 
-  Object.keys(Remote.DEFAULTS).forEach(function(config) {
-    if (opts.hasOwnProperty(config)) {
-      this[config] = opts[config];
+  Object.keys(Remote.DEFAULTS).forEach(function(option) {
+    if (opts.hasOwnProperty(option)) {
+      this[option] = opts[option];
     } else {
-      this[config] = Remote.DEFAULTS[config];
+      this[option] = Remote.DEFAULTS[option];
     }
   }, this);
 
   this.state = 'offline'; // 'online', 'offline'
   this._server_fatal = false; // server exited
-  this._stand_alone = void(0);
-  this._testnet = void(0);
+  this._stand_alone = undefined;
+  this._testnet = undefined;
 
-  this._ledger_current_index = void(0);
-  this._ledger_hash = void(0);
-  this._ledger_time = void(0);
+  this._ledger_current_index = undefined;
+  this._ledger_hash = undefined;
+  this._ledger_time = undefined;
 
   this._connection_count = 0;
   this._connected = false;
   this._should_connect = true;
 
   this._transaction_listeners = 0;
-  this._received_tx = new LRU({ max: 100 });
+  this._received_tx = new LRU({max: 100});
   this._cur_path_find = null;
 
   if (this.local_signing) {
@@ -81,7 +82,7 @@ function Remote(opts) {
   }
 
   this._servers = [ ];
-  this._primary_server = void(0);
+  this._primary_server = undefined;
 
   // Cache information for accounts.
   // DEPRECATED, will be removed
@@ -174,7 +175,7 @@ function Remote(opts) {
           break;
       }
     }
-  };
+  }
 
   this.on('newListener', function(event) {
     listenersModified('add', event);
@@ -183,7 +184,7 @@ function Remote(opts) {
   this.on('removeListener', function(event) {
     listenersModified('remove', event);
   });
-};
+}
 
 util.inherits(Remote, EventEmitter);
 
@@ -249,7 +250,7 @@ Remote.from_config = function(obj, trace) {
         remote.setSecret(accountInfo.account, accountInfo.secret);
       }
     }
-  };
+  }
 
   if (config.accounts) {
     Object.keys(config.accounts).forEach(initializeAccount);
@@ -361,7 +362,7 @@ Remote.prototype.setServerFatal = function() {
  */
 
 Remote.prototype.setTrace = function(trace) {
-  this.trace = (trace === void(0) || trace);
+  this.trace = (trace === undefined || trace);
   return this;
 };
 
@@ -390,7 +391,7 @@ Remote.prototype.addServer = function(opts) {
 
   function serverMessage(data) {
     self._handleMessage(data, server);
-  };
+  }
 
   server.on('message', serverMessage);
 
@@ -406,7 +407,7 @@ Remote.prototype.addServer = function(opts) {
     if (self._connection_count === self._servers.length) {
       self.emit('ready');
     }
-  };
+  }
 
   server.on('connect', serverConnect);
 
@@ -415,7 +416,7 @@ Remote.prototype.addServer = function(opts) {
     if (self._connection_count === 0) {
       self._setState('offline');
     }
-  };
+  }
 
   server.on('disconnect', serverDisconnect);
 
@@ -438,8 +439,6 @@ Remote.prototype.reconnect = function() {
   this._servers.forEach(function(server) {
     server.reconnect();
   });
-
-  return this;
 };
 
 /**
@@ -479,7 +478,9 @@ Remote.prototype.disconnect = function(callback) {
     throw new Error('No servers available, not disconnecting');
   }
 
-  var callback = (typeof callback === 'function') ? callback : function(){};
+  if (typeof callback !== 'function') {
+    callback = function() {};
+  }
 
   this._should_connect = false;
 
@@ -633,7 +634,8 @@ Remote.prototype._handleTransaction = function(message, server) {
     }, this);
   } else {
     // Transaction could be from proposed transaction stream
-    [ 'Account', 'Destination' ].forEach(function(prop) {
+    // XX
+    ['Account', 'Destination'].forEach(function(prop) {
       if (this._accounts[message.transaction[prop]]) {
         this._accounts[message.transaction[prop]].notify(message);
       }
@@ -936,9 +938,12 @@ Remote.prototype.requestLedgerCurrent = function(callback) {
  * Get the contents of a specified ledger
  *
  * @param {Object} options
- * @property {Boolean} [options.binary]       - Flag which determines if rippled returns binary or parsed JSON
- * @property {String|Number} [options.ledger] - Hash or sequence of a ledger to get contents for
- * @property {Number} [options.limit]         - Number of contents to retrieve from the ledger
+ * @property {Boolean} [options.binary]- Flag which determines if rippled
+ * returns binary or parsed JSON
+ * @property {String|Number} [options.ledger] - Hash or sequence of a ledger
+ * to get contents for
+ * @property {Number} [options.limit] - Number of contents to retrieve
+ * from the ledger
  * @property {Function} callback
  *
  * @callback
@@ -965,7 +970,7 @@ Remote.prototype.requestLedgerData = function(options, callback) {
       async.setImmediate(function() {
         next(null, Remote.parseBinaryLedgerData(ledgerData));
       });
-    };
+    }
 
     function complete(err, state) {
       if (err) {
@@ -974,7 +979,7 @@ Remote.prototype.requestLedgerData = function(options, callback) {
         res.state = state;
         request.emit('state', res);
       }
-    };
+    }
 
     async.mapSeries(res.state, iterator, complete);
   });
@@ -1028,7 +1033,7 @@ Remote.prototype.requestLedgerEntry = function(type, callback) {
           // Emulate fetch of ledger entry.
           // console.log('request_ledger_entry: emulating');
           // YYY Missing lots of fields.
-          request.emit('success', { node: node });
+          request.emit('success', {node: node});
           bDefault = false;
         } else { // Was not cached.
           // XXX Only allow with trusted mode.  Must sync response with advance
@@ -1073,7 +1078,7 @@ Remote.prototype.requestSubscribe = function(streams, callback) {
   var request = new Request(this, 'subscribe');
 
   if (streams) {
-    request.message.streams = Array.isArray(streams) ? streams : [ streams ];
+    request.message.streams = Array.isArray(streams) ? streams : [streams];
   }
 
   request.callback(callback);
@@ -1093,7 +1098,7 @@ Remote.prototype.requestUnsubscribe = function(streams, callback) {
   var request = new Request(this, 'unsubscribe');
 
   if (streams) {
-    request.message.streams = Array.isArray(streams) ? streams : [ streams ];
+    request.message.streams = Array.isArray(streams) ? streams : [streams];
   }
 
   request.callback(callback);
@@ -1110,7 +1115,8 @@ Remote.prototype.requestUnsubscribe = function(streams, callback) {
  * @return {Request} request
  */
 
-Remote.prototype.requestTransactionEntry = function(hash, ledgerHash, callback) {
+Remote.prototype.requestTransactionEntry =
+function(hash, ledgerHash, callback) {
   // If not trusted, need to check proof, maybe talk packet protocol.
   // utils.assert(this.trusted);
   var request = new Request(this, 'transaction_entry');
@@ -1119,7 +1125,7 @@ Remote.prototype.requestTransactionEntry = function(hash, ledgerHash, callback) 
     ledgerHash = hash.ledger || hash.ledger_hash || hash.ledger_index;
     hash = hash.hash || hash.tx || hash.transaction;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1151,7 +1157,8 @@ Remote.prototype.requestTransactionEntry = function(hash, ledgerHash, callback) 
  *
  * @param {Object|String} hash
  * @property {String} hash.hash           - Transaction hash
- * @property {Boolean} [hash.binary=true] - Flag which determines if rippled returns binary or parsed JSON
+ * @property {Boolean} [hash.binary=true] - Flag which determines if rippled
+ * returns binary or parsed JSON
  * @param [Function] callback
  * @return {Request} request
  */
@@ -1161,8 +1168,8 @@ Remote.prototype.requestTx = function(hash, callback) {
   var options;
 
   if (typeof hash === 'string') {
-    options = { hash: hash };
-    console.error('DEPRECATED: First argument to request constructor should be'
+    options = {hash: hash};
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   } else {
     options = hash;
@@ -1219,7 +1226,7 @@ Remote.accountRequest = function(type, options, callback) {
     limit = options.limit;
     marker = options.marker;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1387,15 +1394,15 @@ Remote.prototype.requestAccountTx = function(options, callback) {
 
   options.binary = options.binary !== false;
 
-  if (options.min_ledger !== void(0)) {
+  if (options.min_ledger !== undefined) {
     options.ledger_index_min = options.min_ledger;
   }
 
-  if (options.max_ledger !== void(0)) {
+  if (options.max_ledger !== undefined) {
     options.ledger_index_max = options.max_ledger;
   }
 
-  if (options.binary && options.parseBinary === void(0)) {
+  if (options.binary && options.parseBinary === undefined) {
     options.parseBinary = true;
   }
 
@@ -1428,7 +1435,7 @@ Remote.prototype.requestAccountTx = function(options, callback) {
       async.setImmediate(function() {
         next(null, Remote.parseBinaryAccountTransaction(transaction));
       });
-    };
+    }
 
     function complete(err, transactions) {
       if (err) {
@@ -1437,7 +1444,7 @@ Remote.prototype.requestAccountTx = function(options, callback) {
         res.transactions = transactions;
         request.emit('transactions', res);
       }
-    };
+    }
 
     async.mapSeries(res.transactions, iterator, complete);
   });
@@ -1494,15 +1501,18 @@ Remote.parseBinaryTransaction = function(transaction) {
   tx_result.meta = meta;
   tx_result.validated = transaction.validated;
 
-  if (typeof meta.DeliveredAmount === 'string' || typeof meta.DeliveredAmount === 'object') {
-    tx_result.meta.delivered_amount = meta.DeliveredAmount;
-  } else {
-    switch (typeof tx_obj.Amount) {
-      case 'string':
-      case 'object':
-        tx_result.meta.delivered_amount = tx_obj.Amount;
-        break;
-    }
+  switch (typeof meta.DeliveredAmount) {
+    case 'string':
+    case 'object':
+      tx_result.meta.delivered_amount = meta.DeliveredAmount;
+      break;
+    default:
+      switch (typeof tx_obj.Amount) {
+        case 'string':
+        case 'object':
+          tx_result.meta.delivered_amount = tx_obj.Amount;
+          break;
+      }
   }
 
   return tx_result;
@@ -1548,7 +1558,7 @@ Remote.prototype.requestTxHistory = function(start, callback) {
   if (typeof start === 'object') {
     start = start.start;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1588,7 +1598,7 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
     ledger = options.ledger;
     limit = options.limit;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1654,7 +1664,7 @@ Remote.prototype.requestWalletAccounts = function(seed, callback) {
   if (typeof seed === 'object') {
     seed = seed.seed;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1682,7 +1692,7 @@ Remote.prototype.requestSign = function(secret, tx_json, callback) {
     tx_json = secret.tx_json;
     secret = secret.secret;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1718,7 +1728,7 @@ Remote.prototype.requestSubmit = function(callback) {
 
 Remote.prototype._serverPrepareSubscribe = function(server, callback) {
   var self = this;
-  var feeds = [ 'ledger', 'server' ];
+  var feeds = ['ledger', 'server'];
 
   if (typeof server === 'function') {
     callback = server;
@@ -1747,7 +1757,7 @@ Remote.prototype._serverPrepareSubscribe = function(server, callback) {
     self._handleLedgerClosed(message, server);
 
     self.emit('subscribed');
-  };
+  }
 
   request.on('error', function(err) {
     if (self.trace) {
@@ -1775,12 +1785,14 @@ Remote.prototype._serverPrepareSubscribe = function(server, callback) {
 
 Remote.prototype.ledgerAccept =
 Remote.prototype.requestLedgerAccept = function(callback) {
+  /* eslint-disable consistent-return */
+  var request = new Request(this, 'ledger_accept');
+
   if (!this._stand_alone) {
+    // XXX This should emit error on the request
     this.emit('error', new RippleError('notStandAlone'));
     return;
   }
-
-  var request = new Request(this, 'ledger_accept');
 
   this.once('ledger_closed', function(ledger) {
     request.emit('ledger_closed', ledger);
@@ -1790,6 +1802,7 @@ Remote.prototype.requestLedgerAccept = function(callback) {
   request.request();
 
   return request;
+  /* eslint-enable consistent-return */
 };
 
 /**
@@ -1799,13 +1812,14 @@ Remote.prototype.requestLedgerAccept = function(callback) {
  * @api private
  */
 
-Remote.accountRootRequest = function(type, responseFilter, account, ledger, callback) {
+Remote.accountRootRequest =
+function(type, responseFilter, account, ledger, callback) {
   if (typeof account === 'object') {
     callback = ledger;
     ledger = account.ledger;
     account = account.account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1841,7 +1855,7 @@ Remote.accountRootRequest = function(type, responseFilter, account, ledger, call
 Remote.prototype.requestAccountBalance = function() {
   function responseFilter(message) {
     return Amount.from_json(message.node.Balance);
-  };
+  }
 
   var args = Array.prototype.concat.apply(
     ['account_balance', responseFilter],
@@ -1864,7 +1878,7 @@ Remote.prototype.requestAccountBalance = function() {
 Remote.prototype.requestAccountFlags = function() {
   function responseFilter(message) {
     return message.node.Flags;
-  };
+  }
 
   var args = Array.prototype.concat.apply(
     ['account_flags', responseFilter],
@@ -1887,7 +1901,7 @@ Remote.prototype.requestAccountFlags = function() {
 Remote.prototype.requestOwnerCount = function() {
   function responseFilter(message) {
     return message.node.OwnerCount;
-  };
+  }
 
   var args = Array.prototype.concat.apply(
     ['owner_count', responseFilter],
@@ -1949,7 +1963,8 @@ Remote.prototype.findAccount = function(accountID) {
  */
 
 Remote.prototype.pathFind =
-Remote.prototype.createPathFind = function(src_account, dst_account, dst_amount, src_currencies) {
+Remote.prototype.createPathFind =
+function(src_account, dst_account, dst_amount, src_currencies) {
   if (typeof src_account === 'object') {
     var options = src_account;
     src_currencies = options.src_currencies;
@@ -1957,7 +1972,7 @@ Remote.prototype.createPathFind = function(src_account, dst_account, dst_amount,
     dst_account = options.dst_account;
     src_account = options.src_account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -1990,7 +2005,8 @@ Remote.prepareTrade = function(currency, issuer) {
  */
 
 Remote.prototype.book =
-Remote.prototype.createOrderBook = function(currency_gets, issuer_gets, currency_pays, issuer_pays) {
+Remote.prototype.createOrderBook =
+function(currency_gets, issuer_gets, currency_pays, issuer_pays) {
   if (typeof currency_gets === 'object') {
     var options = currency_gets;
     issuer_pays = options.issuer_pays;
@@ -1998,7 +2014,7 @@ Remote.prototype.createOrderBook = function(currency_gets, issuer_gets, currency
     issuer_gets = options.issuer_gets;
     currency_gets = options.currency_gets;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -2032,15 +2048,15 @@ Remote.prototype.createOrderBook = function(currency_gets, issuer_gets, currency
 
 Remote.prototype.accountSeq =
 Remote.prototype.getAccountSequence = function(account, advance) {
-  var account = UInt160.json_rewrite(account);
+  account = UInt160.json_rewrite(account);
   var accountInfo = this.accounts[account];
 
   if (!accountInfo) {
-    return;
+    return NaN;
   }
 
   var seq = accountInfo.seq;
-  var change = { ADVANCE: 1, REWIND: -1 }[advance.toUpperCase()] || 0;
+  var change = {ADVANCE: 1, REWIND: -1}[advance.toUpperCase()] || 0;
 
   accountInfo.seq += change;
 
@@ -2056,7 +2072,7 @@ Remote.prototype.getAccountSequence = function(account, advance) {
 
 Remote.prototype.setAccountSequence =
 Remote.prototype.setAccountSeq = function(account, sequence) {
-  var account = UInt160.json_rewrite(account);
+  account = UInt160.json_rewrite(account);
 
   if (!this.accounts.hasOwnProperty(account)) {
     this.accounts[account] = { };
@@ -2081,7 +2097,7 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
     ledger = options.ledger;
     account = options.account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -2099,13 +2115,13 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
     account_info.seq = seq;
 
     request.emit('success_cache', message);
-  };
+  }
 
   function accountRootError(message) {
     delete account_info.caching_seq_request;
 
     request.emit('error_cache', message);
-  };
+  }
 
   if (!request) {
     request = this.requestLedgerEntry('account_root');
@@ -2129,7 +2145,7 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
  */
 
 Remote.prototype.dirtyAccountRoot = function(account) {
-  var account = UInt160.json_rewrite(account);
+  account = UInt160.json_rewrite(account);
   delete this.ledgers.current.account_root[account];
 };
 
@@ -2140,7 +2156,8 @@ Remote.prototype.dirtyAccountRoot = function(account) {
  *   @param {String|Number} options.ledger
  *   @param {String} [options.account]  - Required unless using options.index
  *   @param {Number} [options.sequence] - Required unless using options.index
- *   @param {String} [options.index]    - Required only if options.account and options.sequence not provided
+ *   @param {String} [options.index]    - Required only if options.account and
+ *   options.sequence not provided
  *
  * @callback
  * @param {Error} error
@@ -2181,7 +2198,8 @@ Remote.prototype.requestOffer = function(options, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestRippleBalance = function(account, issuer, currency, ledger, callback) {
+Remote.prototype.requestRippleBalance =
+function(account, issuer, currency, ledger, callback) {
   if (typeof account === 'object') {
     var options = account;
     callback = issuer;
@@ -2190,7 +2208,7 @@ Remote.prototype.requestRippleBalance = function(account, issuer, currency, ledg
     issuer = options.issuer;
     account = options.account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -2238,7 +2256,7 @@ Remote.prototype.requestRippleBalance = function(account, issuer, currency, ledg
         ? node.HighQualityOut
         : node.LowQualityOut)
     });
-  };
+  }
 
   request.once('success', rippleState);
   request.callback(callback, 'ripple_state');
@@ -2270,7 +2288,8 @@ Remote.prepareCurrencies = function(currency) {
  * @return {Request}
  */
 
-Remote.prototype.requestRipplePathFind = function(src_account, dst_account, dst_amount, src_currencies, callback) {
+Remote.prototype.requestRipplePathFind =
+function(src_account, dst_account, dst_amount, src_currencies, callback) {
   if (typeof src_account === 'object') {
     var options = src_account;
     callback = dst_account;
@@ -2279,7 +2298,7 @@ Remote.prototype.requestRipplePathFind = function(src_account, dst_account, dst_
     dst_account = options.dst_account;
     src_account = options.src_account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -2307,7 +2326,8 @@ Remote.prototype.requestRipplePathFind = function(src_account, dst_account, dst_
  * @return {Request}
  */
 
-Remote.prototype.requestPathFindCreate = function(src_account, dst_account, dst_amount, src_currencies, callback) {
+Remote.prototype.requestPathFindCreate =
+function(src_account, dst_account, dst_amount, src_currencies, callback) {
   if (typeof src_account === 'object') {
     var options = src_account;
     callback = dst_account;
@@ -2316,7 +2336,7 @@ Remote.prototype.requestPathFindCreate = function(src_account, dst_account, dst_
     dst_account = options.dst_account;
     src_account = options.src_account;
   } else {
-    console.error('DEPRECATED: First argument to request constructor should be'
+    log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
   }
 
@@ -2380,7 +2400,7 @@ Remote.prototype.requestUnlAdd = function(address, comment, callback) {
 
   if (comment) {
     // note is not specified anywhere, should remove?
-    request.message.comment = void(0);
+    request.message.comment = undefined;
   }
 
   request.callback(callback);
