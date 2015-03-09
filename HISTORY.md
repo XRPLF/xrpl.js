@@ -4,11 +4,28 @@
 
 + [Removed support for parsing native amounts in floating point format](https://github.com/ripple/ripple-lib/commit/e80cd1ff55deae9cd5b0ae85be957f86856b887e)
 
+
 **Changes**
+
++ [Fix taker pays funded calculation](https://github.com/ripple/ripple-lib/commit/5af824f5cf46c7b9caa58ee0a757bf854d26c8dc)
+
++ [Fix order funded amount calculation](https://github.com/ripple/ripple-lib/commit/b2cdb1a6aed968b1f306e8dadbd4b7ca37e5aa03)
+
++ [Fix handling of quality in order book](https://github.com/ripple/ripple-lib/commit/2a5a8b498da60df738ba18d5c265f34771e8a1af)
+
++ [Fix currency parsing of non-alphanumeric and no-currency currencies](https://github.com/ripple/ripple-lib/commit/2166bb2e88eae8d5f1aba77338f69e8a9edf6a6f)
+
++ [Add Amount.strict_mode for toggling range validation](https://github.com/ripple/ripple-lib/commit/b5ed8f59a7dab1a17491618b8d9193646c314fb4)
+
++ [Add filename and line number to log, use log.warn() for deprecations](https://github.com/ripple/ripple-lib/commit/90329d3d73f1a76675063655b407513e32dc048b)
 
 + [Fix handling of false parameters in requestLedger](https://github.com/ripple/ripple-lib/commit/6023efed41b7812b3bab660a1c0dc9f0a21000b9)
 
-+ [Fix order funded amount calculation](https://github.com/ripple/ripple-lib/commit/b2cdb1a6aed968b1f306e8dadbd4b7ca37e5aa03)
++ [Fix RegularKey requirement in SetRegularKey transaction format](https://github.com/ripple/ripple-lib/commit/c275174f27877ba8f389eb4efe969feb514d6e46)
+
++ [Refactor base conversion](https://github.com/ripple/ripple-lib/commit/f2b63fa4a80663eb29472bc6bb1aea8159f1f205)
+
++ [Update binary transaction format](https://github.com/ripple/ripple-lib/commit/8e134918fb4c22983320a3102f955e4568bb1dfb)
 
 + [Remove `Features` field requirements from `SetFee` transaction format](https://github.com/ripple/ripple-lib/commit/a20a649013646710c078d4ce1e210f87c7fe74fe)
 
