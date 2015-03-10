@@ -218,7 +218,8 @@ Remote.flags = {
     RequireDestTag: 0x00020000, // require a DestinationTag for payments
     RequireAuth: 0x00040000, // require a authorization to hold IOUs
     DisallowXRP: 0x00080000, // disallow sending XRP
-    DisableMaster: 0x00100000  // force regular key
+    DisableMaster: 0x00100000,  // force regular key
+    DefaultRipple: 0x00800000
   },
   // Offer
   offer: {
