@@ -134,7 +134,8 @@ Transaction.set_clear_flags = {
     asfDisableMaster:  4,
     asfAccountTxnID:   5,
     asfNoFreeze:       6,
-    asfGlobalFreeze:   7
+    asfGlobalFreeze:   7,
+    asfDefaultRipple:  8
   }
 };
 
