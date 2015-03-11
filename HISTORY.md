@@ -25,6 +25,8 @@
 
 + [Update binary transaction format](https://github.com/ripple/ripple-lib/commit/8e134918fb4c22983320a3102f955e4568bb1dfb)
 
++ [Add DefaultRipple account flag](https://github.com/ripple/ripple-lib/commit/3e249902c4cf25b4da5e75048c84ae391be83b10)
+
 + [Remove `Features` field requirement in `SetFee` transaction format](https://github.com/ripple/ripple-lib/commit/a20a649013646710c078d4ce1e210f87c7fe74fe)
 
 + [Remove `RegularKey` field requirement in `SetRegularKey` transaction format](https://github.com/ripple/ripple-lib/commit/c275174f27877ba8f389eb4efe969feb514d6e46)
