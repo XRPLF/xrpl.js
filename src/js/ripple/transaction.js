@@ -276,7 +276,7 @@ Transaction.prototype.getManager = function(account) {
 
 Transaction.prototype.generateKeyPair = function(secret) {
   if (this.remote) {
-    return this.remote.generateKeyPair();
+    return this.remote.generateKeyPair(this._secret);
   } else {
     try {
       var seed = Seed.from_json(this._secret);
