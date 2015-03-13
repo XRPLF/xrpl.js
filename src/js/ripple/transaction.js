@@ -273,6 +273,17 @@ Transaction.prototype.getManager = function(account) {
   return this.remote.account(account)._transactionManager;
 };
 
+
+Transaction.prototype.generateKeyPair = function(secret) {
+    try {
+      var seed = Seed.from_json(this._secret);
+      var key  = seed.get_key();
+      return key;
+    } catch(e) {
+      return false;
+    }
+}
+
 /**
  * Get keypair for signing.
  *
@@ -401,7 +412,7 @@ Transaction.prototype.complete = function() {
 
   if (typeof this.tx_json.SigningPubKey === 'undefined') {
     var key = this._keyPair;
-    if (!key && this.remote && !(key = this.remote.generateKeyPair(this._secret))) {
+    if (!key && !(key = this.generateKeyPair(this._secret))) {
       this.emit('error', new RippleError('tejSecretInvalid', 'Invalid secret'));
       return false;
     }
@@ -474,7 +485,7 @@ Transaction.prototype.sign = function() {
   }
 
   var key = this._keyPair || this.getKeyPair(); 
-  if (!key && this.remote && !(key = this.remote.generateKeyPair(this._secret))) {
+  if (!key && !(key = this.generateKeyPair(this._secret))) {
     this.emit('error', new RippleError('tejSecretInvalid', 'Invalid secret'));
     return false;      
   } 
