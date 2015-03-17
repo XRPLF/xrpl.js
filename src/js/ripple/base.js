@@ -56,7 +56,7 @@ function decodeString(indexes, input) {
 
   var input58 = input.split('').map(function(c) {
     var charCode = c.charCodeAt(0);
-    if (charCode >= indexes.length) {
+    if (charCode >= indexes.length || indexes[charCode] === -1) {
       throw new Error('Character ' + c + ' is not valid for encoding');
     }
     return indexes[charCode];
