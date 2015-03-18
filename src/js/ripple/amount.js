@@ -197,9 +197,7 @@ Amount.prototype.divide = function(divisor) {
 Amount.prototype.ratio_human = function(denominator, opts) {
   opts = extend({ }, opts);
 
-  /*eslint-disable consistent-this */
-  var numerator = this;
-  /*eslint-enable consistent-this */
+  var numerator = this.clone();
 
   denominator = Amount.from_json(denominator);
 
