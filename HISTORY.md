@@ -23,6 +23,8 @@
 
 + [Fix Base:decode](https://github.com/ripple/ripple-lib/commit/719f39c01c6941d9a650aa94f95617793dd53ea0)
 
++ [Fix Amount: clone in ratio_human, product_human](https://github.com/ripple/ripple-lib/commit/19e17a8431550cf156b1ad669a19dedfe4e28e4a)
+
 + [Refactor base conversion](https://github.com/ripple/ripple-lib/commit/f2b63fa4a80663eb29472bc6bb1aea8159f1f205)
 
 + [Update binary transaction format](https://github.com/ripple/ripple-lib/commit/8e134918fb4c22983320a3102f955e4568bb1dfb)
