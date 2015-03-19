@@ -50,7 +50,7 @@
   "scripts": {
     "build": "node_modules/.bin/gulp",
     "pretest": "node_modules/.bin/gulp concat-sjcl",
-    "test": "./node_modules/.bin/istanbul test -x build/sjcl.js -x src/js/jsbn/* ./node_modules/mocha/bin/_mocha -- --reporter ${MOCHA_REPORTER:=spec} test/*-test.js",
+    "test": "./node_modules/.bin/istanbul test -x build/sjcl.js -x src/js/jsbn/* ./node_modules/mocha/bin/_mocha -- --reporter ${MOCHA_REPORTER:=spec} --timeout 10000 --slow 500 test/*-test.js",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/master/eslintrc'; fi; eslint --reset -c eslintrc src/js/ripple/*.js",
     "perf": "./scripts/perf_test.sh"
