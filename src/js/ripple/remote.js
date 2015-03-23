@@ -219,7 +219,9 @@ Remote.flags = {
     RequireAuth: 0x00040000, // require a authorization to hold IOUs
     DisallowXRP: 0x00080000, // disallow sending XRP
     DisableMaster: 0x00100000,  // force regular key
-    DefaultRipple: 0x00800000
+    DefaultRipple: 0x00800000,
+    NoFreeze: 0x00200000, // permanently disallowed freezing trustlines
+    GlobalFreeze: 0x00400000 // trustlines globally frozen
   },
   // Offer
   offer: {
