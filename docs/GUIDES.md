@@ -18,7 +18,7 @@ This file provides step-by-step walkthroughs for some of the most common usages 
 
 ##Connecting to the Ripple network
 
-1. [Get ripple-lib](README.md#getting-ripple-lib)
+1. [Get ripple-lib](../README.md#installation)
 2. Load the ripple-lib module into a Node.js file or webpage:
   ```js
   /* Loading ripple-lib with Node.js */
