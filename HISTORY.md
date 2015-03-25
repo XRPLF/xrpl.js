@@ -19,11 +19,15 @@
 
 + [Add filename and line number to log, use log.warn() for deprecations](https://github.com/ripple/ripple-lib/commit/90329d3d73f1a76675063655b407513e32dc048b)
 
++ [Add GlobalFreeze and NoFreeze flags](https://github.com/ripple/ripple-lib/commit/e2ed2bdbf6f01c7d4d690c2cf0b83fba94558dd7)
+
 + [Fix handling of falsy parameters in requestLedger](https://github.com/ripple/ripple-lib/commit/6023efed41b7812b3bab660a1c0dc9f0a21000b9)
 
 + [Fix Base:decode](https://github.com/ripple/ripple-lib/commit/719f39c01c6941d9a650aa94f95617793dd53ea0)
 
 + [Fix Amount: clone in ratio_human, product_human](https://github.com/ripple/ripple-lib/commit/19e17a8431550cf156b1ad669a19dedfe4e28e4a)
+
++ [Fix Amount.to_human for very small numbers](https://github.com/ripple/ripple-lib/commit/6abfa759aa09d68074ac558d96c4b126a7cd1719)
 
 + [Refactor base conversion](https://github.com/ripple/ripple-lib/commit/f2b63fa4a80663eb29472bc6bb1aea8159f1f205)
 
