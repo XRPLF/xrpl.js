@@ -842,7 +842,7 @@ Amount.prototype.to_human = function(opts) {
   }
 
   var isNegative = ref._value.isNegative();
-  var valueString = ref._value.abs().toString();
+  var valueString = ref._value.abs().toFixed();
   var parts = valueString.split('.');
   var int_part = parts[0];
   var fraction_part = parts.length === 2 ? parts[1] : '';

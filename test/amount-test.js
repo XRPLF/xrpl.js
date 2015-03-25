@@ -1,8 +1,10 @@
-var assert      = require('assert');
-var Amount      = require('ripple-lib').Amount;
-var UInt160     = require('ripple-lib').UInt160;
+/* eslint-disable max-len */
+'use strict';
+var assert = require('assert');
+var Amount = require('ripple-lib').Amount;
+var UInt160 = require('ripple-lib').UInt160;
 var load_config = require('ripple-lib').config.load;
-var config      = require('./config-example');
+var config = require('./config-example');
 
 load_config(config);
 
@@ -26,97 +28,103 @@ describe('Amount', function() {
   // also tested extensively in other cases
   describe('to_human', function() {
     it('12345.6789 XAU', function() {
-      assert.strictEqual(Amount.from_human("12345.6789 XAU").to_human(), '12,345.6789');
+      assert.strictEqual(Amount.from_human('12345.6789 XAU').to_human(), '12,345.6789');
     });
     it('12345.678901234 XAU', function() {
-      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human(), '12,345.678901234');
+      assert.strictEqual(Amount.from_human('12345.678901234 XAU').to_human(), '12,345.678901234');
     });
     it('to human, precision -1, should be ignored, precision needs to be >= 0', function() {
-      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:-1}), '12,346');
+      assert.strictEqual(Amount.from_human('12345.678901234 XAU').to_human({precision: -1}), '12,346');
     });
     it('to human, precision 0', function() {
-      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:0}), '12,346');
+      assert.strictEqual(Amount.from_human('12345.678901234 XAU').to_human({precision: 0}), '12,346');
     });
     it('to human, precision 1', function() {
-      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:1}), '12,345.7');
+      assert.strictEqual(Amount.from_human('12345.678901234 XAU').to_human({precision: 1}), '12,345.7');
     });
     it('to human, precision 2', function() {
-      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:2}), '12,345.68');
+      assert.strictEqual(Amount.from_human('12345.678901234 XAU').to_human({precision: 2}), '12,345.68');
     });
     it('to human, precision 3', function() {
-      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:3}), '12,345.679');
+      assert.strictEqual(Amount.from_human('12345.678901234 XAU').to_human({precision: 3}), '12,345.679');
     });
     it('to human, precision 4', function() {
-      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:4}), '12,345.6789');
+      assert.strictEqual(Amount.from_human('12345.678901234 XAU').to_human({precision: 4}), '12,345.6789');
     });
     it('to human, precision 5', function() {
-      assert.strictEqual(Amount.from_human("12345.678901234 XAU").to_human({precision:5}), '12,345.67890');
+      assert.strictEqual(Amount.from_human('12345.678901234 XAU').to_human({precision: 5}), '12,345.67890');
     });
     it('to human, precision -1, should be ignored, precision needs to be >= 0', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:-1}), '0');
+      assert.strictEqual(Amount.from_human('0.00012345 XAU').to_human({precision: -1}), '0');
     });
     it('to human, precision 0', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:0}), '0');
+      assert.strictEqual(Amount.from_human('0.00012345 XAU').to_human({precision: 0}), '0');
     });
     it('to human, precision 1', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:1}), '0.0');
+      assert.strictEqual(Amount.from_human('0.00012345 XAU').to_human({precision: 1}), '0.0');
     });
     it('to human, precision 2', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:2}), '0.00');
+      assert.strictEqual(Amount.from_human('0.00012345 XAU').to_human({precision: 2}), '0.00');
     });
     it('to human, precision 5', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:5}), '0.00012');
+      assert.strictEqual(Amount.from_human('0.00012345 XAU').to_human({precision: 5}), '0.00012');
     });
     it('to human, precision 6', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:6}), '0.000123');
+      assert.strictEqual(Amount.from_human('0.00012345 XAU').to_human({precision: 6}), '0.000123');
     });
     it('to human, precision 16', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:16}), '0.00012345');
+      assert.strictEqual(Amount.from_human('0.00012345 XAU').to_human({precision: 16}), '0.00012345');
     });
     it('to human, precision 16, min_precision 16', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:16, min_precision:16}), '0.0001234500000000');
+      assert.strictEqual(Amount.from_human('0.00012345 XAU').to_human({precision: 16, min_precision: 16}), '0.0001234500000000');
     });
     it('to human, precision 16, min_precision 12', function() {
-      assert.strictEqual(Amount.from_human("0.00012345 XAU").to_human({precision:16, min_precision:12}), '0.000123450000');
+      assert.strictEqual(Amount.from_human('0.00012345 XAU').to_human({precision: 16, min_precision: 12}), '0.000123450000');
     });
     it('to human, precision 0, first decimal 4', function() {
-      assert.strictEqual(Amount.from_human("0.4 XAU").to_human({precision:0}), '0');
+      assert.strictEqual(Amount.from_human('0.4 XAU').to_human({precision: 0}), '0');
     });
     it('to human, precision 0, first decimal 5', function() {
-      assert.strictEqual(Amount.from_human("0.5 XAU").to_human({precision:0}), '1');
+      assert.strictEqual(Amount.from_human('0.5 XAU').to_human({precision: 0}), '1');
     });
     it('to human, precision 0, first decimal 8', function() {
-      assert.strictEqual(Amount.from_human("0.8 XAU").to_human({precision:0}), '1');
+      assert.strictEqual(Amount.from_human('0.8 XAU').to_human({precision: 0}), '1');
     });
     it('to human, precision 0, precision 16', function() {
-      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision:16}), '0');
+      assert.strictEqual(Amount.from_human('0.0 XAU').to_human({precision: 16}), '0');
     });
     it('to human, precision 0, precision 8, min_precision 16', function() {
-      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision:8, min_precision:16}), '0.0000000000000000');
+      assert.strictEqual(Amount.from_human('0.0 XAU').to_human({precision: 8, min_precision: 16}), '0.0000000000000000');
     });
     it('to human, precision 0, first decimal 8', function() {
-      assert.strictEqual(Amount.from_human("0.8 XAU").to_human({precision:0}), '1');
+      assert.strictEqual(Amount.from_human('0.8 XAU').to_human({precision: 0}), '1');
     });
     it('to human, precision 6, min_precision 6, max_sig_digits 20', function() {
-      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision: 6, min_precision: 6, max_sig_digits: 20}), '0.000000');
+      assert.strictEqual(Amount.from_human('0.0 XAU').to_human({precision: 6, min_precision: 6, max_sig_digits: 20}), '0.000000');
     });
     it('to human, precision 16, min_precision 6, max_sig_digits 20', function() {
-      assert.strictEqual(Amount.from_human("0.0 XAU").to_human({precision: 16, min_precision: 6, max_sig_digits: 20}), '0.000000');
+      assert.strictEqual(Amount.from_human('0.0 XAU').to_human({precision: 16, min_precision: 6, max_sig_digits: 20}), '0.000000');
     });
     it('to human rounding edge case, precision 2, 1', function() {
-      assert.strictEqual(Amount.from_human("0.99 XAU").to_human({precision:1}), '1.0');
+      assert.strictEqual(Amount.from_human('0.99 XAU').to_human({precision: 1}), '1.0');
     });
     it('to human rounding edge case, precision 2, 2', function() {
-      assert.strictEqual(Amount.from_human("0.99 XAU").to_human({precision:2}), '0.99');
+      assert.strictEqual(Amount.from_human('0.99 XAU').to_human({precision: 2}), '0.99');
     });
     it('to human rounding edge case, precision 2, 3', function() {
-      assert.strictEqual(Amount.from_human("0.99 XAU").to_human({precision:3}), '0.99');
+      assert.strictEqual(Amount.from_human('0.99 XAU').to_human({precision: 3}), '0.99');
     });
     it('to human rounding edge case, precision 2, 3 min precision 3', function() {
-      assert.strictEqual(Amount.from_human("0.99 XAU").to_human({precision:3, min_precision:3}), '0.990');
+      assert.strictEqual(Amount.from_human('0.99 XAU').to_human({precision: 3, min_precision: 3}), '0.990');
     });
     it('to human rounding edge case, precision 3, 2', function() {
-      assert.strictEqual(Amount.from_human("0.999 XAU").to_human({precision:2}), '1.00');
+      assert.strictEqual(Amount.from_human('0.999 XAU').to_human({precision: 2}), '1.00');
+    });
+    it('to human very small number', function() {
+      assert.strictEqual(Amount.from_json('12e-20/USD').to_human(), '0.00000000000000000012');
+    });
+    it('to human very small number with precision', function() {
+      assert.strictEqual(Amount.from_json('12e-20/USD').to_human({precision: 20}), '0.00000000000000000012');
     });
   });
   describe('from_human', function() {
@@ -127,117 +135,117 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_human('USD').to_text_full(), 'NaN');
     });
     it('1 XRP', function() {
-      assert.strictEqual(Amount.from_human("1 XRP").to_text_full(), '1/XRP');
+      assert.strictEqual(Amount.from_human('1 XRP').to_text_full(), '1/XRP');
     });
     it('1 XRP human', function() {
-      assert.strictEqual(Amount.from_human("1 XRP").to_human_full(), '1/XRP');
+      assert.strictEqual(Amount.from_human('1 XRP').to_human_full(), '1/XRP');
     });
     it('1XRP human', function() {
       assert.strictEqual(Amount.from_human('1XRP').to_human_full(), '1/XRP');
     });
     it('0.1 XRP', function() {
-      assert.strictEqual(Amount.from_human("0.1 XRP").to_text_full(), '0.1/XRP');
+      assert.strictEqual(Amount.from_human('0.1 XRP').to_text_full(), '0.1/XRP');
     });
     it('0.1 XRP human', function() {
-      assert.strictEqual(Amount.from_human("0.1 XRP").to_human_full(), '0.1/XRP');
+      assert.strictEqual(Amount.from_human('0.1 XRP').to_human_full(), '0.1/XRP');
     });
     it('0.1 USD', function() {
-      assert.strictEqual(Amount.from_human("0.1 USD").to_text_full(), '0.1/USD/NaN');
+      assert.strictEqual(Amount.from_human('0.1 USD').to_text_full(), '0.1/USD/NaN');
     });
     it('0.1 USD human', function() {
-      assert.strictEqual(Amount.from_human("0.1 USD").to_human_full(), '0.1/USD/NaN');
+      assert.strictEqual(Amount.from_human('0.1 USD').to_human_full(), '0.1/USD/NaN');
     });
     it('10000 USD', function() {
-      assert.strictEqual(Amount.from_human("10000 USD").to_text_full(), '10000/USD/NaN');
+      assert.strictEqual(Amount.from_human('10000 USD').to_text_full(), '10000/USD/NaN');
     });
     it('10000 USD human', function() {
-      assert.strictEqual(Amount.from_human("10000 USD").to_human_full(), '10,000/USD/NaN');
+      assert.strictEqual(Amount.from_human('10000 USD').to_human_full(), '10,000/USD/NaN');
     });
     it('USD 10000', function() {
-      assert.strictEqual(Amount.from_human("USD 10000").to_text_full(), '10000/USD/NaN');
+      assert.strictEqual(Amount.from_human('USD 10000').to_text_full(), '10000/USD/NaN');
     });
     it('USD 10000 human', function() {
-      assert.strictEqual(Amount.from_human("USD 10000").to_human_full(), '10,000/USD/NaN');
+      assert.strictEqual(Amount.from_human('USD 10000').to_human_full(), '10,000/USD/NaN');
     });
     it('12345.6789 XAU', function() {
-      assert.strictEqual(Amount.from_human("12345.6789 XAU").to_text_full(), '12345.6789/XAU/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 XAU').to_text_full(), '12345.6789/XAU/NaN');
     });
     it('12345.6789 XAU human', function() {
-      assert.strictEqual(Amount.from_human("12345.6789 XAU").to_human_full(), '12,345.6789/XAU/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 XAU').to_human_full(), '12,345.6789/XAU/NaN');
     });
     it('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000', function() {
-      assert.strictEqual(Amount.from_human("12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000").to_text_full(), '12345.6789/XAU (-0.5%pa)/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000').to_text_full(), '12345.6789/XAU (-0.5%pa)/NaN');
     });
     it('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000 human', function() {
-      assert.strictEqual(Amount.from_human("12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000").to_human_full(), '12,345.6789/XAU (-0.5%pa)/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000').to_human_full(), '12,345.6789/XAU (-0.5%pa)/NaN');
     });
     it('12345.6789 0000000000000000000000005553440000000000', function() {
-      assert.strictEqual(Amount.from_human("12345.6789 0000000000000000000000005553440000000000").to_text_full(), '12345.6789/USD/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 0000000000000000000000005553440000000000').to_text_full(), '12345.6789/USD/NaN');
     });
     it('12345.6789 0000000000000000000000005553440000000000 human', function() {
-      assert.strictEqual(Amount.from_human("12345.6789 0000000000000000000000005553440000000000").to_human_full(), '12,345.6789/USD/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 0000000000000000000000005553440000000000').to_human_full(), '12,345.6789/USD/NaN');
     });
     it('10 0000000000000000000000005553440000000000', function() {
-      assert.strictEqual(Amount.from_human("10 0000000000000000000000005553440000000000").to_text_full(), '10/USD/NaN');
+      assert.strictEqual(Amount.from_human('10 0000000000000000000000005553440000000000').to_text_full(), '10/USD/NaN');
     });
     it('10 0000000000000000000000005553440000000000 human', function() {
-      assert.strictEqual(Amount.from_human("10 0000000000000000000000005553440000000000").to_human_full(), '10/USD/NaN');
+      assert.strictEqual(Amount.from_human('10 0000000000000000000000005553440000000000').to_human_full(), '10/USD/NaN');
     });
     it('100 0000000000000000000000005553440000000000', function() {
-      assert.strictEqual(Amount.from_human("100 0000000000000000000000005553440000000000").to_text_full(), '100/USD/NaN');
+      assert.strictEqual(Amount.from_human('100 0000000000000000000000005553440000000000').to_text_full(), '100/USD/NaN');
     });
     it('100 0000000000000000000000005553440000000000 human', function() {
-      assert.strictEqual(Amount.from_human("100 0000000000000000000000005553440000000000").to_human_full(), '100/USD/NaN');
+      assert.strictEqual(Amount.from_human('100 0000000000000000000000005553440000000000').to_human_full(), '100/USD/NaN');
     });
     it('1000 0000000000000000000000005553440000000000', function() {
-      assert.strictEqual(Amount.from_human("1000 0000000000000000000000005553440000000000").to_text_full(), '1000/USD/NaN');
+      assert.strictEqual(Amount.from_human('1000 0000000000000000000000005553440000000000').to_text_full(), '1000/USD/NaN');
     });
     it('1000 0000000000000000000000005553440000000000 human', function() {
-      assert.strictEqual(Amount.from_human("1000 0000000000000000000000005553440000000000").to_human_full(), '1,000/USD/NaN');
+      assert.strictEqual(Amount.from_human('1000 0000000000000000000000005553440000000000').to_human_full(), '1,000/USD/NaN');
     });
     it('-100 0000000000000000000000005553440000000000', function() {
-      assert.strictEqual(Amount.from_human("-100 0000000000000000000000005553440000000000").to_text_full(), '-100/USD/NaN');
+      assert.strictEqual(Amount.from_human('-100 0000000000000000000000005553440000000000').to_text_full(), '-100/USD/NaN');
     });
     it('-100 0000000000000000000000005553440000000000 human', function() {
-      assert.strictEqual(Amount.from_human("-100 0000000000000000000000005553440000000000").to_human_full(), '-100/USD/NaN');
+      assert.strictEqual(Amount.from_human('-100 0000000000000000000000005553440000000000').to_human_full(), '-100/USD/NaN');
     });
     it('-1000 0000000000000000000000005553440000000000', function() {
-      assert.strictEqual(Amount.from_human("-1000 0000000000000000000000005553440000000000").to_text_full(), '-1000/USD/NaN');
+      assert.strictEqual(Amount.from_human('-1000 0000000000000000000000005553440000000000').to_text_full(), '-1000/USD/NaN');
     });
     it('-1000 0000000000000000000000005553440000000000 human', function() {
-      assert.strictEqual(Amount.from_human("-1000 0000000000000000000000005553440000000000").to_human_full(), '-1,000/USD/NaN');
+      assert.strictEqual(Amount.from_human('-1000 0000000000000000000000005553440000000000').to_human_full(), '-1,000/USD/NaN');
     });
     it('-1000.001 0000000000000000000000005553440000000000', function() {
-      assert.strictEqual(Amount.from_human("-1000.001 0000000000000000000000005553440000000000").to_text_full(), '-1000.001/USD/NaN');
+      assert.strictEqual(Amount.from_human('-1000.001 0000000000000000000000005553440000000000').to_text_full(), '-1000.001/USD/NaN');
     });
     it('-1000.001 0000000000000000000000005553440000000000 human', function() {
-      assert.strictEqual(Amount.from_human("-1000.001 0000000000000000000000005553440000000000").to_human_full(), '-1,000.001/USD/NaN');
+      assert.strictEqual(Amount.from_human('-1000.001 0000000000000000000000005553440000000000').to_human_full(), '-1,000.001/USD/NaN');
     });
     it('XAU 12345.6789', function() {
-      assert.strictEqual(Amount.from_human("XAU 12345.6789").to_text_full(), '12345.6789/XAU/NaN');
+      assert.strictEqual(Amount.from_human('XAU 12345.6789').to_text_full(), '12345.6789/XAU/NaN');
     });
     it('XAU 12345.6789 human', function() {
-      assert.strictEqual(Amount.from_human("XAU 12345.6789").to_human_full(), '12,345.6789/XAU/NaN');
+      assert.strictEqual(Amount.from_human('XAU 12345.6789').to_human_full(), '12,345.6789/XAU/NaN');
     });
     it('101 12345.6789', function() {
-      assert.strictEqual(Amount.from_human("101 12345.6789").to_text_full(), '12345.6789/101/NaN');
+      assert.strictEqual(Amount.from_human('101 12345.6789').to_text_full(), '12345.6789/101/NaN');
     });
     it('101 12345.6789 human', function() {
-      assert.strictEqual(Amount.from_human("101 12345.6789").to_human_full(), '12,345.6789/101/NaN');
+      assert.strictEqual(Amount.from_human('101 12345.6789').to_human_full(), '12,345.6789/101/NaN');
     });
     it('12345.6789 101', function() {
-      assert.strictEqual(Amount.from_human("12345.6789 101").to_text_full(), '12345.6789/101/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 101').to_text_full(), '12345.6789/101/NaN');
     });
     it('12345.6789 101 human', function() {
-      assert.strictEqual(Amount.from_human("12345.6789 101").to_human_full(), '12,345.6789/101/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 101').to_human_full(), '12,345.6789/101/NaN');
     });
   });
   describe('from_json', function() {
     it('1 XRP', function() {
-      assert.strictEqual(Amount.from_json("1/XRP").to_text_full(), "1/XRP/NaN");
+      assert.strictEqual(Amount.from_json('1/XRP').to_text_full(), '1/XRP/NaN');
     });
     it('1 XRP human', function() {
-      assert.strictEqual(Amount.from_json("1/XRP").to_human_full(), "1/XRP/NaN");
+      assert.strictEqual(Amount.from_json('1/XRP').to_human_full(), '1/XRP/NaN');
     });
   });
   describe('from_number', function() {
@@ -302,7 +310,7 @@ describe('Amount', function() {
       assert.strictEqual(UInt160.ACCOUNT_ONE, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrBZbvji').to_json());
     });
     it('Parse mtgox export', function () {
-      assert.strictEqual(config.accounts['mtgox'].account, UInt160.from_json('mtgox').to_json());
+      assert.strictEqual(config.accounts.mtgox.account, UInt160.from_json('mtgox').to_json());
     });
     it('is_valid rrrrrrrrrrrrrrrrrrrrrhoLvTp', function () {
       assert(UInt160.is_valid('rrrrrrrrrrrrrrrrrrrrrhoLvTp'));
@@ -353,10 +361,10 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_json('10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_human_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
     it('Parse 800/USD/mtgox', function () {
-      assert.strictEqual('800/USD/'+config.accounts['mtgox'].account, Amount.from_json('800/USD/mtgox').to_text_full());
+      assert.strictEqual('800/USD/' + config.accounts.mtgox.account, Amount.from_json('800/USD/mtgox').to_text_full());
     });
     it('Parse 800/USD/mtgox human', function () {
-      assert.strictEqual('800/USD/'+config.accounts['mtgox'].account, Amount.from_json('800/USD/mtgox').to_human_full());
+      assert.strictEqual('800/USD/' + config.accounts.mtgox.account, Amount.from_json('800/USD/mtgox').to_human_full());
     });
     it('Parse native 0', function () {
       assert.strictEqual('0/XRP', Amount.from_json('0').to_text_full());
@@ -449,19 +457,19 @@ describe('Amount', function() {
   });
   describe('Amount to_json', function() {
     it('10 USD', function() {
-      var amount = Amount.from_human("10 USD").to_json();
-      assert.strictEqual("10", amount.value);
-      assert.strictEqual("USD", amount.currency);
+      var amount = Amount.from_human('10 USD').to_json();
+      assert.strictEqual('10', amount.value);
+      assert.strictEqual('USD', amount.currency);
     });
     it('10 0000000000000000000000005553440000000000', function() {
-      var amount = Amount.from_human("10 0000000000000000000000005553440000000000").to_json();
-      assert.strictEqual("10", amount.value);
-      assert.strictEqual("USD", amount.currency);
+      var amount = Amount.from_human('10 0000000000000000000000005553440000000000').to_json();
+      assert.strictEqual('10', amount.value);
+      assert.strictEqual('USD', amount.currency);
     });
     it('10 015841551A748AD2C1F76FF6ECB0CCCD00000000', function() {
-      var amount = Amount.from_human("10 015841551A748AD2C1F76FF6ECB0CCCD00000000").to_json();
-      assert.strictEqual("10", amount.value);
-      assert.strictEqual("015841551A748AD2C1F76FF6ECB0CCCD00000000", amount.currency);
+      var amount = Amount.from_human('10 015841551A748AD2C1F76FF6ECB0CCCD00000000').to_json();
+      assert.strictEqual('10', amount.value);
+      assert.strictEqual('015841551A748AD2C1F76FF6ECB0CCCD00000000', amount.currency);
     });
   });
   describe('Amount operations', function() {
@@ -487,7 +495,7 @@ describe('Amount', function() {
       assert.strictEqual('200.52/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('150.02/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').add(Amount.from_json('50.5/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
     });
     it('Add 0 USD to 1 USD', function() {
-      assert.strictEqual('1' , Amount.from_json('1/USD').add('0/USD').to_text());
+      assert.strictEqual('1', Amount.from_json('1/USD').add('0/USD').to_text());
     });
     it('Subtract USD from USD', function() {
       assert.strictEqual('99.52/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('150.02/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').subtract(Amount.from_json('50.5/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full());
@@ -625,7 +633,7 @@ describe('Amount', function() {
       assert.strictEqual('200.52/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('150.02/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').add(Amount.from_json('50.5/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_human_full());
     });
     it('Add 0 USD to 1 USD human', function() {
-      assert.strictEqual('1' , Amount.from_json('1/USD').add('0/USD').to_human());
+      assert.strictEqual('1', Amount.from_json('1/USD').add('0/USD').to_human());
     });
     it('Subtract USD from USD human', function() {
       assert.strictEqual('99.52/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', Amount.from_json('150.02/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').subtract(Amount.from_json('50.5/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_human_full());
@@ -766,7 +774,7 @@ describe('Amount', function() {
       assert(isNaN(Amount.from_json('x').copyTo(new Amount())._value));
     });
     it('amount.copyTo zero', function() {
-      assert(!(Amount.from_json(0).copyTo(new Amount())._is_negative))
+      assert(!(Amount.from_json(0).copyTo(new Amount())._is_negative));
     });
   });
   describe('Amount comparisons', function() {
@@ -1085,7 +1093,7 @@ describe('Amount', function() {
   describe('from_quality', function() {
     it('XRP/XRP', function () {
       assert.throws(function() {
-        Amount.from_quality('7B73A610A009249B0CC0D4311E8BA7927B5A34D86634581C5F0FF9FF678E1000', 'XRP', NaN, {base_currency: 'XRP'}).to_text_full()
+        Amount.from_quality('7B73A610A009249B0CC0D4311E8BA7927B5A34D86634581C5F0FF9FF678E1000', 'XRP', NaN, {base_currency: 'XRP'}).to_text_full();
       });
     });
     it('BTC/XRP', function () {
@@ -1151,50 +1159,50 @@ describe('Amount', function() {
   });
 
   describe('apply interest', function() {
-    it ('from_json apply interest 10 XAU', function() {
+    it('from_json apply interest 10 XAU', function() {
       var demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
       assert.strictEqual(demAmount.to_text_full(), '9.294949401870435/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
 
     });
-    it ('from_json apply interest XAU', function() {
+    it('from_json apply interest XAU', function() {
       var demAmount = Amount.from_json('1235.5/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_text_full(), '1235.5/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
       assert.strictEqual(demAmount.to_text_full(), '1148.390998601092/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
-    it ('from_human with reference date', function() {
-      var demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date:459990264});
-      demAmount.set_issuer("rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh");
+    it('from_human with reference date', function() {
+      var demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date: 459990264});
+      demAmount.set_issuer('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_text_full(), '10.75853086191915/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
-    it ('from_json apply interest 10 XAU human', function() {
+    it('from_json apply interest 10 XAU human', function() {
       var demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_human_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
       assert.strictEqual(demAmount.to_human_full(), '9.294949401870435/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
 
     });
-    it ('from_json apply interest XAU human', function() {
+    it('from_json apply interest XAU human', function() {
       var demAmount = Amount.from_json('1235.5/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_human_full(), '1,235.5/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
       assert.strictEqual(demAmount.to_human_full(), '1,148.390998601092/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
-    it ('from_human with reference date human', function() {
-      var demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date:459990264});
-      demAmount.set_issuer("rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh");
+    it('from_human with reference date human', function() {
+      var demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date: 459990264});
+      demAmount.set_issuer('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_human_full(), '10.75853086191915/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
   });
 
   describe('amount limits', function() {
-    it ('max JSON wire limite', function() {
+    it('max JSON wire limite', function() {
       assert.strictEqual(Amount.bi_xns_max.toString(), '100000000000000000');
     });
 
-    it ('max JSON wire limite', function() {
+    it('max JSON wire limite', function() {
       assert.strictEqual(Amount.bi_xns_min.toString(), '-100000000000000000');
     });
 
@@ -1206,29 +1214,29 @@ describe('Amount', function() {
       assert.strictEqual(Amount.bi_man_min_value.toString(), '1000000000000000');
     });
 
-    it ('from_json minimum XRP', function() {
+    it('from_json minimum XRP', function() {
       var amt = Amount.from_json('-100000000000000000');
       assert.strictEqual(amt.to_json(), '-100000000000000000');
     });
 
-    it ('from_json maximum XRP', function() {
+    it('from_json maximum XRP', function() {
       var amt = Amount.from_json('100000000000000000');
       assert.strictEqual(amt.to_json(), '100000000000000000');
     });
 
-    it ('from_json less than minimum XRP', function() {
+    it('from_json less than minimum XRP', function() {
       assert.throws(function() {
         Amount.from_json('-100000000000000001');
       });
     });
 
-    it ('from_json more than maximum XRP', function() {
+    it('from_json more than maximum XRP', function() {
       assert.throws(function() {
         Amount.from_json('100000000000000001');
       });
     });
 
-    it ('from_json minimum IOU', function() {
+    it('from_json minimum IOU', function() {
       var amt = Amount.from_json('-1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '-1000000000000000e-96');
       assert.strictEqual(amt.to_text(), Amount.min_value);
@@ -1236,27 +1244,27 @@ describe('Amount', function() {
 
     it('from_json exceed minimum IOU', function() {
       assert.throws(function() {
-        Amount.from_json('-1e-82/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')
+        Amount.from_json('-1e-82/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       }, 'Exceeding min value of ' + Amount.min_value);
     });
 
-    it ('from_json maximum IOU', function() {
+    it('from_json maximum IOU', function() {
       var amt = Amount.from_json('9999999999999999e80/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '9999999999999999e80');
     });
 
-    it ('from_json exceed maximum IOU', function() {
+    it('from_json exceed maximum IOU', function() {
       assert.throws(function() {
-        Amount.from_json('9999999999999999e81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')
+        Amount.from_json('9999999999999999e81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
         }, 'Exceeding max value of ' + Amount.max_value);
     });
 
-    it ('from_json normalize mantissa to valid max range, lost significant digits', function() {
+    it('from_json normalize mantissa to valid max range, lost significant digits', function() {
       var amt = Amount.from_json('99999999999999999999999999999999/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '9999999999999999e16');
     });
 
-    it ('from_json normalize mantissa to min valid range, lost significant digits', function() {
+    it('from_json normalize mantissa to min valid range, lost significant digits', function() {
       var amt = Amount.from_json('-0.0000000000000000000000001/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '-1000000000000000e-40');
     });
