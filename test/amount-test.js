@@ -118,6 +118,12 @@ describe('Amount', function() {
     it('to human rounding edge case, precision 3, 2', function() {
       assert.strictEqual(Amount.from_human("0.999 XAU").to_human({precision:2}), '1.00');
     });
+    it('to human very small number', function() {
+      assert.strictEqual(Amount.from_json('12e-20/USD').to_human(), '0.00000000000000000012');
+    });
+    it('to human very small number with precision', function() {
+      assert.strictEqual(Amount.from_json('12e-20/USD').to_human({precision: 20}), '0.00000000000000000012');
+    });
   });
   describe('from_human', function() {
     it('empty string', function() {
