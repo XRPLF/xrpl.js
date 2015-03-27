@@ -77,7 +77,7 @@ function getLogInfo(message, args) {
     message,
     '--',
     // Location
-    (typeof stack  === 'string') ? stack.split('\n')[4].replace(/^\s+/, '') : '',
+    (typeof stack === 'string') ? stack.split('\n')[4].replace(/^\s+/, '') : '',
     '\n'
   ].concat(args);
 }
