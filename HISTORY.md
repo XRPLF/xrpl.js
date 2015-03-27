@@ -1,3 +1,7 @@
+##0.12.2
+
++ [Check that stack trace is available, fixes logging in browser](https://github.com/ripple/ripple-lib/commit/53cae3a66d48e88e8a6bbb96d6489ce7b9e22975)
+
 ##0.12.1
 
 **Breaking Changes**
