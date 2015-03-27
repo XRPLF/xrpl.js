@@ -69,13 +69,15 @@ Log.prototype.error = Log.makeLevel(4);
  */
 
 function getLogInfo(message, args) {
+  var stack = new Error().stack;
+
   return [
     // Timestamp
     '[' + new Date().toISOString() + ']',
     message,
     '--',
     // Location
-    (new Error()).stack.split('\n')[4].replace(/^\s+/, ''),
+    (typeof stack  === 'string') ? stack.split('\n')[4].replace(/^\s+/, '') : '',
     '\n'
   ].concat(args);
 }
