@@ -37,6 +37,7 @@ var sjcl = require('./utils').sjcl;
 var hashprefixes = require('./hashprefixes');
 var config = require('./config');
 var log = require('./log').internal.sub('remote');
+var Seed = require('./seed').Seed;
 
 /**
  * Interface to manage connections to rippled servers
@@ -102,6 +103,9 @@ function Remote(opts) {
   // Secrets can be set by calling set_secret(account, secret).
   // account : secret
   this.secrets = { };
+
+  // cache keypairs.
+  this.keyPairs = { };
 
   // Cache for various ledgers.
   // XXX Clear when ledger advances.
@@ -375,16 +379,49 @@ Remote.prototype._trace = function() {
   }
 };
 
+
+
+// Generate KeyPair from given seed. 
+Remote.prototype.generateKeyPair = function(secret, id) {
+  try {
+        var seed = Seed.from_json(secret);
+        var key  = seed.get_key(id);
+        return key;
+      } catch(e) {
+        return false;
+      }
+};
+
+// cache keypairs.
+Remote.prototype.setKeyPair = function(account, key) {
+  this.keyPairs[account] = key;
+}
+
 /**
  * Store a secret - allows the Remote to automatically fill
  * out auth information.
  *
  * @param {String} account
  * @param {String} secret
+ * @param {String|Number} account or index number.
  */
 
-Remote.prototype.setSecret = function(account, secret) {
+Remote.prototype.setSecret = function(account, secret, id) {
   this.secrets[account] = secret;
+
+  // try to cache keypairs, so we don't need to re-generate it for each tx.
+
+  // id could be RegularKey or index number of Account Family, 
+  // if ommited assume using Masterkey.
+  if (typeof id == 'undefined') id = account; 
+
+  var key = this.generateKeyPair(secret, id);
+
+  if (!key) {
+    this.emit('error', new RippleError('secretInvalid'));
+  } else { 
+    this.setKeyPair(account, key);
+  }
 };
 
 Remote.prototype.addServer = function(opts) {
