@@ -1,6 +1,10 @@
-var utils   = require('./utils');
-var sjcl    = utils.sjcl;
-var config  = require('./config');
+'use strict';
+
+/*eslint new-cap: 1*/
+
+var utils = require('./utils');
+var sjcl = utils.sjcl;
+var config = require('./config');
 
 //
 // Abstract UInt class
@@ -8,11 +12,11 @@ var config  = require('./config');
 // Base class for UInt classes
 //
 
-var UInt = function() {
+function UInt() {
   // Internal form: NaN or sjcl.bn
-  this._value  = NaN;
+  this._value = NaN;
   this._update();
-};
+}
 
 UInt.json_rewrite = function(j, opts) {
   return this.from_json(j).to_json(opts);
@@ -22,63 +26,56 @@ UInt.json_rewrite = function(j, opts) {
 UInt.from_generic = function(j) {
   if (j instanceof this) {
     return j.clone();
-  } else {
-    return (new this()).parse_generic(j);
   }
+  return (new this()).parse_generic(j);
 };
 
 // Return a new UInt from j.
 UInt.from_hex = function(j) {
   if (j instanceof this) {
     return j.clone();
-  } else {
-    return (new this()).parse_hex(j);
   }
+  return (new this()).parse_hex(j);
 };
 
 // Return a new UInt from j.
 UInt.from_json = function(j) {
   if (j instanceof this) {
     return j.clone();
-  } else {
-    return (new this()).parse_json(j);
   }
+  return (new this()).parse_json(j);
 };
 
 // Return a new UInt from j.
 UInt.from_bits = function(j) {
   if (j instanceof this) {
     return j.clone();
-  } else {
-    return (new this()).parse_bits(j);
   }
+  return (new this()).parse_bits(j);
 };
 
 // Return a new UInt from j.
 UInt.from_bytes = function(j) {
   if (j instanceof this) {
     return j.clone();
-  } else {
-    return (new this()).parse_bytes(j);
   }
+  return (new this()).parse_bytes(j);
 };
 
 // Return a new UInt from j.
 UInt.from_bn = function(j) {
   if (j instanceof this) {
     return j.clone();
-  } else {
-    return (new this()).parse_bn(j);
   }
+  return (new this()).parse_bn(j);
 };
 
 // Return a new UInt from j.
 UInt.from_number = function(j) {
   if (j instanceof this) {
     return j.clone();
-  } else {
-    return (new this()).parse_number(j);
   }
+  return (new this()).parse_number(j);
 };
 
 UInt.is_valid = function(j) {
@@ -93,7 +90,7 @@ UInt.prototype.clone = function() {
 UInt.prototype.copyTo = function(d) {
   d._value = this._value;
 
-  if (this._version_byte !== void(0)) {
+  if (this._version_byte !== undefined) {
     d._version_byte = this._version_byte;
   }
 
@@ -125,6 +122,8 @@ UInt.prototype.is_zero = function() {
  *
  * The reason for keeping this mechanism in this class is so every subclass can
  * call it whenever it modifies the internal state.
+ *
+ * @return {void}
  */
 UInt.prototype._update = function() {
   // Nothing to do by default. Subclasses will override this.
@@ -137,33 +136,34 @@ UInt.prototype.parse_generic = function(j) {
     j = config.accounts[j].account;
   }
 
+
   switch (j) {
     case undefined:
-      case '0':
-      case this.constructor.STR_ZERO:
-      case this.constructor.ACCOUNT_ZERO:
-      case this.constructor.HEX_ZERO:
-      this._value  = new sjcl.bn(0);
+    case '0':
+    case this.constructor.STR_ZERO:
+    case this.constructor.ACCOUNT_ZERO:
+    case this.constructor.HEX_ZERO:
+      this._value = new sjcl.bn(0);
       break;
 
     case '1':
-      case this.constructor.STR_ONE:
-      case this.constructor.ACCOUNT_ONE:
-      case this.constructor.HEX_ONE:
-      this._value  = new sjcl.bn(1);
+    case this.constructor.STR_ONE:
+    case this.constructor.ACCOUNT_ONE:
+    case this.constructor.HEX_ONE:
+      this._value = new sjcl.bn(1);
       break;
 
     default:
         if (typeof j !== 'string') {
-          this._value  = NaN;
+          this._value = NaN;
         } else if (this.constructor.width === j.length) {
           var hex = utils.arrayToHex(utils.stringToArray(j));
-          this._value  = new sjcl.bn(hex, 16);
+          this._value = new sjcl.bn(hex, 16);
         } else if ((this.constructor.width * 2) === j.length) {
           // XXX Check char set!
-          this._value  = new sjcl.bn(j, 16);
+          this._value = new sjcl.bn(j, 16);
         } else {
-          this._value  = NaN;
+          this._value = NaN;
         }
   }
 
@@ -204,7 +204,7 @@ UInt.prototype.parse_bytes = function(j) {
     this._value = NaN;
   } else {
     var bits = sjcl.codec.bytes.toBits(j);
-    this._value  = sjcl.bn.fromBits(bits);
+    this._value = sjcl.bn.fromBits(bits);
   }
 
   this._update();
@@ -216,9 +216,8 @@ UInt.prototype.parse_bytes = function(j) {
 UInt.prototype.parse_json = UInt.prototype.parse_hex;
 
 UInt.prototype.parse_bn = function(j) {
-  if ((j instanceof sjcl.bn) && j.bitLength() <= this.constructor.width * 8) {
-    // var bytes = sjcl.codec.bytes.fromBits(j.toBits());
-    // this._value  = new sjcl.bn(utils.arrayToHex(bytes), 16);
+  if ((j instanceof sjcl.bn) &&
+      j.bitLength() <= this.constructor.width * 8) {
     this._value = new sjcl.bn(j);
   } else {
     this._value = NaN;

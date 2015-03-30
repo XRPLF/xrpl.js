@@ -1,14 +1,18 @@
-var sjcl    = require('./utils').sjcl;
+'use strict';
+
+/*eslint new-cap: 1*/
+
+var sjcl = require('./utils').sjcl;
 
 var UInt160 = require('./uint160').UInt160;
 var UInt256 = require('./uint256').UInt256;
-var Base    = require('./base').Base;
+var Base = require('./base').Base;
 
 function KeyPair() {
-  this._curve  = sjcl.ecc.curves.k256;
+  this._curve = sjcl.ecc.curves.k256;
   this._secret = null;
   this._pubkey = null;
-};
+}
 
 KeyPair.from_bn_secret = function(j) {
   return (j instanceof this) ? j.clone() : (new this()).parse_bn_secret(j);
@@ -20,15 +24,16 @@ KeyPair.prototype.parse_bn_secret = function(j) {
 };
 
 /**
- * Returns public key as sjcl public key.
- *
  * @private
+ *
+ * @return {sjcl.ecc.ecdsa.publicKey} public key
  */
 KeyPair.prototype._pub = function() {
   var curve = this._curve;
 
   if (!this._pubkey && this._secret) {
     var exponent = this._secret._exponent;
+
     this._pubkey = new sjcl.ecc.ecdsa.publicKey(curve, curve.G.mult(exponent));
   }
 
@@ -36,9 +41,9 @@ KeyPair.prototype._pub = function() {
 };
 
 /**
- * Returns public key in compressed format as bit array.
- *
  * @private
+ *
+ * @return {sjcl.bitArray} public key bits in compressed form
  */
 KeyPair.prototype._pub_bits = function() {
   var pub = this._pub();
@@ -56,9 +61,7 @@ KeyPair.prototype._pub_bits = function() {
 };
 
 /**
- * Returns public key as hex.
- *
- * Key will be returned as a compressed pubkey - 33 bytes converted to hex.
+ * @return {String} public key bytes in compressed form, hex encoded.
  */
 KeyPair.prototype.to_hex_pub = function() {
   var bits = this._pub_bits();
@@ -70,7 +73,7 @@ KeyPair.prototype.to_hex_pub = function() {
   return sjcl.codec.hex.fromBits(bits).toUpperCase();
 };
 
-function SHA256_RIPEMD160(bits) {
+function sha256_ripemd160(bits) {
   return sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
 }
 
@@ -81,7 +84,7 @@ KeyPair.prototype.get_address = function() {
     return null;
   }
 
-  var hash = SHA256_RIPEMD160(bits);
+  var hash = sha256_ripemd160(bits);
 
   var address = UInt160.from_bits(hash);
   address.set_version(Base.VER_ACCOUNT_ID);

@@ -1,3 +1,4 @@
+'use strict';
 
 function getMantissaDecimalString(bignum) {
   var mantissa = bignum.toPrecision(16)
@@ -10,37 +11,22 @@ function getMantissaDecimalString(bignum) {
   return mantissa;
 }
 
-function filterErr(code, done) {
-  return function(e) {
-    done(e.code !== code ? e : void(0));
-  };
-};
-
-function throwErr(done) {
-  return function(e) {
-    if (e) {
-      throw e;
-    }
-    done();
-  };
-};
-
 function trace(comment, func) {
   return function() {
     console.log('%s: %s', trace, arguments.toString);
     func(arguments);
   };
-};
+}
 
 function arraySet(count, value) {
   var a = new Array(count);
 
-  for (var i=0; i<count; i++) {
+  for (var i = 0; i < count; i++) {
     a[i] = value;
   }
 
   return a;
-};
+}
 
 function hexToString(h) {
   var a = [];
@@ -51,35 +37,35 @@ function hexToString(h) {
     i = 1;
   }
 
-  for (; i<h.length; i+=2) {
-    a.push(String.fromCharCode(parseInt(h.substring(i, i+2), 16)));
+  for (; i < h.length; i += 2) {
+    a.push(String.fromCharCode(parseInt(h.substring(i, i + 2), 16)));
   }
 
   return a.join('');
-};
+}
 
 function stringToHex(s) {
   var result = '';
-  for (var i=0; i<s.length; i++) {
+  for (var i = 0; i < s.length; i++) {
     var b = s.charCodeAt(i);
     result += b < 16 ? '0' + b.toString(16) : b.toString(16);
   }
   return result;
-};
+}
 
 function stringToArray(s) {
   var a = new Array(s.length);
 
-  for (var i=0; i<a.length; i+=1) {
+  for (var i = 0; i < a.length; i += 1) {
     a[i] = s.charCodeAt(i);
   }
 
   return a;
-};
+}
 
 function hexToArray(h) {
   return stringToArray(hexToString(h));
-};
+}
 
 function arrayToHex(a) {
   return a.map(function(byteValue) {
@@ -90,7 +76,7 @@ function arrayToHex(a) {
 
 function chunkString(str, n, leftAlign) {
   var ret = [];
-  var i=0, len=str.length;
+  var i = 0, len = str.length;
 
   if (leftAlign) {
     i = str.length % n;
@@ -99,26 +85,27 @@ function chunkString(str, n, leftAlign) {
     }
   }
 
-  for(; i<len; i+=n) {
+  for (; i < len; i += n) {
     ret.push(str.slice(i, n + i));
   }
 
   return ret;
-};
+}
 
 function assert(assertion, msg) {
   if (!assertion) {
     throw new Error('Assertion failed' + (msg ? ': ' + msg : '.'));
   }
-};
+}
 
 /**
- * Return unique values in array.
+ * @param {Array} arr (values)
+ * @return {Array} unique values (for string representation of value) in `arr`
  */
 function arrayUnique(arr) {
   var u = {}, a = [];
 
-  for (var i=0, l=arr.length; i<l; i++){
+  for (var i = 0, l = arr.length; i < l; i++) {
     var k = arr[i];
     if (u[k]) {
       continue;
@@ -128,46 +115,45 @@ function arrayUnique(arr) {
   }
 
   return a;
-};
+}
 
 /**
- * Convert a ripple epoch to a JavaScript timestamp.
+ * @param {Number} rpepoch (seconds since 1/1/2000 GMT)
+ * @return {Number} ms since unix epoch
  *
- * JavaScript timestamps are unix epoch in milliseconds.
  */
 function toTimestamp(rpepoch) {
   return (rpepoch + 0x386D4380) * 1000;
-};
+}
 
 /**
- * Convert a JavaScript timestamp or Date to a Ripple epoch.
- *
- * JavaScript timestamps are unix epoch in milliseconds.
+ * @param {Number|Date} timestamp (ms since unix epoch)
+ * @return {Number} seconds since ripple epoch ( 1/1/2000 GMT)
  */
-function fromTimestamp(rpepoch) {
-  if (rpepoch instanceof Date) {
-    rpepoch = rpepoch.getTime();
+function fromTimestamp(timestamp) {
+  if (timestamp instanceof Date) {
+    timestamp = timestamp.getTime();
   }
 
-  return Math.round(rpepoch / 1000) - 0x386D4380;
-};
+  return Math.round(timestamp / 1000) - 0x386D4380;
+}
 
 exports.time = {
   fromRipple: toTimestamp,
   toRipple: fromTimestamp
 };
 
-exports.trace         = trace;
-exports.arraySet      = arraySet;
-exports.hexToString   = hexToString;
-exports.hexToArray    = hexToArray;
+exports.trace = trace;
+exports.arraySet = arraySet;
+exports.hexToString = hexToString;
+exports.hexToArray = hexToArray;
 exports.stringToArray = stringToArray;
-exports.stringToHex   = stringToHex;
-exports.arrayToHex    = arrayToHex;
-exports.chunkString   = chunkString;
-exports.assert        = assert;
-exports.arrayUnique   = arrayUnique;
-exports.toTimestamp   = toTimestamp;
+exports.stringToHex = stringToHex;
+exports.arrayToHex = arrayToHex;
+exports.chunkString = chunkString;
+exports.assert = assert;
+exports.arrayUnique = arrayUnique;
+exports.toTimestamp = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
 

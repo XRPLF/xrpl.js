@@ -1,18 +1,19 @@
+'use strict';
+
 //
 // Seed support
 //
 
 var extend = require('extend');
-var utils  = require('./utils');
-var sjcl   = utils.sjcl;
+var utils = require('./utils');
+var sjcl = utils.sjcl;
 
-var Base    = require('./base').Base;
-var UInt    = require('./uint').UInt;
-var UInt256 = require('./uint256').UInt256;
+var Base = require('./base').Base;
+var UInt = require('./uint').UInt;
 var UInt160 = require('./uint160').UInt160;
 var KeyPair = require('./keypair').KeyPair;
 
-var Seed = extend(function () {
+var Seed = extend(function() {
   this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;
 }, UInt);
@@ -23,7 +24,7 @@ Seed.prototype.constructor = Seed;
 
 // value = NaN on error.
 // One day this will support rfc1751 too.
-Seed.prototype.parse_json = function (j) {
+Seed.prototype.parse_json = function(j) {
   if (typeof j === 'string') {
     if (!j.length) {
       this._value = NaN;
@@ -43,7 +44,7 @@ Seed.prototype.parse_json = function (j) {
   return this;
 };
 
-Seed.prototype.parse_passphrase = function (j) {
+Seed.prototype.parse_passphrase = function(j) {
   if (typeof j !== 'string') {
     throw new Error('Passphrase must be a string');
   }
@@ -56,7 +57,7 @@ Seed.prototype.parse_passphrase = function (j) {
   return this;
 };
 
-Seed.prototype.to_json = function () {
+Seed.prototype.to_json = function() {
   if (!(this.is_valid())) {
     return NaN;
   }
@@ -68,20 +69,18 @@ Seed.prototype.to_json = function () {
 
 function append_int(a, i) {
   return [].concat(a, i >> 24, (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff);
-};
+}
 
 function firstHalfOfSHA512(bytes) {
   return sjcl.bitArray.bitSlice(
     sjcl.hash.sha512.hash(sjcl.codec.bytes.toBits(bytes)),
     0, 256
   );
-};
+}
 
-function SHA256_RIPEMD160(bits) {
-  return sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
-};
-
-/**
+// Removed a `*` so this JSDoc-ish syntax is ignored.
+// This will soon all change anyway.
+/*
 * @param account
 *        {undefined}                 take first, default, KeyPair
 *
@@ -92,10 +91,11 @@ function SHA256_RIPEMD160(bits) {
 *                                    that is desired.
 *
 * @param maxLoops (optional)
-*        {Number}                    specifies the amount of attempts taken to generate
-*                                    a matching KeyPair
+*        {Number}                    specifies the amount of attempts taken
+*                                    to generate a matching KeyPair
+*
 */
-Seed.prototype.get_key = function (account, maxLoops) {
+Seed.prototype.get_key = function(account, maxLoops) {
   var account_number = 0, address;
   var max_loops = maxLoops || 1;
 
@@ -105,7 +105,7 @@ Seed.prototype.get_key = function (account, maxLoops) {
   if (account) {
     if (typeof account === 'number') {
       account_number = account;
-      max_loops = account_number+1;
+      max_loops = account_number + 1;
     } else {
       address = UInt160.from_json(account);
     }
@@ -116,7 +116,8 @@ Seed.prototype.get_key = function (account, maxLoops) {
   var i = 0;
 
   do {
-    private_gen = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(this.to_bytes(), i)));
+    private_gen = sjcl.bn.fromBits(
+            firstHalfOfSHA512(append_int(this.to_bytes(), i)));
     i++;
   } while (!curve.r.greaterEquals(private_gen));
 
@@ -130,7 +131,13 @@ Seed.prototype.get_key = function (account, maxLoops) {
     i = 0;
 
     do {
-      sec = sjcl.bn.fromBits(firstHalfOfSHA512(append_int(append_int(public_gen.toBytesCompressed(), account_number), i)));
+      sec = sjcl.bn.fromBits(
+              firstHalfOfSHA512(
+                  append_int(
+                    append_int(public_gen.toBytesCompressed(), account_number)
+                    ,
+                    i
+                  )));
       i++;
     } while (!curve.r.greaterEquals(sec));
 
@@ -141,12 +148,13 @@ Seed.prototype.get_key = function (account, maxLoops) {
     if (max_loops-- <= 0) {
       // We are almost certainly looking for an account that would take same
       // value of $too_long {forever, ...}
-      throw new Error('Too many loops looking for KeyPair yielding '+
-                      address.to_json() +' from ' + this.to_json());
+      throw new Error('Too many loops looking for KeyPair yielding ' +
+                      address.to_json() + ' from ' + this.to_json());
     }
 
   } while (address && !key_pair.get_address().equals(address));
-    return key_pair;
+
+  return key_pair;
 };
 
 exports.Seed = Seed;
