@@ -1,6 +1,8 @@
-var utils   = require('./utils');
-var config  = require('./config');
-var extend  = require('extend');
+'use strict';
+
+var utils = require('./utils');
+var config = require('./config');
+var extend = require('extend');
 
 var UInt = require('./uint').UInt;
 var Base = require('./base').Base;
@@ -10,8 +12,8 @@ var Base = require('./base').Base;
 //
 
 var UInt160 = extend(function() {
-  this._value  = NaN;
-  this._version_byte = void(0);
+  this._value = NaN;
+  this._version_byte = undefined;
   this._update();
 }, UInt);
 
@@ -19,12 +21,13 @@ UInt160.width = 20;
 UInt160.prototype = extend({}, UInt.prototype);
 UInt160.prototype.constructor = UInt160;
 
-var ACCOUNT_ZERO = UInt160.ACCOUNT_ZERO = 'rrrrrrrrrrrrrrrrrrrrrhoLvTp';
-var ACCOUNT_ONE  = UInt160.ACCOUNT_ONE  = 'rrrrrrrrrrrrrrrrrrrrBZbvji';
-var HEX_ZERO     = UInt160.HEX_ZERO     = '0000000000000000000000000000000000000000';
-var HEX_ONE      = UInt160.HEX_ONE      = '0000000000000000000000000000000000000001';
-var STR_ZERO     = UInt160.STR_ZERO     = utils.hexToString(HEX_ZERO);
-var STR_ONE      = UInt160.STR_ONE      = utils.hexToString(HEX_ONE);
+var HEX_ZERO = UInt160.HEX_ZERO = '0000000000000000000000000000000000000000';
+var HEX_ONE = UInt160.HEX_ONE = '0000000000000000000000000000000000000001';
+
+UInt160.ACCOUNT_ZERO = 'rrrrrrrrrrrrrrrrrrrrrhoLvTp';
+UInt160.ACCOUNT_ONE = 'rrrrrrrrrrrrrrrrrrrrBZbvji';
+UInt160.STR_ZERO = utils.hexToString(HEX_ZERO);
+UInt160.STR_ONE = utils.hexToString(HEX_ONE);
 
 UInt160.prototype.set_version = function(j) {
   this._version_byte = j;
@@ -78,7 +81,7 @@ UInt160.prototype.parse_generic = function(j) {
 
 // XXX Json form should allow 0 and 1, C++ doesn't currently allow it.
 UInt160.prototype.to_json = function(opts) {
-  opts  = opts || {};
+  opts = opts || {};
 
   if (this.is_valid()) {
     // If this value has a type, return a Base58 encoded string.
@@ -90,9 +93,8 @@ UInt160.prototype.to_json = function(opts) {
       }
 
       return output;
-    } else {
-      return this.to_hex();
     }
+    return this.to_hex();
   }
   return NaN;
 };

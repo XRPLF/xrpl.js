@@ -1,4 +1,4 @@
- 'use strict';
+'use strict';
 
 // Interface to manage connections to rippled servers
 //
@@ -517,8 +517,13 @@ Remote.prototype.disconnect = function(callback) {
 Remote.prototype._handleMessage = function(message, server) {
   try {
     message = JSON.parse(message);
+
+  /*eslint-disable no-empty*/
   } catch (e) {
+    // TODO: why are we suppressing this?
+    console.error(e);
   }
+  /*eslint-enable no-empty*/
 
   if (!Remote.isValidMessage(message)) {
     // Unexpected response from remote.
