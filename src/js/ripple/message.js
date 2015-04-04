@@ -45,14 +45,13 @@ var REGEX_BASE64 =
  *
  *  @param {String} message - to sign
  *  @param {SecretKey} secret_key - used to sign message
- *  @param {RippleAddress} [account] - derive key pair from seed to match
  *  @returns {Base64String} - Base64 encoded signature
  */
-Message.signMessage = function(message, secret_key, account) {
+Message.signMessage = function(message, secret_key) {
 
   var hashFunction = Message.HASH_FUNCTION;
   var hash = hashFunction(Message.MAGIC_BYTES + message);
-  return Message.signHash(hash, secret_key, account);
+  return Message.signHash(hash, secret_key);
 
 };
 
@@ -67,11 +66,10 @@ Message.signMessage = function(message, secret_key, account) {
  *
  *  @param {bitArray|HexString} hash - to sign
  *  @param {SecretKey} secret_key - used to sign message
- *  @param {RippleAddress} [account] - derive key pair from seed to match
  *
  *  @returns {Base64String} - Base64 encoded signature
  */
-Message.signHash = function(hash, secret_key, account) {
+Message.signHash = function(hash, secret_key) {
 
   if (typeof hash === 'string' && /^[0-9a-fA-F]+$/.test(hash)) {
     hash = sjcl.codec.hex.toBits(hash);
@@ -83,7 +81,7 @@ Message.signHash = function(hash, secret_key, account) {
   }
 
   if (!(secret_key instanceof sjcl.ecc.ecdsa.secretKey)) {
-    secret_key = Seed.from_json(secret_key).get_key(account)._secret;
+    secret_key = Seed.from_json(secret_key).get_key()._secret;
   }
 
   var signature_bits = secret_key.signWithRecoverablePublicKey(hash);

@@ -10,7 +10,7 @@ describe('SJCL ECDSA Canonicalization', function() {
   describe('canonicalizeSignature', function() {
     it('should canonicalize non-canonical signatures', function() {
       var seed = Seed.from_json('saESc82Vun7Ta5EJRzGJbrXb5HNYk');
-      var key = seed.get_key('rBZ4j6MsoctipM6GEyHSjQKzXG3yambDnZ');
+      var key = seed.get_key();
 
       var sig = '27ce1b914045ba7e8c11a2f2882cb6e0' +
                 '7a19d4017513f12e3e363d71dc3fff0f' +
@@ -30,7 +30,7 @@ describe('SJCL ECDSA Canonicalization', function() {
 
     it('should not touch canonical signatures', function() {
       var seed = Seed.from_json('saESc82Vun7Ta5EJRzGJbrXb5HNYk');
-      var key = seed.get_key('rBZ4j6MsoctipM6GEyHSjQKzXG3yambDnZ');
+      var key = seed.get_key();
 
       var sig = '5c32bc2b4d34e27af9fb66eeea0f47f6' +
                  'afb3d433658af0f649ebae7b872471ab' +
