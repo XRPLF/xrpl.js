@@ -26,7 +26,8 @@
     "ripple-wallet-generator": "^1.0.3",
     "simple-asyncify": "^0.1.0",
     "sjcl": "^1.0.3",
-    "ws": "~0.7.1"
+    "ws": "~0.7.1",
+    "tweetnacl": "^0.13.0"
   },
   "devDependencies": {
     "assert-diff": "^1.0.1",

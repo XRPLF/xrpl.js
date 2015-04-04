@@ -1,10 +1,12 @@
 'use strict';
 
+/*eslint new-cap: 1*/
+
 //
 // Seed support
 //
-
 const extend = require('extend');
+const lodash = require('lodash');
 const utils = require('./utils');
 const sjcl = utils.sjcl;
 
@@ -12,10 +14,12 @@ const Base = require('./base').Base;
 const UInt = require('./uint').UInt;
 const UInt160 = require('./uint160').UInt160;
 const KeyPair = require('./keypair').KeyPair;
+const Sha512 = utils.Sha512;
 
 const Seed = extend(function() {
   this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;
+  this._version = Base.VER_FAMILY_SEED;
 }, UInt);
 
 Seed.width = 16;
@@ -30,7 +34,7 @@ Seed.prototype.parse_json = function(j) {
       this._value = NaN;
     // XXX Should actually always try and continue if it failed.
     } else if (j[0] === 's') {
-      this._value = Base.decode_check(Base.VER_FAMILY_SEED, j);
+      this.parse_base58(j);
     } else if (/^[0-9a-fA-f]{32}$/.test(j)) {
       this.parse_hex(j);
     // XXX Should also try 1751
@@ -57,104 +61,110 @@ Seed.prototype.parse_passphrase = function(j) {
   return this;
 };
 
+Seed.prototype.parse_base58 = function(j) {
+  const result = Base.decode_multi(j, Seed.width);
+
+  if (result.error) {
+    this._value = NaN;
+  } else if (lodash.isEqual(result.version, [Base.VER_FAMILY_SEED]) ||
+        lodash.isEqual(result.version, Base.VER_ED25519_SEED)) {
+    this._version = result.version;
+    this._value = sjcl.bn.fromBits(sjcl.codec.bytes.toBits(result.bytes));
+  }
+
+  return this;
+};
+
 Seed.prototype.to_json = function() {
   if (!(this.is_valid())) {
     return NaN;
   }
 
-  const output = Base.encode_check(Base.VER_FAMILY_SEED, this.to_bytes());
+  const version = this._version;
+  const output = Base.encode_check(version, this.to_bytes());
 
   return output;
 };
 
-function append_int(a, i) {
-  return [].concat(a, i >> 24, (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff);
-}
+Seed.prototype.get_key = function(opts) {
+  if (opts !== undefined && typeof opts !== 'object') {
+    throw new Error('get_key options not supported: ' + opts);
+  }
 
-function firstHalfOfSHA512(bytes) {
-  return sjcl.bitArray.bitSlice(
-    sjcl.hash.sha512.hash(sjcl.codec.bytes.toBits(bytes)),
-    0, 256
-  );
-}
+  if (lodash.isEqual(this._version, Base.VER_ED25519_SEED)) {
+    throw new Error('get_key ed25519 not supported');
+  }
 
-// Removed a `*` so this JSDoc-ish syntax is ignored.
-// This will soon all change anyway.
-/*
-* @param account
-*        {undefined}                 take first, default, KeyPair
-*
-*        {Number}                    specifies the account number of the KeyPair
-*                                    desired.
-*
-*        {Uint160} (from_json able), specifies the address matching the KeyPair
-*                                    that is desired.
-*
-* @param maxLoops (optional)
-*        {Number}                    specifies the amount of attempts taken
-*                                    to generate a matching KeyPair
-*
+  return this._get_key(opts);
+};
+
+/**
+* @return {KeyPair} - the root key-pair, as used by validators.
 */
-Seed.prototype.get_key = function(account, maxLoops) {
-  let account_number = 0, address;
-  let max_loops = maxLoops || 1;
+Seed.prototype.get_root_key = function() {
+  return this._get_key({root: true});
+};
+
+/**
+* @param {Object} [options] -
+*
+* @param {Number} [options.accountIndex=0] - the account number to generate
+*
+* @param {Boolean} [options.root=false] - generate root key-pair,
+*                                         as used by validators.
+* @return {KeyPair} -
+*/
+Seed.prototype._get_key = function(options) {
+  const opts = options || {};
+
+  const root = opts.root;
 
   if (!this.is_valid()) {
     throw new Error('Cannot generate keys from invalid seed!');
   }
-  if (account) {
-    if (typeof account === 'number') {
-      account_number = account;
-      max_loops = account_number + 1;
-    } else {
-      address = UInt160.from_json(account);
-    }
-  }
 
-  let private_gen, public_gen;
   const curve = this._curve;
+  let privateGen;
   let i = 0;
 
   do {
-    private_gen = sjcl.bn.fromBits(
-            firstHalfOfSHA512(append_int(this.to_bytes(), i)));
+    // We hash the seed to extend from 128 bits to 256, looping until we are
+    // sure the 256 bits represents n where `1 <= n < curve.r`
+    privateGen = new Sha512().add(this.to_bytes()).addU32(i).finish256BN();
+
+    // This private generator, represents the `root` private key, and is what's
+    // used by validators for signing when a keypair is generated from a seed.
     i++;
-  } while (!curve.r.greaterEquals(private_gen));
+  } while (!curve.r.greaterEquals(privateGen));
 
-  public_gen = curve.G.mult(private_gen);
+  let secret;
 
-  let sec;
-  let key_pair;
-
-  do {
-
+  if (root) {
+    // As used by validation_create
+    secret = privateGen;
+  } else {
+    const publicGen = curve.G.mult(privateGen);
     i = 0;
-
+    // A seed can generate many keypairs as a function of the seed and a uint32.
+    // Almost everyone just uses the first account, `0`,
+    let accountIndex = opts.accountIndex || 0;
     do {
-      sec = sjcl.bn.fromBits(
-              firstHalfOfSHA512(
-                  append_int(
-                    append_int(public_gen.toBytesCompressed(), account_number)
-                    ,
-                    i
-                  )));
+      // We hash the root key-pair's public key bytes, along with the account
+      // number to deterministically find another point on the curve.
+      secret = new Sha512().add(publicGen.toBytesCompressed())
+                           .addU32(accountIndex).addU32(i).finish256BN();
       i++;
-    } while (!curve.r.greaterEquals(sec));
 
-    account_number++;
-    sec = sec.add(private_gen).mod(curve.r);
-    key_pair = KeyPair.from_bn_secret(sec);
+    // Again, we make sure the value is situated on the curve. The `i` sequence
+    // was incremented so next time we try we'll have a new hash.
+    } while (secret.greaterEquals(curve.r));
 
-    if (max_loops-- <= 0) {
-      // We are almost certainly looking for an account that would take same
-      // value of $too_long {forever, ...}
-      throw new Error('Too many loops looking for KeyPair yielding ' +
-                      address.to_json() + ' from ' + this.to_json());
-    }
-
-  } while (address && !key_pair.get_address().equals(address));
-
-  return key_pair;
+    // The final operation:
+    secret = secret.add(privateGen).mod(curve.r);
+  }
+  // The public key is lazily computed by the key class, but it has the same
+  // mathematical relationship to `secret` as `publicGen` to `privateGen`.
+  return KeyPair.from_bn_secret(secret);
 };
 
 exports.Seed = Seed;

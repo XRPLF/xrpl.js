@@ -11,7 +11,7 @@ describe('Signing', function() {
   describe('Keys', function() {
     it('SigningPubKey 1 (ripple-client issue #245)', function() {
       const seed = Seed.from_json('saESc82Vun7Ta5EJRzGJbrXb5HNYk');
-      const key = seed.get_key('rBZ4j6MsoctipM6GEyHSjQKzXG3yambDnZ');
+      const key = seed.get_key();
       const pub = key.to_hex_pub();
       assert.strictEqual(
         pub,
@@ -19,7 +19,7 @@ describe('Signing', function() {
     });
     it('SigningPubKey 2 (master seed)', function() {
       const seed = Seed.from_json('snoPBrXtMeMyMHUVTgbuqAfg1SUTb');
-      const key = seed.get_key('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      const key = seed.get_key();
       const pub = key.to_hex_pub();
       assert.strictEqual(
          pub,
@@ -55,7 +55,7 @@ describe('Signing', function() {
   describe('get_key', function() {
     it('get key from invalid seed', function() {
       assert.throws(function() {
-        new Seed().get_key('rBZ4j6MsoctipM6GEyHSjQKzXG3yambDnZ');
+        new Seed().get_key();
       });
     });
   });

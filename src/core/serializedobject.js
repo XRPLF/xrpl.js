@@ -50,11 +50,10 @@ function SerializedObject(buf) {
   this.pointer = 0;
 }
 
-SerializedObject.from_json = function(obj_) {
+SerializedObject.from_json = function(obj_, prefix) {
   // Create a copy of the object so we don't modify it
   const obj = extend(true, {}, obj_);
-
-  let so = new SerializedObject();
+  const so = new SerializedObject(prefix);
   let typedef;
 
   if (typeof obj.TransactionType === 'number') {

@@ -70,6 +70,11 @@
       "version": "1.0.3",
       "resolved": "https://registry.npmjs.org/sjcl/-/sjcl-1.0.3.tgz"
     },
+    "tweetnacl": {
+      "version": "0.13.1",
+      "from": "tweetnacl@>=0.13.0 <0.14.0",
+      "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.13.1.tgz"
+    },
     "ws": {
       "version": "0.7.2",
       "resolved": "https://registry.npmjs.org/ws/-/ws-0.7.2.tgz",
