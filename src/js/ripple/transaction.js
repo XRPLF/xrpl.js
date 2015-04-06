@@ -466,7 +466,7 @@ Transaction.prototype.sign = function() {
   }
 
   var key = seed.get_key(this.tx_json.Account);
-  var sig = key.sign(hash, 0);
+  var sig = key.sign(hash);
   var hex = sjcl.codec.hex.fromBits(sig).toUpperCase();
 
   this.tx_json.TxnSignature = hex;

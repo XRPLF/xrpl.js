@@ -4,6 +4,7 @@ var Transaction      = require('ripple-lib').Transaction;
 var TransactionQueue = require('ripple-lib').TransactionQueue;
 var Remote           = require('ripple-lib').Remote;
 var Server           = require('ripple-lib').Server;
+var sjcl = require('ripple-lib').sjcl;
 
 var transactionResult = {
   engine_result: 'tesSUCCESS',
@@ -35,6 +36,11 @@ var transactionResult = {
 };
 
 describe('Transaction', function() {
+  before(function() {
+    sjcl.random.addEntropy(
+      '3045022100A58B0460BC5092CB4F96155C19125A4E079C870663F1D5E8BBC9BD', 256);
+  });
+
   it('Success listener', function(done) {
     var transaction = new Transaction();
 
