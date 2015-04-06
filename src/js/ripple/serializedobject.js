@@ -1,10 +1,12 @@
-var _         = require('lodash');
-var assert    = require('assert');
-var extend    = require('extend');
+'use strict';
+
+var _ = require('lodash');
+var assert = require('assert');
+var extend = require('extend');
 var binformat = require('./binformat');
-var stypes    = require('./serializedtypes');
-var Crypt     = require('./crypt').Crypt;
-var utils     = require('./utils');
+var stypes = require('./serializedtypes');
+var Crypt = require('./crypt').Crypt;
+var utils = require('./utils');
 
 var sjcl = utils.sjcl;
 
@@ -29,12 +31,14 @@ Object.keys(binformat.ter).forEach(function(key) {
 function normalize_sjcl_bn_hex(string) {
   var hex = string.slice(2);    // remove '0x' prefix
   // now strip leading zeros
-  var i = _.findIndex(hex, function(c) { return c !== '0'; });
+  var i = _.findIndex(hex, function(c) {
+    return c !== '0';
+  });
   return i >= 0 ? hex.slice(i) : '0';
 }
 
 function SerializedObject(buf) {
-  if (Array.isArray(buf) || (Buffer && Buffer.isBuffer(buf)) ) {
+  if (Array.isArray(buf) || (Buffer && Buffer.isBuffer(buf))) {
     this.buffer = buf;
   } else if (typeof buf === 'string') {
     this.buffer = sjcl.codec.bytes.fromBits(sjcl.codec.hex.toBits(buf));
@@ -49,7 +53,7 @@ function SerializedObject(buf) {
 SerializedObject.from_json = function(obj) {
   // Create a copy of the object so we don't modify it
   obj = extend(true, {}, obj);
-  var so  = new SerializedObject();
+  var so = new SerializedObject();
   var typedef;
 
   if (typeof obj.TransactionType === 'number') {
@@ -107,7 +111,7 @@ SerializedObject.check_no_missing_fields = function(typedef, obj) {
     var field = spec[0];
     var requirement = spec[1];
 
-    if (binformat.REQUIRED === requirement && obj[field] === void(0)) {
+    if (binformat.REQUIRED === requirement && obj[field] === undefined) {
       missing_fields.push(field);
     }
   }
@@ -115,9 +119,9 @@ SerializedObject.check_no_missing_fields = function(typedef, obj) {
   if (missing_fields.length > 0) {
     var object_name;
 
-    if (obj.TransactionType !== void(0)) {
+    if (obj.TransactionType !== undefined) {
       object_name = SerializedObject.lookup_type_tx(obj.TransactionType);
-    } else if (obj.LedgerEntryType != null){
+    } else if (obj.LedgerEntryType !== undefined) {
       object_name = SerializedObject.lookup_type_le(obj.LedgerEntryType);
     } else {
       object_name = 'TransactionMetaData';
@@ -133,7 +137,17 @@ SerializedObject.prototype.append = function(bytes) {
     bytes = bytes.buffer;
   }
 
-  this.buffer = this.buffer.concat(bytes);
+  // Make sure both buffer and bytes are Array. Either could potentially be a
+  // Buffer.
+  if (Array.isArray(this.buffer) && Array.isArray(bytes)) {
+    // Array::concat is horribly slow where buffer length is 100 kbytes + One
+    // transaction with 1100 affected nodes took around 23 seconds to convert
+    // from json to bytes.
+    Array.prototype.push.apply(this.buffer, bytes);
+  } else {
+    this.buffer = this.buffer.concat(bytes);
+  }
+
   this.pointer += bytes.length;
 };
 
@@ -216,14 +230,17 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
       if (typeof structure.to_json === 'function') {
         output = structure.to_json();
       } else if (structure instanceof sjcl.bn) {
-        output = ('0000000000000000' + normalize_sjcl_bn_hex(structure.toString()).toUpperCase()).slice(-16);
+        output = ('0000000000000000' +
+                   normalize_sjcl_bn_hex(structure.toString())
+                  .toUpperCase()
+                  ).slice(-16);
       } else {
-        //new Array or Object
+        // new Array or Object
         output = new structure.constructor();
 
         var keys = Object.keys(structure);
 
-        for (var i=0, l=keys.length; i<l; i++) {
+        for (var i = 0, l = keys.length; i < l; i++) {
           var key = keys[i];
           output[key] = SerializedObject.jsonify_structure(structure[key], key);
         }
@@ -256,7 +273,7 @@ SerializedObject.prototype.hash = function(prefix) {
   var sign_buffer = new SerializedObject();
 
   // Add hashing prefix
-  if ('undefined' !== typeof prefix) {
+  if (typeof prefix !== 'undefined') {
     stypes.Int32.serialize(sign_buffer, prefix);
   }
 
@@ -272,17 +289,11 @@ SerializedObject.prototype.hash = function(prefix) {
 SerializedObject.prototype.signing_hash = SerializedObject.prototype.hash;
 
 SerializedObject.prototype.serialize_field = function(spec, obj) {
-  var name     = spec[0];
+  var name = spec[0];
   var presence = spec[1];
-  var field_id = spec[2];
-  var Type     = stypes[spec[3]];
 
   if (typeof obj[name] !== 'undefined') {
-    // ST: Old serialization code
-    //this.append(SerializedObject.get_field_header(Type.id, field_id));
     try {
-      // ST: Old serialization code
-      //Type.serialize(this, obj[name]);
       stypes.serialize(this, name, obj[name]);
     } catch (e) {
       // Add field name to message and rethrow
@@ -295,7 +306,7 @@ SerializedObject.prototype.serialize_field = function(spec, obj) {
 };
 
 SerializedObject.get_field_header = function(type_id, field_id) {
-  var buffer = [ 0 ];
+  var buffer = [0];
 
   if (type_id > 0xF) {
     buffer.push(type_id & 0xFF);
@@ -328,7 +339,7 @@ SerializedObject.lookup_type_tx = function(id) {
   return TRANSACTION_TYPES[id];
 };
 
-SerializedObject.lookup_type_le = function (id) {
+SerializedObject.lookup_type_le = function(id) {
   assert(typeof id === 'number');
   return LEDGER_ENTRY_TYPES[id];
 };
