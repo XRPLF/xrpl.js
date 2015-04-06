@@ -67,21 +67,21 @@ Seed.prototype.to_json = function() {
 };
 
 function Sha512() {
-  this.buffer = [];
+  this.hash = new sjcl.hash.sha512();
 }
 
 Sha512.prototype.add = function(bytes) {
-  Array.prototype.push.apply(this.buffer, bytes);
+  this.hash.update(sjcl.codec.bytes.toBits(bytes));
   return this;
 };
 
 Sha512.prototype.add32 = function(i) {
-  this.add([(i >>> 24) & 0xff, (i >>> 16) & 0xff, (i >>> 8) & 0xff, i & 0xff]);
+  this.hash.update([i]);
   return this;
 };
 
 Sha512.prototype.finish = function() {
-  return sjcl.hash.sha512.hash(sjcl.codec.bytes.toBits(this.buffer));
+  return this.hash.finalize();
 };
 
 Sha512.prototype.finish256 = function() {
@@ -147,7 +147,7 @@ Seed.prototype._get_key = function(root) {
       i++;
 
     // Again, we make sure the value is situated on the curve. The `i` sequence
-    // was incremented so if it wasn't, we try again with a new hash.
+    // was incremented so next time we try we'll have a new hash.
     } while (!curve.r.greaterEquals(sec));
 
     // The final operation:
