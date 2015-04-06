@@ -1,5 +1,7 @@
 'use strict';
 
+/*eslint new-cap: 1*/
+
 //
 // Seed support
 //
