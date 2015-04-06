@@ -121,41 +121,41 @@ Seed.prototype._get_key = function(root) {
     // sure the 256 bits represents a number that is situated on the curve.
     privateGen = new Sha512().add(this.to_bytes()).add32(i).finish256BN();
 
-    // This private generator, represents the `root` key, and is what's used by
-    // validators, when a keypair is generated from a seed.
+    // This private generator, represents the `root` private key, and is what's
+    // used by validators for signing when a keypair is generated from a seed.
     i++;
   } while (!curve.r.greaterEquals(privateGen));
 
-  var sec;
+  var secret;
 
   if (root) {
     // As used by validation_create
-    sec = privateGen;
+    secret = privateGen;
   } else {
     publicGen = curve.G.mult(privateGen);
     i = 0;
     // Previously there was an `account families` feature, where a seed could
     // generate many keypairs (as a function of the seed and a uint32). This
     // gained little use and the feature was removed, as everyone just used the
-    // `first` account (defined by the uint32 `0`).
+    // first account, `0`.
     var accountNumber = 0;
     do {
       // We hash the root key-pair's public key bytes, along with the account
       // number to deterministically find another point on the curve.
-      sec = new Sha512().add(publicGen.toBytesCompressed())
-                        .add32(accountNumber).add32(i).finish256BN();
+      secret = new Sha512().add(publicGen.toBytesCompressed())
+                           .add32(accountNumber).add32(i).finish256BN();
       i++;
 
     // Again, we make sure the value is situated on the curve. The `i` sequence
     // was incremented so next time we try we'll have a new hash.
-    } while (!curve.r.greaterEquals(sec));
+    } while (!curve.r.greaterEquals(secret));
 
     // The final operation:
-    sec = sec.add(privateGen).mod(curve.r);
+    secret = secret.add(privateGen).mod(curve.r);
   }
   // The public key is lazily computed by the key class, but it has the same
-  // mathematical relationship to `sec` as `publicGen` to `privateGen`.
-  return KeyPair.from_bn_secret(sec);
+  // mathematical relationship to `secret` as `publicGen` to `privateGen`.
+  return KeyPair.from_bn_secret(secret);
 };
 
 exports.Seed = Seed;
