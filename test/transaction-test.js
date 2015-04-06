@@ -1,9 +1,10 @@
-var assert           = require('assert');
-var Amount           = require('ripple-lib').Amount;
-var Transaction      = require('ripple-lib').Transaction;
+/* eslint-disable max-len */
+'use strict';
+var assert = require('assert');
+var Transaction = require('ripple-lib').Transaction;
 var TransactionQueue = require('ripple-lib').TransactionQueue;
-var Remote           = require('ripple-lib').Remote;
-var Server           = require('ripple-lib').Server;
+var Remote = require('ripple-lib').Remote;
+var Server = require('ripple-lib').Server;
 var sjcl = require('ripple-lib').sjcl;
 
 var transactionResult = {
@@ -18,21 +19,22 @@ var transactionResult = {
   metadata: {
     AffectedNodes: [ ],
     TransactionIndex: 0,
-    TransactionResult: 'tesSUCCESS' },
-    tx_json: {
-      Account: 'rHPotLj3CNKaP4bQANcecEuT8hai3VpxfB',
-      Amount: '1000000',
-      Destination: 'rYtn3D1VGQyf1MTqcwLDepUKm22YEGXGJA',
-      Fee: '10',
-      Flags: 0,
-      LastLedgerSequence: 7106151,
-      Sequence: 2973,
-      SigningPubKey: '0306E9F38DF11402953A5B030C1AE8A88C47E348170C3B8EC6C8D775E797168462',
-      TransactionType: 'Payment',
-      TxnSignature: '3045022100A58B0460BC5092CB4F96155C19125A4E079C870663F1D5E8BBC9BDEE06D51F530220408A3AA26988ABF18E16BE77B016F25018A2AA7C99FFE723FC8598471357DBCF',
-      date: 455660500,
-      hash: '61D60378AB70ACE630B20A81B50708A3DB5E7CEE35914292FF3761913DA61DEA'
-    }
+    TransactionResult: 'tesSUCCESS'
+  },
+  tx_json: {
+    Account: 'rHPotLj3CNKaP4bQANcecEuT8hai3VpxfB',
+    Amount: '1000000',
+    Destination: 'rYtn3D1VGQyf1MTqcwLDepUKm22YEGXGJA',
+    Fee: '10',
+    Flags: 0,
+    LastLedgerSequence: 7106151,
+    Sequence: 2973,
+    SigningPubKey: '0306E9F38DF11402953A5B030C1AE8A88C47E348170C3B8EC6C8D775E797168462',
+    TransactionType: 'Payment',
+    TxnSignature: '3045022100A58B0460BC5092CB4F96155C19125A4E079C870663F1D5E8BBC9BDEE06D51F530220408A3AA26988ABF18E16BE77B016F25018A2AA7C99FFE723FC8598471357DBCF',
+    date: 455660500,
+    hash: '61D60378AB70ACE630B20A81B50708A3DB5E7CEE35914292FF3761913DA61DEA'
+  }
 };
 
 describe('Transaction', function() {
@@ -195,7 +197,7 @@ describe('Transaction', function() {
 
     assert.strictEqual(transaction._accountSecret('rpzT237Ctpaa58KieifoK8RyBmmRwEcfhK'), 'shY1njzHAXp8Qt3bpxYW6RpoZtMKP');
     assert.strictEqual(transaction._accountSecret('rpdxPs9CR93eLAc5DTvAgv4S9XJ1CzKj1a'), 'ssboTJezioTq8obyvDU9tVo95NGGQ');
-    assert.strictEqual(transaction._accountSecret('rExistNot'), void(0));
+    assert.strictEqual(transaction._accountSecret('rExistNot'), undefined);
   });
 
   it('Get fee units', function() {
@@ -226,7 +228,7 @@ describe('Transaction', function() {
     s5._connected = true;
     s5._load_factor = 256 * 7;
 
-    remote._servers = [ s2, s3, s1, s4 ];
+    remote._servers = [s2, s3, s1, s4];
 
     assert.strictEqual(s1._computeFee(10), '12');
     assert.strictEqual(s2._computeFee(10), '48');
@@ -241,7 +243,7 @@ describe('Transaction', function() {
 
   it('Compute fee, no remote', function() {
     var transaction = new Transaction();
-    assert.strictEqual(transaction._computeFee(10), void(0));
+    assert.strictEqual(transaction._computeFee(10), undefined);
   });
 
   it('Compute fee - no connected server', function() {
@@ -258,7 +260,7 @@ describe('Transaction', function() {
     s3._connected = false;
     s3._load_factor = 256 * 8;
 
-    remote._servers = [ s1, s2, s3 ];
+    remote._servers = [s1, s2, s3];
 
     assert.strictEqual(s1._computeFee(10), '12');
     assert.strictEqual(s2._computeFee(10), '48');
@@ -266,7 +268,7 @@ describe('Transaction', function() {
 
     var transaction = new Transaction(remote);
 
-    assert.strictEqual(transaction._computeFee(), void(0));
+    assert.strictEqual(transaction._computeFee(), undefined);
   });
 
   it('Compute fee - one connected server', function() {
@@ -283,7 +285,7 @@ describe('Transaction', function() {
     s3._connected = true;
     s3._load_factor = 256 * 8;
 
-    remote._servers = [ s1, s2, s3 ];
+    remote._servers = [s1, s2, s3];
 
     assert.strictEqual(s1._computeFee(10), '12');
     assert.strictEqual(s2._computeFee(10), '48');
@@ -313,7 +315,7 @@ describe('Transaction', function() {
     s4._connected = true;
     s4._load_factor = 256 * 16;
 
-    remote._servers = [ s1, s2, s3, s4  ];
+    remote._servers = [s1, s2, s3, s4];
 
     assert.strictEqual(s1._computeFee(10), '12');
     assert.strictEqual(s2._computeFee(10), '48');
@@ -325,7 +327,7 @@ describe('Transaction', function() {
     transaction.tx_json.Sequence = 1;
     var src = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
     var dst = 'rGihwhaqU8g7ahwAvTq6iX5rvsfcbgZw6v';
-    
+
     transaction.payment(src, dst, '100');
     remote.set_secret(src, 'masterpassphrase');
 
@@ -353,7 +355,7 @@ describe('Transaction', function() {
     s4._connected = true;
     s4._load_factor = 256 * 16;
 
-    remote._servers = [ s1, s2, s3, s4  ];
+    remote._servers = [s1, s2, s3, s4];
 
     assert.strictEqual(s1._computeFee(10), '12');
     assert.strictEqual(s2._computeFee(10), '48');
@@ -372,7 +374,7 @@ describe('Transaction', function() {
     var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
 
-    remote._servers = [ s1 ];
+    remote._servers = [s1];
     remote.trusted = true;
     remote.local_signing = true;
 
@@ -433,7 +435,7 @@ describe('Transaction', function() {
     remote.trusted = true;
     remote.local_signing = true;
 
-    transaction.SigningPubKey = void(0);
+    transaction.SigningPubKey = undefined;
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoijX';
 
@@ -471,7 +473,7 @@ describe('Transaction', function() {
     var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
 
-    remote._servers = [ s1 ];
+    remote._servers = [s1];
     remote.trusted = true;
     remote.local_signing = true;
 
@@ -479,7 +481,7 @@ describe('Transaction', function() {
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
 
-    assert.strictEqual(transaction.tx_json.Fee, void(0));
+    assert.strictEqual(transaction.tx_json.Fee, undefined);
 
     assert(transaction.complete());
 
@@ -489,13 +491,13 @@ describe('Transaction', function() {
   });
 
   it('Complete transaction - compute fee exceeds max fee', function(done) {
-    var remote = new Remote({ max_fee: 10 });
+    var remote = new Remote({max_fee: 10});
 
     var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
     s1._load_factor = 256 * 16;
 
-    remote._servers = [ s1 ];
+    remote._servers = [s1];
     remote.trusted = true;
     remote.local_signing = true;
 
@@ -519,7 +521,7 @@ describe('Transaction', function() {
     s1._connected = true;
     s1._load_factor = 256;
 
-    remote._servers = [ s1 ];
+    remote._servers = [s1];
     remote.trusted = true;
     remote.local_signing = true;
 
@@ -545,7 +547,7 @@ describe('Transaction', function() {
     transaction.tx_json.Sequence = 1;
     transaction.tx_json.TransactionType = 'AccountSet';
 
-    assert.strictEqual(transaction.signingHash(), 'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE')
+    assert.strictEqual(transaction.signingHash(), 'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
 
     done();
   });
@@ -560,7 +562,7 @@ describe('Transaction', function() {
     transaction.tx_json.Sequence = 1;
     transaction.tx_json.TransactionType = 'AccountSet';
 
-    assert.strictEqual(transaction.hash(), '1A860FC46D1DD9200560C64002418A4E8BBDE939957AC82D7B14D80A1C0E2EB5')
+    assert.strictEqual(transaction.hash(), '1A860FC46D1DD9200560C64002418A4E8BBDE939957AC82D7B14D80A1C0E2EB5');
 
     done();
   });
@@ -575,7 +577,7 @@ describe('Transaction', function() {
     transaction.tx_json.Sequence = 1;
     transaction.tx_json.TransactionType = 'AccountSet';
 
-    assert.strictEqual(transaction.hash('HASH_TX_SIGN'), 'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE')
+    assert.strictEqual(transaction.hash('HASH_TX_SIGN'), 'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
     assert.strictEqual(transaction.hash('HASH_TX_SIGN_TESTNET'), '9FE7D27FC5B9891076B66591F99A683E01E0912986A629235459A3BD1961F341');
 
     done();
@@ -600,51 +602,51 @@ describe('Transaction', function() {
 
   it('Get hash - complex transaction', function() {
     var input_json = {
-      Account : 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-      Amount : {
-        currency : 'LTC',
-        issuer : 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-        value : '9.985'
+      Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      Amount: {
+        currency: 'LTC',
+        issuer: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+        value: '9.985'
       },
-      Destination : 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-      Fee : '15',
-      Flags : 0,
-      Paths : [
+      Destination: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      Fee: '15',
+      Flags: 0,
+      Paths: [
         [
           {
-        account : 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
-        currency : 'USD',
-        issuer : 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
-        type : 49,
-        type_hex : '0000000000000031'
+        account: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
+        currency: 'USD',
+        issuer: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
+        type: 49,
+        type_hex: '0000000000000031'
       },
       {
-        currency : 'LTC',
-        issuer : 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
-        type : 48,
-        type_hex : '0000000000000030'
+        currency: 'LTC',
+        issuer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        type: 48,
+        type_hex: '0000000000000030'
       },
       {
-        account : 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
-        currency : 'LTC',
-        issuer : 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
-        type : 49,
-        type_hex : '0000000000000031'
+        account: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        currency: 'LTC',
+        issuer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        type: 49,
+        type_hex: '0000000000000031'
       }
       ]
       ],
-      SendMax : {
-        currency : 'USD',
-        issuer : 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-        value : '30.30993068'
+      SendMax: {
+        currency: 'USD',
+        issuer: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+        value: '30.30993068'
       },
-      Sequence : 415,
-      SigningPubKey : '02854B06CE8F3E65323F89260E9E19B33DA3E01B30EA4CA172612DE77973FAC58A',
-      TransactionType : 'Payment',
-      TxnSignature : '304602210096C2F385530587DE573936CA51CB86B801A28F777C944E268212BE7341440B7F022100EBF0508A9145A56CDA7FAF314DF3BBE51C6EE450BA7E74D88516891A3608644E'
+      Sequence: 415,
+      SigningPubKey: '02854B06CE8F3E65323F89260E9E19B33DA3E01B30EA4CA172612DE77973FAC58A',
+      TransactionType: 'Payment',
+      TxnSignature: '304602210096C2F385530587DE573936CA51CB86B801A28F777C944E268212BE7341440B7F022100EBF0508A9145A56CDA7FAF314DF3BBE51C6EE450BA7E74D88516891A3608644E'
     };
 
-    var expected_hash = "87366146D381AD971B97DD41CFAC1AE4670B0E996AB574B0CE18CE6467811868";
+    var expected_hash = '87366146D381AD971B97DD41CFAC1AE4670B0E996AB574B0CE18CE6467811868';
     var transaction = Transaction.from_json(input_json);
 
     assert.deepEqual(transaction.hash(), expected_hash);
@@ -729,48 +731,48 @@ describe('Transaction', function() {
 
   it('Serialize transaction', function() {
     var input_json = {
-      Account : 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-      Amount : {
-        currency : 'LTC',
-        issuer : 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-        value : '9.985'
+      Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      Amount: {
+        currency: 'LTC',
+        issuer: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+        value: '9.985'
       },
-      Destination : 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-      Fee : '15',
-      Flags : 0,
-      Paths : [
+      Destination: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+      Fee: '15',
+      Flags: 0,
+      Paths: [
         [
           {
-        account : 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
-        currency : 'USD',
-        issuer : 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
-        type : 49,
-        type_hex : '0000000000000031'
+        account: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
+        currency: 'USD',
+        issuer: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
+        type: 49,
+        type_hex: '0000000000000031'
       },
       {
-        currency : 'LTC',
-        issuer : 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
-        type : 48,
-        type_hex : '0000000000000030'
+        currency: 'LTC',
+        issuer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        type: 48,
+        type_hex: '0000000000000030'
       },
       {
-        account : 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
-        currency : 'LTC',
-        issuer : 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
-        type : 49,
-        type_hex : '0000000000000031'
+        account: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        currency: 'LTC',
+        issuer: 'rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX',
+        type: 49,
+        type_hex: '0000000000000031'
       }
       ]
       ],
-      SendMax : {
-        currency : 'USD',
-        issuer : 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
-        value : '30.30993068'
+      SendMax: {
+        currency: 'USD',
+        issuer: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+        value: '30.30993068'
       },
-      Sequence : 415,
-      SigningPubKey : '02854B06CE8F3E65323F89260E9E19B33DA3E01B30EA4CA172612DE77973FAC58A',
-      TransactionType : 'Payment',
-      TxnSignature : '304602210096C2F385530587DE573936CA51CB86B801A28F777C944E268212BE7341440B7F022100EBF0508A9145A56CDA7FAF314DF3BBE51C6EE450BA7E74D88516891A3608644E'
+      Sequence: 415,
+      SigningPubKey: '02854B06CE8F3E65323F89260E9E19B33DA3E01B30EA4CA172612DE77973FAC58A',
+      TransactionType: 'Payment',
+      TxnSignature: '304602210096C2F385530587DE573936CA51CB86B801A28F777C944E268212BE7341440B7F022100EBF0508A9145A56CDA7FAF314DF3BBE51C6EE450BA7E74D88516891A3608644E'
     };
 
     var expected_hex = '1200002200000000240000019F61D4A3794DFA1510000000000000000000000000004C54430000000000EF7ED76B77750D79EC92A59389952E0E8054407668400000000000000F69D4CAC4AC112283000000000000000000000000005553440000000000EF7ED76B77750D79EC92A59389952E0E80544076732102854B06CE8F3E65323F89260E9E19B33DA3E01B30EA4CA172612DE77973FAC58A7448304602210096C2F385530587DE573936CA51CB86B801A28F777C944E268212BE7341440B7F022100EBF0508A9145A56CDA7FAF314DF3BBE51C6EE450BA7E74D88516891A3608644E8114EF7ED76B77750D79EC92A59389952E0E805440768314EF7ED76B77750D79EC92A59389952E0E80544076011231DD39C650A96EDA48334E70CC4A85B8B2E8502CD30000000000000000000000005553440000000000DD39C650A96EDA48334E70CC4A85B8B2E8502CD3300000000000000000000000004C5443000000000047DA9E2E00ECF224A52329793F1BB20FB1B5EA643147DA9E2E00ECF224A52329793F1BB20FB1B5EA640000000000000000000000004C5443000000000047DA9E2E00ECF224A52329793F1BB20FB1B5EA6400';
@@ -816,8 +818,8 @@ describe('Transaction', function() {
 
     assert.deepEqual(
       transaction.submittedIDs,
-      [ 'F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE',
-        'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE' ]
+      ['F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE',
+        'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE']
     );
 
     done();
@@ -828,7 +830,7 @@ describe('Transaction', function() {
 
     assert.deepEqual(transaction.findId({
       F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE: transaction
-    }), void(0));
+    }), undefined);
 
     transaction.addId('F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
 
@@ -838,7 +840,7 @@ describe('Transaction', function() {
 
     assert.strictEqual(transaction.findId({
       Z1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE: transaction
-    }), void(0));
+    }), undefined);
 
     done();
   });
@@ -852,7 +854,7 @@ describe('Transaction', function() {
   it('Set DestinationTag', function() {
     var transaction = new Transaction();
     transaction.destinationTag('tag');
-    assert.strictEqual(transaction.tx_json.DestinationTag, void(0));
+    assert.strictEqual(transaction.tx_json.DestinationTag, undefined);
     transaction.destinationTag(1);
     assert.strictEqual(transaction.tx_json.DestinationTag, 1);
   });
@@ -861,7 +863,7 @@ describe('Transaction', function() {
     var transaction = new Transaction();
 
     transaction.invoiceID(1);
-    assert.strictEqual(transaction.tx_json.InvoiceID, void(0));
+    assert.strictEqual(transaction.tx_json.InvoiceID, undefined);
 
     transaction.invoiceID('DEADBEEF');
     assert.strictEqual(transaction.tx_json.InvoiceID, 'DEADBEEF00000000000000000000000000000000000000000000000000000000');
@@ -874,7 +876,7 @@ describe('Transaction', function() {
     var transaction = new Transaction();
 
     transaction.clientID(1);
-    assert.strictEqual(transaction._clientID, void(0));
+    assert.strictEqual(transaction._clientID, undefined);
 
     transaction.clientID('DEADBEEF');
     assert.strictEqual(transaction._clientID, 'DEADBEEF');
@@ -884,11 +886,11 @@ describe('Transaction', function() {
     var transaction = new Transaction();
 
     transaction.lastLedger('a');
-    assert.strictEqual(transaction.tx_json.LastLedgerSequence, void(0));
+    assert.strictEqual(transaction.tx_json.LastLedgerSequence, undefined);
     assert(!transaction._setLastLedger);
 
     transaction.lastLedger(NaN);
-    assert.strictEqual(transaction.tx_json.LastLedgerSequence, void(0));
+    assert.strictEqual(transaction.tx_json.LastLedgerSequence, undefined);
     assert(!transaction._setLastLedger);
 
     transaction.lastLedger(12);
@@ -928,8 +930,6 @@ describe('Transaction', function() {
   });
 
   it('Rewrite transaction path', function() {
-    var transaction = new Transaction();
-
     var path = [
       {
         account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
@@ -971,7 +971,7 @@ describe('Transaction', function() {
 
   it('Rewrite transaction path - invalid path', function() {
     assert.throws(function() {
-      assert.strictEqual(Transaction._rewritePath(1), void(0));
+      assert.strictEqual(Transaction._rewritePath(1), undefined);
     });
   });
 
@@ -980,7 +980,7 @@ describe('Transaction', function() {
 
     transaction.pathAdd(1);
 
-    assert.strictEqual(transaction.tx_json.Paths, void(0));
+    assert.strictEqual(transaction.tx_json.Paths, undefined);
 
     var path = [
       {
@@ -1031,7 +1031,7 @@ describe('Transaction', function() {
 
     transaction.paths(1);
 
-    assert.strictEqual(transaction.tx_json.Paths, void(0));
+    assert.strictEqual(transaction.tx_json.Paths, undefined);
 
     transaction.paths([
       [{
@@ -1081,7 +1081,7 @@ describe('Transaction', function() {
   it('Set SourceTag', function() {
     var transaction = new Transaction();
     transaction.sourceTag('tag');
-    assert.strictEqual(transaction.tx_json.SourceTag, void(0));
+    assert.strictEqual(transaction.tx_json.SourceTag, undefined);
     transaction.sourceTag(1);
     assert.strictEqual(transaction.tx_json.SourceTag, 1);
   });
@@ -1089,7 +1089,7 @@ describe('Transaction', function() {
   it('Set TransferRate', function() {
     var transaction = new Transaction();
     transaction.transferRate(1);
-    assert.strictEqual(transaction.tx_json.TransferRate, void(0));
+    assert.strictEqual(transaction.tx_json.TransferRate, undefined);
     transaction.transferRate(1.5 * 1e9);
     assert.strictEqual(transaction.tx_json.TransferRate, 1.5 * 1e9);
   });
@@ -1100,33 +1100,33 @@ describe('Transaction', function() {
     transaction.setFlags();
     assert.strictEqual(transaction.tx_json.Flags, 0);
 
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
-    transaction.setFlags(Transaction.flags.Payment.PartialPayment);
-    assert.strictEqual(transaction.tx_json.Flags, 131072);
+    var transaction2 = new Transaction();
+    transaction2.tx_json.TransactionType = 'Payment';
+    transaction2.setFlags(Transaction.flags.Payment.PartialPayment);
+    assert.strictEqual(transaction2.tx_json.Flags, 131072);
 
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
-    transaction.setFlags('NoRippleDirect');
-    assert.strictEqual(transaction.tx_json.Flags, 65536);
+    var transaction3 = new Transaction();
+    transaction3.tx_json.TransactionType = 'Payment';
+    transaction3.setFlags('NoRippleDirect');
+    assert.strictEqual(transaction3.tx_json.Flags, 65536);
 
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
-    transaction.setFlags('PartialPayment', 'NoRippleDirect');
-    assert.strictEqual(transaction.tx_json.Flags, 196608);
+    var transaction4 = new Transaction();
+    transaction4.tx_json.TransactionType = 'Payment';
+    transaction4.setFlags('PartialPayment', 'NoRippleDirect');
+    assert.strictEqual(transaction4.tx_json.Flags, 196608);
 
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
-    transaction.setFlags([ 'LimitQuality', 'PartialPayment' ]);
-    assert.strictEqual(transaction.tx_json.Flags, 393216);
+    var transaction5 = new Transaction();
+    transaction5.tx_json.TransactionType = 'Payment';
+    transaction5.setFlags(['LimitQuality', 'PartialPayment']);
+    assert.strictEqual(transaction5.tx_json.Flags, 393216);
 
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
-    transaction.once('error', function(err) {
+    var transaction6 = new Transaction();
+    transaction6.tx_json.TransactionType = 'Payment';
+    transaction6.once('error', function(err) {
       assert.strictEqual(err.result, 'tejInvalidFlag');
       done();
     });
-    transaction.setFlags('asdf');
+    transaction6.setFlags('asdf');
   });
 
   it('Add Memo', function() {
@@ -1185,10 +1185,10 @@ describe('Transaction', function() {
     var transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
-    transaction.addMemo('testkey', void(0), 'testvalue');
-    transaction.addMemo('testkey2', void(0), 'testvalue2');
+    transaction.addMemo('testkey', undefined, 'testvalue');
+    transaction.addMemo('testkey2', undefined, 'testvalue2');
     transaction.addMemo('testkey3', 'text/html');
-    transaction.addMemo(void(0), void(0), 'testvalue4');
+    transaction.addMemo(undefined, undefined, 'testvalue4');
     transaction.addMemo('testkey4', 'text/html', '<html>');
 
     var expected = [
@@ -1250,7 +1250,7 @@ describe('Transaction', function() {
     transaction.tx_json.TransactionType = 'Payment';
 
     assert.throws(function() {
-      transaction.addMemo(void(0), 1);
+      transaction.addMemo(undefined, 1);
     }, /^Error: MemoFormat must be a string$/);
   });
 
@@ -1259,7 +1259,7 @@ describe('Transaction', function() {
     transaction.tx_json.TransactionType = 'Payment';
 
     assert.throws(function() {
-      transaction.addMemo(void(0), 'России');
+      transaction.addMemo(undefined, 'России');
     }, /^Error: MemoFormat must be valid ASCII$/);
   });
 
@@ -1267,7 +1267,7 @@ describe('Transaction', function() {
     var transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
-    transaction.addMemo({memoData:'some_string'});
+    transaction.addMemo({memoData: 'some_string'});
 
     assert.deepEqual(transaction.tx_json.Memos, [
       {
@@ -1366,7 +1366,7 @@ describe('Transaction', function() {
 
   it('Construct AccountSet transaction - invalid account', function() {
     assert.throws(function() {
-      var transaction = new Transaction().accountSet('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm');
+      new Transaction().accountSet('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm');
     });
   });
 
@@ -1399,7 +1399,7 @@ describe('Transaction', function() {
 
   it('Construct OfferCancel transaction - invalid account', function() {
     assert.throws(function() {
-      var transaction = new Transaction().offerCancel('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 1);
+      new Transaction().offerCancel('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 1);
     });
   });
 
@@ -1601,7 +1601,7 @@ describe('Transaction', function() {
 
   it('Construct Payment transaction - invalid account', function() {
     assert.throws(function() {
-      var transaction = new Transaction().payment(
+      new Transaction().payment(
         'xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
         'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
         '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
@@ -1611,7 +1611,7 @@ describe('Transaction', function() {
 
   it('Construct Payment transaction - invalid destination', function() {
     assert.throws(function() {
-      var transaction = new Transaction().payment(
+      new Transaction().payment(
         'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
         'xr36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
         '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
@@ -1680,7 +1680,7 @@ describe('Transaction', function() {
   it('Construct TrustSet transaction - invalid account', function() {
     assert.throws(function() {
       var limit = '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe';
-      var transaction = new Transaction().trustSet('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', limit, 1.0, 1.0);
+      new Transaction().trustSet('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', limit, 1.0, 1.0);
     });
   });
 
@@ -1688,9 +1688,9 @@ describe('Transaction', function() {
     var remote = new Remote();
     var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
 
-    assert.strictEqual(transaction.callback, void(0));
-    assert.strictEqual(transaction._errorHandler, void(0));
-    assert.strictEqual(transaction._successHandler, void(0));
+    assert.strictEqual(transaction.callback, undefined);
+    assert.strictEqual(transaction._errorHandler, undefined);
+    assert.strictEqual(transaction._successHandler, undefined);
     assert.strictEqual(transaction.listeners('error').length, 1);
 
     var account = remote.addAccount('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
@@ -1711,13 +1711,13 @@ describe('Transaction', function() {
       receivedSuccess = true;
     });
 
-    function submitCallback(err, res) {
+    function submitCallback(err) {
       setImmediate(function() {
         assert.ifError(err);
         assert(receivedSuccess);
         done();
       });
-    };
+    }
 
     transaction.submit(submitCallback);
 
@@ -1750,14 +1750,14 @@ describe('Transaction', function() {
       receivedError = true;
     });
 
-    function submitCallback(err, res) {
+    function submitCallback(err) {
       setImmediate(function() {
         assert(err);
         assert.strictEqual(err.constructor.name, 'RippleError');
         assert(receivedError);
         done();
       });
-    };
+    }
 
     transaction.submit(submitCallback);
   });
@@ -1777,7 +1777,7 @@ describe('Transaction', function() {
   it('Submit transaction - invalid account', function(done) {
     var remote = new Remote();
     assert.throws(function() {
-      var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWeZ');
+      new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWeZ');
     });
     done();
   });
@@ -1787,7 +1787,9 @@ describe('Transaction', function() {
     remote.setSecret('rJaT8TafQfYJqDm8aC5n3Yx5yWEL2Ery79', 'snPwFATthTkKnGjEW73q3TL4yci1Q');
 
     var server = new Server(remote, 'wss://s1.ripple.com:443');
-    server._computeFee = function() { return '12'; };
+    server._computeFee = function() {
+      return '12';
+    };
     server._connected = true;
 
     remote._servers.push(server);
@@ -1803,7 +1805,7 @@ describe('Transaction', function() {
       transaction.abort();
     });
 
-    transaction.submit(function(err, res) {
+    transaction.submit(function(err) {
       setImmediate(function() {
         assert(err);
         assert.strictEqual(err.result, 'tejAbort');
@@ -1828,7 +1830,7 @@ describe('Transaction', function() {
       872298,
       543305
     ]
-    .forEach(function(index){
+    .forEach(function(index) {
       var tx = new Transaction();
       tx.initialSubmitIndex = index;
       queue.push(tx);
@@ -1839,11 +1841,9 @@ describe('Transaction', function() {
       return a.initialSubmitIndex - b.initialSubmitIndex;
     });
 
-    sorted.forEach(function(tx){
+    sorted.forEach(function(tx) {
       assert.strictEqual(queue.getMinLedger(), tx.initialSubmitIndex);
       queue.remove(tx);
     });
   });
 });
-
-//vim:sw=2:sts=2:ts=8:et

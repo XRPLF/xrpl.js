@@ -57,6 +57,7 @@ describe('TransactionManager', function() {
         try {
           c.send(JSON.stringify(v));
         } catch (e) {
+          // empty
         }
       };
       c.sendResponse = function(baseResponse, ext) {
