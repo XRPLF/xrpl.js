@@ -1,6 +1,16 @@
+##0.12.3
+
++ [Add getLedgerSequence to Remote](https://github.com/ripple/ripple-lib/commit/d09548d04d3238fca653d482ec1d5faa7254559a)
+
++ [Improve randomness when generating ECDSA signatures](https://github.com/ripple/ripple-lib/commit/fe7e30b737ead6e71adfa466f5835ba546feab31)
+
++ [Improve SerializedObject.append performance](https://github.com/ripple/ripple-lib/commit/f7c35b118ebba549a64bcaa1a0629385ec6dbf6f)
+
+
 ##0.12.2
 
 + [Check that stack trace is available, fixes logging in browser](https://github.com/ripple/ripple-lib/commit/53cae3a66d48e88e8a6bbb96d6489ce7b9e22975)
+
 
 ##0.12.1
 
