@@ -92,8 +92,9 @@ KeyPair.prototype.get_address = function() {
 };
 
 KeyPair.prototype.sign = function(hash) {
+  var PARANOIA_256_BITS = 6; // sjcl constant for ensuring 256 bits of entropy
   hash = UInt256.from_json(hash);
-  var sig = this._secret.sign(hash.to_bits(), 0);
+  var sig = this._secret.sign(hash.to_bits(), PARANOIA_256_BITS);
   sig = this._secret.canonicalizeSignature(sig);
   return this._secret.encodeDER(sig);
 };
