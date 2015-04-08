@@ -553,6 +553,15 @@ Remote.prototype._handleMessage = function(message, server) {
   }
 };
 
+
+Remote.prototype.getLedgerSequence = function() {
+  if (!this._ledger_current_index) {
+    throw new Error('Ledger sequence has not yet been initialized');
+  }
+  return this._ledger_current_index;
+};
+
+
 /**
  * Handle server ledger_closed event
  *
