@@ -14,6 +14,8 @@ var Base = require('./base').Base;
 var UInt = require('./uint').UInt;
 var KeyPair = require('./keypair').KeyPair;
 
+var Sha512 = utils.Sha512;
+
 var Seed = extend(function() {
   this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;
@@ -68,48 +70,34 @@ Seed.prototype.to_json = function() {
   return output;
 };
 
-function Sha512() {
-  this.hash = new sjcl.hash.sha512();
-}
-
-Sha512.prototype.add = function(bytes) {
-  this.hash.update(sjcl.codec.bytes.toBits(bytes));
-  return this;
-};
-
-Sha512.prototype.add32 = function(i) {
-  this.hash.update([i]);
-  return this;
-};
-
-Sha512.prototype.finish = function() {
-  return this.hash.finalize();
-};
-
-Sha512.prototype.finish256 = function() {
-  return sjcl.bitArray.bitSlice(this.finish(), 0, 256);
-};
-
-Sha512.prototype.finish256BN = function() {
-  return sjcl.bn.fromBits(this.finish256());
-};
-
-Seed.prototype.get_key = function() {
-  if (arguments.length !== 0) {
-    throw new Error('Account families are no long supported. ' +
-                    'The first account for each seed is always taken.');
+Seed.prototype.get_key = function(opts) {
+  if (opts !== undefined && typeof opts !== 'object') {
+    throw new Error('get_key options not supported: ' + opts);
   }
-  return this._get_key(false);
+  return this._get_key(opts);
 };
 
 /**
 * @return {KeyPair} - the root key-pair, as used by validators.
 */
 Seed.prototype.get_root_key = function() {
-  return this._get_key(true);
+  return this._get_key({root: true});
 };
 
-Seed.prototype._get_key = function(root) {
+/**
+* @param {Object} [options] -
+*
+* @param {Number} [options.accountIndex=0] - the account number to generate
+*
+* @param {Boolean} [options.root=false] - generate root key-pair,
+*                                         as used by validators.
+* @return {KeyPair} -
+*/
+Seed.prototype._get_key = function(options) {
+  var opts = options || {};
+
+  var root = opts.root;
+
   if (!this.is_valid()) {
     throw new Error('Cannot generate keys from invalid seed!');
   }
@@ -121,7 +109,7 @@ Seed.prototype._get_key = function(root) {
   do {
     // We hash the seed to extend from 128 bits to 256, looping until we are
     // sure the 256 bits represents a number that is situated on the curve.
-    privateGen = new Sha512().add(this.to_bytes()).add32(i).finish256BN();
+    privateGen = new Sha512().add(this.to_bytes()).addU32(i).finish256BN();
 
     // This private generator, represents the `root` private key, and is what's
     // used by validators for signing when a keypair is generated from a seed.
@@ -136,16 +124,14 @@ Seed.prototype._get_key = function(root) {
   } else {
     publicGen = curve.G.mult(privateGen);
     i = 0;
-    // Previously there was an `account families` feature, where a seed could
-    // generate many keypairs (as a function of the seed and a uint32). This
-    // gained little use and the feature was removed, as everyone just used the
-    // first account, `0`.
-    var accountNumber = 0;
+    // A seed can generate many keypairs as a function of the seed and a uint32.
+    // Almost everyone just uses the first account, `0`,
+    var accountIndex = opts.accountIndex || 0;
     do {
       // We hash the root key-pair's public key bytes, along with the account
       // number to deterministically find another point on the curve.
       secret = new Sha512().add(publicGen.toBytesCompressed())
-                           .add32(accountNumber).add32(i).finish256BN();
+                           .addU32(accountIndex).addU32(i).finish256BN();
       i++;
 
     // Again, we make sure the value is situated on the curve. The `i` sequence
