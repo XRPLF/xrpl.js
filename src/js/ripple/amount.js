@@ -1,4 +1,4 @@
- 'use strict';
+'use strict';
 
 // Represent Ripple amounts and currencies.
 // - Numbers in hex are big-endian.
@@ -154,6 +154,10 @@ Amount.prototype.multiply = function(multiplicand) {
     multiplicandAmount._value.times(Amount.bi_xns_unit)
     : multiplicandAmount._value;
   return this._copy(this._value.times(multiplyBy));
+};
+
+Amount.prototype.scale = function(scaleFactor) {
+  return this._copy(this._value.times(scaleFactor));
 };
 
 Amount.prototype.divide = function(divisor) {
