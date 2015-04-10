@@ -6,6 +6,8 @@
 
 + [Improve SerializedObject.append performance](https://github.com/ripple/ripple-lib/commit/f7c35b118ebba549a64bcaa1a0629385ec6dbf6f)
 
++ [Add `Amount.scale`. Multiply an amount’s value by a scale factor](https://github.com/ripple/ripple-lib/commit/74dac97b368493056474468520f05671f458a69f)
+
 
 ##0.12.2
 
