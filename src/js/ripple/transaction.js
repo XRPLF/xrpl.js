@@ -390,7 +390,7 @@ Transaction.prototype.complete = function() {
   if (typeof this.tx_json.SigningPubKey === 'undefined') {
     try {
       var seed = Seed.from_json(this._secret);
-      var key = seed.get_key(this.tx_json.Account);
+      var key = seed.get_key();
       this.tx_json.SigningPubKey = key.to_hex_pub();
     } catch(e) {
       this.emit('error', new RippleError(
@@ -466,7 +466,7 @@ Transaction.prototype.sign = function() {
     return this;
   }
 
-  var key = seed.get_key(this.tx_json.Account);
+  var key = seed.get_key();
   var sig = key.sign(hash);
   var hex = sjcl.codec.hex.fromBits(sig).toUpperCase();
 

@@ -1,5 +1,9 @@
 'use strict';
 
+// Going up three levels is needed to escape the src-cov folder used for the
+// test coverage stuff.
+var sjcl = require('../../../build/sjcl');
+
 function getMantissaDecimalString(bignum) {
   var mantissa = bignum.toPrecision(16)
     .replace(/\./, '')      // remove decimal point
@@ -138,6 +142,35 @@ function fromTimestamp(timestamp) {
   return Math.round(timestamp / 1000) - 0x386D4380;
 }
 
+// This has no dependency on any ripple classes
+function Sha512() {
+  /*eslint-disable new-cap*/
+  this.hash = new sjcl.hash.sha512();
+  /*eslint-enable new-cap*/
+}
+
+Sha512.prototype.add = function(bytes) {
+  this.hash.update(sjcl.codec.bytes.toBits(bytes));
+  return this;
+};
+
+Sha512.prototype.addU32 = function(i) {
+  this.hash.update([i]);
+  return this;
+};
+
+Sha512.prototype.finish = function() {
+  return this.hash.finalize();
+};
+
+Sha512.prototype.finish256 = function() {
+  return sjcl.bitArray.bitSlice(this.finish(), 0, 256);
+};
+
+Sha512.prototype.finish256BN = function() {
+  return sjcl.bn.fromBits(this.finish256());
+};
+
 exports.time = {
   fromRipple: toTimestamp,
   toRipple: fromTimestamp
@@ -156,9 +189,7 @@ exports.arrayUnique = arrayUnique;
 exports.toTimestamp = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
-
-// Going up three levels is needed to escape the src-cov folder used for the
-// test coverage stuff.
-exports.sjcl = require('../../../build/sjcl');
+exports.Sha512 = Sha512;
+exports.sjcl = sjcl;
 
 // vim:sw=2:sts=2:ts=8:et
