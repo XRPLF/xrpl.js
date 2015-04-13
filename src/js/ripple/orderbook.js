@@ -19,6 +19,8 @@ var EventEmitter = require('events').EventEmitter;
 var Amount = require('./amount').Amount;
 var UInt160 = require('./uint160').UInt160;
 var Currency = require('./currency').Currency;
+var AutobridgeCalculator = require('./autobridgecalculator');
+var OrderBookUtils = require('./orderbookutils');
 var log = require('./log').internal.sub('orderbook');
 
 function assertValidNumber(number, message) {
@@ -35,21 +37,25 @@ function assertValidNumber(number, message) {
  * @param {String} orderbook key
  */
 
-function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
+function OrderBook(remote,
+                   currencyGets, issuerGets, currencyPays, issuerPays,
+                   key) {
   EventEmitter.call(this);
 
   var self = this;
 
   this._remote = remote;
-  this._currencyGets = Currency.from_json(getsC);
-  this._issuerGets = getsI;
-  this._currencyPays = Currency.from_json(paysC);
-  this._issuerPays = paysI;
+  this._currencyGets = Currency.from_json(currencyGets);
+  this._issuerGets = issuerGets;
+  this._currencyPays = Currency.from_json(currencyPays);
+  this._issuerPays = issuerPays;
   this._key = key;
   this._subscribed = false;
   this._shouldSubscribe = true;
   this._listeners = 0;
-  this._offers = [ ];
+  this._offers = [];
+  this._offersAutobridged = [];
+  this._mergedOffers = [];
   this._offerCounts = {};
   this._ownerFundsUnadjusted = {};
   this._ownerFunds = {};
@@ -61,6 +67,37 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
 
   // Transfer rate of the taker gets currency issuer
   this._issuerTransferRate = null;
+
+  // When orderbook is IOU/IOU, there will be IOU/XRP and XRP/IOU
+  // books that we must keep track of to compute autobridged offers
+  this._legOneBook = null;
+  this._legTwoBook = null;
+
+  this._isAutobridgeable = !this._currencyGets.is_native()
+    && !this._currencyPays.is_native();
+
+  function computeAutobridgedOffersWrapper() {
+    self.computeAutobridgedOffers();
+    self.mergeDirectAndAutobridgedBooks();
+  }
+
+  if (this._isAutobridgeable) {
+    this._legOneBook = remote.createOrderBook({
+      currency_gets: 'XRP',
+      currency_pays: currencyPays,
+      issuer_pays: issuerPays
+    });
+
+    this._legOneBook.on('model', computeAutobridgedOffersWrapper);
+
+    this._legTwoBook = remote.createOrderBook({
+      currency_gets: currencyGets,
+      issuer_gets: issuerGets,
+      currency_pays: 'XRP'
+    });
+
+    this._legTwoBook.on('model', computeAutobridgedOffersWrapper);
+  }
 
   function listenersModified(action, event) {
     // Automatically subscribe and unsubscribe to orderbook
@@ -81,7 +118,7 @@ function OrderBook(remote, getsC, getsI, paysC, paysI, key) {
     }
   }
 
-  function updateFundedAmountsWrapper (transaction) {
+  function updateFundedAmountsWrapper(transaction) {
     self.updateFundedAmounts(transaction);
   }
 
@@ -128,8 +165,6 @@ OrderBook.EVENTS = [
 ];
 
 OrderBook.DEFAULT_TRANSFER_RATE = 1000000000;
-
-OrderBook.IOU_SUFFIX = '/000/rrrrrrrrrrrrrrrrrrrrrhoLvTp';
 
 /**
  * Normalize offers from book_offers and transaction stream
@@ -247,7 +282,7 @@ OrderBook.prototype.requestOffers = function(callback) {
 
     self.setOffers(res.offers);
     self._synchronized = true;
-    self.emit('model', self._offers);
+    self.notifyDirectOffersChanged();
 
     callback(null, self._offers);
   }
@@ -267,6 +302,48 @@ OrderBook.prototype.requestOffers = function(callback) {
   request.request();
 
   return request;
+};
+
+/**
+ * Request transfer rate for this orderbook's issuer
+ *
+ * @param {Function} callback
+ */
+
+OrderBook.prototype.requestTransferRate = function(callback) {
+  assert.strictEqual(typeof callback, 'function');
+
+  var self = this;
+
+  if (this._currencyGets.is_native()) {
+    // Transfer rate is default for the native currency
+    this._issuerTransferRate = OrderBook.DEFAULT_TRANSFER_RATE;
+
+    return callback(null, OrderBook.DEFAULT_TRANSFER_RATE);
+  }
+
+  if (this._issuerTransferRate) {
+    // Transfer rate has already been cached
+    return callback(null, this._issuerTransferRate);
+  }
+
+  function handleAccountInfo(err, info) {
+    if (err) {
+      return callback(err);
+    }
+
+    // When transfer rate is not explicitly set on account, it implies the
+    // default transfer rate
+    self._issuerTransferRate = info.account_data.TransferRate ||
+                               OrderBook.DEFAULT_TRANSFER_RATE;
+
+    callback(null, self._issuerTransferRate);
+  }
+
+  this._remote.requestAccountInfo(
+    {account: this._issuerGets},
+    handleAccountInfo
+  );
 };
 
 /**
@@ -318,6 +395,19 @@ OrderBook.prototype.subscribeTransactions = function(callback) {
 };
 
 /**
+ * Handles notifying listeners that direct offers have changed. For autobridged
+ * books, an additional merge step is also performed
+ */
+
+OrderBook.prototype.notifyDirectOffersChanged = function() {
+  if (this._isAutobridgeable) {
+    this.mergeDirectAndAutobridgedBooks();
+  } else {
+    this.emit('model', this._offers);
+  }
+};
+
+/**
  * Reset cached owner's funds, offer counts, and offer sums
  */
 
@@ -355,6 +445,27 @@ OrderBook.prototype.setOwnerFunds = function(account, fundedAmount) {
 };
 
 /**
+ * Compute adjusted balance that would be left after issuer's transfer fee is
+ * deducted
+ *
+ * @param {String} balance
+ * @return {String}
+ */
+
+OrderBook.prototype.applyTransferRate = function(balance) {
+  assert(!isNaN(balance), 'Balance is invalid');
+  assertValidNumber(this._issuerTransferRate, 'Transfer rate is invalid');
+
+  var adjustedBalance = OrderBookUtils.normalizeAmount(balance)
+  .divide(this._issuerTransferRate)
+  .multiply(Amount.from_json(OrderBook.DEFAULT_TRANSFER_RATE))
+  .to_json()
+  .value;
+
+  return adjustedBalance;
+};
+
+/**
  * Get owner's cached, transfer rate adjusted, funds
  *
  * @param {String} account - owner's account address
@@ -370,9 +481,7 @@ OrderBook.prototype.getOwnerFunds = function(account) {
     if (this._currencyGets.is_native()) {
       amount = Amount.from_json(this._ownerFunds[account]);
     } else {
-      amount = Amount.from_json(
-        this._ownerFunds[account] + OrderBook.IOU_SUFFIX
-      );
+      amount = OrderBookUtils.normalizeAmount(this._ownerFunds[account]);
     }
   }
 
@@ -459,6 +568,7 @@ OrderBook.prototype.decrementOwnerOfferCount = function(account) {
 
 OrderBook.prototype.addOwnerOfferTotal = function(account, amount) {
   assert(UInt160.is_valid(account), 'Account is invalid');
+
   var previousAmount = this.getOwnerOfferTotal(account);
   var currentAmount = previousAmount.add(Amount.from_json(amount));
 
@@ -478,6 +588,7 @@ OrderBook.prototype.addOwnerOfferTotal = function(account, amount) {
 
 OrderBook.prototype.subtractOwnerOfferTotal = function(account, amount) {
   assert(UInt160.is_valid(account), 'Account is invalid');
+
   var previousAmount = this.getOwnerOfferTotal(account);
   var newAmount = previousAmount.subtract(Amount.from_json(amount));
   this._ownerOffersTotal[account] = newAmount;
@@ -503,7 +614,7 @@ OrderBook.prototype.getOwnerOfferTotal = function(account) {
     if (this._currencyGets.is_native()) {
       amount = Amount.from_json('0');
     } else {
-      amount = Amount.from_json('0' + OrderBook.IOU_SUFFIX);
+      amount = OrderBookUtils.normalizeAmount('0');
     }
   }
 
@@ -518,93 +629,19 @@ OrderBook.prototype.getOwnerOfferTotal = function(account) {
  */
 
 OrderBook.prototype.resetOwnerOfferTotal = function(account) {
+  assert(UInt160.is_valid(account), 'Account is invalid');
+
   var amount;
 
   if (this._currencyGets.is_native()) {
     amount = Amount.from_json('0');
   } else {
-    amount = Amount.from_json('0' + OrderBook.IOU_SUFFIX);
+    amount = OrderBookUtils.normalizeAmount('0');
   }
 
   this._ownerOffersTotal[account] = amount;
 
   return amount;
-};
-
-/**
- * Casts and returns offer's taker gets funded amount as a default IOU amount
- *
- * @param {Object} offer
- * @return {Amount}
- */
-
-OrderBook.prototype.getOfferTakerGetsFunded = function(offer) {
-  assertValidNumber(offer.taker_gets_funded, 'Taker gets funded is invalid');
-
-  return Amount.from_json(offer.taker_gets_funded + OrderBook.IOU_SUFFIX);
-};
-
-/**
- * Compute adjusted balance that would be left after issuer's transfer fee is
- * deducted
- *
- * @param {String} balance
- * @return {String}
- */
-
-OrderBook.prototype.applyTransferRate = function(balance) {
-  assert(!isNaN(balance), 'Balance is invalid');
-  assertValidNumber(this._issuerTransferRate, 'Transfer rate is invalid');
-
-  var adjustedBalance = Amount.from_json(balance + OrderBook.IOU_SUFFIX)
-  .divide(this._issuerTransferRate)
-  .multiply(Amount.from_json(OrderBook.DEFAULT_TRANSFER_RATE))
-  .to_json()
-  .value;
-
-  return adjustedBalance;
-};
-
-/**
- * Request transfer rate for this orderbook's issuer
- *
- * @param {Function} callback
- */
-
-OrderBook.prototype.requestTransferRate = function(callback) {
-  assert.strictEqual(typeof callback, 'function');
-
-  var self = this;
-
-  if (this._currencyGets.is_native()) {
-    // Transfer rate is default for the native currency
-    this._issuerTransferRate = OrderBook.DEFAULT_TRANSFER_RATE;
-
-    return callback(null, OrderBook.DEFAULT_TRANSFER_RATE);
-  }
-
-  if (this._issuerTransferRate) {
-    // Transfer rate has already been cached
-    return callback(null, this._issuerTransferRate);
-  }
-
-  function handleAccountInfo(err, info) {
-    if (err) {
-      return callback(err);
-    }
-
-    // When transfer rate is not explicitly set on account, it implies the
-    // default transfer rate
-    self._issuerTransferRate = info.account_data.TransferRate ||
-                               OrderBook.DEFAULT_TRANSFER_RATE;
-
-    callback(null, self._issuerTransferRate);
-  }
-
-  this._remote.requestAccountInfo(
-    {account: this._issuerGets},
-    handleAccountInfo
-  );
 };
 
 /**
@@ -635,8 +672,9 @@ OrderBook.prototype.setOfferFundedAmount = function(offer) {
   } else if (previousOfferSum.compareTo(fundedAmount) < 0) {
     offer.taker_gets_funded = fundedAmount.subtract(previousOfferSum).to_text();
 
-    var takerPaysFunded = this.getOfferQuality(offer).multiply(
-      this.getOfferTakerGetsFunded(offer)
+    var quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
+    var takerPaysFunded = quality.multiply(
+      OrderBookUtils.getOfferTakerGetsFunded(offer)
     );
 
     offer.taker_pays_funded = this._currencyPays.is_native()
@@ -727,8 +765,8 @@ OrderBook.prototype.isBalanceChangeNode = function(node) {
 /**
  * Updates funded amounts/balances using modified balance nodes
  *
- * Update owner funds using modified AccountRoot and RippleState nodes.
- * Update funded amounts for offers in the orderbook using owner funds.
+ * Update owner funds using modified AccountRoot and RippleState nodes
+ * Update funded amounts for offers in the orderbook using owner funds
  *
  * @param {Object} transaction - transaction that holds meta nodes
  */
@@ -753,7 +791,7 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
     entryType: this._currencyGets.is_native() ? 'AccountRoot' : 'RippleState'
   });
 
-  _.each(affectedNodes, function (node) {
+  _.each(affectedNodes, function(node) {
     if (self.isBalanceChangeNode(node)) {
       var result = self.parseAccountBalanceFromNode(node);
 
@@ -786,7 +824,7 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
 
   this.resetOwnerOfferTotal(account);
 
-  _.each(this._offers, function (offer) {
+  _.each(this._offers, function(offer) {
     if (offer.Account !== account) {
       return;
     }
@@ -798,14 +836,15 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
     if (_.isString(offer.taker_gets_funded)) {
       // Offer is not new, so we should consider it for offer_changed and
       // offer_funds_changed events
-      previousFundedGets = self.getOfferTakerGetsFunded(offer);
+      previousFundedGets = OrderBookUtils.getOfferTakerGetsFunded(offer);
     }
 
     self.setOfferFundedAmount(offer);
     self.addOwnerOfferTotal(offer.Account, offer.TakerGets);
 
+    var takerGetsFunded = OrderBookUtils.getOfferTakerGetsFunded(offer);
     var areFundsChanged = previousFundedGets
-      && !self.getOfferTakerGetsFunded(offer).equals(previousFundedGets);
+      && !takerGetsFunded.equals(previousFundedGets);
 
     if (areFundsChanged) {
       self.emit('offer_changed', previousOffer, offer);
@@ -894,7 +933,7 @@ OrderBook.prototype.notify = function(transaction) {
   _.each(affectedNodes, handleNode);
 
   this.emit('transaction', transaction);
-  this.emit('model', this._offers);
+  this.notifyDirectOffersChanged();
   if (!takerGetsTotal.is_zero()) {
     this.emit('trade', takerPaysTotal, takerGetsTotal);
   }
@@ -924,11 +963,14 @@ OrderBook.prototype.insertOffer = function(node) {
   // We're safe to calculate quality for newly created offers
   offer.quality = takerPays.divide(takerGets).to_text();
 
-  var quality = this.getOfferQuality(offer);
   var originalLength = this._offers.length;
 
   for (var i = 0; i < originalLength; i++) {
-    var existingOfferQuality = this.getOfferQuality(this._offers[i]);
+    var quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
+    var existingOfferQuality = OrderBookUtils.getOfferQuality(
+      this._offers[i],
+      this._currencyGets
+    );
 
     if (quality.compareTo(existingOfferQuality) <= 0) {
       this._offers.splice(i, 0, offer);
@@ -949,29 +991,6 @@ OrderBook.prototype.insertOffer = function(node) {
 };
 
 /**
- * Retrieve offer quality
- *
- * @param {Object} offer
- */
-
-OrderBook.prototype.getOfferQuality = function(offer) {
-  var amount;
-
-  if (this._currencyGets.has_interest()) {
-    // XXX Should use Amount#from_quality
-    amount = Amount.from_json(
-      offer.TakerPays
-    ).ratio_human(offer.TakerGets, {
-      reference_date: new Date()
-    });
-  } else {
-    amount = Amount.from_json(offer.quality + OrderBook.IOU_SUFFIX);
-  }
-
-  return amount;
-};
-
-/**
  * Convert any amount into default IOU
  *
  * NOTE: This is necessary in some places because Amount.js arithmetic
@@ -986,7 +1005,7 @@ OrderBook.prototype.normalizeAmount = function(currency, amountObj) {
   ? amountObj
   : amountObj.value;
 
-  return Amount.from_json(value + OrderBook.IOU_SUFFIX);
+  return OrderBookUtils.normalizeAmount(value);
 };
 
 /**
@@ -1060,13 +1079,13 @@ OrderBook.prototype.deleteOffer = function(node, isOfferCancel) {
  */
 
 OrderBook.prototype.setOffers = function(offers) {
-  assert(Array.isArray(offers), '');
+  assert(Array.isArray(offers), 'Offers is not an array');
 
   var self = this;
 
   this.resetCache();
 
-  var newOffers = _.map(offers, function (rawOffer) {
+  var newOffers = _.map(offers, function(rawOffer) {
     var offer = OrderBook.offerRewrite(rawOffer);
 
     if (offer.hasOwnProperty('owner_funds')) {
@@ -1174,6 +1193,48 @@ OrderBook.prototype.is_valid = function() {
     (this._currencyGets.is_native() || UInt160.is_valid(this._issuerGets)) &&
     !(this._currencyPays.is_native() && this._currencyGets.is_native())
   );
+};
+
+/**
+ * Compute autobridged offers for an IOU:IOU orderbook by merging offers from
+ * IOU:XRP and XRP:IOU books
+ */
+
+OrderBook.prototype.computeAutobridgedOffers = function() {
+  assert(!this._currencyGets.is_native() && !this._currencyPays.is_native(),
+    'Autobridging is only for IOU:IOU orderbooks');
+
+  var autobridgeCalculator = new AutobridgeCalculator(
+    this._currencyGets,
+    this._currencyPays,
+    this._legOneBook.getOffersSync(),
+    this._legTwoBook.getOffersSync()
+  );
+
+  this._offersAutobridged = autobridgeCalculator.calculate();
+};
+
+/**
+ * Merge direct and autobridged offers into a combined orderbook
+ *
+ * @return [Array]
+ */
+
+OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
+  var self = this;
+
+  this._mergedOffers = this._offers
+    .concat(this._offersAutobridged)
+    .sort(function(a, b) {
+      var aQuality = OrderBookUtils.getOfferQuality(a, self._currencyGets);
+      var bQuality = OrderBookUtils.getOfferQuality(b, self._currencyGets);
+
+      return aQuality.compareTo(bQuality);
+    });
+
+  this.emit('model', this._mergedOffers);
+
+  return this._mergedOffers;
 };
 
 exports.OrderBook = OrderBook;
