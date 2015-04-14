@@ -961,7 +961,7 @@ Amount.prototype.to_text_full = function(opts) {
     return 'NaN';
   }
   return this._is_native
-      ? this.to_human() + '/XRP'
+      ? this.to_human({group_sep: false}) + '/XRP'
       : this.to_text() + '/' + this._currency.to_json()
         + '/' + this._issuer.to_json(opts);
 };
