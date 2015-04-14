@@ -12,7 +12,7 @@ var Crypt       = { };
 var cryptConfig = {
   cipher : 'aes',
   mode   : 'ccm',
-  ts     : 64,   // tag length
+  ts     : 128,  // tag length
   ks     : 256,  // key size
   iter   : 1000  // iterations (key derivation)
 };
@@ -60,12 +60,9 @@ function keyHash(key, token) {
  * add entropy at each call to get random words
  * @param {number} nWords
  */
-function randomWords (nWords) {
-  for (var i = 0; i < 8; i++) {
-    sjcl.random.addEntropy(Math.random(), 32, "Math.random()");
-  }  
-  
-  return sjcl.random.randomWords(nWords);  
+function randomWords(nWords) {
+  var PARANOIA_256_BITS = 6; // sjcl constant for ensuring 256 bits of entropy
+  return sjcl.random.randomWords(nWords, PARANOIA_256_BITS);
 }
 
 /****** exposed functions ******/
@@ -113,9 +110,10 @@ Crypt.derive = function(opts, purpose, username, secret, fn) {
   }
 
   var iRandom;
+  var PARANOIA_256_BITS = 6; // sjcl constant for ensuring 256 bits of entropy
 
   for (;;) {
-    iRandom = sjcl.bn.random(iModulus, 0);
+    iRandom = sjcl.bn.random(iModulus, PARANOIA_256_BITS);
     if (iRandom.jacobi(iModulus) === 1) {
       break;
     }

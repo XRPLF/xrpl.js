@@ -1760,19 +1760,7 @@ Remote.prototype._serverPrepareSubscribe = function(server, callback) {
   function serverSubscribed(message) {
     self._stand_alone = !!message.stand_alone;
     self._testnet = !!message.testnet;
-
-    if (typeof message.random === 'string') {
-      var rand = message.random.match(/[0-9A-F]{8}/ig);
-
-      while (rand && rand.length) {
-        sjcl.random.addEntropy(parseInt(rand.pop(), 16));
-      }
-
-      self.emit('random', utils.hexToArray(message.random));
-    }
-
     self._handleLedgerClosed(message, server);
-
     self.emit('subscribed');
   }
 
