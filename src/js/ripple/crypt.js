@@ -1,20 +1,20 @@
-var sjcl        = require('./utils').sjcl;
-var base        = require('./base').Base;
-var Seed        = require('./seed').Seed;
-var UInt160     = require('./uint160').UInt160;
-var UInt256     = require('./uint256').UInt256;
-var request     = require('superagent');
-var querystring = require('querystring');
-var extend      = require("extend");
-var parser      = require("url");
-var Crypt       = { };
+/* eslint-disable new-cap */
+'use strict';
+var sjcl = require('./utils').sjcl;
+var base = require('./base').Base;
+var Seed = require('./seed').Seed;
+var UInt160 = require('./uint160').UInt160;
+var UInt256 = require('./uint256').UInt256;
+var request = require('superagent');
+var extend = require('extend');
+var Crypt = { };
 
 var cryptConfig = {
-  cipher : 'aes',
-  mode   : 'ccm',
-  ts     : 128,  // tag length
-  ks     : 256,  // key size
-  iter   : 1000  // iterations (key derivation)
+  cipher: 'aes',
+  mode: 'ccm',
+  ts: 128,  // tag length
+  ks: 256,  // key size
+  iter: 1000  // iterations (key derivation)
 };
 
 /**
@@ -41,10 +41,10 @@ function fdh(data, bytelen) {
   output = sjcl.bitArray.clamp(output, bitlen);
 
   return output;
-};
+}
 
 /**
- * This is a function to derive different hashes from the same key. 
+ * This is a function to derive different hashes from the same key.
  * Each hash is derived as HMAC-SHA512HALF(key, token).
  *
  * @param {string} key
@@ -53,12 +53,14 @@ function fdh(data, bytelen) {
 
 function keyHash(key, token) {
   var hmac = new sjcl.misc.hmac(key, sjcl.hash.sha512);
-  return sjcl.codec.hex.fromBits(sjcl.bitArray.bitSlice(hmac.encrypt(token), 0, 256));
-};
+  return sjcl.codec.hex.fromBits(
+    sjcl.bitArray.bitSlice(hmac.encrypt(token), 0, 256));
+}
 
 /**
  * add entropy at each call to get random words
- * @param {number} nWords
+ * @param {number} nWords - number of words to generate
+ * @return {array} random words (4 byte unsigned integers)
  */
 function randomWords(nWords) {
   var PARANOIA_256_BITS = 6; // sjcl constant for ensuring 256 bits of entropy
@@ -91,19 +93,21 @@ Crypt.derive = function(opts, purpose, username, secret, fn) {
   }
 
   var iExponent = new sjcl.bn(String(opts.exponent));
-  var iModulus  = new sjcl.bn(String(opts.modulus));
-  var iAlpha    = new sjcl.bn(String(opts.alpha));
+  var iModulus = new sjcl.bn(String(opts.modulus));
+  var iAlpha = new sjcl.bn(String(opts.alpha));
 
-  var publicInfo = [ 'PAKDF_1_0_0', opts.host.length, opts.host, username.length, username, purpose.length, purpose ].join(':') + ':';
-  var publicSize = Math.ceil(Math.min((7 + iModulus.bitLength()) >>> 3, 256) / 8);
+  var publicInfo = ['PAKDF_1_0_0', opts.host.length, opts.host,
+    username.length, username, purpose.length, purpose].join(':') + ':';
+  var publicSize = Math.ceil(Math.min(
+    (7 + iModulus.bitLength()) >>> 3, 256) / 8);
   var publicHash = fdh(publicInfo, publicSize);
-  var publicHex  = sjcl.codec.hex.fromBits(publicHash);
-  var iPublic    = new sjcl.bn(String(publicHex)).setBitM(0);
-  var secretInfo = [ publicInfo, secret.length, secret ].join(':') + ':';
+  var publicHex = sjcl.codec.hex.fromBits(publicHash);
+  var iPublic = new sjcl.bn(String(publicHex)).setBitM(0);
+  var secretInfo = [publicInfo, secret.length, secret].join(':') + ':';
   var secretSize = (7 + iModulus.bitLength()) >>> 3;
   var secretHash = fdh(secretInfo, secretSize);
-  var secretHex  = sjcl.codec.hex.fromBits(secretHash);
-  var iSecret    = new sjcl.bn(String(secretHex)).mod(iModulus);
+  var secretHex = sjcl.codec.hex.fromBits(secretHash);
+  var iSecret = new sjcl.bn(String(secretHex)).mod(iModulus);
 
   if (iSecret.jacobi(iModulus) !== 1) {
     iSecret = iSecret.mul(iAlpha).mod(iModulus);
@@ -119,12 +123,12 @@ Crypt.derive = function(opts, purpose, username, secret, fn) {
     }
   }
 
-  var iBlind   = iRandom.powermodMontgomery(iPublic.mul(iExponent), iModulus);
+  var iBlind = iRandom.powermodMontgomery(iPublic.mul(iExponent), iModulus);
   var iSignreq = iSecret.mulmod(iBlind, iModulus);
-  var signreq  = sjcl.codec.hex.fromBits(iSignreq.toBits());
+  var signreq = sjcl.codec.hex.fromBits(iSignreq.toBits());
 
   request.post(opts.url)
-    .send({ info: publicInfo, signreq: signreq })
+    .send({info: publicInfo, signreq: signreq})
     .end(function(err, resp) {
       if (err || !resp) {
         return fn(new Error('Could not query PAKDF server ' + opts.host));
@@ -133,14 +137,14 @@ Crypt.derive = function(opts, purpose, username, secret, fn) {
       var data = resp.body || resp.text ? JSON.parse(resp.text) : {};
 
       if (data.result !== 'success') {
-        return fn(new Error('Could not query PAKDF server '+opts.host));
+        return fn(new Error('Could not query PAKDF server ' + opts.host));
       }
 
       var iSignres = new sjcl.bn(String(data.signres));
       var iRandomInv = iRandom.inverseMod(iModulus);
-      var iSigned    = iSignres.mulmod(iRandomInv, iModulus);
-      var key        = iSigned.toBits();
-      var result     = { };
+      var iSigned = iSignres.mulmod(iRandomInv, iModulus);
+      var key = iSigned.toBits();
+      var result = { };
 
       tokens.forEach(function(token) {
         result[token] = keyHash(key, token);
@@ -153,8 +157,6 @@ Crypt.derive = function(opts, purpose, username, secret, fn) {
 /**
  * Imported from ripple-client
  */
-
-
 
 /**
  * Encrypt data
@@ -186,20 +188,22 @@ Crypt.encrypt = function(key, data) {
  * @param {string} data
  */
 
-Crypt.decrypt = function (key, data) {
-  
+Crypt.decrypt = function(key, data) {
+
   key = sjcl.codec.hex.toBits(key);
   var encryptedBits = sjcl.codec.base64.toBits(data);
 
   var version = sjcl.bitArray.extract(encryptedBits, 0, 8);
 
   if (version !== 0) {
-    throw new Error('Unsupported encryption version: '+version);
+    throw new Error('Unsupported encryption version: ' + version);
   }
 
   var encrypted = extend(true, {}, cryptConfig, {
-    iv: sjcl.codec.base64.fromBits(sjcl.bitArray.bitSlice(encryptedBits, 8, 8+128)),
-    ct: sjcl.codec.base64.fromBits(sjcl.bitArray.bitSlice(encryptedBits, 8+128))
+    iv: sjcl.codec.base64.fromBits(
+      sjcl.bitArray.bitSlice(encryptedBits, 8, 8 + 128)),
+    ct: sjcl.codec.base64.fromBits(
+      sjcl.bitArray.bitSlice(encryptedBits, 8 + 128))
   });
 
   return sjcl.decrypt(key, JSON.stringify(encrypted));
@@ -212,7 +216,7 @@ Crypt.decrypt = function (key, data) {
  * @param {string} address
  */
 
-Crypt.isValidAddress = function (address) {
+Crypt.isValidAddress = function(address) {
   return UInt160.is_valid(address);
 };
 
@@ -222,7 +226,7 @@ Crypt.isValidAddress = function (address) {
  * @param {integer} nWords - number of words
  */
 
-Crypt.createSecret = function (nWords) {
+Crypt.createSecret = function(nWords) {
   return sjcl.codec.hex.fromBits(randomWords(nWords));
 };
 
@@ -230,7 +234,7 @@ Crypt.createSecret = function (nWords) {
  * Create a new master key
  */
 
-Crypt.createMaster = function () {
+Crypt.createMaster = function() {
   return base.encode_check(33, sjcl.codec.bytes.fromBits(randomWords(4)));
 };
 
@@ -241,7 +245,7 @@ Crypt.createMaster = function () {
  * @param {string} masterkey
  */
 
-Crypt.getAddress = function (masterkey) {
+Crypt.getAddress = function(masterkey) {
   return Seed.from_json(masterkey).get_key().get_address().to_json();
 };
 
@@ -252,9 +256,9 @@ Crypt.getAddress = function (masterkey) {
  * @return {string} Hash of the data
  */
 
-Crypt.hashSha512 = function (data) {
+Crypt.hashSha512 = function(data) {
   // XXX Should return a UInt512
-  return sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(data)); 
+  return sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(data));
 };
 
 /**
@@ -263,7 +267,8 @@ Crypt.hashSha512 = function (data) {
  * @param {string|bitArray} data
  * @return {UInt256} Hash of the data
  */
-Crypt.hashSha512Half = function (data) {
+
+Crypt.hashSha512Half = function(data) {
   return UInt256.from_hex(Crypt.hashSha512(data).substr(0, 64));
 };
 
@@ -276,7 +281,8 @@ Crypt.hashSha512Half = function (data) {
  */
 
 Crypt.signString = function(secret, data) {
-  var hmac = new sjcl.misc.hmac(sjcl.codec.hex.toBits(secret), sjcl.hash.sha512);
+  var hmac = new sjcl.misc.hmac(
+    sjcl.codec.hex.toBits(secret), sjcl.hash.sha512);
   return sjcl.codec.hex.fromBits(hmac.mac(data));
 };
 
@@ -289,8 +295,8 @@ Crypt.signString = function(secret, data) {
 Crypt.deriveRecoveryEncryptionKeyFromSecret = function(secret) {
   var seed = Seed.from_json(secret).to_bits();
   var hmac = new sjcl.misc.hmac(seed, sjcl.hash.sha512);
-  var key  = hmac.mac('ripple/hmac/recovery_encryption_key/v1');
-  key      = sjcl.bitArray.bitSlice(key, 0, 256);
+  var key = sjcl.bitArray.bitSlice(
+    hmac.mac('ripple/hmac/recovery_encryption_key/v1'), 0, 256);
   return sjcl.codec.hex.fromBits(key);
 };
 
@@ -301,7 +307,8 @@ Crypt.deriveRecoveryEncryptionKeyFromSecret = function(secret) {
  */
 
 Crypt.base64ToBase64Url = function(encodedData) {
-  return encodedData.replace(/\+/g, '-').replace(/\//g, '_').replace(/[=]+$/, '');
+  return encodedData.replace(/\+/g, '-')
+    .replace(/\//g, '_').replace(/[=]+$/, '');
 };
 
 /**
@@ -324,8 +331,8 @@ Crypt.base64UrlToBase64 = function(encodedData) {
  * base64 to UTF8
  */
 
-Crypt.decodeBase64 = function (data) {
+Crypt.decodeBase64 = function(data) {
   return sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(data));
-}
+};
 
 exports.Crypt = Crypt;

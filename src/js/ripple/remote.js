@@ -33,7 +33,6 @@ var PathFind = require('./pathfind').PathFind;
 var SerializedObject = require('./serializedobject').SerializedObject;
 var RippleError = require('./rippleerror').RippleError;
 var utils = require('./utils');
-var sjcl = require('./utils').sjcl;
 var hashprefixes = require('./hashprefixes');
 var config = require('./config');
 var log = require('./log').internal.sub('remote');
