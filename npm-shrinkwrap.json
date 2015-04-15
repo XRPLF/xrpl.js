@@ -28,9 +28,9 @@
       "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.2.tgz"
     },
     "ripple-wallet-generator": {
-      "version": "1.0.2",
-      "from": "ripple-wallet-generator@1.0.2",
-      "resolved": "https://registry.npmjs.org/ripple-wallet-generator/-/ripple-wallet-generator-1.0.2.tgz"
+      "version": "1.0.3",
+      "from": "ripple-wallet-generator@>=1.0.3 <2.0.0",
+      "resolved": "https://registry.npmjs.org/ripple-wallet-generator/-/ripple-wallet-generator-1.0.3.tgz"
     },
     "superagent": {
       "version": "0.18.2",
