@@ -9,7 +9,6 @@ var UInt160 = require('./uint160').UInt160;
 var Currency = require('./currency').Currency;
 var stypes = require('./serializedtypes');
 var sjcl  = require('./utils').sjcl;
-var Crypt = require('./crypt').Crypt;
 
 function Ledger()
 {

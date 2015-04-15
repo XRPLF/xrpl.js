@@ -5,8 +5,8 @@ var assert = require('assert');
 var extend = require('extend');
 var binformat = require('./binformat');
 var stypes = require('./serializedtypes');
-var Crypt = require('./crypt').Crypt;
 var utils = require('./utils');
+var UInt256 = require('./uint256').UInt256;
 
 var sjcl = utils.sjcl;
 
@@ -280,9 +280,9 @@ SerializedObject.prototype.hash = function(prefix) {
   // Copy buffer to temporary buffer
   sign_buffer.append(this.buffer);
 
-  // XXX We need a proper Buffer class then Crypt could accept that
   var bits = sjcl.codec.bytes.toBits(sign_buffer.buffer);
-  return Crypt.hashSha512Half(bits);
+  var sha512hex = sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(bits));
+  return UInt256.from_hex(sha512hex.substr(0, 64));
 };
 
 // DEPRECATED
