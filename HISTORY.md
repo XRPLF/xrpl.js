@@ -1,3 +1,7 @@
+##0.12.4
+
++ [Security improvements](https://github.com/ripple/ripple-lib/commit/318e39b2613a2701f0e5883a2f8ee2eb3538c4c0)
+
 ##0.12.3
 
 + [Add getLedgerSequence to Remote](https://github.com/ripple/ripple-lib/commit/d09548d04d3238fca653d482ec1d5faa7254559a)
@@ -72,8 +76,8 @@
     - [Handle invalid input in parse_human - c8f18c8c](https://github.com/ripple/ripple-lib/commit/c8f18c8c8590b7b48e370e0325b6677b7720294f)
     - [Check for null in isNumber - b86790c8](https://github.com/ripple/ripple-lib/commit/b86790c8543c239a532fd7697d4652829019d385)
     - [Cleanup amount.js - d0fb291c](https://github.com/ripple/ripple-lib/commit/d0fb291c4e330193a244902156f1d74730da357d)
- 
- 
+
+
 **Changes**
 
 + [Add deprecation warnings to request constructors. The first argument to request constructor functions should be an object containing request properties](https://github.com/ripple/ripple-lib/commit/35d76b3520934285f80059c1badd6c522539104c)
@@ -88,13 +92,13 @@
 
 + [Bumped dependencies](https://github.com/ripple/ripple-lib/commit/f9bc7cc746b44b24b61bbe260ae2e9d9617286da)
 
- 
+
 
 ##0.11.0
 
 + [Track the funded status of an order based on cumulative account orders](https://github.com/ripple/ripple-lib/commit/67d39737a4d5e0fcd9d9b47b9083ee00e5a9e652) and [67d3973](https://github.com/ripple/ripple-lib/commit/b6b99dde022e1e14c4797e454b1d7fca50e49482)
 
-+ Remove blobvault client from ripple-lib, use the [`ripple-vault-client`](https://github.com/ripple/ripple-vault-client) instead [9b3d62b7](https://github.com/ripple/ripple-lib/commit/9b3d62b765c4c25beae6eb0fa57ef3a07f2581b1) 
++ Remove blobvault client from ripple-lib, use the [`ripple-vault-client`](https://github.com/ripple/ripple-vault-client) instead [9b3d62b7](https://github.com/ripple/ripple-lib/commit/9b3d62b765c4c25beae6eb0fa57ef3a07f2581b1)
 
 + [Add support for `ledger` option in requestBookOffers](https://github.com/ripple/ripple-lib/commit/34c0677c453c409ef0a5b351959abdc176d3bacb)
 
@@ -133,13 +137,13 @@ are locally determined to have expired: `tejMaxLedger`.
 + [Improve memo support](https://github.com/ripple/ripple-lib/commit/1704ac4ae144c0ce54afad86f644c75a632080b1)
     - Add `MemoFormat` property for memo
     - Enforce `MemoFormat` and `MemoType` to be valid ASCII
-    - Support `text` and `json` MemoFormat 
+    - Support `text` and `json` MemoFormat
 
 + [Update jscl library](https://github.com/ripple/ripple-lib/commit/3204998fcb6f31d6c90532a737a4adb8a1e420f6)
     - Improved entropy by taking advantage of platform crypto
     - Use jscl's k256 curve instead of altering the c256 curve with k256 configuration
     - **deprecated:** the c256 curve is linked to the k256 curve to provide backwards compatibility, this link will be removed in the future
-     
+
 + [Fix empty queue check on reconnect](https://github.com/ripple/ripple-lib/commit/3c21994adcf72d1fbd87d453ceb917f9ad6df4ec)
 
 ##0.9.4
@@ -168,7 +172,7 @@ are locally determined to have expired: `tejMaxLedger`.
 
 + [**Breaking change**: Change accountRequest method signature](https://github.com/ripple/ripple-lib/commit/6f5d1104aa3eb440c518ec4f39e264fdce15fa15)
 
-+ [Add paging behavior for account requests, `account_lines` and `account_offers`](https://github.com/ripple/ripple-lib/commit/722f4e175dbbf378e51b49142d0285f87acb22d7) 
++ [Add paging behavior for account requests, `account_lines` and `account_offers`](https://github.com/ripple/ripple-lib/commit/722f4e175dbbf378e51b49142d0285f87acb22d7)
 
 + [Add max_fee setter to transactions to set max fee the submitter is willing to pay] (https://github.com/ripple/ripple-lib/commit/24587fab9c8ad3840d7aa345a7037b48839e09d7)
 
@@ -184,7 +188,7 @@ var options = {
     ledger: < valid ledger_index or ledger_hash >
 }
 
-// The `marker` comes back in an account request if there are more results than are returned 
+// The `marker` comes back in an account request if there are more results than are returned
 // in the current response. The amount of results per response are determined by the `limit`.
 if (marker) {
     options.marker = < marker >;
