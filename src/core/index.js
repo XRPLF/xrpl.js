@@ -22,6 +22,9 @@ exports.TransactionQueue = require('./transactionqueue').TransactionQueue;
 exports.RangeSet = require('./rangeset').RangeSet;
 exports.convertBase = require('./baseconverter');
 
+exports.keypairs = require('./keypairs');
+exports.getKeyPair = exports.keypairs.getKeyPair;
+
 exports._test = {
   Log: require('./log'),
   PathFind: require('./pathfind').PathFind,

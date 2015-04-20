@@ -5,6 +5,7 @@
 //
 // Seed support
 //
+
 const extend = require('extend');
 const lodash = require('lodash');
 const utils = require('./utils');
@@ -12,8 +13,7 @@ const sjcl = utils.sjcl;
 
 const Base = require('./base').Base;
 const UInt = require('./uint').UInt;
-const UInt160 = require('./uint160').UInt160;
-const KeyPair = require('./keypair').KeyPair;
+
 const Sha512 = utils.Sha512;
 
 const Seed = extend(function() {
@@ -62,12 +62,12 @@ Seed.prototype.parse_passphrase = function(j) {
 };
 
 Seed.prototype.parse_base58 = function(j) {
-  const result = Base.decode_multi(j, Seed.width);
+  const result = Base.decode_multi(j, Seed.width, [Base.VER_FAMILY_SEED,
+                                                 Base.VER_ED25519_SEED]);
 
-  if (result.error) {
+  if (!result.bytes) {
     this._value = NaN;
-  } else if (lodash.isEqual(result.version, [Base.VER_FAMILY_SEED]) ||
-        lodash.isEqual(result.version, Base.VER_ED25519_SEED)) {
+  } else {
     this._version = result.version;
     this._value = sjcl.bn.fromBits(sjcl.codec.bytes.toBits(result.bytes));
   }
@@ -86,85 +86,8 @@ Seed.prototype.to_json = function() {
   return output;
 };
 
-Seed.prototype.get_key = function(opts) {
-  if (opts !== undefined && typeof opts !== 'object') {
-    throw new Error('get_key options not supported: ' + opts);
-  }
-
-  if (lodash.isEqual(this._version, Base.VER_ED25519_SEED)) {
-    throw new Error('get_key ed25519 not supported');
-  }
-
-  return this._get_key(opts);
-};
-
-/**
-* @return {KeyPair} - the root key-pair, as used by validators.
-*/
-Seed.prototype.get_root_key = function() {
-  return this._get_key({root: true});
-};
-
-/**
-* @param {Object} [options] -
-*
-* @param {Number} [options.accountIndex=0] - the account number to generate
-*
-* @param {Boolean} [options.root=false] - generate root key-pair,
-*                                         as used by validators.
-* @return {KeyPair} -
-*/
-Seed.prototype._get_key = function(options) {
-  const opts = options || {};
-
-  const root = opts.root;
-
-  if (!this.is_valid()) {
-    throw new Error('Cannot generate keys from invalid seed!');
-  }
-
-  const curve = this._curve;
-  let privateGen;
-  let i = 0;
-
-  do {
-    // We hash the seed to extend from 128 bits to 256, looping until we are
-    // sure the 256 bits represents n where `1 <= n < curve.r`
-    privateGen = new Sha512().add(this.to_bytes()).addU32(i).finish256BN();
-
-    // This private generator, represents the `root` private key, and is what's
-    // used by validators for signing when a keypair is generated from a seed.
-    i++;
-  } while (!curve.r.greaterEquals(privateGen));
-
-  let secret;
-
-  if (root) {
-    // As used by validation_create
-    secret = privateGen;
-  } else {
-    const publicGen = curve.G.mult(privateGen);
-    i = 0;
-    // A seed can generate many keypairs as a function of the seed and a uint32.
-    // Almost everyone just uses the first account, `0`,
-    let accountIndex = opts.accountIndex || 0;
-    do {
-      // We hash the root key-pair's public key bytes, along with the account
-      // number to deterministically find another point on the curve.
-      secret = new Sha512().add(publicGen.toBytesCompressed())
-                           .addU32(accountIndex).addU32(i).finish256BN();
-      i++;
-
-    // Again, we make sure the value is situated on the curve. The `i` sequence
-    // was incremented so next time we try we'll have a new hash.
-    } while (secret.greaterEquals(curve.r));
-
-    // The final operation:
-    secret = secret.add(privateGen).mod(curve.r);
-  }
-  // The public key is lazily computed by the key class, but it has the same
-  // mathematical relationship to `secret` as `publicGen` to `privateGen`.
-  return KeyPair.from_bn_secret(secret);
+Seed.prototype.get_key = function() {
+  throw new Error('Use keypairs.getKeyPair() instead');
 };
 
 exports.Seed = Seed;

@@ -116,6 +116,8 @@ Base.verify_checksum = function(bytes) {
 };
 
 /**
+* Assumes `ripple` alphabet
+*
 * @param {Number} payloadLength - number of bytes encoded not incl checksum
 * @param {String} desiredPrefix - desired prefix when base58 encoded with
 *                                 checksum
@@ -124,8 +126,9 @@ Base.verify_checksum = function(bytes) {
 Base.find_prefix = function(payloadLength, desiredPrefix) {
   var totalLength = payloadLength + 4; // for checksum
   var chars = (Math.log(Math.pow(256, totalLength)) / Math.log(58));
+   // (x, x.8] -> x+1, (x.8, x+1) -> x+2
   var requiredChars = Math.ceil(chars + 0.2);
-  var padding = 'V';
+  var padding = 'V'; // middle of the alphabet
   var template = desiredPrefix + new Array(requiredChars + 1).join(padding);
   var bytes = Base.decode(template);
   var version = bytes.slice(0, -totalLength);
@@ -133,24 +136,40 @@ Base.find_prefix = function(payloadLength, desiredPrefix) {
 };
 
 /**
+*
 * @param {String} encoded - base58 checksum encoded data string
 * @param {Number} expectedLength - of decoded bytes minus checksum
-* @param {String} [alphabet] - used to encode `encoded`
+* @param {Array} possibleVersions - array of possible versions
+*                                   each element could be a single byte or an
+*                                   array of bytes.
+* @param {String} [alphabet] - used to decode `encoded`
+*
 * @return {Object} -
 */
-Base.decode_multi = function(encoded, expectedLength, alphabet) {
+Base.decode_multi = function(encoded, expectedLength, possibleVersions,
+                             alphabet) {
+
   var buffer = Base.decode(encoded, alphabet);
+  var ret = {version: null, bytes: null};
 
   if (!Base.verify_checksum(buffer)) {
-    // TODO: throw Error ?
-    return {version: null, bytes: null, error: true};
+    return ret;
   }
 
   var withoutSum = buffer.slice(0, -4);
   var versionBytes = withoutSum.slice(0, -expectedLength);
   var decoded = withoutSum.slice(-expectedLength);
 
-  return {version: versionBytes, bytes: decoded, error: false};
+  possibleVersions.forEach(function(version) {
+    var asArray = Array.isArray(version) ? version : [version];
+    if (_.isEqual(versionBytes, asArray)) {
+      ret.version = version;
+      ret.bytes = decoded;
+      return false;
+    };
+  });
+
+  return ret;
 };
 
 // --> input: Array

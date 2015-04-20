@@ -148,7 +148,7 @@ function Sha512() {
   /*eslint-enable new-cap*/
 }
 
-Sha512.prototype.add = function(bytes) {
+Sha512.prototype.addBytes = function(bytes) {
   this.hash.update(sjcl.codec.bytes.toBits(bytes));
   return this;
 };
@@ -162,12 +162,12 @@ Sha512.prototype.finish = function() {
   return this.hash.finalize();
 };
 
-Sha512.prototype.finish256 = function() {
+Sha512.prototype.finish256Bits = function() {
   return sjcl.bitArray.bitSlice(this.finish(), 0, 256);
 };
 
 Sha512.prototype.finish256BN = function() {
-  return sjcl.bn.fromBits(this.finish256());
+  return sjcl.bn.fromBits(this.finish256Bits());
 };
 
 exports.time = {

@@ -5,6 +5,13 @@ const sjcl = require('ripple-lib').sjcl;
 const Message = require('ripple-lib').Message;
 const Seed = require('ripple-lib').Seed;
 const Remote = require('ripple-lib').Remote;
+const getKeyPair= require('ripple-lib').getKeyPair;
+
+function getSecret(secretString) {
+  return getKeyPair({key_type: 'secp256k1',
+                    impl: 'sjcl',
+                    base58: secretString}).secretKey;
+}
 
 describe('Message', function() {
 
@@ -75,7 +82,7 @@ describe('Message', function() {
       const hash = 'e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778';
 
       const signature1 = Message.signHash(hash, secret_string);
-      const signature2 = Message.signHash(hash, Seed.from_json(secret_string).get_key()._secret);
+      const signature2 = Message.signHash(hash, getSecret(secret_string));
 
       assert.strictEqual(signature1, signature2);
 

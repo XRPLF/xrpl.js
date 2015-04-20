@@ -13,8 +13,7 @@ const SerializedObject = require('./serializedobject').SerializedObject;
 const RippleError = require('./rippleerror').RippleError;
 const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('transaction');
-
-const getCachedKeyPair = require('./keypairs').getCachedKeyPair;
+const getKeyPair = require('./keypairs').getKeyPair;
 
 /**
  * @constructor Transaction
@@ -389,7 +388,7 @@ Transaction.prototype.complete = function() {
 
   if (typeof this.tx_json.SigningPubKey === 'undefined') {
     try {
-      var keyPair = getCachedKeyPair(this._secret);
+      var keyPair = getKeyPair(this._secret);
       this.tx_json.SigningPubKey = keyPair.pubKeyHex();
     } catch(e) {
       this.emit('error', new RippleError(
@@ -463,7 +462,7 @@ Transaction.prototype._signingData = function(prefix) {
 };
 
 Transaction.prototype.sign = function() {
-  var keyPair = getCachedKeyPair(this._secret);
+  var keyPair = getKeyPair(this._secret);
   var prevSig = this.tx_json.TxnSignature;
   delete this.tx_json.TxnSignature;
 

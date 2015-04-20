@@ -50,14 +50,14 @@ describe('getKeyPair', function() {
     it('defaults to secp256k1', function() {
       assert.equal(pair.type, KeyType.secp256k1);
     });
-    it('will have a Seed `seed` member', function() {
+/*    it('will have a Seed `seed` member', function() {
       assert(pair.seed instanceof Seed);
     });
     it('the seed generated will be as if ' +
        'passed to `wallet_propose`', function() {
       assert.equal(pair.seed.to_json(), 'shQUG1pmPYrcnSUGeuJFJTA1b3JSL');
     });
-  });
+*/  });
 });
 
 describe('Secp256k1Pair', function() {
@@ -143,7 +143,7 @@ describe('ED25519Pair', function() {
 });
 
 describe('Transaction integration', function() {
-  describe('allows setting keypair specifiers as via `tx._secret`',
+  describe('allows setting keypair specifiers via `tx._secret`',
       function() {
     it('allows objects such as {key_type: "ed25519", passphrase: "niq"}',
         function() {

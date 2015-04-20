@@ -1,12 +1,15 @@
 /* eslint-disable valid-jsdoc */
 'use strict';
+
 const async = require('async');
 const sjcl = require('./utils').sjcl;
 const Remote = require('./remote').Remote;
 const Seed = require('./seed').Seed;
-const KeyPair = require('./keypair').KeyPair;
 const Account = require('./account').Account;
 const UInt160 = require('./uint160').UInt160;
+const getKeyPair = require('./keypairs').getKeyPair;
+
+const arrayToHex = require('./utils').arrayToHex;
 
 // Message class (static)
 const Message = {};
@@ -69,8 +72,11 @@ Message.signHash = function(_hash, secret_key_, account) {
     throw new Error('Hash must be a bitArray or hex-encoded string');
   }
 
-  const secret_key = !(secret_key_ instanceof sjcl.ecc.ecdsa.secretKey) ?
-        Seed.from_json(secret_key_).get_key(account)._secret : secret_key_;
+  const secret_key =
+    secret_key_ instanceof sjcl.ecc.ecdsa.secretKey ? secret_key_ :
+        getKeyPair({key_type: 'secp256k1',
+                    impl: 'sjcl',
+                    generic: secret_key_}).secretKey;
 
   const PARANOIA_256_BITS = 6; // sjcl constant for ensuring 256 bits of entropy
   const signature_bits = secret_key.signWithRecoverablePublicKey(hash,
@@ -188,10 +194,7 @@ Message.verifyHashSignature = function(data, remote, callback) {
   function checkPublicKeyIsValid(public_key, async_callback) {
 
     // Get hex-encoded public key
-    const key_pair = new KeyPair();
-    key_pair._pubkey = public_key;
-    const public_key_hex = key_pair.to_hex_pub();
-
+    const public_key_hex = arrayToHex(public_key._point.toBytesCompressed());
     const account_class_instance = new Account(remote, account);
     account_class_instance.publicKeyIsActive(public_key_hex, async_callback);
 

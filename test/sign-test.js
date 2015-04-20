@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const Seed = require('ripple-lib').Seed;
+const getKeyPair = require('ripple-lib').getKeyPair;
 
 function _isNaN(n) {
   return typeof n === 'number' && isNaN(n);
@@ -10,19 +11,15 @@ function _isNaN(n) {
 describe('Signing', function() {
   describe('Keys', function() {
     it('SigningPubKey 1 (ripple-client issue #245)', function() {
-      const seed = Seed.from_json('saESc82Vun7Ta5EJRzGJbrXb5HNYk');
-      const key = seed.get_key();
-      const pub = key.to_hex_pub();
-      assert.strictEqual(
-        pub,
+      const key = getKeyPair('saESc82Vun7Ta5EJRzGJbrXb5HNYk');
+      const pub = key.pubKeyHex();
+      assert.strictEqual(pub,
         '0396941B22791A448E5877A44CE98434DB217D6FB97D63F0DAD23BE49ED45173C9');
     });
     it('SigningPubKey 2 (master seed)', function() {
-      const seed = Seed.from_json('snoPBrXtMeMyMHUVTgbuqAfg1SUTb');
-      const key = seed.get_key();
-      const pub = key.to_hex_pub();
-      assert.strictEqual(
-         pub,
+      const key = getKeyPair('snoPBrXtMeMyMHUVTgbuqAfg1SUTb');
+      const pub = key.pubKeyHex();
+      assert.strictEqual(pub,
         '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020');
     });
   });
@@ -49,13 +46,6 @@ describe('Signing', function() {
     it('invalid passphrase', function() {
       assert.throws(function() {
         new Seed().parse_passphrase(null);
-      });
-    });
-  });
-  describe('get_key', function() {
-    it('get key from invalid seed', function() {
-      assert.throws(function() {
-        new Seed().get_key();
       });
     });
   });
