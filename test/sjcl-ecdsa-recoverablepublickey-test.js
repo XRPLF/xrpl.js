@@ -35,7 +35,9 @@ describe('ECDSA signing with recoverable public key', function(){
 
         var message = messages[m].message;
         var secret_hex = messages[m].secret_hex;
-        var random_value = messages[m].random_value;
+        var random_test_value = sjcl.bn.fromBits(sjcl.codec.hex.toBits(
+          messages[m].random_value
+        ));
         var hash_function = messages[m].hash_function;
 
         var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
@@ -43,7 +45,7 @@ describe('ECDSA signing with recoverable public key', function(){
 
         var pub_val_point = secret_key._curve.G.mult(secret_key._exponent);
         var public_key = new sjcl.ecc.ecdsa.publicKey(curve, pub_val_point);
-        var hash = hash_function(message);
+        var hash = sjcl.bitArray.clamp(hash_function(message), secret_key._curveBitLength);
 
         var recoverable_signature = secret_key.signWithRecoverablePublicKey(hash, 0, random_value);
         var recovered_public_key = sjcl.ecc.ecdsa.publicKey.recoverFromSignature(hash, recoverable_signature);
@@ -56,6 +58,12 @@ describe('ECDSA signing with recoverable public key', function(){
     });
 
   });
+
+  // used for the next couple of describes
+  var random_value = sjcl.bn.fromBits(sjcl.codec.hex.toBits(
+    'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4' +
+    'd0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a'
+  ));
 
   describe('signWithRecoverablePublicKey', function(){
 
@@ -88,7 +96,6 @@ describe('ECDSA signing with recoverable public key', function(){
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
       var hash = 'e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778';
 
       assert.throws(function(){
@@ -100,13 +107,17 @@ describe('ECDSA signing with recoverable public key', function(){
     it('should return a bitArray', function(){
 
       var curve = sjcl.ecc.curves['k256'];
-      var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
+      var secret_hex =
+        '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
-      var hash = sjcl.codec.hex.toBits('e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778');
+      var hash = sjcl.codec.hex.toBits(
+        'e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778'
+      );
 
-      var signature = secret_key.signWithRecoverablePublicKey(hash, 0, random_value);
+      var signature = secret_key.signWithRecoverablePublicKey(
+        hash, 0, random_value
+      );
       assert(typeof signature === 'object' && signature.length > 0 && typeof signature[0] === 'number');
 
     });
@@ -114,13 +125,16 @@ describe('ECDSA signing with recoverable public key', function(){
     it('should return a bitArray where the first word contains the recovery factor', function(){
 
       var curve = sjcl.ecc.curves['k256'];
-      var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
+      var secret_hex =
+        '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
-      var hash = sjcl.codec.hex.toBits('e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778');
+      var hash = sjcl.codec.hex.toBits(
+        'e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778'
+      );
 
-      var signature = secret_key.signWithRecoverablePublicKey(hash, 0, random_value);
+      var signature = secret_key.signWithRecoverablePublicKey(
+        hash, 0, random_value);
       var recovery_factor = signature[0] - 27;
 
       assert(recovery_factor >= 0 && recovery_factor < 4);
@@ -148,10 +162,9 @@ describe('ECDSA signing with recoverable public key', function(){
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
       var hash = sjcl.codec.hex.toBits('e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778');
 
-      var signature = secret_key.sign(hash, 0, random_value);
+      var signature = secret_key.sign(hash, 0, undefined, random_value);
       
       assert.throws(function(){
         sjcl.ecc.ecdsa.publicKey.recoverFromSignature(hash, signature);
@@ -165,7 +178,6 @@ describe('ECDSA signing with recoverable public key', function(){
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
       var hash = sjcl.codec.hex.toBits('e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778');
 
       var signature = secret_key.signWithRecoverablePublicKey(hash, 0, random_value);
@@ -186,7 +198,6 @@ describe('ECDSA signing with recoverable public key', function(){
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
       var hash = sjcl.codec.hex.toBits('e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778');
 
       var signature = sjcl.codec.base64.toBits('IJPzXewhO1CORRx14FROzZC8ne4v0Me94UZoBKH15e4pcSgeYiYeKZ4PJOBI/D5yqUOhemO+rKKHhE0HL66kAcM=');
@@ -206,7 +217,6 @@ describe('ECDSA signing with recoverable public key', function(){
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
       var hash = sjcl.codec.hex.toBits('e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778');
       var signature = secret_key.signWithRecoverablePublicKey(hash, 0, random_value);
       
@@ -222,7 +232,6 @@ describe('ECDSA signing with recoverable public key', function(){
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
       var hash = sjcl.codec.hex.toBits('e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778');
 
       var signature = secret_key.signWithRecoverablePublicKey(hash, 0, random_value);
@@ -243,7 +252,6 @@ describe('ECDSA signing with recoverable public key', function(){
       var secret_hex = '9e623166ac44d4e75fa842f3443485b9c8380551132a8ffaa898b5c93bb18b7d';
       var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
       var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var random_value = 'c3aa71cecb965bbbc96083d868b4955d77adb4e02ce229fe60869f745dfcd4e4a4d0f17a15a353d7592dca1baba2824e45c8e7a8f9faad3ce2c2d3792799f27a';
       var hash = sjcl.codec.hex.toBits('e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778');
       var signature = secret_key.signWithRecoverablePublicKey(hash, 0, random_value);
 

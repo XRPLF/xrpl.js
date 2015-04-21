@@ -56,10 +56,14 @@ sjcl.ecc.pointJac.prototype.add = function(T) {
 // This is a custom doubling algorithm that
 // only works for a=-3 Jacobian curve. It's much
 // faster than the generic implementation
-sjcl.ecc.pointJac.prototype.doubl = function() {
-  if (this.isIdentity) {
-    return this;
-  }
+var neg3Doubl = sjcl.ecc.pointJac.prototype.doubl;
+sjcl.ecc.pointJac.prototype.doubl = function () {
+
+  if (!this.curve.a.equals(0)) {
+    return neg3Doubl.call(this);
+  };
+
+  if (this.isIdentity) { return this; }
 
   var a = this.x.square();
   var b = this.y.square();
@@ -78,4 +82,5 @@ sjcl.ecc.pointJac.prototype.doubl = function() {
 // since then, sjcl has been updated to support k256
 // this override exist to keep supporting the old c256 with k256 behavior
 // this will be removed in future release
+sjcl.ecc.curves.nist_p256 = sjcl.ecc.curves.c256;
 sjcl.ecc.curves.c256 = sjcl.ecc.curves.k256;

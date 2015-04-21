@@ -238,7 +238,7 @@ sjcl.ecc.ecdsa.secretKey.prototype.signWithRecoverablePublicKey = function(
   }
 
   // Sign hash with standard, canonicalized method
-  const standard_signature = self.sign(hash_bits, paranoia, k_for_testing);
+  const standard_signature = self.sign(hash_bits, paranoia, undefined, k_for_testing);
   const canonical_signature = self.canonicalizeSignature(standard_signature);
 
   // Extract r and s signature components from canonical signature
