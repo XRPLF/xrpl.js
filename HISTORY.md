@@ -1,6 +1,8 @@
 ##0.12.4
 
-+ [Security improvements](https://github.com/ripple/ripple-lib/commit/318e39b2613a2701f0e5883a2f8ee2eb3538c4c0)
++ [Improve entropy security](https://github.com/ripple/ripple-lib/commit/c7ba822320880037796f57876d1abb4e525648ed)
+
++ [Remove unused crypt.js file](https://github.com/ripple/ripple-lib/commit/1f68eba1461bca03a4d22872450d15ae5a185334)
 
 ##0.12.3
 
