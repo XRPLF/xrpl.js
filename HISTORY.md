@@ -1,3 +1,7 @@
+##0.12.15
+
++ [Add offer autobridging](https://github.com/ripple/ripple-lib/commit/c7bbce83719c1e8c6a4fae5ca850e7515db1a4a5)
+
 ##0.12.4
 
 + [Improve entropy security](https://github.com/ripple/ripple-lib/commit/c7ba822320880037796f57876d1abb4e525648ed)
