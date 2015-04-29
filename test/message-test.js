@@ -1,14 +1,16 @@
-var assert  = require('assert');
-var sjcl    = require('ripple-lib').sjcl;
+/* eslint-disable max-len */
+'use strict';
+var assert = require('assert');
+var sjcl = require('ripple-lib').sjcl;
 var Message = require('ripple-lib').Message;
-var Seed    = require('ripple-lib').Seed;
-var Remote  = require('ripple-lib').Remote;
+var Seed = require('ripple-lib').Seed;
+var Remote = require('ripple-lib').Remote;
 
-describe('Message', function(){
+describe('Message', function() {
 
-  describe('signMessage', function(){
+  describe('signMessage', function() {
 
-    it('should prepend the MAGIC_BYTES, call the HASH_FUNCTION, and then call signHash', function(){
+    it('should prepend the MAGIC_BYTES, call the hashFunction, and then call signHash', function() {
 
       var normal_signHash = Message.signHash;
 
@@ -17,7 +19,7 @@ describe('Message', function(){
       var signHash_called = false;
       Message.signHash = function(hash) {
         signHash_called = true;
-        assert.deepEqual(hash, Message.HASH_FUNCTION(Message.MAGIC_BYTES + message_text));
+        assert.deepEqual(hash, Message.hashFunction(Message.MAGIC_BYTES + message_text));
       };
 
       Message.signMessage(message_text);
@@ -29,13 +31,13 @@ describe('Message', function(){
 
   });
 
-  describe('signHash', function(){
+  describe('signHash', function() {
 
-    it('should accept the hash as either a hex string or a bitArray', function(){
+    it('should accept the hash as either a hex string or a bitArray', function() {
 
       var normal_random = sjcl.random.randomWords;
 
-      sjcl.random.randomWords = function(num_words){
+      sjcl.random.randomWords = function(num_words) {
         var words = [];
         for (var w = 0; w < num_words; w++) {
           words.push(sjcl.codec.hex.toBits('00000000'));
@@ -56,11 +58,11 @@ describe('Message', function(){
 
     });
 
-    it('should accept the secret as a string or scjl.ecc.ecdsa.secretKey object', function(){
+    it('should accept the secret as a string or scjl.ecc.ecdsa.secretKey object', function() {
 
       var normal_random = sjcl.random.randomWords;
 
-      sjcl.random.randomWords = function(num_words){
+      sjcl.random.randomWords = function(num_words) {
         var words = [];
         for (var w = 0; w < num_words; w++) {
           words.push(sjcl.codec.hex.toBits('00000000'));
@@ -81,7 +83,7 @@ describe('Message', function(){
 
     });
 
-    it('should throw an error if given an invalid secret key', function(){
+    it('should throw an error if given an invalid secret key', function() {
       // Annoyingly non hex can be fed to the BigInteger(s, 16) constructor and
       // it will parse as a number. Before the commit of this comment, this test
       // involved a fixture of 32 chars, which was assumed to be hex. The test
@@ -95,41 +97,41 @@ describe('Message', function(){
       var secret_string = 'sbadsafRpB5euNL52PZPTSqrE9gvuFwTC';
       var hash = 'e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778';
 
-      assert.throws(function(){
+      assert.throws(function() {
         Message.signHash(hash, secret_string);
       }, /Cannot\ generate\ keys\ from\ invalid\ seed/);
 
     });
 
-    it('should throw an error if the parameters are reversed', function(){
+    it('should throw an error if the parameters are reversed', function() {
 
       var secret_string = 'safRpB5euNL52PZPTSqrE9gvuFwTC';
       var hash = 'e865bcc63a86ef21585ac8340a7cc8590ed85175a2a718c6fb2bfb2715d13778';
 
-      assert.throws(function(){
+      assert.throws(function() {
         Message.signHash(secret_string, hash);
       }, Error);
 
-      assert.throws(function(){
+      assert.throws(function() {
         Message.signHash(secret_string, sjcl.codec.hex.toBits(hash));
       }, Error);
 
-      assert.throws(function(){
+      assert.throws(function() {
         Message.signHash(Seed.from_json(secret_string).get_key()._secret, hash);
       }, Error);
 
-      assert.throws(function(){
+      assert.throws(function() {
         Message.signHash(Seed.from_json(secret_string).get_key()._secret, sjcl.codec.hex.toBits(hash));
       }, Error);
 
     });
 
-    it('should produce a base64-encoded signature', function(){
+    it('should produce a base64-encoded signature', function() {
       var REGEX_BASE64 = /^([A-Za-z0-9\+]{4})*([A-Za-z0-9\+]{2}==)|([A-Za-z0-9\+]{3}=)?$/;
 
       var normal_random = sjcl.random.randomWords;
 
-      sjcl.random.randomWords = function(num_words){
+      sjcl.random.randomWords = function(num_words) {
         var words = [];
         for (var w = 0; w < num_words; w++) {
           words.push(sjcl.codec.hex.toBits('00000000'));
@@ -150,9 +152,9 @@ describe('Message', function(){
 
   });
 
-  describe('verifyMessageSignature', function(){
+  describe('verifyMessageSignature', function() {
 
-    it('should prepend the MAGIC_BYTES, call the HASH_FUNCTION, and then call verifyHashSignature', function(){
+    it('should prepend the MAGIC_BYTES, call the hashFunction, and then call verifyHashSignature', function() {
 
       var normal_verifyHashSignature = Message.verifyHashSignature;
 
@@ -165,13 +167,13 @@ describe('Message', function(){
       Message.verifyHashSignature = function(vhs_data, remote, callback) {
         verifyHashSignature_called = true;
 
-        assert.deepEqual(vhs_data.hash, Message.HASH_FUNCTION(Message.MAGIC_BYTES + data.message));
+        assert.deepEqual(vhs_data.hash, Message.hashFunction(Message.MAGIC_BYTES + data.message));
         assert.strictEqual(vhs_data.signature, data.signature);
         callback();
 
       };
 
-      Message.verifyMessageSignature(data, {}, function(err){
+      Message.verifyMessageSignature(data, {}, function(err) {
         assert(!err);
       });
       assert(verifyHashSignature_called);
@@ -182,9 +184,9 @@ describe('Message', function(){
 
   });
 
-  describe('verifyHashSignature', function(){
+  describe('verifyHashSignature', function() {
 
-    it('should throw an error if a callback function is not supplied', function(){
+    it('should throw an error if a callback function is not supplied', function() {
 
       var data = {
         message: 'Hello world!',
@@ -193,15 +195,12 @@ describe('Message', function(){
         account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz'
       };
 
-      //Remote.prototype.addServer = function(){};
-      var test_remote = new Remote();
-
-      assert.throws(function(){
+      assert.throws(function() {
         Message.verifyHashSignature(data);
       }, /(?=.*callback\ function).*/);
     });
 
-    it('should respond with an error if the hash is missing or invalid', function(done){
+    it('should respond with an error if the hash is missing or invalid', function(done) {
 
       var data = {
         message: 'Hello world!',
@@ -209,18 +208,17 @@ describe('Message', function(){
         account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz'
       };
 
-      //Remote.prototype.addServer = function(){};
       var test_remote = new Remote();
       test_remote.state = 'online';
 
-      Message.verifyHashSignature(data, test_remote, function(err, valid){
+      Message.verifyHashSignature(data, test_remote, function(err) {
         assert(/hash/i.test(err.message));
         done();
       });
 
     });
 
-    it('should respond with an error if the account is missing or invalid', function(done){
+    it('should respond with an error if the account is missing or invalid', function(done) {
 
       var data = {
         message: 'Hello world!',
@@ -228,18 +226,17 @@ describe('Message', function(){
         signature: 'AAAAHOUJQzG/7BO82fGNt1TNE+GGVXKuQQ0N2nTO+iJETE69PiHnaAkkOzovM177OosxbKjpt3KvwuJflgUB2YGvgjk='
       };
 
-      //Remote.prototype.addServer = function(){};
       var test_remote = new Remote();
       test_remote.state = 'online';
 
-      Message.verifyHashSignature(data, test_remote, function(err, valid){
+      Message.verifyHashSignature(data, test_remote, function(err) {
         assert(/account|address/i.test(err.message));
         done();
       });
 
     });
 
-    it('should respond with an error if the signature is missing or invalid', function(done){
+    it('should respond with an error if the signature is missing or invalid', function(done) {
 
       var data = {
         message: 'Hello world!',
@@ -247,18 +244,17 @@ describe('Message', function(){
         account: 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz'
       };
 
-      //Remote.prototype.addServer = function(){};
       var test_remote = new Remote();
       test_remote.state = 'online';
 
-      Message.verifyHashSignature(data, test_remote, function(err, valid){
+      Message.verifyHashSignature(data, test_remote, function(err) {
         assert(/signature/i.test(err.message));
         done();
       });
 
     });
 
-    it('should respond true if the signature is valid and corresponds to an active public key for the account', function(done){
+    it('should respond true if the signature is valid and corresponds to an active public key for the account', function(done) {
 
       var data = {
         message: 'Hello world!',
@@ -267,18 +263,17 @@ describe('Message', function(){
         signature: 'AAAAHMIPCQGLgdnpX1Ccv1wHb56H4NggxIM6U08Qkb9mUjN2Vn9pZ3CHvq1yWLBi6NqpW+7kedLnmfu4VG2+y43p4Xs='
       };
 
-      //Remote.prototype.addServer = function(){};
       var test_remote = new Remote();
       test_remote.state = 'online';
       test_remote.requestAccountInfo = function(options, callback) {
         var account = options.account;
         if (account === data.account) {
           callback(null, {
-            "account_data": {
-              "Account": "rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz",
-              "Flags": 1114112,
-              "LedgerEntryType": "AccountRoot",
-              "RegularKey": "rHq2wyUtLkAad3vURUk33q9gozd97skhSf"
+            'account_data': {
+              'Account': 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz',
+              'Flags': 1114112,
+              'LedgerEntryType': 'AccountRoot',
+              'RegularKey': 'rHq2wyUtLkAad3vURUk33q9gozd97skhSf'
             }
           });
         } else {
@@ -286,7 +281,7 @@ describe('Message', function(){
         }
       };
 
-      Message.verifyHashSignature(data, test_remote, function(err, valid){
+      Message.verifyHashSignature(data, test_remote, function(err, valid) {
         assert(!err);
         assert(valid);
         done();
@@ -294,7 +289,7 @@ describe('Message', function(){
 
     });
 
-    it('should respond false if a key can be recovered from the signature but it does not correspond to an active public key', function(done){
+    it('should respond false if a key can be recovered from the signature but it does not correspond to an active public key', function(done) {
 
       // Signature created by disabled master key
       var data = {
@@ -304,18 +299,17 @@ describe('Message', function(){
         signature: 'AAAAG+dB/rAjZ5m8eQ/opcqQOJsFbKxOu9jq9KrOAlNO4OdcBDXyCBlkZqS9Xr8oZI2uh0boVsgYOS3pOLJz+Dh3Otk='
       };
 
-      //Remote.prototype.addServer = function(){};
       var test_remote = new Remote();
       test_remote.state = 'online';
       test_remote.requestAccountInfo = function(options, callback) {
         var account = options.account;
         if (account === data.account) {
           callback(null, {
-            "account_data": {
-              "Account": "rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz",
-              "Flags": 1114112,
-              "LedgerEntryType": "AccountRoot",
-              "RegularKey": "rHq2wyUtLkAad3vURUk33q9gozd97skhSf"
+            'account_data': {
+              'Account': 'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz',
+              'Flags': 1114112,
+              'LedgerEntryType': 'AccountRoot',
+              'RegularKey': 'rHq2wyUtLkAad3vURUk33q9gozd97skhSf'
             }
           });
         } else {
@@ -323,7 +317,7 @@ describe('Message', function(){
         }
       };
 
-      Message.verifyHashSignature(data, test_remote, function(err, valid){
+      Message.verifyHashSignature(data, test_remote, function(err, valid) {
         assert(!err);
         assert(!valid);
         done();

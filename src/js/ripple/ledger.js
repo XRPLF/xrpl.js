@@ -1,5 +1,5 @@
-// Ledger
-
+/* eslint-disable valid-jsdoc */
+'use strict';
 var Transaction = require('./transaction').Transaction;
 var SHAMap = require('./shamap').SHAMap;
 var SHAMapTreeNode = require('./shamap').SHAMapTreeNode;
@@ -7,16 +7,12 @@ var SerializedObject = require('./serializedobject').SerializedObject;
 var stypes = require('./serializedtypes');
 var UInt160 = require('./uint160').UInt160;
 var Currency = require('./currency').Currency;
-var stypes = require('./serializedtypes');
-var sjcl  = require('./utils').sjcl;
-var Crypt = require('./crypt').Crypt;
 
-function Ledger()
-{
+function Ledger() {
   this.ledger_json = {};
 }
 
-Ledger.from_json = function (v) {
+Ledger.from_json = function(v) {
   var ledger = new Ledger();
   ledger.parse_json(v);
   return ledger;
@@ -31,7 +27,7 @@ Ledger.space = require('./ledgerspaces');
  * @return {UInt256}
  */
 Ledger.calcAccountRootEntryHash =
-Ledger.prototype.calcAccountRootEntryHash = function (account) {
+Ledger.prototype.calcAccountRootEntryHash = function(account) {
   account = UInt160.from_json(account);
 
   var index = new SerializedObject();
@@ -51,9 +47,9 @@ Ledger.prototype.calcAccountRootEntryHash = function (account) {
  * @return {UInt256}
  */
 Ledger.calcOfferEntryHash =
-Ledger.prototype.calcOfferEntryHash = function (account, sequence) {
+Ledger.prototype.calcOfferEntryHash = function(account, sequence) {
   account = UInt160.from_json(account);
-  sequence = parseInt(sequence);
+  sequence = parseInt(sequence, 10);
 
   var index = new SerializedObject();
 
@@ -75,19 +71,20 @@ Ledger.prototype.calcOfferEntryHash = function (account, sequence) {
  * @return {UInt256}
  */
 Ledger.calcRippleStateEntryHash =
-Ledger.prototype.calcRippleStateEntryHash = function (account1, account2, currency) {
+Ledger.prototype.calcRippleStateEntryHash = function(
+    account1, account2, currency) {
   currency = Currency.from_json(currency);
   account1 = UInt160.from_json(account1);
   account2 = UInt160.from_json(account2);
 
   if (!account1.is_valid()) {
-    throw new Error("Invalid first account");
+    throw new Error('Invalid first account');
   }
   if (!account2.is_valid()) {
-    throw new Error("Invalid second account");
+    throw new Error('Invalid second account');
   }
   if (!currency.is_valid()) {
-    throw new Error("Invalid currency");
+    throw new Error('Invalid currency');
   }
 
   // The lower ID has to come first
@@ -107,14 +104,14 @@ Ledger.prototype.calcRippleStateEntryHash = function (account1, account2, curren
   return index.hash();
 };
 
-Ledger.prototype.parse_json = function (v) {
+Ledger.prototype.parse_json = function(v) {
   this.ledger_json = v;
 };
 
-Ledger.prototype.calc_tx_hash = function () {
+Ledger.prototype.calc_tx_hash = function() {
   var tx_map = new SHAMap();
 
-  this.ledger_json.transactions.forEach(function (tx_json) {
+  this.ledger_json.transactions.forEach(function(tx_json) {
     var tx = Transaction.from_json(tx_json);
     var meta = SerializedObject.from_json(tx_json.metaData);
 
@@ -128,37 +125,39 @@ Ledger.prototype.calc_tx_hash = function () {
 };
 
 /**
-* @param options.sanity_test {Boolean}
+* @param options .sanity_test {Boolean}
+* @return hash of shamap
 *
 *   If `true`, will serialize each accountState item to binary and then back to
 *   json before finally serializing for hashing. This is mostly to expose any
 *   issues with ripple-lib's binary <--> json codecs.
 *
 */
-Ledger.prototype.calc_account_hash = function (options) {
+Ledger.prototype.calc_account_hash = function(options) {
   var account_map = new SHAMap();
   var erred;
 
-  this.ledger_json.accountState.forEach(function (le) {
+  this.ledger_json.accountState.forEach(function(le) {
     var data = SerializedObject.from_json(le);
 
-    if (options != null && options.sanity_test) {
+    var json;
+    if (options && options.sanity_test) {
       try {
-        var json = data.to_json();
+        json = data.to_json();
         data = SerializedObject.from_json(json);
       } catch (e) {
-        console.log("account state item: ", le);
-        console.log("to_json() ",json);
-        console.log("exception: ", e);
+        console.log('account state item: ', le);
+        console.log('to_json() ', json);
+        console.log('exception: ', e);
         erred = true;
       }
-    };
+    }
 
     account_map.add_item(le.index, data, SHAMapTreeNode.TYPE_ACCOUNT_STATE);
   });
 
   if (erred) {
-    throw new Error("There were errors with sanity_test"); // all logged above
+    throw new Error('There were errors with sanity_test'); // all logged above
   }
 
   return account_map.hash();

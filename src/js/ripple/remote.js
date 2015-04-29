@@ -33,7 +33,6 @@ var PathFind = require('./pathfind').PathFind;
 var SerializedObject = require('./serializedobject').SerializedObject;
 var RippleError = require('./rippleerror').RippleError;
 var utils = require('./utils');
-var sjcl = require('./utils').sjcl;
 var hashprefixes = require('./hashprefixes');
 var config = require('./config');
 var log = require('./log').internal.sub('remote');
@@ -1760,19 +1759,7 @@ Remote.prototype._serverPrepareSubscribe = function(server, callback) {
   function serverSubscribed(message) {
     self._stand_alone = !!message.stand_alone;
     self._testnet = !!message.testnet;
-
-    if (typeof message.random === 'string') {
-      var rand = message.random.match(/[0-9A-F]{8}/ig);
-
-      while (rand && rand.length) {
-        sjcl.random.addEntropy(parseInt(rand.pop(), 16));
-      }
-
-      self.emit('random', utils.hexToArray(message.random));
-    }
-
     self._handleLedgerClosed(message, server);
-
     self.emit('subscribed');
   }
 
