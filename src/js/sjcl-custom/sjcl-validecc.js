@@ -1,3 +1,5 @@
+var sjcl = require('sjcl');
+
 sjcl.ecc.ecdsa.secretKey.prototype.sign = function(hash, paranoia, k_for_testing) {
   var R = this._curve.r,
       l = R.bitLength();

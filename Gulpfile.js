@@ -5,7 +5,6 @@ var watch = require('gulp-watch');
 var plumber = require('gulp-plumber');
 var filelog = require('gulp-filelog');
 var cleanDest = require('gulp-clean-dest');
-var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var webpack = require('webpack');
@@ -13,54 +12,14 @@ var bump = require('gulp-bump');
 var react = require('gulp-react');
 var flow = require('gulp-flowtype');
 var argv = require('yargs').argv;
-// var header = require('gulp-header');
 
 var pkg = require('./package.json');
-
-var sjclSrc = [
-  'src/js/sjcl/core/sjcl.js',
-  'src/js/sjcl/core/aes.js',
-  'src/js/sjcl/core/bitArray.js',
-  'src/js/sjcl/core/codecString.js',
-  'src/js/sjcl/core/codecHex.js',
-  'src/js/sjcl/core/codecBase64.js',
-  'src/js/sjcl/core/codecBytes.js',
-  'src/js/sjcl/core/sha256.js',
-  'src/js/sjcl/core/sha512.js',
-  'src/js/sjcl/core/sha1.js',
-  'src/js/sjcl/core/ccm.js',
-  // 'src/js/sjcl/core/cbc.js',
-  // 'src/js/sjcl/core/ocb2.js',
-  'src/js/sjcl/core/hmac.js',
-  'src/js/sjcl/core/pbkdf2.js',
-  'src/js/sjcl/core/random.js',
-  'src/js/sjcl/core/convenience.js',
-  'src/js/sjcl/core/bn.js',
-  'src/js/sjcl/core/ecc.js',
-  'src/js/sjcl/core/srp.js',
-  'src/js/sjcl-custom/sjcl-ecc-pointextras.js',
-  'src/js/sjcl-custom/sjcl-secp256k1.js',
-  'src/js/sjcl-custom/sjcl-ripemd160.js',
-  'src/js/sjcl-custom/sjcl-extramath.js',
-  'src/js/sjcl-custom/sjcl-montgomery.js',
-  'src/js/sjcl-custom/sjcl-validecc.js',
-  'src/js/sjcl-custom/sjcl-ecdsa-canonical.js',
-  'src/js/sjcl-custom/sjcl-ecdsa-der.js',
-  'src/js/sjcl-custom/sjcl-ecdsa-recoverablepublickey.js',
-  'src/js/sjcl-custom/sjcl-jacobi.js'
-];
 
 function logPluginError(error) {
   gutil.log(error.toString());
 }
 
-gulp.task('concat-sjcl', function() {
-  return gulp.src(sjclSrc)
-  .pipe(concat('sjcl.js'))
-  .pipe(gulp.dest('./build/'));
-});
-
-gulp.task('build', ['concat-sjcl'], function(callback) {
+gulp.task('build', function(callback) {
   webpack({
     cache: true,
     entry: './src/js/ripple/index.js',
@@ -79,7 +38,7 @@ gulp.task('build-min', ['build'], function() {
   .pipe(gulp.dest('./build/'));
 });
 
-gulp.task('build-debug', ['concat-sjcl'], function(callback) {
+gulp.task('build-debug', function(callback) {
   webpack({
     cache: true,
     entry: './src/js/ripple/index.js',
@@ -104,7 +63,7 @@ function buildUseError(cons) {
           .replace(new RegExp('<CONS>', 'g'), cons);
 }
 
-gulp.task('build-core', ['concat-sjcl'], function(callback) {
+gulp.task('build-core', function(callback) {
   webpack({
     entry: [
       './src/js/ripple/remote.js'
@@ -194,4 +153,4 @@ gulp.task('version-beta', function() {
   .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['concat-sjcl', 'build', 'build-debug', 'build-min']);
+gulp.task('default', ['build', 'build-debug', 'build-min']);

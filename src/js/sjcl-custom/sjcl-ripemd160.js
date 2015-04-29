@@ -1,3 +1,5 @@
+var sjcl = require('sjcl');
+
 /** @fileOverview Javascript RIPEMD-160 implementation.
  *
  * @author Artem S Vybornov <vybornov@gmail.com>

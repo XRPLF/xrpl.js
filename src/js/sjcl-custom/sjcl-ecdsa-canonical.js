@@ -1,3 +1,5 @@
+var sjcl = require('sjcl');
+
 sjcl.ecc.ecdsa.secretKey.prototype.canonicalizeSignature = function(rs) {
   var w = sjcl.bitArray,
       R = this._curve.r,

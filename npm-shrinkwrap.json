@@ -28,6 +28,10 @@
       "version": "1.0.3",
       "resolved": "https://registry.npmjs.org/ripple-wallet-generator/-/ripple-wallet-generator-1.0.3.tgz"
     },
+    "sjcl": {
+      "version": "1.0.2",
+      "resolved": "https://registry.npmjs.org/sjcl/-/sjcl-1.0.2.tgz"
+    },
     "ws": {
       "version": "0.7.1",
       "resolved": "https://registry.npmjs.org/ws/-/ws-0.7.1.tgz",

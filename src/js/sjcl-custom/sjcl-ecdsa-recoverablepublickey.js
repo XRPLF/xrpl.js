@@ -1,3 +1,5 @@
+var sjcl = require('sjcl');
+
 /**
  *  This module uses the public key recovery method
  *  described in SEC 1: Elliptic Curve Cryptography,

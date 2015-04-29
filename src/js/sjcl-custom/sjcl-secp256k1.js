@@ -1,3 +1,5 @@
+var sjcl = require('sjcl');
+
 // ----- for secp256k1 ------
 
 sjcl.ecc.point.prototype.toBytesCompressed = function () {

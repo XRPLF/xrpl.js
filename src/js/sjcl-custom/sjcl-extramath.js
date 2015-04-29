@@ -1,3 +1,5 @@
+var sjcl = require('sjcl');
+
 sjcl.bn.ZERO = new sjcl.bn(0);
 
 /** [ this / that , this % that ] */

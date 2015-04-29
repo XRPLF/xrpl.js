@@ -1,3 +1,5 @@
+var sjcl = require('sjcl');
+
 sjcl.bn.prototype.invDigit = function ()
 {
   var radixMod = 1 + this.radixMask;

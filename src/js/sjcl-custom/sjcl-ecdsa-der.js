@@ -1,3 +1,5 @@
+var sjcl = require('sjcl');
+
 sjcl.ecc.ecdsa.secretKey.prototype.signDER = function(hash, paranoia) {
   return this.encodeDER(this.sign(hash, paranoia));
 };

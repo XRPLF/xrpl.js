@@ -1,3 +1,5 @@
+var sjcl = require('sjcl');
+
 sjcl.bn.prototype.jacobi = function (that) {
   var a = this;
   that = new sjcl.bn(that);

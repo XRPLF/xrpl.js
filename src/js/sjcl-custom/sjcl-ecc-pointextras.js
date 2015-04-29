@@ -1,3 +1,4 @@
+var sjcl = require('sjcl');
 /**
  *  Check that the point is valid based on the method described in
  *  SEC 1: Elliptic Curve Cryptography, section 3.2.2.1: 
