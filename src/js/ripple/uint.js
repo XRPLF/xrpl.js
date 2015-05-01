@@ -4,7 +4,6 @@
 
 var utils = require('./utils');
 var sjcl = utils.sjcl;
-var config = require('./config');
 
 //
 // Abstract UInt class
@@ -131,12 +130,6 @@ UInt.prototype._update = function() {
 
 // value = NaN on error.
 UInt.prototype.parse_generic = function(j) {
-  // Canonicalize and validate
-  if (config.accounts && (j in config.accounts)) {
-    j = config.accounts[j].account;
-  }
-
-
   switch (j) {
     case undefined:
     case '0':
