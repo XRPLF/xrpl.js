@@ -17,7 +17,6 @@ exports.Message = require('./message').Message;
 exports.binformat = require('./binformat');
 exports.utils = require('./utils');
 exports.Server = require('./server').Server;
-exports.Wallet = require('./wallet');
 exports.Ledger = require('./ledger').Ledger;
 exports.TransactionQueue = require('./transactionqueue').TransactionQueue;
 exports.RangeSet = require('./rangeset').RangeSet;
@@ -31,27 +30,28 @@ exports.convertBase = require('./baseconverter');
 // the official client, it makes sense to expose the SJCL instance so we don't
 // have to include it twice.
 exports.sjcl = require('./utils').sjcl;
+exports.Wallet = require('ripple-wallet-generator')({sjcl: exports.sjcl});
 exports.types = require('./serializedtypes');
 
 exports.config = require('./config');
 
 // camelCase to under_scored API conversion
 function attachUnderscored(name) {
- var o = exports[name];
+  var o = exports[name];
 
- Object.keys(o.prototype).forEach(function(key) {
-   var UPPERCASE = /([A-Z]{1})[a-z]+/g;
+  Object.keys(o.prototype).forEach(function(key) {
+    var UPPERCASE = /([A-Z]{1})[a-z]+/g;
 
-   if (!UPPERCASE.test(key)) {
-     return;
-   }
+    if (!UPPERCASE.test(key)) {
+      return;
+    }
 
-   var underscored = key.replace(UPPERCASE, function(c) {
-     return '_' + c.toLowerCase();
-   });
+    var underscored = key.replace(UPPERCASE, function(c) {
+      return '_' + c.toLowerCase();
+    });
 
-   o.prototype[underscored] = o.prototype[key];
- });
+    o.prototype[underscored] = o.prototype[key];
+  });
 }
 
 ['Remote',
