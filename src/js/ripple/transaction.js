@@ -11,7 +11,6 @@ var Seed = require('./seed').Seed;
 var SerializedObject = require('./serializedobject').SerializedObject;
 var RippleError = require('./rippleerror').RippleError;
 var hashprefixes = require('./hashprefixes');
-var config = require('./config');
 var log = require('./log').internal.sub('transaction');
 
 /**
@@ -433,8 +432,8 @@ Transaction.prototype.serialize = function() {
   return SerializedObject.from_json(this.tx_json);
 };
 
-Transaction.prototype.signingHash = function() {
-  return this.hash(config.testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
+Transaction.prototype.signingHash = function(testnet) {
+  return this.hash(testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
 };
 
 Transaction.prototype.hash = function(prefix, asUINT256, serialized) {
@@ -452,13 +451,13 @@ Transaction.prototype.hash = function(prefix, asUINT256, serialized) {
   return asUINT256 ? hash : hash.to_hex();
 };
 
-Transaction.prototype.sign = function() {
+Transaction.prototype.sign = function(testnet) {
   var seed = Seed.from_json(this._secret);
 
   var prev_sig = this.tx_json.TxnSignature;
   delete this.tx_json.TxnSignature;
 
-  var hash = this.signingHash();
+  var hash = this.signingHash(testnet);
 
   // If the hash is the same, we can re-use the previous signature
   if (prev_sig && hash === this.previousSigningHash) {

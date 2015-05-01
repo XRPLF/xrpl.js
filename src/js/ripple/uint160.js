@@ -1,7 +1,6 @@
 'use strict';
 
 var utils = require('./utils');
-var config = require('./config');
 var extend = require('extend');
 
 var UInt = require('./uint').UInt;
@@ -40,11 +39,6 @@ UInt160.prototype.get_version = function() {
 
 // value = NaN on error.
 UInt160.prototype.parse_json = function(j) {
-  // Canonicalize and validate
-  if (config.accounts && (j in config.accounts)) {
-    j = config.accounts[j].account;
-  }
-
   if (typeof j === 'number' && !isNaN(j)) {
     // Allow raw numbers - DEPRECATED
     // This is used mostly by the test suite and is supported

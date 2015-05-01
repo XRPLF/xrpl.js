@@ -34,7 +34,6 @@ var SerializedObject = require('./serializedobject').SerializedObject;
 var RippleError = require('./rippleerror').RippleError;
 var utils = require('./utils');
 var hashprefixes = require('./hashprefixes');
-var config = require('./config');
 var log = require('./log').internal.sub('remote');
 
 /**
@@ -236,29 +235,6 @@ Remote.flags = {
     LowNoRipple: 0x00100000,
     HighNoRipple: 0x00200000
   }
-};
-
-Remote.from_config = function(obj, trace) {
-  var serverConfig = (typeof obj === 'string') ? config.servers[obj] : obj;
-  var remote = new Remote(serverConfig, trace);
-
-  function initializeAccount(account) {
-    var accountInfo = config.accounts[account];
-    if (typeof accountInfo === 'object') {
-      if (accountInfo.secret) {
-        // Index by nickname
-        remote.setSecret(account, accountInfo.secret);
-        // Index by account ID
-        remote.setSecret(accountInfo.account, accountInfo.secret);
-      }
-    }
-  }
-
-  if (config.accounts) {
-    Object.keys(config.accounts).forEach(initializeAccount);
-  }
-
-  return remote;
 };
 
 /**

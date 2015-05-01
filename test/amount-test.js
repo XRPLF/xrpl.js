@@ -3,11 +3,6 @@
 var assert = require('assert');
 var Amount = require('ripple-lib').Amount;
 var UInt160 = require('ripple-lib').UInt160;
-var load_config = require('ripple-lib').config.load;
-var config = require('./config-example');
-
-load_config(config);
-
 
 describe('Amount', function() {
   describe('Negatives', function() {
@@ -309,9 +304,6 @@ describe('Amount', function() {
     it('Parse rrrrrrrrrrrrrrrrrrrrBZbvji export', function () {
       assert.strictEqual(UInt160.ACCOUNT_ONE, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrBZbvji').to_json());
     });
-    it('Parse mtgox export', function () {
-      assert.strictEqual(config.accounts.mtgox.account, UInt160.from_json('mtgox').to_json());
-    });
     it('is_valid rrrrrrrrrrrrrrrrrrrrrhoLvTp', function () {
       assert(UInt160.is_valid('rrrrrrrrrrrrrrrrrrrrrhoLvTp'));
     });
@@ -359,12 +351,6 @@ describe('Amount', function() {
     });
     it('parse dem human', function() {
       assert.strictEqual(Amount.from_json('10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_human_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-    });
-    it('Parse 800/USD/mtgox', function () {
-      assert.strictEqual('800/USD/' + config.accounts.mtgox.account, Amount.from_json('800/USD/mtgox').to_text_full());
-    });
-    it('Parse 800/USD/mtgox human', function () {
-      assert.strictEqual('800/USD/' + config.accounts.mtgox.account, Amount.from_json('800/USD/mtgox').to_human_full());
     });
     it('Parse native 0', function () {
       assert.strictEqual('0/XRP', Amount.from_json('0').to_text_full());
