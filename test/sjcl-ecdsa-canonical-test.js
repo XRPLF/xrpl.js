@@ -13,7 +13,6 @@ describe('SJCL ECDSA Canonicalization', function() {
                               base58: 'saESc82Vun7Ta5EJRzGJbrXb5HNYk'});
 
     it('should canonicalize non-canonical signatures', function() {
-
       var sig = '27ce1b914045ba7e8c11a2f2882cb6e0' +
                 '7a19d4017513f12e3e363d71dc3fff0f' +
                 'b0a0747ecc7b4ca46e45b3b32b6b2a06' +

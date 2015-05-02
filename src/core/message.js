@@ -8,7 +8,6 @@ const Seed = require('./seed').Seed;
 const Account = require('./account').Account;
 const UInt160 = require('./uint160').UInt160;
 const getKeyPair = require('./keypairs').getKeyPair;
-
 const arrayToHex = require('./utils').arrayToHex;
 
 // Message class (static)
@@ -62,9 +61,9 @@ Message.signMessage = function(message, secret_key, account) {
  *  @returns {Base64-encoded String} signature
  */
 Message.signHash = function(_hash, secret_key_, account) {
-
   const hash = typeof _hash === 'string' && /^[0-9a-fA-F]+$/.test(_hash) ?
               sjcl.codec.hex.toBits(_hash) : _hash;
+
 
   if (typeof hash !== 'object' ||
       typeof hash[0] !== 'number' ||
@@ -84,9 +83,7 @@ Message.signHash = function(_hash, secret_key_, account) {
   const signature_base64 = sjcl.codec.base64.fromBits(signature_bits);
 
   return signature_base64;
-
 };
-
 
 /**
  *  Verify the signature on a given message.
@@ -96,20 +93,18 @@ Message.signHash = function(_hash, secret_key_, account) {
  *  key extracted from the signature corresponds to one that is currently
  *  active for the given account.
  *
+ *  @param {Object} data - data bundle
+ *  @param {String} data.message - to verify
+ *  @param {RippleAddress} data.account - which created signature
+ *  @param {Base64String} data.signature - of message
+ *
+ *  @param {ripple-lib.Remote} remote - to retrieve account_info
+ *  @param {verifyCallback} callback - to call back
+ *
+ *  @return {void}
  *  @static
- *
- *  @param {String} data.message
- *  @param {RippleAddress} data.account
- *  @param {Base64-encoded String} data.signature
- *  @param {ripple-lib Remote} remote
- *  @param {Function} callback
- *
- *  @callback callback
- *  @param {Error} error
- *  @param {boolean} is_valid true if the signature is valid, false otherwise
  */
 Message.verifyMessageSignature = function(data, remote, callback) {
-
   if (typeof data.message === 'string') {
     data.hash = Message.hashFunction(Message.MAGIC_BYTES + data.message);
   } else {
@@ -118,9 +113,7 @@ Message.verifyMessageSignature = function(data, remote, callback) {
   }
 
   return Message.verifyHashSignature(data, remote, callback);
-
 };
-
 
 /**
  *  Verify the signature on a given hash.
@@ -130,20 +123,20 @@ Message.verifyMessageSignature = function(data, remote, callback) {
  *  key extracted from the signature corresponds to one that is currently
  *  active for the given account.
  *
+ *
+ *  @param {Object} data - data bundle
+ *  @param {String} data.message - to verify
+ *  @param {RippleAddress} data.account - which created signature
+ *  @param {Base64String} data.signature - of message
+ *
+ *  @param {ripple-lib.Remote} remote - to retrieve account_info
+ *  @param {verifyCallback} callback - to call back
+ *
+ *  @return {void}
  *  @static
  *
- *  @param {bitArray|Hex-encoded String} data.hash
- *  @param {RippleAddress} data.account
- *  @param {Base64-encoded String} data.signature
- *  @param {ripple-lib Remote} remote
- *  @param {Function} callback
- *
- *  @callback callback
- *  @param {Error} error
- *  @param {boolean} is_valid true if the signature is valid, false otherwise
  */
 Message.verifyHashSignature = function(data, remote, callback) {
-
   if (typeof callback !== 'function') {
     throw new Error('Must supply callback function');
   }
@@ -188,16 +181,13 @@ Message.verifyHashSignature = function(data, remote, callback) {
     } else {
       async_callback(new Error('Could not recover public key from signature'));
     }
-
   }
 
   function checkPublicKeyIsValid(public_key, async_callback) {
-
     // Get hex-encoded public key
     const public_key_hex = arrayToHex(public_key._point.toBytesCompressed());
     const account_class_instance = new Account(remote, account);
     account_class_instance.publicKeyIsActive(public_key_hex, async_callback);
-
   }
 
   const steps = [
@@ -206,7 +196,6 @@ Message.verifyHashSignature = function(data, remote, callback) {
   ];
 
   async.waterfall(steps, callback);
-
 };
 
 exports.Message = Message;

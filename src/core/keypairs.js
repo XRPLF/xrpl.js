@@ -10,10 +10,8 @@ var utils = require('./utils');
 var Base = require('./base').Base;
 var Seed = require('./seed').Seed;
 var UInt160 = require('./uint160').UInt160;
-var UInt256 = require('./uint256').UInt256;
 
 var arrayToHex = utils.arrayToHex;
-var hexToArray = utils.hexToArray;
 var sjcl = utils.sjcl;
 
 /* ---------------------------------- ENUMS --------------------------------- */
@@ -90,21 +88,22 @@ function deriveEdKeyPairSeed(seed) {
   return new Uint8Array(sjcl.codec.bytes.fromBits(bits));
 }
 
-function findk256Key(seedBytes, discrim)
-{
+function findk256Key(bytes, discrim) {
   var curve = sjcl.ecc.curves.k256;
   var key;
 
   for (var i = 0; i <= 0xFFFFFFFF; i++) {
-    // We hash the seedBytes to find a 256 bit number, looping until we are sure
+    // We hash the bytes to find a 256 bit number, looping until we are sure
     // it is less than the order of the curve.
-    var hasher = new utils.Sha512().addBytes(seedBytes);
+    var hasher = new utils.Sha512().addBytes(bytes);
     // If the optional discriminator index was passed in, update the hash.
     if (discrim !== undefined) {
       hasher.addU32(discrim);
-    };
+    }
     hasher.addU32(i);
     key = hasher.finish256BN();
+
+    /* eslint-disable max-len */
 
     /*
     # js
@@ -122,30 +121,37 @@ function findk256Key(seedBytes, discrim)
     True
 
     We basically always break here, but for the vanishingly rare case that we
-    don't we'll increment i and continue.  :)
+    don't we'll increment i and continue. :)
 
     */
-    if (curve.r.greaterEquals(key)) {
+
+    /* eslint-enable max-len */
+    if (key.greaterEquals(1) && curve.r.greaterEquals(key)) {
       break;
-    }
+    } /*else {
+      throw new Error('omg unicorn ;) ');
+    }*/
   }
   return key;
 }
 
+/* eslint-disable valid-jsdoc */
+
 /**
 * @param {Object} [options] -
-*
 * @param {Number} [options.accountIndex=0] - the account number to generate
-*
 * @param {Boolean} [options.root=false] - generate root key-pair,
 *                                         as used by validators.
 * @return {new sjcl.ecc.ecdsa.secretKey} -
 *
 */
+
+/* eslint-enable valid-jsdoc */
+
 function derivek256Secret(seed, options) {
   if (!seed.is_valid()) {
     throw new Error('Cannot generate keys from invalid seed!');
-  };
+  }
 
   var curve = sjcl.ecc.curves.k256;
   var opts = options || {};
@@ -165,13 +171,15 @@ function derivek256Secret(seed, options) {
     // A seed can generate many keypairs as a function of the seed and a uint32.
     // Almost everyone just uses the first account, `0`.
     var accountIndex = opts.accountIndex || 0;
-    var secret = findk256Key(publicGen.toBytesCompressed(), accountIndex)
+    secret = findk256Key(publicGen.toBytesCompressed(), accountIndex)
                              .add(privateGen).mod(curve.r);
   }
+
   // The public key is lazily computed by the key class, but it has the same
   // mathematical relationship to `secret` as `publicGen` to `privateGen`. The
   // `secret` will be available as the `_exponent` property on the secretKey.
-  return new sjcl.ecc.ecdsa.secretKey(curve, secret);
+  var SjclSecretKey = sjcl.ecc.ecdsa.secretKey;
+  return new SjclSecretKey(curve, secret);
 }
 
 function bytesBnTo256Bits(bytes) {
@@ -255,12 +263,13 @@ util.inherits(Ed25519Pair, KeyPair);
 
 /**
 * @param {Seed} seed - A 128 bit seed
+* @return {Ed25519Pair} key pair
 */
 Ed25519Pair.fromSeed = function(seed) {
   var seed256 = deriveEdKeyPairSeed(seed);
   var keyPair = nacl.sign.keyPair.fromSeed(seed256);
   return new Ed25519Pair(keyPair);
-}
+};
 
 hasCachedProperty(Ed25519Pair, 'pubKeyBytes', function() {
   return [0xED].concat(toGenericArray(this.publicKey));
@@ -296,11 +305,12 @@ util.inherits(Secp256k1Pair, KeyPair);
 
 Secp256k1Pair.fromSeed = function(seed) {
   return new Secp256k1Pair(derivek256Secret(seed));
-}
+};
 
 hasCachedProperty(Secp256k1Pair, 'pubKey', function() {
   var exponent = this.secretKey._exponent;
-  return new sjcl.ecc.ecdsa.publicKey(this.curve, this.curve.G.mult(exponent));
+  var EcdsaPublicKey = sjcl.ecc.ecdsa.publicKey;
+  return new EcdsaPublicKey(this.curve, this.curve.G.mult(exponent));
 });
 
 hasCachedProperty(Secp256k1Pair, 'pubKeyBytes', function() {
@@ -311,9 +321,8 @@ hasCachedProperty(Secp256k1Pair, 'pubKeyBytes', function() {
 @param {Array<Number>} message (bytes)
  */
 Secp256k1Pair.prototype.sign = function(message) {
-  var PARANOIA_256_BITS = 6; // sjcl constant for ensuring 256 bits of entropy
   var hash = this.hashMessage(message);
-  var sig = this.secretKey.sign(hash, PARANOIA_256_BITS);
+  var sig = this.secretKey.signDeterministic(hash);
   sig = this.secretKey.canonicalizeSignature(sig);
   return sjcl.codec.bytes.fromBits(this.secretKey.encodeDER(sig));
 };
@@ -359,7 +368,7 @@ exports.getKeyPair = function(specifier) {
   var seed = parseSeed(specifierObj);
   if (lodash.isEqual(seed._version, Base.VER_ED25519_SEED)) {
     keyType = KeyType.ed25519;
-  };
+  }
 
   if (keyType === KeyType.secp256k1) {
     return Secp256k1Pair.fromSeed(seed);

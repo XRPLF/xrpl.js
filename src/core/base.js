@@ -166,7 +166,7 @@ Base.decode_multi = function(encoded, expectedLength, possibleVersions,
       ret.version = version;
       ret.bytes = decoded;
       return false;
-    };
+    }
   });
 
   return ret;

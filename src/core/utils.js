@@ -149,12 +149,19 @@ function Sha512() {
 }
 
 Sha512.prototype.addBytes = function(bytes) {
-  this.hash.update(sjcl.codec.bytes.toBits(bytes));
+  var bits = sjcl.codec.bytes.toBits(bytes);
+  this.hash.update(bits);
   return this;
 };
 
 Sha512.prototype.addU32 = function(i) {
-  this.hash.update([i]);
+  var bytes = [
+    (i >>> 24) & 0xFF,
+    (i >>> 16) & 0xFF,
+    (i >>> 8) & 0xFF,
+    i & 0xFF
+  ];
+  this.addBytes(bytes);
   return this;
 };
 

@@ -7,7 +7,6 @@
 //
 
 const extend = require('extend');
-const lodash = require('lodash');
 const utils = require('./utils');
 const sjcl = utils.sjcl;
 
