@@ -1223,6 +1223,10 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
 OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
   var self = this;
 
+  if (_.isEmpty(this._offers) && _.isEmpty(this._offersAutobridged)) {
+    return null;
+  }
+
   this._mergedOffers = this._offers
     .concat(this._offersAutobridged)
     .sort(function(a, b) {
