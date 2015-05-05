@@ -2,6 +2,12 @@
 
 + [Add offer autobridging](https://github.com/ripple/ripple-lib/commit/c7bbce83719c1e8c6a4fae5ca850e7515db1a4a5)
 
++ [Fix empty order edgecase](https://github.com/ripple/ripple-lib/commit/64809d9ae23dc24f47accd4b4788b48f49880d3e)
+
++ [Remove unused float.js and wallet.js](https://github.com/ripple/ripple-lib/commit/d4a4b5f4fbbf09677a59ce81bace35c6426a2fda)
+
++ [Remove config singleton to reduce global state](https://github.com/ripple/ripple-lib/commit/c655c2a20ee5d150a4b5a1b6717b9fb81f636025)
+
 ##0.12.4
 
 + [Improve entropy security](https://github.com/ripple/ripple-lib/commit/c7ba822320880037796f57876d1abb4e525648ed)
