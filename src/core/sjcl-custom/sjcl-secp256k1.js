@@ -13,12 +13,20 @@ sjcl.ecc.point.prototype.toBytesCompressed = function() {
 // NIST-P256 is a=-3, we need algorithms for a=0
 //
 // This is a custom point addition formula that
-// only works for a=-3 Jacobian curve. It's much
+// only works for a=0 Jacobian curve. It's much
 // faster than the generic implementation
+
+sjcl.ecc.pointJac.prototype.stashedAdd = sjcl.ecc.pointJac.prototype.add;
+sjcl.ecc.pointJac.prototype.stashedDoubl = sjcl.ecc.pointJac.prototype.doubl;
+
 sjcl.ecc.pointJac.prototype.add = function(T) {
+  if (!this.curve.a.equals(0)) {
+    return this.stashedAdd(T);
+  };
+
   var self = this;
   if (self.curve !== T.curve) {
-    throw ('sjcl.ecc.add(): Points must be on the same curve to add them!');
+    throw("sjcl.ecc.add(): Points must be on the same curve to add them!");
   }
 
   if (self.isIdentity) {
@@ -54,9 +62,13 @@ sjcl.ecc.pointJac.prototype.add = function(T) {
 };
 
 // This is a custom doubling algorithm that
-// only works for a=-3 Jacobian curve. It's much
+// only works for a=0 Jacobian curve. It's much
 // faster than the generic implementation
-sjcl.ecc.pointJac.prototype.doubl = function() {
+sjcl.ecc.pointJac.prototype.doubl = function () {
+  if (!this.curve.a.equals(0)) {
+    return this.stashedDoubl();
+  };
+
   if (this.isIdentity) {
     return this;
   }
@@ -73,6 +85,8 @@ sjcl.ecc.pointJac.prototype.doubl = function() {
   return new sjcl.ecc.pointJac(this.curve, x, y, z);
 };
 
+// Stash away the NIST-P256 curve we monkey patch below.
+sjcl.ecc.curves.p256 = sjcl.ecc.curves.c256;
 // DEPRECATED:
 // previously the c256 curve was overridden with the secp256k1 curve
 // since then, sjcl has been updated to support k256

@@ -182,6 +182,45 @@ describe('Secp256k1Pair', function() {
        assert.equal(results[15].toString().slice(2), f.k15);
      });
     });
+
+    it('complies with rfc6979 test vector for p256/sha256', function() {
+      function bnHex(bn) {
+        return bn.toString().toUpperCase().slice(2);
+      }
+
+      var curve = sjcl.ecc.curves.p256;
+      var q = 'FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551';
+      var x = 'C9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721';
+      var Ux = '60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6';
+      var Uy = '7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299';
+
+      assert.equal(bnHex(curve.r), q);
+      var d = new sjcl.bn(x);
+      var pub = curve.G.mult(d);
+
+      assert.equal(bnHex(pub.x), Ux);
+      assert.equal(bnHex(pub.y), Uy);
+
+      var secret = new sjcl.ecc.ecdsa.secretKey(curve, d);
+      var h1 = sjcl.hash.sha256.hash('sample');
+      var k = secret.generateDeterministicK(h1, function() {
+        return true;
+      });
+
+      var expectedK =
+        'A6E3C57DD01ABE90086538398355DD4C3B17AA873382B0F24D6129493D8AAD60';
+      assert.equal(bnHex(k), expectedK);
+
+      var rs = secret.sign(h1, undefined, undefined, new sjcl.bn(expectedK));
+      var rsHex = sjcl.codec.hex.fromBits(rs).toUpperCase();
+      assert.equal(
+           rsHex.slice(0, 64),
+          'EFD48B2AACB6A8FD1140DD9CD45E81D69D2C877B56AAF991C34D0EA84EAF3716');
+      assert.equal(
+           rsHex.slice(64),
+          'F7CB1C942D657C41D436C7A1B6E29F65F3E900DBB9AFF4064DC4AB2F843ACDA8');
+
+    });
   });
 
   describe('generated tests', function() {

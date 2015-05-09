@@ -11,14 +11,14 @@ describe('ECDSA signing with recoverable public key', function(){
         message: 'Hello world!',
         secret_hex: '9931c08f61f127d5735fa3c60e702212ce7ed9a2ac90d5dbade99c689728cd9b',
         random_value: '5473a3dbdc13ec9efbad7f7f929fbbea404af556a48041dd9d41d29fdbc989ad',
-        hash_function: sjcl.hash.sha512.hash
+        hash_function: sjcl.hash.sha256.hash
         // signature: 'AAAAGzFa1pYjhssCpDFZgFSnYQ8qCnMkLaZrg0mXZyNQ2NxgMQ8z9U3ngYerxSZCEt3Q4raMIpt03db7jDNGbfmHy8I='
       }, {
         // Correct recovery value for this one is 0
         message: 'ua5pdcG0I1JuhSr9Fwai2UoZ9ll5leUtHE5NzSSNnPkw8nSPH5mT1gE1fe0sn',
         secret_hex: '84814318ffe6e612694ad59b9084b7b66d68b6979567c619171a67b05e2b654b',
         random_value: '14261d30b319709c10ab13cabe595313b99dd2d5c76b8b38d7eb445f0b81cc9a',
-        hash_function: sjcl.hash.sha512.hash
+        hash_function: sjcl.hash.sha256.hash
         // signature: 'AAAAHGjpBM7wnTHbPGo0TXsxKbr+d7KvACuJ/eGQsp3ZJfOOQHszaciRo3ClenwKixcquFcBlaVfHlOc3JWOZq1RjpQ='
       }, {
         // Correct recovery value for this one is 1
