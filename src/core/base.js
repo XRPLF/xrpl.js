@@ -23,9 +23,6 @@ extend(Base, {
   VER_FAMILY_GENERATOR: 41,
   VER_FAMILY_SEED: 33,
 
-  // 6 byte version to give `sEd` prefix to 16 byte seed encodings.
-  // VER_ED25519_SEED: [ 73, 141, 118, 70, 140, 214]
-
   // 3 byte version to give `sEd` prefix to 16 byte seed encodings.
   VER_ED25519_SEED: [1, 225, 75]
 });

@@ -2,6 +2,7 @@
 const assert = require('assert');
 const Base = require('ripple-lib').Base;
 const fixtures = require('./fixtures/base58.json');
+const _ = require('lodash');
 
 function digitArray(str) {
   return str.split('').map(function(d) {
@@ -62,5 +63,35 @@ describe('Base', function() {
         assert.deepEqual(decoded, hexToByteArray(testCase.hex));
       }
     });
+  });
+
+  describe('find_prefix', function() {
+    it('can find the right version bytes to induce `sEd` for 16 byte payloads',
+        function() {
+      const version = Base.find_prefix(16, 'sEd');
+
+      // Fill an array of 16 bytes
+      const filled = _.fill(Array(16), 0xFF);
+
+      // For all values 0-255, set MSB to value, then encode
+      for (let i = 0; i < 0xFF; i++) {
+        filled[0] = i;
+        const encoded = Base.encode_check(version, filled);
+        // Check that sEd prefix was induced
+        assert.equal('sEd', encoded.slice(0, 3));
+      }
+
+      // This should already be filled with 0xFF, but for simple assuredness
+      _.fill(filled, 0xFF);
+      // For all values 0-255, set LSB to value, then encode
+      for (let i = 0; i < 0xFF; i++) {
+        filled[filled.length - 1] = i;
+        const encoded = Base.encode_check(version, filled);
+        assert.equal('sEd', encoded.slice(0, 3));
+      }
+
+      // The canonical version for sed25519 prefixes
+      assert(_.isEqual(version, Base.VER_ED25519_SEED));
+    })
   });
 });
