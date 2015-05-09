@@ -162,36 +162,46 @@ describe('Secp256k1Pair', function() {
     assert(verified);
   });
 
-  fixtures.rfc6979.forEach(function(f) {
-   it('produces the expected k values for ' + f.message +
-       ' if k wasn\'t suitable', function() {
+  describe('rfc6979 deterministic k', function() {
+    fixtures.rfc6979.forEach(function(f) {
+     it('produces the expected k values for ' + f.message +
+         ' if k wasn\'t suitable', function() {
 
-     var d = new sjcl.bn(f.d);
-     var secret = new sjcl.ecc.ecdsa.secretKey(sjcl.ecc.curves.k256, d);
-     var h1 = sjcl.hash.sha256.hash(f.message);
-     var results = [];
+       var d = new sjcl.bn(f.d);
+       var secret = new sjcl.ecc.ecdsa.secretKey(sjcl.ecc.curves.k256, d);
+       var h1 = sjcl.hash.sha256.hash(f.message);
+       var results = [];
 
-     secret.generateDeterministicK(h1, function(k) {
-       results.push(k);
-       return results.length === 16;
+       secret.generateDeterministicK(h1, function(k) {
+         results.push(k);
+         return results.length === 16;
+       });
+
+       assert.equal(results[0].toString().slice(2), f.k0);
+       assert.equal(results[1].toString().slice(2), f.k1);
+       assert.equal(results[15].toString().slice(2), f.k15);
      });
-
-     assert.equal(results[0].toString().slice(2), f.k0);
-     assert.equal(results[1].toString().slice(2), f.k1);
-     assert.equal(results[15].toString().slice(2), f.k15);
-   });
+    });
   });
 
   describe('generated tests', function() {
+    var expected = [
+      "30440220312b2e0894b81a2e070ace566c5dfc70cdd18e67d44e2cfef2eb5495f7de2dac02205e155c0019502948c265209dfdd7d84c4a05bd2c38cee6ecd7c33e9c9b12bec2",
+      "304402202a5860a12c15ebb8e91aa83f8e19d85d4ac05b272fc0c4083519339a7a76f2b802200852f9889e1284cf407dc7f73d646e62044c5ab432eaef3fff3f6f8ee9a0f24c",
+      "3045022100b1658c88d1860d9f8beb25b79b3e5137bbc2c382d08fe7a068ffc6ab8978c8040220644f64b97ea144ee7d5ccb71c2372dd730fa0a659e4c18241a80d6c915350263",
+      "3045022100f3e541330ff79ffc42eb0491ede1e47106d94ecfe3cdb2d9dd3bc0e8861f6d45022013f62942dd626d6c9731e317f372ec5c1f72885c4727fdbee9d9321bc530d7b2",
+      "3045022100998abe378f4119d8bee9843482c09f0d5ce5c6012921548182454c610c57a269022036bd8eb71235c4b2c67339de6a59746b1f7e5975987b7ab99b313d124a69bb9f"
+    ];
     var pair = getKeyPair({
       passphrase: 'niq'
     });
     function test_factory(i) {
-      it('can sign/verify message [' + i +
+      it('can deterministically sign/verify message [' + i +
                        ']', function() {
         var message = [i];
         var sig = pair.sign(message);
         assert(pair.verify(message, sig));
+        assert.equal(utils.arrayToHex(sig), expected[i]);
       });
     }
 
@@ -240,6 +250,50 @@ describe('ED25519Pair', function() {
 });
 
 describe('Transaction integration', function() {
+  function tx_json() {
+    return {
+      Account: 'rNvfq2SVbCiio1zkN5WwLQW8CHgy2dUoQi',
+      Amount: '1000',
+      Destination: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      Fee: '10',
+      Flags: 2147483648,
+      Sequence: 1,
+      TransactionType: 'Payment',
+      SigningPubKey:
+        '021E788CDEB9104C9179C3869250A89999C1AFF92D2C3FF7925A1696835EA3D840'
+    };
+  };
+
+  describe('remote.setSecret(account, getKeyPair(...))', function() {
+    it('can sign a transaction', function() {
+      var remote = new ripple.Remote();
+      var keypair = getKeyPair('niq');
+      var tx = remote.transaction();
+      tx.tx_json = tx_json();
+      remote.setSecret(tx.tx_json.Account, keypair);
+
+      // We don't as yet have a signature
+      assert(!tx.tx_json.TxnSignature);
+
+      // Transaction#complete needs to be called, as that is where the secret is
+      // set on the transaction, for later finding by Transaction#sign
+      assert(!tx._secret);
+      tx.complete();
+      assert(tx._secret);
+
+      tx.sign();
+      assert(tx.tx_json.TxnSignature);
+    });
+  });
+  describe('tx.setSecret(getKeyPair(...))', function() {
+    it('can sign a transaction', function() {
+      var tx = Transaction.from_json(tx_json());
+      tx.setSecret(getKeyPair('niq'));
+      assert(!tx.tx_json.TxnSignature);
+      tx.sign();
+      assert.equal('string', typeof tx.tx_json.TxnSignature);
+    });
+  });
   describe('allows setting keypair specifiers via `tx._secret`',
       function() {
     it('allows objects such as {key_type: \'ed25519\', passphrase: \'niq\'}',
@@ -256,18 +310,7 @@ describe('Transaction integration', function() {
       tx.sign();
     });
     it('honours old style generic `secret`s (secp256k1)', function() {
-      var tx_json = {
-        Account: 'rNvfq2SVbCiio1zkN5WwLQW8CHgy2dUoQi',
-        Amount: '1000',
-        Destination: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
-        Fee: '10',
-        Flags: 2147483648,
-        Sequence: 1,
-        TransactionType: 'Payment',
-        SigningPubKey:
-          '021E788CDEB9104C9179C3869250A89999C1AFF92D2C3FF7925A1696835EA3D840'
-      };
-      var tx = Transaction.from_json(deepCopy(tx_json));
+      var tx = Transaction.from_json(tx_json());
       tx._secret = 'niq';
       assert(!tx.tx_json.TxnSignature);
       tx.sign();

@@ -348,7 +348,8 @@ Remote.prototype._trace = function() {
  * out auth information.
  *
  * @param {String} account
- * @param {String} secret
+ * @param {Object} secret - A signing keypair specifier for `account`
+ *                          See keypairs.js#getKeyPair
  */
 
 Remote.prototype.setSecret = function(account, secret) {

@@ -581,17 +581,15 @@ Transaction.prototype.setFixedFee = function(fee) {
 };
 
 /**
- * Set secret If the secret has been set with Remote.setSecret, it does not
+ * If the secret has been set with Remote.setSecret, it does not
  * need to be provided
  *
- * @param {String} secret
+ * @param {Object} secret - a signing keypair specifier
+                            see keypairs.js#getKeyPair
  */
-
 Transaction.prototype.setSecret =
 Transaction.prototype.secret = function(secret) {
-  if (typeof secret === 'string') {
-    this._secret = secret;
-  }
+  this._secret = secret;
   return this;
 };
 
