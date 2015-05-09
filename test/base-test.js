@@ -92,6 +92,6 @@ describe('Base', function() {
 
       // The canonical version for sed25519 prefixes
       assert(_.isEqual(version, Base.VER_ED25519_SEED));
-    })
+    });
   });
 });
