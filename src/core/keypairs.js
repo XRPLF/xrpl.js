@@ -126,7 +126,7 @@ function findk256Key(bytes, discrim) {
     */
 
     /* eslint-enable max-len */
-    if (key.greaterEquals(1) && curve.r.greaterEquals(key)) {
+    if (key.greaterEquals(1) && !key.greaterEquals(curve.r)) {
       break;
     } /*else {
       throw new Error('omg unicorn ;) ');
