@@ -12,4 +12,10 @@ describe('Seed', function() {
     const seed = Seed.from_json('sp6iDHnmiPN7tQFHm5sCW59ax3hfE');
     assert.strictEqual(seed.to_hex(), '00AD8DA764C3C8AF5F9B8D51C94B9E49');
   });
+  it('throws an error when Seed.get_key() is called', function() {
+    var seed = Seed.from_json('passphrase');
+    assert.throws(function() {
+      seed.get_key();
+    });
+  });
 });
