@@ -1224,7 +1224,7 @@ OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
   var self = this;
 
   if (_.isEmpty(this._offers) && _.isEmpty(this._offersAutobridged)) {
-    return null;
+    return;
   }
 
   this._mergedOffers = this._offers
@@ -1237,8 +1237,6 @@ OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
     });
 
   this.emit('model', this._mergedOffers);
-
-  return this._mergedOffers;
 };
 
 exports.OrderBook = OrderBook;
