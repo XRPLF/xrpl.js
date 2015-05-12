@@ -1,23 +1,33 @@
+/* eslint new-cap: [2, {newIsCapExceptions: ["bn"]}] */
+'use strict';
 var sjcl = require('sjcl');
 
-sjcl.bn.prototype.jacobi = function (that) {
-  var a = this;
+sjcl.bn.prototype.jacobi = function(that) {
+  var self = this;
   that = new sjcl.bn(that);
 
-  if (that.sign() === -1) return;
+  if (that.sign() === -1) {
+    return undefined;
+  }
 
   // 1. If a = 0 then return(0).
-  if (a.equals(0)) { return 0; }
+  if (self.equals(0)) {
+    return 0;
+  }
 
   // 2. If a = 1 then return(1).
-  if (a.equals(1)) { return 1; }
+  if (self.equals(1)) {
+    return 1;
+  }
 
   var s = 0;
 
   // 3. Write a = 2^e * a1, where a1 is odd.
   var e = 0;
-  while (!a.testBit(e)) e++;
-  var a1 = a.shiftRight(e);
+  while (!self.testBit(e)) {
+    e++;
+  }
+  var a1 = self.shiftRight(e);
 
   // 4. If e is even then set s ← 1.
   if ((e & 1) === 0) {
@@ -41,7 +51,6 @@ sjcl.bn.prototype.jacobi = function (that) {
 
   if (a1.equals(1)) {
     return s;
-  } else {
-    return s * that.mod(a1).jacobi(a1);
   }
+  return s * that.mod(a1).jacobi(a1);
 };

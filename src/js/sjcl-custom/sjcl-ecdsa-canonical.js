@@ -1,3 +1,4 @@
+'use strict';
 var sjcl = require('sjcl');
 
 sjcl.ecc.ecdsa.secretKey.prototype.canonicalizeSignature = function(rs) {
@@ -5,8 +6,8 @@ sjcl.ecc.ecdsa.secretKey.prototype.canonicalizeSignature = function(rs) {
       R = this._curve.r,
       l = R.bitLength();
 
-  var r = sjcl.bn.fromBits(w.bitSlice(rs,0,l)),
-      s = sjcl.bn.fromBits(w.bitSlice(rs,l,2*l));
+  var r = sjcl.bn.fromBits(w.bitSlice(rs, 0, l)),
+      s = sjcl.bn.fromBits(w.bitSlice(rs, l, 2 * l));
 
   // For a canonical signature we want the lower of two possible values for s
   // 0 < s <= n/2

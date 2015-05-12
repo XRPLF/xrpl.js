@@ -1,3 +1,4 @@
+'use strict';
 require('./sjcl-ecc-pointextras.js');
 require('./sjcl-secp256k1.js');
 require('./sjcl-ripemd160.js');
