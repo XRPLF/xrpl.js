@@ -2,13 +2,13 @@
 
 /*eslint-disable new-cap*/
 
-var assert = require('assert');
-var sjcl = require('ripple-lib').sjcl;
+let assert = require('assert');
+let sjcl = require('ripple-lib').sjcl;
 
 
 describe('Deterministic ECDSA (RFC 6979)', function() {
 
-  var messages = [{
+  let messages = [{
     message: 'Hello world!',
     secret_hex:
       '9931c08f61f127d5735fa3c60e702212ce7ed9a2ac90d5dbade99c689728cd9b',
@@ -26,43 +26,43 @@ describe('Deterministic ECDSA (RFC 6979)', function() {
     hash_function: sjcl.hash.sha256
   }];
 
-  var curve = sjcl.ecc.curves.k256;
+  let curve = sjcl.ecc.curves.k256;
 
   function testMessage(test, index) {
     it('Should create valid signatures: message #' + index, function() {
 
-      var message = test.message;
-      var secret_hex = test.secret_hex;
-      var hash_function = test.hash_function;
+      let message = test.message;
+      let secret_hex = test.secret_hex;
+      let hash_function = test.hash_function;
 
-      var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
-      var secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
-      var hashed_message = hash_function.hash(message);
+      let secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
+      let secret_key = new sjcl.ecc.ecdsa.secretKey(curve, secret_bn);
+      let hashed_message = hash_function.hash(message);
 
-      var signature = secret_key.signDeterministic(
+      let signature = secret_key.signDeterministic(
         hashed_message,
         hash_function
       );
 
-      var pub_val_point = secret_key._curve.G.mult(secret_key._exponent);
-      var public_key = new sjcl.ecc.ecdsa.publicKey(curve, pub_val_point);
+      let pub_val_point = secret_key._curve.G.mult(secret_key._exponent);
+      let public_key = new sjcl.ecc.ecdsa.publicKey(curve, pub_val_point);
 
       assert(public_key.verify(hashed_message, signature));
     });
   }
   messages.forEach(testMessage);
 
-  var rfcCurve = sjcl.ecc.curves.nist_p256;
-  var rfcQ = sjcl.bn.fromBits(sjcl.codec.hex.toBits(
+  let rfcCurve = sjcl.ecc.curves.nist_p256;
+  let rfcQ = sjcl.bn.fromBits(sjcl.codec.hex.toBits(
     'FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551'
   ));
-  var rfcQlen = sjcl.bitArray.bitLength(rfcQ.toBits());
-  var rfcPrivate = new sjcl.ecc.ecdsa.secretKey(
+  let rfcQlen = sjcl.bitArray.bitLength(rfcQ.toBits());
+  let rfcPrivate = new sjcl.ecc.ecdsa.secretKey(
     rfcCurve,
     sjcl.bn.fromBits(sjcl.codec.hex.toBits(
       'C9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721'
   )));
-  var rfcPublic = new sjcl.ecc.ecdsa.publicKey(
+  let rfcPublic = new sjcl.ecc.ecdsa.publicKey(
     rfcCurve,
     (rfcPrivate._curve.G.mult(rfcPrivate._exponent))
   );
@@ -71,23 +71,23 @@ describe('Deterministic ECDSA (RFC 6979)', function() {
 
     assert.equal(
       sjcl.codec.hex.fromBits(rfcCurve.r.toBits()),
-      sjcl.codec.hex.fromBits(rfcQ.toBits()) 
+      sjcl.codec.hex.fromBits(rfcQ.toBits())
     );
 
-    var ux = '60fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb6';
-    var uy = '7903fe1008b8bc99a41ae9e95628bc64f2f1b20c2d7e9f5177a3c294d4462299';
+    let ux = '60fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb6';
+    let uy = '7903fe1008b8bc99a41ae9e95628bc64f2f1b20c2d7e9f5177a3c294d4462299';
 
-    var secret = sjcl.bn.fromBits(rfcPrivate.get());
-    
-    var curve_ux = sjcl.codec.hex.fromBits(rfcCurve.G.mult(secret).x.toBits());
-    var curve_uy = sjcl.codec.hex.fromBits(rfcCurve.G.mult(secret).y.toBits());
+    let secret = sjcl.bn.fromBits(rfcPrivate.get());
+
+    let curve_ux = sjcl.codec.hex.fromBits(rfcCurve.G.mult(secret).x.toBits());
+    let curve_uy = sjcl.codec.hex.fromBits(rfcCurve.G.mult(secret).y.toBits());
 
     assert.equal(curve_ux, ux);
     assert.equal(curve_uy, uy);
 
   });
 
-  var rfcTests = [
+  let rfcTests = [
     {
       hash: sjcl.hash.sha1,
       message: 'sample',
@@ -124,13 +124,13 @@ describe('Deterministic ECDSA (RFC 6979)', function() {
   function testRFC(test, index) {
     it('Should create the right k and s for RFC test #' + index, function() {
 
-      var hashed_message = test.hash.hash(test.message);
-      var k = rfcPrivate.generateK(hashed_message, test.hash);
+      let hashed_message = test.hash.hash(test.message);
+      let k = rfcPrivate.generateK(hashed_message, test.hash);
 
-      var signature = rfcPrivate.signDeterministic(hashed_message, test.hash);
-      var r = sjcl.bitArray.bitSlice(signature, 0, rfcQlen);
-      var s = sjcl.bitArray.bitSlice(signature, rfcQlen);
-    
+      let signature = rfcPrivate.signDeterministic(hashed_message, test.hash);
+      let r = sjcl.bitArray.bitSlice(signature, 0, rfcQlen);
+      let s = sjcl.bitArray.bitSlice(signature, rfcQlen);
+
       assert.equal(sjcl.codec.hex.fromBits(k.toBits()), test.k);
       assert.equal(sjcl.codec.hex.fromBits(s), test.s);
       assert.equal(sjcl.codec.hex.fromBits(r), test.r);
@@ -141,18 +141,18 @@ describe('Deterministic ECDSA (RFC 6979)', function() {
 
   it('Should create the same signatures for the same inputs', function() {
 
-    var message = 'Hello world!';
-    var secret_hex =
+    let message = 'Hello world!';
+    let secret_hex =
       '9931c08f61f127d5735fa3c60e702212ce7ed9a2ac90d5dbade99c689728cd9b';
-    var hash_function = sjcl.hash.sha256;
-    var k256_curve = sjcl.ecc.curves.k256;
+    let hash_function = sjcl.hash.sha256;
+    let k256_curve = sjcl.ecc.curves.k256;
 
-    var secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
-    var secret_key = new sjcl.ecc.ecdsa.secretKey(k256_curve, secret_bn);
-    var hashed_message = hash_function.hash(message);
+    let secret_bn = sjcl.bn.fromBits(sjcl.codec.hex.toBits(secret_hex));
+    let secret_key = new sjcl.ecc.ecdsa.secretKey(k256_curve, secret_bn);
+    let hashed_message = hash_function.hash(message);
 
-    var sig1 = secret_key.signDeterministic(hashed_message, hash_function);
-    var sig2 = secret_key.signDeterministic(hashed_message, hash_function);
+    let sig1 = secret_key.signDeterministic(hashed_message, hash_function);
+    let sig2 = secret_key.signDeterministic(hashed_message, hash_function);
     assert.deepEqual(sig1, sig2);
   });
 });
