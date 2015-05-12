@@ -21,6 +21,7 @@
     "lodash": "^3.1.0",
     "lru-cache": "~2.5.0",
     "ripple-wallet-generator": "^1.0.3",
+    "sjcl": "^1.0.2",
     "ws": "~0.7.1"
   },
   "devDependencies": {
@@ -30,7 +31,6 @@
     "gulp": "~3.8.10",
     "gulp-bump": "~0.1.13",
     "gulp-clean-dest": "^0.1.0",
-    "gulp-concat": "~2.4.3",
     "gulp-filelog": "^0.4.1",
     "gulp-flowtype": "^0.4.1",
     "gulp-plumber": "^0.6.6",
@@ -48,7 +48,7 @@
   },
   "scripts": {
     "build": "node_modules/.bin/gulp",
-    "pretest": "node_modules/.bin/gulp concat-sjcl",
+    "postinstall": "cd node_modules/sjcl; ./configure --with-all --compress=none; make",
     "test": "./node_modules/.bin/istanbul test -x build/sjcl.js -x src/js/jsbn/* ./node_modules/mocha/bin/_mocha -- --reporter ${MOCHA_REPORTER:=spec} --timeout 10000 --slow 500 test/*-test.js",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/master/eslintrc'; fi; eslint --reset -c eslintrc src/js/ripple/*.js",

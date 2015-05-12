@@ -1,10 +1,13 @@
+/* eslint new-cap: [2, {newIsCapExceptions: ["bn"]}] */
+'use strict';
+var sjcl = require('sjcl');
 /**
  *  Check that the point is valid based on the method described in
- *  SEC 1: Elliptic Curve Cryptography, section 3.2.2.1: 
+ *  SEC 1: Elliptic Curve Cryptography, section 3.2.2.1:
  *  Elliptic Curve Public Key Validation Primitive
  *  http://www.secg.org/download/aid-780/sec1-v2.pdf
  *
- *  @returns {Boolean}
+ *  @returns {Boolean} true if point is valid
  */
 sjcl.ecc.point.prototype.isValidPoint = function() {
 
@@ -48,19 +51,19 @@ sjcl.ecc.point.prototype.isValidPoint = function() {
 /**
  *  Check that the point is on the curve
  *
- *  @returns {Boolean}
+ *  @returns {Boolean} true if point is on the curve
  */
 sjcl.ecc.point.prototype.isOnCurve = function() {
 
   var self = this;
 
-  var field_order = self.curve.r;
   var component_a = self.curve.a;
   var component_b = self.curve.b;
   var field_modulus = self.curve.field.modulus;
 
   var left_hand_side = self.y.mul(self.y).mod(field_modulus);
-  var right_hand_side = self.x.mul(self.x).mul(self.x).add(component_a.mul(self.x)).add(component_b).mod(field_modulus);
+  var right_hand_side = self.x.mul(self.x).mul(self.x).add(
+    component_a.mul(self.x)).add(component_b).mod(field_modulus);
 
   return left_hand_side.equals(right_hand_side);
 
@@ -68,14 +71,14 @@ sjcl.ecc.point.prototype.isOnCurve = function() {
 
 
 sjcl.ecc.point.prototype.toString = function() {
-  return '(' + 
+  return '(' +
     this.x.toString() + ', ' +
     this.y.toString() +
     ')';
 };
 
 sjcl.ecc.pointJac.prototype.toString = function() {
-  return '(' + 
+  return '(' +
     this.x.toString() + ', ' +
     this.y.toString() + ', ' +
     this.z.toString() +

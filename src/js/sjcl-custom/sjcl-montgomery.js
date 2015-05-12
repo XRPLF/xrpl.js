@@ -1,3 +1,7 @@
+/* eslint-disable */
+/* this is implemented in sjcl, but has not yet been released as of v1.0.2 */
+var sjcl = require('sjcl');
+
 sjcl.bn.prototype.invDigit = function ()
 {
   var radixMod = 1 + this.radixMask;
