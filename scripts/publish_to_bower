@@ -1,7 +1,7 @@
-rm -rf dist
-git clone git@github.com:ripple/bower-ripple.git dist
+rm -rf dist/bower
+git clone git@github.com:ripple/bower-ripple.git dist/bower
 gulp bower
-cd dist
+cd dist/bower
 version=$(cat bower.json | grep -Eo '([0-9]\.?)+(-rc[0-9])?')
 echo "version: $version"
 git add ripple.js ripple-debug.js ripple-min.js bower.json

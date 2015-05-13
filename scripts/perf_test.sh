@@ -8,4 +8,4 @@ then
   mkdir -p "$DIR/cache"
   curl -L "$URL" > "$DEST"
 fi
-time node "$DIR/verify_ledger_json.js" "$DEST"
+npm run compile && time node "$DIR/verify_ledger_json.js" "$DEST"

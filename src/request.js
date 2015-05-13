@@ -542,7 +542,7 @@ Request.prototype.addStream = function(stream, values) {
         break;
     }
   } else if (arguments.length > 1) {
-    for (arg in arguments) {
+    for (var arg in arguments) {
       this.addStream(arguments[arg]);
     }
     return;

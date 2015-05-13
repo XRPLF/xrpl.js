@@ -510,7 +510,7 @@ describe('Request', function() {
 
   it('Timeout', function(done) {
     var server = makeServer('wss://localhost:5006');
-    var successEmited = false;
+    var successEmitted = false;
 
     server._request = function(req) {
       assert(req instanceof Request);
@@ -542,7 +542,7 @@ describe('Request', function() {
 
   it('Timeout - satisfied', function(done) {
     var server = makeServer('wss://localhost:5006');
-    var successEmited = false;
+    var successEmitted = false;
 
     server._request = function(req) {
       assert(req instanceof Request);

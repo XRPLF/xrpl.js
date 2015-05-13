@@ -2,11 +2,21 @@
   "name": "ripple-lib",
   "version": "0.12.5-rc2",
   "npm-shrinkwrap-version": "5.4.0",
-  "node-version": "v0.10.38",
+  "node-version": "v0.12.3",
   "dependencies": {
     "async": {
       "version": "0.9.0",
       "resolved": "https://registry.npmjs.org/async/-/async-0.9.0.tgz"
+    },
+    "babel-runtime": {
+      "version": "5.3.3",
+      "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.3.3.tgz",
+      "dependencies": {
+        "core-js": {
+          "version": "0.9.9",
+          "resolved": "https://registry.npmjs.org/core-js/-/core-js-0.9.9.tgz"
+        }
+      }
     },
     "bignumber.js": {
       "version": "2.0.7",
@@ -17,8 +27,8 @@
       "resolved": "https://registry.npmjs.org/extend/-/extend-1.2.1.tgz"
     },
     "lodash": {
-      "version": "3.7.0",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.7.0.tgz"
+      "version": "3.8.0",
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.8.0.tgz"
     },
     "lru-cache": {
       "version": "2.5.2",

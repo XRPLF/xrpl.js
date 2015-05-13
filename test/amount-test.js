@@ -1150,7 +1150,7 @@ describe('Amount', function() {
       var demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
-      assert.strictEqual(demAmount.to_text_full(), '9.294949401870435/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(demAmount.to_text_full(), '9.294949401870436/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
 
     });
     it('from_json apply interest XAU', function() {
@@ -1168,7 +1168,7 @@ describe('Amount', function() {
       var demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_human_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
-      assert.strictEqual(demAmount.to_human_full(), '9.294949401870435/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(demAmount.to_human_full(), '9.294949401870436/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
 
     });
     it('from_json apply interest XAU human', function() {

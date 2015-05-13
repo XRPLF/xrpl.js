@@ -7,7 +7,7 @@ var Ledger = require('ripple-lib').Ledger;
 * @param ledger_index {Number}
 * Expects a corresponding ledger dump in $repo/test/fixtures/ folder
 */
-create_ledger_test = function (ledger_index) {
+var create_ledger_test = function (ledger_index) {
   describe(String(ledger_index), function() {
 
     var path = __dirname + '/fixtures/ledger-full-'+ledger_index+'.json';

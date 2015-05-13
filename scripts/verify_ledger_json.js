@@ -1,8 +1,8 @@
 'use strict';
 
 var fs = require('fs');
-var Amount = require('../src/js/ripple').Amount;
-var Ledger = require('../src/js/ripple/ledger').Ledger;
+var Amount = require('../dist/npm').Amount;
+var Ledger = require('../dist/npm/ledger').Ledger;
 
 function parse_options(from, flags) {
   var argv = from.slice(),
