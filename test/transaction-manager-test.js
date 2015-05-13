@@ -7,8 +7,7 @@ var sjcl = require('ripple-lib').sjcl;
 var Remote = require('ripple-lib').Remote;
 var SerializedObject = require('ripple-lib').SerializedObject;
 var Transaction = require('ripple-lib').Transaction;
-var TransactionManager = require('../src/js/ripple/transactionmanager')
-.TransactionManager;
+var TransactionManager = require('ripple-lib')._test.TransactionManager;
 
 var LEDGER = require('./fixtures/transactionmanager').LEDGER;
 var ACCOUNT = require('./fixtures/transactionmanager').ACCOUNT;

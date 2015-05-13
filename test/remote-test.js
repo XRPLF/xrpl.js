@@ -6,7 +6,7 @@ var Transaction = require('ripple-lib').Transaction;
 var UInt160 = require('ripple-lib').UInt160;
 var Currency = require('ripple-lib').Currency;
 var Amount = require('ripple-lib').Amount;
-var PathFind = require('../src/js/ripple/pathfind').PathFind;
+var PathFind = require('ripple-lib')._test.PathFind;
 
 var options, remote, callback, database, tx;
 
