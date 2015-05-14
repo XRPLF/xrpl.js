@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 'use strict';
 
 var fs = require('fs');
@@ -12,10 +13,10 @@ function parse_options(from, flags) {
     // Do we have the flag?
     var flag_index = argv.indexOf('--' + f);
     // normalize the name of the flag
-    f = f.replace('-', '_');
+    var flag = f.replace('-', '_');
     // opts_ has Boolean value for normalized flag key
-    opts_[f] = flag_index !== -1;
-    if (opts_[f]) {
+    opts_[flag] = flag_index !== -1;
+    if (opts_[flag]) {
       // remove the flag from the argv
       argv.splice(flag_index, 1);
     }

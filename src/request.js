@@ -1,10 +1,11 @@
-var EventEmitter = require('events').EventEmitter;
-var util         = require('util');
-var async        = require('async');
-var UInt160      = require('./uint160').UInt160;
-var Currency     = require('./currency').Currency;
-var RippleError  = require('./rippleerror').RippleError;
-var Server       = require('./server').Server;
+'use strict';
+
+const EventEmitter = require('events').EventEmitter;
+const util = require('util');
+const async = require('async');
+const UInt160 = require('./uint160').UInt160;
+const Currency = require('./currency').Currency;
+const RippleError = require('./rippleerror').RippleError;
 
 // Request events emitted:
 //  'success' : Request successful.
@@ -30,20 +31,15 @@ function Request(remote, command) {
   this.errorEvent = 'error';
   this.message = {
     command: command,
-    id: void(0)
+    id: undefined
   };
-};
+}
 
 util.inherits(Request, EventEmitter);
 
 // Send the request to a remote.
 Request.prototype.request = function(servers, callback) {
   this.emit('before');
-
-  if (typeof servers === 'function') {
-    callback = servers;
-  }
-
   this.callback(callback);
 
   if (this.requested) {
@@ -51,7 +47,7 @@ Request.prototype.request = function(servers, callback) {
   }
 
   this.requested = true;
-  this.on('error', function(){});
+  this.on('error', function() {});
   this.emit('request', this.remote);
 
   if (Array.isArray(servers)) {
@@ -79,8 +75,8 @@ Request.prototype.request = function(servers, callback) {
 
 Request.prototype.filter =
 Request.prototype.addFilter =
-Request.prototype.broadcast = function(filterFn) {
-  var self = this;
+Request.prototype.broadcast = function(filterFn=Boolean) {
+  const self = this;
 
   if (!this.requested) {
     // Defer until requested, and prevent the normal request() from executing
@@ -91,10 +87,9 @@ Request.prototype.broadcast = function(filterFn) {
     return this;
   }
 
-  var filterFn = typeof filterFn === 'function' ? filterFn : Boolean;
-  var lastResponse = new Error('No servers available');
-  var connectTimeouts = { };
-  var emit = this.emit;
+  let lastResponse = new Error('No servers available');
+  let connectTimeouts = { };
+  const emit = this.emit;
 
   this.emit = function(event, a, b) {
     // Proxy success/error events
@@ -123,13 +118,13 @@ Request.prototype.broadcast = function(filterFn) {
 
     // Server is disconnected but should reconnect. Wait for it to reconnect,
     // and abort after a timeout
-    var serverID = server.getServerID();
+    const serverID = server.getServerID();
 
     function serverReconnected() {
       clearTimeout(connectTimeouts[serverID]);
       connectTimeouts[serverID] = null;
       iterator(server, callback);
-    };
+    }
 
     connectTimeouts[serverID] = setTimeout(function() {
       server.removeListener('connect', serverReconnected);
@@ -137,27 +132,27 @@ Request.prototype.broadcast = function(filterFn) {
     }, self.reconnectTimeout);
 
     server.once('connect', serverReconnected);
-  };
+  }
 
   function complete(success) {
     // Emit success if the filter is satisfied by any server
     // Emit error if the filter is not satisfied by any server
     // Include the last response
     emit.call(self, success ? 'success' : 'error', lastResponse);
-  };
+  }
 
-  var servers = this.remote._servers.filter(function(server) {
+  const servers = this.remote._servers.filter(function(server) {
     // Pre-filter servers that are disconnected and should not reconnect
     return (server.isConnected() || server._shouldConnect)
-    // Pre-filter servers that do not contain the ledger in request
-    && (!self.message.hasOwnProperty('ledger_index')
-        || server.hasLedger(self.message.ledger_index))
-    && (!self.message.hasOwnProperty('ledger_index_min')
+      // Pre-filter servers that do not contain the ledger in request
+      && (!self.message.hasOwnProperty('ledger_index')
+      || server.hasLedger(self.message.ledger_index))
+      && (!self.message.hasOwnProperty('ledger_index_min')
       || self.message.ledger_index_min === -1
       || server.hasLedger(self.message.ledger_index_min))
-    && (!self.message.hasOwnProperty('ledger_index_max')
+      && (!self.message.hasOwnProperty('ledger_index_max')
       || self.message.ledger_index_max === -1
-      || server.hasLedger(self.message.ledger_index_max))
+      || server.hasLedger(self.message.ledger_index_max));
   });
 
   // Apply iterator in parallel to connected servers, complete when the
@@ -169,7 +164,7 @@ Request.prototype.broadcast = function(filterFn) {
 
 Request.prototype.cancel = function() {
   this.removeAllListeners();
-  this.on('error', function(){});
+  this.on('error', function() {});
 
   return this;
 };
@@ -191,7 +186,7 @@ Request.prototype.setReconnectTimeout = function(timeout) {
 };
 
 Request.prototype.callback = function(callback, successEvent, errorEvent) {
-  var self = this;
+  const self = this;
 
   if (typeof callback !== 'function') {
     return this;
@@ -204,26 +199,26 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
     this.errorEvent = errorEvent;
   }
 
-  var called = false;
+  let called = false;
 
   function requestSuccess(message) {
     if (!called) {
       called = true;
       callback.call(self, null, message);
     }
-  };
+  }
 
   function requestError(error) {
     if (!called) {
       called = true;
 
       if (!(error instanceof RippleError)) {
-        error = new RippleError(error);
+        callback.call(self, new RippleError(error));
+      } else {
+        callback.call(self, error);
       }
-
-      callback.call(self, error);
     }
-  };
+  }
 
   this.once(this.successEvent, requestSuccess);
   this.once(this.errorEvent, requestError);
@@ -233,21 +228,21 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
 };
 
 Request.prototype.timeout = function(duration, callback) {
-  var self = this;
+  const self = this;
 
   function requested() {
     self.timeout(duration, callback);
-  };
+  }
 
   if (!this.requested) {
     // Defer until requested
     return this.once('request', requested);
   }
 
-  var emit = this.emit;
-  var timed_out = false;
+  const emit = this.emit;
+  let timed_out = false;
 
-  var timeout = setTimeout(function() {
+  const timeout = setTimeout(function() {
     timed_out = true;
 
     if (typeof callback === 'function') {
@@ -269,7 +264,7 @@ Request.prototype.timeout = function(duration, callback) {
 };
 
 Request.prototype.setServer = function(server) {
-  var selected = null;
+  let selected = null;
 
   switch (typeof server) {
     case 'object':
@@ -278,16 +273,16 @@ Request.prototype.setServer = function(server) {
 
     case 'string':
       // Find server by URL
-      var servers = this.remote._servers;
+      const servers = this.remote._servers;
 
-      for (var i=0, s; (s=servers[i]); i++) {
+      for (let i = 0, s; (s = servers[i]); i++) {
         if (s._url === server) {
           selected = s;
           break;
         }
       }
       break;
-  };
+  }
 
   this.server = selected;
 
@@ -299,7 +294,7 @@ Request.prototype.buildPath = function(build) {
     throw new Error(
       '`build_path` is completely ignored when doing local signing as '
       + '`Paths` is a component of the signed blob. The `tx_blob` is signed,'
-      + 'sealed and delivered, and the txn unmodified after' );
+      + 'sealed and delivered, and the txn unmodified after');
   }
 
   if (build) {
@@ -317,7 +312,7 @@ Request.prototype.ledgerChoose = function(current) {
   if (current) {
     this.message.ledger_index = this.remote._ledger_current_index;
   } else {
-    this.message.ledger_hash  = this.remote._ledger_hash;
+    this.message.ledger_hash = this.remote._ledger_hash;
   }
 
   return this;
@@ -425,13 +420,11 @@ Request.prototype.rippleState = function(account, issuer, currency) {
 };
 
 Request.prototype.setAccounts =
-Request.prototype.accounts = function(accounts, proposed) {
-  if (!Array.isArray(accounts)) {
-    accounts = [ accounts ];
-  }
+Request.prototype.accounts = function(accountsIn, proposed) {
+  const accounts = Array.isArray(accountsIn) ? accountsIn : [accountsIn];
 
   // Process accounts parameters
-  var processedAccounts = accounts.map(function(account) {
+  const processedAccounts = accounts.map(function(account) {
     return UInt160.json_rewrite(account);
   });
 
@@ -450,8 +443,8 @@ Request.prototype.addAccount = function(account, proposed) {
     return this;
   }
 
-  var processedAccount = UInt160.json_rewrite(account);
-  var prop = proposed === true ? 'accounts_proposed' : 'accounts';
+  const processedAccount = UInt160.json_rewrite(account);
+  const prop = proposed === true ? 'accounts_proposed' : 'accounts';
   this.message[prop] = (this.message[prop] || []).concat(processedAccount);
 
   return this;
@@ -475,10 +468,10 @@ Request.prototype.addAccountProposed = function(account) {
 Request.prototype.setBooks =
 Request.prototype.books = function(books, snapshot) {
   // Reset list of books (this method overwrites the current list)
-  this.message.books = [ ];
+  this.message.books = [];
 
-  for (var i=0, l=books.length; i<l; i++) {
-    var book = books[i];
+  for (let i = 0, l = books.length; i < l; i++) {
+    const book = books[i];
     this.addBook(book, snapshot);
   }
 
@@ -491,15 +484,17 @@ Request.prototype.addBook = function(book, snapshot) {
     return this;
   }
 
-  var json = { };
+  const json = { };
 
   function processSide(side) {
     if (!book[side]) {
       throw new Error('Missing ' + side);
     }
 
-    var obj = json[side] = {
-      currency: Currency.json_rewrite(book[side].currency, { force_hex: true })
+    const obj = json[side] = {
+      currency: Currency.json_rewrite(book[side].currency, {
+        force_hex: true
+      })
     };
 
     if (!Currency.from_json(obj.currency).is_native()) {
@@ -507,7 +502,7 @@ Request.prototype.addBook = function(book, snapshot) {
     }
   }
 
-  [ 'taker_gets', 'taker_pays' ].forEach(processSide);
+  ['taker_gets', 'taker_pays'].forEach(processSide);
 
   if (typeof snapshot !== 'boolean') {
     json.snapshot = true;
@@ -527,8 +522,6 @@ Request.prototype.addBook = function(book, snapshot) {
 };
 
 Request.prototype.addStream = function(stream, values) {
-  var self = this;
-
   if (Array.isArray(values)) {
     switch (stream) {
       case 'accounts':
@@ -542,14 +535,14 @@ Request.prototype.addStream = function(stream, values) {
         break;
     }
   } else if (arguments.length > 1) {
-    for (var arg in arguments) {
+    for (let arg in arguments) {
       this.addStream(arguments[arg]);
     }
-    return;
+    return this;
   }
 
   if (!Array.isArray(this.message.streams)) {
-    this.message.streams = [ ];
+    this.message.streams = [];
   }
 
   if (this.message.streams.indexOf(stream) === -1) {
