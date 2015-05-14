@@ -22,7 +22,7 @@ function logPluginError(error) {
 gulp.task('build', function(callback) {
   webpack({
     cache: true,
-    entry: './src/js/ripple/index.js',
+    entry: './src/index.js',
     output: {
       library: 'ripple',
       path: './build/',
@@ -41,7 +41,7 @@ gulp.task('build-min', ['build'], function() {
 gulp.task('build-debug', function(callback) {
   webpack({
     cache: true,
-    entry: './src/js/ripple/index.js',
+    entry: './src/index.js',
     output: {
       library: 'ripple',
       path: './build/',
@@ -66,7 +66,7 @@ function buildUseError(cons) {
 gulp.task('build-core', function(callback) {
   webpack({
     entry: [
-      './src/js/ripple/remote.js'
+      './src/remote.js'
     ],
     externals: [
       {
@@ -115,12 +115,12 @@ gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug',
                     'bower-version']);
 
 gulp.task('watch', function() {
-  gulp.watch('src/js/ripple/*', ['build-debug']);
+  gulp.watch('src/*', ['build-debug']);
 });
 
 // To use this, each javascript file must have /* @flow */ on the first line
 gulp.task('typecheck', function() {
-  return gulp.src('src/js/ripple/*.js')
+  return gulp.src('src/*.js')
   .pipe(flow({      // note: do not set the 'all' option, it is broken
     weak: true,   // remove this after all errors are addressed
     killFlow: true
@@ -128,8 +128,8 @@ gulp.task('typecheck', function() {
 });
 
 gulp.task('strip', function() {
-  return gulp.src('src/js/ripple/*.js')
-  .pipe(watch('src/js/ripple/*.js'))
+  return gulp.src('src/*.js')
+  .pipe(watch('src/*.js'))
   .pipe(cleanDest('out'))   // delete outdated output file before stripping
   .pipe(plumber())        // prevent an error in one file from ending build
   .pipe(react({stripTypes: true}).on('error', logPluginError))

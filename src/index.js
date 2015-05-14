@@ -22,6 +22,11 @@ exports.TransactionQueue = require('./transactionqueue').TransactionQueue;
 exports.RangeSet = require('./rangeset').RangeSet;
 exports.convertBase = require('./baseconverter');
 
+exports._test = {
+  PathFind: require('./pathfind').PathFind,
+  TransactionManager: require('./transactionmanager').TransactionManager
+};
+
 // Important: We do not guarantee any specific version of SJCL or for any
 // specific features to be included. The version and configuration may change at
 // any time without warning.
