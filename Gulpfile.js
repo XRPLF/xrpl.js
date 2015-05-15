@@ -1,4 +1,7 @@
+/* eslint-disable no-var, no-param-reassign */
+/* these eslint rules are disabled because gulp does not support babel yet */
 'use strict';
+var _ = require('lodash');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var watch = require('gulp-watch');
@@ -15,20 +18,33 @@ var argv = require('yargs').argv;
 
 var pkg = require('./package.json');
 
-function logPluginError(error) {
-  gutil.log(error.toString());
-}
-
-gulp.task('build', function(callback) {
-  webpack({
+function webpackConfig(extension, overrides) {
+  overrides = overrides || {};
+  var defaults = {
     cache: true,
     entry: './src/index.js',
     output: {
       library: 'ripple',
       path: './build/',
-      filename: ['ripple-', '.js'].join(pkg.version)
+      filename: ['ripple-', extension].join(pkg.version)
+    },
+    module: {
+      loaders: [{
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader?optional=runtime'
+      }]
     }
-  }, callback);
+  };
+  return _.assign({}, defaults, overrides);
+}
+
+function logPluginError(error) {
+  gutil.log(error.toString());
+}
+
+gulp.task('build', function(callback) {
+  webpack(webpackConfig('.js'), callback);
 });
 
 gulp.task('build-min', ['build'], function() {
@@ -39,17 +55,8 @@ gulp.task('build-min', ['build'], function() {
 });
 
 gulp.task('build-debug', function(callback) {
-  webpack({
-    cache: true,
-    entry: './src/index.js',
-    output: {
-      library: 'ripple',
-      path: './build/',
-      filename: ['ripple-', '-debug.js'].join(pkg.version)
-    },
-    debug: true,
-    devtool: 'eval'
-  }, callback);
+  var configOverrides = {debug: true, devtool: 'eval'};
+  webpack(webpackConfig('-debug.js', configOverrides), callback);
 });
 
 /**
@@ -64,51 +71,44 @@ function buildUseError(cons) {
 }
 
 gulp.task('build-core', function(callback) {
-  webpack({
-    entry: [
-      './src/remote.js'
-    ],
-    externals: [
-      {
-        './transaction': buildUseError('Transaction'),
-        './orderbook': buildUseError('OrderBook'),
-        './account': buildUseError('Account'),
-        './serializedobject': buildUseError('SerializedObject')
-      }
-    ],
-    output: {
-      library: 'ripple',
-      path: './build/',
-      filename: ['ripple-', '-core.js'].join(pkg.version)
-    },
+  var configOverrides = {
+    cache: false,
+    entry: './src/remote.js',
+    externals: [{
+      './transaction': buildUseError('Transaction'),
+      './orderbook': buildUseError('OrderBook'),
+      './account': buildUseError('Account'),
+      './serializedobject': buildUseError('SerializedObject')
+    }],
     plugins: [
       new webpack.optimize.UglifyJsPlugin()
     ]
-  }, callback);
+  };
+  webpack(webpackConfig('-core.js', configOverrides), callback);
 });
 
 gulp.task('bower-build', ['build'], function() {
   return gulp.src(['./build/ripple-', '.js'].join(pkg.version))
   .pipe(rename('ripple.js'))
-  .pipe(gulp.dest('./dist/'));
+  .pipe(gulp.dest('./dist/bower'));
 });
 
 gulp.task('bower-build-min', ['build-min'], function() {
   return gulp.src(['./build/ripple-', '-min.js'].join(pkg.version))
   .pipe(rename('ripple-min.js'))
-  .pipe(gulp.dest('./dist/'));
+  .pipe(gulp.dest('./dist/bower'));
 });
 
 gulp.task('bower-build-debug', ['build-debug'], function() {
   return gulp.src(['./build/ripple-', '-debug.js'].join(pkg.version))
   .pipe(rename('ripple-debug.js'))
-  .pipe(gulp.dest('./dist/'));
+  .pipe(gulp.dest('./dist/bower'));
 });
 
 gulp.task('bower-version', function() {
-  gulp.src('./dist/bower.json')
+  gulp.src('./dist/bower/bower.json')
   .pipe(bump({version: pkg.version}))
-  .pipe(gulp.dest('./dist/'));
+  .pipe(gulp.dest('./dist/bower'));
 });
 
 gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug',

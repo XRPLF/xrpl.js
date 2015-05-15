@@ -1,2 +1,4 @@
 lib-cov
 coverage.html
+src
+dist/bower

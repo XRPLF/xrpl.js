@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 'use strict';
-var assert = require('assert');
-var Amount = require('ripple-lib').Amount;
-var UInt160 = require('ripple-lib').UInt160;
+const assert = require('assert');
+const Amount = require('ripple-lib').Amount;
+const UInt160 = require('ripple-lib').UInt160;
 
 
 describe('Amount', function() {
@@ -444,17 +444,17 @@ describe('Amount', function() {
   });
   describe('Amount to_json', function() {
     it('10 USD', function() {
-      var amount = Amount.from_human('10 USD').to_json();
+      const amount = Amount.from_human('10 USD').to_json();
       assert.strictEqual('10', amount.value);
       assert.strictEqual('USD', amount.currency);
     });
     it('10 0000000000000000000000005553440000000000', function() {
-      var amount = Amount.from_human('10 0000000000000000000000005553440000000000').to_json();
+      const amount = Amount.from_human('10 0000000000000000000000005553440000000000').to_json();
       assert.strictEqual('10', amount.value);
       assert.strictEqual('USD', amount.currency);
     });
     it('10 015841551A748AD2C1F76FF6ECB0CCCD00000000', function() {
-      var amount = Amount.from_human('10 015841551A748AD2C1F76FF6ECB0CCCD00000000').to_json();
+      const amount = Amount.from_human('10 015841551A748AD2C1F76FF6ECB0CCCD00000000').to_json();
       assert.strictEqual('10', amount.value);
       assert.strictEqual('015841551A748AD2C1F76FF6ECB0CCCD00000000', amount.currency);
     });
@@ -766,135 +766,135 @@ describe('Amount', function() {
   });
   describe('Amount comparisons', function() {
     it('0 USD == 0 USD amount.equals string argument', function() {
-      var a = '0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL';
+      const a = '0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL';
       assert(Amount.from_json(a).equals(a));
     });
     it('0 USD == 0 USD', function() {
-      var a = Amount.from_json('0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });
     it('0 USD == -0 USD', function() {
-      var a = Amount.from_json('0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('-0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('-0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });
     it('0 XRP == 0 XRP', function() {
-      var a = Amount.from_json('0');
-      var b = Amount.from_json('0');
+      const a = Amount.from_json('0');
+      const b = Amount.from_json('0');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });
     it('0 XRP == -0 XRP', function() {
-      var a = Amount.from_json('0');
-      var b = Amount.from_json('-0');
+      const a = Amount.from_json('0');
+      const b = Amount.from_json('-0');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });
     it('10 USD == 10 USD', function() {
-      var a = Amount.from_json('10/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('10/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('10/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('10/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });
     it('123.4567 USD == 123.4567 USD', function() {
-      var a = Amount.from_json('123.4567/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('123.4567/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('123.4567/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('123.4567/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });
     it('10 XRP == 10 XRP', function() {
-      var a = Amount.from_json('10');
-      var b = Amount.from_json('10');
+      const a = Amount.from_json('10');
+      const b = Amount.from_json('10');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });
     it('1.1 XRP == 1.1 XRP', function() {
-      var a = Amount.from_json('1100000');
-      var b = Amount.from_json('11000000').ratio_human('10/XRP');
+      const a = Amount.from_json('1100000');
+      const b = Amount.from_json('11000000').ratio_human('10/XRP');
       assert(a.equals(b));
       assert(!a.not_equals_why(b));
     });
     it('0 USD == 0 USD (ignore issuer)', function() {
-      var a = Amount.from_json('0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('0/USD/rH5aWQJ4R7v4Mpyf4kDBUvDFT5cbpFq3XP');
+      const a = Amount.from_json('0/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('0/USD/rH5aWQJ4R7v4Mpyf4kDBUvDFT5cbpFq3XP');
       assert(a.equals(b, true));
       assert(!a.not_equals_why(b, true));
     });
     it('1.1 USD == 1.10 USD (ignore issuer)', function() {
-      var a = Amount.from_json('1.1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('1.10/USD/rH5aWQJ4R7v4Mpyf4kDBUvDFT5cbpFq3XP');
+      const a = Amount.from_json('1.1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('1.10/USD/rH5aWQJ4R7v4Mpyf4kDBUvDFT5cbpFq3XP');
       assert(a.equals(b, true));
       assert(!a.not_equals_why(b, true));
     });
     // Exponent mismatch
     it('10 USD != 100 USD', function() {
-      var a = Amount.from_json('10/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('100/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('10/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('100/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'Non-XRP value differs.');
     });
     it('10 XRP != 100 XRP', function() {
-      var a = Amount.from_json('10');
-      var b = Amount.from_json('100');
+      const a = Amount.from_json('10');
+      const b = Amount.from_json('100');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'XRP value differs.');
     });
     // Mantissa mismatch
     it('1 USD != 2 USD', function() {
-      var a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('2/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('2/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'Non-XRP value differs.');
     });
     it('1 XRP != 2 XRP', function() {
-      var a = Amount.from_json('1');
-      var b = Amount.from_json('2');
+      const a = Amount.from_json('1');
+      const b = Amount.from_json('2');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'XRP value differs.');
     });
     it('0.1 USD != 0.2 USD', function() {
-      var a = Amount.from_json('0.1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('0.2/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('0.1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('0.2/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'Non-XRP value differs.');
     });
     // Sign mismatch
     it('1 USD != -1 USD', function() {
-      var a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('-1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('-1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'Non-XRP sign differs.');
     });
     it('1 XRP != -1 XRP', function() {
-      var a = Amount.from_json('1');
-      var b = Amount.from_json('-1');
+      const a = Amount.from_json('1');
+      const b = Amount.from_json('-1');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'XRP sign differs.');
     });
     it('1 USD != 1 USD (issuer mismatch)', function() {
-      var a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('1/USD/rH5aWQJ4R7v4Mpyf4kDBUvDFT5cbpFq3XP');
+      const a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('1/USD/rH5aWQJ4R7v4Mpyf4kDBUvDFT5cbpFq3XP');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'Non-XRP issuer differs: rH5aWQJ4R7v4Mpyf4kDBUvDFT5cbpFq3XP/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
     });
     it('1 USD != 1 EUR', function() {
-      var a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('1/EUR/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('1/EUR/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'Non-XRP currency differs.');
     });
     it('1 USD != 1 XRP', function() {
-      var a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
-      var b = Amount.from_json('1');
+      const a = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const b = Amount.from_json('1');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'Native mismatch.');
     });
     it('1 XRP != 1 USD', function() {
-      var a = Amount.from_json('1');
-      var b = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
+      const a = Amount.from_json('1');
+      const b = Amount.from_json('1/USD/rNDKeo9RrCiRdfsMG8AdoZvNZxHASGzbZL');
       assert(!a.equals(b));
       assert.strictEqual(a.not_equals_why(b), 'Native mismatch.');
     });
@@ -1147,38 +1147,38 @@ describe('Amount', function() {
 
   describe('apply interest', function() {
     it('from_json apply interest 10 XAU', function() {
-      var demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      let demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
-      assert.strictEqual(demAmount.to_text_full(), '9.294949401870435/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(demAmount.to_text_full(), '9.294949401870436/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
 
     });
     it('from_json apply interest XAU', function() {
-      var demAmount = Amount.from_json('1235.5/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      let demAmount = Amount.from_json('1235.5/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_text_full(), '1235.5/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
       assert.strictEqual(demAmount.to_text_full(), '1148.390998601092/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
     it('from_human with reference date', function() {
-      var demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date: 459990264});
+      const demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date: 459990264});
       demAmount.set_issuer('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_text_full(), '10.75853086191915/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
     it('from_json apply interest 10 XAU human', function() {
-      var demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      let demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_human_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
-      assert.strictEqual(demAmount.to_human_full(), '9.294949401870435/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(demAmount.to_human_full(), '9.294949401870436/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
 
     });
     it('from_json apply interest XAU human', function() {
-      var demAmount = Amount.from_json('1235.5/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      let demAmount = Amount.from_json('1235.5/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_human_full(), '1,235.5/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       demAmount = demAmount.applyInterest(459990264);
       assert.strictEqual(demAmount.to_human_full(), '1,148.390998601092/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
     it('from_human with reference date human', function() {
-      var demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date: 459990264});
+      const demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date: 459990264});
       demAmount.set_issuer('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(demAmount.to_human_full(), '10.75853086191915/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
@@ -1202,12 +1202,12 @@ describe('Amount', function() {
     });
 
     it('from_json minimum XRP', function() {
-      var amt = Amount.from_json('-100000000000000000');
+      const amt = Amount.from_json('-100000000000000000');
       assert.strictEqual(amt.to_json(), '-100000000000000000');
     });
 
     it('from_json maximum XRP', function() {
-      var amt = Amount.from_json('100000000000000000');
+      const amt = Amount.from_json('100000000000000000');
       assert.strictEqual(amt.to_json(), '100000000000000000');
     });
 
@@ -1224,7 +1224,7 @@ describe('Amount', function() {
     });
 
     it('from_json minimum IOU', function() {
-      var amt = Amount.from_json('-1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      const amt = Amount.from_json('-1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '-1000000000000000e-96');
       assert.strictEqual(amt.to_text(), Amount.min_value);
     });
@@ -1236,7 +1236,7 @@ describe('Amount', function() {
     });
 
     it('from_json maximum IOU', function() {
-      var amt = Amount.from_json('9999999999999999e80/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      const amt = Amount.from_json('9999999999999999e80/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '9999999999999999e80');
     });
 
@@ -1247,12 +1247,12 @@ describe('Amount', function() {
     });
 
     it('from_json normalize mantissa to valid max range, lost significant digits', function() {
-      var amt = Amount.from_json('99999999999999999999999999999999/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      const amt = Amount.from_json('99999999999999999999999999999999/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '9999999999999999e16');
     });
 
     it('from_json normalize mantissa to min valid range, lost significant digits', function() {
-      var amt = Amount.from_json('-0.0000000000000000000000001/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      const amt = Amount.from_json('-0.0000000000000000000000001/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '-1000000000000000e-40');
     });
   });

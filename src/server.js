@@ -1,10 +1,13 @@
-var util         = require('util');
-var url          = require('url');
-var LRU          = require('lru-cache');
-var EventEmitter = require('events').EventEmitter;
-var Amount       = require('./amount').Amount;
-var RangeSet     = require('./rangeset').RangeSet;
-var log          = require('./log').internal.sub('server');
+'use strict';
+
+const _ = require('lodash');
+const util = require('util');
+const url = require('url');
+const LRU = require('lru-cache');
+const EventEmitter = require('events').EventEmitter;
+const Amount = require('./amount').Amount;
+const RangeSet = require('./rangeset').RangeSet;
+const log = require('./log').internal.sub('server');
 
 /**
  *  @constructor Server
@@ -16,18 +19,20 @@ var log          = require('./log').internal.sub('server');
  *    @param [Boolean] securec
  */
 
-function Server(remote, opts) {
+function Server(remote, _opts) {
   EventEmitter.call(this);
 
-  var self = this;
-
-  if (typeof opts === 'string') {
-    var parsedUrl = url.parse(opts);
+  const self = this;
+  let opts;
+  if (typeof _opts === 'string') {
+    const parsedUrl = url.parse(_opts);
     opts = {
       host: parsedUrl.hostname,
       port: parsedUrl.port,
       secure: (parsedUrl.protocol === 'ws:') ? false : true
     };
+  } else {
+    opts = _opts;
   }
 
   if (typeof opts !== 'object') {
@@ -35,11 +40,14 @@ function Server(remote, opts) {
   }
 
   if (!Server.DOMAIN_RE.test(opts.host)) {
-    throw new Error('Server host is malformed, use "host" and "port" server configuration');
+    throw new Error(
+      'Server host is malformed, use "host" and "port" server configuration');
   }
 
-  // We want to allow integer strings as valid port numbers for backward compatibility
-  if (!(opts.port = Number(opts.port))) {
+  // We want to allow integer strings as valid port numbers
+  // for backward compatibility
+  opts.port = Number(opts.port);
+  if (!opts.port) {
     throw new TypeError('Server port must be a number');
   }
 
@@ -53,13 +61,15 @@ function Server(remote, opts) {
 
   this._remote = remote;
   this._opts = opts;
-  this._ws = void(0);
+  this._ws = undefined;
 
   this._connected = false;
   this._shouldConnect = false;
   this._state = 'offline';
   this._ledgerRanges = new RangeSet();
-  this._ledgerMap = LRU({ max: 200 });
+  this._ledgerMap = new LRU({
+    max: 200
+  });
 
   this._id = 0; // request ID
   this._retry = 0;
@@ -71,8 +81,8 @@ function Server(remote, opts) {
   this._fee = 10;
   this._fee_ref = 10;
   this._fee_base = 10;
-  this._reserve_base = void(0);
-  this._reserve_inc = void(0);
+  this._reserve_base = undefined;
+  this._reserve_inc = undefined;
   this._fee_cushion = this._remote.fee_cushion;
 
   this._lastLedgerIndex = NaN;
@@ -87,7 +97,7 @@ function Server(remote, opts) {
   this._pubkey_node = '';
 
   this._url = this._opts.url = (this._opts.secure ? 'wss://' : 'ws://')
-      + this._opts.host + ':' + this._opts.port;
+    + this._opts.host + ':' + this._opts.port;
 
   this.on('message', function onMessage(message) {
     self._handleMessage(message);
@@ -98,9 +108,9 @@ function Server(remote, opts) {
   });
 
   function setActivityInterval() {
-    var interval = self._checkActivity.bind(self);
+    const interval = self._checkActivity.bind(self);
     self._activityInterval = setInterval(interval, 1000);
-  };
+  }
 
   this.on('disconnect', function onDisconnect() {
     clearInterval(self._activityInterval);
@@ -124,11 +134,13 @@ function Server(remote, opts) {
   this.on('connect', function() {
     self.requestServerID();
   });
-};
+}
 
 util.inherits(Server, EventEmitter);
 
+/* eslint-disable max-len */
 Server.DOMAIN_RE = /^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|[-_]){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|[-_]){0,61}[0-9A-Za-z])?)*\.?$/;
+/* eslint-enable max-len */
 
 Server.TLS_ERRORS = [
   'UNABLE_TO_GET_ISSUER_CERT', 'UNABLE_TO_GET_CRL',
@@ -227,7 +239,7 @@ Server.prototype._checkActivity = function() {
     return;
   }
 
-  var delta = (Date.now() - this._lastLedgerClose);
+  const delta = (Date.now() - this._lastLedgerClose);
 
   if (delta > (1000 * 25)) {
     if (this._remote.trace) {
@@ -244,7 +256,7 @@ Server.prototype._checkActivity = function() {
  */
 
 Server.prototype.requestServerID = function() {
-  var self = this;
+  const self = this;
 
   if (this._pubkey_node) {
     return;
@@ -254,11 +266,12 @@ Server.prototype.requestServerID = function() {
     try {
       self._pubkey_node = message.info.pubkey_node;
     } catch (e) {
+      // empty
     }
   });
 
-  var serverInfoRequest = this._remote.requestServerInfo();
-  serverInfoRequest.on('error', function() { });
+  const serverInfoRequest = this._remote.requestServerInfo();
+  serverInfoRequest.on('error', function() {});
   this._request(serverInfoRequest);
 };
 
@@ -279,19 +292,20 @@ Server.prototype._updateScore = function(type, data) {
     return;
   }
 
-  var weight = this._scoreWeights[type] || 1;
+  const weight = this._scoreWeights[type] || 1;
 
+  let delta;
   switch (type) {
     case 'ledgerclose':
       // Ledger lag
-      var delta = data.ledger_index - this._lastLedgerIndex;
+      delta = data.ledger_index - this._lastLedgerIndex;
       if (delta > 0) {
         this._score += weight * delta;
       }
       break;
     case 'response':
       // Ping lag
-      var delta = Math.floor((Date.now() - data.time) / 200);
+      delta = Math.floor((Date.now() - data.time) / 200);
       this._score += weight * delta;
       break;
     case 'loadchange':
@@ -316,20 +330,18 @@ Server.prototype._updateScore = function(type, data) {
 
 Server.prototype.getRemoteAddress =
 Server.prototype._remoteAddress = function() {
-  var address;
   try {
-    address = this._ws._socket.remoteAddress;
+    return this._ws._socket.remoteAddress;
   } catch (e) {
+    // empty
   }
-  return address;
 };
 
 /**
  * Get the server's hostid
  */
 
-Server.prototype.getHostID =
-Server.prototype.getServerID = function() {
+Server.prototype.getHostID = Server.prototype.getServerID = function() {
   return this._url + ' (' + (this._pubkey_node ? this._pubkey_node : '') + ')';
 };
 
@@ -340,7 +352,7 @@ Server.prototype.getServerID = function() {
  */
 
 Server.prototype.disconnect = function() {
-  var self = this;
+  const self = this;
 
   if (!this.isConnected()) {
     this.once('socket_open', function() {
@@ -349,8 +361,8 @@ Server.prototype.disconnect = function() {
     return;
   }
 
-  //these need to be reset so that updateScore 
-  //and checkActivity do not trigger reconnect
+  // these need to be reset so that updateScore
+  // and checkActivity do not trigger reconnect
   this._lastLedgerIndex = NaN;
   this._lastLedgerClose = NaN;
   this._score = 0;
@@ -371,13 +383,13 @@ Server.prototype.disconnect = function() {
  */
 
 Server.prototype.reconnect = function() {
-  var self = this;
+  const self = this;
 
   function reconnect() {
     self._shouldConnect = true;
     self._retry = 0;
     self.connect();
-  };
+  }
 
   if (this._ws && this._shouldConnect) {
     if (this.isConnected()) {
@@ -398,9 +410,9 @@ Server.prototype.reconnect = function() {
  */
 
 Server.prototype.connect = function() {
-  var self = this;
+  const self = this;
 
-  var WebSocket = Server.websocketConstructor();
+  const WebSocket = Server.websocketConstructor();
 
   if (!WebSocket) {
     throw new Error('No websocket support detected!');
@@ -423,7 +435,7 @@ Server.prototype.connect = function() {
     log.info(this.getServerID(), 'connect');
   }
 
-  var ws = this._ws = new WebSocket(this._opts.url);
+  const ws = this._ws = new WebSocket(this._opts.url);
 
   this._shouldConnect = true;
 
@@ -446,7 +458,7 @@ Server.prototype.connect = function() {
       self.emit('socket_error');
 
       if (self._remote.trace) {
-        log.info(self.getServerID(), 'onerror:',  e.data || e);
+        log.info(self.getServerID(), 'onerror:', e.data || e);
       }
 
       if (Server.TLS_ERRORS.indexOf(e.message) !== -1) {
@@ -454,11 +466,13 @@ Server.prototype.connect = function() {
         throw e;
       }
 
-      // Most connection errors for WebSockets are conveyed as 'close' events with
+      // Most connection errors for WebSockets are conveyed as 'close'
+      // events with
       // code 1006. This is done for security purposes and therefore unlikely to
       // ever change.
 
-      // This means that this handler is hardly ever called in practice. If it is,
+      // This means that this handler is hardly ever called in practice.
+      // If it is,
       // it probably means the server's WebSocket implementation is corrupt, or
       // the connection is somehow producing corrupt data.
 
@@ -489,21 +503,21 @@ Server.prototype.connect = function() {
  */
 
 Server.prototype._retryConnect = function() {
-  var self = this;
+  const self = this;
 
   this._retry += 1;
 
-  var retryTimeout = (this._retry < 40)
-  // First, for 2 seconds: 20 times per second
-  ? (1000 / 20)
-  : (this._retry < 40 + 60)
-  // Then, for 1 minute: once per second
-  ? (1000)
-  : (this._retry < 40 + 60 + 60)
-  // Then, for 10 minutes: once every 10 seconds
-  ? (10 * 1000)
-  // Then: once every 30 seconds
-  : (30 * 1000);
+  const retryTimeout = (this._retry < 40)
+    // First, for 2 seconds: 20 times per second
+    ? (1000 / 20)
+    : (this._retry < 40 + 60)
+      // Then, for 1 minute: once per second
+      ? (1000)
+      : (this._retry < 40 + 60 + 60)
+        // Then, for 10 minutes: once every 10 seconds
+        ? (10 * 1000)
+        // Then: once every 30 seconds
+        : (30 * 1000);
 
   function connectionRetry() {
     if (self._shouldConnect) {
@@ -512,7 +526,7 @@ Server.prototype._retryConnect = function() {
       }
       self.connect();
     }
-  };
+  }
 
   this._retryTimer = setTimeout(connectionRetry, retryTimeout);
 };
@@ -524,13 +538,10 @@ Server.prototype._retryConnect = function() {
  */
 
 Server.prototype._handleClose = function() {
-  var self = this;
-  var ws = this._ws;
-
-  function noOp(){};
+  const ws = this._ws;
 
   // Prevent additional events from this socket
-  ws.onopen = ws.onerror = ws.onclose = ws.onmessage = noOp;
+  ws.onopen = ws.onerror = ws.onclose = ws.onmessage = _.noop;
 
   this.emit('socket_close');
   this._setState('offline');
@@ -548,11 +559,13 @@ Server.prototype._handleClose = function() {
  */
 
 Server.prototype._handleMessage = function(message) {
-  var self = this;
-
   try {
+    // this is fixed in Brandon's pull request
+    /* eslint-disable no-param-reassign */
     message = JSON.parse(message);
-  } catch(e) {
+    /* eslint-enable no-param-reassign */
+  } catch (e) {
+    // empty
   }
 
   if (!Server.isValidMessage(message)) {
@@ -587,7 +600,7 @@ Server.prototype._handleLedgerClosed = function(message) {
 Server.prototype._handleServerStatus = function(message) {
   // This message is only received when online.
   // As we are connected, it is the definitive final state.
-  var isOnline = ~Server.onlineStates.indexOf(message.server_status);
+  const isOnline = ~Server.onlineStates.indexOf(message.server_status);
 
   this._setState(isOnline ? 'online' : 'offline');
 
@@ -598,8 +611,8 @@ Server.prototype._handleServerStatus = function(message) {
   this.emit('load', message, this);
   this._remote.emit('load', message, this);
 
-  var loadChanged = message.load_base !== this._load_base
-  || message.load_factor !== this._load_factor;
+  const loadChanged = message.load_base !== this._load_base
+    || message.load_factor !== this._load_factor;
 
   if (loadChanged) {
     this._load_base = message.load_base;
@@ -611,7 +624,7 @@ Server.prototype._handleServerStatus = function(message) {
 
 Server.prototype._handleResponse = function(message) {
   // A response to a request.
-  var request = this._requests[message.id];
+  const request = this._requests[message.id];
 
   delete this._requests[message.id];
 
@@ -627,13 +640,13 @@ Server.prototype._handleResponse = function(message) {
       log.info(this.getServerID(), 'response:', message);
     }
 
-    var command = request.message.command;
-    var result = message.result;
-    var responseEvent = 'response_' + command;
+    const command = request.message.command;
+    const result = message.result;
+    const responseEvent = 'response_' + command;
 
     request.emit('success', result);
 
-    [ this, this._remote ].forEach(function(emitter) {
+    [this, this._remote].forEach(function(emitter) {
       emitter.emit(responseEvent, result, request, message);
     });
   } else if (message.error) {
@@ -672,10 +685,11 @@ Server.prototype._handleResponseSubscribe = function(message) {
   }
 
   if (!this._remote.allow_partial_history
-      && !Server.hasFullLedgerHistory(message)) {
+    && !Server.hasFullLedgerHistory(message)) {
     // Server has partial history and Remote has been configured to disallow
     // servers with incomplete history
-    return this.reconnect();
+    this.reconnect();
+    return;
   }
 
   if (message.pubkey_node) {
@@ -711,9 +725,9 @@ Server.prototype._handleResponseSubscribe = function(message) {
 
 Server.hasFullLedgerHistory = function(message) {
   return (typeof message === 'object')
-  && (message.server_status === 'full')
-  && (typeof message.validated_ledgers === 'string')
-  && (message.validated_ledgers.split('-').length === 2);
+    && (message.server_status === 'full')
+    && (typeof message.validated_ledgers === 'string')
+    && (message.validated_ledgers.split('-').length === 2);
 };
 
 /**
@@ -725,7 +739,7 @@ Server.hasFullLedgerHistory = function(message) {
 
 Server.isValidMessage = function(message) {
   return (typeof message === 'object')
-      && (typeof message.type === 'string');
+    && (typeof message.type === 'string');
 };
 
 /**
@@ -737,8 +751,8 @@ Server.isValidMessage = function(message) {
 
 Server.isLoadStatus = function(message) {
   return (typeof message === 'object')
-      && (typeof message.load_base === 'number')
-      && (typeof message.load_factor === 'number');
+    && (typeof message.load_base === 'number')
+    && (typeof message.load_factor === 'number');
 };
 
 /**
@@ -768,7 +782,7 @@ Server.prototype._sendMessage = function(message) {
  */
 
 Server.prototype._request = function(request) {
-  var self  = this;
+  const self = this;
 
   // Only bother if we are still connected.
   if (!this._ws) {
@@ -789,10 +803,10 @@ Server.prototype._request = function(request) {
 
   function sendRequest() {
     self._sendMessage(request.message);
-  };
+  }
 
-  var isOpen = this._ws.readyState === 1;
-  var isSubscribeRequest = request && request.message.command === 'subscribe';
+  const isOpen = this._ws.readyState === 1;
+  const isSubscribeRequest = request && request.message.command === 'subscribe';
 
   if (this.isConnected() || (isOpen && isSubscribeRequest)) {
     sendRequest();
@@ -807,8 +821,7 @@ Server.prototype._request = function(request) {
  * @return boolean
  */
 
-Server.prototype.isConnected =
-Server.prototype._isConnected = function() {
+Server.prototype.isConnected = Server.prototype._isConnected = function() {
   return this._connected;
 };
 
@@ -838,7 +851,7 @@ Server.prototype._computeFee = function(feeUnits) {
  */
 
 Server.prototype._feeTx = function(units) {
-  var fee_unit = this._feeTxUnit();
+  const fee_unit = this._feeTxUnit();
   return Amount.from_json(String(Math.ceil(units * fee_unit)));
 };
 
@@ -852,12 +865,13 @@ Server.prototype._feeTx = function(units) {
  */
 
 Server.prototype._feeTxUnit = function() {
-  var fee_unit = this._fee_base / this._fee_ref;
+  let fee_unit = this._fee_base / this._fee_ref;
 
   // Apply load fees
   fee_unit *= this._load_factor / this._load_base;
 
-  // Apply fee cushion (a safety margin in case fees rise since we were last updated)
+  // Apply fee cushion (a safety margin in case fees rise since
+  // we were last updated)
   fee_unit *= this._fee_cushion;
 
   return fee_unit;
@@ -870,9 +884,9 @@ Server.prototype._feeTxUnit = function() {
  */
 
 Server.prototype._reserve = function(ownerCount) {
-  var reserve_base = Amount.from_json(String(this._reserve_base));
-  var reserve_inc  = Amount.from_json(String(this._reserve_inc));
-  var owner_count  = ownerCount || 0;
+  const reserve_base = Amount.from_json(String(this._reserve_base));
+  const reserve_inc = Amount.from_json(String(this._reserve_inc));
+  const owner_count = ownerCount || 0;
 
   if (owner_count < 0) {
     throw new Error('Owner count must not be negative.');
@@ -889,11 +903,11 @@ Server.prototype._reserve = function(ownerCount) {
  */
 
 Server.prototype.hasLedger = function(ledger) {
-  var result = false;
+  let result = false;
 
   if (typeof ledger === 'string' && /^[A-F0-9]{64}$/.test(ledger)) {
     result = this._ledgerMap.has(ledger);
-  } else if (ledger != null && !isNaN(ledger)) {
+  } else if (ledger !== null && !isNaN(ledger)) {
     result = this._ledgerRanges.has(ledger);
   }
 

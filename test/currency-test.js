@@ -272,7 +272,9 @@ describe('Currency', function() {
       assert.equal(0.995, precision(cur.get_interest_at(new Date(timeUtil.fromRipple(443845330 + 31536000))), 14));
 
       // After one demurrage period, 1/e should have occurred
-      assert.equal(1/Math.E, cur.get_interest_at(443845330 + 6291418827.05));
+      var epsilon = 1e-14;
+      assert(Math.abs(
+        1/Math.E - cur.get_interest_at(443845330 + 6291418827.05)) < epsilon);
 
       // One year before start, it should be (roughly) 0.5% higher.
       assert.equal(1.005, precision(cur.get_interest_at(443845330 - 31536000), 4));

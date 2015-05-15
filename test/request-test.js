@@ -1,15 +1,16 @@
-var assert = require('assert');
-var Request = require('ripple-lib').Request;
-var Remote = require('ripple-lib').Remote;
-var Server = require('ripple-lib').Server;
-var Currency = require('ripple-lib').Currency;
-var RippleError = require('ripple-lib').RippleError;
+'use strict';
+const assert = require('assert');
+const Request = require('ripple-lib').Request;
+const Remote = require('ripple-lib').Remote;
+const Server = require('ripple-lib').Server;
+const Currency = require('ripple-lib').Currency;
+const RippleError = require('ripple-lib').RippleError;
 
 function makeServer(url) {
-  var server = new Server(new process.EventEmitter(), url);
+  const server = new Server(new process.EventEmitter(), url);
   server._connected = true;
   return server;
-};
+}
 
 const SERVER_INFO = {
   'info': {
@@ -28,7 +29,8 @@ const SERVER_INFO = {
     'validated_ledger': {
       'age': 0,
       'base_fee_xrp': 0.00001,
-      'hash': 'E43FD49087B18031721D9C3C4743FE1692C326AFF7084A2C01B355CE65A4C699',
+      'hash':
+        'E43FD49087B18031721D9C3C4743FE1692C326AFF7084A2C01B355CE65A4C699',
       'reserve_base_xrp': 20,
       'reserve_inc_xrp': 5,
       'seq': 7016339
@@ -39,7 +41,7 @@ const SERVER_INFO = {
 
 describe('Request', function() {
   it('Send request', function(done) {
-    var remote = {
+    const remote = {
       request: function(req) {
         assert(req instanceof Request);
         assert.strictEqual(typeof req.message, 'object');
@@ -48,7 +50,7 @@ describe('Request', function() {
       }
     };
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     request.request();
 
@@ -57,29 +59,31 @@ describe('Request', function() {
   });
 
   it('Send request -- filterRequest', function(done) {
-    var servers = [
+    const servers = [
       makeServer('wss://localhost:5006'),
       makeServer('wss://localhost:5007')
     ];
 
-    var requests = 0;
+    let requests = 0;
 
-    var successResponse = {
+    const successResponse = {
       account_data: {
         Account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
         Balance: '13188802787',
         Flags: 0,
         LedgerEntryType: 'AccountRoot',
         OwnerCount: 17,
-        PreviousTxnID: 'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
+        PreviousTxnID:
+          'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
         PreviousTxnLgrSeq: 8828020,
         Sequence: 1406,
-        index: '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
+        index:
+          '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
       },
       ledger_current_index: 9022821,
       validated: false
     };
-    var errorResponse = {
+    const errorResponse = {
       error: 'remoteError',
       error_message: 'Remote reported an error.',
       remote: {
@@ -104,7 +108,7 @@ describe('Request', function() {
       assert(req instanceof Request);
       assert.strictEqual(typeof req.message, 'object');
       assert.strictEqual(req.message.command, 'account_info');
-    };
+    }
 
     servers[0]._request = function(req) {
       ++requests;
@@ -120,18 +124,18 @@ describe('Request', function() {
       });
     };
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote._servers = servers;
 
-    var request = new Request(remote, 'account_info');
+    const request = new Request(remote, 'account_info');
 
     request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
 
     request.filter(function(res) {
       return res
-      && typeof res === 'object'
-      && !res.hasOwnProperty('error');
+        && typeof res === 'object'
+        && !res.hasOwnProperty('error');
     });
 
     request.callback(function(err, res) {
@@ -143,14 +147,14 @@ describe('Request', function() {
   });
 
   it('Send request -- filterRequest -- no success', function(done) {
-    var servers = [
+    const servers = [
       makeServer('wss://localhost:5006'),
       makeServer('wss://localhost:5007')
     ];
 
-    var requests = 0;
+    let requests = 0;
 
-    var errorResponse = {
+    const errorResponse = {
       error: 'remoteError',
       error_message: 'Remote reported an error.',
       remote: {
@@ -175,31 +179,32 @@ describe('Request', function() {
       assert(req instanceof Request);
       assert.strictEqual(typeof req.message, 'object');
       assert.strictEqual(req.message.command, 'account_info');
-    };
+    }
 
     function sendError(req) {
       ++requests;
       checkRequest(req);
       req.emit('error', errorResponse);
-    };
+    }
+
     servers[0]._request = sendError;
     servers[1]._request = sendError;
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote._servers = servers;
 
-    var request = new Request(remote, 'account_info');
+    const request = new Request(remote, 'account_info');
 
     request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
 
     request.filter(function(res) {
       return res
-      && typeof res === 'object'
-      && !res.hasOwnProperty('error');
+        && typeof res === 'object'
+        && !res.hasOwnProperty('error');
     });
 
-    request.callback(function(err, res) {
+    request.callback(function(err) {
       setImmediate(function() {
         assert.strictEqual(requests, 2, 'Failed to broadcast');
         assert.deepEqual(err, new RippleError(errorResponse));
@@ -209,24 +214,26 @@ describe('Request', function() {
   });
 
   it('Send request -- filterRequest -- ledger prefilter', function(done) {
-    var servers = [
+    const servers = [
       makeServer('wss://localhost:5006'),
       makeServer('wss://localhost:5007')
     ];
 
-    var requests = 0;
+    let requests = 0;
 
-    var successResponse = {
+    const successResponse = {
       account_data: {
         Account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
         Balance: '13188802787',
         Flags: 0,
         LedgerEntryType: 'AccountRoot',
         OwnerCount: 17,
-        PreviousTxnID: 'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
+        PreviousTxnID:
+          'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
         PreviousTxnLgrSeq: 8828020,
         Sequence: 1406,
-        index: '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
+        index:
+          '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
       },
       ledger_current_index: 9022821,
       validated: false
@@ -236,9 +243,9 @@ describe('Request', function() {
       assert(req instanceof Request);
       assert.strictEqual(typeof req.message, 'object');
       assert.strictEqual(req.message.command, 'account_info');
-    };
+    }
 
-    servers[0]._request = function(req) {
+    servers[0]._request = function() {
       assert(false, 'Should not request; server does not have ledger');
     };
 
@@ -253,18 +260,18 @@ describe('Request', function() {
     servers[0]._ledgerRanges.add('5-6');
     servers[1]._ledgerRanges.add('1-4');
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote._servers = servers;
 
-    var request = new Request(remote, 'account_info');
+    const request = new Request(remote, 'account_info');
     request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
     request.selectLedger(4);
 
     request.filter(function(res) {
       return res
-      && typeof res === 'object'
-      && !res.hasOwnProperty('error');
+        && typeof res === 'object'
+        && !res.hasOwnProperty('error');
     });
 
     request.callback(function(err, res) {
@@ -275,29 +282,31 @@ describe('Request', function() {
   });
 
   it('Send request -- filterRequest -- server reconnects', function(done) {
-    var servers = [
+    const servers = [
       makeServer('wss://localhost:5006'),
       makeServer('wss://localhost:5007')
     ];
 
-    var requests = 0;
+    let requests = 0;
 
-    var successResponse = {
+    const successResponse = {
       account_data: {
         Account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
         Balance: '13188802787',
         Flags: 0,
         LedgerEntryType: 'AccountRoot',
         OwnerCount: 17,
-        PreviousTxnID: 'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
+        PreviousTxnID:
+          'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
         PreviousTxnLgrSeq: 8828020,
         Sequence: 1406,
-        index: '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
+        index:
+          '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
       },
       ledger_current_index: 9022821,
       validated: false
     };
-    var errorResponse = {
+    const errorResponse = {
       error: 'remoteError',
       error_message: 'Remote reported an error.',
       remote: {
@@ -322,7 +331,7 @@ describe('Request', function() {
       assert(req instanceof Request);
       assert.strictEqual(typeof req.message, 'object');
       assert.strictEqual(req.message.command, 'account_info');
-    };
+    }
 
     servers[0]._connected = false;
     servers[0]._shouldConnect = true;
@@ -343,18 +352,18 @@ describe('Request', function() {
       servers[0].emit('connect');
     };
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote._servers = servers;
 
-    var request = new Request(remote, 'account_info');
+    const request = new Request(remote, 'account_info');
 
     request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
 
     request.filter(function(res) {
       return res
-      && typeof res === 'object'
-      && !res.hasOwnProperty('error');
+        && typeof res === 'object'
+        && !res.hasOwnProperty('error');
     });
 
     request.callback(function(err, res) {
@@ -367,30 +376,33 @@ describe('Request', function() {
     });
   });
 
-  it('Send request -- filterRequest -- server fails to reconnect', function(done) {
-    var servers = [
+  it('Send request -- filterRequest -- server fails to reconnect',
+      function(done) {
+    const servers = [
       makeServer('wss://localhost:5006'),
       makeServer('wss://localhost:5007')
     ];
 
-    var requests = 0;
+    let requests = 0;
 
-    var successResponse = {
+    const successResponse = {
       account_data: {
         Account: 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC',
         Balance: '13188802787',
         Flags: 0,
         LedgerEntryType: 'AccountRoot',
         OwnerCount: 17,
-        PreviousTxnID: 'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
+        PreviousTxnID:
+          'C6A2313CD9E34FFA3EB42F82B2B30F7FE12A045F1F4FDDAF006B25D7286536DD',
         PreviousTxnLgrSeq: 8828020,
         Sequence: 1406,
-        index: '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
+        index:
+          '4F83A2CF7E70F77F79A307E6A472BFC2585B806A70833CCD1C26105BAE0D6E05'
       },
       ledger_current_index: 9022821,
       validated: false
     };
-    var errorResponse = {
+    const errorResponse = {
       error: 'remoteError',
       error_message: 'Remote reported an error.',
       remote: {
@@ -415,7 +427,7 @@ describe('Request', function() {
       assert(req instanceof Request);
       assert.strictEqual(typeof req.message, 'object');
       assert.strictEqual(req.message.command, 'account_info');
-    };
+    }
 
     servers[0]._connected = false;
     servers[0]._shouldConnect = true;
@@ -437,32 +449,32 @@ describe('Request', function() {
       req.emit('error', errorResponse);
     };
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote._servers = servers;
 
-    var request = new Request(remote, 'account_info');
+    const request = new Request(remote, 'account_info');
     request.setReconnectTimeout(10);
     request.message.account = 'rnoFoLJmqmXe7a7iswk19yfdMHQkbQNrKC';
 
     request.filter(function(res) {
       return res
-      && typeof res === 'object'
-      && !res.hasOwnProperty('error');
+        && typeof res === 'object'
+        && !res.hasOwnProperty('error');
     });
 
-    request.callback(function(err, res) {
+    request.callback(function(err) {
       setTimeout(function() {
         // Wait for the request that would emit 'success' to time out
         assert.deepEqual(err, new RippleError(errorResponse));
-        assert.deepEqual(servers[0].listeners('connect'), [ ]);
+        assert.deepEqual(servers[0].listeners('connect'), []);
         done();
       }, 20);
     });
   });
 
   it('Events API', function(done) {
-    var server = makeServer('wss://localhost:5006');
+    const server = makeServer('wss://localhost:5006');
 
     server._request = function(req) {
       assert(req instanceof Request);
@@ -471,11 +483,11 @@ describe('Request', function() {
       req.emit('success', SERVER_INFO);
     };
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
-    remote._servers = [ server ];
+    remote._servers = [server];
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     request.once('success', function(res) {
       assert.deepEqual(res, SERVER_INFO);
@@ -486,7 +498,7 @@ describe('Request', function() {
   });
 
   it('Callback API', function(done) {
-    var server = makeServer('wss://localhost:5006');
+    const server = makeServer('wss://localhost:5006');
 
     server._request = function(req) {
       assert(req instanceof Request);
@@ -495,11 +507,11 @@ describe('Request', function() {
       req.emit('success', SERVER_INFO);
     };
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
-    remote._servers = [ server ];
+    remote._servers = [server];
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     request.callback(function(err, res) {
       assert.ifError(err);
@@ -509,8 +521,8 @@ describe('Request', function() {
   });
 
   it('Timeout', function(done) {
-    var server = makeServer('wss://localhost:5006');
-    var successEmited = false;
+    const server = makeServer('wss://localhost:5006');
+    let successEmitted = false;
 
     server._request = function(req) {
       assert(req instanceof Request);
@@ -522,11 +534,11 @@ describe('Request', function() {
       }, 200);
     };
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
-    remote._servers = [ server ];
+    remote._servers = [server];
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     request.timeout(10, function() {
       setTimeout(function() {
@@ -535,32 +547,30 @@ describe('Request', function() {
       }, 200);
     });
 
-    request.callback(function(err, res) {
+    request.callback(function() {
       assert(false, 'Callback should not be called');
     });
   });
 
   it('Timeout - satisfied', function(done) {
-    var server = makeServer('wss://localhost:5006');
-    var successEmited = false;
+    const server = makeServer('wss://localhost:5006');
 
     server._request = function(req) {
       assert(req instanceof Request);
       assert.strictEqual(typeof req.message, 'object');
       assert.strictEqual(req.message.command, 'server_info');
       setTimeout(function() {
-        successEmitted = true;
         req.emit('success', SERVER_INFO);
       }, 200);
     };
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
-    remote._servers = [ server ];
+    remote._servers = [server];
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
-    var timedOut = false;
+    let timedOut = false;
 
     request.once('timeout', function() {
       timedOut = true;
@@ -577,7 +587,7 @@ describe('Request', function() {
   });
 
   it('Set server', function(done) {
-    var servers = [
+    const servers = [
       makeServer('wss://localhost:5006'),
       makeServer('wss://localhost:5007')
     ];
@@ -589,7 +599,7 @@ describe('Request', function() {
       done();
     };
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote._servers = servers;
 
@@ -597,7 +607,7 @@ describe('Request', function() {
       return servers[0];
     };
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.setServer(servers[1]);
 
     assert.strictEqual(request.server, servers[1]);
@@ -606,7 +616,7 @@ describe('Request', function() {
   });
 
   it('Set server - by URL', function(done) {
-    var servers = [
+    const servers = [
       makeServer('wss://localhost:5006'),
       makeServer('wss://127.0.0.1:5007')
     ];
@@ -618,7 +628,7 @@ describe('Request', function() {
       done();
     };
 
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote._servers = servers;
 
@@ -626,7 +636,7 @@ describe('Request', function() {
       return servers[0];
     };
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.setServer('wss://127.0.0.1:5007');
 
     assert.strictEqual(request.server, servers[1]);
@@ -635,30 +645,30 @@ describe('Request', function() {
   });
 
   it('Set build path', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote.local_signing = false;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.buildPath(true);
     assert.strictEqual(request.message.build_path, true);
   });
 
   it('Remove build path', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote.local_signing = false;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.buildPath(false);
     assert(!request.message.hasOwnProperty('build_path'));
   });
 
   it('Set build path with local signing', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     assert.throws(function() {
       request.buildPath(true);
@@ -666,125 +676,133 @@ describe('Request', function() {
   });
 
   it('Set ledger hash', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
-    request.ledgerHash('B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
-    assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    const request = new Request(remote, 'server_info');
+    request.ledgerHash(
+      'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    assert.strictEqual(request.message.ledger_hash,
+      'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
   });
 
   it('Set ledger index', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.ledgerIndex(7016915);
     assert.strictEqual(request.message.ledger_index, 7016915);
   });
 
   it('Select cached ledger - index', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote._ledger_current_index = 1;
-    remote._ledger_hash = 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
+    remote._ledger_hash =
+      'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.ledgerChoose(true);
     assert.strictEqual(request.message.ledger_index, 1);
   });
 
   it('Select cached ledger - hash', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
     remote._ledger_current_index = 1;
-    remote._ledger_hash = 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
+    remote._ledger_hash =
+      'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.ledgerChoose();
-    assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
-    assert.strictEqual(request.message.ledger_index, void(0));
+    assert.strictEqual(request.message.ledger_hash,
+      'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    assert.strictEqual(request.message.ledger_index, undefined);
   });
 
   it('Select ledger - identifier', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.ledgerSelect('validated');
     assert.strictEqual(request.message.ledger_index, 'validated');
-    assert.strictEqual(request.message.ledger_hash, void(0));
+    assert.strictEqual(request.message.ledger_hash, undefined);
   });
 
   it('Select ledger - index', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.ledgerSelect(7016915);
     assert.strictEqual(request.message.ledger_index, 7016915);
-    assert.strictEqual(request.message.ledger_hash, void(0));
+    assert.strictEqual(request.message.ledger_hash, undefined);
   });
 
   it('Select ledger - index (String)', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.ledgerSelect('7016915');
     assert.strictEqual(request.message.ledger_index, 7016915);
-    assert.strictEqual(request.message.ledger_hash, void(0));
+    assert.strictEqual(request.message.ledger_hash, undefined);
   });
 
   it('Select ledger - hash', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
-    request.ledgerSelect('B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
-    assert.strictEqual(request.message.ledger_hash, 'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
-    assert.strictEqual(request.message.ledger_index, void(0));
+    const request = new Request(remote, 'server_info');
+    request.ledgerSelect(
+      'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    assert.strictEqual(request.message.ledger_hash,
+      'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE');
+    assert.strictEqual(request.message.ledger_index, undefined);
   });
 
   it('Select ledger - undefined', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.ledgerSelect();
-    assert.strictEqual(request.message.ledger_hash, void(0));
-    assert.strictEqual(request.message.ledger_index, void(0));
+    assert.strictEqual(request.message.ledger_hash, undefined);
+    assert.strictEqual(request.message.ledger_index, undefined);
     request.ledgerSelect(null);
-    assert.strictEqual(request.message.ledger_hash, void(0));
-    assert.strictEqual(request.message.ledger_index, void(0));
+    assert.strictEqual(request.message.ledger_hash, undefined);
+    assert.strictEqual(request.message.ledger_index, undefined);
     request.ledgerSelect(NaN);
-    assert.strictEqual(request.message.ledger_hash, void(0));
-    assert.strictEqual(request.message.ledger_index, void(0));
+    assert.strictEqual(request.message.ledger_hash, undefined);
+    assert.strictEqual(request.message.ledger_index, undefined);
   });
 
   it('Set account_root', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.accountRoot('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59');
-    assert.strictEqual(request.message.account_root, 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59');
+    assert.strictEqual(request.message.account_root,
+      'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59');
   });
 
   it('Set index', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.index(1);
     assert.strictEqual(request.message.index, 1);
   });
 
   it('Set offer ID', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.offerId('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', 1337);
     assert.deepEqual(request.message.offer, {
       account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
@@ -793,186 +811,192 @@ describe('Request', function() {
   });
 
   it('Set offer index', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.offerIndex(1337);
     assert.strictEqual(request.message.offer, 1337);
   });
 
   it('Set secret', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.secret('mySecret');
     assert.strictEqual(request.message.secret, 'mySecret');
   });
 
   it('Set transaction hash', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
-    request.txHash('E08D6E9754025BA2534A78707605E0601F03ACE063687A0CA1BDDACFCD1698C7');
-    assert.strictEqual(request.message.tx_hash, 'E08D6E9754025BA2534A78707605E0601F03ACE063687A0CA1BDDACFCD1698C7');
+    const request = new Request(remote, 'server_info');
+    request.txHash(
+      'E08D6E9754025BA2534A78707605E0601F03ACE063687A0CA1BDDACFCD1698C7');
+    assert.strictEqual(request.message.tx_hash,
+      'E08D6E9754025BA2534A78707605E0601F03ACE063687A0CA1BDDACFCD1698C7');
   });
 
   it('Set transaction JSON', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
-    var txJson = { hash: 'E08D6E9754025BA2534A78707605E0601F03ACE063687A0CA1BDDACFCD1698C7' };
+    const request = new Request(remote, 'server_info');
+    const txJson = {
+      hash: 'E08D6E9754025BA2534A78707605E0601F03ACE063687A0CA1BDDACFCD1698C7'
+    };
     request.txJson(txJson);
     assert.deepEqual(request.message.tx_json, txJson);
   });
 
   it('Set transaction blob', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.txBlob('asdf');
     assert.strictEqual(request.message.tx_blob, 'asdf');
   });
 
   it('Set ripple state', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
-    request.rippleState('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', 'USD');
+    const request = new Request(remote, 'server_info');
+    request.rippleState('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+      'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', 'USD');
     assert.deepEqual(request.message.ripple_state, {
       currency: 'USD',
-      accounts: [ 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59' ]
+      accounts: ['r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+                 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59']
     });
   });
 
   it('Set accounts', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     request.accounts([
-        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
-        'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
+      'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     ]);
 
     assert.deepEqual(request.message.accounts, [
-        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
-        'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
+      'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     ]);
   });
 
   it('Set accounts - string', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     request.accounts('rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun');
 
     assert.deepEqual(request.message.accounts, [
-        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun'
+      'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun'
     ]);
   });
 
   it('Set accounts proposed', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
     request.accountsProposed([
-        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
-        'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
+      'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     ]);
 
     assert.deepEqual(request.message.accounts_proposed, [
-        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
-        'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
+      'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     ]);
   });
 
   it('Add account', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     request.accounts([
-        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
+      'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun'
     ]);
 
     request.addAccount('rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B');
 
     assert.deepEqual(request.message.accounts, [
-        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
-        'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
+      'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     ]);
   });
 
   it('Add account proposed', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     request.accountsProposed([
-        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
+      'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun'
     ]);
 
     request.addAccountProposed('rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B');
 
     assert.deepEqual(request.message.accounts_proposed, [
-        'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
-        'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      'rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun',
+      'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     ]);
   });
 
   it('Set books', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
-    var books = [
+    const books = [
       {
-      'taker_gets': {
-        'currency': 'EUR',
-        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-      },
-      'taker_pays': {
-        'currency': 'USD',
-        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+        'taker_gets': {
+          'currency': 'EUR',
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+        },
+        'taker_pays': {
+          'currency': 'USD',
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+        }
       }
-    }
     ];
 
     request.books(books);
 
     assert.deepEqual(request.message.books, [
       {
-      'taker_gets': {
-        'currency': Currency.from_json('EUR').to_hex(),
-        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-      },
-      'taker_pays': {
-        'currency': Currency.from_json('USD').to_hex(),
-        'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-      },
-      'snapshot': true
-    }
+        'taker_gets': {
+          'currency': Currency.from_json('EUR').to_hex(),
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+        },
+        'taker_pays': {
+          'currency': Currency.from_json('USD').to_hex(),
+          'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+        },
+        'snapshot': true
+      }
     ]);
   });
 
   it('Add book', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
     request.addBook({
       'taker_gets': {
@@ -999,7 +1023,7 @@ describe('Request', function() {
       }
     ]);
 
-    var books = [
+    const books = [
       {
         'taker_gets': {
           'currency': 'EUR',
@@ -1025,19 +1049,19 @@ describe('Request', function() {
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
         'snapshot': true
-      },
+      }
     ]);
   });
 
   it('Add book - missing side', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
-    request.message.books = void(0);
+    request.message.books = undefined;
 
-    var books = [
+    const books = [
       {
         'taker_gets': {
           'currency': 'EUR',
@@ -1052,14 +1076,14 @@ describe('Request', function() {
   });
 
   it('Add book - without snapshot', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
-    request.message.books = void(0);
+    request.message.books = undefined;
 
-    var book = {
+    const book = {
       'taker_gets': {
         'currency': 'EUR',
         'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
@@ -1088,14 +1112,14 @@ describe('Request', function() {
   });
 
   it('Add book -  no snapshot', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'server_info');
+    const request = new Request(remote, 'server_info');
 
-    request.message.books = void(0);
+    request.message.books = undefined;
 
-    var book = {
+    const book = {
       'taker_gets': {
         'currency': 'EUR',
         'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
@@ -1123,15 +1147,17 @@ describe('Request', function() {
   });
 
   it('Add stream', function() {
-    var remote = new Remote();
+    const remote = new Remote();
     remote._connected = true;
 
-    var request = new Request(remote, 'subscribe');
+    const request = new Request(remote, 'subscribe');
 
     request.addStream('server', 'ledger');
     request.addStream('transactions', 'transactions_proposed');
-    request.addStream('accounts', [ 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' ]);
-    request.addStream('accounts_proposed', [ 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59' ]);
+    request.addStream('accounts', ['rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B']);
+    request.addStream('accounts_proposed', [
+      'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59'
+    ]);
     request.addStream('books', [{
       'taker_gets': {
         'currency': 'EUR',
@@ -1145,7 +1171,7 @@ describe('Request', function() {
 
     assert.deepEqual(request.message, {
       'command': 'subscribe',
-      'id': void(0),
+      'id': undefined,
       'streams': [
         'server',
         'ledger',

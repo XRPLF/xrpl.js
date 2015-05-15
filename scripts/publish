@@ -17,15 +17,15 @@ echo "publish to npm"
 npm publish
 exit_on_error
 
-rm -rf dist
+rm -rf dist/bower
 echo ""
 echo "publish to bower"
 
-git clone git@github.com:ripple/bower-ripple.git dist
+git clone git@github.com:ripple/bower-ripple.git dist/bower
 gulp bower
 exit_on_error
 
-cd dist
+cd dist/bower
 version=$(cat bower.json | grep -Eo '([0-9]\.?)+(-rc[0-9])?')
 echo "version: $version"
 git add ripple.js ripple-debug.js ripple-min.js bower.json
