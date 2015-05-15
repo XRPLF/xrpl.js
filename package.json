@@ -51,7 +51,8 @@
   },
   "scripts": {
     "build": "gulp",
-    "compile": "babel --optional runtime -d dist/npm/ src/",
+    "compile": "babel -i runtime -d dist/npm/ src/",
+    "compile-with-source-maps": "babel -i runtime -s -t -d dist/npm/ src/",
     "prepublish": "npm run compile",
     "postinstall": "cd node_modules/sjcl; ./configure --with-all --compress=none; make",
     "test": "istanbul test _mocha",
