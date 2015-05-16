@@ -1,6 +1,7 @@
 'use strict';
 
 var util = require('util');
+var lodash = require('lodash');
 var EventEmitter = require('events').EventEmitter;
 var utils = require('./utils');
 var sjcl = require('./utils').sjcl;
@@ -143,7 +144,11 @@ Transaction.set_clear_flags = {
 Transaction.MEMO_TYPES = {
 };
 
-Transaction.ASCII_REGEX = /^[\x00-\x7F]*$/;
+/* eslint-disable max-len */
+
+// URL characters per RFC 3986
+Transaction.MEMO_REGEX = /^[0-9a-zA-Z-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+$/;
+/* eslint-enable max-len */
 
 Transaction.formats = require('./binformat').tx;
 
@@ -813,34 +818,22 @@ Transaction.prototype.setFlags = function(flags) {
 /**
  * Add a Memo to transaction.
  *
- * @param {String} memoType
- * - describes what the data represents, needs to be valid ASCII
- * * @param {String} memoFormat
- * - describes what format the data is in, MIME type, needs to be valid ASCII
- * @param {String} memoData
+ * @param [String] memoType
+ * - describes what the data represents, must contain valid URL characters
+ * @param [String] memoFormat
+ * - describes what format the data is in, MIME type, must contain valid URL
+ * - characters
+ * @param [String] memoData
  * - data for the memo, can be any JS object. Any object other than string will
  *   be stringified (JSON) for transport
  */
 
 Transaction.prototype.addMemo = function(memoType, memoFormat, memoData) {
-
   if (typeof memoType === 'object') {
     var opts = memoType;
     memoType = opts.memoType;
     memoFormat = opts.memoFormat;
     memoData = opts.memoData;
-  }
-
-  if (!/(undefined|string)/.test(typeof memoType)) {
-    throw new Error('MemoType must be a string');
-  } else if (!Transaction.ASCII_REGEX.test(memoType)) {
-    throw new Error('MemoType must be valid ASCII');
-  }
-
-  if (!/(undefined|string)/.test(typeof memoFormat)) {
-    throw new Error('MemoFormat must be a string');
-  } else if (!Transaction.ASCII_REGEX.test(memoFormat)) {
-    throw new Error('MemoFormat must be valid ASCII');
   }
 
   function convertStringToHex(string) {
@@ -849,8 +842,13 @@ Transaction.prototype.addMemo = function(memoType, memoFormat, memoData) {
   }
 
   var memo = {};
+  var memoRegex = Transaction.MEMO_REGEX;
 
   if (memoType) {
+    if (!(lodash.isString(memoType) && memoRegex.test(memoType))) {
+      throw new Error(
+        'MemoType must be a string containing only valid URL characters');
+    }
     if (Transaction.MEMO_TYPES[memoType]) {
       // XXX Maybe in the future we want a schema validator for
       // memo types
@@ -860,6 +858,11 @@ Transaction.prototype.addMemo = function(memoType, memoFormat, memoData) {
   }
 
   if (memoFormat) {
+    if (!(lodash.isString(memoFormat) && memoRegex.test(memoFormat))) {
+      throw new Error(
+        'MemoFormat must be a string containing only valid URL characters');
+    }
+
     memo.MemoFormat = convertStringToHex(memoFormat);
   }
 
@@ -1211,8 +1214,9 @@ Transaction.prototype.abort = function() {
  * @return {Object} transaction summary
  */
 
+Transaction.prototype.getSummary =
 Transaction.prototype.summary = function() {
-  var result = {
+  var txSummary = {
     tx_json: this.tx_json,
     clientID: this._clientID,
     submittedIDs: this.submittedIDs,
@@ -1221,21 +1225,24 @@ Transaction.prototype.summary = function() {
     initialSubmitIndex: this.initialSubmitIndex,
     lastLedgerSequence: this.lastLedgerSequence,
     state: this.state,
-    server: this._server ? this._server._opts.url : undefined,
     finalized: this.finalized
   };
 
   if (this.result) {
-    result.result = {
+    var transaction_hash = this.result.tx_json
+    ? this.result.tx_json.hash
+    : undefined;
+
+    txSummary.result = {
       engine_result: this.result.engine_result,
       engine_result_message: this.result.engine_result_message,
       ledger_hash: this.result.ledger_hash,
       ledger_index: this.result.ledger_index,
-      transaction_hash: this.result.tx_json.hash
+      transaction_hash: transaction_hash
     };
   }
 
-  return result;
+  return txSummary;
 };
 
 exports.Transaction = Transaction;

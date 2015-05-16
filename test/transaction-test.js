@@ -1,6 +1,9 @@
 /* eslint-disable max-len */
+
 'use strict';
+
 var assert = require('assert');
+var lodash = require('lodash');
 var Transaction = require('ripple-lib').Transaction;
 var TransactionQueue = require('ripple-lib').TransactionQueue;
 var Remote = require('ripple-lib').Remote;
@@ -36,6 +39,19 @@ var transactionResult = {
     hash: '61D60378AB70ACE630B20A81B50708A3DB5E7CEE35914292FF3761913DA61DEA'
   }
 };
+
+// https://github.com/ripple/rippled/blob/c61d0c663e410c3d3622f20092535710243b55af/src/ripple/protocol/impl/STTx.cpp#L342-L370
+var allowed_memo_chars = ('0123456789-._~:/?#[]@!$&\'()*+,;=%ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz').split('');
+
+// Disallowed ASCII characters
+var disallowed_memo_chars = [];
+
+for (var i = 0; i <= 127; i++) {
+  var char = String.fromCharCode(i);
+  if (!lodash.contains(allowed_memo_chars, char)) {
+    disallowed_memo_chars.push(char);
+  }
+}
 
 describe('Transaction', function() {
   before(function() {
@@ -1155,6 +1171,21 @@ describe('Transaction', function() {
     ];
 
     assert.deepEqual(transaction.tx_json.Memos, expected);
+
+    allowed_memo_chars.forEach(function(c) {
+      var hexStr = new Buffer(c).toString('hex').toUpperCase();
+      var tx = new Transaction();
+
+      tx.addMemo(c, c, c);
+
+      assert.deepEqual(tx.tx_json.Memos, [{
+        Memo: {
+          MemoType: hexStr,
+          MemoFormat: hexStr,
+          MemoData: hexStr
+        }
+      }]);
+    });
   });
 
   it('Add Memo - by object', function() {
@@ -1231,36 +1262,46 @@ describe('Transaction', function() {
     var transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
+    var error_regex = /^Error: MemoType must be a string containing only valid URL characters$/;
+
     assert.throws(function() {
       transaction.addMemo(1);
-    }, /^Error: MemoType must be a string$/);
-  });
-
-  it('Add Memo - invalid ASCII MemoType', function() {
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
-
+    }, error_regex);
     assert.throws(function() {
       transaction.addMemo('한국어');
-    }, /^Error: MemoType must be valid ASCII$/);
+    }, error_regex);
+    assert.throws(function() {
+      transaction.addMemo('my memo');
+    }, error_regex);
+
+    disallowed_memo_chars.forEach(function(c) {
+      assert.throws(function() {
+        transaction.addMemo(c);
+      }, error_regex);
+    });
   });
 
   it('Add Memo - invalid MemoFormat', function() {
     var transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
+    var error_regex = /^Error: MemoFormat must be a string containing only valid URL characters$/;
+
     assert.throws(function() {
       transaction.addMemo(undefined, 1);
-    }, /^Error: MemoFormat must be a string$/);
-  });
-
-  it('Add Memo - invalid ASCII MemoFormat', function() {
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
-
+    }, error_regex);
     assert.throws(function() {
       transaction.addMemo(undefined, 'России');
-    }, /^Error: MemoFormat must be valid ASCII$/);
+    }, error_regex);
+    assert.throws(function() {
+      transaction.addMemo(undefined, 'my memo');
+    }, error_regex);
+
+    disallowed_memo_chars.forEach(function(c) {
+      assert.throws(function() {
+        transaction.addMemo(undefined, c);
+      }, error_regex);
+    });
   });
 
   it('Add Memo - MemoData string', function() {

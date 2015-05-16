@@ -56,24 +56,24 @@
     "meta": {
       "AffectedNodes": [
         {
-          "ModifiedNode": {
-            "FinalFields": {
-              "Account": "rNP2Y5EZrVZdFKsow11NoKTE5FjXuBQd3d",
-              "Balance": "1000",
-              "Flags": 4849664,
-              "OwnerCount": 1,
-              "Sequence": 1
-            },
-            "LedgerEntryType": "AccountRoot",
-            "LedgerIndex": "A4B28FB972EF890DC39A8557DF8960D41DADA00D39B0F1EFCD4BBB85FCA13A30",
-            "PreviousFields": {
-              "Balance": "1000",
-              "Sequence": 3864
-            },
-            "PreviousTxnID": "F4910E55A39C42AB82071212D84119631DDE0B0F4F8F9040F252B0066898DBDF",
-            "PreviousTxnLgrSeq": 11693103
-          }
+        "ModifiedNode": {
+          "FinalFields": {
+            "Account": "rNP2Y5EZrVZdFKsow11NoKTE5FjXuBQd3d",
+            "Balance": "1000",
+            "Flags": 4849664,
+            "OwnerCount": 1,
+            "Sequence": 1
+          },
+          "LedgerEntryType": "AccountRoot",
+          "LedgerIndex": "A4B28FB972EF890DC39A8557DF8960D41DADA00D39B0F1EFCD4BBB85FCA13A30",
+          "PreviousFields": {
+            "Balance": "1000",
+            "Sequence": 3864
+          },
+          "PreviousTxnID": "F4910E55A39C42AB82071212D84119631DDE0B0F4F8F9040F252B0066898DBDF",
+          "PreviousTxnLgrSeq": 11693103
         }
+      }
       ],
       "TransactionIndex": 9,
       "TransactionResult": "tesSUCCESS"
@@ -101,24 +101,24 @@
       "TransactionIndex": 3,
       "AffectedNodes": [
         {
-          "ModifiedNode": {
-            "LedgerEntryType": "AccountRoot",
-            "PreviousTxnLgrSeq": 11693103,
-            "PreviousTxnID": "F4910E55A39C42AB82071212D84119631DDE0B0F4F8F9040F252B0066898DBDF",
-            "LedgerIndex": "A4B28FB972EF890DC39A8557DF8960D41DADA00D39B0F1EFCD4BBB85FCA13A30",
-            "PreviousFields": {
-              "Sequence": 3864,
-              "Balance": "1000"
-            },
-            "FinalFields": {
-              "Flags": 4849664,
-              "Sequence": 3865,
-              "OwnerCount": 1,
-              "Balance": "1000",
-              "Account": "rNP2Y5EZrVZdFKsow11NoKTE5FjXuBQd3d"
-            }
+        "ModifiedNode": {
+          "LedgerEntryType": "AccountRoot",
+          "PreviousTxnLgrSeq": 11693103,
+          "PreviousTxnID": "F4910E55A39C42AB82071212D84119631DDE0B0F4F8F9040F252B0066898DBDF",
+          "LedgerIndex": "A4B28FB972EF890DC39A8557DF8960D41DADA00D39B0F1EFCD4BBB85FCA13A30",
+          "PreviousFields": {
+            "Sequence": 3864,
+            "Balance": "1000"
+          },
+          "FinalFields": {
+            "Flags": 4849664,
+            "Sequence": 3865,
+            "OwnerCount": 1,
+            "Balance": "1000",
+            "Account": "rNP2Y5EZrVZdFKsow11NoKTE5FjXuBQd3d"
           }
         }
+      }
       ],
       "TransactionResult": "tesSUCCESS"
     },
@@ -289,6 +289,18 @@
       }
     },
     "status": "success",
+    "type": "response"
+  },
+  "SUBMIT_REMOTE_ERROR": {
+    "error": "invalidTransaction",
+    "error_exception": "fails local checks: The MemoType and MemoFormat fields may only contain characters that are allowed in URLs under RFC 3986.",
+    "id": 1,
+    "request": {
+      "command": "submit",
+      "id": 1,
+      "tx_blob": "12000022800000002400000001201B00CCEAD0614000000000000001684000000000002EE0732102999FB4BC17144F83CDC2F17EA642519FF115EE7B0CC8C78DE9061F1A473F7BAC7447304502210098DC7E9ED1CE860FB6B0904E6E8140D5463D288BA633F36E69A68ACB3D6FCA06022014E76E22F5173B37239F9F56F904839B462F5019169C56A324D3F074FBA39A2A811492DECA2DC92352BE97C1F6347F7E6CCB9A8241C883143108B9AC27BF036EFE5CBE787921F54D622B7A5BF9EA7C0B6D79206D656D6F747970657E0C6D79206D656D6F5F64617461E1F1"
+    },
+    "status": "error",
     "type": "response"
   }
 }

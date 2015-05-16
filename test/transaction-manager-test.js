@@ -1,3 +1,6 @@
+/* eslint-disable max-len */
+/* eslint-disable comma-spacing */
+
 'use strict';
 
 var ws = require('ws');
@@ -34,6 +37,8 @@ var SUBMIT_TEF_RESPONSE = require('./fixtures/transactionmanager')
 .SUBMIT_TEF_RESPONSE;
 var SUBMIT_TEL_RESPONSE = require('./fixtures/transactionmanager')
 .SUBMIT_TEL_RESPONSE;
+var SUBMIT_REMOTE_ERROR = require('./fixtures/transactionmanager')
+.SUBMIT_REMOTE_ERROR;
 
 describe('TransactionManager', function() {
   var rippled;
@@ -491,7 +496,7 @@ describe('TransactionManager', function() {
       assert(false, 'Should not receive proposed event');
     });
     transaction.once('submitted', function(m) {
-      assert.strictEqual(m.engine_result, 'terNO_ACCOUNT');
+      assert.strictEqual(m.engine_result, SUBMIT_TER_RESPONSE.result.engine_result);
       receivedSubmitted = true;
     });
 
@@ -523,6 +528,22 @@ describe('TransactionManager', function() {
       assert.strictEqual(err.engine_result, 'tejMaxLedger');
       assert(receivedSubmitted);
       assert.strictEqual(transactionManager.getPending().length(), 0);
+      assert.strictEqual(transactionManager.getPending().length(), 0);
+
+      var summary = transaction.summary();
+      assert.strictEqual(summary.submissionAttempts, 1);
+      assert.strictEqual(summary.submitIndex, 2);
+      assert.strictEqual(summary.initialSubmitIndex, 2);
+      assert.strictEqual(summary.lastLedgerSequence, 5);
+      assert.strictEqual(summary.state, 'failed');
+      assert.strictEqual(summary.finalized, true);
+      assert.deepEqual(summary.result, {
+        engine_result: SUBMIT_TER_RESPONSE.result.engine_result,
+        engine_result_message: SUBMIT_TER_RESPONSE.result.engine_result_message,
+        ledger_hash: undefined,
+        ledger_index: undefined,
+        transaction_hash: SUBMIT_TER_RESPONSE.result.tx_json.hash
+      });
       transactionManager.once('sequence_filled', done);
     });
   });
@@ -569,6 +590,21 @@ describe('TransactionManager', function() {
       assert(receivedResubmitted);
       assert.strictEqual(err.engine_result, 'tejMaxLedger');
       assert.strictEqual(transactionManager.getPending().length(), 0);
+
+      var summary = transaction.summary();
+      assert.strictEqual(summary.submissionAttempts, 2);
+      assert.strictEqual(summary.submitIndex, 3);
+      assert.strictEqual(summary.initialSubmitIndex, 2);
+      assert.strictEqual(summary.lastLedgerSequence, 5);
+      assert.strictEqual(summary.state, 'failed');
+      assert.strictEqual(summary.finalized, true);
+      assert.deepEqual(summary.result, {
+        engine_result: SUBMIT_TEF_RESPONSE.result.engine_result,
+        engine_result_message: SUBMIT_TEF_RESPONSE.result.engine_result_message,
+        ledger_hash: undefined,
+        ledger_index: undefined,
+        transaction_hash: SUBMIT_TEF_RESPONSE.result.tx_json.hash
+      });
       done();
     });
   });
@@ -612,6 +648,21 @@ describe('TransactionManager', function() {
       assert(receivedResubmitted);
       assert.strictEqual(err.engine_result, 'tejMaxLedger');
       assert.strictEqual(transactionManager.getPending().length(), 0);
+
+      var summary = transaction.summary();
+      assert.strictEqual(summary.submissionAttempts, 2);
+      assert.strictEqual(summary.submitIndex, 3);
+      assert.strictEqual(summary.initialSubmitIndex, 2);
+      assert.strictEqual(summary.lastLedgerSequence, 5);
+      assert.strictEqual(summary.state, 'failed');
+      assert.strictEqual(summary.finalized, true);
+      assert.deepEqual(summary.result, {
+        engine_result: SUBMIT_TEL_RESPONSE.result.engine_result,
+        engine_result_message: SUBMIT_TEL_RESPONSE.result.engine_result_message,
+        ledger_hash: undefined,
+        ledger_index: undefined,
+        transaction_hash: SUBMIT_TEL_RESPONSE.result.tx_json.hash
+      });
       done();
     });
   });
@@ -630,6 +681,89 @@ describe('TransactionManager', function() {
     transaction.submit(function(err) {
       assert.strictEqual(err.engine_result, 'tejSecretInvalid');
       assert.strictEqual(transactionManager.getPending().length(), 0);
+
+      var summary = transaction.summary();
+      assert.deepEqual(summary.tx_json, transaction.tx_json);
+      assert.strictEqual(summary.submissionAttempts, 0);
+      assert.strictEqual(summary.submitIndex, undefined);
+      assert.strictEqual(summary.initialSubmitIndex, undefined);
+      assert.strictEqual(summary.lastLedgerSequence, undefined);
+      assert.strictEqual(summary.state, 'failed');
+      assert.strictEqual(summary.finalized, true);
+      assert.deepEqual(summary.result, {
+        engine_result: 'tejSecretInvalid',
+        engine_result_message: 'Invalid secret',
+        ledger_hash: undefined,
+        ledger_index: undefined,
+        transaction_hash: undefined
+      });
+      done();
+    });
+  });
+
+  it('Submit transaction -- remote error', function(done) {
+    var transaction = remote.createTransaction('Payment', {
+      account: ACCOUNT.address,
+      destination: ACCOUNT2.address,
+      amount: '1'
+    });
+
+    // MemoType must contain only valid URL characters (RFC 3986). This
+    // transaction is invalid
+    //transaction.addMemo('my memotype','my_memo_data');
+    transaction.tx_json.Memos = [{
+      Memo: {
+        MemoType: '6D79206D656D6F74797065',
+        MemoData: '6D795F6D656D6F5F64617461'
+      }
+    }];
+
+    var receivedSubmitted = false;
+    transaction.once('proposed', function() {
+      assert(false, 'Should not receive proposed event');
+    });
+    transaction.once('submitted', function(m) {
+      assert.strictEqual(m.error, 'remoteError');
+      receivedSubmitted = true;
+    });
+
+    rippled.on('request_submit', function(m, req) {
+      assert.strictEqual(transactionManager.getPending().length(), 1);
+      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
+        transaction.tx_json).to_hex());
+
+        /* eslint-disable max-len */
+
+        // rippled returns an exception here rather than an engine result
+        // https://github.com/ripple/rippled/blob/c61d0c663e410c3d3622f20092535710243b55af/src/ripple/rpc/handlers/Submit.cpp#L66-L75
+
+        /* eslint-enable max-len */
+
+        req.sendResponse(SUBMIT_REMOTE_ERROR, {id: m.id});
+    });
+
+    transaction.submit(function(err) {
+      assert(err, 'Transaction submission should not succeed');
+      assert(receivedSubmitted);
+      assert.strictEqual(err.error, 'remoteError');
+      assert.strictEqual(err.remote.error, 'invalidTransaction');
+      assert.strictEqual(transactionManager.getPending().length(), 0);
+
+      var summary = transaction.summary();
+      assert.deepEqual(summary.tx_json, transaction.tx_json);
+      assert.strictEqual(summary.submissionAttempts, 1);
+      assert.strictEqual(summary.submitIndex, 2);
+      assert.strictEqual(summary.initialSubmitIndex, 2);
+      assert.strictEqual(summary.lastLedgerSequence, 5);
+      assert.strictEqual(summary.state, 'failed');
+      assert.strictEqual(summary.finalized, true);
+      assert.deepEqual(summary.result, {
+        engine_result: undefined,
+        engine_result_message: undefined,
+        ledger_hash: undefined,
+        ledger_index: undefined,
+        transaction_hash: undefined
+      });
       done();
     });
   });
