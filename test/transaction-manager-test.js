@@ -1,51 +1,50 @@
 /* eslint-disable max-len */
-/* eslint-disable comma-spacing */
 
 'use strict';
 
-var ws = require('ws');
-var lodash = require('lodash');
-var assert = require('assert-diff');
-var sjcl = require('ripple-lib').sjcl;
-var Remote = require('ripple-lib').Remote;
-var SerializedObject = require('ripple-lib').SerializedObject;
-var Transaction = require('ripple-lib').Transaction;
-var TransactionManager = require('ripple-lib')._test.TransactionManager;
+const ws = require('ws');
+const lodash = require('lodash');
+const assert = require('assert-diff');
+const sjcl = require('ripple-lib').sjcl;
+const Remote = require('ripple-lib').Remote;
+const SerializedObject = require('ripple-lib').SerializedObject;
+const Transaction = require('ripple-lib').Transaction;
+const TransactionManager = require('ripple-lib')._test.TransactionManager;
 
-var LEDGER = require('./fixtures/transactionmanager').LEDGER;
-var ACCOUNT = require('./fixtures/transactionmanager').ACCOUNT;
-var ACCOUNT2 = require('./fixtures/transactionmanager').ACCOUNT2;
-var SUBSCRIBE_RESPONSE = require('./fixtures/transactionmanager')
+const LEDGER = require('./fixtures/transactionmanager').LEDGER;
+const ACCOUNT = require('./fixtures/transactionmanager').ACCOUNT;
+const ACCOUNT2 = require('./fixtures/transactionmanager').ACCOUNT2;
+const SUBSCRIBE_RESPONSE = require('./fixtures/transactionmanager')
 .SUBSCRIBE_RESPONSE;
-var ACCOUNT_INFO_RESPONSE = require('./fixtures/transactionmanager')
+const ACCOUNT_INFO_RESPONSE = require('./fixtures/transactionmanager')
 .ACCOUNT_INFO_RESPONSE;
-var TX_STREAM_TRANSACTION = require('./fixtures/transactionmanager')
+const TX_STREAM_TRANSACTION = require('./fixtures/transactionmanager')
 .TX_STREAM_TRANSACTION;
-var ACCOUNT_TX_TRANSACTION = require('./fixtures/transactionmanager')
+const ACCOUNT_TX_TRANSACTION = require('./fixtures/transactionmanager')
 .ACCOUNT_TX_TRANSACTION;
-var ACCOUNT_TX_RESPONSE = require('./fixtures/transactionmanager')
+const ACCOUNT_TX_RESPONSE = require('./fixtures/transactionmanager')
 .ACCOUNT_TX_RESPONSE;
-var ACCOUNT_TX_ERROR = require('./fixtures/transactionmanager')
+const ACCOUNT_TX_ERROR = require('./fixtures/transactionmanager')
 .ACCOUNT_TX_ERROR;
-var SUBMIT_RESPONSE = require('./fixtures/transactionmanager')
+const SUBMIT_RESPONSE = require('./fixtures/transactionmanager')
 .SUBMIT_RESPONSE;
-var SUBMIT_TEC_RESPONSE = require('./fixtures/transactionmanager')
+const SUBMIT_TEC_RESPONSE = require('./fixtures/transactionmanager')
 .SUBMIT_TEC_RESPONSE;
-var SUBMIT_TER_RESPONSE = require('./fixtures/transactionmanager')
+const SUBMIT_TER_RESPONSE = require('./fixtures/transactionmanager')
 .SUBMIT_TER_RESPONSE;
-var SUBMIT_TEF_RESPONSE = require('./fixtures/transactionmanager')
+const SUBMIT_TEF_RESPONSE = require('./fixtures/transactionmanager')
 .SUBMIT_TEF_RESPONSE;
-var SUBMIT_TEL_RESPONSE = require('./fixtures/transactionmanager')
+const SUBMIT_TEL_RESPONSE = require('./fixtures/transactionmanager')
 .SUBMIT_TEL_RESPONSE;
-var SUBMIT_REMOTE_ERROR = require('./fixtures/transactionmanager')
+const SUBMIT_REMOTE_ERROR = require('./fixtures/transactionmanager')
 .SUBMIT_REMOTE_ERROR;
 
 describe('TransactionManager', function() {
-  var rippled;
-  var rippledConnection;
-  var remote;
-  var account;
-  var transactionManager;
+  let rippled;
+  let rippledConnection;
+  let remote;
+  let account;
+  let transactionManager;
 
   before(function() {
     sjcl.random.addEntropy(
@@ -56,7 +55,7 @@ describe('TransactionManager', function() {
     rippled = new ws.Server({port: 5763});
 
     rippled.on('connection', function(c) {
-      var ledger = lodash.extend({}, LEDGER);
+      const ledger = lodash.extend({}, LEDGER);
       c.sendJSON = function(v) {
         try {
           c.send(JSON.stringify(v));
@@ -75,8 +74,8 @@ describe('TransactionManager', function() {
         }));
       };
       c.on('message', function(m) {
-        m = JSON.parse(m);
-        rippled.emit('request_' + m.command, m, c);
+        const parsed = JSON.parse(m);
+        rippled.emit('request_' + parsed.command, parsed, c);
       });
       rippledConnection = c;
     });
@@ -110,8 +109,8 @@ describe('TransactionManager', function() {
   });
 
   it('Normalize transaction', function() {
-    var t1 = TransactionManager.normalizeTransaction(TX_STREAM_TRANSACTION);
-    var t2 = TransactionManager.normalizeTransaction(ACCOUNT_TX_TRANSACTION);
+    const t1 = TransactionManager.normalizeTransaction(TX_STREAM_TRANSACTION);
+    const t2 = TransactionManager.normalizeTransaction(ACCOUNT_TX_TRANSACTION);
 
     [t1, t2].forEach(function(t) {
       assert(t.hasOwnProperty('metadata'));
@@ -126,7 +125,7 @@ describe('TransactionManager', function() {
   });
 
   it('Handle received transaction', function(done) {
-    var transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
+    const transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
 
     transaction.once('success', function() {
       done();
@@ -137,7 +136,7 @@ describe('TransactionManager', function() {
     rippledConnection.sendJSON(TX_STREAM_TRANSACTION);
   });
   it('Handle received transaction -- failed', function(done) {
-    var transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
+    const transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
 
     transaction.once('error', function(err) {
       assert.strictEqual(err.engine_result, 'tecINSUFF_FEE_P');
@@ -160,7 +159,7 @@ describe('TransactionManager', function() {
     });
   });
   it('Handle received transaction -- Account mismatch', function(done) {
-    var tx = lodash.extend({ }, TX_STREAM_TRANSACTION);
+    const tx = lodash.extend({ }, TX_STREAM_TRANSACTION);
     lodash.extend(tx.transaction, {
       Account: 'rMP2Y5EZrVZdFKsow11NoKTE5FjXuBQd3d'
     });
@@ -173,7 +172,7 @@ describe('TransactionManager', function() {
     });
   });
   it('Handle received transaction -- not validated', function(done) {
-    var tx = lodash.extend({ }, TX_STREAM_TRANSACTION, {
+    const tx = lodash.extend({ }, TX_STREAM_TRANSACTION, {
       validated: false
     });
     rippledConnection.sendJSON(tx);
@@ -185,7 +184,7 @@ describe('TransactionManager', function() {
     });
   });
   it('Handle received transaction -- from account_tx', function(done) {
-    var transaction = Transaction.from_json(ACCOUNT_TX_TRANSACTION.tx);
+    const transaction = Transaction.from_json(ACCOUNT_TX_TRANSACTION.tx);
     transaction.once('success', function() {
       done();
     });
@@ -196,7 +195,7 @@ describe('TransactionManager', function() {
   });
 
   it('Adjust pending transaction fee', function(done) {
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
     transaction.tx_json = ACCOUNT_TX_TRANSACTION.tx;
 
     transaction.once('fee_adjusted', function(a, b) {
@@ -219,7 +218,7 @@ describe('TransactionManager', function() {
   it('Adjust pending transaction fee -- max fee exceeded', function(done) {
     transactionManager._maxFee = 10;
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
     transaction.tx_json = ACCOUNT_TX_TRANSACTION.tx;
 
     transaction.once('fee_adjusted', function() {
@@ -241,7 +240,7 @@ describe('TransactionManager', function() {
   it('Adjust pending transaction fee -- no local fee', function(done) {
     remote.local_fee = false;
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
     transaction.tx_json = ACCOUNT_TX_TRANSACTION.tx;
 
     transaction.once('fee_adjusted', function() {
@@ -263,7 +262,7 @@ describe('TransactionManager', function() {
   it('Wait ledgers', function(done) {
     transactionManager._waitLedgers(3, done);
 
-    for (var i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 3; i++) {
       rippledConnection.closeLedger();
     }
   });
@@ -273,12 +272,12 @@ describe('TransactionManager', function() {
   });
 
   it('Update pending status', function(done) {
-    var transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
+    const transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
     transaction.submitIndex = 1;
     transaction.tx_json.LastLedgerSequence = 10;
 
-    var receivedMissing = false;
-    var receivedLost = false;
+    let receivedMissing = false;
+    let receivedLost = false;
 
     transaction.once('missing', function() {
       receivedMissing = true;
@@ -296,20 +295,20 @@ describe('TransactionManager', function() {
     transaction.addId(TX_STREAM_TRANSACTION.transaction.hash);
     transactionManager.getPending().push(transaction);
 
-    for (var i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 10; i++) {
       rippledConnection.closeLedger();
     }
   });
 
   it('Update pending status -- finalized before max ledger exceeded',
     function(done) {
-    var transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
+    const transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
     transaction.submitIndex = 1;
     transaction.tx_json.LastLedgerSequence = 10;
     transaction.finalized = true;
 
-    var receivedMissing = false;
-    var receivedLost = false;
+    let receivedMissing = false;
+    let receivedLost = false;
 
     transaction.once('missing', function() {
       receivedMissing = true;
@@ -324,7 +323,7 @@ describe('TransactionManager', function() {
     transaction.addId(TX_STREAM_TRANSACTION.transaction.hash);
     transactionManager.getPending().push(transaction);
 
-    for (var i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 10; i++) {
       rippledConnection.closeLedger();
     }
 
@@ -336,15 +335,15 @@ describe('TransactionManager', function() {
   });
 
   it('Handle reconnect', function(done) {
-    var transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
+    const transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
 
-    var binaryTx = lodash.extend({}, ACCOUNT_TX_TRANSACTION, {
+    const binaryTx = lodash.extend({}, ACCOUNT_TX_TRANSACTION, {
       ledger_index: ACCOUNT_TX_TRANSACTION.tx.ledger_index,
       tx_blob: SerializedObject.from_json(ACCOUNT_TX_TRANSACTION.tx).to_hex(),
       meta: SerializedObject.from_json(ACCOUNT_TX_TRANSACTION.meta).to_hex()
     });
 
-    var hash = new SerializedObject(binaryTx.tx_blob).hash(0x54584E00).to_hex();
+    const hash = new SerializedObject(binaryTx.tx_blob).hash(0x54584E00).to_hex();
 
     transaction.addId(hash);
 
@@ -356,7 +355,7 @@ describe('TransactionManager', function() {
     transactionManager.getPending().push(transaction);
 
     rippled.once('request_account_tx', function(m, req) {
-      var response = lodash.extend({}, ACCOUNT_TX_RESPONSE);
+      const response = lodash.extend({}, ACCOUNT_TX_RESPONSE);
       response.result.transactions = [binaryTx];
       req.sendResponse(response, {id: m.id});
     });
@@ -365,9 +364,9 @@ describe('TransactionManager', function() {
   });
 
   it('Handle reconnect -- no matching transaction found', function(done) {
-    var transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
+    const transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
 
-    var binaryTx = lodash.extend({}, ACCOUNT_TX_TRANSACTION, {
+    const binaryTx = lodash.extend({}, ACCOUNT_TX_TRANSACTION, {
       ledger_index: ACCOUNT_TX_TRANSACTION.tx.ledger_index,
       tx_blob: SerializedObject.from_json(ACCOUNT_TX_TRANSACTION.tx).to_hex(),
       meta: SerializedObject.from_json(ACCOUNT_TX_TRANSACTION.meta).to_hex()
@@ -381,7 +380,7 @@ describe('TransactionManager', function() {
     transactionManager.getPending().push(transaction);
 
     rippled.once('request_account_tx', function(m, req) {
-      var response = lodash.extend({}, ACCOUNT_TX_RESPONSE);
+      const response = lodash.extend({}, ACCOUNT_TX_RESPONSE);
       response.result.transactions = [binaryTx];
       req.sendResponse(response, {id: m.id});
     });
@@ -390,7 +389,7 @@ describe('TransactionManager', function() {
   });
 
   it('Handle reconnect -- account_tx error', function(done) {
-    var transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
+    const transaction = Transaction.from_json(TX_STREAM_TRANSACTION.transaction);
     transactionManager.getPending().push(transaction);
 
     transactionManager._resubmit = function() {
@@ -406,12 +405,12 @@ describe('TransactionManager', function() {
   });
 
   it('Submit transaction', function(done) {
-    var transaction = remote.createTransaction('AccountSet', {
+    const transaction = remote.createTransaction('AccountSet', {
       account: ACCOUNT.address
     });
 
-    var receivedInitialSuccess = false;
-    var receivedProposed = false;
+    let receivedInitialSuccess = false;
+    let receivedProposed = false;
     transaction.once('proposed', function(m) {
       assert.strictEqual(m.engine_result, 'tesSUCCESS');
       receivedProposed = true;
@@ -427,7 +426,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_RESPONSE, {id: m.id});
       setImmediate(function() {
-        var txEvent = lodash.extend({}, TX_STREAM_TRANSACTION);
+        let txEvent = lodash.extend({}, TX_STREAM_TRANSACTION);
         txEvent.transaction = transaction.tx_json;
         txEvent.transaction.hash = transaction.hash();
         rippledConnection.sendJSON(txEvent);
@@ -445,12 +444,12 @@ describe('TransactionManager', function() {
   });
 
   it('Submit transaction -- tec error', function(done) {
-    var transaction = remote.createTransaction('AccountSet', {
+    const transaction = remote.createTransaction('AccountSet', {
       account: ACCOUNT.address,
       set_flag: 'asfDisableMaster'
     });
 
-    var receivedSubmitted = false;
+    let receivedSubmitted = false;
     transaction.once('proposed', function() {
       assert(false, 'Should not receive proposed event');
     });
@@ -465,7 +464,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_TEC_RESPONSE, {id: m.id});
       setImmediate(function() {
-        var txEvent = lodash.extend({}, TX_STREAM_TRANSACTION,
+        const txEvent = lodash.extend({}, TX_STREAM_TRANSACTION,
           SUBMIT_TEC_RESPONSE.result);
         txEvent.transaction = transaction.tx_json;
         txEvent.transaction.hash = transaction.hash();
@@ -483,7 +482,7 @@ describe('TransactionManager', function() {
   });
 
   it('Submit transaction -- ter error', function(done) {
-    var transaction = remote.createTransaction('Payment', {
+    const transaction = remote.createTransaction('Payment', {
       account: ACCOUNT.address,
       destination: ACCOUNT2.address,
       amount: '1'
@@ -491,7 +490,7 @@ describe('TransactionManager', function() {
     transaction.tx_json.Sequence = ACCOUNT_INFO_RESPONSE.result
     .account_data.Sequence + 1;
 
-    var receivedSubmitted = false;
+    let receivedSubmitted = false;
     transaction.once('proposed', function() {
       assert(false, 'Should not receive proposed event');
     });
@@ -501,7 +500,7 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      var deserialized = new SerializedObject(m.tx_blob).to_json();
+      const deserialized = new SerializedObject(m.tx_blob).to_json();
 
       switch (deserialized.TransactionType) {
         case 'Payment':
@@ -530,7 +529,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(transactionManager.getPending().length(), 0);
       assert.strictEqual(transactionManager.getPending().length(), 0);
 
-      var summary = transaction.summary();
+      const summary = transaction.summary();
       assert.strictEqual(summary.submissionAttempts, 1);
       assert.strictEqual(summary.submitIndex, 2);
       assert.strictEqual(summary.initialSubmitIndex, 2);
@@ -549,15 +548,15 @@ describe('TransactionManager', function() {
   });
 
   it('Submit transaction -- tef error', function(done) {
-    var transaction = remote.createTransaction('AccountSet', {
+    const transaction = remote.createTransaction('AccountSet', {
       account: ACCOUNT.address
     });
 
     transaction.tx_json.Sequence = ACCOUNT_INFO_RESPONSE.result
     .account_data.Sequence - 1;
 
-    var receivedSubmitted = false;
-    var receivedResubmitted = false;
+    let receivedSubmitted = false;
+    let receivedResubmitted = false;
     transaction.once('proposed', function() {
       assert(false, 'Should not receive proposed event');
     });
@@ -591,7 +590,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(err.engine_result, 'tejMaxLedger');
       assert.strictEqual(transactionManager.getPending().length(), 0);
 
-      var summary = transaction.summary();
+      const summary = transaction.summary();
       assert.strictEqual(summary.submissionAttempts, 2);
       assert.strictEqual(summary.submitIndex, 3);
       assert.strictEqual(summary.initialSubmitIndex, 2);
@@ -610,12 +609,12 @@ describe('TransactionManager', function() {
   });
 
   it('Submit transaction -- tel error', function(done) {
-    var transaction = remote.createTransaction('AccountSet', {
+    const transaction = remote.createTransaction('AccountSet', {
       account: ACCOUNT.address
     });
 
-    var receivedSubmitted = false;
-    var receivedResubmitted = false;
+    let receivedSubmitted = false;
+    let receivedResubmitted = false;
     transaction.once('proposed', function() {
       assert(false, 'Should not receive proposed event');
     });
@@ -649,7 +648,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(err.engine_result, 'tejMaxLedger');
       assert.strictEqual(transactionManager.getPending().length(), 0);
 
-      var summary = transaction.summary();
+      const summary = transaction.summary();
       assert.strictEqual(summary.submissionAttempts, 2);
       assert.strictEqual(summary.submitIndex, 3);
       assert.strictEqual(summary.initialSubmitIndex, 2);
@@ -670,7 +669,7 @@ describe('TransactionManager', function() {
   it('Submit transaction -- invalid secret', function(done) {
     remote.setSecret(ACCOUNT.address, ACCOUNT.secret + 'z');
 
-    var transaction = remote.createTransaction('AccountSet', {
+    const transaction = remote.createTransaction('AccountSet', {
       account: ACCOUNT.address
     });
 
@@ -682,7 +681,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(err.engine_result, 'tejSecretInvalid');
       assert.strictEqual(transactionManager.getPending().length(), 0);
 
-      var summary = transaction.summary();
+      const summary = transaction.summary();
       assert.deepEqual(summary.tx_json, transaction.tx_json);
       assert.strictEqual(summary.submissionAttempts, 0);
       assert.strictEqual(summary.submitIndex, undefined);
@@ -702,7 +701,7 @@ describe('TransactionManager', function() {
   });
 
   it('Submit transaction -- remote error', function(done) {
-    var transaction = remote.createTransaction('Payment', {
+    const transaction = remote.createTransaction('Payment', {
       account: ACCOUNT.address,
       destination: ACCOUNT2.address,
       amount: '1'
@@ -710,7 +709,7 @@ describe('TransactionManager', function() {
 
     // MemoType must contain only valid URL characters (RFC 3986). This
     // transaction is invalid
-    //transaction.addMemo('my memotype','my_memo_data');
+    // transaction.addMemo('my memotype','my_memo_data');
     transaction.tx_json.Memos = [{
       Memo: {
         MemoType: '6D79206D656D6F74797065',
@@ -718,7 +717,7 @@ describe('TransactionManager', function() {
       }
     }];
 
-    var receivedSubmitted = false;
+    let receivedSubmitted = false;
     transaction.once('proposed', function() {
       assert(false, 'Should not receive proposed event');
     });
@@ -732,14 +731,14 @@ describe('TransactionManager', function() {
       assert.strictEqual(m.tx_blob, SerializedObject.from_json(
         transaction.tx_json).to_hex());
 
-        /* eslint-disable max-len */
+      /* eslint-disable max-len */
 
-        // rippled returns an exception here rather than an engine result
-        // https://github.com/ripple/rippled/blob/c61d0c663e410c3d3622f20092535710243b55af/src/ripple/rpc/handlers/Submit.cpp#L66-L75
+      // rippled returns an exception here rather than an engine result
+      // https://github.com/ripple/rippled/blob/c61d0c663e410c3d3622f20092535710243b55af/src/ripple/rpc/handlers/Submit.cpp#L66-L75
 
-        /* eslint-enable max-len */
+      /* eslint-enable max-len */
 
-        req.sendResponse(SUBMIT_REMOTE_ERROR, {id: m.id});
+      req.sendResponse(SUBMIT_REMOTE_ERROR, {id: m.id});
     });
 
     transaction.submit(function(err) {
@@ -749,7 +748,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(err.remote.error, 'invalidTransaction');
       assert.strictEqual(transactionManager.getPending().length(), 0);
 
-      var summary = transaction.summary();
+      const summary = transaction.summary();
       assert.deepEqual(summary.tx_json, transaction.tx_json);
       assert.strictEqual(summary.submissionAttempts, 1);
       assert.strictEqual(summary.submitIndex, 2);
