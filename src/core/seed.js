@@ -13,8 +13,6 @@ const sjcl = utils.sjcl;
 const Base = require('./base').Base;
 const UInt = require('./uint').UInt;
 
-const Sha512 = utils.Sha512;
-
 const Seed = extend(function() {
   this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;

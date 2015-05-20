@@ -1,22 +1,24 @@
 'use strict';
 
+/* eslint new-cap: [2, {newIsCapExceptions: ["secretKey", "publicKey"]}] */
+
 /* -------------------------------- REQUIRES -------------------------------- */
 
-var util = require('util');
-var nacl = require('tweetnacl');
-var lodash = require('lodash');
+const util = require('util');
+const nacl = require('tweetnacl');
+const lodash = require('lodash');
 
-var utils = require('./utils');
-var Base = require('./base').Base;
-var Seed = require('./seed').Seed;
-var UInt160 = require('./uint160').UInt160;
+const utils = require('./utils');
+const Base = require('./base').Base;
+const Seed = require('./seed').Seed;
+const UInt160 = require('./uint160').UInt160;
 
-var arrayToHex = utils.arrayToHex;
-var sjcl = utils.sjcl;
+const arrayToHex = utils.arrayToHex;
+const sjcl = utils.sjcl;
 
 /* ---------------------------------- ENUMS --------------------------------- */
 
-var KeyType = exports.KeyType = {
+const KeyType = exports.KeyType = {
   secp256k1: 'secp256k1',
   ed25519: 'ed25519'
 };
@@ -28,7 +30,7 @@ function isVirtual() {
 }
 
 function hasCachedProperty(obj, name, computer) {
-  var key = name + '__';
+  const key = name + '__';
   obj.prototype[name] = function() {
     return this[key] !== undefined ? this[key] :
            this[key] = computer.call(this);
@@ -38,7 +40,7 @@ function hasCachedProperty(obj, name, computer) {
 /* --------------------------------- HELPERS -------------------------------- */
 
 function toGenericArray(typedArray) {
-  var generic = [];
+  const generic = [];
   Array.prototype.push.apply(generic, typedArray);
   return generic;
 }
@@ -61,7 +63,7 @@ what format the seed is in.
 @param {String} [opts.generic] -
  */
 function parseSeed(opts) {
-  var seed = new Seed();
+  const seed = new Seed();
 
   if (opts.passphrase) {
     seed.parse_passphrase(opts.passphrase);
@@ -83,19 +85,19 @@ function parseSeed(opts) {
 @param {Seed} seed
  */
 function deriveEdKeyPairSeed(seed) {
-  var hashed = sjcl.hash.sha512.hash(seed.to_bits());
-  var bits = sjcl.bitArray.bitSlice(hashed, 0, 256);
+  const hashed = sjcl.hash.sha512.hash(seed.to_bits());
+  const bits = sjcl.bitArray.bitSlice(hashed, 0, 256);
   return new Uint8Array(sjcl.codec.bytes.fromBits(bits));
 }
 
 function findk256Key(bytes, discrim) {
-  var curve = sjcl.ecc.curves.k256;
-  var key;
+  const curve = sjcl.ecc.curves.k256;
+  let key;
 
-  for (var i = 0; i <= 0xFFFFFFFF; i++) {
+  for (let i = 0; i <= 0xFFFFFFFF; i++) {
     // We hash the bytes to find a 256 bit number, looping until we are sure
     // it is less than the order of the curve.
-    var hasher = new utils.Sha512().addBytes(bytes);
+    const hasher = new utils.Sha512().addBytes(bytes);
     // If the optional discriminator index was passed in, update the hash.
     if (discrim !== undefined) {
       hasher.addU32(discrim);
@@ -153,24 +155,24 @@ function derivek256Secret(seed, options) {
     throw new Error('Cannot generate keys from invalid seed!');
   }
 
-  var curve = sjcl.ecc.curves.k256;
-  var opts = options || {};
-  var root = opts.root;
+  const curve = sjcl.ecc.curves.k256;
+  const opts = options || {};
+  const root = opts.root;
 
   // This private generator represents the `root` private key, and is what's
   // used by validators for signing when a keypair is generated from a seed.
-  var privateGen = findk256Key(seed.to_bytes());
-  var secret;
+  const privateGen = findk256Key(seed.to_bytes());
+  let secret;
 
   if (root) {
     // As used by validation_create
     secret = privateGen;
   } else {
-    var publicGen = curve.G.mult(privateGen);
+    const publicGen = curve.G.mult(privateGen);
 
     // A seed can generate many keypairs as a function of the seed and a uint32.
     // Almost everyone just uses the first account, `0`.
-    var accountIndex = opts.accountIndex || 0;
+    const accountIndex = opts.accountIndex || 0;
     secret = findk256Key(publicGen.toBytesCompressed(), accountIndex)
                              .add(privateGen).mod(curve.r);
   }
@@ -178,32 +180,31 @@ function derivek256Secret(seed, options) {
   // The public key is lazily computed by the key class, but it has the same
   // mathematical relationship to `secret` as `publicGen` to `privateGen`. The
   // `secret` will be available as the `_exponent` property on the secretKey.
-  var SjclSecretKey = sjcl.ecc.ecdsa.secretKey;
-  return new SjclSecretKey(curve, secret);
+  return new sjcl.ecc.ecdsa.secretKey(curve, secret);
 }
 
 function bytesBnTo256Bits(bytes) {
-  var bits = sjcl.codec.bytes.toBits(bytes);
-  var bitLength = 256;
+  const bits = sjcl.codec.bytes.toBits(bytes);
+  const bitLength = 256;
   return sjcl.bn.fromBits(bits).toBits(bitLength);
 }
 
 function extractRSFromDER(signature) {
-  var rPos = 4;
-  var rLen = signature[3];
-  var sPos = rLen + 6;
-  var sLen = signature[rLen + 5];
-  var r = signature.slice(rPos, rPos + rLen);
-  var s = signature.slice(sPos, sPos + sLen);
-  var rs = sjcl.bitArray.concat(bytesBnTo256Bits(r),
+  const rPos = 4;
+  const rLen = signature[3];
+  const sPos = rLen + 6;
+  const sLen = signature[rLen + 5];
+  const r = signature.slice(rPos, rPos + rLen);
+  const s = signature.slice(sPos, sPos + sLen);
+  const rs = sjcl.bitArray.concat(bytesBnTo256Bits(r),
                                 bytesBnTo256Bits(s));
   return rs;
 }
 
 function createAccountId(pubKeyBytes) {
-  var bits = sjcl.codec.bytes.toBits(pubKeyBytes);
-  var hash = sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
-  var id = UInt160.from_bits(hash);
+  const bits = sjcl.codec.bytes.toBits(pubKeyBytes);
+  const hash = sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
+  const id = UInt160.from_bits(hash);
   id.set_version(Base.VER_ACCOUNT_ID);
   return id;
 }
@@ -266,8 +267,8 @@ util.inherits(Ed25519Pair, KeyPair);
 * @return {Ed25519Pair} key pair
 */
 Ed25519Pair.fromSeed = function(seed) {
-  var seed256 = deriveEdKeyPairSeed(seed);
-  var keyPair = nacl.sign.keyPair.fromSeed(seed256);
+  const seed256 = deriveEdKeyPairSeed(seed);
+  const keyPair = nacl.sign.keyPair.fromSeed(seed256);
   return new Ed25519Pair(keyPair);
 };
 
@@ -276,14 +277,14 @@ hasCachedProperty(Ed25519Pair, 'pubKeyBytes', function() {
 });
 
 Ed25519Pair.prototype.sign = function(message) {
-  var messageArray = new Uint8Array(message);
-  var signatureArray = nacl.sign.detached(messageArray, this.secretKey);
+  const messageArray = new Uint8Array(message);
+  const signatureArray = nacl.sign.detached(messageArray, this.secretKey);
   return toGenericArray(signatureArray);
 };
 
 Ed25519Pair.prototype.verify = function(message, signature) {
-  var messageArray = new Uint8Array(message);
-  var signatureArray = new Uint8Array(signature);
+  const messageArray = new Uint8Array(message);
+  const signatureArray = new Uint8Array(signature);
   return nacl.sign.detached.verify(messageArray, signatureArray,
                                    this.publicKey);
 };
@@ -308,9 +309,8 @@ Secp256k1Pair.fromSeed = function(seed) {
 };
 
 hasCachedProperty(Secp256k1Pair, 'pubKey', function() {
-  var exponent = this.secretKey._exponent;
-  var EcdsaPublicKey = sjcl.ecc.ecdsa.publicKey;
-  return new EcdsaPublicKey(this.curve, this.curve.G.mult(exponent));
+  const exponent = this.secretKey._exponent;
+  return new sjcl.ecc.ecdsa.publicKey(this.curve, this.curve.G.mult(exponent));
 });
 
 hasCachedProperty(Secp256k1Pair, 'pubKeyBytes', function() {
@@ -321,10 +321,10 @@ hasCachedProperty(Secp256k1Pair, 'pubKeyBytes', function() {
 @param {Array<Number>} message (bytes)
  */
 Secp256k1Pair.prototype.sign = function(message) {
-  var hash = this.hashMessage(message);
-  var sig = this.secretKey.signDeterministic(hash);
-  sig = this.secretKey.canonicalizeSignature(sig);
-  return sjcl.codec.bytes.fromBits(this.secretKey.encodeDER(sig));
+  const hash = this.hashMessage(message);
+  const sig = this.secretKey.signDeterministic(hash);
+  const canonicalSig = this.secretKey.canonicalizeSignature(sig);
+  return sjcl.codec.bytes.fromBits(this.secretKey.encodeDER(canonicalSig));
 };
 
 /*
@@ -354,9 +354,9 @@ exports.getKeyPair = function(specifier) {
     return specifier;
   }
 
-  var isGeneric = typeof specifier === 'string';
-  var specifierObj = isGeneric ? {} : specifier;
-  var keyType = specifierObj.key_type;
+  const isGeneric = typeof specifier === 'string';
+  const specifierObj = isGeneric ? {} : specifier;
+  let keyType = specifierObj.key_type;
 
   if (isGeneric) {
     specifierObj.generic = arguments[0];
@@ -365,7 +365,7 @@ exports.getKeyPair = function(specifier) {
     keyType = KeyType.secp256k1;
   }
 
-  var seed = parseSeed(specifierObj);
+  const seed = parseSeed(specifierObj);
   if (lodash.isEqual(seed._version, Base.VER_ED25519_SEED)) {
     keyType = KeyType.ed25519;
   }

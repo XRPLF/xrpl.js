@@ -4,7 +4,6 @@
 const async = require('async');
 const sjcl = require('./utils').sjcl;
 const Remote = require('./remote').Remote;
-const Seed = require('./seed').Seed;
 const Account = require('./account').Account;
 const UInt160 = require('./uint160').UInt160;
 const getKeyPair = require('./keypairs').getKeyPair;
@@ -60,9 +59,9 @@ Message.signMessage = function(message, secret_key, account) {
  *          the secret generator will be used.
  *  @returns {Base64-encoded String} signature
  */
-Message.signHash = function(_hash, secret_key_, account) {
-  const hash = typeof _hash === 'string' && /^[0-9a-fA-F]+$/.test(_hash) ?
-              sjcl.codec.hex.toBits(_hash) : _hash;
+Message.signHash = function(hash_, secret_key_) {
+  const hash = typeof hash_ === 'string' && /^[0-9a-fA-F]+$/.test(hash_) ?
+              sjcl.codec.hex.toBits(hash_) : hash_;
 
 
   if (typeof hash !== 'object' ||

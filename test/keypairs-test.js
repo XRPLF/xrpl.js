@@ -5,24 +5,24 @@
 /*eslint-disable indent */
 /*eslint-disable new-cap */
 /*eslint max-nested-callbacks: [1, 5]*/
-var assert = require('assert');
-var extend = require('extend');
-var ripple = require('ripple-lib');
+const assert = require('assert');
+const extend = require('extend');
+const ripple = require('ripple-lib');
 
-var SerializedObject = ripple.SerializedObject;
-var keypairs = ripple.keypairs;
-var Transaction = ripple.Transaction;
-var utils = ripple.utils;
-var sjcl = ripple.sjcl;
+const SerializedObject = ripple.SerializedObject;
+const keypairs = ripple.keypairs;
+const Transaction = ripple.Transaction;
+const utils = ripple.utils;
+const sjcl = ripple.sjcl;
 
-var getKeyPair = keypairs.getKeyPair;
-var KeyType = keypairs.KeyType;
+const getKeyPair = keypairs.getKeyPair;
+const KeyType = keypairs.KeyType;
 
 function deepCopy(obj) {
   return extend(true, {}, obj);
 }
 
-var fixtures = {
+const fixtures = {
   message: [0xB, 0xE, 0xE, 0xF],
   tx_json: {
     Account: 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN',
@@ -117,13 +117,13 @@ var fixtures = {
 describe('getKeyPair', function() {
   describe('a KeyPair itself can be used as a specifier', function() {
     it('returns the KeyPair passed in', function() {
-      var pair = getKeyPair('niq');
-      var pair2 = getKeyPair(pair);
+      const pair = getKeyPair('niq');
+      const pair2 = getKeyPair(pair);
       assert(pair === pair2);
     });
   });
   describe('constructing via a generic String `secret`', function() {
-    var pair = getKeyPair('niq');
+    const pair = getKeyPair('niq');
     it('defaults to secp256k1', function() {
       assert.equal(pair.type, KeyType.secp256k1);
     });
@@ -139,7 +139,7 @@ describe('getKeyPair', function() {
 
 describe('Secp256k1Pair', function() {
   it('can verify a TxnSignature', function() {
-    var tx_json = {
+    const tx_json = {
       'Account': 'rNvfq2SVbCiio1zkN5WwLQW8CHgy2dUoQi',
       'Amount': '1000',
       'Destination': 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
@@ -150,15 +150,15 @@ describe('Secp256k1Pair', function() {
         '021E788CDEB9104C9179C3869250A89999C1AFF92D2C3FF7925A1696835EA3D840',
       'TransactionType': 'Payment'
     };
-    var sig = '3045022100AF5EEA5B62463F80E1C01D05D' +
+    const sig = '3045022100AF5EEA5B62463F80E1C01D05D' +
           '1D913B5E02693550ED724EDB02FBC55322E' +
           '5A250220185D7C6E93EC15B8EFBDA5C0721' +
           '9DB553EEBA22DDBA1012DD93CA1621D1BB433';
 
-    var pair = getKeyPair('niq');
-    var prefix = [0x53, 0x54, 0x58, 0x00];
-    var so = SerializedObject.from_json(tx_json, prefix);
-    var verified = pair.verify(so.buffer, utils.hexToArray(sig));
+    const pair = getKeyPair('niq');
+    const prefix = [0x53, 0x54, 0x58, 0x00];
+    const so = SerializedObject.from_json(tx_json, prefix);
+    const verified = pair.verify(so.buffer, utils.hexToArray(sig));
     assert(verified);
   });
 
@@ -167,10 +167,10 @@ describe('Secp256k1Pair', function() {
      it('produces the expected k values for ' + f.message +
          ' if k wasn\'t suitable', function() {
 
-       var d = new sjcl.bn(f.d);
-       var secret = new sjcl.ecc.ecdsa.secretKey(sjcl.ecc.curves.k256, d);
-       var h1 = sjcl.hash.sha256.hash(f.message);
-       var results = [];
+       const d = new sjcl.bn(f.d);
+       const secret = new sjcl.ecc.ecdsa.secretKey(sjcl.ecc.curves.k256, d);
+       const h1 = sjcl.hash.sha256.hash(f.message);
+       const results = [];
 
        secret.generateDeterministicK(h1, function(k) {
          results.push(k);
@@ -188,31 +188,31 @@ describe('Secp256k1Pair', function() {
         return bn.toString().toUpperCase().slice(2);
       }
 
-      var curve = sjcl.ecc.curves.p256;
-      var q = 'FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551';
-      var x = 'C9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721';
-      var Ux = '60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6';
-      var Uy = '7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299';
+      const curve = sjcl.ecc.curves.p256;
+      const q = 'FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551';
+      const x = 'C9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721';
+      const Ux = '60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6';
+      const Uy = '7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299';
 
       assert.equal(bnHex(curve.r), q);
-      var d = new sjcl.bn(x);
-      var pub = curve.G.mult(d);
+      const d = new sjcl.bn(x);
+      const pub = curve.G.mult(d);
 
       assert.equal(bnHex(pub.x), Ux);
       assert.equal(bnHex(pub.y), Uy);
 
-      var secret = new sjcl.ecc.ecdsa.secretKey(curve, d);
-      var h1 = sjcl.hash.sha256.hash('sample');
-      var k = secret.generateDeterministicK(h1, function() {
+      const secret = new sjcl.ecc.ecdsa.secretKey(curve, d);
+      const h1 = sjcl.hash.sha256.hash('sample');
+      const k = secret.generateDeterministicK(h1, function() {
         return true;
       });
 
-      var expectedK =
+      const expectedK =
         'A6E3C57DD01ABE90086538398355DD4C3B17AA873382B0F24D6129493D8AAD60';
       assert.equal(bnHex(k), expectedK);
 
-      var rs = secret.sign(h1, undefined, undefined, new sjcl.bn(expectedK));
-      var rsHex = sjcl.codec.hex.fromBits(rs).toUpperCase();
+      const rs = secret.sign(h1, undefined, undefined, new sjcl.bn(expectedK));
+      const rsHex = sjcl.codec.hex.fromBits(rs).toUpperCase();
       assert.equal(
            rsHex.slice(0, 64),
           'EFD48B2AACB6A8FD1140DD9CD45E81D69D2C877B56AAF991C34D0EA84EAF3716');
@@ -224,34 +224,34 @@ describe('Secp256k1Pair', function() {
   });
 
   describe('generated tests', function() {
-    var expected = [
+    const expected = [
       '30440220312b2e0894b81a2e070ace566c5dfc70cdd18e67d44e2cfef2eb5495f7de2dac02205e155c0019502948c265209dfdd7d84c4a05bd2c38cee6ecd7c33e9c9b12bec2',
       '304402202a5860a12c15ebb8e91aa83f8e19d85d4ac05b272fc0c4083519339a7a76f2b802200852f9889e1284cf407dc7f73d646e62044c5ab432eaef3fff3f6f8ee9a0f24c',
       '3045022100b1658c88d1860d9f8beb25b79b3e5137bbc2c382d08fe7a068ffc6ab8978c8040220644f64b97ea144ee7d5ccb71c2372dd730fa0a659e4c18241a80d6c915350263',
       '3045022100f3e541330ff79ffc42eb0491ede1e47106d94ecfe3cdb2d9dd3bc0e8861f6d45022013f62942dd626d6c9731e317f372ec5c1f72885c4727fdbee9d9321bc530d7b2',
       '3045022100998abe378f4119d8bee9843482c09f0d5ce5c6012921548182454c610c57a269022036bd8eb71235c4b2c67339de6a59746b1f7e5975987b7ab99b313d124a69bb9f'
     ];
-    var pair = getKeyPair({
+    const pair = getKeyPair({
       passphrase: 'niq'
     });
     function test_factory(i) {
       it('can deterministically sign/verify message [' + i +
                        ']', function() {
-        var message = [i];
-        var sig = pair.sign(message);
+        const message = [i];
+        const sig = pair.sign(message);
         assert(pair.verify(message, sig));
         assert.equal(utils.arrayToHex(sig), expected[i]);
       });
     }
 
-    for (var n = 0; n < 5; n++) {
+    for (let n = 0; n < 5; n++) {
       test_factory(n);
     }
   });
 });
 
 describe('ED25519Pair', function() {
-  var pair = getKeyPair({
+  const pair = getKeyPair({
     key_type: 'ed25519',
     passphrase: 'niq'
   });
@@ -260,13 +260,13 @@ describe('ED25519Pair', function() {
     assert.equal(pair.type, KeyType.ed25519);
   });
   it('has a public key representation beginning with ED', function() {
-    var pub_hex = pair.pubKeyHex();
+    const pub_hex = pair.pubKeyHex();
     assert(pub_hex.length === 66);
     assert(pub_hex.slice(0, 2) === 'ED');
   });
   it('derives the same keypair for a given passphrase as rippled', function() {
-    var pub_hex = pair.pubKeyHex();
-    var target_hex = 'EDD3993CDC6647896C455F136648B7750' +
+    const pub_hex = pair.pubKeyHex();
+    const target_hex = 'EDD3993CDC6647896C455F136648B7750' +
                    '723B011475547AF60691AA3D7438E021D';
     assert.equal(pub_hex, target_hex);
   });
@@ -276,14 +276,14 @@ describe('ED25519Pair', function() {
                  'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN');
   });
   it('creates signatures that are a function of secret/message', function() {
-    var signature = pair.sign(fixtures.message);
+    const signature = pair.sign(fixtures.message);
     assert(Array.isArray(signature));
     assert(pair.verify(fixtures.message, signature));
   });
   it('signs transactions exactly as rippled', function() {
-    var so = SerializedObject.from_json(fixtures.tx_json);
-    var message = [0x53, 0x54, 0x58, 0x00].concat(so.buffer);
-    var sig = pair.signHex(message);
+    const so = SerializedObject.from_json(fixtures.tx_json);
+    const message = [0x53, 0x54, 0x58, 0x00].concat(so.buffer);
+    const sig = pair.signHex(message);
     assert.equal(sig, fixtures.tx_json.expected_sig);
   });
 });
@@ -305,9 +305,9 @@ describe('Transaction integration', function() {
 
   describe('remote.setSecret(account, getKeyPair(...))', function() {
     it('can sign a transaction', function() {
-      var remote = new ripple.Remote();
-      var keypair = getKeyPair('niq');
-      var tx = remote.transaction();
+      const remote = new ripple.Remote();
+      const keypair = getKeyPair('niq');
+      const tx = remote.transaction();
       tx.tx_json = tx_json();
       remote.setSecret(tx.tx_json.Account, keypair);
 
@@ -326,7 +326,7 @@ describe('Transaction integration', function() {
   });
   describe('tx.setSecret(getKeyPair(...))', function() {
     it('can sign a transaction', function() {
-      var tx = Transaction.from_json(tx_json());
+      const tx = Transaction.from_json(tx_json());
       tx.setSecret(getKeyPair('niq'));
       assert(!tx.tx_json.TxnSignature);
       tx.sign();
@@ -337,7 +337,7 @@ describe('Transaction integration', function() {
       function() {
     it('allows objects such as {key_type: \'ed25519\', passphrase: \'niq\'}',
         function() {
-      var tx = Transaction.from_json(deepCopy(fixtures.tx_json));
+      const tx = Transaction.from_json(deepCopy(fixtures.tx_json));
       tx._secret = {
         key_type: 'ed25519',
         passphrase: 'niq'
@@ -349,7 +349,7 @@ describe('Transaction integration', function() {
       tx.sign();
     });
     it('honours old style generic `secret`s (secp256k1)', function() {
-      var tx = Transaction.from_json(tx_json());
+      const tx = Transaction.from_json(tx_json());
       tx._secret = 'niq';
       assert(!tx.tx_json.TxnSignature);
       tx.sign();

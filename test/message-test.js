@@ -5,7 +5,7 @@ const sjcl = require('ripple-lib').sjcl;
 const Message = require('ripple-lib').Message;
 const Seed = require('ripple-lib').Seed;
 const Remote = require('ripple-lib').Remote;
-const getKeyPair= require('ripple-lib').getKeyPair;
+const getKeyPair = require('ripple-lib').getKeyPair;
 
 function getSecret(secretString) {
   return getKeyPair({key_type: 'secp256k1',

@@ -1,6 +1,6 @@
 'use strict';
 
-var sjcl = require('sjcl');
+const sjcl = require('sjcl');
 require('./sjcl-custom');
 
 function getMantissaDecimalString(bignum) {
@@ -149,13 +149,13 @@ function Sha512() {
 }
 
 Sha512.prototype.addBytes = function(bytes) {
-  var bits = sjcl.codec.bytes.toBits(bytes);
+  const bits = sjcl.codec.bytes.toBits(bytes);
   this.hash.update(bits);
   return this;
 };
 
 Sha512.prototype.addU32 = function(i) {
-  var bytes = [
+  const bytes = [
     (i >>> 24) & 0xFF,
     (i >>> 16) & 0xFF,
     (i >>> 8) & 0xFF,

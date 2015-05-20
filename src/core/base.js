@@ -121,14 +121,14 @@ Base.verify_checksum = function(bytes) {
 * @return {Array} version
 */
 Base.find_prefix = function(payloadLength, desiredPrefix) {
-  var totalLength = payloadLength + 4; // for checksum
-  var chars = (Math.log(Math.pow(256, totalLength)) / Math.log(58));
+  const totalLength = payloadLength + 4; // for checksum
+  const chars = (Math.log(Math.pow(256, totalLength)) / Math.log(58));
    // (x, x.8] -> x+1, (x.8, x+1) -> x+2
-  var requiredChars = Math.ceil(chars + 0.2);
-  var padding = 'V'; // middle of the alphabet
-  var template = desiredPrefix + new Array(requiredChars + 1).join(padding);
-  var bytes = Base.decode(template);
-  var version = bytes.slice(0, -totalLength);
+  const requiredChars = Math.ceil(chars + 0.2);
+  const padding = 'V'; // middle of the alphabet
+  const template = desiredPrefix + new Array(requiredChars + 1).join(padding);
+  const bytes = Base.decode(template);
+  const version = bytes.slice(0, -totalLength);
   return version;
 };
 
@@ -146,19 +146,19 @@ Base.find_prefix = function(payloadLength, desiredPrefix) {
 Base.decode_multi = function(encoded, expectedLength, possibleVersions,
                              alphabet) {
 
-  var buffer = Base.decode(encoded, alphabet);
-  var ret = {version: null, bytes: null};
+  const buffer = Base.decode(encoded, alphabet);
+  const ret = {version: null, bytes: null};
 
   if (!Base.verify_checksum(buffer)) {
     return ret;
   }
 
-  var withoutSum = buffer.slice(0, -4);
-  var versionBytes = withoutSum.slice(0, -expectedLength);
-  var decoded = withoutSum.slice(-expectedLength);
+  const withoutSum = buffer.slice(0, -4);
+  const versionBytes = withoutSum.slice(0, -expectedLength);
+  const decoded = withoutSum.slice(-expectedLength);
 
   possibleVersions.forEach(function(version) {
-    var asArray = Array.isArray(version) ? version : [version];
+    const asArray = Array.isArray(version) ? version : [version];
     if (_.isEqual(versionBytes, asArray)) {
       ret.version = version;
       ret.bytes = decoded;

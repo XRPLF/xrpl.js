@@ -8,7 +8,6 @@ const sjcl = require('./utils').sjcl;
 const Amount = require('./amount').Amount;
 const Currency = require('./amount').Currency;
 const UInt160 = require('./amount').UInt160;
-const Seed = require('./seed').Seed;
 const SerializedObject = require('./serializedobject').SerializedObject;
 const RippleError = require('./rippleerror').RippleError;
 const hashprefixes = require('./hashprefixes');
@@ -388,7 +387,7 @@ Transaction.prototype.complete = function() {
 
   if (typeof this.tx_json.SigningPubKey === 'undefined') {
     try {
-      var keyPair = getKeyPair(this._secret);
+      const keyPair = getKeyPair(this._secret);
       this.tx_json.SigningPubKey = keyPair.pubKeyHex();
     } catch(e) {
       this.emit('error', new RippleError(
@@ -462,11 +461,11 @@ Transaction.prototype._signingData = function(prefix) {
 };
 
 Transaction.prototype.sign = function() {
-  var keyPair = getKeyPair(this._secret);
-  var prevSig = this.tx_json.TxnSignature;
+  const keyPair = getKeyPair(this._secret);
+  const prevSig = this.tx_json.TxnSignature;
   delete this.tx_json.TxnSignature;
 
-  var signingData = this.signingData();
+  const signingData = this.signingData();
 
   // If the signingData is the same, we can re-use the previous signature
   if (prevSig && lodash.isEqual(signingData, this.previousSigningData)) {
@@ -474,7 +473,7 @@ Transaction.prototype.sign = function() {
     return this;
   }
 
-  var sig = keyPair.signHex(signingData);
+  const sig = keyPair.signHex(signingData);
   this.tx_json.TxnSignature = sig;
   this.previousSigningData = signingData;
 
