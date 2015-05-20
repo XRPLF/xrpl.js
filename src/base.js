@@ -1,13 +1,13 @@
 'use strict';
-var _ = require('lodash');
-var sjcl = require('./utils').sjcl;
-var utils = require('./utils');
-var extend = require('extend');
-var convertBase = require('./baseconverter');
+const _ = require('lodash');
+const sjcl = require('./utils').sjcl;
+const utils = require('./utils');
+const extend = require('extend');
+const convertBase = require('./baseconverter');
 
-var Base = {};
+const Base = {};
 
-var alphabets = Base.alphabets = {
+const alphabets = Base.alphabets = {
   ripple: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
   tipple: 'RPShNAF39wBUDnEGHJKLM4pQrsT7VWXYZ2bcdeCg65jkm8ofqi1tuvaxyz',
   bitcoin: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
@@ -34,16 +34,16 @@ function encodeString(alphabet, input) {
     return '';
   }
 
-  var leadingZeros = _.takeWhile(input, function(d) {
+  const leadingZeros = _.takeWhile(input, function(d) {
     return d === 0;
   });
-  var out = convertBase(input, 256, 58).map(function(digit) {
+  const out = convertBase(input, 256, 58).map(function(digit) {
     if (digit < 0 || digit >= alphabet.length) {
       throw new Error('Value ' + digit + ' is out of bounds for encoding');
     }
     return alphabet[digit];
   });
-  var prefix = leadingZeros.map(function() {
+  const prefix = leadingZeros.map(function() {
     return alphabet[0];
   });
   return prefix.concat(out).join('');
@@ -54,23 +54,23 @@ function decodeString(indexes, input) {
     return [];
   }
 
-  var input58 = input.split('').map(function(c) {
-    var charCode = c.charCodeAt(0);
+  const input58 = input.split('').map(function(c) {
+    const charCode = c.charCodeAt(0);
     if (charCode >= indexes.length || indexes[charCode] === -1) {
       throw new Error('Character ' + c + ' is not valid for encoding');
     }
     return indexes[charCode];
   });
-  var leadingZeros = _.takeWhile(input58, function(d) {
+  const leadingZeros = _.takeWhile(input58, function(d) {
     return d === 0;
   });
-  var out = convertBase(input58, 58, 256);
+  const out = convertBase(input58, 58, 256);
   return leadingZeros.concat(out);
 }
 
 function Base58(alphabet) {
-  var indexes = utils.arraySet(128, -1);
-  for (var i = 0; i < alphabet.length; i++) {
+  const indexes = utils.arraySet(128, -1);
+  for (let i = 0; i < alphabet.length; i++) {
     indexes[alphabet.charCodeAt(i)] = i;
   }
   return {
@@ -104,16 +104,16 @@ Base.decode = function(input, alpha) {
 };
 
 Base.verify_checksum = function(bytes) {
-  var computed = sha256(sha256(bytes.slice(0, -4))).slice(0, 4);
-  var checksum = bytes.slice(-4);
+  const computed = sha256(sha256(bytes.slice(0, -4))).slice(0, 4);
+  const checksum = bytes.slice(-4);
   return _.isEqual(computed, checksum);
 };
 
 // --> input: Array
 // <-- String
 Base.encode_check = function(version, input, alphabet) {
-  var buffer = [].concat(version, input);
-  var check = sha256(sha256(buffer)).slice(0, 4);
+  const buffer = [].concat(version, input);
+  const check = sha256(sha256(buffer)).slice(0, 4);
 
   return Base.encode([].concat(buffer, check), alphabet);
 };
@@ -121,7 +121,7 @@ Base.encode_check = function(version, input, alphabet) {
 // --> input : String
 // <-- NaN || sjcl.bn
 Base.decode_check = function(version, input, alphabet) {
-  var buffer = Base.decode(input, alphabet);
+  const buffer = Base.decode(input, alphabet);
 
   if (!buffer || buffer.length < 5) {
     return NaN;
@@ -134,8 +134,8 @@ Base.decode_check = function(version, input, alphabet) {
 
   // Multiple allowed versions
   if (Array.isArray(version) && _.every(version, function(v) {
-          return v !== buffer[0];
-      })) {
+    return v !== buffer[0];
+  })) {
     return NaN;
   }
 

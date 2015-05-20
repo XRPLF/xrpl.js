@@ -40,16 +40,16 @@ exports.types = require('./serializedtypes');
 
 // camelCase to under_scored API conversion
 function attachUnderscored(name) {
-  var o = exports[name];
+  const o = exports[name];
 
   Object.keys(o.prototype).forEach(function(key) {
-    var UPPERCASE = /([A-Z]{1})[a-z]+/g;
+    const UPPERCASE = /([A-Z]{1})[a-z]+/g;
 
     if (!UPPERCASE.test(key)) {
       return;
     }
 
-    var underscored = key.replace(UPPERCASE, function(c) {
+    const underscored = key.replace(UPPERCASE, function(c) {
       return '_' + c.toLowerCase();
     });
 
