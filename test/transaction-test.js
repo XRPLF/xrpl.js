@@ -1,13 +1,16 @@
 /* eslint-disable max-len */
-'use strict';
-var assert = require('assert');
-var Transaction = require('ripple-lib').Transaction;
-var TransactionQueue = require('ripple-lib').TransactionQueue;
-var Remote = require('ripple-lib').Remote;
-var Server = require('ripple-lib').Server;
-var sjcl = require('ripple-lib').sjcl;
 
-var transactionResult = {
+'use strict';
+
+const assert = require('assert');
+const lodash = require('lodash');
+const Transaction = require('ripple-lib').Transaction;
+const TransactionQueue = require('ripple-lib').TransactionQueue;
+const Remote = require('ripple-lib').Remote;
+const Server = require('ripple-lib').Server;
+const sjcl = require('ripple-lib').sjcl;
+
+const transactionResult = {
   engine_result: 'tesSUCCESS',
   engine_result_code: 0,
   engine_result_message: 'The transaction was applied.',
@@ -37,6 +40,19 @@ var transactionResult = {
   }
 };
 
+// https://github.com/ripple/rippled/blob/c61d0c663e410c3d3622f20092535710243b55af/src/ripple/protocol/impl/STTx.cpp#L342-L370
+const allowed_memo_chars = ('0123456789-._~:/?#[]@!$&\'()*+,;=%ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz').split('');
+
+// Disallowed ASCII characters
+const disallowed_memo_chars = [];
+
+for (let i = 0; i <= 127; i++) {
+  const char = String.fromCharCode(i);
+  if (!lodash.contains(allowed_memo_chars, char)) {
+    disallowed_memo_chars.push(char);
+  }
+}
+
 describe('Transaction', function() {
   before(function() {
     sjcl.random.addEntropy(
@@ -44,7 +60,7 @@ describe('Transaction', function() {
   });
 
   it('Success listener', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
     transaction.once('final', function(message) {
       assert.deepEqual(message, transactionResult);
@@ -57,7 +73,7 @@ describe('Transaction', function() {
   });
 
   it('Error listener', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
     transaction.once('final', function(message) {
       assert.deepEqual(message, transactionResult);
@@ -70,19 +86,19 @@ describe('Transaction', function() {
   });
 
   it('Submitted listener', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.emit('submitted');
     assert.strictEqual(transaction.state, 'submitted');
   });
 
   it('Proposed listener', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.emit('proposed');
     assert.strictEqual(transaction.state, 'pending');
   });
 
   it('Check response code is tel', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     assert(!transaction.isTelLocal(-400));
     assert(transaction.isTelLocal(-399));
     assert(transaction.isTelLocal(-300));
@@ -90,7 +106,7 @@ describe('Transaction', function() {
   });
 
   it('Check response code is tem', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     assert(!transaction.isTemMalformed(-300));
     assert(transaction.isTemMalformed(-299));
     assert(transaction.isTemMalformed(-200));
@@ -98,7 +114,7 @@ describe('Transaction', function() {
   });
 
   it('Check response code is tef', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     assert(!transaction.isTefFailure(-200));
     assert(transaction.isTefFailure(-199));
     assert(transaction.isTefFailure(-100));
@@ -106,7 +122,7 @@ describe('Transaction', function() {
   });
 
   it('Check response code is ter', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     assert(!transaction.isTerRetry(-100));
     assert(transaction.isTerRetry(-99));
     assert(transaction.isTerRetry(-1));
@@ -114,21 +130,21 @@ describe('Transaction', function() {
   });
 
   it('Check response code is tep', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     assert(!transaction.isTepSuccess(-1));
     assert(transaction.isTepSuccess(0));
     assert(transaction.isTepSuccess(1e3));
   });
 
   it('Check response code is tec', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     assert(!transaction.isTecClaimed(99));
     assert(transaction.isTecClaimed(100));
     assert(transaction.isTecClaimed(1e3));
   });
 
   it('Check response code is rejected', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     assert(!transaction.isRejected(0));
     assert(!transaction.isRejected(-99));
     assert(transaction.isRejected(-100));
@@ -137,12 +153,12 @@ describe('Transaction', function() {
   });
 
   it('Set state', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
     assert.strictEqual(transaction.state, 'unsubmitted');
 
-    var receivedEvents = 0;
-    var events = [
+    let receivedEvents = 0;
+    const events = [
       'submitted',
       'pending',
       'validated'
@@ -164,9 +180,9 @@ describe('Transaction', function() {
   });
 
   it('Finalize submission', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
-    var tx = transactionResult;
+    const tx = transactionResult;
     tx.ledger_hash = '2031E311FD28A6BZ76Z7BD6ECF8E6661521902E7A6A8EF069A2F3C628E76A322';
     tx.ledger_index = 7106150;
 
@@ -178,7 +194,7 @@ describe('Transaction', function() {
   });
 
   it('Finalize unsubmitted', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.finalize(transactionResult);
 
     assert.strictEqual(transaction.result.ledger_index, transactionResult.ledger_index);
@@ -186,14 +202,14 @@ describe('Transaction', function() {
   });
 
   it('Get account secret', function() {
-    var remote = new Remote();
+    const remote = new Remote();
 
     remote.secrets = {
       rpzT237Ctpaa58KieifoK8RyBmmRwEcfhK: 'shY1njzHAXp8Qt3bpxYW6RpoZtMKP',
       rpdxPs9CR93eLAc5DTvAgv4S9XJ1CzKj1a: 'ssboTJezioTq8obyvDU9tVo95NGGQ'
     };
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
 
     assert.strictEqual(transaction._accountSecret('rpzT237Ctpaa58KieifoK8RyBmmRwEcfhK'), 'shY1njzHAXp8Qt3bpxYW6RpoZtMKP');
     assert.strictEqual(transaction._accountSecret('rpdxPs9CR93eLAc5DTvAgv4S9XJ1CzKj1a'), 'ssboTJezioTq8obyvDU9tVo95NGGQ');
@@ -201,30 +217,30 @@ describe('Transaction', function() {
   });
 
   it('Get fee units', function() {
-    var remote = new Remote();
-    var transaction = new Transaction(remote);
+    const remote = new Remote();
+    const transaction = new Transaction(remote);
     assert.strictEqual(transaction.feeUnits(), 10);
   });
 
   it('Compute fee', function() {
-    var remote = new Remote();
+    const remote = new Remote();
 
-    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
 
-    var s2 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s2 = new Server(remote, 'wss://s-west.ripple.com:443');
     s2._connected = true;
     s2._load_factor = 256 * 4;
 
-    var s3 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s3 = new Server(remote, 'wss://s-west.ripple.com:443');
     s3._connected = true;
     s3._load_factor = 256 * 8;
 
-    var s4 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s4 = new Server(remote, 'wss://s-west.ripple.com:443');
     s4._connected = true;
     s4._load_factor = 256 * 8;
 
-    var s5 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s5 = new Server(remote, 'wss://s-west.ripple.com:443');
     s5._connected = true;
     s5._load_factor = 256 * 7;
 
@@ -236,27 +252,27 @@ describe('Transaction', function() {
     assert.strictEqual(s4._computeFee(10), '96');
     assert.strictEqual(s5._computeFee(10), '84');
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
 
     assert.strictEqual(transaction._computeFee(), '72');
   });
 
   it('Compute fee, no remote', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     assert.strictEqual(transaction._computeFee(10), undefined);
   });
 
   it('Compute fee - no connected server', function() {
-    var remote = new Remote();
+    const remote = new Remote();
 
-    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = false;
 
-    var s2 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s2 = new Server(remote, 'wss://s-west.ripple.com:443');
     s2._connected = false;
     s2._load_factor = 256 * 4;
 
-    var s3 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s3 = new Server(remote, 'wss://s-west.ripple.com:443');
     s3._connected = false;
     s3._load_factor = 256 * 8;
 
@@ -266,22 +282,22 @@ describe('Transaction', function() {
     assert.strictEqual(s2._computeFee(10), '48');
     assert.strictEqual(s3._computeFee(10), '96');
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
 
     assert.strictEqual(transaction._computeFee(), undefined);
   });
 
   it('Compute fee - one connected server', function() {
-    var remote = new Remote();
+    const remote = new Remote();
 
-    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = false;
 
-    var s2 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s2 = new Server(remote, 'wss://s-west.ripple.com:443');
     s2._connected = false;
     s2._load_factor = 256 * 4;
 
-    var s3 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s3 = new Server(remote, 'wss://s-west.ripple.com:443');
     s3._connected = true;
     s3._load_factor = 256 * 8;
 
@@ -291,27 +307,27 @@ describe('Transaction', function() {
     assert.strictEqual(s2._computeFee(10), '48');
     assert.strictEqual(s3._computeFee(10), '96');
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
 
     assert.strictEqual(transaction._computeFee(), '96');
   });
 
   it('Does not compute a median fee with floating point', function() {
-    var remote = new Remote();
+    const remote = new Remote();
 
-    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
 
-    var s2 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s2 = new Server(remote, 'wss://s-west.ripple.com:443');
     s2._connected = true;
     s2._load_factor = 256 * 4;
 
-    var s3 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s3 = new Server(remote, 'wss://s-west.ripple.com:443');
     s3._connected = true;
 
     s3._load_factor = (256 * 7) + 1;
 
-    var s4 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s4 = new Server(remote, 'wss://s-west.ripple.com:443');
     s4._connected = true;
     s4._load_factor = 256 * 16;
 
@@ -323,35 +339,35 @@ describe('Transaction', function() {
     assert.strictEqual(s3._computeFee(10), '85');
     assert.strictEqual(s4._computeFee(10), '192');
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
     transaction.tx_json.Sequence = 1;
-    var src = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
-    var dst = 'rGihwhaqU8g7ahwAvTq6iX5rvsfcbgZw6v';
+    const src = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
+    const dst = 'rGihwhaqU8g7ahwAvTq6iX5rvsfcbgZw6v';
 
     transaction.payment(src, dst, '100');
     remote.set_secret(src, 'masterpassphrase');
 
     assert(transaction.complete());
-    var json = transaction.serialize().to_json();
+    const json = transaction.serialize().to_json();
     assert.notStrictEqual(json.Fee, '66500000', 'Fee == 66500000, i.e. 66.5 XRP!');
   });
 
 
   it('Compute fee - even server count', function() {
-    var remote = new Remote();
+    const remote = new Remote();
 
-    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
 
-    var s2 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s2 = new Server(remote, 'wss://s-west.ripple.com:443');
     s2._connected = true;
     s2._load_factor = 256 * 4;
 
-    var s3 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s3 = new Server(remote, 'wss://s-west.ripple.com:443');
     s3._connected = true;
     s3._load_factor = 256 * 8;
 
-    var s4 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s4 = new Server(remote, 'wss://s-west.ripple.com:443');
     s4._connected = true;
     s4._load_factor = 256 * 16;
 
@@ -363,22 +379,22 @@ describe('Transaction', function() {
     assert.strictEqual(s3._computeFee(10), '96');
     assert.strictEqual(s4._computeFee(10), '192');
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
 
     assert.strictEqual(transaction._computeFee(), '72');
   });
 
   it('Complete transaction', function(done) {
-    var remote = new Remote();
+    const remote = new Remote();
 
-    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
 
     remote._servers = [s1];
     remote.trusted = true;
     remote.local_signing = true;
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction.tx_json.Flags = 0;
@@ -389,7 +405,7 @@ describe('Transaction', function() {
   });
 
   it('Complete transaction, local signing, no remote', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
 
@@ -399,8 +415,8 @@ describe('Transaction', function() {
   });
 
   it('Complete transaction - untrusted', function(done) {
-    var remote = new Remote();
-    var transaction = new Transaction(remote);
+    const remote = new Remote();
+    const transaction = new Transaction(remote);
 
     remote.trusted = false;
     remote.local_signing = false;
@@ -414,8 +430,8 @@ describe('Transaction', function() {
   });
 
   it('Complete transaction - no secret', function(done) {
-    var remote = new Remote();
-    var transaction = new Transaction(remote);
+    const remote = new Remote();
+    const transaction = new Transaction(remote);
 
     remote.trusted = true;
     remote.local_signing = true;
@@ -429,8 +445,8 @@ describe('Transaction', function() {
   });
 
   it('Complete transaction - invalid secret', function(done) {
-    var remote = new Remote();
-    var transaction = new Transaction(remote);
+    const remote = new Remote();
+    const transaction = new Transaction(remote);
 
     remote.trusted = true;
     remote.local_signing = true;
@@ -448,8 +464,8 @@ describe('Transaction', function() {
   });
 
   it('Complete transaction - cached SigningPubKey', function(done) {
-    var remote = new Remote();
-    var transaction = new Transaction(remote);
+    const remote = new Remote();
+    const transaction = new Transaction(remote);
 
     remote.trusted = true;
     remote.local_signing = true;
@@ -467,10 +483,10 @@ describe('Transaction', function() {
   });
 
   it('Complete transaction - compute fee', function(done) {
-    var remote = new Remote();
-    var transaction = new Transaction(remote);
+    const remote = new Remote();
+    const transaction = new Transaction(remote);
 
-    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
 
     remote._servers = [s1];
@@ -491,9 +507,9 @@ describe('Transaction', function() {
   });
 
   it('Complete transaction - compute fee exceeds max fee', function(done) {
-    var remote = new Remote({max_fee: 10});
+    const remote = new Remote({max_fee: 10});
 
-    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
     s1._load_factor = 256 * 16;
 
@@ -501,7 +517,7 @@ describe('Transaction', function() {
     remote.trusted = true;
     remote.local_signing = true;
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
@@ -515,9 +531,9 @@ describe('Transaction', function() {
   });
 
   it('Complete transaction - canonical flags', function(done) {
-    var remote = new Remote();
+    const remote = new Remote();
 
-    var s1 = new Server(remote, 'wss://s-west.ripple.com:443');
+    const s1 = new Server(remote, 'wss://s-west.ripple.com:443');
     s1._connected = true;
     s1._load_factor = 256;
 
@@ -525,7 +541,7 @@ describe('Transaction', function() {
     remote.trusted = true;
     remote.local_signing = true;
 
-    var transaction = new Transaction(remote);
+    const transaction = new Transaction(remote);
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
@@ -538,7 +554,7 @@ describe('Transaction', function() {
   });
 
   it('Get signing hash', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
@@ -553,7 +569,7 @@ describe('Transaction', function() {
   });
 
   it('Get hash - no prefix', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
@@ -568,7 +584,7 @@ describe('Transaction', function() {
   });
 
   it('Get hash - prefix', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
@@ -584,7 +600,7 @@ describe('Transaction', function() {
   });
 
   it('Get hash - invalid prefix', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
@@ -601,7 +617,7 @@ describe('Transaction', function() {
   });
 
   it('Get hash - complex transaction', function() {
-    var input_json = {
+    const input_json = {
       Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
       Amount: {
         currency: 'LTC',
@@ -646,14 +662,14 @@ describe('Transaction', function() {
       TxnSignature: '304602210096C2F385530587DE573936CA51CB86B801A28F777C944E268212BE7341440B7F022100EBF0508A9145A56CDA7FAF314DF3BBE51C6EE450BA7E74D88516891A3608644E'
     };
 
-    var expected_hash = '87366146D381AD971B97DD41CFAC1AE4670B0E996AB574B0CE18CE6467811868';
-    var transaction = Transaction.from_json(input_json);
+    const expected_hash = '87366146D381AD971B97DD41CFAC1AE4670B0E996AB574B0CE18CE6467811868';
+    const transaction = Transaction.from_json(input_json);
 
     assert.deepEqual(transaction.hash(), expected_hash);
   });
 
   it('Get hash - complex transaction including Memo', function() {
-    var input_json = {
+    const input_json = {
       Account: 'rfe8yiZUymRPx35BEwGjhfkaLmgNsTytxT',
       Amount: '1',
       Destination: 'r9kiSEUEw6iSCNksDVKf9k3AyxjW3r1qPf',
@@ -730,7 +746,7 @@ describe('Transaction', function() {
   });
 
   it('Serialize transaction', function() {
-    var input_json = {
+    const input_json = {
       Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
       Amount: {
         currency: 'LTC',
@@ -775,15 +791,15 @@ describe('Transaction', function() {
       TxnSignature: '304602210096C2F385530587DE573936CA51CB86B801A28F777C944E268212BE7341440B7F022100EBF0508A9145A56CDA7FAF314DF3BBE51C6EE450BA7E74D88516891A3608644E'
     };
 
-    var expected_hex = '1200002200000000240000019F61D4A3794DFA1510000000000000000000000000004C54430000000000EF7ED76B77750D79EC92A59389952E0E8054407668400000000000000F69D4CAC4AC112283000000000000000000000000005553440000000000EF7ED76B77750D79EC92A59389952E0E80544076732102854B06CE8F3E65323F89260E9E19B33DA3E01B30EA4CA172612DE77973FAC58A7448304602210096C2F385530587DE573936CA51CB86B801A28F777C944E268212BE7341440B7F022100EBF0508A9145A56CDA7FAF314DF3BBE51C6EE450BA7E74D88516891A3608644E8114EF7ED76B77750D79EC92A59389952E0E805440768314EF7ED76B77750D79EC92A59389952E0E80544076011231DD39C650A96EDA48334E70CC4A85B8B2E8502CD30000000000000000000000005553440000000000DD39C650A96EDA48334E70CC4A85B8B2E8502CD3300000000000000000000000004C5443000000000047DA9E2E00ECF224A52329793F1BB20FB1B5EA643147DA9E2E00ECF224A52329793F1BB20FB1B5EA640000000000000000000000004C5443000000000047DA9E2E00ECF224A52329793F1BB20FB1B5EA6400';
+    const expected_hex = '1200002200000000240000019F61D4A3794DFA1510000000000000000000000000004C54430000000000EF7ED76B77750D79EC92A59389952E0E8054407668400000000000000F69D4CAC4AC112283000000000000000000000000005553440000000000EF7ED76B77750D79EC92A59389952E0E80544076732102854B06CE8F3E65323F89260E9E19B33DA3E01B30EA4CA172612DE77973FAC58A7448304602210096C2F385530587DE573936CA51CB86B801A28F777C944E268212BE7341440B7F022100EBF0508A9145A56CDA7FAF314DF3BBE51C6EE450BA7E74D88516891A3608644E8114EF7ED76B77750D79EC92A59389952E0E805440768314EF7ED76B77750D79EC92A59389952E0E80544076011231DD39C650A96EDA48334E70CC4A85B8B2E8502CD30000000000000000000000005553440000000000DD39C650A96EDA48334E70CC4A85B8B2E8502CD3300000000000000000000000004C5443000000000047DA9E2E00ECF224A52329793F1BB20FB1B5EA643147DA9E2E00ECF224A52329793F1BB20FB1B5EA640000000000000000000000004C5443000000000047DA9E2E00ECF224A52329793F1BB20FB1B5EA6400';
 
-    var transaction = Transaction.from_json(input_json);
+    const transaction = Transaction.from_json(input_json);
 
     assert.deepEqual(transaction.serialize().to_hex(), expected_hex);
   });
 
   it('Sign transaction', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
@@ -794,7 +810,7 @@ describe('Transaction', function() {
 
     transaction.sign();
 
-    var signature = transaction.tx_json.TxnSignature;
+    const signature = transaction.tx_json.TxnSignature;
 
     assert.strictEqual(transaction.previousSigningHash, 'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
     assert(/^[A-Z0-9]+$/.test(signature));
@@ -810,7 +826,7 @@ describe('Transaction', function() {
   });
 
   it('Add transaction ID', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
     transaction.addId('D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
     transaction.addId('F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
@@ -826,7 +842,7 @@ describe('Transaction', function() {
   });
 
   it('Find transaction IDs in cache', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
     assert.deepEqual(transaction.findId({
       F1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE: transaction
@@ -846,34 +862,73 @@ describe('Transaction', function() {
   });
 
   it('Set build_path', function() {
-    var transaction = new Transaction();
-    transaction.buildPath(true);
+    const transaction = new Transaction();
+
+//    assert.throws(function() {
+//      transaction.buildPath();
+//    }, /Error: TransactionType must be Payment to use build_path/);
+//    assert.throws(function() {
+//      transaction.setBuildPath();
+//    }, /Error: TransactionType must be Payment to use build_path/);
+
+    assert.strictEqual(transaction._build_path, false);
+
+    transaction.setType('Payment');
+    transaction.setBuildPath();
     assert.strictEqual(transaction._build_path, true);
+    transaction.setBuildPath(false);
+    assert.strictEqual(transaction._build_path, false);
   });
 
   it('Set DestinationTag', function() {
-    var transaction = new Transaction();
-    transaction.destinationTag('tag');
+    const transaction = new Transaction();
+
+//     assert.throws(function() {
+//       transaction.destinationTag(1);
+//     }, /Error: TransactionType must be Payment to use DestinationTag/);
+//     assert.throws(function() {
+//       transaction.setDestinationTag(1);
+//     }, /Error: TransactionType must be Payment to use DestinationTag/);
+
     assert.strictEqual(transaction.tx_json.DestinationTag, undefined);
-    transaction.destinationTag(1);
+
+    transaction.setType('Payment');
+
+    assert.throws(function() {
+      transaction.setDestinationTag('tag');
+    }, /Error: DestinationTag must be a valid UInt32/);
+
+    transaction.setDestinationTag(1);
     assert.strictEqual(transaction.tx_json.DestinationTag, 1);
   });
 
   it('Set InvoiceID', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
-    transaction.invoiceID(1);
+//     assert.throws(function() {
+//       transaction.invoiceID('DEADBEEF');
+//     }, /Error: TransactionType must be Payment to use InvoiceID/);
+//     assert.strictEqual(transaction.tx_json.InvoiceID, undefined);
+
+    transaction.setType('Payment');
+
+    assert.throws(function() {
+      transaction.setInvoiceID(1);
+    }, /Error: InvoiceID must be a valid Hash256/);
+
     assert.strictEqual(transaction.tx_json.InvoiceID, undefined);
 
-    transaction.invoiceID('DEADBEEF');
+    transaction.setType('Payment');
+
+    transaction.setInvoiceID('DEADBEEF');
     assert.strictEqual(transaction.tx_json.InvoiceID, 'DEADBEEF00000000000000000000000000000000000000000000000000000000');
 
-    transaction.invoiceID('FEADBEEF00000000000000000000000000000000000000000000000000000000');
+    transaction.setInvoiceID('FEADBEEF00000000000000000000000000000000000000000000000000000000');
     assert.strictEqual(transaction.tx_json.InvoiceID, 'FEADBEEF00000000000000000000000000000000000000000000000000000000');
   });
 
   it('Set ClientID', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
     transaction.clientID(1);
     assert.strictEqual(transaction._clientID, undefined);
@@ -883,23 +938,28 @@ describe('Transaction', function() {
   });
 
   it('Set LastLedgerSequence', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
-    transaction.lastLedger('a');
+    assert.throws(function() {
+      transaction.lastLedger('a');
+    }, /Error: LastLedgerSequence must be a valid UInt32/);
+    assert.throws(function() {
+      transaction.setLastLedgerSequence('a');
+    }, /Error: LastLedgerSequence must be a valid UInt32/);
+    assert.throws(function() {
+      transaction.setLastLedgerSequence(NaN);
+    }, /Error: LastLedgerSequence must be a valid UInt32/);
+
     assert.strictEqual(transaction.tx_json.LastLedgerSequence, undefined);
     assert(!transaction._setLastLedger);
 
-    transaction.lastLedger(NaN);
-    assert.strictEqual(transaction.tx_json.LastLedgerSequence, undefined);
-    assert(!transaction._setLastLedger);
-
-    transaction.lastLedger(12);
+    transaction.setLastLedgerSequence(12);
     assert.strictEqual(transaction.tx_json.LastLedgerSequence, 12);
     assert(transaction._setLastLedger);
   });
 
   it('Set Max Fee', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
     transaction.maxFee('a');
     assert(!transaction._setMaxFee);
@@ -913,7 +973,7 @@ describe('Transaction', function() {
   });
 
   it('Set Fixed Fee', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
     transaction.setFixedFee('a');
     assert(!transaction._setFixedFee);
@@ -930,7 +990,7 @@ describe('Transaction', function() {
   });
 
   it('Rewrite transaction path', function() {
-    var path = [
+    const path = [
       {
         account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
         issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
@@ -976,13 +1036,9 @@ describe('Transaction', function() {
   });
 
   it('Add transaction path', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
-    transaction.pathAdd(1);
-
-    assert.strictEqual(transaction.tx_json.Paths, undefined);
-
-    var path = [
+    const path = [
       {
         account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
         issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
@@ -991,7 +1047,7 @@ describe('Transaction', function() {
       }
     ];
 
-    var path2 = [
+    const path2 = [
       {
         account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
         issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
@@ -1000,7 +1056,25 @@ describe('Transaction', function() {
       }
     ];
 
-    transaction.pathAdd(path);
+//     assert.throws(function() {
+//       transaction.pathAdd(path);
+//     }, /^Error: TransactionType must be Payment to use Paths$/);
+//     assert.throws(function() {
+//       transaction.addPath(path);
+//     }, /^Error: TransactionType must be Payment to use Paths$/);
+
+    assert.strictEqual(transaction.tx_json.Paths, undefined);
+
+    transaction.setType('Payment');
+
+    assert.throws(function() {
+      transaction.pathAdd(1);
+    }, /^Error: Path must be an array$/);
+    assert.throws(function() {
+      transaction.addPath(1);
+    }, /^Error: Path must be an array$/);
+
+    transaction.addPath(path);
 
     assert.deepEqual(transaction.tx_json.Paths, [
       [{
@@ -1010,7 +1084,7 @@ describe('Transaction', function() {
       }]
     ]);
 
-    transaction.pathAdd(path2);
+    transaction.addPath(path2);
 
     assert.deepEqual(transaction.tx_json.Paths, [
       [{
@@ -1027,26 +1101,43 @@ describe('Transaction', function() {
   });
 
   it('Add transaction paths', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
-    transaction.paths(1);
+    const paths = [
+      [{
+      account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
+      issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      test: 1,
+      currency: 'USD'
+    }],
+    [{
+      account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
+      issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      test: 2,
+      currency: 'USD'
+    }]
+    ];
+
+//     assert.throws(function() {
+//       transaction.paths(paths);
+//     }, /Error: TransactionType must be Payment to use Paths/);
+//     assert.throws(function() {
+//       transaction.setPaths(paths);
+//     }, /Error: TransactionType must be Payment to use Paths/);
 
     assert.strictEqual(transaction.tx_json.Paths, undefined);
 
-    transaction.paths([
-      [{
-        account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
-        issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
-        test: 1,
-        currency: 'USD'
-      }],
-      [{
-        account: 'rP51ycDJw5ZhgvdKiRjBYZKYjsyoCcHmnY',
-        issuer: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
-        test: 2,
-        currency: 'USD'
-      }]
-    ]);
+    transaction.setType('Payment');
+
+    assert.throws(function() {
+      transaction.paths(1);
+    }, /Error: Paths must be an array/);
+    assert.throws(function() {
+      transaction.setPaths(1);
+    }, /Error: Paths must be an array/);
+
+    transaction.setPaths(paths);
+    transaction.setPaths(paths);
 
     assert.deepEqual(transaction.tx_json.Paths, [
       [{
@@ -1063,14 +1154,24 @@ describe('Transaction', function() {
   });
 
   it('Set secret', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.secret('shHXjwp9m3MDQNcUrTekXcdzFsCjM');
     assert.strictEqual(transaction._secret, 'shHXjwp9m3MDQNcUrTekXcdzFsCjM');
   });
 
   it('Set SendMax', function() {
-    var transaction = new Transaction();
-    transaction.sendMax('1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm');
+    const transaction = new Transaction();
+
+//     assert.throws(function() {
+//       transaction.sendMax('1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm');
+//     }, /^Error: TransactionType must be Payment to use SendMax$/);
+//     assert.throws(function() {
+//       transaction.setSendMax('1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm');
+//     }, /^Error: TransactionType must be Payment to use SendMax$/);
+
+    transaction.setType('Payment');
+    transaction.setSendMax('1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm');
+
     assert.deepEqual(transaction.tx_json.SendMax, {
       value: '1',
       currency: 'USD',
@@ -1079,48 +1180,67 @@ describe('Transaction', function() {
   });
 
   it('Set SourceTag', function() {
-    var transaction = new Transaction();
-    transaction.sourceTag('tag');
+    const transaction = new Transaction();
+
+    assert.throws(function() {
+      transaction.sourceTag('tag');
+    }, /Error: SourceTag must be a valid UInt32/);
+
     assert.strictEqual(transaction.tx_json.SourceTag, undefined);
     transaction.sourceTag(1);
     assert.strictEqual(transaction.tx_json.SourceTag, 1);
+    transaction.setSourceTag(2);
+    assert.strictEqual(transaction.tx_json.SourceTag, 2);
   });
 
   it('Set TransferRate', function() {
-    var transaction = new Transaction();
-    transaction.transferRate(1);
+    const transaction = new Transaction();
+    transaction.setType('AccountSet');
+
+    assert.throws(function() {
+      transaction.transferRate(1);
+    }, /^Error: TransferRate must be >= 1000000000$/);
+    assert.throws(function() {
+      transaction.setTransferRate(1);
+    }, /^Error: TransferRate must be >= 1000000000$/);
+    assert.throws(function() {
+      transaction.setTransferRate('a');
+    }, /^Error: TransferRate must be a valid UInt32$/);
+
     assert.strictEqual(transaction.tx_json.TransferRate, undefined);
-    transaction.transferRate(1.5 * 1e9);
+    transaction.setTransferRate(1.5 * 1e9);
     assert.strictEqual(transaction.tx_json.TransferRate, 1.5 * 1e9);
+    transaction.setTransferRate(0);
+    assert.strictEqual(transaction.tx_json.TransferRate, 0);
   });
 
   it('Set Flags', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
     transaction.setFlags();
     assert.strictEqual(transaction.tx_json.Flags, 0);
 
-    var transaction2 = new Transaction();
+    const transaction2 = new Transaction();
     transaction2.tx_json.TransactionType = 'Payment';
     transaction2.setFlags(Transaction.flags.Payment.PartialPayment);
     assert.strictEqual(transaction2.tx_json.Flags, 131072);
 
-    var transaction3 = new Transaction();
+    const transaction3 = new Transaction();
     transaction3.tx_json.TransactionType = 'Payment';
     transaction3.setFlags('NoRippleDirect');
     assert.strictEqual(transaction3.tx_json.Flags, 65536);
 
-    var transaction4 = new Transaction();
+    const transaction4 = new Transaction();
     transaction4.tx_json.TransactionType = 'Payment';
     transaction4.setFlags('PartialPayment', 'NoRippleDirect');
     assert.strictEqual(transaction4.tx_json.Flags, 196608);
 
-    var transaction5 = new Transaction();
-    transaction5.tx_json.TransactionType = 'Payment';
+    const transaction5 = new Transaction();
+    transaction5.setType('Payment');
     transaction5.setFlags(['LimitQuality', 'PartialPayment']);
     assert.strictEqual(transaction5.tx_json.Flags, 393216);
 
-    var transaction6 = new Transaction();
+    const transaction6 = new Transaction();
     transaction6.tx_json.TransactionType = 'Payment';
     transaction6.once('error', function(err) {
       assert.strictEqual(err.result, 'tejInvalidFlag');
@@ -1130,12 +1250,12 @@ describe('Transaction', function() {
   });
 
   it('Add Memo', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
-    var memoType = 'message';
-    var memoFormat = 'json';
-    var memoData = {
+    const memoType = 'message';
+    const memoFormat = 'json';
+    const memoData = {
       string: 'value',
       bool: true,
       integer: 1
@@ -1143,7 +1263,7 @@ describe('Transaction', function() {
 
     transaction.addMemo(memoType, memoFormat, memoData);
 
-    var expected = [
+    const expected = [
       {
         Memo:
         {
@@ -1155,23 +1275,37 @@ describe('Transaction', function() {
     ];
 
     assert.deepEqual(transaction.tx_json.Memos, expected);
+
+    allowed_memo_chars.forEach(function(c) {
+      const hexStr = new Buffer(c).toString('hex').toUpperCase();
+      const tx = new Transaction();
+
+      tx.addMemo(c, c, c);
+
+      assert.deepEqual(tx.tx_json.Memos, [{
+        Memo: {
+          MemoType: hexStr,
+          MemoFormat: hexStr,
+          MemoData: hexStr
+        }
+      }]);
+    });
   });
 
   it('Add Memo - by object', function() {
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
+    const transaction = new Transaction();
+    transaction.setType('Payment');
 
-    var memo = {
+    const memo = {
       memoType: 'type',
       memoData: 'data'
     };
 
     transaction.addMemo(memo);
 
-    var expected = [
+    const expected = [
       {
-        Memo:
-        {
+        Memo: {
           MemoType: '74797065',
           MemoData: '64617461'
         }
@@ -1182,7 +1316,7 @@ describe('Transaction', function() {
   });
 
   it('Add Memos', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
     transaction.addMemo('testkey', undefined, 'testvalue');
@@ -1191,7 +1325,7 @@ describe('Transaction', function() {
     transaction.addMemo(undefined, undefined, 'testvalue4');
     transaction.addMemo('testkey4', 'text/html', '<html>');
 
-    var expected = [
+    const expected = [
       {
         Memo: {
           MemoType: '746573746B6579',
@@ -1228,43 +1362,53 @@ describe('Transaction', function() {
   });
 
   it('Add Memo - invalid MemoType', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
+
+    const error_regex = /^Error: MemoType must be a string containing only valid URL characters$/;
 
     assert.throws(function() {
       transaction.addMemo(1);
-    }, /^Error: MemoType must be a string$/);
-  });
-
-  it('Add Memo - invalid ASCII MemoType', function() {
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
-
+    }, error_regex);
     assert.throws(function() {
       transaction.addMemo('한국어');
-    }, /^Error: MemoType must be valid ASCII$/);
+    }, error_regex);
+    assert.throws(function() {
+      transaction.addMemo('my memo');
+    }, error_regex);
+
+    disallowed_memo_chars.forEach(function(c) {
+      assert.throws(function() {
+        transaction.addMemo(c);
+      }, error_regex);
+    });
   });
 
   it('Add Memo - invalid MemoFormat', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
+
+    const error_regex = /^Error: MemoFormat must be a string containing only valid URL characters$/;
 
     assert.throws(function() {
       transaction.addMemo(undefined, 1);
-    }, /^Error: MemoFormat must be a string$/);
-  });
-
-  it('Add Memo - invalid ASCII MemoFormat', function() {
-    var transaction = new Transaction();
-    transaction.tx_json.TransactionType = 'Payment';
-
+    }, error_regex);
     assert.throws(function() {
       transaction.addMemo(undefined, 'России');
-    }, /^Error: MemoFormat must be valid ASCII$/);
+    }, error_regex);
+    assert.throws(function() {
+      transaction.addMemo(undefined, 'my memo');
+    }, error_regex);
+
+    disallowed_memo_chars.forEach(function(c) {
+      assert.throws(function() {
+        transaction.addMemo(undefined, c);
+      }, error_regex);
+    });
   });
 
   it('Add Memo - MemoData string', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
     transaction.addMemo({memoData: 'some_string'});
@@ -1279,10 +1423,10 @@ describe('Transaction', function() {
   });
 
   it('Add Memo - MemoData complex object', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     transaction.tx_json.TransactionType = 'Payment';
 
-    var memo = {
+    const memo = {
       memoFormat: 'json',
       memoData: {
         string: 'string',
@@ -1311,7 +1455,7 @@ describe('Transaction', function() {
   });
 
   it('Set AccountTxnID', function() {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
     assert(transaction instanceof Transaction);
 
     transaction.accountTxnID('75C5A92212AA82A89C3824F6F071FE49C95C45DE9113EB51763A217DBACB5B4F');
@@ -1323,7 +1467,7 @@ describe('Transaction', function() {
   });
 
   it('Construct AccountSet transaction - with setFlag, clearFlag', function() {
-    var transaction = new Transaction().accountSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'asfRequireDest', 'asfRequireAuth');
+    const transaction = new Transaction().accountSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'asfRequireDest', 'asfRequireAuth');
 
     assert(transaction instanceof Transaction);
     assert.deepEqual(transaction.tx_json, {
@@ -1336,7 +1480,7 @@ describe('Transaction', function() {
   });
 
   it('Construct AccountSet transaction - with AccountTxnID SetFlag', function() {
-    var transaction = new Transaction().accountSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'asfAccountTxnID');
+    const transaction = new Transaction().accountSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'asfAccountTxnID');
 
     assert(transaction instanceof Transaction);
     assert.deepEqual(transaction.tx_json, {
@@ -1348,7 +1492,7 @@ describe('Transaction', function() {
   });
 
   it('Construct AccountSet transaction - params object', function() {
-    var transaction = new Transaction().accountSet({
+    const transaction = new Transaction().accountSet({
       account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
       set: 'asfRequireDest',
       clear: 'asfRequireAuth'
@@ -1371,7 +1515,7 @@ describe('Transaction', function() {
   });
 
   it('Construct OfferCancel transaction', function() {
-    var transaction = new Transaction().offerCancel('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 1);
+    const transaction = new Transaction().offerCancel('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 1);
 
     assert(transaction instanceof Transaction);
     assert.deepEqual(transaction.tx_json, {
@@ -1383,7 +1527,7 @@ describe('Transaction', function() {
   });
 
   it('Construct OfferCancel transaction - params object', function() {
-    var transaction = new Transaction().offerCancel({
+    const transaction = new Transaction().offerCancel({
       account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
       sequence: 1
     });
@@ -1404,10 +1548,10 @@ describe('Transaction', function() {
   });
 
   it('Construct OfferCreate transaction', function() {
-    var bid = '1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
-    var ask = '1/EUR/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
+    const bid = '1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
+    const ask = '1/EUR/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
 
-    var transaction = new Transaction().offerCreate('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', bid, ask);
+    const transaction = new Transaction().offerCreate('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', bid, ask);
 
     assert(transaction instanceof Transaction);
     assert.deepEqual(transaction.tx_json, {
@@ -1428,14 +1572,14 @@ describe('Transaction', function() {
   });
 
   it('Construct OfferCreate transaction - with expiration, cancelSequence', function() {
-    var bid = '1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
-    var ask = '1/EUR/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
-    var expiration = new Date();
+    const bid = '1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
+    const ask = '1/EUR/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
+    const expiration = new Date();
     expiration.setHours(expiration.getHours() + 1);
 
-    var rippleExpiration = Math.round(expiration.getTime() / 1000) - 0x386D4380;
+    const rippleExpiration = Math.round(expiration.getTime() / 1000) - 0x386D4380;
 
-    var transaction = new Transaction().offerCreate('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', bid, ask, expiration, 1);
+    const transaction = new Transaction().offerCreate('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', bid, ask, expiration, 1);
 
     assert(transaction instanceof Transaction);
     assert.deepEqual(transaction.tx_json, {
@@ -1458,14 +1602,14 @@ describe('Transaction', function() {
   });
 
   it('Construct OfferCreate transaction - params object', function() {
-    var bid = '1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
-    var ask = '1/EUR/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
-    var expiration = new Date();
+    const bid = '1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
+    const ask = '1/EUR/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
+    const expiration = new Date();
     expiration.setHours(expiration.getHours() + 1);
 
-    var rippleExpiration = Math.round(expiration.getTime() / 1000) - 0x386D4380;
+    const rippleExpiration = Math.round(expiration.getTime() / 1000) - 0x386D4380;
 
-    var transaction = new Transaction().offerCreate({
+    const transaction = new Transaction().offerCreate({
       account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
       taker_gets: ask,
       taker_pays: bid,
@@ -1494,15 +1638,15 @@ describe('Transaction', function() {
   });
 
   it('Construct OfferCreate transaction - invalid account', function() {
-    var bid = '1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
-    var ask = '1/EUR/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
+    const bid = '1/USD/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
+    const ask = '1/EUR/rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm';
     assert.throws(function() {
       new Transaction().offerCreate('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', bid, ask);
     });
   });
 
   it('Construct SetRegularKey transaction', function() {
-    var transaction = new Transaction().setRegularKey('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+    const transaction = new Transaction().setRegularKey('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
 
     assert(transaction instanceof Transaction);
     assert.deepEqual(transaction.tx_json, {
@@ -1514,7 +1658,7 @@ describe('Transaction', function() {
   });
 
   it('Construct SetRegularKey transaction - params object', function() {
-    var transaction = new Transaction().setRegularKey({
+    const transaction = new Transaction().setRegularKey({
       account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
       regular_key: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
     });
@@ -1541,7 +1685,7 @@ describe('Transaction', function() {
   });
 
   it('Construct Payment transaction', function() {
-    var transaction = new Transaction().payment(
+    const transaction = new Transaction().payment(
       'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
       'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
       '1'
@@ -1558,7 +1702,7 @@ describe('Transaction', function() {
   });
 
   it('Construct Payment transaction - complex amount', function() {
-    var transaction = new Transaction().payment(
+    const transaction = new Transaction().payment(
       'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
       'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
       '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
@@ -1579,7 +1723,7 @@ describe('Transaction', function() {
   });
 
   it('Construct Payment transaction - params object', function() {
-    var transaction = new Transaction().payment({
+    const transaction = new Transaction().payment({
       account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
       destination: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
       amount: '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
@@ -1620,8 +1764,8 @@ describe('Transaction', function() {
   });
 
   it('Construct TrustSet transaction', function() {
-    var limit = '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe';
-    var transaction = new Transaction().trustSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', limit);
+    const limit = '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe';
+    const transaction = new Transaction().trustSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', limit);
     assert(transaction instanceof Transaction);
     assert.deepEqual(transaction.tx_json, {
       Flags: 0,
@@ -1636,8 +1780,8 @@ describe('Transaction', function() {
   });
 
   it('Construct TrustSet transaction - with qualityIn, qualityOut', function() {
-    var limit = '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe';
-    var transaction = new Transaction().trustSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', limit, 1.0, 1.0);
+    const limit = '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe';
+    const transaction = new Transaction().trustSet('rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', limit, 1.0, 1.0);
     assert(transaction instanceof Transaction);
     assert.deepEqual(transaction.tx_json, {
       Flags: 0,
@@ -1654,8 +1798,8 @@ describe('Transaction', function() {
   });
 
   it('Construct TrustSet transaction - params object', function() {
-    var limit = '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe';
-    var transaction = new Transaction().trustSet({
+    const limit = '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe';
+    const transaction = new Transaction().trustSet({
       account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
       limit: limit,
       quality_in: 1.0,
@@ -1679,21 +1823,21 @@ describe('Transaction', function() {
 
   it('Construct TrustSet transaction - invalid account', function() {
     assert.throws(function() {
-      var limit = '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe';
+      const limit = '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe';
       new Transaction().trustSet('xrsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm', limit, 1.0, 1.0);
     });
   });
 
   it('Submit transaction', function(done) {
-    var remote = new Remote();
-    var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+    const remote = new Remote();
+    const transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
 
     assert.strictEqual(transaction.callback, undefined);
     assert.strictEqual(transaction._errorHandler, undefined);
     assert.strictEqual(transaction._successHandler, undefined);
     assert.strictEqual(transaction.listeners('error').length, 1);
 
-    var account = remote.addAccount('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+    const account = remote.addAccount('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
 
     account._transactionManager._nextSequence = 1;
 
@@ -1705,7 +1849,7 @@ describe('Transaction', function() {
       return this;
     };
 
-    var receivedSuccess = false;
+    let receivedSuccess = false;
 
     transaction.once('success', function() {
       receivedSuccess = true;
@@ -1728,11 +1872,11 @@ describe('Transaction', function() {
   });
 
   it('Submit transaction - submission error', function(done) {
-    var remote = new Remote();
+    const remote = new Remote();
 
-    var transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+    const transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
 
-    var account = remote.addAccount('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
+    const account = remote.addAccount('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
 
     account._transactionManager._nextSequence = 1;
 
@@ -1744,7 +1888,7 @@ describe('Transaction', function() {
       return this;
     };
 
-    var receivedError = false;
+    let receivedError = false;
 
     transaction.once('error', function() {
       receivedError = true;
@@ -1763,7 +1907,7 @@ describe('Transaction', function() {
   });
 
   it('Submit transaction - submission error, no remote', function(done) {
-    var transaction = new Transaction();
+    const transaction = new Transaction();
 
     transaction.once('error', function(error) {
       assert(error);
@@ -1775,7 +1919,7 @@ describe('Transaction', function() {
   });
 
   it('Submit transaction - invalid account', function(done) {
-    var remote = new Remote();
+    const remote = new Remote();
     assert.throws(function() {
       new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWeZ');
     });
@@ -1783,10 +1927,10 @@ describe('Transaction', function() {
   });
 
   it('Abort submission on presubmit', function(done) {
-    var remote = new Remote();
+    const remote = new Remote();
     remote.setSecret('rJaT8TafQfYJqDm8aC5n3Yx5yWEL2Ery79', 'snPwFATthTkKnGjEW73q3TL4yci1Q');
 
-    var server = new Server(remote, 'wss://s1.ripple.com:443');
+    const server = new Server(remote, 'wss://s1.ripple.com:443');
     server._computeFee = function() {
       return '12';
     };
@@ -1796,8 +1940,8 @@ describe('Transaction', function() {
     remote._connected = true;
     remote._ledger_current_index = 1;
 
-    var transaction = new Transaction(remote).accountSet('rJaT8TafQfYJqDm8aC5n3Yx5yWEL2Ery79');
-    var account = remote.account('rJaT8TafQfYJqDm8aC5n3Yx5yWEL2Ery79');
+    const transaction = new Transaction(remote).accountSet('rJaT8TafQfYJqDm8aC5n3Yx5yWEL2Ery79');
+    const account = remote.account('rJaT8TafQfYJqDm8aC5n3Yx5yWEL2Ery79');
 
     account._transactionManager._nextSequence = 1;
 
@@ -1815,7 +1959,7 @@ describe('Transaction', function() {
   });
 
   it('Get min ledger', function() {
-    var queue = new TransactionQueue();
+    let queue = new TransactionQueue();
 
     // Randomized submit indexes
     [
@@ -1831,13 +1975,13 @@ describe('Transaction', function() {
       543305
     ]
     .forEach(function(index) {
-      var tx = new Transaction();
+      let tx = new Transaction();
       tx.initialSubmitIndex = index;
       queue.push(tx);
     });
 
     // Pending queue sorted by submit index
-    var sorted = queue._queue.slice().sort(function(a, b) {
+    const sorted = queue._queue.slice().sort(function(a, b) {
       return a.initialSubmitIndex - b.initialSubmitIndex;
     });
 

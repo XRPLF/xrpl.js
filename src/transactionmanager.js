@@ -1,13 +1,13 @@
 'use strict';
 
-var util = require('util');
-var assert = require('assert');
-var async = require('async');
-var EventEmitter = require('events').EventEmitter;
-var Transaction = require('./transaction').Transaction;
-var RippleError = require('./rippleerror').RippleError;
-var PendingQueue = require('./transactionqueue').TransactionQueue;
-var log = require('./log').internal.sub('transactionmanager');
+const util = require('util');
+const assert = require('assert');
+const async = require('async');
+const EventEmitter = require('events').EventEmitter;
+const Transaction = require('./transaction').Transaction;
+const RippleError = require('./rippleerror').RippleError;
+const PendingQueue = require('./transactionqueue').TransactionQueue;
+const log = require('./log').internal.sub('transactionmanager');
 
 /**
  * @constructor TransactionManager
@@ -17,7 +17,7 @@ var log = require('./log').internal.sub('transactionmanager');
 function TransactionManager(account) {
   EventEmitter.call(this);
 
-  var self = this;
+  const self = this;
 
   this._account = account;
   this._accountID = account._account_id;
@@ -95,11 +95,11 @@ TransactionManager._isTooBusy = function(error) {
  */
 
 TransactionManager.normalizeTransaction = function(tx) {
-  var transaction = { };
-  var keys = Object.keys(tx);
+  let transaction = { };
+  const keys = Object.keys(tx);
 
-  for (var i = 0; i < keys.length; i++) {
-    var k = keys[i];
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i];
     switch (k) {
       case 'transaction':
         // Account transaction stream
@@ -141,7 +141,7 @@ TransactionManager.normalizeTransaction = function(tx) {
  */
 
 TransactionManager.prototype._transactionReceived = function(tx) {
-  var transaction = TransactionManager.normalizeTransaction(tx);
+  const transaction = TransactionManager.normalizeTransaction(tx);
 
   if (!transaction.validated) {
     // Transaction has not been validated
@@ -159,8 +159,8 @@ TransactionManager.prototype._transactionReceived = function(tx) {
 
   this._pending.addReceivedSequence(transaction.tx_json.Sequence);
 
-  var hash = transaction.tx_json.hash;
-  var submission = this._pending.getSubmission(hash);
+  const hash = transaction.tx_json.hash;
+  const submission = this._pending.getSubmission(hash);
 
   if (!(submission instanceof Transaction)) {
     // The received transaction does not correlate to one submitted
@@ -189,7 +189,7 @@ TransactionManager.prototype._transactionReceived = function(tx) {
  */
 
 TransactionManager.prototype._adjustFees = function() {
-  var self = this;
+  const self = this;
 
   if (!this._remote.local_fee) {
     return;
@@ -207,8 +207,8 @@ TransactionManager.prototype._adjustFees = function() {
       return;
     }
 
-    var oldFee = transaction.tx_json.Fee;
-    var newFee = transaction._computeFee();
+    const oldFee = transaction.tx_json.Fee;
+    const newFee = transaction._computeFee();
 
     if (Number(newFee) > self._maxFee) {
       // Max transaction fee exceeded, abort submission
@@ -271,10 +271,10 @@ TransactionManager.prototype._updatePendingStatus = function(ledger) {
 
 // Fill an account transaction sequence
 TransactionManager.prototype._fillSequence = function(tx, callback) {
-  var self = this;
+  const self = this;
 
   function submitFill(sequence, fCallback) {
-    var fillTransaction = self._remote.createTransaction('AccountSet', {
+    let fillTransaction = self._remote.createTransaction('AccountSet', {
       account: self._accountID
     });
     fillTransaction.tx_json.Sequence = sequence;
@@ -294,8 +294,8 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
       return callback();
     }
 
-    var sequenceDiff = tx.tx_json.Sequence - sequence;
-    var submitted = 0;
+    const sequenceDiff = tx.tx_json.Sequence - sequence;
+    let submitted = 0;
 
     async.whilst(
       function() {
@@ -328,9 +328,11 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
  * @api private
  */
 
-TransactionManager.prototype._loadSequence = function(callback) {
-  var self = this;
-  callback = (typeof callback === 'function') ? callback : function() {};
+TransactionManager.prototype._loadSequence = function(callback_) {
+  const self = this;
+  const callback = (typeof callback_ === 'function')
+  ? callback_
+  : function() {};
 
   function sequenceLoaded(err, sequence) {
     if (err || typeof sequence !== 'number') {
@@ -356,9 +358,11 @@ TransactionManager.prototype._loadSequence = function(callback) {
  * @api private
  */
 
-TransactionManager.prototype._handleReconnect = function(callback) {
-  var self = this;
-  callback = (typeof callback === 'function') ? callback : function() {};
+TransactionManager.prototype._handleReconnect = function(callback_) {
+  const self = this;
+  const callback = (typeof callback_ === 'function')
+  ? callback_
+  : function() {};
 
   if (!this._pending.length()) {
     callback();
@@ -387,7 +391,7 @@ TransactionManager.prototype._handleReconnect = function(callback) {
     });
   }
 
-  var options = {
+  const options = {
     account: this._accountID,
     ledger_index_min: this._pending.getMinLedger(),
     ledger_index_max: -1,
@@ -415,8 +419,8 @@ TransactionManager.prototype._waitLedgers = function(ledgers, callback) {
     return callback();
   }
 
-  var self = this;
-  var closes = 0;
+  const self = this;
+  let closes = 0;
 
   function ledgerClosed() {
     if (++closes === ledgers) {
@@ -437,10 +441,13 @@ TransactionManager.prototype._waitLedgers = function(ledgers, callback) {
  * @api private
  */
 
-TransactionManager.prototype._resubmit = function(ledgers, pending) {
-  var self = this;
+TransactionManager.prototype._resubmit = function(ledgers_, pending_) {
+  const self = this;
 
-  if (ledgers && typeof ledgers !== 'number') {
+  let ledgers = ledgers_;
+  let pending = pending_;
+
+  if (arguments.length === 1) {
     pending = ledgers;
     ledgers = 0;
   }
@@ -457,7 +464,7 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
     }
 
     // Find ID within cache of received (validated) transaction IDs
-    var received = transaction.findId(self._pending._idCache);
+    const received = transaction.findId(self._pending._idCache);
 
     if (received) {
       switch (received.engine_result) {
@@ -504,15 +511,15 @@ TransactionManager.prototype._resubmit = function(ledgers, pending) {
  */
 
 TransactionManager.prototype._prepareRequest = function(tx) {
-  var submitRequest = this._remote.requestSubmit();
+  const submitRequest = this._remote.requestSubmit();
 
   if (this._remote.local_signing) {
     tx.sign();
 
-    var serialized = tx.serialize();
+    const serialized = tx.serialize();
     submitRequest.tx_blob(serialized.to_hex());
 
-    var hash = tx.hash(null, null, serialized);
+    const hash = tx.hash(null, null, serialized);
     tx.addId(hash);
   } else {
     // ND: `build_path` is completely ignored when doing local signing as
@@ -536,8 +543,8 @@ TransactionManager.prototype._prepareRequest = function(tx) {
  */
 
 TransactionManager.prototype._request = function(tx) {
-  var self = this;
-  var remote = this._remote;
+  const self = this;
+  const remote = this._remote;
 
   if (tx.finalized) {
     return;
@@ -549,7 +556,7 @@ TransactionManager.prototype._request = function(tx) {
   }
 
   if (tx.attempts > 0 && !remote.local_signing) {
-    var errMessage = 'Automatic resubmission requires local signing';
+    const errMessage = 'Automatic resubmission requires local signing';
     tx.emit('error', new RippleError('tejLocalSigningRequired', errMessage));
     return;
   }
@@ -671,7 +678,7 @@ TransactionManager.prototype._request = function(tx) {
     tx.sign();
   }
 
-  var submitRequest = this._prepareRequest(tx);
+  const submitRequest = this._prepareRequest(tx);
   submitRequest.once('error', submitted);
   submitRequest.once('success', submitted);
 
@@ -692,7 +699,7 @@ TransactionManager.prototype._request = function(tx) {
  */
 
 TransactionManager.prototype.submit = function(tx) {
-  var self = this;
+  const self = this;
 
   if (typeof this._nextSequence !== 'number') {
     // If sequence number is not yet known, defer until it is.
