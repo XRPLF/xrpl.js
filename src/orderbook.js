@@ -924,7 +924,11 @@ OrderBook.prototype.notify = function(transaction) {
         break;
 
       case 'CreatedNode':
-        self.setOwnerFunds(node.fields.Account, transactionOwnerFunds);
+        // rippled does not set owner_funds if the order maker is the issuer
+        // because the value would be infinite
+        var fundedAmount = transactionOwnerFunds !== undefined ?
+          transactionOwnerFunds : Infinity;
+        self.setOwnerFunds(node.fields.Account, fundedAmount);
         self.insertOffer(node);
         break;
     }
