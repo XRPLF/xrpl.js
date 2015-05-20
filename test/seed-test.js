@@ -1,26 +1,26 @@
 /* eslint max-len: 0 */
 'use strict';
-var assert = require('assert');
-var Seed = require('ripple-lib').Seed;
+const assert = require('assert');
+const Seed = require('ripple-lib').Seed;
 
 function assert_helper(seed_json, address_or_nth, expected) {
-  var seed = Seed.from_json(seed_json);
-  var keypair = seed.get_key(address_or_nth, 500);
+  const seed = Seed.from_json(seed_json);
+  const keypair = seed.get_key(address_or_nth, 500);
   assert.strictEqual(keypair.to_hex_pub(), expected);
 }
 
 describe('Seed', function() {
-  it('saESc82Vun7Ta5EJRzGJbrXb5HNYk', function () {
-    var seed = Seed.from_json('saESc82Vun7Ta5EJRzGJbrXb5HNYk');
+  it('saESc82Vun7Ta5EJRzGJbrXb5HNYk', function() {
+    const seed = Seed.from_json('saESc82Vun7Ta5EJRzGJbrXb5HNYk');
     assert.strictEqual(seed.to_hex(), 'FF1CF838D02B2CF7B45BAC27F5F24F4F');
   });
-  it('sp6iDHnmiPN7tQFHm5sCW59ax3hfE', function () {
-    var seed = Seed.from_json('sp6iDHnmiPN7tQFHm5sCW59ax3hfE');
+  it('sp6iDHnmiPN7tQFHm5sCW59ax3hfE', function() {
+    const seed = Seed.from_json('sp6iDHnmiPN7tQFHm5sCW59ax3hfE');
     assert.strictEqual(seed.to_hex(), '00AD8DA764C3C8AF5F9B8D51C94B9E49');
   });
-  it('can generate many addresses', function () {
+  it('can generate many addresses', function() {
 
-    var test_data = [
+    const test_data = [
       // Format:
       // [passphrase, address, nth-for-seed, expected-public-key]
       ['masterpassphrase', 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', 0,
@@ -39,11 +39,11 @@ describe('Seed', function() {
        '023A2876EA130CBE7BBA0573C2DB4C4CEB9A7547666915BD40366CDC6150CF54DC']
     ];
 
-    for (var nth = 0; nth < test_data.length; nth++) {
-      var seed_json = test_data[nth][0];
-      var address = test_data[nth][1];
-      var nth_for_seed = test_data[nth][2];
-      var expected = test_data[nth][3];
+    for (let nth = 0; nth < test_data.length; nth++) {
+      const seed_json = test_data[nth][0];
+      const address = test_data[nth][1];
+      const nth_for_seed = test_data[nth][2];
+      const expected = test_data[nth][3];
 
       // `seed.get_key($ripple_address)` is arguably an ill concieved feature
       // as it needs to generate `nth` many keypairs and generate hashed public
@@ -58,17 +58,17 @@ describe('Seed', function() {
   });
 
   it('should return the key_pair for a valid account and secret pair', function() {
-    var address = 'r3GgMwvgvP8h4yVWvjH1dPZNvC37TjzBBE';
-    var seed = Seed.from_json('shsWGZcmZz6YsWWmcnpfr6fLTdtFV');
-    var keyPair = seed.get_key(address);
+    const address = 'r3GgMwvgvP8h4yVWvjH1dPZNvC37TjzBBE';
+    const seed = Seed.from_json('shsWGZcmZz6YsWWmcnpfr6fLTdtFV');
+    const keyPair = seed.get_key(address);
     assert.strictEqual(keyPair.get_address().to_json(), address);
     assert.strictEqual(keyPair.to_hex_pub(), '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8');
   });
 
   it('should not find a KeyPair for a secret that does not belong to the given account', function() {
-    var address = 'r3GgMwvgvP8h4yVWvjH1dPZNvC37TjzBBE';
-    var secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
-    var seed = Seed.from_json('snoPBrXtMeMyMHUVTgbuqAfg1SUTb');
+    const address = 'r3GgMwvgvP8h4yVWvjH1dPZNvC37TjzBBE';
+    const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+    const seed = Seed.from_json('snoPBrXtMeMyMHUVTgbuqAfg1SUTb');
     try {
       seed.get_key(address);
       assert(false, 'should throw an error');

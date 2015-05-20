@@ -1,7 +1,7 @@
 'use strict';
 
 function getMantissaDecimalString(bignum) {
-  var mantissa = bignum.toPrecision(16)
+  let mantissa = bignum.toPrecision(16)
     .replace(/\./, '')      // remove decimal point
     .replace(/e.*/, '')     // remove scientific notation
     .replace(/^0*/, '');    // remove leading zeroes
@@ -19,9 +19,9 @@ function trace(comment, func) {
 }
 
 function arraySet(count, value) {
-  var a = new Array(count);
+  const a = new Array(count);
 
-  for (var i = 0; i < count; i++) {
+  for (let i = 0; i < count; i++) {
     a[i] = value;
   }
 
@@ -29,8 +29,8 @@ function arraySet(count, value) {
 }
 
 function hexToString(h) {
-  var a = [];
-  var i = 0;
+  const a = [];
+  let i = 0;
 
   if (h.length % 2) {
     a.push(String.fromCharCode(parseInt(h.substring(0, 1), 16)));
@@ -45,18 +45,18 @@ function hexToString(h) {
 }
 
 function stringToHex(s) {
-  var result = '';
-  for (var i = 0; i < s.length; i++) {
-    var b = s.charCodeAt(i);
+  let result = '';
+  for (let i = 0; i < s.length; i++) {
+    const b = s.charCodeAt(i);
     result += b < 16 ? '0' + b.toString(16) : b.toString(16);
   }
   return result;
 }
 
 function stringToArray(s) {
-  var a = new Array(s.length);
+  const a = new Array(s.length);
 
-  for (var i = 0; i < a.length; i += 1) {
+  for (let i = 0; i < a.length; i += 1) {
     a[i] = s.charCodeAt(i);
   }
 
@@ -69,14 +69,15 @@ function hexToArray(h) {
 
 function arrayToHex(a) {
   return a.map(function(byteValue) {
-    var hex = byteValue.toString(16);
+    const hex = byteValue.toString(16);
     return hex.length > 1 ? hex : '0' + hex;
   }).join('');
 }
 
 function chunkString(str, n, leftAlign) {
-  var ret = [];
-  var i = 0, len = str.length;
+  const ret = [];
+  let i = 0;
+  const len = str.length;
 
   if (leftAlign) {
     i = str.length % n;
@@ -103,10 +104,10 @@ function assert(assertion, msg) {
  * @return {Array} unique values (for string representation of value) in `arr`
  */
 function arrayUnique(arr) {
-  var u = {}, a = [];
+  const u = {}, a = [];
 
-  for (var i = 0, l = arr.length; i < l; i++) {
-    var k = arr[i];
+  for (let i = 0, l = arr.length; i < l; i++) {
+    const k = arr[i];
     if (u[k]) {
       continue;
     }
@@ -131,11 +132,10 @@ function toTimestamp(rpepoch) {
  * @return {Number} seconds since ripple epoch ( 1/1/2000 GMT)
  */
 function fromTimestamp(timestamp) {
-  if (timestamp instanceof Date) {
-    timestamp = timestamp.getTime();
-  }
-
-  return Math.round(timestamp / 1000) - 0x386D4380;
+  const timestamp_ = timestamp instanceof Date ?
+                     timestamp.getTime() :
+                     timestamp;
+  return Math.round(timestamp_ / 1000) - 0x386D4380;
 }
 
 exports.time = {

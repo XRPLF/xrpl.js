@@ -1,21 +1,21 @@
 /* eslint-disable valid-jsdoc */
 'use strict';
-var async = require('async');
-var sjcl = require('./utils').sjcl;
-var Remote = require('./remote').Remote;
-var Seed = require('./seed').Seed;
-var KeyPair = require('./keypair').KeyPair;
-var Account = require('./account').Account;
-var UInt160 = require('./uint160').UInt160;
+const async = require('async');
+const sjcl = require('./utils').sjcl;
+const Remote = require('./remote').Remote;
+const Seed = require('./seed').Seed;
+const KeyPair = require('./keypair').KeyPair;
+const Account = require('./account').Account;
+const UInt160 = require('./uint160').UInt160;
 
 // Message class (static)
-var Message = {};
+const Message = {};
 
 Message.hashFunction = sjcl.hash.sha512.hash;
 Message.MAGIC_BYTES = 'Ripple Signed Message:\n';
 
-var REGEX_HEX = /^[0-9a-fA-F]+$/;
-var REGEX_BASE64 =
+const REGEX_HEX = /^[0-9a-fA-F]+$/;
+const REGEX_BASE64 =
   /^([A-Za-z0-9\+]{4})*([A-Za-z0-9\+]{2}==)|([A-Za-z0-9\+]{3}=)?$/;
 
 /**
@@ -58,25 +58,24 @@ Message.signMessage = function(message, secret_key, account) {
  *          the secret generator will be used.
  *  @returns {Base64-encoded String} signature
  */
-Message.signHash = function(hash, secret_key, account) {
+Message.signHash = function(_hash, secret_key_, account) {
 
-  if (typeof hash === 'string' && /^[0-9a-fA-F]+$/.test(hash)) {
-    hash = sjcl.codec.hex.toBits(hash);
-  }
+  const hash = typeof _hash === 'string' && /^[0-9a-fA-F]+$/.test(_hash) ?
+              sjcl.codec.hex.toBits(_hash) : _hash;
 
-  if (typeof hash !== 'object' || hash.length <= 0
-      || typeof hash[0] !== 'number') {
+  if (typeof hash !== 'object' ||
+      typeof hash[0] !== 'number' ||
+      hash.length <= 0) {
     throw new Error('Hash must be a bitArray or hex-encoded string');
   }
 
-  if (!(secret_key instanceof sjcl.ecc.ecdsa.secretKey)) {
-    secret_key = Seed.from_json(secret_key).get_key(account)._secret;
-  }
+  const secret_key = !(secret_key_ instanceof sjcl.ecc.ecdsa.secretKey) ?
+        Seed.from_json(secret_key_).get_key(account)._secret : secret_key_;
 
-  var PARANOIA_256_BITS = 6; // sjcl constant for ensuring 256 bits of entropy
-  var signature_bits = secret_key.signWithRecoverablePublicKey(hash,
+  const PARANOIA_256_BITS = 6; // sjcl constant for ensuring 256 bits of entropy
+  const signature_bits = secret_key.signWithRecoverablePublicKey(hash,
     PARANOIA_256_BITS);
-  var signature_base64 = sjcl.codec.base64.fromBits(signature_bits);
+  const signature_base64 = sjcl.codec.base64.fromBits(signature_bits);
 
   return signature_base64;
 
@@ -139,34 +138,30 @@ Message.verifyMessageSignature = function(data, remote, callback) {
  */
 Message.verifyHashSignature = function(data, remote, callback) {
 
-  var hash,
-    account,
-    signature;
-
   if (typeof callback !== 'function') {
     throw new Error('Must supply callback function');
   }
 
-  hash = data.hash;
-  if (hash && typeof hash === 'string' && REGEX_HEX.test(hash)) {
-    hash = sjcl.codec.hex.toBits(hash);
-  }
+  const hash = REGEX_HEX.test(data.hash) ?
+                sjcl.codec.hex.toBits(data.hash) :
+                            data.hash;
 
   if (typeof hash !== 'object' || hash.length <= 0
       || typeof hash[0] !== 'number') {
     return callback(new Error('Hash must be a bitArray or hex-encoded string'));
   }
 
-  account = data.account || data.address;
+  const account = data.account || data.address;
   if (!account || !UInt160.from_json(account).is_valid()) {
     return callback(new Error('Account must be a valid ripple address'));
   }
 
-  signature = data.signature;
+  const signature = data.signature;
   if (typeof signature !== 'string' || !REGEX_BASE64.test(signature)) {
     return callback(new Error('Signature must be a Base64-encoded string'));
   }
-  signature = sjcl.codec.base64.toBits(signature);
+
+  const signature_bits = sjcl.codec.base64.toBits(signature);
 
   if (!(remote instanceof Remote) || remote.state !== 'online') {
     return callback(new Error(
@@ -174,11 +169,10 @@ Message.verifyHashSignature = function(data, remote, callback) {
   }
 
   function recoverPublicKey(async_callback) {
-
-    var public_key;
+    let public_key;
     try {
       public_key =
-        sjcl.ecc.ecdsa.publicKey.recoverFromSignature(hash, signature);
+        sjcl.ecc.ecdsa.publicKey.recoverFromSignature(hash, signature_bits);
     } catch (err) {
       return async_callback(err);
     }
@@ -194,16 +188,16 @@ Message.verifyHashSignature = function(data, remote, callback) {
   function checkPublicKeyIsValid(public_key, async_callback) {
 
     // Get hex-encoded public key
-    var key_pair = new KeyPair();
+    const key_pair = new KeyPair();
     key_pair._pubkey = public_key;
-    var public_key_hex = key_pair.to_hex_pub();
+    const public_key_hex = key_pair.to_hex_pub();
 
-    var account_class_instance = new Account(remote, account);
+    const account_class_instance = new Account(remote, account);
     account_class_instance.publicKeyIsActive(public_key_hex, async_callback);
 
   }
 
-  var steps = [
+  const steps = [
     recoverPublicKey,
     checkPublicKeyIsValid
   ];

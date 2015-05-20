@@ -4,16 +4,16 @@
 // Seed support
 //
 
-var extend = require('extend');
-var utils = require('./utils');
-var sjcl = utils.sjcl;
+const extend = require('extend');
+const utils = require('./utils');
+const sjcl = utils.sjcl;
 
-var Base = require('./base').Base;
-var UInt = require('./uint').UInt;
-var UInt160 = require('./uint160').UInt160;
-var KeyPair = require('./keypair').KeyPair;
+const Base = require('./base').Base;
+const UInt = require('./uint').UInt;
+const UInt160 = require('./uint160').UInt160;
+const KeyPair = require('./keypair').KeyPair;
 
-var Seed = extend(function() {
+const Seed = extend(function() {
   this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;
 }, UInt);
@@ -49,8 +49,8 @@ Seed.prototype.parse_passphrase = function(j) {
     throw new Error('Passphrase must be a string');
   }
 
-  var hash = sjcl.hash.sha512.hash(sjcl.codec.utf8String.toBits(j));
-  var bits = sjcl.bitArray.bitSlice(hash, 0, 128);
+  const hash = sjcl.hash.sha512.hash(sjcl.codec.utf8String.toBits(j));
+  const bits = sjcl.bitArray.bitSlice(hash, 0, 128);
 
   this.parse_bits(bits);
 
@@ -62,7 +62,7 @@ Seed.prototype.to_json = function() {
     return NaN;
   }
 
-  var output = Base.encode_check(Base.VER_FAMILY_SEED, this.to_bytes());
+  const output = Base.encode_check(Base.VER_FAMILY_SEED, this.to_bytes());
 
   return output;
 };
@@ -96,8 +96,8 @@ function firstHalfOfSHA512(bytes) {
 *
 */
 Seed.prototype.get_key = function(account, maxLoops) {
-  var account_number = 0, address;
-  var max_loops = maxLoops || 1;
+  let account_number = 0, address;
+  let max_loops = maxLoops || 1;
 
   if (!this.is_valid()) {
     throw new Error('Cannot generate keys from invalid seed!');
@@ -111,9 +111,9 @@ Seed.prototype.get_key = function(account, maxLoops) {
     }
   }
 
-  var private_gen, public_gen;
-  var curve = this._curve;
-  var i = 0;
+  let private_gen, public_gen;
+  const curve = this._curve;
+  let i = 0;
 
   do {
     private_gen = sjcl.bn.fromBits(
@@ -123,8 +123,8 @@ Seed.prototype.get_key = function(account, maxLoops) {
 
   public_gen = curve.G.mult(private_gen);
 
-  var sec;
-  var key_pair;
+  let sec;
+  let key_pair;
 
   do {
 
