@@ -1,6 +1,6 @@
 'use strict';
 
-var assert = require('assert');
+const assert = require('assert');
 
 /**
  * Logging functionality for ripple-lib and any applications built on it.
@@ -36,13 +36,13 @@ function Log(namespace) {
  * @return {Log} sub logger
  */
 Log.prototype.sub = function(namespace) {
-  var subNamespace = this._namespace.slice();
+  const subNamespace = this._namespace.slice();
 
   if (namespace && typeof namespace === 'string') {
     subNamespace.push(namespace);
   }
 
-  var subLogger = new Log(subNamespace);
+  const subLogger = new Log(subNamespace);
   subLogger._setParent(this);
   return subLogger;
 };
@@ -53,7 +53,7 @@ Log.prototype._setParent = function(parentLogger) {
 
 Log.makeLevel = function(level) {
   return function() {
-    var args = Array.prototype.slice.apply(arguments);
+    const args = Array.prototype.slice.apply(arguments);
     args[0] = this._prefix + args[0];
     Log.engine.logObject.apply(Log, [level].concat(args[0], [args.slice(2)]));
   };
@@ -71,7 +71,7 @@ Log.prototype.error = Log.makeLevel(4);
  */
 
 function getLogInfo(message, args) {
-  var stack = new Error().stack;
+  const stack = new Error().stack;
 
   return [
     // Timestamp
@@ -104,7 +104,7 @@ function logMessage(logLevel, args) {
   }
 }
 
-var engines = {};
+const engines = {};
 
 /**
  * Basic logging connector.
@@ -113,8 +113,8 @@ var engines = {};
  * implementations. This is the logging engine used in Node.js.
  */
 engines.basic = {
-  logObject: function logObject(level, message, args) {
-    args = args.map(function(arg) {
+  logObject: function logObject(level, message, args_) {
+    const args = args_.map(function(arg) {
       return JSON.stringify(arg, null, 2);
     });
 
@@ -130,8 +130,8 @@ engines.basic = {
  * function without any stringification.
  */
 engines.interactive = {
-  logObject: function(level, message, args) {
-    args = args.map(function(arg) {
+  logObject: function(level, message, args_) {
+    const args = args_.map(function(arg) {
       return /MSIE/.test(navigator.userAgent)
       ? JSON.stringify(arg, null, 2)
       : arg;

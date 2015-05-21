@@ -5,6 +5,7 @@ const util = require('util');
 const url = require('url');
 const LRU = require('lru-cache');
 const EventEmitter = require('events').EventEmitter;
+const RippleError = require('./').RippleError;
 const Amount = require('./amount').Amount;
 const RangeSet = require('./rangeset').RangeSet;
 const log = require('./log').internal.sub('server');
@@ -442,12 +443,12 @@ Server.prototype.connect = function() {
   self.emit('connecting');
 
   ws.onmessage = function onMessage(msg) {
-    var message = msg.data;
+    let message = msg.data;
 
     try {
       message = JSON.parse(message);
     } catch (e) {
-      var error = new RippleError('unexpected',
+      const error = new RippleError('unexpected',
         'Unexpected response from server: ' + JSON.stringify(message));
 
       self.emit('unexpected', message);
