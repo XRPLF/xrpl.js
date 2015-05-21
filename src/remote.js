@@ -13,28 +13,28 @@
 // has not yet been implemented. However, this class has been designed for it
 // to be a very simple drop option.
 
-var EventEmitter = require('events').EventEmitter;
-var util = require('util');
-var assert = require('assert');
-var LRU = require('lru-cache');
-var async = require('async');
-var lodash = require('lodash');
-var Server = require('./server').Server;
-var Request = require('./request').Request;
-var Amount = require('./amount').Amount;
-var Currency = require('./currency').Currency;
-var UInt160 = require('./uint160').UInt160;
-var UInt256 = require('./uint256').UInt256;
-var Transaction = require('./transaction').Transaction;
-var Account = require('./account').Account;
-var Meta = require('./meta').Meta;
-var OrderBook = require('./orderbook').OrderBook;
-var PathFind = require('./pathfind').PathFind;
-var SerializedObject = require('./serializedobject').SerializedObject;
-var RippleError = require('./rippleerror').RippleError;
-var utils = require('./utils');
-var hashprefixes = require('./hashprefixes');
-var log = require('./log').internal.sub('remote');
+const EventEmitter = require('events').EventEmitter;
+const util = require('util');
+const assert = require('assert');
+const LRU = require('lru-cache');
+const async = require('async');
+const lodash = require('lodash');
+const Server = require('./server').Server;
+const Request = require('./request').Request;
+const Amount = require('./amount').Amount;
+const Currency = require('./currency').Currency;
+const UInt160 = require('./uint160').UInt160;
+const UInt256 = require('./uint256').UInt256;
+const Transaction = require('./transaction').Transaction;
+const Account = require('./account').Account;
+const Meta = require('./meta').Meta;
+const OrderBook = require('./orderbook').OrderBook;
+const PathFind = require('./pathfind').PathFind;
+const SerializedObject = require('./serializedobject').SerializedObject;
+const RippleError = require('./rippleerror').RippleError;
+const utils = require('./utils');
+const hashprefixes = require('./hashprefixes');
+const log = require('./log').internal.sub('remote');
 
 /**
  * Interface to manage connections to rippled servers
@@ -42,19 +42,12 @@ var log = require('./log').internal.sub('remote');
  * @param {Object} Options
  */
 
-function Remote(opts) {
+function Remote(options = {}) {
   EventEmitter.call(this);
 
-  var self = this;
-  opts = opts || { };
+  const self = this;
 
-  Object.keys(Remote.DEFAULTS).forEach(function(option) {
-    if (opts.hasOwnProperty(option)) {
-      this[option] = opts[option];
-    } else {
-      this[option] = Remote.DEFAULTS[option];
-    }
-  }, this);
+  lodash.merge(this, lodash.defaults(options, Remote.DEFAULTS));
 
   this.state = 'offline'; // 'online', 'offline'
   this._server_fatal = false; // server exited
@@ -152,7 +145,7 @@ function Remote(opts) {
   this.setMaxListeners(this.max_listeners);
 
   this.servers.forEach(function(serverOptions) {
-    var server = self.addServer(serverOptions);
+    const server = self.addServer(serverOptions);
     server.setMaxListeners(self.max_listeners);
   });
 
@@ -362,10 +355,9 @@ Remote.prototype.setSecret = function(account, secret) {
   this.secrets[account] = secret;
 };
 
-Remote.prototype.addServer = function(opts) {
-  var self = this;
-
-  var server = new Server(this, opts);
+Remote.prototype.addServer = function(options) {
+  const self = this;
+  const server = new Server(this, options);
 
   function serverMessage(data) {
     self._handleMessage(data, server);
@@ -376,7 +368,7 @@ Remote.prototype.addServer = function(opts) {
   function serverConnect() {
     self._connection_count += 1;
 
-    if (opts.primary) {
+    if (options.primary) {
       self._setPrimaryServer(server);
     }
     if (self._connection_count === 1) {
@@ -451,14 +443,14 @@ Remote.prototype.connect = function(callback) {
  * @api public
  */
 
-Remote.prototype.disconnect = function(callback) {
+Remote.prototype.disconnect = function(callback_) {
   if (!this._servers.length) {
     throw new Error('No servers available, not disconnecting');
   }
 
-  if (typeof callback !== 'function') {
-    callback = function() {};
-  }
+  let callback = lodash.isFunction(callback_)
+  ? callback_
+  : function() {};
 
   this._should_connect = false;
 
@@ -490,20 +482,13 @@ Remote.prototype.disconnect = function(callback) {
  */
 
 Remote.prototype._handleMessage = function(message, server) {
-  try {
-    message = JSON.parse(message);
-
-  /*eslint-disable no-empty*/
-  } catch (e) {
-    // TODO: why are we suppressing this?
-    console.error(e);
-  }
-  /*eslint-enable no-empty*/
-
   if (!Remote.isValidMessage(message)) {
     // Unexpected response from remote.
-    this.emit('error', new RippleError('remoteUnexpected',
-      'Unexpected response from remote'));
+    const error = new RippleError('remoteUnexpected',
+      'Unexpected response from remote: ' + JSON.stringify(message));
+
+    this.emit('error', error);
+    log.error(error);
     return;
   }
 
@@ -544,7 +529,7 @@ Remote.prototype.getLedgerSequence = function() {
  */
 
 Remote.prototype._handleLedgerClosed = function(message, server) {
-  var self = this;
+  const self = this;
 
   // XXX If not trusted, need to verify we consider ledger closed.
   // XXX Also need to consider a slow server or out of order response.
@@ -554,7 +539,7 @@ Remote.prototype._handleLedgerClosed = function(message, server) {
     return;
   }
 
-  var ledgerAdvanced = message.ledger_index >= this._ledger_current_index;
+  const ledgerAdvanced = message.ledger_index >= this._ledger_current_index;
 
   if (isNaN(this._ledger_current_index) || ledgerAdvanced) {
     this._ledger_time = message.ledger_time;
@@ -590,7 +575,7 @@ Remote.prototype._handleServerStatus = function(message, server) {
 
 Remote.prototype._handleTransaction = function(message, server) {
   // XXX If not trusted, need proof.
-  var transactionHash = message.transaction.hash;
+  const transactionHash = message.transaction.hash;
 
   if (this._received_tx.get(transactionHash)) {
     // De-duplicate transactions
@@ -605,7 +590,7 @@ Remote.prototype._handleTransaction = function(message, server) {
     log.info('tx:', message);
   }
 
-  var metadata = message.meta || message.metadata;
+  const metadata = message.meta || message.metadata;
 
   if (metadata) {
     // Process metadata
@@ -695,13 +680,9 @@ Remote.prototype.isConnected = function() {
  */
 
 Remote.prototype.getConnectedServers = function() {
-  var servers = [ ];
-  for (var i = 0; i < this._servers.length; i++) {
-    if (this._servers[i].isConnected()) {
-      servers.push(this._servers[i]);
-    }
-  }
-  return servers;
+  return this._servers.filter(function(server) {
+    return server.isConnected();
+  });
 };
 
 /**
@@ -719,17 +700,17 @@ Remote.prototype.getServer = function() {
     return null;
   }
 
-  var connectedServers = this.getConnectedServers();
+  const connectedServers = this.getConnectedServers();
   if (connectedServers.length === 0 || !connectedServers[0]) {
     return null;
   }
 
-  var server = connectedServers[0];
-  var cScore = server._score + server._fee;
+  let server = connectedServers[0];
+  let cScore = server._score + server._fee;
 
-  for (var i = 1; i < connectedServers.length; i++) {
-    var _server = connectedServers[i];
-    var bScore = _server._score + _server._fee;
+  for (let i = 1; i < connectedServers.length; i++) {
+    const _server = connectedServers[i];
+    const bScore = _server._score + _server._fee;
     if (bScore < cScore) {
       server = _server;
       cScore = bScore;
@@ -747,14 +728,16 @@ Remote.prototype.getServer = function() {
  * @param {Request} request
  */
 
-Remote.prototype.request = function(request) {
+Remote.prototype.request = function(request_) {
+  let request = request_;
+
   if (typeof request === 'string') {
     if (!/^request_/.test(request)) {
       request = 'request_' + request;
     }
 
     if (typeof this[request] === 'function') {
-      var args = Array.prototype.slice.call(arguments, 1);
+      const args = Array.prototype.slice.call(arguments, 1);
       return this[request].apply(this, args);
     }
 
@@ -775,7 +758,7 @@ Remote.prototype.request = function(request) {
     return request.emit('error', new Error('Server does not exist'));
   }
 
-  var server = request.server || this.getServer();
+  const server = request.server || this.getServer();
   if (server) {
     server._request(request);
   } else {
@@ -792,8 +775,9 @@ Remote.prototype.request = function(request) {
  */
 
 Remote.prototype.ping =
-Remote.prototype.requestPing = function(host, callback) {
-  var request = new Request(this, 'ping');
+Remote.prototype.requestPing = function(host, callback_) {
+  const request = new Request(this, 'ping');
+  let callback = callback_;
 
   switch (typeof host) {
     case 'function':
@@ -804,7 +788,7 @@ Remote.prototype.requestPing = function(host, callback) {
       break;
   }
 
-  var then = Date.now();
+  const then = Date.now();
 
   request.once('success', function() {
     request.emit('pong', Date.now() - then);
@@ -832,12 +816,13 @@ Remote.prototype.requestServerInfo = function(callback) {
  * @return {Request} request
  */
 
-Remote.prototype.requestLedger = function(options, callback) {
+Remote.prototype.requestLedger = function(options, callback_) {
   // XXX This is a bad command. Some variants don't scale.
   // XXX Require the server to be trusted.
   // utils.assert(this.trusted);
 
-  var request = new Request(this, 'ledger');
+  const request = new Request(this, 'ledger');
+  let callback = callback_;
 
   switch (typeof options) {
     case 'undefined': break;
@@ -946,7 +931,7 @@ Remote.prototype.requestLedgerCurrent = function(callback) {
  */
 
 Remote.prototype.requestLedgerData = function(options, callback) {
-  var request = new Request(this, 'ledger_data');
+  const request = new Request(this, 'ledger_data');
 
   request.message.binary = options.binary !== false;
   request.selectLedger(options.ledger);
@@ -989,16 +974,14 @@ Remote.prototype.requestLedgerData = function(options, callback) {
  * @return {Request} request
  */
 
-Remote.prototype.requestLedgerEntry = function(type, callback) {
+Remote.prototype.requestLedgerEntry = function(type, callback_) {
   // utils.assert(this.trusted);
   // If not trusted, need to check proof, maybe talk packet protocol.
 
-  var self = this;
-  var request = new Request(this, 'ledger_entry');
+  const self = this;
 
-  if (typeof type === 'function') {
-    callback = type;
-  }
+  let request = new Request(this, 'ledger_entry');
+  const callback = lodash.isFunction(type) ? type : callback_;
 
   // Transparent caching. When .request() is invoked, look in the Remote object
   // for the result.  If not found, listen, cache result, and emit it.
@@ -1009,16 +992,16 @@ Remote.prototype.requestLedgerEntry = function(type, callback) {
 
     request.request = function() {
       // Intercept default request.
-      var bDefault = true;
+      let bDefault = true;
 
       if (!self._ledger_hash && type === 'account_root') {
-        var cache = self.ledgers.current.account_root;
+        let cache = self.ledgers.current.account_root;
 
         if (!cache) {
           cache = self.ledgers.current.account_root = {};
         }
 
-        var node = self.ledgers.current
+        const node = self.ledgers.current
         .account_root[request.message.account_root];
 
         if (node) {
@@ -1067,7 +1050,7 @@ Remote.prototype.requestLedgerEntry = function(type, callback) {
  */
 
 Remote.prototype.requestSubscribe = function(streams, callback) {
-  var request = new Request(this, 'subscribe');
+  const request = new Request(this, 'subscribe');
 
   if (streams) {
     request.message.streams = Array.isArray(streams) ? streams : [streams];
@@ -1087,7 +1070,7 @@ Remote.prototype.requestSubscribe = function(streams, callback) {
  */
 
 Remote.prototype.requestUnsubscribe = function(streams, callback) {
-  var request = new Request(this, 'unsubscribe');
+  const request = new Request(this, 'unsubscribe');
 
   if (streams) {
     request.message.streams = Array.isArray(streams) ? streams : [streams];
@@ -1107,36 +1090,44 @@ Remote.prototype.requestUnsubscribe = function(streams, callback) {
  * @return {Request} request
  */
 
-Remote.prototype.requestTransactionEntry =
-function(hash, ledgerHash, callback) {
+Remote.prototype.requestTransactionEntry = function(options_, callback_) {
   // If not trusted, need to check proof, maybe talk packet protocol.
   // utils.assert(this.trusted);
-  var request = new Request(this, 'transaction_entry');
+  let options, callback = callback_;
 
-  if (typeof hash === 'object') {
-    ledgerHash = hash.ledger || hash.ledger_hash || hash.ledger_index;
-    hash = hash.hash || hash.tx || hash.transaction;
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({
+      ledger: options_.ledger_index || options_.ledger_hash
+    }, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    const args = Array.prototype.slice.call(arguments);
+
+    if (lodash.isFunction(lodash.last(args))) {
+      callback = args.pop();
+    }
+
+    options = {
+      hash: args.shift(),
+      ledger: args.shift()
+    };
   }
 
-  request.txHash(hash);
+  const request = new Request(this, 'transaction_entry');
+  request.txHash(options.hash);
 
-  switch (typeof ledgerHash) {
+  switch (typeof options.ledger) {
     case 'string':
     case 'number':
-      request.selectLedger(ledgerHash);
+      request.selectLedger(options.ledger);
       break;
-
     case 'undefined':
-    case 'function':
       request.ledgerIndex('validated');
-      callback = ledgerHash;
       break;
-
     default:
-      throw new Error('Invalid ledger_hash type');
+      throw new Error('ledger must be a ledger index or hash');
   }
 
   request.callback(callback);
@@ -1156,19 +1147,28 @@ function(hash, ledgerHash, callback) {
  */
 
 Remote.prototype.requestTransaction =
-Remote.prototype.requestTx = function(hash, callback) {
-  var options;
+Remote.prototype.requestTx = function(options_, callback_) {
+  let options, callback = callback_;
 
-  if (typeof hash === 'string') {
-    options = {hash: hash};
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({}, options_);
+  } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
-  } else {
-    options = hash;
+
+    const args = Array.prototype.slice.call(arguments);
+
+    if (lodash.isFunction(lodash.last(args))) {
+      callback = args.pop();
+    }
+
+    options = {
+      hash: args.shift(),
+      binary: args.shift()
+    };
   }
 
-  var request = new Request(this, 'tx');
-
+  const request = new Request(this, 'tx');
   request.message.binary = options.binary !== false;
   request.message.transaction = options.hash;
 
@@ -1197,8 +1197,8 @@ Remote.prototype.requestTx = function(hash, callback) {
  * when paging to ensure a complete response
  *
  * @param {String} type - request name, e.g. 'account_lines'
- * @param {String} account - ripple address
  * @param {Object} options - all optional
+ *   @param {String} account - ripple address
  *   @param {String} peer - ripple address
  *   @param [String|Number] ledger identifier
  *   @param [Number] limit - max results per response
@@ -1208,19 +1208,31 @@ Remote.prototype.requestTx = function(hash, callback) {
  * @throws {Error} if a marker is provided, but no ledger_index or ledger_hash
  */
 
-Remote.accountRequest = function(type, options, callback) {
-  var account, ledger, peer, limit, marker;
+Remote.accountRequest = function(command, options_, callback_) {
+  let options, callback = callback_;
 
-  if (typeof options === 'object') {
-    account = options.account;
-    ledger = options.ledger;
-    peer = options.peer;
-    limit = options.limit;
-    marker = options.marker;
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({}, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    const args = Array.prototype.slice.call(arguments);
+
+    if (lodash.isFunction(lodash.last(args))) {
+      callback = args.pop();
+    }
+
+    options = {
+      account: args.shift(),
+      peer: args.shift(),
+      ledger: args.shift(),
+      limit: args.shift(),
+      marker: args.shift()
+    };
   }
+
+  let {account, ledger, peer, limit, marker} = options;
 
   // if a marker is given, we need a ledger
   // check if a valid ledger_index or ledger_hash is provided
@@ -1231,13 +1243,7 @@ Remote.accountRequest = function(type, options, callback) {
     }
   }
 
-  var lastArg = arguments[arguments.length - 1];
-
-  if (typeof lastArg === 'function') {
-    callback = lastArg;
-  }
-
-  var request = new Request(this, type);
+  const request = new Request(this, command);
 
   if (account) {
     account = UInt160.json_rewrite(account);
@@ -1272,6 +1278,7 @@ Remote.accountRequest = function(type, options, callback) {
   }
 
   request.callback(callback);
+
   return request;
 };
 
@@ -1286,9 +1293,9 @@ Remote.accountRequest = function(type, options, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestAccountInfo = function() {
-  var args = Array.prototype.concat.apply(['account_info'], arguments);
-  return Remote.accountRequest.apply(this, args);
+Remote.prototype.requestAccountInfo = function(...args) {
+  const options = ['account_info', ...args];
+  return Remote.accountRequest.apply(this, options);
 };
 
 /**
@@ -1302,9 +1309,9 @@ Remote.prototype.requestAccountInfo = function() {
  * @return {Request}
  */
 
-Remote.prototype.requestAccountCurrencies = function() {
-  var args = Array.prototype.concat.apply(['account_currencies'], arguments);
-  return Remote.accountRequest.apply(this, args);
+Remote.prototype.requestAccountCurrencies = function(...args) {
+  const options = ['account_currencies', ...args];
+  return Remote.accountRequest.apply(this, options);
 };
 
 /**
@@ -1327,11 +1334,11 @@ Remote.prototype.requestAccountCurrencies = function() {
  * @return {Request}
  */
 
-Remote.prototype.requestAccountLines = function() {
+Remote.prototype.requestAccountLines = function(...args) {
   // XXX Does this require the server to be trusted?
   // utils.assert(this.trusted);
-  var args = Array.prototype.concat.apply(['account_lines'], arguments);
-  return Remote.accountRequest.apply(this, args);
+  const options = ['account_lines', ...args];
+  return Remote.accountRequest.apply(this, options);
 };
 
 /**
@@ -1353,9 +1360,9 @@ Remote.prototype.requestAccountLines = function() {
  * @return {Request}
  */
 
-Remote.prototype.requestAccountOffers = function() {
-  var args = Array.prototype.concat.apply(['account_offers'], arguments);
-  return Remote.accountRequest.apply(this, args);
+Remote.prototype.requestAccountOffers = function(...args) {
+  const options = ['account_offers', ...args];
+  return Remote.accountRequest.apply(this, options);
 };
 
 /**
@@ -1382,7 +1389,7 @@ Remote.prototype.requestAccountTx = function(options, callback) {
   // XXX Does this require the server to be trusted?
   // utils.assert(this.trusted);
 
-  var request = new Request(this, 'account_tx');
+  const request = new Request(this, 'account_tx');
 
   options.binary = options.binary !== false;
 
@@ -1452,11 +1459,11 @@ Remote.prototype.requestAccountTx = function(options, callback) {
  */
 
 Remote.parseBinaryAccountTransaction = function(transaction) {
-  var tx_obj = new SerializedObject(transaction.tx_blob);
-  var tx_obj_json = tx_obj.to_json();
-  var meta = new SerializedObject(transaction.meta).to_json();
+  const tx_obj = new SerializedObject(transaction.tx_blob);
+  const tx_obj_json = tx_obj.to_json();
+  const meta = new SerializedObject(transaction.meta).to_json();
 
-  var tx_result = {
+  const tx_result = {
     validated: transaction.validated
   };
 
@@ -1481,10 +1488,10 @@ Remote.parseBinaryAccountTransaction = function(transaction) {
 };
 
 Remote.parseBinaryTransaction = function(transaction) {
-  var tx_obj = new SerializedObject(transaction.tx).to_json();
-  var meta = new SerializedObject(transaction.meta).to_json();
+  const tx_obj = new SerializedObject(transaction.tx).to_json();
+  const meta = new SerializedObject(transaction.meta).to_json();
 
-  var tx_result = tx_obj;
+  const tx_result = tx_obj;
 
   tx_result.date = transaction.date;
   tx_result.hash = transaction.hash;
@@ -1521,12 +1528,9 @@ Remote.parseBinaryTransaction = function(transaction) {
  */
 
 Remote.parseBinaryLedgerData = function(ledgerData) {
-  var data = new SerializedObject(ledgerData.data);
-
-  var state = data.to_json();
-  state.index = ledgerData.index;
-
-  return state;
+  const data = new SerializedObject(ledgerData.data).to_json();
+  data.index = ledgerData.index;
+  return data;
 };
 
 /**
@@ -1541,13 +1545,15 @@ Remote.parseBinaryLedgerData = function(ledgerData) {
  */
 
 Remote.prototype.requestTransactionHistory =
-Remote.prototype.requestTxHistory = function(start, callback) {
+Remote.prototype.requestTxHistory = function(start_, callback_) {
   // XXX Does this require the server to be trusted?
   // utils.assert(this.trusted);
 
-  var request = new Request(this, 'tx_history');
+  const request = new Request(this, 'tx_history');
+  let start = start_;
+  let callback = callback_;
 
-  if (typeof start === 'object') {
+  if (lodash.isPlainObject(start)) {
     start = start.start;
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
@@ -1573,32 +1579,36 @@ Remote.prototype.requestTxHistory = function(start, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
-  var ledger;
-  var limit;
-  var lastArg = arguments[arguments.length - 1];
+Remote.prototype.requestBookOffers = function(options_, callback_) {
+  let options, callback = callback_;
 
-  if (gets.hasOwnProperty('gets') || gets.hasOwnProperty('taker_gets')) {
-    var options = gets;
-    // This would mutate the `lastArg` in `arguments` to be `null` and is
-    // redundant. Once upon a time, some awkward code was written f(g, null,
-    // null, cb) ...
-    callback = pays;
-    taker = options.taker;
-    pays = options.pays || options.taker_pays;
-    gets = options.gets || options.taker_gets;
-    ledger = options.ledger;
-    limit = options.limit;
+  if (options_.gets || options_.taker_gets) {
+    options = lodash.merge({
+      pays: options_.taker_pays,
+      gets: options_.taker_gets
+    }, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    const args = Array.prototype.slice.call(arguments);
+
+    if (lodash.isFunction(lodash.last(args))) {
+      callback = args.pop();
+    }
+
+    options = {
+      gets: args.shift(),
+      pays: args.shift(),
+      taker: args.shift(),
+      ledger: args.shift(),
+      limit: args.shift()
+    };
   }
 
-  if (typeof lastArg === 'function') {
-    callback = lastArg;
-  }
+  let {gets, pays, taker, ledger, limit} = options;
 
-  var request = new Request(this, 'book_offers');
+  const request = new Request(this, 'book_offers');
 
   request.message.taker_gets = {
     currency: Currency.json_rewrite(gets.currency, {force_hex: true})
@@ -1648,19 +1658,24 @@ Remote.prototype.requestBookOffers = function(gets, pays, taker, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestWalletAccounts = function(seed, callback) {
+Remote.prototype.requestWalletAccounts = function(options_, callback_) {
   utils.assert(this.trusted); // Don't send secrets.
 
-  var request = new Request(this, 'wallet_accounts');
+  let options, callback = callback_;
 
-  if (typeof seed === 'object') {
-    seed = seed.seed;
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({}, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    options = {
+      seed: arguments[0]
+    };
   }
 
-  request.message.seed = seed;
+  const request = new Request(this, 'wallet_accounts');
+  request.message.seed = options.seed;
   request.callback(callback);
 
   return request;
@@ -1675,21 +1690,28 @@ Remote.prototype.requestWalletAccounts = function(seed, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestSign = function(secret, tx_json, callback) {
+Remote.prototype.requestSign = function(options_, callback_) {
   utils.assert(this.trusted); // Don't send secrets.
 
-  var request = new Request(this, 'sign');
+  let options, callback = callback_;
 
-  if (typeof secret === 'object') {
-    tx_json = secret.tx_json;
-    secret = secret.secret;
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({}, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    options = {
+      secret: arguments[0],
+      tx_json: arguments[1]
+    };
+
+    callback = arguments[2];
   }
 
-  request.message.secret = secret;
-  request.message.tx_json = tx_json;
+  const request = new Request(this, 'sign');
+  request.message.secret = options.secret;
+  request.message.tx_json = options.tx_json;
   request.callback(callback);
 
   return request;
@@ -1718,19 +1740,16 @@ Remote.prototype.requestSubmit = function(callback) {
  * @api private
  */
 
-Remote.prototype._serverPrepareSubscribe = function(server, callback) {
-  var self = this;
-  var feeds = ['ledger', 'server'];
-
-  if (typeof server === 'function') {
-    callback = server;
-  }
+Remote.prototype._serverPrepareSubscribe = function(server, callback_) {
+  const self = this;
+  const feeds = ['ledger', 'server'];
+  const callback = lodash.isFunction(server) ? server : callback_;
 
   if (this._transaction_listeners) {
     feeds.push('transactions');
   }
 
-  var request = this.requestSubscribe(feeds);
+  const request = this.requestSubscribe(feeds);
 
   function serverSubscribed(message) {
     self._stand_alone = !!message.stand_alone;
@@ -1766,7 +1785,7 @@ Remote.prototype._serverPrepareSubscribe = function(server, callback) {
 Remote.prototype.ledgerAccept =
 Remote.prototype.requestLedgerAccept = function(callback) {
   /* eslint-disable consistent-return */
-  var request = new Request(this, 'ledger_accept');
+  const request = new Request(this, 'ledger_accept');
 
   if (!this._stand_alone) {
     // XXX This should emit error on the request
@@ -1792,33 +1811,36 @@ Remote.prototype.requestLedgerAccept = function(callback) {
  * @api private
  */
 
-Remote.accountRootRequest =
-function(type, responseFilter, account, ledger, callback) {
-  if (typeof account === 'object') {
-    callback = ledger;
-    ledger = account.ledger;
-    account = account.account;
+Remote.accountRootRequest = function(command, filter, options_, callback_) {
+  let options, callback = callback_;
+
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({}, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    const args = Array.prototype.slice.call(arguments);
+
+    if (lodash.isFunction(lodash.last(args))) {
+      callback = args.pop();
+    }
+
+    options = {
+      account: args.shift(),
+      ledger: args.shift()
+    };
   }
 
-  var lastArg = arguments[arguments.length - 1];
-
-  if (typeof lastArg === 'function') {
-    callback = lastArg;
-  }
-
-  var request = this.requestLedgerEntry('account_root');
-
-  request.accountRoot(account);
-  request.selectLedger(ledger);
+  const request = this.requestLedgerEntry('account_root');
+  request.accountRoot(options.account);
+  request.selectLedger(options.ledger);
 
   request.once('success', function(message) {
-    request.emit(type, responseFilter(message));
+    request.emit(command, filter(message));
   });
 
-  request.callback(callback, type);
+  request.callback(callback, command);
 
   return request;
 };
@@ -1832,18 +1854,13 @@ function(type, responseFilter, account, ledger, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestAccountBalance = function() {
+Remote.prototype.requestAccountBalance = function(...args) {
   function responseFilter(message) {
     return Amount.from_json(message.node.Balance);
   }
 
-  var args = Array.prototype.concat.apply(
-    ['account_balance', responseFilter],
-    arguments);
-
-  var request = Remote.accountRootRequest.apply(this, args);
-
-  return request;
+  const options = ['account_balance', responseFilter, ...args];
+  return Remote.accountRootRequest.apply(this, options);
 };
 
 /**
@@ -1855,18 +1872,13 @@ Remote.prototype.requestAccountBalance = function() {
  * @return {Request}
  */
 
-Remote.prototype.requestAccountFlags = function() {
+Remote.prototype.requestAccountFlags = function(...args) {
   function responseFilter(message) {
     return message.node.Flags;
   }
 
-  var args = Array.prototype.concat.apply(
-    ['account_flags', responseFilter],
-    arguments);
-
-  var request = Remote.accountRootRequest.apply(this, args);
-
-  return request;
+  const options = ['account_flags', responseFilter, ...args];
+  return Remote.accountRootRequest.apply(this, options);
 };
 
 /**
@@ -1878,18 +1890,13 @@ Remote.prototype.requestAccountFlags = function() {
  * @return {Request}
  */
 
-Remote.prototype.requestOwnerCount = function() {
+Remote.prototype.requestOwnerCount = function(...args) {
   function responseFilter(message) {
     return message.node.OwnerCount;
   }
 
-  var args = Array.prototype.concat.apply(
-    ['owner_count', responseFilter],
-    arguments);
-
-  var request = Remote.accountRootRequest.apply(this, args);
-
-  return request;
+  const options = ['owner_count', responseFilter, ...args];
+  return Remote.accountRootRequest.apply(this, options);
 };
 
 /**
@@ -1912,7 +1919,7 @@ Remote.prototype.getAccount = function(accountID) {
  */
 
 Remote.prototype.addAccount = function(accountID) {
-  var account = new Account(this, accountID);
+  const account = new Account(this, accountID);
 
   if (account.isValid()) {
     this._accounts[accountID] = account;
@@ -1931,7 +1938,7 @@ Remote.prototype.addAccount = function(accountID) {
 
 Remote.prototype.account =
 Remote.prototype.findAccount = function(accountID) {
-  var account = this.getAccount(accountID);
+  const account = this.getAccount(accountID);
   return account ? account : this.addAccount(accountID);
 };
 
@@ -1942,23 +1949,26 @@ Remote.prototype.findAccount = function(accountID) {
  * @return {PathFind}
  */
 
-Remote.prototype.pathFind =
-Remote.prototype.createPathFind =
-function(src_account, dst_account, dst_amount, src_currencies) {
-  if (typeof src_account === 'object') {
-    var options = src_account;
-    src_currencies = options.src_currencies;
-    dst_amount = options.dst_amount;
-    dst_account = options.dst_account;
-    src_account = options.src_account;
+function createPathFind(options_) {
+  let options;
+
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({}, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    options = {
+      src_account: arguments[0],
+      dst_account: arguments[1],
+      dst_amount: arguments[2],
+      src_currencies: arguments[3]
+    };
   }
 
-  var pathFind = new PathFind(this,
-    src_account, dst_account,
-    dst_amount, src_currencies);
+  const pathFind = new PathFind(this,
+    options.src_account, options.dst_account,
+    options.dst_amount, options.src_currencies);
 
   if (this._cur_path_find) {
     this._cur_path_find.notify_superceded();
@@ -1969,10 +1979,12 @@ function(src_account, dst_account, dst_amount, src_currencies) {
   this._cur_path_find = pathFind;
 
   return pathFind;
-};
+}
+
+Remote.prototype.pathFind = Remote.prototype.createPathFind = createPathFind;
 
 Remote.prepareTrade = function(currency, issuer) {
-  var suffix = Currency.from_json(currency).is_native() ? '' : ('/' + issuer);
+  const suffix = Currency.from_json(currency).is_native() ? '' : ('/' + issuer);
   return currency + suffix;
 };
 
@@ -1984,31 +1996,33 @@ Remote.prepareTrade = function(currency, issuer) {
  * @return {OrderBook}
  */
 
-Remote.prototype.book =
-Remote.prototype.createOrderBook =
-function(currency_gets, issuer_gets, currency_pays, issuer_pays) {
-  if (typeof currency_gets === 'object') {
-    var options = currency_gets;
-    issuer_pays = options.issuer_pays;
-    currency_pays = options.currency_pays;
-    issuer_gets = options.issuer_gets;
-    currency_gets = options.currency_gets;
+Remote.prototype.book = Remote.prototype.createOrderBook = function(options_) {
+  let options;
+
+  if (arguments.length === 1) {
+    options = lodash.merge({}, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
+             + ' an object containing request properties');
+    options = {
+      currency_gets: arguments[0],
+      issuer_gets: arguments[1],
+      currency_pays: arguments[2],
+      issuer_pays: arguments[3]
+    };
   }
 
-  var gets = Remote.prepareTrade(currency_gets, issuer_gets);
-  var pays = Remote.prepareTrade(currency_pays, issuer_pays);
-  var key = gets + ':' + pays;
+  const gets = Remote.prepareTrade(options.currency_gets, options.issuer_gets);
+  const pays = Remote.prepareTrade(options.currency_pays, options.issuer_pays);
+  const key = gets + ':' + pays;
 
   if (this._books.hasOwnProperty(key)) {
     return this._books[key];
   }
 
-  var book = new OrderBook(this,
-    currency_gets, issuer_gets,
-    currency_pays, issuer_pays,
+  const book = new OrderBook(this,
+    options.currency_gets, options.issuer_gets,
+    options.currency_pays, options.issuer_pays,
     key);
 
   if (book.is_valid()) {
@@ -2027,16 +2041,16 @@ function(currency_gets, issuer_gets, currency_pays, issuer_pays) {
  */
 
 Remote.prototype.accountSeq =
-Remote.prototype.getAccountSequence = function(account, advance) {
-  account = UInt160.json_rewrite(account);
-  var accountInfo = this.accounts[account];
+Remote.prototype.getAccountSequence = function(account_, advance) {
+  const account = UInt160.json_rewrite(account_);
+  const accountInfo = this.accounts[account];
 
   if (!accountInfo) {
     return NaN;
   }
 
-  var seq = accountInfo.seq;
-  var change = {ADVANCE: 1, REWIND: -1}[advance.toUpperCase()] || 0;
+  const seq = accountInfo.seq;
+  const change = {ADVANCE: 1, REWIND: -1}[advance.toUpperCase()] || 0;
 
   accountInfo.seq += change;
 
@@ -2051,8 +2065,8 @@ Remote.prototype.getAccountSequence = function(account, advance) {
  */
 
 Remote.prototype.setAccountSequence =
-Remote.prototype.setAccountSeq = function(account, sequence) {
-  account = UInt160.json_rewrite(account);
+Remote.prototype.setAccountSeq = function(account_, sequence) {
+  const account = UInt160.json_rewrite(account_);
 
   if (!this.accounts.hasOwnProperty(account)) {
     this.accounts[account] = { };
@@ -2070,28 +2084,38 @@ Remote.prototype.setAccountSeq = function(account, sequence) {
  * @return {Request}
  */
 
-Remote.prototype.accountSeqCache = function(account, ledger, callback) {
-  if (typeof account === 'object') {
-    var options = account;
-    callback = ledger;
-    ledger = options.ledger;
-    account = options.account;
+Remote.prototype.accountSeqCache = function(options_, callback_) {
+  let options, callback = callback_;
+
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({}, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    const args = Array.prototype.slice.call(arguments);
+
+    if (lodash.isFunction(lodash.last(args))) {
+      callback = args.pop();
+    }
+
+    options = {
+      account: args.shift(),
+      ledger: args.shift()
+    };
   }
 
-  if (!this.accounts.hasOwnProperty(account)) {
-    this.accounts[account] = { };
+  if (!this.accounts.hasOwnProperty(options.account)) {
+    this.accounts[options.account] = { };
   }
 
-  var account_info = this.accounts[account];
-  var request = account_info.caching_seq_request;
+  const account_info = this.accounts[options.account];
+  let request = account_info.caching_seq_request;
 
   function accountRootSuccess(message) {
     delete account_info.caching_seq_request;
 
-    var seq = message.node.Sequence;
+    const seq = message.node.Sequence;
     account_info.seq = seq;
 
     request.emit('success_cache', message);
@@ -2105,8 +2129,12 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
 
   if (!request) {
     request = this.requestLedgerEntry('account_root');
-    request.accountRoot(account);
-    request.selectLedger(ledger);
+    request.accountRoot(options.account);
+
+    if (!lodash.isUndefined(options.ledger)) {
+      request.selectLedger(options.ledger);
+    }
+
     request.once('success', accountRootSuccess);
     request.once('error', accountRootError);
 
@@ -2124,8 +2152,8 @@ Remote.prototype.accountSeqCache = function(account, ledger, callback) {
  * @param {String} account
  */
 
-Remote.prototype.dirtyAccountRoot = function(account) {
-  account = UInt160.json_rewrite(account);
+Remote.prototype.dirtyAccountRoot = function(account_) {
+  const account = UInt160.json_rewrite(account_);
   delete this.ledgers.current.account_root[account];
 };
 
@@ -2147,7 +2175,7 @@ Remote.prototype.dirtyAccountRoot = function(account) {
  */
 
 Remote.prototype.requestOffer = function(options, callback) {
-  var request = this.requestLedgerEntry('offer');
+  const request = this.requestLedgerEntry('offer');
 
   if (options.account && options.sequence) {
     request.offerId(options.account, options.sequence);
@@ -2178,51 +2206,63 @@ Remote.prototype.requestOffer = function(options, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestRippleBalance =
-function(account, issuer, currency, ledger, callback) {
-  if (typeof account === 'object') {
-    var options = account;
-    callback = issuer;
-    ledger = options.ledger;
-    currency = options.currency;
-    issuer = options.issuer;
-    account = options.account;
+Remote.prototype.requestRippleBalance = function(options_, callback_) {
+  let options, callback = callback_;
+
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({}, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    const args = Array.prototype.slice.call(arguments);
+
+    if (lodash.isFunction(lodash.last(args))) {
+      callback = args.pop();
+    }
+
+    options = {
+      account: args.shift(),
+      issuer: args.shift(),
+      currency: args.shift(),
+      ledger: args.shift()
+    };
   }
 
   // YYY Could be cached per ledger.
-  var request = this.requestLedgerEntry('ripple_state');
+  const request = this.requestLedgerEntry('ripple_state');
+  request.rippleState(options.account, options.issuer, options.currency);
 
-  request.rippleState(account, issuer, currency);
-  request.selectLedger(ledger);
+  if (!lodash.isUndefined(options.ledger)) {
+    request.selectLedger(options.ledger);
+  }
 
   function rippleState(message) {
-    var node = message.node;
-    var lowLimit = Amount.from_json(node.LowLimit);
-    var highLimit = Amount.from_json(node.HighLimit);
+    const node = message.node;
+    const lowLimit = Amount.from_json(node.LowLimit);
+    const highLimit = Amount.from_json(node.HighLimit);
 
     // The amount the low account holds of issuer.
-    var balance = Amount.from_json(node.Balance);
+    const balance = Amount.from_json(node.Balance);
 
     // accountHigh implies for account: balance is negated.  highLimit is the
     // limit set by account.
-    var accountHigh = UInt160.from_json(account).equals(highLimit.issuer());
+    const accountHigh = UInt160.from_json(options.account)
+    .equals(highLimit.issuer());
 
     request.emit('ripple_state', {
       account_balance: (accountHigh
         ? balance.negate()
-        : balance.clone()).parse_issuer(account),
+        : balance.clone()).parse_issuer(options.account),
       peer_balance: (!accountHigh
         ? balance.negate()
-        : balance.clone()).parse_issuer(issuer),
+        : balance.clone()).parse_issuer(options.issuer),
       account_limit: (accountHigh
         ? highLimit
-        : lowLimit).clone().parse_issuer(issuer),
+        : lowLimit).clone().parse_issuer(options.issuer),
       peer_limit: (!accountHigh
         ? highLimit
-        : lowLimit).clone().parse_issuer(account),
+        : lowLimit).clone().parse_issuer(options.account),
       account_quality_in: (accountHigh
         ? node.HighQualityIn
         : node.LowQualityIn),
@@ -2246,7 +2286,7 @@ function(account, issuer, currency, ledger, callback) {
 
 Remote.prepareCurrency =
 Remote.prepareCurrencies = function(currency) {
-  var newCurrency = { };
+  const newCurrency = { };
 
   if (currency.hasOwnProperty('issuer')) {
     newCurrency.issuer = UInt160.json_rewrite(currency.issuer);
@@ -2268,29 +2308,47 @@ Remote.prepareCurrencies = function(currency) {
  * @return {Request}
  */
 
-Remote.prototype.requestRipplePathFind =
-function(src_account, dst_account, dst_amount, src_currencies, callback) {
-  if (typeof src_account === 'object') {
-    var options = src_account;
-    callback = dst_account;
-    src_currencies = options.src_currencies;
-    dst_amount = options.dst_amount;
-    dst_account = options.dst_account;
-    src_account = options.src_account;
+Remote.prototype.requestRipplePathFind = function(options_, callback_) {
+  let options, callback = callback_;
+
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({
+      source_account: options_.src_account,
+      destination_account: options_.dst_account,
+      destination_amount: options_.dst_amount,
+      source_currencies: options_.src_currencies
+      }, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    const args = Array.prototype.slice.call(arguments);
+
+    if (lodash.isFunction(lodash.last(args))) {
+      callback = args.pop();
+    }
+
+    options = {
+      source_account: args.shift(),
+      destination_account: args.shift(),
+      destination_amount: args.shift(),
+      source_currencies: args.shift()
+    };
   }
 
-  var request = new Request(this, 'ripple_path_find');
+  const request = new Request(this, 'ripple_path_find');
 
-  request.message.source_account = UInt160.json_rewrite(src_account);
-  request.message.destination_account = UInt160.json_rewrite(dst_account);
-  request.message.destination_amount = Amount.json_rewrite(dst_amount);
+  request.message.source_account = UInt160.json_rewrite(options.source_account);
 
-  if (src_currencies) {
+  request.message.destination_account =
+    UInt160.json_rewrite(options.destination_account);
+
+  request.message.destination_amount =
+    Amount.json_rewrite(options.destination_amount);
+
+  if (Array.isArray(options.source_currencies)) {
     request.message.source_currencies =
-      src_currencies.map(Remote.prepareCurrencies);
+      options.source_currencies.map(Remote.prepareCurrency);
   }
 
   request.callback(callback);
@@ -2306,30 +2364,48 @@ function(src_account, dst_account, dst_amount, src_currencies, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestPathFindCreate =
-function(src_account, dst_account, dst_amount, src_currencies, callback) {
-  if (typeof src_account === 'object') {
-    var options = src_account;
-    callback = dst_account;
-    src_currencies = options.src_currencies;
-    dst_amount = options.dst_amount;
-    dst_account = options.dst_account;
-    src_account = options.src_account;
+Remote.prototype.requestPathFindCreate = function(options_, callback_) {
+  let options, callback = callback_;
+
+  if (lodash.isPlainObject(options_)) {
+    options = lodash.merge({
+      source_account: options_.src_account,
+      destination_account: options_.dst_account,
+      destination_amount: options_.dst_amount,
+      source_currencies: options_.src_currencies
+      }, options_);
   } else {
     log.warn('DEPRECATED: First argument to request constructor should be'
       + ' an object containing request properties');
+
+    const args = Array.prototype.slice.call(arguments);
+
+    if (lodash.isFunction(lodash.last(args))) {
+      callback = args.pop();
+    }
+
+    options = {
+      source_account: args.shift(),
+      destination_account: args.shift(),
+      destination_amount: args.shift(),
+      source_currencies: args.shift()
+    };
   }
 
-  var request = new Request(this, 'path_find');
-
+  const request = new Request(this, 'path_find');
   request.message.subcommand = 'create';
-  request.message.source_account = UInt160.json_rewrite(src_account);
-  request.message.destination_account = UInt160.json_rewrite(dst_account);
-  request.message.destination_amount = Amount.json_rewrite(dst_amount);
 
-  if (src_currencies) {
+  request.message.source_account = UInt160.json_rewrite(options.source_account);
+
+  request.message.destination_account =
+    UInt160.json_rewrite(options.destination_account);
+
+  request.message.destination_amount =
+    Amount.json_rewrite(options.destination_amount);
+
+  if (Array.isArray(options.source_currencies)) {
     request.message.source_currencies =
-      src_currencies.map(Remote.prepareCurrencies);
+      options.source_currencies.map(Remote.prepareCurrency);
   }
 
   request.callback(callback);
@@ -2345,7 +2421,7 @@ function(src_account, dst_account, dst_amount, src_currencies, callback) {
  */
 
 Remote.prototype.requestPathFindClose = function(callback) {
-  var request = new Request(this, 'path_find');
+  const request = new Request(this, 'path_find');
 
   request.message.subcommand = 'close';
   request.callback(callback);
@@ -2374,7 +2450,7 @@ Remote.prototype.requestUnlList = function(callback) {
  */
 
 Remote.prototype.requestUnlAdd = function(address, comment, callback) {
-  var request = new Request(this, 'unl_add');
+  const request = new Request(this, 'unl_add');
 
   request.message.node = address;
 
@@ -2397,7 +2473,7 @@ Remote.prototype.requestUnlAdd = function(address, comment, callback) {
  */
 
 Remote.prototype.requestUnlDelete = function(node, callback) {
-  var request = new Request(this, 'unl_delete');
+  const request = new Request(this, 'unl_delete');
 
   request.message.node = node;
   request.callback(callback);
@@ -2426,7 +2502,7 @@ Remote.prototype.requestPeers = function(callback) {
  */
 
 Remote.prototype.requestConnect = function(ip, port, callback) {
-  var request = new Request(this, 'connect');
+  const request = new Request(this, 'connect');
 
   request.message.ip = ip;
 
@@ -2448,36 +2524,32 @@ Remote.prototype.requestConnect = function(ip, port, callback) {
  */
 
 Remote.prototype.transaction =
-Remote.prototype.createTransaction = function(type, options) {
+Remote.prototype.createTransaction = function(type, options = {}) {
+  const transaction = new Transaction(this);
+
   if (arguments.length === 0) {
     // Fallback
-    return new Transaction(this);
+    return transaction;
   }
 
-  assert.strictEqual(typeof type, 'string',
-    'TransactionType must be a string');
-  assert.strictEqual(typeof options, 'object',
-    'Transaction options must be an object');
+  assert.strictEqual(typeof type, 'string', 'TransactionType must be a string');
 
-  var transaction = new Transaction(this);
-
-  var transactionTypes = {
-    payment: 'payment',
-    accountset: 'accountSet',
-    trustset: 'trustSet',
-    offercreate: 'offerCreate',
-    offercancel: 'offerCancel',
-    setregularkey: 'setRegularKey',
-    sign: 'sign'
+  const constructorMap = {
+    Payment: transaction.payment,
+    AccountSet: transaction.accountSet,
+    TrustSet: transaction.trustSet,
+    OfferCreate: transaction.offerCreate,
+    OfferCancel: transaction.offerCancel,
+    SetRegularkey: transaction.setRegularKey
   };
 
-  var transactionConstructor = transactionTypes[type.toLowerCase()];
+  const transactionConstructor = constructorMap[type];
 
   if (!transactionConstructor) {
-    throw new Error('Invalid transaction type: ' + type);
+    throw new Error('TransactionType must be a valid transaction type');
   }
 
-  return transaction[transactionConstructor](options);
+  return transactionConstructor.call(transaction, options);
 };
 
 /**
@@ -2490,7 +2562,7 @@ Remote.prototype.createTransaction = function(type, options) {
  */
 
 Remote.prototype.feeTx = function(units) {
-  var server = this.getServer();
+  const server = this.getServer();
 
   if (!server) {
     throw new Error('No connected servers');
@@ -2509,7 +2581,7 @@ Remote.prototype.feeTx = function(units) {
  */
 
 Remote.prototype.feeTxUnit = function() {
-  var server = this.getServer();
+  const server = this.getServer();
 
   if (!server) {
     throw new Error('No connected servers');
@@ -2528,7 +2600,7 @@ Remote.prototype.feeTxUnit = function() {
  */
 
 Remote.prototype.reserve = function(owner_count) {
-  var server = this.getServer();
+  const server = this.getServer();
 
   if (!server) {
     throw new Error('No connected servers');

@@ -1,5 +1,7 @@
 'use strict';
+
 /* eslint-disable no-new */
+
 const _ = require('lodash');
 const assert = require('assert');
 const ws = require('ws');

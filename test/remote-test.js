@@ -1,25 +1,31 @@
+/* eslint-disable no-new */
+
 'use strict';
-var assert = require('assert');
-var Remote = require('ripple-lib').Remote;
-var Server = require('ripple-lib').Server;
-var Transaction = require('ripple-lib').Transaction;
-var UInt160 = require('ripple-lib').UInt160;
-var Currency = require('ripple-lib').Currency;
-var Amount = require('ripple-lib').Amount;
-var PathFind = require('ripple-lib')._test.PathFind;
 
-var options, remote, callback;
+const assert = require('assert-diff');
+const Remote = require('ripple-lib').Remote;
+const Server = require('ripple-lib').Server;
+const Transaction = require('ripple-lib').Transaction;
+const UInt160 = require('ripple-lib').UInt160;
+const Currency = require('ripple-lib').Currency;
+const Amount = require('ripple-lib').Amount;
+const PathFind = require('ripple-lib')._test.PathFind;
+const Log = require('ripple-lib')._test.Log;
 
-var ADDRESS = 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS';
-var LEDGER_INDEX = 9592219;
-var LEDGER_HASH =
+let options, remote, callback;
+
+const ADDRESS = 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS';
+const LEDGER_INDEX = 9592219;
+const LEDGER_HASH =
   'B4FD84A73DBD8F0DA9E320D137176EBFED969691DC0AAC7882B76B595A0841AE';
-var PAGING_MARKER =
+const PAGING_MARKER =
   '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73';
-var TRANSACTION_HASH =
+const TRANSACTION_HASH =
   '14576FFD5D59FFA73CAA90547BE4DE09926AAB59E981306C32CCE04408CBF8EA';
 
 describe('Remote', function() {
+  let initialLogEngine = Log.getEngine();
+
   beforeEach(function() {
     options = {
       trusted: true,
@@ -28,13 +34,13 @@ describe('Remote', function() {
     remote = new Remote(options);
   });
 
+  afterEach(function() {
+    Log.setEngine(initialLogEngine);
+  });
+
   it('Server initialization -- url object', function() {
     remote = new Remote({
-      servers: [{
-        host: 's-west.ripple.com',
-        port: 443,
-        secure: true
-      }]
+      servers: [{host: 's-west.ripple.com', port: 443, secure: true}]
     });
     assert(Array.isArray(remote._servers));
     assert(remote._servers[0] instanceof Server);
@@ -43,10 +49,7 @@ describe('Remote', function() {
 
   it('Server initialization -- url object -- no secure property', function() {
     remote = new Remote({
-      servers: [{
-        host: 's-west.ripple.com',
-        port: 443
-      }]
+      servers: [{host: 's-west.ripple.com', port: 443}]
     });
     assert(Array.isArray(remote._servers));
     assert(remote._servers[0] instanceof Server);
@@ -55,11 +58,7 @@ describe('Remote', function() {
 
   it('Server initialization -- url object -- secure: false', function() {
     remote = new Remote({
-      servers: [{
-        host: 's-west.ripple.com',
-        port: 443,
-        secure: false
-      }]
+      servers: [{host: 's-west.ripple.com', port: 443, secure: false}]
     });
     assert(Array.isArray(remote._servers));
     assert(remote._servers[0] instanceof Server);
@@ -68,11 +67,7 @@ describe('Remote', function() {
 
   it('Server initialization -- url object -- string port', function() {
     remote = new Remote({
-      servers: [{
-        host: 's-west.ripple.com',
-        port: '443',
-        secure: true
-      }]
+      servers: [{host: 's-west.ripple.com', port: '443', secure: true}]
     });
     assert(Array.isArray(remote._servers));
     assert(remote._servers[0] instanceof Server);
@@ -82,12 +77,8 @@ describe('Remote', function() {
   it('Server initialization -- url object -- invalid host', function() {
     assert.throws(
       function() {
-        remote = new Remote({
-          servers: [{
-            host: '+',
-            port: 443,
-            secure: true
-          }]
+        new Remote({
+          servers: [{host: '+', port: 443, secure: true}]
         });
       }, Error);
   });
@@ -95,12 +86,8 @@ describe('Remote', function() {
   it('Server initialization -- url object -- invalid port', function() {
     assert.throws(
       function() {
-        remote = new Remote({
-          servers: [{
-            host: 's-west.ripple.com',
-            port: null,
-            secure: true
-          }]
+        new Remote({
+          servers: [{host: 's-west.ripple.com', port: null, secure: true}]
         });
       }, TypeError);
   });
@@ -108,12 +95,8 @@ describe('Remote', function() {
   it('Server initialization -- url object -- port out of range', function() {
     assert.throws(
       function() {
-        remote = new Remote({
-          servers: [{
-            host: 's-west.ripple.com',
-            port: 65537,
-            secure: true
-          }]
+        new Remote({
+          servers: [{host: 's-west.ripple.com', port: 65537, secure: true}]
         });
       }, Error);
   });
@@ -139,7 +122,7 @@ describe('Remote', function() {
   it('Server initialization -- url string -- invalid host', function() {
     assert.throws(
       function() {
-        remote = new Remote({
+        new Remote({
           servers: ['ws://+:443']
         });
       }, Error
@@ -149,7 +132,7 @@ describe('Remote', function() {
   it('Server initialization -- url string -- invalid port', function() {
     assert.throws(
       function() {
-        remote = new Remote({
+        new Remote({
           servers: ['ws://s-west.ripple.com:null']
         });
       }, Error
@@ -159,7 +142,7 @@ describe('Remote', function() {
   it('Server initialization -- url string -- port out of range', function() {
     assert.throws(
       function() {
-        remote = new Remote({
+        new Remote({
           servers: ['ws://s-west.ripple.com:65537:']
         });
       }, Error
@@ -167,142 +150,101 @@ describe('Remote', function() {
   });
 
   it('Server initialization -- set max_fee', function() {
-    remote = new Remote({
-      max_fee: 10
-    });
+    remote = new Remote({max_fee: 10});
     assert.strictEqual(remote.max_fee, 10);
-
-    remote = new Remote({
-      max_fee: 1234567890
-    });
+    remote = new Remote({max_fee: 1234567890});
     assert.strictEqual(remote.max_fee, 1234567890);
   });
 
   it('Server initialization -- set max_fee -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        max_fee: '1234567890'
-      });
+      new Remote({max_fee: '1234567890'});
     });
   });
 
   it('Server initialization -- set trusted', function() {
-    remote = new Remote({
-      trusted: true
-    });
+    remote = new Remote({trusted: true});
     assert.strictEqual(remote.trusted, true);
   });
   it('Server initialization -- set trusted -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        trusted: '1234567890'
-      });
+      new Remote({trusted: '1234567890'});
     });
   });
 
   it('Server initialization -- set trace', function() {
-    remote = new Remote({
-      trace: true
-    });
+    remote = new Remote({trace: true});
     assert.strictEqual(remote.trace, true);
   });
   it('Server initialization -- set trace -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        trace: '1234567890'
-      });
+      new Remote({trace: '1234567890'});
     });
   });
 
   it('Server initialization -- set allow_partial_history', function() {
-    remote = new Remote({
-      allow_partial_history: true
-    });
+    remote = new Remote({allow_partial_history: true});
     assert.strictEqual(remote.allow_partial_history, true);
   });
   it('Server initialization -- set allow_partial_history -- invalid',
-      function() {
+     function() {
     assert.throws(function() {
-      remote = new Remote({
-        allow_partial_history: '1234567890'
-      });
+      new Remote({allow_partial_history: '1234567890'});
     });
   });
 
   it('Server initialization -- set max_attempts', function() {
-    remote = new Remote({
-      max_attempts: 10
-    });
+    remote = new Remote({max_attempts: 10});
     assert.strictEqual(remote.max_attempts, 10);
   });
   it('Server initialization -- set max_attempts -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        max_attempts: '1234567890'
-      });
+      new Remote({max_attempts: '1234567890'});
     });
   });
 
   it('Server initialization -- set fee_cushion', function() {
-    remote = new Remote({
-      fee_cushion: 1.3
-    });
+    remote = new Remote({fee_cushion: 1.3});
     assert.strictEqual(remote.fee_cushion, 1.3);
   });
   it('Server initialization -- set fee_cushion -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        fee_cushion: '1234567890'
-      });
+      new Remote({fee_cushion: '1234567890'});
     });
   });
 
   it('Server initialization -- set local_signing', function() {
-    remote = new Remote({
-      local_signing: false
-    });
+    remote = new Remote({local_signing: false});
     assert.strictEqual(remote.local_signing, false);
   });
   it('Server initialization -- set local_signing -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        local_signing: '1234567890'
-      });
+      remote = new Remote({local_signing: '1234567890'});
     });
   });
   it('Server initialization -- set local_fee', function() {
-    remote = new Remote({
-      local_fee: false
-    });
+    remote = new Remote({local_fee: false});
     assert.strictEqual(remote.local_fee, true);
-    remote = new Remote({
-      local_signing: false,
-      local_fee: false
-    });
+    remote = new Remote({local_signing: false, local_fee: false});
     assert.strictEqual(remote.local_fee, false);
   });
   it('Server initialization -- set local_fee -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
+      new Remote({
         local_signing: false,
         local_fee: '1234567890'
       });
     });
   });
   it('Server initialization -- set local_sequence', function() {
-    remote = new Remote({
-      local_sequence: false
-    });
+    remote = new Remote({local_sequence: false});
     assert.strictEqual(remote.local_sequence, true);
-    remote = new Remote({
-      local_signing: false,
-      local_sequence: false
-    });
+    remote = new Remote({local_signing: false, local_sequence: false});
     assert.strictEqual(remote.local_sequence, false);
   });
   it('Server initialization -- set local_sequence -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
+      new Remote({
         local_signing: false,
         local_sequence: '1234567890'
       });
@@ -310,64 +252,46 @@ describe('Remote', function() {
   });
 
   it('Server initialization -- set canonical_signing', function() {
-    remote = new Remote({
-      canonical_signing: false
-    });
-    assert.strictEqual(remote.canonical_signing, false);
+    assert.strictEqual(new Remote({canonical_signing: false})
+                       .canonical_signing, false);
   });
   it('Server initialization -- set canonical_signing -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        canonical_signing: '1234567890'
-      });
+      new Remote({canonical_signing: '1234567890'});
     });
   });
 
   it('Server initialization -- set submission_timeout', function() {
-    remote = new Remote({
-      submission_timeout: 10
-    });
-    assert.strictEqual(remote.submission_timeout, 10);
+    assert.strictEqual(new Remote({submission_timeout: 10})
+                       .submission_timeout, 10);
   });
   it('Server initialization -- set submission_timeout -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        submission_timeout: '1234567890'
-      });
+      new Remote({submission_timeout: '1234567890'});
     });
   });
 
   it('Server initialization -- set last_ledger_offset', function() {
-    remote = new Remote({
-      last_ledger_offset: 10
-    });
-    assert.strictEqual(remote.last_ledger_offset, 10);
+    assert.strictEqual(new Remote({last_ledger_offset: 10})
+                       .last_ledger_offset, 10);
   });
   it('Server initialization -- set last_ledger_offset -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        last_ledger_offset: '1234567890'
-      });
+      new Remote({last_ledger_offset: '1234567890'});
     });
   });
 
   it('Server initialization -- set servers', function() {
-    remote = new Remote({
-      servers: []
-    });
-    assert.deepEqual(remote.servers, []);
+    assert.deepEqual(new Remote({servers: []}).servers, [ ]);
   });
   it('Server initialization -- set servers -- invalid', function() {
     assert.throws(function() {
-      remote = new Remote({
-        servers: '1234567890'
-      });
+      new Remote({servers: '1234567890'});
     });
   });
 
   it('Automatic transactions subscription', function(done) {
-    remote = new Remote(options);
-    var i = 0;
+    let i = 0;
 
     remote.request = function(request) {
       switch (++i) {
@@ -387,10 +311,8 @@ describe('Remote', function() {
   });
 
   it('Check is valid message', function() {
-    assert(Remote.isValidMessage({
-      type: 'response'
-    }));
-    assert(!Remote.isValidMessage({ }));
+    assert(Remote.isValidMessage({type: 'response'}));
+    assert(!Remote.isValidMessage({}));
     assert(!Remote.isValidMessage(''));
   });
   it('Check is valid ledger data', function() {
@@ -435,21 +357,15 @@ describe('Remote', function() {
       }));
   });
   it('Check is validated', function() {
-    assert(Remote.isValidated({
-      validated: true
-    }));
-    assert(!Remote.isValidated({
-        validated: false
-      }));
-    assert(!Remote.isValidated({
-        validated: 'true'
-      }));
-    assert(!Remote.isValidated({ }));
+    assert(Remote.isValidated({validated: true}));
+    assert(!Remote.isValidated({validated: false}));
+    assert(!Remote.isValidated({validated: 'true'}));
+    assert(!Remote.isValidated({}));
     assert(!Remote.isValidated(null));
   });
 
   it('Set state', function() {
-    var i = 0;
+    let i = 0;
     remote.on('state', function(state) {
       switch (++i) {
         case 1:
@@ -483,10 +399,10 @@ describe('Remote', function() {
   });
 
   it('Add server', function() {
-    var server = remote.addServer('wss://s1.ripple.com:443');
+    const server = remote.addServer('wss://s1.ripple.com:443');
     assert(server instanceof Server);
 
-    var i = 0;
+    let i = 0;
     remote.once('connect', function() {
       assert.strictEqual(remote._connection_count, 1);
       ++i;
@@ -502,7 +418,7 @@ describe('Remote', function() {
     assert.strictEqual(i, 2, 'Remote did not receive all server events');
   });
   it('Add server -- primary server', function() {
-    var server = remote.addServer({
+    const server = remote.addServer({
       host: 's1.ripple.com',
       port: 443,
       secure: true,
@@ -513,7 +429,7 @@ describe('Remote', function() {
     assert.strictEqual(remote._servers.length, 2);
     assert.strictEqual(remote._servers[1], server);
 
-    var i = 0;
+    let i = 0;
     remote.once('connect', function() {
       assert.strictEqual(remote._connection_count, 1);
       assert.strictEqual(remote._primary_server, server);
@@ -531,7 +447,7 @@ describe('Remote', function() {
   it('Connect', function() {
     remote.addServer('wss://s1.ripple.com:443');
 
-    var i = 0;
+    let i = 0;
     remote._servers.forEach(function(s) {
       s.connect = function() {
         ++i;
@@ -547,7 +463,7 @@ describe('Remote', function() {
   it('Connect -- with callback', function(done) {
     remote.addServer('wss://s1.ripple.com:443');
 
-    var i = 0;
+    let i = 0;
     remote._servers.forEach(function(s) {
       s.connect = function() {
         ++i;
@@ -572,7 +488,7 @@ describe('Remote', function() {
   it('Disconnect', function() {
     remote.addServer('wss://s1.ripple.com:443');
 
-    var i = 0;
+    let i = 0;
     remote._servers.forEach(function(s) {
       s.disconnect = function() {
         ++i;
@@ -588,7 +504,7 @@ describe('Remote', function() {
   it('Disconnect -- with callback', function(done) {
     remote.addServer('wss://s1.ripple.com:443');
 
-    var i = 0;
+    let i = 0;
     remote._servers.forEach(function(s) {
       s.disconnect = function() {
         ++i;
@@ -608,7 +524,7 @@ describe('Remote', function() {
   it('Disconnect -- unconnected', function(done) {
     remote.addServer('wss://s1.ripple.com:443');
 
-    var i = 0;
+    let i = 0;
     remote._servers.forEach(function(s) {
       s.disconnect = function() {
         ++i;
@@ -627,7 +543,7 @@ describe('Remote', function() {
   });
 
   it('Handle server message -- ledger', function() {
-    var message = {
+    const message = {
       type: 'ledgerClosed',
       fee_base: 10,
       fee_ref: 10,
@@ -649,7 +565,7 @@ describe('Remote', function() {
     remote._servers[0].emit('message', message);
   });
   it('Handle server message -- ledger', function(done) {
-    var message = {
+    const message = {
       type: 'ledgerClosed',
       fee_base: 10,
       fee_ref: 10,
@@ -674,7 +590,7 @@ describe('Remote', function() {
     });
   });
   it('Handle server message -- server status', function() {
-    var message = {
+    const message = {
       type: 'serverStatus',
       load_base: 256,
       load_factor: 256,
@@ -688,7 +604,7 @@ describe('Remote', function() {
     remote._servers[0].emit('connect');
   });
   it('Handle server message -- transaction', function() {
-    var message = require('./fixtures/transaction');
+    const message = require('./fixtures/transaction');
 
     remote.once('transaction', function(l) {
       assert.deepEqual(l, message);
@@ -697,8 +613,8 @@ describe('Remote', function() {
     remote._servers[0].emit('message', message);
   });
   it('Handle server message -- transaction -- duplicate hashes', function() {
-    var message = require('./fixtures/transaction');
-    var i = 0;
+    const message = require('./fixtures/transaction');
+    let i = 0;
 
     remote.once('transaction', function(l) {
       assert.deepEqual(l, message);
@@ -711,11 +627,11 @@ describe('Remote', function() {
     remote._servers[0].emit('message', message);
     assert.strictEqual(i, 1);
   });
-  it('Handle server message -- transaction -- with account notification',
-      function() {
-    var message = require('./fixtures/transaction');
-    var i = 0;
-    var account = remote.addAccount(message.transaction.Account);
+  it('Handle server message -- '
+     + 'transaction -- with account notification', function() {
+    const message = require('./fixtures/transaction');
+    let i = 0;
+    const account = remote.addAccount(message.transaction.Account);
 
     account.once('transaction', function(t) {
       assert.deepEqual(t, message);
@@ -731,11 +647,11 @@ describe('Remote', function() {
     remote._servers[0].emit('message', message);
     assert.strictEqual(i, 2);
   });
-  it('Handle server message -- transaction proposed'
-      + ' -- with account notification', function() {
-    var message = require('./fixtures/transaction-proposed');
-    var i = 0;
-    var account = remote.addAccount(message.transaction.Account);
+  it('Handle server message -- '
+     + 'transaction proposed -- with account notification', function() {
+    const message = require('./fixtures/transaction-proposed');
+    let i = 0;
+    const account = remote.addAccount(message.transaction.Account);
 
     account.once('transaction', function(t) {
       assert.deepEqual(t, message);
@@ -751,11 +667,11 @@ describe('Remote', function() {
     remote._servers[0].emit('message', message);
     assert.strictEqual(i, 2);
   });
-  it('Handle server message -- transaction'
-      + ' -- with orderbook notification', function() {
-    var message = require('./fixtures/transaction-offercreate');
-    var i = 0;
-    var orderbook = remote.createOrderBook({
+  it('Handle server message -- transaction -- with orderbook notification',
+     function() {
+    const message = require('./fixtures/transaction-offercreate');
+    let i = 0;
+    const orderbook = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: 'rJy64aCJLP3vf8o3WPKn4iQKtfpjh6voAR',
       currency_pays: 'XRP'
@@ -778,17 +694,15 @@ describe('Remote', function() {
     assert.strictEqual(i, 2);
   });
   it('Handle server message -- path find', function() {
-    var message = require('./fixtures/pathfind');
-    var i = 0;
+    const message = require('./fixtures/pathfind');
+    let i = 0;
 
-    var amount = Amount.from_json(
-      {
-        currency: 'USD',
-        issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-        value: '0.001'
-      }
-    );
-    var path = new PathFind(remote,
+    const amount = Amount.from_json({
+      currency: 'USD',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      value: '0.001'
+    });
+    const path = new PathFind(remote,
       'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
       'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
       amount
@@ -810,32 +724,34 @@ describe('Remote', function() {
     assert.strictEqual(i, 2);
   });
   it('Handle server message -- invalid message', function() {
-    var i = 0;
+    // Silence error log
+    Log.setEngine(Log.engines.none);
 
-    remote.on('error', function() {
+    require('./fixtures/pathfind');
+    let i = 0;
+
+    remote.on('error', function(e) {
+      assert(/^Unexpected response from remote/.test(e.message));
       ++i;
     });
     remote._servers[0].emit('message', '1');
-    remote._servers[0].emit('message', { });
-    remote._servers[0].emit('message', {
-      type: 'response'
-    });
-    remote._servers[0].emit('message', JSON.stringify({
-      type: 'response'
-    }));
+    remote._servers[0].emit('message', {});
+    remote._servers[0].emit('message', {type: 'response'});
+    remote._servers[0].emit('message', JSON.stringify({type: 'response'}));
 
-    assert.strictEqual(i, 2, 'Failed to receive all invalid message errors');
+    assert.strictEqual(i, 3, 'Failed to receive all invalid message errors');
   });
 
   it('Get server', function() {
     remote.addServer('wss://sasdf.ripple.com:443');
+
     remote.connect();
     remote._connected = true;
     remote._servers.forEach(function(s) {
       s._connected = true;
     });
 
-    var message = {
+    const message = {
       type: 'ledgerClosed',
       fee_base: 10,
       fee_ref: 10,
@@ -866,7 +782,7 @@ describe('Remote', function() {
     assert.strictEqual(remote.getServer(), null);
   });
   it('Get server -- primary server', function() {
-    var server = remote.addServer({
+    const server = remote.addServer({
       host: 'sasdf.ripple.com',
       port: 443,
       secure: true,
@@ -880,70 +796,73 @@ describe('Remote', function() {
   });
 
   it('Parse binary transaction', function() {
-    var binaryTransaction = require('./fixtures/binary-transaction.json');
+    const binaryTransaction = require('./fixtures/binary-transaction.json');
 
-    var parsedSourceTag = Remote.parseBinaryTransaction(
+    const parsedSourceTag = Remote.parseBinaryTransaction(
       binaryTransaction.PaymentWithSourceTag.binary);
     assert.deepEqual(parsedSourceTag,
-      binaryTransaction.PaymentWithSourceTag.parsed);
+                     binaryTransaction.PaymentWithSourceTag.parsed);
 
-    var parsedMemosAndPaths = Remote.parseBinaryTransaction(
+    const parsedMemosAndPaths = Remote.parseBinaryTransaction(
       binaryTransaction.PaymentWithMemosAndPaths.binary);
     assert.deepEqual(parsedMemosAndPaths,
-      binaryTransaction.PaymentWithMemosAndPaths.parsed);
+                     binaryTransaction.PaymentWithMemosAndPaths.parsed);
 
-    var parsedPartialPayment = Remote.parseBinaryTransaction(
+    const parsedPartialPayment = Remote.parseBinaryTransaction(
       binaryTransaction.PartialPayment.binary);
     assert.deepEqual(parsedPartialPayment,
-      binaryTransaction.PartialPayment.parsed);
+                     binaryTransaction.PartialPayment.parsed);
 
-    var parsedOfferCreate = Remote.parseBinaryTransaction(
+    const parsedOfferCreate = Remote.parseBinaryTransaction(
       binaryTransaction.OfferCreate.binary);
     assert.deepEqual(parsedOfferCreate, binaryTransaction.OfferCreate.parsed);
 
-    var parsedPartialPaymentWithXRPDelieveredAmount =
+    const parsedPartialPaymentWithXRPDelieveredAmount =
       Remote.parseBinaryTransaction(
         binaryTransaction.PartialPaymentWithXRPDeliveredAmount.binary);
+
     assert.deepEqual(parsedPartialPaymentWithXRPDelieveredAmount,
-      binaryTransaction.PartialPaymentWithXRPDeliveredAmount.parsed);
+                     binaryTransaction
+                     .PartialPaymentWithXRPDeliveredAmount
+                     .parsed);
   });
 
   it('Parse binary account transaction', function() {
-    var binaryAccountTransaction =
+    const binaryAccountTransaction =
       require('./fixtures/binary-account-transaction.json');
 
-    var parsed = Remote.parseBinaryAccountTransaction(
+    const parsed = Remote.parseBinaryAccountTransaction(
       binaryAccountTransaction.OfferCreate.binary);
     assert.deepEqual(parsed, binaryAccountTransaction.OfferCreate.parsed);
 
-    var parsedPartialPayment = Remote.parseBinaryAccountTransaction(
+    const parsedPartialPayment = Remote.parseBinaryAccountTransaction(
       binaryAccountTransaction.PartialPayment.binary);
     assert.deepEqual(parsedPartialPayment,
-      binaryAccountTransaction.PartialPayment.parsed);
+                     binaryAccountTransaction.PartialPayment.parsed);
 
-    var parsedPayment = Remote.parseBinaryAccountTransaction(
+    const parsedPayment = Remote.parseBinaryAccountTransaction(
       binaryAccountTransaction.Payment.binary);
     assert.deepEqual(parsedPayment, binaryAccountTransaction.Payment.parsed);
   });
 
   it('Parse binary ledger', function() {
-    var binaryLedgerData = require('./fixtures/binary-ledger-data.json');
+    const binaryLedgerData = require('./fixtures/binary-ledger-data.json');
 
-    var parsedAccountRoot = Remote.parseBinaryLedgerData(
-      binaryLedgerData.AccountRoot.binary);
+    const parsedAccountRoot =
+      Remote.parseBinaryLedgerData(binaryLedgerData.AccountRoot.binary);
     assert.deepEqual(parsedAccountRoot, binaryLedgerData.AccountRoot.parsed);
 
-    var parsedOffer = Remote.parseBinaryLedgerData(
-      binaryLedgerData.Offer.binary);
+    const parsedOffer =
+      Remote.parseBinaryLedgerData(binaryLedgerData.Offer.binary);
     assert.deepEqual(parsedOffer, binaryLedgerData.Offer.parsed);
 
-    var parsedDirectoryNode = Remote.parseBinaryLedgerData(
-      binaryLedgerData.DirectoryNode.binary);
+    const parsedDirectoryNode =
+      Remote.parseBinaryLedgerData(binaryLedgerData.DirectoryNode.binary);
     assert.deepEqual(parsedDirectoryNode,
-      binaryLedgerData.DirectoryNode.parsed);
+                     binaryLedgerData.DirectoryNode.parsed);
 
-    var parsedRippleState = Remote.parseBinaryLedgerData(
-      binaryLedgerData.RippleState.binary);
+    const parsedRippleState =
+      Remote.parseBinaryLedgerData(binaryLedgerData.RippleState.binary);
     assert.deepEqual(parsedRippleState, binaryLedgerData.RippleState.parsed);
   });
 
@@ -987,14 +906,14 @@ describe('Remote', function() {
   });
 
   it('Initiate request', function() {
-    var request = remote.requestServerInfo();
+    const request = remote.requestServerInfo();
 
     assert.deepEqual(request.message, {
       command: 'server_info',
       id: undefined
     });
 
-    var i = 0;
+    let i = 0;
     remote._connected = true;
     remote._servers[0]._connected = true;
     remote._servers[0]._request = function() {
@@ -1005,14 +924,14 @@ describe('Remote', function() {
     assert.strictEqual(i, 1, 'Did not initiate request');
   });
   it('Initiate request -- with request name', function() {
-    var request = remote.request('server_info');
+    const request = remote.request('server_info');
 
     assert.deepEqual(request.message, {
       command: 'server_info',
       id: undefined
     });
 
-    var i = 0;
+    let i = 0;
     remote._connected = true;
     remote._servers[0]._connected = true;
     remote._servers[0]._request = function() {
@@ -1029,17 +948,14 @@ describe('Remote', function() {
   });
   it('Initiate request -- with invalid request', function() {
     assert.throws(function() {
-      remote.request({ });
+      remote.request({});
     });
     assert.throws(function() {
-      remote.request({
-        command: 'server_info',
-        id: 1
-      });
+      remote.request({command: 'server_info', id: 1});
     });
   });
   it('Initiate request -- set non-existent servers', function() {
-    var request = remote.requestServerInfo();
+    const request = remote.requestServerInfo();
     request.setServer('wss://s-east.ripple.com:443');
     assert.strictEqual(request.server, null);
     assert.throws(function() {
@@ -1049,24 +965,20 @@ describe('Remote', function() {
   });
 
   it('Construct ledger request', function() {
-    var request = remote.requestLedger();
+    const request = remote.requestLedger();
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined
     });
   });
   it('Construct ledger request -- with ledger index', function() {
-    var request = remote.requestLedger({
-      ledger: 1
-    });
+    let request = remote.requestLedger({ledger: 1});
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined,
       ledger_index: 1
     });
-    request = remote.requestLedger({
-      ledger_index: 1
-    });
+    request = remote.requestLedger({ledger_index: 1});
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined,
@@ -1085,23 +997,23 @@ describe('Remote', function() {
     });
   });
   it('Construct ledger request -- with ledger hash', function() {
-    var request = remote.requestLedger({
-      ledger: LEDGER_HASH
-    });
+    let request = remote.requestLedger({ledger: LEDGER_HASH});
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined,
       ledger_hash: LEDGER_HASH
     });
-    request = remote.requestLedger({
-      ledger_hash: LEDGER_HASH
-    });
+
+    request = remote.requestLedger({ledger_hash: LEDGER_HASH});
+
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined,
       ledger_hash: LEDGER_HASH
     });
+
     request = remote.requestLedger(LEDGER_HASH);
+
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined,
@@ -1109,31 +1021,32 @@ describe('Remote', function() {
     });
   });
   it('Construct ledger request -- with ledger identifier', function() {
-    var request = remote.requestLedger({
-      ledger: 'validated'
-    });
+    let request = remote.requestLedger({ledger: 'validated'});
+
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined,
       ledger_index: 'validated'
     });
-    request = remote.requestLedger({
-      ledger: 'current'
-    });
+
+    request = remote.requestLedger({ledger: 'current'});
+
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined,
       ledger_index: 'current'
     });
+
     request = remote.requestLedger('validated');
+
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined,
       ledger_index: 'validated'
     });
-    request = remote.requestLedger({
-      validated: true
-    });
+
+    request = remote.requestLedger({validated: true});
+
     assert.deepEqual(request.message, {
       command: 'ledger',
       id: undefined,
@@ -1141,7 +1054,7 @@ describe('Remote', function() {
     });
   });
   it('Construct ledger request -- with transactions', function() {
-    var request = remote.requestLedger({
+    let request = remote.requestLedger({
       ledger: 'validated',
       transactions: true
     });
@@ -1154,21 +1067,21 @@ describe('Remote', function() {
   });
 
   it('Construct ledger_closed request', function() {
-    var request = remote.requestLedgerClosed();
+    let request = remote.requestLedgerClosed();
     assert.deepEqual(request.message, {
       command: 'ledger_closed',
       id: undefined
     });
   });
   it('Construct ledger_header request', function() {
-    var request = remote.requestLedgerHeader();
+    let request = remote.requestLedgerHeader();
     assert.deepEqual(request.message, {
       command: 'ledger_header',
       id: undefined
     });
   });
   it('Construct ledger_current request', function() {
-    var request = remote.requestLedgerCurrent();
+    let request = remote.requestLedgerCurrent();
     assert.deepEqual(request.message, {
       command: 'ledger_current',
       id: undefined
@@ -1176,7 +1089,7 @@ describe('Remote', function() {
   });
 
   it('Construct ledger_data request -- with ledger hash', function() {
-    var request = remote.requestLedgerData({
+    let request = remote.requestLedgerData({
       ledger: LEDGER_HASH,
       limit: 5
     });
@@ -1191,7 +1104,7 @@ describe('Remote', function() {
   });
 
   it('Construct ledger_data request -- with ledger index', function() {
-    var request = remote.requestLedgerData({
+    let request = remote.requestLedgerData({
       ledger: LEDGER_INDEX,
       limit: 5
     });
@@ -1206,7 +1119,7 @@ describe('Remote', function() {
   });
 
   it('Construct ledger_data request -- no binary', function() {
-    var request = remote.requestLedgerData({
+    let request = remote.requestLedgerData({
       ledger: LEDGER_HASH,
       limit: 5,
       binary: false
@@ -1222,7 +1135,7 @@ describe('Remote', function() {
   });
 
   it('Construct server_info request', function() {
-    var request = remote.requestServerInfo();
+    let request = remote.requestServerInfo();
     assert.deepEqual(request.message, {
       command: 'server_info',
       id: undefined
@@ -1230,7 +1143,7 @@ describe('Remote', function() {
   });
 
   it('Construct peers request', function() {
-    var request = remote.requestPeers();
+    let request = remote.requestPeers();
     assert.deepEqual(request.message, {
       command: 'peers',
       id: undefined
@@ -1238,7 +1151,7 @@ describe('Remote', function() {
   });
 
   it('Construct connection request', function() {
-    var request = remote.requestConnect('0.0.0.0', '443');
+    let request = remote.requestConnect('0.0.0.0', '443');
     assert.deepEqual(request.message, {
       command: 'connect',
       id: undefined,
@@ -1248,7 +1161,7 @@ describe('Remote', function() {
   });
 
   it('Construct unl_add request', function() {
-    var request = remote.requestUnlAdd('0.0.0.0');
+    let request = remote.requestUnlAdd('0.0.0.0');
     assert.deepEqual(request.message, {
       command: 'unl_add',
       node: '0.0.0.0',
@@ -1257,7 +1170,7 @@ describe('Remote', function() {
   });
 
   it('Construct unl_list request', function() {
-    var request = remote.requestUnlList();
+    let request = remote.requestUnlList();
     assert.deepEqual(request.message, {
       command: 'unl_list',
       id: undefined
@@ -1265,7 +1178,7 @@ describe('Remote', function() {
   });
 
   it('Construct unl_delete request', function() {
-    var request = remote.requestUnlDelete('0.0.0.0');
+    let request = remote.requestUnlDelete('0.0.0.0');
     assert.deepEqual(request.message, {
       command: 'unl_delete',
       node: '0.0.0.0',
@@ -1274,7 +1187,7 @@ describe('Remote', function() {
   });
 
   it('Construct subscribe request', function() {
-    var request = remote.requestSubscribe(['server', 'ledger']);
+    let request = remote.requestSubscribe(['server', 'ledger']);
     assert.deepEqual(request.message, {
       command: 'subscribe',
       id: undefined,
@@ -1282,7 +1195,7 @@ describe('Remote', function() {
     });
   });
   it('Construct unsubscribe request', function() {
-    var request = remote.requestUnsubscribe(['server', 'ledger']);
+    let request = remote.requestUnsubscribe(['server', 'ledger']);
     assert.deepEqual(request.message, {
       command: 'unsubscribe',
       id: undefined,
@@ -1291,14 +1204,14 @@ describe('Remote', function() {
   });
 
   it('Construct ping request', function() {
-    var request = remote.requestPing();
+    let request = remote.requestPing();
     assert.deepEqual(request.message, {
       command: 'ping',
       id: undefined
     });
   });
   it('Construct ping request -- with server', function() {
-    var request = remote.requestPing('wss://s1.ripple.com:443');
+    let request = remote.requestPing('wss://s1.ripple.com:443');
     assert.strictEqual(request.server, remote._servers[0]);
     assert.deepEqual(request.message, {
       command: 'ping',
@@ -1307,7 +1220,7 @@ describe('Remote', function() {
   });
 
   it('Construct account_currencies request -- with ledger index', function() {
-    var request = remote.requestAccountCurrencies({
+    let request = remote.requestAccountCurrencies({
       account: ADDRESS
     });
     assert.strictEqual(request.message.command, 'account_currencies');
@@ -1315,7 +1228,7 @@ describe('Remote', function() {
   });
 
   it('Construct account_info request -- with ledger index', function() {
-    var request = remote.requestAccountInfo({
+    let request = remote.requestAccountInfo({
       account: ADDRESS,
       ledger: 9592219
     });
@@ -1324,7 +1237,7 @@ describe('Remote', function() {
     assert.strictEqual(request.message.ledger_index, 9592219);
   });
   it('Construct account_info request -- with ledger hash', function() {
-    var request = remote.requestAccountInfo({
+    let request = remote.requestAccountInfo({
       account: ADDRESS,
       ledger: LEDGER_HASH
     });
@@ -1333,7 +1246,7 @@ describe('Remote', function() {
     assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
   });
   it('Construct account_info request -- with ledger identifier', function() {
-    var request = remote.requestAccountInfo({
+    let request = remote.requestAccountInfo({
       account: ADDRESS,
       ledger: 'validated'
     });
@@ -1343,7 +1256,7 @@ describe('Remote', function() {
   });
 
   it('Construct account balance request -- with ledger index', function() {
-    var request = remote.requestAccountBalance({
+    let request = remote.requestAccountBalance({
       account: ADDRESS,
       ledger: 9592219
     });
@@ -1352,7 +1265,7 @@ describe('Remote', function() {
     assert.strictEqual(request.message.ledger_index, 9592219);
   });
   it('Construct account balance request -- with ledger hash', function() {
-    var request = remote.requestAccountBalance({
+    let request = remote.requestAccountBalance({
       account: ADDRESS,
       ledger: LEDGER_HASH
     });
@@ -1361,7 +1274,7 @@ describe('Remote', function() {
     assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
   });
   it('Construct account balance request -- with ledger identifier', function() {
-    var request = remote.requestAccountBalance({
+    let request = remote.requestAccountBalance({
       account: ADDRESS,
       ledger: 'validated'
     });
@@ -1371,24 +1284,18 @@ describe('Remote', function() {
   });
 
   it('Construct account flags request', function() {
-    var request = remote.requestAccountFlags({
-      account: ADDRESS
-    });
+    let request = remote.requestAccountFlags({account: ADDRESS});
     assert.strictEqual(request.message.command, 'ledger_entry');
     assert.strictEqual(request.message.account_root, ADDRESS);
   });
   it('Construct account owner count request', function() {
-    var request = remote.requestOwnerCount({
-      account: ADDRESS
-    });
+    let request = remote.requestOwnerCount({account: ADDRESS});
     assert.strictEqual(request.message.command, 'ledger_entry');
     assert.strictEqual(request.message.account_root, ADDRESS);
   });
 
   it('Construct account_lines request', function() {
-    var request = remote.requestAccountLines({
-      account: ADDRESS
-    });
+    let request = remote.requestAccountLines({account: ADDRESS});
     assert.deepEqual(request.message, {
       command: 'account_lines',
       id: undefined,
@@ -1396,7 +1303,7 @@ describe('Remote', function() {
     });
   });
   it('Construct account_lines request -- with peer', function() {
-    var request = remote.requestAccountLines({
+    let request = remote.requestAccountLines({
       account: ADDRESS,
       peer: ADDRESS
     });
@@ -1408,7 +1315,7 @@ describe('Remote', function() {
     });
   });
   it('Construct account_lines request -- with limit', function() {
-    var request = remote.requestAccountLines({
+    let request = remote.requestAccountLines({
       account: ADDRESS,
       limit: 100
     });
@@ -1420,7 +1327,7 @@ describe('Remote', function() {
     });
   });
   it('Construct account_lines request -- with limit and marker', function() {
-    var request = remote.requestAccountLines({
+    let request = remote.requestAccountLines({
       account: ADDRESS,
       limit: 100,
       marker: PAGING_MARKER,
@@ -1437,47 +1344,37 @@ describe('Remote', function() {
   });
   it('Construct account_lines request -- with min limit', function() {
     assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS,
-      limit: 0
+      account: ADDRESS, limit: 0
     }).message.limit, 0);
     assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS,
-      limit: -1
+      account: ADDRESS, limit: -1
     }).message.limit, 0);
     assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS,
-      limit: -1e9
+      account: ADDRESS, limit: -1e9
     }).message.limit, 0);
     assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS,
-      limit: -1e24
+      account: ADDRESS, limit: -1e24
     }).message.limit, 0);
   });
   it('Construct account_lines request -- with max limit', function() {
     assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS,
-      limit: 1e9
+      account: ADDRESS, limit: 1e9
     }).message.limit, 1e9);
     assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS,
-      limit: 1e9 + 1
+      account: ADDRESS, limit: 1e9 + 1
     }).message.limit, 1e9);
     assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS,
-      limit: 1e10
+      account: ADDRESS, limit: 1e10
     }).message.limit, 1e9);
     assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS,
-      limit: 1e24
+      account: ADDRESS, limit: 1e24
     }).message.limit, 1e9);
   });
+
   it('Construct account_lines request -- with marker -- missing ledger',
-      function() {
+     function() {
     assert.throws(function() {
-      remote.requestAccountLines({
-        account: ADDRESS,
-        marker: PAGING_MARKER
-      });
+      remote.requestAccountLines({account: ADDRESS, marker: PAGING_MARKER});
     }, 'A ledger_index or ledger_hash must be provided when using a marker');
 
     assert.throws(function() {
@@ -1506,14 +1403,12 @@ describe('Remote', function() {
 
     assert.throws(function() {
       remote.requestAccountLines({
-        account: ADDRESS,
-        marker: PAGING_MARKER,
-        ledger: LEDGER_HASH + 'F'
+        account: ADDRESS, marker: PAGING_MARKER, ledger: LEDGER_HASH + 'F'
       });
     }, 'A ledger_index or ledger_hash must be provided when using a marker');
   });
   it('Construct account_lines request -- with callback', function() {
-    var request = remote.requestAccountLines({
+    let request = remote.requestAccountLines({
       account: ADDRESS
     }, callback);
 
@@ -1525,7 +1420,7 @@ describe('Remote', function() {
   });
 
   it('Construct account_tx request', function() {
-    var request = remote.requestAccountTransactions({
+    let request = remote.requestAccountTransactions({
       account: UInt160.ACCOUNT_ONE,
       ledger_index_min: -1,
       ledger_index_max: -1,
@@ -1561,7 +1456,7 @@ describe('Remote', function() {
     });
   });
   it('Construct account_tx request -- no binary', function() {
-    var request = remote.requestAccountTransactions({
+    let request = remote.requestAccountTransactions({
       account: UInt160.ACCOUNT_ONE,
       ledger_index_min: -1,
       ledger_index_max: -1,
@@ -1585,9 +1480,7 @@ describe('Remote', function() {
   });
 
   it('Construct account_offers request -- no binary', function() {
-    var request = remote.requestAccountOffers({
-      account: ADDRESS
-    });
+    let request = remote.requestAccountOffers({account: ADDRESS});
     assert.deepEqual(request.message, {
       command: 'account_offers',
       id: undefined,
@@ -1596,19 +1489,16 @@ describe('Remote', function() {
   });
 
   it('Construct offer request -- with ledger index', function() {
-    var request = remote.requestOffer({
-      index: TRANSACTION_HASH,
-      ledger: LEDGER_INDEX
+    let request = remote.requestOffer({
+      index: TRANSACTION_HASH, ledger: LEDGER_INDEX
     });
     assert.strictEqual(request.message.command, 'ledger_entry');
     assert.strictEqual(request.message.offer, TRANSACTION_HASH);
     assert.strictEqual(request.message.ledger_index, LEDGER_INDEX);
   });
   it('Construct offer request -- with ledger index and sequence', function() {
-    var request = remote.requestOffer({
-      account: ADDRESS,
-      ledger: LEDGER_INDEX,
-      sequence: 5
+    let request = remote.requestOffer({
+      account: ADDRESS, ledger: LEDGER_INDEX, sequence: 5
     });
     assert.strictEqual(request.message.command, 'ledger_entry');
     assert.strictEqual(request.message.offer.account, ADDRESS);
@@ -1616,10 +1506,8 @@ describe('Remote', function() {
     assert.strictEqual(request.message.ledger_index, LEDGER_INDEX);
   });
   it('Construct offer request -- with ledger hash', function() {
-    var request = remote.requestOffer({
-      account: ADDRESS,
-      ledger: LEDGER_HASH,
-      sequence: 5
+    let request = remote.requestOffer({
+      account: ADDRESS, ledger: LEDGER_HASH, sequence: 5
     });
     assert.strictEqual(request.message.command, 'ledger_entry');
     assert.strictEqual(request.message.offer.account, ADDRESS);
@@ -1627,11 +1515,9 @@ describe('Remote', function() {
     assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
   });
   it('Construct offer request -- with ledger identifier and sequence',
-      function() {
-    var request = remote.requestOffer({
-      account: ADDRESS,
-      ledger: 'validated',
-      sequence: 5
+     function() {
+    let request = remote.requestOffer({
+      account: ADDRESS, ledger: 'validated', sequence: 5
     });
     assert.strictEqual(request.message.command, 'ledger_entry');
     assert.strictEqual(request.message.offer.account, ADDRESS);
@@ -1640,7 +1526,7 @@ describe('Remote', function() {
   });
 
   it('Construct book_offers request', function() {
-    var request = remote.requestBookOffers({
+    let request = remote.requestBookOffers({
       taker_gets: {
         currency: 'USD',
         issuer: ADDRESS
@@ -1665,7 +1551,7 @@ describe('Remote', function() {
   });
 
   it('Construct book_offers request -- with ledger and limit', function() {
-    var request = remote.requestBookOffers({
+    let request = remote.requestBookOffers({
       taker_gets: {
         currency: 'USD',
         issuer: ADDRESS
@@ -1694,7 +1580,7 @@ describe('Remote', function() {
   });
 
   it('Construct tx request', function() {
-    var request = remote.requestTransaction({
+    let request = remote.requestTransaction({
       hash: TRANSACTION_HASH
     });
 
@@ -1706,7 +1592,7 @@ describe('Remote', function() {
     });
   });
   it('Construct tx request -- no binary', function() {
-    var request = remote.requestTransaction({
+    let request = remote.requestTransaction({
       hash: TRANSACTION_HASH,
       binary: false
     });
@@ -1720,7 +1606,7 @@ describe('Remote', function() {
   });
 
   it('Construct transaction_entry request', function() {
-    var request = remote.requestTransactionEntry({
+    let request = remote.requestTransactionEntry({
       hash: TRANSACTION_HASH
     });
 
@@ -1732,7 +1618,7 @@ describe('Remote', function() {
     });
   });
   it('Construct transaction_entry request -- with ledger index', function() {
-    var request = remote.requestTransactionEntry({
+    let request = remote.requestTransactionEntry({
       hash: TRANSACTION_HASH,
       ledger: 1
     });
@@ -1745,7 +1631,7 @@ describe('Remote', function() {
     });
   });
   it('Construct transaction_entry request -- with ledger hash', function() {
-    var request = remote.requestTransactionEntry({
+    let request = remote.requestTransactionEntry({
       hash: TRANSACTION_HASH,
       ledger: LEDGER_HASH
     });
@@ -1767,7 +1653,7 @@ describe('Remote', function() {
   });
 
   it('Construct tx_history request', function() {
-    var request = remote.requestTransactionHistory({
+    let request = remote.requestTransactionHistory({
       start: 1
     });
 
@@ -1779,7 +1665,7 @@ describe('Remote', function() {
   });
 
   it('Construct wallet_accounts request', function() {
-    var request = remote.requestWalletAccounts({
+    let request = remote.requestWalletAccounts({
       seed: 'shmnpxY42DaoyNbNQDoGuymNT1T9U'
     });
 
@@ -1800,7 +1686,7 @@ describe('Remote', function() {
   });
 
   it('Construct sign request', function() {
-    var request = remote.requestSign({
+    let request = remote.requestSign({
       secret: 'shmnpxY42DaoyNbNQDoGuymNT1T9U',
       tx_json: {
         Flags: 0,
@@ -1836,7 +1722,7 @@ describe('Remote', function() {
   });
 
   it('Construct submit request', function() {
-    var request = remote.requestSubmit();
+    let request = remote.requestSubmit();
     assert.deepEqual(request.message, {
       command: 'submit',
       id: undefined
@@ -1844,7 +1730,7 @@ describe('Remote', function() {
   });
 
   it('Construct transaction', function() {
-    var tx = remote.createTransaction('AccountSet', {
+    let tx = remote.createTransaction('AccountSet', {
       account: 'rwLZs9MUVv28XZdYXDk9uNRUpAh1c6jij8',
       flags: 0
     });
@@ -1872,7 +1758,7 @@ describe('Remote', function() {
 
   it('Construct ledger_accept request', function() {
     remote._stand_alone = true;
-    var request = remote.requestLedgerAccept();
+    let request = remote.requestLedgerAccept();
 
     assert.deepEqual(request.message, {
       command: 'ledger_accept',
@@ -1901,7 +1787,7 @@ describe('Remote', function() {
   });
 
   it('Construct ripple balance request', function() {
-    var request = remote.requestRippleBalance({
+    let request = remote.requestRippleBalance({
       account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
       ledger: 1,
@@ -1923,13 +1809,12 @@ describe('Remote', function() {
   });
 
   it('Construct ripple_path_find request', function() {
-    var request = remote.requestRipplePathFind({
+    let request = remote.requestRipplePathFind({
       src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
       dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       src_currencies: [{
-        currency: 'BTC',
-        issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
+        currency: 'BTC', issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
       }]
     });
 
@@ -1951,13 +1836,12 @@ describe('Remote', function() {
   });
 
   it('Construct path_find create request', function() {
-    var request = remote.requestPathFindCreate({
+    let request = remote.requestPathFindCreate({
       src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
       dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       src_currencies: [{
-        currency: 'BTC',
-        issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
+        currency: 'BTC', issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
       }]
     });
 
@@ -1980,7 +1864,7 @@ describe('Remote', function() {
   });
 
   it('Construct path_find close request', function() {
-    var request = remote.requestPathFindClose();
+    let request = remote.requestPathFindClose();
 
     assert.deepEqual(request.message, {
       command: 'path_find',
