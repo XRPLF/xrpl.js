@@ -19,20 +19,21 @@ const log = require('./log').internal.sub('server');
  *    @param [Boolean] securec
  */
 
-function Server(remote, _opts) {
+function Server(remote, opts_) {
   EventEmitter.call(this);
 
   const self = this;
   let opts;
-  if (typeof _opts === 'string') {
-    const parsedUrl = url.parse(_opts);
+
+  if (typeof opts_ === 'string') {
+    const parsedUrl = url.parse(opts_);
     opts = {
       host: parsedUrl.hostname,
       port: parsedUrl.port,
       secure: (parsedUrl.protocol === 'ws:') ? false : true
     };
   } else {
-    opts = _opts;
+    opts = opts_;
   }
 
   if (typeof opts !== 'object') {
@@ -44,10 +45,10 @@ function Server(remote, _opts) {
       'Server host is malformed, use "host" and "port" server configuration');
   }
 
-  // We want to allow integer strings as valid port numbers
-  // for backward compatibility
+  // We want to allow integer strings as valid port numbers for backward
+  // compatibility
   opts.port = Number(opts.port);
-  if (!opts.port) {
+  if (isNaN(opts.port)) {
     throw new TypeError('Server port must be a number');
   }
 
@@ -67,13 +68,11 @@ function Server(remote, _opts) {
   this._shouldConnect = false;
   this._state = 'offline';
   this._ledgerRanges = new RangeSet();
-  this._ledgerMap = new LRU({
-    max: 200
-  });
+  this._ledgerMap = new LRU({max: 200});
 
   this._id = 0; // request ID
   this._retry = 0;
-  this._requests = { };
+  this._requests = {};
 
   this._load_base = 256;
   this._load_factor = 256;
@@ -266,7 +265,7 @@ Server.prototype.requestServerID = function() {
     try {
       self._pubkey_node = message.info.pubkey_node;
     } catch (e) {
-      // empty
+      log.warn('Failed to get server pubkey_node', message);
     }
   });
 
@@ -293,8 +292,8 @@ Server.prototype._updateScore = function(type, data) {
   }
 
   const weight = this._scoreWeights[type] || 1;
-
   let delta;
+
   switch (type) {
     case 'ledgerclose':
       // Ledger lag
@@ -305,6 +304,7 @@ Server.prototype._updateScore = function(type, data) {
       break;
     case 'response':
       // Ping lag
+      // Servers are not pinged by default
       delta = Math.floor((Date.now() - data.time) / 200);
       this._score += weight * delta;
       break;
@@ -333,7 +333,7 @@ Server.prototype._remoteAddress = function() {
   try {
     return this._ws._socket.remoteAddress;
   } catch (e) {
-    // empty
+    log.warn('Cannot get remote address. Does not work in browser');
   }
 };
 
@@ -442,7 +442,20 @@ Server.prototype.connect = function() {
   self.emit('connecting');
 
   ws.onmessage = function onMessage(msg) {
-    self.emit('message', msg.data);
+    var message = msg.data;
+
+    try {
+      message = JSON.parse(message);
+    } catch (e) {
+      var error = new RippleError('unexpected',
+        'Unexpected response from server: ' + JSON.stringify(message));
+
+      self.emit('unexpected', message);
+      log.error(error);
+      return;
+    }
+
+    self.emit('message', message);
   };
 
   ws.onopen = function onOpen() {
@@ -559,15 +572,6 @@ Server.prototype._handleClose = function() {
  */
 
 Server.prototype._handleMessage = function(message) {
-  try {
-    // this is fixed in Brandon's pull request
-    /* eslint-disable no-param-reassign */
-    message = JSON.parse(message);
-    /* eslint-enable no-param-reassign */
-  } catch (e) {
-    // empty
-  }
-
   if (!Server.isValidMessage(message)) {
     this.emit('unexpected', message);
     return;

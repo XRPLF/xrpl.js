@@ -490,20 +490,13 @@ Remote.prototype.disconnect = function(callback) {
  */
 
 Remote.prototype._handleMessage = function(message, server) {
-  try {
-    message = JSON.parse(message);
-
-  /*eslint-disable no-empty*/
-  } catch (e) {
-    // TODO: why are we suppressing this?
-    console.error(e);
-  }
-  /*eslint-enable no-empty*/
-
   if (!Remote.isValidMessage(message)) {
     // Unexpected response from remote.
-    this.emit('error', new RippleError('remoteUnexpected',
-      'Unexpected response from remote'));
+    var error = new RippleError('remoteUnexpected',
+      'Unexpected response from remote: ' + JSON.stringify(message));
+
+    this.emit('error', error);
+    log.error(error);
     return;
   }
 

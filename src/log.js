@@ -1,5 +1,7 @@
 'use strict';
 
+var assert = require('assert');
+
 /**
  * Logging functionality for ripple-lib and any applications built on it.
  *
@@ -102,13 +104,15 @@ function logMessage(logLevel, args) {
   }
 }
 
+var engines = {};
+
 /**
  * Basic logging connector.
  *
  * This engine has no formatting and works with the most basic of 'console.log'
  * implementations. This is the logging engine used in Node.js.
  */
-var BasicLogEngine = {
+engines.basic = {
   logObject: function logObject(level, message, args) {
     args = args.map(function(arg) {
       return JSON.stringify(arg, null, 2);
@@ -125,7 +129,7 @@ var BasicLogEngine = {
  * JavaScript objects. This connector passes objects through to the logging
  * function without any stringification.
  */
-var InteractiveLogEngine = {
+engines.interactive = {
   logObject: function(level, message, args) {
     args = args.map(function(arg) {
       return /MSIE/.test(navigator.userAgent)
@@ -136,22 +140,33 @@ var InteractiveLogEngine = {
     logMessage(level, getLogInfo(message, args));
   }
 };
+
 /**
  * Null logging connector.
  *
  * This engine simply swallows all messages. Used when console.log is not
  * available.
  */
-var NullLogEngine = {
+engines.none = {
   logObject: function() {}
 };
 
+Log.getEngine = Log.prototype.getEngine = function() {
+  return Log.engine;
+};
+
+Log.setEngine = Log.prototype.setEngine = function(engine) {
+  assert.strictEqual(typeof engine, 'object');
+  assert.strictEqual(typeof engine.logObject, 'function');
+  Log.engine = engine;
+};
+
 if (typeof window !== 'undefined' && typeof console !== 'undefined') {
-  Log.engine = InteractiveLogEngine;
+  Log.setEngine(engines.interactive);
 } else if (typeof console !== 'undefined' && console.log) {
-  Log.engine = BasicLogEngine;
+  Log.setEngine(engines.basic);
 } else {
-  Log.engine = NullLogEngine;
+  Log.setEngine(engines.none);
 }
 
 /**
@@ -171,3 +186,8 @@ module.exports.internal = module.exports.sub();
  * Expose the class as well.
  */
 module.exports.Log = Log;
+
+/**
+ * Expose log engines
+ */
+module.exports.engines = engines;

@@ -23,6 +23,7 @@ exports.RangeSet = require('./rangeset').RangeSet;
 exports.convertBase = require('./baseconverter');
 
 exports._test = {
+  Log: require('./log'),
   PathFind: require('./pathfind').PathFind,
   TransactionManager: require('./transactionmanager').TransactionManager
 };
