@@ -10,18 +10,18 @@
 
 'use strict';
 
-var _ = require('lodash');
-var util = require('util');
-var extend = require('extend');
-var assert = require('assert');
-var async = require('async');
-var EventEmitter = require('events').EventEmitter;
-var Amount = require('./amount').Amount;
-var UInt160 = require('./uint160').UInt160;
-var Currency = require('./currency').Currency;
-var AutobridgeCalculator = require('./autobridgecalculator');
-var OrderBookUtils = require('./orderbookutils');
-var log = require('./log').internal.sub('orderbook');
+const _ = require('lodash');
+const util = require('util');
+const extend = require('extend');
+const assert = require('assert');
+const async = require('async');
+const EventEmitter = require('events').EventEmitter;
+const Amount = require('./amount').Amount;
+const UInt160 = require('./uint160').UInt160;
+const Currency = require('./currency').Currency;
+const AutobridgeCalculator = require('./autobridgecalculator');
+const OrderBookUtils = require('./orderbookutils');
+const log = require('./log').internal.sub('orderbook');
 
 function assertValidNumber(number, message) {
   assert(!_.isNull(number) && !isNaN(number), message);
@@ -42,7 +42,7 @@ function OrderBook(remote,
                    key) {
   EventEmitter.call(this);
 
-  var self = this;
+  const self = this;
 
   this._remote = remote;
   this._currencyGets = Currency.from_json(currencyGets);
@@ -174,11 +174,11 @@ OrderBook.DEFAULT_TRANSFER_RATE = 1000000000;
  */
 
 OrderBook.offerRewrite = function(offer) {
-  var result = {};
-  var keys = Object.keys(offer);
+  const result = {};
+  const keys = Object.keys(offer);
 
-  for (var i = 0, l = keys.length; i < l; i++) {
-    var key = keys[i];
+  for (let i = 0, l = keys.length; i < l; i++) {
+    const key = keys[i];
     switch (key) {
       case 'PreviousTxnID':
       case 'PreviousTxnLgrSeq':
@@ -200,7 +200,7 @@ OrderBook.offerRewrite = function(offer) {
  */
 
 OrderBook.prototype.subscribe = function() {
-  var self = this;
+  const self = this;
 
   if (!this._shouldSubscribe) {
     return;
@@ -210,7 +210,7 @@ OrderBook.prototype.subscribe = function() {
     log.info('subscribing', this._key);
   }
 
-  var steps = [
+  const steps = [
     function(callback) {
       self.requestTransferRate(callback);
     },
@@ -231,7 +231,7 @@ OrderBook.prototype.subscribe = function() {
  */
 
 OrderBook.prototype.unsubscribe = function() {
-  var self = this;
+  const self = this;
 
   if (this._remote.trace) {
     log.info('unsubscribing', this._key);
@@ -256,11 +256,7 @@ OrderBook.prototype.unsubscribe = function() {
  */
 
 OrderBook.prototype.requestOffers = function(callback) {
-  var self = this;
-
-  if (typeof callback !== 'function') {
-    callback = function() {};
-  }
+  const self = this;
 
   if (!this._shouldSubscribe) {
     return callback(new Error('Should not request offers'));
@@ -296,7 +292,7 @@ OrderBook.prototype.requestOffers = function(callback) {
     callback(err);
   }
 
-  var request = this._remote.requestBookOffers(this.toJSON());
+  const request = this._remote.requestBookOffers(this.toJSON());
   request.once('success', handleOffers);
   request.once('error', handleError);
   request.request();
@@ -313,7 +309,7 @@ OrderBook.prototype.requestOffers = function(callback) {
 OrderBook.prototype.requestTransferRate = function(callback) {
   assert.strictEqual(typeof callback, 'function');
 
-  var self = this;
+  const self = this;
 
   if (this._currencyGets.is_native()) {
     // Transfer rate is default for the native currency
@@ -353,11 +349,7 @@ OrderBook.prototype.requestTransferRate = function(callback) {
  */
 
 OrderBook.prototype.subscribeTransactions = function(callback) {
-  var self = this;
-
-  if (typeof callback !== 'function') {
-    callback = function() {};
-  }
+  const self = this;
 
   if (!this._shouldSubscribe) {
     return callback('Should not subscribe');
@@ -385,7 +377,7 @@ OrderBook.prototype.subscribeTransactions = function(callback) {
     callback(err);
   }
 
-  var request = this._remote.requestSubscribe();
+  const request = this._remote.requestSubscribe();
   request.addStream('transactions');
   request.once('success', handleSubscribed);
   request.once('error', handleError);
@@ -456,7 +448,7 @@ OrderBook.prototype.applyTransferRate = function(balance) {
   assert(!isNaN(balance), 'Balance is invalid');
   assertValidNumber(this._issuerTransferRate, 'Transfer rate is invalid');
 
-  var adjustedBalance = OrderBookUtils.normalizeAmount(balance)
+  const adjustedBalance = OrderBookUtils.normalizeAmount(balance)
   .divide(this._issuerTransferRate)
   .multiply(Amount.from_json(OrderBook.DEFAULT_TRANSFER_RATE))
   .to_json()
@@ -474,18 +466,12 @@ OrderBook.prototype.applyTransferRate = function(balance) {
 
 OrderBook.prototype.getOwnerFunds = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-
-  var amount;
-
   if (this.hasOwnerFunds(account)) {
     if (this._currencyGets.is_native()) {
-      amount = Amount.from_json(this._ownerFunds[account]);
-    } else {
-      amount = OrderBookUtils.normalizeAmount(this._ownerFunds[account]);
+      return Amount.from_json(this._ownerFunds[account]);
     }
+    return OrderBookUtils.normalizeAmount(this._ownerFunds[account]);
   }
-
-  return amount;
 };
 
 /**
@@ -532,7 +518,7 @@ OrderBook.prototype.getOwnerOfferCount = function(account) {
 
 OrderBook.prototype.incrementOwnerOfferCount = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  var result = (this._offerCounts[account] || 0) + 1;
+  const result = (this._offerCounts[account] || 0) + 1;
   this._offerCounts[account] = result;
   return result;
 };
@@ -547,7 +533,7 @@ OrderBook.prototype.incrementOwnerOfferCount = function(account) {
 
 OrderBook.prototype.decrementOwnerOfferCount = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-  var result = (this._offerCounts[account] || 1) - 1;
+  const result = (this._offerCounts[account] || 1) - 1;
   this._offerCounts[account] = result;
 
   if (result < 1) {
@@ -569,8 +555,8 @@ OrderBook.prototype.decrementOwnerOfferCount = function(account) {
 OrderBook.prototype.addOwnerOfferTotal = function(account, amount) {
   assert(UInt160.is_valid(account), 'Account is invalid');
 
-  var previousAmount = this.getOwnerOfferTotal(account);
-  var currentAmount = previousAmount.add(Amount.from_json(amount));
+  const previousAmount = this.getOwnerOfferTotal(account);
+  const currentAmount = previousAmount.add(Amount.from_json(amount));
 
   this._ownerOffersTotal[account] = currentAmount;
 
@@ -589,8 +575,8 @@ OrderBook.prototype.addOwnerOfferTotal = function(account, amount) {
 OrderBook.prototype.subtractOwnerOfferTotal = function(account, amount) {
   assert(UInt160.is_valid(account), 'Account is invalid');
 
-  var previousAmount = this.getOwnerOfferTotal(account);
-  var newAmount = previousAmount.subtract(Amount.from_json(amount));
+  const previousAmount = this.getOwnerOfferTotal(account);
+  const newAmount = previousAmount.subtract(Amount.from_json(amount));
   this._ownerOffersTotal[account] = newAmount;
 
   assert(!newAmount.is_negative(), 'Offer total cannot be negative');
@@ -607,18 +593,14 @@ OrderBook.prototype.subtractOwnerOfferTotal = function(account, amount) {
 
 OrderBook.prototype.getOwnerOfferTotal = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-
-  var amount = this._ownerOffersTotal[account];
-
-  if (!amount) {
-    if (this._currencyGets.is_native()) {
-      amount = Amount.from_json('0');
-    } else {
-      amount = OrderBookUtils.normalizeAmount('0');
-    }
+  const amount = this._ownerOffersTotal[account];
+  if (amount) {
+    return amount;
   }
-
-  return amount;
+  if (this._currencyGets.is_native()) {
+    return Amount.from_json('0');
+  }
+  return OrderBookUtils.normalizeAmount('0');
 };
 
 /**
@@ -630,18 +612,11 @@ OrderBook.prototype.getOwnerOfferTotal = function(account) {
 
 OrderBook.prototype.resetOwnerOfferTotal = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
-
-  var amount;
-
   if (this._currencyGets.is_native()) {
-    amount = Amount.from_json('0');
+    this._ownerOffersTotal[account] = Amount.from_json('0');
   } else {
-    amount = OrderBookUtils.normalizeAmount('0');
+    this._ownerOffersTotal[account] = OrderBookUtils.normalizeAmount('0');
   }
-
-  this._ownerOffersTotal[account] = amount;
-
-  return amount;
 };
 
 /**
@@ -658,9 +633,10 @@ OrderBook.prototype.resetOwnerOfferTotal = function(account) {
 OrderBook.prototype.setOfferFundedAmount = function(offer) {
   assert.strictEqual(typeof offer, 'object', 'Offer is invalid');
 
-  var fundedAmount = this.getOwnerFunds(offer.Account);
-  var previousOfferSum = this.getOwnerOfferTotal(offer.Account);
-  var currentOfferSum = previousOfferSum.add(Amount.from_json(offer.TakerGets));
+  const fundedAmount = this.getOwnerFunds(offer.Account);
+  const previousOfferSum = this.getOwnerOfferTotal(offer.Account);
+  const currentOfferSum = previousOfferSum.add(
+    Amount.from_json(offer.TakerGets));
 
   offer.owner_funds = this.getUnadjustedOwnerFunds(offer.Account);
 
@@ -672,8 +648,8 @@ OrderBook.prototype.setOfferFundedAmount = function(offer) {
   } else if (previousOfferSum.compareTo(fundedAmount) < 0) {
     offer.taker_gets_funded = fundedAmount.subtract(previousOfferSum).to_text();
 
-    var quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
-    var takerPaysFunded = quality.multiply(
+    const quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
+    const takerPaysFunded = quality.multiply(
       OrderBookUtils.getOfferTakerGetsFunded(offer)
     );
 
@@ -696,7 +672,7 @@ OrderBook.prototype.setOfferFundedAmount = function(offer) {
  */
 
 OrderBook.prototype.parseAccountBalanceFromNode = function(node) {
-  var result = {
+  const result = {
     account: undefined,
     balance: undefined
   };
@@ -772,7 +748,7 @@ OrderBook.prototype.isBalanceChangeNode = function(node) {
  */
 
 OrderBook.prototype.updateFundedAmounts = function(transaction) {
-  var self = this;
+  const self = this;
 
   if (!this._currencyGets.is_native() && !this._issuerTransferRate) {
     if (this._remote.trace) {
@@ -786,14 +762,14 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
     return;
   }
 
-  var affectedNodes = transaction.mmeta.getNodes({
+  const affectedNodes = transaction.mmeta.getNodes({
     nodeType: 'ModifiedNode',
     entryType: this._currencyGets.is_native() ? 'AccountRoot' : 'RippleState'
   });
 
   _.each(affectedNodes, function(node) {
     if (self.isBalanceChangeNode(node)) {
-      var result = self.parseAccountBalanceFromNode(node);
+      const result = self.parseAccountBalanceFromNode(node);
 
       if (self.hasOwnerFunds(result.account)) {
         // We are only updating owner funds that are already cached
@@ -814,10 +790,10 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
 OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
 
-  var self = this;
+  const self = this;
 
   if (this._remote.trace) {
-    var ownerFunds = this.getOwnerFunds(account).to_text();
+    const ownerFunds = this.getOwnerFunds(account).to_text();
 
     log.info('updating offer funds', this._key, account, ownerFunds);
   }
@@ -830,8 +806,8 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
     }
 
     // Save a copy of the old offer so we can show how the offer has changed
-    var previousOffer = extend({}, offer);
-    var previousFundedGets;
+    const previousOffer = extend({}, offer);
+    let previousFundedGets;
 
     if (_.isString(offer.taker_gets_funded)) {
       // Offer is not new, so we should consider it for offer_changed and
@@ -842,8 +818,8 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
     self.setOfferFundedAmount(offer);
     self.addOwnerOfferTotal(offer.Account, offer.TakerGets);
 
-    var takerGetsFunded = OrderBookUtils.getOfferTakerGetsFunded(offer);
-    var areFundsChanged = previousFundedGets
+    const takerGetsFunded = OrderBookUtils.getOfferTakerGetsFunded(offer);
+    const areFundsChanged = previousFundedGets
       && !takerGetsFunded.equals(previousFundedGets);
 
     if (areFundsChanged) {
@@ -865,7 +841,7 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
  */
 
 OrderBook.prototype.notify = function(transaction) {
-  var self = this;
+  const self = this;
 
   if (!this._subscribed) {
     return;
@@ -875,7 +851,7 @@ OrderBook.prototype.notify = function(transaction) {
     log.info('notifying', this._key, transaction.transaction.hash);
   }
 
-  var affectedNodes = transaction.mmeta.getNodes({
+  const affectedNodes = transaction.mmeta.getNodes({
     entryType: 'Offer',
     bookKey: this._key
   });
@@ -884,20 +860,21 @@ OrderBook.prototype.notify = function(transaction) {
     return;
   }
 
-  var takerGetsTotal = Amount.from_json(
+  let takerGetsTotal = Amount.from_json(
     '0' + ((Currency.from_json(this._currencyGets).is_native())
            ? ''
            : ('/' + this._currencyGets.to_human() + '/' + this._issuerGets))
   );
 
-  var takerPaysTotal = Amount.from_json(
+  let takerPaysTotal = Amount.from_json(
     '0' + ((Currency.from_json(this._currencyPays).is_native())
            ? ''
            : ('/' + this._currencyPays.to_human() + '/' + this._issuerPays))
   );
 
-  var isOfferCancel = transaction.transaction.TransactionType === 'OfferCancel';
-  var transactionOwnerFunds = transaction.transaction.owner_funds;
+  const isOfferCancel =
+    transaction.transaction.TransactionType === 'OfferCancel';
+  const transactionOwnerFunds = transaction.transaction.owner_funds;
 
   function handleNode(node) {
     switch (node.nodeType) {
@@ -924,7 +901,11 @@ OrderBook.prototype.notify = function(transaction) {
         break;
 
       case 'CreatedNode':
-        self.setOwnerFunds(node.fields.Account, transactionOwnerFunds);
+        // rippled does not set owner_funds if the order maker is the issuer
+        // because the value would be infinite
+        const fundedAmount = transactionOwnerFunds !== undefined ?
+          transactionOwnerFunds : Infinity;
+        self.setOwnerFunds(node.fields.Account, fundedAmount);
         self.insertOffer(node);
         break;
     }
@@ -953,9 +934,9 @@ OrderBook.prototype.insertOffer = function(node) {
     log.info('inserting offer', this._key, node.fields);
   }
 
-  var offer = OrderBook.offerRewrite(node.fields);
-  var takerGets = this.normalizeAmount(this._currencyGets, offer.TakerGets);
-  var takerPays = this.normalizeAmount(this._currencyPays, offer.TakerPays);
+  const offer = OrderBook.offerRewrite(node.fields);
+  const takerGets = this.normalizeAmount(this._currencyGets, offer.TakerGets);
+  const takerPays = this.normalizeAmount(this._currencyPays, offer.TakerPays);
 
   offer.LedgerEntryType = node.entryType;
   offer.index = node.ledgerIndex;
@@ -963,11 +944,11 @@ OrderBook.prototype.insertOffer = function(node) {
   // We're safe to calculate quality for newly created offers
   offer.quality = takerPays.divide(takerGets).to_text();
 
-  var originalLength = this._offers.length;
+  const originalLength = this._offers.length;
 
-  for (var i = 0; i < originalLength; i++) {
-    var quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
-    var existingOfferQuality = OrderBookUtils.getOfferQuality(
+  for (let i = 0; i < originalLength; i++) {
+    const quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
+    const existingOfferQuality = OrderBookUtils.getOfferQuality(
       this._offers[i],
       this._currencyGets
     );
@@ -1001,7 +982,7 @@ OrderBook.prototype.insertOffer = function(node) {
  */
 
 OrderBook.prototype.normalizeAmount = function(currency, amountObj) {
-  var value = currency.is_native()
+  const value = currency.is_native()
   ? amountObj
   : amountObj.value;
 
@@ -1019,8 +1000,8 @@ OrderBook.prototype.modifyOffer = function(node) {
     log.info('modifying offer', this._key, node.fields);
   }
 
-  for (var i = 0; i < this._offers.length; i++) {
-    var offer = this._offers[i];
+  for (let i = 0; i < this._offers.length; i++) {
+    const offer = this._offers[i];
 
     if (offer.index === node.ledgerIndex) {
       // TODO: This assumes no fields are deleted, which is
@@ -1050,8 +1031,8 @@ OrderBook.prototype.deleteOffer = function(node, isOfferCancel) {
     log.info('deleting offer', this._key, node.fields);
   }
 
-  for (var i = 0; i < this._offers.length; i++) {
-    var offer = this._offers[i];
+  for (let i = 0; i < this._offers.length; i++) {
+    const offer = this._offers[i];
 
     if (offer.index === node.ledgerIndex) {
       // Remove offer amount from sum for account
@@ -1081,12 +1062,12 @@ OrderBook.prototype.deleteOffer = function(node, isOfferCancel) {
 OrderBook.prototype.setOffers = function(offers) {
   assert(Array.isArray(offers), 'Offers is not an array');
 
-  var self = this;
+  const self = this;
 
   this.resetCache();
 
-  var newOffers = _.map(offers, function(rawOffer) {
-    var offer = OrderBook.offerRewrite(rawOffer);
+  const newOffers = _.map(offers, function(rawOffer) {
+    const offer = OrderBook.offerRewrite(rawOffer);
 
     if (offer.hasOwnProperty('owner_funds')) {
       // The first offer of each owner from book_offers contains owner balance
@@ -1154,7 +1135,7 @@ OrderBook.prototype.getOffersSync = function() {
 
 OrderBook.prototype.toJSON =
 OrderBook.prototype.to_json = function() {
-  var json = {
+  const json = {
     taker_gets: {
       currency: this._currencyGets.to_hex()
     },
@@ -1204,7 +1185,7 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
   assert(!this._currencyGets.is_native() && !this._currencyPays.is_native(),
     'Autobridging is only for IOU:IOU orderbooks');
 
-  var autobridgeCalculator = new AutobridgeCalculator(
+  const autobridgeCalculator = new AutobridgeCalculator(
     this._currencyGets,
     this._currencyPays,
     this._legOneBook.getOffersSync(),
@@ -1221,7 +1202,7 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
  */
 
 OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
-  var self = this;
+  const self = this;
 
   if (_.isEmpty(this._offers) && _.isEmpty(this._offersAutobridged)) {
     return;
@@ -1230,8 +1211,8 @@ OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
   this._mergedOffers = this._offers
     .concat(this._offersAutobridged)
     .sort(function(a, b) {
-      var aQuality = OrderBookUtils.getOfferQuality(a, self._currencyGets);
-      var bQuality = OrderBookUtils.getOfferQuality(b, self._currencyGets);
+      const aQuality = OrderBookUtils.getOfferQuality(a, self._currencyGets);
+      const bQuality = OrderBookUtils.getOfferQuality(b, self._currencyGets);
 
       return aQuality.compareTo(bQuality);
     });
