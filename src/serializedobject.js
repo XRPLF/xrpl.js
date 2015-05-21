@@ -157,13 +157,18 @@ SerializedObject.check_fields = function(typedef, obj) {
 SerializedObject.prototype.append = function(bytes_) {
   const bytes = bytes_ instanceof SerializedObject ? bytes_.buffer : bytes_;
 
-  // Make sure both buffer and bytes are Array. Either could potentially be a
-  // Buffer.
+  // Make sure both buffer and bytes are Array. Either could be a Buffer.
   if (Array.isArray(this.buffer) && Array.isArray(bytes)) {
-    // Array::concat is horribly slow where buffer length is 100 kbytes + One
-    // transaction with 1100 affected nodes took around 23 seconds to convert
-    // from json to bytes.
-    Array.prototype.push.apply(this.buffer, bytes);
+    // `this.buffer = this.buffer.concat(bytes)` can be unbearably slow for
+    // large bytes length and acceptable bytes length is limited for
+    // `Array.prototype.push.apply(this.buffer, bytes)` as every element in the
+    // bytes array is pushed onto the stack, potentially causing a RangeError
+    // exception. Both of these solutions are known to be problematic for
+    // ledger 7501326. KISS instead
+
+    for (let i = 0; i < bytes.length; i++) {
+      this.buffer.push(bytes[i]);
+    }
   } else {
     this.buffer = this.buffer.concat(bytes);
   }
