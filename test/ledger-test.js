@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+/* eslint-disable max-len, valid-jsdoc */
 'use strict';
 
 const assert = require('assert');
@@ -10,22 +10,23 @@ const Ledger = require('ripple-lib').Ledger;
 * @param ledger_index {Number}
 * Expects a corresponding ledger dump in $repo/test/fixtures/ folder
 */
-
 function create_ledger_test(ledger_index) {
   describe(String(ledger_index), function() {
-
     const path = __dirname + '/fixtures/ledger-full-' + ledger_index + '.json';
 
     const ledger_raw = fs.readFileSync(path);
     const ledger_json = JSON.parse(ledger_raw);
     const ledger = Ledger.from_json(ledger_json);
 
-    it('has account_hash of ' + ledger_json.account_hash, function() {
-      assert.equal(ledger_json.account_hash,
-        ledger.calc_account_hash({
-          sanity_test: true
-        }).to_hex());
-    });
+    const hasAccounts = Array.isArray(ledger_json.accountState)
+    && ledger_json.accountState.length > 0;
+
+    if (hasAccounts) {
+      it('has account_hash of ' + ledger_json.account_hash, function() {
+        assert.equal(ledger_json.account_hash,
+                     ledger.calc_account_hash({sanity_test: true}).to_hex());
+      });
+    }
     it('has transaction_hash of ' + ledger_json.transaction_hash, function() {
       assert.equal(ledger_json.transaction_hash,
         ledger.calc_tx_hash().to_hex());
@@ -37,6 +38,8 @@ describe('Ledger', function() {
   create_ledger_test(38129);
   // Because, why not.
   create_ledger_test(40000);
+  // 1311 AffectedNodes, no accounts
+  create_ledger_test(7501326);
 
   describe('#calcAccountRootEntryHash', function() {
     it('will calculate the AccountRoot entry hash for rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function() {
