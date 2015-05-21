@@ -1,37 +1,37 @@
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert');
-var extend = require('extend');
-var binformat = require('./binformat');
-var stypes = require('./serializedtypes');
-var utils = require('./utils');
-var UInt256 = require('./uint256').UInt256;
+const _ = require('lodash');
+const assert = require('assert');
+const extend = require('extend');
+const binformat = require('./binformat');
+const stypes = require('./serializedtypes');
+const utils = require('./utils');
+const UInt256 = require('./uint256').UInt256;
 
-var sjcl = utils.sjcl;
+const sjcl = utils.sjcl;
 
-var TRANSACTION_TYPES = { };
+const TRANSACTION_TYPES = { };
 
 Object.keys(binformat.tx).forEach(function(key) {
   TRANSACTION_TYPES[binformat.tx[key][0]] = key;
 });
 
-var LEDGER_ENTRY_TYPES = {};
+const LEDGER_ENTRY_TYPES = {};
 
 Object.keys(binformat.ledger).forEach(function(key) {
   LEDGER_ENTRY_TYPES[binformat.ledger[key][0]] = key;
 });
 
-var TRANSACTION_RESULTS = {};
+const TRANSACTION_RESULTS = {};
 
 Object.keys(binformat.ter).forEach(function(key) {
   TRANSACTION_RESULTS[binformat.ter[key]] = key;
 });
 
 function normalize_sjcl_bn_hex(string) {
-  var hex = string.slice(2);    // remove '0x' prefix
+  const hex = string.slice(2);    // remove '0x' prefix
   // now strip leading zeros
-  var i = _.findIndex(hex, function(c) {
+  const i = _.findIndex(hex, function(c) {
     return c !== '0';
   });
   return i >= 0 ? hex.slice(i) : '0';
@@ -50,11 +50,12 @@ function SerializedObject(buf) {
   this.pointer = 0;
 }
 
-SerializedObject.from_json = function(obj) {
+SerializedObject.from_json = function(obj_) {
   // Create a copy of the object so we don't modify it
-  obj = extend(true, {}, obj);
-  var so = new SerializedObject();
-  var typedef;
+  const obj = extend(true, {}, obj_);
+
+  let so = new SerializedObject();
+  let typedef;
 
   if (typeof obj.TransactionType === 'number') {
     obj.TransactionType = SerializedObject.lookup_type_tx(obj.TransactionType);
@@ -97,45 +98,64 @@ SerializedObject.from_json = function(obj) {
   }
 
   // ND: This from_*json* seems a reasonable place to put validation of `json`
-  SerializedObject.check_no_missing_fields(typedef, obj);
+  SerializedObject.check_fields(typedef, obj);
   so.serialize(typedef, obj);
 
   return so;
 };
 
-SerializedObject.check_no_missing_fields = function(typedef, obj) {
-  var missing_fields = [];
+SerializedObject.check_fields = function(typedef, obj) {
+  const missingFields = [];
+  const unknownFields = [];
+  const fieldsMap = {};
 
-  for (var i = typedef.length - 1; i >= 0; i--) {
-    var spec = typedef[i];
-    var field = spec[0];
-    var requirement = spec[1];
+  // Get missing required fields
+  typedef.forEach(function(field) {
+    const fieldName = field[0];
+    const isRequired = field[1] === binformat.REQUIRED;
 
-    if (binformat.REQUIRED === requirement && obj[field] === undefined) {
-      missing_fields.push(field);
-    }
-  }
-
-  if (missing_fields.length > 0) {
-    var object_name;
-
-    if (obj.TransactionType !== undefined) {
-      object_name = SerializedObject.lookup_type_tx(obj.TransactionType);
-    } else if (obj.LedgerEntryType !== undefined) {
-      object_name = SerializedObject.lookup_type_le(obj.LedgerEntryType);
+    if (isRequired && obj[fieldName] === undefined) {
+      missingFields.push(fieldName);
     } else {
-      object_name = 'TransactionMetaData';
+      fieldsMap[fieldName] = true;
     }
+  });
 
-    throw new Error(object_name + ' is missing fields: ' +
-                    JSON.stringify(missing_fields));
+  // Get fields that are not specified in format
+  Object.keys(obj).forEach(function(key) {
+    if (!fieldsMap[key] && /^[A-Z]/.test(key)) {
+      unknownFields.push(key);
+    }
+  });
+
+  if (!(missingFields.length || unknownFields.length)) {
+    // No missing or unknown fields
+    return;
   }
+
+  let errorMessage;
+
+  if (obj.TransactionType !== undefined) {
+    errorMessage = SerializedObject.lookup_type_tx(obj.TransactionType);
+  } else if (obj.LedgerEntryType !== undefined) {
+    errorMessage = SerializedObject.lookup_type_le(obj.LedgerEntryType);
+  } else {
+    errorMessage = 'TransactionMetaData';
+  }
+
+  if (missingFields.length > 0) {
+    errorMessage += ' is missing fields: ' + JSON.stringify(missingFields);
+  }
+  if (unknownFields.length > 0) {
+    errorMessage += (missingFields.length ? ' and' : '')
+     + ' has unknown fields: ' + JSON.stringify(unknownFields);
+  }
+
+  throw new Error(errorMessage);
 };
 
-SerializedObject.prototype.append = function(bytes) {
-  if (bytes instanceof SerializedObject) {
-    bytes = bytes.buffer;
-  }
+SerializedObject.prototype.append = function(bytes_) {
+  const bytes = bytes_ instanceof SerializedObject ? bytes_.buffer : bytes_;
 
   // Make sure both buffer and bytes are Array. Either could potentially be a
   // Buffer.
@@ -157,14 +177,14 @@ SerializedObject.prototype.resetPointer = function() {
 
 function readOrPeek(advance) {
   return function(bytes) {
-    var start = this.pointer;
-    var end = start + bytes;
+    const start = this.pointer;
+    const end = start + bytes;
 
     if (end > this.buffer.length) {
       throw new Error('Buffer length exceeded');
     }
 
-    var result = this.buffer.slice(start, end);
+    const result = this.buffer.slice(start, end);
 
     if (advance) {
       this.pointer = end;
@@ -187,14 +207,16 @@ SerializedObject.prototype.to_hex = function() {
 };
 
 SerializedObject.prototype.to_json = function() {
-  var old_pointer = this.pointer;
+  const old_pointer = this.pointer;
+
   this.resetPointer();
-  var output = { };
+
+  let output = { };
 
   while (this.pointer < this.buffer.length) {
-    var key_and_value = stypes.parse(this);
-    var key = key_and_value[0];
-    var value = key_and_value[1];
+    const key_and_value = stypes.parse(this);
+    const key = key_and_value[0];
+    const value = key_and_value[1];
     output[key] = SerializedObject.jsonify_structure(value, key);
   }
 
@@ -204,7 +226,7 @@ SerializedObject.prototype.to_json = function() {
 };
 
 SerializedObject.jsonify_structure = function(structure, field_name) {
-  var output;
+  let output;
 
   switch (typeof structure) {
     case 'number':
@@ -238,10 +260,10 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
         // new Array or Object
         output = new structure.constructor();
 
-        var keys = Object.keys(structure);
+        let keys = Object.keys(structure);
 
-        for (var i = 0, l = keys.length; i < l; i++) {
-          var key = keys[i];
+        for (let i = 0, l = keys.length; i < l; i++) {
+          let key = keys[i];
           output[key] = SerializedObject.jsonify_structure(structure[key], key);
         }
       }
@@ -263,14 +285,14 @@ SerializedObject.prototype.serialize = function(typedef, obj) {
   typedef = SerializedObject.sort_typedef(typedef);
 
   // Serialize fields
-  for (var i=0, l=typedef.length; i<l; i++) {
+  for (let i=0, l=typedef.length; i<l; i++) {
     this.serialize_field(typedef[i], obj);
   }
   */
 };
 
 SerializedObject.prototype.hash = function(prefix) {
-  var sign_buffer = new SerializedObject();
+  let sign_buffer = new SerializedObject();
 
   // Add hashing prefix
   if (typeof prefix !== 'undefined') {
@@ -280,8 +302,9 @@ SerializedObject.prototype.hash = function(prefix) {
   // Copy buffer to temporary buffer
   sign_buffer.append(this.buffer);
 
-  var bits = sjcl.codec.bytes.toBits(sign_buffer.buffer);
-  var sha512hex = sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(bits));
+  const bits = sjcl.codec.bytes.toBits(sign_buffer.buffer);
+  const sha512hex = sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(bits));
+
   return UInt256.from_hex(sha512hex.substr(0, 64));
 };
 
@@ -289,8 +312,8 @@ SerializedObject.prototype.hash = function(prefix) {
 SerializedObject.prototype.signing_hash = SerializedObject.prototype.hash;
 
 SerializedObject.prototype.serialize_field = function(spec, obj) {
-  var name = spec[0];
-  var presence = spec[1];
+  const name = spec[0];
+  const presence = spec[1];
 
   if (typeof obj[name] !== 'undefined') {
     try {
@@ -306,7 +329,7 @@ SerializedObject.prototype.serialize_field = function(spec, obj) {
 };
 
 SerializedObject.get_field_header = function(type_id, field_id) {
-  var buffer = [0];
+  let buffer = [0];
 
   if (type_id > 0xF) {
     buffer.push(type_id & 0xFF);

@@ -48,7 +48,7 @@ exports.types = [
  * Mapping of field type id to field type name.
  */
 
-var FIELDS_MAP = exports.fields = {
+const FIELDS_MAP = exports.fields = {
   // Common types
   1: { // Int16
     1: 'LedgerEntryType',
@@ -202,7 +202,7 @@ var FIELDS_MAP = exports.fields = {
   }
 };
 
-var INVERSE_FIELDS_MAP = exports.fieldsInverseMap = { };
+let INVERSE_FIELDS_MAP = exports.fieldsInverseMap = { };
 
 Object.keys(FIELDS_MAP).forEach(function(k1) {
   Object.keys(FIELDS_MAP[k1]).forEach(function(k2) {
@@ -210,11 +210,11 @@ Object.keys(FIELDS_MAP).forEach(function(k1) {
   });
 });
 
-var REQUIRED = exports.REQUIRED = 0,
-    OPTIONAL = exports.OPTIONAL = 1,
-    DEFAULT  = exports.DEFAULT  = 2;
+const REQUIRED = exports.REQUIRED = 0,
+      OPTIONAL = exports.OPTIONAL = 1,
+      DEFAULT  = exports.DEFAULT  = 2;
 
-var base = [
+const base = [
   [ 'TransactionType'    , REQUIRED ],
   [ 'Flags'              , OPTIONAL ],
   [ 'SourceTag'          , OPTIONAL ],
@@ -224,7 +224,9 @@ var base = [
   [ 'Fee'                , REQUIRED ],
   [ 'OperationLimit'     , OPTIONAL ],
   [ 'SigningPubKey'      , REQUIRED ],
-  [ 'TxnSignature'       , OPTIONAL ]
+  [ 'TxnSignature'       , OPTIONAL ],
+  [ 'AccountTxnID'       , OPTIONAL ],
+  [ 'Memos'              , OPTIONAL ]
 ];
 
 exports.tx = {
@@ -297,7 +299,7 @@ exports.tx = {
   ])
 };
 
-var sleBase = [
+const sleBase = [
   ['LedgerIndex',          OPTIONAL],
   ['LedgerEntryType',      REQUIRED],
   ['Flags',                REQUIRED]
