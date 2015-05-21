@@ -12,6 +12,7 @@
 /* eslint-disable quotes*/
 
 var assert = require('assert');
+var lodash = require('lodash');
 var SerializedObject = require('ripple-lib').SerializedObject;
 var Amount = require('ripple-lib').Amount;
 var sjcl = require('ripple-lib').sjcl;
@@ -148,6 +149,52 @@ describe('Serialized object', function() {
       var output_json = SerializedObject.from_json(input_json).to_json();
       assert.equal(100, input_json.LedgerEntryType);
       assert.equal("DirectoryNode", output_json.LedgerEntryType);
+    });
+
+    it('checks for missing required fields', function() {
+      var input_json = {
+        TransactionType: 'Payment',
+        // no non required fields
+        Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+        Amount: '274579388',
+        Destination: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+        Fee: '15',
+        Sequence: 351,
+        SigningPubKey: '02'
+      };
+
+      Object.keys(input_json).slice(1).forEach(function(k) {
+        var bad_json = lodash.merge({}, input_json);
+        delete bad_json[k];
+
+        assert.strictEqual(bad_json[k], undefined);
+        assert.throws(function() {
+          SerializedObject.from_json(bad_json);
+        }, new RegExp('Payment is missing fields: \\["' + k + '"\\]'));
+
+      });
+    });
+    it('checks for unknown fields', function() {
+      var input_json = {
+        TransactionType: 'Payment',
+        // no non required fields
+        Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+        Amount: '274579388',
+        Destination: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
+        Fee: '15',
+        Sequence: 351,
+        SigningPubKey: '02'
+      };
+
+      Object.keys(input_json).slice(1).forEach(function(k) {
+        var bad_json = lodash.merge({}, input_json);
+        bad_json[k + 'z'] = bad_json[k];
+
+        assert.throws(function() {
+          SerializedObject.from_json(bad_json);
+        }, new RegExp('Payment has unknown fields: \\["' + k + 'z"\\]'));
+
+      });
     });
 
     describe('Format validation', function() {

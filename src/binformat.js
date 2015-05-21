@@ -224,7 +224,9 @@ var base = [
   [ 'Fee'                , REQUIRED ],
   [ 'OperationLimit'     , OPTIONAL ],
   [ 'SigningPubKey'      , REQUIRED ],
-  [ 'TxnSignature'       , OPTIONAL ]
+  [ 'TxnSignature'       , OPTIONAL ],
+  [ 'AccountTxnID'       , OPTIONAL ],
+  [ 'Memos'              , OPTIONAL ]
 ];
 
 exports.tx = {

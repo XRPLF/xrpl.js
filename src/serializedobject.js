@@ -97,39 +97,60 @@ SerializedObject.from_json = function(obj) {
   }
 
   // ND: This from_*json* seems a reasonable place to put validation of `json`
-  SerializedObject.check_no_missing_fields(typedef, obj);
+  SerializedObject.check_fields(typedef, obj);
   so.serialize(typedef, obj);
 
   return so;
 };
 
-SerializedObject.check_no_missing_fields = function(typedef, obj) {
-  var missing_fields = [];
+SerializedObject.check_fields = function(typedef, obj) {
+  let missingFields = [];
+  let unknownFields = [];
+  let fieldsMap = {};
 
-  for (var i = typedef.length - 1; i >= 0; i--) {
-    var spec = typedef[i];
-    var field = spec[0];
-    var requirement = spec[1];
+  // Get missing required fields
+  typedef.forEach(function(field) {
+    var fieldName = field[0];
+    var isRequired = field[1] === binformat.REQUIRED;
 
-    if (binformat.REQUIRED === requirement && obj[field] === undefined) {
-      missing_fields.push(field);
-    }
-  }
-
-  if (missing_fields.length > 0) {
-    var object_name;
-
-    if (obj.TransactionType !== undefined) {
-      object_name = SerializedObject.lookup_type_tx(obj.TransactionType);
-    } else if (obj.LedgerEntryType !== undefined) {
-      object_name = SerializedObject.lookup_type_le(obj.LedgerEntryType);
+    if (isRequired && obj[fieldName] === undefined) {
+      missingFields.push(fieldName);
     } else {
-      object_name = 'TransactionMetaData';
+      fieldsMap[fieldName] = true;
     }
+  });
 
-    throw new Error(object_name + ' is missing fields: ' +
-                    JSON.stringify(missing_fields));
+  // Get fields that are not specified in format
+  Object.keys(obj).forEach(function(key) {
+    if (!fieldsMap[key] && /^[A-Z]/.test(key)) {
+      unknownFields.push(key);
+    }
+  });
+
+  if (!(missingFields.length || unknownFields.length)) {
+    // No missing or unknown fields
+    return;
   }
+
+  var errorMessage;
+
+  if (obj.TransactionType !== undefined) {
+    errorMessage = SerializedObject.lookup_type_tx(obj.TransactionType);
+  } else if (obj.LedgerEntryType !== undefined) {
+    errorMessage = SerializedObject.lookup_type_le(obj.LedgerEntryType);
+  } else {
+    errorMessage = 'TransactionMetaData';
+  }
+
+  if (missingFields.length > 0) {
+    errorMessage += ' is missing fields: ' + JSON.stringify(missingFields);
+  }
+  if (unknownFields.length > 0) {
+     errorMessage += (missingFields.length ? ' and' : '')
+     + ' has unknown fields: ' + JSON.stringify(unknownFields);
+  }
+
+  throw new Error(errorMessage);
 };
 
 SerializedObject.prototype.append = function(bytes) {
