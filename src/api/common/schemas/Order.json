@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Order",
+  "description": "A simplified Order object used by the ripple-rest API (note that \"orders\" are referred to elsewhere in the Ripple protocol as \"offers\")",
+  "type": "object",
+  "properties": {
+    "account": {
+      "description": "The Ripple account address of the order's creator",
+      "$ref": "RippleAddress"
+    },
+    "type": {
+      "description": "If set to true the order it indicates that the creator is looking to receive the base_amount in exchange for the counter_amount. If undefined or set to false it indicates that the creator is looking to sell the base_amount to receive the counter_amount",
+      "enum": ["buy", "sell"]
+    },
+    "taker_pays": {
+      "description": "The amount of currency the seller_account is seeking to buy. If other orders take part of this one, this value will change to represent the amount left in the order. This may be specified along with the counter_amount OR exchange_rate but not both. When the order is parsed from the Ripple Ledger the base currency will be determined according to the Priority Ranking of Currencies (XRP,EUR,GBP,AUD,NZD,USD,CAD,CHF,JPY,CNY) and if neither currency is listed in the ranking the base currency will be the one that is alphabetically first",
+      "$ref": "Amount"
+    },
+    "taker_gets": {
+      "description": "The amount of currency being sold. If other orders take part of this one, this value will change to represent the amount left in the order. This may be specified along with the base_amount OR the exchange_rate but not both",
+      "$ref": "Amount"
+    },
+    "exchange_rate": {
+      "description": "A string representation of the order price, defined as the cost one unit of the base currency in terms of the counter currency. This may be specified along with the base_amount OR the counter_amount but not both. If it is unspecified it will be computed automatically based on the counter_amount divided by the base_amount",
+      "$ref": "FloatString"
+    },
+    "passive": {
+      "type": "boolean"
+    },
+    "expiration_timestamp": {
+      "description": "The ISO combined date and time string representing the point beyond which the order will no longer be considered active or valid",
+      "$ref": "Timestamp"
+    },
+    "ledger_timeout": {
+      "description": "A string representation of the number of ledger closes after submission during which the order should be considered active",
+      "type": "string",
+      "pattern": "^[0-9]*$"
+    },
+    "immediate_or_cancel": {
+      "description": "If set to true this order will only take orders that are available at the time of execution and will not create an entry in the Ripple Ledger",
+      "type": "boolean"
+    },
+    "fill_or_kill": {
+      "description": "If set to true this order will only take orders that fill the base_amount and are available at the time of execution and will not create an entry in the Ripple Ledger",
+      "type": "boolean"
+    },
+    "maximize_buy_or_sell": {
+      "description": "If set to true and it is a buy order it will buy up to the base_amount even if the counter_amount is exceeded, if it is a sell order it will sell up to the counter_amount even if the base_amount is exceeded",
+      "type": "boolean"
+    },
+    "cancel_replace": {
+      "description": "If this is set to the sequence number of an outstanding order, that order will be cancelled and replaced with this one",
+      "type": "string",
+      "pattern": "^d*$"
+    },
+    "sequence": {
+      "description": "The sequence number of this order from the perspective of the seller_account. The seller_account and the sequence number uniquely identify the order in the Ripple Ledger",
+      "type": "string",
+      "pattern": "^[0-9]*$"
+    },
+    "fee": {
+      "description": "The Ripple Network transaction fee, represented in whole XRP (NOT \"drops\", or millionths of an XRP, which is used elsewhere in the Ripple protocol) used to create the order",
+      "$ref": "FloatString"
+    },
+    "state": {
+      "description": "If the order is active the state will be \"active\". If this object represents a historical order the state will be \"validated\", \"filled\" if the order was removed because it was fully filled, \"cancelled\" if it was deleted by the owner, \"expired\" if it reached the expiration_timestamp, or \"failed\" if there was an error with the initial attempt to place the order",
+      "type": "string",
+      "pattern": "^active|validated|filled|cancelled|expired|failed$"
+    },
+    "ledger": {
+      "description": "The string representation of the index number of the ledger containing this order or, in the case of historical queries, of the transaction that modified this Order. ",
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "hash": {
+      "description": "When returned as the result of a historical query this will be the hash of Ripple transaction that created, modified, or deleted this order. The transaction hash is used throughout the Ripple Protocol to uniquely identify a particular transaction",
+      "$ref": "Hash256"
+    },
+    "previous": {
+      "description": "If the order was modified or partially filled this will be a full Order object. If the previous object also had a previous object that will be removed to reduce data complexity. Order changes can be walked backwards by querying the API for previous.hash repeatedly",
+      "$ref": "Order"
+    }
+  },
+  "required": ["type", "taker_gets", "taker_pays"],
+  "additionalProperties": false
+}
