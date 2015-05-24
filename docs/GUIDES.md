@@ -37,7 +37,7 @@ This file provides step-by-step walkthroughs for some of the most common usages 
     servers: [
       { host: 's-west.ripple.com', port: 443, secure: true }
     ]
-  }
+  };
 
   var remote = new Remote(options);
 
