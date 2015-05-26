@@ -21,7 +21,7 @@
     "lodash": "^3.1.0",
     "lru-cache": "~2.5.0",
     "ripple-wallet-generator": "^1.0.3",
-    "sjcl": "^1.0.2",
+    "sjcl": "^1.0.3",
     "ws": "~0.7.1"
   },
   "devDependencies": {

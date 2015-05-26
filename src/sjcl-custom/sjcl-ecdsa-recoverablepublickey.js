@@ -125,7 +125,7 @@ function recoverPublicKeyPointFromSignature(curve, signature_r, signature_s,
   // Conversion
   var alpha = x.mul(x).mul(x).add(curve.a.mul(x)).add(curve.b).mod(
     field_modulus);
-  var beta = alpha.powermodMontgomery(FIELD_MODULUS_PLUS_ONE_DIVIDED_BY_FOUR,
+  var beta = alpha.powermod(FIELD_MODULUS_PLUS_ONE_DIVIDED_BY_FOUR,
     field_modulus);
 
   // If beta is even but y isn't or
