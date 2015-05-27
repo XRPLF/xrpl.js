@@ -793,9 +793,9 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
   const self = this;
 
   if (this._remote.trace) {
-    const ownerFunds = this.getOwnerFunds(account).to_text();
-
-    log.info('updating offer funds', this._key, account, ownerFunds);
+    const ownerFunds = this.getOwnerFunds(account);
+    log.info('updating offer funds', this._key, account,
+             ownerFunds ? ownerFunds.to_text() : 'undefined');
   }
 
   this.resetOwnerOfferTotal(account);
