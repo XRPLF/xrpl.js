@@ -1,11 +1,11 @@
 /* eslint new-cap: [2, {newIsCapExceptions: ["pointJac"]}] */
 'use strict';
-var sjcl = require('sjcl');
+let sjcl = require('sjcl');
 
 // ----- for secp256k1 ------
 
 sjcl.ecc.point.prototype.toBytesCompressed = function() {
-  var header = this.y.mod(2).toString() === '0x0' ? 0x02 : 0x03;
+  let header = this.y.mod(2).toString() === '0x0' ? 0x02 : 0x03;
   return [header].concat(sjcl.codec.bytes.fromBits(this.x.toBits()));
 };
 
@@ -16,7 +16,7 @@ sjcl.ecc.point.prototype.toBytesCompressed = function() {
 // only works for a=-3 Jacobian curve. It's much
 // faster than the generic implementation
 sjcl.ecc.pointJac.prototype.add = function(T) {
-  var self = this;
+  let self = this;
   if (self.curve !== T.curve) {
     throw ('sjcl.ecc.add(): Points must be on the same curve to add them!');
   }
@@ -27,9 +27,9 @@ sjcl.ecc.pointJac.prototype.add = function(T) {
     return self;
   }
 
-  var z1z1 = self.z.square();
-  var h = T.x.mul(z1z1).subM(self.x);
-  var s2 = T.y.mul(self.z).mul(z1z1);
+  let z1z1 = self.z.square();
+  let h = T.x.mul(z1z1).subM(self.x);
+  let s2 = T.y.mul(self.z).mul(z1z1);
 
   if (h.equals(0)) {
     if (self.y.equals(T.y.mul(z1z1.mul(self.z)))) {
@@ -40,15 +40,15 @@ sjcl.ecc.pointJac.prototype.add = function(T) {
     return new sjcl.ecc.pointJac(self.curve);
   }
 
-  var hh = h.square();
-  var i = hh.copy().doubleM().doubleM();
-  var j = h.mul(i);
-  var r = s2.sub(self.y).doubleM();
-  var v = self.x.mul(i);
+  let hh = h.square();
+  let i = hh.copy().doubleM().doubleM();
+  let j = h.mul(i);
+  let r = s2.sub(self.y).doubleM();
+  let v = self.x.mul(i);
 
-  var x = r.square().subM(j).subM(v.copy().doubleM());
-  var y = r.mul(v.sub(x)).subM(self.y.mul(j).doubleM());
-  var z = self.z.add(h).square().subM(z1z1).subM(hh);
+  let x = r.square().subM(j).subM(v.copy().doubleM());
+  let y = r.mul(v.sub(x)).subM(self.y.mul(j).doubleM());
+  let z = self.z.add(h).square().subM(z1z1).subM(hh);
 
   return new sjcl.ecc.pointJac(this.curve, x, y, z);
 };
@@ -56,20 +56,26 @@ sjcl.ecc.pointJac.prototype.add = function(T) {
 // This is a custom doubling algorithm that
 // only works for a=-3 Jacobian curve. It's much
 // faster than the generic implementation
+let neg3Doubl = sjcl.ecc.pointJac.prototype.doubl;
 sjcl.ecc.pointJac.prototype.doubl = function() {
+
+  if (!this.curve.a.equals(0)) {
+    return neg3Doubl.call(this);
+  }
+
   if (this.isIdentity) {
     return this;
   }
 
-  var a = this.x.square();
-  var b = this.y.square();
-  var c = b.square();
-  var d = this.x.add(b).square().subM(a).subM(c).doubleM();
-  var e = a.mul(3);
-  var f = e.square();
-  var x = f.sub(d.copy().doubleM());
-  var y = e.mul(d.sub(x)).subM(c.doubleM().doubleM().doubleM());
-  var z = this.z.mul(this.y).doubleM();
+  let a = this.x.square();
+  let b = this.y.square();
+  let c = b.square();
+  let d = this.x.add(b).square().subM(a).subM(c).doubleM();
+  let e = a.mul(3);
+  let f = e.square();
+  let x = f.sub(d.copy().doubleM());
+  let y = e.mul(d.sub(x)).subM(c.doubleM().doubleM().doubleM());
+  let z = this.z.mul(this.y).doubleM();
   return new sjcl.ecc.pointJac(this.curve, x, y, z);
 };
 
@@ -78,4 +84,5 @@ sjcl.ecc.pointJac.prototype.doubl = function() {
 // since then, sjcl has been updated to support k256
 // this override exist to keep supporting the old c256 with k256 behavior
 // this will be removed in future release
+sjcl.ecc.curves.nist_p256 = sjcl.ecc.curves.c256;
 sjcl.ecc.curves.c256 = sjcl.ecc.curves.k256;
