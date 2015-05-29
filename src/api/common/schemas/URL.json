@@ -1,7 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "URL",
-  "description": "A standard URL",
-  "type": "string",
-  "pattern": "^(ftp:\/\/|http:\/\/|https:\/\/)?([A-Za-z0-9_]+:{0,1}[A-Za-z0-9_]*@)?(^([ \t\r\n\f])+)(:[0-9]+)?(\/|\/([[A-Za-z0-9_]#!:.?+=&%@!-\/]))?$"
-}

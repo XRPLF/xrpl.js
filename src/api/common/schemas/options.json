@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "options",
+  "description": "Options for a ledger request",
+  "type": "object",
+  "properties": {
+    "currency": {"$ref": "currency"},
+    "counterparty": {"$ref": "address"},
+    "limit": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "ledgerVersion": {
+      "anyOf": [
+        {"enum": ["current", "closed", "validated"]},
+        {"$ref": "ledgerVersion"},
+        {"type": "string", "format": "ledgerHash"}
+      ]
+    },
+    "minLedgerVersion": {"$ref": "ledgerVersion"},
+    "maxLedgerVersion": {"$ref": "ledgerVersion"},
+    "marker": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "dependencies": {
+    "marker": ["ledgerVersion"]
+  },
+  "not": {
+    "description": "Fixed fee and max fee are mutually exclusive",
+    "required": ["fee", "maxFee"]
+  }
+}

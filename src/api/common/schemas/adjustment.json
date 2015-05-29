@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "adjustment",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "amount": {"$ref": "amount"},
+    "tag": {
+      "description": "A string representing an unsigned 32-bit integer most commonly used to refer to a sender's hosted account at a Ripple gateway",
+      "$ref": "uint32"
+    }
+  },
+  "required": ["address", "amount"],
+  "additionalProperties": false
+}

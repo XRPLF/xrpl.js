@@ -212,7 +212,7 @@ function getNotificationHelper(api, account, identifier, urlBase, topCallback) {
  */
 function getNotification(account, identifier, urlBase, callback) {
   validate.address(account);
-  validate.paymentIdentifier(identifier);
+  validate.identifier(identifier);
 
   return getNotificationHelper(this, account, identifier, urlBase, callback);
 }

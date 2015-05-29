@@ -5,7 +5,6 @@ const async = require('async');
 const asyncify = require('simple-asyncify');
 const common = require('../common');
 const ripple = common.core;
-const validator = common.schemaValidator;
 
 function renameCounterpartyToIssuer(amount) {
   if (amount === undefined) {
@@ -25,7 +24,7 @@ function renameCounterpartyToIssuerInOrder(order) {
 }
 
 function isValidHash256(hash) {
-  return validator.isValid(hash, 'Hash256');
+  return ripple.UInt256.is_valid(hash);
 }
 
 function parseLedger(ledger) {
@@ -68,23 +67,6 @@ function parseCurrencyAmount(rippledAmount, useIssuer) {
   return amount;
 }
 
-
-function parseCurrencyQuery(query) {
-  const params = query.split('+');
-
-  if (!isNaN(params[0])) {
-    return {
-      value: (params.length >= 1 ? params[0] : ''),
-      currency: (params.length >= 2 ? params[1] : ''),
-      counterparty: (params.length >= 3 ? params[2] : '')
-    };
-  }
-  return {
-    currency: (params.length >= 1 ? params[0] : ''),
-    counterparty: (params.length >= 2 ? params[1] : '')
-  };
-}
-
 function signum(num) {
   return (num === 0) ? 0 : (num > 0 ? 1 : -1);
 }
@@ -106,18 +88,6 @@ function compareTransactions(first, second) {
       Number(second.meta.TransactionIndex));
   }
   return Number(first.ledger_index) < Number(second.ledger_index) ? -1 : 1;
-}
-
-function isValidLedgerSequence(ledger) {
-  return (Number(ledger) >= 0) && isFinite(Number(ledger));
-}
-
-function isValidLedgerHash(ledger) {
-  return ripple.UInt256.is_valid(ledger);
-}
-
-function isValidLedgerWord(ledger) {
-  return (/^current$|^closed$|^validated$/.test(ledger));
 }
 
 function attachDate(api, baseTransactions, callback) {
@@ -150,12 +120,8 @@ function attachDate(api, baseTransactions, callback) {
 }
 
 module.exports = {
-  isValidLedgerSequence: isValidLedgerSequence,
-  isValidLedgerWord: isValidLedgerWord,
-  isValidLedgerHash: isValidLedgerHash,
   parseLedger: parseLedger,
   parseCurrencyAmount: parseCurrencyAmount,
-  parseCurrencyQuery: parseCurrencyQuery,
   compareTransactions: compareTransactions,
   renameCounterpartyToIssuer: renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder: renameCounterpartyToIssuerInOrder,

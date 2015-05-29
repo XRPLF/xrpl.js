@@ -31,7 +31,7 @@ const DEFAULT_RESULTS_PER_PAGE = 10;
 function getTransaction(api, account, identifier, requestOptions, callback) {
   try {
     assert.strictEqual(typeof requestOptions, 'object');
-    validate.address(account, true);
+    validate.address(account);
     validate.identifier(identifier);
     validate.options(requestOptions);
   } catch(err) {

@@ -2,7 +2,6 @@
 /* eslint-disable valid-jsdoc */
 'use strict';
 const utils = require('./utils');
-const validator = utils.common.schemaValidator;
 const validate = utils.common.validate;
 
 const DefaultPageLimit = 200;
@@ -29,8 +28,6 @@ const DefaultPageLimit = 200;
  */
 function getTrustLines(account, options, callback) {
   validate.address(account);
-  validate.currency(options.currency, true);
-  validate.counterparty(options.counterparty, true);
   validate.options(options);
 
   const self = this;
@@ -39,7 +36,7 @@ function getTrustLines(account, options, callback) {
     ('^' + options.currency.toUpperCase() + '$') : /./);
 
   function getAccountLines(prevResult) {
-    const isAggregate = options.limit === 'all';
+    const isAggregate = options.limit === undefined;
     if (prevResult && (!isAggregate || !prevResult.marker)) {
       return Promise.resolve(prevResult);
     }
@@ -56,8 +53,7 @@ function getTrustLines(account, options, callback) {
         ledger = prevResult.ledger_index;
       } else {
         marker = options.marker;
-        limit = validator.isValid(options.limit, 'UINT32')
-          ? Number(options.limit) : DefaultPageLimit;
+        limit = options.limit || DefaultPageLimit;
         ledger = utils.parseLedger(options.ledger);
       }
 

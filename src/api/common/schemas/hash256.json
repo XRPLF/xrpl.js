@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Hash256",
+  "title": "hash256",
   "description": "The hex representation of a 256-bit hash",
   "type": "string",
   "pattern": "^[A-Fa-f0-9]{64}$"
