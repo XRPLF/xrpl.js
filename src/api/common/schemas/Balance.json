@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Balance",
+  "description": "A simplified representation of an account Balance",
+  "type": "object",
+  "properties": {
+    "value": {
+      "description": "The quantity of the currency, denoted as a string to retain floating point precision",
+      "type": "string",
+      "$ref": "FloatString"
+    },
+    "currency": {
+      "description": "The currency expressed as a three-character code",
+      "$ref": "Currency"
+    },
+    "counterparty": {
+      "description": "The Ripple account address of the currency's issuer or gateway, or an empty string if the currency is XRP",
+      "type": "string",
+      "pattern": "^$|^r[1-9A-HJ-NP-Za-km-z]{25,33}$"
+    }
+  },
+  "required": [ "value", "currency" ]
+}

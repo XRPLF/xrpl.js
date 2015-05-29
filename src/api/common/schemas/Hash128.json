@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Hash128",
+  "description": "The hex representation of a 128-bit hash",
+  "type": "string",
+  "pattern": "^$|^[A-Fa-f0-9]{32}$"
+}

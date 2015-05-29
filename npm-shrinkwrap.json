@@ -26,6 +26,20 @@
       "version": "1.2.1",
       "resolved": "https://registry.npmjs.org/extend/-/extend-1.2.1.tgz"
     },
+    "jayschema": {
+      "version": "0.3.1",
+      "resolved": "https://registry.npmjs.org/jayschema/-/jayschema-0.3.1.tgz",
+      "dependencies": {
+        "when": {
+          "version": "3.4.6",
+          "resolved": "https://registry.npmjs.org/when/-/when-3.4.6.tgz"
+        }
+      }
+    },
+    "jayschema-error-messages": {
+      "version": "1.0.3",
+      "resolved": "https://registry.npmjs.org/jayschema-error-messages/-/jayschema-error-messages-1.0.3.tgz"
+    },
     "lodash": {
       "version": "3.9.3",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.9.3.tgz"
@@ -34,9 +48,23 @@
       "version": "2.5.2",
       "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.2.tgz"
     },
+    "ripple-lib-transactionparser": {
+      "version": "0.3.2",
+      "resolved": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.3.2.tgz",
+      "dependencies": {
+        "bignumber.js": {
+          "version": "1.4.1",
+          "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-1.4.1.tgz"
+        }
+      }
+    },
     "ripple-wallet-generator": {
       "version": "1.0.3",
       "resolved": "https://registry.npmjs.org/ripple-wallet-generator/-/ripple-wallet-generator-1.0.3.tgz"
+    },
+    "simple-asyncify": {
+      "version": "0.1.0",
+      "resolved": "https://registry.npmjs.org/simple-asyncify/-/simple-asyncify-0.1.0.tgz"
     },
     "sjcl": {
       "version": "1.0.3",

@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "AccountSettings",
+  "description": "An object ",
+  "type": "object",
+  "properties": {
+    "account": {
+      "description": "The Ripple address of the account in question",
+      "$ref": "RippleAddress"
+    },
+    "regular_key": {
+      "description": "The hash of an optional additional public key that can be used for signing and verifying transactions",
+      "$ref": "RippleAddress"
+    },
+    "domain": {
+      "description": "The domain associated with this account. The ripple.txt file can be looked up to verify this information",
+      "$ref": "URL"
+    },
+    "email_hash": {
+      "description": "The MD5 128-bit hash of the account owner's email address",
+      "$ref": "Hash128"
+    },
+    "message_key": {
+      "description": "An optional public key, represented as hex, that can be set to allow others to send encrypted messages to the account owner",
+      "type": "string",
+      "pattern": "^([0-9a-fA-F]{2}){0,33}$"
+    },
+    "transfer_rate": {
+      "description": "A number representation of the rate charged each time a holder of currency issued by this account transfers it. By default the rate is 100. A rate of 101 is a 1% charge on top of the amount being transferred. Up to nine decimal places are supported",
+      "type": "UINT32"
+    },
+    "password_spent": {
+      "description": "If false, then this account can submit a special SetRegularKey transaction without a transaction fee.",
+      "type": "boolean"
+    },
+    "require_destination_tag": {
+      "description": "If set to true incoming payments will only be validated if they include a destination_tag. This may be used primarily by gateways that operate exclusively with hosted wallets",
+      "type": "boolean"
+    },
+    "require_authorization": {
+      "description": "If set to true incoming trustlines will only be validated if this account first creates a trustline to the counterparty with the authorized flag set to true. This may be used by gateways to prevent accounts unknown to them from holding currencies they issue",
+      "type": "boolean"
+    },
+    "disallow_xrp": {
+      "description": "If set to true incoming XRP payments will be allowed",
+      "type": "boolean"
+    },
+    "disable_master": {
+      "description": "If true, the master secret key cannot be used to sign transactions for this account. Can only be set to true if a Regular Key is defined for the account.",
+      "type": "boolean"
+    },
+    "transaction_sequence": {
+      "description": "A string representation of the last sequence number of a validated transaction created by this account",
+      "$ref": "UINT32"
+    },
+    "trustline_count": {
+      "description": "The number of trustlines owned by this account. This value does not include incoming trustlines where this account has not explicitly reciprocated trust",
+      "$ref": "UINT32"
+    },
+    "ledger": {
+      "description": "The string representation of the index number of the ledger containing these account settings or, in the case of historical queries, of the transaction that modified these settings",
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "hash": {
+      "description": "If this object was returned by a historical query this value will be the hash of the transaction that modified these settings. The transaction hash is used throughout the Ripple Protocol to uniquely identify a particular transaction",
+      "$ref": "Hash256"
+    }
+},
+  "required": ["account"]
+}
