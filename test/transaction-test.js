@@ -8,7 +8,6 @@ const Transaction = require('ripple-lib').Transaction;
 const TransactionQueue = require('ripple-lib').TransactionQueue;
 const Remote = require('ripple-lib').Remote;
 const Server = require('ripple-lib').Server;
-const sjcl = require('ripple-lib').sjcl;
 
 const transactionResult = {
   engine_result: 'tesSUCCESS',

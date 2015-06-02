@@ -3,7 +3,6 @@
 /*eslint new-cap: 1*/
 
 var utils = require('./utils');
-var sjcl = utils.sjcl;
 var bnjs = require('bn.js');
 
 //
@@ -179,17 +178,7 @@ UInt.prototype.parse_hex = function(j) {
 };
 
 UInt.prototype.parse_bits = function(j) {
-  if (sjcl.bitArray.bitLength(j) !== this.constructor.width * 8) {
-    this._value = NaN;
-  } else {
-    var bytes = sjcl.codec.bytes.fromBits(j);
-    this._value = new bnjs(bytes);
-    // this.parse_bytes(bytes);
-  }
-
-  this._update();
-
-  return this;
+  throw new Error('unsupported');
 };
 
 
@@ -197,7 +186,6 @@ UInt.prototype.parse_bytes = function(j) {
   if (!Array.isArray(j) || j.length !== this.constructor.width) {
     this._value = NaN;
   } else {
-    // var bits = sjcl.codec.bytes.toBits(j);
     this._value = new bnjs(j);
   }
 
@@ -210,9 +198,9 @@ UInt.prototype.parse_bytes = function(j) {
 UInt.prototype.parse_json = UInt.prototype.parse_hex;
 
 UInt.prototype.parse_bn = function(j) {
-  if ((j instanceof sjcl.bn) &&
-      j.bitLength() <= this.constructor.width * 8) {
-    this._value = new bnjs(j.toString(), 'hex');
+  if ((j instanceof bnjs) &&
+      j.byteLength() <= this.constructor.width) {
+    this._value = new bnjs(j);
   } else {
     this._value = NaN;
   }
@@ -249,17 +237,13 @@ UInt.prototype.to_hex = function() {
   if (!this.is_valid()) {
     return null;
   }
-  return sjcl.codec.hex.fromBits(this.to_bits()).toUpperCase();
+  return utils.arrayToHex(this.to_bytes()).toUpperCase();
 };
 
 UInt.prototype.to_json = UInt.prototype.to_hex;
 
 UInt.prototype.to_bits = function() {
-  if (!this.is_valid()) {
-    return null;
-  }
-
-  return sjcl.codec.bytes.toBits(this.to_bytes());
+  throw new Error('unsupported');
 };
 
 UInt.prototype.to_bn = function() {

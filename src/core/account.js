@@ -13,14 +13,12 @@
 var async              = require('async');
 var util               = require('util');
 var extend             = require('extend');
+var hashjs             = require('hash.js');
 var EventEmitter       = require('events').EventEmitter;
 var Amount             = require('./amount').Amount;
 var UInt160            = require('./uint160').UInt160;
 var TransactionManager = require('./transactionmanager').TransactionManager;
-var sjcl               = require('./utils').sjcl;
 var Base               = require('./base').Base;
-
-var hashjs = require('hash.js');
 
 
 /**

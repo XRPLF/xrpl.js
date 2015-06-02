@@ -5,7 +5,6 @@
 const ws = require('ws');
 const lodash = require('lodash');
 const assert = require('assert-diff');
-const sjcl = require('ripple-lib').sjcl;
 const Remote = require('ripple-lib').Remote;
 const SerializedObject = require('ripple-lib').SerializedObject;
 const Transaction = require('ripple-lib').Transaction;

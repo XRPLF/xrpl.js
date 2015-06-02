@@ -8,7 +8,6 @@ var bnjs = require('bn.js');
 var SerializedObject = require('ripple-lib').SerializedObject;
 var types = require('ripple-lib').types;
 var Amount = require('ripple-lib').Amount;
-var sjcl = require('ripple-lib').sjcl;
 
 describe('Serialized types', function() {
   describe('Int8', function() {

@@ -30,15 +30,6 @@ exports._test = {
   TransactionManager: require('./transactionmanager').TransactionManager
 };
 
-// Important: We do not guarantee any specific version of SJCL or for any
-// specific features to be included. The version and configuration may change at
-// any time without warning.
-//
-// However, for programs that are tied to a specific version of ripple.js like
-// the official client, it makes sense to expose the SJCL instance so we don't
-// have to include it twice.
-exports.sjcl = require('./utils').sjcl;
-exports.Wallet = require('ripple-wallet-generator')({sjcl: exports.sjcl});
 exports.types = require('./serializedtypes');
 
 // camelCase to under_scored API conversion

@@ -10,8 +10,6 @@ const stypes = require('./serializedtypes');
 const utils = require('./utils');
 const UInt256 = require('./uint256').UInt256;
 
-const sjcl = utils.sjcl;
-
 const TRANSACTION_TYPES = { };
 
 Object.keys(binformat.tx).forEach(function(key) {
@@ -205,11 +203,11 @@ SerializedObject.prototype.read = readOrPeek(true);
 SerializedObject.prototype.peek = readOrPeek(false);
 
 SerializedObject.prototype.to_bits = function() {
-  return sjcl.codec.bytes.toBits(this.buffer);
+  throw new Error('unsupported');
 };
 
 SerializedObject.prototype.to_hex = function() {
-  return sjcl.codec.hex.fromBits(this.to_bits()).toUpperCase();
+  return utils.arrayToHex(this.buffer).toUpperCase();
 };
 
 SerializedObject.prototype.to_json = function() {

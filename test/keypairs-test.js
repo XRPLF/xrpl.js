@@ -13,7 +13,6 @@ const SerializedObject = ripple.SerializedObject;
 const keypairs = ripple.keypairs;
 const Transaction = ripple.Transaction;
 const utils = ripple.utils;
-const sjcl = ripple.sjcl;
 
 const getKeyPair = keypairs.getKeyPair;
 const KeyType = keypairs.KeyType;

@@ -1,7 +1,5 @@
 'use strict';
 
-const sjcl = require('sjcl');
-
 function getMantissaDecimalString(bignum) {
   let mantissa = bignum.toPrecision(16)
     .replace(/\./, '')      // remove decimal point
@@ -95,6 +93,24 @@ function chunkString(str, n, leftAlign) {
   return ret;
 }
 
+function utf8Encode(str) {
+  var utf8 = unescape(encodeURIComponent(str));
+  var arr = [];
+  for (var i = 0; i < utf8.length; i++) {
+      arr.push(utf8.charCodeAt(i));
+  }
+  return arr;
+}
+
+function utf8Decode(bytes) {
+  var stringy = [];
+  bytes.forEach(function(b) {
+    stringy.push(String.fromCharCode(b));
+  });
+  
+  return decodeURIComponent(escape(stringy.join('')));
+}
+
 function assert(assertion, msg) {
   if (!assertion) {
     throw new Error('Assertion failed' + (msg ? ': ' + msg : '.'));
@@ -140,42 +156,6 @@ function fromTimestamp(timestamp) {
   return Math.round(timestamp_ / 1000) - 0x386D4380;
 }
 
-// This has no dependency on any ripple classes
-function Sha512() {
-  /*eslint-disable new-cap*/
-  this.hash = new sjcl.hash.sha512();
-  /*eslint-enable new-cap*/
-}
-
-Sha512.prototype.addBytes = function(bytes) {
-  const bits = sjcl.codec.bytes.toBits(bytes);
-  this.hash.update(bits);
-  return this;
-};
-
-Sha512.prototype.addU32 = function(i) {
-  const bytes = [
-    (i >>> 24) & 0xFF,
-    (i >>> 16) & 0xFF,
-    (i >>> 8) & 0xFF,
-    i & 0xFF
-  ];
-  this.addBytes(bytes);
-  return this;
-};
-
-Sha512.prototype.finish = function() {
-  return this.hash.finalize();
-};
-
-Sha512.prototype.finish256Bits = function() {
-  return sjcl.bitArray.bitSlice(this.finish(), 0, 256);
-};
-
-Sha512.prototype.finish256BN = function() {
-  return sjcl.bn.fromBits(this.finish256Bits());
-};
-
 exports.time = {
   fromRipple: toTimestamp,
   toRipple: fromTimestamp
@@ -194,7 +174,7 @@ exports.arrayUnique = arrayUnique;
 exports.toTimestamp = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
-exports.sjcl = sjcl;
-exports.Sha512 = Sha512;
+exports.utf8Encode = utf8Encode;
+exports.utf8Decode = utf8Decode;
 
 // vim:sw=2:sts=2:ts=8:et

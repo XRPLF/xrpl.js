@@ -10,13 +10,10 @@ const extend = require('extend');
 const hashjs = require('hash.js');
 const utils = require('./utils');
 const bnjs = require('bn.js');
-const sjcl = utils.sjcl;
-
 const Base = require('./base').Base;
 const UInt = require('./uint').UInt;
 
 const Seed = extend(function() {
-  // this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;
   this._version = Base.VER_FAMILY_SEED;
 }, UInt);
@@ -52,9 +49,9 @@ Seed.prototype.parse_passphrase = function(j) {
     throw new Error('Passphrase must be a string');
   }
 
-  const phraseBytes = sjcl.codec.bytes.fromBits(sjcl.codec.utf8String.toBits(j));
-  const phraseHash = hashjs.sha512().update(phraseBytes);
-  this.parse_bytes(phraseHash.digest().slice(0, 16));
+  const phraseBytes = utils.utf8Encode(j);
+  const phraseHash = hashjs.sha512().update(phraseBytes).digest();
+  this.parse_bytes(phraseHash.slice(0, 16));
 
   return this;
 };

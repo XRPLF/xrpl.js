@@ -66,10 +66,6 @@
       "version": "0.1.0",
       "resolved": "https://registry.npmjs.org/simple-asyncify/-/simple-asyncify-0.1.0.tgz"
     },
-    "sjcl": {
-      "version": "1.0.3",
-      "resolved": "https://registry.npmjs.org/sjcl/-/sjcl-1.0.3.tgz"
-    },
     "bn.js": {
       "version": "2.0.5",
       "from": "bn.js@*",

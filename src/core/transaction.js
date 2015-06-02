@@ -4,7 +4,6 @@ const util = require('util');
 const lodash = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils');
-const sjcl = require('./utils').sjcl;
 const Amount = require('./amount').Amount;
 const Currency = require('./amount').Currency;
 const UInt160 = require('./amount').UInt160;
@@ -766,8 +765,7 @@ Transaction.prototype.addMemo = function(options_) {
   }
 
   function convertStringToHex(string) {
-    const utf8String = sjcl.codec.utf8String.toBits(string);
-    return sjcl.codec.hex.fromBits(utf8String).toUpperCase();
+    return utils.arrayToHex(utils.utf8Encode(string)).toUpperCase();
   }
 
   const memo = {};
