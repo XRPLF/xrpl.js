@@ -17,7 +17,10 @@
     "async": "~0.9.0",
     "babel-runtime": "^5.3.2",
     "bignumber.js": "^2.0.3",
+    "bn.js": "^2.0.5",
+    "elliptic": "sublimator/elliptic#derivations-test",
     "extend": "~1.2.1",
+    "hash.js": "^1.0.3",
     "jayschema": "^0.3.1",
     "jayschema-error-messages": "^1.0.3",
     "lodash": "^3.1.0",
@@ -25,7 +28,6 @@
     "ripple-lib-transactionparser": "^0.3.2",
     "ripple-wallet-generator": "^1.0.3",
     "simple-asyncify": "^0.1.0",
-    "sjcl": "^1.0.3",
     "ws": "~0.7.1"
   },
   "devDependencies": {
@@ -59,7 +61,6 @@
     "compile": "babel -i runtime -d dist/npm/ src/",
     "compile-with-source-maps": "babel -i runtime -s -t -d dist/npm/ src/",
     "prepublish": "npm run compile",
-    "postinstall": "cd node_modules/sjcl; ./configure --with-all --compress=none; make",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; fi; eslint --reset -c eslintrc src/*.js",

@@ -13,12 +13,13 @@
 var async              = require('async');
 var util               = require('util');
 var extend             = require('extend');
+var hashjs             = require('hash.js');
 var EventEmitter       = require('events').EventEmitter;
 var Amount             = require('./amount').Amount;
 var UInt160            = require('./uint160').UInt160;
 var TransactionManager = require('./transactionmanager').TransactionManager;
-var sjcl               = require('./utils').sjcl;
 var Base               = require('./base').Base;
+
 
 /**
  * @constructor Account
@@ -374,12 +375,11 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
 Account._publicKeyToAddress = function(public_key) {
   // Based on functions in /src/js/ripple/keypair.js
   function hexToUInt160(public_key) {
-    var bits = sjcl.codec.hex.toBits(public_key);
-    var hash = sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
-    var address = UInt160.from_bits(hash);
-    address.set_version(Base.VER_ACCOUNT_ID);
-
-    return address.to_json();
+    const hash256 = hashjs.sha256().update(public_key, 'hex').digest()
+    const hash160 = hashjs.ripemd160().update(hash256).digest();
+    const id = UInt160.from_bytes(hash160);
+    id.set_version(Base.VER_ACCOUNT_ID);
+    return id.to_json();
   };
 
   if (UInt160.is_valid(public_key)) {

@@ -1,8 +1,9 @@
 'use strict';
 const _ = require('lodash');
-const sjcl = require('./utils').sjcl;
+const hashjs = require('hash.js');
 const utils = require('./utils');
 const extend = require('extend');
+const bnjs = require('bn.js');
 const convertBase = require('./baseconverter');
 
 const Base = {};
@@ -21,12 +22,14 @@ extend(Base, {
   VER_ACCOUNT_PUBLIC: 35,
   VER_ACCOUNT_PRIVATE: 34,
   VER_FAMILY_GENERATOR: 41,
-  VER_FAMILY_SEED: 33
+  VER_FAMILY_SEED: 33,
+
+  // 3 byte version to give `sEd` prefix to 16 byte seed encodings.
+  VER_ED25519_SEED: [1, 225, 75]
 });
 
 function sha256(bytes) {
-  return sjcl.codec.bytes.fromBits(
-    sjcl.hash.sha256.hash(sjcl.codec.bytes.toBits(bytes)));
+  return hashjs.sha256().update(bytes).digest();
 }
 
 function encodeString(alphabet, input) {
@@ -109,6 +112,63 @@ Base.verify_checksum = function(bytes) {
   return _.isEqual(computed, checksum);
 };
 
+/**
+* Assumes `ripple` alphabet
+*
+* @param {Number} payloadLength - number of bytes encoded not incl checksum
+* @param {String} desiredPrefix - desired prefix when base58 encoded with
+*                                 checksum
+* @return {Array} version
+*/
+Base.find_prefix = function(payloadLength, desiredPrefix) {
+  const totalLength = payloadLength + 4; // for checksum
+  const chars = (Math.log(Math.pow(256, totalLength)) / Math.log(58));
+   // (x, x.8] -> x+1, (x.8, x+1) -> x+2
+  const requiredChars = Math.ceil(chars + 0.2);
+  const padding = 'V'; // middle of the alphabet
+  const template = desiredPrefix + new Array(requiredChars + 1).join(padding);
+  const bytes = Base.decode(template);
+  const version = bytes.slice(0, -totalLength);
+  return version;
+};
+
+/**
+*
+* @param {String} encoded - base58 checksum encoded data string
+* @param {Number} expectedLength - of decoded bytes minus checksum
+* @param {Array} possibleVersions - array of possible versions
+*                                   each element could be a single byte or an
+*                                   array of bytes.
+* @param {String} [alphabet] - used to decode `encoded`
+*
+* @return {Object} -
+*/
+Base.decode_multi = function(encoded, expectedLength, possibleVersions,
+                             alphabet) {
+
+  const buffer = Base.decode(encoded, alphabet);
+  const ret = {version: null, bytes: null};
+
+  if (!Base.verify_checksum(buffer)) {
+    return ret;
+  }
+
+  const withoutSum = buffer.slice(0, -4);
+  const versionBytes = withoutSum.slice(0, -expectedLength);
+  const decoded = withoutSum.slice(-expectedLength);
+
+  possibleVersions.forEach(function(version) {
+    const asArray = Array.isArray(version) ? version : [version];
+    if (_.isEqual(versionBytes, asArray)) {
+      ret.version = version;
+      ret.bytes = decoded;
+      return false;
+    }
+  });
+
+  return ret;
+};
+
 // --> input: Array
 // <-- String
 Base.encode_check = function(version, input, alphabet) {
@@ -119,7 +179,7 @@ Base.encode_check = function(version, input, alphabet) {
 };
 
 // --> input : String
-// <-- NaN || sjcl.bn
+// <-- NaN || bn.js
 Base.decode_check = function(version, input, alphabet) {
   const buffer = Base.decode(input, alphabet);
 
@@ -127,8 +187,12 @@ Base.decode_check = function(version, input, alphabet) {
     return NaN;
   }
 
+  function isNotVersion(v) {
+    return v !== buffer[0];
+  }
+
   // Single valid version
-  if (typeof version === 'number' && buffer[0] !== version) {
+  if (typeof version === 'number' && isNotVersion(version)) {
     return NaN;
   }
 
@@ -143,12 +207,7 @@ Base.decode_check = function(version, input, alphabet) {
     return NaN;
   }
 
-  // We'll use the version byte to add a leading zero, this ensures JSBN doesn't
-  // intrepret the value as a negative number
-  buffer[0] = 0;
-
-  return sjcl.bn.fromBits(
-      sjcl.codec.bytes.toBits(buffer.slice(0, -4)));
+  return new bnjs(buffer.slice(1, -4));
 };
 
 exports.Base = Base;

@@ -4,15 +4,14 @@ const util = require('util');
 const lodash = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils');
-const sjcl = require('./utils').sjcl;
 const Amount = require('./amount').Amount;
 const Currency = require('./amount').Currency;
 const UInt160 = require('./amount').UInt160;
-const Seed = require('./seed').Seed;
 const SerializedObject = require('./serializedobject').SerializedObject;
 const RippleError = require('./rippleerror').RippleError;
 const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('transaction');
+const getKeyPair = require('./keypairs').getKeyPair;
 
 /**
  * @constructor Transaction
@@ -42,7 +41,7 @@ function Transaction(remote) {
   this._maxFee = remoteExists ? this.remote.max_fee : undefined;
   this.state = 'unsubmitted';
   this.finalized = false;
-  this.previousSigningHash = undefined;
+  this.previousSigningData = undefined;
   this.submitIndex = undefined;
   this.canonical = remoteExists ? this.remote.canonical_signing : true;
   this.submittedIDs = [ ];
@@ -387,9 +386,8 @@ Transaction.prototype.complete = function() {
 
   if (typeof this.tx_json.SigningPubKey === 'undefined') {
     try {
-      const seed = Seed.from_json(this._secret);
-      const key = seed.get_key(this.tx_json.Account);
-      this.tx_json.SigningPubKey = key.to_hex_pub();
+      const keyPair = getKeyPair(this._secret);
+      this.tx_json.SigningPubKey = keyPair.pubKeyHex();
     } catch(e) {
       this.emit('error', new RippleError(
         'tejSecretInvalid', 'Invalid secret'));
@@ -431,8 +429,9 @@ Transaction.prototype.serialize = function() {
   return SerializedObject.from_json(this.tx_json);
 };
 
-Transaction.prototype.signingHash = function(testnet) {
-  return this.hash(testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
+Transaction.prototype.signingHash = function() {
+  // assert(this.tx_json.SigningPubKey !== '');
+  return this.hash('HASH_TX_SIGN');
 };
 
 Transaction.prototype.hash = function(prefix_, asUINT256, serialized) {
@@ -451,26 +450,31 @@ Transaction.prototype.hash = function(prefix_, asUINT256, serialized) {
   return asUINT256 ? hash : hash.to_hex();
 };
 
-Transaction.prototype.sign = function(testnet) {
-  const seed = Seed.from_json(this._secret);
-  const prev_sig = this.tx_json.TxnSignature;
+Transaction.prototype.signingData = function() {
+  return this._signingData('HASH_TX_SIGN').buffer;
+};
 
+Transaction.prototype._signingData = function(prefix) {
+  return SerializedObject.from_json(
+        this.tx_json, hashprefixes[prefix].toString(16));
+};
+
+Transaction.prototype.sign = function() {
+  const keyPair = getKeyPair(this._secret);
+  const prevSig = this.tx_json.TxnSignature;
   delete this.tx_json.TxnSignature;
 
-  const hash = this.signingHash(testnet);
+  const signingData = this.signingData();
 
-  // If the hash is the same, we can re-use the previous signature
-  if (prev_sig && hash === this.previousSigningHash) {
-    this.tx_json.TxnSignature = prev_sig;
+  // If the signingData is the same, we can re-use the previous signature
+  if (prevSig && lodash.isEqual(signingData, this.previousSigningData)) {
+    this.tx_json.TxnSignature = prevSig;
     return this;
   }
 
-  const key = seed.get_key(this.tx_json.Account);
-  const sig = key.sign(hash);
-  const hex = sjcl.codec.hex.fromBits(sig).toUpperCase();
-
-  this.tx_json.TxnSignature = hex;
-  this.previousSigningHash = hash;
+  const sig = keyPair.signHex(signingData);
+  this.tx_json.TxnSignature = sig;
+  this.previousSigningData = signingData;
 
   return this;
 };
@@ -575,17 +579,15 @@ Transaction.prototype.setFixedFee = function(fee) {
 };
 
 /**
- * Set secret If the secret has been set with Remote.setSecret, it does not
+ * If the secret has been set with Remote.setSecret, it does not
  * need to be provided
  *
- * @param {String} secret
+ * @param {Object} secret - a signing keypair specifier
+                            see keypairs.js#getKeyPair
  */
-
 Transaction.prototype.setSecret =
 Transaction.prototype.secret = function(secret) {
-  if (typeof secret === 'string') {
-    this._secret = secret;
-  }
+  this._secret = secret;
   return this;
 };
 
@@ -763,8 +765,7 @@ Transaction.prototype.addMemo = function(options_) {
   }
 
   function convertStringToHex(string) {
-    const utf8String = sjcl.codec.utf8String.toBits(string);
-    return sjcl.codec.hex.fromBits(utf8String).toUpperCase();
+    return utils.arrayToHex(utils.utf8Encode(string)).toUpperCase();
   }
 
   const memo = {};

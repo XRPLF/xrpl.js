@@ -13,7 +13,6 @@ exports.Seed = require('./seed').Seed;
 exports.Meta = require('./meta').Meta;
 exports.SerializedObject = require('./serializedobject').SerializedObject;
 exports.RippleError = require('./rippleerror').RippleError;
-exports.Message = require('./message').Message;
 exports.binformat = require('./binformat');
 exports.utils = require('./utils');
 exports.Server = require('./server').Server;
@@ -22,21 +21,15 @@ exports.TransactionQueue = require('./transactionqueue').TransactionQueue;
 exports.RangeSet = require('./rangeset').RangeSet;
 exports.convertBase = require('./baseconverter');
 
+exports.keypairs = require('./keypairs');
+exports.getKeyPair = exports.keypairs.getKeyPair;
+
 exports._test = {
   Log: require('./log'),
   PathFind: require('./pathfind').PathFind,
   TransactionManager: require('./transactionmanager').TransactionManager
 };
 
-// Important: We do not guarantee any specific version of SJCL or for any
-// specific features to be included. The version and configuration may change at
-// any time without warning.
-//
-// However, for programs that are tied to a specific version of ripple.js like
-// the official client, it makes sense to expose the SJCL instance so we don't
-// have to include it twice.
-exports.sjcl = require('./utils').sjcl;
-exports.Wallet = require('ripple-wallet-generator')({sjcl: exports.sjcl});
 exports.types = require('./serializedtypes');
 
 // camelCase to under_scored API conversion

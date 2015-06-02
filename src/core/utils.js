@@ -93,6 +93,24 @@ function chunkString(str, n, leftAlign) {
   return ret;
 }
 
+function utf8Encode(str) {
+  var utf8 = unescape(encodeURIComponent(str));
+  var arr = [];
+  for (var i = 0; i < utf8.length; i++) {
+      arr.push(utf8.charCodeAt(i));
+  }
+  return arr;
+}
+
+function utf8Decode(bytes) {
+  var stringy = [];
+  bytes.forEach(function(b) {
+    stringy.push(String.fromCharCode(b));
+  });
+  
+  return decodeURIComponent(escape(stringy.join('')));
+}
+
 function assert(assertion, msg) {
   if (!assertion) {
     throw new Error('Assertion failed' + (msg ? ': ' + msg : '.'));
@@ -156,8 +174,7 @@ exports.arrayUnique = arrayUnique;
 exports.toTimestamp = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
-
-exports.sjcl = require('sjcl');
-require('./sjcl-custom');
+exports.utf8Encode = utf8Encode;
+exports.utf8Decode = utf8Decode;
 
 // vim:sw=2:sts=2:ts=8:et

@@ -2,20 +2,15 @@
 
 /* eslint-disable max-len*/
 
-const assert = require('assert');
+const assert = require('assert-diff');
 const lodash = require('lodash');
 const SerializedObject = require('ripple-lib').SerializedObject;
 const Amount = require('ripple-lib').Amount;
-const sjcl = require('ripple-lib').sjcl;
-
-// Shortcuts
-const hex = sjcl.codec.hex;
-const utf8 = sjcl.codec.utf8String;
+const utils = require('ripple-lib').utils;
 
 describe('Serialized object', function() {
-
   function convertStringToHex(string) {
-    return hex.fromBits(utf8.toBits(string)).toUpperCase();
+    return utils.arrayToHex(utils.utf8Encode(string)).toUpperCase();
   }
 
   describe('#from_json(v).to_json() == v', function() {

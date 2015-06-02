@@ -10,14 +10,12 @@
 
 var assert = require('assert');
 var extend = require('extend');
+var bnjs = require('bn.js');
 var GlobalBigNumber = require('bignumber.js');
 var Amount = require('./amount').Amount;
 var Currency = require('./currency').Currency;
 var binformat = require('./binformat');
 var utils = require('./utils');
-var sjcl = utils.sjcl;
-var SJCL_BN = sjcl.bn;
-
 var UInt128 = require('./uint128').UInt128;
 var UInt160 = require('./uint160').UInt160;
 var UInt256 = require('./uint256').UInt256;
@@ -32,6 +30,10 @@ function SerializedType(methods) {
   extend(this, methods);
 }
 
+function parseHexEncodedUtf8(hexString) {
+  return utils.utf8Decode(utils.hexToArray(hexString));
+}
+
 function isNumber(val) {
   return typeof val === 'number' && isFinite(val);
 }
@@ -44,8 +46,7 @@ function isHexInt64String(val) {
   return isString(val) && /^[0-9A-F]{0,16}$/i.test(val);
 }
 
-function serializeBits(so, bits, noLength) {
-  var byteData = sjcl.codec.bytes.fromBits(bits);
+function serializeBytes(so, byteData, noLength) {
   if (!noLength) {
     SerializedType.serialize_varint(so, byteData.length);
   }
@@ -53,7 +54,7 @@ function serializeBits(so, bits, noLength) {
 }
 
 function serializeHex(so, hexData, noLength) {
-  serializeBits(so, sjcl.codec.hex.toBits(hexData), noLength);
+  serializeBytes(so, utils.hexToArray(hexData), noLength);
 }
 
 /**
@@ -63,13 +64,7 @@ function serializeHex(so, hexData, noLength) {
  * @return {String} hex string
  */
 function convertByteArrayToHex(byte_array) {
-  return sjcl.codec.hex.fromBits(sjcl.codec.bytes.toBits(byte_array))
-  .toUpperCase();
-}
-
-function convertHexToString(hexString) {
-  var bits = sjcl.codec.hex.toBits(hexString);
-  return sjcl.codec.utf8String.fromBits(bits);
+  return utils.arrayToHex(byte_array).toUpperCase();
 }
 
 function sort_fields(keys) {
@@ -143,12 +138,12 @@ SerializedType.prototype.parse_varint = function(so) {
  * @param {Number} bytes byte size
  * @return {Array} byte array
  */
-function convertIntegerToByteArray(val, bytes) {
+function convertIntegerToByteArray(val, bytes, unbounded) {
   if (!isNumber(val)) {
     throw new Error('Value is not a number', bytes);
   }
 
-  if (val < 0 || val >= Math.pow(256, bytes)) {
+  if (!unbounded && (val < 0 || val >= Math.pow(256, bytes))) {
     throw new Error('Value out of bounds ');
   }
 
@@ -295,6 +290,12 @@ var STInt32 = exports.Int32 = new SerializedType({
 
 STInt32.id = 2;
 
+function bnToBytes(bn, len) {
+  const bytes = bn.toArray();
+  while (bytes.length < len) bytes.unshift(0);
+  return bytes;
+}
+
 var STInt64 = exports.Int64 = new SerializedType({
   serialize: function(so, val) {
     var bigNumObject;
@@ -304,25 +305,25 @@ var STInt64 = exports.Int64 = new SerializedType({
       if (val < 0) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
-      bigNumObject = new SJCL_BN(val, 10);
+      bigNumObject = new bnjs(val, 10);
     } else if (isString(val)) {
       if (!isHexInt64String(val)) {
         throw new Error('Not a valid hex Int64.');
       }
-      bigNumObject = new SJCL_BN(val, 16);
-    } else if (val instanceof SJCL_BN) {
-      if (!val.greaterEquals(0)) {
+      bigNumObject = new bnjs(val, 16);
+    } else if (val instanceof bnjs) {
+      if (!(val.cmpn(0) >= 0)) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
       bigNumObject = val;
     } else {
       throw new Error('Invalid type for Int64');
     }
-    serializeBits(so, bigNumObject.toBits(64), true); // noLength = true
+    serializeBytes(so, bnToBytes(bigNumObject, 8), true); // noLength = true
   },
   parse: function(so) {
     var bytes = so.read(8);
-    return SJCL_BN.fromBits(sjcl.codec.bytes.toBits(bytes));
+    return new bnjs(bytes);
   }
 });
 
@@ -334,7 +335,7 @@ var STHash128 = exports.Hash128 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash128');
     }
-    serializeBits(so, hash.to_bits(), true); // noLength = true
+    serializeBytes(so, hash.to_bytes(), true); // noLength = true
   },
   parse: function(so) {
     return UInt128.from_bytes(so.read(16));
@@ -349,7 +350,7 @@ var STHash256 = exports.Hash256 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash256');
     }
-    serializeBits(so, hash.to_bits(), true); // noLength = true
+    serializeBytes(so, hash.to_bytes(), true); // noLength = true
   },
   parse: function(so) {
     return UInt256.from_bytes(so.read(32));
@@ -364,7 +365,7 @@ var STHash160 = exports.Hash160 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash160');
     }
-    serializeBits(so, hash.to_bits(), true); // noLength = true
+    serializeBytes(so, hash.to_bytes(), true); // noLength = true
   },
   parse: function(so) {
     return UInt160.from_bytes(so.read(20));
@@ -431,10 +432,8 @@ exports.Quality = new SerializedType({
       hi |= parseInt(mantissaHex.slice(0, -8), 16) & 0xffffff;
       lo = parseInt(mantissaHex.slice(-8), 16);
     }
-
-    var valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
-
-    so.append(valueBytes);
+    STInt32.serialize(so, hi);
+    STInt32.serialize(so, lo);
   }
 });
 
@@ -472,7 +471,7 @@ var STAmount = exports.Amount = new SerializedType({
         valueHex = '0' + valueHex;
       }
 
-      valueBytes = sjcl.codec.bytes.fromBits(sjcl.codec.hex.toBits(valueHex));
+      valueBytes = utils.hexToArray(valueHex);
       // Clear most significant two bits - these bits should already be 0 if
       // Amount enforces the range correctly, but we'll clear them anyway just
       // so this code can make certain guarantees about the encoded value.
@@ -481,6 +480,7 @@ var STAmount = exports.Amount = new SerializedType({
       if (!amount.is_negative()) {
         valueBytes[0] |= 0x40;
       }
+      so.append(valueBytes);
     } else {
       var hi = 0, lo = 0;
 
@@ -506,10 +506,9 @@ var STAmount = exports.Amount = new SerializedType({
         lo = parseInt(mantissaHex.slice(-8), 16);
       }
 
-      valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
+      so.append(convertIntegerToByteArray(hi, 4, true));
+      so.append(convertIntegerToByteArray(lo, 4, true));
     }
-
-    so.append(valueBytes);
 
     if (!amount.is_native()) {
       // Currency (160-bit hash)
@@ -583,7 +582,7 @@ var STAccount = exports.Account = new SerializedType({
     if (!account.is_valid()) {
       throw new Error('Invalid account!');
     }
-    serializeBits(so, account.to_bits());
+    serializeBytes(so, account.to_bytes());
   },
   parse: function(so) {
     var len = this.parse_varint(so);
@@ -791,7 +790,7 @@ exports.STMemo = new SerializedType({
 
     if (output.MemoType !== undefined) {
       try {
-        var parsedType = convertHexToString(output.MemoType);
+        var parsedType = parseHexEncodedUtf8(output.MemoType);
 
         if (parsedType !== 'unformatted_memo') {
           output.parsed_memo_type = parsedType;
@@ -806,7 +805,7 @@ exports.STMemo = new SerializedType({
 
     if (output.MemoFormat !== undefined) {
       try {
-        output.parsed_memo_format = convertHexToString(output.MemoFormat);
+        output.parsed_memo_format = parseHexEncodedUtf8(output.MemoFormat);
       } catch (e) {
         // empty
         // we don't know what's in the binary, apparently it's not a UTF-8
@@ -821,11 +820,11 @@ exports.STMemo = new SerializedType({
         if (output.parsed_memo_format === 'json') {
           // see if we can parse JSON
           output.parsed_memo_data =
-          JSON.parse(convertHexToString(output.MemoData));
+          JSON.parse(parseHexEncodedUtf8(output.MemoData));
 
         } else if (output.parsed_memo_format === 'text') {
           // otherwise see if we can parse text
-          output.parsed_memo_data = convertHexToString(output.MemoData);
+          output.parsed_memo_data = parseHexEncodedUtf8(output.MemoData);
         }
       } catch(e) {
         // empty
