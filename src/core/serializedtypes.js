@@ -10,13 +10,13 @@
 
 var assert = require('assert');
 var extend = require('extend');
+var bnjs = require('bn.js');
 var GlobalBigNumber = require('bignumber.js');
 var Amount = require('./amount').Amount;
 var Currency = require('./currency').Currency;
 var binformat = require('./binformat');
 var utils = require('./utils');
 var sjcl = utils.sjcl;
-var SJCL_BN = sjcl.bn;
 
 var UInt128 = require('./uint128').UInt128;
 var UInt160 = require('./uint160').UInt160;
@@ -295,6 +295,12 @@ var STInt32 = exports.Int32 = new SerializedType({
 
 STInt32.id = 2;
 
+function bnToBits(bn, len) {
+  const bytes = bn.toArray();
+  while (bytes.length < len/8) bytes.unshift(0);
+  return sjcl.codec.bytes.toBits(bytes);
+}
+
 var STInt64 = exports.Int64 = new SerializedType({
   serialize: function(so, val) {
     var bigNumObject;
@@ -304,25 +310,25 @@ var STInt64 = exports.Int64 = new SerializedType({
       if (val < 0) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
-      bigNumObject = new SJCL_BN(val, 10);
+      bigNumObject = new bnjs(val, 10);
     } else if (isString(val)) {
       if (!isHexInt64String(val)) {
         throw new Error('Not a valid hex Int64.');
       }
-      bigNumObject = new SJCL_BN(val, 16);
-    } else if (val instanceof SJCL_BN) {
-      if (!val.greaterEquals(0)) {
+      bigNumObject = new bnjs(val, 16);
+    } else if (val instanceof bnjs) {
+      if (!(val.cmpn(0) >= 0)) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
       bigNumObject = val;
     } else {
       throw new Error('Invalid type for Int64');
     }
-    serializeBits(so, bigNumObject.toBits(64), true); // noLength = true
+    serializeBits(so, bnToBits(bigNumObject, 64), true); // noLength = true
   },
   parse: function(so) {
     var bytes = so.read(8);
-    return SJCL_BN.fromBits(sjcl.codec.bytes.toBits(bytes));
+    return new bnjs(bytes);
   }
 });
 

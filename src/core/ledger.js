@@ -88,7 +88,7 @@ Ledger.prototype.calcRippleStateEntryHash = function(
   }
 
   // The lower ID has to come first
-  if (account1.to_bn().greaterEquals(account2.to_bn())) {
+  if (account1.to_bn().cmp(account2.to_bn()) >= 0) {
     var tmp = account2;
     account2 = account1;
     account1 = tmp;

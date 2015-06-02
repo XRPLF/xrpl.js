@@ -4,6 +4,7 @@
 
 var utils = require('./utils');
 var sjcl = utils.sjcl;
+var bnjs = require('bn.js');
 
 //
 // Abstract UInt class
@@ -12,7 +13,7 @@ var sjcl = utils.sjcl;
 //
 
 function UInt() {
-  // Internal form: NaN or sjcl.bn
+  // Internal form: NaN or bnjs
   this._value = NaN;
   this._update();
 }
@@ -101,15 +102,15 @@ UInt.prototype.copyTo = function(d) {
 };
 
 UInt.prototype.equals = function(d) {
-  return this.is_valid() && d.is_valid() && this._value.equals(d._value);
+  return this.is_valid() && d.is_valid() && this._value.cmp(d._value) === 0;
 };
 
 UInt.prototype.is_valid = function() {
-  return this._value instanceof sjcl.bn;
+  return this._value instanceof bnjs;
 };
 
 UInt.prototype.is_zero = function() {
-  return this.is_valid() && this._value.equals(new sjcl.bn(0));
+  return this.is_valid() && this._value.cmpn(0) === 0;
 };
 
 /**
@@ -136,14 +137,14 @@ UInt.prototype.parse_generic = function(j) {
     case this.constructor.STR_ZERO:
     case this.constructor.ACCOUNT_ZERO:
     case this.constructor.HEX_ZERO:
-      this._value = new sjcl.bn(0);
+      this._value = new bnjs(0);
       break;
 
     case '1':
     case this.constructor.STR_ONE:
     case this.constructor.ACCOUNT_ONE:
     case this.constructor.HEX_ONE:
-      this._value = new sjcl.bn(1);
+      this._value = new bnjs(1);
       break;
 
     default:
@@ -151,10 +152,10 @@ UInt.prototype.parse_generic = function(j) {
           this._value = NaN;
         } else if (this.constructor.width === j.length) {
           var hex = utils.arrayToHex(utils.stringToArray(j));
-          this._value = new sjcl.bn(hex, 16);
+          this._value = new bnjs(hex, 16);
         } else if ((this.constructor.width * 2) === j.length) {
           // XXX Check char set!
-          this._value = new sjcl.bn(j, 16);
+          this._value = new bnjs(j, 16);
         } else {
           this._value = NaN;
         }
@@ -167,7 +168,7 @@ UInt.prototype.parse_generic = function(j) {
 
 UInt.prototype.parse_hex = function(j) {
   if (typeof j === 'string' && j.length === (this.constructor.width * 2)) {
-    this._value = new sjcl.bn(j, 16);
+    this._value = new bnjs(j, 16);
   } else {
     this._value = NaN;
   }
@@ -181,8 +182,8 @@ UInt.prototype.parse_bits = function(j) {
   if (sjcl.bitArray.bitLength(j) !== this.constructor.width * 8) {
     this._value = NaN;
   } else {
-    this._value = sjcl.bn.fromBits(j);
-    // var bytes = sjcl.codec.bytes.fromBits(j);
+    var bytes = sjcl.codec.bytes.fromBits(j);
+    this._value = new bnjs(bytes);
     // this.parse_bytes(bytes);
   }
 
@@ -196,8 +197,8 @@ UInt.prototype.parse_bytes = function(j) {
   if (!Array.isArray(j) || j.length !== this.constructor.width) {
     this._value = NaN;
   } else {
-    var bits = sjcl.codec.bytes.toBits(j);
-    this._value = sjcl.bn.fromBits(bits);
+    // var bits = sjcl.codec.bytes.toBits(j);
+    this._value = new bnjs(j);
   }
 
   this._update();
@@ -211,7 +212,7 @@ UInt.prototype.parse_json = UInt.prototype.parse_hex;
 UInt.prototype.parse_bn = function(j) {
   if ((j instanceof sjcl.bn) &&
       j.bitLength() <= this.constructor.width * 8) {
-    this._value = new sjcl.bn(j);
+    this._value = new bnjs(j.toString(), 'hex');
   } else {
     this._value = NaN;
   }
@@ -225,7 +226,7 @@ UInt.prototype.parse_number = function(j) {
   this._value = NaN;
 
   if (typeof j === 'number' && isFinite(j) && j >= 0) {
-    this._value = new sjcl.bn(j);
+    this._value = new bnjs(j);
   }
 
   this._update();
@@ -238,7 +239,10 @@ UInt.prototype.to_bytes = function() {
   if (!this.is_valid()) {
     return null;
   }
-  return sjcl.codec.bytes.fromBits(this.to_bits());
+  var bytes = this._value.toArray();
+  while (bytes.length < this.constructor.width)
+    bytes.unshift(0);
+  return bytes;
 };
 
 UInt.prototype.to_hex = function() {
@@ -255,7 +259,7 @@ UInt.prototype.to_bits = function() {
     return null;
   }
 
-  return this._value.toBits(this.constructor.width * 8);
+  return sjcl.codec.bytes.toBits(this.to_bytes());
 };
 
 UInt.prototype.to_bn = function() {
@@ -263,9 +267,7 @@ UInt.prototype.to_bn = function() {
     return null;
   }
 
-  var bits = this.to_bits();
-
-  return sjcl.bn.fromBits(bits);
+  return this._value;
 };
 
 exports.UInt = UInt;

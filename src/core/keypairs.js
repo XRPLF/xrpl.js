@@ -304,12 +304,6 @@ hasCachedProperty(Secp256k1Pair, 'pubKeyBytes', function() {
   return this.keyPair.getPublic(/*compact*/ true, /*enc*/ 'bytes');
 });
 
-hasCachedProperty(Secp256k1Pair, 'sjclSecret', function(sjcl) {
-  const curve = sjcl.ecc.curves.k256;
-  const secret = this.keyPair.priv.toString('hex');
-  return new sjcl.ecc.ecdsa.secretKey(curve, new sjcl.bn(secret));
-});
-
 /*
 @param {Array<Byte>} message (bytes)
  */

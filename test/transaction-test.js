@@ -54,11 +54,6 @@ for (let i = 0; i <= 127; i++) {
 }
 
 describe('Transaction', function() {
-  before(function() {
-    sjcl.random.addEntropy(
-      '3045022100A58B0460BC5092CB4F96155C19125A4E079C870663F1D5E8BBC9BD', 256);
-  });
-
   it('Success listener', function(done) {
     const transaction = new Transaction();
 

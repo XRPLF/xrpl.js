@@ -62,7 +62,7 @@
     "compile": "babel -i runtime -d dist/npm/ src/",
     "compile-with-source-maps": "babel -i runtime -s -t -d dist/npm/ src/",
     "prepublish": "npm run compile",
-    "postinstall": "cd node_modules/sjcl; ./configure --with-all --compress=none; make",
+    "postinstall": "cd node_modules/sjcl; ./configure --without-all --with-bitArray --with-codecString --with-codecHex --with-codecBytes --compression=none; make",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; fi; eslint --reset -c eslintrc src/*.js",

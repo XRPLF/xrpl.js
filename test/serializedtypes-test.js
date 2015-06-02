@@ -4,6 +4,7 @@
 
 var assert = require('assert');
 var BigNumber = require('bignumber.js');
+var bnjs = require('bn.js');
 var SerializedObject = require('ripple-lib').SerializedObject;
 var types = require('ripple-lib').types;
 var Amount = require('ripple-lib').Amount;
@@ -292,7 +293,7 @@ describe('Serialized types', function() {
       so = new SerializedObject('8B2386F26F8E232B');
       var num = types.Int64.parse(so);
       // We get a positive number
-      assert.strictEqual(num.toString(), '0x8b2386f26f8e232b');
+      assert.strictEqual(num.toString(16), '8b2386f26f8e232b');
     });
     it('Serialize "0123456789ABCDEF"', function() {
       var so = new SerializedObject();
@@ -306,8 +307,9 @@ describe('Serialized types', function() {
     });
     it('Serialize bn("FFEEDDCCBBAA9988")', function() {
       var so = new SerializedObject();
-      var BN = sjcl.bn;
-      types.Int64.serialize(so, new BN('FFEEDDCCBBAA9988', 16));
+      var BN = bnjs;
+      var num = new BN('FFEEDDCCBBAA9988', 16);
+      types.Int64.serialize(so, num);
       assert.strictEqual(so.to_hex(), 'FFEEDDCCBBAA9988');
     });
     it('Fail to serialize BigNumber("-1")', function() {
@@ -349,7 +351,7 @@ describe('Serialized types', function() {
     it('Parse "0123456789ABCDEF"', function() {
       var so = new SerializedObject('0123456789ABCDEF');
       var num = types.Int64.parse(so);
-      assert.strictEqual(num.toString(), '0x123456789abcdef');
+      assert.strictEqual(num.toString(16), '123456789abcdef');
     });
   });
 

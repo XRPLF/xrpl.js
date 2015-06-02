@@ -7,14 +7,16 @@
 //
 
 const extend = require('extend');
+const hashjs = require('hash.js');
 const utils = require('./utils');
+const bnjs = require('bn.js');
 const sjcl = utils.sjcl;
 
 const Base = require('./base').Base;
 const UInt = require('./uint').UInt;
 
 const Seed = extend(function() {
-  this._curve = sjcl.ecc.curves.k256;
+  // this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;
   this._version = Base.VER_FAMILY_SEED;
 }, UInt);
@@ -50,23 +52,22 @@ Seed.prototype.parse_passphrase = function(j) {
     throw new Error('Passphrase must be a string');
   }
 
-  const hash = sjcl.hash.sha512.hash(sjcl.codec.utf8String.toBits(j));
-  const bits = sjcl.bitArray.bitSlice(hash, 0, 128);
-
-  this.parse_bits(bits);
+  const phraseBytes = sjcl.codec.bytes.fromBits(sjcl.codec.utf8String.toBits(j));
+  const phraseHash = hashjs.sha512().update(phraseBytes);
+  this.parse_bytes(phraseHash.digest().slice(0, 16));
 
   return this;
 };
 
 Seed.prototype.parse_base58 = function(j) {
   const result = Base.decode_multi(j, Seed.width, [Base.VER_FAMILY_SEED,
-                                                 Base.VER_ED25519_SEED]);
+                                                   Base.VER_ED25519_SEED]);
 
   if (!result.bytes) {
     this._value = NaN;
   } else {
     this._version = result.version;
-    this._value = sjcl.bn.fromBits(sjcl.codec.bytes.toBits(result.bytes));
+    this._value = new bnjs(result.bytes);
   }
 
   return this;

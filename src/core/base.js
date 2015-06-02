@@ -1,8 +1,9 @@
 'use strict';
 const _ = require('lodash');
-const sjcl = require('./utils').sjcl;
+const hashjs = require('hash.js');
 const utils = require('./utils');
 const extend = require('extend');
+const bnjs = require('bn.js');
 const convertBase = require('./baseconverter');
 
 const Base = {};
@@ -28,8 +29,7 @@ extend(Base, {
 });
 
 function sha256(bytes) {
-  return sjcl.codec.bytes.fromBits(
-    sjcl.hash.sha256.hash(sjcl.codec.bytes.toBits(bytes)));
+  return hashjs.sha256().update(bytes).digest();
 }
 
 function encodeString(alphabet, input) {
@@ -179,7 +179,7 @@ Base.encode_check = function(version, input, alphabet) {
 };
 
 // --> input : String
-// <-- NaN || sjcl.bn
+// <-- NaN || bn.js
 Base.decode_check = function(version, input, alphabet) {
   const buffer = Base.decode(input, alphabet);
 
@@ -207,7 +207,7 @@ Base.decode_check = function(version, input, alphabet) {
     return NaN;
   }
 
-  return sjcl.bn.fromBits(sjcl.codec.bytes.toBits(buffer.slice(1, -4)));
+  return new bnjs(buffer.slice(1, -4));
 };
 
 exports.Base = Base;

@@ -1,7 +1,6 @@
 'use strict';
 
 const sjcl = require('sjcl');
-require('./sjcl-custom');
 
 function getMantissaDecimalString(bignum) {
   let mantissa = bignum.toPrecision(16)
