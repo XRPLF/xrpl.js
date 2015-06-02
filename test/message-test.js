@@ -9,8 +9,7 @@ const getKeyPair = require('ripple-lib').getKeyPair;
 
 function getSecret(secretString) {
   return getKeyPair({key_type: 'secp256k1',
-                    impl: 'sjcl',
-                    base58: secretString}).secretKey;
+                    base58: secretString}).sjclSecret(sjcl);
 }
 
 describe('Message', function() {

@@ -19,6 +19,13 @@ const REGEX_HEX = /^[0-9a-fA-F]+$/;
 const REGEX_BASE64 =
   /^([A-Za-z0-9\+]{4})*([A-Za-z0-9\+]{2}==)|([A-Za-z0-9\+]{3}=)?$/;
 
+function getSecret(secret_key_) {
+  return  getKeyPair({key_type: 'secp256k1',
+                    impl: 'elliptic',
+                    generic: secret_key_}).sjclSecret(sjcl);
+}
+
+
 /**
  *  Produce a Base64-encoded signature on the given message with
  *  the string 'Ripple Signed Message:\n' prepended.
@@ -72,9 +79,7 @@ Message.signHash = function(hash_, secret_key_) {
 
   const secret_key =
     secret_key_ instanceof sjcl.ecc.ecdsa.secretKey ? secret_key_ :
-        getKeyPair({key_type: 'secp256k1',
-                    impl: 'sjcl',
-                    generic: secret_key_}).secretKey;
+                                                      getSecret(secret_key_);
 
   const PARANOIA_256_BITS = 6; // sjcl constant for ensuring 256 bits of entropy
   const signature_bits = secret_key.signWithRecoverablePublicKey(hash,
