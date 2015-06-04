@@ -25,7 +25,7 @@
     "ripple-lib-transactionparser": "^0.3.2",
     "ripple-wallet-generator": "^1.0.3",
     "simple-asyncify": "^0.1.0",
-    "sjcl": "^1.0.3",
+    "sjcl-extended": "ripple/sjcl-extended#1.0.3",
     "ws": "~0.7.1"
   },
   "devDependencies": {
@@ -59,7 +59,6 @@
     "compile": "babel -i runtime -d dist/npm/ src/",
     "compile-with-source-maps": "babel -i runtime -s -t -d dist/npm/ src/",
     "prepublish": "npm run compile",
-    "postinstall": "cd node_modules/sjcl; ./configure --with-all --compress=none; make",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; fi; eslint --reset -c eslintrc src/*.js",
