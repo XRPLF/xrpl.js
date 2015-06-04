@@ -157,7 +157,6 @@ exports.toTimestamp = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
 
-exports.sjcl = require('sjcl');
-require('./sjcl-custom');
+exports.sjcl = require('sjcl-extended');
 
 // vim:sw=2:sts=2:ts=8:et

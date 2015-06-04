@@ -66,9 +66,17 @@
       "version": "0.1.0",
       "resolved": "https://registry.npmjs.org/simple-asyncify/-/simple-asyncify-0.1.0.tgz"
     },
-    "sjcl": {
+    "sjcl-extended": {
       "version": "1.0.3",
-      "resolved": "https://registry.npmjs.org/sjcl/-/sjcl-1.0.3.tgz"
+      "from": "ripple/sjcl-extended#1.0.3",
+      "resolved": "git://github.com/ripple/sjcl-extended.git#908218e0db4fccd08c4e3f1f7269b72f8d93c270",
+      "dependencies": {
+        "sjcl": {
+          "version": "1.0.3",
+          "from": "sjcl@>=1.0.3 <2.0.0",
+          "resolved": "https://registry.npmjs.org/sjcl/-/sjcl-1.0.3.tgz"
+        }
+      }
     },
     "ws": {
       "version": "0.7.2",
