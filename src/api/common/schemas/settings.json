@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "settings",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "name": {"type": "string"},
+    "value": {"type": "string"}
+  },
+  "required": ["address", "name", "value"],
+  "additionalProperties": false
+}

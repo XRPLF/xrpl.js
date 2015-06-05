@@ -8,11 +8,9 @@ const bignum = require('bignumber.js');
 const transactions = require('./transactions');
 const TxToRestConverter = require('./tx-to-rest-converter.js');
 const utils = require('./utils');
-const ripple = utils.common.core;
-const validator = utils.common.schemaValidator;
 const validate = utils.common.validate;
 
-const InvalidRequestError = utils.common.errors.InvalidRequestError;
+const ValidationError = utils.common.errors.ValidationError;
 const NotFoundError = utils.common.errors.NotFoundError;
 const TimeOutError = utils.common.errors.TimeOutError;
 
@@ -31,7 +29,7 @@ const DEFAULT_RESULTS_PER_PAGE = 10;
  */
 function formatPaymentHelper(account, txJSON) {
   if (!(txJSON && /^payment$/i.test(txJSON.TransactionType))) {
-    throw new InvalidRequestError('Not a payment. The transaction '
+    throw new ValidationError('Not a payment. The transaction '
       + 'corresponding to the given identifier is not a payment.');
   }
   const metadata = {
@@ -59,7 +57,7 @@ function getPayment(account, identifier, callback) {
   const self = this;
 
   validate.address(account);
-  validate.paymentIdentifier(identifier);
+  validate.identifier(identifier);
 
   function getTransaction(_callback) {
     transactions.getTransaction(self, account, identifier, {}, _callback);
@@ -147,61 +145,15 @@ function getAccountPayments(account, source_account, destination_account,
  * @param {RippleAddress} req.params.destination_account
  * @param {Amount "1+USD+r..."} req.params.destination_amount_string
  */
-function getPathFind(source_account, destination_account,
-    destination_amount_string, source_currency_strings, callback) {
+function getPathFind(pathfind, callback) {
   const self = this;
-
-  const destination_amount = utils.renameCounterpartyToIssuer(
-    utils.parseCurrencyQuery(destination_amount_string || ''));
-
-  validate.pathfind({
-    source_account: source_account,
-    destination_account: destination_account,
-    destination_amount: destination_amount,
-    source_currency_strings: source_currency_strings
-  });
-
-  const source_currencies = [];
-  // Parse source currencies
-  // Note that the source_currencies should be in the form
-  // "USD r...,BTC,XRP". The issuer is optional but if provided should be
-  // separated from the currency by a single space.
-  if (source_currency_strings) {
-    const sourceCurrencyStrings = source_currency_strings.split(',');
-    for (let c = 0; c < sourceCurrencyStrings.length; c++) {
-      // Remove leading and trailing spaces
-      sourceCurrencyStrings[c] = sourceCurrencyStrings[c].replace(
-                                                        /(^[ ])|([ ]$)/g, '');
-      // If there is a space, there should be a valid issuer after the space
-      if (/ /.test(sourceCurrencyStrings[c])) {
-        const currencyIssuerArray = sourceCurrencyStrings[c].split(' ');
-        const currencyObject = {
-          currency: currencyIssuerArray[0],
-          issuer: currencyIssuerArray[1]
-        };
-        if (validator.isValid(currencyObject.currency, 'Currency')
-            && ripple.UInt160.is_valid(currencyObject.issuer)) {
-          source_currencies.push(currencyObject);
-        } else {
-          callback(new InvalidRequestError('Invalid parameter: '
-            + 'source_currencies. Must be a list of valid currencies'));
-          return;
-        }
-      } else if (validator.isValid(sourceCurrencyStrings[c], 'Currency')) {
-        source_currencies.push({currency: sourceCurrencyStrings[c]});
-      } else {
-        callback(new InvalidRequestError('Invalid parameter: '
-          + 'source_currencies. Must be a list of valid currencies'));
-        return;
-      }
-    }
-  }
+  validate.pathfind(pathfind);
 
   function prepareOptions() {
     const pathfindParams = {
-      src_account: source_account,
-      dst_account: destination_account,
-      dst_amount: utils.common.convertAmount(destination_amount)
+      src_account: pathfind.source.address,
+      dst_account: pathfind.destination.address,
+      dst_amount: utils.common.convertAmount(pathfind.destination.amount)
     };
     if (typeof pathfindParams.dst_amount === 'object'
           && !pathfindParams.dst_amount.issuer) {
@@ -210,11 +162,10 @@ function getPathFind(source_account, destination_account,
       // https://ripple.com/build/transactions/
       //     #special-issuer-values-for-sendmax-and-amount
       // https://ripple.com/build/ripple-rest/#counterparties-in-payments
-
       pathfindParams.dst_amount.issuer = pathfindParams.dst_account;
     }
-    if (source_currencies.length > 0) {
-      pathfindParams.src_currencies = source_currencies;
+    if (pathfind.source.amounts && pathfind.source.amounts.length > 0) {
+      pathfindParams.src_currencies = pathfind.source.amounts;
     }
     return pathfindParams;
   }
@@ -279,10 +230,10 @@ function getPathFind(source_account, destination_account,
       return TxToRestConverter.parsePaymentsFromPathFind(pathfindResults);
     }
     if (pathfindResults.destination_currencies.indexOf(
-            destination_amount.currency) === -1) {
+            pathfind.destination.amount.currency) === -1) {
       throw new NotFoundError('No paths found. ' +
         'The destination_account does not accept ' +
-        destination_amount.currency +
+        pathfind.destination.amount.currency +
         ', they only accept: ' +
         pathfindResults.destination_currencies.join(', '));
     } else if (pathfindResults.source_currencies

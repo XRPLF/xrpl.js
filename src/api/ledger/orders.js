@@ -9,7 +9,6 @@ const utils = require('./utils');
 const ripple = utils.common.core;
 const errors = utils.common.errors;
 const validate = utils.common.validate;
-const validator = utils.common.schemaValidator;
 
 const DefaultPageLimit = 200;
 
@@ -37,7 +36,7 @@ function getOrders(account, options, callback) {
   validate.options(options);
 
   function getAccountOrders(prevResult) {
-    const isAggregate = options.limit === 'all';
+    const isAggregate = options.limit === undefined;
     if (prevResult && (!isAggregate || !prevResult.marker)) {
       return Promise.resolve(prevResult);
     }
@@ -54,8 +53,7 @@ function getOrders(account, options, callback) {
         ledger = prevResult.ledger_index;
       } else {
         marker = options.marker;
-        limit = validator.isValid(options.limit, 'UINT32') ?
-          Number(options.limit) : DefaultPageLimit;
+        limit = options.limit || DefaultPageLimit;
         ledger = utils.parseLedger(options.ledger);
       }
 
@@ -141,18 +139,16 @@ function getOrders(account, options, callback) {
  *
  *  @param {Express.js Request} request
  */
-function getOrderBook(account, base, counter, options, callback) {
+function getOrderBook(account, orderbook, options, callback) {
   const self = this;
-
-  const params = _.merge(options, {
-    validated: true,
-    order_book: base + '/' + counter,
-    base: utils.parseCurrencyQuery(base),
-    counter: utils.parseCurrencyQuery(counter)
-  });
   validate.address(account);
-  validate.orderbook(params);
+  validate.orderbook(orderbook);
   validate.options(options);
+
+  const params = _.assign({}, orderbook, options, {
+    validated: true,
+    order_book: orderbook.base + '/' + orderbook.counter
+  });
 
   function getLastValidatedLedger(parameters) {
     const promise = new Promise(function(resolve, reject) {

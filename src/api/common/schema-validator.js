@@ -1,45 +1,59 @@
 'use strict';
+const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
-const JaySchema = require('jayschema');
-const formatJaySchemaErrors = require('jayschema-error-messages');
+const validator = require('is-my-json-valid');
+const ripple = require('./core');
+const ValidationError = require('./errors').ValidationError;
 
-const baseDir = path.join(__dirname, './schemas');
+let SCHEMAS = {};
 
-module.exports = (function() {
-  const validator = new JaySchema();
-  const validate = validator.validate;
+function isValidAddress(address) {
+  return ripple.UInt160.is_valid(address);
+}
 
-  // If schema is valid, return true. Otherwise
-  // return array of validation errors
-  validator.validate = function() {
-    const errors = validate.apply(validator, arguments);
-    return {
-      err: errors,
-      errors: formatJaySchemaErrors(errors),
-      isValid: errors.length === 0
-    };
-  };
+function isValidLedgerHash(ledgerHash) {
+  return ripple.UInt256.is_valid(ledgerHash);
+}
 
-  validator.isValid = function() {
-    return validator.validate.apply(validator, arguments).isValid;
-  };
+function loadSchema(filepath) {
+  try {
+    return JSON.parse(fs.readFileSync(filepath, 'utf8'));
+  } catch (e) {
+    throw new Error('Failed to parse schema: ' + filepath);
+  }
+}
 
-  // Load Schemas
-  fs.readdirSync(baseDir).filter(function(fileName) {
-    return /^[\w\s]+\.json$/.test(fileName);
-  })
-  .map(function(fileName) {
-    try {
-      return JSON.parse(fs.readFileSync(path.join(baseDir, fileName), 'utf8'));
-    } catch (e) {
-      throw new Error('Failed to parse schema: ' + fileName);
-    }
-  })
-  .forEach(function(schema) {
-    schema.id = schema.title;
-    validator.register(schema);
-  });
+function loadSchemas(dir) {
+  const filenames = fs.readdirSync(dir).filter(name => name.endsWith('.json'));
+  const schemas = filenames.map(name => loadSchema(path.join(dir, name)));
+  return _.indexBy(schemas, 'title');
+}
 
-  return validator;
-})();
+function formatSchemaError(error) {
+  return error.field + ' ' + error.message
+    + (error.value ? ' (' + error.value + ')' : '');
+}
+
+function formatSchemaErrors(errors) {
+  return errors.map(formatSchemaError).join(', ');
+}
+
+function schemaValidate(schemaName, object) {
+  const formats = {address: isValidAddress,
+                   ledgerHash: isValidLedgerHash};
+  const options = {schema: SCHEMAS, formats: formats,
+                   verbose: true, greedy: true};
+  const schema = SCHEMAS[schemaName];
+  if (schema === undefined) {
+    throw new Error('schema not found for: ' + schemaName);
+  }
+  const validate = validator(schema, options);
+  const isValid = validate(object);
+  if (!isValid) {
+    throw new ValidationError(formatSchemaErrors(validate.errors));
+  }
+}
+
+SCHEMAS = loadSchemas(path.join(__dirname, './schemas'));
+module.exports = schemaValidate;

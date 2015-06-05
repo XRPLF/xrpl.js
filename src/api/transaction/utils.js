@@ -47,27 +47,27 @@ function getFeeDrops(remote) {
 }
 
 function createTxJSON(transaction, remote, instructions, callback) {
-  common.validate.options(instructions);
+  common.validate.instructions(instructions);
 
   transaction.complete();
   const account = transaction.getAccount();
   const tx_json = transaction.tx_json;
 
-  if (instructions.last_ledger_sequence !== undefined) {
+  if (instructions.maxLedgerVersion !== undefined) {
     tx_json.LastLedgerSequence =
-      parseInt(instructions.last_ledger_sequence, 10);
+      parseInt(instructions.maxLedgerVersion, 10);
   } else {
-    const offset = instructions.last_ledger_offset !== undefined ?
-      parseInt(instructions.last_ledger_offset, 10) : 3;
+    const offset = instructions.maxLedgerVersionOffset !== undefined ?
+      parseInt(instructions.maxLedgerVersionOffset, 10) : 3;
     tx_json.LastLedgerSequence = remote.getLedgerSequence() + offset;
   }
 
-  if (instructions.fixed_fee !== undefined) {
-    tx_json.Fee = common.xrpToDrops(instructions.fixed_fee);
+  if (instructions.fee !== undefined) {
+    tx_json.Fee = common.xrpToDrops(instructions.fee);
   } else {
     const serverFeeDrops = getFeeDrops(remote);
-    if (instructions.max_fee !== undefined) {
-      const maxFeeDrops = common.xrpToDrops(instructions.max_fee);
+    if (instructions.maxFee !== undefined) {
+      const maxFeeDrops = common.xrpToDrops(instructions.maxFee);
       tx_json.Fee = BigNumber.min(serverFeeDrops, maxFeeDrops).toString();
     } else {
       tx_json.Fee = serverFeeDrops;

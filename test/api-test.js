@@ -11,7 +11,7 @@ describe('RippleAPI', function() {
   afterEach(setupAPI.teardown);
 
   it('preparePayment', function(done) {
-    const instructions = {lastLedgerOffset: 100};
+    const instructions = {maxLedgerVersionOffset: 100};
     this.api.preparePayment(address, paymentSpecification, instructions,
     (error, response) => {
       if (error) {
