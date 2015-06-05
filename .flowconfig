@@ -1,7 +1,11 @@
 [ignore]
+.*/src/.*
+.*/dist/.*
+.*/test/fixtures/.*
 
 [include]
 
 [libs]
 
 [options]
+module.system=node

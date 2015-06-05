@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-disable valid-jsdoc */
 'use strict';
 const BigNumber = require('bignumber.js');
@@ -77,7 +78,7 @@ function createPaymentTransaction(account, payment) {
       .plus(payment.source.slippage || 0).toString();
 
     if (payment.source_amount.currency === 'XRP') {
-      transaction.sendMax(utils.xrpToDrops(maxValue));
+      transaction.sendMax(utils.common.utils.xrpToDrops(maxValue));
     } else {
       transaction.sendMax({
         value: maxValue,

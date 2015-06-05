@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
@@ -34,9 +35,9 @@ function createOrderTransaction(account, order) {
   const _order = renameCounterpartyToIssuerInOrder(order);
   const transaction = new ripple.Transaction();
   const takerPays = _order.taker_pays.currency !== 'XRP'
-    ? _order.taker_pays : utils.xrpToDrops(_order.taker_pays.value);
+    ? _order.taker_pays : utils.common.xrpToDrops(_order.taker_pays.value);
   const takerGets = _order.taker_gets.currency !== 'XRP'
-    ? _order.taker_gets : utils.xrpToDrops(_order.taker_gets.value);
+    ? _order.taker_gets : utils.common.xrpToDrops(_order.taker_gets.value);
 
   transaction.offerCreate(account, ripple.Amount.from_json(takerPays),
     ripple.Amount.from_json(takerGets));

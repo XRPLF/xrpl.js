@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const utils = require('./utils');
 const ripple = utils.common.core;
@@ -37,7 +38,7 @@ function hashJSON(txJSON, prefix) {
   return hashSerialization(serialize(txJSON), prefix);
 }
 
-function signingHash(txJSON, isTestNet) {
+function signingHash(txJSON, isTestNet=false) {
   return hashJSON(txJSON, isTestNet ? HASH_TX_SIGN_TESTNET : HASH_TX_SIGN);
 }
 
@@ -46,11 +47,14 @@ function computeSignature(txJSON, keypair) {
   return ripple.sjcl.codec.hex.fromBits(signature).toUpperCase();
 }
 
-function sign(txJSON, secret) {
+/*:: type TxJSON = {Account: string; SigningPubKey: string,
+                    TxnSignature: string};
+     type Signed = {tx_blob: string; hash: string}; */
+function sign(txJSON: TxJSON, secret: string): Signed {
   validate.txJSON(txJSON);
   validate.addressAndSecret({address: txJSON.Account, secret: secret});
 
-  const keypair = getKeyPair(txJSON.Acccount, secret);
+  const keypair = getKeyPair(txJSON.Account, secret);
   if (txJSON.SigningPubKey === undefined) {
     txJSON.SigningPubKey = getPublicKeyHex(keypair);
   }
