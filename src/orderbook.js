@@ -1189,7 +1189,9 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
     this._currencyGets,
     this._currencyPays,
     this._legOneBook.getOffersSync(),
-    this._legTwoBook.getOffersSync()
+    this._legTwoBook.getOffersSync(),
+    this._issuerGets,
+    this._issuerPays
   );
 
   this._offersAutobridged = autobridgeCalculator.calculate();
