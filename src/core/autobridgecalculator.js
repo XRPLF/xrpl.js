@@ -18,9 +18,11 @@ function assertValidLegOneOffer(legOneOffer, message) {
 }
 
 function AutobridgeCalculator(currencyGets, currencyPays,
-  legOneOffers, legTwoOffers) {
+  legOneOffers, legTwoOffers, issuerGets, issuerPays) {
   this._currencyGets = currencyGets;
   this._currencyPays = currencyPays;
+  this._issuerGets = issuerGets;
+  this._issuerPays = issuerPays;
   this.legOneOffers = _.cloneDeep(legOneOffers);
   this.legTwoOffers = _.cloneDeep(legTwoOffers);
 
