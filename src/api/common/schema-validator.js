@@ -32,7 +32,7 @@ function loadSchemas(dir) {
 
 function formatSchemaError(error) {
   return error.field + ' ' + error.message
-    + (error.value ? ' (' + error.value + ')' : '');
+    + (error.value ? ' (' + JSON.stringify(error.value) + ')' : '');
 }
 
 function formatSchemaErrors(errors) {
@@ -42,7 +42,7 @@ function formatSchemaErrors(errors) {
 function schemaValidate(schemaName, object) {
   const formats = {address: isValidAddress,
                    ledgerHash: isValidLedgerHash};
-  const options = {schema: SCHEMAS, formats: formats,
+  const options = {schemas: SCHEMAS, formats: formats,
                    verbose: true, greedy: true};
   const schema = SCHEMAS[schemaName];
   if (schema === undefined) {

@@ -3,10 +3,9 @@
   "title": "settings",
   "type": "object",
   "properties": {
-    "address": {"$ref": "address"},
     "name": {"type": "string"},
     "value": {"type": "string"}
   },
-  "required": ["address", "name", "value"],
+  "required": ["name", "value"],
   "additionalProperties": false
 }

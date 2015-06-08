@@ -77,8 +77,8 @@ function createPaymentTransaction(account, payment) {
     const maxValue = new BigNumber(payment.source.amount.value)
       .plus(payment.source.slippage || 0).toString();
 
-    if (payment.source_amount.currency === 'XRP') {
-      transaction.sendMax(utils.common.utils.xrpToDrops(maxValue));
+    if (payment.source.amount.currency === 'XRP') {
+      transaction.sendMax(utils.common.xrpToDrops(maxValue));
     } else {
       transaction.sendMax({
         value: maxValue,

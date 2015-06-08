@@ -3,7 +3,6 @@
   "title": "trustline",
   "type": "object",
   "properties": {
-    "address": {"$ref": "address"},
     "currency": {"$ref": "currency"},
     "counterparty": {"$ref": "address"},
     "limit": {"$ref": "value"},
@@ -12,6 +11,6 @@
     "allowRippling": {"type": "boolean"},
     "frozen": {"type": "boolean"}
   },
-  "required": ["address", "currency", "counterparty", "limit"],
+  "required": ["currency", "counterparty", "limit"],
   "additionalProperties": false
 }
