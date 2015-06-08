@@ -55,36 +55,35 @@ function createTxJSON(transaction: any, remote: any,
 
   transaction.complete();
   const account = transaction.getAccount();
-  const tx_json = transaction.tx_json;
+  const txJSON = transaction.tx_json;
 
   if (instructions.maxLedgerVersion !== undefined) {
-    tx_json.LastLedgerSequence =
-      parseInt(instructions.maxLedgerVersion, 10);
+    txJSON.LastLedgerSequence = parseInt(instructions.maxLedgerVersion, 10);
   } else {
     const offset = instructions.maxLedgerVersionOffset !== undefined ?
       parseInt(instructions.maxLedgerVersionOffset, 10) : 3;
-    tx_json.LastLedgerSequence = remote.getLedgerSequence() + offset;
+    txJSON.LastLedgerSequence = remote.getLedgerSequence() + offset;
   }
 
   if (instructions.fee !== undefined) {
-    tx_json.Fee = common.xrpToDrops(instructions.fee);
+    txJSON.Fee = common.xrpToDrops(instructions.fee);
   } else {
     const serverFeeDrops = getFeeDrops(remote);
     if (instructions.maxFee !== undefined) {
       const maxFeeDrops = common.xrpToDrops(instructions.maxFee);
-      tx_json.Fee = BigNumber.min(serverFeeDrops, maxFeeDrops).toString();
+      txJSON.Fee = BigNumber.min(serverFeeDrops, maxFeeDrops).toString();
     } else {
-      tx_json.Fee = serverFeeDrops;
+      txJSON.Fee = serverFeeDrops;
     }
   }
 
   if (instructions.sequence !== undefined) {
-    tx_json.Sequence = parseInt(instructions.sequence, 10);
-    callback(null, {tx_json: tx_json});
+    txJSON.Sequence = parseInt(instructions.sequence, 10);
+    callback(null, txJSON);
   } else {
     remote.findAccount(account).getNextSequence(function(error, sequence) {
-      tx_json.Sequence = sequence;
-      callback(null, {tx_json: tx_json});
+      txJSON.Sequence = sequence;
+      callback(null, txJSON);
     });
   }
 }

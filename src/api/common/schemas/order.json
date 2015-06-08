@@ -3,7 +3,6 @@
   "title": "order",
   "type": "object",
   "properties": {
-    "address": {"$ref": "address"},
     "direction": {
       "type": "string",
       "enum": ["buy", "sell"]
@@ -17,7 +16,7 @@
       "type": "boolean"
     }
   },
-  "required": ["address", "direction", "quantity", "totalPrice"],
+  "required": ["direction", "quantity", "totalPrice"],
   "additionalProperties": false,
   "not": {
     "description": "immediateOrCancel and fillOrKill are mutually exclusive",

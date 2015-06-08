@@ -4,6 +4,8 @@ const setupAPI = require('./setup-api');
 const address = require('./fixtures/addresses').ACCOUNT;
 const paymentSpecification = require('./fixtures/payment-specification');
 const paymentResponse = require('./fixtures/payment-response');
+const orderSpecification = require('./fixtures/order-specification');
+const orderResponse = require('./fixtures/order-response');
 const balancesResponse = require('./fixtures/balances-response');
 
 describe('RippleAPI', function() {
@@ -19,6 +21,19 @@ describe('RippleAPI', function() {
         return;
       }
       assert.deepEqual(response, paymentResponse);
+      done();
+    });
+  });
+
+  it('prepareOrder', function(done) {
+    const instructions = {maxLedgerVersionOffset: 100};
+    this.api.prepareOrder(address, orderSpecification, instructions,
+    (error, response) => {
+      if (error) {
+        done(error);
+        return;
+      }
+      assert.deepEqual(response, orderResponse);
       done();
     });
   });
