@@ -37,32 +37,27 @@ const AccountRootFlags = {
 };
 
 const AccountRootFields = {
-  Sequence: {name: 'transaction_sequence'},
-  EmailHash: {name: 'email_hash', encoding: 'hex', length: 32, defaults: '0'},
-  WalletLocator: {name: 'wallet_locator', encoding: 'hex',
+  Sequence: {name: 'sequence'},
+  EmailHash: {name: 'emailHash', encoding: 'hex', length: 32, defaults: '0'},
+  WalletLocator: {name: 'walletLocator', encoding: 'hex',
                   length: 64, defaults: '0'},
-  WalletSize: {name: 'wallet_size', defaults: 0},
-  MessageKey: {name: 'message_key'},
+  WalletSize: {name: 'walletSize', defaults: 0},
+  MessageKey: {name: 'messageKey'},
   Domain: {name: 'domain', encoding: 'hex'},
-  TransferRate: {name: 'transfer_rate', defaults: 0},
+  TransferRate: {name: 'transferRate', defaults: 0},
   Signers: {name: 'signers'}
 };
 
 const AccountSetIntFlags = {
-  NoFreeze: {name: 'no_freeze',
-    value: ripple.Transaction.set_clear_flags.AccountSet.asfNoFreeze},
-  GlobalFreeze: {name: 'global_freeze',
-    value: ripple.Transaction.set_clear_flags.AccountSet.asfGlobalFreeze},
-  DefaultRipple: {name: 'default_ripple',
-    value: ripple.Transaction.set_clear_flags.AccountSet.asfDefaultRipple}
+  noFreeze: ripple.Transaction.set_clear_flags.AccountSet.asfNoFreeze,
+  globalFreeze: ripple.Transaction.set_clear_flags.AccountSet.asfGlobalFreeze,
+  defaultRipple: ripple.Transaction.set_clear_flags.AccountSet.asfDefaultRipple
 };
 
 const AccountSetFlags = {
-  RequireDestTag: {name: 'require_destination_tag', set: 'RequireDestTag',
-                   unset: 'OptionalDestTag'},
-  RequireAuth: {name: 'require_authorization', set: 'RequireAuth',
-                unset: 'OptionalAuth'},
-  DisallowXRP: {name: 'disallow_xrp', set: 'DisallowXRP', unset: 'AllowXRP'}
+  requireDestinationTag: {set: 'RequireDestTag', unset: 'OptionalDestTag'},
+  requireAuthorization: {set: 'RequireAuth', unset: 'OptionalAuth'},
+  disallowIncomingXRP: {set: 'DisallowXRP', unset: 'AllowXRP'}
 };
 
 const AccountSetResponseFlags = {

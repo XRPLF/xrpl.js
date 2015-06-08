@@ -42,7 +42,7 @@ module.exports = {
   addressAndSecret: validateAddressAndSecret,
   currency: _.partial(schemaValidate, 'currency'),
   identifier: _.partial(schemaValidate, 'hash256'),
-  sequence: _.partial(schemaValidate, 'natural'),
+  sequence: _.partial(schemaValidate, 'sequence'),
   order: _.partial(schemaValidate, 'order'),
   orderbook: _.partial(schemaValidate, 'orderbook'),
   payment: _.partial(schemaValidate, 'payment'),

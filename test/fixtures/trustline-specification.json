@@ -1,0 +1,9 @@
+{
+  "currency": "USD",
+  "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+  "limit": "10000",
+  "qualityIn": 500000000,
+  "qualityOut": 500000000,
+  "allowRippling": false,
+  "frozen": false
+}
