@@ -1,10 +1,10 @@
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert');
-var UInt160 = require('./uint160').UInt160;
-var Amount = require('./amount').Amount;
-var Utils = require('./orderbookutils');
+const _ = require('lodash');
+const assert = require('assert');
+const UInt160 = require('./uint160').UInt160;
+const Amount = require('./amount').Amount;
+const Utils = require('./orderbookutils');
 
 function assertValidNumber(number, message) {
   assert(!_.isNull(number) && !isNaN(number), message);
@@ -34,18 +34,18 @@ function AutobridgeCalculator(currencyGets, currencyPays,
  */
 
 AutobridgeCalculator.prototype.calculate = function() {
-  var legOnePointer = 0;
-  var legTwoPointer = 0;
+  let legOnePointer = 0;
+  let legTwoPointer = 0;
 
-  var offersAutobridged = [];
+  let offersAutobridged = [];
 
   this.clearOwnerFundsLeftover();
 
   while (this.legOneOffers[legOnePointer] && this.legTwoOffers[legTwoPointer]) {
-    var legOneOffer = this.legOneOffers[legOnePointer];
-    var legTwoOffer = this.legTwoOffers[legTwoPointer];
-    var leftoverFunds = this.getLeftoverOwnerFunds(legOneOffer.Account);
-    var autobridgedOffer;
+    const legOneOffer = this.legOneOffers[legOnePointer];
+    const legTwoOffer = this.legTwoOffers[legTwoPointer];
+    const leftoverFunds = this.getLeftoverOwnerFunds(legOneOffer.Account);
+    let autobridgedOffer;
 
     if (legOneOffer.Account === legTwoOffer.Account) {
       this.unclampLegOneOwnerFunds(legOneOffer);
@@ -53,8 +53,8 @@ AutobridgeCalculator.prototype.calculate = function() {
       this.adjustLegOneFundedAmount(legOneOffer);
     }
 
-    var legOneTakerGetsFunded = Utils.getOfferTakerGetsFunded(legOneOffer);
-    var legTwoTakerPaysFunded = Utils.getOfferTakerPaysFunded(legTwoOffer);
+    const legOneTakerGetsFunded = Utils.getOfferTakerGetsFunded(legOneOffer);
+    const legTwoTakerPaysFunded = Utils.getOfferTakerPaysFunded(legTwoOffer);
 
     if (legOneTakerGetsFunded.is_zero()) {
       legOnePointer++;
@@ -110,23 +110,23 @@ AutobridgeCalculator.prototype.calculate = function() {
 
 AutobridgeCalculator.prototype.getAutobridgedOfferWithClampedLegOne =
 function(legOneOffer, legTwoOffer) {
-  var legOneTakerGetsFunded = Utils.getOfferTakerGetsFunded(legOneOffer);
-  var legTwoTakerPaysFunded = Utils.getOfferTakerPaysFunded(legTwoOffer);
-  var legOneQuality = Utils.getOfferQuality(legOneOffer, this._currencyGets);
+  const legOneTakerGetsFunded = Utils.getOfferTakerGetsFunded(legOneOffer);
+  const legTwoTakerPaysFunded = Utils.getOfferTakerPaysFunded(legTwoOffer);
+  const legOneQuality = Utils.getOfferQuality(legOneOffer, this._currencyGets);
 
-  var autobridgedTakerGets = Utils.getOfferTakerGetsFunded(legTwoOffer);
-  var autobridgedTakerPays = legTwoTakerPaysFunded.multiply(legOneQuality);
+  const autobridgedTakerGets = Utils.getOfferTakerGetsFunded(legTwoOffer);
+  const autobridgedTakerPays = legTwoTakerPaysFunded.multiply(legOneQuality);
 
   if (legOneOffer.Account === legTwoOffer.Account) {
-    var legOneTakerGets = Utils.getOfferTakerGets(legOneOffer);
-    var updatedTakerGets = legOneTakerGets.subtract(legTwoTakerPaysFunded);
+    const legOneTakerGets = Utils.getOfferTakerGets(legOneOffer);
+    const updatedTakerGets = legOneTakerGets.subtract(legTwoTakerPaysFunded);
 
     this.setLegOneTakerGets(legOneOffer, updatedTakerGets);
 
     this.clampLegOneOwnerFunds(legOneOffer);
   } else {
     // Update funded amount since leg one offer was not completely consumed
-    var updatedTakerGetsFunded = legOneTakerGetsFunded
+    const updatedTakerGetsFunded = legOneTakerGetsFunded
       .subtract(legTwoTakerPaysFunded);
 
     this.setLegOneTakerGetsFunded(legOneOffer, updatedTakerGetsFunded);
@@ -150,12 +150,12 @@ function(legOneOffer, legTwoOffer) {
 
 AutobridgeCalculator.prototype.getAutobridgedOfferWithClampedLegTwo =
 function(legOneOffer, legTwoOffer) {
-  var legOneTakerGetsFunded = Utils.getOfferTakerGetsFunded(legOneOffer);
-  var legTwoTakerPaysFunded = Utils.getOfferTakerPaysFunded(legTwoOffer);
-  var legTwoQuality = Utils.getOfferQuality(legTwoOffer, this._currencyGets);
+  const legOneTakerGetsFunded = Utils.getOfferTakerGetsFunded(legOneOffer);
+  const legTwoTakerPaysFunded = Utils.getOfferTakerPaysFunded(legTwoOffer);
+  const legTwoQuality = Utils.getOfferQuality(legTwoOffer, this._currencyGets);
 
-  var autobridgedTakerGets = legOneTakerGetsFunded.divide(legTwoQuality);
-  var autobridgedTakerPays = Utils.getOfferTakerPaysFunded(legOneOffer);
+  const autobridgedTakerGets = legOneTakerGetsFunded.divide(legTwoQuality);
+  const autobridgedTakerPays = Utils.getOfferTakerPaysFunded(legOneOffer);
 
   // Update funded amount since leg two offer was not completely consumed
   legTwoOffer.taker_gets_funded = Utils.getOfferTakerGetsFunded(legTwoOffer)
@@ -182,8 +182,8 @@ function(legOneOffer, legTwoOffer) {
 
 AutobridgeCalculator.prototype.getAutobridgedOfferWithoutClamps =
 function(legOneOffer, legTwoOffer) {
-  var autobridgedTakerGets = Utils.getOfferTakerGetsFunded(legTwoOffer);
-  var autobridgedTakerPays = Utils.getOfferTakerPaysFunded(legOneOffer);
+  const autobridgedTakerGets = Utils.getOfferTakerGetsFunded(legTwoOffer);
+  const autobridgedTakerPays = Utils.getOfferTakerPaysFunded(legOneOffer);
 
   return this.formatAutobridgedOffer(
     autobridgedTakerGets,
@@ -226,7 +226,7 @@ AutobridgeCalculator.prototype.resetOwnerFundsLeftover = function(account) {
 AutobridgeCalculator.prototype.getLeftoverOwnerFunds = function(account) {
   assert(UInt160.is_valid(account), 'Account is invalid');
 
-  var amount = this._ownerFundsLeftover[account];
+  let amount = this._ownerFundsLeftover[account];
 
   if (!amount) {
     amount = Utils.normalizeAmount('0');
@@ -284,8 +284,8 @@ function(takerGets, takerPays) {
   assert(takerGets instanceof Amount, 'Autobridged taker gets is invalid');
   assert(takerPays instanceof Amount, 'Autobridged taker pays is invalid');
 
-  var autobridgedOffer = {};
-  var quality = takerPays.divide(takerGets);
+  const autobridgedOffer = {};
+  const quality = takerPays.divide(takerGets);
 
   autobridgedOffer.TakerGets = {
     value: takerGets.to_text(),
@@ -348,13 +348,13 @@ AutobridgeCalculator.prototype.unclampLegOneOwnerFunds = function(legOneOffer) {
 AutobridgeCalculator.prototype.clampLegOneOwnerFunds = function(legOneOffer) {
   assertValidLegOneOffer(legOneOffer, 'Leg one offer is invalid');
 
-  var takerGets = Utils.getOfferTakerGets(legOneOffer);
+  const takerGets = Utils.getOfferTakerGets(legOneOffer);
 
   if (takerGets.compareTo(legOneOffer.initTakerGetsFunded) > 0) {
     // After clamping, TakerGets is still greater than initial funded amount
     this.setLegOneTakerGetsFunded(legOneOffer, legOneOffer.initTakerGetsFunded);
   } else {
-    var updatedLeftover = legOneOffer.initTakerGetsFunded.subtract(takerGets);
+    const updatedLeftover = legOneOffer.initTakerGetsFunded.subtract(takerGets);
 
     this.setLegOneTakerGetsFunded(legOneOffer, takerGets);
     this.addLeftoverOwnerFunds(legOneOffer.Account, updatedLeftover);
@@ -373,13 +373,13 @@ function(legOneOffer) {
   assertValidLegOneOffer(legOneOffer, 'Leg one offer is invalid');
   assert(!legOneOffer.is_fully_funded, 'Leg one offer cannot be fully funded');
 
-  var fundedSum = Utils.getOfferTakerGetsFunded(legOneOffer)
+  const fundedSum = Utils.getOfferTakerGetsFunded(legOneOffer)
     .add(this.getLeftoverOwnerFunds(legOneOffer.Account));
 
   if (fundedSum.compareTo(Utils.getOfferTakerGets(legOneOffer)) >= 0) {
     // There are enough extra funds to fully fund the offer
-    var legOneTakerGets = Utils.getOfferTakerGets(legOneOffer);
-    var updatedLeftover = fundedSum.subtract(legOneTakerGets);
+    const legOneTakerGets = Utils.getOfferTakerGets(legOneOffer);
+    const updatedLeftover = fundedSum.subtract(legOneTakerGets);
 
     this.setLegOneTakerGetsFunded(legOneOffer, legOneTakerGets);
     this.setLeftoverOwnerFunds(legOneOffer.Account, updatedLeftover);
@@ -426,7 +426,7 @@ function(legOneOffer, takerGets) {
   assertValidLegOneOffer(legOneOffer, 'Leg one offer is invalid');
   assert(takerGets instanceof Amount, 'Taker gets funded is invalid');
 
-  var legOneQuality = Utils.getOfferQuality(legOneOffer, this._currencyGets);
+  const legOneQuality = Utils.getOfferQuality(legOneOffer, this._currencyGets);
 
   legOneOffer.TakerGets = takerGets.to_text();
   legOneOffer.TakerPays = takerGets.multiply(legOneQuality);
