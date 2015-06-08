@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-disable valid-jsdoc */
 'use strict';
 const _ = require('lodash');

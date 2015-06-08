@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-disable valid-jsdoc */
 'use strict';
 const BigNumber = require('bignumber.js');
@@ -18,7 +19,8 @@ const common = require('../common');
  *
  * @returns undefined
  */
-function setTransactionBitFlags(transaction, options) {
+/*:: type FlagOptions = {flags: any; input: any; clear_setting?: string} */
+function setTransactionBitFlags(transaction: any, options: FlagOptions): void {
   for (let flagName in options.flags) {
     const flag = options.flags[flagName];
 
@@ -46,7 +48,9 @@ function getFeeDrops(remote) {
   return remote.feeTx(feeUnits).to_text();
 }
 
-function createTxJSON(transaction, remote, instructions, callback) {
+/*:: type Callback = (err: typeof Error, data: {tx_json: any}) => void */
+function createTxJSON(transaction: any, remote: any,
+    instructions: any, callback: Callback): void {
   common.validate.instructions(instructions);
 
   transaction.complete();
@@ -85,12 +89,12 @@ function createTxJSON(transaction, remote, instructions, callback) {
   }
 }
 
-function wrapCatch(asyncFunction) {
+function wrapCatch(asyncFunction: any): any {
   return function() {
-    const callback = arguments[arguments.length - 1];
     try {
       asyncFunction.apply(this, arguments);
     } catch (error) {
+      const callback = arguments[arguments.length - 1];
       callback(error);
     }
   };
