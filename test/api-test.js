@@ -19,6 +19,7 @@ const signInput = require('./fixtures/sign-input');
 const signOutput = require('./fixtures/sign-output');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
+const submitResponse = require('./fixtures/submit-response');
 
 function checkResult(expected, done, error, response) {
   if (error) {
@@ -72,6 +73,11 @@ describe('RippleAPI', function() {
       const result = this.api.sign(signInput, secret);
       assert.deepEqual(result, signOutput);
     });
+  });
+
+  it('submit', function(done) {
+    this.api.submit(signOutput.signedTransaction,
+      _.partial(checkResult, submitResponse, done));
   });
 
   it('getBalances', function(done) {

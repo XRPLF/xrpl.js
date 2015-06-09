@@ -697,3 +697,19 @@ module.exports.serverInfoResponse = function(request) {
     }
   });
 };
+
+module.exports.submitResponse = function(request) {
+  return JSON.stringify({
+    id: request.id,
+    status: 'success',
+    type: 'response',
+    result: {
+      success: true,
+      engine_result: 'tesSUCCESS',
+      engine_result_code: 0,
+      engine_result_message: 'The transaction was applied. Only final in a validated ledger.',
+      tx_blob: request.tx_blob,
+      tx_json: {}     // stubbed out for simplicity, not needed for testing
+    }
+  });
+};
