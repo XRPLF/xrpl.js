@@ -2,7 +2,6 @@
 /* eslint-disable valid-jsdoc */
 'use strict';
 const _ = require('lodash');
-const assert = require('assert');
 const utils = require('./utils');
 const ripple = utils.common.core;
 const validate = utils.common.validate;
@@ -11,26 +10,6 @@ const InvalidRequestError = utils.common.errors.InvalidRequestError;
 
 // Emptry string passed to setting will clear it
 const CLEAR_SETTING = '';
-
-/**
- * Pad the value of a fixed-length field
- *
- * @param {String} value
- * @param {Number} length
- * @return {String}
- */
-function padValue(value, length) {
-  assert.strictEqual(typeof value, 'string');
-  assert.strictEqual(typeof length, 'number');
-
-  let result = value;
-
-  while (result.length < length) {
-    result = '0' + result;
-  }
-
-  return result;
-}
 
 /**
  * Set integer flags on a transaction based on input and a flag map
@@ -43,20 +22,15 @@ function padValue(value, length) {
  *
  * @returns undefined
  */
-function setTransactionIntFlags(transaction, input, flags) {
+function setTransactionIntFlags(transaction, values, flags) {
   for (let flagName in flags) {
-    const flag = flags[flagName];
+    const value = values[flagName];
+    const code = flags[flagName];
 
-    if (!input.hasOwnProperty(flag.name)) {
-      continue;
-    }
-
-    const value = input[flag.name];
-
-    if (value) {
-      transaction.tx_json.SetFlag = flag.value;
-    } else {
-      transaction.tx_json.ClearFlag = flag.value;
+    if (value === true) {
+      transaction.tx_json.SetFlag = code;
+    } else if (value === false) {
+      transaction.tx_json.ClearFlag = code;
     }
   }
 }
@@ -95,7 +69,7 @@ function setTransactionFields(transaction, input, fieldSchema) {
           throw new InvalidRequestError(
             'Parameter length exceeded: ' + fieldName);
         } else if (value.length < field.length) {
-          value = padValue(value, field.length);
+          value = _.padLeft(value, field.length);
         }
       } else {
         // Field is variable length. Expecting an ascii string as input.
@@ -139,16 +113,15 @@ function createSettingsTransaction(account, settings) {
   const transaction = new ripple.Transaction();
   transaction.accountSet(account);
 
-  utils.setTransactionBitFlags(transaction, {
-    input: settings,
-    flags: constants.AccountSetFlags,
-    clear_setting: CLEAR_SETTING
-  });
+  utils.setTransactionBitFlags(transaction, settings,
+    constants.AccountSetFlags);
   setTransactionIntFlags(transaction, settings, constants.AccountSetIntFlags);
   setTransactionFields(transaction, settings, constants.AccountRootFields);
 
-  transaction.tx_json.TransferRate = convertTransferRate(
-    transaction.tx_json.TransferRate);
+  if (transaction.tx_json.TransferRate !== undefined) {
+    transaction.tx_json.TransferRate = convertTransferRate(
+      transaction.tx_json.TransferRate);
+  }
   return transaction;
 }
 

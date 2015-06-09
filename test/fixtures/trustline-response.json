@@ -1,0 +1,15 @@
+{
+  "Flags": 131072,
+  "TransactionType": "TrustSet",
+  "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+  "LimitAmount": {
+    "value": "10000",
+    "currency": "USD",
+    "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+  },
+  "QualityIn": 500000000,
+  "QualityOut": 500000000,
+  "LastLedgerSequence": 8820052,
+  "Fee": "12",
+  "Sequence": 23
+}

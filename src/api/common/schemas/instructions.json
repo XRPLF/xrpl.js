@@ -6,8 +6,7 @@
   "properties": {
     "sequence": {
       "description": "The sequence number, relative to the initiating account, of this transaction.",
-      "type": "integer",
-      "minimum": 1
+      "$ref": "sequence"
     },
     "fee": {
       "description": "Fixed Fee",

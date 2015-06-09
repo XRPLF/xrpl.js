@@ -345,13 +345,11 @@ function parseTrustLineResponse(message, meta) {
 function parseSettingsResponse(settings, message, meta) {
   const _settings = {};
   for (let flagName in constants.AccountSetIntFlags) {
-    const flag = constants.AccountSetIntFlags[flagName];
-    _settings[flag.name] = settings[flag.name];
+    _settings[flagName] = settings[flagName];
   }
 
   for (let fieldName in constants.AccountRootFields) {
-    const field = constants.AccountRootFields[fieldName];
-    _settings[field.name] = settings[field.name];
+    _settings[fieldName] = settings[fieldName];
   }
 
   _.assign(_settings, parseFlagsFromResponse(message.tx_json.Flags,

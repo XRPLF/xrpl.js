@@ -3,10 +3,7 @@
   "title": "cancellation",
   "type": "object",
   "properties": {
-    "orderSequence": {
-      "type": "integer",
-      "minimum": 0
-    }
+    "orderSequence": {"$ref": "sequence"}
   },
   "required": ["orderSequence"],
   "additionalProperties": false

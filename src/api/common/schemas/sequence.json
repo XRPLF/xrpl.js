@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "ledgerVersion",
-  "description": "A ledger version number",
+  "title": "sequence",
+  "description": "An account transaction sequence number",
   "type": "integer",
   "minimum": 1
 }

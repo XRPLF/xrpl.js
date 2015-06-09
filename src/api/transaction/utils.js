@@ -19,26 +19,17 @@ const common = require('../common');
  *
  * @returns undefined
  */
-/*:: type FlagOptions = {flags: any; input: any; clear_setting?: string} */
-function setTransactionBitFlags(transaction: any, options: FlagOptions): void {
-  for (let flagName in options.flags) {
-    const flag = options.flags[flagName];
+function setTransactionBitFlags(transaction: any, values: any, flags: any):
+    void {
+  for (let flagName in flags) {
+    const flagValue = values[flagName];
+    const flagConversions = flags[flagName];
 
-    // Set transaction flags
-    if (!(flag.name in options.input)) {
-      continue;
+    if (flagValue === true && flagConversions.set !== undefined) {
+      transaction.setFlags(flagConversions.set);
     }
-
-    let value = options.input[flag.name];
-
-    if (value === options.clear_setting) {
-      value = false;
-    }
-
-    if (flag.unset) {
-      transaction.setFlags(value ? flag.set : flag.unset);
-    } else if (flag.set && value) {
-      transaction.setFlags(flag.set);
+    if (flagValue === false && flagConversions.unset !== undefined) {
+      transaction.setFlags(flagConversions.unset);
     }
   }
 }

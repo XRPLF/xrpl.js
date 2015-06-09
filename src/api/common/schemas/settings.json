@@ -3,9 +3,22 @@
   "title": "settings",
   "type": "object",
   "properties": {
-    "name": {"type": "string"},
-    "value": {"type": "string"}
+    "passwordSpent": {"type": "boolean"},
+    "requireDestinationTag": {"type": "boolean"},
+    "requireAuthorization": {"type": "boolean"},
+    "disallowIncomingXRP": {"type": "boolean"},
+    "disableMasterKey": {"type": "boolean"},
+    "noFreeze": {"type": "boolean"},
+    "globalFreeze": {"type": "boolean"},
+    "defaultRipple": {"type": "boolean"},
+    "emailHash": {"type": "string"},
+    "walletLocator": {"$ref": "hash256"},
+    "walletSize": {"type": "integer"},
+    "messageKey": {"type": "string"},
+    "domain": {"type": "string"},
+    "transferRate": {"type": "integer"},
+    "signers": {"type": "string"}
   },
-  "required": ["name", "value"],
+  "minProperties": 1,
   "additionalProperties": false
 }

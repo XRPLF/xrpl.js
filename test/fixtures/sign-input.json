@@ -1,0 +1,9 @@
+{
+  "Flags": 0,
+  "TransactionType": "AccountSet",
+  "Account": "r3GgMwvgvP8h4yVWvjH1dPZNvC37TjzBBE",
+  "Domain": "726970706C652E636F6D",
+  "LastLedgerSequence": 8820052,
+  "Fee": "12",
+  "Sequence": 23
+}

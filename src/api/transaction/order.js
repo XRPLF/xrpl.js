@@ -17,9 +17,9 @@ function renameCounterpartyToIssuer(amount) {
 }
 
 const OfferCreateFlags = {
-  Passive: {name: 'passive', set: 'Passive'},
-  ImmediateOrCancel: {name: 'immediateOrCancel', set: 'ImmediateOrCancel'},
-  FillOrKill: {name: 'fillOrKill', set: 'FillOrKill'}
+  passive: {set: 'Passive'},
+  immediateOrCancel: {set: 'ImmediateOrCancel'},
+  fillOrKill: {set: 'FillOrKill'}
 };
 
 function toRippledAmount(amount) {
@@ -37,17 +37,13 @@ function createOrderTransaction(account, order) {
   const takerGets = toRippledAmount(order.direction === 'buy' ?
     order.totalPrice : order.quantity);
 
-  transaction.offerCreate(account, ripple.Amount.from_json(takerPays),
-    ripple.Amount.from_json(takerGets));
+  transaction.offerCreate(account, takerPays, takerGets);
 
-  utils.setTransactionBitFlags(transaction, {
-    input: order,
-    flags: OfferCreateFlags
-  });
-
+  utils.setTransactionBitFlags(transaction, order, OfferCreateFlags);
   if (order.direction === 'sell') {
     transaction.setFlags('Sell');
   }
+
   return transaction;
 }
 
