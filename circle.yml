@@ -1,18 +1,7 @@
 machine:
   node:
     version: 0.12.0
-dependencies:
-  post:
-    - npm install -g eslint
-    - npm install -g esprima-fb   # allow flow type annotations in eslint
-    - npm install -g flow-bin
 test:
-  pre:
-    - curl 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc' > ./eslintrc
-    - 'echo "parser: esprima-fb" >> ./eslintrc'
-    - eslint --reset -c ./eslintrc $(git --no-pager diff --name-only -M100% --diff-filter=AM --relative $(git merge-base FETCH_HEAD origin/HEAD) FETCH_HEAD | grep "\.js$")
-    - npm run typecheck
   override:
-    - npm test --coverage
-  post:
-    - npm run coveralls
+    - bin/ci.sh "$CIRCLE_NODE_INDEX" "$CIRCLE_NODE_TOTAL":
+        parallel: true

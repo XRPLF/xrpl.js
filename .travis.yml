@@ -2,16 +2,6 @@ sudo: false       # use faster docker containers
 language: node_js
 node_js:
   - "0.12"
-before_script:
-  - npm install -g eslint
-  - npm install -g esprima-fb   # allow flow type annotations in eslint
-  - curl 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc' > ./eslintrc
-  - 'echo "parser: esprima-fb" >> ./eslintrc'
-  - eslint --reset -c ./eslintrc $(git --no-pager diff --name-only -M100% --diff-filter=AM --relative $(git merge-base FETCH_HEAD origin/HEAD) FETCH_HEAD | grep "\.js$")
-  - npm install -g flow-bin
-  - npm run typecheck
-script: MOCHA_REPORTER=tap npm test --coverage
-after_success:
-- npm run coveralls
+script: bin/ci.sh
 notifications:
   email: false
