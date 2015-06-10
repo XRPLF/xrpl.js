@@ -553,6 +553,36 @@ describe('Transaction', function() {
     done();
   });
 
+  describe('ed25519 signing', function() {
+    it('can accept an ed25519 seed for ._secret', function() {
+      const expectedPub = 'EDD3993CDC6647896C455F136648B7750' +
+                          '723B011475547AF60691AA3D7438E021D';
+
+      const expectedSig = 'C3646313B08EED6AF4392261A31B961F' +
+                          '10C66CB733DB7F6CD9EAB079857834C8' +
+                          'B0334270A2C037E63CDCCC1932E08328' +
+                          '82B7B7066ECD2FAEDEB4A83DF8AE6303';
+
+      const tx_json = {
+        Account: 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN',
+        Amount: '1000',
+        Destination: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        Fee: '10',
+        Flags: 2147483648,
+        Sequence: 1,
+        TransactionType: 'Payment'
+      };
+
+      const tx = Transaction.from_json(tx_json);
+      tx.setSecret('sEd7rBGm5kxzauRTAV2hbsNz7N45X91');
+      tx.complete();
+      tx.sign();
+
+      assert.strictEqual(tx_json.SigningPubKey, expectedPub);
+      assert.strictEqual(tx_json.TxnSignature, expectedSig);
+    });
+  });
+
   describe('signing', function() {
     const tx_json = {
       SigningPubKey: '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED',
