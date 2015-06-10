@@ -25,6 +25,8 @@
     "lodash": "^3.1.0",
     "lru-cache": "~2.5.0",
     "ripple-lib-transactionparser": "^0.5.0",
+    "ripple-address-codec": "^1.6.0",
+    "ripple-keypairs": "^0.7.3",
     "ripple-wallet-generator": "^1.0.3",
     "sjcl-extended": "ripple/sjcl-extended#1.0.3",
     "ws": "~0.7.1"
@@ -59,7 +61,7 @@
     "prepublish": "npm run clean && npm run compile",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; echo 'plugins:\n  - flowtype' >> eslintrc; fi; eslint --reset -c eslintrc src/",
+    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; echo 'plugins:\n  - flowtype' >> eslintrc; fi; eslint -c eslintrc src/",
     "perf": "./scripts/perf_test.sh"
   },
   "repository": {

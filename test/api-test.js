@@ -151,11 +151,9 @@ describe('RippleAPI', function() {
 
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
-    withDeterministicPRNG(() => {
-      const result = this.api.sign(requests.sign, secret);
-      assert.deepEqual(result, responses.sign);
-      schemaValidator.schemaValidate('sign', result);
-    });
+    const result = this.api.sign(requests.sign, secret);
+    assert.deepEqual(result, responses.sign);
+    schemaValidator.schemaValidate('sign', result);
   });
 
   it('submit', function() {
@@ -647,21 +645,14 @@ describe('RippleAPI', function() {
     });
 
     it('addressAndSecret', function() {
-      const wrongSecret = {address: address,
-        secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
-      };
-      assert.throws(_.partial(validate.addressAndSecret, wrongSecret),
-        this.api.errors.ValidationError);
       const noSecret = {address: address};
       assert.throws(_.partial(validate.addressAndSecret, noSecret),
         this.api.errors.ValidationError);
       assert.throws(_.partial(validate.addressAndSecret, noSecret),
         /Parameter missing/);
-      const badSecret = {address: address, secret: 'bad'};
+      const badSecret = {address: address, secret: 'sbad'};
       assert.throws(_.partial(validate.addressAndSecret, badSecret),
         this.api.errors.ValidationError);
-      assert.throws(_.partial(validate.addressAndSecret, badSecret),
-        /not match/);
       const goodWallet = {address: 'rpZMK8hwyrBvLorFNWHRCGt88nCJWbixur',
         secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
       };

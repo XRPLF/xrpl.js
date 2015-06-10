@@ -15,15 +15,13 @@ const validate = utils.common.validate;
  * some arbitrary string. For example "TXN".
  */
 const HASH_TX_ID = 0x54584E00; // 'TXN'
-const HASH_TX_SIGN = 0x53545800; // 'STX'
-const HASH_TX_SIGN_TESTNET = 0x73747800; // 'stx'
 
 function getKeyPair(secret) {
   return core.Seed.from_json(secret).get_key();
 }
 
 function getPublicKeyHex(keypair) {
-  return keypair.to_hex_pub();
+  return keypair.pubKeyHex();
 }
 
 function serialize(txJSON) {
@@ -34,17 +32,12 @@ function hashSerialization(serialized, prefix) {
   return serialized.hash(prefix || HASH_TX_ID).to_hex();
 }
 
-function hashJSON(txJSON, prefix) {
-  return hashSerialization(serialize(txJSON), prefix);
-}
-
-function signingHash(txJSON, isTestNet=false) {
-  return hashJSON(txJSON, isTestNet ? HASH_TX_SIGN_TESTNET : HASH_TX_SIGN);
+function signingData(txJSON) {
+  return core.Transaction.from_json(txJSON).signingData().buffer;
 }
 
 function computeSignature(txJSON, keypair) {
-  const signature = keypair.sign(signingHash(txJSON));
-  return core.sjcl.codec.hex.fromBits(signature).toUpperCase();
+  return keypair.signHex(signingData(txJSON));
 }
 
 function sign(txJSON: {Account: string; SigningPubKey: string,
