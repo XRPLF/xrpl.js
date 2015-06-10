@@ -21,7 +21,7 @@ const common = require('../common');
  */
 function setTransactionBitFlags(transaction: any, values: any, flags: any):
     void {
-  for (let flagName in flags) {
+  for (const flagName in flags) {
     const flagValue = values[flagName];
     const flagConversions = flags[flagName];
 
@@ -79,20 +79,9 @@ function createTxJSON(transaction: any, remote: any,
   }
 }
 
-function wrapCatch(asyncFunction: any): any {
-  return function() {
-    try {
-      asyncFunction.apply(this, arguments);
-    } catch (error) {
-      const callback = arguments[arguments.length - 1];
-      callback(error);
-    }
-  };
-}
-
 module.exports = {
   setTransactionBitFlags: setTransactionBitFlags,
   createTxJSON: createTxJSON,
-  wrapCatch: wrapCatch,
+  wrapCatch: common.wrapCatch,
   common: common
 };

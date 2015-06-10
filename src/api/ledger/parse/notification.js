@@ -1,6 +1,6 @@
 /* eslint-disable valid-jsdoc */
 'use strict';
-const ripple = require('./utils').common.core;
+const ripple = require('../utils').common.core;
 
 /**
  * Convert a Ripple transaction in the JSON format,

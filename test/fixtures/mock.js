@@ -638,7 +638,8 @@ const BINARY_TRANSACTION_SYNTH = module.exports.BINARY_TRANSACTION_SYNTH = {
   date: 416447810,
   hash: 'F4AB442A6D4CBB935D66E1DA7309A5FC71C7143ED4049053EC14E3875B0CF9BF',
   inLedger: 348860,
-  ledger_index: 348860
+  ledger_index: 348860,
+  validated: true
 };
 
 module.exports.transactionResponse = function(request) {

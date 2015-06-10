@@ -2,35 +2,28 @@
 /* eslint-disable valid-jsdoc */
 'use strict';
 const _ = require('lodash');
+const assert = require('assert');
 const utils = require('./utils');
 const ripple = utils.common.core;
 const validate = utils.common.validate;
-const constants = utils.common.constants;
-const InvalidRequestError = utils.common.errors.InvalidRequestError;
+const AccountFlagIndices = utils.common.constants.AccountFlagIndices;
+const AccountFields = utils.common.constants.AccountFields;
+const ValidationError = utils.common.errors.ValidationError;
 
 // Emptry string passed to setting will clear it
 const CLEAR_SETTING = '';
 
-/**
- * Set integer flags on a transaction based on input and a flag map
- *
- * @param {Transaction} transaction
- * @param {Object} input - Object whose properties determine whether
- *                to update the transaction's SetFlag or ClearFlag property
- * @param {Object} flags - Object that maps property names to transaction
- *                integer flag values
- *
- * @returns undefined
- */
-function setTransactionIntFlags(transaction, values, flags) {
-  for (let flagName in flags) {
-    const value = values[flagName];
-    const code = flags[flagName];
-
-    if (value === true) {
-      transaction.tx_json.SetFlag = code;
-    } else if (value === false) {
-      transaction.tx_json.ClearFlag = code;
+function setTransactionFlags(transaction, values) {
+  const keys = Object.keys(values);
+  assert(keys.length === 1, 'ERROR: can only set one setting per transaction');
+  const flagName = keys[0];
+  const value = values[flagName];
+  const index = AccountFlagIndices[flagName];
+  if (index !== undefined) {
+    if (value) {
+      transaction.tx_json.SetFlag = index;
+    } else {
+      transaction.tx_json.ClearFlag = index;
     }
   }
 }
@@ -45,8 +38,9 @@ function setTransactionIntFlags(transaction, values, flags) {
  *
  * @returns undefined
  */
-function setTransactionFields(transaction, input, fieldSchema) {
-  for (let fieldName in fieldSchema) {
+function setTransactionFields(transaction, input) {
+  const fieldSchema = AccountFields;
+  for (const fieldName in fieldSchema) {
     const field = fieldSchema[fieldName];
     let value = input[field.name];
 
@@ -66,8 +60,7 @@ function setTransactionFields(transaction, input, fieldSchema) {
         // Field is fixed length, why are we checking here though?
         // We could move this to validateInputs
         if (value.length > field.length) {
-          throw new InvalidRequestError(
-            'Parameter length exceeded: ' + fieldName);
+          throw new ValidationError('Parameter length exceeded: ' + fieldName);
         } else if (value.length < field.length) {
           value = _.padLeft(value, field.length);
         }
@@ -113,10 +106,8 @@ function createSettingsTransaction(account, settings) {
   const transaction = new ripple.Transaction();
   transaction.accountSet(account);
 
-  utils.setTransactionBitFlags(transaction, settings,
-    constants.AccountSetFlags);
-  setTransactionIntFlags(transaction, settings, constants.AccountSetIntFlags);
-  setTransactionFields(transaction, settings, constants.AccountRootFields);
+  setTransactionFlags(transaction, settings);
+  setTransactionFields(transaction, settings);
 
   if (transaction.tx_json.TransferRate !== undefined) {
     transaction.tx_json.TransferRate = convertTransferRate(

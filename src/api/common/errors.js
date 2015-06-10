@@ -51,6 +51,12 @@ function NotFoundError(message) {
 NotFoundError.prototype = new RippleError();
 NotFoundError.prototype.name = 'NotFoundError';
 
+function MissingLedgerHistoryError(message) {
+  this.message = message;
+}
+MissingLedgerHistoryError.prototype = new RippleError();
+MissingLedgerHistoryError.prototype.name = 'MissingLedgerHistoryError';
+
 /**
  * Request timed out
  */
@@ -75,6 +81,7 @@ module.exports = {
   TransactionError: TransactionError,
   RippledNetworkError: RippledNetworkError,
   NotFoundError: NotFoundError,
+  MissingLedgerHistoryError: MissingLedgerHistoryError,
   TimeOutError: TimeOutError,
   ApiError: ApiError,
   RippleError: RippleError

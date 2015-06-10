@@ -9,5 +9,6 @@ module.exports = {
   server: require('./server'),
   dropsToXrp: utils.dropsToXrp,
   xrpToDrops: utils.xrpToDrops,
-  convertAmount: utils.convertAmount
+  toRippledAmount: utils.toRippledAmount,
+  wrapCatch: utils.wrapCatch
 };

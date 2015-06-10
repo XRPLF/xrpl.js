@@ -9,7 +9,7 @@ function xrpToDrops(xrp) {
   return (new BigNumber(xrp)).times(1000000.0).floor().toString();
 }
 
-function convertAmount(amount) {
+function toRippledAmount(amount) {
   if (amount.currency === 'XRP') {
     return xrpToDrops(amount.value);
   }
@@ -20,8 +20,20 @@ function convertAmount(amount) {
   };
 }
 
+function wrapCatch(asyncFunction: () => void): () => void {
+  return function() {
+    try {
+      asyncFunction.apply(this, arguments);
+    } catch (error) {
+      const callback = arguments[arguments.length - 1];
+      callback(error);
+    }
+  };
+}
+
 module.exports = {
-  dropsToXrp: dropsToXrp,
-  xrpToDrops: xrpToDrops,
-  convertAmount: convertAmount
+  dropsToXrp,
+  xrpToDrops,
+  toRippledAmount,
+  wrapCatch
 };

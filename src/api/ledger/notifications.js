@@ -3,8 +3,8 @@
 const _ = require('lodash');
 const async = require('async');
 const transactions = require('./transactions');
-const NotificationParser = require('./notification_parser.js');
-const utils = require('./utils.js');
+const NotificationParser = require('./parse/notification');
+const utils = require('./utils');
 const validate = utils.common.validate;
 const server = utils.common.server;
 

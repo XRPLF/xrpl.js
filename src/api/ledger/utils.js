@@ -43,30 +43,6 @@ function parseLedger(ledger) {
   return 'validated';
 }
 
-function parseCurrencyAmount(rippledAmount, useIssuer) {
-  const amount = {};
-
-  if (typeof rippledAmount === 'string') {
-    amount.currency = 'XRP';
-    amount.value = common.dropsToXrp(rippledAmount);
-    if (useIssuer) {
-      amount.issuer = '';
-    } else {
-      amount.counterparty = '';
-    }
-  } else {
-    amount.currency = rippledAmount.currency;
-    amount.value = rippledAmount.value;
-    if (useIssuer) {
-      amount.issuer = rippledAmount.issuer;
-    } else {
-      amount.counterparty = rippledAmount.issuer;
-    }
-  }
-
-  return amount;
-}
-
 function signum(num) {
   return (num === 0) ? 0 : (num > 0 ? 1 : -1);
 }
@@ -121,11 +97,11 @@ function attachDate(api, baseTransactions, callback) {
 
 module.exports = {
   parseLedger: parseLedger,
-  parseCurrencyAmount: parseCurrencyAmount,
   compareTransactions: compareTransactions,
   renameCounterpartyToIssuer: renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder: renameCounterpartyToIssuerInOrder,
   attachDate: attachDate,
+  wrapCatch: common.wrapCatch,
   common: common
 };
 
