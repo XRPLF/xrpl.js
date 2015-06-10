@@ -255,7 +255,7 @@ OrderBook.prototype.unsubscribe = function() {
  * @param {Function} callback
  */
 
-OrderBook.prototype.requestOffers = function(callback) {
+OrderBook.prototype.requestOffers = function(callback=function() {}) {
   const self = this;
 
   if (!this._shouldSubscribe) {
@@ -1207,6 +1207,8 @@ OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
   const self = this;
 
   if (_.isEmpty(this._offers) && _.isEmpty(this._offersAutobridged)) {
+    // still emit empty offers list to indicate that load is completed
+    this.emit('model', []);
     return;
   }
 
