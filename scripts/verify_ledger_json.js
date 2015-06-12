@@ -3,7 +3,7 @@
 
 var fs = require('fs');
 var Amount = require('../dist/npm').Amount;
-var Ledger = require('../dist/npm/ledger').Ledger;
+var Ledger = require('../dist/npm').Ledger;
 
 function parse_options(from, flags) {
   var argv = from.slice(),

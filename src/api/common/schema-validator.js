@@ -24,8 +24,12 @@ function loadSchema(filepath) {
   }
 }
 
+function endsWith(str, suffix) {
+  return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
 function loadSchemas(dir) {
-  const filenames = fs.readdirSync(dir).filter(name => name.endsWith('.json'));
+  const filenames = fs.readdirSync(dir).filter(name => endsWith(name, '.json'));
   const schemas = filenames.map(name => loadSchema(path.join(dir, name)));
   return _.indexBy(schemas, 'title');
 }

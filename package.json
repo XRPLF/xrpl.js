@@ -47,9 +47,9 @@
   "scripts": {
     "build": "gulp",
     "clean": "rm -rf dist/npm && rm -rf build/flow",
-    "typecheck": "babel -i runtime --blacklist flow -d build/flow/ src/ && flow",
-    "compile": "babel -i runtime -d dist/npm/ src/",
-    "compile-with-source-maps": "babel -i runtime -s -t -d dist/npm/ src/",
+    "typecheck": "babel --optional runtime --blacklist flow -d build/flow/ src/ && flow",
+    "compile": "babel --optional runtime -d dist/npm/ src/ && cp -r src/api/common/schemas/ dist/npm/api/common/schemas/",
+    "compile-with-source-maps": "babel --optional runtime -s -t -d dist/npm/ src/",
     "prepublish": "npm run clean && npm run compile",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
