@@ -1,17 +1,34 @@
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert');
-var SerializedObject = require('./serializedobject').SerializedObject;
-var Types = require('./serializedtypes');
-var Amount = require('./amount').Amount;
-
-var IOU_SUFFIX = '/000/rrrrrrrrrrrrrrrrrrrrrhoLvTp';
-var OrderBookUtils = {};
+const _ = require('lodash');
+const assert = require('assert');
+const SerializedObject = require('./serializedobject').SerializedObject;
+const Types = require('./serializedtypes');
+const Amount = require('./amount').Amount;
+const OrderBookUtils = {};
 
 function assertValidNumber(number, message) {
   assert(!_.isNull(number) && !isNaN(number), message);
 }
+
+/**
+* Creates a JSON amount object using
+* passed parameters for value, currency and counterparty
+* if currency or counterparty is undefined, defaults to IOU
+*
+* @param amount of value, currency, counterparty
+* @return JSON amount object
+*/
+
+function createAmount(value, currency, counterparty) {
+  if (currency === undefined || counterparty === undefined) {
+    return {'value': value,
+      'currency': '000',
+      'issuer': 'rrrrrrrrrrrrrrrrrrrrrhoLvTp'};
+  }
+  return {'value': value, 'currency': currency, 'issuer': counterparty};
+}
+
 
 /**
  * Casts and returns offer's taker gets funded amount as a default IOU amount
@@ -23,7 +40,16 @@ function assertValidNumber(number, message) {
 OrderBookUtils.getOfferTakerGetsFunded = function(offer) {
   assertValidNumber(offer.taker_gets_funded, 'Taker gets funded is invalid');
 
-  return Amount.from_json(offer.taker_gets_funded + IOU_SUFFIX);
+  let currency = offer.TakerPays.currency;
+  let issuer = offer.TakerPays.issuer;
+
+  if (currency === undefined || issuer === undefined) {
+    currency = offer.TakerGets.currency;
+    issuer = offer.TakerGets.issuer;
+  }
+
+  return Amount.from_json(
+    createAmount(offer.taker_gets_funded, currency, issuer));
 };
 
 /**
@@ -36,7 +62,16 @@ OrderBookUtils.getOfferTakerGetsFunded = function(offer) {
 OrderBookUtils.getOfferTakerPaysFunded = function(offer) {
   assertValidNumber(offer.taker_pays_funded, 'Taker gets funded is invalid');
 
-  return Amount.from_json(offer.taker_pays_funded + IOU_SUFFIX);
+  let currency = offer.TakerGets.currency;
+  let issuer = offer.TakerGets.issuer;
+
+  if (currency === undefined || issuer === undefined) {
+    currency = offer.TakerPays.currency;
+    issuer = offer.TakerPays.issuer;
+  }
+
+  return Amount.from_json(
+    createAmount(offer.taker_pays_funded, currency, issuer));
 };
 
 /**
@@ -50,7 +85,10 @@ OrderBookUtils.getOfferTakerPaysFunded = function(offer) {
 OrderBookUtils.getOfferTakerGets = function(offer) {
   assert(typeof offer, 'object', 'Offer is invalid');
 
-  return Amount.from_json(offer.TakerGets + IOU_SUFFIX);
+  let currency = offer.TakerPays.currency;
+  let issuer = offer.TakerPays.issuer;
+
+  return Amount.from_json(createAmount(offer.TakerGets, currency, issuer));
 };
 
 /**
@@ -61,7 +99,7 @@ OrderBookUtils.getOfferTakerGets = function(offer) {
  */
 
 OrderBookUtils.getOfferQuality = function(offer, currencyGets) {
-  var amount;
+  let amount;
 
   if (currencyGets.has_interest()) {
     // XXX Should use Amount#from_quality
@@ -71,7 +109,16 @@ OrderBookUtils.getOfferQuality = function(offer, currencyGets) {
       reference_date: new Date()
     });
   } else {
-    amount = Amount.from_json(offer.quality + IOU_SUFFIX);
+
+    let currency = offer.TakerGets.currency;
+    let issuer = offer.TakerGets.issuer;
+
+    if (currency === undefined || issuer === undefined) {
+      currency = offer.TakerPays.currency;
+      issuer = offer.TakerPays.issuer;
+    }
+
+    amount = Amount.from_json(createAmount(offer.quality, currency, issuer));
   }
 
   return amount;
@@ -89,8 +136,8 @@ OrderBookUtils.getOfferQuality = function(offer, currencyGets) {
 OrderBookUtils.convertOfferQualityToHex = function(quality) {
   assert(quality instanceof Amount, 'Quality is not an amount');
 
-  var so = new SerializedObject();
-  Types.Quality.serialize(so, quality.to_text() + IOU_SUFFIX);
+  let so = new SerializedObject();
+  Types.Quality.serialize(so, quality.to_text());
 
   return so.to_hex();
 };
@@ -100,7 +147,8 @@ OrderBookUtils.convertOfferQualityToHex = function(quality) {
  */
 
 OrderBookUtils.normalizeAmount = function(value) {
-  return Amount.from_json(value + IOU_SUFFIX);
+
+  return Amount.from_json(createAmount(value));
 };
 
 module.exports = OrderBookUtils;
