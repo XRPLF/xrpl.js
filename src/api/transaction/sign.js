@@ -49,7 +49,7 @@ function computeSignature(txJSON, keypair) {
 
 /*:: type TxJSON = {Account: string; SigningPubKey: string,
                     TxnSignature: string};
-     type Signed = {tx_blob: string; hash: string}; */
+     type Signed = {signedTransaction: string; id: string}; */
 function sign(txJSON: TxJSON, secret: string): Signed {
   validate.txJSON(txJSON);
   validate.addressAndSecret({address: txJSON.Account, secret: secret});
@@ -61,8 +61,8 @@ function sign(txJSON: TxJSON, secret: string): Signed {
   txJSON.TxnSignature = computeSignature(txJSON, keypair);
   const serialized = serialize(txJSON);
   return {
-    tx_blob: serialized.to_hex(),
-    hash: hashSerialization(serialized, HASH_TX_ID)
+    signedTransaction: serialized.to_hex(),
+    id: hashSerialization(serialized, HASH_TX_ID)
   };
 }
 

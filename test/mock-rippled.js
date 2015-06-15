@@ -32,9 +32,9 @@ module.exports = function(port) {
   };
 
   mock.once('connection', function(conn) {
-    conn.on('message', function(messageJSON) {
-      const message = JSON.parse(messageJSON);
-      mock.emit('request_' + message.command, message, conn);
+    conn.on('message', function(requestJSON) {
+      const request = JSON.parse(requestJSON);
+      mock.emit('request_' + request.command, request, conn);
     });
   });
 
@@ -55,55 +55,60 @@ module.exports = function(port) {
     mock.expectedRequests[this.event] -= 1;
   });
 
-  mock.on('request_server_info', function(message, conn) {
-    assert.strictEqual(message.command, 'server_info');
-    conn.send(fixtures.serverInfoResponse(message));
+  mock.on('request_server_info', function(request, conn) {
+    assert.strictEqual(request.command, 'server_info');
+    conn.send(fixtures.serverInfoResponse(request));
   });
 
-  mock.on('request_subscribe', function(message, conn) {
-    assert.strictEqual(message.command, 'subscribe');
-    if (message.accounts) {
-      assert.strictEqual(message.accounts[0], addresses.ACCOUNT);
+  mock.on('request_subscribe', function(request, conn) {
+    assert.strictEqual(request.command, 'subscribe');
+    if (request.accounts) {
+      assert.strictEqual(request.accounts[0], addresses.ACCOUNT);
     } else {
-      assert.deepEqual(message.streams, ['ledger', 'server']);
+      assert.deepEqual(request.streams, ['ledger', 'server']);
     }
-    conn.send(fixtures.subscribeResponse(message));
+    conn.send(fixtures.subscribeResponse(request));
   });
 
-  mock.on('request_account_info', function(message, conn) {
-    assert.strictEqual(message.command, 'account_info');
-    if (message.account === addresses.ACCOUNT) {
-      conn.send(fixtures.accountInfoResponse(message));
-    } else if (message.account === addresses.NOTFOUND) {
-      conn.send(fixtures.accountNotFoundResponse(message));
+  mock.on('request_account_info', function(request, conn) {
+    assert.strictEqual(request.command, 'account_info');
+    if (request.account === addresses.ACCOUNT) {
+      conn.send(fixtures.accountInfoResponse(request));
+    } else if (request.account === addresses.NOTFOUND) {
+      conn.send(fixtures.accountNotFoundResponse(request));
     } else {
-      assert(false, 'Unrecognized account address: ' + message.account);
-    }
-  });
-
-  mock.on('request_ledger', function(message, conn) {
-    assert.strictEqual(message.command, 'ledger');
-    conn.send(fixtures.ledgerResponse(message));
-  });
-
-  mock.on('request_tx', function(message, conn) {
-    assert.strictEqual(message.command, 'tx');
-    if (message.transaction === hashes.VALID_TRANSACTION_HASH) {
-      conn.send(fixtures.transactionResponse(message));
-    } else if (message.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
-      conn.send(fixtures.transactionNotFoundResponse(message));
-    } else {
-      assert(false, 'Unrecognized transaction hash: ' + message.transaction);
+      assert(false, 'Unrecognized account address: ' + request.account);
     }
   });
 
-  mock.on('request_account_lines', function(message, conn) {
-    if (message.account === addresses.ACCOUNT) {
-      conn.send(fixtures.accountLinesResponse(message));
-    } else if (message.account === addresses.OTHER_ACCOUNT) {
-      conn.send(fixtures.accountLinesCounterpartyResponse(message));
+  mock.on('request_ledger', function(request, conn) {
+    assert.strictEqual(request.command, 'ledger');
+    conn.send(fixtures.ledgerResponse(request));
+  });
+
+  mock.on('request_tx', function(request, conn) {
+    assert.strictEqual(request.command, 'tx');
+    if (request.transaction === hashes.VALID_TRANSACTION_HASH) {
+      conn.send(fixtures.transactionResponse(request));
+    } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
+      conn.send(fixtures.transactionNotFoundResponse(request));
     } else {
-      assert(false, 'Unrecognized account address: ' + message.account);
+      assert(false, 'Unrecognized transaction hash: ' + request.transaction);
+    }
+  });
+
+  mock.on('request_submit', function(request, conn) {
+    assert.strictEqual(request.command, 'submit');
+    conn.send(fixtures.submitResponse(request));
+  });
+
+  mock.on('request_account_lines', function(request, conn) {
+    if (request.account === addresses.ACCOUNT) {
+      conn.send(fixtures.accountLinesResponse(request));
+    } else if (request.account === addresses.OTHER_ACCOUNT) {
+      conn.send(fixtures.accountLinesCounterpartyResponse(request));
+    } else {
+      assert(false, 'Unrecognized account address: ' + request.account);
     }
   });
 
