@@ -17,8 +17,10 @@
     "messageKey": {"type": "string"},
     "domain": {"type": "string"},
     "transferRate": {"type": "integer"},
-    "signers": {"type": "string"}
+    "signers": {"type": "string"},
+    "regularKey": {"$ref": "address"}
   },
   "minProperties": 1,
+  "maxProperties": 1,
   "additionalProperties": false
 }

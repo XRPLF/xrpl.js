@@ -6,9 +6,10 @@ const async = require('async');
 const asyncify = require('simple-asyncify');
 const bignum = require('bignumber.js');
 const transactions = require('./transactions');
-const TxToRestConverter = require('./tx-to-rest-converter.js');
 const utils = require('./utils');
 const validate = utils.common.validate;
+const parseTransaction = require('./parse/transaction');
+const parsePathfind = require('./parse/pathfind');
 
 const ValidationError = utils.common.errors.ValidationError;
 const NotFoundError = utils.common.errors.NotFoundError;
@@ -32,16 +33,7 @@ function formatPaymentHelper(account, txJSON) {
     throw new ValidationError('Not a payment. The transaction '
       + 'corresponding to the given identifier is not a payment.');
   }
-  const metadata = {
-    hash: txJSON.hash || '',
-    ledger: String(!_.isUndefined(txJSON.inLedger) ?
-      txJSON.inLedger : txJSON.ledger_index),
-    state: txJSON.validated === true ? 'validated' : 'pending'
-  };
-  const message = {tx_json: txJSON};
-  const meta = txJSON.meta;
-  const parsed = TxToRestConverter.parsePaymentFromTx(account, message, meta);
-  return _.assign({payment: parsed.payment}, metadata);
+  return parseTransaction(txJSON);
 }
 
 /**
@@ -153,7 +145,7 @@ function getPathFind(pathfind, callback) {
     const pathfindParams = {
       src_account: pathfind.source.address,
       dst_account: pathfind.destination.address,
-      dst_amount: utils.common.convertAmount(pathfind.destination.amount)
+      dst_amount: utils.common.toRippledAmount(pathfind.destination.amount)
     };
     if (typeof pathfindParams.dst_amount === 'object'
           && !pathfindParams.dst_amount.issuer) {
@@ -227,7 +219,7 @@ function getPathFind(pathfind, callback) {
   function formatPath(pathfindResults) {
     const alternatives = pathfindResults.alternatives;
     if (alternatives && alternatives.length > 0) {
-      return TxToRestConverter.parsePaymentsFromPathFind(pathfindResults);
+      return parsePathfind(pathfindResults);
     }
     if (pathfindResults.destination_currencies.indexOf(
             pathfind.destination.amount.currency) === -1) {

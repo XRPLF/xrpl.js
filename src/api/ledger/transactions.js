@@ -1,102 +1,77 @@
 /* eslint-disable valid-jsdoc */
 'use strict';
 const _ = require('lodash');
-const assert = require('assert');
 const async = require('async');
 const utils = require('./utils');
+const parseTransaction = require('./parse/transaction');
 const validate = utils.common.validate;
 const errors = utils.common.errors;
 
 const DEFAULT_RESULTS_PER_PAGE = 10;
+const MIN_LEDGER_VERSION = 32570; // earlier versions have been completely lost
 
-/**
- * Retrieve a transaction from the Remote based on the account and hash
- *
- * Note that if any errors are encountered while executing this function
- * they will be sent back to the client through the res. If the query is
- * successful it will be passed to the callback function
- *
- * @global
- * @param {Remote} remote
- *
- * @param {RippleAddress} account
- * @param {Hex-encoded String|ASCII printable character String} identifier
- * @param {Object} options
- * @param {Function} callback
- *
- * @callback
- * @param {Error} error
- * @param {Transaction} transaction
- */
-function getTransaction(api, account, identifier, requestOptions, callback) {
-  try {
-    assert.strictEqual(typeof requestOptions, 'object');
-    validate.address(account);
-    validate.identifier(identifier);
-    validate.options(requestOptions);
-  } catch(err) {
-    return callback(err);
+function hasCompleteLedgerRange(remote, options) {
+  const minLedgerVersion = options.minLedgerVersion || MIN_LEDGER_VERSION;
+  const maxLedgerVersion = options.maxLedgerVersion
+    || remote.getLedgerSequence();
+  for (let i = minLedgerVersion; i <= maxLedgerVersion; i++) {
+    if (!remote.getServer().hasLedger(i)) { // TODO: optimize this
+      return false;
+    }
+  }
+  return true;
+}
+
+function attachTransactionDate(remote, tx, callback) {
+  if (tx.date) {
+    callback(null, tx);
+    return;
+  }
+  if (!tx.ledger_index) {
+    callback(new errors.ApiError('ledger_index not found in tx'));
+    return;
   }
 
-  const options = {};
-  options.hash = identifier;
+  remote.requestLedger(tx.ledger_index, (error, data) => {
+    if (error) {
+      callback(new errors.NotFoundError('Transaction ledger not found'));
+    } else if (typeof data.ledger.close_time === 'number') {
+      callback(null, _.assign({date: data.ledger.close_time, tx}));
+    } else {
+      callback(new errors.ApiError('Ledger missing close_time'));
+    }
+  });
+}
 
-  const isLedgerRangeRequest = !_.isUndefined(requestOptions.min_ledger)
-    && !_.isUndefined(requestOptions.max_ledger);
+function isTransactionInRange(tx, options) {
+  return (!options.minLedgerVersion
+          || tx.ledger_index >= options.minLedgerVersion)
+      && (!options.maxLedgerVersion
+          || tx.ledger_index <= options.maxLedgerVersion);
+}
 
-  if (isLedgerRangeRequest) {
-    const minLedger = Number(options.min_ledger);
-    const maxLedger = Number(options.max_ledger);
-    for (let i = minLedger; i <= maxLedger; i++) {
-      if (!api.remote.getServer().hasLedger(i)) {
-        return callback(new errors.NotFoundError('Ledger not found'));
-      }
+function getTransaction(identifier, options, callback) {
+  validate.identifier(identifier);
+  validate.options(options);
+
+  const remote = this.remote;
+
+  function callbackWrapper(error, tx) {
+    if (error instanceof errors.NotFoundError
+        && !hasCompleteLedgerRange(remote, options)) {
+      callback(new errors.MissingLedgerHistoryError('Transaction not found,'
+        + ' but the server\'s ledger history is incomplete'));
+    } else if (!error && !isTransactionInRange(tx, options)) {
+      callback(new errors.NotFoundError('Transaction not found'));
+    } else {
+      callback(error, parseTransaction(tx));
     }
   }
 
-  function queryTransaction(async_callback) {
-    api.remote.requestTx({hash: options.hash}, async_callback);
-  }
-
-  function checkIfRelatedToAccount(transaction, async_callback) {
-    if (options.account) {
-      const transactionString = JSON.stringify(transaction);
-      const account_regex = new RegExp(options.account);
-      if (!account_regex.test(transactionString)) {
-        return async_callback(new errors.InvalidRequestError(
-          'Transaction specified did not affect the given account'));
-      }
-    }
-    async_callback(null, transaction);
-  }
-
-  function attachDate(transaction, async_callback) {
-    if (!transaction || transaction.date || !transaction.ledger_index) {
-      return async_callback(null, transaction);
-    }
-
-    api.remote.requestLedger(transaction.ledger_index,
-        function(error, ledgerRequest) {
-      if (error) {
-        return async_callback(new errors.NotFoundError(
-          'Transaction ledger not found'));
-      }
-
-      if (typeof ledgerRequest.ledger.close_time === 'number') {
-        transaction.date = ledgerRequest.ledger.close_time;
-      }
-
-      async_callback(null, transaction);
-    });
-  }
-
-  const steps = [
-    queryTransaction,
-    checkIfRelatedToAccount,
-    attachDate
-  ];
-
-  async.waterfall(steps, callback);
+  async.waterfall([
+    _.partial(remote.requestTx.bind(remote), {hash: identifier}),
+    _.partial(attachTransactionDate, remote)
+  ], callbackWrapper);
 }
 
 /**
@@ -132,7 +107,7 @@ function getAccountTx(api, options, callback) {
     if (error) {
       return callback(error);
     }
-    let transactions = [];
+    const transactions = [];
     account_tx_results.transactions.forEach(function(tx_entry) {
       if (!tx_entry.validated) {
         return;
@@ -321,6 +296,6 @@ module.exports = {
   DEFAULT_RESULTS_PER_PAGE: DEFAULT_RESULTS_PER_PAGE,
   NUM_TRANSACTION_TYPES: 5,
   DEFAULT_LEDGER_BUFFER: 3,
-  getTransaction: getTransaction,
+  getTransaction: utils.wrapCatch(getTransaction),
   getAccountTransactions: getAccountTransactions
 };

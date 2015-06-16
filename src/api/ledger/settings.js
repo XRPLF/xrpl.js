@@ -1,33 +1,31 @@
-/* eslint-disable valid-jsdoc */
 'use strict';
 const _ = require('lodash');
-const TxToRestConverter = require('./tx-to-rest-converter.js');
 const utils = require('./utils');
+const flags = utils.common.core.Remote.flags.account_root;
 const validate = utils.common.validate;
-const constants = utils.common.constants;
+const parseFields = require('./parse/fields');
 
-function parseFieldsFromResponse(responseBody, fields) {
-  let parsedBody = {};
+const AccountFlags = {
+  passwordSpent: flags.PasswordSpent,
+  requireDestinationTag: flags.RequireDestTag,
+  requireAuthorization: flags.RequireAuth,
+  disallowIncomingXRP: flags.DisallowXRP,
+  disableMasterKey: flags.DisableMaster,
+  noFreeze: flags.NoFreeze,
+  globalFreeze: flags.GlobalFreeze,
+  defaultRipple: flags.DefaultRipple
+};
 
-  for (let fieldName in fields) {
-    const field = fields[fieldName];
-    let value = responseBody[fieldName] || '';
-    if (field.encoding === 'hex' && !field.length) {
-      value = new Buffer(value, 'hex').toString('ascii');
+function parseFlags(value) {
+  const settings = {};
+  for (const flagName in AccountFlags) {
+    if (value & AccountFlags[flagName]) {
+      settings[flagName] = true;
     }
-    parsedBody[field.name] = value;
   }
-
-  return parsedBody;
+  return settings;
 }
 
-/**
- * Retrieves account settings for a given account
- *
- * @url
- * @param {String} request.params.account
- *
- */
 function getSettings(account, callback) {
   validate.address(account);
 
@@ -35,24 +33,11 @@ function getSettings(account, callback) {
     if (error) {
       return callback(error);
     }
-
     const data = info.account_data;
-    const settings = {
-      account: data.Account,
-      transfer_rate: '0'
-    };
-
-    // Attach account flags
-    _.extend(settings, TxToRestConverter.parseFlagsFromResponse(data.Flags,
-      constants.AccountRootFlags));
-
-    // Attach account fields
-    _.extend(settings, parseFieldsFromResponse(data,
-      constants.AccountRootFields));
-
-    settings.transaction_sequence = String(settings.transaction_sequence);
-
-    callback(null, {settings: settings});
+    const parsedFlags = parseFlags(data.Flags);
+    const parsedFields = parseFields(data);
+    const settings = _.assign({}, parsedFlags, parsedFields);
+    callback(null, settings);
   });
 }
 

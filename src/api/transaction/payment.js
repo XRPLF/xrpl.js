@@ -5,7 +5,7 @@ const BigNumber = require('bignumber.js');
 const utils = require('./utils');
 const ripple = utils.common.core;
 const validate = utils.common.validate;
-const convertAmount = utils.common.convertAmount;
+const toRippledAmount = utils.common.toRippledAmount;
 
 function isSendMaxAllowed(payment) {
   const srcAmt = payment.source.amount;
@@ -58,7 +58,7 @@ function createPaymentTransaction(account, payment) {
   const transactionData = {
     from: payment.source.address,
     to: payment.destination.address,
-    amount: convertAmount(payment.destination.amount)
+    amount: toRippledAmount(payment.destination.amount)
   };
 
   if (payment.invoiceID) {
@@ -101,7 +101,7 @@ function createPaymentTransaction(account, payment) {
     }
   }
 
-  let flags = [];
+  const flags = [];
   if (payment.allowPartialPayment) {
     flags.push('PartialPayment');
   }

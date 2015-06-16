@@ -4,11 +4,11 @@
 const _ = require('lodash');
 const bignum = require('bignumber.js');
 const asyncify = require('simple-asyncify');
-const TxToRestConverter = require('./tx-to-rest-converter.js');
 const utils = require('./utils');
 const ripple = utils.common.core;
 const errors = utils.common.errors;
 const validate = utils.common.validate;
+const parseTransaction = require('./parse/transaction');
 
 const DefaultPageLimit = 200;
 
@@ -302,18 +302,14 @@ function getOrder(account, identifier, callback) {
   });
 
   txRequest.once('error', callback);
-  txRequest.once('transaction', function(response) {
-    if (response.TransactionType !== 'OfferCreate'
-        && response.TransactionType !== 'OfferCancel') {
+  txRequest.once('transaction', function(tx) {
+    if (tx.TransactionType !== 'OfferCreate'
+        && tx.TransactionType !== 'OfferCancel') {
       callback(new errors.InvalidRequestError('Invalid parameter: identifier. '
         + 'The transaction corresponding to the given identifier '
         + 'is not an order'));
     } else {
-      const options = {
-        account: account,
-        identifier: identifier
-      };
-      asyncify(TxToRestConverter.parseOrderFromTx)(response, options, callback);
+      asyncify(parseTransaction)(tx, callback);
     }
   });
   txRequest.request();

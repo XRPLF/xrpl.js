@@ -3,6 +3,7 @@ const _ = require('lodash');
 const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
 const address = require('./fixtures/addresses').ACCOUNT;
+const hashes = require('./fixtures/hashes');
 const paymentSpecification = require('./fixtures/payment-specification');
 const paymentResponse = require('./fixtures/payment-response');
 const orderSpecification = require('./fixtures/order-specification');
@@ -20,6 +21,7 @@ const signOutput = require('./fixtures/sign-output');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const submitResponse = require('./fixtures/submit-response');
+const transactionResponse = require('./fixtures/transaction-response');
 
 function checkResult(expected, done, error, response) {
   if (error) {
@@ -83,5 +85,10 @@ describe('RippleAPI', function() {
   it('getBalances', function(done) {
     this.api.getBalances(address, {},
       _.partial(checkResult, balancesResponse, done));
+  });
+
+  it('getTransaction', function(done) {
+    this.api.getTransaction(hashes.VALID_TRANSACTION_HASH, {},
+      _.partial(checkResult, transactionResponse, done));
   });
 });

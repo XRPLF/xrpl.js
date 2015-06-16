@@ -210,9 +210,9 @@ Remote.flags = {
     RequireAuth: 0x00040000, // require a authorization to hold IOUs
     DisallowXRP: 0x00080000, // disallow sending XRP
     DisableMaster: 0x00100000,  // force regular key
-    DefaultRipple: 0x00800000,
     NoFreeze: 0x00200000, // permanently disallowed freezing trustlines
-    GlobalFreeze: 0x00400000 // trustlines globally frozen
+    GlobalFreeze: 0x00400000, // trustlines globally frozen
+    DefaultRipple: 0x00800000
   },
   // Offer
   offer: {
@@ -448,7 +448,7 @@ Remote.prototype.disconnect = function(callback_) {
     throw new Error('No servers available, not disconnecting');
   }
 
-  let callback = lodash.isFunction(callback_)
+  const callback = lodash.isFunction(callback_)
   ? callback_
   : function() {};
 
@@ -980,7 +980,7 @@ Remote.prototype.requestLedgerEntry = function(type, callback_) {
 
   const self = this;
 
-  let request = new Request(this, 'ledger_entry');
+  const request = new Request(this, 'ledger_entry');
   const callback = lodash.isFunction(type) ? type : callback_;
 
   // Transparent caching. When .request() is invoked, look in the Remote object
@@ -1232,7 +1232,7 @@ Remote.accountRequest = function(command, options_, callback_) {
     };
   }
 
-  let {account, ledger, peer, limit, marker} = options;
+  const {account, ledger, peer, limit, marker} = options;
 
   // if a marker is given, we need a ledger
   // check if a valid ledger_index or ledger_hash is provided
@@ -1246,8 +1246,7 @@ Remote.accountRequest = function(command, options_, callback_) {
   const request = new Request(this, command);
 
   if (account) {
-    account = UInt160.json_rewrite(account);
-    request.message.account = account;
+    request.message.account = UInt160.json_rewrite(account);
   }
 
   request.selectLedger(ledger);
@@ -1257,20 +1256,20 @@ Remote.accountRequest = function(command, options_, callback_) {
   }
 
   if (!isNaN(limit)) {
-    limit = Number(limit);
+    let _limit = Number(limit);
 
     // max for 32-bit unsigned int is 4294967295
     // we'll clamp to 1e9
-    if (limit > 1e9) {
-      limit = 1e9;
+    if (_limit > 1e9) {
+      _limit = 1e9;
     }
     // min for 32-bit unsigned int is 0
     // we'll clamp to 0
-    if (limit < 0) {
-      limit = 0;
+    if (_limit < 0) {
+      _limit = 0;
     }
 
-    request.message.limit = limit;
+    request.message.limit = _limit;
   }
 
   if (marker) {
@@ -1551,7 +1550,7 @@ Remote.prototype.requestTxHistory = function(start_, callback_) {
 
   const request = new Request(this, 'tx_history');
   let start = start_;
-  let callback = callback_;
+  const callback = callback_;
 
   if (lodash.isPlainObject(start)) {
     start = start.start;
@@ -1606,7 +1605,7 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
     };
   }
 
-  let {gets, pays, taker, ledger, limit} = options;
+  const {gets, pays, taker, ledger, limit} = options;
 
   const request = new Request(this, 'book_offers');
 
@@ -1630,20 +1629,20 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
   request.selectLedger(ledger);
 
   if (!isNaN(limit)) {
-    limit = Number(limit);
+    let _limit = Number(limit);
 
     // max for 32-bit unsigned int is 4294967295
     // we'll clamp to 1e9
-    if (limit > 1e9) {
-      limit = 1e9;
+    if (_limit > 1e9) {
+      _limit = 1e9;
     }
     // min for 32-bit unsigned int is 0
     // we'll clamp to 0
-    if (limit < 0) {
-      limit = 0;
+    if (_limit < 0) {
+      _limit = 0;
     }
 
-    request.message.limit = limit;
+    request.message.limit = _limit;
   }
 
   request.callback(callback);
@@ -1661,7 +1660,8 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
 Remote.prototype.requestWalletAccounts = function(options_, callback_) {
   utils.assert(this.trusted); // Don't send secrets.
 
-  let options, callback = callback_;
+  let options;
+  const callback = callback_;
 
   if (lodash.isPlainObject(options_)) {
     options = lodash.merge({}, options_);

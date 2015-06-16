@@ -25,9 +25,10 @@ function validateAddressAndSecret(obj) {
 }
 
 function validateLedgerRange(options) {
-  if (_.isUndefined(options.minLedger) && _.isUndefined(options.maxLedger)) {
-    if (Number(options.minLedger) > Number(options.maxLedger)) {
-      throw error('minLedger must not be greater than maxLedger');
+  if (!_.isUndefined(options.minLedgerVersion)
+      && !_.isUndefined(options.maxLedgerVersion)) {
+    if (Number(options.minLedgerVersion) > Number(options.maxLedgerVersion)) {
+      throw error('minLedgerVersion must not be greater than maxLedgerVersion');
     }
   }
 }
