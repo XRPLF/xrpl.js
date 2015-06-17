@@ -16,6 +16,7 @@
   "dependencies": {
     "babel-runtime": "^5.3.2",
     "bn.js": "^2.0.5",
+    "elliptic": "sublimator/elliptic#derivations-test",
     "hash.js": "^1.0.3",
     "ripple-address-codec": "github:sublimator/ripple-address-codec"
   },
