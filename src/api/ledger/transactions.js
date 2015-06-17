@@ -7,7 +7,7 @@ const parseTransaction = require('./parse/transaction');
 const validate = utils.common.validate;
 const errors = utils.common.errors;
 
-const DEFAULT_RESULTS_PER_PAGE = 10;
+const DEFAULT_LIMIT = 100;
 const MIN_LEDGER_VERSION = 32570; // earlier versions have been completely lost
 
 function hasCompleteLedgerRange(remote, options) {
@@ -74,228 +74,86 @@ function getTransaction(identifier, options, callback) {
   ], callbackWrapper);
 }
 
-/**
- * Wrapper around the standard ripple-lib requestAccountTx function
- *
- * @param {Remote} remote
- * @param {RippleAddress} options.account
- * @param {Number} [-1] options.ledger_index_min
- * @param {Number} [-1] options.ledger_index_max
- * @param {Boolean} [false] options.earliestFirst
- * @param {Boolean} [false] options.binary
- * @param {opaque value} options.marker
- * @param {Function} callback
- *
- * @callback
- * @param {Error} error
- * @param {Array of transactions in JSON format} response.transactions
- * @param {opaque value} response.marker
- */
-function getAccountTx(api, options, callback) {
+function parseAccountTxTransaction(tx) {
+  // rippled uses a different response format for 'account_tx' than 'tx'
+  tx.tx.meta = tx.meta;
+  tx.tx.validated = tx.validated;
+  return parseTransaction(tx.tx);
+}
+
+function getAccountTx(remote, address, limit, marker, options, callback) {
   const params = {
-    account: options.account,
-    ledger_index_min: options.ledger_index_min || options.ledger_index || -1,
-    ledger_index_max: options.ledger_index_max || options.ledger_index || -1,
-    limit: options.limit || DEFAULT_RESULTS_PER_PAGE,
+    account: address,
+    ledger_index_min: options.ledgerVersion || options.minLedgerVersion || -1,
+    ledger_index_max: options.ledgerVersion || options.maxLedgerVersion || -1,
     forward: options.earliestFirst,
-    marker: options.marker
+    binary: options.binary,
+    limit: Math.min(limit || DEFAULT_LIMIT, 10),
+    marker: marker
   };
-  if (options.binary) {
-    params.binary = true;
+
+  remote.requestAccountTx(params, (error, data) => {
+    return error ? callback(error) : callback(null, {
+      transactions: data.transactions.filter((tx) => tx.validated)
+        .map(parseAccountTxTransaction),
+      marker: data.marker
+    });
+  });
+}
+
+function transactionFilter(address, filters, tx) {
+  if (filters.excludeFailures && tx.outcome.result !== 'tesSUCCESS') {
+    return false;
   }
-  api.remote.requestAccountTx(params, function(error, account_tx_results) {
-    if (error) {
-      return callback(error);
-    }
-    const transactions = [];
-    account_tx_results.transactions.forEach(function(tx_entry) {
-      if (!tx_entry.validated) {
-        return;
-      }
-      const tx = tx_entry.tx;
-      tx.meta = tx_entry.meta;
-      tx.validated = tx_entry.validated;
-      transactions.push(tx);
-    });
-    callback(null, {
-      transactions: transactions,
-      marker: account_tx_results.marker
-    });
-  });
+  if (filters.types && !_.includes(filters.types, tx.type)) {
+    return false;
+  }
+  if (filters.outgoing && tx.address !== address) {
+    return false;
+  }
+  if (filters.incoming && tx.address === address) {
+    return false;
+  }
+  return true;
 }
 
-/**
- * Filter transactions based on the given set of options.
- *
- * @param {Array of transactions in JSON format} transactions
- * @param {Boolean} [false] options.exclude_failed
- * @param {Array of Strings} options.types Possible values are "payment",
- *                      "offercreate", "offercancel", "trustset", "accountset"
- * @param {RippleAddress} options.source_account
- * @param {RippleAddress} options.destination_account
- * @param {String} options.direction Possible values are "incoming", "outgoing"
- *
- * @returns {Array of transactions in JSON format} filtered_transactions
- */
-function transactionFilter(transactions, options) {
-  const filtered_transactions = transactions.filter(function(transaction) {
-    if (options.exclude_failed) {
-      if (transaction.state === 'failed' || (transaction.meta
-          && transaction.meta.TransactionResult !== 'tesSUCCESS')) {
-        return false;
-      }
-    }
-    if (options.types && options.types.length > 0) {
-      if (options.types.indexOf(
-          transaction.TransactionType.toLowerCase()) === -1) {
-        return false;
-      }
-    }
-    if (options.source_account) {
-      if (transaction.Account !== options.source_account) {
-        return false;
-      }
-    }
-    if (options.destination_account) {
-      if (transaction.Destination !== options.destination_account) {
-        return false;
-      }
-    }
-    if (options.direction) {
-      if (options.direction === 'outgoing'
-          && transaction.Account !== options.account) {
-        return false;
-      }
-      if (options.direction === 'incoming' && transaction.Destination
-          && transaction.Destination !== options.account) {
-        return false;
-      }
-    }
-    return true;
-  });
-
-  return filtered_transactions;
-}
-
-function getTransactionsHelper(api, options, callback) {
-  getAccountTx(api, options, function(error, results) {
+function getAccountTransactionsRecursive(
+    remote, address, limit, marker, options, callback) {
+  getAccountTx(remote, address, limit, marker, options, (error, data) => {
     if (error) {
       callback(error);
+      return;
+    }
+    const filter = _.partial(transactionFilter, address, options);
+    const unfilteredTransactions = data.transactions;
+    const filteredTransactions = unfilteredTransactions.filter(filter);
+    const isExhausted = unfilteredTransactions.length === 0;
+    if (!isExhausted && filteredTransactions.length < limit) {
+      const remaining = limit - filteredTransactions.length;
+      getAccountTransactionsRecursive(
+      remote, address, remaining, data.marker, options, (_err, txs) => {
+        return error ? callback(_err) :
+          callback(null, filteredTransactions.concat(txs));
+      });
     } else {
-      // Set marker so that when this function is called again
-      // recursively it starts from the last place it left off
-      options.marker = results.marker;
-      callback(null, results.transactions);
+      callback(null, filteredTransactions.slice(0, limit));
     }
   });
 }
 
-/**
- * Recursively get transactions for the specified account from
- * the Remote. If options.min is set, this will
- * recurse until it has retrieved that number of transactions or
- * it has reached the end of the account's transaction history.
- *
- * @param {Remote} remote
- * @param {RippleAddress} options.account
- * @param {Number} [-1] options.ledger_index_min
- * @param {Number} [-1] options.ledger_index_max
- * @param {Boolean} [false] options.earliestFirst
- * @param {Boolean} [false] options.binary
- * @param {Boolean} [false] options.exclude_failed
- * @param {Number} [DEFAULT_RESULTS_PER_PAGE] options.min
- * @param {Number} [DEFAULT_RESULTS_PER_PAGE] options.max
- * @param {Array of Strings} options.types Possible values are "payment",
- *                       "offercreate", "offercancel", "trustset", "accountset"
- * @param {opaque value} options.marker
- * @param {Array of Transactions} options.previous_transactions
- *            Included automatically when this function is called recursively
- * @param {Express.js Response} res
- * @param {Function} callback
- *
- * @callback
- * @param {Error} error
- * @param {Array of transactions in JSON format} transactions
- */
-function getAccountTransactions(api, options, callback) {
-  try {
-    validate.address(options.account);
-  } catch(err) {
-    return callback(err);
-  }
+function getAccountTransactions(address, options, callback) {
+  validate.address(address);
 
-  if (!options.min) {
-    options.min = module.exports.DEFAULT_RESULTS_PER_PAGE;
-  }
-  if (!options.max) {
-    options.max = Math.max(options.min,
-      module.exports.DEFAULT_RESULTS_PER_PAGE);
-  }
-  if (!options.limit) {
-    options.limit = module.exports.DEFAULT_LIMIT;
-  }
-
-  function queryTransactions(async_callback) {
-    getTransactionsHelper(api, options, async_callback);
-  }
-
-  function filterTransactions(transactions, async_callback) {
-    async_callback(null, transactionFilter(transactions, options));
-  }
-
-  function sortTransactions(transactions, async_callback) {
-    const compare = options.earliestFirst ? utils.compareTransactions :
-      _.rearg(utils.compareTransactions, 1, 0);
-    transactions.sort(compare);
-    async_callback(null, transactions);
-  }
-
-  function mergeAndTruncateResults(txns, async_callback) {
-    let transactions = txns;
-    if (options.previous_transactions
-        && options.previous_transactions.length > 0) {
-      transactions = options.previous_transactions.concat(transactions);
-    }
-    if (options.offset && options.offset > 0) {
-      const offset_remaining = options.offset - transactions.length;
-      transactions = transactions.slice(options.offset);
-      options.offset = offset_remaining;
-    }
-    if (transactions.length > options.max) {
-      transactions = transactions.slice(0, options.max);
-    }
-    async_callback(null, transactions);
-  }
-
-  function asyncWaterfallCallback(error, transactions) {
-    if (error) {
-      return callback(error);
-    }
-    if (!options.min || transactions.length >= options.min || !options.marker) {
-      callback(null, transactions);
-    } else {
-      options.previous_transactions = transactions;
-      setImmediate(function() {
-        getAccountTransactions(api, options, callback);
-      });
-    }
-  }
-
-  const steps = [
-    queryTransactions,
-    filterTransactions,
-    sortTransactions,
-    mergeAndTruncateResults
-  ];
-
-  async.waterfall(steps, asyncWaterfallCallback);
+  const limit = options.limit || DEFAULT_LIMIT;
+  const compare = options.earliestFirst ? utils.compareTransactions :
+    _.rearg(utils.compareTransactions, 1, 0);
+  getAccountTransactionsRecursive(
+  this.remote, address, limit, null, options, (error, transactions) => {
+    return error ? callback(error) : callback(null, transactions.sort(compare));
+  });
 }
 
 module.exports = {
-  DEFAULT_LIMIT: 200,
-  DEFAULT_RESULTS_PER_PAGE: DEFAULT_RESULTS_PER_PAGE,
-  NUM_TRANSACTION_TYPES: 5,
-  DEFAULT_LEDGER_BUFFER: 3,
   getTransaction: utils.wrapCatch(getTransaction),
-  getAccountTransactions: getAccountTransactions
+  getAccountTransactions: utils.wrapCatch(getAccountTransactions)
 };

@@ -112,5 +112,13 @@ module.exports = function(port) {
     }
   });
 
+  mock.on('request_account_tx', function(request, conn) {
+    if (request.account === addresses.ACCOUNT) {
+      conn.send(fixtures.accountTransactionsResponse(request));
+    } else {
+      assert(false, 'Unrecognized account address: ' + request.account);
+    }
+  });
+
   return mock;
 };

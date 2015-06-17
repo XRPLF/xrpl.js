@@ -1,9 +1,10 @@
+/* @flow */
 'use strict';
 const assert = require('assert');
 const utils = require('./utils');
 const flags = utils.core.Transaction.flags.TrustSet;
 
-function parseTrustline(tx) {
+function parseTrustline(tx: Object): Object {
   assert(tx.TransactionType === 'TrustSet');
 
   return {
@@ -12,9 +13,9 @@ function parseTrustline(tx) {
     counterparty: tx.LimitAmount.issuer,
     qualityIn: tx.QualityIn,
     qualityOut: tx.QualityOut,
-    allowRippling: tx.Flags & flags.NoRipple === 0,
-    frozen: tx.Flags & flags.SetFreeze !== 0,
-    authorized: tx.Flags & flags.SetAuth !== 0
+    allowRippling: (tx.Flags & flags.NoRipple) === 0,
+    frozen: (tx.Flags & flags.SetFreeze) !== 0,
+    authorized: (tx.Flags & flags.SetAuth) !== 0
   };
 }
 

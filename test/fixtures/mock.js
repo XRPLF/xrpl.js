@@ -2,8 +2,11 @@
 'use strict';
 const _ = require('lodash');
 const addresses = require('./addresses');
+const accountTransactionsResponse = require('./acct-tx-response');
 const SerializedObject = require('ripple-lib').SerializedObject;
 const BASE_LEDGER_INDEX = 8819951;
+
+module.exports.accountTransactionsResponse = accountTransactionsResponse;
 
 module.exports.subscribeResponse = function(request) {
   return JSON.stringify({

@@ -1,7 +1,9 @@
+/* @flow */
 'use strict';
 const parseAmount = require('./amount');
 
-function parsePathfind(sourceAddress, destinationAmount, pathfindResult) {
+function parsePathfind(sourceAddress: string,
+    destinationAmount: Object, pathfindResult: Object): Object {
   return pathfindResult.alternatives.map(function(alternative) {
     return {
       source: {

@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const assert = require('assert');
 const utils = require('./utils');
@@ -19,7 +20,7 @@ function parseTransactionType(type) {
   return mapping[type] || null;
 }
 
-function parseTransaction(tx) {
+function parseTransaction(tx: Object): ?Object {
   const type = parseTransactionType(tx.TransactionType);
   const mapping = {
     'payment': parsePayment,

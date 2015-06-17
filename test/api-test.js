@@ -22,6 +22,8 @@ const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const submitResponse = require('./fixtures/submit-response');
 const transactionResponse = require('./fixtures/transaction-response');
+const accountTransactionsResponse =
+  require('./fixtures/account-transactions-response');
 
 function checkResult(expected, done, error, response) {
   if (error) {
@@ -90,5 +92,11 @@ describe('RippleAPI', function() {
   it('getTransaction', function(done) {
     this.api.getTransaction(hashes.VALID_TRANSACTION_HASH, {},
       _.partial(checkResult, transactionResponse, done));
+  });
+
+  it('getAccountTransactions', function(done) {
+    const options = {types: ['payment', 'order'], outgoing: true, limit: 2};
+    this.api.getAccountTransactions(address, options,
+      _.partial(checkResult, accountTransactionsResponse, done));
   });
 });

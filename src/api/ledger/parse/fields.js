@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const AccountFields = require('./utils').constants.AccountFields;
 
@@ -8,7 +9,7 @@ function parseField(info, value) {
   return value;
 }
 
-function parseFields(data) {
+function parseFields(data: Object): Object {
   const settings = {};
   for (const fieldName in AccountFields) {
     const fieldValue = data[fieldName];
