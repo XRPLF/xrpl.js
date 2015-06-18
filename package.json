@@ -48,7 +48,7 @@
   "scripts": {
     "build": "gulp",
     "clean": "rm -rf dist/npm && rm -rf build/flow",
-    "typecheck": "babel --optional runtime --blacklist flow -d build/flow/ src/ && flow",
+    "typecheck": "babel --optional runtime --blacklist flow -d build/flow/ src/ && flow check",
     "compile": "babel --optional runtime -d dist/npm/ src/ && cp -r src/api/common/schemas/ dist/npm/api/common/schemas/",
     "compile-with-source-maps": "babel --optional runtime -s -t -d dist/npm/ src/",
     "prepublish": "npm run clean && npm run compile",
