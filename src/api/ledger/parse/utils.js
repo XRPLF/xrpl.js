@@ -13,6 +13,26 @@ function removeUndefined(obj: ?Object): ?Object {
   return obj ? _.omit(obj, _.isUndefined) : obj;
 }
 
+function removeEmptyCounterparty(amount) {
+  if (amount.counterparty === '') {
+    delete amount.counterparty;
+  }
+}
+
+function removeEmptyCounterpartyInBalanceChanges(balanceChanges) {
+  _.forEach(balanceChanges, (changes) => {
+    _.forEach(changes, removeEmptyCounterparty);
+  });
+}
+
+function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges) {
+  _.forEach(orderbookChanges, (changes) => {
+    _.forEach(changes, (change) => {
+      _.forEach(change, removeEmptyCounterparty);
+    });
+  });
+}
+
 function parseOutcome(tx: Object): ?Object {
   if (!tx.validated) {
     return undefined;
@@ -20,6 +40,8 @@ function parseOutcome(tx: Object): ?Object {
 
   const balanceChanges = transactionParser.parseBalanceChanges(tx.meta);
   const orderbookChanges = transactionParser.parseOrderBookChanges(tx.meta);
+  removeEmptyCounterpartyInBalanceChanges(balanceChanges);
+  removeEmptyCounterpartyInOrderbookChanges(orderbookChanges);
 
   return {
     result: tx.meta.TransactionResult,

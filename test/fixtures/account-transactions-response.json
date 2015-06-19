@@ -47,14 +47,12 @@
         ],
         "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59": [
           {
-            "counterparty": "",
             "currency": "XRP",
             "value": "-1.101208"
           }
         ],
         "r9tGqzZgKxVFvzKFdUqXAqTzazWBUia8Qr": [
           {
-            "counterparty": "",
             "currency": "XRP",
             "value": "1.101198"
           },
@@ -70,7 +68,6 @@
           {
             "taker_pays": {
               "currency": "XRP",
-              "counterparty": "",
               "value": "-1.101198"
             },
             "taker_gets": {
@@ -136,14 +133,12 @@
         ],
         "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59": [
           {
-            "counterparty": "",
             "currency": "XRP",
             "value": "-1.101208"
           }
         ],
         "r9tGqzZgKxVFvzKFdUqXAqTzazWBUia8Qr": [
           {
-            "counterparty": "",
             "currency": "XRP",
             "value": "1.101198"
           },
@@ -159,7 +154,6 @@
           {
             "taker_pays": {
               "currency": "XRP",
-              "counterparty": "",
               "value": "-1.101198"
             },
             "taker_gets": {
