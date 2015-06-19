@@ -40,6 +40,7 @@ RippleAPI.prototype = {
   getOrderBook: orders.getOrderBook,
   getSettings: settings.getSettings,
   getTransaction: transactions.getTransaction,
+  getAccountTransactions: transactions.getAccountTransactions,
   getNotification: notifications.getNotification,
   getNotifications: notifications.getNotifications,
 

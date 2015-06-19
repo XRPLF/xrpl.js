@@ -58,12 +58,10 @@ function signum(num) {
  *  @returns {Number} [-1, 0, 1]
  */
 function compareTransactions(first, second) {
-  if (first.ledger_index === second.ledger_index) {
-    return signum(
-      Number(first.meta.TransactionIndex) -
-      Number(second.meta.TransactionIndex));
+  if (first.ledgerVersion === second.ledgerVersion) {
+    return signum(Number(first.indexInLedger) - Number(second.indexInLedger));
   }
-  return Number(first.ledger_index) < Number(second.ledger_index) ? -1 : 1;
+  return Number(first.ledgerVersion) < Number(second.ledgerVersion) ? -1 : 1;
 }
 
 function attachDate(api, baseTransactions, callback) {

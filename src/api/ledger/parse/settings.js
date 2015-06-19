@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const _ = require('lodash');
 const assert = require('assert');
@@ -8,7 +9,7 @@ function getName(flagNumber) {
   return _.findKey(AccountSetFlags, (v) => v === flagNumber);
 }
 
-function parseSettings(tx) {
+function parseSettings(tx: Object) {
   const txType = tx.TransactionType;
   assert(txType === 'AccountSet' || txType === 'SetRegularKey');
   const settings = {};

@@ -1,9 +1,11 @@
 [ignore]
-.*/src/.*
+.*/src/api/.*
+.*/src/core/.*
 .*/dist/.*
 .*/test/fixtures/.*
 
 [include]
+./node_modules/
 
 [libs]
 

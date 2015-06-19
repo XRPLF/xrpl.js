@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const assert = require('assert');
 const utils = require('./utils');
@@ -19,7 +20,7 @@ function parsePaymentMemos(tx) {
   return tx.Memos.map((m) => m.Memo);
 }
 
-function parsePayment(tx) {
+function parsePayment(tx: Object): Object {
   assert(tx.TransactionType === 'Payment');
 
   const source = {

@@ -1,10 +1,11 @@
+/* @flow */
 'use strict';
 const assert = require('assert');
 const utils = require('./utils');
 const parseAmount = require('./amount');
 const flags = utils.core.Transaction.flags.OfferCreate;
 
-function parseOrder(tx) {
+function parseOrder(tx: Object): Object {
   assert(tx.TransactionType === 'OfferCreate');
 
   const direction = (tx.Flags & flags.Sell) === 0 ? 'buy' : 'sell';
