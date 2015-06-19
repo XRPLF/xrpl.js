@@ -13,13 +13,13 @@ function sha256(bytes) {
 var api = apiFactory({sha256: sha256, defaultAlphabet: 'ripple'});
 
 function addVersion(name, version) {
-  function add(symbol, func) {
-    api[symbol+name] = function(string) {
-      return api[symbol](string, {version: version});
+  function add(operation, func) {
+    api[operation + name] = function(string) {
+      return api[operation](string, {version: version});
     }
   }
-  add('decode')
-  add('encode')
+  add('decode');
+  add('encode');
 }
 
 addVersion('Seed', VER_FAMILY_SEED);
