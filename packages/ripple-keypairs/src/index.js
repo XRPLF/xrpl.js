@@ -209,7 +209,12 @@ hasCachedProperty(Secp256k1Pair, 'pubKeyCanonicalBytes', function() {
 @param {Array<Byte>} message (bytes)
  */
 Secp256k1Pair.prototype.sign = function(message) {
-  return this.key.sign(this.hashMessage(message), {canonical: true}).toDER();
+  return this._createSignature(message).toDER();
+};
+
+Secp256k1Pair.prototype._createSignature = function(message) {
+  // The key.sign message silently discards options
+  return secp256k1.sign(this.hashMessage(message), this.key, {canonical: true});
 };
 
 /*
