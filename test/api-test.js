@@ -24,6 +24,7 @@ const submitResponse = require('./fixtures/submit-response');
 const transactionResponse = require('./fixtures/transaction-response');
 const accountTransactionsResponse =
   require('./fixtures/account-transactions-response');
+const trustlinesResponse = require('./fixtures/trustlines-response');
 
 function checkResult(expected, done, error, response) {
   if (error) {
@@ -98,5 +99,11 @@ describe('RippleAPI', function() {
     const options = {types: ['payment', 'order'], outgoing: true, limit: 2};
     this.api.getAccountTransactions(address, options,
       _.partial(checkResult, accountTransactionsResponse, done));
+  });
+
+  it('getTrustlines', function(done) {
+    const options = {currency: 'USD'};
+    this.api.getTrustlines(address, options,
+      _.partial(checkResult, trustlinesResponse, done));
   });
 });

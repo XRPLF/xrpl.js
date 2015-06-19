@@ -10,13 +10,11 @@
       "type": "integer",
       "minimum": 1
     },
-    "ledgerVersion": {
-      "anyOf": [
-        {"enum": ["current", "closed", "validated"]},
-        {"$ref": "ledgerVersion"},
-        {"type": "string", "format": "ledgerHash"}
-      ]
+    "ledgerHash": {
+      "type": "string",
+      "format": "ledgerHash"
     },
+    "ledgerVersion": {"$ref": "ledgerVersion"},
     "minLedgerVersion": {"$ref": "ledgerVersion"},
     "maxLedgerVersion": {"$ref": "ledgerVersion"},
     "marker": {

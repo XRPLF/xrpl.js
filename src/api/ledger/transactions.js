@@ -81,25 +81,6 @@ function parseAccountTxTransaction(tx) {
   return parseTransaction(tx.tx);
 }
 
-function getAccountTx(remote, address, limit, marker, options, callback) {
-  const params = {
-    account: address,
-    ledger_index_min: options.ledgerVersion || options.minLedgerVersion || -1,
-    ledger_index_max: options.ledgerVersion || options.maxLedgerVersion || -1,
-    forward: options.earliestFirst,
-    binary: options.binary,
-    limit: Math.min(limit || DEFAULT_LIMIT, 10),
-    marker: marker
-  };
-
-  remote.requestAccountTx(params, (error, data) => {
-    return error ? callback(error) : callback(null, {
-      transactions: data.transactions.filter((tx) => tx.validated)
-        .map(parseAccountTxTransaction),
-      marker: data.marker
-    });
-  });
-}
 
 function transactionFilter(address, filters, tx) {
   if (filters.excludeFailures && tx.outcome.result !== 'tesSUCCESS') {
@@ -117,27 +98,25 @@ function transactionFilter(address, filters, tx) {
   return true;
 }
 
-function getAccountTransactionsRecursive(
-    remote, address, limit, marker, options, callback) {
-  getAccountTx(remote, address, limit, marker, options, (error, data) => {
-    if (error) {
-      callback(error);
-      return;
-    }
-    const filter = _.partial(transactionFilter, address, options);
-    const unfilteredTransactions = data.transactions;
-    const filteredTransactions = unfilteredTransactions.filter(filter);
-    const isExhausted = unfilteredTransactions.length === 0;
-    if (!isExhausted && filteredTransactions.length < limit) {
-      const remaining = limit - filteredTransactions.length;
-      getAccountTransactionsRecursive(
-      remote, address, remaining, data.marker, options, (_err, txs) => {
-        return error ? callback(_err) :
-          callback(null, filteredTransactions.concat(txs));
-      });
-    } else {
-      callback(null, filteredTransactions.slice(0, limit));
-    }
+function getAccountTx(remote, address, options, marker, limit, callback) {
+  const params = {
+    account: address,
+    ledger_index_min: options.ledgerVersion || options.minLedgerVersion || -1,
+    ledger_index_max: options.ledgerVersion || options.maxLedgerVersion || -1,
+    forward: options.earliestFirst,
+    binary: options.binary,
+    limit: Math.min(limit || DEFAULT_LIMIT, 10),
+    marker: marker
+  };
+
+  remote.requestAccountTx(params, (error, data) => {
+    return error ? callback(error) : callback(null, {
+      marker: data.marker,
+      results: data.transactions
+        .filter((tx) => tx.validated)
+        .map(parseAccountTxTransaction)
+        .filter(_.partial(transactionFilter, address, options))
+    });
   });
 }
 
@@ -147,9 +126,9 @@ function getAccountTransactions(address, options, callback) {
   const limit = options.limit || DEFAULT_LIMIT;
   const compare = options.earliestFirst ? utils.compareTransactions :
     _.rearg(utils.compareTransactions, 1, 0);
-  getAccountTransactionsRecursive(
-  this.remote, address, limit, null, options, (error, transactions) => {
-    return error ? callback(error) : callback(null, transactions.sort(compare));
+  const getter = _.partial(getAccountTx, this.remote, address, options);
+  utils.getRecursive(getter, limit, (error, data) => {
+    return error ? callback(error) : callback(null, data.sort(compare));
   });
 }
 

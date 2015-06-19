@@ -196,6 +196,7 @@ module.exports = function(request, options={}) {
     status: 'success',
     type: 'response',
     result: {
+      marker: request.marker === undefined ? 'ABC' : undefined,
       transactions: [
         {
           ledger_index: 348860,
