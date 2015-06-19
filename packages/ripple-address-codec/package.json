@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "hash.js": "^1.0.3"
+    "hash.js": "^1.0.3",
+    "coin-address-codec" : "sublimator/coin-address-codec"
   }
 }
