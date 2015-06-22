@@ -441,7 +441,7 @@ exports.Quality = new SerializedType({
       lo = parseInt(mantissaHex.slice(-8), 16);
     }
 
-    let valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
+    const valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
 
     so.append(valueBytes);
   }
@@ -805,23 +805,27 @@ exports.STMemo = new SerializedType({
         if (parsedType !== 'unformatted_memo') {
           output.parsed_memo_type = parsedType;
         }
+        /*eslint-disable no-empty*/
       } catch (e) {
         // empty
         // we don't know what's in the binary, apparently it's not a UTF-8
         // string
         // this is fine, we won't add the parsed_memo_type field
       }
+      /*eslint-enable no-empty*/
     }
 
     if (output.MemoFormat !== undefined) {
       try {
         output.parsed_memo_format = convertHexToString(output.MemoFormat);
+        /*eslint-disable no-empty*/
       } catch (e) {
         // empty
         // we don't know what's in the binary, apparently it's not a UTF-8
         // string
         // this is fine, we won't add the parsed_memo_format field
       }
+      /*eslint-enable no-empty*/
     }
 
     if (output.MemoData !== undefined) {
@@ -836,6 +840,7 @@ exports.STMemo = new SerializedType({
           // otherwise see if we can parse text
           output.parsed_memo_data = convertHexToString(output.MemoData);
         }
+        /*eslint-disable no-empty*/
       } catch(e) {
         // empty
         // we'll fail in case the content does not match what the MemoFormat
@@ -843,6 +848,7 @@ exports.STMemo = new SerializedType({
         // this is fine, we won't add the parsed_memo_data, the user has to
         // parse themselves
       }
+      /*eslint-enable no-empty*/
     }
 
     so.read(1);

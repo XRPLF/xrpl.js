@@ -3,15 +3,17 @@
 // Represent Ripple amounts and currencies.
 // - Numbers in hex are big-endian.
 
-var assert = require('assert');
-var extend = require('extend');
-var utils = require('./utils');
-var UInt160 = require('./uint160').UInt160;
-var Seed = require('./seed').Seed;
-var Currency = require('./currency').Currency;
-var GlobalBigNumber = require('bignumber.js');
+const assert = require('assert');
+const extend = require('extend');
+const utils = require('./utils');
+const UInt160 = require('./uint160').UInt160;
+const Seed = require('./seed').Seed;
+const Currency = require('./currency').Currency;
+const GlobalBigNumber = require('bignumber.js');
+const Value_IOU = require('./value_IOU').Value_IOU;
+const Value_XRP = require('./value_XRP').Value_XRP;
 
-var BigNumber = GlobalBigNumber.another({
+const BigNumber = GlobalBigNumber.another({
   ROUNDING_MODE: GlobalBigNumber.ROUND_HALF_UP,
   DECIMAL_PLACES: 40
 });
@@ -38,7 +40,7 @@ function Amount() {
 
 Amount.strict_mode = true;
 
-var consts = {
+const consts = {
   currency_xns: 0,
   currency_one: 1,
   xns_precision: 6,
@@ -68,9 +70,9 @@ var consts = {
   min_value: '-1000000000000000e-96'
 };
 
-var MAX_XRP_VALUE = new BigNumber(1e11);
-var MAX_IOU_VALUE = new BigNumber(consts.max_value);
-var MIN_IOU_VALUE = (new BigNumber(consts.min_value)).abs();
+const MAX_XRP_VALUE = new BigNumber(1e11);
+const MAX_IOU_VALUE = new BigNumber(consts.max_value);
+const MIN_IOU_VALUE = (new BigNumber(consts.min_value)).abs();
 
 // Add constants to Amount class
 extend(Amount, consts);
@@ -113,7 +115,7 @@ Amount.is_valid_full = function(j) {
 };
 
 Amount.NaN = function() {
-  var result = new Amount();
+  const result = new Amount();
   result._value = new BigNumber(NaN); // should have no effect
   return result;                      // but let's be careful
 };
@@ -128,17 +130,23 @@ Amount.prototype._set_value = function(value, roundingMode) {
 
 // Returns a new value which is the absolute value of this.
 Amount.prototype.abs = function() {
-  return this.clone(this.is_negative());
+
+  const val = (new Value_IOU(this._value)).abs();
+  return this._copy(new BigNumber(val._value));
+
 };
 
 Amount.prototype.add = function(addend) {
-  var addendAmount = Amount.from_json(addend);
+  const addendAmount = Amount.from_json(addend);
 
   if (!this.is_comparable(addendAmount)) {
     return new Amount(NaN);
   }
 
-  return this._copy(this._value.plus(addendAmount._value));
+  const thisValue = new Value_IOU(this._value);
+  const addendValue = new Value_IOU(addendAmount._value);
+  return this._copy(new BigNumber(thisValue.add(addendValue)._value));
+
 };
 
 Amount.prototype.subtract = function(subtrahend) {
@@ -148,20 +156,22 @@ Amount.prototype.subtract = function(subtrahend) {
 
 // XXX Diverges from cpp.
 Amount.prototype.multiply = function(multiplicand) {
-  var multiplicandAmount = Amount.from_json(multiplicand);
-  // TODO: probably should just multiply by multiplicandAmount._value
-  var multiplyBy = multiplicandAmount.is_native() ?
-    multiplicandAmount._value.times(Amount.bi_xns_unit)
-    : multiplicandAmount._value;
-  return this._copy(this._value.times(multiplyBy));
+
+  const multiplicandAmount = Amount.from_json(multiplicand);
+  const multiplyBy = multiplicandAmount.is_native() ?
+    new Value_XRP(multiplicandAmount._value, Amount.bi_xns_unit)
+    : new Value_IOU(multiplicandAmount._value);
+  const thisValue = new Value_IOU(this._value);
+  return this._copy(new BigNumber(thisValue.multiply(multiplyBy)._value));
+
 };
 
 Amount.prototype.scale = function(scaleFactor) {
-  return this._copy(this._value.times(scaleFactor));
+  return this.multiply(scaleFactor);
 };
 
 Amount.prototype.divide = function(divisor) {
-  var divisorAmount = Amount.from_json(divisor);
+  const divisorAmount = Amount.from_json(divisor);
   if (!this.is_valid()) {
     throw new Error('Invalid dividend');
   }
@@ -171,11 +181,11 @@ Amount.prototype.divide = function(divisor) {
   if (divisorAmount.is_zero()) {
     throw new Error('divide by zero');
   }
-  // TODO: probably should just divide by divisorAmount._value
-  var divideBy = divisorAmount.is_native() ?
-    divisorAmount._value.times(Amount.bi_xns_unit)
-    : divisorAmount._value;
-  return this._copy(this._value.dividedBy(divideBy));
+  const divideBy = divisorAmount.is_native() ?
+    new Value_XRP(divisorAmount._value, Amount.bi_xns_unit)
+    : new Value_IOU(divisorAmount._value);
+  const thisValue = new Value_IOU(this._value);
+  return this._copy(new BigNumber(thisValue.divide(divideBy)._value));
 };
 
 /**
@@ -187,7 +197,7 @@ Amount.prototype.divide = function(divisor) {
  * price would be rendered as USD.
  *
  * @example
- *   var price = buy_amount.ratio_human(sell_amount);
+ *   const price = buy_amount.ratio_human(sell_amount);
  *
  * @this {Amount} The numerator (top half) of the fraction.
  * @param {Amount} denominator The denominator (bottom half) of the fraction.
@@ -198,12 +208,12 @@ Amount.prototype.divide = function(divisor) {
  * @return {Amount} The resulting ratio. Unit will be the same as numerator.
  */
 
-Amount.prototype.ratio_human = function(denominator, opts) {
-  opts = extend({ }, opts);
+Amount.prototype.ratio_human = function(denom, opts) {
+  const options = extend({ }, opts);
 
-  var numerator = this.clone();
+  const numerator = this.clone();
 
-  denominator = Amount.from_json(denominator);
+  let denominator = Amount.from_json(denom);
 
   // If either operand is NaN, the result is NaN.
   if (!numerator.is_valid() || !denominator.is_valid()) {
@@ -218,8 +228,8 @@ Amount.prototype.ratio_human = function(denominator, opts) {
   //
   // We only need to apply it to the second factor, because the currency unit of
   // the first factor will carry over into the result.
-  if (opts.reference_date) {
-    denominator = denominator.applyInterest(opts.reference_date);
+  if (options.reference_date) {
+    denominator = denominator.applyInterest(options.reference_date);
   }
 
   // Special case: The denominator is a native (XRP) amount.
@@ -249,21 +259,21 @@ Amount.prototype.ratio_human = function(denominator, opts) {
  * Intended use is to calculate something like: 10 USD * 10 XRP/USD = 100 XRP
  *
  * @example
- *   var sell_amount = buy_amount.product_human(price);
+ *   let sell_amount = buy_amount.product_human(price);
  *
  * @see Amount#ratio_human
  *
- * @param {Amount} factor The second factor of the product.
+ * @param {Amount} fac The second factor of the product.
  * @param {Object} opts Options for the calculation.
  * @param {Date|Number} opts.reference_date Date based on which
  * demurrage/interest should be applied. Can be given as JavaScript Date or int
  * for Ripple epoch.
  * @return {Amount} The product. Unit will be the same as the first factor.
  */
-Amount.prototype.product_human = function(factor, opts) {
-  opts = opts || {};
+Amount.prototype.product_human = function(fac, opts) {
+  const options = opts || {};
 
-  factor = Amount.from_json(factor);
+  let factor = Amount.from_json(fac);
 
   // If either operand is NaN, the result is NaN.
   if (!this.is_valid() || !factor.is_valid()) {
@@ -274,11 +284,11 @@ Amount.prototype.product_human = function(factor, opts) {
   //
   // We only need to apply it to the second factor, because the currency unit of
   // the first factor will carry over into the result.
-  if (opts.reference_date) {
-    factor = factor.applyInterest(opts.reference_date);
+  if (options.reference_date) {
+    factor = factor.applyInterest(options.reference_date);
   }
 
-  var product = this.multiply(factor);
+  const product = this.multiply(factor);
 
   // Special case: The second factor is a native (XRP) amount expressed as base
   // units (1 XRP = 10^xns_precision base units).
@@ -359,7 +369,7 @@ Amount.prototype._check_limits = function() {
   if (this._value.isNaN() || this._value.isZero()) {
     return this;
   }
-  var absval = this._value.absoluteValue();
+  const absval = this._value.absoluteValue();
   if (this._is_native) {
     if (absval.greaterThan(MAX_XRP_VALUE)) {
       throw new Error('Exceeding max value of ' + MAX_XRP_VALUE.toString());
@@ -380,13 +390,13 @@ Amount.prototype.clone = function(negate) {
 };
 
 Amount.prototype._copy = function(value) {
-  var copy = this.clone();
+  const copy = this.clone();
   copy._set_value(value);
   return copy;
 };
 
 Amount.prototype.compareTo = function(to) {
-  var toAmount = Amount.from_json(to);
+  const toAmount = Amount.from_json(to);
   if (!this.is_comparable(toAmount)) {
     return new Amount(NaN);
   }
@@ -482,16 +492,16 @@ Amount.prototype.negate = function() {
  * $
  */
 
-Amount.prototype.parse_human = function(j, opts) {
-  opts = opts || {};
+Amount.prototype.parse_human = function(j, options) {
+  const opts = options || {};
 
-  var hex_RE = /^[a-fA-F0-9]{40}$/;
-  var currency_RE = /^([a-zA-Z]{3}|[0-9]{3})$/;
+  const hex_RE = /^[a-fA-F0-9]{40}$/;
+  const currency_RE = /^([a-zA-Z]{3}|[0-9]{3})$/;
 
-  var value;
-  var currency;
+  let value;
+  let currency;
 
-  var words = j.split(' ').filter(function(word) {
+  const words = j.split(' ').filter(function(word) {
     return word !== '';
   });
 
@@ -534,7 +544,7 @@ Amount.prototype.parse_human = function(j, opts) {
 
   // Apply interest/demurrage
   if (opts.reference_date && this._currency.has_interest()) {
-    var interest = this._currency.get_interest_at(opts.reference_date);
+    const interest = this._currency.get_interest_at(opts.reference_date);
     this._set_value(this._value.dividedBy(interest.toString()));
   }
 
@@ -582,16 +592,17 @@ Amount.prototype.parse_issuer = function(issuer) {
  */
 Amount.prototype.parse_quality =
 function(quality, counterCurrency, counterIssuer, opts) {
-  opts = opts || {};
+  const options = opts || {};
 
-  var baseCurrency = Currency.from_json(opts.base_currency);
+  const baseCurrency = Currency.from_json(options.base_currency);
 
-  var mantissa_hex = quality.substring(quality.length - 14);
-  var offset_hex = quality.substring(quality.length - 16, quality.length - 14);
-  var mantissa = new BigNumber(mantissa_hex, 16);
-  var offset = parseInt(offset_hex, 16) - 100;
+  const mantissa_hex = quality.substring(quality.length - 14);
+  const offset_hex = quality.substring(
+    quality.length - 16, quality.length - 14);
+  const mantissa = new BigNumber(mantissa_hex, 16);
+  const offset = parseInt(offset_hex, 16) - 100;
 
-  var value = new BigNumber(mantissa.toString() + 'e' + offset.toString());
+  const value = new BigNumber(mantissa.toString() + 'e' + offset.toString());
 
   this._currency = Currency.from_json(counterCurrency);
   this._issuer = UInt160.from_json(counterIssuer);
@@ -614,10 +625,10 @@ function(quality, counterCurrency, counterIssuer, opts) {
     quality as stored :  5 USD          /  3000000 drops
     inverted          :  3000000 drops  /          5 USD
   */
-  var adjusted = opts.inverse ? inverse(value) : value;
-  var nativeAdjusted = adjusted;
+  const adjusted = options.inverse ? inverse(value) : value;
+  let nativeAdjusted = adjusted;
 
-  if (!opts.xrp_as_drops) {
+  if (!options.xrp_as_drops) {
     // `In a currency exchange, the exchange rate is quoted as the units of the
     //  counter currency in terms of a single unit of a base currency`. A
     //  quality is how much taker must `pay` to get ONE `gets` unit thus:
@@ -636,9 +647,9 @@ function(quality, counterCurrency, counterIssuer, opts) {
 
   this._set_value(nativeAdjusted);
 
-  if (opts.reference_date && baseCurrency.is_valid()
+  if (options.reference_date && baseCurrency.is_valid()
     && baseCurrency.has_interest()) {
-    var interest = baseCurrency.get_interest_at(opts.reference_date);
+    const interest = baseCurrency.get_interest_at(options.reference_date);
     this._set_value(this._value.dividedBy(interest.toString()));
   }
 
@@ -659,7 +670,7 @@ Amount.prototype.parse_json = function(j) {
     case 'string':
       // .../.../... notation is not a wire format.  But allowed for easier
       // testing.
-      var m = j.match(/^([^/]+)\/([^/]+)(?:\/(.+))?$/);
+      const m = j.match(/^([^/]+)\/([^/]+)(?:\/(.+))?$/);
 
       if (m) {
         this._currency = Currency.from_json(m[2]);
@@ -715,7 +726,7 @@ Amount.prototype.parse_native = function(j) {
     if (j.indexOf('.') >= 0) {
       throw new Error('Native amounts must be specified in integer drops');
     }
-    var value = new BigNumber(j);
+    const value = new BigNumber(j);
     this._is_native = true;
     this._set_value(value.dividedBy(Amount.bi_xns_unit));
   } else {
@@ -764,22 +775,22 @@ Amount.prototype.to_text = function() {
   }
 
   // not native
-  var offset = this._value.e - 15;
-  var sign = this._value.isNegative() ? '-' : '';
-  var mantissa = utils.getMantissaDecimalString(this._value.absoluteValue());
+  const offset = this._value.e - 15;
+  const sign = this._value.isNegative() ? '-' : '';
+  const mantissa = utils.getMantissaDecimalString(this._value.absoluteValue());
   if (offset !== 0 && (offset < -25 || offset > -4)) {
     // Use e notation.
     // XXX Clamp output.
     return sign + mantissa.toString() + 'e' + offset.toString();
   }
 
-  var val = '000000000000000000000000000'
+  const val = '000000000000000000000000000'
   + mantissa.toString()
   + '00000000000000000000000';
-  var pre = val.substring(0, offset + 43);
-  var post = val.substring(offset + 43);
-  var s_pre = pre.match(/[1-9].*$/);  // Everything but leading zeros.
-  var s_post = post.match(/[1-9]0*$/); // Last non-zero plus trailing zeros.
+  const pre = val.substring(0, offset + 43);
+  const post = val.substring(offset + 43);
+  const s_pre = pre.match(/[1-9].*$/);  // Everything but leading zeros.
+  const s_post = post.match(/[1-9]0*$/); // Last non-zero plus trailing zeros.
 
   return sign + (s_pre ? s_pre[0] : '0')
   + (s_post ? '.' + post.substring(0, 1 + post.length - s_post[0].length) : '');
@@ -801,7 +812,7 @@ Amount.prototype.applyInterest = function(referenceDate) {
   if (!this._currency.has_interest()) {
     return this;
   }
-  var interest = this._currency.get_interest_at(referenceDate);
+  const interest = this._currency.get_interest_at(referenceDate);
   return this._copy(this._value.times(interest.toString()));
 };
 
@@ -809,28 +820,28 @@ Amount.prototype.applyInterest = function(referenceDate) {
  * Format only value in a human-readable format.
  *
  * @example
- *   var pretty = amount.to_human({precision: 2});
+ *   let pretty = amount.to_human({precision: 2});
  *
- * @param {Object} opts Options for formatter.
- * @param {Number} opts.precision Max. number of digits after decimal point.
- * @param {Number} opts.min_precision Min. number of digits after dec. point.
- * @param {Boolean} opts.skip_empty_fraction Don't show fraction if it is zero,
- *   even if min_precision is set.
- * @param {Number} opts.max_sig_digits Maximum number of significant digits.
+ * @param {Object} options Options for formatter.
+ * @param {Number} options.precision Max. number of digits after decimal point.
+ * @param {Number} options.min_precision Min. number of digits after dec. point.
+ * @param {Boolean} options.skip_empty_fraction Don't show fraction if it
+ *   is zero, even if min_precision is set.
+ * @param {Number} options.max_sig_digits Maximum number of significant digits.
  *   Will cut fractional part, but never integer part.
- * @param {Boolean|String} opts.group_sep Whether to show a separator every n
+ * @param {Boolean|String} options.group_sep Whether to show a separator every n
  *   digits, if a string, that value will be used as the separator. Default: ','
- * @param {Number} opts.group_width How many numbers will be grouped together,
- *   default: 3.
- * @param {Boolean|String} opts.signed Whether negative numbers will have a
+ * @param {Number} options.group_width How many numbers will be grouped
+ *   together, default: 3.
+ * @param {Boolean|String} options.signed Whether negative numbers will have a
  *   prefix. If String, that string will be used as the prefix. Default: '-'
- * @param {Date|Number} opts.reference_date Date based on which
+ * @param {Date|Number} options.reference_date Date based on which
  * demurrage/interest should be applied. Can be given as JavaScript Date or int
  * for Ripple epoch.
  * @return {String} amount string
  */
-Amount.prototype.to_human = function(opts) {
-  opts = opts || {};
+Amount.prototype.to_human = function(options) {
+  const opts = options || {};
 
   if (!this.is_valid()) {
     return 'NaN';
@@ -838,18 +849,18 @@ Amount.prototype.to_human = function(opts) {
 
   /* eslint-disable consistent-this */
   // Apply demurrage/interest
-  var ref = this;
+  let ref = this;
   /* eslint-enable consistent-this */
 
   if (opts.reference_date) {
     ref = this.applyInterest(opts.reference_date);
   }
 
-  var isNegative = ref._value.isNegative();
-  var valueString = ref._value.abs().toFixed();
-  var parts = valueString.split('.');
-  var int_part = parts[0];
-  var fraction_part = parts.length === 2 ? parts[1] : '';
+  const isNegative = ref._value.isNegative();
+  const valueString = ref._value.abs().toFixed();
+  const parts = valueString.split('.');
+  let int_part = parts[0];
+  let fraction_part = parts.length === 2 ? parts[1] : '';
 
   int_part = int_part.replace(/^0*/, '');
   fraction_part = fraction_part.replace(/0*$/, '');
@@ -857,9 +868,9 @@ Amount.prototype.to_human = function(opts) {
   if (fraction_part.length || !opts.skip_empty_fraction) {
     // Enforce the maximum number of decimal digits (precision)
     if (typeof opts.precision === 'number') {
-      var precision = Math.max(0, opts.precision);
+      let precision = Math.max(0, opts.precision);
       precision = Math.min(precision, fraction_part.length);
-      var rounded = Number('0.' + fraction_part).toFixed(precision);
+      const rounded = Number('0.' + fraction_part).toFixed(precision);
 
       if (rounded < 1) {
         fraction_part = rounded.substring(2);
@@ -877,18 +888,18 @@ Amount.prototype.to_human = function(opts) {
     if (typeof opts.max_sig_digits === 'number') {
       // First, we count the significant digits we have.
       // A zero in the integer part does not count.
-      var int_is_zero = Number(int_part) === 0;
-      var digits = int_is_zero ? 0 : int_part.length;
+      const int_is_zero = Number(int_part) === 0;
+      let digits = int_is_zero ? 0 : int_part.length;
 
       // Don't count leading zeros in the fractional part if the integer part is
       // zero.
-      var sig_frac = int_is_zero
+      const sig_frac = int_is_zero
       ? fraction_part.replace(/^0*/, '')
       : fraction_part;
       digits += sig_frac.length;
 
       // Now we calculate where we are compared to the maximum
-      var rounding = digits - opts.max_sig_digits;
+      let rounding = digits - opts.max_sig_digits;
 
       // If we're under the maximum we want to cut no (=0) digits
       rounding = Math.max(rounding, 0);
@@ -913,12 +924,12 @@ Amount.prototype.to_human = function(opts) {
   }
 
   if (opts.group_sep !== false) {
-    var sep = (typeof opts.group_sep === 'string') ? opts.group_sep : ',';
-    var groups = utils.chunkString(int_part, opts.group_width || 3, true);
+    const sep = (typeof opts.group_sep === 'string') ? opts.group_sep : ',';
+    const groups = utils.chunkString(int_part, opts.group_width || 3, true);
     int_part = groups.join(sep);
   }
 
-  var formatted = '';
+  let formatted = '';
   if (isNegative && opts.signed !== false) {
     formatted += '-';
   }
@@ -929,12 +940,12 @@ Amount.prototype.to_human = function(opts) {
   return formatted;
 };
 
-Amount.prototype.to_human_full = function(opts) {
-  opts = opts || {};
-  var value = this.to_human(opts);
-  var currency = this._currency.to_human();
-  var issuer = this._issuer.to_json(opts);
-  var base = value + '/' + currency;
+Amount.prototype.to_human_full = function(options) {
+  const opts = options || {};
+  const value = this.to_human(opts);
+  const currency = this._currency.to_human();
+  const issuer = this._issuer.to_json(opts);
+  const base = value + '/' + currency;
   return this.is_native() ? base : (base + '/' + issuer);
 };
 
@@ -943,7 +954,7 @@ Amount.prototype.to_json = function() {
     return this.to_text();
   }
 
-  var amount_json = {
+  const amount_json = {
     value: this.to_text(),
     currency: this._currency.has_interest() ?
     this._currency.to_hex() : this._currency.to_json()
@@ -981,7 +992,7 @@ Amount.prototype.not_equals_why = function(d, ignore_issuer) {
     return 'Native mismatch.';
   }
 
-  var type = this._is_native ? 'XRP' : 'Non-XRP';
+  let type = this._is_native ? 'XRP' : 'Non-XRP';
   if (!this._value.isZero() && this._value.negated().equals(d._value)) {
     return type + ' sign differs.';
   }
