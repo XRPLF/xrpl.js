@@ -50,57 +50,9 @@ function SerializedObject(buf) {
   this.pointer = 0;
 }
 
-SerializedObject.from_json = function(obj_) {
-  // Create a copy of the object so we don't modify it
-  const obj = extend(true, {}, obj_);
-
+SerializedObject.from_json = function(obj) {
   const so = new SerializedObject();
-  let typedef;
-
-  if (typeof obj.TransactionType === 'number') {
-    obj.TransactionType = SerializedObject.lookup_type_tx(obj.TransactionType);
-    if (!obj.TransactionType) {
-      throw new Error('Transaction type ID is invalid.');
-    }
-  }
-
-  if (typeof obj.LedgerEntryType === 'number') {
-    obj.LedgerEntryType = SerializedObject.lookup_type_le(obj.LedgerEntryType);
-
-    if (!obj.LedgerEntryType) {
-      throw new Error('LedgerEntryType ID is invalid.');
-    }
-  }
-
-  if (typeof obj.TransactionType === 'string') {
-    typedef = binformat.tx[obj.TransactionType];
-    if (!Array.isArray(typedef)) {
-      throw new Error('Transaction type is invalid');
-    }
-
-    typedef = typedef.slice();
-    obj.TransactionType = typedef.shift();
-  } else if (typeof obj.LedgerEntryType === 'string') {
-    typedef = binformat.ledger[obj.LedgerEntryType];
-
-    if (!Array.isArray(typedef)) {
-      throw new Error('LedgerEntryType is invalid');
-    }
-
-    typedef = typedef.slice();
-    obj.LedgerEntryType = typedef.shift();
-
-  } else if (typeof obj.AffectedNodes === 'object') {
-    typedef = binformat.metadata;
-  } else {
-    throw new Error('Object to be serialized must contain either' +
-                    ' TransactionType, LedgerEntryType or AffectedNodes.');
-  }
-
-  // ND: This from_*json* seems a reasonable place to put validation of `json`
-  SerializedObject.check_fields(typedef, obj);
-  so.serialize(typedef, obj);
-
+  so.parse_json(obj);
   return so;
 };
 
@@ -152,6 +104,55 @@ SerializedObject.check_fields = function(typedef, obj) {
   }
 
   throw new Error(errorMessage);
+};
+
+SerializedObject.prototype.parse_json = function(obj_) {
+  // Create a copy of the object so we don't modify it
+  const obj = extend(true, {}, obj_);
+  let typedef;
+
+  if (typeof obj.TransactionType === 'number') {
+    obj.TransactionType = SerializedObject.lookup_type_tx(obj.TransactionType);
+    if (!obj.TransactionType) {
+      throw new Error('Transaction type ID is invalid.');
+    }
+  }
+
+  if (typeof obj.LedgerEntryType === 'number') {
+    obj.LedgerEntryType = SerializedObject.lookup_type_le(obj.LedgerEntryType);
+
+    if (!obj.LedgerEntryType) {
+      throw new Error('LedgerEntryType ID is invalid.');
+    }
+  }
+
+  if (typeof obj.TransactionType === 'string') {
+    typedef = binformat.tx[obj.TransactionType];
+    if (!Array.isArray(typedef)) {
+      throw new Error('Transaction type is invalid');
+    }
+
+    typedef = typedef.slice();
+    obj.TransactionType = typedef.shift();
+  } else if (typeof obj.LedgerEntryType === 'string') {
+    typedef = binformat.ledger[obj.LedgerEntryType];
+
+    if (!Array.isArray(typedef)) {
+      throw new Error('LedgerEntryType is invalid');
+    }
+
+    typedef = typedef.slice();
+    obj.LedgerEntryType = typedef.shift();
+
+  } else if (typeof obj.AffectedNodes === 'object') {
+    typedef = binformat.metadata;
+  } else {
+    throw new Error('Object to be serialized must contain either' +
+                    ' TransactionType, LedgerEntryType or AffectedNodes.');
+  }
+
+  SerializedObject.check_fields(typedef, obj);
+  this.serialize(typedef, obj);
 };
 
 SerializedObject.prototype.append = function(bytes_) {

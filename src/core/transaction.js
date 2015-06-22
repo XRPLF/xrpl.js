@@ -274,7 +274,7 @@ Transaction.prototype.getManager = function(account_) {
     return undefined;
   }
 
-  let account = account_ || this.tx_json.Account;
+  const account = account_ || this.tx_json.Account;
   return this.remote.account(account)._transactionManager;
 };
 
@@ -290,7 +290,7 @@ Transaction.prototype._accountSecret = function(account_) {
     return undefined;
   }
 
-  let account = account_ || this.tx_json.Account;
+  const account = account_ || this.tx_json.Account;
   return this.remote.secrets[account];
 };
 
@@ -326,7 +326,7 @@ Transaction.prototype._computeFee = function() {
   const fees = [ ];
 
   for (let i = 0; i < servers.length; i++) {
-    let server = servers[i];
+    const server = servers[i];
     if (server.isConnected()) {
       fees.push(Number(server._computeFee(this._getFeeUnits())));
     }
@@ -433,6 +433,13 @@ Transaction.prototype.serialize = function() {
 
 Transaction.prototype.signingHash = function(testnet) {
   return this.hash(testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
+};
+
+Transaction.prototype.signingData = function() {
+  const so = new SerializedObject();
+  so.append(hashprefixes.HASH_TX_SIGN_BYTES);
+  so.parse_json(this.tx_json);
+  return so;
 };
 
 Transaction.prototype.hash = function(prefix_, asUINT256, serialized) {
@@ -770,7 +777,7 @@ Transaction.prototype.addMemo = function(options_) {
   const memo = {};
   const memoRegex = Transaction.MEMO_REGEX;
   let memoType = options.memoType;
-  let memoFormat = options.memoFormat;
+  const memoFormat = options.memoFormat;
   let memoData = options.memoData;
 
   if (memoType) {
@@ -918,7 +925,7 @@ Transaction.prototype.transferRate = function(rate) {
   // }
   /* eslint-enable max-len */
 
-  let transferRate = rate;
+  const transferRate = rate;
 
   if (transferRate === 0) {
     // Clear TransferRate
@@ -1323,7 +1330,7 @@ Transaction.prototype.setExpiration = function(expiration) {
     // throw new Error('TransactionType must be OfferCreate to use Expiration');
   // }
 
-  let timeOffset = expiration instanceof Date
+  const timeOffset = expiration instanceof Date
   ? expiration.getTime()
   : expiration;
 
@@ -1433,7 +1440,7 @@ Transaction.prototype.abort = function() {
 
 Transaction.prototype.getSummary =
 Transaction.prototype.summary = function() {
-  let txSummary = {
+  const txSummary = {
     tx_json: this.tx_json,
     clientID: this._clientID,
     submittedIDs: this.submittedIDs,
