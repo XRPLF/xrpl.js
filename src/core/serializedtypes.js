@@ -441,7 +441,7 @@ exports.Quality = new SerializedType({
       lo = parseInt(mantissaHex.slice(-8), 16);
     }
 
-    const valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
+    let valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
 
     so.append(valueBytes);
   }
