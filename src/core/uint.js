@@ -2,8 +2,10 @@
 
 /*eslint new-cap: 1*/
 
-var utils = require('./utils');
-var sjcl = utils.sjcl;
+const assert = require('assert');
+const lodash = require('lodash');
+const utils = require('./utils');
+const sjcl = utils.sjcl;
 
 //
 // Abstract UInt class
@@ -14,7 +16,6 @@ var sjcl = utils.sjcl;
 function UInt() {
   // Internal form: NaN or sjcl.bn
   this._value = NaN;
-  this._update();
 }
 
 UInt.json_rewrite = function(j, opts) {
@@ -26,6 +27,7 @@ UInt.from_generic = function(j) {
   if (j instanceof this) {
     return j.clone();
   }
+
   return (new this()).parse_generic(j);
 };
 
@@ -34,6 +36,7 @@ UInt.from_hex = function(j) {
   if (j instanceof this) {
     return j.clone();
   }
+
   return (new this()).parse_hex(j);
 };
 
@@ -42,6 +45,7 @@ UInt.from_json = function(j) {
   if (j instanceof this) {
     return j.clone();
   }
+
   return (new this()).parse_json(j);
 };
 
@@ -50,6 +54,7 @@ UInt.from_bits = function(j) {
   if (j instanceof this) {
     return j.clone();
   }
+
   return (new this()).parse_bits(j);
 };
 
@@ -58,6 +63,7 @@ UInt.from_bytes = function(j) {
   if (j instanceof this) {
     return j.clone();
   }
+
   return (new this()).parse_bytes(j);
 };
 
@@ -66,6 +72,7 @@ UInt.from_bn = function(j) {
   if (j instanceof this) {
     return j.clone();
   }
+
   return (new this()).parse_bn(j);
 };
 
@@ -74,6 +81,7 @@ UInt.from_number = function(j) {
   if (j instanceof this) {
     return j.clone();
   }
+
   return (new this()).parse_number(j);
 };
 
@@ -130,34 +138,46 @@ UInt.prototype._update = function() {
 
 // value = NaN on error.
 UInt.prototype.parse_generic = function(j) {
+  const subclass = this.constructor;
+
+  assert(typeof subclass.width === 'number', 'UInt missing width');
+
+  this._value = NaN;
+
   switch (j) {
     case undefined:
     case '0':
-    case this.constructor.STR_ZERO:
-    case this.constructor.ACCOUNT_ZERO:
-    case this.constructor.HEX_ZERO:
+    case subclass.STR_ZERO:
+    case subclass.ACCOUNT_ZERO:
+    case subclass.HEX_ZERO:
       this._value = new sjcl.bn(0);
       break;
 
     case '1':
-    case this.constructor.STR_ONE:
-    case this.constructor.ACCOUNT_ONE:
-    case this.constructor.HEX_ONE:
+    case subclass.STR_ONE:
+    case subclass.ACCOUNT_ONE:
+    case subclass.HEX_ONE:
       this._value = new sjcl.bn(1);
       break;
 
     default:
-        if (typeof j !== 'string') {
-          this._value = NaN;
-        } else if (this.constructor.width === j.length) {
-          var hex = utils.arrayToHex(utils.stringToArray(j));
-          this._value = new sjcl.bn(hex, 16);
-        } else if ((this.constructor.width * 2) === j.length) {
-          // XXX Check char set!
-          this._value = new sjcl.bn(j, 16);
-        } else {
-          this._value = NaN;
+      if (lodash.isString(j)) {
+        switch (j.length) {
+          case subclass.width:
+            const hex = utils.arrayToHex(utils.stringToArray(j));
+            this._value = new sjcl.bn(hex, 16);
+            break;
+          case subclass.width * 2:
+            // Assume hex, check char set
+            this.parse_hex(j);
+            break;
         }
+      } else if (lodash.isNumber(j)) {
+        this.parse_number(j);
+      } else if (lodash.isArray(j)) {
+        // Assume bytes array
+        this.parse_bytes(j);
+      }
   }
 
   this._update();
@@ -166,7 +186,7 @@ UInt.prototype.parse_generic = function(j) {
 };
 
 UInt.prototype.parse_hex = function(j) {
-  if (typeof j === 'string' && j.length === (this.constructor.width * 2)) {
+  if (new RegExp(`^[0-9A-Fa-f]{${this.constructor.width * 2}}$`).test(j)) {
     this._value = new sjcl.bn(j, 16);
   } else {
     this._value = NaN;
@@ -178,12 +198,12 @@ UInt.prototype.parse_hex = function(j) {
 };
 
 UInt.prototype.parse_bits = function(j) {
-  if (sjcl.bitArray.bitLength(j) !== this.constructor.width * 8) {
-    this._value = NaN;
-  } else {
+  if (sjcl.bitArray.bitLength(j) === this.constructor.width * 8) {
     this._value = sjcl.bn.fromBits(j);
-    // var bytes = sjcl.codec.bytes.fromBits(j);
+    // let bytes = sjcl.codec.bytes.fromBits(j);
     // this.parse_bytes(bytes);
+  } else {
+    this._value = NaN;
   }
 
   this._update();
@@ -193,11 +213,11 @@ UInt.prototype.parse_bits = function(j) {
 
 
 UInt.prototype.parse_bytes = function(j) {
-  if (!Array.isArray(j) || j.length !== this.constructor.width) {
-    this._value = NaN;
-  } else {
-    var bits = sjcl.codec.bytes.toBits(j);
+  if (Array.isArray(j) && j.length === this.constructor.width) {
+    const bits = sjcl.codec.bytes.toBits(j);
     this._value = sjcl.bn.fromBits(bits);
+  } else {
+    this._value = NaN;
   }
 
   this._update();
@@ -209,8 +229,7 @@ UInt.prototype.parse_bytes = function(j) {
 UInt.prototype.parse_json = UInt.prototype.parse_hex;
 
 UInt.prototype.parse_bn = function(j) {
-  if ((j instanceof sjcl.bn) &&
-      j.bitLength() <= this.constructor.width * 8) {
+  if ((j instanceof sjcl.bn) && j.bitLength() <= this.constructor.width * 8) {
     this._value = new sjcl.bn(j);
   } else {
     this._value = NaN;
@@ -238,6 +257,7 @@ UInt.prototype.to_bytes = function() {
   if (!this.is_valid()) {
     return null;
   }
+
   return sjcl.codec.bytes.fromBits(this.to_bits());
 };
 
@@ -245,6 +265,7 @@ UInt.prototype.to_hex = function() {
   if (!this.is_valid()) {
     return null;
   }
+
   return sjcl.codec.hex.fromBits(this.to_bits()).toUpperCase();
 };
 
@@ -263,7 +284,7 @@ UInt.prototype.to_bn = function() {
     return null;
   }
 
-  var bits = this.to_bits();
+  const bits = this.to_bits();
 
   return sjcl.bn.fromBits(bits);
 };

@@ -54,7 +54,7 @@ SerializedObject.from_json = function(obj_) {
   // Create a copy of the object so we don't modify it
   const obj = extend(true, {}, obj_);
 
-  let so = new SerializedObject();
+  const so = new SerializedObject();
   let typedef;
 
   if (typeof obj.TransactionType === 'number') {
@@ -216,7 +216,7 @@ SerializedObject.prototype.to_json = function() {
 
   this.resetPointer();
 
-  let output = { };
+  const output = { };
 
   while (this.pointer < this.buffer.length) {
     const key_and_value = stypes.parse(this);
@@ -265,10 +265,10 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
         // new Array or Object
         output = new structure.constructor();
 
-        let keys = Object.keys(structure);
+        const keys = Object.keys(structure);
 
         for (let i = 0, l = keys.length; i < l; i++) {
-          let key = keys[i];
+          const key = keys[i];
           output[key] = SerializedObject.jsonify_structure(structure[key], key);
         }
       }
@@ -297,7 +297,7 @@ SerializedObject.prototype.serialize = function(typedef, obj) {
 };
 
 SerializedObject.prototype.hash = function(prefix) {
-  let sign_buffer = new SerializedObject();
+  const sign_buffer = new SerializedObject();
 
   // Add hashing prefix
   if (typeof prefix !== 'undefined') {
@@ -310,7 +310,7 @@ SerializedObject.prototype.hash = function(prefix) {
   const bits = sjcl.codec.bytes.toBits(sign_buffer.buffer);
   const sha512hex = sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(bits));
 
-  return UInt256.from_hex(sha512hex.substr(0, 64));
+  return UInt256.from_hex(sha512hex.substr(0, 64).toUpperCase());
 };
 
 // DEPRECATED
@@ -334,7 +334,7 @@ SerializedObject.prototype.serialize_field = function(spec, obj) {
 };
 
 SerializedObject.get_field_header = function(type_id, field_id) {
-  let buffer = [0];
+  const buffer = [0];
 
   if (type_id > 0xF) {
     buffer.push(type_id & 0xFF);
