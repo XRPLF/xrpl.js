@@ -3,6 +3,8 @@
 'use strict';
 
 const assert = require('assert-diff');
+const lodash = require('lodash');
+const ripple = require('ripple-lib');
 const Remote = require('ripple-lib').Remote;
 const Server = require('ripple-lib').Server;
 const Transaction = require('ripple-lib').Transaction;
@@ -22,6 +24,19 @@ const PAGING_MARKER =
   '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73';
 const TRANSACTION_HASH =
   '14576FFD5D59FFA73CAA90547BE4DE09926AAB59E981306C32CCE04408CBF8EA';
+const HEX_USD = ripple.Currency.json_rewrite('USD', {force_hex: true});
+const SECRET = 'shvHH5yMTrVrF9s7YHSFPCWJgmfbE';
+const TX_JSON = {
+  Flags: 0,
+  TransactionType: 'Payment',
+  Account: ADDRESS,
+  Destination: ripple.UInt160.ACCOUNT_ONE,
+  Amount: {
+    value: '1',
+    currency: 'USD',
+    issuer: ADDRESS
+  }
+};
 
 describe('Remote', function() {
   let initialLogEngine = Log.getEngine();
@@ -1218,275 +1233,327 @@ describe('Remote', function() {
       id: undefined
     });
   });
+   it('Construct account_currencies request', function() {
+     let request = remote.requestAccountCurrencies({
+       account: ADDRESS
+     });
 
-  it('Construct account_currencies request -- with ledger index', function() {
-    let request = remote.requestAccountCurrencies({
-      account: ADDRESS
-    });
-    assert.strictEqual(request.message.command, 'account_currencies');
-    assert.strictEqual(request.message.account, ADDRESS);
-  });
+     assert.strictEqual(request.message.command, 'account_currencies');
+     assert.strictEqual(request.message.account, ADDRESS);
 
-  it('Construct account_info request -- with ledger index', function() {
-    let request = remote.requestAccountInfo({
-      account: ADDRESS,
-      ledger: 9592219
-    });
-    assert.strictEqual(request.message.command, 'account_info');
-    assert.strictEqual(request.message.account, ADDRESS);
-    assert.strictEqual(request.message.ledger_index, 9592219);
-  });
-  it('Construct account_info request -- with ledger hash', function() {
-    let request = remote.requestAccountInfo({
-      account: ADDRESS,
-      ledger: LEDGER_HASH
-    });
-    assert.strictEqual(request.message.command, 'account_info');
-    assert.strictEqual(request.message.account, ADDRESS);
-    assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
-  });
-  it('Construct account_info request -- with ledger identifier', function() {
-    let request = remote.requestAccountInfo({
-      account: ADDRESS,
-      ledger: 'validated'
-    });
-    assert.strictEqual(request.message.command, 'account_info');
-    assert.strictEqual(request.message.account, ADDRESS);
-    assert.strictEqual(request.message.ledger_index, 'validated');
-  });
+     Log.setEngine(Log.engines.none);
+     request = remote.requestAccountCurrencies(ADDRESS);
+     assert.strictEqual(request.message.command, 'account_currencies');
+     assert.strictEqual(request.message.account, ADDRESS);
+   });
 
-  it('Construct account balance request -- with ledger index', function() {
-    let request = remote.requestAccountBalance({
-      account: ADDRESS,
-      ledger: 9592219
-    });
-    assert.strictEqual(request.message.command, 'ledger_entry');
-    assert.strictEqual(request.message.account_root, ADDRESS);
-    assert.strictEqual(request.message.ledger_index, 9592219);
-  });
-  it('Construct account balance request -- with ledger hash', function() {
-    let request = remote.requestAccountBalance({
-      account: ADDRESS,
-      ledger: LEDGER_HASH
-    });
-    assert.strictEqual(request.message.command, 'ledger_entry');
-    assert.strictEqual(request.message.account_root, ADDRESS);
-    assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
-  });
-  it('Construct account balance request -- with ledger identifier', function() {
-    let request = remote.requestAccountBalance({
-      account: ADDRESS,
-      ledger: 'validated'
-    });
-    assert.strictEqual(request.message.command, 'ledger_entry');
-    assert.strictEqual(request.message.account_root, ADDRESS);
-    assert.strictEqual(request.message.ledger_index, 'validated');
-  });
+   it('Construct account_info request', function() {
+     let request = remote.requestAccountInfo({
+       account: ADDRESS
+     });
 
-  it('Construct account flags request', function() {
-    let request = remote.requestAccountFlags({account: ADDRESS});
-    assert.strictEqual(request.message.command, 'ledger_entry');
-    assert.strictEqual(request.message.account_root, ADDRESS);
-  });
-  it('Construct account owner count request', function() {
-    let request = remote.requestOwnerCount({account: ADDRESS});
-    assert.strictEqual(request.message.command, 'ledger_entry');
-    assert.strictEqual(request.message.account_root, ADDRESS);
-  });
+     assert.strictEqual(request.message.command, 'account_info');
+     assert.strictEqual(request.message.account, ADDRESS);
 
-  it('Construct account_lines request', function() {
-    let request = remote.requestAccountLines({account: ADDRESS});
-    assert.deepEqual(request.message, {
-      command: 'account_lines',
-      id: undefined,
-      account: ADDRESS
-    });
-  });
-  it('Construct account_lines request -- with peer', function() {
-    let request = remote.requestAccountLines({
-      account: ADDRESS,
-      peer: ADDRESS
-    });
-    assert.deepEqual(request.message, {
-      command: 'account_lines',
-      id: undefined,
-      account: ADDRESS,
-      peer: ADDRESS
-    });
-  });
-  it('Construct account_lines request -- with limit', function() {
-    let request = remote.requestAccountLines({
-      account: ADDRESS,
-      limit: 100
-    });
-    assert.deepEqual(request.message, {
-      command: 'account_lines',
-      id: undefined,
-      account: ADDRESS,
-      limit: 100
-    });
-  });
-  it('Construct account_lines request -- with limit and marker', function() {
-    let request = remote.requestAccountLines({
-      account: ADDRESS,
-      limit: 100,
-      marker: PAGING_MARKER,
-      ledger: 9592219
-    });
-    assert.deepEqual(request.message, {
-      command: 'account_lines',
-      id: undefined,
-      account: ADDRESS,
-      limit: 100,
-      marker: PAGING_MARKER,
-      ledger_index: 9592219
-    });
-  });
-  it('Construct account_lines request -- with min limit', function() {
-    assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS, limit: 0
-    }).message.limit, 0);
-    assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS, limit: -1
-    }).message.limit, 0);
-    assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS, limit: -1e9
-    }).message.limit, 0);
-    assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS, limit: -1e24
-    }).message.limit, 0);
-  });
-  it('Construct account_lines request -- with max limit', function() {
-    assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS, limit: 1e9
-    }).message.limit, 1e9);
-    assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS, limit: 1e9 + 1
-    }).message.limit, 1e9);
-    assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS, limit: 1e10
-    }).message.limit, 1e9);
-    assert.strictEqual(remote.requestAccountLines({
-      account: ADDRESS, limit: 1e24
-    }).message.limit, 1e9);
-  });
+     Log.setEngine(Log.engines.none);
+     request = remote.requestAccountInfo(ADDRESS);
+     assert.strictEqual(request.message.command, 'account_info');
+     assert.strictEqual(request.message.account, ADDRESS);
+     });
 
-  it('Construct account_lines request -- with marker -- missing ledger',
-     function() {
-    assert.throws(function() {
-      remote.requestAccountLines({account: ADDRESS, marker: PAGING_MARKER});
-    }, 'A ledger_index or ledger_hash must be provided when using a marker');
+   it('Construct account_info request -- with ledger index', function() {
+     let request = remote.requestAccountInfo({
+       account: ADDRESS,
+       ledger: 9592219
+     });
+     assert.strictEqual(request.message.command, 'account_info');
+     assert.strictEqual(request.message.account, ADDRESS);
+     assert.strictEqual(request.message.ledger_index, 9592219);
 
-    assert.throws(function() {
-      remote.requestAccountLines({
-        account: ADDRESS,
-        marker: PAGING_MARKER,
-        ledger: 'validated'
-      });
-    }, 'A ledger_index or ledger_hash must be provided when using a marker');
+     Log.setEngine(Log.engines.none);
+     request = remote.requestAccountInfo(ADDRESS, 9592219);
 
-    assert.throws(function() {
-      remote.requestAccountLines({
-        account: ADDRESS,
-        marker: PAGING_MARKER,
-        ledger: NaN
-      });
-    }, 'A ledger_index or ledger_hash must be provided when using a marker');
+     assert.strictEqual(request.message.command, 'account_info');
+     assert.strictEqual(request.message.account, ADDRESS);
+     assert.strictEqual(request.message.ledger_index, 9592219);
+     });
 
-    assert.throws(function() {
-      remote.requestAccountLines({
-        account: ADDRESS,
-        marker: PAGING_MARKER,
-        ledger: LEDGER_HASH.substr(0, 63)
-      });
-    }, 'A ledger_index or ledger_hash must be provided when using a marker');
+   it('Construct account_info request -- with ledger hash', function() {
+     let request = remote.requestAccountInfo({
+       account: ADDRESS,
+       ledger: LEDGER_HASH
+     });
+     assert.strictEqual(request.message.command, 'account_info');
+     assert.strictEqual(request.message.account, ADDRESS);
+     assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
+   });
+   it('Construct account_info request -- with ledger identifier', function() {
+     let request = remote.requestAccountInfo({
+       account: ADDRESS,
+       ledger: 'validated'
+     });
+     assert.strictEqual(request.message.command, 'account_info');
+     assert.strictEqual(request.message.account, ADDRESS);
+     assert.strictEqual(request.message.ledger_index, 'validated');
+   });
 
-    assert.throws(function() {
-      remote.requestAccountLines({
-        account: ADDRESS, marker: PAGING_MARKER, ledger: LEDGER_HASH + 'F'
-      });
-    }, 'A ledger_index or ledger_hash must be provided when using a marker');
-  });
-  it('Construct account_lines request -- with callback', function() {
-    let request = remote.requestAccountLines({
-      account: ADDRESS
-    }, callback);
+   it('Construct account balance request -- with ledger index', function() {
+     let request = remote.requestAccountBalance({
+       account: ADDRESS,
+       ledger: 9592219
+     });
+     assert.strictEqual(request.message.command, 'ledger_entry');
+     assert.strictEqual(request.message.account_root, ADDRESS);
+     assert.strictEqual(request.message.ledger_index, 9592219);
+   });
+   it('Construct account balance request -- with ledger hash', function() {
+     let request = remote.requestAccountBalance({
+       account: ADDRESS,
+       ledger: LEDGER_HASH
+     });
+     assert.strictEqual(request.message.command, 'ledger_entry');
+     assert.strictEqual(request.message.account_root, ADDRESS);
+     assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
+   });
+   it('Construct account balance request -- with ledger identifier', function() {
+     let request = remote.requestAccountBalance({
+       account: ADDRESS,
+       ledger: 'validated'
+     });
+     assert.strictEqual(request.message.command, 'ledger_entry');
+     assert.strictEqual(request.message.account_root, ADDRESS);
+     assert.strictEqual(request.message.ledger_index, 'validated');
+   });
 
-    assert.deepEqual(request.message, {
-      command: 'account_lines',
-      id: undefined,
-      account: ADDRESS
-    });
-  });
+   it('Construct account flags request', function() {
+     let request = remote.requestAccountFlags({account: ADDRESS});
+     assert.strictEqual(request.message.command, 'ledger_entry');
+     assert.strictEqual(request.message.account_root, ADDRESS);
+   });
+   it('Construct account owner count request', function() {
+     let request = remote.requestOwnerCount({account: ADDRESS});
+     assert.strictEqual(request.message.command, 'ledger_entry');
+     assert.strictEqual(request.message.account_root, ADDRESS);
 
-  it('Construct account_tx request', function() {
-    let request = remote.requestAccountTransactions({
-      account: UInt160.ACCOUNT_ONE,
-      ledger_index_min: -1,
-      ledger_index_max: -1,
-      limit: 5,
-      forward: true,
-      marker: PAGING_MARKER
-    });
+     Log.setEngine(Log.engines.none);
+     request = remote.requestOwnerCount(ADDRESS);
 
-    assert.deepEqual(request.message, {
-      command: 'account_tx',
-      id: undefined,
-      account: UInt160.ACCOUNT_ONE,
-      ledger_index_min: -1,
-      ledger_index_max: -1,
-      binary: true,
-      forward: true,
-      limit: 5,
-      marker: PAGING_MARKER
-    });
+     assert.strictEqual(request.message.command, 'ledger_entry');
+     assert.strictEqual(request.message.account_root, ADDRESS);
+   });
 
-    request = remote.requestAccountTransactions({
-      account: UInt160.ACCOUNT_ONE,
-      min_ledger: -1,
-      max_ledger: -1
-    });
-    assert.deepEqual(request.message, {
-      command: 'account_tx',
-      id: undefined,
-      account: UInt160.ACCOUNT_ONE,
-      binary: true,
-      ledger_index_min: -1,
-      ledger_index_max: -1
-    });
-  });
-  it('Construct account_tx request -- no binary', function() {
-    let request = remote.requestAccountTransactions({
-      account: UInt160.ACCOUNT_ONE,
-      ledger_index_min: -1,
-      ledger_index_max: -1,
-      limit: 5,
-      forward: true,
-      binary: false,
-      marker: PAGING_MARKER
-    });
+   it('Construct account_lines request', function() {
+     let request = remote.requestAccountLines({account: ADDRESS});
+     assert.deepEqual(request.message, {
+       command: 'account_lines',
+       id: undefined,
+       account: ADDRESS
+     });
+   });
+   it('Construct account_lines request -- with peer', function() {
+     let request = remote.requestAccountLines({
+       account: ADDRESS,
+       peer: ADDRESS
+     });
+     assert.deepEqual(request.message, {
+       command: 'account_lines',
+       id: undefined,
+       account: ADDRESS,
+       peer: ADDRESS
+     });
+   });
+   it('Construct account_lines request -- with limit', function() {
+     let request = remote.requestAccountLines({
+       account: ADDRESS,
+       limit: 100
+     });
+     assert.deepEqual(request.message, {
+       command: 'account_lines',
+       id: undefined,
+       account: ADDRESS,
+       limit: 100
+     });
+   });
+   it('Construct account_lines request -- with limit and marker', function() {
+     let request = remote.requestAccountLines({
+       account: ADDRESS,
+       limit: 100,
+       marker: PAGING_MARKER,
+       ledger: 9592219
+     });
+     assert.deepEqual(request.message, {
+       command: 'account_lines',
+       id: undefined,
+       account: ADDRESS,
+       limit: 100,
+       marker: PAGING_MARKER,
+       ledger_index: 9592219
+     });
 
-    assert.deepEqual(request.message, {
-      command: 'account_tx',
-      id: undefined,
-      account: UInt160.ACCOUNT_ONE,
-      ledger_index_min: -1,
-      ledger_index_max: -1,
-      binary: false,
-      forward: true,
-      limit: 5,
-      marker: PAGING_MARKER
-    });
-  });
+     Log.setEngine(Log.engines.none);
+     request = remote.requestAccountLines(
+       ADDRESS,
+       null,
+       9592219,
+       100,
+       PAGING_MARKER
+     );
 
-  it('Construct account_offers request -- no binary', function() {
-    let request = remote.requestAccountOffers({account: ADDRESS});
-    assert.deepEqual(request.message, {
-      command: 'account_offers',
-      id: undefined,
-      account: ADDRESS
-    });
-  });
+     assert.deepEqual(request.message, {
+       command: 'account_lines',
+       id: undefined,
+       account: ADDRESS,
+       limit: 100,
+       marker: PAGING_MARKER,
+       ledger_index: 9592219
+     });
+   });
+   it('Construct account_lines request -- with min limit', function() {
+     assert.strictEqual(remote.requestAccountLines({
+       account: ADDRESS, limit: 0
+     }).message.limit, 0);
+     assert.strictEqual(remote.requestAccountLines({
+       account: ADDRESS, limit: -1
+     }).message.limit, 0);
+     assert.strictEqual(remote.requestAccountLines({
+       account: ADDRESS, limit: -1e9
+     }).message.limit, 0);
+     assert.strictEqual(remote.requestAccountLines({
+       account: ADDRESS, limit: -1e24
+     }).message.limit, 0);
+   });
+   it('Construct account_lines request -- with max limit', function() {
+     assert.strictEqual(remote.requestAccountLines({
+       account: ADDRESS, limit: 1e9
+     }).message.limit, 1e9);
+     assert.strictEqual(remote.requestAccountLines({
+       account: ADDRESS, limit: 1e9 + 1
+     }).message.limit, 1e9);
+     assert.strictEqual(remote.requestAccountLines({
+       account: ADDRESS, limit: 1e10
+     }).message.limit, 1e9);
+     assert.strictEqual(remote.requestAccountLines({
+       account: ADDRESS, limit: 1e24
+     }).message.limit, 1e9);
+   });
+ 
+   it('Construct account_lines request -- with marker -- missing ledger',
+      function() {
+     assert.throws(function() {
+       remote.requestAccountLines({account: ADDRESS, marker: PAGING_MARKER});
+     }, 'A ledger_index or ledger_hash must be provided when using a marker');
+ 
+     assert.throws(function() {
+       remote.requestAccountLines({
+         account: ADDRESS,
+         marker: PAGING_MARKER,
+         ledger: 'validated'
+       });
+     }, 'A ledger_index or ledger_hash must be provided when using a marker');
+ 
+     assert.throws(function() {
+       remote.requestAccountLines({
+         account: ADDRESS,
+         marker: PAGING_MARKER,
+         ledger: NaN
+       });
+     }, 'A ledger_index or ledger_hash must be provided when using a marker');
+ 
+     assert.throws(function() {
+       remote.requestAccountLines({
+         account: ADDRESS,
+         marker: PAGING_MARKER,
+         ledger: LEDGER_HASH.substr(0, 63)
+       });
+     }, 'A ledger_index or ledger_hash must be provided when using a marker');
+ 
+     assert.throws(function() {
+       remote.requestAccountLines({
+         account: ADDRESS, marker: PAGING_MARKER, ledger: LEDGER_HASH + 'F'
+       });
+     }, 'A ledger_index or ledger_hash must be provided when using a marker');
+   });
+   it('Construct account_lines request -- with callback', function() {
+     let request = remote.requestAccountLines({
+       account: ADDRESS
+     }, callback);
+ 
+     assert.deepEqual(request.message, {
+       command: 'account_lines',
+       id: undefined,
+       account: ADDRESS
+     });
+   });
+ 
+   it('Construct account_tx request', function() {
+     let request = remote.requestAccountTransactions({
+       account: UInt160.ACCOUNT_ONE,
+       ledger_index_min: -1,
+       ledger_index_max: -1,
+       limit: 5,
+       forward: true,
+       marker: PAGING_MARKER
+     });
+ 
+     assert.deepEqual(request.message, {
+       command: 'account_tx',
+       id: undefined,
+       account: UInt160.ACCOUNT_ONE,
+       ledger_index_min: -1,
+       ledger_index_max: -1,
+       binary: true,
+       forward: true,
+       limit: 5,
+       marker: PAGING_MARKER
+     });
+ 
+     request = remote.requestAccountTransactions({
+       account: UInt160.ACCOUNT_ONE,
+       min_ledger: -1,
+       max_ledger: -1
+     });
+     assert.deepEqual(request.message, {
+       command: 'account_tx',
+       id: undefined,
+       account: UInt160.ACCOUNT_ONE,
+       binary: true,
+       ledger_index_min: -1,
+       ledger_index_max: -1
+     });
+   });
+   it('Construct account_tx request -- no binary', function() {
+     let request = remote.requestAccountTransactions({
+       account: UInt160.ACCOUNT_ONE,
+       ledger_index_min: -1,
+       ledger_index_max: -1,
+       limit: 5,
+       forward: true,
+       binary: false,
+       marker: PAGING_MARKER
+     });
+ 
+     assert.deepEqual(request.message, {
+       command: 'account_tx',
+       id: undefined,
+       account: UInt160.ACCOUNT_ONE,
+       ledger_index_min: -1,
+       ledger_index_max: -1,
+       binary: false,
+       forward: true,
+       limit: 5,
+       marker: PAGING_MARKER
+     });
+   });
+ 
+   it('Construct account_offers request -- no binary', function() {
+     let request = remote.requestAccountOffers({account: ADDRESS});
+     assert.deepEqual(request.message, {
+       command: 'account_offers',
+       id: undefined,
+       account: ADDRESS
+     });
+   });
+ 
 
   it('Construct offer request -- with ledger index', function() {
     let request = remote.requestOffer({
@@ -1873,3 +1940,502 @@ describe('Remote', function() {
     });
   });
 });
+
+describe.skip('Request API consistency tests', function() {
+  // XXX convert all this to use fixtures
+
+  // Method parameters may be translated into multiple request parameters;
+  // 'ledger' may become the request param 'ledger_index' or 'ledger_hash'
+  // depending on the argument type.
+  //
+  // This function maps an args array to a new array that only includes one
+  // form of request parameter: the first specified
+  //
+  // ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]
+  //
+  // should become
+  //
+  // ['ledger_index', LEDGER_INDEX]
+  function firstReqParam(arg) {
+    if (lodash.isEmpty(arg)) {
+      return undefined;
+    }
+    return Array.isArray(arg[1])
+    ? arg[1][0]
+    : arg;
+  }
+  assert.deepEqual(
+    firstReqParam(['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]),
+    ['ledger_index', LEDGER_INDEX]
+  );
+  assert.deepEqual(
+    firstReqParam(['account', ADDRESS]),
+    ['account', ADDRESS]
+  );
+
+  // ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]
+  //
+  // should become
+  //
+  // ['ledger', LEDGER_INDEX]
+  function firstMethodParam(arg) {
+    if (lodash.isEmpty(arg)) {
+      return undefined;
+    }
+    return Array.isArray(arg[1])
+    ? [arg[0], arg[1][0][1]]
+    : arg;
+  }
+  assert.deepEqual(
+    firstMethodParam(['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]),
+    ['ledger', LEDGER_INDEX]
+  );
+  assert.deepEqual(
+    firstMethodParam(['account', ADDRESS]),
+    ['account', ADDRESS]
+  );
+
+  // Filters default params against optional params
+  function filterDefault(optionalArgs, defaultArg) {
+    return lodash.isEmpty(defaultArg)
+    || lodash.isEmpty(optionalArgs)
+    || !lodash.unzip(optionalArgs)[0].includes(defaultArg[0])
+  }
+  assert.strictEqual(filterDefault([
+                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
+                  ['hash', [['transaction', TRANSACTION_HASH]]],
+                  ['binary', true]],
+                  ['ledger', 'validated']
+                 ), false);
+
+  assert.strictEqual(filterDefault([
+                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
+                  ['hash', [['transaction', TRANSACTION_HASH]]],
+                  ['binary', true]],
+                  ['hash', TRANSACTION_HASH]
+                 ), false);
+  assert.strictEqual(filterDefault([
+                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
+                  ['hash', [['transaction', TRANSACTION_HASH]]],
+                  ['binary', true]],
+                  ['binary', false]
+                 ), false);
+  assert.strictEqual(filterDefault([
+                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
+                  ['hash', [['transaction', TRANSACTION_HASH]]],
+                  ['binary', true]],
+                  ['transaction', TRANSACTION_HASH]
+                 ), true);
+  assert.strictEqual(filterDefault([
+                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
+                  ['hash', [['transaction', TRANSACTION_HASH]]],
+                  ['binary', true]],
+                  ['myprop', false]
+                 ), true);
+  assert.deepEqual([['transaction', TRANSACTION_HASH], ['myprop', true], ['ledger', 'validated']].filter(lodash.partial(filterDefault, [
+                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
+                  ['hash', [['transaction', TRANSACTION_HASH]]],
+                  ['binary', true]])), [['transaction', TRANSACTION_HASH], ['myprop', true]]);
+  assert.deepEqual([['binary', false], ['ledger', [['ledger_index', LEDGER_INDEX]]]].filter(lodash.partial(filterDefault, [
+                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
+                  ['hash', [['transaction', TRANSACTION_HASH]]],
+                  ['binary', true]])), []);
+
+  function filterDefaultArgs(defaultArgs, optionalArgs) {
+    return lodash.filter(defaultArgs, lodash.partial(
+      filterDefault, optionalArgs));
+  }
+
+  function normalizeOptionalArgs(args) {
+    if (lodash.isEmpty(args)) {
+      return [];
+    }
+    return Array.isArray(args[1])
+    ? args[1].slice()
+    : [args];
+  }
+  assert.deepEqual(
+    normalizeOptionalArgs(['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]),
+    [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]
+  );
+  assert.deepEqual(
+    normalizeOptionalArgs(['binary', true]),
+    [['binary', true]]
+  );
+  assert.deepEqual(
+    normalizeOptionalArgs([]),
+    []
+  );
+
+  function request(command, methodName, options_) {
+    let options = lodash.merge({}, options_);
+
+    return lodash.extend({
+      name: options.alias || command,
+      command: command,
+      methodName: methodName,
+      requiredArgs: options.required || [],
+      optionalArgs: options.optional || [],
+      defaultArgs: options.default || [],
+    }, options);
+  }
+
+  const REQOPTION = {
+    ACCOUNT: ['account', ADDRESS],
+    LEDGER: ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
+    ACCOUNT_ROOT: ['account', [['account_root', ADDRESS]]],
+    STREAMS: ['streams', [['streams', ['server', 'ledger']]]]
+  }
+
+  const testCases = [
+    request('server_info', 'requestServerInfo'),
+    request('ping', 'requestPing'),
+
+    request('subscribe', 'requestSubscribe', {
+      optional: [
+        REQOPTION.STREAMS
+      ],
+      noKeyed: true
+    }),
+    request('unsubscribe', 'requestUnsubscribe', {
+      optional: [
+        REQOPTION.STREAMS
+      ],
+      noKeyed: true
+    }),
+
+    request('account_info', 'requestAccountInfo', {
+      required: [
+        REQOPTION.ACCOUNT,
+      ],
+      optional: [
+        undefined,
+        REQOPTION.LEDGER
+      ]
+    }),
+    request('account_currencies', 'requestAccountCurrencies', {
+      required: [
+        REQOPTION.ACCOUNT,
+      ],
+      optional: [
+        ['peer', ADDRESS],
+        REQOPTION.LEDGER,
+        ['limit', 10]
+      ]
+    }),
+    request('account_lines', 'requestAccountLines', {
+      required: [
+        REQOPTION.ACCOUNT,
+      ],
+      optional: [
+        ['peer', ADDRESS],
+        REQOPTION.LEDGER,
+        ['limit', 10]
+      ]
+    }),
+    request('account_offers', 'requestAccountOffers', {
+      required: [
+        REQOPTION.ACCOUNT,
+      ],
+      optional: [
+        undefined,
+        REQOPTION.LEDGER,
+        ['limit', 10]
+      ]
+    }),
+    request('account_tx', 'requestAccountTransactions', {
+      required: [
+        REQOPTION.ACCOUNT,
+      ],
+      optional: [
+        undefined,
+        ['binary', false],
+        ['ledger_index_min', -1],
+        ['ledger_index_max', -1],
+        ['forward', true],
+        ['limit', 10],
+      ],
+      default: [
+        ['binary', true]
+      ],
+      noPositional: true
+    }),
+
+    request('tx', 'requestTransaction', {
+      required: [
+        ['hash', [['transaction', TRANSACTION_HASH]]]
+      ],
+      optional: [
+        ['binary', false]
+      ],
+      default: [
+        ['binary', true]
+      ]
+    }),
+    request('transaction_entry', 'requestTransactionEntry', {
+      required: [
+        ['hash', [['tx_hash', TRANSACTION_HASH]]]
+      ],
+      optional: [
+        REQOPTION.LEDGER,
+      ],
+      default: [
+        ['ledger', [['ledger_index', 'validated']]]
+      ]
+    }),
+
+    request('tx_history', 'requestTransactionHistory', {
+      optional: [
+        ['start', 10]
+      ],
+      noPositional: true
+    }),
+    request('book_offers', 'requestBookOffers', {
+      required: [
+        ['gets', [['taker_gets', {currency: HEX_USD, issuer: ADDRESS}]]],
+        ['pays', [['taker_pays', {currency: HEX_USD, issuer: ADDRESS}]]]
+      ],
+      optional: [
+        ['taker', ADDRESS],
+        REQOPTION.LEDGER,
+        ['limit', 10],
+      ],
+      default: [
+        ['taker', ripple.UInt160.ACCOUNT_ONE]
+      ],
+      noPositional: true
+    }),
+
+    request('ledger', 'requestLedger', {
+      optional: [
+        REQOPTION.LEDGER,
+        ['full', true],
+        ['expand', true],
+        ['transactions', true],
+        ['accounts', true]
+      ],
+      noPositional: true
+    }),
+    request('ledger_data', 'requestLedgerData', {
+      optional: [
+        REQOPTION.LEDGER,
+        ['binary', false],
+        ['limit', 10]
+      ],
+      default: [
+        ['binary', true]
+      ],
+      noPositional: true
+    }),
+    request('ledger_entry', 'requestLedgerEntry', {
+      required: [
+        ['type', 'account_root']
+      ],
+      noKeyed: true
+    }),
+    request('ledger_closed', 'requestLedgerClosed'),
+    request('ledger_current', 'requestLedgerCurrent'),
+    request('ledger_header', 'requestLedgerHeader'),
+
+    request('ledger_entry', 'requestAccountBalance', {
+      alias: 'account_balance',
+      required: [
+        REQOPTION.ACCOUNT_ROOT,
+      ],
+      optional: [
+        REQOPTION.LEDGER,
+      ]
+    }),
+    request('ledger_entry', 'requestAccountFlags', {
+      alias: 'account_flags',
+      required: [
+        REQOPTION.ACCOUNT_ROOT,
+      ],
+      optional: [
+        REQOPTION.LEDGER,
+      ],
+    }),
+    request('ledger_entry', 'requestOwnerCount', {
+      alias: 'owner_count',
+      required: [
+        REQOPTION.ACCOUNT_ROOT,
+      ],
+      optional: [
+        REQOPTION.LEDGER,
+      ],
+    }),
+
+    request('sign', 'requestSign', {
+      required: [
+        ['secret', SECRET],
+        ['tx_json', TX_JSON]
+      ]
+    }),
+    request('submit', 'requestSubmit')
+  ];
+
+  function checkRequest(request, expectedReqParams) {
+    assert(request.requested, 'Request unattempted, most likely callback was ignored');
+    [['id', undefined], ...expectedReqParams].forEach(arg => {
+      assert.deepEqual(
+        request.message[arg[0]], arg[1],
+        'Expected request param: ' + arg.join('=')
+      );
+    });
+  }
+
+  function makeRequestTest(testCase) {
+    it(`Construct ${testCase.name} request`, function() {
+      let reqMethod = remote[testCase.methodName];
+      let requiredArgs = testCase.requiredArgs;
+      let optionalArgs = lodash.compact(testCase.optionalArgs);
+      let defaultArgs = filterDefaultArgs(testCase.defaultArgs, optionalArgs);
+
+      assert.strictEqual(typeof reqMethod, 'function');
+      assert(Array.isArray(requiredArgs));
+      assert(Array.isArray(optionalArgs));
+      assert(Array.isArray(defaultArgs));
+
+      // if (!lodash.isEmpty(requiredArgs)) {
+        // Most request constructors do not (but should) throw for missing
+        // required options
+        //
+        // assert.throws(function() {
+        //   reqMethod.call(remote, {}, lodash.noop);
+        // });
+      // }
+
+      if (testCase.noKeyed) {
+        return;
+      }
+
+      let baseReqParams = [
+        ['command', testCase.command],
+        ...requiredArgs.map(firstReqParam),
+        ...defaultArgs.map(firstReqParam)
+      ];
+
+      let baseReqOptions = lodash.zipObject(requiredArgs.map(firstMethodParam));
+
+      // All required options set
+      checkRequest(reqMethod.call(remote, baseReqOptions, lodash.noop),
+                   baseReqParams);
+
+      let expectedReqParams = [
+        ...baseReqParams,
+        ...optionalArgs.map(firstReqParam)
+      ];
+
+      let reqOptions = lodash.merge(
+        baseReqOptions,
+        lodash.zipObject(optionalArgs.map(firstMethodParam))
+      );
+
+      // All options set
+      checkRequest(reqMethod.call(remote, reqOptions, lodash.noop),
+                   expectedReqParams);
+    });
+  }
+
+  function makeRequestOptionTest(testCase, optionalArgs, index) {
+    if (lodash.isEmpty(optionalArgs)) {
+      return;
+    }
+    if (testCase.noKeyed) {
+      return;
+    }
+
+    normalizeOptionalArgs(optionalArgs).forEach(function(optionalArg) {
+      let testParam = lodash.first(optionalArg);
+
+      it(`Construct ${testCase.name} request -- with ${testParam}`, function() {
+        let reqMethod = remote[testCase.methodName];
+        let requiredArgs = testCase.requiredArgs;
+        let defaultArgs = filterDefaultArgs(testCase.defaultArgs, [optionalArgs]);
+
+        assert.strictEqual(typeof reqMethod, 'function');
+        assert(Array.isArray(requiredArgs));
+        assert(Array.isArray(optionalArg));
+        assert(Array.isArray(defaultArgs));
+
+        let expectedReqParams = [
+          ['command', testCase.command],
+          optionalArg,
+          ...requiredArgs.map(firstReqParam),
+          ...defaultArgs.map(firstReqParam)
+        ];
+
+        let reqOptions = lodash.merge(
+          // Required args
+          lodash.zipObject(requiredArgs.map(firstMethodParam)),
+          // Optional arg
+          lodash.zipObject([optionalArgs[0]], [optionalArg[1]])
+        );
+
+        checkRequest(reqMethod.call(remote, reqOptions, lodash.noop),
+                     expectedReqParams);
+      });
+    });
+  }
+
+  function makePositionalRequestOptionTest(testCase, optionalArgs, index) {
+    if (lodash.isEmpty(optionalArgs)) {
+      return;
+    }
+    if (testCase.noPositional) {
+      return;
+    }
+
+    normalizeOptionalArgs(optionalArgs).forEach(function(optionalArg) {
+      let testParam = lodash.first(optionalArg);
+
+      it(`Construct ${testCase.name} request -- with ${testParam} as postiional arg`, function() {
+        let reqMethod = remote[testCase.methodName];
+        let requiredArgs = testCase.requiredArgs;
+        let defaultArgs = filterDefaultArgs(testCase.defaultArgs, [optionalArgs]);
+
+        assert.strictEqual(typeof reqMethod, 'function');
+        assert(Array.isArray(requiredArgs));
+        assert(Array.isArray(optionalArg));
+        assert(Array.isArray(defaultArgs));
+
+        let expectedReqParams = [
+          ['command', testCase.command],
+          optionalArg,
+          ...requiredArgs.map(firstReqParam),
+          ...defaultArgs.map(firstReqParam)
+        ];
+
+        let reqArgs = [
+          // Required args
+          ...(lodash.last(lodash.unzip(expectedReqParams.slice(2))) || []),
+          // Placeholder undefined args
+          ...lodash.fill(Array(index), undefined),
+          // Optional arg
+          lodash.last(optionalArg),
+          // Callback
+          lodash.noop
+        ];
+
+        // Silence positional arguments deprecation warning
+        Log.setEngine(Log.engines.none);
+
+        checkRequest(reqMethod.apply(remote, reqArgs),
+                     expectedReqParams);
+      });
+    });
+  }
+
+  testCases.forEach(function(testCase) {
+    makeRequestTest(lodash.merge({}, testCase));
+
+    [
+      makeRequestOptionTest,
+      /* DEPRECATED */ makePositionalRequestOptionTest
+    ].forEach(function(optionTest) {
+      lodash.each(testCase.optionalArgs.slice(), lodash.partial(
+        optionTest, lodash.merge({}, testCase)));
+    });
+  });
+});
+
