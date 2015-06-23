@@ -10,11 +10,9 @@ typecheck() {
 
 lint() {
   REPO_URL="https://raw.githubusercontent.com/ripple/javascript-style-guide"
-  npm install -g eslint
-  npm install -g esprima-fb   # allow flow type annotations in eslint
   curl "$REPO_URL/es6/eslintrc" > ./eslintrc
   echo "parser: esprima-fb" >> ./eslintrc
-  eslint --reset -c ./eslintrc $(git --no-pager diff --name-only -M100% --diff-filter=AM --relative $(git merge-base FETCH_HEAD origin/HEAD) FETCH_HEAD | grep "\.js$")
+  node_modules/.bin/eslint --reset -c ./eslintrc $(git --no-pager diff --name-only -M100% --diff-filter=AM --relative $(git merge-base FETCH_HEAD origin/HEAD) FETCH_HEAD | grep "\.js$")
 }
 
 unittest() {

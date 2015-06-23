@@ -553,19 +553,38 @@ describe('Transaction', function() {
     done();
   });
 
-  it('Get signing hash', function(done) {
-    const transaction = new Transaction();
-    transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
-    transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
-    transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
-    transaction.tx_json.Flags = 0;
-    transaction.tx_json.Fee = 10;
-    transaction.tx_json.Sequence = 1;
-    transaction.tx_json.TransactionType = 'AccountSet';
+  describe('signing', function() {
+    const tx_json = {
+      SigningPubKey: '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED',
+      Account: 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ',
+      Flags: 0,
+      Fee: 10,
+      Sequence: 1,
+      TransactionType: 'AccountSet'
+    };
 
-    assert.strictEqual(transaction.signingHash(), 'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
+    const expectedSigningHash =
+      'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE';
 
-    done();
+    it('Get signing hash', function() {
+      const transaction = Transaction.from_json(tx_json);
+      transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
+      assert.strictEqual(transaction.signingHash(), expectedSigningHash);
+    });
+
+    it('Get signing data', function() {
+      const tx = Transaction.from_json(tx_json);
+      const data = tx.signingData();
+
+      assert.strictEqual(data.hash().to_json(),
+                         expectedSigningHash);
+
+      assert.strictEqual(data.to_hex(),
+        ('535458001200032200000000240000000168400000000000000' +
+         'A7321021FED5FD081CE5C4356431267D04C6E2167E4112C897D' +
+         '5E10335D4E22B4DA49ED8114E0E6E281CA324AEE034B2BB8AC9' +
+         '7BA1ACA95A068'));
+    });
   });
 
   it('Get hash - no prefix', function(done) {
@@ -1959,7 +1978,7 @@ describe('Transaction', function() {
   });
 
   it('Get min ledger', function() {
-    let queue = new TransactionQueue();
+    const queue = new TransactionQueue();
 
     // Randomized submit indexes
     [
@@ -1975,7 +1994,7 @@ describe('Transaction', function() {
       543305
     ]
     .forEach(function(index) {
-      let tx = new Transaction();
+      const tx = new Transaction();
       tx.initialSubmitIndex = index;
       queue.push(tx);
     });

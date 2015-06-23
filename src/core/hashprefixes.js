@@ -1,3 +1,10 @@
+'use strict';
+
+// TODO: move in helpers from serializedtypes to utils
+function toBytes(n) {
+  return [n >>> 24, (n >>> 16) & 0xff, (n >>> 8) & 0xff, n & 0xff];
+}
+
 /**
  * Prefix for hashing functions.
  *
@@ -12,14 +19,18 @@
  */
 
 // transaction plus signature to give transaction ID
-exports.HASH_TX_ID           = 0x54584E00; // 'TXN'
+exports.HASH_TX_ID = 0x54584E00; // 'TXN'
 // transaction plus metadata
-exports.HASH_TX_NODE         = 0x534E4400; // 'TND'
+exports.HASH_TX_NODE = 0x534E4400; // 'TND'
 // inner node in tree
-exports.HASH_INNER_NODE      = 0x4D494E00; // 'MIN'
+exports.HASH_INNER_NODE = 0x4D494E00; // 'MIN'
 // leaf node in tree
-exports.HASH_LEAF_NODE       = 0x4D4C4E00; // 'MLN'
+exports.HASH_LEAF_NODE = 0x4D4C4E00; // 'MLN'
 // inner transaction to sign
-exports.HASH_TX_SIGN         = 0x53545800; // 'STX'
+exports.HASH_TX_SIGN = 0x53545800; // 'STX'
 // inner transaction to sign (TESTNET)
 exports.HASH_TX_SIGN_TESTNET = 0x73747800; // 'stx'
+
+Object.keys(exports).forEach(function(k) {
+  exports[k + '_BYTES'] = toBytes(exports[k]);
+});
