@@ -6,7 +6,6 @@ const balances = require('./ledger/balances');
 const settings = require('./ledger/settings');
 const transactions = require('./ledger/transactions');
 const trustlines = require('./ledger/trustlines');
-const notifications = require('./ledger/notifications');
 const payments = require('./ledger/payments');
 const orders = require('./ledger/orders');
 const preparePayment = require('./transaction/payment');
@@ -41,8 +40,6 @@ RippleAPI.prototype = {
   getSettings: settings.getSettings,
   getTransaction: transactions.getTransaction,
   getAccountTransactions: transactions.getAccountTransactions,
-  getNotification: notifications.getNotification,
-  getNotifications: notifications.getNotifications,
 
   preparePayment: preparePayment,
   prepareTrustline: prepareTrustline,

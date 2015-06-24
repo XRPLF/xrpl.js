@@ -101,6 +101,17 @@ describe('RippleAPI', function() {
       _.partial(checkResult, accountTransactionsResponse, done));
   });
 
+  // TODO: this doesn't test much, just that it doesn't crash
+  it('getAccountTransactions with start option', function(done) {
+    const options = {
+      start: hashes.VALID_TRANSACTION_HASH,
+      earliestFirst: false,
+      limit: 2
+    };
+    this.api.getAccountTransactions(address, options,
+      _.partial(checkResult, accountTransactionsResponse, done));
+  });
+
   it('getTrustlines', function(done) {
     const options = {currency: 'USD'};
     this.api.getTrustlines(address, options,
