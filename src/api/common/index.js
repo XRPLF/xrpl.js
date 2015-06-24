@@ -10,5 +10,6 @@ module.exports = {
   dropsToXrp: utils.dropsToXrp,
   xrpToDrops: utils.xrpToDrops,
   toRippledAmount: utils.toRippledAmount,
-  wrapCatch: utils.wrapCatch
+  wrapCatch: utils.wrapCatch,
+  composeAsync: utils.composeAsync
 };

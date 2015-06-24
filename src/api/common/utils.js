@@ -31,9 +31,20 @@ function wrapCatch(asyncFunction: () => void): () => void {
   };
 }
 
+function composeAsync(wrapper, callback) {
+  return function(error, data) {
+    if (error) {
+      callback(error);
+      return;
+    }
+    callback(null, wrapper(data));
+  };
+}
+
 module.exports = {
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,
-  wrapCatch
+  wrapCatch,
+  composeAsync
 };
