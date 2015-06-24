@@ -33,8 +33,8 @@ function validateLedgerRange(options) {
   }
 }
 
-function validateOptions(options) {
-  schemaValidate('options', options);
+function validateOptions(schema, options) {
+  schemaValidate(schema, options);
   validateLedgerRange(options);
 }
 
@@ -52,6 +52,7 @@ module.exports = {
   trustline: _.partial(schemaValidate, 'trustline'),
   txJSON: _.partial(schemaValidate, 'tx'),
   blob: _.partial(schemaValidate, 'blob'),
-  options: validateOptions,
+  getAccountTransactionsOptions: _.partial(validateOptions, 'acct-tx-options'),
+  options: _.partial(validateOptions, 'options'),
   instructions: _.partial(schemaValidate, 'instructions')
 };
