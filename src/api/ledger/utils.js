@@ -6,6 +6,29 @@ const asyncify = require('simple-asyncify');
 const common = require('../common');
 const ripple = common.core;
 
+// If the marker is omitted from a response, you have reached the end
+// getter(marker, limit, callback), callback(error, {marker, results})
+function getRecursiveRecur(getter, marker, limit, callback) {
+  getter(marker, limit, (error, data) => {
+    if (error) {
+      return callback(error);
+    }
+    const remaining = limit - data.results.length;
+    if (remaining > 0 && data.marker !== undefined) {
+      getRecursiveRecur(getter, data.marker, remaining, (_error, results) => {
+        return _error ? callback(_error) :
+          callback(null, data.results.concat(results));
+      });
+    } else {
+      return callback(null, data.results.slice(0, limit));
+    }
+  });
+}
+
+function getRecursive(getter, limit, callback) {
+  getRecursiveRecur(getter, undefined, limit, callback);
+}
+
 function renameCounterpartyToIssuer(amount) {
   if (amount === undefined) {
     return undefined;
@@ -99,6 +122,7 @@ module.exports = {
   renameCounterpartyToIssuer: renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder: renameCounterpartyToIssuerInOrder,
   attachDate: attachDate,
+  getRecursive: getRecursive,
   wrapCatch: common.wrapCatch,
   common: common
 };

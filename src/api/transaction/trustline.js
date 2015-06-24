@@ -10,7 +10,7 @@ const TrustSetFlags = {
   frozed: {set: 'SetFreeze', unset: 'ClearFreeze'}
 };
 
-function createTrustLineTransaction(account, trustline) {
+function createTrustlineTransaction(account, trustline) {
   validate.address(account);
   validate.trustline(trustline);
 
@@ -27,9 +27,9 @@ function createTrustLineTransaction(account, trustline) {
   return transaction;
 }
 
-function prepareTrustLine(account, trustline, instructions, callback) {
-  const transaction = createTrustLineTransaction(account, trustline);
+function prepareTrustline(account, trustline, instructions, callback) {
+  const transaction = createTrustlineTransaction(account, trustline);
   utils.createTxJSON(transaction, this.remote, instructions, callback);
 }
 
-module.exports = utils.wrapCatch(prepareTrustLine);
+module.exports = utils.wrapCatch(prepareTrustline);

@@ -13,7 +13,7 @@ function parseTrustline(tx: Object): Object {
     counterparty: tx.LimitAmount.issuer,
     qualityIn: tx.QualityIn,
     qualityOut: tx.QualityOut,
-    allowRippling: (tx.Flags & flags.NoRipple) === 0,
+    disableRippling: (tx.Flags & flags.NoRipple) !== 0,
     frozen: (tx.Flags & flags.SetFreeze) !== 0,
     authorized: (tx.Flags & flags.SetAuth) !== 0
   };
