@@ -1,13 +1,12 @@
 'use strict';
 const common = require('../common');
 
-function generateWallet(callback) {
+function generateWallet() {
   const wallet = common.core.Wallet.generate();
-  if (wallet) {
-    callback(null, {wallet: wallet});
-  } else {
-    callback(new common.errors.ApiError('Could not generate wallet'));
+  if (!wallet) {
+    throw new common.errors.ApiError('Could not generate wallet');
   }
+  return wallet;
 }
 
 module.exports = generateWallet;

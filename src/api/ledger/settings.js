@@ -41,6 +41,4 @@ function getSettings(account, callback) {
   });
 }
 
-module.exports = {
-  getSettings: getSettings
-};
+module.exports = getSettings;

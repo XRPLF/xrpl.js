@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const async = require('async');
 const utils = require('./utils');
-const getTrustlines = require('./trustlines').getTrustlines;
+const getTrustlines = require('./trustlines');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
 const dropsToXrp = utils.common.dropsToXrp;
@@ -12,7 +12,7 @@ function getXRPBalance(remote, address, ledgerVersion, callback) {
     composeAsync((data) => dropsToXrp(data.account_data.Balance), callback));
 }
 
-function parseBalanceAmount(trustline) {
+function getTrustlineBalanceAmount(trustline) {
   return {
     currency: trustline.specification.currency,
     counterparty: trustline.specification.counterparty,
@@ -25,7 +25,7 @@ function formatBalances(balances) {
     currency: 'XRP',
     value: balances[0]
   };
-  return [xrpBalance].concat(balances[1].map(parseBalanceAmount));
+  return [xrpBalance].concat(balances[1].map(getTrustlineBalanceAmount));
 }
 
 function getBalances(account, options, callback) {
@@ -40,4 +40,4 @@ function getBalances(account, options, callback) {
   ], composeAsync(formatBalances, callback));
 }
 
-module.exports.getBalances = getBalances;
+module.exports = getBalances;

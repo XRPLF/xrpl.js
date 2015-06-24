@@ -1,127 +1,13 @@
 /* eslint-disable valid-jsdoc */
 'use strict';
-
-const _ = require('lodash');
 const async = require('async');
 const asyncify = require('simple-asyncify');
 const bignum = require('bignumber.js');
-const transactions = require('./transactions');
 const utils = require('./utils');
 const validate = utils.common.validate;
-const parseTransaction = require('./parse/transaction');
 const parsePathfind = require('./parse/pathfind');
-
-const ValidationError = utils.common.errors.ValidationError;
 const NotFoundError = utils.common.errors.NotFoundError;
 const TimeOutError = utils.common.errors.TimeOutError;
-
-const DEFAULT_RESULTS_PER_PAGE = 10;
-
-/**
- * Formats a transaction into ripple-rest Payment format
- *
- * @param {RippleAddress} account
- * @param {Transaction} transaction
- * @param {Function} callback
- *
- * @callback
- * @param {Error} error
- * @param {RippleRestTransaction} transaction
- */
-function formatPaymentHelper(account, txJSON) {
-  if (!(txJSON && /^payment$/i.test(txJSON.TransactionType))) {
-    throw new ValidationError('Not a payment. The transaction '
-      + 'corresponding to the given identifier is not a payment.');
-  }
-  return parseTransaction(txJSON);
-}
-
-/**
- * Retrieve the details of a particular payment from the Remote
- * and return it in the ripple-rest Payment format.
- *
- * @param {Remote} remote
- * @param {RippleAddress} req.params.account
- * @param {Hex-encoded String|ASCII printable character String}
- *            req.params.identifier
- */
-function getPayment(account, identifier, callback) {
-  const self = this;
-
-  validate.address(account);
-  validate.identifier(identifier);
-
-  function getTransaction(_callback) {
-    transactions.getTransaction(self, account, identifier, {}, _callback);
-  }
-
-  const steps = [
-    getTransaction,
-    asyncify(_.partial(formatPaymentHelper, account))
-  ];
-
-  async.waterfall(steps, callback);
-}
-
-/**
- * Retrieve the details of multiple payments from the Remote
- *
- * This function calls transactions.getAccountTransactions
- * recursively to retrieve results_per_page number of transactions
- * and filters the results by type "payment", along with the other
- * client-specified parameters.
- *
- * @param {Remote} remote
- * @param {RippleAddress} req.params.account
- * @param {RippleAddress} req.query.source_account
- * @param {RippleAddress} req.query.destination_account
- * @param {String "incoming"|"outgoing"} req.query.direction
- * @param {Number} [-1] req.query.start_ledger
- * @param {Number} [-1] req.query.end_ledger
- * @param {Boolean} [false] req.query.earliest_first
- * @param {Boolean} [false] req.query.exclude_failed
- * @param {Number} [20] req.query.results_per_page
- * @param {Number} [1] req.query.page
- */
-function getAccountPayments(account, source_account, destination_account,
-    direction, options, callback) {
-  const self = this;
-
-  function getTransactions(_callback) {
-    const args = {
-      account: account,
-      source_account: source_account,
-      destination_account: destination_account,
-      direction: direction,
-      min: options.results_per_page,
-      max: options.results_per_page,
-      offset: (options.results_per_page || DEFAULT_RESULTS_PER_PAGE)
-              * ((options.page || 1) - 1),
-      types: ['payment'],
-      earliestFirst: options.earliest_first
-    };
-
-    transactions.getAccountTransactions(self,
-      _.merge(options, args), _callback);
-  }
-
-  function formatTransactions(_transactions) {
-    return _transactions.map(_.partial(formatPaymentHelper, account));
-  }
-
-  function formatResponse(_transactions) {
-    return {payments: _transactions};
-  }
-
-  const steps = [
-    getTransactions,
-    _.partial(utils.attachDate, self),
-    asyncify(formatTransactions),
-    asyncify(formatResponse)
-  ];
-
-  async.waterfall(steps, callback);
-}
 
 /**
  * Get a ripple path find, a.k.a. payment options,
@@ -258,8 +144,4 @@ function getPathFind(pathfind, callback) {
   async.waterfall(steps, callback);
 }
 
-module.exports = {
-  getPayment: getPayment,
-  getAccountPayments: getAccountPayments,
-  getPathFind: getPathFind
-};
+module.exports = getPathFind;
