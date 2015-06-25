@@ -12,6 +12,10 @@ function MockPRNG(seed) {
   this.seed = seed || SEED;
 }
 
+/* eslint-disable no-unused-vars */
+MockPRNG.prototype.addEntropy = function(data, estimatedEntropy, source) {};
+/* eslint-enable no-unused-vars */
+
 MockPRNG.prototype.randomWord = function() {
   const i = this.position;
   this.position = (i + 8) % this.seed.length;
