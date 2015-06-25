@@ -26,6 +26,7 @@ const accountTransactionsResponse =
   require('./fixtures/account-transactions-response');
 const trustlinesResponse = require('./fixtures/trustlines-response');
 const walletResponse = require('./fixtures/wallet.json');
+const getSettingsResponse = require('./fixtures/get-settings-response');
 
 function checkResult(expected, done, error, response) {
   if (error) {
@@ -124,4 +125,10 @@ describe('RippleAPI', function() {
       assert.deepEqual(this.api.generateWallet(), walletResponse);
     });
   });
+
+  it('getSettings', function(done) {
+    this.api.getSettings(address,
+      _.partial(checkResult, getSettingsResponse, done));
+  });
+
 });
