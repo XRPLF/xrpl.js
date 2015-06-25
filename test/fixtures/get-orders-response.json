@@ -1,0 +1,307 @@
+[
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "1122.990930900328",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      },
+      "totalPrice": {
+        "currency": "EUR",
+        "value": "17.70155237781915",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      },
+      "immediateOrCancel": true
+    },
+    "state": {
+      "sequence": 719930
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "EUR",
+        "value": "750",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      },
+      "totalPrice": {
+        "currency": "USD",
+        "value": "19.11697137482289",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      }
+    },
+    "state": {
+      "sequence": 756999
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "19.50899530491766",
+        "counterparty": "rpDMez6pm6dBve2TJsmDpv7Yae6V5Pyvy2"
+      },
+      "totalPrice": {
+        "currency": "USD",
+        "value": "18.46856867857617",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      }
+    },
+    "state": {
+      "sequence": 757002
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "1445.796633544794",
+        "counterparty": "rpDMez6pm6dBve2TJsmDpv7Yae6V5Pyvy2"
+      },
+      "totalPrice": {
+        "currency": "USD",
+        "value": "14.40727807030772",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      }
+    },
+    "state": {
+      "sequence": 757003
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "750",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      },
+      "totalPrice": {
+        "currency": "NZD",
+        "value": "9.178557969538755",
+        "counterparty": "rsP3mgGb2tcYUrxiLFiHJiQXhsziegtwBc"
+      }
+    },
+    "state": {
+      "sequence": 782148
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "500",
+        "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+      },
+      "totalPrice": {
+        "currency": "USD",
+        "value": "9.94768291869523",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      }
+    },
+    "state": {
+      "sequence": 787368
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "10000",
+        "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+      },
+      "totalPrice": {
+        "currency": "USD",
+        "value": "9.994805759894176",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      }
+    },
+    "state": {
+      "sequence": 787408
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "MXN",
+        "value": "15834.53653918684",
+        "counterparty": "rG6FZ31hDHN1K5Dkbma3PSB5uVCuVVRzfn"
+      },
+      "totalPrice": {
+        "currency": "USD",
+        "value": "11.67691646304319",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      }
+    },
+    "state": {
+      "sequence": 803438
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "3968.240250979598",
+        "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
+      },
+      "totalPrice": {
+        "currency": "XAU",
+        "value": "0.03206299605333101",
+        "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
+      }
+    },
+    "state": {
+      "sequence": 807858
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "4139.022125516302",
+        "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+      },
+      "totalPrice": {
+        "currency": "XAU",
+        "value": "0.03347459066593226",
+        "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
+      }
+    },
+    "state": {
+      "sequence": 807896
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "XRP",
+        "value": "115760.19"
+      },
+      "totalPrice": {
+        "currency": "NZD",
+        "value": "6.840555705",
+        "counterparty": "rsP3mgGb2tcYUrxiLFiHJiQXhsziegtwBc"
+      }
+    },
+    "state": {
+      "sequence": 814018
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "902.4050961259154",
+        "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+      },
+      "totalPrice": {
+        "currency": "EUR",
+        "value": "14.40843766044656",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      }
+    },
+    "state": {
+      "sequence": 827522
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "181.4887131319798",
+        "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
+      },
+      "totalPrice": {
+        "currency": "XAG",
+        "value": "1.128432823485989",
+        "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
+      }
+    },
+    "state": {
+      "sequence": 833591
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "1814.887131319799",
+        "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
+      },
+      "totalPrice": {
+        "currency": "XAG",
+        "value": "1.128432823485991",
+        "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
+      }
+    },
+    "state": {
+      "sequence": 833592
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "USD",
+        "value": "118.6872603846736",
+        "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+      },
+      "totalPrice": {
+        "currency": "XAG",
+        "value": "0.7283371225235964",
+        "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
+      }
+    },
+    "state": {
+      "sequence": 838954
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "XAU",
+        "value": "1",
+        "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
+      },
+      "totalPrice": {
+        "currency": "XRP",
+        "value": "2229.229447"
+      }
+    },
+    "state": {
+      "sequence": 843730
+    }
+  },
+  {
+    "specification": {
+      "direction": "buy",
+      "quantity": {
+        "currency": "EUR",
+        "value": "750",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      },
+      "totalPrice": {
+        "currency": "USD",
+        "value": "17.77537376072202",
+        "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+      }
+    },
+    "state": {
+      "sequence": 844068
+    }
+  }
+]

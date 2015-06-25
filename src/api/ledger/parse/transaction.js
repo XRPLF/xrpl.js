@@ -20,7 +20,7 @@ function parseTransactionType(type) {
   return mapping[type] || null;
 }
 
-function parseTransaction(tx: Object): ?Object {
+function parseTransaction(tx: Object): Object {
   const type = parseTransactionType(tx.TransactionType);
   const mapping = {
     'payment': parsePayment,
@@ -32,11 +32,12 @@ function parseTransaction(tx: Object): ?Object {
   const parser = mapping[type];
   assert(parser !== undefined, 'Unrecognized transaction type');
   const specification = parser(tx);
+  const outcome = utils.parseOutcome(tx);
   return utils.removeUndefined({
     type: type,
     address: tx.Account,
     specification: utils.removeUndefined(specification),
-    outcome: utils.removeUndefined(utils.parseOutcome(tx))
+    outcome: outcome ? utils.removeUndefined(outcome) : undefined
   });
 }
 

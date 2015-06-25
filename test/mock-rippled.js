@@ -6,6 +6,7 @@ const EventEmitter2 = require('eventemitter2').EventEmitter2;
 const fixtures = require('./fixtures/mock');
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
+const accountOffersResponse = require('./fixtures/acct-offers-response');
 
 module.exports = function(port) {
   const mock = new WebSocketServer({port: port});
@@ -115,6 +116,14 @@ module.exports = function(port) {
   mock.on('request_account_tx', function(request, conn) {
     if (request.account === addresses.ACCOUNT) {
       conn.send(fixtures.accountTransactionsResponse(request));
+    } else {
+      assert(false, 'Unrecognized account address: ' + request.account);
+    }
+  });
+
+  mock.on('request_account_offers', function(request, conn) {
+    if (request.account === addresses.ACCOUNT) {
+      conn.send(accountOffersResponse(request));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
