@@ -4,7 +4,6 @@
 
 const util = require('util');
 const elliptic = require('elliptic');
-const bnjs = require('bn.js');
 const hashjs = require('hash.js');
 const codec = require('ripple-address-codec');
 
@@ -13,12 +12,10 @@ const secp256k1 = elliptic.ec('secp256k1');
 const Ed25519 = elliptic.eddsa('ed25519');
 
 const {
-  arrayToHex,
   bytesToHex,
   hasCachedProperty,
   isVirtual,
   Sha512,
-  toGenericArray
 } = require('./utils');
 
 /* ---------------------------------- ENUMS --------------------------------- */
@@ -58,7 +55,9 @@ function findk256Key(bytes, discrim) {
 function compressedPoint(p) {
   const x = p.getX().toArray();
   const y = p.getY();
-  while (x.length < 32) x.unshift(0)
+  while (x.length < 32) {
+    x.unshift(0);
+  }
   return [y.isEven() ? 0x02 : 0x03].concat(x);
 }
 
@@ -92,7 +91,7 @@ function derivek256Secret(seed, opts={}) {
 }
 
 function createAccountId(pubKeyBytes) {
-  const hash256 = hashjs.sha256().update(pubKeyBytes).digest()
+  const hash256 = hashjs.sha256().update(pubKeyBytes).digest();
   const hash160 = hashjs.ripemd160().update(hash256).digest();
   return hash160;
 }
@@ -192,7 +191,7 @@ Ed25519Pair.prototype.verify = function(message, signature) {
 function Secp256k1Pair(key) {
   KeyPair.apply(this, arguments);
   this.type = KeyType.secp256k1;
-  this.key = key
+  this.key = key;
 }
 
 util.inherits(Secp256k1Pair, KeyPair);
@@ -249,4 +248,4 @@ module.exports = {
   Ed25519Pair,
   KeyType,
   seedFromPhrase
-}
+};
