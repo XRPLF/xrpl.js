@@ -28,12 +28,14 @@ const trustlinesResponse = require('./fixtures/trustlines-response');
 const walletResponse = require('./fixtures/wallet.json');
 const getSettingsResponse = require('./fixtures/get-settings-response');
 const getOrdersResponse = require('./fixtures/get-orders-response');
+const getOrderBookResponse = require('./fixtures/get-orderbook-response');
 
 function checkResult(expected, done, error, response) {
   if (error) {
     done(error);
     return;
   }
+  // console.log(JSON.stringify(response, null, 2));
   assert.deepEqual(response, expected);
   done();
 }
@@ -137,4 +139,18 @@ describe('RippleAPI', function() {
       _.partial(checkResult, getOrdersResponse, done));
   });
 
+  it('getOrderBook', function(done) {
+    const orderbook = {
+      base: {
+        currency: 'USD',
+        counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      },
+      counter: {
+        currency: 'BTC',
+        counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      }
+    };
+    this.api.getOrderBook(address, orderbook, {},
+      _.partial(checkResult, getOrderBookResponse, done));
+  });
 });
