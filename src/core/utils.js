@@ -1,5 +1,7 @@
 'use strict';
 
+const sjcl = require('sjcl-extended');
+
 function getMantissaDecimalString(bignum) {
   let mantissa = bignum.toPrecision(16)
     .replace(/\./, '')      // remove decimal point
@@ -138,6 +140,11 @@ function fromTimestamp(timestamp) {
   return Math.round(timestamp_ / 1000) - 0x386D4380;
 }
 
+function sha256(bytes) {
+  return sjcl.codec.bytes.fromBits(
+            sjcl.hash.sha256.hash(sjcl.codec.bytes.toBits(bytes)));
+}
+
 exports.time = {
   fromRipple: toTimestamp,
   toRipple: fromTimestamp
@@ -156,7 +163,8 @@ exports.arrayUnique = arrayUnique;
 exports.toTimestamp = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
+exports.sha256 = sha256;
 
-exports.sjcl = require('sjcl-extended');
+exports.sjcl = sjcl;
 
 // vim:sw=2:sts=2:ts=8:et
