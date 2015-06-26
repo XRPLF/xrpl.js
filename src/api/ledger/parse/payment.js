@@ -35,15 +35,15 @@ function parsePayment(tx: Object): Object {
     tag: tx.DestinationTag
   };
 
-  return {
+  return utils.removeUndefined({
     source: utils.removeUndefined(source),
     destination: utils.removeUndefined(destination),
     memos: parsePaymentMemos(tx),
     invoiceID: tx.InvoiceID,
-    paths: JSON.stringify(tx.Paths || []),
-    allowPartialPayment: isPartialPayment(tx),
-    noDirectRipple: isNoDirectRipple(tx)
-  };
+    paths: tx.Paths ? JSON.stringify(tx.Paths) : undefined,
+    allowPartialPayment: isPartialPayment(tx) || undefined,
+    noDirectRipple: isNoDirectRipple(tx) || undefined
+  });
 }
 
 module.exports = parsePayment;

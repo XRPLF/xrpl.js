@@ -9,8 +9,8 @@ function parseTimestamp(tx: {date: string}): string | void {
   return tx.date ? (new Date(toTimestamp(tx.date))).toISOString() : undefined;
 }
 
-function removeUndefined(obj: ?Object): ?Object {
-  return obj ? _.omit(obj, _.isUndefined) : obj;
+function removeUndefined(obj: Object): Object {
+  return _.omit(obj, _.isUndefined);
 }
 
 function removeEmptyCounterparty(amount) {
