@@ -775,7 +775,7 @@ Remote.prototype.request = function(request_) {
  */
 
 function makeOptions(command, params, args) {
-  let result = {};
+  const result = {};
 
   log.warn(
     'DEPRECATED: First argument to ' + command
@@ -1234,7 +1234,7 @@ Remote.prototype.requestTx = function(options_, callback_) {
  */
 
 Remote.accountRequest = function(command, options_, callback_) {
-  let options = {callback:callback_};
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
     lodash.merge(options, options_);
@@ -1559,7 +1559,7 @@ Remote.prototype.requestTxHistory = function(start_, callback_) {
   // utils.assert(this.trusted);
 
   const request = new Request(this, 'tx_history');
-  let options = {start:start_, callback:callback_};
+  const options = {start: start_, callback: callback_};
 
   if (lodash.isPlainObject(start_)) {
     lodash.merge(options, start_);
@@ -1588,7 +1588,7 @@ Remote.prototype.requestTxHistory = function(start_, callback_) {
  */
 
 Remote.prototype.requestBookOffers = function(options_, callback_) {
-  let options = {callback:callback_};
+  const options = {callback: callback_};
 
   if (options_.gets || options_.taker_gets) {
     lodash.merge(options, {
@@ -1657,7 +1657,7 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
 Remote.prototype.requestWalletAccounts = function(options_, callback_) {
   utils.assert(this.trusted); // Don't send secrets.
 
-  let options = {callback:callback_};;
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
     lodash.merge(options, options_);
@@ -1688,7 +1688,7 @@ Remote.prototype.requestWalletAccounts = function(options_, callback_) {
 Remote.prototype.requestSign = function(options_, callback_) {
   utils.assert(this.trusted); // Don't send secrets.
 
-  let options = {callback: callback_};
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
     lodash.merge(options, options_);
@@ -1803,7 +1803,7 @@ Remote.prototype.requestLedgerAccept = function(callback) {
  */
 
 Remote.accountRootRequest = function(command, filter, options_, callback_) {
-  let options = {callback: callback_};
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
     lodash.merge(options, options_);
@@ -1932,13 +1932,13 @@ Remote.prototype.findAccount = function(accountID) {
  */
 
 function createPathFind(options_) {
-  let options = {};
+  const options = {};
 
   if (lodash.isPlainObject(options_)) {
     lodash.merge(options, options_);
   } else {
     lodash.merge(options, makeOptions(
-      'pathfind'
+      'pathfind',
       ['src_account', 'dst_account', 'dst_amount', 'src_currencies'],
       Array.prototype.slice.call(arguments)
     ));
@@ -1975,7 +1975,7 @@ Remote.prepareTrade = function(currency, issuer) {
  */
 
 Remote.prototype.book = Remote.prototype.createOrderBook = function(options_) {
-  let options = {};
+  const options = {};
 
   if (arguments.length === 1) {
     lodash.merge(options, options_);
@@ -2060,7 +2060,7 @@ Remote.prototype.setAccountSeq = function(account_, sequence) {
  */
 
 Remote.prototype.accountSeqCache = function(options_, callback_) {
-  let options = {callback: callback_};
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
     lodash.merge(options, options_);
@@ -2173,7 +2173,7 @@ Remote.prototype.requestOffer = function(options, callback) {
  */
 
 Remote.prototype.requestRippleBalance = function(options_, callback_) {
-  let options = {callback: callback_};
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
     lodash.merge(options, options_);
@@ -2266,7 +2266,7 @@ Remote.prepareCurrencies = function(currency) {
  */
 
 Remote.prototype.requestRipplePathFind = function(options_, callback_) {
-  let options = {callback: callback_};
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
     lodash.merge(options, {
@@ -2278,7 +2278,9 @@ Remote.prototype.requestRipplePathFind = function(options_, callback_) {
   } else {
     lodash.merge(options, makeOptions(
       'ripple_path_find',
+      /* eslint-disable max-len */
       ['source_account', 'destination_account', 'destination_amount', 'source_currencies'],
+      /* eslint-enable max-len */
       Array.prototype.slice.call(arguments)
     ));
   }
@@ -2312,7 +2314,7 @@ Remote.prototype.requestRipplePathFind = function(options_, callback_) {
  */
 
 Remote.prototype.requestPathFindCreate = function(options_, callback_) {
-  let options = {callback: callback_};
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
     lodash.merge(options, {
@@ -2323,8 +2325,10 @@ Remote.prototype.requestPathFindCreate = function(options_, callback_) {
       }, options_);
   } else {
     lodash.merge(options, makeOptions(
-      'path_find'
+      'path_find',
+      /* eslint-disable max-len */
       ['source_account', 'destination_account', 'destination_amount', 'source_currencies'],
+      /* eslint-enable max-len */
       Array.prototype.slice.call(arguments)
     ));
   }

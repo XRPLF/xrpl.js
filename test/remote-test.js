@@ -1,4 +1,4 @@
-/* eslint-disable no-new */
+/* eslint-disable no-new, max-len, no-comma-dangle, indent */
 
 'use strict';
 
@@ -39,7 +39,7 @@ const TX_JSON = {
 };
 
 describe('Remote', function() {
-  let initialLogEngine = Log.getEngine();
+  const initialLogEngine = Log.getEngine();
 
   beforeEach(function() {
     options = {
@@ -1069,7 +1069,7 @@ describe('Remote', function() {
     });
   });
   it('Construct ledger request -- with transactions', function() {
-    let request = remote.requestLedger({
+    const request = remote.requestLedger({
       ledger: 'validated',
       transactions: true
     });
@@ -1082,21 +1082,21 @@ describe('Remote', function() {
   });
 
   it('Construct ledger_closed request', function() {
-    let request = remote.requestLedgerClosed();
+    const request = remote.requestLedgerClosed();
     assert.deepEqual(request.message, {
       command: 'ledger_closed',
       id: undefined
     });
   });
   it('Construct ledger_header request', function() {
-    let request = remote.requestLedgerHeader();
+    const request = remote.requestLedgerHeader();
     assert.deepEqual(request.message, {
       command: 'ledger_header',
       id: undefined
     });
   });
   it('Construct ledger_current request', function() {
-    let request = remote.requestLedgerCurrent();
+    const request = remote.requestLedgerCurrent();
     assert.deepEqual(request.message, {
       command: 'ledger_current',
       id: undefined
@@ -1104,7 +1104,7 @@ describe('Remote', function() {
   });
 
   it('Construct ledger_data request -- with ledger hash', function() {
-    let request = remote.requestLedgerData({
+    const request = remote.requestLedgerData({
       ledger: LEDGER_HASH,
       limit: 5
     });
@@ -1119,7 +1119,7 @@ describe('Remote', function() {
   });
 
   it('Construct ledger_data request -- with ledger index', function() {
-    let request = remote.requestLedgerData({
+    const request = remote.requestLedgerData({
       ledger: LEDGER_INDEX,
       limit: 5
     });
@@ -1134,7 +1134,7 @@ describe('Remote', function() {
   });
 
   it('Construct ledger_data request -- no binary', function() {
-    let request = remote.requestLedgerData({
+    const request = remote.requestLedgerData({
       ledger: LEDGER_HASH,
       limit: 5,
       binary: false
@@ -1150,7 +1150,7 @@ describe('Remote', function() {
   });
 
   it('Construct server_info request', function() {
-    let request = remote.requestServerInfo();
+    const request = remote.requestServerInfo();
     assert.deepEqual(request.message, {
       command: 'server_info',
       id: undefined
@@ -1158,7 +1158,7 @@ describe('Remote', function() {
   });
 
   it('Construct peers request', function() {
-    let request = remote.requestPeers();
+    const request = remote.requestPeers();
     assert.deepEqual(request.message, {
       command: 'peers',
       id: undefined
@@ -1166,7 +1166,7 @@ describe('Remote', function() {
   });
 
   it('Construct connection request', function() {
-    let request = remote.requestConnect('0.0.0.0', '443');
+    const request = remote.requestConnect('0.0.0.0', '443');
     assert.deepEqual(request.message, {
       command: 'connect',
       id: undefined,
@@ -1176,7 +1176,7 @@ describe('Remote', function() {
   });
 
   it('Construct unl_add request', function() {
-    let request = remote.requestUnlAdd('0.0.0.0');
+    const request = remote.requestUnlAdd('0.0.0.0');
     assert.deepEqual(request.message, {
       command: 'unl_add',
       node: '0.0.0.0',
@@ -1185,7 +1185,7 @@ describe('Remote', function() {
   });
 
   it('Construct unl_list request', function() {
-    let request = remote.requestUnlList();
+    const request = remote.requestUnlList();
     assert.deepEqual(request.message, {
       command: 'unl_list',
       id: undefined
@@ -1193,7 +1193,7 @@ describe('Remote', function() {
   });
 
   it('Construct unl_delete request', function() {
-    let request = remote.requestUnlDelete('0.0.0.0');
+    const request = remote.requestUnlDelete('0.0.0.0');
     assert.deepEqual(request.message, {
       command: 'unl_delete',
       node: '0.0.0.0',
@@ -1202,7 +1202,7 @@ describe('Remote', function() {
   });
 
   it('Construct subscribe request', function() {
-    let request = remote.requestSubscribe(['server', 'ledger']);
+    const request = remote.requestSubscribe(['server', 'ledger']);
     assert.deepEqual(request.message, {
       command: 'subscribe',
       id: undefined,
@@ -1210,7 +1210,7 @@ describe('Remote', function() {
     });
   });
   it('Construct unsubscribe request', function() {
-    let request = remote.requestUnsubscribe(['server', 'ledger']);
+    const request = remote.requestUnsubscribe(['server', 'ledger']);
     assert.deepEqual(request.message, {
       command: 'unsubscribe',
       id: undefined,
@@ -1219,67 +1219,67 @@ describe('Remote', function() {
   });
 
   it('Construct ping request', function() {
-    let request = remote.requestPing();
+    const request = remote.requestPing();
     assert.deepEqual(request.message, {
       command: 'ping',
       id: undefined
     });
   });
   it('Construct ping request -- with server', function() {
-    let request = remote.requestPing('wss://s1.ripple.com:443');
+    const request = remote.requestPing('wss://s1.ripple.com:443');
     assert.strictEqual(request.server, remote._servers[0]);
     assert.deepEqual(request.message, {
       command: 'ping',
       id: undefined
     });
   });
-   it('Construct account_currencies request', function() {
-     let request = remote.requestAccountCurrencies({
-       account: ADDRESS
-     });
+  it('Construct account_currencies request', function() {
+    let request = remote.requestAccountCurrencies({
+      account: ADDRESS
+    });
 
-     assert.strictEqual(request.message.command, 'account_currencies');
-     assert.strictEqual(request.message.account, ADDRESS);
+    assert.strictEqual(request.message.command, 'account_currencies');
+    assert.strictEqual(request.message.account, ADDRESS);
 
-     Log.setEngine(Log.engines.none);
-     request = remote.requestAccountCurrencies(ADDRESS);
-     assert.strictEqual(request.message.command, 'account_currencies');
-     assert.strictEqual(request.message.account, ADDRESS);
-   });
+    Log.setEngine(Log.engines.none);
+    request = remote.requestAccountCurrencies(ADDRESS);
+    assert.strictEqual(request.message.command, 'account_currencies');
+    assert.strictEqual(request.message.account, ADDRESS);
+  });
 
-   it('Construct account_info request', function() {
-     let request = remote.requestAccountInfo({
-       account: ADDRESS
-     });
+  it('Construct account_info request', function() {
+    let request = remote.requestAccountInfo({
+      account: ADDRESS
+    });
 
-     assert.strictEqual(request.message.command, 'account_info');
-     assert.strictEqual(request.message.account, ADDRESS);
+    assert.strictEqual(request.message.command, 'account_info');
+    assert.strictEqual(request.message.account, ADDRESS);
 
-     Log.setEngine(Log.engines.none);
-     request = remote.requestAccountInfo(ADDRESS);
-     assert.strictEqual(request.message.command, 'account_info');
-     assert.strictEqual(request.message.account, ADDRESS);
-     });
+    Log.setEngine(Log.engines.none);
+    request = remote.requestAccountInfo(ADDRESS);
+    assert.strictEqual(request.message.command, 'account_info');
+    assert.strictEqual(request.message.account, ADDRESS);
+  });
 
-   it('Construct account_info request -- with ledger index', function() {
-     let request = remote.requestAccountInfo({
-       account: ADDRESS,
-       ledger: 9592219
-     });
-     assert.strictEqual(request.message.command, 'account_info');
-     assert.strictEqual(request.message.account, ADDRESS);
-     assert.strictEqual(request.message.ledger_index, 9592219);
+  it('Construct account_info request -- with ledger index', function() {
+    let request = remote.requestAccountInfo({
+      account: ADDRESS,
+      ledger: 9592219
+    });
+    assert.strictEqual(request.message.command, 'account_info');
+    assert.strictEqual(request.message.account, ADDRESS);
+    assert.strictEqual(request.message.ledger_index, 9592219);
 
-     Log.setEngine(Log.engines.none);
-     request = remote.requestAccountInfo(ADDRESS, 9592219);
+    Log.setEngine(Log.engines.none);
+    request = remote.requestAccountInfo(ADDRESS, 9592219);
 
-     assert.strictEqual(request.message.command, 'account_info');
-     assert.strictEqual(request.message.account, ADDRESS);
-     assert.strictEqual(request.message.ledger_index, 9592219);
-     });
+    assert.strictEqual(request.message.command, 'account_info');
+    assert.strictEqual(request.message.account, ADDRESS);
+    assert.strictEqual(request.message.ledger_index, 9592219);
+  });
 
-   it('Construct account_info request -- with ledger hash', function() {
-     let request = remote.requestAccountInfo({
+  it('Construct account_info request -- with ledger hash', function() {
+     const request = remote.requestAccountInfo({
        account: ADDRESS,
        ledger: LEDGER_HASH
      });
@@ -1288,7 +1288,7 @@ describe('Remote', function() {
      assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
    });
    it('Construct account_info request -- with ledger identifier', function() {
-     let request = remote.requestAccountInfo({
+     const request = remote.requestAccountInfo({
        account: ADDRESS,
        ledger: 'validated'
      });
@@ -1298,7 +1298,7 @@ describe('Remote', function() {
    });
 
    it('Construct account balance request -- with ledger index', function() {
-     let request = remote.requestAccountBalance({
+     const request = remote.requestAccountBalance({
        account: ADDRESS,
        ledger: 9592219
      });
@@ -1307,7 +1307,7 @@ describe('Remote', function() {
      assert.strictEqual(request.message.ledger_index, 9592219);
    });
    it('Construct account balance request -- with ledger hash', function() {
-     let request = remote.requestAccountBalance({
+     const request = remote.requestAccountBalance({
        account: ADDRESS,
        ledger: LEDGER_HASH
      });
@@ -1316,7 +1316,7 @@ describe('Remote', function() {
      assert.strictEqual(request.message.ledger_hash, LEDGER_HASH);
    });
    it('Construct account balance request -- with ledger identifier', function() {
-     let request = remote.requestAccountBalance({
+     const request = remote.requestAccountBalance({
        account: ADDRESS,
        ledger: 'validated'
      });
@@ -1326,7 +1326,7 @@ describe('Remote', function() {
    });
 
    it('Construct account flags request', function() {
-     let request = remote.requestAccountFlags({account: ADDRESS});
+     const request = remote.requestAccountFlags({account: ADDRESS});
      assert.strictEqual(request.message.command, 'ledger_entry');
      assert.strictEqual(request.message.account_root, ADDRESS);
    });
@@ -1343,7 +1343,7 @@ describe('Remote', function() {
    });
 
    it('Construct account_lines request', function() {
-     let request = remote.requestAccountLines({account: ADDRESS});
+     const request = remote.requestAccountLines({account: ADDRESS});
      assert.deepEqual(request.message, {
        command: 'account_lines',
        id: undefined,
@@ -1351,7 +1351,7 @@ describe('Remote', function() {
      });
    });
    it('Construct account_lines request -- with peer', function() {
-     let request = remote.requestAccountLines({
+     const request = remote.requestAccountLines({
        account: ADDRESS,
        peer: ADDRESS
      });
@@ -1363,7 +1363,7 @@ describe('Remote', function() {
      });
    });
    it('Construct account_lines request -- with limit', function() {
-     let request = remote.requestAccountLines({
+     const request = remote.requestAccountLines({
        account: ADDRESS,
        limit: 100
      });
@@ -1436,13 +1436,13 @@ describe('Remote', function() {
        account: ADDRESS, limit: 1e24
      }).message.limit, 1e9);
    });
- 
+
    it('Construct account_lines request -- with marker -- missing ledger',
       function() {
      assert.throws(function() {
        remote.requestAccountLines({account: ADDRESS, marker: PAGING_MARKER});
      }, 'A ledger_index or ledger_hash must be provided when using a marker');
- 
+
      assert.throws(function() {
        remote.requestAccountLines({
          account: ADDRESS,
@@ -1450,7 +1450,7 @@ describe('Remote', function() {
          ledger: 'validated'
        });
      }, 'A ledger_index or ledger_hash must be provided when using a marker');
- 
+
      assert.throws(function() {
        remote.requestAccountLines({
          account: ADDRESS,
@@ -1458,7 +1458,7 @@ describe('Remote', function() {
          ledger: NaN
        });
      }, 'A ledger_index or ledger_hash must be provided when using a marker');
- 
+
      assert.throws(function() {
        remote.requestAccountLines({
          account: ADDRESS,
@@ -1466,7 +1466,7 @@ describe('Remote', function() {
          ledger: LEDGER_HASH.substr(0, 63)
        });
      }, 'A ledger_index or ledger_hash must be provided when using a marker');
- 
+
      assert.throws(function() {
        remote.requestAccountLines({
          account: ADDRESS, marker: PAGING_MARKER, ledger: LEDGER_HASH + 'F'
@@ -1474,17 +1474,17 @@ describe('Remote', function() {
      }, 'A ledger_index or ledger_hash must be provided when using a marker');
    });
    it('Construct account_lines request -- with callback', function() {
-     let request = remote.requestAccountLines({
+     const request = remote.requestAccountLines({
        account: ADDRESS
      }, callback);
- 
+
      assert.deepEqual(request.message, {
        command: 'account_lines',
        id: undefined,
        account: ADDRESS
      });
    });
- 
+
    it('Construct account_tx request', function() {
      let request = remote.requestAccountTransactions({
        account: UInt160.ACCOUNT_ONE,
@@ -1494,7 +1494,7 @@ describe('Remote', function() {
        forward: true,
        marker: PAGING_MARKER
      });
- 
+
      assert.deepEqual(request.message, {
        command: 'account_tx',
        id: undefined,
@@ -1506,7 +1506,7 @@ describe('Remote', function() {
        limit: 5,
        marker: PAGING_MARKER
      });
- 
+
      request = remote.requestAccountTransactions({
        account: UInt160.ACCOUNT_ONE,
        min_ledger: -1,
@@ -1522,7 +1522,7 @@ describe('Remote', function() {
      });
    });
    it('Construct account_tx request -- no binary', function() {
-     let request = remote.requestAccountTransactions({
+     const request = remote.requestAccountTransactions({
        account: UInt160.ACCOUNT_ONE,
        ledger_index_min: -1,
        ledger_index_max: -1,
@@ -1531,7 +1531,7 @@ describe('Remote', function() {
        binary: false,
        marker: PAGING_MARKER
      });
- 
+
      assert.deepEqual(request.message, {
        command: 'account_tx',
        id: undefined,
@@ -1544,19 +1544,19 @@ describe('Remote', function() {
        marker: PAGING_MARKER
      });
    });
- 
+
    it('Construct account_offers request -- no binary', function() {
-     let request = remote.requestAccountOffers({account: ADDRESS});
+     const request = remote.requestAccountOffers({account: ADDRESS});
      assert.deepEqual(request.message, {
        command: 'account_offers',
        id: undefined,
        account: ADDRESS
      });
    });
- 
+
 
   it('Construct offer request -- with ledger index', function() {
-    let request = remote.requestOffer({
+    const request = remote.requestOffer({
       index: TRANSACTION_HASH, ledger: LEDGER_INDEX
     });
     assert.strictEqual(request.message.command, 'ledger_entry');
@@ -1564,7 +1564,7 @@ describe('Remote', function() {
     assert.strictEqual(request.message.ledger_index, LEDGER_INDEX);
   });
   it('Construct offer request -- with ledger index and sequence', function() {
-    let request = remote.requestOffer({
+    const request = remote.requestOffer({
       account: ADDRESS, ledger: LEDGER_INDEX, sequence: 5
     });
     assert.strictEqual(request.message.command, 'ledger_entry');
@@ -1573,7 +1573,7 @@ describe('Remote', function() {
     assert.strictEqual(request.message.ledger_index, LEDGER_INDEX);
   });
   it('Construct offer request -- with ledger hash', function() {
-    let request = remote.requestOffer({
+    const request = remote.requestOffer({
       account: ADDRESS, ledger: LEDGER_HASH, sequence: 5
     });
     assert.strictEqual(request.message.command, 'ledger_entry');
@@ -1583,7 +1583,7 @@ describe('Remote', function() {
   });
   it('Construct offer request -- with ledger identifier and sequence',
      function() {
-    let request = remote.requestOffer({
+    const request = remote.requestOffer({
       account: ADDRESS, ledger: 'validated', sequence: 5
     });
     assert.strictEqual(request.message.command, 'ledger_entry');
@@ -1593,7 +1593,7 @@ describe('Remote', function() {
   });
 
   it('Construct book_offers request', function() {
-    let request = remote.requestBookOffers({
+    const request = remote.requestBookOffers({
       taker_gets: {
         currency: 'USD',
         issuer: ADDRESS
@@ -1618,7 +1618,7 @@ describe('Remote', function() {
   });
 
   it('Construct book_offers request -- with ledger and limit', function() {
-    let request = remote.requestBookOffers({
+    const request = remote.requestBookOffers({
       taker_gets: {
         currency: 'USD',
         issuer: ADDRESS
@@ -1647,7 +1647,7 @@ describe('Remote', function() {
   });
 
   it('Construct tx request', function() {
-    let request = remote.requestTransaction({
+    const request = remote.requestTransaction({
       hash: TRANSACTION_HASH
     });
 
@@ -1659,7 +1659,7 @@ describe('Remote', function() {
     });
   });
   it('Construct tx request -- no binary', function() {
-    let request = remote.requestTransaction({
+    const request = remote.requestTransaction({
       hash: TRANSACTION_HASH,
       binary: false
     });
@@ -1673,7 +1673,7 @@ describe('Remote', function() {
   });
 
   it('Construct transaction_entry request', function() {
-    let request = remote.requestTransactionEntry({
+    const request = remote.requestTransactionEntry({
       hash: TRANSACTION_HASH
     });
 
@@ -1685,7 +1685,7 @@ describe('Remote', function() {
     });
   });
   it('Construct transaction_entry request -- with ledger index', function() {
-    let request = remote.requestTransactionEntry({
+    const request = remote.requestTransactionEntry({
       hash: TRANSACTION_HASH,
       ledger: 1
     });
@@ -1698,7 +1698,7 @@ describe('Remote', function() {
     });
   });
   it('Construct transaction_entry request -- with ledger hash', function() {
-    let request = remote.requestTransactionEntry({
+    const request = remote.requestTransactionEntry({
       hash: TRANSACTION_HASH,
       ledger: LEDGER_HASH
     });
@@ -1720,7 +1720,7 @@ describe('Remote', function() {
   });
 
   it('Construct tx_history request', function() {
-    let request = remote.requestTransactionHistory({
+    const request = remote.requestTransactionHistory({
       start: 1
     });
 
@@ -1732,7 +1732,7 @@ describe('Remote', function() {
   });
 
   it('Construct wallet_accounts request', function() {
-    let request = remote.requestWalletAccounts({
+    const request = remote.requestWalletAccounts({
       seed: 'shmnpxY42DaoyNbNQDoGuymNT1T9U'
     });
 
@@ -1753,7 +1753,7 @@ describe('Remote', function() {
   });
 
   it('Construct sign request', function() {
-    let request = remote.requestSign({
+    const request = remote.requestSign({
       secret: 'shmnpxY42DaoyNbNQDoGuymNT1T9U',
       tx_json: {
         Flags: 0,
@@ -1789,7 +1789,7 @@ describe('Remote', function() {
   });
 
   it('Construct submit request', function() {
-    let request = remote.requestSubmit();
+    const request = remote.requestSubmit();
     assert.deepEqual(request.message, {
       command: 'submit',
       id: undefined
@@ -1825,7 +1825,7 @@ describe('Remote', function() {
 
   it('Construct ledger_accept request', function() {
     remote._stand_alone = true;
-    let request = remote.requestLedgerAccept();
+    const request = remote.requestLedgerAccept();
 
     assert.deepEqual(request.message, {
       command: 'ledger_accept',
@@ -1854,7 +1854,7 @@ describe('Remote', function() {
   });
 
   it('Construct ripple balance request', function() {
-    let request = remote.requestRippleBalance({
+    const request = remote.requestRippleBalance({
       account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
       ledger: 1,
@@ -1876,7 +1876,7 @@ describe('Remote', function() {
   });
 
   it('Construct ripple_path_find request', function() {
-    let request = remote.requestRipplePathFind({
+    const request = remote.requestRipplePathFind({
       src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
       dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
@@ -1903,7 +1903,7 @@ describe('Remote', function() {
   });
 
   it('Construct path_find create request', function() {
-    let request = remote.requestPathFindCreate({
+    const request = remote.requestPathFindCreate({
       src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
       dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
@@ -1931,7 +1931,7 @@ describe('Remote', function() {
   });
 
   it('Construct path_find close request', function() {
-    let request = remote.requestPathFindClose();
+    const request = remote.requestPathFindClose();
 
     assert.deepEqual(request.message, {
       command: 'path_find',
@@ -1999,7 +1999,7 @@ describe.skip('Request API consistency tests', function() {
   function filterDefault(optionalArgs, defaultArg) {
     return lodash.isEmpty(defaultArg)
     || lodash.isEmpty(optionalArgs)
-    || !lodash.unzip(optionalArgs)[0].includes(defaultArg[0])
+    || !lodash.unzip(optionalArgs)[0].includes(defaultArg[0]);
   }
   assert.strictEqual(filterDefault([
                   ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
@@ -2067,17 +2067,17 @@ describe.skip('Request API consistency tests', function() {
     []
   );
 
-  function request(command, methodName, options_) {
-    let options = lodash.merge({}, options_);
+  function makeRequest(command, methodName, options_) {
+    const opts = lodash.merge({}, options_);
 
     return lodash.extend({
-      name: options.alias || command,
+      name: opts.alias || command,
       command: command,
       methodName: methodName,
-      requiredArgs: options.required || [],
-      optionalArgs: options.optional || [],
-      defaultArgs: options.default || [],
-    }, options);
+      requiredArgs: opts.required || [],
+      optionalArgs: opts.optional || [],
+      defaultArgs: opts.default || [],
+    }, opts);
   }
 
   const REQOPTION = {
@@ -2085,26 +2085,26 @@ describe.skip('Request API consistency tests', function() {
     LEDGER: ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
     ACCOUNT_ROOT: ['account', [['account_root', ADDRESS]]],
     STREAMS: ['streams', [['streams', ['server', 'ledger']]]]
-  }
+  };
 
   const testCases = [
-    request('server_info', 'requestServerInfo'),
-    request('ping', 'requestPing'),
+    makeRequest('server_info', 'requestServerInfo'),
+    makeRequest('ping', 'requestPing'),
 
-    request('subscribe', 'requestSubscribe', {
+    makeRequest('subscribe', 'requestSubscribe', {
       optional: [
         REQOPTION.STREAMS
       ],
       noKeyed: true
     }),
-    request('unsubscribe', 'requestUnsubscribe', {
+    makeRequest('unsubscribe', 'requestUnsubscribe', {
       optional: [
         REQOPTION.STREAMS
       ],
       noKeyed: true
     }),
 
-    request('account_info', 'requestAccountInfo', {
+    makeRequest('account_info', 'requestAccountInfo', {
       required: [
         REQOPTION.ACCOUNT,
       ],
@@ -2113,7 +2113,7 @@ describe.skip('Request API consistency tests', function() {
         REQOPTION.LEDGER
       ]
     }),
-    request('account_currencies', 'requestAccountCurrencies', {
+    makeRequest('account_currencies', 'requestAccountCurrencies', {
       required: [
         REQOPTION.ACCOUNT,
       ],
@@ -2123,7 +2123,7 @@ describe.skip('Request API consistency tests', function() {
         ['limit', 10]
       ]
     }),
-    request('account_lines', 'requestAccountLines', {
+    makeRequest('account_lines', 'requestAccountLines', {
       required: [
         REQOPTION.ACCOUNT,
       ],
@@ -2133,7 +2133,7 @@ describe.skip('Request API consistency tests', function() {
         ['limit', 10]
       ]
     }),
-    request('account_offers', 'requestAccountOffers', {
+    makeRequest('account_offers', 'requestAccountOffers', {
       required: [
         REQOPTION.ACCOUNT,
       ],
@@ -2143,7 +2143,7 @@ describe.skip('Request API consistency tests', function() {
         ['limit', 10]
       ]
     }),
-    request('account_tx', 'requestAccountTransactions', {
+    makeRequest('account_tx', 'requestAccountTransactions', {
       required: [
         REQOPTION.ACCOUNT,
       ],
@@ -2161,7 +2161,7 @@ describe.skip('Request API consistency tests', function() {
       noPositional: true
     }),
 
-    request('tx', 'requestTransaction', {
+    makeRequest('tx', 'requestTransaction', {
       required: [
         ['hash', [['transaction', TRANSACTION_HASH]]]
       ],
@@ -2172,7 +2172,7 @@ describe.skip('Request API consistency tests', function() {
         ['binary', true]
       ]
     }),
-    request('transaction_entry', 'requestTransactionEntry', {
+    makeRequest('transaction_entry', 'requestTransactionEntry', {
       required: [
         ['hash', [['tx_hash', TRANSACTION_HASH]]]
       ],
@@ -2184,13 +2184,13 @@ describe.skip('Request API consistency tests', function() {
       ]
     }),
 
-    request('tx_history', 'requestTransactionHistory', {
+    makeRequest('tx_history', 'requestTransactionHistory', {
       optional: [
         ['start', 10]
       ],
       noPositional: true
     }),
-    request('book_offers', 'requestBookOffers', {
+    makeRequest('book_offers', 'requestBookOffers', {
       required: [
         ['gets', [['taker_gets', {currency: HEX_USD, issuer: ADDRESS}]]],
         ['pays', [['taker_pays', {currency: HEX_USD, issuer: ADDRESS}]]]
@@ -2206,7 +2206,7 @@ describe.skip('Request API consistency tests', function() {
       noPositional: true
     }),
 
-    request('ledger', 'requestLedger', {
+    makeRequest('ledger', 'requestLedger', {
       optional: [
         REQOPTION.LEDGER,
         ['full', true],
@@ -2216,7 +2216,7 @@ describe.skip('Request API consistency tests', function() {
       ],
       noPositional: true
     }),
-    request('ledger_data', 'requestLedgerData', {
+    makeRequest('ledger_data', 'requestLedgerData', {
       optional: [
         REQOPTION.LEDGER,
         ['binary', false],
@@ -2227,17 +2227,17 @@ describe.skip('Request API consistency tests', function() {
       ],
       noPositional: true
     }),
-    request('ledger_entry', 'requestLedgerEntry', {
+    makeRequest('ledger_entry', 'requestLedgerEntry', {
       required: [
         ['type', 'account_root']
       ],
       noKeyed: true
     }),
-    request('ledger_closed', 'requestLedgerClosed'),
-    request('ledger_current', 'requestLedgerCurrent'),
-    request('ledger_header', 'requestLedgerHeader'),
+    makeRequest('ledger_closed', 'requestLedgerClosed'),
+    makeRequest('ledger_current', 'requestLedgerCurrent'),
+    makeRequest('ledger_header', 'requestLedgerHeader'),
 
-    request('ledger_entry', 'requestAccountBalance', {
+    makeRequest('ledger_entry', 'requestAccountBalance', {
       alias: 'account_balance',
       required: [
         REQOPTION.ACCOUNT_ROOT,
@@ -2246,7 +2246,7 @@ describe.skip('Request API consistency tests', function() {
         REQOPTION.LEDGER,
       ]
     }),
-    request('ledger_entry', 'requestAccountFlags', {
+    makeRequest('ledger_entry', 'requestAccountFlags', {
       alias: 'account_flags',
       required: [
         REQOPTION.ACCOUNT_ROOT,
@@ -2255,7 +2255,7 @@ describe.skip('Request API consistency tests', function() {
         REQOPTION.LEDGER,
       ],
     }),
-    request('ledger_entry', 'requestOwnerCount', {
+    makeRequest('ledger_entry', 'requestOwnerCount', {
       alias: 'owner_count',
       required: [
         REQOPTION.ACCOUNT_ROOT,
@@ -2265,13 +2265,13 @@ describe.skip('Request API consistency tests', function() {
       ],
     }),
 
-    request('sign', 'requestSign', {
+    makeRequest('sign', 'requestSign', {
       required: [
         ['secret', SECRET],
         ['tx_json', TX_JSON]
       ]
     }),
-    request('submit', 'requestSubmit')
+    makeRequest('submit', 'requestSubmit')
   ];
 
   function checkRequest(request, expectedReqParams) {
@@ -2286,10 +2286,10 @@ describe.skip('Request API consistency tests', function() {
 
   function makeRequestTest(testCase) {
     it(`Construct ${testCase.name} request`, function() {
-      let reqMethod = remote[testCase.methodName];
-      let requiredArgs = testCase.requiredArgs;
-      let optionalArgs = lodash.compact(testCase.optionalArgs);
-      let defaultArgs = filterDefaultArgs(testCase.defaultArgs, optionalArgs);
+      const reqMethod = remote[testCase.methodName];
+      const requiredArgs = testCase.requiredArgs;
+      const optionalArgs = lodash.compact(testCase.optionalArgs);
+      const defaultArgs = filterDefaultArgs(testCase.defaultArgs, optionalArgs);
 
       assert.strictEqual(typeof reqMethod, 'function');
       assert(Array.isArray(requiredArgs));
@@ -2309,24 +2309,24 @@ describe.skip('Request API consistency tests', function() {
         return;
       }
 
-      let baseReqParams = [
+      const baseReqParams = [
         ['command', testCase.command],
         ...requiredArgs.map(firstReqParam),
         ...defaultArgs.map(firstReqParam)
       ];
 
-      let baseReqOptions = lodash.zipObject(requiredArgs.map(firstMethodParam));
+      const baseReqOptions = lodash.zipObject(requiredArgs.map(firstMethodParam));
 
       // All required options set
       checkRequest(reqMethod.call(remote, baseReqOptions, lodash.noop),
                    baseReqParams);
 
-      let expectedReqParams = [
+      const expectedReqParams = [
         ...baseReqParams,
         ...optionalArgs.map(firstReqParam)
       ];
 
-      let reqOptions = lodash.merge(
+      const reqOptions = lodash.merge(
         baseReqOptions,
         lodash.zipObject(optionalArgs.map(firstMethodParam))
       );
@@ -2337,7 +2337,7 @@ describe.skip('Request API consistency tests', function() {
     });
   }
 
-  function makeRequestOptionTest(testCase, optionalArgs, index) {
+  function makeRequestOptionTest(testCase, optionalArgs) {
     if (lodash.isEmpty(optionalArgs)) {
       return;
     }
@@ -2346,26 +2346,26 @@ describe.skip('Request API consistency tests', function() {
     }
 
     normalizeOptionalArgs(optionalArgs).forEach(function(optionalArg) {
-      let testParam = lodash.first(optionalArg);
+      const testParam = lodash.first(optionalArg);
 
       it(`Construct ${testCase.name} request -- with ${testParam}`, function() {
-        let reqMethod = remote[testCase.methodName];
-        let requiredArgs = testCase.requiredArgs;
-        let defaultArgs = filterDefaultArgs(testCase.defaultArgs, [optionalArgs]);
+        const reqMethod = remote[testCase.methodName];
+        const requiredArgs = testCase.requiredArgs;
+        const defaultArgs = filterDefaultArgs(testCase.defaultArgs, [optionalArgs]);
 
         assert.strictEqual(typeof reqMethod, 'function');
         assert(Array.isArray(requiredArgs));
         assert(Array.isArray(optionalArg));
         assert(Array.isArray(defaultArgs));
 
-        let expectedReqParams = [
+        const expectedReqParams = [
           ['command', testCase.command],
           optionalArg,
           ...requiredArgs.map(firstReqParam),
           ...defaultArgs.map(firstReqParam)
         ];
 
-        let reqOptions = lodash.merge(
+        const reqOptions = lodash.merge(
           // Required args
           lodash.zipObject(requiredArgs.map(firstMethodParam)),
           // Optional arg
@@ -2387,26 +2387,26 @@ describe.skip('Request API consistency tests', function() {
     }
 
     normalizeOptionalArgs(optionalArgs).forEach(function(optionalArg) {
-      let testParam = lodash.first(optionalArg);
+      const testParam = lodash.first(optionalArg);
 
       it(`Construct ${testCase.name} request -- with ${testParam} as postiional arg`, function() {
-        let reqMethod = remote[testCase.methodName];
-        let requiredArgs = testCase.requiredArgs;
-        let defaultArgs = filterDefaultArgs(testCase.defaultArgs, [optionalArgs]);
+        const reqMethod = remote[testCase.methodName];
+        const requiredArgs = testCase.requiredArgs;
+        const defaultArgs = filterDefaultArgs(testCase.defaultArgs, [optionalArgs]);
 
         assert.strictEqual(typeof reqMethod, 'function');
         assert(Array.isArray(requiredArgs));
         assert(Array.isArray(optionalArg));
         assert(Array.isArray(defaultArgs));
 
-        let expectedReqParams = [
+        const expectedReqParams = [
           ['command', testCase.command],
           optionalArg,
           ...requiredArgs.map(firstReqParam),
           ...defaultArgs.map(firstReqParam)
         ];
 
-        let reqArgs = [
+        const reqArgs = [
           // Required args
           ...(lodash.last(lodash.unzip(expectedReqParams.slice(2))) || []),
           // Placeholder undefined args
