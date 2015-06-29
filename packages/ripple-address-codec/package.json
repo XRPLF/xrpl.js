@@ -1,15 +1,11 @@
 {
   "name": "ripple-address-codec",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.2",
+  "description": "encodes/decodes base58 encoded ripple identifiers",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "hash.js": "^1.0.3",
-    "coin-address-codec" : "sublimator/coin-address-codec"
+    "x-address-codec" : "^0.1.3"
   }
 }
