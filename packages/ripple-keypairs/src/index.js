@@ -90,7 +90,7 @@ function derivek256Secret(seed, opts={}) {
             .add(privateGen).mod(order);
 }
 
-function createAccountId(pubKeyBytes) {
+function createAccountID(pubKeyBytes) {
   const hash256 = hashjs.sha256().update(pubKeyBytes).digest();
   const hash160 = hashjs.ripemd160().update(hash256).digest();
   return hash160;
@@ -134,7 +134,7 @@ hasCachedProperty(KeyPair, 'pubKeyHex', function() {
 });
 
 hasCachedProperty(KeyPair, 'accountBytes', function() {
-  return createAccountId(this.pubKeyCanonicalBytes());
+  return createAccountID(this.pubKeyCanonicalBytes());
 });
 
 hasCachedProperty(KeyPair, 'accountID', function() {
@@ -247,5 +247,6 @@ module.exports = {
   Secp256k1Pair,
   Ed25519Pair,
   KeyType,
-  seedFromPhrase
+  seedFromPhrase,
+  createAccountID
 };
