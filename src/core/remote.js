@@ -767,6 +767,31 @@ Remote.prototype.request = function(request_) {
 };
 
 /**
+ *  Create options object from positional function arguments
+ *
+ * @param {Array} params function parameters
+ * @param {Array} args function arguments
+ * @return {Object} keyed options
+ */
+
+function makeOptions(command, params, args) {
+  const result = {};
+
+  log.warn(
+    'DEPRECATED: First argument to ' + command
+    + ' request constructor must be an object containing'
+    + ' request properties: '
+    + params.join(', ')
+  );
+
+  if (lodash.isFunction(lodash.last(args))) {
+    result.callback = args.pop();
+  }
+
+  return lodash.merge(result, lodash.zipObject(params, args));
+}
+
+/**
  * Request ping
  *
  * @param [String] server host
@@ -1006,7 +1031,6 @@ Remote.prototype.requestLedgerEntry = function(type, callback_) {
 
         if (node) {
           // Emulate fetch of ledger entry.
-          // console.log('request_ledger_entry: emulating');
           // YYY Missing lots of fields.
           request.emit('success', {node: node});
           bDefault = false;
@@ -1016,7 +1040,6 @@ Remote.prototype.requestLedgerEntry = function(type, callback_) {
             case 'account_root':
               request.once('success', function(message) {
                 // Cache node.
-                // console.log('request_ledger_entry: caching');
                 self.ledgers.current
                 .account_root[message.node.Account] = message.node;
               });
@@ -1024,13 +1047,11 @@ Remote.prototype.requestLedgerEntry = function(type, callback_) {
 
             default:
               // This type not cached.
-              // console.log('request_ledger_entry: non-cached type');
           }
         }
       }
 
       if (bDefault) {
-        // console.log('request_ledger_entry: invoking');
         request.request_default();
       }
     };
@@ -1093,26 +1114,17 @@ Remote.prototype.requestUnsubscribe = function(streams, callback) {
 Remote.prototype.requestTransactionEntry = function(options_, callback_) {
   // If not trusted, need to check proof, maybe talk packet protocol.
   // utils.assert(this.trusted);
-  let options, callback = callback_;
+  let options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({
+    lodash.merge(options, {
       ledger: options_.ledger_index || options_.ledger_hash
     }, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    const args = Array.prototype.slice.call(arguments);
-
-    if (lodash.isFunction(lodash.last(args))) {
-      callback = args.pop();
-    }
-
-    options = {
-      hash: args.shift(),
-      ledger: args.shift()
-    };
+    lodash.merge(options, makeOptions(
+      'transaction_entry',
+    ['hash', 'ledger'],
+    Array.prototype.slice.call(arguments)));
   }
 
   const request = new Request(this, 'transaction_entry');
@@ -1130,7 +1142,7 @@ Remote.prototype.requestTransactionEntry = function(options_, callback_) {
       throw new Error('ledger must be a ledger index or hash');
   }
 
-  request.callback(callback);
+  request.callback(options.callback);
 
   return request;
 };
@@ -1148,24 +1160,16 @@ Remote.prototype.requestTransactionEntry = function(options_, callback_) {
 
 Remote.prototype.requestTransaction =
 Remote.prototype.requestTx = function(options_, callback_) {
-  let options, callback = callback_;
+  let options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({}, options_);
+    lodash.merge(options, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    const args = Array.prototype.slice.call(arguments);
-
-    if (lodash.isFunction(lodash.last(args))) {
-      callback = args.pop();
-    }
-
-    options = {
-      hash: args.shift(),
-      binary: args.shift()
-    };
+    lodash.merge(options, makeOptions(
+      'tx',
+      ['hash', 'binary'],
+      Array.prototype.slice.call(arguments)
+    ));
   }
 
   const request = new Request(this, 'tx');
@@ -1175,13 +1179,12 @@ Remote.prototype.requestTx = function(options_, callback_) {
   request.once('success', function(res) {
     if (options.binary === false) {
       request.emit('transaction', res);
-      return;
+    } else {
+      request.emit('transaction', Remote.parseBinaryTransaction(res));
     }
-
-    request.emit('transaction', Remote.parseBinaryTransaction(res));
   });
 
-  request.callback(callback, 'transaction');
+  request.callback(options.callback, 'transaction');
 
   return request;
 };
@@ -1196,7 +1199,7 @@ Remote.prototype.requestTx = function(options_, callback_) {
  * ledger closes. You have to supply a ledger_index or ledger_hash
  * when paging to ensure a complete response
  *
- * @param {String} type - request name, e.g. 'account_lines'
+ * @param {String} command - request command, e.g. 'account_lines'
  * @param {Object} options - all optional
  *   @param {String} account - ripple address
  *   @param {String} peer - ripple address
@@ -1209,35 +1212,21 @@ Remote.prototype.requestTx = function(options_, callback_) {
  */
 
 Remote.accountRequest = function(command, options_, callback_) {
-  let options, callback = callback_;
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({}, options_);
+    lodash.merge(options, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    const args = Array.prototype.slice.call(arguments);
-
-    if (lodash.isFunction(lodash.last(args))) {
-      callback = args.pop();
-    }
-
-    options = {
-      account: args.shift(),
-      peer: args.shift(),
-      ledger: args.shift(),
-      limit: args.shift(),
-      marker: args.shift()
-    };
+    lodash.merge(options, makeOptions(
+      command,
+      ['account', 'ledger', 'peer', 'limit', 'marker'],
+      Array.prototype.slice.call(arguments, 1)));
   }
-
-  const {account, ledger, peer, limit, marker} = options;
 
   // if a marker is given, we need a ledger
   // check if a valid ledger_index or ledger_hash is provided
-  if (marker) {
-    if (!(Number(ledger) > 0) && !UInt256.is_valid(ledger)) {
+  if (options.marker) {
+    if (!(Number(options.ledger) > 0) && !UInt256.is_valid(options.ledger)) {
       throw new Error(
         'A ledger_index or ledger_hash must be provided when using a marker');
     }
@@ -1245,18 +1234,15 @@ Remote.accountRequest = function(command, options_, callback_) {
 
   const request = new Request(this, command);
 
-  if (account) {
-    request.message.account = UInt160.json_rewrite(account);
+  request.message.account = UInt160.json_rewrite(options.account);
+  request.selectLedger(options.ledger);
+
+  if (UInt160.is_valid(options.peer)) {
+    request.message.peer = UInt160.json_rewrite(options.peer);
   }
 
-  request.selectLedger(ledger);
-
-  if (UInt160.is_valid(peer)) {
-    request.message.peer = UInt160.json_rewrite(peer);
-  }
-
-  if (!isNaN(limit)) {
-    let _limit = Number(limit);
+  if (!isNaN(options.limit)) {
+    let _limit = Number(options.limit);
 
     // max for 32-bit unsigned int is 4294967295
     // we'll clamp to 1e9
@@ -1272,11 +1258,11 @@ Remote.accountRequest = function(command, options_, callback_) {
     request.message.limit = _limit;
   }
 
-  if (marker) {
-    request.message.marker = marker;
+  if (options.marker) {
+    request.message.marker = options.marker;
   }
 
-  request.callback(callback);
+  request.callback(options.callback);
 
   return request;
 };
@@ -1336,7 +1322,20 @@ Remote.prototype.requestAccountCurrencies = function(...args) {
 Remote.prototype.requestAccountLines = function(...args) {
   // XXX Does this require the server to be trusted?
   // utils.assert(this.trusted);
-  const options = ['account_lines', ...args];
+  let options = ['account_lines'];
+
+  if (lodash.isPlainObject(args[0])) {
+    options = options.concat(args);
+  } else {
+    let [account, peer, ledger] = args;
+    options = options.concat([
+      account,
+      ledger,
+      peer,
+      ...args.slice(3)
+    ]);
+  }
+
   return Remote.accountRequest.apply(this, options);
 };
 
@@ -1549,18 +1548,17 @@ Remote.prototype.requestTxHistory = function(start_, callback_) {
   // utils.assert(this.trusted);
 
   const request = new Request(this, 'tx_history');
-  let start = start_;
-  const callback = callback_;
+  const options = {start: start_, callback: callback_};
 
-  if (lodash.isPlainObject(start)) {
-    start = start.start;
+  if (lodash.isPlainObject(start_)) {
+    lodash.merge(options, start_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
+    lodash.merge(options, makeOptions(
+      'tx_history', ['start'], Array.prototype.slice.call(arguments)));
   }
 
-  request.message.start = start;
-  request.callback(callback);
+  request.message.start = options.start;
+  request.callback(options.callback);
 
   return request;
 };
@@ -1579,34 +1577,22 @@ Remote.prototype.requestTxHistory = function(start_, callback_) {
  */
 
 Remote.prototype.requestBookOffers = function(options_, callback_) {
-  let options, callback = callback_;
+  const options = {callback: callback_};
 
   if (options_.gets || options_.taker_gets) {
-    options = lodash.merge({
+    lodash.merge(options, {
       pays: options_.taker_pays,
       gets: options_.taker_gets
     }, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    const args = Array.prototype.slice.call(arguments);
-
-    if (lodash.isFunction(lodash.last(args))) {
-      callback = args.pop();
-    }
-
-    options = {
-      gets: args.shift(),
-      pays: args.shift(),
-      taker: args.shift(),
-      ledger: args.shift(),
-      limit: args.shift()
-    };
+    lodash.merge(options, makeOptions(
+      'book_offers',
+      ['gets', 'pays', 'taker', 'ledger', 'limit'],
+      Array.prototype.slice.call(arguments)
+    ));
   }
 
   const {gets, pays, taker, ledger, limit} = options;
-
   const request = new Request(this, 'book_offers');
 
   request.message.taker_gets = {
@@ -1645,7 +1631,7 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
     request.message.limit = _limit;
   }
 
-  request.callback(callback);
+  request.callback(options.callback);
   return request;
 };
 
@@ -1660,23 +1646,21 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
 Remote.prototype.requestWalletAccounts = function(options_, callback_) {
   utils.assert(this.trusted); // Don't send secrets.
 
-  let options;
-  const callback = callback_;
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({}, options_);
+    lodash.merge(options, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    options = {
-      seed: arguments[0]
-    };
+    lodash.merge(options, makeOptions(
+      'wallet_accounts',
+      ['seed'],
+      Array.prototype.slice.call(arguments)
+    ));
   }
 
   const request = new Request(this, 'wallet_accounts');
   request.message.seed = options.seed;
-  request.callback(callback);
+  request.callback(options.callback);
 
   return request;
 };
@@ -1693,26 +1677,22 @@ Remote.prototype.requestWalletAccounts = function(options_, callback_) {
 Remote.prototype.requestSign = function(options_, callback_) {
   utils.assert(this.trusted); // Don't send secrets.
 
-  let options, callback = callback_;
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({}, options_);
+    lodash.merge(options, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    options = {
-      secret: arguments[0],
-      tx_json: arguments[1]
-    };
-
-    callback = arguments[2];
+    lodash.merge(options, makeOptions(
+      'sign',
+      ['secret', 'tx_json'],
+      Array.prototype.slice.call(arguments)
+    ));
   }
 
   const request = new Request(this, 'sign');
   request.message.secret = options.secret;
   request.message.tx_json = options.tx_json;
-  request.callback(callback);
+  request.callback(options.callback);
 
   return request;
 };
@@ -1812,24 +1792,15 @@ Remote.prototype.requestLedgerAccept = function(callback) {
  */
 
 Remote.accountRootRequest = function(command, filter, options_, callback_) {
-  let options, callback = callback_;
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({}, options_);
+    lodash.merge(options, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    const args = Array.prototype.slice.call(arguments);
-
-    if (lodash.isFunction(lodash.last(args))) {
-      callback = args.pop();
-    }
-
-    options = {
-      account: args.shift(),
-      ledger: args.shift()
-    };
+    lodash.merge(options, makeOptions(
+      command,
+      ['account', 'ledger'],
+      Array.prototype.slice.call(arguments, 2)));
   }
 
   const request = this.requestLedgerEntry('account_root');
@@ -1840,7 +1811,7 @@ Remote.accountRootRequest = function(command, filter, options_, callback_) {
     request.emit(command, filter(message));
   });
 
-  request.callback(callback, command);
+  request.callback(options.callback, command);
 
   return request;
 };
@@ -1950,20 +1921,16 @@ Remote.prototype.findAccount = function(accountID) {
  */
 
 function createPathFind(options_) {
-  let options;
+  const options = {};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({}, options_);
+    lodash.merge(options, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    options = {
-      src_account: arguments[0],
-      dst_account: arguments[1],
-      dst_amount: arguments[2],
-      src_currencies: arguments[3]
-    };
+    lodash.merge(options, makeOptions(
+      'pathfind',
+      ['src_account', 'dst_account', 'dst_amount', 'src_currencies'],
+      Array.prototype.slice.call(arguments)
+    ));
   }
 
   const pathFind = new PathFind(this,
@@ -1997,19 +1964,16 @@ Remote.prepareTrade = function(currency, issuer) {
  */
 
 Remote.prototype.book = Remote.prototype.createOrderBook = function(options_) {
-  let options;
+  const options = {};
 
   if (arguments.length === 1) {
-    options = lodash.merge({}, options_);
+    lodash.merge(options, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-             + ' an object containing request properties');
-    options = {
-      currency_gets: arguments[0],
-      issuer_gets: arguments[1],
-      currency_pays: arguments[2],
-      issuer_pays: arguments[3]
-    };
+    lodash.merge(options, makeOptions(
+      'orderbook',
+      ['currency_gets', 'issuer_gets', 'currency_pays', 'issuer_pays'],
+      Array.prototype.slice.call(arguments)
+    ));
   }
 
   const gets = Remote.prepareTrade(options.currency_gets, options.issuer_gets);
@@ -2085,24 +2049,15 @@ Remote.prototype.setAccountSeq = function(account_, sequence) {
  */
 
 Remote.prototype.accountSeqCache = function(options_, callback_) {
-  let options, callback = callback_;
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({}, options_);
+    lodash.merge(options, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    const args = Array.prototype.slice.call(arguments);
-
-    if (lodash.isFunction(lodash.last(args))) {
-      callback = args.pop();
-    }
-
-    options = {
-      account: args.shift(),
-      ledger: args.shift()
-    };
+    lodash.merge(options, makeOptions(
+      'accountseqcache',
+      ['account', 'ledger']
+    ));
   }
 
   if (!this.accounts.hasOwnProperty(options.account)) {
@@ -2141,7 +2096,7 @@ Remote.prototype.accountSeqCache = function(options_, callback_) {
     account_info.caching_seq_request = request;
   }
 
-  request.callback(callback, 'success_cache', 'error_cache');
+  request.callback(options.callback, 'success_cache', 'error_cache');
 
   return request;
 };
@@ -2207,26 +2162,17 @@ Remote.prototype.requestOffer = function(options, callback) {
  */
 
 Remote.prototype.requestRippleBalance = function(options_, callback_) {
-  let options, callback = callback_;
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({}, options_);
+    lodash.merge(options, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
+    lodash.merge(options, makeOptions(
+      'ripplebalance',
+      ['account', 'issuer', 'currency', 'ledger'],
+      Array.prototype.slice.call(arguments)
+    ));
 
-    const args = Array.prototype.slice.call(arguments);
-
-    if (lodash.isFunction(lodash.last(args))) {
-      callback = args.pop();
-    }
-
-    options = {
-      account: args.shift(),
-      issuer: args.shift(),
-      currency: args.shift(),
-      ledger: args.shift()
-    };
   }
 
   // YYY Could be cached per ledger.
@@ -2279,7 +2225,7 @@ Remote.prototype.requestRippleBalance = function(options_, callback_) {
   }
 
   request.once('success', rippleState);
-  request.callback(callback, 'ripple_state');
+  request.callback(options.callback, 'ripple_state');
 
   return request;
 };
@@ -2309,31 +2255,23 @@ Remote.prepareCurrencies = function(currency) {
  */
 
 Remote.prototype.requestRipplePathFind = function(options_, callback_) {
-  let options, callback = callback_;
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({
+    lodash.merge(options, {
       source_account: options_.src_account,
       destination_account: options_.dst_account,
       destination_amount: options_.dst_amount,
       source_currencies: options_.src_currencies
       }, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    const args = Array.prototype.slice.call(arguments);
-
-    if (lodash.isFunction(lodash.last(args))) {
-      callback = args.pop();
-    }
-
-    options = {
-      source_account: args.shift(),
-      destination_account: args.shift(),
-      destination_amount: args.shift(),
-      source_currencies: args.shift()
-    };
+    lodash.merge(options, makeOptions(
+      'ripple_path_find',
+      /* eslint-disable max-len */
+      ['source_account', 'destination_account', 'destination_amount', 'source_currencies'],
+      /* eslint-enable max-len */
+      Array.prototype.slice.call(arguments)
+    ));
   }
 
   const request = new Request(this, 'ripple_path_find');
@@ -2351,7 +2289,7 @@ Remote.prototype.requestRipplePathFind = function(options_, callback_) {
       options.source_currencies.map(Remote.prepareCurrency);
   }
 
-  request.callback(callback);
+  request.callback(options.callback);
 
   return request;
 };
@@ -2365,31 +2303,23 @@ Remote.prototype.requestRipplePathFind = function(options_, callback_) {
  */
 
 Remote.prototype.requestPathFindCreate = function(options_, callback_) {
-  let options, callback = callback_;
+  const options = {callback: callback_};
 
   if (lodash.isPlainObject(options_)) {
-    options = lodash.merge({
+    lodash.merge(options, {
       source_account: options_.src_account,
       destination_account: options_.dst_account,
       destination_amount: options_.dst_amount,
       source_currencies: options_.src_currencies
       }, options_);
   } else {
-    log.warn('DEPRECATED: First argument to request constructor should be'
-      + ' an object containing request properties');
-
-    const args = Array.prototype.slice.call(arguments);
-
-    if (lodash.isFunction(lodash.last(args))) {
-      callback = args.pop();
-    }
-
-    options = {
-      source_account: args.shift(),
-      destination_account: args.shift(),
-      destination_amount: args.shift(),
-      source_currencies: args.shift()
-    };
+    lodash.merge(options, makeOptions(
+      'path_find',
+      /* eslint-disable max-len */
+      ['source_account', 'destination_account', 'destination_amount', 'source_currencies'],
+      /* eslint-enable max-len */
+      Array.prototype.slice.call(arguments)
+    ));
   }
 
   const request = new Request(this, 'path_find');
@@ -2408,7 +2338,7 @@ Remote.prototype.requestPathFindCreate = function(options_, callback_) {
       options.source_currencies.map(Remote.prepareCurrency);
   }
 
-  request.callback(callback);
+  request.callback(options.callback);
 
   return request;
 };
