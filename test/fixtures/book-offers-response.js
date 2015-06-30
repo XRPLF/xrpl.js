@@ -297,9 +297,7 @@ module.exports.requestBookOffersBidsResponse = function(request, options={}) {
  });
 };
 
-module.exports.requestBookOffersBidsPartialFundedResponse = function(request, options) {
-  options = options || {};
-
+module.exports.requestBookOffersBidsPartialFundedResponse = function(request, options={}) {
   _.defaults(options, {
     gets: {
       currency: 'BTC',
