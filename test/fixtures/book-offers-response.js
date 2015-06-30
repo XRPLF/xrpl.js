@@ -7,12 +7,12 @@ module.exports.requestBookOffersBidsResponse = function(request, options={}) {
     gets: {
       currency: 'BTC',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-   },
+    },
     pays: {
       currency: 'USD',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-   }
- });
+    }
+  });
 
   return JSON.stringify({
     id: request.id,
@@ -361,12 +361,12 @@ module.exports.requestBookOffersAsksPartialFundedResponse = function(request, op
     gets: {
       currency: 'BTC',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-   },
+    },
     pays: {
       currency: 'USD',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-   }
- });
+    }
+  });
 
   return JSON.stringify({
     id: request.id,
@@ -419,13 +419,12 @@ module.exports.requestBookOffersAsksResponse = function(request, options={}) {
     pays: {
       currency: 'BTC',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-   },
+    },
     gets: {
       currency: 'USD',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-   }
- });
-
+    }
+  });
 
   return JSON.stringify({
     id: request.id,
