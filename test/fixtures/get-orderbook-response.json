@@ -366,5 +366,99 @@
         "sequence": 35789
       }
     }
-  ]
+  ],
+  "flipped": {
+    "bids": [
+      {
+        "specification": {
+          "direction": "buy",
+          "quantity": {
+            "currency": "BTC",
+            "value": "93.030522464522",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          },
+          "totalPrice": {
+            "currency": "USD",
+            "value": "0.2849323720855092",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          }
+        },
+        "properties": {
+          "maker": "rwBYyfufTzk77zUSKEu4MvixfarC35av1J",
+          "sequence": 386940
+        }
+      },
+      {
+        "specification": {
+          "direction": "buy",
+          "quantity": {
+            "currency": "BTC",
+            "value": "1",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          },
+          "totalPrice": {
+            "currency": "USD",
+            "value": "0.00302447007930511",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          }
+        },
+        "properties": {
+          "maker": "rwjsRktX1eguUr1pHTffyHnC4uyrvX58V1",
+          "sequence": 207855
+        }
+      },
+      {
+        "specification": {
+          "direction": "buy",
+          "quantity": {
+            "currency": "BTC",
+            "value": "182.9814890090516",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          },
+          "totalPrice": {
+            "currency": "USD",
+            "value": "0.5",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          }
+        },
+        "properties": {
+          "maker": "rUeCeioKJkbYhv4mRGuAbZpPcqkMCoYq6N",
+          "sequence": 5255
+        },
+        "state": {
+          "availableQuantity": {
+            "currency": "BTC",
+            "value": "82.50309772176658",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          },
+          "priceOfAvailableQuantity": {
+            "currency": "USD",
+            "value": "0.2254411038203033",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          }
+        }
+      }
+    ],
+    "asks": [
+      {
+        "specification": {
+          "direction": "sell",
+          "quantity": {
+            "currency": "BTC",
+            "value": "1.24252537879871",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          },
+          "totalPrice": {
+            "currency": "USD",
+            "value": "0.003967400879423823",
+            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+          }
+        },
+        "properties": {
+          "maker": "rDbsCJr5m8gHDCNEHCZtFxcXHsD4S9jH83",
+          "sequence": 110099
+        }
+      }
+    ]
+  }
 }

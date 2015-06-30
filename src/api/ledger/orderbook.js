@@ -40,9 +40,13 @@ function formatBidsAndAsks(orderbook, offers) {
   // for both bids and asks, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
   const orders = _.sortBy(offers, 'quality').map(parseOrderbookOrder);
-  const bids = orders.filter(_.partial(orderFilter, orderbook.base, 'buy'));
-  const asks = orders.filter(_.partial(orderFilter, orderbook.base, 'sell'));
-  return {bids, asks};
+  const {base, counter} = orderbook;
+  const bids = orders.filter(_.partial(orderFilter, base, 'buy'));
+  const asks = orders.filter(_.partial(orderFilter, base, 'sell'));
+  const flippedBids = orders.filter(_.partial(orderFilter, counter, 'buy'));
+  const flippedAsks = orders.filter(_.partial(orderFilter, counter, 'sell'));
+  const flipped = {bids: flippedBids, asks: flippedAsks};
+  return {bids, asks, flipped};
 }
 
 function getOrderBook(account, orderbook, options, callback) {
