@@ -1610,7 +1610,7 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
   const request = new Request(this, 'book_offers');
 
   request.message.taker_gets = {
-    currency: Currency.json_rewrite(gets.currency)
+    currency: Currency.json_rewrite(gets.currency, {force_hex: true})
   };
 
   if (!Currency.from_json(request.message.taker_gets.currency).is_native()) {
@@ -1618,7 +1618,7 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
   }
 
   request.message.taker_pays = {
-    currency: Currency.json_rewrite(pays.currency)
+    currency: Currency.json_rewrite(pays.currency, {force_hex: true})
   };
 
   if (!Currency.from_json(request.message.taker_pays.currency).is_native()) {
