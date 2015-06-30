@@ -10,13 +10,13 @@ const composeAsync = utils.common.composeAsync;
 // are returned
 function getBookOffers(remote, account, ledgerVersion, limit,
     takerGets, takerPays, callback) {
-  remote.requestBookOffers({
+  remote.requestBookOffers(utils.renameCounterpartyToIssuerInOrder({
     taker_gets: takerGets,
     taker_pays: takerPays,
     ledger: ledgerVersion || 'validated',
     limit: limit,
     taker: account
-  }, composeAsync((data) => data.offers.map(parseOrderbookOrder), callback));
+  }), composeAsync((data) => data.offers.map(parseOrderbookOrder), callback));
 }
 
 function isSameIssue(a, b) {
