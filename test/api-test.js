@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
-const address = require('./fixtures/addresses').ACCOUNT;
+const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
 const paymentSpecification = require('./fixtures/payment-specification');
 const paymentResponse = require('./fixtures/payment-response');
@@ -30,6 +30,8 @@ const getSettingsResponse = require('./fixtures/get-settings-response');
 const getOrdersResponse = require('./fixtures/get-orders-response');
 const getOrderBookResponse = require('./fixtures/get-orderbook-response');
 const getServerInfoResponse = require('./fixtures/get-server-info-response');
+const getPathFindResponse = require('./fixtures/get-pathfind-response');
+const address = addresses.ACCOUNT;
 
 function checkResult(expected, done, error, response) {
   if (error) {
@@ -169,5 +171,23 @@ describe('RippleAPI', function() {
       assert.strictEqual(this.api.isConnected(), false);
       done();
     });
+  });
+
+  it('getPathFind', function(done) {
+    const pathfind = {
+      source: {
+        address: address
+      },
+      destination: {
+        address: addresses.OTHER_ACCOUNT,
+        amount: {
+          currency: 'USD',
+          counterparty: addresses.ISSUER,
+          value: '100'
+        }
+      }
+    };
+    this.api.getPathFind(pathfind,
+      _.partial(checkResult, getPathFindResponse, done));
   });
 });

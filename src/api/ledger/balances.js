@@ -5,12 +5,6 @@ const utils = require('./utils');
 const getTrustlines = require('./trustlines');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
-const dropsToXrp = utils.common.dropsToXrp;
-
-function getXRPBalance(remote, address, ledgerVersion, callback) {
-  remote.requestAccountInfo({account: address, ledger: ledgerVersion},
-    composeAsync((data) => dropsToXrp(data.account_data.Balance), callback));
-}
 
 function getTrustlineBalanceAmount(trustline) {
   return {
@@ -23,9 +17,10 @@ function getTrustlineBalanceAmount(trustline) {
 function formatBalances(balances) {
   const xrpBalance = {
     currency: 'XRP',
-    value: balances[0]
+    value: balances.xrp
   };
-  return [xrpBalance].concat(balances[1].map(getTrustlineBalanceAmount));
+  return [xrpBalance].concat(
+    balances.trustlines.map(getTrustlineBalanceAmount));
 }
 
 function getBalances(account, options, callback) {
@@ -34,10 +29,10 @@ function getBalances(account, options, callback) {
 
   const ledgerVersion = options.ledgerVersion
                       || this.remote.getLedgerSequence();
-  async.parallel([
-    _.partial(getXRPBalance, this.remote, account, ledgerVersion),
-    _.partial(getTrustlines.bind(this), account, options)
-  ], composeAsync(formatBalances, callback));
+  async.parallel({
+    xrp: _.partial(utils.getXRPBalance, this.remote, account, ledgerVersion),
+    trustlines: _.partial(getTrustlines.bind(this), account, options)
+  }, composeAsync(formatBalances, callback));
 }
 
 module.exports = utils.wrapCatch(getBalances);

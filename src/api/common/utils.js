@@ -38,7 +38,14 @@ function composeAsync(wrapper, callback) {
       callback(error);
       return;
     }
-    callback(null, wrapper(data));
+    let result;
+    try {
+      result = wrapper(data);
+    } catch (exception) {
+      callback(exception);
+      return;
+    }
+    callback(null, result);
   };
 }
 
