@@ -1,3 +1,5 @@
+/* @flow */
+
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
@@ -29,10 +31,12 @@ function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
   });
 }
 
-/*:: type Options = {currency: string, counterparty: string,
-                     limit: number, ledgerVersion: number} */
-function getTrustlines(account: string, options: Options,
-    callback: () => void): void {
+function getTrustlines(
+  account: string,
+  options: {currency: string, counterparty: string,
+    limit: number, ledgerVersion: number},
+  callback: () => void
+  ): void {
   validate.address(account);
   validate.options(options);
 

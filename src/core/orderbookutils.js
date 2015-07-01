@@ -12,23 +12,48 @@ function assertValidNumber(number, message) {
 }
 
 /**
-* Creates a JSON amount object using
+* Creates a new Amount from a JSON amount object using
 * passed parameters for value, currency and counterparty
-* if currency or counterparty is undefined, defaults to IOU
 *
 * @param amount of value, currency, counterparty
 * @return JSON amount object
 */
 
 function createAmount(value, currency, counterparty) {
-  if (currency === undefined || counterparty === undefined) {
-    return {'value': value,
-      'currency': '000',
-      'issuer': 'rrrrrrrrrrrrrrrrrrrrrhoLvTp'};
-  }
-  return {'value': value, 'currency': currency, 'issuer': counterparty};
+  const newJSON =
+  {'value': value, 'currency': currency, 'issuer': counterparty};
+  return Amount.from_json(newJSON);
 }
 
+/**
+* Gets currency for getOfferTaker(Gets/Pays)Funded
+* @param offer
+* @return currency
+*/
+
+function getCurrencyFromOffer(offer) {
+  let currency = offer.TakerPays.currency;
+
+  if (!currency) {
+    currency = offer.TakerGets.currency;
+  }
+  return currency;
+}
+
+/**
+* Gets issuer for getOfferTaker(Gets/Pays)Funded
+* @param offer
+* @return issuer
+*/
+
+function getIssuerFromOffer(offer) {
+  let issuer = offer.TakerPays.issuer;
+
+  if (!issuer) {
+    issuer = offer.TakerGets.issuer;
+  }
+  return issuer;
+}
 
 /**
  * Casts and returns offer's taker gets funded amount as a default IOU amount
@@ -40,16 +65,10 @@ function createAmount(value, currency, counterparty) {
 OrderBookUtils.getOfferTakerGetsFunded = function(offer) {
   assertValidNumber(offer.taker_gets_funded, 'Taker gets funded is invalid');
 
-  let currency = offer.TakerPays.currency;
-  let issuer = offer.TakerPays.issuer;
+  const currency = getCurrencyFromOffer(offer);
+  const issuer = getIssuerFromOffer(offer);
 
-  if (currency === undefined || issuer === undefined) {
-    currency = offer.TakerGets.currency;
-    issuer = offer.TakerGets.issuer;
-  }
-
-  return Amount.from_json(
-    createAmount(offer.taker_gets_funded, currency, issuer));
+  return createAmount(offer.taker_gets_funded, currency, issuer);
 };
 
 /**
@@ -62,16 +81,10 @@ OrderBookUtils.getOfferTakerGetsFunded = function(offer) {
 OrderBookUtils.getOfferTakerPaysFunded = function(offer) {
   assertValidNumber(offer.taker_pays_funded, 'Taker gets funded is invalid');
 
-  let currency = offer.TakerGets.currency;
-  let issuer = offer.TakerGets.issuer;
+  const currency = getCurrencyFromOffer(offer);
+  const issuer = getIssuerFromOffer(offer);
 
-  if (currency === undefined || issuer === undefined) {
-    currency = offer.TakerPays.currency;
-    issuer = offer.TakerPays.issuer;
-  }
-
-  return Amount.from_json(
-    createAmount(offer.taker_pays_funded, currency, issuer));
+  return createAmount(offer.taker_pays_funded, currency, issuer);
 };
 
 /**
@@ -85,10 +98,10 @@ OrderBookUtils.getOfferTakerPaysFunded = function(offer) {
 OrderBookUtils.getOfferTakerGets = function(offer) {
   assert(typeof offer, 'object', 'Offer is invalid');
 
-  let currency = offer.TakerPays.currency;
-  let issuer = offer.TakerPays.issuer;
+  const currency = offer.TakerPays.currency;
+  const issuer = offer.TakerPays.issuer;
 
-  return Amount.from_json(createAmount(offer.TakerGets, currency, issuer));
+  return createAmount(offer.TakerGets, currency, issuer);
 };
 
 /**
@@ -110,15 +123,10 @@ OrderBookUtils.getOfferQuality = function(offer, currencyGets) {
     });
   } else {
 
-    let currency = offer.TakerGets.currency;
-    let issuer = offer.TakerGets.issuer;
+    const currency = getCurrencyFromOffer(offer);
+    const issuer = getIssuerFromOffer(offer);
 
-    if (currency === undefined || issuer === undefined) {
-      currency = offer.TakerPays.currency;
-      issuer = offer.TakerPays.issuer;
-    }
-
-    amount = Amount.from_json(createAmount(offer.quality, currency, issuer));
+    amount = createAmount(offer.quality, currency, issuer);
   }
 
   return amount;
@@ -136,7 +144,7 @@ OrderBookUtils.getOfferQuality = function(offer, currencyGets) {
 OrderBookUtils.convertOfferQualityToHex = function(quality) {
   assert(quality instanceof Amount, 'Quality is not an amount');
 
-  let so = new SerializedObject();
+  const so = new SerializedObject();
   Types.Quality.serialize(so, quality.to_text());
 
   return so.to_hex();
@@ -148,7 +156,7 @@ OrderBookUtils.convertOfferQualityToHex = function(quality) {
 
 OrderBookUtils.normalizeAmount = function(value) {
 
-  return Amount.from_json(createAmount(value));
+  return Amount.from_number(value);
 };
 
 module.exports = OrderBookUtils;

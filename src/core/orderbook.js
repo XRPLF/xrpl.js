@@ -22,7 +22,7 @@ const Currency = require('./currency').Currency;
 const AutobridgeCalculator = require('./autobridgecalculator');
 const OrderBookUtils = require('./orderbookutils');
 const log = require('./log').internal.sub('orderbook');
-const Value_IOU = require('./value_IOU').Value_IOU;
+const IOUValue = require('./IOUValue').IOUValue;
 
 function assertValidNumber(number, message) {
   assert(!_.isNull(number) && !isNaN(number), message);
@@ -449,9 +449,9 @@ OrderBook.prototype.applyTransferRate = function(balance) {
   assert(!isNaN(balance), 'Balance is invalid');
   assertValidNumber(this._issuerTransferRate, 'Transfer rate is invalid');
 
-  const adjustedBalance = (new Value_IOU(balance))
-  .divide(new Value_IOU(this._issuerTransferRate))
-  .multiply(new Value_IOU(OrderBook.DEFAULT_TRANSFER_RATE))
+  const adjustedBalance = (new IOUValue(balance))
+  .divide(new IOUValue(this._issuerTransferRate))
+  .multiply(new IOUValue(OrderBook.DEFAULT_TRANSFER_RATE))
   ._value.toString();
 
   return adjustedBalance;

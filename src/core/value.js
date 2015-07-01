@@ -1,3 +1,5 @@
+/* @flow */
+
 'use strict';
 
 const GlobalBigNumber = require('bignumber.js');
@@ -7,49 +9,79 @@ const BigNumber = GlobalBigNumber.another({
   DECIMAL_PLACES: 40
 });
 
-function Value(value) {
-  this._value = new BigNumber(value);
-}
+class Value {
 
-Value.prototype.abs = function() {
-  let result = this._value.abs();
-  return this._canonicalize(result);
-};
-
-Value.prototype.add = function(addend) {
-  let result = this._value.plus(addend._value);
-  return this._canonicalize(result);
-};
-
-Value.prototype.subtract = function(subtrahend) {
-  let result = this._value.minus(subtrahend._value);
-  return this._canonicalize(result);
-};
-
-Value.prototype.multiply = function(multiplicand) {
-  let val = this._value;
-  let mult = multiplicand._value;
-  let result = (val).times(mult);
-  return this._canonicalize(result);
-};
-
-Value.prototype.scale = function(scaleFactor) {
-  let result = this._value.times(scaleFactor._value);
-  return this._canonicalize(result);
-
-};
-
-Value.prototype.divide = function(divisor) {
-  if (divisor === 0) {
-    throw new Error('Divide by zero');
+  constructor(value: string | BigNumber, base: number) {
+    this._value = new BigNumber(value, base);
   }
-  let result = this._value.dividedBy(divisor._value);
-  return this._canonicalize(result);
-};
 
-Value.prototype.invert = function() {
-  let result = (new BigNumber(this._value)).toPower(-1);
-  return this._canonicalize(result);
-};
+  static getBNRoundDown() {
+    return BigNumber.ROUND_DOWN;
+  }
+
+  abs() {
+    const result = this._value.abs();
+    return this._canonicalize(result);
+  }
+
+  add(addend: Value) {
+    const result = this._value.plus(addend._value);
+    return this._canonicalize(result);
+  }
+
+  subtract(subtrahend: Value) {
+    const result = this._value.minus(subtrahend._value);
+    return this._canonicalize(result);
+  }
+
+  multiply(multiplicand: Value) {
+    const val = this._value;
+    const mult = multiplicand._value;
+    const result = (val).times(mult);
+    return this._canonicalize(result);
+  }
+
+  scale(scaleFactor: Value) {
+    const result = this._value.times(scaleFactor._value);
+    return this._canonicalize(result);
+
+  }
+
+  divide(divisor: Value) {
+    if (this._value.isNaN()) {
+      throw new Error('Invalid dividend');
+    }
+    if (divisor.isNaN()) {
+      throw new Error('Invalid divisor');
+    }
+    if (divisor.isZero()) {
+      throw new Error('divide by zero');
+    }
+    const result = this._value.dividedBy(divisor._value);
+    return this._canonicalize(result);
+  }
+
+  invert() {
+    const result = (new BigNumber(this._value)).toPower(-1);
+    return this._canonicalize(result);
+  }
+
+  isNaN() {
+    return this._value.isNaN();
+  }
+
+  isZero() {
+    return this._value.isZero();
+  }
+
+  isNegative() {
+    return this._value.isNegative();
+  }
+
+  negated() {
+    return this._value.neg();
+  }
+
+}
 
 exports.Value = Value;
