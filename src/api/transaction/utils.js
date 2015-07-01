@@ -1,24 +1,8 @@
 /* @flow */
-/* eslint-disable valid-jsdoc */
 'use strict';
 const BigNumber = require('bignumber.js');
 const common = require('../common');
 
-/**
- * Helper that sets bit flags on transactions
- *
- * @param {Transaction} transaction - Transaction object that is used to submit
- *                                    requests to ripple
- * @param {Object} options
- * @param {Object} options.flags - Holds flag names to set on transaction when
- *                                 parameter values are true or false on input
- * @param {Object} options.input - Holds parameter values
- * @param {String} options.clear_setting - Used to check if parameter values
- *                                         besides false mean false
- *
- *
- * @returns undefined
- */
 function setTransactionBitFlags(transaction: any, values: any, flags: any):
     void {
   for (const flagName in flags) {

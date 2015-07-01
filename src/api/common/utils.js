@@ -1,5 +1,6 @@
 'use strict';
 const BigNumber = require('bignumber.js');
+const core = require('../../core');
 
 function dropsToXrp(drops) {
   return (new BigNumber(drops)).dividedBy(1000000.0).toString();
@@ -42,6 +43,7 @@ function composeAsync(wrapper, callback) {
 }
 
 module.exports = {
+  core,
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,

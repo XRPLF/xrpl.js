@@ -1,5 +1,5 @@
 'use strict';
-const Transaction = require('./core').Transaction;
+const Transaction = require('./utils').core.Transaction;
 const flagIndices = Transaction.set_clear_flags.AccountSet;
 
 const AccountFlagIndices = {

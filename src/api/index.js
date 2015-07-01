@@ -2,9 +2,10 @@
 const ripple = require('./common').core;
 const server = require('./server/server');
 const connect = server.connect;
-// const getServerStatus = server.getServerStatus;
-// const getFee = server.getFee;
-// const isConnected = server.isConnected;
+const disconnect = server.disconnect;
+const getServerInfo = server.getServerInfo;
+const getFee = server.getFee;
+const isConnected = server.isConnected;
 const getTransaction = require('./ledger/transaction');
 const getAccountTransactions = require('./ledger/transactions');
 const getTrustlines = require('./ledger/trustlines');
@@ -29,9 +30,10 @@ function RippleAPI(options) {
 
 RippleAPI.prototype = {
   connect,
-  // getServerStatus,
-  // getFee,
-  // isConnected,
+  disconnect,
+  isConnected,
+  getServerInfo,
+  getFee,
 
   getTransaction,
   getAccountTransactions,

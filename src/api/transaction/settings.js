@@ -1,5 +1,4 @@
 /* @flow */
-/* eslint-disable valid-jsdoc */
 'use strict';
 const _ = require('lodash');
 const assert = require('assert');
@@ -28,16 +27,6 @@ function setTransactionFlags(transaction, values) {
   }
 }
 
-/**
- * Set fields on a transaction based on input and fields schema object
- *
- * @param {Transaction} transaction
- * @param {Object} input - Object whose properties are used to set fields on
- *                         the transaction
- * @param {Object} fieldSchema - Object that holds the schema of each field
- *
- * @returns undefined
- */
 function setTransactionFields(transaction, input) {
   const fieldSchema = AccountFields;
   for (const fieldName in fieldSchema) {
@@ -78,8 +67,6 @@ function setTransactionFields(transaction, input) {
 }
 
 /**
- *  Convert a numerical transfer rate in ripple-rest format to ripple-lib
- *
  *  Note: A fee of 1% requires 101% of the destination to be sent for the
  *        destination to receive 100%.
  *  The transfer rate is specified as the input amount as fraction of 1.
