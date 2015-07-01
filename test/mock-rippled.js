@@ -7,6 +7,15 @@ const fixtures = require('./fixtures/mock');
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
 const accountOffersResponse = require('./fixtures/acct-offers-response');
+const bookOffers = require('./fixtures/book-offers-response');
+
+function isUSD(json) {
+  return json === 'USD' || json === '0000000000000000000000005553440000000000';
+}
+
+function isBTC(json) {
+  return json === 'BTC' || json === '0000000000000000000000004254430000000000';
+}
 
 module.exports = function(port) {
   const mock = new WebSocketServer({port: port});
@@ -126,6 +135,18 @@ module.exports = function(port) {
       conn.send(accountOffersResponse(request));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
+    }
+  });
+
+  mock.on('request_book_offers', function(request, conn) {
+    if (isBTC(request.taker_gets.currency)
+        && isUSD(request.taker_pays.currency)) {
+      conn.send(bookOffers.requestBookOffersBidsResponse(request));
+    } else if (isUSD(request.taker_gets.currency)
+        && isBTC(request.taker_pays.currency)) {
+      conn.send(bookOffers.requestBookOffersAsksResponse(request));
+    } else {
+      assert(false, 'Unrecognized order book: ' + JSON.stringify(request));
     }
   });
 

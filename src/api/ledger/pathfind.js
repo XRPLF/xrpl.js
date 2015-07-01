@@ -144,4 +144,4 @@ function getPathFind(pathfind, callback) {
   async.waterfall(steps, callback);
 }
 
-module.exports = getPathFind;
+module.exports = utils.wrapCatch(getPathFind);

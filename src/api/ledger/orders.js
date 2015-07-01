@@ -30,8 +30,8 @@ function getAccountOrders(account, options, callback) {
   const getter = _.partial(requestAccountOffers, this.remote, account,
                            ledgerVersion, options);
   utils.getRecursive(getter, limit,
-    composeAsync((orders) => _.sortBy(orders, (order) => order.state.sequence),
-                 callback));
+    composeAsync((orders) => _.sortBy(orders,
+      (order) => order.properties.sequence), callback));
 }
 
-module.exports = getAccountOrders;
+module.exports = utils.wrapCatch(getAccountOrders);

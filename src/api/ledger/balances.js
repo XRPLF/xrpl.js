@@ -40,4 +40,4 @@ function getBalances(account, options, callback) {
   ], composeAsync(formatBalances, callback));
 }
 
-module.exports = getBalances;
+module.exports = utils.wrapCatch(getBalances);

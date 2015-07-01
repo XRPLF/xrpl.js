@@ -41,4 +41,4 @@ function getSettings(account, callback) {
   });
 }
 
-module.exports = getSettings;
+module.exports = utils.wrapCatch(getSettings);

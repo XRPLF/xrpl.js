@@ -1,20 +1,19 @@
 [
   {
     "specification": {
-      "direction": "buy",
+      "direction": "sell",
       "quantity": {
-        "currency": "USD",
-        "value": "1122.990930900328",
-        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
-      },
-      "totalPrice": {
         "currency": "EUR",
         "value": "17.70155237781915",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       },
-      "immediateOrCancel": true
+      "totalPrice": {
+        "currency": "USD",
+        "value": "1122.990930900328",
+        "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+      }
     },
-    "state": {
+    "properties": {
       "sequence": 719930
     }
   },
@@ -32,7 +31,7 @@
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 756999
     }
   },
@@ -50,7 +49,7 @@
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 757002
     }
   },
@@ -68,7 +67,7 @@
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 757003
     }
   },
@@ -86,7 +85,7 @@
         "counterparty": "rsP3mgGb2tcYUrxiLFiHJiQXhsziegtwBc"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 782148
     }
   },
@@ -104,7 +103,7 @@
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 787368
     }
   },
@@ -122,7 +121,7 @@
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 787408
     }
   },
@@ -140,7 +139,7 @@
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 803438
     }
   },
@@ -158,7 +157,7 @@
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 807858
     }
   },
@@ -176,7 +175,7 @@
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 807896
     }
   },
@@ -193,7 +192,7 @@
         "counterparty": "rsP3mgGb2tcYUrxiLFiHJiQXhsziegtwBc"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 814018
     }
   },
@@ -211,7 +210,7 @@
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 827522
     }
   },
@@ -229,7 +228,7 @@
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 833591
     }
   },
@@ -247,7 +246,7 @@
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 833592
     }
   },
@@ -265,7 +264,7 @@
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 838954
     }
   },
@@ -282,7 +281,7 @@
         "value": "2229.229447"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 843730
     }
   },
@@ -300,7 +299,7 @@
         "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
       }
     },
-    "state": {
+    "properties": {
       "sequence": 844068
     }
   }

@@ -45,4 +45,4 @@ function getTrustlines(account: string, options: Options,
   utils.getRecursive(getter, limit, callback);
 }
 
-module.exports = getTrustlines;
+module.exports = utils.wrapCatch(getTrustlines);
