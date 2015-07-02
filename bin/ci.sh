@@ -11,7 +11,7 @@ typecheck() {
 lint() {
   REPO_URL="https://raw.githubusercontent.com/ripple/javascript-style-guide"
   curl "$REPO_URL/es6/eslintrc" > ./eslintrc
-  echo "parser: esprima-fb" >> ./eslintrc
+  echo "parser: babel-eslint" >> ./eslintrc
   node_modules/.bin/eslint --reset -c ./eslintrc $(git --no-pager diff --name-only -M100% --diff-filter=AM --relative $(git merge-base FETCH_HEAD origin/HEAD) FETCH_HEAD | grep "\.js$")
 }
 
