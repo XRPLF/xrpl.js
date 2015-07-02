@@ -13,11 +13,12 @@ function parseOrder(tx: Object): Object {
   const takerPaysAmount = parseAmount(tx.TakerPays);
   const quantity = (direction === 'buy') ? takerPaysAmount : takerGetsAmount;
   const totalPrice = (direction === 'buy') ? takerGetsAmount : takerPaysAmount;
+  const price = utils.calculatePrice(totalPrice, quantity);
 
   return utils.removeUndefined({
     direction: direction,
     quantity: quantity,
-    totalPrice: totalPrice,
+    price: price,
     passive: ((tx.Flags & flags.Passive) !== 0) || undefined,
     immediateOrCancel: ((tx.Flags & flags.ImmediateOrCancel) !== 0)
       || undefined,

@@ -7,9 +7,9 @@
         "value": "17.70155237781915",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       },
-      "totalPrice": {
+      "price": {
         "currency": "USD",
-        "value": "1122.990930900328",
+        "value": "63.44025128030504",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
@@ -25,9 +25,9 @@
         "value": "750",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       },
-      "totalPrice": {
+      "price": {
         "currency": "USD",
-        "value": "19.11697137482289",
+        "value": "0.02548929516643052",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
@@ -43,9 +43,9 @@
         "value": "19.50899530491766",
         "counterparty": "rpDMez6pm6dBve2TJsmDpv7Yae6V5Pyvy2"
       },
-      "totalPrice": {
+      "price": {
         "currency": "USD",
-        "value": "18.46856867857617",
+        "value": "0.9466693896799889",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
@@ -61,9 +61,9 @@
         "value": "1445.796633544794",
         "counterparty": "rpDMez6pm6dBve2TJsmDpv7Yae6V5Pyvy2"
       },
-      "totalPrice": {
+      "price": {
         "currency": "USD",
-        "value": "14.40727807030772",
+        "value": "0.009964940943999888",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
@@ -79,9 +79,9 @@
         "value": "750",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       },
-      "totalPrice": {
+      "price": {
         "currency": "NZD",
-        "value": "9.178557969538755",
+        "value": "0.01223807729271834",
         "counterparty": "rsP3mgGb2tcYUrxiLFiHJiQXhsziegtwBc"
       }
     },
@@ -97,9 +97,9 @@
         "value": "500",
         "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
       },
-      "totalPrice": {
+      "price": {
         "currency": "USD",
-        "value": "9.94768291869523",
+        "value": "0.01989536583739046",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
@@ -115,9 +115,9 @@
         "value": "10000",
         "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
       },
-      "totalPrice": {
+      "price": {
         "currency": "USD",
-        "value": "9.994805759894176",
+        "value": "0.0009994805759894176",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
@@ -133,9 +133,9 @@
         "value": "15834.53653918684",
         "counterparty": "rG6FZ31hDHN1K5Dkbma3PSB5uVCuVVRzfn"
       },
-      "totalPrice": {
+      "price": {
         "currency": "USD",
-        "value": "11.67691646304319",
+        "value": "0.0007374334218210621",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
@@ -151,9 +151,9 @@
         "value": "3968.240250979598",
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       },
-      "totalPrice": {
+      "price": {
         "currency": "XAU",
-        "value": "0.03206299605333101",
+        "value": "0.00000807990293566927",
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
@@ -169,9 +169,9 @@
         "value": "4139.022125516302",
         "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
       },
-      "totalPrice": {
+      "price": {
         "currency": "XAU",
-        "value": "0.03347459066593226",
+        "value": "0.0000080875602136958",
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
@@ -186,9 +186,9 @@
         "currency": "XRP",
         "value": "115760.19"
       },
-      "totalPrice": {
+      "price": {
         "currency": "NZD",
-        "value": "6.840555705",
+        "value": "0.00005909247129777517",
         "counterparty": "rsP3mgGb2tcYUrxiLFiHJiQXhsziegtwBc"
       }
     },
@@ -204,9 +204,9 @@
         "value": "902.4050961259154",
         "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
       },
-      "totalPrice": {
+      "price": {
         "currency": "EUR",
-        "value": "14.40843766044656",
+        "value": "0.01596670688397365",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       }
     },
@@ -222,9 +222,9 @@
         "value": "181.4887131319798",
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       },
-      "totalPrice": {
+      "price": {
         "currency": "XAG",
-        "value": "1.128432823485989",
+        "value": "0.006217647389815284",
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
@@ -240,9 +240,9 @@
         "value": "1814.887131319799",
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       },
-      "totalPrice": {
+      "price": {
         "currency": "XAG",
-        "value": "1.128432823485991",
+        "value": "0.0006217647389815291",
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
@@ -258,9 +258,9 @@
         "value": "118.6872603846736",
         "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
       },
-      "totalPrice": {
+      "price": {
         "currency": "XAG",
-        "value": "0.7283371225235964",
+        "value": "0.006136607418209886",
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       }
     },
@@ -276,7 +276,7 @@
         "value": "1",
         "counterparty": "r9Dr5xwkeLegBeXq6ujinjSBLQzQ1zQGjH"
       },
-      "totalPrice": {
+      "price": {
         "currency": "XRP",
         "value": "2229.229447"
       }
@@ -293,9 +293,9 @@
         "value": "750",
         "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
       },
-      "totalPrice": {
+      "price": {
         "currency": "USD",
-        "value": "17.77537376072202",
+        "value": "0.02370049834762936",
         "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
       }
     },
