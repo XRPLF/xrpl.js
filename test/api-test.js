@@ -29,6 +29,7 @@ const walletResponse = require('./fixtures/wallet.json');
 const getSettingsResponse = require('./fixtures/get-settings-response');
 const getOrdersResponse = require('./fixtures/get-orders-response');
 const getOrderBookResponse = require('./fixtures/get-orderbook-response');
+const getServerInfoResponse = require('./fixtures/get-server-info-response');
 
 function checkResult(expected, done, error, response) {
   if (error) {
@@ -152,5 +153,21 @@ describe('RippleAPI', function() {
     };
     this.api.getOrderBook(address, orderbook, {},
       _.partial(checkResult, getOrderBookResponse, done));
+  });
+
+  it('getServerInfo', function(done) {
+    this.api.getServerInfo(_.partial(checkResult, getServerInfoResponse, done));
+  });
+
+  it('getFee', function() {
+    assert.strictEqual(this.api.getFee(), '0.000012');
+  });
+
+  it('disconnect & isConnected', function(done) {
+    assert.strictEqual(this.api.isConnected(), true);
+    this.api.disconnect(() => {
+      assert.strictEqual(this.api.isConnected(), false);
+      done();
+    });
   });
 });

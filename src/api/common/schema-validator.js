@@ -3,7 +3,7 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const validator = require('is-my-json-valid');
-const ripple = require('./core');
+const ripple = require('./utils').core;
 const ValidationError = require('./errors').ValidationError;
 
 let SCHEMAS = {};

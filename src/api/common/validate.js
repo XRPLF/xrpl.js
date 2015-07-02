@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const ValidationError = require('./errors').ValidationError;
 const schemaValidate = require('./schema-validator');
-const ripple = require('./core');
+const ripple = require('./utils').core;
 
 function error(text) {
   return new ValidationError(text);

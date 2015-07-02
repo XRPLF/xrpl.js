@@ -1,10 +1,6 @@
-/* eslint-disable valid-jsdoc */
 'use strict';
 const _ = require('lodash');
-const async = require('async');
-const asyncify = require('simple-asyncify');
 const common = require('../common');
-const ripple = common.core;
 
 // If the marker is omitted from a response, you have reached the end
 // getter(marker, limit, callback), callback(error, {marker, results})
@@ -46,26 +42,6 @@ function renameCounterpartyToIssuerInOrder(order) {
   return _.assign({}, order, _.omit(changes, _.isUndefined));
 }
 
-function isValidHash256(hash) {
-  return ripple.UInt256.is_valid(hash);
-}
-
-function parseLedger(ledger) {
-  if (/^current$|^closed$|^validated$/.test(ledger)) {
-    return ledger;
-  }
-
-  if (ledger && Number(ledger) >= 0 && isFinite(Number(ledger))) {
-    return Number(ledger);
-  }
-
-  if (isValidHash256(ledger)) {
-    return ledger;
-  }
-
-  return 'validated';
-}
-
 function signum(num) {
   return (num === 0) ? 0 : (num > 0 ? 1 : -1);
 }
@@ -87,41 +63,10 @@ function compareTransactions(first, second) {
   return Number(first.ledgerVersion) < Number(second.ledgerVersion) ? -1 : 1;
 }
 
-function attachDate(api, baseTransactions, callback) {
-  const groupedTx = _.groupBy(baseTransactions, function(tx) {
-    return tx.ledger_index;
-  });
-
-  function attachDateToTransactions(transactions, data) {
-    return _.map(transactions, function(tx) {
-      return _.assign(tx, {date: data.ledger.close_time});
-    });
-  }
-
-  function getLedger(ledgerIndex, _callback) {
-    api.remote.requestLedger({ledger_index: ledgerIndex}, _callback);
-  }
-
-  function attachDateToLedgerTransactions(_groupedTx, ledger, _callback) {
-    const transactions = _groupedTx[ledger];
-    async.waterfall([
-      _.partial(getLedger, Number(ledger)),
-      asyncify(_.partial(attachDateToTransactions, transactions))
-    ], _callback);
-  }
-
-  const ledgers = _.keys(groupedTx);
-  const flatMap = async.seq(async.map, asyncify(_.flatten));
-  const iterator = _.partial(attachDateToLedgerTransactions, groupedTx);
-  flatMap(ledgers, iterator, callback);
-}
-
 module.exports = {
-  parseLedger: parseLedger,
   compareTransactions: compareTransactions,
   renameCounterpartyToIssuer: renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder: renameCounterpartyToIssuerInOrder,
-  attachDate: attachDate,
   getRecursive: getRecursive,
   wrapCatch: common.wrapCatch,
   common: common
