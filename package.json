@@ -34,7 +34,7 @@
     "babel-core": "^5.5.4",
     "babel-loader": "^5.0.0",
     "coveralls": "~2.10.0",
-    "eslint": "^0.23.0",
+    "eslint": "^0.24.0",
     "esprima-fb": "^15001.1.0-dev-harmony-fb",
     "eventemitter2": "^0.4.14",
     "gulp": "~3.8.10",
