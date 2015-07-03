@@ -187,7 +187,7 @@ var Amount = require('ripple-lib').Amount;
 var MY_ADDRESS = 'rrrMyAddress';
 var MY_SECRET  = 'secret';
 var RECIPIENT  = 'rrrRecipient';
-var AMOUNT     = Amount.from_human('1XRP');
+var AMOUNT     = Amount.from_human('1XRP').set_issuer('rrrIssuer');
 
 var remote = new Remote({ /* Remote options */ });
 
