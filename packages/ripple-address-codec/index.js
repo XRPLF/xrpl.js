@@ -1,5 +1,5 @@
 var hashjs = require('hash.js');
-var apiFactory = require('coin-address-codec');
+var apiFactory = require('x-address-codec');
 
 var VER_NODE_PUBLIC = 28;
 var VER_NODE_PRIVATE = 32;
