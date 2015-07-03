@@ -451,8 +451,7 @@ OrderBook.prototype.applyTransferRate = function(balance) {
 
   const adjustedBalance = (new IOUValue(balance))
   .divide(new IOUValue(this._issuerTransferRate))
-  .multiply(new IOUValue(OrderBook.DEFAULT_TRANSFER_RATE))
-  ._value.toString();
+  .multiply(new IOUValue(OrderBook.DEFAULT_TRANSFER_RATE)).toString();
 
   return adjustedBalance;
 };

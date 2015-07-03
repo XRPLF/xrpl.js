@@ -13,17 +13,13 @@ const Value = require('./value').Value;
 const IOUValue = require('./IOUValue').IOUValue;
 const XRPValue = require('./XRPValue').XRPValue;
 
-
-function inverse(number) {
-  return new IOUValue(number).invert()._value;
-}
-
-function Amount() {
+function Amount(value = new XRPValue(NaN)) {
   // Json format:
   //  integer : XRP
   //  { 'value' : ..., 'currency' : ..., 'issuer' : ...}
+  assert(value instanceof Value);
 
-  this._value = new Value(NaN)._value;
+  this._value = value;
   this._is_native = true; // Default to XRP. Only valid if value is not NaN.
   this._currency = new Currency();
   this._issuer = new UInt160();
@@ -41,19 +37,11 @@ const consts = {
   xns_precision: 6,
 
   // bi_ prefix refers to "big integer"
-  // TODO: we shouldn't expose our BigNumber library publicly
-  bi_5: new Value(5)._value,
-  bi_7: new Value(7)._value,
-  bi_10: new Value(10)._value,
-  bi_1e14: new Value(1e14)._value,
-  bi_1e16: new Value(1e16)._value,
-  bi_1e17: new Value(1e17)._value,
-  bi_1e32: new Value(1e32)._value,
-  bi_man_max_value: new Value('9999999999999999')._value,
-  bi_man_min_value: new Value(1e15)._value,
-  bi_xns_max: new Value(1e17)._value,
-  bi_xns_min: new Value(-1e17)._value,
-  bi_xns_unit: new Value(1e6)._value,
+  // man refers to mantissa
+  bi_man_max_value: '9999999999999999',
+  bi_man_min_value: Number(1e15).toString(),
+  bi_xns_max: Number(1e17).toString(),
+  bi_xns_min: Number(-1e17).toString(),
 
   cMinOffset: -96,
   cMaxOffset: 80,
@@ -65,9 +53,11 @@ const consts = {
   min_value: '-1000000000000000e-96'
 };
 
-const MAX_XRP_VALUE = new Value(1e11)._value;
-const MAX_IOU_VALUE = new Value(consts.max_value)._value;
-const MIN_IOU_VALUE = new Value(consts.min_value)._value.abs();
+const MAX_XRP_VALUE = new XRPValue(1e11);
+const MAX_IOU_VALUE = new IOUValue(consts.max_value);
+const MIN_IOU_VALUE = new IOUValue(consts.min_value).abs();
+
+const bi_xns_unit = new IOUValue(1e6);
 
 // Add constants to Amount class
 extend(Amount, consts);
@@ -111,21 +101,15 @@ Amount.is_valid_full = function(j) {
 
 Amount.NaN = function() {
   const result = new Amount();
-  result._value = new Value(NaN)._value; // should have no effect
+  result._value = new IOUValue(NaN); // should have no effect
   return result;                      // but let's be careful
 };
 
 // be sure that _is_native is set properly BEFORE calling _set_value
-Amount.prototype._set_value = function(value, roundingMode) {
-  assert(value instanceof Object);
+Amount.prototype._set_value = function(value: Value) {
 
-  this._value = this._value = value.isZero() && value.isNegative() ?
-      value.negated()._value : value._value;
-  if (!this._value) {
-    this._value = value.isZero() && value.isNegative() ?
-      value.negated() : value;
-  }
-  this.canonicalize(roundingMode);
+  this._value = value.isZero() && value.isNegative() ?
+      value.negate() : value;
   this._check_limits();
 
 };
@@ -133,8 +117,7 @@ Amount.prototype._set_value = function(value, roundingMode) {
 // Returns a new value which is the absolute value of this.
 Amount.prototype.abs = function() {
 
-  const val = (new IOUValue(this._value)).abs();
-  return this._copy(val);
+  return this._copy(this._value.abs());
 
 };
 
@@ -142,12 +125,10 @@ Amount.prototype.add = function(addend) {
   const addendAmount = Amount.from_json(addend);
 
   if (!this.is_comparable(addendAmount)) {
-    return new Amount(NaN);
+    return new Amount();
   }
 
-  const thisValue = new IOUValue(this._value);
-  const addendValue = new IOUValue(addendAmount._value);
-  return this._copy(thisValue.add(addendValue));
+  return this._copy(this._value.add(addendAmount._value));
 
 };
 
@@ -160,17 +141,8 @@ Amount.prototype.subtract = function(subtrahend) {
 Amount.prototype.multiply = function(multiplicand) {
 
   const multiplicandAmount = Amount.from_json(multiplicand);
-  const thisValue = new IOUValue(this._value);
 
-  let multiplyBy;
-
-  if (multiplicandAmount.is_native()) {
-    multiplyBy = new XRPValue(multiplicandAmount._value, Amount.bi_xns_unit);
-    return this._copy(thisValue.multiplyByXRP(multiplyBy)._value);
-  }
-
-  multiplyBy = new IOUValue(multiplicandAmount._value);
-  return this._copy(thisValue.multiply(multiplyBy));
+  return this._copy(this._value.multiply(multiplicandAmount._value));
 
 };
 
@@ -180,17 +152,8 @@ Amount.prototype.scale = function(scaleFactor) {
 
 Amount.prototype.divide = function(divisor) {
   const divisorAmount = Amount.from_json(divisor);
-  const thisValue = new IOUValue(this._value);
 
-  let divideBy;
-
-  if (divisorAmount.is_native()) {
-    divideBy = new XRPValue(divisorAmount._value, Amount.bi_xns_unit);
-    return this._copy(thisValue.divideByXRP(divideBy)._value);
-  }
-
-  divideBy = new IOUValue(divisorAmount._value);
-  return this._copy(thisValue.divide(divideBy));
+  return this._copy(this._value.divide(divisorAmount._value));
 };
 
 /**
@@ -248,7 +211,7 @@ Amount.prototype.ratio_human = function(denom, opts) {
   //
   // To compensate, we multiply the numerator by 10^xns_precision.
   if (denominator._is_native) {
-    numerator._set_value(numerator.multiply(Amount.bi_xns_unit));
+    numerator._set_value(numerator.multiply(bi_xns_unit));
   }
 
   return numerator.divide(denominator);
@@ -268,20 +231,20 @@ Amount.prototype.ratio_human = function(denom, opts) {
  *
  * @see Amount#ratio_human
  *
- * @param {Amount} fac The second factor of the product.
+ * @param {Amount} factor The second factor of the product.
  * @param {Object} opts Options for the calculation.
  * @param {Date|Number} opts.reference_date Date based on which
  * demurrage/interest should be applied. Can be given as JavaScript Date or int
  * for Ripple epoch.
  * @return {Amount} The product. Unit will be the same as the first factor.
  */
-Amount.prototype.product_human = function(fac, options = {}) {
+Amount.prototype.product_human = function(factor, options = {}) {
 
-  let factor = Amount.from_json(fac);
+  let fac = Amount.from_json(factor);
 
   // If either operand is NaN, the result is NaN.
-  if (!this.is_valid() || !factor.is_valid()) {
-    return new Amount(NaN);
+  if (!this.is_valid() || !fac.is_valid()) {
+    return new Amount();
   }
 
   // Apply interest/demurrage
@@ -289,17 +252,17 @@ Amount.prototype.product_human = function(fac, options = {}) {
   // We only need to apply it to the second factor, because the currency unit of
   // the first factor will carry over into the result.
   if (options.reference_date) {
-    factor = factor.applyInterest(options.reference_date);
+    fac = fac.applyInterest(options.reference_date);
   }
 
-  const product = this.multiply(factor);
+  const product = this.multiply(fac);
 
   // Special case: The second factor is a native (XRP) amount expressed as base
   // units (1 XRP = 10^xns_precision base units).
   //
   // See also Amount#ratio_human.
-  if (factor._is_native) {
-    const quotient = product.divide(Amount.bi_xns_unit.toString());
+  if (fac._is_native) {
+    const quotient = product.divide(bi_xns_unit.toString());
     product._set_value(quotient._value);
   }
 
@@ -313,7 +276,7 @@ Amount.prototype.product_human = function(fac, options = {}) {
  * @private
  */
 Amount.prototype._invert = function() {
-  this._set_value(inverse(this._value));
+  this._set_value(this._value.invert());
   return this;
 };
 
@@ -328,7 +291,7 @@ Amount.prototype.invert = function() {
 };
 
 /**
- * Canonicalize amount value
+ * Canonicalize amount value is now taken care of in the Value classes
  *
  * Mirrors rippled's internal Amount representation
  * From https://github.com/ripple/rippled/blob/develop/src/ripple/data
@@ -357,19 +320,6 @@ Amount.prototype.invert = function() {
  * bigger than supported
  */
 
-Amount.prototype.canonicalize = function(roundingMode) {
-  if (typeof this._value === 'undefined') {
-    throw new Error('undefined value');
-  }
-  if (this._is_native) {
-    this._value = this._value.round(6, Value.getBNRoundDown());
-  } else if (roundingMode) {
-    this._value = new Value(this._value.toPrecision(16, roundingMode))._value;
-  } else {
-    this._value = new Value(this._value.toPrecision(16))._value;
-  }
-};
-
 Amount.prototype._check_limits = function() {
   if (!Amount.strict_mode) {
     return this;
@@ -377,7 +327,7 @@ Amount.prototype._check_limits = function() {
   if (this._value.isNaN() || this._value.isZero()) {
     return this;
   }
-  const absval = this._value.absoluteValue();
+  const absval = this._value.abs();
   if (this._is_native) {
     if (absval.greaterThan(MAX_XRP_VALUE)) {
       throw new Error('Exceeding max value of ' + MAX_XRP_VALUE.toString());
@@ -406,7 +356,7 @@ Amount.prototype._copy = function(value) {
 Amount.prototype.compareTo = function(to) {
   const toAmount = Amount.from_json(to);
   if (!this.is_comparable(toAmount)) {
-    return new Amount(NaN);
+    return new Amount();
   }
   return this._value.comparedTo(toAmount._value);
 };
@@ -414,7 +364,7 @@ Amount.prototype.compareTo = function(to) {
 // Make d a copy of this. Returns d.
 // Modification of objects internally refered to is not allowed.
 Amount.prototype.copyTo = function(d, negate) {
-  d._value = negate ? this._value.negated() : this._value;
+  d._value = negate ? this._value.negate() : this._value;
   d._is_native = this._is_native;
   d._currency = this._currency;
   d._issuer = this._issuer;
@@ -525,7 +475,7 @@ Amount.prototype.parse_human = function(j, options) {
       value = words[0].slice(0, -3);
       currency = words[0].slice(-3);
       if (!(isNumber(value) && currency.match(currency_RE))) {
-        return new Amount(NaN);
+        return new Amount();
       }
     }
   } else if (words.length === 2) {
@@ -539,22 +489,25 @@ Amount.prototype.parse_human = function(j, options) {
       value = words[0];
       currency = words[1];
     } else {
-      return new Amount(NaN);
+      return new Amount();
     }
   } else {
-    return new Amount(NaN);
+    return new Amount();
   }
 
   currency = currency.toUpperCase();
   this.set_currency(currency);
   this._is_native = (currency === 'XRP');
-  this._set_value(new Value(value)._value);
+  const newValue =
+    (this._is_native ? new XRPValue(value) :
+      new IOUValue(value));
+  this._set_value(newValue);
 
   // Apply interest/demurrage
   if (opts.reference_date && this._currency.has_interest()) {
     const interest = this._currency.get_interest_at(opts.reference_date);
     this._set_value(
-      new IOUValue(this._value).divide(new Value(interest.toString())));
+      this._value.divide(new IOUValue(interest.toString())));
   }
 
   return this;
@@ -608,11 +561,9 @@ function(quality, counterCurrency, counterIssuer, opts) {
   const mantissa_hex = quality.substring(quality.length - 14);
   const offset_hex = quality.substring(
     quality.length - 16, quality.length - 14);
-  const mantissa = new Value(mantissa_hex, 16)._value;
+  const mantissa = new IOUValue(mantissa_hex, null, 16);
   const offset = parseInt(offset_hex, 16) - 100;
 
-  const valueStr = mantissa.toString() + 'e' + offset.toString();
-  const value = new Value(valueStr)._value;
   this._currency = Currency.from_json(counterCurrency);
   this._issuer = UInt160.from_json(counterIssuer);
   this._is_native = this._currency.is_native();
@@ -634,9 +585,9 @@ function(quality, counterCurrency, counterIssuer, opts) {
     quality as stored :  5 USD          /  3000000 drops
     inverted          :  3000000 drops  /          5 USD
   */
-  const adjusted = options.inverse ? inverse(value) : value;
-  let nativeAdjusted = this._is_native ?
-    new XRPValue(adjusted, Amount.bi_xns_unit) : new IOUValue(adjusted);
+  const valueStr = mantissa.toString() + 'e' + offset.toString();
+  let nativeAdjusted = new IOUValue(valueStr);
+  nativeAdjusted = options.inverse ? nativeAdjusted.invert() : nativeAdjusted;
 
   if (!options.xrp_as_drops) {
     // `In a currency exchange, the exchange rate is quoted as the units of the
@@ -647,22 +598,26 @@ function(quality, counterCurrency, counterIssuer, opts) {
     if (this._is_native) {
       // pay:$price              drops  get:1 X
       // pay:($price / 1,000,000)  XRP  get:1 X
-      nativeAdjusted = nativeAdjusted.divide(new Value(Amount.bi_xns_unit));
+      nativeAdjusted = nativeAdjusted.divide(bi_xns_unit);
     } else if (baseCurrency.is_valid() && baseCurrency.is_native()) {
       // pay:$price X                   get:1 drop
       // pay:($price * 1,000,000) X     get:1 XRP
-      nativeAdjusted = nativeAdjusted.multiply(new Value(Amount.bi_xns_unit));
+      nativeAdjusted = nativeAdjusted.multiply(bi_xns_unit);
     }
   }
-  this._set_value(nativeAdjusted);
+  if (this._is_native) {
+    this._set_value(
+      new XRPValue(nativeAdjusted.round(6, Value.getBNRoundDown())));
+  } else {
+    this._set_value(nativeAdjusted);
+  }
 
   if (options.reference_date && baseCurrency.is_valid()
     && baseCurrency.has_interest()) {
     const interest = baseCurrency.get_interest_at(options.reference_date);
     this._set_value(
-      new IOUValue(this._value).divide(new Value(interest.toString())));
+      this._value.divide(new IOUValue(interest.toString())));
   }
-
   return this;
 };
 
@@ -670,7 +625,7 @@ Amount.prototype.parse_number = function(n) {
   this._is_native = false;
   this._currency = Currency.from_json(1);
   this._issuer = UInt160.from_json(1);
-  this._set_value(new Value(n)._value);
+  this._set_value(new IOUValue(n));
   return this;
 };
 
@@ -721,7 +676,7 @@ Amount.prototype.parse_json = function(j) {
       break;
 
     default:
-      this._set_value(new Value(NaN)._value);
+      this._set_value(new IOUValue(NaN));
   }
 
   return this;
@@ -736,11 +691,11 @@ Amount.prototype.parse_native = function(j) {
     if (j.indexOf('.') >= 0) {
       throw new Error('Native amounts must be specified in integer drops');
     }
-    const value = new XRPValue(j, Amount.bi_xns_unit);
+    const value = new XRPValue(j);
     this._is_native = true;
-    this._set_value(value.divide(new Value(Amount.bi_xns_unit)));
+    this._set_value(value.divide(bi_xns_unit));
   } else {
-    this._set_value(new Value(NaN)._value);
+    this._set_value(new IOUValue(NaN));
   }
 
   return this;
@@ -750,7 +705,8 @@ Amount.prototype.parse_native = function(j) {
 // Requires _currency to be set!
 Amount.prototype.parse_value = function(j) {
   this._is_native = false;
-  this._set_value(new Value(j)._value, Value.getBNRoundDown());
+  const newValue = new IOUValue(j, Value.getBNRoundDown());
+  this._set_value(newValue);
   return this;
 };
 
@@ -781,14 +737,14 @@ Amount.prototype.to_text = function() {
   }
 
   if (this._is_native) {
-    return new XRPValue(this._value).multiply(
-      new Value(Amount.bi_xns_unit))._value.toString();
+    return this._value.multiply(bi_xns_unit).toString();
   }
 
   // not native
-  const offset = this._value.e - 15;
+  const offset = this._value.getExponent() - 15;
   const sign = this._value.isNegative() ? '-' : '';
-  const mantissa = utils.getMantissaDecimalString(this._value.absoluteValue());
+  const mantissa = utils.getMantissa16FromString(
+    this._value.abs().toString());
   if (offset !== 0 && (offset < -25 || offset > -4)) {
     // Use e notation.
     // XXX Clamp output.
@@ -825,7 +781,7 @@ Amount.prototype.applyInterest = function(referenceDate) {
   }
   const interest = this._currency.get_interest_at(referenceDate);
   return this._copy(
-    new IOUValue(this._value).multiply(new Value(interest.toString())));
+    this._value.multiply(new IOUValue(interest.toString())));
 };
 
 /**
@@ -1005,7 +961,7 @@ Amount.prototype.not_equals_why = function(d, ignore_issuer) {
   }
 
   const type = this._is_native ? 'XRP' : 'Non-XRP';
-  if (!this._value.isZero() && this._value.negated().equals(d._value)) {
+  if (!this._value.isZero() && this._value.negate().equals(d._value)) {
     return type + ' sign differs.';
   }
   if (!this._value.equals(d._value)) {

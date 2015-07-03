@@ -1,14 +1,19 @@
 'use strict';
 
-function getMantissaDecimalString(bignum) {
-  let mantissa = bignum.toPrecision(16)
-    .replace(/\./, '')      // remove decimal point
+// returns the mantissa from the passed in string,
+// adding zeros until it has 16 sd
+function getMantissa16FromString(decimalString) {
+  let mantissa = decimalString.replace(/\./, '')      // remove decimal point
     .replace(/e.*/, '')     // remove scientific notation
     .replace(/^0*/, '');    // remove leading zeroes
   while (mantissa.length < 16) {
     mantissa += '0';        // add trailing zeroes until length is 16
   }
   return mantissa;
+}
+
+function getMantissaDecimalString(bignum) {
+  return getMantissa16FromString(bignum.toPrecision(16));
 }
 
 function trace(comment, func) {
@@ -156,6 +161,7 @@ exports.arrayUnique = arrayUnique;
 exports.toTimestamp = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
+exports.getMantissa16FromString = getMantissa16FromString;
 
 exports.sjcl = require('sjcl-extended');
 

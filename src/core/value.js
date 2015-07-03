@@ -9,10 +9,16 @@ const BigNumber = GlobalBigNumber.another({
   DECIMAL_PLACES: 40
 });
 
+const assert = require('assert');
+
 class Value {
 
-  constructor(value: string | BigNumber, base: number) {
-    this._value = new BigNumber(value, base);
+  constructor(value: string | BigNumber) {
+    if (this.constructor === 'Value') {
+      throw new Error(
+        'Cannot instantiate Value directly, it is an abstract base class');
+    }
+    this._value = new BigNumber(value);
   }
 
   static getBNRoundDown() {
@@ -25,35 +31,23 @@ class Value {
   }
 
   add(addend: Value) {
+    assert(this.constructor === addend.constructor);
     const result = this._value.plus(addend._value);
     return this._canonicalize(result);
   }
 
   subtract(subtrahend: Value) {
+    assert(this.constructor === subtrahend.constructor);
     const result = this._value.minus(subtrahend._value);
     return this._canonicalize(result);
   }
 
   multiply(multiplicand: Value) {
-    const val = this._value;
-    const mult = multiplicand._value;
-    const result = (val).times(mult);
+    const result = this._value.times(multiplicand._value);
     return this._canonicalize(result);
-  }
-
-  scale(scaleFactor: Value) {
-    const result = this._value.times(scaleFactor._value);
-    return this._canonicalize(result);
-
   }
 
   divide(divisor: Value) {
-    if (this._value.isNaN()) {
-      throw new Error('Invalid dividend');
-    }
-    if (divisor.isNaN()) {
-      throw new Error('Invalid divisor');
-    }
     if (divisor.isZero()) {
       throw new Error('divide by zero');
     }
@@ -64,6 +58,19 @@ class Value {
   invert() {
     const result = (new BigNumber(this._value)).toPower(-1);
     return this._canonicalize(result);
+  }
+
+  round(decimalPlaces: number, roundingMode: number) {
+    const result = this._value.round(decimalPlaces, roundingMode);
+    return this._canonicalize(result);
+  }
+
+  toFixed(decimalPlaces: number, roundingMode: number) {
+    return this._value.toFixed(decimalPlaces, roundingMode);
+  }
+
+  getExponent() {
+    return this._value.e;
   }
 
   isNaN() {
@@ -78,8 +85,23 @@ class Value {
     return this._value.isNegative();
   }
 
-  negated() {
-    return this._value.neg();
+  toString() {
+    return this._value.toString();
+  }
+
+  greaterThan(comparator: Value) {
+    assert(this.constructor === comparator.constructor);
+    return this._value.greaterThan(comparator._value);
+  }
+
+  lessThan(comparator: Value) {
+    assert(this.constructor === comparator.constructor);
+    return this._value.lessThan(comparator._value);
+  }
+
+  comparedTo(comparator: Value) {
+    assert(this.constructor === comparator.constructor);
+    return this._value.comparedTo(comparator._value);
   }
 
 }

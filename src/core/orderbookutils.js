@@ -32,12 +32,7 @@ function createAmount(value, currency, counterparty) {
 */
 
 function getCurrencyFromOffer(offer) {
-  let currency = offer.TakerPays.currency;
-
-  if (!currency) {
-    currency = offer.TakerGets.currency;
-  }
-  return currency;
+  return offer.TakerPays.currency || offer.TakerGets.currency;
 }
 
 /**
@@ -47,12 +42,7 @@ function getCurrencyFromOffer(offer) {
 */
 
 function getIssuerFromOffer(offer) {
-  let issuer = offer.TakerPays.issuer;
-
-  if (!issuer) {
-    issuer = offer.TakerGets.issuer;
-  }
-  return issuer;
+  return offer.TakerPays.issuer || offer.TakerGets.issuer;
 }
 
 /**
