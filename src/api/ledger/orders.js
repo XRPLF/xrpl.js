@@ -15,7 +15,7 @@ function requestAccountOffers(remote, address, ledgerVersion, options,
   },
   composeAsync((data) => ({
     marker: data.marker,
-    results: data.offers.map(parseAccountOrder)
+    results: data.offers.map(_.partial(parseAccountOrder, address))
   }), callback));
 }
 

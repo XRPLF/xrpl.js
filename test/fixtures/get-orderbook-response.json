@@ -16,7 +16,8 @@
       },
       "properties": {
         "maker": "r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ",
-        "sequence": 434
+        "sequence": 434,
+        "makerExchangeRate": "0.003120027456241615"
       }
     },
     {
@@ -35,7 +36,8 @@
       },
       "properties": {
         "maker": "rDYCRhpahKEhCFV25xScg67Bwf4W9sTYAm",
-        "sequence": 233
+        "sequence": 233,
+        "makerExchangeRate": "0.003125"
       }
     },
     {
@@ -54,7 +56,8 @@
       },
       "properties": {
         "maker": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
-        "sequence": 110104
+        "sequence": 110104,
+        "makerExchangeRate": "0.003144542101755081"
       },
       "state": {
         "availableQuantity": {
@@ -85,7 +88,8 @@
       },
       "properties": {
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
-        "sequence": 35625
+        "sequence": 35625,
+        "makerExchangeRate": "0.003145529403882357"
       },
       "state": {
         "availableQuantity": {
@@ -116,7 +120,8 @@
       },
       "properties": {
         "maker": "rwBYyfufTzk77zUSKEu4MvixfarC35av1J",
-        "sequence": 387756
+        "sequence": 387756,
+        "makerExchangeRate": "0.003155743848271834"
       }
     },
     {
@@ -135,7 +140,8 @@
       },
       "properties": {
         "maker": "rwjsRktX1eguUr1pHTffyHnC4uyrvX58V1",
-        "sequence": 208927
+        "sequence": 208927,
+        "makerExchangeRate": "0.003160328237957649"
       }
     },
     {
@@ -154,7 +160,8 @@
       },
       "properties": {
         "maker": "r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ",
-        "sequence": 429
+        "sequence": 429,
+        "makerExchangeRate": "0.003174603174603175"
       }
     },
     {
@@ -173,7 +180,8 @@
       },
       "properties": {
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
-        "sequence": 35627
+        "sequence": 35627,
+        "makerExchangeRate": "0.003222279177208227"
       },
       "state": {
         "availableQuantity": {
@@ -204,7 +212,8 @@
       },
       "properties": {
         "maker": "r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ",
-        "sequence": 431
+        "sequence": 431,
+        "makerExchangeRate": "0.003222687721559781"
       }
     }
   ],
@@ -225,7 +234,8 @@
       },
       "properties": {
         "maker": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
-        "sequence": 110103
+        "sequence": 110103,
+        "makerExchangeRate": "331.1338298016111"
       }
     },
     {
@@ -244,7 +254,8 @@
       },
       "properties": {
         "maker": "rPyYxUGK8L4dgEvjPs3aRc1B1jEiLr3Hx5",
-        "sequence": 392
+        "sequence": 392,
+        "makerExchangeRate": "332"
       },
       "state": {
         "availableQuantity": {
@@ -275,7 +286,8 @@
       },
       "properties": {
         "maker": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
-        "sequence": 110105
+        "sequence": 110105,
+        "makerExchangeRate": "337.7996295968016"
       }
     },
     {
@@ -294,7 +306,8 @@
       },
       "properties": {
         "maker": "rDbsCJr5m8gHDCNEHCZtFxcXHsD4S9jH83",
-        "sequence": 110061
+        "sequence": 110061,
+        "makerExchangeRate": "347.2306949944844"
       }
     },
     {
@@ -313,7 +326,8 @@
       },
       "properties": {
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
-        "sequence": 35788
+        "sequence": 35788,
+        "makerExchangeRate": "352.7092203179974"
       }
     },
     {
@@ -332,7 +346,8 @@
       },
       "properties": {
         "maker": "rN6jbxx4H6NxcnmkzBxQnbCWLECNKrgSSf",
-        "sequence": 491
+        "sequence": 491,
+        "makerExchangeRate": "358.96"
       },
       "state": {
         "availableQuantity": {
@@ -363,7 +378,8 @@
       },
       "properties": {
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
-        "sequence": 35789
+        "sequence": 35789,
+        "makerExchangeRate": "360.9637829743709"
       }
     }
   ],
@@ -385,7 +401,8 @@
         },
         "properties": {
           "maker": "rwBYyfufTzk77zUSKEu4MvixfarC35av1J",
-          "sequence": 386940
+          "sequence": 386940,
+          "makerExchangeRate": "326.5003614141928"
         }
       },
       {
@@ -404,7 +421,8 @@
         },
         "properties": {
           "maker": "rwjsRktX1eguUr1pHTffyHnC4uyrvX58V1",
-          "sequence": 207855
+          "sequence": 207855,
+          "makerExchangeRate": "330.6364334177034"
         }
       },
       {
@@ -423,7 +441,8 @@
         },
         "properties": {
           "maker": "rUeCeioKJkbYhv4mRGuAbZpPcqkMCoYq6N",
-          "sequence": 5255
+          "sequence": 5255,
+          "makerExchangeRate": "365.9629780181032"
         },
         "state": {
           "availableQuantity": {
@@ -456,7 +475,8 @@
         },
         "properties": {
           "maker": "rDbsCJr5m8gHDCNEHCZtFxcXHsD4S9jH83",
-          "sequence": 110099
+          "sequence": 110099,
+          "makerExchangeRate": "0.003193013959408667"
         }
       }
     ]

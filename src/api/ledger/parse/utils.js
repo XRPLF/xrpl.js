@@ -4,6 +4,15 @@ const _ = require('lodash');
 const transactionParser = require('ripple-lib-transactionparser');
 const toTimestamp = require('../../../core/utils').toTimestamp;
 const utils = require('../utils');
+const BigNumber = require('bignumber.js');
+
+function adjustQualityForXRP(quality: string, takerGetsCurrency: string,
+    takerPaysCurrency: string) {
+  const shift = (takerGetsCurrency === 'XRP' ? 6 : 0)
+              - (takerPaysCurrency === 'XRP' ? 6 : 0);
+  return shift === 0 ? quality :
+    (new BigNumber(quality)).shift(shift).toString();
+}
 
 function parseTimestamp(tx: {date: string}): string | void {
   return tx.date ? (new Date(toTimestamp(tx.date))).toISOString() : undefined;
@@ -58,6 +67,7 @@ function parseOutcome(tx: Object): ?Object {
 module.exports = {
   parseOutcome,
   removeUndefined,
+  adjustQualityForXRP,
   dropsToXrp: utils.common.dropsToXrp,
   constants: utils.common.constants,
   core: utils.common.core
