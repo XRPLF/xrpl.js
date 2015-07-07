@@ -173,7 +173,7 @@ See the [wiki](https://ripple.com/wiki/JSON_Messages#subscribe) for details on s
 
 ##Submitting a payment to the network
 
-Submitting a payment transaction to the Ripple network involves connecting to a `Remote`, creating a transaction, signing it with the user's secret, and submitting it to the `rippled` server. Note that the `Amount` module is used to convert human-readable amounts like '1XRP' or '10.50USD' to the type of Amount object used by the Ripple network.
+Submitting a payment transaction to the Ripple network involves connecting to a `Remote`, creating a transaction, signing it with the user's secret, and submitting it to the `rippled` server. Note that the `Amount` module is used to convert human-readable amounts like '1 XRP' or '10.50 USD' to the type of Amount object used by the Ripple network.
 
 ```js
 /* Loading ripple-lib Remote and Amount modules in Node.js */
@@ -187,7 +187,7 @@ var Amount = require('ripple-lib').Amount;
 var MY_ADDRESS = 'rrrMyAddress';
 var MY_SECRET  = 'secret';
 var RECIPIENT  = 'rrrRecipient';
-var AMOUNT     = Amount.from_human('1XRP');
+var AMOUNT     = Amount.from_human('1 USD').set_issuer('rrrIssuer');
 
 var remote = new Remote({ /* Remote options */ });
 
