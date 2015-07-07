@@ -4,22 +4,25 @@ const utils = require('./utils');
 const flags = utils.core.Remote.flags.offer;
 const parseAmount = require('./amount');
 
+function replaceValue(amount, value) {
+  return _.assign({}, amount, {value});
+}
+
 function parseOrderbookOrder(order: Object): Object {
   const direction = (order.Flags & flags.Sell) === 0 ? 'buy' : 'sell';
   const takerGetsAmount = parseAmount(order.TakerGets);
   const takerPaysAmount = parseAmount(order.TakerPays);
   const quantity = (direction === 'buy') ? takerPaysAmount : takerGetsAmount;
   const totalPrice = (direction === 'buy') ? takerGetsAmount : takerPaysAmount;
+  const price = replaceValue(totalPrice, (direction === 'buy') ?
+    utils.invertQuality(order.quality) : order.quality);
 
   const specification = utils.removeUndefined({
     direction: direction,
     quantity: quantity,
-    totalPrice: totalPrice,
+    price: price,
     passive: ((order.Flags & flags.Passive) !== 0) || undefined
   });
-  // "quality" is omitted intentionally as it corresponds to
-  // either price or inverse price, and it is better to avoid
-  // inverting floats where precision issues can arise
   const properties = {
     maker: order.Account,
     sequence: order.Sequence

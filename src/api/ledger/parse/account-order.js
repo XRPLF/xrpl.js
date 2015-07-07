@@ -11,11 +11,12 @@ function parseAccountOrder(order: Object): Object {
   const takerPaysAmount = parseAmount(order.taker_pays);
   const quantity = (direction === 'buy') ? takerPaysAmount : takerGetsAmount;
   const totalPrice = (direction === 'buy') ? takerGetsAmount : takerPaysAmount;
+  const price = utils.calculatePrice(totalPrice, quantity);
 
   const specification = utils.removeUndefined({
     direction: direction,
     quantity: quantity,
-    totalPrice: totalPrice,
+    price: price,
     passive: ((order.flags & flags.Passive) !== 0) || undefined
   });
   const properties = {

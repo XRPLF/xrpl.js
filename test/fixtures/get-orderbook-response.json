@@ -8,9 +8,9 @@
           "value": "10",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "3205.1",
+          "value": "320.51",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -27,9 +27,9 @@
           "value": "4.99707396683212",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "1599.063669386278",
+          "value": "320",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -46,9 +46,9 @@
           "value": "0.4499999999999999",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "143.1050962074379",
+          "value": "318.0113249054177",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -77,9 +77,9 @@
           "value": "0.8",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "254.329207354604",
+          "value": "317.911509193255",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -108,9 +108,9 @@
           "value": "1.23231134568807",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "390.4979",
+          "value": "316.8825000000002",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -127,9 +127,9 @@
           "value": "0.003160328237957649",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "1",
+          "value": "316.4228284864",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -146,9 +146,9 @@
           "value": "15",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "4725",
+          "value": "315",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -165,9 +165,9 @@
           "value": "1.6",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "496.5429474010489",
+          "value": "310.3393421256556",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -196,9 +196,9 @@
           "value": "10",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "3103",
+          "value": "310.3",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -217,9 +217,9 @@
           "value": "0.3",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "99.34014894048333",
+          "value": "331.1338298016111",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -236,9 +236,9 @@
           "value": "0.8095",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "268.754",
+          "value": "332",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -267,9 +267,9 @@
           "value": "0.4499999999999999",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "152.0098333185607",
+          "value": "337.7996295968016",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -286,9 +286,9 @@
           "value": "0.003768001830745216",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "1.308365894430151",
+          "value": "347.2306949944844",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -305,9 +305,9 @@
           "value": "0.5",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "176.3546101589987",
+          "value": "352.7092203179974",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -324,9 +324,9 @@
           "value": "0.5",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "179.48",
+          "value": "358.96",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -355,9 +355,9 @@
           "value": "0.8",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         },
-        "totalPrice": {
+        "price": {
           "currency": "BTC",
-          "value": "288.7710263794967",
+          "value": "360.9637829743709",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
       },
@@ -377,9 +377,9 @@
             "value": "93.030522464522",
             "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           },
-          "totalPrice": {
+          "price": {
             "currency": "USD",
-            "value": "0.2849323720855092",
+            "value": "0.003062783745992296",
             "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           }
         },
@@ -396,7 +396,7 @@
             "value": "1",
             "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           },
-          "totalPrice": {
+          "price": {
             "currency": "USD",
             "value": "0.00302447007930511",
             "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
@@ -415,9 +415,9 @@
             "value": "182.9814890090516",
             "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           },
-          "totalPrice": {
+          "price": {
             "currency": "USD",
-            "value": "0.5",
+            "value": "0.002732516839314092",
             "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           }
         },
@@ -448,9 +448,9 @@
             "value": "1.24252537879871",
             "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           },
-          "totalPrice": {
+          "price": {
             "currency": "USD",
-            "value": "0.003967400879423823",
+            "value": "0.003193013959408667",
             "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           }
         },
