@@ -23,9 +23,8 @@ function getFeeDrops(remote) {
   return remote.feeTx(feeUnits).to_text();
 }
 
-/*:: type Callback = (err: ?(typeof Error), data: {tx_json: any}) => void */
-function createTxJSON(transaction: any, remote: any,
-    instructions: any, callback: Callback): void {
+function createTxJSON(transaction: any, remote: any, instructions: any,
+    callback: (err: ?(typeof Error), data: {tx_json: any}) => void): void {
   common.validate.instructions(instructions);
 
   transaction.complete();

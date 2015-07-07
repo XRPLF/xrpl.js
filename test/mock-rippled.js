@@ -8,6 +8,7 @@ const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
 const accountOffersResponse = require('./fixtures/acct-offers-response');
 const bookOffers = require('./fixtures/book-offers-response');
+const paths = require('./fixtures/paths');
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';
@@ -148,6 +149,13 @@ module.exports = function(port) {
     } else {
       assert(false, 'Unrecognized order book: ' + JSON.stringify(request));
     }
+  });
+
+  mock.on('request_ripple_path_find', function(request, conn) {
+    const response = paths.generateIOUPaymentPaths(request.id,
+      request.source_account, request.destination_account,
+      request.destination_amount);
+    conn.send(response);
   });
 
   return mock;

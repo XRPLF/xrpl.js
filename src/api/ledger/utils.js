@@ -1,6 +1,13 @@
 'use strict';
 const _ = require('lodash');
 const common = require('../common');
+const dropsToXrp = common.dropsToXrp;
+const composeAsync = common.composeAsync;
+
+function getXRPBalance(remote, address, ledgerVersion, callback) {
+  remote.requestAccountInfo({account: address, ledger: ledgerVersion},
+    composeAsync((data) => dropsToXrp(data.account_data.Balance), callback));
+}
 
 // If the marker is omitted from a response, you have reached the end
 // getter(marker, limit, callback), callback(error, {marker, results})
@@ -56,6 +63,7 @@ function signum(num) {
  *  @param {Object} second
  *  @returns {Number} [-1, 0, 1]
  */
+
 function compareTransactions(first, second) {
   if (first.ledgerVersion === second.ledgerVersion) {
     return signum(Number(first.indexInLedger) - Number(second.indexInLedger));
@@ -64,6 +72,7 @@ function compareTransactions(first, second) {
 }
 
 module.exports = {
+  getXRPBalance: getXRPBalance,
   compareTransactions: compareTransactions,
   renameCounterpartyToIssuer: renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder: renameCounterpartyToIssuerInOrder,

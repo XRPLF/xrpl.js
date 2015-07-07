@@ -1,6 +1,12 @@
 /* @flow */
 'use strict';
+const _ = require('lodash');
 const parseAmount = require('./amount');
+
+function parsePaths(paths) {
+  return paths.map(steps => steps.map(step =>
+    _.omit(step, ['type', 'type_hex'])));
+}
 
 function parsePathfind(sourceAddress: string,
     destinationAmount: Object, pathfindResult: Object): Object {
@@ -14,9 +20,7 @@ function parsePathfind(sourceAddress: string,
         address: pathfindResult.destination_account,
         amount: destinationAmount
       },
-      paths: JSON.stringify(alternative.paths_computed),
-      allowPartialPayment: false,
-      noDirectRipple: false
+      paths: JSON.stringify(parsePaths(alternative.paths_computed))
     };
   });
 }

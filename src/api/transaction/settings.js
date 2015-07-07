@@ -78,6 +78,7 @@ function setTransactionFields(transaction, input) {
  *  @returns {Number|String} numbers will be converted while strings
  *                           are returned
  */
+
 function convertTransferRate(transferRate) {
   if (_.isNumber(transferRate)) {
     return transferRate * Math.pow(10, 9);
