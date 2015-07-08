@@ -52,7 +52,7 @@ module.exports = {
   trustline: _.partial(schemaValidate, 'trustline'),
   txJSON: _.partial(schemaValidate, 'tx'),
   blob: _.partial(schemaValidate, 'blob'),
-  getAccountTransactionsOptions: _.partial(validateOptions, 'acct-tx-options'),
+  getTransactionsOptions: _.partial(validateOptions, 'acct-tx-options'),
   options: _.partial(validateOptions, 'options'),
   instructions: _.partial(schemaValidate, 'instructions')
 };

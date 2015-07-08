@@ -7,7 +7,7 @@ const getServerInfo = server.getServerInfo;
 const getFee = server.getFee;
 const isConnected = server.isConnected;
 const getTransaction = require('./ledger/transaction');
-const getAccountTransactions = require('./ledger/transactions');
+const getTransactions = require('./ledger/transactions');
 const getTrustlines = require('./ledger/trustlines');
 const getBalances = require('./ledger/balances');
 const getPathFind = require('./ledger/pathfind');
@@ -36,7 +36,7 @@ RippleAPI.prototype = {
   getFee,
 
   getTransaction,
-  getAccountTransactions,
+  getTransactions,
   getTrustlines,
   getBalances,
   getPathFind,

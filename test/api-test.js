@@ -103,20 +103,20 @@ describe('RippleAPI', function() {
       _.partial(checkResult, transactionResponse, done));
   });
 
-  it('getAccountTransactions', function(done) {
+  it('getTransactions', function(done) {
     const options = {types: ['payment', 'order'], outgoing: true, limit: 2};
-    this.api.getAccountTransactions(address, options,
+    this.api.getTransactions(address, options,
       _.partial(checkResult, accountTransactionsResponse, done));
   });
 
   // TODO: this doesn't test much, just that it doesn't crash
-  it('getAccountTransactions with start option', function(done) {
+  it('getTransactions with start option', function(done) {
     const options = {
       start: hashes.VALID_TRANSACTION_HASH,
       earliestFirst: false,
       limit: 2
     };
-    this.api.getAccountTransactions(address, options,
+    this.api.getTransactions(address, options,
       _.partial(checkResult, accountTransactionsResponse, done));
   });
 
