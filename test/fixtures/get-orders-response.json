@@ -14,7 +14,9 @@
       }
     },
     "properties": {
-      "sequence": 719930
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 719930,
+      "makerExchangeRate": "63.44025128030504"
     }
   },
   {
@@ -32,7 +34,9 @@
       }
     },
     "properties": {
-      "sequence": 756999
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 756999,
+      "makerExchangeRate": "39.23215583132338"
     }
   },
   {
@@ -50,7 +54,9 @@
       }
     },
     "properties": {
-      "sequence": 757002
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 757002,
+      "makerExchangeRate": "1.056334989703257"
     }
   },
   {
@@ -68,7 +74,9 @@
       }
     },
     "properties": {
-      "sequence": 757003
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 757003,
+      "makerExchangeRate": "100.3518240218094"
     }
   },
   {
@@ -86,7 +94,9 @@
       }
     },
     "properties": {
-      "sequence": 782148
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 782148,
+      "makerExchangeRate": "81.7121820757743"
     }
   },
   {
@@ -104,7 +114,9 @@
       }
     },
     "properties": {
-      "sequence": 787368
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 787368,
+      "makerExchangeRate": "50.26296114247091"
     }
   },
   {
@@ -122,7 +134,9 @@
       }
     },
     "properties": {
-      "sequence": 787408
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 787408,
+      "makerExchangeRate": "1000.519693952099"
     }
   },
   {
@@ -140,7 +154,9 @@
       }
     },
     "properties": {
-      "sequence": 803438
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 803438,
+      "makerExchangeRate": "1356.054621894598"
     }
   },
   {
@@ -158,7 +174,9 @@
       }
     },
     "properties": {
-      "sequence": 807858
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 807858,
+      "makerExchangeRate": "123763.8630020459"
     }
   },
   {
@@ -176,7 +194,9 @@
       }
     },
     "properties": {
-      "sequence": 807896
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 807896,
+      "makerExchangeRate": "123646.6837435794"
     }
   },
   {
@@ -193,7 +213,9 @@
       }
     },
     "properties": {
-      "sequence": 814018
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 814018,
+      "makerExchangeRate": "16922.62953364839"
     }
   },
   {
@@ -211,7 +233,9 @@
       }
     },
     "properties": {
-      "sequence": 827522
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 827522,
+      "makerExchangeRate": "62.63032241192674"
     }
   },
   {
@@ -229,7 +253,9 @@
       }
     },
     "properties": {
-      "sequence": 833591
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 833591,
+      "makerExchangeRate": "160.8325363767064"
     }
   },
   {
@@ -247,7 +273,9 @@
       }
     },
     "properties": {
-      "sequence": 833592
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 833592,
+      "makerExchangeRate": "1608.325363767062"
     }
   },
   {
@@ -265,7 +293,9 @@
       }
     },
     "properties": {
-      "sequence": 838954
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 838954,
+      "makerExchangeRate": "162.9564891233845"
     }
   },
   {
@@ -282,7 +312,9 @@
       }
     },
     "properties": {
-      "sequence": 843730
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 843730,
+      "makerExchangeRate": "0.0004485854972648762"
     }
   },
   {
@@ -300,7 +332,9 @@
       }
     },
     "properties": {
-      "sequence": 844068
+      "maker": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "sequence": 844068,
+      "makerExchangeRate": "42.19320561670911"
     }
   }
 ]

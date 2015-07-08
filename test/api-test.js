@@ -28,7 +28,7 @@ const trustlinesResponse = require('./fixtures/trustlines-response');
 const walletResponse = require('./fixtures/wallet.json');
 const getSettingsResponse = require('./fixtures/get-settings-response');
 const getOrdersResponse = require('./fixtures/get-orders-response');
-const getOrderBookResponse = require('./fixtures/get-orderbook-response');
+const getOrderbookResponse = require('./fixtures/get-orderbook-response');
 const getServerInfoResponse = require('./fixtures/get-server-info-response');
 const getPathFindResponse = require('./fixtures/get-pathfind-response');
 const address = addresses.ACCOUNT;
@@ -142,7 +142,7 @@ describe('RippleAPI', function() {
       _.partial(checkResult, getOrdersResponse, done));
   });
 
-  it('getOrderBook', function(done) {
+  it('getOrderbook', function(done) {
     const orderbook = {
       base: {
         currency: 'USD',
@@ -153,8 +153,8 @@ describe('RippleAPI', function() {
         counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       }
     };
-    this.api.getOrderBook(address, orderbook, {},
-      _.partial(checkResult, getOrderBookResponse, done));
+    this.api.getOrderbook(address, orderbook, {},
+      _.partial(checkResult, getOrderbookResponse, done));
   });
 
   it('getServerInfo', function(done) {

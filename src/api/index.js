@@ -12,7 +12,7 @@ const getTrustlines = require('./ledger/trustlines');
 const getBalances = require('./ledger/balances');
 const getPathFind = require('./ledger/pathfind');
 const getOrders = require('./ledger/orders');
-const getOrderBook = require('./ledger/orderbook');
+const getOrderbook = require('./ledger/orderbook');
 const getSettings = require('./ledger/settings');
 const preparePayment = require('./transaction/payment');
 const prepareTrustline = require('./transaction/trustline');
@@ -41,7 +41,7 @@ RippleAPI.prototype = {
   getBalances,
   getPathFind,
   getOrders,
-  getOrderBook,
+  getOrderbook,
   getSettings,
 
   preparePayment,

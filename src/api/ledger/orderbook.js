@@ -49,7 +49,7 @@ function formatBidsAndAsks(orderbook, offers) {
   return {bids, asks, flipped};
 }
 
-function getOrderBook(account, orderbook, options, callback) {
+function getOrderbook(account, orderbook, options, callback) {
   validate.address(account);
   validate.orderbook(orderbook);
   validate.options(options);
@@ -63,4 +63,4 @@ function getOrderBook(account, orderbook, options, callback) {
                  callback));
 }
 
-module.exports = utils.wrapCatch(getOrderBook);
+module.exports = utils.wrapCatch(getOrderbook);
