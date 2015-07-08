@@ -10,8 +10,8 @@ const UInt160 = require('./uint160').UInt160;
 const Seed = require('./seed').Seed;
 const Currency = require('./currency').Currency;
 const Value = require('./value').Value;
-const IOUValue = require('./IOUValue').IOUValue;
-const XRPValue = require('./XRPValue').XRPValue;
+const IOUValue = require('./iouvalue').IOUValue;
+const XRPValue = require('./xrpvalue').XRPValue;
 
 function Amount(value = new XRPValue(NaN)) {
   // Json format:
@@ -607,7 +607,7 @@ function(quality, counterCurrency, counterIssuer, opts) {
   }
   if (this._is_native) {
     this._set_value(
-      new XRPValue(nativeAdjusted.round(6, Value.getBNRoundDown())));
+      new XRPValue(nativeAdjusted.round(6, Value.getBNRoundDown()).toString()));
   } else {
     this._set_value(nativeAdjusted);
   }

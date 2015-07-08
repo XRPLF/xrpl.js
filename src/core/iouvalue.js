@@ -3,12 +3,13 @@
 'use strict';
 
 const Value = require('./value').Value;
-const XRPValue = require('./XRPValue').XRPValue;
+const XRPValue = require('./xrpvalue').XRPValue;
 const GlobalBigNumber = require('bignumber.js');
 const BigNumber = GlobalBigNumber.another({
   ROUNDING_MODE: GlobalBigNumber.ROUND_HALF_UP,
   DECIMAL_PLACES: 40
 });
+const rippleUnits = new BigNumber(1e6);
 
 class IOUValue extends Value {
 
@@ -22,7 +23,7 @@ class IOUValue extends Value {
     if (multiplicand instanceof XRPValue) {
       return super.multiply(
         new IOUValue(
-          multiplicand._value.times(multiplicand.rippleUnits)));
+          multiplicand._value.times(rippleUnits)));
     }
     return super.multiply(multiplicand);
   }
@@ -30,7 +31,7 @@ class IOUValue extends Value {
   divide(divisor: Value) {
     if (divisor instanceof XRPValue) {
       return super.divide(
-        new IOUValue(divisor._value.times(divisor.rippleUnits)));
+        new IOUValue(divisor._value.times(rippleUnits)));
     }
     return super.divide(divisor);
   }

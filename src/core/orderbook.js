@@ -22,7 +22,7 @@ const Currency = require('./currency').Currency;
 const AutobridgeCalculator = require('./autobridgecalculator');
 const OrderBookUtils = require('./orderbookutils');
 const log = require('./log').internal.sub('orderbook');
-const IOUValue = require('./IOUValue').IOUValue;
+const IOUValue = require('./iouvalue').IOUValue;
 
 function assertValidNumber(number, message) {
   assert(!_.isNull(number) && !isNaN(number), message);

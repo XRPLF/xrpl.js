@@ -9,12 +9,12 @@ const BigNumber = GlobalBigNumber.another({
 });
 
 const Value = require('./value').Value;
+const rippleUnits = new BigNumber(1e6);
 
 class XRPValue extends Value {
 
   constructor(value: string | BigNumber) {
     super(value);
-    this.rippleUnits = new BigNumber(1e6);
     if (this._value.dp() > 6) {
       throw new Error(
         'Value has more than 6 digits of precision past the decimal point, '
@@ -26,7 +26,7 @@ class XRPValue extends Value {
   multiply(multiplicand: Value) {
     if (multiplicand instanceof XRPValue) {
       return super.multiply(
-        new XRPValue(multiplicand._value.times(multiplicand.rippleUnits)));
+        new XRPValue(multiplicand._value.times(rippleUnits)));
     }
     return super.multiply(multiplicand);
   }
@@ -34,7 +34,7 @@ class XRPValue extends Value {
   divide(divisor: Value) {
     if (divisor instanceof XRPValue) {
       return super.divide(
-        new XRPValue(divisor._value.times(divisor.rippleUnits)));
+        new XRPValue(divisor._value.times(rippleUnits)));
     }
     return super.divide(divisor);
   }

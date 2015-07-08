@@ -6,6 +6,9 @@ function getMantissa16FromString(decimalString) {
   let mantissa = decimalString.replace(/\./, '')      // remove decimal point
     .replace(/e.*/, '')     // remove scientific notation
     .replace(/^0*/, '');    // remove leading zeroes
+  if (mantissa.length > 16) {
+    return mantissa.substring(0, 16);
+  }
   while (mantissa.length < 16) {
     mantissa += '0';        // add trailing zeroes until length is 16
   }
