@@ -1186,19 +1186,19 @@ describe('Amount', function() {
 
   describe('amount limits', function() {
     it('max JSON wire limite', function() {
-      assert.strictEqual(Amount.bi_xns_max.toString(), '100000000000000000');
+      assert.strictEqual(Amount.bi_xns_max, '100000000000000000');
     });
 
     it('max JSON wire limite', function() {
-      assert.strictEqual(Amount.bi_xns_min.toString(), '-100000000000000000');
+      assert.strictEqual(Amount.bi_xns_min, '-100000000000000000');
     });
 
     it('max mantissa value', function() {
-      assert.strictEqual(Amount.bi_man_max_value.toString(), '9999999999999999');
+      assert.strictEqual(Amount.bi_man_max_value, '9999999999999999');
     });
 
     it('min mantissa value', function() {
-      assert.strictEqual(Amount.bi_man_min_value.toString(), '1000000000000000');
+      assert.strictEqual(Amount.bi_man_min_value, '1000000000000000');
     });
 
     it('from_json minimum XRP', function() {

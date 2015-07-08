@@ -8,22 +8,22 @@
  * SerializedObject.parse() or SerializedObject.serialize().
  */
 
-var assert = require('assert');
-var extend = require('extend');
-var GlobalBigNumber = require('bignumber.js');
-var Amount = require('./amount').Amount;
-var Currency = require('./currency').Currency;
-var binformat = require('./binformat');
-var utils = require('./utils');
-var sjcl = utils.sjcl;
-var SJCL_BN = sjcl.bn;
+const assert = require('assert');
+const extend = require('extend');
+const GlobalBigNumber = require('bignumber.js');
+const Amount = require('./amount').Amount;
+const Currency = require('./currency').Currency;
+const binformat = require('./binformat');
+const utils = require('./utils');
+const sjcl = utils.sjcl;
+const SJCL_BN = sjcl.bn;
 
-var UInt128 = require('./uint128').UInt128;
-var UInt160 = require('./uint160').UInt160;
-var UInt256 = require('./uint256').UInt256;
-var Base = require('./base').Base;
+const UInt128 = require('./uint128').UInt128;
+const UInt160 = require('./uint160').UInt160;
+const UInt256 = require('./uint256').UInt256;
+const Base = require('./base').Base;
 
-var BigNumber = GlobalBigNumber.another({
+const BigNumber = GlobalBigNumber.another({
   ROUNDING_MODE: GlobalBigNumber.ROUND_HALF_UP,
   DECIMAL_PLACES: 40
 });
@@ -45,7 +45,7 @@ function isHexInt64String(val) {
 }
 
 function serializeBits(so, bits, noLength) {
-  var byteData = sjcl.codec.bytes.fromBits(bits);
+  const byteData = sjcl.codec.bytes.fromBits(bits);
   if (!noLength) {
     SerializedType.serialize_varint(so, byteData.length);
   }
@@ -68,18 +68,18 @@ function convertByteArrayToHex(byte_array) {
 }
 
 function convertHexToString(hexString) {
-  var bits = sjcl.codec.hex.toBits(hexString);
+  const bits = sjcl.codec.hex.toBits(hexString);
   return sjcl.codec.utf8String.fromBits(bits);
 }
 
 function sort_fields(keys) {
   function sort_field_compare(a, b) {
-    var a_field_coordinates = binformat.fieldsInverseMap[a];
-    var a_type_bits = a_field_coordinates[0];
-    var a_field_bits = a_field_coordinates[1];
-    var b_field_coordinates = binformat.fieldsInverseMap[b];
-    var b_type_bits = b_field_coordinates[0];
-    var b_field_bits = b_field_coordinates[1];
+    const a_field_coordinates = binformat.fieldsInverseMap[a];
+    const a_type_bits = a_field_coordinates[0];
+    const a_field_bits = a_field_coordinates[1];
+    const b_field_coordinates = binformat.fieldsInverseMap[b];
+    const b_type_bits = b_field_coordinates[0];
+    const b_field_bits = b_field_coordinates[1];
 
     // Sort by type id first, then by field id
     return a_type_bits !== b_type_bits
@@ -91,26 +91,28 @@ function sort_fields(keys) {
 }
 
 SerializedType.serialize_varint = function(so, val) {
-  if (val < 0) {
+  let value = val;
+  if (value < 0) {
     throw new Error('Variable integers are unsigned.');
   }
 
-  if (val <= 192) {
-    so.append([val]);
-  } else if (val <= 12480) {
-    val -= 193;
-    so.append([193 + (val >>> 8), val & 0xff]);
-  } else if (val <= 918744) {
-    val -= 12481;
-    so.append([241 + (val >>> 16), val >>> 8 & 0xff, val & 0xff]);
+  if (value <= 192) {
+    so.append([value]);
+  } else if (value <= 12480) {
+    value -= 193;
+    so.append([193 + (value >>> 8), value & 0xff]);
+  } else if (value <= 918744) {
+    value -= 12481;
+    so.append([241 + (value >>> 16), value >>> 8 & 0xff, value & 0xff]);
   } else {
     throw new Error('Variable integer overflow.');
   }
 };
 
 SerializedType.prototype.parse_varint = function(so) {
-  var b1 = so.read(1)[0], b2, b3;
-  var result;
+  const b1 = so.read(1)[0];
+  let b2, b3;
+  let result;
 
   if (b1 > 254) {
     throw new Error('Invalid varint length indicator');
@@ -152,9 +154,9 @@ function convertIntegerToByteArray(val, bytes) {
     throw new Error('Value out of bounds ');
   }
 
-  var newBytes = [ ];
+  const newBytes = [ ];
 
-  for (var i = 0; i < bytes; i++) {
+  for (let i = 0; i < bytes; i++) {
     newBytes.unshift(val >>> (i * 8) & 0xff);
   }
 
@@ -164,14 +166,14 @@ function convertIntegerToByteArray(val, bytes) {
 // Convert a certain number of bytes from the serialized object ('so') into an
 // integer.
 function readAndSum(so, bytes) {
-  var sum = 0;
+  let sum = 0;
 
   if (bytes > 4) {
     throw new Error('This function only supports up to four bytes.');
   }
 
-  for (var i = 0; i < bytes; i++) {
-    var byte = so.read(1)[0];
+  for (let i = 0; i < bytes; i++) {
+    const byte = so.read(1)[0];
     sum += (byte << (8 * (bytes - i - 1)));
   }
 
@@ -179,7 +181,7 @@ function readAndSum(so, bytes) {
   return sum >>> 0;
 }
 
-var STInt8 = exports.Int8 = new SerializedType({
+const STInt8 = exports.Int8 = new SerializedType({
   serialize: function(so, val) {
     so.append(convertIntegerToByteArray(val, 1));
   },
@@ -194,21 +196,22 @@ function serialize(so, field_name, value) {
   // so: a byte-stream to serialize into.
   // field_name: a string for the field name ('LedgerEntryType' etc.)
   // value: the value of that field.
-  var field_coordinates = binformat.fieldsInverseMap[field_name];
-  var type_bits = field_coordinates[0];
-  var field_bits = field_coordinates[1];
-  var tag_byte = (type_bits < 16
+  const field_coordinates = binformat.fieldsInverseMap[field_name];
+  const type_bits = field_coordinates[0];
+  const field_bits = field_coordinates[1];
+  const tag_byte = (type_bits < 16
     ? type_bits << 4
     : 0) | (field_bits < 16
       ? field_bits
       : 0);
+  let val = value;
 
-  if (field_name === 'LedgerEntryType' && typeof value === 'string') {
-    value = binformat.ledger[value][0];
+  if (field_name === 'LedgerEntryType' && typeof val === 'string') {
+    val = binformat.ledger[val][0];
   }
 
-  if (field_name === 'TransactionResult' && typeof value === 'string') {
-    value = binformat.ter[value];
+  if (field_name === 'TransactionResult' && typeof val === 'string') {
+    val = binformat.ter[val];
   }
 
   STInt8.serialize(so, tag_byte);
@@ -222,9 +225,9 @@ function serialize(so, field_name, value) {
   }
 
   // Get the serializer class (ST...)
-  var serialized_object_type;
+  let serialized_object_type;
 
-  if (field_name === 'Memo' && typeof value === 'object') {
+  if (field_name === 'Memo' && typeof val === 'object') {
     // for Memo we override the default behavior with our STMemo serializer
     serialized_object_type = exports.STMemo;
   } else {
@@ -233,7 +236,7 @@ function serialize(so, field_name, value) {
   }
 
   try {
-    serialized_object_type.serialize(so, value);
+    serialized_object_type.serialize(so, val);
   } catch (e) {
     e.message += ' (' + field_name + ')';
     throw e;
@@ -246,15 +249,15 @@ exports.serialize = exports.serialize_whatever = serialize;
 // parsing of that.
 
 function parse(so) {
-  var tag_byte = so.read(1)[0];
-  var type_bits = tag_byte >> 4;
+  const tag_byte = so.read(1)[0];
+  let type_bits = tag_byte >> 4;
 
   if (type_bits === 0) {
     type_bits = so.read(1)[0];
   }
 
-  var field_bits = tag_byte & 0x0f;
-  var field_name = (field_bits === 0)
+  const field_bits = tag_byte & 0x0f;
+  let field_name = (field_bits === 0)
     ? field_name = binformat.fields[type_bits][so.read(1)[0]]
     : field_name = binformat.fields[type_bits][field_bits];
 
@@ -262,7 +265,7 @@ function parse(so) {
     + tag_byte.toString(16));
 
   // Get the parser class (ST...) for a field based on the type bits.
-  var type = (field_name === 'Memo')
+  const type = (field_name === 'Memo')
     ? exports.STMemo
     : exports[binformat.types[type_bits]];
 
@@ -273,7 +276,7 @@ function parse(so) {
 
 exports.parse = exports.parse_whatever = parse;
 
-var STInt16 = exports.Int16 = new SerializedType({
+const STInt16 = exports.Int16 = new SerializedType({
   serialize: function(so, val) {
     so.append(convertIntegerToByteArray(val, 2));
   },
@@ -284,7 +287,7 @@ var STInt16 = exports.Int16 = new SerializedType({
 
 STInt16.id = 1;
 
-var STInt32 = exports.Int32 = new SerializedType({
+const STInt32 = exports.Int32 = new SerializedType({
   serialize: function(so, val) {
     so.append(convertIntegerToByteArray(val, 4));
   },
@@ -295,42 +298,43 @@ var STInt32 = exports.Int32 = new SerializedType({
 
 STInt32.id = 2;
 
-var STInt64 = exports.Int64 = new SerializedType({
+const STInt64 = exports.Int64 = new SerializedType({
   serialize: function(so, val) {
-    var bigNumObject;
+    let bigNumObject;
+    let value = val;
 
-    if (isNumber(val)) {
-      val = Math.floor(val);
-      if (val < 0) {
+    if (isNumber(value)) {
+      value = Math.floor(value);
+      if (value < 0) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
-      bigNumObject = new SJCL_BN(val, 10);
-    } else if (isString(val)) {
-      if (!isHexInt64String(val)) {
+      bigNumObject = new SJCL_BN(value, 10);
+    } else if (isString(value)) {
+      if (!isHexInt64String(value)) {
         throw new Error('Not a valid hex Int64.');
       }
-      bigNumObject = new SJCL_BN(val, 16);
-    } else if (val instanceof SJCL_BN) {
-      if (!val.greaterEquals(0)) {
+      bigNumObject = new SJCL_BN(value, 16);
+    } else if (value instanceof SJCL_BN) {
+      if (!value.greaterEquals(0)) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
-      bigNumObject = val;
+      bigNumObject = value;
     } else {
       throw new Error('Invalid type for Int64');
     }
     serializeBits(so, bigNumObject.toBits(64), true); // noLength = true
   },
   parse: function(so) {
-    var bytes = so.read(8);
+    const bytes = so.read(8);
     return SJCL_BN.fromBits(sjcl.codec.bytes.toBits(bytes));
   }
 });
 
 STInt64.id = 3;
 
-var STHash128 = exports.Hash128 = new SerializedType({
+const STHash128 = exports.Hash128 = new SerializedType({
   serialize: function(so, val) {
-    var hash = UInt128.from_json(val);
+    const hash = UInt128.from_json(val);
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash128');
     }
@@ -343,9 +347,9 @@ var STHash128 = exports.Hash128 = new SerializedType({
 
 STHash128.id = 4;
 
-var STHash256 = exports.Hash256 = new SerializedType({
+const STHash256 = exports.Hash256 = new SerializedType({
   serialize: function(so, val) {
-    var hash = UInt256.from_json(val);
+    const hash = UInt256.from_json(val);
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash256');
     }
@@ -358,9 +362,9 @@ var STHash256 = exports.Hash256 = new SerializedType({
 
 STHash256.id = 5;
 
-var STHash160 = exports.Hash160 = new SerializedType({
+const STHash160 = exports.Hash160 = new SerializedType({
   serialize: function(so, val) {
-    var hash = UInt160.from_json(val);
+    const hash = UInt160.from_json(val);
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash160');
     }
@@ -374,9 +378,9 @@ var STHash160 = exports.Hash160 = new SerializedType({
 STHash160.id = 17;
 
 // Internal
-var STCurrency = new SerializedType({
+const STCurrency = new SerializedType({
   serialize: function(so, val) {
-    var currencyData = val.to_bytes();
+    const currencyData = val.to_bytes();
 
     if (!currencyData) {
       throw new Error(
@@ -386,8 +390,8 @@ var STCurrency = new SerializedType({
     so.append(currencyData);
   },
   parse: function(so) {
-    var bytes = so.read(20);
-    var currency = Currency.from_bytes(bytes);
+    const bytes = so.read(20);
+    const currency = Currency.from_bytes(bytes);
     // XXX Disabled check. Theoretically, the Currency class should support any
     //     UInt160 value and consider it valid. But it doesn't, so for the
     //     deserialization to be usable, we need to allow invalid results for
@@ -408,23 +412,29 @@ var STCurrency = new SerializedType({
  */
 exports.Quality = new SerializedType({
   serialize: function(so, val) {
-    var amount = Amount.from_json(val);
+    let value;
+    // if in format: amount/currency/issuer
+    if (val.includes('/')) {
+      const amount = Amount.from_json(val);
 
-    if (!amount.is_valid()) {
-      throw new Error('Not a valid Amount object.');
+      if (!amount.is_valid()) {
+        throw new Error('Not a valid Amount object.');
+      }
+      value = new BigNumber(amount.to_text());
+    } else {
+      value = new BigNumber(val);
     }
 
-    var hi = 0, lo = 0;
-    var value = new BigNumber(amount.to_text());
-    var offset = value.e - 15;
+    let hi = 0, lo = 0;
 
-    if (!amount.is_zero()) {
+    const offset = value.e - 15;
+    if (val !== 0) {
       // First eight bits: offset/exponent
       hi |= ((100 + offset) & 0xff) << 24;
 
       // Remaining 56 bits: mantissa
-      var mantissaDecimal = utils.getMantissaDecimalString(value.abs());
-      var mantissaHex = (new BigNumber(mantissaDecimal)).toString(16);
+      const mantissaDecimal = utils.getMantissaDecimalString(value.abs());
+      const mantissaHex = (new BigNumber(mantissaDecimal)).toString(16);
       assert(mantissaHex.length <= 16,
         'Mantissa hex representation ' + mantissaHex +
         ' exceeds the maximum length of 16');
@@ -432,7 +442,7 @@ exports.Quality = new SerializedType({
       lo = parseInt(mantissaHex.slice(-8), 16);
     }
 
-    var valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
+    const valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
 
     so.append(valueBytes);
   }
@@ -442,22 +452,22 @@ exports.Quality = new SerializedType({
  * Amount is encoded into 64 bits:
  * (1 bit non-native) (1 bit non-negative) (8 bits offset) (54 bits mantissa)
  */
-var STAmount = exports.Amount = new SerializedType({
+const STAmount = exports.Amount = new SerializedType({
   serialize: function(so, val) {
-    var amount = Amount.from_json(val);
+    const amount = Amount.from_json(val);
 
     if (!amount.is_valid()) {
       throw new Error('Not a valid Amount object.');
     }
 
-    var value = new BigNumber(amount.to_text());
-    var offset = value.e - 15;
+    const value = new BigNumber(amount.to_text());
+    const offset = value.e - 15;
 
     // Amount (64-bit integer)
-    var valueBytes = utils.arraySet(8, 0);
+    let valueBytes = utils.arraySet(8, 0);
 
     if (amount.is_native()) {
-      var valueHex = value.abs().toString(16);
+      let valueHex = value.abs().toString(16);
 
       if (Amount.strict_mode && value.abs().greaterThan(Amount.bi_xns_max)) {
         throw new Error('Value out of bounds');
@@ -482,7 +492,7 @@ var STAmount = exports.Amount = new SerializedType({
         valueBytes[0] |= 0x40;
       }
     } else {
-      var hi = 0, lo = 0;
+      let hi = 0, lo = 0;
 
       // First bit: non-native
       hi |= 1 << 31;
@@ -497,8 +507,8 @@ var STAmount = exports.Amount = new SerializedType({
         hi |= ((97 + offset) & 0xff) << 22;
 
         // Remaining 54 bits: mantissa
-        var mantissaDecimal = utils.getMantissaDecimalString(value.abs());
-        var mantissaHex = (new BigNumber(mantissaDecimal)).toString(16);
+        const mantissaDecimal = utils.getMantissaDecimalString(value.abs());
+        const mantissaHex = (new BigNumber(mantissaDecimal)).toString(16);
         assert(mantissaHex.length <= 16,
           'Mantissa hex representation ' + mantissaHex +
           ' exceeds the maximum length of 16');
@@ -513,7 +523,7 @@ var STAmount = exports.Amount = new SerializedType({
 
     if (!amount.is_native()) {
       // Currency (160-bit hash)
-      var currency = amount.currency();
+      const currency = amount.currency();
       STCurrency.serialize(so, currency, true);
 
       // Issuer (160-bit hash)
@@ -521,27 +531,28 @@ var STAmount = exports.Amount = new SerializedType({
     }
   },
   parse: function(so) {
-    var value_bytes = so.read(8);
-    var is_zero = !(value_bytes[0] & 0x7f);
+    const value_bytes = so.read(8);
+    let is_zero = !(value_bytes[0] & 0x7f);
 
-    for (var i = 1; i < 8; i++) {
+    for (let i = 1; i < 8; i++) {
       is_zero = is_zero && !value_bytes[i];
     }
 
-    var is_negative = !is_zero && !(value_bytes[0] & 0x40);
+    const is_negative = !is_zero && !(value_bytes[0] & 0x40);
 
     if (value_bytes[0] & 0x80) {
       // non-native
-      var currency = STCurrency.parse(so);
-      var issuer_bytes = so.read(20);
-      var issuer = UInt160.from_bytes(issuer_bytes);
+      const currency = STCurrency.parse(so);
+      const issuer_bytes = so.read(20);
+      const issuer = UInt160.from_bytes(issuer_bytes);
       issuer.set_version(Base.VER_ACCOUNT_ID);
-      var offset = ((value_bytes[0] & 0x3f) << 2) + (value_bytes[1] >>> 6) - 97;
-      var mantissa_bytes = value_bytes.slice(1);
+      const offset =
+        ((value_bytes[0] & 0x3f) << 2) + (value_bytes[1] >>> 6) - 97;
+      const mantissa_bytes = value_bytes.slice(1);
       mantissa_bytes[0] &= 0x3f;
-      var mantissa = new BigNumber(utils.arrayToHex(mantissa_bytes), 16);
-      var sign = is_negative ? '-' : '';
-      var valueString = sign + mantissa.toString() + 'e' + offset.toString();
+      const mantissa = new BigNumber(utils.arrayToHex(mantissa_bytes), 16);
+      const sign = is_negative ? '-' : '';
+      const valueString = sign + mantissa.toString() + 'e' + offset.toString();
 
       return Amount.from_json({
         currency: currency,
@@ -551,17 +562,17 @@ var STAmount = exports.Amount = new SerializedType({
     }
 
     // native
-    var integer_bytes = value_bytes.slice();
+    const integer_bytes = value_bytes.slice();
     integer_bytes[0] &= 0x3f;
-    var integer_hex = utils.arrayToHex(integer_bytes);
-    var value = new BigNumber(integer_hex, 16);
+    const integer_hex = utils.arrayToHex(integer_bytes);
+    const value = new BigNumber(integer_hex, 16);
     return Amount.from_json((is_negative ? '-' : '') + value.toString());
   }
 });
 
 STAmount.id = 6;
 
-var STVL = exports.VariableLength = exports.VL = new SerializedType({
+const STVL = exports.VariableLength = exports.VL = new SerializedType({
   serialize: function(so, val) {
     if (typeof val === 'string') {
       serializeHex(so, val);
@@ -570,29 +581,29 @@ var STVL = exports.VariableLength = exports.VL = new SerializedType({
     }
   },
   parse: function(so) {
-    var len = this.parse_varint(so);
+    const len = this.parse_varint(so);
     return convertByteArrayToHex(so.read(len));
   }
 });
 
 STVL.id = 7;
 
-var STAccount = exports.Account = new SerializedType({
+const STAccount = exports.Account = new SerializedType({
   serialize: function(so, val) {
-    var account = UInt160.from_json(val);
+    const account = UInt160.from_json(val);
     if (!account.is_valid()) {
       throw new Error('Invalid account!');
     }
     serializeBits(so, account.to_bits());
   },
   parse: function(so) {
-    var len = this.parse_varint(so);
+    const len = this.parse_varint(so);
 
     if (len !== 20) {
       throw new Error('Non-standard-length account ID');
     }
 
-    var result = UInt160.from_bytes(so.read(len));
+    const result = UInt160.from_bytes(so.read(len));
     result.set_version(Base.VER_ACCOUNT_ID);
 
     if (false && !result.is_valid()) {
@@ -605,23 +616,23 @@ var STAccount = exports.Account = new SerializedType({
 
 STAccount.id = 8;
 
-var STPathSet = exports.PathSet = new SerializedType({
+const STPathSet = exports.PathSet = new SerializedType({
   typeBoundary: 0xff,
   typeEnd: 0x00,
   typeAccount: 0x01,
   typeCurrency: 0x10,
   typeIssuer: 0x20,
   serialize: function(so, val) {
-    for (var i = 0, l = val.length; i < l; i++) {
+    for (let i = 0, l = val.length; i < l; i++) {
       // Boundary
       if (i) {
         STInt8.serialize(so, this.typeBoundary);
       }
 
-      for (var j = 0, l2 = val[i].length; j < l2; j++) {
-        var entry = val[i][j];
+      for (let j = 0, l2 = val[i].length; j < l2; j++) {
+        const entry = val[i][j];
         // if (entry.hasOwnProperty('_value')) {entry = entry._value;}
-        var type = 0;
+        let type = 0;
 
         if (entry.account) {
           type |= this.typeAccount;
@@ -640,7 +651,7 @@ var STPathSet = exports.PathSet = new SerializedType({
         }
 
         if (entry.currency) {
-          var currency = Currency.from_json(entry.currency, entry.non_native);
+          const currency = Currency.from_json(entry.currency, entry.non_native);
           STCurrency.serialize(so, currency);
         }
 
@@ -666,9 +677,9 @@ var STPathSet = exports.PathSet = new SerializedType({
        amount, currency, issuer.
        */
 
-    var path_list = [];
-    var current_path = [];
-    var tag_byte;
+    const path_list = [];
+    let current_path = [];
+    let tag_byte;
 
     /* eslint-disable no-cond-assign */
 
@@ -686,8 +697,8 @@ var STPathSet = exports.PathSet = new SerializedType({
       }
 
       // It's an entry-begin tag.
-      var entry = {};
-      var type = 0;
+      const entry = {};
+      let type = 0;
 
       if (tag_byte & this.typeAccount) {
         entry.account = STHash160.parse(so);
@@ -729,19 +740,19 @@ var STPathSet = exports.PathSet = new SerializedType({
 
 STPathSet.id = 18;
 
-var STVector256 = exports.Vector256 = new SerializedType({
+const STVector256 = exports.Vector256 = new SerializedType({
   serialize: function(so, val) {
     // Assume val is an array of STHash256 objects.
     SerializedType.serialize_varint(so, val.length * 32);
-    for (var i = 0, l = val.length; i < l; i++) {
+    for (let i = 0, l = val.length; i < l; i++) {
       STHash256.serialize(so, val[i]);
     }
   },
   parse: function(so) {
-    var length = this.parse_varint(so);
-    var output = [];
+    const length = this.parse_varint(so);
+    const output = [];
     // length is number of bytes not number of Hash256
-    for (var i = 0; i < length / 32; i++) {
+    for (let i = 0; i < length / 32; i++) {
       output.push(STHash256.parse(so));
     }
     return output;
@@ -753,7 +764,7 @@ STVector256.id = 19;
 // Internal
 exports.STMemo = new SerializedType({
   serialize: function(so, val, no_marker) {
-    var keys = [];
+    let keys = [];
 
     Object.keys(val).forEach(function(key) {
       // Ignore lowercase field names - they're non-serializable fields by
@@ -782,37 +793,41 @@ exports.STMemo = new SerializedType({
     }
   },
   parse: function(so) {
-    var output = {};
+    const output = {};
 
     while (so.peek(1)[0] !== 0xe1) {
-      var keyval = parse(so);
+      const keyval = parse(so);
       output[keyval[0]] = keyval[1];
     }
 
     if (output.MemoType !== undefined) {
       try {
-        var parsedType = convertHexToString(output.MemoType);
+        const parsedType = convertHexToString(output.MemoType);
 
         if (parsedType !== 'unformatted_memo') {
           output.parsed_memo_type = parsedType;
         }
+        /*eslint-disable no-empty*/
       } catch (e) {
         // empty
         // we don't know what's in the binary, apparently it's not a UTF-8
         // string
         // this is fine, we won't add the parsed_memo_type field
       }
+      /*eslint-enable no-empty*/
     }
 
     if (output.MemoFormat !== undefined) {
       try {
         output.parsed_memo_format = convertHexToString(output.MemoFormat);
+        /*eslint-disable no-empty*/
       } catch (e) {
         // empty
         // we don't know what's in the binary, apparently it's not a UTF-8
         // string
         // this is fine, we won't add the parsed_memo_format field
       }
+      /*eslint-enable no-empty*/
     }
 
     if (output.MemoData !== undefined) {
@@ -827,6 +842,7 @@ exports.STMemo = new SerializedType({
           // otherwise see if we can parse text
           output.parsed_memo_data = convertHexToString(output.MemoData);
         }
+        /*eslint-disable no-empty*/
       } catch(e) {
         // empty
         // we'll fail in case the content does not match what the MemoFormat
@@ -834,6 +850,7 @@ exports.STMemo = new SerializedType({
         // this is fine, we won't add the parsed_memo_data, the user has to
         // parse themselves
       }
+      /*eslint-enable no-empty*/
     }
 
     so.read(1);
@@ -842,9 +859,9 @@ exports.STMemo = new SerializedType({
 
 });
 
-var STObject = exports.Object = new SerializedType({
+const STObject = exports.Object = new SerializedType({
   serialize: function(so, val, no_marker) {
-    var keys = [];
+    let keys = [];
 
     Object.keys(val).forEach(function(key) {
       // Ignore lowercase field names - they're non-serializable fields by
@@ -863,7 +880,7 @@ var STObject = exports.Object = new SerializedType({
     // Sort fields
     keys = sort_fields(keys);
 
-    for (var i = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
       serialize(so, keys[i], val[keys[i]]);
     }
 
@@ -874,9 +891,9 @@ var STObject = exports.Object = new SerializedType({
   },
 
   parse: function(so) {
-    var output = {};
+    const output = {};
     while (so.peek(1)[0] !== 0xe1) {
-      var keyval = parse(so);
+      const keyval = parse(so);
       output[keyval[0]] = keyval[1];
     }
     so.read(1);
@@ -886,18 +903,18 @@ var STObject = exports.Object = new SerializedType({
 
 STObject.id = 14;
 
-var STArray = exports.Array = new SerializedType({
+const STArray = exports.Array = new SerializedType({
   serialize: function(so, val) {
-    for (var i = 0, l = val.length; i < l; i++) {
-      var keys = Object.keys(val[i]);
+    for (let i = 0, l = val.length; i < l; i++) {
+      const keys = Object.keys(val[i]);
 
       if (keys.length !== 1) {
         throw new Error(
           'Cannot serialize an array containing non-single-key objects');
       }
 
-      var field_name = keys[0];
-      var value = val[i][field_name];
+      const field_name = keys[0];
+      const value = val[i][field_name];
       serialize(so, field_name, value);
     }
 
@@ -906,11 +923,11 @@ var STArray = exports.Array = new SerializedType({
   },
 
   parse: function(so) {
-    var output = [ ];
+    const output = [ ];
 
     while (so.peek(1)[0] !== 0xf1) {
-      var keyval = parse(so);
-      var obj = { };
+      const keyval = parse(so);
+      const obj = { };
       obj[keyval[0]] = keyval[1];
       output.push(obj);
     }
