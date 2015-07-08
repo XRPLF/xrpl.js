@@ -133,7 +133,7 @@ describe('RippleAPI', function() {
   });
 
   it('getSettings', function(done) {
-    this.api.getSettings(address,
+    this.api.getSettings(address, {},
       _.partial(checkResult, getSettingsResponse, done));
   });
 
