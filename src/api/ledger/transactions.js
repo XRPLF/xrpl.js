@@ -59,7 +59,7 @@ function getAccountTx(remote, address, options, marker, limit, callback) {
   });
 }
 
-function getAccountTransactionsInternal(remote, address, options, callback) {
+function getTransactionsInternal(remote, address, options, callback) {
   const limit = options.limit || DEFAULT_LIMIT;
   const compare = options.earliestFirst ? utils.compareTransactions :
     _.rearg(utils.compareTransactions, 1, 0);
@@ -68,9 +68,9 @@ function getAccountTransactionsInternal(remote, address, options, callback) {
     composeAsync((txs) => txs.sort(compare), callback));
 }
 
-function getAccountTransactions(address, options, callback) {
+function getTransactions(address, options, callback) {
   validate.address(address);
-  validate.getAccountTransactionsOptions(options);
+  validate.getTransactionsOptions(options);
 
   const remote = this.remote;
   if (options.start) {
@@ -83,11 +83,11 @@ function getAccountTransactions(address, options, callback) {
       const ledgerOption = options.earliestFirst ?
         {minLedgerVersion: ledgerVersion} : {maxLedgerVersion: ledgerVersion};
       const newOptions = _.assign({}, options, {startTx: tx}, ledgerOption);
-      getAccountTransactionsInternal(remote, address, newOptions, callback);
+      getTransactionsInternal(remote, address, newOptions, callback);
     });
   } else {
-    getAccountTransactionsInternal(remote, address, options, callback);
+    getTransactionsInternal(remote, address, options, callback);
   }
 }
 
-module.exports = utils.wrapCatch(getAccountTransactions);
+module.exports = utils.wrapCatch(getTransactions);

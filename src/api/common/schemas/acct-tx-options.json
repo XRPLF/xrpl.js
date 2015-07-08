@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "acct-tx-options",
-  "description": "Options for getAccountTransactions",
+  "description": "Options for getTransactions",
   "type": "object",
   "properties": {
     "start": {"$ref": "hash256"},
