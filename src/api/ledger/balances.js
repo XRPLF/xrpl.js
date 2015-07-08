@@ -25,7 +25,7 @@ function formatBalances(balances) {
 
 function getBalances(account, options, callback) {
   validate.address(account);
-  validate.options(options);
+  validate.getBalancesOptions(options);
 
   const ledgerVersion = options.ledgerVersion
                       || this.remote.getLedgerSequence();

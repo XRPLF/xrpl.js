@@ -38,7 +38,7 @@ function getTrustlines(
   callback: () => void
   ): void {
   validate.address(account);
-  validate.options(options);
+  validate.getTrustlinesOptions(options);
 
   const defaultLimit = 100;
   const limit = options.limit || defaultLimit;

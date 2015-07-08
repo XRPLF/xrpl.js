@@ -19,9 +19,9 @@ function requestAccountOffers(remote, address, ledgerVersion, options,
   }), callback));
 }
 
-function getAccountOrders(account, options, callback) {
+function getOrders(account, options, callback) {
   validate.address(account);
-  validate.options(options);
+  validate.getOrdersOptions(options);
 
   const defaultLimit = 100;
   const limit = options.limit || defaultLimit;
@@ -34,4 +34,4 @@ function getAccountOrders(account, options, callback) {
       (order) => order.properties.sequence), callback));
 }
 
-module.exports = utils.wrapCatch(getAccountOrders);
+module.exports = utils.wrapCatch(getOrders);

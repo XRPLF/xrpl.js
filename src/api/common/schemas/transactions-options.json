@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "acct-tx-options",
+  "title": "transactions-options",
   "description": "Options for getTransactions",
   "type": "object",
   "properties": {
