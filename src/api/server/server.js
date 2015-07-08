@@ -36,10 +36,15 @@ function getFee() {
   return common.dropsToXrp(this.remote.createTransaction()._computeFee());
 }
 
+function getLedgerVersion() {
+  return this.remote.getLedgerSequence();
+}
+
 module.exports = {
-  connect: connect,
-  disconnect: disconnect,
-  isConnected: isConnected,
-  getServerInfo: getServerInfo,
-  getFee: getFee
+  connect,
+  disconnect,
+  isConnected,
+  getServerInfo,
+  getFee,
+  getLedgerVersion
 };
