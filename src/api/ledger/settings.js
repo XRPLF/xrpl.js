@@ -36,7 +36,7 @@ function formatSettings(response) {
 
 function getSettings(account, options, callback) {
   validate.address(account);
-  validate.options(options);
+  validate.getSettingsOptions(options);
 
   const request = {
     account: account,

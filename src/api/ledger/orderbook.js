@@ -52,7 +52,7 @@ function formatBidsAndAsks(orderbook, offers) {
 function getOrderbook(account, orderbook, options, callback) {
   validate.address(account);
   validate.orderbook(orderbook);
-  validate.options(options);
+  validate.getOrderbookOptions(options);
 
   const getter = _.partial(getBookOffers, this.remote, account,
     options.ledgerVersion, options.limit);

@@ -49,7 +49,7 @@ function isTransactionInRange(tx, options) {
 
 function getTransaction(identifier, options, callback) {
   validate.identifier(identifier);
-  validate.options(options);
+  validate.getTransactionOptions(options);
 
   const remote = this.remote;
 
