@@ -190,4 +190,8 @@ describe('RippleAPI', function() {
     this.api.getPathFind(pathfind,
       _.partial(checkResult, getPathFindResponse, done));
   });
+
+  it('getLedgerVersion', function() {
+    assert.strictEqual(this.api.getLedgerVersion(), 8819952);
+  });
 });
