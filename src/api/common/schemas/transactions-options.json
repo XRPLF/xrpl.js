@@ -15,6 +15,7 @@
     "excludeFailures": {"type": "boolean"},
     "outgoing": {"type": "boolean"},
     "incoming": {"type": "boolean"},
+    "counterparty": {"$ref": "address"},
     "types": {
       "type": "array",
       "items": {
