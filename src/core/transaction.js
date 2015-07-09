@@ -39,6 +39,7 @@ function Transaction(remote) {
   this.tx_json = {Flags: 0};
   this._secret = undefined;
   this._build_path = false;
+  this._should_resubmit = remoteExists ? this.remote.automatic_resubmission : true;
   this._maxFee = remoteExists ? this.remote.max_fee : undefined;
   this.state = 'unsubmitted';
   this.finalized = false;
@@ -191,9 +192,10 @@ Transaction.prototype.isRejected = function(ter) {
 };
 
 Transaction.from_json = function(j) {
-  return (new Transaction()).parseJson(j);
+  return (new Transaction()).setJson(j);
 };
 
+Transaction.prototype.setJson =
 Transaction.prototype.parseJson = function(v) {
   this.tx_json = v;
   return this;
@@ -210,6 +212,13 @@ Transaction.prototype.setState = function(state) {
     this.state = state;
     this.emit('state', state);
   }
+};
+
+Transaction.prototype.setResubmittable = function(v) {
+  this._should_resubmit = v !== false;
+};
+Transaction.prototype.isResubmittable = function() {
+  return this._should_resubmit;
 };
 
 /**
@@ -269,13 +278,12 @@ Transaction.prototype.getTransactionType = function() {
  * @return {TransactionManager]
  */
 
-Transaction.prototype.getManager = function(account_) {
+Transaction.prototype.getManager = function(account) {
   if (!this.remote) {
     return undefined;
   }
 
-  const account = account_ || this.tx_json.Account;
-  return this.remote.account(account)._transactionManager;
+  return this.remote.account(account || this.getAccount())._transactionManager;
 };
 
 /**
@@ -285,13 +293,12 @@ Transaction.prototype.getManager = function(account_) {
  */
 
 Transaction.prototype.getSecret =
-Transaction.prototype._accountSecret = function(account_) {
+Transaction.prototype._accountSecret = function(account) {
   if (!this.remote) {
     return undefined;
   }
 
-  const account = account_ || this.tx_json.Account;
-  return this.remote.secrets[account];
+  return this.remote.secrets[account || this.getAccount()];
 };
 
 /**

@@ -476,6 +476,11 @@ TransactionManager.prototype._resubmit = function(ledgers_, pending_) {
       }
     }
 
+    if (!transaction.isResubmittable()) {
+      // Allow the transaction to fail via ledger close
+      return;
+    }
+
     while (self._pending.hasSequence(transaction.tx_json.Sequence)) {
       // Sequence number has been consumed by another transaction
       transaction.tx_json.Sequence += 1;
@@ -591,7 +596,12 @@ TransactionManager.prototype._request = function(tx) {
     // Either a tem-class error or generic server error such as tooBusy. This
     // should be a definitive failure
     if (TransactionManager._isTooBusy(error)) {
-      self._resubmit(1, tx);
+      self._waitLedgers(1, function() {
+        tx.once('submitted', function(m) {
+          tx.emit('resubmitted', m);
+        });
+        self._request(tx);
+      });
     } else {
       self._nextSequence--;
       tx.emit('error', error);
