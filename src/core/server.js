@@ -597,7 +597,7 @@ Server.prototype._handleMessage = function(message) {
 Server.prototype._handleLedgerClosed = function(message) {
   this._lastLedgerIndex = message.ledger_index;
   this._lastLedgerClose = Date.now();
-  this._ledgerRanges.add(message.ledger_index);
+  this._ledgerRanges.addValue(message.ledger_index);
   this._ledgerMap.set(message.ledger_hash, message.ledger_index);
   this.emit('ledger_closed', message);
 };
@@ -713,7 +713,7 @@ Server.prototype._handleResponseSubscribe = function(message) {
 
   if (message.validated_ledgers) {
     // Add validated ledgers to ledger range set
-    this._ledgerRanges.add(message.validated_ledgers);
+    this._ledgerRanges.parseAndAddRanges(message.validated_ledgers);
   }
 
   if (~Server.onlineStates.indexOf(message.server_status)) {
@@ -913,10 +913,14 @@ Server.prototype.hasLedger = function(ledger) {
   if (typeof ledger === 'string' && /^[A-F0-9]{64}$/.test(ledger)) {
     result = this._ledgerMap.has(ledger);
   } else if (ledger !== null && !isNaN(ledger)) {
-    result = this._ledgerRanges.has(ledger);
+    result = this._ledgerRanges.containsValue(ledger);
   }
 
   return result;
+};
+
+Server.prototype.hasLedgerRange = function(startLedger, endLedger) {
+  return this._ledgerRanges.containsRange(startLedger, endLedger);
 };
 
 /**

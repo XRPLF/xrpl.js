@@ -257,8 +257,8 @@ describe('Request', function() {
       });
     };
 
-    servers[0]._ledgerRanges.add('5-6');
-    servers[1]._ledgerRanges.add('1-4');
+    servers[0]._ledgerRanges.addRange(5, 6);
+    servers[1]._ledgerRanges.addRange(1, 4);
 
     const remote = new Remote();
     remote._connected = true;

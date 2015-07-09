@@ -1,67 +1,61 @@
-var assert = require('assert');
-var lodash = require('lodash');
+/* @flow */
+'use strict';
+const _ = require('lodash');
+const assert = require('assert');
+const ranges = Symbol();
 
-function RangeSet() {
-  this._ranges = [ ];
-};
+function mergeIntervals(intervals: Array<[number, number]>) {
+  const stack = [[-Infinity, -Infinity]];
+  _.forEach(_.sortBy(intervals, x => x[0]), interval => {
+    const lastInterval = stack.pop();
+    if (interval[0] <= lastInterval[1] + 1) {
+      stack.push([lastInterval[0], Math.max(interval[1], lastInterval[1])]);
+    } else {
+      stack.push(lastInterval);
+      stack.push(interval);
+    }
+  });
+  return stack.slice(1);
+}
 
-/**
- * Add a ledger range
- *
- * @param {Number|String} range string (n-n2,n3-n4)
- */
-
-RangeSet.prototype.add = function(range) {
-  assert(typeof range !== 'number' || !isNaN(range), 'Ledger range malformed');
-
-  range = String(range).split(',');
-
-  if (range.length > 1) {
-    return range.forEach(this.add, this);
+class RangeSet {
+  constructor() {
+    this.reset();
   }
 
-  range = range[0].split('-').map(Number);
+  reset() {
+    this[ranges] = [];
+  }
 
-  var lRange = {
-    start: range[0],
-    end: range[range.length === 1 ? 0 : 1]
-  };
+  serialize() {
+    return this[ranges].map(range =>
+      range[0].toString() + '-' + range[1].toString()).join(',');
+  }
 
-  // Comparisons on NaN should be falsy
-  assert(lRange.start <= lRange.end, 'Ledger range malformed');
+  addRange(start: number, end: number) {
+    assert(start <= end, 'invalid range');
+    this[ranges] = mergeIntervals(this[ranges].concat([[start, end]]));
+  }
 
-  var insertionPoint = lodash.sortedIndex(this._ranges, lRange, function(r) {
-    return r.start;
-  });
+  addValue(value: number) {
+    this.addRange(value, value);
+  }
 
-  this._ranges.splice(insertionPoint, 0, lRange);
-};
+  parseAndAddRanges(rangesString: string) {
+    const rangeStrings = rangesString.split(',');
+    _.forEach(rangeStrings, rangeString => {
+      const range = rangeString.split('-').map(Number);
+      this.addRange(range[0], range[1]);
+    });
+  }
 
+  containsRange(start: number, end: number) {
+    return _.some(this[ranges], range => range[0] <= start && range[1] >= end);
+  }
 
-/*
- * Check presence of ledger in range
- *
- * @param {Number|String} ledger
- * @return Boolean
- */
-
-RangeSet.prototype.has =
-RangeSet.prototype.contains = function(ledger) {
-  assert(ledger != null && !isNaN(ledger), 'Ledger must be a number');
-
-  ledger = Number(ledger);
-
-  return this._ranges.some(function(r) {
-    return ledger >= r.start && ledger <= r.end;
-  });
-};
-
-/**
- * Reset ledger ranges
- */
-
-RangeSet.prototype.reset = function() {
-  this._ranges = [ ];
-};
+  containsValue(value: number) {
+    return this.containsRange(value, value);
+  }
+}
 
 exports.RangeSet = RangeSet;

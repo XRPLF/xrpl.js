@@ -11,12 +11,7 @@ function hasCompleteLedgerRange(remote, options) {
   const minLedgerVersion = options.minLedgerVersion || MIN_LEDGER_VERSION;
   const maxLedgerVersion = options.maxLedgerVersion
     || remote.getLedgerSequence();
-  for (let i = minLedgerVersion; i <= maxLedgerVersion; i++) {
-    if (!remote.getServer().hasLedger(i)) { // TODO: optimize this
-      return false;
-    }
-  }
-  return true;
+  return remote.getServer().hasLedgerRange(minLedgerVersion, maxLedgerVersion);
 }
 
 function attachTransactionDate(remote, tx, callback) {
