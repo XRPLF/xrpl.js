@@ -27,6 +27,10 @@ function transactionFilter(address, filters, tx) {
   if (filters.incoming && tx.address === address) {
     return false;
   }
+  if (filters.counterparty && tx.address !== filters.counterparty
+      && tx.Destination !== filters.counterparty) {
+    return false;
+  }
   return true;
 }
 
