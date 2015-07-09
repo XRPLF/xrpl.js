@@ -618,6 +618,25 @@ describe('Remote', function() {
     remote._servers[0].emit('message', message);
     remote._servers[0].emit('connect');
   });
+  it('Handle server message -- validation received', function() {
+    const message = {
+      type: 'validationReceived',
+      ledger_hash:
+        '96D9E225F10C22D5047B87597939F94024F4180609227D1EB7E9D1CE9A428620',
+      validation_public_key:
+        'n9L81uNCaPgtUJfaHh89gmdvXKAmSt5Gdsw2g1iPWaPkAHW5Nm4C',
+      signature:
+        '304402207E221CF0679B1A52BC07C4B97C56B93392F8BB53DFB52B821828118A740' +
+        '9F3E302202669AD632D9CD288B20A0A98DBC50DD3961EC50B95B138A9DCBDC11506' +
+        'F63646'
+    };
+
+    remote.once('validation_received', function(l) {
+      assert.deepEqual(l, message);
+    });
+    remote._servers[0].emit('message', message);
+    remote._servers[0].emit('connect');
+  });
   it('Handle server message -- transaction', function() {
     const message = require('./fixtures/transaction');
 
