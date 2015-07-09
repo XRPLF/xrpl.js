@@ -18,13 +18,13 @@ exports.utils = require('./utils');
 exports.Server = require('./server').Server;
 exports.Ledger = require('./ledger').Ledger;
 exports.TransactionQueue = require('./transactionqueue').TransactionQueue;
-exports.RangeSet = require('./rangeset').RangeSet;
 exports.convertBase = require('./baseconverter');
 
 exports._test = {
   Log: require('./log'),
   PathFind: require('./pathfind').PathFind,
-  TransactionManager: require('./transactionmanager').TransactionManager
+  TransactionManager: require('./transactionmanager').TransactionManager,
+  RangeSet: require('./rangeset').RangeSet
 };
 
 // Important: We do not guarantee any specific version of SJCL or for any
