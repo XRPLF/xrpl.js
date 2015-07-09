@@ -30,7 +30,7 @@ const getSettingsResponse = require('./fixtures/get-settings-response');
 const getOrdersResponse = require('./fixtures/get-orders-response');
 const getOrderbookResponse = require('./fixtures/get-orderbook-response');
 const getServerInfoResponse = require('./fixtures/get-server-info-response');
-const getPathFindResponse = require('./fixtures/get-pathfind-response');
+const getPathsResponse = require('./fixtures/get-paths-response');
 const address = addresses.ACCOUNT;
 
 function checkResult(expected, done, error, response) {
@@ -173,7 +173,7 @@ describe('RippleAPI', function() {
     });
   });
 
-  it('getPathFind', function(done) {
+  it('getPaths', function(done) {
     const pathfind = {
       source: {
         address: address
@@ -187,8 +187,8 @@ describe('RippleAPI', function() {
         }
       }
     };
-    this.api.getPathFind(pathfind,
-      _.partial(checkResult, getPathFindResponse, done));
+    this.api.getPaths(pathfind,
+      _.partial(checkResult, getPathsResponse, done));
   });
 
   it('getLedgerVersion', function() {

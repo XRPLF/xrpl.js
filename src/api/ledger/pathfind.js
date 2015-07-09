@@ -92,7 +92,7 @@ function formatResponse(pathfind, paths) {
   }
 }
 
-function getPathFind(pathfind, callback) {
+function getPaths(pathfind, callback) {
   validate.pathfind(pathfind);
 
   const address = pathfind.source.address;
@@ -102,4 +102,4 @@ function getPathFind(pathfind, callback) {
   ], composeAsync(_.partial(formatResponse, pathfind), callback));
 }
 
-module.exports = utils.wrapCatch(getPathFind);
+module.exports = utils.wrapCatch(getPaths);
