@@ -5,14 +5,6 @@ const utils = require('./utils');
 const parseTransaction = require('./parse/transaction');
 const validate = utils.common.validate;
 const errors = utils.common.errors;
-const MIN_LEDGER_VERSION = 32570; // earlier versions have been completely lost
-
-function hasCompleteLedgerRange(remote, options) {
-  const minLedgerVersion = options.minLedgerVersion || MIN_LEDGER_VERSION;
-  const maxLedgerVersion = options.maxLedgerVersion
-    || remote.getLedgerSequence();
-  return remote.getServer().hasLedgerRange(minLedgerVersion, maxLedgerVersion);
-}
 
 function attachTransactionDate(remote, tx, callback) {
   if (tx.date) {
@@ -50,7 +42,8 @@ function getTransaction(identifier, options, callback) {
 
   function callbackWrapper(error, tx) {
     if (error instanceof errors.NotFoundError
-        && !hasCompleteLedgerRange(remote, options)) {
+        && !utils.hasCompleteLedgerRange(remote,
+            options.minLedgerVersion, options.maxLedgerVersion)) {
       callback(new errors.MissingLedgerHistoryError('Transaction not found,'
         + ' but the server\'s ledger history is incomplete'));
     } else if (!error && !isTransactionInRange(tx, options)) {

@@ -513,14 +513,13 @@ Remote.prototype._handleMessage = function(message, server) {
   }
 };
 
-
 Remote.prototype.getLedgerSequence = function() {
   if (!this._ledger_current_index) {
     throw new Error('Ledger sequence has not yet been initialized');
   }
-  return this._ledger_current_index;
+  // the "current" ledger is the one after the most recently closed ledger
+  return this._ledger_current_index - 1;
 };
-
 
 /**
  * Handle server ledger_closed event

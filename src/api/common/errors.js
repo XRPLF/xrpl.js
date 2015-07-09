@@ -52,7 +52,8 @@ NotFoundError.prototype = new RippleError();
 NotFoundError.prototype.name = 'NotFoundError';
 
 function MissingLedgerHistoryError(message) {
-  this.message = message;
+  this.message = message ||
+    'Server is missing ledger history in the specified range';
 }
 MissingLedgerHistoryError.prototype = new RippleError();
 MissingLedgerHistoryError.prototype.name = 'MissingLedgerHistoryError';

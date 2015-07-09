@@ -192,6 +192,6 @@ describe('RippleAPI', function() {
   });
 
   it('getLedgerVersion', function() {
-    assert.strictEqual(this.api.getLedgerVersion(), 8819952);
+    assert.strictEqual(this.api.getLedgerVersion(), 8819951);
   });
 });

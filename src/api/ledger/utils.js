@@ -71,12 +71,20 @@ function compareTransactions(first, second) {
   return Number(first.ledgerVersion) < Number(second.ledgerVersion) ? -1 : 1;
 }
 
+function hasCompleteLedgerRange(remote, minLedgerVersion, maxLedgerVersion) {
+  const firstLedgerVersion = 32570; // earlier versions have been lost
+  return remote.getServer().hasLedgerRange(
+    minLedgerVersion || firstLedgerVersion,
+    maxLedgerVersion || remote.getLedgerSequence());
+}
+
 module.exports = {
-  getXRPBalance: getXRPBalance,
-  compareTransactions: compareTransactions,
-  renameCounterpartyToIssuer: renameCounterpartyToIssuer,
-  renameCounterpartyToIssuerInOrder: renameCounterpartyToIssuerInOrder,
-  getRecursive: getRecursive,
+  getXRPBalance,
+  compareTransactions,
+  renameCounterpartyToIssuer,
+  renameCounterpartyToIssuerInOrder,
+  getRecursive,
+  hasCompleteLedgerRange,
   wrapCatch: common.wrapCatch,
   common: common
 };
