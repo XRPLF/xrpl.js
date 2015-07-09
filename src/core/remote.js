@@ -135,6 +135,9 @@ function Remote(options = {}) {
   if (typeof this.submission_timeout !== 'number') {
     throw new TypeError('submission_timeout must be a number');
   }
+  if (typeof this.automatic_resubmission !== 'boolean') {
+    throw new TypeError('automatic_resubmission must be a boolean');
+  }
   if (typeof this.last_ledger_offset !== 'number') {
     throw new TypeError('last_ledger_offset must be a number');
   }
@@ -191,6 +194,7 @@ Remote.DEFAULTS = {
   max_fee: 1000000, // 1 XRP
   max_attempts: 10,
   submission_timeout: 1000 * 20,
+  automatic_resubmission: true,
   last_ledger_offset: 3,
   servers: [ ],
   max_listeners: 0 // remove Node EventEmitter warnings

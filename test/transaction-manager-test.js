@@ -38,6 +38,8 @@ const SUBMIT_TEL_RESPONSE = require('./fixtures/transactionmanager')
 .SUBMIT_TEL_RESPONSE;
 const SUBMIT_REMOTE_ERROR = require('./fixtures/transactionmanager')
 .SUBMIT_REMOTE_ERROR;
+const SUBMIT_TOO_BUSY_ERROR = require('./fixtures/transactionmanager')
+.SUBMIT_TOO_BUSY_ERROR;
 
 describe('TransactionManager', function() {
   let rippled;
@@ -59,9 +61,9 @@ describe('TransactionManager', function() {
       c.sendJSON = function(v) {
         try {
           c.send(JSON.stringify(v));
-        } catch (e) {
+        } catch (e) /* eslint-disable no-empty */{
           // empty
-        }
+        } /* eslint-enable no-empty */
       };
       c.sendResponse = function(baseResponse, ext) {
         assert.strictEqual(typeof baseResponse, 'object');
@@ -426,7 +428,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_RESPONSE, {id: m.id});
       setImmediate(function() {
-        let txEvent = lodash.extend({}, TX_STREAM_TRANSACTION);
+        const txEvent = lodash.extend({}, TX_STREAM_TRANSACTION);
         txEvent.transaction = transaction.tx_json;
         txEvent.transaction.hash = transaction.hash();
         rippledConnection.sendJSON(txEvent);
@@ -752,6 +754,132 @@ describe('TransactionManager', function() {
       assert.deepEqual(summary.tx_json, transaction.tx_json);
       assert.strictEqual(summary.submissionAttempts, 1);
       assert.strictEqual(summary.submitIndex, 2);
+      assert.strictEqual(summary.initialSubmitIndex, 2);
+      assert.strictEqual(summary.lastLedgerSequence, 5);
+      assert.strictEqual(summary.state, 'failed');
+      assert.strictEqual(summary.finalized, true);
+      assert.deepEqual(summary.result, {
+        engine_result: undefined,
+        engine_result_message: undefined,
+        ledger_hash: undefined,
+        ledger_index: undefined,
+        transaction_hash: undefined
+      });
+      done();
+    });
+  });
+
+  it('Submit transaction -- disabled resubmission', function(done) {
+    const transaction = remote.createTransaction('AccountSet', {
+      account: ACCOUNT.address
+    });
+
+    transaction.setResubmittable(false);
+
+    let receivedSubmitted = false;
+    let receivedResubmitted = false;
+    transaction.once('proposed', function() {
+      assert(false, 'Should not receive proposed event');
+    });
+    transaction.once('submitted', function(m) {
+      assert.strictEqual(m.engine_result, 'telINSUF_FEE_P');
+      receivedSubmitted = true;
+    });
+
+    rippled.on('request_submit', function(m, req) {
+      assert.strictEqual(transactionManager.getPending().length(), 1);
+      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
+        transaction.tx_json).to_hex());
+      req.sendResponse(SUBMIT_TEL_RESPONSE, {id: m.id});
+    });
+
+    rippled.once('request_submit', function(m, req) {
+      transaction.once('resubmitted', function() {
+        receivedResubmitted = true;
+      });
+
+      req.closeLedger();
+
+      setImmediate(function() {
+        req.sendJSON(lodash.extend({}, LEDGER, {
+          ledger_index: transaction.tx_json.LastLedgerSequence + 1
+        }));
+      });
+    });
+
+    transaction.submit(function(err) {
+      assert(err, 'Transaction submission should not succeed');
+      assert(receivedSubmitted);
+      assert(!receivedResubmitted);
+      assert.strictEqual(err.engine_result, 'tejMaxLedger');
+      assert.strictEqual(transactionManager.getPending().length(), 0);
+
+      const summary = transaction.summary();
+      assert.strictEqual(summary.submissionAttempts, 1);
+      assert.strictEqual(summary.submitIndex, 2);
+      assert.strictEqual(summary.initialSubmitIndex, 2);
+      assert.strictEqual(summary.lastLedgerSequence, 5);
+      assert.strictEqual(summary.state, 'failed');
+      assert.strictEqual(summary.finalized, true);
+      assert.deepEqual(summary.result, {
+        engine_result: SUBMIT_TEL_RESPONSE.result.engine_result,
+        engine_result_message: SUBMIT_TEL_RESPONSE.result.engine_result_message,
+        ledger_hash: undefined,
+        ledger_index: undefined,
+        transaction_hash: SUBMIT_TEL_RESPONSE.result.tx_json.hash
+      });
+      done();
+    });
+  });
+
+  it('Submit transaction -- disabled resubmission -- too busy error', function(done) {
+    // Transactions should always be resubmitted in the event of a 'tooBusy'
+    // rippled response, even with transaction resubmission disabled
+
+    const transaction = remote.createTransaction('AccountSet', {
+      account: ACCOUNT.address
+    });
+
+    transaction.setResubmittable(false);
+
+    let receivedSubmitted = false;
+    let receivedResubmitted = false;
+    transaction.once('proposed', function() {
+      assert(false, 'Should not receive proposed event');
+    });
+    transaction.once('submitted', function() {
+      receivedSubmitted = true;
+    });
+
+    rippled.on('request_submit', function(m, req) {
+      assert.strictEqual(transactionManager.getPending().length(), 1);
+      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
+        transaction.tx_json).to_hex());
+
+      req.sendResponse(SUBMIT_TOO_BUSY_ERROR, {id: m.id});
+    });
+
+    rippled.once('request_submit', function(m, req) {
+      transaction.once('resubmitted', function() {
+        receivedResubmitted = true;
+        req.sendJSON(lodash.extend({}, LEDGER, {
+          ledger_index: transaction.tx_json.LastLedgerSequence + 1
+        }));
+      });
+
+      req.closeLedger();
+    });
+
+    transaction.submit(function(err) {
+      assert(err, 'Transaction submission should not succeed');
+      assert(receivedSubmitted);
+      assert(receivedResubmitted);
+      assert.strictEqual(err.engine_result, 'tejMaxLedger');
+      assert.strictEqual(transactionManager.getPending().length(), 0);
+
+      const summary = transaction.summary();
+      assert.strictEqual(summary.submissionAttempts, 2);
+      assert.strictEqual(summary.submitIndex, 3);
       assert.strictEqual(summary.initialSubmitIndex, 2);
       assert.strictEqual(summary.lastLedgerSequence, 5);
       assert.strictEqual(summary.state, 'failed');
