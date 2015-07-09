@@ -77,6 +77,11 @@ function getTransactions(address, options, callback) {
   validate.getTransactionsOptions(options);
 
   const remote = this.remote;
+  if (!utils.hasCompleteLedgerRange(remote, options.minLedgerVersion,
+      options.maxLedgerVersion)) {
+    callback(new utils.common.errors.MissingLedgerHistoryError());
+  }
+
   if (options.start) {
     getTransaction.bind(this)(options.start, {}, (error, tx) => {
       if (error) {
