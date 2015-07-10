@@ -95,7 +95,7 @@ TransactionManager._isTooBusy = function(error) {
  */
 
 TransactionManager.normalizeTransaction = function(tx) {
-  let transaction = { };
+  const transaction = { };
   const keys = Object.keys(tx);
 
   for (let i = 0; i < keys.length; i++) {
@@ -274,7 +274,7 @@ TransactionManager.prototype._fillSequence = function(tx, callback) {
   const self = this;
 
   function submitFill(sequence, fCallback) {
-    let fillTransaction = self._remote.createTransaction('AccountSet', {
+    const fillTransaction = self._remote.createTransaction('AccountSet', {
       account: self._accountID
     });
     fillTransaction.tx_json.Sequence = sequence;
@@ -476,6 +476,13 @@ TransactionManager.prototype._resubmit = function(ledgers_, pending_) {
       }
     }
 
+    if (!transaction.isResubmittable()) {
+      // Rather than resubmit, wait for the transaction to fail due to
+      // LastLedgerSequence's being exceeded. The ultimate error emitted on
+      // transaction is 'tejMaxLedger'; should be definitive
+      return;
+    }
+
     while (self._pending.hasSequence(transaction.tx_json.Sequence)) {
       // Sequence number has been consumed by another transaction
       transaction.tx_json.Sequence += 1;
@@ -591,7 +598,12 @@ TransactionManager.prototype._request = function(tx) {
     // Either a tem-class error or generic server error such as tooBusy. This
     // should be a definitive failure
     if (TransactionManager._isTooBusy(error)) {
-      self._resubmit(1, tx);
+      self._waitLedgers(1, function() {
+        tx.once('submitted', function(m) {
+          tx.emit('resubmitted', m);
+        });
+        self._request(tx);
+      });
     } else {
       self._nextSequence--;
       tx.emit('error', error);
@@ -716,7 +728,8 @@ TransactionManager.prototype.submit = function(tx) {
 
   if (typeof tx.tx_json.Sequence !== 'number') {
     // Honor manually-set sequences
-    tx.tx_json.Sequence = this._nextSequence++;
+    this._nextSequence += 1;
+    tx.tx_json.Sequence = this._nextSequence;
   }
 
   tx.once('cleanup', function() {
@@ -724,7 +737,7 @@ TransactionManager.prototype.submit = function(tx) {
   });
 
   if (!tx.complete()) {
-    this._nextSequence--;
+    this._nextSequence -= 1;
     return;
   }
 

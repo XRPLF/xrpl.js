@@ -1008,6 +1008,18 @@ describe('Transaction', function() {
     assert.strictEqual(transaction.tx_json.Fee, '1000');
   });
 
+  it('Set resubmittable', function() {
+    const tx = new Transaction();
+
+    assert.strictEqual(tx.isResubmittable(), true);
+
+    tx.setResubmittable(false);
+    assert.strictEqual(tx.isResubmittable(), false);
+
+    tx.setResubmittable(true);
+    assert.strictEqual(tx.isResubmittable(), true);
+  });
+
   it('Rewrite transaction path', function() {
     const path = [
       {
