@@ -33,6 +33,17 @@ const getServerInfoResponse = require('./fixtures/get-server-info-response');
 const getPathsResponse = require('./fixtures/get-paths-response');
 const address = addresses.ACCOUNT;
 
+const orderbook = {
+  base: {
+    currency: 'USD',
+    counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+  },
+  counter: {
+    currency: 'BTC',
+    counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+  }
+};
+
 function checkResult(expected, done, error, response) {
   if (error) {
     done(error);
@@ -143,18 +154,45 @@ describe('RippleAPI', function() {
   });
 
   it('getOrderbook', function(done) {
-    const orderbook = {
-      base: {
-        currency: 'USD',
-        counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-      },
-      counter: {
-        currency: 'BTC',
-        counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-      }
-    };
     this.api.getOrderbook(address, orderbook, {},
       _.partial(checkResult, getOrderbookResponse, done));
+  });
+
+  it('getOrderbook - sorted so that best deals come first', function(done) {
+    this.api.getOrderbook(address, orderbook, {}, (error, data) => {
+      const bidRates = data.bids.map(bid => bid.properties.makerExchangeRate);
+      const askRates = data.asks.map(ask => ask.properties.makerExchangeRate);
+      // makerExchangeRate = quality = takerPays.value/takerGets.value
+      // so the best deal for the taker is the lowest makerExchangeRate
+      // bids and asks should be sorted so that the best deals come first
+      assert.deepEqual(_.sortBy(bidRates, x => Number(x)), bidRates);
+      assert.deepEqual(_.sortBy(askRates, x => Number(x)), askRates);
+      done();
+    });
+  });
+
+  it('getOrderbook - currency & counterparty are correct', function(done) {
+    this.api.getOrderbook(address, orderbook, {}, (error, data) => {
+      const orders = _.flatten([data.bids, data.asks]);
+      _.forEach(orders, order => {
+        const quantity = order.specification.quantity;
+        const totalPrice = order.specification.totalPrice;
+        const {base, counter} = orderbook;
+        assert.strictEqual(quantity.currency, base.currency);
+        assert.strictEqual(quantity.counterparty, base.counterparty);
+        assert.strictEqual(totalPrice.currency, counter.currency);
+        assert.strictEqual(totalPrice.counterparty, counter.counterparty);
+      });
+      done();
+    });
+  });
+
+  it('getOrderbook - direction is correct for bids and asks', function(done) {
+    this.api.getOrderbook(address, orderbook, {}, (error, data) => {
+      assert(_.every(data.bids, bid => bid.specification.direction === 'buy'));
+      assert(_.every(data.asks, ask => ask.specification.direction === 'sell'));
+      done();
+    });
   });
 
   it('getServerInfo', function(done) {

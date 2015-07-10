@@ -5,11 +5,11 @@ const _ = require('lodash');
 module.exports.requestBookOffersBidsResponse = function(request, options={}) {
   _.defaults(options, {
     gets: {
-      currency: 'BTC',
+      currency: 'USD',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     },
     pays: {
-      currency: 'USD',
+      currency: 'BTC',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     }
   });
@@ -36,7 +36,7 @@ module.exports.requestBookOffersBidsResponse = function(request, options={}) {
          },
           TakerPays: {
             currency: options.pays.currency,
-            issuer: options.gets.issuer,
+            issuer: options.pays.issuer,
             value: '10'
          },
           index: 'CE457115A4ADCC8CB351B3E35A0851E48DE16605C23E305017A9B697B156DE5A',
@@ -417,11 +417,11 @@ module.exports.requestBookOffersAsksPartialFundedResponse = function(request, op
 module.exports.requestBookOffersAsksResponse = function(request, options={}) {
   _.defaults(options, {
     pays: {
-      currency: 'BTC',
+      currency: 'USD',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     },
     gets: {
-      currency: 'USD',
+      currency: 'BTC',
       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
     }
   });

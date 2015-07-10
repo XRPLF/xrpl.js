@@ -32,9 +32,8 @@ function parseOrderbookOrder(order: Object): Object {
   const takerPaysFunded = order.taker_pays_funded ?
       parseAmount(order.taker_pays_funded) : undefined;
   const available = utils.removeUndefined({
-    availableQuantity: direction === 'buy' ? takerPaysFunded : takerGetsFunded,
-    priceOfAvailableQuantity: direction === 'buy' ?
-      takerGetsFunded : takerPaysFunded
+    fundedAmount: takerGetsFunded,
+    priceOfFundedAmount: takerPaysFunded
   });
   const state = _.isEmpty(available) ? undefined : available;
   return utils.removeUndefined({specification, properties, state});
