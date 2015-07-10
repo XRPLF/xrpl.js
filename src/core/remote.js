@@ -505,6 +505,9 @@ Remote.prototype._handleMessage = function(message, server) {
     case 'path_find':
       this._handlePathFind(message, server);
       break;
+    case 'validationReceived':
+      this._handleValidationReceived(message, server);
+      break;
     default:
       if (this.trace) {
         log.info(message.type + ': ', message);
@@ -554,6 +557,16 @@ Remote.prototype._handleLedgerClosed = function(message, server) {
       });
     }
   }
+};
+
+/**
+ * Handle server validation_received event
+ *
+ * @param {Object} message
+ */
+
+Remote.prototype._handleValidationReceived = function(message, server) {
+  this.emit('validation_received', message, server);
 };
 
 /**
