@@ -8,8 +8,11 @@ const BigNumber = require('bignumber.js');
 
 function adjustQualityForXRP(quality: string, takerGetsCurrency: string,
     takerPaysCurrency: string) {
-  const shift = (takerGetsCurrency === 'XRP' ? 6 : 0)
-              - (takerPaysCurrency === 'XRP' ? 6 : 0);
+  // quality = takerPays.value/takerGets.value
+  // using drops (1e-6 XRP) for XRP values
+  const numeratorShift = (takerPaysCurrency === 'XRP' ? -6 : 0);
+  const denominatorShift = (takerGetsCurrency === 'XRP' ? -6 : 0);
+  const shift = numeratorShift - denominatorShift;
   return shift === 0 ? quality :
     (new BigNumber(quality)).shift(shift).toString();
 }
