@@ -1,6 +1,6 @@
 {
   "name": "ripple-keypairs",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "ripple key pairs",
   "files": [
     "dist/npm/*",
@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "babel-runtime": "^5.3.2",
-    "bn.js": "^2.1.0",
-    "elliptic": "^4.0.0",
+    "bn.js": "^3.0.1",
+    "elliptic": "^5.0.0",
     "hash.js": "^1.0.3",
     "ripple-address-codec": "^1.0.3"
   },
