@@ -12,7 +12,7 @@ function attachTransactionDate(remote, tx, callback) {
     return;
   }
   if (!tx.ledger_index) {
-    callback(new errors.ApiError('ledger_index not found in tx'));
+    callback(new errors.NotFoundError('ledger_index not found in tx'));
     return;
   }
 
@@ -48,6 +48,8 @@ function getTransaction(identifier, options, callback) {
         + ' but the server\'s ledger history is incomplete'));
     } else if (!error && !isTransactionInRange(tx, options)) {
       callback(new errors.NotFoundError('Transaction not found'));
+    } else if (error) {
+      callback(error);
     } else {
       callback(error, parseTransaction(tx));
     }
