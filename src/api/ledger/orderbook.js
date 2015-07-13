@@ -23,9 +23,24 @@ function isSameIssue(a, b) {
   return a.currency === b.currency && a.counterparty === b.counterparty;
 }
 
-function orderFilter(issue, direction, order) {
-  return isSameIssue(issue, order.specification.quantity)
-    && order.specification.direction === direction;
+function directionFilter(direction, order) {
+  return order.specification.direction === direction;
+}
+
+function flipOrder(order) {
+  const specification = order.specification;
+  const flippedSpecification = {
+    quantity: specification.totalPrice,
+    totalPrice: specification.quantity,
+    direction: specification.direction === 'buy' ? 'sell' : 'buy'
+  };
+  const newSpecification = _.merge({}, specification, flippedSpecification);
+  return _.merge({}, order, {specification: newSpecification});
+}
+
+function alignOrder(base, order) {
+  const quantity = order.specification.quantity;
+  return isSameIssue(quantity, base) ? order : flipOrder(order);
 }
 
 function formatBidsAndAsks(orderbook, offers) {
@@ -40,13 +55,10 @@ function formatBidsAndAsks(orderbook, offers) {
   // for both bids and asks, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
   const orders = _.sortBy(offers, 'quality').map(parseOrderbookOrder);
-  const {base, counter} = orderbook;
-  const bids = orders.filter(_.partial(orderFilter, base, 'buy'));
-  const asks = orders.filter(_.partial(orderFilter, base, 'sell'));
-  const flippedBids = orders.filter(_.partial(orderFilter, counter, 'buy'));
-  const flippedAsks = orders.filter(_.partial(orderFilter, counter, 'sell'));
-  const flipped = {bids: flippedBids, asks: flippedAsks};
-  return {bids, asks, flipped};
+  const alignedOrders = orders.map(_.partial(alignOrder, orderbook.base));
+  const bids = alignedOrders.filter(_.partial(directionFilter, 'buy'));
+  const asks = alignedOrders.filter(_.partial(directionFilter, 'sell'));
+  return {bids, asks};
 }
 
 function getOrderbook(account, orderbook, options, callback) {
