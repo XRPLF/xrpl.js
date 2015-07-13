@@ -16,6 +16,7 @@ const orderCancellationResponse =
   require('./fixtures/ordercancellation-response');
 const settingsSpecification = require('./fixtures/settings-specification');
 const settingsResponse = require('./fixtures/settings-response');
+const regularKeyResponse = require('./fixtures/regular-key-response');
 const signInput = require('./fixtures/sign-input');
 const signOutput = require('./fixtures/sign-output');
 const MockPRNG = require('./mock-prng');
@@ -89,6 +90,12 @@ describe('RippleAPI', function() {
   it('prepareSettings', function(done) {
     this.api.prepareSettings(address, settingsSpecification,
       instructions, _.partial(checkResult, settingsResponse, done));
+  });
+
+  it('prepareSettings - regularKey', function(done) {
+    const regularKey = {regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD'};
+    this.api.prepareSettings(address, regularKey,
+      instructions, _.partial(checkResult, regularKeyResponse, done));
   });
 
   it('sign', function() {
