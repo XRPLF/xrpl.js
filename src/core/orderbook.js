@@ -933,41 +933,44 @@ OrderBook.prototype.insertOffer = function(node) {
     log.info('inserting offer', this._key, node.fields);
   }
 
-  const offer = OrderBook.offerRewrite(node.fields);
-  const takerGets = this.normalizeAmount(this._currencyGets, offer.TakerGets);
-  const takerPays = this.normalizeAmount(this._currencyPays, offer.TakerPays);
+  try {
+    const offer = OrderBook.offerRewrite(node.fields);
+    const takerGets = this.normalizeAmount(this._currencyGets, offer.TakerGets);
+    const takerPays = this.normalizeAmount(this._currencyPays, offer.TakerPays);
 
-  offer.LedgerEntryType = node.entryType;
-  offer.index = node.ledgerIndex;
+    offer.LedgerEntryType = node.entryType;
+    offer.index = node.ledgerIndex;
 
-  // We're safe to calculate quality for newly created offers
-  offer.quality = takerPays.divide(takerGets).to_text();
+    // We're safe to calculate quality for newly created offers
+    offer.quality = takerPays.divide(takerGets).to_text();
 
-  const originalLength = this._offers.length;
+    const originalLength = this._offers.length;
 
-  for (let i = 0; i < originalLength; i++) {
-    const quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
-    const existingOfferQuality = OrderBookUtils.getOfferQuality(
-      this._offers[i],
-      this._currencyGets
-    );
+    for (let i = 0; i < originalLength; i++) {
+      const quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
+      const existingOfferQuality = OrderBookUtils.getOfferQuality(
+        this._offers[i],
+        this._currencyGets
+      );
 
-    if (quality.compareTo(existingOfferQuality) <= 0) {
-      this._offers.splice(i, 0, offer);
+      if (quality.compareTo(existingOfferQuality) <= 0) {
+        this._offers.splice(i, 0, offer);
 
-      break;
+        break;
+      }
     }
+
+    if (this._offers.length === originalLength) {
+      this._offers.push(offer);
+    }
+
+    this.incrementOwnerOfferCount(offer.Account);
+    this.updateOwnerOffersFundedAmount(offer.Account);
+    this.emit('offer_added', offer);
+  } catch (e) {
+    this.emit('unexpected', e);
+    log.error(e);
   }
-
-  if (this._offers.length === originalLength) {
-    this._offers.push(offer);
-  }
-
-  this.incrementOwnerOfferCount(offer.Account);
-
-  this.updateOwnerOffersFundedAmount(offer.Account);
-
-  this.emit('offer_added', offer);
 };
 
 /**
@@ -999,19 +1002,24 @@ OrderBook.prototype.modifyOffer = function(node) {
     log.info('modifying offer', this._key, node.fields);
   }
 
-  for (let i = 0; i < this._offers.length; i++) {
-    const offer = this._offers[i];
+  try {
+    for (let i = 0; i < this._offers.length; i++) {
+      const offer = this._offers[i];
 
-    if (offer.index === node.ledgerIndex) {
-      // TODO: This assumes no fields are deleted, which is
-      // probably a safe assumption, but should be checked.
-      extend(offer, node.fieldsFinal);
+      if (offer.index === node.ledgerIndex) {
+        // TODO: This assumes no fields are deleted, which is
+        // probably a safe assumption, but should be checked.
+        extend(offer, node.fieldsFinal);
 
-      break;
+        break;
+      }
     }
-  }
 
-  this.updateOwnerOffersFundedAmount(node.fields.Account);
+    this.updateOwnerOffersFundedAmount(node.fields.Account);
+  } catch (e) {
+    this.emit('unexpected', e);
+    log.error(e);
+  }
 };
 
 /**
@@ -1030,24 +1038,29 @@ OrderBook.prototype.deleteOffer = function(node, isOfferCancel) {
     log.info('deleting offer', this._key, node.fields);
   }
 
-  for (let i = 0; i < this._offers.length; i++) {
-    const offer = this._offers[i];
+  try {
+    for (let i = 0; i < this._offers.length; i++) {
+      const offer = this._offers[i];
 
-    if (offer.index === node.ledgerIndex) {
-      // Remove offer amount from sum for account
-      this.subtractOwnerOfferTotal(offer.Account, offer.TakerGets);
+      if (offer.index === node.ledgerIndex) {
+        // Remove offer amount from sum for account
+        this.subtractOwnerOfferTotal(offer.Account, offer.TakerGets);
 
-      this._offers.splice(i, 1);
-      this.decrementOwnerOfferCount(offer.Account);
+        this._offers.splice(i, 1);
+        this.decrementOwnerOfferCount(offer.Account);
 
-      this.emit('offer_removed', offer);
+        this.emit('offer_removed', offer);
 
-      break;
+        break;
+      }
     }
-  }
 
-  if (isOfferCancel) {
-    this.updateOwnerOffersFundedAmount(node.fields.Account);
+    if (isOfferCancel) {
+      this.updateOwnerOffersFundedAmount(node.fields.Account);
+    }
+  } catch (e) {
+    this.emit('unexpected', e);
+    log.error(e);
   }
 };
 
@@ -1224,3 +1237,4 @@ OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
 };
 
 exports.OrderBook = OrderBook;
+
