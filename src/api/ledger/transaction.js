@@ -39,11 +39,13 @@ function getTransaction(identifier, options, callback) {
   validate.getTransactionOptions(options);
 
   const remote = this.remote;
+  const maxLedgerVersion = Math.min(options.maxLedgerVersion,
+    remote.getLedgerSequence());
 
   function callbackWrapper(error, tx) {
     if (error instanceof errors.NotFoundError
         && !utils.hasCompleteLedgerRange(remote,
-            options.minLedgerVersion, options.maxLedgerVersion)) {
+            options.minLedgerVersion, maxLedgerVersion)) {
       callback(new errors.MissingLedgerHistoryError('Transaction not found,'
         + ' but the server\'s ledger history is incomplete'));
     } else if (!error && !isTransactionInRange(tx, options)) {
