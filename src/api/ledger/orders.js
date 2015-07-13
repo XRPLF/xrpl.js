@@ -10,7 +10,7 @@ function requestAccountOffers(remote, address, ledgerVersion, options,
   remote.requestAccountOffers({
     account: address,
     marker: marker,
-    limit: limit,
+    limit: utils.clamp(limit, 10, 400),
     ledger: ledgerVersion
   },
   composeAsync((data) => ({
@@ -23,13 +23,11 @@ function getOrders(account, options, callback) {
   validate.address(account);
   validate.getOrdersOptions(options);
 
-  const defaultLimit = 100;
-  const limit = options.limit || defaultLimit;
   const ledgerVersion = options.ledgerVersion
                       || this.remote.getLedgerSequence();
   const getter = _.partial(requestAccountOffers, this.remote, account,
                            ledgerVersion, options);
-  utils.getRecursive(getter, limit,
+  utils.getRecursive(getter, options.limit,
     composeAsync((orders) => _.sortBy(orders,
       (order) => order.properties.sequence), callback));
 }

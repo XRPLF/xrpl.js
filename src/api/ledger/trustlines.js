@@ -16,7 +16,7 @@ function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
     account: address,
     ledger: ledgerVersion,
     marker: marker,
-    limit: Math.max(limit, 10),
+    limit: utils.clamp(limit, 10, 400),
     peer: options.counterparty
   };
 
@@ -40,13 +40,11 @@ function getTrustlines(
   validate.address(account);
   validate.getTrustlinesOptions(options);
 
-  const defaultLimit = 100;
-  const limit = options.limit || defaultLimit;
   const ledgerVersion = options.ledgerVersion
                       || this.remote.getLedgerSequence();
   const getter = _.partial(getAccountLines, this.remote, account,
                            ledgerVersion, options);
-  utils.getRecursive(getter, limit, callback);
+  utils.getRecursive(getter, options.limit, callback);
 }
 
 module.exports = utils.wrapCatch(getTrustlines);

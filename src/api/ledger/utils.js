@@ -1,8 +1,14 @@
 'use strict';
 const _ = require('lodash');
+const assert = require('assert');
 const common = require('../common');
 const dropsToXrp = common.dropsToXrp;
 const composeAsync = common.composeAsync;
+
+function clamp(value, min, max) {
+  assert(min <= max, 'Illegal clamp bounds');
+  return Math.min(Math.max(value, min), max);
+}
 
 function getXRPBalance(remote, address, ledgerVersion, callback) {
   remote.requestAccountInfo({account: address, ledger: ledgerVersion},
@@ -29,7 +35,7 @@ function getRecursiveRecur(getter, marker, limit, callback) {
 }
 
 function getRecursive(getter, limit, callback) {
-  getRecursiveRecur(getter, undefined, limit, callback);
+  getRecursiveRecur(getter, undefined, limit || Infinity, callback);
 }
 
 function renameCounterpartyToIssuer(amount) {
@@ -86,6 +92,7 @@ module.exports = {
   getRecursive,
   hasCompleteLedgerRange,
   wrapCatch: common.wrapCatch,
+  clamp: clamp,
   common: common
 };
 

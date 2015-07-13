@@ -5,7 +5,6 @@ const parseTransaction = require('./parse/transaction');
 const getTransaction = require('./transaction');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
-const DEFAULT_LIMIT = 100;
 
 function parseAccountTxTransaction(tx) {
   // rippled uses a different response format for 'account_tx' than 'tx'
@@ -47,7 +46,7 @@ function getAccountTx(remote, address, options, marker, limit, callback) {
     ledger_index_max: options.maxLedgerVersion || -1,
     forward: options.earliestFirst,
     binary: options.binary,
-    limit: Math.max(limit || DEFAULT_LIMIT, 10),
+    limit: utils.clamp(limit, 10, 400),
     marker: marker
   };
 
@@ -64,11 +63,10 @@ function getAccountTx(remote, address, options, marker, limit, callback) {
 }
 
 function getTransactionsInternal(remote, address, options, callback) {
-  const limit = options.limit || DEFAULT_LIMIT;
   const compare = options.earliestFirst ? utils.compareTransactions :
     _.rearg(utils.compareTransactions, 1, 0);
   const getter = _.partial(getAccountTx, remote, address, options);
-  utils.getRecursive(getter, limit,
+  utils.getRecursive(getter, options.limit,
     composeAsync((txs) => txs.sort(compare), callback));
 }
 
