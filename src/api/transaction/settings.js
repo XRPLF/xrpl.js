@@ -92,8 +92,14 @@ function createSettingsTransaction(account, settings) {
   validate.settings(settings);
 
   const transaction = new ripple.Transaction();
-  transaction.accountSet(account);
+  if (settings.regularKey) {
+    return transaction.setRegularKey({
+      account: account,
+      regular_key: settings.regularKey
+    });
+  }
 
+  transaction.accountSet(account);
   setTransactionFlags(transaction, settings);
   setTransactionFields(transaction, settings);
 
