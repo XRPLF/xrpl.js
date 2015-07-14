@@ -62,24 +62,45 @@ function getAccountTx(remote, address, options, marker, limit, callback) {
   });
 }
 
-function getTransactionsInternal(remote, address, options, callback) {
+function checkForLedgerGaps(remote, options, transactions) {
+  let {minLedgerVersion, maxLedgerVersion} = options;
+
+  // if we reached the limit on number of transactions, then we can shrink
+  // the required ledger range to only guarantee that there are no gaps in
+  // the range of ledgers spanned by those transactions
+  if (options.limit && transactions.length === options.limit) {
+    if (options.earliestFirst) {
+      maxLedgerVersion = _.last(transactions).outcome.ledgerVersion;
+    } else {
+      minLedgerVersion = _.last(transactions).outcome.ledgerVersion;
+    }
+  }
+
+  if (!utils.hasCompleteLedgerRange(remote, minLedgerVersion,
+      maxLedgerVersion)) {
+    throw new utils.common.errors.MissingLedgerHistoryError();
+  }
+}
+
+function formatResponse(remote, options, transactions) {
   const compare = options.earliestFirst ? utils.compareTransactions :
     _.rearg(utils.compareTransactions, 1, 0);
+  const sortedTransactions = transactions.sort(compare);
+  checkForLedgerGaps(remote, options, sortedTransactions);
+  return sortedTransactions;
+}
+
+function getTransactionsInternal(remote, address, options, callback) {
   const getter = _.partial(getAccountTx, remote, address, options);
-  utils.getRecursive(getter, options.limit,
-    composeAsync((txs) => txs.sort(compare), callback));
+  const format = _.partial(formatResponse, remote, options);
+  utils.getRecursive(getter, options.limit, composeAsync(format, callback));
 }
 
 function getTransactions(address, options, callback) {
   validate.address(address);
   validate.getTransactionsOptions(options);
 
-  const remote = this.remote;
-  if (!utils.hasCompleteLedgerRange(remote, options.minLedgerVersion,
-      options.maxLedgerVersion)) {
-    callback(new utils.common.errors.MissingLedgerHistoryError());
-  }
-
+  const defaults = {maxLedgerVersion: this.remote.getLedgerSequence()};
   if (options.start) {
     getTransaction.bind(this)(options.start, {}, (error, tx) => {
       if (error) {
@@ -87,13 +108,14 @@ function getTransactions(address, options, callback) {
         return;
       }
       const ledgerVersion = tx.outcome.ledgerVersion;
-      const ledgerOption = options.earliestFirst ?
+      const bound = options.earliestFirst ?
         {minLedgerVersion: ledgerVersion} : {maxLedgerVersion: ledgerVersion};
-      const newOptions = _.assign({}, options, {startTx: tx}, ledgerOption);
-      getTransactionsInternal(remote, address, newOptions, callback);
+      const newOptions = _.assign(defaults, options, {startTx: tx}, bound);
+      getTransactionsInternal(this.remote, address, newOptions, callback);
     });
   } else {
-    getTransactionsInternal(remote, address, options, callback);
+    const newOptions = _.assign(defaults, options);
+    getTransactionsInternal(this.remote, address, newOptions, callback);
   }
 }
 
