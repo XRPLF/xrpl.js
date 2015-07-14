@@ -1,21 +1,10 @@
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
-const flags = utils.common.core.Remote.flags.account_root;
 const validate = utils.common.validate;
 const parseFields = require('./parse/fields');
 const composeAsync = utils.common.composeAsync;
-
-const AccountFlags = {
-  passwordSpent: flags.PasswordSpent,
-  requireDestinationTag: flags.RequireDestTag,
-  requireAuthorization: flags.RequireAuth,
-  disallowIncomingXRP: flags.DisallowXRP,
-  disableMasterKey: flags.DisableMaster,
-  noFreeze: flags.NoFreeze,
-  globalFreeze: flags.GlobalFreeze,
-  defaultRipple: flags.DefaultRipple
-};
+const AccountFlags = utils.common.constants.AccountFlags;
 
 function parseFlags(value) {
   const settings = {};

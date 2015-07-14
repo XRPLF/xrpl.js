@@ -3,7 +3,6 @@
 const _ = require('lodash');
 const addresses = require('./addresses');
 const accountTransactionsResponse = require('./acct-tx-response');
-const SerializedObject = require('ripple-lib').SerializedObject;
 const BASE_LEDGER_INDEX = 8819951;
 
 module.exports.accountTransactionsResponse = accountTransactionsResponse;
@@ -645,15 +644,14 @@ const BINARY_TRANSACTION_SYNTH = module.exports.BINARY_TRANSACTION_SYNTH = {
   validated: true
 };
 
-module.exports.transactionResponse = function(request) {
+const EXAMPLE_TX = _.merge(BINARY_TRANSACTION_SYNTH, BINARY_TRANSACTION, {meta: METADATA});
+
+module.exports.transactionResponse = function(request, transaction) {
   return JSON.stringify({
     id: request.id,
     status: 'success',
     type: 'response',
-    result: _.extend({
-      meta: SerializedObject.from_json(METADATA).to_hex(),
-      tx: SerializedObject.from_json(BINARY_TRANSACTION).to_hex()
-    }, BINARY_TRANSACTION_SYNTH)
+    result: transaction || EXAMPLE_TX
   });
 };
 
