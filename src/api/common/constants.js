@@ -1,6 +1,18 @@
 'use strict';
-const Transaction = require('./utils').core.Transaction;
-const flagIndices = Transaction.set_clear_flags.AccountSet;
+const core = require('./utils').core;
+const flagIndices = core.Transaction.set_clear_flags.AccountSet;
+const flags = core.Remote.flags.account_root;
+
+const AccountFlags = {
+  passwordSpent: flags.PasswordSpent,
+  requireDestinationTag: flags.RequireDestTag,
+  requireAuthorization: flags.RequireAuth,
+  disallowIncomingXRP: flags.DisallowXRP,
+  disableMasterKey: flags.DisableMaster,
+  noFreeze: flags.NoFreeze,
+  globalFreeze: flags.GlobalFreeze,
+  defaultRipple: flags.DefaultRipple
+};
 
 const AccountFlagIndices = {
   requireDestinationTag: flagIndices.asfRequireDest,
@@ -28,5 +40,6 @@ const AccountFields = {
 
 module.exports = {
   AccountFields,
-  AccountFlagIndices
+  AccountFlagIndices,
+  AccountFlags
 };

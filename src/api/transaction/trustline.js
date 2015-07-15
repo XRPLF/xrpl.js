@@ -7,7 +7,7 @@ const validate = utils.common.validate;
 const TrustSetFlags = {
   authorized: {set: 'SetAuth'},
   allowRippling: {set: 'ClearNoRipple', unset: 'NoRipple'},
-  frozed: {set: 'SetFreeze', unset: 'ClearFreeze'}
+  frozen: {set: 'SetFreeze', unset: 'ClearFreeze'}
 };
 
 function createTrustlineTransaction(account, trustline) {

@@ -32,6 +32,7 @@ const getOrdersResponse = require('./fixtures/get-orders-response');
 const getOrderbookResponse = require('./fixtures/get-orderbook-response');
 const getServerInfoResponse = require('./fixtures/get-server-info-response');
 const getPathsResponse = require('./fixtures/get-paths-response');
+const settingsTransactionResponse = require('./fixtures/settings-tx-response');
 const address = addresses.ACCOUNT;
 
 const orderbook = {
@@ -119,6 +120,13 @@ describe('RippleAPI', function() {
   it('getTransaction', function(done) {
     this.api.getTransaction(hashes.VALID_TRANSACTION_HASH, {},
       _.partial(checkResult, transactionResponse, done));
+  });
+
+  it('getTransaction - settings', function(done) {
+    const hash =
+      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
+    this.api.getTransaction(hash, {},
+      _.partial(checkResult, settingsTransactionResponse, done));
   });
 
   it('getTransactions', function(done) {

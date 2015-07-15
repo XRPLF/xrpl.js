@@ -58,7 +58,7 @@ function getTransaction(identifier, options, callback) {
   }
 
   async.waterfall([
-    _.partial(remote.requestTx.bind(remote), {hash: identifier}),
+    _.partial(remote.requestTx.bind(remote), {hash: identifier, binary: false}),
     _.partial(attachTransactionDate, remote)
   ], callbackWrapper);
 }

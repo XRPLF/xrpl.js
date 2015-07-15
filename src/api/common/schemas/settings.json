@@ -8,6 +8,7 @@
     "requireAuthorization": {"type": "boolean"},
     "disallowIncomingXRP": {"type": "boolean"},
     "disableMasterKey": {"type": "boolean"},
+    "enableTransactionIDTracking": {"type": "boolean"},
     "noFreeze": {"type": "boolean"},
     "globalFreeze": {"type": "boolean"},
     "defaultRipple": {"type": "boolean"},
