@@ -257,9 +257,9 @@ function parse(so) {
   }
 
   const field_bits = tag_byte & 0x0f;
-  let field_name = (field_bits === 0)
-    ? field_name = binformat.fields[type_bits][so.read(1)[0]]
-    : field_name = binformat.fields[type_bits][field_bits];
+  const field_name = (field_bits === 0)
+    ? binformat.fields[type_bits][so.read(1)[0]]
+    : binformat.fields[type_bits][field_bits];
 
   assert(field_name, 'Unknown field - header byte is 0x'
     + tag_byte.toString(16));
