@@ -2,13 +2,12 @@
 'use strict';
 const utils = require('./utils');
 const validate = utils.common.validate;
-const ripple = utils.common.core;
 
 function createOrderCancellationTransaction(account, sequence) {
   validate.address(account);
   validate.sequence(sequence);
 
-  const transaction = new ripple.Transaction();
+  const transaction = new utils.common.core.Transaction();
   transaction.offerCancel(account, sequence);
   return transaction;
 }

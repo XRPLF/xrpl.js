@@ -12,7 +12,7 @@
     "noFreeze": {"type": "boolean"},
     "globalFreeze": {"type": "boolean"},
     "defaultRipple": {"type": "boolean"},
-    "emailHash": {"type": "string"},
+    "emailHash": {"$ref": "hash128"},
     "walletLocator": {"$ref": "hash256"},
     "walletSize": {"type": "integer"},
     "messageKey": {"type": "string"},

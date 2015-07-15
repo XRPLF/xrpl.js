@@ -1,8 +1,8 @@
 'use strict';
 const _ = require('lodash');
+const utils = require('./utils');
 const ValidationError = require('./errors').ValidationError;
 const schemaValidate = require('./schema-validator');
-const ripple = require('./utils').core;
 
 function error(text) {
   return new ValidationError(text);
@@ -16,7 +16,7 @@ function validateAddressAndSecret(obj) {
     throw error('Parameter missing: secret');
   }
   try {
-    if (!ripple.Seed.from_json(secret).get_key(address)) {
+    if (!utils.core.Seed.from_json(secret).get_key(address)) {
       throw error('secret does not match address');
     }
   } catch (exception) {

@@ -1,6 +1,7 @@
 'use strict';
 const BigNumber = require('bignumber.js');
 const core = require('../../core');
+const errors = require('./errors');
 
 function dropsToXrp(drops) {
   return (new BigNumber(drops)).dividedBy(1000000.0).toString();
@@ -49,11 +50,22 @@ function composeAsync(wrapper, callback) {
   };
 }
 
+function convertExceptions(f) {
+  return function() {
+    try {
+      return f.apply(this, arguments);
+    } catch (error) {
+      throw new errors.ApiError(error.message);
+    }
+  };
+}
+
 module.exports = {
   core,
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,
   wrapCatch,
-  composeAsync
+  composeAsync,
+  convertExceptions
 };

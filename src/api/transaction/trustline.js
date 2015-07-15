@@ -1,7 +1,6 @@
 /* @flow */
 'use strict';
 const utils = require('./utils');
-const ripple = utils.common.core;
 const validate = utils.common.validate;
 
 const TrustSetFlags = {
@@ -20,7 +19,7 @@ function createTrustlineTransaction(account, trustline) {
     value: trustline.limit
   };
 
-  const transaction = new ripple.Transaction();
+  const transaction = new utils.common.core.Transaction();
   transaction.trustSet(account, limit,
     trustline.qualityIn, trustline.qualityOut);
   utils.setTransactionBitFlags(transaction, trustline, TrustSetFlags);
