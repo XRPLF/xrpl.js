@@ -62,8 +62,7 @@ function parseOutcome(tx: Object): ?Object {
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
     ledgerVersion: tx.ledger_index,
-    indexInLedger: tx.meta.TransactionIndex,
-    sequence: tx.Sequence
+    indexInLedger: tx.meta.TransactionIndex
   };
 }
 

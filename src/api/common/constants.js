@@ -26,7 +26,6 @@ const AccountFlagIndices = {
 };
 
 const AccountFields = {
-  Sequence: {name: 'sequence'},
   EmailHash: {name: 'emailHash', encoding: 'hex',
               length: 32, defaults: '0'},
   WalletLocator: {name: 'walletLocator', encoding: 'hex',

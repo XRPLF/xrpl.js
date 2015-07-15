@@ -36,6 +36,7 @@ function parseTransaction(tx: Object): Object {
   return utils.removeUndefined({
     type: type,
     address: tx.Account,
+    sequence: tx.Sequence,
     id: tx.hash,
     specification: utils.removeUndefined(specification),
     outcome: outcome ? utils.removeUndefined(outcome) : undefined
