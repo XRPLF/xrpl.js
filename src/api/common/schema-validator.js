@@ -3,17 +3,17 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const validator = require('is-my-json-valid');
-const ripple = require('./utils').core;
+const utils = require('./utils');
 const ValidationError = require('./errors').ValidationError;
 
 let SCHEMAS = {};
 
 function isValidAddress(address) {
-  return ripple.UInt160.is_valid(address);
+  return utils.core.UInt160.is_valid(address);
 }
 
 function isValidLedgerHash(ledgerHash) {
-  return ripple.UInt256.is_valid(ledgerHash);
+  return utils.core.UInt256.is_valid(ledgerHash);
 }
 
 function loadSchema(filepath) {

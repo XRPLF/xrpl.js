@@ -1,9 +1,8 @@
 /* @flow */
-/* eslint-disable valid-jsdoc */
 'use strict';
+const _ = require('lodash');
 const BigNumber = require('bignumber.js');
 const utils = require('./utils');
-const ripple = utils.common.core;
 const validate = utils.common.validate;
 const toRippledAmount = utils.common.toRippledAmount;
 
@@ -37,80 +36,48 @@ function applyAnyCounterpartyEncoding(payment) {
   }
 }
 
-function uppercaseCurrencyCodes(payment) {
-  if (payment.source.amount) {
-    payment.source.amount.currency =
-    payment.source.amount.currency.toUpperCase();
-  }
-  if (payment.destination.amount) {
-    payment.destination.amount.currency =
-    payment.destination.amount.currency.toUpperCase();
-  }
-}
-
 function createPaymentTransaction(account, payment) {
   applyAnyCounterpartyEncoding(payment);
-  uppercaseCurrencyCodes(payment);
   validate.address(account);
   validate.payment(payment);
 
-  const transaction = new ripple.Transaction();
-  const transactionData = {
+  const transaction = new utils.common.core.Transaction();
+  transaction.payment({
     from: payment.source.address,
     to: payment.destination.address,
     amount: toRippledAmount(payment.destination.amount)
-  };
+  });
 
   if (payment.invoiceID) {
     transaction.invoiceID(payment.invoiceID);
   }
-  transaction.payment(transactionData);
-
   if (payment.source.tag) {
-    transaction.sourceTag(parseInt(payment.source.tag, 10));
+    transaction.sourceTag(payment.source.tag);
   }
   if (payment.destination.tag) {
-    transaction.destinationTag(parseInt(payment.destination.tag, 10));
+    transaction.destinationTag(payment.destination.tag);
   }
-
+  if (payment.paths) {
+    transaction.paths(JSON.parse(payment.paths));
+  }
+  if (payment.memos) {
+    _.forEach(payment.memos, memo =>
+      transaction.addMemo(memo.type, memo.format, memo.data)
+    );
+  }
+  if (payment.allowPartialPayment) {
+    transaction.setFlags(['PartialPayment']);
+  }
+  if (payment.noDirectRipple) {
+    transaction.setFlags(['NoRippleDirect']);
+  }
   if (isSendMaxAllowed(payment)) {
     const maxValue = new BigNumber(payment.source.amount.value)
       .plus(payment.source.slippage || 0).toString();
-
-    if (payment.source.amount.currency === 'XRP') {
-      transaction.sendMax(utils.common.xrpToDrops(maxValue));
-    } else {
-      transaction.sendMax({
-        value: maxValue,
-        currency: payment.source.amount.currency,
-        issuer: payment.source.amount.counterparty
-      });
-    }
+    const maxAmount = _.assign({}, payment.source.amount, {value: maxValue});
+    transaction.sendMax(toRippledAmount(maxAmount));
   }
 
-  if (typeof payment.paths === 'string') {
-    transaction.paths(JSON.parse(payment.paths));
-  } else if (typeof payment.paths === 'object') {
-    transaction.paths(payment.paths);
-  }
-
-  if (payment.memos && Array.isArray(payment.memos)) {
-    for (let m = 0; m < payment.memos.length; m++) {
-      const memo = payment.memos[m];
-      transaction.addMemo(memo.type, memo.format, memo.data);
-    }
-  }
-
-  const flags = [];
-  if (payment.allowPartialPayment) {
-    flags.push('PartialPayment');
-  }
-  if (payment.noDirectRipple) {
-    flags.push('NoRippleDirect');
-  }
-  if (flags.length > 0) {
-    transaction.setFlags(flags);
-  }
   return transaction;
 }
 

@@ -1,5 +1,4 @@
 /* @flow */
-
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
@@ -20,23 +19,19 @@ function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
     peer: options.counterparty
   };
 
-  const currency = options.currency ? options.currency.toUpperCase() : null;
   remote.requestAccountLines(requestOptions, (error, data) => {
     return error ? callback(error) :
       callback(null, {
         marker: data.marker,
         results: data.lines.map(parseAccountTrustline)
-          .filter(_.partial(currencyFilter, currency))
+          .filter(_.partial(currencyFilter, options.currency || null))
       });
   });
 }
 
-function getTrustlines(
-  account: string,
-  options: {currency: string, counterparty: string,
-    limit: number, ledgerVersion: number},
-  callback: () => void
-  ): void {
+function getTrustlines(account: string, options: {currency: string,
+    counterparty: string, limit: number, ledgerVersion: number},
+    callback: () => void): void {
   validate.address(account);
   validate.getTrustlinesOptions(options);
 

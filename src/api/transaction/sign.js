@@ -1,7 +1,7 @@
 /* @flow */
 'use strict';
 const utils = require('./utils');
-const ripple = utils.common.core;
+const core = utils.common.core;
 const validate = utils.common.validate;
 
 /**
@@ -19,7 +19,7 @@ const HASH_TX_SIGN = 0x53545800; // 'STX'
 const HASH_TX_SIGN_TESTNET = 0x73747800; // 'stx'
 
 function getKeyPair(address, secret) {
-  return ripple.Seed.from_json(secret).get_key(address);
+  return core.Seed.from_json(secret).get_key(address);
 }
 
 function getPublicKeyHex(keypair) {
@@ -27,7 +27,7 @@ function getPublicKeyHex(keypair) {
 }
 
 function serialize(txJSON) {
-  return ripple.SerializedObject.from_json(txJSON);
+  return core.SerializedObject.from_json(txJSON);
 }
 
 function hashSerialization(serialized, prefix) {
@@ -44,13 +44,12 @@ function signingHash(txJSON, isTestNet=false) {
 
 function computeSignature(txJSON, keypair) {
   const signature = keypair.sign(signingHash(txJSON));
-  return ripple.sjcl.codec.hex.fromBits(signature).toUpperCase();
+  return core.sjcl.codec.hex.fromBits(signature).toUpperCase();
 }
 
-/*:: type TxJSON = {Account: string; SigningPubKey: string,
-                    TxnSignature: string};
-     type Signed = {signedTransaction: string; id: string}; */
-function sign(txJSON: TxJSON, secret: string): Signed {
+function sign(txJSON: {Account: string; SigningPubKey: string,
+    TxnSignature: string}, secret: string):
+    {signedTransaction: string; id: string} {
   validate.txJSON(txJSON);
   validate.addressAndSecret({address: txJSON.Account, secret: secret});
 

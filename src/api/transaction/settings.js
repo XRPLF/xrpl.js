@@ -3,11 +3,9 @@
 const _ = require('lodash');
 const assert = require('assert');
 const utils = require('./utils');
-const ripple = utils.common.core;
 const validate = utils.common.validate;
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices;
 const AccountFields = utils.common.constants.AccountFields;
-const ValidationError = utils.common.errors.ValidationError;
 
 // Emptry string passed to setting will clear it
 const CLEAR_SETTING = '';
@@ -33,7 +31,7 @@ function setTransactionFields(transaction, input) {
     const field = fieldSchema[fieldName];
     let value = input[field.name];
 
-    if (typeof value === 'undefined') {
+    if (value === undefined) {
       continue;
     }
 
@@ -42,24 +40,9 @@ function setTransactionFields(transaction, input) {
       value = field.defaults;
     }
 
-    if (field.encoding === 'hex') {
-      // If the field is supposed to be hex, why don't we do a
-      //  toString('hex') on it?
-      if (field.length) {
-        // Field is fixed length, why are we checking here though?
-        // We could move this to validateInputs
-        if (value.length > field.length) {
-          throw new ValidationError('Parameter length exceeded: ' + fieldName);
-        } else if (value.length < field.length) {
-          value = _.padLeft(value, field.length);
-        }
-      } else {
-        // Field is variable length. Expecting an ascii string as input.
-        // This is currently only used for Domain field
-        value = new Buffer(value, 'ascii').toString('hex');
-      }
-
-      value = value.toUpperCase();
+    if (field.encoding === 'hex' && !field.length) {
+      // This is currently only used for Domain field
+      value = new Buffer(value, 'ascii').toString('hex').toUpperCase();
     }
 
     transaction.tx_json[fieldName] = value;
@@ -80,18 +63,14 @@ function setTransactionFields(transaction, input) {
  */
 
 function convertTransferRate(transferRate) {
-  if (_.isNumber(transferRate)) {
-    return transferRate * Math.pow(10, 9);
-  }
-
-  return transferRate;
+  return _.isNumber(transferRate) ? transferRate * 1e9 : transferRate;
 }
 
 function createSettingsTransaction(account, settings) {
   validate.address(account);
   validate.settings(settings);
 
-  const transaction = new ripple.Transaction();
+  const transaction = new utils.common.core.Transaction();
   if (settings.regularKey) {
     return transaction.setRegularKey({
       account: account,

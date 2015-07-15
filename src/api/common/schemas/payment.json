@@ -5,6 +5,7 @@
   "properties": {
     "source": {"$ref": "adjustment"},
     "destination": {"$ref": "adjustment"},
+    "paths": {"type": "string"},
     "slippage": {
       "description": "An optional cushion for the source_amount to increase the likelihood that the payment will succeed. The source_account will never be charged more than source_amount.value + source_slippage",
       "$ref": "value"
