@@ -44,7 +44,7 @@ A JavaScript API for interacting with Ripple in Node.js and the browser
   $ bower install ripple
 ```
 
-See the [bower-ripple repo](https://github.com/ripple/bower-ripple) for additional bower instructions
+See the [bower-ripple repo](https://github.com/ripple/bower-ripple) for additional bower instructions.
 
 
 **Building ripple-lib for browser environments**
