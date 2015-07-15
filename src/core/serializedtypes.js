@@ -257,7 +257,7 @@ function parse(so) {
   }
 
   const field_bits = tag_byte & 0x0f;
-  var field_name = (field_bits === 0)
+  const field_name = (field_bits === 0)
     ? binformat.fields[type_bits][so.read(1)[0]]
     : binformat.fields[type_bits][field_bits];
 
