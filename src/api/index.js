@@ -1,4 +1,5 @@
 'use strict';
+const _ = require('lodash');
 const ripple = require('./common').core;
 const server = require('./server/server');
 const connect = server.connect;
@@ -26,7 +27,8 @@ const generateWallet = require('./generate/wallet');
 const errors = require('./common').errors;
 
 function RippleAPI(options) {
-  this.remote = new ripple.Remote(options);
+  const _options = _.assign({}, options, {automatic_resubmission: false});
+  this.remote = new ripple.Remote(_options);
 }
 
 RippleAPI.prototype = {
