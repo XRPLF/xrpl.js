@@ -188,46 +188,39 @@ Ed25519Pair.prototype.verify = function(message, signature) {
 * @class
 * @private
 */
-function Secp256k1Pair(key) {
+function K256Pair(key) {
   KeyPair.apply(this, arguments);
   this.type = KeyType.secp256k1;
   this.key = key;
 }
 
-util.inherits(Secp256k1Pair, KeyPair);
+util.inherits(K256Pair, KeyPair);
 
-Secp256k1Pair.fromSeed = function(seed) {
-  return new Secp256k1Pair(secp256k1.keyFromPrivate(derivek256Secret(seed)));
+K256Pair.fromSeed = function(seed) {
+  return new K256Pair(secp256k1.keyFromPrivate(derivek256Secret(seed)));
 };
 
-hasCachedProperty(Secp256k1Pair, 'pubKeyCanonicalBytes', function() {
+hasCachedProperty(K256Pair, 'pubKeyCanonicalBytes', function() {
   return this.key.getPublic(/*compact*/ true, /*enc*/ 'bytes');
 });
 
 /*
 @param {Array<Byte>} message (bytes)
  */
-Secp256k1Pair.prototype.sign = function(message) {
+K256Pair.prototype.sign = function(message) {
   return this._createSignature(message).toDER();
 };
 
-Secp256k1Pair.prototype._createSignature = function(message) {
+K256Pair.prototype._createSignature = function(message) {
   // The key.sign message silently discards options
   return secp256k1.sign(this.hashMessage(message), this.key, {canonical: true});
 };
 
 /*
-@param {Array<Byte>} message (bytes)
+@param {Array<Byte>} message - (bytes)
+@return {Array<Byte>} - 256 bit hash of the message
  */
-Secp256k1Pair.prototype.signMessage = function(message) {
-  return this.key.sign(this.hashMessage(message), {canonical: true});
-};
-
-/*
-@param {Array<Byte>} message (bytes)
-@return {Array<Byte>} 256 bit hash of the message
- */
-Secp256k1Pair.prototype.hashMessage = function(message) {
+K256Pair.prototype.hashMessage = function(message) {
   return hashjs.sha512().update(message).digest().slice(0, 32);
 };
 
@@ -235,7 +228,7 @@ Secp256k1Pair.prototype.hashMessage = function(message) {
 @param {Array<Byte>} message - bytes
 @param {Array<Byte>} signature - DER encoded signature bytes
  */
-Secp256k1Pair.prototype.verify = function(message, signature) {
+K256Pair.prototype.verify = function(message, signature) {
   try {
     return this.key.verify(this.hashMessage(message), signature);
   } catch (e) {
@@ -243,10 +236,18 @@ Secp256k1Pair.prototype.verify = function(message, signature) {
   }
 };
 
+function keyPairFromSeed(seedString) {
+  var decoded = codec.decodeSeed(seedString);
+  var pair = decoded.type === 'EdSeed' ? Ed25519Pair : K256Pair;
+  return pair.fromSeed(decoded.bytes);
+}
+
 module.exports = {
-  Secp256k1Pair,
+  KeyPair,
+  K256Pair,
   Ed25519Pair,
   KeyType,
   seedFromPhrase,
-  createAccountID
+  createAccountID,
+  keyPairFromSeed
 };

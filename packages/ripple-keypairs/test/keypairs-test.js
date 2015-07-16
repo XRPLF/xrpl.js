@@ -2,7 +2,15 @@
 
 const assert = require('assert');
 const utils = require('../src/utils');
-const {KeyType, Secp256k1Pair, seedFromPhrase, Ed25519Pair} = require('../src');
+const keypairs = require('../src');
+
+const {
+  KeyType,
+  K256Pair,
+  seedFromPhrase,
+  Ed25519Pair,
+  keyPairFromSeed
+} = keypairs
 
 const {SerializedObject} = require('ripple-lib');
 const TX_HASH_PREFIX_SIGN = [0x53, 0x54, 0x58, 0x00];
@@ -68,7 +76,18 @@ describe('ED25519Pair', function() {
   });
 });
 
-describe('Secp256k1Pair', function() {
+describe('keyPairFromSeed', function() {
+  it('returns an Ed25519Pair from an ed25519 seed', function() {
+    const pair = keyPairFromSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2');
+    assert(pair instanceof Ed25519Pair);
+  });
+  it('returns a K256Pair from an secp256k1 (default) seed', function() {
+    const pair = keyPairFromSeed('sn259rEFXrQrWyx3Q7XneWcwV6dfL');
+    assert(pair instanceof K256Pair);
+  });
+});
+
+describe('K256Pair', function() {
   describe('generated tests', function() {
     /*eslint-disable max-len*/
     const expected = [
@@ -79,7 +98,7 @@ describe('Secp256k1Pair', function() {
       '3045022100998ABE378F4119D8BEE9843482C09F0D5CE5C6012921548182454C610C57A269022036BD8EB71235C4B2C67339DE6A59746B1F7E5975987B7AB99B313D124A69BB9F'
     ];
     /*eslint-enable max-len*/
-    const key = Secp256k1Pair.fromSeed(seedFromPhrase('niq'));
+    const key = K256Pair.fromSeed(seedFromPhrase('niq'));
     function test_factory(i) {
       it('can deterministically sign/verify message [' + i + ']', function() {
         const message = [i];

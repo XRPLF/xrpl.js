@@ -18,7 +18,7 @@
     "bn.js": "^3.0.1",
     "elliptic": "^5.0.0",
     "hash.js": "^1.0.3",
-    "ripple-address-codec": "^1.0.3"
+    "ripple-address-codec": "^1.1.0"
   },
   "devDependencies": {
     "assert-diff": "^1.0.1",
