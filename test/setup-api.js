@@ -1,7 +1,7 @@
 'use strict';
 const net = require('net');
 const RippleAPI = require('../src').RippleAPI;
-const fixtures = require('./fixtures/mock');
+const fixtures = require('./fixtures/api/rippled').misc;
 const createMockRippled = require('./mock-rippled');
 
 // using a free port instead of a constant port enables parallelization
