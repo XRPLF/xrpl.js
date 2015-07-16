@@ -1,9 +1,9 @@
 /* eslint-disable max-len */
 'use strict';
 const _ = require('lodash');
-const hashes = require('./hashes');
-const addresses = require('./addresses');
-const SerializedObject = require('../../src/core').SerializedObject;
+const hashes = require('../../hashes');
+const addresses = require('../../addresses');
+const SerializedObject = require('../../../../src/core').SerializedObject;
 
 module.exports = function(request, options={}) {
   _.defaults(options, {

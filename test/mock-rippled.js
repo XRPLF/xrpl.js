@@ -3,17 +3,9 @@ const _ = require('lodash');
 const assert = require('assert');
 const WebSocketServer = require('ws').Server;
 const EventEmitter2 = require('eventemitter2').EventEmitter2;
-const fixtures = require('./fixtures/mock');
+const fixtures = require('./fixtures/api/rippled');
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
-const accountOffersResponse = require('./fixtures/acct-offers-response');
-const bookOffers = require('./fixtures/book-offers-response');
-const accountSetTransactionResponse = require('./fixtures/account-set-tx.json');
-const offerCreateTransactionResponse =
-  require('./fixtures/rippled-responses/offer-create');
-const offerCancelTransactionResponse =
-  require('./fixtures/rippled-responses/offer-cancel');
-const paths = require('./fixtures/paths');
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';
@@ -73,7 +65,7 @@ module.exports = function(port) {
 
   mock.on('request_server_info', function(request, conn) {
     assert.strictEqual(request.command, 'server_info');
-    conn.send(fixtures.serverInfoResponse(request));
+    conn.send(fixtures.misc.serverInfoResponse(request));
   });
 
   mock.on('request_subscribe', function(request, conn) {
@@ -83,15 +75,15 @@ module.exports = function(port) {
     } else {
       assert.deepEqual(request.streams, ['ledger', 'server']);
     }
-    conn.send(fixtures.subscribeResponse(request));
+    conn.send(fixtures.misc.subscribeResponse(request));
   });
 
   mock.on('request_account_info', function(request, conn) {
     assert.strictEqual(request.command, 'account_info');
     if (request.account === addresses.ACCOUNT) {
-      conn.send(fixtures.accountInfoResponse(request));
+      conn.send(fixtures.misc.accountInfoResponse(request));
     } else if (request.account === addresses.NOTFOUND) {
-      conn.send(fixtures.accountNotFoundResponse(request));
+      conn.send(fixtures.misc.accountNotFoundResponse(request));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
@@ -99,27 +91,27 @@ module.exports = function(port) {
 
   mock.on('request_ledger', function(request, conn) {
     assert.strictEqual(request.command, 'ledger');
-    conn.send(fixtures.ledgerResponse(request));
+    conn.send(fixtures.misc.ledgerResponse(request));
   });
 
   mock.on('request_tx', function(request, conn) {
     assert.strictEqual(request.command, 'tx');
     if (request.transaction === hashes.VALID_TRANSACTION_HASH) {
-      conn.send(fixtures.transactionResponse(request));
+      conn.send(fixtures.misc.transactionResponse(request));
     } else if (request.transaction ===
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B') {
-      const transaction = accountSetTransactionResponse;
-      conn.send(fixtures.transactionResponse(request, transaction));
+      const transaction = fixtures.tx.AccountSet;
+      conn.send(fixtures.misc.transactionResponse(request, transaction));
     } else if (request.transaction ===
         '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51') {
-      const transaction = offerCreateTransactionResponse;
-      conn.send(fixtures.transactionResponse(request, transaction));
+      const transaction = fixtures.tx.OfferCreate;
+      conn.send(fixtures.misc.transactionResponse(request, transaction));
     } else if (request.transaction ===
         '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E') {
-      const transaction = offerCancelTransactionResponse;
-      conn.send(fixtures.transactionResponse(request, transaction));
+      const transaction = fixtures.tx.OfferCancel;
+      conn.send(fixtures.misc.transactionResponse(request, transaction));
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
-      conn.send(fixtures.transactionNotFoundResponse(request));
+      conn.send(fixtures.misc.transactionNotFoundResponse(request));
     } else {
       assert(false, 'Unrecognized transaction hash: ' + request.transaction);
     }
@@ -127,14 +119,14 @@ module.exports = function(port) {
 
   mock.on('request_submit', function(request, conn) {
     assert.strictEqual(request.command, 'submit');
-    conn.send(fixtures.submitResponse(request));
+    conn.send(fixtures.misc.submitResponse(request));
   });
 
   mock.on('request_account_lines', function(request, conn) {
     if (request.account === addresses.ACCOUNT) {
-      conn.send(fixtures.accountLinesResponse(request));
+      conn.send(fixtures.misc.accountLinesResponse(request));
     } else if (request.account === addresses.OTHER_ACCOUNT) {
-      conn.send(fixtures.accountLinesCounterpartyResponse(request));
+      conn.send(fixtures.misc.accountLinesCounterpartyResponse(request));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
@@ -142,7 +134,7 @@ module.exports = function(port) {
 
   mock.on('request_account_tx', function(request, conn) {
     if (request.account === addresses.ACCOUNT) {
-      conn.send(fixtures.accountTransactionsResponse(request));
+      conn.send(fixtures.misc.accountTransactionsResponse(request));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
@@ -150,7 +142,7 @@ module.exports = function(port) {
 
   mock.on('request_account_offers', function(request, conn) {
     if (request.account === addresses.ACCOUNT) {
-      conn.send(accountOffersResponse(request));
+      conn.send(fixtures.account_offers(request));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
@@ -159,18 +151,18 @@ module.exports = function(port) {
   mock.on('request_book_offers', function(request, conn) {
     if (isBTC(request.taker_gets.currency)
         && isUSD(request.taker_pays.currency)) {
-      conn.send(bookOffers.requestBookOffersBidsResponse(request));
+      conn.send(fixtures.book_offers.requestBookOffersBidsResponse(request));
     } else if (isUSD(request.taker_gets.currency)
         && isBTC(request.taker_pays.currency)) {
-      conn.send(bookOffers.requestBookOffersAsksResponse(request));
+      conn.send(fixtures.book_offers.requestBookOffersAsksResponse(request));
     } else {
       assert(false, 'Unrecognized order book: ' + JSON.stringify(request));
     }
   });
 
   mock.on('request_ripple_path_find', function(request, conn) {
-    const response = paths.generateIOUPaymentPaths(request.id,
-      request.source_account, request.destination_account,
+    const response = fixtures.ripple_path_find.generateIOUPaymentPaths(
+      request.id, request.source_account, request.destination_account,
       request.destination_amount);
     conn.send(response);
   });

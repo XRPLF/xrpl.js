@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 'use strict';
 const _ = require('lodash');
-const addresses = require('./addresses');
-const accountTransactionsResponse = require('./acct-tx-response');
+const addresses = require('../../addresses');
+const accountTransactionsResponse = require('./account-tx');
 const BASE_LEDGER_INDEX = 8819951;
 
 module.exports.accountTransactionsResponse = accountTransactionsResponse;

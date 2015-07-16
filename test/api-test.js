@@ -3,41 +3,13 @@
 const _ = require('lodash');
 const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
+const fixtures = require('./fixtures/api');
+const requests = fixtures.requests;
+const responses = fixtures.responses;
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
-const paymentSpecification = require('./fixtures/payment-specification');
-const paymentResponse = require('./fixtures/payment-response');
-const orderSpecification = require('./fixtures/order-specification');
-const orderResponse = require('./fixtures/order-response');
-const trustlineSpecification =
-  require('./fixtures/trustline-specification');
-const trustlineResponse = require('./fixtures/trustline-response');
-const balancesResponse = require('./fixtures/balances-response');
-const orderCancellationResponse =
-  require('./fixtures/ordercancellation-response');
-const settingsSpecification = require('./fixtures/settings-specification');
-const settingsResponse = require('./fixtures/settings-response');
-const getAccountInfoResponse = require('./fixtures/account-info-response');
-const regularKeyResponse = require('./fixtures/regular-key-response');
-const signInput = require('./fixtures/sign-input');
-const signOutput = require('./fixtures/sign-output');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
-const submitResponse = require('./fixtures/submit-response');
-const transactionResponse = require('./fixtures/transaction-response');
-const accountTransactionsResponse =
-  require('./fixtures/account-transactions-response');
-const trustlinesResponse = require('./fixtures/trustlines-response');
-const walletResponse = require('./fixtures/wallet.json');
-const getSettingsResponse = require('./fixtures/get-settings-response');
-const getOrdersResponse = require('./fixtures/get-orders-response');
-const getOrderbookResponse = require('./fixtures/get-orderbook-response');
-const getServerInfoResponse = require('./fixtures/get-server-info-response');
-const getPathsResponse = require('./fixtures/get-paths-response');
-const settingsTransactionResponse = require('./fixtures/settings-tx-response');
-const orderTransactionResponse = require('./fixtures/responses/order');
-const orderCancellationTransactionResponse =
-  require('./fixtures/responses/order-cancellation');
 const address = addresses.ACCOUNT;
 
 const orderbook = {
@@ -74,84 +46,84 @@ describe('RippleAPI', function() {
   afterEach(setupAPI.teardown);
 
   it('preparePayment', function(done) {
-    this.api.preparePayment(address, paymentSpecification, instructions,
-      _.partial(checkResult, paymentResponse, done));
+    this.api.preparePayment(address, requests.preparePayment, instructions,
+      _.partial(checkResult, responses.preparePayment, done));
   });
 
   it('prepareOrder', function(done) {
-    this.api.prepareOrder(address, orderSpecification, instructions,
-      _.partial(checkResult, orderResponse, done));
+    this.api.prepareOrder(address, requests.prepareOrder, instructions,
+      _.partial(checkResult, responses.prepareOrder, done));
   });
 
   it('prepareOrderCancellation', function(done) {
     this.api.prepareOrderCancellation(address, 23, instructions,
-      _.partial(checkResult, orderCancellationResponse, done));
+      _.partial(checkResult, responses.prepareOrderCancellation, done));
   });
 
   it('prepareTrustline', function(done) {
-    this.api.prepareTrustline(address, trustlineSpecification,
-      instructions, _.partial(checkResult, trustlineResponse, done));
+    this.api.prepareTrustline(address, requests.prepareTrustline,
+      instructions, _.partial(checkResult, responses.prepareTrustline, done));
   });
 
   it('prepareSettings', function(done) {
-    this.api.prepareSettings(address, settingsSpecification,
-      instructions, _.partial(checkResult, settingsResponse, done));
+    this.api.prepareSettings(address, requests.prepareSettings, instructions,
+      _.partial(checkResult, responses.prepareSettings.flags, done));
   });
 
   it('prepareSettings - regularKey', function(done) {
     const regularKey = {regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD'};
-    this.api.prepareSettings(address, regularKey,
-      instructions, _.partial(checkResult, regularKeyResponse, done));
+    this.api.prepareSettings(address, regularKey, instructions,
+      _.partial(checkResult, responses.prepareSettings.regularKey, done));
   });
 
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
     withDeterministicPRNG(() => {
-      const result = this.api.sign(signInput, secret);
-      assert.deepEqual(result, signOutput);
+      const result = this.api.sign(requests.sign, secret);
+      assert.deepEqual(result, responses.sign);
     });
   });
 
   it('submit', function(done) {
-    this.api.submit(signOutput.signedTransaction,
-      _.partial(checkResult, submitResponse, done));
+    this.api.submit(responses.sign.signedTransaction,
+      _.partial(checkResult, responses.submit, done));
   });
 
   it('getBalances', function(done) {
     this.api.getBalances(address, {},
-      _.partial(checkResult, balancesResponse, done));
+      _.partial(checkResult, responses.getBalances, done));
   });
 
-  it('getTransaction', function(done) {
+  it('getTransaction - payment', function(done) {
     this.api.getTransaction(hashes.VALID_TRANSACTION_HASH, {},
-      _.partial(checkResult, transactionResponse, done));
+      _.partial(checkResult, responses.getTransaction.payment, done));
   });
 
   it('getTransaction - settings', function(done) {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
     this.api.getTransaction(hash, {},
-      _.partial(checkResult, settingsTransactionResponse, done));
+      _.partial(checkResult, responses.getTransaction.settings, done));
   });
 
   it('getTransaction - order', function(done) {
     const hash =
       '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51';
     this.api.getTransaction(hash, {},
-      _.partial(checkResult, orderTransactionResponse, done));
+      _.partial(checkResult, responses.getTransaction.order, done));
   });
 
   it('getTransaction - order cancellation', function(done) {
     const hash =
       '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
     this.api.getTransaction(hash, {},
-      _.partial(checkResult, orderCancellationTransactionResponse, done));
+      _.partial(checkResult, responses.getTransaction.orderCancellation, done));
   });
 
   it('getTransactions', function(done) {
     const options = {types: ['payment', 'order'], outgoing: true, limit: 2};
     this.api.getTransactions(address, options,
-      _.partial(checkResult, accountTransactionsResponse, done));
+      _.partial(checkResult, responses.getTransactions, done));
   });
 
   // TODO: this doesn't test much, just that it doesn't crash
@@ -162,39 +134,39 @@ describe('RippleAPI', function() {
       limit: 2
     };
     this.api.getTransactions(address, options,
-      _.partial(checkResult, accountTransactionsResponse, done));
+      _.partial(checkResult, responses.getTransactions, done));
   });
 
   it('getTrustlines', function(done) {
     const options = {currency: 'USD'};
     this.api.getTrustlines(address, options,
-      _.partial(checkResult, trustlinesResponse, done));
+      _.partial(checkResult, responses.getTrustlines, done));
   });
 
   it('generateWallet', function() {
     withDeterministicPRNG(() => {
-      assert.deepEqual(this.api.generateWallet(), walletResponse);
+      assert.deepEqual(this.api.generateWallet(), responses.generateWallet);
     });
   });
 
   it('getSettings', function(done) {
     this.api.getSettings(address, {},
-      _.partial(checkResult, getSettingsResponse, done));
+      _.partial(checkResult, responses.getSettings, done));
   });
 
   it('getAccountInfo', function(done) {
     this.api.getAccountInfo(address, {},
-      _.partial(checkResult, getAccountInfoResponse, done));
+      _.partial(checkResult, responses.getAccountInfo, done));
   });
 
   it('getOrders', function(done) {
     this.api.getOrders(address, {},
-      _.partial(checkResult, getOrdersResponse, done));
+      _.partial(checkResult, responses.getOrders, done));
   });
 
   it('getOrderbook', function(done) {
     this.api.getOrderbook(address, orderbook, {},
-      _.partial(checkResult, getOrderbookResponse, done));
+      _.partial(checkResult, responses.getOrderbook, done));
   });
 
   it('getOrderbook - sorted so that best deals come first', function(done) {
@@ -235,7 +207,8 @@ describe('RippleAPI', function() {
   });
 
   it('getServerInfo', function(done) {
-    this.api.getServerInfo(_.partial(checkResult, getServerInfoResponse, done));
+    this.api.getServerInfo(
+      _.partial(checkResult, responses.getServerInfo, done));
   });
 
   it('getFee', function() {
@@ -265,7 +238,7 @@ describe('RippleAPI', function() {
       }
     };
     this.api.getPaths(pathfind,
-      _.partial(checkResult, getPathsResponse, done));
+      _.partial(checkResult, responses.getPaths, done));
   });
 
   it('getLedgerVersion', function() {

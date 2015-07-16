@@ -1,6 +1,6 @@
 'use strict';
 const _ = require('lodash');
-const addresses = require('./addresses');
+const addresses = require('../../addresses');
 
 module.exports = function(request, options={}) {
   _.defaults(options, {
