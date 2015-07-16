@@ -38,6 +38,15 @@ describe('Base', function() {
       assert(decoded.equals(1));
     });
   });
+  describe('decode_multi', function() {
+    it('can return the version', function() {
+      const seed = 'sEd7rBGm5kxzauRTAV2hbsNz7N45X91';
+      const versions = [Base.VER_ED25519_SEED, Base.VER_FAMILY_SEED];
+      const decoded = Base.decode_multi(versions, seed, 16);
+      assert.equal(16 * 8, decoded.value.bitLength());
+      assert.deepEqual(decoded.version, Base.VER_ED25519_SEED);
+    });
+  });
   describe('decode-encode identity', function() {
     it('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function() {
       const decoded = Base.decode('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
