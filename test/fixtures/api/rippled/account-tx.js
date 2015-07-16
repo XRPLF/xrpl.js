@@ -7,7 +7,12 @@ const SerializedObject = require('../../../../src/core').SerializedObject;
 
 module.exports = function(request, options={}) {
   _.defaults(options, {
-    memos: [],
+    memos: [{
+      Memo: {
+        MemoFormat: '7274312E352E32',
+        MemoType: '636C69656E74'
+      }
+    }],
     hash: hashes.VALID_TRANSACTION_HASH,
     validated: true
   });

@@ -6,6 +6,8 @@ const EventEmitter2 = require('eventemitter2').EventEmitter2;
 const fixtures = require('./fixtures/api/rippled');
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
+const transactionsResponse = require('./fixtures/api/rippled/account-tx');
+const accountLinesResponse = require('./fixtures/api/rippled/account-lines');
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';
@@ -13,6 +15,10 @@ function isUSD(json) {
 
 function isBTC(json) {
   return json === 'BTC' || json === '0000000000000000000000004254430000000000';
+}
+
+function createResponse(request, response) {
+  return JSON.stringify(_.assign({}, response, {id: request.id}));
 }
 
 module.exports = function(port) {
@@ -65,7 +71,7 @@ module.exports = function(port) {
 
   mock.on('request_server_info', function(request, conn) {
     assert.strictEqual(request.command, 'server_info');
-    conn.send(fixtures.misc.serverInfoResponse(request));
+    conn.send(createResponse(request, fixtures.server_info));
   });
 
   mock.on('request_subscribe', function(request, conn) {
@@ -75,15 +81,15 @@ module.exports = function(port) {
     } else {
       assert.deepEqual(request.streams, ['ledger', 'server']);
     }
-    conn.send(fixtures.misc.subscribeResponse(request));
+    conn.send(createResponse(request, fixtures.subscribe));
   });
 
   mock.on('request_account_info', function(request, conn) {
     assert.strictEqual(request.command, 'account_info');
     if (request.account === addresses.ACCOUNT) {
-      conn.send(fixtures.misc.accountInfoResponse(request));
+      conn.send(createResponse(request, fixtures.account_info.normal));
     } else if (request.account === addresses.NOTFOUND) {
-      conn.send(fixtures.misc.accountNotFoundResponse(request));
+      conn.send(createResponse(request, fixtures.account_info.notfound));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
@@ -91,31 +97,27 @@ module.exports = function(port) {
 
   mock.on('request_ledger', function(request, conn) {
     assert.strictEqual(request.command, 'ledger');
-    conn.send(fixtures.misc.ledgerResponse(request));
+    conn.send(createResponse(request, fixtures.ledger));
   });
 
   mock.on('request_tx', function(request, conn) {
     assert.strictEqual(request.command, 'tx');
     if (request.transaction === hashes.VALID_TRANSACTION_HASH) {
-      conn.send(fixtures.misc.transactionResponse(request));
+      conn.send(createResponse(request, fixtures.tx.Payment));
     } else if (request.transaction ===
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B') {
-      const transaction = fixtures.tx.AccountSet;
-      conn.send(fixtures.misc.transactionResponse(request, transaction));
+      conn.send(createResponse(request, fixtures.tx.AccountSet));
     } else if (request.transaction ===
         '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51') {
-      const transaction = fixtures.tx.OfferCreate;
-      conn.send(fixtures.misc.transactionResponse(request, transaction));
+      conn.send(createResponse(request, fixtures.tx.OfferCreate));
     } else if (request.transaction ===
         '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E') {
-      const transaction = fixtures.tx.OfferCancel;
-      conn.send(fixtures.misc.transactionResponse(request, transaction));
+      conn.send(createResponse(request, fixtures.tx.OfferCancel));
     } else if (request.transaction ===
         '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D') {
-      const transaction = fixtures.tx.TrustSet;
-      conn.send(fixtures.misc.transactionResponse(request, transaction));
+      conn.send(createResponse(request, fixtures.tx.TrustSet));
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
-      conn.send(fixtures.misc.transactionNotFoundResponse(request));
+      conn.send(createResponse(request, fixtures.tx.NotFound));
     } else {
       assert(false, 'Unrecognized transaction hash: ' + request.transaction);
     }
@@ -123,14 +125,14 @@ module.exports = function(port) {
 
   mock.on('request_submit', function(request, conn) {
     assert.strictEqual(request.command, 'submit');
-    conn.send(fixtures.misc.submitResponse(request));
+    conn.send(createResponse(request, fixtures.submit));
   });
 
   mock.on('request_account_lines', function(request, conn) {
     if (request.account === addresses.ACCOUNT) {
-      conn.send(fixtures.misc.accountLinesResponse(request));
+      conn.send(accountLinesResponse.normal(request));
     } else if (request.account === addresses.OTHER_ACCOUNT) {
-      conn.send(fixtures.misc.accountLinesCounterpartyResponse(request));
+      conn.send(accountLinesResponse.counterparty(request));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
@@ -138,15 +140,7 @@ module.exports = function(port) {
 
   mock.on('request_account_tx', function(request, conn) {
     if (request.account === addresses.ACCOUNT) {
-      const options = {
-        memos: [{
-          Memo: {
-            MemoFormat: '7274312E352E32',
-            MemoType: '636C69656E74'
-          }
-        }]
-      };
-      conn.send(fixtures.misc.accountTransactionsResponse(request, options));
+      conn.send(transactionsResponse(request));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
