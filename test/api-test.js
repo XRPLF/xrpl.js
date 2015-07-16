@@ -16,6 +16,7 @@ const orderCancellationResponse =
   require('./fixtures/ordercancellation-response');
 const settingsSpecification = require('./fixtures/settings-specification');
 const settingsResponse = require('./fixtures/settings-response');
+const getAccountInfoResponse = require('./fixtures/account-info-response');
 const regularKeyResponse = require('./fixtures/regular-key-response');
 const signInput = require('./fixtures/sign-input');
 const signOutput = require('./fixtures/sign-output');
@@ -161,6 +162,11 @@ describe('RippleAPI', function() {
   it('getSettings', function(done) {
     this.api.getSettings(address, {},
       _.partial(checkResult, getSettingsResponse, done));
+  });
+
+  it('getAccountInfo', function(done) {
+    this.api.getAccountInfo(address, {},
+      _.partial(checkResult, getAccountInfoResponse, done));
   });
 
   it('getOrders', function(done) {

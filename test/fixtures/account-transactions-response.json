@@ -2,6 +2,7 @@
   {
     "type": "payment",
     "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+    "sequence": 4,
     "id": "4C37C92576DEB000D13B07F4D3F99F968BD86B6B83A840BEFFB2BFC8A042A81B",
     "specification": {
       "source": {
@@ -80,14 +81,14 @@
         ]
       },
       "ledgerVersion": 348860,
-      "indexInLedger": 0,
-      "sequence": 4
+      "indexInLedger": 0
     }
   },
   {
     "type": "payment",
     "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
     "id": "4C37C92576DEB000D13B07F4D3F99F968BD86B6B83A840BEFFB2BFC8A042A81B",
+    "sequence": 4,
     "specification": {
       "source": {
         "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
@@ -165,8 +166,7 @@
         ]
       },
       "ledgerVersion": 348860,
-      "indexInLedger": 0,
-      "sequence": 4
+      "indexInLedger": 0
     }
   }
 ]
