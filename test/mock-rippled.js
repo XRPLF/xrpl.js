@@ -9,6 +9,10 @@ const hashes = require('./fixtures/hashes');
 const accountOffersResponse = require('./fixtures/acct-offers-response');
 const bookOffers = require('./fixtures/book-offers-response');
 const accountSetTransactionResponse = require('./fixtures/account-set-tx.json');
+const offerCreateTransactionResponse =
+  require('./fixtures/rippled-responses/offer-create');
+const offerCancelTransactionResponse =
+  require('./fixtures/rippled-responses/offer-cancel');
 const paths = require('./fixtures/paths');
 
 function isUSD(json) {
@@ -105,6 +109,14 @@ module.exports = function(port) {
     } else if (request.transaction ===
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B') {
       const transaction = accountSetTransactionResponse;
+      conn.send(fixtures.transactionResponse(request, transaction));
+    } else if (request.transaction ===
+        '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51') {
+      const transaction = offerCreateTransactionResponse;
+      conn.send(fixtures.transactionResponse(request, transaction));
+    } else if (request.transaction ===
+        '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E') {
+      const transaction = offerCancelTransactionResponse;
       conn.send(fixtures.transactionResponse(request, transaction));
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
       conn.send(fixtures.transactionNotFoundResponse(request));

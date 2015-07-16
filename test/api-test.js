@@ -1,3 +1,4 @@
+/* eslint-disable max-nested-callbacks */
 'use strict';
 const _ = require('lodash');
 const assert = require('assert-diff');
@@ -34,6 +35,9 @@ const getOrderbookResponse = require('./fixtures/get-orderbook-response');
 const getServerInfoResponse = require('./fixtures/get-server-info-response');
 const getPathsResponse = require('./fixtures/get-paths-response');
 const settingsTransactionResponse = require('./fixtures/settings-tx-response');
+const orderTransactionResponse = require('./fixtures/responses/order');
+const orderCancellationTransactionResponse =
+  require('./fixtures/responses/order-cancellation');
 const address = addresses.ACCOUNT;
 
 const orderbook = {
@@ -128,6 +132,20 @@ describe('RippleAPI', function() {
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
     this.api.getTransaction(hash, {},
       _.partial(checkResult, settingsTransactionResponse, done));
+  });
+
+  it('getTransaction - order', function(done) {
+    const hash =
+      '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51';
+    this.api.getTransaction(hash, {},
+      _.partial(checkResult, orderTransactionResponse, done));
+  });
+
+  it('getTransaction - order cancellation', function(done) {
+    const hash =
+      '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
+    this.api.getTransaction(hash, {},
+      _.partial(checkResult, orderCancellationTransactionResponse, done));
   });
 
   it('getTransactions', function(done) {
