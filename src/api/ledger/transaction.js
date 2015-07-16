@@ -20,7 +20,7 @@ function attachTransactionDate(remote, tx, callback) {
     if (error) {
       callback(new errors.NotFoundError('Transaction ledger not found'));
     } else if (typeof data.ledger.close_time === 'number') {
-      callback(null, _.assign({date: data.ledger.close_time, tx}));
+      callback(null, _.assign({date: data.ledger.close_time}, tx));
     } else {
       callback(new errors.ApiError('Ledger missing close_time'));
     }
