@@ -1,12 +1,12 @@
 {
   "name": "ripple-address-codec",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "encodes/decodes base58 encoded ripple identifiers",
   "main": "index.js",
   "license": "ISC",
   "dependencies": {
     "hash.js": "^1.0.3",
-    "x-address-codec": "^0.3.1"
+    "x-address-codec": "^0.3.2"
   },
   "scripts": {
     "test": "mocha test/*-test.js"
