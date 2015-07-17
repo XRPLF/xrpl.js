@@ -17,7 +17,13 @@ function parsePaymentMemos(tx) {
   if (!Array.isArray(tx.Memos) || tx.Memos.length === 0) {
     return undefined;
   }
-  return tx.Memos.map((m) => m.Memo);
+  return tx.Memos.map((m) => {
+    return utils.removeUndefined({
+      type: m.Memo.parsed_memo_type,
+      format: m.Memo.parsed_memo_format,
+      data: m.Memo.parsed_memo_data
+    });
+  });
 }
 
 function parsePayment(tx: Object): Object {

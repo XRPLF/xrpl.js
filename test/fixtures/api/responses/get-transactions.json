@@ -3,8 +3,14 @@
     "type": "payment",
     "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
     "sequence": 4,
-    "id": "4C37C92576DEB000D13B07F4D3F99F968BD86B6B83A840BEFFB2BFC8A042A81B",
+    "id": "99404A34E8170319521223A6C604AF48B9F1E3000C377E6141F9A1BF60B0B865",
     "specification": {
+      "memos": [
+        {
+          "type": "client",
+          "format": "rt1.5.2"
+        }
+      ],
       "source": {
         "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
         "amount": {
@@ -87,9 +93,15 @@
   {
     "type": "payment",
     "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-    "id": "4C37C92576DEB000D13B07F4D3F99F968BD86B6B83A840BEFFB2BFC8A042A81B",
+    "id": "99404A34E8170319521223A6C604AF48B9F1E3000C377E6141F9A1BF60B0B865",
     "sequence": 4,
     "specification": {
+      "memos": [
+        {
+          "type": "client",
+          "format": "rt1.5.2"
+        }
+      ],
       "source": {
         "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
         "amount": {

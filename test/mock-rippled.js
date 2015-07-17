@@ -134,7 +134,15 @@ module.exports = function(port) {
 
   mock.on('request_account_tx', function(request, conn) {
     if (request.account === addresses.ACCOUNT) {
-      conn.send(fixtures.misc.accountTransactionsResponse(request));
+      const options = {
+        memos: [{
+          Memo: {
+            MemoFormat: '7274312E352E32',
+            MemoType: '636C69656E74'
+          }
+        }]
+      };
+      conn.send(fixtures.misc.accountTransactionsResponse(request, options));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
