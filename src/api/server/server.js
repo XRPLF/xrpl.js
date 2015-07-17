@@ -23,11 +23,11 @@ function isConnected() {
 }
 
 function getServerInfo(callback) {
-  this.remote.requestServerInfo((error, info) => {
+  this.remote.requestServerInfo((error, response) => {
     if (error) {
       callback(new common.errors.RippledNetworkError(error.message));
     } else {
-      callback(null, info);
+      callback(null, response.info);
     }
   });
 }
