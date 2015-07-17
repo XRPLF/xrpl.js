@@ -13,6 +13,10 @@ function isNoDirectRipple(tx) {
   return (tx.Flags & Transaction.flags.Payment.NoRippleDirect) !== 0;
 }
 
+function isQualityLimited(tx) {
+  return (tx.Flags & Transaction.flags.Payment.LimitQuality) !== 0;
+}
+
 function parsePaymentMemos(tx) {
   if (!Array.isArray(tx.Memos) || tx.Memos.length === 0) {
     return undefined;
@@ -48,7 +52,8 @@ function parsePayment(tx: Object): Object {
     invoiceID: tx.InvoiceID,
     paths: tx.Paths ? JSON.stringify(tx.Paths) : undefined,
     allowPartialPayment: isPartialPayment(tx) || undefined,
-    noDirectRipple: isNoDirectRipple(tx) || undefined
+    noDirectRipple: isNoDirectRipple(tx) || undefined,
+    limitQuality: isQualityLimited(tx) || undefined
   });
 }
 

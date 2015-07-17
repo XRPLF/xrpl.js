@@ -71,6 +71,9 @@ function createPaymentTransaction(account, payment) {
   if (payment.noDirectRipple) {
     transaction.setFlags(['NoRippleDirect']);
   }
+  if (payment.limitQuality) {
+    transaction.setFlags(['LimitQuality']);
+  }
   if (isSendMaxAllowed(payment)) {
     const maxValue = new BigNumber(payment.source.amount.value)
       .plus(payment.source.slippage || 0).toString();
