@@ -9,6 +9,7 @@ module.exports = {
   tx: {
     AccountSet: require('./tx/account-set.json'),
     OfferCreate: require('./tx/offer-create.json'),
-    OfferCancel: require('./tx/offer-cancel.json')
+    OfferCancel: require('./tx/offer-cancel.json'),
+    TrustSet: require('./tx/trust-set.json')
   }
 };

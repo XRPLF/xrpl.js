@@ -110,6 +110,10 @@ module.exports = function(port) {
         '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E') {
       const transaction = fixtures.tx.OfferCancel;
       conn.send(fixtures.misc.transactionResponse(request, transaction));
+    } else if (request.transaction ===
+        '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D') {
+      const transaction = fixtures.tx.TrustSet;
+      conn.send(fixtures.misc.transactionResponse(request, transaction));
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
       conn.send(fixtures.misc.transactionNotFoundResponse(request));
     } else {

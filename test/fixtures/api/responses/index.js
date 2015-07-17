@@ -13,7 +13,8 @@ module.exports = {
     orderCancellation: require('./get-transaction-order-cancellation.json'),
     order: require('./get-transaction-order.json'),
     payment: require('./get-transaction-payment.json'),
-    settings: require('./get-transaction-settings.json')
+    settings: require('./get-transaction-settings.json'),
+    trustline: require('./get-transaction-trustline-set.json')
   },
   getTransactions: require('./get-transactions.json'),
   getTrustlines: require('./get-trustlines.json'),

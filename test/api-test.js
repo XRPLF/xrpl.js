@@ -120,6 +120,13 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getTransaction.orderCancellation, done));
   });
 
+  it('getTransaction - trustline set', function(done) {
+    const hash =
+      '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D';
+    this.api.getTransaction(hash, {},
+      _.partial(checkResult, responses.getTransaction.trustline, done));
+  });
+
   it('getTransactions', function(done) {
     const options = {types: ['payment', 'order'], outgoing: true, limit: 2};
     this.api.getTransactions(address, options,
