@@ -34,7 +34,7 @@
     "map-stream": "~0.1.0",
     "mocha": "~2.1.0",
     "nock": "^0.34.1",
-    "ripple-lib": "ripple/ripple-lib#8d98e443c5302a87d70410d834758099595d46df",
+    "ripple-lib": "^0.12.4",
     "webpack": "~1.5.3",
     "yargs": "~1.3.1"
   },
