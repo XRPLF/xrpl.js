@@ -10,7 +10,7 @@ const {
   seedFromPhrase,
   Ed25519Pair,
   keyPairFromSeed
-} = keypairs
+} = keypairs;
 
 const {SerializedObject} = require('ripple-lib');
 const TX_HASH_PREFIX_SIGN = [0x53, 0x54, 0x58, 0x00];

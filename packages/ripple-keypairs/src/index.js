@@ -15,7 +15,7 @@ const {
   bytesToHex,
   hasCachedProperty,
   isVirtual,
-  Sha512,
+  Sha512
 } = require('./utils');
 
 /* ---------------------------------- ENUMS --------------------------------- */
@@ -52,15 +52,6 @@ function findk256Key(bytes, discrim) {
 
 /* eslint-disable valid-jsdoc */
 
-function compressedPoint(p) {
-  const x = p.getX().toArray();
-  const y = p.getY();
-  while (x.length < 32) {
-    x.unshift(0);
-  }
-  return [y.isEven() ? 0x02 : 0x03].concat(x);
-}
-
 /**
 * @param {Object} [options] -
 * @param {Number} [options.accountIndex=0] - the account number to generate
@@ -86,7 +77,7 @@ function derivek256Secret(seed, opts={}) {
   // A seed can generate many keypairs as a function of the seed and a uint32.
   // Almost everyone just uses the first account, `0`.
   const accountIndex = opts.accountIndex || 0;
-  return findk256Key(compressedPoint(publicGen), accountIndex)
+  return findk256Key(publicGen.encodeCompressed(), accountIndex)
             .add(privateGen).mod(order);
 }
 
@@ -237,8 +228,8 @@ K256Pair.prototype.verify = function(message, signature) {
 };
 
 function keyPairFromSeed(seedString) {
-  var decoded = codec.decodeSeed(seedString);
-  var pair = decoded.type === 'EdSeed' ? Ed25519Pair : K256Pair;
+  const decoded = codec.decodeSeed(seedString);
+  const pair = decoded.type === 'EdSeed' ? Ed25519Pair : K256Pair;
   return pair.fromSeed(decoded.bytes);
 }
 
