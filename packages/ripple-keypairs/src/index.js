@@ -229,7 +229,7 @@ K256Pair.prototype.verify = function(message, signature) {
 
 function keyPairFromSeed(seedString) {
   const decoded = codec.decodeSeed(seedString);
-  const pair = decoded.type === 'EdSeed' ? Ed25519Pair : K256Pair;
+  const pair = decoded.type === 'ed25519' ? Ed25519Pair : K256Pair;
   return pair.fromSeed(decoded.bytes);
 }
 
