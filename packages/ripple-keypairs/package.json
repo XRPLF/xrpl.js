@@ -15,10 +15,10 @@
   },
   "dependencies": {
     "babel-runtime": "^5.3.2",
-    "bn.js": "^3.0.1",
-    "elliptic": "^5.0.0",
+    "bn.js": "^3.1.1",
+    "elliptic": "^5.1.0",
     "hash.js": "^1.0.3",
-    "ripple-address-codec": "^1.1.0"
+    "ripple-address-codec": "^1.2.2"
   },
   "devDependencies": {
     "assert-diff": "^1.0.1",
