@@ -1,15 +1,18 @@
 'use strict';
 
-const assert = require('assert');
+const assert = require('assert-diff');
 const utils = require('../src/utils');
 const keypairs = require('../src');
+const _ = require('lodash');
 
 const {
   KeyType,
   K256Pair,
   seedFromPhrase,
   Ed25519Pair,
-  keyPairFromSeed
+  keyPairFromSeed,
+  generateWallet,
+  walletFromSeed
 } = keypairs;
 
 const {SerializedObject} = require('ripple-lib');
@@ -84,6 +87,37 @@ describe('keyPairFromSeed', function() {
   it('returns a K256Pair from an secp256k1 (default) seed', function() {
     const pair = keyPairFromSeed('sn259rEFXrQrWyx3Q7XneWcwV6dfL');
     assert(pair instanceof K256Pair);
+  });
+});
+
+describe('generateWallet', function() {
+  function randGen(len) {
+    return _.fill(Array(len), 0);
+  }
+
+  it('can generate ed25519 wallets', function() {
+    const expected = {
+      seed: 'sEdSJHS4oiAdz7w2X2ni1gFiqtbJHqE',
+      accountID: 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
+      publicKey:
+        'ED' +
+        '1A7C082846CFF58FF9A892BA4BA2593151CCF1DBA59F37714CC9ED39824AF85F'
+    };
+    const actual = generateWallet({type: 'ed25519', randGen});
+    assert.deepEqual(actual, expected);
+    assert.deepEqual(walletFromSeed(actual.seed), expected);
+  });
+  it('can generate secp256k1 wallets (by default)', function() {
+    const expected = {
+      seed: 'sp6JS7f14BuwFY8Mw6bTtLKWauoUs',
+      accountID: 'rGCkuB7PBr5tNy68tPEABEtcdno4hE6Y7f',
+      publicKey:
+        '03' +
+        '90A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284'
+    };
+    const actual = generateWallet({type: undefined, randGen});
+    assert.deepEqual(actual, expected);
+    assert.deepEqual(walletFromSeed(actual.seed), expected);
   });
 });
 

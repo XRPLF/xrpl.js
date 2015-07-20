@@ -3,9 +3,11 @@
 /* -------------------------------- REQUIRES -------------------------------- */
 
 const util = require('util');
+const assert = require('assert');
 const elliptic = require('elliptic');
 const hashjs = require('hash.js');
 const codec = require('ripple-address-codec');
+const rand = require('brorand');
 
 // elliptic
 const secp256k1 = elliptic.ec('secp256k1');
@@ -233,6 +235,37 @@ function keyPairFromSeed(seedString) {
   return pair.fromSeed(decoded.bytes);
 }
 
+function deriveWallet(type, seedBytes) {
+  assert(type === 'secp256k1' || type === 'ed25519');
+
+  let pair;
+  let seed;
+
+  if (type === 'secp256k1') {
+    seed = codec.encodeK256Seed(seedBytes);
+    pair = K256Pair.fromSeed(seedBytes);
+  } else {
+    seed = codec.encodeEdSeed(seedBytes);
+    pair = Ed25519Pair.fromSeed(seedBytes);
+  }
+
+  return {
+    seed,
+    accountID: pair.accountID(),
+    publicKey: pair.pubKeyHex()
+  };
+}
+
+function generateWallet({type='secp256k1', randGen=rand}) {
+  const seedBytes = randGen(16);
+  return deriveWallet(type, seedBytes);
+}
+
+function walletFromSeed(seed) {
+  const {type, bytes} = codec.decodeSeed(seed);
+  return deriveWallet(type, bytes);
+}
+
 module.exports = {
   KeyPair,
   K256Pair,
@@ -240,5 +273,7 @@ module.exports = {
   KeyType,
   seedFromPhrase,
   createAccountID,
-  keyPairFromSeed
+  keyPairFromSeed,
+  generateWallet,
+  walletFromSeed
 };
