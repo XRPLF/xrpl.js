@@ -62,9 +62,9 @@ function OrderBook(remote,
   this._ownerFunds = {};
   this._ownerOffersTotal = {};
 
-  // We consider ourselves synchronized if we have a current
+  // We consider ourselves synced if we have a current
   // copy of the offers, we are online and subscribed to updates
-  this._synchronized = false;
+  this._synced = false;
 
   // Transfer rate of the taker gets currency issuer
   this._issuerTransferRate = null;
@@ -278,7 +278,6 @@ OrderBook.prototype.requestOffers = function(callback=function() {}) {
     }
 
     self.setOffers(res.offers);
-    self._synchronized = true;
     self.notifyDirectOffersChanged();
 
     callback(null, self._offers);
@@ -293,7 +292,8 @@ OrderBook.prototype.requestOffers = function(callback=function() {}) {
     callback(err);
   }
 
-  const request = this._remote.requestBookOffers(this.toJSON());
+  const requestOptions = _.merge({}, this.toJSON(), {ledger: 'validated'});
+  const request = this._remote.requestBookOffers(requestOptions);
   request.once('success', handleOffers);
   request.once('error', handleError);
   request.request();
@@ -408,7 +408,7 @@ OrderBook.prototype.resetCache = function() {
   this._ownerFunds = {};
   this._ownerOffersTotal = {};
   this._offerCounts = {};
-  this._synchronized = false;
+  this._synced = false;
 };
 
 /**
@@ -754,9 +754,15 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
       log.info('waiting for transfer rate');
     }
 
-    this.requestTransferRate(function() {
-      // Defer until transfer rate is requested
-      self.updateFundedAmounts(transaction);
+    this.requestTransferRate(function(err) {
+      if (err) {
+        log.error(
+          'Failed to request transfer rate, will not update funded amounts: '
+          + err.toString());
+      } else {
+        // Defer until transfer rate is requested
+        self.updateFundedAmounts(transaction);
+      }
     });
     return;
   }
@@ -842,7 +848,7 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
 OrderBook.prototype.notify = function(transaction) {
   const self = this;
 
-  if (!this._subscribed) {
+  if (!(this._subscribed && this._synced)) {
     return;
   }
 
@@ -1083,6 +1089,7 @@ OrderBook.prototype.setOffers = function(offers) {
   });
 
   this._offers = newOffers;
+  this._synced = true;
 };
 
 /**
@@ -1101,7 +1108,7 @@ OrderBook.prototype.offers =
 OrderBook.prototype.getOffers = function(callback) {
   assert.strictEqual(typeof callback, 'function', 'Callback missing');
 
-  if (this._synchronized) {
+  if (this._synced) {
     callback(null, this._offers);
   } else {
     this.once('model', function(m) {
