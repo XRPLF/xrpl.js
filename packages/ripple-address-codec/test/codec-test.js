@@ -33,10 +33,10 @@ describe('ripple-address-codec', function() {
   it('can decode arbitray seeds', function() {
     var decoded = api.decodeSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2');
     assert.equal(toHex(decoded.bytes), '4C3A1D213FBDFB14C7C28D609469B341');
-    assert.equal(decoded.type, 'EdSeed');
+    assert.equal(decoded.type, 'ed25519');
 
     var decoded = api.decodeSeed('sn259rEFXrQrWyx3Q7XneWcwV6dfL');
     assert.equal(toHex(decoded.bytes), 'CF2DE378FBDD7E2EE87D486DFB5A7BFF');
-    assert.equal(decoded.type, 'K256Seed');
+    assert.equal(decoded.type, 'secp256k1');
   });
 });

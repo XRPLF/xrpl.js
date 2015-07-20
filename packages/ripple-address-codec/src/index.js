@@ -18,7 +18,7 @@ module.exports = apiFactory({
       version: ED25519_SEED
     },
     Seed: {
-      versionTypes: ['EdSeed', 'K256Seed'],
+      versionTypes: ['ed25519', 'secp256k1'],
       versions: [ED25519_SEED, FAMILY_SEED],
       expectedLength: 16
     },
