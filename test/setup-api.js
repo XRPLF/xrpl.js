@@ -1,7 +1,7 @@
 'use strict';
 const net = require('net');
 const RippleAPI = require('../src').RippleAPI;
-const fixtures = require('./fixtures/api/rippled').misc;
+const ledgerClosed = require('./fixtures/api/rippled/ledger-close');
 const createMockRippled = require('./mock-rippled');
 
 // using a free port instead of a constant port enables parallelization
@@ -26,8 +26,7 @@ function setupMockRippledConnection(testcase, port, done) {
   testcase.api = new RippleAPI({servers: ['ws://localhost:' + port]});
   testcase.api.connect(() => {
     testcase.api.remote.getServer().once('ledger_closed', () => done());
-    testcase.api.remote.getServer().emit('message',
-      JSON.parse(fixtures.ledgerClose(0)));
+    testcase.api.remote.getServer().emit('message', ledgerClosed);
   });
 }
 
