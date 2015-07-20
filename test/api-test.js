@@ -128,7 +128,7 @@ describe('RippleAPI', function() {
   });
 
   it('getTransactions', function(done) {
-    const options = {types: ['payment', 'order'], outgoing: true, limit: 2};
+    const options = {types: ['payment', 'order'], initiated: true, limit: 2};
     this.api.getTransactions(address, options,
       _.partial(checkResult, responses.getTransactions, done));
   });

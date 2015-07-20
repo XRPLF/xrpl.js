@@ -20,10 +20,10 @@ function transactionFilter(address, filters, tx) {
   if (filters.types && !_.includes(filters.types, tx.type)) {
     return false;
   }
-  if (filters.outgoing && tx.address !== address) {
+  if (filters.initiated === true && tx.address !== address) {
     return false;
   }
-  if (filters.incoming && tx.address === address) {
+  if (filters.initiated === false && tx.address === address) {
     return false;
   }
   if (filters.counterparty && tx.address !== filters.counterparty
