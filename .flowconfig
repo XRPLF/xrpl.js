@@ -3,6 +3,7 @@
 .*/src/core/.*
 .*/dist/.*
 .*/test/fixtures/.*
+.*/node_modules/flow-bin/.*
 
 [include]
 ./node_modules/

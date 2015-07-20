@@ -32,11 +32,13 @@
     "assert-diff": "^1.0.1",
     "babel": "^5.5.4",
     "babel-core": "^5.5.4",
-    "babel-eslint": "^3.1.20",
+    "babel-eslint": "^3.1.23",
     "babel-loader": "^5.0.0",
     "coveralls": "~2.10.0",
     "eslint": "^0.24.0",
+    "eslint-plugin-flowtype": "^1.0.0",
     "eventemitter2": "^0.4.14",
+    "flow-bin": "^0.13.1",
     "gulp": "~3.8.10",
     "gulp-bump": "~0.1.13",
     "gulp-rename": "~1.2.0",
@@ -55,7 +57,7 @@
     "prepublish": "npm run clean && npm run compile",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; echo 'parser: babel-eslint' >> eslintrc; fi; eslint --reset -c eslintrc src/",
+    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; echo 'plugins:\n  - flowtype' >> eslintrc; fi; eslint --reset -c eslintrc src/",
     "perf": "./scripts/perf_test.sh"
   },
   "repository": {
