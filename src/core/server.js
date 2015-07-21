@@ -437,7 +437,7 @@ Server.prototype.connect = function() {
     log.info(this.getServerID(), 'connect');
   }
 
-  if (this._remote.hasOwnProperty('proxy')) {
+  if (this._remote.proxy !== undefined) {
     const parsed = url.parse(this._opts.url);
     const opts = url.parse(this._remote.proxy);
     opts.secureEndpoint = parsed.protocol === 'wss:';
