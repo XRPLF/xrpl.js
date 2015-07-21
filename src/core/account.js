@@ -1,3 +1,4 @@
+'use strict';
 // Routines for working with an account.
 //
 // You should not instantiate this class yourself, instead use Remote#account.
@@ -9,16 +10,15 @@
 //   balance_proposed
 //
 
-// var network = require('./network.js');
-var async              = require('async');
-var util               = require('util');
-var extend             = require('extend');
-var EventEmitter       = require('events').EventEmitter;
-var Amount             = require('./amount').Amount;
-var UInt160            = require('./uint160').UInt160;
-var TransactionManager = require('./transactionmanager').TransactionManager;
-var sjcl               = require('./utils').sjcl;
-var Base               = require('./base').Base;
+const _ = require('lodash');
+const async = require('async');
+const util = require('util');
+const extend = require('extend');
+const EventEmitter = require('events').EventEmitter;
+const UInt160 = require('./uint160').UInt160;
+const TransactionManager = require('./transactionmanager').TransactionManager;
+const sjcl = require('./utils').sjcl;
+const Base = require('./base').Base;
 
 /**
  * @constructor Account
@@ -29,7 +29,7 @@ var Base               = require('./base').Base;
 function Account(remote, account) {
   EventEmitter.call(this);
 
-  var self = this;
+  const self = this;
 
   this._remote = remote;
   this._account = UInt160.from_json(account);
@@ -40,29 +40,29 @@ function Account(remote, account) {
   // Important: This must never be overwritten, only extend()-ed
   this._entry = { };
 
-  function listenerAdded(type, listener) {
+  function listenerAdded(type) {
     if (~Account.subscribeEvents.indexOf(type)) {
       if (!self._subs && self._remote._connected) {
-        self._remote.request_subscribe()
-        .add_account(self._account_id)
+        self._remote.requestSubscribe()
+        .addAccount(self._account_id)
         .broadcast().request();
       }
       self._subs += 1;
     }
-  };
+  }
 
   this.on('newListener', listenerAdded);
 
-  function listenerRemoved(type, listener) {
+  function listenerRemoved(type) {
     if (~Account.subscribeEvents.indexOf(type)) {
       self._subs -= 1;
       if (!self._subs && self._remote._connected) {
-        self._remote.request_unsubscribe()
-        .add_account(self._account_id)
+        self._remote.requestUnsubscribe()
+        .addAccount(self._account_id)
         .broadcast().request();
       }
     }
-  };
+  }
 
   this.on('removeListener', listenerRemoved);
 
@@ -70,7 +70,7 @@ function Account(remote, account) {
     if (self._account.is_valid() && self._subs) {
       request.add_account(self._account_id);
     }
-  };
+  }
 
   this._remote.on('prepare_subscribe', attachAccount);
 
@@ -79,11 +79,11 @@ function Account(remote, account) {
       return;
     }
 
-    var changed = false;
+    let changed = false;
 
     transaction.mmeta.each(function(an) {
-      var isAccount = an.fields.Account === self._account_id;
-      var isAccountRoot = isAccount && (an.entryType === 'AccountRoot');
+      const isAccount = an.fields.Account === self._account_id;
+      const isAccountRoot = isAccount && (an.entryType === 'AccountRoot');
 
       if (isAccountRoot) {
         extend(self._entry, an.fieldsNew, an.fieldsFinal);
@@ -94,14 +94,14 @@ function Account(remote, account) {
     if (changed) {
       self.emit('entry', self._entry);
     }
-  };
+  }
 
   this.on('transaction', handleTransaction);
 
   this._transactionManager = new TransactionManager(this);
 
   return this;
-};
+}
 
 util.inherits(Account, EventEmitter);
 
@@ -109,7 +109,7 @@ util.inherits(Account, EventEmitter);
  * List of events that require a remote subscription to the account.
  */
 
-Account.subscribeEvents = [ 'transaction', 'entry' ];
+Account.subscribeEvents = ['transaction', 'entry'];
 
 Account.prototype.toJson = function() {
   return this._account.to_json();
@@ -144,9 +144,9 @@ Account.prototype.getInfo = function(callback) {
  * @param {Function} callback
  */
 
-Account.prototype.entry = function(callback) {
-  var self = this;
-  var callback = typeof callback === 'function' ? callback : function(){};
+Account.prototype.entry = function(callback_) {
+  const self = this;
+  const callback = typeof callback_ === 'function' ? callback_ : _.noop;
 
   function accountInfo(err, info) {
     if (err) {
@@ -156,21 +156,21 @@ Account.prototype.entry = function(callback) {
       self.emit('entry', self._entry);
       callback(null, info);
     }
-  };
+  }
 
   this.getInfo(accountInfo);
 
   return this;
 };
 
-Account.prototype.getNextSequence = function(callback) {
-  var callback = typeof callback === 'function' ? callback : function(){};
+Account.prototype.getNextSequence = function(callback_) {
+  const callback = typeof callback_ === 'function' ? callback_ : _.noop;
 
   function isNotFound(err) {
     return err && typeof err === 'object'
     && typeof err.remote === 'object'
     && err.remote.error === 'actNotFound';
-  };
+  }
 
   function accountInfo(err, info) {
     if (isNotFound(err)) {
@@ -181,7 +181,7 @@ Account.prototype.getNextSequence = function(callback) {
     } else {
       callback(null, info.account_data.Sequence);
     }
-  };
+  }
 
   this.getInfo(accountInfo);
 
@@ -197,9 +197,9 @@ Account.prototype.getNextSequence = function(callback) {
  * @param {function(err, lines)} callback Called with the result
  */
 
-Account.prototype.lines = function(callback) {
-  var self = this;
-  var callback = typeof callback === 'function' ? callback : function(){};
+Account.prototype.lines = function(callback_) {
+  const self = this;
+  const callback = typeof callback_ === 'function' ? callback_ : _.noop;
 
   function accountLines(err, res) {
     if (err) {
@@ -225,23 +225,22 @@ Account.prototype.lines = function(callback) {
  * @returns {Account}
  */
 
-Account.prototype.line = function(currency, address, callback) {
-  var self = this;
-  var callback = typeof callback === 'function' ? callback : function(){};
+Account.prototype.line = function(currency, address, callback_) {
+  const self = this;
+  const callback = typeof callback_ === 'function' ? callback_ : _.noop;
 
   self.lines(function(err, data) {
     if (err) {
       return callback(err);
     }
 
-    var line;
+    let line;
 
-    top:
-    for (var i=0; i<data.lines.length; i++) {
-      var l = data.lines[i];
+    for (let i = 0; i < data.lines.length; i++) {
+      const l = data.lines[i];
       if (l.account === address && l.currency === currency) {
         line = l;
-        break top;
+        break;
       }
     }
 
@@ -271,15 +270,16 @@ Account.prototype.notifyTx = function(transaction) {
 
   this.emit('transaction', transaction);
 
-  var account = transaction.transaction.Account;
+  const account = transaction.transaction.Account;
 
   if (!account) {
     return;
   }
 
-  var isThisAccount = (account === this._account_id);
+  const isThisAccount = (account === this._account_id);
 
-  this.emit(isThisAccount ? 'transaction-outbound' : 'transaction-inbound', transaction);
+  this.emit(isThisAccount ? 'transaction-outbound' : 'transaction-inbound',
+    transaction);
 };
 
 /**
@@ -297,16 +297,17 @@ Account.prototype.submit = function(transaction) {
 /**
  *  Check whether the given public key is valid for this account
  *
- *  @param {Hex-encoded String|RippleAddress} public_key
- *  @param {Function} callback
+ *  @param {Hex-encoded_String|RippleAddress} public_key Public key
+ *  @param {Function} callback Is a callback
+ *  @returns {void}
  *
  *  @callback
- *  @param {Error} err
- *  @param {Boolean} true if the public key is valid and active, false otherwise
+ *  param {Error} err
+ *  param {Boolean} true if the public key is valid and active, false otherwise
  */
 Account.prototype.publicKeyIsActive = function(public_key, callback) {
-  var self = this;
-  var public_key_as_uint160;
+  const self = this;
+  let public_key_as_uint160;
 
   try {
     public_key_as_uint160 = Account._publicKeyToAddress(public_key);
@@ -315,7 +316,7 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
   }
 
   function getAccountInfo(async_callback) {
-    self.getInfo(function(err, account_info_res){
+    self.getInfo(function(err, account_info_res) {
 
       // If the remote responds with an Account Not Found error then the account
       // is unfunded and thus we can assume that the master key is active
@@ -325,7 +326,7 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
         async_callback(err, account_info_res);
       }
     });
-  };
+  }
 
   function publicKeyIsValid(account_info_res, async_callback) {
     // Catch the case of unfunded accounts
@@ -340,10 +341,11 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
       return;
     }
 
-    var account_info = account_info_res.account_data;
+    const account_info = account_info_res.account_data;
 
-    // Respond with true if the RegularKey is set and matches the given public key or
-    // if the public key matches the account address and the lsfDisableMaster is not set
+    // Respond with true if the RegularKey is set and matches the given
+    // public key or if the public key matches the account address and
+    // the lsfDisableMaster is not set
     if (account_info.RegularKey &&
       account_info.RegularKey === public_key_as_uint160) {
       async_callback(null, true);
@@ -353,9 +355,9 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
     } else {
       async_callback(null, false);
     }
-  };
+  }
 
-  var steps = [
+  const steps = [
     getAccountInfo,
     publicKeyIsValid
   ];
@@ -368,25 +370,25 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
  *
  *  @static
  *
- *  @param {Hex-encoded string|RippleAddress} public_key
- *  @returns {RippleAddress}
+ *  @param {Hex-encoded_string|RippleAddress} public_key Public key
+ *  @returns {RippleAddress} Ripple Address
  */
 Account._publicKeyToAddress = function(public_key) {
   // Based on functions in /src/js/ripple/keypair.js
-  function hexToUInt160(public_key) {
-    var bits = sjcl.codec.hex.toBits(public_key);
-    var hash = sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
-    var address = UInt160.from_bits(hash);
+  function hexToUInt160(publicKey) {
+    const bits = sjcl.codec.hex.toBits(publicKey);
+    const hash = sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
+    const address = UInt160.from_bits(hash);
     address.set_version(Base.VER_ACCOUNT_ID);
 
     return address.to_json();
-  };
+  }
 
   if (UInt160.is_valid(public_key)) {
     return public_key;
   } else if (/^[0-9a-fA-F]+$/.test(public_key)) {
     return hexToUInt160(public_key);
-  } else {
+  } else { // eslint-disable-line no-else-return
     throw new Error('Public key is invalid. Must be a UInt160 or a hex string');
   }
 };
