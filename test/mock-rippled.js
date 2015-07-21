@@ -77,11 +77,21 @@ module.exports = function(port) {
   mock.on('request_subscribe', function(request, conn) {
     assert.strictEqual(request.command, 'subscribe');
     if (request.accounts) {
-      assert.strictEqual(request.accounts[0], addresses.ACCOUNT);
+      assert(_.indexOf(_.values(addresses), request.accounts[0]) !== -1);
     } else {
       assert.deepEqual(request.streams, ['ledger', 'server']);
     }
     conn.send(createResponse(request, fixtures.subscribe));
+  });
+
+  mock.on('request_unsubscribe', function(request, conn) {
+    assert.strictEqual(request.command, 'unsubscribe');
+    if (request.accounts) {
+      assert(_.indexOf(_.values(addresses), request.accounts[0]) !== -1);
+    } else {
+      assert.deepEqual(request.streams, ['ledger', 'server']);
+    }
+    conn.send(createResponse(request, fixtures.unsubscribe));
   });
 
   mock.on('request_account_info', function(request, conn) {
@@ -133,6 +143,8 @@ module.exports = function(port) {
       conn.send(accountLinesResponse.normal(request));
     } else if (request.account === addresses.OTHER_ACCOUNT) {
       conn.send(accountLinesResponse.counterparty(request));
+    } else if (request.account === addresses.NOTFOUND) {
+      conn.send(createResponse(request, fixtures.account_info.notfound));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }

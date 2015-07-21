@@ -4,6 +4,7 @@ module.exports = {
   submit: require('./submit'),
   ledger: require('./ledger'),
   subscribe: require('./subscribe'),
+  unsubscribe: require('./unsubscribe'),
   account_info: {
     normal: require('./account-info'),
     notfound: require('./account-info-not-found')
