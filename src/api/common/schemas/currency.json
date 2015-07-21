@@ -3,5 +3,5 @@
   "title": "currency",
   "description": "The three-character code or hex string used to denote currencies",
   "type": "string",
-  "pattern": "^([a-zA-Z0-9<>(){}[\\]|?!@#$%^&*]{3}|[A-Fa-f0-9]{40})$"
+  "pattern": "^([a-zA-Z0-9<>(){}[\\]|?!@#$%^&*]{3}|[A-F0-9]{40})$"
 }
