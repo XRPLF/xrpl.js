@@ -27,7 +27,8 @@
     "noDirectRipple": {
       "description": "A boolean that can be set to true if paths are specified and the sender would like the Ripple Network to disregard any direct paths from the source_account to the destination_account. This may be used to take advantage of an arbitrage opportunity or by gateways wishing to issue balances from a hot wallet to a user who has mistakenly set a trustline directly to the hot wallet",
       "type": "boolean"
-    }
+    },
+    "limitQuality": {"type": "boolean"}
   },
   "required": ["source", "destination"],
   "additionalProperties": false

@@ -4,7 +4,7 @@
       "limit": "5",
       "currency": "USD",
       "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-      "disableRippling": true,
+      "ripplingDisabled": true,
       "frozen": true
     },
     "counterparty": {
@@ -45,7 +45,7 @@
       "limit": "1",
       "currency": "USD",
       "counterparty": "r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X",
-      "disableRippling": true
+      "ripplingDisabled": true
     },
     "counterparty": {
       "limit": "0"
@@ -59,7 +59,7 @@
       "limit": "500",
       "currency": "USD",
       "counterparty": "rfF3PNkwkq1DygW2wum2HK3RGfgkJjdPVD",
-      "disableRippling": true
+      "ripplingDisabled": true
     },
     "counterparty": {
       "limit": "0"
@@ -76,7 +76,7 @@
     },
     "counterparty": {
       "limit": "100",
-      "disableRippling": true
+      "ripplingDisabled": true
     },
     "state": {
       "balance": "0"

@@ -9,9 +9,7 @@
     "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
     "qualityIn": 500000000,
     "qualityOut": 500000000,
-    "disableRippling": true,
-    "frozen": false,
-    "authorized": false
+    "ripplingDisabled": true
   },
   "outcome": {
     "result": "tesSUCCESS",
