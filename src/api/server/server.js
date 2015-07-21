@@ -1,28 +1,31 @@
+/* @flow */
+
 'use strict';
+
 const common = require('../common');
 
 // If a ledger is not received in this time, consider the connection offline
 const CONNECTION_TIMEOUT = 1000 * 30;
 
-function connect(callback) {
+function connect(callback: (err: any, data: any) => void): void {
   this.remote.connect(callback);
 }
 
-function disconnect(callback) {
+function disconnect(callback: (err: any, data: any) => void): void {
   this.remote.disconnect(callback);
 }
 
-function isUpToDate(remote) {
+function isUpToDate(remote): boolean {
   const server = remote.getServer();
   return Boolean(server) && (remote._stand_alone
     || (Date.now() - server._lastLedgerClose) <= CONNECTION_TIMEOUT);
 }
 
-function isConnected() {
+function isConnected(): boolean {
   return Boolean(this.remote._ledger_current_index) && isUpToDate(this.remote);
 }
 
-function getServerInfo(callback) {
+function getServerInfo(callback: (err: any, data: any) => void): void {
   this.remote.requestServerInfo((error, response) => {
     if (error) {
       callback(new common.errors.RippledNetworkError(error.message));
@@ -32,11 +35,11 @@ function getServerInfo(callback) {
   });
 }
 
-function getFee() {
+function getFee(): number {
   return common.dropsToXrp(this.remote.createTransaction()._computeFee());
 }
 
-function getLedgerVersion() {
+function getLedgerVersion(): number {
   return this.remote.getLedgerSequence();
 }
 

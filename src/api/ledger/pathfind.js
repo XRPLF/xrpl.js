@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const _ = require('lodash');
 const async = require('async');
@@ -8,7 +9,12 @@ const parsePathfind = require('./parse/pathfind');
 const NotFoundError = utils.common.errors.NotFoundError;
 const composeAsync = utils.common.composeAsync;
 
-function addParams(params, result) {
+type PathFindParams = {
+  src_currencies?: Array<string>, src_account: string, dst_amount: string,
+  dst_account?: string
+}
+
+function addParams(params: PathFindParams, result: {}) {
   return _.assign({}, result, {
     source_account: params.src_account,
     source_currencies: params.src_currencies,
@@ -16,8 +22,13 @@ function addParams(params, result) {
   });
 }
 
-function requestPathFind(remote, pathfind, callback) {
-  const params = {
+type PathFind = {
+  source: {address: string, currencies: Array<string>},
+  destination: {address: string, amount: string}
+}
+
+function requestPathFind(remote, pathfind: PathFind, callback) {
+  const params: PathFindParams = {
     src_account: pathfind.source.address,
     dst_account: pathfind.destination.address,
     dst_amount: utils.common.toRippledAmount(pathfind.destination.amount)

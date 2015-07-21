@@ -1,3 +1,5 @@
+/* @flow */
+
 'use strict';
 const _ = require('lodash');
 const core = require('./common').core;
@@ -28,7 +30,7 @@ const errors = require('./common').errors;
 const convertExceptions = require('./common').convertExceptions;
 const generateWallet = convertExceptions(core.Wallet.generate);
 
-function RippleAPI(options) {
+function RippleAPI(options: {}) {
   const _options = _.assign({}, options, {automatic_resubmission: false});
   this.remote = new core.Remote(_options);
 }

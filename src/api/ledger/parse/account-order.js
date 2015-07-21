@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const utils = require('./utils');
 const flags = utils.core.Remote.flags.offer;

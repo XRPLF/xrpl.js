@@ -1,3 +1,5 @@
+/* @flow */
+
 'use strict';
 const utils = require('./utils');
 const removeUndefined = require('./parse/utils').removeUndefined;

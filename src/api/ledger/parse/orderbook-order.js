@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
