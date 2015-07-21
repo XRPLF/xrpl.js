@@ -13,8 +13,7 @@
     "maxLedgerVersion": {"$ref": "ledgerVersion"},
     "earliestFirst": {"type": "boolean"},
     "excludeFailures": {"type": "boolean"},
-    "outgoing": {"type": "boolean"},
-    "incoming": {"type": "boolean"},
+    "initiated": {"type": "boolean"},
     "counterparty": {"$ref": "address"},
     "types": {
       "type": "array",
