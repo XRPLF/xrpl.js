@@ -533,6 +533,8 @@ Server.prototype._retryConnect = function() {
 
   this._retry += 1;
 
+  /*eslint-disable */
+
   const retryTimeout = (this._retry < 40)
     // First, for 2 seconds: 20 times per second
     ? (1000 / 20)
@@ -544,6 +546,8 @@ Server.prototype._retryConnect = function() {
         ? (10 * 1000)
         // Then: once every 30 seconds
         : (30 * 1000);
+
+  /*eslint-enable */
 
   function connectionRetry() {
     if (self._shouldConnect) {
