@@ -5,6 +5,7 @@ const BigNumber = require('bignumber.js');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const toRippledAmount = utils.common.toRippledAmount;
+const Transaction = utils.common.core.Transaction;
 
 function isSendMaxAllowed(payment) {
   const srcAmt = payment.source.amount;
@@ -41,7 +42,7 @@ function createPaymentTransaction(account, payment) {
   validate.address(account);
   validate.payment(payment);
 
-  const transaction = new utils.common.core.Transaction();
+  const transaction = new Transaction();
   transaction.payment({
     from: payment.source.address,
     to: payment.destination.address,

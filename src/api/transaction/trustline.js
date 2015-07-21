@@ -2,6 +2,7 @@
 'use strict';
 const utils = require('./utils');
 const validate = utils.common.validate;
+const Transaction = utils.common.core.Transaction;
 
 const TrustSetFlags = {
   authorized: {set: 'SetAuth'},
@@ -19,7 +20,7 @@ function createTrustlineTransaction(account, trustline) {
     value: trustline.limit
   };
 
-  const transaction = new utils.common.core.Transaction();
+  const transaction = new Transaction();
   transaction.trustSet(account, limit,
     trustline.qualityIn, trustline.qualityOut);
   utils.setTransactionBitFlags(transaction, trustline, TrustSetFlags);

@@ -2,6 +2,7 @@
 'use strict';
 const utils = require('./utils');
 const validate = utils.common.validate;
+const Transaction = utils.common.core.Transaction;
 
 const OfferCreateFlags = {
   passive: {set: 'Passive'},
@@ -13,7 +14,7 @@ function createOrderTransaction(account, order) {
   validate.address(account);
   validate.order(order);
 
-  const transaction = new utils.common.core.Transaction();
+  const transaction = new Transaction();
   const takerPays = utils.common.toRippledAmount(order.direction === 'buy' ?
     order.quantity : order.totalPrice);
   const takerGets = utils.common.toRippledAmount(order.direction === 'buy' ?
