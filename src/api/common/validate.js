@@ -1,6 +1,6 @@
 'use strict';
 const _ = require('lodash');
-const utils = require('./utils');
+const core = require('./utils').core;
 const ValidationError = require('./errors').ValidationError;
 const schemaValidate = require('./schema-validator');
 
@@ -16,7 +16,7 @@ function validateAddressAndSecret(obj) {
     throw error('Parameter missing: secret');
   }
   try {
-    if (!utils.core.Seed.from_json(secret).get_key(address)) {
+    if (!core.Seed.from_json(secret).get_key(address)) {
       throw error('secret does not match address');
     }
   } catch (exception) {

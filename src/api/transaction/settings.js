@@ -6,6 +6,7 @@ const utils = require('./utils');
 const validate = utils.common.validate;
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices;
 const AccountFields = utils.common.constants.AccountFields;
+const Transaction = utils.common.core.Transaction;
 
 // Emptry string passed to setting will clear it
 const CLEAR_SETTING = '';
@@ -70,7 +71,7 @@ function createSettingsTransaction(account, settings) {
   validate.address(account);
   validate.settings(settings);
 
-  const transaction = new utils.common.core.Transaction();
+  const transaction = new Transaction();
   if (settings.regularKey) {
     return transaction.setRegularKey({
       account: account,

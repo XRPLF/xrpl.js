@@ -3,17 +3,17 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const validator = require('is-my-json-valid');
-const utils = require('./utils');
+const core = require('./utils').core;
 const ValidationError = require('./errors').ValidationError;
 
 let SCHEMAS = {};
 
 function isValidAddress(address) {
-  return utils.core.UInt160.is_valid(address);
+  return core.UInt160.is_valid(address);
 }
 
 function isValidLedgerHash(ledgerHash) {
-  return utils.core.UInt256.is_valid(ledgerHash);
+  return core.UInt256.is_valid(ledgerHash);
 }
 
 function loadSchema(filepath) {
