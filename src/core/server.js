@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const util = require('util');
 const url = require('url');
+const HttpsProxyAgent = require('https-proxy-agent');
 const LRU = require('lru-cache');
 const EventEmitter = require('events').EventEmitter;
 const RippleError = require('./').RippleError;
@@ -436,7 +437,18 @@ Server.prototype.connect = function() {
     log.info(this.getServerID(), 'connect');
   }
 
-  const ws = this._ws = new WebSocket(this._opts.url);
+  if (this._remote.hasOwnProperty('proxy')) {
+    const parsed = url.parse(this._opts.url);
+    const opts = url.parse(this._remote.proxy);
+    opts.secureEndpoint = parsed.protocol === 'wss:';
+    const agent = new HttpsProxyAgent(opts);
+
+    this._ws = new WebSocket(this._opts.url, {agent: agent});
+  } else {
+    this._ws = new WebSocket(this._opts.url);
+  }
+
+  const ws = this._ws;
 
   this._shouldConnect = true;
 
@@ -521,6 +533,8 @@ Server.prototype._retryConnect = function() {
 
   this._retry += 1;
 
+  /*eslint-disable */
+
   const retryTimeout = (this._retry < 40)
     // First, for 2 seconds: 20 times per second
     ? (1000 / 20)
@@ -532,6 +546,8 @@ Server.prototype._retryConnect = function() {
         ? (10 * 1000)
         // Then: once every 30 seconds
         : (30 * 1000);
+
+  /*eslint-enable */
 
   function connectionRetry() {
     if (self._shouldConnect) {
