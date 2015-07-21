@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const util = require('util');
 const url = require('url');
+const HttpsProxyAgent = require('https-proxy-agent');
 const LRU = require('lru-cache');
 const EventEmitter = require('events').EventEmitter;
 const RippleError = require('./').RippleError;
@@ -436,7 +437,18 @@ Server.prototype.connect = function() {
     log.info(this.getServerID(), 'connect');
   }
 
-  const ws = this._ws = new WebSocket(this._opts.url);
+  if (this._remote.hasOwnProperty('proxy')) {
+    const parsed = url.parse(this._opts.url);
+    const opts = url.parse(this._remote.proxy);
+    opts.secureEndpoint = parsed.protocol === 'wss:';
+    const agent = new HttpsProxyAgent(opts);
+
+    this._ws = new WebSocket(this._opts.url, {agent: agent});
+  } else {
+    this._ws = new WebSocket(this._opts.url);
+  }
+
+  const ws = this._ws;
 
   this._shouldConnect = true;
 
