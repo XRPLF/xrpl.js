@@ -11,6 +11,7 @@ const hashes = require('./fixtures/hashes');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const address = addresses.ACCOUNT;
+const NotFoundError = require('../src/api/common/errors').NotFoundError;
 
 const orderbook = {
   base: {
@@ -274,7 +275,134 @@ describe('RippleAPI', function() {
       }
     };
     this.api.getPaths(pathfind,
-      _.partial(checkResult, responses.getPaths, done));
+      _.partial(checkResult, responses.getPaths.XrpToUsd, done));
+  });
+
+  // @TODO
+  // need decide what to do with currencies/XRP:
+  // if add 'XRP' in currencies, then there will be exception in
+  // xrpToDrops function (called from toRippledAmount)
+  it('getPaths USD 2 USD', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.OTHER_ACCOUNT,
+        currencies: [
+          {
+            currency: 'LTC'
+          },
+          {
+            currency: 'USD'
+          }
+        ]
+      },
+      destination: {
+        address: address,
+        amount: {
+          currency: 'USD',
+          value: '0.000001'
+        }
+      }
+    };
+    this.api.getPaths(pathfind,
+      _.partial(checkResult, responses.getPaths.UsdToUsd, done));
+  });
+
+  it('getPaths XRP 2 XRP', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '0.000002',
+          currency: 'XRP'
+        }
+      }
+    };
+    this.api.getPaths(pathfind,
+      _.partial(checkResult, responses.getPaths.XrpToXrp, done));
+  });
+
+  it('getPaths - XRP 2 XRP - not enough', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '1000002',
+          currency: 'XRP'
+        }
+      }
+    };
+    this.api.getPaths(pathfind, (error) => {
+      assert.ok(error instanceof NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - does not accept currency', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '0.000002',
+          currency: 'GBP'
+        }
+      }
+    };
+    this.api.getPaths(pathfind, (error) => {
+      assert.ok(error instanceof NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - no paths', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '1000002',
+          currency: 'USD'
+        }
+      }
+    };
+    this.api.getPaths(pathfind, (error) => {
+      assert.ok(error instanceof NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - no paths with source currencies', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT,
+        currencies: [
+          {
+            currency: 'USD'
+          }
+        ]
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '1000002',
+          currency: 'USD'
+        }
+      }
+    };
+    this.api.getPaths(pathfind, (error) => {
+      assert.ok(error instanceof NotFoundError);
+      done();
+    });
   });
 
   it('getLedgerVersion', function() {
