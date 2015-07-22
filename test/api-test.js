@@ -46,19 +46,29 @@ describe('RippleAPI', function() {
   afterEach(setupAPI.teardown);
 
   it('preparePayment', function(done) {
-    this.api.preparePayment(address, requests.preparePayment, instructions,
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    this.api.preparePayment(address, requests.preparePayment, localInstructions,
       _.partial(checkResult, responses.preparePayment, done));
   });
 
   it('preparePayment with all options specified', function(done) {
+    const localInstructions = {
+      maxLedgerVersion: this.api.getLedgerVersion() + 100,
+      fee: '0.000012'
+    };
     this.api.preparePayment(address, requests.preparePaymentAllOptions,
-      instructions,
+      localInstructions,
       _.partial(checkResult, responses.preparePaymentAllOptions, done));
   });
 
   it('preparePayment without counterparty set', function(done) {
+    const localInstructions = _.defaults({
+      sequence: 23
+    }, instructions);
     this.api.preparePayment(address, requests.preparePaymentNoCounterparty,
-      instructions,
+      localInstructions,
       _.partial(checkResult, responses.preparePaymentNoCounterparty, done));
   });
 
@@ -224,8 +234,10 @@ describe('RippleAPI', function() {
 
   it('getOrderbook - direction is correct for bids and asks', function(done) {
     this.api.getOrderbook(address, orderbook, {}, (error, data) => {
-      assert(_.every(data.bids, bid => bid.specification.direction === 'buy'));
-      assert(_.every(data.asks, ask => ask.specification.direction === 'sell'));
+      assert.ok(
+        _.every(data.bids, bid => bid.specification.direction === 'buy'));
+      assert.ok(
+        _.every(data.asks, ask => ask.specification.direction === 'sell'));
       done();
     });
   });
