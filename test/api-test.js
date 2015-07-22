@@ -50,6 +50,18 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.preparePayment, done));
   });
 
+  it('preparePayment with all options specified', function(done) {
+    this.api.preparePayment(address, requests.preparePaymentAllOptions,
+      instructions,
+      _.partial(checkResult, responses.preparePaymentAllOptions, done));
+  });
+
+  it('preparePayment without counterparty set', function(done) {
+    this.api.preparePayment(address, requests.preparePaymentNoCounterparty,
+      instructions,
+      _.partial(checkResult, responses.preparePaymentNoCounterparty, done));
+  });
+
   it('prepareOrder', function(done) {
     this.api.prepareOrder(address, requests.prepareOrder, instructions,
       _.partial(checkResult, responses.prepareOrder, done));

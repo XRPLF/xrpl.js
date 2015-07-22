@@ -21,6 +21,9 @@ module.exports = {
   prepareOrderCancellation: require('./prepare-order-cancellation.json'),
   prepareOrder: require('./prepare-order.json'),
   preparePayment: require('./prepare-payment.json'),
+  preparePaymentAllOptions: require('./prepare-payment-all-options.json'),
+  preparePaymentNoCounterparty:
+    require('./prepare-payment-no-counterparty.json'),
   prepareSettings: {
     regularKey: require('./prepare-settings-regular-key.json'),
     flags: require('./prepare-settings.json')
