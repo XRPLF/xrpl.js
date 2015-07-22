@@ -234,8 +234,10 @@ describe('RippleAPI', function() {
 
   it('getOrderbook - direction is correct for bids and asks', function(done) {
     this.api.getOrderbook(address, orderbook, {}, (error, data) => {
-      assert(_.every(data.bids, bid => bid.specification.direction === 'buy'));
-      assert(_.every(data.asks, ask => ask.specification.direction === 'sell'));
+      assert.ok(
+        _.every(data.bids, bid => bid.specification.direction === 'buy'));
+      assert.ok(
+        _.every(data.asks, ask => ask.specification.direction === 'sell'));
       done();
     });
   });
