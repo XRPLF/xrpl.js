@@ -100,6 +100,10 @@ module.exports = function(port) {
       conn.send(createResponse(request, fixtures.account_info.normal));
     } else if (request.account === addresses.NOTFOUND) {
       conn.send(createResponse(request, fixtures.account_info.notfound));
+    } else if (request.account === addresses.THIRD_ACCOUNT) {
+      const response = _.assign({}, fixtures.account_info.normal);
+      response.Account = addresses.THIRD_ACCOUNT;
+      conn.send(createResponse(request, response));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
@@ -179,9 +183,16 @@ module.exports = function(port) {
   });
 
   mock.on('request_ripple_path_find', function(request, conn) {
-    const response = fixtures.ripple_path_find.generateIOUPaymentPaths(
-      request.id, request.source_account, request.destination_account,
-      request.destination_amount);
+    let response = null;
+    if (request.source_account === addresses.OTHER_ACCOUNT) {
+      response = createResponse(request, fixtures.ripple_path_find.sendUSD);
+    } else if (request.source_account === addresses.THIRD_ACCOUNT) {
+      response = createResponse(request, fixtures.ripple_path_find.XrpToXrp);
+    } else {
+      response = fixtures.ripple_path_find.generate.generateIOUPaymentPaths(
+        request.id, request.source_account, request.destination_account,
+        request.destination_amount);
+    }
     conn.send(response);
   });
 

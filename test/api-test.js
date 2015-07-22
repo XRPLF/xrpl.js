@@ -234,9 +234,8 @@ describe('RippleAPI', function() {
 
   it('getOrderbook - direction is correct for bids and asks', function(done) {
     this.api.getOrderbook(address, orderbook, {}, (error, data) => {
-      assert.ok(
-        _.every(data.bids, bid => bid.specification.direction === 'buy'));
-      assert.ok(
+      assert(_.every(data.bids, bid => bid.specification.direction === 'buy'));
+      assert(
         _.every(data.asks, ask => ask.specification.direction === 'sell'));
       done();
     });
@@ -260,21 +259,50 @@ describe('RippleAPI', function() {
   });
 
   it('getPaths', function(done) {
-    const pathfind = {
-      source: {
-        address: address
-      },
-      destination: {
-        address: addresses.OTHER_ACCOUNT,
-        amount: {
-          currency: 'USD',
-          counterparty: addresses.ISSUER,
-          value: '100'
-        }
-      }
-    };
-    this.api.getPaths(pathfind,
-      _.partial(checkResult, responses.getPaths, done));
+    this.api.getPaths(requests.getPaths.normal,
+      _.partial(checkResult, responses.getPaths.XrpToUsd, done));
+  });
+
+  // @TODO
+  // need decide what to do with currencies/XRP:
+  // if add 'XRP' in currencies, then there will be exception in
+  // xrpToDrops function (called from toRippledAmount)
+  it('getPaths USD 2 USD', function(done) {
+    this.api.getPaths(requests.getPaths.UsdToUsd,
+      _.partial(checkResult, responses.getPaths.UsdToUsd, done));
+  });
+
+  it('getPaths XRP 2 XRP', function(done) {
+    this.api.getPaths(requests.getPaths.XrpToXrp,
+      _.partial(checkResult, responses.getPaths.XrpToXrp, done));
+  });
+
+  it('getPaths - XRP 2 XRP - not enough', function(done) {
+    this.api.getPaths(requests.getPaths.XrpToXrpNotEnough, (error) => {
+      assert(error instanceof this.api.errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - does not accept currency', function(done) {
+    this.api.getPaths(requests.getPaths.NotAcceptCurrency, (error) => {
+      assert(error instanceof this.api.errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - no paths', function(done) {
+    this.api.getPaths(requests.getPaths.NoPaths, (error) => {
+      assert(error instanceof this.api.errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - no paths with source currencies', function(done) {
+    this.api.getPaths(requests.getPaths.NoPathsWithCurrencies, (error) => {
+      assert(error instanceof this.api.errors.NotFoundError);
+      done();
+    });
   });
 
   it('getLedgerVersion', function() {
