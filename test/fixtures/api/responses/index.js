@@ -20,6 +20,7 @@ module.exports = {
   getTrustlines: require('./get-trustlines.json'),
   prepareOrderCancellation: require('./prepare-order-cancellation.json'),
   prepareOrder: require('./prepare-order.json'),
+  prepareOrderSell: require('./prepare-order-sell.json'),
   preparePayment: require('./prepare-payment.json'),
   preparePaymentAllOptions: require('./prepare-payment-all-options.json'),
   preparePaymentNoCounterparty:

@@ -62,9 +62,14 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.preparePaymentNoCounterparty, done));
   });
 
-  it('prepareOrder', function(done) {
+  it('prepareOrder - buy order', function(done) {
     this.api.prepareOrder(address, requests.prepareOrder, instructions,
       _.partial(checkResult, responses.prepareOrder, done));
+  });
+
+  it('prepareOrder - sell order', function(done) {
+    this.api.prepareOrder(address, requests.prepareOrderSell, instructions,
+      _.partial(checkResult, responses.prepareOrderSell, done));
   });
 
   it('prepareOrderCancellation', function(done) {
