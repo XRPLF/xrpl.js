@@ -12,6 +12,7 @@ const rand = require('brorand');
 // elliptic
 const secp256k1 = elliptic.ec('secp256k1');
 const Ed25519 = elliptic.eddsa('ed25519');
+const {utils: {parseBytes}} = elliptic;
 
 const {
   bytesToHex,
@@ -57,7 +58,7 @@ function findk256Key(bytes, discrim) {
 /**
 * @param {Object} [options] -
 * @param {Number} [options.accountIndex=0] - the account number to generate
-* @param {Boolean} [options.root=false] - generate root key-pair,
+* @param {Boolean} [options.validator=false] - generate root key-pair,
 *                                         as used by validators.
 * @return {new bn.js} -
 *
@@ -65,7 +66,7 @@ function findk256Key(bytes, discrim) {
 
 /* eslint-enable valid-jsdoc */
 function derivek256Secret(seed, opts={}) {
-  const root = opts.root;
+  const root = opts.validator;
   const order = secp256k1.curve.n;
 
   // This private generator represents the `root` private key, and is what's
@@ -100,7 +101,10 @@ function deriveEdKeyPairSeed(seed) {
 
 /* --------------------------------- KEYPAIR -------------------------------- */
 
-function KeyPair() {}
+function KeyPair({seedBytes, pubBytes}) {
+  this.seedBytes = seedBytes;
+  this.pubKeyCanonicalBytes__ = pubBytes;
+}
 
 /*
 @param {Array} message
@@ -145,34 +149,48 @@ KeyPair.prototype.signHex = function(message) {
 * @private
 * @param {Object} - key
 */
-function Ed25519Pair(key) {
+function Ed25519Pair() {
   KeyPair.apply(this, arguments);
-  this.key = key;
   this.type = KeyType.ed25519;
 }
 
 util.inherits(Ed25519Pair, KeyPair);
 
 /**
-* @param {Seed} seed - A 128 bit seed
+* @param {Array<Number>} seedBytes - A 128 bit seed
 * @return {Ed25519Pair} key pair
 */
-Ed25519Pair.fromSeed = function(seed) {
-  const seed256 = deriveEdKeyPairSeed(seed);
-  const derived = Ed25519.keyFromSecret(seed256);
-  return new Ed25519Pair(derived);
+Ed25519Pair.fromSeed = function(seedBytes) {
+  return new Ed25519Pair({seedBytes});
 };
 
+/**
+* @param {Seed} publicKey - public key in canonical form (0xED + 32 bytes)
+* @return {Ed25519Pair} key pair
+*/
+Ed25519Pair.fromPublic = function (publicKey) {
+  return new Ed25519Pair({pubBytes: parseBytes(publicKey)});
+};
+
+hasCachedProperty(Ed25519Pair, 'key', function() {
+  if (this.seedBytes) {
+    const seed256 = deriveEdKeyPairSeed(this.seedBytes);
+    return Ed25519.keyFromSecret(seed256);
+  } else {
+    return Ed25519.keyFromPublic(this.pubKeyCanonicalBytes().slice(1));
+  }
+});
+
 hasCachedProperty(Ed25519Pair, 'pubKeyCanonicalBytes', function() {
-  return [0xED].concat(this.key.pubBytes());
+  return [0xED].concat(this.key().pubBytes());
 });
 
 Ed25519Pair.prototype.sign = function(message) {
-  return this.key.sign(message).toBytes();
+  return this.key().sign(message).toBytes();
 };
 
 Ed25519Pair.prototype.verify = function(message, signature) {
-  return this.key.verify(message, signature);
+  return this.key().verify(message, signature);
 };
 
 /* ---------------------------- SECP256K1 KEYPAIR --------------------------- */
@@ -181,20 +199,29 @@ Ed25519Pair.prototype.verify = function(message, signature) {
 * @class
 * @private
 */
-function K256Pair(key) {
+function K256Pair({validator}) {
   KeyPair.apply(this, arguments);
   this.type = KeyType.secp256k1;
-  this.key = key;
+  this.validator = validator;
 }
 
 util.inherits(K256Pair, KeyPair);
 
-K256Pair.fromSeed = function(seed) {
-  return new K256Pair(secp256k1.keyFromPrivate(derivek256Secret(seed)));
+K256Pair.fromSeed = function(seedBytes, opts={}) {
+  return new K256Pair({seedBytes, validator: opts.validator});
 };
 
+hasCachedProperty(K256Pair, 'key', function() {
+  if (this.seedBytes) {
+    const options = {validator: this.validator};
+    return secp256k1.keyFromPrivate(derivek256Secret(this.seedBytes, options));
+  } else {
+    return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
+  }
+});
+
 hasCachedProperty(K256Pair, 'pubKeyCanonicalBytes', function() {
-  return this.key.getPublic(/*compact*/ true, /*enc*/ 'bytes');
+  return this.key().getPublic().encodeCompressed();
 });
 
 /*
@@ -206,7 +233,7 @@ K256Pair.prototype.sign = function(message) {
 
 K256Pair.prototype._createSignature = function(message) {
   // The key.sign message silently discards options
-  return secp256k1.sign(this.hashMessage(message), this.key, {canonical: true});
+  return this.key().sign(this.hashMessage(message), {canonical: true});
 };
 
 /*
@@ -223,16 +250,16 @@ K256Pair.prototype.hashMessage = function(message) {
  */
 K256Pair.prototype.verify = function(message, signature) {
   try {
-    return this.key.verify(this.hashMessage(message), signature);
+    return this.key().verify(this.hashMessage(message), signature);
   } catch (e) {
     return false;
   }
 };
 
-function keyPairFromSeed(seedString) {
+function keyPairFromSeed(seedString, options) {
   const decoded = codec.decodeSeed(seedString);
-  const pair = decoded.type === 'ed25519' ? Ed25519Pair : K256Pair;
-  return pair.fromSeed(decoded.bytes);
+  const Pair = decoded.type === 'ed25519' ? Ed25519Pair : K256Pair;
+  return Pair.fromSeed(decoded.bytes, options);
 }
 
 function deriveWallet(type, seedBytes) {
@@ -256,7 +283,8 @@ function deriveWallet(type, seedBytes) {
   };
 }
 
-function generateWallet({type='secp256k1', randGen=rand}) {
+function generateWallet(opts={}) {
+  const {type='secp256k1', randGen=rand} = opts;
   const seedBytes = randGen(16);
   return deriveWallet(type, seedBytes);
 }
@@ -264,6 +292,25 @@ function generateWallet({type='secp256k1', randGen=rand}) {
 function walletFromSeed(seed) {
   const {type, bytes} = codec.decodeSeed(seed);
   return deriveWallet(type, bytes);
+}
+
+function deriveValidator(seedBytes) {
+  const pair = K256Pair.fromSeed(seedBytes, {validator: true});
+  return {
+    seed: codec.encodeK256Seed(seedBytes),
+    publicKey: codec.encodeNodePublic(pair.pubKeyCanonicalBytes())
+  };
+}
+
+function generateValidatorKeys(opts={}) {
+  const {randGen=rand} = opts;
+  return deriveValidator(randGen(16));
+}
+
+function validatorKeysFromSeed(seed) {
+  const {type, bytes} = codec.decodeSeed(seed);
+  assert(type == KeyType.secp256k1);
+  return deriveValidator(bytes);
 }
 
 module.exports = {
@@ -275,5 +322,7 @@ module.exports = {
   createAccountID,
   keyPairFromSeed,
   generateWallet,
-  walletFromSeed
+  generateValidatorKeys,
+  walletFromSeed,
+  validatorKeysFromSeed
 };

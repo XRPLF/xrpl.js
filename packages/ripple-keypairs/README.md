@@ -18,6 +18,22 @@
   publicKey: 'ED5F5AC8B98974A3CA843326D9B88CEBD0560177B973EE0B149F782CFAA06DC66A' }')
 ```
 
+## Generate random validator keys
+```js
+> var generateValidatorKeys = require('ripple-keypairs').generateValidatorKeys;
+> generateValidatorKeys();
+{ seed: 'ssC7Y9LMKhuzFMVueaj2fnTuGLftA',
+  publicKey: 'n9MU2RsULUayZnWeLssjbMzVRPeVUUMgiPYTwe8eMgpdGDWp5t8C' }
+```
+
+## Derive validator keys from a seed
+```js
+> var validatorKeysFromSeed = require('ripple-keypairs').validatorKeysFromSeed;
+> validatorKeysFromSeed('ssC7Y9LMKhuzFMVueaj2fnTuGLftA');
+{ seed: 'ssC7Y9LMKhuzFMVueaj2fnTuGLftA',
+  publicKey: 'n9MU2RsULUayZnWeLssjbMzVRPeVUUMgiPYTwe8eMgpdGDWp5t8C' }
+```
+
 ## Sign a transaction
 see [examples/sign-transaction.js](examples/sign-transaction.js)
 ```js

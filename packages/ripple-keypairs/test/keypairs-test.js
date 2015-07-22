@@ -12,7 +12,9 @@ const {
   Ed25519Pair,
   keyPairFromSeed,
   generateWallet,
-  walletFromSeed
+  walletFromSeed,
+  generateValidatorKeys,
+  validatorKeysFromSeed
 } = keypairs;
 
 const {SerializedObject} = require('ripple-lib');
@@ -43,6 +45,13 @@ describe('ED25519Pair', function() {
 
   before(function() {
     pair = Ed25519Pair.fromSeed(seedFromPhrase('niq'));
+  });
+
+  it('can be constructed from a pulbic key to verify a txn', function() {
+    const sig = pair.sign(FIXTURES.message);
+    const key = Ed25519Pair.fromPublic(pair.pubKeyCanonicalBytes());
+    assert(key.verify(FIXTURES.message, sig));
+    assert(!key.verify(FIXTURES.message.concat(0), sig));
   });
 
   it('has a String member `type` equal to KeyPair.ed25519 constant',
@@ -118,6 +127,32 @@ describe('generateWallet', function() {
     const actual = generateWallet({type: undefined, randGen});
     assert.deepEqual(actual, expected);
     assert.deepEqual(walletFromSeed(actual.seed), expected);
+  });
+});
+
+describe('generateValidatorKeys', function() {
+  function randGen(len) {
+    return _.fill(Array(len), 0);
+  }
+  it('can generate secp256k1 validator keys', function() {
+    /*
+    rippled validation_create 00000000000000000000000000000000
+    {
+       "result" : {
+          "status" : "success",
+          "validation_key" : "A A A A A A A A A A A A",
+          "validation_public_key" : "n9LPxYzbDpWBZ1bC3J3Fdkgqoa3FEhVKCnS8yKp7RFQFwuvd8Q2c",
+          "validation_seed" : "sp6JS7f14BuwFY8Mw6bTtLKWauoUs"
+       }
+    }
+    */
+    const expected = {
+      seed: 'sp6JS7f14BuwFY8Mw6bTtLKWauoUs',
+      publicKey: 'n9LPxYzbDpWBZ1bC3J3Fdkgqoa3FEhVKCnS8yKp7RFQFwuvd8Q2c'
+    };
+    const actual = generateValidatorKeys({randGen});
+    assert.deepEqual(actual, expected);
+    assert.deepEqual(validatorKeysFromSeed(actual.seed), expected);
   });
 });
 
