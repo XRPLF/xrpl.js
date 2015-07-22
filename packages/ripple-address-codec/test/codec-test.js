@@ -15,14 +15,19 @@ describe('ripple-address-codec', function() {
 
     it('can translate between ' + hex + ' and ' + base58, function() {
       var actual = api['encode' + type](toBytes(hex));
-      var buf = api['decode' + type](base58);
       assert.equal(actual, base58);
+    });
+    it('can translate between ' + base58 + ' and ' + hex, function() {
+      var buf = api['decode' + type](base58);
       assert.equal(toHex(buf), hex);
     });
   }
 
   makeTest('AccountID', 'rJrRMgiRgrU6hDF4pgu5DXQdWyPbY35ErN',
                         'BA8E78626EE42C41B46D46C3048DF3A1C3C87072');
+
+  makeTest('NodePublic', 'n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH',
+                        '0388E5BA87A000CB807240DF8C848EB0B5FFA5C8E5A521BC8E105C0F0A44217828');
 
   makeTest('K256Seed',  'sn259rEFXrQrWyx3Q7XneWcwV6dfL',
                         'CF2DE378FBDD7E2EE87D486DFB5A7BFF');

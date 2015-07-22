@@ -18,13 +18,14 @@ module.exports = apiFactory({
       version: ED25519_SEED
     },
     Seed: {
+      // TODO: Use a map, not a parallel array
       versionTypes: ['ed25519', 'secp256k1'],
       versions: [ED25519_SEED, FAMILY_SEED],
       expectedLength: 16
     },
     AccountID: {version: ACCOUNT_ID },
     NodePublic: {version: NODE_PUBLIC },
-    NodePrivate: {version: NODE_PRIVATE },
+    NodePrivate: {version: NODE_PRIVATE},
     K256Seed : {version: FAMILY_SEED }
   }
 });
