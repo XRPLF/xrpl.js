@@ -2,7 +2,21 @@
 
 + [Add offer autobridging](https://github.com/ripple/ripple-lib/commit/c7bbce83719c1e8c6a4fae5ca850e7515db1a4a5)
 
++ [Prevent crash when listening for "model" events on the OrderBook class](https://github.com/ripple/ripple-lib/commit/5824c3cb7cb6bd834d6e037f69943aebf3d83351)
+
 + [Fix empty order edgecase](https://github.com/ripple/ripple-lib/commit/64809d9ae23dc24f47accd4b4788b48f49880d3e)
+
++ [Fix AutobridgeCalculator (RT-3445)](https://github.com/ripple/ripple-lib/commit/1fff5ea6dcbcee856536df26f3b9cf1aec3c3b55)
+
++ [Update sjcl and delete custom ripemd160, montgomery, and jacobi](https://github.com/ripple/ripple-lib/commit/50cda426eb83599c38c0b725e1524a01fc415da2)
+
++ [Fix transaction summary for transactions that fail with remoteError](https://github.com/ripple/ripple-lib/commit/5e714f6143464d7912f42537acaa553b88eaf6dc)
+
++ [Fix serializedobject append for excessively large bytes length](https://github.com/ripple/ripple-lib/commit/e93f1ab6f4aaad347450aee75a169af0faa2121c)
+
++ [Switch to sjcl npm module](https://github.com/ripple/ripple-lib/commit/9a502580fd89ec6a9aa55f4e5847f6a4a2cb5bba)
+
++ [Add babel transpiler](https://github.com/ripple/ripple-lib/commit/398f8d001f758bf575b959537a17e79e4042d17b)
 
 + [Remove unused float.js and wallet.js](https://github.com/ripple/ripple-lib/commit/d4a4b5f4fbbf09677a59ce81bace35c6426a2fda)
 
