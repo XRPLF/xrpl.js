@@ -1,5 +1,9 @@
 # ripple-keypairs
 
+An implementation of ripple keypairs & wallet generation using
+[elliptic](https://github.com/indutny/elliptic) which supports rfc6979 and
+eddsa deterministic signatures.
+
 ## Generate a random wallet
 ```js
 > var generateWallet = require('ripple-keypairs').generateWallet;
