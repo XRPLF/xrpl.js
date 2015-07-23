@@ -4,6 +4,8 @@ const _ = require('lodash');
 const hashes = require('../../hashes');
 const addresses = require('../../addresses');
 const SerializedObject = require('../../../../src/core').SerializedObject;
+const AccountSet = require('./tx/account-set.json');
+const NotFound = require('./tx/not-found.json');
 
 module.exports = function(request, options={}) {
   _.defaults(options, {
@@ -17,7 +19,7 @@ module.exports = function(request, options={}) {
     validated: true
   });
 
-  const tx = {
+  let tx = {
     Account: addresses.ACCOUNT,
     Amount: {
       currency: 'USD',
@@ -52,7 +54,7 @@ module.exports = function(request, options={}) {
     TxnSignature: '304502204EE3E9D1B01D8959B08450FCA9E22025AF503DEF310E34A93863A85CAB3C0BC5022100B61F5B567F77026E8DEED89EED0B7CAF0E6C96C228A2A65216F0DC2D04D52083'
   };
 
-  const meta = {
+  let meta = {
     AffectedNodes: [
       {
         ModifiedNode: {
@@ -196,15 +198,37 @@ module.exports = function(request, options={}) {
     TransactionResult: 'tesSUCCESS'
   };
 
+  let marker = +request.marker || 0;
+  marker += 1;
+  if (marker === 5) {
+    meta.TransactionResult = 'tecINSUFFICIENT_RESERVE';
+  } else if (marker === 6) {
+    tx = _.cloneDeep(AccountSet.result);
+    meta = tx.meta;
+    delete tx.meta;
+  } else if (marker === 7) {
+    tx.Account = addresses.OTHER_ACCOUNT;
+  } else if (marker === 8) {
+    tx.Destination = addresses.THIRD_ACCOUNT;
+  } else if (marker > 25) {
+    marker = undefined;
+  } else if (marker > 15) {
+    tx.Account = addresses.ISSUER;
+    tx.Destination = addresses.ACCOUNT;
+  }
+  if (request.limit === 13) {
+    const res = _.assign({}, NotFound, {id: request.id});
+    return JSON.stringify(res);
+  }
   return JSON.stringify({
     id: request.id,
     status: 'success',
     type: 'response',
     result: {
-      marker: request.marker === undefined ? 'ABC' : undefined,
+      marker: marker === undefined ? undefined : String(marker),
       transactions: [
         {
-          ledger_index: 348860,
+          ledger_index: 348860 - +marker,
           tx_blob: SerializedObject.from_json(tx).to_hex(),
           meta: SerializedObject.from_json(meta).to_hex(),
           validated: options.validated

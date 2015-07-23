@@ -11,7 +11,9 @@ const hashes = require('./fixtures/hashes');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const address = addresses.ACCOUNT;
-const NotFoundError = require('../src/api/common/errors').NotFoundError;
+const errors = require('../src/api/common/errors');
+const RippleError = require('../src/core/rippleerror').RippleError;
+const utils = require('../src/api/ledger/utils');
 
 const orderbook = {
   base: {
@@ -159,6 +161,83 @@ describe('RippleAPI', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2};
     this.api.getTransactions(address, options,
       _.partial(checkResult, responses.getTransactions, done));
+  });
+
+  it('getTransactions - earliest first', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 2,
+      earliestFirst: true
+    };
+    const expected = _.cloneDeep(responses.getTransactions)
+      .sort(utils.compareTransactions);
+    this.api.getTransactions(address, options,
+      _.partial(checkResult, expected, done));
+  });
+
+  it('getTransactions - earliest first with start option', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 2,
+      start: hashes.VALID_TRANSACTION_HASH,
+      earliestFirst: true
+    };
+    this.api.getTransactions(address, options, (error, data) => {
+      assert.strictEqual(data.length, 0);
+      done(error);
+    });
+  });
+
+  it('getTransactions - gap', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 2,
+      maxLedgerVersion: 348858000
+    };
+    this.api.getTransactions(address, options, (error) => {
+      assert.ok(error instanceof errors.MissingLedgerHistoryError);
+      done();
+    });
+  });
+
+  it('getTransactions - tx not found', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 2,
+      start: hashes.NOTFOUND_TRANSACTION_HASH,
+      counterparty: address
+    };
+    this.api.getTransactions(address, options, (error) => {
+      assert.ok(error instanceof RippleError);
+      assert.strictEqual(error.remote.error, 'txnNotFound');
+      done();
+    });
+  });
+
+  it('getTransactions - filters', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 10,
+      excludeFailures: true,
+      counterparty: addresses.ISSUER
+    };
+    this.api.getTransactions(address, options, (error, data) => {
+      assert.strictEqual(data.length, 10);
+      assert.ok(_.every(data, t => t.type === 'payment' || t.type === 'order'));
+      assert.ok(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
+      done();
+    });
+  });
+
+  it('getTransactions - filters for incoming', function(done) {
+    const options = {types: ['payment', 'order'], initiated: false, limit: 10,
+      excludeFailures: true,
+      counterparty: addresses.ISSUER
+    };
+    this.api.getTransactions(address, options, (error, data) => {
+      assert.strictEqual(data.length, 10);
+      assert.ok(_.every(data, t => t.type === 'payment' || t.type === 'order'));
+      assert.ok(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
+      done();
+    });
+  });
+
+  it('getTransactions - error', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 13};
+    this.api.getTransactions(address, options, (error) => {
+      assert.ok(error instanceof RippleError);
+      done();
+    });
   });
 
   // TODO: this doesn't test much, just that it doesn't crash
@@ -338,7 +417,7 @@ describe('RippleAPI', function() {
       }
     };
     this.api.getPaths(pathfind, (error) => {
-      assert.ok(error instanceof NotFoundError);
+      assert.ok(error instanceof errors.NotFoundError);
       done();
     });
   });
@@ -357,7 +436,7 @@ describe('RippleAPI', function() {
       }
     };
     this.api.getPaths(pathfind, (error) => {
-      assert.ok(error instanceof NotFoundError);
+      assert.ok(error instanceof errors.NotFoundError);
       done();
     });
   });
@@ -376,7 +455,7 @@ describe('RippleAPI', function() {
       }
     };
     this.api.getPaths(pathfind, (error) => {
-      assert.ok(error instanceof NotFoundError);
+      assert.ok(error instanceof errors.NotFoundError);
       done();
     });
   });
@@ -400,7 +479,7 @@ describe('RippleAPI', function() {
       }
     };
     this.api.getPaths(pathfind, (error) => {
-      assert.ok(error instanceof NotFoundError);
+      assert.ok(error instanceof errors.NotFoundError);
       done();
     });
   });
