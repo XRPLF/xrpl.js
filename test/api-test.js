@@ -11,6 +11,11 @@ const hashes = require('./fixtures/hashes');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const address = addresses.ACCOUNT;
+const errors = require('../src/api/common/errors');
+const validate = require('../src/api/common/validate');
+const RippleError = require('../src/core/rippleerror').RippleError;
+const utils = require('../src/api/ledger/utils');
+const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
 
 const orderbook = {
   base: {
@@ -46,19 +51,29 @@ describe('RippleAPI', function() {
   afterEach(setupAPI.teardown);
 
   it('preparePayment', function(done) {
-    this.api.preparePayment(address, requests.preparePayment, instructions,
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    this.api.preparePayment(address, requests.preparePayment, localInstructions,
       _.partial(checkResult, responses.preparePayment, done));
   });
 
   it('preparePayment with all options specified', function(done) {
+    const localInstructions = {
+      maxLedgerVersion: this.api.getLedgerVersion() + 100,
+      fee: '0.000012'
+    };
     this.api.preparePayment(address, requests.preparePaymentAllOptions,
-      instructions,
+      localInstructions,
       _.partial(checkResult, responses.preparePaymentAllOptions, done));
   });
 
   it('preparePayment without counterparty set', function(done) {
+    const localInstructions = _.defaults({
+      sequence: 23
+    }, instructions);
     this.api.preparePayment(address, requests.preparePaymentNoCounterparty,
-      instructions,
+      localInstructions,
       _.partial(checkResult, responses.preparePaymentNoCounterparty, done));
   });
 
@@ -144,10 +159,144 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getTransaction.trustline, done));
   });
 
+  it('getTransaction - not found in range', function(done) {
+    const hash =
+      '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
+    const options = {
+      minLedgerVersion: 32570,
+      maxLedgerVersion: 32571
+    };
+    this.api.getTransaction(hash, options, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getTransaction - not found by hash', function(done) {
+    this.api.getTransaction(hashes.NOTFOUND_TRANSACTION_HASH, {}, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getTransaction - missing ledger history', function(done) {
+    // make gaps in history
+    this.api.remote.getServer().emit('message', ledgerClosed);
+    this.api.getTransaction(hashes.NOTFOUND_TRANSACTION_HASH, {}, (error) => {
+      assert.ok(error instanceof errors.MissingLedgerHistoryError);
+      done();
+    });
+  });
+
+  it('getTransaction - ledger_index not found', function(done) {
+    const hash =
+      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11';
+    this.api.getTransaction(hash, {}, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      assert.ok(error.message.indexOf('ledger_index') !== -1);
+      done();
+    });
+  });
+
+  it('getTransaction - transaction ledger not found', function(done) {
+    const hash =
+      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA12';
+    this.api.getTransaction(hash, {}, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      assert.ok(error.message.indexOf('ledger not found') !== -1);
+      done();
+    });
+  });
+
+  it('getTransaction - ledger missing close time', function(done) {
+    const hash =
+      '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04';
+    this.api.getTransaction(hash, {}, (error) => {
+      assert.ok(error instanceof errors.ApiError);
+      done();
+    });
+  });
+
   it('getTransactions', function(done) {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2};
     this.api.getTransactions(address, options,
       _.partial(checkResult, responses.getTransactions, done));
+  });
+
+  it('getTransactions - earliest first', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 2,
+      earliestFirst: true
+    };
+    const expected = _.cloneDeep(responses.getTransactions)
+      .sort(utils.compareTransactions);
+    this.api.getTransactions(address, options,
+      _.partial(checkResult, expected, done));
+  });
+
+  it('getTransactions - earliest first with start option', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 2,
+      start: hashes.VALID_TRANSACTION_HASH,
+      earliestFirst: true
+    };
+    this.api.getTransactions(address, options, (error, data) => {
+      assert.strictEqual(data.length, 0);
+      done(error);
+    });
+  });
+
+  it('getTransactions - gap', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 2,
+      maxLedgerVersion: 348858000
+    };
+    this.api.getTransactions(address, options, (error) => {
+      assert.ok(error instanceof errors.MissingLedgerHistoryError);
+      done();
+    });
+  });
+
+  it('getTransactions - tx not found', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 2,
+      start: hashes.NOTFOUND_TRANSACTION_HASH,
+      counterparty: address
+    };
+    this.api.getTransactions(address, options, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getTransactions - filters', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 10,
+      excludeFailures: true,
+      counterparty: addresses.ISSUER
+    };
+    this.api.getTransactions(address, options, (error, data) => {
+      assert.strictEqual(data.length, 10);
+      assert.ok(_.every(data, t => t.type === 'payment' || t.type === 'order'));
+      assert.ok(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
+      done();
+    });
+  });
+
+  it('getTransactions - filters for incoming', function(done) {
+    const options = {types: ['payment', 'order'], initiated: false, limit: 10,
+      excludeFailures: true,
+      counterparty: addresses.ISSUER
+    };
+    this.api.getTransactions(address, options, (error, data) => {
+      assert.strictEqual(data.length, 10);
+      assert.ok(_.every(data, t => t.type === 'payment' || t.type === 'order'));
+      assert.ok(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
+      done();
+    });
+  });
+
+  it('getTransactions - error', function(done) {
+    const options = {types: ['payment', 'order'], initiated: true, limit: 13};
+    this.api.getTransactions(address, options, (error) => {
+      assert.ok(error instanceof RippleError);
+      done();
+    });
   });
 
   // TODO: this doesn't test much, just that it doesn't crash
@@ -224,8 +373,10 @@ describe('RippleAPI', function() {
 
   it('getOrderbook - direction is correct for bids and asks', function(done) {
     this.api.getOrderbook(address, orderbook, {}, (error, data) => {
-      assert(_.every(data.bids, bid => bid.specification.direction === 'buy'));
-      assert(_.every(data.asks, ask => ask.specification.direction === 'sell'));
+      assert.ok(
+        _.every(data.bids, bid => bid.specification.direction === 'buy'));
+      assert.ok(
+        _.every(data.asks, ask => ask.specification.direction === 'sell'));
       done();
     });
   });
@@ -233,6 +384,15 @@ describe('RippleAPI', function() {
   it('getServerInfo', function(done) {
     this.api.getServerInfo(
       _.partial(checkResult, responses.getServerInfo, done));
+  });
+
+  it('getServerInfo - error', function(done) {
+    this.mockRippled.returnErrorOnServerInfo = true;
+    this.api.getServerInfo((error) => {
+      assert.ok(error instanceof errors.NetworkError);
+      assert.ok(error.message.indexOf('too much load') !== -1);
+      done();
+    });
   });
 
   it('getFee', function() {
@@ -262,10 +422,188 @@ describe('RippleAPI', function() {
       }
     };
     this.api.getPaths(pathfind,
-      _.partial(checkResult, responses.getPaths, done));
+      _.partial(checkResult, responses.getPaths.XrpToUsd, done));
+  });
+
+  // @TODO
+  // need decide what to do with currencies/XRP:
+  // if add 'XRP' in currencies, then there will be exception in
+  // xrpToDrops function (called from toRippledAmount)
+  it('getPaths USD 2 USD', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.OTHER_ACCOUNT,
+        currencies: [
+          {
+            currency: 'LTC'
+          },
+          {
+            currency: 'USD'
+          }
+        ]
+      },
+      destination: {
+        address: address,
+        amount: {
+          currency: 'USD',
+          value: '0.000001'
+        }
+      }
+    };
+    this.api.getPaths(pathfind,
+      _.partial(checkResult, responses.getPaths.UsdToUsd, done));
+  });
+
+  it('getPaths XRP 2 XRP', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '0.000002',
+          currency: 'XRP'
+        }
+      }
+    };
+    this.api.getPaths(pathfind,
+      _.partial(checkResult, responses.getPaths.XrpToXrp, done));
+  });
+
+  it('getPaths - XRP 2 XRP - not enough', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '1000002',
+          currency: 'XRP'
+        }
+      }
+    };
+    this.api.getPaths(pathfind, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - does not accept currency', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '0.000002',
+          currency: 'GBP'
+        }
+      }
+    };
+    this.api.getPaths(pathfind, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - no paths', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '1000002',
+          currency: 'USD'
+        }
+      }
+    };
+    this.api.getPaths(pathfind, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - no paths with source currencies', function(done) {
+    const pathfind = {
+      source: {
+        address: addresses.THIRD_ACCOUNT,
+        currencies: [
+          {
+            currency: 'USD'
+          }
+        ]
+      },
+      destination: {
+        address: address,
+        amount: {
+          value: '1000002',
+          currency: 'USD'
+        }
+      }
+    };
+    this.api.getPaths(pathfind, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      done();
+    });
   });
 
   it('getLedgerVersion', function() {
     assert.strictEqual(this.api.getLedgerVersion(), 8819951);
   });
+
+  it('ledget utils - compareTransactions', function() {
+    let first = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+    let second = {outcome: {ledgerVersion: 1, indexInLedger: 200}};
+
+    assert.strictEqual(utils.compareTransactions(first, second), -1);
+
+    first = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+
+    assert.strictEqual(utils.compareTransactions(first, second), 0);
+
+    first = {outcome: {ledgerVersion: 1, indexInLedger: 200}};
+    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+
+    assert.strictEqual(utils.compareTransactions(first, second), 1);
+  });
+
+  it('ledget utils - renameCounterpartyToIssuer', function() {
+    assert.strictEqual(utils.renameCounterpartyToIssuer(undefined), undefined);
+    const amountArg = {issuer: '1'};
+    assert.deepEqual(utils.renameCounterpartyToIssuer(amountArg), amountArg);
+  });
+
+  it('ledget utils - getRecursive', function(done) {
+    function getter(marker, limit, callback) {
+      if (marker === undefined) {
+        callback(null, {marker: 'A', results: [1]});
+      } else {
+        callback(new Error(), null);
+      }
+    }
+    utils.getRecursive(getter, 10, (error) => {
+      assert.ok(error instanceof Error);
+      done();
+    });
+  });
+
+  it('validator', function() {
+    const noSecret = {address: address};
+    assert.throws(_.partial(validate.addressAndSecret, noSecret),
+      errors.ValidationError);
+    assert.throws(_.partial(validate.addressAndSecret, noSecret),
+      /Parameter missing/);
+    const badSecret = {address: address, secret: 'bad'};
+    assert.throws(_.partial(validate.addressAndSecret, badSecret),
+      errors.ValidationError);
+    assert.throws(_.partial(validate.addressAndSecret, badSecret),
+      /not match/);
+  });
+
 });

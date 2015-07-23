@@ -24,7 +24,32 @@
       "additionalProperties": false,
       "required": ["address"]
     },
-    "destination": {"$ref": "adjustment"}
+    "destination": {
+      "type": "object",
+      "properties": {
+        "address": {"$ref": "address"},
+        "amount": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "description": "The quantity of the currency, denoted as a string to retain floating point precision",
+              "$ref": "value"
+            },
+            "currency": {
+              "description": "The three-character code or hex string used to denote currencies",
+              "$ref": "currency"
+            },
+            "counterparty": {
+              "description": "The Ripple account address of the currency's issuer or gateway",
+              "$ref": "address"
+            },
+            "required": ["currency", "value"]
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["address", "amount"]
+    }
   },
   "required": ["source", "destination"],
   "additionalProperties": false

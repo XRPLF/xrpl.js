@@ -6,6 +6,7 @@ const utils = require('./utils');
 const parseTransaction = require('./parse/transaction');
 const validate = utils.common.validate;
 const errors = utils.common.errors;
+const RippleError = require('../../core/rippleerror').RippleError;
 
 function attachTransactionDate(remote, tx, callback) {
   if (tx.date) {
@@ -43,7 +44,13 @@ function getTransaction(identifier, options, callback) {
   const maxLedgerVersion = Math.min(options.maxLedgerVersion,
     remote.getLedgerSequence());
 
-  function callbackWrapper(error, tx) {
+  function callbackWrapper(error_, tx) {
+    let error = error_;
+    if (error instanceof RippleError && error.remote &&
+      error.remote.error === 'txnNotFound') {
+      error = new errors.NotFoundError('Transaction not found');
+    }
+
     if (error instanceof errors.NotFoundError
         && !utils.hasCompleteLedgerRange(remote,
             options.minLedgerVersion, maxLedgerVersion)) {
