@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable max-params */
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
@@ -28,7 +29,7 @@ function transactionFilter(address, filters, tx) {
     return false;
   }
   if (filters.counterparty && tx.address !== filters.counterparty
-      && tx.Destination !== filters.counterparty) {
+      && tx.specification.destination.address !== filters.counterparty) {
     return false;
   }
   return true;
