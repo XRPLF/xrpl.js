@@ -27,7 +27,11 @@ module.exports = {
     require('./prepare-payment-no-counterparty.json'),
   prepareSettings: {
     regularKey: require('./prepare-settings-regular-key.json'),
-    flags: require('./prepare-settings.json')
+    flags: require('./prepare-settings.json'),
+    flagSet: require('./prepare-settings-flag-set.json'),
+    flagClear: require('./prepare-settings-flag-clear.json'),
+    setTransferRate: require('./prepare-settings-set-transfer-rate.json'),
+    fieldClear: require('./prepare-settings-field-clear.json')
   },
   prepareTrustline: require('./prepare-trustline.json'),
   sign: require('./sign.json'),

@@ -93,6 +93,39 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.prepareSettings.regularKey, done));
   });
 
+  it('prepareSettings - flag set', function(done) {
+    const settings = {requireDestinationTag: true};
+    this.api.prepareSettings(address, settings, instructions,
+      _.partial(checkResult, responses.prepareSettings.flagSet, done));
+  });
+
+  it('prepareSettings - flag clear', function(done) {
+    const settings = {requireDestinationTag: false};
+    this.api.prepareSettings(address, settings, instructions,
+      _.partial(checkResult, responses.prepareSettings.flagClear, done));
+  });
+
+  it('prepareSettings - string field clear', function(done) {
+    const settings = {walletLocator: null};
+    this.api.prepareSettings(address, settings, instructions,
+      _.partial(checkResult, responses.prepareSettings.fieldClear, done));
+  });
+
+  it('prepareSettings - integer field clear', function(done) {
+    const settings = {walletSize: null};
+    this.api.prepareSettings(address, settings, instructions, (e, data) => {
+      assert(data);
+      assert.strictEqual(data.WalletSize, 0);
+      done(e);
+    });
+  });
+
+  it('prepareSettings - set transferRate', function(done) {
+    const settings = {transferRate: 1};
+    this.api.prepareSettings(address, settings, instructions,
+      _.partial(checkResult, responses.prepareSettings.setTransferRate, done));
+  });
+
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
     withDeterministicPRNG(() => {

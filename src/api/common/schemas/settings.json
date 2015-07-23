@@ -12,12 +12,22 @@
     "noFreeze": {"type": "boolean"},
     "globalFreeze": {"type": "boolean"},
     "defaultRipple": {"type": "boolean"},
-    "emailHash": {"$ref": "hash128"},
-    "walletLocator": {"$ref": "hash256"},
-    "walletSize": {"type": "integer"},
+    "emailHash": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "hash128"}
+      ]
+    },
+    "walletLocator": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "hash256"}
+      ]
+    },
+    "walletSize": {"type": ["integer", "null"]},
     "messageKey": {"type": "string"},
     "domain": {"type": "string"},
-    "transferRate": {"type": "integer"},
+    "transferRate": {"type": ["integer", "null"]},
     "signers": {"type": "string"},
     "regularKey": {"$ref": "address"}
   },
