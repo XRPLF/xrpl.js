@@ -13,6 +13,7 @@ const sjcl = require('../src').sjcl;
 const address = addresses.ACCOUNT;
 const RippleError = require('../src/core/rippleerror').RippleError;
 const utils = require('../src/api/ledger/utils');
+const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
 const schemaValidate = require('../src/api/common/schema-validator');
 
 const orderbook = {
@@ -204,6 +205,64 @@ describe('RippleAPI', function() {
         'getTransaction', done));
   });
 
+  it('getTransaction - not found in range', function(done) {
+    const hash =
+      '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
+    const options = {
+      minLedgerVersion: 32570,
+      maxLedgerVersion: 32571
+    };
+    this.api.getTransaction(hash, options, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getTransaction - not found by hash', function(done) {
+    this.api.getTransaction(hashes.NOTFOUND_TRANSACTION_HASH, {}, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getTransaction - missing ledger history', function(done) {
+    // make gaps in history
+    this.api.remote.getServer().emit('message', ledgerClosed);
+    this.api.getTransaction(hashes.NOTFOUND_TRANSACTION_HASH, {}, (error) => {
+      assert.ok(error instanceof errors.MissingLedgerHistoryError);
+      done();
+    });
+  });
+
+  it('getTransaction - ledger_index not found', function(done) {
+    const hash =
+      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11';
+    this.api.getTransaction(hash, {}, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      assert.ok(error.message.indexOf('ledger_index') !== -1);
+      done();
+    });
+  });
+
+  it('getTransaction - transaction ledger not found', function(done) {
+    const hash =
+      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA12';
+    this.api.getTransaction(hash, {}, (error) => {
+      assert.ok(error instanceof errors.NotFoundError);
+      assert.ok(error.message.indexOf('ledger not found') !== -1);
+      done();
+    });
+  });
+
+  it('getTransaction - ledger missing close time', function(done) {
+    const hash =
+      '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04';
+    this.api.getTransaction(hash, {}, (error) => {
+      assert.ok(error instanceof errors.ApiError);
+      done();
+    });
+  });
+
   it('getTransactions', function(done) {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2};
     this.api.getTransactions(address, options,
@@ -248,8 +307,7 @@ describe('RippleAPI', function() {
       counterparty: address
     };
     this.api.getTransactions(address, options, (error) => {
-      assert.ok(error instanceof RippleError);
-      assert.strictEqual(error.remote.error, 'txnNotFound');
+      assert.ok(error instanceof errors.NotFoundError);
       done();
     });
   });
