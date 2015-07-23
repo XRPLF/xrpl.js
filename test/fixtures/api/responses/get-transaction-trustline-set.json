@@ -7,8 +7,8 @@
     "limit": "10000",
     "currency": "USD",
     "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-    "qualityIn": 500000000,
-    "qualityOut": 500000000,
+    "qualityIn": 0.5,
+    "qualityOut": 0.5,
     "ripplingDisabled": true
   },
   "outcome": {
