@@ -71,7 +71,11 @@ module.exports = function(port) {
 
   mock.on('request_server_info', function(request, conn) {
     assert.strictEqual(request.command, 'server_info');
-    conn.send(createResponse(request, fixtures.server_info));
+    if (mock.returnErrorOnServerInfo) {
+      conn.send(createResponse(request, fixtures.server_info_error));
+    } else {
+      conn.send(createResponse(request, fixtures.server_info));
+    }
   });
 
   mock.on('request_subscribe', function(request, conn) {

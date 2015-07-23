@@ -198,7 +198,7 @@ module.exports = function(request, options={}) {
     TransactionResult: 'tesSUCCESS'
   };
 
-  let marker = +request.marker || 0;
+  let marker = Number(request.marker) || 0;
   marker += 1;
   if (marker === 5) {
     meta.TransactionResult = 'tecINSUFFICIENT_RESERVE';
@@ -228,7 +228,7 @@ module.exports = function(request, options={}) {
       marker: marker === undefined ? undefined : String(marker),
       transactions: [
         {
-          ledger_index: 348860 - +marker,
+          ledger_index: 348860 - Number(marker),
           tx_blob: SerializedObject.from_json(tx).to_hex(),
           meta: SerializedObject.from_json(meta).to_hex(),
           validated: options.validated

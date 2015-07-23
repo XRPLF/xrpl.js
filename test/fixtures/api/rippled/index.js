@@ -15,6 +15,7 @@ module.exports = {
   account_tx: require('./account-tx'),
   book_offers: require('./book-offers'),
   server_info: require('./server-info'),
+  server_info_error: require('./server-info-error'),
   ripple_path_find: {
     generate: require('./ripple-path-find'),
     sendUSD: require('./ripple-path-find-send-usd'),

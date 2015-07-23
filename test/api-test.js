@@ -11,6 +11,7 @@ const hashes = require('./fixtures/hashes');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const address = addresses.ACCOUNT;
+const validate = require('../src/api/common/validate');
 const RippleError = require('../src/core/rippleerror').RippleError;
 const utils = require('../src/api/ledger/utils');
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
@@ -213,14 +214,14 @@ describe('RippleAPI', function() {
       maxLedgerVersion: 32571
     };
     this.api.getTransaction(hash, options, (error) => {
-      assert.ok(error instanceof errors.NotFoundError);
+      assert(error instanceof this.api.errors.NotFoundError);
       done();
     });
   });
 
   it('getTransaction - not found by hash', function(done) {
     this.api.getTransaction(hashes.NOTFOUND_TRANSACTION_HASH, {}, (error) => {
-      assert.ok(error instanceof errors.NotFoundError);
+      assert(error instanceof this.api.errors.NotFoundError);
       done();
     });
   });
@@ -229,7 +230,7 @@ describe('RippleAPI', function() {
     // make gaps in history
     this.api.remote.getServer().emit('message', ledgerClosed);
     this.api.getTransaction(hashes.NOTFOUND_TRANSACTION_HASH, {}, (error) => {
-      assert.ok(error instanceof errors.MissingLedgerHistoryError);
+      assert(error instanceof this.api.errors.MissingLedgerHistoryError);
       done();
     });
   });
@@ -238,8 +239,8 @@ describe('RippleAPI', function() {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11';
     this.api.getTransaction(hash, {}, (error) => {
-      assert.ok(error instanceof errors.NotFoundError);
-      assert.ok(error.message.indexOf('ledger_index') !== -1);
+      assert(error instanceof this.api.errors.NotFoundError);
+      assert(error.message.indexOf('ledger_index') !== -1);
       done();
     });
   });
@@ -248,8 +249,8 @@ describe('RippleAPI', function() {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA12';
     this.api.getTransaction(hash, {}, (error) => {
-      assert.ok(error instanceof errors.NotFoundError);
-      assert.ok(error.message.indexOf('ledger not found') !== -1);
+      assert(error instanceof this.api.errors.NotFoundError);
+      assert(error.message.indexOf('ledger not found') !== -1);
       done();
     });
   });
@@ -258,7 +259,7 @@ describe('RippleAPI', function() {
     const hash =
       '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04';
     this.api.getTransaction(hash, {}, (error) => {
-      assert.ok(error instanceof errors.ApiError);
+      assert(error instanceof this.api.errors.ApiError);
       done();
     });
   });
@@ -277,7 +278,7 @@ describe('RippleAPI', function() {
     const expected = _.cloneDeep(responses.getTransactions)
       .sort(utils.compareTransactions);
     this.api.getTransactions(address, options,
-      _.partial(checkResult, expected, done));
+      _.partial(checkResult, expected, 'getTransactions', done));
   });
 
   it('getTransactions - earliest first with start option', function(done) {
@@ -296,7 +297,7 @@ describe('RippleAPI', function() {
       maxLedgerVersion: 348858000
     };
     this.api.getTransactions(address, options, (error) => {
-      assert.ok(error instanceof this.errors.MissingLedgerHistoryError);
+      assert(error instanceof this.api.errors.MissingLedgerHistoryError);
       done();
     });
   });
@@ -307,7 +308,7 @@ describe('RippleAPI', function() {
       counterparty: address
     };
     this.api.getTransactions(address, options, (error) => {
-      assert.ok(error instanceof errors.NotFoundError);
+      assert(error instanceof this.api.errors.NotFoundError);
       done();
     });
   });
@@ -319,8 +320,8 @@ describe('RippleAPI', function() {
     };
     this.api.getTransactions(address, options, (error, data) => {
       assert.strictEqual(data.length, 10);
-      assert.ok(_.every(data, t => t.type === 'payment' || t.type === 'order'));
-      assert.ok(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
+      assert(_.every(data, t => t.type === 'payment' || t.type === 'order'));
+      assert(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
       done();
     });
   });
@@ -332,16 +333,18 @@ describe('RippleAPI', function() {
     };
     this.api.getTransactions(address, options, (error, data) => {
       assert.strictEqual(data.length, 10);
-      assert.ok(_.every(data, t => t.type === 'payment' || t.type === 'order'));
-      assert.ok(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
+      assert(_.every(data, t => t.type === 'payment' || t.type === 'order'));
+      assert(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
       done();
     });
   });
 
+  // this is the case where core.RippleError just falls
+  // through the api to the user
   it('getTransactions - error', function(done) {
     const options = {types: ['payment', 'order'], initiated: true, limit: 13};
     this.api.getTransactions(address, options, (error) => {
-      assert.ok(error instanceof RippleError);
+      assert(error instanceof RippleError);
       done();
     });
   });
@@ -435,6 +438,15 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getServerInfo, null, done));
   });
 
+  it('getServerInfo - error', function(done) {
+    this.mockRippled.returnErrorOnServerInfo = true;
+    this.api.getServerInfo((error) => {
+      assert(error instanceof this.api.errors.NetworkError);
+      assert(error.message.indexOf('too much load') !== -1);
+      done();
+    });
+  });
+
   it('getFee', function() {
     assert.strictEqual(this.api.getFee(), '0.000012');
   });
@@ -497,4 +509,59 @@ describe('RippleAPI', function() {
   it('getLedgerVersion', function() {
     assert.strictEqual(this.api.getLedgerVersion(), 8819951);
   });
+
+  it('ledger utils - compareTransactions', function() {
+    let first = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+    let second = {outcome: {ledgerVersion: 1, indexInLedger: 200}};
+
+    assert.strictEqual(utils.compareTransactions(first, second), -1);
+
+    first = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+
+    assert.strictEqual(utils.compareTransactions(first, second), 0);
+
+    first = {outcome: {ledgerVersion: 1, indexInLedger: 200}};
+    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+
+    assert.strictEqual(utils.compareTransactions(first, second), 1);
+  });
+
+  it('ledger utils - renameCounterpartyToIssuer', function() {
+    assert.strictEqual(utils.renameCounterpartyToIssuer(undefined), undefined);
+    const amountArg = {issuer: '1'};
+    assert.deepEqual(utils.renameCounterpartyToIssuer(amountArg), amountArg);
+  });
+
+  it('ledger utils - getRecursive', function(done) {
+    function getter(marker, limit, callback) {
+      if (marker === undefined) {
+        callback(null, {marker: 'A', results: [1]});
+      } else {
+        callback(new Error(), null);
+      }
+    }
+    utils.getRecursive(getter, 10, (error) => {
+      assert(error instanceof Error);
+      done();
+    });
+  });
+
+  it('validator', function() {
+    const noSecret = {address: address};
+    assert.throws(_.partial(validate.addressAndSecret, noSecret),
+      this.api.errors.ValidationError);
+    assert.throws(_.partial(validate.addressAndSecret, noSecret),
+      /Parameter missing/);
+    const badSecret = {address: address, secret: 'bad'};
+    assert.throws(_.partial(validate.addressAndSecret, badSecret),
+      this.api.errors.ValidationError);
+    assert.throws(_.partial(validate.addressAndSecret, badSecret),
+      /not match/);
+    const goodWallet = {address: 'rpZMK8hwyrBvLorFNWHRCGt88nCJWbixur',
+      secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
+    };
+    assert.doesNotThrow(_.partial(validate.addressAndSecret, goodWallet));
+  });
+
 });
