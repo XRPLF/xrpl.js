@@ -12,6 +12,7 @@ const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const address = addresses.ACCOUNT;
 const errors = require('../src/api/common/errors');
+const validate = require('../src/api/common/validate');
 const RippleError = require('../src/core/rippleerror').RippleError;
 const utils = require('../src/api/ledger/utils');
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
@@ -385,6 +386,15 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getServerInfo, done));
   });
 
+  it('getServerInfo - error', function(done) {
+    this.mockRippled.returnErrorOnServerInfo = true;
+    this.api.getServerInfo((error) => {
+      assert.ok(error instanceof errors.NetworkError);
+      assert.ok(error.message.indexOf('too much load') !== -1);
+      done();
+    });
+  });
+
   it('getFee', function() {
     assert.strictEqual(this.api.getFee(), '0.000012');
   });
@@ -545,4 +555,55 @@ describe('RippleAPI', function() {
   it('getLedgerVersion', function() {
     assert.strictEqual(this.api.getLedgerVersion(), 8819951);
   });
+
+  it('ledget utils - compareTransactions', function() {
+    let first = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+    let second = {outcome: {ledgerVersion: 1, indexInLedger: 200}};
+
+    assert.strictEqual(utils.compareTransactions(first, second), -1);
+
+    first = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+
+    assert.strictEqual(utils.compareTransactions(first, second), 0);
+
+    first = {outcome: {ledgerVersion: 1, indexInLedger: 200}};
+    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
+
+    assert.strictEqual(utils.compareTransactions(first, second), 1);
+  });
+
+  it('ledget utils - renameCounterpartyToIssuer', function() {
+    assert.strictEqual(utils.renameCounterpartyToIssuer(undefined), undefined);
+    const amountArg = {issuer: '1'};
+    assert.deepEqual(utils.renameCounterpartyToIssuer(amountArg), amountArg);
+  });
+
+  it('ledget utils - getRecursive', function(done) {
+    function getter(marker, limit, callback) {
+      if (marker === undefined) {
+        callback(null, {marker: 'A', results: [1]});
+      } else {
+        callback(new Error(), null);
+      }
+    }
+    utils.getRecursive(getter, 10, (error) => {
+      assert.ok(error instanceof Error);
+      done();
+    });
+  });
+
+  it('validator', function() {
+    const noSecret = {address: address};
+    assert.throws(_.partial(validate.addressAndSecret, noSecret),
+      errors.ValidationError);
+    assert.throws(_.partial(validate.addressAndSecret, noSecret),
+      /Parameter missing/);
+    const badSecret = {address: address, secret: 'bad'};
+    assert.throws(_.partial(validate.addressAndSecret, badSecret),
+      errors.ValidationError);
+    assert.throws(_.partial(validate.addressAndSecret, badSecret),
+      /not match/);
+  });
+
 });
