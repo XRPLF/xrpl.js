@@ -6,7 +6,11 @@ module.exports = {
   getBalances: require('./get-balances.json'),
   getOrderbook: require('./get-orderbook.json'),
   getOrders: require('./get-orders.json'),
-  getPaths: require('./get-paths.json'),
+  getPaths: {
+    XrpToUsd: require('./get-paths.json'),
+    UsdToUsd: require('./get-paths-send-usd.json'),
+    XrpToXrp: require('./get-paths-xrp-to-xrp.json')
+  },
   getServerInfo: require('./get-server-info.json'),
   getSettings: require('./get-settings.json'),
   getTransaction: {
