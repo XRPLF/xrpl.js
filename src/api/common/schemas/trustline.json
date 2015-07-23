@@ -8,7 +8,7 @@
     "limit": {"$ref": "value"},
     "qualityIn": {"$ref": "quality"},
     "qualityOut": {"$ref": "quality"},
-    "allowRippling": {"type": "boolean"},
+    "ripplingDisabled": {"type": "boolean"},
     "authorized": {"type": "boolean"},
     "frozen": {"type": "boolean"}
   },

@@ -6,7 +6,7 @@ const Transaction = utils.common.core.Transaction;
 
 const TrustSetFlags = {
   authorized: {set: 'SetAuth'},
-  allowRippling: {set: 'ClearNoRipple', unset: 'NoRipple'},
+  ripplingDisabled: {set: 'NoRipple', unset: 'ClearNoRipple'},
   frozen: {set: 'SetFreeze', unset: 'ClearFreeze'}
 };
 

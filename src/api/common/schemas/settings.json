@@ -1,37 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "settings",
-  "type": "object",
-  "properties": {
-    "passwordSpent": {"type": "boolean"},
-    "requireDestinationTag": {"type": "boolean"},
-    "requireAuthorization": {"type": "boolean"},
-    "disallowIncomingXRP": {"type": "boolean"},
-    "disableMasterKey": {"type": "boolean"},
-    "enableTransactionIDTracking": {"type": "boolean"},
-    "noFreeze": {"type": "boolean"},
-    "globalFreeze": {"type": "boolean"},
-    "defaultRipple": {"type": "boolean"},
-    "emailHash": {
-      "oneOf": [
-        {"type": "null"},
-        {"$ref": "hash128"}
-      ]
+  "allOf": [
+    {
+      "$ref": "getSettings"
     },
-    "walletLocator": {
-      "oneOf": [
-        {"type": "null"},
-        {"$ref": "hash256"}
-      ]
-    },
-    "walletSize": {"type": ["integer", "null"]},
-    "messageKey": {"type": "string"},
-    "domain": {"type": "string"},
-    "transferRate": {"type": ["integer", "null"]},
-    "signers": {"type": "string"},
-    "regularKey": {"$ref": "address"}
-  },
-  "minProperties": 1,
-  "maxProperties": 1,
-  "additionalProperties": false
+    {
+      "minProperties": 1,
+      "maxProperties": 1
+    }
+  ]
 }
