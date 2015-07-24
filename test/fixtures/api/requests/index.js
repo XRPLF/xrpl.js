@@ -8,5 +8,14 @@ module.exports = {
   preparePaymentNoCounterparty: require('./prepare-payment-no-counterparty'),
   prepareSettings: require('./prepare-settings'),
   prepareTrustline: require('./prepare-trustline'),
-  sign: require('./sign')
+  sign: require('./sign'),
+  getPaths: {
+    normal: require('./getpaths/normal'),
+    UsdToUsd: require('./getpaths/usd2usd'),
+    XrpToXrp: require('./getpaths/xrp2xrp'),
+    XrpToXrpNotEnough: require('./getpaths/xrp2xrp-not-enough'),
+    NotAcceptCurrency: require('./getpaths/not-accept-currency'),
+    NoPaths: require('./getpaths/no-paths'),
+    NoPathsWithCurrencies: require('./getpaths/no-paths-with-currencies')
+  }
 };

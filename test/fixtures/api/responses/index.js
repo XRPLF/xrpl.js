@@ -6,7 +6,11 @@ module.exports = {
   getBalances: require('./get-balances.json'),
   getOrderbook: require('./get-orderbook.json'),
   getOrders: require('./get-orders.json'),
-  getPaths: require('./get-paths.json'),
+  getPaths: {
+    XrpToUsd: require('./get-paths.json'),
+    UsdToUsd: require('./get-paths-send-usd.json'),
+    XrpToXrp: require('./get-paths-xrp-to-xrp.json')
+  },
   getServerInfo: require('./get-server-info.json'),
   getSettings: require('./get-settings.json'),
   getTransaction: {
@@ -27,7 +31,11 @@ module.exports = {
     require('./prepare-payment-no-counterparty.json'),
   prepareSettings: {
     regularKey: require('./prepare-settings-regular-key.json'),
-    flags: require('./prepare-settings.json')
+    flags: require('./prepare-settings.json'),
+    flagSet: require('./prepare-settings-flag-set.json'),
+    flagClear: require('./prepare-settings-flag-clear.json'),
+    setTransferRate: require('./prepare-settings-set-transfer-rate.json'),
+    fieldClear: require('./prepare-settings-field-clear.json')
   },
   prepareTrustline: require('./prepare-trustline.json'),
   sign: require('./sign.json'),

@@ -46,19 +46,29 @@ describe('RippleAPI', function() {
   afterEach(setupAPI.teardown);
 
   it('preparePayment', function(done) {
-    this.api.preparePayment(address, requests.preparePayment, instructions,
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    this.api.preparePayment(address, requests.preparePayment, localInstructions,
       _.partial(checkResult, responses.preparePayment, done));
   });
 
   it('preparePayment with all options specified', function(done) {
+    const localInstructions = {
+      maxLedgerVersion: this.api.getLedgerVersion() + 100,
+      fee: '0.000012'
+    };
     this.api.preparePayment(address, requests.preparePaymentAllOptions,
-      instructions,
+      localInstructions,
       _.partial(checkResult, responses.preparePaymentAllOptions, done));
   });
 
   it('preparePayment without counterparty set', function(done) {
+    const localInstructions = _.defaults({
+      sequence: 23
+    }, instructions);
     this.api.preparePayment(address, requests.preparePaymentNoCounterparty,
-      instructions,
+      localInstructions,
       _.partial(checkResult, responses.preparePaymentNoCounterparty, done));
   });
 
@@ -91,6 +101,39 @@ describe('RippleAPI', function() {
     const regularKey = {regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD'};
     this.api.prepareSettings(address, regularKey, instructions,
       _.partial(checkResult, responses.prepareSettings.regularKey, done));
+  });
+
+  it('prepareSettings - flag set', function(done) {
+    const settings = {requireDestinationTag: true};
+    this.api.prepareSettings(address, settings, instructions,
+      _.partial(checkResult, responses.prepareSettings.flagSet, done));
+  });
+
+  it('prepareSettings - flag clear', function(done) {
+    const settings = {requireDestinationTag: false};
+    this.api.prepareSettings(address, settings, instructions,
+      _.partial(checkResult, responses.prepareSettings.flagClear, done));
+  });
+
+  it('prepareSettings - string field clear', function(done) {
+    const settings = {walletLocator: null};
+    this.api.prepareSettings(address, settings, instructions,
+      _.partial(checkResult, responses.prepareSettings.fieldClear, done));
+  });
+
+  it('prepareSettings - integer field clear', function(done) {
+    const settings = {walletSize: null};
+    this.api.prepareSettings(address, settings, instructions, (e, data) => {
+      assert(data);
+      assert.strictEqual(data.WalletSize, 0);
+      done(e);
+    });
+  });
+
+  it('prepareSettings - set transferRate', function(done) {
+    const settings = {transferRate: 1};
+    this.api.prepareSettings(address, settings, instructions,
+      _.partial(checkResult, responses.prepareSettings.setTransferRate, done));
   });
 
   it('sign', function() {
@@ -225,7 +268,8 @@ describe('RippleAPI', function() {
   it('getOrderbook - direction is correct for bids and asks', function(done) {
     this.api.getOrderbook(address, orderbook, {}, (error, data) => {
       assert(_.every(data.bids, bid => bid.specification.direction === 'buy'));
-      assert(_.every(data.asks, ask => ask.specification.direction === 'sell'));
+      assert(
+        _.every(data.asks, ask => ask.specification.direction === 'sell'));
       done();
     });
   });
@@ -248,21 +292,50 @@ describe('RippleAPI', function() {
   });
 
   it('getPaths', function(done) {
-    const pathfind = {
-      source: {
-        address: address
-      },
-      destination: {
-        address: addresses.OTHER_ACCOUNT,
-        amount: {
-          currency: 'USD',
-          counterparty: addresses.ISSUER,
-          value: '100'
-        }
-      }
-    };
-    this.api.getPaths(pathfind,
-      _.partial(checkResult, responses.getPaths, done));
+    this.api.getPaths(requests.getPaths.normal,
+      _.partial(checkResult, responses.getPaths.XrpToUsd, done));
+  });
+
+  // @TODO
+  // need decide what to do with currencies/XRP:
+  // if add 'XRP' in currencies, then there will be exception in
+  // xrpToDrops function (called from toRippledAmount)
+  it('getPaths USD 2 USD', function(done) {
+    this.api.getPaths(requests.getPaths.UsdToUsd,
+      _.partial(checkResult, responses.getPaths.UsdToUsd, done));
+  });
+
+  it('getPaths XRP 2 XRP', function(done) {
+    this.api.getPaths(requests.getPaths.XrpToXrp,
+      _.partial(checkResult, responses.getPaths.XrpToXrp, done));
+  });
+
+  it('getPaths - XRP 2 XRP - not enough', function(done) {
+    this.api.getPaths(requests.getPaths.XrpToXrpNotEnough, (error) => {
+      assert(error instanceof this.api.errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - does not accept currency', function(done) {
+    this.api.getPaths(requests.getPaths.NotAcceptCurrency, (error) => {
+      assert(error instanceof this.api.errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - no paths', function(done) {
+    this.api.getPaths(requests.getPaths.NoPaths, (error) => {
+      assert(error instanceof this.api.errors.NotFoundError);
+      done();
+    });
+  });
+
+  it('getPaths - no paths with source currencies', function(done) {
+    this.api.getPaths(requests.getPaths.NoPathsWithCurrencies, (error) => {
+      assert(error instanceof this.api.errors.NotFoundError);
+      done();
+    });
   });
 
   it('getLedgerVersion', function() {

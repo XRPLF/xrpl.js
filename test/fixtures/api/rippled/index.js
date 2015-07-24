@@ -13,7 +13,11 @@ module.exports = {
   account_tx: require('./account-tx'),
   book_offers: require('./book-offers'),
   server_info: require('./server-info'),
-  ripple_path_find: require('./ripple-path-find'),
+  ripple_path_find: {
+    generate: require('./ripple-path-find'),
+    sendUSD: require('./ripple-path-find-send-usd'),
+    XrpToXrp: require('./ripple-path-find-xrp-to-xrp')
+  },
   tx: {
     Payment: require('./tx/payment.json'),
     AccountSet: require('./tx/account-set.json'),

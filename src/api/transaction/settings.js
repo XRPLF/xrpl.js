@@ -9,7 +9,7 @@ const AccountFields = utils.common.constants.AccountFields;
 const Transaction = utils.common.core.Transaction;
 
 // Emptry string passed to setting will clear it
-const CLEAR_SETTING = '';
+const CLEAR_SETTING = null;
 
 function setTransactionFlags(transaction, values) {
   const keys = Object.keys(values);
