@@ -1,3 +1,7 @@
+##0.12.6
+
++ [Fix webpack require failure due to "./" notation](https://github.com/ripple/ripple-lib/commit/8d9746d7b10be203ee613df523c2522012ff1baf)
+
 ##0.12.15
 
 + [Add offer autobridging](https://github.com/ripple/ripple-lib/commit/c7bbce83719c1e8c6a4fae5ca850e7515db1a4a5)
