@@ -1,10 +1,10 @@
-/*eslint-disable max-len */
+/*eslint-disable max-len, no-param-reassign*/
 
 'use strict';
 
-var _ = require('lodash');
-var addresses = require('./addresses');
-var Meta = require('ripple-lib').Meta;
+const _ = require('lodash');
+const addresses = require('./addresses');
+const Meta = require('ripple-lib').Meta;
 
 module.exports.FIAT_BALANCE = '10';
 module.exports.NATIVE_BALANCE = '55';
@@ -816,7 +816,7 @@ module.exports.transactionWithCreatedOffer = function(options) {
     amount: '1.9951'
   });
 
-  var meta = new Meta({
+  const meta = new Meta({
     AffectedNodes: [
       {
         CreatedNode: {
@@ -856,7 +856,7 @@ module.exports.transactionWithDeletedOffer = function(options) {
     transaction_type: 'OfferCreate'
   });
 
-  var meta = new Meta({
+  const meta = new Meta({
     AffectedNodes: [
       {
         DeletedNode: {
@@ -895,8 +895,53 @@ module.exports.transactionWithDeletedOffer = function(options) {
   };
 };
 
+module.exports.transactionWithDeletedOfferR = function(options) {
+  options = options || {};
+  _.defaults(options, {
+    transaction_type: 'OfferCreate'
+  });
+
+  const meta = new Meta({
+    AffectedNodes: [
+      {
+        DeletedNode: {
+          FinalFields: {
+            Account: addresses.ACCOUNT,
+            BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
+            BookNode: '0000000000000000',
+            Expiration: 477086871,
+            Flags: 131072,
+            OwnerNode: '0000000000000979',
+            PreviousTxnID: 'DDD2AB60A2AA1690A6CB99B094BFD2E39A81AFF2AA91B5E4049D2C96A4BC8EBA',
+            PreviousTxnLgrSeq: 11674760,
+            Sequence: 85006,
+            TakerPays: {
+              currency: 'USD',
+              issuer: addresses.ISSUER,
+              value: module.exports.TAKER_GETS
+            },
+            TakerGets: module.exports.TAKER_PAYS
+          },
+          LedgerEntryType: 'Offer',
+          LedgerIndex: 'B6BC3B0F87976370EE11F5575593FE63AA5DC1D602830DC96F04B2D597F044BF'
+        }
+      }
+    ]
+  });
+
+  meta.getAffectedBooks();
+
+  return {
+    mmeta: meta,
+    transaction: {
+      TransactionType: options.transaction_type,
+      owner_funds: '2010.027702881682'
+    }
+  };
+};
+
 module.exports.transactionWithModifiedOffer = function() {
-  var meta = new Meta({
+  const meta = new Meta({
     AffectedNodes: module.exports.MODIFIED_NODES.slice(0, 1)
   });
 
@@ -912,7 +957,7 @@ module.exports.transactionWithModifiedOffer = function() {
 };
 
 module.exports.transactionWithModifiedOffers = function() {
-  var meta = new Meta({
+  const meta = new Meta({
     AffectedNodes: module.exports.MODIFIED_NODES
   });
 
@@ -928,7 +973,7 @@ module.exports.transactionWithModifiedOffers = function() {
 };
 
 module.exports.transactionWithNoNodes = function() {
-  var meta = new Meta({
+  const meta = new Meta({
     AffectedNodes: []
   });
 

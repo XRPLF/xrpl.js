@@ -712,6 +712,8 @@ describe('Remote', function() {
     });
 
     orderbook._subscribed = true;
+    orderbook._synced = true;
+
     orderbook.once('transaction', function(t) {
       assert.deepEqual(t.transaction, message.transaction);
       assert.deepEqual(t.meta, message.meta);
