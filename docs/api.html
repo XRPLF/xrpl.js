@@ -1,0 +1,176 @@
+<html>
+<head>
+<style>
+.method {
+  margin-bottom: 10px;
+}
+.details {
+  display: none;
+}
+</style>
+<script type="text/javascript">
+function toggle() {
+  console.log(this);
+}
+</script>
+</head>
+<body>
+
+<div class="method">
+<a href="#">connect</a>(callback)
+</div>
+
+<div class="method">
+<a href="#">disconnect</a>(callback)
+</div>
+
+<div class="method">
+<a href="#">isConnected</a>()
+</div>
+
+<div class="method">
+<a href="#">getServerInfo</a>(callback)
+</div>
+
+<div class="method">
+<a href="#">getFee</a>()
+</div>
+
+<div class="method">
+<a href="#">getLedgerVersion</a>()
+</div>
+
+<div class="method">
+<a href="#">getTransaction</a>(identifier, options, callback)
+<div class="details">
+  identifier: txhash
+    options: {minLedgerVersion: int, maxLedgerVersion: int}
+</div>
+</div>
+
+<div class="method">
+<a href="#">getTransactions</a>(account, options, callback)
+<div class="details">
+options: {start: txhash, limit: int, minLedgerVersion: int, maxLedgerVersion: int,
+earliestFirst: bool, excludeFailures: bool, initiated: bool, counterparty: address,
+types: [string], binary: bool}
+</div>
+</div>
+
+<div class="method">
+<a href="#">getTrustlines</a>(account, options, callback)
+<div class="details">
+  options: {counterparty: address, currency: string, limit: int, ledgerVersion: int}
+</div>
+</div>
+
+<div class="method">
+<a href="#">getBalances</a>(account, options, callback)
+<div class="details">
+  options: {counterparty: address, currency: string, limit: int, ledgerVersion: int}
+</div>
+</div>
+
+<div class="method">
+<a href="#">getPaths</a>(pathfind, callback)
+<div class="details">
+pathfind: {source: {address, currencies: [{currency: string, counterparty: address}]},
+      destination: adjustment}
+</div>
+</div>
+
+<div class="method">
+<a href="#">getOrders</a>(account, options, callback)
+<div class="details">
+  options: {limit: int, ledverVersion: int}
+</div>
+</div>
+
+<div class="method">
+<a href="#">getOrderbook</a>(account, orderbook, options, callback)
+<div class="details">
+  orderbook: {base: {currency, counterparty}, counter: {currency, counterparty}}
+  options: {limit: int, ledverVersion: int}
+</div>
+</div>
+
+<div class="method">
+<a href="#">getSettings</a>(account, options, callback)
+<div class="details">
+  options: {ledgerVersion: int}
+</div>
+</div>
+
+<div class="method">
+<a href="#">getAccountInfo</a>(account, options, callback)
+<div class="details">
+  options: {ledgerVersion: int}
+</div>
+</div>
+
+<div class="method">
+<a href="#">preparePayment</a>(account, payment, instructions, callback)
+<div class="details">
+  payment: {source: adjustment, destination: adjustment, paths?: string, slippage?: strfloat,
+memos?: [{type: string, format: string, data: string}], invoiceID?: hash256, allowPartialPayment?: bool, noDirectRipple?: bool, limitQuality?: bool}
+</div>
+</div>
+
+<div class="method">
+<a href="#">prepareTrustline</a>(account, trustline, instructions, callback)
+<div class="details">
+  trustline: {currency: string, counterparty: address, limit: strfloat, qualityIn?: float,
+qualityOut?: float, allowRippling?: bool, authorized?: bool, frozen?: bool}
+</div>
+</div>
+
+<div class="method">
+<a href="#">prepareOrder</a>(account, order, instructions, callback)
+<div class="details">
+  order: {direction: (“buy”|”sell”), quantity: amount, totalPrice: amount,
+immediateOrCancel?: bool, fillOrKill?: bool, passive?: bool}
+</div>
+</div>
+
+<div class="method">
+<a href="#">prepareOrderCancellation</a>(account, sequence, instructions, callback)
+<div class="details">
+  sequence: int
+</div>
+</div>
+
+<div class="method">
+<a href="#">prepareSettings</a>(account, settings, instructions, callback)
+<div class="details">
+  settings: {passwordSpent: bool, requireDestinationTag: bool, requireAuthorization: bool,
+    disallowIncomingXRP: bool, disableMasterKey: bool,
+enableTransactionIDTracking: bool, noFreeze: bool, globalFreeze: bool,
+defaultRipple: bool, emailHash: hash128, walletLocator: hash256, walletSize: int,
+  messageKey: string, domain: string, transferRate: float, signers: string,
+regularKey: address}
+</div>
+</div>
+
+<div class="method">
+<a href="#">sign</a>(txJSON, secret)
+</div>
+
+<div class="method">
+<a href="#">submit</a>(txBlob, callback)
+</div>
+
+<div class="method">
+<a href="#">generateWallet</a>()
+</div>
+
+errors
+
+<pre>
+  amount = {currency: string, counterparty: address, value: floatstr}
+  adjustment = {address: address, amount: amount, tag?: int}
+  instructions = {sequence: int, fee: floatstr, maxFee: floatstr,
+  maxLedgerVersion: int, maxLedgerVersionOffset: int}
+</pre>
+
+</body>
+</html>
