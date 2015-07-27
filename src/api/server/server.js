@@ -2,6 +2,7 @@
 
 'use strict';
 
+const _ = require('lodash');
 const common = require('../common');
 
 // If a ledger is not received in this time, consider the connection offline
@@ -28,7 +29,8 @@ function isConnected(): boolean {
 function getServerInfo(callback: (err: any, data: any) => void): void {
   this.remote.requestServerInfo((error, response) => {
     if (error) {
-      callback(new common.errors.RippledNetworkError(error.message));
+      const message = _.get(error, ['remote', 'error_message'], error.message);
+      callback(new common.errors.RippledNetworkError(message));
     } else {
       callback(null, response.info);
     }

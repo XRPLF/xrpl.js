@@ -71,10 +71,12 @@ function signum(num) {
  */
 
 function compareTransactions(first, second) {
-  if (first.ledgerVersion === second.ledgerVersion) {
-    return signum(Number(first.indexInLedger) - Number(second.indexInLedger));
+  if (first.outcome.ledgerVersion === second.outcome.ledgerVersion) {
+    return signum(Number(first.outcome.indexInLedger) -
+      Number(second.outcome.indexInLedger));
   }
-  return Number(first.ledgerVersion) < Number(second.ledgerVersion) ? -1 : 1;
+  return Number(first.outcome.ledgerVersion) <
+    Number(second.outcome.ledgerVersion) ? -1 : 1;
 }
 
 function hasCompleteLedgerRange(remote, minLedgerVersion, maxLedgerVersion) {

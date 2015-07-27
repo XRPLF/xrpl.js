@@ -71,7 +71,11 @@ module.exports = function(port) {
 
   mock.on('request_server_info', function(request, conn) {
     assert.strictEqual(request.command, 'server_info');
-    conn.send(createResponse(request, fixtures.server_info));
+    if (mock.returnErrorOnServerInfo) {
+      conn.send(createResponse(request, fixtures.server_info_error));
+    } else {
+      conn.send(createResponse(request, fixtures.server_info));
+    }
   });
 
   mock.on('request_subscribe', function(request, conn) {
@@ -111,7 +115,13 @@ module.exports = function(port) {
 
   mock.on('request_ledger', function(request, conn) {
     assert.strictEqual(request.command, 'ledger');
-    conn.send(createResponse(request, fixtures.ledger));
+    if (request.ledger_index === 34) {
+      conn.send(createResponse(request, fixtures.ledgerNotFound));
+    } else if (request.ledger_index === 9038215) {
+      conn.send(createResponse(request, fixtures.ledgerWithoutCloseTime));
+    } else {
+      conn.send(createResponse(request, fixtures.ledger));
+    }
   });
 
   mock.on('request_tx', function(request, conn) {
@@ -130,6 +140,15 @@ module.exports = function(port) {
     } else if (request.transaction ===
         '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D') {
       conn.send(createResponse(request, fixtures.tx.TrustSet));
+    } else if (request.transaction ===
+        '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11') {
+      conn.send(createResponse(request, fixtures.tx.NoLedgerIndex));
+    } else if (request.transaction ===
+        '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA12') {
+      conn.send(createResponse(request, fixtures.tx.NoLedgerFound));
+    } else if (request.transaction ===
+        '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04') {
+      conn.send(createResponse(request, fixtures.tx.LedgerWithoutTime));
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
       conn.send(createResponse(request, fixtures.tx.NotFound));
     } else {
