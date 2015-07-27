@@ -78,10 +78,17 @@ function conditionallyAddDirectXRPPath(remote, address, paths, callback) {
   }
 }
 
+function addDestinationCounterparty(amount, address) {
+  return amount.currency === 'XRP' || amount.counterparty ? amount :
+    _.assign({counterparty: address}, amount);
+}
+
 function formatResponse(pathfind, paths) {
   if (paths.alternatives && paths.alternatives.length > 0) {
     const address = pathfind.source.address;
-    return parsePathfind(address, pathfind.destination.amount, paths);
+    const destinationAmount = addDestinationCounterparty(
+      pathfind.destination.amount, pathfind.destination.address);
+    return parsePathfind(address, destinationAmount, paths);
   }
   if (!_.includes(paths.destination_currencies,
       pathfind.destination.amount.currency)) {

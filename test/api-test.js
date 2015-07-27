@@ -11,6 +11,7 @@ const hashes = require('./fixtures/hashes');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const address = addresses.ACCOUNT;
+const schemaValidate = require('../src/api/common/schema-validator');
 
 const orderbook = {
   base: {
@@ -23,13 +24,16 @@ const orderbook = {
   }
 };
 
-function checkResult(expected, done, error, response) {
+function checkResult(expected, schemaName, done, error, response) {
   if (error) {
     done(error);
     return;
   }
   // console.log(JSON.stringify(response, null, 2));
   assert.deepEqual(response, expected);
+  if (schemaName) {
+    schemaValidate(schemaName, response);
+  }
   done();
 }
 
@@ -50,7 +54,7 @@ describe('RippleAPI', function() {
       maxFee: '0.000012'
     }, instructions);
     this.api.preparePayment(address, requests.preparePayment, localInstructions,
-      _.partial(checkResult, responses.preparePayment, done));
+      _.partial(checkResult, responses.preparePayment, 'tx', done));
   });
 
   it('preparePayment with all options specified', function(done) {
@@ -60,7 +64,7 @@ describe('RippleAPI', function() {
     };
     this.api.preparePayment(address, requests.preparePaymentAllOptions,
       localInstructions,
-      _.partial(checkResult, responses.preparePaymentAllOptions, done));
+      _.partial(checkResult, responses.preparePaymentAllOptions, 'tx', done));
   });
 
   it('preparePayment without counterparty set', function(done) {
@@ -69,56 +73,60 @@ describe('RippleAPI', function() {
     }, instructions);
     this.api.preparePayment(address, requests.preparePaymentNoCounterparty,
       localInstructions,
-      _.partial(checkResult, responses.preparePaymentNoCounterparty, done));
+      _.partial(checkResult, responses.preparePaymentNoCounterparty,
+        'tx', done));
   });
 
   it('prepareOrder - buy order', function(done) {
     this.api.prepareOrder(address, requests.prepareOrder, instructions,
-      _.partial(checkResult, responses.prepareOrder, done));
+      _.partial(checkResult, responses.prepareOrder, 'tx', done));
   });
 
   it('prepareOrder - sell order', function(done) {
     this.api.prepareOrder(address, requests.prepareOrderSell, instructions,
-      _.partial(checkResult, responses.prepareOrderSell, done));
+      _.partial(checkResult, responses.prepareOrderSell, 'tx', done));
   });
 
   it('prepareOrderCancellation', function(done) {
     this.api.prepareOrderCancellation(address, 23, instructions,
-      _.partial(checkResult, responses.prepareOrderCancellation, done));
+      _.partial(checkResult, responses.prepareOrderCancellation, 'tx',
+        done));
   });
 
   it('prepareTrustline', function(done) {
     this.api.prepareTrustline(address, requests.prepareTrustline,
-      instructions, _.partial(checkResult, responses.prepareTrustline, done));
+      instructions, _.partial(checkResult, responses.prepareTrustline,
+        'tx', done));
   });
 
   it('prepareSettings', function(done) {
     this.api.prepareSettings(address, requests.prepareSettings, instructions,
-      _.partial(checkResult, responses.prepareSettings.flags, done));
+      _.partial(checkResult, responses.prepareSettings.flags, 'tx', done));
   });
 
   it('prepareSettings - regularKey', function(done) {
     const regularKey = {regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD'};
     this.api.prepareSettings(address, regularKey, instructions,
-      _.partial(checkResult, responses.prepareSettings.regularKey, done));
+      _.partial(checkResult, responses.prepareSettings.regularKey,
+        'tx', done));
   });
 
   it('prepareSettings - flag set', function(done) {
     const settings = {requireDestinationTag: true};
     this.api.prepareSettings(address, settings, instructions,
-      _.partial(checkResult, responses.prepareSettings.flagSet, done));
+      _.partial(checkResult, responses.prepareSettings.flagSet, 'tx', done));
   });
 
   it('prepareSettings - flag clear', function(done) {
     const settings = {requireDestinationTag: false};
     this.api.prepareSettings(address, settings, instructions,
-      _.partial(checkResult, responses.prepareSettings.flagClear, done));
+      _.partial(checkResult, responses.prepareSettings.flagClear, 'tx', done));
   });
 
   it('prepareSettings - string field clear', function(done) {
     const settings = {walletLocator: null};
     this.api.prepareSettings(address, settings, instructions,
-      _.partial(checkResult, responses.prepareSettings.fieldClear, done));
+      _.partial(checkResult, responses.prepareSettings.fieldClear, 'tx', done));
   });
 
   it('prepareSettings - integer field clear', function(done) {
@@ -133,7 +141,8 @@ describe('RippleAPI', function() {
   it('prepareSettings - set transferRate', function(done) {
     const settings = {transferRate: 1};
     this.api.prepareSettings(address, settings, instructions,
-      _.partial(checkResult, responses.prepareSettings.setTransferRate, done));
+      _.partial(checkResult, responses.prepareSettings.setTransferRate,
+        'tx', done));
   });
 
   it('sign', function() {
@@ -141,56 +150,63 @@ describe('RippleAPI', function() {
     withDeterministicPRNG(() => {
       const result = this.api.sign(requests.sign, secret);
       assert.deepEqual(result, responses.sign);
+      schemaValidate('sign', result);
     });
   });
 
   it('submit', function(done) {
     this.api.submit(responses.sign.signedTransaction,
-      _.partial(checkResult, responses.submit, done));
+      _.partial(checkResult, responses.submit, null, done));
   });
 
   it('getBalances', function(done) {
     this.api.getBalances(address, {},
-      _.partial(checkResult, responses.getBalances, done));
+      _.partial(checkResult, responses.getBalances, 'getBalances', done));
   });
 
   it('getTransaction - payment', function(done) {
     this.api.getTransaction(hashes.VALID_TRANSACTION_HASH, {},
-      _.partial(checkResult, responses.getTransaction.payment, done));
+      _.partial(checkResult, responses.getTransaction.payment,
+        'getTransaction', done));
   });
 
   it('getTransaction - settings', function(done) {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
     this.api.getTransaction(hash, {},
-      _.partial(checkResult, responses.getTransaction.settings, done));
+      _.partial(checkResult, responses.getTransaction.settings,
+        'getTransaction', done));
   });
 
   it('getTransaction - order', function(done) {
     const hash =
       '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51';
     this.api.getTransaction(hash, {},
-      _.partial(checkResult, responses.getTransaction.order, done));
+      _.partial(checkResult, responses.getTransaction.order,
+        'getTransaction', done));
   });
 
   it('getTransaction - order cancellation', function(done) {
     const hash =
       '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
     this.api.getTransaction(hash, {},
-      _.partial(checkResult, responses.getTransaction.orderCancellation, done));
+      _.partial(checkResult, responses.getTransaction.orderCancellation,
+        'getTransaction', done));
   });
 
   it('getTransaction - trustline set', function(done) {
     const hash =
       '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D';
     this.api.getTransaction(hash, {},
-      _.partial(checkResult, responses.getTransaction.trustline, done));
+      _.partial(checkResult, responses.getTransaction.trustline,
+        'getTransaction', done));
   });
 
   it('getTransactions', function(done) {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2};
     this.api.getTransactions(address, options,
-      _.partial(checkResult, responses.getTransactions, done));
+      _.partial(checkResult, responses.getTransactions,
+        'getTransactions', done));
   });
 
   // TODO: this doesn't test much, just that it doesn't crash
@@ -201,13 +217,15 @@ describe('RippleAPI', function() {
       limit: 2
     };
     this.api.getTransactions(address, options,
-      _.partial(checkResult, responses.getTransactions, done));
+      _.partial(checkResult, responses.getTransactions,
+        'getTransactions', done));
   });
 
   it('getTrustlines', function(done) {
     const options = {currency: 'USD'};
     this.api.getTrustlines(address, options,
-      _.partial(checkResult, responses.getTrustlines, done));
+      _.partial(checkResult, responses.getTrustlines, 'getTrustlines',
+        done));
   });
 
   it('generateWallet', function() {
@@ -218,22 +236,23 @@ describe('RippleAPI', function() {
 
   it('getSettings', function(done) {
     this.api.getSettings(address, {},
-      _.partial(checkResult, responses.getSettings, done));
+      _.partial(checkResult, responses.getSettings, 'getSettings', done));
   });
 
   it('getAccountInfo', function(done) {
     this.api.getAccountInfo(address, {},
-      _.partial(checkResult, responses.getAccountInfo, done));
+      _.partial(checkResult, responses.getAccountInfo, 'getAccountInfo',
+        done));
   });
 
   it('getOrders', function(done) {
     this.api.getOrders(address, {},
-      _.partial(checkResult, responses.getOrders, done));
+      _.partial(checkResult, responses.getOrders, 'getOrders', done));
   });
 
   it('getOrderbook', function(done) {
     this.api.getOrderbook(address, orderbook, {},
-      _.partial(checkResult, responses.getOrderbook, done));
+      _.partial(checkResult, responses.getOrderbook, 'getOrderbook', done));
   });
 
   it('getOrderbook - sorted so that best deals come first', function(done) {
@@ -276,7 +295,7 @@ describe('RippleAPI', function() {
 
   it('getServerInfo', function(done) {
     this.api.getServerInfo(
-      _.partial(checkResult, responses.getServerInfo, done));
+      _.partial(checkResult, responses.getServerInfo, null, done));
   });
 
   it('getFee', function() {
@@ -293,7 +312,7 @@ describe('RippleAPI', function() {
 
   it('getPaths', function(done) {
     this.api.getPaths(requests.getPaths.normal,
-      _.partial(checkResult, responses.getPaths.XrpToUsd, done));
+      _.partial(checkResult, responses.getPaths.XrpToUsd, 'getPaths', done));
   });
 
   // @TODO
@@ -302,12 +321,12 @@ describe('RippleAPI', function() {
   // xrpToDrops function (called from toRippledAmount)
   it('getPaths USD 2 USD', function(done) {
     this.api.getPaths(requests.getPaths.UsdToUsd,
-      _.partial(checkResult, responses.getPaths.UsdToUsd, done));
+      _.partial(checkResult, responses.getPaths.UsdToUsd, 'getPaths', done));
   });
 
   it('getPaths XRP 2 XRP', function(done) {
     this.api.getPaths(requests.getPaths.XrpToXrp,
-      _.partial(checkResult, responses.getPaths.XrpToXrp, done));
+      _.partial(checkResult, responses.getPaths.XrpToXrp, 'getPaths', done));
   });
 
   it('getPaths - XRP 2 XRP - not enough', function(done) {

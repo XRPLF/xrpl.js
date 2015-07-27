@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "outcome",
+  "type": "object",
+  "properties": {
+    "result": {"type": "string"},
+    "timestamp": {"type": "string"},
+    "fee": {"$ref": "value"},
+    "balanceChanges": {"type": "object"},
+    "orderbookChanges": {"type": "object"},
+    "ledgerVersion": {"$ref": "ledgerVersion"},
+    "indexInLedger": {"type": "integer", "minimum": 0}
+  },
+  "required": ["result", "fee", "balanceChanges",
+    "orderbookChanges", "ledgerVersion", "indexInLedger"],
+  "additionalProperties": false
+}

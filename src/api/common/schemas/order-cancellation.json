@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "cancellation",
+  "title": "orderCancellation",
   "type": "object",
   "properties": {
     "orderSequence": {"$ref": "sequence"}

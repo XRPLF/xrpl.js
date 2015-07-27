@@ -4,6 +4,6 @@
   "limit": "10000",
   "qualityIn": 500000000,
   "qualityOut": 500000000,
-  "allowRippling": false,
+  "ripplingDisabled": true,
   "frozen": false
 }
