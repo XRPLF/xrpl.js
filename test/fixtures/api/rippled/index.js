@@ -24,6 +24,9 @@ module.exports = {
   tx: {
     Payment: require('./tx/payment.json'),
     AccountSet: require('./tx/account-set.json'),
+    AccountSetTrackingOn: require('./tx/account-set-tracking-on.json'),
+    AccountSetTrackingOff: require('./tx/account-set-tracking-off.json'),
+    RegularKey: require('./tx/set-regular-key.json'),
     OfferCreate: require('./tx/offer-create.json'),
     OfferCancel: require('./tx/offer-cancel.json'),
     TrustSet: require('./tx/trust-set.json'),

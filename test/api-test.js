@@ -206,6 +206,30 @@ describe('RippleAPI', function() {
         'getTransaction', done));
   });
 
+  it('getTransaction - tracking on', function(done) {
+    const hash =
+      '8925FC8844A1E930E2CC76AD0A15E7665AFCC5425376D548BB1413F484C31B8C';
+    this.api.getTransaction(hash, {},
+      _.partial(checkResult, responses.getTransaction.trackingOn,
+        'getTransaction', done));
+  });
+
+  it('getTransaction - tracking off', function(done) {
+    const hash =
+      'C8C5E20DFB1BF533D0D81A2ED23F0A3CBD1EF2EE8A902A1D760500473CC9C582';
+    this.api.getTransaction(hash, {},
+      _.partial(checkResult, responses.getTransaction.trackingOff,
+        'getTransaction', done));
+  });
+
+  it('getTransaction - set regular key', function(done) {
+    const hash =
+      '278E6687C1C60C6873996210A6523564B63F2844FB1019576C157353B1813E60';
+    this.api.getTransaction(hash, {},
+      _.partial(checkResult, responses.getTransaction.setRegularKey,
+        'getTransaction', done));
+  });
+
   it('getTransaction - not found in range', function(done) {
     const hash =
       '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
