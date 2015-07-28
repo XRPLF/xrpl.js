@@ -98,8 +98,8 @@ function getTransactionsInternal(remote, address, options, callback) {
   utils.getRecursive(getter, options.limit, composeAsync(format, callback));
 }
 
-function getTransactions(address, options, callback) {
-  validate.address(address);
+function getTransactions(account, options, callback) {
+  validate.address(account);
   validate.getTransactionsOptions(options);
 
   const defaults = {maxLedgerVersion: this.remote.getLedgerSequence()};
@@ -113,11 +113,11 @@ function getTransactions(address, options, callback) {
       const bound = options.earliestFirst ?
         {minLedgerVersion: ledgerVersion} : {maxLedgerVersion: ledgerVersion};
       const newOptions = _.assign(defaults, options, {startTx: tx}, bound);
-      getTransactionsInternal(this.remote, address, newOptions, callback);
+      getTransactionsInternal(this.remote, account, newOptions, callback);
     });
   } else {
     const newOptions = _.assign(defaults, options);
-    getTransactionsInternal(this.remote, address, newOptions, callback);
+    getTransactionsInternal(this.remote, account, newOptions, callback);
   }
 }
 
