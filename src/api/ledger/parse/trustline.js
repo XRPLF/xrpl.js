@@ -3,6 +3,7 @@
 const assert = require('assert');
 const utils = require('./utils');
 const flags = utils.core.Transaction.flags.TrustSet;
+const BigNumber = require('bignumber.js');
 
 function parseFlag(flagsValue, trueValue, falseValue) {
   if (flagsValue & trueValue) {
@@ -14,6 +15,10 @@ function parseFlag(flagsValue, trueValue, falseValue) {
   return undefined;
 }
 
+function parseQuality(quality) {
+  return (new BigNumber(quality)).shift(-9).toNumber();
+}
+
 function parseTrustline(tx: Object): Object {
   assert(tx.TransactionType === 'TrustSet');
 
@@ -21,8 +26,8 @@ function parseTrustline(tx: Object): Object {
     limit: tx.LimitAmount.value,
     currency: tx.LimitAmount.currency,
     counterparty: tx.LimitAmount.issuer,
-    qualityIn: tx.QualityIn,
-    qualityOut: tx.QualityOut,
+    qualityIn: parseQuality(tx.QualityIn),
+    qualityOut: parseQuality(tx.QualityOut),
     ripplingDisabled: parseFlag(
       tx.Flags, flags.SetNoRipple, flags.ClearNoRipple),
     frozen: parseFlag(tx.Flags, flags.SetFreeze, flags.ClearFreeze),

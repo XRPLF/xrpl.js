@@ -1,7 +1,7 @@
 /* @flow */
 'use strict';
-const _ = require('lodash');
 const assert = require('assert');
+const BigNumber = require('bignumber.js');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices;
@@ -64,7 +64,7 @@ function setTransactionFields(transaction, input) {
  */
 
 function convertTransferRate(transferRate) {
-  return _.isNumber(transferRate) ? transferRate * 1e9 : transferRate;
+  return (new BigNumber(transferRate)).shift(9).toNumber();
 }
 
 function createSettingsTransaction(account, settings) {

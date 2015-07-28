@@ -7,8 +7,8 @@
     "currency": "USD",
     "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
   },
-  "QualityIn": 500000000,
-  "QualityOut": 500000000,
+  "QualityIn": 910000000,
+  "QualityOut": 870000000,
   "LastLedgerSequence": 8820051,
   "Fee": "12",
   "Sequence": 23
