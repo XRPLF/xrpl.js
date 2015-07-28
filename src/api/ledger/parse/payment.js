@@ -1,5 +1,6 @@
 /* @flow */
 'use strict';
+const _ = require('lodash');
 const assert = require('assert');
 const utils = require('./utils');
 const parseAmount = require('./amount');
@@ -30,18 +31,24 @@ function parsePaymentMemos(tx) {
   });
 }
 
+function removeGenericCounterparty(amount, address) {
+  return amount.counterparty === address ?
+    _.omit(amount, 'counterparty') : amount;
+}
+
 function parsePayment(tx: Object): Object {
   assert(tx.TransactionType === 'Payment');
 
   const source = {
     address: tx.Account,
-    amount: parseAmount(tx.SendMax || tx.Amount),
+    amount: removeGenericCounterparty(
+      parseAmount(tx.SendMax || tx.Amount), tx.Account),
     tag: tx.SourceTag
   };
 
   const destination = {
     address: tx.Destination,
-    amount: parseAmount(tx.Amount),
+    amount: removeGenericCounterparty(parseAmount(tx.Amount), tx.Destination),
     tag: tx.DestinationTag
   };
 
