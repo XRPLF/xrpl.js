@@ -28,17 +28,31 @@ Seed.prototype.parse_json = function(j) {
   if (typeof j === 'string') {
     if (!j.length) {
       this._value = NaN;
-    // XXX Should actually always try and continue if it failed.
-    } else if (j[0] === 's') {
-      this._value = Base.decode_check(Base.VER_FAMILY_SEED, j);
-    } else if (/^[0-9a-fA-f]{32}$/.test(j)) {
-      this.parse_hex(j);
-    // XXX Should also try 1751
     } else {
-      this.parse_passphrase(j);
+      this.parse_base58(j);
+      if (!this.is_valid()) {
+        this.parse_hex(j);
+        // XXX Should also try 1751
+      }
+      if (!this.is_valid()) {
+        this.parse_passphrase(j);
+      }
     }
   } else {
     this._value = NaN;
+  }
+
+  return this;
+};
+
+Seed.prototype.parse_base58 = function(j) {
+  if (typeof j !== 'string') {
+    throw new Error('Value must be a string');
+  }
+  if (!j.length || j[0] !== 's') {
+    this._value = NaN;
+  } else {
+    this._value = Base.decode_check(Base.VER_FAMILY_SEED, j);
   }
 
   return this;

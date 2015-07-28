@@ -24,6 +24,20 @@ function validateAddressAndSecret(obj) {
   }
 }
 
+function validateSecret(secret) {
+  if (!secret) {
+    throw error('Parameter missing: secret');
+  }
+  if (typeof secret !== 'string' || secret[0] !== 's') {
+    throw error('Invalid parameter');
+  }
+
+  const seed = new core.Seed().parse_base58(secret);
+  if (!seed.is_valid()) {
+    throw error('invalid seed');
+  }
+}
+
 function validateLedgerRange(options) {
   if (!_.isUndefined(options.minLedgerVersion)
       && !_.isUndefined(options.maxLedgerVersion)) {
@@ -41,6 +55,7 @@ function validateOptions(schema, options) {
 module.exports = {
   address: _.partial(schemaValidate, 'address'),
   addressAndSecret: validateAddressAndSecret,
+  secret: validateSecret,
   currency: _.partial(schemaValidate, 'currency'),
   identifier: _.partial(schemaValidate, 'hash256'),
   sequence: _.partial(schemaValidate, 'sequence'),

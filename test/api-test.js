@@ -562,6 +562,20 @@ describe('RippleAPI', function() {
       secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
     };
     assert.doesNotThrow(_.partial(validate.addressAndSecret, goodWallet));
+    assert.doesNotThrow(_.partial(validate.secret,
+      'shzjfakiK79YQdMjy4h8cGGfQSV6u'));
+    assert.throws(_.partial(validate.secret, 1),
+      /Invalid parameter/);
+    assert.throws(_.partial(validate.secret, ''),
+      this.api.errors.ValidationError);
+    assert.throws(_.partial(validate.secret, 's!!!'),
+      this.api.errors.ValidationError);
+    assert.throws(_.partial(validate.secret, 'passphrase'),
+      this.api.errors.ValidationError);
+    // 32 0s is a valid hex repr of seed bytes
+    const hex = new Array(33).join('0');
+    assert.throws(_.partial(validate.secret, hex),
+      this.api.errors.ValidationError);
   });
 
 });
