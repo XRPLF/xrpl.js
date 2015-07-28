@@ -132,6 +132,15 @@ module.exports = function(port) {
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B') {
       conn.send(createResponse(request, fixtures.tx.AccountSet));
     } else if (request.transaction ===
+        '8925FC8844A1E930E2CC76AD0A15E7665AFCC5425376D548BB1413F484C31B8C') {
+      conn.send(createResponse(request, fixtures.tx.AccountSetTrackingOn));
+    } else if (request.transaction ===
+        'C8C5E20DFB1BF533D0D81A2ED23F0A3CBD1EF2EE8A902A1D760500473CC9C582') {
+      conn.send(createResponse(request, fixtures.tx.AccountSetTrackingOff));
+    } else if (request.transaction ===
+        '278E6687C1C60C6873996210A6523564B63F2844FB1019576C157353B1813E60') {
+      conn.send(createResponse(request, fixtures.tx.RegularKey));
+    } else if (request.transaction ===
         '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51') {
       conn.send(createResponse(request, fixtures.tx.OfferCreate));
     } else if (request.transaction ===

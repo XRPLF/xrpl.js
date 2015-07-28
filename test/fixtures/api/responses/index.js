@@ -18,7 +18,10 @@ module.exports = {
     order: require('./get-transaction-order.json'),
     payment: require('./get-transaction-payment.json'),
     settings: require('./get-transaction-settings.json'),
-    trustline: require('./get-transaction-trustline-set.json')
+    trustline: require('./get-transaction-trustline-set.json'),
+    trackingOn: require('./get-transaction-settings-tracking-on.json'),
+    trackingOff: require('./get-transaction-settings-tracking-off.json'),
+    setRegularKey: require('./get-transaction-settings-set-regular-key.json')
   },
   getTransactions: require('./get-transactions.json'),
   getTrustlines: require('./get-trustlines.json'),
