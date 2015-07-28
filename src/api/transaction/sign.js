@@ -18,8 +18,8 @@ const HASH_TX_ID = 0x54584E00; // 'TXN'
 const HASH_TX_SIGN = 0x53545800; // 'STX'
 const HASH_TX_SIGN_TESTNET = 0x73747800; // 'stx'
 
-function getKeyPair(address, secret) {
-  return core.Seed.from_json(secret).get_key(address);
+function getKeyPair(secret) {
+  return core.Seed.from_json(secret).get_key();
 }
 
 function getPublicKeyHex(keypair) {
@@ -51,9 +51,9 @@ function sign(txJSON: {Account: string; SigningPubKey: string,
     TxnSignature: string}, secret: string):
     {signedTransaction: string; id: string} {
   validate.txJSON(txJSON);
-  validate.addressAndSecret({address: txJSON.Account, secret: secret});
+  validate.secret(secret);
 
-  const keypair = getKeyPair(txJSON.Account, secret);
+  const keypair = getKeyPair(secret);
   if (txJSON.SigningPubKey === undefined) {
     txJSON.SigningPubKey = getPublicKeyHex(keypair);
   }

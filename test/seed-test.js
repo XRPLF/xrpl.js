@@ -1,4 +1,5 @@
 /* eslint max-len: 0 */
+/* eslint-disable max-nested-callbacks */
 'use strict';
 const assert = require('assert');
 const Seed = require('ripple-lib').Seed;
@@ -17,6 +18,23 @@ describe('Seed', function() {
   it('sp6iDHnmiPN7tQFHm5sCW59ax3hfE', function() {
     const seed = Seed.from_json('sp6iDHnmiPN7tQFHm5sCW59ax3hfE');
     assert.strictEqual(seed.to_hex(), '00AD8DA764C3C8AF5F9B8D51C94B9E49');
+  });
+  it('sp6iDHnmiPN7tQFHm5sCW59ax3hfE using parse_base58', function() {
+    const seed = new Seed().parse_base58('sp6iDHnmiPN7tQFHm5sCW59ax3hfE');
+    assert.strictEqual(seed.to_hex(), '00AD8DA764C3C8AF5F9B8D51C94B9E49');
+  });
+  it('parse_base58 should throw on non-string input', function() {
+    assert.throws(function() {
+      new Seed().parse_base58(1);
+    });
+  });
+  it('parse_base58 should make invalid seed from empty string', function() {
+    const seed = new Seed().parse_base58('');
+    assert(!seed.is_valid());
+  });
+  it('parse_base58 should make invalid seed from invalid input', function() {
+    const seed = new Seed().parse_base58('Xs');
+    assert(!seed.is_valid());
   });
   it('can generate many addresses', function() {
 
