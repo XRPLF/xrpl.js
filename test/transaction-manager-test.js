@@ -425,6 +425,8 @@ describe('TransactionManager', function() {
     rippled.once('request_submit', function(m, req) {
       assert.strictEqual(m.tx_blob, SerializedObject.from_json(
         transaction.tx_json).to_hex());
+      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+                         ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_RESPONSE, {id: m.id});
       setImmediate(function() {
@@ -463,6 +465,8 @@ describe('TransactionManager', function() {
     rippled.once('request_submit', function(m, req) {
       assert.strictEqual(m.tx_blob, SerializedObject.from_json(
         transaction.tx_json).to_hex());
+      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+                         ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_TEC_RESPONSE, {id: m.id});
       setImmediate(function() {
@@ -506,13 +510,15 @@ describe('TransactionManager', function() {
 
       switch (deserialized.TransactionType) {
         case 'Payment':
-          assert.strictEqual(transactionManager.getPending().length(), 1);
           assert.deepEqual(deserialized, transaction.tx_json);
+          assert.strictEqual(transactionManager.getPending().length(), 1);
           req.sendResponse(SUBMIT_TER_RESPONSE, {id: m.id});
           break;
         case 'AccountSet':
           assert.strictEqual(deserialized.Account, ACCOUNT.address);
           assert.strictEqual(deserialized.Flags, 2147483648);
+          assert.strictEqual(deserialized.Sequence,
+                             ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
           req.sendResponse(SUBMIT_RESPONSE, {id: m.id});
           req.closeLedger();
           break;
@@ -568,9 +574,9 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(transactionManager.getPending().length(), 1);
       assert.strictEqual(m.tx_blob, SerializedObject.from_json(
         transaction.tx_json).to_hex());
+      assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_TEF_RESPONSE, {id: m.id});
     });
 
@@ -626,9 +632,11 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(transactionManager.getPending().length(), 1);
       assert.strictEqual(m.tx_blob, SerializedObject.from_json(
         transaction.tx_json).to_hex());
+      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+                         ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
+      assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_TEL_RESPONSE, {id: m.id});
     });
 
@@ -729,9 +737,11 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(transactionManager.getPending().length(), 1);
       assert.strictEqual(m.tx_blob, SerializedObject.from_json(
         transaction.tx_json).to_hex());
+      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+                         ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
+      assert.strictEqual(transactionManager.getPending().length(), 1);
 
       /* eslint-disable max-len */
 
@@ -787,9 +797,11 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(transactionManager.getPending().length(), 1);
       assert.strictEqual(m.tx_blob, SerializedObject.from_json(
         transaction.tx_json).to_hex());
+      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+                         ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
+      assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_TEL_RESPONSE, {id: m.id});
     });
 
@@ -852,9 +864,11 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(transactionManager.getPending().length(), 1);
       assert.strictEqual(m.tx_blob, SerializedObject.from_json(
         transaction.tx_json).to_hex());
+      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+                         ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
+      assert.strictEqual(transactionManager.getPending().length(), 1);
 
       req.sendResponse(SUBMIT_TOO_BUSY_ERROR, {id: m.id});
     });

@@ -728,8 +728,7 @@ TransactionManager.prototype.submit = function(tx) {
 
   if (typeof tx.tx_json.Sequence !== 'number') {
     // Honor manually-set sequences
-    this._nextSequence += 1;
-    tx.tx_json.Sequence = this._nextSequence;
+    tx.tx_json.Sequence = this._nextSequence++;
   }
 
   tx.once('cleanup', function() {
