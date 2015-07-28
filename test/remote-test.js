@@ -24,8 +24,6 @@ const PAGING_MARKER =
   '29F992CC252056BF690107D1E8F2D9FBAFF29FF107B62B1D1F4E4E11ADF2CC73';
 const TRANSACTION_HASH =
   '14576FFD5D59FFA73CAA90547BE4DE09926AAB59E981306C32CCE04408CBF8EA';
-const HEX_USD = ripple.Currency.json_rewrite('USD', {force_hex: true});
-const SECRET = 'shvHH5yMTrVrF9s7YHSFPCWJgmfbE';
 const TX_JSON = {
   Flags: 0,
   TransactionType: 'Payment',
@@ -1980,500 +1978,99 @@ describe('Remote', function() {
       subcommand: 'close'
     });
   });
-});
 
-describe.skip('Request API consistency tests', function() {
-  // XXX convert all this to use fixtures
-
-  // Method parameters may be translated into multiple request parameters;
-  // 'ledger' may become the request param 'ledger_index' or 'ledger_hash'
-  // depending on the argument type.
-  //
-  // This function maps an args array to a new array that only includes one
-  // form of request parameter: the first specified
-  //
-  // ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]
-  //
-  // should become
-  //
-  // ['ledger_index', LEDGER_INDEX]
-  function firstReqParam(arg) {
-    if (lodash.isEmpty(arg)) {
-      return undefined;
-    }
-    return Array.isArray(arg[1])
-    ? arg[1][0]
-    : arg;
-  }
-  assert.deepEqual(
-    firstReqParam(['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]),
-    ['ledger_index', LEDGER_INDEX]
-  );
-  assert.deepEqual(
-    firstReqParam(['account', ADDRESS]),
-    ['account', ADDRESS]
-  );
-
-  // ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]
-  //
-  // should become
-  //
-  // ['ledger', LEDGER_INDEX]
-  function firstMethodParam(arg) {
-    if (lodash.isEmpty(arg)) {
-      return undefined;
-    }
-    return Array.isArray(arg[1])
-    ? [arg[0], arg[1][0][1]]
-    : arg;
-  }
-  assert.deepEqual(
-    firstMethodParam(['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]),
-    ['ledger', LEDGER_INDEX]
-  );
-  assert.deepEqual(
-    firstMethodParam(['account', ADDRESS]),
-    ['account', ADDRESS]
-  );
-
-  // Filters default params against optional params
-  function filterDefault(optionalArgs, defaultArg) {
-    return lodash.isEmpty(defaultArg)
-    || lodash.isEmpty(optionalArgs)
-    || !lodash.unzip(optionalArgs)[0].includes(defaultArg[0]);
-  }
-  assert.strictEqual(filterDefault([
-                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
-                  ['hash', [['transaction', TRANSACTION_HASH]]],
-                  ['binary', true]],
-                  ['ledger', 'validated']
-                 ), false);
-
-  assert.strictEqual(filterDefault([
-                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
-                  ['hash', [['transaction', TRANSACTION_HASH]]],
-                  ['binary', true]],
-                  ['hash', TRANSACTION_HASH]
-                 ), false);
-  assert.strictEqual(filterDefault([
-                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
-                  ['hash', [['transaction', TRANSACTION_HASH]]],
-                  ['binary', true]],
-                  ['binary', false]
-                 ), false);
-  assert.strictEqual(filterDefault([
-                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
-                  ['hash', [['transaction', TRANSACTION_HASH]]],
-                  ['binary', true]],
-                  ['transaction', TRANSACTION_HASH]
-                 ), true);
-  assert.strictEqual(filterDefault([
-                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
-                  ['hash', [['transaction', TRANSACTION_HASH]]],
-                  ['binary', true]],
-                  ['myprop', false]
-                 ), true);
-  assert.deepEqual([['transaction', TRANSACTION_HASH], ['myprop', true], ['ledger', 'validated']].filter(lodash.partial(filterDefault, [
-                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
-                  ['hash', [['transaction', TRANSACTION_HASH]]],
-                  ['binary', true]])), [['transaction', TRANSACTION_HASH], ['myprop', true]]);
-  assert.deepEqual([['binary', false], ['ledger', [['ledger_index', LEDGER_INDEX]]]].filter(lodash.partial(filterDefault, [
-                  ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
-                  ['hash', [['transaction', TRANSACTION_HASH]]],
-                  ['binary', true]])), []);
-
-  function filterDefaultArgs(defaultArgs, optionalArgs) {
-    return lodash.filter(defaultArgs, lodash.partial(
-      filterDefault, optionalArgs));
-  }
-
-  function normalizeOptionalArgs(args) {
-    if (lodash.isEmpty(args)) {
-      return [];
-    }
-    return Array.isArray(args[1])
-    ? args[1].slice()
-    : [args];
-  }
-  assert.deepEqual(
-    normalizeOptionalArgs(['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]]),
-    [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]
-  );
-  assert.deepEqual(
-    normalizeOptionalArgs(['binary', true]),
-    [['binary', true]]
-  );
-  assert.deepEqual(
-    normalizeOptionalArgs([]),
-    []
-  );
-
-  function makeRequest(command, methodName, options_) {
-    const opts = lodash.merge({}, options_);
-
-    return lodash.extend({
-      name: opts.alias || command,
-      command: command,
-      methodName: methodName,
-      requiredArgs: opts.required || [],
-      optionalArgs: opts.optional || [],
-      defaultArgs: opts.default || [],
-    }, opts);
-  }
-
-  const REQOPTION = {
-    ACCOUNT: ['account', ADDRESS],
-    LEDGER: ['ledger', [['ledger_index', LEDGER_INDEX], ['ledger_hash', LEDGER_HASH]]],
-    ACCOUNT_ROOT: ['account', [['account_root', ADDRESS]]],
-    STREAMS: ['streams', [['streams', ['server', 'ledger']]]]
-  };
-
-  const testCases = [
-    makeRequest('server_info', 'requestServerInfo'),
-    makeRequest('ping', 'requestPing'),
-
-    makeRequest('subscribe', 'requestSubscribe', {
-      optional: [
-        REQOPTION.STREAMS
-      ],
-      noKeyed: true
-    }),
-    makeRequest('unsubscribe', 'requestUnsubscribe', {
-      optional: [
-        REQOPTION.STREAMS
-      ],
-      noKeyed: true
-    }),
-
-    makeRequest('account_info', 'requestAccountInfo', {
-      required: [
-        REQOPTION.ACCOUNT,
-      ],
-      optional: [
-        undefined,
-        REQOPTION.LEDGER
-      ]
-    }),
-    makeRequest('account_currencies', 'requestAccountCurrencies', {
-      required: [
-        REQOPTION.ACCOUNT,
-      ],
-      optional: [
-        ['peer', ADDRESS],
-        REQOPTION.LEDGER,
-        ['limit', 10]
-      ]
-    }),
-    makeRequest('account_lines', 'requestAccountLines', {
-      required: [
-        REQOPTION.ACCOUNT,
-      ],
-      optional: [
-        ['peer', ADDRESS],
-        REQOPTION.LEDGER,
-        ['limit', 10]
-      ]
-    }),
-    makeRequest('account_offers', 'requestAccountOffers', {
-      required: [
-        REQOPTION.ACCOUNT,
-      ],
-      optional: [
-        undefined,
-        REQOPTION.LEDGER,
-        ['limit', 10]
-      ]
-    }),
-    makeRequest('account_tx', 'requestAccountTransactions', {
-      required: [
-        REQOPTION.ACCOUNT,
-      ],
-      optional: [
-        undefined,
-        ['binary', false],
-        ['ledger_index_min', -1],
-        ['ledger_index_max', -1],
-        ['forward', true],
-        ['limit', 10],
-      ],
-      default: [
-        ['binary', true]
-      ],
-      noPositional: true
-    }),
-
-    makeRequest('tx', 'requestTransaction', {
-      required: [
-        ['hash', [['transaction', TRANSACTION_HASH]]]
-      ],
-      optional: [
-        ['binary', false]
-      ],
-      default: [
-        ['binary', true]
-      ]
-    }),
-    makeRequest('transaction_entry', 'requestTransactionEntry', {
-      required: [
-        ['hash', [['tx_hash', TRANSACTION_HASH]]]
-      ],
-      optional: [
-        REQOPTION.LEDGER,
-      ],
-      default: [
-        ['ledger', [['ledger_index', 'validated']]]
-      ]
-    }),
-
-    makeRequest('tx_history', 'requestTransactionHistory', {
-      optional: [
-        ['start', 10]
-      ],
-      noPositional: true
-    }),
-    makeRequest('book_offers', 'requestBookOffers', {
-      required: [
-        ['gets', [['taker_gets', {currency: HEX_USD, issuer: ADDRESS}]]],
-        ['pays', [['taker_pays', {currency: HEX_USD, issuer: ADDRESS}]]]
-      ],
-      optional: [
-        ['taker', ADDRESS],
-        REQOPTION.LEDGER,
-        ['limit', 10],
-      ],
-      default: [
-        ['taker', ripple.UInt160.ACCOUNT_ONE]
-      ],
-      noPositional: true
-    }),
-
-    makeRequest('ledger', 'requestLedger', {
-      optional: [
-        REQOPTION.LEDGER,
-        ['full', true],
-        ['expand', true],
-        ['transactions', true],
-        ['accounts', true]
-      ],
-      noPositional: true
-    }),
-    makeRequest('ledger_data', 'requestLedgerData', {
-      optional: [
-        REQOPTION.LEDGER,
-        ['binary', false],
-        ['limit', 10]
-      ],
-      default: [
-        ['binary', true]
-      ],
-      noPositional: true
-    }),
-    makeRequest('ledger_entry', 'requestLedgerEntry', {
-      required: [
-        ['type', 'account_root']
-      ],
-      noKeyed: true
-    }),
-    makeRequest('ledger_closed', 'requestLedgerClosed'),
-    makeRequest('ledger_current', 'requestLedgerCurrent'),
-    makeRequest('ledger_header', 'requestLedgerHeader'),
-
-    makeRequest('ledger_entry', 'requestAccountBalance', {
-      alias: 'account_balance',
-      required: [
-        REQOPTION.ACCOUNT_ROOT,
-      ],
-      optional: [
-        REQOPTION.LEDGER,
-      ]
-    }),
-    makeRequest('ledger_entry', 'requestAccountFlags', {
-      alias: 'account_flags',
-      required: [
-        REQOPTION.ACCOUNT_ROOT,
-      ],
-      optional: [
-        REQOPTION.LEDGER,
-      ],
-    }),
-    makeRequest('ledger_entry', 'requestOwnerCount', {
-      alias: 'owner_count',
-      required: [
-        REQOPTION.ACCOUNT_ROOT,
-      ],
-      optional: [
-        REQOPTION.LEDGER,
-      ],
-    }),
-
-    makeRequest('sign', 'requestSign', {
-      required: [
-        ['secret', SECRET],
-        ['tx_json', TX_JSON]
-      ]
-    }),
-    makeRequest('submit', 'requestSubmit')
-  ];
-
-  function checkRequest(request, expectedReqParams) {
-    assert(request.requested, 'Request unattempted, most likely callback was ignored');
-    [['id', undefined], ...expectedReqParams].forEach(arg => {
-      assert.deepEqual(
-        request.message[arg[0]], arg[1],
-        'Expected request param: ' + arg.join('=')
-      );
+  it('Construct Payment transaction', function() {
+    const tx = remote.createTransaction('Payment', {
+      account: TX_JSON.Account,
+      destination: TX_JSON.Destination,
+      amount: TX_JSON.Amount
     });
-  }
 
-  function makeRequestTest(testCase) {
-    it(`Construct ${testCase.name} request`, function() {
-      const reqMethod = remote[testCase.methodName];
-      const requiredArgs = testCase.requiredArgs;
-      const optionalArgs = lodash.compact(testCase.optionalArgs);
-      const defaultArgs = filterDefaultArgs(testCase.defaultArgs, optionalArgs);
+    assert.deepEqual(tx.tx_json, {
+      Flags: 0,
+      TransactionType: 'Payment',
+      Account: TX_JSON.Account,
+      Destination: TX_JSON.Destination,
+      Amount: TX_JSON.Amount
+    });
+  });
+  it('Construct AccountSet transaction', function() {
+    const tx = remote.createTransaction('AccountSet', {
+      account: TX_JSON.Account,
+      set: 'asfRequireDest'
+    });
 
-      assert.strictEqual(typeof reqMethod, 'function');
-      assert(Array.isArray(requiredArgs));
-      assert(Array.isArray(optionalArgs));
-      assert(Array.isArray(defaultArgs));
+    assert.deepEqual(tx.tx_json, {
+      Flags: 0,
+      TransactionType: 'AccountSet',
+      Account: TX_JSON.Account,
+      SetFlag: 1
+    });
+  });
+  it('Construct TrustSet transaction', function() {
+    const tx = remote.createTransaction('TrustSet', {
+      account: TX_JSON.Account,
+      limit: '1/USD/' + TX_JSON.Destination
+    });
 
-      // if (!lodash.isEmpty(requiredArgs)) {
-        // Most request constructors do not (but should) throw for missing
-        // required options
-        //
-        // assert.throws(function() {
-        //   reqMethod.call(remote, {}, lodash.noop);
-        // });
-      // }
-
-      if (testCase.noKeyed) {
-        return;
+    assert.deepEqual(tx.tx_json, {
+      Flags: 0,
+      TransactionType: 'TrustSet',
+      Account: TX_JSON.Account,
+      LimitAmount: {
+        value: '1',
+        currency: 'USD',
+        issuer: TX_JSON.Destination
       }
-
-      const baseReqParams = [
-        ['command', testCase.command]
-      ]
-      .concat(requiredArgs.map(firstReqParam))
-      .concat(defaultArgs.map(firstReqParam));
-
-      const baseReqOptions = lodash.zipObject(requiredArgs.map(firstMethodParam));
-
-      // All required options set
-      checkRequest(reqMethod.call(remote, baseReqOptions, lodash.noop),
-                   baseReqParams);
-
-      const expectedReqParams = [baseReqParams]
-      .concat(optionalArgs.map(firstReqParam));
-
-      const reqOptions = lodash.merge(
-        baseReqOptions,
-        lodash.zipObject(optionalArgs.map(firstMethodParam))
-      );
-
-      // All options set
-      checkRequest(reqMethod.call(remote, reqOptions, lodash.noop),
-                   expectedReqParams);
     });
-  }
-
-  function makeRequestOptionTest(testCase, optionalArgs) {
-    if (lodash.isEmpty(optionalArgs)) {
-      return;
-    }
-    if (testCase.noKeyed) {
-      return;
-    }
-
-    normalizeOptionalArgs(optionalArgs).forEach(function(optionalArg) {
-      const testParam = lodash.first(optionalArg);
-
-      it(`Construct ${testCase.name} request -- with ${testParam}`, function() {
-        const reqMethod = remote[testCase.methodName];
-        const requiredArgs = testCase.requiredArgs;
-        const defaultArgs = filterDefaultArgs(testCase.defaultArgs, [optionalArgs]);
-
-        assert.strictEqual(typeof reqMethod, 'function');
-        assert(Array.isArray(requiredArgs));
-        assert(Array.isArray(optionalArg));
-        assert(Array.isArray(defaultArgs));
-
-        const expectedReqParams = [
-          ['command', testCase.command],
-          optionalArg
-        ]
-        .concat(requiredArgs.map(firstReqParam))
-        .concat(defaultArgs.map(firstReqParam));
-
-        const reqOptions = lodash.merge(
-          // Required args
-          lodash.zipObject(requiredArgs.map(firstMethodParam)),
-          // Optional arg
-          lodash.zipObject([optionalArgs[0]], [optionalArg[1]])
-        );
-
-        checkRequest(reqMethod.call(remote, reqOptions, lodash.noop),
-                     expectedReqParams);
-      });
+  });
+  it('Construct OfferCreate transaction', function() {
+    const tx = remote.createTransaction('OfferCreate', {
+      account: TX_JSON.Account,
+      taker_gets: '1/USD/' + TX_JSON.Destination,
+      taker_pays: '1/BTC/' + TX_JSON.Destination
     });
-  }
 
-  function makePositionalRequestOptionTest(testCase, optionalArgs, index) {
-    if (lodash.isEmpty(optionalArgs)) {
-      return;
-    }
-    if (testCase.noPositional) {
-      return;
-    }
-
-    normalizeOptionalArgs(optionalArgs).forEach(function(optionalArg) {
-      const testParam = lodash.first(optionalArg);
-
-      it(`Construct ${testCase.name} request -- with ${testParam} as postiional arg`, function() {
-        const reqMethod = remote[testCase.methodName];
-        const requiredArgs = testCase.requiredArgs;
-        const defaultArgs = filterDefaultArgs(testCase.defaultArgs, [optionalArgs]);
-
-        assert.strictEqual(typeof reqMethod, 'function');
-        assert(Array.isArray(requiredArgs));
-        assert(Array.isArray(optionalArg));
-        assert(Array.isArray(defaultArgs));
-
-        const expectedReqParams = [
-          ['command', testCase.command],
-          optionalArg
-        ]
-        .concat(requiredArgs.map(firstReqParam))
-        .concat(defaultArgs.map(firstReqParam));
-
-        const reqArgs = []
-        // Required args
-        .concat(lodash.last(lodash.unzip(expectedReqParams.slice(2))) || [])
-          // Placeholder undefined args
-        .concat(lodash.fill(Array(index), undefined))
-        // Optional arg
-        .concat(lodash.last(optionalArg))
-        // Callback
-        .concat(lodash.noop);
-
-        // Silence positional arguments deprecation warning
-        Log.setEngine(Log.engines.none);
-
-        checkRequest(reqMethod.apply(remote, reqArgs),
-                     expectedReqParams);
-      });
+    assert.deepEqual(tx.tx_json, {
+      Flags: 0,
+      TransactionType: 'OfferCreate',
+      Account: TX_JSON.Account,
+      TakerGets: {
+        value: '1',
+        currency: 'USD',
+        issuer: TX_JSON.Destination
+      },
+      TakerPays: {
+        value: '1',
+        currency: 'BTC',
+        issuer: TX_JSON.Destination
+      }
     });
-  }
+  });
+  it('Construct OfferCancel transaction', function() {
+    const tx = remote.createTransaction('OfferCancel', {
+      account: TX_JSON.Account,
+      offer_sequence: 1
+    });
 
-  testCases.forEach(function(testCase) {
-    makeRequestTest(lodash.merge({}, testCase));
+    assert.deepEqual(tx.tx_json, {
+      Flags: 0,
+      TransactionType: 'OfferCancel',
+      Account: TX_JSON.Account,
+      OfferSequence: 1
+    });
+  });
+  it('Construct SetRegularKey transaction', function() {
+    const tx = remote.createTransaction('SetRegularKey', {
+      account: TX_JSON.Account,
+      regular_key: TX_JSON.Destination
+    });
 
-    [
-      makeRequestOptionTest,
-      /* DEPRECATED */ makePositionalRequestOptionTest
-    ].forEach(function(optionTest) {
-      lodash.each(testCase.optionalArgs.slice(), lodash.partial(
-        optionTest, lodash.merge({}, testCase)));
+    assert.deepEqual(tx.tx_json, {
+      Flags: 0,
+      TransactionType: 'SetRegularKey',
+      Account: TX_JSON.Account,
+      RegularKey: TX_JSON.Destination
     });
   });
 });
-

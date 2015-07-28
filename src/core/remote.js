@@ -2486,7 +2486,7 @@ Remote.prototype.createTransaction = function(type, options = {}) {
     TrustSet: transaction.trustSet,
     OfferCreate: transaction.offerCreate,
     OfferCancel: transaction.offerCancel,
-    SetRegularkey: transaction.setRegularKey
+    SetRegularKey: transaction.setRegularKey
   };
 
   const transactionConstructor = constructorMap[type];
