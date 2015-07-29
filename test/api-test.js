@@ -208,11 +208,11 @@ describe('RippleAPI', function() {
         'getTransaction', done));
   });
 
-  it('getTransaction - trustline froze off', function(done) {
+  it('getTransaction - trustline frozen off', function(done) {
     const hash =
       'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B';
     this.api.getTransaction(hash, {},
-      _.partial(checkResult, responses.getTransaction.trustlineFrozeOff,
+      _.partial(checkResult, responses.getTransaction.trustlineFrozenOff,
         'getTransaction', done));
   });
 
@@ -702,6 +702,36 @@ describe('RippleAPI', function() {
       assert.throws(common.convertExceptions(function() {
         throw new Error('fall through');
       }), /fall through/);
+    });
+
+  });
+
+  describe('common errors', function() {
+
+    it('TransactionError', function() {
+      // TransactionError is not used anywhere, so just test its creation
+      assert.throws(function() {
+        throw new common.errors.TransactionError('fall through');
+      }, this.api.errors.TransactionError);
+      assert.throws(function() {
+        throw new common.errors.TransactionError('fall through');
+      }, /fall through/);
+    });
+
+    it('TimeOutError', function() {
+      // TimeOutError is not used anywhere, so just test its creation
+      assert.throws(function() {
+        throw new common.errors.TimeOutError('fall through');
+      }, this.api.errors.TimeOutError);
+      assert.throws(function() {
+        throw new common.errors.TimeOutError('fall through');
+      }, /fall through/);
+    });
+
+    it('RippledNetworkError', function() {
+      assert.throws(function() {
+        throw new common.errors.RippledNetworkError();
+      }, /Cannot connect to rippled/);
     });
 
   });

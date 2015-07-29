@@ -22,7 +22,7 @@ module.exports = {
     trackingOn: require('./get-transaction-settings-tracking-on.json'),
     trackingOff: require('./get-transaction-settings-tracking-off.json'),
     setRegularKey: require('./get-transaction-settings-set-regular-key.json'),
-    trustlineFrozeOff: require('./get-transaction-trust-set-froze-off.json'),
+    trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
     notValidated: require('./get-transaction-not-validated.json')
   },
   getTransactions: require('./get-transactions.json'),

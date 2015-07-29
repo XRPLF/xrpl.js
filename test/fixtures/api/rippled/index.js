@@ -30,7 +30,7 @@ module.exports = {
     OfferCreate: require('./tx/offer-create.json'),
     OfferCancel: require('./tx/offer-cancel.json'),
     TrustSet: require('./tx/trust-set.json'),
-    TrustSetFrozeOff: require('./tx/trust-set-froze-off.json'),
+    TrustSetFrozenOff: require('./tx/trust-set-frozen-off.json'),
     NotFound: require('./tx/not-found.json'),
     NoLedgerIndex: require('./tx/no-ledger-index.json'),
     NoLedgerFound: require('./tx/no-ledger-found.json'),
