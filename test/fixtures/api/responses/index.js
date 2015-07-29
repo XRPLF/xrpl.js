@@ -21,7 +21,8 @@ module.exports = {
     trustline: require('./get-transaction-trustline-set.json'),
     trackingOn: require('./get-transaction-settings-tracking-on.json'),
     trackingOff: require('./get-transaction-settings-tracking-off.json'),
-    setRegularKey: require('./get-transaction-settings-set-regular-key.json')
+    setRegularKey: require('./get-transaction-settings-set-regular-key.json'),
+    trustlineFrozeOff: require('./get-transaction-trust-set-froze-off.json')
   },
   getTransactions: require('./get-transactions.json'),
   getTrustlines: require('./get-trustlines.json'),

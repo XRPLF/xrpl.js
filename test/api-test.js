@@ -207,6 +207,14 @@ describe('RippleAPI', function() {
         'getTransaction', done));
   });
 
+  it('getTransaction - trustline froze off', function(done) {
+    const hash =
+      'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B';
+    this.api.getTransaction(hash, {},
+      _.partial(checkResult, responses.getTransaction.trustlineFrozeOff,
+        'getTransaction', done));
+  });
+
   it('getTransaction - tracking on', function(done) {
     const hash =
       '8925FC8844A1E930E2CC76AD0A15E7665AFCC5425376D548BB1413F484C31B8C';
