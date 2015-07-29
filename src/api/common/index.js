@@ -11,5 +11,6 @@ module.exports = {
   toRippledAmount: utils.toRippledAmount,
   wrapCatch: utils.wrapCatch,
   composeAsync: utils.composeAsync,
-  convertExceptions: utils.convertExceptions
+  convertExceptions: utils.convertExceptions,
+  convertKeysFromSnakeCaseToCamelCase: utils.convertKeysFromSnakeCaseToCamelCase
 };
