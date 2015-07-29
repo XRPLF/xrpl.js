@@ -16,9 +16,7 @@ function validateAddressAndSecret(obj) {
     throw error('Parameter missing: secret');
   }
   try {
-    if (!core.Seed.from_json(secret).get_key(address)) {
-      throw error('secret does not match address');
-    }
+    core.Seed.from_json(secret).get_key(address);
   } catch (exception) {
     throw error('secret does not match address');
   }

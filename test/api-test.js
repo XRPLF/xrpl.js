@@ -629,35 +629,58 @@ describe('RippleAPI', function() {
 
   });
 
-  it('validator', function() {
-    const noSecret = {address: address};
-    assert.throws(_.partial(validate.addressAndSecret, noSecret),
-      this.api.errors.ValidationError);
-    assert.throws(_.partial(validate.addressAndSecret, noSecret),
-      /Parameter missing/);
-    const badSecret = {address: address, secret: 'bad'};
-    assert.throws(_.partial(validate.addressAndSecret, badSecret),
-      this.api.errors.ValidationError);
-    assert.throws(_.partial(validate.addressAndSecret, badSecret),
-      /not match/);
-    const goodWallet = {address: 'rpZMK8hwyrBvLorFNWHRCGt88nCJWbixur',
-      secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
-    };
-    assert.doesNotThrow(_.partial(validate.addressAndSecret, goodWallet));
-    assert.doesNotThrow(_.partial(validate.secret,
-      'shzjfakiK79YQdMjy4h8cGGfQSV6u'));
-    assert.throws(_.partial(validate.secret, 1),
-      /Invalid parameter/);
-    assert.throws(_.partial(validate.secret, ''),
-      this.api.errors.ValidationError);
-    assert.throws(_.partial(validate.secret, 's!!!'),
-      this.api.errors.ValidationError);
-    assert.throws(_.partial(validate.secret, 'passphrase'),
-      this.api.errors.ValidationError);
-    // 32 0s is a valid hex repr of seed bytes
-    const hex = new Array(33).join('0');
-    assert.throws(_.partial(validate.secret, hex),
-      this.api.errors.ValidationError);
+  describe('validator', function() {
+
+    it('validateLedgerRange', function() {
+      const options = {
+        minLedgerVersion: 20000,
+        maxLedgerVersion: 10000
+      };
+      assert.throws(_.partial(validate.getTransactionsOptions, options),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.getTransactionsOptions, options),
+        /minLedgerVersion must not be greater than maxLedgerVersion/);
+    });
+
+    it('addressAndSecret', function() {
+      const wrongSecret = {address: address,
+        secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
+      };
+      assert.throws(_.partial(validate.addressAndSecret, wrongSecret),
+        this.api.errors.ValidationError);
+      const noSecret = {address: address};
+      assert.throws(_.partial(validate.addressAndSecret, noSecret),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.addressAndSecret, noSecret),
+        /Parameter missing/);
+      const badSecret = {address: address, secret: 'bad'};
+      assert.throws(_.partial(validate.addressAndSecret, badSecret),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.addressAndSecret, badSecret),
+        /not match/);
+      const goodWallet = {address: 'rpZMK8hwyrBvLorFNWHRCGt88nCJWbixur',
+        secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
+      };
+      assert.doesNotThrow(_.partial(validate.addressAndSecret, goodWallet));
+    });
+
+    it('secret', function() {
+      assert.doesNotThrow(_.partial(validate.secret,
+        'shzjfakiK79YQdMjy4h8cGGfQSV6u'));
+      assert.throws(_.partial(validate.secret, 1),
+        /Invalid parameter/);
+      assert.throws(_.partial(validate.secret, ''),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.secret, 's!!!'),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.secret, 'passphrase'),
+        this.api.errors.ValidationError);
+      // 32 0s is a valid hex repr of seed bytes
+      const hex = new Array(33).join('0');
+      assert.throws(_.partial(validate.secret, hex),
+        this.api.errors.ValidationError);
+    });
+
   });
 
 });
