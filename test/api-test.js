@@ -2,6 +2,7 @@
 'use strict';
 const _ = require('lodash');
 const assert = require('assert-diff');
+const path = require('path');
 const setupAPI = require('./setup-api');
 const fixtures = require('./fixtures/api');
 const requests = fixtures.requests;
@@ -15,7 +16,7 @@ const validate = require('../src/api/common/validate');
 const RippleError = require('../src/core/rippleerror').RippleError;
 const utils = require('../src/api/ledger/utils');
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
-const schemaValidate = require('../src/api/common/schema-validator');
+const schemaValidator = require('../src/api/common/schema-validator');
 
 const orderbook = {
   base: {
@@ -36,7 +37,7 @@ function checkResult(expected, schemaName, done, error, response) {
   // console.log(JSON.stringify(response, null, 2));
   assert.deepEqual(response, expected);
   if (schemaName) {
-    schemaValidate(schemaName, response);
+    schemaValidator.schemaValidate(schemaName, response);
   }
   done();
 }
@@ -154,7 +155,7 @@ describe('RippleAPI', function() {
     withDeterministicPRNG(() => {
       const result = this.api.sign(requests.sign, secret);
       assert.deepEqual(result, responses.sign);
-      schemaValidate('sign', result);
+      schemaValidator.schemaValidate('sign', result);
     });
   });
 
@@ -569,6 +570,46 @@ describe('RippleAPI', function() {
       assert(error instanceof Error);
       done();
     });
+  });
+
+  describe('schema-validator', function() {
+    beforeEach(function() {
+      const schema = schemaValidator.loadSchema(path.join(__dirname,
+        './fixtures/schemas/ledgerhash.json'));
+      schemaValidator.SCHEMAS.ledgerhash = schema;
+    });
+
+    it('valid', function() {
+      assert.doesNotThrow(function() {
+        schemaValidator.schemaValidate('ledgerhash',
+          '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F');
+      });
+    });
+
+    it('invalid', function() {
+      assert.throws(function() {
+        schemaValidator.schemaValidate('ledgerhash', 'invalid');
+      }, this.api.errors.ValidationError);
+    });
+
+    it('invalid - empty value', function() {
+      assert.throws(function() {
+        schemaValidator.schemaValidate('ledgerhash', '');
+      }, this.api.errors.ValidationError);
+    });
+
+    it('load schema error', function() {
+      assert.throws(function() {
+        schemaValidator.loadSchema('/bad/file/name');
+      }, Error);
+    });
+
+    it('schema not found error', function() {
+      assert.throws(function() {
+        schemaValidator.schemaValidate('unexisting', 'anything');
+      }, /schema not found/);
+    });
+
   });
 
   it('validator', function() {
