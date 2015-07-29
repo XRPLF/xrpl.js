@@ -215,6 +215,15 @@ describe('RippleAPI', function() {
         'getTransaction', done));
   });
 
+  it('getTransaction - not validated', function(done) {
+    const hash =
+      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';
+    this.api.getTransaction(hash, {}, (error, data) => {
+      assert.deepEqual(data, responses.getTransaction.notValidated);
+      done(error);
+    });
+  });
+
   it('getTransaction - tracking on', function(done) {
     const hash =
       '8925FC8844A1E930E2CC76AD0A15E7665AFCC5425376D548BB1413F484C31B8C';
