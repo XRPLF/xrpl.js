@@ -1,4 +1,6 @@
+/* @flow */
 'use strict';
+
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
@@ -16,9 +18,10 @@ function isValidLedgerHash(ledgerHash) {
   return core.UInt256.is_valid(ledgerHash);
 }
 
-function loadSchema(filepath) {
+function loadSchema(filepath: string): {} {
   try {
-    return JSON.parse(fs.readFileSync(filepath, 'utf8'));
+    const schemaContent: any = fs.readFileSync(filepath, 'utf8');
+    return JSON.parse(schemaContent);
   } catch (e) {
     throw new Error('Failed to parse schema: ' + filepath);
   }
@@ -43,7 +46,7 @@ function formatSchemaErrors(errors) {
   return errors.map(formatSchemaError).join(', ');
 }
 
-function schemaValidate(schemaName, object) {
+function schemaValidate(schemaName: string, object: any): void {
   const formats = {address: isValidAddress,
                    ledgerHash: isValidLedgerHash};
   const options = {schemas: SCHEMAS, formats: formats,

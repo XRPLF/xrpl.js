@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const _ = require('lodash');
 const assert = require('assert');
@@ -5,19 +6,23 @@ const common = require('../common');
 const dropsToXrp = common.dropsToXrp;
 const composeAsync = common.composeAsync;
 
-function clamp(value, min, max) {
+type Callback = (err: any, data: any) => void
+
+function clamp(value: number, min: number, max: number): number {
   assert(min <= max, 'Illegal clamp bounds');
   return Math.min(Math.max(value, min), max);
 }
 
-function getXRPBalance(remote, address, ledgerVersion, callback) {
+function getXRPBalance(remote: any, address: string, ledgerVersion?: number, callback: Callback): void {
   remote.requestAccountInfo({account: address, ledger: ledgerVersion},
     composeAsync((data) => dropsToXrp(data.account_data.Balance), callback));
 }
 
+type Getter = (marker: ?string, limit: number, callback: Callback) => void
+
 // If the marker is omitted from a response, you have reached the end
 // getter(marker, limit, callback), callback(error, {marker, results})
-function getRecursiveRecur(getter, marker, limit, callback) {
+function getRecursiveRecur(getter: Getter, marker?: string, limit: number, callback: Callback): void {
   getter(marker, limit, (error, data) => {
     if (error) {
       return callback(error);
@@ -34,11 +39,13 @@ function getRecursiveRecur(getter, marker, limit, callback) {
   });
 }
 
-function getRecursive(getter, limit, callback) {
+function getRecursive(getter: Getter, limit?: number, callback: Callback) {
   getRecursiveRecur(getter, undefined, limit || Infinity, callback);
 }
 
-function renameCounterpartyToIssuer(amount) {
+type Amount = {counterparty?: string, issuer?: string, value: string}
+
+function renameCounterpartyToIssuer(amount?: Amount): ?{issuer?: string} {
   if (amount === undefined) {
     return undefined;
   }
@@ -48,7 +55,9 @@ function renameCounterpartyToIssuer(amount) {
   return _.omit(withIssuer, 'counterparty');
 }
 
-function renameCounterpartyToIssuerInOrder(order) {
+type Order = {taker_gets: Amount, taker_pays: Amount}
+
+function renameCounterpartyToIssuerInOrder(order: Order) {
   const taker_gets = renameCounterpartyToIssuer(order.taker_gets);
   const taker_pays = renameCounterpartyToIssuer(order.taker_pays);
   const changes = {taker_gets: taker_gets, taker_pays: taker_pays};
@@ -70,7 +79,9 @@ function signum(num) {
  *  @returns {Number} [-1, 0, 1]
  */
 
-function compareTransactions(first, second) {
+type Outcome = {outcome: {ledgerVersion: string, indexInLedger: string}};
+
+function compareTransactions(first: Outcome, second: Outcome): number {
   if (first.outcome.ledgerVersion === second.outcome.ledgerVersion) {
     return signum(Number(first.outcome.indexInLedger) -
       Number(second.outcome.indexInLedger));
@@ -79,7 +90,8 @@ function compareTransactions(first, second) {
     Number(second.outcome.ledgerVersion) ? -1 : 1;
 }
 
-function hasCompleteLedgerRange(remote, minLedgerVersion, maxLedgerVersion) {
+function hasCompleteLedgerRange(remote: any, minLedgerVersion: number,
+                                maxLedgerVersion: number): boolean {
   const firstLedgerVersion = 32570; // earlier versions have been lost
   return remote.getServer().hasLedgerRange(
     minLedgerVersion || firstLedgerVersion,

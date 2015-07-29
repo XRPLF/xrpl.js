@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 const _ = require('lodash');
 const core = require('./utils').core;
@@ -8,7 +9,7 @@ function error(text) {
   return new ValidationError(text);
 }
 
-function validateAddressAndSecret(obj) {
+function validateAddressAndSecret(obj: {address: string, secret: string}): void {
   const address = obj.address;
   const secret = obj.secret;
   schemaValidate('address', address);
@@ -22,7 +23,7 @@ function validateAddressAndSecret(obj) {
   }
 }
 
-function validateSecret(secret) {
+function validateSecret(secret: string): void {
   if (!secret) {
     throw error('Parameter missing: secret');
   }
