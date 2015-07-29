@@ -892,10 +892,6 @@ Transaction.prototype.accountSet = function(options_) {
 };
 
 Transaction.prototype.setAccountSetFlag = function(name, value) {
-  // if (this.getType() !== 'AccountSet') {
-    // throw new Error('TransactionType must be AccountSet to use ' + name);
-  // }
-
   const accountSetFlags = Transaction.set_clear_flags.AccountSet;
   let flagValue = value;
 
@@ -930,12 +926,6 @@ Transaction.prototype.setClearFlag = function(flag) {
 
 Transaction.prototype.setTransferRate =
 Transaction.prototype.transferRate = function(rate) {
-  /* eslint-disable max-len */
-  // if (this.getType() !== 'AccountSet') {
-    // throw new Error('TransactionType must be AccountSet to use TransferRate');
-  // }
-  /* eslint-enable max-len */
-
   const transferRate = rate;
 
   if (transferRate === 0) {
@@ -1037,26 +1027,14 @@ Transaction.prototype.rippleLineSet = function(options_) {
 };
 
 Transaction.prototype.setLimit = function(amount) {
-  // if (this.getType() !== 'TrustSet') {
-    // throw new Error('TransactionType must be TrustSet to use LimitAmount');
-  // }
-
   return this._setAmount('LimitAmount', amount, {no_native: true});
 };
 
 Transaction.prototype.setQualityIn = function(quality) {
-  // if (this.getType() !== 'TrustSet') {
-    // throw new Error('TransactionType must be TrustSet to use QualityIn');
-  // }
-
   return this._setUInt32('QualityIn', quality);
 };
 
 Transaction.prototype.setQualityOut = function(quality) {
-  // if (this.getType() !== 'TrustSet') {
-    // throw new Error('TransactionType must be TrustSet to use QualityOut');
-  // }
-
   return this._setUInt32('QualityOut', quality);
 };
 
@@ -1106,18 +1084,10 @@ Transaction.prototype.payment = function(options_) {
 };
 
 Transaction.prototype.setAmount = function(amount) {
-  // if (this.getType() !== 'Payment') {
-    // throw new Error('TransactionType must be Payment to use SendMax');
-  // }
-
   return this._setAmount('Amount', amount);
 };
 
 Transaction.prototype.setDestination = function(destination) {
-  // if (this.getType() !== 'Payment') {
-    // throw new Error('TransactionType must be Payment to use Destination');
-  // }
-
   return this._setAccount('Destination', destination);
 };
 
@@ -1129,11 +1099,17 @@ Transaction.prototype.setDestination = function(destination) {
 
 Transaction.prototype.setSendMax =
 Transaction.prototype.sendMax = function(send_max) {
-  // if (this.getType() !== 'Payment') {
-    // throw new Error('TransactionType must be Payment to use SendMax');
-  // }
-
   return this._setAmount('SendMax', send_max);
+};
+
+/**
+ * Set DeliverMin for Payment
+ *
+ * @param {String|Object} deliver_min minimum amount to deliver
+ */
+
+Transaction.prototype.setDeliverMin = function(deliver_min) {
+  return this._setAmount('DeliverMin', deliver_min);
 };
 
 /**
@@ -1186,9 +1162,6 @@ Transaction.prototype.pathAdd = function(path) {
   if (!Array.isArray(path)) {
     throw new Error('Path must be an array');
   }
-  // if (this.getType() !== 'Payment') {
-    // throw new Error('TransactionType must be Payment to use Paths');
-  // }
 
   this.tx_json.Paths = this.tx_json.Paths || [];
   this.tx_json.Paths.push(Transaction._rewritePath(path));
@@ -1207,9 +1180,6 @@ Transaction.prototype.paths = function(paths) {
   if (!Array.isArray(paths)) {
     throw new Error('Paths must be an array');
   }
-  // if (this.getType() !== 'Payment') {
-    // throw new Error('TransactionType must be Payment to use Paths');
-  // }
 
   this.tx_json.Paths = [];
   paths.forEach(this.addPath, this);
@@ -1228,10 +1198,6 @@ Transaction.prototype.paths = function(paths) {
 
 Transaction.prototype.setBuildPath =
 Transaction.prototype.buildPath = function(build) {
-  // if (this.getType() !== 'Payment') {
-    // throw new Error('TransactionType must be Payment to use build_path');
-  // }
-
   this._build_path = build === undefined || build;
 
   return this;
@@ -1245,10 +1211,6 @@ Transaction.prototype.buildPath = function(build) {
 
 Transaction.prototype.setDestinationTag =
 Transaction.prototype.destinationTag = function(tag) {
-  // if (this.getType() !== 'Payment') {
-    // throw new Error('TransactionType must be Payment to use DestinationTag');
-  // }
-
   return this._setUInt32('DestinationTag', tag);
 };
 
@@ -1260,10 +1222,6 @@ Transaction.prototype.destinationTag = function(tag) {
 
 Transaction.prototype.setInvoiceID =
 Transaction.prototype.invoiceID = function(id) {
-  // if (this.getType() !== 'Payment') {
-    // throw new Error('TransactionType must be Payment to use InvoiceID');
-  // }
-
   return this._setHash256('InvoiceID', id, {pad: true});
 };
 
@@ -1321,26 +1279,14 @@ Transaction.prototype.offerCreate = function(options_) {
 };
 
 Transaction.prototype.setTakerGets = function(amount) {
-  // if (this.getType() !== 'OfferCreate') {
-    // throw new Error('TransactionType must be OfferCreate to use TakerGets');
-  // }
-
   return this._setAmount('TakerGets', amount);
 };
 
 Transaction.prototype.setTakerPays = function(amount) {
-  // if (this.getType() !== 'OfferCreate') {
-    // throw new Error('TransactionType must be OfferCreate to use TakerPays');
-  // }
-
   return this._setAmount('TakerPays', amount);
 };
 
 Transaction.prototype.setExpiration = function(expiration) {
-  // if (this.getType() !== 'OfferCreate') {
-    // throw new Error('TransactionType must be OfferCreate to use Expiration');
-  // }
-
   const timeOffset = expiration instanceof Date
   ? expiration.getTime()
   : expiration;
@@ -1349,14 +1295,6 @@ Transaction.prototype.setExpiration = function(expiration) {
 };
 
 Transaction.prototype.setOfferSequence = function(offerSequence) {
-  /* eslint-disable max-len */
-  // if (!/^Offer(Cancel|Create)$/.test(this.getType())) {
-    // throw new Error(
-      // 'TransactionType must be OfferCreate or OfferCancel to use OfferSequence'
-    // );
-  // }
-  /* eslint-enable max-len */
-
   return this._setUInt32('OfferSequence', offerSequence);
 };
 
@@ -1422,13 +1360,6 @@ Transaction.prototype.submit = function(callback) {
     this.emit('error', new Error('No remote found'));
     return this;
   }
-
-  /* eslint-disable max-len */
-  // if (this.state !== 'unsubmitted') {
-    // this.emit('error', new Error('Attempt to submit transaction more than once'));
-    // return;
-  // }
-  /* eslint-enable max-len */
 
   this.getManager().submit(this);
 
