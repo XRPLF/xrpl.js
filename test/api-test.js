@@ -12,7 +12,8 @@ const hashes = require('./fixtures/hashes');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const address = addresses.ACCOUNT;
-const validate = require('../src/api/common/validate');
+const common = require('../src/api/common');
+const validate = common.validate;
 const RippleError = require('../src/core/rippleerror').RippleError;
 const utils = require('../src/api/ledger/utils');
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
@@ -679,6 +680,28 @@ describe('RippleAPI', function() {
       const hex = new Array(33).join('0');
       assert.throws(_.partial(validate.secret, hex),
         this.api.errors.ValidationError);
+    });
+
+  });
+
+  describe('common utils', function() {
+
+    it('wrapCatch', function(done) {
+      common.wrapCatch(function() {
+        throw new Error('error');
+      })(function(error) {
+        assert(error instanceof Error);
+        done();
+      });
+    });
+
+    it('convertExceptions', function() {
+      assert.throws(common.convertExceptions(function() {
+        throw new Error('fall through');
+      }), this.api.errors.ApiError);
+      assert.throws(common.convertExceptions(function() {
+        throw new Error('fall through');
+      }), /fall through/);
     });
 
   });
