@@ -12,7 +12,8 @@ const hashes = require('./fixtures/hashes');
 const MockPRNG = require('./mock-prng');
 const sjcl = require('../src').sjcl;
 const address = addresses.ACCOUNT;
-const validate = require('../src/api/common/validate');
+const common = require('../src/api/common');
+const validate = common.validate;
 const RippleError = require('../src/core/rippleerror').RippleError;
 const utils = require('../src/api/ledger/utils');
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
@@ -205,6 +206,23 @@ describe('RippleAPI', function() {
     this.api.getTransaction(hash, {},
       _.partial(checkResult, responses.getTransaction.trustline,
         'getTransaction', done));
+  });
+
+  it('getTransaction - trustline frozen off', function(done) {
+    const hash =
+      'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B';
+    this.api.getTransaction(hash, {},
+      _.partial(checkResult, responses.getTransaction.trustlineFrozenOff,
+        'getTransaction', done));
+  });
+
+  it('getTransaction - not validated', function(done) {
+    const hash =
+      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';
+    this.api.getTransaction(hash, {}, (error, data) => {
+      assert.deepEqual(data, responses.getTransaction.notValidated);
+      done(error);
+    });
   });
 
   it('getTransaction - tracking on', function(done) {
@@ -612,35 +630,110 @@ describe('RippleAPI', function() {
 
   });
 
-  it('validator', function() {
-    const noSecret = {address: address};
-    assert.throws(_.partial(validate.addressAndSecret, noSecret),
-      this.api.errors.ValidationError);
-    assert.throws(_.partial(validate.addressAndSecret, noSecret),
-      /Parameter missing/);
-    const badSecret = {address: address, secret: 'bad'};
-    assert.throws(_.partial(validate.addressAndSecret, badSecret),
-      this.api.errors.ValidationError);
-    assert.throws(_.partial(validate.addressAndSecret, badSecret),
-      /not match/);
-    const goodWallet = {address: 'rpZMK8hwyrBvLorFNWHRCGt88nCJWbixur',
-      secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
-    };
-    assert.doesNotThrow(_.partial(validate.addressAndSecret, goodWallet));
-    assert.doesNotThrow(_.partial(validate.secret,
-      'shzjfakiK79YQdMjy4h8cGGfQSV6u'));
-    assert.throws(_.partial(validate.secret, 1),
-      /Invalid parameter/);
-    assert.throws(_.partial(validate.secret, ''),
-      this.api.errors.ValidationError);
-    assert.throws(_.partial(validate.secret, 's!!!'),
-      this.api.errors.ValidationError);
-    assert.throws(_.partial(validate.secret, 'passphrase'),
-      this.api.errors.ValidationError);
-    // 32 0s is a valid hex repr of seed bytes
-    const hex = new Array(33).join('0');
-    assert.throws(_.partial(validate.secret, hex),
-      this.api.errors.ValidationError);
+  describe('validator', function() {
+
+    it('validateLedgerRange', function() {
+      const options = {
+        minLedgerVersion: 20000,
+        maxLedgerVersion: 10000
+      };
+      assert.throws(_.partial(validate.getTransactionsOptions, options),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.getTransactionsOptions, options),
+        /minLedgerVersion must not be greater than maxLedgerVersion/);
+    });
+
+    it('addressAndSecret', function() {
+      const wrongSecret = {address: address,
+        secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
+      };
+      assert.throws(_.partial(validate.addressAndSecret, wrongSecret),
+        this.api.errors.ValidationError);
+      const noSecret = {address: address};
+      assert.throws(_.partial(validate.addressAndSecret, noSecret),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.addressAndSecret, noSecret),
+        /Parameter missing/);
+      const badSecret = {address: address, secret: 'bad'};
+      assert.throws(_.partial(validate.addressAndSecret, badSecret),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.addressAndSecret, badSecret),
+        /not match/);
+      const goodWallet = {address: 'rpZMK8hwyrBvLorFNWHRCGt88nCJWbixur',
+        secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
+      };
+      assert.doesNotThrow(_.partial(validate.addressAndSecret, goodWallet));
+    });
+
+    it('secret', function() {
+      assert.doesNotThrow(_.partial(validate.secret,
+        'shzjfakiK79YQdMjy4h8cGGfQSV6u'));
+      assert.throws(_.partial(validate.secret, 1),
+        /Invalid parameter/);
+      assert.throws(_.partial(validate.secret, ''),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.secret, 's!!!'),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validate.secret, 'passphrase'),
+        this.api.errors.ValidationError);
+      // 32 0s is a valid hex repr of seed bytes
+      const hex = new Array(33).join('0');
+      assert.throws(_.partial(validate.secret, hex),
+        this.api.errors.ValidationError);
+    });
+
+  });
+
+  describe('common utils', function() {
+
+    it('wrapCatch', function(done) {
+      common.wrapCatch(function() {
+        throw new Error('error');
+      })(function(error) {
+        assert(error instanceof Error);
+        done();
+      });
+    });
+
+    it('convertExceptions', function() {
+      assert.throws(common.convertExceptions(function() {
+        throw new Error('fall through');
+      }), this.api.errors.ApiError);
+      assert.throws(common.convertExceptions(function() {
+        throw new Error('fall through');
+      }), /fall through/);
+    });
+
+  });
+
+  describe('common errors', function() {
+
+    it('TransactionError', function() {
+      // TransactionError is not used anywhere, so just test its creation
+      assert.throws(function() {
+        throw new common.errors.TransactionError('fall through');
+      }, this.api.errors.TransactionError);
+      assert.throws(function() {
+        throw new common.errors.TransactionError('fall through');
+      }, /fall through/);
+    });
+
+    it('TimeOutError', function() {
+      // TimeOutError is not used anywhere, so just test its creation
+      assert.throws(function() {
+        throw new common.errors.TimeOutError('fall through');
+      }, this.api.errors.TimeOutError);
+      assert.throws(function() {
+        throw new common.errors.TimeOutError('fall through');
+      }, /fall through/);
+    });
+
+    it('RippledNetworkError', function() {
+      assert.throws(function() {
+        throw new common.errors.RippledNetworkError();
+      }, /Cannot connect to rippled/);
+    });
+
   });
 
 });

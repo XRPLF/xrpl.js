@@ -158,6 +158,12 @@ module.exports = function(port) {
     } else if (request.transaction ===
         '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04') {
       conn.send(createResponse(request, fixtures.tx.LedgerWithoutTime));
+    } else if (request.transaction ===
+        'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B') {
+      conn.send(createResponse(request, fixtures.tx.TrustSetFrozenOff));
+    } else if (request.transaction ===
+        '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10') {
+      conn.send(createResponse(request, fixtures.tx.NotValidated));
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
       conn.send(createResponse(request, fixtures.tx.NotFound));
     } else {
