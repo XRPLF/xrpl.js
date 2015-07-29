@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const core = require('./utils').core;
 const ValidationError = require('./errors').ValidationError;
-const schemaValidate = require('./schema-validator');
+const schemaValidate = require('./schema-validator').schemaValidate;
 
 function error(text) {
   return new ValidationError(text);

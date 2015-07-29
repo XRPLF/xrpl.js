@@ -60,4 +60,8 @@ function schemaValidate(schemaName, object) {
 }
 
 SCHEMAS = loadSchemas(path.join(__dirname, './schemas'));
-module.exports = schemaValidate;
+module.exports = {
+  schemaValidate: schemaValidate,
+  loadSchema: loadSchema,
+  SCHEMAS: SCHEMAS
+};
