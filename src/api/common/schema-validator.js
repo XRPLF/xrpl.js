@@ -20,8 +20,7 @@ function isValidLedgerHash(ledgerHash) {
 
 function loadSchema(filepath: string): {} {
   try {
-    const schemaContent: any = fs.readFileSync(filepath, 'utf8');
-    return JSON.parse(schemaContent);
+    return JSON.parse(fs.readFileSync(filepath, 'utf8'));
   } catch (e) {
     throw new Error('Failed to parse schema: ' + filepath);
   }
