@@ -1,5 +1,7 @@
 # ripple-keypairs
 
+[![Build Status](https://travis-ci.org/sublimator/ripple-keypairs.svg?branch=master)](https://travis-ci.org/sublimator/ripple-keypairs)
+
 An implementation of ripple keypairs & wallet generation using
 [elliptic](https://github.com/indutny/elliptic) which supports rfc6979 and
 eddsa deterministic signatures.
