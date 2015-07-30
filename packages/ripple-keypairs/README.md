@@ -1,6 +1,8 @@
 # ripple-keypairs
 
-[![Build Status](https://travis-ci.org/sublimator/ripple-keypairs.svg?branch=master)](https://travis-ci.org/sublimator/ripple-keypairs)
+[![NPM](https://nodei.co/npm/ripple-keypairs.png)](https://npmjs.org/package/ripple-keypairs)
+
+[![Build Status](https://travis-ci.org/sublimator/ripple-keypairs.svg?branch=master)](https://travis-ci.org/sublimator/ripple-keypairs) [![Coverage Status](https://coveralls.io/repos/sublimator/ripple-keypairs/badge.svg?branch=master&service=github&v=1)](https://coveralls.io/github/sublimator/ripple-keypairs?branch=master)
 
 An implementation of ripple keypairs & wallet generation using
 [elliptic](https://github.com/indutny/elliptic) which supports rfc6979 and
