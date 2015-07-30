@@ -1,5 +1,6 @@
 /* @flow */
 'use strict';
+const _ = require('lodash');
 const BigNumber = require('bignumber.js');
 const core = require('../../core');
 const errors = require('./errors');
@@ -68,6 +69,22 @@ function convertExceptions<T>(f: () => T): () => T {
   };
 }
 
+const FINDSNAKE = /([a-zA-Z]_[a-zA-Z])/g;
+function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
+  if (typeof obj === 'object') {
+    let newKey;
+    return _.reduce(obj, (result, value, key) => {
+      newKey = key;
+      if (FINDSNAKE.test(key)) {
+        newKey = key.replace(FINDSNAKE, r => r[0] + r[2].toUpperCase());
+      }
+      result[newKey] = convertKeysFromSnakeCaseToCamelCase(value);
+      return result;
+    }, {});
+  }
+  return obj;
+}
+
 module.exports = {
   core,
   dropsToXrp,
@@ -75,5 +92,6 @@ module.exports = {
   toRippledAmount,
   wrapCatch,
   composeAsync,
-  convertExceptions
+  convertExceptions,
+  convertKeysFromSnakeCaseToCamelCase
 };

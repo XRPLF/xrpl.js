@@ -162,7 +162,7 @@ describe('RippleAPI', function() {
 
   it('submit', function(done) {
     this.api.submit(responses.sign.signedTransaction,
-      _.partial(checkResult, responses.submit, null, done));
+      _.partial(checkResult, responses.submit, 'submit', done));
   });
 
   it('getBalances', function(done) {
@@ -478,7 +478,7 @@ describe('RippleAPI', function() {
 
   it('getServerInfo', function(done) {
     this.api.getServerInfo(
-      _.partial(checkResult, responses.getServerInfo, null, done));
+      _.partial(checkResult, responses.getServerInfo, 'getServerInfo', done));
   });
 
   it('getServerInfo - error', function(done) {

@@ -32,7 +32,7 @@ function getServerInfo(callback: (err: any, data: any) => void): void {
       const message = _.get(error, ['remote', 'error_message'], error.message);
       callback(new common.errors.RippledNetworkError(message));
     } else {
-      callback(null, response.info);
+      callback(null, common.convertKeysFromSnakeCaseToCamelCase(response.info));
     }
   });
 }

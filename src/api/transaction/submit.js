@@ -8,7 +8,10 @@ function submit(txBlob: string, callback: (err: any, data: any) => void): void {
   validate.blob(txBlob);
   const request = new Request(this.remote, 'submit');
   request.message.tx_blob = txBlob;
-  request.request(null, callback);
+  request.request(null,
+    utils.common.composeAsync(
+      data => utils.common.convertKeysFromSnakeCaseToCamelCase(data),
+      callback));
 }
 
 module.exports = submit;
