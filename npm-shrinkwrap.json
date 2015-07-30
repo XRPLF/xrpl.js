@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.13.0-rc1",
+  "version": "0.13.0-rc2",
   "npm-shrinkwrap-version": "5.4.0",
   "node-version": "v0.12.7",
   "dependencies": {
@@ -108,6 +108,7 @@
     },
     "sjcl-extended": {
       "version": "1.0.3",
+      "from": "sjcl-extended@git://github.com/ripple/sjcl-extended.git#d8cf8b22e7d97193c54e1f65113e3edcf200ca17",
       "resolved": "git://github.com/ripple/sjcl-extended.git#d8cf8b22e7d97193c54e1f65113e3edcf200ca17",
       "dependencies": {
         "sjcl": {
