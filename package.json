@@ -25,7 +25,6 @@
     "lru-cache": "~2.5.0",
     "ripple-lib-transactionparser": "^0.4",
     "ripple-wallet-generator": "^1.0.3",
-    "simple-asyncify": "^0.1.0",
     "sjcl-extended": "ripple/sjcl-extended#1.0.3",
     "ws": "~0.7.1"
   },
