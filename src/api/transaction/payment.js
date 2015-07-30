@@ -7,15 +7,10 @@ const validate = utils.common.validate;
 const toRippledAmount = utils.common.toRippledAmount;
 const Transaction = utils.common.core.Transaction;
 
-function isSendMaxAllowed(payment) {
-  const srcAmt = payment.source.amount;
-  const dstAmt = payment.destination.amount;
-
-  // Don't set SendMax for XRP->XRP payment
-  // temREDUNDANT_SEND_MAX removed in:
-  // https://github.com/ripple/rippled/commit/
-  //  c522ffa6db2648f1d8a987843e7feabf1a0b7de8/
-  return srcAmt && !(srcAmt.currency === 'XRP' && dstAmt.currency === 'XRP');
+function isXRPToXRPPayment(payment) {
+  const sourceCurrency = _.get(payment, 'source.amount.currency');
+  const destinationCurrency = _.get(payment, 'destination.amount.currency');
+  return sourceCurrency === 'XRP' && destinationCurrency === 'XRP';
 }
 
 function isIOUWithoutCounterparty(amount) {
@@ -58,9 +53,6 @@ function createPaymentTransaction(account, payment) {
   if (payment.destination.tag) {
     transaction.destinationTag(payment.destination.tag);
   }
-  if (payment.paths) {
-    transaction.paths(JSON.parse(payment.paths));
-  }
   if (payment.memos) {
     _.forEach(payment.memos, memo =>
       transaction.addMemo(memo.type, memo.format, memo.data)
@@ -75,11 +67,19 @@ function createPaymentTransaction(account, payment) {
   if (payment.limitQuality) {
     transaction.setFlags(['LimitQuality']);
   }
-  if (isSendMaxAllowed(payment)) {
+  if (!isXRPToXRPPayment(payment)) {
+    // Don't set SendMax for XRP->XRP payment
+    // temREDUNDANT_SEND_MAX removed in:
+    // https://github.com/ripple/rippled/commit/
+    //  c522ffa6db2648f1d8a987843e7feabf1a0b7de8/
     const maxValue = new BigNumber(payment.source.amount.value)
       .plus(payment.source.slippage || 0).toString();
     const maxAmount = _.assign({}, payment.source.amount, {value: maxValue});
     transaction.sendMax(toRippledAmount(maxAmount));
+
+    if (payment.paths) {
+      transaction.paths(JSON.parse(payment.paths));
+    }
   }
 
   return transaction;
