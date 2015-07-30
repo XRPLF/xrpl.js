@@ -1,5 +1,7 @@
 # ripple-address-codec
 
+[![Build Status](https://travis-ci.org/sublimator/ripple-address-codec.svg?branch=master)](https://travis-ci.org/sublimator/ripple-address-codec)
+
 ## API
 
 ```js
