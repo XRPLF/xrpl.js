@@ -57,7 +57,7 @@ function deriveSecret(seed, opts={}) {
             .add(privateGen).mod(order);
 }
 
-function accountPublicFromGenerator(publicGenBytes) {
+function accountPublicFromPublicGenerator(publicGenBytes) {
   const rootPubPoint = secp256k1.curve.decodePoint(publicGenBytes);
   const scalar = deriveScalar(publicGenBytes, 0);
   const point = secp256k1.g.mul(scalar);
@@ -126,5 +126,5 @@ K256Pair.prototype.verify = function(message, signature) {
 
 module.exports = {
   K256Pair,
-  accountPublicFromGenerator
+  accountPublicFromPublicGenerator
 };

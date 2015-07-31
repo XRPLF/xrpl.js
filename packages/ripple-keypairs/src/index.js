@@ -1,13 +1,15 @@
 'use strict';
 
 const assert = require('assert');
-const codec = require('ripple-address-codec');
 const rand = require('brorand');
 
 const {seedFromPhrase, createAccountID} = require('./utils');
 const {KeyPair, KeyType} = require('./keypair');
 const {Ed25519Pair} = require('./ed25519');
-const {K256Pair, accountPublicFromGenerator} = require('./secp256k1');
+const {K256Pair, accountPublicFromPublicGenerator} = require('./secp256k1');
+
+const {decodeSeed, encodeNodePublic, decodeNodePublic, encodeAccountID} =
+                                          require('ripple-address-codec');
 
 KeyPair.fromSeed = function(seedBytes, type, options) {
   assert(type === 'secp256k1' || type === 'ed25519');
@@ -16,7 +18,7 @@ KeyPair.fromSeed = function(seedBytes, type, options) {
 };
 
 function keyPairFromSeed(seedString, options) {
-  const decoded = codec.decodeSeed(seedString);
+  const decoded = decodeSeed(seedString);
   return KeyPair.fromSeed(decoded.bytes, decoded.type, options);
 }
 
@@ -37,7 +39,7 @@ function generateWallet(opts={}) {
 }
 
 function walletFromSeed(seed) {
-  const {type, bytes} = codec.decodeSeed(seed);
+  const {type, bytes} = decodeSeed(seed);
   return deriveWallet(type, bytes);
 }
 
@@ -45,7 +47,7 @@ function deriveValidator(seedBytes) {
   const pair = K256Pair.fromSeed(seedBytes, {validator: true});
   return {
     seed: pair.seed(),
-    publicKey: codec.encodeNodePublic(pair.pubKeyCanonicalBytes())
+    publicKey: encodeNodePublic(pair.pubKeyCanonicalBytes())
   };
 }
 
@@ -55,13 +57,13 @@ function generateValidatorKeys(opts={}) {
 }
 
 function nodePublicAccountID(publicKey) {
-  const genBytes = codec.decodeNodePublic(publicKey);
-  const accountPublicBytes = accountPublicFromGenerator(genBytes);
-  return codec.encodeAccountID(createAccountID(accountPublicBytes));
+  const generatorBytes = decodeNodePublic(publicKey);
+  const accountPublicBytes = accountPublicFromPublicGenerator(generatorBytes);
+  return encodeAccountID(createAccountID(accountPublicBytes));
 }
 
 function validatorKeysFromSeed(seed) {
-  const {type, bytes} = codec.decodeSeed(seed);
+  const {type, bytes} = decodeSeed(seed);
   assert(type === KeyType.secp256k1);
   return deriveValidator(bytes);
 }
