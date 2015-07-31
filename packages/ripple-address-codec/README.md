@@ -1,8 +1,6 @@
 # ripple-address-codec
 
-[![NPM](https://nodei.co/npm/ripple-address-codec.png)](https://npmjs.org/package/ripple-address-codec)
-
-[![Build Status](https://travis-ci.org/sublimator/ripple-address-codec.svg?branch=master)](https://travis-ci.org/sublimator/ripple-address-codec) [![Coverage Status](https://coveralls.io/repos/sublimator/ripple-address-codec/badge.svg?branch=master&service=github)](https://coveralls.io/github/sublimator/ripple-address-codec?branch=master)
+[![NPM](https://img.shields.io/npm/v/ripple-address-codec.svg)](https://npmjs.org/package/ripple-address-codec) [![Build Status](https://img.shields.io/travis/sublimator/ripple-address-codec/master.svg)](https://travis-ci.org/sublimator/ripple-address-codec) [![Coverage Status](https://img.shields.io/coveralls/sublimator/ripple-address-codec/master.svg)](https://coveralls.io/github/sublimator/ripple-address-codec?branch=master)
 
 ## API
 
