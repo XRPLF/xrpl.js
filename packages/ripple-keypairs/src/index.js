@@ -6,8 +6,8 @@ const rand = require('brorand');
 
 const {seedFromPhrase, createAccountID} = require('./utils');
 const {KeyPair, KeyType} = require('./keypair');
-const Ed25519Pair = require('./ed25519');
-const K256Pair = require('./secp256k1');
+const {Ed25519Pair} = require('./ed25519');
+const {K256Pair, accountPublicFromGenerator} = require('./secp256k1');
 
 KeyPair.fromSeed = function(seedBytes, type, options) {
   assert(type === 'secp256k1' || type === 'ed25519');
@@ -54,6 +54,12 @@ function generateValidatorKeys(opts={}) {
   return deriveValidator(randGen(16));
 }
 
+function nodePublicAccountID(publicKey) {
+  const genBytes = codec.decodeNodePublic(publicKey);
+  const accountPublicBytes = accountPublicFromGenerator(genBytes);
+  return codec.encodeAccountID(createAccountID(accountPublicBytes));
+}
+
 function validatorKeysFromSeed(seed) {
   const {type, bytes} = codec.decodeSeed(seed);
   assert(type === KeyType.secp256k1);
@@ -71,5 +77,6 @@ module.exports = {
   generateWallet,
   generateValidatorKeys,
   walletFromSeed,
-  validatorKeysFromSeed
+  validatorKeysFromSeed,
+  nodePublicAccountID
 };

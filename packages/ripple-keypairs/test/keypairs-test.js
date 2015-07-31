@@ -14,7 +14,8 @@ const {
   generateWallet,
   walletFromSeed,
   generateValidatorKeys,
-  validatorKeysFromSeed
+  validatorKeysFromSeed,
+  nodePublicAccountID
 } = keypairs;
 
 const {SerializedObject} = require('ripple-lib');
@@ -154,6 +155,13 @@ describe('generateValidatorKeys', function() {
     const actual = generateValidatorKeys({randGen});
     assert.deepEqual(actual, expected);
     assert.deepEqual(validatorKeysFromSeed(actual.seed), expected);
+  });
+
+  it('can generate the correct accountID from validator public key', () => {
+    const accountID = 'rhcfR9Cg98qCxHpCcPBmMonbDBXo84wyTn';
+    const validatorPublic =
+          'n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH';
+    assert.equal(nodePublicAccountID(validatorPublic), accountID);
   });
 });
 

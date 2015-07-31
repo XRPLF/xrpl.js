@@ -40,6 +40,13 @@ eddsa deterministic signatures.
   publicKey: 'n9MU2RsULUayZnWeLssjbMzVRPeVUUMgiPYTwe8eMgpdGDWp5t8C' }
 ```
 
+## Derive accountID matching a validator public key (aka public generator)
+```js
+> var nodePublicAccountID = require('ripple-keypairs').nodePublicAccountID;
+> nodePublicAccountID('n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH')
+'rhcfR9Cg98qCxHpCcPBmMonbDBXo84wyTn'
+```
+
 ## Sign a transaction
 see [examples/sign-transaction.js](examples/sign-transaction.js)
 ```js

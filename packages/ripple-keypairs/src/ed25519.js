@@ -63,4 +63,6 @@ Ed25519Pair.prototype.verify = function(message, signature) {
   return this.key().verify(message, signature);
 };
 
-module.exports = Ed25519Pair;
+module.exports = {
+  Ed25519Pair
+};

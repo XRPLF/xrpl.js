@@ -57,6 +57,14 @@ function deriveSecret(seed, opts={}) {
             .add(privateGen).mod(order);
 }
 
+function accountPublicFromGenerator(publicGenBytes) {
+  const rootPubPoint = secp256k1.curve.decodePoint(publicGenBytes);
+  const scalar = deriveScalar(publicGenBytes, 0);
+  const point = secp256k1.g.mul(scalar);
+  const offset = rootPubPoint.add(point);
+  return offset.encodeCompressed();
+}
+
 /*
 * @class
 */
@@ -116,4 +124,7 @@ K256Pair.prototype.verify = function(message, signature) {
   }
 };
 
-module.exports = K256Pair;
+module.exports = {
+  K256Pair,
+  accountPublicFromGenerator
+};
