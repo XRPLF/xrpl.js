@@ -19,7 +19,7 @@
     "brorand": "^1.0.5",
     "elliptic": "^5.1.0",
     "hash.js": "^1.0.3",
-    "ripple-address-codec": "^1.5.0"
+    "ripple-address-codec": "^1.6.0"
   },
   "devDependencies": {
     "assert-diff": "^1.0.1",
@@ -42,7 +42,7 @@
     "build": "gulp",
     "compile": "babel -i runtime -d dist/npm/ src/",
     "compile-with-source-maps": "babel -i runtime -s -t -d dist/npm/ src/",
-    "prepublish": "npm run compile",
+    "prepublish": "npm test && npm run lint && npm run compile",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; fi; eslint --reset -c eslintrc src/*.js test/*.js"

@@ -10,7 +10,7 @@ const {
   hasCachedProperty
 } = require('./utils');
 
-function findk256Key(bytes, discrim) {
+function deriveScalar(bytes, discrim) {
   const order = secp256k1.curve.n;
   for (let i = 0; i <= 0xFFFFFFFF; i++) {
     // We hash the bytes to find a 256 bit number, looping until we are sure it
@@ -38,13 +38,13 @@ function findk256Key(bytes, discrim) {
 * @return {bn.js} - 256 bit scalar value
 *
 */
-function derivek256Scalar(seed, opts={}) {
+function deriveSecret(seed, opts={}) {
   const root = opts.validator;
   const order = secp256k1.curve.n;
 
   // This private generator represents the `root` private key, and is what's
   // used by validators for signing when a keypair is generated from a seed.
-  const privateGen = findk256Key(seed);
+  const privateGen = deriveScalar(seed);
   if (root) {
     // As returned by validation_create for a given seed
     return privateGen;
@@ -53,7 +53,7 @@ function derivek256Scalar(seed, opts={}) {
   // A seed can generate many keypairs as a function of the seed and a uint32.
   // Almost everyone just uses the first account, `0`.
   const accountIndex = opts.accountIndex || 0;
-  return findk256Key(publicGen.encodeCompressed(), accountIndex)
+  return deriveScalar(publicGen.encodeCompressed(), accountIndex)
             .add(privateGen).mod(order);
 }
 
@@ -75,7 +75,7 @@ K256Pair.fromSeed = function(seedBytes, opts={}) {
 hasCachedProperty(K256Pair, 'key', function() {
   if (this.seedBytes) {
     const options = {validator: this.validator};
-    return secp256k1.keyFromPrivate(derivek256Scalar(this.seedBytes, options));
+    return secp256k1.keyFromPrivate(deriveSecret(this.seedBytes, options));
   }
   return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
 });

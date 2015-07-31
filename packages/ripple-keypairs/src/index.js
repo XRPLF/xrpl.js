@@ -1,7 +1,5 @@
 'use strict';
 
-/* -------------------------------- REQUIRES -------------------------------- */
-
 const assert = require('assert');
 const codec = require('ripple-address-codec');
 const rand = require('brorand');
@@ -11,28 +9,22 @@ const {KeyPair, KeyType} = require('./keypair');
 const Ed25519Pair = require('./ed25519');
 const K256Pair = require('./secp256k1');
 
+KeyPair.fromSeed = function(seedBytes, type, options) {
+  const Pair = type === 'ed25519' ? Ed25519Pair : K256Pair;
+  return Pair.fromSeed(seedBytes, options);
+};
+
 function keyPairFromSeed(seedString, options) {
   const decoded = codec.decodeSeed(seedString);
-  const Pair = decoded.type === 'ed25519' ? Ed25519Pair : K256Pair;
-  return Pair.fromSeed(decoded.bytes, options);
+  return KeyPair.fromSeed(decoded.bytes, decoded.type, options);
 }
 
 function deriveWallet(type, seedBytes) {
   assert(type === 'secp256k1' || type === 'ed25519');
-
-  let pair;
-  let seed;
-
-  if (type === 'secp256k1') {
-    seed = codec.encodeK256Seed(seedBytes);
-    pair = K256Pair.fromSeed(seedBytes);
-  } else {
-    seed = codec.encodeEdSeed(seedBytes);
-    pair = Ed25519Pair.fromSeed(seedBytes);
-  }
+  const pair = KeyPair.fromSeed(seedBytes, type);
 
   return {
-    seed,
+    seed: pair.seed(),
     accountID: pair.accountID(),
     publicKey: pair.pubKeyHex()
   };

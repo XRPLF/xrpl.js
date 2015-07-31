@@ -50,6 +50,10 @@ hasCachedProperty(KeyPair, 'accountID', function() {
   return codec.encodeAccountID(this.accountBytes());
 });
 
+hasCachedProperty(KeyPair, 'seed', function() {
+  return codec.encodeSeed(this.seedBytes, this.type);
+});
+
 KeyPair.prototype.signHex = function(message) {
   return bytesToHex(this.sign(message));
 };
