@@ -4,6 +4,7 @@ const _ = require('lodash');
 const assert = require('assert-diff');
 const path = require('path');
 const setupAPI = require('./setup-api');
+const RippleAPI = require('../src').RippleAPI;
 const fixtures = require('./fixtures/api');
 const requests = fixtures.requests;
 const responses = fixtures.responses;
@@ -736,4 +737,28 @@ describe('RippleAPI', function() {
 
   });
 
+});
+
+describe('RippleAPI - offline', function() {
+  it('prepareSettings and sign', function(done) {
+    const api = new RippleAPI();
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const settings = requests.prepareSettings;
+    const instructions = {
+      sequence: 23,
+      maxLedgerVersion: 8820051,
+      fee: '0.000012'
+    };
+    api.prepareSettings(address, settings, instructions, (error, txJSON) => {
+      if (error) {
+        done(error);
+        return;
+      }
+      assert.deepEqual(txJSON, responses.prepareSettings.flags);
+      withDeterministicPRNG(() => {
+        assert.deepEqual(api.sign(txJSON, secret), responses.sign);
+        done();
+      });
+    });
+  });
 });
