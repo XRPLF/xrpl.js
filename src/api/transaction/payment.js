@@ -1,7 +1,6 @@
 /* @flow */
 'use strict';
 const _ = require('lodash');
-const BigNumber = require('bignumber.js');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const toRippledAmount = utils.common.toRippledAmount;
@@ -72,10 +71,7 @@ function createPaymentTransaction(account, payment) {
     // temREDUNDANT_SEND_MAX removed in:
     // https://github.com/ripple/rippled/commit/
     //  c522ffa6db2648f1d8a987843e7feabf1a0b7de8/
-    const maxValue = new BigNumber(payment.source.amount.value)
-      .plus(payment.source.slippage || 0).toString();
-    const maxAmount = _.assign({}, payment.source.amount, {value: maxValue});
-    transaction.sendMax(toRippledAmount(maxAmount));
+    transaction.sendMax(toRippledAmount(payment.source.amount));
 
     if (payment.paths) {
       transaction.paths(JSON.parse(payment.paths));
