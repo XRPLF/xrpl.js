@@ -10,6 +10,7 @@ const Ed25519Pair = require('./ed25519');
 const K256Pair = require('./secp256k1');
 
 KeyPair.fromSeed = function(seedBytes, type, options) {
+  assert(type === 'secp256k1' || type === 'ed25519');
   const Pair = type === 'ed25519' ? Ed25519Pair : K256Pair;
   return Pair.fromSeed(seedBytes, options);
 };
@@ -20,7 +21,6 @@ function keyPairFromSeed(seedString, options) {
 }
 
 function deriveWallet(type, seedBytes) {
-  assert(type === 'secp256k1' || type === 'ed25519');
   const pair = KeyPair.fromSeed(seedBytes, type);
 
   return {
@@ -44,7 +44,7 @@ function walletFromSeed(seed) {
 function deriveValidator(seedBytes) {
   const pair = K256Pair.fromSeed(seedBytes, {validator: true});
   return {
-    seed: codec.encodeK256Seed(seedBytes),
+    seed: pair.seed(),
     publicKey: codec.encodeNodePublic(pair.pubKeyCanonicalBytes())
   };
 }
