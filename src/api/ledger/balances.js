@@ -24,7 +24,13 @@ function formatBalances(balances) {
     balances.trustlines.map(getTrustlineBalanceAmount));
 }
 
-function getBalances(account, options, callback) {
+function getTrustlinesAsync(account, options, callback) {
+  getTrustlines.bind(this)(account, options)
+    .then(data => callback(null, data))
+    .catch(callback);
+}
+
+function getBalancesAsync(account, options, callback) {
   validate.address(account);
   validate.getBalancesOptions(options);
 
@@ -32,8 +38,12 @@ function getBalances(account, options, callback) {
                       || this.remote.getLedgerSequence();
   async.parallel({
     xrp: _.partial(utils.getXRPBalance, this.remote, account, ledgerVersion),
-    trustlines: _.partial(getTrustlines.bind(this), account, options)
+    trustlines: _.partial(getTrustlinesAsync.bind(this), account, options)
   }, composeAsync(formatBalances, callback));
 }
 
-module.exports = utils.wrapCatch(getBalances);
+function getBalances(account: string, options={}) {
+  return utils.promisify(getBalancesAsync.bind(this))(account, options);
+}
+
+module.exports = getBalances;

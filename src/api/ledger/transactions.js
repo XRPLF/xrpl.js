@@ -98,27 +98,27 @@ function getTransactionsInternal(remote, address, options, callback) {
   utils.getRecursive(getter, options.limit, composeAsync(format, callback));
 }
 
-function getTransactions(account, options, callback) {
+function getTransactionsAsync(account, options, callback) {
   validate.address(account);
   validate.getTransactionsOptions(options);
 
   const defaults = {maxLedgerVersion: this.remote.getLedgerSequence()};
   if (options.start) {
-    getTransaction.bind(this)(options.start, {}, (error, tx) => {
-      if (error) {
-        callback(error);
-        return;
-      }
+    getTransaction.bind(this)(options.start).then(tx => {
       const ledgerVersion = tx.outcome.ledgerVersion;
       const bound = options.earliestFirst ?
         {minLedgerVersion: ledgerVersion} : {maxLedgerVersion: ledgerVersion};
       const newOptions = _.assign(defaults, options, {startTx: tx}, bound);
       getTransactionsInternal(this.remote, account, newOptions, callback);
-    });
+    }).catch(callback);
   } else {
     const newOptions = _.assign(defaults, options);
     getTransactionsInternal(this.remote, account, newOptions, callback);
   }
 }
 
-module.exports = utils.wrapCatch(getTransactions);
+function getTransactions(account: string, options={}) {
+  return utils.promisify(getTransactionsAsync.bind(this))(account, options);
+}
+
+module.exports = getTransactions;

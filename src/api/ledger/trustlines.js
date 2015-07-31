@@ -29,7 +29,7 @@ function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
   });
 }
 
-function getTrustlines(account: string, options: {currency: string,
+function getTrustlinesAsync(account: string, options: {currency: string,
     counterparty: string, limit: number, ledgerVersion: number},
     callback: () => void): void {
   validate.address(account);
@@ -42,4 +42,8 @@ function getTrustlines(account: string, options: {currency: string,
   utils.getRecursive(getter, options.limit, callback);
 }
 
-module.exports = utils.wrapCatch(getTrustlines);
+function getTrustlines(account: string, options={}) {
+  return utils.promisify(getTrustlinesAsync.bind(this))(account, options);
+}
+
+module.exports = getTrustlines;

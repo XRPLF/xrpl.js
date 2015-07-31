@@ -103,7 +103,7 @@ function formatResponse(pathfind, paths) {
   }
 }
 
-function getPaths(pathfind, callback) {
+function getPathsAsync(pathfind, callback) {
   validate.pathfind(pathfind);
 
   const address = pathfind.source.address;
@@ -113,4 +113,8 @@ function getPaths(pathfind, callback) {
   ], composeAsync(_.partial(formatResponse, pathfind), callback));
 }
 
-module.exports = utils.wrapCatch(getPaths);
+function getPaths(pathfind: Object) {
+  return utils.promisify(getPathsAsync.bind(this))(pathfind);
+}
+
+module.exports = getPaths;

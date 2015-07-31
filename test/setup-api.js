@@ -24,10 +24,10 @@ function getFreePort(callback) {
 function setupMockRippledConnection(testcase, port, done) {
   testcase.mockRippled = createMockRippled(port);
   testcase.api = new RippleAPI({servers: ['ws://localhost:' + port]});
-  testcase.api.connect(() => {
+  testcase.api.connect().then(() => {
     testcase.api.remote.getServer().once('ledger_closed', () => done());
     testcase.api.remote.getServer().emit('message', ledgerClosed);
-  });
+  }).catch(done);
 }
 
 function setup(done) {
@@ -40,10 +40,10 @@ function setup(done) {
 }
 
 function teardown(done) {
-  this.api.remote.disconnect(() => {
+  this.api.disconnect().then(() => {
     this.mockRippled.close();
     setImmediate(done);
-  });
+  }).catch(done);
 }
 
 module.exports = {

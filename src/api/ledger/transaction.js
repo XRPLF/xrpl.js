@@ -36,7 +36,7 @@ function isTransactionInRange(tx, options) {
           || tx.ledger_index <= options.maxLedgerVersion);
 }
 
-function getTransaction(identifier, options, callback) {
+function getTransactionAsync(identifier, options, callback) {
   validate.identifier(identifier);
   validate.getTransactionOptions(options);
 
@@ -71,4 +71,8 @@ function getTransaction(identifier, options, callback) {
   ], callbackWrapper);
 }
 
-module.exports = utils.wrapCatch(getTransaction);
+function getTransaction(identifier: string, options={}) {
+  return utils.promisify(getTransactionAsync.bind(this))(identifier, options);
+}
+
+module.exports = getTransaction;

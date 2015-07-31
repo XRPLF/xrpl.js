@@ -9,8 +9,10 @@ module.exports = {
   dropsToXrp: utils.dropsToXrp,
   xrpToDrops: utils.xrpToDrops,
   toRippledAmount: utils.toRippledAmount,
-  wrapCatch: utils.wrapCatch,
   composeAsync: utils.composeAsync,
+  wrapCatch: utils.wrapCatch,
   convertExceptions: utils.convertExceptions,
-  convertKeysFromSnakeCaseToCamelCase: utils.convertKeysFromSnakeCaseToCamelCase
+  convertKeysFromSnakeCaseToCamelCase:
+    utils.convertKeysFromSnakeCaseToCamelCase,
+  promisify: utils.promisify
 };
