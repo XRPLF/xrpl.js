@@ -1,6 +1,6 @@
 {
   "name": "ripple-keypairs",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "ripple key pairs",
   "files": [
     "dist/npm/*",
