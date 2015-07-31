@@ -6,15 +6,18 @@
   "license": "ISC",
   "dependencies": {
     "hash.js": "^1.0.3",
-    "x-address-codec": "^0.5.0"
+    "x-address-codec": "^0.6.0"
   },
   "scripts": {
     "test": "istanbul test _mocha",
-    "coveralls": "cat ./coverage/lcov.info | coveralls"
+    "prepublish": "npm test && npm run lint",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/master/eslintrc'; fi; eslint --reset -c eslintrc src/*.js test/*.js"
   },
   "devDependencies": {
-    "istanbul": "~0.3.5",
     "coveralls": "~2.10.0",
+    "eslint": "^0.24.1",
+    "istanbul": "~0.3.5",
     "mocha": "^2.2.5"
   },
   "readmeFilename": "README.md",

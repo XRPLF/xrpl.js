@@ -3,6 +3,7 @@ node_js:
 - '0.12'
 script:
 - npm test --coverage
+- npm run-script lint
 - npm run-script coveralls
 env:
   global:
