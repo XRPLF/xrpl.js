@@ -11,7 +11,6 @@ const {
 } = require('./utils');
 
 /*
-@private
 @param {Array} seed bytes
  */
 function deriveEdKeyPairSeed(seed) {
@@ -20,8 +19,6 @@ function deriveEdKeyPairSeed(seed) {
 
 /*
 * @class
-* @private
-* @param {Object} - key
 */
 function Ed25519Pair() {
   KeyPair.apply(this, arguments);
@@ -66,4 +63,4 @@ Ed25519Pair.prototype.verify = function(message, signature) {
   return this.key().verify(message, signature);
 };
 
-module.exports = {Ed25519Pair};
+module.exports = Ed25519Pair;

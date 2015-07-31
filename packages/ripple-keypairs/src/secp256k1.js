@@ -35,10 +35,10 @@ function findk256Key(bytes, discrim) {
 * @param {Number} [opts.accountIndex=0] - the account number to generate
 * @param {Boolean} [opts.validator=false] - generate root key-pair,
 *                                              as used by validators.
-* @return {bn.js} - bignumber
+* @return {bn.js} - 256 bit scalar value
 *
 */
-function derivek256Secret(seed, opts={}) {
+function derivek256Scalar(seed, opts={}) {
   const root = opts.validator;
   const order = secp256k1.curve.n;
 
@@ -59,7 +59,6 @@ function derivek256Secret(seed, opts={}) {
 
 /*
 * @class
-* @private
 */
 function K256Pair({validator}) {
   KeyPair.apply(this, arguments);
@@ -76,7 +75,7 @@ K256Pair.fromSeed = function(seedBytes, opts={}) {
 hasCachedProperty(K256Pair, 'key', function() {
   if (this.seedBytes) {
     const options = {validator: this.validator};
-    return secp256k1.keyFromPrivate(derivek256Secret(this.seedBytes, options));
+    return secp256k1.keyFromPrivate(derivek256Scalar(this.seedBytes, options));
   }
   return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
 });
@@ -117,8 +116,4 @@ K256Pair.prototype.verify = function(message, signature) {
   }
 };
 
-module.exports = {
-  derivek256Secret,
-  findk256Key,
-  K256Pair
-};
+module.exports = K256Pair;

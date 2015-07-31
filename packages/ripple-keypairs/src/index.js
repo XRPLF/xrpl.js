@@ -8,8 +8,8 @@ const rand = require('brorand');
 
 const {seedFromPhrase, createAccountID} = require('./utils');
 const {KeyPair, KeyType} = require('./keypair');
-const {Ed25519Pair} = require('./ed25519');
-const {K256Pair} = require('./secp256k1');
+const Ed25519Pair = require('./ed25519');
+const K256Pair = require('./secp256k1');
 
 function keyPairFromSeed(seedString, options) {
   const decoded = codec.decodeSeed(seedString);
