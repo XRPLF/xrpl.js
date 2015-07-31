@@ -141,7 +141,8 @@ describe('generateValidatorKeys', function() {
        "result" : {
           "status" : "success",
           "validation_key" : "A A A A A A A A A A A A",
-          "validation_public_key" : "n9LPxYzbDpWBZ1bC3J3Fdkgqoa3FEhVKCnS8yKp7RFQFwuvd8Q2c",
+          "validation_public_key" :
+              "n9LPxYzbDpWBZ1bC3J3Fdkgqoa3FEhVKCnS8yKp7RFQFwuvd8Q2c",
           "validation_seed" : "sp6JS7f14BuwFY8Mw6bTtLKWauoUs"
        }
     }

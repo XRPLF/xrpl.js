@@ -25,9 +25,11 @@ function arrayToHex(a) {
   }).join('');
 }
 
-function toGenericArray(typedArray) {
+function toGenericArray(sequence) {
   const generic = [];
-  Array.prototype.push.apply(generic, typedArray);
+  for (let i = 0; i < sequence.length; i++) {
+    generic.push(sequence[i]);
+  }
   return generic;
 }
 
@@ -50,12 +52,22 @@ class Sha512 {
   finish() {
     return this.hash.digest();
   }
-  finish256() {
+  first256() {
     return this.finish().slice(0, 32);
   }
-  finish256BN() {
-    return new BigNum(this.finish256());
+  first256BN() {
+    return new BigNum(this.first256());
   }
+}
+
+function seedFromPhrase(phrase) {
+  return hashjs.sha512().update(phrase).digest().slice(0, 16);
+}
+
+function createAccountID(pubKeyBytes) {
+  const hash256 = hashjs.sha256().update(pubKeyBytes).digest();
+  const hash160 = hashjs.ripemd160().update(hash256).digest();
+  return hash160;
 }
 
 module.exports = {
@@ -64,5 +76,7 @@ module.exports = {
   hasCachedProperty,
   isVirtual,
   Sha512,
-  toGenericArray
+  toGenericArray,
+  seedFromPhrase,
+  createAccountID
 };
