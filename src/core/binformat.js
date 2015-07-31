@@ -400,6 +400,7 @@ exports.ledger = {
 };
 
 exports.metadata = [
+  [ 'DeliveredAmount'      , OPTIONAL ],
   [ 'TransactionIndex'     , REQUIRED ],
   [ 'TransactionResult'    , REQUIRED ],
   [ 'AffectedNodes'        , REQUIRED ]
