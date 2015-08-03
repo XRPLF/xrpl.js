@@ -2,7 +2,7 @@
 
 A JavaScript API for interacting with Ripple in Node.js and the browser
 
-[![Build Status](https://travis-ci.org/ripple/ripple-lib.svg?branch=develop)](https://travis-ci.org/ripple/ripple-lib) [![Coverage Status](https://coveralls.io/repos/ripple/ripple-lib/badge.png?branch=develop)](https://coveralls.io/r/ripple/ripple-lib?branch=develop)
+[![Circle CI](https://circleci.com/gh/ripple/ripple-lib/tree/develop.svg?style=svg)](https://circleci.com/gh/ripple/ripple-lib/tree/develop) [![Coverage Status](https://coveralls.io/repos/ripple/ripple-lib/badge.png?branch=develop)](https://coveralls.io/r/ripple/ripple-lib?branch=develop)
 
 [![NPM](https://nodei.co/npm/ripple-lib.png)](https://www.npmjs.org/package/ripple-lib)
 
