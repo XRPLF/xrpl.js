@@ -1,7 +1,7 @@
-var EventEmitter = require('events').EventEmitter;
-var util         = require('util');
-var Amount       = require('./amount').Amount;
-var extend       = require('extend');
+'use strict';
+const EventEmitter = require('events').EventEmitter;
+const util = require('util');
+const Amount = require('./amount').Amount;
 
 /**
  * Represents a persistent path finding request.
@@ -10,16 +10,18 @@ var extend       = require('extend');
  * find request is triggered it will supercede the existing one, making it emit
  * the 'end' and 'superceded' events.
  */
-function PathFind(remote, src_account, dst_account, dst_amount, src_currencies) {
+
+function PathFind(remote, src_account, dst_account,
+    dst_amount, src_currencies) {
   EventEmitter.call(this);
 
   this.remote = remote;
 
-  this.src_account    = src_account;
-  this.dst_account    = dst_account;
-  this.dst_amount     = dst_amount;
+  this.src_account = src_account;
+  this.dst_account = dst_account;
+  this.dst_amount = dst_amount;
   this.src_currencies = src_currencies;
-};
+}
 
 util.inherits(PathFind, EventEmitter);
 
@@ -32,14 +34,16 @@ util.inherits(PathFind, EventEmitter);
  * so you should only have to call it if the path find was closed or superceded
  * and you wish to restart it.
  */
-PathFind.prototype.create = function () {
-  var self = this;
 
-  var req = this.remote.request_path_find_create(
-    this.src_account,
-    this.dst_account,
-    this.dst_amount,
-    this.src_currencies);
+PathFind.prototype.create = function() {
+  const self = this;
+
+  const req = this.remote.requestPathFindCreate({
+    source_account: this.src_account,
+    destination_account: this.dst_account,
+    destination_amount: this.dst_amount,
+    source_currencies: this.src_currencies
+  });
 
   req.once('error', function(err) {
     self.emit('error', err);
@@ -54,16 +58,16 @@ PathFind.prototype.create = function () {
   req.broadcast().request();
 };
 
-PathFind.prototype.close = function () {
+PathFind.prototype.close = function() {
   this.remote.request_path_find_close().broadcast().request();
   this.emit('end');
   this.emit('close');
 };
 
-PathFind.prototype.notify_update = function (message) {
-  var src_account = message.source_account;
-  var dst_account = message.destination_account;
-  var dst_amount  = Amount.from_json(message.destination_amount);
+PathFind.prototype.notify_update = function(message) {
+  const src_account = message.source_account;
+  const dst_account = message.destination_account;
+  const dst_amount = Amount.from_json(message.destination_amount);
 
   // Only pass the event along if this path find response matches what we were
   // looking for.
@@ -74,7 +78,7 @@ PathFind.prototype.notify_update = function (message) {
   }
 };
 
-PathFind.prototype.notify_superceded = function () {
+PathFind.prototype.notify_superceded = function() {
   // XXX If we're set to re-subscribe whenever we connect to a new server, then
   // we should cancel that behavior here. See PathFind#create.
 

@@ -345,7 +345,7 @@ describe('Transaction', function() {
     const dst = 'rGihwhaqU8g7ahwAvTq6iX5rvsfcbgZw6v';
 
     transaction.payment(src, dst, '100');
-    remote.set_secret(src, 'masterpassphrase');
+    remote.setSecret(src, 'masterpassphrase');
 
     assert(transaction.complete());
     const json = transaction.serialize().to_json();

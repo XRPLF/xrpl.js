@@ -469,7 +469,7 @@ Remote.prototype.disconnect = function(callback_) {
     server.disconnect();
   });
 
-  this._set_state('offline');
+  this._setState('offline');
 
   return this;
 };
@@ -744,20 +744,18 @@ Remote.prototype.getServer = function() {
  * @param {Request} request
  */
 
-Remote.prototype.request = function(request_) {
-  let request = request_;
-
+Remote.prototype.request = function(request) {
   if (typeof request === 'string') {
-    if (!/^request_/.test(request)) {
-      request = 'request_' + request;
-    }
+    const prefix = /^request_/.test(request) ? '' : 'request_';
+    const requestName = prefix + request;
+    const methodName = requestName.replace(/(\_\w)/g, m => m[1].toUpperCase());
 
-    if (typeof this[request] === 'function') {
+    if (typeof this[methodName] === 'function') {
       const args = _.slice(arguments, 1);
-      return this[request].apply(this, args);
+      return this[methodName].apply(this, args);
     }
 
-    throw new Error('Command does not exist: ' + request);
+    throw new Error('Command does not exist: ' + requestName);
   }
 
   if (!(request instanceof Request)) {
