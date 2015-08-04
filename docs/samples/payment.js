@@ -1,8 +1,8 @@
 'use strict';
 const RippleAPI = require('../../src').RippleAPI; // require('ripple-lib')
 
-const address = 'ENTER ADDRESS HERE';
-const secret = 'ENTER SECRET HERE';
+const address = 'INSERT ADDRESS HERE';
+const secret = 'INSERT SECRET HERE';
 
 const api = new RippleAPI({servers: ['wss://s1.ripple.com:443']});
 const instructions = {maxLedgerVersionOffset: 5};
@@ -24,15 +24,18 @@ const payment = {
   }
 };
 
-api.connect(() => {
+api.connect().then(() => {
   console.log('Connected...');
-  api.preparePayment(address, payment, instructions, (error, txJSON) => {
+  api.preparePayment(address, payment, instructions).then(txJSON => {
     console.log('Payment transaction prepared...');
     const signedTransaction = api.sign(txJSON, secret).signedTransaction;
     console.log('Payment transaction signed...');
-    api.submit(signedTransaction, (submitError, response) => {
-      console.log(submitError ? submitError : response);
-      process.exit(submitError ? 1 : 0);
+    api.submit(signedTransaction).then(response => {
+      console.log(response);
+      process.exit(0);
+    }).catch(error => {
+      console.log(error);
+      process.exit(1);
     });
   });
 });
