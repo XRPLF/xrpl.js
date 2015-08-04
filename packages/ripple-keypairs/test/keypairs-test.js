@@ -181,7 +181,7 @@ describe('K256Pair', function() {
       it('can deterministically sign/verify message [' + i + ']', function() {
         const message = [i];
         const sig = key.sign(message);
-        assert.equal(utils.arrayToHex(sig), expected[i]);
+        assert.equal(utils.bytesToHex(sig), expected[i]);
         assert(key.verify(message, sig));
       });
     }
