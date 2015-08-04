@@ -28,19 +28,19 @@ function Ed25519Pair() {
 util.inherits(Ed25519Pair, KeyPair);
 
 /**
-* @param {Array<Number>} seedBytes - A 128 bit seed
-* @return {Ed25519Pair} key pair
-*/
-Ed25519Pair.fromSeed = function(seedBytes) {
-  return new Ed25519Pair({seedBytes});
-};
-
-/**
 * @param {Seed} publicKey - public key in canonical form (0xED + 32 bytes)
 * @return {Ed25519Pair} key pair
 */
 Ed25519Pair.fromPublic = function(publicKey) {
   return new Ed25519Pair({pubBytes: parseBytes(publicKey)});
+};
+
+Ed25519Pair.prototype.sign = function(message) {
+  return this.key().sign(message).toBytes();
+};
+
+Ed25519Pair.prototype.verify = function(message, signature) {
+  return this.key().verify(message, signature);
 };
 
 cachedProperty(Ed25519Pair, function key() {
@@ -55,12 +55,12 @@ cachedProperty(Ed25519Pair, function pubKeyCanonicalBytes() {
   return [0xED].concat(this.key().pubBytes());
 });
 
-Ed25519Pair.prototype.sign = function(message) {
-  return this.key().sign(message).toBytes();
-};
-
-Ed25519Pair.prototype.verify = function(message, signature) {
-  return this.key().verify(message, signature);
+/**
+* @param {Array<Number>} seedBytes - A 128 bit seed
+* @return {Ed25519Pair} key pair
+*/
+Ed25519Pair.fromSeed = function(seedBytes) {
+  return new Ed25519Pair({seedBytes});
 };
 
 module.exports = {

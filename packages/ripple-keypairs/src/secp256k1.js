@@ -76,22 +76,6 @@ function K256Pair({validator}) {
 
 util.inherits(K256Pair, KeyPair);
 
-K256Pair.fromSeed = function(seedBytes, opts={}) {
-  return new K256Pair({seedBytes, validator: opts.validator});
-};
-
-cachedProperty(K256Pair, function key() {
-  if (this.seedBytes) {
-    const options = {validator: this.validator};
-    return secp256k1.keyFromPrivate(deriveSecret(this.seedBytes, options));
-  }
-  return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
-});
-
-cachedProperty(K256Pair, function pubKeyCanonicalBytes() {
-  return this.key().getPublic().encodeCompressed();
-});
-
 /*
 @param {Array<Byte>} message (bytes)
  */
@@ -122,6 +106,22 @@ K256Pair.prototype.verify = function(message, signature) {
   } catch (e) {
     return false;
   }
+};
+
+cachedProperty(K256Pair, function key() {
+  if (this.seedBytes) {
+    const options = {validator: this.validator};
+    return secp256k1.keyFromPrivate(deriveSecret(this.seedBytes, options));
+  }
+  return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
+});
+
+cachedProperty(K256Pair, function pubKeyCanonicalBytes() {
+  return this.key().getPublic().encodeCompressed();
+});
+
+K256Pair.fromSeed = function(seedBytes, opts={}) {
+  return new K256Pair({seedBytes, validator: opts.validator});
 };
 
 module.exports = {
