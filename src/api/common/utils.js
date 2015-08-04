@@ -4,6 +4,7 @@ const _ = require('lodash');
 const BigNumber = require('bignumber.js');
 const core = require('../../core');
 const errors = require('./errors');
+const es6promisify = require('es6-promisify');
 
 type Amount = {currency: string, issuer: string, value: string}
 
@@ -85,13 +86,18 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
   return obj;
 }
 
+function promisify<T>(asyncFunction: AsyncFunction): Function {
+  return es6promisify(wrapCatch(asyncFunction));
+}
+
 module.exports = {
   core,
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,
-  wrapCatch,
   composeAsync,
+  wrapCatch,
   convertExceptions,
-  convertKeysFromSnakeCaseToCamelCase
+  convertKeysFromSnakeCaseToCamelCase,
+  promisify
 };

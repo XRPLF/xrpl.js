@@ -90,9 +90,14 @@ function createSettingsTransaction(account, settings) {
   return transaction;
 }
 
-function prepareSettings(account, settings, instructions, callback) {
+function prepareSettingsAsync(account, settings, instructions, callback) {
   const transaction = createSettingsTransaction(account, settings);
   utils.createTxJSON(transaction, this.remote, instructions, callback);
 }
 
-module.exports = utils.wrapCatch(prepareSettings);
+function prepareSettings(account: string, settings: Object, instructions={}) {
+  return utils.promisify(prepareSettingsAsync.bind(this))(
+    account, settings, instructions);
+}
+
+module.exports = prepareSettings;

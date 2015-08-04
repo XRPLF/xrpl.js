@@ -20,7 +20,7 @@ function requestAccountOffers(remote, address, ledgerVersion, options,
   }), callback));
 }
 
-function getOrders(account, options, callback) {
+function getOrdersAsync(account, options, callback) {
   validate.address(account);
   validate.getOrdersOptions(options);
 
@@ -33,4 +33,8 @@ function getOrders(account, options, callback) {
       (order) => order.properties.sequence), callback));
 }
 
-module.exports = utils.wrapCatch(getOrders);
+function getOrders(account: string, options={}) {
+  return utils.promisify(getOrdersAsync.bind(this))(account, options);
+}
+
+module.exports = getOrders;

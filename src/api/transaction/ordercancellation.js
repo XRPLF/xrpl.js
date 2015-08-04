@@ -13,9 +13,16 @@ function createOrderCancellationTransaction(account, sequence) {
   return transaction;
 }
 
-function prepareOrderCancellation(account, sequence, instructions, callback) {
+function prepareOrderCancellationAsync(account, sequence, instructions,
+    callback) {
   const transaction = createOrderCancellationTransaction(account, sequence);
   utils.createTxJSON(transaction, this.remote, instructions, callback);
 }
 
-module.exports = utils.wrapCatch(prepareOrderCancellation);
+function prepareOrderCancellation(account: string, sequence: number,
+    instructions={}) {
+  return utils.promisify(prepareOrderCancellationAsync.bind(this))(
+    account, sequence, instructions);
+}
+
+module.exports = prepareOrderCancellation;

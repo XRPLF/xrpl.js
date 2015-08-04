@@ -24,7 +24,7 @@ function formatSettings(response) {
   return _.assign({}, parsedFlags, parsedFields);
 }
 
-function getSettings(account, options, callback) {
+function getSettingsAsync(account, options, callback) {
   validate.address(account);
   validate.getSettingsOptions(options);
 
@@ -37,4 +37,8 @@ function getSettings(account, options, callback) {
     composeAsync(formatSettings, callback));
 }
 
-module.exports = utils.wrapCatch(getSettings);
+function getSettings(account: string, options={}) {
+  return utils.promisify(getSettingsAsync.bind(this))(account, options);
+}
+
+module.exports = getSettings;

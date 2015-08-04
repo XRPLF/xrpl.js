@@ -31,17 +31,12 @@ const orderbook = {
   }
 };
 
-function checkResult(expected, schemaName, done, error, response) {
-  if (error) {
-    done(error);
-    return;
-  }
+function checkResult(expected, schemaName, response) {
   // console.log(JSON.stringify(response, null, 2));
   assert.deepEqual(response, expected);
   if (schemaName) {
     schemaValidator.schemaValidate(schemaName, response);
   }
-  done();
 }
 
 function withDeterministicPRNG(f) {
@@ -56,100 +51,97 @@ describe('RippleAPI', function() {
   beforeEach(setupAPI.setup);
   afterEach(setupAPI.teardown);
 
-  it('preparePayment', function(done) {
+  it('preparePayment', function() {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
     }, instructions);
-    this.api.preparePayment(address, requests.preparePayment, localInstructions,
-      _.partial(checkResult, responses.preparePayment, 'tx', done));
+    return this.api.preparePayment(
+      address, requests.preparePayment, localInstructions).then(
+      _.partial(checkResult, responses.preparePayment, 'tx'));
   });
 
-  it('preparePayment with all options specified', function(done) {
+  it('preparePayment with all options specified', function() {
     const localInstructions = {
       maxLedgerVersion: this.api.getLedgerVersion() + 100,
       fee: '0.000012'
     };
-    this.api.preparePayment(address, requests.preparePaymentAllOptions,
-      localInstructions,
-      _.partial(checkResult, responses.preparePaymentAllOptions, 'tx', done));
+    return this.api.preparePayment(
+      address, requests.preparePaymentAllOptions, localInstructions).then(
+      _.partial(checkResult, responses.preparePaymentAllOptions, 'tx'));
   });
 
-  it('preparePayment without counterparty set', function(done) {
-    const localInstructions = _.defaults({
-      sequence: 23
-    }, instructions);
-    this.api.preparePayment(address, requests.preparePaymentNoCounterparty,
-      localInstructions,
-      _.partial(checkResult, responses.preparePaymentNoCounterparty,
-        'tx', done));
+  it('preparePayment without counterparty set', function() {
+    const localInstructions = _.defaults({sequence: 23}, instructions);
+    return this.api.preparePayment(
+      address, requests.preparePaymentNoCounterparty, localInstructions).then(
+      _.partial(checkResult, responses.preparePaymentNoCounterparty, 'tx'));
   });
 
-  it('prepareOrder - buy order', function(done) {
-    this.api.prepareOrder(address, requests.prepareOrder, instructions,
-      _.partial(checkResult, responses.prepareOrder, 'tx', done));
+  it('prepareOrder - buy order', function() {
+    return this.api.prepareOrder(address, requests.prepareOrder, instructions)
+      .then(_.partial(checkResult, responses.prepareOrder, 'tx'));
   });
 
-  it('prepareOrder - sell order', function(done) {
-    this.api.prepareOrder(address, requests.prepareOrderSell, instructions,
-      _.partial(checkResult, responses.prepareOrderSell, 'tx', done));
+  it('prepareOrder - sell order', function() {
+    return this.api.prepareOrder(
+      address, requests.prepareOrderSell, instructions).then(
+      _.partial(checkResult, responses.prepareOrderSell, 'tx'));
   });
 
-  it('prepareOrderCancellation', function(done) {
-    this.api.prepareOrderCancellation(address, 23, instructions,
-      _.partial(checkResult, responses.prepareOrderCancellation, 'tx',
-        done));
+  it('prepareOrderCancellation', function() {
+    return this.api.prepareOrderCancellation(address, 23, instructions).then(
+      _.partial(checkResult, responses.prepareOrderCancellation, 'tx'));
   });
 
-  it('prepareTrustline', function(done) {
-    this.api.prepareTrustline(address, requests.prepareTrustline,
-      instructions, _.partial(checkResult, responses.prepareTrustline,
-        'tx', done));
+  it('prepareTrustline', function() {
+    return this.api.prepareTrustline(
+      address, requests.prepareTrustline, instructions).then(
+        _.partial(checkResult, responses.prepareTrustline, 'tx'));
   });
 
-  it('prepareSettings', function(done) {
-    this.api.prepareSettings(address, requests.prepareSettings, instructions,
-      _.partial(checkResult, responses.prepareSettings.flags, 'tx', done));
+  it('prepareSettings', function() {
+    return this.api.prepareSettings(
+      address, requests.prepareSettings, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.flags, 'tx'));
   });
 
-  it('prepareSettings - regularKey', function(done) {
+  it('prepareSettings - regularKey', function() {
     const regularKey = {regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD'};
-    this.api.prepareSettings(address, regularKey, instructions,
-      _.partial(checkResult, responses.prepareSettings.regularKey,
-        'tx', done));
+    return this.api.prepareSettings(address, regularKey, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.regularKey, 'tx'));
   });
 
-  it('prepareSettings - flag set', function(done) {
+  it('prepareSettings - flag set', function() {
     const settings = {requireDestinationTag: true};
-    this.api.prepareSettings(address, settings, instructions,
-      _.partial(checkResult, responses.prepareSettings.flagSet, 'tx', done));
+    return this.api.prepareSettings(address, settings, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.flagSet, 'tx'));
   });
 
-  it('prepareSettings - flag clear', function(done) {
+  it('prepareSettings - flag clear', function() {
     const settings = {requireDestinationTag: false};
-    this.api.prepareSettings(address, settings, instructions,
-      _.partial(checkResult, responses.prepareSettings.flagClear, 'tx', done));
+    return this.api.prepareSettings(address, settings, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.flagClear, 'tx'));
   });
 
-  it('prepareSettings - string field clear', function(done) {
+  it('prepareSettings - string field clear', function() {
     const settings = {walletLocator: null};
-    this.api.prepareSettings(address, settings, instructions,
-      _.partial(checkResult, responses.prepareSettings.fieldClear, 'tx', done));
+    return this.api.prepareSettings(address, settings, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.fieldClear, 'tx'));
   });
 
-  it('prepareSettings - integer field clear', function(done) {
+  it('prepareSettings - integer field clear', function() {
     const settings = {walletSize: null};
-    this.api.prepareSettings(address, settings, instructions, (e, data) => {
-      assert(data);
-      assert.strictEqual(data.WalletSize, 0);
-      done(e);
-    });
+    return this.api.prepareSettings(address, settings, instructions)
+      .then(data => {
+        assert(data);
+        assert.strictEqual(data.WalletSize, 0);
+      });
   });
 
-  it('prepareSettings - set transferRate', function(done) {
+  it('prepareSettings - set transferRate', function() {
     const settings = {transferRate: 1};
-    this.api.prepareSettings(address, settings, instructions,
-      _.partial(checkResult, responses.prepareSettings.setTransferRate,
-        'tx', done));
+    return this.api.prepareSettings(address, settings, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.setTransferRate, 'tx'));
   });
 
   it('sign', function() {
@@ -161,255 +153,260 @@ describe('RippleAPI', function() {
     });
   });
 
-  it('submit', function(done) {
-    this.api.submit(responses.sign.signedTransaction,
-      _.partial(checkResult, responses.submit, 'submit', done));
+  it('submit', function() {
+    return this.api.submit(responses.sign.signedTransaction).then(
+      _.partial(checkResult, responses.submit, 'submit'));
   });
 
-  it('getBalances', function(done) {
-    this.api.getBalances(address, {},
-      _.partial(checkResult, responses.getBalances, 'getBalances', done));
+  it('getBalances', function() {
+    return this.api.getBalances(address).then(
+      _.partial(checkResult, responses.getBalances, 'getBalances'));
   });
 
-  it('getTransaction - payment', function(done) {
-    this.api.getTransaction(hashes.VALID_TRANSACTION_HASH, {},
+  it('getTransaction - payment', function() {
+    return this.api.getTransaction(hashes.VALID_TRANSACTION_HASH).then(
       _.partial(checkResult, responses.getTransaction.payment,
-        'getTransaction', done));
+        'getTransaction'));
   });
 
-  it('getTransaction - settings', function(done) {
+  it('getTransaction - settings', function() {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
-    this.api.getTransaction(hash, {},
+    return this.api.getTransaction(hash).then(
       _.partial(checkResult, responses.getTransaction.settings,
-        'getTransaction', done));
+        'getTransaction'));
   });
 
-  it('getTransaction - order', function(done) {
+  it('getTransaction - order', function() {
     const hash =
       '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51';
-    this.api.getTransaction(hash, {},
+    return this.api.getTransaction(hash).then(
       _.partial(checkResult, responses.getTransaction.order,
-        'getTransaction', done));
+      'getTransaction'));
   });
 
-  it('getTransaction - order cancellation', function(done) {
+  it('getTransaction - order cancellation', function() {
     const hash =
       '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
-    this.api.getTransaction(hash, {},
+    return this.api.getTransaction(hash).then(
       _.partial(checkResult, responses.getTransaction.orderCancellation,
-        'getTransaction', done));
+        'getTransaction'));
   });
 
-  it('getTransaction - trustline set', function(done) {
+  it('getTransaction - trustline set', function() {
     const hash =
       '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D';
-    this.api.getTransaction(hash, {},
+    return this.api.getTransaction(hash).then(
       _.partial(checkResult, responses.getTransaction.trustline,
-        'getTransaction', done));
+        'getTransaction'));
   });
 
-  it('getTransaction - trustline frozen off', function(done) {
+  it('getTransaction - trustline frozen off', function() {
     const hash =
       'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B';
-    this.api.getTransaction(hash, {},
+    return this.api.getTransaction(hash).then(
       _.partial(checkResult, responses.getTransaction.trustlineFrozenOff,
-        'getTransaction', done));
+        'getTransaction'));
   });
 
-  it('getTransaction - not validated', function(done) {
+  it('getTransaction - not validated', function() {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';
-    this.api.getTransaction(hash, {}, (error, data) => {
-      assert.deepEqual(data, responses.getTransaction.notValidated);
-      done(error);
-    });
+    return this.api.getTransaction(hash).then(
+      _.partial(checkResult, responses.getTransaction.notValidated,
+      'getTransaction'));
   });
 
-  it('getTransaction - tracking on', function(done) {
+  it('getTransaction - tracking on', function() {
     const hash =
       '8925FC8844A1E930E2CC76AD0A15E7665AFCC5425376D548BB1413F484C31B8C';
-    this.api.getTransaction(hash, {},
+    return this.api.getTransaction(hash).then(
       _.partial(checkResult, responses.getTransaction.trackingOn,
-        'getTransaction', done));
+        'getTransaction'));
   });
 
-  it('getTransaction - tracking off', function(done) {
+  it('getTransaction - tracking off', function() {
     const hash =
       'C8C5E20DFB1BF533D0D81A2ED23F0A3CBD1EF2EE8A902A1D760500473CC9C582';
-    this.api.getTransaction(hash, {},
+    return this.api.getTransaction(hash).then(
       _.partial(checkResult, responses.getTransaction.trackingOff,
-        'getTransaction', done));
+        'getTransaction'));
   });
 
-  it('getTransaction - set regular key', function(done) {
+  it('getTransaction - set regular key', function() {
     const hash =
       '278E6687C1C60C6873996210A6523564B63F2844FB1019576C157353B1813E60';
-    this.api.getTransaction(hash, {},
+    return this.api.getTransaction(hash).then(
       _.partial(checkResult, responses.getTransaction.setRegularKey,
-        'getTransaction', done));
+        'getTransaction'));
   });
 
-  it('getTransaction - not found in range', function(done) {
+  it('getTransaction - not found in range', function() {
     const hash =
       '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
     const options = {
       minLedgerVersion: 32570,
       maxLedgerVersion: 32571
     };
-    this.api.getTransaction(hash, options, (error) => {
+    return this.api.getTransaction(hash, options).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
-      done();
     });
   });
 
-  it('getTransaction - not found by hash', function(done) {
-    this.api.getTransaction(hashes.NOTFOUND_TRANSACTION_HASH, {}, (error) => {
+  it('getTransaction - not found by hash', function() {
+    const hash = hashes.NOTFOUND_TRANSACTION_HASH;
+    return this.api.getTransaction(hash).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
-      done();
     });
   });
 
-  it('getTransaction - missing ledger history', function(done) {
+  it('getTransaction - missing ledger history', function() {
+    const hash = hashes.NOTFOUND_TRANSACTION_HASH;
     // make gaps in history
     this.api.remote.getServer().emit('message', ledgerClosed);
-    this.api.getTransaction(hashes.NOTFOUND_TRANSACTION_HASH, {}, (error) => {
+    return this.api.getTransaction(hash).then(() => {
+      assert(false, 'Should throw MissingLedgerHistoryError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.MissingLedgerHistoryError);
-      done();
     });
   });
 
-  it('getTransaction - ledger_index not found', function(done) {
+  it('getTransaction - ledger_index not found', function() {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11';
-    this.api.getTransaction(hash, {}, (error) => {
+    return this.api.getTransaction(hash).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
       assert(error.message.indexOf('ledger_index') !== -1);
-      done();
     });
   });
 
-  it('getTransaction - transaction ledger not found', function(done) {
+  it('getTransaction - transaction ledger not found', function() {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA12';
-    this.api.getTransaction(hash, {}, (error) => {
+    return this.api.getTransaction(hash).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
       assert(error.message.indexOf('ledger not found') !== -1);
-      done();
     });
   });
 
-  it('getTransaction - ledger missing close time', function(done) {
+  it('getTransaction - ledger missing close time', function() {
     const hash =
       '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04';
-    this.api.getTransaction(hash, {}, (error) => {
+    return this.api.getTransaction(hash).then(() => {
+      assert(false, 'Should throw ApiError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.ApiError);
-      done();
     });
   });
 
-  it('getTransactions', function(done) {
+  it('getTransactions', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2};
-    this.api.getTransactions(address, options,
+    return this.api.getTransactions(address, options).then(
       _.partial(checkResult, responses.getTransactions,
-        'getTransactions', done));
+        'getTransactions'));
   });
 
-  it('getTransactions - earliest first', function(done) {
+  it('getTransactions - earliest first', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2,
       earliestFirst: true
     };
     const expected = _.cloneDeep(responses.getTransactions)
       .sort(utils.compareTransactions);
-    this.api.getTransactions(address, options,
-      _.partial(checkResult, expected, 'getTransactions', done));
+    return this.api.getTransactions(address, options).then(
+      _.partial(checkResult, expected, 'getTransactions'));
   });
 
-  it('getTransactions - earliest first with start option', function(done) {
+  it('getTransactions - earliest first with start option', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2,
       start: hashes.VALID_TRANSACTION_HASH,
       earliestFirst: true
     };
-    this.api.getTransactions(address, options, (error, data) => {
+    return this.api.getTransactions(address, options).then(data => {
       assert.strictEqual(data.length, 0);
-      done(error);
     });
   });
 
-  it('getTransactions - gap', function(done) {
+  it('getTransactions - gap', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2,
       maxLedgerVersion: 348858000
     };
-    this.api.getTransactions(address, options, (error) => {
+    return this.api.getTransactions(address, options).then(() => {
+      assert(false, 'Should throw MissingLedgerHistoryError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.MissingLedgerHistoryError);
-      done();
     });
   });
 
-  it('getTransactions - tx not found', function(done) {
+  it('getTransactions - tx not found', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2,
       start: hashes.NOTFOUND_TRANSACTION_HASH,
       counterparty: address
     };
-    this.api.getTransactions(address, options, (error) => {
+    return this.api.getTransactions(address, options).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
-      done();
     });
   });
 
-  it('getTransactions - filters', function(done) {
+  it('getTransactions - filters', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 10,
       excludeFailures: true,
       counterparty: addresses.ISSUER
     };
-    this.api.getTransactions(address, options, (error, data) => {
+    return this.api.getTransactions(address, options).then(data => {
       assert.strictEqual(data.length, 10);
       assert(_.every(data, t => t.type === 'payment' || t.type === 'order'));
       assert(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
-      done();
     });
   });
 
-  it('getTransactions - filters for incoming', function(done) {
+  it('getTransactions - filters for incoming', function() {
     const options = {types: ['payment', 'order'], initiated: false, limit: 10,
       excludeFailures: true,
       counterparty: addresses.ISSUER
     };
-    this.api.getTransactions(address, options, (error, data) => {
+    return this.api.getTransactions(address, options).then(data => {
       assert.strictEqual(data.length, 10);
       assert(_.every(data, t => t.type === 'payment' || t.type === 'order'));
       assert(_.every(data, t => t.outcome.result === 'tesSUCCESS'));
-      done();
     });
   });
 
   // this is the case where core.RippleError just falls
   // through the api to the user
-  it('getTransactions - error', function(done) {
+  it('getTransactions - error', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 13};
-    this.api.getTransactions(address, options, (error) => {
+    return this.api.getTransactions(address, options).then(() => {
+      assert(false, 'Should throw RippleError');
+    }).catch(error => {
       assert(error instanceof RippleError);
-      done();
     });
   });
 
   // TODO: this doesn't test much, just that it doesn't crash
-  it('getTransactions with start option', function(done) {
+  it('getTransactions with start option', function() {
     const options = {
       start: hashes.VALID_TRANSACTION_HASH,
       earliestFirst: false,
       limit: 2
     };
-    this.api.getTransactions(address, options,
-      _.partial(checkResult, responses.getTransactions,
-        'getTransactions', done));
+    return this.api.getTransactions(address, options).then(
+      _.partial(checkResult, responses.getTransactions, 'getTransactions'));
   });
 
-  it('getTrustlines', function(done) {
+  it('getTrustlines', function() {
     const options = {currency: 'USD'};
-    this.api.getTrustlines(address, options,
-      _.partial(checkResult, responses.getTrustlines, 'getTrustlines',
-        done));
+    return this.api.getTrustlines(address, options).then(
+      _.partial(checkResult, responses.getTrustlines, 'getTrustlines'));
   });
 
   it('generateWallet', function() {
@@ -418,29 +415,28 @@ describe('RippleAPI', function() {
     });
   });
 
-  it('getSettings', function(done) {
-    this.api.getSettings(address, {},
-      _.partial(checkResult, responses.getSettings, 'getSettings', done));
+  it('getSettings', function() {
+    return this.api.getSettings(address).then(
+      _.partial(checkResult, responses.getSettings, 'getSettings'));
   });
 
-  it('getAccountInfo', function(done) {
-    this.api.getAccountInfo(address, {},
-      _.partial(checkResult, responses.getAccountInfo, 'getAccountInfo',
-        done));
+  it('getAccountInfo', function() {
+    return this.api.getAccountInfo(address).then(
+      _.partial(checkResult, responses.getAccountInfo, 'getAccountInfo'));
   });
 
-  it('getOrders', function(done) {
-    this.api.getOrders(address, {},
-      _.partial(checkResult, responses.getOrders, 'getOrders', done));
+  it('getOrders', function() {
+    return this.api.getOrders(address).then(
+      _.partial(checkResult, responses.getOrders, 'getOrders'));
   });
 
-  it('getOrderbook', function(done) {
-    this.api.getOrderbook(address, orderbook, {},
-      _.partial(checkResult, responses.getOrderbook, 'getOrderbook', done));
+  it('getOrderbook', function() {
+    return this.api.getOrderbook(address, orderbook).then(
+      _.partial(checkResult, responses.getOrderbook, 'getOrderbook'));
   });
 
-  it('getOrderbook - sorted so that best deals come first', function(done) {
-    this.api.getOrderbook(address, orderbook, {}, (error, data) => {
+  it('getOrderbook - sorted so that best deals come first', function() {
+    return this.api.getOrderbook(address, orderbook).then(data => {
       const bidRates = data.bids.map(bid => bid.properties.makerExchangeRate);
       const askRates = data.asks.map(ask => ask.properties.makerExchangeRate);
       // makerExchangeRate = quality = takerPays.value/takerGets.value
@@ -448,12 +444,11 @@ describe('RippleAPI', function() {
       // bids and asks should be sorted so that the best deals come first
       assert.deepEqual(_.sortBy(bidRates, x => Number(x)), bidRates);
       assert.deepEqual(_.sortBy(askRates, x => Number(x)), askRates);
-      done();
     });
   });
 
-  it('getOrderbook - currency & counterparty are correct', function(done) {
-    this.api.getOrderbook(address, orderbook, {}, (error, data) => {
+  it('getOrderbook - currency & counterparty are correct', function() {
+    return this.api.getOrderbook(address, orderbook).then(data => {
       const orders = _.flatten([data.bids, data.asks]);
       _.forEach(orders, order => {
         const quantity = order.specification.quantity;
@@ -464,30 +459,28 @@ describe('RippleAPI', function() {
         assert.strictEqual(totalPrice.currency, counter.currency);
         assert.strictEqual(totalPrice.counterparty, counter.counterparty);
       });
-      done();
     });
   });
 
-  it('getOrderbook - direction is correct for bids and asks', function(done) {
-    this.api.getOrderbook(address, orderbook, {}, (error, data) => {
+  it('getOrderbook - direction is correct for bids and asks', function() {
+    return this.api.getOrderbook(address, orderbook).then(data => {
       assert(_.every(data.bids, bid => bid.specification.direction === 'buy'));
-      assert(
-        _.every(data.asks, ask => ask.specification.direction === 'sell'));
-      done();
+      assert(_.every(data.asks, ask => ask.specification.direction === 'sell'));
     });
   });
 
-  it('getServerInfo', function(done) {
-    this.api.getServerInfo(
-      _.partial(checkResult, responses.getServerInfo, 'getServerInfo', done));
+  it('getServerInfo', function() {
+    return this.api.getServerInfo().then(
+      _.partial(checkResult, responses.getServerInfo, 'getServerInfo'));
   });
 
-  it('getServerInfo - error', function(done) {
+  it('getServerInfo - error', function() {
     this.mockRippled.returnErrorOnServerInfo = true;
-    this.api.getServerInfo((error) => {
+    return this.api.getServerInfo().then(() => {
+      assert(false, 'Should throw NetworkError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NetworkError);
       assert(error.message.indexOf('too much load') !== -1);
-      done();
     });
   });
 
@@ -495,58 +488,62 @@ describe('RippleAPI', function() {
     assert.strictEqual(this.api.getFee(), '0.000012');
   });
 
-  it('disconnect & isConnected', function(done) {
+  it('disconnect & isConnected', function() {
     assert.strictEqual(this.api.isConnected(), true);
-    this.api.disconnect(() => {
+    return this.api.disconnect().then(() => {
       assert.strictEqual(this.api.isConnected(), false);
-      done();
     });
   });
 
-  it('getPaths', function(done) {
-    this.api.getPaths(requests.getPaths.normal,
-      _.partial(checkResult, responses.getPaths.XrpToUsd, 'getPaths', done));
+  it('getPaths', function() {
+    return this.api.getPaths(requests.getPaths.normal).then(
+      _.partial(checkResult, responses.getPaths.XrpToUsd, 'getPaths'));
   });
 
   // @TODO
   // need decide what to do with currencies/XRP:
   // if add 'XRP' in currencies, then there will be exception in
   // xrpToDrops function (called from toRippledAmount)
-  it('getPaths USD 2 USD', function(done) {
-    this.api.getPaths(requests.getPaths.UsdToUsd,
-      _.partial(checkResult, responses.getPaths.UsdToUsd, 'getPaths', done));
+  it('getPaths USD 2 USD', function() {
+    return this.api.getPaths(requests.getPaths.UsdToUsd).then(
+      _.partial(checkResult, responses.getPaths.UsdToUsd, 'getPaths'));
   });
 
-  it('getPaths XRP 2 XRP', function(done) {
-    this.api.getPaths(requests.getPaths.XrpToXrp,
-      _.partial(checkResult, responses.getPaths.XrpToXrp, 'getPaths', done));
+  it('getPaths XRP 2 XRP', function() {
+    return this.api.getPaths(requests.getPaths.XrpToXrp).then(
+      _.partial(checkResult, responses.getPaths.XrpToXrp, 'getPaths'));
   });
 
-  it('getPaths - XRP 2 XRP - not enough', function(done) {
-    this.api.getPaths(requests.getPaths.XrpToXrpNotEnough, (error) => {
+  it('getPaths - XRP 2 XRP - not enough', function() {
+    return this.api.getPaths(requests.getPaths.XrpToXrpNotEnough).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
-      done();
     });
   });
 
-  it('getPaths - does not accept currency', function(done) {
-    this.api.getPaths(requests.getPaths.NotAcceptCurrency, (error) => {
+  it('getPaths - does not accept currency', function() {
+    return this.api.getPaths(requests.getPaths.NotAcceptCurrency).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
-      done();
     });
   });
 
-  it('getPaths - no paths', function(done) {
-    this.api.getPaths(requests.getPaths.NoPaths, (error) => {
+  it('getPaths - no paths', function() {
+    return this.api.getPaths(requests.getPaths.NoPaths).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
-      done();
     });
   });
 
-  it('getPaths - no paths with source currencies', function(done) {
-    this.api.getPaths(requests.getPaths.NoPathsWithCurrencies, (error) => {
+  it('getPaths - no paths with source currencies', function() {
+    const pathfind = requests.getPaths.NoPathsWithCurrencies;
+    return this.api.getPaths(pathfind).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
-      done();
     });
   });
 
@@ -740,7 +737,7 @@ describe('RippleAPI', function() {
 });
 
 describe('RippleAPI - offline', function() {
-  it('prepareSettings and sign', function(done) {
+  it('prepareSettings and sign', function() {
     const api = new RippleAPI();
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
     const settings = requests.prepareSettings;
@@ -749,15 +746,10 @@ describe('RippleAPI - offline', function() {
       maxLedgerVersion: 8820051,
       fee: '0.000012'
     };
-    api.prepareSettings(address, settings, instructions, (error, txJSON) => {
-      if (error) {
-        done(error);
-        return;
-      }
+    return api.prepareSettings(address, settings, instructions).then(txJSON => {
       assert.deepEqual(txJSON, responses.prepareSettings.flags);
       withDeterministicPRNG(() => {
         assert.deepEqual(api.sign(txJSON, secret), responses.sign);
-        done();
       });
     });
   });

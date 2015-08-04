@@ -13,7 +13,8 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-function getXRPBalance(remote: any, address: string, ledgerVersion?: number, callback: Callback): void {
+function getXRPBalance(remote: any, address: string, ledgerVersion?: number,
+    callback: Callback): void {
   remote.requestAccountInfo({account: address, ledger: ledgerVersion},
     composeAsync((data) => dropsToXrp(data.account_data.Balance), callback));
 }
@@ -22,7 +23,8 @@ type Getter = (marker: ?string, limit: number, callback: Callback) => void
 
 // If the marker is omitted from a response, you have reached the end
 // getter(marker, limit, callback), callback(error, {marker, results})
-function getRecursiveRecur(getter: Getter, marker?: string, limit: number, callback: Callback): void {
+function getRecursiveRecur(getter: Getter, marker?: string, limit: number,
+    callback: Callback): void {
   getter(marker, limit, (error, data) => {
     if (error) {
       return callback(error);
@@ -105,7 +107,7 @@ module.exports = {
   renameCounterpartyToIssuerInOrder,
   getRecursive,
   hasCompleteLedgerRange,
-  wrapCatch: common.wrapCatch,
+  promisify: common.promisify,
   clamp: clamp,
   common: common
 };

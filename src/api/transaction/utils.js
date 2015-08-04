@@ -65,6 +65,6 @@ function createTxJSON(transaction: any, remote: any, instructions: any,
 module.exports = {
   setTransactionBitFlags: setTransactionBitFlags,
   createTxJSON: createTxJSON,
-  wrapCatch: common.wrapCatch,
-  common: common
+  common: common,
+  promisify: common.promisify
 };

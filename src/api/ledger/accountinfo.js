@@ -18,7 +18,7 @@ function formatAccountInfo(response) {
   });
 }
 
-function getAccountInfo(account, options, callback) {
+function getAccountInfoAsync(account, options, callback) {
   validate.address(account);
   validate.getAccountInfoOptions(options);
 
@@ -31,4 +31,8 @@ function getAccountInfo(account, options, callback) {
     composeAsync(formatAccountInfo, callback));
 }
 
-module.exports = utils.wrapCatch(getAccountInfo);
+function getAccountInfo(account: string, options={}) {
+  return utils.promisify(getAccountInfoAsync.bind(this))(account, options);
+}
+
+module.exports = getAccountInfo;

@@ -30,9 +30,14 @@ function createOrderTransaction(account, order) {
   return transaction;
 }
 
-function prepareOrder(account, order, instructions, callback) {
+function prepareOrderAsync(account, order, instructions, callback) {
   const transaction = createOrderTransaction(account, order);
   utils.createTxJSON(transaction, this.remote, instructions, callback);
 }
 
-module.exports = utils.wrapCatch(prepareOrder);
+function prepareOrder(account: string, order: Object, instructions={}) {
+  return utils.promisify(prepareOrderAsync.bind(this))(
+    account, order, instructions);
+}
+
+module.exports = prepareOrder;

@@ -62,7 +62,7 @@ function formatBidsAndAsks(orderbook, offers) {
   return {bids, asks};
 }
 
-function getOrderbook(account, orderbook, options, callback) {
+function getOrderbookAsync(account, orderbook, options, callback) {
   validate.address(account);
   validate.orderbook(orderbook);
   validate.getOrderbookOptions(options);
@@ -76,4 +76,9 @@ function getOrderbook(account, orderbook, options, callback) {
                  callback));
 }
 
-module.exports = utils.wrapCatch(getOrderbook);
+function getOrderbook(account: string, orderbook: Object, options={}) {
+  return utils.promisify(getOrderbookAsync.bind(this))(
+    account, orderbook, options);
+}
+
+module.exports = getOrderbook;

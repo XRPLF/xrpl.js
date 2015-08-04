@@ -8,14 +8,6 @@ const common = require('../common');
 // If a ledger is not received in this time, consider the connection offline
 const CONNECTION_TIMEOUT = 1000 * 30;
 
-function connect(callback: (err: any, data: any) => void): void {
-  this.remote.connect(callback);
-}
-
-function disconnect(callback: (err: any, data: any) => void): void {
-  this.remote.disconnect(callback);
-}
-
 function isUpToDate(remote): boolean {
   const server = remote.getServer();
   return Boolean(server) && (remote._stand_alone
@@ -26,7 +18,7 @@ function isConnected(): boolean {
   return Boolean(this.remote._ledger_current_index) && isUpToDate(this.remote);
 }
 
-function getServerInfo(callback: (err: any, data: any) => void): void {
+function getServerInfoAsync(callback: (err: any, data: any) => void): void {
   this.remote.requestServerInfo((error, response) => {
     if (error) {
       const message = _.get(error, ['remote', 'error_message'], error.message);
@@ -43,6 +35,22 @@ function getFee(): number {
 
 function getLedgerVersion(): number {
   return this.remote.getLedgerSequence();
+}
+
+function connect() {
+  return common.promisify(callback => {
+    this.remote.connect(() => callback(null));
+  })();
+}
+
+function disconnect() {
+  return common.promisify(callback => {
+    this.remote.disconnect(() => callback(null));
+  })();
+}
+
+function getServerInfo() {
+  return common.promisify(getServerInfoAsync.bind(this))();
 }
 
 module.exports = {
