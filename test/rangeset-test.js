@@ -26,6 +26,31 @@ describe('RangeSet', function() {
     r.parseAndAddRanges('4-5,7-10,1-2,3-3');
     assert.deepEqual(r.serialize(), '1-5,7-10');
   });
+  it('parseAndAddRanges() -- single ledger', function() {
+    const r = new RangeSet();
+
+    r.parseAndAddRanges('3');
+    assert.strictEqual(r.serialize(), '3-3');
+    assert(r.containsValue(3));
+    assert(!r.containsValue(0));
+    assert(!r.containsValue(2));
+    assert(!r.containsValue(4));
+    assert(r.containsRange(3, 3));
+    assert(!r.containsRange(2, 3));
+    assert(!r.containsRange(3, 4));
+
+    r.parseAndAddRanges('1-5');
+    assert.strictEqual(r.serialize(), '1-5');
+    assert(r.containsValue(3));
+    assert(r.containsValue(1));
+    assert(r.containsValue(5));
+    assert(!r.containsValue(6));
+    assert(!r.containsValue(0));
+    assert(r.containsRange(1, 5));
+    assert(r.containsRange(2, 4));
+    assert(!r.containsRange(1, 6));
+    assert(!r.containsRange(0, 3));
+  });
 
   it('containsValue()', function() {
     const r = new RangeSet();
