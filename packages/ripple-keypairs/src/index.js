@@ -2,14 +2,13 @@
 
 const assert = require('assert');
 const rand = require('brorand');
+const codec = require('ripple-address-codec');
 
 const {seedFromPhrase, createAccountID} = require('./utils');
 const {KeyPair, KeyType} = require('./keypair');
 const {Ed25519Pair} = require('./ed25519');
 const {K256Pair, accountPublicFromPublicGenerator} = require('./secp256k1');
-
-const {decodeSeed, encodeNodePublic, decodeNodePublic, encodeAccountID} =
-                                          require('ripple-address-codec');
+const {decodeSeed, encodeNodePublic, decodeNodePublic, encodeAccountID} = codec;
 
 KeyPair.fromSeed = function(seedBytes, type, options) {
   assert(type === 'secp256k1' || type === 'ed25519');

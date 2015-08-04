@@ -7,12 +7,13 @@ function isVirtual() {
   throw new Error('virtual method not implemented ');
 }
 
-function hasCachedProperty(obj, name, computer) {
-  const key = name + '__';
+function cachedProperty(obj, computer) {
+  const name = computer.name;
+  const key = '_' + name;
   obj.prototype[name] = function() {
     let cached = this[key];
     if (cached === undefined) {
-      cached = this[key] = computer.apply(this, arguments);
+      cached = this[key] = computer.call(this);
     }
     return cached;
   };
@@ -73,7 +74,7 @@ function createAccountID(pubKeyBytes) {
 module.exports = {
   arrayToHex,
   bytesToHex,
-  hasCachedProperty,
+  cachedProperty,
   isVirtual,
   Sha512,
   toGenericArray,

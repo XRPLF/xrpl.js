@@ -114,9 +114,3 @@ console.log(prettyJSON(signTxJson(seed, tx_json)));
   }
 }
 ```
-
-### Coverage
-
-This keeps coveralls happy (we think)
-
-[![Coverage Status](https://coveralls.io/repos/sublimator/ripple-keypairs/badge.svg?branch=master&service=github)](https://coveralls.io/github/sublimator/ripple-keypairs?branch=master)

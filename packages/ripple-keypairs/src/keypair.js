@@ -3,7 +3,7 @@
 const codec = require('ripple-address-codec');
 const {
   bytesToHex,
-  hasCachedProperty,
+  cachedProperty,
   isVirtual,
   createAccountID
 } = require('./utils');
@@ -15,7 +15,7 @@ const KeyType = {
 
 function KeyPair({seedBytes, pubBytes}) {
   this.seedBytes = seedBytes;
-  this.pubKeyCanonicalBytes__ = pubBytes;
+  this._pubKeyCanonicalBytes = pubBytes;
 }
 
 /*
@@ -38,19 +38,19 @@ KeyPair.prototype.verify = isVirtual;
 */
 KeyPair.prototype.pubKeyCanonicalBytes = isVirtual;
 
-hasCachedProperty(KeyPair, 'pubKeyHex', function() {
+cachedProperty(KeyPair, function pubKeyHex() {
   return bytesToHex(this.pubKeyCanonicalBytes());
 });
 
-hasCachedProperty(KeyPair, 'accountBytes', function() {
+cachedProperty(KeyPair, function accountBytes() {
   return createAccountID(this.pubKeyCanonicalBytes());
 });
 
-hasCachedProperty(KeyPair, 'accountID', function() {
+cachedProperty(KeyPair, function accountID() {
   return codec.encodeAccountID(this.accountBytes());
 });
 
-hasCachedProperty(KeyPair, 'seed', function() {
+cachedProperty(KeyPair, function seed() {
   return codec.encodeSeed(this.seedBytes, this.type);
 });
 

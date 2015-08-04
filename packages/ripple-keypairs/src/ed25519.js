@@ -7,7 +7,7 @@ const Ed25519 = elliptic.eddsa('ed25519');
 const {KeyPair, KeyType} = require('./keypair');
 const {
   Sha512,
-  hasCachedProperty,
+  cachedProperty
 } = require('./utils');
 
 /*
@@ -43,7 +43,7 @@ Ed25519Pair.fromPublic = function(publicKey) {
   return new Ed25519Pair({pubBytes: parseBytes(publicKey)});
 };
 
-hasCachedProperty(Ed25519Pair, 'key', function() {
+cachedProperty(Ed25519Pair, function key() {
   if (this.seedBytes) {
     const seed256 = deriveEdKeyPairSeed(this.seedBytes);
     return Ed25519.keyFromSecret(seed256);
@@ -51,7 +51,7 @@ hasCachedProperty(Ed25519Pair, 'key', function() {
   return Ed25519.keyFromPublic(this.pubKeyCanonicalBytes().slice(1));
 });
 
-hasCachedProperty(Ed25519Pair, 'pubKeyCanonicalBytes', function() {
+cachedProperty(Ed25519Pair, function pubKeyCanonicalBytes() {
   return [0xED].concat(this.key().pubBytes());
 });
 

@@ -27,7 +27,7 @@
     "babel-core": "^5.3.2",
     "babel-loader": "^5.0.0",
     "coveralls": "~2.10.0",
-    "eslint": "^0.23.0",
+    "eslint": "^1.0.0",
     "eventemitter2": "^0.4.14",
     "istanbul": "~0.3.5",
     "lodash": "^3.10.0",
@@ -45,14 +45,14 @@
     "prepublish": "npm test && npm run lint && npm run compile",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; fi; eslint --reset -c eslintrc src/*.js test/*.js"
+    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; fi; eslint -c eslintrc src/*.js test/*.js"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/ripple/ripple-keypairs.git"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=0.12.0"
   },
   "bugs": {
     "url": "https://github.com/ripple/ripple-keypairs/issues"
@@ -60,8 +60,5 @@
   "homepage": "https://github.com/ripple/ripple-keypairs#readme",
   "author": "ndudfield@gmail.com",
   "license": "ISC",
-  "readmeFilename": "README.md",
-  "engines": {
-    "node": ">=0.12.0"
-  }
+  "readmeFilename": "README.md"
 }

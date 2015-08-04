@@ -7,7 +7,7 @@ const hashjs = require('hash.js');
 const {KeyPair, KeyType} = require('./keypair');
 const {
   Sha512,
-  hasCachedProperty
+  cachedProperty
 } = require('./utils');
 
 function deriveScalar(bytes, discrim) {
@@ -80,7 +80,7 @@ K256Pair.fromSeed = function(seedBytes, opts={}) {
   return new K256Pair({seedBytes, validator: opts.validator});
 };
 
-hasCachedProperty(K256Pair, 'key', function() {
+cachedProperty(K256Pair, function key() {
   if (this.seedBytes) {
     const options = {validator: this.validator};
     return secp256k1.keyFromPrivate(deriveSecret(this.seedBytes, options));
@@ -88,7 +88,7 @@ hasCachedProperty(K256Pair, 'key', function() {
   return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
 });
 
-hasCachedProperty(K256Pair, 'pubKeyCanonicalBytes', function() {
+cachedProperty(K256Pair, function pubKeyCanonicalBytes() {
   return this.key().getPublic().encodeCompressed();
 });
 
