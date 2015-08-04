@@ -524,7 +524,7 @@ TransactionManager.prototype._prepareRequest = function(tx) {
     tx.sign();
 
     const serialized = tx.serialize();
-    submitRequest.tx_blob(serialized.to_hex());
+    submitRequest.txBlob(serialized.to_hex());
 
     const hash = tx.hash(null, null, serialized);
     tx.addId(hash);

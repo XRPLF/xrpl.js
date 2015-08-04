@@ -36,6 +36,12 @@ const TX_JSON = {
   }
 };
 
+function makeServer(url) {
+  const server = new Server(new process.EventEmitter(), url);
+  server._connected = true;
+  return server;
+}
+
 describe('Remote', function() {
   const initialLogEngine = Log.getEngine();
 
@@ -1939,6 +1945,27 @@ describe('Remote', function() {
         currency: '0000000000000000000000004254430000000000'
       }]
     });
+  });
+
+  it('createPathFind', function() {
+    const servers = [
+      makeServer('wss://localhost:5006'),
+      makeServer('wss://localhost:5007')
+    ];
+
+    remote._servers = servers;
+
+    const pathfind = remote.createPathFind({
+      src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
+      dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      src_currencies: [{
+        currency: 'BTC', issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
+      }]
+    });
+
+    // TODO: setup a mock server to provide a response
+    pathfind.on('update', message => console.log(message));
   });
 
   it('Construct path_find create request', function() {

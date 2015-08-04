@@ -68,7 +68,7 @@ function Account(remote, account) {
 
   function attachAccount(request) {
     if (self._account.is_valid() && self._subs) {
-      request.add_account(self._account_id);
+      request.addAccount(self._account_id);
     }
   }
 

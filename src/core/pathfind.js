@@ -35,7 +35,7 @@ util.inherits(PathFind, EventEmitter);
 PathFind.prototype.create = function () {
   var self = this;
 
-  var req = this.remote.request_path_find_create(
+  var req = this.remote.requestPathFindCreate(
     this.src_account,
     this.dst_account,
     this.dst_amount,
