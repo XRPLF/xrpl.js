@@ -45,7 +45,7 @@ class RangeSet {
     const rangeStrings = rangesString.split(',');
     _.forEach(rangeStrings, rangeString => {
       const range = rangeString.split('-').map(Number);
-      this.addRange(range[0], range[1]);
+      this.addRange(range[0], range.length === 1 ? range[0] : range[1]);
     });
   }
 
