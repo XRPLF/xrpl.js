@@ -9,7 +9,7 @@
       "properties": {
         "currency": {"$ref": "currency"},
         "counterparty": {"$ref": "address"},
-        "value": {"$ref": "$value"}
+        "value": {"$ref": "value"}
       },
       "required": ["currency", "value"],
       "additionalProperties": false
