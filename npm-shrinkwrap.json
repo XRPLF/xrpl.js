@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.13.0-rc2",
+  "version": "0.13.0-rc3",
   "npm-shrinkwrap-version": "5.4.0",
   "node-version": "v0.12.7",
   "dependencies": {
@@ -95,8 +95,8 @@
       }
     },
     "lodash": {
-      "version": "3.10.0",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.0.tgz"
+      "version": "3.10.1",
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
     },
     "lru-cache": {
       "version": "2.5.2",
