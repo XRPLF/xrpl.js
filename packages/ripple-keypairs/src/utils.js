@@ -3,19 +3,21 @@
 const hashjs = require('hash.js');
 const Sha512 = require('./sha512');
 
-function isVirtual() {
-  throw new Error('virtual method not implemented ');
+function isVirtual(target, name, descriptor) {
+  descriptor.value = function() {
+    throw new Error('virtual method not implemented ');
+  };
 }
 
-function cachedProperty(obj, computer) {
-  const name = computer.name;
+function cached(target, name, descriptor) {
+  const computer = descriptor.value;
   const key = '_' + name;
-  obj.prototype[name] = function() {
-    let cached = this[key];
-    if (cached === undefined) {
-      cached = this[key] = computer.call(this);
+  descriptor.value = function() {
+    let value = this[key];
+    if (value === undefined) {
+      value = this[key] = computer.call(this);
     }
-    return cached;
+    return value;
   };
 }
 
@@ -45,8 +47,8 @@ function seedFromPhrase(phrase) {
 }
 
 module.exports = {
+  cached,
   bytesToHex,
-  cachedProperty,
   createAccountID,
   isVirtual,
   seedFromPhrase,

@@ -1,14 +1,10 @@
 'use strict';
 
-const util = require('util');
 const elliptic = require('elliptic');
 const secp256k1 = elliptic.ec('secp256k1');
 const hashjs = require('hash.js');
 const {KeyPair, KeyType} = require('./keypair');
-const {
-  Sha512,
-  cachedProperty
-} = require('./utils');
+const {Sha512, cached} = require('./utils');
 
 function deriveScalar(bytes, discrim) {
   const order = secp256k1.curve.n;
@@ -65,64 +61,63 @@ function accountPublicFromPublicGenerator(publicGenBytes) {
   return offset.encodeCompressed();
 }
 
-/*
-* @class
-*/
-function K256Pair({validator}) {
-  KeyPair.apply(this, arguments);
-  this.type = KeyType.secp256k1;
-  this.validator = validator;
+class K256Pair extends KeyPair {
+  constructor(options) {
+    super(options);
+    this.type = KeyType.secp256k1;
+    this.validator = options.validator;
+  }
+
+  static fromSeed(seedBytes, opts={}) {
+    return new K256Pair({seedBytes, validator: opts.validator});
+  }
+
+  /*
+  @param {Array<Byte>} message (bytes)
+   */
+  sign(message) {
+    return this._createSignature(message).toDER();
+  }
+
+  _createSignature(message) {
+    // The key.sign message silently discards options
+    return this.key().sign(this.hashMessage(message), {canonical: true});
+  }
+
+  /*
+  @param {Array<Byte>} message - (bytes)
+  @return {Array<Byte>} - 256 bit hash of the message
+   */
+  hashMessage(message) {
+    return hashjs.sha512().update(message).digest().slice(0, 32);
+  }
+
+  /*
+  @param {Array<Byte>} message - bytes
+  @param {Array<Byte>} signature - DER encoded signature bytes
+   */
+  verify(message, signature) {
+    try {
+      return this.key().verify(this.hashMessage(message), signature);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @cached
+  key() {
+    if (this.seedBytes) {
+      const options = {validator: this.validator};
+      return secp256k1.keyFromPrivate(deriveSecret(this.seedBytes, options));
+    }
+    return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
+  }
+
+  @cached
+  pubKeyCanonicalBytes() {
+    return this.key().getPublic().encodeCompressed();
+  }
 }
-
-util.inherits(K256Pair, KeyPair);
-
-/*
-@param {Array<Byte>} message (bytes)
- */
-K256Pair.prototype.sign = function(message) {
-  return this._createSignature(message).toDER();
-};
-
-K256Pair.prototype._createSignature = function(message) {
-  // The key.sign message silently discards options
-  return this.key().sign(this.hashMessage(message), {canonical: true});
-};
-
-/*
-@param {Array<Byte>} message - (bytes)
-@return {Array<Byte>} - 256 bit hash of the message
- */
-K256Pair.prototype.hashMessage = function(message) {
-  return hashjs.sha512().update(message).digest().slice(0, 32);
-};
-
-/*
-@param {Array<Byte>} message - bytes
-@param {Array<Byte>} signature - DER encoded signature bytes
- */
-K256Pair.prototype.verify = function(message, signature) {
-  try {
-    return this.key().verify(this.hashMessage(message), signature);
-  } catch (e) {
-    return false;
-  }
-};
-
-cachedProperty(K256Pair, function key() {
-  if (this.seedBytes) {
-    const options = {validator: this.validator};
-    return secp256k1.keyFromPrivate(deriveSecret(this.seedBytes, options));
-  }
-  return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
-});
-
-cachedProperty(K256Pair, function pubKeyCanonicalBytes() {
-  return this.key().getPublic().encodeCompressed();
-});
-
-K256Pair.fromSeed = function(seedBytes, opts={}) {
-  return new K256Pair({seedBytes, validator: opts.validator});
-};
 
 module.exports = {
   K256Pair,
