@@ -62,8 +62,8 @@ function parseOutcome(tx: Object): ?Object {
     fee: utils.common.dropsToXrp(tx.Fee),
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
-    ledgerVersion: tx.ledger_index,
-    indexInLedger: tx.meta.TransactionIndex
+    ledgerVersion: tx.ledger_index || 0,
+    indexInLedger: tx.meta.TransactionIndex || 0
   };
 }
 

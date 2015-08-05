@@ -228,7 +228,7 @@ module.exports = function(request, options={}) {
       marker: marker === undefined ? undefined : String(marker),
       transactions: [
         {
-          ledger_index: 348860 - Number(marker),
+          ledger_index: 348860 - Number(marker || 100),
           tx_blob: SerializedObject.from_json(tx).to_hex(),
           meta: SerializedObject.from_json(meta).to_hex(),
           validated: options.validated
