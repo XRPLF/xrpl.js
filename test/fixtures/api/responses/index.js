@@ -42,7 +42,10 @@ module.exports = {
     setTransferRate: require('./prepare-settings-set-transfer-rate.json'),
     fieldClear: require('./prepare-settings-field-clear.json')
   },
-  prepareTrustline: require('./prepare-trustline.json'),
+  prepareTrustline: {
+    simple: require('./prepare-trustline-simple.json'),
+    complex: require('./prepare-trustline.json')
+  },
   sign: require('./sign.json'),
   submit: require('./submit.json')
 };

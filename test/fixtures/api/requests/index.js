@@ -7,7 +7,10 @@ module.exports = {
   preparePaymentAllOptions: require('./prepare-payment-all-options'),
   preparePaymentNoCounterparty: require('./prepare-payment-no-counterparty'),
   prepareSettings: require('./prepare-settings'),
-  prepareTrustline: require('./prepare-trustline'),
+  prepareTrustline: {
+    simple: require('./prepare-trustline-simple'),
+    complex: require('./prepare-trustline')
+  },
   sign: require('./sign'),
   getPaths: {
     normal: require('./getpaths/normal'),
