@@ -5,6 +5,7 @@ const assert = require('assert');
 const common = require('../common');
 const dropsToXrp = common.dropsToXrp;
 const composeAsync = common.composeAsync;
+import type {Remote} from '../../core/remote';
 
 type Callback = (err: any, data: any) => void
 
@@ -13,8 +14,9 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-function getXRPBalance(remote: any, address: string, ledgerVersion?: number,
-    callback: Callback): void {
+function getXRPBalance(remote: Remote, address: string, ledgerVersion?: number,
+                       callback: Callback
+): void {
   remote.requestAccountInfo({account: address, ledger: ledgerVersion},
     composeAsync((data) => dropsToXrp(data.account_data.Balance), callback));
 }
@@ -24,7 +26,8 @@ type Getter = (marker: ?string, limit: number, callback: Callback) => void
 // If the marker is omitted from a response, you have reached the end
 // getter(marker, limit, callback), callback(error, {marker, results})
 function getRecursiveRecur(getter: Getter, marker?: string, limit: number,
-    callback: Callback): void {
+                          callback: Callback
+): void {
   getter(marker, limit, (error, data) => {
     if (error) {
       return callback(error);
@@ -81,19 +84,21 @@ function signum(num) {
  *  @returns {Number} [-1, 0, 1]
  */
 
-type Outcome = {outcome: {ledgerVersion: string, indexInLedger: string}};
+type Outcome = {outcome: {ledgerVersion: number, indexInLedger: number}};
 
 function compareTransactions(first: Outcome, second: Outcome): number {
-  if (first.outcome.ledgerVersion === second.outcome.ledgerVersion) {
-    return signum(Number(first.outcome.indexInLedger) -
-      Number(second.outcome.indexInLedger));
+  if (!first.outcome || !second.outcome) {
+    return 0;
   }
-  return Number(first.outcome.ledgerVersion) <
-    Number(second.outcome.ledgerVersion) ? -1 : 1;
+  if (first.outcome.ledgerVersion === second.outcome.ledgerVersion) {
+    return signum(first.outcome.indexInLedger - second.outcome.indexInLedger);
+  }
+  return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1;
 }
 
-function hasCompleteLedgerRange(remote: any, minLedgerVersion: number,
-                                maxLedgerVersion: number): boolean {
+function hasCompleteLedgerRange(remote: Remote, minLedgerVersion?: number,
+                                maxLedgerVersion?: number
+): boolean {
   const firstLedgerVersion = 32570; // earlier versions have been lost
   return remote.getServer().hasLedgerRange(
     minLedgerVersion || firstLedgerVersion,
