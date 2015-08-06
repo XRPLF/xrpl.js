@@ -6,8 +6,9 @@ const toTimestamp = require('../../../core/utils').toTimestamp;
 const utils = require('../utils');
 const BigNumber = require('bignumber.js');
 
-function adjustQualityForXRP(quality: string, takerGetsCurrency: string,
-    takerPaysCurrency: string) {
+function adjustQualityForXRP(
+  quality: string, takerGetsCurrency: string, takerPaysCurrency: string
+) {
   // quality = takerPays.value/takerGets.value
   // using drops (1e-6 XRP) for XRP values
   const numeratorShift = (takerPaysCurrency === 'XRP' ? -6 : 0);
@@ -51,7 +52,7 @@ function parseOutcome(tx: Object): ?Object {
   }
 
   const balanceChanges = transactionParser.parseBalanceChanges(tx.meta);
-  const orderbookChanges = transactionParser.parseOrderBookChanges(tx.meta);
+  const orderbookChanges = transactionParser.parseOrderbookChanges(tx.meta);
   removeEmptyCounterpartyInBalanceChanges(balanceChanges);
   removeEmptyCounterpartyInOrderbookChanges(orderbookChanges);
 

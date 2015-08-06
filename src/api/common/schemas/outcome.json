@@ -6,8 +6,22 @@
     "result": {"type": "string"},
     "timestamp": {"type": "string"},
     "fee": {"$ref": "value"},
-    "balanceChanges": {"type": "object"},
-    "orderbookChanges": {"type": "object"},
+    "balanceChanges": {
+      "type": "object",
+      "description": "Key is the ripple address; value is an array of changes",
+      "additionalProperties": {
+        "type": "array",
+        "items": {"$ref": "balance"}
+      }
+    },
+    "orderbookChanges": {
+      "type": "object",
+      "description": "Key is the maker's ripple address; value is an array of changes",
+      "additionalProperties": {
+        "type": "array",
+        "items": {"$ref": "order-change"}
+      }
+    },
     "ledgerVersion": {"$ref": "ledgerVersion"},
     "indexInLedger": {"type": "integer", "minimum": 0}
   },

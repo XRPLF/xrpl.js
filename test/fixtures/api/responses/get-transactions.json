@@ -71,11 +71,12 @@
       "orderbookChanges": {
         "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59": [
           {
-            "taker_pays": {
+            "direction": "buy",
+            "quantity": {
               "currency": "XRP",
               "value": "-1.101198"
             },
-            "taker_gets": {
+            "totalPrice": {
               "currency": "USD",
               "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
               "value": "-0.001002"
@@ -161,11 +162,12 @@
       "orderbookChanges": {
         "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59": [
           {
-            "taker_pays": {
+            "direction": "buy",
+            "quantity": {
               "currency": "XRP",
               "value": "-1.101198"
             },
-            "taker_gets": {
+            "totalPrice": {
               "currency": "USD",
               "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
               "value": "-0.001002"
