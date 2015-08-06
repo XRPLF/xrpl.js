@@ -16,8 +16,14 @@ lint() {
 }
 
 unittest() {
+  # test "src"
   npm test --coverage
   npm run coveralls
+
+  # test compiled version in "dist/npm"
+  ln -nfs ../../dist/npm/core test/node_modules/ripple-lib
+  ln -nfs ../../dist/npm test/node_modules/ripple-api
+  npm test
 }
 
 oneNode() {

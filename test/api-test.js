@@ -4,21 +4,20 @@ const _ = require('lodash');
 const assert = require('assert-diff');
 const path = require('path');
 const setupAPI = require('./setup-api');
-const RippleAPI = require('../src').RippleAPI;
+const RippleAPI = require('ripple-api').RippleAPI;
+const common = RippleAPI._PRIVATE.common;
 const fixtures = require('./fixtures/api');
 const requests = fixtures.requests;
 const responses = fixtures.responses;
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
 const MockPRNG = require('./mock-prng');
-const sjcl = require('../src/core').sjcl;
+const sjcl = common.core.sjcl;
 const address = addresses.ACCOUNT;
-const common = require('../src/api/common');
 const validate = common.validate;
-const RippleError = require('../src/core/rippleerror').RippleError;
-const utils = require('../src/api/ledger/utils');
+const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
-const schemaValidator = require('../src/api/common/schema-validator');
+const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 
 const orderbook = {
   base: {
@@ -394,7 +393,7 @@ describe('RippleAPI', function() {
     return this.api.getTransactions(address, options).then(() => {
       assert(false, 'Should throw RippleError');
     }).catch(error => {
-      assert(error instanceof RippleError);
+      assert(error instanceof common.core.RippleError);
     });
   });
 
