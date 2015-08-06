@@ -93,10 +93,16 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.prepareOrderCancellation, 'tx'));
   });
 
-  it('prepareTrustline', function() {
+  it('prepareTrustline - simple', function() {
     return this.api.prepareTrustline(
-      address, requests.prepareTrustline, instructions).then(
-        _.partial(checkResult, responses.prepareTrustline, 'tx'));
+      address, requests.prepareTrustline.simple, instructions).then(
+        _.partial(checkResult, responses.prepareTrustline.simple, 'tx'));
+  });
+
+  it('prepareTrustline - complex', function() {
+    return this.api.prepareTrustline(
+      address, requests.prepareTrustline.complex, instructions).then(
+        _.partial(checkResult, responses.prepareTrustline.complex, 'tx'));
   });
 
   it('prepareSettings', function() {

@@ -12,7 +12,8 @@ const TrustSetFlags = {
 };
 
 function convertQuality(quality) {
-  return (new BigNumber(quality)).shift(9).truncated().toNumber();
+  return quality === undefined ? undefined :
+    (new BigNumber(quality)).shift(9).truncated().toNumber();
 }
 
 function createTrustlineTransaction(account, trustline) {
