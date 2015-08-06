@@ -2,7 +2,7 @@
 
 'use strict';
 const _ = require('lodash');
-const core = require('./common').core;
+const common = require('./common');
 const server = require('./server/server');
 const connect = server.connect;
 const disconnect = server.disconnect;
@@ -28,11 +28,11 @@ const sign = require('./transaction/sign');
 const submit = require('./transaction/submit');
 const errors = require('./common').errors;
 const convertExceptions = require('./common').convertExceptions;
-const generateWallet = convertExceptions(core.Wallet.generate);
+const generateWallet = convertExceptions(common.core.Wallet.generate);
 
 function RippleAPI(options: {}) {
   const _options = _.assign({}, options, {automatic_resubmission: false});
-  this.remote = new core.Remote(_options);
+  this.remote = new common.core.Remote(_options);
 }
 
 RippleAPI.prototype = {
@@ -63,6 +63,13 @@ RippleAPI.prototype = {
 
   generateWallet,
   errors
+};
+
+// these are exposed only for use by unit tests; they are not part of the API
+RippleAPI._PRIVATE = {
+  common: common,
+  ledgerUtils: require('./ledger/utils'),
+  schemaValidator: require('./common/schema-validator')
 };
 
 module.exports = RippleAPI;

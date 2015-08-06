@@ -1,6 +1,6 @@
 'use strict';
 const net = require('net');
-const RippleAPI = require('../src').RippleAPI;
+const RippleAPI = require('ripple-api').RippleAPI;
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close');
 const createMockRippled = require('./mock-rippled');
 
