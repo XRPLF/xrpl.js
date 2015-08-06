@@ -103,8 +103,8 @@
       "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.2.tgz"
     },
     "ripple-lib-transactionparser": {
-      "version": "0.4.0",
-      "resolved": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.4.0.tgz",
+      "version": "0.5.0",
+      "resolved": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.5.0.tgz",
       "dependencies": {
         "bignumber.js": {
           "version": "1.4.1",

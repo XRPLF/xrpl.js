@@ -24,7 +24,7 @@
     "is-my-json-valid": "^2.12.0",
     "lodash": "^3.1.0",
     "lru-cache": "~2.5.0",
-    "ripple-lib-transactionparser": "^0.4",
+    "ripple-lib-transactionparser": "^0.5.0",
     "ripple-wallet-generator": "^1.0.3",
     "sjcl-extended": "ripple/sjcl-extended#1.0.3",
     "ws": "~0.7.1"
@@ -36,7 +36,7 @@
     "babel-eslint": "^3.1.23",
     "babel-loader": "^5.0.0",
     "coveralls": "~2.10.0",
-    "eslint": "^0.24.0",
+    "eslint": "^1.0.0",
     "eslint-plugin-flowtype": "^1.0.0",
     "eventemitter2": "^0.4.14",
     "flow-bin": "^0.14",

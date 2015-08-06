@@ -30,12 +30,13 @@
     "orderbookChanges": {
       "r9UHu5CWni1qRY7Q4CfFZLGvXo2pGQy96b": [
         {
-          "taker_pays": {
+          "direction": "buy",
+          "quantity": {
             "currency": "USD",
             "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
             "value": "237"
           },
-          "taker_gets": {
+          "totalPrice": {
             "currency": "XRP",
             "value": "0.0002"
           },
