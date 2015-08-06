@@ -37,31 +37,3 @@ exports._test = {
 exports.sjcl = require('./utils').sjcl;
 exports.Wallet = require('ripple-wallet-generator')({sjcl: exports.sjcl});
 exports.types = require('./serializedtypes');
-
-// camelCase to under_scored API conversion
-function attachUnderscored(name) {
-  const o = exports[name];
-
-  Object.keys(o.prototype).forEach(function(key) {
-    const UPPERCASE = /([A-Z]{1})[a-z]+/g;
-
-    if (!UPPERCASE.test(key)) {
-      return;
-    }
-
-    const underscored = key.replace(UPPERCASE, function(c) {
-      return '_' + c.toLowerCase();
-    });
-
-    o.prototype[underscored] = o.prototype[key];
-  });
-}
-
-['Remote',
- 'Request',
- 'Transaction',
- 'Account',
- 'Server'
-].forEach(attachUnderscored);
-
-// vim:sw=2:sts=2:ts=8:et
