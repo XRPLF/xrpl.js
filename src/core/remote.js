@@ -2480,6 +2480,9 @@ Remote.prototype.createTransaction = function(type, options = {}) {
 
   const constructorMap = {
     Payment: transaction.payment,
+    SuspendedPaymentCreate: transaction.suspendedPayment,
+    SuspendedPaymentCancel: transaction.suspendedPaymentCancel,
+    SuspendedPaymentFinish: transaction.suspendedPaymentFinish,
     AccountSet: transaction.accountSet,
     TrustSet: transaction.trustSet,
     OfferCreate: transaction.offerCreate,
