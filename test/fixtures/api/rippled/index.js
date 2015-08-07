@@ -16,10 +16,10 @@ module.exports = {
   book_offers: require('./book-offers'),
   server_info: require('./server-info'),
   server_info_error: require('./server-info-error'),
-  ripple_path_find: {
-    generate: require('./ripple-path-find'),
-    sendUSD: require('./ripple-path-find-send-usd'),
-    XrpToXrp: require('./ripple-path-find-xrp-to-xrp')
+  path_find: {
+    generate: require('./path-find'),
+    sendUSD: require('./path-find-send-usd'),
+    XrpToXrp: require('./path-find-xrp-to-xrp')
   },
   tx: {
     Payment: require('./tx/payment.json'),

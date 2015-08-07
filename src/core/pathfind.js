@@ -59,7 +59,8 @@ PathFind.prototype.create = function() {
 };
 
 PathFind.prototype.close = function() {
-  this.remote.request_path_find_close().broadcast().request();
+  this.removeAllListeners('update');
+  this.remote.requestPathFindClose().broadcast().request();
   this.emit('end');
   this.emit('close');
 };
@@ -73,7 +74,7 @@ PathFind.prototype.notify_update = function(message) {
   // looking for.
   if (this.src_account === src_account &&
       this.dst_account === dst_account &&
-      this.dst_amount.equals(dst_amount)) {
+      dst_amount.equals(this.dst_amount)) {
     this.emit('update', message);
   }
 };

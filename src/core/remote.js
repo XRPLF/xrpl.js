@@ -65,6 +65,7 @@ function Remote(options = {}) {
   this._transaction_listeners = 0;
   this._received_tx = new LRU({max: 100});
   this._cur_path_find = null;
+  this._queued_path_finds = [];
 
   if (this.local_signing) {
     // Local signing implies local fees and sequences
@@ -1934,8 +1935,13 @@ Remote.prototype.findAccount = function(accountID) {
  * @return {PathFind}
  */
 
-function createPathFind(options_) {
+function createPathFind(options_, callback) {
   const options = {};
+
+  if (this._cur_path_find !== null) {
+    this._queued_path_finds.push({options: options_, callback: callback});
+    return null;
+  }
 
   if (_.isPlainObject(options_)) {
     _.merge(options, options_);
@@ -1955,10 +1961,21 @@ function createPathFind(options_) {
     this._cur_path_find.notify_superceded();
   }
 
-  pathFind.create();
+  if (callback) {
+    pathFind.on('update', (data) => {
+      if (data.full_reply) {
+        pathFind.close();
+        callback(null, data);
+      }
+    });
+    pathFind.on('error', (error) => {
+      pathFind.close();
+      callback(error);
+    });
+  }
 
   this._cur_path_find = pathFind;
-
+  pathFind.create();
   return pathFind;
 }
 
@@ -2369,6 +2386,11 @@ Remote.prototype.requestPathFindClose = function(callback) {
 
   request.message.subcommand = 'close';
   request.callback(callback);
+  this._cur_path_find = null;
+  if (this._queued_path_finds.length > 0) {
+    const pathfind = this._queued_path_finds.shift();
+    this.createPathFind(pathfind.options, pathfind.callback);
+  }
 
   return request;
 };
