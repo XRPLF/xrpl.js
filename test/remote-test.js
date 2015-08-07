@@ -2100,4 +2100,97 @@ describe('Remote', function() {
       RegularKey: TX_JSON.Destination
     });
   });
+
+  it('Construct SuspendedPaymentCreate transaction', function() {
+    const transaction = remote.createTransaction('SuspendedPaymentCreate', {
+      account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      destination: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      amount: '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
+    });
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      TransactionType: 'SuspendedPaymentCreate',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      Destination: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      Amount: {
+        value: '1',
+        currency: 'USD',
+        issuer: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
+      }
+    });
+  });
+  it('Construct SuspendedPaymentCreate transaction -- with optional params', function() {
+    const transaction = remote.createTransaction('SuspendedPaymentCreate', {
+      account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      destination: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      amount: '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      digest: '5'.repeat(64),
+      cancel_after: 12345,
+      finish_after: 12346
+    });
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      TransactionType: 'SuspendedPaymentCreate',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      Destination: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      Amount: {
+        value: '1',
+        currency: 'USD',
+        issuer: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
+      },
+      Digest: '5'.repeat(64),
+      CancelAfter: 12345,
+      FinishAfter: 12346
+    });
+  });
+
+  it('Construct SuspendedPaymentCancel transaction', function() {
+    const transaction = remote.createTransaction('SuspendedPaymentCancel', {
+      account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      owner: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      offer_sequence: 1
+    });
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      TransactionType: 'SuspendedPaymentCancel',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      Owner: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      OfferSequence: 1
+    });
+  });
+
+  it('Construct SuspendedPaymentFinish transaction', function() {
+    const transaction = remote.createTransaction('SuspendedPaymentFinish', {
+      account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      owner: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      offer_sequence: 1
+    });
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      TransactionType: 'SuspendedPaymentFinish',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      Owner: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      OfferSequence: 1
+    });
+  });
+  it('Construct SuspendedPaymentFinish transaction -- with optional params', function() {
+    const transaction = remote.createTransaction('SuspendedPaymentFinish', {
+      account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      owner: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      offer_sequence: 1,
+      digest: '5'.repeat(64),
+      method: 255,
+      proof: 'DEADBEEF'
+    });
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      TransactionType: 'SuspendedPaymentFinish',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      Owner: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      OfferSequence: 1,
+      Digest: '5'.repeat(64),
+      Method: 255,
+      Proof: 'DEADBEEF'
+    });
+  });
 });

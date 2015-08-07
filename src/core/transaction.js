@@ -1,7 +1,7 @@
 'use strict';
 
 const util = require('util');
-const lodash = require('lodash');
+const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils');
 const sjcl = require('./utils').sjcl;
@@ -501,7 +501,7 @@ Transaction.prototype.sign = function(testnet) {
  */
 
 Transaction.prototype.addId = function(id) {
-  if (!lodash.contains(this.submittedIDs, id)) {
+  if (!_.contains(this.submittedIDs, id)) {
     this.submittedIDs.unshift(id);
   }
 };
@@ -517,7 +517,7 @@ Transaction.prototype.addId = function(id) {
  */
 
 Transaction.prototype.findId = function(cache) {
-  const cachedTransactionID = lodash.detect(this.submittedIDs, function(id) {
+  const cachedTransactionID = _.detect(this.submittedIDs, function(id) {
     return cache.hasOwnProperty(id);
   });
   return cache[cachedTransactionID];
@@ -608,7 +608,7 @@ Transaction.prototype.secret = function(secret) {
 };
 
 Transaction.prototype.setType = function(type) {
-  if (lodash.isUndefined(Transaction.formats, type)) {
+  if (_.isUndefined(Transaction.formats, type)) {
     throw new Error('TransactionType must be a valid transaction type');
   }
 
@@ -618,14 +618,14 @@ Transaction.prototype.setType = function(type) {
 };
 
 Transaction.prototype._setUInt32 = function(name, value, options_) {
-  const options = lodash.merge({}, options_);
+  const options = _.merge({}, options_);
   const isValidUInt32 = typeof value === 'number'
   && value >= 0 && value < Math.pow(256, 4);
 
   if (!isValidUInt32) {
     throw new Error(name + ' must be a valid UInt32');
   }
-  if (!lodash.isUndefined(options.min_value) && value < options.min_value) {
+  if (!_.isUndefined(options.min_value) && value < options.min_value) {
     throw new Error(name + ' must be >= ' + options.min_value);
   }
 
@@ -662,7 +662,7 @@ Transaction.prototype.setAccount = function(account) {
 };
 
 Transaction.prototype._setAmount = function(name, amount, options_) {
-  const options = lodash.merge({no_native: false}, options_);
+  const options = _.merge({no_native: false}, options_);
   const parsedAmount = Amount.from_json(amount);
 
   if (parsedAmount.is_negative()) {
@@ -691,7 +691,7 @@ Transaction.prototype._setHash256 = function(name, value, options_) {
     throw new Error(name + ' must be a valid Hash256');
   }
 
-  const options = lodash.merge({pad: false}, options_);
+  const options = _.merge({pad: false}, options_);
   let hash256 = value;
 
   if (options.pad) {
@@ -771,7 +771,7 @@ Transaction.prototype.addMemo = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
   } else {
     options = {
       memoType: arguments[0],
@@ -792,7 +792,7 @@ Transaction.prototype.addMemo = function(options_) {
   let memoData = options.memoData;
 
   if (memoType) {
-    if (!(lodash.isString(memoType) && memoRegex.test(memoType))) {
+    if (!(_.isString(memoType) && memoRegex.test(memoType))) {
       throw new Error(
         'MemoType must be a string containing only valid URL characters');
     }
@@ -805,7 +805,7 @@ Transaction.prototype.addMemo = function(options_) {
   }
 
   if (memoFormat) {
-    if (!(lodash.isString(memoFormat) && memoRegex.test(memoFormat))) {
+    if (!(_.isString(memoFormat) && memoRegex.test(memoFormat))) {
       throw new Error(
         'MemoFormat must be a string containing only valid URL characters');
     }
@@ -859,15 +859,15 @@ Transaction.prototype.accountSet = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
-    if (lodash.isUndefined(options.set_flag)) {
+    if (_.isUndefined(options.set_flag)) {
       options.set_flag = options.set;
     }
-    if (lodash.isUndefined(options.clear_flag)) {
+    if (_.isUndefined(options.clear_flag)) {
       options.clear_flag = options.clear;
     }
   } else {
@@ -881,10 +881,10 @@ Transaction.prototype.accountSet = function(options_) {
   this.setType('AccountSet');
   this.setAccount(options.account);
 
-  if (!lodash.isUndefined(options.set_flag)) {
+  if (!_.isUndefined(options.set_flag)) {
     this.setSetFlag(options.set_flag);
   }
-  if (!lodash.isUndefined(options.clear_flag)) {
+  if (!_.isUndefined(options.clear_flag)) {
     this.setClearFlag(options.clear_flag);
   }
 
@@ -901,7 +901,7 @@ Transaction.prototype.setAccountSetFlag = function(name, value) {
     : accountSetFlags['asf' + flagValue];
   }
 
-  if (!lodash.contains(lodash.values(accountSetFlags), flagValue)) {
+  if (!_.contains(_.values(accountSetFlags), flagValue)) {
     throw new Error(name + ' must be a valid AccountSet flag');
   }
 
@@ -958,9 +958,9 @@ Transaction.prototype.setRegularKey = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
   } else {
@@ -973,7 +973,7 @@ Transaction.prototype.setRegularKey = function(options_) {
   this.setType('SetRegularKey');
   this.setAccount(options.account);
 
-  if (!lodash.isUndefined(options.regular_key)) {
+  if (!_.isUndefined(options.regular_key)) {
     this._setAccount('RegularKey', options.regular_key);
   }
 
@@ -994,9 +994,9 @@ Transaction.prototype.rippleLineSet = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
   } else {
@@ -1011,13 +1011,13 @@ Transaction.prototype.rippleLineSet = function(options_) {
   this.setType('TrustSet');
   this.setAccount(options.account);
 
-  if (!lodash.isUndefined(options.limit)) {
+  if (!_.isUndefined(options.limit)) {
     this.setLimit(options.limit);
   }
-  if (!lodash.isUndefined(options.quality_in)) {
+  if (!_.isUndefined(options.quality_in)) {
     this.setQualityIn(options.quality_in);
   }
-  if (!lodash.isUndefined(options.quality_out)) {
+  if (!_.isUndefined(options.quality_out)) {
     this.setQualityOut(options.quality_out);
   }
 
@@ -1059,12 +1059,12 @@ Transaction.prototype.payment = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src || options.from;
     }
-    if (lodash.isUndefined(options.destination)) {
+    if (_.isUndefined(options.destination)) {
       options.destination = options.dst || options.to;
     }
   } else {
@@ -1110,6 +1110,70 @@ Transaction.prototype.sendMax = function(send_max) {
 
 Transaction.prototype.setDeliverMin = function(deliver_min) {
   return this._setAmount('DeliverMin', deliver_min);
+};
+
+Transaction.prototype.suspendedPayment = function(options_) {
+  const options = _.merge({}, options_);
+
+  this.setType('SuspendedPaymentCreate');
+  this.setAccount(options.account);
+  this.setDestination(options.destination);
+  this.setAmount(options.amount);
+
+  if (!_.isUndefined(options.digest)) {
+    this._setHash256('Digest', options.digest);
+  }
+  if (!_.isUndefined(options.cancelAfter)) {
+    this.setCancelAfter(options.cancelAfter);
+  }
+  if (!_.isUndefined(options.finishAfter)) {
+    this.setFinishAfter(options.finishAfter);
+  }
+
+  return this;
+};
+
+Transaction.prototype.setCancelAfter = function(cancelAfter) {
+  return this._setUInt32('CancelAfter', cancelAfter);
+};
+Transaction.prototype.setFinishAfter = function(finishAfter) {
+  return this._setUInt32('FinishAfter', finishAfter);
+};
+
+Transaction.prototype.suspendedPaymentCancel = function(options_) {
+  const options = _.merge({}, options_);
+
+  this.setType('SuspendedPaymentCancel');
+  this.setAccount(options.account);
+  this.setOwner(options.owner);
+  this.setOfferSequence(options.offerSequence);
+
+  return this;
+};
+
+Transaction.prototype.setOwner = function(owner) {
+  return this._setAccount('Owner', owner);
+};
+
+Transaction.prototype.suspendedPaymentFinish = function(options_) {
+  const options = _.merge({}, options_);
+
+  this.setType('SuspendedPaymentFinish');
+  this.setAccount(options.account);
+  this.setOwner(options.owner);
+  this.setOfferSequence(options.offerSequence);
+
+  if (!_.isUndefined(options.digest)) {
+    this._setHash256('Digest', options.digest);
+  }
+  if (!_.isUndefined(options.method)) {
+    this.tx_json.Method = options.method;
+  }
+  if (!_.isUndefined(options.proof)) {
+    this.tx_json.Proof = options.proof;
+  }
+
+  return this;
 };
 
 /**
@@ -1243,18 +1307,18 @@ Transaction.prototype.offerCreate = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
-    if (lodash.isUndefined(options.taker_pays)) {
+    if (_.isUndefined(options.taker_pays)) {
       options.taker_pays = options.buy;
     }
-    if (lodash.isUndefined(options.taker_gets)) {
+    if (_.isUndefined(options.taker_gets)) {
       options.taker_gets = options.sell;
     }
-    if (lodash.isUndefined(options.offer_sequence)) {
+    if (_.isUndefined(options.offer_sequence)) {
       options.offer_sequence = options.cancel_sequence || options.sequence;
     }
   } else {
@@ -1272,10 +1336,10 @@ Transaction.prototype.offerCreate = function(options_) {
   this.setTakerGets(options.taker_gets);
   this.setTakerPays(options.taker_pays);
 
-  if (!lodash.isUndefined(options.expiration)) {
+  if (!_.isUndefined(options.expiration)) {
     this.setExpiration(options.expiration);
   }
-  if (!lodash.isUndefined(options.offer_sequence)) {
+  if (!_.isUndefined(options.offer_sequence)) {
     this.setOfferSequence(options.offer_sequence);
   }
 
@@ -1313,12 +1377,12 @@ Transaction.prototype.offerCancel = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
-    if (lodash.isUndefined(options.offer_sequence)) {
+    if (_.isUndefined(options.offer_sequence)) {
       options.offer_sequence = options.sequence || options.cancel_sequence;
     }
   } else {
@@ -1416,5 +1480,3 @@ Transaction.prototype.summary = function() {
 };
 
 exports.Transaction = Transaction;
-
-// vim:sw=2:sts=2:ts=8:et
