@@ -344,8 +344,8 @@ Transaction.prototype._computeFee = function() {
   }
 
   switch (fees.length) {
-    case 0: return undefined;
-    case 1: return String(fees[0]);
+  case 0: return undefined;
+  case 1: return String(fees[0]);
   }
 
   fees.sort(function ascending(a, b) {
@@ -1179,6 +1179,10 @@ Transaction.prototype.setPaths =
 Transaction.prototype.paths = function(paths) {
   if (!Array.isArray(paths)) {
     throw new Error('Paths must be an array');
+  }
+
+  if (paths.length === 0) {
+    return this;
   }
 
   this.tx_json.Paths = [];
