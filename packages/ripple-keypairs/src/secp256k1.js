@@ -80,7 +80,6 @@ class K256Pair extends KeyPair {
   }
 
   _createSignature(message) {
-    // The key.sign message silently discards options
     return this.key().sign(this.hashMessage(message), {canonical: true});
   }
 
