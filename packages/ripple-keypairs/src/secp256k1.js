@@ -79,18 +79,6 @@ class K256Pair extends KeyPair {
     return this._createSignature(message).toDER();
   }
 
-  _createSignature(message) {
-    return this.key().sign(this.hashMessage(message), {canonical: true});
-  }
-
-  /*
-  @param {Array<Byte>} message - (bytes)
-  @return {Array<Byte>} - 256 bit hash of the message
-   */
-  hashMessage(message) {
-    return hashjs.sha512().update(message).digest().slice(0, 32);
-  }
-
   /*
   @param {Array<Byte>} message - bytes
   @param {Array<Byte>} signature - DER encoded signature bytes
@@ -106,6 +94,23 @@ class K256Pair extends KeyPair {
   }
 
   @cached
+  pubKeyCanonicalBytes() {
+    return this.key().getPublic().encodeCompressed();
+  }
+
+  _createSignature(message) {
+    return this.key().sign(this.hashMessage(message), {canonical: true});
+  }
+
+  /*
+  @param {Array<Byte>} message - (bytes)
+  @return {Array<Byte>} - 256 bit hash of the message
+   */
+  hashMessage(message) {
+    return hashjs.sha512().update(message).digest().slice(0, 32);
+  }
+
+  @cached
   key() {
     if (this.seedBytes) {
       const options = {validator: this.validator};
@@ -114,10 +119,6 @@ class K256Pair extends KeyPair {
     return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
   }
 
-  @cached
-  pubKeyCanonicalBytes() {
-    return this.key().getPublic().encodeCompressed();
-  }
 }
 
 module.exports = {

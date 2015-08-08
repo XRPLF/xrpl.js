@@ -9,7 +9,7 @@ const {Sha512, cached} = require('./utils');
 /*
 @param {Array} seed bytes
  */
-function deriveEdKeyPairSeed(seed) {
+function deriveEdKeyPairSecret(seed) {
   return new Sha512().add(seed).first256();
 }
 
@@ -45,17 +45,16 @@ class Ed25519Pair extends KeyPair {
   }
 
   @cached
-  key() {
-    if (this.seedBytes) {
-      const seed256 = deriveEdKeyPairSeed(this.seedBytes);
-      return Ed25519.keyFromSecret(seed256);
-    }
-    return Ed25519.keyFromPublic(this.pubKeyCanonicalBytes().slice(1));
+  pubKeyCanonicalBytes() {
+    return [0xED].concat(this.key().pubBytes());
   }
 
   @cached
-  pubKeyCanonicalBytes() {
-    return [0xED].concat(this.key().pubBytes());
+  key() {
+    if (this.seedBytes) {
+      return Ed25519.keyFromSecret(deriveEdKeyPairSecret(this.seedBytes));
+    }
+    return Ed25519.keyFromPublic(this.pubKeyCanonicalBytes().slice(1));
   }
 }
 
