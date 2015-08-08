@@ -98,7 +98,9 @@ class K256Pair extends KeyPair {
   verify(message, signature) {
     try {
       return this.key().verify(this.hashMessage(message), signature);
+      /* eslint-disable no-catch-shadow */
     } catch (e) {
+      /* eslint-enable no-catch-shadow */
       return false;
     }
   }
