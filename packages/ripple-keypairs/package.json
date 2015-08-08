@@ -41,8 +41,8 @@
   },
   "scripts": {
     "build": "gulp",
-    "compile": "babel -i runtime -d dist/npm/ src/",
-    "compile-with-source-maps": "babel -i runtime -s -t -d dist/npm/ src/",
+    "compile": "babel --optional runtime -d dist/npm/ src/",
+    "compile-with-source-maps": "babel --optional runtime -s -t -d dist/npm/ src/",
     "prepublish": "npm test && npm run lint && npm run compile",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
