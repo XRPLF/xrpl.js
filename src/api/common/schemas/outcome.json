@@ -19,7 +19,7 @@
       "description": "Key is the maker's ripple address; value is an array of changes",
       "additionalProperties": {
         "type": "array",
-        "items": {"$ref": "order-change"}
+        "items": {"$ref": "orderChange"}
       }
     },
     "ledgerVersion": {"$ref": "ledgerVersion"},

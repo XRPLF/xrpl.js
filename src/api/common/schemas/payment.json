@@ -3,7 +3,7 @@
   "title": "payment",
   "type": "object",
   "properties": {
-    "source": {"$ref": "adjustment"},
+    "source": {"$ref": "maxAdjustment"},
     "destination": {"$ref": "adjustment"},
     "paths": {"type": "string"},
     "memos": {
