@@ -1747,8 +1747,8 @@ Remote.prototype._serverPrepareSubscribe = function(server, callback_) {
   const request = this.requestSubscribe(feeds);
 
   function serverSubscribed(message) {
-    self._stand_alone = !!message.stand_alone;
-    self._testnet = !!message.testnet;
+    self._stand_alone = Boolean(message.stand_alone);
+    self._testnet = Boolean(message.testnet);
     self._handleLedgerClosed(message, server);
     self.emit('subscribed');
   }
@@ -2294,7 +2294,7 @@ Remote.prototype.requestRipplePathFind = function(options_, callback_) {
       destination_account: options_.dst_account,
       destination_amount: options_.dst_amount,
       source_currencies: options_.src_currencies
-      }, options_);
+    }, options_);
   } else {
     _.merge(options, makeOptions(
       'ripple_path_find',
@@ -2342,7 +2342,7 @@ Remote.prototype.requestPathFindCreate = function(options_, callback_) {
       destination_account: options_.dst_account,
       destination_amount: options_.dst_amount,
       source_currencies: options_.src_currencies
-      }, options_);
+    }, options_);
   } else {
     _.merge(options, makeOptions(
       'path_find',

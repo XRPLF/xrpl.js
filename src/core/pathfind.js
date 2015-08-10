@@ -11,8 +11,8 @@ const Amount = require('./amount').Amount;
  * the 'end' and 'superceded' events.
  */
 
-function PathFind(remote, src_account, dst_account,
-    dst_amount, src_currencies) {
+function PathFind(remote, src_account, dst_account, dst_amount, src_currencies
+) {
   EventEmitter.call(this);
 
   this.remote = remote;
