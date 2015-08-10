@@ -4,6 +4,7 @@
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
+const assert = require('assert');
 const validator = require('is-my-json-valid');
 const core = require('./utils').core;
 const ValidationError = require('./errors').ValidationError;
@@ -33,6 +34,9 @@ function endsWith(str, suffix) {
 function loadSchemas(dir) {
   const filenames = fs.readdirSync(dir).filter(name => endsWith(name, '.json'));
   const schemas = filenames.map(name => loadSchema(path.join(dir, name)));
+  const titles = _.map(schemas, schema => schema.title);
+  const duplicates = _.keys(_.pick(_.countBy(titles), count => count > 1));
+  assert(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates);
   return _.indexBy(schemas, 'title');
 }
 
