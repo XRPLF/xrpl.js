@@ -13,7 +13,7 @@
       ],
       "source": {
         "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-        "amount": {
+        "maxAmount": {
           "currency": "XRP",
           "value": "1.112209"
         }
@@ -104,7 +104,7 @@
       ],
       "source": {
         "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-        "amount": {
+        "maxAmount": {
           "currency": "XRP",
           "value": "1.112209"
         }

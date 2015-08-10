@@ -6,7 +6,7 @@
   "properties": {
     "value": {
       "description": "The balance on the trustline",
-      "$ref": "signed-value"
+      "$ref": "signedValue"
     },
     "currency": {
       "description": "The three-character code or hex string used to denote currencies",
