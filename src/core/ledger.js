@@ -1,4 +1,5 @@
 'use strict';
+const BigNumber = require('bignumber.js');
 const Transaction = require('./transaction').Transaction;
 const SHAMap = require('./shamap').SHAMap;
 const SHAMapTreeNode = require('./shamap').SHAMapTreeNode;
@@ -154,6 +155,26 @@ Ledger.prototype.calc_account_hash = function(options) {
   }
 
   return account_map.hash();
+};
+
+// see rippled Ledger::updateHash()
+Ledger.calculateLedgerHash =
+Ledger.prototype.calculateLedgerHash = function(ledgerHeader) {
+  const so = new SerializedObject();
+  const prefix = 0x4C575200;
+  const totalCoins = (new BigNumber(ledgerHeader.total_coins)).toString(16);
+
+  stypes.Int32.serialize(so, Number(ledgerHeader.ledger_index));
+  stypes.Int64.serialize(so, totalCoins);
+  stypes.Hash256.serialize(so, ledgerHeader.parent_hash);
+  stypes.Hash256.serialize(so, ledgerHeader.transaction_hash);
+  stypes.Hash256.serialize(so, ledgerHeader.account_hash);
+  stypes.Int32.serialize(so, ledgerHeader.parent_close_time);
+  stypes.Int32.serialize(so, ledgerHeader.close_time);
+  stypes.Int8.serialize(so, ledgerHeader.close_time_resolution);
+  stypes.Int8.serialize(so, ledgerHeader.close_flags);
+
+  return so.hash(prefix).to_hex();
 };
 
 exports.Ledger = Ledger;
