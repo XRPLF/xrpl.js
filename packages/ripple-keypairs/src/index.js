@@ -42,6 +42,10 @@ function walletFromSeed(seed) {
   return deriveWallet(type, bytes);
 }
 
+function walletFromPhrase(phrase, type='secp256k1') {
+  return deriveWallet(type, seedFromPhrase(phrase));
+}
+
 function deriveValidator(seedBytes) {
   const pair = K256Pair.fromSeed(seedBytes, {validator: true});
   return {
@@ -67,6 +71,10 @@ function validatorKeysFromSeed(seed) {
   return deriveValidator(bytes);
 }
 
+function validatorKeysFromPhrase(phrase) {
+  return deriveValidator(seedFromPhrase(phrase));
+}
+
 module.exports = {
   KeyPair,
   K256Pair,
@@ -78,6 +86,8 @@ module.exports = {
   generateWallet,
   generateValidatorKeys,
   walletFromSeed,
+  walletFromPhrase,
   validatorKeysFromSeed,
+  validatorKeysFromPhrase,
   nodePublicAccountID
 };

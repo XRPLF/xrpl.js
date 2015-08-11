@@ -13,8 +13,10 @@ const {
   keyPairFromSeed,
   generateWallet,
   walletFromSeed,
+  walletFromPhrase,
   generateValidatorKeys,
   validatorKeysFromSeed,
+  validatorKeysFromPhrase,
   nodePublicAccountID
 } = keypairs;
 
@@ -97,6 +99,42 @@ describe('keyPairFromSeed', function() {
   it('returns a K256Pair from an secp256k1 (default) seed', function() {
     const pair = keyPairFromSeed('sn259rEFXrQrWyx3Q7XneWcwV6dfL');
     assert(pair instanceof K256Pair);
+  });
+});
+
+describe('walletFromPhrase', function() {
+  it('can gan generate ed25519 wallets', function() {
+    const expected = {
+      seed: 'sEd7rBGm5kxzauRTAV2hbsNz7N45X91',
+      accountID: 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN',
+      publicKey:
+        'ED' +
+        'D3993CDC6647896C455F136648B7750723B011475547AF60691AA3D7438E021D'
+    };
+    const wallet = walletFromPhrase('niq', 'ed25519');
+    assert.deepEqual(wallet, expected);
+  });
+  it('generates secp256k1 wallets by default', function() {
+    const expected = {
+      seed: 'shQUG1pmPYrcnSUGeuJFJTA1b3JSL',
+      accountID: 'rNvfq2SVbCiio1zkN5WwLQW8CHgy2dUoQi',
+      publicKey:
+        '02' +
+        '1E788CDEB9104C9179C3869250A89999C1AFF92D2C3FF7925A1696835EA3D840'
+    };
+    const wallet = walletFromPhrase('niq');
+    assert.deepEqual(wallet, expected);
+  });
+});
+
+describe('validatorKeysFromPhrase', function() {
+  it('generates keys used by peer nodes/validators', function() {
+    const expected = {
+      seed: 'shQUG1pmPYrcnSUGeuJFJTA1b3JSL',
+      publicKey: 'n9KNees3ippJvi7ZT1GqHMCmEmmkCVPxQRPfU5tPzmg9MtWevpjP'
+    };
+    const wallet = validatorKeysFromPhrase('niq');
+    assert.deepEqual(wallet, expected);
   });
 });
 
