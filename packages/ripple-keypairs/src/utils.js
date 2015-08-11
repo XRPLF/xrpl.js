@@ -3,13 +3,13 @@
 const hashjs = require('hash.js');
 const Sha512 = require('./sha512');
 
-function isVirtual(target, name, descriptor) {
+function isVirtual(_, __, descriptor) {
   descriptor.value = function() {
     throw new Error('virtual method not implemented ');
   };
 }
 
-function cached(target, name, descriptor) {
+function cached(_, name, descriptor) {
   const computer = descriptor.value;
   const key = '_' + name;
   descriptor.value = function() {

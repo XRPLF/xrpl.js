@@ -10,18 +10,26 @@ const {Ed25519Pair} = require('./ed25519');
 const {K256Pair, accountPublicFromPublicGenerator} = require('./secp256k1');
 const {decodeSeed, encodeNodePublic, decodeNodePublic, encodeAccountID} = codec;
 
-KeyPair.fromSeed = function(seedBytes, type, options) {
-  assert(type === 'secp256k1' || type === 'ed25519');
-  const Pair = type === 'ed25519' ? Ed25519Pair : K256Pair;
-  return Pair.fromSeed(seedBytes, options);
-};
-
-function keyPairFromSeed(seedString, options) {
-  const decoded = decodeSeed(seedString);
-  return KeyPair.fromSeed(decoded.bytes, decoded.type, options);
+function parseSeed(seed, type=KeyType.secp256k1) {
+  if (typeof seed !== 'string') {
+    return {bytes: seed, type};
+  }
+  return decodeSeed(seed);
 }
 
-function deriveWallet(type, seedBytes) {
+KeyPair.fromSeed = function(seed, type=KeyType.secp256k1, options) {
+  if (typeof seed === 'string') {
+    const decoded = decodeSeed(seed);
+    const optionsArg = type;
+    return this.fromSeed(decoded.bytes, decoded.type, optionsArg);
+  }
+
+  assert(type === KeyType.secp256k1 || type === KeyType.ed25519);
+  const Pair = type === 'ed25519' ? Ed25519Pair : K256Pair;
+  return Pair.fromSeed(seed, options);
+};
+
+function deriveWallet(seedBytes, type) {
   const pair = KeyPair.fromSeed(seedBytes, type);
 
   return {
@@ -31,27 +39,27 @@ function deriveWallet(type, seedBytes) {
   };
 }
 
-function generateWallet(opts={}) {
-  const {type='secp256k1', randGen=rand} = opts;
-  const seedBytes = randGen(16);
-  return deriveWallet(type, seedBytes);
-}
-
-function walletFromSeed(seed) {
-  const {type, bytes} = decodeSeed(seed);
-  return deriveWallet(type, bytes);
-}
-
-function walletFromPhrase(phrase, type='secp256k1') {
-  return deriveWallet(type, seedFromPhrase(phrase));
-}
-
 function deriveValidator(seedBytes) {
   const pair = K256Pair.fromSeed(seedBytes, {validator: true});
   return {
     seed: pair.seed(),
     publicKey: encodeNodePublic(pair.pubKeyCanonicalBytes())
   };
+}
+
+function generateWallet(opts={}) {
+  const {type='secp256k1', randGen=rand} = opts;
+  const seedBytes = randGen(16);
+  return deriveWallet(seedBytes, type);
+}
+
+function walletFromSeed(seed, seedType) {
+  const {type, bytes} = parseSeed(seed, seedType);
+  return deriveWallet(bytes, type);
+}
+
+function walletFromPhrase(phrase, type) {
+  return walletFromSeed(seedFromPhrase(phrase), type);
 }
 
 function generateValidatorKeys(opts={}) {
@@ -65,14 +73,18 @@ function nodePublicAccountID(publicKey) {
   return encodeAccountID(createAccountID(accountPublicBytes));
 }
 
-function validatorKeysFromSeed(seed) {
-  const {type, bytes} = decodeSeed(seed);
+function validatorKeysFromSeed(seed, seedType) {
+  const {type, bytes} = parseSeed(seed, seedType);
   assert(type === KeyType.secp256k1);
   return deriveValidator(bytes);
 }
 
 function validatorKeysFromPhrase(phrase) {
   return deriveValidator(seedFromPhrase(phrase));
+}
+
+function keyPairFromSeed(seedString, options) {
+  return KeyPair.fromSeed(seedString, options);
 }
 
 module.exports = {

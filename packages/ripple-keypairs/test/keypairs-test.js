@@ -1,5 +1,6 @@
 'use strict';
 
+const codec = require('ripple-address-codec');
 const assert = require('assert-diff');
 const utils = require('../src/utils');
 const keypairs = require('../src');
@@ -99,6 +100,13 @@ describe('keyPairFromSeed', function() {
   it('returns a K256Pair from an secp256k1 (default) seed', function() {
     const pair = keyPairFromSeed('sn259rEFXrQrWyx3Q7XneWcwV6dfL');
     assert(pair instanceof K256Pair);
+  });
+  it('can be intantiated with an array of bytes', function() {
+    const seed = 'sn259rEFXrQrWyx3Q7XneWcwV6dfL';
+    const {bytes} = codec.decodeSeed(seed);
+    const pair = keyPairFromSeed(bytes);
+    assert(pair instanceof K256Pair);
+    assert.equal(pair.seed(), seed);
   });
 });
 
