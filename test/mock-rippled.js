@@ -17,8 +17,11 @@ function isBTC(json) {
   return json === 'BTC' || json === '0000000000000000000000004254430000000000';
 }
 
-function createResponse(request, response) {
-  return JSON.stringify(_.assign({}, response, {id: request.id}));
+function createResponse(request, response, overrides={}) {
+  const result = _.assign({}, response.result, overrides);
+  const change = response.result && !_.isEmpty(overrides) ?
+    {id: request.id, result: result} : {id: request.id};
+  return JSON.stringify(_.assign({}, response, change));
 }
 
 module.exports = function(port) {
@@ -216,14 +219,20 @@ module.exports = function(port) {
     }
   });
 
-  mock.on('request_ripple_path_find', function(request, conn) {
+  mock.on('request_path_find', function(request, conn) {
     let response = null;
+    if (request.subcommand === 'close') {
+      return;
+    }
     if (request.source_account === addresses.OTHER_ACCOUNT) {
-      response = createResponse(request, fixtures.ripple_path_find.sendUSD);
+      response = createResponse(request, fixtures.path_find.sendUSD);
     } else if (request.source_account === addresses.THIRD_ACCOUNT) {
-      response = createResponse(request, fixtures.ripple_path_find.XrpToXrp);
+      response = createResponse(request, fixtures.path_find.XrpToXrp, {
+        destination_amount: request.destination_amount,
+        destination_address: request.destination_address
+      });
     } else {
-      response = fixtures.ripple_path_find.generate.generateIOUPaymentPaths(
+      response = fixtures.path_find.generate.generateIOUPaymentPaths(
         request.id, request.source_account, request.destination_account,
         request.destination_amount);
     }

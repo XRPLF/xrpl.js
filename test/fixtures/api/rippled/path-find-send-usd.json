@@ -1,6 +1,7 @@
 {
   "id": 0,
   "result": {
+    "full_reply": true,
     "alternatives": [
       {
         "paths_canonical": [],
@@ -72,6 +73,12 @@
         }
       }
     ],
+    "source_account": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+    "destination_amount": {
+      "currency": "USD",
+      "value": "0.000001",
+      "issuer": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
+    },
     "destination_account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
     "destination_currencies": [
       "JOE",

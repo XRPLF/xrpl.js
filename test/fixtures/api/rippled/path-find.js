@@ -7,6 +7,9 @@ function(request_id, sendingAccount, destinationAccount, destinationAmount) {
     'status': 'success',
     'type': 'response',
     'result': {
+      'full_reply': true,
+      'source_account': sendingAccount,
+      'destination_amount': destinationAmount,
       'alternatives': [
         {
           'paths_canonical': [],
@@ -308,6 +311,7 @@ function(request_id, sendingAccount, destinationAccount) {
     'status': 'success',
     'type': 'response',
     'result': {
+      'full_reply': true,
       'alternatives': [
         {
           'paths_canonical': [],
