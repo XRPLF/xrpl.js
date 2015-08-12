@@ -1,6 +1,6 @@
 'use strict';
 
-const sjcl = require('./utils').sjcl;
+const BN = require('bn.js');
 const extend = require('extend');
 const {encode, decode} = require('ripple-address-codec');
 
@@ -44,11 +44,11 @@ Base.encode_check = function(version, input, alphabet) {
 };
 
 // --> input : String
-// <-- NaN || sjcl.bn
+// <-- NaN || BN
 Base.decode_check = function(version, input, alphabet) {
   try {
     const decoded = decode(input, {version, alphabet});
-    return sjcl.bn.fromBits(sjcl.codec.bytes.toBits(decoded));
+    return new BN(decoded);
   } catch (e) {
     return NaN;
   }
