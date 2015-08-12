@@ -24,7 +24,7 @@ function getAccountInfoAsync(account, options, callback) {
 
   const request = {
     account: account,
-    ledger: options.ledgerVersion
+    ledger: options.ledgerVersion || 'validated'
   };
 
   this.remote.requestAccountInfo(request,
