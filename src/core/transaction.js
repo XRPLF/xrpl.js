@@ -344,8 +344,8 @@ Transaction.prototype._computeFee = function() {
   }
 
   switch (fees.length) {
-  case 0: return undefined;
-  case 1: return String(fees[0]);
+    case 0: return undefined;
+    case 1: return String(fees[0]);
   }
 
   fees.sort(function ascending(a, b) {
@@ -399,8 +399,8 @@ Transaction.prototype.complete = function() {
   if (typeof this.tx_json.SigningPubKey === 'undefined') {
     try {
       const seed = Seed.from_json(this._secret);
-      const key = seed.get_key(this.tx_json.Account);
-      this.tx_json.SigningPubKey = key.to_hex_pub();
+      const key = seed.get_key();
+      this.tx_json.SigningPubKey = key.pubKeyHex();
     } catch(e) {
       this.emit('error', new RippleError(
         'tejSecretInvalid', 'Invalid secret'));
@@ -469,13 +469,13 @@ Transaction.prototype.hash = function(prefix_, asUINT256, serialized) {
   return asUINT256 ? hash : hash.to_hex();
 };
 
-Transaction.prototype.sign = function(testnet) {
+Transaction.prototype.sign = function() {
   const seed = Seed.from_json(this._secret);
   const prev_sig = this.tx_json.TxnSignature;
 
   delete this.tx_json.TxnSignature;
 
-  const hash = this.signingHash(testnet);
+  const hash = this.signingHash();
 
   // If the hash is the same, we can re-use the previous signature
   if (prev_sig && hash === this.previousSigningHash) {
@@ -483,10 +483,8 @@ Transaction.prototype.sign = function(testnet) {
     return this;
   }
 
-  const key = seed.get_key(this.tx_json.Account);
-  const sig = key.sign(hash);
-  const hex = sjcl.codec.hex.fromBits(sig).toUpperCase();
-
+  const key = seed.get_key();
+  const hex = key.signHex(this.signingData().buffer);
   this.tx_json.TxnSignature = hex;
   this.previousSigningHash = hash;
 
