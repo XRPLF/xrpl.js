@@ -77,7 +77,7 @@ function hexToArray(h) {
 
 function arrayToHex(a) {
   return a.map(function(byteValue) {
-    const hex = byteValue.toString(16);
+    const hex = byteValue.toString(16).toUpperCase();
     return hex.length > 1 ? hex : '0' + hex;
   }).join('');
 }

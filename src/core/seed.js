@@ -7,6 +7,7 @@
 const {KeyPair, KeyType} = require('ripple-keypairs');
 const codec = require('ripple-address-codec');
 const extend = require('extend');
+const BN = require('bn.js');
 const utils = require('./utils');
 
 const sjcl = utils.sjcl;
@@ -54,7 +55,7 @@ Seed.prototype.parse_base58 = function(j) {
   } else {
     try {
       const {bytes, type} = codec.decodeSeed(j);
-      this._value = sjcl.bn.fromBits(sjcl.codec.bytes.toBits(bytes));
+      this._value = new BN(bytes);
       this._type = type;
     } catch (e) {
       this._value = NaN;

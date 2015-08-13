@@ -22,6 +22,11 @@
       "version": "2.0.7",
       "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.0.7.tgz"
     },
+    "bn.js": {
+      "version": "3.1.1",
+      "from": "bn.js@*",
+      "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.1.1.tgz"
+    },
     "es6-promisify": {
       "version": "2.0.0",
       "resolved": "https://registry.npmjs.org/es6-promisify/-/es6-promisify-2.0.0.tgz",

@@ -1,8 +1,8 @@
 'use strict';
 
-const _ = require('lodash');
 const assert = require('assert');
 const extend = require('extend');
+const BN = require('bn.js');
 const binformat = require('./binformat');
 const stypes = require('./serializedtypes');
 const utils = require('./utils');
@@ -28,13 +28,9 @@ Object.keys(binformat.ter).forEach(function(key) {
   TRANSACTION_RESULTS[binformat.ter[key]] = key;
 });
 
-function normalize_sjcl_bn_hex(string) {
-  const hex = string.slice(2);    // remove '0x' prefix
-  // now strip leading zeros
-  const i = _.findIndex(hex, function(c) {
-    return c !== '0';
-  });
-  return i >= 0 ? hex.slice(i) : '0';
+function fieldType(fieldName) {
+  const fieldDef = binformat.fieldsInverseMap[fieldName];
+  return binformat.types[fieldDef[0]];
 }
 
 function SerializedObject(buf) {
@@ -231,12 +227,12 @@ SerializedObject.prototype.to_json = function() {
   return output;
 };
 
-SerializedObject.jsonify_structure = function(structure, field_name) {
+SerializedObject.jsonify_structure = function(structure, fieldName) {
   let output;
 
   switch (typeof structure) {
     case 'number':
-      switch (field_name) {
+      switch (fieldName) {
         case 'LedgerEntryType':
           output = LEDGER_ENTRY_TYPES[structure];
           break;
@@ -257,11 +253,10 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
 
       if (typeof structure.to_json === 'function') {
         output = structure.to_json();
-      } else if (structure instanceof sjcl.bn) {
-        output = ('0000000000000000' +
-                   normalize_sjcl_bn_hex(structure.toString())
-                  .toUpperCase()
-                  ).slice(-16);
+      } else if (structure instanceof BN) {
+        // We assume that any BN is a UInt64 field
+        assert.equal(fieldType(fieldName), 'Int64');
+        output = utils.arrayToHex(structure.toArray('bn', 8));
       } else {
         // new Array or Object
         output = new structure.constructor();
