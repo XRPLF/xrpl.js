@@ -5,16 +5,15 @@
 //
 
 const {KeyPair, KeyType} = require('ripple-keypairs');
-const codec = require('ripple-address-codec');
+const {decodeSeed, encodeSeed} = require('ripple-address-codec');
 const extend = require('extend');
+const sjclcodec = require('sjcl-codec');
 const BN = require('bn.js');
-const utils = require('./utils');
+const hashjs = require('hash.js');
 
-const sjcl = utils.sjcl;
 const UInt = require('./uint').UInt;
 
 const Seed = extend(function() {
-  this._curve = sjcl.ecc.curves.k256;
   this._value = NaN;
   this._type = KeyType.secp256k1;
 }, UInt);
@@ -54,7 +53,7 @@ Seed.prototype.parse_base58 = function(j) {
     this._value = NaN;
   } else {
     try {
-      const {bytes, type} = codec.decodeSeed(j);
+      const {bytes, type} = decodeSeed(j);
       this._value = new BN(bytes);
       this._type = type;
     } catch (e) {
@@ -74,10 +73,9 @@ Seed.prototype.parse_passphrase = function(j) {
     throw new Error('Passphrase must be a string');
   }
 
-  const hash = sjcl.hash.sha512.hash(sjcl.codec.utf8String.toBits(j));
-  const bits = sjcl.bitArray.bitSlice(hash, 0, 128);
-
-  this.parse_bits(bits);
+  const phraseBytes = sjclcodec.bytes.fromBits(sjclcodec.utf8String.toBits(j));
+  const hash = hashjs.sha512().update(phraseBytes).digest();
+  this.parse_bytes(hash.slice(0, 16));
 
   return this;
 };
@@ -86,7 +84,7 @@ Seed.prototype.to_json = function() {
   if (!(this.is_valid())) {
     return NaN;
   }
-  return codec.encodeSeed(this.to_bytes(), this._type);
+  return encodeSeed(this.to_bytes(), this._type);
 };
 
 Seed.prototype.get_key = function() {

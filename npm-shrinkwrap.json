@@ -41,6 +41,18 @@
       "version": "1.2.1",
       "resolved": "https://registry.npmjs.org/extend/-/extend-1.2.1.tgz"
     },
+    "hash.js": {
+      "version": "1.0.3",
+      "from": "hash.js@*",
+      "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
+      "dependencies": {
+        "inherits": {
+          "version": "2.0.1",
+          "from": "inherits@>=2.0.1 <3.0.0",
+          "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+        }
+      }
+    },
     "https-proxy-agent": {
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-1.0.0.tgz",
@@ -138,8 +150,8 @@
       }
     },
     "ripple-keypairs": {
-      "version": "0.7.3",
-      "from": "ripple-keypairs@>=0.7.3 <0.8.0",
+      "version": "0.8.0",
+      "from": "ripple-keypairs@>=0.8.0 <0.9.0",
       "dependencies": {
         "bn.js": {
           "version": "3.1.1",
@@ -187,19 +199,9 @@
         }
       }
     },
-    "ripple-wallet-generator": {
-      "version": "1.0.3",
-      "resolved": "https://registry.npmjs.org/ripple-wallet-generator/-/ripple-wallet-generator-1.0.3.tgz"
-    },
-    "sjcl-extended": {
-      "version": "1.0.3",
-      "resolved": "git://github.com/ripple/sjcl-extended.git#d8cf8b22e7d97193c54e1f65113e3edcf200ca17",
-      "dependencies": {
-        "sjcl": {
-          "version": "1.0.3",
-          "resolved": "https://registry.npmjs.org/sjcl/-/sjcl-1.0.3.tgz"
-        }
-      }
+    "sjcl-codec": {
+      "version": "0.1.0",
+      "from": "sjcl-codec@*"
     },
     "ws": {
       "version": "0.7.2",

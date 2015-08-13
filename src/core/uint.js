@@ -4,10 +4,9 @@
 
 const assert = require('assert');
 const lodash = require('lodash');
+const sjclcodec = require('sjcl-codec');
 const utils = require('./utils');
 const BN = require('bn.js');
-
-const sjcl = utils.sjcl;
 
 //
 // Abstract UInt class
@@ -217,16 +216,7 @@ UInt.prototype.parse_hex = function(j) {
 };
 
 UInt.prototype.parse_bits = function(j) {
-  if (sjcl.bitArray.bitLength(j) === this.constructor.width * 8) {
-    const bytes = sjcl.codec.bytes.fromBits(j);
-    this.parse_bytes(bytes);
-  } else {
-    this._value = NaN;
-  }
-
-  this._update();
-
-  return this;
+  return this.parse_bytes(sjclcodec.bytes.fromBits(j));
 };
 
 UInt.prototype.parse_bytes = function(j) {
@@ -280,7 +270,7 @@ UInt.prototype.to_bits = function() {
     return null;
   }
 
-  return sjcl.codec.bytes.toBits(this.to_bytes());
+  return sjclcodec.bytes.toBits(this.to_bytes());
 };
 
 exports.UInt = UInt;

@@ -5,7 +5,6 @@
 const ws = require('ws');
 const lodash = require('lodash');
 const assert = require('assert-diff');
-const sjcl = require('ripple-lib').sjcl;
 const Remote = require('ripple-lib').Remote;
 const SerializedObject = require('ripple-lib').SerializedObject;
 const Transaction = require('ripple-lib').Transaction;
@@ -47,11 +46,6 @@ describe('TransactionManager', function() {
   let remote;
   let account;
   let transactionManager;
-
-  before(function() {
-    sjcl.random.addEntropy(
-      '3045022100A58B0460BC5092CB4F96155C19125A4E079C870663F1D5E8BBC9BD', 256);
-  });
 
   beforeEach(function(done) {
     rippled = new ws.Server({port: 5763});
