@@ -554,6 +554,11 @@ describe('RippleAPI', function() {
     assert.strictEqual(this.api.getLedgerVersion(), 8819951);
   });
 
+  it('getLedgerHeader', function() {
+    return this.api.getLedgerHeader().then(
+      _.partial(checkResult, responses.getLedgerHeader, 'getLedgerHeader'));
+  });
+
   it('ledger utils - compareTransactions', function() {
     let first = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
     let second = {outcome: {ledgerVersion: 1, indexInLedger: 200}};

@@ -55,6 +55,7 @@ module.exports = {
   secret: validateSecret,
   currency: _.partial(schemaValidate, 'currency'),
   identifier: _.partial(schemaValidate, 'hash256'),
+  ledgerVersion: _.partial(schemaValidate, 'ledgerVersion'),
   sequence: _.partial(schemaValidate, 'sequence'),
   order: _.partial(schemaValidate, 'order'),
   orderbook: _.partial(schemaValidate, 'orderbook'),
