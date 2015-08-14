@@ -147,7 +147,7 @@ describe('validatorKeysFromPhrase', function() {
 });
 
 describe('generateWallet', function() {
-  function randGen(len) {
+  function random(len) {
     return _.fill(Array(len), 0);
   }
 
@@ -159,7 +159,7 @@ describe('generateWallet', function() {
         'ED' +
         '1A7C082846CFF58FF9A892BA4BA2593151CCF1DBA59F37714CC9ED39824AF85F'
     };
-    const actual = generateWallet({type: 'ed25519', randGen});
+    const actual = generateWallet({type: 'ed25519', random});
     assert.deepEqual(actual, expected);
     assert.deepEqual(walletFromSeed(actual.seed), expected);
   });
@@ -171,14 +171,14 @@ describe('generateWallet', function() {
         '03' +
         '90A196799EE412284A5D80BF78C3E84CBB80E1437A0AECD9ADF94D7FEAAFA284'
     };
-    const actual = generateWallet({type: undefined, randGen});
+    const actual = generateWallet({type: undefined, random});
     assert.deepEqual(actual, expected);
     assert.deepEqual(walletFromSeed(actual.seed), expected);
   });
 });
 
 describe('generateValidatorKeys', function() {
-  function randGen(len) {
+  function random(len) {
     return _.fill(Array(len), 0);
   }
   it('can generate secp256k1 validator keys', function() {
@@ -198,7 +198,7 @@ describe('generateValidatorKeys', function() {
       seed: 'sp6JS7f14BuwFY8Mw6bTtLKWauoUs',
       publicKey: 'n9LPxYzbDpWBZ1bC3J3Fdkgqoa3FEhVKCnS8yKp7RFQFwuvd8Q2c'
     };
-    const actual = generateValidatorKeys({randGen});
+    const actual = generateValidatorKeys({random});
     assert.deepEqual(actual, expected);
     assert.deepEqual(validatorKeysFromSeed(actual.seed), expected);
   });

@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const rand = require('brorand');
+const brorand = require('brorand');
 const codec = require('ripple-address-codec');
 
 const {seedFromPhrase, createAccountID} = require('./utils');
@@ -48,8 +48,8 @@ function deriveValidator(seedBytes) {
 }
 
 function generateWallet(opts={}) {
-  const {type='secp256k1', randGen=rand} = opts;
-  const seedBytes = randGen(16);
+  const {type='secp256k1', random=brorand} = opts;
+  const seedBytes = random(16);
   return deriveWallet(seedBytes, type);
 }
 
@@ -63,8 +63,8 @@ function walletFromPhrase(phrase, type) {
 }
 
 function generateValidatorKeys(opts={}) {
-  const {randGen=rand} = opts;
-  return deriveValidator(randGen(16));
+  const {random=brorand} = opts;
+  return deriveValidator(random(16));
 }
 
 function nodePublicAccountID(publicKey) {
