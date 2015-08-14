@@ -73,6 +73,7 @@ module.exports = {
   getOrdersOptions: _.partial(validateOptions, 'orders-options'),
   getOrderbookOptions: _.partial(validateOptions, 'orders-options'),
   getTransactionOptions: _.partial(validateOptions, 'transaction-options'),
+  getLedgerOptions: _.partial(validateOptions, 'ledger-options'),
   options: _.partial(validateOptions, 'options'),
   instructions: _.partial(schemaValidate, 'instructions')
 };

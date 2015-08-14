@@ -6,7 +6,7 @@
   "closeTimeResolution": 10,
   "closeFlags": 0,
   "ledgerHash": "0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F",
-  "ledgerVersion": "9038214",
+  "ledgerVersion": 9038214,
   "parentLedgerHash": "4BB9CBE44C39DC67A1BE849C7467FE1A6D1F73949EA163C38A0121A15E04FFDE",
   "parentCloseTime": 464908900,
   "totalDrops": "99999973964317514",

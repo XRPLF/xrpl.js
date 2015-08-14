@@ -28,25 +28,48 @@ function hashLedgerHeader(ledgerHeader) {
   return common.core.Ledger.calculateLedgerHash(header);
 }
 
-function computeLedgerHash(ledgerHeader: Object, transactions: Array<Object>
-): string {
-  if (transactions) {
-    const txs = _.map(transactions, tx => {
-      const mergeTx = _.assign({}, _.omit(tx, 'tx'), tx.tx || {});
-      const renameMeta = _.assign({}, _.omit(mergeTx, 'meta'),
-        tx.meta ? {metaData: tx.meta} : {});
-      return renameMeta;
-    });
-    const ledger = common.core.Ledger.from_json({transactions: txs});
-    const transactionHash = ledger.calc_tx_hash().to_hex();
-    if (ledgerHeader.transaction_hash !== undefined
-        && ledgerHeader.transaction_hash !== transactionHash) {
-      throw new common.errors.ValidationError('transaction_hash in header'
-        + ' does not match computed hash of transactions');
-    }
-    return hashLedgerHeader(_.assign({}, ledgerHeader, {transactionHash}));
+function computeTransactionHash(ledger) {
+  if (ledger.rawTransactions === undefined) {
+    return ledger.transactionHash;
   }
-  return hashLedgerHeader(ledgerHeader);
+  const transactions = JSON.parse(ledger.rawTransactions);
+  const txs = _.map(transactions, tx => {
+    const mergeTx = _.assign({}, _.omit(tx, 'tx'), tx.tx || {});
+    const renameMeta = _.assign({}, _.omit(mergeTx, 'meta'),
+      tx.meta ? {metaData: tx.meta} : {});
+    return renameMeta;
+  });
+  const ledgerObject = common.core.Ledger.from_json({transactions: txs});
+  const transactionHash = ledgerObject.calc_tx_hash().to_hex();
+  if (ledger.transactionHash !== undefined
+      && ledger.transactionHash !== transactionHash) {
+    throw new common.errors.ValidationError('transactionHash in header'
+      + ' does not match computed hash of transactions');
+  }
+  return transactionHash;
+}
+
+function computeAccountHash(ledger) {
+  if (ledger.rawAccounts === undefined) {
+    return ledger.accountHash;
+  }
+  const accounts = JSON.parse(ledger.rawAccounts);
+  const ledgerObject = common.core.Ledger.from_json({accountState: accounts});
+  const accountHash = ledgerObject.calc_account_hash().to_hex();
+  if (ledger.accountHash !== undefined
+      && ledger.accountHash !== accountHash) {
+    throw new common.errors.ValidationError('accountHash in header'
+      + ' does not match computed hash of accounts');
+  }
+  return accountHash;
+}
+
+function computeLedgerHash(ledger: Object): string {
+  const hashes = {
+    transactionHash: computeTransactionHash(ledger),
+    accountHash: computeAccountHash(ledger)
+  };
+  return hashLedgerHeader(_.assign({}, ledger, hashes));
 }
 
 module.exports = computeLedgerHash;

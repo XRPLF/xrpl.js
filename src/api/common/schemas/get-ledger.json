@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "getLedgerHeader",
+  "title": "getLedger",
   "type": "object",
   "properties": {
     "accepted": {"type": "boolean"},
@@ -14,7 +14,12 @@
     "parentLedgerHash": {"$ref": "hash256"},
     "parentCloseTime": {"type": "integer", "minimum": 0},
     "totalDrops": {"$ref": "value"},
-    "transactionHash": {"$ref": "hash256"}
+    "transactionHash": {"$ref": "hash256"},
+    "transactions": {"type": "array", "items": {"type": "object"}},
+    "rawTransactions": {"type": "string"},
+    "transactionHashes": {"type": "array", "items": {"$ref": "hash256"}},
+    "rawAccounts": {"type": "string"},
+    "accountHashes": {"type": "array", "items": {"$ref": "hash256"}}
   },
   "required": [
     "accepted",
