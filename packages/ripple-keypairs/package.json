@@ -3,13 +3,13 @@
   "version": "0.7.3",
   "description": "ripple key pairs",
   "files": [
-    "dist/npm/*",
+    "distrib/npm/*",
     "bin/*",
     "build/*",
     "test/*",
     "Gulpfile.js"
   ],
-  "main": "dist/npm/",
+  "main": "distrib/npm/",
   "directories": {
     "test": "test"
   },
@@ -41,8 +41,8 @@
   },
   "scripts": {
     "build": "gulp",
-    "compile": "babel --optional runtime -d dist/npm/ src/",
-    "compile-with-source-maps": "babel --optional runtime -s -t -d dist/npm/ src/",
+    "compile": "babel --optional runtime -d distrib/npm/ src/",
+    "compile-with-source-maps": "babel --optional runtime -s -t -d distrib/npm/ src/",
     "prepublish": "npm test && npm run lint && npm run compile",
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
