@@ -28,7 +28,7 @@ const sign = require('./transaction/sign');
 const submit = require('./transaction/submit');
 const errors = require('./common').errors;
 const convertExceptions = require('./common').convertExceptions;
-const generateWallet = convertExceptions(common.core.Wallet.generate);
+const generateWallet = convertExceptions(common.generateWallet);
 const getLedgerHeader = require('./ledger/ledger-header');
 
 function RippleAPI(options: {}) {

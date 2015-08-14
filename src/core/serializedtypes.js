@@ -12,11 +12,11 @@ const assert = require('assert');
 const extend = require('extend');
 const BN = require('bn.js');
 const GlobalBigNumber = require('bignumber.js');
+const sjclcodec = require('sjcl-codec');
 const Amount = require('./amount').Amount;
 const Currency = require('./currency').Currency;
 const binformat = require('./binformat');
 const utils = require('./utils');
-const sjcl = utils.sjcl;
 
 const UInt128 = require('./uint128').UInt128;
 const UInt160 = require('./uint160').UInt160;
@@ -56,8 +56,8 @@ function serializeHex(so, hexData, noLength) {
 }
 
 function convertHexToString(hexString) {
-  const bits = sjcl.codec.hex.toBits(hexString);
-  return sjcl.codec.utf8String.fromBits(bits);
+  const bits = sjclcodec.hex.toBits(hexString);
+  return sjclcodec.utf8String.fromBits(bits);
 }
 
 function sort_fields(keys) {
@@ -432,7 +432,7 @@ exports.Quality = new SerializedType({
       lo = parseInt(mantissaHex.slice(-8), 16);
     }
 
-    const valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
+    const valueBytes = sjclcodec.bytes.fromBits([hi, lo]);
 
     so.append(valueBytes);
   }
@@ -472,7 +472,7 @@ const STAmount = exports.Amount = new SerializedType({
         valueHex = '0' + valueHex;
       }
 
-      valueBytes = sjcl.codec.bytes.fromBits(sjcl.codec.hex.toBits(valueHex));
+      valueBytes = sjclcodec.bytes.fromBits(sjclcodec.hex.toBits(valueHex));
       // Clear most significant two bits - these bits should already be 0 if
       // Amount enforces the range correctly, but we'll clear them anyway just
       // so this code can make certain guarantees about the encoded value.
@@ -506,7 +506,7 @@ const STAmount = exports.Amount = new SerializedType({
         lo = parseInt(mantissaHex.slice(-8), 16);
       }
 
-      valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
+      valueBytes = sjclcodec.bytes.fromBits([hi, lo]);
     }
 
     so.append(valueBytes);

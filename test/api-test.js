@@ -11,8 +11,6 @@ const requests = fixtures.requests;
 const responses = fixtures.responses;
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
-const MockPRNG = require('./mock-prng');
-const sjcl = common.core.sjcl;
 const address = addresses.ACCOUNT;
 const validate = common.validate;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
@@ -36,13 +34,6 @@ function checkResult(expected, schemaName, response) {
   if (schemaName) {
     schemaValidator.schemaValidate(schemaName, response);
   }
-}
-
-function withDeterministicPRNG(f) {
-  const prng = sjcl.random;
-  sjcl.random = new MockPRNG();
-  f();
-  sjcl.random = prng;
 }
 
 describe('RippleAPI', function() {
@@ -413,9 +404,11 @@ describe('RippleAPI', function() {
   });
 
   it('generateWallet', function() {
-    withDeterministicPRNG(() => {
-      assert.deepEqual(this.api.generateWallet(), responses.generateWallet);
-    });
+    function random() {
+      return _.fill(Array(16), 0);
+    }
+    assert.deepEqual(this.api.generateWallet({random}),
+                     responses.generateWallet);
   });
 
   it('getSettings', function() {
@@ -749,9 +742,7 @@ describe('RippleAPI - offline', function() {
     };
     return api.prepareSettings(address, settings, instructions).then(txJSON => {
       assert.deepEqual(txJSON, responses.prepareSettings.flags);
-      withDeterministicPRNG(() => {
-        assert.deepEqual(api.sign(txJSON, secret), responses.sign);
-      });
+      assert.deepEqual(api.sign(txJSON, secret), responses.sign);
     });
   });
 });

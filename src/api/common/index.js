@@ -9,6 +9,7 @@ module.exports = {
   dropsToXrp: utils.dropsToXrp,
   xrpToDrops: utils.xrpToDrops,
   toRippledAmount: utils.toRippledAmount,
+  generateWallet: utils.generateWallet,
   composeAsync: utils.composeAsync,
   wrapCatch: utils.wrapCatch,
   convertExceptions: utils.convertExceptions,
