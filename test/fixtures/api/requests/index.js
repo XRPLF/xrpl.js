@@ -20,5 +20,9 @@ module.exports = {
     NotAcceptCurrency: require('./getpaths/not-accept-currency'),
     NoPaths: require('./getpaths/no-paths'),
     NoPathsWithCurrencies: require('./getpaths/no-paths-with-currencies')
+  },
+  computeLedgerHash: {
+    header: require('./compute-ledger-hash'),
+    transactions: require('./compute-ledger-hash-transactions')
   }
 };

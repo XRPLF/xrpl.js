@@ -745,4 +745,31 @@ describe('RippleAPI - offline', function() {
       assert.deepEqual(api.sign(txJSON, secret), responses.sign);
     });
   });
+
+  it('computeLedgerHash', function() {
+    const api = new RippleAPI();
+    const header = requests.computeLedgerHash.header;
+    const ledgerHash = api.computeLedgerHash(header);
+    assert.strictEqual(ledgerHash,
+      'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
+  });
+
+  it('computeLedgerHash - with transactions', function() {
+    const api = new RippleAPI();
+    const header = _.omit(requests.computeLedgerHash.header,
+      'transaction_hash');
+    const transactions = requests.computeLedgerHash.transactions;
+    const ledgerHash = api.computeLedgerHash(header, transactions);
+    assert.strictEqual(ledgerHash,
+      'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
+  });
+
+  it('computeLedgerHash - incorrent transaction_hash', function() {
+    const api = new RippleAPI();
+    const header = _.assign({}, requests.computeLedgerHash.header,
+      {transaction_hash:
+        '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'});
+    const transactions = requests.computeLedgerHash.transactions;
+    assert.throws(() => api.computeLedgerHash(header, transactions));
+  });
 });
