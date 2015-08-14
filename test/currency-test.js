@@ -12,9 +12,11 @@ describe('Currency', function() {
     it('json_rewrite("NaN") == "XRP"', function() {
       assert.strictEqual('XRP', currency.json_rewrite(NaN));
     });
-    it('json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000") == "XAU (-0.5%pa)"', function() {
-      assert.strictEqual(currency.json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000"),
-                         "XAU (-0.5%pa)");
+    it('json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000") == '+
+                    '"015841551A748AD2C1F76FF6ECB0CCCD00000000', function() {
+      assert.strictEqual(
+        "015841551A748AD2C1F76FF6ECB0CCCD00000000",
+        currency.json_rewrite("015841551A748AD2C1F76FF6ECB0CCCD00000000"));
     });
   });
   describe('from_json', function() {
@@ -75,7 +77,8 @@ describe('Currency', function() {
       assert.strictEqual('015841550000000041F78E0A28CBF19200000000', r.to_json({force_hex: true}));
     });
     it('json_rewrite("015841550000000041F78E0A28CBF19200000000").to_json() hex', function() {
-      var r = currency.json_rewrite('015841550000000041F78E0A28CBF19200000000');
+      var r = currency.json_rewrite('015841550000000041F78E0A28CBF19200000000',
+                                    {force_hex: false});
       assert.strictEqual('XAU (0.5%pa)', r);
     });
     it('json_rewrite("015841550000000041F78E0A28CBF19200000000") hex', function() {
@@ -87,32 +90,31 @@ describe('Currency', function() {
   describe('from_human', function() {
     it('From human "USD - Gold (-25%pa)"', function() {
       var cur = currency.from_human('USD - Gold (-25%pa)');
-      assert.strictEqual(cur.to_json(), 'USD (-25%pa)');
-      assert.strictEqual(cur.to_hex(), '0155534400000000C19A22BC51297F0B00000000');
-      assert.strictEqual(cur.to_json(), cur.to_human());
+      assert.strictEqual(cur.to_human(), 'USD (-25%pa)');
+      assert.strictEqual(cur.to_json(), '0155534400000000C19A22BC51297F0B00000000');
     });
     it('From human "EUR (-0.5%pa)', function() {
       var cur = currency.from_human('EUR (-0.5%pa)');
-      assert.strictEqual(cur.to_json(), 'EUR (-0.5%pa)');
+      assert.strictEqual(cur.to_human(), 'EUR (-0.5%pa)');
     });
     it('From human "EUR (0.5361%pa)", test decimals', function() {
       var cur = currency.from_human('EUR (0.5361%pa)');
-      assert.strictEqual(cur.to_json(), 'EUR (0.54%pa)');
-      assert.strictEqual(cur.to_json({decimals:4}), 'EUR (0.5361%pa)');
+      assert.strictEqual(cur.to_human(), 'EUR (0.54%pa)');
+      assert.strictEqual(cur.to_human({decimals:4}), 'EUR (0.5361%pa)');
       assert.strictEqual(cur.get_interest_percentage_at(undefined, 4), 0.5361);
     });
     it('From human "EUR - Euro (0.5361%pa)", test decimals and full_name', function() {
       var cur = currency.from_human('EUR (0.5361%pa)');
-      assert.strictEqual(cur.to_json(), 'EUR (0.54%pa)');
-      assert.strictEqual(cur.to_json({decimals:4, full_name:'Euro'}), 'EUR - Euro (0.5361%pa)');
-      assert.strictEqual(cur.to_json({decimals:void(0), full_name:'Euro'}), 'EUR - Euro (0.54%pa)');
-      assert.strictEqual(cur.to_json({decimals:undefined, full_name:'Euro'}), 'EUR - Euro (0.54%pa)');
-      assert.strictEqual(cur.to_json({decimals:'henk', full_name:'Euro'}), 'EUR - Euro (0.54%pa)');
+      assert.strictEqual(cur.to_human(), 'EUR (0.54%pa)');
+      assert.strictEqual(cur.to_human({decimals:4, full_name:'Euro'}), 'EUR - Euro (0.5361%pa)');
+      assert.strictEqual(cur.to_human({decimals:void(0), full_name:'Euro'}), 'EUR - Euro (0.54%pa)');
+      assert.strictEqual(cur.to_human({decimals:undefined, full_name:'Euro'}), 'EUR - Euro (0.54%pa)');
+      assert.strictEqual(cur.to_human({decimals:'henk', full_name:'Euro'}), 'EUR - Euro (0.54%pa)');
       assert.strictEqual(cur.get_interest_percentage_at(undefined, 4), 0.5361);
     });
     it('From human "TYX - 30-Year Treasuries (1.5%pa)"', function() {
       var cur = currency.from_human('TYX - 30-Year Treasuries (1.5%pa)');
-      assert.strictEqual(cur.to_json(), 'TYX (1.5%pa)');
+      assert.strictEqual(cur.to_human(), 'TYX (1.5%pa)');
     });
     it('From human "TYX - 30-Year Treasuries"', function() {
       var cur = currency.from_human('TYX - 30-Year Treasuries');
@@ -120,7 +122,7 @@ describe('Currency', function() {
     });
     it('From human "INR - Indian Rupees (-0.5%)"', function() {
       var cur = currency.from_human('INR - Indian Rupees (-0.5%pa)');
-      assert.strictEqual(cur.to_json(), 'INR (-0.5%pa)');
+      assert.strictEqual(cur.to_human(), 'INR (-0.5%pa)');
     });
     it('From human "INR - 30 Indian Rupees"', function() {
       var cur = currency.from_human('INR - 30 Indian Rupees');
@@ -190,15 +192,14 @@ describe('Currency', function() {
   describe('from_hex', function() {
     it('"015841551A748AD2C1F76FF6ECB0CCCD00000000" === "XAU (-0.5%pa)"', function() {
       var cur = currency.from_hex('015841551A748AD2C1F76FF6ECB0CCCD00000000');
-      assert.strictEqual(cur.to_json(), 'XAU (-0.5%pa)');
+      assert.strictEqual(cur.to_human(), 'XAU (-0.5%pa)');
       assert.strictEqual(cur.to_hex(), '015841551A748AD2C1F76FF6ECB0CCCD00000000');
-      assert.strictEqual(cur.to_json(), cur.to_human());
     });
   });
   describe('parse_json', function() {
     it('should parse a currency object', function() {
       assert.strictEqual('USD', new currency().parse_json(currency.from_json('USD')).to_json());
-      assert.strictEqual('USD (0.5%pa)', new currency().parse_json(currency.from_json('USD (0.5%pa)')).to_json());
+      assert.strictEqual('USD (0.5%pa)', new currency().parse_json(currency.from_json('USD (0.5%pa)')).to_human());
     });
     it('should clone for parse_json on itself', function() {
       var cur = currency.from_json('USD');

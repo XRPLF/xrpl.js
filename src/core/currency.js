@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('extend');
 var extend = require('extend');
 var UInt160 = require('./uint160').UInt160;
 var utils = require('./utils');
@@ -72,6 +73,22 @@ Currency.from_json = function(j, shouldInterpretXrpAsIou) {
 Currency.from_human = function(j, opts) {
   return (new Currency().parse_human(j, opts));
 };
+
+function percentageEFoldingBytes(percentageString) {
+  // byte 9-16 are for the interest
+  var percentage = parseFloat(percentageString);
+
+  // the interest or demurrage is expressed as a yearly (per annum)
+  // value
+  var secondsPerYear = 31536000; // 60 * 60 * 24 * 365
+
+  // Calculating the interest e-fold
+  // 0.5% demurrage is expressed 0.995, 0.005 less than 1
+  // 0.5% interest is expressed as 1.005, 0.005 more than 1
+  var interestEfold = secondsPerYear / Math.log(1 + percentage / 100);
+  var bytes = Float.toIEEE754Double(interestEfold);
+  return bytes;
+}
 
 // this._value = NaN on error.
 Currency.prototype.parse_json = function(j, shouldInterpretXrpAsIou) {
@@ -159,18 +176,7 @@ Currency.prototype.parse_json = function(j, shouldInterpretXrpAsIou) {
           // byte 5-8 are for reference date, but should always be 0 so we
           // won't fill it
 
-          // byte 9-16 are for the interest
-          percentage = parseFloat(percentage[0]);
-
-          // the interest or demurrage is expressed as a yearly (per annum)
-          // value
-          var secondsPerYear = 31536000; // 60 * 60 * 24 * 365
-
-          // Calculating the interest e-fold
-          // 0.5% demurrage is expressed 0.995, 0.005 less than 1
-          // 0.5% interest is expressed as 1.005, 0.005 more than 1
-          var interestEfold = secondsPerYear / Math.log(1 + percentage / 100);
-          var bytes = Float.toIEEE754Double(interestEfold);
+          var bytes = percentageEFoldingBytes(percentage[0]);
 
           for (var i = 0; i <= bytes.length; i++) {
             currencyData[8 + i] = bytes[i] & 0xff;
@@ -322,8 +328,8 @@ Currency.prototype.get_interest_at = function(referenceDate) {
   }
 
   // calculate interest by e-fold number
-  return Math.exp((referenceDate - this._interest_start)
-                / this._interest_period);
+  return Math.exp(
+      (referenceDate - this._interest_start) / this._interest_period);
 };
 
 Currency.prototype.get_interest_percentage_at
@@ -354,24 +360,22 @@ Currency.prototype.to_json = function(opts) {
   }
 
   if (!opts) {
-    opts = {};
+    opts = {force_hex: this.has_interest()};
   }
 
   var currency;
   var fullName = opts && opts.full_name ? ' - ' + opts.full_name : '';
-  opts.show_interest = opts.show_interest !== undefined
-  ? opts.show_interest
-  : this.has_interest();
+  opts.show_interest = opts.show_interest !== undefined ?
+                       opts.show_interest: this.has_interest();
 
   if (!opts.force_hex && /^[A-Z0-9]{3}$/.test(this._iso_code)) {
     currency = this._iso_code + fullName;
     if (opts.show_interest) {
       var decimals = !isNaN(opts.decimals) ? opts.decimals : undefined;
-      var interestPercentage = this.has_interest()
-      ? this.get_interest_percentage_at(
-          this._interest_start + 3600 * 24 * 365, decimals
-        )
-      : 0;
+      var interestPercentage = this.has_interest() ?
+            this.get_interest_percentage_at(
+                  this._interest_start + 3600 * 24 * 365, decimals ) :
+            0;
       currency += ' (' + interestPercentage + '%pa)';
     }
 
@@ -391,7 +395,7 @@ Currency.prototype.to_json = function(opts) {
 };
 
 Currency.prototype.to_human = function(opts) {
-  // to_human() will always print the human-readable currency code if available.
+  var opts = extend({}, opts, {force_hex : false});
   return this.to_json(opts);
 };
 
