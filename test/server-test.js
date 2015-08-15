@@ -1063,6 +1063,13 @@ describe('Server', function() {
     assert.strictEqual(server._reserve().to_json(), '20000000');
   });
 
+  it('Compute reserve, positive OwnerCount', function() {
+    const server = new Server(new Remote(), 'ws://localhost:5748');
+    server._reserve_base = 20000000;
+    server._reserve_inc = 5000000;
+    assert.strictEqual(server._reserve(4).to_json(), '40000000');
+  });
+
   it('Cache hostid', function(done) {
     const wss = new ws.Server({
       port: 5748

@@ -1,6 +1,8 @@
 'use strict';
 
+
 const _ = require('lodash');
+const assert = require('assert');
 const util = require('util');
 const url = require('url');
 const HttpsProxyAgent = require('https-proxy-agent');
@@ -905,6 +907,9 @@ Server.prototype._feeTxUnit = function() {
  */
 
 Server.prototype._reserve = function(ownerCount) {
+  // We should be in a valid state before calling this method
+  assert(this._reserve_base && this._reserve_inc);
+
   const reserve_base = Amount.from_json(String(this._reserve_base));
   const reserve_inc = Amount.from_json(String(this._reserve_inc));
   const owner_count = ownerCount || 0;
@@ -913,7 +918,7 @@ Server.prototype._reserve = function(ownerCount) {
     throw new Error('Owner count must not be negative.');
   }
 
-  return reserve_base.add(reserve_inc.product_human(owner_count));
+  return reserve_base.add(reserve_inc.multiply(owner_count));
 };
 
 /**
