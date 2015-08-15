@@ -305,7 +305,7 @@ describe('Server', function() {
 
     server.emit('message', {
       type: 'serverStatus',
-      load_base: 256 * 1,
+      load_base: 256,
       load_factor: 256 * 10,
       server_status: 'full'
     });

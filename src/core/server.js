@@ -623,7 +623,7 @@ Server.prototype._handleLedgerClosed = function(message) {
 Server.prototype._handleServerStatus = function(message) {
   // This message is only received when online.
   // As we are connected, it is the definitive final state.
-  const isOnline = ~Server.onlineStates.indexOf(message.server_status);
+  const isOnline = _.includes(Server.onlineStates, message.server_status);
 
   this._setState(isOnline ? 'online' : 'offline');
 
@@ -734,7 +734,7 @@ Server.prototype._handleResponseSubscribe = function(message) {
     this._ledgerRanges.parseAndAddRanges(message.validated_ledgers);
   }
 
-  if (~Server.onlineStates.indexOf(message.server_status)) {
+  if (_.includes(Server.onlineStates, message.server_status)) {
     this._setState('online');
   }
 };
