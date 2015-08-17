@@ -69,15 +69,6 @@ UInt.from_bytes = function(j) {
 };
 
 // Return a new UInt from j.
-UInt.from_bn = function(j) {
-  if (j instanceof this) {
-    return j.clone();
-  }
-
-  return (new this()).parse_bn(j);
-};
-
-// Return a new UInt from j.
 UInt.from_number = function(j) {
   if (j instanceof this) {
     return j.clone();
