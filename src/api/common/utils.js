@@ -28,7 +28,7 @@ function toRippledAmount(amount: Amount): string|Amount {
   };
 }
 
-function generateWallet(options?: Object): Object {
+function generateAddress(options?: Object): Object {
   const {accountID, seed} = keypairs.generateWallet(options);
   return {secret: seed, address: accountID};
 }
@@ -92,7 +92,7 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
   return obj;
 }
 
-function promisify<T>(asyncFunction: AsyncFunction): Function {
+function promisify(asyncFunction: AsyncFunction): Function {
   return es6promisify(wrapCatch(asyncFunction));
 }
 
@@ -101,7 +101,7 @@ module.exports = {
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,
-  generateWallet,
+  generateAddress,
   composeAsync,
   wrapCatch,
   convertExceptions,
