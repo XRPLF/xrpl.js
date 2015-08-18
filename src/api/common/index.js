@@ -15,5 +15,6 @@ module.exports = {
   convertExceptions: utils.convertExceptions,
   convertKeysFromSnakeCaseToCamelCase:
     utils.convertKeysFromSnakeCaseToCamelCase,
-  promisify: utils.promisify
+  promisify: utils.promisify,
+  isValidAddress: require('./schema-validator').isValidAddress
 };

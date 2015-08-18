@@ -31,6 +31,7 @@ const convertExceptions = require('./common').convertExceptions;
 const generateWallet = convertExceptions(common.generateWallet);
 const computeLedgerHash = require('./offline/ledgerhash');
 const getLedger = require('./ledger/ledger');
+const isValidAddress = common.isValidAddress;
 
 function RippleAPI(options: {}) {
   const _options = _.assign({}, options, {automatic_resubmission: false});
@@ -65,6 +66,7 @@ RippleAPI.prototype = {
   submit,
 
   computeLedgerHash,
+  isValidAddress,
   generateWallet,
   errors
 };
