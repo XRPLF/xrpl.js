@@ -534,9 +534,9 @@ TransactionManager.prototype._prepareRequest = function(tx) {
     // sealed and delivered, and the txn unmodified.
     // TODO: perhaps an exception should be raised if build_path is attempted
     // while local signing
-    submitRequest.build_path(tx._build_path);
+    submitRequest.buildPath(tx._build_path);
     submitRequest.secret(tx._secret);
-    submitRequest.tx_json(tx.tx_json);
+    submitRequest.txJson(tx.tx_json);
   }
 
   return submitRequest;
