@@ -7,7 +7,7 @@
     "ledgerVersion": {"$ref": "ledgerVersion"},
     "includeAllData": {"type": "boolean"},
     "includeTransactions": {"type": "boolean"},
-    "includeAccounts": {"type": "boolean"}
+    "includeState": {"type": "boolean"}
   },
   "additionalProperties": false
 }

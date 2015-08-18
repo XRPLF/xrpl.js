@@ -556,7 +556,7 @@ describe('RippleAPI', function() {
   it('getLedger - full, then computeLedgerHash', function() {
     const request = {
       includeTransactions: true,
-      includeAccounts: true,
+      includeState: true,
       includeAllData: true,
       ledgerVersion: 38129
     };

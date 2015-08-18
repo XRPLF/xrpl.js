@@ -32,7 +32,8 @@ function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
 
 function getTrustlinesAsync(account: string, options: {currency: string,
     counterparty: string, limit: number, ledgerVersion: number},
-    callback: () => void): void {
+    callback: () => void
+): void {
   validate.address(account);
   validate.getTrustlinesOptions(options);
 

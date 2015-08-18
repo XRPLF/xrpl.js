@@ -12,7 +12,7 @@ function getLedgerAsync(options, callback) {
     ledger: options.ledgerVersion || 'validated',
     expand: options.includeAllData,
     transactions: options.includeTransactions,
-    accounts: options.includeAccounts
+    accounts: options.includeState
   };
 
   this.remote.requestLedger(request,

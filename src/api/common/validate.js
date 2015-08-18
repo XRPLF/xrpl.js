@@ -9,7 +9,8 @@ function error(text) {
   return new ValidationError(text);
 }
 
-function validateAddressAndSecret(obj: {address: string, secret: string}): void {
+function validateAddressAndSecret(obj: {address: string, secret: string}
+): void {
   const address = obj.address;
   const secret = obj.secret;
   schemaValidate('address', address);

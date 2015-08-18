@@ -7,7 +7,7 @@ function convertLedgerHeader(header) {
   return {
     accepted: header.accepted,
     closed: header.closed,
-    account_hash: header.accountHash,
+    account_hash: header.stateHash,
     close_time: header.closeTime,
     close_time_resolution: header.closeTimeResolution,
     close_flags: header.closeFlags,
@@ -49,25 +49,24 @@ function computeTransactionHash(ledger) {
   return transactionHash;
 }
 
-function computeAccountHash(ledger) {
-  if (ledger.rawAccounts === undefined) {
-    return ledger.accountHash;
+function computeStateHash(ledger) {
+  if (ledger.rawState === undefined) {
+    return ledger.stateHash;
   }
-  const accounts = JSON.parse(ledger.rawAccounts);
-  const ledgerObject = common.core.Ledger.from_json({accountState: accounts});
-  const accountHash = ledgerObject.calc_account_hash().to_hex();
-  if (ledger.accountHash !== undefined
-      && ledger.accountHash !== accountHash) {
-    throw new common.errors.ValidationError('accountHash in header'
-      + ' does not match computed hash of accounts');
+  const state = JSON.parse(ledger.rawState);
+  const ledgerObject = common.core.Ledger.from_json({accountState: state});
+  const stateHash = ledgerObject.calc_account_hash().to_hex();
+  if (ledger.stateHash !== undefined && ledger.stateHash !== stateHash) {
+    throw new common.errors.ValidationError('stateHash in header'
+      + ' does not match computed hash of state');
   }
-  return accountHash;
+  return stateHash;
 }
 
 function computeLedgerHash(ledger: Object): string {
   const hashes = {
     transactionHash: computeTransactionHash(ledger),
-    accountHash: computeAccountHash(ledger)
+    stateHash: computeStateHash(ledger)
   };
   return hashLedgerHeader(_.assign({}, ledger, hashes));
 }

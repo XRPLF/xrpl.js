@@ -17,21 +17,21 @@ function parseTransactions(transactions) {
   };
 }
 
-function parseAccounts(accounts) {
-  if (_.isEmpty(accounts)) {
+function parseState(state) {
+  if (_.isEmpty(state)) {
     return {};
   }
-  if (_.isString(accounts[0])) {
-    return {accountHashes: accounts};
+  if (_.isString(state[0])) {
+    return {stateHashes: state};
   }
-  return {rawAccounts: JSON.stringify(accounts)};
+  return {rawState: JSON.stringify(state)};
 }
 
 function parseLedger(ledger: Object): Object {
   return removeUndefined(_.assign({
     accepted: ledger.accepted,
     closed: ledger.closed,
-    accountHash: ledger.account_hash,
+    stateHash: ledger.account_hash,
     closeTime: ledger.close_time,
     closeTimeResolution: ledger.close_time_resolution,
     closeFlags: ledger.close_flags,
@@ -43,7 +43,7 @@ function parseLedger(ledger: Object): Object {
     transactionHash: ledger.transaction_hash
   },
   parseTransactions(ledger.transactions),
-  parseAccounts(ledger.accountState)
+  parseState(ledger.accountState)
   ));
 }
 
