@@ -91,7 +91,7 @@ function Remote(options = {}) {
   this._books = { };
 
   // Secrets that we know about.
-  // Secrets can be set by calling set_secret(account, secret).
+  // Secrets can be set by calling setSecret(account, secret).
   // account : secret
   this.secrets = { };
 
@@ -206,7 +206,7 @@ Remote.TRANSACTION_EVENTS = [
   'transaction_all'
 ];
 
-// Flags for ledger entries. In support of account_root().
+// Flags for ledger entries. In support of accountRoot().
 Remote.flags = {
   // AccountRoot
   account_root: {
