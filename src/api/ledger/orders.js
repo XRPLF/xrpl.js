@@ -7,7 +7,8 @@ const composeAsync = utils.common.composeAsync;
 const parseAccountOrder = require('./parse/account-order');
 
 function requestAccountOffers(remote, address, ledgerVersion, options,
-    marker, limit, callback) {
+    marker, limit, callback
+) {
   remote.requestAccountOffers({
     account: address,
     marker: marker,
@@ -34,7 +35,7 @@ function getOrdersAsync(account, options, callback) {
 }
 
 function getOrders(account: string, options={}) {
-  return utils.promisify(getOrdersAsync.bind(this))(account, options);
+  return utils.promisify(getOrdersAsync).call(this, account, options);
 }
 
 module.exports = getOrders;

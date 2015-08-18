@@ -71,7 +71,7 @@ function getAccountInfoAsync(account: string, options: AccountInfoOptions,
 
 function getAccountInfo(account: string, options: AccountInfoOptions={}
 ): Promise<AccountInfoResponse> {
-  return utils.promisify(getAccountInfoAsync.bind(this))(account, options);
+  return utils.promisify(getAccountInfoAsync).call(this, account, options);
 }
 
 module.exports = getAccountInfo;

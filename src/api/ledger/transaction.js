@@ -87,7 +87,7 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
 function getTransaction(identifier: string,
                         options: TransactionOptions={}
 ): Promise<GetTransactionResponse> {
-  return utils.promisify(getTransactionAsync.bind(this))(identifier, options);
+  return utils.promisify(getTransactionAsync).call(this, identifier, options);
 }
 
 module.exports = getTransaction;

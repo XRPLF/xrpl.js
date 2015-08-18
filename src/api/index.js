@@ -29,8 +29,8 @@ const submit = require('./transaction/submit');
 const errors = require('./common').errors;
 const convertExceptions = require('./common').convertExceptions;
 const generateWallet = convertExceptions(common.generateWallet);
-const getLedgerHeader = require('./ledger/ledger-header');
 const computeLedgerHash = require('./offline/ledgerhash');
+const getLedger = require('./ledger/ledger');
 
 function RippleAPI(options: {}) {
   const _options = _.assign({}, options, {automatic_resubmission: false});
@@ -54,7 +54,7 @@ RippleAPI.prototype = {
   getOrderbook,
   getSettings,
   getAccountInfo,
-  getLedgerHeader,
+  getLedger,
 
   preparePayment,
   prepareTrustline,

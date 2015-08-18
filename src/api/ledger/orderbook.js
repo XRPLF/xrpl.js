@@ -10,7 +10,8 @@ const composeAsync = utils.common.composeAsync;
 // account is to specify a "perspective", which affects which unfunded offers
 // are returned
 function getBookOffers(remote, account, ledgerVersion, limit,
-    takerGets, takerPays, callback) {
+    takerGets, takerPays, callback
+) {
   remote.requestBookOffers(utils.renameCounterpartyToIssuerInOrder({
     taker_gets: takerGets,
     taker_pays: takerPays,
@@ -77,7 +78,7 @@ function getOrderbookAsync(account, orderbook, options, callback) {
 }
 
 function getOrderbook(account: string, orderbook: Object, options={}) {
-  return utils.promisify(getOrderbookAsync.bind(this))(
+  return utils.promisify(getOrderbookAsync).call(this,
     account, orderbook, options);
 }
 

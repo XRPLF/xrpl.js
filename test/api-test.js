@@ -34,6 +34,7 @@ function checkResult(expected, schemaName, response) {
   if (schemaName) {
     schemaValidator.schemaValidate(schemaName, response);
   }
+  return response;
 }
 
 describe('RippleAPI', function() {
@@ -547,9 +548,27 @@ describe('RippleAPI', function() {
     assert.strictEqual(this.api.getLedgerVersion(), 8819951);
   });
 
-  it('getLedgerHeader', function() {
-    return this.api.getLedgerHeader().then(
-      _.partial(checkResult, responses.getLedgerHeader, 'getLedgerHeader'));
+  it('getLedger', function() {
+    return this.api.getLedger().then(
+      _.partial(checkResult, responses.getLedger.header, 'getLedger'));
+  });
+
+  it('getLedger - full, then computeLedgerHash', function() {
+    const request = {
+      includeTransactions: true,
+      includeState: true,
+      includeAllData: true,
+      ledgerVersion: 38129
+    };
+    return this.api.getLedger(request).then(
+      _.partial(checkResult, responses.getLedger.full, 'getLedger'))
+      .then(response => {
+        const ledger = _.assign({}, response,
+          {parentCloseTime: response.closeTime});
+        const hash = this.api.computeLedgerHash(ledger);
+        assert.strictEqual(hash,
+          'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
+      });
   });
 
   it('ledger utils - compareTransactions', function() {
@@ -757,9 +776,10 @@ describe('RippleAPI - offline', function() {
   it('computeLedgerHash - with transactions', function() {
     const api = new RippleAPI();
     const header = _.omit(requests.computeLedgerHash.header,
-      'transaction_hash');
-    const transactions = requests.computeLedgerHash.transactions;
-    const ledgerHash = api.computeLedgerHash(header, transactions);
+      'transactionHash');
+    header.rawTransactions = JSON.stringify(
+      requests.computeLedgerHash.transactions);
+    const ledgerHash = api.computeLedgerHash(header);
     assert.strictEqual(ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
   });
@@ -767,9 +787,10 @@ describe('RippleAPI - offline', function() {
   it('computeLedgerHash - incorrent transaction_hash', function() {
     const api = new RippleAPI();
     const header = _.assign({}, requests.computeLedgerHash.header,
-      {transaction_hash:
+      {transactionHash:
         '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'});
-    const transactions = requests.computeLedgerHash.transactions;
-    assert.throws(() => api.computeLedgerHash(header, transactions));
+    header.rawTransactions = JSON.stringify(
+      requests.computeLedgerHash.transactions);
+    assert.throws(() => api.computeLedgerHash(header));
   });
 });

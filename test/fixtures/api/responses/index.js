@@ -27,7 +27,10 @@ module.exports = {
   },
   getTransactions: require('./get-transactions.json'),
   getTrustlines: require('./get-trustlines.json'),
-  getLedgerHeader: require('./get-ledger-header'),
+  getLedger: {
+    header: require('./get-ledger'),
+    full: require('./get-ledger-full')
+  },
   prepareOrderCancellation: require('./prepare-order-cancellation.json'),
   prepareOrder: require('./prepare-order.json'),
   prepareOrderSell: require('./prepare-order-sell.json'),

@@ -104,7 +104,7 @@ function getTransactionsAsync(account, options, callback) {
 
   const defaults = {maxLedgerVersion: this.remote.getLedgerSequence()};
   if (options.start) {
-    getTransaction.bind(this)(options.start).then(tx => {
+    getTransaction.call(this, options.start).then(tx => {
       const ledgerVersion = tx.outcome.ledgerVersion;
       const bound = options.earliestFirst ?
         {minLedgerVersion: ledgerVersion} : {maxLedgerVersion: ledgerVersion};
@@ -118,7 +118,7 @@ function getTransactionsAsync(account, options, callback) {
 }
 
 function getTransactions(account: string, options={}) {
-  return utils.promisify(getTransactionsAsync.bind(this))(account, options);
+  return utils.promisify(getTransactionsAsync).call(this, account, options);
 }
 
 module.exports = getTransactions;

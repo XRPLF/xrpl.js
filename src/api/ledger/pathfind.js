@@ -114,7 +114,7 @@ function getPathsAsync(pathfind, callback) {
 }
 
 function getPaths(pathfind: Object) {
-  return utils.promisify(getPathsAsync.bind(this))(pathfind);
+  return utils.promisify(getPathsAsync).call(this, pathfind);
 }
 
 module.exports = getPaths;

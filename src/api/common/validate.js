@@ -9,7 +9,8 @@ function error(text) {
   return new ValidationError(text);
 }
 
-function validateAddressAndSecret(obj: {address: string, secret: string}): void {
+function validateAddressAndSecret(obj: {address: string, secret: string}
+): void {
   const address = obj.address;
   const secret = obj.secret;
   schemaValidate('address', address);
@@ -73,6 +74,7 @@ module.exports = {
   getOrdersOptions: _.partial(validateOptions, 'orders-options'),
   getOrderbookOptions: _.partial(validateOptions, 'orders-options'),
   getTransactionOptions: _.partial(validateOptions, 'transaction-options'),
+  getLedgerOptions: _.partial(validateOptions, 'ledger-options'),
   options: _.partial(validateOptions, 'options'),
   instructions: _.partial(schemaValidate, 'instructions')
 };

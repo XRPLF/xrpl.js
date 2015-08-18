@@ -8,6 +8,7 @@ const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
 const transactionsResponse = require('./fixtures/api/rippled/account-tx');
 const accountLinesResponse = require('./fixtures/api/rippled/account-lines');
+const fullLedger = require('./fixtures/ledger-full-38129.json');
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';
@@ -22,6 +23,27 @@ function createResponse(request, response, overrides={}) {
   const change = response.result && !_.isEmpty(overrides) ?
     {id: request.id, result: result} : {id: request.id};
   return JSON.stringify(_.assign({}, response, change));
+}
+
+function createLedgerResponse(request, response) {
+  const newResponse = JSON.parse(createResponse(request, response));
+  if (newResponse.result && newResponse.result.ledger) {
+    if (!request.transactions) {
+      delete newResponse.result.ledger.transactions;
+    }
+    if (!request.accounts) {
+      delete newResponse.result.ledger.accountState;
+    }
+    // the following fields were not in the ledger response in the past
+    if (newResponse.result.ledger.close_flags === undefined) {
+      newResponse.result.ledger.close_flags = 0;
+    }
+    if (newResponse.result.ledger.parent_close_time === undefined) {
+      newResponse.result.ledger.parent_close_time =
+        newResponse.result.ledger.close_time - 10;
+    }
+  }
+  return JSON.stringify(newResponse);
 }
 
 module.exports = function(port) {
@@ -119,11 +141,15 @@ module.exports = function(port) {
   mock.on('request_ledger', function(request, conn) {
     assert.strictEqual(request.command, 'ledger');
     if (request.ledger_index === 34) {
-      conn.send(createResponse(request, fixtures.ledgerNotFound));
+      conn.send(createLedgerResponse(request, fixtures.ledgerNotFound));
     } else if (request.ledger_index === 9038215) {
-      conn.send(createResponse(request, fixtures.ledgerWithoutCloseTime));
+      conn.send(createLedgerResponse(request, fixtures.ledgerWithoutCloseTime));
+    } else if (request.ledger_index === 38129) {
+      const response = _.assign({}, fixtures.ledger,
+        {result: {ledger: fullLedger}});
+      conn.send(createLedgerResponse(request, response));
     } else {
-      conn.send(createResponse(request, fixtures.ledger));
+      conn.send(createLedgerResponse(request, fixtures.ledger));
     }
   });
 
