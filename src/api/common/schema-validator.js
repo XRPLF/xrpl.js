@@ -11,7 +11,7 @@ const ValidationError = require('./errors').ValidationError;
 
 let SCHEMAS = {};
 
-function isValidAddress(address) {
+function isValidAddress(address: string): boolean {
   return core.UInt160.is_valid(address);
 }
 
@@ -68,6 +68,7 @@ function schemaValidate(schemaName: string, object: any): void {
 SCHEMAS = loadSchemas(path.join(__dirname, './schemas'));
 module.exports = {
   schemaValidate: schemaValidate,
+  isValidAddress: isValidAddress,
   loadSchema: loadSchema,
   SCHEMAS: SCHEMAS
 };

@@ -793,4 +793,14 @@ describe('RippleAPI - offline', function() {
       requests.computeLedgerHash.transactions);
     assert.throws(() => api.computeLedgerHash(header));
   });
+
+  it('isValidAddress - valid', function() {
+    const api = new RippleAPI();
+    assert(api.isValidAddress(address));
+  });
+
+  it('isValidAddress - invalid', function() {
+    const api = new RippleAPI();
+    assert(!api.isValidAddress(address.slice(0, -1) + 'a'));
+  });
 });
