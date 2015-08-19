@@ -191,6 +191,9 @@ module.exports = function(port) {
         'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B') {
       conn.send(createResponse(request, fixtures.tx.TrustSetFrozenOff));
     } else if (request.transaction ===
+        'BAF1C678323C37CCB7735550C379287667D8288C30F83148AD3C1CB019FC9002') {
+      conn.send(createResponse(request, fixtures.tx.TrustSetNoQuality));
+    } else if (request.transaction ===
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10') {
       conn.send(createResponse(request, fixtures.tx.NotValidated));
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {

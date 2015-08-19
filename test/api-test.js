@@ -204,6 +204,14 @@ describe('RippleAPI', function() {
         'getTransaction'));
   });
 
+  it('getTransaction - trustline no quality', function() {
+    const hash =
+      'BAF1C678323C37CCB7735550C379287667D8288C30F83148AD3C1CB019FC9002';
+    return this.api.getTransaction(hash).then(
+      _.partial(checkResult, responses.getTransaction.trustlineNoQuality,
+        'getTransaction'));
+  });
+
   it('getTransaction - not validated', function() {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';
