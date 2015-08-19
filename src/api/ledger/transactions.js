@@ -15,6 +15,21 @@ function parseAccountTxTransaction(tx) {
   return parseTransaction(tx.tx);
 }
 
+function counterpartyFilter(filters, tx) {
+  if (!filters.counterparty) {
+    return true;
+  }
+  if (tx.address === filters.counterparty || (
+    tx.specification && (
+      (tx.specification.destination &&
+        tx.specification.destination.address === filters.counterparty) ||
+      (tx.specification.counterparty === filters.counterparty)
+    ))) {
+    return true;
+  }
+  return false;
+}
+
 function transactionFilter(address, filters, tx) {
   if (filters.excludeFailures && tx.outcome.result !== 'tesSUCCESS') {
     return false;
@@ -28,8 +43,7 @@ function transactionFilter(address, filters, tx) {
   if (filters.initiated === false && tx.address === address) {
     return false;
   }
-  if (filters.counterparty && tx.address !== filters.counterparty
-      && tx.specification.destination.address !== filters.counterparty) {
+  if (filters.counterparty && !counterpartyFilter(filters, tx)) {
     return false;
   }
   return true;
