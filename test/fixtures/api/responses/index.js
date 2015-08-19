@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  generateWallet: require('./generate-wallet.json'),
+  generateAddress: require('./generate-address.json'),
   getAccountInfo: require('./get-account-info.json'),
   getBalances: require('./get-balances.json'),
   getOrderbook: require('./get-orderbook.json'),

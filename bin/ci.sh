@@ -5,10 +5,13 @@ TOTAL_NODES="$2"
 
 typecheck() {
   npm install -g flow-bin
+  flow --version
   npm run typecheck
 }
 
 lint() {
+  echo "eslint $(node_modules/.bin/eslint --version)"
+  npm list babel-eslint | grep babel-eslint
   REPO_URL="https://raw.githubusercontent.com/ripple/javascript-style-guide"
   curl "$REPO_URL/es6/eslintrc" > ./eslintrc
   echo "parser: babel-eslint" >> ./eslintrc

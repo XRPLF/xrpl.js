@@ -404,12 +404,12 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getTrustlines, 'getTrustlines'));
   });
 
-  it('generateWallet', function() {
+  it('generateAddress', function() {
     function random() {
       return _.fill(Array(16), 0);
     }
-    assert.deepEqual(this.api.generateWallet({random}),
-                     responses.generateWallet);
+    assert.deepEqual(this.api.generateAddress({random}),
+                     responses.generateAddress);
   });
 
   it('getSettings', function() {
@@ -597,7 +597,7 @@ describe('RippleAPI', function() {
   it('ledger utils - getRecursive', function(done) {
     function getter(marker, limit, callback) {
       if (marker === undefined) {
-        callback(null, {marker: 'A', results: [1]});
+        callback(null, {marker: 'A', limit: limit, results: [1]});
       } else {
         callback(new Error(), null);
       }
