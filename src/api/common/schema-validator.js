@@ -12,7 +12,9 @@ const ValidationError = require('./errors').ValidationError;
 let SCHEMAS = {};
 
 function isValidAddress(address: string): boolean {
-  return core.UInt160.is_valid(address);
+  return typeof address === 'string' && address.length > 0 &&
+    address[0] === 'r' &&
+    core.UInt160.is_valid(address);
 }
 
 function isValidLedgerHash(ledgerHash) {

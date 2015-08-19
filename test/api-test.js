@@ -803,4 +803,11 @@ describe('RippleAPI - offline', function() {
     const api = new RippleAPI();
     assert(!api.isValidAddress(address.slice(0, -1) + 'a'));
   });
+
+  it('isValidAddress - invalid - hex representation', function() {
+    const api = new RippleAPI();
+    const hex = '6e3efa86a5eb0a3c5dc9beb3a204783bb00e1913';
+    assert(!api.isValidAddress(hex));
+  });
+
 });
