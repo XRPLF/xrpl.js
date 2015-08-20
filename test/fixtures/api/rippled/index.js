@@ -19,7 +19,8 @@ module.exports = {
   path_find: {
     generate: require('./path-find'),
     sendUSD: require('./path-find-send-usd'),
-    XrpToXrp: require('./path-find-xrp-to-xrp')
+    XrpToXrp: require('./path-find-xrp-to-xrp'),
+    srcActNotFound: require('./path-find-srcActNotFound')
   },
   tx: {
     Payment: require('./tx/payment.json'),

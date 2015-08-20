@@ -66,6 +66,16 @@ function composeAsync(wrapper: Wrapper, callback: Callback): Callback {
   };
 }
 
+function convertErrors(callback: () => void): () => void {
+  return function(error, data) {
+    if (error && !(error instanceof errors.RippleError)) {
+      callback(new errors.RippleError(error));
+    } else {
+      callback(error, data);
+    }
+  };
+}
+
 function convertExceptions<T>(f: () => T): () => T {
   return function() {
     try {
@@ -105,6 +115,7 @@ module.exports = {
   composeAsync,
   wrapCatch,
   convertExceptions,
+  convertErrors,
   convertKeysFromSnakeCaseToCamelCase,
   promisify
 };

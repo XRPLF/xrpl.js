@@ -1,6 +1,5 @@
 'use strict';
 
-
 const _ = require('lodash');
 const assert = require('assert');
 const util = require('util');
@@ -130,9 +129,8 @@ function Server(remote, opts_) {
     self._updateScore('ledgerclose', ledger);
   });
 
-/* eslint-disable no-unused-vars */
   this.on('response_ping', function onPingResponse(message, request) {
-/* eslint-enable no-unused-vars */
+    _.noop(message);
     self._updateScore('response', request);
   });
 

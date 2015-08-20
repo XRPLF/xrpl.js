@@ -4,10 +4,11 @@ const _ = require('lodash');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
+const convertErrors = utils.common.convertErrors;
 const parseAccountOrder = require('./parse/account-order');
 
-function requestAccountOffers(remote, address, ledgerVersion, options,
-    marker, limit, callback
+function requestAccountOffers(remote, address, ledgerVersion, marker, limit,
+  callback
 ) {
   remote.requestAccountOffers({
     account: address,
@@ -18,7 +19,7 @@ function requestAccountOffers(remote, address, ledgerVersion, options,
   composeAsync((data) => ({
     marker: data.marker,
     results: data.offers.map(_.partial(parseAccountOrder, address))
-  }), callback));
+  }), convertErrors(callback)));
 }
 
 function getOrdersAsync(account, options, callback) {
@@ -28,13 +29,13 @@ function getOrdersAsync(account, options, callback) {
   const ledgerVersion = options.ledgerVersion
                       || this.remote.getLedgerSequence();
   const getter = _.partial(requestAccountOffers, this.remote, account,
-                           ledgerVersion, options);
+                           ledgerVersion);
   utils.getRecursive(getter, options.limit,
     composeAsync((orders) => _.sortBy(orders,
       (order) => order.properties.sequence), callback));
 }
 
-function getOrders(account: string, options={}) {
+function getOrders(account: string, options = {}) {
   return utils.promisify(getOrdersAsync).call(this, account, options);
 }
 

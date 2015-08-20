@@ -3,9 +3,10 @@
 const _ = require('lodash');
 const async = require('async');
 const utils = require('./utils');
-const parseOrderbookOrder = require('./parse/orderbook-order');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
+const convertErrors = utils.common.convertErrors;
+const parseOrderbookOrder = require('./parse/orderbook-order');
 
 // account is to specify a "perspective", which affects which unfunded offers
 // are returned
@@ -18,7 +19,7 @@ function getBookOffers(remote, account, ledgerVersion, limit,
     ledger: ledgerVersion || 'validated',
     limit: limit,
     taker: account
-  }), composeAsync(data => data.offers, callback));
+  }), composeAsync(data => data.offers, convertErrors(callback)));
 }
 
 function isSameIssue(a, b) {
@@ -77,7 +78,7 @@ function getOrderbookAsync(account, orderbook, options, callback) {
                  callback));
 }
 
-function getOrderbook(account: string, orderbook: Object, options={}) {
+function getOrderbook(account: string, orderbook: Object, options = {}) {
   return utils.promisify(getOrderbookAsync).call(this,
     account, orderbook, options);
 }
