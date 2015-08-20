@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.13.0-rc4",
+  "version": "0.13.0-rc5",
   "npm-shrinkwrap-version": "5.4.0",
   "node-version": "v0.12.7",
   "dependencies": {
@@ -24,7 +24,6 @@
     },
     "bn.js": {
       "version": "3.1.1",
-      "from": "bn.js@*",
       "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.1.1.tgz"
     },
     "es6-promisify": {
@@ -43,12 +42,10 @@
     },
     "hash.js": {
       "version": "1.0.3",
-      "from": "hash.js@*",
       "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
       "dependencies": {
         "inherits": {
           "version": "2.0.1",
-          "from": "inherits@>=2.0.1 <3.0.0",
           "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
         }
       }
@@ -121,28 +118,14 @@
     },
     "ripple-address-codec": {
       "version": "1.6.0",
-      "from": "ripple-address-codec@>=1.6.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-1.6.0.tgz",
       "dependencies": {
-        "hash.js": {
-          "version": "1.0.3",
-          "from": "hash.js@>=1.0.3 <2.0.0",
-          "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
-          "dependencies": {
-            "inherits": {
-              "version": "2.0.1",
-              "from": "inherits@>=2.0.1 <3.0.0",
-              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
-            }
-          }
-        },
         "x-address-codec": {
           "version": "0.6.0",
-          "from": "x-address-codec@>=0.6.0 <0.7.0",
           "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.6.0.tgz",
           "dependencies": {
             "base-x": {
               "version": "1.0.1",
-              "from": "base-x@>=1.0.1 <2.0.0",
               "resolved": "https://registry.npmjs.org/base-x/-/base-x-1.0.1.tgz"
             }
           }
@@ -151,38 +134,18 @@
     },
     "ripple-keypairs": {
       "version": "0.8.0",
-      "from": "ripple-keypairs@>=0.8.0 <0.9.0",
+      "resolved": "https://registry.npmjs.org/ripple-keypairs/-/ripple-keypairs-0.8.0.tgz",
       "dependencies": {
-        "bn.js": {
-          "version": "3.1.1",
-          "from": "bn.js@>=3.1.1 <4.0.0",
-          "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.1.1.tgz"
-        },
         "brorand": {
           "version": "1.0.5",
-          "from": "brorand@>=1.0.5 <2.0.0",
           "resolved": "https://registry.npmjs.org/brorand/-/brorand-1.0.5.tgz"
         },
         "elliptic": {
           "version": "5.1.0",
-          "from": "elliptic@>=5.1.0 <6.0.0",
           "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.1.0.tgz",
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
-              "from": "inherits@>=2.0.1 <3.0.0",
-              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
-            }
-          }
-        },
-        "hash.js": {
-          "version": "1.0.3",
-          "from": "hash.js@>=1.0.3 <2.0.0",
-          "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
-          "dependencies": {
-            "inherits": {
-              "version": "2.0.1",
-              "from": "inherits@>=2.0.1 <3.0.0",
               "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             }
           }
@@ -201,7 +164,7 @@
     },
     "sjcl-codec": {
       "version": "0.1.0",
-      "from": "sjcl-codec@*"
+      "resolved": "https://registry.npmjs.org/sjcl-codec/-/sjcl-codec-0.1.0.tgz"
     },
     "ws": {
       "version": "0.7.2",
