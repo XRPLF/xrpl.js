@@ -1,9 +1,12 @@
-##0.13.0
+##0.13.0 (release candidate)
 
-+ Added experimental version of RippleAPI
++ [Deprecate core and remove snake case method copying](https://github.com/ripple/ripple-lib/commit/fb8dc44ec1d49bb05cd0cdbe6dd4ab211195868a)
++ Add new RippleAPI interface
     - [RippleAPI README and samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
     - [Method documentation](https://rawgit.com/ripple/ripple-lib/develop/docs/api.html)
++ [Fix RangeSet for validated_ledger as single ledger](https://github.com/ripple/ripple-lib/commit/9f9e76f8b933201651af59307135f67cfa7d60e8)
 + [Fix bug where the paths would be set with an empty array](https://github.com/ripple/ripple-lib/commit/83874ec0962da311b76f2385623e51c68bc39035)
++ [Fix reserve calculation](https://github.com/ripple/ripple-lib/commit/52879febb92d876f01f2e4d70871baa07af631fb)
 
 ##0.12.6
 
