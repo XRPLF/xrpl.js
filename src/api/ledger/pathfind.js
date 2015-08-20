@@ -46,7 +46,7 @@ function requestPathFind(remote, pathfind: PathFind, callback) {
       _.omit(utils.common.toRippledAmount(amount), 'value'));
   }
 
-  remote.requestRipplePathFind(params,
+  remote.createPathFind(params,
     composeAsync(_.partial(addParams, params), callback));
 }
 
@@ -114,7 +114,7 @@ function getPathsAsync(pathfind, callback) {
 }
 
 function getPaths(pathfind: Object) {
-  return utils.promisify(getPathsAsync.bind(this))(pathfind);
+  return utils.promisify(getPathsAsync).call(this, pathfind);
 }
 
 module.exports = getPaths;

@@ -11,8 +11,6 @@ const requests = fixtures.requests;
 const responses = fixtures.responses;
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
-const MockPRNG = require('./mock-prng');
-const sjcl = common.core.sjcl;
 const address = addresses.ACCOUNT;
 const validate = common.validate;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
@@ -36,13 +34,7 @@ function checkResult(expected, schemaName, response) {
   if (schemaName) {
     schemaValidator.schemaValidate(schemaName, response);
   }
-}
-
-function withDeterministicPRNG(f) {
-  const prng = sjcl.random;
-  sjcl.random = new MockPRNG();
-  f();
-  sjcl.random = prng;
+  return response;
 }
 
 describe('RippleAPI', function() {
@@ -151,11 +143,9 @@ describe('RippleAPI', function() {
 
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
-    withDeterministicPRNG(() => {
-      const result = this.api.sign(requests.sign, secret);
-      assert.deepEqual(result, responses.sign);
-      schemaValidator.schemaValidate('sign', result);
-    });
+    const result = this.api.sign(requests.sign, secret);
+    assert.deepEqual(result, responses.sign);
+    schemaValidator.schemaValidate('sign', result);
   });
 
   it('submit', function() {
@@ -211,6 +201,14 @@ describe('RippleAPI', function() {
       'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B';
     return this.api.getTransaction(hash).then(
       _.partial(checkResult, responses.getTransaction.trustlineFrozenOff,
+        'getTransaction'));
+  });
+
+  it('getTransaction - trustline no quality', function() {
+    const hash =
+      'BAF1C678323C37CCB7735550C379287667D8288C30F83148AD3C1CB019FC9002';
+    return this.api.getTransaction(hash).then(
+      _.partial(checkResult, responses.getTransaction.trustlineNoQuality,
         'getTransaction'));
   });
 
@@ -414,10 +412,12 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getTrustlines, 'getTrustlines'));
   });
 
-  it('generateWallet', function() {
-    withDeterministicPRNG(() => {
-      assert.deepEqual(this.api.generateWallet(), responses.generateWallet);
-    });
+  it('generateAddress', function() {
+    function random() {
+      return _.fill(Array(16), 0);
+    }
+    assert.deepEqual(this.api.generateAddress({random}),
+                     responses.generateAddress);
   });
 
   it('getSettings', function() {
@@ -556,6 +556,29 @@ describe('RippleAPI', function() {
     assert.strictEqual(this.api.getLedgerVersion(), 8819951);
   });
 
+  it('getLedger', function() {
+    return this.api.getLedger().then(
+      _.partial(checkResult, responses.getLedger.header, 'getLedger'));
+  });
+
+  it('getLedger - full, then computeLedgerHash', function() {
+    const request = {
+      includeTransactions: true,
+      includeState: true,
+      includeAllData: true,
+      ledgerVersion: 38129
+    };
+    return this.api.getLedger(request).then(
+      _.partial(checkResult, responses.getLedger.full, 'getLedger'))
+      .then(response => {
+        const ledger = _.assign({}, response,
+          {parentCloseTime: response.closeTime});
+        const hash = this.api.computeLedgerHash(ledger);
+        assert.strictEqual(hash,
+          'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
+      });
+  });
+
   it('ledger utils - compareTransactions', function() {
     let first = {outcome: {ledgerVersion: 1, indexInLedger: 100}};
     let second = {outcome: {ledgerVersion: 1, indexInLedger: 200}};
@@ -582,7 +605,7 @@ describe('RippleAPI', function() {
   it('ledger utils - getRecursive', function(done) {
     function getter(marker, limit, callback) {
       if (marker === undefined) {
-        callback(null, {marker: 'A', results: [1]});
+        callback(null, {marker: 'A', limit: limit, results: [1]});
       } else {
         callback(new Error(), null);
       }
@@ -647,21 +670,14 @@ describe('RippleAPI', function() {
     });
 
     it('addressAndSecret', function() {
-      const wrongSecret = {address: address,
-        secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
-      };
-      assert.throws(_.partial(validate.addressAndSecret, wrongSecret),
-        this.api.errors.ValidationError);
       const noSecret = {address: address};
       assert.throws(_.partial(validate.addressAndSecret, noSecret),
         this.api.errors.ValidationError);
       assert.throws(_.partial(validate.addressAndSecret, noSecret),
         /Parameter missing/);
-      const badSecret = {address: address, secret: 'bad'};
+      const badSecret = {address: address, secret: 'sbad'};
       assert.throws(_.partial(validate.addressAndSecret, badSecret),
         this.api.errors.ValidationError);
-      assert.throws(_.partial(validate.addressAndSecret, badSecret),
-        /not match/);
       const goodWallet = {address: 'rpZMK8hwyrBvLorFNWHRCGt88nCJWbixur',
         secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
       };
@@ -753,9 +769,53 @@ describe('RippleAPI - offline', function() {
     };
     return api.prepareSettings(address, settings, instructions).then(txJSON => {
       assert.deepEqual(txJSON, responses.prepareSettings.flags);
-      withDeterministicPRNG(() => {
-        assert.deepEqual(api.sign(txJSON, secret), responses.sign);
-      });
+      assert.deepEqual(api.sign(txJSON, secret), responses.sign);
     });
   });
+
+  it('computeLedgerHash', function() {
+    const api = new RippleAPI();
+    const header = requests.computeLedgerHash.header;
+    const ledgerHash = api.computeLedgerHash(header);
+    assert.strictEqual(ledgerHash,
+      'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
+  });
+
+  it('computeLedgerHash - with transactions', function() {
+    const api = new RippleAPI();
+    const header = _.omit(requests.computeLedgerHash.header,
+      'transactionHash');
+    header.rawTransactions = JSON.stringify(
+      requests.computeLedgerHash.transactions);
+    const ledgerHash = api.computeLedgerHash(header);
+    assert.strictEqual(ledgerHash,
+      'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
+  });
+
+  it('computeLedgerHash - incorrent transaction_hash', function() {
+    const api = new RippleAPI();
+    const header = _.assign({}, requests.computeLedgerHash.header,
+      {transactionHash:
+        '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'});
+    header.rawTransactions = JSON.stringify(
+      requests.computeLedgerHash.transactions);
+    assert.throws(() => api.computeLedgerHash(header));
+  });
+
+  it('isValidAddress - valid', function() {
+    const api = new RippleAPI();
+    assert(api.isValidAddress(address));
+  });
+
+  it('isValidAddress - invalid', function() {
+    const api = new RippleAPI();
+    assert(!api.isValidAddress(address.slice(0, -1) + 'a'));
+  });
+
+  it('isValidAddress - invalid - hex representation', function() {
+    const api = new RippleAPI();
+    const hex = '6e3efa86a5eb0a3c5dc9beb3a204783bb00e1913';
+    assert(!api.isValidAddress(hex));
+  });
+
 });

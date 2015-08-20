@@ -41,7 +41,7 @@ function parsePayment(tx: Object): Object {
 
   const source = {
     address: tx.Account,
-    amount: removeGenericCounterparty(
+    maxAmount: removeGenericCounterparty(
       parseAmount(tx.SendMax || tx.Amount), tx.Account),
     tag: tx.SourceTag
   };

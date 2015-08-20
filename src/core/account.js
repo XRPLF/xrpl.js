@@ -12,13 +12,14 @@
 
 const _ = require('lodash');
 const async = require('async');
-const util = require('util');
 const extend = require('extend');
-const EventEmitter = require('events').EventEmitter;
-const UInt160 = require('./uint160').UInt160;
-const TransactionManager = require('./transactionmanager').TransactionManager;
-const sjcl = require('./utils').sjcl;
-const Base = require('./base').Base;
+const util = require('util');
+const {createAccountID} = require('ripple-keypairs');
+const {encodeAccountID} = require('ripple-address-codec');
+const {EventEmitter} = require('events');
+const {hexToArray} = require('./utils');
+const {TransactionManager} = require('./transactionmanager');
+const {UInt160} = require('./uint160');
 
 /**
  * @constructor Account
@@ -41,7 +42,7 @@ function Account(remote, account) {
   this._entry = { };
 
   function listenerAdded(type) {
-    if (~Account.subscribeEvents.indexOf(type)) {
+    if (_.includes(Account.subscribeEvents, type)) {
       if (!self._subs && self._remote._connected) {
         self._remote.requestSubscribe()
         .addAccount(self._account_id)
@@ -54,7 +55,7 @@ function Account(remote, account) {
   this.on('newListener', listenerAdded);
 
   function listenerRemoved(type) {
-    if (~Account.subscribeEvents.indexOf(type)) {
+    if (_.includes(Account.subscribeEvents, type)) {
       self._subs -= 1;
       if (!self._subs && self._remote._connected) {
         self._remote.requestUnsubscribe()
@@ -376,12 +377,7 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
 Account._publicKeyToAddress = function(public_key) {
   // Based on functions in /src/js/ripple/keypair.js
   function hexToUInt160(publicKey) {
-    const bits = sjcl.codec.hex.toBits(publicKey);
-    const hash = sjcl.hash.ripemd160.hash(sjcl.hash.sha256.hash(bits));
-    const address = UInt160.from_bits(hash);
-    address.set_version(Base.VER_ACCOUNT_ID);
-
-    return address.to_json();
+    return encodeAccountID(createAccountID(hexToArray(publicKey)));
   }
 
   if (UInt160.is_valid(public_key)) {

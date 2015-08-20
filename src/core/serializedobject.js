@@ -1,14 +1,14 @@
 'use strict';
 
-const _ = require('lodash');
 const assert = require('assert');
 const extend = require('extend');
+const BN = require('bn.js');
+const hashjs = require('hash.js');
+const sjclcodec = require('sjcl-codec');
 const binformat = require('./binformat');
 const stypes = require('./serializedtypes');
 const utils = require('./utils');
 const UInt256 = require('./uint256').UInt256;
-
-const sjcl = utils.sjcl;
 
 const TRANSACTION_TYPES = { };
 
@@ -28,20 +28,16 @@ Object.keys(binformat.ter).forEach(function(key) {
   TRANSACTION_RESULTS[binformat.ter[key]] = key;
 });
 
-function normalize_sjcl_bn_hex(string) {
-  const hex = string.slice(2);    // remove '0x' prefix
-  // now strip leading zeros
-  const i = _.findIndex(hex, function(c) {
-    return c !== '0';
-  });
-  return i >= 0 ? hex.slice(i) : '0';
+function fieldType(fieldName) {
+  const fieldDef = binformat.fieldsInverseMap[fieldName];
+  return binformat.types[fieldDef[0]];
 }
 
 function SerializedObject(buf) {
   if (Array.isArray(buf) || (Buffer && Buffer.isBuffer(buf))) {
     this.buffer = buf;
   } else if (typeof buf === 'string') {
-    this.buffer = sjcl.codec.bytes.fromBits(sjcl.codec.hex.toBits(buf));
+    this.buffer = sjclcodec.bytes.fromBits(sjclcodec.hex.toBits(buf));
   } else if (!buf) {
     this.buffer = [];
   } else {
@@ -205,11 +201,11 @@ SerializedObject.prototype.read = readOrPeek(true);
 SerializedObject.prototype.peek = readOrPeek(false);
 
 SerializedObject.prototype.to_bits = function() {
-  return sjcl.codec.bytes.toBits(this.buffer);
+  return sjclcodec.bytes.toBits(this.buffer);
 };
 
 SerializedObject.prototype.to_hex = function() {
-  return sjcl.codec.hex.fromBits(this.to_bits()).toUpperCase();
+  return sjclcodec.hex.fromBits(this.to_bits()).toUpperCase();
 };
 
 SerializedObject.prototype.to_json = function() {
@@ -231,12 +227,12 @@ SerializedObject.prototype.to_json = function() {
   return output;
 };
 
-SerializedObject.jsonify_structure = function(structure, field_name) {
+SerializedObject.jsonify_structure = function(structure, fieldName) {
   let output;
 
   switch (typeof structure) {
     case 'number':
-      switch (field_name) {
+      switch (fieldName) {
         case 'LedgerEntryType':
           output = LEDGER_ENTRY_TYPES[structure];
           break;
@@ -257,11 +253,10 @@ SerializedObject.jsonify_structure = function(structure, field_name) {
 
       if (typeof structure.to_json === 'function') {
         output = structure.to_json();
-      } else if (structure instanceof sjcl.bn) {
-        output = ('0000000000000000' +
-                   normalize_sjcl_bn_hex(structure.toString())
-                  .toUpperCase()
-                  ).slice(-16);
+      } else if (structure instanceof BN) {
+        // We assume that any BN is a UInt64 field
+        assert.equal(fieldType(fieldName), 'Int64');
+        output = utils.arrayToHex(structure.toArray('bn', 8));
       } else {
         // new Array or Object
         output = new structure.constructor();
@@ -307,11 +302,9 @@ SerializedObject.prototype.hash = function(prefix) {
 
   // Copy buffer to temporary buffer
   sign_buffer.append(this.buffer);
+  const bytes = hashjs.sha512().update(sign_buffer.buffer).digest();
 
-  const bits = sjcl.codec.bytes.toBits(sign_buffer.buffer);
-  const sha512hex = sjcl.codec.hex.fromBits(sjcl.hash.sha512.hash(bits));
-
-  return UInt256.from_hex(sha512hex.substr(0, 64).toUpperCase());
+  return UInt256.from_bytes(bytes.slice(0, 32));
 };
 
 // DEPRECATED

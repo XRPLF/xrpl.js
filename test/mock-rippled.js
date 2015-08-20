@@ -8,6 +8,7 @@ const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
 const transactionsResponse = require('./fixtures/api/rippled/account-tx');
 const accountLinesResponse = require('./fixtures/api/rippled/account-lines');
+const fullLedger = require('./fixtures/ledger-full-38129.json');
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';
@@ -17,8 +18,32 @@ function isBTC(json) {
   return json === 'BTC' || json === '0000000000000000000000004254430000000000';
 }
 
-function createResponse(request, response) {
-  return JSON.stringify(_.assign({}, response, {id: request.id}));
+function createResponse(request, response, overrides={}) {
+  const result = _.assign({}, response.result, overrides);
+  const change = response.result && !_.isEmpty(overrides) ?
+    {id: request.id, result: result} : {id: request.id};
+  return JSON.stringify(_.assign({}, response, change));
+}
+
+function createLedgerResponse(request, response) {
+  const newResponse = JSON.parse(createResponse(request, response));
+  if (newResponse.result && newResponse.result.ledger) {
+    if (!request.transactions) {
+      delete newResponse.result.ledger.transactions;
+    }
+    if (!request.accounts) {
+      delete newResponse.result.ledger.accountState;
+    }
+    // the following fields were not in the ledger response in the past
+    if (newResponse.result.ledger.close_flags === undefined) {
+      newResponse.result.ledger.close_flags = 0;
+    }
+    if (newResponse.result.ledger.parent_close_time === undefined) {
+      newResponse.result.ledger.parent_close_time =
+        newResponse.result.ledger.close_time - 10;
+    }
+  }
+  return JSON.stringify(newResponse);
 }
 
 module.exports = function(port) {
@@ -116,11 +141,15 @@ module.exports = function(port) {
   mock.on('request_ledger', function(request, conn) {
     assert.strictEqual(request.command, 'ledger');
     if (request.ledger_index === 34) {
-      conn.send(createResponse(request, fixtures.ledgerNotFound));
+      conn.send(createLedgerResponse(request, fixtures.ledgerNotFound));
     } else if (request.ledger_index === 9038215) {
-      conn.send(createResponse(request, fixtures.ledgerWithoutCloseTime));
+      conn.send(createLedgerResponse(request, fixtures.ledgerWithoutCloseTime));
+    } else if (request.ledger_index === 38129) {
+      const response = _.assign({}, fixtures.ledger,
+        {result: {ledger: fullLedger}});
+      conn.send(createLedgerResponse(request, response));
     } else {
-      conn.send(createResponse(request, fixtures.ledger));
+      conn.send(createLedgerResponse(request, fixtures.ledger));
     }
   });
 
@@ -161,6 +190,9 @@ module.exports = function(port) {
     } else if (request.transaction ===
         'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B') {
       conn.send(createResponse(request, fixtures.tx.TrustSetFrozenOff));
+    } else if (request.transaction ===
+        'BAF1C678323C37CCB7735550C379287667D8288C30F83148AD3C1CB019FC9002') {
+      conn.send(createResponse(request, fixtures.tx.TrustSetNoQuality));
     } else if (request.transaction ===
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10') {
       conn.send(createResponse(request, fixtures.tx.NotValidated));
@@ -216,14 +248,20 @@ module.exports = function(port) {
     }
   });
 
-  mock.on('request_ripple_path_find', function(request, conn) {
+  mock.on('request_path_find', function(request, conn) {
     let response = null;
+    if (request.subcommand === 'close') {
+      return;
+    }
     if (request.source_account === addresses.OTHER_ACCOUNT) {
-      response = createResponse(request, fixtures.ripple_path_find.sendUSD);
+      response = createResponse(request, fixtures.path_find.sendUSD);
     } else if (request.source_account === addresses.THIRD_ACCOUNT) {
-      response = createResponse(request, fixtures.ripple_path_find.XrpToXrp);
+      response = createResponse(request, fixtures.path_find.XrpToXrp, {
+        destination_amount: request.destination_amount,
+        destination_address: request.destination_address
+      });
     } else {
-      response = fixtures.ripple_path_find.generate.generateIOUPaymentPaths(
+      response = fixtures.path_find.generate.generateIOUPaymentPaths(
         request.id, request.source_account, request.destination_account,
         request.destination_amount);
     }

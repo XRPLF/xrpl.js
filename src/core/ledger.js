@@ -1,19 +1,19 @@
-/* eslint-disable valid-jsdoc */
 'use strict';
-var Transaction = require('./transaction').Transaction;
-var SHAMap = require('./shamap').SHAMap;
-var SHAMapTreeNode = require('./shamap').SHAMapTreeNode;
-var SerializedObject = require('./serializedobject').SerializedObject;
-var stypes = require('./serializedtypes');
-var UInt160 = require('./uint160').UInt160;
-var Currency = require('./currency').Currency;
+const BigNumber = require('bignumber.js');
+const Transaction = require('./transaction').Transaction;
+const SHAMap = require('./shamap').SHAMap;
+const SHAMapTreeNode = require('./shamap').SHAMapTreeNode;
+const SerializedObject = require('./serializedobject').SerializedObject;
+const stypes = require('./serializedtypes');
+const UInt160 = require('./uint160').UInt160;
+const Currency = require('./currency').Currency;
 
 function Ledger() {
   this.ledger_json = {};
 }
 
 Ledger.from_json = function(v) {
-  var ledger = new Ledger();
+  const ledger = new Ledger();
   ledger.parse_json(v);
   return ledger;
 };
@@ -23,14 +23,13 @@ Ledger.space = require('./ledgerspaces');
 /**
  * Generate the key for an AccountRoot entry.
  *
- * @param {String|UInt160} account Ripple Account
+ * @param {String|UInt160} accountArg - Ripple Account
  * @return {UInt256}
  */
 Ledger.calcAccountRootEntryHash =
-Ledger.prototype.calcAccountRootEntryHash = function(account) {
-  account = UInt160.from_json(account);
-
-  var index = new SerializedObject();
+Ledger.prototype.calcAccountRootEntryHash = function(accountArg) {
+  const account = UInt160.from_json(accountArg);
+  const index = new SerializedObject();
 
   index.append([0, Ledger.space.account.charCodeAt(0)]);
   index.append(account.to_bytes());
@@ -41,17 +40,15 @@ Ledger.prototype.calcAccountRootEntryHash = function(account) {
 /**
  * Generate the key for an Offer entry.
  *
- * @param {String|UInt160} account Ripple Account
- * @param {Number} sequence Sequence number of the OfferCreate transaction
+ * @param {String|UInt160} accountArg - Ripple Account
+ * @param {Number} sequence - Sequence number of the OfferCreate transaction
  *   that instantiated this offer.
  * @return {UInt256}
  */
 Ledger.calcOfferEntryHash =
-Ledger.prototype.calcOfferEntryHash = function(account, sequence) {
-  account = UInt160.from_json(account);
-  sequence = parseInt(sequence, 10);
-
-  var index = new SerializedObject();
+Ledger.prototype.calcOfferEntryHash = function(accountArg, sequence) {
+  const account = UInt160.from_json(accountArg);
+  const index = new SerializedObject();
 
   index.append([0, Ledger.space.offer.charCodeAt(0)]);
   index.append(account.to_bytes());
@@ -65,17 +62,17 @@ Ledger.prototype.calcOfferEntryHash = function(account, sequence) {
  *
  * The ordering of the two account parameters does not matter.
  *
- * @param {String|UInt160} account1 First Ripple Account
- * @param {String|UInt160} account2 Second Ripple Account
- * @param {String|Currency} currency The currency code
+ * @param {String|UInt160} _account1 - First Ripple Account
+ * @param {String|UInt160} _account2 - Second Ripple Account
+ * @param {String|Currency} _currency - The currency code
  * @return {UInt256}
  */
 Ledger.calcRippleStateEntryHash =
 Ledger.prototype.calcRippleStateEntryHash = function(
-    account1, account2, currency) {
-  currency = Currency.from_json(currency);
-  account1 = UInt160.from_json(account1);
-  account2 = UInt160.from_json(account2);
+    _account1, _account2, _currency) {
+  const currency = Currency.from_json(_currency);
+  const account1 = UInt160.from_json(_account1);
+  const account2 = UInt160.from_json(_account2);
 
   if (!account1.is_valid()) {
     throw new Error('Invalid first account');
@@ -87,18 +84,14 @@ Ledger.prototype.calcRippleStateEntryHash = function(
     throw new Error('Invalid currency');
   }
 
-  // The lower ID has to come first
-  if (account1.to_bn().greaterEquals(account2.to_bn())) {
-    var tmp = account2;
-    account2 = account1;
-    account1 = tmp;
-  }
-
-  var index = new SerializedObject();
+  const swap = account1.greater_than(account2);
+  const lowAccount = swap ? account2 : account1;
+  const highAccount = swap ? account1 : account2;
+  const index = new SerializedObject();
 
   index.append([0, Ledger.space.rippleState.charCodeAt(0)]);
-  index.append(account1.to_bytes());
-  index.append(account2.to_bytes());
+  index.append(lowAccount.to_bytes());
+  index.append(highAccount.to_bytes());
   index.append(currency.to_bytes());
 
   return index.hash();
@@ -109,13 +102,13 @@ Ledger.prototype.parse_json = function(v) {
 };
 
 Ledger.prototype.calc_tx_hash = function() {
-  var tx_map = new SHAMap();
+  const tx_map = new SHAMap();
 
   this.ledger_json.transactions.forEach(function(tx_json) {
-    var tx = Transaction.from_json(tx_json);
-    var meta = SerializedObject.from_json(tx_json.metaData);
+    const tx = Transaction.from_json(tx_json);
+    const meta = SerializedObject.from_json(tx_json.metaData);
 
-    var data = new SerializedObject();
+    const data = new SerializedObject();
     stypes.VariableLength.serialize(data, tx.serialize().to_hex());
     stypes.VariableLength.serialize(data, meta.to_hex());
     tx_map.add_item(tx.hash(), data, SHAMapTreeNode.TYPE_TRANSACTION_MD);
@@ -125,22 +118,23 @@ Ledger.prototype.calc_tx_hash = function() {
 };
 
 /**
-* @param options .sanity_test {Boolean}
-* @return hash of shamap
+* @param {Object} options - object
 *
-*   If `true`, will serialize each accountState item to binary and then back to
-*   json before finally serializing for hashing. This is mostly to expose any
-*   issues with ripple-lib's binary <--> json codecs.
+* @param {Boolean} [options.sanity_test=false] - If `true`, will serialize each
+*   accountState item to binary and then back to json before finally
+*   serializing for hashing. This is mostly to expose any issues with
+*   ripple-lib's binary <--> json codecs.
 *
+* @return {UInt256} - hash of shamap
 */
 Ledger.prototype.calc_account_hash = function(options) {
-  var account_map = new SHAMap();
-  var erred;
+  const account_map = new SHAMap();
+  let erred;
 
   this.ledger_json.accountState.forEach(function(le) {
-    var data = SerializedObject.from_json(le);
+    let data = SerializedObject.from_json(le);
 
-    var json;
+    let json;
     if (options && options.sanity_test) {
       try {
         json = data.to_json();
@@ -161,6 +155,26 @@ Ledger.prototype.calc_account_hash = function(options) {
   }
 
   return account_map.hash();
+};
+
+// see rippled Ledger::updateHash()
+Ledger.calculateLedgerHash =
+Ledger.prototype.calculateLedgerHash = function(ledgerHeader) {
+  const so = new SerializedObject();
+  const prefix = 0x4C575200;
+  const totalCoins = (new BigNumber(ledgerHeader.total_coins)).toString(16);
+
+  stypes.Int32.serialize(so, Number(ledgerHeader.ledger_index));
+  stypes.Int64.serialize(so, totalCoins);
+  stypes.Hash256.serialize(so, ledgerHeader.parent_hash);
+  stypes.Hash256.serialize(so, ledgerHeader.transaction_hash);
+  stypes.Hash256.serialize(so, ledgerHeader.account_hash);
+  stypes.Int32.serialize(so, ledgerHeader.parent_close_time);
+  stypes.Int32.serialize(so, ledgerHeader.close_time);
+  stypes.Int8.serialize(so, ledgerHeader.close_time_resolution);
+  stypes.Int8.serialize(so, ledgerHeader.close_flags);
+
+  return so.hash(prefix).to_hex();
 };
 
 exports.Ledger = Ledger;

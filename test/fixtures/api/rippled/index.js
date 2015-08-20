@@ -16,10 +16,10 @@ module.exports = {
   book_offers: require('./book-offers'),
   server_info: require('./server-info'),
   server_info_error: require('./server-info-error'),
-  ripple_path_find: {
-    generate: require('./ripple-path-find'),
-    sendUSD: require('./ripple-path-find-send-usd'),
-    XrpToXrp: require('./ripple-path-find-xrp-to-xrp')
+  path_find: {
+    generate: require('./path-find'),
+    sendUSD: require('./path-find-send-usd'),
+    XrpToXrp: require('./path-find-xrp-to-xrp')
   },
   tx: {
     Payment: require('./tx/payment.json'),
@@ -31,6 +31,7 @@ module.exports = {
     OfferCancel: require('./tx/offer-cancel.json'),
     TrustSet: require('./tx/trust-set.json'),
     TrustSetFrozenOff: require('./tx/trust-set-frozen-off.json'),
+    TrustSetNoQuality: require('./tx/trust-set-no-quality.json'),
     NotFound: require('./tx/not-found.json'),
     NoLedgerIndex: require('./tx/no-ledger-index.json'),
     NoLedgerFound: require('./tx/no-ledger-found.json'),

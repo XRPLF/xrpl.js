@@ -8,7 +8,6 @@ const Transaction = require('ripple-lib').Transaction;
 const TransactionQueue = require('ripple-lib').TransactionQueue;
 const Remote = require('ripple-lib').Remote;
 const Server = require('ripple-lib').Server;
-const sjcl = require('ripple-lib').sjcl;
 
 const transactionResult = {
   engine_result: 'tesSUCCESS',
@@ -54,11 +53,6 @@ for (let i = 0; i <= 127; i++) {
 }
 
 describe('Transaction', function() {
-  before(function() {
-    sjcl.random.addEntropy(
-      '3045022100A58B0460BC5092CB4F96155C19125A4E079C870663F1D5E8BBC9BD', 256);
-  });
-
   it('Success listener', function(done) {
     const transaction = new Transaction();
 
@@ -454,7 +448,6 @@ describe('Transaction', function() {
     transaction.SigningPubKey = undefined;
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoijX';
-
     transaction.once('error', function(err) {
       assert.strictEqual(err.result, 'tejSecretInvalid');
       done();
@@ -551,6 +544,36 @@ describe('Transaction', function() {
     assert.strictEqual(transaction.tx_json.Flags, 2147483648);
 
     done();
+  });
+
+  describe('ed25519 signing', function() {
+    it('can accept an ed25519 seed for ._secret', function() {
+      const expectedPub = 'EDD3993CDC6647896C455F136648B7750' +
+                          '723B011475547AF60691AA3D7438E021D';
+
+      const expectedSig = 'C3646313B08EED6AF4392261A31B961F' +
+                          '10C66CB733DB7F6CD9EAB079857834C8' +
+                          'B0334270A2C037E63CDCCC1932E08328' +
+                          '82B7B7066ECD2FAEDEB4A83DF8AE6303';
+
+      const tx_json = {
+        Account: 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN',
+        Amount: '1000',
+        Destination: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        Fee: '10',
+        Flags: 2147483648,
+        Sequence: 1,
+        TransactionType: 'Payment'
+      };
+
+      const tx = Transaction.from_json(tx_json);
+      tx.setSecret('sEd7rBGm5kxzauRTAV2hbsNz7N45X91');
+      tx.complete();
+      tx.sign();
+
+      assert.strictEqual(tx_json.SigningPubKey, expectedPub);
+      assert.strictEqual(tx_json.TxnSignature, expectedSig);
+    });
   });
 
   describe('signing', function() {
@@ -1318,11 +1341,11 @@ describe('Transaction', function() {
     const expected = [
       {
         Memo:
-        {
-          MemoType: '6D657373616765',
-          MemoFormat: '6A736F6E',
-          MemoData: '7B22737472696E67223A2276616C7565222C22626F6F6C223A747275652C22696E7465676572223A317D'
-        }
+          {
+            MemoType: '6D657373616765',
+            MemoFormat: '6A736F6E',
+            MemoData: '7B22737472696E67223A2276616C7565222C22626F6F6C223A747275652C22696E7465676572223A317D'
+          }
       }
     ];
 
@@ -2014,7 +2037,7 @@ describe('Transaction', function() {
     const queue = new TransactionQueue();
 
     // Randomized submit indexes
-    [
+    const indexes = [
       28093,
       456944,
       347213,
@@ -2025,8 +2048,9 @@ describe('Transaction', function() {
       925550,
       872298,
       543305
-    ]
-    .forEach(function(index) {
+    ];
+
+    indexes.forEach(function(index) {
       const tx = new Transaction();
       tx.initialSubmitIndex = index;
       queue.push(tx);

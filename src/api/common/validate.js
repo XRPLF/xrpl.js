@@ -9,17 +9,16 @@ function error(text) {
   return new ValidationError(text);
 }
 
-function validateAddressAndSecret(obj: {address: string, secret: string}): void {
+function validateAddressAndSecret(obj: {address: string, secret: string}
+): void {
   const address = obj.address;
   const secret = obj.secret;
   schemaValidate('address', address);
   if (!secret) {
     throw error('Parameter missing: secret');
   }
-  try {
-    core.Seed.from_json(secret).get_key(address);
-  } catch (exception) {
-    throw error('secret does not match address');
+  if (!core.Seed.from_json(secret).is_valid()) {
+    throw error('secret is invalid');
   }
 }
 
@@ -57,6 +56,7 @@ module.exports = {
   secret: validateSecret,
   currency: _.partial(schemaValidate, 'currency'),
   identifier: _.partial(schemaValidate, 'hash256'),
+  ledgerVersion: _.partial(schemaValidate, 'ledgerVersion'),
   sequence: _.partial(schemaValidate, 'sequence'),
   order: _.partial(schemaValidate, 'order'),
   orderbook: _.partial(schemaValidate, 'orderbook'),
@@ -74,6 +74,7 @@ module.exports = {
   getOrdersOptions: _.partial(validateOptions, 'orders-options'),
   getOrderbookOptions: _.partial(validateOptions, 'orders-options'),
   getTransactionOptions: _.partial(validateOptions, 'transaction-options'),
+  getLedgerOptions: _.partial(validateOptions, 'ledger-options'),
   options: _.partial(validateOptions, 'options'),
   instructions: _.partial(schemaValidate, 'instructions')
 };

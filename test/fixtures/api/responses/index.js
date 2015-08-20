@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  generateWallet: require('./generate-wallet.json'),
+  generateAddress: require('./generate-address.json'),
   getAccountInfo: require('./get-account-info.json'),
   getBalances: require('./get-balances.json'),
   getOrderbook: require('./get-orderbook.json'),
@@ -23,10 +23,15 @@ module.exports = {
     trackingOff: require('./get-transaction-settings-tracking-off.json'),
     setRegularKey: require('./get-transaction-settings-set-regular-key.json'),
     trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
+    trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
     notValidated: require('./get-transaction-not-validated.json')
   },
   getTransactions: require('./get-transactions.json'),
   getTrustlines: require('./get-trustlines.json'),
+  getLedger: {
+    header: require('./get-ledger'),
+    full: require('./get-ledger-full')
+  },
   prepareOrderCancellation: require('./prepare-order-cancellation.json'),
   prepareOrder: require('./prepare-order.json'),
   prepareOrderSell: require('./prepare-order-sell.json'),

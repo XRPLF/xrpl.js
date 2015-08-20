@@ -31,11 +31,11 @@ describe('Base', function() {
   describe('decode_check', function() {
     it('rrrrrrrrrrrrrrrrrrrrrhoLvTp', function() {
       const decoded = Base.decode_check(0, 'rrrrrrrrrrrrrrrrrrrrrhoLvTp');
-      assert(decoded.equals(0));
+      assert(decoded.cmpn(0) === 0);
     });
     it('rrrrrrrrrrrrrrrrrrrrBZbvji', function() {
       const decoded = Base.decode_check(0, 'rrrrrrrrrrrrrrrrrrrrBZbvji');
-      assert(decoded.equals(1));
+      assert(decoded.cmpn(1) === 0);
     });
   });
   describe('decode-encode identity', function() {

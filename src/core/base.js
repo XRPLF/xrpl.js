@@ -1,17 +1,10 @@
 'use strict';
-const _ = require('lodash');
-const sjcl = require('./utils').sjcl;
-const utils = require('./utils');
+
+const BN = require('bn.js');
 const extend = require('extend');
-const convertBase = require('./baseconverter');
+const {encode, decode} = require('ripple-address-codec');
 
 const Base = {};
-
-const alphabets = Base.alphabets = {
-  ripple: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
-  tipple: 'RPShNAF39wBUDnEGHJKLM4pQrsT7VWXYZ2bcdeCg65jkm8ofqi1tuvaxyz',
-  bitcoin: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-};
 
 extend(Base, {
   VER_NONE: 1,
@@ -21,134 +14,44 @@ extend(Base, {
   VER_ACCOUNT_PUBLIC: 35,
   VER_ACCOUNT_PRIVATE: 34,
   VER_FAMILY_GENERATOR: 41,
-  VER_FAMILY_SEED: 33
-});
-
-function sha256(bytes) {
-  return sjcl.codec.bytes.fromBits(
-    sjcl.hash.sha256.hash(sjcl.codec.bytes.toBits(bytes)));
-}
-
-function encodeString(alphabet, input) {
-  if (input.length === 0) {
-    return '';
-  }
-
-  const leadingZeros = _.takeWhile(input, function(d) {
-    return d === 0;
-  });
-  const out = convertBase(input, 256, 58).map(function(digit) {
-    if (digit < 0 || digit >= alphabet.length) {
-      throw new Error('Value ' + digit + ' is out of bounds for encoding');
-    }
-    return alphabet[digit];
-  });
-  const prefix = leadingZeros.map(function() {
-    return alphabet[0];
-  });
-  return prefix.concat(out).join('');
-}
-
-function decodeString(indexes, input) {
-  if (input.length === 0) {
-    return [];
-  }
-
-  const input58 = input.split('').map(function(c) {
-    const charCode = c.charCodeAt(0);
-    if (charCode >= indexes.length || indexes[charCode] === -1) {
-      throw new Error('Character ' + c + ' is not valid for encoding');
-    }
-    return indexes[charCode];
-  });
-  const leadingZeros = _.takeWhile(input58, function(d) {
-    return d === 0;
-  });
-  const out = convertBase(input58, 58, 256);
-  return leadingZeros.concat(out);
-}
-
-function Base58(alphabet) {
-  const indexes = utils.arraySet(128, -1);
-  for (let i = 0; i < alphabet.length; i++) {
-    indexes[alphabet.charCodeAt(i)] = i;
-  }
-  return {
-    decode: decodeString.bind(null, indexes),
-    encode: encodeString.bind(null, alphabet)
-  };
-}
-
-Base.encoders = {};
-Object.keys(alphabets).forEach(function(alphabet) {
-  Base.encoders[alphabet] = new Base58(alphabets[alphabet]);
+  VER_FAMILY_SEED: 33,
+  VER_ED25519_SEED: [0x01, 0xE1, 0x4B]
 });
 
 // --> input: big-endian array of bytes.
 // <-- string at least as long as input.
-Base.encode = function(input, alpha) {
-  return this.encoders[alpha || 'ripple'].encode(input);
+Base.encode = function(input, alphabet) {
+  return encode(input, {alphabet});
 };
 
 // --> input: String
 // <-- array of bytes or undefined.
-Base.decode = function(input, alpha) {
+Base.decode = function(input, alphabet) {
   if (typeof input !== 'string') {
     return undefined;
   }
   try {
-    return this.encoders[alpha || 'ripple'].decode(input);
+    return decode(input, {alphabet});
   } catch (e) {
     return undefined;
   }
 };
 
-Base.verify_checksum = function(bytes) {
-  const computed = sha256(sha256(bytes.slice(0, -4))).slice(0, 4);
-  const checksum = bytes.slice(-4);
-  return _.isEqual(computed, checksum);
-};
-
 // --> input: Array
 // <-- String
 Base.encode_check = function(version, input, alphabet) {
-  const buffer = [].concat(version, input);
-  const check = sha256(sha256(buffer)).slice(0, 4);
-
-  return Base.encode([].concat(buffer, check), alphabet);
+  return encode(input, {version, alphabet});
 };
 
 // --> input : String
-// <-- NaN || sjcl.bn
+// <-- NaN || BN
 Base.decode_check = function(version, input, alphabet) {
-  const buffer = Base.decode(input, alphabet);
-
-  if (!buffer || buffer.length < 5) {
+  try {
+    const decoded = decode(input, {version, alphabet});
+    return new BN(decoded);
+  } catch (e) {
     return NaN;
   }
-
-  // Single valid version
-  if (typeof version === 'number' && buffer[0] !== version) {
-    return NaN;
-  }
-
-  // Multiple allowed versions
-  if (Array.isArray(version) && _.every(version, function(v) {
-    return v !== buffer[0];
-  })) {
-    return NaN;
-  }
-
-  if (!Base.verify_checksum(buffer)) {
-    return NaN;
-  }
-
-  // We'll use the version byte to add a leading zero, this ensures JSBN doesn't
-  // intrepret the value as a negative number
-  buffer[0] = 0;
-
-  return sjcl.bn.fromBits(
-      sjcl.codec.bytes.toBits(buffer.slice(0, -4)));
 };
 
 exports.Base = Base;

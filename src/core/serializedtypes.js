@@ -10,13 +10,13 @@
 
 const assert = require('assert');
 const extend = require('extend');
+const BN = require('bn.js');
 const GlobalBigNumber = require('bignumber.js');
+const sjclcodec = require('sjcl-codec');
 const Amount = require('./amount').Amount;
 const Currency = require('./currency').Currency;
 const binformat = require('./binformat');
 const utils = require('./utils');
-const sjcl = utils.sjcl;
-const SJCL_BN = sjcl.bn;
 
 const UInt128 = require('./uint128').UInt128;
 const UInt160 = require('./uint160').UInt160;
@@ -44,8 +44,7 @@ function isHexInt64String(val) {
   return isString(val) && /^[0-9A-F]{0,16}$/i.test(val);
 }
 
-function serializeBits(so, bits, noLength) {
-  const byteData = sjcl.codec.bytes.fromBits(bits);
+function serializeBytes(so, byteData, noLength) {
   if (!noLength) {
     SerializedType.serialize_varint(so, byteData.length);
   }
@@ -53,23 +52,12 @@ function serializeBits(so, bits, noLength) {
 }
 
 function serializeHex(so, hexData, noLength) {
-  serializeBits(so, sjcl.codec.hex.toBits(hexData), noLength);
-}
-
-/**
- * parses bytes as hex
- *
- * @param {Array} byte_array bytes
- * @return {String} hex string
- */
-function convertByteArrayToHex(byte_array) {
-  return sjcl.codec.hex.fromBits(sjcl.codec.bytes.toBits(byte_array))
-  .toUpperCase();
+  serializeBytes(so, utils.hexToArray(hexData), noLength);
 }
 
 function convertHexToString(hexString) {
-  const bits = sjcl.codec.hex.toBits(hexString);
-  return sjcl.codec.utf8String.fromBits(bits);
+  const bits = sjclcodec.hex.toBits(hexString);
+  return sjclcodec.utf8String.fromBits(bits);
 }
 
 function sort_fields(keys) {
@@ -308,25 +296,27 @@ const STInt64 = exports.Int64 = new SerializedType({
       if (value < 0) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
-      bigNumObject = new SJCL_BN(value, 10);
+      bigNumObject = new BN(value, 10);
     } else if (isString(value)) {
       if (!isHexInt64String(value)) {
         throw new Error('Not a valid hex Int64.');
       }
-      bigNumObject = new SJCL_BN(value, 16);
-    } else if (value instanceof SJCL_BN) {
-      if (!value.greaterEquals(0)) {
+      bigNumObject = new BN(value, 16);
+    } else if (value instanceof BN) {
+      if (value.cmpn(0) < 0) {
         throw new Error('Negative value for unsigned Int64 is invalid.');
       }
       bigNumObject = value;
     } else {
-      throw new Error('Invalid type for Int64');
+      throw new Error('Invalid type for Int64: ' + (typeof value) + ' value');
     }
-    serializeBits(so, bigNumObject.toBits(64), true); // noLength = true
+    // `'be'` means big endian, and the following arg is the byte length, which
+    // it will pad with 0s to if not enough bytes, or throw if over
+    serializeBytes(so, bigNumObject.toArray('be', 8), /* noLength= */true);
   },
   parse: function(so) {
     const bytes = so.read(8);
-    return SJCL_BN.fromBits(sjcl.codec.bytes.toBits(bytes));
+    return new BN(bytes);
   }
 });
 
@@ -338,7 +328,7 @@ const STHash128 = exports.Hash128 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash128');
     }
-    serializeBits(so, hash.to_bits(), true); // noLength = true
+    serializeBytes(so, hash.to_bytes(), true); // noLength = true
   },
   parse: function(so) {
     return UInt128.from_bytes(so.read(16));
@@ -353,7 +343,7 @@ const STHash256 = exports.Hash256 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash256');
     }
-    serializeBits(so, hash.to_bits(), true); // noLength = true
+    serializeBytes(so, hash.to_bytes(), true); // noLength = true
   },
   parse: function(so) {
     return UInt256.from_bytes(so.read(32));
@@ -368,7 +358,7 @@ const STHash160 = exports.Hash160 = new SerializedType({
     if (!hash.is_valid()) {
       throw new Error('Invalid Hash160');
     }
-    serializeBits(so, hash.to_bits(), true); // noLength = true
+    serializeBytes(so, hash.to_bytes(), true); // noLength = true
   },
   parse: function(so) {
     return UInt160.from_bytes(so.read(20));
@@ -442,7 +432,7 @@ exports.Quality = new SerializedType({
       lo = parseInt(mantissaHex.slice(-8), 16);
     }
 
-    const valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
+    const valueBytes = sjclcodec.bytes.fromBits([hi, lo]);
 
     so.append(valueBytes);
   }
@@ -482,7 +472,7 @@ const STAmount = exports.Amount = new SerializedType({
         valueHex = '0' + valueHex;
       }
 
-      valueBytes = sjcl.codec.bytes.fromBits(sjcl.codec.hex.toBits(valueHex));
+      valueBytes = sjclcodec.bytes.fromBits(sjclcodec.hex.toBits(valueHex));
       // Clear most significant two bits - these bits should already be 0 if
       // Amount enforces the range correctly, but we'll clear them anyway just
       // so this code can make certain guarantees about the encoded value.
@@ -516,7 +506,7 @@ const STAmount = exports.Amount = new SerializedType({
         lo = parseInt(mantissaHex.slice(-8), 16);
       }
 
-      valueBytes = sjcl.codec.bytes.fromBits([hi, lo]);
+      valueBytes = sjclcodec.bytes.fromBits([hi, lo]);
     }
 
     so.append(valueBytes);
@@ -582,7 +572,7 @@ const STVL = exports.VariableLength = exports.VL = new SerializedType({
   },
   parse: function(so) {
     const len = this.parse_varint(so);
-    return convertByteArrayToHex(so.read(len));
+    return utils.arrayToHex(so.read(len));
   }
 });
 
@@ -594,7 +584,7 @@ const STAccount = exports.Account = new SerializedType({
     if (!account.is_valid()) {
       throw new Error('Invalid account!');
     }
-    serializeBits(so, account.to_bits());
+    serializeBytes(so, account.to_bytes());
   },
   parse: function(so) {
     const len = this.parse_varint(so);
@@ -807,27 +797,27 @@ exports.STMemo = new SerializedType({
         if (parsedType !== 'unformatted_memo') {
           output.parsed_memo_type = parsedType;
         }
-        /*eslint-disable no-empty*/
+        /* eslint-disable no-empty */
       } catch (e) {
         // empty
         // we don't know what's in the binary, apparently it's not a UTF-8
         // string
         // this is fine, we won't add the parsed_memo_type field
       }
-      /*eslint-enable no-empty*/
+      /* eslint-enable no-empty */
     }
 
     if (output.MemoFormat !== undefined) {
       try {
         output.parsed_memo_format = convertHexToString(output.MemoFormat);
-        /*eslint-disable no-empty*/
+        /* eslint-disable no-empty */
       } catch (e) {
         // empty
         // we don't know what's in the binary, apparently it's not a UTF-8
         // string
         // this is fine, we won't add the parsed_memo_format field
       }
-      /*eslint-enable no-empty*/
+      /* eslint-enable no-empty */
     }
 
     if (output.MemoData !== undefined) {
@@ -842,7 +832,7 @@ exports.STMemo = new SerializedType({
           // otherwise see if we can parse text
           output.parsed_memo_data = convertHexToString(output.MemoData);
         }
-        /*eslint-disable no-empty*/
+        /* eslint-disable no-empty */
       } catch(e) {
         // empty
         // we'll fail in case the content does not match what the MemoFormat
@@ -850,7 +840,7 @@ exports.STMemo = new SerializedType({
         // this is fine, we won't add the parsed_memo_data, the user has to
         // parse themselves
       }
-      /*eslint-enable no-empty*/
+      /* eslint-enable no-empty */
     }
 
     so.read(1);

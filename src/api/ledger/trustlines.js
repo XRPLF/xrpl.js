@@ -10,7 +10,8 @@ function currencyFilter(currency, trustline) {
 }
 
 function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
-    callback) {
+    callback
+) {
   const requestOptions = {
     account: address,
     ledger: ledgerVersion,
@@ -31,7 +32,8 @@ function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
 
 function getTrustlinesAsync(account: string, options: {currency: string,
     counterparty: string, limit: number, ledgerVersion: number},
-    callback: () => void): void {
+    callback: () => void
+): void {
   validate.address(account);
   validate.getTrustlinesOptions(options);
 
@@ -43,7 +45,7 @@ function getTrustlinesAsync(account: string, options: {currency: string,
 }
 
 function getTrustlines(account: string, options={}) {
-  return utils.promisify(getTrustlinesAsync.bind(this))(account, options);
+  return utils.promisify(getTrustlinesAsync).call(this, account, options);
 }
 
 module.exports = getTrustlines;

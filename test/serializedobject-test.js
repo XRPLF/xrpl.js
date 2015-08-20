@@ -6,11 +6,11 @@ const assert = require('assert');
 const lodash = require('lodash');
 const SerializedObject = require('ripple-lib').SerializedObject;
 const Amount = require('ripple-lib').Amount;
-const sjcl = require('ripple-lib').sjcl;
+const sjclcodec = require('sjcl-codec');
 
 // Shortcuts
-const hex = sjcl.codec.hex;
-const utf8 = sjcl.codec.utf8String;
+const hex = sjclcodec.hex;
+const utf8 = sjclcodec.utf8String;
 
 describe('Serialized object', function() {
 
@@ -20,7 +20,7 @@ describe('Serialized object', function() {
 
   describe('#from_json(v).to_json() == v', function() {
     it('outputs same as passed to from_json', function() {
-      let input_json = {
+      const input_json = {
         Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
         Amount: '274579388',
         Destination: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
@@ -50,14 +50,14 @@ describe('Serialized object', function() {
         TransactionType: 'Payment',
         TxnSignature: '30450221009DA3A42DD25E3B22EC45AD8BA8FC7A954264264A816D300B2DF69F814D7D4DD2022072C9627F97EEC6DA13DE841E06E2CD985EF06A0FBB15DDBF0800D0730C8986BF'
       };
-      let output_json = SerializedObject.from_json(input_json).to_json();
+      const output_json = SerializedObject.from_json(input_json).to_json();
       assert.deepEqual(input_json, output_json);
     });
   });
 
   describe('#from_json(v).to_json() == v -- invalid amount', function() {
     it('outputs same as passed to from_json', function() {
-      let input_json = {
+      const input_json = {
         Account: 'rUR9gTCcrUY9fMkz9rwcM9urPREh3LKXoW',
         Fee: '10',
         Flags: 0,
@@ -81,7 +81,7 @@ describe('Serialized object', function() {
 
   describe('#from_json(v).to_json() == v -- invalid amount, strict_mode = false', function() {
     it('outputs same as passed to from_json', function() {
-      let input_json = {
+      const input_json = {
         Account: 'rUR9gTCcrUY9fMkz9rwcM9urPREh3LKXoW',
         Fee: '10',
         Flags: 0,
@@ -97,9 +97,9 @@ describe('Serialized object', function() {
         TxnSignature: 'FFFFFF210085C6AE945643150E6D450CF796E45D74FB24B4E03E964A29CC6AFFEB346C77C80221009BE1B6678CF6C2E61F8F2696144C75AFAF66DF4FC0733DF9118EDEFEEFE33243'
       };
 
-      let strictMode = Amount.strict_mode;
+      const strictMode = Amount.strict_mode;
       Amount.strict_mode = false;
-      let output_json = SerializedObject.from_json(input_json).to_json();
+      const output_json = SerializedObject.from_json(input_json).to_json();
       assert.deepEqual(input_json, output_json);
       Amount.strict_mode = strictMode;
     });
@@ -107,7 +107,7 @@ describe('Serialized object', function() {
 
   describe('#from_json', function() {
     it('understands TransactionType as a Number', function() {
-      let input_json = {
+      const input_json = {
         // no non required fields
         Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
         Amount: '274579388',
@@ -117,14 +117,14 @@ describe('Serialized object', function() {
         SigningPubKey: '02',// VL field ;)
         TransactionType: 0 //
       };
-      let output_json = SerializedObject.from_json(input_json).to_json();
+      const output_json = SerializedObject.from_json(input_json).to_json();
 
       assert.equal(0, input_json.TransactionType);
       assert.equal('Payment', output_json.TransactionType);
     });
 
     it('understands LedgerEntryType as a Number', function() {
-      let input_json = {
+      const input_json = {
         // no, non required fields
         LedgerEntryType: 100,
         Flags: 0,
@@ -132,13 +132,13 @@ describe('Serialized object', function() {
         RootIndex: '000360186E008422E06B72D5B275E29EE3BE9D87A370F424E0E7BF613C465909'
       };
 
-      let output_json = SerializedObject.from_json(input_json).to_json();
+      const output_json = SerializedObject.from_json(input_json).to_json();
       assert.equal(100, input_json.LedgerEntryType);
       assert.equal('DirectoryNode', output_json.LedgerEntryType);
     });
 
     it('checks for missing required fields', function() {
-      let input_json = {
+      const input_json = {
         TransactionType: 'Payment',
         // no non required fields
         Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
@@ -150,7 +150,7 @@ describe('Serialized object', function() {
       };
 
       Object.keys(input_json).slice(1).forEach(function(k) {
-        let bad_json = lodash.merge({}, input_json);
+        const bad_json = lodash.merge({}, input_json);
         delete bad_json[k];
 
         assert.strictEqual(bad_json[k], undefined);
@@ -161,7 +161,7 @@ describe('Serialized object', function() {
       });
     });
     it('checks for unknown fields', function() {
-      let input_json = {
+      const input_json = {
         TransactionType: 'Payment',
         // no non required fields
         Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
@@ -173,7 +173,7 @@ describe('Serialized object', function() {
       };
 
       Object.keys(input_json).slice(1).forEach(function(k) {
-        let bad_json = lodash.merge({}, input_json);
+        const bad_json = lodash.merge({}, input_json);
         bad_json[k + 'z'] = bad_json[k];
 
         assert.throws(function() {
@@ -187,7 +187,7 @@ describe('Serialized object', function() {
       // Peercover actually had a problem submitting transactions without a `Fee`
       // and rippled was only informing of 'transaction is invalid'
       it('should throw an Error when there is a missing field', function() {
-        let input_json = {
+        const input_json = {
           Account: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
           Amount: '274579388',
           Destination: 'r4qLSAzv4LZ9TLsR7diphGwKnSEAMQTSjS',
@@ -234,7 +234,7 @@ describe('Serialized object', function() {
           }
         ];
 
-        let so = SerializedObject.from_json(input_json).to_json();
+        const so = SerializedObject.from_json(input_json).to_json();
         input_json.Memos[0].Memo.parsed_memo_type = 'test';
         input_json.Memos[0].Memo.parsed_memo_format = 'text';
         input_json.Memos[0].Memo.parsed_memo_data = 'some data';
@@ -257,7 +257,7 @@ describe('Serialized object', function() {
           }
         ];
 
-        let so = SerializedObject.from_json(input_json).to_json();
+        const so = SerializedObject.from_json(input_json).to_json();
         input_json.Memos[0].Memo.parsed_memo_type = 'test';
         input_json.Memos[0].Memo.parsed_memo_format = 'application/json';
         input_json.Memos[0].Memo.MemoType = convertStringToHex('test');
@@ -280,7 +280,7 @@ describe('Serialized object', function() {
           }
         ];
 
-        let so = SerializedObject.from_json(input_json).to_json();
+        const so = SerializedObject.from_json(input_json).to_json();
         delete input_json.Memos[0].Memo.ignored;
         input_json.Memos[0].Memo.parsed_memo_type = 'test';
         input_json.Memos[0].Memo.parsed_memo_format = 'json';
@@ -338,7 +338,7 @@ describe('Serialized object', function() {
           TxnSignature: '304402206B53EDFA6EFCF6FE5BA76C81BABB60A3B55E9DE8A1462DEDC5F387879575E498022015AE7B59AA49E735D7F2E252802C4406CD00689BCE5057C477FE979D38D2DAC9'
         };
 
-        let serializedHex = '12000022800000002400000126201B009EC2FF614000000000000001684000000000002EE0732103D642E6457B8AB4D140E2C66EB4C484FAFB1BF267CB578EC4815FE6CD06379C517446304402206B53EDFA6EFCF6FE5BA76C81BABB60A3B55E9DE8A1462DEDC5F387879575E498022015AE7B59AA49E735D7F2E252802C4406CD00689BCE5057C477FE979D38D2DAC9811426C4CFB3BD05A9AA23936F2E81634C66A9820C9483143DD06317D19C6110CAFF150AE528F58843BE2CA1F9EA7C05696D616765E1F1';
+        const serializedHex = '12000022800000002400000126201B009EC2FF614000000000000001684000000000002EE0732103D642E6457B8AB4D140E2C66EB4C484FAFB1BF267CB578EC4815FE6CD06379C517446304402206B53EDFA6EFCF6FE5BA76C81BABB60A3B55E9DE8A1462DEDC5F387879575E498022015AE7B59AA49E735D7F2E252802C4406CD00689BCE5057C477FE979D38D2DAC9811426C4CFB3BD05A9AA23936F2E81634C66A9820C9483143DD06317D19C6110CAFF150AE528F58843BE2CA1F9EA7C05696D616765E1F1';
         assert.strictEqual(SerializedObject.from_json(input_json).to_hex(), serializedHex);
 
       });

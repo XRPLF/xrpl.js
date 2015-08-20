@@ -5,6 +5,7 @@ const BigNumber = require('bignumber.js');
 const core = require('../../core');
 const errors = require('./errors');
 const es6promisify = require('es6-promisify');
+const keypairs = require('ripple-keypairs');
 
 type Amount = {currency: string, issuer: string, value: string}
 
@@ -25,6 +26,11 @@ function toRippledAmount(amount: Amount): string|Amount {
     issuer: amount.counterparty ? amount.counterparty : amount.issuer,
     value: amount.value
   };
+}
+
+function generateAddress(options?: Object): Object {
+  const {accountID, seed} = keypairs.generateWallet(options);
+  return {secret: seed, address: accountID};
 }
 
 type AsyncFunction = (...x: any) => void
@@ -86,7 +92,7 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
   return obj;
 }
 
-function promisify<T>(asyncFunction: AsyncFunction): Function {
+function promisify(asyncFunction: AsyncFunction): Function {
   return es6promisify(wrapCatch(asyncFunction));
 }
 
@@ -95,6 +101,7 @@ module.exports = {
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,
+  generateAddress,
   composeAsync,
   wrapCatch,
   convertExceptions,

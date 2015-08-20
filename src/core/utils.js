@@ -77,7 +77,7 @@ function hexToArray(h) {
 
 function arrayToHex(a) {
   return a.map(function(byteValue) {
-    const hex = byteValue.toString(16);
+    const hex = byteValue.toString(16).toUpperCase();
     return hex.length > 1 ? hex : '0' + hex;
   }).join('');
 }
@@ -165,7 +165,5 @@ exports.toTimestamp = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
 exports.getMantissa16FromString = getMantissa16FromString;
-
-exports.sjcl = require('sjcl-extended');
 
 // vim:sw=2:sts=2:ts=8:et

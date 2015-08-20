@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "order-change",
+  "title": "orderChange",
   "type": "object",
   "properties": {
     "direction": {

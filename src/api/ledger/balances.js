@@ -25,7 +25,7 @@ function formatBalances(balances) {
 }
 
 function getTrustlinesAsync(account, options, callback) {
-  getTrustlines.bind(this)(account, options)
+  getTrustlines.call(this, account, options)
     .then(data => callback(null, data))
     .catch(callback);
 }
@@ -43,7 +43,7 @@ function getBalancesAsync(account, options, callback) {
 }
 
 function getBalances(account: string, options={}) {
-  return utils.promisify(getBalancesAsync.bind(this))(account, options);
+  return utils.promisify(getBalancesAsync).call(this, account, options);
 }
 
 module.exports = getBalances;

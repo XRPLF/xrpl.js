@@ -935,11 +935,10 @@ describe('Remote', function() {
       remote.feeTxUnit(10).to_json();
     });
   });
-  it('Get reserve', function() {
+  it('reserve() before reserve rate known', function() {
     remote._connected = true;
     remote._servers[0]._connected = true;
-    assert.strictEqual(remote.reserve(1).to_json(), 'NaN');
-    remote._servers = [];
+    // Throws because the server has not had reserve_inc, reserve_base set
     assert.throws(function() {
       remote.reserve(10).to_json();
     });

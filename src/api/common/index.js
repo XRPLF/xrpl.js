@@ -9,10 +9,12 @@ module.exports = {
   dropsToXrp: utils.dropsToXrp,
   xrpToDrops: utils.xrpToDrops,
   toRippledAmount: utils.toRippledAmount,
+  generateAddress: utils.generateAddress,
   composeAsync: utils.composeAsync,
   wrapCatch: utils.wrapCatch,
   convertExceptions: utils.convertExceptions,
   convertKeysFromSnakeCaseToCamelCase:
     utils.convertKeysFromSnakeCaseToCamelCase,
-  promisify: utils.promisify
+  promisify: utils.promisify,
+  isValidAddress: require('./schema-validator').isValidAddress
 };

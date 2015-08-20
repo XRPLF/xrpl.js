@@ -30,7 +30,7 @@ function getSettingsAsync(account, options, callback) {
 
   const request = {
     account: account,
-    ledger: options.ledgerVersion
+    ledger: options.ledgerVersion || 'validated'
   };
 
   this.remote.requestAccountInfo(request,
@@ -38,7 +38,7 @@ function getSettingsAsync(account, options, callback) {
 }
 
 function getSettings(account: string, options={}) {
-  return utils.promisify(getSettingsAsync.bind(this))(account, options);
+  return utils.promisify(getSettingsAsync).call(this, account, options);
 }
 
 module.exports = getSettings;

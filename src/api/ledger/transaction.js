@@ -8,7 +8,15 @@ const validate = utils.common.validate;
 const errors = utils.common.errors;
 const RippleError = require('../../core/rippleerror').RippleError;
 
-function attachTransactionDate(remote, tx, callback) {
+import type {Remote} from '../../core/remote';
+
+import type {CallbackType, GetTransactionResponse,
+  GetTransactionResponseCallback, TransactionOptions}
+  from './transaction-types';
+
+function attachTransactionDate(remote: Remote, tx: Object,
+                              callback: CallbackType
+) {
   if (tx.date) {
     callback(null, tx);
     return;
@@ -29,22 +37,24 @@ function attachTransactionDate(remote, tx, callback) {
   });
 }
 
-function isTransactionInRange(tx, options) {
+function isTransactionInRange(tx: Object, options: TransactionOptions) {
   return (!options.minLedgerVersion
           || tx.ledger_index >= options.minLedgerVersion)
       && (!options.maxLedgerVersion
           || tx.ledger_index <= options.maxLedgerVersion);
 }
 
-function getTransactionAsync(identifier, options, callback) {
+function getTransactionAsync(identifier: string, options: TransactionOptions,
+                             callback: GetTransactionResponseCallback
+) {
   validate.identifier(identifier);
   validate.getTransactionOptions(options);
 
   const remote = this.remote;
-  const maxLedgerVersion = Math.min(options.maxLedgerVersion,
+  const maxLedgerVersion = Math.min(options.maxLedgerVersion || Infinity,
     remote.getLedgerSequence());
 
-  function callbackWrapper(error_, tx) {
+  function callbackWrapper(error_?: Error, tx?: Object) {
     let error = error_;
     if (error instanceof RippleError && error.remote &&
       error.remote.error === 'txnNotFound') {
@@ -56,23 +66,28 @@ function getTransactionAsync(identifier, options, callback) {
             options.minLedgerVersion, maxLedgerVersion)) {
       callback(new errors.MissingLedgerHistoryError('Transaction not found,'
         + ' but the server\'s ledger history is incomplete'));
-    } else if (!error && !isTransactionInRange(tx, options)) {
+    } else if (!error && tx && !isTransactionInRange(tx, options)) {
       callback(new errors.NotFoundError('Transaction not found'));
     } else if (error) {
       callback(error);
+    } else if (!tx) {
+      callback(new Error('Internal error'));
     } else {
       callback(error, parseTransaction(tx));
     }
   }
 
   async.waterfall([
-    _.partial(remote.requestTx.bind(remote), {hash: identifier, binary: false}),
+    _.partial(remote.requestTx.bind(remote),
+      {hash: identifier, binary: false}),
     _.partial(attachTransactionDate, remote)
   ], callbackWrapper);
 }
 
-function getTransaction(identifier: string, options={}) {
-  return utils.promisify(getTransactionAsync.bind(this))(identifier, options);
+function getTransaction(identifier: string,
+                        options: TransactionOptions={}
+): Promise<GetTransactionResponse> {
+  return utils.promisify(getTransactionAsync).call(this, identifier, options);
 }
 
 module.exports = getTransaction;

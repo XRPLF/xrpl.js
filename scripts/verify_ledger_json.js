@@ -2,12 +2,13 @@
 'use strict';
 
 var fs = require('fs');
-var Amount = require('../dist/npm').Amount;
-var Ledger = require('../dist/npm').Ledger;
+var ripple = require('../dist/npm')._DEPRECATED;
+var Amount = ripple.Amount;
+var Ledger = ripple.Ledger;
 
 function parse_options(from, flags) {
-  var argv = from.slice(),
-      opts_ = {argv: argv};
+  var argv = from.slice();
+  var opts_ = {argv: argv};
 
   flags.forEach(function(f) {
     // Do we have the flag?

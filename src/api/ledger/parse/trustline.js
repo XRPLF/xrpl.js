@@ -15,8 +15,11 @@ function parseFlag(flagsValue, trueValue, falseValue) {
   return undefined;
 }
 
-function parseQuality(quality) {
-  return (new BigNumber(quality)).shift(-9).toNumber();
+function parseQuality(quality?: number) {
+  if (typeof quality === 'number') {
+    return (new BigNumber(quality)).shift(-9).toNumber();
+  }
+  return undefined;
 }
 
 function parseTrustline(tx: Object): Object {
