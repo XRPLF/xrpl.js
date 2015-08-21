@@ -180,16 +180,40 @@ function wrapRemote(Remote) {
       positionals: ['account', 'issuer', 'currency', 'ledger']
     },
     {
-      staticMethod: true,
-      method: 'accountRequest',
-      command: 'accountrequest(*)',
-      positionals: ['*', 'account', 'ledger', 'peer', 'limit', 'marker']
+      method: 'requestAccountInfo',
+      command: 'account_info',
+      positionals: ['account', 'ledger', 'peer', 'limit', 'marker']
     },
     {
-      staticMethod: true,
-      method: 'accountRootRequest',
-      command: 'accountRootRequest(*)',
-      positionals: ['*', '*', 'account', 'ledger']
+      method: 'requestAccountCurrencies',
+      command: 'account_currencies',
+      positionals: ['account', 'ledger', 'peer', 'limit', 'marker']
+    },
+    {
+      method: 'requestAccountLines',
+      command: 'account_lines',
+      positionals: ['account', 'peer', 'ledger', 'limit', 'marker']
+    },
+    {
+      method: 'requestAccountOffers',
+      command: 'account_offers',
+      positionals: ['account', 'ledger', 'peer', 'limit', 'marker']
+    },
+
+    {
+      method: 'requestAccountBalance',
+      command: 'account_balance',
+      positionals: ['account', 'ledger']
+    },
+    {
+      method: 'requestAccountFlags',
+      command: 'account_flags',
+      positionals: ['account', 'ledger']
+    },
+    {
+      method: 'requestOwnerCount',
+      command: 'owner_count',
+      positionals: ['account', 'ledger']
     }
   ];
 
