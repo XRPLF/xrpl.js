@@ -782,31 +782,6 @@ Remote.prototype.request = function(request) {
 };
 
 /**
- *  Create options object from positional function arguments
- *
- * @param {Array} params function parameters
- * @param {Array} args function arguments
- * @return {Object} keyed options
- */
-
-function makeOptions(command, params, args) {
-  const result = {};
-
-  log.warn(
-    'DEPRECATED: First argument to ' + command
-    + ' request constructor must be an object containing'
-    + ' request properties: '
-    + params.join(', ')
-  );
-
-  if (_.isFunction(_.last(args))) {
-    result.callback = args.pop();
-  }
-
-  return _.merge(result, _.zipObject(params, args));
-}
-
-/**
  * Request ping
  *
  * @param [String] server host
@@ -1126,22 +1101,9 @@ Remote.prototype.requestUnsubscribe = function(streams, callback) {
  * @return {Request} request
  */
 
-Remote.prototype.requestTransactionEntry = function(options_, callback_) {
+Remote.prototype.requestTransactionEntry = function(options, callback) {
   // If not trusted, need to check proof, maybe talk packet protocol.
   // utils.assert(this.trusted);
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, {
-      ledger: options_.ledger_index || options_.ledger_hash
-    }, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'transaction_entry',
-    ['hash', 'ledger'],
-    _.slice(arguments)));
-  }
-
   const request = new Request(this, 'transaction_entry');
   request.txHash(options.hash);
 
@@ -1157,8 +1119,7 @@ Remote.prototype.requestTransactionEntry = function(options_, callback_) {
       throw new Error('ledger must be a ledger index or hash');
   }
 
-  request.callback(options.callback);
-
+  request.callback(callback);
   return request;
 };
 
@@ -1173,20 +1134,7 @@ Remote.prototype.requestTransactionEntry = function(options_, callback_) {
  * @return {Request} request
  */
 
-Remote.prototype.requestTransaction =
-Remote.prototype.requestTx = function(options_, callback_) {
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'tx',
-      ['hash', 'binary'],
-      _.slice(arguments)
-    ));
-  }
-
+Remote.prototype.requestTransaction = function(options, callback) {
   const request = new Request(this, 'tx');
   request.message.binary = options.binary !== false;
   request.message.transaction = options.hash;
@@ -1199,7 +1147,7 @@ Remote.prototype.requestTx = function(options_, callback_) {
     }
   });
 
-  request.callback(options.callback, 'transaction');
+  request.callback(callback, 'transaction');
 
   return request;
 };
@@ -1226,20 +1174,7 @@ Remote.prototype.requestTx = function(options_, callback_) {
  * @throws {Error} if a marker is provided, but no ledger_index or ledger_hash
  */
 
-Remote.accountRequest = function(command, options_, callback_) {
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, options_);
-  } else {
-    _.merge(options, makeOptions(
-      command,
-      ['account', 'ledger', 'peer', 'limit', 'marker'],
-      _.slice(arguments, 1)));
-  }
-
-  // if a marker is given, we need a ledger
-  // check if a valid ledger_index or ledger_hash is provided
+Remote.accountRequest = function(command, options, callback) {
   if (options.marker) {
     if (!(Number(options.ledger) > 0) && !UInt256.is_valid(options.ledger)) {
       throw new Error(
@@ -1277,7 +1212,7 @@ Remote.accountRequest = function(command, options_, callback_) {
     request.message.marker = options.marker;
   }
 
-  request.callback(options.callback);
+  request.callback(callback);
 
   return request;
 };
@@ -1557,23 +1492,12 @@ Remote.parseBinaryLedgerData = function(ledgerData) {
  * @return {Request}
  */
 
-Remote.prototype.requestTransactionHistory =
-Remote.prototype.requestTxHistory = function(start_, callback_) {
+Remote.prototype.requestTransactionHistory = function(options, callback) {
   // XXX Does this require the server to be trusted?
   // utils.assert(this.trusted);
-
   const request = new Request(this, 'tx_history');
-  const options = {start: start_, callback: callback_};
-
-  if (_.isPlainObject(start_)) {
-    _.merge(options, start_);
-  } else {
-    _.merge(options, makeOptions(
-      'tx_history', ['start'], _.slice(arguments)));
-  }
-
   request.message.start = options.start;
-  request.callback(options.callback);
+  request.callback(callback);
 
   return request;
 };
@@ -1591,22 +1515,7 @@ Remote.prototype.requestTxHistory = function(start_, callback_) {
  * @return {Request}
  */
 
-Remote.prototype.requestBookOffers = function(options_, callback_) {
-  const options = {callback: callback_};
-
-  if (options_.gets || options_.taker_gets) {
-    _.merge(options, {
-      pays: options_.taker_pays,
-      gets: options_.taker_gets
-    }, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'book_offers',
-      ['gets', 'pays', 'taker', 'ledger', 'limit'],
-      _.slice(arguments)
-    ));
-  }
-
+Remote.prototype.requestBookOffers = function(options, callback) {
   const {gets, pays, taker, ledger, limit} = options;
   const request = new Request(this, 'book_offers');
 
@@ -1646,7 +1555,7 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
     request.message.limit = _limit;
   }
 
-  request.callback(options.callback);
+  request.callback(callback);
   return request;
 };
 
@@ -1658,24 +1567,11 @@ Remote.prototype.requestBookOffers = function(options_, callback_) {
  * @return {Request}
  */
 
-Remote.prototype.requestWalletAccounts = function(options_, callback_) {
+Remote.prototype.requestWalletAccounts = function(options, callback) {
   utils.assert(this.trusted); // Don't send secrets.
-
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'wallet_accounts',
-      ['seed'],
-      _.slice(arguments)
-    ));
-  }
-
   const request = new Request(this, 'wallet_accounts');
   request.message.seed = options.seed;
-  request.callback(options.callback);
+  request.callback(callback);
 
   return request;
 };
@@ -1689,25 +1585,13 @@ Remote.prototype.requestWalletAccounts = function(options_, callback_) {
  * @return {Request}
  */
 
-Remote.prototype.requestSign = function(options_, callback_) {
+Remote.prototype.requestSign = function(options, callback) {
   utils.assert(this.trusted); // Don't send secrets.
-
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'sign',
-      ['secret', 'tx_json'],
-      _.slice(arguments)
-    ));
-  }
 
   const request = new Request(this, 'sign');
   request.message.secret = options.secret;
   request.message.tx_json = options.tx_json;
-  request.callback(options.callback);
+  request.callback(callback);
 
   return request;
 };
@@ -1806,18 +1690,7 @@ Remote.prototype.requestLedgerAccept = function(callback) {
  * @api private
  */
 
-Remote.accountRootRequest = function(command, filter, options_, callback_) {
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, options_);
-  } else {
-    _.merge(options, makeOptions(
-      command,
-      ['account', 'ledger'],
-      _.slice(arguments, 2)));
-  }
-
+Remote.accountRootRequest = function(command, filter, options, callback) {
   const request = this.requestLedgerEntry('account_root');
   request.accountRoot(options.account);
   request.selectLedger(options.ledger);
@@ -1826,7 +1699,7 @@ Remote.accountRootRequest = function(command, filter, options_, callback_) {
     request.emit(command, filter(message));
   });
 
-  request.callback(options.callback, command);
+  request.callback(callback, command);
 
   return request;
 };
@@ -1931,26 +1804,14 @@ Remote.prototype.findAccount = function(accountID) {
 /**
  * Create a pathfind
  *
- * @param {Object} options
- * @return {PathFind}
+ * @param {Object} options -
+ * @param {Function} callback -
+ * @return {PathFind} -
  */
-
-function createPathFind(options_, callback) {
-  const options = {};
-
+Remote.prototype.createPathFind = function(options, callback) {
   if (this._cur_path_find !== null) {
-    this._queued_path_finds.push({options: options_, callback: callback});
+    this._queued_path_finds.push({options, callback});
     return null;
-  }
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'pathfind',
-      ['src_account', 'dst_account', 'dst_amount', 'src_currencies'],
-      _.slice(arguments)
-    ));
   }
 
   const pathFind = new PathFind(this,
@@ -1977,9 +1838,7 @@ function createPathFind(options_, callback) {
   this._cur_path_find = pathFind;
   pathFind.create();
   return pathFind;
-}
-
-Remote.prototype.pathFind = Remote.prototype.createPathFind = createPathFind;
+};
 
 Remote.prepareTrade = function(currency, issuer) {
   const suffix = Currency.from_json(currency).is_native() ? '' : ('/' + issuer);
@@ -1994,19 +1853,7 @@ Remote.prepareTrade = function(currency, issuer) {
  * @return {OrderBook}
  */
 
-Remote.prototype.book = Remote.prototype.createOrderBook = function(options_) {
-  const options = {};
-
-  if (arguments.length === 1) {
-    _.merge(options, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'orderbook',
-      ['currency_gets', 'issuer_gets', 'currency_pays', 'issuer_pays'],
-      _.slice(arguments)
-    ));
-  }
-
+Remote.prototype.book = Remote.prototype.createOrderBook = function(options) {
   const gets = Remote.prepareTrade(options.currency_gets, options.issuer_gets);
   const pays = Remote.prepareTrade(options.currency_pays, options.issuer_pays);
   const key = gets + ':' + pays;
@@ -2079,18 +1926,7 @@ Remote.prototype.setAccountSeq = function(account_, sequence) {
  * @return {Request}
  */
 
-Remote.prototype.accountSeqCache = function(options_, callback_) {
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'accountseqcache',
-      ['account', 'ledger']
-    ));
-  }
-
+Remote.prototype.accountSeqCache = function(options, callback) {
   if (!this.accounts.hasOwnProperty(options.account)) {
     this.accounts[options.account] = { };
   }
@@ -2127,7 +1963,7 @@ Remote.prototype.accountSeqCache = function(options_, callback_) {
     account_info.caching_seq_request = request;
   }
 
-  request.callback(options.callback, 'success_cache', 'error_cache');
+  request.callback(callback, 'success_cache', 'error_cache');
 
   return request;
 };
@@ -2192,20 +2028,7 @@ Remote.prototype.requestOffer = function(options, callback) {
  * @return {Request}
  */
 
-Remote.prototype.requestRippleBalance = function(options_, callback_) {
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'ripplebalance',
-      ['account', 'issuer', 'currency', 'ledger'],
-      _.slice(arguments)
-    ));
-
-  }
-
+Remote.prototype.requestRippleBalance = function(options, callback) {
   // YYY Could be cached per ledger.
   const request = this.requestLedgerEntry('ripple_state');
   request.rippleState(options.account, options.issuer, options.currency);
@@ -2256,7 +2079,7 @@ Remote.prototype.requestRippleBalance = function(options_, callback_) {
   }
 
   request.once('success', rippleState);
-  request.callback(options.callback, 'ripple_state');
+  request.callback(callback, 'ripple_state');
 
   return request;
 };
@@ -2285,26 +2108,7 @@ Remote.prepareCurrencies = function(currency) {
  * @return {Request}
  */
 
-Remote.prototype.requestRipplePathFind = function(options_, callback_) {
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, {
-      source_account: options_.src_account,
-      destination_account: options_.dst_account,
-      destination_amount: options_.dst_amount,
-      source_currencies: options_.src_currencies
-    }, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'ripple_path_find',
-      /* eslint-disable max-len */
-      ['source_account', 'destination_account', 'destination_amount', 'source_currencies'],
-      /* eslint-enable max-len */
-      _.slice(arguments)
-    ));
-  }
-
+Remote.prototype.requestRipplePathFind = function(options, callback) {
   const request = new Request(this, 'ripple_path_find');
 
   request.message.source_account = UInt160.json_rewrite(options.source_account);
@@ -2320,7 +2124,7 @@ Remote.prototype.requestRipplePathFind = function(options_, callback_) {
       options.source_currencies.map(Remote.prepareCurrency);
   }
 
-  request.callback(options.callback);
+  request.callback(callback);
 
   return request;
 };
@@ -2333,26 +2137,7 @@ Remote.prototype.requestRipplePathFind = function(options_, callback_) {
  * @return {Request}
  */
 
-Remote.prototype.requestPathFindCreate = function(options_, callback_) {
-  const options = {callback: callback_};
-
-  if (_.isPlainObject(options_)) {
-    _.merge(options, {
-      source_account: options_.src_account,
-      destination_account: options_.dst_account,
-      destination_amount: options_.dst_amount,
-      source_currencies: options_.src_currencies
-    }, options_);
-  } else {
-    _.merge(options, makeOptions(
-      'path_find',
-      /* eslint-disable max-len */
-      ['source_account', 'destination_account', 'destination_amount', 'source_currencies'],
-      /* eslint-enable max-len */
-      _.slice(arguments)
-    ));
-  }
-
+Remote.prototype.requestPathFindCreate = function(options, callback) {
   const request = new Request(this, 'path_find');
   request.message.subcommand = 'create';
 
@@ -2369,8 +2154,7 @@ Remote.prototype.requestPathFindCreate = function(options_, callback_) {
       options.source_currencies.map(Remote.prepareCurrency);
   }
 
-  request.callback(options.callback);
-
+  request.callback(callback);
   return request;
 };
 
