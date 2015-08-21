@@ -49,6 +49,14 @@ function Server(remote, opts_) {
       'Server host is malformed, use "host" and "port" server configuration');
   }
 
+  if (typeof opts.secure !== 'boolean') {
+    opts.secure = true;
+  }
+
+  if (!Boolean(opts.port)) {
+    opts.port = opts.secure ? 443 : 80;
+  }
+
   // We want to allow integer strings as valid port numbers for backward
   // compatibility
   opts.port = Number(opts.port);
@@ -58,10 +66,6 @@ function Server(remote, opts_) {
 
   if (opts.port < 1 || opts.port > 65535) {
     throw new TypeError('Server "port" must be an integer in range 1-65535');
-  }
-
-  if (typeof opts.secure !== 'boolean') {
-    opts.secure = true;
   }
 
   this._remote = remote;
@@ -126,7 +130,9 @@ function Server(remote, opts_) {
     self._updateScore('ledgerclose', ledger);
   });
 
+/* eslint-disable no-unused-vars */
   this.on('response_ping', function onPingResponse(message, request) {
+/* eslint-enable no-unused-vars */
     self._updateScore('response', request);
   });
 

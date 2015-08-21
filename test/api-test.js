@@ -818,4 +818,9 @@ describe('RippleAPI - offline', function() {
     assert(!api.isValidAddress(hex));
   });
 
+/* eslint-disable no-unused-vars */
+  it('RippleAPI - implicit server port', function() {
+    const api = new RippleAPI({servers: ['wss://s1.ripple.com']});
+  });
+/* eslint-enable no-unused-vars */
 });
