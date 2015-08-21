@@ -1095,30 +1095,17 @@ Remote.prototype.requestUnsubscribe = function(streams, callback) {
 /**
  * Request transaction_entry
  *
- * @param {String} transaction hash
- * @param {String|Number} ledger hash or sequence
+ * @param {Object} options -
+ * @param {String} [options.transaction] -  hash
+ * @param {String|Number} [options.ledger='validated'] - hash or sequence
  * @param [Function] callback
  * @return {Request} request
  */
 
 Remote.prototype.requestTransactionEntry = function(options, callback) {
-  // If not trusted, need to check proof, maybe talk packet protocol.
-  // utils.assert(this.trusted);
   const request = new Request(this, 'transaction_entry');
   request.txHash(options.hash);
-
-  switch (typeof options.ledger) {
-    case 'string':
-    case 'number':
-      request.selectLedger(options.ledger);
-      break;
-    case 'undefined':
-      request.ledgerIndex('validated');
-      break;
-    default:
-      throw new Error('ledger must be a ledger index or hash');
-  }
-
+  request.selectLedger(options.ledger, 'validated');
   request.callback(callback);
   return request;
 };
