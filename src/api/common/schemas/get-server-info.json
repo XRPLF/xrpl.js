@@ -10,7 +10,7 @@
     "load": {
       "type": "object",
       "properties": {
-        "job_types": {
+        "jobTypes": {
           "type": "array",
           "items": {"type": "object"}
         },
