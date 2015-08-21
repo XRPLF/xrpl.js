@@ -77,13 +77,13 @@ ApiError.prototype = new RippleError();
 ApiError.prototype.name = 'ApiError';
 
 module.exports = {
-  ValidationError: ValidationError,
-  NetworkError: NetworkError,
-  TransactionError: TransactionError,
-  RippledNetworkError: RippledNetworkError,
-  NotFoundError: NotFoundError,
-  MissingLedgerHistoryError: MissingLedgerHistoryError,
-  TimeOutError: TimeOutError,
-  ApiError: ApiError,
-  RippleError: RippleError
+  ValidationError,
+  NetworkError,
+  TransactionError,
+  RippledNetworkError,
+  NotFoundError,
+  MissingLedgerHistoryError,
+  TimeOutError,
+  ApiError,
+  RippleError
 };

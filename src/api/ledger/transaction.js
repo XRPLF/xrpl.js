@@ -6,6 +6,7 @@ const utils = require('./utils');
 const parseTransaction = require('./parse/transaction');
 const validate = utils.common.validate;
 const errors = utils.common.errors;
+const convertErrors = utils.common.convertErrors;
 const RippleError = require('../../core/rippleerror').RippleError;
 
 import type {Remote} from '../../core/remote';
@@ -69,9 +70,9 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
     } else if (!error && tx && !isTransactionInRange(tx, options)) {
       callback(new errors.NotFoundError('Transaction not found'));
     } else if (error) {
-      callback(error);
+      convertErrors(callback)(error);
     } else if (!tx) {
-      callback(new Error('Internal error'));
+      callback(new errors.ApiError('Internal error'));
     } else {
       callback(error, parseTransaction(tx));
     }
@@ -85,7 +86,7 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
 }
 
 function getTransaction(identifier: string,
-                        options: TransactionOptions={}
+                        options: TransactionOptions = {}
 ): Promise<GetTransactionResponse> {
   return utils.promisify(getTransactionAsync).call(this, identifier, options);
 }

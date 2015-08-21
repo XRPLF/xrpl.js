@@ -5,6 +5,7 @@ const utils = require('./utils');
 const removeUndefined = require('./parse/utils').removeUndefined;
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
+const convertErrors = utils.common.convertErrors;
 
 type AccountData = {
   Sequence: number,
@@ -66,10 +67,10 @@ function getAccountInfoAsync(account: string, options: AccountInfoOptions,
   };
 
   this.remote.requestAccountInfo(request,
-    composeAsync(formatAccountInfo, callback));
+    composeAsync(formatAccountInfo, convertErrors(callback)));
 }
 
-function getAccountInfo(account: string, options: AccountInfoOptions={}
+function getAccountInfo(account: string, options: AccountInfoOptions = {}
 ): Promise<AccountInfoResponse> {
   return utils.promisify(getAccountInfoAsync).call(this, account, options);
 }

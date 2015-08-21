@@ -18,7 +18,7 @@ function isBTC(json) {
   return json === 'BTC' || json === '0000000000000000000000004254430000000000';
 }
 
-function createResponse(request, response, overrides={}) {
+function createResponse(request, response, overrides = {}) {
   const result = _.assign({}, response.result, overrides);
   const change = response.result && !_.isEmpty(overrides) ?
     {id: request.id, result: result} : {id: request.id};
@@ -253,7 +253,9 @@ module.exports = function(port) {
     if (request.subcommand === 'close') {
       return;
     }
-    if (request.source_account === addresses.OTHER_ACCOUNT) {
+    if (request.source_account === addresses.NOTFOUND) {
+      response = createResponse(request, fixtures.path_find.srcActNotFound);
+    } else if (request.source_account === addresses.OTHER_ACCOUNT) {
       response = createResponse(request, fixtures.path_find.sendUSD);
     } else if (request.source_account === addresses.THIRD_ACCOUNT) {
       response = createResponse(request, fixtures.path_find.XrpToXrp, {

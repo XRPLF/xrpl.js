@@ -7,6 +7,7 @@ const parseTransaction = require('./parse/transaction');
 const getTransaction = require('./transaction');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
+const convertErrors = utils.common.convertErrors;
 
 function parseAccountTxTransaction(tx) {
   // rippled uses a different response format for 'account_tx' than 'tx'
@@ -55,6 +56,17 @@ function orderFilter(options, tx) {
     utils.compareTransactions(tx, options.startTx) < 0);
 }
 
+function formatPartialResponse(address, options, data) {
+  return {
+    marker: data.marker,
+    results: data.transactions
+      .filter((tx) => tx.validated)
+      .map(parseAccountTxTransaction)
+      .filter(_.partial(transactionFilter, address, options))
+      .filter(_.partial(orderFilter, options))
+  };
+}
+
 function getAccountTx(remote, address, options, marker, limit, callback) {
   const params = {
     account: address,
@@ -66,16 +78,9 @@ function getAccountTx(remote, address, options, marker, limit, callback) {
     marker: marker
   };
 
-  remote.requestAccountTx(params, (error, data) => {
-    return error ? callback(error) : callback(null, {
-      marker: data.marker,
-      results: data.transactions
-        .filter((tx) => tx.validated)
-        .map(parseAccountTxTransaction)
-        .filter(_.partial(transactionFilter, address, options))
-        .filter(_.partial(orderFilter, options))
-    });
-  });
+  remote.requestAccountTx(params,
+    composeAsync(_.partial(formatPartialResponse, address, options),
+      convertErrors(callback)));
 }
 
 function checkForLedgerGaps(remote, options, transactions) {
@@ -131,7 +136,7 @@ function getTransactionsAsync(account, options, callback) {
   }
 }
 
-function getTransactions(account: string, options={}) {
+function getTransactions(account: string, options = {}) {
   return utils.promisify(getTransactionsAsync).call(this, account, options);
 }
 

@@ -3,10 +3,20 @@
 const _ = require('lodash');
 const utils = require('./utils');
 const validate = utils.common.validate;
+const composeAsync = utils.common.composeAsync;
+const convertErrors = utils.common.convertErrors;
 const parseAccountTrustline = require('./parse/account-trustline');
 
 function currencyFilter(currency, trustline) {
   return currency === null || trustline.specification.currency === currency;
+}
+
+function formatResponse(options, data) {
+  return {
+    marker: data.marker,
+    results: data.lines.map(parseAccountTrustline)
+      .filter(_.partial(currencyFilter, options.currency || null))
+  };
 }
 
 function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
@@ -20,14 +30,9 @@ function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
     peer: options.counterparty
   };
 
-  remote.requestAccountLines(requestOptions, (error, data) => {
-    return error ? callback(error) :
-      callback(null, {
-        marker: data.marker,
-        results: data.lines.map(parseAccountTrustline)
-          .filter(_.partial(currencyFilter, options.currency || null))
-      });
-  });
+  remote.requestAccountLines(requestOptions,
+    composeAsync(_.partial(formatResponse, options),
+      convertErrors(callback)));
 }
 
 function getTrustlinesAsync(account: string, options: {currency: string,
@@ -44,7 +49,7 @@ function getTrustlinesAsync(account: string, options: {currency: string,
   utils.getRecursive(getter, options.limit, callback);
 }
 
-function getTrustlines(account: string, options={}) {
+function getTrustlines(account: string, options = {}) {
   return utils.promisify(getTrustlinesAsync).call(this, account, options);
 }
 

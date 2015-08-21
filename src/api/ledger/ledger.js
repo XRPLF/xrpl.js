@@ -3,6 +3,7 @@
 const utils = require('./utils');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
+const convertErrors = utils.common.convertErrors;
 const parseLedger = require('./parse/ledger');
 
 function getLedgerAsync(options, callback) {
@@ -16,10 +17,11 @@ function getLedgerAsync(options, callback) {
   };
 
   this.remote.requestLedger(request,
-    composeAsync(response => parseLedger(response.ledger), callback));
+    composeAsync(response => parseLedger(response.ledger),
+    convertErrors(callback)));
 }
 
-function getLedger(options={}) {
+function getLedger(options = {}) {
   return utils.promisify(getLedgerAsync).call(this, options);
 }
 

@@ -6,6 +6,7 @@ const validate = utils.common.validate;
 const parseFields = require('./parse/fields');
 const composeAsync = utils.common.composeAsync;
 const AccountFlags = utils.common.constants.AccountFlags;
+const convertErrors = utils.common.convertErrors;
 
 function parseFlags(value) {
   const settings = {};
@@ -34,10 +35,10 @@ function getSettingsAsync(account, options, callback) {
   };
 
   this.remote.requestAccountInfo(request,
-    composeAsync(formatSettings, callback));
+    composeAsync(formatSettings, convertErrors(callback)));
 }
 
-function getSettings(account: string, options={}) {
+function getSettings(account: string, options = {}) {
   return utils.promisify(getSettingsAsync).call(this, account, options);
 }
 

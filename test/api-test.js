@@ -391,7 +391,7 @@ describe('RippleAPI', function() {
     return this.api.getTransactions(address, options).then(() => {
       assert(false, 'Should throw RippleError');
     }).catch(error => {
-      assert(error instanceof common.core.RippleError);
+      assert(error instanceof this.api.errors.RippleError);
     });
   });
 
@@ -549,6 +549,14 @@ describe('RippleAPI', function() {
       assert(false, 'Should throw NotFoundError');
     }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
+    });
+  });
+
+  it('getPaths - error: srcActNotFound', function() {
+    const pathfind = _.assign({}, requests.getPaths.normal,
+      {source: {address: addresses.NOTFOUND}});
+    return this.api.getPaths(pathfind).catch(error => {
+      assert(error instanceof this.api.errors.RippleError);
     });
   });
 
