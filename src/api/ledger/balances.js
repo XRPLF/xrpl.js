@@ -6,6 +6,7 @@ const utils = require('./utils');
 const getTrustlines = require('./trustlines');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
+const convertErrors = utils.common.convertErrors;
 
 function getTrustlineBalanceAmount(trustline) {
   return {
@@ -39,10 +40,10 @@ function getBalancesAsync(account, options, callback) {
   async.parallel({
     xrp: _.partial(utils.getXRPBalance, this.remote, account, ledgerVersion),
     trustlines: _.partial(getTrustlinesAsync.bind(this), account, options)
-  }, composeAsync(formatBalances, callback));
+  }, composeAsync(formatBalances, convertErrors(callback)));
 }
 
-function getBalances(account: string, options={}) {
+function getBalances(account: string, options = {}) {
   return utils.promisify(getBalancesAsync).call(this, account, options);
 }
 

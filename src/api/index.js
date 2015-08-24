@@ -34,6 +34,7 @@ const getLedger = require('./ledger/ledger');
 const isValidAddress = common.isValidAddress;
 
 function RippleAPI(options: {}) {
+  common.validate.remoteOptions(options);
   const _options = _.assign({}, options, {automatic_resubmission: false});
   this.remote = new common.core.Remote(_options);
 }

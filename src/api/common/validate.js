@@ -76,5 +76,6 @@ module.exports = {
   getTransactionOptions: _.partial(validateOptions, 'transaction-options'),
   getLedgerOptions: _.partial(validateOptions, 'ledger-options'),
   options: _.partial(validateOptions, 'options'),
+  remoteOptions: _.partial(schemaValidate, 'remote-options'),
   instructions: _.partial(schemaValidate, 'instructions')
 };

@@ -391,7 +391,7 @@ describe('RippleAPI', function() {
     return this.api.getTransactions(address, options).then(() => {
       assert(false, 'Should throw RippleError');
     }).catch(error => {
-      assert(error instanceof common.core.RippleError);
+      assert(error instanceof this.api.errors.RippleError);
     });
   });
 
@@ -549,6 +549,14 @@ describe('RippleAPI', function() {
       assert(false, 'Should throw NotFoundError');
     }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
+    });
+  });
+
+  it('getPaths - error: srcActNotFound', function() {
+    const pathfind = _.assign({}, requests.getPaths.normal,
+      {source: {address: addresses.NOTFOUND}});
+    return this.api.getPaths(pathfind).catch(error => {
+      assert(error instanceof this.api.errors.RippleError);
     });
   });
 
@@ -816,6 +824,25 @@ describe('RippleAPI - offline', function() {
     const api = new RippleAPI();
     const hex = '6e3efa86a5eb0a3c5dc9beb3a204783bb00e1913';
     assert(!api.isValidAddress(hex));
+  });
+
+/* eslint-disable no-unused-vars */
+  it('RippleAPI - implicit server port', function() {
+    const api = new RippleAPI({servers: ['wss://s1.ripple.com']});
+  });
+/* eslint-enable no-unused-vars */
+  it('RippleAPI invalid options', function() {
+    assert.throws(() => new RippleAPI({invalid: true}));
+  });
+
+  it('RippleAPI valid options', function() {
+    const api = new RippleAPI({trace: true, servers: ['wss://s:1']});
+    assert(api.remote.trace);
+    assert.deepEqual(api.remote.servers, ['wss://s:1']);
+  });
+
+  it('RippleAPI invalid server uri', function() {
+    assert.throws(() => new RippleAPI({servers: ['wss//s:1']}));
   });
 
 });

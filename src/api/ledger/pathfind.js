@@ -8,6 +8,7 @@ const validate = utils.common.validate;
 const parsePathfind = require('./parse/pathfind');
 const NotFoundError = utils.common.errors.NotFoundError;
 const composeAsync = utils.common.composeAsync;
+const convertErrors = utils.common.convertErrors;
 
 type PathFindParams = {
   src_currencies?: Array<string>, src_account: string, dst_amount: string,
@@ -47,7 +48,7 @@ function requestPathFind(remote, pathfind: PathFind, callback) {
   }
 
   remote.createPathFind(params,
-    composeAsync(_.partial(addParams, params), callback));
+    composeAsync(_.partial(addParams, params), convertErrors(callback)));
 }
 
 function addDirectXrpPath(paths, xrpBalance) {

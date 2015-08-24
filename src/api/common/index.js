@@ -12,6 +12,7 @@ module.exports = {
   generateAddress: utils.generateAddress,
   composeAsync: utils.composeAsync,
   wrapCatch: utils.wrapCatch,
+  convertErrors: utils.convertErrors,
   convertExceptions: utils.convertExceptions,
   convertKeysFromSnakeCaseToCamelCase:
     utils.convertKeysFromSnakeCaseToCamelCase,
