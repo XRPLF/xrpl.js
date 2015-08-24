@@ -4,7 +4,7 @@ const assert = require('assert');
 const brorand = require('brorand');
 const codec = require('ripple-address-codec');
 
-const {seedFromPhrase, createAccountID} = require('./utils');
+const {seedFromPhrase, computePublicKeyHash} = require('./utils');
 const {KeyPair, KeyType} = require('./keypair');
 const {Ed25519Pair} = require('./ed25519');
 const {K256Pair, accountPublicFromPublicGenerator} = require('./secp256k1');
@@ -70,7 +70,7 @@ function generateValidatorKeys(opts = {}) {
 function nodePublicAccountID(publicKey) {
   const generatorBytes = decodeNodePublic(publicKey);
   const accountPublicBytes = accountPublicFromPublicGenerator(generatorBytes);
-  return encodeAccountID(createAccountID(accountPublicBytes));
+  return encodeAccountID(computePublicKeyHash(accountPublicBytes));
 }
 
 function validatorKeysFromSeed(seed, seedType) {
@@ -93,7 +93,7 @@ module.exports = {
   Ed25519Pair,
   KeyType,
   seedFromPhrase,
-  createAccountID,
+  computePublicKeyHash,
   keyPairFromSeed,
   generateWallet,
   generateValidatorKeys,
