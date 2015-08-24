@@ -831,4 +831,18 @@ describe('RippleAPI - offline', function() {
     const api = new RippleAPI({servers: ['wss://s1.ripple.com']});
   });
 /* eslint-enable no-unused-vars */
+  it('RippleAPI invalid options', function() {
+    assert.throws(() => new RippleAPI({invalid: true}));
+  });
+
+  it('RippleAPI valid options', function() {
+    const api = new RippleAPI({trace: true, servers: ['wss://s:1']});
+    assert(api.remote.trace);
+    assert.deepEqual(api.remote.servers, ['wss://s:1']);
+  });
+
+  it('RippleAPI invalid server uri', function() {
+    assert.throws(() => new RippleAPI({servers: ['wss//s:1']}));
+  });
+
 });
