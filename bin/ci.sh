@@ -24,9 +24,13 @@ unittest() {
   npm run coveralls
 
   # test compiled version in "dist/npm"
-  ln -nfs ../../dist/npm/core test/node_modules/ripple-lib
-  ln -nfs ../../dist/npm test/node_modules/ripple-api
-  npm test
+  babel -D --optional runtime --ignore "**/node_modules/**" -d test-compiled/ test/
+  echo "--reporter spec --timeout 5000 --slow 500" > test-compiled/mocha.opts
+  mkdir -p test-compiled/node_modules
+  ln -nfs ../../dist/npm/core test-compiled/node_modules/ripple-lib
+  ln -nfs ../../dist/npm test-compiled/node_modules/ripple-api
+  mocha --opts test-compiled/mocha.opts test-compiled
+  rm -rf test-compiled
 }
 
 oneNode() {

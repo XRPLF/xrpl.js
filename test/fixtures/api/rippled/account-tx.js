@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const hashes = require('../../hashes');
 const addresses = require('../../addresses');
-const SerializedObject = require('../../../../src/core').SerializedObject;
+const SerializedObject = require('ripple-lib').SerializedObject;
 const AccountSet = require('./tx/account-set.json');
 const NotFound = require('./tx/not-found.json');
 
