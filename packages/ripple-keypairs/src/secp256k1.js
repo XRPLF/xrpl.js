@@ -34,7 +34,7 @@ function deriveScalar(bytes, discrim) {
 * @return {bn.js} - 256 bit scalar value
 *
 */
-function deriveSecret(seed, opts={}) {
+function deriveSecret(seed, opts = {}) {
   const root = opts.validator;
   const order = secp256k1.curve.n;
 
@@ -68,7 +68,7 @@ class K256Pair extends KeyPair {
     this.validator = options.validator;
   }
 
-  static fromSeed(seedBytes, opts={}) {
+  static fromSeed(seedBytes, opts = {}) {
     return new K256Pair({seedBytes, validator: opts.validator});
   }
 
