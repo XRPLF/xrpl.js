@@ -2,7 +2,7 @@
   {
     "source": {
       "address": "rwBYyfufTzk77zUSKEu4MvixfarC35av1J",
-      "amount": {
+      "maxAmount": {
         "currency": "XRP",
         "value": "0.000002"
       }
