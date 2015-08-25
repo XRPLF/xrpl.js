@@ -1,7 +1,7 @@
 'use strict';
 
 /* eslint-disable max-len */
-
+const _ = require('lodash');
 const assert = require('assert-diff');
 const lodash = require('lodash');
 const ripple = require('ripple-lib');
@@ -75,11 +75,11 @@ function makeTests(uIntType) {
           case undefined:
             switch (test.outputMethod) {
               case 'to_bytes':
-                test.expected = Array(rippleType.width).fill(0);
+                test.expected = _.fill(Array(rippleType.width), 0);
                 break;
               case 'to_json':
               case 'to_hex':
-                test.expected = Array(rippleType.width * 2).fill(0).join('');
+                test.expected = _.fill(Array(rippleType.width * 2), 0).join('');
                 break;
             }
         }
