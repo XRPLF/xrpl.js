@@ -1263,39 +1263,27 @@ describe('Remote', function() {
     });
   });
   it('Construct account_currencies request', function() {
-    let request = remote.requestAccountCurrencies({
+    const request = remote.requestAccountCurrencies({
       account: ADDRESS
     }, lodash.noop);
 
-    assert.strictEqual(request.message.command, 'account_currencies');
-    assert.strictEqual(request.message.account, ADDRESS);
-    assert.strictEqual(request.requested, true);
-
-    Log.setEngine(Log.engines.none);
-    request = remote.requestAccountCurrencies(ADDRESS, lodash.noop);
     assert.strictEqual(request.message.command, 'account_currencies');
     assert.strictEqual(request.message.account, ADDRESS);
     assert.strictEqual(request.requested, true);
   });
 
   it('Construct account_info request', function() {
-    let request = remote.requestAccountInfo({
+    const request = remote.requestAccountInfo({
       account: ADDRESS
     }, lodash.noop);
 
     assert.strictEqual(request.message.command, 'account_info');
     assert.strictEqual(request.message.account, ADDRESS);
     assert.strictEqual(request.requested, true);
-
-    Log.setEngine(Log.engines.none);
-    request = remote.requestAccountInfo(ADDRESS, lodash.noop);
-    assert.strictEqual(request.message.command, 'account_info');
-    assert.strictEqual(request.message.account, ADDRESS);
-    assert.strictEqual(request.requested, true);
   });
 
   it('Construct account_info request -- with ledger index', function() {
-    let request = remote.requestAccountInfo({
+    const request = remote.requestAccountInfo({
       account: ADDRESS,
       ledger: 9592219
     }, lodash.noop);
@@ -1303,14 +1291,6 @@ describe('Remote', function() {
     assert.strictEqual(request.message.account, ADDRESS);
     assert.strictEqual(request.message.ledger_index, 9592219);
     assert.strictEqual(request.requested, true);
-
-    Log.setEngine(Log.engines.none);
-    request = remote.requestAccountInfo(ADDRESS, 9592219, lodash.noop);
-    assert.strictEqual(request.requested, true);
-
-    assert.strictEqual(request.message.command, 'account_info');
-    assert.strictEqual(request.message.account, ADDRESS);
-    assert.strictEqual(request.message.ledger_index, 9592219);
   });
 
   it('Construct account_info request -- with ledger hash', function() {
@@ -1362,7 +1342,7 @@ describe('Remote', function() {
      assert.strictEqual(request.message.command, 'ledger_entry');
      assert.strictEqual(request.message.account_root, ADDRESS);
      assert.strictEqual(request.message.ledger_index, 'validated');
-    assert.strictEqual(request.requested, true);
+     assert.strictEqual(request.requested, true);
    });
 
    it('Construct account flags request', function() {
@@ -1372,14 +1352,7 @@ describe('Remote', function() {
     assert.strictEqual(request.requested, true);
    });
    it('Construct account owner count request', function() {
-     let request = remote.requestOwnerCount({account: ADDRESS}, lodash.noop);
-     assert.strictEqual(request.message.command, 'ledger_entry');
-     assert.strictEqual(request.message.account_root, ADDRESS);
-    assert.strictEqual(request.requested, true);
-
-     Log.setEngine(Log.engines.none);
-     request = remote.requestOwnerCount(ADDRESS, lodash.noop);
-
+     const request = remote.requestOwnerCount({account: ADDRESS}, lodash.noop);
      assert.strictEqual(request.message.command, 'ledger_entry');
      assert.strictEqual(request.message.account_root, ADDRESS);
      assert.strictEqual(request.requested, true);
@@ -1421,32 +1394,12 @@ describe('Remote', function() {
     assert.strictEqual(request.requested, true);
    });
    it('Construct account_lines request -- with limit and marker', function() {
-     let request = remote.requestAccountLines({
+     const request = remote.requestAccountLines({
        account: ADDRESS,
        limit: 100,
        marker: PAGING_MARKER,
        ledger: 9592219
      }, lodash.noop);
-     assert.deepEqual(request.message, {
-       command: 'account_lines',
-       id: undefined,
-       account: ADDRESS,
-       limit: 100,
-       marker: PAGING_MARKER,
-       ledger_index: 9592219
-     });
-    assert.strictEqual(request.requested, true);
-
-     Log.setEngine(Log.engines.none);
-     request = remote.requestAccountLines(
-       ADDRESS,
-       null,
-       9592219,
-       100,
-       PAGING_MARKER,
-       lodash.noop
-     );
-
      assert.deepEqual(request.message, {
        command: 'account_lines',
        id: undefined,
@@ -1668,11 +1621,11 @@ describe('Remote', function() {
 
   it('Construct book_offers request -- with ledger and limit', function() {
     const request = remote.requestBookOffers({
-      taker_gets: {
+      gets: {
         currency: 'USD',
         issuer: ADDRESS
       },
-      taker_pays: {
+      pays: {
         currency: 'XRP'
       },
       ledger: LEDGER_HASH,
@@ -1926,10 +1879,10 @@ describe('Remote', function() {
 
   it('Construct ripple_path_find request', function() {
     const request = remote.requestRipplePathFind({
-      src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
-      dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
-      dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
-      src_currencies: [{
+      source_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      destination_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
+      destination_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      source_currencies: [{
         currency: 'BTC', issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
       }]
     });
@@ -1974,10 +1927,10 @@ describe('Remote', function() {
 
   it('Construct path_find create request', function() {
     const request = remote.requestPathFindCreate({
-      src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
-      dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
-      dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
-      src_currencies: [{
+      source_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      destination_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
+      destination_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      source_currencies: [{
         currency: 'BTC', issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
       }]
     });
