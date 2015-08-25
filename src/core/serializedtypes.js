@@ -8,6 +8,7 @@
  * SerializedObject.parse() or SerializedObject.serialize().
  */
 
+const _ = require('lodash');
 const assert = require('assert');
 const extend = require('extend');
 const BN = require('bn.js');
@@ -404,7 +405,7 @@ exports.Quality = new SerializedType({
   serialize: function(so, val) {
     let value;
     // if in format: amount/currency/issuer
-    if (val.includes('/')) {
+    if (_.includes(val, '/')) {
       const amount = Amount.from_json(val);
 
       if (!amount.is_valid()) {
