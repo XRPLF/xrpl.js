@@ -28,6 +28,3 @@ exports._test = {
 };
 
 exports.types = require('./serializedtypes');
-
-// This patches remote with legacy support for positional arguments
-require('./legacy-support.js')(exports);

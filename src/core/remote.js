@@ -1121,6 +1121,7 @@ Remote.prototype.requestTransactionEntry = function(options, callback) {
  * @return {Request} request
  */
 
+Remote.prototype.requestTx =
 Remote.prototype.requestTransaction = function(options, callback) {
   const request = new Request(this, 'tx');
   request.message.binary = options.binary !== false;
@@ -1476,8 +1477,8 @@ Remote.prototype.requestTransactionHistory = function(options, callback) {
  * Request book_offers
  *
  * @param {Object} options
- *   @param {Object} options.gets - taker_gets with issuer and currency
- *   @param {Object} options.pays - taker_pays with issuer and currency
+ *   @param {Object} options.taker_gets - taker_gets with issuer and currency
+ *   @param {Object} options.taker_pays - taker_pays with issuer and currency
  *   @param {String} [options.taker]
  *   @param {String} [options.ledger]
  *   @param {String|Number} [options.limit]
@@ -1486,23 +1487,32 @@ Remote.prototype.requestTransactionHistory = function(options, callback) {
  */
 
 Remote.prototype.requestBookOffers = function(options, callback) {
-  const {gets, pays, taker, ledger, limit} = options;
+  const {taker, ledger, limit} = options;
+  let {taker_gets, taker_pays} = options;
+
+  if (taker_gets === undefined) {
+    taker_gets = options.gets;
+  }
+  if (taker_pays === undefined) {
+    taker_pays = options.pays;
+  }
+
   const request = new Request(this, 'book_offers');
 
   request.message.taker_gets = {
-    currency: Currency.json_rewrite(gets.currency, {force_hex: true})
+    currency: Currency.json_rewrite(taker_gets.currency, {force_hex: true})
   };
 
   if (!Currency.from_json(request.message.taker_gets.currency).is_native()) {
-    request.message.taker_gets.issuer = UInt160.json_rewrite(gets.issuer);
+    request.message.taker_gets.issuer = UInt160.json_rewrite(taker_gets.issuer);
   }
 
   request.message.taker_pays = {
-    currency: Currency.json_rewrite(pays.currency, {force_hex: true})
+    currency: Currency.json_rewrite(taker_pays.currency, {force_hex: true})
   };
 
   if (!Currency.from_json(request.message.taker_pays.currency).is_native()) {
-    request.message.taker_pays.issuer = UInt160.json_rewrite(pays.issuer);
+    request.message.taker_pays.issuer = UInt160.json_rewrite(taker_pays.issuer);
   }
 
   request.message.taker = taker ? taker : UInt160.ACCOUNT_ONE;
@@ -1526,6 +1536,7 @@ Remote.prototype.requestBookOffers = function(options, callback) {
   }
 
   request.callback(callback);
+
   return request;
 };
 
