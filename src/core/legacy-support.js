@@ -30,35 +30,24 @@ function wrapRemote(Remote) {
     return _.merge(result, _.zipObject(params, args));
   }
 
-  function shiftFront(list, e) {
-    let ix = 0;
-    while (list[0] === e) {
-      list.shift();
-      ix++;
-    }
-    return ix;
-  }
-
   function addBackwardsCompatibility(compatParams) {
     const {method,
            command,
-           staticMethod = false,
            positionals = [],
            mappings = {},
            hasCallback = true,
            aliases = []} = compatParams;
 
-    const positionalsStartIx = shiftFront(positionals, '*');
     const needsWrapping = positionals.length ||
                           Object.keys(mappings).length;
 
     function wrapFunction(func) {
       return function() {
-        const optionsArg = arguments[positionalsStartIx];
+        const optionsArg = arguments[0];
         const options = {};
 
         if (hasCallback) {
-          options.callback = arguments[positionalsStartIx + 1];
+          options.callback = arguments[1];
         }
 
         if (_.isPlainObject(optionsArg)) {
@@ -68,20 +57,15 @@ function wrapRemote(Remote) {
           });
           _.merge(options, mapped);
         } else {
-          // This hack handles accountRequest type helper helpers
-          const commandName = positionalsStartIx ? arguments[0] : command;
-          const args = _.slice(arguments, positionalsStartIx);
-          const positionalOptions = makeOptions(commandName, positionals, args);
+          const args = _.slice(arguments);
+          const positionalOptions = makeOptions(command, positionals, args);
           _.merge(options, positionalOptions);
         }
-        // Only some `positionals` get remapped to options
-        const alwaysPositional = _.slice(arguments, 0, positionalsStartIx);
-        const args = alwaysPositional.concat([options, options.callback]);
-        return func.apply(this, args);
+        return func.call(this, options, options.callback);
       };
     }
 
-    const obj = staticMethod ? Remote : Remote.prototype;
+    const obj = Remote.prototype;
     // Wrap the function and set the aliases
     const wrapped = needsWrapping ? wrapFunction(obj[method]) : obj[method];
     aliases.concat(method).forEach((name) => {
@@ -180,16 +164,40 @@ function wrapRemote(Remote) {
       positionals: ['account', 'issuer', 'currency', 'ledger']
     },
     {
-      staticMethod: true,
-      method: 'accountRequest',
-      command: 'accountrequest(*)',
-      positionals: ['*', 'account', 'ledger', 'peer', 'limit', 'marker']
+      method: 'requestAccountInfo',
+      command: 'account_info',
+      positionals: ['account', 'ledger', 'peer', 'limit', 'marker']
     },
     {
-      staticMethod: true,
-      method: 'accountRootRequest',
-      command: 'accountRootRequest(*)',
-      positionals: ['*', '*', 'account', 'ledger']
+      method: 'requestAccountCurrencies',
+      command: 'account_currencies',
+      positionals: ['account', 'ledger', 'peer', 'limit', 'marker']
+    },
+    {
+      method: 'requestAccountLines',
+      command: 'account_lines',
+      positionals: ['account', 'peer', 'ledger', 'limit', 'marker']
+    },
+    {
+      method: 'requestAccountOffers',
+      command: 'account_offers',
+      positionals: ['account', 'ledger', 'peer', 'limit', 'marker']
+    },
+
+    {
+      method: 'requestAccountBalance',
+      command: 'account_balance',
+      positionals: ['account', 'ledger']
+    },
+    {
+      method: 'requestAccountFlags',
+      command: 'account_flags',
+      positionals: ['account', 'ledger']
+    },
+    {
+      method: 'requestOwnerCount',
+      command: 'owner_count',
+      positionals: ['account', 'ledger']
     }
   ];
 
