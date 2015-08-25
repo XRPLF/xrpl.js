@@ -9,12 +9,13 @@ function parsePaths(paths) {
 }
 
 function parsePathfind(sourceAddress: string,
-    destinationAmount: Object, pathfindResult: Object): Object {
+    destinationAmount: Object, pathfindResult: Object
+): Object {
   return pathfindResult.alternatives.map(function(alternative) {
     return {
       source: {
         address: sourceAddress,
-        amount: parseAmount(alternative.source_amount)
+        maxAmount: parseAmount(alternative.source_amount)
       },
       destination: {
         address: pathfindResult.destination_account,

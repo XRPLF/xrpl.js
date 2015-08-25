@@ -2,7 +2,7 @@
   {
     "source": {
       "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-      "amount": {
+      "maxAmount": {
         "currency": "JPY",
         "value": "0.1117218827811721",
         "counterparty": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
@@ -21,7 +21,7 @@
   {
     "source": {
       "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-      "amount": {
+      "maxAmount": {
         "currency": "USD",
         "value": "0.001002",
         "counterparty": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
@@ -40,7 +40,7 @@
   {
     "source": {
       "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-      "amount": {
+      "maxAmount": {
         "currency": "XRP",
         "value": "0.207669"
       }
