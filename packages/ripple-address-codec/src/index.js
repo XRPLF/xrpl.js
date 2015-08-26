@@ -25,9 +25,9 @@ module.exports = apiFactory({
       versions: [ED25519_SEED, FAMILY_SEED],
       expectedLength: 16
     },
-    AccountID: {version: ACCOUNT_ID},
-    NodePublic: {version: NODE_PUBLIC},
-    NodePrivate: {version: NODE_PRIVATE},
-    K256Seed: {version: FAMILY_SEED}
-  }
+    AccountID: {version: ACCOUNT_ID, expectedLength: 20},
+    Address: {version: ACCOUNT_ID, expectedLength: 20},
+    NodePublic: {version: NODE_PUBLIC, expectedLength: 33},
+    NodePrivate: {version: NODE_PRIVATE, expectedLength: 32},
+    K256Seed: {version: FAMILY_SEED, expectedLength: 16}}
 });

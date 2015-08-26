@@ -56,4 +56,18 @@ describe('ripple-address-codec', function() {
     assert.equal(decoded.type, 'ed25519');
     assert.equal(api.encodeSeed(decoded.bytes, decoded.type), edSeed);
   });
+
+  it('isValidAddress - secp256k1 address valid', function() {
+    assert(api.isValidAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1'));
+  });
+  it('isValidAddress - ed25519 address valid', function() {
+    assert(api.isValidAddress('rLUEXYuLiQptky37CqLcm9USQpPiz5rkpD'));
+  });
+  it('isValidAddress - invalid', function() {
+    assert(!api.isValidAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw2'));
+  });
+  it('isValidAddress - empty', function() {
+    assert(!api.isValidAddress(''));
+  });
+
 });
