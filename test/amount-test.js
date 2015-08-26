@@ -1224,15 +1224,21 @@ describe('Amount', function() {
     });
 
     it('from_json minimum IOU', function() {
-      const amt = Amount.from_json('-1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      const amt = Amount.from_json('1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '1000000000000000e-96');
       assert.strictEqual(amt.to_text(), Amount.min_value);
     });
 
+    it('from_json negative minimum IOU', function() {
+      const amt = Amount.from_json('-1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(amt.to_text(), '-1000000000000000e-96');
+      assert.strictEqual(amt.negate().to_text(), Amount.min_value);
+    });
+
     it('from_json exceed minimum IOU', function() {
       assert.throws(function() {
-        Amount.from_json('-1e-82/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      }, 'Exceeding min value of ' + Amount.min_value);
+        Amount.from_json('1e-82/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      }, 'Exceeding min absolute value of ' + Amount.min_value);
     });
 
     it('from_json maximum IOU', function() {
