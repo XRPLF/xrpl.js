@@ -1,4 +1,4 @@
-/*eslint-disable max-len */
+/* eslint-disable max-len */
 
 'use strict';
 
@@ -9,6 +9,10 @@ const Amount = require('ripple-lib').Amount;
 const Meta = require('ripple-lib').Meta;
 const addresses = require('./fixtures/addresses');
 const fixtures = require('./fixtures/orderbook');
+
+function ledgerClosed(book, ledger_index) {
+  book._remote.emit('ledger_closed', {ledger_index});
+}
 
 describe('OrderBook', function() {
   this.timeout(0);
@@ -1594,6 +1598,7 @@ describe('OrderBook', function() {
     book.notify(offer);
     book.notify(lowQualityOffer);
     book.notify(highQualityOffer);
+    ledgerClosed(book, offer.ledger_index);
 
     assert.strictEqual(book._offers.length, 3);
     assert.strictEqual(book._offers[0].Account, addresses.THIRD_ACCOUNT);
@@ -1636,9 +1641,12 @@ describe('OrderBook', function() {
     book.notify(offer);
     book.notify(offer2);
     book.notify(offer3);
+    assert.strictEqual(book._ledgerLastNotified, offer.ledger_index);
+
+    ledgerClosed(book, offer.ledger_index);
 
     assert.strictEqual(numTransactionEvents, 3);
-    assert.strictEqual(numModelEvents, 3);
+    assert.strictEqual(numModelEvents, 1);
     assert.strictEqual(numOfferAddedEvents, 3);
   });
 
@@ -1659,6 +1667,7 @@ describe('OrderBook', function() {
     const message = fixtures.transactionWithDeletedOffer();
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
 
     assert.strictEqual(book._offers.length, 2);
     assert.strictEqual(book.getOwnerOfferTotal(addresses.ACCOUNT).to_text(), '4.9656112525');
@@ -1682,6 +1691,7 @@ describe('OrderBook', function() {
     const message = fixtures.transactionWithDeletedOffer();
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
 
     assert.strictEqual(book._offers.length, 0);
     assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), undefined);
@@ -1724,6 +1734,7 @@ describe('OrderBook', function() {
     const message = fixtures.transactionWithDeletedOffer();
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
 
     assert.strictEqual(numTransactionEvents, 1);
     assert.strictEqual(numModelEvents, 1);
@@ -1761,6 +1772,7 @@ describe('OrderBook', function() {
     const message = fixtures.transactionWithDeletedOffer();
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
   });
 
   it('Notify - deleted node - offer cancel', function() {
@@ -1782,6 +1794,7 @@ describe('OrderBook', function() {
     });
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
 
     assert.strictEqual(book._offers.length, 2);
     assert.strictEqual(book.getOwnerOfferTotal(addresses.ACCOUNT).to_text(), '4.9656112525');
@@ -1807,6 +1820,7 @@ describe('OrderBook', function() {
     });
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
 
     assert.strictEqual(book._offers.length, 0);
     assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), undefined);
@@ -1829,6 +1843,7 @@ describe('OrderBook', function() {
     const message = fixtures.transactionWithModifiedOffer();
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
 
     assert.strictEqual(book._offers.length, 3);
     assert.strictEqual(book.getOwnerOfferTotal(addresses.ACCOUNT).to_text(), '23.8114145625');
@@ -1880,6 +1895,7 @@ describe('OrderBook', function() {
     const message = fixtures.transactionWithModifiedOffer();
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
 
     assert.strictEqual(numTransactionEvents, 1);
     assert.strictEqual(numModelEvents, 1);
@@ -1917,6 +1933,7 @@ describe('OrderBook', function() {
     const message = fixtures.transactionWithModifiedOffer();
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
   });
 
   it('Notify - modified nodes - trade', function(done) {
@@ -1949,6 +1966,7 @@ describe('OrderBook', function() {
     const message = fixtures.transactionWithModifiedOffers();
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
   });
 
   it('Notify - no nodes', function() {
@@ -1988,6 +2006,7 @@ describe('OrderBook', function() {
     const message = fixtures.transactionWithNoNodes();
 
     book.notify(message);
+    ledgerClosed(book, message.ledger_index);
 
     assert.strictEqual(numTransactionEvents, 0);
     assert.strictEqual(numModelEvents, 0);
