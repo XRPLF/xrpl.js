@@ -38,9 +38,10 @@ function assertValidNumber(number, message) {
  * @param {String} orderbook key
  */
 
-function OrderBook(remote,
-                   currencyGets, issuerGets, currencyPays, issuerPays,
-                   key) {
+/* eslint-disable max-len*/
+// Otherwise it gets confused by the indentation!
+function OrderBook(remote, currencyGets, issuerGets, currencyPays, issuerPays, key) {
+/* eslint-enable max-len*/
   EventEmitter.call(this);
 
   const self = this;
@@ -61,6 +62,7 @@ function OrderBook(remote,
   this._ownerFundsUnadjusted = {};
   this._ownerFunds = {};
   this._ownerOffersTotal = {};
+  this._ledgerLastNotified = NaN;
 
   // We consider ourselves synced if we have a current
   // copy of the offers, we are online and subscribed to updates
@@ -123,6 +125,13 @@ function OrderBook(remote,
     self.updateFundedAmounts(transaction);
   }
 
+  function ledgerClosed(message) {
+    if (message.ledger_index === self._ledgerLastNotified) {
+      // We had transaction notifications, so notify and recompute
+      self.notifyDirectOffersChanged();
+    }
+  }
+
   this.on('newListener', function(event) {
     listenersModified('add', event);
   });
@@ -137,6 +146,7 @@ function OrderBook(remote,
     self.resetCache();
 
     self._remote.removeListener('transaction', updateFundedAmountsWrapper);
+    self._remote.removeListener('ledger_closed', ledgerClosed);
   });
 
   this._remote.once('prepare_subscribe', function() {
@@ -149,6 +159,8 @@ function OrderBook(remote,
       self.subscribe();
     });
   });
+
+  this._remote.on('ledger_closed', ledgerClosed);
 
   return this;
 }
@@ -256,7 +268,7 @@ OrderBook.prototype.unsubscribe = function() {
  * @param {Function} callback
  */
 
-OrderBook.prototype.requestOffers = function(callback=function() {}) {
+OrderBook.prototype.requestOffers = function(callback = function() {}) {
   const self = this;
 
   if (!this._shouldSubscribe) {
@@ -409,6 +421,7 @@ OrderBook.prototype.resetCache = function() {
   this._ownerOffersTotal = {};
   this._offerCounts = {};
   this._synced = false;
+  this._ledgerLastNotified = NaN;
 };
 
 /**
@@ -841,11 +854,13 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
 /**
  * Notify orderbook of a relevant transaction
  *
- * @param {Object} transaction
+ * @param {Object} transaction - {"type" : "transaction", ...} notification
+ *                               message with {Meta} `mmeta` property
  * @api private
  */
 
-OrderBook.prototype.notify = function(transaction) {
+OrderBook.prototype.notify = function(transaction, options = {}) {
+  const bufferNotifications = options.bufferNotifications !== false;
   const self = this;
 
   if (!(this._subscribed && this._synced)) {
@@ -919,7 +934,20 @@ OrderBook.prototype.notify = function(transaction) {
   _.each(affectedNodes, handleNode);
 
   this.emit('transaction', transaction);
-  this.notifyDirectOffersChanged();
+
+  if (bufferNotifications) {
+    // We'll wait until the ledger close message which always comes AFTER all
+    // the {"type: "transaction", ... } messages in a well specified (if not
+    // documented) order.
+    const ledger_index = transaction.ledger_index;
+    assert(ledger_index !== undefined,
+           'transaction notification message had no `ledger_index`');
+    this._ledgerLastNotified = ledger_index;
+  } else {
+    this.notifyDirectOffersChanged();
+  }
+  //
+
   if (!takerGetsTotal.is_zero()) {
     this.emit('trade', takerPaysTotal, takerGetsTotal);
   }

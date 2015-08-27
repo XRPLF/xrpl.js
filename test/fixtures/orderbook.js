@@ -1,4 +1,4 @@
-/*eslint-disable max-len, no-param-reassign*/
+/* eslint-disable max-len, no-param-reassign*/
 
 'use strict';
 
@@ -843,6 +843,7 @@ module.exports.transactionWithCreatedOffer = function(options) {
 
   return {
     mmeta: meta,
+    ledger_index: 2400000,
     transaction: {
       TransactionType: 'OfferCreate',
       owner_funds: '2010.027702881682'
@@ -888,6 +889,7 @@ module.exports.transactionWithDeletedOffer = function(options) {
 
   return {
     mmeta: meta,
+    ledger_index: 2400000,
     transaction: {
       TransactionType: options.transaction_type,
       owner_funds: '2010.027702881682'
@@ -933,6 +935,7 @@ module.exports.transactionWithDeletedOfferR = function(options) {
 
   return {
     mmeta: meta,
+    ledger_index: 2400000,
     transaction: {
       TransactionType: options.transaction_type,
       owner_funds: '2010.027702881682'
@@ -949,6 +952,7 @@ module.exports.transactionWithModifiedOffer = function() {
 
   return {
     mmeta: meta,
+    ledger_index: 2400000,
     transaction: {
       TransactionType: 'OfferCreate',
       owner_funds: '2010.027702881682'
@@ -965,6 +969,7 @@ module.exports.transactionWithModifiedOffers = function() {
 
   return {
     mmeta: meta,
+    ledger_index: 2400000,
     transaction: {
       TransactionType: 'OfferCreate',
       owner_funds: '2010.027702881682'
@@ -981,6 +986,7 @@ module.exports.transactionWithNoNodes = function() {
 
   return {
     mmeta: meta,
+    ledger_index: 2400000,
     transaction: {
       TransactionType: 'OfferCreate',
       owner_funds: '2010.027702881682'
