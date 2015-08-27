@@ -31,7 +31,6 @@ const convertExceptions = require('./common').convertExceptions;
 const generateAddress = convertExceptions(common.generateAddress);
 const computeLedgerHash = require('./offline/ledgerhash');
 const getLedger = require('./ledger/ledger');
-const isValidAddress = common.isValidAddress;
 
 function RippleAPI(options: {}) {
   common.validate.remoteOptions(options);
@@ -66,15 +65,14 @@ RippleAPI.prototype = {
   sign,
   submit,
 
-  computeLedgerHash,
-  isValidAddress,
   generateAddress,
   errors
 };
 
 // these are exposed only for use by unit tests; they are not part of the API
 RippleAPI._PRIVATE = {
-  common: common,
+  common,
+  computeLedgerHash,
   ledgerUtils: require('./ledger/utils'),
   schemaValidator: require('./common/schema-validator')
 };

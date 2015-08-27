@@ -581,7 +581,7 @@ describe('RippleAPI', function() {
       .then(response => {
         const ledger = _.assign({}, response,
           {parentCloseTime: response.closeTime});
-        const hash = this.api.computeLedgerHash(ledger);
+        const hash = RippleAPI._PRIVATE.computeLedgerHash(ledger);
         assert.strictEqual(hash,
           'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
       });
@@ -782,48 +782,29 @@ describe('RippleAPI - offline', function() {
   });
 
   it('computeLedgerHash', function() {
-    const api = new RippleAPI();
     const header = requests.computeLedgerHash.header;
-    const ledgerHash = api.computeLedgerHash(header);
+    const ledgerHash = RippleAPI._PRIVATE.computeLedgerHash(header);
     assert.strictEqual(ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
   });
 
   it('computeLedgerHash - with transactions', function() {
-    const api = new RippleAPI();
     const header = _.omit(requests.computeLedgerHash.header,
       'transactionHash');
     header.rawTransactions = JSON.stringify(
       requests.computeLedgerHash.transactions);
-    const ledgerHash = api.computeLedgerHash(header);
+    const ledgerHash = RippleAPI._PRIVATE.computeLedgerHash(header);
     assert.strictEqual(ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
   });
 
   it('computeLedgerHash - incorrent transaction_hash', function() {
-    const api = new RippleAPI();
     const header = _.assign({}, requests.computeLedgerHash.header,
       {transactionHash:
         '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'});
     header.rawTransactions = JSON.stringify(
       requests.computeLedgerHash.transactions);
-    assert.throws(() => api.computeLedgerHash(header));
-  });
-
-  it('isValidAddress - valid', function() {
-    const api = new RippleAPI();
-    assert(api.isValidAddress(address));
-  });
-
-  it('isValidAddress - invalid', function() {
-    const api = new RippleAPI();
-    assert(!api.isValidAddress(address.slice(0, -1) + 'a'));
-  });
-
-  it('isValidAddress - invalid - hex representation', function() {
-    const api = new RippleAPI();
-    const hex = '6e3efa86a5eb0a3c5dc9beb3a204783bb00e1913';
-    assert(!api.isValidAddress(hex));
+    assert.throws(() => RippleAPI._PRIVATE.computeLedgerHash(header));
   });
 
 /* eslint-disable no-unused-vars */

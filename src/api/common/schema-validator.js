@@ -70,7 +70,6 @@ function schemaValidate(schemaName: string, object: any): void {
 SCHEMAS = loadSchemas(path.join(__dirname, './schemas'));
 module.exports = {
   schemaValidate: schemaValidate,
-  isValidAddress: isValidAddress,
   loadSchema: loadSchema,
   SCHEMAS: SCHEMAS
 };
