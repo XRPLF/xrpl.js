@@ -1223,26 +1223,49 @@ describe('Amount', function() {
       });
     });
 
-    it('from_json minimum IOU', function() {
-      const amt = Amount.from_json('-1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(amt.to_text(), '-1000000000000000e-96');
+    it('from_json minimum positive IOU', function() {
+      const amt = Amount.from_json('1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(amt.to_text(), '1000000000000000e-96');
       assert.strictEqual(amt.to_text(), Amount.min_value);
     });
 
-    it('from_json exceed minimum IOU', function() {
-      assert.throws(function() {
-        Amount.from_json('-1e-82/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      }, 'Exceeding min value of ' + Amount.min_value);
+    it('from_json smallest-absolute-value negative IOU', function() {
+      const amt = Amount.from_json('-1e-81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(amt.to_text(), '-1000000000000000e-96');
+      assert.strictEqual(amt.negate().to_text(), Amount.min_value);
     });
 
-    it('from_json maximum IOU', function() {
+    it('from_json exceeding minimum positive IOU', function() {
+      assert.throws(function() {
+        Amount.from_json('1e-82/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      }, 'Exceeding min absolute value of ' + Amount.min_value);
+    });
+
+    it('from_json exceeding minimum-absolute-value negative IOU', function() {
+      assert.throws(function() {
+        Amount.from_json('-1e-82/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      }, 'Exceeding min absolute value of ' + Amount.min_value);
+    });
+
+    it('from_json maximum positive IOU', function() {
       const amt = Amount.from_json('9999999999999999e80/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       assert.strictEqual(amt.to_text(), '9999999999999999e80');
     });
 
-    it('from_json exceed maximum IOU', function() {
+    it('from_json exceed maximum positive IOU', function() {
       assert.throws(function() {
         Amount.from_json('9999999999999999e81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      }, 'Exceeding max value of ' + Amount.max_value);
+    });
+
+    it('from_json largest-absolute-value negative IOU', function() {
+      const amt = Amount.from_json('-9999999999999999e80/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(amt.to_text(), '-9999999999999999e80');
+    });
+
+    it('from_json exceed largest-absolute-value negative IOU', function() {
+      assert.throws(function() {
+        Amount.from_json('-9999999999999999e81/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
       }, 'Exceeding max value of ' + Amount.max_value);
     });
 

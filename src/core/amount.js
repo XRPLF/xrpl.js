@@ -49,13 +49,13 @@ const consts = {
   // Maximum possible amount for non-XRP currencies using the maximum mantissa
   // with maximum exponent. Corresponds to hex 0xEC6386F26FC0FFFF.
   max_value: '9999999999999999e80',
-  // Minimum possible amount for non-XRP currencies.
-  min_value: '-1000000000000000e-96'
+  // Minimum nonzero absolute value for non-XRP currencies.
+  min_value: '1000000000000000e-96'
 };
 
 const MAX_XRP_VALUE = new XRPValue(1e11);
 const MAX_IOU_VALUE = new IOUValue(consts.max_value);
-const MIN_IOU_VALUE = new IOUValue(consts.min_value).abs();
+const MIN_IOU_VALUE = new IOUValue(consts.min_value);
 
 const bi_xns_unit = new IOUValue(1e6);
 
