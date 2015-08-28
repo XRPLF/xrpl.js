@@ -83,10 +83,10 @@ function createPaymentTransaction(account, payment) {
 
 function preparePaymentAsync(account, payment, instructions, callback) {
   const transaction = createPaymentTransaction(account, payment);
-  utils.createTxJSON(transaction, this.remote, instructions, callback);
+  utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function preparePayment(account: string, payment: Object, instructions={}) {
+function preparePayment(account: string, payment: Object, instructions = {}) {
   return utils.promisify(preparePaymentAsync.bind(this))(
     account, payment, instructions);
 }

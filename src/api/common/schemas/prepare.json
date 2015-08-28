@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "prepare",
+  "description": "Result of prepare function",
+  "type": "object",
+  "properties": {
+    "txJSON": {"type": "string"},
+    "instructions": {
+      "type": "object",
+      "properties": {
+        "fee": {"$ref": "value"},
+        "sequence": {"$ref": "sequence"},
+        "maxLedgerVersion": {"$ref": "ledgerVersion"}
+      },
+      "additionalProperties": false,
+      "required": ["fee", "sequence"]
+    }
+  },
+  "additionalProperties": false,
+  "required": ["txJSON", "instructions"]
+}

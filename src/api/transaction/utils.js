@@ -1,10 +1,11 @@
 /* @flow */
 'use strict';
+const _ = require('lodash');
 const BigNumber = require('bignumber.js');
 const common = require('../common');
 
-function setTransactionBitFlags(transaction: any, values: any, flags: any):
-    void {
+function setTransactionBitFlags(transaction: any, values: any, flags: any
+): void {
   for (const flagName in flags) {
     const flagValue = values[flagName];
     const flagConversions = flags[flagName];
@@ -23,8 +24,22 @@ function getFeeDrops(remote) {
   return remote.feeTx(feeUnits).to_text();
 }
 
-function createTxJSON(transaction: any, remote: any, instructions: any,
-    callback: (err: ?(typeof Error), data: {tx_json: any}) => void): void {
+function formatPrepareResponse(txJSON) {
+  const instructions = {
+    fee: txJSON.Fee,
+    sequence: txJSON.Sequence,
+    maxLedgerVersion: txJSON.LastLedgerSequence
+  };
+  return {
+    txJSON: JSON.stringify(txJSON),
+    instructions: _.omit(instructions, _.isUndefined)
+  };
+}
+
+type Callback = (err: ?(typeof Error),
+                 data: {txJSON: string, instructions: any}) => void;
+function prepareTransaction(transaction: any, remote: any, instructions: any,
+    callback: Callback): void {
   common.validate.instructions(instructions);
 
   transaction.complete();
@@ -53,18 +68,18 @@ function createTxJSON(transaction: any, remote: any, instructions: any,
 
   if (instructions.sequence !== undefined) {
     txJSON.Sequence = parseInt(instructions.sequence, 10);
-    callback(null, txJSON);
+    callback(null, formatPrepareResponse(txJSON));
   } else {
     remote.findAccount(account).getNextSequence(function(error, sequence) {
       txJSON.Sequence = sequence;
-      callback(null, txJSON);
+      callback(error, formatPrepareResponse(txJSON));
     });
   }
 }
 
 module.exports = {
-  setTransactionBitFlags: setTransactionBitFlags,
-  createTxJSON: createTxJSON,
-  common: common,
+  setTransactionBitFlags,
+  prepareTransaction,
+  common,
   promisify: common.promisify
 };

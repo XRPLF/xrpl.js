@@ -32,10 +32,10 @@ function createOrderTransaction(account, order) {
 
 function prepareOrderAsync(account, order, instructions, callback) {
   const transaction = createOrderTransaction(account, order);
-  utils.createTxJSON(transaction, this.remote, instructions, callback);
+  utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function prepareOrder(account: string, order: Object, instructions={}) {
+function prepareOrder(account: string, order: Object, instructions = {}) {
   return utils.promisify(prepareOrderAsync.bind(this))(
     account, order, instructions);
 }

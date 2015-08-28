@@ -35,10 +35,11 @@ function createTrustlineTransaction(account, trustline) {
 
 function prepareTrustlineAsync(account, trustline, instructions, callback) {
   const transaction = createTrustlineTransaction(account, trustline);
-  utils.createTxJSON(transaction, this.remote, instructions, callback);
+  utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function prepareTrustline(account: string, trustline: Object, instructions={}) {
+function prepareTrustline(account: string, trustline: Object, instructions = {}
+) {
   return utils.promisify(prepareTrustlineAsync.bind(this))(
     account, trustline, instructions);
 }
