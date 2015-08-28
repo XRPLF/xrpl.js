@@ -40,18 +40,18 @@ function computeSignature(txJSON, keypair) {
   return keypair.signHex(signingData(txJSON));
 }
 
-function sign(txJSON: {Account: string; SigningPubKey: string,
-    TxnSignature: string}, secret: string):
-    {signedTransaction: string; id: string} {
-  validate.txJSON(txJSON);
+function sign(txJSON: string, secret: string
+): {signedTransaction: string; id: string} {
+  const tx = JSON.parse(txJSON);
+  validate.txJSON(tx);
   validate.secret(secret);
 
   const keypair = getKeyPair(secret);
-  if (txJSON.SigningPubKey === undefined) {
-    txJSON.SigningPubKey = getPublicKeyHex(keypair);
+  if (tx.SigningPubKey === undefined) {
+    tx.SigningPubKey = getPublicKeyHex(keypair);
   }
-  txJSON.TxnSignature = computeSignature(txJSON, keypair);
-  const serialized = serialize(txJSON);
+  tx.TxnSignature = computeSignature(tx, keypair);
+  const serialized = serialize(tx);
   return {
     signedTransaction: serialized.to_hex(),
     id: hashSerialization(serialized, HASH_TX_ID)

@@ -14,13 +14,15 @@ function createOrderCancellationTransaction(account, sequence) {
 }
 
 function prepareOrderCancellationAsync(account, sequence, instructions,
-    callback) {
+  callback
+) {
   const transaction = createOrderCancellationTransaction(account, sequence);
-  utils.createTxJSON(transaction, this.remote, instructions, callback);
+  utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
 function prepareOrderCancellation(account: string, sequence: number,
-    instructions={}) {
+    instructions = {}
+) {
   return utils.promisify(prepareOrderCancellationAsync.bind(this))(
     account, sequence, instructions);
 }

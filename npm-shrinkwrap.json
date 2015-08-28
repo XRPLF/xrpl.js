@@ -13,8 +13,8 @@
       "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.20.tgz",
       "dependencies": {
         "core-js": {
-          "version": "1.0.1",
-          "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.0.1.tgz"
+          "version": "1.1.2",
+          "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.1.2.tgz"
         }
       }
     },
@@ -23,8 +23,8 @@
       "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.0.7.tgz"
     },
     "bn.js": {
-      "version": "3.1.1",
-      "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.1.1.tgz"
+      "version": "3.1.2",
+      "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.1.2.tgz"
     },
     "es6-promisify": {
       "version": "2.0.0",
@@ -81,8 +81,8 @@
       }
     },
     "is-my-json-valid": {
-      "version": "2.12.1",
-      "resolved": "https://registry.npmjs.org/is-my-json-valid/-/is-my-json-valid-2.12.1.tgz",
+      "version": "2.12.2",
+      "resolved": "https://registry.npmjs.org/is-my-json-valid/-/is-my-json-valid-2.12.2.tgz",
       "dependencies": {
         "generate-function": {
           "version": "2.0.0",
@@ -99,8 +99,8 @@
           }
         },
         "jsonpointer": {
-          "version": "1.1.0",
-          "resolved": "https://registry.npmjs.org/jsonpointer/-/jsonpointer-1.1.0.tgz"
+          "version": "2.0.0",
+          "resolved": "https://registry.npmjs.org/jsonpointer/-/jsonpointer-2.0.0.tgz"
         },
         "xtend": {
           "version": "4.0.0",

@@ -48,7 +48,7 @@ describe('RippleAPI', function() {
     }, instructions);
     return this.api.preparePayment(
       address, requests.preparePayment, localInstructions).then(
-      _.partial(checkResult, responses.preparePayment, 'tx'));
+      _.partial(checkResult, responses.preparePayment, 'prepare'));
   });
 
   it('preparePayment with all options specified', function() {
@@ -58,72 +58,73 @@ describe('RippleAPI', function() {
     };
     return this.api.preparePayment(
       address, requests.preparePaymentAllOptions, localInstructions).then(
-      _.partial(checkResult, responses.preparePaymentAllOptions, 'tx'));
+      _.partial(checkResult, responses.preparePaymentAllOptions, 'prepare'));
   });
 
   it('preparePayment without counterparty set', function() {
     const localInstructions = _.defaults({sequence: 23}, instructions);
     return this.api.preparePayment(
       address, requests.preparePaymentNoCounterparty, localInstructions).then(
-      _.partial(checkResult, responses.preparePaymentNoCounterparty, 'tx'));
+      _.partial(checkResult, responses.preparePaymentNoCounterparty,
+        'prepare'));
   });
 
   it('prepareOrder - buy order', function() {
     return this.api.prepareOrder(address, requests.prepareOrder, instructions)
-      .then(_.partial(checkResult, responses.prepareOrder, 'tx'));
+      .then(_.partial(checkResult, responses.prepareOrder, 'prepare'));
   });
 
   it('prepareOrder - sell order', function() {
     return this.api.prepareOrder(
       address, requests.prepareOrderSell, instructions).then(
-      _.partial(checkResult, responses.prepareOrderSell, 'tx'));
+      _.partial(checkResult, responses.prepareOrderSell, 'prepare'));
   });
 
   it('prepareOrderCancellation', function() {
     return this.api.prepareOrderCancellation(address, 23, instructions).then(
-      _.partial(checkResult, responses.prepareOrderCancellation, 'tx'));
+      _.partial(checkResult, responses.prepareOrderCancellation, 'prepare'));
   });
 
   it('prepareTrustline - simple', function() {
     return this.api.prepareTrustline(
       address, requests.prepareTrustline.simple, instructions).then(
-        _.partial(checkResult, responses.prepareTrustline.simple, 'tx'));
+        _.partial(checkResult, responses.prepareTrustline.simple, 'prepare'));
   });
 
   it('prepareTrustline - complex', function() {
     return this.api.prepareTrustline(
       address, requests.prepareTrustline.complex, instructions).then(
-        _.partial(checkResult, responses.prepareTrustline.complex, 'tx'));
+        _.partial(checkResult, responses.prepareTrustline.complex, 'prepare'));
   });
 
   it('prepareSettings', function() {
     return this.api.prepareSettings(
       address, requests.prepareSettings, instructions).then(
-      _.partial(checkResult, responses.prepareSettings.flags, 'tx'));
+      _.partial(checkResult, responses.prepareSettings.flags, 'prepare'));
   });
 
   it('prepareSettings - regularKey', function() {
     const regularKey = {regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD'};
     return this.api.prepareSettings(address, regularKey, instructions).then(
-      _.partial(checkResult, responses.prepareSettings.regularKey, 'tx'));
+      _.partial(checkResult, responses.prepareSettings.regularKey, 'prepare'));
   });
 
   it('prepareSettings - flag set', function() {
     const settings = {requireDestinationTag: true};
     return this.api.prepareSettings(address, settings, instructions).then(
-      _.partial(checkResult, responses.prepareSettings.flagSet, 'tx'));
+      _.partial(checkResult, responses.prepareSettings.flagSet, 'prepare'));
   });
 
   it('prepareSettings - flag clear', function() {
     const settings = {requireDestinationTag: false};
     return this.api.prepareSettings(address, settings, instructions).then(
-      _.partial(checkResult, responses.prepareSettings.flagClear, 'tx'));
+      _.partial(checkResult, responses.prepareSettings.flagClear, 'prepare'));
   });
 
   it('prepareSettings - string field clear', function() {
     const settings = {walletLocator: null};
     return this.api.prepareSettings(address, settings, instructions).then(
-      _.partial(checkResult, responses.prepareSettings.fieldClear, 'tx'));
+      _.partial(checkResult, responses.prepareSettings.fieldClear, 'prepare'));
   });
 
   it('prepareSettings - integer field clear', function() {
@@ -131,19 +132,20 @@ describe('RippleAPI', function() {
     return this.api.prepareSettings(address, settings, instructions)
       .then(data => {
         assert(data);
-        assert.strictEqual(data.WalletSize, 0);
+        assert.strictEqual(JSON.parse(data.txJSON).WalletSize, 0);
       });
   });
 
   it('prepareSettings - set transferRate', function() {
     const settings = {transferRate: 1};
     return this.api.prepareSettings(address, settings, instructions).then(
-      _.partial(checkResult, responses.prepareSettings.setTransferRate, 'tx'));
+      _.partial(checkResult, responses.prepareSettings.setTransferRate,
+        'prepare'));
   });
 
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
-    const result = this.api.sign(requests.sign, secret);
+    const result = this.api.sign(requests.sign.txJSON, secret);
     assert.deepEqual(result, responses.sign);
     schemaValidator.schemaValidate('sign', result);
   });
@@ -775,9 +777,9 @@ describe('RippleAPI - offline', function() {
       maxLedgerVersion: 8820051,
       fee: '0.000012'
     };
-    return api.prepareSettings(address, settings, instructions).then(txJSON => {
-      assert.deepEqual(txJSON, responses.prepareSettings.flags);
-      assert.deepEqual(api.sign(txJSON, secret), responses.sign);
+    return api.prepareSettings(address, settings, instructions).then(data => {
+      assert.deepEqual(data, responses.prepareSettings.flags);
+      assert.deepEqual(api.sign(data.txJSON, secret), responses.sign);
     });
   });
 

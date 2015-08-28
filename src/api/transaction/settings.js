@@ -92,10 +92,10 @@ function createSettingsTransaction(account, settings) {
 
 function prepareSettingsAsync(account, settings, instructions, callback) {
   const transaction = createSettingsTransaction(account, settings);
-  utils.createTxJSON(transaction, this.remote, instructions, callback);
+  utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function prepareSettings(account: string, settings: Object, instructions={}) {
+function prepareSettings(account: string, settings: Object, instructions = {}) {
   return utils.promisify(prepareSettingsAsync.bind(this))(
     account, settings, instructions);
 }
