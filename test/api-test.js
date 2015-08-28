@@ -2,7 +2,6 @@
 'use strict';
 const _ = require('lodash');
 const assert = require('assert-diff');
-const path = require('path');
 const setupAPI = require('./setup-api');
 const RippleAPI = require('ripple-api').RippleAPI;
 const common = RippleAPI._PRIVATE.common;
@@ -16,6 +15,7 @@ const validate = common.validate;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
+const ledgerHashSchema = require('./fixtures/schemas/ledgerhash.json');
 
 const orderbook = {
   base: {
@@ -626,9 +626,7 @@ describe('RippleAPI', function() {
 
   describe('schema-validator', function() {
     beforeEach(function() {
-      const schema = schemaValidator.loadSchema(path.join(__dirname,
-        './fixtures/schemas/ledgerhash.json'));
-      schemaValidator.SCHEMAS.ledgerhash = schema;
+      schemaValidator.SCHEMAS.ledgerhash = ledgerHashSchema;
     });
 
     it('valid', function() {
@@ -648,12 +646,6 @@ describe('RippleAPI', function() {
       assert.throws(function() {
         schemaValidator.schemaValidate('ledgerhash', '');
       }, this.api.errors.ValidationError);
-    });
-
-    it('load schema error', function() {
-      assert.throws(function() {
-        schemaValidator.loadSchema('/bad/file/name');
-      }, Error);
     });
 
     it('schema not found error', function() {

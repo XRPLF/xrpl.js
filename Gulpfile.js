@@ -21,6 +21,9 @@ function webpackConfig(extension, overrides) {
       path: './build/',
       filename: ['ripple-', extension].join(pkg.version)
     },
+    node: {
+      console: true
+    },
     module: {
       loaders: [{
         test: /\.js$/,
