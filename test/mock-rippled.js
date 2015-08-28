@@ -205,7 +205,11 @@ module.exports = function(port) {
 
   mock.on('request_submit', function(request, conn) {
     assert.strictEqual(request.command, 'submit');
-    conn.send(createResponse(request, fixtures.submit));
+    if (request.tx_blob === 'BAD') {
+      conn.send(createResponse(request, fixtures.submit.failure));
+    } else {
+      conn.send(createResponse(request, fixtures.submit.success));
+    }
   });
 
   mock.on('request_account_lines', function(request, conn) {
