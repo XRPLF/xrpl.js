@@ -388,7 +388,7 @@ Amount.prototype._copy = function(value) {
 Amount.prototype.compareTo = function(to) {
   var toAmount = Amount.from_json(to);
   if (!this.is_comparable(toAmount)) {
-    return new Amount(NaN);
+    return 0;
   }
   return this._value.comparedTo(toAmount._value);
 };
