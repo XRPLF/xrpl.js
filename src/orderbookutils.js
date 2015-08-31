@@ -1,16 +1,29 @@
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert');
-var SerializedObject = require('./serializedobject').SerializedObject;
-var Types = require('./serializedtypes');
-var Amount = require('./amount').Amount;
+const _ = require('lodash');
+const assert = require('assert');
+const SerializedObject = require('./serializedobject').SerializedObject;
+const Types = require('./serializedtypes');
+const Amount = require('./amount').Amount;
+const Currency = require('./currency').Currency;
+const UInt160 = require('./uint160').UInt160;
 
-var IOU_SUFFIX = '/000/rrrrrrrrrrrrrrrrrrrrrhoLvTp';
-var OrderBookUtils = {};
+// const IOU_SUFFIX = '/000/rrrrrrrrrrrrrrrrrrrrrhoLvTp';
+const IOU_SUFFIX_CURRENCY = Currency.from_json('000');
+const IOU_SUFFIX_ISSUER = UInt160.from_json('rrrrrrrrrrrrrrrrrrrrrhoLvTp');
+const OrderBookUtils = {};
 
 function assertValidNumber(number, message) {
   assert(!_.isNull(number) && !isNaN(number), message);
+}
+
+function createAmount(number) {
+  const amount = new Amount();
+  amount.set_issuer(IOU_SUFFIX_ISSUER);
+  amount._currency = IOU_SUFFIX_CURRENCY;
+  amount.parse_value(number);
+
+  return amount;
 }
 
 /**
@@ -23,7 +36,7 @@ function assertValidNumber(number, message) {
 OrderBookUtils.getOfferTakerGetsFunded = function(offer) {
   assertValidNumber(offer.taker_gets_funded, 'Taker gets funded is invalid');
 
-  return Amount.from_json(offer.taker_gets_funded + IOU_SUFFIX);
+  return createAmount(offer.taker_gets_funded);
 };
 
 /**
@@ -36,7 +49,7 @@ OrderBookUtils.getOfferTakerGetsFunded = function(offer) {
 OrderBookUtils.getOfferTakerPaysFunded = function(offer) {
   assertValidNumber(offer.taker_pays_funded, 'Taker gets funded is invalid');
 
-  return Amount.from_json(offer.taker_pays_funded + IOU_SUFFIX);
+  return createAmount(offer.taker_pays_funded);
 };
 
 /**
@@ -50,7 +63,7 @@ OrderBookUtils.getOfferTakerPaysFunded = function(offer) {
 OrderBookUtils.getOfferTakerGets = function(offer) {
   assert(typeof offer, 'object', 'Offer is invalid');
 
-  return Amount.from_json(offer.TakerGets + IOU_SUFFIX);
+  return createAmount(offer.TakerGets);
 };
 
 /**
@@ -61,7 +74,7 @@ OrderBookUtils.getOfferTakerGets = function(offer) {
  */
 
 OrderBookUtils.getOfferQuality = function(offer, currencyGets) {
-  var amount;
+  let amount;
 
   if (currencyGets.has_interest()) {
     // XXX Should use Amount#from_quality
@@ -71,7 +84,7 @@ OrderBookUtils.getOfferQuality = function(offer, currencyGets) {
       reference_date: new Date()
     });
   } else {
-    amount = Amount.from_json(offer.quality + IOU_SUFFIX);
+    amount = createAmount(offer.quality);
   }
 
   return amount;
@@ -89,8 +102,25 @@ OrderBookUtils.getOfferQuality = function(offer, currencyGets) {
 OrderBookUtils.convertOfferQualityToHex = function(quality) {
   assert(quality instanceof Amount, 'Quality is not an amount');
 
-  var so = new SerializedObject();
-  Types.Quality.serialize(so, quality.to_text() + IOU_SUFFIX);
+  const so = new SerializedObject();
+  Types.Quality.serialize(so, createAmount(quality.to_text()));
+
+  return so.to_hex();
+};
+
+/**
+ * Formats an offer quality amount to a hex that can be parsed by
+ * Amount.parse_quality
+ *
+ * @param {String} quality
+ *
+ * @return {String}
+ */
+
+OrderBookUtils.convertOfferQualityToHexFromText = function(quality) {
+
+  const so = new SerializedObject();
+  Types.Quality.serialize(so, createAmount(quality));
 
   return so.to_hex();
 };
@@ -100,7 +130,7 @@ OrderBookUtils.convertOfferQualityToHex = function(quality) {
  */
 
 OrderBookUtils.normalizeAmount = function(value) {
-  return Amount.from_json(value + IOU_SUFFIX);
+  return createAmount(value);
 };
 
 module.exports = OrderBookUtils;

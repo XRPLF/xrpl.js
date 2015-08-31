@@ -23,10 +23,6 @@ const AutobridgeCalculator = require('./autobridgecalculator');
 const OrderBookUtils = require('./orderbookutils');
 const log = require('./log').internal.sub('orderbook');
 
-function assertValidNumber(number, message) {
-  assert(!_.isNull(number) && !isNaN(number), message);
-}
-
 /**
  * @constructor OrderBook
  * @param {Remote} remote
@@ -35,11 +31,12 @@ function assertValidNumber(number, message) {
  * @param {String} bid currency
  * @param {String} bid issuer
  * @param {String} orderbook key
+ * @param {Boolean} fire 'model' event after receiving transaction
+                    only once in 10 seconds
  */
 
 function OrderBook(remote,
-                   currencyGets, issuerGets, currencyPays, issuerPays,
-                   key) {
+                   currencyGets, issuerGets, currencyPays, issuerPays, key) {
   EventEmitter.call(this);
 
   const self = this;
@@ -60,6 +57,8 @@ function OrderBook(remote,
   this._ownerFundsUnadjusted = {};
   this._ownerFunds = {};
   this._ownerOffersTotal = {};
+  this._validAccounts = {};
+  this._validAccountsCount = 0;
 
   // We consider ourselves synchronized if we have a current
   // copy of the offers, we are online and subscribed to updates
@@ -72,13 +71,44 @@ function OrderBook(remote,
   // books that we must keep track of to compute autobridged offers
   this._legOneBook = null;
   this._legTwoBook = null;
+  this._gotOffersFromLegOne = false;
+  this._gotOffersFromLegTwo = false;
+
+  this.sortOffers = this._currencyGets.has_interest() ?
+    _sortOffers.bind(this) : _sortOffersQuick;
+
+  this.notifyDirectOffersChanged =
+    _.debounce(
+      this.notifyDirectOffersChangedInternal,
+      OrderBook.NOTIFY_TIMEOUT,
+      {maxWait: OrderBook.NOTIFY_MAXWAIT});
 
   this._isAutobridgeable = !this._currencyGets.is_native()
     && !this._currencyPays.is_native();
 
-  function computeAutobridgedOffersWrapper() {
-    self.computeAutobridgedOffers();
-    self.mergeDirectAndAutobridgedBooks();
+  this._autobridgeThrottleTimeMultiplier = 1;
+  this.createDebouncedOffersWrapper();
+
+  function computeAutobridgedOffersWrapperOne() {
+    self._gotOffersFromLegOne = true;
+    self.computeAutobridgedOffersThrottled();
+  }
+
+  function computeAutobridgedOffersWrapperTwo() {
+    self._gotOffersFromLegTwo = true;
+    self.computeAutobridgedOffersThrottled();
+  }
+
+  function onDisconnect() {
+    self.resetCache();
+    self._gotOffersFromLegOne = false;
+    self._gotOffersFromLegTwo = false;
+    if (!self._destroyed) {
+      self._remote.once('disconnect', onDisconnect);
+      self._remote.once('connect', function() {
+        self.subscribe();
+      });
+    }
   }
 
   if (this._isAutobridgeable) {
@@ -88,15 +118,15 @@ function OrderBook(remote,
       issuer_pays: issuerPays
     });
 
-    this._legOneBook.on('model', computeAutobridgedOffersWrapper);
-
     this._legTwoBook = remote.createOrderBook({
       currency_gets: currencyGets,
       issuer_gets: issuerGets,
       currency_pays: 'XRP'
     });
+  }
 
-    this._legTwoBook.on('model', computeAutobridgedOffersWrapper);
+  function updateFundedAmountsWrapper(transaction) {
+    self.updateFundedAmounts(transaction);
   }
 
   function listenersModified(action, event) {
@@ -106,7 +136,16 @@ function OrderBook(remote,
       switch (action) {
         case 'add':
           if (++self._listeners === 1) {
+            self._shouldSubscribe = true;
             self.subscribe();
+
+            self._remote.on('transaction', updateFundedAmountsWrapper);
+            self._remote.once('disconnect', onDisconnect);
+
+            if (self._isAutobridgeable) {
+              self._legOneBook.on('model', computeAutobridgedOffersWrapperOne);
+              self._legTwoBook.on('model', computeAutobridgedOffersWrapperTwo);
+            }
           }
           break;
         case 'remove':
@@ -118,10 +157,6 @@ function OrderBook(remote,
     }
   }
 
-  function updateFundedAmountsWrapper(transaction) {
-    self.updateFundedAmounts(transaction);
-  }
-
   this.on('newListener', function(event) {
     listenersModified('add', event);
   });
@@ -130,23 +165,21 @@ function OrderBook(remote,
     listenersModified('remove', event);
   });
 
-  this._remote.on('transaction', updateFundedAmountsWrapper);
-
   this.on('unsubscribe', function() {
     self.resetCache();
 
     self._remote.removeListener('transaction', updateFundedAmountsWrapper);
-  });
+    self._remote.removeListener('disconnect', onDisconnect);
 
-  this._remote.once('prepare_subscribe', function() {
-    self.subscribe();
-  });
+    self._gotOffersFromLegOne = false;
+    self._gotOffersFromLegTwo = false;
 
-  this._remote.on('disconnect', function() {
-    self.resetCache();
-    self._remote.once('prepare_subscribe', function() {
-      self.subscribe();
-    });
+    if (self._isAutobridgeable) {
+      self._legOneBook.removeListener('model',
+        computeAutobridgedOffersWrapperOne);
+      self._legTwoBook.removeListener('model',
+        computeAutobridgedOffersWrapperTwo);
+    }
   });
 
   return this;
@@ -164,7 +197,21 @@ OrderBook.EVENTS = [
   'offer_changed', 'offer_funds_changed'
 ];
 
-OrderBook.DEFAULT_TRANSFER_RATE = 1000000000;
+OrderBook.DEFAULT_TRANSFER_RATE = Amount.from_json(1000000000);
+
+OrderBook.NOTIFY_TIMEOUT = 100;
+
+OrderBook.NOTIFY_MAXWAIT = 250;
+
+OrderBook.AUTOBRIDGE_CALCULATE_THROTTLE_TIME = 1000;
+
+OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_TIME = 250;
+
+OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_MAXWAIT = 500;
+
+OrderBook.ZERO_NATIVE_AMOUNT = Amount.from_json('0');
+
+OrderBook.ZERO_NORMALIZED_AMOUNT = OrderBookUtils.normalizeAmount('0');
 
 /**
  * Normalize offers from book_offers and transaction stream
@@ -191,18 +238,20 @@ OrderBook.offerRewrite = function(offer) {
   result.Flags = result.Flags || 0;
   result.OwnerNode = result.OwnerNode || new Array(16 + 1).join('0');
   result.BookNode = result.BookNode || new Array(16 + 1).join('0');
+  result.qualityHex = result.BookDirectory.slice(-16);
 
   return result;
 };
 
 /**
  * Initialize orderbook. Get orderbook offers and subscribe to transactions
+ * @api private
  */
 
 OrderBook.prototype.subscribe = function() {
   const self = this;
 
-  if (!this._shouldSubscribe) {
+  if (!this._shouldSubscribe || this._destroyed) {
     return;
   }
 
@@ -215,7 +264,7 @@ OrderBook.prototype.subscribe = function() {
       self.requestTransferRate(callback);
     },
     function(callback) {
-      self.requestOffers(callback);
+      self.requestOffers(callback, true);
     },
     function(callback) {
       self.subscribeTransactions(callback);
@@ -228,6 +277,7 @@ OrderBook.prototype.subscribe = function() {
 /**
  * Unhook event listeners and prevent ripple-lib from further work on this
  * orderbook. There is no more orderbook stream, so "unsubscribe" is nominal
+ * @api private
  */
 
 OrderBook.prototype.unsubscribe = function() {
@@ -250,32 +300,74 @@ OrderBook.prototype.unsubscribe = function() {
 };
 
 /**
+ * After that you can't use this object.
+ */
+
+OrderBook.prototype.destroy = function() {
+  this._destroyed = true;
+  if (this._subscribed) {
+    this.unsubscribe();
+  }
+
+  if (this._remote._books.hasOwnProperty(this._key)) {
+    delete this._remote._books[this._key];
+  }
+
+  if (this._isAutobridgeable) {
+    this._legOneBook.destroy();
+    this._legTwoBook.destroy();
+  }
+};
+
+/**
  * Request orderbook entries from server
  *
  * @param {Function} callback
  */
 
-OrderBook.prototype.requestOffers = function(callback) {
+OrderBook.prototype.requestOffers = function(callback = function() {},
+  internal = false) {
   const self = this;
 
+  if (!this._remote.isConnected()) {
+    // do not make request if not online.
+    // that requests will be queued and
+    // eventually all of them will fire back
+    return undefined;
+  }
+
   if (!this._shouldSubscribe) {
-    return callback(new Error('Should not request offers'));
+    callback(new Error('Should not request offers'));
+    return undefined;
   }
 
   if (this._remote.trace) {
     log.info('requesting offers', this._key);
   }
 
+  if (this._isAutobridgeable && !internal) {
+    this._gotOffersFromLegOne = false;
+    this._gotOffersFromLegTwo = false;
+
+    this._legOneBook.requestOffers();
+    this._legTwoBook.requestOffers();
+  }
+
+
   function handleOffers(res) {
+    if (self._destroyed) {
+      return;
+    }
+
     if (!Array.isArray(res.offers)) {
       // XXX What now?
-      return callback(new Error('Invalid response'));
+      callback(new Error('Invalid response'));
+      return;
     }
 
     if (self._remote.trace) {
       log.info('requested offers', self._key, 'offers: ' + res.offers.length);
     }
-
     self.setOffers(res.offers);
     self._synchronized = true;
     self.notifyDirectOffersChanged();
@@ -330,8 +422,9 @@ OrderBook.prototype.requestTransferRate = function(callback) {
 
     // When transfer rate is not explicitly set on account, it implies the
     // default transfer rate
-    self._issuerTransferRate = info.account_data.TransferRate ||
-                               OrderBook.DEFAULT_TRANSFER_RATE;
+    self._issuerTransferRate =
+      Amount.from_json(info.account_data.TransferRate ||
+      OrderBook.DEFAULT_TRANSFER_RATE);
 
     callback(null, self._issuerTransferRate);
   }
@@ -391,7 +484,7 @@ OrderBook.prototype.subscribeTransactions = function(callback) {
  * books, an additional merge step is also performed
  */
 
-OrderBook.prototype.notifyDirectOffersChanged = function() {
+OrderBook.prototype.notifyDirectOffersChangedInternal = function() {
   if (this._isAutobridgeable) {
     this.mergeDirectAndAutobridgedBooks();
   } else {
@@ -407,7 +500,13 @@ OrderBook.prototype.resetCache = function() {
   this._ownerFunds = {};
   this._ownerOffersTotal = {};
   this._offerCounts = {};
+  this._offers = [];
   this._synchronized = false;
+
+  if (this._validAccountsCount > 3000) {
+    this._validAccounts = {};
+    this._validAccountsCount = 0;
+  }
 };
 
 /**
@@ -417,7 +516,6 @@ OrderBook.prototype.resetCache = function() {
  */
 
 OrderBook.prototype.hasOwnerFunds = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   return this._ownerFunds[account] !== undefined;
 };
 
@@ -429,7 +527,6 @@ OrderBook.prototype.hasOwnerFunds = function(account) {
  */
 
 OrderBook.prototype.setOwnerFunds = function(account, fundedAmount) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   assert(!isNaN(fundedAmount), 'Funded amount is invalid');
 
   this._ownerFundsUnadjusted[account] = fundedAmount;
@@ -446,11 +543,11 @@ OrderBook.prototype.setOwnerFunds = function(account, fundedAmount) {
 
 OrderBook.prototype.applyTransferRate = function(balance) {
   assert(!isNaN(balance), 'Balance is invalid');
-  assertValidNumber(this._issuerTransferRate, 'Transfer rate is invalid');
+  assert(this._issuerTransferRate.is_valid(), 'Transfer rate is invalid');
 
   const adjustedBalance = OrderBookUtils.normalizeAmount(balance)
   .divide(this._issuerTransferRate)
-  .multiply(Amount.from_json(OrderBook.DEFAULT_TRANSFER_RATE))
+  .multiply(OrderBook.DEFAULT_TRANSFER_RATE)
   .to_json()
   .value;
 
@@ -465,7 +562,6 @@ OrderBook.prototype.applyTransferRate = function(balance) {
  */
 
 OrderBook.prototype.getOwnerFunds = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   if (this.hasOwnerFunds(account)) {
     if (this._currencyGets.is_native()) {
       return Amount.from_json(this._ownerFunds[account]);
@@ -482,7 +578,6 @@ OrderBook.prototype.getOwnerFunds = function(account) {
  */
 
 OrderBook.prototype.getUnadjustedOwnerFunds = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   return this._ownerFundsUnadjusted[account];
 };
 
@@ -493,7 +588,6 @@ OrderBook.prototype.getUnadjustedOwnerFunds = function(account) {
  */
 
 OrderBook.prototype.deleteOwnerFunds = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   this._ownerFunds[account] = undefined;
 };
 
@@ -505,7 +599,6 @@ OrderBook.prototype.deleteOwnerFunds = function(account) {
  */
 
 OrderBook.prototype.getOwnerOfferCount = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   return this._offerCounts[account] || 0;
 };
 
@@ -517,7 +610,6 @@ OrderBook.prototype.getOwnerOfferCount = function(account) {
  */
 
 OrderBook.prototype.incrementOwnerOfferCount = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   const result = (this._offerCounts[account] || 0) + 1;
   this._offerCounts[account] = result;
   return result;
@@ -532,7 +624,6 @@ OrderBook.prototype.incrementOwnerOfferCount = function(account) {
  */
 
 OrderBook.prototype.decrementOwnerOfferCount = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   const result = (this._offerCounts[account] || 1) - 1;
   this._offerCounts[account] = result;
 
@@ -553,8 +644,6 @@ OrderBook.prototype.decrementOwnerOfferCount = function(account) {
  */
 
 OrderBook.prototype.addOwnerOfferTotal = function(account, amount) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
-
   const previousAmount = this.getOwnerOfferTotal(account);
   const currentAmount = previousAmount.add(Amount.from_json(amount));
 
@@ -573,14 +662,12 @@ OrderBook.prototype.addOwnerOfferTotal = function(account, amount) {
  */
 
 OrderBook.prototype.subtractOwnerOfferTotal = function(account, amount) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
-
   const previousAmount = this.getOwnerOfferTotal(account);
   const newAmount = previousAmount.subtract(Amount.from_json(amount));
+
   this._ownerOffersTotal[account] = newAmount;
 
   assert(!newAmount.is_negative(), 'Offer total cannot be negative');
-
   return newAmount;
 };
 
@@ -592,15 +679,14 @@ OrderBook.prototype.subtractOwnerOfferTotal = function(account, amount) {
  */
 
 OrderBook.prototype.getOwnerOfferTotal = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   const amount = this._ownerOffersTotal[account];
   if (amount) {
     return amount;
   }
   if (this._currencyGets.is_native()) {
-    return Amount.from_json('0');
+    return OrderBook.ZERO_NATIVE_AMOUNT.clone();
   }
-  return OrderBookUtils.normalizeAmount('0');
+  return OrderBook.ZERO_NORMALIZED_AMOUNT.clone();
 };
 
 /**
@@ -611,11 +697,10 @@ OrderBook.prototype.getOwnerOfferTotal = function(account) {
  */
 
 OrderBook.prototype.resetOwnerOfferTotal = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   if (this._currencyGets.is_native()) {
-    this._ownerOffersTotal[account] = Amount.from_json('0');
+    this._ownerOffersTotal[account] = OrderBook.ZERO_NATIVE_AMOUNT.clone();
   } else {
-    this._ownerOffersTotal[account] = OrderBookUtils.normalizeAmount('0');
+    this._ownerOffersTotal[account] = OrderBook.ZERO_NORMALIZED_AMOUNT.clone();
   }
 };
 
@@ -633,17 +718,18 @@ OrderBook.prototype.resetOwnerOfferTotal = function(account) {
 OrderBook.prototype.setOfferFundedAmount = function(offer) {
   assert.strictEqual(typeof offer, 'object', 'Offer is invalid');
 
+  const takerGets = Amount.from_json(offer.TakerGets);
   const fundedAmount = this.getOwnerFunds(offer.Account);
   const previousOfferSum = this.getOwnerOfferTotal(offer.Account);
-  const currentOfferSum = previousOfferSum.add(
-    Amount.from_json(offer.TakerGets));
+  const currentOfferSum = previousOfferSum.add(takerGets);
 
   offer.owner_funds = this.getUnadjustedOwnerFunds(offer.Account);
 
-  offer.is_fully_funded = fundedAmount.compareTo(currentOfferSum) >= 0;
+  offer.is_fully_funded = fundedAmount.is_comparable(currentOfferSum) &&
+    fundedAmount.compareTo(currentOfferSum) >= 0;
 
   if (offer.is_fully_funded) {
-    offer.taker_gets_funded = Amount.from_json(offer.TakerGets).to_text();
+    offer.taker_gets_funded = takerGets.to_text();
     offer.taker_pays_funded = Amount.from_json(offer.TakerPays).to_text();
   } else if (previousOfferSum.compareTo(fundedAmount) < 0) {
     offer.taker_gets_funded = fundedAmount.subtract(previousOfferSum).to_text();
@@ -699,7 +785,11 @@ OrderBook.prototype.parseAccountBalanceFromNode = function(node) {
   }
 
   assert(!isNaN(result.balance), 'node has an invalid balance');
-  assert(UInt160.is_valid(result.account), 'node has an invalid account');
+  if (this._validAccounts[result.Account] === undefined) {
+    assert(UInt160.is_valid(result.account), 'node has an invalid account');
+    this._validAccounts[result.Account] = true;
+    this._validAccountsCount++;
+  }
 
   return result;
 };
@@ -781,6 +871,7 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
   });
 };
 
+
 /**
  * Update offers' funded amount with their owner's funds
  *
@@ -788,9 +879,14 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
  */
 
 OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
+  // assert(UInt160.is_valid(account), 'Account is invalid');
 
   const self = this;
+
+  if (!this.hasOwnerFunds(account)) {
+    // We are only updating owner funds that are already cached
+    return;
+  }
 
   if (this._remote.trace) {
     const ownerFunds = this.getOwnerFunds(account);
@@ -843,7 +939,7 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
 OrderBook.prototype.notify = function(transaction) {
   const self = this;
 
-  if (!this._subscribed) {
+  if (!this._subscribed || this._destroyed) {
     return;
   }
 
@@ -879,6 +975,12 @@ OrderBook.prototype.notify = function(transaction) {
   function handleNode(node) {
     switch (node.nodeType) {
       case 'DeletedNode':
+        if (self._validAccounts[node.fields.Account] === undefined) {
+          assert(UInt160.is_valid(node.fields.Account),
+            'node has an invalid account');
+          self._validAccounts[node.fields.Account] = true;
+          self._validAccountsCount++;
+        }
         self.deleteOffer(node, isOfferCancel);
 
         // We don't want to count an OfferCancel as a trade
@@ -889,6 +991,12 @@ OrderBook.prototype.notify = function(transaction) {
         break;
 
       case 'ModifiedNode':
+        if (self._validAccounts[node.fields.Account] === undefined) {
+          assert(UInt160.is_valid(node.fields.Account),
+            'node has an invalid account');
+          self._validAccounts[node.fields.Account] = true;
+          self._validAccountsCount++;
+        }
         self.modifyOffer(node);
 
         takerGetsTotal = takerGetsTotal
@@ -901,6 +1009,12 @@ OrderBook.prototype.notify = function(transaction) {
         break;
 
       case 'CreatedNode':
+        if (self._validAccounts[node.fields.Account] === undefined) {
+          assert(UInt160.is_valid(node.fields.Account),
+            'node has an invalid account');
+          self._validAccounts[node.fields.Account] = true;
+          self._validAccountsCount++;
+        }
         // rippled does not set owner_funds if the order maker is the issuer
         // because the value would be infinite
         const fundedAmount = transactionOwnerFunds !== undefined ?
@@ -914,7 +1028,9 @@ OrderBook.prototype.notify = function(transaction) {
   _.each(affectedNodes, handleNode);
 
   this.emit('transaction', transaction);
+
   this.notifyDirectOffersChanged();
+
   if (!takerGetsTotal.is_zero()) {
     this.emit('trade', takerPaysTotal, takerGetsTotal);
   }
@@ -946,17 +1062,27 @@ OrderBook.prototype.insertOffer = function(node) {
 
   const originalLength = this._offers.length;
 
-  for (let i = 0; i < originalLength; i++) {
-    const quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
-    const existingOfferQuality = OrderBookUtils.getOfferQuality(
-      this._offers[i],
-      this._currencyGets
-    );
+  if (!this._currencyGets.has_interest()) {
+    // use fast path
+    for (let i = 0; i < originalLength; i++) {
+      if (offer.qualityHex <= this._offers[i].qualityHex) {
+        this._offers.splice(i, 0, offer);
+        break;
+      }
+    }
+  } else {
+    for (let i = 0; i < originalLength; i++) {
+      const quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
+      const existingOfferQuality = OrderBookUtils.getOfferQuality(
+        this._offers[i],
+        this._currencyGets
+      );
 
-    if (quality.compareTo(existingOfferQuality) <= 0) {
-      this._offers.splice(i, 0, offer);
+      if (quality.compareTo(existingOfferQuality) <= 0) {
+        this._offers.splice(i, 0, offer);
 
-      break;
+        break;
+      }
     }
   }
 
@@ -1062,28 +1188,33 @@ OrderBook.prototype.deleteOffer = function(node, isOfferCancel) {
 OrderBook.prototype.setOffers = function(offers) {
   assert(Array.isArray(offers), 'Offers is not an array');
 
-  const self = this;
-
   this.resetCache();
 
-  const newOffers = _.map(offers, function(rawOffer) {
-    const offer = OrderBook.offerRewrite(rawOffer);
+  let i = -1, offer;
+  const l = offers.length;
 
-    if (offer.hasOwnProperty('owner_funds')) {
+  while (++i < l) {
+    offer = OrderBook.offerRewrite(offers[i]);
+
+    if (this._validAccounts[offer.Account] === undefined) {
+      assert(UInt160.is_valid(offer.Account), 'Account is invalid');
+      this._validAccounts[offer.Account] = true;
+      this._validAccountsCount++;
+    }
+    if (offer.owner_funds !== undefined) {
       // The first offer of each owner from book_offers contains owner balance
       // of offer's output
-      self.setOwnerFunds(offer.Account, offer.owner_funds);
+      this.setOwnerFunds(offer.Account, offer.owner_funds);
     }
 
-    self.incrementOwnerOfferCount(offer.Account);
+    this.incrementOwnerOfferCount(offer.Account);
 
-    self.setOfferFundedAmount(offer);
-    self.addOwnerOfferTotal(offer.Account, offer.TakerGets);
+    this.setOfferFundedAmount(offer);
+    this.addOwnerOfferTotal(offer.Account, offer.TakerGets);
+    offers[i] = offer;
+  }
 
-    return offer;
-  });
-
-  this._offers = newOffers;
+  this._offers = offers;
 };
 
 /**
@@ -1185,6 +1316,14 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
   assert(!this._currencyGets.is_native() && !this._currencyPays.is_native(),
     'Autobridging is only for IOU:IOU orderbooks');
 
+  if (this._destroyed) {
+    return;
+  }
+
+  if (!this._gotOffersFromLegOne || !this._gotOffersFromLegTwo) {
+    return;
+  }
+
   const autobridgeCalculator = new AutobridgeCalculator(
     this._currencyGets,
     this._currencyPays,
@@ -1197,6 +1336,44 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
   this._offersAutobridged = autobridgeCalculator.calculate();
 };
 
+OrderBook.prototype.computeAutobridgedOffersWrapper = function() {
+  var startTime = Date.now();
+  this.computeAutobridgedOffers();
+  this.mergeDirectAndAutobridgedBooks();
+  var lasted = (Date.now() - startTime);
+  
+  const newMult =
+    ((lasted * 2 / OrderBook.AUTOBRIDGE_CALCULATE_THROTTLE_TIME) << 0) + 1;
+  if (newMult !== this._autobridgeThrottleTimeMultiplier) {
+    this._autobridgeThrottleTimeMultiplier = newMult;
+    this.createDebouncedOffersWrapper();
+  }
+}
+
+OrderBook.prototype.createDebouncedOffersWrapper = function() {
+  const m = this._autobridgeThrottleTimeMultiplier;
+  this.computeAutobridgedOffersThrottled = 
+    _.debounce(
+      _.throttle(
+        this.computeAutobridgedOffersWrapper,
+        OrderBook.AUTOBRIDGE_CALCULATE_THROTTLE_TIME * m,
+        {leading: true, trailing: true}),
+      OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_TIME,
+      {maxWait: OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_MAXWAIT});
+}
+
+
+function _sortOffers(a, b) {
+  const aQuality = OrderBookUtils.getOfferQuality(a, this._currencyGets);
+  const bQuality = OrderBookUtils.getOfferQuality(b, this._currencyGets);
+
+  return aQuality._value.comparedTo(bQuality._value);
+}
+
+function _sortOffersQuick(a, b) {
+  return a.qualityHex.localeCompare(b.qualityHex);
+}
+
 /**
  * Merge direct and autobridged offers into a combined orderbook
  *
@@ -1204,20 +1381,24 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
  */
 
 OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
-  const self = this;
+
+  if (this._destroyed) {
+    return;
+  }
 
   if (_.isEmpty(this._offers) && _.isEmpty(this._offersAutobridged)) {
+    if (this._synchronized && this._gotOffersFromLegOne &&
+      this._gotOffersFromLegTwo) {
+      // emit empty model to indicate to listeners that we've got offers,
+      // just there was no one
+      this.emit('model', []);
+    }
     return;
   }
 
   this._mergedOffers = this._offers
     .concat(this._offersAutobridged)
-    .sort(function(a, b) {
-      const aQuality = OrderBookUtils.getOfferQuality(a, self._currencyGets);
-      const bQuality = OrderBookUtils.getOfferQuality(b, self._currencyGets);
-
-      return aQuality.compareTo(bQuality);
-    });
+    .sort(this.sortOffers);
 
   this.emit('model', this._mergedOffers);
 };
