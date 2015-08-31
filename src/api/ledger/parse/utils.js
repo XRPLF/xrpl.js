@@ -67,8 +67,22 @@ function parseOutcome(tx: Object): ?Object {
   };
 }
 
+function parseMemos(tx: Object): ?Array<Object> {
+  if (!Array.isArray(tx.Memos) || tx.Memos.length === 0) {
+    return undefined;
+  }
+  return tx.Memos.map((m) => {
+    return removeUndefined({
+      type: m.Memo.parsed_memo_type,
+      format: m.Memo.parsed_memo_format,
+      data: m.Memo.parsed_memo_data
+    });
+  });
+}
+
 module.exports = {
   parseOutcome,
+  parseMemos,
   removeUndefined,
   adjustQualityForXRP,
   dropsToXrp: utils.common.dropsToXrp,

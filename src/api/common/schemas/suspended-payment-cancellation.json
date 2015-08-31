@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "suspended-payment-cancellation",
+  "type": "object",
+  "properties": {
+    "memos": {
+      "type": "array",
+      "items": {
+        "$ref": "memo"
+      }
+    },
+    "owner": {"$ref": "address"},
+    "paymentSequence": {"$ref": "uint32"}
+  },
+  "required": ["owner", "paymentSequence"],
+  "additionalProperties": false
+}

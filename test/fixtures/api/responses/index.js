@@ -47,6 +47,12 @@ module.exports = {
     setTransferRate: require('./prepare-settings-set-transfer-rate.json'),
     fieldClear: require('./prepare-settings-field-clear.json')
   },
+  prepareSuspendedPaymentCreation:
+    require('./prepare-suspended-payment-creation'),
+  prepareSuspendedPaymentExecution:
+    require('./prepare-suspended-payment-execution'),
+  prepareSuspendedPaymentCancellation:
+    require('./prepare-suspended-payment-cancellation'),
   prepareTrustline: {
     simple: require('./prepare-trustline-simple.json'),
     complex: require('./prepare-trustline.json')

@@ -23,6 +23,12 @@ const preparePayment = require('./transaction/payment');
 const prepareTrustline = require('./transaction/trustline');
 const prepareOrder = require('./transaction/order');
 const prepareOrderCancellation = require('./transaction/ordercancellation');
+const prepareSuspendedPaymentCreation =
+  require('./transaction/suspended-payment-creation');
+const prepareSuspendedPaymentExecution =
+  require('./transaction/suspended-payment-execution');
+const prepareSuspendedPaymentCancellation =
+  require('./transaction/suspended-payment-cancellation');
 const prepareSettings = require('./transaction/settings');
 const sign = require('./transaction/sign');
 const submit = require('./transaction/submit');
@@ -61,6 +67,9 @@ RippleAPI.prototype = {
   prepareTrustline,
   prepareOrder,
   prepareOrderCancellation,
+  prepareSuspendedPaymentCreation,
+  prepareSuspendedPaymentExecution,
+  prepareSuspendedPaymentCancellation,
   prepareSettings,
   sign,
   submit,

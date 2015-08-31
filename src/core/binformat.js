@@ -92,6 +92,8 @@ const FIELDS_MAP = exports.fields = {
     33: 'SetFlag',
     34: 'ClearFlag',
     35: 'SignerQuorum',
+    36: 'CancelAfter',
+    37: 'FinishAfter',
     38: 'SignerListID'
   },
   3: { // Int64
@@ -121,7 +123,8 @@ const FIELDS_MAP = exports.fields = {
     17: 'InvoiceID',
     18: 'Nickname',
     19: 'Amendment',
-    20: 'TicketID'
+    20: 'TicketID',
+    21: 'Digest'
   },
   6: { // Amount
     1: 'Amount',
@@ -151,7 +154,8 @@ const FIELDS_MAP = exports.fields = {
     11: 'CreateCode',
     12: 'MemoType',
     13: 'MemoData',
-    14: 'MemoFormat'
+    14: 'MemoFormat',
+    17: 'Proof'
   },
   8: { // Account
     1: 'Account',
@@ -190,7 +194,7 @@ const FIELDS_MAP = exports.fields = {
   // Uncommon types
   16: { // Int8
     1: 'CloseResolution',
-    2: 'TemplateEntryType',
+    2: 'Method',
     3: 'TransactionResult'
   },
   17: { // Hash160
@@ -217,9 +221,9 @@ Object.keys(FIELDS_MAP).forEach(function(k1) {
   });
 });
 
-const REQUIRED = exports.REQUIRED = 0,
-  OPTIONAL = exports.OPTIONAL = 1,
-  DEFAULT  = exports.DEFAULT  = 2;
+const REQUIRED = exports.REQUIRED = 0;
+const OPTIONAL = exports.OPTIONAL = 1;
+const DEFAULT  = exports.DEFAULT  = 2;
 
 const base = [
   [ 'TransactionType'    , REQUIRED ],
@@ -308,6 +312,25 @@ exports.tx = {
   SignerListSet: [12].concat(base, [
     ['SignerQuorum', REQUIRED],
     ['SignerEntries', OPTIONAL]
+  ]),
+  SuspendedPaymentCreate: [1].concat(base, [
+    [ 'Destination'        , REQUIRED ],
+    [ 'Amount'             , REQUIRED ],
+    [ 'Digest'             , OPTIONAL ],
+    [ 'CancelAfter'        , OPTIONAL ],
+    [ 'FinishAfter'        , OPTIONAL ],
+    [ 'DestinationTag'     , OPTIONAL ]
+  ]),
+  SuspendedPaymentFinish: [2].concat(base, [
+    [ 'Owner'              , REQUIRED ],
+    [ 'OfferSequence'      , REQUIRED ],
+    [ 'Method'             , OPTIONAL ],
+    [ 'Digest'             , OPTIONAL ],
+    [ 'Proof'              , OPTIONAL ]
+  ]),
+  SuspendedPaymentCancel: [4].concat(base, [
+    [ 'Owner'              , REQUIRED ],
+    [ 'OfferSequence'      , REQUIRED ]
   ])
 };
 

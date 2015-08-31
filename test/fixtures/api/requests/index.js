@@ -7,6 +7,12 @@ module.exports = {
   preparePaymentAllOptions: require('./prepare-payment-all-options'),
   preparePaymentNoCounterparty: require('./prepare-payment-no-counterparty'),
   prepareSettings: require('./prepare-settings'),
+  prepareSuspendedPaymentCreation:
+    require('./prepare-suspended-payment-creation'),
+  prepareSuspendedPaymentExecution:
+    require('./prepare-suspended-payment-execution'),
+  prepareSuspendedPaymentCancellation:
+    require('./prepare-suspended-payment-cancellation'),
   prepareTrustline: {
     simple: require('./prepare-trustline-simple'),
     complex: require('./prepare-trustline')
