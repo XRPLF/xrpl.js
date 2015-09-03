@@ -1218,16 +1218,23 @@ OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
     return;
   }
 
-  this._mergedOffers = this._offers
-    .concat(this._offersAutobridged)
-    .sort(function(a, b) {
-      const aQuality = OrderBookUtils.getOfferQuality(a, self._currencyGets);
-      const bQuality = OrderBookUtils.getOfferQuality(b, self._currencyGets);
+  const offers = self._offers.concat(self._offersAutobridged);
+  const qualities = offers.map(function(o, i) {
+    return {
+      index: i,
+      value: OrderBookUtils.getOfferQuality(o, self._currencyGets)
+    }
+  });
 
-      return aQuality.compareTo(bQuality);
-    });
+  qualities.sort(function(a, b) {
+    return a.value.compareTo(b.value);
+  });
 
-  this.emit('model', this._mergedOffers);
+  self._mergedOffers = qualities.map(function(q) {
+    return offers[q.index];
+  });
+
+  self.emit('model', self._mergedOffers);
 };
 
 exports.OrderBook = OrderBook;
