@@ -1601,7 +1601,7 @@ describe('OrderBook', function() {
     assert.strictEqual(book._offers[2].Account, addresses.OTHER_ACCOUNT);
   });
 
-  it('Notify - created nodes - events', function() {
+  it('Notify - created nodes - events', function(done) {
     let numTransactionEvents = 0;
     let numModelEvents = 0;
     let numOfferAddedEvents = 0;
@@ -1637,9 +1637,12 @@ describe('OrderBook', function() {
     book.notify(offer2);
     book.notify(offer3);
 
-    assert.strictEqual(numTransactionEvents, 3);
-    assert.strictEqual(numModelEvents, 3);
-    assert.strictEqual(numOfferAddedEvents, 3);
+    setTimeout(function() {
+      assert.strictEqual(numTransactionEvents, 3);
+      assert.strictEqual(numModelEvents, 1);
+      assert.strictEqual(numOfferAddedEvents, 3);
+      done();
+    }, 200);
   });
 
   it('Notify - deleted node', function() {
@@ -1687,7 +1690,7 @@ describe('OrderBook', function() {
     assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), undefined);
   });
 
-  it('Notify - deleted node - events', function() {
+  it('Notify - deleted node - events', function(done) {
     let numTransactionEvents = 0;
     let numModelEvents = 0;
     let numTradeEvents = 0;
@@ -1725,10 +1728,13 @@ describe('OrderBook', function() {
 
     book.notify(message);
 
-    assert.strictEqual(numTransactionEvents, 1);
-    assert.strictEqual(numModelEvents, 1);
-    assert.strictEqual(numTradeEvents, 1);
-    assert.strictEqual(numOfferRemovedEvents, 1);
+    setTimeout(function() {
+      assert.strictEqual(numTransactionEvents, 1);
+      assert.strictEqual(numModelEvents, 1);
+      assert.strictEqual(numTradeEvents, 1);
+      assert.strictEqual(numOfferRemovedEvents, 1);
+      done();
+    }, 200);
   });
 
   it('Notify - deleted node - trade', function(done) {
@@ -1843,7 +1849,7 @@ describe('OrderBook', function() {
     assert.strictEqual(book._offers[1].taker_pays_funded, '972251352');
   });
 
-  it('Notify - modified node - events', function() {
+  it('Notify - modified node - events', function(done) {
     let numTransactionEvents = 0;
     let numModelEvents = 0;
     let numTradeEvents = 0;
@@ -1881,10 +1887,13 @@ describe('OrderBook', function() {
 
     book.notify(message);
 
-    assert.strictEqual(numTransactionEvents, 1);
-    assert.strictEqual(numModelEvents, 1);
-    assert.strictEqual(numTradeEvents, 1);
-    assert.strictEqual(numOfferChangedEvents, 1);
+    setTimeout(function() {
+      assert.strictEqual(numTransactionEvents, 1);
+      assert.strictEqual(numModelEvents, 1);
+      assert.strictEqual(numTradeEvents, 1);
+      assert.strictEqual(numOfferChangedEvents, 1);
+      done();
+    }, 200);
   });
 
   it('Notify - modified node - trade', function(done) {

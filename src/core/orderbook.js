@@ -393,11 +393,18 @@ OrderBook.prototype.subscribeTransactions = function(callback) {
  */
 
 OrderBook.prototype.notifyDirectOffersChanged = function() {
-  if (this._isAutobridgeable) {
-    this.mergeDirectAndAutobridgedBooks();
-  } else {
-    this.emit('model', this._offers);
-  }
+  const self = this;
+
+  // debounce
+  clearTimeout(this._notifyTimeout);
+  this._notifyTimeout = setTimeout(function() {
+
+    if (self._isAutobridgeable) {
+      self.mergeDirectAndAutobridgedBooks();
+    } else {
+      self.emit('model', self._offers);
+    }
+  }, 100);
 };
 
 /**
@@ -920,6 +927,7 @@ OrderBook.prototype.notify = function(transaction) {
 
   this.emit('transaction', transaction);
   this.notifyDirectOffersChanged();
+
   if (!takerGetsTotal.is_zero()) {
     this.emit('trade', takerPaysTotal, takerGetsTotal);
   }
