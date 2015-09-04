@@ -1255,21 +1255,11 @@ OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
       return;
     }
 
-    const offers = self._offers.concat(self._offersAutobridged);
-    const qualities = offers.map(function(o, i) {
-      return {
-        index: i,
-        value: OrderBookUtils.getOfferQuality(o, self._currencyGets)
-      }
+    self._mergedOffers = self._offers.concat(self._offersAutobridged)
+    .sort(function(a, b) {
+      return Number(a.quality) - Number(b.quality);
     });
 
-    qualities.sort(function(a, b) {
-      return a.value.compareTo(b.value);
-    });
-
-    self._mergedOffers = qualities.map(function(q) {
-      return offers[q.index];
-    });
 
     self.emit('model', self._mergedOffers);
   }
