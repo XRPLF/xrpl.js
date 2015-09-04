@@ -167,6 +167,57 @@ function OrderBook(remote,
     });
   });
 
+  /**
+   * Handles notifying listeners that direct offers have changed. For autobridged
+   * books, an additional merge step is also performed
+   */
+
+  function notifyDirectOffersChanged() {
+    if (self._isAutobridgeable) {
+      self.mergeDirectAndAutobridgedBooks();
+    } else {
+      self.emit('model', self._offers);
+    }
+  }
+
+  // debounce
+  this.notifyDirectOffersChanged = _.debounce(notifyDirectOffersChanged, 100, {
+    maxWait: 500
+  });
+
+  /**
+   * Merge direct and autobridged offers into a combined orderbook
+   *
+   * @return [Array]
+   */
+
+  function mergeBooks() {
+
+    if (self._shouldCompute) {
+      self.computeAutobridgedOffers();
+      self._shouldCompute = false;
+    }
+
+    if (_.isEmpty(self._offers) && _.isEmpty(self._offersAutobridged)) {
+      // still emit empty offers list to indicate that load is completed
+      self.emit('model', []);
+      return;
+    }
+
+    self._mergedOffers = self._offers.concat(self._offersAutobridged)
+    .sort(function(a, b) {
+      return Number(a.quality) - Number(b.quality);
+    });
+
+
+    self.emit('model', self._mergedOffers);
+  }
+
+  // debounce
+  this.mergeDirectAndAutobridgedBooks = _.debounce(mergeBooks, 250, {
+    maxWait: 500
+  });
+
   return this;
 }
 
@@ -403,26 +454,6 @@ OrderBook.prototype.subscribeTransactions = function(callback) {
   request.request();
 
   return request;
-};
-
-/**
- * Handles notifying listeners that direct offers have changed. For autobridged
- * books, an additional merge step is also performed
- */
-
-OrderBook.prototype.notifyDirectOffersChanged = function() {
-  const self = this;
-
-  // debounce
-  clearTimeout(this._notifyTimeout);
-  this._notifyTimeout = setTimeout(function() {
-
-    if (self._isAutobridgeable) {
-      self.mergeDirectAndAutobridgedBooks();
-    } else {
-      self.emit('model', self._offers);
-    }
-  }, 50);
 };
 
 /**
@@ -1226,43 +1257,6 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
   );
 
   this._offersAutobridged = autobridgeCalculator.calculate();
-};
-
-/**
- * Merge direct and autobridged offers into a combined orderbook
- *
- * @return [Array]
- */
-
-OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
-  const self = this;
-
-  // debounce
-  clearTimeout(this._mergeTimeout);
-  this._mergeTimeout = setTimeout(merge, 100);
-
-  function merge(compareOffers) {
-
-    if (self._shouldCompute) {
-      self.computeAutobridgedOffers();
-    }
-
-    self._shouldCompute = false;
-
-    if (_.isEmpty(self._offers) && _.isEmpty(self._offersAutobridged)) {
-      // still emit empty offers list to indicate that load is completed
-      self.emit('model', []);
-      return;
-    }
-
-    self._mergedOffers = self._offers.concat(self._offersAutobridged)
-    .sort(function(a, b) {
-      return Number(a.quality) - Number(b.quality);
-    });
-
-
-    self.emit('model', self._mergedOffers);
-  }
 };
 
 exports.OrderBook = OrderBook;
