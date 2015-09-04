@@ -73,6 +73,7 @@ function OrderBook(remote,
   // books that we must keep track of to compute autobridged offers
   this._legOneBook = null;
   this._legTwoBook = null;
+  this._subscribedAutobridgeLegs = null;
 
   this._isAutobridgeable = !this._currencyGets.is_native()
     && !this._currencyPays.is_native();
@@ -89,15 +90,22 @@ function OrderBook(remote,
       issuer_pays: issuerPays
     });
 
-    this._legOneBook.on('model', computeAutobridgedOffersWrapper);
-
     this._legTwoBook = remote.createOrderBook({
       currency_gets: currencyGets,
       issuer_gets: issuerGets,
       currency_pays: 'XRP'
     });
 
-    this._legTwoBook.on('model', computeAutobridgedOffersWrapper);
+    this.on('subscribe', function() {
+      if (!self._subscribedAutobridgeLegs) {
+        self._legOneBook._shouldSubscribe = true;
+        self._legTwoBook._shouldSubscribe = true;
+
+        self._legOneBook.on('model', computeAutobridgedOffersWrapper);
+        self._legTwoBook.on('model', computeAutobridgedOffersWrapper);
+        self._subscribedAutobridgeLegs = true;
+      }
+    });
   }
 
   function listenersModified(action, event) {
@@ -137,6 +145,14 @@ function OrderBook(remote,
     self.resetCache();
 
     self._remote.removeListener('transaction', updateFundedAmountsWrapper);
+
+    if (self._isAutobridgeable && self._subscribedAutobridgeLegs) {
+      self._legOneBook.removeListener('model',
+        computeAutobridgedOffersWrapper);
+      self._legTwoBook.removeListener('model',
+        computeAutobridgedOffersWrapper);
+      self._subscribedAutobridgeLegs = false;
+    }
   });
 
   this._remote.once('prepare_subscribe', function() {
@@ -224,6 +240,7 @@ OrderBook.prototype.subscribe = function() {
   ];
 
   async.series(steps);
+  this.emit('subscribe');
 };
 
 /**
@@ -924,7 +941,6 @@ OrderBook.prototype.notify = function(transaction) {
   }
 
   _.each(affectedNodes, handleNode);
-
   this.emit('transaction', transaction);
   this.notifyDirectOffersChanged();
 
