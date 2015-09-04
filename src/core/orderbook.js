@@ -61,6 +61,7 @@ function OrderBook(remote,
   this._ownerFundsUnadjusted = {};
   this._ownerFunds = {};
   this._ownerOffersTotal = {};
+  this._notifyTimeout;
 
   // We consider ourselves synced if we have a current
   // copy of the offers, we are online and subscribed to updates
@@ -74,12 +75,14 @@ function OrderBook(remote,
   this._legOneBook = null;
   this._legTwoBook = null;
   this._subscribedAutobridgeLegs = null;
+  this._shouldCompute = false;
+  this._mergeTimeout;
 
   this._isAutobridgeable = !this._currencyGets.is_native()
     && !this._currencyPays.is_native();
 
-  function computeAutobridgedOffersWrapper() {
-    self.computeAutobridgedOffers();
+  function mergeOffersWrapper() {
+    self._shouldCompute = true;
     self.mergeDirectAndAutobridgedBooks();
   }
 
@@ -101,8 +104,8 @@ function OrderBook(remote,
         self._legOneBook._shouldSubscribe = true;
         self._legTwoBook._shouldSubscribe = true;
 
-        self._legOneBook.on('model', computeAutobridgedOffersWrapper);
-        self._legTwoBook.on('model', computeAutobridgedOffersWrapper);
+        self._legOneBook.on('model', mergeOffersWrapper);
+        self._legTwoBook.on('model', mergeOffersWrapper);
         self._subscribedAutobridgeLegs = true;
       }
     });
@@ -147,10 +150,8 @@ function OrderBook(remote,
     self._remote.removeListener('transaction', updateFundedAmountsWrapper);
 
     if (self._isAutobridgeable && self._subscribedAutobridgeLegs) {
-      self._legOneBook.removeListener('model',
-        computeAutobridgedOffersWrapper);
-      self._legTwoBook.removeListener('model',
-        computeAutobridgedOffersWrapper);
+      self._legOneBook.removeListener('model', mergeOffersWrapper);
+      self._legTwoBook.removeListener('model', mergeOffersWrapper);
       self._subscribedAutobridgeLegs = false;
     }
   });
@@ -421,7 +422,7 @@ OrderBook.prototype.notifyDirectOffersChanged = function() {
     } else {
       self.emit('model', self._offers);
     }
-  }, 100);
+  }, 50);
 };
 
 /**
@@ -1236,29 +1237,42 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
 OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
   const self = this;
 
-  if (_.isEmpty(this._offers) && _.isEmpty(this._offersAutobridged)) {
-    // still emit empty offers list to indicate that load is completed
-    this.emit('model', []);
-    return;
-  }
+  // debounce
+  clearTimeout(this._mergeTimeout);
+  this._mergeTimeout = setTimeout(merge, 100);
 
-  const offers = self._offers.concat(self._offersAutobridged);
-  const qualities = offers.map(function(o, i) {
-    return {
-      index: i,
-      value: OrderBookUtils.getOfferQuality(o, self._currencyGets)
+  function merge(compareOffers) {
+
+    if (self._shouldCompute) {
+      self.computeAutobridgedOffers();
     }
-  });
 
-  qualities.sort(function(a, b) {
-    return a.value.compareTo(b.value);
-  });
+    self._shouldCompute = false;
 
-  self._mergedOffers = qualities.map(function(q) {
-    return offers[q.index];
-  });
+    if (_.isEmpty(self._offers) && _.isEmpty(self._offersAutobridged)) {
+      // still emit empty offers list to indicate that load is completed
+      self.emit('model', []);
+      return;
+    }
 
-  self.emit('model', self._mergedOffers);
+    const offers = self._offers.concat(self._offersAutobridged);
+    const qualities = offers.map(function(o, i) {
+      return {
+        index: i,
+        value: OrderBookUtils.getOfferQuality(o, self._currencyGets)
+      }
+    });
+
+    qualities.sort(function(a, b) {
+      return a.value.compareTo(b.value);
+    });
+
+    self._mergedOffers = qualities.map(function(q) {
+      return offers[q.index];
+    });
+
+    self.emit('model', self._mergedOffers);
+  }
 };
 
 exports.OrderBook = OrderBook;
