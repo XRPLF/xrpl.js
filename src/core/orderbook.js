@@ -39,8 +39,7 @@ function assertValidNumber(number, message) {
  */
 
 function OrderBook(remote,
-                   currencyGets, issuerGets, currencyPays, issuerPays,
-                   key) {
+                   currencyGets, issuerGets, currencyPays, issuerPays, key) {
   EventEmitter.call(this);
 
   const self = this;
@@ -61,7 +60,6 @@ function OrderBook(remote,
   this._ownerFundsUnadjusted = {};
   this._ownerFunds = {};
   this._ownerOffersTotal = {};
-  this._notifyTimeout;
 
   // We consider ourselves synced if we have a current
   // copy of the offers, we are online and subscribed to updates
@@ -76,7 +74,6 @@ function OrderBook(remote,
   this._legTwoBook = null;
   this._subscribedAutobridgeLegs = null;
   this._shouldCompute = false;
-  this._mergeTimeout;
 
   this._isAutobridgeable = !this._currencyGets.is_native()
     && !this._currencyPays.is_native();
@@ -168,8 +165,8 @@ function OrderBook(remote,
   });
 
   /**
-   * Handles notifying listeners that direct offers have changed. For autobridged
-   * books, an additional merge step is also performed
+   * Handles notifying listeners that direct offers have changed. For
+   * autobridged books, an additional merge step is also performed
    */
 
   function notifyDirectOffersChanged() {
@@ -325,7 +322,7 @@ OrderBook.prototype.unsubscribe = function() {
  * @param {Function} callback
  */
 
-OrderBook.prototype.requestOffers = function(callback=function() {}) {
+OrderBook.prototype.requestOffers = function(callback = function() {}) {
   const self = this;
 
   if (!this._shouldSubscribe) {
