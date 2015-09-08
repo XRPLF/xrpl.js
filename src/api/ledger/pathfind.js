@@ -84,7 +84,8 @@ function formatResponse(pathfind, paths) {
     const address = pathfind.source.address;
     return parsePathfind(address, pathfind.destination.amount, paths);
   }
-  if (!_.includes(paths.destination_currencies,
+  if (paths.destination_currencies !== undefined &&
+      !_.includes(paths.destination_currencies,
       pathfind.destination.amount.currency)) {
     throw new NotFoundError('No paths found. ' +
       'The destination_account does not accept ' +
