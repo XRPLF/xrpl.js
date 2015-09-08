@@ -207,7 +207,12 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
 
   let called = false;
 
+  function onReconnect() {
+    self.remote.request(self);
+  }
+
   function requestSuccess(message) {
+    self.remote.removeListener('connected', onReconnect);
     if (!called) {
       called = true;
       callback.call(self, null, message);
@@ -215,6 +220,7 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
   }
 
   function requestError(error) {
+    self.remote.removeListener('connected', onReconnect);
     if (!called) {
       called = true;
 
@@ -228,6 +234,9 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
 
   this.once(this.successEvent, requestSuccess);
   this.once(this.errorEvent, requestError);
+  if (this.remote.isConnected()) {
+    this.remote.once('connected', onReconnect);
+  }
   this.request();
 
   return this;
