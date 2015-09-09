@@ -2150,12 +2150,16 @@ Remote.prototype.requestPathFindClose = function(callback) {
   const request = new Request(this, 'path_find');
 
   request.message.subcommand = 'close';
-  request.callback(callback);
-  this._cur_path_find = null;
-  if (this._queued_path_finds.length > 0) {
-    const pathfind = this._queued_path_finds.shift();
-    this.createPathFind(pathfind.options, pathfind.callback);
-  }
+  request.callback((error, data) => {
+    this._cur_path_find = null;
+    if (this._queued_path_finds.length > 0) {
+      const pathfind = this._queued_path_finds.shift();
+      this.createPathFind(pathfind.options, pathfind.callback);
+    }
+    if (callback) {
+      callback(error, data);
+    }
+  });
 
   return request;
 };
