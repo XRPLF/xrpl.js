@@ -672,6 +672,7 @@ Server.prototype._handleResponse = function(message) {
     const responseEvent = 'response_' + command;
 
     request.emit('success', result);
+    request.emit('response', result);
 
     [this, this._remote].forEach(function(emitter) {
       emitter.emit(responseEvent, result, request, message);
@@ -686,6 +687,7 @@ Server.prototype._handleResponse = function(message) {
       error_message: 'Remote reported an error.',
       remote: message
     });
+    request.emit('response');
   }
 };
 
