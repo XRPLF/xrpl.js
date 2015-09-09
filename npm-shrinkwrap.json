@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.13.0-rc7",
+  "version": "0.13.0-rc8",
   "npm-shrinkwrap-version": "5.4.0",
   "node-version": "v0.12.7",
   "dependencies": {
