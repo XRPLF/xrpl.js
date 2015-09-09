@@ -39,8 +39,7 @@ function assertValidNumber(number, message) {
  */
 
 function OrderBook(remote,
-                   currencyGets, issuerGets, currencyPays, issuerPays,
-                   key) {
+                   currencyGets, issuerGets, currencyPays, issuerPays, key) {
   EventEmitter.call(this);
 
   const self = this;
@@ -73,12 +72,14 @@ function OrderBook(remote,
   // books that we must keep track of to compute autobridged offers
   this._legOneBook = null;
   this._legTwoBook = null;
+  this._subscribedAutobridgeLegs = null;
+  this._shouldCompute = false;
 
   this._isAutobridgeable = !this._currencyGets.is_native()
     && !this._currencyPays.is_native();
 
-  function computeAutobridgedOffersWrapper() {
-    self.computeAutobridgedOffers();
+  function mergeOffersWrapper() {
+    self._shouldCompute = true;
     self.mergeDirectAndAutobridgedBooks();
   }
 
@@ -89,15 +90,22 @@ function OrderBook(remote,
       issuer_pays: issuerPays
     });
 
-    this._legOneBook.on('model', computeAutobridgedOffersWrapper);
-
     this._legTwoBook = remote.createOrderBook({
       currency_gets: currencyGets,
       issuer_gets: issuerGets,
       currency_pays: 'XRP'
     });
 
-    this._legTwoBook.on('model', computeAutobridgedOffersWrapper);
+    this.on('subscribe', function() {
+      if (!self._subscribedAutobridgeLegs) {
+        self._legOneBook._shouldSubscribe = true;
+        self._legTwoBook._shouldSubscribe = true;
+
+        self._legOneBook.on('model', mergeOffersWrapper);
+        self._legTwoBook.on('model', mergeOffersWrapper);
+        self._subscribedAutobridgeLegs = true;
+      }
+    });
   }
 
   function listenersModified(action, event) {
@@ -137,6 +145,12 @@ function OrderBook(remote,
     self.resetCache();
 
     self._remote.removeListener('transaction', updateFundedAmountsWrapper);
+
+    if (self._isAutobridgeable && self._subscribedAutobridgeLegs) {
+      self._legOneBook.removeListener('model', mergeOffersWrapper);
+      self._legTwoBook.removeListener('model', mergeOffersWrapper);
+      self._subscribedAutobridgeLegs = false;
+    }
   });
 
   this._remote.once('prepare_subscribe', function() {
@@ -148,6 +162,57 @@ function OrderBook(remote,
     self._remote.once('prepare_subscribe', function() {
       self.subscribe();
     });
+  });
+
+  /**
+   * Handles notifying listeners that direct offers have changed. For
+   * autobridged books, an additional merge step is also performed
+   */
+
+  function notifyDirectOffersChanged() {
+    if (self._isAutobridgeable) {
+      self.mergeDirectAndAutobridgedBooks();
+    } else {
+      self.emit('model', self._offers);
+    }
+  }
+
+  // debounce
+  this.notifyDirectOffersChanged = _.debounce(notifyDirectOffersChanged, 100, {
+    maxWait: 500
+  });
+
+  /**
+   * Merge direct and autobridged offers into a combined orderbook
+   *
+   * @return [Array]
+   */
+
+  function mergeBooks() {
+
+    if (self._shouldCompute) {
+      self.computeAutobridgedOffers();
+      self._shouldCompute = false;
+    }
+
+    if (_.isEmpty(self._offers) && _.isEmpty(self._offersAutobridged)) {
+      // still emit empty offers list to indicate that load is completed
+      self.emit('model', []);
+      return;
+    }
+
+    self._mergedOffers = self._offers.concat(self._offersAutobridged)
+    .sort(function(a, b) {
+      return Number(a.quality) - Number(b.quality);
+    });
+
+
+    self.emit('model', self._mergedOffers);
+  }
+
+  // debounce
+  this.mergeDirectAndAutobridgedBooks = _.debounce(mergeBooks, 250, {
+    maxWait: 500
   });
 
   return this;
@@ -224,6 +289,7 @@ OrderBook.prototype.subscribe = function() {
   ];
 
   async.series(steps);
+  this.emit('subscribe');
 };
 
 /**
@@ -256,7 +322,7 @@ OrderBook.prototype.unsubscribe = function() {
  * @param {Function} callback
  */
 
-OrderBook.prototype.requestOffers = function(callback=function() {}) {
+OrderBook.prototype.requestOffers = function(callback = function() {}) {
   const self = this;
 
   if (!this._shouldSubscribe) {
@@ -385,19 +451,6 @@ OrderBook.prototype.subscribeTransactions = function(callback) {
   request.request();
 
   return request;
-};
-
-/**
- * Handles notifying listeners that direct offers have changed. For autobridged
- * books, an additional merge step is also performed
- */
-
-OrderBook.prototype.notifyDirectOffersChanged = function() {
-  if (this._isAutobridgeable) {
-    this.mergeDirectAndAutobridgedBooks();
-  } else {
-    this.emit('model', this._offers);
-  }
 };
 
 /**
@@ -917,9 +970,9 @@ OrderBook.prototype.notify = function(transaction) {
   }
 
   _.each(affectedNodes, handleNode);
-
   this.emit('transaction', transaction);
   this.notifyDirectOffersChanged();
+
   if (!takerGetsTotal.is_zero()) {
     this.emit('trade', takerPaysTotal, takerGetsTotal);
   }
@@ -1201,33 +1254,6 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
   );
 
   this._offersAutobridged = autobridgeCalculator.calculate();
-};
-
-/**
- * Merge direct and autobridged offers into a combined orderbook
- *
- * @return [Array]
- */
-
-OrderBook.prototype.mergeDirectAndAutobridgedBooks = function() {
-  const self = this;
-
-  if (_.isEmpty(this._offers) && _.isEmpty(this._offersAutobridged)) {
-    // still emit empty offers list to indicate that load is completed
-    this.emit('model', []);
-    return;
-  }
-
-  this._mergedOffers = this._offers
-    .concat(this._offersAutobridged)
-    .sort(function(a, b) {
-      const aQuality = OrderBookUtils.getOfferQuality(a, self._currencyGets);
-      const bQuality = OrderBookUtils.getOfferQuality(b, self._currencyGets);
-
-      return aQuality.compareTo(bQuality);
-    });
-
-  this.emit('model', this._mergedOffers);
 };
 
 exports.OrderBook = OrderBook;
