@@ -24,7 +24,8 @@ exports._test = {
   Log: require('./log'),
   PathFind: require('./pathfind').PathFind,
   TransactionManager: require('./transactionmanager').TransactionManager,
-  RangeSet: require('./rangeset').RangeSet
+  RangeSet: require('./rangeset').RangeSet,
+  HashPrefixes: require('./hashprefixes')
 };
 
 exports.types = require('./serializedtypes');

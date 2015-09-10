@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const util = require('util');
 const assert = require('assert');
 const async = require('async');
@@ -520,6 +521,17 @@ TransactionManager.prototype._resubmit = function(ledgers_, pending_) {
 TransactionManager.prototype._prepareRequest = function(tx) {
   const submitRequest = this._remote.requestSubmit();
 
+  if (tx.hasMultiSigners()) {
+    tx.setSigningPubKey('');
+
+    if (this._remote.local_signing) {
+      tx.setSigners(tx.getMultiSigners());
+    } else {
+      submitRequest.message.command = 'submit_multisigned';
+      submitRequest.message.Signers = tx.getMultiSigners();
+    }
+  }
+
   if (this._remote.local_signing) {
     tx.sign();
 
@@ -678,7 +690,7 @@ TransactionManager.prototype._request = function(tx) {
     tx.initialSubmitIndex = tx.submitIndex;
   }
 
-  if (!tx._setLastLedger) {
+  if (!tx._setLastLedger && !tx.hasMultiSigners()) {
     // Honor LastLedgerSequence set with tx.lastLedger()
     tx.tx_json.LastLedgerSequence = tx.initialSubmitIndex
     + this._lastLedgerOffset;
@@ -726,9 +738,13 @@ TransactionManager.prototype.submit = function(tx) {
     return;
   }
 
-  if (typeof tx.tx_json.Sequence !== 'number') {
+  if (!_.isNumber(tx.tx_json.Sequence)) {
     // Honor manually-set sequences
-    tx.tx_json.Sequence = this._nextSequence++;
+    tx.setSequence(this._nextSequence++);
+  }
+
+  if (tx.hasMultiSigners()) {
+    tx.setResubmittable(false);
   }
 
   tx.once('cleanup', function() {
