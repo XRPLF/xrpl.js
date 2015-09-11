@@ -13,7 +13,7 @@ var UInt256 = extend(function() {
 }, UInt);
 
 UInt256.width = 32;
-UInt256.prototype = extend({}, UInt.prototype);
+UInt256.prototype = Object.create(extend({}, UInt.prototype));
 UInt256.prototype.constructor = UInt256;
 
 var HEX_ZERO = UInt256.HEX_ZERO = '00000000000000000000000000000000' +

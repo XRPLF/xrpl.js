@@ -17,7 +17,7 @@ var UInt160 = extend(function() {
 }, UInt);
 
 UInt160.width = 20;
-UInt160.prototype = extend({}, UInt.prototype);
+UInt160.prototype = Object.create(extend({}, UInt.prototype));
 UInt160.prototype.constructor = UInt160;
 
 var HEX_ZERO = UInt160.HEX_ZERO = '0000000000000000000000000000000000000000';

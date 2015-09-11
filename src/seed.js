@@ -19,7 +19,7 @@ const Seed = extend(function() {
 }, UInt);
 
 Seed.width = 16;
-Seed.prototype = extend({}, UInt.prototype);
+Seed.prototype = Object.create(extend({}, UInt.prototype));
 Seed.prototype.constructor = Seed;
 
 // value = NaN on error.

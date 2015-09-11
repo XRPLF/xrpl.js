@@ -20,7 +20,8 @@ function assertValidLegOneOffer(legOneOffer, message) {
 function AutobridgeCalculator(currencyGets, currencyPays,
   legOneOffers, legTwoOffers, issuerGets, issuerPays) {
   this._currencyGets = currencyGets;
-  this._currencyPays = currencyPays;
+  this._currencyGetsHex = currencyGets.to_hex();
+  this._currencyPaysHex = currencyPays.to_hex();
   this._issuerGets = issuerGets;
   this._issuerPays = issuerPays;
   this.legOneOffers = _.cloneDeep(legOneOffers);
@@ -28,6 +29,8 @@ function AutobridgeCalculator(currencyGets, currencyPays,
 
   this._ownerFundsLeftover = {};
 }
+
+AutobridgeCalculator.NULL_AMOUNT = Utils.normalizeAmount('0');
 
 /**
  * Calculates an ordered array of autobridged offers by quality
@@ -39,7 +42,7 @@ AutobridgeCalculator.prototype.calculate = function() {
   let legOnePointer = 0;
   let legTwoPointer = 0;
 
-  let offersAutobridged = [];
+  const offersAutobridged = [];
 
   this.clearOwnerFundsLeftover();
 
@@ -70,14 +73,17 @@ AutobridgeCalculator.prototype.calculate = function() {
       continue;
     }
 
-    if (legOneTakerGetsFunded.compareTo(legTwoTakerPaysFunded) > 0) {
+    //  using private fields for speed
+    if (legOneTakerGetsFunded._value.comparedTo(
+      legTwoTakerPaysFunded._value) > 0) {
       autobridgedOffer = this.getAutobridgedOfferWithClampedLegOne(
         legOneOffer,
         legTwoOffer
       );
 
       legTwoPointer++;
-    } else if (legTwoTakerPaysFunded.compareTo(legOneTakerGetsFunded) > 0) {
+    } else if (legTwoTakerPaysFunded._value.comparedTo(
+      legOneTakerGetsFunded._value) > 0) {
       autobridgedOffer = this.getAutobridgedOfferWithClampedLegTwo(
         legOneOffer,
         legTwoOffer
@@ -210,8 +216,6 @@ AutobridgeCalculator.prototype.clearOwnerFundsLeftover = function() {
  */
 
 AutobridgeCalculator.prototype.resetOwnerFundsLeftover = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
-
   this._ownerFundsLeftover[account] = Utils.normalizeAmount('0');
 
   return this._ownerFundsLeftover[account];
@@ -226,12 +230,10 @@ AutobridgeCalculator.prototype.resetOwnerFundsLeftover = function(account) {
  */
 
 AutobridgeCalculator.prototype.getLeftoverOwnerFunds = function(account) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
-
   let amount = this._ownerFundsLeftover[account];
 
   if (!amount) {
-    amount = Utils.normalizeAmount('0');
+    amount = AutobridgeCalculator.NULL_AMOUNT.clone();
   }
 
   return amount;
@@ -248,7 +250,6 @@ AutobridgeCalculator.prototype.getLeftoverOwnerFunds = function(account) {
 
 AutobridgeCalculator.prototype.addLeftoverOwnerFunds =
 function(account, amount) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   assert(amount instanceof Amount, 'Amount is invalid');
 
   this._ownerFundsLeftover[account] = this.getLeftoverOwnerFunds(account)
@@ -266,7 +267,6 @@ function(account, amount) {
 
 AutobridgeCalculator.prototype.setLeftoverOwnerFunds =
 function(account, amount) {
-  assert(UInt160.is_valid(account), 'Account is invalid');
   assert(amount instanceof Amount, 'Amount is invalid');
 
   this._ownerFundsLeftover[account] = amount;
@@ -291,13 +291,13 @@ function(takerGets, takerPays) {
 
   autobridgedOffer.TakerGets = {
     value: takerGets.to_text(),
-    currency: this._currencyGets.to_hex(),
+    currency: this._currencyGetsHex,
     issuer: this._issuerGets
   };
 
   autobridgedOffer.TakerPays = {
     value: takerPays.to_text(),
-    currency: this._currencyPays.to_hex(),
+    currency: this._currencyPaysHex,
     issuer: this._issuerPays
   };
 
@@ -308,7 +308,8 @@ function(takerGets, takerPays) {
 
   autobridgedOffer.autobridged = true;
 
-  autobridgedOffer.BookDirectory = Utils.convertOfferQualityToHex(quality);
+  autobridgedOffer.BookDirectory = Utils.convertOfferQualityToHexFromText(autobridgedOffer.quality);
+  autobridgedOffer.qualityHex = autobridgedOffer.BookDirectory;
 
   return autobridgedOffer;
 };

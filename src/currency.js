@@ -22,7 +22,7 @@ var Currency = extend(function() {
   this._update();
 }, UInt160);
 
-Currency.prototype = extend({}, UInt160.prototype);
+Currency.prototype = Object.create(extend({}, UInt160.prototype));
 Currency.prototype.constructor = Currency;
 
 Currency.HEX_CURRENCY_BAD = '0000000000000000000000005852500000000000';
