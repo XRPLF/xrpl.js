@@ -4,7 +4,6 @@ const _ = require('lodash');
 const assert = require('assert');
 const util = require('util');
 const url = require('url');
-const HttpsProxyAgent = require('https-proxy-agent');
 const LRU = require('lru-cache');
 const EventEmitter = require('events').EventEmitter;
 const RippleError = require('./rippleerror').RippleError;
@@ -447,6 +446,12 @@ Server.prototype.connect = function() {
     const parsed = url.parse(this._opts.url);
     const opts = url.parse(this._remote.proxy);
     opts.secureEndpoint = parsed.protocol === 'wss:';
+    let HttpsProxyAgent;
+    try {
+      HttpsProxyAgent = require('https-proxy-agent');
+    } catch (error) {
+      throw new Error('"proxy" option is not supported in the browser');
+    }
     const agent = new HttpsProxyAgent(opts);
 
     this._ws = new WebSocket(this._opts.url, {agent: agent});

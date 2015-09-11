@@ -26,6 +26,9 @@ function webpackConfig(extension, overrides) {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader?optional=runtime'
+      }, {
+        test: /\.json/,
+        loader: 'json-loader'
       }]
     }
   };
