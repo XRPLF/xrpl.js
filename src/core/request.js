@@ -39,8 +39,9 @@ function Request(remote, command) {
 util.inherits(Request, EventEmitter);
 
 // Send the request to a remote.
-Request.prototype.request = function(servers, callback) {
+Request.prototype.request = function(servers, callback_) {
   const self = this;
+  const callback = typeof servers === 'function' ? servers : callback_;
 
   this.emit('before');
   this.callback(callback);
@@ -247,7 +248,9 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
 
   this.once(this.successEvent, requestSuccess);
   this.once(this.errorEvent, requestError);
-  this.request();
+  if (!this.requested) {
+    this.request();
+  }
 
   return this;
 };
