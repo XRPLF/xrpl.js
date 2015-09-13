@@ -692,6 +692,7 @@ Server.prototype._handleResponse = function(message) {
       remote: message
     });
   }
+  request.emit('response', message);
 };
 
 Server.prototype._handlePathFind = function(message) {

@@ -47,6 +47,11 @@ describe('Request', function() {
         assert.strictEqual(typeof req.message, 'object');
         assert.strictEqual(req.message.command, 'server_info');
         done();
+      },
+      on: function() {
+      },
+      isConnected: function() {
+        return true;
       }
     };
 

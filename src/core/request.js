@@ -39,7 +39,10 @@ function Request(remote, command) {
 util.inherits(Request, EventEmitter);
 
 // Send the request to a remote.
-Request.prototype.request = function(servers, callback) {
+Request.prototype.request = function(servers, callback_) {
+  const self = this;
+  const callback = typeof servers === 'function' ? servers : callback_;
+
   this.emit('before');
   this.callback(callback);
 
@@ -51,14 +54,31 @@ Request.prototype.request = function(servers, callback) {
   this.on('error', function() {});
   this.emit('request', this.remote);
 
-  if (Array.isArray(servers)) {
-    servers.forEach(function(server) {
-      this.setServer(server);
-      this.remote.request(this);
-    }, this);
-  } else {
-    this.remote.request(this);
+  function doRequest() {
+    if (Array.isArray(servers)) {
+      servers.forEach(function(server) {
+        self.setServer(server);
+        self.remote.request(self);
+      }, self);
+    } else {
+      self.remote.request(self);
+    }
   }
+
+  function onReconnect() {
+    doRequest();
+  }
+
+  function onResponse() {
+    self.remote.removeListener('connected', onReconnect);
+  }
+
+  if (this.remote.isConnected()) {
+    this.remote.on('connected', onReconnect);
+  }
+  this.once('response', onResponse);
+
+  doRequest();
 
   return this;
 };
@@ -228,7 +248,9 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
 
   this.once(this.successEvent, requestSuccess);
   this.once(this.errorEvent, requestError);
-  this.request();
+  if (!this.requested) {
+    this.request();
+  }
 
   return this;
 };
