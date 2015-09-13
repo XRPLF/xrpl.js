@@ -4,6 +4,7 @@
 
 const assert = require('assert');
 const lodash = require('lodash');
+const ripple = require('ripple-lib');
 const Transaction = require('ripple-lib').Transaction;
 const TransactionQueue = require('ripple-lib').TransactionQueue;
 const Remote = require('ripple-lib').Remote;
@@ -412,6 +413,7 @@ describe('Transaction', function() {
     const remote = new Remote();
     const transaction = new Transaction(remote);
 
+    transaction.setSecret('shK5kH88MZPaCpCNmzmzpLY58xKS9');
     remote.trusted = false;
     remote.local_signing = false;
 
@@ -445,7 +447,6 @@ describe('Transaction', function() {
     remote.trusted = true;
     remote.local_signing = true;
 
-    transaction.SigningPubKey = undefined;
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoijX';
     transaction.once('error', function(err) {
@@ -571,8 +572,8 @@ describe('Transaction', function() {
       tx.complete();
       tx.sign();
 
-      assert.strictEqual(tx_json.SigningPubKey, expectedPub);
-      assert.strictEqual(tx_json.TxnSignature, expectedSig);
+      assert.strictEqual(tx.tx_json.SigningPubKey, expectedPub);
+      assert.strictEqual(tx.tx_json.TxnSignature, expectedSig);
     });
   });
 
@@ -1903,6 +1904,45 @@ describe('Transaction', function() {
     });
   });
 
+  it('Construct SignerListSet transaction', function() {
+    const transaction = new Transaction().setSignerList({
+      account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      signerQuorum: 3,
+      signers: [
+        {
+          account: 'rH4KEcG9dEwGwpn6AyoWK9cZPLL4RLSmWW',
+          weight: 1
+        },
+        {
+          account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+          weight: 2
+        }
+      ]
+    });
+
+    assert(transaction instanceof Transaction);
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      TransactionType: 'SignerListSet',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      SignerQuorum: 3,
+      SignerEntries: [
+        {
+          SignerEntry: {
+            Account: 'rH4KEcG9dEwGwpn6AyoWK9cZPLL4RLSmWW',
+            SignerWeight: 1
+          }
+        },
+        {
+          SignerEntry: {
+            Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+            SignerWeight: 2
+          }
+        }
+      ]
+    });
+  });
+
   it('Submit transaction', function(done) {
     const remote = new Remote();
     const transaction = new Transaction(remote).accountSet('r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe');
@@ -2065,5 +2105,81 @@ describe('Transaction', function() {
       assert.strictEqual(queue.getMinLedger(), tx.initialSubmitIndex);
       queue.remove(tx);
     });
+  });
+
+  it('Add multisigner', function() {
+    const transaction = new Transaction();
+    const s1 = {
+      Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+      TxnSignature: '304402203020865BDC995431325C371E6A3CE89BFC40597D9CFAF77DBB16E9D159824EA402203645A6462A6DCEC7B5D0811882DC54CEA66258A227A2762BE6EFCD9EB62C27BF',
+      SigningPubKey: '02691AC5AE1C4C333AE5DF8A93BDC495F0EEBFC6DB0DA7EB6EF808F3AFC006E3FE'
+    };
+    const s2 = {
+      Account: 'rH4KEcG9dEwGwpn6AyoWK9cZPLL4RLSmWW',
+      TxnSignature: '30450221009C84E455DC199A7DB4B800D68C92269D60972E8850AFC0D50B1AE6B08BBB02EA02206FA93A560BE96844DF7D96D07F6400EF9534A32FBA352DD10E855DA8923A3AF8',
+      SigningPubKey: '028949021029D5CC87E78BCF053AFEC0CAFD15108EC119EAAFEC466F5C095407BF'
+    };
+
+    transaction.addMultiSigner(s1);
+    transaction.addMultiSigner(s2);
+
+    assert.deepEqual(transaction.getMultiSigners(), [
+                     {Signer: s2}, {Signer: s1}]);
+  });
+
+  it('Get multisign data', function() {
+    const transaction = Transaction.from_json({
+      Account: 'rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn',
+      Sequence: 1,
+      Fee: '100',
+      TransactionType: 'AccountSet',
+      Flags: 0
+    });
+
+    transaction.setSigningPubKey('');
+
+    const a1 = 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK';
+    const d1 = transaction.multiSigningData(a1);
+
+    const tbytes = ripple.SerializedObject.from_json(
+      lodash.merge(transaction.tx_json, {SigningPubKey: ''})).buffer;
+    const abytes = ripple.UInt160.from_json(a1).to_bytes();
+    const prefix = require('ripple-lib')._test.HashPrefixes.HASH_TX_MULTISIGN_BYTES;
+
+    assert.deepEqual(d1.buffer, prefix.concat(tbytes, abytes));
+  });
+
+  it('Multisign', function() {
+    const transaction = Transaction.from_json({
+      Account: 'rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn',
+      Sequence: 1,
+      Fee: '100',
+      TransactionType: 'AccountSet',
+      Flags: 0
+    });
+
+    const multiSigningJson = transaction.getMultiSigningJson();
+    const t1 = Transaction.from_json(multiSigningJson);
+
+    const a1 = 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK';
+    const a2 = 'rH4KEcG9dEwGwpn6AyoWK9cZPLL4RLSmWW';
+
+    const s1 = t1.multiSign(a1, 'alice');
+    assert.strictEqual(s1.Account, a1);
+    assert.strictEqual(s1.SigningPubKey, '0388935426E0D08083314842EDFBB2D517BD47699F9A4527318A8E10468C97C052');
+    assert.strictEqual(s1.TxnSignature, '30440220611256E46B2946152695FFEF34D5C71BB3AE569C3D919A270BFBCA9ADF260D9202202FAE24FC8A575FE3265A6D7CFA596094A7950E0011706431A11C2A9ABEF60B3B');
+
+    const s2 = t1.multiSign(a2, 'bob');
+    assert.strictEqual(s2.Account, a2);
+    assert.strictEqual(s2.SigningPubKey, '02691AC5AE1C4C333AE5DF8A93BDC495F0EEBFC6DB0DA7EB6EF808F3AFC006E3FE');
+    assert.strictEqual(s2.TxnSignature, '3044022067F769BE0A4CC2B4F26E7B52B366F861FED02DA0F564F98B44009C8181A9655702206D882919139DF8E9D7F2FC1DD54D8B4FEAC40203349AE21519FD388925A4DE83');
+
+    transaction.addMultiSigner(s1);
+    transaction.addMultiSigner(s2);
+
+    assert.deepEqual(transaction.getMultiSigners(), [
+    {Signer: s2},
+    {Signer: s1}
+    ]);
   });
 });

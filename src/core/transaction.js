@@ -1,7 +1,8 @@
 'use strict';
 
+const assert = require('assert');
 const util = require('util');
-const lodash = require('lodash');
+const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils');
 const sjclcodec = require('sjcl-codec');
@@ -9,6 +10,7 @@ const Amount = require('./amount').Amount;
 const Currency = require('./amount').Currency;
 const UInt160 = require('./amount').UInt160;
 const Seed = require('./seed').Seed;
+const KeyPair = require('ripple-keypairs').KeyPair;
 const SerializedObject = require('./serializedobject').SerializedObject;
 const RippleError = require('./rippleerror').RippleError;
 const hashprefixes = require('./hashprefixes');
@@ -199,7 +201,7 @@ Transaction.from_json = function(j) {
 
 Transaction.prototype.setJson =
 Transaction.prototype.parseJson = function(v) {
-  this.tx_json = v;
+  this.tx_json = _.merge({}, v);
   return this;
 };
 
@@ -358,7 +360,6 @@ Transaction.prototype._computeFee = function() {
   });
 
   const midInd = Math.floor(fees.length / 2);
-
   const median = fees.length % 2 === 0
   ? Math.floor(0.5 + (fees[midInd] + fees[midInd - 1]) / 2)
   : fees[midInd];
@@ -377,56 +378,86 @@ Transaction.prototype._computeFee = function() {
  * return `false`
  */
 
+Transaction.prototype.err = function(error, errorMessage) {
+  this.emit('error', new RippleError(error, errorMessage));
+  return false;
+};
+
 Transaction.prototype.complete = function() {
-  if (this.remote) {
-    if (!this.remote.trusted && !this.remote.local_signing) {
-      this.emit('error', new RippleError(
-        'tejServerUntrusted', 'Attempt to give secret to untrusted server'));
-      return false;
-    }
+  // Auto-fill the secret
+  this._secret = this._secret || this.getSecret();
+
+  if (_.isUndefined(this._secret)) {
+    return this.err('tejSecretUnknown', 'Missing secret');
   }
 
-  if (!this._secret) {
-    this._secret = this.getSecret();
+  if (this.remote && !(this.remote.local_signing || this.remote.trusted)) {
+    return this.err(
+      'tejServerUntrusted',
+      'Attempt to give secret to untrusted server');
   }
 
-  // Try to auto-fill the secret
-  if (!this._secret) {
-    this.emit('error', new RippleError('tejSecretUnknown', 'Missing secret'));
-    return false;
-  }
-
-  if (typeof this.tx_json.SigningPubKey === 'undefined') {
+  if (_.isUndefined(this.tx_json.SigningPubKey)) {
     try {
-      const seed = Seed.from_json(this._secret);
-      const key = seed.get_key();
-      this.tx_json.SigningPubKey = key.pubKeyHex();
-    } catch(e) {
-      this.emit('error', new RippleError(
-        'tejSecretInvalid', 'Invalid secret'));
-      return false;
+      this.setSigningPubKey(this.getSigningPubKey());
+    } catch (e) {
+      return this.err('tejSecretInvalid', 'Invalid secret');
     }
   }
 
-  // If the Fee hasn't been set, one needs to be computed by
-  // an assigned server
-  if (this.remote && typeof this.tx_json.Fee === 'undefined') {
-    if (this.remote.local_fee || !this.remote.trusted) {
-      this.tx_json.Fee = this._computeFee();
-      if (!this.tx_json.Fee) {
-        this.emit('error', new RippleError('tejUnconnected'));
-        return false;
+  // Auto-fill transaction Fee
+  if (_.isUndefined(this.tx_json.Fee)) {
+    if (this.remote && (this.remote.local_fee || !this.remote.trusted)) {
+      const computedFee = this._computeFee();
+
+      if (!computedFee) {
+        // Unable to compute fee due to no connected servers
+        return this.err('tejUnconnected');
       }
+
+      this.tx_json.Fee = computedFee;
     }
   }
 
   if (Number(this.tx_json.Fee) > this._maxFee) {
-    this.emit('error', new RippleError(
-      'tejMaxFeeExceeded', 'Max fee exceeded'));
-    return false;
+    return this.err('tejMaxFeeExceeded', 'Max fee exceeded');
   }
 
   // Set canonical flag - this enables canonicalized signature checking
+  this.setCanonicalFlag();
+
+  return this.tx_json;
+};
+
+Transaction.prototype.getKeyPair = function(secret_) {
+  if (this._keyPair) {
+    return this._keyPair;
+  }
+
+  const secret = secret_ || this._secret;
+  assert(secret, 'Secret missing');
+
+  const keyPair = Seed.from_json(secret).get_key();
+  this._keyPair = keyPair;
+
+  return keyPair;
+};
+
+Transaction.prototype.getSigningPubKey = function(secret) {
+  return this.getKeyPair(secret).pubKeyHex();
+};
+
+Transaction.prototype.setSigningPubKey = function(key) {
+  if (_.isString(key)) {
+    this.tx_json.SigningPubKey = key;
+  } else if (key instanceof KeyPair) {
+    this.tx_json.SigningPubKey = key.pubKeyHex();
+  }
+
+  return this;
+};
+
+Transaction.prototype.setCanonicalFlag = function() {
   if (this.remote && this.remote.local_signing && this.canonical) {
     this.tx_json.Flags |= Transaction.flags.Universal.FullyCanonicalSig;
 
@@ -435,7 +466,7 @@ Transaction.prototype.complete = function() {
     this.tx_json.Flags = this.tx_json.Flags >>> 0;
   }
 
-  return this.tx_json;
+  return this;
 };
 
 Transaction.prototype.serialize = function() {
@@ -450,6 +481,14 @@ Transaction.prototype.signingData = function() {
   const so = new SerializedObject();
   so.append(hashprefixes.HASH_TX_SIGN_BYTES);
   so.parse_json(this.tx_json);
+  return so;
+};
+
+Transaction.prototype.multiSigningData = function(account) {
+  const so = new SerializedObject();
+  so.append(hashprefixes.HASH_TX_MULTISIGN_BYTES);
+  so.parse_json(this.tx_json);
+  so.append(UInt160.from_json(account).to_bytes());
   return so;
 };
 
@@ -470,7 +509,11 @@ Transaction.prototype.hash = function(prefix_, asUINT256, serialized) {
 };
 
 Transaction.prototype.sign = function() {
-  const seed = Seed.from_json(this._secret);
+  if (this.hasMultiSigners()) {
+    return this;
+  }
+
+  const keyPair = this.getKeyPair();
   const prev_sig = this.tx_json.TxnSignature;
 
   delete this.tx_json.TxnSignature;
@@ -483,9 +526,7 @@ Transaction.prototype.sign = function() {
     return this;
   }
 
-  const key = seed.get_key();
-  const hex = key.signHex(this.signingData().buffer);
-  this.tx_json.TxnSignature = hex;
+  this.tx_json.TxnSignature = keyPair.signHex(this.signingData().buffer);
   this.previousSigningHash = hash;
 
   return this;
@@ -499,7 +540,7 @@ Transaction.prototype.sign = function() {
  */
 
 Transaction.prototype.addId = function(id) {
-  if (!lodash.contains(this.submittedIDs, id)) {
+  if (!_.contains(this.submittedIDs, id)) {
     this.submittedIDs.unshift(id);
   }
 };
@@ -515,7 +556,7 @@ Transaction.prototype.addId = function(id) {
  */
 
 Transaction.prototype.findId = function(cache) {
-  const cachedTransactionID = lodash.detect(this.submittedIDs, function(id) {
+  const cachedTransactionID = _.detect(this.submittedIDs, function(id) {
     return cache.hasOwnProperty(id);
   });
   return cache[cachedTransactionID];
@@ -582,9 +623,24 @@ Transaction.prototype.maxFee = function(fee) {
  * @returns {Transaction} calling instance for chaining
  */
 Transaction.prototype.setFixedFee = function(fee) {
-  if (typeof fee === 'number' && fee >= 0) {
-    this._setFixedFee = true;
+  return this.setFee(fee, {fixed: true});
+};
+
+Transaction.prototype.setFee = function(fee, options = {}) {
+  if (_.isNumber(fee) && fee >= 0) {
     this.tx_json.Fee = String(fee);
+    if (options.fixed) {
+      this._setFixedFee = true;
+    }
+  }
+
+  return this;
+};
+
+Transaction.prototype.setSequence = function(sequence) {
+  if (_.isNumber(sequence)) {
+    this._setUInt32('Sequence', sequence);
+    this._setSequence = true;
   }
 
   return this;
@@ -606,7 +662,7 @@ Transaction.prototype.secret = function(secret) {
 };
 
 Transaction.prototype.setType = function(type) {
-  if (lodash.isUndefined(Transaction.formats, type)) {
+  if (_.isUndefined(Transaction.formats, type)) {
     throw new Error('TransactionType must be a valid transaction type');
   }
 
@@ -616,14 +672,14 @@ Transaction.prototype.setType = function(type) {
 };
 
 Transaction.prototype._setUInt32 = function(name, value, options_) {
-  const options = lodash.merge({}, options_);
+  const options = _.merge({}, options_);
   const isValidUInt32 = typeof value === 'number'
   && value >= 0 && value < Math.pow(256, 4);
 
   if (!isValidUInt32) {
     throw new Error(name + ' must be a valid UInt32');
   }
-  if (!lodash.isUndefined(options.min_value) && value < options.min_value) {
+  if (!_.isUndefined(options.min_value) && value < options.min_value) {
     throw new Error(name + ' must be >= ' + options.min_value);
   }
 
@@ -660,7 +716,7 @@ Transaction.prototype.setAccount = function(account) {
 };
 
 Transaction.prototype._setAmount = function(name, amount, options_) {
-  const options = lodash.merge({no_native: false}, options_);
+  const options = _.merge({no_native: false}, options_);
   const parsedAmount = Amount.from_json(amount);
 
   if (parsedAmount.is_negative()) {
@@ -689,7 +745,7 @@ Transaction.prototype._setHash256 = function(name, value, options_) {
     throw new Error(name + ' must be a valid Hash256');
   }
 
-  const options = lodash.merge({pad: false}, options_);
+  const options = _.merge({pad: false}, options_);
   let hash256 = value;
 
   if (options.pad) {
@@ -769,7 +825,7 @@ Transaction.prototype.addMemo = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
   } else {
     options = {
       memoType: arguments[0],
@@ -790,7 +846,7 @@ Transaction.prototype.addMemo = function(options_) {
   let memoData = options.memoData;
 
   if (memoType) {
-    if (!(lodash.isString(memoType) && memoRegex.test(memoType))) {
+    if (!(_.isString(memoType) && memoRegex.test(memoType))) {
       throw new Error(
         'MemoType must be a string containing only valid URL characters');
     }
@@ -803,7 +859,7 @@ Transaction.prototype.addMemo = function(options_) {
   }
 
   if (memoFormat) {
-    if (!(lodash.isString(memoFormat) && memoRegex.test(memoFormat))) {
+    if (!(_.isString(memoFormat) && memoRegex.test(memoFormat))) {
       throw new Error(
         'MemoFormat must be a string containing only valid URL characters');
     }
@@ -857,15 +913,15 @@ Transaction.prototype.accountSet = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
-    if (lodash.isUndefined(options.set_flag)) {
+    if (_.isUndefined(options.set_flag)) {
       options.set_flag = options.set;
     }
-    if (lodash.isUndefined(options.clear_flag)) {
+    if (_.isUndefined(options.clear_flag)) {
       options.clear_flag = options.clear;
     }
   } else {
@@ -879,10 +935,10 @@ Transaction.prototype.accountSet = function(options_) {
   this.setType('AccountSet');
   this.setAccount(options.account);
 
-  if (!lodash.isUndefined(options.set_flag)) {
+  if (!_.isUndefined(options.set_flag)) {
     this.setSetFlag(options.set_flag);
   }
-  if (!lodash.isUndefined(options.clear_flag)) {
+  if (!_.isUndefined(options.clear_flag)) {
     this.setClearFlag(options.clear_flag);
   }
 
@@ -899,7 +955,7 @@ Transaction.prototype.setAccountSetFlag = function(name, value) {
     : accountSetFlags['asf' + flagValue];
   }
 
-  if (!lodash.contains(lodash.values(accountSetFlags), flagValue)) {
+  if (!_.contains(_.values(accountSetFlags), flagValue)) {
     throw new Error(name + ' must be a valid AccountSet flag');
   }
 
@@ -956,9 +1012,9 @@ Transaction.prototype.setRegularKey = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
   } else {
@@ -971,7 +1027,7 @@ Transaction.prototype.setRegularKey = function(options_) {
   this.setType('SetRegularKey');
   this.setAccount(options.account);
 
-  if (!lodash.isUndefined(options.regular_key)) {
+  if (!_.isUndefined(options.regular_key)) {
     this._setAccount('RegularKey', options.regular_key);
   }
 
@@ -992,9 +1048,9 @@ Transaction.prototype.rippleLineSet = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
   } else {
@@ -1009,13 +1065,13 @@ Transaction.prototype.rippleLineSet = function(options_) {
   this.setType('TrustSet');
   this.setAccount(options.account);
 
-  if (!lodash.isUndefined(options.limit)) {
+  if (!_.isUndefined(options.limit)) {
     this.setLimit(options.limit);
   }
-  if (!lodash.isUndefined(options.quality_in)) {
+  if (!_.isUndefined(options.quality_in)) {
     this.setQualityIn(options.quality_in);
   }
-  if (!lodash.isUndefined(options.quality_out)) {
+  if (!_.isUndefined(options.quality_out)) {
     this.setQualityOut(options.quality_out);
   }
 
@@ -1057,12 +1113,12 @@ Transaction.prototype.payment = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src || options.from;
     }
-    if (lodash.isUndefined(options.destination)) {
+    if (_.isUndefined(options.destination)) {
       options.destination = options.dst || options.to;
     }
   } else {
@@ -1241,18 +1297,18 @@ Transaction.prototype.offerCreate = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
-    if (lodash.isUndefined(options.taker_pays)) {
+    if (_.isUndefined(options.taker_pays)) {
       options.taker_pays = options.buy;
     }
-    if (lodash.isUndefined(options.taker_gets)) {
+    if (_.isUndefined(options.taker_gets)) {
       options.taker_gets = options.sell;
     }
-    if (lodash.isUndefined(options.offer_sequence)) {
+    if (_.isUndefined(options.offer_sequence)) {
       options.offer_sequence = options.cancel_sequence || options.sequence;
     }
   } else {
@@ -1270,10 +1326,10 @@ Transaction.prototype.offerCreate = function(options_) {
   this.setTakerGets(options.taker_gets);
   this.setTakerPays(options.taker_pays);
 
-  if (!lodash.isUndefined(options.expiration)) {
+  if (!_.isUndefined(options.expiration)) {
     this.setExpiration(options.expiration);
   }
-  if (!lodash.isUndefined(options.offer_sequence)) {
+  if (!_.isUndefined(options.offer_sequence)) {
     this.setOfferSequence(options.offer_sequence);
   }
 
@@ -1311,12 +1367,12 @@ Transaction.prototype.offerCancel = function(options_) {
   let options;
 
   if (typeof options_ === 'object') {
-    options = lodash.merge({}, options_);
+    options = _.merge({}, options_);
 
-    if (lodash.isUndefined(options.account)) {
+    if (_.isUndefined(options.account)) {
       options.account = options.src;
     }
-    if (lodash.isUndefined(options.offer_sequence)) {
+    if (_.isUndefined(options.offer_sequence)) {
       options.offer_sequence = options.sequence || options.cancel_sequence;
     }
   } else {
@@ -1333,16 +1389,48 @@ Transaction.prototype.offerCancel = function(options_) {
   return this;
 };
 
+Transaction._prepareSignerEntry = function(signer) {
+  const {account, weight} = signer;
+
+  assert(UInt160.is_valid(account), 'Signer account invalid');
+  assert(_.isNumber(weight), 'Signer weight missing');
+  assert(weight > 0 && weight <= 65535, 'Signer weight must be 1-65535');
+
+  return {
+    SignerEntry: {
+      Account: account,
+      SignerWeight: weight
+    }
+  };
+};
+
+Transaction.prototype.setSignerList = function(options = {}) {
+  this.setType('SignerListSet');
+  this.setAccount(options.account);
+  this.setSignerQuorum(options.signerQuorum);
+
+  if (!_.isEmpty(options.signers)) {
+    this.tx_json.SignerEntries =
+      options.signers.map(Transaction._prepareSignerEntry);
+  }
+
+  return this;
+};
+
+Transaction.prototype.setSignerQuorum = function(quorum) {
+  this._setUInt32('SignerQuorum', quorum);
+};
+
 /**
  * Submit transaction to the network
  *
  * @param [Function] callback
  */
 
-Transaction.prototype.submit = function(callback) {
+Transaction.prototype.submit = function(callback = function() {}) {
   const self = this;
 
-  this.callback = (typeof callback === 'function') ? callback : function() {};
+  this.callback = callback;
 
   this._errorHandler = function transactionError(error_, message) {
     let error = error_;
@@ -1413,6 +1501,59 @@ Transaction.prototype.summary = function() {
   return txSummary;
 };
 
-exports.Transaction = Transaction;
+Transaction.prototype.setSigners = function(signers) {
+  if (_.isArray(signers)) {
+    this.tx_json.Signers = signers;
+  }
 
-// vim:sw=2:sts=2:ts=8:et
+  return this;
+};
+
+Transaction.prototype.addMultiSigner = function(signer) {
+  assert(UInt160.is_valid(signer.Account), 'Signer must have a valid Account');
+
+  if (_.isUndefined(this.multi_signers)) {
+    this.multi_signers = [];
+  }
+
+  this.multi_signers.push({Signer: signer});
+
+  this.multi_signers.sort((a, b) => {
+    return UInt160.from_json(a.Signer.Account)
+    .cmp(UInt160.from_json(b.Signer.Account));
+  });
+};
+
+Transaction.prototype.hasMultiSigners = function() {
+  return !_.isEmpty(this.multi_signers);
+};
+Transaction.prototype.getMultiSigners = function() {
+  return this.multi_signers;
+};
+
+Transaction.prototype.getMultiSigningJson = function() {
+  assert(this.tx_json.Sequence, 'Sequence must be set before multi-signing');
+  assert(this.tx_json.Fee, 'Fee must be set before multi-signing');
+
+  const signingTx = Transaction.from_json(this.tx_json);
+  signingTx.remote = this.remote;
+  signingTx.setSigningPubKey('');
+  signingTx.setCanonicalFlag();
+
+  return signingTx.tx_json;
+};
+
+Transaction.prototype.multiSign = function(account, secret) {
+  const signingData = this.multiSigningData(account);
+  const keyPair = Seed.from_json(secret).get_key();
+
+  const signer = {
+    Account: account,
+    TxnSignature: keyPair.signHex(signingData.buffer),
+    SigningPubKey: keyPair.pubKeyHex()
+  };
+
+  return signer;
+};
+
+exports.Transaction = Transaction;

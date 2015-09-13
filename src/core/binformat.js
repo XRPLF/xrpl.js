@@ -1,6 +1,8 @@
 'use strict';
 
-/*eslint no-multi-spaces:0,space-in-brackets:0,key-spacing:0,comma-spacing:0*/
+/*eslint-disable max-len,spaced-comment,array-bracket-spacing,key-spacing*/
+/*eslint-disable no-multi-spaces,comma-spacing*/
+/*eslint-disable no-multi-spaces:0,space-in-brackets:0,key-spacing:0,comma-spacing:0*/
 
 /**
  * Data type map.
@@ -52,7 +54,8 @@ const FIELDS_MAP = exports.fields = {
   // Common types
   1: { // Int16
     1: 'LedgerEntryType',
-    2: 'TransactionType'
+    2: 'TransactionType',
+    3: 'SignerWeight'
   },
   2: { // Int32
     2: 'Flags',
@@ -87,7 +90,9 @@ const FIELDS_MAP = exports.fields = {
     31: 'ReserveBase',
     32: 'ReserveIncrement',
     33: 'SetFlag',
-    34: 'ClearFlag'
+    34: 'ClearFlag',
+    35: 'SignerQuorum',
+    38: 'SignerListID'
   },
   3: { // Int64
     1: 'IndexNext',
@@ -166,13 +171,15 @@ const FIELDS_MAP = exports.fields = {
     7: 'FinalFields',
     8: 'NewFields',
     9: 'TemplateEntry',
-    10: 'Memo'
+    10: 'Memo',
+    11: 'SignerEntry',
+    16: 'Signer'
   },
   15: { // Array
     1: undefined,  // end of Array
     2: 'SigningAccounts',
-    3: 'TxnSignatures',
-    4: 'Signatures',
+    3: 'Signers',
+    4: 'SignerEntries',
     5: 'Template',
     6: 'Necessary',
     7: 'Sufficient',
@@ -202,7 +209,7 @@ const FIELDS_MAP = exports.fields = {
   }
 };
 
-let INVERSE_FIELDS_MAP = exports.fieldsInverseMap = { };
+const INVERSE_FIELDS_MAP = exports.fieldsInverseMap = { };
 
 Object.keys(FIELDS_MAP).forEach(function(k1) {
   Object.keys(FIELDS_MAP[k1]).forEach(function(k2) {
@@ -211,8 +218,8 @@ Object.keys(FIELDS_MAP).forEach(function(k1) {
 });
 
 const REQUIRED = exports.REQUIRED = 0,
-      OPTIONAL = exports.OPTIONAL = 1,
-      DEFAULT  = exports.DEFAULT  = 2;
+  OPTIONAL = exports.OPTIONAL = 1,
+  DEFAULT  = exports.DEFAULT  = 2;
 
 const base = [
   [ 'TransactionType'    , REQUIRED ],
@@ -226,7 +233,8 @@ const base = [
   [ 'SigningPubKey'      , REQUIRED ],
   [ 'TxnSignature'       , OPTIONAL ],
   [ 'AccountTxnID'       , OPTIONAL ],
-  [ 'Memos'              , OPTIONAL ]
+  [ 'Memos'              , OPTIONAL ],
+  [ 'Signers'            , OPTIONAL ]
 ];
 
 exports.tx = {
@@ -296,6 +304,10 @@ exports.tx = {
   ]),
   TicketCancel: [11].concat(base, [
     [ 'TicketID'           , REQUIRED ]
+  ]),
+  SignerListSet: [12].concat(base, [
+    ['SignerQuorum', REQUIRED],
+    ['SignerEntries', OPTIONAL]
   ])
 };
 
@@ -396,7 +408,15 @@ exports.ledger = {
     ['LedgerIndex',         OPTIONAL],
     ['Balance',             REQUIRED],
     ['LowLimit',            REQUIRED],
-    ['HighLimit',           REQUIRED]])
+    ['HighLimit',           REQUIRED]]),
+  SignerList: [83].concat(sleBase,[
+    ['OwnerNode',           REQUIRED],
+    ['SignerQuorum',        REQUIRED],
+    ['SignerEntries',       REQUIRED],
+    ['SignerListID',        REQUIRED],
+    ['PreviousTxnID',       REQUIRED],
+    ['PreviousTxnLgrSeq',   REQUIRED]
+  ])
 };
 
 exports.metadata = [
