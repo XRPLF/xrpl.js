@@ -443,7 +443,7 @@ exports.ter = {
   tecNO_LINE_REDUNDANT     : 127,
   tecPATH_DRY              : 128,
   tecUNFUNDED              : 129,  // Deprecated, old ambiguous unfunded.
-  tecMASTER_DISABLED       : 130,
+  tecNO_ALTERNATIVE_KEY    : 130,
   tecNO_REGULAR_KEY        : 131,
   tecOWNERS                : 132,
   tecNO_ISSUER             : 133,
@@ -457,5 +457,6 @@ exports.ter = {
   tecINSUFFICIENT_RESERVE  : 141,
   tecNEED_MASTER_KEY       : 142,
   tecDST_TAG_NEEDED        : 143,
-  tecINTERNAL              : 144
+  tecINTERNAL              : 144,
+  tecOVERSIZE              : 145
 };
