@@ -639,7 +639,8 @@ OrderBook.prototype.setOfferFundedAmount = function(offer) {
 
   offer.owner_funds = this.getUnadjustedOwnerFunds(offer.Account);
 
-  offer.is_fully_funded = fundedAmount.compareTo(currentOfferSum) >= 0;
+  offer.is_fully_funded = fundedAmount.is_comparable(currentOfferSum) &&
+    fundedAmount.compareTo(currentOfferSum) >= 0;
 
   if (offer.is_fully_funded) {
     offer.taker_gets_funded = Amount.from_json(offer.TakerGets).to_text();
