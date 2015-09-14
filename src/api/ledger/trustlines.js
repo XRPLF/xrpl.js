@@ -42,10 +42,21 @@ function getTrustlinesAsync(account: string, options: {currency: string,
   validate.address(account);
   validate.getTrustlinesOptions(options);
 
-  const ledgerVersion = options.ledgerVersion
-                      || this.remote.getLedgerSequence();
+  if (!options.ledgerVersion) {
+    const self = this;
+    this.remote.getLedgerSequence(convertErrors(function(err?, seq: number) {
+      if (err) {
+        callback(err);
+      } else {
+        const newOptions = _.extend(options, {ledgerVersion: seq});
+        getTrustlinesAsync.call(self, account, newOptions, callback);
+      }
+    }));
+    return;
+  }
+
   const getter = _.partial(getAccountLines, this.remote, account,
-                           ledgerVersion, options);
+                           options.ledgerVersion, options);
   utils.getRecursive(getter, options.limit, callback);
 }
 

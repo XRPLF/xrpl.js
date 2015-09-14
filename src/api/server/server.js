@@ -53,8 +53,7 @@ function getServerInfoAsync(
 ): void {
   this.remote.requestServerInfo((error, response) => {
     if (error) {
-      const message =
-        _.get(error, ['remote', 'error_message'], error.message);
+      const message = _.get(error, ['remote', 'error_message'], error.message);
       callback(new common.errors.RippledNetworkError(message));
     } else {
       callback(null,
@@ -63,28 +62,43 @@ function getServerInfoAsync(
   });
 }
 
-function getFee(): number {
-  return common.dropsToXrp(this.remote.createTransaction()._computeFee());
+function getFee(): ?number {
+  if (!this.remote._servers.length) {
+    throw new common.errors.RippledNetworkError('No servers available.');
+  }
+  const fee = this.remote.createTransaction()._computeFee();
+  if (typeof fee !== 'string') {
+    return undefined;
+  }
+  return common.dropsToXrp(fee);
 }
 
-function getLedgerVersion(): number {
-  return this.remote.getLedgerSequence();
+function getLedgerVersion(): Promise<number> {
+  return common.promisify(this.remote.getLedgerSequence).call(this.remote);
 }
 
 function connect(): Promise<void> {
   return common.promisify(callback => {
-    this.remote.connect(() => callback(null));
+    try {
+      this.remote.connect(() => callback(null));
+    } catch(error) {
+      callback(new common.errors.RippledNetworkError(error.message));
+    }
   })();
 }
 
 function disconnect(): Promise<void> {
   return common.promisify(callback => {
-    this.remote.disconnect(() => callback(null));
+    try {
+      this.remote.disconnect(() => callback(null));
+    } catch(error) {
+      callback(new common.errors.RippledNetworkError(error.message));
+    }
   })();
 }
 
 function getServerInfo(): Promise<GetServerInfoResponse> {
-  return common.promisify(getServerInfoAsync.bind(this))();
+  return common.promisify(getServerInfoAsync).call(this);
 }
 
 function rippleTimeToISO8601(rippleTime: string): string {

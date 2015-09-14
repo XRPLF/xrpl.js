@@ -103,7 +103,7 @@ function hasCompleteLedgerRange(remote: Remote, minLedgerVersion?: number,
   const firstLedgerVersion = 32570; // earlier versions have been lost
   return remote.getServer().hasLedgerRange(
     minLedgerVersion || firstLedgerVersion,
-    maxLedgerVersion || remote.getLedgerSequence());
+    maxLedgerVersion || remote.getLedgerSequenceSync());
 }
 
 function isPendingLedgerVersion(remote: Remote, maxLedgerVersion: ?number

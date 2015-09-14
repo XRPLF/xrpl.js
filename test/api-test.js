@@ -52,13 +52,15 @@ describe('RippleAPI', function() {
   });
 
   it('preparePayment with all options specified', function() {
-    const localInstructions = {
-      maxLedgerVersion: this.api.getLedgerVersion() + 100,
-      fee: '0.000012'
-    };
-    return this.api.preparePayment(
-      address, requests.preparePaymentAllOptions, localInstructions).then(
-      _.partial(checkResult, responses.preparePaymentAllOptions, 'prepare'));
+    return this.api.getLedgerVersion().then((ver) => {
+      const localInstructions = {
+        maxLedgerVersion: ver + 100,
+        fee: '0.000012'
+      };
+      return this.api.preparePayment(
+        address, requests.preparePaymentAllOptions, localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentAllOptions, 'prepare'));
+    });
   });
 
   it('preparePayment without counterparty set', function() {
@@ -637,8 +639,13 @@ describe('RippleAPI', function() {
     });
   });
 
-  it('getLedgerVersion', function() {
-    assert.strictEqual(this.api.getLedgerVersion(), 8819951);
+  it('getLedgerVersion', function(done) {
+    this.api.getLedgerVersion().then((ver) => {
+      assert.strictEqual(ver, 8819951);
+      done();
+    }, (err) => {
+      done(err);
+    });
   });
 
   it('getLedger', function() {

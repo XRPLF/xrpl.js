@@ -7,6 +7,9 @@ const getTrustlines = require('./trustlines');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
+import type {Remote} from '../../core/remote';
+import type {GetLedgerSequenceCallback} from '../../core/remote';
+
 
 function getTrustlineBalanceAmount(trustline) {
   return {
@@ -31,14 +34,26 @@ function getTrustlinesAsync(account, options, callback) {
     .catch(callback);
 }
 
+function getLedgerVersion(remote: Remote, optionValue?: number,
+  callback: GetLedgerSequenceCallback
+) {
+  if (typeof optionValue === 'number') {
+    callback(null, optionValue);
+  } else {
+    remote.getLedgerSequence(callback);
+  }
+}
+
+
 function getBalancesAsync(account, options, callback) {
   validate.address(account);
   validate.getBalancesOptions(options);
 
-  const ledgerVersion = options.ledgerVersion
-                      || this.remote.getLedgerSequence();
   async.parallel({
-    xrp: _.partial(utils.getXRPBalance, this.remote, account, ledgerVersion),
+    xrp: async.compose(
+      _.partial(utils.getXRPBalance, this.remote, account),
+      _.partial(getLedgerVersion, this.remote, options.ledgerVersion)
+    ),
     trustlines: _.partial(getTrustlinesAsync.bind(this), account, options)
   }, composeAsync(formatBalances, convertErrors(callback)));
 }

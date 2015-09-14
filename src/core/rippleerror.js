@@ -1,3 +1,5 @@
+'use strict';
+
 const util = require('util');
 const _ = require('lodash');
 
@@ -18,18 +20,23 @@ function RippleError(code?: any, message?: string) {
     }
   }
 
-  this.engine_result = this.result = (this.result || this.engine_result || this.error || 'Error');
-  this.engine_result_message = this.result_message = (this.result_message || this.engine_result_message || this.error_message || 'Error');
+  this.engine_result = this.result = (this.result || this.engine_result ||
+    this.error || 'Error');
+  this.engine_result_message = this.result_message = (this.result_message ||
+    this.engine_result_message || this.error_message || 'Error');
   this.message = this.result_message;
 
   let stack;
 
-  if (!!Error.captureStackTrace) {
+  if (Boolean(Error.captureStackTrace)) {
     Error.captureStackTrace(this, code || this);
-  } else if ((stack = new Error().stack)) {
-    this.stack = stack;
+  } else {
+    stack = new Error().stack;
+    if (Boolean(stack)) {
+      this.stack = stack;
+    }
   }
-};
+}
 
 util.inherits(RippleError, Error);
 

@@ -26,10 +26,21 @@ function getOrdersAsync(account, options, callback) {
   validate.address(account);
   validate.getOrdersOptions(options);
 
-  const ledgerVersion = options.ledgerVersion
-                      || this.remote.getLedgerSequence();
+  if (!options.ledgerVersion) {
+    const self = this;
+    this.remote.getLedgerSequence((err, seq) => {
+      if (err) {
+        convertErrors(callback)(err);
+        return;
+      }
+      const newOptions = _.extend(options, {ledgerVersion: seq});
+      getOrdersAsync.call(self, account, newOptions, callback);
+    });
+    return;
+  }
+
   const getter = _.partial(requestAccountOffers, this.remote, account,
-                           ledgerVersion);
+                           options.ledgerVersion);
   utils.getRecursive(getter, options.limit,
     composeAsync((orders) => _.sortBy(orders,
       (order) => order.properties.sequence), callback));

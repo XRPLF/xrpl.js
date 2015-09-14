@@ -71,7 +71,8 @@ function composeAsync(wrapper: Wrapper, callback: Callback): Callback {
 function convertErrors(callback: Callback): () => void {
   return function(error, data) {
     if (error && !(error instanceof errors.RippleError)) {
-      const error_ = new errors.RippleError(error);
+      const message = _.get(error, ['remote', 'error_message'], error.message);
+      const error_ = new errors.RippleError(message);
       error_.data = data;
       callback(error_, data);
     } else if (error) {
