@@ -52,8 +52,8 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
   validate.getTransactionOptions(options);
 
   const remote = this.remote;
-  const maxLedgerVersion = Math.min(options.maxLedgerVersion || Infinity,
-    remote.getLedgerSequence());
+  const maxLedgerVersion =
+    options.maxLedgerVersion || remote.getLedgerSequence();
 
   function callbackWrapper(error_?: Error, tx?: Object) {
     let error = error_;
@@ -67,13 +67,19 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
       error = new errors.NotFoundError('Transaction not found');
     }
 
+    // Missing complete ledger range
     if (error instanceof errors.NotFoundError
-        && !utils.hasCompleteLedgerRange(remote,
-            options.minLedgerVersion, maxLedgerVersion)) {
-      callback(new errors.MissingLedgerHistoryError('Transaction not found,'
-        + ' but the server\'s ledger history is incomplete'));
+        && !utils.hasCompleteLedgerRange(remote, options.minLedgerVersion,
+                                         maxLedgerVersion)) {
+      if (utils.isPendingLedgerVersion(remote, maxLedgerVersion)) {
+        callback(new errors.PendingLedgerVersionError());
+      } else {
+        callback(new errors.MissingLedgerHistoryError());
+      }
+      // Transaction is found, but not in specified range
     } else if (!error && tx && !isTransactionInRange(tx, options)) {
       callback(new errors.NotFoundError('Transaction not found'));
+      // Transaction is not found
     } else if (error) {
       convertErrors(callback)(error);
     } else if (!tx) {

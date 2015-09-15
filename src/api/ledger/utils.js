@@ -99,10 +99,17 @@ function compareTransactions(first: Outcome, second: Outcome): number {
 function hasCompleteLedgerRange(remote: Remote, minLedgerVersion?: number,
                                 maxLedgerVersion?: number
 ): boolean {
+
   const firstLedgerVersion = 32570; // earlier versions have been lost
   return remote.getServer().hasLedgerRange(
     minLedgerVersion || firstLedgerVersion,
     maxLedgerVersion || remote.getLedgerSequence());
+}
+
+function isPendingLedgerVersion(remote: Remote, maxLedgerVersion: ?number
+): boolean {
+  const currentLedger = remote.getLedgerSequence();
+  return currentLedger < (maxLedgerVersion || 0);
 }
 
 module.exports = {
@@ -112,6 +119,7 @@ module.exports = {
   renameCounterpartyToIssuerInOrder,
   getRecursive,
   hasCompleteLedgerRange,
+  isPendingLedgerVersion,
   promisify: common.promisify,
   clamp: clamp,
   common: common

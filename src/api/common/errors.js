@@ -58,6 +58,13 @@ function MissingLedgerHistoryError(message) {
 MissingLedgerHistoryError.prototype = new RippleError();
 MissingLedgerHistoryError.prototype.name = 'MissingLedgerHistoryError';
 
+function PendingLedgerVersionError(message) {
+  this.message = message ||
+    'maxLedgerVersion is greater than server\'s most recent validated ledger';
+}
+PendingLedgerVersionError.prototype = new RippleError();
+PendingLedgerVersionError.prototype.name = 'PendingLedgerVersionError';
+
 /**
  * Request timed out
  */
@@ -82,6 +89,7 @@ module.exports = {
   TransactionError,
   RippledNetworkError,
   NotFoundError,
+  PendingLedgerVersionError,
   MissingLedgerHistoryError,
   TimeOutError,
   ApiError,
