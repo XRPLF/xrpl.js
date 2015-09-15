@@ -141,6 +141,24 @@ OrderBookUtils.convertOfferQualityToHex = function(quality) {
 };
 
 /**
+ * Formats an offer quality amount to a hex that can be parsed by
+ * Amount.parse_quality
+ *
+ * @param {String} quality
+ *
+ * @return {String}
+ */
+
+OrderBookUtils.convertOfferQualityToHexFromText = function(quality) {
+
+  const so = new SerializedObject();
+  Types.Quality.serialize(so, quality);
+
+  return so.to_hex();
+};
+
+
+/**
  *
  */
 

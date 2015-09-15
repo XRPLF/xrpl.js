@@ -9,6 +9,7 @@ const Amount = require('ripple-lib').Amount;
 const Meta = require('ripple-lib').Meta;
 const addresses = require('./fixtures/addresses');
 const fixtures = require('./fixtures/orderbook');
+const IOUValue = require('ripple-lib')._test.IOUValue;
 
 describe('OrderBook', function() {
   this.timeout(0);
@@ -160,7 +161,7 @@ describe('OrderBook', function() {
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
     book.setOwnerFunds(addresses.ACCOUNT, '1');
 
     assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT).to_text(), '1');
@@ -173,7 +174,7 @@ describe('OrderBook', function() {
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
     book.setOwnerFunds(addresses.ACCOUNT, '1');
 
     assert.strictEqual(book._ownerFundsUnadjusted[addresses.ACCOUNT], '1');
@@ -226,21 +227,6 @@ describe('OrderBook', function() {
 
     book.deleteOwnerFunds(addresses.ACCOUNT);
     assert(!book.hasOwnerFunds(addresses.ACCOUNT));
-  });
-
-  it('Delete owner funds', function() {
-    const book = createRemote().createOrderBook({
-      currency_gets: 'BTC',
-      issuer_gets: addresses.ISSUER,
-      currency_pays: 'XRP'
-    });
-
-    book._ownerFunds[addresses.ACCOUNT] = '1';
-    assert(book.hasOwnerFunds(addresses.ACCOUNT));
-
-    assert.throws(function() {
-      book.deleteOwnerFunds('0rrrrrrrrrrrrrrrrrrrrBZbvji');
-    });
   });
 
   it('Increment owner offer count', function() {
@@ -379,7 +365,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
 
     assert.strictEqual(book.applyTransferRate('1'), '0.9980039920159681');
   });
@@ -391,7 +377,7 @@ describe('OrderBook', function() {
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     assert.strictEqual(book.applyTransferRate('0.9980039920159681'), '0.9980039920159681');
   });
@@ -437,14 +423,14 @@ describe('OrderBook', function() {
 
       request.emit('success', {
         account_data: {
-          TransferRate: Amount.from_json(1002000000)
+          TransferRate: 1002000000
         }
       });
     };
 
     book.requestTransferRate(function(err, rate) {
       assert.ifError(err);
-      assert(rate.equals(1002000000));
+      assert(rate.equals(new IOUValue(1002000000)));
     });
   });
 
@@ -471,7 +457,7 @@ describe('OrderBook', function() {
 
     book.requestTransferRate(function(err, rate) {
       assert.ifError(err);
-      assert(rate.equals(1000000000));
+      assert(rate.equals(new IOUValue(1000000000)));
     });
   });
 
@@ -483,7 +469,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
 
     remote.request = function() {
       assert(false);
@@ -491,7 +477,7 @@ describe('OrderBook', function() {
 
     book.requestTransferRate(function(err, rate) {
       assert.ifError(err);
-      assert(rate.equals(1002000000));
+      assert(rate.equals(new IOUValue(1002000000)));
     });
   });
 
@@ -509,8 +495,8 @@ describe('OrderBook', function() {
 
     book.requestTransferRate(function(err, rate) {
       assert.ifError(err);
-      assert(rate.equals(1000000000));
-      assert(book._issuerTransferRate.equals(1000000000));
+      assert(rate.equals(new IOUValue(1000000000)));
+      assert(book._issuerTransferRate.equals(new IOUValue(1000000000)));
     });
   });
 
@@ -522,7 +508,7 @@ describe('OrderBook', function() {
       issuer_gets: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -558,7 +544,7 @@ describe('OrderBook', function() {
       issuer_gets: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -596,7 +582,7 @@ describe('OrderBook', function() {
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -632,7 +618,7 @@ describe('OrderBook', function() {
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -670,7 +656,7 @@ describe('OrderBook', function() {
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -1101,7 +1087,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book._offers = fixtures.fiatOffers();
 
@@ -1153,7 +1139,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '19'
@@ -1192,7 +1178,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
 
     book._offers = fixtures.fiatOffers();
 
@@ -1218,7 +1204,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
 
     book._ownerFunds[addresses.ACCOUNT] = '100';
     book._offers = fixtures.fiatOffers();
@@ -1362,7 +1348,7 @@ describe('OrderBook', function() {
 
       request.emit('success', fixtures.accountInfoResponse());
 
-      assert(book._issuerTransferRate.equals(fixtures.TRANSFER_RATE));
+      assert(book._issuerTransferRate.equals(new IOUValue(fixtures.TRANSFER_RATE)));
       done();
     };
 
@@ -1379,7 +1365,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
 
     const offers = fixtures.bookOffersResponse().offers;
 
@@ -1412,7 +1398,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
 
     const offers = fixtures.bookOffersResponse({
       account_funds: '233.13532'
@@ -1485,7 +1471,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
 
     const offers = fixtures.bookOffersResponse().offers;
 
@@ -1519,7 +1505,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
 
     const offers = fixtures.DECIMAL_TAKER_PAYS_FUNDED_OFFERS;
 
@@ -1540,7 +1526,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
     book._subscribed = book._synced = true;
 
     const message = fixtures.transactionWithCreatedOffer();
@@ -1562,7 +1548,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
     book._subscribed = book._synced = true;
 
     const offer = fixtures.transactionWithCreatedOffer();
@@ -1612,7 +1598,7 @@ describe('OrderBook', function() {
       numOfferAddedEvents += 1;
     });
 
-    book._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1002000000);
     book._subscribed = book._synced = true;
 
     const offer = fixtures.transactionWithCreatedOffer();
@@ -1641,7 +1627,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1664,7 +1650,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers().slice(0, 1));
 
@@ -1706,7 +1692,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1746,7 +1732,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1765,7 +1751,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1790,7 +1776,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers().slice(0, 1));
 
@@ -1814,7 +1800,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1865,7 +1851,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1905,7 +1891,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1937,7 +1923,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1976,7 +1962,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -2046,7 +2032,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '20'
@@ -2073,7 +2059,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '4.5'
@@ -2102,7 +2088,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.QUALITY_OFFERS);
 
@@ -2126,7 +2112,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -2161,7 +2147,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '25'
@@ -2198,7 +2184,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '30'

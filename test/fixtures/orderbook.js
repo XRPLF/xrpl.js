@@ -8,6 +8,7 @@ const Meta = require('ripple-lib').Meta;
 const Amount = require('ripple-lib').Amount;
 const SerializedObject = require('ripple-lib').SerializedObject;
 const Types = require('ripple-lib').types;
+const IOUValue = require('ripple-lib')._test.IOUValue;
 
 module.exports.FIAT_BALANCE = '10';
 module.exports.NATIVE_BALANCE = '55';
@@ -812,7 +813,6 @@ module.exports.transactionWithInvalidAccountRoot = function(options) {
   };
 };
 
-const IOU_SUFFIX = '/000/rrrrrrrrrrrrrrrrrrrrrhoLvTp';
 
 module.exports.transactionWithCreatedOffer = function(options) {
   options = options || {};
@@ -821,8 +821,8 @@ module.exports.transactionWithCreatedOffer = function(options) {
     amount: '1.9951'
   });
 
-  const takerGets = Amount.from_json(options.amount + IOU_SUFFIX);
-  const takerPays = Amount.from_json(module.exports.TAKER_PAYS + IOU_SUFFIX);
+  const takerGets = new IOUValue(options.amount);
+  const takerPays = new IOUValue(module.exports.TAKER_PAYS);
   const quality = takerPays.divide(takerGets);
 
   const so = new SerializedObject();

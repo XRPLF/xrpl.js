@@ -198,7 +198,7 @@ OrderBook.EVENTS = [
   'offer_changed', 'offer_funds_changed'
 ];
 
-OrderBook.DEFAULT_TRANSFER_RATE = Amount.from_json(1000000000);
+OrderBook.DEFAULT_TRANSFER_RATE = new IOUValue(1000000000);
 
 OrderBook.NOTIFY_TIMEOUT = 100;
 
@@ -424,8 +424,9 @@ OrderBook.prototype.requestTransferRate = function(callback) {
     // When transfer rate is not explicitly set on account, it implies the
     // default transfer rate
     self._issuerTransferRate =
-      Amount.from_json(info.account_data.TransferRate ||
-      OrderBook.DEFAULT_TRANSFER_RATE);
+      info.account_data.TransferRate ?
+        new IOUValue(info.account_data.TransferRate) :
+        OrderBook.DEFAULT_TRANSFER_RATE;
 
     callback(null, self._issuerTransferRate);
   }
@@ -544,16 +545,10 @@ OrderBook.prototype.setOwnerFunds = function(account, fundedAmount) {
 
 OrderBook.prototype.applyTransferRate = function(balance) {
   assert(!isNaN(balance), 'Balance is invalid');
-  assert(this._issuerTransferRate.is_valid(), 'Transfer rate is invalid');
 
   const adjustedBalance = (new IOUValue(balance))
-  .divide(new IOUValue(this._issuerTransferRate))
-  .multiply(new IOUValue(OrderBook.DEFAULT_TRANSFER_RATE)).toString();
-  const adjustedBalance = OrderBookUtils.normalizeAmount(balance)
   .divide(this._issuerTransferRate)
-  .multiply(OrderBook.DEFAULT_TRANSFER_RATE)
-  .to_json()
-  .value;
+  .multiply(OrderBook.DEFAULT_TRANSFER_RATE).toString();
 
   return adjustedBalance;
 };

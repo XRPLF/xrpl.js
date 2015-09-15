@@ -9,6 +9,7 @@ const Currency = require('ripple-lib').Currency;
 const Amount = require('ripple-lib').Amount;
 const addresses = require('./fixtures/addresses');
 const fixtures = require('./fixtures/orderbook');
+const IOUValue = require('ripple-lib')._test.IOUValue;
 
 describe('OrderBook Autobridging', function() {
   this.timeout(0);
@@ -45,9 +46,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
@@ -77,9 +78,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
@@ -108,9 +109,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
@@ -139,9 +140,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1002000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
@@ -168,9 +169,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
@@ -203,9 +204,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
@@ -236,9 +237,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
@@ -272,9 +273,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 2));
@@ -306,9 +307,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 2));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
@@ -344,9 +345,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1002000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 2));
@@ -383,9 +384,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1002000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1002000000);
 
     const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
     const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 2));
@@ -423,9 +424,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
@@ -476,9 +477,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
@@ -562,9 +563,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
@@ -648,9 +649,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
@@ -750,9 +751,9 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = Amount.from_json(1000000000);
-    book._legOneBook._issuerTransferRate = Amount.from_json(1000000000);
-    book._legTwoBook._issuerTransferRate = Amount.from_json(1000000000);
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
