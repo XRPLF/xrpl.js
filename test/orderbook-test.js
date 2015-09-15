@@ -1,4 +1,4 @@
-/*eslint-disable max-len */
+/* eslint-disable max-len */
 
 'use strict';
 
@@ -13,8 +13,18 @@ const fixtures = require('./fixtures/orderbook');
 describe('OrderBook', function() {
   this.timeout(0);
 
+  function createRemote() {
+    const remote = new Remote();
+
+    remote.isConnected = function() {
+      return true;
+    };
+
+    return remote;
+  }
+
   it('toJSON', function() {
-    let book = new Remote().createOrderBook({
+    let book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -30,7 +40,7 @@ describe('OrderBook', function() {
       }
     });
 
-    book = new Remote().createOrderBook({
+    book = createRemote().createOrderBook({
       issuer_gets: addresses.ISSUER,
       currency_gets: 'BTC',
       currency_pays: 'XRP'
@@ -48,7 +58,7 @@ describe('OrderBook', function() {
   });
 
   it('Check orderbook validity', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -58,7 +68,7 @@ describe('OrderBook', function() {
   });
 
   it('Automatic subscription (based on listeners)', function(done) {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -72,7 +82,7 @@ describe('OrderBook', function() {
   });
 
   it('Subscribe', function(done) {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -94,7 +104,7 @@ describe('OrderBook', function() {
   });
 
   it('Unsubscribe', function(done) {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -114,7 +124,7 @@ describe('OrderBook', function() {
   });
 
   it('Automatic unsubscription - remove all listeners', function(done) {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -129,7 +139,7 @@ describe('OrderBook', function() {
   });
 
   it('Automatic unsubscription - once listener', function(done) {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -144,33 +154,33 @@ describe('OrderBook', function() {
   });
 
   it('Set owner funds', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
     book.setOwnerFunds(addresses.ACCOUNT, '1');
 
     assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT).to_text(), '1');
   });
 
   it('Set owner funds - unadjusted funds', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
     book.setOwnerFunds(addresses.ACCOUNT, '1');
 
     assert.strictEqual(book._ownerFundsUnadjusted[addresses.ACCOUNT], '1');
   });
 
   it('Set owner funds - invalid account', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -182,7 +192,7 @@ describe('OrderBook', function() {
   });
 
   it('Set owner funds - invalid amount', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -194,7 +204,7 @@ describe('OrderBook', function() {
   });
 
   it('Has owner funds', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -205,7 +215,7 @@ describe('OrderBook', function() {
   });
 
   it('Delete owner funds', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -219,7 +229,7 @@ describe('OrderBook', function() {
   });
 
   it('Delete owner funds', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -234,7 +244,7 @@ describe('OrderBook', function() {
   });
 
   it('Increment owner offer count', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -244,20 +254,8 @@ describe('OrderBook', function() {
     assert.strictEqual(book.getOwnerOfferCount(addresses.ACCOUNT), 1);
   });
 
-  it('Increment owner offer count - invalid address', function() {
-    const book = new Remote().createOrderBook({
-      currency_gets: 'BTC',
-      issuer_gets: addresses.ISSUER,
-      currency_pays: 'XRP'
-    });
-
-    assert.throws(function() {
-      book.incrementOwnerOfferCount('zrrrrrrrrrrrrrrrrrrrBZbvji');
-    });
-  });
-
   it('Decrement owner offer count', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -270,7 +268,7 @@ describe('OrderBook', function() {
   });
 
   it('Decrement owner offer count - no more offers', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -283,20 +281,8 @@ describe('OrderBook', function() {
     assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), undefined);
   });
 
-  it('Decrement owner offer count - invalid address', function() {
-    const book = new Remote().createOrderBook({
-      currency_gets: 'BTC',
-      issuer_gets: addresses.ISSUER,
-      currency_pays: 'XRP'
-    });
-
-    assert.throws(function() {
-      book.decrementOwnerOfferCount('zrrrrrrrrrrrrrrrrrrrBZbvji');
-    });
-  });
-
   it('Subtract owner offer total', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -324,7 +310,7 @@ describe('OrderBook', function() {
   });
 
   it('Subtract owner offer total - negative total', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -340,7 +326,7 @@ describe('OrderBook', function() {
   });
 
   it('Get owner offer total', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -355,7 +341,7 @@ describe('OrderBook', function() {
   });
 
   it('Get owner offer total - native', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -367,7 +353,7 @@ describe('OrderBook', function() {
   });
 
   it('Get owner offer total - no total', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -377,7 +363,7 @@ describe('OrderBook', function() {
   });
 
   it('Get owner offer total - native - no total', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
@@ -387,31 +373,31 @@ describe('OrderBook', function() {
   });
 
   it('Apply transfer rate - cached transfer rate', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
 
     assert.strictEqual(book.applyTransferRate('1'), '0.9980039920159681');
   });
 
   it('Apply transfer rate - native currency', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     assert.strictEqual(book.applyTransferRate('0.9980039920159681'), '0.9980039920159681');
   });
 
   it('Apply transfer rate - invalid balance', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -423,7 +409,7 @@ describe('OrderBook', function() {
   });
 
   it('Apply transfer rate - invalid transfer rate', function() {
-    const book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
@@ -435,7 +421,7 @@ describe('OrderBook', function() {
   });
 
   it('Request transfer rate', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
@@ -451,19 +437,19 @@ describe('OrderBook', function() {
 
       request.emit('success', {
         account_data: {
-          TransferRate: 1002000000
+          TransferRate: Amount.from_json(1002000000)
         }
       });
     };
 
     book.requestTransferRate(function(err, rate) {
       assert.ifError(err);
-      assert.strictEqual(rate, 1002000000);
+      assert(rate.equals(1002000000));
     });
   });
 
   it('Request transfer rate - not set', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
@@ -485,19 +471,19 @@ describe('OrderBook', function() {
 
     book.requestTransferRate(function(err, rate) {
       assert.ifError(err);
-      assert.strictEqual(rate, 1000000000);
+      assert(rate.equals(1000000000));
     });
   });
 
   it('Request transfer rate - cached transfer rate', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'BTC',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
 
     remote.request = function() {
       assert(false);
@@ -505,12 +491,12 @@ describe('OrderBook', function() {
 
     book.requestTransferRate(function(err, rate) {
       assert.ifError(err);
-      assert.strictEqual(rate, 1002000000);
+      assert(rate.equals(1002000000));
     });
   });
 
   it('Request transfer rate - native currency', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
@@ -523,20 +509,20 @@ describe('OrderBook', function() {
 
     book.requestTransferRate(function(err, rate) {
       assert.ifError(err);
-      assert.strictEqual(rate, 1000000000);
-      assert.strictEqual(book._issuerTransferRate, 1000000000);
+      assert(rate.equals(1000000000));
+      assert(book._issuerTransferRate.equals(1000000000));
     });
   });
 
   it('Set offer funded amount - iou/xrp - fully funded', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'BTC',
       currency_pays: 'XRP',
       issuer_gets: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -565,14 +551,14 @@ describe('OrderBook', function() {
   });
 
   it('Set offer funded amount - iou/xrp - unfunded', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'BTC',
       currency_pays: 'XRP',
       issuer_gets: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -603,14 +589,14 @@ describe('OrderBook', function() {
   });
 
   it('Set offer funded amount - xrp/iou - funded', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -639,14 +625,14 @@ describe('OrderBook', function() {
   });
 
   it('Set offer funded amount - xrp/iou - unfunded', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -677,14 +663,14 @@ describe('OrderBook', function() {
   });
 
   it('Set offer funded amount - zero funds', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'XRP',
       issuer_pays: addresses.ISSUER,
       currency_pays: 'BTC'
     });
 
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     const offer = {
       Account: addresses.ACCOUNT,
@@ -711,7 +697,7 @@ describe('OrderBook', function() {
   });
 
   it('Check is balance change node', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -761,7 +747,7 @@ describe('OrderBook', function() {
   });
 
   it('Check is balance change node - not balance change', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'XRP',
@@ -804,7 +790,7 @@ describe('OrderBook', function() {
   });
 
   it('Check is balance change node - different currency', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'BTC',
@@ -854,7 +840,7 @@ describe('OrderBook', function() {
   });
 
   it('Check is balance change node - different issuer', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -904,7 +890,7 @@ describe('OrderBook', function() {
   });
 
   it('Check is balance change node - native currency', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'XRP',
@@ -939,7 +925,7 @@ describe('OrderBook', function() {
   });
 
   it('Check is balance change node - native currency - not balance change', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'XRP',
@@ -969,7 +955,7 @@ describe('OrderBook', function() {
   });
 
   it('Parse account balance from node', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1064,7 +1050,7 @@ describe('OrderBook', function() {
   });
 
   it('Parse account balance from node - native currency', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1105,7 +1091,7 @@ describe('OrderBook', function() {
     let receivedChangedEvents = 0;
     let receivedFundsChangedEvents = 0;
 
-    const remote = new Remote();
+    const remote = createRemote();
 
     const message = fixtures.transactionWithRippleState();
 
@@ -1115,7 +1101,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book._offers = fixtures.fiatOffers();
 
@@ -1155,7 +1141,7 @@ describe('OrderBook', function() {
   it('Update funded amounts - increase funds', function() {
     let receivedFundsChangedEvents = 0;
 
-    const remote = new Remote();
+    const remote = createRemote();
 
     const message = fixtures.transactionWithRippleState({
       balance: '50'
@@ -1167,7 +1153,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '19'
@@ -1196,7 +1182,7 @@ describe('OrderBook', function() {
   });
 
   it('Update funded amounts - owner_funds', function(done) {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const message = fixtures.transactionWithRippleState();
 
@@ -1206,7 +1192,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
 
     book._offers = fixtures.fiatOffers();
 
@@ -1222,7 +1208,7 @@ describe('OrderBook', function() {
   });
 
   it('Update funded amounts - issuer transfer rate set', function(done) {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const message = fixtures.transactionWithRippleState();
 
@@ -1232,7 +1218,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
 
     book._ownerFunds[addresses.ACCOUNT] = '100';
     book._offers = fixtures.fiatOffers();
@@ -1250,7 +1236,7 @@ describe('OrderBook', function() {
     let receivedChangedEvents = 0;
     let receivedFundsChangedEvents = 0;
 
-    const remote = new Remote();
+    const remote = createRemote();
 
     const message = fixtures.transactionWithAccountRoot();
 
@@ -1292,7 +1278,7 @@ describe('OrderBook', function() {
   });
 
   it('Update funded amounts - no affected account', function(done) {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const message = fixtures.transactionWithAccountRoot({
       account: addresses.ACCOUNT
@@ -1324,7 +1310,7 @@ describe('OrderBook', function() {
   });
 
   it('Update funded amounts - no balance change', function(done) {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'XRP',
@@ -1357,7 +1343,7 @@ describe('OrderBook', function() {
   });
 
   it('Update funded amounts - deferred TransferRate', function(done) {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1376,7 +1362,7 @@ describe('OrderBook', function() {
 
       request.emit('success', fixtures.accountInfoResponse());
 
-      assert.strictEqual(book._issuerTransferRate, fixtures.TRANSFER_RATE);
+      assert(book._issuerTransferRate.equals(fixtures.TRANSFER_RATE));
       done();
     };
 
@@ -1385,7 +1371,7 @@ describe('OrderBook', function() {
   });
 
   it('Set offers - issuer transfer rate set - iou/xrp', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1393,7 +1379,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
 
     const offers = fixtures.bookOffersResponse().offers;
 
@@ -1418,7 +1404,7 @@ describe('OrderBook', function() {
   });
 
   it('Set offers - issuer transfer rate set - iou/xrp - funded amounts', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1426,7 +1412,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
 
     const offers = fixtures.bookOffersResponse({
       account_funds: '233.13532'
@@ -1491,7 +1477,7 @@ describe('OrderBook', function() {
   });
 
   it('Set offers - multiple calls', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1499,7 +1485,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
 
     const offers = fixtures.bookOffersResponse().offers;
 
@@ -1525,7 +1511,7 @@ describe('OrderBook', function() {
   });
 
   it('Set offers - incorrect taker pays funded', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1533,7 +1519,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
 
     const offers = fixtures.DECIMAL_TAKER_PAYS_FUNDED_OFFERS;
 
@@ -1546,7 +1532,7 @@ describe('OrderBook', function() {
   });
 
   it('Notify - created node', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1554,7 +1540,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
     book._subscribed = book._synced = true;
 
     const message = fixtures.transactionWithCreatedOffer();
@@ -1568,7 +1554,7 @@ describe('OrderBook', function() {
   });
 
   it('Notify - created nodes - correct sorting', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1576,7 +1562,7 @@ describe('OrderBook', function() {
       currency_pays: 'XRP'
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
     book._subscribed = book._synced = true;
 
     const offer = fixtures.transactionWithCreatedOffer();
@@ -1601,12 +1587,12 @@ describe('OrderBook', function() {
     assert.strictEqual(book._offers[2].Account, addresses.OTHER_ACCOUNT);
   });
 
-  it('Notify - created nodes - events', function() {
+  it('Notify - created nodes - events', function(done) {
     let numTransactionEvents = 0;
     let numModelEvents = 0;
     let numOfferAddedEvents = 0;
 
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1626,7 +1612,7 @@ describe('OrderBook', function() {
       numOfferAddedEvents += 1;
     });
 
-    book._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = Amount.from_json(1002000000);
     book._subscribed = book._synced = true;
 
     const offer = fixtures.transactionWithCreatedOffer();
@@ -1638,12 +1624,15 @@ describe('OrderBook', function() {
     book.notify(offer3);
 
     assert.strictEqual(numTransactionEvents, 3);
-    assert.strictEqual(numModelEvents, 3);
     assert.strictEqual(numOfferAddedEvents, 3);
+    setTimeout(function() {
+      assert.strictEqual(numModelEvents, 1);
+      done();
+    }, 300);
   });
 
   it('Notify - deleted node', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1652,7 +1641,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1666,7 +1655,7 @@ describe('OrderBook', function() {
   });
 
   it('Notify - deleted node - last offer', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1675,7 +1664,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers().slice(0, 1));
 
@@ -1687,13 +1676,13 @@ describe('OrderBook', function() {
     assert.strictEqual(book.getOwnerFunds(addresses.ACCOUNT), undefined);
   });
 
-  it('Notify - deleted node - events', function() {
+  it('Notify - deleted node - events', function(done) {
     let numTransactionEvents = 0;
     let numModelEvents = 0;
     let numTradeEvents = 0;
     let numOfferRemovedEvents = 0;
 
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -1717,7 +1706,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1726,13 +1715,16 @@ describe('OrderBook', function() {
     book.notify(message);
 
     assert.strictEqual(numTransactionEvents, 1);
-    assert.strictEqual(numModelEvents, 1);
     assert.strictEqual(numTradeEvents, 1);
     assert.strictEqual(numOfferRemovedEvents, 1);
+    setTimeout(function() {
+      assert.strictEqual(numModelEvents, 1);
+      done();
+    }, 300)
   });
 
   it('Notify - deleted node - trade', function(done) {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -1754,7 +1746,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1764,7 +1756,7 @@ describe('OrderBook', function() {
   });
 
   it('Notify - deleted node - offer cancel', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1773,7 +1765,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1789,7 +1781,7 @@ describe('OrderBook', function() {
   });
 
   it('Notify - deleted node - offer cancel - last offer', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1798,7 +1790,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers().slice(0, 1));
 
@@ -1813,7 +1805,7 @@ describe('OrderBook', function() {
   });
 
   it('Notify - modified node', function() {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const book = remote.createOrderBook({
       currency_gets: 'USD',
@@ -1822,7 +1814,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1843,13 +1835,13 @@ describe('OrderBook', function() {
     assert.strictEqual(book._offers[1].taker_pays_funded, '972251352');
   });
 
-  it('Notify - modified node - events', function() {
+  it('Notify - modified node - events', function(done) {
     let numTransactionEvents = 0;
     let numModelEvents = 0;
     let numTradeEvents = 0;
     let numOfferChangedEvents = 0;
 
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -1873,7 +1865,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1882,13 +1874,16 @@ describe('OrderBook', function() {
     book.notify(message);
 
     assert.strictEqual(numTransactionEvents, 1);
-    assert.strictEqual(numModelEvents, 1);
     assert.strictEqual(numTradeEvents, 1);
     assert.strictEqual(numOfferChangedEvents, 1);
+    setTimeout(function() {
+      assert.strictEqual(numModelEvents, 1);
+      done();
+    }, 300);
   });
 
   it('Notify - modified node - trade', function(done) {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -1910,7 +1905,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1920,7 +1915,7 @@ describe('OrderBook', function() {
   });
 
   it('Notify - modified nodes - trade', function(done) {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -1942,7 +1937,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1957,7 +1952,7 @@ describe('OrderBook', function() {
     let numTradeEvents = 0;
     let numOfferChangedEvents = 0;
 
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -1981,7 +1976,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -1998,7 +1993,7 @@ describe('OrderBook', function() {
   it('Notify - in disconnected state', function(done) {
     this.timeout(100);
 
-    const remote = new Remote();
+    const remote = createRemote();
     const transaction = fixtures.transactionWithDeletedOfferR();
     const offers = {
       offers: fixtures.REQUEST_OFFERS_NATIVE
@@ -2043,7 +2038,7 @@ describe('OrderBook', function() {
     });
   });
   it('Delete offer - offer cancel - funded after delete', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -2051,7 +2046,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '20'
@@ -2070,7 +2065,7 @@ describe('OrderBook', function() {
   });
 
   it('Delete offer - offer cancel - not fully funded after delete', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -2078,7 +2073,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '4.5'
@@ -2099,7 +2094,7 @@ describe('OrderBook', function() {
   });
 
   it('Insert offer - best quality', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -2107,7 +2102,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.QUALITY_OFFERS);
 
@@ -2123,7 +2118,7 @@ describe('OrderBook', function() {
   });
 
   it('Insert offer - best quality - insufficient funds for all offers', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -2131,7 +2126,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers());
 
@@ -2158,7 +2153,7 @@ describe('OrderBook', function() {
   });
 
   it('Insert offer - worst quality - insufficient funds for all orders', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -2166,7 +2161,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '25'
@@ -2195,7 +2190,7 @@ describe('OrderBook', function() {
   });
 
   it('Insert offer - middle quality - insufficient funds for all offers', function() {
-    const remote = new Remote();
+    const remote = createRemote();
     const book = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: addresses.ISSUER,
@@ -2203,7 +2198,7 @@ describe('OrderBook', function() {
     });
 
     book._subscribed = true;
-    book._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = Amount.from_json(1000000000);
 
     book.setOffers(fixtures.fiatOffers({
       account_funds: '30'
@@ -2232,7 +2227,7 @@ describe('OrderBook', function() {
   });
 
   it('Request offers - native currency', function(done) {
-    const remote = new Remote();
+    const remote = createRemote();
 
     const offers = {
       offers: fixtures.REQUEST_OFFERS_NATIVE
@@ -2258,6 +2253,7 @@ describe('OrderBook', function() {
         is_fully_funded: false,
         taker_gets_funded: '600',
         taker_pays_funded: '33.6398379637041',
+        qualityHex: '5711A3A4254F5000',
         quality: '.0560663966061735'
       },
       {
@@ -2280,6 +2276,7 @@ describe('OrderBook', function() {
         is_fully_funded: true,
         taker_gets_funded: '2000',
         taker_pays_funded: '99.72233516476456',
+        qualityHex: '5711B6D8C62EF414',
         quality: '0.049861167582382'
       },
       {
@@ -2302,6 +2299,7 @@ describe('OrderBook', function() {
         is_fully_funded: true,
         taker_gets_funded: '2000',
         taker_pays_funded: '99.72233516476456',
+        qualityHex: '5711B6D8C62EF414',
         quality: '0.049861167582382'
       },
       {
@@ -2324,6 +2322,7 @@ describe('OrderBook', function() {
         taker_gets_funded: '1900',
         taker_pays_funded: '94.7362184065258',
         owner_funds: '3900',
+        qualityHex: '5711B6D8C62EF414',
         quality: '0.049861167582382'
       }
     ];

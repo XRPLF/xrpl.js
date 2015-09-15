@@ -5,6 +5,9 @@
 const _ = require('lodash');
 const addresses = require('./addresses');
 const Meta = require('ripple-lib').Meta;
+const Amount = require('ripple-lib').Amount;
+const SerializedObject = require('ripple-lib').SerializedObject;
+const Types = require('ripple-lib').types;
 
 module.exports.FIAT_BALANCE = '10';
 module.exports.NATIVE_BALANCE = '55';
@@ -809,6 +812,8 @@ module.exports.transactionWithInvalidAccountRoot = function(options) {
   };
 };
 
+const IOU_SUFFIX = '/000/rrrrrrrrrrrrrrrrrrrrrhoLvTp';
+
 module.exports.transactionWithCreatedOffer = function(options) {
   options = options || {};
   _.defaults(options, {
@@ -816,7 +821,16 @@ module.exports.transactionWithCreatedOffer = function(options) {
     amount: '1.9951'
   });
 
-  const meta = new Meta({
+  const takerGets = Amount.from_json(options.amount + IOU_SUFFIX);
+  const takerPays = Amount.from_json(module.exports.TAKER_PAYS + IOU_SUFFIX);
+  const quality = takerPays.divide(takerGets);
+
+  const so = new SerializedObject();
+  Types.Quality.serialize(so, quality);
+
+  const BookDirectory = so.to_hex();
+
+  var meta = new Meta({
     AffectedNodes: [
       {
         CreatedNode: {
@@ -824,7 +838,7 @@ module.exports.transactionWithCreatedOffer = function(options) {
           LedgerIndex: 'AF3C702057C9C47DB9E809FD8C76CD22521012C5CC7AE95D914EC9E226F1D7E5',
           NewFields: {
             Account: options.account,
-            BookDirectory: '7B73A610A009249B0CC0D4311E8BA7927B5A34D86634581C5F211CEE1E0697A0',
+            BookDirectory: BookDirectory,
             Flags: 131072,
             Sequence: 1404,
             TakerGets: {

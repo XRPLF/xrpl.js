@@ -1,7 +1,10 @@
 machine:
   node:
     version: 0.12.0
+<<<<<<< HEAD
 test:
   override:
     - bin/ci.sh "$CIRCLE_NODE_INDEX" "$CIRCLE_NODE_TOTAL":
         parallel: true
+=======
+>>>>>>> upstream/master
