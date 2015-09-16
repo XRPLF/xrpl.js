@@ -160,157 +160,184 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getBalances, 'getBalances'));
   });
 
-  it('getTransaction - payment', function() {
-    return this.api.getTransaction(hashes.VALID_TRANSACTION_HASH).then(
-      _.partial(checkResult, responses.getTransaction.payment,
-        'getTransaction'));
-  });
-
-  it('getTransaction - settings', function() {
-    const hash =
-      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.settings,
-        'getTransaction'));
-  });
-
-  it('getTransaction - order', function() {
-    const hash =
-      '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.order,
-      'getTransaction'));
-  });
-
-  it('getTransaction - order cancellation', function() {
-    const hash =
-      '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.orderCancellation,
-        'getTransaction'));
-  });
-
-  it('getTransaction - trustline set', function() {
-    const hash =
-      '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.trustline,
-        'getTransaction'));
-  });
-
-  it('getTransaction - trustline frozen off', function() {
-    const hash =
-      'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.trustlineFrozenOff,
-        'getTransaction'));
-  });
-
-  it('getTransaction - trustline no quality', function() {
-    const hash =
-      'BAF1C678323C37CCB7735550C379287667D8288C30F83148AD3C1CB019FC9002';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.trustlineNoQuality,
-        'getTransaction'));
-  });
-
-  it('getTransaction - not validated', function() {
-    const hash =
-      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';
-    return this.api.getTransaction(hash).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
+  describe('getTransaction', () => {
+    it('getTransaction - payment', function() {
+      return this.api.getTransaction(hashes.VALID_TRANSACTION_HASH).then(
+        _.partial(checkResult, responses.getTransaction.payment,
+          'getTransaction'));
     });
-  });
 
-  it('getTransaction - tracking on', function() {
-    const hash =
-      '8925FC8844A1E930E2CC76AD0A15E7665AFCC5425376D548BB1413F484C31B8C';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.trackingOn,
+    it('getTransaction - settings', function() {
+      const hash =
+        '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult, responses.getTransaction.settings,
+          'getTransaction'));
+    });
+
+    it('getTransaction - order', function() {
+      const hash =
+        '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult, responses.getTransaction.order,
         'getTransaction'));
-  });
-
-  it('getTransaction - tracking off', function() {
-    const hash =
-      'C8C5E20DFB1BF533D0D81A2ED23F0A3CBD1EF2EE8A902A1D760500473CC9C582';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.trackingOff,
-        'getTransaction'));
-  });
-
-  it('getTransaction - set regular key', function() {
-    const hash =
-      '278E6687C1C60C6873996210A6523564B63F2844FB1019576C157353B1813E60';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.setRegularKey,
-        'getTransaction'));
-  });
-
-  it('getTransaction - not found in range', function() {
-    const hash =
-      '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
-    const options = {
-      minLedgerVersion: 32570,
-      maxLedgerVersion: 32571
-    };
-    return this.api.getTransaction(hash, options).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
     });
-  });
 
-  it('getTransaction - not found by hash', function() {
-    const hash = hashes.NOTFOUND_TRANSACTION_HASH;
-    return this.api.getTransaction(hash).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
+    it('getTransaction - order cancellation', function() {
+      const hash =
+        '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult, responses.getTransaction.orderCancellation,
+          'getTransaction'));
     });
-  });
 
-  it('getTransaction - missing ledger history', function() {
-    const hash = hashes.NOTFOUND_TRANSACTION_HASH;
-    // make gaps in history
-    this.api.remote.getServer().emit('message', ledgerClosed);
-    return this.api.getTransaction(hash).then(() => {
-      assert(false, 'Should throw MissingLedgerHistoryError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.MissingLedgerHistoryError);
+    it('getTransaction - trustline set', function() {
+      const hash =
+        '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult, responses.getTransaction.trustline,
+          'getTransaction'));
     });
-  });
 
-  it('getTransaction - ledger_index not found', function() {
-    const hash =
-      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11';
-    return this.api.getTransaction(hash).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
-      assert(error.message.indexOf('ledger_index') !== -1);
+    it('getTransaction - trustline frozen off', function() {
+      const hash =
+        'FE72FAD0FA7CA904FB6C633A1666EDF0B9C73B2F5A4555D37EEF2739A78A531B';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult, responses.getTransaction.trustlineFrozenOff,
+          'getTransaction'));
     });
-  });
 
-  it('getTransaction - transaction ledger not found', function() {
-    const hash =
-      '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA12';
-    return this.api.getTransaction(hash).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
-      assert(error.message.indexOf('ledger not found') !== -1);
+    it('getTransaction - trustline no quality', function() {
+      const hash =
+        'BAF1C678323C37CCB7735550C379287667D8288C30F83148AD3C1CB019FC9002';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult, responses.getTransaction.trustlineNoQuality,
+          'getTransaction'));
     });
-  });
 
-  it('getTransaction - ledger missing close time', function() {
-    const hash =
-      '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04';
-    return this.api.getTransaction(hash).then(() => {
-      assert(false, 'Should throw ApiError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.ApiError);
+    it('getTransaction - not validated', function() {
+      const hash =
+        '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';
+      return this.api.getTransaction(hash).then(() => {
+        assert(false, 'Should throw NotFoundError');
+      }).catch(error => {
+        assert(error instanceof this.api.errors.NotFoundError);
+      });
+    });
+
+    it('getTransaction - tracking on', function() {
+      const hash =
+        '8925FC8844A1E930E2CC76AD0A15E7665AFCC5425376D548BB1413F484C31B8C';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult, responses.getTransaction.trackingOn,
+          'getTransaction'));
+    });
+
+    it('getTransaction - tracking off', function() {
+      const hash =
+        'C8C5E20DFB1BF533D0D81A2ED23F0A3CBD1EF2EE8A902A1D760500473CC9C582';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult, responses.getTransaction.trackingOff,
+          'getTransaction'));
+    });
+
+    it('getTransaction - set regular key', function() {
+      const hash =
+        '278E6687C1C60C6873996210A6523564B63F2844FB1019576C157353B1813E60';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult, responses.getTransaction.setRegularKey,
+          'getTransaction'));
+    });
+
+    it('getTransaction - not found in range', function() {
+      const hash =
+        '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
+      const options = {
+        minLedgerVersion: 32570,
+        maxLedgerVersion: 32571
+      };
+      return this.api.getTransaction(hash, options).then(() => {
+        assert(false, 'Should throw NotFoundError');
+      }).catch(error => {
+        assert(error instanceof this.api.errors.NotFoundError);
+      });
+    });
+
+    it('getTransaction - not found by hash', function() {
+      const hash = hashes.NOTFOUND_TRANSACTION_HASH;
+      return this.api.getTransaction(hash).then(() => {
+        assert(false, 'Should throw NotFoundError');
+      }).catch(error => {
+        assert(error instanceof this.api.errors.NotFoundError);
+      });
+    });
+
+    it('getTransaction - missing ledger history', function() {
+      const hash = hashes.NOTFOUND_TRANSACTION_HASH;
+      // make gaps in history
+      this.api.remote.getServer().emit('message', ledgerClosed);
+      return this.api.getTransaction(hash).then(() => {
+        assert(false, 'Should throw MissingLedgerHistoryError');
+      }).catch(error => {
+        assert(error instanceof this.api.errors.MissingLedgerHistoryError);
+      });
+    });
+
+    it('getTransaction - missing ledger history with ledger range', function() {
+      const hash = hashes.NOTFOUND_TRANSACTION_HASH;
+      const options = {
+        minLedgerVersion: 32569,
+        maxLedgerVersion: 32571
+      };
+      return this.api.getTransaction(hash, options).then(() => {
+        assert(false, 'Should throw MissingLedgerHistoryError');
+      }).catch(error => {
+        assert(error instanceof this.api.errors.MissingLedgerHistoryError);
+      });
+    });
+
+    it('getTransaction - not found - future maxLedgerVersion', function() {
+      const hash = hashes.NOTFOUND_TRANSACTION_HASH;
+      const options = {
+        maxLedgerVersion: 99999999999
+      };
+      return this.api.getTransaction(hash, options).then(() => {
+        assert(false, 'Should throw PendingLedgerVersionError');
+      }).catch(error => {
+        assert(error instanceof this.api.errors.PendingLedgerVersionError);
+      });
+    });
+
+    it('getTransaction - ledger_index not found', function() {
+      const hash =
+        '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11';
+      return this.api.getTransaction(hash).then(() => {
+        assert(false, 'Should throw NotFoundError');
+      }).catch(error => {
+        assert(error instanceof this.api.errors.NotFoundError);
+        assert(error.message.indexOf('ledger_index') !== -1);
+      });
+    });
+
+    it('getTransaction - transaction ledger not found', function() {
+      const hash =
+        '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA12';
+      return this.api.getTransaction(hash).then(() => {
+        assert(false, 'Should throw NotFoundError');
+      }).catch(error => {
+        assert(error instanceof this.api.errors.NotFoundError);
+        assert(error.message.indexOf('ledger not found') !== -1);
+      });
+    });
+
+    it('getTransaction - ledger missing close time', function() {
+      const hash =
+        '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04';
+      return this.api.getTransaction(hash).then(() => {
+        assert(false, 'Should throw ApiError');
+      }).catch(error => {
+        assert(error instanceof this.api.errors.ApiError);
+      });
     });
   });
 
