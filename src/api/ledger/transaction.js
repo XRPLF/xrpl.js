@@ -57,6 +57,11 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
 
   function callbackWrapper(error_?: Error, tx?: Object) {
     let error = error_;
+
+    if (!error && tx && tx.validated !== true) {
+      return callback(new errors.NotFoundError('Transaction not found'));
+    }
+
     if (error instanceof RippleError && error.remote &&
       error.remote.error === 'txnNotFound') {
       error = new errors.NotFoundError('Transaction not found');

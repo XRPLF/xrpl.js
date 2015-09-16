@@ -181,6 +181,7 @@
       ],
       "TransactionIndex": 0,
       "TransactionResult": "tesSUCCESS"
-    }
+    },
+    "validated": true
   }
 }
