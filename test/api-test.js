@@ -217,9 +217,11 @@ describe('RippleAPI', function() {
   it('getTransaction - not validated', function() {
     const hash =
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';
-    return this.api.getTransaction(hash).then(
-      _.partial(checkResult, responses.getTransaction.notValidated,
-      'getTransaction'));
+    return this.api.getTransaction(hash).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.NotFoundError);
+    });
   });
 
   it('getTransaction - tracking on', function() {
