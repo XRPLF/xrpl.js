@@ -1,4 +1,4 @@
-# ripple-keypairs [![NPM](https://img.shields.io/npm/v/ripple-keypairs.svg)](https://npmjs.org/package/ripple-keypairs) [![Build Status](https://img.shields.io/travis/sublimator/ripple-keypairs/master.svg)](https://travis-ci.org/sublimator/ripple-keypairs) [![Coverage Status](https://coveralls.io/repos/sublimator/ripple-keypairs/badge.svg?branch=master&service=github)](https://coveralls.io/github/sublimator/ripple-keypairs?branch=master)
+# ripple-keypairs [![NPM](https://img.shields.io/npm/v/ripple-keypairs.svg)](https://npmjs.org/package/ripple-keypairs) [![Build Status](https://img.shields.io/travis/ripple/ripple-keypairs/master.svg)](https://travis-ci.org/ripple/ripple-keypairs) [![Coverage Status](https://coveralls.io/repos/ripple/ripple-keypairs/badge.svg?branch=master&service=github)](https://coveralls.io/github/ripple/ripple-keypairs?branch=master)
 
 An implementation of ripple keypairs & wallet generation using
 [elliptic](https://github.com/indutny/elliptic) which supports rfc6979 and

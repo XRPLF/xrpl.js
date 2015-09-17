@@ -1,6 +1,6 @@
 {
   "name": "ripple-keypairs",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "ripple key pairs",
   "files": [
     "distrib/npm/*",
@@ -50,16 +50,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/sublimator/ripple-keypairs.git"
+    "url": "git://github.com/ripple/ripple-keypairs.git"
   },
   "engines": {
     "node": ">=0.12.0"
   },
   "bugs": {
-    "url": "https://github.com/sublimator/ripple-keypairs/issues"
+    "url": "https://github.com/ripple/ripple-keypairs/issues"
   },
-  "homepage": "https://github.com/sublimator/ripple-keypairs#readme",
-  "author": "ndudfield@gmail.com",
+  "homepage": "https://github.com/ripple/ripple-keypairs#readme",
   "license": "ISC",
   "readmeFilename": "README.md"
 }
