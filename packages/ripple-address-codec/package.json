@@ -1,6 +1,6 @@
 {
   "name": "ripple-address-codec",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "encodes/decodes base58 encoded ripple identifiers",
   "main": "src/index.js",
   "license": "ISC",
@@ -8,17 +8,21 @@
     "hash.js": "^1.0.3",
     "x-address-codec": "^0.7.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ripple/ripple-address-codec.git"
+  },
   "scripts": {
     "test": "istanbul test _mocha",
     "prepublish": "npm test && npm run lint",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/master/eslintrc'; fi; eslint --reset -c eslintrc src/*.js test/*.js"
+    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/master/eslintrc'; fi; eslint -c eslintrc src/*.js test/*.js"
   },
   "devDependencies": {
-    "coveralls": "~2.10.0",
-    "eslint": "^0.24.1",
-    "istanbul": "~0.3.5",
-    "mocha": "^2.2.5"
+    "coveralls": "~2.11.4",
+    "eslint": "^1.4.3",
+    "istanbul": "~0.3.20",
+    "mocha": "^2.3.2"
   },
   "readmeFilename": "README.md",
   "engines": {

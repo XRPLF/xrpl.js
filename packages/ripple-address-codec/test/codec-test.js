@@ -12,9 +12,7 @@ function toBytes(hex) {
 }
 
 describe('ripple-address-codec', function() {
-  function makeTest(type, base58, hex, opts) {
-    opts = opts || {};
-
+  function makeTest(type, base58, hex) {
     it('can translate between ' + hex + ' and ' + base58, function() {
       var actual = api['encode' + type](toBytes(hex));
       assert.equal(actual, base58);

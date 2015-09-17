@@ -1,6 +1,6 @@
 # ripple-address-codec
 
-[![NPM](https://img.shields.io/npm/v/ripple-address-codec.svg)](https://npmjs.org/package/ripple-address-codec) [![Build Status](https://img.shields.io/travis/sublimator/ripple-address-codec/master.svg)](https://travis-ci.org/sublimator/ripple-address-codec) [![Coverage Status](https://coveralls.io/repos/sublimator/ripple-address-codec/badge.svg?branch=master&service=github)](https://coveralls.io/github/sublimator/ripple-address-codec?branch=master)
+[![NPM](https://img.shields.io/npm/v/ripple-address-codec.svg)](https://npmjs.org/package/ripple-address-codec) [![Build Status](https://img.shields.io/travis/ripple/ripple-address-codec/master.svg)](https://travis-ci.org/ripple/ripple-address-codec) [![Coverage Status](https://coveralls.io/repos/ripple/ripple-address-codec/badge.svg?branch=master&service=github)](https://coveralls.io/github/ripple/ripple-address-codec?branch=master)
 
 ## API
 
@@ -65,15 +65,25 @@ We give you the kitchen sink.
   encode: [Function: encode],
   decodeEdSeed: [Function],
   encodeEdSeed: [Function],
+  isValidEdSeed: [Function],
   decodeSeed: [Function],
+  encodeSeed: [Function],
+  isValidSeed: [Function],
   decodeAccountID: [Function],
   encodeAccountID: [Function],
+  isValidAccountID: [Function],
+  decodeAddress: [Function],
+  encodeAddress: [Function],
+  isValidAddress: [Function],
   decodeNodePublic: [Function],
   encodeNodePublic: [Function],
+  isValidNodePublic: [Function],
   decodeNodePrivate: [Function],
   encodeNodePrivate: [Function],
+  isValidNodePrivate: [Function],
   decodeK256Seed: [Function],
-  encodeK256Seed: [Function] }
+  encodeK256Seed: [Function],
+  isValidK256Seed: [Function] }
 ```
 
 # Decode a bip32 bitcoin public key
