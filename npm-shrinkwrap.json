@@ -27,12 +27,12 @@
       "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.1.2.tgz"
     },
     "es6-promisify": {
-      "version": "2.0.0",
-      "resolved": "https://registry.npmjs.org/es6-promisify/-/es6-promisify-2.0.0.tgz",
+      "version": "3.0.0",
+      "resolved": "https://registry.npmjs.org/es6-promisify/-/es6-promisify-3.0.0.tgz",
       "dependencies": {
         "es6-promise": {
-          "version": "2.3.0",
-          "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-2.3.0.tgz"
+          "version": "3.0.2",
+          "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz"
         }
       }
     },
