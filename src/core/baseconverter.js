@@ -14,7 +14,8 @@ function normalize(digitArray) {
 
 function divmod(digitArray, base, divisor) {
   let remainder = 0;
-  let temp, divided;
+  let temp;
+  let divided;
   let j = -1;
 
   const length = digitArray.length;
@@ -31,7 +32,8 @@ function divmod(digitArray, base, divisor) {
 
 function convertBase(digitArray, fromBase, toBase) {
   const result = [];
-  let dividend = digitArray, qr;
+  let dividend = digitArray;
+  let qr;
   while (dividend.length > 0) {
     qr = divmod(dividend, fromBase, toBase);
     result.unshift(qr.remainder);

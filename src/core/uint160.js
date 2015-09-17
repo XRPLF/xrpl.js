@@ -1,16 +1,16 @@
 'use strict';
 
-var utils = require('./utils');
-var extend = require('extend');
+const utils = require('./utils');
+const extend = require('extend');
 
-var UInt = require('./uint').UInt;
-var Base = require('./base').Base;
+const UInt = require('./uint').UInt;
+const Base = require('./base').Base;
 
 //
 // UInt160 support
 //
 
-var UInt160 = extend(function() {
+const UInt160 = extend(function() {
   this._value = NaN;
   this._version_byte = undefined;
   this._update();
@@ -20,8 +20,8 @@ UInt160.width = 20;
 UInt160.prototype = Object.create(extend({}, UInt.prototype));
 UInt160.prototype.constructor = UInt160;
 
-var HEX_ZERO = UInt160.HEX_ZERO = '0000000000000000000000000000000000000000';
-var HEX_ONE = UInt160.HEX_ONE = '0000000000000000000000000000000000000001';
+const HEX_ZERO = UInt160.HEX_ZERO = '0000000000000000000000000000000000000000';
+const HEX_ONE = UInt160.HEX_ONE = '0000000000000000000000000000000000000001';
 
 UInt160.ACCOUNT_ZERO = 'rrrrrrrrrrrrrrrrrrrrrhoLvTp';
 UInt160.ACCOUNT_ONE = 'rrrrrrrrrrrrrrrrrrrrBZbvji';
@@ -74,13 +74,12 @@ UInt160.prototype.parse_generic = function(j) {
 };
 
 // XXX Json form should allow 0 and 1, C++ doesn't currently allow it.
-UInt160.prototype.to_json = function(opts) {
-  opts = opts || {};
+UInt160.prototype.to_json = function(opts = {}) {
 
   if (this.is_valid()) {
     // If this value has a type, return a Base58 encoded string.
     if (typeof this._version_byte === 'number') {
-      var output = Base.encode_check(this._version_byte, this.to_bytes());
+      let output = Base.encode_check(this._version_byte, this.to_bytes());
 
       if (opts.gateways && output in opts.gateways) {
         output = opts.gateways[output];

@@ -32,7 +32,8 @@ function createAmount(value, currency_, counterparty_) {
     counterparty_ :
     UInt160.from_json(counterparty_);
 
-  return Amount.createFast(new IOUValue(value), currency, counterparty, false);
+  return Amount.from_components_unsafe(new IOUValue(value),
+    currency, counterparty, false);
 }
 
 /**
@@ -179,8 +180,8 @@ OrderBookUtils.ISSUER_ONE = UInt160.from_json(1);
  */
 
 OrderBookUtils.normalizeAmount = function(value) {
-  return Amount.createFast(new IOUValue(value), OrderBookUtils.CURRENCY_ONE,
-    OrderBookUtils.ISSUER_ONE, false);
+  return Amount.from_components_unsafe(new IOUValue(value),
+    OrderBookUtils.CURRENCY_ONE, OrderBookUtils.ISSUER_ONE, false);
 };
 
 module.exports = OrderBookUtils;

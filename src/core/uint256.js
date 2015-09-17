@@ -1,14 +1,14 @@
 'use strict';
 
-var utils = require('./utils');
-var extend = require('extend');
-var UInt = require('./uint').UInt;
+const utils = require('./utils');
+const extend = require('extend');
+const UInt = require('./uint').UInt;
 
 //
 // UInt256 support
 //
 
-var UInt256 = extend(function() {
+const UInt256 = extend(function() {
   this._value = NaN;
 }, UInt);
 
@@ -16,10 +16,10 @@ UInt256.width = 32;
 UInt256.prototype = Object.create(extend({}, UInt.prototype));
 UInt256.prototype.constructor = UInt256;
 
-var HEX_ZERO = UInt256.HEX_ZERO = '00000000000000000000000000000000' +
+const HEX_ZERO = UInt256.HEX_ZERO = '00000000000000000000000000000000' +
                                   '00000000000000000000000000000000';
 
-var HEX_ONE = UInt256.HEX_ONE = '00000000000000000000000000000000' +
+const HEX_ONE = UInt256.HEX_ONE = '00000000000000000000000000000000' +
                                 '00000000000000000000000000000001';
 
 UInt256.STR_ZERO = utils.hexToString(HEX_ZERO);

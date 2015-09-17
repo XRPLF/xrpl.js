@@ -105,17 +105,17 @@ Amount.NaN = function() {
   return result;                      // but let's be careful
 };
 
-Amount.createFast = function(value: Value, currency: Currency, issuer: UInt160,
-  isNative: boolean
+Amount.from_components_unsafe = function(value: Value, currency: Currency,
+  issuer: UInt160, isNative: boolean
 ) {
-  const res = new Amount(value);
-  res._is_native = isNative;
-  res._currency = currency;
-  res._issuer = issuer;
+  const result = new Amount(value);
+  result._is_native = isNative;
+  result._currency = currency;
+  result._issuer = issuer;
 
-  res._value = value.isZero() && value.isNegative() ?
+  result._value = value.isZero() && value.isNegative() ?
       value.negate() : value;
-  return res;
+  return result;
 };
 
 // be sure that _is_native is set properly BEFORE calling _set_value
@@ -749,6 +749,14 @@ Amount.prototype.to_number = function() {
   return Number(this.to_text());
 };
 
+
+// this one is needed because Value.abs creates new BigNumber,
+// and BigNumber constructor is very slow, so we want to
+// call it only if absolutely necessary
+function absValue(value: Value): Value {
+  return value.isNegative() ? value.abs() : value;
+}
+
 // Convert only value to JSON wire format.
 Amount.prototype.to_text = function() {
   if (!this.is_valid()) {
@@ -762,9 +770,8 @@ Amount.prototype.to_text = function() {
   // not native
   const offset = this._value.getExponent() - 15;
   const sign = this._value.isNegative() ? '-' : '';
-  const mantissa = this._value.isNegative() ?
-    utils.getMantissa16FromString(this._value.abs().toString()) :
-    utils.getMantissa16FromString(this._value.toString());
+  const mantissa =
+    utils.getMantissa16FromString(absValue(this._value).toString());
   if (offset !== 0 && (offset < -25 || offset > -4)) {
     // Use e notation.
     // XXX Clamp output.

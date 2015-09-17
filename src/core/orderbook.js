@@ -1207,7 +1207,8 @@ OrderBook.prototype.setOffers = function(offers) {
 
   this.resetCache();
 
-  let i = -1, offer;
+  let i = -1;
+  let offer;
   const l = offers.length;
 
   while (++i < l) {
