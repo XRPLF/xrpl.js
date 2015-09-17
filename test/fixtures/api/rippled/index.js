@@ -1,7 +1,10 @@
 'use strict';
 
 module.exports = {
-  submit: require('./submit'),
+  submit: {
+    success: require('./submit'),
+    failure: require('./submit-failed')
+  },
   ledger: require('./ledger'),
   ledgerNotFound: require('./ledger-not-found'),
   ledgerWithoutCloseTime: require('./ledger-without-close-time'),

@@ -155,6 +155,14 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.submit, 'submit'));
   });
 
+  it('submit - failure', function() {
+    return this.api.submit('BAD').then(() => {
+      assert(false, 'Should throw RippleError');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.RippleError);
+    });
+  });
+
   it('getBalances', function() {
     return this.api.getBalances(address).then(
       _.partial(checkResult, responses.getBalances, 'getBalances'));
