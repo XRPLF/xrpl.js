@@ -105,6 +105,19 @@ Amount.NaN = function() {
   return result;                      // but let's be careful
 };
 
+Amount.createFast = function(value: Value, currency: Currency, issuer: UInt160,
+  isNative: boolean
+) {
+  const res = new Amount(value);
+  res._is_native = isNative;
+  res._currency = currency;
+  res._issuer = issuer;
+
+  res._value = value.isZero() && value.isNegative() ?
+      value.negate() : value;
+  return res;
+};
+
 // be sure that _is_native is set properly BEFORE calling _set_value
 Amount.prototype._set_value = function(value: Value) {
 
@@ -122,27 +135,30 @@ Amount.prototype.abs = function() {
 };
 
 Amount.prototype.add = function(addend) {
-  const addendAmount = Amount.from_json(addend);
+  const addendAmount = addend instanceof Amount ?
+    addend : Amount.from_json(addend);
 
   if (!this.is_comparable(addendAmount)) {
     return new Amount();
   }
 
   return this._copy(this._value.add(addendAmount._value));
-
 };
 
 Amount.prototype.subtract = function(subtrahend) {
   // Correctness over speed, less code has less bugs, reuse add code.
-  return this.add(Amount.from_json(subtrahend).negate());
+  const subsAmount = subtrahend instanceof Amount ?
+    subtrahend : Amount.from_json(subtrahend);
+  return this.add(subsAmount.negate());
 };
 
 // XXX Diverges from cpp.
 Amount.prototype.multiply = function(multiplicand) {
+  const multiplicandValue = multiplicand instanceof Amount ?
+    multiplicand._value :
+    Amount.from_json(multiplicand)._value;
 
-  const multiplicandAmount = Amount.from_json(multiplicand);
-
-  return this._copy(this._value.multiply(multiplicandAmount._value));
+  return this._copy(this._value.multiply(multiplicandValue));
 
 };
 
@@ -151,9 +167,11 @@ Amount.prototype.scale = function(scaleFactor) {
 };
 
 Amount.prototype.divide = function(divisor) {
-  const divisorAmount = Amount.from_json(divisor);
+  const divisorValue = divisor instanceof Amount ?
+    divisor._value :
+    Amount.from_json(divisor)._value;
 
-  return this._copy(this._value.divide(divisorAmount._value));
+  return this._copy(this._value.divide(divisorValue));
 };
 
 /**
@@ -344,7 +362,7 @@ Amount.prototype._check_limits = function() {
 };
 
 Amount.prototype.clone = function(negate) {
-  return this.copyTo(new Amount(), negate);
+  return this.copyTo(new Amount(this._value), negate);
 };
 
 Amount.prototype._copy = function(value) {
@@ -354,9 +372,10 @@ Amount.prototype._copy = function(value) {
 };
 
 Amount.prototype.compareTo = function(to) {
-  const toAmount = Amount.from_json(to);
+  const toAmount = to instanceof Amount ? to : Amount.from_json(to);
+
   if (!this.is_comparable(toAmount)) {
-    return 0;
+    throw new Error('Not comparable');
   }
   return this._value.comparedTo(toAmount._value);
 };
@@ -743,8 +762,9 @@ Amount.prototype.to_text = function() {
   // not native
   const offset = this._value.getExponent() - 15;
   const sign = this._value.isNegative() ? '-' : '';
-  const mantissa = utils.getMantissa16FromString(
-    this._value.abs().toString());
+  const mantissa = this._value.isNegative() ?
+    utils.getMantissa16FromString(this._value.abs().toString()) :
+    utils.getMantissa16FromString(this._value.toString());
   if (offset !== 0 && (offset < -25 || offset > -4)) {
     // Use e notation.
     // XXX Clamp output.

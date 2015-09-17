@@ -6,7 +6,6 @@ const _ = require('lodash');
 const assert = require('assert-diff');
 const Remote = require('ripple-lib').Remote;
 const Currency = require('ripple-lib').Currency;
-const Amount = require('ripple-lib').Amount;
 const addresses = require('./fixtures/addresses');
 const fixtures = require('./fixtures/orderbook');
 const IOUValue = require('ripple-lib')._test.IOUValue;

@@ -1,11 +1,10 @@
-/*eslint-disable max-len, no-param-reassign*/
+/* eslint-disable max-len, no-param-reassign */
 
 'use strict';
 
 const _ = require('lodash');
 const addresses = require('./addresses');
 const Meta = require('ripple-lib').Meta;
-const Amount = require('ripple-lib').Amount;
 const SerializedObject = require('ripple-lib').SerializedObject;
 const Types = require('ripple-lib').types;
 const IOUValue = require('ripple-lib')._test.IOUValue;
@@ -830,7 +829,7 @@ module.exports.transactionWithCreatedOffer = function(options) {
 
   const BookDirectory = so.to_hex();
 
-  var meta = new Meta({
+  const meta = new Meta({
     AffectedNodes: [
       {
         CreatedNode: {

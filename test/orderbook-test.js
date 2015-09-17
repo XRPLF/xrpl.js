@@ -1706,7 +1706,7 @@ describe('OrderBook', function() {
     setTimeout(function() {
       assert.strictEqual(numModelEvents, 1);
       done();
-    }, 300)
+    }, 300);
   });
 
   it('Notify - deleted node - trade', function(done) {

@@ -24,6 +24,17 @@ const OrderBookUtils = require('./orderbookutils');
 const log = require('./log').internal.sub('orderbook');
 const IOUValue = require('./iouvalue').IOUValue;
 
+function _sortOffers(a, b) {
+  const aQuality = OrderBookUtils.getOfferQuality(a, this._currencyGets);
+  const bQuality = OrderBookUtils.getOfferQuality(b, this._currencyGets);
+
+  return aQuality._value.comparedTo(bQuality._value);
+}
+
+function _sortOffersQuick(a, b) {
+  return a.qualityHex.localeCompare(b.qualityHex);
+}
+
 /**
  * @constructor OrderBook
  * @param {Remote} remote
@@ -37,7 +48,8 @@ const IOUValue = require('./iouvalue').IOUValue;
  */
 
 function OrderBook(remote,
-                   currencyGets, issuerGets, currencyPays, issuerPays, key) {
+                   currencyGets, issuerGets, currencyPays, issuerPays, key
+) {
   EventEmitter.call(this);
 
   const self = this;
@@ -1343,22 +1355,22 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
 };
 
 OrderBook.prototype.computeAutobridgedOffersWrapper = function() {
-  var startTime = Date.now();
+  const startTime = Date.now();
   this.computeAutobridgedOffers();
   this.mergeDirectAndAutobridgedBooks();
-  var lasted = (Date.now() - startTime);
-  
+  const lasted = (Date.now() - startTime);
+
   const newMult =
-    ((lasted * 2 / OrderBook.AUTOBRIDGE_CALCULATE_THROTTLE_TIME) << 0) + 1;
+    Math.floor(lasted * 2 / OrderBook.AUTOBRIDGE_CALCULATE_THROTTLE_TIME) + 1;
   if (newMult !== this._autobridgeThrottleTimeMultiplier) {
     this._autobridgeThrottleTimeMultiplier = newMult;
     this.createDebouncedOffersWrapper();
   }
-}
+};
 
 OrderBook.prototype.createDebouncedOffersWrapper = function() {
   const m = this._autobridgeThrottleTimeMultiplier;
-  this.computeAutobridgedOffersThrottled = 
+  this.computeAutobridgedOffersThrottled =
     _.debounce(
       _.throttle(
         this.computeAutobridgedOffersWrapper,
@@ -1366,19 +1378,8 @@ OrderBook.prototype.createDebouncedOffersWrapper = function() {
         {leading: true, trailing: true}),
       OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_TIME,
       {maxWait: OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_MAXWAIT});
-}
+};
 
-
-function _sortOffers(a, b) {
-  const aQuality = OrderBookUtils.getOfferQuality(a, this._currencyGets);
-  const bQuality = OrderBookUtils.getOfferQuality(b, this._currencyGets);
-
-  return aQuality._value.comparedTo(bQuality._value);
-}
-
-function _sortOffersQuick(a, b) {
-  return a.qualityHex.localeCompare(b.qualityHex);
-}
 
 /**
  * Merge direct and autobridged offers into a combined orderbook
