@@ -52,7 +52,7 @@ type Wrapper = (data: any) => any
 function composeAsync(wrapper: Wrapper, callback: Callback): Callback {
   return function(error, data) {
     if (error) {
-      callback(error);
+      callback(error, data);
       return;
     }
     let result;
@@ -66,10 +66,15 @@ function composeAsync(wrapper: Wrapper, callback: Callback): Callback {
   };
 }
 
-function convertErrors(callback: () => void): () => void {
+function convertErrors(callback: Callback): () => void {
   return function(error, data) {
     if (error && !(error instanceof errors.RippleError)) {
-      callback(new errors.RippleError(error));
+      const error_ = new errors.RippleError(error);
+      error_.data = data;
+      callback(error_, data);
+    } else if (error) {
+      error.data = data;
+      callback(error, data);
     } else {
       callback(error, data);
     }

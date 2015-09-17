@@ -160,6 +160,7 @@ describe('RippleAPI', function() {
       assert(false, 'Should throw RippleError');
     }).catch(error => {
       assert(error instanceof this.api.errors.RippleError);
+      assert(error.data);
     });
   });
 
