@@ -786,6 +786,13 @@ describe('RippleAPI', function() {
 
   });
 
+  it('ledgerClosed', function(done) {
+    this.api.on('ledgerClosed', message => {
+      checkResult(responses.ledgerClosed, 'ledgerClosed', message);
+      done();
+    });
+    this.api.remote.getServer().emit('message', ledgerClosed);
+  });
 });
 
 describe('RippleAPI - offline', function() {

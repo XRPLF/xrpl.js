@@ -4,7 +4,7 @@
   "type": "object",
   "properties": {
     "result": {"type": "string"},
-    "timestamp": {"type": "string"},
+    "timestamp": {"type": "string", "format": "date-time"},
     "fee": {"$ref": "value"},
     "balanceChanges": {
       "type": "object",

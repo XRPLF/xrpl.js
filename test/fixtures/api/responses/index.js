@@ -52,5 +52,6 @@ module.exports = {
     complex: require('./prepare-trustline.json')
   },
   sign: require('./sign.json'),
-  submit: require('./submit.json')
+  submit: require('./submit.json'),
+  ledgerClosed: require('./ledger-closed.json')
 };

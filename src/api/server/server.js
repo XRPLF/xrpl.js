@@ -87,11 +87,30 @@ function getServerInfo(): Promise<GetServerInfoResponse> {
   return common.promisify(getServerInfoAsync.bind(this))();
 }
 
+function rippleTimeToISO8601(rippleTime: string): string {
+  return new Date(common.core.utils.toTimestamp(rippleTime)).toISOString();
+}
+
+function formatLedgerClose(ledgerClose: Object): Object {
+  return {
+    feeBase: ledgerClose.fee_base,
+    feeReference: ledgerClose.fee_ref,
+    ledgerHash: ledgerClose.ledger_hash,
+    ledgerVersion: ledgerClose.ledger_index,
+    ledgerTimestamp: rippleTimeToISO8601(ledgerClose.ledger_time),
+    reserveBase: ledgerClose.reserve_base,
+    reserveIncrement: ledgerClose.reserve_inc,
+    transactionCount: ledgerClose.txn_count,
+    validatedLedgerVersions: ledgerClose.validated_ledgers
+  };
+}
+
 module.exports = {
   connect,
   disconnect,
   isConnected,
   getServerInfo,
   getFee,
-  getLedgerVersion
+  getLedgerVersion,
+  formatLedgerClose
 };

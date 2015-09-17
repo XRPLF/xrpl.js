@@ -2,6 +2,8 @@
 
 'use strict';
 const _ = require('lodash');
+const util = require('util');
+const EventEmitter = require('events').EventEmitter;
 const common = require('./common');
 const server = require('./server/server');
 const connect = server.connect;
@@ -34,11 +36,19 @@ const getLedger = require('./ledger/ledger');
 
 function RippleAPI(options: {}) {
   common.validate.remoteOptions(options);
+  if (EventEmitter instanceof Function) { // always true, needed for flow
+    EventEmitter.call(this);
+  }
   const _options = _.assign({}, options, {automatic_resubmission: false});
   this.remote = new common.core.Remote(_options);
+  this.remote.on('ledger_closed', message => {
+    this.emit('ledgerClosed', server.formatLedgerClose(message));
+  });
 }
 
-RippleAPI.prototype = {
+util.inherits(RippleAPI, EventEmitter);
+
+_.assign(RippleAPI.prototype, {
   connect,
   disconnect,
   isConnected,
@@ -67,7 +77,7 @@ RippleAPI.prototype = {
 
   generateAddress,
   errors
-};
+});
 
 // these are exposed only for use by unit tests; they are not part of the API
 RippleAPI._PRIVATE = {
