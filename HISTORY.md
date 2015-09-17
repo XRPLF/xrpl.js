@@ -1,3 +1,11 @@
+##0.12.7
+
++ [Improve performance of orderbook](https://github.com/ripple/ripple-lib/commit/c745faaaf0956ca98448a754b4fe97fb50574fc7)
+
++ [Remove Firefox warning about prototype overwrite](https://github.com/ripple/ripple-lib/commit/0c62fa21123b220b066871e1c41a3b4fe6f51885)
+
++ [Fix compare bug in Amount class](https://github.com/ripple/ripple-lib/commit/806547dd154e1b0bf252e8a74ad3ac6aa8a97660)
+
 ##0.12.6
 
 + [Fix webpack require failure due to "./" notation](https://github.com/ripple/ripple-lib/commit/8d9746d7b10be203ee613df523c2522012ff1baf)
