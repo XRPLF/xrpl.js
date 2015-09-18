@@ -1,19 +1,30 @@
-/*eslint-disable max-len */
+/* eslint-disable max-len */
 
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert-diff');
-var Remote = require('ripple-lib').Remote;
-var Currency = require('ripple-lib').Currency;
-var addresses = require('./fixtures/addresses');
-var fixtures = require('./fixtures/orderbook');
+const _ = require('lodash');
+const assert = require('assert-diff');
+const Remote = require('ripple-lib').Remote;
+const Currency = require('ripple-lib').Currency;
+const addresses = require('./fixtures/addresses');
+const fixtures = require('./fixtures/orderbook');
+const IOUValue = require('ripple-lib')._test.IOUValue;
 
 describe('OrderBook Autobridging', function() {
   this.timeout(0);
 
+  function createRemote() {
+    const remote = new Remote();
+
+    remote.isConnected = function() {
+      return true;
+    };
+
+    return remote;
+  }
+
   it('Initialize IOU/IOU', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
@@ -27,23 +38,24 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
 
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 1);
@@ -58,25 +70,26 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - leg one partially funded', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
 
     legOneOffers[0].owner_funds = '2105863129';
 
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 1);
@@ -88,25 +101,26 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - leg two partially funded', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
 
     legTwoOffers[0].owner_funds = '10';
 
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 1);
@@ -118,25 +132,26 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - leg two transfer rate', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1002000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
 
     legTwoOffers[0].owner_funds = '10';
 
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '9.980039920159681');
@@ -146,19 +161,19 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - taker funds < leg two in', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
 
     legOneOffers[0].owner_funds = '33461561812';
 
@@ -169,6 +184,7 @@ describe('OrderBook Autobridging', function() {
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 1);
@@ -180,19 +196,19 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - leg one partially funded - owners equal', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
 
     legOneOffers[0].owner_funds = '2105863129';
 
@@ -201,6 +217,7 @@ describe('OrderBook Autobridging', function() {
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 1);
@@ -212,19 +229,19 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - leg one partially funded - owners equal - leg two in > leg one out', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
 
     legOneOffers[0].owner_funds = '2105863129';
 
@@ -236,6 +253,7 @@ describe('OrderBook Autobridging', function() {
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 1);
@@ -247,23 +265,24 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - leg one consumes leg two fully', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 2));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 2));
 
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 2);
@@ -280,19 +299,19 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - leg two consumes first leg one offer fully', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 2));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 2));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 1));
 
     legTwoOffers[0].TakerGets.value = '170.7639524223001';
     legTwoOffers[0].TakerPays = '49439476610';
@@ -301,6 +320,7 @@ describe('OrderBook Autobridging', function() {
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 2);
@@ -317,19 +337,19 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - owners equal', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1002000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 2));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 2));
 
     legOneOffers[0].owner_funds = '2105863129';
     legTwoOffers[1].owner_funds = '19.32660005780981';
@@ -339,6 +359,7 @@ describe('OrderBook Autobridging', function() {
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 2);
@@ -355,19 +376,19 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - owners equal - leg one overfunded', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1002000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1002000000);
 
-    var legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
-    var legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 2));
+    const legOneOffers = _.cloneDeep(fixtures.LEG_ONE_OFFERS.slice(0, 1));
+    const legTwoOffers = _.cloneDeep(fixtures.LEG_TWO_OFFERS.slice(0, 2));
 
     legOneOffers[0].owner_funds = '41461561812';
 
@@ -378,6 +399,7 @@ describe('OrderBook Autobridging', function() {
     book._legOneBook.setOffers(legOneOffers);
     book._legTwoBook.setOffers(legTwoOffers);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 2);
@@ -394,20 +416,21 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - TakerPays < Quality * TakerGets', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: '75',
         TakerPays: {
           value: '50',
@@ -422,6 +445,7 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: {
           value: '90',
           issuer: addresses.ISSUER,
@@ -433,6 +457,7 @@ describe('OrderBook Autobridging', function() {
       }
     ]);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 1);
@@ -444,20 +469,21 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - update funded amount', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: '100',
         TakerPays: {
           value: '100',
@@ -469,6 +495,7 @@ describe('OrderBook Autobridging', function() {
       },
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: '50',
         TakerPays: {
           value: '100',
@@ -482,6 +509,7 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: {
           value: '90',
           issuer: addresses.ISSUER,
@@ -493,6 +521,7 @@ describe('OrderBook Autobridging', function() {
       },
       {
         Account: addresses.OTHER_ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: {
           value: '30',
           issuer: addresses.ISSUER,
@@ -504,6 +533,7 @@ describe('OrderBook Autobridging', function() {
       }
     ]);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 3);
@@ -525,20 +555,21 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - update funded amount - owners equal', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: '100',
         TakerPays: {
           value: '100',
@@ -550,6 +581,7 @@ describe('OrderBook Autobridging', function() {
       },
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: '20',
         TakerPays: {
           value: '100',
@@ -563,6 +595,7 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: {
           value: '90',
           issuer: addresses.ISSUER,
@@ -574,6 +607,7 @@ describe('OrderBook Autobridging', function() {
       },
       {
         Account: addresses.OTHER_ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: {
           value: '30',
           issuer: addresses.ISSUER,
@@ -585,6 +619,7 @@ describe('OrderBook Autobridging', function() {
       }
     ]);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 3);
@@ -606,20 +641,21 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - update funded amount - first two owners equal', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: '100',
         TakerPays: {
           value: '100',
@@ -631,6 +667,7 @@ describe('OrderBook Autobridging', function() {
       },
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: '100',
         TakerPays: {
           value: '200',
@@ -644,6 +681,7 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: {
           value: '90',
           issuer: addresses.ISSUER,
@@ -655,6 +693,7 @@ describe('OrderBook Autobridging', function() {
       },
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: {
           value: '30',
           issuer: addresses.ISSUER,
@@ -665,6 +704,7 @@ describe('OrderBook Autobridging', function() {
       },
       {
         Account: addresses.OTHER_ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: {
           value: '20',
           issuer: addresses.ISSUER,
@@ -676,6 +716,7 @@ describe('OrderBook Autobridging', function() {
       }
     ]);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 4);
@@ -702,20 +743,21 @@ describe('OrderBook Autobridging', function() {
   });
 
   it('Compute autobridged offers - unfunded offer - owners equal', function() {
-    var book = new Remote().createOrderBook({
+    const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
       currency_pays: 'USD',
       issuer_pays: addresses.ISSUER
     });
 
-    book._issuerTransferRate = 1000000000;
-    book._legOneBook._issuerTransferRate = 1000000000;
-    book._legTwoBook._issuerTransferRate = 1000000000;
+    book._issuerTransferRate = new IOUValue(1000000000);
+    book._legOneBook._issuerTransferRate = new IOUValue(1000000000);
+    book._legTwoBook._issuerTransferRate = new IOUValue(1000000000);
 
     book._legOneBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: '75',
         TakerPays: {
           value: '75',
@@ -730,6 +772,7 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers([
       {
         Account: addresses.ACCOUNT,
+        BookDirectory: '3B95C29205977C2136BBC70F21895F8C8F471C8522BF446E570463F9CDB31517',
         TakerGets: {
           value: '90',
           issuer: addresses.ISSUER,
@@ -741,6 +784,7 @@ describe('OrderBook Autobridging', function() {
       }
     ]);
 
+    book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
     book.computeAutobridgedOffers();
 
     assert.strictEqual(book._offersAutobridged.length, 1);

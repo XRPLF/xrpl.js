@@ -1,28 +1,41 @@
 'use strict';
 
+
 function normalize(digitArray) {
-  while (digitArray[0] === 0) {
-    digitArray.shift();
+  let i = 0;
+  while (digitArray[i] === 0) {
+    ++i;
+  }
+  if (i > 0) {
+    digitArray.splice(0, i);
   }
   return digitArray;
 }
 
 function divmod(digitArray, base, divisor) {
-  var remainder = 0;
-  var quotient = [];
-  for (var j = 0; j < digitArray.length; j++) {
-    var temp = remainder * base + parseInt(digitArray[j], 10);
-    quotient.push(Math.floor(temp / divisor));
+  let remainder = 0;
+  let temp;
+  let divided;
+  let j = -1;
+
+  const length = digitArray.length;
+  const quotient = new Array(length);
+
+  while (++j < length) {
+    temp = remainder * base + digitArray[j];
+    divided = temp / divisor;
+    quotient[j] = divided << 0;
     remainder = temp % divisor;
   }
   return {quotient: normalize(quotient), remainder: remainder};
 }
 
 function convertBase(digitArray, fromBase, toBase) {
-  var result = [];
-  var dividend = digitArray;
+  const result = [];
+  let dividend = digitArray;
+  let qr;
   while (dividend.length > 0) {
-    var qr = divmod(dividend, fromBase, toBase);
+    qr = divmod(dividend, fromBase, toBase);
     result.unshift(qr.remainder);
     dividend = qr.quotient;
   }
