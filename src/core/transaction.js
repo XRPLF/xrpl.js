@@ -808,6 +808,11 @@ Transaction.prototype.setFlags = function(flags) {
   return this;
 };
 
+function convertStringToHex(string) {
+  const utf8String = sjclcodec.utf8String.toBits(string);
+  return sjclcodec.hex.fromBits(utf8String).toUpperCase();
+}
+
 /**
  * Add a Memo to transaction.
  *
@@ -832,11 +837,6 @@ Transaction.prototype.addMemo = function(options_) {
       memoFormat: arguments[1],
       memoData: arguments[2]
     };
-  }
-
-  function convertStringToHex(string) {
-    const utf8String = sjclcodec.utf8String.toBits(string);
-    return sjclcodec.hex.fromBits(utf8String).toUpperCase();
   }
 
   const memo = {};
@@ -1499,6 +1499,110 @@ Transaction.prototype.summary = function() {
   }
 
   return txSummary;
+};
+
+/**
+ * Construct a 'SuspendedPaymentCreate' transaction
+ *
+ * Relevant setters:
+ *  - setSourceTag()
+ *  - setFlags()
+ *  - setDigest()
+ *  - setAllowCancelAfter()
+ *  - setAllowExecuteAfter()
+ *
+ *  @param {String} options.account source account
+ *  @param {String} options.destination account
+ *  @param {Amount} options.amount payment amount
+ */
+
+Transaction.prototype.suspendedPaymentCreate = function(options) {
+  this.setType('SuspendedPaymentCreate');
+  this.setAccount(options.account);
+  this.setDestination(options.destination);
+  this.setAmount(options.amount);
+  return this;
+};
+
+/**
+ * Construct a 'SuspendedPaymentFinish' transaction
+ *
+ * Relevant setters:
+ *  - setSourceTag()
+ *  - setFlags()
+ *  - setOwner()
+ *  - setOfferSequence()
+ *  - setMethod()
+ *  - setDigest()
+ *  - setProof()
+ *
+ *  @param {String} options.account source account
+ *  @param {String} options.owner SuspendedPaymentCreate's Account
+ *  @param {Integer} options.paymentSequence SuspendedPaymentCreate's Sequence
+ */
+
+Transaction.prototype.suspendedPaymentFinish = function(options) {
+  this.setType('SuspendedPaymentFinish');
+  this.setAccount(options.account);
+  this.setOwner(options.owner);
+  this.setOfferSequence(options.paymentSequence);
+  return this;
+};
+
+/**
+ * Construct a 'SuspendedPaymentCancel' transaction
+ *
+ * Relevant setters:
+ *  - setSourceTag()
+ *  - setFlags()
+ *  - setOwner()
+ *  - setOfferSequence()
+ *
+ *  @param {String} options.account source account
+ *  @param {String} options.owner SuspendedPaymentCreate's Account
+ *  @param {Integer} options.paymentSequence SuspendedPaymentCreate's Sequence
+ */
+
+Transaction.prototype.suspendedPaymentCancel = function(options) {
+  this.setType('SuspendedPaymentCancel');
+  this.setAccount(options.account);
+  this.setOwner(options.owner);
+  this.setOfferSequence(options.paymentSequence);
+  return this;
+};
+
+Transaction.prototype.setDigest = function(digest) {
+  return this._setHash256('Digest', digest);
+};
+
+Transaction.prototype.setAllowCancelAfter = function(after) {
+  return this._setUInt32('CancelAfter', utils.time.toRipple(after));
+};
+
+Transaction.prototype.setAllowExecuteAfter = function(after) {
+  return this._setUInt32('FinishAfter', utils.time.toRipple(after));
+};
+
+Transaction.prototype.setOwner = function(owner) {
+  return this._setAccount('Owner', owner);
+};
+
+Transaction.prototype.setMethod = function(method) {
+  return this._setUInt8('Method', method);
+};
+
+Transaction.prototype.setProof = function(proof) {
+  this.tx_json.Proof = convertStringToHex(proof);
+  return this;
+};
+
+Transaction.prototype._setUInt8 = function(name, value) {
+  const isValidUInt8 = typeof value === 'number' && value >= 0 && value < 256;
+  if (!isValidUInt8) {
+    throw new Error(name + ' must be a valid UInt8');
+  }
+  this.tx_json[name] = value;
+  return this;
 };
 
 Transaction.prototype.setSigners = function(signers) {

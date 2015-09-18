@@ -61,6 +61,12 @@ module.exports = {
   order: _.partial(schemaValidate, 'order'),
   orderbook: _.partial(schemaValidate, 'orderbook'),
   payment: _.partial(schemaValidate, 'payment'),
+  suspendedPaymentCreation:
+    _.partial(schemaValidate, 'suspended-payment-creation'),
+  suspendedPaymentExecution:
+    _.partial(schemaValidate, 'suspended-payment-execution'),
+  suspendedPaymentCancellation:
+    _.partial(schemaValidate, 'suspended-payment-cancellation'),
   pathfind: _.partial(schemaValidate, 'pathfind'),
   settings: _.partial(schemaValidate, 'settings'),
   trustline: _.partial(schemaValidate, 'trustline'),

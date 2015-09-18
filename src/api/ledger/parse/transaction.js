@@ -7,6 +7,10 @@ const parseTrustline = require('./trustline');
 const parseOrder = require('./order');
 const parseOrderCancellation = require('./cancellation');
 const parseSettings = require('./settings');
+const parseSuspendedPaymentCreation = require('./suspended-payment-creation');
+const parseSuspendedPaymentExecution = require('./suspended-payment-execution');
+const parseSuspendedPaymentCancellation =
+  require('./suspended-payment-cancellation');
 
 function parseTransactionType(type) {
   const mapping = {
@@ -15,7 +19,10 @@ function parseTransactionType(type) {
     OfferCreate: 'order',
     OfferCancel: 'orderCancellation',
     AccountSet: 'settings',
-    SetRegularKey: 'settings'
+    SetRegularKey: 'settings',
+    SuspendedPaymentCreate: 'suspendedPaymentCreation',
+    SuspendedPaymentFinish: 'suspendedPaymentExecution',
+    SuspendedPaymentCancel: 'suspendedPaymentCancellation'
   };
   return mapping[type] || null;
 }
@@ -27,7 +34,10 @@ function parseTransaction(tx: Object): Object {
     'trustline': parseTrustline,
     'order': parseOrder,
     'orderCancellation': parseOrderCancellation,
-    'settings': parseSettings
+    'settings': parseSettings,
+    'suspendedPaymentCreation': parseSuspendedPaymentCreation,
+    'suspendedPaymentExecution': parseSuspendedPaymentExecution,
+    'suspendedPaymentCancellation': parseSuspendedPaymentCancellation
   };
   const parser = mapping[type];
   assert(parser !== undefined, 'Unrecognized transaction type');

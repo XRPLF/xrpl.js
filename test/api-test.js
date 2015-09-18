@@ -143,6 +143,31 @@ describe('RippleAPI', function() {
         'prepare'));
   });
 
+  it('prepareSuspendedPaymentCreation', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.prepareSuspendedPaymentCreation(
+      address, requests.prepareSuspendedPaymentCreation,
+      localInstructions).then(
+        _.partial(checkResult, responses.prepareSuspendedPaymentCreation,
+          'prepare'));
+  });
+
+  it('prepareSuspendedPaymentExecution', function() {
+    return this.api.prepareSuspendedPaymentExecution(
+      address, requests.prepareSuspendedPaymentExecution, instructions).then(
+      _.partial(checkResult, responses.prepareSuspendedPaymentExecution,
+        'prepare'));
+  });
+
+  it('prepareSuspendedPaymentCancellation', function() {
+    return this.api.prepareSuspendedPaymentCancellation(
+      address, requests.prepareSuspendedPaymentCancellation, instructions).then(
+      _.partial(checkResult, responses.prepareSuspendedPaymentCancellation,
+        'prepare'));
+  });
+
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
     const result = this.api.sign(requests.sign.txJSON, secret);

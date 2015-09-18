@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "suspended-payment-creation",
+  "type": "object",
+  "properties": {
+    "source": {"$ref": "maxAdjustment"},
+    "destination": {"$ref": "adjustment"},
+    "memos": {
+      "type": "array",
+      "items": {
+        "$ref": "memo"
+      }
+    },
+    "digest": {"$ref": "hash256"},
+    "allowCancelAfter": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "milliseconds since unix epoch"
+    },
+    "allowExecuteAfter": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "milliseconds since unix epoch"
+    }
+  },
+  "required": ["source", "destination"],
+  "additionalProperties": false
+}

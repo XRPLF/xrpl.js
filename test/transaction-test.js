@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+/* eslint-disable max-len, max-nested-callbacks */
 
 'use strict';
 
@@ -2181,5 +2181,117 @@ describe('Transaction', function() {
     {Signer: s2},
     {Signer: s1}
     ]);
+  });
+
+  it('Construct SuspendedPaymentCreate transaction', function() {
+    const transaction = new Transaction().suspendedPaymentCreate({
+      account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      destination: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      amount: '1/USD/r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
+    });
+
+    assert(transaction instanceof Transaction);
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      TransactionType: 'SuspendedPaymentCreate',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      Destination: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe',
+      Amount: {
+        value: '1',
+        currency: 'USD',
+        issuer: 'r36xtKNKR43SeXnGn7kN4r4JdQzcrkqpWe'
+      }
+    });
+  });
+
+  it('Set Digest', function() {
+    const transaction = new Transaction();
+    assert.strictEqual(transaction.tx_json.Digest, undefined);
+    transaction.setType('SuspendedPaymentCreate');
+    assert.throws(function() {
+      transaction.setDigest('foo');
+    }, /Error: Digest must be a valid Hash256/);
+
+    const hash = '8F434346648F6B96DF89DDA901C5176B10A6D83961DD3C1AC88B59B2DC327AA4';
+    transaction.setDigest(hash);
+    assert.strictEqual(transaction.tx_json.Digest, hash);
+  });
+
+  it('Set CancelAfter', function() {
+    const transaction = new Transaction();
+    assert.strictEqual(transaction.tx_json.CancelAfter, undefined);
+    transaction.setType('SuspendedPaymentCreate');
+    assert.throws(function() {
+      transaction.setAllowCancelAfter('foo');
+    }, /Error: CancelAfter must be a valid UInt32/);
+
+    transaction.setAllowCancelAfter(1441043377523);
+    assert.strictEqual(transaction.tx_json.CancelAfter, 494358578);
+  });
+
+  it('Set FinishAfter', function() {
+    const transaction = new Transaction();
+    assert.strictEqual(transaction.tx_json.FinishAfter, undefined);
+    transaction.setType('SuspendedPaymentCreate');
+    assert.throws(function() {
+      transaction.setAllowExecuteAfter('foo');
+    }, /Error: FinishAfter must be a valid UInt32/);
+
+    transaction.setAllowExecuteAfter(1441043377523);
+    assert.strictEqual(transaction.tx_json.FinishAfter, 494358578);
+  });
+
+  it('Construct SuspendedPaymentFinish transaction', function() {
+    const transaction = new Transaction().suspendedPaymentFinish({
+      account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      owner: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      paymentSequence: 1234
+    });
+
+    assert(transaction instanceof Transaction);
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      TransactionType: 'SuspendedPaymentFinish',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      Owner: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      OfferSequence: 1234
+    });
+  });
+
+  it('Set Method', function() {
+    const transaction = new Transaction();
+    assert.strictEqual(transaction.tx_json.Method, undefined);
+    transaction.setType('SuspendedPaymentFinish');
+    assert.throws(function() {
+      transaction.setMethod('foo');
+    }, /Error: Method must be a valid UInt8/);
+
+    transaction.setMethod(1);
+    assert.strictEqual(transaction.tx_json.Method, 1);
+  });
+
+  it('Set Proof', function() {
+    const transaction = new Transaction();
+    assert.strictEqual(transaction.tx_json.Proof, undefined);
+    transaction.setType('SuspendedPaymentFinish');
+    transaction.setProof('foo');
+    assert.strictEqual(transaction.tx_json.Proof, '666F6F');
+  });
+
+  it('Construct SuspendedPaymentCancel transaction', function() {
+    const transaction = new Transaction().suspendedPaymentCancel({
+      account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      owner: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      paymentSequence: 1234
+    });
+
+    assert(transaction instanceof Transaction);
+    assert.deepEqual(transaction.tx_json, {
+      Flags: 0,
+      TransactionType: 'SuspendedPaymentCancel',
+      Account: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      Owner: 'rsLEU1TPdCJPPysqhWYw9jD97xtG5WqSJm',
+      OfferSequence: 1234
+    });
   });
 });
