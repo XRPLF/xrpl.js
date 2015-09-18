@@ -7,9 +7,13 @@ const Request = utils.common.core.Request;
 const convertErrors = utils.common.convertErrors;
 
 function isImmediateRejection(engineResult) {
-  return _.startsWith(engineResult, 'tel')
-      || _.startsWith(engineResult, 'tem')
-      || _.startsWith(engineResult, 'tej');
+  // note: "tel" errors mean the local server refused to process the
+  // transaction *at that time*, but it could potentially buffer the
+  // transaction and then process it at a later time, for example
+  // if the required fee changes (this does not occur at the time of
+  // this writing, but it could change in the future)
+  // all other error classes can potentially result in transcation validation
+  return _.startsWith(engineResult, 'tem') || _.startsWith(engineResult, 'tej');
 }
 
 function convertSubmitErrors(callback) {
