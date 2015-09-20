@@ -108,12 +108,28 @@ function hasCompleteLedgerRange(remote: Remote, minLedgerVersion?: number,
 
 function isPendingLedgerVersion(remote: Remote, maxLedgerVersion: ?number
 ): boolean {
-  const currentLedger = remote.getLedgerSequence();
+  const currentLedger = remote.getLedgerSequenceSync();
   return currentLedger < (maxLedgerVersion || 0);
+}
+
+function getLedgerOptionsWithLedgerVersion(account: string, options: Object,
+  callback: (err?: ?Error, account?: string, options: Object) => void
+) {
+  if (Boolean(options) && options.ledgerVersion !== undefined &&
+    options.ledgerVersion !== null
+  ) {
+    callback(null, account, options);
+  } else {
+    this.remote.getLedgerSequence(common.convertErrors((err, sequence) => {
+      callback(err, account, _.assign({}, options, {
+        ledgerVersion: sequence}));
+    }));
+  }
 }
 
 module.exports = {
   getXRPBalance,
+  getLedgerOptionsWithLedgerVersion,
   compareTransactions,
   renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder,

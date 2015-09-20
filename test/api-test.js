@@ -643,9 +643,7 @@ describe('RippleAPI', function() {
     this.api.getLedgerVersion().then((ver) => {
       assert.strictEqual(ver, 8819951);
       done();
-    }, (err) => {
-      done(err);
-    });
+    }, done);
   });
 
   it('getLedger', function() {

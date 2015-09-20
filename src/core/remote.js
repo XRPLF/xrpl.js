@@ -536,9 +536,8 @@ Remote.prototype.getLedgerSequence = function(callback = function() {}) {
     // the "current" ledger is the one after the most recently closed ledger
     callback(null, this._ledger_current_index - 1);
   } else {
-    const self = this;
-    this.once('ledger_closed', function() {
-      callback(null, self._ledger_current_index - 1);
+    this.once('ledger_closed', () => {
+      callback(null, this._ledger_current_index - 1);
     });
   }
 };

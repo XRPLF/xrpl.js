@@ -681,7 +681,7 @@ TransactionManager.prototype._request = function(tx) {
     }
   }
 
-  tx.submitIndex = this._remote.getLedgerSequence() + 1;
+  tx.submitIndex = this._remote.getLedgerSequenceSync() + 1;
 
   if (tx.attempts === 0) {
     tx.initialSubmitIndex = tx.submitIndex;

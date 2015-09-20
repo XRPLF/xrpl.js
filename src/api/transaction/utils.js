@@ -52,7 +52,7 @@ function prepareTransaction(transaction: any, remote: any, instructions: any,
   const txJSON = transaction.tx_json;
 
 
-  function prepare1(callback_) {
+  function prepareMaxLedgerVersion(callback_) {
     if (instructions.maxLedgerVersion !== undefined) {
       txJSON.LastLedgerSequence = parseInt(instructions.maxLedgerVersion, 10);
       callback_();
@@ -66,7 +66,7 @@ function prepareTransaction(transaction: any, remote: any, instructions: any,
     }
   }
 
-  function prepare2(callback_) {
+  function prepareFee(callback_) {
     if (instructions.fee !== undefined) {
       txJSON.Fee = common.xrpToDrops(instructions.fee);
       callback_();
@@ -82,7 +82,7 @@ function prepareTransaction(transaction: any, remote: any, instructions: any,
     }
   }
 
-  function prepare3(callback_) {
+  function prepareSequence(callback_) {
     if (instructions.sequence !== undefined) {
       txJSON.Sequence = parseInt(instructions.sequence, 10);
       callback_(null, formatPrepareResponse(txJSON));
@@ -95,9 +95,9 @@ function prepareTransaction(transaction: any, remote: any, instructions: any,
   }
 
   async.series([
-    prepare1,
-    prepare2,
-    prepare3
+    prepareMaxLedgerVersion,
+    prepareFee,
+    prepareSequence
   ], common.convertErrors(function(error, results) {
     callback(error, results && results[2]);
   }));

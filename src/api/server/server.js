@@ -63,14 +63,11 @@ function getServerInfoAsync(
 }
 
 function getFee(): ?number {
-  if (!this.remote._servers.length) {
+  if (!this.remote.getConnectedServers().length) {
     throw new common.errors.RippledNetworkError('No servers available.');
   }
   const fee = this.remote.createTransaction()._computeFee();
-  if (typeof fee !== 'string') {
-    return undefined;
-  }
-  return common.dropsToXrp(fee);
+  return fee === undefined ? undefined : common.dropsToXrp(fee);
 }
 
 function getLedgerVersion(): Promise<number> {

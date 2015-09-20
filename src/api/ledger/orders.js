@@ -1,6 +1,7 @@
 /* @flow */
 'use strict';
 const _ = require('lodash');
+const async = require('async');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
@@ -26,19 +27,6 @@ function getOrdersAsync(account, options, callback) {
   validate.address(account);
   validate.getOrdersOptions(options);
 
-  if (!options.ledgerVersion) {
-    const self = this;
-    this.remote.getLedgerSequence((err, seq) => {
-      if (err) {
-        convertErrors(callback)(err);
-        return;
-      }
-      const newOptions = _.extend(options, {ledgerVersion: seq});
-      getOrdersAsync.call(self, account, newOptions, callback);
-    });
-    return;
-  }
-
   const getter = _.partial(requestAccountOffers, this.remote, account,
                            options.ledgerVersion);
   utils.getRecursive(getter, options.limit,
@@ -47,7 +35,9 @@ function getOrdersAsync(account, options, callback) {
 }
 
 function getOrders(account: string, options = {}) {
-  return utils.promisify(getOrdersAsync).call(this, account, options);
+  return utils.promisify(async.seq(
+    utils.getLedgerOptionsWithLedgerVersion,
+    getOrdersAsync)).call(this, account, options);
 }
 
 module.exports = getOrders;

@@ -90,21 +90,19 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
   }
 
 
-  /* eslint-disable no-unused-vars, handle-callback-err */
-  function callbackWrapper2(error_?: Error, tx?: Object) {
+  function maxLedgerGetter(error_?: Error, tx?: Object) {
     remote.getLedgerSequence(function(err?, seq: number) {
-      const maxLedgerVersion = Math.min(options.maxLedgerVersion || Infinity,
-        seq);
+      _.noop(err);
+      const maxLedgerVersion = options.maxLedgerVersion || seq;
       callbackWrapper(error_, tx, maxLedgerVersion);
     });
   }
-  /* eslint-enable no-unused-vars, handle-callback-err */
 
   async.waterfall([
     _.partial(remote.requestTx.bind(remote),
       {hash: identifier, binary: false}),
     _.partial(attachTransactionDate, remote)
-  ], callbackWrapper2);
+  ], maxLedgerGetter);
 }
 
 function getTransaction(identifier: string,

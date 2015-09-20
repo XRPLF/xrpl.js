@@ -34,25 +34,24 @@ function getTrustlinesAsync(account, options, callback) {
     .catch(callback);
 }
 
-function getLedgerVersion(remote: Remote, optionValue?: number,
+function getLedgerVersionHelper(remote: Remote, optionValue?: number,
   callback: GetLedgerSequenceCallback
 ) {
-  if (typeof optionValue === 'number') {
+  if (optionValue !== undefined && optionValue !== null) {
     callback(null, optionValue);
   } else {
     remote.getLedgerSequence(callback);
   }
 }
 
-
 function getBalancesAsync(account, options, callback) {
   validate.address(account);
   validate.getBalancesOptions(options);
 
   async.parallel({
-    xrp: async.compose(
-      _.partial(utils.getXRPBalance, this.remote, account),
-      _.partial(getLedgerVersion, this.remote, options.ledgerVersion)
+    xrp: async.seq(
+      _.partial(getLedgerVersionHelper, this.remote, options.ledgerVersion),
+      _.partial(utils.getXRPBalance, this.remote, account)
     ),
     trustlines: _.partial(getTrustlinesAsync.bind(this), account, options)
   }, composeAsync(formatBalances, convertErrors(callback)));

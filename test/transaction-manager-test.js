@@ -696,7 +696,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(summary.submissionAttempts, 0);
       assert.strictEqual(summary.submitIndex, undefined);
       assert.strictEqual(summary.initialSubmitIndex, undefined);
-      assert.strictEqual(summary.lastLedgerSequence, remote.getLedgerSequence() + 1 + Remote.DEFAULTS.last_ledger_offset);
+      assert.strictEqual(summary.lastLedgerSequence, remote.getLedgerSequenceSync() + 1 + Remote.DEFAULTS.last_ledger_offset);
       assert.strictEqual(summary.state, 'failed');
       assert.strictEqual(summary.finalized, true);
       assert.deepEqual(summary.result, {
