@@ -81,7 +81,8 @@ function loadSchemas() {
     require('./schemas/tx.json'),
     require('./schemas/uint32.json'),
     require('./schemas/value.json'),
-    require('./schemas/prepare.json')
+    require('./schemas/prepare.json'),
+    require('./schemas/ledger-closed.json')
   ];
   const titles = _.map(schemas, schema => schema.title);
   const duplicates = _.keys(_.pick(_.countBy(titles), count => count > 1));
