@@ -2,9 +2,7 @@
 
 const elliptic = require('elliptic');
 const secp256k1 = elliptic.ec('secp256k1');
-const hashjs = require('hash.js');
-const {KeyPair, KeyType} = require('./keypair');
-const {Sha512, cached} = require('./utils');
+const Sha512 = require('./sha512');
 
 function deriveScalar(bytes, discrim) {
   const order = secp256k1.curve.n;
@@ -61,69 +59,7 @@ function accountPublicFromPublicGenerator(publicGenBytes) {
   return offset.encodeCompressed();
 }
 
-class K256Pair extends KeyPair {
-  constructor(options) {
-    super(options);
-    this.type = KeyType.secp256k1;
-    this.validator = options.validator;
-  }
-
-  static fromSeed(seedBytes, opts = {}) {
-    return new K256Pair({seedBytes, validator: opts.validator});
-  }
-
-  /*
-  @param {Array<Byte>} message (bytes)
-   */
-  sign(message) {
-    return this._createSignature(message).toDER();
-  }
-
-  /*
-  @param {Array<Byte>} message - bytes
-  @param {Array<Byte>} signature - DER encoded signature bytes
-   */
-  verify(message, signature) {
-    try {
-      return this.key().verify(this.hashMessage(message), signature);
-      /* eslint-disable no-catch-shadow */
-    } catch (e) {
-      /* eslint-enable no-catch-shadow */
-      return false;
-    }
-  }
-
-  @cached
-  pubKeyCanonicalBytes() {
-    return this.key().getPublic().encodeCompressed();
-  }
-
-  _createSignature(message) {
-    return this.key().sign(this.hashMessage(message), {canonical: true});
-  }
-
-  /*
-  @param {Array<Byte>} message - (bytes)
-  @return {Array<Byte>} - 256 bit hash of the message
-   */
-  hashMessage(message) {
-    return hashjs.sha512().update(message).digest().slice(0, 32);
-  }
-
-  @cached
-  key() {
-    if (this.seedBytes) {
-      const options = {validator: this.validator};
-      return secp256k1.keyFromPrivate(
-        derivePrivateKey(this.seedBytes, options));
-    }
-    return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
-  }
-
-}
-
 module.exports = {
-  K256Pair,
   derivePrivateKey,
   accountPublicFromPublicGenerator
 };

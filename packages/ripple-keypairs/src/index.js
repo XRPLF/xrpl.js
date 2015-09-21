@@ -1,105 +1,113 @@
 'use strict';
-
 const assert = require('assert');
 const brorand = require('brorand');
-const codec = require('ripple-address-codec');
+const hashjs = require('hash.js');
+const elliptic = require('elliptic');
+const Ed25519 = elliptic.eddsa('ed25519');
+const Secp256k1 = elliptic.ec('secp256k1');
+const addressCodec = require('ripple-address-codec');
+const derivePrivateKey = require('./secp256k1').derivePrivateKey;
+const accountPublicFromPublicGenerator = require('./secp256k1')
+  .accountPublicFromPublicGenerator;
+const utils = require('./utils');
+const hexToBytes = utils.hexToBytes;
+const bytesToHex = utils.bytesToHex;
 
-const {seedFromPhrase, computePublicKeyHash} = require('./utils');
-const {KeyPair, KeyType} = require('./keypair');
-const {Ed25519Pair} = require('./ed25519');
-const {K256Pair, accountPublicFromPublicGenerator} = require('./secp256k1');
-const {decodeSeed, encodeNodePublic, decodeNodePublic, encodeAccountID} = codec;
-
-function parseSeed(seed, type = KeyType.secp256k1) {
-  if (typeof seed !== 'string') {
-    return {bytes: seed, type};
-  }
-  return decodeSeed(seed);
+function generateSeed(options = {}) {
+  assert(!options.entropy || options.entropy.length >= 16, 'entropy too short');
+  const entropy = options.entropy ? options.entropy.slice(0, 16) : brorand(16);
+  const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1';
+  return addressCodec.encodeSeed(entropy, type);
 }
 
-KeyPair.fromSeed = function(seed, type = KeyType.secp256k1, options) {
-  if (typeof seed === 'string') {
-    const decoded = decodeSeed(seed);
-    const optionsArg = type;
-    return this.fromSeed(decoded.bytes, decoded.type, optionsArg);
-  }
+function hash(message) {
+  return hashjs.sha512().update(message).digest().slice(0, 32);
+}
 
-  assert(type === KeyType.secp256k1 || type === KeyType.ed25519);
-  const Pair = type === 'ed25519' ? Ed25519Pair : K256Pair;
-  return Pair.fromSeed(seed, options);
+const secp256k1 = {
+  deriveKeypair: function(entropy, options) {
+    const prefix = '00';
+    const privateKey = prefix + derivePrivateKey(entropy, options)
+      .toString(16, 64).toUpperCase();
+    const publicKey = bytesToHex(Secp256k1.keyFromPrivate(
+      privateKey.slice(2)).getPublic().encodeCompressed());
+    return {privateKey, publicKey};
+  },
+  sign: function(message, privateKey) {
+    return bytesToHex(Secp256k1.sign(hash(message),
+      hexToBytes(privateKey), {canonical: true}).toDER());
+  },
+  verify: function(message, signature, publicKey) {
+    return Secp256k1.verify(hash(message), signature, hexToBytes(publicKey));
+  }
 };
 
-function deriveWallet(seedBytes, type) {
-  const pair = KeyPair.fromSeed(seedBytes, type);
+const ed25519 = {
+  deriveKeypair: function(entropy) {
+    const prefix = 'ED';
+    const rawPrivateKey = hash(entropy);
+    const privateKey = prefix + bytesToHex(rawPrivateKey);
+    const publicKey = prefix + bytesToHex(
+      Ed25519.keyFromSecret(rawPrivateKey).pubBytes());
+    return {privateKey, publicKey};
+  },
+  sign: function(message, privateKey) {
+    return bytesToHex(Ed25519.sign(
+      message, hexToBytes(privateKey).slice(1)).toBytes());
+  },
+  verify: function(message, signature, publicKey) {
+    return Ed25519.verify(message, hexToBytes(signature),
+      hexToBytes(publicKey).slice(1));
+  }
+};
 
-  return {
-    seed: pair.seed(),
-    accountID: pair.accountID(),
-    publicKey: pair.pubKeyHex()
-  };
+function select(algorithm) {
+  const methods = {'ecdsa-secp256k1': secp256k1, ed25519};
+  return methods[algorithm];
 }
 
-function deriveValidator(seedBytes) {
-  const pair = K256Pair.fromSeed(seedBytes, {validator: true});
-  return {
-    seed: pair.seed(),
-    publicKey: encodeNodePublic(pair.pubKeyCanonicalBytes())
-  };
+function deriveKeypair(seed, options) {
+  const decoded = addressCodec.decodeSeed(seed);
+  const algorithm = decoded.type === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1';
+  return select(algorithm).deriveKeypair(decoded.bytes, options);
 }
 
-function generateWallet(opts = {}) {
-  const {type = 'secp256k1', random = brorand} = opts;
-  const seedBytes = random(16);
-  return deriveWallet(seedBytes, type);
+function getAlgorithmFromKey(key) {
+  const bytes = hexToBytes(key);
+  return (bytes.length === 33 && bytes[0] === 0xED) ?
+    'ed25519' : 'ecdsa-secp256k1';
 }
 
-function walletFromSeed(seed, seedType) {
-  const {type, bytes} = parseSeed(seed, seedType);
-  return deriveWallet(bytes, type);
+function sign(message, privateKey) {
+  const algorithm = getAlgorithmFromKey(privateKey);
+  return select(algorithm).sign(message, privateKey);
 }
 
-function walletFromPhrase(phrase, type) {
-  return walletFromSeed(seedFromPhrase(phrase), type);
+function verify(message, signature, publicKey) {
+  const algorithm = getAlgorithmFromKey(publicKey);
+  return select(algorithm).verify(message, signature, publicKey);
 }
 
-function generateValidatorKeys(opts = {}) {
-  const {random = brorand} = opts;
-  return deriveValidator(random(16));
+function deriveAddressFromBytes(publicKeyBytes) {
+  return addressCodec.encodeAccountID(
+    utils.computePublicKeyHash(publicKeyBytes));
 }
 
-function nodePublicAccountID(publicKey) {
-  const generatorBytes = decodeNodePublic(publicKey);
+function deriveAddress(publicKey) {
+  return deriveAddressFromBytes(hexToBytes(publicKey));
+}
+
+function deriveNodeAddress(publicKey) {
+  const generatorBytes = addressCodec.decodeNodePublic(publicKey);
   const accountPublicBytes = accountPublicFromPublicGenerator(generatorBytes);
-  return encodeAccountID(computePublicKeyHash(accountPublicBytes));
-}
-
-function validatorKeysFromSeed(seed, seedType) {
-  const {type, bytes} = parseSeed(seed, seedType);
-  assert(type === KeyType.secp256k1);
-  return deriveValidator(bytes);
-}
-
-function validatorKeysFromPhrase(phrase) {
-  return deriveValidator(seedFromPhrase(phrase));
-}
-
-function keyPairFromSeed(seedString, options) {
-  return KeyPair.fromSeed(seedString, options);
+  return deriveAddressFromBytes(accountPublicBytes);
 }
 
 module.exports = {
-  KeyPair,
-  K256Pair,
-  Ed25519Pair,
-  KeyType,
-  seedFromPhrase,
-  computePublicKeyHash,
-  keyPairFromSeed,
-  generateWallet,
-  generateValidatorKeys,
-  walletFromSeed,
-  walletFromPhrase,
-  validatorKeysFromSeed,
-  validatorKeysFromPhrase,
-  nodePublicAccountID
+  generateSeed,
+  deriveKeypair,
+  sign,
+  verify,
+  deriveAddress,
+  deriveNodeAddress
 };

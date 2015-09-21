@@ -2,39 +2,6 @@
 const assert = require('assert');
 const hashjs = require('hash.js');
 const BN = require('bn.js');
-const Sha512 = require('./sha512');
-
-function unused() {}
-
-function isVirtual(_, __, descriptor) {
-  unused(_, __);
-
-  descriptor.value = function() {
-    throw new Error('virtual method not implemented ');
-  };
-}
-
-function cached(_, name, descriptor) {
-  unused(_);
-
-  const computer = descriptor.value;
-  const key = '_' + name;
-  descriptor.value = function() {
-    let value = this[key];
-    if (value === undefined) {
-      value = this[key] = computer.call(this);
-    }
-    return value;
-  };
-}
-
-function toGenericArray(sequence) {
-  const generic = [];
-  for (let i = 0; i < sequence.length; i++) {
-    generic.push(sequence[i]);
-  }
-  return generic;
-}
 
 function bytesToHex(a) {
   return a.map(function(byteValue) {
@@ -59,12 +26,8 @@ function seedFromPhrase(phrase) {
 }
 
 module.exports = {
-  cached,
   bytesToHex,
   hexToBytes,
   computePublicKeyHash,
-  isVirtual,
-  seedFromPhrase,
-  Sha512,
-  toGenericArray
+  seedFromPhrase
 };
