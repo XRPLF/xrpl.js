@@ -518,7 +518,9 @@ describe('TransactionManager', function() {
           break;
       }
     });
+    /* eslint-disable  no-unused-vars */
     rippled.once('request_submit', function(m, req) {
+    /* eslint-enable  no-unused-vars */
       req.sendJSON(lodash.extend({}, LEDGER, {
         ledger_index: transaction.tx_json.LastLedgerSequence + 1
       }));
@@ -574,7 +576,9 @@ describe('TransactionManager', function() {
       req.sendResponse(SUBMIT_TEF_RESPONSE, {id: m.id});
     });
 
+    /* eslint-disable  no-unused-vars */
     rippled.once('request_submit', function(m, req) {
+    /* eslint-enable  no-unused-vars */
       transaction.once('resubmitted', function() {
         receivedResubmitted = true;
         req.sendJSON(lodash.extend({}, LEDGER, {
@@ -634,7 +638,9 @@ describe('TransactionManager', function() {
       req.sendResponse(SUBMIT_TEL_RESPONSE, {id: m.id});
     });
 
+    /* eslint-disable  no-unused-vars */
     rippled.once('request_submit', function(m, req) {
+    /* eslint-enable  no-unused-vars */
       transaction.once('resubmitted', function() {
         receivedResubmitted = true;
         req.sendJSON(lodash.extend({}, LEDGER, {
@@ -690,7 +696,7 @@ describe('TransactionManager', function() {
       assert.strictEqual(summary.submissionAttempts, 0);
       assert.strictEqual(summary.submitIndex, undefined);
       assert.strictEqual(summary.initialSubmitIndex, undefined);
-      assert.strictEqual(summary.lastLedgerSequence, undefined);
+      assert.strictEqual(summary.lastLedgerSequence, remote.getLedgerSequence() + 1 + Remote.DEFAULTS.last_ledger_offset);
       assert.strictEqual(summary.state, 'failed');
       assert.strictEqual(summary.finalized, true);
       assert.deepEqual(summary.result, {
@@ -799,7 +805,9 @@ describe('TransactionManager', function() {
       req.sendResponse(SUBMIT_TEL_RESPONSE, {id: m.id});
     });
 
+    /* eslint-disable  no-unused-vars */
     rippled.once('request_submit', function(m, req) {
+    /* eslint-enable  no-unused-vars */
       transaction.once('resubmitted', function() {
         receivedResubmitted = true;
       });
@@ -857,6 +865,7 @@ describe('TransactionManager', function() {
       receivedSubmitted = true;
     });
 
+    /* eslint-disable  no-unused-vars */
     rippled.on('request_submit', function(m, req) {
       assert.strictEqual(m.tx_blob, SerializedObject.from_json(
         transaction.tx_json).to_hex());
@@ -867,7 +876,9 @@ describe('TransactionManager', function() {
       req.sendResponse(SUBMIT_TOO_BUSY_ERROR, {id: m.id});
     });
 
+    /* eslint-disable  no-unused-vars */
     rippled.once('request_submit', function(m, req) {
+    /* eslint-enable  no-unused-vars */
       transaction.once('resubmitted', function() {
         receivedResubmitted = true;
         req.sendJSON(lodash.extend({}, LEDGER, {

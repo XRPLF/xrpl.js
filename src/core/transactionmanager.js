@@ -27,7 +27,6 @@ function TransactionManager(account) {
   this._maxFee = this._remote.max_fee;
   this._maxAttempts = this._remote.max_attempts;
   this._submissionTimeout = this._remote.submission_timeout;
-  this._lastLedgerOffset = this._remote.last_ledger_offset;
   this._pending = new PendingQueue();
 
   this._account.on('transaction-outbound', function(res) {
@@ -521,17 +520,6 @@ TransactionManager.prototype._resubmit = function(ledgers_, pending_) {
 TransactionManager.prototype._prepareRequest = function(tx) {
   const submitRequest = this._remote.requestSubmit();
 
-  if (tx.hasMultiSigners()) {
-    tx.setSigningPubKey('');
-
-    if (this._remote.local_signing) {
-      tx.setSigners(tx.getMultiSigners());
-    } else {
-      submitRequest.message.command = 'submit_multisigned';
-      submitRequest.message.Signers = tx.getMultiSigners();
-    }
-  }
-
   if (this._remote.local_signing) {
     tx.sign();
 
@@ -541,6 +529,10 @@ TransactionManager.prototype._prepareRequest = function(tx) {
     const hash = tx.hash(null, null, serialized);
     tx.addId(hash);
   } else {
+    if (tx.hasMultiSigners()) {
+      submitRequest.message.command = 'submit_multisigned';
+    }
+
     // ND: `build_path` is completely ignored when doing local signing as
     // `Paths` is a component of the signed blob, the `tx_blob` is signed,
     // sealed and delivered, and the txn unmodified.
@@ -577,6 +569,11 @@ TransactionManager.prototype._request = function(tx) {
   if (tx.attempts > 0 && !remote.local_signing) {
     const errMessage = 'Automatic resubmission requires local signing';
     tx.emit('error', new RippleError('tejLocalSigningRequired', errMessage));
+    return;
+  }
+
+  if (Number(tx.tx_json.Fee) > tx._maxFee) {
+    tx.emit('error', new RippleError('tejMaxFeeExceeded'));
     return;
   }
 
@@ -684,22 +681,10 @@ TransactionManager.prototype._request = function(tx) {
     }
   }
 
-  tx.submitIndex = this._remote._ledger_current_index;
+  tx.submitIndex = this._remote.getLedgerSequence() + 1;
 
   if (tx.attempts === 0) {
     tx.initialSubmitIndex = tx.submitIndex;
-  }
-
-  if (!tx._setLastLedger && !tx.hasMultiSigners()) {
-    // Honor LastLedgerSequence set with tx.lastLedger()
-    tx.tx_json.LastLedgerSequence = tx.initialSubmitIndex
-    + this._lastLedgerOffset;
-  }
-
-  tx.lastLedgerSequence = tx.tx_json.LastLedgerSequence;
-
-  if (remote.local_signing) {
-    tx.sign();
   }
 
   const submitRequest = this._prepareRequest(tx);
@@ -743,8 +728,13 @@ TransactionManager.prototype.submit = function(tx) {
     tx.setSequence(this._nextSequence++);
   }
 
+  if (_.isUndefined(tx.tx_json.LastLedgerSequence)) {
+    tx.setLastLedgerSequence();
+  }
+
   if (tx.hasMultiSigners()) {
     tx.setResubmittable(false);
+    tx.setSigningPubKey('');
   }
 
   tx.once('cleanup', function() {
