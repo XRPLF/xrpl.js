@@ -31,6 +31,8 @@ function loadSchemas() {
     require('./schemas/currency.json'),
     require('./schemas/get-account-info.json'),
     require('./schemas/get-balances.json'),
+    require('./schemas/get-balance-sheet'),
+    require('./schemas/balance-sheet-options.json'),
     require('./schemas/get-ledger.json'),
     require('./schemas/get-orderbook.json'),
     require('./schemas/get-orders.json'),

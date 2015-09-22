@@ -1966,7 +1966,7 @@ describe('Remote', function() {
     });
   });
 
-  it.only('Construct gateway_balances request', function() {
+  it('Construct gateway_balances request', function() {
     const request = remote.requestGatewayBalances({
       account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       hotwallet: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5',
