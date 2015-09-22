@@ -1,12 +1,21 @@
 /* @flow */
 'use strict';
 const _ = require('lodash');
-const core = require('./utils').core;
+const deriveKeypair = require('ripple-keypairs').deriveKeypair;
 const ValidationError = require('./errors').ValidationError;
 const schemaValidate = require('./schema-validator').schemaValidate;
 
 function error(text) {
   return new ValidationError(text);
+}
+
+function isValidSecret(secret) {
+  try {
+    deriveKeypair(secret);
+    return true;
+  } catch (err) {
+    return false;
+  }
 }
 
 function validateAddressAndSecret(obj: {address: string, secret: string}
@@ -17,8 +26,8 @@ function validateAddressAndSecret(obj: {address: string, secret: string}
   if (!secret) {
     throw error('Parameter missing: secret');
   }
-  if (!core.Seed.from_json(secret).is_valid()) {
-    throw error('secret is invalid');
+  if (!isValidSecret(secret)) {
+    throw error('Invalid parameter: secret');
   }
 }
 
@@ -26,13 +35,9 @@ function validateSecret(secret: string): void {
   if (!secret) {
     throw error('Parameter missing: secret');
   }
-  if (typeof secret !== 'string' || secret[0] !== 's') {
-    throw error('Invalid parameter');
-  }
-
-  const seed = new core.Seed().parse_base58(secret);
-  if (!seed.is_valid()) {
-    throw error('invalid seed');
+  if (typeof secret !== 'string' || secret[0] !== 's'
+      || !isValidSecret(secret)) {
+    throw error('Invalid parameter: secret');
   }
 }
 

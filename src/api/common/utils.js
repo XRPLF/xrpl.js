@@ -29,8 +29,10 @@ function toRippledAmount(amount: Amount): string|Amount {
 }
 
 function generateAddress(options?: Object): Object {
-  const {accountID, seed} = keypairs.generateWallet(options);
-  return {secret: seed, address: accountID};
+  const secret = keypairs.generateSeed(options);
+  const keypair = keypairs.deriveKeypair(secret);
+  const address = keypairs.deriveAddress(keypair.publicKey);
+  return {secret, address};
 }
 
 type AsyncFunction = (...x: any) => void

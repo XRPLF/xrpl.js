@@ -2,8 +2,9 @@
 
 'use strict';
 
-const assert = require('assert');
+const assert = require('assert-diff');
 const lodash = require('lodash');
+const addresses = require('./fixtures/addresses');
 const ripple = require('ripple-lib');
 const Transaction = require('ripple-lib').Transaction;
 const TransactionQueue = require('ripple-lib').TransactionQueue;
@@ -340,7 +341,7 @@ describe('Transaction', function() {
     const dst = 'rGihwhaqU8g7ahwAvTq6iX5rvsfcbgZw6v';
 
     transaction.payment(src, dst, '100');
-    remote.setSecret(src, 'masterpassphrase');
+    remote.setSecret(src, addresses.SECRET);
 
     assert(transaction.complete());
     const json = transaction.serialize().to_json();
@@ -2278,20 +2279,19 @@ describe('Transaction', function() {
     const a1 = 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK';
     const a2 = 'rH4KEcG9dEwGwpn6AyoWK9cZPLL4RLSmWW';
 
-    const s1 = t1.multiSign(a1, 'alice');
+    const s1 = t1.multiSign(a1, addresses.SECRET);
     assert.deepEqual(s1, {
       Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
-      TxnSignature: '3045022100DB13DC794DDFA1E27D099CDBFC7DB5B1EE892AD1725B0CEEE97D8B1C4C2055C7022030B3372C96D08106594B3CF8CDF88E05CC6260C51954F02387289CB69B839D7A',
-      SigningPubKey: '0388935426E0D08083314842EDFBB2D517BD47699F9A4527318A8E10468C97C052'
+      TxnSignature: '30440220613DF9410B4844C7FAB637FD707F5185A2107DD10D0C2F59155844CD1910AB99022004A2AE607C15DD0959FDB3AAEE6A0337AA5337515230CE6EC11E32B74EEE896E',
+      SigningPubKey: '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8'
 
     });
 
-    const s2 = t1.multiSign(a2, 'bob');
+    const s2 = t1.multiSign(a2, addresses.SECRET);
     assert.deepEqual(s2, {
       Account: 'rH4KEcG9dEwGwpn6AyoWK9cZPLL4RLSmWW',
-      TxnSignature: '304402207A22109088069C5ABE3E961C2F85B2B8111C5666C869E8BA3F2A57C2ECEA7FC402205F9D87FB42266CC498FCE9B4904955D0E6D5F44D092596F5DE3E25843F6D10AB',
-      SigningPubKey: '02691AC5AE1C4C333AE5DF8A93BDC495F0EEBFC6DB0DA7EB6EF808F3AFC006E3FE'
-
+      TxnSignature: '3044022011762BC175E166EF540ABB162F0E8B48250E7C95DE5E8464E3F648EAF9A94A50022022439146DC3C6BB943C719F89696E7EBED14888A653F4618F62F8DA5CE202A45',
+      SigningPubKey: '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8'
     });
 
     transaction.addMultiSigner(s1);

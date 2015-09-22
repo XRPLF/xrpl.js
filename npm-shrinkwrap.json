@@ -133,8 +133,8 @@
       }
     },
     "ripple-keypairs": {
-      "version": "0.8.0",
-      "resolved": "https://registry.npmjs.org/ripple-keypairs/-/ripple-keypairs-0.8.0.tgz",
+      "version": "0.9.0",
+      "resolved": "https://registry.npmjs.org/ripple-keypairs/-/ripple-keypairs-0.9.0.tgz",
       "dependencies": {
         "brorand": {
           "version": "1.0.5",

@@ -1,6 +1,7 @@
 /* @flow */
 'use strict';
 const utils = require('./utils');
+const keypairs = require('ripple-keypairs');
 const core = utils.common.core;
 const validate = utils.common.validate;
 
@@ -16,14 +17,6 @@ const validate = utils.common.validate;
  */
 const HASH_TX_ID = 0x54584E00; // 'TXN'
 
-function getKeyPair(secret) {
-  return core.Seed.from_json(secret).get_key();
-}
-
-function getPublicKeyHex(keypair) {
-  return keypair.pubKeyHex();
-}
-
 function serialize(txJSON) {
   return core.SerializedObject.from_json(txJSON);
 }
@@ -36,8 +29,8 @@ function signingData(txJSON) {
   return core.Transaction.from_json(txJSON).signingData().buffer;
 }
 
-function computeSignature(txJSON, keypair) {
-  return keypair.signHex(signingData(txJSON));
+function computeSignature(txJSON, privateKey) {
+  return keypairs.sign(signingData(txJSON), privateKey);
 }
 
 function sign(txJSON: string, secret: string
@@ -46,11 +39,11 @@ function sign(txJSON: string, secret: string
   validate.txJSON(tx);
   validate.secret(secret);
 
-  const keypair = getKeyPair(secret);
+  const keypair = keypairs.deriveKeypair(secret);
   if (tx.SigningPubKey === undefined) {
-    tx.SigningPubKey = getPublicKeyHex(keypair);
+    tx.SigningPubKey = keypair.publicKey;
   }
-  tx.TxnSignature = computeSignature(tx, keypair);
+  tx.TxnSignature = computeSignature(tx, keypair.privateKey);
   const serialized = serialize(tx);
   return {
     signedTransaction: serialized.to_hex(),

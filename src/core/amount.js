@@ -7,7 +7,6 @@ const assert = require('assert');
 const extend = require('extend');
 const utils = require('./utils');
 const UInt160 = require('./uint160').UInt160;
-const Seed = require('./seed').Seed;
 const Currency = require('./currency').Currency;
 const Value = require('./value').Value;
 const IOUValue = require('./iouvalue').IOUValue;
@@ -1008,10 +1007,4 @@ Amount.prototype.not_equals_why = function(d, ignore_issuer) {
 };
 
 exports.Amount = Amount;
-
-// DEPRECATED: Include the corresponding files instead.
-exports.Currency = Currency;
-exports.Seed = Seed;
-exports.UInt160 = UInt160;
-
 // vim:sw=2:sts=2:ts=8:et
