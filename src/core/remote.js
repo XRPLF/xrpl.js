@@ -2280,6 +2280,29 @@ Remote.prototype.requestConnect = function(ip, port, callback) {
   return request;
 };
 
+Remote.prototype.requestGatewayBalances = function(options, callback) {
+  assert(_.isObject(options), 'Options missing');
+  assert(options.account, 'Account missing');
+
+  const request = new Request(this, 'gateway_balances');
+
+  request.message.account = UInt160.json_rewrite(options.account);
+
+  if (!_.isUndefined(options.hotwallet)) {
+    request.message.hotwallet = options.hotwallet;
+  }
+  if (!_.isUndefined(options.strict)) {
+    request.message.strict = options.strict;
+  }
+  if (!_.isUndefined(options.ledger)) {
+    request.selectLedger(options.ledger);
+  }
+
+  request.callback(callback);
+
+  return request;
+};
+
 /**
  * Create a Transaction
  *
