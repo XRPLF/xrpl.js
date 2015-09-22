@@ -82,6 +82,7 @@ module.exports = {
   getAccountInfoOptions: _.partial(validateOptions, 'settings-options'),
   getTrustlinesOptions: _.partial(validateOptions, 'trustlines-options'),
   getBalancesOptions: _.partial(validateOptions, 'trustlines-options'),
+  getBalanceSheetOptions: _.partial(validateOptions, 'balance-sheet-options'),
   getOrdersOptions: _.partial(validateOptions, 'orders-options'),
   getOrderbookOptions: _.partial(validateOptions, 'orders-options'),
   getTransactionOptions: _.partial(validateOptions, 'transaction-options'),

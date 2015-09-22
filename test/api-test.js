@@ -29,7 +29,6 @@ const orderbook = {
 };
 
 function checkResult(expected, schemaName, response) {
-  // console.log(JSON.stringify(response, null, 2));
   assert.deepEqual(response, expected);
   if (schemaName) {
     schemaValidator.schemaValidate(schemaName, response);
@@ -200,6 +199,11 @@ describe('RippleAPI', function() {
   it('getBalances', function() {
     return this.api.getBalances(address).then(
       _.partial(checkResult, responses.getBalances, 'getBalances'));
+  });
+
+  it('getBalanceSheet', function() {
+    return this.api.getBalanceSheet(address).then(
+      _.partial(checkResult, responses.getBalanceSheet, undefined));
   });
 
   describe('getTransaction', () => {
