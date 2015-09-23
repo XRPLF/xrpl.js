@@ -4,7 +4,14 @@
   "type": "object",
   "properties": {
     "trace": {"type": "boolean"},
-    "servers": {"type": "array", "items": {"type": "string", "format": "uri"}}
+    "servers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^wss?://"
+      }
+    }
   },
   "additionalProperties": false
 }
