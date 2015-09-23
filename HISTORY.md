@@ -1,4 +1,4 @@
-##0.12.7
+##0.12.7 and 0.12.8
 
 + [Improve performance of orderbook](https://github.com/ripple/ripple-lib/commit/c745faaaf0956ca98448a754b4fe97fb50574fc7)
 
