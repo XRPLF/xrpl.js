@@ -421,22 +421,23 @@ Remote.prototype.reconnect = function() {
 /**
  * Connect to the Ripple network
  *
- * @param {Function} [callback]
+ * @param [Function] [callback]
  * @api public
  */
 
-Remote.prototype.connect = function(callback) {
-  if (!this._servers.length) {
+Remote.prototype.connect = function(callback = function() {}) {
+  if (_.isEmpty(this._servers)) {
     throw new Error('No servers available.');
   }
 
-  if (typeof callback === 'function') {
-    this.once('connect', callback);
+  if (this.isConnected()) {
+    callback();
+    return this;
   }
 
+  this.once('connect', callback);
   this._should_connect = true;
-
-  this._servers.forEach(function(server) {
+  this._servers.forEach(server => {
     server.connect();
   });
 
@@ -450,25 +451,19 @@ Remote.prototype.connect = function(callback) {
  * @api public
  */
 
-Remote.prototype.disconnect = function(callback_) {
-  if (!this._servers.length) {
+Remote.prototype.disconnect = function(callback = function() {}) {
+  if (_.isEmpty(this._servers)) {
     throw new Error('No servers available, not disconnecting');
   }
-
-  const callback = _.isFunction(callback_)
-  ? callback_
-  : function() {};
-
-  this._should_connect = false;
 
   if (!this.isConnected()) {
     callback();
     return this;
   }
 
+  this._should_connect = false;
   this.once('disconnect', callback);
-
-  this._servers.forEach(function(server) {
+  this._servers.forEach(server => {
     server.disconnect();
   });
 
