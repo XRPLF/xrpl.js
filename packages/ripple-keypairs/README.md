@@ -9,7 +9,7 @@ eddsa deterministic signatures.
 ```
 generateSeed({entropy?: Array<integer>, algorithm?: string}) -> string
 ```
-Generate a seed that can be used to generate keypairs. Entropy can be provided as an array of 32-bit integers. If provided, it must be at least 16 words long. If not provided, entropy will be automatically generated. The "algorithm" defaults to "secp256k1", but can also be set to "ed25519". The result is a seed encoded in base58, starting with "s".
+Generate a seed that can be used to generate keypairs. Entropy can be provided as an array of bytes expressed as integers in the range 0-255. If provided, it must be at least 16 bytes long. If not provided, entropy will be automatically generated. The "algorithm" defaults to "ecdsa-secp256k1", but can also be set to "ed25519". The result is a seed encoded in base58, starting with "s".
 
 ```
 deriveKeypair(seed: string) -> {privateKey: string, publicKey: string}
