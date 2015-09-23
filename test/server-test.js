@@ -1249,4 +1249,71 @@ describe('Server', function() {
 
     server.connect();
   });
+
+  it('Automatic reconnect', function(done) {
+    const port = 5748;
+    let connections = 0;
+
+    function handleWsConnection(_ws) {
+      ++connections;
+
+      _ws.on('message', (message) => {
+        const parsed = JSON.parse(message);
+        assert.strictEqual(parsed.command, 'subscribe');
+
+        _ws.send(JSON.stringify({
+          id: parsed.id,
+          status: 'success',
+          type: 'response',
+          result: {
+            fee_base: 10,
+            fee_ref: 10,
+            ledger_hash:
+            '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
+            ledger_index: 7053695,
+            ledger_time: 455414390,
+            load_base: 256,
+            load_factor: 256,
+            random:
+            'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
+            reserve_base: 20000000,
+            reserve_inc: 5000000,
+            server_status: 'full',
+            validated_ledgers: '32570-7053695',
+            pubkey_node: 'n94pSqypSfddzAVj9qoezHyUoetsrMnwgNuBqRJ3WHvM8aMMf7rW'
+          }
+        }));
+      });
+    }
+
+    let wss = new ws.Server({port});
+
+    wss.once('connection', handleWsConnection);
+
+    const remote = new Remote();
+    const server = remote.addServer(`ws://localhost:${port}`);
+
+    let receivedReconnectAttempt = false;
+    server.once('disconnect', () => {
+      assert.equal(remote.getServer(), null);
+      server.once('connect', () => {
+        assert(receivedReconnectAttempt);
+        assert.equal(connections, 2);
+        assert(remote.getServer() instanceof Server);
+        done();
+      });
+      server.once('connecting', () => {
+        receivedReconnectAttempt = true;
+        wss = new ws.Server({port});
+        wss.once('connection', handleWsConnection);
+      });
+    });
+    server.once('connect', () => {
+      assert(remote.getServer() instanceof Server);
+      // Force server disconnect, ripple-lib should attempt
+      // to reconnect automatically
+      wss.close();
+    });
+    server.connect();
+  });
 });
