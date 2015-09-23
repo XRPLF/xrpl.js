@@ -15,7 +15,7 @@ describe('OrderBook', function() {
 
   function createRemote() {
     const remote = new Remote();
-
+    remote._ledger_current_index = 32570;
     remote.isConnected = function() {
       return true;
     };
@@ -1613,9 +1613,15 @@ describe('OrderBook', function() {
     const offer2 = fixtures.transactionWithCreatedOffer();
     const offer3 = fixtures.transactionWithCreatedOffer();
 
+    remote.emit('ledger_closed', {txn_count: 3});
+
     book.notify(offer);
+    remote.emit('transaction', offer);
     book.notify(offer2);
+    remote.emit('transaction', offer2);
     book.notify(offer3);
+    remote.emit('transaction', offer3);
+
 
     assert.strictEqual(numTransactionEvents, 3);
     assert.strictEqual(numOfferAddedEvents, 3);
@@ -1706,7 +1712,10 @@ describe('OrderBook', function() {
 
     const message = fixtures.transactionWithDeletedOffer();
 
+    remote.emit('ledger_closed', {txn_count: 1});
+
     book.notify(message);
+    remote.emit('transaction', message);
 
     assert.strictEqual(numTransactionEvents, 1);
     assert.strictEqual(numTradeEvents, 1);
@@ -1865,7 +1874,10 @@ describe('OrderBook', function() {
 
     const message = fixtures.transactionWithModifiedOffer();
 
+    remote.emit('ledger_closed', {txn_count: 1});
+
     book.notify(message);
+    remote.emit('transaction', message);
 
     assert.strictEqual(numTransactionEvents, 1);
     assert.strictEqual(numTradeEvents, 1);

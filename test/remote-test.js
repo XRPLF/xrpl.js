@@ -671,6 +671,7 @@ describe('Remote', function() {
      function() {
     const message = require('./fixtures/transaction-offercreate');
     let i = 0;
+    remote._ledger_current_index = 32570;
     const orderbook = remote.createOrderBook({
       currency_gets: 'USD',
       issuer_gets: 'rJy64aCJLP3vf8o3WPKn4iQKtfpjh6voAR',
