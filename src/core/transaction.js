@@ -45,6 +45,7 @@ function Transaction(remote) {
   ? this.remote.automatic_resubmission
   : true;
   this._maxFee = remoteExists ? this.remote.max_fee : undefined;
+  this._lastLedgerOffset = remoteExists ? this.remote.last_ledger_offset : 3;
   this.state = 'unsubmitted';
   this.finalized = false;
   this.previousSigningHash = undefined;
@@ -582,19 +583,30 @@ Transaction.prototype.clientID = function(id) {
   return this;
 };
 
-/**
- * Set LastLedgerSequence as the absolute last ledger sequence the transaction
- * is valid for. LastLedgerSequence is set automatically if not set using this
- * method
- *
- * @param {Number} ledger index
- */
+Transaction.prototype.setLastLedgerSequenceOffset = function(offset) {
+  this._lastLedgerOffset = offset;
+};
 
-Transaction.prototype.setLastLedgerSequence =
+Transaction.prototype.getLastLedgerSequenceOffset = function() {
+  return this._lastLedgerOffset;
+};
+
+Transaction.prototype.lastLedger =
 Transaction.prototype.setLastLedger =
-Transaction.prototype.lastLedger = function(sequence) {
-  this._setUInt32('LastLedgerSequence', sequence);
+Transaction.prototype.setLastLedgerSequence = function(sequence) {
+  if (!_.isUndefined(sequence)) {
+    this._setUInt32('LastLedgerSequence', sequence);
+  } else {
+    // Autofill LastLedgerSequence
+    assert(this.remote, 'Unable to set LastLedgerSequence, missing Remote');
+
+    this._setUInt32('LastLedgerSequence',
+                    this.remote.getLedgerSequence() + 1
+                    + this.getLastLedgerSequenceOffset());
+  }
+
   this._setLastLedger = true;
+
   return this;
 };
 
@@ -1479,7 +1491,7 @@ Transaction.prototype.summary = function() {
     submissionAttempts: this.attempts,
     submitIndex: this.submitIndex,
     initialSubmitIndex: this.initialSubmitIndex,
-    lastLedgerSequence: this.lastLedgerSequence,
+    lastLedgerSequence: this.tx_json.LastLedgerSequence,
     state: this.state,
     finalized: this.finalized
   };
@@ -1616,30 +1628,44 @@ Transaction.prototype.setSigners = function(signers) {
 Transaction.prototype.addMultiSigner = function(signer) {
   assert(UInt160.is_valid(signer.Account), 'Signer must have a valid Account');
 
-  if (_.isUndefined(this.multi_signers)) {
-    this.multi_signers = [];
+  if (_.isUndefined(this.tx_json.Signers)) {
+    this.tx_json.Signers = [];
   }
 
-  this.multi_signers.push({Signer: signer});
+  this.tx_json.Signers.push({Signer: signer});
 
-  this.multi_signers.sort((a, b) => {
+  this.tx_json.Signers.sort((a, b) => {
     return UInt160.from_json(a.Signer.Account)
     .cmp(UInt160.from_json(b.Signer.Account));
   });
+
+  return this;
 };
 
 Transaction.prototype.hasMultiSigners = function() {
-  return !_.isEmpty(this.multi_signers);
+  return !_.isEmpty(this.tx_json.Signers);
 };
+
 Transaction.prototype.getMultiSigners = function() {
-  return this.multi_signers;
+  return this.tx_json.Signers;
 };
 
 Transaction.prototype.getMultiSigningJson = function() {
   assert(this.tx_json.Sequence, 'Sequence must be set before multi-signing');
   assert(this.tx_json.Fee, 'Fee must be set before multi-signing');
 
-  const signingTx = Transaction.from_json(this.tx_json);
+  if (_.isUndefined(this.tx_json.LastLedgerSequence)) {
+    // Auto-fill LastLedgerSequence
+    this.setLastLedgerSequence();
+  }
+
+  const cleanedJson = _.omit(this.tx_json, [
+    'SigningPubKey',
+    'Signers',
+    'TxnSignature'
+  ]);
+
+  const signingTx = Transaction.from_json(cleanedJson);
   signingTx.remote = this.remote;
   signingTx.setSigningPubKey('');
   signingTx.setCanonicalFlag();
