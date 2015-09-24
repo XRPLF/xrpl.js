@@ -16,6 +16,7 @@ describe('OrderBook Autobridging', function() {
   function createRemote() {
     const remote = new Remote();
 
+    remote._ledger_current_index = 32570;
     remote.isConnected = function() {
       return true;
     };
@@ -37,7 +38,7 @@ describe('OrderBook Autobridging', function() {
     assert.deepEqual(book._legTwoBook._currencyPays.to_hex(), Currency.from_json('XRP').to_hex());
   });
 
-  it('Compute autobridged offers', function() {
+  it('Compute autobridged offers', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -56,20 +57,23 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 1);
 
-    assert.strictEqual(book._offersAutobridged.length, 1);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
+      assert.strictEqual(book._offersAutobridged[0].taker_gets_funded, '17.07639524223001');
+      assert.strictEqual(book._offersAutobridged[0].taker_pays_funded, '58.61727326122974');
 
-    assert.strictEqual(book._offersAutobridged[0].taker_gets_funded, '17.07639524223001');
-    assert.strictEqual(book._offersAutobridged[0].taker_pays_funded, '58.61727326122974');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - leg one partially funded', function() {
+  it('Compute autobridged offers - leg one partially funded', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -90,17 +94,20 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 1);
 
-    assert.strictEqual(book._offersAutobridged.length, 1);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '7.273651248813431');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '24.96789265329184');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '7.273651248813431');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '24.96789265329184');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - leg two partially funded', function() {
+  it('Compute autobridged offers - leg two partially funded', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -121,17 +128,20 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 1);
 
-    assert.strictEqual(book._offersAutobridged.length, 1);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '10');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '34.32649132449533');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '10');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '34.32649132449533');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - leg two transfer rate', function() {
+  it('Compute autobridged offers - leg two transfer rate', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -152,15 +162,18 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '9.980039920159681');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '34.25797537722665');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '9.980039920159681');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '34.25797537722665');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - taker funds < leg two in', function() {
+  it('Compute autobridged offers - taker funds < leg two in', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -185,17 +198,20 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 1);
 
-    assert.strictEqual(book._offersAutobridged.length, 1);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '108.6682345172846');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '373.019921005');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '108.6682345172846');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '373.019921005');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - leg one partially funded - owners equal', function() {
+  it('Compute autobridged offers - leg one partially funded - owners equal', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -218,17 +234,20 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 1);
 
-    assert.strictEqual(book._offersAutobridged.length, 1);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - leg one partially funded - owners equal - leg two in > leg one out', function() {
+  it('Compute autobridged offers - leg one partially funded - owners equal - leg two in > leg one out', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -254,17 +273,20 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 1);
 
-    assert.strictEqual(book._offersAutobridged.length, 1);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '108.6682345172846');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '373.0199210049999');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '108.6682345172846');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '373.0199210049999');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - leg one consumes leg two fully', function() {
+  it('Compute autobridged offers - leg one consumes leg two fully', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -283,22 +305,25 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 2);
 
-    assert.strictEqual(book._offersAutobridged.length, 2);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5.038346688725268');
+      assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '314.4026477437702');
 
-    assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5.038346688725268');
-    assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '314.4026477437702');
+      assert(book._offersAutobridged[1].autobridged);
 
-    assert(book._offersAutobridged[1].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - leg two consumes first leg one offer fully', function() {
+  it('Compute autobridged offers - leg two consumes first leg one offer fully', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -321,22 +346,25 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 2);
 
-    assert.strictEqual(book._offersAutobridged.length, 2);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '108.6682345172846');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '373.019921005');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '108.6682345172846');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '373.019921005');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '62.0957179050155');
+      assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '213.1791399943838');
 
-    assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '62.0957179050155');
-    assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '213.1791399943838');
+      assert(book._offersAutobridged[1].autobridged);
 
-    assert(book._offersAutobridged[1].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - owners equal', function() {
+  it('Compute autobridged offers - owners equal', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -360,22 +388,25 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 2);
 
-    assert.strictEqual(book._offersAutobridged.length, 2);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '0.4001139945128008');
+      assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '24.96789265329184');
 
-    assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '0.4001139945128008');
-    assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '24.96789265329184');
+      assert(book._offersAutobridged[1].autobridged);
 
-    assert(book._offersAutobridged[1].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - owners equal - leg one overfunded', function() {
+  it('Compute autobridged offers - owners equal - leg one overfunded', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -400,22 +431,25 @@ describe('OrderBook Autobridging', function() {
     book._legTwoBook.setOffers(legTwoOffers);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 2);
 
-    assert.strictEqual(book._offersAutobridged.length, 2);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '17.07639524223001');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '58.61727326122974');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5.038346688725268');
+      assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '314.4026477437702');
 
-    assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5.038346688725268');
-    assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '314.4026477437702');
+      assert(book._offersAutobridged[1].autobridged);
 
-    assert(book._offersAutobridged[1].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - TakerPays < Quality * TakerGets', function() {
+  it('Compute autobridged offers - TakerPays < Quality * TakerGets', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -458,17 +492,20 @@ describe('OrderBook Autobridging', function() {
     ]);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 1);
 
-    assert.strictEqual(book._offersAutobridged.length, 1);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '75');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '75');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '75');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '75');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - update funded amount', function() {
+  it('Compute autobridged offers - update funded amount', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -534,27 +571,30 @@ describe('OrderBook Autobridging', function() {
     ]);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 3);
 
-    assert.strictEqual(book._offersAutobridged.length, 3);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '90');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '90');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '90');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '90');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5');
+      assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '10');
 
-    assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5');
-    assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '10');
+      assert(book._offersAutobridged[1].autobridged);
 
-    assert(book._offersAutobridged[1].autobridged);
+      assert.strictEqual(book._offersAutobridged[2].TakerGets.value, '20');
+      assert.strictEqual(book._offersAutobridged[2].TakerPays.value, '80');
 
-    assert.strictEqual(book._offersAutobridged[2].TakerGets.value, '20');
-    assert.strictEqual(book._offersAutobridged[2].TakerPays.value, '80');
+      assert(book._offersAutobridged[2].autobridged);
 
-    assert(book._offersAutobridged[2].autobridged);
+      done();  
+    });
+
   });
 
-  it('Compute autobridged offers - update funded amount - owners equal', function() {
+  it('Compute autobridged offers - update funded amount - owners equal', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -620,27 +660,30 @@ describe('OrderBook Autobridging', function() {
     ]);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 3);
 
-    assert.strictEqual(book._offersAutobridged.length, 3);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '90');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '90');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '90');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '90');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5');
+      assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '10');
 
-    assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5');
-    assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '10');
+      assert(book._offersAutobridged[1].autobridged);
 
-    assert(book._offersAutobridged[1].autobridged);
+      assert.strictEqual(book._offersAutobridged[2].TakerGets.value, '10');
+      assert.strictEqual(book._offersAutobridged[2].TakerPays.value, '100');
 
-    assert.strictEqual(book._offersAutobridged[2].TakerGets.value, '10');
-    assert.strictEqual(book._offersAutobridged[2].TakerPays.value, '100');
+      assert(book._offersAutobridged[2].autobridged);
 
-    assert(book._offersAutobridged[2].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - update funded amount - first two owners equal', function() {
+  it('Compute autobridged offers - update funded amount - first two owners equal', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -717,32 +760,35 @@ describe('OrderBook Autobridging', function() {
     ]);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 4);
 
-    assert.strictEqual(book._offersAutobridged.length, 4);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '90');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '90');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '90');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '90');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5');
+      assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '10');
 
-    assert.strictEqual(book._offersAutobridged[1].TakerGets.value, '5');
-    assert.strictEqual(book._offersAutobridged[1].TakerPays.value, '10');
+      assert(book._offersAutobridged[1].autobridged);
 
-    assert(book._offersAutobridged[1].autobridged);
+      assert.strictEqual(book._offersAutobridged[2].TakerGets.value, '25');
+      assert.strictEqual(book._offersAutobridged[2].TakerPays.value, '100');
 
-    assert.strictEqual(book._offersAutobridged[2].TakerGets.value, '25');
-    assert.strictEqual(book._offersAutobridged[2].TakerPays.value, '100');
+      assert(book._offersAutobridged[2].autobridged);
 
-    assert(book._offersAutobridged[2].autobridged);
+      assert.strictEqual(book._offersAutobridged[3].TakerGets.value, '20');
+      assert.strictEqual(book._offersAutobridged[3].TakerPays.value, '80');
 
-    assert.strictEqual(book._offersAutobridged[3].TakerGets.value, '20');
-    assert.strictEqual(book._offersAutobridged[3].TakerPays.value, '80');
+      assert(book._offersAutobridged[3].autobridged);
 
-    assert(book._offersAutobridged[3].autobridged);
+      done();
+    });
+
   });
 
-  it('Compute autobridged offers - unfunded offer - owners equal', function() {
+  it('Compute autobridged offers - unfunded offer - owners equal', function(done) {
     const book = createRemote().createOrderBook({
       currency_gets: 'EUR',
       issuer_gets: addresses.ISSUER,
@@ -785,13 +831,16 @@ describe('OrderBook Autobridging', function() {
     ]);
 
     book._gotOffersFromLegOne = book._gotOffersFromLegTwo = true;
-    book.computeAutobridgedOffers();
+    book.computeAutobridgedOffers(() => {
+      assert.strictEqual(book._offersAutobridged.length, 1);
 
-    assert.strictEqual(book._offersAutobridged.length, 1);
+      assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '75');
+      assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '75');
 
-    assert.strictEqual(book._offersAutobridged[0].TakerGets.value, '75');
-    assert.strictEqual(book._offersAutobridged[0].TakerPays.value, '75');
+      assert(book._offersAutobridged[0].autobridged);
 
-    assert(book._offersAutobridged[0].autobridged);
+      done();
+    });
+
   });
 });

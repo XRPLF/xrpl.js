@@ -87,29 +87,30 @@ function OrderBook(remote,
   this._gotOffersFromLegOne = false;
   this._gotOffersFromLegTwo = false;
 
+  this._waitingForOffers = false;
+  this._offersModifiedAt = 0;
+  this._transactionsLeft = 0;
+  this._calculatorRunning = false;
+
+
   this.sortOffers = this._currencyGets.has_interest() ?
     _sortOffers.bind(this) : _sortOffersQuick;
-
-  this.notifyDirectOffersChanged =
-    _.debounce(
-      this.notifyDirectOffersChangedInternal,
-      OrderBook.NOTIFY_TIMEOUT,
-      {maxWait: OrderBook.NOTIFY_MAXWAIT});
 
   this._isAutobridgeable = !this._currencyGets.is_native()
     && !this._currencyPays.is_native();
 
-  this._autobridgeThrottleTimeMultiplier = 1;
-  this.createDebouncedOffersWrapper();
-
   function computeAutobridgedOffersWrapperOne() {
-    self._gotOffersFromLegOne = true;
-    self.computeAutobridgedOffersThrottled();
+    if (!self._gotOffersFromLegOne) {
+      self._gotOffersFromLegOne = true;
+      self.computeAutobridgedOffersWrapper();
+    }
   }
 
   function computeAutobridgedOffersWrapperTwo() {
-    self._gotOffersFromLegTwo = true;
-    self.computeAutobridgedOffersThrottled();
+    if (!self._gotOffersFromLegTwo) {
+      self._gotOffersFromLegTwo = true;
+      self.computeAutobridgedOffersWrapper();
+    }
   }
 
   function onDisconnect() {
@@ -138,8 +139,12 @@ function OrderBook(remote,
     });
   }
 
-  function updateFundedAmountsWrapper(transaction) {
-    self.updateFundedAmounts(transaction);
+  function onTransactionWrapper(transaction) {
+    self.onTransaction(transaction);
+  }
+
+  function onLedgerClosedWrapper(message) {
+    self.onLedgerClosed(message);
   }
 
   function listenersModified(action, event) {
@@ -152,7 +157,8 @@ function OrderBook(remote,
             self._shouldSubscribe = true;
             self.subscribe();
 
-            self._remote.on('transaction', updateFundedAmountsWrapper);
+            self._remote.on('transaction', onTransactionWrapper);
+            self._remote.on('ledger_closed', onLedgerClosedWrapper);
             self._remote.once('disconnect', onDisconnect);
 
             if (self._isAutobridgeable) {
@@ -181,7 +187,8 @@ function OrderBook(remote,
   this.on('unsubscribe', function() {
     self.resetCache();
 
-    self._remote.removeListener('transaction', updateFundedAmountsWrapper);
+    self._remote.removeListener('transaction', onTransactionWrapper);
+    self._remote.removeListener('ledger_closed', onLedgerClosedWrapper);
     self._remote.removeListener('disconnect', onDisconnect);
 
     self._gotOffersFromLegOne = false;
@@ -211,16 +218,6 @@ OrderBook.EVENTS = [
 ];
 
 OrderBook.DEFAULT_TRANSFER_RATE = new IOUValue(1000000000);
-
-OrderBook.NOTIFY_TIMEOUT = 100;
-
-OrderBook.NOTIFY_MAXWAIT = 250;
-
-OrderBook.AUTOBRIDGE_CALCULATE_THROTTLE_TIME = 1000;
-
-OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_TIME = 250;
-
-OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_MAXWAIT = 500;
 
 OrderBook.ZERO_NATIVE_AMOUNT = Amount.from_json('0');
 
@@ -358,6 +355,8 @@ OrderBook.prototype.requestOffers = function(callback = function() {},
     log.info('requesting offers', this._key);
   }
 
+  this._synchronized = false;
+
   if (this._isAutobridgeable && !internal) {
     this._gotOffersFromLegOne = false;
     this._gotOffersFromLegTwo = false;
@@ -372,9 +371,12 @@ OrderBook.prototype.requestOffers = function(callback = function() {},
       return;
     }
 
+    self._waitingForOffers = false;
+
     if (!Array.isArray(res.offers)) {
       // XXX What now?
       callback(new Error('Invalid response'));
+      self.emit('model', []);
       return;
     }
 
@@ -382,7 +384,12 @@ OrderBook.prototype.requestOffers = function(callback = function() {},
       log.info('requested offers', self._key, 'offers: ' + res.offers.length);
     }
     self.setOffers(res.offers);
-    self.notifyDirectOffersChanged();
+
+    if (self._isAutobridgeable) {
+      self.computeAutobridgedOffersWrapper();
+    } else {
+      self.emit('model', self._offers);
+    }
 
     callback(null, self._offers);
   }
@@ -393,8 +400,11 @@ OrderBook.prototype.requestOffers = function(callback = function() {},
       log.info('failed to request offers', self._key, err);
     }
 
+    self._waitingForOffers = false;
     callback(err);
   }
+
+  this._waitingForOffers = true;
 
   const requestOptions = _.merge({}, this.toJSON(), {ledger: 'validated'});
   const request = this._remote.requestBookOffers(requestOptions);
@@ -493,18 +503,6 @@ OrderBook.prototype.subscribeTransactions = function(callback) {
   return request;
 };
 
-/**
- * Handles notifying listeners that direct offers have changed. For autobridged
- * books, an additional merge step is also performed
- */
-
-OrderBook.prototype.notifyDirectOffersChangedInternal = function() {
-  if (this._isAutobridgeable) {
-    this.mergeDirectAndAutobridgedBooks();
-  } else {
-    this.emit('model', this._offers);
-  }
-};
 
 /**
  * Reset cached owner's funds, offer counts, and offer sums
@@ -839,6 +837,32 @@ OrderBook.prototype.isBalanceChangeNode = function(node) {
   return true;
 };
 
+OrderBook.prototype._canRunAutobridgeCalc = function(): boolean {
+  return !this._calculatorRunning;
+}
+
+OrderBook.prototype.onTransaction = function(transaction) {
+  this.updateFundedAmounts(transaction);
+
+
+  if (--this._transactionsLeft === 0 && !this._waitingForOffers) {
+    const lastClosedLedger = this._remote.getLedgerSequence() - 1;
+    if (this._isAutobridgeable) {
+      if (this._canRunAutobridgeCalc()) {
+        if (this._legOneBook._offersModifiedAt === lastClosedLedger ||
+            this._legTwoBook._offersModifiedAt === lastClosedLedger
+        ) {
+          this.computeAutobridgedOffersWrapper();
+        } else if (this._offersModifiedAt === lastClosedLedger) {
+          this.mergeDirectAndAutobridgedBooks();
+        }
+      }
+    } else if (this._offersModifiedAt === lastClosedLedger) {
+      this.emit('model', this._offers);
+    }
+  }
+}
+
 /**
  * Updates funded amounts/balances using modified balance nodes
  *
@@ -946,6 +970,16 @@ OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
   });
 };
 
+
+OrderBook.prototype.onLedgerClosed = function(message) {
+  if (!message || (message && !_.isNumber(message.txn_count)) ||
+    !this._subscribed || this._destroyed || this._waitingForOffers
+  ) {
+    return;
+  }
+  this._transactionsLeft = message.txn_count;
+}
+
 /**
  * Notify orderbook of a relevant transaction
  *
@@ -1046,7 +1080,7 @@ OrderBook.prototype.notify = function(transaction) {
 
   this.emit('transaction', transaction);
 
-  this.notifyDirectOffersChanged();
+  this._offersModifiedAt = this._remote.getLedgerSequence() - 1;
 
   if (!takerGetsTotal.is_zero()) {
     this.emit('trade', takerPaysTotal, takerGetsTotal);
@@ -1331,15 +1365,13 @@ OrderBook.prototype.is_valid = function() {
  * IOU:XRP and XRP:IOU books
  */
 
-OrderBook.prototype.computeAutobridgedOffers = function() {
+OrderBook.prototype.computeAutobridgedOffers = function(callback = function() {}
+) {
   assert(!this._currencyGets.is_native() && !this._currencyPays.is_native(),
     'Autobridging is only for IOU:IOU orderbooks');
 
+  
   if (this._destroyed) {
-    return;
-  }
-
-  if (!this._gotOffersFromLegOne || !this._gotOffersFromLegTwo) {
     return;
   }
 
@@ -1352,35 +1384,27 @@ OrderBook.prototype.computeAutobridgedOffers = function() {
     this._issuerPays
   );
 
-  this._offersAutobridged = autobridgeCalculator.calculate();
+  const lastClosedLedger = this._remote.getLedgerSequence() - 1;
+
+  autobridgeCalculator.calculate((autobridgedOffers) => {
+    this._offersAutobridged = autobridgedOffers;
+    callback();
+  });
 };
 
 OrderBook.prototype.computeAutobridgedOffersWrapper = function() {
-  const startTime = Date.now();
-  this.computeAutobridgedOffers();
-  this.mergeDirectAndAutobridgedBooks();
-  const lasted = (Date.now() - startTime);
-
-  const newMult =
-    Math.floor(lasted * 2 / OrderBook.AUTOBRIDGE_CALCULATE_THROTTLE_TIME) + 1;
-  if (newMult !== this._autobridgeThrottleTimeMultiplier) {
-    this._autobridgeThrottleTimeMultiplier = newMult;
-    this.createDebouncedOffersWrapper();
+  if (!this._gotOffersFromLegOne || !this._gotOffersFromLegTwo ||
+      !this._synchronized || this._destroyed || this._calculatorRunning
+  ) {
+    return;
   }
-};
 
-OrderBook.prototype.createDebouncedOffersWrapper = function() {
-  const m = this._autobridgeThrottleTimeMultiplier;
-  this.computeAutobridgedOffersThrottled =
-    _.debounce(
-      _.throttle(
-        this.computeAutobridgedOffersWrapper,
-        OrderBook.AUTOBRIDGE_CALCULATE_THROTTLE_TIME * m,
-        {leading: true, trailing: true}),
-      OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_TIME,
-      {maxWait: OrderBook.AUTOBRIDGE_CALCULATE_DEBOUNCE_MAXWAIT});
+  this._calculatorRunning = true;
+  this.computeAutobridgedOffers(() => {
+    this.mergeDirectAndAutobridgedBooks();
+    this._calculatorRunning = false;
+  });
 };
-
 
 /**
  * Merge direct and autobridged offers into a combined orderbook
