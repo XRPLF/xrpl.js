@@ -9,6 +9,14 @@
 + [Fix bug where the paths would be set with an empty array](https://github.com/ripple/ripple-lib/commit/83874ec0962da311b76f2385623e51c68bc39035)
 + [Fix reserve calculation](https://github.com/ripple/ripple-lib/commit/52879febb92d876f01f2e4d70871baa07af631fb)
 
+##0.12.7 and 0.12.8
+
++ [Improve performance of orderbook](https://github.com/ripple/ripple-lib/commit/c745faaaf0956ca98448a754b4fe97fb50574fc7)
+
++ [Remove Firefox warning about prototype overwrite](https://github.com/ripple/ripple-lib/commit/0c62fa21123b220b066871e1c41a3b4fe6f51885)
+
++ [Fix compare bug in Amount class](https://github.com/ripple/ripple-lib/commit/806547dd154e1b0bf252e8a74ad3ac6aa8a97660)
+
 ##0.12.6
 
 + [Fix webpack require failure due to "./" notation](https://github.com/ripple/ripple-lib/commit/8d9746d7b10be203ee613df523c2522012ff1baf)

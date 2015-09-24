@@ -170,20 +170,6 @@
       "version": "0.7.2",
       "resolved": "https://registry.npmjs.org/ws/-/ws-0.7.2.tgz",
       "dependencies": {
-        "bufferutil": {
-          "version": "1.1.0",
-          "resolved": "https://registry.npmjs.org/bufferutil/-/bufferutil-1.1.0.tgz",
-          "dependencies": {
-            "bindings": {
-              "version": "1.2.1",
-              "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
-            },
-            "nan": {
-              "version": "1.8.4",
-              "resolved": "https://registry.npmjs.org/nan/-/nan-1.8.4.tgz"
-            }
-          }
-        },
         "options": {
           "version": "0.0.6",
           "resolved": "https://registry.npmjs.org/options/-/options-0.0.6.tgz"
@@ -191,20 +177,6 @@
         "ultron": {
           "version": "1.0.2",
           "resolved": "https://registry.npmjs.org/ultron/-/ultron-1.0.2.tgz"
-        },
-        "utf-8-validate": {
-          "version": "1.1.0",
-          "resolved": "https://registry.npmjs.org/utf-8-validate/-/utf-8-validate-1.1.0.tgz",
-          "dependencies": {
-            "bindings": {
-              "version": "1.2.1",
-              "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
-            },
-            "nan": {
-              "version": "1.8.4",
-              "resolved": "https://registry.npmjs.org/nan/-/nan-1.8.4.tgz"
-            }
-          }
         }
       }
     }

@@ -2,8 +2,8 @@
 
 const _ = require('lodash');
 const assert = require('assert');
-const UInt160 = require('./uint160').UInt160;
 const Amount = require('./amount').Amount;
+const UInt160 = require('./uint160').UInt160;
 const Utils = require('./orderbookutils');
 
 function assertValidNumber(number, message) {
@@ -42,18 +42,46 @@ const NULL_AMOUNT = Utils.normalizeAmount('0');
  * @return {Array}
  */
 
-AutobridgeCalculator.prototype.calculate = function() {
-  const oldMode = Amount.strict_mode;
-  Amount.strict_mode = false;
+AutobridgeCalculator.prototype.calculate = function(callback) {
 
-  let legOnePointer = 0;
-  let legTwoPointer = 0;
+  const legOnePointer = 0;
+  const legTwoPointer = 0;
 
   const offersAutobridged = [];
 
   this.clearOwnerFundsLeftover();
 
+  this._calculateInternal(legOnePointer, legTwoPointer, offersAutobridged,
+    callback);
+};
+
+AutobridgeCalculator.prototype._calculateInternal = function(
+  legOnePointer_, legTwoPointer_, offersAutobridged, callback
+) {
+
+  // Amount class is calling _check_limits after each operation in strict mode,
+  // and _check_limits is very computationally expensive, so we turning it off
+  // whle doing calculations
+  this._oldMode = Amount.strict_mode;
+  Amount.strict_mode = false;
+
+  let legOnePointer = legOnePointer_;
+  let legTwoPointer = legTwoPointer_;
+
+  const startTime = Date.now();
+
   while (this.legOneOffers[legOnePointer] && this.legTwoOffers[legTwoPointer]) {
+    // manually implement cooperative multitasking that yields after 30ms
+    // of execution so user's browser stays responsive
+    const lasted = (Date.now() - startTime);
+    if (lasted > 30) {
+      setTimeout(this._calculateInternal.bind(this, legOnePointer,
+        legTwoPointer, offersAutobridged, callback), 0);
+
+      Amount.strict_mode = this._oldMode;
+      return;
+    }
+
     const legOneOffer = this.legOneOffers[legOnePointer];
     const legTwoOffer = this.legTwoOffers[legTwoPointer];
     const leftoverFunds = this.getLeftoverOwnerFunds(legOneOffer.Account);
@@ -112,8 +140,8 @@ AutobridgeCalculator.prototype.calculate = function() {
     offersAutobridged.push(autobridgedOffer);
   }
 
-  Amount.strict_mode = oldMode;
-  return offersAutobridged;
+  Amount.strict_mode = this._oldMode;
+  callback(offersAutobridged);
 };
 
 /**
