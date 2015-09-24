@@ -14,10 +14,8 @@ const _ = require('lodash');
 const async = require('async');
 const extend = require('extend');
 const util = require('util');
-const {createAccountID} = require('ripple-keypairs');
-const {encodeAccountID} = require('ripple-address-codec');
+const {deriveAddress} = require('ripple-keypairs');
 const {EventEmitter} = require('events');
-const {hexToArray} = require('./utils');
 const {TransactionManager} = require('./transactionmanager');
 const {UInt160} = require('./uint160');
 
@@ -377,7 +375,7 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
 Account._publicKeyToAddress = function(public_key) {
   // Based on functions in /src/js/ripple/keypair.js
   function hexToUInt160(publicKey) {
-    return encodeAccountID(createAccountID(hexToArray(publicKey)));
+    return deriveAddress(publicKey);
   }
 
   if (UInt160.is_valid(public_key)) {

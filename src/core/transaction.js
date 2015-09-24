@@ -3,14 +3,13 @@
 const assert = require('assert');
 const util = require('util');
 const _ = require('lodash');
+const {deriveKeypair, sign} = require('ripple-keypairs');
 const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils');
 const sjclcodec = require('sjcl-codec');
 const Amount = require('./amount').Amount;
-const Currency = require('./amount').Currency;
-const UInt160 = require('./amount').UInt160;
-const Seed = require('./seed').Seed;
-const KeyPair = require('ripple-keypairs').KeyPair;
+const Currency = require('./currency').Currency;
+const UInt160 = require('./uint160').UInt160;
 const SerializedObject = require('./serializedobject').SerializedObject;
 const RippleError = require('./rippleerror').RippleError;
 const hashprefixes = require('./hashprefixes');
@@ -430,31 +429,12 @@ Transaction.prototype.complete = function() {
   return this.tx_json;
 };
 
-Transaction.prototype.getKeyPair = function(secret_) {
-  if (this._keyPair) {
-    return this._keyPair;
-  }
-
-  const secret = secret_ || this._secret;
-  assert(secret, 'Secret missing');
-
-  const keyPair = Seed.from_json(secret).get_key();
-  this._keyPair = keyPair;
-
-  return keyPair;
-};
-
 Transaction.prototype.getSigningPubKey = function(secret) {
-  return this.getKeyPair(secret).pubKeyHex();
+  return deriveKeypair(secret || this._secret).publicKey;
 };
 
 Transaction.prototype.setSigningPubKey = function(key) {
-  if (_.isString(key)) {
-    this.tx_json.SigningPubKey = key;
-  } else if (key instanceof KeyPair) {
-    this.tx_json.SigningPubKey = key.pubKeyHex();
-  }
-
+  this.tx_json.SigningPubKey = key;
   return this;
 };
 
@@ -509,16 +489,13 @@ Transaction.prototype.hash = function(prefix_, asUINT256, serialized) {
   return asUINT256 ? hash : hash.to_hex();
 };
 
-Transaction.prototype.sign = function() {
+Transaction.prototype.sign = function(secret) {
   if (this.hasMultiSigners()) {
     return this;
   }
 
-  const keyPair = this.getKeyPair();
   const prev_sig = this.tx_json.TxnSignature;
-
   delete this.tx_json.TxnSignature;
-
   const hash = this.signingHash();
 
   // If the hash is the same, we can re-use the previous signature
@@ -527,7 +504,9 @@ Transaction.prototype.sign = function() {
     return this;
   }
 
-  this.tx_json.TxnSignature = keyPair.signHex(this.signingData().buffer);
+  const keypair = deriveKeypair(secret || this._secret);
+  this.tx_json.TxnSignature = sign(this.signingData().buffer,
+    keypair.privateKey);
   this.previousSigningHash = hash;
 
   return this;
@@ -1675,12 +1654,12 @@ Transaction.prototype.getMultiSigningJson = function() {
 
 Transaction.prototype.multiSign = function(account, secret) {
   const signingData = this.multiSigningData(account);
-  const keyPair = Seed.from_json(secret).get_key();
+  const keypair = deriveKeypair(secret);
 
   const signer = {
     Account: account,
-    TxnSignature: keyPair.signHex(signingData.buffer),
-    SigningPubKey: keyPair.pubKeyHex()
+    TxnSignature: sign(signingData.buffer, keypair.privateKey),
+    SigningPubKey: keypair.publicKey
   };
 
   return signer;

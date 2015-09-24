@@ -481,7 +481,7 @@ describe('RippleAPI', function() {
     function random() {
       return _.fill(Array(16), 0);
     }
-    assert.deepEqual(this.api.generateAddress({random}),
+    assert.deepEqual(this.api.generateAddress({entropy: random()}),
                      responses.generateAddress);
   });
 
