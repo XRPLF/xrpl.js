@@ -7,7 +7,7 @@ const Types = require('./serializedtypes');
 const Amount = require('./amount').Amount;
 const Currency = require('./currency').Currency;
 const UInt160 = require('./uint160').UInt160;
-const IOUValue = require('./iouvalue').IOUValue;
+const {IOUValue} = require('ripple-lib-value');
 const OrderBookUtils = {};
 
 function assertValidNumber(number, message) {

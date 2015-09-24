@@ -75,6 +75,7 @@
             "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
             "value": "-0.001002"
           },
+          "makerExchangeRate": "1099",
           "sequence": 58,
           "status": "open"
         }

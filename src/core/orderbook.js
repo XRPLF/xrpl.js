@@ -22,7 +22,7 @@ const Currency = require('./currency').Currency;
 const AutobridgeCalculator = require('./autobridgecalculator');
 const OrderBookUtils = require('./orderbookutils');
 const log = require('./log').internal.sub('orderbook');
-const IOUValue = require('./iouvalue').IOUValue;
+const {IOUValue} = require('ripple-lib-value');
 
 function _sortOffers(a, b) {
   const aQuality = OrderBookUtils.getOfferQuality(a, this._currencyGets);

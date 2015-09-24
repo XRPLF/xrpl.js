@@ -9,6 +9,7 @@
     },
     "quantity": {"$ref": "balance"},
     "totalPrice": {"$ref": "balance"},
+    "makerExchangeRate": {"$ref": "value"},
     "sequence": {"$ref": "sequence"},
     "status": {"enum": ["created", "open", "closed", "canceled"]}
   },

@@ -20,7 +20,6 @@ exports.TransactionQueue = require('./transactionqueue').TransactionQueue;
 exports.convertBase = require('./baseconverter');
 
 exports._test = {
-  IOUValue: require('./iouvalue').IOUValue,
   Log: require('./log'),
   PathFind: require('./pathfind').PathFind,
   TransactionManager: require('./transactionmanager').TransactionManager,
