@@ -589,7 +589,7 @@ describe('OrderBook Autobridging', function() {
 
       assert(book._offersAutobridged[2].autobridged);
 
-      done();  
+      done();
     });
 
   });

@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const assert = require('assert');
 const Amount = require('./amount').Amount;
+const UInt160 = require('./uint160').UInt160;
 const Utils = require('./orderbookutils');
 
 function assertValidNumber(number, message) {
@@ -42,8 +43,6 @@ const NULL_AMOUNT = Utils.normalizeAmount('0');
  */
 
 AutobridgeCalculator.prototype.calculate = function(callback) {
-  this._oldMode = Amount.strict_mode;
-  Amount.strict_mode = false;
 
   const legOnePointer = 0;
   const legTwoPointer = 0;
@@ -60,6 +59,12 @@ AutobridgeCalculator.prototype._calculateInternal = function(
   legOnePointer_, legTwoPointer_, offersAutobridged, callback
 ) {
 
+  // Amount class is calling _check_limits after each operation in strict mode,
+  // and _check_limits is very computationally expensive, so we turning it off
+  // whle doing calculations
+  this._oldMode = Amount.strict_mode;
+  Amount.strict_mode = false;
+
   let legOnePointer = legOnePointer_;
   let legTwoPointer = legTwoPointer_;
 
@@ -70,12 +75,8 @@ AutobridgeCalculator.prototype._calculateInternal = function(
     // of execution so user's browser stays responsive
     const lasted = (Date.now() - startTime);
     if (lasted > 30) {
-      setTimeout(() => {
-        this._oldMode = Amount.strict_mode;
-        Amount.strict_mode = false;
-        this._calculateInternal(legOnePointer, legTwoPointer, offersAutobridged,
-          callback);
-      }, 0);
+      setTimeout(this._calculateInternal.bind(this, legOnePointer,
+        legTwoPointer, offersAutobridged, callback), 0);
 
       Amount.strict_mode = this._oldMode;
       return;

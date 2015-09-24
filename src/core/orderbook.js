@@ -88,7 +88,7 @@ function OrderBook(remote,
   this._gotOffersFromLegTwo = false;
 
   this._waitingForOffers = false;
-  this._offersModifiedAt = 0;
+  this._lastUpdateLedgerSequence = 0;
   this._transactionsLeft = 0;
   this._calculatorRunning = false;
 
@@ -839,29 +839,29 @@ OrderBook.prototype.isBalanceChangeNode = function(node) {
 
 OrderBook.prototype._canRunAutobridgeCalc = function(): boolean {
   return !this._calculatorRunning;
-}
+};
 
 OrderBook.prototype.onTransaction = function(transaction) {
   this.updateFundedAmounts(transaction);
 
 
   if (--this._transactionsLeft === 0 && !this._waitingForOffers) {
-    const lastClosedLedger = this._remote.getLedgerSequence() - 1;
+    const lastClosedLedger = this._remote.getLedgerSequence();
     if (this._isAutobridgeable) {
       if (this._canRunAutobridgeCalc()) {
-        if (this._legOneBook._offersModifiedAt === lastClosedLedger ||
-            this._legTwoBook._offersModifiedAt === lastClosedLedger
+        if (this._legOneBook._lastUpdateLedgerSequence === lastClosedLedger ||
+            this._legTwoBook._lastUpdateLedgerSequence === lastClosedLedger
         ) {
           this.computeAutobridgedOffersWrapper();
-        } else if (this._offersModifiedAt === lastClosedLedger) {
+        } else if (this._lastUpdateLedgerSequence === lastClosedLedger) {
           this.mergeDirectAndAutobridgedBooks();
         }
       }
-    } else if (this._offersModifiedAt === lastClosedLedger) {
+    } else if (this._lastUpdateLedgerSequence === lastClosedLedger) {
       this.emit('model', this._offers);
     }
   }
-}
+};
 
 /**
  * Updates funded amounts/balances using modified balance nodes
@@ -978,7 +978,7 @@ OrderBook.prototype.onLedgerClosed = function(message) {
     return;
   }
   this._transactionsLeft = message.txn_count;
-}
+};
 
 /**
  * Notify orderbook of a relevant transaction
@@ -1080,7 +1080,7 @@ OrderBook.prototype.notify = function(transaction) {
 
   this.emit('transaction', transaction);
 
-  this._offersModifiedAt = this._remote.getLedgerSequence() - 1;
+  this._lastUpdateLedgerSequence = this._remote.getLedgerSequence();
 
   if (!takerGetsTotal.is_zero()) {
     this.emit('trade', takerPaysTotal, takerGetsTotal);
@@ -1370,7 +1370,7 @@ OrderBook.prototype.computeAutobridgedOffers = function(callback = function() {}
   assert(!this._currencyGets.is_native() && !this._currencyPays.is_native(),
     'Autobridging is only for IOU:IOU orderbooks');
 
-  
+
   if (this._destroyed) {
     return;
   }
@@ -1383,8 +1383,6 @@ OrderBook.prototype.computeAutobridgedOffers = function(callback = function() {}
     this._issuerGets,
     this._issuerPays
   );
-
-  const lastClosedLedger = this._remote.getLedgerSequence() - 1;
 
   autobridgeCalculator.calculate((autobridgedOffers) => {
     this._offersAutobridged = autobridgedOffers;
