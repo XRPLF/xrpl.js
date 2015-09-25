@@ -1,9 +1,10 @@
-var extend  = require('extend');
-var utils = require('./utils');
-var UInt160 = require('./uint160').UInt160;
-var Amount  = require('./amount').Amount;
-var ACCOUNT_ZERO = require('./constants').ACCOUNT_ZERO;
-var {isValidAddress} = require('ripple-address-codec');
+'use strict';
+const extend = require('extend');
+const utils = require('./utils');
+const UInt160 = require('./uint160').UInt160;
+const Amount = require('./amount').Amount;
+const ACCOUNT_ZERO = require('./constants').ACCOUNT_ZERO;
+const {isValidAddress} = require('ripple-address-codec');
 
 /**
  * Meta data processing facility
@@ -13,8 +14,6 @@ var {isValidAddress} = require('ripple-address-codec');
  */
 
 function Meta(data) {
-  var self = this;
-
   this.nodes = [ ];
 
   if (typeof data !== 'object') {
@@ -26,7 +25,7 @@ function Meta(data) {
   }
 
   data.AffectedNodes.forEach(this.addNode, this);
-};
+}
 
 Meta.NODE_TYPES = [
   'CreatedNode',
@@ -55,10 +54,10 @@ Meta.ACCOUNT_FIELDS = [
  */
 
 Meta.prototype.getNodeType = function(node) {
-  var result = null;
+  let result = null;
 
-  for (var i=0; i<Meta.NODE_TYPES.length; i++) {
-    var type = Meta.NODE_TYPES[i];
+  for (let i = 0; i < Meta.NODE_TYPES.length; i++) {
+    const type = Meta.NODE_TYPES[i];
     if (node.hasOwnProperty(type)) {
       result = type;
       break;
@@ -85,20 +84,22 @@ Meta.prototype.isAccountField = function(field) {
  */
 
 Meta.prototype.addNode = function(node) {
-  this._affectedAccounts = void(0);
-  this._affectedBooks = void(0);
+  this._affectedAccounts = undefined;
+  this._affectedBooks = undefined;
 
-  var result = { };
+  const result = { };
 
-  if ((result.nodeType = this.getNodeType(node))) {
-    node = node[result.nodeType];
-    result.diffType    = result.nodeType;
-    result.entryType   = node.LedgerEntryType;
-    result.ledgerIndex = node.LedgerIndex;
-    result.fields      = extend({ }, node.PreviousFields, node.NewFields, node.FinalFields);
-    result.fieldsPrev  = node.PreviousFields || { };
-    result.fieldsNew   = node.NewFields || { };
-    result.fieldsFinal = node.FinalFields || { };
+  result.nodeType = this.getNodeType(node);
+  if (result.nodeType) {
+    const _node = node[result.nodeType];
+    result.diffType = result.nodeType;
+    result.entryType = _node.LedgerEntryType;
+    result.ledgerIndex = _node.LedgerIndex;
+    result.fields = extend({ }, _node.PreviousFields,
+      _node.NewFields, _node.FinalFields);
+    result.fieldsPrev = _node.PreviousFields || { };
+    result.fieldsNew = _node.NewFields || { };
+    result.fieldsFinal = _node.FinalFields || { };
 
     // getAffectedBooks will set this
     // result.bookKey   = undefined;
@@ -128,34 +129,34 @@ Meta.prototype.getNodes = function(options) {
       }
       return true;
     });
-  } else {
-    return this.nodes;
   }
+  return this.nodes;
 };
 
-Meta.prototype.getAffectedAccounts = function(from) {
+Meta.prototype.getAffectedAccounts = function() {
   if (this._affectedAccounts) {
     return this._affectedAccounts;
   }
 
-  var accounts = [ ];
+  const accounts = [ ];
 
   // This code should match the behavior of the C++ method:
   // TransactionMetaSet::getAffectedAccounts
-  for (var i=0; i<this.nodes.length; i++) {
-    var node = this.nodes[i];
-    var fields = (node.nodeType === 'CreatedNode')
+  for (let i = 0; i < this.nodes.length; i++) {
+    const node = this.nodes[i];
+    const fields = (node.nodeType === 'CreatedNode')
     ? node.fieldsNew
     : node.fieldsFinal;
 
-    for (var fieldName in fields) {
-      var field = fields[fieldName];
+    for (const fieldName in fields) {
+      const field = fields[fieldName];
 
       if (this.isAccountField(fieldName) && UInt160.is_valid(field)) {
         accounts.push(field);
-      } else if (~Meta.AMOUNT_FIELDS_AFFECTING_ISSUER.indexOf(fieldName)) {
-        var amount = Amount.from_json(field);
-        var issuer = amount.issuer();
+      } else if (
+          Meta.AMOUNT_FIELDS_AFFECTING_ISSUER.indexOf(fieldName) !== -1) {
+        const amount = Amount.from_json(field);
+        const issuer = amount.issuer();
         if (isValidAddress(issuer) && issuer !== ACCOUNT_ZERO) {
           accounts.push(issuer);
         }
@@ -173,19 +174,19 @@ Meta.prototype.getAffectedBooks = function() {
     return this._affectedBooks;
   }
 
-  var books = [ ];
+  const books = [ ];
 
-  for (var i=0; i<this.nodes.length; i++) {
-    var node = this.nodes[i];
+  for (let i = 0; i < this.nodes.length; i++) {
+    const node = this.nodes[i];
 
     if (node.entryType !== 'Offer') {
       continue;
     }
 
-    var gets = Amount.from_json(node.fields.TakerGets);
-    var pays = Amount.from_json(node.fields.TakerPays);
-    var getsKey = gets.currency().to_json();
-    var paysKey = pays.currency().to_json();
+    const gets = Amount.from_json(node.fields.TakerGets);
+    const pays = Amount.from_json(node.fields.TakerPays);
+    let getsKey = gets.currency().to_json();
+    let paysKey = pays.currency().to_json();
 
     if (getsKey !== 'XRP') {
       getsKey += '/' + gets.issuer();
@@ -195,7 +196,7 @@ Meta.prototype.getAffectedBooks = function() {
       paysKey += '/' + pays.issuer();
     }
 
-    var key = getsKey + ':' + paysKey;
+    const key = getsKey + ':' + paysKey;
 
     // Hell of a lot of work, so we are going to cache this. We can use this
     // later to good effect in OrderBook.notify to make sure we only process
@@ -245,12 +246,12 @@ Meta.prototype.getAffectedBooks = function() {
  */
 
 [
- 'forEach',
- 'map',
- 'filter',
- 'every',
- 'some',
- 'reduce'
+  'forEach',
+  'map',
+  'filter',
+  'every',
+  'some',
+  'reduce'
 ].forEach(function(fn) {
   Meta.prototype[fn] = function() {
     return Array.prototype[fn].apply(this.nodes, arguments);
