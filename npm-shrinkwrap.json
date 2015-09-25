@@ -9,8 +9,8 @@
       "resolved": "https://registry.npmjs.org/async/-/async-0.9.2.tgz"
     },
     "babel-runtime": {
-      "version": "5.8.24",
-      "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.24.tgz",
+      "version": "5.8.25",
+      "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.25.tgz",
       "dependencies": {
         "core-js": {
           "version": "1.1.4",
@@ -117,12 +117,12 @@
       "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.2.tgz"
     },
     "ripple-address-codec": {
-      "version": "1.6.0",
-      "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-1.6.0.tgz",
+      "version": "2.0.1",
+      "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz",
       "dependencies": {
         "x-address-codec": {
-          "version": "0.6.0",
-          "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.6.0.tgz",
+          "version": "0.7.0",
+          "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.7.0.tgz",
           "dependencies": {
             "base-x": {
               "version": "1.0.1",
@@ -149,6 +149,22 @@
               "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             }
           }
+        },
+        "ripple-address-codec": {
+          "version": "1.6.0",
+          "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-1.6.0.tgz",
+          "dependencies": {
+            "x-address-codec": {
+              "version": "0.6.0",
+              "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.6.0.tgz",
+              "dependencies": {
+                "base-x": {
+                  "version": "1.0.1",
+                  "resolved": "https://registry.npmjs.org/base-x/-/base-x-1.0.1.tgz"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -168,6 +184,20 @@
       "version": "0.7.2",
       "resolved": "https://registry.npmjs.org/ws/-/ws-0.7.2.tgz",
       "dependencies": {
+        "bufferutil": {
+          "version": "1.1.0",
+          "resolved": "https://registry.npmjs.org/bufferutil/-/bufferutil-1.1.0.tgz",
+          "dependencies": {
+            "bindings": {
+              "version": "1.2.1",
+              "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
+            },
+            "nan": {
+              "version": "1.8.4",
+              "resolved": "https://registry.npmjs.org/nan/-/nan-1.8.4.tgz"
+            }
+          }
+        },
         "options": {
           "version": "0.0.6",
           "resolved": "https://registry.npmjs.org/options/-/options-0.0.6.tgz"
@@ -175,6 +205,20 @@
         "ultron": {
           "version": "1.0.2",
           "resolved": "https://registry.npmjs.org/ultron/-/ultron-1.0.2.tgz"
+        },
+        "utf-8-validate": {
+          "version": "1.1.0",
+          "resolved": "https://registry.npmjs.org/utf-8-validate/-/utf-8-validate-1.1.0.tgz",
+          "dependencies": {
+            "bindings": {
+              "version": "1.2.1",
+              "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
+            },
+            "nan": {
+              "version": "1.8.4",
+              "resolved": "https://registry.npmjs.org/nan/-/nan-1.8.4.tgz"
+            }
+          }
         }
       }
     }
