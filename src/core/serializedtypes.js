@@ -518,7 +518,7 @@ const STAmount = exports.Amount = new SerializedType({
       STCurrency.serialize(so, currency, true);
 
       // Issuer (160-bit hash)
-      so.append(amount.issuer().to_bytes());
+      so.append(UInt160.from_json(amount.issuer()).to_bytes());
     }
   },
   parse: function(so) {

@@ -381,6 +381,8 @@ Account._publicKeyToAddress = function(public_key) {
   }
 };
 
-exports.Account = Account;
+module.exports = {
+  Account
+};
 
 // vim:sw=2:sts=2:ts=8:et

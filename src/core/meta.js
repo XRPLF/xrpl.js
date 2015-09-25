@@ -2,6 +2,8 @@ var extend  = require('extend');
 var utils = require('./utils');
 var UInt160 = require('./uint160').UInt160;
 var Amount  = require('./amount').Amount;
+var ACCOUNT_ZERO = require('./constants').ACCOUNT_ZERO;
+var {isValidAddress} = require('ripple-address-codec');
 
 /**
  * Meta data processing facility
@@ -154,8 +156,8 @@ Meta.prototype.getAffectedAccounts = function(from) {
       } else if (~Meta.AMOUNT_FIELDS_AFFECTING_ISSUER.indexOf(fieldName)) {
         var amount = Amount.from_json(field);
         var issuer = amount.issuer();
-        if (issuer.is_valid() && !issuer.is_zero()) {
-          accounts.push(issuer.to_json());
+        if (isValidAddress(issuer) && issuer !== ACCOUNT_ZERO) {
+          accounts.push(issuer);
         }
       }
     }
@@ -186,11 +188,11 @@ Meta.prototype.getAffectedBooks = function() {
     var paysKey = pays.currency().to_json();
 
     if (getsKey !== 'XRP') {
-      getsKey += '/' + gets.issuer().to_json();
+      getsKey += '/' + gets.issuer();
     }
 
     if (paysKey !== 'XRP') {
-      paysKey += '/' + pays.issuer().to_json();
+      paysKey += '/' + pays.issuer();
     }
 
     var key = getsKey + ':' + paysKey;

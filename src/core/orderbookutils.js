@@ -29,8 +29,7 @@ function createAmount(value, currency_, counterparty_) {
     Currency.from_json(currency_);
 
   const counterparty = counterparty_ instanceof UInt160 ?
-    counterparty_ :
-    UInt160.from_json(counterparty_);
+    counterparty_.to_json() : counterparty_;
 
   return Amount.from_components_unsafe(new IOUValue(value),
     currency, counterparty, false);
