@@ -18,7 +18,7 @@ function isImmediateRejection(engineResult) {
 
 function convertSubmitErrors(callback) {
   return function(error, data) {
-    if (isImmediateRejection(data.engineResult)) {
+    if (!error && isImmediateRejection(data.engineResult)) {
       callback(new utils.common.errors.RippleError('Submit failed'), data);
     } else {
       callback(error, data);

@@ -227,14 +227,8 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
 
   let called = false;
 
-  function requestSuccess(message) {
-    if (!called) {
-      called = true;
-      callback.call(self, null, message);
-    }
-  }
-
   function requestError(error) {
+    self.remote.removeListener('error', requestError);
     if (!called) {
       called = true;
 
@@ -246,8 +240,18 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
     }
   }
 
+  function requestSuccess(message) {
+    self.remote.removeListener('error', requestError);
+    if (!called) {
+      called = true;
+      callback.call(self, null, message);
+    }
+  }
+
+  this.remote.once('error', requestError); // e.g. rate-limiting slowDown error
   this.once(this.successEvent, requestSuccess);
   this.once(this.errorEvent, requestError);
+
   if (!this.requested) {
     this.request();
   }
