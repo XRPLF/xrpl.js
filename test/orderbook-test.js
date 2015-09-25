@@ -9,7 +9,7 @@ const Amount = require('ripple-lib').Amount;
 const Meta = require('ripple-lib').Meta;
 const addresses = require('./fixtures/addresses');
 const fixtures = require('./fixtures/orderbook');
-const IOUValue = require('ripple-lib')._test.IOUValue;
+const IOUValue = require('ripple-lib-value').IOUValue;
 
 describe('OrderBook', function() {
   this.timeout(0);

@@ -8,7 +8,7 @@ const Remote = require('ripple-lib').Remote;
 const Currency = require('ripple-lib').Currency;
 const addresses = require('./fixtures/addresses');
 const fixtures = require('./fixtures/orderbook');
-const IOUValue = require('ripple-lib')._test.IOUValue;
+const IOUValue = require('ripple-lib-value').IOUValue;
 
 describe('OrderBook Autobridging', function() {
   this.timeout(0);

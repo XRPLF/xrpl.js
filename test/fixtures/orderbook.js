@@ -7,7 +7,7 @@ const addresses = require('./addresses');
 const Meta = require('ripple-lib').Meta;
 const SerializedObject = require('ripple-lib').SerializedObject;
 const Types = require('ripple-lib').types;
-const IOUValue = require('ripple-lib')._test.IOUValue;
+const IOUValue = require('ripple-lib-value').IOUValue;
 
 module.exports.FIAT_BALANCE = '10';
 module.exports.NATIVE_BALANCE = '55';

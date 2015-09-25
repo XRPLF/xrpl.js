@@ -153,14 +153,12 @@
       }
     },
     "ripple-lib-transactionparser": {
-      "version": "0.5.0",
-      "resolved": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.5.0.tgz",
-      "dependencies": {
-        "bignumber.js": {
-          "version": "1.4.1",
-          "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-1.4.1.tgz"
-        }
-      }
+      "version": "0.5.1",
+      "resolved": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.5.1.tgz"
+    },
+    "ripple-lib-value": {
+      "version": "0.1.0",
+      "resolved": "https://registry.npmjs.org/ripple-lib-value/-/ripple-lib-value-0.1.0.tgz"
     },
     "sjcl-codec": {
       "version": "0.1.0",

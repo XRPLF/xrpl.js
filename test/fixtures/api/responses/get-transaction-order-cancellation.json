@@ -31,6 +31,7 @@
             "currency": "XRP",
             "value": "0"
           },
+          "makerExchangeRate": "1185000",
           "sequence": 465,
           "status": "canceled"
         }
