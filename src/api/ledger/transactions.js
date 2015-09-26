@@ -70,7 +70,9 @@ function formatPartialResponse(address, options, data) {
 function getAccountTx(remote, address, options, marker, limit, callback) {
   const params = {
     account: address,
+    // -1 is equivalent to earliest available validated ledger
     ledger_index_min: options.minLedgerVersion || -1,
+    // -1 is equivalent to most recent available validated ledger
     ledger_index_max: options.maxLedgerVersion || -1,
     forward: options.earliestFirst,
     binary: options.binary,
@@ -121,7 +123,7 @@ function getTransactionsAsync(account, options, callback) {
   validate.address(account);
   validate.getTransactionsOptions(options);
 
-  const defaults = {maxLedgerVersion: this.remote.getLedgerSequence()};
+  const defaults = {maxLedgerVersion: -1};
   if (options.start) {
     getTransaction.call(this, options.start).then(tx => {
       const ledgerVersion = tx.outcome.ledgerVersion;
