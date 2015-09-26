@@ -71,7 +71,7 @@ function getAccountTx(remote, address, options, marker, limit, callback) {
   const params = {
     account: address,
     ledger_index_min: options.minLedgerVersion || -1,
-    ledger_index_max: options.maxLedgerVersion || remote.getLedgerSequence(),
+    ledger_index_max: options.maxLedgerVersion || -1,
     forward: options.earliestFirst,
     binary: options.binary,
     limit: utils.clamp(limit, 10, 400),
