@@ -1,5 +1,6 @@
 ##0.13.0 (release candidate)
 
++ [Fix crash due to rippled slowDown error](https://github.com/ripple/ripple-lib/commit/84838b2e9f6969b593b8462a62a6b8f516ada937)
 + [Fix: Emit error events and return error on pathfind](https://github.com/ripple/ripple-lib/commit/1ccbaf677631a1944eb05d90f7afc5f3690a03dd)
 + [Deprecate core and remove snake case method copying](https://github.com/ripple/ripple-lib/commit/fb8dc44ec1d49bb05cd0cdbe6dd4ab211195868a)
 + Add new RippleAPI interface
