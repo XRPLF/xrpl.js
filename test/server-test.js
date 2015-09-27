@@ -1280,7 +1280,7 @@ describe('Server', function() {
   });
 
   it('Automatic reconnect', function(done) {
-    const port = 5748;
+    const port = 5749;
     let connections = 0;
 
     function handleWsConnection(_ws) {
