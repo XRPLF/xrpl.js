@@ -30,6 +30,7 @@ function Request(remote, command) {
   this.reconnectTimeout = 1000 * 3;
   this.successEvent = 'success';
   this.errorEvent = 'error';
+  this.reconnectionsCount = 0;
   this.message = {
     command: command,
     id: undefined
@@ -66,6 +67,7 @@ Request.prototype.request = function(servers, callback_) {
   }
 
   function onReconnect() {
+    this.reconnectionsCount += 1;
     doRequest();
   }
 
