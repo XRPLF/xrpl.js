@@ -44,13 +44,15 @@ Request.prototype.request = function(servers, callback_) {
   const callback = typeof servers === 'function' ? servers : callback_;
 
   this.emit('before');
+
+  const wasRequested = this.requested;
+  this.requested = true;
   this.callback(callback);
 
-  if (this.requested) {
+  if (wasRequested) {
     return this;
   }
 
-  this.requested = true;
   this.on('error', function() {});
   this.emit('request', this.remote);
 

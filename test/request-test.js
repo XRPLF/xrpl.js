@@ -1207,4 +1207,22 @@ describe('Request', function() {
       ]
     });
   });
+
+  it('Emit "before" only once', function(done) {
+    const remote = new Remote();
+    remote._connected = true;
+
+    const request = new Request(remote, 'server_info');
+
+    let beforeCalled = 0;
+
+    request.on('before', () => {
+      beforeCalled++;
+    });
+
+    request.request(function() {});
+    assert.strictEqual(beforeCalled, 1);
+    done();
+  });
+
 });
