@@ -21,7 +21,7 @@ function TransactionManager(account) {
   const self = this;
 
   this._account = account;
-  this._accountID = account._account_id;
+  this._accountID = account._address;
   this._remote = account._remote;
   this._nextSequence = undefined;
   this._maxFee = this._remote.max_fee;

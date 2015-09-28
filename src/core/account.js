@@ -17,7 +17,7 @@ const util = require('util');
 const {deriveAddress} = require('ripple-keypairs');
 const {EventEmitter} = require('events');
 const {TransactionManager} = require('./transactionmanager');
-const {UInt160} = require('./uint160');
+const {isValidAddress} = require('ripple-address-codec');
 
 /**
  * @constructor Account
@@ -25,14 +25,13 @@ const {UInt160} = require('./uint160');
  * @param {String} account
  */
 
-function Account(remote, account) {
+function Account(remote, address) {
   EventEmitter.call(this);
 
   const self = this;
 
   this._remote = remote;
-  this._account = UInt160.from_json(account);
-  this._account_id = this._account.to_json();
+  this._address = address;
   this._subs = 0;
 
   // Ledger entry object
@@ -43,7 +42,7 @@ function Account(remote, account) {
     if (_.includes(Account.subscribeEvents, type)) {
       if (!self._subs && self._remote._connected) {
         self._remote.requestSubscribe()
-        .addAccount(self._account_id)
+        .addAccount(self._address)
         .broadcast().request();
       }
       self._subs += 1;
@@ -57,7 +56,7 @@ function Account(remote, account) {
       self._subs -= 1;
       if (!self._subs && self._remote._connected) {
         self._remote.requestUnsubscribe()
-        .addAccount(self._account_id)
+        .addAccount(self._address)
         .broadcast().request();
       }
     }
@@ -66,8 +65,8 @@ function Account(remote, account) {
   this.on('removeListener', listenerRemoved);
 
   function attachAccount(request) {
-    if (self._account.is_valid() && self._subs) {
-      request.addAccount(self._account_id);
+    if (isValidAddress(self._address) && self._subs) {
+      request.addAccount(self._address);
     }
   }
 
@@ -81,7 +80,7 @@ function Account(remote, account) {
     let changed = false;
 
     transaction.mmeta.each(function(an) {
-      const isAccount = an.fields.Account === self._account_id;
+      const isAccount = an.fields.Account === self._address;
       const isAccountRoot = isAccount && (an.entryType === 'AccountRoot');
 
       if (isAccountRoot) {
@@ -111,7 +110,7 @@ util.inherits(Account, EventEmitter);
 Account.subscribeEvents = ['transaction', 'entry'];
 
 Account.prototype.toJson = function() {
-  return this._account.to_json();
+  return this._address;
 };
 
 /**
@@ -121,7 +120,7 @@ Account.prototype.toJson = function() {
  */
 
 Account.prototype.isValid = function() {
-  return this._account.is_valid();
+  return isValidAddress(this._address);
 };
 
 /**
@@ -131,7 +130,7 @@ Account.prototype.isValid = function() {
  */
 
 Account.prototype.getInfo = function(callback) {
-  return this._remote.requestAccountInfo({account: this._account_id}, callback);
+  return this._remote.requestAccountInfo({account: this._address}, callback);
 };
 
 /**
@@ -210,7 +209,7 @@ Account.prototype.lines = function(callback_) {
     }
   }
 
-  this._remote.requestAccountLines({account: this._account_id}, accountLines);
+  this._remote.requestAccountLines({account: this._address}, accountLines);
 
   return this;
 };
@@ -275,7 +274,7 @@ Account.prototype.notifyTx = function(transaction) {
     return;
   }
 
-  const isThisAccount = (account === this._account_id);
+  const isThisAccount = (account === this._address);
 
   this.emit(isThisAccount ? 'transaction-outbound' : 'transaction-inbound',
     transaction);
@@ -331,7 +330,7 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
     // Catch the case of unfunded accounts
     if (!account_info_res) {
 
-      if (public_key_as_uint160 === self._account_id) {
+      if (public_key_as_uint160 === self._address) {
         async_callback(null, true);
       } else {
         async_callback(null, false);
@@ -373,20 +372,17 @@ Account.prototype.publicKeyIsActive = function(public_key, callback) {
  *  @returns {RippleAddress} Ripple Address
  */
 Account._publicKeyToAddress = function(public_key) {
-  // Based on functions in /src/js/ripple/keypair.js
-  function hexToUInt160(publicKey) {
-    return deriveAddress(publicKey);
-  }
-
-  if (UInt160.is_valid(public_key)) {
+  if (isValidAddress(public_key)) {
     return public_key;
   } else if (/^[0-9a-fA-F]+$/.test(public_key)) {
-    return hexToUInt160(public_key);
+    return deriveAddress(public_key);
   } else { // eslint-disable-line no-else-return
     throw new Error('Public key is invalid. Must be a UInt160 or a hex string');
   }
 };
 
-exports.Account = Account;
+module.exports = {
+  Account
+};
 
 // vim:sw=2:sts=2:ts=8:et

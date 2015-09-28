@@ -6,9 +6,10 @@
 const assert = require('assert');
 const extend = require('extend');
 const utils = require('./utils');
-const UInt160 = require('./uint160').UInt160;
 const Currency = require('./currency').Currency;
 const {XRPValue, IOUValue} = require('ripple-lib-value');
+const {isValidAddress} = require('ripple-address-codec');
+const {ACCOUNT_ONE, ACCOUNT_ZERO} = require('./constants');
 
 type Value = XRPValue | IOUValue;
 
@@ -21,7 +22,7 @@ function Amount(value = new XRPValue(NaN)) {
   this._value = value;
   this._is_native = true; // Default to XRP. Only valid if value is not NaN.
   this._currency = new Currency();
-  this._issuer = new UInt160();
+  this._issuer = 'NaN';
 }
 
 /**
@@ -105,7 +106,7 @@ Amount.NaN = function() {
 };
 
 Amount.from_components_unsafe = function(value: Value, currency: Currency,
-  issuer: UInt160, isNative: boolean
+  issuer: string, isNative: boolean
 ) {
   const result = new Amount(value);
   result._is_native = isNative;
@@ -402,7 +403,7 @@ Amount.prototype.equals = function(d, ignore_issuer) {
          && this._is_native === d._is_native
          && this._value.equals(d._value)
          && (this._is_native || (this._currency.equals(d._currency)
-              && (ignore_issuer || this._issuer.equals(d._issuer))));
+              && (ignore_issuer || this._issuer === d._issuer)));
 };
 
 // True if Amounts are valid and both native or non-native.
@@ -428,9 +429,8 @@ Amount.prototype.is_valid = function() {
 };
 
 Amount.prototype.is_valid_full = function() {
-  return this.is_valid()
-  && this._currency.is_valid()
-  && this._issuer.is_valid();
+  return this.is_valid() && this._currency.is_valid()
+    && isValidAddress(this._issuer) && this._issuer !== ACCOUNT_ZERO;
 };
 
 Amount.prototype.is_zero = function() {
@@ -532,7 +532,7 @@ Amount.prototype.parse_human = function(j, options) {
 };
 
 Amount.prototype.parse_issuer = function(issuer) {
-  this._issuer = UInt160.from_json(issuer);
+  this._issuer = issuer;
   return this;
 };
 
@@ -583,7 +583,7 @@ function(quality, counterCurrency, counterIssuer, opts) {
   const offset = parseInt(offset_hex, 16) - 100;
 
   this._currency = Currency.from_json(counterCurrency);
-  this._issuer = UInt160.from_json(counterIssuer);
+  this._issuer = counterIssuer;
   this._is_native = this._currency.is_native();
 
   if (this._is_native && baseCurrency.is_native()) {
@@ -643,7 +643,7 @@ function(quality, counterCurrency, counterIssuer, opts) {
 Amount.prototype.parse_number = function(n) {
   this._is_native = false;
   this._currency = Currency.from_json(1);
-  this._issuer = UInt160.from_json(1);
+  this._issuer = ACCOUNT_ONE;
   this._set_value(new IOUValue(n));
   return this;
 };
@@ -659,15 +659,15 @@ Amount.prototype.parse_json = function(j) {
       if (m) {
         this._currency = Currency.from_json(m[2]);
         if (m[3]) {
-          this._issuer = UInt160.from_json(m[3]);
+          this._issuer = m[3];
         } else {
-          this._issuer = UInt160.from_json('1');
+          this._issuer = 'NaN';
         }
         this.parse_value(m[1]);
       } else {
         this.parse_native(j);
         this._currency = Currency.from_json('0');
-        this._issuer = UInt160.from_json('0');
+        this._issuer = ACCOUNT_ZERO;
       }
       break;
 
@@ -686,9 +686,10 @@ Amount.prototype.parse_json = function(j) {
         // Parse the passed value to sanitize and copy it.
         this._currency.parse_json(j.currency, true); // Never XRP.
 
-        if (typeof j.issuer === 'string') {
-          this._issuer.parse_json(j.issuer);
+        if (typeof j.issuer !== 'string') {
+          throw new Error('issuer must be a string');
         }
+        this._issuer = j.issuer;
 
         this.parse_value(j.value);
       }
@@ -736,12 +737,7 @@ Amount.prototype.set_currency = function(c) {
 };
 
 Amount.prototype.set_issuer = function(issuer) {
-  if (issuer instanceof UInt160) {
-    this._issuer = issuer;
-  } else {
-    this._issuer = UInt160.from_json(issuer);
-  }
-
+  this._issuer = issuer;
   return this;
 };
 
@@ -939,7 +935,7 @@ Amount.prototype.to_human_full = function(options) {
   const opts = options || {};
   const value = this.to_human(opts);
   const currency = this._currency.to_human();
-  const issuer = this._issuer.to_json(opts);
+  const issuer = this._issuer;
   const base = value + '/' + currency;
   return this.is_native() ? base : (base + '/' + issuer);
 };
@@ -955,21 +951,21 @@ Amount.prototype.to_json = function() {
     this._currency.to_hex() : this._currency.to_json()
   };
 
-  if (this._issuer.is_valid()) {
-    amount_json.issuer = this._issuer.to_json();
+  if (isValidAddress(this._issuer)) {
+    amount_json.issuer = this._issuer;
   }
 
   return amount_json;
 };
 
-Amount.prototype.to_text_full = function(opts) {
+Amount.prototype.to_text_full = function() {
   if (!this.is_valid()) {
     return 'NaN';
   }
   return this._is_native
       ? this.to_human() + '/XRP'
       : this.to_text() + '/' + this._currency.to_json()
-        + '/' + this._issuer.to_json(opts);
+        + '/' + this._issuer;
 };
 
 // For debugging.
@@ -998,11 +994,8 @@ Amount.prototype.not_equals_why = function(d, ignore_issuer) {
     if (!this._currency.equals(d._currency)) {
       return 'Non-XRP currency differs.';
     }
-    if (!ignore_issuer && !this._issuer.equals(d._issuer)) {
-      return 'Non-XRP issuer differs: '
-      + d._issuer.to_json()
-      + '/'
-      + this._issuer.to_json();
+    if (!ignore_issuer && this._issuer !== d._issuer) {
+      return 'Non-XRP issuer differs: ' + d._issuer + '/' + this._issuer;
     }
   }
 };
