@@ -271,7 +271,8 @@ module.exports = function(port) {
         request.id, request.source_account, request.destination_account,
         request.destination_amount);
     }
-    conn.send(response);
+    // delay response to simulate calculation time so we can test queuing
+    setTimeout(() => conn.send(response), 20);
   });
 
   return mock;
