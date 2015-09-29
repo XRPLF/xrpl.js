@@ -1824,7 +1824,7 @@ Remote.prototype.createPathFind = function(options, callback) {
 
   const pathFind = new PathFind(this,
     options.src_account, options.dst_account,
-    options.dst_amount, options.src_currencies);
+    options.dst_amount, options.src_currencies, options.src_amount);
 
   if (this._cur_path_find) {
     this._cur_path_find.notify_superceded();
@@ -2170,6 +2170,10 @@ Remote.prototype.requestPathFindCreate = function(options, callback) {
   if (Array.isArray(options.source_currencies)) {
     request.message.source_currencies =
       options.source_currencies.map(Remote.prepareCurrency);
+  }
+
+  if (options.send_max) {
+    request.message.send_max = Amount.json_rewrite(options.send_max);
   }
 
   request.callback(callback);

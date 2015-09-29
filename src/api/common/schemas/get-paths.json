@@ -5,8 +5,8 @@
   "items": {
     "type": "object",
     "properties": {
-      "source": {"$ref": "maxAdjustment"},
-      "destination": {"$ref": "adjustment"},
+      "source": {"$ref": "sourceAdjustment"},
+      "destination": {"$ref": "destinationAdjustment"},
       "paths": {"type": "string"}
     },
     "required": ["source", "destination", "paths"],

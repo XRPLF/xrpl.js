@@ -4,8 +4,7 @@
       "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
       "maxAmount": {
         "currency": "USD",
-        "value": "0.000001002",
-        "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo"
+        "value": "0.000001002"
       }
     },
     "destination": {
