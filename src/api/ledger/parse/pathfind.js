@@ -8,22 +8,42 @@ function parsePaths(paths) {
     _.omit(step, ['type', 'type_hex'])));
 }
 
-function parsePathfind(sourceAddress: string,
-    destinationAmount: Object, pathfindResult: Object
-): Object {
-  return pathfindResult.alternatives.map(function(alternative) {
-    return {
-      source: {
-        address: sourceAddress,
-        maxAmount: parseAmount(alternative.source_amount)
-      },
-      destination: {
-        address: pathfindResult.destination_account,
-        amount: destinationAmount
-      },
-      paths: JSON.stringify(parsePaths(alternative.paths_computed))
-    };
-  });
+function removeAnyCounterpartyEncoding(address: string, amount: Object) {
+  return amount.counterparty === address ?
+    _.omit(amount, 'counterparty') : amount;
+}
+
+function createAdjustment(address: string, adjustmentWithoutAddress: Object) {
+  const amountKey = _.keys(adjustmentWithoutAddress)[0];
+  const amount = adjustmentWithoutAddress[amountKey];
+  return _.set({address: address}, amountKey,
+               removeAnyCounterpartyEncoding(address, amount));
+}
+
+function parseAlternative(sourceAddress: string, destinationAddress: string,
+  destinationAmount: Object, alternative: Object
+) {
+  // we use "maxAmount"/"minAmount" here so that the result can be passed
+  // directly to preparePayment
+  const amounts = (alternative.destination_amount !== undefined) ?
+    {source: {amount: parseAmount(alternative.source_amount)},
+     destination: {minAmount: parseAmount(alternative.destination_amount)}} :
+    {source: {maxAmount: parseAmount(alternative.source_amount)},
+     destination: {amount: parseAmount(destinationAmount)}};
+
+  return {
+    source: createAdjustment(sourceAddress, amounts.source),
+    destination: createAdjustment(destinationAddress, amounts.destination),
+    paths: JSON.stringify(parsePaths(alternative.paths_computed))
+  };
+}
+
+function parsePathfind(pathfindResult: Object): Object {
+  const sourceAddress = pathfindResult.source_account;
+  const destinationAddress = pathfindResult.destination_account;
+  const destinationAmount = pathfindResult.destination_amount;
+  return pathfindResult.alternatives.map(_.partial(parseAlternative,
+    sourceAddress, destinationAddress, destinationAmount));
 }
 
 module.exports = parsePathfind;

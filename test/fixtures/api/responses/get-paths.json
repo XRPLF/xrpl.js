@@ -4,8 +4,7 @@
       "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
       "maxAmount": {
         "currency": "JPY",
-        "value": "0.1117218827811721",
-        "counterparty": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
+        "value": "0.1117218827811721"
       }
     },
     "destination": {
@@ -23,8 +22,7 @@
       "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
       "maxAmount": {
         "currency": "USD",
-        "value": "0.001002",
-        "counterparty": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
+        "value": "0.001002"
       }
     },
     "destination": {
