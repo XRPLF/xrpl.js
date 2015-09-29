@@ -570,6 +570,18 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getPaths.XrpToUsd, 'getPaths'));
   });
 
+  it('getPaths - queuing', function() {
+    return Promise.all([
+      this.api.getPaths(requests.getPaths.normal),
+      this.api.getPaths(requests.getPaths.UsdToUsd),
+      this.api.getPaths(requests.getPaths.XrpToXrp)
+    ]).then(results => {
+      checkResult(responses.getPaths.XrpToUsd, 'getPaths', results[0]);
+      checkResult(responses.getPaths.UsdToUsd, 'getPaths', results[1]);
+      checkResult(responses.getPaths.XrpToXrp, 'getPaths', results[2]);
+    });
+  });
+
   // @TODO
   // need decide what to do with currencies/XRP:
   // if add 'XRP' in currencies, then there will be exception in

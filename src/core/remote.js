@@ -1803,9 +1803,20 @@ Remote.prototype.createPathFind = function(options, callback) {
 
   if (callback) {
     pathFind.on('update', (data) => {
-      if (data.full_reply) {
-        pathFind.close();
+      if (data.full_reply && !data.closed) {
+        this._cur_path_find = null;
         callback(null, data);
+        // "A client can only have one pathfinding request open at a time.
+        // If another pathfinding request is already open on the same
+        // connection, the old request is automatically closed and replaced
+        // with the new request."
+        // - ripple.com/build/rippled-apis/#path-find-create
+        if (this._queued_path_finds.length > 0) {
+          const pathfind = this._queued_path_finds.shift();
+          this.createPathFind(pathfind.options, pathfind.callback);
+        } else {
+          pathFind.close();
+        }
       }
     });
     pathFind.on('error', callback);
@@ -2145,19 +2156,8 @@ Remote.prototype.requestPathFindCreate = function(options, callback) {
 
 Remote.prototype.requestPathFindClose = function(callback) {
   const request = new Request(this, 'path_find');
-
   request.message.subcommand = 'close';
-  request.callback((error, data) => {
-    this._cur_path_find = null;
-    if (this._queued_path_finds.length > 0) {
-      const pathfind = this._queued_path_finds.shift();
-      this.createPathFind(pathfind.options, pathfind.callback);
-    }
-    if (callback) {
-      callback(error, data);
-    }
-  });
-
+  request.callback(callback);
   return request;
 };
 
