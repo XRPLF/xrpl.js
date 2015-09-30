@@ -40,13 +40,12 @@ const SERVER_INFO = {
 };
 
 describe('Request', function() {
-  it('Send request', function(done) {
+  it('Send request', function() {
     const remote = {
       request: function(req) {
         assert(req instanceof Request);
         assert.strictEqual(typeof req.message, 'object');
         assert.strictEqual(req.message.command, 'server_info');
-        done();
       },
       on: function() {
       },
@@ -60,7 +59,10 @@ describe('Request', function() {
     request.request();
 
     // Should only request once
-    request.request();
+    assert.throws(function() {
+      request.request();
+    }, Error);
+
   });
 
   it('Send request -- filterRequest', function(done) {

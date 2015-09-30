@@ -43,15 +43,18 @@ Request.prototype.request = function(servers, callback_) {
   const self = this;
   const callback = typeof servers === 'function' ? servers : callback_;
 
+  if (this.requested) {
+    throw new Error('Already requested');
+  }
+
   this.emit('before');
-
-  const wasRequested = this.requested;
-  this.requested = true;
-  this.callback(callback);
-
-  if (wasRequested) {
+  // emit handler can set requested flag
+  if (this.requested) {
     return this;
   }
+
+  this.requested = true;
+  this.callback(callback);
 
   this.on('error', function() {});
   this.emit('request', this.remote);
