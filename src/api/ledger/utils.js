@@ -120,10 +120,9 @@ function getLedgerOptionsWithLedgerVersion(account: string, options: Object,
   ) {
     callback(null, account, options);
   } else {
-    this.remote.getLedgerSequence(common.convertErrors((err, sequence) => {
-      callback(err, account, _.assign({}, options, {
-        ledgerVersion: sequence}));
-    }));
+    this.getLedgerVersion().then((version) => {
+      callback(null, account, _.assign({}, options, {ledgerVersion: version}));
+    }, callback);
   }
 }
 

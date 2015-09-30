@@ -846,7 +846,7 @@ OrderBook.prototype.onTransaction = function(transaction) {
 
 
   if (--this._transactionsLeft === 0 && !this._waitingForOffers) {
-    const lastClosedLedger = this._remote.getLedgerSequence();
+    const lastClosedLedger = this._remote.getLedgerSequenceSync();
     if (this._isAutobridgeable) {
       if (this._canRunAutobridgeCalc()) {
         if (this._legOneBook._lastUpdateLedgerSequence === lastClosedLedger ||
@@ -1080,7 +1080,7 @@ OrderBook.prototype.notify = function(transaction) {
 
   this.emit('transaction', transaction);
 
-  this._lastUpdateLedgerSequence = this._remote.getLedgerSequence();
+  this._lastUpdateLedgerSequence = this._remote.getLedgerSequenceSync();
 
   if (!takerGetsTotal.is_zero()) {
     this.emit('trade', takerPaysTotal, takerGetsTotal);

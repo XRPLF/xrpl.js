@@ -59,8 +59,8 @@ function prepareTransaction(transaction: any, remote: any, instructions: any,
     } else {
       const offset = instructions.maxLedgerVersionOffset !== undefined ?
         parseInt(instructions.maxLedgerVersionOffset, 10) : 3;
-      remote.getLedgerSequence((error, seq) => {
-        txJSON.LastLedgerSequence = seq + offset;
+      remote.getLedgerSequence((error, ledgerVersion) => {
+        txJSON.LastLedgerSequence = ledgerVersion + offset;
         callback_(error);
       });
     }

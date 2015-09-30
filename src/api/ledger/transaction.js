@@ -91,18 +91,17 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
 
 
   function maxLedgerGetter(error_?: Error, tx?: Object) {
-    remote.getLedgerSequence(function(err?, seq: number) {
-      _.noop(err);
-      const maxLedgerVersion = options.maxLedgerVersion || seq;
+    this.getLedgerVersion().then((version) => {
+      const maxLedgerVersion = options.maxLedgerVersion || version;
       callbackWrapper(error_, tx, maxLedgerVersion);
-    });
+    }, callbackWrapper);
   }
 
   async.waterfall([
     _.partial(remote.requestTx.bind(remote),
       {hash: identifier, binary: false}),
     _.partial(attachTransactionDate, remote)
-  ], maxLedgerGetter);
+  ], maxLedgerGetter.bind(this));
 }
 
 function getTransaction(identifier: string,
