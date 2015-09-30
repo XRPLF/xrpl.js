@@ -1,6 +1,7 @@
 /* @flow */
 'use strict';
 const _ = require('lodash');
+const async = require('async');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
@@ -42,15 +43,15 @@ function getTrustlinesAsync(account: string, options: {currency: string,
   validate.address(account);
   validate.getTrustlinesOptions(options);
 
-  const ledgerVersion = options.ledgerVersion
-                      || this.remote.getLedgerSequence();
   const getter = _.partial(getAccountLines, this.remote, account,
-                           ledgerVersion, options);
+                           options.ledgerVersion, options);
   utils.getRecursive(getter, options.limit, callback);
 }
 
 function getTrustlines(account: string, options = {}) {
-  return utils.promisify(getTrustlinesAsync).call(this, account, options);
+  return utils.promisify(async.seq(
+    utils.getLedgerOptionsWithLedgerVersion,
+    getTrustlinesAsync)).call(this, account, options);
 }
 
 module.exports = getTrustlines;

@@ -36,6 +36,8 @@ const utils = require('./utils');
 const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('remote');
 
+export type GetLedgerSequenceCallback = (err?: ?Error, index?: number) => void;
+
 /**
  * Interface to manage connections to rippled servers
  *
@@ -518,7 +520,34 @@ Remote.prototype._handleMessage = function(message, server) {
   }
 };
 
-Remote.prototype.getLedgerSequence = function() {
+/**
+ *
+ * @param {Function} [callback]
+ * @api public
+ */
+
+Remote.prototype.getLedgerSequence = function(callback = function() {}) {
+  if (!this._servers.length) {
+    callback(new Error('No servers available.'));
+    return;
+  }
+
+  if (_.isFinite(this._ledger_current_index)) {
+    // the "current" ledger is the one after the most recently closed ledger
+    callback(null, this._ledger_current_index - 1);
+  } else {
+    this.once('ledger_closed', () => {
+      callback(null, this._ledger_current_index - 1);
+    });
+  }
+};
+
+/**
+ *
+ * @api private
+ */
+
+Remote.prototype.getLedgerSequenceSync = function(): number {
   if (!this._ledger_current_index) {
     throw new Error('Ledger sequence has not yet been initialized');
   }
@@ -2305,6 +2334,32 @@ Remote.prototype.feeTx = function(units) {
   }
 
   return server._feeTx(units);
+};
+
+/**
+ * Same as feeTx, but will wait to connect to server if currently
+ * disconnected.
+ *
+ * @param {Number} fee units
+ * @param {Function} callback
+ */
+
+Remote.prototype.feeTxAsync = function(units, callback) {
+  if (!this._servers.length) {
+    callback(new Error('No servers available.'));
+    return;
+  }
+
+  let server = this.getServer();
+
+  if (!server) {
+    this.once('connected', () => {
+      server = this.getServer();
+      callback(null, server._feeTx(units));
+    });
+  } else {
+    callback(null, server._feeTx(units));
+  }
 };
 
 /**

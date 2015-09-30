@@ -581,7 +581,7 @@ Transaction.prototype.setLastLedgerSequence = function(sequence) {
     assert(this.remote, 'Unable to set LastLedgerSequence, missing Remote');
 
     this._setUInt32('LastLedgerSequence',
-                    this.remote.getLedgerSequence() + 1
+                    this.remote.getLedgerSequenceSync() + 1
                     + this.getLastLedgerSequenceOffset());
   }
 

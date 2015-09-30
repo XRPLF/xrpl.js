@@ -1,6 +1,7 @@
 /* @flow */
 'use strict';
 const _ = require('lodash');
+const async = require('async');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
@@ -26,17 +27,17 @@ function getOrdersAsync(account, options, callback) {
   validate.address(account);
   validate.getOrdersOptions(options);
 
-  const ledgerVersion = options.ledgerVersion
-                      || this.remote.getLedgerSequence();
   const getter = _.partial(requestAccountOffers, this.remote, account,
-                           ledgerVersion);
+                           options.ledgerVersion);
   utils.getRecursive(getter, options.limit,
     composeAsync((orders) => _.sortBy(orders,
       (order) => order.properties.sequence), callback));
 }
 
 function getOrders(account: string, options = {}) {
-  return utils.promisify(getOrdersAsync).call(this, account, options);
+  return utils.promisify(async.seq(
+    utils.getLedgerOptionsWithLedgerVersion,
+    getOrdersAsync)).call(this, account, options);
 }
 
 module.exports = getOrders;

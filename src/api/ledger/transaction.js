@@ -52,10 +52,10 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
   validate.getTransactionOptions(options);
 
   const remote = this.remote;
-  const maxLedgerVersion =
-    options.maxLedgerVersion || remote.getLedgerSequence();
 
-  function callbackWrapper(error_?: Error, tx?: Object) {
+  function callbackWrapper(error_?: Error, tx?: Object,
+    maxLedgerVersion?: number
+  ) {
     let error = error_;
 
     if (!error && tx && tx.validated !== true) {
@@ -89,11 +89,19 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
     }
   }
 
+
+  function maxLedgerGetter(error_?: Error, tx?: Object) {
+    this.getLedgerVersion().then((version) => {
+      const maxLedgerVersion = options.maxLedgerVersion || version;
+      callbackWrapper(error_, tx, maxLedgerVersion);
+    }, callbackWrapper);
+  }
+
   async.waterfall([
     _.partial(remote.requestTx.bind(remote),
       {hash: identifier, binary: false}),
     _.partial(attachTransactionDate, remote)
-  ], callbackWrapper);
+  ], maxLedgerGetter.bind(this));
 }
 
 function getTransaction(identifier: string,
