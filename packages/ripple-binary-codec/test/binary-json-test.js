@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const fixtures = require('./fixtures/codec-fixtures.json');
-const {binaryToJSON, jsonToBinary} = require('../src');
+const {decode, encode} = require('../src');
 
 function json(object) {
   return JSON.stringify(object);
@@ -14,11 +14,11 @@ describe('ripple-binary-codec', function() {
       entries.forEach((t, test_n) => {
         it(`${name}[${test_n}] can encode ${json(t.json)} to ${t.binary}`,
         () => {
-          assert.equal(t.binary, jsonToBinary(t.json));
+          assert.equal(t.binary, encode(t.json));
         });
         it(`${name}[${test_n}] can decode ${t.binary} to ${json(t.json)}`,
         () => {
-          const decoded = binaryToJSON(t.binary);
+          const decoded = decode(t.binary);
           assert.deepEqual(t.json, decoded);
         });
       });
