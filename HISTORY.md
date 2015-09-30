@@ -1,3 +1,7 @@
+##0.12.9
+
++ [OrderBook performance optimizations](https://github.com/ripple/ripple-lib/commit/3e17d91edf36745f6b6c09b0ad88971b7775f6ab)
+
 ##0.12.7 and 0.12.8
 
 + [Improve performance of orderbook](https://github.com/ripple/ripple-lib/commit/c745faaaf0956ca98448a754b4fe97fb50574fc7)
