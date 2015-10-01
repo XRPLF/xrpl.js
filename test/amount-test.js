@@ -1048,6 +1048,17 @@ describe('Amount', function() {
   });
 
   describe('ratio_human', function() {
+    it('Divide USD by XRP', function() {
+      const a = Amount.from_json({
+        value: '0.08161672093323858',
+        currency: 'USD',
+        issuer: 'rLFPPebckMYZf3urdomLsaqRGmQ6zHVrrK'
+      });
+      const b = Amount.from_json('15000000');
+      const c = a.ratio_human(b);
+      assert.deepEqual(c.to_json(), {value: '0.005441114728882572',
+        currency: 'USD', issuer: 'rLFPPebckMYZf3urdomLsaqRGmQ6zHVrrK'});
+    });
     it('Divide USD by XAU (dem)', function() {
       assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').ratio_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_text_full(), '201.0049931765529/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });

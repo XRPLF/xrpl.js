@@ -120,18 +120,14 @@ Amount.from_components_unsafe = function(value: Value, currency: Currency,
 
 // be sure that _is_native is set properly BEFORE calling _set_value
 Amount.prototype._set_value = function(value: Value) {
-
   this._value = value.isZero() && value.isNegative() ?
       value.negate() : value;
   this._check_limits();
-
 };
 
 // Returns a new value which is the absolute value of this.
 Amount.prototype.abs = function() {
-
   return this._copy(this._value.abs());
-
 };
 
 Amount.prototype.add = function(addend) {
@@ -229,7 +225,7 @@ Amount.prototype.ratio_human = function(denom, opts) {
   //
   // To compensate, we multiply the numerator by 10^xns_precision.
   if (denominator._is_native) {
-    numerator._set_value(numerator.multiply(bi_xns_unit));
+    numerator._set_value(numerator._value.multiply(bi_xns_unit));
   }
 
   return numerator.divide(denominator);
