@@ -1,6 +1,6 @@
 'use strict';
 
-var hashjs = require('hash.js');
+var createHash = require('create-hash');
 var apiFactory = require('x-address-codec');
 
 var NODE_PUBLIC = 28;
@@ -11,7 +11,7 @@ var ED25519_SEED = [0x01, 0xE1, 0x4B];
 
 module.exports = apiFactory({
   sha256: function(bytes) {
-    return hashjs.sha256().update(bytes).digest();
+    return createHash('sha256').update(new Buffer(bytes)).digest();
   },
   defaultAlphabet: 'ripple',
   codecMethods: {

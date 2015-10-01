@@ -1,12 +1,12 @@
 {
   "name": "ripple-address-codec",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "encodes/decodes base58 encoded ripple identifiers",
   "main": "src/index.js",
   "license": "ISC",
   "dependencies": {
-    "hash.js": "^1.0.3",
-    "x-address-codec": "^0.7.0"
+    "create-hash": "^1.1.2",
+    "x-address-codec": "^0.7.2"
   },
   "repository": {
     "type": "git",
@@ -20,9 +20,9 @@
   },
   "devDependencies": {
     "coveralls": "~2.11.4",
-    "eslint": "^1.4.3",
-    "istanbul": "~0.3.20",
-    "mocha": "^2.3.2"
+    "eslint": "^1.5.1",
+    "istanbul": "~0.3.21",
+    "mocha": "^2.3.3"
   },
   "readmeFilename": "README.md",
   "engines": {
