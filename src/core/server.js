@@ -676,6 +676,17 @@ Server.prototype._handleResponse = function(message) {
     const result = message.result;
     const responseEvent = 'response_' + command;
 
+    if (command === 'submit' && result.engine_result === 'tefPAST_SEQ' &&
+        request.reconnectionsCount > 0
+    ) {
+      // handle case when request reached the server, but response was lost
+      // and request was automatically repeated
+      result.engine_result = 'tesSUCCESS';
+      result.engine_result_code = 0;
+      result.engine_result_message =
+        'The transaction was applied. Only final in a validated ledger.';
+    }
+
     request.emit('success', result);
 
     [this, this._remote].forEach(function(emitter) {

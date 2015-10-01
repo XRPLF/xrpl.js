@@ -16,6 +16,35 @@ describe('Server', function() {
     });
   });
 
+  it('Handle re-submit due to reconnection', function(done) {
+    const remote = new Remote();
+    const server = new Server(remote, 'ws://localhost:5748');
+    const request = new Request(remote, 'submit');
+    request.reconnectionsCount = 1;
+    const id = 1;
+    server._requests[id] = request;
+
+    request.once('success', function(result) {
+      assert.strictEqual(result.engine_result, 'tesSUCCESS');
+      assert.strictEqual(result.engine_result_code, 0);
+      done();
+    });
+
+    const response = {
+      id: id,
+      type: 'response',
+      status: 'success',
+      result: {
+        engine_result: 'tefPAST_SEQ',
+        engine_result_code: -190,
+        engine_result_message: 'This sequence number has already past.'
+      }
+    };
+
+    server.emit('message', response);
+
+  });
+
   it('Message listener', function(done) {
     const server = new Server(new Remote(), 'wss://localhost:5006');
 
@@ -1251,7 +1280,7 @@ describe('Server', function() {
   });
 
   it('Automatic reconnect', function(done) {
-    const port = 5748;
+    const port = 5749;
     let connections = 0;
 
     function handleWsConnection(_ws) {
