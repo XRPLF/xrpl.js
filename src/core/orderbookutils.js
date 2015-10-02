@@ -2,11 +2,11 @@
 
 const _ = require('lodash');
 const assert = require('assert');
+const constants = require('./constants');
 const SerializedObject = require('./serializedobject').SerializedObject;
 const Types = require('./serializedtypes');
 const Amount = require('./amount').Amount;
 const Currency = require('./currency').Currency;
-const UInt160 = require('./uint160').UInt160;
 const {IOUValue} = require('ripple-lib-value');
 const OrderBookUtils = {};
 
@@ -22,14 +22,12 @@ function assertValidNumber(number, message) {
 * @return JSON amount object
 */
 
-function createAmount(value, currency_, counterparty_) {
+function createAmount(value, currency_, counterparty) {
+  assert(_.isString(counterparty), 'counterparty must be a string');
 
   const currency = currency_ instanceof Currency ?
     currency_ :
     Currency.from_json(currency_);
-
-  const counterparty = counterparty_ instanceof UInt160 ?
-    counterparty_.to_json() : counterparty_;
 
   return Amount.from_components_unsafe(new IOUValue(value),
     currency, counterparty, false);
@@ -172,7 +170,7 @@ OrderBookUtils.convertOfferQualityToHexFromText = function(quality) {
 
 OrderBookUtils.CURRENCY_ONE = Currency.from_json(1);
 
-OrderBookUtils.ISSUER_ONE = UInt160.from_json(1);
+OrderBookUtils.ISSUER_ONE = constants.ACCOUNT_ONE;
 
 /**
  *

@@ -4,7 +4,6 @@ const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 const util = require('util');
 const async = require('async');
-const UInt160 = require('./uint160').UInt160;
 const Currency = require('./currency').Currency;
 const RippleError = require('./rippleerror').RippleError;
 
@@ -388,7 +387,7 @@ Request.prototype.selectLedger = function(ledger, defaultValue) {
 };
 
 Request.prototype.accountRoot = function(account) {
-  this.message.account_root = UInt160.json_rewrite(account);
+  this.message.account_root = account;
   return this;
 };
 
@@ -402,7 +401,7 @@ Request.prototype.index = function(index) {
 // --> seq : sequence number of transaction creating offer (integer)
 Request.prototype.offerId = function(account, sequence) {
   this.message.offer = {
-    account: UInt160.json_rewrite(account),
+    account: account,
     seq: sequence
   };
   return this;
@@ -440,8 +439,8 @@ Request.prototype.rippleState = function(account, issuer, currency) {
   this.message.ripple_state = {
     currency: currency,
     accounts: [
-      UInt160.json_rewrite(account),
-      UInt160.json_rewrite(issuer)
+      account,
+      issuer
     ]
   };
   return this;
@@ -453,7 +452,7 @@ Request.prototype.accounts = function(accountsIn, proposed) {
 
   // Process accounts parameters
   const processedAccounts = accounts.map(function(account) {
-    return UInt160.json_rewrite(account);
+    return account;
   });
 
   if (proposed) {
@@ -471,7 +470,7 @@ Request.prototype.addAccount = function(account, proposed) {
     return this;
   }
 
-  const processedAccount = UInt160.json_rewrite(account);
+  const processedAccount = account;
   const prop = proposed === true ? 'accounts_proposed' : 'accounts';
   this.message[prop] = (this.message[prop] || []).concat(processedAccount);
 
@@ -526,7 +525,7 @@ Request.prototype.addBook = function(book, snapshot) {
     };
 
     if (!Currency.from_json(obj.currency).is_native()) {
-      obj.issuer = UInt160.json_rewrite(book[side].issuer);
+      obj.issuer = book[side].issuer;
     }
   }
 

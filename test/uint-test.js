@@ -4,8 +4,9 @@
 const _ = require('lodash');
 const assert = require('assert-diff');
 const lodash = require('lodash');
-const ripple = require('ripple-lib');
+const ripple = require('ripple-lib')._test;
 const fixtures = require('./fixtures/uint');
+const UInt160 = ripple.UInt160;
 
 function resultError(test, result) {
   function type(e) {
@@ -100,5 +101,26 @@ function makeTests(uIntType) {
     });
   });
 }
+
+describe('UInt160', function() {
+  it('Parse 0 export', function() {
+    assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_generic('0').set_version(0).to_json());
+  });
+  it('Parse 1', function() {
+    assert.deepEqual(UInt160.ACCOUNT_ONE, UInt160.from_generic('1').set_version(0).to_json());
+  });
+  it('Parse rrrrrrrrrrrrrrrrrrrrrhoLvTp export', function() {
+    assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrrhoLvTp').to_json());
+  });
+  it('Parse rrrrrrrrrrrrrrrrrrrrBZbvji export', function() {
+    assert.strictEqual(UInt160.ACCOUNT_ONE, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrBZbvji').to_json());
+  });
+  it('is_valid rrrrrrrrrrrrrrrrrrrrrhoLvTp', function() {
+    assert(UInt160.is_valid('rrrrrrrrrrrrrrrrrrrrrhoLvTp'));
+  });
+  it('!is_valid rrrrrrrrrrrrrrrrrrrrrhoLvT', function() {
+    assert(!UInt160.is_valid('rrrrrrrrrrrrrrrrrrrrrhoLvT'));
+  });
+});
 
 ['UInt128', 'UInt160', 'UInt256'].forEach(makeTests);

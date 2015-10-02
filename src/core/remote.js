@@ -18,13 +18,12 @@ const assert = require('assert');
 const _ = require('lodash');
 const LRU = require('lru-cache');
 const async = require('async');
+const constants = require('./constants');
 const EventEmitter = require('events').EventEmitter;
 const Server = require('./server').Server;
 const Request = require('./request').Request;
 const Amount = require('./amount').Amount;
 const Currency = require('./currency').Currency;
-const UInt160 = require('./uint160').UInt160;
-const UInt256 = require('./uint256').UInt256;
 const Transaction = require('./transaction').Transaction;
 const Account = require('./account').Account;
 const Meta = require('./meta').Meta;
@@ -35,6 +34,7 @@ const RippleError = require('./rippleerror').RippleError;
 const utils = require('./utils');
 const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('remote');
+const {isValidAddress} = require('ripple-address-codec');
 
 export type GetLedgerSequenceCallback = (err?: ?Error, index?: number) => void;
 
@@ -1188,9 +1188,13 @@ Remote.prototype.requestTransaction = function(options, callback) {
  * @throws {Error} if a marker is provided, but no ledger_index or ledger_hash
  */
 
+function isValidLedgerHash(hash) {
+  return /^[A-F0-9]{64}$/.test(hash);
+}
+
 Remote.prototype._accountRequest = function(command, options, callback) {
   if (options.marker) {
-    if (!(Number(options.ledger) > 0) && !UInt256.is_valid(options.ledger)) {
+    if (!(Number(options.ledger) > 0) && !isValidLedgerHash(options.ledger)) {
       throw new Error(
         'A ledger_index or ledger_hash must be provided when using a marker');
     }
@@ -1198,11 +1202,11 @@ Remote.prototype._accountRequest = function(command, options, callback) {
 
   const request = new Request(this, command);
 
-  request.message.account = UInt160.json_rewrite(options.account);
+  request.message.account = options.account;
   request.selectLedger(options.ledger);
 
-  if (UInt160.is_valid(options.peer)) {
-    request.message.peer = UInt160.json_rewrite(options.peer);
+  if (isValidAddress(options.peer)) {
+    request.message.peer = options.peer;
   }
 
   if (!isNaN(options.limit)) {
@@ -1530,7 +1534,7 @@ Remote.prototype.requestBookOffers = function(options, callback) {
   };
 
   if (!Currency.from_json(request.message.taker_gets.currency).is_native()) {
-    request.message.taker_gets.issuer = UInt160.json_rewrite(taker_gets.issuer);
+    request.message.taker_gets.issuer = taker_gets.issuer;
   }
 
   request.message.taker_pays = {
@@ -1538,10 +1542,10 @@ Remote.prototype.requestBookOffers = function(options, callback) {
   };
 
   if (!Currency.from_json(request.message.taker_pays.currency).is_native()) {
-    request.message.taker_pays.issuer = UInt160.json_rewrite(taker_pays.issuer);
+    request.message.taker_pays.issuer = taker_pays.issuer;
   }
 
-  request.message.taker = taker ? taker : UInt160.ACCOUNT_ONE;
+  request.message.taker = taker ? taker : constants.ACCOUNT_ONE;
   request.selectLedger(ledger);
 
   if (!isNaN(limit)) {
@@ -1775,7 +1779,7 @@ Remote.prototype.requestOwnerCount = function(options, callback) {
  */
 
 Remote.prototype.getAccount = function(accountID) {
-  return this._accounts[UInt160.json_rewrite(accountID)];
+  return this._accounts[accountID];
 };
 
 /**
@@ -1899,8 +1903,7 @@ Remote.prototype.book = Remote.prototype.createOrderBook = function(options) {
  */
 
 Remote.prototype.accountSeq =
-Remote.prototype.getAccountSequence = function(account_, advance) {
-  const account = UInt160.json_rewrite(account_);
+Remote.prototype.getAccountSequence = function(account, advance) {
   const accountInfo = this.accounts[account];
 
   if (!accountInfo) {
@@ -1923,9 +1926,7 @@ Remote.prototype.getAccountSequence = function(account_, advance) {
  */
 
 Remote.prototype.setAccountSequence =
-Remote.prototype.setAccountSeq = function(account_, sequence) {
-  const account = UInt160.json_rewrite(account_);
-
+Remote.prototype.setAccountSeq = function(account, sequence) {
   if (!this.accounts.hasOwnProperty(account)) {
     this.accounts[account] = { };
   }
@@ -1991,8 +1992,7 @@ Remote.prototype.accountSeqCache = function(options, callback) {
  * @param {String} account
  */
 
-Remote.prototype.dirtyAccountRoot = function(account_) {
-  const account = UInt160.json_rewrite(account_);
+Remote.prototype.dirtyAccountRoot = function(account) {
   delete this.ledgers.current.account_root[account];
 };
 
@@ -2065,8 +2065,7 @@ Remote.prototype.requestRippleBalance = function(options, callback) {
 
     // accountHigh implies for account: balance is negated.  highLimit is the
     // limit set by account.
-    const accountHigh = UInt160.from_json(options.account)
-    .equals(highLimit.issuer());
+    const accountHigh = (options.account === highLimit.issuer());
 
     request.emit('ripple_state', {
       account_balance: (accountHigh
@@ -2107,7 +2106,7 @@ Remote.prepareCurrencies = function(currency) {
   const newCurrency = { };
 
   if (currency.hasOwnProperty('issuer')) {
-    newCurrency.issuer = UInt160.json_rewrite(currency.issuer);
+    newCurrency.issuer = currency.issuer;
   }
 
   if (currency.hasOwnProperty('currency')) {
@@ -2128,12 +2127,8 @@ Remote.prepareCurrencies = function(currency) {
 
 Remote.prototype.requestRipplePathFind = function(options, callback) {
   const request = new Request(this, 'ripple_path_find');
-
-  request.message.source_account = UInt160.json_rewrite(options.source_account);
-
-  request.message.destination_account =
-    UInt160.json_rewrite(options.destination_account);
-
+  request.message.source_account = options.source_account;
+  request.message.destination_account = options.destination_account;
   request.message.destination_amount =
     Amount.json_rewrite(options.destination_amount);
 
@@ -2159,11 +2154,8 @@ Remote.prototype.requestPathFindCreate = function(options, callback) {
   const request = new Request(this, 'path_find');
   request.message.subcommand = 'create';
 
-  request.message.source_account = UInt160.json_rewrite(options.source_account);
-
-  request.message.destination_account =
-    UInt160.json_rewrite(options.destination_account);
-
+  request.message.source_account = options.source_account;
+  request.message.destination_account = options.destination_account;
   request.message.destination_amount =
     Amount.json_rewrite(options.destination_amount);
 

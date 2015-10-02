@@ -16,8 +16,8 @@ const extend = require('extend');
 const assert = require('assert');
 const async = require('async');
 const EventEmitter = require('events').EventEmitter;
+const {isValidAddress} = require('ripple-address-codec');
 const Amount = require('./amount').Amount;
-const UInt160 = require('./uint160').UInt160;
 const Currency = require('./currency').Currency;
 const AutobridgeCalculator = require('./autobridgecalculator');
 const OrderBookUtils = require('./orderbookutils');
@@ -795,7 +795,7 @@ OrderBook.prototype.parseAccountBalanceFromNode = function(node) {
 
   assert(!isNaN(result.balance), 'node has an invalid balance');
   if (this._validAccounts[result.Account] === undefined) {
-    assert(UInt160.is_valid(result.account), 'node has an invalid account');
+    assert(isValidAddress(result.account), 'node has an invalid account');
     this._validAccounts[result.Account] = true;
     this._validAccountsCount++;
   }
@@ -920,8 +920,6 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
  */
 
 OrderBook.prototype.updateOwnerOffersFundedAmount = function(account) {
-  // assert(UInt160.is_valid(account), 'Account is invalid');
-
   const self = this;
 
   if (!this.hasOwnerFunds(account)) {
@@ -1027,7 +1025,7 @@ OrderBook.prototype.notify = function(transaction) {
     switch (node.nodeType) {
       case 'DeletedNode':
         if (self._validAccounts[node.fields.Account] === undefined) {
-          assert(UInt160.is_valid(node.fields.Account),
+          assert(isValidAddress(node.fields.Account),
             'node has an invalid account');
           self._validAccounts[node.fields.Account] = true;
           self._validAccountsCount++;
@@ -1043,7 +1041,7 @@ OrderBook.prototype.notify = function(transaction) {
 
       case 'ModifiedNode':
         if (self._validAccounts[node.fields.Account] === undefined) {
-          assert(UInt160.is_valid(node.fields.Account),
+          assert(isValidAddress(node.fields.Account),
             'node has an invalid account');
           self._validAccounts[node.fields.Account] = true;
           self._validAccountsCount++;
@@ -1061,7 +1059,7 @@ OrderBook.prototype.notify = function(transaction) {
 
       case 'CreatedNode':
         if (self._validAccounts[node.fields.Account] === undefined) {
-          assert(UInt160.is_valid(node.fields.Account),
+          assert(isValidAddress(node.fields.Account),
             'node has an invalid account');
           self._validAccounts[node.fields.Account] = true;
           self._validAccountsCount++;
@@ -1249,7 +1247,7 @@ OrderBook.prototype.setOffers = function(offers) {
     offer = OrderBook.offerRewrite(offers[i]);
 
     if (this._validAccounts[offer.Account] === undefined) {
-      assert(UInt160.is_valid(offer.Account), 'Account is invalid');
+      assert(isValidAddress(offer.Account), 'Account is invalid');
       this._validAccounts[offer.Account] = true;
       this._validAccountsCount++;
     }
@@ -1353,9 +1351,9 @@ OrderBook.prototype.is_valid = function() {
   // XXX Should check for same currency (non-native) && same issuer
   return (
     this._currencyPays && this._currencyPays.is_valid() &&
-    (this._currencyPays.is_native() || UInt160.is_valid(this._issuerPays)) &&
+    (this._currencyPays.is_native() || isValidAddress(this._issuerPays)) &&
     this._currencyGets && this._currencyGets.is_valid() &&
-    (this._currencyGets.is_native() || UInt160.is_valid(this._issuerGets)) &&
+    (this._currencyGets.is_native() || isValidAddress(this._issuerGets)) &&
     !(this._currencyPays.is_native() && this._currencyGets.is_native())
   );
 };

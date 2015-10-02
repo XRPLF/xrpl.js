@@ -9,12 +9,11 @@ const utils = require('./utils');
 const sjclcodec = require('sjcl-codec');
 const Amount = require('./amount').Amount;
 const Currency = require('./currency').Currency;
-const UInt160 = require('./uint160').UInt160;
 const SerializedObject = require('./serializedobject').SerializedObject;
 const RippleError = require('./rippleerror').RippleError;
 const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('transaction');
-const {isValidAddress} = require('ripple-address-codec');
+const {isValidAddress, decodeAddress} = require('ripple-address-codec');
 
 /**
  * @constructor Transaction
@@ -470,7 +469,7 @@ Transaction.prototype.multiSigningData = function(account) {
   const so = new SerializedObject();
   so.append(hashprefixes.HASH_TX_MULTISIGN_BYTES);
   so.parse_json(this.tx_json);
-  so.append(UInt160.from_json(account).to_bytes());
+  so.append(decodeAddress(account));
   return so;
 };
 
@@ -692,14 +691,10 @@ Transaction.prototype.sourceTag = function(tag) {
 };
 
 Transaction.prototype._setAccount = function(name, value) {
-  const uInt160 = UInt160.from_json(value);
-
-  if (!uInt160.is_valid()) {
+  if (!isValidAddress(value)) {
     throw new Error(name + ' must be a valid account');
   }
-
-  this.tx_json[name] = uInt160.to_json();
-
+  this.tx_json[name] = value;
   return this;
 };
 
@@ -1176,11 +1171,11 @@ Transaction._rewritePath = function(path) {
     const newNode = { };
 
     if (node.hasOwnProperty('account')) {
-      newNode.account = UInt160.json_rewrite(node.account);
+      newNode.account = node.account;
     }
 
     if (node.hasOwnProperty('issuer')) {
-      newNode.issuer = UInt160.json_rewrite(node.issuer);
+      newNode.issuer = node.issuer;
     }
 
     if (node.hasOwnProperty('currency')) {
@@ -1384,7 +1379,7 @@ Transaction.prototype.offerCancel = function(options_) {
 Transaction._prepareSignerEntry = function(signer) {
   const {account, weight} = signer;
 
-  assert(UInt160.is_valid(account), 'Signer account invalid');
+  assert(isValidAddress(account), 'Signer account invalid');
   assert(_.isNumber(weight), 'Signer weight missing');
   assert(weight > 0 && weight <= 65535, 'Signer weight must be 1-65535');
 
@@ -1606,7 +1601,7 @@ Transaction.prototype.setSigners = function(signers) {
 };
 
 Transaction.prototype.addMultiSigner = function(signer) {
-  assert(UInt160.is_valid(signer.Account), 'Signer must have a valid Account');
+  assert(isValidAddress(signer.Account), 'Signer must have a valid Account');
 
   if (_.isUndefined(this.tx_json.Signers)) {
     this.tx_json.Signers = [];
@@ -1615,8 +1610,8 @@ Transaction.prototype.addMultiSigner = function(signer) {
   this.tx_json.Signers.push({Signer: signer});
 
   this.tx_json.Signers.sort((a, b) => {
-    return UInt160.from_json(a.Signer.Account)
-    .cmp(UInt160.from_json(b.Signer.Account));
+    return (new Buffer(decodeAddress(a.Signer.Account))).compare(
+      new Buffer(decodeAddress(b.Signer.Account)));
   });
 
   return this;
