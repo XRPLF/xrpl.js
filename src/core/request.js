@@ -34,14 +34,15 @@ function Request(remote, command) {
     command: command,
     id: undefined
   };
+  this._timeout = this.remote.submission_timeout;
 }
 
 util.inherits(Request, EventEmitter);
 
 // Send the request to a remote.
 Request.prototype.request = function(servers, callback_) {
-  const self = this;
   const callback = typeof servers === 'function' ? servers : callback_;
+  const self = this;
 
   if (this.requested) {
     throw new Error('Already requested');
@@ -70,17 +71,25 @@ Request.prototype.request = function(servers, callback_) {
     }
   }
 
-  function onReconnect() {
-    doRequest();
-  }
+  const timeout = setTimeout(() => {
+    if (typeof callback === 'function') {
+      callback(new RippleError('tejTimeout'));
+    }
+
+    this.emit('timeout');
+    // just in case
+    this.emit = _.noop;
+    this.cancel();
+  }, this._timeout);
 
   function onResponse() {
-    self.remote.removeListener('connected', onReconnect);
+    clearTimeout(timeout);
   }
 
   if (this.remote.isConnected()) {
-    this.remote.on('connected', onReconnect);
+    this.remote.on('connected', doRequest);
   }
+
   this.once('response', onResponse);
 
   doRequest();
@@ -264,38 +273,11 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
   return this;
 };
 
-Request.prototype.timeout = function(duration, callback) {
-  const self = this;
-
-  function requested() {
-    self.timeout(duration, callback);
+Request.prototype.setTimeout = function(delay) {
+  if (!_.isFinite(delay)) {
+    throw new Error('delay must be number');
   }
-
-  if (!this.requested) {
-    // Defer until requested
-    return this.once('request', requested);
-  }
-
-  const emit = this.emit;
-  let timed_out = false;
-
-  const timeout = setTimeout(function() {
-    timed_out = true;
-
-    if (typeof callback === 'function') {
-      callback();
-    }
-
-    emit.call(self, 'timeout');
-    self.cancel();
-  }, duration);
-
-  this.emit = function() {
-    if (!timed_out) {
-      clearTimeout(timeout);
-      emit.apply(self, arguments);
-    }
-  };
+  this._timeout = delay;
 
   return this;
 };

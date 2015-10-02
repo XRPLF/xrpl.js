@@ -698,7 +698,8 @@ TransactionManager.prototype._request = function(tx) {
 
   tx.emit('postsubmit');
 
-  submitRequest.timeout(self._submissionTimeout, requestTimeout);
+  submitRequest.setTimeout(self._submissionTimeout);
+  submitRequest.once('timeout', requestTimeout);
 };
 
 /**
