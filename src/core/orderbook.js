@@ -355,7 +355,7 @@ OrderBook.prototype.requestOffers = function(callback = function() {},
     log.info('requesting offers', this._key);
   }
 
-  this._synchronized = false;
+  this._synced = false;
 
   if (this._isAutobridgeable && !internal) {
     this._gotOffersFromLegOne = false;
@@ -1392,7 +1392,7 @@ OrderBook.prototype.computeAutobridgedOffers = function(callback = function() {}
 
 OrderBook.prototype.computeAutobridgedOffersWrapper = function() {
   if (!this._gotOffersFromLegOne || !this._gotOffersFromLegTwo ||
-      !this._synchronized || this._destroyed || this._calculatorRunning
+      !this._synced || this._destroyed || this._calculatorRunning
   ) {
     return;
   }
