@@ -9,7 +9,8 @@ module.exports = {
   getPaths: {
     XrpToUsd: require('./get-paths.json'),
     UsdToUsd: require('./get-paths-send-usd.json'),
-    XrpToXrp: require('./get-paths-xrp-to-xrp.json')
+    XrpToXrp: require('./get-paths-xrp-to-xrp.json'),
+    sendAll: require('./get-paths-send-all.json')
   },
   getServerInfo: require('./get-server-info.json'),
   getSettings: require('./get-settings.json'),
@@ -35,10 +36,12 @@ module.exports = {
   prepareOrderCancellation: require('./prepare-order-cancellation.json'),
   prepareOrder: require('./prepare-order.json'),
   prepareOrderSell: require('./prepare-order-sell.json'),
-  preparePayment: require('./prepare-payment.json'),
-  preparePaymentAllOptions: require('./prepare-payment-all-options.json'),
-  preparePaymentNoCounterparty:
-    require('./prepare-payment-no-counterparty.json'),
+  preparePayment: {
+    normal: require('./prepare-payment.json'),
+    allOptions: require('./prepare-payment-all-options.json'),
+    noCounterparty: require('./prepare-payment-no-counterparty.json'),
+    minAmount: require('./prepare-payment-min-amount.json')
+  },
   prepareSettings: {
     regularKey: require('./prepare-settings-regular-key.json'),
     flags: require('./prepare-settings.json'),

@@ -25,7 +25,8 @@ module.exports = {
     XrpToXrpNotEnough: require('./getpaths/xrp2xrp-not-enough'),
     NotAcceptCurrency: require('./getpaths/not-accept-currency'),
     NoPaths: require('./getpaths/no-paths'),
-    NoPathsWithCurrencies: require('./getpaths/no-paths-with-currencies')
+    NoPathsWithCurrencies: require('./getpaths/no-paths-with-currencies'),
+    sendAll: require('./getpaths/send-all')
   },
   computeLedgerHash: {
     header: require('./compute-ledger-hash'),

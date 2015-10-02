@@ -48,7 +48,7 @@ describe('RippleAPI', function() {
     }, instructions);
     return this.api.preparePayment(
       address, requests.preparePayment, localInstructions).then(
-      _.partial(checkResult, responses.preparePayment, 'prepare'));
+      _.partial(checkResult, responses.preparePayment.normal, 'prepare'));
   });
 
   it('preparePayment with all options specified', function() {
@@ -59,7 +59,7 @@ describe('RippleAPI', function() {
       };
       return this.api.preparePayment(
         address, requests.preparePaymentAllOptions, localInstructions).then(
-        _.partial(checkResult, responses.preparePaymentAllOptions, 'prepare'));
+        _.partial(checkResult, responses.preparePayment.allOptions, 'prepare'));
     });
   });
 
@@ -67,8 +67,14 @@ describe('RippleAPI', function() {
     const localInstructions = _.defaults({sequence: 23}, instructions);
     return this.api.preparePayment(
       address, requests.preparePaymentNoCounterparty, localInstructions).then(
-      _.partial(checkResult, responses.preparePaymentNoCounterparty,
+      _.partial(checkResult, responses.preparePayment.noCounterparty,
         'prepare'));
+  });
+
+  it('preparePayment - destination.minAmount', function() {
+    return this.api.preparePayment(address, responses.getPaths.sendAll[0],
+      instructions).then(_.partial(checkResult,
+        responses.preparePayment.minAmount, 'prepare'));
   });
 
   it('prepareOrder - buy order', function() {
@@ -637,6 +643,11 @@ describe('RippleAPI', function() {
     return this.api.getPaths(pathfind).catch(error => {
       assert(error instanceof this.api.errors.RippleError);
     });
+  });
+
+  it('getPaths - send all', function() {
+    return this.api.getPaths(requests.getPaths.sendAll).then(
+      _.partial(checkResult, responses.getPaths.sendAll, 'getPaths'));
   });
 
   it('getLedgerVersion', function(done) {

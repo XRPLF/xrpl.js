@@ -11,7 +11,8 @@ const Amount = require('./amount').Amount;
  * the 'end' and 'superceded' events.
  */
 
-function PathFind(remote, src_account, dst_account, dst_amount, src_currencies
+function PathFind(remote, src_account, dst_account, dst_amount,
+  src_currencies, src_amount
 ) {
   EventEmitter.call(this);
 
@@ -21,6 +22,7 @@ function PathFind(remote, src_account, dst_account, dst_amount, src_currencies
   this.dst_account = dst_account;
   this.dst_amount = dst_amount;
   this.src_currencies = src_currencies;
+  this.src_amount = src_amount;
 }
 
 util.inherits(PathFind, EventEmitter);
@@ -42,7 +44,8 @@ PathFind.prototype.create = function() {
     source_account: this.src_account,
     destination_account: this.dst_account,
     destination_amount: this.dst_amount,
-    source_currencies: this.src_currencies
+    source_currencies: this.src_currencies,
+    send_max: this.src_amount
   });
 
   req.once('error', function(err) {

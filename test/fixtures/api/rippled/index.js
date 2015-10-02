@@ -22,6 +22,7 @@ module.exports = {
   path_find: {
     generate: require('./path-find'),
     sendUSD: require('./path-find-send-usd'),
+    sendAll: require('./path-find-send-all'),
     XrpToXrp: require('./path-find-xrp-to-xrp'),
     srcActNotFound: require('./path-find-srcActNotFound')
   },

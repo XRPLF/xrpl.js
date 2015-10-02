@@ -1,0 +1,70 @@
+[
+  {
+    "source": {
+      "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "amount": {
+        "currency": "USD",
+        "value": "5"
+      }
+    },
+    "destination": {
+      "address": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
+      "minAmount": {
+        "currency": "USD",
+        "value": "4.93463759481038"
+      }
+    },
+    "paths": "[[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"XRP\"},{\"currency\":\"USD\",\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn\"}],[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"XRP\"},{\"currency\":\"USD\",\"issuer\":\"rfsEoNBUBbvkf4jPcFe2u9CyaQagLVHGfP\"},{\"account\":\"rfsEoNBUBbvkf4jPcFe2u9CyaQagLVHGfP\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"}]]"
+  },
+  {
+    "source": {
+      "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "amount": {
+        "currency": "USD",
+        "value": "5"
+      }
+    },
+    "destination": {
+      "address": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
+      "minAmount": {
+        "currency": "USD",
+        "value": "4.93463759481038"
+      }
+    },
+    "paths": "[[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"XRP\"},{\"currency\":\"USD\",\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn\"}],[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"EUR\",\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"currency\":\"USD\",\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"}],[{\"account\":\"rLEsXccBGNR3UPuPu2hUXPjziKC3qKSBun\"},{\"currency\":\"USD\",\"issuer\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"}]]"
+  },
+  {
+    "source": {
+      "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "amount": {
+        "currency": "USD",
+        "value": "5"
+      }
+    },
+    "destination": {
+      "address": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
+      "minAmount": {
+        "currency": "USD",
+        "value": "4.93463759481038"
+      }
+    },
+    "paths": "[[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"XRP\"},{\"currency\":\"USD\",\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn\"}],[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"XRP\"},{\"currency\":\"USD\",\"issuer\":\"rfsEoNBUBbvkf4jPcFe2u9CyaQagLVHGfP\"},{\"account\":\"rfsEoNBUBbvkf4jPcFe2u9CyaQagLVHGfP\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"}],[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"JPY\",\"issuer\":\"rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6\"},{\"currency\":\"USD\",\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"}]]"
+  },
+  {
+    "source": {
+      "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+      "amount": {
+        "currency": "USD",
+        "value": "5"
+      }
+    },
+    "destination": {
+      "address": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
+      "minAmount": {
+        "currency": "USD",
+        "value": "4.990019960079841"
+      }
+    },
+    "paths": "[[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"}],[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"account\":\"rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn\"}],[{\"account\":\"rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B\"},{\"currency\":\"USD\",\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"}]]"
+  }
+]

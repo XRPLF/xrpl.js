@@ -4,15 +4,18 @@ const _ = require('lodash');
 const async = require('async');
 const BigNumber = require('bignumber.js');
 const utils = require('./utils');
-const validate = utils.common.validate;
 const parsePathfind = require('./parse/pathfind');
+const validate = utils.common.validate;
 const NotFoundError = utils.common.errors.NotFoundError;
+const ValidationError = utils.common.errors.ValidationError;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
+const toRippledAmount = utils.common.toRippledAmount;
 
 type PathFindParams = {
-  src_currencies?: Array<string>, src_account: string, dst_amount: string,
-  dst_account?: string
+  src_currencies?: Array<string>, src_account: string,
+  dst_amount: string | Object, dst_account?: string,
+  src_amount?: string | Object
 }
 
 function addParams(params: PathFindParams, result: {}) {
@@ -29,10 +32,11 @@ type PathFind = {
 }
 
 function requestPathFind(remote, pathfind: PathFind, callback) {
+  const destinationAmount = _.assign({value: -1}, pathfind.destination.amount);
   const params: PathFindParams = {
     src_account: pathfind.source.address,
     dst_account: pathfind.destination.address,
-    dst_amount: utils.common.toRippledAmount(pathfind.destination.amount)
+    dst_amount: toRippledAmount(destinationAmount)
   };
   if (typeof params.dst_amount === 'object' && !params.dst_amount.issuer) {
     // Convert blank issuer to sender's address
@@ -44,7 +48,17 @@ function requestPathFind(remote, pathfind: PathFind, callback) {
   }
   if (pathfind.source.currencies && pathfind.source.currencies.length > 0) {
     params.src_currencies = pathfind.source.currencies.map(amount =>
-      _.omit(utils.common.toRippledAmount(amount), 'value'));
+      _.omit(toRippledAmount(amount), 'value'));
+  }
+  if (pathfind.source.amount) {
+    if (pathfind.destination.amount.value !== undefined) {
+      throw new ValidationError('Cannot specify both source.amount'
+        + ' and destination.amount.value in getPaths');
+    }
+    params.src_amount = toRippledAmount(pathfind.source.amount);
+    if (params.src_amount.currency && !params.src_amount.issuer) {
+      params.src_amount.issuer = pathfind.source.address;
+    }
   }
 
   remote.createPathFind(params,
@@ -81,8 +95,7 @@ function conditionallyAddDirectXRPPath(remote, address, paths, callback) {
 
 function formatResponse(pathfind, paths) {
   if (paths.alternatives && paths.alternatives.length > 0) {
-    const address = pathfind.source.address;
-    return parsePathfind(address, pathfind.destination.amount, paths);
+    return parsePathfind(paths);
   }
   if (paths.destination_currencies !== undefined &&
       !_.includes(paths.destination_currencies,
