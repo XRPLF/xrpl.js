@@ -15,12 +15,13 @@
   "scripts": {
     "test": "istanbul test _mocha",
     "prepublish": "npm test && npm run lint",
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "codecov": "cat ./coverage/coverage.json | ./node_modules/codecov.io/bin/codecov.io.js",
     "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/master/eslintrc'; fi; eslint -c eslintrc src/*.js test/*.js"
   },
   "devDependencies": {
+    "codecov.io": "^0.1.6",
     "coveralls": "~2.11.4",
-    "eslint": "^1.5.1",
+    "eslint": "^1.6.0",
     "istanbul": "~0.3.21",
     "mocha": "^2.3.3"
   },
