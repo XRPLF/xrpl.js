@@ -1966,6 +1966,22 @@ describe('Remote', function() {
     });
   });
 
+  it('Construct gateway_balances request', function() {
+    const request = remote.requestGatewayBalances({
+      account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      hotwallet: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5',
+      strict: true
+    });
+
+    assert.deepEqual(request.message, {
+      command: 'gateway_balances',
+      id: undefined,
+      account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      hotwallet: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5',
+      strict: true
+    });
+  });
+
   it('Construct Payment transaction', function() {
     const tx = remote.createTransaction('Payment', {
       account: TX_JSON.Account,

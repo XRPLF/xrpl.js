@@ -4,6 +4,7 @@ module.exports = {
   generateAddress: require('./generate-address.json'),
   getAccountInfo: require('./get-account-info.json'),
   getBalances: require('./get-balances.json'),
+  getBalanceSheet: require('./get-balance-sheet.json'),
   getOrderbook: require('./get-orderbook.json'),
   getOrders: require('./get-orders.json'),
   getPaths: {

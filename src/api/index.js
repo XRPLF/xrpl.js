@@ -16,6 +16,7 @@ const getTransaction = require('./ledger/transaction');
 const getTransactions = require('./ledger/transactions');
 const getTrustlines = require('./ledger/trustlines');
 const getBalances = require('./ledger/balances');
+const getBalanceSheet = require('./ledger/balance-sheet');
 const getPaths = require('./ledger/pathfind');
 const getOrders = require('./ledger/orders');
 const getOrderbook = require('./ledger/orderbook');
@@ -66,6 +67,7 @@ _.assign(RippleAPI.prototype, {
   getTransactions,
   getTrustlines,
   getBalances,
+  getBalanceSheet,
   getPaths,
   getOrders,
   getOrderbook,
