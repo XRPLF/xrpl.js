@@ -117,12 +117,12 @@
       "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.2.tgz"
     },
     "ripple-address-codec": {
-      "version": "1.6.0",
-      "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-1.6.0.tgz",
+      "version": "2.0.1",
+      "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz",
       "dependencies": {
         "x-address-codec": {
-          "version": "0.6.0",
-          "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.6.0.tgz",
+          "version": "0.7.0",
+          "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.7.0.tgz",
           "dependencies": {
             "base-x": {
               "version": "1.0.1",
@@ -147,6 +147,22 @@
             "inherits": {
               "version": "2.0.1",
               "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+            }
+          }
+        },
+        "ripple-address-codec": {
+          "version": "1.6.0",
+          "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-1.6.0.tgz",
+          "dependencies": {
+            "x-address-codec": {
+              "version": "0.6.0",
+              "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.6.0.tgz",
+              "dependencies": {
+                "base-x": {
+                  "version": "1.0.1",
+                  "resolved": "https://registry.npmjs.org/base-x/-/base-x-1.0.1.tgz"
+                }
+              }
             }
           }
         }

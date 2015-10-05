@@ -14,6 +14,7 @@ const SerializedObject = require('./serializedobject').SerializedObject;
 const RippleError = require('./rippleerror').RippleError;
 const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('transaction');
+const {isValidAddress} = require('ripple-address-codec');
 
 /**
  * @constructor Transaction
@@ -580,7 +581,7 @@ Transaction.prototype.setLastLedgerSequence = function(sequence) {
     assert(this.remote, 'Unable to set LastLedgerSequence, missing Remote');
 
     this._setUInt32('LastLedgerSequence',
-                    this.remote.getLedgerSequence() + 1
+                    this.remote.getLedgerSequenceSync() + 1
                     + this.getLastLedgerSequenceOffset());
   }
 
@@ -722,7 +723,7 @@ Transaction.prototype._setAmount = function(name, amount, options_) {
   if (!(isNative || parsedAmount.currency().is_valid())) {
     throw new Error(name + ' must have a valid currency');
   }
-  if (!(isNative || parsedAmount.issuer().is_valid())) {
+  if (!(isNative || isValidAddress(parsedAmount.issuer()))) {
     throw new Error(name + ' must have a valid issuer');
   }
 

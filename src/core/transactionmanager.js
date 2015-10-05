@@ -21,7 +21,7 @@ function TransactionManager(account) {
   const self = this;
 
   this._account = account;
-  this._accountID = account._account_id;
+  this._accountID = account._address;
   this._remote = account._remote;
   this._nextSequence = undefined;
   this._maxFee = this._remote.max_fee;
@@ -681,7 +681,7 @@ TransactionManager.prototype._request = function(tx) {
     }
   }
 
-  tx.submitIndex = this._remote.getLedgerSequence() + 1;
+  tx.submitIndex = this._remote.getLedgerSequenceSync() + 1;
 
   if (tx.attempts === 0) {
     tx.initialSubmitIndex = tx.submitIndex;
@@ -698,7 +698,8 @@ TransactionManager.prototype._request = function(tx) {
 
   tx.emit('postsubmit');
 
-  submitRequest.timeout(self._submissionTimeout, requestTimeout);
+  submitRequest.setTimeout(self._submissionTimeout);
+  submitRequest.once('timeout', requestTimeout);
 };
 
 /**

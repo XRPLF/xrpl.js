@@ -103,17 +103,32 @@ function hasCompleteLedgerRange(remote: Remote, minLedgerVersion?: number,
   const firstLedgerVersion = 32570; // earlier versions have been lost
   return remote.getServer().hasLedgerRange(
     minLedgerVersion || firstLedgerVersion,
-    maxLedgerVersion || remote.getLedgerSequence());
+    maxLedgerVersion || remote.getLedgerSequenceSync());
 }
 
 function isPendingLedgerVersion(remote: Remote, maxLedgerVersion: ?number
 ): boolean {
-  const currentLedger = remote.getLedgerSequence();
+  const currentLedger = remote.getLedgerSequenceSync();
   return currentLedger < (maxLedgerVersion || 0);
+}
+
+function getLedgerOptionsWithLedgerVersion(account: string, options: Object,
+  callback: (err?: ?Error, account?: string, options: Object) => void
+) {
+  if (Boolean(options) && options.ledgerVersion !== undefined &&
+    options.ledgerVersion !== null
+  ) {
+    callback(null, account, options);
+  } else {
+    this.getLedgerVersion().then((version) => {
+      callback(null, account, _.assign({}, options, {ledgerVersion: version}));
+    }, callback);
+  }
 }
 
 module.exports = {
   getXRPBalance,
+  getLedgerOptionsWithLedgerVersion,
   compareTransactions,
   renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder,

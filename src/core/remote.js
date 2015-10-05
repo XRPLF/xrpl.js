@@ -36,6 +36,8 @@ const utils = require('./utils');
 const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('remote');
 
+export type GetLedgerSequenceCallback = (err?: ?Error, index?: number) => void;
+
 /**
  * Interface to manage connections to rippled servers
  *
@@ -518,7 +520,34 @@ Remote.prototype._handleMessage = function(message, server) {
   }
 };
 
-Remote.prototype.getLedgerSequence = function() {
+/**
+ *
+ * @param {Function} [callback]
+ * @api public
+ */
+
+Remote.prototype.getLedgerSequence = function(callback = function() {}) {
+  if (!this._servers.length) {
+    callback(new Error('No servers available.'));
+    return;
+  }
+
+  if (_.isFinite(this._ledger_current_index)) {
+    // the "current" ledger is the one after the most recently closed ledger
+    callback(null, this._ledger_current_index - 1);
+  } else {
+    this.once('ledger_closed', () => {
+      callback(null, this._ledger_current_index - 1);
+    });
+  }
+};
+
+/**
+ *
+ * @api private
+ */
+
+Remote.prototype.getLedgerSequenceSync = function(): number {
   if (!this._ledger_current_index) {
     throw new Error('Ledger sequence has not yet been initialized');
   }
@@ -1795,7 +1824,7 @@ Remote.prototype.createPathFind = function(options, callback) {
 
   const pathFind = new PathFind(this,
     options.src_account, options.dst_account,
-    options.dst_amount, options.src_currencies);
+    options.dst_amount, options.src_currencies, options.src_amount);
 
   if (this._cur_path_find) {
     this._cur_path_find.notify_superceded();
@@ -1803,9 +1832,20 @@ Remote.prototype.createPathFind = function(options, callback) {
 
   if (callback) {
     pathFind.on('update', (data) => {
-      if (data.full_reply) {
-        pathFind.close();
+      if (data.full_reply && !data.closed) {
+        this._cur_path_find = null;
         callback(null, data);
+        // "A client can only have one pathfinding request open at a time.
+        // If another pathfinding request is already open on the same
+        // connection, the old request is automatically closed and replaced
+        // with the new request."
+        // - ripple.com/build/rippled-apis/#path-find-create
+        if (this._queued_path_finds.length > 0) {
+          const pathfind = this._queued_path_finds.shift();
+          this.createPathFind(pathfind.options, pathfind.callback);
+        } else {
+          pathFind.close();
+        }
       }
     });
     pathFind.on('error', callback);
@@ -2132,6 +2172,10 @@ Remote.prototype.requestPathFindCreate = function(options, callback) {
       options.source_currencies.map(Remote.prepareCurrency);
   }
 
+  if (options.send_max) {
+    request.message.send_max = Amount.json_rewrite(options.send_max);
+  }
+
   request.callback(callback);
   return request;
 };
@@ -2145,19 +2189,8 @@ Remote.prototype.requestPathFindCreate = function(options, callback) {
 
 Remote.prototype.requestPathFindClose = function(callback) {
   const request = new Request(this, 'path_find');
-
   request.message.subcommand = 'close';
-  request.callback((error, data) => {
-    this._cur_path_find = null;
-    if (this._queued_path_finds.length > 0) {
-      const pathfind = this._queued_path_finds.shift();
-      this.createPathFind(pathfind.options, pathfind.callback);
-    }
-    if (callback) {
-      callback(error, data);
-    }
-  });
-
+  request.callback(callback);
   return request;
 };
 
@@ -2247,6 +2280,29 @@ Remote.prototype.requestConnect = function(ip, port, callback) {
   return request;
 };
 
+Remote.prototype.requestGatewayBalances = function(options, callback) {
+  assert(_.isObject(options), 'Options missing');
+  assert(options.account, 'Account missing');
+
+  const request = new Request(this, 'gateway_balances');
+
+  request.message.account = UInt160.json_rewrite(options.account);
+
+  if (!_.isUndefined(options.hotwallet)) {
+    request.message.hotwallet = options.hotwallet;
+  }
+  if (!_.isUndefined(options.strict)) {
+    request.message.strict = options.strict;
+  }
+  if (!_.isUndefined(options.ledger)) {
+    request.selectLedger(options.ledger);
+  }
+
+  request.callback(callback);
+
+  return request;
+};
+
 /**
  * Create a Transaction
  *
@@ -2305,6 +2361,32 @@ Remote.prototype.feeTx = function(units) {
   }
 
   return server._feeTx(units);
+};
+
+/**
+ * Same as feeTx, but will wait to connect to server if currently
+ * disconnected.
+ *
+ * @param {Number} fee units
+ * @param {Function} callback
+ */
+
+Remote.prototype.feeTxAsync = function(units, callback) {
+  if (!this._servers.length) {
+    callback(new Error('No servers available.'));
+    return;
+  }
+
+  let server = this.getServer();
+
+  if (!server) {
+    this.once('connected', () => {
+      server = this.getServer();
+      callback(null, server._feeTx(units));
+    });
+  } else {
+    callback(null, server._feeTx(units));
+  }
 };
 
 /**

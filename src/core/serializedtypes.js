@@ -100,7 +100,8 @@ SerializedType.serialize_varint = function(so, val) {
 
 SerializedType.prototype.parse_varint = function(so) {
   const b1 = so.read(1)[0];
-  let b2, b3;
+  let b2;
+  let b3;
   let result;
 
   if (b1 > 254) {
@@ -416,7 +417,8 @@ exports.Quality = new SerializedType({
       value = new BigNumber(val);
     }
 
-    let hi = 0, lo = 0;
+    let hi = 0;
+    let lo = 0;
 
     const offset = value.e - 15;
     if (val !== 0) {
@@ -483,7 +485,8 @@ const STAmount = exports.Amount = new SerializedType({
         valueBytes[0] |= 0x40;
       }
     } else {
-      let hi = 0, lo = 0;
+      let hi = 0;
+      let lo = 0;
 
       // First bit: non-native
       hi |= 1 << 31;
@@ -518,7 +521,7 @@ const STAmount = exports.Amount = new SerializedType({
       STCurrency.serialize(so, currency, true);
 
       // Issuer (160-bit hash)
-      so.append(amount.issuer().to_bytes());
+      so.append(UInt160.from_json(amount.issuer()).to_bytes());
     }
   },
   parse: function(so) {
@@ -834,7 +837,7 @@ exports.STMemo = new SerializedType({
           output.parsed_memo_data = convertHexToString(output.MemoData);
         }
         /* eslint-disable no-empty */
-      } catch(e) {
+      } catch (e) {
         // empty
         // we'll fail in case the content does not match what the MemoFormat
         // described

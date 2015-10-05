@@ -266,12 +266,25 @@ module.exports = function(port) {
         destination_amount: request.destination_amount,
         destination_address: request.destination_address
       });
+    } else if (request.source_account === addresses.ACCOUNT) {
+      if (request.destination_account ===
+          'ra5nK24KXen9AHvsdFTKHSANinZseWnPcX') {
+        response = createResponse(request, fixtures.path_find.sendAll);
+      } else {
+        response = fixtures.path_find.generate.generateIOUPaymentPaths(
+          request.id, request.source_account, request.destination_account,
+          request.destination_amount);
+      }
     } else {
-      response = fixtures.path_find.generate.generateIOUPaymentPaths(
-        request.id, request.source_account, request.destination_account,
-        request.destination_amount);
+      assert(false, 'Unrecognized path find request: '
+             + JSON.stringify(request));
     }
-    conn.send(response);
+    // delay response to simulate calculation time so we can test queuing
+    setTimeout(() => conn.send(response), 20);
+  });
+
+  mock.on('request_gateway_balances', function(request, conn) {
+    conn.send(createResponse(request, fixtures.gateway_balances));
   });
 
   return mock;

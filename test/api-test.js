@@ -29,7 +29,6 @@ const orderbook = {
 };
 
 function checkResult(expected, schemaName, response) {
-  // console.log(JSON.stringify(response, null, 2));
   assert.deepEqual(response, expected);
   if (schemaName) {
     schemaValidator.schemaValidate(schemaName, response);
@@ -48,25 +47,33 @@ describe('RippleAPI', function() {
     }, instructions);
     return this.api.preparePayment(
       address, requests.preparePayment, localInstructions).then(
-      _.partial(checkResult, responses.preparePayment, 'prepare'));
+      _.partial(checkResult, responses.preparePayment.normal, 'prepare'));
   });
 
   it('preparePayment with all options specified', function() {
-    const localInstructions = {
-      maxLedgerVersion: this.api.getLedgerVersion() + 100,
-      fee: '0.000012'
-    };
-    return this.api.preparePayment(
-      address, requests.preparePaymentAllOptions, localInstructions).then(
-      _.partial(checkResult, responses.preparePaymentAllOptions, 'prepare'));
+    return this.api.getLedgerVersion().then((ver) => {
+      const localInstructions = {
+        maxLedgerVersion: ver + 100,
+        fee: '0.000012'
+      };
+      return this.api.preparePayment(
+        address, requests.preparePaymentAllOptions, localInstructions).then(
+        _.partial(checkResult, responses.preparePayment.allOptions, 'prepare'));
+    });
   });
 
   it('preparePayment without counterparty set', function() {
     const localInstructions = _.defaults({sequence: 23}, instructions);
     return this.api.preparePayment(
       address, requests.preparePaymentNoCounterparty, localInstructions).then(
-      _.partial(checkResult, responses.preparePaymentNoCounterparty,
+      _.partial(checkResult, responses.preparePayment.noCounterparty,
         'prepare'));
+  });
+
+  it('preparePayment - destination.minAmount', function() {
+    return this.api.preparePayment(address, responses.getPaths.sendAll[0],
+      instructions).then(_.partial(checkResult,
+        responses.preparePayment.minAmount, 'prepare'));
   });
 
   it('prepareOrder - buy order', function() {
@@ -192,6 +199,11 @@ describe('RippleAPI', function() {
   it('getBalances', function() {
     return this.api.getBalances(address).then(
       _.partial(checkResult, responses.getBalances, 'getBalances'));
+  });
+
+  it('getBalanceSheet', function() {
+    return this.api.getBalanceSheet(address).then(
+      _.partial(checkResult, responses.getBalanceSheet, 'getBalanceSheet'));
   });
 
   describe('getTransaction', () => {
@@ -570,6 +582,18 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getPaths.XrpToUsd, 'getPaths'));
   });
 
+  it('getPaths - queuing', function() {
+    return Promise.all([
+      this.api.getPaths(requests.getPaths.normal),
+      this.api.getPaths(requests.getPaths.UsdToUsd),
+      this.api.getPaths(requests.getPaths.XrpToXrp)
+    ]).then(results => {
+      checkResult(responses.getPaths.XrpToUsd, 'getPaths', results[0]);
+      checkResult(responses.getPaths.UsdToUsd, 'getPaths', results[1]);
+      checkResult(responses.getPaths.XrpToXrp, 'getPaths', results[2]);
+    });
+  });
+
   // @TODO
   // need decide what to do with currencies/XRP:
   // if add 'XRP' in currencies, then there will be exception in
@@ -625,8 +649,16 @@ describe('RippleAPI', function() {
     });
   });
 
-  it('getLedgerVersion', function() {
-    assert.strictEqual(this.api.getLedgerVersion(), 8819951);
+  it('getPaths - send all', function() {
+    return this.api.getPaths(requests.getPaths.sendAll).then(
+      _.partial(checkResult, responses.getPaths.sendAll, 'getPaths'));
+  });
+
+  it('getLedgerVersion', function(done) {
+    this.api.getLedgerVersion().then((ver) => {
+      assert.strictEqual(ver, 8819951);
+      done();
+    }, done);
   });
 
   it('getLedger', function() {

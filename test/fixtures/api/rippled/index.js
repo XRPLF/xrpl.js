@@ -16,12 +16,14 @@ module.exports = {
   },
   account_offers: require('./account-offers'),
   account_tx: require('./account-tx'),
+  gateway_balances: require('./gateway-balances'),
   book_offers: require('./book-offers'),
   server_info: require('./server-info'),
   server_info_error: require('./server-info-error'),
   path_find: {
     generate: require('./path-find'),
     sendUSD: require('./path-find-send-usd'),
+    sendAll: require('./path-find-send-all'),
     XrpToXrp: require('./path-find-xrp-to-xrp'),
     srcActNotFound: require('./path-find-srcActNotFound')
   },

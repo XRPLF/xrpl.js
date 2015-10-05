@@ -7,6 +7,7 @@
       "type": "object",
       "properties": {
         "address": {"$ref": "address"},
+        "amount": {"$ref": "laxAmount"},
         "currencies": {
           "type": "array",
           "items": {
@@ -19,12 +20,23 @@
             "additionalProperties": false
           },
           "uniqueItems": true
+        },
+        "not": {
+          "required": ["amount", "currencies"]
         }
       },
       "additionalProperties": false,
       "required": ["address"]
     },
-    "destination": {"$ref": "adjustment"}
+    "destination": {
+      "type": "object",
+      "properties": {
+        "address": {"$ref": "address"},
+        "amount": {"$ref": "laxLaxAmount"}
+      },
+      "required": ["address", "amount"],
+      "additionalProperties": false
+    }
   },
   "required": ["source", "destination"],
   "additionalProperties": false

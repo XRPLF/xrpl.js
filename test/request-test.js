@@ -40,13 +40,12 @@ const SERVER_INFO = {
 };
 
 describe('Request', function() {
-  it('Send request', function(done) {
+  it('Send request', function() {
     const remote = {
       request: function(req) {
         assert(req instanceof Request);
         assert.strictEqual(typeof req.message, 'object');
         assert.strictEqual(req.message.command, 'server_info');
-        done();
       },
       on: function() {
       },
@@ -60,7 +59,42 @@ describe('Request', function() {
     request.request();
 
     // Should only request once
-    request.request();
+    assert.throws(function() {
+      request.request();
+    }, Error);
+
+  });
+
+  it('Send request - reconnect', function(done) {
+    const server = makeServer('wss://localhost:5006');
+    let emitted = 0;
+
+    const remote = new Remote();
+    remote._connected = true;
+    remote._servers = [server];
+
+    server._request = function(req) {
+      assert(req instanceof Request);
+      assert.strictEqual(typeof req.message, 'object');
+      assert.strictEqual(req.message.command, 'server_info');
+      if (++emitted === 1) {
+        setTimeout(function() {
+          remote.emit('connected');
+        }, 2);
+      } if (emitted === 2) {
+        setTimeout(function() {
+          req.emit('success', SERVER_INFO);
+          req.emit('response', SERVER_INFO);
+        }, 2);
+      }
+    };
+
+    const request = new Request(remote, 'server_info');
+
+    request.callback(function() {
+      assert.strictEqual(emitted, 2);
+      done();
+    });
   });
 
   it('Send request -- filterRequest', function(done) {
@@ -536,6 +570,7 @@ describe('Request', function() {
       setTimeout(function() {
         successEmitted = true;
         req.emit('success', SERVER_INFO);
+        req.emit('response', SERVER_INFO);
       }, 200);
     };
 
@@ -544,8 +579,9 @@ describe('Request', function() {
     remote._servers = [server];
 
     const request = new Request(remote, 'server_info');
+    request.setTimeout(10);
 
-    request.timeout(10, function() {
+    request.on('timeout', function() {
       setTimeout(function() {
         assert(successEmitted);
         done();
@@ -566,7 +602,8 @@ describe('Request', function() {
       assert.strictEqual(req.message.command, 'server_info');
       setTimeout(function() {
         req.emit('success', SERVER_INFO);
-      }, 200);
+        req.emit('response', SERVER_INFO);
+      }, 20);
     };
 
     const remote = new Remote();
@@ -581,13 +618,15 @@ describe('Request', function() {
       timedOut = true;
     });
 
-    request.timeout(1000);
+    request.setTimeout(100);
 
     request.callback(function(err, res) {
-      assert(!timedOut);
-      assert.ifError(err);
-      assert.deepEqual(res, SERVER_INFO);
-      done();
+      setTimeout(function() {
+        assert(!timedOut, 'must not timeout');
+        assert.ifError(err);
+        assert.deepEqual(res, SERVER_INFO);
+        done();
+      }, 100);
     });
   });
 
@@ -1207,4 +1246,22 @@ describe('Request', function() {
       ]
     });
   });
+
+  it('Emit "before" only once', function(done) {
+    const remote = new Remote();
+    remote._connected = true;
+
+    const request = new Request(remote, 'server_info');
+
+    let beforeCalled = 0;
+
+    request.on('before', () => {
+      beforeCalled++;
+    });
+
+    request.request(function() {});
+    assert.strictEqual(beforeCalled, 1);
+    done();
+  });
+
 });

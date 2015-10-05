@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getBalanceSheet",
+  "description": "getBalanceSheet response",
+  "type": "object",
+  "properties": {
+    "balances": {
+      "type": "array",
+      "items": {"$ref": "amount"}
+    },
+    "assets": {
+      "type": "array",
+      "items": {"$ref": "amount"}
+    },
+    "obligations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["currency", "value"],
+        "additionalProperties": false,
+        "properties": {
+          "currency": {"$ref": "currency"},
+          "value": {"$ref": "value"}
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
