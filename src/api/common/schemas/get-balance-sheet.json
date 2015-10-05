@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "get-balance-sheet",
+  "title": "getBalanceSheet",
   "description": "getBalanceSheet response",
   "type": "object",
   "properties": {
@@ -8,17 +8,17 @@
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["counterparty", "balances"],
+        "additionalProperties": false,
         "properties": {
-          "required": ["counterparty", "balances"],
-          "additionalProperties": false,
           "counterparty": {"$ref": "address"},
           "balances": {
             "type": "array",
             "items": {
               "type": "object",
+              "required": ["currency", "value"],
+              "additionalProperties": false,
               "properties": {
-                "required": ["currency", "value"],
-                "additionalProperties": false,
                 "currency": {"$ref": "currency"},
                 "value": {"$ref": "value"}
               }
@@ -31,17 +31,17 @@
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["counterparty", "assets"],
+        "additionalProperties": false,
         "properties": {
-          "required": ["counterparty", "assets"],
-          "additionalProperties": false,
           "counterparty": {"$ref": "address"},
           "assets": {
             "type": "array",
             "items": {
               "type": "object",
+              "required": ["currency", "value"],
+              "additionalProperties": false,
               "properties": {
-                "required": ["currency", "value"],
-                "additionalProperties": false,
                 "currency": {"$ref": "currency"},
                 "value": {"$ref": "value"}
               }
@@ -54,9 +54,9 @@
       "type": "array",
       "items": {
         "type": "object",
+        "required": ["currency", "value"],
+        "additionalProperties": false,
         "properties": {
-          "required": ["currency", "value"],
-          "additionalProperties": false,
           "currency": {"$ref": "currency"},
           "value": {"$ref": "value"}
         }

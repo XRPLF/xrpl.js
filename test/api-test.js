@@ -203,7 +203,7 @@ describe('RippleAPI', function() {
 
   it('getBalanceSheet', function() {
     return this.api.getBalanceSheet(address).then(
-      _.partial(checkResult, responses.getBalanceSheet, undefined));
+      _.partial(checkResult, responses.getBalanceSheet, 'getBalanceSheet'));
   });
 
   describe('getTransaction', () => {

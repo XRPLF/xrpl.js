@@ -10,25 +10,16 @@ function formatBalanceSheet({balances, obligations, assets}) {
   const result = {};
 
   if (!_.isUndefined(balances)) {
-    result.balances = Object.keys(balances).map((k) => {
-      return {
-        counterparty: k,
-        balances: balances[k]
-      };
-    });
+    result.balances = _.map(balances, (balances, counterparty) =>
+                            ({counterparty, balances}));
   }
   if (!_.isUndefined(assets)) {
-    result.assets = Object.keys(assets).map((k) => {
-      return {
-        counterparty: k,
-        assets: assets[k]
-      };
-    });
+    result.assets = _.map(assets, (assets, counterparty) =>
+                          ({counterparty, assets}));
   }
   if (!_.isUndefined(obligations)) {
-    result.obligations = Object.keys(obligations).map((k) => {
-      return {currency: k, value: obligations[k]};
-    });
+    result.obligations = _.map(obligations, (value, currency) =>
+                               ({currency, value}));
   }
 
   return result;
