@@ -6,29 +6,11 @@
   "properties": {
     "balances": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["counterparty", "currency", "value"],
-        "additionalProperties": false,
-        "properties": {
-          "counterparty": {"$ref": "address"},
-          "currency": {"$ref": "currency"},
-          "value": {"$ref": "value"}
-        }
-      }
+      "items": {"$ref": "amount"}
     },
     "assets": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["counterparty", "currency", "value"],
-        "additionalProperties": false,
-        "properties": {
-          "counterparty": {"$ref": "address"},
-          "currency": {"$ref": "currency"},
-          "value": {"$ref": "value"}
-        }
-      }
+      "items": {"$ref": "amount"}
     },
     "obligations": {
       "type": "array",
