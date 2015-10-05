@@ -26,7 +26,7 @@ gulp bower
 exit_on_error
 
 cd dist/bower
-version=$(cat bower.json | grep -Eo '([0-9]\.?)+(-rc[0-9])?')
+version=$(cat bower.json | grep -Eo '([0-9]\.?)+(-rc([0-9])+)?')
 echo "version: $version"
 git add ripple.js ripple-debug.js ripple-min.js bower.json
 exit_on_error
@@ -40,4 +40,4 @@ exit_on_error
 git push origin master
 git push --tags origin master
 
-cd ..
+cd ../..
