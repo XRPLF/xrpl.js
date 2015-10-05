@@ -284,7 +284,7 @@ module.exports = function(port) {
   });
 
   mock.on('request_gateway_balances', function(request, conn) {
-    conn.send(createResponse(request, fixtures.balance_sheet));
+    conn.send(createResponse(request, fixtures.gateway_balances));
   });
 
   return mock;

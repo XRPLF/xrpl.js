@@ -16,7 +16,7 @@ module.exports = {
   },
   account_offers: require('./account-offers'),
   account_tx: require('./account-tx'),
-  balance_sheet: require('./balance-sheet'),
+  gateway_balances: require('./gateway-balances'),
   book_offers: require('./book-offers'),
   server_info: require('./server-info'),
   server_info_error: require('./server-info-error'),
