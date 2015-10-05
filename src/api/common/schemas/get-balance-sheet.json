@@ -8,22 +8,12 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["counterparty", "balances"],
+        "required": ["counterparty", "currency", "value"],
         "additionalProperties": false,
         "properties": {
           "counterparty": {"$ref": "address"},
-          "balances": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["currency", "value"],
-              "additionalProperties": false,
-              "properties": {
-                "currency": {"$ref": "currency"},
-                "value": {"$ref": "value"}
-              }
-            }
-          }
+          "currency": {"$ref": "currency"},
+          "value": {"$ref": "value"}
         }
       }
     },
@@ -31,22 +21,12 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["counterparty", "assets"],
+        "required": ["counterparty", "currency", "value"],
         "additionalProperties": false,
         "properties": {
           "counterparty": {"$ref": "address"},
-          "assets": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["currency", "value"],
-              "additionalProperties": false,
-              "properties": {
-                "currency": {"$ref": "currency"},
-                "value": {"$ref": "value"}
-              }
-            }
-          }
+          "currency": {"$ref": "currency"},
+          "value": {"$ref": "value"}
         }
       }
     },

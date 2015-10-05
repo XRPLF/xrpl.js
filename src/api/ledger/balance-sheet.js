@@ -10,12 +10,20 @@ function formatBalanceSheet(balanceSheet) {
   const result = {};
 
   if (!_.isUndefined(balanceSheet.balances)) {
-    result.balances = _.map(balanceSheet.balances, (balances, counterparty) =>
-                            ({counterparty, balances}));
+    result.balances = [];
+    _.forEach(balanceSheet.balances, (balances, counterparty) => {
+      _.forEach(balances, (balance) => {
+        result.balances.push(Object.assign({counterparty}, balance));
+      });
+    });
   }
   if (!_.isUndefined(balanceSheet.assets)) {
-    result.assets = _.map(balanceSheet.assets, (assets, counterparty) =>
-                          ({counterparty, assets}));
+    result.assets = [];
+    _.forEach(balanceSheet.assets, (assets, counterparty) => {
+      _.forEach(assets, (balance) => {
+        result.assets.push(Object.assign({counterparty}, balance));
+      });
+    });
   }
   if (!_.isUndefined(balanceSheet.obligations)) {
     result.obligations = _.map(balanceSheet.obligations, (value, currency) =>
