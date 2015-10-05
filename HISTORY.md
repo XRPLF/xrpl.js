@@ -1,11 +1,17 @@
 ##0.13.0 (release candidate)
 
-+ [Fix crash due to rippled slowDown error](https://github.com/ripple/ripple-lib/commit/84838b2e9f6969b593b8462a62a6b8f516ada937)
-+ [Fix: Emit error events and return error on pathfind](https://github.com/ripple/ripple-lib/commit/1ccbaf677631a1944eb05d90f7afc5f3690a03dd)
-+ [Deprecate core and remove snake case method copying](https://github.com/ripple/ripple-lib/commit/fb8dc44ec1d49bb05cd0cdbe6dd4ab211195868a)
+**Breaking Changes**
++ [Removed timeout method of Request and added default timeout](https://github.com/ripple/ripple-lib/commit/634fe5683a9082e57682ff7d5c4fb9483b4af818)
 + Add new RippleAPI interface
     - [RippleAPI README and samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
     - [Method documentation](https://rawgit.com/ripple/ripple-lib/develop/docs/api.html)
+
+**Changes**
++ [Implement Balance Sheet API](https://github.com/ripple/ripple-lib/pull/579)
++ [Fix crash due to rippled slowDown error](https://github.com/ripple/ripple-lib/commit/84838b2e9f6969b593b8462a62a6b8f516ada937)
++ [Fix: Emit error events and return error on pathfind](https://github.com/ripple/ripple-lib/commit/1ccbaf677631a1944eb05d90f7afc5f3690a03dd)
++ [Deprecate core and remove snake case method copying](https://github.com/ripple/ripple-lib/commit/fb8dc44ec1d49bb05cd0cdbe6dd4ab211195868a)
+
 + [Fix RangeSet for validated_ledger as single ledger](https://github.com/ripple/ripple-lib/commit/9f9e76f8b933201651af59307135f67cfa7d60e8)
 + [Fix bug where the paths would be set with an empty array](https://github.com/ripple/ripple-lib/commit/83874ec0962da311b76f2385623e51c68bc39035)
 + [Fix reserve calculation](https://github.com/ripple/ripple-lib/commit/52879febb92d876f01f2e4d70871baa07af631fb)
