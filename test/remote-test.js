@@ -4,15 +4,14 @@
 
 const assert = require('assert-diff');
 const lodash = require('lodash');
-const ripple = require('ripple-lib');
 const Remote = require('ripple-lib').Remote;
 const Server = require('ripple-lib').Server;
 const Transaction = require('ripple-lib').Transaction;
-const UInt160 = require('ripple-lib').UInt160;
 const Currency = require('ripple-lib').Currency;
 const Amount = require('ripple-lib').Amount;
 const PathFind = require('ripple-lib')._test.PathFind;
 const Log = require('ripple-lib')._test.Log;
+const ACCOUNT_ONE = require('ripple-lib')._test.constants.ACCOUNT_ONE;
 
 let options;
 let remote;
@@ -30,7 +29,7 @@ const TX_JSON = {
   Flags: 0,
   TransactionType: 'Payment',
   Account: ADDRESS,
-  Destination: ripple.UInt160.ACCOUNT_ONE,
+  Destination: ACCOUNT_ONE,
   Amount: {
     value: '1',
     currency: 'USD',
@@ -1492,7 +1491,7 @@ describe('Remote', function() {
 
    it('Construct account_tx request', function() {
      let request = remote.requestAccountTransactions({
-       account: UInt160.ACCOUNT_ONE,
+       account: ACCOUNT_ONE,
        ledger_index_min: -1,
        ledger_index_max: -1,
        limit: 5,
@@ -1503,7 +1502,7 @@ describe('Remote', function() {
      assert.deepEqual(request.message, {
        command: 'account_tx',
        id: undefined,
-       account: UInt160.ACCOUNT_ONE,
+       account: ACCOUNT_ONE,
        ledger_index_min: -1,
        ledger_index_max: -1,
        binary: true,
@@ -1513,14 +1512,14 @@ describe('Remote', function() {
      });
 
      request = remote.requestAccountTransactions({
-       account: UInt160.ACCOUNT_ONE,
+       account: ACCOUNT_ONE,
        min_ledger: -1,
        max_ledger: -1
      });
      assert.deepEqual(request.message, {
        command: 'account_tx',
        id: undefined,
-       account: UInt160.ACCOUNT_ONE,
+       account: ACCOUNT_ONE,
        binary: true,
        ledger_index_min: -1,
        ledger_index_max: -1
@@ -1528,7 +1527,7 @@ describe('Remote', function() {
    });
    it('Construct account_tx request -- no binary', function() {
      const request = remote.requestAccountTransactions({
-       account: UInt160.ACCOUNT_ONE,
+       account: ACCOUNT_ONE,
        ledger_index_min: -1,
        ledger_index_max: -1,
        limit: 5,
@@ -1540,7 +1539,7 @@ describe('Remote', function() {
      assert.deepEqual(request.message, {
        command: 'account_tx',
        id: undefined,
-       account: UInt160.ACCOUNT_ONE,
+       account: ACCOUNT_ONE,
        ledger_index_min: -1,
        ledger_index_max: -1,
        binary: false,
@@ -1618,7 +1617,7 @@ describe('Remote', function() {
       taker_pays: {
         currency: Currency.from_human('XRP').to_hex()
       },
-      taker: UInt160.ACCOUNT_ONE
+      taker: ACCOUNT_ONE
     });
   });
 
@@ -1645,7 +1644,7 @@ describe('Remote', function() {
       taker_pays: {
         currency: Currency.from_human('XRP').to_hex()
       },
-      taker: UInt160.ACCOUNT_ONE,
+      taker: ACCOUNT_ONE,
       ledger_hash: LEDGER_HASH,
       limit: 10
     });

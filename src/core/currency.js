@@ -1,15 +1,14 @@
 'use strict';
-
-const extend = require('extend');
-const UInt160 = require('./uint160').UInt160;
+const assert = require('assert');
 const utils = require('./utils');
 const Float = require('./ieee754').Float;
+const BN = require('bn.js');
 
 //
 // Currency support
 //
 
-const Currency = extend(function() {
+function Currency() {
   // Internal form: 0 = XRP. 3 letter-code.
   // XXX Internal should be 0 or hex with three letter annotation when valid.
 
@@ -20,12 +19,12 @@ const Currency = extend(function() {
 
   this._value = NaN;
   this._update();
-}, UInt160);
+}
 
-Currency.prototype = Object.create(extend({}, UInt160.prototype));
-Currency.prototype.constructor = Currency;
-
+Currency.width = 20;
 Currency.HEX_CURRENCY_BAD = '0000000000000000000000005852500000000000';
+Currency.HEX_ZERO = '0000000000000000000000000000000000000000';
+Currency.HEX_ONE = '0000000000000000000000000000000000000001';
 
 /**
  * Tries to correctly interpret a Currency as entered by a user.
@@ -69,8 +68,52 @@ Currency.from_json = function(j, shouldInterpretXrpAsIou) {
   return (new Currency()).parse_json(j, shouldInterpretXrpAsIou);
 };
 
+Currency.from_hex = function(j) {
+  if (j instanceof this) {
+    return j.clone();
+  }
+
+  return (new this()).parse_hex(j);
+};
+
+Currency.from_bytes = function(j) {
+  if (j instanceof this) {
+    return j.clone();
+  }
+
+  return (new this()).parse_bytes(j);
+};
+
+Currency.prototype.to_hex = function() {
+  if (!this.is_valid()) {
+    return null;
+  }
+
+  return utils.arrayToHex(this.to_bytes());
+};
+
 Currency.from_human = function(j, opts) {
   return (new Currency().parse_human(j, opts));
+};
+
+Currency.json_rewrite = function(j, opts) {
+  return this.from_json(j).to_json(opts);
+};
+
+Currency.prototype.clone = function() {
+  return this.copyTo(new this.constructor());
+};
+
+Currency.prototype.equals = function(o) {
+  return this.is_valid() &&
+         o.is_valid() &&
+         // This throws but the expression will short circuit
+         this.cmp(o) === 0;
+};
+
+Currency.prototype.cmp = function(o) {
+  assert(this.is_valid() && o.is_valid());
+  return this._value.cmp(o._value);
 };
 
 // this._value = NaN on error.
@@ -197,6 +240,40 @@ Currency.prototype.parse_human = function(j) {
   return this.parse_json(j);
 };
 
+Currency.prototype.is_valid = function() {
+  return this._value instanceof BN;
+};
+
+Currency.prototype.parse_number = function(j) {
+  this._value = NaN;
+
+  if (typeof j === 'number' && isFinite(j) && j >= 0) {
+    this._value = new BN(j);
+  }
+
+  this._update();
+  return this;
+};
+
+Currency.prototype.parse_hex = function(j) {
+  if (new RegExp(`^[0-9A-Fa-f]{${this.constructor.width * 2}}$`).test(j)) {
+    this._value = new BN(j, 16);
+  } else {
+    this._value = NaN;
+  }
+
+  this._update();
+  return this;
+};
+
+Currency.prototype.to_bytes = function() {
+  if (!this.is_valid()) {
+    return null;
+  }
+
+  return this._value.toArray('be', this.constructor.width);
+};
+
 /**
  * Recalculate internal representation.
  *
@@ -276,6 +353,16 @@ Currency.prototype.copyTo = function(d) {
   return d;
 };
 
+Currency.prototype.parse_bytes = function(j) {
+  if (Array.isArray(j) && j.length === this.constructor.width) {
+    this._value = new BN(j);
+  } else {
+    this._value = NaN;
+  }
+
+  this._update();
+  return this;
+};
 
 // XXX Probably not needed anymore?
 /*
@@ -424,6 +511,10 @@ Currency.prototype.to_human = function(opts) {
 
 Currency.prototype.get_iso = function() {
   return this._iso_code;
+};
+
+Currency.is_valid = function(j) {
+  return this.from_json(j).is_valid();
 };
 
 exports.Currency = Currency;

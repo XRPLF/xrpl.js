@@ -1,7 +1,6 @@
 'use strict';
 const extend = require('extend');
 const utils = require('./utils');
-const UInt160 = require('./uint160').UInt160;
 const Amount = require('./amount').Amount;
 const ACCOUNT_ZERO = require('./constants').ACCOUNT_ZERO;
 const {isValidAddress} = require('ripple-address-codec');
@@ -151,7 +150,7 @@ Meta.prototype.getAffectedAccounts = function() {
     for (const fieldName in fields) {
       const field = fields[fieldName];
 
-      if (this.isAccountField(fieldName) && UInt160.is_valid(field)) {
+      if (this.isAccountField(fieldName) && isValidAddress(field)) {
         accounts.push(field);
       } else if (
           Meta.AMOUNT_FIELDS_AFFECTING_ISSUER.indexOf(fieldName) !== -1) {

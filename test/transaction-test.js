@@ -10,6 +10,7 @@ const Transaction = require('ripple-lib').Transaction;
 const TransactionQueue = require('ripple-lib').TransactionQueue;
 const Remote = require('ripple-lib').Remote;
 const Server = require('ripple-lib').Server;
+const {decodeAddress} = require('ripple-address-codec');
 
 const transactionResult = {
   engine_result: 'tesSUCCESS',
@@ -2257,7 +2258,7 @@ describe('Transaction', function() {
 
     const tbytes = ripple.SerializedObject.from_json(
       lodash.merge(transaction.tx_json, {SigningPubKey: ''})).buffer;
-    const abytes = ripple.UInt160.from_json(a1).to_bytes();
+    const abytes = decodeAddress(a1);
     const prefix = require('ripple-lib')._test.HashPrefixes.HASH_TX_MULTISIGN_BYTES;
 
     assert.deepEqual(d1.buffer, prefix.concat(tbytes, abytes));

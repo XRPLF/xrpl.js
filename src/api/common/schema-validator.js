@@ -4,20 +4,10 @@
 const _ = require('lodash');
 const assert = require('assert');
 const validator = require('is-my-json-valid');
-const core = require('./utils').core;
 const ValidationError = require('./errors').ValidationError;
+const {isValidAddress} = require('ripple-address-codec');
 
 let SCHEMAS = {};
-
-function isValidAddress(address: string): boolean {
-  return typeof address === 'string' && address.length > 0 &&
-    address[0] === 'r' &&
-    core.UInt160.is_valid(address);
-}
-
-function isValidLedgerHash(ledgerHash) {
-  return core.UInt256.is_valid(ledgerHash);
-}
 
 function loadSchemas() {
   // listed explicitly for webpack (instead of scanning schemas directory)
@@ -102,8 +92,7 @@ function formatSchemaErrors(errors) {
 }
 
 function schemaValidate(schemaName: string, object: any): void {
-  const formats = {address: isValidAddress,
-                   ledgerHash: isValidLedgerHash};
+  const formats = {address: isValidAddress};
   const options = {schemas: SCHEMAS, formats: formats,
                    verbose: true, greedy: true};
   const schema = SCHEMAS[schemaName];

@@ -2,8 +2,6 @@
 'use strict';
 const assert = require('assert');
 const Amount = require('ripple-lib').Amount;
-const UInt160 = require('ripple-lib').UInt160;
-
 
 describe('Amount', function() {
   describe('Negatives', function() {
@@ -290,26 +288,6 @@ describe('Amount', function() {
   describe('json_rewrite', function() {
     it('Number 1', function() {
       assert.strictEqual('1', Amount.json_rewrite(1));
-    });
-  });
-  describe('UInt160', function() {
-    it('Parse 0 export', function() {
-      assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_generic('0').set_version(0).to_json());
-    });
-    it('Parse 1', function() {
-      assert.deepEqual(UInt160.ACCOUNT_ONE, UInt160.from_generic('1').set_version(0).to_json());
-    });
-    it('Parse rrrrrrrrrrrrrrrrrrrrrhoLvTp export', function() {
-      assert.strictEqual(UInt160.ACCOUNT_ZERO, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrrhoLvTp').to_json());
-    });
-    it('Parse rrrrrrrrrrrrrrrrrrrrBZbvji export', function() {
-      assert.strictEqual(UInt160.ACCOUNT_ONE, UInt160.from_json('rrrrrrrrrrrrrrrrrrrrBZbvji').to_json());
-    });
-    it('is_valid rrrrrrrrrrrrrrrrrrrrrhoLvTp', function() {
-      assert(UInt160.is_valid('rrrrrrrrrrrrrrrrrrrrrhoLvTp'));
-    });
-    it('!is_valid rrrrrrrrrrrrrrrrrrrrrhoLvT', function() {
-      assert(!UInt160.is_valid('rrrrrrrrrrrrrrrrrrrrrhoLvT'));
     });
   });
   describe('Amount validity', function() {

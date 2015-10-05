@@ -3,5 +3,5 @@
   "title": "ledgerhash",
   "description": "A ledger hash",
   "type": "string",
-  "format": "ledgerHash"
+  "pattern": "^[A-F0-9]{64}$"
 }
