@@ -6,19 +6,19 @@ const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
 
-function formatBalanceSheet({balances, obligations, assets}) {
+function formatBalanceSheet(balanceSheet) {
   const result = {};
 
-  if (!_.isUndefined(balances)) {
-    result.balances = _.map(balances, (balances, counterparty) =>
+  if (!_.isUndefined(balanceSheet.balances)) {
+    result.balances = _.map(balanceSheet.balances, (balances, counterparty) =>
                             ({counterparty, balances}));
   }
-  if (!_.isUndefined(assets)) {
-    result.assets = _.map(assets, (assets, counterparty) =>
+  if (!_.isUndefined(balanceSheet.assets)) {
+    result.assets = _.map(balanceSheet.assets, (assets, counterparty) =>
                           ({counterparty, assets}));
   }
-  if (!_.isUndefined(obligations)) {
-    result.obligations = _.map(obligations, (value, currency) =>
+  if (!_.isUndefined(balanceSheet.obligations)) {
+    result.obligations = _.map(balanceSheet.obligations, (value, currency) =>
                                ({currency, value}));
   }
 
