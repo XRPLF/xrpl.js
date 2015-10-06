@@ -1927,6 +1927,30 @@ describe('Remote', function() {
     pathfind.on('update', message => console.log(message));
   });
 
+  it('createPathFind - throw error without callback if already running', function() {
+    const servers = [
+      makeServer('wss://localhost:5006'),
+      makeServer('wss://localhost:5007')
+    ];
+
+    remote._servers = servers;
+
+    const pathfindParam = {
+      src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
+      dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+      src_currencies: [{
+        currency: 'BTC', issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
+      }]
+    };
+    remote.createPathFind(pathfindParam);
+    remote.createPathFind(pathfindParam, () => {});
+    assert.throws(
+      function() {
+        remote.createPathFind(pathfindParam);
+      }, Error);
+  });
+
   it('Construct path_find create request', function() {
     const request = remote.requestPathFindCreate({
       source_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
