@@ -25,6 +25,7 @@ exports._test = {
   UInt128: require('./uint128').UInt128,
   UInt160: require('./uint160').UInt160,
   UInt256: require('./uint256').UInt256,
+  OrderbookUtils: require('./orderbookutils'),
   constants: require('./constants')
 };
 

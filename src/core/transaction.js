@@ -9,11 +9,11 @@ const utils = require('./utils');
 const sjclcodec = require('sjcl-codec');
 const Amount = require('./amount').Amount;
 const Currency = require('./currency').Currency;
-const SerializedObject = require('./serializedobject').SerializedObject;
 const RippleError = require('./rippleerror').RippleError;
 const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('transaction');
 const {isValidAddress, decodeAddress} = require('ripple-address-codec');
+const binary = require('ripple-binary-codec');
 
 /**
  * @constructor Transaction
@@ -451,7 +451,7 @@ Transaction.prototype.setCanonicalFlag = function() {
 };
 
 Transaction.prototype.serialize = function() {
-  return SerializedObject.from_json(this.tx_json);
+  return binary.encode(this.tx_json);
 };
 
 Transaction.prototype.signingHash = function(testnet) {
@@ -459,22 +459,16 @@ Transaction.prototype.signingHash = function(testnet) {
 };
 
 Transaction.prototype.signingData = function() {
-  const so = new SerializedObject();
-  so.append(hashprefixes.HASH_TX_SIGN_BYTES);
-  so.parse_json(this.tx_json);
-  return so;
+  return binary.encodeForSigning(this.tx_json);
 };
 
 Transaction.prototype.multiSigningData = function(account) {
-  const so = new SerializedObject();
-  so.append(hashprefixes.HASH_TX_MULTISIGN_BYTES);
-  so.parse_json(this.tx_json);
-  so.append(decodeAddress(account));
-  return so;
+  return binary.encodeForMultisigning(this.tx_json, account);
 };
 
-Transaction.prototype.hash = function(prefix_, asUINT256, serialized) {
+Transaction.prototype.hash = function(prefix_, serialized_) {
   let prefix;
+  assert(serialized_ === undefined || _.isString(serialized_));
 
   if (typeof prefix_ !== 'string') {
     prefix = hashprefixes.HASH_TX_ID;
@@ -484,9 +478,9 @@ Transaction.prototype.hash = function(prefix_, asUINT256, serialized) {
     prefix = hashprefixes[prefix_];
   }
 
-  const hash = (serialized || this.serialize()).hash(prefix);
-
-  return asUINT256 ? hash : hash.to_hex();
+  const hexPrefix = prefix.toString(16).toUpperCase();
+  const serialized = serialized_ || this.serialize();
+  return utils.sha512half(new Buffer(hexPrefix + serialized, 'hex'));
 };
 
 Transaction.prototype.sign = function(secret) {
@@ -505,7 +499,7 @@ Transaction.prototype.sign = function(secret) {
   }
 
   const keypair = deriveKeypair(secret || this._secret);
-  this.tx_json.TxnSignature = sign(this.signingData().buffer,
+  this.tx_json.TxnSignature = sign(new Buffer(this.signingData(), 'hex'),
     keypair.privateKey);
   this.previousSigningHash = hash;
 
@@ -1654,7 +1648,7 @@ Transaction.prototype.multiSign = function(account, secret) {
 
   const signer = {
     Account: account,
-    TxnSignature: sign(signingData.buffer, keypair.privateKey),
+    TxnSignature: sign(new Buffer(signingData, 'hex'), keypair.privateKey),
     SigningPubKey: keypair.publicKey
   };
 
