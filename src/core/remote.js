@@ -2278,7 +2278,7 @@ Remote.prototype.requestGatewayBalances = function(options, callback) {
 
   const request = new Request(this, 'gateway_balances');
 
-  request.message.account = UInt160.json_rewrite(options.account);
+  request.message.account = options.account;
 
   if (!_.isUndefined(options.hotwallet)) {
     request.message.hotwallet = options.hotwallet;
