@@ -22,6 +22,7 @@ const Currency = require('./currency').Currency;
 const AutobridgeCalculator = require('./autobridgecalculator');
 const OrderBookUtils = require('./orderbookutils');
 const log = require('./log').internal.sub('orderbook');
+const RippleError = require('./rippleerror').RippleError;
 
 /**
  * @constructor OrderBook
@@ -326,15 +327,16 @@ OrderBook.prototype.requestOffers = function(callback = function() {},
   internal = false) {
   const self = this;
 
-  if (!this._remote.isConnected()) {
+  if (!this._remote.isConnected() && !internal) {
     // do not make request if not online.
     // that requests will be queued and
     // eventually all of them will fire back
+    callback(new RippleError('remote is offline'));
     return undefined;
   }
 
   if (!this._shouldSubscribe) {
-    callback(new Error('Should not request offers'));
+    callback(new RippleError('Should not request offers'));
     return undefined;
   }
 
@@ -362,7 +364,7 @@ OrderBook.prototype.requestOffers = function(callback = function() {},
 
     if (!Array.isArray(res.offers)) {
       // XXX What now?
-      callback(new Error('Invalid response'));
+      callback(new RippleError('Invalid response'));
       self.emit('model', []);
       return;
     }
@@ -1351,7 +1353,7 @@ OrderBook.prototype.computeAutobridgedOffers = function(callback = function() {}
   assert(!this._currencyGets.is_native() && !this._currencyPays.is_native(),
     'Autobridging is only for IOU:IOU orderbooks');
 
-  
+
   if (this._destroyed) {
     return;
   }
