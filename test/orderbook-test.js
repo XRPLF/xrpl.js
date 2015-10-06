@@ -12,7 +12,6 @@ const fixtures = require('./fixtures/orderbook');
 const IOUValue = require('ripple-lib-value').IOUValue;
 
 describe('OrderBook', function() {
-  this.timeout(0);
 
   function createRemote() {
     const remote = new Remote();
@@ -68,40 +67,155 @@ describe('OrderBook', function() {
     assert(book.isValid());
   });
 
-  it('Automatic subscription (based on listeners)', function(done) {
-    const book = createRemote().createOrderBook({
-      currency_gets: 'XRP',
-      issuer_pays: addresses.ISSUER,
-      currency_pays: 'BTC'
-    });
-
-    book.subscribe = function() {
-      done();
-    };
-
-    book.on('model', function() {});
-  });
-
   it('Subscribe', function(done) {
-    const book = createRemote().createOrderBook({
-      currency_gets: 'XRP',
-      issuer_pays: addresses.ISSUER,
-      currency_pays: 'BTC'
+    const remote = createRemote();
+    const book = remote.createOrderBook({
+      currency_pays: 'XRP',
+      issuer_gets: addresses.ISSUER,
+      currency_gets: 'BTC'
     });
 
-    let requestedOffers = false;
+    remote.request = function(request) {
+      const response = {};
 
-    book.subscribeTransactions = function() {
-      assert(requestedOffers);
-      done();
-    };
+      if (request.message.command === 'account_info') {
+        response.account_data = {
+          TransferRate: 1002000000
+        };
 
-    book.requestOffers = function(callback) {
-      requestedOffers = true;
-      callback();
+      } else if (request.message.command === 'book_offers') {
+        response.offers = [];
+      }
+
+      request.emit('success', response);
     };
 
     book.subscribe();
+    assert.strictEqual(book._subscribed, true);
+    done();
+  });
+
+  it('Subscribe - gets XRP', function(done) {
+    const remote = createRemote();
+    const book = remote.createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: addresses.ISSUER,
+      currency_pays: 'BTC'
+    });
+
+    remote.isConnected = function() {
+      return false;
+    };
+
+    remote.request = function(request) {
+      const response = {};
+      if (request.message.command === 'book_offers') {
+        response.offers = [];
+      }
+
+      request.emit('success', response);
+    };
+
+    book.subscribe();
+    assert.strictEqual(book._subscribed, true, '_subscribed');
+    done();
+  });
+
+  it('Subscribe - autobridged', function(done) {
+
+    const remote = createRemote();
+    const book = remote.createOrderBook({
+      currency_pays: 'USD',
+      issuer_pays: addresses.ISSUER,
+      currency_gets: 'BTC',
+      issuer_gets: addresses.ISSUER
+    });
+
+    remote.request = function(request) {
+      const response = {};
+
+      if (request.message.command === 'account_info') {
+        response.account_data = {
+          TransferRate: 1002000000
+        };
+
+      } else if (request.message.command === 'book_offers') {
+        response.offers = [];
+      }
+
+      request.emit('success', response);
+    };
+
+    book.subscribe();
+    assert.strictEqual(book._subscribed, true, '_subscribed');
+    done();
+  });
+
+  it('Automatic subscription (based on listeners)', function(done) {
+    this.timeout(100);
+
+    const remote = createRemote();
+    const book = remote.createOrderBook({
+      currency_gets: 'XRP',
+      issuer_pays: addresses.ISSUER,
+      currency_pays: 'BTC'
+    });
+
+    remote.request = function(request) {
+      const response = {};
+
+      if (request.message.command === 'account_info') {
+        response.account_data = {
+          TransferRate: 1002000000
+        };
+
+      } else if (request.message.command === 'book_offers') {
+        response.offers = [];
+      }
+
+      setImmediate(function() {
+        request.emit('success', response);
+      });
+    };
+
+    book.on('model', function(offers) {
+      assert.strictEqual(offers.length, 0);
+      done();
+    });
+  });
+
+  it('Automatic subscription (based on listeners) - autobridged', function(done) {
+    this.timeout(100);
+
+    const remote = createRemote();
+    const book = remote.createOrderBook({
+      currency_pays: 'USD',
+      issuer_pays: addresses.ISSUER,
+      currency_gets: 'BTC',
+      issuer_gets: addresses.ISSUER
+    });
+
+    remote.request = function(request) {
+      const response = {};
+
+      if (request.message.command === 'account_info') {
+        response.account_data = {
+          TransferRate: 1002000000
+        };
+
+      } else if (request.message.command === 'book_offers') {
+        response.offers = [];
+      }
+
+      setImmediate(function() {
+        request.emit('success', response);
+      });
+    };
+
+    book.on('model', function(offers) {
+      assert.strictEqual(offers.length, 0);
+      done();
+    });
   });
 
   it('Unsubscribe', function(done) {

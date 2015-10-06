@@ -23,6 +23,7 @@ const AutobridgeCalculator = require('./autobridgecalculator');
 const OrderBookUtils = require('./orderbookutils');
 const log = require('./log').internal.sub('orderbook');
 const {IOUValue} = require('ripple-lib-value');
+const RippleError = require('./rippleerror').RippleError;
 
 function _sortOffers(a, b) {
   const aQuality = OrderBookUtils.getOfferQuality(a, this._currencyGets);
@@ -256,6 +257,9 @@ OrderBook.offerRewrite = function(offer) {
 /**
  * Initialize orderbook. Get orderbook offers and subscribe to transactions
  * @api private
+ * NOTE: this method is not meant to be publicly used
+ * and it does not work for autobridged books since
+ * it does not add listeners for them
  */
 
 OrderBook.prototype.subscribe = function() {
@@ -333,21 +337,23 @@ OrderBook.prototype.destroy = function() {
  * Request orderbook entries from server
  *
  * @param {Function} callback
+ * @param {boolean} internal - internal request made on 'subscribe'
  */
 
 OrderBook.prototype.requestOffers = function(callback = function() {},
   internal = false) {
   const self = this;
 
-  if (!this._remote.isConnected()) {
+  if (!this._remote.isConnected() && !internal) {
     // do not make request if not online.
     // that requests will be queued and
     // eventually all of them will fire back
+    callback(new RippleError('remote is offline'));
     return undefined;
   }
 
   if (!this._shouldSubscribe) {
-    callback(new Error('Should not request offers'));
+    callback(new RippleError('Should not request offers'));
     return undefined;
   }
 
@@ -355,7 +361,7 @@ OrderBook.prototype.requestOffers = function(callback = function() {},
     log.info('requesting offers', this._key);
   }
 
-  this._synchronized = false;
+  this._synced = false;
 
   if (this._isAutobridgeable && !internal) {
     this._gotOffersFromLegOne = false;
@@ -375,7 +381,7 @@ OrderBook.prototype.requestOffers = function(callback = function() {},
 
     if (!Array.isArray(res.offers)) {
       // XXX What now?
-      callback(new Error('Invalid response'));
+      callback(new RippleError('Invalid response'));
       self.emit('model', []);
       return;
     }
@@ -1390,7 +1396,7 @@ OrderBook.prototype.computeAutobridgedOffers = function(callback = function() {}
 
 OrderBook.prototype.computeAutobridgedOffersWrapper = function() {
   if (!this._gotOffersFromLegOne || !this._gotOffersFromLegTwo ||
-      !this._synchronized || this._destroyed || this._calculatorRunning
+      !this._synced || this._destroyed || this._calculatorRunning
   ) {
     return;
   }
