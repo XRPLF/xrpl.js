@@ -7,11 +7,20 @@ const getTrustlines = require('./trustlines');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
-import type {Remote} from '../../core/remote';
-import type {GetLedgerSequenceCallback} from '../../core/remote';
+import type {Remote, GetLedgerSequenceCallback} from '../../core/remote';
+
+import type {TrustlinesOptions, Trustline} from './trustlines-types.js';
 
 
-function getTrustlineBalanceAmount(trustline) {
+type Balance = {
+  value: string,
+  currency: string,
+  counterparty?: string
+}
+
+type GetBalances = Array<Balance>
+
+function getTrustlineBalanceAmount(trustline: Trustline) {
   return {
     currency: trustline.specification.currency,
     counterparty: trustline.specification.counterparty,
@@ -28,7 +37,9 @@ function formatBalances(balances) {
     balances.trustlines.map(getTrustlineBalanceAmount));
 }
 
-function getTrustlinesAsync(account, options, callback) {
+function getTrustlinesAsync(account: string, options: TrustlinesOptions,
+  callback
+) {
   getTrustlines.call(this, account, options)
     .then(data => callback(null, data))
     .catch(callback);
@@ -44,7 +55,9 @@ function getLedgerVersionHelper(remote: Remote, optionValue?: number,
   }
 }
 
-function getBalancesAsync(account, options, callback) {
+function getBalancesAsync(account: string, options: TrustlinesOptions,
+  callback
+) {
   validate.address(account);
   validate.getBalancesOptions(options);
 
@@ -57,7 +70,8 @@ function getBalancesAsync(account, options, callback) {
   }, composeAsync(formatBalances, convertErrors(callback)));
 }
 
-function getBalances(account: string, options = {}) {
+function getBalances(account: string, options: TrustlinesOptions = {}
+): Promise<GetBalances> {
   return utils.promisify(getBalancesAsync).call(this, account, options);
 }
 

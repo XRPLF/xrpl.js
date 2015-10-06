@@ -4,8 +4,21 @@ const _ = require('lodash');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const Transaction = utils.common.core.Transaction;
+import type {Instructions, Prepare} from './types.js';
+import type {Memo} from '../common/types.js';
 
-function createSuspendedPaymentExecutionTransaction(account, payment) {
+type SuspendedPaymentExecution = {
+  owner: string,
+  paymentSequence: number,
+  memos?: Array<Memo>,
+  method?: number,
+  digest?: string,
+  proof?: string
+}
+
+function createSuspendedPaymentExecutionTransaction(account: string,
+      payment: SuspendedPaymentExecution
+): Transaction {
   validate.address(account);
   validate.suspendedPaymentExecution(payment);
 
@@ -34,15 +47,17 @@ function createSuspendedPaymentExecutionTransaction(account, payment) {
   return transaction;
 }
 
-function prepareSuspendedPaymentExecutionAsync(account, payment, instructions,
-callback) {
+function prepareSuspendedPaymentExecutionAsync(account: string,
+    payment: SuspendedPaymentExecution, instructions: Instructions, callback
+) {
   const transaction =
     createSuspendedPaymentExecutionTransaction(account, payment);
   utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function prepareSuspendedPaymentExecution(account: string, payment: Object,
-instructions = {}) {
+function prepareSuspendedPaymentExecution(account: string,
+    payment: SuspendedPaymentExecution, instructions: Instructions = {}
+): Promise<Prepare> {
   return utils.promisify(prepareSuspendedPaymentExecutionAsync)
     .call(this, account, payment, instructions);
 }

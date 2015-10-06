@@ -5,8 +5,17 @@ const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
 const parseLedger = require('./parse/ledger');
+import type {GetLedger} from './types.js';
 
-function getLedgerAsync(options, callback) {
+type LedgerOptions = {
+  ledgerVersion?: number,
+  includeAllData?: boolean,
+  includeTransactions?: boolean,
+  includeState?: boolean
+}
+
+
+function getLedgerAsync(options: LedgerOptions, callback) {
   validate.getLedgerOptions(options);
 
   const request = {
@@ -21,7 +30,7 @@ function getLedgerAsync(options, callback) {
     convertErrors(callback)));
 }
 
-function getLedger(options = {}) {
+function getLedger(options: LedgerOptions = {}): Promise<GetLedger> {
   return utils.promisify(getLedgerAsync).call(this, options);
 }
 

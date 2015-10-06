@@ -7,9 +7,13 @@ const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
 const parseAccountOrder = require('./parse/account-order');
+import type {Remote} from '../../core/remote';
+import type {OrdersOptions, Order} from './types.js';
 
-function requestAccountOffers(remote, address, ledgerVersion, marker, limit,
-  callback
+type GetOrders = Array<Order>
+
+function requestAccountOffers(remote: Remote, address: string,
+  ledgerVersion: number, marker: string, limit: number, callback
 ) {
   remote.requestAccountOffers({
     account: address,
@@ -23,7 +27,7 @@ function requestAccountOffers(remote, address, ledgerVersion, marker, limit,
   }), convertErrors(callback)));
 }
 
-function getOrdersAsync(account, options, callback) {
+function getOrdersAsync(account: string, options: OrdersOptions, callback) {
   validate.address(account);
   validate.getOrdersOptions(options);
 
@@ -34,7 +38,8 @@ function getOrdersAsync(account, options, callback) {
       (order) => order.properties.sequence), callback));
 }
 
-function getOrders(account: string, options = {}) {
+function getOrders(account: string, options: OrdersOptions = {}
+): Promise<GetOrders> {
   return utils.promisify(async.seq(
     utils.getLedgerOptionsWithLedgerVersion,
     getOrdersAsync)).call(this, account, options);

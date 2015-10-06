@@ -6,7 +6,16 @@ const validate = utils.common.validate;
 const Request = utils.common.core.Request;
 const convertErrors = utils.common.convertErrors;
 
-function isImmediateRejection(engineResult) {
+type Submit = {
+  success: boolean,
+  engineResult: string,
+  engineResultCode: number,
+  engineResultMessage?: string,
+  txBlob?: string,
+  txJson?: Object
+}
+
+function isImmediateRejection(engineResult: string): boolean {
   // note: "tel" errors mean the local server refused to process the
   // transaction *at that time*, but it could potentially buffer the
   // transaction and then process it at a later time, for example
@@ -37,7 +46,7 @@ function submitAsync(txBlob: string, callback: (err: any, data: any) => void
       convertSubmitErrors(convertErrors(callback))));
 }
 
-function submit(txBlob: string) {
+function submit(txBlob: string): Promise<Submit> {
   return utils.promisify(submitAsync.bind(this))(txBlob);
 }
 

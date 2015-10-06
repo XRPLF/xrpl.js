@@ -9,6 +9,29 @@ const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
 
+import type {Remote} from '../../core/remote';
+
+import type {TransactionType} from './transaction-types';
+
+
+type TransactionsOptions = {
+  start?: string,
+  limit?: number,
+  minLedgerVersion?: number,
+  maxLedgerVersion?: number,
+  earliestFirst?: boolean,
+  excludeFailures?: boolean,
+  initiated?: boolean,
+  counterparty?: string,
+  types?: Array<string>,
+  binary?: boolean,
+  startTx?: TransactionType
+}
+
+type GetTransactionsResponse = Array<TransactionType>
+
+type CallbackType = (err?: ?Error, data?: GetTransactionsResponse) => void
+
 function parseAccountTxTransaction(tx) {
   // rippled uses a different response format for 'account_tx' than 'tx'
   tx.tx.meta = tx.meta;
@@ -16,7 +39,7 @@ function parseAccountTxTransaction(tx) {
   return parseTransaction(tx.tx);
 }
 
-function counterpartyFilter(filters, tx) {
+function counterpartyFilter(filters, tx: TransactionType) {
   if (!filters.counterparty) {
     return true;
   }
@@ -31,7 +54,9 @@ function counterpartyFilter(filters, tx) {
   return false;
 }
 
-function transactionFilter(address, filters, tx) {
+function transactionFilter(address: string, filters: TransactionsOptions,
+                           tx: TransactionType
+) {
   if (filters.excludeFailures && tx.outcome.result !== 'tesSUCCESS') {
     return false;
   }
@@ -50,13 +75,15 @@ function transactionFilter(address, filters, tx) {
   return true;
 }
 
-function orderFilter(options, tx) {
+function orderFilter(options: TransactionsOptions, tx: TransactionType) {
   return !options.startTx || (options.earliestFirst ?
     utils.compareTransactions(tx, options.startTx) > 0 :
     utils.compareTransactions(tx, options.startTx) < 0);
 }
 
-function formatPartialResponse(address, options, data) {
+function formatPartialResponse(address: string,
+  options: TransactionsOptions, data
+) {
   return {
     marker: data.marker,
     results: data.transactions
@@ -67,7 +94,9 @@ function formatPartialResponse(address, options, data) {
   };
 }
 
-function getAccountTx(remote, address, options, marker, limit, callback) {
+function getAccountTx(remote: Remote, address: string,
+  options: TransactionsOptions, marker: string, limit: number, callback
+) {
   const params = {
     account: address,
     // -1 is equivalent to earliest available validated ledger
@@ -85,7 +114,9 @@ function getAccountTx(remote, address, options, marker, limit, callback) {
       convertErrors(callback)));
 }
 
-function checkForLedgerGaps(remote, options, transactions) {
+function checkForLedgerGaps(remote: Remote, options: TransactionsOptions,
+                            transactions: GetTransactionsResponse
+) {
   let {minLedgerVersion, maxLedgerVersion} = options;
 
   // if we reached the limit on number of transactions, then we can shrink
@@ -105,7 +136,9 @@ function checkForLedgerGaps(remote, options, transactions) {
   }
 }
 
-function formatResponse(remote, options, transactions) {
+function formatResponse(remote: Remote, options: TransactionsOptions,
+                        transactions: GetTransactionsResponse
+) {
   const compare = options.earliestFirst ? utils.compareTransactions :
     _.rearg(utils.compareTransactions, 1, 0);
   const sortedTransactions = transactions.sort(compare);
@@ -113,13 +146,17 @@ function formatResponse(remote, options, transactions) {
   return sortedTransactions;
 }
 
-function getTransactionsInternal(remote, address, options, callback) {
+function getTransactionsInternal(remote: Remote, address: string,
+                                 options: TransactionsOptions, callback
+) {
   const getter = _.partial(getAccountTx, remote, address, options);
   const format = _.partial(formatResponse, remote, options);
   utils.getRecursive(getter, options.limit, composeAsync(format, callback));
 }
 
-function getTransactionsAsync(account, options, callback) {
+function getTransactionsAsync(account: string,
+  options: TransactionsOptions, callback: CallbackType
+) {
   validate.address(account);
   validate.getTransactionsOptions(options);
 
@@ -138,7 +175,8 @@ function getTransactionsAsync(account, options, callback) {
   }
 }
 
-function getTransactions(account: string, options = {}) {
+function getTransactions(account: string, options: TransactionsOptions = {}
+): Promise<GetTransactionsResponse> {
   return utils.promisify(getTransactionsAsync).call(this, account, options);
 }
 

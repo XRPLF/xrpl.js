@@ -5,8 +5,21 @@ const utils = require('./utils');
 const validate = utils.common.validate;
 const toRippledAmount = utils.common.toRippledAmount;
 const Transaction = utils.common.core.Transaction;
+import type {Instructions, Prepare} from './types.js';
+import type {Adjustment, MaxAdjustment, Memo} from '../common/types.js';
 
-function createSuspendedPaymentCreationTransaction(account, payment) {
+type SuspendedPaymentCreation = {
+  source: MaxAdjustment,
+  destination: Adjustment,
+  memos?: Array<Memo>,
+  digest?: string,
+  allowCancelAfter?: number,
+  allowExecuteAfter?: number
+}
+
+function createSuspendedPaymentCreationTransaction(account: string,
+    payment: SuspendedPaymentCreation
+): Transaction {
   validate.address(account);
   validate.suspendedPaymentCreation(payment);
 
@@ -41,15 +54,17 @@ function createSuspendedPaymentCreationTransaction(account, payment) {
   return transaction;
 }
 
-function prepareSuspendedPaymentCreationAsync(account, payment, instructions,
-callback) {
+function prepareSuspendedPaymentCreationAsync(account: string,
+    payment: SuspendedPaymentCreation, instructions: Instructions, callback
+) {
   const transaction =
     createSuspendedPaymentCreationTransaction(account, payment);
   utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function prepareSuspendedPaymentCreation(account: string, payment: Object,
-instructions = {}) {
+function prepareSuspendedPaymentCreation(account: string,
+    payment: SuspendedPaymentCreation, instructions: Instructions = {}
+): Promise<Prepare> {
   return utils.promisify(prepareSuspendedPaymentCreationAsync)
     .call(this, account, payment, instructions);
 }

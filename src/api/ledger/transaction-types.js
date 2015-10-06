@@ -1,14 +1,16 @@
 /* @flow */
 'use strict';
 
+import type {Amount, Memo} from '../common/types.js';
+
 type Outcome = {
   result: string,
-  timestamp?: string,
+  ledgerVersion: number,
+  indexInLedger: number,
   fee: string,
   balanceChanges: Object,
   orderbookChanges: Object,
-  ledgerVersion: number,
-  indexInLedger: number
+  timestamp?: string
 }
 
 type Adjustment = {
@@ -56,18 +58,6 @@ type OrderCancellation = {
   orderSequence: number
 }
 
-type Memo = {
-  type?: string,
-  format?: string,
-  data?: string
-}
-
-type Amount = {
-  value: string,
-  currency: string,
-  counterparty?: string
-}
-
 type Payment = {
   source: Adjustment,
   destination: Adjustment,
@@ -88,7 +78,7 @@ type PaymentTransaction = {
   sequence: number
 }
 
-type Order = {
+export type Order = {
   direction: string,
   quantity: Amount,
   totalPrice: Amount,
@@ -138,10 +128,10 @@ export type TransactionOptions = {
   maxLedgerVersion?: number
 }
 
-export type GetTransactionResponse = PaymentTransaction | OrderTransaction |
+export type TransactionType = PaymentTransaction | OrderTransaction |
   OrderCancellationTransaction | TrustlineTransaction | SettingsTransaction
 
 export type GetTransactionResponseCallback =
-  (err?: ?Error, data?: GetTransactionResponse) => void
+  (err?: ?Error, data?: TransactionType) => void
 
 export type CallbackType = (err?: ?Error, data?: Object) => void

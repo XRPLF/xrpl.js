@@ -11,7 +11,7 @@ const RippleError = require('../../core/rippleerror').RippleError;
 
 import type {Remote} from '../../core/remote';
 
-import type {CallbackType, GetTransactionResponse,
+import type {CallbackType, TransactionType,
   GetTransactionResponseCallback, TransactionOptions}
   from './transaction-types';
 
@@ -106,7 +106,7 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
 
 function getTransaction(identifier: string,
                         options: TransactionOptions = {}
-): Promise<GetTransactionResponse> {
+): Promise<TransactionType> {
   return utils.promisify(getTransactionAsync).call(this, identifier, options);
 }
 

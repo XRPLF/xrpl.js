@@ -6,19 +6,44 @@ const validate = utils.common.validate;
 const toRippledAmount = utils.common.toRippledAmount;
 const Transaction = utils.common.core.Transaction;
 const ValidationError = utils.common.errors.ValidationError;
+import type {Instructions, Prepare} from './types.js';
+import type {Amount, Adjustment, MaxAdjustment,
+  MinAdjustment, Memo} from '../common/types.js';
 
-function isXRPToXRPPayment(payment) {
+
+type Payment = {
+  source: Adjustment | MaxAdjustment,
+  destination: Adjustment | MinAdjustment,
+  paths?: string,
+  memos?: Array<Memo>,
+  // A 256-bit hash that can be used to identify a particular payment
+  invoiceID?: string,
+  // A boolean that, if set to true, indicates that this payment should go
+  // through even if the whole amount cannot be delivered because of a lack of
+  // liquidity or funds in the source_account account
+  allowPartialPayment?: boolean,
+  // A boolean that can be set to true if paths are specified and the sender
+  // would like the Ripple Network to disregard any direct paths from
+  // the source_account to the destination_account. This may be used to take
+  // advantage of an arbitrage opportunity or by gateways wishing to issue
+  // balances from a hot wallet to a user who has mistakenly set a trustline
+  // directly to the hot wallet
+  noDirectRipple?: boolean,
+  limitQuality?: boolean
+}
+
+function isXRPToXRPPayment(payment: Payment): boolean {
   const sourceCurrency = _.get(payment, 'source.maxAmount.currency');
   const destinationCurrency = _.get(payment, 'destination.amount.currency');
   return sourceCurrency === 'XRP' && destinationCurrency === 'XRP';
 }
 
-function isIOUWithoutCounterparty(amount) {
+function isIOUWithoutCounterparty(amount: Amount): boolean {
   return amount && amount.currency !== 'XRP'
     && amount.counterparty === undefined;
 }
 
-function applyAnyCounterpartyEncoding(payment) {
+function applyAnyCounterpartyEncoding(payment: Payment): void {
   // Convert blank counterparty to sender or receiver's address
   //   (Ripple convention for 'any counterparty')
   // https://ripple.com/build/transactions/
@@ -33,14 +58,15 @@ function applyAnyCounterpartyEncoding(payment) {
   });
 }
 
-function createMaximalAmount(amount) {
+function createMaximalAmount(amount: Amount): Amount {
   const maxXRPValue = '100000000000';
   const maxIOUValue = '9999999999999999e80';
   const maxValue = amount.currency === 'XRP' ? maxXRPValue : maxIOUValue;
   return _.assign(amount, {value: maxValue});
 }
 
-function createPaymentTransaction(account, paymentArgument) {
+function createPaymentTransaction(account: string, paymentArgument: Payment
+): Transaction {
   const payment = _.cloneDeep(paymentArgument);
   applyAnyCounterpartyEncoding(payment);
   validate.address(account);
@@ -115,12 +141,16 @@ function createPaymentTransaction(account, paymentArgument) {
   return transaction;
 }
 
-function preparePaymentAsync(account, payment, instructions, callback) {
+function preparePaymentAsync(account: string, payment: Payment,
+    instructions: Instructions, callback
+) {
   const transaction = createPaymentTransaction(account, payment);
   utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function preparePayment(account: string, payment: Object, instructions = {}) {
+function preparePayment(account: string, payment: Payment,
+    instructions: Instructions = {}
+): Promise<Prepare> {
   return utils.promisify(preparePaymentAsync.bind(this))(
     account, payment, instructions);
 }
