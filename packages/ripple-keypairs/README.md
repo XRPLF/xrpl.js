@@ -14,7 +14,7 @@ Generate a seed that can be used to generate keypairs. Entropy can be provided a
 ```
 deriveKeypair(seed: string) -> {privateKey: string, publicKey: string}
 ```
-Derive a public and private key from a seed. The keys are represented as hexadecimal strings. A single metadata byte is prepended so the keys are 33 bytes long.
+Derive a public and private key from a seed. The keys are represented as 33-byte hexadecimal strings.
 
 ```
 sign(message: string, privateKey: string) -> string
