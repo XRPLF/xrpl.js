@@ -1814,6 +1814,19 @@ Remote.prototype.findAccount = function(accountID) {
 };
 
 /**
+ * Closes current pathfind, if there is one.
+ * After that new pathfind can be created, without adding to queue.
+ *
+ * @return {void} -
+ */
+Remote.prototype.closeCurrentPathFind = function() {
+  if (this._cur_path_find !== null) {
+    this._cur_path_find.close();
+    this._cur_path_find = null;
+  }
+};
+
+/**
  * Create a pathfind
  *
  * @param {Object} options -
@@ -1822,6 +1835,10 @@ Remote.prototype.findAccount = function(accountID) {
  */
 Remote.prototype.createPathFind = function(options, callback) {
   if (this._cur_path_find !== null) {
+    if (callback === undefined) {
+      throw new Error('Only one streaming pathfind ' +
+                      'request at a time is supported');
+    }
     this._queued_path_finds.push({options, callback});
     return null;
   }
