@@ -7,7 +7,9 @@
     - [Method documentation](https://rawgit.com/ripple/ripple-lib/develop/docs/api.html)
 
 **Changes**
++ [Add Remote.closeCurrentPathFind function, so current pathfind can be properly closed](https://github.com/ripple/ripple-lib/commit/e99010f363fc7cbe7fd547d3ca5b32ea083c44e6)
 + [Implement Balance Sheet API](https://github.com/ripple/ripple-lib/pull/579)
++ [Fix bugs in orderbook subscription](https://github.com/ripple/ripple-lib/commit/7404795dc64a85216148de7bc3ca7da7b33f4490)
 + [Fix crash due to rippled slowDown error](https://github.com/ripple/ripple-lib/commit/84838b2e9f6969b593b8462a62a6b8f516ada937)
 + [Fix: Emit error events and return error on pathfind](https://github.com/ripple/ripple-lib/commit/1ccbaf677631a1944eb05d90f7afc5f3690a03dd)
 + [Deprecate core and remove snake case method copying](https://github.com/ripple/ripple-lib/commit/fb8dc44ec1d49bb05cd0cdbe6dd4ab211195868a)
