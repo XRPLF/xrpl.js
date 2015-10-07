@@ -1,8 +1,9 @@
 'use strict';
 
 const assert = require('assert');
-const coreTypes = require('@niq/ripple-core-types');
-const {binary: {bytesToHex,
+const coreTypes = require('@niq/ripple-core');
+const {quality,
+       binary: {bytesToHex,
                 signingData,
                 multiSigningData,
                 binaryToJSON,
@@ -26,4 +27,14 @@ exports.encodeForSigning = function(json) {
 exports.encodeForMultisigning = function(json, signer) {
   assert(typeof json === 'object');
   return bytesToHex(multiSigningData(json, signer));
+};
+
+exports.encodeQuality = function(value) {
+  assert(typeof value === 'string');
+  return bytesToHex(quality.encode(value));
+};
+
+exports.decodeQuality = function(value) {
+  assert(typeof value === 'string');
+  return quality.decode(value).toString();
 };

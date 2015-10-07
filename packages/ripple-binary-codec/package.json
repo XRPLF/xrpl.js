@@ -1,6 +1,6 @@
 {
   "name": "ripple-binary-codec",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ripple binary codec",
   "files": [
     "distrib/npm/*",
@@ -14,7 +14,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@niq/ripple-core-types": "0.0.3"
+    "@niq/ripple-core": "0.0.6"
   },
   "devDependencies": {
     "assert-diff": "^1.0.1",
