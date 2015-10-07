@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const coreTypes = require('@niq/ripple-core');
+const coreTypes = require('./coretypes');
 const {quality,
        binary: {bytesToHex,
                 signingData,
