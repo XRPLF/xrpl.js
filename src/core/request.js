@@ -79,17 +79,23 @@ Request.prototype.request = function(servers, callback_) {
     // just in case
     this.emit = _.noop;
     this.cancel();
+    this.remote.removeListener('connected', doRequest);
   }, this._timeout);
-
-  function onResponse() {
-    clearTimeout(timeout);
-  }
 
   if (this.remote.isConnected()) {
     this.remote.on('connected', doRequest);
   }
 
-  this.once('response', onResponse);
+  function onRemoteError(error) {
+    self.emit('error', error);
+  }
+  this.remote.once('error', onRemoteError); // e.g. rate-limiting slowDown error
+
+  this.once('response', () => {
+    clearTimeout(timeout);
+    this.remote.removeListener('connected', doRequest);
+    this.remote.removeListener('error', onRemoteError);
+  });
 
   doRequest();
 
@@ -126,6 +132,7 @@ Request.prototype.broadcast = function(isResponseSuccess = isResponseNotError) {
     return this;
   }
 
+  this.on('error', function() {});
   let lastResponse = new Error('No servers available');
   const connectTimeouts = { };
   const emit = this.emit;
@@ -142,23 +149,44 @@ Request.prototype.broadcast = function(isResponseSuccess = isResponseNotError) {
     }
   };
 
+  let serversCallbacks = { };
+  let serversTimeouts = { };
+  let serversClearConnectHandlers = { };
+
   function iterator(server, callback) {
     // Iterator is called in parallel
 
-    if (server.isConnected()) {
-      // Listen for proxied success/error event and apply filter
-      self.once('proposed', function(res) {
-        lastResponse = res;
-        callback(isResponseSuccess(res));
-      });
+    const serverID = server.getServerID();
 
+    serversCallbacks[serverID] = callback;
+
+    function doRequest() {
       return server._request(self);
+    }
+
+    if (server.isConnected()) {
+      const timeout = setTimeout(() => {
+        lastResponse = new RippleError('tejTimeout',
+          JSON.stringify(self.message));
+
+        server.removeListener('connect', doRequest);
+        delete serversCallbacks[serverID];
+        delete serversClearConnectHandlers[serverID];
+
+        callback(false);
+      }, self._timeout);
+
+      serversTimeouts[serverID] = timeout;
+      serversClearConnectHandlers[serverID] = function() {
+        server.removeListener('connect', doRequest);
+      };
+
+      server.on('connect', doRequest);
+      return doRequest();
     }
 
     // Server is disconnected but should reconnect. Wait for it to reconnect,
     // and abort after a timeout
-    const serverID = server.getServerID();
-
     function serverReconnected() {
       clearTimeout(connectTimeouts[serverID]);
       connectTimeouts[serverID] = null;
@@ -173,12 +201,58 @@ Request.prototype.broadcast = function(isResponseSuccess = isResponseNotError) {
     server.once('connect', serverReconnected);
   }
 
+  // Listen for proxied success/error event and apply filter
+  function onProposed(result, server) {
+    const serverID = server.getServerID();
+    lastResponse = result;
+
+    const callback = serversCallbacks[serverID];
+    delete serversCallbacks[serverID];
+
+    clearTimeout(serversTimeouts[serverID]);
+    delete serversTimeouts[serverID];
+
+    if (serversClearConnectHandlers[serverID] !== undefined) {
+      serversClearConnectHandlers[serverID]();
+      delete serversClearConnectHandlers[serverID];
+    }
+
+    if (callback !== undefined) {
+      callback(isResponseSuccess(result));
+    }
+  }
+
+  this.on('proposed', onProposed);
+
+  let complete_ = null;
+
+  // e.g. rate-limiting slowDown error
+  function onRemoteError(error) {
+    serversCallbacks = {};
+    _.forEach(serversTimeouts, clearTimeout);
+    serversTimeouts = {};
+    _.forEach(serversClearConnectHandlers, (handler) => {
+      handler();
+    });
+    serversClearConnectHandlers = {};
+
+    lastResponse = error instanceof RippleError ? error :
+      new RippleError(error);
+    complete_(false);
+  }
+
   function complete(success) {
+    self.removeListener('proposed', onProposed);
+    self.remote.removeListener('error', onRemoteError);
     // Emit success if the filter is satisfied by any server
     // Emit error if the filter is not satisfied by any server
     // Include the last response
     emit.call(self, success ? 'success' : 'error', lastResponse);
   }
+
+  complete_ = complete;
+
+  this.remote.once('error', onRemoteError);
 
   const servers = this.remote._servers.filter(function(server) {
     // Pre-filter servers that are disconnected and should not reconnect
@@ -241,7 +315,6 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
   let called = false;
 
   function requestError(error) {
-    self.remote.removeListener('error', requestError);
     if (!called) {
       called = true;
 
@@ -254,14 +327,12 @@ Request.prototype.callback = function(callback, successEvent, errorEvent) {
   }
 
   function requestSuccess(message) {
-    self.remote.removeListener('error', requestError);
     if (!called) {
       called = true;
       callback.call(self, null, message);
     }
   }
 
-  this.remote.once('error', requestError); // e.g. rate-limiting slowDown error
   this.once(this.successEvent, requestSuccess);
   this.once(this.errorEvent, requestError);
 

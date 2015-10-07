@@ -12,6 +12,7 @@ const Amount = require('ripple-lib').Amount;
 const PathFind = require('ripple-lib')._test.PathFind;
 const Log = require('ripple-lib')._test.Log;
 const ACCOUNT_ONE = require('ripple-lib')._test.constants.ACCOUNT_ONE;
+const RippleError = require('ripple-lib').RippleError;
 
 let options;
 let remote;
@@ -1906,49 +1907,102 @@ describe('Remote', function() {
     });
   });
 
-  it('createPathFind', function() {
-    const servers = [
-      makeServer('wss://localhost:5006'),
-      makeServer('wss://localhost:5007')
-    ];
-
-    remote._servers = servers;
-
-    const pathfind = remote.createPathFind({
-      src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
-      dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
-      dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
-      src_currencies: [{
-        currency: 'BTC', issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
-      }]
-    });
-
-    // TODO: setup a mock server to provide a response
-    pathfind.on('update', message => console.log(message));
-  });
-
-  it('createPathFind - throw error without callback if already running', function() {
-    const servers = [
-      makeServer('wss://localhost:5006'),
-      makeServer('wss://localhost:5007')
-    ];
-
-    remote._servers = servers;
-
-    const pathfindParam = {
-      src_account: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
-      dst_account: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
-      dst_amount: '1/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+  describe('createPathFind', function() {
+    const pathfindParams = {
+      src_account: 'r9UHu5CWni1qRY7Q4CfFZLGvXo2pGQy96b',
+      dst_account: 'rB31JZB8o5BvxyvPiRABatGsXwKYVaqGmN',
+      dst_amount: '0.001/USD/rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
       src_currencies: [{
         currency: 'BTC', issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6'
       }]
     };
-    remote.createPathFind(pathfindParam);
-    remote.createPathFind(pathfindParam, () => {});
-    assert.throws(
-      function() {
-        remote.createPathFind(pathfindParam);
-      }, Error);
+    const response1 = {
+      id: 1,
+      result: {
+        alternatives: [],
+        destination_account: 'rB31JZB8o5BvxyvPiRABatGsXwKYVaqGmN',
+        destination_amount: {
+          currency: 'USD',
+          issuer: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+          value: '0.001'
+        },
+        full_reply: false,
+        id: 1,
+        source_account: 'r9UHu5CWni1qRY7Q4CfFZLGvXo2pGQy96b'
+      },
+      status: 'success',
+      type: 'response'
+    };
+    const response2 = {
+      alternatives: [],
+      destination_account: 'rB31JZB8o5BvxyvPiRABatGsXwKYVaqGmN',
+      destination_amount: {
+        currency: 'USD',
+        issuer: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
+        value: '0.001'
+      },
+      full_reply: true,
+      id: 1,
+      source_account: 'r9UHu5CWni1qRY7Q4CfFZLGvXo2pGQy96b',
+      type: 'path_find'
+    };
+
+    it('createPathFind', function(done) {
+      const servers = [
+        makeServer('wss://localhost:5006')
+      ];
+
+      remote._servers = servers;
+
+      servers[0]._request = function(req) {
+        setTimeout(() => {
+          req.emit('success', response1, this);
+          setTimeout(() => {
+            remote._handleMessage(response2, this);
+          }, 5);
+        }, 5);
+      };
+
+      remote.createPathFind(pathfindParams, (err, result) => {
+        (function() {})(err);
+        assert.deepEqual(result, response2);
+        done();
+      });
+
+    });
+
+    it('createPathFind - timeout', function(done) {
+      const servers = [
+        makeServer('wss://localhost:5006'),
+        makeServer('wss://localhost:5007')
+      ];
+
+      remote.submission_timeout = 50;
+      remote._servers = servers;
+      const pathfind = remote.createPathFind(pathfindParams);
+
+      pathfind.on('error', (error) => {
+        assert(error instanceof RippleError);
+        assert.strictEqual(error.result, 'tejTimeout');
+        done();
+      });
+    });
+
+    it('createPathFind - throw error without callback if already running', function() {
+      const servers = [
+        makeServer('wss://localhost:5006'),
+        makeServer('wss://localhost:5007')
+      ];
+
+      remote._servers = servers;
+
+      const pathfind = remote.createPathFind(pathfindParams);
+      pathfind.on('error', function() { });
+      assert.throws(
+        function() {
+          remote.createPathFind(pathfindParams);
+        }, Error);
+    });
   });
 
   it('Construct path_find create request', function() {
