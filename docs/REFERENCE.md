@@ -14,6 +14,8 @@ __(More examples coming soon!)__
   + [Transaction requests](REFERENCE.md#transaction-requests)
 3. [`Transaction` constructors](REFERENCE.md#transaction-constructors)
   + [Transaction events](REFERENCE.md#transaction-events)
+4. [Subscriptions](REFERENCE.md#subscriptions)
+  + [Orderbook subscription](REFERENCE.md#orderbook-subscription)
 
 ###Also see:
 
@@ -352,3 +354,24 @@ transaction.submit(function(err, res) {
 #Amount objects
 
 Coming Soon
+
+#Subscriptions 
+
+##Orderbook subscription
+
+Subscribes to an orderbook (including autobridged books). Send the orderbook on subscribe then notifies updates.
+Available events: ['transaction', 'model', 'trade', 'offer_added', 'offer_removed', 'offer_changed', 'offer_funds_changed']
+```js
+parameters  = {
+	currency_pays: <string>,
+	issuer_pays: <string>,
+	currency_gets: <string>,
+	issuer_gets: <string>
+}
+```
+Basic subscription:
+```js
+var Orderbook = Remote.book(parameters);
+Orderbook.on('model', handler);
+
+```
