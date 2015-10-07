@@ -55,7 +55,7 @@ Log.makeLevel = function(level) {
   return function() {
     const args = Array.prototype.slice.apply(arguments);
     args[0] = this._prefix + args[0];
-    Log.engine.logObject.apply(Log, [level].concat(args[0], [args.slice(2)]));
+    Log.engine.logObject.apply(Log, [level].concat(args[0], [args.slice(1)]));
   };
 };
 
