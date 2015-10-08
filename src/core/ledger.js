@@ -109,7 +109,7 @@ Ledger.prototype.calc_tx_hash = function() {
     const meta = SerializedObject.from_json(tx_json.metaData);
 
     const data = new SerializedObject();
-    stypes.VariableLength.serialize(data, tx.serialize().to_hex());
+    stypes.VariableLength.serialize(data, tx.serialize());
     stypes.VariableLength.serialize(data, meta.to_hex());
     tx_map.add_item(tx.hash(), data, SHAMapTreeNode.TYPE_TRANSACTION_MD);
   });

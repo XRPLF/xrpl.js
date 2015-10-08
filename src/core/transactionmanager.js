@@ -524,9 +524,9 @@ TransactionManager.prototype._prepareRequest = function(tx) {
     tx.sign();
 
     const serialized = tx.serialize();
-    submitRequest.txBlob(serialized.to_hex());
+    submitRequest.txBlob(serialized);
 
-    const hash = tx.hash(null, null, serialized);
+    const hash = tx.hash(null, serialized);
     tx.addId(hash);
   } else {
     if (tx.hasMultiSigners()) {

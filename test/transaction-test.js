@@ -345,7 +345,7 @@ describe('Transaction', function() {
     remote.setSecret(src, addresses.SECRET);
 
     assert(transaction.complete());
-    const json = transaction.serialize().to_json();
+    const json = transaction.serialize();
     assert.notStrictEqual(json.Fee, '66500000', 'Fee == 66500000, i.e. 66.5 XRP!');
   });
 
@@ -584,7 +584,7 @@ describe('Transaction', function() {
       SigningPubKey: '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED',
       Account: 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ',
       Flags: 0,
-      Fee: 10,
+      Fee: '10',
       Sequence: 1,
       TransactionType: 'AccountSet'
     };
@@ -602,10 +602,9 @@ describe('Transaction', function() {
       const tx = Transaction.from_json(tx_json);
       const data = tx.signingData();
 
-      assert.strictEqual(data.hash().to_json(),
-                         expectedSigningHash);
+      assert.strictEqual(tx.signingHash(), expectedSigningHash);
 
-      assert.strictEqual(data.to_hex(),
+      assert.strictEqual(data,
         ('535458001200032200000000240000000168400000000000000' +
          'A7321021FED5FD081CE5C4356431267D04C6E2167E4112C897D' +
          '5E10335D4E22B4DA49ED8114E0E6E281CA324AEE034B2BB8AC9' +
@@ -619,7 +618,7 @@ describe('Transaction', function() {
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction.tx_json.Flags = 0;
-    transaction.tx_json.Fee = 10;
+    transaction.tx_json.Fee = '10';
     transaction.tx_json.Sequence = 1;
     transaction.tx_json.TransactionType = 'AccountSet';
 
@@ -634,7 +633,7 @@ describe('Transaction', function() {
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction.tx_json.Flags = 0;
-    transaction.tx_json.Fee = 10;
+    transaction.tx_json.Fee = '10';
     transaction.tx_json.Sequence = 1;
     transaction.tx_json.TransactionType = 'AccountSet';
 
@@ -650,7 +649,7 @@ describe('Transaction', function() {
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction.tx_json.Flags = 0;
-    transaction.tx_json.Fee = 10;
+    transaction.tx_json.Fee = '10';
     transaction.tx_json.Sequence = 1;
     transaction.tx_json.TransactionType = 'AccountSet';
 
@@ -840,7 +839,7 @@ describe('Transaction', function() {
 
     const transaction = Transaction.from_json(input_json);
 
-    assert.deepEqual(transaction.serialize().to_hex(), expected_hex);
+    assert.deepEqual(transaction.serialize(), expected_hex);
   });
 
   it('Sign transaction', function(done) {
@@ -849,7 +848,7 @@ describe('Transaction', function() {
     transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
     transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
     transaction.tx_json.Flags = 0;
-    transaction.tx_json.Fee = 10;
+    transaction.tx_json.Fee = '10';
     transaction.tx_json.Sequence = 1;
     transaction.tx_json.TransactionType = 'AccountSet';
 
@@ -2261,7 +2260,8 @@ describe('Transaction', function() {
     const abytes = decodeAddress(a1);
     const prefix = require('ripple-lib')._test.HashPrefixes.HASH_TX_MULTISIGN_BYTES;
 
-    assert.deepEqual(d1.buffer, prefix.concat(tbytes, abytes));
+    assert.deepEqual(new Buffer(d1, 'hex'),
+      new Buffer(prefix.concat(tbytes, abytes)));
   });
 
   it('Multisign', function() {

@@ -1,4 +1,13 @@
 'use strict';
+const sha512 = require('hash.js').sha512;
+
+// For a hash function, rippled uses SHA-512 and then truncates the result
+// to the first 256 bytes. This algorithm, informally called SHA-512Half,
+// provides an output that has comparable security to SHA-256, but runs
+// faster on 64-bit processors.
+function sha512half(buffer) {
+  return sha512().update(buffer).digest('hex').toUpperCase().slice(0, 64);
+}
 
 // returns the mantissa from the passed in string,
 // adding zeros until it has 16 sd
@@ -21,7 +30,7 @@ function getMantissaDecimalString(bignum) {
 
 function trace(comment, func) {
   return function() {
-    console.log('%s: %s', trace, arguments.toString);
+    console.log('%s: %s', comment, arguments.toString);
     func(arguments);
   };
 }
@@ -112,7 +121,8 @@ function assert(assertion, msg) {
  * @return {Array} unique values (for string representation of value) in `arr`
  */
 function arrayUnique(arr) {
-  const u = {}, a = [];
+  const u = {};
+  const a = [];
 
   for (let i = 0, l = arr.length; i < l; i++) {
     const k = arr[i];
@@ -151,6 +161,7 @@ exports.time = {
   toRipple: fromTimestamp
 };
 
+exports.sha512half = sha512half;
 exports.trace = trace;
 exports.arraySet = arraySet;
 exports.hexToString = hexToString;

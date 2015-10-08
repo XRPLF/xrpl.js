@@ -132,6 +132,42 @@
         }
       }
     },
+    "ripple-binary-codec": {
+      "version": "0.0.5",
+      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.0.5.tgz",
+      "dependencies": {
+        "bn.js": {
+          "version": "3.2.0",
+          "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.2.0.tgz"
+        },
+        "create-hash": {
+          "version": "1.1.2",
+          "resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
+          "dependencies": {
+            "cipher-base": {
+              "version": "1.0.1",
+              "resolved": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.1.tgz"
+            },
+            "ripemd160": {
+              "version": "1.0.1",
+              "resolved": "https://registry.npmjs.org/ripemd160/-/ripemd160-1.0.1.tgz"
+            },
+            "sha.js": {
+              "version": "2.4.4",
+              "resolved": "https://registry.npmjs.org/sha.js/-/sha.js-2.4.4.tgz"
+            }
+          }
+        },
+        "decimal.js": {
+          "version": "4.0.3",
+          "resolved": "https://registry.npmjs.org/decimal.js/-/decimal.js-4.0.3.tgz"
+        },
+        "inherits": {
+          "version": "2.0.1",
+          "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+        }
+      }
+    },
     "ripple-keypairs": {
       "version": "0.9.0",
       "resolved": "https://registry.npmjs.org/ripple-keypairs/-/ripple-keypairs-0.9.0.tgz",

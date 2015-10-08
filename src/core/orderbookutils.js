@@ -3,11 +3,10 @@
 const _ = require('lodash');
 const assert = require('assert');
 const constants = require('./constants');
-const SerializedObject = require('./serializedobject').SerializedObject;
-const Types = require('./serializedtypes');
 const Amount = require('./amount').Amount;
 const Currency = require('./currency').Currency;
 const {IOUValue} = require('ripple-lib-value');
+const binary = require('ripple-binary-codec');
 const OrderBookUtils = {};
 
 function assertValidNumber(number, message) {
@@ -143,11 +142,7 @@ OrderBookUtils.getOfferQuality = function(offer, currencyGets, currency_,
 
 OrderBookUtils.convertOfferQualityToHex = function(quality) {
   assert(quality instanceof Amount, 'Quality is not an amount');
-
-  const so = new SerializedObject();
-  Types.Quality.serialize(so, quality.to_text());
-
-  return so.to_hex();
+  return OrderBookUtils.convertOfferQualityToHex(quality.to_text());
 };
 
 /**
@@ -160,13 +155,8 @@ OrderBookUtils.convertOfferQualityToHex = function(quality) {
  */
 
 OrderBookUtils.convertOfferQualityToHexFromText = function(quality) {
-
-  const so = new SerializedObject();
-  Types.Quality.serialize(so, quality);
-
-  return so.to_hex();
+  return binary.encodeQuality(quality);
 };
-
 
 OrderBookUtils.CURRENCY_ONE = Currency.from_json(1);
 

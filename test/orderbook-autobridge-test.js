@@ -6,6 +6,7 @@ const _ = require('lodash');
 const assert = require('assert-diff');
 const Remote = require('ripple-lib').Remote;
 const Currency = require('ripple-lib').Currency;
+const OrderbookUtils = require('ripple-lib')._test.OrderbookUtils;
 const addresses = require('./fixtures/addresses');
 const fixtures = require('./fixtures/orderbook');
 const IOUValue = require('ripple-lib-value').IOUValue;
@@ -842,5 +843,15 @@ describe('OrderBook Autobridging', function() {
       done();
     });
 
+  });
+
+  it('convertOfferQualityToHexFromText', function() {
+    const bookDirectory =
+      '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F4C3362FE1D0';
+    const quality = '195796912.5171664';
+    assert.strictEqual(
+      OrderbookUtils.convertOfferQualityToHexFromText(quality),
+      bookDirectory.slice(-16)
+    );
   });
 });
