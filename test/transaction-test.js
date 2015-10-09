@@ -2302,6 +2302,10 @@ describe('Transaction', function() {
     {Signer: s2},
     {Signer: s1}
     ]);
+
+    transaction.remote = new Remote();
+    assert(transaction.complete());
+    assert.strictEqual(transaction.tx_json.SigningPubKey, '');
   });
 
   it('Multisign -- missing LastLedgerSequence', function() {
@@ -2316,5 +2320,28 @@ describe('Transaction', function() {
     assert.throws(function() {
       transaction.getMultiSigningJson();
     });
+  });
+
+  it('Multisign -- LastLedgerSequence autofill', function() {
+    const transaction = Transaction.from_json({
+      Account: 'rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn',
+      Sequence: 1,
+      Fee: '100',
+      TransactionType: 'AccountSet',
+      Flags: 0
+    });
+
+    const sequence = 1;
+    transaction.remote = {
+      getLedgerSequenceSync: () => {
+        return sequence;
+      }
+    };
+
+    const mJson = transaction.getMultiSigningJson();
+    assert.strictEqual(mJson.LastLedgerSequence,
+                       sequence + 1 + transaction._lastLedgerOffset);
+    assert.strictEqual(transaction.tx_json.LastLedgerSequence,
+                       sequence + 1 + transaction._lastLedgerOffset);
   });
 });
