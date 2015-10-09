@@ -133,8 +133,8 @@
       }
     },
     "ripple-binary-codec": {
-      "version": "0.0.5",
-      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.0.5.tgz",
+      "version": "0.0.6",
+      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.0.6.tgz",
       "dependencies": {
         "bn.js": {
           "version": "3.2.0",

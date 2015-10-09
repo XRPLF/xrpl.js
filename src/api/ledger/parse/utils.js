@@ -67,15 +67,19 @@ function parseOutcome(tx: Object): ?Object {
   };
 }
 
+function hexToString(hex) {
+  return hex ? new Buffer(hex, 'hex').toString('utf-8') : undefined;
+}
+
 function parseMemos(tx: Object): ?Array<Object> {
   if (!Array.isArray(tx.Memos) || tx.Memos.length === 0) {
     return undefined;
   }
   return tx.Memos.map((m) => {
     return removeUndefined({
-      type: m.Memo.parsed_memo_type,
-      format: m.Memo.parsed_memo_format,
-      data: m.Memo.parsed_memo_data
+      type: m.Memo.parsed_memo_type || hexToString(m.Memo.MemoType),
+      format: m.Memo.parsed_memo_format || hexToString(m.Memo.MemoFormat),
+      data: m.Memo.parsed_memo_data || hexToString(m.Memo.MemoData)
     });
   });
 }

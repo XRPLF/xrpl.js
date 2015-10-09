@@ -5,12 +5,12 @@
 const assert = require('assert-diff');
 const lodash = require('lodash');
 const addresses = require('./fixtures/addresses');
-const ripple = require('ripple-lib');
 const Transaction = require('ripple-lib').Transaction;
-const TransactionQueue = require('ripple-lib').TransactionQueue;
+const TransactionQueue = require('ripple-lib')._test.TransactionQueue;
 const Remote = require('ripple-lib').Remote;
 const Server = require('ripple-lib').Server;
 const {decodeAddress} = require('ripple-address-codec');
+const binary = require('ripple-binary-codec');
 
 const transactionResult = {
   engine_result: 'tesSUCCESS',
@@ -2255,13 +2255,14 @@ describe('Transaction', function() {
     const a1 = 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK';
     const d1 = transaction.multiSigningData(a1);
 
-    const tbytes = ripple.SerializedObject.from_json(
-      lodash.merge(transaction.tx_json, {SigningPubKey: ''})).buffer;
+    const txHex = binary.encode(
+      lodash.merge(transaction.tx_json, {SigningPubKey: ''}));
     const abytes = decodeAddress(a1);
     const prefix = require('ripple-lib')._test.HashPrefixes.HASH_TX_MULTISIGN_BYTES;
 
     assert.deepEqual(new Buffer(d1, 'hex'),
-      new Buffer(prefix.concat(tbytes, abytes)));
+      Buffer.concat([new Buffer(prefix), new Buffer(txHex, 'hex'),
+        new Buffer(abytes)]));
   });
 
   it('Multisign', function() {

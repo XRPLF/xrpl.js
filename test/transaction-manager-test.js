@@ -6,7 +6,8 @@ const ws = require('ws');
 const lodash = require('lodash');
 const assert = require('assert-diff');
 const Remote = require('ripple-lib').Remote;
-const SerializedObject = require('ripple-lib').SerializedObject;
+const binary = require('ripple-binary-codec');
+const utils = require('ripple-lib').utils;
 const Transaction = require('ripple-lib').Transaction;
 const TransactionManager = require('ripple-lib')._test.TransactionManager;
 
@@ -335,11 +336,12 @@ describe('TransactionManager', function() {
 
     const binaryTx = lodash.extend({}, ACCOUNT_TX_TRANSACTION, {
       ledger_index: ACCOUNT_TX_TRANSACTION.tx.ledger_index,
-      tx_blob: SerializedObject.from_json(ACCOUNT_TX_TRANSACTION.tx).to_hex(),
-      meta: SerializedObject.from_json(ACCOUNT_TX_TRANSACTION.meta).to_hex()
+      tx_blob: binary.encode(ACCOUNT_TX_TRANSACTION.tx),
+      meta: binary.encode(ACCOUNT_TX_TRANSACTION.meta)
     });
 
-    const hash = new SerializedObject(binaryTx.tx_blob).hash(0x54584E00).to_hex();
+    const prefix = (0x54584E00).toString(16);
+    const hash = utils.sha512half(new Buffer(prefix + binaryTx.tx_blob, 'hex'));
 
     transaction.addId(hash);
 
@@ -364,8 +366,8 @@ describe('TransactionManager', function() {
 
     const binaryTx = lodash.extend({}, ACCOUNT_TX_TRANSACTION, {
       ledger_index: ACCOUNT_TX_TRANSACTION.tx.ledger_index,
-      tx_blob: SerializedObject.from_json(ACCOUNT_TX_TRANSACTION.tx).to_hex(),
-      meta: SerializedObject.from_json(ACCOUNT_TX_TRANSACTION.meta).to_hex()
+      tx_blob: binary.encode(ACCOUNT_TX_TRANSACTION.tx),
+      meta: binary.encode(ACCOUNT_TX_TRANSACTION.meta)
     });
 
     transactionManager._request = function() {
@@ -417,9 +419,8 @@ describe('TransactionManager', function() {
     });
 
     rippled.once('request_submit', function(m, req) {
-      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
-        transaction.tx_json).to_hex());
-      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+      assert.strictEqual(m.tx_blob, binary.encode(transaction.tx_json));
+      assert.strictEqual(binary.decode(m.tx_blob).Sequence,
                          ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_RESPONSE, {id: m.id});
@@ -457,9 +458,8 @@ describe('TransactionManager', function() {
     });
 
     rippled.once('request_submit', function(m, req) {
-      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
-        transaction.tx_json).to_hex());
-      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+      assert.strictEqual(m.tx_blob, binary.encode(transaction.tx_json));
+      assert.strictEqual(binary.decode(m.tx_blob).Sequence,
                          ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_TEC_RESPONSE, {id: m.id});
@@ -500,7 +500,7 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      const deserialized = new SerializedObject(m.tx_blob).to_json();
+      const deserialized = binary.decode(m.tx_blob);
 
       switch (deserialized.TransactionType) {
         case 'Payment':
@@ -570,8 +570,7 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
-        transaction.tx_json).to_hex());
+      assert.strictEqual(m.tx_blob, binary.encode(transaction.tx_json));
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_TEF_RESPONSE, {id: m.id});
     });
@@ -630,9 +629,8 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
-        transaction.tx_json).to_hex());
-      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+      assert.strictEqual(m.tx_blob, binary.encode(transaction.tx_json));
+      assert.strictEqual(binary.decode(m.tx_blob).Sequence,
                          ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_TEL_RESPONSE, {id: m.id});
@@ -737,9 +735,8 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
-        transaction.tx_json).to_hex());
-      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+      assert.strictEqual(m.tx_blob, binary.encode(transaction.tx_json));
+      assert.strictEqual(binary.decode(m.tx_blob).Sequence,
                          ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
       assert.strictEqual(transactionManager.getPending().length(), 1);
 
@@ -797,9 +794,8 @@ describe('TransactionManager', function() {
     });
 
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
-        transaction.tx_json).to_hex());
-      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+      assert.strictEqual(m.tx_blob, binary.encode(transaction.tx_json));
+      assert.strictEqual(binary.decode(m.tx_blob).Sequence,
                          ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
       assert.strictEqual(transactionManager.getPending().length(), 1);
       req.sendResponse(SUBMIT_TEL_RESPONSE, {id: m.id});
@@ -867,9 +863,8 @@ describe('TransactionManager', function() {
 
     /* eslint-disable  no-unused-vars */
     rippled.on('request_submit', function(m, req) {
-      assert.strictEqual(m.tx_blob, SerializedObject.from_json(
-        transaction.tx_json).to_hex());
-      assert.strictEqual(new SerializedObject(m.tx_blob).to_json().Sequence,
+      assert.strictEqual(m.tx_blob, binary.encode(transaction.tx_json));
+      assert.strictEqual(binary.decode(m.tx_blob).Sequence,
                          ACCOUNT_INFO_RESPONSE.result.account_data.Sequence);
       assert.strictEqual(transactionManager.getPending().length(), 1);
 

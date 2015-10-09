@@ -104,61 +104,41 @@
       "Paths": [
         [
           {
-            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           },
           {
             "currency": "USD",
-            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 48,
-            "type_hex": "0000000000000030"
+            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           },
           {
-            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           }
         ],
         [
           {
-            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           }
         ],
         [
           {
-            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           },
           {
-            "account": "rP9Lt7SZUEErkXAXyggceibTCEYbfSyx6n",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rP9Lt7SZUEErkXAXyggceibTCEYbfSyx6n"
           },
           {
-            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           }
         ],
         [
           {
-            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           },
           {
-            "account": "rwBWBFZrbLzHoe3PhwWYv89iHJdxAFrxcB",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rwBWBFZrbLzHoe3PhwWYv89iHJdxAFrxcB"
           },
           {
-            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           }
         ]
       ],
@@ -405,84 +385,56 @@
       "Paths": [
         [
           {
-            "account": "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6"
           },
           {
             "currency": "USD",
-            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 48,
-            "type_hex": "0000000000000030"
+            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           },
           {
-            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           }
         ],
         [
           {
-            "account": "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6"
           },
           {
-            "currency": "XRP",
-            "type": 16,
-            "type_hex": "0000000000000010"
+            "currency": "XRP"
           },
           {
             "currency": "USD",
-            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 48,
-            "type_hex": "0000000000000030"
+            "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           },
           {
-            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           }
         ],
         [
           {
-            "account": "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6"
           },
           {
-            "currency": "XRP",
-            "type": 16,
-            "type_hex": "0000000000000010"
+            "currency": "XRP"
           },
           {
             "currency": "USD",
-            "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 48,
-            "type_hex": "0000000000000030"
+            "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           },
           {
-            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           }
         ],
         [
           {
-            "account": "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6"
           },
           {
             "currency": "USD",
-            "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 48,
-            "type_hex": "0000000000000030"
+            "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           },
           {
-            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           }
         ]
       ],
@@ -871,60 +823,40 @@
       "Paths": [
         [
           {
-            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           },
           {
-            "currency": "XRP",
-            "type": 16,
-            "type_hex": "0000000000000010"
+            "currency": "XRP"
           }
         ],
         [
           {
-            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           },
           {
-            "currency": "XRP",
-            "type": 16,
-            "type_hex": "0000000000000010"
+            "currency": "XRP"
           }
         ],
         [
           {
-            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
           },
           {
-            "account": "rULnR9YhAkj9HrcxAcudzBhaXRSqT7zJkq",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rULnR9YhAkj9HrcxAcudzBhaXRSqT7zJkq"
           },
           {
-            "currency": "XRP",
-            "type": 16,
-            "type_hex": "0000000000000010"
+            "currency": "XRP"
           }
         ],
         [
           {
-            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
           },
           {
-            "account": "rP5ShE8dGBH6hHtNvRESdMceen36XFBQmh",
-            "type": 1,
-            "type_hex": "0000000000000001"
+            "account": "rP5ShE8dGBH6hHtNvRESdMceen36XFBQmh"
           },
           {
-            "currency": "XRP",
-            "type": 16,
-            "type_hex": "0000000000000010"
+            "currency": "XRP"
           }
         ]
       ],

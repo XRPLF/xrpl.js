@@ -5,9 +5,8 @@
 const _ = require('lodash');
 const addresses = require('./addresses');
 const Meta = require('ripple-lib').Meta;
-const SerializedObject = require('ripple-lib').SerializedObject;
-const Types = require('ripple-lib').types;
 const IOUValue = require('ripple-lib-value').IOUValue;
+const binary = require('ripple-binary-codec');
 
 module.exports.FIAT_BALANCE = '10';
 module.exports.NATIVE_BALANCE = '55';
@@ -824,10 +823,7 @@ module.exports.transactionWithCreatedOffer = function(options) {
   const takerPays = new IOUValue(module.exports.TAKER_PAYS);
   const quality = takerPays.divide(takerGets);
 
-  const so = new SerializedObject();
-  Types.Quality.serialize(so, quality);
-
-  const BookDirectory = so.to_hex();
+  const BookDirectory = binary.encodeQuality(quality.toString());
 
   const meta = new Meta({
     AffectedNodes: [
