@@ -34,7 +34,7 @@ const Hop = makeClass({
   },
   toJSON() {
     const type = this.type();
-    const ret = {type};
+    const ret = {};
     (type & TYPE_ACCOUNT) && (ret.account = this.account.toJSON());
     (type & TYPE_ISSUER) && (ret.issuer = this.issuer.toJSON());
     (type & TYPE_CURRENCY) && (ret.currency = this.currency.toJSON());

@@ -1309,7 +1309,6 @@
                 "Flags": 0,
                 "Sequence": 6,
                 "Paths": [[{
-                    "type": 1,
                     "account": "razqQKzJRdB4UxFPWf5NEpEG3WMkmwgcXA"
                 }]],
                 "DestinationTag": 736049272
@@ -1414,7 +1413,6 @@
                             "00"
                         ],
                         "json": [[{
-                            "type": 1,
                             "account": "razqQKzJRdB4UxFPWf5NEpEG3WMkmwgcXA"
                         }]],
                         "field_header": "0112"
@@ -1850,7 +1848,6 @@
                 "Sequence": 10,
                 "Paths": [[{
                     "currency": "BTC",
-                    "type": 48,
                     "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
                 }]],
                 "InvoiceID": "342B8D16BEE494D169034AFF0908FDE35874A38E548D4CEC8DFC5C49E9A33B76",
@@ -1958,7 +1955,6 @@
                         ],
                         "json": [[{
                             "currency": "BTC",
-                            "type": 48,
                             "issuer": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
                         }]],
                         "field_header": "0112"
