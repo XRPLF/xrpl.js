@@ -40,7 +40,7 @@ function computeTransactionHash(ledger) {
     return renameMeta;
   });
   const ledgerObject = common.core.Ledger.from_json({transactions: txs});
-  const transactionHash = ledgerObject.calc_tx_hash().to_hex();
+  const transactionHash = ledgerObject.calc_tx_hash();
   if (ledger.transactionHash !== undefined
       && ledger.transactionHash !== transactionHash) {
     throw new common.errors.ValidationError('transactionHash in header'
@@ -55,7 +55,7 @@ function computeStateHash(ledger) {
   }
   const state = JSON.parse(ledger.rawState);
   const ledgerObject = common.core.Ledger.from_json({accountState: state});
-  const stateHash = ledgerObject.calc_account_hash().to_hex();
+  const stateHash = ledgerObject.calc_account_hash();
   if (ledger.stateHash !== undefined && ledger.stateHash !== stateHash) {
     throw new common.errors.ValidationError('stateHash in header'
       + ' does not match computed hash of state');

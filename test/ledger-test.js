@@ -23,13 +23,12 @@ function create_ledger_test(ledger_index) {
 
     if (hasAccounts) {
       it('has account_hash of ' + ledger_json.account_hash, function() {
-        assert.equal(ledger_json.account_hash,
-                     ledger.calc_account_hash({sanity_test: true}).to_hex());
+        assert.equal(ledger_json.account_hash, ledger.calc_account_hash());
       });
     }
     it('has transaction_hash of ' + ledger_json.transaction_hash, function() {
       assert.equal(ledger_json.transaction_hash,
-        ledger.calc_tx_hash().to_hex());
+        ledger.calc_tx_hash());
     });
   });
 }
@@ -47,7 +46,7 @@ describe('Ledger', function() {
       const expectedEntryHash = '2B6AC232AA4C4BE41BF49D2459FA4A0347E1B543A4C92FCEE0821C0201E2E9A8';
       const actualEntryHash = Ledger.calcAccountRootEntryHash(account);
 
-      assert.equal(actualEntryHash.to_hex(), expectedEntryHash);
+      assert.equal(actualEntryHash, expectedEntryHash);
     });
   });
 
@@ -61,8 +60,8 @@ describe('Ledger', function() {
       const actualEntryHash1 = Ledger.calcRippleStateEntryHash(account1, account2, currency);
       const actualEntryHash2 = Ledger.calcRippleStateEntryHash(account2, account1, currency);
 
-      assert.equal(actualEntryHash1.to_hex(), expectedEntryHash);
-      assert.equal(actualEntryHash2.to_hex(), expectedEntryHash);
+      assert.equal(actualEntryHash1, expectedEntryHash);
+      assert.equal(actualEntryHash2, expectedEntryHash);
     });
 
     it('will calculate the RippleState entry hash for r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV and rUAMuQTfVhbfqUDuro7zzy4jj4Wq57MPTj in UAM', function() {
@@ -74,8 +73,8 @@ describe('Ledger', function() {
       const actualEntryHash1 = Ledger.calcRippleStateEntryHash(account1, account2, currency);
       const actualEntryHash2 = Ledger.calcRippleStateEntryHash(account2, account1, currency);
 
-      assert.equal(actualEntryHash1.to_hex(), expectedEntryHash);
-      assert.equal(actualEntryHash2.to_hex(), expectedEntryHash);
+      assert.equal(actualEntryHash1, expectedEntryHash);
+      assert.equal(actualEntryHash2, expectedEntryHash);
     });
   });
 
@@ -86,7 +85,7 @@ describe('Ledger', function() {
       const expectedEntryHash = '03F0AED09DEEE74CEF85CD57A0429D6113507CF759C597BABB4ADB752F734CE3';
       const actualEntryHash = Ledger.calcOfferEntryHash(account, sequence);
 
-      assert.equal(actualEntryHash.to_hex(), expectedEntryHash);
+      assert.equal(actualEntryHash, expectedEntryHash);
     });
   });
 });
