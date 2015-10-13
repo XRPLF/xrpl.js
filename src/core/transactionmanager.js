@@ -724,6 +724,10 @@ TransactionManager.prototype.submit = function(tx) {
     return;
   }
 
+  tx.once('cleanup', function() {
+    self.getPending().remove(tx);
+  });
+
   if (!_.isNumber(tx.tx_json.Sequence)) {
     // Honor manually-set sequences
     tx.setSequence(this._nextSequence++);
@@ -735,12 +739,7 @@ TransactionManager.prototype.submit = function(tx) {
 
   if (tx.hasMultiSigners()) {
     tx.setResubmittable(false);
-    tx.setSigningPubKey('');
   }
-
-  tx.once('cleanup', function() {
-    self.getPending().remove(tx);
-  });
 
   if (!tx.complete()) {
     this._nextSequence -= 1;

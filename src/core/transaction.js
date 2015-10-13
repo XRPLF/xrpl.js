@@ -384,24 +384,32 @@ Transaction.prototype.err = function(error, errorMessage) {
 };
 
 Transaction.prototype.complete = function() {
-  // Auto-fill the secret
-  this._secret = this._secret || this.getSecret();
+  const hasMultiSigners = this.hasMultiSigners();
 
-  if (_.isUndefined(this._secret)) {
-    return this.err('tejSecretUnknown', 'Missing secret');
-  }
+  if (!hasMultiSigners) {
+    // Auto-fill the secret
+    this._secret = this._secret || this.getSecret();
 
-  if (this.remote && !(this.remote.local_signing || this.remote.trusted)) {
-    return this.err(
-      'tejServerUntrusted',
-      'Attempt to give secret to untrusted server');
+    if (_.isUndefined(this._secret)) {
+      return this.err('tejSecretUnknown', 'Missing secret');
+    }
+
+    if (this.remote && !(this.remote.local_signing || this.remote.trusted)) {
+      return this.err(
+        'tejServerUntrusted',
+        'Attempt to give secret to untrusted server');
+    }
   }
 
   if (_.isUndefined(this.tx_json.SigningPubKey)) {
-    try {
-      this.setSigningPubKey(this.getSigningPubKey());
-    } catch (e) {
-      return this.err('tejSecretInvalid', 'Invalid secret');
+    if (hasMultiSigners) {
+      this.setSigningPubKey('');
+    } else {
+      try {
+        this.setSigningPubKey(this.getSigningPubKey());
+      } catch (e) {
+        return this.err('tejSecretInvalid', 'Invalid secret');
+      }
     }
   }
 
