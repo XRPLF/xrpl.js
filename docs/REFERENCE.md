@@ -242,11 +242,10 @@ var options = {
   limit: < limit >
 };
 
-var request = remote.requestBookOffers(options);
-
-request.request(function(err, offers) {
-  //handle offers
+var request = remote.requestBookOffers(options, function(err, offers) {
+	// handle offers
 });
+
 ```
 
 ##Transaction requests
