@@ -482,11 +482,21 @@ Server.prototype.connect = function() {
     self.emit('message', message);
   };
 
+  function onRemoteError() {}
+
   ws.onopen = function onOpen() {
     if (ws === self._ws) {
       self.emit('socket_open');
+
+      // e.g. rate-limiting slowDown error
+      self._remote.once('error', onRemoteError);
+
       // Subscribe to events
-      self._request(self._remote._serverPrepareSubscribe(self));
+      const request = self._remote._serverPrepareSubscribe(self);
+      request.once('response', () => {
+        self._remote.removeListener('error', onRemoteError);
+      });
+      self._request(request);
     }
   };
 
@@ -676,7 +686,7 @@ Server.prototype._handleResponse = function(message) {
     const result = message.result;
     const responseEvent = 'response_' + command;
 
-    request.emit('success', result);
+    request.emit('success', result, this);
 
     [this, this._remote].forEach(function(emitter) {
       emitter.emit(responseEvent, result, request, message);
@@ -690,9 +700,9 @@ Server.prototype._handleResponse = function(message) {
       error: 'remoteError',
       error_message: 'Remote reported an error.',
       remote: message
-    });
+    }, this);
   }
-  request.emit('response', message);
+  request.emit('response', message, this);
 };
 
 Server.prototype._handlePathFind = function(message) {
@@ -800,7 +810,16 @@ Server.prototype._sendMessage = function(message) {
     if (this._remote.trace) {
       log.info(this.getServerID(), 'request:', message);
     }
-    this._ws.send(JSON.stringify(message));
+    this._ws.send(JSON.stringify(message), (error) => {
+      // sometimes gives 'not opened'
+      // without callback it wil throw
+      if (error) {
+        // resend in case of error
+        this.once('connect', () => {
+          this._sendMessage(message);
+        });
+      }
+    });
   }
 };
 

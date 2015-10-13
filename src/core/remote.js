@@ -138,6 +138,9 @@ function Remote(options = {}) {
   if (typeof this.submission_timeout !== 'number') {
     throw new TypeError('submission_timeout must be a number');
   }
+  if (typeof this.pathfind_timeout !== 'number') {
+    throw new TypeError('pathfind_timeout must be a number');
+  }
   if (typeof this.automatic_resubmission !== 'boolean') {
     throw new TypeError('automatic_resubmission must be a boolean');
   }
@@ -197,6 +200,7 @@ Remote.DEFAULTS = {
   max_fee: 1000000, // 1 XRP
   max_attempts: 10,
   submission_timeout: 1000 * 20,
+  pathfind_timeout: 1000 * 10,
   automatic_resubmission: true,
   last_ledger_offset: 3,
   servers: [ ],
@@ -1852,8 +1856,15 @@ Remote.prototype.createPathFind = function(options, callback) {
   }
 
   if (callback) {
+    const updateTimeout = setTimeout(() => {
+      callback(new RippleError('tejTimeout'));
+      pathFind.close();
+      this._cur_path_find = null;
+    }, this.pathfind_timeout);
+
     pathFind.on('update', (data) => {
       if (data.full_reply && !data.closed) {
+        clearTimeout(updateTimeout);
         this._cur_path_find = null;
         callback(null, data);
         // "A client can only have one pathfinding request open at a time.
@@ -1869,7 +1880,10 @@ Remote.prototype.createPathFind = function(options, callback) {
         }
       }
     });
-    pathFind.on('error', callback);
+    pathFind.on('error', (error) => {
+      this._cur_path_find = null;
+      callback(error);
+    });
   }
 
   this._cur_path_find = pathFind;
