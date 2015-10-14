@@ -33,7 +33,7 @@ function hashSerialization(serialized, prefix) {
 
 function computeSignature(txJSON, privateKey) {
   const signingData = binary.encodeForSigning(txJSON);
-  return keypairs.sign(new Buffer(signingData, 'hex'), privateKey);
+  return keypairs.sign(signingData, privateKey);
 }
 
 function sign(txJSON: string, secret: string

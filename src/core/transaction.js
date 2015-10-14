@@ -507,8 +507,7 @@ Transaction.prototype.sign = function(secret) {
   }
 
   const keypair = deriveKeypair(secret || this._secret);
-  this.tx_json.TxnSignature = sign(new Buffer(this.signingData(), 'hex'),
-    keypair.privateKey);
+  this.tx_json.TxnSignature = sign(this.signingData(), keypair.privateKey);
   this.previousSigningHash = hash;
 
   return this;
@@ -1656,7 +1655,7 @@ Transaction.prototype.multiSign = function(account, secret) {
 
   const signer = {
     Account: account,
-    TxnSignature: sign(new Buffer(signingData, 'hex'), keypair.privateKey),
+    TxnSignature: sign(signingData, keypair.privateKey),
     SigningPubKey: keypair.publicKey
   };
 
