@@ -3,5 +3,5 @@ machine:
     version: 0.12.0
 test:
   override:
-    - bin/ci.sh "$CIRCLE_NODE_INDEX" "$CIRCLE_NODE_TOTAL":
+    - scripts/ci.sh "$CIRCLE_NODE_INDEX" "$CIRCLE_NODE_TOTAL":
         parallel: true
