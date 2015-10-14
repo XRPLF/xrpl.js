@@ -1,11 +1,12 @@
-var assert = require('assert');
-var Transaction = require('ripple-lib').Transaction;
-var TransactionQueue = require('ripple-lib').TransactionQueue;
+'use strict';
+const assert = require('assert');
+const Transaction = require('ripple-lib').Transaction;
+const TransactionQueue = require('ripple-lib')._test.TransactionQueue;
 
 describe('Transaction queue', function() {
   it('Push transaction', function() {
-    var queue = new TransactionQueue();
-    var tx = new Transaction();
+    const queue = new TransactionQueue();
+    const tx = new Transaction();
 
     queue.push(tx);
 
@@ -13,8 +14,8 @@ describe('Transaction queue', function() {
   });
 
   it('Remove transaction', function() {
-    var queue = new TransactionQueue();
-    var tx = new Transaction();
+    const queue = new TransactionQueue();
+    const tx = new Transaction();
 
     queue.push(tx);
     queue.remove(tx);
@@ -23,8 +24,8 @@ describe('Transaction queue', function() {
   });
 
   it('Remove transaction by ID', function() {
-    var queue = new TransactionQueue();
-    var tx = new Transaction();
+    const queue = new TransactionQueue();
+    const tx = new Transaction();
 
     queue.push(tx);
 
@@ -33,32 +34,38 @@ describe('Transaction queue', function() {
       '2A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'
     ];
 
-    queue.remove('3A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B');
+    queue.remove(
+      '3A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B');
 
     assert.strictEqual(queue.length(), 1);
 
-    queue.remove('2A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B');
+    queue.remove(
+      '2A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B');
 
     assert.strictEqual(queue.length(), 0);
   });
 
   it('Add sequence', function() {
-    var queue = new TransactionQueue();
+    const queue = new TransactionQueue();
     queue.addReceivedSequence(1);
     assert(queue.hasSequence(1));
   });
 
   it('Add ID', function() {
-    var queue = new TransactionQueue();
-    var tx = new Transaction();
-    queue.addReceivedId('1A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B', tx);
-    assert.strictEqual(queue.getReceived('2A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'), void(0));
-    assert.strictEqual(queue.getReceived('1A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'), tx);
+    const queue = new TransactionQueue();
+    const tx = new Transaction();
+    queue.addReceivedId(
+      '1A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B', tx);
+    assert.strictEqual(queue.getReceived(
+      '2A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'),
+      undefined);
+    assert.strictEqual(queue.getReceived(
+      '1A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'), tx);
   });
 
   it('Get submission', function() {
-    var queue = new TransactionQueue();
-    var tx = new Transaction();
+    const queue = new TransactionQueue();
+    const tx = new Transaction();
 
     queue.push(tx);
 
@@ -67,16 +74,20 @@ describe('Transaction queue', function() {
       '2A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'
     ];
 
-    assert.strictEqual(queue.getSubmission('1A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'), tx);
-    assert.strictEqual(queue.getSubmission('2A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'), tx);
-    assert.strictEqual(queue.getSubmission('3A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'), void(0));
+    assert.strictEqual(queue.getSubmission(
+      '1A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'), tx);
+    assert.strictEqual(queue.getSubmission(
+      '2A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'), tx);
+    assert.strictEqual(queue.getSubmission(
+      '3A4DEBF37496464145AA301F0AA77712E3A2BFE3480D24C3584663F800B85B5B'),
+      undefined);
   });
 
   it('Iterate over queue', function() {
-    var queue = new TransactionQueue();
-    var count = 10;
+    const queue = new TransactionQueue();
+    let count = 10;
 
-    for (var i=0; i<count; i++) {
+    for (let i = 0; i < count; i++) {
       queue.push(new Transaction());
     }
 

@@ -29,12 +29,11 @@ const Account = require('./account').Account;
 const Meta = require('./meta').Meta;
 const OrderBook = require('./orderbook').OrderBook;
 const PathFind = require('./pathfind').PathFind;
-const SerializedObject = require('./serializedobject').SerializedObject;
 const RippleError = require('./rippleerror').RippleError;
 const utils = require('./utils');
-const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('remote');
 const {isValidAddress} = require('ripple-address-codec');
+const binary = require('ripple-binary-codec');
 
 export type GetLedgerSequenceCallback = (err?: ?Error, index?: number) => void;
 
@@ -1412,27 +1411,26 @@ Remote.prototype.requestAccountTx = function(options, callback) {
  */
 
 Remote.parseBinaryAccountTransaction = function(transaction) {
-  const tx_obj = new SerializedObject(transaction.tx_blob);
-  const tx_obj_json = tx_obj.to_json();
-  const meta = new SerializedObject(transaction.meta).to_json();
+  const tx_json = binary.decode(transaction.tx_blob);
+  const meta = binary.decode(transaction.meta);
 
   const tx_result = {
     validated: transaction.validated
   };
 
   tx_result.meta = meta;
-  tx_result.tx = tx_obj_json;
-  tx_result.tx.hash = tx_obj.hash(hashprefixes.HASH_TX_ID).to_hex();
+  tx_result.tx = tx_json;
+  tx_result.tx.hash = Transaction.from_json(tx_json).hash();
   tx_result.tx.ledger_index = transaction.ledger_index;
   tx_result.tx.inLedger = transaction.ledger_index;
 
   if (typeof meta.DeliveredAmount === 'object') {
     tx_result.meta.delivered_amount = meta.DeliveredAmount;
   } else {
-    switch (typeof tx_obj_json.Amount) {
+    switch (typeof tx_json.Amount) {
       case 'string':
       case 'object':
-        tx_result.meta.delivered_amount = tx_obj_json.Amount;
+        tx_result.meta.delivered_amount = tx_json.Amount;
         break;
     }
   }
@@ -1441,10 +1439,10 @@ Remote.parseBinaryAccountTransaction = function(transaction) {
 };
 
 Remote.parseBinaryTransaction = function(transaction) {
-  const tx_obj = new SerializedObject(transaction.tx).to_json();
-  const meta = new SerializedObject(transaction.meta).to_json();
+  const tx_json = binary.decode(transaction.tx);
+  const meta = binary.decode(transaction.meta);
 
-  const tx_result = tx_obj;
+  const tx_result = tx_json;
 
   tx_result.date = transaction.date;
   tx_result.hash = transaction.hash;
@@ -1459,10 +1457,10 @@ Remote.parseBinaryTransaction = function(transaction) {
       tx_result.meta.delivered_amount = meta.DeliveredAmount;
       break;
     default:
-      switch (typeof tx_obj.Amount) {
+      switch (typeof tx_json.Amount) {
         case 'string':
         case 'object':
-          tx_result.meta.delivered_amount = tx_obj.Amount;
+          tx_result.meta.delivered_amount = tx_json.Amount;
           break;
       }
   }
@@ -1481,7 +1479,7 @@ Remote.parseBinaryTransaction = function(transaction) {
  */
 
 Remote.parseBinaryLedgerData = function(ledgerData) {
-  const data = new SerializedObject(ledgerData.data).to_json();
+  const data = binary.decode(ledgerData.data);
   data.index = ledgerData.index;
   return data;
 };

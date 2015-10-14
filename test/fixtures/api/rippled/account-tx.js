@@ -3,9 +3,9 @@
 const _ = require('lodash');
 const hashes = require('../../hashes');
 const addresses = require('../../addresses');
-const SerializedObject = require('ripple-lib').SerializedObject;
 const AccountSet = require('./tx/account-set.json');
 const NotFound = require('./tx/not-found.json');
+const binary = require('ripple-binary-codec');
 
 module.exports = function(request, options = {}) {
   _.defaults(options, {
@@ -229,8 +229,8 @@ module.exports = function(request, options = {}) {
       transactions: [
         {
           ledger_index: 348860 - Number(marker || 100),
-          tx_blob: SerializedObject.from_json(tx).to_hex(),
-          meta: SerializedObject.from_json(meta).to_hex(),
+          tx_blob: binary.encode(tx),
+          meta: binary.encode(meta),
           validated: options.validated
         }
       ]
