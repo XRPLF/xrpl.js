@@ -53,7 +53,9 @@ describe('api', () => {
 
   it('sign - secp256k1', () => {
     const privateKey = fixtures.secp256k1.keypair.privateKey;
-    const signature = api.sign(fixtures.secp256k1.message, privateKey);
+    const message = fixtures.secp256k1.message;
+    const messageHex = (new Buffer(message, 'utf8')).toString('hex');
+    const signature = api.sign(messageHex, privateKey);
     assert.strictEqual(signature, fixtures.secp256k1.signature);
   });
 
@@ -61,12 +63,15 @@ describe('api', () => {
     const signature = fixtures.secp256k1.signature;
     const publicKey = fixtures.secp256k1.keypair.publicKey;
     const message = fixtures.secp256k1.message;
-    assert(api.verify(message, signature, publicKey));
+    const messageHex = (new Buffer(message, 'utf8')).toString('hex');
+    assert(api.verify(messageHex, signature, publicKey));
   });
 
   it('sign - ed25519', () => {
     const privateKey = fixtures.ed25519.keypair.privateKey;
-    const signature = api.sign(fixtures.ed25519.message, privateKey);
+    const message = fixtures.ed25519.message;
+    const messageHex = (new Buffer(message, 'utf8')).toString('hex');
+    const signature = api.sign(messageHex, privateKey);
     assert.strictEqual(signature, fixtures.ed25519.signature);
   });
 
@@ -74,7 +79,8 @@ describe('api', () => {
     const signature = fixtures.ed25519.signature;
     const publicKey = fixtures.ed25519.keypair.publicKey;
     const message = fixtures.ed25519.message;
-    assert(api.verify(message, signature, publicKey));
+    const messageHex = (new Buffer(message, 'utf8')).toString('hex');
+    assert(api.verify(messageHex, signature, publicKey));
   });
 
   it('deriveNodeAddress', () => {

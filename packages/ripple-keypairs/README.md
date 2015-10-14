@@ -17,14 +17,14 @@ deriveKeypair(seed: string) -> {privateKey: string, publicKey: string}
 Derive a public and private key from a seed. The keys are represented as 33-byte hexadecimal strings.
 
 ```
-sign(message: string, privateKey: string) -> string
+sign(messageHex: string, privateKey: string) -> string
 ```
-Sign an arbitrary message with a private key. Returns the signature as a hexadecimal string.
+Sign an arbitrary hex-encoded message with a private key. Returns the signature as a hexadecimal string.
 
 ```
-verify(message: string, signature: string, publicKey: string) -> boolean
+verify(messageHex: string, signature: string, publicKey: string) -> boolean
 ```
-Verify a signature for a given message and public key. Returns true if the signature is valid, false otherwise.
+Verify a signature for a given hex-encoded message and public key. Returns true if the signature is valid, false otherwise.
 
 ```
 deriveAddress(publicKey: string) -> string

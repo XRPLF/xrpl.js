@@ -52,6 +52,9 @@ const ed25519 = {
     return {privateKey, publicKey};
   },
   sign: function(message, privateKey) {
+    // caution: Ed25519.sign interprets all strings as hex, stripping
+    // any non-hex characters without warning
+    assert(Array.isArray(message), 'message must be array of octets');
     return bytesToHex(Ed25519.sign(
       message, hexToBytes(privateKey).slice(1)).toBytes());
   },
@@ -78,14 +81,14 @@ function getAlgorithmFromKey(key) {
     'ed25519' : 'ecdsa-secp256k1';
 }
 
-function sign(message, privateKey) {
+function sign(messageHex, privateKey) {
   const algorithm = getAlgorithmFromKey(privateKey);
-  return select(algorithm).sign(message, privateKey);
+  return select(algorithm).sign(hexToBytes(messageHex), privateKey);
 }
 
-function verify(message, signature, publicKey) {
+function verify(messageHex, signature, publicKey) {
   const algorithm = getAlgorithmFromKey(publicKey);
-  return select(algorithm).verify(message, signature, publicKey);
+  return select(algorithm).verify(hexToBytes(messageHex), signature, publicKey);
 }
 
 function deriveAddressFromBytes(publicKeyBytes) {
