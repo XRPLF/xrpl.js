@@ -168,10 +168,10 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_human('12345.6789 XAU').to_human_full(), '12,345.6789/XAU/NaN');
     });
     it('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000', function() {
-      assert.strictEqual(Amount.from_human('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000').to_text_full(), '12345.6789/XAU (-0.5%pa)/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000').to_text_full(), '12345.6789/015841551A748AD2C1F76FF6ECB0CCCD00000000/NaN');
     });
     it('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000 human', function() {
-      assert.strictEqual(Amount.from_human('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000').to_human_full(), '12,345.6789/XAU (-0.5%pa)/NaN');
+      assert.strictEqual(Amount.from_human('12345.6789 015841551A748AD2C1F76FF6ECB0CCCD00000000').to_human_full(), '12,345.6789/015841551A748AD2C1F76FF6ECB0CCCD00000000/NaN');
     });
     it('12345.6789 0000000000000000000000005553440000000000', function() {
       assert.strictEqual(Amount.from_human('12345.6789 0000000000000000000000005553440000000000').to_text_full(), '12345.6789/USD/NaN');
@@ -320,16 +320,10 @@ describe('Amount', function() {
       assert(isNaN(Amount.from_json('x').to_text()));
     });
     it('parse dem', function() {
-      assert.strictEqual(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full(), '10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
     it('parse dem human', function() {
-      assert.strictEqual(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_human_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-    });
-    it('parse dem', function() {
-      assert.strictEqual(Amount.from_json('10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-    });
-    it('parse dem human', function() {
-      assert.strictEqual(Amount.from_json('10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_human_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
+      assert.strictEqual(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').to_human_full(), '10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
     it('Parse native 0', function() {
       assert.strictEqual('0/XRP', Amount.from_json('0').to_text_full());
@@ -948,9 +942,6 @@ describe('Amount', function() {
     it('Multiply XRP with XRP', function() {
       assert.strictEqual(Amount.from_json('10000000').product_human(Amount.from_json('10')).to_text_full(), '0.0001/XRP');
     });
-    it('Multiply USD with XAU (dem)', function() {
-      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_text_full(), '19900.00316303883/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-    });
     it('Multiply 0 XRP with 0 XRP human', function() {
       assert.strictEqual('0/XRP', Amount.from_json('0').product_human(Amount.from_json('0')).to_human_full());
     });
@@ -1020,9 +1011,6 @@ describe('Amount', function() {
     it('Multiply XRP with XRP human', function() {
       assert.strictEqual(Amount.from_json('10000000').product_human(Amount.from_json('10')).to_human_full(), '0.0001/XRP');
     });
-    it('Multiply USD with XAU (dem) human', function() {
-      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').product_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_human_full(), '19,900.00316303883/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-    });
   });
 
   describe('ratio_human', function() {
@@ -1036,12 +1024,6 @@ describe('Amount', function() {
       const c = a.ratio_human(b);
       assert.deepEqual(c.to_json(), {value: '0.005441114728882572',
         currency: 'USD', issuer: 'rLFPPebckMYZf3urdomLsaqRGmQ6zHVrrK'});
-    });
-    it('Divide USD by XAU (dem)', function() {
-      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').ratio_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_text_full(), '201.0049931765529/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-    });
-    it('Divide USD by XAU (dem) human', function() {
-      assert.strictEqual(Amount.from_json('2000/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').ratio_human(Amount.from_json('10/015841551A748AD2C1F76FF6ECB0CCCD00000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'), {reference_date: 443845330 + 31535000}).to_human_full(), '201.0049931765529/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
   });
 
@@ -1090,18 +1072,6 @@ describe('Amount', function() {
     it('BTC/USD inverse', function() {
       assert.strictEqual(Amount.from_quality('20294C923E80A51B487EB9547B3835FD483748B170D2D0A455071AFD498D0000', 'USD', 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B', {inverse: true, base_currency: 'BTC'}).to_text_full(), '0.5/USD/rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B');
     });
-    it('XAU(dem)/XRP', function() {
-      assert.strictEqual(Amount.from_quality('587322CCBDE0ABD01704769A73A077C32FB39057D813D4165F1FF973CAF997EF', 'XRP', NaN, {base_currency: '015841551A748AD2C1F76FF6ECB0CCCD00000000', reference_date: 443845330 + 31535000}).to_text_full(), '90,452.246928/XRP');
-    });
-    it('XAU(dem)/XRP inverse', function() {
-      assert.strictEqual(Amount.from_quality('F72C7A9EAE4A45ED1FB547AD037D07B9B965C6E662BEBAFA4A03F2A976804235', 'XRP', NaN, {inverse: true, base_currency: '015841551A748AD2C1F76FF6ECB0CCCD00000000', reference_date: 443845330 + 31535000}).to_text_full(), '90,442.196677/XRP');
-    });
-    it('USD/XAU(dem)', function() {
-      assert.strictEqual(Amount.from_quality('4743E58E44974B325D42FD2BB683A6E36950F350EE46DD3A521B644B99782F5F', '015841551A748AD2C1F76FF6ECB0CCCD00000000', 'rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN', {base_currency: 'USD', reference_date: 443845330 + 31535000}).to_text_full(), '0.007710100231303007/XAU (-0.5%pa)/rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN');
-    });
-    it('USD/XAU(dem) inverse', function() {
-      assert.strictEqual(Amount.from_quality('CDFD3AFB2F8C5DBEF75B081F7C957FF5509563266F28F36C5704A0FB0BAD8800', '015841551A748AD2C1F76FF6ECB0CCCD00000000', 'rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN', {inverse: true, base_currency: 'USD', reference_date: 443845330 + 31535000}).to_text_full(), '0.007675186123263489/XAU (-0.5%pa)/rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN');
-    });
     it('BTC/XRP human', function() {
       assert.strictEqual(Amount.from_quality('7B73A610A009249B0CC0D4311E8BA7927B5A34D86634581C5F0FF9FF678E1000', 'XRP', NaN, {base_currency: 'BTC'}).to_human_full(), '44,970/XRP');
     });
@@ -1119,57 +1089,6 @@ describe('Amount', function() {
     });
     it('BTC/USD inverse human', function() {
       assert.strictEqual(Amount.from_quality('20294C923E80A51B487EB9547B3835FD483748B170D2D0A455071AFD498D0000', 'USD', 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B', {inverse: true, base_currency: 'BTC'}).to_human_full(), '0.5/USD/rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B');
-    });
-    it('XAU(dem)/XRP human', function() {
-      assert.strictEqual(Amount.from_quality('587322CCBDE0ABD01704769A73A077C32FB39057D813D4165F1FF973CAF997EF', 'XRP', NaN, {base_currency: '015841551A748AD2C1F76FF6ECB0CCCD00000000', reference_date: 443845330 + 31535000}).to_human_full(), '90,452.246928/XRP');
-    });
-    it('XAU(dem)/XRP inverse human', function() {
-      assert.strictEqual(Amount.from_quality('F72C7A9EAE4A45ED1FB547AD037D07B9B965C6E662BEBAFA4A03F2A976804235', 'XRP', NaN, {inverse: true, base_currency: '015841551A748AD2C1F76FF6ECB0CCCD00000000', reference_date: 443845330 + 31535000}).to_human_full(), '90,442.196677/XRP');
-    });
-    it('USD/XAU(dem) human', function() {
-      assert.strictEqual(Amount.from_quality('4743E58E44974B325D42FD2BB683A6E36950F350EE46DD3A521B644B99782F5F', '015841551A748AD2C1F76FF6ECB0CCCD00000000', 'rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN', {base_currency: 'USD', reference_date: 443845330 + 31535000}).to_human_full(), '0.007710100231303007/XAU (-0.5%pa)/rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN');
-    });
-    it('USD/XAU(dem) inverse human', function() {
-      assert.strictEqual(Amount.from_quality('CDFD3AFB2F8C5DBEF75B081F7C957FF5509563266F28F36C5704A0FB0BAD8800', '015841551A748AD2C1F76FF6ECB0CCCD00000000', 'rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN', {inverse: true, base_currency: 'USD', reference_date: 443845330 + 31535000}).to_human_full(), '0.007675186123263489/XAU (-0.5%pa)/rUyPiNcSFFj6uMR2gEaD8jUerQ59G1qvwN');
-    });
-  });
-
-  describe('apply interest', function() {
-    it('from_json apply interest 10 XAU', function() {
-      let demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(demAmount.to_text_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      demAmount = demAmount.applyInterest(459990264);
-      assert.strictEqual(demAmount.to_text_full(), '9.294949401870436/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-
-    });
-    it('from_json apply interest XAU', function() {
-      let demAmount = Amount.from_json('1235.5/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(demAmount.to_text_full(), '1235.5/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      demAmount = demAmount.applyInterest(459990264);
-      assert.strictEqual(demAmount.to_text_full(), '1148.390998601092/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-    });
-    it('from_human with reference date', function() {
-      const demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date: 459990264});
-      demAmount.set_issuer('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(demAmount.to_text_full(), '10.75853086191915/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-    });
-    it('from_json apply interest 10 XAU human', function() {
-      let demAmount = Amount.from_json('10/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(demAmount.to_human_full(), '10/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      demAmount = demAmount.applyInterest(459990264);
-      assert.strictEqual(demAmount.to_human_full(), '9.294949401870436/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-
-    });
-    it('from_json apply interest XAU human', function() {
-      let demAmount = Amount.from_json('1235.5/0158415500000000C1F76FF6ECB0BAC600000000/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(demAmount.to_human_full(), '1,235.5/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      demAmount = demAmount.applyInterest(459990264);
-      assert.strictEqual(demAmount.to_human_full(), '1,148.390998601092/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-    });
-    it('from_human with reference date human', function() {
-      const demAmount = Amount.from_human('10 0158415500000000C1F76FF6ECB0BAC600000000', {reference_date: 459990264});
-      demAmount.set_issuer('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
-      assert.strictEqual(demAmount.to_human_full(), '10.75853086191915/XAU (-0.5%pa)/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
   });
 

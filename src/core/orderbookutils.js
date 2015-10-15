@@ -108,27 +108,10 @@ OrderBookUtils.getOfferTakerGets = function(offer, currency_, issuer_) {
  * @param {Currency} currencyGets
  */
 
-OrderBookUtils.getOfferQuality = function(offer, currencyGets, currency_,
-  issuer_
-) {
-  let amount;
-
-  if (currencyGets.has_interest()) {
-    // XXX Should use Amount#from_quality
-    amount = Amount.from_json(
-      offer.TakerPays
-    ).ratio_human(offer.TakerGets, {
-      reference_date: new Date()
-    });
-  } else {
-
-    const currency = currency_ || getCurrencyFromOffer(offer);
-    const issuer = issuer_ || getIssuerFromOffer(offer);
-
-    amount = createAmount(offer.quality, currency, issuer);
-  }
-
-  return amount;
+OrderBookUtils.getOfferQuality = function(offer, currency_, issuer_) {
+  const currency = currency_ || getCurrencyFromOffer(offer);
+  const issuer = issuer_ || getIssuerFromOffer(offer);
+  return createAmount(offer.quality, currency, issuer);
 };
 
 /**
