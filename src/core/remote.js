@@ -23,7 +23,7 @@ const EventEmitter = require('events').EventEmitter;
 const Server = require('./server').Server;
 const Request = require('./request').Request;
 const Amount = require('./amount').Amount;
-const Currency = require('./currency').Currency;
+const {normalizeCurrency} = require('./currency');
 const Transaction = require('./transaction').Transaction;
 const Account = require('./account').Account;
 const Meta = require('./meta').Meta;
@@ -1532,18 +1532,18 @@ Remote.prototype.requestBookOffers = function(options, callback) {
   const request = new Request(this, 'book_offers');
 
   request.message.taker_gets = {
-    currency: Currency.json_rewrite(taker_gets.currency, {force_hex: true})
+    currency: taker_gets.currency
   };
 
-  if (!Currency.from_json(request.message.taker_gets.currency).is_native()) {
+  if (normalizeCurrency(request.message.taker_gets.currency) !== 'XRP') {
     request.message.taker_gets.issuer = taker_gets.issuer;
   }
 
   request.message.taker_pays = {
-    currency: Currency.json_rewrite(taker_pays.currency, {force_hex: true})
+    currency: taker_pays.currency
   };
 
-  if (!Currency.from_json(request.message.taker_pays.currency).is_native()) {
+  if (normalizeCurrency(request.message.taker_pays.currency) !== 'XRP') {
     request.message.taker_pays.issuer = taker_pays.issuer;
   }
 
@@ -1890,7 +1890,7 @@ Remote.prototype.createPathFind = function(options, callback) {
 };
 
 Remote.prepareTrade = function(currency, issuer) {
-  const suffix = Currency.from_json(currency).is_native() ? '' : ('/' + issuer);
+  const suffix = normalizeCurrency(currency) === 'XRP' ? '' : ('/' + issuer);
   return currency + suffix;
 };
 
@@ -2139,8 +2139,7 @@ Remote.prepareCurrencies = function(currency) {
   }
 
   if (currency.hasOwnProperty('currency')) {
-    newCurrency.currency =
-      Currency.json_rewrite(currency.currency, {force_hex: true});
+    newCurrency.currency = currency.currency;
   }
 
   return newCurrency;

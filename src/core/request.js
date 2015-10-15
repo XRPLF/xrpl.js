@@ -4,7 +4,7 @@ const _ = require('lodash');
 const EventEmitter = require('events').EventEmitter;
 const util = require('util');
 const async = require('async');
-const Currency = require('./currency').Currency;
+const {normalizeCurrency} = require('./currency');
 const RippleError = require('./rippleerror').RippleError;
 
 // Request events emitted:
@@ -572,12 +572,10 @@ Request.prototype.addBook = function(book, snapshot) {
     }
 
     const obj = json[side] = {
-      currency: Currency.json_rewrite(book[side].currency, {
-        force_hex: true
-      })
+      currency: normalizeCurrency(book[side].currency)
     };
 
-    if (!Currency.from_json(obj.currency).is_native()) {
+    if (obj.currency !== 'XRP') {
       obj.issuer = book[side].issuer;
     }
   }

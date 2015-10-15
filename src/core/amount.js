@@ -6,10 +6,11 @@
 const assert = require('assert');
 const extend = require('extend');
 const utils = require('./utils');
-const Currency = require('./currency').Currency;
+const normalizeCurrency = require('./currency').normalizeCurrency;
 const {XRPValue, IOUValue} = require('ripple-lib-value');
 const {isValidAddress} = require('ripple-address-codec');
-const {ACCOUNT_ONE, ACCOUNT_ZERO} = require('./constants');
+const {ACCOUNT_ONE, ACCOUNT_ZERO, CURRENCY_ONE}
+  = require('./constants');
 
 type Value = XRPValue | IOUValue;
 
@@ -21,7 +22,7 @@ function Amount(value = new XRPValue(NaN)) {
 
   this._value = value;
   this._is_native = true; // Default to XRP. Only valid if value is not NaN.
-  this._currency = new Currency();
+  this._currency = null;
   this._issuer = 'NaN';
 }
 
@@ -105,7 +106,7 @@ Amount.NaN = function() {
   return result;                      // but let's be careful
 };
 
-Amount.from_components_unsafe = function(value: Value, currency: Currency,
+Amount.from_components_unsafe = function(value: Value, currency: string,
   issuer: string, isNative: boolean
 ) {
   const result = new Amount(value);
@@ -378,7 +379,7 @@ Amount.prototype.equals = function(d, ignore_issuer) {
   return this.is_valid() && d.is_valid()
          && this._is_native === d._is_native
          && this._value.equals(d._value)
-         && (this._is_native || (this._currency.equals(d._currency)
+         && (this._is_native || ((this._currency === d._currency)
               && (ignore_issuer || this._issuer === d._issuer)));
 };
 
@@ -405,7 +406,7 @@ Amount.prototype.is_valid = function() {
 };
 
 Amount.prototype.is_valid_full = function() {
-  return this.is_valid() && this._currency.is_valid()
+  return this.is_valid() && this._currency !== null
     && isValidAddress(this._issuer) && this._issuer !== ACCOUNT_ZERO;
 };
 
@@ -540,7 +541,7 @@ Amount.prototype.parse_quality =
 function(quality, counterCurrency, counterIssuer, opts) {
   const options = opts || {};
 
-  const baseCurrency = Currency.from_json(options.base_currency);
+  const baseCurrency = options.base_currency;
 
   const mantissa_hex = quality.substring(quality.length - 14);
   const offset_hex = quality.substring(
@@ -548,11 +549,11 @@ function(quality, counterCurrency, counterIssuer, opts) {
   const mantissa = new IOUValue(mantissa_hex, null, 16);
   const offset = parseInt(offset_hex, 16) - 100;
 
-  this._currency = Currency.from_json(counterCurrency);
+  this._currency = normalizeCurrency(counterCurrency);
   this._issuer = counterIssuer;
-  this._is_native = this._currency.is_native();
+  this._is_native = (this._currency === 'XRP');
 
-  if (this._is_native && baseCurrency.is_native()) {
+  if (this._is_native && baseCurrency === 'XRP') {
     throw new Error('XRP/XRP quality is not allowed');
   }
 
@@ -583,7 +584,7 @@ function(quality, counterCurrency, counterIssuer, opts) {
       // pay:$price              drops  get:1 X
       // pay:($price / 1,000,000)  XRP  get:1 X
       nativeAdjusted = nativeAdjusted.divide(bi_xns_unit);
-    } else if (baseCurrency.is_valid() && baseCurrency.is_native()) {
+    } else if (baseCurrency === 'XRP') {
       // pay:$price X                   get:1 drop
       // pay:($price * 1,000,000) X     get:1 XRP
       nativeAdjusted = nativeAdjusted.multiply(bi_xns_unit);
@@ -602,7 +603,7 @@ function(quality, counterCurrency, counterIssuer, opts) {
 
 Amount.prototype.parse_number = function(n) {
   this._is_native = false;
-  this._currency = Currency.from_json(1);
+  this._currency = CURRENCY_ONE;
   this._issuer = ACCOUNT_ONE;
   this._set_value(new IOUValue(n));
   return this;
@@ -617,7 +618,7 @@ Amount.prototype.parse_json = function(j) {
       const m = j.match(/^([^/]+)\/([^/]+)(?:\/(.+))?$/);
 
       if (m) {
-        this._currency = Currency.from_json(m[2]);
+        this._currency = normalizeCurrency(m[2]);
         if (m[3]) {
           this._issuer = m[3];
         } else {
@@ -626,7 +627,7 @@ Amount.prototype.parse_json = function(j) {
         this.parse_value(m[1]);
       } else {
         this.parse_native(j);
-        this._currency = Currency.from_json('0');
+        this._currency = 'XRP';
         this._issuer = ACCOUNT_ZERO;
       }
       break;
@@ -643,8 +644,7 @@ Amount.prototype.parse_json = function(j) {
       if (j instanceof Amount) {
         j.copyTo(this);
       } else if (j.hasOwnProperty('value')) {
-        // Parse the passed value to sanitize and copy it.
-        this._currency.parse_json(j.currency, true); // Never XRP.
+        this._currency = normalizeCurrency(j.currency);
 
         if (typeof j.issuer !== 'string') {
           throw new Error('issuer must be a string');
@@ -691,8 +691,8 @@ Amount.prototype.parse_value = function(j) {
 };
 
 Amount.prototype.set_currency = function(c) {
-  this._currency = Currency.from_json(c);
-  this._is_native = this._currency.is_native();
+  this._currency = normalizeCurrency(c);
+  this._is_native = (c === 'XRP');
   return this;
 };
 
@@ -869,7 +869,7 @@ Amount.prototype.to_human = function(options) {
 Amount.prototype.to_human_full = function(options) {
   const opts = options || {};
   const value = this.to_human(opts);
-  const currency = this._currency.to_json();
+  const currency = this._currency;
   const issuer = this._issuer;
   const base = value + '/' + currency;
   return this.is_native() ? base : (base + '/' + issuer);
@@ -882,7 +882,7 @@ Amount.prototype.to_json = function() {
 
   const amount_json = {
     value: this.to_text(),
-    currency: this._currency.to_json()
+    currency: this._currency
   };
 
   if (isValidAddress(this._issuer)) {
@@ -898,8 +898,7 @@ Amount.prototype.to_text_full = function() {
   }
   return this._is_native
       ? this.to_human() + '/XRP'
-      : this.to_text() + '/' + this._currency.to_json()
-        + '/' + this._issuer;
+      : this.to_text() + '/' + this._currency + '/' + this._issuer;
 };
 
 // For debugging.
@@ -925,7 +924,7 @@ Amount.prototype.not_equals_why = function(d, ignore_issuer) {
     return type + ' value differs.';
   }
   if (!this._is_native) {
-    if (!this._currency.equals(d._currency)) {
+    if (this._currency !== d._currency) {
       return 'Non-XRP currency differs.';
     }
     if (!ignore_issuer && this._issuer !== d._issuer) {

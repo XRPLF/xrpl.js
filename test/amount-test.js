@@ -244,22 +244,22 @@ describe('Amount', function() {
   });
   describe('from_number', function() {
     it('Number 1', function() {
-      assert.strictEqual(Amount.from_number(1).to_text_full(), '1/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(1).to_text_full(), '1/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
     it('Number 1 human', function() {
-      assert.strictEqual(Amount.from_number(1).to_human_full(), '1/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(1).to_human_full(), '1/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
     it('Number 2', function() {
-      assert.strictEqual(Amount.from_number(2).to_text_full(), '2/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(2).to_text_full(), '2/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
     it('Number 2 human', function() {
-      assert.strictEqual(Amount.from_number(2).to_human_full(), '2/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(2).to_human_full(), '2/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
     it('Multiply 2 "1" with 3 "1", by product_human', function() {
-      assert.strictEqual(Amount.from_number(2).product_human(Amount.from_number(3)).to_text_full(), '6/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(2).product_human(Amount.from_number(3)).to_text_full(), '6/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
     it('Multiply 2 "1" with 3 "1", by product_human human', function() {
-      assert.strictEqual(Amount.from_number(2).product_human(Amount.from_number(3)).to_human_full(), '6/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(2).product_human(Amount.from_number(3)).to_human_full(), '6/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
     it('Multiply 3 USD with 3 "1"', function() {
       assert.strictEqual(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').multiply(Amount.from_number(3)).to_text_full(), '9/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
@@ -268,16 +268,16 @@ describe('Amount', function() {
       assert.strictEqual(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh').multiply(Amount.from_number(3)).to_human_full(), '9/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh');
     });
     it('Multiply -1 "1" with 3 USD', function() {
-      assert.strictEqual(Amount.from_number(-1).multiply(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full(), '-3/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(-1).multiply(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full(), '-3/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
     it('Multiply -1 "1" with 3 USD human', function() {
-      assert.strictEqual(Amount.from_number(-1).multiply(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_human_full(), '-3/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(-1).multiply(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_human_full(), '-3/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
     it('Multiply -1 "1" with 3 USD, by product_human', function() {
-      assert.strictEqual(Amount.from_number(-1).product_human(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full(), '-3/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(-1).product_human(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_text_full(), '-3/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
     it('Multiply -1 "1" with 3 USD, by product_human human', function() {
-      assert.strictEqual(Amount.from_number(-1).product_human(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_human_full(), '-3/1/rrrrrrrrrrrrrrrrrrrrBZbvji');
+      assert.strictEqual(Amount.from_number(-1).product_human(Amount.from_json('3/USD/rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')).to_human_full(), '-3/0000000000000000000000000000000000000001/rrrrrrrrrrrrrrrrrrrrBZbvji');
     });
   });
   describe('text_full_rewrite', function() {
