@@ -19,13 +19,22 @@ function getTrustlineBalanceAmount(trustline) {
   };
 }
 
-function formatBalances(balances) {
-  const xrpBalance = {
-    currency: 'XRP',
-    value: balances.xrp
-  };
-  return [xrpBalance].concat(
-    balances.trustlines.map(getTrustlineBalanceAmount));
+function formatBalances(options, balances) {
+  const result = balances.trustlines.map(getTrustlineBalanceAmount);
+  if (!(options.counterparty ||
+       (options.currency && options.currency !== 'XRP')
+  )) {
+    const xrpBalance = {
+      currency: 'XRP',
+      value: balances.xrp
+    };
+    result.unshift(xrpBalance);
+  }
+  if (options.limit && result.length > options.limit) {
+    const toRemove = result.length - options.limit;
+    result.splice(-toRemove, toRemove);
+  }
+  return result;
 }
 
 function getTrustlinesAsync(account, options, callback) {
@@ -54,7 +63,7 @@ function getBalancesAsync(account, options, callback) {
       _.partial(utils.getXRPBalance, this.remote, account)
     ),
     trustlines: _.partial(getTrustlinesAsync.bind(this), account, options)
-  }, composeAsync(formatBalances, convertErrors(callback)));
+  }, composeAsync(_.partial(formatBalances, options), convertErrors(callback)));
 }
 
 function getBalances(account: string, options = {}) {
