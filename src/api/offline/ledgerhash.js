@@ -2,6 +2,7 @@
 'use strict';
 const _ = require('lodash');
 const common = require('../common');
+const hashes = require('ripple-hashes');
 
 function convertLedgerHeader(header) {
   return {
@@ -25,7 +26,7 @@ function convertLedgerHeader(header) {
 
 function hashLedgerHeader(ledgerHeader) {
   const header = convertLedgerHeader(ledgerHeader);
-  return common.core.Ledger.calculateLedgerHash(header);
+  return hashes.computeLedgerHash(header);
 }
 
 function computeTransactionHash(ledger) {
@@ -39,8 +40,7 @@ function computeTransactionHash(ledger) {
       tx.meta ? {metaData: tx.meta} : {});
     return renameMeta;
   });
-  const ledgerObject = common.core.Ledger.from_json({transactions: txs});
-  const transactionHash = ledgerObject.calc_tx_hash();
+  const transactionHash = hashes.computeTransactionTreeHash(txs);
   if (ledger.transactionHash !== undefined
       && ledger.transactionHash !== transactionHash) {
     throw new common.errors.ValidationError('transactionHash in header'
@@ -54,8 +54,7 @@ function computeStateHash(ledger) {
     return ledger.stateHash;
   }
   const state = JSON.parse(ledger.rawState);
-  const ledgerObject = common.core.Ledger.from_json({accountState: state});
-  const stateHash = ledgerObject.calc_account_hash();
+  const stateHash = hashes.computeStateTreeHash(state);
   if (ledger.stateHash !== undefined && ledger.stateHash !== stateHash) {
     throw new common.errors.ValidationError('stateHash in header'
       + ' does not match computed hash of state');
@@ -64,11 +63,11 @@ function computeStateHash(ledger) {
 }
 
 function computeLedgerHash(ledger: Object): string {
-  const hashes = {
+  const subhashes = {
     transactionHash: computeTransactionHash(ledger),
     stateHash: computeStateHash(ledger)
   };
-  return hashLedgerHeader(_.assign({}, ledger, hashes));
+  return hashLedgerHeader(_.assign({}, ledger, subhashes));
 }
 
 module.exports = computeLedgerHash;

@@ -9,7 +9,6 @@ exports.Meta = require('./meta').Meta;
 exports.RippleError = require('./rippleerror').RippleError;
 exports.utils = require('./utils');
 exports.Server = require('./server').Server;
-exports.Ledger = require('./ledger').Ledger;
 
 exports._test = {
   Log: require('./log'),
@@ -17,7 +16,6 @@ exports._test = {
   TransactionManager: require('./transactionmanager').TransactionManager,
   TransactionQueue: require('./transactionqueue').TransactionQueue,
   RangeSet: require('./rangeset').RangeSet,
-  HashPrefixes: require('./hashprefixes'),
   OrderbookUtils: require('./orderbookutils'),
   constants: require('./constants')
 };

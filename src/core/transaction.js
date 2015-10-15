@@ -10,10 +10,11 @@ const sjclcodec = require('sjcl-codec');
 const Amount = require('./amount').Amount;
 const Currency = require('./currency').Currency;
 const RippleError = require('./rippleerror').RippleError;
-const hashprefixes = require('./hashprefixes');
 const log = require('./log').internal.sub('transaction');
 const {isValidAddress, decodeAddress} = require('ripple-address-codec');
 const binary = require('ripple-binary-codec');
+const {computeTransactionHash, computeTransactionSigningHash}
+  = require('ripple-hashes');
 
 /**
  * @constructor Transaction
@@ -462,8 +463,8 @@ Transaction.prototype.serialize = function() {
   return binary.encode(this.tx_json);
 };
 
-Transaction.prototype.signingHash = function(testnet) {
-  return this.hash(testnet ? 'HASH_TX_SIGN_TESTNET' : 'HASH_TX_SIGN');
+Transaction.prototype.signingHash = function() {
+  return computeTransactionSigningHash(this.tx_json);
 };
 
 Transaction.prototype.signingData = function() {
@@ -474,21 +475,8 @@ Transaction.prototype.multiSigningData = function(account) {
   return binary.encodeForMultisigning(this.tx_json, account);
 };
 
-Transaction.prototype.hash = function(prefix_, serialized_) {
-  let prefix;
-  assert(serialized_ === undefined || _.isString(serialized_));
-
-  if (typeof prefix_ !== 'string') {
-    prefix = hashprefixes.HASH_TX_ID;
-  } else if (!hashprefixes.hasOwnProperty(prefix_)) {
-    throw new Error('Unknown hashing prefix requested: ' + prefix_);
-  } else {
-    prefix = hashprefixes[prefix_];
-  }
-
-  const hexPrefix = prefix.toString(16).toUpperCase();
-  const serialized = serialized_ || this.serialize();
-  return utils.sha512half(new Buffer(hexPrefix + serialized, 'hex'));
+Transaction.prototype.hash = function() {
+  return computeTransactionHash(this.tx_json);
 };
 
 Transaction.prototype.sign = function(secret) {

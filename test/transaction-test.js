@@ -637,25 +637,8 @@ describe('Transaction', function() {
     transaction.tx_json.Sequence = 1;
     transaction.tx_json.TransactionType = 'AccountSet';
 
-    assert.strictEqual(transaction.hash('HASH_TX_SIGN'), 'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
-    assert.strictEqual(transaction.hash('HASH_TX_SIGN_TESTNET'), '9FE7D27FC5B9891076B66591F99A683E01E0912986A629235459A3BD1961F341');
-
-    done();
-  });
-
-  it('Get hash - invalid prefix', function(done) {
-    const transaction = new Transaction();
-    transaction._secret = 'sh2pTicynUEG46jjR4EoexHcQEoij';
-    transaction.tx_json.SigningPubKey = '021FED5FD081CE5C4356431267D04C6E2167E4112C897D5E10335D4E22B4DA49ED';
-    transaction.tx_json.Account = 'rMWwx3Ma16HnqSd4H6saPisihX9aKpXxHJ';
-    transaction.tx_json.Flags = 0;
-    transaction.tx_json.Fee = '10';
-    transaction.tx_json.Sequence = 1;
-    transaction.tx_json.TransactionType = 'AccountSet';
-
-    assert.throws(function() {
-      transaction.hash('HASH_TX_SIGNZ');
-    });
+    assert.strictEqual(transaction.signingHash(),
+      'D1C15200CF532175F1890B6440AD223D3676140522BC11D2784E56760AE3B4FE');
 
     done();
   });
@@ -2258,10 +2241,11 @@ describe('Transaction', function() {
     const txHex = binary.encode(
       lodash.merge(transaction.tx_json, {SigningPubKey: ''}));
     const abytes = decodeAddress(a1);
-    const prefix = require('ripple-lib')._test.HashPrefixes.HASH_TX_MULTISIGN_BYTES;
+    const prefix = 0x534D5400;
+    const prefixHex = prefix.toString(16);
 
     assert.deepEqual(new Buffer(d1, 'hex'),
-      Buffer.concat([new Buffer(prefix), new Buffer(txHex, 'hex'),
+      Buffer.concat([new Buffer(prefixHex, 'hex'), new Buffer(txHex, 'hex'),
         new Buffer(abytes)]));
   });
 
