@@ -6,8 +6,17 @@ const common = require('../common');
 const dropsToXrp = common.dropsToXrp;
 const composeAsync = common.composeAsync;
 import type {Remote} from '../../core/remote';
+import type {TransactionType} from './transaction-types';
+import type {Issue} from '../common/types.js';
 
 type Callback = (err: any, data: any) => void
+
+type RecursiveData = {
+  marker: string,
+  results: Array<any>
+}
+
+type RecursiveCallback = (err: any, data: RecursiveData) => void
 
 function clamp(value: number, min: number, max: number): number {
   assert(min <= max, 'Illegal clamp bounds');
@@ -21,7 +30,8 @@ function getXRPBalance(remote: Remote, address: string, ledgerVersion?: number,
     composeAsync((data) => dropsToXrp(data.account_data.Balance), callback));
 }
 
-type Getter = (marker: ?string, limit: number, callback: Callback) => void
+type Getter = (marker: ?string, limit: number,
+  callback: RecursiveCallback) => void
 
 // If the marker is omitted from a response, you have reached the end
 // getter(marker, limit, callback), callback(error, {marker, results})
@@ -48,21 +58,20 @@ function getRecursive(getter: Getter, limit?: number, callback: Callback) {
   getRecursiveRecur(getter, undefined, limit || Infinity, callback);
 }
 
-type Amount = {counterparty?: string, issuer?: string, value: string}
-
-function renameCounterpartyToIssuer(amount?: Amount): ?{issuer?: string} {
+function renameCounterpartyToIssuer(amount?: Issue): ?{issuer?: string} {
   if (amount === undefined) {
     return undefined;
   }
   const issuer = amount.counterparty === undefined ?
-    amount.issuer : amount.counterparty;
+    (amount.issuer !== undefined ? amount.issuer : undefined) :
+    amount.counterparty;
   const withIssuer = _.assign({}, amount, {issuer: issuer});
   return _.omit(withIssuer, 'counterparty');
 }
 
-type Order = {taker_gets: Amount, taker_pays: Amount}
+type RequestBookOffersArgs = {taker_gets: Issue, taker_pays: Issue}
 
-function renameCounterpartyToIssuerInOrder(order: Order) {
+function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
   const taker_gets = renameCounterpartyToIssuer(order.taker_gets);
   const taker_pays = renameCounterpartyToIssuer(order.taker_pays);
   const changes = {taker_gets: taker_gets, taker_pays: taker_pays};
@@ -84,9 +93,8 @@ function signum(num) {
  *  @returns {Number} [-1, 0, 1]
  */
 
-type Outcome = {outcome: {ledgerVersion: number, indexInLedger: number}};
-
-function compareTransactions(first: Outcome, second: Outcome): number {
+function compareTransactions(first: TransactionType, second: TransactionType
+): number {
   if (!first.outcome || !second.outcome) {
     return 0;
   }

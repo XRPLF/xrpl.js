@@ -7,11 +7,40 @@ const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
 const parseOrderbookOrder = require('./parse/orderbook-order');
+import type {Remote} from '../../core/remote';
+import type {OrdersOptions, OrderSpecification} from './types.js';
+import type {Amount, Issue} from '../common/types.js';
+
+type Orderbook = {
+  base: Issue,
+  counter: Issue
+}
+
+type OrderbookItem = {
+   specification: OrderSpecification,
+   properties: {
+    maker: string,
+    sequence: number,
+    makerExchangeRate: string
+  },
+  state?: {
+    fundedAmount: Amount,
+    priceOfFundedAmount: Amount
+  }
+}
+
+type OrderbookOrders = Array<OrderbookItem>
+
+type GetOrderbook = {
+  bids: OrderbookOrders,
+  asks: OrderbookOrders
+}
 
 // account is to specify a "perspective", which affects which unfunded offers
 // are returned
-function getBookOffers(remote, account, ledgerVersion, limit,
-    takerGets, takerPays, callback
+function getBookOffers(remote: Remote, account: string,
+    ledgerVersion?: number, limit?: number, takerGets: Issue,
+    takerPays: Issue, callback
 ) {
   remote.requestBookOffers(utils.renameCounterpartyToIssuerInOrder({
     taker_gets: takerGets,
@@ -22,15 +51,15 @@ function getBookOffers(remote, account, ledgerVersion, limit,
   }), composeAsync(data => data.offers, convertErrors(callback)));
 }
 
-function isSameIssue(a, b) {
+function isSameIssue(a: Amount, b: Amount) {
   return a.currency === b.currency && a.counterparty === b.counterparty;
 }
 
-function directionFilter(direction, order) {
+function directionFilter(direction: string, order: OrderbookItem) {
   return order.specification.direction === direction;
 }
 
-function flipOrder(order) {
+function flipOrder(order: OrderbookItem) {
   const specification = order.specification;
   const flippedSpecification = {
     quantity: specification.totalPrice,
@@ -41,12 +70,12 @@ function flipOrder(order) {
   return _.merge({}, order, {specification: newSpecification});
 }
 
-function alignOrder(base, order) {
+function alignOrder(base: Amount, order: OrderbookItem) {
   const quantity = order.specification.quantity;
   return isSameIssue(quantity, base) ? order : flipOrder(order);
 }
 
-function formatBidsAndAsks(orderbook, offers) {
+function formatBidsAndAsks(orderbook: Orderbook, offers) {
   // the "base" currency is the currency that you are buying or selling
   // the "counter" is the currency that the "base" is priced in
   // a "bid"/"ask" is an order to buy/sell the base, respectively
@@ -64,7 +93,9 @@ function formatBidsAndAsks(orderbook, offers) {
   return {bids, asks};
 }
 
-function getOrderbookAsync(account, orderbook, options, callback) {
+function getOrderbookAsync(account: string, orderbook: Orderbook,
+    options: OrdersOptions, callback
+) {
   validate.address(account);
   validate.orderbook(orderbook);
   validate.getOrderbookOptions(options);
@@ -78,7 +109,9 @@ function getOrderbookAsync(account, orderbook, options, callback) {
                  callback));
 }
 
-function getOrderbook(account: string, orderbook: Object, options = {}) {
+function getOrderbook(account: string, orderbook: Orderbook,
+    options: OrdersOptions = {}
+): Promise<GetOrderbook> {
   return utils.promisify(getOrderbookAsync).call(this,
     account, orderbook, options);
 }

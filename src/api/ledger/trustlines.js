@@ -8,11 +8,17 @@ const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
 const parseAccountTrustline = require('./parse/account-trustline');
 
-function currencyFilter(currency, trustline) {
+import type {Remote} from '../../core/remote';
+import type {TrustlinesOptions, Trustline} from './trustlines-types.js';
+
+
+type GetTrustlinesResponse = Array<Trustline>
+
+function currencyFilter(currency: string, trustline: Trustline) {
   return currency === null || trustline.specification.currency === currency;
 }
 
-function formatResponse(options, data) {
+function formatResponse(options: TrustlinesOptions, data) {
   return {
     marker: data.marker,
     results: data.lines.map(parseAccountTrustline)
@@ -20,8 +26,8 @@ function formatResponse(options, data) {
   };
 }
 
-function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
-    callback
+function getAccountLines(remote: Remote, address: string, ledgerVersion: number,
+  options: TrustlinesOptions, marker: string, limit: number, callback
 ) {
   const requestOptions = {
     account: address,
@@ -36,8 +42,7 @@ function getAccountLines(remote, address, ledgerVersion, options, marker, limit,
       convertErrors(callback)));
 }
 
-function getTrustlinesAsync(account: string, options: {currency: string,
-    counterparty: string, limit: number, ledgerVersion: number},
+function getTrustlinesAsync(account: string, options: TrustlinesOptions,
     callback: () => void
 ): void {
   validate.address(account);
@@ -48,7 +53,8 @@ function getTrustlinesAsync(account: string, options: {currency: string,
   utils.getRecursive(getter, options.limit, callback);
 }
 
-function getTrustlines(account: string, options = {}) {
+function getTrustlines(account: string, options: TrustlinesOptions = {}
+): Promise<GetTrustlinesResponse> {
   return utils.promisify(async.seq(
     utils.getLedgerOptionsWithLedgerVersion,
     getTrustlinesAsync)).call(this, account, options);

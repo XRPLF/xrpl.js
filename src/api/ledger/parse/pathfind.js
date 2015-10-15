@@ -2,13 +2,15 @@
 'use strict';
 const _ = require('lodash');
 const parseAmount = require('./amount');
+import type {Amount, RippledAmount} from '../../common/types.js';
+import type {GetPaths, RippledPathsResponse} from '../pathfind-types.js';
 
 function parsePaths(paths) {
   return paths.map(steps => steps.map(step =>
     _.omit(step, ['type', 'type_hex'])));
 }
 
-function removeAnyCounterpartyEncoding(address: string, amount: Object) {
+function removeAnyCounterpartyEncoding(address: string, amount: Amount) {
   return amount.counterparty === address ?
     _.omit(amount, 'counterparty') : amount;
 }
@@ -21,7 +23,7 @@ function createAdjustment(address: string, adjustmentWithoutAddress: Object) {
 }
 
 function parseAlternative(sourceAddress: string, destinationAddress: string,
-  destinationAmount: Object, alternative: Object
+  destinationAmount: RippledAmount, alternative: Object
 ) {
   // we use "maxAmount"/"minAmount" here so that the result can be passed
   // directly to preparePayment
@@ -38,7 +40,7 @@ function parseAlternative(sourceAddress: string, destinationAddress: string,
   };
 }
 
-function parsePathfind(pathfindResult: Object): Object {
+function parsePathfind(pathfindResult: RippledPathsResponse): GetPaths {
   const sourceAddress = pathfindResult.source_account;
   const destinationAddress = pathfindResult.destination_account;
   const destinationAmount = pathfindResult.destination_amount;

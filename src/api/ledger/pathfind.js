@@ -11,27 +11,20 @@ const ValidationError = utils.common.errors.ValidationError;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
 const toRippledAmount = utils.common.toRippledAmount;
+import type {Remote} from '../../core/remote';
+import type {RippledAmount} from '../common/types.js';
+import type {GetPaths, PathFind, PathFindParams,
+  RippledPathsResponse} from './pathfind-types.js';
 
-type PathFindParams = {
-  src_currencies?: Array<string>, src_account: string,
-  dst_amount: string | Object, dst_account?: string,
-  src_amount?: string | Object
-}
 
-function addParams(params: PathFindParams, result: {}) {
-  return _.assign({}, result, {
+function addParams(params: PathFindParams, result: RippledPathsResponse) {
+  return _.defaults(_.assign({}, result, {
     source_account: params.src_account,
-    source_currencies: params.src_currencies,
-    destination_amount: params.dst_amount
-  });
+    source_currencies: params.src_currencies
+  }), {destination_amount: params.dst_amount});
 }
 
-type PathFind = {
-  source: {address: string, currencies: Array<string>},
-  destination: {address: string, amount: string}
-}
-
-function requestPathFind(remote, pathfind: PathFind, callback) {
+function requestPathFind(remote: Remote, pathfind: PathFind, callback) {
   const destinationAmount = _.assign({value: -1}, pathfind.destination.amount);
   const params: PathFindParams = {
     src_account: pathfind.source.address,
@@ -65,7 +58,8 @@ function requestPathFind(remote, pathfind: PathFind, callback) {
     composeAsync(_.partial(addParams, params), convertErrors(callback)));
 }
 
-function addDirectXrpPath(paths, xrpBalance) {
+function addDirectXrpPath(paths: RippledPathsResponse, xrpBalance: string
+): RippledPathsResponse {
   // Add XRP "path" only if the source acct has enough XRP to make the payment
   const destinationAmount = paths.destination_amount;
   if ((new BigNumber(xrpBalance)).greaterThanOrEqualTo(destinationAmount)) {
@@ -77,13 +71,15 @@ function addDirectXrpPath(paths, xrpBalance) {
   return paths;
 }
 
-function isRippledIOUAmount(amount) {
+function isRippledIOUAmount(amount: RippledAmount) {
   // rippled XRP amounts are specified as decimal strings
   return (typeof amount === 'object') &&
     amount.currency && (amount.currency !== 'XRP');
 }
 
-function conditionallyAddDirectXRPPath(remote, address, paths, callback) {
+function conditionallyAddDirectXRPPath(remote: Remote, address: string,
+  paths: RippledPathsResponse, callback
+) {
   if (isRippledIOUAmount(paths.destination_amount)
       || !_.includes(paths.destination_currencies, 'XRP')) {
     callback(null, paths);
@@ -93,7 +89,7 @@ function conditionallyAddDirectXRPPath(remote, address, paths, callback) {
   }
 }
 
-function formatResponse(pathfind, paths) {
+function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
   if (paths.alternatives && paths.alternatives.length > 0) {
     return parsePathfind(paths);
   }
@@ -118,7 +114,7 @@ function formatResponse(pathfind, paths) {
   }
 }
 
-function getPathsAsync(pathfind, callback) {
+function getPathsAsync(pathfind: PathFind, callback) {
   validate.pathfind(pathfind);
 
   const address = pathfind.source.address;
@@ -128,7 +124,7 @@ function getPathsAsync(pathfind, callback) {
   ], composeAsync(_.partial(formatResponse, pathfind), callback));
 }
 
-function getPaths(pathfind: Object) {
+function getPaths(pathfind: PathFind): Promise<GetPaths> {
   return utils.promisify(getPathsAsync).call(this, pathfind);
 }
 

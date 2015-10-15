@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const removeUndefined = require('./utils').removeUndefined;
 const parseTransaction = require('./transaction');
+import type {GetLedger} from '../types.js';
 
 function parseTransactions(transactions) {
   if (_.isEmpty(transactions)) {
@@ -27,7 +28,7 @@ function parseState(state) {
   return {rawState: JSON.stringify(state)};
 }
 
-function parseLedger(ledger: Object): Object {
+function parseLedger(ledger: Object): GetLedger {
   return removeUndefined(_.assign({
     accepted: ledger.accepted,
     closed: ledger.closed,

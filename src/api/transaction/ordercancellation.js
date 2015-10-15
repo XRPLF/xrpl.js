@@ -3,8 +3,11 @@
 const utils = require('./utils');
 const validate = utils.common.validate;
 const Transaction = utils.common.core.Transaction;
+import type {Instructions, Prepare} from './types.js';
 
-function createOrderCancellationTransaction(account, sequence) {
+function createOrderCancellationTransaction(account: string,
+    sequence: number
+): Transaction {
   validate.address(account);
   validate.sequence(sequence);
 
@@ -13,16 +16,16 @@ function createOrderCancellationTransaction(account, sequence) {
   return transaction;
 }
 
-function prepareOrderCancellationAsync(account, sequence, instructions,
-  callback
+function prepareOrderCancellationAsync(account: string, sequence: number,
+  instructions: Instructions, callback
 ) {
   const transaction = createOrderCancellationTransaction(account, sequence);
   utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
 function prepareOrderCancellation(account: string, sequence: number,
-    instructions = {}
-) {
+    instructions: Instructions = {}
+): Promise<Prepare> {
   return utils.promisify(prepareOrderCancellationAsync.bind(this))(
     account, sequence, instructions);
 }

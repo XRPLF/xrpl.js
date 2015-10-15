@@ -3,6 +3,8 @@
 const utils = require('./utils');
 const validate = utils.common.validate;
 const Transaction = utils.common.core.Transaction;
+import type {Instructions, Prepare} from './types.js';
+import type {Order} from '../ledger/transaction-types.js';
 
 const OfferCreateFlags = {
   passive: {set: 'Passive'},
@@ -10,7 +12,7 @@ const OfferCreateFlags = {
   fillOrKill: {set: 'FillOrKill'}
 };
 
-function createOrderTransaction(account, order) {
+function createOrderTransaction(account: string, order: Order): Transaction {
   validate.address(account);
   validate.order(order);
 
@@ -30,12 +32,16 @@ function createOrderTransaction(account, order) {
   return transaction;
 }
 
-function prepareOrderAsync(account, order, instructions, callback) {
+function prepareOrderAsync(account: string, order: Order,
+    instructions: Instructions, callback
+) {
   const transaction = createOrderTransaction(account, order);
   utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function prepareOrder(account: string, order: Object, instructions = {}) {
+function prepareOrder(account: string, order: Order,
+    instructions: Instructions = {}
+): Promise<Prepare> {
   return utils.promisify(prepareOrderAsync.bind(this))(
     account, order, instructions);
 }

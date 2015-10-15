@@ -4,6 +4,8 @@ const utils = require('./utils');
 const validate = utils.common.validate;
 const Transaction = utils.common.core.Transaction;
 const BigNumber = require('bignumber.js');
+import type {Instructions, Prepare} from './types.js';
+import type {TrustLineSpecification} from '../ledger/trustlines-types.js';
 
 const TrustSetFlags = {
   authorized: {set: 'SetAuth'},
@@ -16,7 +18,9 @@ function convertQuality(quality) {
     (new BigNumber(quality)).shift(9).truncated().toNumber();
 }
 
-function createTrustlineTransaction(account, trustline) {
+function createTrustlineTransaction(account: string,
+    trustline: TrustLineSpecification
+): Transaction {
   validate.address(account);
   validate.trustline(trustline);
 
@@ -33,13 +37,16 @@ function createTrustlineTransaction(account, trustline) {
   return transaction;
 }
 
-function prepareTrustlineAsync(account, trustline, instructions, callback) {
+function prepareTrustlineAsync(account: string,
+    trustline: TrustLineSpecification, instructions: Instructions, callback
+) {
   const transaction = createTrustlineTransaction(account, trustline);
   utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function prepareTrustline(account: string, trustline: Object, instructions = {}
-) {
+function prepareTrustline(account: string,
+    trustline: TrustLineSpecification, instructions: Instructions = {}
+): Promise<Prepare> {
   return utils.promisify(prepareTrustlineAsync.bind(this))(
     account, trustline, instructions);
 }

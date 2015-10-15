@@ -1,3 +1,4 @@
+/* @flow */
 'use strict';
 
 const _ = require('lodash');
@@ -5,8 +6,23 @@ const utils = require('./utils');
 const validate = utils.common.validate;
 const composeAsync = utils.common.composeAsync;
 const convertErrors = utils.common.convertErrors;
+import type {Amount} from '../common/types.js';
 
-function formatBalanceSheet(balanceSheet) {
+type BalanceSheetOptions = {
+  excludeAddresses?: Array<string>,
+  ledgerVersion?: number
+}
+
+type GetBalanceSheet = {
+  balances?: Array<Amount>,
+  assets?: Array<Amount>,
+  obligations?: Array<{
+     currency: string,
+     value: string
+   }>
+}
+
+function formatBalanceSheet(balanceSheet): GetBalanceSheet {
   const result = {};
 
   if (!_.isUndefined(balanceSheet.balances)) {
@@ -33,7 +49,9 @@ function formatBalanceSheet(balanceSheet) {
   return result;
 }
 
-function getBalanceSheetAsync(address, options, callback) {
+function getBalanceSheetAsync(address: string, options: BalanceSheetOptions,
+    callback
+) {
   validate.address(address);
   validate.getBalanceSheetOptions(options);
 
@@ -61,7 +79,8 @@ function getBalanceSheetAsync(address, options, callback) {
   });
 }
 
-function getBalanceSheet(address: string, options = {}) {
+function getBalanceSheet(address: string, options: BalanceSheetOptions = {}
+): Promise<GetBalanceSheet> {
   return utils.promisify(getBalanceSheetAsync).call(this, address, options);
 }
 

@@ -7,11 +7,14 @@ const validate = utils.common.validate;
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices;
 const AccountFields = utils.common.constants.AccountFields;
 const Transaction = utils.common.core.Transaction;
+import type {Instructions, Prepare} from './types.js';
+import type {Settings} from './settings-types.js';
 
 // Emptry string passed to setting will clear it
 const CLEAR_SETTING = null;
 
-function setTransactionFlags(transaction, values) {
+
+function setTransactionFlags(transaction: Transaction, values: Settings) {
   const keys = Object.keys(values);
   assert(keys.length === 1, 'ERROR: can only set one setting per transaction');
   const flagName = keys[0];
@@ -26,7 +29,7 @@ function setTransactionFlags(transaction, values) {
   }
 }
 
-function setTransactionFields(transaction, input) {
+function setTransactionFields(transaction: Transaction, input: Settings) {
   const fieldSchema = AccountFields;
   for (const fieldName in fieldSchema) {
     const field = fieldSchema[fieldName];
@@ -63,11 +66,12 @@ function setTransactionFields(transaction, input) {
  *                           are returned
  */
 
-function convertTransferRate(transferRate) {
+function convertTransferRate(transferRate: number | string): number | string {
   return (new BigNumber(transferRate)).shift(9).toNumber();
 }
 
-function createSettingsTransaction(account, settings) {
+function createSettingsTransaction(account: string, settings: Settings
+): Transaction {
   validate.address(account);
   validate.settings(settings);
 
@@ -90,12 +94,16 @@ function createSettingsTransaction(account, settings) {
   return transaction;
 }
 
-function prepareSettingsAsync(account, settings, instructions, callback) {
+function prepareSettingsAsync(account: string, settings: Settings,
+    instructions: Instructions, callback
+) {
   const transaction = createSettingsTransaction(account, settings);
   utils.prepareTransaction(transaction, this.remote, instructions, callback);
 }
 
-function prepareSettings(account: string, settings: Object, instructions = {}) {
+function prepareSettings(account: string, settings: Object,
+    instructions: Instructions = {}
+): Promise<Prepare> {
   return utils.promisify(prepareSettingsAsync.bind(this))(
     account, settings, instructions);
 }

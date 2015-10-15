@@ -8,6 +8,31 @@ const composeAsync = utils.common.composeAsync;
 const AccountFlags = utils.common.constants.AccountFlags;
 const convertErrors = utils.common.convertErrors;
 
+type SettingsOptions = {
+  ledgerVersion?: number
+}
+
+type GetSettings = {
+  passwordSpent?: boolean,
+  requireDestinationTag?: boolean,
+  requireAuthorization?: boolean,
+  disallowIncomingXRP?: boolean,
+  disableMasterKey?: boolean,
+  enableTransactionIDTracking?: boolean,
+  noFreeze?: boolean,
+  globalFreeze?: boolean,
+  defaultRipple?: boolean,
+  emailHash?: ?string,
+  walletLocator?: ?string,
+  walletSize?: ?number,
+  messageKey?: string,
+  domain?: string,
+  transferRate?: ?number,
+  signers?: string,
+  regularKey?: string
+}
+
+
 function parseFlags(value) {
   const settings = {};
   for (const flagName in AccountFlags) {
@@ -25,7 +50,7 @@ function formatSettings(response) {
   return _.assign({}, parsedFlags, parsedFields);
 }
 
-function getSettingsAsync(account, options, callback) {
+function getSettingsAsync(account: string, options: SettingsOptions, callback) {
   validate.address(account);
   validate.getSettingsOptions(options);
 
@@ -38,7 +63,8 @@ function getSettingsAsync(account, options, callback) {
     composeAsync(formatSettings, convertErrors(callback)));
 }
 
-function getSettings(account: string, options = {}) {
+function getSettings(account: string, options: SettingsOptions = {}
+): Promise<GetSettings> {
   return utils.promisify(getSettingsAsync).call(this, account, options);
 }
 
