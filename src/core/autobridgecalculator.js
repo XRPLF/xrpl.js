@@ -157,7 +157,7 @@ function(legOneOffer, legTwoOffer) {
     this._currencyPays, this._issuerPays);
   const legTwoTakerPaysFunded = Utils.getOfferTakerPaysFunded(legTwoOffer,
     this._currencyGets, this._issuerGets);
-  const legOneQuality = Utils.getOfferQuality(legOneOffer, this._currencyGets,
+  const legOneQuality = Utils.getOfferQuality(legOneOffer,
     this._currencyPays, this._issuerPays);
 
   const autobridgedTakerGets = Utils.getOfferTakerGetsFunded(legTwoOffer,
@@ -202,7 +202,7 @@ function(legOneOffer, legTwoOffer) {
     this._currencyPays, this._issuerPays);
   const legTwoTakerPaysFunded = Utils.getOfferTakerPaysFunded(legTwoOffer,
     this._currencyGets, this._issuerGets);
-  const legTwoQuality = Utils.getOfferQuality(legTwoOffer, this._currencyGets,
+  const legTwoQuality = Utils.getOfferQuality(legTwoOffer,
     this._currencyGets, this._issuerGets);
 
   const autobridgedTakerGets = legOneTakerGetsFunded.divide(legTwoQuality);
@@ -463,7 +463,7 @@ function setLegOneTakerGetsFunded(legOneOffer, takerGetsFunded) {
 
   legOneOffer.taker_gets_funded = takerGetsFunded.to_text();
   legOneOffer.taker_pays_funded = takerGetsFunded
-    .multiply(Utils.getOfferQuality(legOneOffer, this._currencyGets,
+    .multiply(Utils.getOfferQuality(legOneOffer,
       this._currencyPays, this._issuerPays))
       .to_text();
 
@@ -485,7 +485,7 @@ function(legOneOffer, takerGets) {
   assertValidLegOneOffer(legOneOffer, 'Leg one offer is invalid');
   assert(takerGets instanceof Amount, 'Taker gets funded is invalid');
 
-  const legOneQuality = Utils.getOfferQuality(legOneOffer, this._currencyGets,
+  const legOneQuality = Utils.getOfferQuality(legOneOffer,
     this._currencyPays, this._issuerPays);
 
   legOneOffer.TakerGets = takerGets.to_text();

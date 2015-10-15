@@ -1612,11 +1612,11 @@ describe('Remote', function() {
       command: 'book_offers',
       id: undefined,
       taker_gets: {
-        currency: Currency.from_human('USD').to_hex(),
+        currency: Currency.from_json('USD').to_hex(),
         issuer: ADDRESS
       },
       taker_pays: {
-        currency: Currency.from_human('XRP').to_hex()
+        currency: Currency.from_json('XRP').to_hex()
       },
       taker: ACCOUNT_ONE
     });
@@ -1639,11 +1639,11 @@ describe('Remote', function() {
       command: 'book_offers',
       id: undefined,
       taker_gets: {
-        currency: Currency.from_human('USD').to_hex(),
+        currency: Currency.from_json('USD').to_hex(),
         issuer: ADDRESS
       },
       taker_pays: {
-        currency: Currency.from_human('XRP').to_hex()
+        currency: Currency.from_json('XRP').to_hex()
       },
       taker: ACCOUNT_ONE,
       ledger_hash: LEDGER_HASH,

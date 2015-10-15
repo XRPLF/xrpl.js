@@ -190,12 +190,9 @@ Amount.prototype.divide = function(divisor) {
  * @return {Amount} The resulting ratio. Unit will be the same as numerator.
  */
 
-Amount.prototype.ratio_human = function(denom, opts) {
-  const options = extend({ }, opts);
-
+Amount.prototype.ratio_human = function(denom) {
   const numerator = this.clone();
-
-  let denominator = Amount.from_json(denom);
+  const denominator = Amount.from_json(denom);
 
   // If either operand is NaN, the result is NaN.
   if (!numerator.is_valid() || !denominator.is_valid()) {
@@ -204,14 +201,6 @@ Amount.prototype.ratio_human = function(denom, opts) {
 
   if (denominator.is_zero()) {
     return new Amount(NaN);
-  }
-
-  // Apply interest/demurrage
-  //
-  // We only need to apply it to the second factor, because the currency unit of
-  // the first factor will carry over into the result.
-  if (options.reference_date) {
-    denominator = denominator.applyInterest(options.reference_date);
   }
 
   // Special case: The denominator is a native (XRP) amount.
@@ -252,21 +241,12 @@ Amount.prototype.ratio_human = function(denom, opts) {
  * for Ripple epoch.
  * @return {Amount} The product. Unit will be the same as the first factor.
  */
-Amount.prototype.product_human = function(factor, options = {}) {
-
-  let fac = Amount.from_json(factor);
+Amount.prototype.product_human = function(factor) {
+  const fac = Amount.from_json(factor);
 
   // If either operand is NaN, the result is NaN.
   if (!this.is_valid() || !fac.is_valid()) {
     return new Amount();
-  }
-
-  // Apply interest/demurrage
-  //
-  // We only need to apply it to the second factor, because the currency unit of
-  // the first factor will carry over into the result.
-  if (options.reference_date) {
-    fac = fac.applyInterest(options.reference_date);
   }
 
   const product = this.multiply(fac);
@@ -464,9 +444,7 @@ Amount.prototype.negate = function() {
  * $
  */
 
-Amount.prototype.parse_human = function(j, options) {
-  const opts = options || {};
-
+Amount.prototype.parse_human = function(j) {
   const hex_RE = /^[a-fA-F0-9]{40}$/;
   const currency_RE = /^([a-zA-Z]{3}|[0-9]{3})$/;
 
@@ -516,14 +494,6 @@ Amount.prototype.parse_human = function(j, options) {
     (this._is_native ? new XRPValue(value) :
       new IOUValue(value));
   this._set_value(newValue);
-
-  // Apply interest/demurrage
-  if (opts.reference_date && this._currency.has_interest()) {
-    const interest = this._currency.get_interest_at(opts.reference_date);
-    this._set_value(
-      this._value.divide(new IOUValue(interest.toString())));
-  }
-
   return this;
 };
 
@@ -627,12 +597,6 @@ function(quality, counterCurrency, counterIssuer, opts) {
     this._set_value(nativeAdjusted);
   }
 
-  if (options.reference_date && baseCurrency.is_valid()
-    && baseCurrency.has_interest()) {
-    const interest = baseCurrency.get_interest_at(options.reference_date);
-    this._set_value(
-      this._value.divide(new IOUValue(interest.toString())));
-  }
   return this;
 };
 
@@ -783,27 +747,6 @@ Amount.prototype.to_text = function() {
 };
 
 /**
- * Calculate present value based on currency and a reference date.
- *
- * This only affects demurraging and interest-bearing currencies.
- *
- * User should not store amount objects after the interest is applied. This is
- * intended by display functions such as toHuman().
- *
- * @param {Date|Number} referenceDate Date based on which demurrage/interest
- *   should be applied. Can be given as JavaScript Date or int for Ripple epoch.
- * @return {Amount} The amount with interest applied.
- */
-Amount.prototype.applyInterest = function(referenceDate) {
-  if (!this._currency.has_interest()) {
-    return this;
-  }
-  const interest = this._currency.get_interest_at(referenceDate);
-  return this._copy(
-    this._value.multiply(new IOUValue(interest.toString())));
-};
-
-/**
  * Format only value in a human-readable format.
  *
  * @example
@@ -836,12 +779,8 @@ Amount.prototype.to_human = function(options) {
 
   /* eslint-disable consistent-this */
   // Apply demurrage/interest
-  let ref = this;
+  const ref = this;
   /* eslint-enable consistent-this */
-
-  if (opts.reference_date) {
-    ref = this.applyInterest(opts.reference_date);
-  }
 
   const isNegative = ref._value.isNegative();
   const valueString = ref._value.abs().toFixed();
@@ -930,7 +869,7 @@ Amount.prototype.to_human = function(options) {
 Amount.prototype.to_human_full = function(options) {
   const opts = options || {};
   const value = this.to_human(opts);
-  const currency = this._currency.to_human();
+  const currency = this._currency.to_json();
   const issuer = this._issuer;
   const base = value + '/' + currency;
   return this.is_native() ? base : (base + '/' + issuer);
@@ -943,8 +882,7 @@ Amount.prototype.to_json = function() {
 
   const amount_json = {
     value: this.to_text(),
-    currency: this._currency.has_interest() ?
-    this._currency.to_hex() : this._currency.to_json()
+    currency: this._currency.to_json()
   };
 
   if (isValidAddress(this._issuer)) {

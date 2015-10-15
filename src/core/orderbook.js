@@ -25,13 +25,6 @@ const log = require('./log').internal.sub('orderbook');
 const {IOUValue} = require('ripple-lib-value');
 const RippleError = require('./rippleerror').RippleError;
 
-function _sortOffers(a, b) {
-  const aQuality = OrderBookUtils.getOfferQuality(a, this._currencyGets);
-  const bQuality = OrderBookUtils.getOfferQuality(b, this._currencyGets);
-
-  return aQuality._value.comparedTo(bQuality._value);
-}
-
 function _sortOffersQuick(a, b) {
   return a.qualityHex.localeCompare(b.qualityHex);
 }
@@ -94,8 +87,7 @@ function OrderBook(remote,
   this._calculatorRunning = false;
 
 
-  this.sortOffers = this._currencyGets.has_interest() ?
-    _sortOffers.bind(this) : _sortOffersQuick;
+  this.sortOffers = _sortOffersQuick;
 
   this._isAutobridgeable = !this._currencyGets.is_native()
     && !this._currencyPays.is_native();
@@ -749,7 +741,7 @@ OrderBook.prototype.setOfferFundedAmount = function(offer) {
   } else if (previousOfferSum.compareTo(fundedAmount) < 0) {
     offer.taker_gets_funded = fundedAmount.subtract(previousOfferSum).to_text();
 
-    const quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
+    const quality = OrderBookUtils.getOfferQuality(offer);
     const takerPaysFunded = quality.multiply(
       OrderBookUtils.getOfferTakerGetsFunded(offer)
     );
@@ -1014,13 +1006,13 @@ OrderBook.prototype.notify = function(transaction) {
   let takerGetsTotal = Amount.from_json(
     '0' + ((Currency.from_json(this._currencyGets).is_native())
            ? ''
-           : ('/' + this._currencyGets.to_human() + '/' + this._issuerGets))
+           : ('/' + this._currencyGets.to_json() + '/' + this._issuerGets))
   );
 
   let takerPaysTotal = Amount.from_json(
     '0' + ((Currency.from_json(this._currencyPays).is_native())
            ? ''
-           : ('/' + this._currencyPays.to_human() + '/' + this._issuerPays))
+           : ('/' + this._currencyPays.to_json() + '/' + this._issuerPays))
   );
 
   const isOfferCancel =
@@ -1117,27 +1109,10 @@ OrderBook.prototype.insertOffer = function(node) {
 
   const originalLength = this._offers.length;
 
-  if (!this._currencyGets.has_interest()) {
-    // use fast path
-    for (let i = 0; i < originalLength; i++) {
-      if (offer.qualityHex <= this._offers[i].qualityHex) {
-        this._offers.splice(i, 0, offer);
-        break;
-      }
-    }
-  } else {
-    for (let i = 0; i < originalLength; i++) {
-      const quality = OrderBookUtils.getOfferQuality(offer, this._currencyGets);
-      const existingOfferQuality = OrderBookUtils.getOfferQuality(
-        this._offers[i],
-        this._currencyGets
-      );
-
-      if (quality.compareTo(existingOfferQuality) <= 0) {
-        this._offers.splice(i, 0, offer);
-
-        break;
-      }
+  for (let i = 0; i < originalLength; i++) {
+    if (offer.qualityHex <= this._offers[i].qualityHex) {
+      this._offers.splice(i, 0, offer);
+      break;
     }
   }
 
