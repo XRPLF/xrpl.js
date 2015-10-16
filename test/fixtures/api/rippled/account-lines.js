@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const BASE_LEDGER_INDEX = 8819951;
 
-module.exports.normal = function(request, options={}) {
+module.exports.normal = function(request, options = {}) {
   _.defaults(options, {
     ledger: BASE_LEDGER_INDEX
   });
@@ -16,8 +16,7 @@ module.exports.normal = function(request, options={}) {
       marker: options.marker,
       limit: request.limit,
       ledger_index: options.ledger,
-      lines: [
-        {
+      lines: _.filter([{
         account: 'r3vi7mWxru9rJCxETCyA1CHvzL96eZWx5z',
         balance: '0',
         currency: 'ASP',
@@ -252,12 +251,12 @@ module.exports.normal = function(request, options={}) {
         quality_out: 0,
         freeze: true
       }
-      ]
+      ], item => !request.peer || item.account === request.peer)
     }
   });
 };
 
-module.exports.counterparty = function(request, options={}) {
+module.exports.counterparty = function(request, options = {}) {
   _.defaults(options, {
     ledger: BASE_LEDGER_INDEX
   });
@@ -271,8 +270,7 @@ module.exports.counterparty = function(request, options={}) {
       marker: options.marker,
       limit: request.limit,
       ledger_index: options.ledger,
-      lines: [
-      {
+      lines: [{
         account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
         balance: '0.3488146605801446',
         currency: 'CHF',

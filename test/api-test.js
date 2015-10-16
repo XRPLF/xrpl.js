@@ -196,9 +196,45 @@ describe('RippleAPI', function() {
     });
   });
 
-  it('getBalances', function() {
-    return this.api.getBalances(address).then(
-      _.partial(checkResult, responses.getBalances, 'getBalances'));
+  describe('RippleAPI', function() {
+
+    it('getBalances', function() {
+      return this.api.getBalances(address).then(
+        _.partial(checkResult, responses.getBalances, 'getBalances'));
+    });
+
+    it('getBalances - limit', function() {
+      const options = {
+        limit: 3
+      };
+      const expectedResponse = responses.getBalances.slice(0, 3);
+      return this.api.getBalances(address, options).then(
+        _.partial(checkResult, expectedResponse, 'getBalances'));
+    });
+
+    it('getBalances - limit & currency', function() {
+      const options = {
+        currency: 'USD',
+        limit: 3
+      };
+      const expectedResponse = _.filter(responses.getBalances,
+        item => item.currency === 'USD').slice(0, 3);
+      return this.api.getBalances(address, options).then(
+        _.partial(checkResult, expectedResponse, 'getBalances'));
+    });
+
+    it('getBalances - limit & currency & issuer', function() {
+      const options = {
+        currency: 'USD',
+        counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        limit: 3
+      };
+      const expectedResponse = _.filter(responses.getBalances,
+        item => item.currency === 'USD' &&
+        item.counterparty === 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B').slice(0, 3);
+      return this.api.getBalances(address, options).then(
+        _.partial(checkResult, expectedResponse, 'getBalances'));
+    });
   });
 
   it('getBalanceSheet', function() {
