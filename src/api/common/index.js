@@ -2,6 +2,7 @@
 const utils = require('./utils');
 
 module.exports = {
+  Connection: require('./connection'),
   core: utils.core,
   constants: require('./constants'),
   errors: require('./errors'),
