@@ -11,6 +11,9 @@
         "format": "uri",
         "pattern": "^wss?://"
       }
+    },
+    "proxy": {
+      "format": "uri"
     }
   },
   "additionalProperties": false
