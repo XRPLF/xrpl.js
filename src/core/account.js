@@ -1,14 +1,8 @@
 'use strict';
+
 // Routines for working with an account.
 //
 // You should not instantiate this class yourself, instead use Remote#account.
-//
-// Events:
-//   wallet_clean :  True, iff the wallet has been updated.
-//   wallet_dirty :  True, iff the wallet needs to be updated.
-//   balance:        The current stamp balance.
-//   balance_proposed
-//
 
 const _ = require('lodash');
 const async = require('async');
@@ -18,6 +12,7 @@ const {deriveAddress} = require('ripple-keypairs');
 const {EventEmitter} = require('events');
 const {TransactionManager} = require('./transactionmanager');
 const {isValidAddress} = require('ripple-address-codec');
+const log = require('./log').internal.sub('account');
 
 /**
  * @constructor Account
@@ -43,7 +38,11 @@ function Account(remote, address) {
       if (!self._subs && self._remote._connected) {
         self._remote.requestSubscribe()
         .addAccount(self._address)
-        .broadcast().request();
+        .broadcast().request((err) => {
+          if (err) {
+            log.warn('account subscription failed: ' + err.toString());
+          }
+        });
       }
       self._subs += 1;
     }
@@ -57,7 +56,11 @@ function Account(remote, address) {
       if (!self._subs && self._remote._connected) {
         self._remote.requestUnsubscribe()
         .addAccount(self._address)
-        .broadcast().request();
+        .broadcast().request((err) => {
+          if (err) {
+            log.warn('account unsubscription failed: ' + err.toString());
+          }
+        });
       }
     }
   }
@@ -142,35 +145,28 @@ Account.prototype.getInfo = function(callback) {
  * @param {Function} callback
  */
 
-Account.prototype.entry = function(callback_) {
-  const self = this;
-  const callback = typeof callback_ === 'function' ? callback_ : _.noop;
-
-  function accountInfo(err, info) {
+Account.prototype.entry = function(callback = function() {}) {
+  this.getInfo((err, info) => {
     if (err) {
       callback(err);
     } else {
-      extend(self._entry, info.account_data);
-      self.emit('entry', self._entry);
+      extend(this._entry, info.account_data);
+      this.emit('entry', this._entry);
       callback(null, info);
     }
-  }
-
-  this.getInfo(accountInfo);
+  });
 
   return this;
 };
 
-Account.prototype.getNextSequence = function(callback_) {
-  const callback = typeof callback_ === 'function' ? callback_ : _.noop;
-
+Account.prototype.getNextSequence = function(callback = function() {}) {
   function isNotFound(err) {
     return err && typeof err === 'object'
     && typeof err.remote === 'object'
     && err.remote.error === 'actNotFound';
   }
 
-  function accountInfo(err, info) {
+  this.getInfo((err, info) => {
     if (isNotFound(err)) {
       // New accounts will start out as sequence one
       callback(null, 1);
@@ -179,9 +175,7 @@ Account.prototype.getNextSequence = function(callback_) {
     } else {
       callback(null, info.account_data.Sequence);
     }
-  }
-
-  this.getInfo(accountInfo);
+  });
 
   return this;
 };
@@ -195,21 +189,28 @@ Account.prototype.getNextSequence = function(callback_) {
  * @param {function(err, lines)} callback Called with the result
  */
 
-Account.prototype.lines = function(callback_) {
-  const self = this;
-  const callback = typeof callback_ === 'function' ? callback_ : _.noop;
-
-  function accountLines(err, res) {
+Account.prototype.getTrustLines = function(callback = function() {}) {
+  this.lines((err, res) => {
     if (err) {
       callback(err);
     } else {
-      self._lines = res.lines;
-      self.emit('lines', self._lines);
+      callback(null, res.lines);
+    }
+  });
+
+  return this;
+};
+
+Account.prototype.lines = function(callback = function() {}) {
+  this._remote.requestAccountLines({account: this._address}, (err, res) => {
+    if (err) {
+      callback(err);
+    } else {
+      this._lines = res.lines;
+      this.emit('lines', this._lines);
       callback(null, res);
     }
-  }
-
-  this._remote.requestAccountLines({account: this._address}, accountLines);
+  });
 
   return this;
 };
@@ -223,26 +224,15 @@ Account.prototype.lines = function(callback_) {
  * @returns {Account}
  */
 
-Account.prototype.line = function(currency, address, callback_) {
-  const self = this;
-  const callback = typeof callback_ === 'function' ? callback_ : _.noop;
+Account.prototype.line = function(currency, address, callback) {
+  const requestOptions = {account: this._address, peer: address};
 
-  self.lines(function(err, data) {
+  this._remote.requestAccountLines(requestOptions, (err, res) => {
     if (err) {
-      return callback(err);
+      callback(err);
+    } else {
+      callback(null, res.lines.find((line) => line.currency === currency));
     }
-
-    let line;
-
-    for (let i = 0; i < data.lines.length; i++) {
-      const l = data.lines[i];
-      if (l.account === address && l.currency === currency) {
-        line = l;
-        break;
-      }
-    }
-
-    callback(null, line);
   });
 
   return this;
@@ -384,5 +374,3 @@ Account._publicKeyToAddress = function(public_key) {
 module.exports = {
   Account
 };
-
-// vim:sw=2:sts=2:ts=8:et
