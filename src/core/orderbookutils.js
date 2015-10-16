@@ -4,7 +4,6 @@ const _ = require('lodash');
 const assert = require('assert');
 const constants = require('./constants');
 const Amount = require('./amount').Amount;
-const Currency = require('./currency').Currency;
 const {IOUValue} = require('ripple-lib-value');
 const binary = require('ripple-binary-codec');
 const OrderBookUtils = {};
@@ -21,12 +20,9 @@ function assertValidNumber(number, message) {
 * @return JSON amount object
 */
 
-function createAmount(value, currency_, counterparty) {
+function createAmount(value, currency, counterparty) {
   assert(_.isString(counterparty), 'counterparty must be a string');
-
-  const currency = currency_ instanceof Currency ?
-    currency_ :
-    Currency.from_json(currency_);
+  assert(_.isString(currency), 'currency must be a string');
 
   return Amount.from_components_unsafe(new IOUValue(value),
     currency, counterparty, false);
@@ -141,7 +137,7 @@ OrderBookUtils.convertOfferQualityToHexFromText = function(quality) {
   return binary.encodeQuality(quality);
 };
 
-OrderBookUtils.CURRENCY_ONE = Currency.from_json(1);
+OrderBookUtils.CURRENCY_ONE = constants.CURRENCY_ONE;
 
 OrderBookUtils.ISSUER_ONE = constants.ACCOUNT_ONE;
 

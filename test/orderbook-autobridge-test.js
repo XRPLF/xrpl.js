@@ -5,7 +5,6 @@
 const _ = require('lodash');
 const assert = require('assert-diff');
 const Remote = require('ripple-lib').Remote;
-const Currency = require('ripple-lib').Currency;
 const OrderbookUtils = require('ripple-lib')._test.OrderbookUtils;
 const addresses = require('./fixtures/addresses');
 const fixtures = require('./fixtures/orderbook');
@@ -33,10 +32,10 @@ describe('OrderBook Autobridging', function() {
       issuer_pays: addresses.ISSUER
     });
 
-    assert.deepEqual(book._legOneBook._currencyGets.to_hex(), Currency.from_json('XRP').to_hex());
-    assert.deepEqual(book._legOneBook._currencyPays.to_hex(), Currency.from_json('USD').to_hex());
-    assert.deepEqual(book._legTwoBook._currencyGets.to_hex(), Currency.from_json('EUR').to_hex());
-    assert.deepEqual(book._legTwoBook._currencyPays.to_hex(), Currency.from_json('XRP').to_hex());
+    assert.deepEqual(book._legOneBook._currencyGets, 'XRP');
+    assert.deepEqual(book._legOneBook._currencyPays, 'USD');
+    assert.deepEqual(book._legTwoBook._currencyGets, 'EUR');
+    assert.deepEqual(book._legTwoBook._currencyPays, 'XRP');
   });
 
   it('Compute autobridged offers', function(done) {

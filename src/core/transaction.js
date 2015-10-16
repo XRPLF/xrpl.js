@@ -8,7 +8,7 @@ const EventEmitter = require('events').EventEmitter;
 const utils = require('./utils');
 const sjclcodec = require('sjcl-codec');
 const Amount = require('./amount').Amount;
-const Currency = require('./currency').Currency;
+const {normalizeCurrency, isValidCurrency} = require('./currency');
 const RippleError = require('./rippleerror').RippleError;
 const log = require('./log').internal.sub('transaction');
 const {isValidAddress, decodeAddress} = require('ripple-address-codec');
@@ -699,12 +699,12 @@ Transaction.prototype._setAmount = function(name, amount, options_) {
     throw new Error(name + ' value must be non-negative');
   }
 
-  const isNative = parsedAmount.currency().is_native();
+  const isNative = parsedAmount.is_native();
 
   if (isNative && options.no_native) {
     throw new Error(name + ' must be a non-native amount');
   }
-  if (!(isNative || parsedAmount.currency().is_valid())) {
+  if (!(isNative || isValidCurrency(parsedAmount.currency()))) {
     throw new Error(name + ' must have a valid currency');
   }
   if (!(isNative || isValidAddress(parsedAmount.issuer()))) {
@@ -1168,7 +1168,7 @@ Transaction._rewritePath = function(path) {
     }
 
     if (node.hasOwnProperty('currency')) {
-      newNode.currency = Currency.json_rewrite(node.currency);
+      newNode.currency = normalizeCurrency(node.currency);
     }
 
     if (node.hasOwnProperty('type_hex')) {

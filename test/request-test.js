@@ -3,7 +3,6 @@ const assert = require('assert');
 const Request = require('ripple-lib').Request;
 const Remote = require('ripple-lib').Remote;
 const Server = require('ripple-lib').Server;
-const Currency = require('ripple-lib').Currency;
 const RippleError = require('ripple-lib').RippleError;
 
 function makeServer(url) {
@@ -940,11 +939,11 @@ describe('Request', function() {
     assert.deepEqual(request.message.books, [
       {
         'taker_gets': {
-          'currency': Currency.from_json('EUR').to_hex(),
+          'currency': 'EUR',
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
         'taker_pays': {
-          'currency': Currency.from_json('USD').to_hex(),
+          'currency': 'USD',
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
         'snapshot': true
@@ -972,11 +971,11 @@ describe('Request', function() {
     assert.deepEqual(request.message.books, [
       {
         'taker_gets': {
-          'currency': Currency.from_json('CNY').to_hex(),
+          'currency': 'CNY',
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
         'taker_pays': {
-          'currency': Currency.from_json('USD').to_hex(),
+          'currency': 'USD',
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
         'snapshot': true
@@ -1001,11 +1000,11 @@ describe('Request', function() {
     assert.deepEqual(request.message.books, [
       {
         'taker_gets': {
-          'currency': '0000000000000000000000004555520000000000', // EUR hex
+          'currency': 'EUR',
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
         'taker_pays': {
-          'currency': '0000000000000000000000005553440000000000', // USD hex
+          'currency': 'USD',
           'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
         },
         'snapshot': true
@@ -1059,11 +1058,11 @@ describe('Request', function() {
 
     assert.deepEqual(request.message.books, [{
       'taker_gets': {
-        'currency': Currency.from_json('EUR').to_hex(),
+        'currency': 'EUR',
         'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       },
       'taker_pays': {
-        'currency': Currency.from_json('USD').to_hex(),
+        'currency': 'USD',
         'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       },
       'both': true,
@@ -1095,11 +1094,11 @@ describe('Request', function() {
 
     assert.deepEqual(request.message.books, [{
       'taker_gets': {
-        'currency': Currency.from_json('EUR').to_hex(),
+        'currency': 'EUR',
         'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       },
       'taker_pays': {
-        'currency': Currency.from_json('USD').to_hex(),
+        'currency': 'USD',
         'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       },
       'both': true
@@ -1150,11 +1149,11 @@ describe('Request', function() {
       'books': [
         {
           'taker_gets': {
-            'currency': '0000000000000000000000004555520000000000',
+            'currency': 'EUR',
             'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
           },
           'taker_pays': {
-            'currency': '0000000000000000000000005553440000000000',
+            'currency': 'USD',
             'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
           },
           'snapshot': true

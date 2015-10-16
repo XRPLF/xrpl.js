@@ -4,7 +4,6 @@
 
 const assert = require('assert-diff');
 const Remote = require('ripple-lib').Remote;
-const Currency = require('ripple-lib').Currency;
 const Amount = require('ripple-lib').Amount;
 const Meta = require('ripple-lib').Meta;
 const addresses = require('./fixtures/addresses');
@@ -32,10 +31,10 @@ describe('OrderBook', function() {
 
     assert.deepEqual(book.toJSON(), {
       taker_gets: {
-        currency: Currency.from_json('XRP').to_hex()
+        currency: 'XRP'
       },
       taker_pays: {
-        currency: Currency.from_json('BTC').to_hex(),
+        currency: 'BTC',
         issuer: addresses.ISSUER
       }
     });
@@ -48,11 +47,11 @@ describe('OrderBook', function() {
 
     assert.deepEqual(book.toJSON(), {
       taker_gets: {
-        currency: Currency.from_json('BTC').to_hex(),
+        currency: 'BTC',
         issuer: addresses.ISSUER
       },
       taker_pays: {
-        currency: Currency.from_json('XRP').to_hex()
+        currency: 'XRP'
       }
     });
   });
@@ -2446,10 +2445,10 @@ describe('OrderBook', function() {
             command: 'book_offers',
             id: undefined,
             taker_gets: {
-              currency: '0000000000000000000000000000000000000000'
+              currency: 'XRP'
             },
             taker_pays: {
-              currency: '0000000000000000000000005553440000000000',
+              currency: 'USD',
               issuer: addresses.ISSUER
             },
             taker: 'rrrrrrrrrrrrrrrrrrrrBZbvji',

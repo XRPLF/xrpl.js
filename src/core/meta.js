@@ -184,8 +184,8 @@ Meta.prototype.getAffectedBooks = function() {
 
     const gets = Amount.from_json(node.fields.TakerGets);
     const pays = Amount.from_json(node.fields.TakerPays);
-    let getsKey = gets.currency().to_json();
-    let paysKey = pays.currency().to_json();
+    let getsKey = gets.currency();
+    let paysKey = pays.currency();
 
     if (getsKey !== 'XRP') {
       getsKey += '/' + gets.issuer();

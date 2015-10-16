@@ -7,7 +7,6 @@ const lodash = require('lodash');
 const Remote = require('ripple-lib').Remote;
 const Server = require('ripple-lib').Server;
 const Transaction = require('ripple-lib').Transaction;
-const Currency = require('ripple-lib').Currency;
 const Amount = require('ripple-lib').Amount;
 const PathFind = require('ripple-lib')._test.PathFind;
 const Log = require('ripple-lib')._test.Log;
@@ -921,7 +920,7 @@ describe('Remote', function() {
       value: 1
     }), {
       issuer: 'rGr9PjmVe7MqEXTSbd3njhgJc2s5vpHV54',
-      currency: '0000000000000000000000005553440000000000'
+      currency: 'USD'
     });
   });
 
@@ -1612,11 +1611,11 @@ describe('Remote', function() {
       command: 'book_offers',
       id: undefined,
       taker_gets: {
-        currency: Currency.from_json('USD').to_hex(),
+        currency: 'USD',
         issuer: ADDRESS
       },
       taker_pays: {
-        currency: Currency.from_json('XRP').to_hex()
+        currency: 'XRP'
       },
       taker: ACCOUNT_ONE
     });
@@ -1639,11 +1638,11 @@ describe('Remote', function() {
       command: 'book_offers',
       id: undefined,
       taker_gets: {
-        currency: Currency.from_json('USD').to_hex(),
+        currency: 'USD',
         issuer: ADDRESS
       },
       taker_pays: {
-        currency: Currency.from_json('XRP').to_hex()
+        currency: 'XRP'
       },
       taker: ACCOUNT_ONE,
       ledger_hash: LEDGER_HASH,
@@ -1902,7 +1901,7 @@ describe('Remote', function() {
       },
       source_currencies: [{
         issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
-        currency: '0000000000000000000000004254430000000000'
+        currency: 'BTC'
       }]
     });
   });
@@ -2028,7 +2027,7 @@ describe('Remote', function() {
       },
       source_currencies: [{
         issuer: 'rwxBjBC9fPzyQ9GgPZw6YYLNeRTSx5c2W6',
-        currency: '0000000000000000000000004254430000000000'
+        currency: 'BTC'
       }]
     });
   });

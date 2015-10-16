@@ -4,6 +4,7 @@ const _ = require('lodash');
 const assert = require('assert');
 const Amount = require('./amount').Amount;
 const Utils = require('./orderbookutils');
+const {toHexCurrency} = require('./currency');
 
 function assertValidNumber(number, message) {
   assert(!_.isNull(number) && !isNaN(number), message);
@@ -21,8 +22,8 @@ function AutobridgeCalculator(currencyGets, currencyPays,
 ) {
   this._currencyGets = currencyGets;
   this._currencyPays = currencyPays;
-  this._currencyGetsHex = currencyGets.to_hex();
-  this._currencyPaysHex = currencyPays.to_hex();
+  this._currencyGetsHex = toHexCurrency(currencyGets);
+  this._currencyPaysHex = toHexCurrency(currencyPays);
   this._issuerGets = issuerGets;
   this._issuerPays = issuerPays;
   this.legOneOffers = _.cloneDeep(legOneOffers);

@@ -18,12 +18,12 @@ const async = require('async');
 const EventEmitter = require('events').EventEmitter;
 const {isValidAddress} = require('ripple-address-codec');
 const Amount = require('./amount').Amount;
-const Currency = require('./currency').Currency;
 const AutobridgeCalculator = require('./autobridgecalculator');
 const OrderBookUtils = require('./orderbookutils');
 const log = require('./log').internal.sub('orderbook');
 const {IOUValue} = require('ripple-lib-value');
 const RippleError = require('./rippleerror').RippleError;
+const {normalizeCurrency, isValidCurrency} = require('./currency');
 
 function _sortOffersQuick(a, b) {
   return a.qualityHex.localeCompare(b.qualityHex);
@@ -49,9 +49,9 @@ function OrderBook(remote,
   const self = this;
 
   this._remote = remote;
-  this._currencyGets = Currency.from_json(currencyGets);
+  this._currencyGets = normalizeCurrency(currencyGets);
   this._issuerGets = issuerGets;
-  this._currencyPays = Currency.from_json(currencyPays);
+  this._currencyPays = normalizeCurrency(currencyPays);
   this._issuerPays = issuerPays;
   this._key = key;
   this._subscribed = false;
@@ -89,8 +89,8 @@ function OrderBook(remote,
 
   this.sortOffers = _sortOffersQuick;
 
-  this._isAutobridgeable = !this._currencyGets.is_native()
-    && !this._currencyPays.is_native();
+  this._isAutobridgeable = this._currencyGets !== 'XRP'
+    && this._currencyPays !== 'XRP';
 
   function computeAutobridgedOffersWrapperOne() {
     if (!self._gotOffersFromLegOne) {
@@ -424,7 +424,7 @@ OrderBook.prototype.requestTransferRate = function(callback) {
 
   const self = this;
 
-  if (this._currencyGets.is_native()) {
+  if (this._currencyGets === 'XRP') {
     // Transfer rate is default for the native currency
     this._issuerTransferRate = OrderBook.DEFAULT_TRANSFER_RATE;
 
@@ -570,7 +570,7 @@ OrderBook.prototype.applyTransferRate = function(balance) {
 
 OrderBook.prototype.getOwnerFunds = function(account) {
   if (this.hasOwnerFunds(account)) {
-    if (this._currencyGets.is_native()) {
+    if (this._currencyGets === 'XRP') {
       return Amount.from_json(this._ownerFunds[account]);
     }
     return OrderBookUtils.normalizeAmount(this._ownerFunds[account]);
@@ -690,7 +690,7 @@ OrderBook.prototype.getOwnerOfferTotal = function(account) {
   if (amount) {
     return amount;
   }
-  if (this._currencyGets.is_native()) {
+  if (this._currencyGets === 'XRP') {
     return OrderBook.ZERO_NATIVE_AMOUNT.clone();
   }
   return OrderBook.ZERO_NORMALIZED_AMOUNT.clone();
@@ -704,7 +704,7 @@ OrderBook.prototype.getOwnerOfferTotal = function(account) {
  */
 
 OrderBook.prototype.resetOwnerOfferTotal = function(account) {
-  if (this._currencyGets.is_native()) {
+  if (this._currencyGets === 'XRP') {
     this._ownerOffersTotal[account] = OrderBook.ZERO_NATIVE_AMOUNT.clone();
   } else {
     this._ownerOffersTotal[account] = OrderBook.ZERO_NORMALIZED_AMOUNT.clone();
@@ -746,7 +746,7 @@ OrderBook.prototype.setOfferFundedAmount = function(offer) {
       OrderBookUtils.getOfferTakerGetsFunded(offer)
     );
 
-    offer.taker_pays_funded = this._currencyPays.is_native()
+    offer.taker_pays_funded = (this._currencyPays === 'XRP')
       ? String(Math.floor(takerPaysFunded.to_number()))
       : takerPaysFunded.to_json().value;
   } else {
@@ -817,12 +817,12 @@ OrderBook.prototype.isBalanceChangeNode = function(node) {
   }
 
   // Check if taker gets currency is native and balance is not a number
-  if (this._currencyGets.is_native()) {
+  if (this._currencyGets === 'XRP') {
     return !isNaN(node.fields.Balance);
   }
 
   // Check if balance change is not for taker gets currency
-  if (node.fields.Balance.currency !== this._currencyGets.to_json()) {
+  if (node.fields.Balance.currency !== this._currencyGets) {
     return false;
   }
 
@@ -873,7 +873,7 @@ OrderBook.prototype.onTransaction = function(transaction) {
 OrderBook.prototype.updateFundedAmounts = function(transaction) {
   const self = this;
 
-  if (!this._currencyGets.is_native() && !this._issuerTransferRate) {
+  if (this._currencyGets !== 'XRP' && !this._issuerTransferRate) {
     if (this._remote.trace) {
       log.info('waiting for transfer rate');
     }
@@ -893,7 +893,7 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
 
   const affectedNodes = transaction.mmeta.getNodes({
     nodeType: 'ModifiedNode',
-    entryType: this._currencyGets.is_native() ? 'AccountRoot' : 'RippleState'
+    entryType: this._currencyGets === 'XRP' ? 'AccountRoot' : 'RippleState'
   });
 
   _.each(affectedNodes, function(node) {
@@ -1004,15 +1004,14 @@ OrderBook.prototype.notify = function(transaction) {
   }
 
   let takerGetsTotal = Amount.from_json(
-    '0' + ((Currency.from_json(this._currencyGets).is_native())
+    '0' + (this._currencyGets === 'XRP'
            ? ''
-           : ('/' + this._currencyGets.to_json() + '/' + this._issuerGets))
+           : ('/' + this._currencyGets + '/' + this._issuerGets))
   );
 
   let takerPaysTotal = Amount.from_json(
-    '0' + ((Currency.from_json(this._currencyPays).is_native())
-           ? ''
-           : ('/' + this._currencyPays.to_json() + '/' + this._issuerPays))
+    '0' + (this._currencyPays === 'XRP' ? ''
+           : ('/' + this._currencyPays + '/' + this._issuerPays))
   );
 
   const isOfferCancel =
@@ -1138,10 +1137,7 @@ OrderBook.prototype.insertOffer = function(node) {
  */
 
 OrderBook.prototype.normalizeAmount = function(currency, amountObj) {
-  const value = currency.is_native()
-  ? amountObj
-  : amountObj.value;
-
+  const value = (currency === 'XRP') ? amountObj : amountObj.value;
   return OrderBookUtils.normalizeAmount(value);
 };
 
@@ -1300,18 +1296,18 @@ OrderBook.prototype.toJSON =
 OrderBook.prototype.to_json = function() {
   const json = {
     taker_gets: {
-      currency: this._currencyGets.to_hex()
+      currency: this._currencyGets
     },
     taker_pays: {
-      currency: this._currencyPays.to_hex()
+      currency: this._currencyPays
     }
   };
 
-  if (!this._currencyGets.is_native()) {
+  if (this._currencyGets !== 'XRP') {
     json.taker_gets.issuer = this._issuerGets;
   }
 
-  if (!this._currencyPays.is_native()) {
+  if (this._currencyPays !== 'XRP') {
     json.taker_pays.issuer = this._issuerPays;
   }
 
@@ -1331,11 +1327,11 @@ OrderBook.prototype.isValid =
 OrderBook.prototype.is_valid = function() {
   // XXX Should check for same currency (non-native) && same issuer
   return (
-    this._currencyPays && this._currencyPays.is_valid() &&
-    (this._currencyPays.is_native() || isValidAddress(this._issuerPays)) &&
-    this._currencyGets && this._currencyGets.is_valid() &&
-    (this._currencyGets.is_native() || isValidAddress(this._issuerGets)) &&
-    !(this._currencyPays.is_native() && this._currencyGets.is_native())
+    this._currencyPays && isValidCurrency(this._currencyPays) &&
+    (this._currencyPays === 'XRP' || isValidAddress(this._issuerPays)) &&
+    this._currencyGets && isValidCurrency(this._currencyGets) &&
+    (this._currencyGets === 'XRP' || isValidAddress(this._issuerGets)) &&
+    !(this._currencyPays === 'XRP' && this._currencyGets === 'XRP')
   );
 };
 
@@ -1346,7 +1342,7 @@ OrderBook.prototype.is_valid = function() {
 
 OrderBook.prototype.computeAutobridgedOffers = function(callback = function() {}
 ) {
-  assert(!this._currencyGets.is_native() && !this._currencyPays.is_native(),
+  assert(this._currencyGets !== 'XRP' && this._currencyPays !== 'XRP',
     'Autobridging is only for IOU:IOU orderbooks');
 
 
