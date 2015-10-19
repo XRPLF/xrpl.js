@@ -307,7 +307,7 @@ describe('Remote', function() {
   });
 
   it('Server initialization -- set servers', function() {
-    assert.deepEqual(new Remote({servers: []}).servers, [ ]);
+    assert.deepEqual(new Remote({servers: []}).servers, []);
   });
   it('Server initialization -- set servers -- invalid', function() {
     assert.throws(function() {
@@ -792,11 +792,7 @@ describe('Remote', function() {
   it('Get server', function() {
     remote.addServer('wss://sasdf.ripple.com:443');
 
-    remote.connect();
-    remote._connected = true;
-    remote._servers.forEach(function(s) {
-      s._connected = true;
-    });
+    remote._servers.concat(remote).forEach(s => s._connected = true);
 
     const message = {
       type: 'ledgerClosed',
@@ -827,19 +823,6 @@ describe('Remote', function() {
     remote.addServer('wss://sasdf.ripple.com:443');
     assert.strictEqual(remote._servers.length, 2);
     assert.strictEqual(remote.getServer(), null);
-  });
-  it('Get server -- primary server', function() {
-    const server = remote.addServer({
-      host: 'sasdf.ripple.com',
-      port: 443,
-      secure: true,
-      primary: true
-    });
-
-    remote.connect();
-    server._connected = true;
-
-    assert.strictEqual(remote.getServer().getServerID(), server.getServerID());
   });
 
   it('Parse binary transaction', function() {

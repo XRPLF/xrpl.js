@@ -5,6 +5,7 @@ const assert = require('assert');
 const util = require('util');
 const url = require('url');
 const LRU = require('lru-cache');
+const HttpsProxyAgent = require('https-proxy-agent');
 const EventEmitter = require('events').EventEmitter;
 const RippleError = require('./rippleerror').RippleError;
 const Amount = require('./amount').Amount;
@@ -418,7 +419,6 @@ Server.prototype.reconnect = function() {
 
 Server.prototype.connect = function() {
   const self = this;
-
   const WebSocket = Server.websocketConstructor();
 
   if (!WebSocket) {
@@ -442,22 +442,23 @@ Server.prototype.connect = function() {
     log.info(this.getServerID(), 'connect');
   }
 
-  if (this._remote.proxy !== undefined) {
-    const parsed = url.parse(this._opts.url);
-    const opts = url.parse(this._remote.proxy);
-    opts.secureEndpoint = parsed.protocol === 'wss:';
-    let HttpsProxyAgent;
-    try {
-      HttpsProxyAgent = require('https-proxy-agent');
-    } catch (error) {
-      throw new Error('"proxy" option is not supported in the browser');
-    }
-    const agent = new HttpsProxyAgent(opts);
+  const wsOptions = {};
 
-    this._ws = new WebSocket(this._opts.url, {agent: agent});
-  } else {
-    this._ws = new WebSocket(this._opts.url);
+  if (!_.isUndefined(this._remote.proxy)) {
+    const proxyOptions = _.merge(url.parse(this._remote.proxy), {
+      secureEndpoint: /^wss/.test(this._opts.url)
+    });
+
+    wsOptions.agent = new HttpsProxyAgent(proxyOptions);
   }
+
+  if (!_.isUndefined(this._remote.basic_auth)) {
+    const authOptions = this._remote.basic_auth;
+    const auth = new Buffer(authOptions).toString('base64');
+    wsOptions.headers = {Authorization: `Basic ${auth}`};
+  }
+
+  this._ws = new WebSocket(this._opts.url, wsOptions);
 
   const ws = this._ws;
 
@@ -505,11 +506,13 @@ Server.prototype.connect = function() {
       self.emit('socket_error');
 
       if (self._remote.trace) {
-        log.info(self.getServerID(), 'onerror:', e.data || e);
+        log.info(`${self.getServerID()} onerror: ${e.toString()}`);
       }
 
-      if (Server.TLS_ERRORS.indexOf(e.message) !== -1) {
-        // Unrecoverable
+      if (Server.TLS_ERRORS.includes(e.message)) {
+        throw e;
+      }
+      if (e.message.includes('unexpected')) {
         throw e;
       }
 

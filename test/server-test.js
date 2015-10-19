@@ -1,6 +1,6 @@
 'use strict';
 
-/* eslint-disable no-new */
+/* eslint-disable no-new, max-len */
 
 const _ = require('lodash');
 const assert = require('assert');
@@ -405,6 +405,67 @@ describe('Server', function() {
     });
 
     const server = new Server(new Remote(), 'ws://localhost:5748');
+
+    server.once('connect', function() {
+      server.once('disconnect', function() {
+        wss.close();
+        done();
+      });
+      server.disconnect();
+    });
+
+    server.connect();
+  });
+
+  it('Connect -- with basic auth', function(done) {
+    const port = 5748;
+    function verifyClient(info, callback) {
+      assert.strictEqual(info.req.headers.authorization, 'Basic dXNlcm5hbWU6cGFzc3dvcmQ=');
+      callback(true);
+    }
+    const wss = new ws.Server({port, verifyClient});
+
+    function handleSubscribeRequest(_ws, message) {
+      const m = JSON.parse(message);
+
+      assert.deepEqual(m, {
+        command: 'subscribe',
+        id: 0,
+        streams: ['ledger', 'server']
+      });
+
+      _ws.send(JSON.stringify({
+        id: 0,
+        status: 'success',
+        type: 'response',
+        result: {
+          fee_base: 10,
+          fee_ref: 10,
+          ledger_hash:
+            '1838539EE12463C36F2C53B079D807C697E3D93A1936B717E565A4A912E11776',
+          ledger_index: 7053695,
+          ledger_time: 455414390,
+          load_base: 256,
+          load_factor: 256,
+          random:
+            'E56C9154D9BE94D49C581179356C2E084E16D18D74E8B09093F2D61207625E6A',
+          reserve_base: 20000000,
+          reserve_inc: 5000000,
+          server_status: 'full',
+          validated_ledgers: '32570-7053695'
+        }
+      }));
+    }
+
+
+    wss.once('connection', function(_ws) {
+      _ws.once('message', _.partial(handleSubscribeRequest, _ws));
+    });
+
+    const remote = new Remote({
+      basic_auth: 'username:password'
+    });
+    const server = new Server(remote, `ws://localhost:${port}`);
 
     server.once('connect', function() {
       server.once('disconnect', function() {
