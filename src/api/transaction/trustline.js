@@ -40,8 +40,8 @@ function createTrustlineTransaction(account: string,
 function prepareTrustlineAsync(account: string,
     trustline: TrustLineSpecification, instructions: Instructions, callback
 ) {
-  const transaction = createTrustlineTransaction(account, trustline);
-  utils.prepareTransaction(transaction, this.remote, instructions, callback);
+  const txJSON = createTrustlineTransaction(account, trustline).tx_json;
+  utils.prepareTransaction(txJSON, this.remote, instructions, callback);
 }
 
 function prepareTrustline(account: string,

@@ -19,8 +19,8 @@ function createOrderCancellationTransaction(account: string,
 function prepareOrderCancellationAsync(account: string, sequence: number,
   instructions: Instructions, callback
 ) {
-  const transaction = createOrderCancellationTransaction(account, sequence);
-  utils.prepareTransaction(transaction, this.remote, instructions, callback);
+  const txJSON = createOrderCancellationTransaction(account, sequence).tx_json;
+  utils.prepareTransaction(txJSON, this.remote, instructions, callback);
 }
 
 function prepareOrderCancellation(account: string, sequence: number,

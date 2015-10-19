@@ -5,6 +5,7 @@ const async = require('async');
 const BigNumber = require('bignumber.js');
 const common = require('../common');
 const composeAsync = common.composeAsync;
+const txFlags = require('./txflags');
 import type {Remote} from '../../core/remote';
 import type {Transaction} from '../../core/transaction';
 import type {Instructions} from './types.js';
@@ -44,17 +45,23 @@ function formatPrepareResponse(txJSON: Object): Object {
   };
 }
 
+function setCanonicalFlag(txJSON) {
+  txJSON.Flags |= txFlags.transactionFlags.Universal.FullyCanonicalSig;
+
+  // JavaScript converts operands to 32-bit signed ints before doing bitwise
+  // operations. We need to convert it back to an unsigned int.
+  txJSON.Flags = txJSON.Flags >>> 0;
+}
+
 type Callback = (err: ?(typeof Error),
                  data: {txJSON: string, instructions: Instructions}) => void;
-function prepareTransaction(transaction: Transaction, remote: Remote,
+function prepareTransaction(txJSON: Object, remote: Remote,
     instructions: Instructions, callback: Callback
 ): void {
   common.validate.instructions(instructions);
 
-  transaction.complete();
-  const account = transaction.getAccount();
-  const txJSON = transaction.tx_json;
-
+  const account = txJSON.Account;
+  setCanonicalFlag(txJSON);
 
   function prepareMaxLedgerVersion(callback_) {
     if (instructions.maxLedgerVersion !== undefined) {
