@@ -33,23 +33,28 @@ unittest() {
   rm -rf test-compiled
 }
 
+integrationtest() {
+  mocha test/integration/integration-test.js
+}
+
 oneNode() {
   lint
   typecheck
   unittest
+  integrationtest
 }
 
 twoNodes() {
   case "$NODE_INDEX" in
-    0) lint && unittest;;
-    1) typecheck;;
+    0) lint && integrationtest;;
+    1) typecheck && unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;
   esac
 }
 
 threeNodes() {
   case "$NODE_INDEX" in
-    0) lint;;
+    0) lint && integrationtest;;
     1) typecheck;;
     2) unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;

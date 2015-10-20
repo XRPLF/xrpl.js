@@ -12,7 +12,7 @@ function loadWallet() {
   try {
     const walletRaw = fs.readFileSync(secretPath, {encoding: 'utf8'}).trim();
     return JSON.parse(walletRaw);
-  } catch(e) {
+  } catch (e) {
     return null;
   }
 }
@@ -20,6 +20,14 @@ function loadWallet() {
 const WALLET = loadWallet();
 
 function getTestKey(key) {
+  if (process.env.TEST_ADDRESS && process.env.TEST_SECRET) {
+    if (key === 'address') {
+      return process.env.TEST_ADDRESS;
+    }
+    if (key === 'secret') {
+      return process.env.TEST_SECRET;
+    }
+  }
   if (WALLET === null) {
     throw new Error('Could not find .ripple_wallet file in home directory');
   }
