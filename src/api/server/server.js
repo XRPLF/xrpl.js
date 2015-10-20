@@ -4,10 +4,6 @@
 
 const _ = require('lodash');
 const common = require('../common');
-import type {Remote} from '../../core/remote';
-
-// If a ledger is not received in this time, consider the connection offline
-const CONNECTION_TIMEOUT = 1000 * 30;
 
 type GetServerInfoResponse = {
   buildVersion: string,
@@ -38,14 +34,9 @@ type GetServerInfoResponse = {
   validationQuorum: number
 }
 
-function isUpToDate(remote: Remote): boolean {
-  const server = remote.getServer();
-  return Boolean(server) && (remote._stand_alone
-    || (Date.now() - server._lastLedgerClose) <= CONNECTION_TIMEOUT);
-}
-
 function isConnected(): boolean {
-  return Boolean(this.remote._ledger_current_index) && isUpToDate(this.remote);
+  const server = this.remote.getServer();
+  return Boolean(server && server.isConnected());
 }
 
 function getServerInfoAsync(
@@ -78,7 +69,7 @@ function connect(): Promise<void> {
   return common.promisify(callback => {
     try {
       this.remote.connect(() => callback(null));
-    } catch(error) {
+    } catch (error) {
       callback(new common.errors.RippledNetworkError(error.message));
     }
   })();
@@ -88,7 +79,7 @@ function disconnect(): Promise<void> {
   return common.promisify(callback => {
     try {
       this.remote.disconnect(() => callback(null));
-    } catch(error) {
+    } catch (error) {
       callback(new common.errors.RippledNetworkError(error.message));
     }
   })();

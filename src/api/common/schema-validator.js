@@ -83,8 +83,12 @@ function loadSchemas() {
 }
 
 function formatSchemaError(error) {
-  return error.field + ' ' + error.message
-    + (error.value ? ' (' + JSON.stringify(error.value) + ')' : '');
+  try {
+    return error.field + ' ' + error.message
+      + (error.value ? ' (' + JSON.stringify(error.value) + ')' : '');
+  } catch (err) {
+    return error.field + ' ' + error.message;
+  }
 }
 
 function formatSchemaErrors(errors) {
