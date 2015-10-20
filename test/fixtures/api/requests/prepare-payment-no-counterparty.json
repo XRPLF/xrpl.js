@@ -26,5 +26,5 @@
   "allowPartialPayment": true,
   "noDirectRipple": true,
   "limitQuality": true,
-  "paths": "[[{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\",\"currency\":\"USD\",\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\",\"type\":49,\"type_hex\":\"0000000000000031\"},{\"currency\":\"LTC\",\"issuer\":\"rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX\",\"type\":48,\"type_hex\":\"0000000000000030\"},{\"account\":\"rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX\",\"currency\":\"LTC\",\"issuer\":\"rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX\",\"type\":49,\"type_hex\":\"0000000000000031\"}]]"
+  "paths": "[[{\"account\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\",\"currency\":\"USD\",\"issuer\":\"rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q\"},{\"currency\":\"LTC\",\"issuer\":\"rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX\"},{\"account\":\"rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX\",\"currency\":\"LTC\",\"issuer\":\"rfYv1TXnwgDDK4WQNbFALykYuEBnrR4pDX\"}]]"
 }

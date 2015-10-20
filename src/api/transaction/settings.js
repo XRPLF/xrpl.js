@@ -6,7 +6,6 @@ const utils = require('./utils');
 const validate = utils.common.validate;
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices;
 const AccountFields = utils.common.constants.AccountFields;
-const Transaction = utils.common.core.Transaction;
 import type {Instructions, Prepare} from './types.js';
 import type {Settings} from './settings-types.js';
 
@@ -14,7 +13,7 @@ import type {Settings} from './settings-types.js';
 const CLEAR_SETTING = null;
 
 
-function setTransactionFlags(transaction: Transaction, values: Settings) {
+function setTransactionFlags(txJSON: Object, values: Settings) {
   const keys = Object.keys(values);
   assert(keys.length === 1, 'ERROR: can only set one setting per transaction');
   const flagName = keys[0];
@@ -22,14 +21,14 @@ function setTransactionFlags(transaction: Transaction, values: Settings) {
   const index = AccountFlagIndices[flagName];
   if (index !== undefined) {
     if (value) {
-      transaction.tx_json.SetFlag = index;
+      txJSON.SetFlag = index;
     } else {
-      transaction.tx_json.ClearFlag = index;
+      txJSON.ClearFlag = index;
     }
   }
 }
 
-function setTransactionFields(transaction: Transaction, input: Settings) {
+function setTransactionFields(txJSON: Object, input: Settings) {
   const fieldSchema = AccountFields;
   for (const fieldName in fieldSchema) {
     const field = fieldSchema[fieldName];
@@ -49,7 +48,7 @@ function setTransactionFields(transaction: Transaction, input: Settings) {
       value = new Buffer(value, 'ascii').toString('hex').toUpperCase();
     }
 
-    transaction.tx_json[fieldName] = value;
+    txJSON[fieldName] = value;
   }
 }
 
@@ -71,33 +70,35 @@ function convertTransferRate(transferRate: number | string): number | string {
 }
 
 function createSettingsTransaction(account: string, settings: Settings
-): Transaction {
+): Object {
   validate.address(account);
   validate.settings(settings);
 
-  const transaction = new Transaction();
   if (settings.regularKey) {
-    return transaction.setRegularKey({
-      account: account,
-      regular_key: settings.regularKey
-    });
+    return {
+      TransactionType: 'SetRegularKey',
+      Account: account,
+      RegularKey: settings.regularKey
+    };
   }
 
-  transaction.accountSet(account);
-  setTransactionFlags(transaction, settings);
-  setTransactionFields(transaction, settings);
+  const txJSON: Object = {
+    TransactionType: 'AccountSet',
+    Account: account
+  };
+  setTransactionFlags(txJSON, settings);
+  setTransactionFields(txJSON, settings);
 
-  if (transaction.tx_json.TransferRate !== undefined) {
-    transaction.tx_json.TransferRate = convertTransferRate(
-      transaction.tx_json.TransferRate);
+  if (txJSON.TransferRate !== undefined) {
+    txJSON.TransferRate = convertTransferRate(txJSON.TransferRate);
   }
-  return transaction;
+  return txJSON;
 }
 
 function prepareSettingsAsync(account: string, settings: Settings,
     instructions: Instructions, callback
 ) {
-  const txJSON = createSettingsTransaction(account, settings).tx_json;
+  const txJSON = createSettingsTransaction(account, settings);
   utils.prepareTransaction(txJSON, this.remote, instructions, callback);
 }
 

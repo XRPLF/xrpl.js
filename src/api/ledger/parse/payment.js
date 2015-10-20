@@ -4,18 +4,18 @@ const _ = require('lodash');
 const assert = require('assert');
 const utils = require('./utils');
 const parseAmount = require('./amount');
-const Transaction = utils.core.Transaction;
+const txFlags = utils.txFlags;
 
 function isPartialPayment(tx) {
-  return (tx.Flags & Transaction.flags.Payment.PartialPayment) !== 0;
+  return (tx.Flags & txFlags.Payment.PartialPayment) !== 0;
 }
 
 function isNoDirectRipple(tx) {
-  return (tx.Flags & Transaction.flags.Payment.NoRippleDirect) !== 0;
+  return (tx.Flags & txFlags.Payment.NoRippleDirect) !== 0;
 }
 
 function isQualityLimited(tx) {
-  return (tx.Flags & Transaction.flags.Payment.LimitQuality) !== 0;
+  return (tx.Flags & txFlags.Payment.LimitQuality) !== 0;
 }
 
 function removeGenericCounterparty(amount, address) {

@@ -2,16 +2,10 @@
 'use strict';
 const utils = require('./utils');
 const validate = utils.common.validate;
-const Transaction = utils.common.core.Transaction;
+const trustlineFlags = utils.common.txFlags.TrustSet;
 const BigNumber = require('bignumber.js');
 import type {Instructions, Prepare} from './types.js';
 import type {TrustLineSpecification} from '../ledger/trustlines-types.js';
-
-const TrustSetFlags = {
-  authorized: {set: 'SetAuth'},
-  ripplingDisabled: {set: 'NoRipple', unset: 'ClearNoRipple'},
-  frozen: {set: 'SetFreeze', unset: 'ClearFreeze'}
-};
 
 function convertQuality(quality) {
   return quality === undefined ? undefined :
@@ -20,7 +14,7 @@ function convertQuality(quality) {
 
 function createTrustlineTransaction(account: string,
     trustline: TrustLineSpecification
-): Transaction {
+): Object {
   validate.address(account);
   validate.trustline(trustline);
 
@@ -30,17 +24,36 @@ function createTrustlineTransaction(account: string,
     value: trustline.limit
   };
 
-  const transaction = new Transaction();
-  transaction.trustSet(account, limit, convertQuality(trustline.qualityIn),
-    convertQuality(trustline.qualityOut));
-  utils.setTransactionBitFlags(transaction, trustline, TrustSetFlags);
-  return transaction;
+  const txJSON: Object = {
+    TransactionType: 'TrustSet',
+    Account: account,
+    LimitAmount: limit,
+    Flags: 0
+  };
+  if (trustline.qualityIn !== undefined) {
+    txJSON.QualityIn = convertQuality(trustline.qualityIn);
+  }
+  if (trustline.qualityOut !== undefined) {
+    txJSON.QualityOut = convertQuality(trustline.qualityOut);
+  }
+  if (trustline.authorized === true) {
+    txJSON.Flags |= trustlineFlags.SetAuth;
+  }
+  if (trustline.ripplingDisabled !== undefined) {
+    txJSON.Flags |= trustline.ripplingDisabled ?
+      trustlineFlags.NoRipple : trustlineFlags.ClearNoRipple;
+  }
+  if (trustline.frozen !== undefined) {
+    txJSON.Flags |= trustline.frozen ?
+      trustlineFlags.SetFreeze : trustlineFlags.ClearFreeze;
+  }
+  return txJSON;
 }
 
 function prepareTrustlineAsync(account: string,
     trustline: TrustLineSpecification, instructions: Instructions, callback
 ) {
-  const txJSON = createTrustlineTransaction(account, trustline).tx_json;
+  const txJSON = createTrustlineTransaction(account, trustline);
   utils.prepareTransaction(txJSON, this.remote, instructions, callback);
 }
 

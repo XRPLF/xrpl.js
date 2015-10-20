@@ -1,6 +1,6 @@
 'use strict';
 const core = require('./utils').core;
-const flagIndices = core.Transaction.set_clear_flags.AccountSet;
+const flagIndices = require('./txflags').txFlagIndices.AccountSet;
 const flags = core.Remote.flags.account_root;
 
 const AccountFlags = {

@@ -91,5 +91,6 @@ module.exports = {
   adjustQualityForXRP,
   dropsToXrp: utils.common.dropsToXrp,
   constants: utils.common.constants,
+  txFlags: utils.common.txFlags,
   core: utils.common.core
 };

@@ -2,24 +2,25 @@
 'use strict';
 const utils = require('./utils');
 const validate = utils.common.validate;
-const Transaction = utils.common.core.Transaction;
 import type {Instructions, Prepare} from './types.js';
 
 function createOrderCancellationTransaction(account: string,
     sequence: number
-): Transaction {
+): Object {
   validate.address(account);
   validate.sequence(sequence);
 
-  const transaction = new Transaction();
-  transaction.offerCancel(account, sequence);
-  return transaction;
+  return {
+    TransactionType: 'OfferCancel',
+    Account: account,
+    OfferSequence: sequence
+  };
 }
 
 function prepareOrderCancellationAsync(account: string, sequence: number,
   instructions: Instructions, callback
 ) {
-  const txJSON = createOrderCancellationTransaction(account, sequence).tx_json;
+  const txJSON = createOrderCancellationTransaction(account, sequence);
   utils.prepareTransaction(txJSON, this.remote, instructions, callback);
 }
 

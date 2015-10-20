@@ -1,6 +1,6 @@
 'use strict';
 
-const transactionFlags = {
+const txFlags = {
   // Universal flags can apply to any transaction type
   Universal: {
     FullyCanonicalSig: 0x80000000
@@ -41,7 +41,7 @@ const transactionFlags = {
 // The following are integer (as opposed to bit) flags
 // that can be set for particular transactions in the
 // SetFlag or ClearFlag field
-const transactionFlagIndices = {
+const txFlagIndices = {
   AccountSet: {
     asfRequireDest: 1,
     asfRequireAuth: 2,
@@ -55,6 +55,6 @@ const transactionFlagIndices = {
 };
 
 module.exports = {
-  transactionFlags,
-  transactionFlagIndices
+  txFlags,
+  txFlagIndices
 };
