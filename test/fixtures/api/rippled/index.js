@@ -8,6 +8,7 @@ module.exports = {
   ledger: require('./ledger'),
   ledgerNotFound: require('./ledger-not-found'),
   ledgerWithoutCloseTime: require('./ledger-without-close-time'),
+  ledgerWithSettingsTx: require('./ledger-with-settings-tx'),
   subscribe: require('./subscribe'),
   unsubscribe: require('./unsubscribe'),
   account_info: {
