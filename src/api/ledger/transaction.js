@@ -4,9 +4,7 @@ const _ = require('lodash');
 const async = require('async');
 const utils = require('./utils');
 const parseTransaction = require('./parse/transaction');
-const validate = utils.common.validate;
-const errors = utils.common.errors;
-const convertErrors = utils.common.convertErrors;
+const {validate, convertErrors, errors} = utils.common;
 const RippleError = require('../../core/rippleerror').RippleError;
 
 import type {Remote} from '../../core/remote';
@@ -27,7 +25,12 @@ function attachTransactionDate(remote: Remote, tx: Object,
     return;
   }
 
-  remote.requestLedger(tx.ledger_index, (error, data) => {
+  const request = {
+    command: 'ledger',
+    ledger_index: tx.ledger_index
+  };
+
+  remote.rawRequest(request, (error, data) => {
     if (error) {
       callback(new errors.NotFoundError('Transaction ledger not found'));
     } else if (typeof data.ledger.close_time === 'number') {
@@ -98,8 +101,8 @@ function getTransactionAsync(identifier: string, options: TransactionOptions,
   }
 
   async.waterfall([
-    _.partial(remote.requestTx.bind(remote),
-      {hash: identifier, binary: false}),
+    _.partial(remote.rawRequest.bind(remote),
+      {command: 'tx', transaction: identifier, binary: false}),
     _.partial(attachTransactionDate, remote)
   ], maxLedgerGetter.bind(this));
 }

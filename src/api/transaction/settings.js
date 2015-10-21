@@ -99,7 +99,7 @@ function prepareSettingsAsync(account: string, settings: Settings,
     instructions: Instructions, callback
 ) {
   const txJSON = createSettingsTransaction(account, settings);
-  utils.prepareTransaction(txJSON, this.remote, instructions, callback);
+  utils.prepareTransaction(txJSON, this, instructions, callback);
 }
 
 function prepareSettings(account: string, settings: Object,

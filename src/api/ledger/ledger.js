@@ -1,9 +1,7 @@
 /* @flow */
 'use strict';
 const utils = require('./utils');
-const validate = utils.common.validate;
-const composeAsync = utils.common.composeAsync;
-const convertErrors = utils.common.convertErrors;
+const {validate, composeAsync, convertErrors} = utils.common;
 const parseLedger = require('./parse/ledger');
 import type {GetLedger} from './types.js';
 
@@ -19,13 +17,14 @@ function getLedgerAsync(options: LedgerOptions, callback) {
   validate.getLedgerOptions(options);
 
   const request = {
-    ledger: options.ledgerVersion || 'validated',
+    command: 'ledger',
+    ledger_index: options.ledgerVersion || 'validated',
     expand: options.includeAllData,
     transactions: options.includeTransactions,
     accounts: options.includeState
   };
 
-  this.remote.requestLedger(request,
+  this.remote.rawRequest(request,
     composeAsync(response => parseLedger(response.ledger),
     convertErrors(callback)));
 }

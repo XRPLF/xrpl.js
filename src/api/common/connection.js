@@ -26,6 +26,12 @@ class ConnectionError extends Error {
   }
 }
 
+class NotConnectedError extends ConnectionError {
+  constructor(message) {
+    super(message);
+  }
+}
+
 class DisconnectedError extends ConnectionError {
   constructor(message) {
     super(message);
@@ -50,6 +56,7 @@ class Connection extends EventEmitter {
     this._url = url;
     this._timeout = options.timeout || (20 * 1000);
     this._ws = null;
+    this._ledgerVersion = null;
     this._nextRequestID = 1;
   }
 
@@ -62,6 +69,9 @@ class Connection extends EventEmitter {
         }
         this.emit(data.id.toString(), data);
       } else if (isStreamMessageType(data.type)) {
+        if (data.type === 'ledgerClosed') {
+          this._ledgerVersion = Number(data.ledger_index);
+        }
         this.emit(data.type, data);
       } else if (data.type === undefined && data.error) {
         this.emit('error', data.error, data.error_message);  // e.g. slowDown
@@ -77,12 +87,34 @@ class Connection extends EventEmitter {
     return this._ws ? this._ws.readyState : WebSocket.CLOSED;
   }
 
+  get _shouldBeConnected() {
+    return this._ws !== null;
+  }
+
   _onUnexpectedClose() {
+    this._ledgerVersion = null;
     this.connect().then();
   }
 
+  _onOpen() {
+    const subscribeRequest = {
+      command: 'subscribe',
+      streams: ['ledger']
+    };
+    return this.request(subscribeRequest).then(() => {
+      const ledgerRequest = {
+        command: 'ledger',
+        ledger_index: 'validated'
+      };
+      return this.request(ledgerRequest).then(info => {
+        this._ledgerVersion = Number(info.ledger.ledger_index);
+        this.emit('connected');
+      });
+    });
+  }
+
   connect() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (this.state === WebSocket.OPEN) {
         resolve();
       } else if (this.state === WebSocket.CONNECTING) {
@@ -91,7 +123,7 @@ class Connection extends EventEmitter {
         this._ws = new WebSocket(this._url);
         this._ws.on('message', this._onMessage.bind(this));
         this._ws.once('close', () => this._onUnexpectedClose);
-        this._ws.once('open', resolve);
+        this._ws.once('open', () => this._onOpen().then(resolve, reject));
       }
     });
   }
@@ -104,7 +136,11 @@ class Connection extends EventEmitter {
         this._ws.once('close', resolve);
       } else {
         this._ws.removeListener('close', this._onUnexpectedClose);
-        this._ws.once('close', resolve);
+        this._ws.once('close', () => {
+          this._ws = null;
+          this._ledgerVersion = null;
+          resolve();
+        });
         this._ws.close();
       }
     });
@@ -112,6 +148,19 @@ class Connection extends EventEmitter {
 
   reconnect() {
     return this.disconnect().then(() => this.connect());
+  }
+
+  getLedgerVersion() {
+    return new Promise((resolve, reject) => {
+      const ledgerVersion = this._ledgerVersion;
+      if (!this._shouldBeConnected) {
+        reject(new NotConnectedError());
+      } else if (this.state === WebSocket.OPEN && ledgerVersion !== null) {
+        resolve(ledgerVersion);
+      } else {
+        this.once('connected', () => resolve(this._ledgerVersion));
+      }
+    });
   }
 
   _send(message) {
@@ -131,13 +180,18 @@ class Connection extends EventEmitter {
       if (this.state === WebSocket.OPEN) {
         this._send(message).then(resolve, reject);
       } else {
-        this._ws.once('open', () => this._send(message).then(resolve, reject));
+        this._ws.once('connected', () =>
+          this._send(message).then(resolve, reject));
       }
     });
   }
 
   request(request, timeout) {
     return new Promise((resolve, reject) => {
+      if (!this._shouldBeConnected) {
+        reject(new NotConnectedError());
+      }
+
       let timer = null;
       const self = this;
       const id = this._nextRequestID;
@@ -179,6 +233,7 @@ class Connection extends EventEmitter {
 
       this._ws.once('close', onDisconnect);
 
+      // JSON.stringify automatically removes keys with value of 'undefined'
       const message = JSON.stringify(Object.assign({}, request, {id}));
 
       this._sendWhenReady(message).then(() => {

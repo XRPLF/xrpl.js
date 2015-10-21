@@ -810,6 +810,12 @@ Remote.prototype.request = function(request) {
   }
 };
 
+Remote.prototype.rawRequest = function(message, callback) {
+  const request = new Request(this, message.command);
+  _.assign(request.message, _.omit(message, _.isUndefined));
+  request.request(callback);
+};
+
 /**
  * Request ping
  *

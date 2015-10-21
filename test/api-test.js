@@ -607,7 +607,9 @@ describe('RippleAPI', function() {
   });
 
   it('getFee', function() {
-    assert.strictEqual(this.api.getFee(), '0.000012');
+    return this.api.getFee().then(fee => {
+      assert.strictEqual(fee, '0.000012');
+    });
   });
 
   it('disconnect & isConnected', function() {

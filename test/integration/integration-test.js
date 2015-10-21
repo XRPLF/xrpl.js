@@ -176,10 +176,11 @@ describe('integration tests', function() {
 
 
   it('getFee', function() {
-    const fee = this.api.getFee();
-    assert.strictEqual(typeof fee, 'string');
-    assert(!isNaN(Number(fee)));
-    assert(parseFloat(fee) === Number(fee));
+    return this.api.getFee().then(fee => {
+      assert.strictEqual(typeof fee, 'string');
+      assert(!isNaN(Number(fee)));
+      assert(parseFloat(fee) === Number(fee));
+    });
   });
 
 

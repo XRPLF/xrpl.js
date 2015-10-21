@@ -40,7 +40,11 @@ function main() {
       makeRequest(connection, request4)
     ]).then(() => {
       console.log('Done');
-      process.exit();
+    });
+    connection.getLedgerVersion().then(console.log);
+    connection.on('ledgerClosed', ledger => {
+      console.log(ledger);
+      connection.getLedgerVersion().then(console.log);
     });
   });
 }

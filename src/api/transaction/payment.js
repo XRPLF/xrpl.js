@@ -145,7 +145,7 @@ function preparePaymentAsync(account: string, payment: Payment,
     instructions: Instructions, callback
 ) {
   const txJSON = createPaymentTransaction(account, payment);
-  utils.prepareTransaction(txJSON, this.remote, instructions, callback);
+  utils.prepareTransaction(txJSON, this, instructions, callback);
 }
 
 function preparePayment(account: string, payment: Payment,

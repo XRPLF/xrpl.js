@@ -2,10 +2,7 @@
 
 'use strict';
 const utils = require('./utils');
-const removeUndefined = require('./parse/utils').removeUndefined;
-const validate = utils.common.validate;
-const composeAsync = utils.common.composeAsync;
-const convertErrors = utils.common.convertErrors;
+const {validate, composeAsync, convertErrors, removeUndefined} = utils.common;
 
 type AccountData = {
   Sequence: number,
@@ -62,11 +59,12 @@ function getAccountInfoAsync(account: string, options: AccountInfoOptions,
   validate.getAccountInfoOptions(options);
 
   const request = {
+    command: 'account_info',
     account: account,
-    ledger: options.ledgerVersion || 'validated'
+    ledger_index: options.ledgerVersion || 'validated'
   };
 
-  this.remote.requestAccountInfo(request,
+  this.remote.rawRequest(request,
     composeAsync(formatAccountInfo, convertErrors(callback)));
 }
 

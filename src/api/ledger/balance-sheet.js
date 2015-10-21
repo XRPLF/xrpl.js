@@ -3,9 +3,7 @@
 
 const _ = require('lodash');
 const utils = require('./utils');
-const validate = utils.common.validate;
-const composeAsync = utils.common.composeAsync;
-const convertErrors = utils.common.convertErrors;
+const {validate, composeAsync, convertErrors} = utils.common;
 import type {Amount} from '../common/types.js';
 
 type BalanceSheetOptions = {
@@ -55,12 +53,13 @@ function getBalanceSheetAsync(address: string, options: BalanceSheetOptions,
   validate.address(address);
   validate.getBalanceSheetOptions(options);
 
-  const requestOptions = Object.assign({}, {
+  const request = {
+    command: 'gateway_balances',
     account: address,
     strict: true,
     hotwallet: options.excludeAddresses,
-    ledger: options.ledgerVersion
-  });
+    ledger_index: options.ledgerVersion
+  };
 
   const requestCallback = composeAsync(
     formatBalanceSheet, convertErrors(callback));
@@ -71,11 +70,11 @@ function getBalanceSheetAsync(address: string, options: BalanceSheetOptions,
       return;
     }
 
-    if (_.isUndefined(requestOptions.ledger)) {
-      requestOptions.ledger = ledgerVersion;
+    if (_.isUndefined(request.ledger_index)) {
+      request.ledger_index = ledgerVersion;
     }
 
-    this.remote.requestGatewayBalances(requestOptions, requestCallback);
+    this.remote.rawRequest(request, requestCallback);
   });
 }
 

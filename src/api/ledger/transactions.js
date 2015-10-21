@@ -2,15 +2,13 @@
 /* eslint-disable max-params */
 'use strict';
 const _ = require('lodash');
+const binary = require('ripple-binary-codec');
+const {computeTransactionHash} = require('ripple-hashes');
 const utils = require('./utils');
 const parseTransaction = require('./parse/transaction');
 const getTransaction = require('./transaction');
-const validate = utils.common.validate;
-const composeAsync = utils.common.composeAsync;
-const convertErrors = utils.common.convertErrors;
-
+const {validate, composeAsync, convertErrors} = utils.common;
 import type {Remote} from '../../core/remote';
-
 import type {TransactionType} from './transaction-types';
 
 
@@ -32,11 +30,22 @@ type GetTransactionsResponse = Array<TransactionType>
 
 type CallbackType = (err?: ?Error, data?: GetTransactionsResponse) => void
 
+function parseBinaryTransaction(transaction) {
+  const tx = binary.decode(transaction.tx_blob);
+  tx.hash = computeTransactionHash(tx);
+  tx.ledger_index = transaction.ledger_index;
+  return {
+    tx: tx,
+    meta: binary.decode(transaction.meta),
+    validated: transaction.validated
+  };
+}
+
 function parseAccountTxTransaction(tx) {
+  const _tx = tx.tx_blob ? parseBinaryTransaction(tx) : tx;
   // rippled uses a different response format for 'account_tx' than 'tx'
-  tx.tx.meta = tx.meta;
-  tx.tx.validated = tx.validated;
-  return parseTransaction(tx.tx);
+  return parseTransaction(_.assign({}, _tx.tx,
+    {meta: _tx.meta, validated: _tx.validated}));
 }
 
 function counterpartyFilter(filters, tx: TransactionType) {
@@ -97,7 +106,8 @@ function formatPartialResponse(address: string,
 function getAccountTx(remote: Remote, address: string,
   options: TransactionsOptions, marker: string, limit: number, callback
 ) {
-  const params = {
+  const request = {
+    command: 'account_tx',
     account: address,
     // -1 is equivalent to earliest available validated ledger
     ledger_index_min: options.minLedgerVersion || -1,
@@ -109,7 +119,7 @@ function getAccountTx(remote: Remote, address: string,
     marker: marker
   };
 
-  remote.requestAccountTx(params,
+  remote.rawRequest(request,
     composeAsync(_.partial(formatPartialResponse, address, options),
       convertErrors(callback)));
 }

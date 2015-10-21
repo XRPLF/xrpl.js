@@ -3,9 +3,7 @@
 const _ = require('lodash');
 const async = require('async');
 const utils = require('./utils');
-const validate = utils.common.validate;
-const composeAsync = utils.common.composeAsync;
-const convertErrors = utils.common.convertErrors;
+const {validate, composeAsync, convertErrors} = utils.common;
 const parseAccountOrder = require('./parse/account-order');
 import type {Remote} from '../../core/remote';
 import type {OrdersOptions, Order} from './types.js';
@@ -15,11 +13,12 @@ type GetOrders = Array<Order>
 function requestAccountOffers(remote: Remote, address: string,
   ledgerVersion: number, marker: string, limit: number, callback
 ) {
-  remote.requestAccountOffers({
+  remote.rawRequest({
+    command: 'account_offers',
     account: address,
     marker: marker,
     limit: utils.clamp(limit, 10, 400),
-    ledger: ledgerVersion
+    ledger_index: ledgerVersion
   },
   composeAsync((data) => ({
     marker: data.marker,
