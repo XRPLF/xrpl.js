@@ -144,6 +144,8 @@ module.exports = function(port) {
       conn.send(createLedgerResponse(request, fixtures.ledgerNotFound));
     } else if (request.ledger_index === 9038215) {
       conn.send(createLedgerResponse(request, fixtures.ledgerWithoutCloseTime));
+    } else if (request.ledger_index === 4181996) {
+      conn.send(createLedgerResponse(request, fixtures.ledgerWithSettingsTx));
     } else if (request.ledger_index === 38129) {
       const response = _.assign({}, fixtures.ledger,
         {result: {ledger: fullLedger}});

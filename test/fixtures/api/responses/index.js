@@ -32,7 +32,8 @@ module.exports = {
   getTrustlines: require('./get-trustlines.json'),
   getLedger: {
     header: require('./get-ledger'),
-    full: require('./get-ledger-full')
+    full: require('./get-ledger-full'),
+    withSettingsTx: require('./get-ledger-with-settings-tx')
   },
   prepareOrderCancellation: require('./prepare-order-cancellation.json'),
   prepareOrder: require('./prepare-order.json'),

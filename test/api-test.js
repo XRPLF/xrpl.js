@@ -702,6 +702,16 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getLedger.header, 'getLedger'));
   });
 
+  it('getLedger - with settings transaction', function() {
+    const request = {
+      includeTransactions: true,
+      includeAllData: true,
+      ledgerVersion: 4181996
+    };
+    return this.api.getLedger(request).then(
+      _.partial(checkResult, responses.getLedger.withSettingsTx, 'getLedger'));
+  });
+
   it('getLedger - full, then computeLedgerHash', function() {
     const request = {
       includeTransactions: true,

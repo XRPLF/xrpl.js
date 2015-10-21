@@ -5,6 +5,12 @@ const removeUndefined = require('./utils').removeUndefined;
 const parseTransaction = require('./transaction');
 import type {GetLedger} from '../types.js';
 
+function parseTransactionWrapper(tx) {
+  const transaction = _.assign({}, _.omit(tx, 'metaData'),
+    {meta: tx.metaData});
+  return parseTransaction(transaction);
+}
+
 function parseTransactions(transactions) {
   if (_.isEmpty(transactions)) {
     return {};
@@ -13,7 +19,7 @@ function parseTransactions(transactions) {
     return {transactionHashes: transactions};
   }
   return {
-    transactions: _.map(transactions, parseTransaction),
+    transactions: _.map(transactions, parseTransactionWrapper),
     rawTransactions: JSON.stringify(transactions)
   };
 }
