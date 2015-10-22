@@ -115,6 +115,10 @@ function promisify(asyncFunction: AsyncFunction): Function {
   return es6promisify(wrapCatch(asyncFunction));
 }
 
+function removeUndefined(obj: Object): Object {
+  return _.omit(obj, _.isUndefined);
+}
+
 module.exports = {
   core,
   dropsToXrp,
@@ -126,5 +130,6 @@ module.exports = {
   convertExceptions,
   convertErrors,
   convertKeysFromSnakeCaseToCamelCase,
-  promisify
+  promisify,
+  removeUndefined
 };

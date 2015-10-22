@@ -1,6 +1,8 @@
 'use strict';
 const {EventEmitter} = require('events');
 const WebSocket = require('ws');
+// temporary: RangeSet will be moved to api/common soon
+const RangeSet = require('./utils').core._test.RangeSet;
 
 function isStreamMessageType(type) {
   return type === 'ledgerClosed' ||
@@ -23,6 +25,12 @@ class ConnectionError extends Error {
     this.name = this.constructor.name;
     this.message = message;
     Error.captureStackTrace(this, this.constructor.name);
+  }
+}
+
+class NotConnectedError extends ConnectionError {
+  constructor(message) {
+    super(message);
   }
 }
 
@@ -49,7 +57,10 @@ class Connection extends EventEmitter {
     super();
     this._url = url;
     this._timeout = options.timeout || (20 * 1000);
+    this._isReady = false;
     this._ws = null;
+    this._ledgerVersion = null;
+    this._availableLedgerVersions = new RangeSet();
     this._nextRequestID = 1;
   }
 
@@ -62,6 +73,10 @@ class Connection extends EventEmitter {
         }
         this.emit(data.id.toString(), data);
       } else if (isStreamMessageType(data.type)) {
+        if (data.type === 'ledgerClosed') {
+          this._ledgerVersion = Number(data.ledger_index);
+          this._availableLedgerVersions.addValue(this._ledgerVersion);
+        }
         this.emit(data.type, data);
       } else if (data.type === undefined && data.error) {
         this.emit('error', data.error, data.error_message);  // e.g. slowDown
@@ -77,12 +92,33 @@ class Connection extends EventEmitter {
     return this._ws ? this._ws.readyState : WebSocket.CLOSED;
   }
 
+  get _shouldBeConnected() {
+    return this._ws !== null;
+  }
+
   _onUnexpectedClose() {
+    this._isReady = false;
     this.connect().then();
   }
 
+  _onOpen() {
+    const subscribeRequest = {
+      command: 'subscribe',
+      streams: ['ledger']
+    };
+    return this.request(subscribeRequest).then(() => {
+      return this.request({command: 'server_info'}).then(response => {
+        this._ledgerVersion = Number(response.info.validated_ledger.seq);
+        this._availableLedgerVersions.parseAndAddRanges(
+          response.info.complete_ledgers);
+        this._isReady = true;
+        this.emit('connected');
+      });
+    });
+  }
+
   connect() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (this.state === WebSocket.OPEN) {
         resolve();
       } else if (this.state === WebSocket.CONNECTING) {
@@ -91,7 +127,7 @@ class Connection extends EventEmitter {
         this._ws = new WebSocket(this._url);
         this._ws.on('message', this._onMessage.bind(this));
         this._ws.once('close', () => this._onUnexpectedClose);
-        this._ws.once('open', resolve);
+        this._ws.once('open', () => this._onOpen().then(resolve, reject));
       }
     });
   }
@@ -104,7 +140,11 @@ class Connection extends EventEmitter {
         this._ws.once('close', resolve);
       } else {
         this._ws.removeListener('close', this._onUnexpectedClose);
-        this._ws.once('close', resolve);
+        this._ws.once('close', () => {
+          this._ws = null;
+          this._isReady = false;
+          resolve();
+        });
         this._ws.close();
       }
     });
@@ -112,6 +152,33 @@ class Connection extends EventEmitter {
 
   reconnect() {
     return this.disconnect().then(() => this.connect());
+  }
+
+  _whenReady(promise) {
+    return new Promise((resolve, reject) => {
+      if (!this._shouldBeConnected) {
+        reject(new NotConnectedError());
+      } else if (this.state === WebSocket.OPEN && this._isReady) {
+        promise.then(resolve, reject);
+      } else {
+        this.once('connected', () => promise.then(resolve, reject));
+      }
+    });
+  }
+
+  getLedgerVersion() {
+    return this._whenReady(
+      new Promise(resolve => resolve(this._ledgerVersion)));
+  }
+
+  hasLedgerVersions(lowLedgerVersion, highLedgerVersion) {
+    return this._whenReady(new Promise(resolve =>
+      resolve(this._availableLedgerVersions.containsRange(
+        lowLedgerVersion, highLedgerVersion))));
+  }
+
+  hasLedgerVersion(ledgerVersion) {
+    return this.hasLedgerVersions(ledgerVersion, ledgerVersion);
   }
 
   _send(message) {
@@ -126,18 +193,12 @@ class Connection extends EventEmitter {
     });
   }
 
-  _sendWhenReady(message) {
-    return new Promise((resolve, reject) => {
-      if (this.state === WebSocket.OPEN) {
-        this._send(message).then(resolve, reject);
-      } else {
-        this._ws.once('open', () => this._send(message).then(resolve, reject));
-      }
-    });
-  }
-
   request(request, timeout) {
     return new Promise((resolve, reject) => {
+      if (!this._shouldBeConnected) {
+        reject(new NotConnectedError());
+      }
+
       let timer = null;
       const self = this;
       const id = this._nextRequestID;
@@ -179,9 +240,10 @@ class Connection extends EventEmitter {
 
       this._ws.once('close', onDisconnect);
 
+      // JSON.stringify automatically removes keys with value of 'undefined'
       const message = JSON.stringify(Object.assign({}, request, {id}));
 
-      this._sendWhenReady(message).then(() => {
+      this._whenReady(this._send(message)).then(() => {
         const delay = timeout || this._timeout;
         timer = setTimeout(() => _reject(new TimeoutError()), delay);
       }).catch(_reject);

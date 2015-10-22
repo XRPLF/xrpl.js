@@ -5,12 +5,9 @@ const async = require('async');
 const BigNumber = require('bignumber.js');
 const utils = require('./utils');
 const parsePathfind = require('./parse/pathfind');
-const validate = utils.common.validate;
+const {validate, composeAsync, convertErrors, toRippledAmount} = utils.common;
 const NotFoundError = utils.common.errors.NotFoundError;
 const ValidationError = utils.common.errors.ValidationError;
-const composeAsync = utils.common.composeAsync;
-const convertErrors = utils.common.convertErrors;
-const toRippledAmount = utils.common.toRippledAmount;
 import type {Remote} from '../../core/remote';
 import type {RippledAmount} from '../common/types.js';
 import type {GetPaths, PathFind, PathFindParams,

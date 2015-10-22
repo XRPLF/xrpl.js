@@ -4,6 +4,7 @@
   "type": "object",
   "properties": {
     "trace": {"type": "boolean"},
+    "feeCushion": {"$ref": "value"},
     "servers": {
       "type": "array",
       "items": {

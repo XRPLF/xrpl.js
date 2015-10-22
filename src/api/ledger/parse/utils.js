@@ -22,10 +22,6 @@ function parseTimestamp(tx: {date: string}): string | void {
   return tx.date ? (new Date(toTimestamp(tx.date))).toISOString() : undefined;
 }
 
-function removeUndefined(obj: Object): Object {
-  return _.omit(obj, _.isUndefined);
-}
-
 function removeEmptyCounterparty(amount) {
   if (amount.counterparty === '') {
     delete amount.counterparty;
@@ -76,7 +72,7 @@ function parseMemos(tx: Object): ?Array<Object> {
     return undefined;
   }
   return tx.Memos.map((m) => {
-    return removeUndefined({
+    return utils.common.removeUndefined({
       type: m.Memo.parsed_memo_type || hexToString(m.Memo.MemoType),
       format: m.Memo.parsed_memo_format || hexToString(m.Memo.MemoFormat),
       data: m.Memo.parsed_memo_data || hexToString(m.Memo.MemoData)
@@ -87,10 +83,10 @@ function parseMemos(tx: Object): ?Array<Object> {
 module.exports = {
   parseOutcome,
   parseMemos,
-  removeUndefined,
   adjustQualityForXRP,
   dropsToXrp: utils.common.dropsToXrp,
   constants: utils.common.constants,
   txFlags: utils.common.txFlags,
-  core: utils.common.core
+  core: utils.common.core,
+  removeUndefined: utils.common.removeUndefined
 };

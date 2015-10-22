@@ -2,11 +2,9 @@
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
-const validate = utils.common.validate;
 const parseFields = require('./parse/fields');
-const composeAsync = utils.common.composeAsync;
+const {validate, composeAsync, convertErrors} = utils.common;
 const AccountFlags = utils.common.constants.AccountFlags;
-const convertErrors = utils.common.convertErrors;
 
 type SettingsOptions = {
   ledgerVersion?: number
@@ -55,11 +53,12 @@ function getSettingsAsync(account: string, options: SettingsOptions, callback) {
   validate.getSettingsOptions(options);
 
   const request = {
+    command: 'account_info',
     account: account,
-    ledger: options.ledgerVersion || 'validated'
+    ledger_index: options.ledgerVersion || 'validated'
   };
 
-  this.remote.requestAccountInfo(request,
+  this.remote.rawRequest(request,
     composeAsync(formatSettings, convertErrors(callback)));
 }
 

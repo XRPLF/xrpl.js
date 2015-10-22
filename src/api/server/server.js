@@ -1,64 +1,11 @@
 /* @flow */
-
 'use strict';
-
-const _ = require('lodash');
 const common = require('../common');
-
-type GetServerInfoResponse = {
-  buildVersion: string,
-  completeLedgers: string,
-  hostid: string,
-  ioLatencyMs: number,
-  load?: {
-    jobTypes: Array<Object>,
-    threads: number
-  },
-  lastClose: {
-    convergeTimeS: number,
-    proposers: number
-  },
-  loadFactor: number,
-  peers: number,
-  pubkeyNode: string,
-  pubkeyValidator?: string,
-  serverState: string,
-  validatedLedger: {
-    age: number,
-    baseFeeXrp: number,
-    hash: string,
-    reserveBaseXrp: number,
-    reserveIncXrp: number,
-    seq: number
-  },
-  validationQuorum: number
-}
+import type {GetServerInfoResponse} from '../common/serverinfo';
 
 function isConnected(): boolean {
   const server = this.remote.getServer();
   return Boolean(server && server.isConnected());
-}
-
-function getServerInfoAsync(
-  callback: (err: any, data?: GetServerInfoResponse) => void
-): void {
-  this.remote.requestServerInfo((error, response) => {
-    if (error) {
-      const message = _.get(error, ['remote', 'error_message'], error.message);
-      callback(new common.errors.RippledNetworkError(message));
-    } else {
-      callback(null,
-        common.convertKeysFromSnakeCaseToCamelCase(response.info));
-    }
-  });
-}
-
-function getFee(): ?number {
-  if (!this.remote.getConnectedServers().length) {
-    throw new common.errors.RippledNetworkError('No servers available.');
-  }
-  const fee = this.remote.createTransaction()._computeFee();
-  return fee === undefined ? undefined : common.dropsToXrp(fee);
 }
 
 function getLedgerVersion(): Promise<number> {
@@ -86,7 +33,12 @@ function disconnect(): Promise<void> {
 }
 
 function getServerInfo(): Promise<GetServerInfoResponse> {
-  return common.promisify(getServerInfoAsync).call(this);
+  return common.serverInfo.getServerInfo(this.remote);
+}
+
+function getFee(): Promise<number> {
+  const cushion = this._feeCushion || 1.2;
+  return common.serverInfo.getFee(this.remote, cushion);
 }
 
 function rippleTimeToISO8601(rippleTime: string): string {

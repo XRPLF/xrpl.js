@@ -4,25 +4,16 @@ const _ = require('lodash');
 const async = require('async');
 const BigNumber = require('bignumber.js');
 const common = require('../common');
-const composeAsync = common.composeAsync;
 const txFlags = common.txFlags;
-import type {Remote} from '../../core/remote';
 import type {Instructions} from './types.js';
 
 function removeUndefined(obj: Object): Object {
   return _.omit(obj, _.isUndefined);
 }
 
-function getFeeDrops(remote: Remote, callback) {
-  const feeUnits = 10; // all transactions currently have a fee of 10 fee units
-  remote.feeTxAsync(feeUnits, (err, data) => {
-    callback(err, data ? data.to_text() : undefined);
-  });
-}
-
 function formatPrepareResponse(txJSON: Object): Object {
   const instructions = {
-    fee: txJSON.Fee,
+    fee: common.dropsToXrp(txJSON.Fee),
     sequence: txJSON.Sequence,
     maxLedgerVersion: txJSON.LastLedgerSequence
   };
@@ -42,7 +33,7 @@ function setCanonicalFlag(txJSON) {
 
 type Callback = (err: ?(typeof Error),
                  data: {txJSON: string, instructions: Instructions}) => void;
-function prepareTransaction(txJSON: Object, remote: Remote,
+function prepareTransaction(txJSON: Object, api: Object,
     instructions: Instructions, callback: Callback
 ): void {
   common.validate.instructions(instructions);
@@ -57,7 +48,7 @@ function prepareTransaction(txJSON: Object, remote: Remote,
     } else {
       const offset = instructions.maxLedgerVersionOffset !== undefined ?
         instructions.maxLedgerVersionOffset : 3;
-      remote.getLedgerSequence((error, ledgerVersion) => {
+      api.remote.getLedgerSequence((error, ledgerVersion) => {
         txJSON.LastLedgerSequence = ledgerVersion + offset;
         callback_(error);
       });
@@ -69,14 +60,16 @@ function prepareTransaction(txJSON: Object, remote: Remote,
       txJSON.Fee = common.xrpToDrops(instructions.fee);
       callback_();
     } else {
-      getFeeDrops(remote, composeAsync((serverFeeDrops) => {
+      common.serverInfo.getFee(api.remote, api._feeCushion).then(fee => {
+        const feeDrops = common.xrpToDrops(fee);
         if (instructions.maxFee !== undefined) {
           const maxFeeDrops = common.xrpToDrops(instructions.maxFee);
-          txJSON.Fee = BigNumber.min(serverFeeDrops, maxFeeDrops).toString();
+          txJSON.Fee = BigNumber.min(feeDrops, maxFeeDrops).toString();
         } else {
-          txJSON.Fee = serverFeeDrops;
+          txJSON.Fee = feeDrops;
         }
-      }, callback_));
+        callback_();
+      });
     }
   }
 
@@ -85,8 +78,12 @@ function prepareTransaction(txJSON: Object, remote: Remote,
       txJSON.Sequence = instructions.sequence;
       callback_(null, formatPrepareResponse(txJSON));
     } else {
-      remote.findAccount(account).getNextSequence(function(error, sequence) {
-        txJSON.Sequence = sequence;
+      const request = {
+        command: 'account_info',
+        account: account
+      };
+      api.remote.rawRequest(request, function(error, response) {
+        txJSON.Sequence = response.account_data.Sequence;
         callback_(error, formatPrepareResponse(txJSON));
       });
     }

@@ -4,11 +4,8 @@ const _ = require('lodash');
 const async = require('async');
 const utils = require('./utils');
 const getTrustlines = require('./trustlines');
-const validate = utils.common.validate;
-const composeAsync = utils.common.composeAsync;
-const convertErrors = utils.common.convertErrors;
+const {validate, composeAsync, convertErrors} = utils.common;
 import type {Remote, GetLedgerSequenceCallback} from '../../core/remote';
-
 import type {TrustlinesOptions, Trustline} from './trustlines-types.js';
 
 

@@ -47,6 +47,7 @@ function RippleAPI(options: {}) {
     EventEmitter.call(this);
   }
   const _options = _.assign({}, options, {automatic_resubmission: false});
+  this._feeCushion = _options.feeCushion || 1.2;
   this.remote = new common.core.Remote(_options);
   this.remote.on('ledger_closed', message => {
     this.emit('ledgerClosed', server.formatLedgerClose(message));

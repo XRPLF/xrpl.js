@@ -26,7 +26,12 @@ function clamp(value: number, min: number, max: number): number {
 function getXRPBalance(remote: Remote, address: string, ledgerVersion?: number,
                        callback: Callback
 ): void {
-  remote.requestAccountInfo({account: address, ledger: ledgerVersion},
+  const request = {
+    command: 'account_info',
+    account: address,
+    ledger_index: ledgerVersion
+  };
+  remote.rawRequest(request,
     composeAsync((data) => dropsToXrp(data.account_data.Balance), callback));
 }
 

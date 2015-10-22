@@ -3,9 +3,7 @@
 const _ = require('lodash');
 const async = require('async');
 const utils = require('./utils');
-const validate = utils.common.validate;
-const composeAsync = utils.common.composeAsync;
-const convertErrors = utils.common.convertErrors;
+const {validate, composeAsync, convertErrors} = utils.common;
 const parseAccountTrustline = require('./parse/account-trustline');
 
 import type {Remote} from '../../core/remote';
@@ -29,15 +27,16 @@ function formatResponse(options: TrustlinesOptions, data) {
 function getAccountLines(remote: Remote, address: string, ledgerVersion: number,
   options: TrustlinesOptions, marker: string, limit: number, callback
 ) {
-  const requestOptions = {
+  const request = {
+    command: 'account_lines',
     account: address,
-    ledger: ledgerVersion,
+    ledger_index: ledgerVersion,
     marker: marker,
     limit: utils.clamp(limit, 10, 400),
     peer: options.counterparty
   };
 
-  remote.requestAccountLines(requestOptions,
+  remote.rawRequest(request,
     composeAsync(_.partial(formatResponse, options),
       convertErrors(callback)));
 }

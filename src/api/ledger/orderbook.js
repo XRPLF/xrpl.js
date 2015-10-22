@@ -3,9 +3,7 @@
 const _ = require('lodash');
 const async = require('async');
 const utils = require('./utils');
-const validate = utils.common.validate;
-const composeAsync = utils.common.composeAsync;
-const convertErrors = utils.common.convertErrors;
+const {validate, composeAsync, convertErrors} = utils.common;
 const parseOrderbookOrder = require('./parse/orderbook-order');
 import type {Remote} from '../../core/remote';
 import type {OrdersOptions, OrderSpecification} from './types.js';
@@ -42,10 +40,11 @@ function getBookOffers(remote: Remote, account: string,
     ledgerVersion?: number, limit?: number, takerGets: Issue,
     takerPays: Issue, callback
 ) {
-  remote.requestBookOffers(utils.renameCounterpartyToIssuerInOrder({
+  remote.rawRequest(utils.renameCounterpartyToIssuerInOrder({
+    command: 'book_offers',
     taker_gets: takerGets,
     taker_pays: takerPays,
-    ledger: ledgerVersion || 'validated',
+    ledger_index: ledgerVersion || 'validated',
     limit: limit,
     taker: account
   }), composeAsync(data => data.offers, convertErrors(callback)));

@@ -35,7 +35,7 @@ function prepareSuspendedPaymentCancellationAsync(account: string,
 ) {
   const txJSON =
     createSuspendedPaymentCancellationTransaction(account, payment);
-  utils.prepareTransaction(txJSON, this.remote, instructions, callback);
+  utils.prepareTransaction(txJSON, this, instructions, callback);
 }
 
 function prepareSuspendedPaymentCancellation(account: string,
