@@ -4,7 +4,7 @@ const _ = require('lodash');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const toRippledAmount = utils.common.toRippledAmount;
-const Transaction = utils.common.core.Transaction;
+const paymentFlags = utils.common.txFlags.Payment;
 const ValidationError = utils.common.errors.ValidationError;
 import type {Instructions, Prepare} from './types.js';
 import type {Amount, Adjustment, MaxAdjustment,
@@ -66,7 +66,7 @@ function createMaximalAmount(amount: Amount): Amount {
 }
 
 function createPaymentTransaction(account: string, paymentArgument: Payment
-): Transaction {
+): Object {
   const payment = _.cloneDeep(paymentArgument);
   applyAnyCounterpartyEncoding(payment);
   validate.address(account);
@@ -88,63 +88,63 @@ function createPaymentTransaction(account: string, paymentArgument: Payment
     createMaximalAmount(payment.destination.minAmount) :
     (payment.destination.amount || payment.destination.minAmount);
 
-  const transaction = new Transaction();
-  transaction.payment({
-    from: payment.source.address,
-    to: payment.destination.address,
-    amount: toRippledAmount(amount)
-  });
+  const txJSON: Object = {
+    TransactionType: 'Payment',
+    Account: payment.source.address,
+    Destination: payment.destination.address,
+    Amount: toRippledAmount(amount),
+    Flags: 0
+  };
 
-  if (payment.invoiceID) {
-    transaction.invoiceID(payment.invoiceID);
+  if (payment.invoiceID !== undefined) {
+    txJSON.InvoiceID = payment.invoiceID;
   }
-  if (payment.source.tag) {
-    transaction.sourceTag(payment.source.tag);
+  if (payment.source.tag !== undefined) {
+    txJSON.SourceTag = payment.source.tag;
   }
-  if (payment.destination.tag) {
-    transaction.destinationTag(payment.destination.tag);
+  if (payment.destination.tag !== undefined) {
+    txJSON.DestinationTag = payment.destination.tag;
   }
-  if (payment.memos) {
-    _.forEach(payment.memos, memo =>
-      transaction.addMemo(memo.type, memo.format, memo.data)
-    );
+  if (payment.memos !== undefined) {
+    txJSON.Memos = _.map(payment.memos, utils.convertMemo);
   }
-  if (payment.noDirectRipple) {
-    transaction.setFlags(['NoRippleDirect']);
+  if (payment.noDirectRipple === true) {
+    txJSON.Flags |= paymentFlags.NoRippleDirect;
   }
-  if (payment.limitQuality) {
-    transaction.setFlags(['LimitQuality']);
+  if (payment.limitQuality === true) {
+    txJSON.Flags |= paymentFlags.LimitQuality;
   }
   if (!isXRPToXRPPayment(payment)) {
     // Don't set SendMax for XRP->XRP payment
     // temREDUNDANT_SEND_MAX removed in:
     // https://github.com/ripple/rippled/commit/
     //  c522ffa6db2648f1d8a987843e7feabf1a0b7de8/
-    if (payment.allowPartialPayment || payment.destination.minAmount) {
-      transaction.setFlags(['PartialPayment']);
+    if (payment.allowPartialPayment === true
+        || payment.destination.minAmount !== undefined) {
+      txJSON.Flags |= paymentFlags.PartialPayment;
     }
 
-    transaction.setSendMax(toRippledAmount(
-      payment.source.maxAmount || payment.source.amount));
+    txJSON.SendMax = toRippledAmount(
+      payment.source.maxAmount || payment.source.amount);
 
-    if (payment.destination.minAmount) {
-      transaction.setDeliverMin(toRippledAmount(payment.destination.minAmount));
+    if (payment.destination.minAmount !== undefined) {
+      txJSON.DeliverMin = toRippledAmount(payment.destination.minAmount);
     }
 
-    if (payment.paths) {
-      transaction.paths(JSON.parse(payment.paths));
+    if (payment.paths !== undefined) {
+      txJSON.Paths = JSON.parse(payment.paths);
     }
-  } else if (payment.allowPartialPayment) {
+  } else if (payment.allowPartialPayment === true) {
     throw new ValidationError('XRP to XRP payments cannot be partial payments');
   }
 
-  return transaction;
+  return txJSON;
 }
 
 function preparePaymentAsync(account: string, payment: Payment,
     instructions: Instructions, callback
 ) {
-  const txJSON = createPaymentTransaction(account, payment).tx_json;
+  const txJSON = createPaymentTransaction(account, payment);
   utils.prepareTransaction(txJSON, this.remote, instructions, callback);
 }
 

@@ -3,7 +3,7 @@
 const assert = require('assert');
 const utils = require('./utils');
 const parseAmount = require('./amount');
-const flags = utils.core.Transaction.flags.OfferCreate;
+const flags = utils.txFlags.OfferCreate;
 
 function parseOrder(tx: Object): Object {
   assert(tx.TransactionType === 'OfferCreate');

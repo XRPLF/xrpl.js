@@ -3,7 +3,6 @@
 const _ = require('lodash');
 const utils = require('./utils');
 const validate = utils.common.validate;
-const Transaction = utils.common.core.Transaction;
 import type {Instructions, Prepare} from './types.js';
 import type {Memo} from '../common/types.js';
 
@@ -18,40 +17,36 @@ type SuspendedPaymentExecution = {
 
 function createSuspendedPaymentExecutionTransaction(account: string,
       payment: SuspendedPaymentExecution
-): Transaction {
+): Object {
   validate.address(account);
   validate.suspendedPaymentExecution(payment);
 
-  const transaction = new Transaction();
-  transaction.suspendedPaymentFinish({
-    account: account,
-    owner: payment.owner,
-    paymentSequence: payment.paymentSequence
-  });
+  const txJSON: Object = {
+    TransactionType: 'SuspendedPaymentFinish',
+    Account: account,
+    Owner: payment.owner,
+    OfferSequence: payment.paymentSequence
+  };
 
-  if (payment.method) {
-    transaction.setMethod(payment.method);
+  if (payment.method !== undefined) {
+    txJSON.Method = payment.method;
   }
-  if (payment.digest) {
-    transaction.setDigest(payment.digest);
+  if (payment.digest !== undefined) {
+    txJSON.Digest = payment.digest;
   }
-  if (payment.proof) {
-    transaction.setProof(payment.proof);
+  if (payment.proof !== undefined) {
+    txJSON.Proof = utils.convertStringToHex(payment.proof);
   }
-
-  if (payment.memos) {
-    _.forEach(payment.memos, memo =>
-      transaction.addMemo(memo.type, memo.format, memo.data)
-    );
+  if (payment.memos !== undefined) {
+    txJSON.Memos = _.map(payment.memos, utils.convertMemo);
   }
-  return transaction;
+  return txJSON;
 }
 
 function prepareSuspendedPaymentExecutionAsync(account: string,
     payment: SuspendedPaymentExecution, instructions: Instructions, callback
 ) {
-  const txJSON =
-    createSuspendedPaymentExecutionTransaction(account, payment).tx_json;
+  const txJSON = createSuspendedPaymentExecutionTransaction(account, payment);
   utils.prepareTransaction(txJSON, this.remote, instructions, callback);
 }
 

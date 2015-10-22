@@ -3,7 +3,6 @@
 const _ = require('lodash');
 const utils = require('./utils');
 const validate = utils.common.validate;
-const Transaction = utils.common.core.Transaction;
 import type {Instructions, Prepare} from './types.js';
 import type {Memo} from '../common/types.js';
 
@@ -15,30 +14,27 @@ type SuspendedPaymentCancellation = {
 
 function createSuspendedPaymentCancellationTransaction(account: string,
   payment: SuspendedPaymentCancellation
-): Transaction {
+): Object {
   validate.address(account);
   validate.suspendedPaymentCancellation(payment);
 
-  const transaction = new Transaction();
-  transaction.suspendedPaymentCancel({
-    account: account,
-    owner: payment.owner,
-    paymentSequence: payment.paymentSequence
-  });
-
-  if (payment.memos) {
-    _.forEach(payment.memos, memo =>
-      transaction.addMemo(memo.type, memo.format, memo.data)
-    );
+  const txJSON: Object = {
+    TransactionType: 'SuspendedPaymentCancel',
+    Account: account,
+    Owner: payment.owner,
+    OfferSequence: payment.paymentSequence
+  };
+  if (payment.memos !== undefined) {
+    txJSON.Memos = _.map(payment.memos, utils.convertMemo);
   }
-  return transaction;
+  return txJSON;
 }
 
 function prepareSuspendedPaymentCancellationAsync(account: string,
     payment: SuspendedPaymentCancellation, instructions: Instructions, callback
 ) {
   const txJSON =
-    createSuspendedPaymentCancellationTransaction(account, payment).tx_json;
+    createSuspendedPaymentCancellationTransaction(account, payment);
   utils.prepareTransaction(txJSON, this.remote, instructions, callback);
 }
 

@@ -4,7 +4,6 @@ const _ = require('lodash');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const toRippledAmount = utils.common.toRippledAmount;
-const Transaction = utils.common.core.Transaction;
 import type {Instructions, Prepare} from './types.js';
 import type {Adjustment, MaxAdjustment, Memo} from '../common/types.js';
 
@@ -19,46 +18,42 @@ type SuspendedPaymentCreation = {
 
 function createSuspendedPaymentCreationTransaction(account: string,
     payment: SuspendedPaymentCreation
-): Transaction {
+): Object {
   validate.address(account);
   validate.suspendedPaymentCreation(payment);
 
-  const transaction = new Transaction();
-  transaction.suspendedPaymentCreate({
-    account: account,
-    destination: payment.destination.address,
-    amount: toRippledAmount(payment.destination.amount)
-  });
+  const txJSON: Object = {
+    TransactionType: 'SuspendedPaymentCreate',
+    Account: account,
+    Destination: payment.destination.address,
+    Amount: toRippledAmount(payment.destination.amount)
+  };
 
-  if (payment.digest) {
-    transaction.setDigest(payment.digest);
+  if (payment.digest !== undefined) {
+    txJSON.Digest = payment.digest;
   }
-  if (payment.allowCancelAfter) {
-    transaction.setAllowCancelAfter(payment.allowCancelAfter);
+  if (payment.allowCancelAfter !== undefined) {
+    txJSON.CancelAfter = utils.fromTimestamp(payment.allowCancelAfter);
   }
-  if (payment.allowExecuteAfter) {
-    transaction.setAllowExecuteAfter(payment.allowExecuteAfter);
+  if (payment.allowExecuteAfter !== undefined) {
+    txJSON.FinishAfter = utils.fromTimestamp(payment.allowExecuteAfter);
   }
-
-  if (payment.source.tag) {
-    transaction.sourceTag(payment.source.tag);
+  if (payment.source.tag !== undefined) {
+    txJSON.SourceTag = payment.source.tag;
   }
-  if (payment.destination.tag) {
-    transaction.destinationTag(payment.destination.tag);
+  if (payment.destination.tag !== undefined) {
+    txJSON.DestinationTag = payment.destination.tag;
   }
-  if (payment.memos) {
-    _.forEach(payment.memos, memo =>
-      transaction.addMemo(memo.type, memo.format, memo.data)
-    );
+  if (payment.memos !== undefined) {
+    txJSON.Memos = _.map(payment.memos, utils.convertMemo);
   }
-  return transaction;
+  return txJSON;
 }
 
 function prepareSuspendedPaymentCreationAsync(account: string,
     payment: SuspendedPaymentCreation, instructions: Instructions, callback
 ) {
-  const txJSON =
-    createSuspendedPaymentCreationTransaction(account, payment).tx_json;
+  const txJSON = createSuspendedPaymentCreationTransaction(account, payment);
   utils.prepareTransaction(txJSON, this.remote, instructions, callback);
 }
 

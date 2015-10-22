@@ -29,7 +29,11 @@ const orderbook = {
 };
 
 function checkResult(expected, schemaName, response) {
-  assert.deepEqual(response, expected);
+  if (expected.txJSON) {
+    assert(response.txJSON);
+    assert.deepEqual(JSON.parse(response.txJSON), JSON.parse(expected.txJSON));
+  }
+  assert.deepEqual(_.omit(response, 'txJSON'), _.omit(expected, 'txJSON'));
   if (schemaName) {
     schemaValidator.schemaValidate(schemaName, response);
   }
@@ -918,7 +922,7 @@ describe('RippleAPI - offline', function() {
       fee: '0.000012'
     };
     return api.prepareSettings(address, settings, instructions).then(data => {
-      assert.deepEqual(data, responses.prepareSettings.flags);
+      checkResult(responses.prepareSettings.flags, 'prepare', data);
       assert.deepEqual(api.sign(data.txJSON, secret), responses.sign);
     });
   });

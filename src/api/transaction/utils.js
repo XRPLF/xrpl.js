@@ -5,25 +5,12 @@ const async = require('async');
 const BigNumber = require('bignumber.js');
 const common = require('../common');
 const composeAsync = common.composeAsync;
-const txFlags = require('./txflags');
+const txFlags = common.txFlags;
 import type {Remote} from '../../core/remote';
-import type {Transaction} from '../../core/transaction';
 import type {Instructions} from './types.js';
 
-function setTransactionBitFlags(transaction: Transaction, values: any,
-    flags: any
-): void {
-  for (const flagName in flags) {
-    const flagValue = values[flagName];
-    const flagConversions = flags[flagName];
-
-    if (flagValue === true && flagConversions.set !== undefined) {
-      transaction.setFlags(flagConversions.set);
-    }
-    if (flagValue === false && flagConversions.unset !== undefined) {
-      transaction.setFlags(flagConversions.unset);
-    }
-  }
+function removeUndefined(obj: Object): Object {
+  return _.omit(obj, _.isUndefined);
 }
 
 function getFeeDrops(remote: Remote, callback) {
@@ -46,7 +33,7 @@ function formatPrepareResponse(txJSON: Object): Object {
 }
 
 function setCanonicalFlag(txJSON) {
-  txJSON.Flags |= txFlags.transactionFlags.Universal.FullyCanonicalSig;
+  txJSON.Flags |= txFlags.Universal.FullyCanonicalSig;
 
   // JavaScript converts operands to 32-bit signed ints before doing bitwise
   // operations. We need to convert it back to an unsigned int.
@@ -114,8 +101,47 @@ function prepareTransaction(txJSON: Object, remote: Remote,
   }));
 }
 
+function convertStringToHex(string: string) {
+  return string ? (new Buffer(string, 'utf8')).toString('hex').toUpperCase() :
+    undefined;
+}
+
+function convertMemo(memo: Object): Object {
+  return {
+    Memo: removeUndefined({
+      MemoData: convertStringToHex(memo.data),
+      MemoType: convertStringToHex(memo.type),
+      MemoFormat: convertStringToHex(memo.format)
+    })
+  };
+}
+
+/**
+ * @param {Number} rpepoch (seconds since 1/1/2000 GMT)
+ * @return {Number} ms since unix epoch
+ *
+ */
+function toTimestamp(rpepoch: number): number {
+  return (rpepoch + 0x386D4380) * 1000;
+}
+
+/**
+ * @param {Number|Date} timestamp (ms since unix epoch)
+ * @return {Number} seconds since ripple epoch ( 1/1/2000 GMT)
+ */
+function fromTimestamp(timestamp: number | Date): number {
+  const timestamp_ = timestamp instanceof Date ?
+                     timestamp.getTime() :
+                     timestamp;
+  return Math.round(timestamp_ / 1000) - 0x386D4380;
+}
+
 module.exports = {
-  setTransactionBitFlags,
+  removeUndefined,
+  convertStringToHex,
+  fromTimestamp,
+  toTimestamp,
+  convertMemo,
   prepareTransaction,
   common,
   promisify: common.promisify

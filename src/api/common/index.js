@@ -7,6 +7,7 @@ module.exports = {
   constants: require('./constants'),
   errors: require('./errors'),
   validate: require('./validate'),
+  txFlags: require('./txflags').txFlags,
   dropsToXrp: utils.dropsToXrp,
   xrpToDrops: utils.xrpToDrops,
   toRippledAmount: utils.toRippledAmount,

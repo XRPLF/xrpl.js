@@ -2,7 +2,7 @@
 'use strict';
 const assert = require('assert');
 const utils = require('./utils');
-const flags = utils.core.Transaction.flags.TrustSet;
+const flags = utils.txFlags.TrustSet;
 const BigNumber = require('bignumber.js');
 
 function parseFlag(flagsValue, trueValue, falseValue) {
