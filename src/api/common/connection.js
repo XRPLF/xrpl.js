@@ -1,6 +1,8 @@
 'use strict';
 const {EventEmitter} = require('events');
 const WebSocket = require('ws');
+// temporary: RangeSet will be moved to api/common soon
+const RangeSet = require('./utils').core._test.RangeSet;
 
 function isStreamMessageType(type) {
   return type === 'ledgerClosed' ||
@@ -55,8 +57,10 @@ class Connection extends EventEmitter {
     super();
     this._url = url;
     this._timeout = options.timeout || (20 * 1000);
+    this._isReady = false;
     this._ws = null;
     this._ledgerVersion = null;
+    this._availableLedgerVersions = new RangeSet();
     this._nextRequestID = 1;
   }
 
@@ -71,6 +75,7 @@ class Connection extends EventEmitter {
       } else if (isStreamMessageType(data.type)) {
         if (data.type === 'ledgerClosed') {
           this._ledgerVersion = Number(data.ledger_index);
+          this._availableLedgerVersions.addValue(this._ledgerVersion);
         }
         this.emit(data.type, data);
       } else if (data.type === undefined && data.error) {
@@ -92,7 +97,7 @@ class Connection extends EventEmitter {
   }
 
   _onUnexpectedClose() {
-    this._ledgerVersion = null;
+    this._isReady = false;
     this.connect().then();
   }
 
@@ -102,12 +107,11 @@ class Connection extends EventEmitter {
       streams: ['ledger']
     };
     return this.request(subscribeRequest).then(() => {
-      const ledgerRequest = {
-        command: 'ledger',
-        ledger_index: 'validated'
-      };
-      return this.request(ledgerRequest).then(info => {
-        this._ledgerVersion = Number(info.ledger.ledger_index);
+      return this.request({command: 'server_info'}).then(response => {
+        this._ledgerVersion = Number(response.info.validated_ledger.seq);
+        this._availableLedgerVersions.parseAndAddRanges(
+          response.info.complete_ledgers);
+        this._isReady = true;
         this.emit('connected');
       });
     });
@@ -138,7 +142,7 @@ class Connection extends EventEmitter {
         this._ws.removeListener('close', this._onUnexpectedClose);
         this._ws.once('close', () => {
           this._ws = null;
-          this._ledgerVersion = null;
+          this._isReady = false;
           resolve();
         });
         this._ws.close();
@@ -150,17 +154,31 @@ class Connection extends EventEmitter {
     return this.disconnect().then(() => this.connect());
   }
 
-  getLedgerVersion() {
+  _whenReady(promise) {
     return new Promise((resolve, reject) => {
-      const ledgerVersion = this._ledgerVersion;
       if (!this._shouldBeConnected) {
         reject(new NotConnectedError());
-      } else if (this.state === WebSocket.OPEN && ledgerVersion !== null) {
-        resolve(ledgerVersion);
+      } else if (this.state === WebSocket.OPEN && this._isReady) {
+        promise.then(resolve, reject);
       } else {
-        this.once('connected', () => resolve(this._ledgerVersion));
+        this.once('connected', () => promise.then(resolve, reject));
       }
     });
+  }
+
+  getLedgerVersion() {
+    return this._whenReady(
+      new Promise(resolve => resolve(this._ledgerVersion)));
+  }
+
+  hasLedgerVersions(lowLedgerVersion, highLedgerVersion) {
+    return this._whenReady(new Promise(resolve =>
+      resolve(this._availableLedgerVersions.containsRange(
+        lowLedgerVersion, highLedgerVersion))));
+  }
+
+  hasLedgerVersion(ledgerVersion) {
+    return this.hasLedgerVersions(ledgerVersion, ledgerVersion);
   }
 
   _send(message) {
@@ -172,17 +190,6 @@ class Connection extends EventEmitter {
           resolve(result);
         }
       });
-    });
-  }
-
-  _sendWhenReady(message) {
-    return new Promise((resolve, reject) => {
-      if (this.state === WebSocket.OPEN) {
-        this._send(message).then(resolve, reject);
-      } else {
-        this._ws.once('connected', () =>
-          this._send(message).then(resolve, reject));
-      }
     });
   }
 
@@ -236,7 +243,7 @@ class Connection extends EventEmitter {
       // JSON.stringify automatically removes keys with value of 'undefined'
       const message = JSON.stringify(Object.assign({}, request, {id}));
 
-      this._sendWhenReady(message).then(() => {
+      this._whenReady(this._send(message)).then(() => {
         const delay = timeout || this._timeout;
         timer = setTimeout(() => _reject(new TimeoutError()), delay);
       }).catch(_reject);

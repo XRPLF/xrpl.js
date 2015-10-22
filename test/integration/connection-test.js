@@ -46,6 +46,8 @@ function main() {
       console.log(ledger);
       connection.getLedgerVersion().then(console.log);
     });
+    connection.hasLedgerVersions(1, 100).then(console.log);
+    connection.hasLedgerVersions(16631039, 16631040).then(console.log);
   });
 }
 
