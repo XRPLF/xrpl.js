@@ -25,12 +25,13 @@ export type PathFind = {
   }
 }
 
-export type PathFindParams = {
-  src_account: string,
-  dst_amount: RippledAmount,
-  dst_account: string,
-  src_amount?: RippledAmount,
-  src_currencies?: Array<string>
+export type PathFindRequest = {
+  command: string,
+  source_account: string,
+  destination_amount: RippledAmount,
+  destination_account: string,
+  source_amount?: RippledAmount,
+  source_currencies?: Array<string>
 }
 
 export type RippledPathsResponse = {

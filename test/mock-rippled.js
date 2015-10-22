@@ -254,9 +254,9 @@ module.exports = function(port) {
     }
   });
 
-  mock.on('request_path_find', function(request, conn) {
+  mock.on('request_ripple_path_find', function(request, conn) {
     let response = null;
-    if (request.subcommand === 'close') {
+    if (request.subcommand === 'close') {   // for path_find command
       return;
     }
     if (request.source_account === addresses.NOTFOUND) {
