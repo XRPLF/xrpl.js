@@ -64,18 +64,20 @@ function getBalanceSheetAsync(address: string, options: BalanceSheetOptions,
   const requestCallback = composeAsync(
     formatBalanceSheet, convertErrors(callback));
 
-  this.remote.getLedgerSequence((err, ledgerVersion) => {
-    if (err) {
-      callback(err);
-      return;
-    }
+  if (_.isUndefined(request.ledger_index)) {
+    this.remote.getLedgerSequence((err, ledgerVersion) => {
+      if (err) {
+        convertErrors(callback)(err);
+        return;
+      }
 
-    if (_.isUndefined(request.ledger_index)) {
       request.ledger_index = ledgerVersion;
-    }
 
+      this.remote.rawRequest(request, requestCallback);
+    });
+  } else {
     this.remote.rawRequest(request, requestCallback);
-  });
+  }
 }
 
 function getBalanceSheet(address: string, options: BalanceSheetOptions = {}
