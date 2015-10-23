@@ -1,14 +1,38 @@
 /* eslint-disable valid-jsdoc */
 'use strict';
 
+const util = require('util');
+const utils = require('./utils');
+
 /**
  * Base class for all errors
  */
 function RippleError(message) {
   this.message = message;
 }
-RippleError.prototype = new Error();
+
+RippleError.prototype = Object.create(Error.prototype);
 RippleError.prototype.name = 'RippleError';
+
+
+RippleError.prototype.toString = function() {
+  let result = '[' + this.name + '(' + this.message;
+  if (this.data) {
+    result += ', ' + util.inspect(this.data);
+  }
+  result += ')]';
+  return result;
+};
+
+/*
+  console.log in node uses util.inspect on object, and util.inspect allows
+  to cutomize it output:
+  https://nodejs.org/api/util.html#util_custom_inspect_function_on_objects
+*/
+RippleError.prototype.inspect = function(depth) {
+  utils.unused(depth);
+  return this.toString();
+};
 
 function ValidationError(message) {
   this.message = message;
