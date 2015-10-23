@@ -9,32 +9,22 @@
       "resolved": "https://registry.npmjs.org/async/-/async-0.9.2.tgz"
     },
     "babel-runtime": {
-      "version": "5.8.25",
-      "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.25.tgz",
+      "version": "5.8.29",
+      "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.29.tgz",
       "dependencies": {
         "core-js": {
-          "version": "1.1.4",
-          "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.1.4.tgz"
+          "version": "1.2.3",
+          "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.3.tgz"
         }
       }
     },
     "bignumber.js": {
-      "version": "2.0.7",
-      "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.0.7.tgz"
+      "version": "2.1.0",
+      "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.1.0.tgz"
     },
     "bn.js": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.1.2.tgz"
-    },
-    "es6-promisify": {
-      "version": "2.0.0",
-      "resolved": "https://registry.npmjs.org/es6-promisify/-/es6-promisify-2.0.0.tgz",
-      "dependencies": {
-        "es6-promise": {
-          "version": "2.3.0",
-          "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-2.3.0.tgz"
-        }
-      }
+      "version": "3.2.0",
+      "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.2.0.tgz"
     },
     "extend": {
       "version": "1.2.1",
@@ -121,8 +111,8 @@
       "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz",
       "dependencies": {
         "x-address-codec": {
-          "version": "0.7.0",
-          "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.7.0.tgz",
+          "version": "0.7.2",
+          "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.7.2.tgz",
           "dependencies": {
             "base-x": {
               "version": "1.0.1",
@@ -136,17 +126,13 @@
       "version": "0.0.6",
       "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.0.6.tgz",
       "dependencies": {
-        "bn.js": {
-          "version": "3.2.0",
-          "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.2.0.tgz"
-        },
         "create-hash": {
           "version": "1.1.2",
           "resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
           "dependencies": {
             "cipher-base": {
-              "version": "1.0.1",
-              "resolved": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.1.tgz"
+              "version": "1.0.2",
+              "resolved": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.2.tgz"
             },
             "ripemd160": {
               "version": "1.0.1",
@@ -177,8 +163,8 @@
           "resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
           "dependencies": {
             "cipher-base": {
-              "version": "1.0.1",
-              "resolved": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.1.tgz"
+              "version": "1.0.2",
+              "resolved": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.2.tgz"
             },
             "inherits": {
               "version": "2.0.1",
@@ -205,8 +191,8 @@
           "resolved": "https://registry.npmjs.org/brorand/-/brorand-1.0.5.tgz"
         },
         "elliptic": {
-          "version": "5.1.0",
-          "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.1.0.tgz",
+          "version": "5.2.0",
+          "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.0.tgz",
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
@@ -222,7 +208,13 @@
     },
     "ripple-lib-value": {
       "version": "0.1.0",
-      "resolved": "https://registry.npmjs.org/ripple-lib-value/-/ripple-lib-value-0.1.0.tgz"
+      "resolved": "https://registry.npmjs.org/ripple-lib-value/-/ripple-lib-value-0.1.0.tgz",
+      "dependencies": {
+        "bignumber.js": {
+          "version": "2.0.8",
+          "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.0.8.tgz"
+        }
+      }
     },
     "sjcl-codec": {
       "version": "0.1.0",
@@ -232,20 +224,6 @@
       "version": "0.7.2",
       "resolved": "https://registry.npmjs.org/ws/-/ws-0.7.2.tgz",
       "dependencies": {
-        "bufferutil": {
-          "version": "1.1.0",
-          "resolved": "https://registry.npmjs.org/bufferutil/-/bufferutil-1.1.0.tgz",
-          "dependencies": {
-            "bindings": {
-              "version": "1.2.1",
-              "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
-            },
-            "nan": {
-              "version": "1.8.4",
-              "resolved": "https://registry.npmjs.org/nan/-/nan-1.8.4.tgz"
-            }
-          }
-        },
         "options": {
           "version": "0.0.6",
           "resolved": "https://registry.npmjs.org/options/-/options-0.0.6.tgz"
@@ -253,20 +231,6 @@
         "ultron": {
           "version": "1.0.2",
           "resolved": "https://registry.npmjs.org/ultron/-/ultron-1.0.2.tgz"
-        },
-        "utf-8-validate": {
-          "version": "1.1.0",
-          "resolved": "https://registry.npmjs.org/utf-8-validate/-/utf-8-validate-1.1.0.tgz",
-          "dependencies": {
-            "bindings": {
-              "version": "1.2.1",
-              "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
-            },
-            "nan": {
-              "version": "1.8.4",
-              "resolved": "https://registry.npmjs.org/nan/-/nan-1.8.4.tgz"
-            }
-          }
         }
       }
     }

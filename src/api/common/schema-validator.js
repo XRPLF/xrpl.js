@@ -53,7 +53,7 @@ function loadSchemas() {
     require('./schemas/payment-transaction.json'),
     require('./schemas/payment.json'),
     require('./schemas/quality.json'),
-    require('./schemas/remote-options.json'),
+    require('./schemas/api-options.json'),
     require('./schemas/sequence.json'),
     require('./schemas/settings-options.json'),
     require('./schemas/settings-transaction.json'),

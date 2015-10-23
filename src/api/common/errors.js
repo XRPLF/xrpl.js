@@ -34,6 +34,48 @@ RippleError.prototype.inspect = function(depth) {
   return this.toString();
 };
 
+class RippledError extends RippleError {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+    this.message = message;
+    Error.captureStackTrace(this, this.constructor.name);
+  }
+}
+
+class ConnectionError extends RippleError {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+    this.message = message;
+    Error.captureStackTrace(this, this.constructor.name);
+  }
+}
+
+class NotConnectedError extends ConnectionError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+class DisconnectedError extends ConnectionError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+class TimeoutError extends ConnectionError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+class UnexpectedError extends ConnectionError {
+  constructor(message) {
+    super(message);
+  }
+}
+
 function ValidationError(message) {
   this.message = message;
 }
@@ -117,5 +159,11 @@ module.exports = {
   MissingLedgerHistoryError,
   TimeOutError,
   ApiError,
-  RippleError
+  RippleError,
+  ConnectionError,
+  RippledError,
+  NotConnectedError,
+  DisconnectedError,
+  TimeoutError,
+  UnexpectedError
 };

@@ -2,8 +2,8 @@
 'use strict';
 const _ = require('lodash');
 const transactionParser = require('ripple-lib-transactionparser');
-const toTimestamp = require('../../../core/utils').toTimestamp;
 const utils = require('../utils');
+const toTimestamp = utils.common.toTimestamp;
 const BigNumber = require('bignumber.js');
 
 function adjustQualityForXRP(
@@ -87,6 +87,5 @@ module.exports = {
   dropsToXrp: utils.common.dropsToXrp,
   constants: utils.common.constants,
   txFlags: utils.common.txFlags,
-  core: utils.common.core,
   removeUndefined: utils.common.removeUndefined
 };

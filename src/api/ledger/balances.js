@@ -1,11 +1,8 @@
 /* @flow */
 'use strict';
-const _ = require('lodash');
-const async = require('async');
 const utils = require('./utils');
-const getTrustlines = require('./trustlines');
-const {validate, composeAsync, convertErrors} = utils.common;
-import type {Remote, GetLedgerSequenceCallback} from '../../core/remote';
+const {validate} = utils.common;
+import type {Connection} from '../common/connection.js';
 import type {TrustlinesOptions, Trustline} from './trustlines-types.js';
 
 
@@ -43,42 +40,26 @@ function formatBalances(options, balances) {
   return result;
 }
 
-function getTrustlinesAsync(account: string, options: TrustlinesOptions,
-  callback
-) {
-  getTrustlines.call(this, account, options)
-    .then(data => callback(null, data))
-    .catch(callback);
-}
-
-function getLedgerVersionHelper(remote: Remote, optionValue?: number,
-  callback: GetLedgerSequenceCallback
-) {
+function getLedgerVersionHelper(connection: Connection, optionValue?: number
+): Promise<number> {
   if (optionValue !== undefined && optionValue !== null) {
-    callback(null, optionValue);
-  } else {
-    remote.getLedgerSequence(callback);
+    return new Promise(resolve => resolve(optionValue));
   }
-}
-
-function getBalancesAsync(account: string, options: TrustlinesOptions,
-  callback
-) {
-  validate.address(account);
-  validate.getBalancesOptions(options);
-
-  async.parallel({
-    xrp: async.seq(
-      _.partial(getLedgerVersionHelper, this.remote, options.ledgerVersion),
-      _.partial(utils.getXRPBalance, this.remote, account)
-    ),
-    trustlines: _.partial(getTrustlinesAsync.bind(this), account, options)
-  }, composeAsync(_.partial(formatBalances, options), convertErrors(callback)));
+  return connection.getLedgerVersion();
 }
 
 function getBalances(account: string, options: TrustlinesOptions = {}
 ): Promise<GetBalances> {
-  return utils.promisify(getBalancesAsync).call(this, account, options);
+  validate.address(account);
+  validate.getBalancesOptions(options);
+
+  return Promise.all([
+    getLedgerVersionHelper(this.connection, options.ledgerVersion).then(
+      ledgerVersion =>
+        utils.getXRPBalance(this.connection, account, ledgerVersion)),
+    this.getTrustlines(account, options)
+  ]).then(results =>
+    formatBalances(options, {xrp: results[0], trustlines: results[1]}));
 }
 
 module.exports = getBalances;

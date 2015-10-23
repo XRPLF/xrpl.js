@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const utils = require('./utils');
 const parseFields = require('./parse/fields');
-const {validate, composeAsync, convertErrors} = utils.common;
+const {validate} = utils.common;
 const AccountFlags = utils.common.constants.AccountFlags;
 
 type SettingsOptions = {
@@ -48,7 +48,8 @@ function formatSettings(response) {
   return _.assign({}, parsedFlags, parsedFields);
 }
 
-function getSettingsAsync(account: string, options: SettingsOptions, callback) {
+function getSettings(account: string, options: SettingsOptions = {}
+): Promise<GetSettings> {
   validate.address(account);
   validate.getSettingsOptions(options);
 
@@ -58,13 +59,7 @@ function getSettingsAsync(account: string, options: SettingsOptions, callback) {
     ledger_index: options.ledgerVersion || 'validated'
   };
 
-  this.remote.rawRequest(request,
-    composeAsync(formatSettings, convertErrors(callback)));
-}
-
-function getSettings(account: string, options: SettingsOptions = {}
-): Promise<GetSettings> {
-  return utils.promisify(getSettingsAsync).call(this, account, options);
+  return this.connection.request(request).then(formatSettings);
 }
 
 module.exports = getSettings;

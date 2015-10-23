@@ -17,18 +17,11 @@ function createOrderCancellationTransaction(account: string,
   };
 }
 
-function prepareOrderCancellationAsync(account: string, sequence: number,
-  instructions: Instructions, callback
-) {
-  const txJSON = createOrderCancellationTransaction(account, sequence);
-  utils.prepareTransaction(txJSON, this, instructions, callback);
-}
-
 function prepareOrderCancellation(account: string, sequence: number,
-    instructions: Instructions = {}
+  instructions: Instructions = {}
 ): Promise<Prepare> {
-  return utils.promisify(prepareOrderCancellationAsync.bind(this))(
-    account, sequence, instructions);
+  const txJSON = createOrderCancellationTransaction(account, sequence);
+  return utils.prepareTransaction(txJSON, this, instructions);
 }
 
 module.exports = prepareOrderCancellation;

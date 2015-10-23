@@ -50,18 +50,11 @@ function createTrustlineTransaction(account: string,
   return txJSON;
 }
 
-function prepareTrustlineAsync(account: string,
-    trustline: TrustLineSpecification, instructions: Instructions, callback
-) {
-  const txJSON = createTrustlineTransaction(account, trustline);
-  utils.prepareTransaction(txJSON, this, instructions, callback);
-}
-
 function prepareTrustline(account: string,
     trustline: TrustLineSpecification, instructions: Instructions = {}
 ): Promise<Prepare> {
-  return utils.promisify(prepareTrustlineAsync.bind(this))(
-    account, trustline, instructions);
+  const txJSON = createTrustlineTransaction(account, trustline);
+  return utils.prepareTransaction(txJSON, this, instructions);
 }
 
 module.exports = prepareTrustline;

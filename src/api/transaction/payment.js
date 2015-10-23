@@ -141,18 +141,11 @@ function createPaymentTransaction(account: string, paymentArgument: Payment
   return txJSON;
 }
 
-function preparePaymentAsync(account: string, payment: Payment,
-    instructions: Instructions, callback
-) {
-  const txJSON = createPaymentTransaction(account, payment);
-  utils.prepareTransaction(txJSON, this, instructions, callback);
-}
-
 function preparePayment(account: string, payment: Payment,
-    instructions: Instructions = {}
+    instructions: Instructions
 ): Promise<Prepare> {
-  return utils.promisify(preparePaymentAsync.bind(this))(
-    account, payment, instructions);
+  const txJSON = createPaymentTransaction(account, payment);
+  return utils.prepareTransaction(txJSON, this, instructions);
 }
 
 module.exports = preparePayment;

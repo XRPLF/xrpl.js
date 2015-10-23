@@ -1,7 +1,7 @@
 /* @flow */
 'use strict';
 const utils = require('./utils');
-const {validate, composeAsync, convertErrors} = utils.common;
+const {validate} = utils.common;
 const parseLedger = require('./parse/ledger');
 import type {GetLedger} from './types.js';
 
@@ -13,7 +13,7 @@ type LedgerOptions = {
 }
 
 
-function getLedgerAsync(options: LedgerOptions, callback) {
+function getLedger(options: LedgerOptions = {}): Promise<GetLedger> {
   validate.getLedgerOptions(options);
 
   const request = {
@@ -24,13 +24,8 @@ function getLedgerAsync(options: LedgerOptions, callback) {
     accounts: options.includeState
   };
 
-  this.remote.rawRequest(request,
-    composeAsync(response => parseLedger(response.ledger),
-    convertErrors(callback)));
-}
-
-function getLedger(options: LedgerOptions = {}): Promise<GetLedger> {
-  return utils.promisify(getLedgerAsync).call(this, options);
+  return this.connection.request(request).then(response =>
+    parseLedger(response.ledger));
 }
 
 module.exports = getLedger;

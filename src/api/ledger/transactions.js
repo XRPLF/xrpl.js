@@ -7,8 +7,8 @@ const {computeTransactionHash} = require('ripple-hashes');
 const utils = require('./utils');
 const parseTransaction = require('./parse/transaction');
 const getTransaction = require('./transaction');
-const {validate, composeAsync, convertErrors} = utils.common;
-import type {Remote} from '../../core/remote';
+const {validate} = utils.common;
+import type {Connection} from '../common/connection.js';
 import type {TransactionType} from './transaction-types';
 
 
@@ -27,8 +27,6 @@ type TransactionsOptions = {
 }
 
 type GetTransactionsResponse = Array<TransactionType>
-
-type CallbackType = (err?: ?Error, data?: GetTransactionsResponse) => void
 
 function parseBinaryTransaction(transaction) {
   const tx = binary.decode(transaction.tx_blob);
@@ -103,8 +101,8 @@ function formatPartialResponse(address: string,
   };
 }
 
-function getAccountTx(remote: Remote, address: string,
-  options: TransactionsOptions, marker: string, limit: number, callback
+function getAccountTx(connection: Connection, address: string,
+  options: TransactionsOptions, marker: string, limit: number
 ) {
   const request = {
     command: 'account_tx',
@@ -119,13 +117,12 @@ function getAccountTx(remote: Remote, address: string,
     marker: marker
   };
 
-  remote.rawRequest(request,
-    composeAsync(_.partial(formatPartialResponse, address, options),
-      convertErrors(callback)));
+  return connection.request(request).then(response =>
+    formatPartialResponse(address, options, response));
 }
 
-function checkForLedgerGaps(remote: Remote, options: TransactionsOptions,
-                            transactions: GetTransactionsResponse
+function checkForLedgerGaps(connection: Connection,
+  options: TransactionsOptions, transactions: GetTransactionsResponse
 ) {
   let {minLedgerVersion, maxLedgerVersion} = options;
 
@@ -140,54 +137,49 @@ function checkForLedgerGaps(remote: Remote, options: TransactionsOptions,
     }
   }
 
-  if (!utils.hasCompleteLedgerRange(remote, minLedgerVersion,
-      maxLedgerVersion)) {
-    throw new utils.common.errors.MissingLedgerHistoryError();
-  }
+  return utils.hasCompleteLedgerRange(connection, minLedgerVersion,
+    maxLedgerVersion).then(hasCompleteLedgerRange => {
+      if (!hasCompleteLedgerRange) {
+        throw new utils.common.errors.MissingLedgerHistoryError();
+      }
+    });
 }
 
-function formatResponse(remote: Remote, options: TransactionsOptions,
+function formatResponse(connection: Connection, options: TransactionsOptions,
                         transactions: GetTransactionsResponse
 ) {
   const compare = options.earliestFirst ? utils.compareTransactions :
     _.rearg(utils.compareTransactions, 1, 0);
   const sortedTransactions = transactions.sort(compare);
-  checkForLedgerGaps(remote, options, sortedTransactions);
-  return sortedTransactions;
+  return checkForLedgerGaps(connection, options, sortedTransactions).then(
+    () => sortedTransactions);
 }
 
-function getTransactionsInternal(remote: Remote, address: string,
-                                 options: TransactionsOptions, callback
-) {
-  const getter = _.partial(getAccountTx, remote, address, options);
-  const format = _.partial(formatResponse, remote, options);
-  utils.getRecursive(getter, options.limit, composeAsync(format, callback));
+function getTransactionsInternal(connection: Connection, address: string,
+                                 options: TransactionsOptions
+): Promise<GetTransactionsResponse> {
+  const getter = _.partial(getAccountTx, connection, address, options);
+  const format = _.partial(formatResponse, connection, options);
+  return utils.getRecursive(getter, options.limit).then(format);
 }
 
-function getTransactionsAsync(account: string,
-  options: TransactionsOptions, callback: CallbackType
-) {
+function getTransactions(account: string, options: TransactionsOptions = {}
+): Promise<GetTransactionsResponse> {
   validate.address(account);
   validate.getTransactionsOptions(options);
 
   const defaults = {maxLedgerVersion: -1};
   if (options.start) {
-    getTransaction.call(this, options.start).then(tx => {
+    return getTransaction.call(this, options.start).then(tx => {
       const ledgerVersion = tx.outcome.ledgerVersion;
       const bound = options.earliestFirst ?
         {minLedgerVersion: ledgerVersion} : {maxLedgerVersion: ledgerVersion};
       const newOptions = _.assign(defaults, options, {startTx: tx}, bound);
-      getTransactionsInternal(this.remote, account, newOptions, callback);
-    }).catch(callback);
-  } else {
-    const newOptions = _.assign(defaults, options);
-    getTransactionsInternal(this.remote, account, newOptions, callback);
+      return getTransactionsInternal(this.connection, account, newOptions);
+    });
   }
-}
-
-function getTransactions(account: string, options: TransactionsOptions = {}
-): Promise<GetTransactionsResponse> {
-  return utils.promisify(getTransactionsAsync).call(this, account, options);
+  const newOptions = _.assign(defaults, options);
+  return getTransactionsInternal(this.connection, account, newOptions);
 }
 
 module.exports = getTransactions;

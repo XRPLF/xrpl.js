@@ -2,7 +2,7 @@
 
 'use strict';
 const utils = require('./utils');
-const {validate, composeAsync, convertErrors, removeUndefined} = utils.common;
+const {validate, removeUndefined} = utils.common;
 
 type AccountData = {
   Sequence: number,
@@ -29,8 +29,6 @@ type AccountInfoOptions = {
   ledgerVersion?: number
 }
 
-type AccountInfoCallback = (err: any, data: AccountInfoResponse) => void
-
 type AccountInfoResponse = {
   sequence: number,
   xrpBalance: string,
@@ -52,9 +50,8 @@ function formatAccountInfo(response: AccountDataResponse) {
   });
 }
 
-function getAccountInfoAsync(account: string, options: AccountInfoOptions,
-                             callback: AccountInfoCallback
-) {
+function getAccountInfo(account: string, options: AccountInfoOptions = {}
+): Promise<AccountInfoResponse> {
   validate.address(account);
   validate.getAccountInfoOptions(options);
 
@@ -64,13 +61,7 @@ function getAccountInfoAsync(account: string, options: AccountInfoOptions,
     ledger_index: options.ledgerVersion || 'validated'
   };
 
-  this.remote.rawRequest(request,
-    composeAsync(formatAccountInfo, convertErrors(callback)));
-}
-
-function getAccountInfo(account: string, options: AccountInfoOptions = {}
-): Promise<AccountInfoResponse> {
-  return utils.promisify(getAccountInfoAsync).call(this, account, options);
+  return this.connection.request(request).then(formatAccountInfo);
 }
 
 module.exports = getAccountInfo;

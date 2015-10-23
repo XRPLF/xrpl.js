@@ -107,8 +107,6 @@ module.exports = function(port) {
     assert.strictEqual(request.command, 'subscribe');
     if (request.accounts) {
       assert(_.indexOf(_.values(addresses), request.accounts[0]) !== -1);
-    } else {
-      assert.deepEqual(request.streams, ['ledger', 'server']);
     }
     conn.send(createResponse(request, fixtures.subscribe));
   });

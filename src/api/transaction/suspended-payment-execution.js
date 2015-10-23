@@ -43,18 +43,11 @@ function createSuspendedPaymentExecutionTransaction(account: string,
   return txJSON;
 }
 
-function prepareSuspendedPaymentExecutionAsync(account: string,
-    payment: SuspendedPaymentExecution, instructions: Instructions, callback
-) {
-  const txJSON = createSuspendedPaymentExecutionTransaction(account, payment);
-  utils.prepareTransaction(txJSON, this, instructions, callback);
-}
-
 function prepareSuspendedPaymentExecution(account: string,
     payment: SuspendedPaymentExecution, instructions: Instructions = {}
 ): Promise<Prepare> {
-  return utils.promisify(prepareSuspendedPaymentExecutionAsync)
-    .call(this, account, payment, instructions);
+  const txJSON = createSuspendedPaymentExecutionTransaction(account, payment);
+  return utils.prepareTransaction(txJSON, this, instructions);
 }
 
 module.exports = prepareSuspendedPaymentExecution;

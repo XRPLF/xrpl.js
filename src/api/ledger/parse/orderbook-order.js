@@ -2,7 +2,7 @@
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
-const flags = utils.core.Remote.flags.offer;
+const flags = require('./flags').orderFlags;
 const parseAmount = require('./amount');
 
 function parseOrderbookOrder(order: Object): Object {

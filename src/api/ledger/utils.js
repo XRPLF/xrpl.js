@@ -4,63 +4,51 @@ const _ = require('lodash');
 const assert = require('assert');
 const common = require('../common');
 const dropsToXrp = common.dropsToXrp;
-const composeAsync = common.composeAsync;
-import type {Remote} from '../../core/remote';
 import type {TransactionType} from './transaction-types';
 import type {Issue} from '../common/types.js';
-
-type Callback = (err: any, data: any) => void
+import type {Connection} from '../common/connection';
 
 type RecursiveData = {
   marker: string,
   results: Array<any>
 }
 
-type RecursiveCallback = (err: any, data: RecursiveData) => void
+type Getter = (marker: ?string, limit: number) => Promise<RecursiveData>
 
 function clamp(value: number, min: number, max: number): number {
   assert(min <= max, 'Illegal clamp bounds');
   return Math.min(Math.max(value, min), max);
 }
 
-function getXRPBalance(remote: Remote, address: string, ledgerVersion?: number,
-                       callback: Callback
-): void {
+function getXRPBalance(connection: Connection, address: string,
+  ledgerVersion?: number
+): Promise<number> {
   const request = {
     command: 'account_info',
     account: address,
     ledger_index: ledgerVersion
   };
-  remote.rawRequest(request,
-    composeAsync((data) => dropsToXrp(data.account_data.Balance), callback));
+  return connection.request(request).then(data =>
+    dropsToXrp(data.account_data.Balance));
 }
-
-type Getter = (marker: ?string, limit: number,
-  callback: RecursiveCallback) => void
 
 // If the marker is omitted from a response, you have reached the end
 // getter(marker, limit, callback), callback(error, {marker, results})
-function getRecursiveRecur(getter: Getter, marker?: string, limit: number,
-                          callback: Callback
-): void {
-  getter(marker, limit, (error, data) => {
-    if (error) {
-      return callback(error);
-    }
+function getRecursiveRecur(getter: Getter, marker?: string, limit: number
+): Promise {
+  return getter(marker, limit).then(data => {
     const remaining = limit - data.results.length;
     if (remaining > 0 && data.marker !== undefined) {
-      getRecursiveRecur(getter, data.marker, remaining, (_error, results) => {
-        return _error ? callback(_error) :
-          callback(null, data.results.concat(results));
-      });
-    } else {
-      return callback(null, data.results.slice(0, limit));
+      return getRecursiveRecur(getter, data.marker, remaining).then(results =>
+        data.results.concat(results)
+      );
     }
+    return data.results.slice(0, limit);
   });
 }
 
-function getRecursive(getter: Getter, limit?: number, callback: Callback) {
-  getRecursiveRecur(getter, undefined, limit || Infinity, callback);
+function getRecursive(getter: Getter, limit?: number): Promise {
+  return getRecursiveRecur(getter, undefined, limit || Infinity);
 }
 
 function renameCounterpartyToIssuer(amount?: Issue): ?{issuer?: string} {
@@ -109,46 +97,41 @@ function compareTransactions(first: TransactionType, second: TransactionType
   return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1;
 }
 
-function hasCompleteLedgerRange(remote: Remote, minLedgerVersion?: number,
-                                maxLedgerVersion?: number
-): boolean {
-
+function hasCompleteLedgerRange(connection: Connection,
+  minLedgerVersion?: number, maxLedgerVersion?: number
+): Promise<boolean> {
   const firstLedgerVersion = 32570; // earlier versions have been lost
-  return remote.getServer().hasLedgerRange(
-    minLedgerVersion || firstLedgerVersion,
-    maxLedgerVersion || remote.getLedgerSequenceSync());
+  return connection.hasLedgerVersions(
+    minLedgerVersion || firstLedgerVersion, maxLedgerVersion);
 }
 
-function isPendingLedgerVersion(remote: Remote, maxLedgerVersion: ?number
-): boolean {
-  const currentLedger = remote.getLedgerSequenceSync();
-  return currentLedger < (maxLedgerVersion || 0);
+function isPendingLedgerVersion(connection: Connection,
+  maxLedgerVersion: ?number
+): Promise<boolean> {
+  return connection.getLedgerVersion().then(ledgerVersion =>
+    ledgerVersion < (maxLedgerVersion || 0));
 }
 
-function getLedgerOptionsWithLedgerVersion(account: string, options: Object,
-  callback: (err?: ?Error, account?: string, options: Object) => void
-) {
+function ensureLedgerVersion(options: Object
+): Promise<number> {
   if (Boolean(options) && options.ledgerVersion !== undefined &&
     options.ledgerVersion !== null
   ) {
-    callback(null, account, options);
-  } else {
-    this.getLedgerVersion().then((version) => {
-      callback(null, account, _.assign({}, options, {ledgerVersion: version}));
-    }, callback);
+    return new Promise(resolve => resolve(options));
   }
+  return this.getLedgerVersion().then(ledgerVersion =>
+    _.assign({}, options, {ledgerVersion}));
 }
 
 module.exports = {
   getXRPBalance,
-  getLedgerOptionsWithLedgerVersion,
+  ensureLedgerVersion,
   compareTransactions,
   renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder,
   getRecursive,
   hasCompleteLedgerRange,
   isPendingLedgerVersion,
-  promisify: common.promisify,
   clamp: clamp,
   common: common
 };

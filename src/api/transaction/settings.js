@@ -95,18 +95,11 @@ function createSettingsTransaction(account: string, settings: Settings
   return txJSON;
 }
 
-function prepareSettingsAsync(account: string, settings: Settings,
-    instructions: Instructions, callback
-) {
-  const txJSON = createSettingsTransaction(account, settings);
-  utils.prepareTransaction(txJSON, this, instructions, callback);
-}
-
-function prepareSettings(account: string, settings: Object,
+function prepareSettings(account: string, settings: Settings,
     instructions: Instructions = {}
 ): Promise<Prepare> {
-  return utils.promisify(prepareSettingsAsync.bind(this))(
-    account, settings, instructions);
+  const txJSON = createSettingsTransaction(account, settings);
+  return utils.prepareTransaction(txJSON, this, instructions);
 }
 
 module.exports = prepareSettings;

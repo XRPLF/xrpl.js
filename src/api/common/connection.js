@@ -2,54 +2,14 @@
 const {EventEmitter} = require('events');
 const WebSocket = require('ws');
 // temporary: RangeSet will be moved to api/common soon
-const RangeSet = require('./utils').core._test.RangeSet;
+const RangeSet = require('./rangeset').RangeSet;
+const {RippledError, DisconnectedError, NotConnectedError,
+  TimeoutError, UnexpectedError} = require('./errors');
 
 function isStreamMessageType(type) {
   return type === 'ledgerClosed' ||
          type === 'transaction' ||
          type === 'path_find';
-}
-
-class RippledError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    this.message = message;
-    Error.captureStackTrace(this, this.constructor.name);
-  }
-}
-
-class ConnectionError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    this.message = message;
-    Error.captureStackTrace(this, this.constructor.name);
-  }
-}
-
-class NotConnectedError extends ConnectionError {
-  constructor(message) {
-    super(message);
-  }
-}
-
-class DisconnectedError extends ConnectionError {
-  constructor(message) {
-    super(message);
-  }
-}
-
-class TimeoutError extends ConnectionError {
-  constructor(message) {
-    super(message);
-  }
-}
-
-class UnexpectedError extends ConnectionError {
-  constructor(message) {
-    super(message);
-  }
 }
 
 class Connection extends EventEmitter {
@@ -75,7 +35,9 @@ class Connection extends EventEmitter {
       } else if (isStreamMessageType(data.type)) {
         if (data.type === 'ledgerClosed') {
           this._ledgerVersion = Number(data.ledger_index);
-          this._availableLedgerVersions.addValue(this._ledgerVersion);
+          this._availableLedgerVersions.reset();
+          this._availableLedgerVersions.parseAndAddRanges(
+            data.validated_ledgers);
         }
         this.emit(data.type, data);
       } else if (data.type === undefined && data.error) {
@@ -94,6 +56,10 @@ class Connection extends EventEmitter {
 
   get _shouldBeConnected() {
     return this._ws !== null;
+  }
+
+  isConnected() {
+    return this.state === WebSocket.OPEN && this._isReady;
   }
 
   _onUnexpectedClose() {
@@ -174,7 +140,7 @@ class Connection extends EventEmitter {
   hasLedgerVersions(lowLedgerVersion, highLedgerVersion) {
     return this._whenReady(new Promise(resolve =>
       resolve(this._availableLedgerVersions.containsRange(
-        lowLedgerVersion, highLedgerVersion))));
+        lowLedgerVersion, highLedgerVersion || this._ledgerVersion))));
   }
 
   hasLedgerVersion(ledgerVersion) {
@@ -214,7 +180,9 @@ class Connection extends EventEmitter {
       function cleanup() {
         clearTimeout(timer);
         self.removeAllListeners(eventName);
-        self._ws.removeListener('close', onDisconnect);
+        if (self._ws !== null) {
+          self._ws.removeListener('close', onDisconnect);
+        }
       }
 
       function _resolve(response) {
