@@ -156,6 +156,9 @@ function fromTimestamp(timestamp) {
   return Math.round(timestamp_ / 1000) - 0x386D4380;
 }
 
+function unused() {
+}
+
 exports.time = {
   fromRipple: toTimestamp,
   toRipple: fromTimestamp
@@ -176,5 +179,6 @@ exports.toTimestamp = toTimestamp;
 exports.fromTimestamp = fromTimestamp;
 exports.getMantissaDecimalString = getMantissaDecimalString;
 exports.getMantissa16FromString = getMantissa16FromString;
+exports.unused = unused;
 
 // vim:sw=2:sts=2:ts=8:et

@@ -1871,7 +1871,8 @@ Remote.prototype.createPathFind = function(options, callback) {
 
   if (callback) {
     const updateTimeout = setTimeout(() => {
-      callback(new RippleError('tejTimeout'));
+      callback(new RippleError('tejTimeout',
+        'createPathFind request timed out'));
       pathFind.close();
       this._cur_path_find = null;
     }, this.pathfind_timeout);
@@ -1894,7 +1895,8 @@ Remote.prototype.createPathFind = function(options, callback) {
         }
       }
     });
-    pathFind.on('error', (error) => {
+    pathFind.once('error', (error) => {
+      clearTimeout(updateTimeout);
       this._cur_path_find = null;
       callback(error);
     });
