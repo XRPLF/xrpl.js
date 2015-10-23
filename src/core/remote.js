@@ -535,13 +535,23 @@ Remote.prototype.getLedgerSequence = function(callback = function() {}) {
     return;
   }
 
+  let timeout = null;
+  function onLedgerClosed() {
+    clearTimeout(timeout);
+    callback(null, this._ledger_current_index - 1);
+  }
+
   if (_.isFinite(this._ledger_current_index)) {
     // the "current" ledger is the one after the most recently closed ledger
     callback(null, this._ledger_current_index - 1);
   } else {
-    this.once('ledger_closed', () => {
-      callback(null, this._ledger_current_index - 1);
-    });
+    this.once('ledger_closed', onLedgerClosed);
+
+    timeout = setTimeout(() => {
+      this.removeListener('ledger_closed', onLedgerClosed);
+      callback(new RippleError('timeout',
+        'Timed out waiting for ledger to close.'));
+    }, this.pathfind_timeout);
   }
 };
 
