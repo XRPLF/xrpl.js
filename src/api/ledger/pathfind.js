@@ -10,34 +10,36 @@ const NotFoundError = utils.common.errors.NotFoundError;
 const ValidationError = utils.common.errors.ValidationError;
 import type {Remote} from '../../core/remote';
 import type {RippledAmount} from '../common/types.js';
-import type {GetPaths, PathFind, PathFindParams,
-  RippledPathsResponse} from './pathfind-types.js';
+import type {GetPaths, PathFind, RippledPathsResponse, PathFindRequest}
+  from './pathfind-types.js';
 
 
-function addParams(params: PathFindParams, result: RippledPathsResponse) {
+function addParams(request: PathFindRequest, result: RippledPathsResponse) {
   return _.defaults(_.assign({}, result, {
-    source_account: params.src_account,
-    source_currencies: params.src_currencies
-  }), {destination_amount: params.dst_amount});
+    source_account: request.source_account,
+    source_currencies: request.source_currencies
+  }), {destination_amount: request.destination_amount});
 }
 
 function requestPathFind(remote: Remote, pathfind: PathFind, callback) {
   const destinationAmount = _.assign({value: -1}, pathfind.destination.amount);
-  const params: PathFindParams = {
-    src_account: pathfind.source.address,
-    dst_account: pathfind.destination.address,
-    dst_amount: toRippledAmount(destinationAmount)
+  const request: PathFindRequest = {
+    command: 'ripple_path_find',
+    source_account: pathfind.source.address,
+    destination_account: pathfind.destination.address,
+    destination_amount: toRippledAmount(destinationAmount)
   };
-  if (typeof params.dst_amount === 'object' && !params.dst_amount.issuer) {
+  if (typeof request.destination_amount === 'object'
+      && !request.destination_amount.issuer) {
     // Convert blank issuer to sender's address
     // (Ripple convention for 'any issuer')
     // https://ripple.com/build/transactions/
     //     #special-issuer-values-for-sendmax-and-amount
     // https://ripple.com/build/ripple-rest/#counterparties-in-payments
-    params.dst_amount.issuer = params.dst_account;
+    request.destination_amount.issuer = request.destination_account;
   }
   if (pathfind.source.currencies && pathfind.source.currencies.length > 0) {
-    params.src_currencies = pathfind.source.currencies.map(amount =>
+    request.source_currencies = pathfind.source.currencies.map(amount =>
       _.omit(toRippledAmount(amount), 'value'));
   }
   if (pathfind.source.amount) {
@@ -45,14 +47,14 @@ function requestPathFind(remote: Remote, pathfind: PathFind, callback) {
       throw new ValidationError('Cannot specify both source.amount'
         + ' and destination.amount.value in getPaths');
     }
-    params.src_amount = toRippledAmount(pathfind.source.amount);
-    if (params.src_amount.currency && !params.src_amount.issuer) {
-      params.src_amount.issuer = pathfind.source.address;
+    request.source_amount = toRippledAmount(pathfind.source.amount);
+    if (request.source_amount.currency && !request.source_amount.issuer) {
+      request.source_amount.issuer = pathfind.source.address;
     }
   }
 
-  remote.createPathFind(params,
-    composeAsync(_.partial(addParams, params), convertErrors(callback)));
+  remote.rawRequest(request,
+    composeAsync(_.partial(addParams, request), convertErrors(callback)));
 }
 
 function addDirectXrpPath(paths: RippledPathsResponse, xrpBalance: string
