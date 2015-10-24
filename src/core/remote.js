@@ -74,7 +74,7 @@ function Remote(options = {}) {
     this.local_fee = true;
   }
 
-  this._servers = [ ];
+  this._servers = [];
   this._primary_server = undefined;
 
   // Cache information for accounts.
@@ -149,6 +149,9 @@ function Remote(options = {}) {
   if (!Array.isArray(this.servers)) {
     throw new TypeError('servers must be an array');
   }
+  if (!(_.isUndefined(this.basic_auth) || _.isString(this.basic_auth))) {
+    throw new TypeError('basic_auth must be a string');
+  }
 
   this.setMaxListeners(this.max_listeners);
 
@@ -202,7 +205,7 @@ Remote.DEFAULTS = {
   pathfind_timeout: 1000 * 10,
   automatic_resubmission: true,
   last_ledger_offset: 3,
-  servers: [ ],
+  servers: [],
   max_listeners: 0 // remove Node EventEmitter warnings
 };
 
