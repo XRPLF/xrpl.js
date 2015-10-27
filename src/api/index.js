@@ -36,22 +36,34 @@ const prepareSettings = require('./transaction/settings');
 const sign = require('./transaction/sign');
 const submit = require('./transaction/submit');
 const errors = require('./common').errors;
-const convertExceptions = require('./common').convertExceptions;
-const generateAddress = convertExceptions(common.generateAddress);
+const generateAddress = common.generateAddressAPI;
 const computeLedgerHash = require('./offline/ledgerhash');
 const getLedger = require('./ledger/ledger');
 
-function RippleAPI(options: {}) {
-  common.validate.remoteOptions(options);
+type APIOptions = {
+  servers?: Array<string>,
+  feeCushion?: number,
+  trace?: boolean,
+  proxy?: string
+}
+
+function RippleAPI(options: APIOptions = {}) {
+  common.validate.apiOptions(options);
   if (EventEmitter instanceof Function) { // always true, needed for flow
     EventEmitter.call(this);
   }
-  const _options = _.assign({}, options, {automatic_resubmission: false});
-  this._feeCushion = _options.feeCushion || 1.2;
-  this.remote = new common.core.Remote(_options);
-  this.remote.on('ledger_closed', message => {
-    this.emit('ledgerClosed', server.formatLedgerClose(message));
-  });
+  if (options.servers !== undefined) {
+    const servers: Array<string> = options.servers;
+    if (servers.length === 1) {
+      this._feeCushion = options.feeCushion || 1.2;
+      this.connection = new common.Connection(servers[0], options);
+      this.connection.on('ledgerClosed', message => {
+        this.emit('ledgerClosed', server.formatLedgerClose(message));
+      });
+    } else {
+      throw new errors.RippleError('Multi-server not implemented');
+    }
+  }
 }
 
 util.inherits(RippleAPI, EventEmitter);

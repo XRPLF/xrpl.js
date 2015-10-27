@@ -2,54 +2,14 @@
 const {EventEmitter} = require('events');
 const WebSocket = require('ws');
 // temporary: RangeSet will be moved to api/common soon
-const RangeSet = require('./utils').core._test.RangeSet;
+const RangeSet = require('./rangeset').RangeSet;
+const {RippledError, DisconnectedError, NotConnectedError,
+  TimeoutError, UnexpectedError} = require('./errors');
 
 function isStreamMessageType(type) {
   return type === 'ledgerClosed' ||
          type === 'transaction' ||
          type === 'path_find';
-}
-
-class RippledError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    this.message = message;
-    Error.captureStackTrace(this, this.constructor.name);
-  }
-}
-
-class ConnectionError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    this.message = message;
-    Error.captureStackTrace(this, this.constructor.name);
-  }
-}
-
-class NotConnectedError extends ConnectionError {
-  constructor(message) {
-    super(message);
-  }
-}
-
-class DisconnectedError extends ConnectionError {
-  constructor(message) {
-    super(message);
-  }
-}
-
-class TimeoutError extends ConnectionError {
-  constructor(message) {
-    super(message);
-  }
-}
-
-class UnexpectedError extends ConnectionError {
-  constructor(message) {
-    super(message);
-  }
 }
 
 class Connection extends EventEmitter {
@@ -64,36 +24,51 @@ class Connection extends EventEmitter {
     this._nextRequestID = 1;
   }
 
-  _onMessage(message) {
-    try {
-      const data = JSON.parse(message);
-      if (data.type === 'response') {
-        if (!(Number.isInteger(data.id) && data.id >= 0)) {
-          throw new UnexpectedError('valid id not found in response');
-        }
-        this.emit(data.id.toString(), data);
-      } else if (isStreamMessageType(data.type)) {
-        if (data.type === 'ledgerClosed') {
-          this._ledgerVersion = Number(data.ledger_index);
-          this._availableLedgerVersions.addValue(this._ledgerVersion);
-        }
-        this.emit(data.type, data);
-      } else if (data.type === undefined && data.error) {
-        this.emit('error', data.error, data.error_message);  // e.g. slowDown
-      } else {
-        throw new UnexpectedError('unrecognized message type: ' + data.type);
+  // return value is array of arguments to Connection.emit
+  _parseMessage(message) {
+    const data = JSON.parse(message);
+    if (data.type === 'response') {
+      if (!(Number.isInteger(data.id) && data.id >= 0)) {
+        throw new UnexpectedError('valid id not found in response');
       }
-    } catch (error) {
-      this.emit('error', 'badMessage', message);
+      return [data.id.toString(), data];
+    } else if (isStreamMessageType(data.type)) {
+      if (data.type === 'ledgerClosed') {
+        this._ledgerVersion = Number(data.ledger_index);
+        this._availableLedgerVersions.reset();
+        this._availableLedgerVersions.parseAndAddRanges(
+          data.validated_ledgers);
+      }
+      return [data.type, data];
+    } else if (data.type === undefined && data.error) {
+      return ['error', data.error, data.error_message];  // e.g. slowDown
     }
+    throw new UnexpectedError('unrecognized message type: ' + data.type);
   }
 
-  get state() {
+  _onMessage(message) {
+    let parameters;
+    try {
+      parameters = this._parseMessage(message);
+    } catch (error) {
+      this.emit('error', 'badMessage', message);
+      return;
+    }
+    // we don't want this inside the try/catch or exceptions in listener
+    // will be caught
+    this.emit.apply(this, parameters);
+  }
+
+  get _state() {
     return this._ws ? this._ws.readyState : WebSocket.CLOSED;
   }
 
   get _shouldBeConnected() {
     return this._ws !== null;
+  }
+
+  isConnected() {
+    return this._state === WebSocket.OPEN && this._isReady;
   }
 
   _onUnexpectedClose() {
@@ -102,26 +77,24 @@ class Connection extends EventEmitter {
   }
 
   _onOpen() {
-    const subscribeRequest = {
+    const request = {
       command: 'subscribe',
       streams: ['ledger']
     };
-    return this.request(subscribeRequest).then(() => {
-      return this.request({command: 'server_info'}).then(response => {
-        this._ledgerVersion = Number(response.info.validated_ledger.seq);
-        this._availableLedgerVersions.parseAndAddRanges(
-          response.info.complete_ledgers);
-        this._isReady = true;
-        this.emit('connected');
-      });
+    return this.request(request).then(response => {
+      this._ledgerVersion = Number(response.ledger_index);
+      this._availableLedgerVersions.parseAndAddRanges(
+        response.validated_ledgers);
+      this._isReady = true;
+      this.emit('connected');
     });
   }
 
   connect() {
     return new Promise((resolve, reject) => {
-      if (this.state === WebSocket.OPEN) {
+      if (this._state === WebSocket.OPEN) {
         resolve();
-      } else if (this.state === WebSocket.CONNECTING) {
+      } else if (this._state === WebSocket.CONNECTING) {
         this._ws.once('open', resolve);
       } else {
         this._ws = new WebSocket(this._url);
@@ -133,10 +106,10 @@ class Connection extends EventEmitter {
   }
 
   disconnect() {
-    return new Promise((resolve) => {
-      if (this.state === WebSocket.CLOSED) {
+    return new Promise(resolve => {
+      if (this._state === WebSocket.CLOSED) {
         resolve();
-      } else if (this.state === WebSocket.CLOSING) {
+      } else if (this._state === WebSocket.CLOSING) {
         this._ws.once('close', resolve);
       } else {
         this._ws.removeListener('close', this._onUnexpectedClose);
@@ -158,7 +131,7 @@ class Connection extends EventEmitter {
     return new Promise((resolve, reject) => {
       if (!this._shouldBeConnected) {
         reject(new NotConnectedError());
-      } else if (this.state === WebSocket.OPEN && this._isReady) {
+      } else if (this._state === WebSocket.OPEN && this._isReady) {
         promise.then(resolve, reject);
       } else {
         this.once('connected', () => promise.then(resolve, reject));
@@ -167,14 +140,13 @@ class Connection extends EventEmitter {
   }
 
   getLedgerVersion() {
-    return this._whenReady(
-      new Promise(resolve => resolve(this._ledgerVersion)));
+    return this._whenReady(Promise.resolve(this._ledgerVersion));
   }
 
   hasLedgerVersions(lowLedgerVersion, highLedgerVersion) {
-    return this._whenReady(new Promise(resolve =>
-      resolve(this._availableLedgerVersions.containsRange(
-        lowLedgerVersion, highLedgerVersion))));
+    return this._whenReady(Promise.resolve(
+      this._availableLedgerVersions.containsRange(
+        lowLedgerVersion, highLedgerVersion || this._ledgerVersion)));
   }
 
   hasLedgerVersion(ledgerVersion) {
@@ -214,7 +186,9 @@ class Connection extends EventEmitter {
       function cleanup() {
         clearTimeout(timer);
         self.removeAllListeners(eventName);
-        self._ws.removeListener('close', onDisconnect);
+        if (self._ws !== null) {
+          self._ws.removeListener('close', onDisconnect);
+        }
       }
 
       function _resolve(response) {

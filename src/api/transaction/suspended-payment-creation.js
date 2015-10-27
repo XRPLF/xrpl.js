@@ -2,8 +2,7 @@
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
-const validate = utils.common.validate;
-const toRippledAmount = utils.common.toRippledAmount;
+const {validate, unixToRippleTimestamp, toRippledAmount} = utils.common;
 import type {Instructions, Prepare} from './types.js';
 import type {Adjustment, MaxAdjustment, Memo} from '../common/types.js';
 
@@ -33,10 +32,10 @@ function createSuspendedPaymentCreationTransaction(account: string,
     txJSON.Digest = payment.digest;
   }
   if (payment.allowCancelAfter !== undefined) {
-    txJSON.CancelAfter = utils.fromTimestamp(payment.allowCancelAfter);
+    txJSON.CancelAfter = unixToRippleTimestamp(payment.allowCancelAfter);
   }
   if (payment.allowExecuteAfter !== undefined) {
-    txJSON.FinishAfter = utils.fromTimestamp(payment.allowExecuteAfter);
+    txJSON.FinishAfter = unixToRippleTimestamp(payment.allowExecuteAfter);
   }
   if (payment.source.tag !== undefined) {
     txJSON.SourceTag = payment.source.tag;
@@ -50,18 +49,11 @@ function createSuspendedPaymentCreationTransaction(account: string,
   return txJSON;
 }
 
-function prepareSuspendedPaymentCreationAsync(account: string,
-    payment: SuspendedPaymentCreation, instructions: Instructions, callback
-) {
-  const txJSON = createSuspendedPaymentCreationTransaction(account, payment);
-  utils.prepareTransaction(txJSON, this, instructions, callback);
-}
-
 function prepareSuspendedPaymentCreation(account: string,
     payment: SuspendedPaymentCreation, instructions: Instructions = {}
 ): Promise<Prepare> {
-  return utils.promisify(prepareSuspendedPaymentCreationAsync)
-    .call(this, account, payment, instructions);
+  const txJSON = createSuspendedPaymentCreationTransaction(account, payment);
+  return utils.prepareTransaction(txJSON, this, instructions);
 }
 
 module.exports = prepareSuspendedPaymentCreation;

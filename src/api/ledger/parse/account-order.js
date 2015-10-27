@@ -1,7 +1,7 @@
 /* @flow */
 'use strict';
 const utils = require('./utils');
-const flags = utils.core.Remote.flags.offer;
+const flags = require('./flags').orderFlags;
 const parseAmount = require('./amount');
 const BigNumber = require('bignumber.js');
 

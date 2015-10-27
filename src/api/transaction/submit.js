@@ -2,9 +2,7 @@
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
-const validate = utils.common.validate;
-const Request = utils.common.core.Request;
-const convertErrors = utils.common.convertErrors;
+const {validate, convertKeysFromSnakeCaseToCamelCase} = utils.common;
 
 type Submit = {
   success: boolean,
@@ -25,29 +23,20 @@ function isImmediateRejection(engineResult: string): boolean {
   return _.startsWith(engineResult, 'tem') || _.startsWith(engineResult, 'tej');
 }
 
-function convertSubmitErrors(callback) {
-  return function(error, data) {
-    if (!error && isImmediateRejection(data.engineResult)) {
-      callback(new utils.common.errors.RippleError('Submit failed'), data);
-    } else {
-      callback(error, data);
-    }
-  };
-}
-
-function submitAsync(txBlob: string, callback: (err: any, data: any) => void
-): void {
-  validate.blob(txBlob);
-  const request = new Request(this.remote, 'submit');
-  request.message.tx_blob = txBlob;
-  request.request(null,
-    utils.common.composeAsync(
-      data => utils.common.convertKeysFromSnakeCaseToCamelCase(data),
-      convertSubmitErrors(convertErrors(callback))));
+function formatResponse(response) {
+  if (isImmediateRejection(response.engine_result)) {
+    throw new utils.common.errors.RippledError('Submit failed');
+  }
+  return convertKeysFromSnakeCaseToCamelCase(response);
 }
 
 function submit(txBlob: string): Promise<Submit> {
-  return utils.promisify(submitAsync.bind(this))(txBlob);
+  validate.blob(txBlob);
+  const request = {
+    command: 'submit',
+    tx_blob: txBlob
+  };
+  return this.connection.request(request).then(formatResponse);
 }
 
 module.exports = submit;

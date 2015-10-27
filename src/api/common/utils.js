@@ -2,9 +2,7 @@
 'use strict';
 const _ = require('lodash');
 const BigNumber = require('bignumber.js');
-const core = require('../../core');
 const errors = require('./errors');
-const es6promisify = require('es6-promisify');
 const keypairs = require('ripple-keypairs');
 
 import type {Amount, RippledAmount} from './types.js';
@@ -36,63 +34,12 @@ function generateAddress(options?: Object): Object {
   return {secret, address};
 }
 
-type AsyncFunction = (...x: any) => void
-
-function wrapCatch(asyncFunction: AsyncFunction): AsyncFunction {
-  return function() {
-    try {
-      asyncFunction.apply(this, arguments);
-    } catch (error) {
-      const callback = arguments[arguments.length - 1];
-      callback(error);
-    }
-  };
-}
-
-type Callback = (err: any, data: any) => void
-type Wrapper = (data: any) => any
-
-function composeAsync(wrapper: Wrapper, callback: Callback): Callback {
-  return function(error, data) {
-    if (error) {
-      callback(error, data);
-      return;
-    }
-    let result;
-    try {
-      result = wrapper(data);
-    } catch (exception) {
-      callback(exception);
-      return;
-    }
-    callback(null, result);
-  };
-}
-
-function convertErrors(callback: Callback): () => void {
-  return function(error, data) {
-    if (error && !(error instanceof errors.RippleError)) {
-      const message = _.get(error, ['remote', 'error_message'], error.message);
-      const error_ = new errors.RippleError(message);
-      error_.data = data;
-      callback(error_, data);
-    } else if (error) {
-      error.data = data;
-      callback(error, data);
-    } else {
-      callback(error, data);
-    }
-  };
-}
-
-function convertExceptions<T>(f: () => T): () => T {
-  return function() {
-    try {
-      return f.apply(this, arguments);
-    } catch (error) {
-      throw new errors.ApiError(error.message);
-    }
-  };
+function generateAddressAPI(options?: Object): Object {
+  try {
+    return generateAddress(options);
+  } catch (error) {
+    throw new errors.ApiError(error.message);
+  }
 }
 
 const FINDSNAKE = /([a-zA-Z]_[a-zA-Z])/g;
@@ -111,25 +58,38 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
   return obj;
 }
 
-function promisify(asyncFunction: AsyncFunction): Function {
-  return es6promisify(wrapCatch(asyncFunction));
-}
-
 function removeUndefined(obj: Object): Object {
   return _.omit(obj, _.isUndefined);
 }
 
+/**
+ * @param {Number} rpepoch (seconds since 1/1/2000 GMT)
+ * @return {Number} ms since unix epoch
+ *
+ */
+function rippleToUnixTimestamp(rpepoch: number): number {
+  return (rpepoch + 0x386D4380) * 1000;
+}
+
+/**
+ * @param {Number|Date} timestamp (ms since unix epoch)
+ * @return {Number} seconds since ripple epoch ( 1/1/2000 GMT)
+ */
+function unixToRippleTimestamp(timestamp: number | Date): number {
+  const timestamp_ = timestamp instanceof Date ?
+                     timestamp.getTime() :
+                     timestamp;
+  return Math.round(timestamp_ / 1000) - 0x386D4380;
+}
+
 module.exports = {
-  core,
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,
   generateAddress,
-  composeAsync,
-  wrapCatch,
-  convertExceptions,
-  convertErrors,
+  generateAddressAPI,
   convertKeysFromSnakeCaseToCamelCase,
-  promisify,
-  removeUndefined
+  removeUndefined,
+  rippleToUnixTimestamp,
+  unixToRippleTimestamp
 };

@@ -1,15 +1,10 @@
 /* @flow */
 'use strict';
 const _ = require('lodash');
-const async = require('async');
 const BigNumber = require('bignumber.js');
 const common = require('../common');
 const txFlags = common.txFlags;
-import type {Instructions} from './types.js';
-
-function removeUndefined(obj: Object): Object {
-  return _.omit(obj, _.isUndefined);
-}
+import type {Instructions, Prepare} from './types.js';
 
 function formatPrepareResponse(txJSON: Object): Object {
   const instructions = {
@@ -31,71 +26,65 @@ function setCanonicalFlag(txJSON) {
   txJSON.Flags = txJSON.Flags >>> 0;
 }
 
-type Callback = (err: ?(typeof Error),
-                 data: {txJSON: string, instructions: Instructions}) => void;
 function prepareTransaction(txJSON: Object, api: Object,
-    instructions: Instructions, callback: Callback
-): void {
+    instructions: Instructions
+): Promise<Prepare> {
   common.validate.instructions(instructions);
 
   const account = txJSON.Account;
   setCanonicalFlag(txJSON);
 
-  function prepareMaxLedgerVersion(callback_) {
+  function prepareMaxLedgerVersion(): Promise<Object> {
     if (instructions.maxLedgerVersion !== undefined) {
       txJSON.LastLedgerSequence = instructions.maxLedgerVersion;
-      callback_();
-    } else {
-      const offset = instructions.maxLedgerVersionOffset !== undefined ?
-        instructions.maxLedgerVersionOffset : 3;
-      api.remote.getLedgerSequence((error, ledgerVersion) => {
-        txJSON.LastLedgerSequence = ledgerVersion + offset;
-        callback_(error);
-      });
+      return Promise.resolve(txJSON);
     }
+    const offset = instructions.maxLedgerVersionOffset !== undefined ?
+      instructions.maxLedgerVersionOffset : 3;
+    return api.connection.getLedgerVersion().then(ledgerVersion => {
+      txJSON.LastLedgerSequence = ledgerVersion + offset;
+      return txJSON;
+    });
   }
 
-  function prepareFee(callback_) {
+  function prepareFee(): Promise<Object> {
     if (instructions.fee !== undefined) {
       txJSON.Fee = common.xrpToDrops(instructions.fee);
-      callback_();
-    } else {
-      common.serverInfo.getFee(api.remote, api._feeCushion).then(fee => {
-        const feeDrops = common.xrpToDrops(fee);
-        if (instructions.maxFee !== undefined) {
-          const maxFeeDrops = common.xrpToDrops(instructions.maxFee);
-          txJSON.Fee = BigNumber.min(feeDrops, maxFeeDrops).toString();
-        } else {
-          txJSON.Fee = feeDrops;
-        }
-        callback_();
-      });
+      return Promise.resolve(txJSON);
     }
+    const cushion = api._feeCushion;
+    return common.serverInfo.getFee(api.connection, cushion).then(fee => {
+      const feeDrops = common.xrpToDrops(fee);
+      if (instructions.maxFee !== undefined) {
+        const maxFeeDrops = common.xrpToDrops(instructions.maxFee);
+        txJSON.Fee = BigNumber.min(feeDrops, maxFeeDrops).toString();
+      } else {
+        txJSON.Fee = feeDrops;
+      }
+      return txJSON;
+    });
   }
 
-  function prepareSequence(callback_) {
+  function prepareSequence(): Promise<Object> {
     if (instructions.sequence !== undefined) {
       txJSON.Sequence = instructions.sequence;
-      callback_(null, formatPrepareResponse(txJSON));
-    } else {
-      const request = {
-        command: 'account_info',
-        account: account
-      };
-      api.remote.rawRequest(request, function(error, response) {
-        txJSON.Sequence = response.account_data.Sequence;
-        callback_(error, formatPrepareResponse(txJSON));
-      });
+      return Promise.resolve(txJSON);
     }
+    const request = {
+      command: 'account_info',
+      account: account
+    };
+    return api.connection.request(request).then(response => {
+      txJSON.Sequence = response.account_data.Sequence;
+      return txJSON;
+    });
   }
 
-  async.series([
-    prepareMaxLedgerVersion,
-    prepareFee,
-    prepareSequence
-  ], common.convertErrors(function(error, results) {
-    callback(error, results && results[2]);
-  }));
+  return Promise.all([
+    prepareMaxLedgerVersion(),
+    prepareFee(),
+    prepareSequence()
+  ]).then(() => formatPrepareResponse(txJSON));
 }
 
 function convertStringToHex(string: string) {
@@ -105,7 +94,7 @@ function convertStringToHex(string: string) {
 
 function convertMemo(memo: Object): Object {
   return {
-    Memo: removeUndefined({
+    Memo: common.removeUndefined({
       MemoData: convertStringToHex(memo.data),
       MemoType: convertStringToHex(memo.type),
       MemoFormat: convertStringToHex(memo.format)
@@ -113,33 +102,9 @@ function convertMemo(memo: Object): Object {
   };
 }
 
-/**
- * @param {Number} rpepoch (seconds since 1/1/2000 GMT)
- * @return {Number} ms since unix epoch
- *
- */
-function toTimestamp(rpepoch: number): number {
-  return (rpepoch + 0x386D4380) * 1000;
-}
-
-/**
- * @param {Number|Date} timestamp (ms since unix epoch)
- * @return {Number} seconds since ripple epoch ( 1/1/2000 GMT)
- */
-function fromTimestamp(timestamp: number | Date): number {
-  const timestamp_ = timestamp instanceof Date ?
-                     timestamp.getTime() :
-                     timestamp;
-  return Math.round(timestamp_ / 1000) - 0x386D4380;
-}
-
 module.exports = {
-  removeUndefined,
   convertStringToHex,
-  fromTimestamp,
-  toTimestamp,
   convertMemo,
   prepareTransaction,
-  common,
-  promisify: common.promisify
+  common
 };

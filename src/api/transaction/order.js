@@ -37,18 +37,11 @@ function createOrderTransaction(account: string, order: Order): Object {
   return txJSON;
 }
 
-function prepareOrderAsync(account: string, order: Order,
-    instructions: Instructions, callback
-) {
-  const txJSON = createOrderTransaction(account, order);
-  utils.prepareTransaction(txJSON, this, instructions, callback);
-}
-
 function prepareOrder(account: string, order: Order,
     instructions: Instructions = {}
 ): Promise<Prepare> {
-  return utils.promisify(prepareOrderAsync.bind(this))(
-    account, order, instructions);
+  const txJSON = createOrderTransaction(account, order);
+  return utils.prepareTransaction(txJSON, this, instructions);
 }
 
 module.exports = prepareOrder;

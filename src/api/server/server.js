@@ -4,45 +4,32 @@ const common = require('../common');
 import type {GetServerInfoResponse} from '../common/serverinfo';
 
 function isConnected(): boolean {
-  const server = this.remote.getServer();
-  return Boolean(server && server.isConnected());
+  return this.connection.isConnected();
 }
 
 function getLedgerVersion(): Promise<number> {
-  return common.promisify(this.remote.getLedgerSequence).call(this.remote);
+  return this.connection.getLedgerVersion();
 }
 
 function connect(): Promise<void> {
-  return common.promisify(callback => {
-    try {
-      this.remote.connect(() => callback(null));
-    } catch (error) {
-      callback(new common.errors.RippledNetworkError(error.message));
-    }
-  })();
+  return this.connection.connect();
 }
 
 function disconnect(): Promise<void> {
-  return common.promisify(callback => {
-    try {
-      this.remote.disconnect(() => callback(null));
-    } catch (error) {
-      callback(new common.errors.RippledNetworkError(error.message));
-    }
-  })();
+  return this.connection.disconnect();
 }
 
 function getServerInfo(): Promise<GetServerInfoResponse> {
-  return common.serverInfo.getServerInfo(this.remote);
+  return common.serverInfo.getServerInfo(this.connection);
 }
 
 function getFee(): Promise<number> {
   const cushion = this._feeCushion || 1.2;
-  return common.serverInfo.getFee(this.remote, cushion);
+  return common.serverInfo.getFee(this.connection, cushion);
 }
 
 function rippleTimeToISO8601(rippleTime: string): string {
-  return new Date(common.core.utils.toTimestamp(rippleTime)).toISOString();
+  return new Date(common.rippleToUnixTimestamp(rippleTime)).toISOString();
 }
 
 function formatLedgerClose(ledgerClose: Object): Object {

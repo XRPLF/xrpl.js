@@ -25,8 +25,8 @@ function setupMockRippledConnection(testcase, port, done) {
   testcase.mockRippled = createMockRippled(port);
   testcase.api = new RippleAPI({servers: ['ws://localhost:' + port]});
   testcase.api.connect().then(() => {
-    testcase.api.remote.getServer().once('ledger_closed', () => done());
-    testcase.api.remote.getServer().emit('message', ledgerClosed);
+    testcase.api.once('ledgerClosed', () => done());
+    testcase.api.connection._ws.emit('message', JSON.stringify(ledgerClosed));
   }).catch(done);
 }
 

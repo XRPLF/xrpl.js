@@ -1,11 +1,10 @@
 /* @flow */
 'use strict';
 const _ = require('lodash');
-const async = require('async');
 const utils = require('./utils');
-const {validate, composeAsync, convertErrors} = utils.common;
+const {validate} = utils.common;
 const parseOrderbookOrder = require('./parse/orderbook-order');
-import type {Remote} from '../../core/remote';
+import type {Connection} from '../common/connection.js';
 import type {OrdersOptions, OrderSpecification} from './types.js';
 import type {Amount, Issue} from '../common/types.js';
 
@@ -36,18 +35,18 @@ type GetOrderbook = {
 
 // account is to specify a "perspective", which affects which unfunded offers
 // are returned
-function getBookOffers(remote: Remote, account: string,
+function getBookOffers(connection: Connection, account: string,
     ledgerVersion?: number, limit?: number, takerGets: Issue,
-    takerPays: Issue, callback
-) {
-  remote.rawRequest(utils.renameCounterpartyToIssuerInOrder({
+    takerPays: Issue
+): Promise {
+  return connection.request(utils.renameCounterpartyToIssuerInOrder({
     command: 'book_offers',
     taker_gets: takerGets,
     taker_pays: takerPays,
     ledger_index: ledgerVersion || 'validated',
     limit: limit,
     taker: account
-  }), composeAsync(data => data.offers, convertErrors(callback)));
+  })).then(data => data.offers);
 }
 
 function isSameIssue(a: Amount, b: Amount) {
@@ -92,27 +91,19 @@ function formatBidsAndAsks(orderbook: Orderbook, offers) {
   return {bids, asks};
 }
 
-function getOrderbookAsync(account: string, orderbook: Orderbook,
-    options: OrdersOptions, callback
-) {
+function getOrderbook(account: string, orderbook: Orderbook,
+    options: OrdersOptions = {}
+): Promise<GetOrderbook> {
   validate.address(account);
   validate.orderbook(orderbook);
   validate.getOrderbookOptions(options);
 
-  const getter = _.partial(getBookOffers, this.remote, account,
+  const getter = _.partial(getBookOffers, this.connection, account,
     options.ledgerVersion, options.limit);
   const getOffers = _.partial(getter, orderbook.base, orderbook.counter);
   const getReverseOffers = _.partial(getter, orderbook.counter, orderbook.base);
-  async.parallel([getOffers, getReverseOffers],
-    composeAsync((data) => formatBidsAndAsks(orderbook, _.flatten(data)),
-                 callback));
-}
-
-function getOrderbook(account: string, orderbook: Orderbook,
-    options: OrdersOptions = {}
-): Promise<GetOrderbook> {
-  return utils.promisify(getOrderbookAsync).call(this,
-    account, orderbook, options);
+  return Promise.all([getOffers(), getReverseOffers()]).then(data =>
+    formatBidsAndAsks(orderbook, _.flatten(data)));
 }
 
 module.exports = getOrderbook;

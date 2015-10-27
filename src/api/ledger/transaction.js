@@ -1,28 +1,22 @@
 /* @flow */
 'use strict';
 const _ = require('lodash');
-const async = require('async');
 const utils = require('./utils');
 const parseTransaction = require('./parse/transaction');
-const {validate, convertErrors, errors} = utils.common;
-const RippleError = require('../../core/rippleerror').RippleError;
+const {validate, errors} = utils.common;
+import type {Connection} from '../common/connection.js';
+import type {TransactionType, TransactionOptions} from './transaction-types';
 
-import type {Remote} from '../../core/remote';
-
-import type {CallbackType, TransactionType,
-  GetTransactionResponseCallback, TransactionOptions}
-  from './transaction-types';
-
-function attachTransactionDate(remote: Remote, tx: Object,
-                              callback: CallbackType
-) {
+function attachTransactionDate(connection: Connection, tx: Object
+): Promise<TransactionType> {
   if (tx.date) {
-    callback(null, tx);
-    return;
+    return Promise.resolve(tx);
   }
+
   if (!tx.ledger_index) {
-    callback(new errors.NotFoundError('ledger_index not found in tx'));
-    return;
+    return new Promise(() => {
+      throw new errors.NotFoundError('ledger_index not found in tx');
+    });
   }
 
   const request = {
@@ -30,14 +24,16 @@ function attachTransactionDate(remote: Remote, tx: Object,
     ledger_index: tx.ledger_index
   };
 
-  remote.rawRequest(request, (error, data) => {
-    if (error) {
-      callback(new errors.NotFoundError('Transaction ledger not found'));
-    } else if (typeof data.ledger.close_time === 'number') {
-      callback(null, _.assign({date: data.ledger.close_time}, tx));
-    } else {
-      callback(new errors.ApiError('Ledger missing close_time'));
+  return connection.request(request).then(data => {
+    if (typeof data.ledger.close_time === 'number') {
+      return _.assign({date: data.ledger.close_time}, tx);
     }
+    throw new errors.ApiError('Ledger missing close_time');
+  }).catch(error => {
+    if (error instanceof errors.ApiError) {
+      throw error;
+    }
+    throw new errors.NotFoundError('Transaction ledger not found');
   });
 }
 
@@ -48,69 +44,59 @@ function isTransactionInRange(tx: Object, options: TransactionOptions) {
           || tx.ledger_index <= options.maxLedgerVersion);
 }
 
-function getTransactionAsync(identifier: string, options: TransactionOptions,
-                             callback: GetTransactionResponseCallback
-) {
-  validate.identifier(identifier);
-  validate.getTransactionOptions(options);
-
-  const remote = this.remote;
-
-  function callbackWrapper(error_?: Error, tx?: Object,
-    maxLedgerVersion?: number
-  ) {
-    let error = error_;
-
-    if (!error && tx && tx.validated !== true) {
-      return callback(new errors.NotFoundError('Transaction not found'));
-    }
-
-    if (error instanceof RippleError && error.remote &&
-      error.remote.error === 'txnNotFound') {
-      error = new errors.NotFoundError('Transaction not found');
-    }
-
-    // Missing complete ledger range
-    if (error instanceof errors.NotFoundError
-        && !utils.hasCompleteLedgerRange(remote, options.minLedgerVersion,
-                                         maxLedgerVersion)) {
-      if (utils.isPendingLedgerVersion(remote, maxLedgerVersion)) {
-        callback(new errors.PendingLedgerVersionError());
-      } else {
-        callback(new errors.MissingLedgerHistoryError());
-      }
-      // Transaction is found, but not in specified range
-    } else if (!error && tx && !isTransactionInRange(tx, options)) {
-      callback(new errors.NotFoundError('Transaction not found'));
-      // Transaction is not found
-    } else if (error) {
-      convertErrors(callback)(error);
-    } else if (!tx) {
-      callback(new errors.ApiError('Internal error'));
-    } else {
-      callback(error, parseTransaction(tx));
-    }
+function convertError(connection: Connection, options: TransactionOptions,
+  error: Error
+): Promise<Error> {
+  const _error = (error.message === 'txnNotFound') ?
+    new errors.NotFoundError('Transaction not found') : error;
+  if (_error instanceof errors.NotFoundError) {
+    return utils.hasCompleteLedgerRange(connection, options.minLedgerVersion,
+      options.maxLedgerVersion).then(hasCompleteLedgerRange => {
+        if (!hasCompleteLedgerRange) {
+          return utils.isPendingLedgerVersion(
+            connection, options.maxLedgerVersion)
+            .then(isPendingLedgerVersion => {
+              return isPendingLedgerVersion ?
+                new errors.PendingLedgerVersionError() :
+                new errors.MissingLedgerHistoryError();
+            });
+        }
+        return _error;
+      });
   }
+  return Promise.resolve(_error);
+}
 
-
-  function maxLedgerGetter(error_?: Error, tx?: Object) {
-    this.getLedgerVersion().then((version) => {
-      const maxLedgerVersion = options.maxLedgerVersion || version;
-      callbackWrapper(error_, tx, maxLedgerVersion);
-    }, callbackWrapper);
+function formatResponse(options: TransactionOptions, tx: TransactionType
+): TransactionType {
+  if (tx.validated !== true || !isTransactionInRange(tx, options)) {
+    throw new errors.NotFoundError('Transaction not found');
   }
-
-  async.waterfall([
-    _.partial(remote.rawRequest.bind(remote),
-      {command: 'tx', transaction: identifier, binary: false}),
-    _.partial(attachTransactionDate, remote)
-  ], maxLedgerGetter.bind(this));
+  return parseTransaction(tx);
 }
 
 function getTransaction(identifier: string,
-                        options: TransactionOptions = {}
+  options: TransactionOptions = {}
 ): Promise<TransactionType> {
-  return utils.promisify(getTransactionAsync).call(this, identifier, options);
+  validate.identifier(identifier);
+  validate.getTransactionOptions(options);
+
+  const request = {
+    command: 'tx',
+    transaction: identifier,
+    binary: false
+  };
+
+  return utils.ensureLedgerVersion.call(this, options).then(_options => {
+    return this.connection.request(request).then(tx =>
+      attachTransactionDate(this.connection, tx)
+    ).then(_.partial(formatResponse, _options))
+    .catch(error => {
+      return convertError(this.connection, _options, error).then(_error => {
+        throw _error;
+      });
+    });
+  });
 }
 
 module.exports = getTransaction;

@@ -1,7 +1,7 @@
 'use strict';
 const _ = require('lodash');
-const {RippledNetworkError} = require('./errors');
-const {promisify, convertKeysFromSnakeCaseToCamelCase} = require('./utils');
+const {convertKeysFromSnakeCaseToCamelCase} = require('./utils');
+import type {Connection} from './connection';
 
 export type GetServerInfoResponse = {
   buildVersion: string,
@@ -32,21 +32,10 @@ export type GetServerInfoResponse = {
   validationQuorum: number
 }
 
-function getServerInfoAsync(remote,
-  callback: (err: any, data?: GetServerInfoResponse) => void
-): void {
-  remote.rawRequest({command: 'server_info'}, (error, response) => {
-    if (error) {
-      const message = _.get(error, ['remote', 'error_message'], error.message);
-      callback(new RippledNetworkError(message));
-    } else {
-      callback(null, convertKeysFromSnakeCaseToCamelCase(response.info));
-    }
-  });
-}
-
-function getServerInfo(remote: Object): Promise<GetServerInfoResponse> {
-  return promisify(getServerInfoAsync)(remote);
+function getServerInfo(connection: Connection): Promise<GetServerInfoResponse> {
+  return connection.request({command: 'server_info'}).then(response =>
+    convertKeysFromSnakeCaseToCamelCase(response.info)
+  );
 }
 
 function computeFeeFromServerInfo(cushion: number,
@@ -56,8 +45,8 @@ function computeFeeFromServerInfo(cushion: number,
        * Number(serverInfo.loadFactor) * cushion).toString();
 }
 
-function getFee(remote: Object, cushion: number) {
-  return getServerInfo(remote).then(
+function getFee(connection: Connection, cushion: number) {
+  return getServerInfo(connection).then(
     _.partial(computeFeeFromServerInfo, cushion));
 }
 

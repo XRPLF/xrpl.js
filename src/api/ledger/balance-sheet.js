@@ -3,7 +3,7 @@
 
 const _ = require('lodash');
 const utils = require('./utils');
-const {validate, composeAsync, convertErrors} = utils.common;
+const {validate} = utils.common;
 import type {Amount} from '../common/types.js';
 
 type BalanceSheetOptions = {
@@ -47,42 +47,22 @@ function formatBalanceSheet(balanceSheet): GetBalanceSheet {
   return result;
 }
 
-function getBalanceSheetAsync(address: string, options: BalanceSheetOptions,
-    callback
-) {
+function getBalanceSheet(address: string, options: BalanceSheetOptions = {}
+): Promise<GetBalanceSheet> {
   validate.address(address);
   validate.getBalanceSheetOptions(options);
 
-  const request = {
-    command: 'gateway_balances',
-    account: address,
-    strict: true,
-    hotwallet: options.excludeAddresses,
-    ledger_index: options.ledgerVersion
-  };
+  return utils.ensureLedgerVersion.call(this, options).then(_options => {
+    const request = {
+      command: 'gateway_balances',
+      account: address,
+      strict: true,
+      hotwallet: _options.excludeAddresses,
+      ledger_index: _options.ledgerVersion
+    };
 
-  const requestCallback = composeAsync(
-    formatBalanceSheet, convertErrors(callback));
-
-  if (_.isUndefined(request.ledger_index)) {
-    this.remote.getLedgerSequence((err, ledgerVersion) => {
-      if (err) {
-        convertErrors(callback)(err);
-        return;
-      }
-
-      request.ledger_index = ledgerVersion;
-
-      this.remote.rawRequest(request, requestCallback);
-    });
-  } else {
-    this.remote.rawRequest(request, requestCallback);
-  }
-}
-
-function getBalanceSheet(address: string, options: BalanceSheetOptions = {}
-): Promise<GetBalanceSheet> {
-  return utils.promisify(getBalanceSheetAsync).call(this, address, options);
+    return this.connection.request(request).then(formatBalanceSheet);
+  });
 }
 
 module.exports = getBalanceSheet;

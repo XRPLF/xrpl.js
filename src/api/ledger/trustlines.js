@@ -1,12 +1,10 @@
 /* @flow */
 'use strict';
 const _ = require('lodash');
-const async = require('async');
 const utils = require('./utils');
-const {validate, composeAsync, convertErrors} = utils.common;
+const {validate} = utils.common;
 const parseAccountTrustline = require('./parse/account-trustline');
-
-import type {Remote} from '../../core/remote';
+import type {Connection} from '../common/connection.js';
 import type {TrustlinesOptions, Trustline} from './trustlines-types.js';
 
 
@@ -24,9 +22,10 @@ function formatResponse(options: TrustlinesOptions, data) {
   };
 }
 
-function getAccountLines(remote: Remote, address: string, ledgerVersion: number,
-  options: TrustlinesOptions, marker: string, limit: number, callback
-) {
+function getAccountLines(connection: Connection, address: string,
+  ledgerVersion: number, options: TrustlinesOptions, marker: string,
+  limit: number
+): Promise<GetTrustlinesResponse> {
   const request = {
     command: 'account_lines',
     account: address,
@@ -36,27 +35,19 @@ function getAccountLines(remote: Remote, address: string, ledgerVersion: number,
     peer: options.counterparty
   };
 
-  remote.rawRequest(request,
-    composeAsync(_.partial(formatResponse, options),
-      convertErrors(callback)));
-}
-
-function getTrustlinesAsync(account: string, options: TrustlinesOptions,
-    callback: () => void
-): void {
-  validate.address(account);
-  validate.getTrustlinesOptions(options);
-
-  const getter = _.partial(getAccountLines, this.remote, account,
-                           options.ledgerVersion, options);
-  utils.getRecursive(getter, options.limit, callback);
+  return connection.request(request).then(_.partial(formatResponse, options));
 }
 
 function getTrustlines(account: string, options: TrustlinesOptions = {}
 ): Promise<GetTrustlinesResponse> {
-  return utils.promisify(async.seq(
-    utils.getLedgerOptionsWithLedgerVersion,
-    getTrustlinesAsync)).call(this, account, options);
+  validate.address(account);
+  validate.getTrustlinesOptions(options);
+
+  return this.getLedgerVersion().then(ledgerVersion => {
+    const getter = _.partial(getAccountLines, this.connection, account,
+      options.ledgerVersion || ledgerVersion, options);
+    return utils.getRecursive(getter, options.limit);
+  });
 }
 
 module.exports = getTrustlines;

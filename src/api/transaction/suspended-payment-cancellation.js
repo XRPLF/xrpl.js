@@ -30,19 +30,12 @@ function createSuspendedPaymentCancellationTransaction(account: string,
   return txJSON;
 }
 
-function prepareSuspendedPaymentCancellationAsync(account: string,
-    payment: SuspendedPaymentCancellation, instructions: Instructions, callback
-) {
-  const txJSON =
-    createSuspendedPaymentCancellationTransaction(account, payment);
-  utils.prepareTransaction(txJSON, this, instructions, callback);
-}
-
 function prepareSuspendedPaymentCancellation(account: string,
     payment: SuspendedPaymentCancellation, instructions: Instructions = {}
 ): Promise<Prepare> {
-  return utils.promisify(prepareSuspendedPaymentCancellationAsync)
-    .call(this, account, payment, instructions);
+  const txJSON =
+    createSuspendedPaymentCancellationTransaction(account, payment);
+  return utils.prepareTransaction(txJSON, this, instructions);
 }
 
 module.exports = prepareSuspendedPaymentCancellation;

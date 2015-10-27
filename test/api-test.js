@@ -193,10 +193,9 @@ describe('RippleAPI', function() {
 
   it('submit - failure', function() {
     return this.api.submit('BAD').then(() => {
-      assert(false, 'Should throw RippleError');
+      assert(false, 'Should throw RippledError');
     }).catch(error => {
-      assert(error instanceof this.api.errors.RippleError);
-      assert(error.data);
+      assert(error instanceof this.api.errors.RippledError);
     });
   });
 
@@ -361,7 +360,7 @@ describe('RippleAPI', function() {
     it('getTransaction - missing ledger history', function() {
       const hash = hashes.NOTFOUND_TRANSACTION_HASH;
       // make gaps in history
-      this.api.remote.getServer().emit('message', ledgerClosed);
+      this.api.connection._ws.emit('message', JSON.stringify(ledgerClosed));
       return this.api.getTransaction(hash).then(() => {
         assert(false, 'Should throw MissingLedgerHistoryError');
       }).catch(error => {
@@ -601,8 +600,8 @@ describe('RippleAPI', function() {
     return this.api.getServerInfo().then(() => {
       assert(false, 'Should throw NetworkError');
     }).catch(error => {
-      assert(error instanceof this.api.errors.NetworkError);
-      assert(error.message.indexOf('too much load') !== -1);
+      assert(error instanceof this.api.errors.RippledError);
+      assert(_.includes(error.message, 'slowDown'));
     });
   });
 
@@ -759,17 +758,20 @@ describe('RippleAPI', function() {
     assert.deepEqual(utils.renameCounterpartyToIssuer(amountArg), amountArg);
   });
 
-  it('ledger utils - getRecursive', function(done) {
-    function getter(marker, limit, callback) {
-      if (marker === undefined) {
-        callback(null, {marker: 'A', limit: limit, results: [1]});
-      } else {
-        callback(new Error(), null);
-      }
+  it('ledger utils - getRecursive', function() {
+    function getter(marker, limit) {
+      return new Promise((resolve, reject) => {
+        if (marker === undefined) {
+          resolve({marker: 'A', limit: limit, results: [1]});
+        } else {
+          reject(new Error());
+        }
+      });
     }
-    utils.getRecursive(getter, 10, (error) => {
+    return utils.getRecursive(getter, 10).then(() => {
+      assert(false, 'Should throw Error');
+    }).catch(error => {
       assert(error instanceof Error);
-      done();
     });
   });
 
@@ -852,28 +854,6 @@ describe('RippleAPI', function() {
 
   });
 
-  describe('common utils', function() {
-
-    it('wrapCatch', function(done) {
-      common.wrapCatch(function() {
-        throw new Error('error');
-      })(function(error) {
-        assert(error instanceof Error);
-        done();
-      });
-    });
-
-    it('convertExceptions', function() {
-      assert.throws(common.convertExceptions(function() {
-        throw new Error('fall through');
-      }), this.api.errors.ApiError);
-      assert.throws(common.convertExceptions(function() {
-        throw new Error('fall through');
-      }), /fall through/);
-    });
-
-  });
-
   describe('common errors', function() {
 
     it('TransactionError', function() {
@@ -909,7 +889,7 @@ describe('RippleAPI', function() {
       checkResult(responses.ledgerClosed, 'ledgerClosed', message);
       done();
     });
-    this.api.remote.getServer().emit('message', ledgerClosed);
+    this.api.connection._ws.emit('message', JSON.stringify(ledgerClosed));
   });
 });
 
@@ -965,9 +945,8 @@ describe('RippleAPI - offline', function() {
   });
 
   it('RippleAPI valid options', function() {
-    const api = new RippleAPI({trace: true, servers: ['wss://s:1']});
-    assert(api.remote.trace);
-    assert.deepEqual(api.remote.servers, ['wss://s:1']);
+    const api = new RippleAPI({servers: ['wss://s:1']});
+    assert.deepEqual(api.connection._url, 'wss://s:1');
   });
 
   it('RippleAPI invalid server uri', function() {

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "remote-options",
+  "title": "api-options",
   "type": "object",
   "properties": {
     "trace": {"type": "boolean"},
