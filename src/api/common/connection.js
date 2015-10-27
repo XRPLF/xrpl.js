@@ -59,7 +59,7 @@ class Connection extends EventEmitter {
     this.emit.apply(this, parameters);
   }
 
-  get state() {
+  get _state() {
     return this._ws ? this._ws.readyState : WebSocket.CLOSED;
   }
 
@@ -68,7 +68,7 @@ class Connection extends EventEmitter {
   }
 
   isConnected() {
-    return this.state === WebSocket.OPEN && this._isReady;
+    return this._state === WebSocket.OPEN && this._isReady;
   }
 
   _onUnexpectedClose() {
@@ -92,9 +92,9 @@ class Connection extends EventEmitter {
 
   connect() {
     return new Promise((resolve, reject) => {
-      if (this.state === WebSocket.OPEN) {
+      if (this._state === WebSocket.OPEN) {
         resolve();
-      } else if (this.state === WebSocket.CONNECTING) {
+      } else if (this._state === WebSocket.CONNECTING) {
         this._ws.once('open', resolve);
       } else {
         this._ws = new WebSocket(this._url);
@@ -107,9 +107,9 @@ class Connection extends EventEmitter {
 
   disconnect() {
     return new Promise(resolve => {
-      if (this.state === WebSocket.CLOSED) {
+      if (this._state === WebSocket.CLOSED) {
         resolve();
-      } else if (this.state === WebSocket.CLOSING) {
+      } else if (this._state === WebSocket.CLOSING) {
         this._ws.once('close', resolve);
       } else {
         this._ws.removeListener('close', this._onUnexpectedClose);
@@ -131,7 +131,7 @@ class Connection extends EventEmitter {
     return new Promise((resolve, reject) => {
       if (!this._shouldBeConnected) {
         reject(new NotConnectedError());
-      } else if (this.state === WebSocket.OPEN && this._isReady) {
+      } else if (this._state === WebSocket.OPEN && this._isReady) {
         promise.then(resolve, reject);
       } else {
         this.once('connected', () => promise.then(resolve, reject));
