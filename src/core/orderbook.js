@@ -138,6 +138,7 @@ function OrderBook(remote,
 
   function onLedgerClosedWrapper(message) {
     self.onLedgerClosed(message);
+    self.pruneExpiredOffers(message);
   }
 
   function listenersModified(action, event) {
@@ -910,7 +911,6 @@ OrderBook.prototype.updateFundedAmounts = function(transaction) {
   });
 };
 
-
 /**
  * Update offers' funded amount with their owner's funds
  *
@@ -1201,6 +1201,27 @@ OrderBook.prototype.deleteOffer = function(node, isOfferCancel) {
 
   if (isOfferCancel) {
     this.updateOwnerOffersFundedAmount(node.fields.Account);
+  }
+};
+
+OrderBook.prototype.pruneExpiredOffers = function(ledger) {
+  const offersLength = this._offers.length;
+
+  this._offers = this._offers.filter(offer => {
+    if (offer.Expiration <= ledger.ledger_time) {
+      this.subtractOwnerOfferTotal(offer.Account, offer.TakerGets);
+      this.decrementOwnerOfferCount(offer.Account);
+      this.updateOwnerOffersFundedAmount(offer.Account);
+      this.emit('offer_removed', offer);
+
+      return false;
+    }
+
+    return true;
+  });
+
+  if (this._offers.length < offersLength) {
+    this.emit('model', this._offers);
   }
 };
 

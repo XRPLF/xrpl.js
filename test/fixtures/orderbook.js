@@ -28,6 +28,7 @@ module.exports.TRANSFER_RATE = 1002000000;
 
 module.exports.fiatOffers = function(options) {
   options = options || {};
+
   _.defaults(options, {
     account_funds: '318.3643710638508',
     other_account_funds: '235.0194163432668'
@@ -39,6 +40,7 @@ module.exports.fiatOffers = function(options) {
       BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F15E821839FB',
       BookNode: '0000000000000000',
       Flags: 0,
+      Expiration: options.expiration,
       LedgerEntryType: 'Offer',
       OwnerNode: '0000000000001897',
       PreviousTxnID: '11BA57676711A42C2FC2191EAEE98023B04627DFA84926B0C8E9D61A9CAF13AD',
@@ -61,6 +63,7 @@ module.exports.fiatOffers = function(options) {
       BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F4C3362FE1D0',
       BookNode: '0000000000000000',
       Flags: 0,
+      Expiration: options.expiration,
       LedgerEntryType: 'Offer',
       OwnerNode: '00000000000063CC',
       PreviousTxnID: 'CD77500EF28984BFC123E8A257C10E44FF486EA8FC43E1356C42BD6DB853A602',
@@ -83,6 +86,7 @@ module.exports.fiatOffers = function(options) {
       BookDirectory: '4627DFFCFF8B5A265EDBD8AE8C14A52325DBFEDAF4F5C32E5D06F4C3362FE1D0',
       BookNode: '0000000000000000',
       Flags: 0,
+      Expiration: options.expiration,
       LedgerEntryType: 'Offer',
       OwnerNode: '00000000000063CC',
       PreviousTxnID: 'CD77500EF28984BFC123E8A257C10E44FF486EA8FC43E1356C42BD6DB853A602',

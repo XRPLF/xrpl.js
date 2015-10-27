@@ -6,6 +6,7 @@ const assert = require('assert-diff');
 const Remote = require('ripple-lib').Remote;
 const Amount = require('ripple-lib').Amount;
 const Meta = require('ripple-lib').Meta;
+const timeUtils = require('ripple-lib').utils.time;
 const addresses = require('./fixtures/addresses');
 const fixtures = require('./fixtures/orderbook');
 const IOUValue = require('ripple-lib-value').IOUValue;
@@ -2473,5 +2474,48 @@ describe('OrderBook', function() {
       assert.strictEqual(book._synced, true);
       done();
     });
+  });
+
+  it('Offers expired', function() {
+    const remote = createRemote();
+    const book = remote.createOrderBook({
+      currency_gets: 'USD',
+      issuer_gets: addresses.ISSUER,
+      currency_pays: 'XRP'
+    });
+
+    let numModelEvents = 0;
+    let numOfferRemovedEvents = 0;
+
+    book.on('model', function() {
+      numModelEvents += 1;
+    });
+
+    book.on('offer_removed', function() {
+      numOfferRemovedEvents += 1;
+    });
+
+    book._subscribed = true;
+    book._issuerTransferRate = new IOUValue(1000000000);
+
+    const d1 = timeUtils.toRipple(new Date());
+    let d2 = new Date();
+    d2.setSeconds(d2.getSeconds() - 1);
+    d2 = timeUtils.toRipple(d2);
+
+    const offers = fixtures.fiatOffers({expiration: d2});
+    offers[0].Expiration = offers[0].Expiration + 2;
+
+    book.setOffers(offers);
+
+    assert(book._offers.length === 3);
+
+    remote.emit('ledger_closed', {
+      ledger_time: d1
+    });
+
+    assert(book._offers.length === 1);
+    assert(numModelEvents === 1);
+    assert(numOfferRemovedEvents === 2);
   });
 });
