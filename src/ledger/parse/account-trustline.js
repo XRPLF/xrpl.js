@@ -4,9 +4,9 @@ const utils = require('./utils');
 
 type Trustline = {
   account: string, limit: number, currency: string, quality_in: ?number,
-  quality_out: ?number, no_ripple: boolean, freeze: boolean, authorized: boolean,
-  limit_peer: string, no_ripple_peer: boolean, freeze_peer: boolean,
-  peer_authorized: boolean, balance: any
+  quality_out: ?number, no_ripple: boolean, freeze: boolean,
+  authorized: boolean, limit_peer: string, no_ripple_peer: boolean,
+  freeze_peer: boolean, peer_authorized: boolean, balance: any
 }
 
 type TrustlineSpecification = {}

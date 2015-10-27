@@ -64,7 +64,7 @@ function parseOutcome(tx: Object): ?Object {
   };
 }
 
-function hexToString(hex) {
+function hexToString(hex: string): ?string {
   return hex ? new Buffer(hex, 'hex').toString('utf-8') : undefined;
 }
 
@@ -84,6 +84,7 @@ function parseMemos(tx: Object): ?Array<Object> {
 module.exports = {
   parseOutcome,
   parseMemos,
+  hexToString,
   adjustQualityForXRP,
   dropsToXrp: utils.common.dropsToXrp,
   constants: utils.common.constants,

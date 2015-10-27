@@ -4,10 +4,6 @@
   "npm-shrinkwrap-version": "5.4.0",
   "node-version": "v0.12.7",
   "dependencies": {
-    "async": {
-      "version": "0.9.2",
-      "resolved": "https://registry.npmjs.org/async/-/async-0.9.2.tgz"
-    },
     "babel-runtime": {
       "version": "5.8.29",
       "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.29.tgz",
@@ -21,14 +17,6 @@
     "bignumber.js": {
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.1.0.tgz"
-    },
-    "bn.js": {
-      "version": "3.2.0",
-      "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.2.0.tgz"
-    },
-    "extend": {
-      "version": "1.2.1",
-      "resolved": "https://registry.npmjs.org/extend/-/extend-1.2.1.tgz"
     },
     "hash.js": {
       "version": "1.0.3",
@@ -102,10 +90,6 @@
       "version": "3.10.1",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
     },
-    "lru-cache": {
-      "version": "2.5.2",
-      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.2.tgz"
-    },
     "ripple-address-codec": {
       "version": "2.0.1",
       "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz",
@@ -126,6 +110,10 @@
       "version": "0.0.6",
       "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.0.6.tgz",
       "dependencies": {
+        "bn.js": {
+          "version": "3.3.0",
+          "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.3.0.tgz"
+        },
         "create-hash": {
           "version": "1.1.2",
           "resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
@@ -186,6 +174,10 @@
       "version": "0.10.0",
       "resolved": "https://registry.npmjs.org/ripple-keypairs/-/ripple-keypairs-0.10.0.tgz",
       "dependencies": {
+        "bn.js": {
+          "version": "3.3.0",
+          "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.3.0.tgz"
+        },
         "brorand": {
           "version": "1.0.5",
           "resolved": "https://registry.npmjs.org/brorand/-/brorand-1.0.5.tgz"
@@ -205,20 +197,6 @@
     "ripple-lib-transactionparser": {
       "version": "0.5.1",
       "resolved": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.5.1.tgz"
-    },
-    "ripple-lib-value": {
-      "version": "0.1.0",
-      "resolved": "https://registry.npmjs.org/ripple-lib-value/-/ripple-lib-value-0.1.0.tgz",
-      "dependencies": {
-        "bignumber.js": {
-          "version": "2.0.8",
-          "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.0.8.tgz"
-        }
-      }
-    },
-    "sjcl-codec": {
-      "version": "0.1.0",
-      "resolved": "https://registry.npmjs.org/sjcl-codec/-/sjcl-codec-0.1.0.tgz"
     },
     "ws": {
       "version": "0.7.2",
