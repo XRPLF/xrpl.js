@@ -68,18 +68,16 @@ class Connection extends EventEmitter {
   }
 
   _onOpen() {
-    const subscribeRequest = {
+    const request = {
       command: 'subscribe',
       streams: ['ledger']
     };
-    return this.request(subscribeRequest).then(() => {
-      return this.request({command: 'server_info'}).then(response => {
-        this._ledgerVersion = Number(response.info.validated_ledger.seq);
-        this._availableLedgerVersions.parseAndAddRanges(
-          response.info.complete_ledgers);
-        this._isReady = true;
-        this.emit('connected');
-      });
+    return this.request(request).then(response => {
+      this._ledgerVersion = Number(response.ledger_index);
+      this._availableLedgerVersions.parseAndAddRanges(
+        response.validated_ledgers);
+      this._isReady = true;
+      this.emit('connected');
     });
   }
 
