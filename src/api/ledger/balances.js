@@ -43,7 +43,7 @@ function formatBalances(options, balances) {
 function getLedgerVersionHelper(connection: Connection, optionValue?: number
 ): Promise<number> {
   if (optionValue !== undefined && optionValue !== null) {
-    return new Promise(resolve => resolve(optionValue));
+    return Promise.resolve(optionValue);
   }
   return connection.getLedgerVersion();
 }

@@ -10,7 +10,7 @@ import type {TransactionType, TransactionOptions} from './transaction-types';
 function attachTransactionDate(connection: Connection, tx: Object
 ): Promise<TransactionType> {
   if (tx.date) {
-    return new Promise(resolve => resolve(tx));
+    return Promise.resolve(tx);
   }
 
   if (!tx.ledger_index) {
@@ -64,7 +64,7 @@ function convertError(connection: Connection, options: TransactionOptions,
         return _error;
       });
   }
-  return new Promise(resolve => resolve(_error));
+  return Promise.resolve(_error);
 }
 
 function formatResponse(options: TransactionOptions, tx: TransactionType

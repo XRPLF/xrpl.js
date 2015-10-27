@@ -117,7 +117,7 @@ function ensureLedgerVersion(options: Object
   if (Boolean(options) && options.ledgerVersion !== undefined &&
     options.ledgerVersion !== null
   ) {
-    return new Promise(resolve => resolve(options));
+    return Promise.resolve(options);
   }
   return this.getLedgerVersion().then(ledgerVersion =>
     _.assign({}, options, {ledgerVersion}));

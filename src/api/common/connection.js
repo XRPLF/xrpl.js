@@ -106,7 +106,7 @@ class Connection extends EventEmitter {
   }
 
   disconnect() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (this.state === WebSocket.CLOSED) {
         resolve();
       } else if (this.state === WebSocket.CLOSING) {
@@ -140,14 +140,13 @@ class Connection extends EventEmitter {
   }
 
   getLedgerVersion() {
-    return this._whenReady(
-      new Promise(resolve => resolve(this._ledgerVersion)));
+    return this._whenReady(Promise.resolve(this._ledgerVersion));
   }
 
   hasLedgerVersions(lowLedgerVersion, highLedgerVersion) {
-    return this._whenReady(new Promise(resolve =>
-      resolve(this._availableLedgerVersions.containsRange(
-        lowLedgerVersion, highLedgerVersion || this._ledgerVersion))));
+    return this._whenReady(Promise.resolve(
+      this._availableLedgerVersions.containsRange(
+        lowLedgerVersion, highLedgerVersion || this._ledgerVersion)));
   }
 
   hasLedgerVersion(ledgerVersion) {

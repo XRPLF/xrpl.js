@@ -37,7 +37,7 @@ function prepareTransaction(txJSON: Object, api: Object,
   function prepareMaxLedgerVersion(): Promise<Object> {
     if (instructions.maxLedgerVersion !== undefined) {
       txJSON.LastLedgerSequence = instructions.maxLedgerVersion;
-      return new Promise(resolve => resolve(txJSON));
+      return Promise.resolve(txJSON);
     }
     const offset = instructions.maxLedgerVersionOffset !== undefined ?
       instructions.maxLedgerVersionOffset : 3;
@@ -50,7 +50,7 @@ function prepareTransaction(txJSON: Object, api: Object,
   function prepareFee(): Promise<Object> {
     if (instructions.fee !== undefined) {
       txJSON.Fee = common.xrpToDrops(instructions.fee);
-      return new Promise(resolve => resolve(txJSON));
+      return Promise.resolve(txJSON);
     }
     const cushion = api._feeCushion;
     return common.serverInfo.getFee(api.connection, cushion).then(fee => {
@@ -68,7 +68,7 @@ function prepareTransaction(txJSON: Object, api: Object,
   function prepareSequence(): Promise<Object> {
     if (instructions.sequence !== undefined) {
       txJSON.Sequence = instructions.sequence;
-      return new Promise(resolve => resolve(txJSON));
+      return Promise.resolve(txJSON);
     }
     const request = {
       command: 'account_info',

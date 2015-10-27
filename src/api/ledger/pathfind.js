@@ -79,7 +79,7 @@ function conditionallyAddDirectXRPPath(connection: Connection, address: string,
 ): Promise {
   if (isRippledIOUAmount(paths.destination_amount)
       || !_.includes(paths.destination_currencies, 'XRP')) {
-    return new Promise(resolve => resolve(paths));
+    return Promise.resolve(paths);
   }
   return utils.getXRPBalance(connection, address, undefined).then(
     xrpBalance => addDirectXrpPath(paths, xrpBalance));
