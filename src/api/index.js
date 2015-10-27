@@ -2,7 +2,6 @@
 
 'use strict';
 const _ = require('lodash');
-const util = require('util');
 const EventEmitter = require('events').EventEmitter;
 const common = require('./common');
 const server = require('./server/server');
@@ -47,26 +46,24 @@ type APIOptions = {
   proxy?: string
 }
 
-function RippleAPI(options: APIOptions = {}) {
-  common.validate.apiOptions(options);
-  if (EventEmitter instanceof Function) { // always true, needed for flow
-    EventEmitter.call(this);
-  }
-  if (options.servers !== undefined) {
-    const servers: Array<string> = options.servers;
-    if (servers.length === 1) {
-      this._feeCushion = options.feeCushion || 1.2;
-      this.connection = new common.Connection(servers[0], options);
-      this.connection.on('ledgerClosed', message => {
-        this.emit('ledgerClosed', server.formatLedgerClose(message));
-      });
-    } else {
-      throw new errors.RippleError('Multi-server not implemented');
+class RippleAPI extends EventEmitter {
+  constructor(options: APIOptions = {}) {
+    common.validate.apiOptions(options);
+    super();
+    if (options.servers !== undefined) {
+      const servers: Array<string> = options.servers;
+      if (servers.length === 1) {
+        this._feeCushion = options.feeCushion || 1.2;
+        this.connection = new common.Connection(servers[0], options);
+        this.connection.on('ledgerClosed', message => {
+          this.emit('ledgerClosed', server.formatLedgerClose(message));
+        });
+      } else {
+        throw new errors.RippleError('Multi-server not implemented');
+      }
     }
   }
 }
-
-util.inherits(RippleAPI, EventEmitter);
 
 _.assign(RippleAPI.prototype, {
   connect,
