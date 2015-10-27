@@ -24,30 +24,39 @@ class Connection extends EventEmitter {
     this._nextRequestID = 1;
   }
 
-  _onMessage(message) {
-    try {
-      const data = JSON.parse(message);
-      if (data.type === 'response') {
-        if (!(Number.isInteger(data.id) && data.id >= 0)) {
-          throw new UnexpectedError('valid id not found in response');
-        }
-        this.emit(data.id.toString(), data);
-      } else if (isStreamMessageType(data.type)) {
-        if (data.type === 'ledgerClosed') {
-          this._ledgerVersion = Number(data.ledger_index);
-          this._availableLedgerVersions.reset();
-          this._availableLedgerVersions.parseAndAddRanges(
-            data.validated_ledgers);
-        }
-        this.emit(data.type, data);
-      } else if (data.type === undefined && data.error) {
-        this.emit('error', data.error, data.error_message);  // e.g. slowDown
-      } else {
-        throw new UnexpectedError('unrecognized message type: ' + data.type);
+  // return value is array of arguments to Connection.emit
+  _parseMessage(message) {
+    const data = JSON.parse(message);
+    if (data.type === 'response') {
+      if (!(Number.isInteger(data.id) && data.id >= 0)) {
+        throw new UnexpectedError('valid id not found in response');
       }
+      return [data.id.toString(), data];
+    } else if (isStreamMessageType(data.type)) {
+      if (data.type === 'ledgerClosed') {
+        this._ledgerVersion = Number(data.ledger_index);
+        this._availableLedgerVersions.reset();
+        this._availableLedgerVersions.parseAndAddRanges(
+          data.validated_ledgers);
+      }
+      return [data.type, data];
+    } else if (data.type === undefined && data.error) {
+      return ['error', data.error, data.error_message];  // e.g. slowDown
+    }
+    throw new UnexpectedError('unrecognized message type: ' + data.type);
+  }
+
+  _onMessage(message) {
+    let parameters;
+    try {
+      parameters = this._parseMessage(message);
     } catch (error) {
       this.emit('error', 'badMessage', message);
+      return;
     }
+    // we don't want this inside the try/catch or exceptions in listener
+    // will be caught
+    this.emit.apply(this, parameters);
   }
 
   get state() {
