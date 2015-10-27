@@ -130,8 +130,3 @@ export type TransactionOptions = {
 
 export type TransactionType = PaymentTransaction | OrderTransaction |
   OrderCancellationTransaction | TrustlineTransaction | SettingsTransaction
-
-export type GetTransactionResponseCallback =
-  (err?: ?Error, data?: TransactionType) => void
-
-export type CallbackType = (err?: ?Error, data?: Object) => void

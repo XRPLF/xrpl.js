@@ -33,7 +33,6 @@ function getXRPBalance(connection: Connection, address: string,
 }
 
 // If the marker is omitted from a response, you have reached the end
-// getter(marker, limit, callback), callback(error, {marker, results})
 function getRecursiveRecur(getter: Getter, marker?: string, limit: number
 ): Promise {
   return getter(marker, limit).then(data => {
@@ -135,4 +134,3 @@ module.exports = {
   clamp: clamp,
   common: common
 };
-

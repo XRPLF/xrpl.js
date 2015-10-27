@@ -1,9 +1,9 @@
 [ignore]
-.*/src/api/.*
-.*/src/core/.*
-.*/dist/.*
-.*/test/fixtures/.*
+.*/ripple-lib/src/.*
+.*/ripple-lib/dist/.*
+.*/ripple-lib/test/fixtures/.*
 .*/node_modules/flow-bin/.*
+.*/node_modules/webpack/.*
 
 [include]
 ./node_modules/

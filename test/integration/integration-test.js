@@ -3,8 +3,8 @@
 'use strict';
 const _ = require('lodash');
 const assert = require('assert');
-const errors = require('../../src/api/common/errors');
-const validate = require('../../src/api/common').validate;
+const errors = require('../../src/common/errors');
+const validate = require('../../src/common').validate;
 const wallet = require('./wallet');
 const requests = require('../fixtures/api/requests');
 const RippleAPI = require('../../src').RippleAPI;

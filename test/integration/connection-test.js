@@ -1,5 +1,5 @@
 'use strict';
-const Connection = require('../../src/api/common/connection');
+const Connection = require('../../src/common/connection');
 
 const request1 = {
   command: 'server_info'

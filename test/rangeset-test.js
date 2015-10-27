@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('assert');
-const RangeSet = require('ripple-lib')._test.RangeSet;
+const RangeSet = require('ripple-api').RippleAPI._PRIVATE.RangeSet;
 
 describe('RangeSet', function() {
   it('addRange()/addValue()', function() {
