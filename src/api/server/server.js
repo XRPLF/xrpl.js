@@ -29,7 +29,7 @@ function getFee(): Promise<number> {
 }
 
 function rippleTimeToISO8601(rippleTime: string): string {
-  return new Date(common.toTimestamp(rippleTime)).toISOString();
+  return new Date(common.rippleToUnixTimestamp(rippleTime)).toISOString();
 }
 
 function formatLedgerClose(ledgerClose: Object): Object {

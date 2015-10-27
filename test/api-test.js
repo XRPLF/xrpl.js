@@ -601,7 +601,7 @@ describe('RippleAPI', function() {
       assert(false, 'Should throw NetworkError');
     }).catch(error => {
       assert(error instanceof this.api.errors.RippledError);
-      assert(error.message.indexOf('slowDown') !== -1);
+      assert(_.includes(error.message, 'slowDown'));
     });
   });
 

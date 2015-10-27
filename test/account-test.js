@@ -99,35 +99,34 @@ describe('Account', function() {
     it('should respond true if the public key corresponds to the account ' +
       ' address and the master key IS NOT disabled', function(done) {
 
-        const options = {Flags: 65536};
-        const account = new Account(createRemote(options),
-          'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz');
-        account.publicKeyIsActive(
-          '025B32A54BFA33FB781581F49B235C0E2820C929FF41E677ADA5D3E53CFBA46332',
-          function(err, is_valid) {
+      const options = {Flags: 65536};
+      const account = new Account(createRemote(options),
+        'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz');
+      account.publicKeyIsActive(
+        '025B32A54BFA33FB781581F49B235C0E2820C929FF41E677ADA5D3E53CFBA46332',
+        function(err, is_valid) {
 
-            assert(err === null);
-            assert(is_valid === true);
-            done();
-          });
+          assert(err === null);
+          assert(is_valid === true);
+          done();
+        });
 
-      });
+    });
 
     it('should respond false if the public key corresponds to the account ' +
       ' address and the master key IS disabled', function(done) {
 
-        const account = new Account(createRemote(),
-          'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz');
-        account.publicKeyIsActive(
-          '025B32A54BFA33FB781581F49B235C0E2820C929FF41E677ADA5D3E53CFBA46332',
-          function(err, is_valid) {
+      const account = new Account(createRemote(),
+        'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz');
+      account.publicKeyIsActive(
+        '025B32A54BFA33FB781581F49B235C0E2820C929FF41E677ADA5D3E53CFBA46332',
+        function(err, is_valid) {
+          assert(err === null);
+          assert(is_valid === false);
+          done();
+        });
 
-            assert(err === null);
-            assert(is_valid === false);
-            done();
-          });
-
-      });
+    });
 
     it('should respond true if the public key corresponds to the regular key',
       function(done) {
@@ -149,17 +148,17 @@ describe('Account', function() {
     it('should respond false if the public key does not correspond to an ' +
       ' active public key for the account', function(done) {
 
-        const account = new Account(createRemote(),
-          'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz');
-        account.publicKeyIsActive(
-          '032ECDA93970BC7E8872EF6582CB52A5557F117244A949EB4FA8AC7688CF24FBC8',
-          function(err, is_valid) {
-            assert(err === null);
-            assert(is_valid === false);
-            done();
-          });
+      const account = new Account(createRemote(),
+        'rKXCummUHnenhYudNb9UoJ4mGBR75vFcgz');
+      account.publicKeyIsActive(
+        '032ECDA93970BC7E8872EF6582CB52A5557F117244A949EB4FA8AC7688CF24FBC8',
+        function(err, is_valid) {
+          assert(err === null);
+          assert(is_valid === false);
+          done();
+        });
 
-      });
+    });
 
     it('should respond false if the public key is invalid', function(done) {
 
@@ -189,17 +188,17 @@ describe('Account', function() {
     it('should respond false if the public key does not correspond to an ' +
       ' active public key for the unfunded account', function(done) {
 
-        const account = new Account(createRemote(),
-          'rLdfp6eoR948KVxfn6EpaaNTKwfwXhzSeQ');
-        account.publicKeyIsActive(
-          '032ECDA93970BC7E8872EF6582CB52A5557F117244A949EB4FA8AC7688CF24FBC8',
-          function(err, is_valid) {
-            assert(err === null);
-            assert(is_valid === false);
-            done();
-          });
+      const account = new Account(createRemote(),
+        'rLdfp6eoR948KVxfn6EpaaNTKwfwXhzSeQ');
+      account.publicKeyIsActive(
+        '032ECDA93970BC7E8872EF6582CB52A5557F117244A949EB4FA8AC7688CF24FBC8',
+        function(err, is_valid) {
+          assert(err === null);
+          assert(is_valid === false);
+          done();
+        });
 
-      });
+    });
 
   });
 

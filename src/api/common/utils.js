@@ -67,7 +67,7 @@ function removeUndefined(obj: Object): Object {
  * @return {Number} ms since unix epoch
  *
  */
-function toTimestamp(rpepoch: number): number {
+function rippleToUnixTimestamp(rpepoch: number): number {
   return (rpepoch + 0x386D4380) * 1000;
 }
 
@@ -75,7 +75,7 @@ function toTimestamp(rpepoch: number): number {
  * @param {Number|Date} timestamp (ms since unix epoch)
  * @return {Number} seconds since ripple epoch ( 1/1/2000 GMT)
  */
-function fromTimestamp(timestamp: number | Date): number {
+function unixToRippleTimestamp(timestamp: number | Date): number {
   const timestamp_ = timestamp instanceof Date ?
                      timestamp.getTime() :
                      timestamp;
@@ -90,6 +90,6 @@ module.exports = {
   generateAddressAPI,
   convertKeysFromSnakeCaseToCamelCase,
   removeUndefined,
-  toTimestamp,
-  fromTimestamp
+  rippleToUnixTimestamp,
+  unixToRippleTimestamp
 };

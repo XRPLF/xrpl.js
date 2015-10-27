@@ -17,6 +17,6 @@ module.exports = {
   convertExceptions: utils.convertExceptions,
   convertKeysFromSnakeCaseToCamelCase:
     utils.convertKeysFromSnakeCaseToCamelCase,
-  toTimestamp: utils.toTimestamp,
-  fromTimestamp: utils.fromTimestamp
+  rippleToUnixTimestamp: utils.rippleToUnixTimestamp,
+  unixToRippleTimestamp: utils.unixToRippleTimestamp
 };
