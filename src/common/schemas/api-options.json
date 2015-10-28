@@ -15,6 +15,9 @@
     },
     "proxy": {
       "format": "uri"
+    },
+    "authorization": {
+      "type": "string"
     }
   },
   "additionalProperties": false
