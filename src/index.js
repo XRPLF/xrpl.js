@@ -52,6 +52,21 @@ type APIOptions = {
   proxy?: string
 }
 
+// prevent access to non-validated ledger versions
+class RestrictedConnection extends common.Connection {
+  request(request, timeout) {
+    const ledger_index = request.ledger_index;
+    if (ledger_index !== undefined && ledger_index !== 'validated') {
+      if (!_.isNumber(ledger_index) || ledger_index > this._ledgerVersion) {
+        return Promise.reject(new errors.LedgerVersionError(
+          `ledgerVersion ${ledger_index} is greater than server\'s ` +
+          `most recent validated ledger: ${this._ledgerVersion}`));
+      }
+    }
+    return super.request(request, timeout);
+  }
+}
+
 class RippleAPI extends EventEmitter {
   constructor(options: APIOptions = {}) {
     common.validate.apiOptions(options);
@@ -60,7 +75,7 @@ class RippleAPI extends EventEmitter {
       const servers: Array<string> = options.servers;
       if (servers.length === 1) {
         this._feeCushion = options.feeCushion || 1.2;
-        this.connection = new common.Connection(servers[0], options);
+        this.connection = new RestrictedConnection(servers[0], options);
         this.connection.on('ledgerClosed', message => {
           this.emit('ledgerClosed', server.formatLedgerClose(message));
         });
@@ -106,13 +121,13 @@ _.assign(RippleAPI.prototype, {
   submit,
 
   generateAddress,
+  computeLedgerHash,
   errors
 });
 
 // these are exposed only for use by unit tests; they are not part of the API
 RippleAPI._PRIVATE = {
-  common,
-  computeLedgerHash,
+  validate: common.validate,
   RangeSet: require('./common/rangeset').RangeSet,
   ledgerUtils: require('./ledger/utils'),
   schemaValidator: require('./common/schema-validator')

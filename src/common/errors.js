@@ -30,6 +30,8 @@ class RippledError extends RippleError {}
 
 class UnexpectedError extends RippleError {}
 
+class LedgerVersionError extends RippleError {}
+
 class ConnectionError extends RippleError {}
 
 class NotConnectedError extends ConnectionError {}
@@ -57,7 +59,7 @@ class MissingLedgerHistoryError extends RippleError {
 class PendingLedgerVersionError extends RippleError {
   constructor(message) {
     super(message || 'maxLedgerVersion is greater than server\'s'
-      + 'most recent validated ledger');
+      + ' most recent validated ledger');
   }
 }
 
@@ -73,5 +75,6 @@ module.exports = {
   ValidationError,
   NotFoundError,
   PendingLedgerVersionError,
-  MissingLedgerHistoryError
+  MissingLedgerHistoryError,
+  LedgerVersionError
 };

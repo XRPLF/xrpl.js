@@ -4,14 +4,13 @@ const _ = require('lodash');
 const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
 const RippleAPI = require('ripple-api').RippleAPI;
-const common = RippleAPI._PRIVATE.common;
+const validate = RippleAPI._PRIVATE.validate;
 const fixtures = require('./fixtures/api');
 const requests = fixtures.requests;
 const responses = fixtures.responses;
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
 const address = addresses.ACCOUNT;
-const validate = common.validate;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
@@ -26,6 +25,10 @@ const orderbook = {
     counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
   }
 };
+
+function closeLedger(connection) {
+  connection._ws.emit('message', JSON.stringify(ledgerClosed));
+}
 
 function checkResult(expected, schemaName, response) {
   if (expected.txJSON) {
@@ -262,6 +265,7 @@ describe('RippleAPI', function() {
     it('getTransaction - order', function() {
       const hash =
         '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51';
+      closeLedger(this.api.connection);
       return this.api.getTransaction(hash).then(
         _.partial(checkResult, responses.getTransaction.order,
         'getTransaction'));
@@ -270,6 +274,7 @@ describe('RippleAPI', function() {
     it('getTransaction - order cancellation', function() {
       const hash =
         '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E';
+      closeLedger(this.api.connection);
       return this.api.getTransaction(hash).then(
         _.partial(checkResult, responses.getTransaction.orderCancellation,
           'getTransaction'));
@@ -359,7 +364,7 @@ describe('RippleAPI', function() {
     it('getTransaction - missing ledger history', function() {
       const hash = hashes.NOTFOUND_TRANSACTION_HASH;
       // make gaps in history
-      this.api.connection._ws.emit('message', JSON.stringify(ledgerClosed));
+      closeLedger(this.api.connection);
       return this.api.getTransaction(hash).then(() => {
         assert(false, 'Should throw MissingLedgerHistoryError');
       }).catch(error => {
@@ -417,6 +422,7 @@ describe('RippleAPI', function() {
     it('getTransaction - ledger missing close time', function() {
       const hash =
         '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04';
+      closeLedger(this.api.connection);
       return this.api.getTransaction(hash).then(() => {
         assert(false, 'Should throw UnexpectedError');
       }).catch(error => {
@@ -706,6 +712,14 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getLedger.header, 'getLedger'));
   });
 
+  it('getLedger - future ledger version', function() {
+    return this.api.getLedger({ledgerVersion: 14661789}).then(() => {
+      assert(false, 'Should throw LedgerVersionError');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.LedgerVersionError);
+    });
+  });
+
   it('getLedger - with settings transaction', function() {
     const request = {
       includeTransactions: true,
@@ -728,7 +742,7 @@ describe('RippleAPI', function() {
       .then(response => {
         const ledger = _.assign({}, response,
           {parentCloseTime: response.closeTime});
-        const hash = RippleAPI._PRIVATE.computeLedgerHash(ledger);
+        const hash = this.api.computeLedgerHash(ledger);
         assert.strictEqual(hash,
           'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
       });
@@ -833,7 +847,7 @@ describe('RippleAPI', function() {
       checkResult(responses.ledgerClosed, 'ledgerClosed', message);
       done();
     });
-    this.api.connection._ws.emit('message', JSON.stringify(ledgerClosed));
+    closeLedger(this.api.connection);
   });
 });
 
@@ -854,29 +868,32 @@ describe('RippleAPI - offline', function() {
   });
 
   it('computeLedgerHash', function() {
+    const api = new RippleAPI();
     const header = requests.computeLedgerHash.header;
-    const ledgerHash = RippleAPI._PRIVATE.computeLedgerHash(header);
+    const ledgerHash = api.computeLedgerHash(header);
     assert.strictEqual(ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
   });
 
   it('computeLedgerHash - with transactions', function() {
+    const api = new RippleAPI();
     const header = _.omit(requests.computeLedgerHash.header,
       'transactionHash');
     header.rawTransactions = JSON.stringify(
       requests.computeLedgerHash.transactions);
-    const ledgerHash = RippleAPI._PRIVATE.computeLedgerHash(header);
+    const ledgerHash = api.computeLedgerHash(header);
     assert.strictEqual(ledgerHash,
       'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
   });
 
   it('computeLedgerHash - incorrent transaction_hash', function() {
+    const api = new RippleAPI();
     const header = _.assign({}, requests.computeLedgerHash.header,
       {transactionHash:
         '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'});
     header.rawTransactions = JSON.stringify(
       requests.computeLedgerHash.transactions);
-    assert.throws(() => RippleAPI._PRIVATE.computeLedgerHash(header));
+    assert.throws(() => api.computeLedgerHash(header));
   });
 
 /* eslint-disable no-unused-vars */
