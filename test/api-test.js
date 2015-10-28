@@ -419,9 +419,9 @@ describe('RippleAPI', function() {
       const hash =
         '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A04';
       return this.api.getTransaction(hash).then(() => {
-        assert(false, 'Should throw ApiError');
+        assert(false, 'Should throw UnexpectedError');
       }).catch(error => {
-        assert(error instanceof this.api.errors.ApiError);
+        assert(error instanceof this.api.errors.UnexpectedError);
       });
     });
   });
@@ -850,36 +850,6 @@ describe('RippleAPI', function() {
       const hex = new Array(33).join('0');
       assert.throws(_.partial(validate.secret, hex),
         this.api.errors.ValidationError);
-    });
-
-  });
-
-  describe('common errors', function() {
-
-    it('TransactionError', function() {
-      // TransactionError is not used anywhere, so just test its creation
-      assert.throws(function() {
-        throw new common.errors.TransactionError('fall through');
-      }, this.api.errors.TransactionError);
-      assert.throws(function() {
-        throw new common.errors.TransactionError('fall through');
-      }, /fall through/);
-    });
-
-    it('TimeOutError', function() {
-      // TimeOutError is not used anywhere, so just test its creation
-      assert.throws(function() {
-        throw new common.errors.TimeOutError('fall through');
-      }, this.api.errors.TimeOutError);
-      assert.throws(function() {
-        throw new common.errors.TimeOutError('fall through');
-      }, /fall through/);
-    });
-
-    it('RippledNetworkError', function() {
-      assert.throws(function() {
-        throw new common.errors.RippledNetworkError();
-      }, /Cannot connect to rippled/);
     });
 
   });

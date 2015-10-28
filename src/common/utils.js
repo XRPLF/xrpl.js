@@ -38,7 +38,7 @@ function generateAddressAPI(options?: Object): Object {
   try {
     return generateAddress(options);
   } catch (error) {
-    throw new errors.ApiError(error.message);
+    throw new errors.UnexpectedError(error.message);
   }
 }
 
