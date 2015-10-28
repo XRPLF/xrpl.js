@@ -112,6 +112,5 @@ function schemaValidate(schemaName: string, object: any): void {
 
 SCHEMAS = loadSchemas();
 module.exports = {
-  schemaValidate: schemaValidate,
-  SCHEMAS: SCHEMAS
+  schemaValidate
 };

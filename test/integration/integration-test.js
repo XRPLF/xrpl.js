@@ -292,7 +292,8 @@ describe('integration tests', function() {
   it('generateWallet', function() {
     const newWallet = this.api.generateAddress();
     assert(newWallet && newWallet.address && newWallet.secret);
-    validate.addressAndSecret(newWallet);
+    validate.address(newWallet.address);
+    validate.secret(newWallet.secret);
   });
 
 });

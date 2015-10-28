@@ -18,16 +18,6 @@
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.1.0.tgz"
     },
-    "hash.js": {
-      "version": "1.0.3",
-      "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
-      "dependencies": {
-        "inherits": {
-          "version": "2.0.1",
-          "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
-        }
-      }
-    },
     "https-proxy-agent": {
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-1.0.0.tgz",
@@ -94,6 +84,16 @@
       "version": "2.0.1",
       "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz",
       "dependencies": {
+        "hash.js": {
+          "version": "1.0.3",
+          "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
+          "dependencies": {
+            "inherits": {
+              "version": "2.0.1",
+              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+            }
+          }
+        },
         "x-address-codec": {
           "version": "0.7.2",
           "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.7.2.tgz",
@@ -185,6 +185,16 @@
         "elliptic": {
           "version": "5.2.0",
           "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.0.tgz",
+          "dependencies": {
+            "inherits": {
+              "version": "2.0.1",
+              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+            }
+          }
+        },
+        "hash.js": {
+          "version": "1.0.3",
+          "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
           "dependencies": {
             "inherits": {
               "version": "2.0.1",

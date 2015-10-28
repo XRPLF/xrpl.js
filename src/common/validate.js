@@ -18,19 +18,6 @@ function isValidSecret(secret) {
   }
 }
 
-function validateAddressAndSecret(obj: {address: string, secret: string}
-): void {
-  const address = obj.address;
-  const secret = obj.secret;
-  schemaValidate('address', address);
-  if (!secret) {
-    throw error('Parameter missing: secret');
-  }
-  if (!isValidSecret(secret)) {
-    throw error('Invalid parameter: secret');
-  }
-}
-
 function validateSecret(secret: string): void {
   if (!secret) {
     throw error('Parameter missing: secret');
@@ -57,7 +44,6 @@ function validateOptions(schema, options) {
 
 module.exports = {
   address: _.partial(schemaValidate, 'address'),
-  addressAndSecret: validateAddressAndSecret,
   secret: validateSecret,
   currency: _.partial(schemaValidate, 'currency'),
   identifier: _.partial(schemaValidate, 'hash256'),

@@ -15,7 +15,6 @@ const validate = common.validate;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
-const ledgerHashSchema = require('./fixtures/schemas/ledgerhash.json');
 
 const orderbook = {
   base: {
@@ -752,12 +751,6 @@ describe('RippleAPI', function() {
     assert.strictEqual(utils.compareTransactions(first, second), 1);
   });
 
-  it('ledger utils - renameCounterpartyToIssuer', function() {
-    assert.strictEqual(utils.renameCounterpartyToIssuer(undefined), undefined);
-    const amountArg = {issuer: '1'};
-    assert.deepEqual(utils.renameCounterpartyToIssuer(amountArg), amountArg);
-  });
-
   it('ledger utils - getRecursive', function() {
     function getter(marker, limit) {
       return new Promise((resolve, reject) => {
@@ -776,26 +769,22 @@ describe('RippleAPI', function() {
   });
 
   describe('schema-validator', function() {
-    beforeEach(function() {
-      schemaValidator.SCHEMAS.ledgerhash = ledgerHashSchema;
-    });
-
     it('valid', function() {
       assert.doesNotThrow(function() {
-        schemaValidator.schemaValidate('ledgerhash',
+        schemaValidator.schemaValidate('hash256',
           '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F');
       });
     });
 
     it('invalid', function() {
       assert.throws(function() {
-        schemaValidator.schemaValidate('ledgerhash', 'invalid');
+        schemaValidator.schemaValidate('hash256', 'invalid');
       }, this.api.errors.ValidationError);
     });
 
     it('invalid - empty value', function() {
       assert.throws(function() {
-        schemaValidator.schemaValidate('ledgerhash', '');
+        schemaValidator.schemaValidate('hash256', '');
       }, this.api.errors.ValidationError);
     });
 
@@ -818,21 +807,6 @@ describe('RippleAPI', function() {
         this.api.errors.ValidationError);
       assert.throws(_.partial(validate.getTransactionsOptions, options),
         /minLedgerVersion must not be greater than maxLedgerVersion/);
-    });
-
-    it('addressAndSecret', function() {
-      const noSecret = {address: address};
-      assert.throws(_.partial(validate.addressAndSecret, noSecret),
-        this.api.errors.ValidationError);
-      assert.throws(_.partial(validate.addressAndSecret, noSecret),
-        /Parameter missing/);
-      const badSecret = {address: address, secret: 'sbad'};
-      assert.throws(_.partial(validate.addressAndSecret, badSecret),
-        this.api.errors.ValidationError);
-      const goodWallet = {address: 'rpZMK8hwyrBvLorFNWHRCGt88nCJWbixur',
-        secret: 'shzjfakiK79YQdMjy4h8cGGfQSV6u'
-      };
-      assert.doesNotThrow(_.partial(validate.addressAndSecret, goodWallet));
     });
 
     it('secret', function() {
