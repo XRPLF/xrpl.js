@@ -14,7 +14,6 @@ module.exports = {
   generateAddress: utils.generateAddress,
   generateAddressAPI: utils.generateAddressAPI,
   removeUndefined: utils.removeUndefined,
-  convertExceptions: utils.convertExceptions,
   convertKeysFromSnakeCaseToCamelCase:
     utils.convertKeysFromSnakeCaseToCamelCase,
   rippleToUnixTimestamp: utils.rippleToUnixTimestamp,

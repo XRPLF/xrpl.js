@@ -64,6 +64,9 @@ class RippleAPI extends EventEmitter {
         this.connection.on('ledgerClosed', message => {
           this.emit('ledgerClosed', server.formatLedgerClose(message));
         });
+        this.connection.on('error', (type, info) => {
+          this.emit('error', type, info);
+        });
       } else {
         throw new errors.RippleError('Multi-server not implemented');
       }

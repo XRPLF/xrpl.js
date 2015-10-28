@@ -126,7 +126,6 @@ module.exports = {
   getXRPBalance,
   ensureLedgerVersion,
   compareTransactions,
-  renameCounterpartyToIssuer,
   renameCounterpartyToIssuerInOrder,
   getRecursive,
   hasCompleteLedgerRange,
