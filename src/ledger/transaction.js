@@ -28,9 +28,9 @@ function attachTransactionDate(connection: Connection, tx: Object
     if (typeof data.ledger.close_time === 'number') {
       return _.assign({date: data.ledger.close_time}, tx);
     }
-    throw new errors.ApiError('Ledger missing close_time');
+    throw new errors.UnexpectedError('Ledger missing close_time');
   }).catch(error => {
-    if (error instanceof errors.ApiError) {
+    if (error instanceof errors.UnexpectedError) {
       throw error;
     }
     throw new errors.NotFoundError('Transaction ledger not found');

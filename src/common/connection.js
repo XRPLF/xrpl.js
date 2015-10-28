@@ -4,7 +4,7 @@ const WebSocket = require('ws');
 const parseURL = require('url').parse;
 const RangeSet = require('./rangeset').RangeSet;
 const {RippledError, DisconnectedError, NotConnectedError,
-  TimeoutError, UnexpectedError} = require('./errors');
+  TimeoutError, ResponseFormatError} = require('./errors');
 
 function isStreamMessageType(type) {
   return type === 'ledgerClosed' ||
@@ -31,7 +31,7 @@ class Connection extends EventEmitter {
     const data = JSON.parse(message);
     if (data.type === 'response') {
       if (!(Number.isInteger(data.id) && data.id >= 0)) {
-        throw new UnexpectedError('valid id not found in response');
+        throw new ResponseFormatError('valid id not found in response');
       }
       return [data.id.toString(), data];
     } else if (isStreamMessageType(data.type)) {
@@ -45,7 +45,7 @@ class Connection extends EventEmitter {
     } else if (data.type === undefined && data.error) {
       return ['error', data.error, data.error_message];  // e.g. slowDown
     }
-    throw new UnexpectedError('unrecognized message type: ' + data.type);
+    throw new ResponseFormatError('unrecognized message type: ' + data.type);
   }
 
   _onMessage(message) {
@@ -231,7 +231,7 @@ class Connection extends EventEmitter {
         } else if (response.status === 'success') {
           _resolve(response.result);
         } else {
-          _reject(new UnexpectedError(
+          _reject(new ResponseFormatError(
             'unrecognized status: ' + response.status));
         }
       });
