@@ -1,7 +1,7 @@
 'use strict';
 const {EventEmitter} = require('events');
 const WebSocket = require('ws');
-// temporary: RangeSet will be moved to api/common soon
+const parseURL = require('url').parse;
 const RangeSet = require('./rangeset').RangeSet;
 const {RippledError, DisconnectedError, NotConnectedError,
   TimeoutError, UnexpectedError} = require('./errors');
@@ -16,6 +16,8 @@ class Connection extends EventEmitter {
   constructor(url, options = {}) {
     super();
     this._url = url;
+    this._proxyURL = options.proxyURL;
+    this._authorization = options.authorization;
     this._timeout = options.timeout || (20 * 1000);
     this._isReady = false;
     this._ws = null;
@@ -90,6 +92,27 @@ class Connection extends EventEmitter {
     });
   }
 
+  _createWebSocket(url, proxyURL, authorization) {
+    const options = {};
+    if (proxyURL !== undefined) {
+      const parsedURL = parseURL(url);
+      const proxyOptions = parseURL(proxyURL);
+      proxyOptions.secureEndpoint = (parsedURL.protocol === 'wss:');
+      let HttpsProxyAgent;
+      try {
+        HttpsProxyAgent = require('https-proxy-agent');
+      } catch (error) {
+        throw new Error('"proxy" option is not supported in the browser');
+      }
+      options.agent = new HttpsProxyAgent(proxyOptions);
+    }
+    if (authorization !== undefined) {
+      const base64 = new Buffer(authorization).toString('base64');
+      options.headers = {Authorization: `Basic ${base64}`};
+    }
+    return new WebSocket(url, options);
+  }
+
   connect() {
     return new Promise((resolve, reject) => {
       if (this._state === WebSocket.OPEN) {
@@ -97,7 +120,8 @@ class Connection extends EventEmitter {
       } else if (this._state === WebSocket.CONNECTING) {
         this._ws.once('open', resolve);
       } else {
-        this._ws = new WebSocket(this._url);
+        this._ws = this._createWebSocket(this._url, this._proxyURL,
+          this._authorization);
         this._ws.on('message', this._onMessage.bind(this));
         this._ws.once('close', () => this._onUnexpectedClose);
         this._ws.once('open', () => this._onOpen().then(resolve, reject));
