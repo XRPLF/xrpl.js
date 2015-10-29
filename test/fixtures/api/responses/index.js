@@ -17,6 +17,8 @@ module.exports = {
   getSettings: require('./get-settings.json'),
   getTransaction: {
     orderCancellation: require('./get-transaction-order-cancellation.json'),
+    orderWithExpirationCancellation:
+      require('./get-transaction-order-with-expiration-cancellation.json'),
     order: require('./get-transaction-order.json'),
     payment: require('./get-transaction-payment.json'),
     settings: require('./get-transaction-settings.json'),
@@ -36,8 +38,11 @@ module.exports = {
     withSettingsTx: require('./get-ledger-with-settings-tx')
   },
   prepareOrderCancellation: require('./prepare-order-cancellation.json'),
-  prepareOrder: require('./prepare-order.json'),
-  prepareOrderSell: require('./prepare-order-sell.json'),
+  prepareOrder: {
+    buy: require('./prepare-order.json'),
+    sell: require('./prepare-order-sell.json'),
+    expiration: require('./prepare-order-expiration')
+  },
   preparePayment: {
     normal: require('./prepare-payment.json'),
     allOptions: require('./prepare-payment-all-options.json'),

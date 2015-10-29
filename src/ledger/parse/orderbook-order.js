@@ -18,7 +18,8 @@ function parseOrderbookOrder(order: Object): Object {
     direction: direction,
     quantity: quantity,
     totalPrice: totalPrice,
-    passive: ((order.Flags & flags.Passive) !== 0) || undefined
+    passive: ((order.Flags & flags.Passive) !== 0) || undefined,
+    expirationTime: utils.parseTimestamp(order.Expiration)
   });
 
   const properties = {

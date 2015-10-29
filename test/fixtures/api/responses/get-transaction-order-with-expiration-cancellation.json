@@ -1,0 +1,44 @@
+{
+  "type": "orderCancellation",
+  "address": "rBSZe33F5oxHTbxSF1nZJooVDpcrrqNFp3",
+  "sequence": 1122979,
+  "id": "097B9491CC76B64831F1FEA82EAA93BCD728106D90B65A072C933888E946C40B",
+  "specification": {
+    "orderSequence": 1122978
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2015-01-14T18:27:00.000Z",
+    "fee": "0.011",
+    "balanceChanges": {
+      "rBSZe33F5oxHTbxSF1nZJooVDpcrrqNFp3": [
+        {
+          "currency": "XRP",
+          "value": "-0.011"
+        }
+      ]
+    },
+    "orderbookChanges": {
+      "rBSZe33F5oxHTbxSF1nZJooVDpcrrqNFp3": [
+        {
+          "direction": "buy",
+          "quantity": {
+            "currency": "CNY",
+            "counterparty": "rnuF96W4SZoCJmbHYBFoJZpR8eCaxNvekK",
+            "value": "3200"
+          },
+          "totalPrice": {
+            "currency": "XRP",
+            "value": "34700.537395"
+          },
+          "sequence": 1122978,
+          "status": "cancelled",
+          "makerExchangeRate": "0.09221759200942773",
+          "expirationTime": "2015-01-14T18:36:52.000Z"
+        }
+      ]
+    },
+    "ledgerVersion": 11119599,
+    "indexInLedger": 15
+  }
+}

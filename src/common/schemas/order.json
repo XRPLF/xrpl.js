@@ -14,7 +14,8 @@
     "passive": {
       "description": "If enabled, the offer will not consume offers that exactly match it, and instead becomes an Offer node in the ledger. It will still consume offers that cross it.",
       "type": "boolean"
-    }
+    },
+    "expirationTime": {"type": "string", "format": "date-time"}
   },
   "required": ["direction", "quantity", "totalPrice"],
   "additionalProperties": false,

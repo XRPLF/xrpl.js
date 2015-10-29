@@ -7,11 +7,12 @@
       "type": "string",
       "enum": ["buy", "sell"]
     },
-    "quantity": {"$ref": "balance"},
-    "totalPrice": {"$ref": "balance"},
+    "quantity": {"$ref": "amount"},
+    "totalPrice": {"$ref": "amount"},
     "makerExchangeRate": {"$ref": "value"},
     "sequence": {"$ref": "sequence"},
-    "status": {"enum": ["created", "open", "closed", "canceled"]}
+    "status": {"enum": ["created", "filled", "partially-filled", "cancelled"]},
+    "expirationTime": {"type": "string", "format": "date-time"}
   },
   "required": ["direction", "quantity", "totalPrice", "sequence", "status"],
   "additionalProperties": false

@@ -43,6 +43,7 @@ module.exports = {
     NoLedgerIndex: require('./tx/no-ledger-index.json'),
     NoLedgerFound: require('./tx/no-ledger-found.json'),
     LedgerWithoutTime: require('./tx/ledger-without-time.json'),
-    NotValidated: require('./tx/not-validated.json')
+    NotValidated: require('./tx/not-validated.json'),
+    OfferWithExpiration: require('./tx/order-with-expiration.json')
   }
 };

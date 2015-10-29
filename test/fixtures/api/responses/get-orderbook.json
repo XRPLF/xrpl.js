@@ -52,7 +52,8 @@
           "currency": "BTC",
           "value": "0.3",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-        }
+        },
+        "expirationTime": "2014-12-25T01:14:43.000Z"
       },
       "properties": {
         "maker": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
@@ -104,7 +105,8 @@
           "currency": "BTC",
           "value": "0.4499999999999999",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-        }
+        },
+        "expirationTime": "2014-12-25T01:14:44.000Z"
       },
       "properties": {
         "maker": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
@@ -144,7 +146,8 @@
           "currency": "BTC",
           "value": "0.5",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-        }
+        },
+        "expirationTime": "2014-12-25T00:41:38.000Z"
       },
       "properties": {
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
@@ -196,7 +199,8 @@
           "currency": "BTC",
           "value": "0.8",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-        }
+        },
+        "expirationTime": "2014-12-25T00:41:39.000Z"
       },
       "properties": {
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
@@ -290,7 +294,8 @@
           "currency": "BTC",
           "value": "0.4499999999999999",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-        }
+        },
+        "expirationTime": "2014-12-25T01:14:44.000Z"
       },
       "properties": {
         "maker": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
@@ -322,7 +327,8 @@
           "currency": "BTC",
           "value": "0.8",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-        }
+        },
+        "expirationTime": "2014-12-24T21:44:11.000Z"
       },
       "properties": {
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
@@ -434,7 +440,8 @@
           "currency": "BTC",
           "value": "1.6",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-        }
+        },
+        "expirationTime": "2014-12-24T21:44:12.000Z"
       },
       "properties": {
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
