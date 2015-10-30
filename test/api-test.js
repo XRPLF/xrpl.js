@@ -83,14 +83,22 @@ describe('RippleAPI', function() {
   });
 
   it('prepareOrder - buy order', function() {
-    return this.api.prepareOrder(address, requests.prepareOrder, instructions)
-      .then(_.partial(checkResult, responses.prepareOrder, 'prepare'));
+    const request = requests.prepareOrder.buy;
+    return this.api.prepareOrder(address, request, instructions)
+      .then(_.partial(checkResult, responses.prepareOrder.buy, 'prepare'));
+  });
+
+  it('prepareOrder - buy order with expiration', function() {
+    const request = requests.prepareOrder.expiration;
+    const response = responses.prepareOrder.expiration;
+    return this.api.prepareOrder(address, request, instructions)
+      .then(_.partial(checkResult, response, 'prepare'));
   });
 
   it('prepareOrder - sell order', function() {
-    return this.api.prepareOrder(
-      address, requests.prepareOrderSell, instructions).then(
-      _.partial(checkResult, responses.prepareOrderSell, 'prepare'));
+    const request = requests.prepareOrder.sell;
+    return this.api.prepareOrder(address, request, instructions).then(
+      _.partial(checkResult, responses.prepareOrder.sell, 'prepare'));
   });
 
   it('prepareOrderCancellation', function() {
@@ -277,6 +285,15 @@ describe('RippleAPI', function() {
       closeLedger(this.api.connection);
       return this.api.getTransaction(hash).then(
         _.partial(checkResult, responses.getTransaction.orderCancellation,
+          'getTransaction'));
+    });
+
+    it('getTransaction - order with expiration cancellation', function() {
+      const hash =
+        '097B9491CC76B64831F1FEA82EAA93BCD728106D90B65A072C933888E946C40B';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.orderWithExpirationCancellation,
           'getTransaction'));
     });
 

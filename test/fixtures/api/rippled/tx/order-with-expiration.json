@@ -1,0 +1,98 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "Account": "rBSZe33F5oxHTbxSF1nZJooVDpcrrqNFp3",
+    "Fee": "11000",
+    "Flags": 2147483648,
+    "LastLedgerSequence": 11119601,
+    "OfferSequence": 1122978,
+    "Sequence": 1122979,
+    "SigningPubKey": "03FD8927D4450E5B6C060BF7E46D1DDA2B24C547A45D43926741095D8FCA6A71DB",
+    "TransactionType": "OfferCancel",
+    "TxnSignature": "304402207758C80B90667A407299B2D8A16F8D6DF51E7103B562529AB8242B14B737D9B10220431095B7881C4363C3A2AB966C95190DF2E438FBB394F65014B6436E56F4F6E6",
+    "date": 474575220,
+    "hash": "097B9491CC76B64831F1FEA82EAA93BCD728106D90B65A072C933888E946C40B",
+    "inLedger": 11119599,
+    "ledger_index": 11119599,
+    "meta": {
+      "AffectedNodes": [
+        {
+          "DeletedNode": {
+            "FinalFields": {
+              "Account": "rBSZe33F5oxHTbxSF1nZJooVDpcrrqNFp3",
+              "BookDirectory": "94A08655B7E5C048769B82A900C085FD1D8A28B2A9E7939C4D20C32421605AB5",
+              "BookNode": "0000000000000000",
+              "Expiration": 474575812,
+              "Flags": 0,
+              "OwnerNode": "0000000000000003",
+              "PreviousTxnID": "40FA69EF2F42729DEE5F3BE0D43FAAB63C35FF5A28C3221A385EAFE84733C208",
+              "PreviousTxnLgrSeq": 11119599,
+              "Sequence": 1122978,
+              "TakerGets": "34700537395",
+              "TakerPays": {
+                "currency": "CNY",
+                "issuer": "rnuF96W4SZoCJmbHYBFoJZpR8eCaxNvekK",
+                "value": "3200"
+              }
+            },
+            "LedgerEntryType": "Offer",
+            "LedgerIndex": "40A3657C011B5E1EACBEECB40B1BEAA1220645EA89EA8AEC2D562192B8E60095"
+          }
+        },
+        {
+          "ModifiedNode": {
+            "FinalFields": {
+              "Flags": 0,
+              "IndexPrevious": "0000000000000001",
+              "Owner": "rBSZe33F5oxHTbxSF1nZJooVDpcrrqNFp3",
+              "RootIndex": "3D3DA923D48E02DB1C0B667FA9E2777C348CBE229C7E4E83CBBDE5851D80FF32"
+            },
+            "LedgerEntryType": "DirectoryNode",
+            "LedgerIndex": "8EB5EC4A94AB9D4142DB695F9503CEB4E471E803A76FD563C9B0A598281D085A"
+          }
+        },
+        {
+          "ModifiedNode": {
+            "FinalFields": {
+              "ExchangeRate": "4D20C32421605AB5",
+              "Flags": 0,
+              "RootIndex": "94A08655B7E5C048769B82A900C085FD1D8A28B2A9E7939C4D20C32421605AB5",
+              "TakerGetsCurrency": "0000000000000000000000000000000000000000",
+              "TakerGetsIssuer": "0000000000000000000000000000000000000000",
+              "TakerPaysCurrency": "000000000000000000000000434E590000000000",
+              "TakerPaysIssuer": "35DD7DF146893456296BF4061FBE68735D28F328"
+            },
+            "LedgerEntryType": "DirectoryNode",
+            "LedgerIndex": "94A08655B7E5C048769B82A900C085FD1D8A28B2A9E7939C4D20C32421605AB5"
+          }
+        },
+        {
+          "ModifiedNode": {
+            "FinalFields": {
+              "Account": "rBSZe33F5oxHTbxSF1nZJooVDpcrrqNFp3",
+              "Balance": "266777347375",
+              "Flags": 0,
+              "OwnerCount": 18,
+              "RegularKey": "rDpVpTMogkwzoq2mkNRBmMCxbmUAwPvoFt",
+              "Sequence": 1122980
+            },
+            "LedgerEntryType": "AccountRoot",
+            "LedgerIndex": "9DE2C31C24122AEDCD6CBE74567B2AF1CE9A5B31795E60F7A6BBD48BA1304E37",
+            "PreviousFields": {
+              "Balance": "266777358375",
+              "OwnerCount": 19,
+              "Sequence": 1122979
+            },
+            "PreviousTxnID": "40FA69EF2F42729DEE5F3BE0D43FAAB63C35FF5A28C3221A385EAFE84733C208",
+            "PreviousTxnLgrSeq": 11119599
+          }
+        }
+      ],
+      "TransactionIndex": 15,
+      "TransactionResult": "tesSUCCESS"
+    },
+    "validated": true
+  }
+}

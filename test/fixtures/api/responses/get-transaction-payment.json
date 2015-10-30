@@ -68,16 +68,16 @@
           "direction": "buy",
           "quantity": {
             "currency": "XRP",
-            "value": "-1.101198"
+            "value": "1.101198"
           },
           "totalPrice": {
             "currency": "USD",
             "counterparty": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-            "value": "-0.001002"
+            "value": "0.001002"
           },
           "makerExchangeRate": "1099",
           "sequence": 58,
-          "status": "open"
+          "status": "partially-filled"
         }
       ]
     },

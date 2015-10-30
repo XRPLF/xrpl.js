@@ -205,8 +205,8 @@
       }
     },
     "ripple-lib-transactionparser": {
-      "version": "0.5.1",
-      "resolved": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.5.1.tgz"
+      "version": "0.6.0",
+      "resolved": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.6.0.tgz"
     },
     "ws": {
       "version": "0.7.2",

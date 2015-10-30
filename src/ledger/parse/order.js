@@ -21,7 +21,8 @@ function parseOrder(tx: Object): Object {
     passive: ((tx.Flags & flags.Passive) !== 0) || undefined,
     immediateOrCancel: ((tx.Flags & flags.ImmediateOrCancel) !== 0)
       || undefined,
-    fillOrKill: ((tx.Flags & flags.FillOrKill) !== 0) || undefined
+    fillOrKill: ((tx.Flags & flags.FillOrKill) !== 0) || undefined,
+    expirationTime: utils.parseTimestamp(tx.Expiration)
   });
 }
 

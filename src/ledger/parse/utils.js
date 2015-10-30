@@ -18,8 +18,8 @@ function adjustQualityForXRP(
     (new BigNumber(quality)).shift(shift).toString();
 }
 
-function parseTimestamp(tx: {date: string}): string | void {
-  return tx.date ? (new Date(rippleToUnixTimestamp(tx.date))).toISOString()
+function parseTimestamp(date: number): string | void {
+  return date ? (new Date(rippleToUnixTimestamp(date))).toISOString()
     : undefined;
 }
 
@@ -55,7 +55,7 @@ function parseOutcome(tx: Object): ?Object {
 
   return {
     result: tx.meta.TransactionResult,
-    timestamp: parseTimestamp(tx),
+    timestamp: parseTimestamp(tx.date),
     fee: utils.common.dropsToXrp(tx.Fee),
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
@@ -85,6 +85,7 @@ module.exports = {
   parseOutcome,
   parseMemos,
   hexToString,
+  parseTimestamp,
   adjustQualityForXRP,
   dropsToXrp: utils.common.dropsToXrp,
   constants: utils.common.constants,

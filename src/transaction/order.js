@@ -3,6 +3,7 @@
 const utils = require('./utils');
 const validate = utils.common.validate;
 const offerFlags = utils.common.txFlags.OfferCreate;
+const unixToRippleTimestamp = utils.common.unixToRippleTimestamp;
 import type {Instructions, Prepare} from './types.js';
 import type {Order} from '../ledger/transaction-types.js';
 
@@ -33,6 +34,9 @@ function createOrderTransaction(account: string, order: Order): Object {
   }
   if (order.fillOrKill === true) {
     txJSON.Flags |= offerFlags.FillOrKill;
+  }
+  if (order.expirationTime !== undefined) {
+    txJSON.Expiration = unixToRippleTimestamp(Date.parse(order.expirationTime));
   }
   return txJSON;
 }

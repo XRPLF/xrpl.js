@@ -26,7 +26,9 @@ function parseAccountOrder(address: string, order: Object): Object {
     direction: direction,
     quantity: quantity,
     totalPrice: totalPrice,
-    passive: ((order.flags & flags.Passive) !== 0) || undefined
+    passive: ((order.flags & flags.Passive) !== 0) || undefined,
+    // rippled currently does not provide "expiration" in account_offers
+    expirationTime: utils.parseTimestamp(order.expiration)
   });
 
   const properties = {

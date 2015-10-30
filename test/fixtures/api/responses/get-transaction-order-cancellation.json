@@ -25,15 +25,15 @@
           "quantity": {
             "currency": "USD",
             "counterparty": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q",
-            "value": "0"
+            "value": "237"
           },
           "totalPrice": {
             "currency": "XRP",
-            "value": "0"
+            "value": "0.0002"
           },
           "makerExchangeRate": "1185000",
           "sequence": 465,
-          "status": "canceled"
+          "status": "cancelled"
         }
       ]
     },

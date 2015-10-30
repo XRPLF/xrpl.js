@@ -198,6 +198,9 @@ module.exports = function(port) {
       conn.send(createResponse(request, fixtures.tx.NotValidated));
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
       conn.send(createResponse(request, fixtures.tx.NotFound));
+    } else if (request.transaction ===
+        '097B9491CC76B64831F1FEA82EAA93BCD728106D90B65A072C933888E946C40B') {
+      conn.send(createResponse(request, fixtures.tx.OfferWithExpiration));
     } else {
       assert(false, 'Unrecognized transaction hash: ' + request.transaction);
     }
