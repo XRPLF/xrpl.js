@@ -3,12 +3,12 @@ const _ = require('lodash');
 const assert = require('assert');
 const WebSocketServer = require('ws').Server;
 const EventEmitter2 = require('eventemitter2').EventEmitter2;
-const fixtures = require('./fixtures/api/rippled');
+const fixtures = require('./fixtures/rippled');
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
-const transactionsResponse = require('./fixtures/api/rippled/account-tx');
-const accountLinesResponse = require('./fixtures/api/rippled/account-lines');
-const fullLedger = require('./fixtures/ledger-full-38129.json');
+const transactionsResponse = require('./fixtures/rippled/account-tx');
+const accountLinesResponse = require('./fixtures/rippled/account-lines');
+const fullLedger = require('./fixtures/rippled/ledger-full-38129.json');
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';

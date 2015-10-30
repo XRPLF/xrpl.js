@@ -1,9 +1,0 @@
-sudo: false       # use faster docker containers
-language: node_js
-node_js:
-  - "0.12"
-before_script:
-  - sh -c "git log | head -12"
-script: bin/ci.sh
-notifications:
-  email: false
