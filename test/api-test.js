@@ -822,7 +822,7 @@ describe('RippleAPI', function() {
     it('schema not found error', function() {
       assert.throws(function() {
         schemaValidator.schemaValidate('unexisting', 'anything');
-      }, /schema not found/);
+      }, /no schema/);
     });
 
   });
