@@ -24,18 +24,22 @@ const payment = {
   }
 };
 
+function quit(message) {
+  console.log(message);
+  process.exit(0);
+}
+
+function fail(message) {
+  console.error(message);
+  process.exit(1);
+}
+
 api.connect().then(() => {
   console.log('Connected...');
-  api.preparePayment(address, payment, instructions).then(txJSON => {
+  return api.preparePayment(address, payment, instructions).then(prepared => {
     console.log('Payment transaction prepared...');
-    const signedTransaction = api.sign(txJSON, secret).signedTransaction;
+    const {signedTransaction} = api.sign(prepared.txJSON, secret);
     console.log('Payment transaction signed...');
-    api.submit(signedTransaction).then(response => {
-      console.log(response);
-      process.exit(0);
-    }).catch(error => {
-      console.log(error);
-      process.exit(1);
-    });
+    api.submit(signedTransaction).then(quit, fail);
   });
-});
+}).catch(fail);
