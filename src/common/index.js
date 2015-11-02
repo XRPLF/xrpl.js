@@ -16,6 +16,6 @@ module.exports = {
   removeUndefined: utils.removeUndefined,
   convertKeysFromSnakeCaseToCamelCase:
     utils.convertKeysFromSnakeCaseToCamelCase,
-  rippleToUnixTimestamp: utils.rippleToUnixTimestamp,
-  unixToRippleTimestamp: utils.unixToRippleTimestamp
+  iso8601ToRippleTime: utils.iso8601ToRippleTime,
+  rippleTimeToISO8601: utils.rippleTimeToISO8601
 };

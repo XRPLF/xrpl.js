@@ -28,17 +28,13 @@ function getFee(): Promise<number> {
   return common.serverInfo.getFee(this.connection, cushion);
 }
 
-function rippleTimeToISO8601(rippleTime: string): string {
-  return new Date(common.rippleToUnixTimestamp(rippleTime)).toISOString();
-}
-
 function formatLedgerClose(ledgerClose: Object): Object {
   return {
     feeBase: ledgerClose.fee_base,
     feeReference: ledgerClose.fee_ref,
     ledgerHash: ledgerClose.ledger_hash,
     ledgerVersion: ledgerClose.ledger_index,
-    ledgerTimestamp: rippleTimeToISO8601(ledgerClose.ledger_time),
+    ledgerTimestamp: common.rippleTimeToISO8601(ledgerClose.ledger_time),
     reserveBase: ledgerClose.reserve_base,
     reserveIncrement: ledgerClose.reserve_inc,
     transactionCount: ledgerClose.txn_count,

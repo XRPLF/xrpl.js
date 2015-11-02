@@ -31,8 +31,8 @@ function parseSuspendedPaymentCreation(tx: Object): Object {
     destination: utils.removeUndefined(destination),
     memos: utils.parseMemos(tx),
     digest: tx.Digest,
-    allowCancelAfter: tx.CancelAfter,
-    allowExecuteAfter: tx.FinishAfter
+    allowCancelAfter: utils.parseTimestamp(tx.CancelAfter),
+    allowExecuteAfter: utils.parseTimestamp(tx.FinishAfter)
   });
 }
 

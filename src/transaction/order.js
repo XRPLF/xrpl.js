@@ -1,9 +1,8 @@
 /* @flow */
 'use strict';
 const utils = require('./utils');
-const validate = utils.common.validate;
 const offerFlags = utils.common.txFlags.OfferCreate;
-const unixToRippleTimestamp = utils.common.unixToRippleTimestamp;
+const {validate, iso8601ToRippleTime} = utils.common;
 import type {Instructions, Prepare} from './types.js';
 import type {Order} from '../ledger/transaction-types.js';
 
@@ -36,7 +35,7 @@ function createOrderTransaction(account: string, order: Order): Object {
     txJSON.Flags |= offerFlags.FillOrKill;
   }
   if (order.expirationTime !== undefined) {
-    txJSON.Expiration = unixToRippleTimestamp(Date.parse(order.expirationTime));
+    txJSON.Expiration = iso8601ToRippleTime(order.expirationTime);
   }
   return txJSON;
 }
