@@ -2,7 +2,7 @@
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
-const {validate, unixToRippleTimestamp, toRippledAmount} = utils.common;
+const {validate, iso8601ToRippleTime, toRippledAmount} = utils.common;
 import type {Instructions, Prepare} from './types.js';
 import type {Adjustment, MaxAdjustment, Memo} from '../common/types.js';
 
@@ -11,8 +11,8 @@ type SuspendedPaymentCreation = {
   destination: Adjustment,
   memos?: Array<Memo>,
   digest?: string,
-  allowCancelAfter?: number,
-  allowExecuteAfter?: number
+  allowCancelAfter?: string,
+  allowExecuteAfter?: string
 }
 
 function createSuspendedPaymentCreationTransaction(account: string,
@@ -32,10 +32,10 @@ function createSuspendedPaymentCreationTransaction(account: string,
     txJSON.Digest = payment.digest;
   }
   if (payment.allowCancelAfter !== undefined) {
-    txJSON.CancelAfter = unixToRippleTimestamp(payment.allowCancelAfter);
+    txJSON.CancelAfter = iso8601ToRippleTime(payment.allowCancelAfter);
   }
   if (payment.allowExecuteAfter !== undefined) {
-    txJSON.FinishAfter = unixToRippleTimestamp(payment.allowExecuteAfter);
+    txJSON.FinishAfter = iso8601ToRippleTime(payment.allowExecuteAfter);
   }
   if (payment.source.tag !== undefined) {
     txJSON.SourceTag = payment.source.tag;

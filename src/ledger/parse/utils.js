@@ -3,7 +3,6 @@
 const _ = require('lodash');
 const transactionParser = require('ripple-lib-transactionparser');
 const utils = require('../utils');
-const rippleToUnixTimestamp = utils.common.rippleToUnixTimestamp;
 const BigNumber = require('bignumber.js');
 
 function adjustQualityForXRP(
@@ -18,9 +17,8 @@ function adjustQualityForXRP(
     (new BigNumber(quality)).shift(shift).toString();
 }
 
-function parseTimestamp(date: number): string | void {
-  return date ? (new Date(rippleToUnixTimestamp(date))).toISOString()
-    : undefined;
+function parseTimestamp(rippleTime: number): string | void {
+  return rippleTime ? utils.common.rippleTimeToISO8601(rippleTime) : undefined;
 }
 
 function removeEmptyCounterparty(amount) {
@@ -90,5 +88,6 @@ module.exports = {
   dropsToXrp: utils.common.dropsToXrp,
   constants: utils.common.constants,
   txFlags: utils.common.txFlags,
-  removeUndefined: utils.common.removeUndefined
+  removeUndefined: utils.common.removeUndefined,
+  rippleTimeToISO8601: utils.common.rippleTimeToISO8601
 };

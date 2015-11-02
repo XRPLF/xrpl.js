@@ -75,11 +75,16 @@ function rippleToUnixTimestamp(rpepoch: number): number {
  * @param {Number|Date} timestamp (ms since unix epoch)
  * @return {Number} seconds since ripple epoch ( 1/1/2000 GMT)
  */
-function unixToRippleTimestamp(timestamp: number | Date): number {
-  const timestamp_ = timestamp instanceof Date ?
-                     timestamp.getTime() :
-                     timestamp;
-  return Math.round(timestamp_ / 1000) - 0x386D4380;
+function unixToRippleTimestamp(timestamp: number): number {
+  return Math.round(timestamp / 1000) - 0x386D4380;
+}
+
+function rippleTimeToISO8601(rippleTime: number): string {
+  return new Date(rippleToUnixTimestamp(rippleTime)).toISOString();
+}
+
+function iso8601ToRippleTime(iso8601: string): number {
+  return unixToRippleTimestamp(Date.parse(iso8601));
 }
 
 module.exports = {
@@ -90,6 +95,6 @@ module.exports = {
   generateAddressAPI,
   convertKeysFromSnakeCaseToCamelCase,
   removeUndefined,
-  rippleToUnixTimestamp,
-  unixToRippleTimestamp
+  rippleTimeToISO8601,
+  iso8601ToRippleTime
 };
