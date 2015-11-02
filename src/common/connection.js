@@ -4,7 +4,7 @@ const WebSocket = require('ws');
 const parseURL = require('url').parse;
 const RangeSet = require('./rangeset').RangeSet;
 const {RippledError, DisconnectedError, NotConnectedError,
-  TimeoutError, ResponseFormatError} = require('./errors');
+  TimeoutError, ResponseFormatError, ConnectionError} = require('./errors');
 
 function isStreamMessageType(type) {
   return type === 'ledgerClosed' ||
@@ -115,6 +115,10 @@ class Connection extends EventEmitter {
 
   connect() {
     return new Promise((resolve, reject) => {
+      if (!this._url) {
+        reject(new ConnectionError(
+          'Cannot connect because no server was specified'));
+      }
       if (this._state === WebSocket.OPEN) {
         resolve();
       } else if (this._state === WebSocket.CONNECTING) {

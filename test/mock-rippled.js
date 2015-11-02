@@ -282,8 +282,7 @@ module.exports = function(port) {
       assert(false, 'Unrecognized path find request: '
              + JSON.stringify(request));
     }
-    // delay response to simulate calculation time so we can test queuing
-    setTimeout(() => conn.send(response), 20);
+    conn.send(response);
   });
 
   mock.on('request_gateway_balances', function(request, conn) {

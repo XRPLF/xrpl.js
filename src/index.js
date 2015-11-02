@@ -76,10 +76,10 @@ class RippleAPI extends EventEmitter {
   constructor(options: APIOptions = {}) {
     common.validate.apiOptions(options);
     super();
+    this._feeCushion = options.feeCushion || 1.2;
     if (options.servers !== undefined) {
       const servers: Array<string> = options.servers;
       if (servers.length === 1) {
-        this._feeCushion = options.feeCushion || 1.2;
         this.connection = new RestrictedConnection(servers[0], options);
         this.connection.on('ledgerClosed', message => {
           this.emit('ledgerClosed', server.formatLedgerClose(message));
@@ -90,6 +90,10 @@ class RippleAPI extends EventEmitter {
       } else {
         throw new errors.RippleError('Multi-server not implemented');
       }
+    } else {
+      // use null object pattern to provide better error message if user
+      // tries to call a method that requires a connection
+      this.connection = new RestrictedConnection(null, options);
     }
   }
 }

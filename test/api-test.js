@@ -884,6 +884,15 @@ describe('RippleAPI - offline', function() {
     });
   });
 
+  it('getServerInfo - offline', function() {
+    const api = new RippleAPI();
+    return api.getServerInfo().then(() => {
+      assert(false, 'Should throw error');
+    }).catch(error => {
+      assert(error instanceof api.errors.NotConnectedError);
+    });
+  });
+
   it('computeLedgerHash', function() {
     const api = new RippleAPI();
     const header = requests.computeLedgerHash.header;
