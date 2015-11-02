@@ -6,7 +6,7 @@
   "properties": {
     "feeBase": {"type": "integer", "minimum": 0},
     "feeReference": {"type": "integer", "minimum": 0},
-    "ledgerHash": {"$ref": "ledgerHash"},
+    "ledgerHash": {"$ref": "hash256"},
     "ledgerVersion": {"$ref": "ledgerVersion"},
     "ledgerTimestamp": {"type": "string", "format": "date-time"},
     "reserveBase": {"type": "integer", "minimum": 0},

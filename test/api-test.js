@@ -5,14 +5,14 @@ const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
 const RippleAPI = require('ripple-api').RippleAPI;
 const validate = RippleAPI._PRIVATE.validate;
-const fixtures = require('./fixtures/api');
+const fixtures = require('./fixtures');
 const requests = fixtures.requests;
 const responses = fixtures.responses;
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
 const address = addresses.ACCOUNT;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
-const ledgerClosed = require('./fixtures/api/rippled/ledger-close-newer');
+const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 
 const orderbook = {
@@ -822,7 +822,7 @@ describe('RippleAPI', function() {
     it('schema not found error', function() {
       assert.throws(function() {
         schemaValidator.schemaValidate('unexisting', 'anything');
-      }, /schema not found/);
+      }, /no schema/);
     });
 
   });

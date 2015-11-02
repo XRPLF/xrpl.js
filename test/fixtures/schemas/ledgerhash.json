@@ -1,7 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "ledgerhash",
-  "description": "A ledger hash",
-  "type": "string",
-  "pattern": "^[A-F0-9]{64}$"
-}

@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 'use strict';
 const _ = require('lodash');
-const hashes = require('../../hashes');
-const addresses = require('../../addresses');
+const hashes = require('../hashes');
+const addresses = require('../addresses');
 const AccountSet = require('./tx/account-set.json');
 const NotFound = require('./tx/not-found.json');
 const binary = require('ripple-binary-codec');
