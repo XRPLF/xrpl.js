@@ -34,7 +34,8 @@ function parseAccountOrder(address: string, order: Object): Object {
   const properties = {
     maker: address,
     sequence: order.seq,
-    makerExchangeRate: computeQuality(takerGetsAmount, takerPaysAmount)
+    makerExchangeRate: order.quality ? order.quality.toString()
+      : computeQuality(takerGetsAmount, takerPaysAmount)
   };
 
   return {specification, properties};
