@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getSettingsParameters",
+  "description": "Parameters for getSettings and getAccountInfo",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "options": {
+      "properties": {
+        "ledgerVersion": {"$ref": "ledgerVersion"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["address"],
+  "additionalProperties": false
+}

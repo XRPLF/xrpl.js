@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getOrderbookParameters",
+  "description": "Parameters for getOrderbook",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "Address of an account to use as point-of-view. (This affects which unfunded offers are returned.)"
+    },
+    "orderbook": {"$ref": "orderbook"},
+    "options": {
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ledgerVersion": {"$ref": "ledgerVersion"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["address", "orderbook"],
+  "additionalProperties": false
+}

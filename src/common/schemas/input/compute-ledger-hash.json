@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "computeLedgerHashParameters",
+  "type": "object",
+  "properties": {
+    "ledger": {"$ref": "getLedger"}
+  },
+  "additionalProperties": false,
+  "required": ["ledger"]
+}

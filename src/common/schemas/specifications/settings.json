@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "settings",
+  "link": "settings-specification",
   "allOf": [
     {
       "$ref": "getSettings"

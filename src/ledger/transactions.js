@@ -163,10 +163,9 @@ function getTransactionsInternal(connection: Connection, address: string,
   return utils.getRecursive(getter, options.limit).then(format);
 }
 
-function getTransactions(account: string, options: TransactionsOptions = {}
+function getTransactions(address: string, options: TransactionsOptions = {}
 ): Promise<GetTransactionsResponse> {
-  validate.address(account);
-  validate.getTransactionsOptions(options);
+  validate.getTransactions({address, options});
 
   const defaults = {maxLedgerVersion: -1};
   if (options.start) {
@@ -175,11 +174,11 @@ function getTransactions(account: string, options: TransactionsOptions = {}
       const bound = options.earliestFirst ?
         {minLedgerVersion: ledgerVersion} : {maxLedgerVersion: ledgerVersion};
       const newOptions = _.assign(defaults, options, {startTx: tx}, bound);
-      return getTransactionsInternal(this.connection, account, newOptions);
+      return getTransactionsInternal(this.connection, address, newOptions);
     });
   }
   const newOptions = _.assign(defaults, options);
-  return getTransactionsInternal(this.connection, account, newOptions);
+  return getTransactionsInternal(this.connection, address, newOptions);
 }
 
 module.exports = getTransactions;

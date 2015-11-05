@@ -10,6 +10,6 @@
     "address": {"$ref": "address"},
     "sequence": {"$ref": "sequence"}
   },
-  "required": ["type", "id", "address", "sequence", "specification"],
+  "required": ["type", "id", "address", "sequence", "specification", "outcome"],
   "additionalProperties": false
 }

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "preparePaymentParameters",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "payment": {"$ref": "payment"},
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "payment"]
+}

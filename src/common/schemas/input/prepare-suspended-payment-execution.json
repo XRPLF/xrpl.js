@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "prepareSuspendedPaymentExecutionParameters",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "suspendedPaymentExecution": {"$ref": "suspendedPaymentExecution"},
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "suspendedPaymentExecution"]
+}

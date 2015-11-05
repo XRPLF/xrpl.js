@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "submitParameters",
+  "type": "object",
+  "properties": {
+    "txBlob": {"$ref": "blob"}
+  },
+  "additionalProperties": false,
+  "required": ["txBlob"]
+}

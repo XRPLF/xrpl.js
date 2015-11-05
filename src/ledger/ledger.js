@@ -14,7 +14,7 @@ type LedgerOptions = {
 
 
 function getLedger(options: LedgerOptions = {}): Promise<GetLedger> {
-  validate.getLedgerOptions(options);
+  validate.getLedger({options});
 
   const request = {
     command: 'ledger',

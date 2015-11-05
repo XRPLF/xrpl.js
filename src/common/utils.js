@@ -4,8 +4,18 @@ const _ = require('lodash');
 const BigNumber = require('bignumber.js');
 const errors = require('./errors');
 const keypairs = require('ripple-keypairs');
+const {deriveKeypair} = require('ripple-keypairs');
 
 import type {Amount, RippledAmount} from './types.js';
+
+function isValidSecret(secret: string): boolean {
+  try {
+    deriveKeypair(secret);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
 
 function dropsToXrp(drops: string): string {
   return (new BigNumber(drops)).dividedBy(1000000.0).toString();
@@ -96,5 +106,6 @@ module.exports = {
   convertKeysFromSnakeCaseToCamelCase,
   removeUndefined,
   rippleTimeToISO8601,
-  iso8601ToRippleTime
+  iso8601ToRippleTime,
+  isValidSecret
 };

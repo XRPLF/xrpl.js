@@ -7,6 +7,7 @@
       "build_version": "0.24.0-rc1",
       "complete_ledgers": "32570-6595042",
       "hostid": "ARTS",
+      "io_latency_ms": 1,
       "last_close": {
         "converge_time_s": 2.007,
         "proposers": 4

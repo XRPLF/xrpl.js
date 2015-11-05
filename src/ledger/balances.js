@@ -48,16 +48,15 @@ function getLedgerVersionHelper(connection: Connection, optionValue?: number
   return connection.getLedgerVersion();
 }
 
-function getBalances(account: string, options: TrustlinesOptions = {}
+function getBalances(address: string, options: TrustlinesOptions = {}
 ): Promise<GetBalances> {
-  validate.address(account);
-  validate.getBalancesOptions(options);
+  validate.getTrustlines({address, options});
 
   return Promise.all([
     getLedgerVersionHelper(this.connection, options.ledgerVersion).then(
       ledgerVersion =>
-        utils.getXRPBalance(this.connection, account, ledgerVersion)),
-    this.getTrustlines(account, options)
+        utils.getXRPBalance(this.connection, address, ledgerVersion)),
+    this.getTrustlines(address, options)
   ]).then(results =>
     formatBalances(options, {xrp: results[0], trustlines: results[1]}));
 }

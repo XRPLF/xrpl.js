@@ -48,14 +48,13 @@ function formatSettings(response) {
   return _.assign({}, parsedFlags, parsedFields);
 }
 
-function getSettings(account: string, options: SettingsOptions = {}
+function getSettings(address: string, options: SettingsOptions = {}
 ): Promise<GetSettings> {
-  validate.address(account);
-  validate.getSettingsOptions(options);
+  validate.getSettings({address, options});
 
   const request = {
     command: 'account_info',
-    account: account,
+    account: address,
     ledger_index: options.ledgerVersion || 'validated'
   };
 

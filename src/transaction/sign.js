@@ -13,12 +13,11 @@ function computeSignature(txJSON, privateKey) {
 
 function sign(txJSON: string, secret: string
 ): {signedTransaction: string; id: string} {
-  const tx = JSON.parse(txJSON);
-  validate.txJSON(tx);
+  validate.sign({txJSON, secret});
   // we can't validate that the secret matches the account because
   // the secret could correspond to the regular key
-  validate.secret(secret);
 
+  const tx = JSON.parse(txJSON);
   const keypair = keypairs.deriveKeypair(secret);
   if (tx.SigningPubKey === undefined) {
     tx.SigningPubKey = keypair.publicKey;

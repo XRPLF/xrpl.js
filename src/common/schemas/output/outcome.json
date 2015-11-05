@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "outcome",
   "type": "object",
+  "link": "transaction-outcome",
   "properties": {
     "result": {"type": "string"},
     "timestamp": {"type": "string", "format": "date-time"},

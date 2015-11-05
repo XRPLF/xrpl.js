@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "prepareTrustlineParameters",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "trustline": {"$ref": "trustline"},
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "trustline"]
+}

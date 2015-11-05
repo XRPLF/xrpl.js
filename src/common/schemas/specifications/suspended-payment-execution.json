@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "suspended-payment-cancellation",
+  "title": "suspendedPaymentExecution",
+  "link": "suspended-payment-execution-specification",
   "type": "object",
   "properties": {
     "memos": {
@@ -10,7 +11,10 @@
       }
     },
     "owner": {"$ref": "address"},
-    "paymentSequence": {"$ref": "uint32"}
+    "paymentSequence": {"$ref": "uint32"},
+    "method": {"type": "integer", "minimum": 0, "maximum": 255},
+    "digest": {"$ref": "hash256"},
+    "proof": {"type": "string"}
   },
   "required": ["owner", "paymentSequence"],
   "additionalProperties": false

@@ -49,8 +49,7 @@ function formatBalanceSheet(balanceSheet): GetBalanceSheet {
 
 function getBalanceSheet(address: string, options: BalanceSheetOptions = {}
 ): Promise<GetBalanceSheet> {
-  validate.address(address);
-  validate.getBalanceSheetOptions(options);
+  validate.getBalanceSheet({address, options});
 
   return utils.ensureLedgerVersion.call(this, options).then(_options => {
     const request = {

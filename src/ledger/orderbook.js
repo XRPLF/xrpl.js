@@ -91,14 +91,12 @@ function formatBidsAndAsks(orderbook: Orderbook, offers) {
   return {bids, asks};
 }
 
-function getOrderbook(account: string, orderbook: Orderbook,
+function getOrderbook(address: string, orderbook: Orderbook,
     options: OrdersOptions = {}
 ): Promise<GetOrderbook> {
-  validate.address(account);
-  validate.orderbook(orderbook);
-  validate.getOrderbookOptions(options);
+  validate.getOrderbook({address, orderbook, options});
 
-  const getter = _.partial(getBookOffers, this.connection, account,
+  const getter = _.partial(getBookOffers, this.connection, address,
     options.ledgerVersion, options.limit);
   const getOffers = _.partial(getter, orderbook.base, orderbook.counter);
   const getReverseOffers = _.partial(getter, orderbook.counter, orderbook.base);

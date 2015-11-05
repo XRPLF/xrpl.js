@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "prepareOrderParameters",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "order": {"$ref": "order"},
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "order"]
+}

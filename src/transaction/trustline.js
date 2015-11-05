@@ -15,9 +15,6 @@ function convertQuality(quality) {
 function createTrustlineTransaction(account: string,
     trustline: TrustLineSpecification
 ): Object {
-  validate.address(account);
-  validate.trustline(trustline);
-
   const limit = {
     currency: trustline.currency,
     issuer: trustline.counterparty,
@@ -50,10 +47,11 @@ function createTrustlineTransaction(account: string,
   return txJSON;
 }
 
-function prepareTrustline(account: string,
+function prepareTrustline(address: string,
     trustline: TrustLineSpecification, instructions: Instructions = {}
 ): Promise<Prepare> {
-  const txJSON = createTrustlineTransaction(account, trustline);
+  validate.prepareTrustline({address, trustline, instructions});
+  const txJSON = createTrustlineTransaction(address, trustline);
   return utils.prepareTransaction(txJSON, this, instructions);
 }
 

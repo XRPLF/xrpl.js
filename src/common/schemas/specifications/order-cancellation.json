@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "orderCancellation",
+  "link": "order-cancellation-specification",
   "type": "object",
   "properties": {
     "orderSequence": {"$ref": "sequence"}

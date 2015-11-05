@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "suspended-payment-creation",
+  "title": "suspendedPaymentCreation",
+  "link": "suspended-payment-creation-specification",
   "type": "object",
   "properties": {
     "source": {"$ref": "maxAdjustment"},

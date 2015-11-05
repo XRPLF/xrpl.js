@@ -71,9 +71,6 @@ function convertTransferRate(transferRate: number | string): number | string {
 
 function createSettingsTransaction(account: string, settings: Settings
 ): Object {
-  validate.address(account);
-  validate.settings(settings);
-
   if (settings.regularKey) {
     return {
       TransactionType: 'SetRegularKey',
@@ -95,10 +92,11 @@ function createSettingsTransaction(account: string, settings: Settings
   return txJSON;
 }
 
-function prepareSettings(account: string, settings: Settings,
+function prepareSettings(address: string, settings: Settings,
     instructions: Instructions = {}
 ): Promise<Prepare> {
-  const txJSON = createSettingsTransaction(account, settings);
+  validate.prepareSettings({address, settings, instructions});
+  const txJSON = createSettingsTransaction(address, settings);
   return utils.prepareTransaction(txJSON, this, instructions);
 }
 

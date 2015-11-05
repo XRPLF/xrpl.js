@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getPathsParameters",
+  "type": "object",
+  "properties": {
+    "pathfind": {
+      "properties": {
+        "source": {
+          "type": "object",
+          "properties": {
+            "address": {"$ref": "address"},
+            "amount": {"$ref": "laxAmount"},
+            "currencies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "currency": {"$ref": "currency"},
+                  "counterparty": {"$ref": "address"}
+                },
+                "required": ["currency"],
+                "additionalProperties": false
+              },
+              "uniqueItems": true
+            }
+          },
+          "not": {
+            "required": ["amount", "currencies"]
+          },
+          "additionalProperties": false,
+          "required": ["address"]
+        },
+        "destination": {
+          "type": "object",
+          "properties": {
+            "address": {"$ref": "address"},
+            "amount": {"$ref": "laxLaxAmount"}
+          },
+          "required": ["address", "amount"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["source", "destination"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": ["pathfind"]
+}

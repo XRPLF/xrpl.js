@@ -7,9 +7,6 @@ import type {Instructions, Prepare} from './types.js';
 function createOrderCancellationTransaction(account: string,
     sequence: number
 ): Object {
-  validate.address(account);
-  validate.sequence(sequence);
-
   return {
     TransactionType: 'OfferCancel',
     Account: account,
@@ -17,10 +14,11 @@ function createOrderCancellationTransaction(account: string,
   };
 }
 
-function prepareOrderCancellation(account: string, sequence: number,
+function prepareOrderCancellation(address: string, sequence: number,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  const txJSON = createOrderCancellationTransaction(account, sequence);
+  validate.prepareOrderCancellation({address, sequence, instructions});
+  const txJSON = createOrderCancellationTransaction(address, sequence);
   return utils.prepareTransaction(txJSON, this, instructions);
 }
 
