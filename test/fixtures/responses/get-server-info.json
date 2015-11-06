@@ -2,6 +2,7 @@
   "buildVersion": "0.24.0-rc1",
   "completeLedgers": "32570-6595042",
   "hostid": "ARTS",
+  "ioLatencyMs": 1,
   "lastClose": {
     "convergeTimeS": 2.007,
     "proposers": 4

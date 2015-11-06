@@ -65,12 +65,14 @@ function createMaximalAmount(amount: Amount): Amount {
   return _.assign(amount, {value: maxValue});
 }
 
-function createPaymentTransaction(account: string, paymentArgument: Payment
+function createPaymentTransaction(address: string, paymentArgument: Payment
 ): Object {
   const payment = _.cloneDeep(paymentArgument);
   applyAnyCounterpartyEncoding(payment);
-  validate.address(account);
-  validate.payment(payment);
+
+  if (address !== payment.source.address) {
+    throw new ValidationError('address must match payment.source.address');
+  }
 
   if ((payment.source.maxAmount && payment.destination.minAmount) ||
       (payment.source.amount && payment.destination.amount)) {
@@ -141,10 +143,11 @@ function createPaymentTransaction(account: string, paymentArgument: Payment
   return txJSON;
 }
 
-function preparePayment(account: string, payment: Payment,
-    instructions: Instructions
+function preparePayment(address: string, payment: Payment,
+    instructions: Instructions = {}
 ): Promise<Prepare> {
-  const txJSON = createPaymentTransaction(account, payment);
+  validate.preparePayment({address, payment, instructions});
+  const txJSON = createPaymentTransaction(address, payment);
   return utils.prepareTransaction(txJSON, this, instructions);
 }
 

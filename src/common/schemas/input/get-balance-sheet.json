@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getBalanceSheetParameters",
+  "description": "Parameters for getBalanceSheet",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "options": {
+      "properties": {
+        "excludeAddresses": {
+          "type": "array",
+          "items": {"$ref": "address"},
+          "uniqueItems": true
+        },
+        "ledgerVersion": {"$ref": "ledgerVersion"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": ["address"]
+}

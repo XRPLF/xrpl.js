@@ -31,7 +31,7 @@ function formatResponse(response) {
 }
 
 function submit(txBlob: string): Promise<Submit> {
-  validate.blob(txBlob);
+  validate.submit({txBlob});
   const request = {
     command: 'submit',
     tx_blob: txBlob

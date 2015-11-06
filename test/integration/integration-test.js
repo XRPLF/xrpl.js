@@ -4,10 +4,11 @@
 const _ = require('lodash');
 const assert = require('assert');
 const errors = require('../../src/common/errors');
-const validate = require('../../src/common').validate;
 const wallet = require('./wallet');
 const requests = require('../fixtures/requests');
 const RippleAPI = require('../../src').RippleAPI;
+const {isValidAddress} = require('ripple-address-codec');
+const {isValidSecret} = require('../../src/common');
 
 
 const TIMEOUT = 30000;   // how long before each test case times out
@@ -292,8 +293,8 @@ describe('integration tests', function() {
   it('generateWallet', function() {
     const newWallet = this.api.generateAddress();
     assert(newWallet && newWallet.address && newWallet.secret);
-    validate.address(newWallet.address);
-    validate.secret(newWallet.secret);
+    assert(isValidAddress(newWallet.address));
+    assert(isValidSecret(newWallet.secret));
   });
 
 });

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "prepareOrderCancellationParameters",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "sequence": {"$ref": "sequence"},
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "sequence"]
+}

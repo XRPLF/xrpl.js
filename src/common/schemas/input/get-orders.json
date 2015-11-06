@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getOrdersParameters",
+  "description": "Parameters for getOrders",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "options": {
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ledgerVersion": {"$ref": "ledgerVersion"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["address"],
+  "additionalProperties": false
+}

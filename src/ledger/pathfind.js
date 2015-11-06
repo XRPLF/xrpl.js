@@ -111,7 +111,7 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
 }
 
 function getPaths(pathfind: PathFind): Promise<GetPaths> {
-  validate.pathfind(pathfind);
+  validate.getPaths({pathfind});
 
   const address = pathfind.source.address;
   return requestPathFind(this.connection, pathfind).then(paths =>

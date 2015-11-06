@@ -834,26 +834,32 @@ describe('RippleAPI', function() {
         minLedgerVersion: 20000,
         maxLedgerVersion: 10000
       };
-      assert.throws(_.partial(validate.getTransactionsOptions, options),
-        this.api.errors.ValidationError);
-      assert.throws(_.partial(validate.getTransactionsOptions, options),
+      const thunk = _.partial(validate.getTransactions,
+        {address, options});
+      assert.throws(thunk, this.api.errors.ValidationError);
+      assert.throws(thunk,
         /minLedgerVersion must not be greater than maxLedgerVersion/);
     });
 
     it('secret', function() {
-      assert.doesNotThrow(_.partial(validate.secret,
+      function validateSecret(secret) {
+        validate.sign({txJSON: '', secret});
+      }
+      assert.doesNotThrow(_.partial(validateSecret,
         'shzjfakiK79YQdMjy4h8cGGfQSV6u'));
-      assert.throws(_.partial(validate.secret, 1),
-        /Invalid parameter/);
-      assert.throws(_.partial(validate.secret, ''),
+      assert.throws(_.partial(validateSecret,
+        'shzjfakiK79YQdMjy4h8cGGfQSV6v'), this.api.errors.ValidationError);
+      assert.throws(_.partial(validateSecret, 1),
         this.api.errors.ValidationError);
-      assert.throws(_.partial(validate.secret, 's!!!'),
+      assert.throws(_.partial(validateSecret, ''),
         this.api.errors.ValidationError);
-      assert.throws(_.partial(validate.secret, 'passphrase'),
+      assert.throws(_.partial(validateSecret, 's!!!'),
+        this.api.errors.ValidationError);
+      assert.throws(_.partial(validateSecret, 'passphrase'),
         this.api.errors.ValidationError);
       // 32 0s is a valid hex repr of seed bytes
       const hex = new Array(33).join('0');
-      assert.throws(_.partial(validate.secret, hex),
+      assert.throws(_.partial(validateSecret, hex),
         this.api.errors.ValidationError);
     });
 

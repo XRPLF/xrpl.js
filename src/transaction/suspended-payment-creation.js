@@ -18,9 +18,6 @@ type SuspendedPaymentCreation = {
 function createSuspendedPaymentCreationTransaction(account: string,
     payment: SuspendedPaymentCreation
 ): Object {
-  validate.address(account);
-  validate.suspendedPaymentCreation(payment);
-
   const txJSON: Object = {
     TransactionType: 'SuspendedPaymentCreate',
     Account: account,
@@ -49,10 +46,14 @@ function createSuspendedPaymentCreationTransaction(account: string,
   return txJSON;
 }
 
-function prepareSuspendedPaymentCreation(account: string,
-    payment: SuspendedPaymentCreation, instructions: Instructions = {}
+function prepareSuspendedPaymentCreation(address: string,
+  suspendedPaymentCreation: SuspendedPaymentCreation,
+  instructions: Instructions = {}
 ): Promise<Prepare> {
-  const txJSON = createSuspendedPaymentCreationTransaction(account, payment);
+  validate.prepareSuspendedPaymentCreation(
+    {address, suspendedPaymentCreation, instructions});
+  const txJSON = createSuspendedPaymentCreationTransaction(
+    address, suspendedPaymentCreation);
   return utils.prepareTransaction(txJSON, this, instructions);
 }
 

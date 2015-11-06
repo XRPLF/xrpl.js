@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getTransactionParameters",
+  "description": "Parameters for getTransaction",
+  "type": "object",
+  "properties": {
+    "identifier": {"$ref": "identifier"},
+    "options": {
+      "properties": {
+        "minLedgerVersion": {"$ref": "ledgerVersion"},
+        "maxLedgerVersion": {"$ref": "ledgerVersion"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": ["identifier"]
+}

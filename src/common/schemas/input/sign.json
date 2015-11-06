@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "signParameters",
+  "type": "object",
+  "properties": {
+    "txJSON": {
+      "type": "string",
+      "description": "Transaction represented as a JSON string in rippled format."
+    },
+    "secret": {
+      "type": "string",
+      "format": "secret",
+      "description": "The secret of the account that is initiating the transaction."
+    }
+  },
+  "additionalProperties": false,
+  "required": ["txJSON", "secret"]
+}

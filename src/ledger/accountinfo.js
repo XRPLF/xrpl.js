@@ -50,14 +50,13 @@ function formatAccountInfo(response: AccountDataResponse) {
   });
 }
 
-function getAccountInfo(account: string, options: AccountInfoOptions = {}
+function getAccountInfo(address: string, options: AccountInfoOptions = {}
 ): Promise<AccountInfoResponse> {
-  validate.address(account);
-  validate.getAccountInfoOptions(options);
+  validate.getAccountInfo({address, options});
 
   const request = {
     command: 'account_info',
-    account: account,
+    account: address,
     ledger_index: options.ledgerVersion || 'validated'
   };
 

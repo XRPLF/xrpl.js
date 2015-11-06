@@ -38,13 +38,12 @@ function getAccountLines(connection: Connection, address: string,
   return connection.request(request).then(_.partial(formatResponse, options));
 }
 
-function getTrustlines(account: string, options: TrustlinesOptions = {}
+function getTrustlines(address: string, options: TrustlinesOptions = {}
 ): Promise<GetTrustlinesResponse> {
-  validate.address(account);
-  validate.getTrustlinesOptions(options);
+  validate.getTrustlines({address, options});
 
   return this.getLedgerVersion().then(ledgerVersion => {
-    const getter = _.partial(getAccountLines, this.connection, account,
+    const getter = _.partial(getAccountLines, this.connection, address,
       options.ledgerVersion || ledgerVersion, options);
     return utils.getRecursive(getter, options.limit);
   });

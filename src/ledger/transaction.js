@@ -78,8 +78,7 @@ function formatResponse(options: TransactionOptions, tx: TransactionType
 function getTransaction(identifier: string,
   options: TransactionOptions = {}
 ): Promise<TransactionType> {
-  validate.identifier(identifier);
-  validate.getTransactionOptions(options);
+  validate.getTransaction({identifier, options});
 
   const request = {
     command: 'tx',

@@ -26,13 +26,12 @@ function requestAccountOffers(connection: Connection, address: string,
   });
 }
 
-function getOrders(account: string, options: OrdersOptions = {}
+function getOrders(address: string, options: OrdersOptions = {}
 ): Promise<GetOrders> {
-  validate.address(account);
-  validate.getOrdersOptions(options);
+  validate.getOrders({address, options});
 
   return utils.ensureLedgerVersion.call(this, options).then(_options => {
-    const getter = _.partial(requestAccountOffers, this.connection, account,
+    const getter = _.partial(requestAccountOffers, this.connection, address,
                              _options.ledgerVersion);
     return utils.getRecursive(getter, _options.limit).then(orders =>
       _.sortBy(orders, (order) => order.properties.sequence));

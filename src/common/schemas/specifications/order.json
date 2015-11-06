@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "order",
+  "link": "order-specification",
   "type": "object",
   "properties": {
     "direction": {

@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "instructions",
+  "link": "transaction-instructions",
   "description": "Instructions for executing a transaction",
   "type": "object",
   "properties": {

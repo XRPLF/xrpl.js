@@ -7,9 +7,6 @@ import type {Instructions, Prepare} from './types.js';
 import type {Order} from '../ledger/transaction-types.js';
 
 function createOrderTransaction(account: string, order: Order): Object {
-  validate.address(account);
-  validate.order(order);
-
   const takerPays = utils.common.toRippledAmount(order.direction === 'buy' ?
     order.quantity : order.totalPrice);
   const takerGets = utils.common.toRippledAmount(order.direction === 'buy' ?
@@ -40,10 +37,11 @@ function createOrderTransaction(account: string, order: Order): Object {
   return txJSON;
 }
 
-function prepareOrder(account: string, order: Order,
+function prepareOrder(address: string, order: Order,
     instructions: Instructions = {}
 ): Promise<Prepare> {
-  const txJSON = createOrderTransaction(account, order);
+  validate.prepareOrder({address, order, instructions});
+  const txJSON = createOrderTransaction(address, order);
   return utils.prepareTransaction(txJSON, this, instructions);
 }
 

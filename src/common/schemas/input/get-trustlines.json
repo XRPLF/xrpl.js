@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getTrustlinesParameters",
+  "description": "Parameters for getTrustlines and getBalances",
+  "type": "object",
+  "properties": {
+    "address": {"$ref": "address"},
+    "options": {
+      "properties": {
+        "counterparty": {"$ref": "address"},
+        "currency": {"$ref": "currency"},
+        "limit": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ledgerVersion": {"$ref": "ledgerVersion"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": ["address"]
+}
