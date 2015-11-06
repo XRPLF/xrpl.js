@@ -3,8 +3,14 @@
   "title": "prepareOrderParameters",
   "type": "object",
   "properties": {
-    "address": {"$ref": "address"},
-    "order": {"$ref": "order"},
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that is creating the transaction."
+    },
+    "order": {
+      "$ref": "order",
+      "description": "The specification of the order to prepare."
+    },
     "instructions": {"$ref": "instructions"}
   },
   "additionalProperties": false,

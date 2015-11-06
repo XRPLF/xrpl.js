@@ -10,11 +10,11 @@
       "$ref": "signedValue"
     },
     "currency": {
-      "description": "The three-character code or hex string used to denote currencies",
+      "description": "The three-character code or hexadecimal string used to denote currencies",
       "$ref": "currency"
     },
     "counterparty": {
-      "description": "The Ripple account address of the currency's issuer or gateway",
+      "description": "The Ripple address of the account that owes or is owed the funds.",
       "$ref": "address"
     }
   },

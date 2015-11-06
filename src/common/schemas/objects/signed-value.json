@@ -3,5 +3,6 @@
   "title": "signedValue",
   "description": "A string representation of a floating point number",
   "type": "string",
+  "link": "value",
   "pattern": "^[-]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?$"
 }

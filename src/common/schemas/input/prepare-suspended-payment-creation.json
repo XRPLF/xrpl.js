@@ -3,8 +3,14 @@
   "title": "prepareSuspendedPaymentCreationParameters",
   "type": "object",
   "properties": {
-    "address": {"$ref": "address"},
-    "suspendedPaymentCreation": {"$ref": "suspendedPaymentCreation"},
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that is creating the transaction."
+    },
+    "suspendedPaymentCreation": {
+      "$ref": "suspendedPaymentCreation",
+      "description": "The specification of the suspended payment creation to prepare."
+    },
     "instructions": {"$ref": "instructions"}
   },
   "additionalProperties": false,

@@ -5,11 +5,24 @@
   "type": "object",
   "properties": {
     "options": {
+      "description": "Options affecting what ledger and how much data to return.",
       "properties": {
-        "ledgerVersion": {"$ref": "ledgerVersion"},
-        "includeAllData": {"type": "boolean"},
-        "includeTransactions": {"type": "boolean"},
-        "includeState": {"type": "boolean"}
+        "ledgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "Get ledger data for this historical ledger version."
+        },
+        "includeAllData": {
+          "type": "boolean",
+          "description": "Include full transactions and/or state information if `includeTransactions` and/or `includeState` is set."
+        },
+        "includeTransactions": {
+          "type": "boolean",
+          "description": "Return an array of hashes for each transaction or an array of all transactions that were validated in this ledger version, depending on whether `includeAllData` is set."
+        },
+        "includeState": {
+          "type": "boolean",
+          "description": "Return an array of hashes for all state data or an array of all state data in this ledger version, depending on whether `includeAllData` is set."
+        }
       },
       "additionalProperties": false
     }

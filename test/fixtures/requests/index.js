@@ -31,6 +31,7 @@ module.exports = {
     NoPathsWithCurrencies: require('./getpaths/no-paths-with-currencies'),
     sendAll: require('./getpaths/send-all')
   },
+  getOrderbook: require('./get-orderbook'),
   computeLedgerHash: {
     header: require('./compute-ledger-hash'),
     transactions: require('./compute-ledger-hash-transactions')

@@ -3,8 +3,11 @@
   "title": "submitParameters",
   "type": "object",
   "properties": {
-    "txBlob": {"$ref": "blob"}
+    "signedTransaction": {
+      "$ref": "blob",
+      "description": "A signed transaction as returned by [sign](#sign)."
+    }
   },
   "additionalProperties": false,
-  "required": ["txBlob"]
+  "required": ["signedTransaction"]
 }

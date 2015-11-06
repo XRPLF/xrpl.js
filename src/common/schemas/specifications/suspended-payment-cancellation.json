@@ -1,17 +1,18 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "suspendedPaymentCancellation",
-  "link": "suspended-payment-cancellation-specification",
+  "link": "suspended-payment-cancellation",
   "type": "object",
   "properties": {
-    "memos": {
-      "type": "array",
-      "items": {
-        "$ref": "memo"
-      }
+    "memos": {"$ref": "memos"},
+    "owner": {
+      "$ref": "address",
+      "description": "The address of the owner of the suspended payment to cancel."
     },
-    "owner": {"$ref": "address"},
-    "paymentSequence": {"$ref": "uint32"}
+    "paymentSequence": {
+      "$ref": "sequence",
+      "description": "The [account sequence number](#account-sequence-number) of the [Suspended Payment Creation](#suspended-payment-creation) transaction for the suspended payment to cancel."
+    }
   },
   "required": ["owner", "paymentSequence"],
   "additionalProperties": false

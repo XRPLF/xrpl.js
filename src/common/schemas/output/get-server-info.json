@@ -88,7 +88,7 @@
         },
         "hash": {
           "$ref": "hash256",
-          "description": "Unique hash for the ledger, as hex."
+          "description": "Unique hash for the ledger, as an uppercase hexadecimal string."
         },
         "reserveBaseXrp": {
           "type": "integer",

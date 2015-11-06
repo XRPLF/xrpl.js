@@ -1,20 +1,32 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "suspendedPaymentCreation",
-  "link": "suspended-payment-creation-specification",
+  "link": "suspended-payment-creation",
   "type": "object",
   "properties": {
-    "source": {"$ref": "maxAdjustment"},
-    "destination": {"$ref": "adjustment"},
-    "memos": {
-      "type": "array",
-      "items": {
-        "$ref": "memo"
-      }
+    "source": {
+      "$ref": "maxAdjustment",
+      "description": "Fields pertaining to the source of the payment."
     },
-    "digest": {"$ref": "hash256"},
-    "allowCancelAfter": {"type": "string", "format": "date-time"},
-    "allowExecuteAfter": {"type": "string", "format": "date-time"}
+    "destination": {
+      "$ref": "destinationExactAdjustment",
+      "description": "Fields pertaining to the destination of the payment."
+    },
+    "memos": {"$ref": "memos"},
+    "digest": {
+      "$ref": "hash256",
+      "description": "If present, proof is required upon execution."
+    },
+    "allowCancelAfter": {
+      "type": "string",
+      "format": "date-time",
+      "description": "If present, the suspended payment may be cancelled after this time."
+    },
+    "allowExecuteAfter": {
+      "type": "string",
+      "format": "date-time",
+      "description": "If present, the suspended payment can not be executed before this time."
+    }
   },
   "required": ["source", "destination"],
   "additionalProperties": false

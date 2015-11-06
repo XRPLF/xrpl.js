@@ -42,12 +42,12 @@ function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges) {
 }
 
 function parseOutcome(tx: Object): ?Object {
-  if (!tx.validated) {
+  const metadata = tx.meta || tx.metaData;
+  if (!metadata) {
     return undefined;
   }
-
-  const balanceChanges = transactionParser.parseBalanceChanges(tx.meta);
-  const orderbookChanges = transactionParser.parseOrderbookChanges(tx.meta);
+  const balanceChanges = transactionParser.parseBalanceChanges(metadata);
+  const orderbookChanges = transactionParser.parseOrderbookChanges(metadata);
   removeEmptyCounterpartyInBalanceChanges(balanceChanges);
   removeEmptyCounterpartyInOrderbookChanges(orderbookChanges);
 

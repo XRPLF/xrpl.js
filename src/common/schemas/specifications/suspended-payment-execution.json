@@ -1,20 +1,32 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "suspendedPaymentExecution",
-  "link": "suspended-payment-execution-specification",
+  "link": "suspended-payment-execution",
   "type": "object",
   "properties": {
-    "memos": {
-      "type": "array",
-      "items": {
-        "$ref": "memo"
-      }
+    "memos": {"$ref": "memos"},
+    "owner": {
+      "$ref": "address",
+      "description": "The address of the owner of the suspended payment to execute."
     },
-    "owner": {"$ref": "address"},
-    "paymentSequence": {"$ref": "uint32"},
-    "method": {"type": "integer", "minimum": 0, "maximum": 255},
-    "digest": {"$ref": "hash256"},
-    "proof": {"type": "string"}
+    "paymentSequence": {
+      "$ref": "sequence",
+      "description": "The [account sequence number](#account-sequence-number) of the [Suspended Payment Creation](#suspended-payment-creation) transaction for the suspended payment to execute."
+    },
+    "method": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "description": "The method for verifying the proof; only method `1` is supported."
+    },
+    "digest": {
+      "$ref": "hash256",
+      "description": "TODO"
+    },
+    "proof": {
+      "type": "string",
+      "description": "This value will be hashed to produce the digest."
+    }
   },
   "required": ["owner", "paymentSequence"],
   "additionalProperties": false
