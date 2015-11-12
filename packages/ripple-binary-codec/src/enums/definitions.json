@@ -1581,15 +1581,15 @@
     "TicketCreate": 10,
     "TicketCancel": 11,
     "NickNameSet": 6,
-    "WalletAdd": 2,
     "TrustSet": 20,
-    "PasswordFund": 4,
     "Payment": 0,
     "AccountSet": 3,
     "OfferCreate": 7,
     "SignerListSet": 12,
     "Contract": 9,
-    "Claim": 1,
+    "SuspendedPaymentCreate": 1,
+    "SuspendedPaymentFinish": 2,
+    "SuspendedPaymentCancel": 4,
     "Invalid": -1
   }
 }

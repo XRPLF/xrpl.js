@@ -2880,7 +2880,7 @@
             "expected_hex": "0000"
         },
         {
-            "test_json": "Claim",
+            "test_json": "SuspendedPaymentCreate",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
@@ -2888,14 +2888,14 @@
         },
         {
             "test_json": 1,
-            "canonical_json": "Claim",
+            "canonical_json": "SuspendedPaymentCreate",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
             "expected_hex": "0001"
         },
         {
-            "test_json": "WalletAdd",
+            "test_json": "SuspendedPaymentFinish",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
@@ -2903,7 +2903,7 @@
         },
         {
             "test_json": 2,
-            "canonical_json": "WalletAdd",
+            "canonical_json": "SuspendedPaymentFinish",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
@@ -2925,7 +2925,7 @@
             "expected_hex": "0003"
         },
         {
-            "test_json": "PasswordFund",
+            "test_json": "SuspendedPaymentCancel",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
@@ -2933,7 +2933,7 @@
         },
         {
             "test_json": 4,
-            "canonical_json": "PasswordFund",
+            "canonical_json": "SuspendedPaymentCancel",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
