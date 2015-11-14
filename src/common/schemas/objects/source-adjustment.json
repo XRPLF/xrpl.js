@@ -3,7 +3,7 @@
   "title": "sourceAdjustment",
   "type": "object",
   "oneOf": [
-    {"$ref": "laxAdjustment"},
+    {"$ref": "sourceExactAdjustment"},
     {"$ref": "maxAdjustment"}
   ]
 }

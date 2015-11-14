@@ -3,26 +3,86 @@
   "title": "getLedger",
   "type": "object",
   "properties": {
-    "accepted": {"type": "boolean"},
-    "closed": {"type": "boolean"},
-    "stateHash": {"$ref": "hash256"},
-    "closeTime": {"type": "string", "format": "date-time"},
-    "closeTimeResolution": {"type": "integer", "minimum": 1},
-    "closeFlags": {"type": "integer", "minimum": 0},
-    "ledgerHash": {"$ref": "hash256"},
-    "ledgerVersion": {"$ref": "ledgerVersion"},
-    "parentLedgerHash": {"$ref": "hash256"},
-    "parentCloseTime": {"type": "string", "format": "date-time"},
-    "totalDrops": {"$ref": "value"},
-    "transactionHash": {"$ref": "hash256"},
-    "transactions": {"type": "array", "items": {"type": "object"}},
-    "rawTransactions": {"type": "string"},
-    "transactionHashes": {"type": "array", "items": {"$ref": "hash256"}},
-    "rawState": {"type": "string"},
-    "stateHashes": {"type": "array", "items": {"$ref": "hash256"}}
+    "closed": {
+      "type": "boolean",
+      "description": "Whether or not this ledger has been closed. This should always be true."
+    },
+    "stateHash": {
+      "$ref": "hash256",
+      "description": "Hash of all state information in this ledger."
+    },
+    "closeTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time at which this ledger was closed."
+    },
+    "closeTimeResolution": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Approximate number of seconds between closing one ledger version and closing the next one."
+    },
+    "closeFlags": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "TODO"
+    },
+    "ledgerHash": {
+      "$ref": "hash256",
+      "description": "Unique identifying hash of the entire ledger."
+    },
+    "ledgerVersion": {
+      "$ref": "ledgerVersion",
+      "description": "The ledger version of this ledger."
+    },
+    "parentLedgerHash": {
+      "$ref": "hash256",
+      "description": "Unique identifying hash of the ledger that came immediately before this one."
+    },
+    "parentCloseTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time at which the previous ledger was closed."
+    },
+    "totalDrops": {
+      "$ref": "value",
+      "description": "Total number of drops (1/1,000,000th of an XRP) in the network, as a quoted integer. (This decreases as transaction fees cause XRP to be destroyed.)"
+    },
+    "transactionHash": {
+      "$ref": "hash256",
+      "description": "Hash of the transaction information included in this ledger."
+    },
+    "transactions": {
+      "description": "Array of all transactions that were validated in this ledger. Transactions are represented in the same format as the return value of [getTransaction](#gettransaction).",
+      "type": "array",
+      "items": {
+        "$ref": "getTransaction",
+        "description": "A transaction in the same format as the return value of [getTransaction](#gettransaction)."
+      }
+    },
+    "rawTransactions": {
+      "type": "string",
+      "description": "A JSON string containing rippled format transaction JSON for all transactions that were validated in this ledger."
+    },
+    "transactionHashes": {
+      "description": "An array of hashes of all transactions that were validated in this ledger.",
+      "type": "array",
+      "items": {
+        "$ref": "id"
+      }
+    },
+    "rawState": {
+      "type": "string",
+      "description": "A JSON string containing all state data for this ledger in rippled JSON format."
+    },
+    "stateHashes": {
+      "description": "An array of hashes of all state data in this ledger.",
+      "type": "array",
+      "items": {
+        "$ref": "hash256"
+      }
+    }
   },
   "required": [
-    "accepted",
     "closed",
     "stateHash",
     "closeTime",

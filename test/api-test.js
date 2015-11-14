@@ -15,17 +15,6 @@ const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 
-const orderbook = {
-  base: {
-    currency: 'USD',
-    counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-  },
-  counter: {
-    currency: 'BTC',
-    counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-  }
-};
-
 function closeLedger(connection) {
   connection._ws.emit('message', JSON.stringify(ledgerClosed));
 }
@@ -574,12 +563,13 @@ describe('RippleAPI', function() {
   });
 
   it('getOrderbook', function() {
-    return this.api.getOrderbook(address, orderbook).then(
+    return this.api.getOrderbook(address, requests.getOrderbook).then(
       _.partial(checkResult, responses.getOrderbook, 'getOrderbook'));
   });
 
   it('getOrderbook - sorted so that best deals come first', function() {
-    return this.api.getOrderbook(address, orderbook).then(data => {
+    return this.api.getOrderbook(address, requests.getOrderbook)
+    .then(data => {
       const bidRates = data.bids.map(bid => bid.properties.makerExchangeRate);
       const askRates = data.asks.map(ask => ask.properties.makerExchangeRate);
       // makerExchangeRate = quality = takerPays.value/takerGets.value
@@ -591,12 +581,13 @@ describe('RippleAPI', function() {
   });
 
   it('getOrderbook - currency & counterparty are correct', function() {
-    return this.api.getOrderbook(address, orderbook).then(data => {
+    return this.api.getOrderbook(address, requests.getOrderbook)
+    .then(data => {
       const orders = _.flatten([data.bids, data.asks]);
       _.forEach(orders, order => {
         const quantity = order.specification.quantity;
         const totalPrice = order.specification.totalPrice;
-        const {base, counter} = orderbook;
+        const {base, counter} = requests.getOrderbook;
         assert.strictEqual(quantity.currency, base.currency);
         assert.strictEqual(quantity.counterparty, base.counterparty);
         assert.strictEqual(totalPrice.currency, counter.currency);
@@ -606,7 +597,8 @@ describe('RippleAPI', function() {
   });
 
   it('getOrderbook - direction is correct for bids and asks', function() {
-    return this.api.getOrderbook(address, orderbook).then(data => {
+    return this.api.getOrderbook(address, requests.getOrderbook)
+    .then(data => {
       assert(_.every(data.bids, bid => bid.specification.direction === 'buy'));
       assert(_.every(data.asks, ask => ask.specification.direction === 'sell'));
     });

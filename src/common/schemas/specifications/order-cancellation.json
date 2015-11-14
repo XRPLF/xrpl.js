@@ -1,10 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "orderCancellation",
-  "link": "order-cancellation-specification",
+  "link": "order-cancellation",
   "type": "object",
   "properties": {
-    "orderSequence": {"$ref": "sequence"}
+    "orderSequence": {
+      "$ref": "sequence",
+      "description": "The [account sequence number](#account-sequence-number) of the order to cancel."
+    }
   },
   "required": ["orderSequence"],
   "additionalProperties": false

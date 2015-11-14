@@ -3,12 +3,30 @@
   "title": "submit",
   "type": "object",
   "properties": {
-    "success": {"type": "boolean"},
-    "engineResult": {"type": "string"},
-    "engineResultCode": {"type": "integer"},
-    "engineResultMessage": {"type": "string"},
-    "txBlob": {"type": "string"},
-    "txJson": {"type": "object"}
+    "success": {
+      "type": "boolean",
+      "description": "Indicates whether the transaction submission was successful; this does **not** indicate whether the transaction itself was successful."
+    },
+    "engineResult": {
+      "type": "string",
+      "description": "The result code returned by rippled. [List of tranasction responses](http://pages.lightthenight.org/gba/SanFran15/ripple)"
+    },
+    "engineResultCode": {
+      "type": "integer",
+      "description": "Numeric code indicating the status of the transaction, corresponding to `engineResult`."
+    },
+    "engineResultMessage": {
+      "type": "string",
+      "description": "Human-readable explanation of the status of the transaction."
+    },
+    "txBlob": {
+      "type": "string",
+      "description": "The signed transaction (identical to parameter)."
+    },
+    "txJson": {
+      "type": "object",
+      "description": "The signed transaction decoded to rippled JSON format."
+    }
   },
   "required": ["success", "engineResult", "engineResultCode"],
   "additionalProperties": false

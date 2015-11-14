@@ -4,13 +4,26 @@
   "description": "Result of prepare function",
   "type": "object",
   "properties": {
-    "txJSON": {"type": "string"},
+    "txJSON": {
+      "type": "string",
+      "description": "The prepared transaction in rippled JSON format."
+    },
     "instructions": {
+      "description": "The instructions for how to execute the transaction after adding automatic defaults.",
       "type": "object",
       "properties": {
-        "fee": {"$ref": "value"},
-        "sequence": {"$ref": "sequence"},
-        "maxLedgerVersion": {"$ref": "ledgerVersion"}
+        "fee": {
+          "$ref": "value",
+          "description": "An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information."
+        },
+        "sequence": {
+          "$ref": "sequence",
+          "description": "The initiating account's sequence number for this transaction."
+        },
+        "maxLedgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "The highest ledger version that the transaction can be included in."
+        }
       },
       "additionalProperties": false,
       "required": ["fee", "sequence"]

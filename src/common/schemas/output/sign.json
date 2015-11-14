@@ -5,9 +5,13 @@
   "properties": {
     "signedTransaction": {
       "type": "string",
-      "pattern": "^[A-F0-9]+$"
+      "pattern": "^[A-F0-9]+$",
+      "description": "The signed transaction represented as an uppercase hexadecimal string."
     },
-    "id": {"$ref": "hash256"}
+    "id": {
+      "$ref": "id",
+      "description": "The [Transaction ID](#transaction-id) of the signed transaction."
+    }
   },
   "required": ["signedTransaction", "id"],
   "additionalProperties": false

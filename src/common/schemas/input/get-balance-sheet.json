@@ -4,16 +4,24 @@
   "description": "Parameters for getBalanceSheet",
   "type": "object",
   "properties": {
-    "address": {"$ref": "address"},
+    "address": {
+      "$ref": "address",
+      "description": "The Ripple address of the account to get the balance sheet of."
+    },
     "options": {
       "properties": {
         "excludeAddresses": {
           "type": "array",
           "items": {"$ref": "address"},
-          "uniqueItems": true
+          "uniqueItems": true,
+          "description": "Addresses to exclude from the balance totals."
         },
-        "ledgerVersion": {"$ref": "ledgerVersion"}
+        "ledgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "Get the balance sheet as of this historical ledger version."
+        }
       },
+      "description": "Options to determine how the balances will be calculated.",
       "additionalProperties": false
     }
   },

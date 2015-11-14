@@ -3,8 +3,14 @@
   "title": "preparePaymentParameters",
   "type": "object",
   "properties": {
-    "address": {"$ref": "address"},
-    "payment": {"$ref": "payment"},
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that is creating the transaction."
+    },
+    "payment": {
+      "$ref": "payment",
+      "description": "The specification of the payment to prepare."
+    },
     "instructions": {"$ref": "instructions"}
   },
   "additionalProperties": false,

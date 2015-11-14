@@ -2,27 +2,27 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "instructions",
   "link": "transaction-instructions",
-  "description": "Instructions for executing a transaction",
+  "description": "Instructions for executing the transaction",
   "type": "object",
   "properties": {
     "sequence": {
-      "description": "The sequence number, relative to the initiating account, of this transaction.",
+      "description": "The initiating account's sequence number for this transaction.",
       "$ref": "sequence"
     },
     "fee": {
-      "description": "Fixed Fee",
+      "description": "An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.",
       "$ref": "value"
     },
     "maxFee": {
-      "description": "Max Fee",
+      "description": "The maximum fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.",
       "$ref": "value"
     },
     "maxLedgerVersion": {
-      "description": "Highest ledger version number that a transaction can appear in.",
+      "description": "The highest ledger version that the transaction can be included in.",
       "$ref": "ledgerVersion"
     },
     "maxLedgerVersionOffset": {
-      "description": "Offset from current legder version to highest ledger version that a transaction can appear in.",
+      "description": "Offset from current legder version to highest ledger version that the transaction can be included in.",
       "type": "integer",
       "minimum": 0
     }

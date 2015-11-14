@@ -1,5 +1,4 @@
 {
-  "accepted": true,
   "closed": true,
   "stateHash": "2C23D15B6B549123FB351E4B5CDE81C564318EB845449CD43C3EA7953C4DB452",
   "closeTime": "2013-01-02T06:43:20.000Z",
@@ -32,6 +31,27 @@
             "value": "10000"
           }
         }
+      },
+      "outcome": {
+        "result": "tesSUCCESS",
+        "fee": "0.00001",
+        "balanceChanges": {
+          "rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj": [
+            {
+              "currency": "XRP",
+              "value": "10000"
+            }
+          ],
+          "r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV": [
+            {
+              "currency": "XRP",
+              "value": "-10000.00001"
+            }
+          ]
+        },
+        "orderbookChanges": {},
+        "indexInLedger": 0,
+        "ledgerVersion": 38129
       }
     }
   ],

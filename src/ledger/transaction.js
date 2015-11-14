@@ -75,14 +75,13 @@ function formatResponse(options: TransactionOptions, tx: TransactionType
   return parseTransaction(tx);
 }
 
-function getTransaction(identifier: string,
-  options: TransactionOptions = {}
+function getTransaction(id: string, options: TransactionOptions = {}
 ): Promise<TransactionType> {
-  validate.getTransaction({identifier, options});
+  validate.getTransaction({id, options});
 
   const request = {
     command: 'tx',
-    transaction: identifier,
+    transaction: id,
     binary: false
   };
 

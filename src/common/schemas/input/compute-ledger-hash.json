@@ -3,7 +3,10 @@
   "title": "computeLedgerHashParameters",
   "type": "object",
   "properties": {
-    "ledger": {"$ref": "getLedger"}
+    "ledger": {
+      "$ref": "getLedger",
+      "description": "The ledger header to hash."
+    }
   },
   "additionalProperties": false,
   "required": ["ledger"]

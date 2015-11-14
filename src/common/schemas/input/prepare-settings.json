@@ -3,8 +3,14 @@
   "title": "prepareSettingsParameters",
   "type": "object",
   "properties": {
-    "address": {"$ref": "address"},
-    "settings": {"$ref": "settings"},
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that is creating the transaction."
+    },
+    "settings": {
+      "$ref": "settings",
+      "description": "The specification of the settings to prepare."
+    },
     "instructions": {"$ref": "instructions"}
   },
   "additionalProperties": false,

@@ -30,11 +30,11 @@ function formatResponse(response) {
   return convertKeysFromSnakeCaseToCamelCase(response);
 }
 
-function submit(txBlob: string): Promise<Submit> {
-  validate.submit({txBlob});
+function submit(signedTransaction: string): Promise<Submit> {
+  validate.submit({signedTransaction});
   const request = {
     command: 'submit',
-    tx_blob: txBlob
+    tx_blob: signedTransaction
   };
   return this.connection.request(request).then(formatResponse);
 }

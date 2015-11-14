@@ -3,7 +3,7 @@
   "title": "destinationAdjustment",
   "type": "object",
   "oneOf": [
-    {"$ref": "laxAdjustment"},
+    {"$ref": "destinationExactAdjustment"},
     {"$ref": "minAdjustment"}
   ]
 }

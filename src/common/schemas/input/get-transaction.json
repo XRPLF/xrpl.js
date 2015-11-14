@@ -4,15 +4,22 @@
   "description": "Parameters for getTransaction",
   "type": "object",
   "properties": {
-    "identifier": {"$ref": "identifier"},
+    "id": {"$ref": "id"},
     "options": {
+      "description": "Options to limit the ledger versions to search.",
       "properties": {
-        "minLedgerVersion": {"$ref": "ledgerVersion"},
-        "maxLedgerVersion": {"$ref": "ledgerVersion"}
+        "minLedgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "The lowest ledger version to search."
+        },
+        "maxLedgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "The highest ledger version to search"
+        }
       },
       "additionalProperties": false
     }
   },
   "additionalProperties": false,
-  "required": ["identifier"]
+  "required": ["id"]
 }
