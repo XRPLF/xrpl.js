@@ -1,5 +1,6 @@
 /* @flow */
 'use strict';
+const _ = require('lodash');
 const assert = require('assert');
 const BigNumber = require('bignumber.js');
 const utils = require('./utils');
@@ -71,12 +72,15 @@ function convertTransferRate(transferRate: number | string): number | string {
 
 function createSettingsTransaction(account: string, settings: Settings
 ): Object {
-  if (settings.regularKey) {
-    return {
+  if (settings.regularKey !== undefined) {
+    const removeRegularKey = {
       TransactionType: 'SetRegularKey',
-      Account: account,
-      RegularKey: settings.regularKey
+      Account: account
     };
+    if (settings.regularKey === null) {
+      return removeRegularKey;
+    }
+    return _.assign({}, removeRegularKey, {RegularKey: settings.regularKey});
   }
 
   const txJSON: Object = {

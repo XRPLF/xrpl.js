@@ -77,8 +77,11 @@
       "description": "TODO"
     },
     "regularKey": {
-      "$ref": "address",
-      "description": "The public key of a new keypair, to use as the regular key to this account, as a base-58-encoded string in the same format as an account address."
+      "oneOf": [
+        {"$ref": "address"},
+        {"type": "null"}
+      ],
+      "description": "The public key of a new keypair, to use as the regular key to this account, as a base-58-encoded string in the same format as an account address. Use `null` to remove the regular key."
     }
   },
   "additionalProperties": false
