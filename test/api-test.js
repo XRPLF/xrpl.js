@@ -138,18 +138,12 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.prepareSettings.flagClear, 'prepare'));
   });
 
-  it('prepareSettings - string field clear', function() {
-    const settings = {walletLocator: null};
-    return this.api.prepareSettings(address, settings, instructions).then(
-      _.partial(checkResult, responses.prepareSettings.fieldClear, 'prepare'));
-  });
-
   it('prepareSettings - integer field clear', function() {
-    const settings = {walletSize: null};
+    const settings = {transferRate: null};
     return this.api.prepareSettings(address, settings, instructions)
       .then(data => {
         assert(data);
-        assert.strictEqual(JSON.parse(data.txJSON).WalletSize, 0);
+        assert.strictEqual(JSON.parse(data.txJSON).TransferRate, 0);
       });
   });
 

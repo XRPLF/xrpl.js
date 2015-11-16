@@ -37,9 +37,6 @@ const AccountFlagIndices = {
 const AccountFields = {
   EmailHash: {name: 'emailHash', encoding: 'hex',
               length: 32, defaults: '0'},
-  WalletLocator: {name: 'walletLocator', encoding: 'hex',
-                  length: 64, defaults: '0'},
-  WalletSize: {name: 'walletSize', defaults: 0},
   MessageKey: {name: 'messageKey'},
   Domain: {name: 'domain', encoding: 'hex'},
   TransferRate: {name: 'transferRate', defaults: 0, shift: 9},

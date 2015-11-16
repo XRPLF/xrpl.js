@@ -31,12 +31,6 @@ type SettingDefaultRipple = {
 type SettingEmailHash = {
   emailHash?: ?string,
 }
-type SettingWalletLocator = {
-  walletLocator?: ?string,
-}
-type SettingWalletSize = {
-  walletSize?: ?number,
-}
 type SettingMessageKey = {
   messageKey?: string,
 }
@@ -54,8 +48,8 @@ type SettingRegularKey = {
 }
 
 export type Settings = SettingRegularKey | SettingSigners |
-  SettingTransferRate | SettingDomain | SettingMessageKey | SettingWalletSize |
-  SettingWalletLocator | SettingEmailHash | SettingDefaultRipple |
+  SettingTransferRate | SettingDomain | SettingMessageKey |
+  SettingEmailHash | SettingDefaultRipple |
   SettingGlobalFreeze | SettingNoFreeze | SettingEnableTransactionIDTracking |
   SettingDisableMasterKey | SettingDisallowIncomingXRP |
   SettingRequireAuthorization | SettingRequireDestinationTag |

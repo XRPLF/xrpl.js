@@ -46,17 +46,6 @@
         {"$ref": "hash128"}
       ]
     },
-    "walletLocator": {
-      "description": "Hash of wallet in content-addressable storage (CAS) in the Ripple Consensus Ledger (not implemented yet). Use `null` to delete.",
-      "oneOf": [
-        {"type": "null"},
-        {"$ref": "hash256"}
-      ]
-    },
-    "walletSize": {
-      "type": ["integer", "null"],
-      "description": "Size of wallet in content-addressable storage (CAS) in the Ripple Consensus Ledger (not implemeneted yet). Use `null` to delete."
-    },
     "messageKey": {
       "type": "string",
       "description": "Public key for sending encrypted messages to this account. Conventionally, it should be a secp256k1 key, the same encryption that is used by the rest of Ripple."
