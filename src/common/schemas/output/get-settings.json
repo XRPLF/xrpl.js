@@ -47,7 +47,7 @@
       ]
     },
     "walletLocator": {
-      "description": "Not used.",
+      "description": "Hash of wallet in content-addressable storage (CAS) in the Ripple Consensus Ledger (not implemented yet). Use `null` to delete.",
       "oneOf": [
         {"type": "null"},
         {"$ref": "hash256"}
@@ -55,7 +55,7 @@
     },
     "walletSize": {
       "type": ["integer", "null"],
-      "description": "Not used."
+      "description": "Size of wallet in content-addressable storage (CAS) in the Ripple Consensus Ledger (not implemeneted yet). Use `null` to delete."
     },
     "messageKey": {
       "type": "string",

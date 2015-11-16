@@ -4,7 +4,6 @@
   "parentCloseTime": "2015-08-12T01:01:00.000Z",
   "closeFlags": 0,
   "closeTimeResolution": 10,
-  "closed": true,
   "ledgerVersion": 15202439,
   "parentLedgerHash": "12724A65B030C15A1573AA28B1BBB5DF3DA4589AA3623675A31CAE69B23B1C4E",
   "totalDrops": "99998831688050493",

@@ -4,7 +4,7 @@ const BigNumber = require('bignumber.js');
 const AccountFields = require('./utils').constants.AccountFields;
 
 function parseField(info, value) {
-  if (info.encoding === 'hex' && !info.length) {
+  if (info.encoding === 'hex' && !info.length) {  // e.g. "domain"
     return new Buffer(value, 'hex').toString('ascii');
   }
   if (info.shift) {
