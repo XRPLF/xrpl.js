@@ -12,7 +12,7 @@
       "pattern": "[0-9,-]+",
       "description": "Range expression indicating the sequence numbers of the ledger versions the local rippled has in its database. It is possible to be a disjoint sequence, e.g. “2500-5000,32570-7695432”."
     },
-    "hostid": {
+    "hostID": {
       "type": "string",
       "description": "On an admin request, returns the hostname of the server running the rippled instance; otherwise, returns a unique four letter word."
     },
@@ -42,7 +42,7 @@
       "properties": {
         "convergeTimeS": {
           "type": "number",
-          "description": "The time it took to reach a consensus for the last ledger closing."
+          "description": "The time it took to reach a consensus for the last ledger closing, in seconds."
         },
         "proposers": {
           "type": "integer",
@@ -82,7 +82,7 @@
           "minimum": 0,
           "description": "The time since the ledger was closed, in seconds."
         },
-        "baseFeeXrp": {
+        "baseFeeXRP": {
           "type": "number",
           "description": "Base fee, in XRP. This may be represented in scientific notation such as 1e-05 for 0.00005."
         },
@@ -90,30 +90,30 @@
           "$ref": "hash256",
           "description": "Unique hash for the ledger, as an uppercase hexadecimal string."
         },
-        "reserveBaseXrp": {
+        "reserveBaseXRP": {
           "type": "integer",
           "minimum": 0,
           "description": "Minimum amount of XRP (not drops) necessary for every account to keep in reserve."
         },
-        "reserveIncXrp": {
+        "reserveIncrementXRP": {
           "type": "integer",
           "minimum": 0,
           "description": "Amount of XRP (not drops) added to the account reserve for each object an account is responsible for in the ledger."
         },
-        "seq": {
+        "ledgerVersion": {
           "type": "integer",
           "minimum": 0,
           "description": "Identifying sequence number of this ledger version."
         }
       },
       "additionalProperties": false,
-      "required": ["age", "baseFeeXrp", "hash", "reserveBaseXrp", "reserveIncXrp", "seq"]
+      "required": ["age", "baseFeeXRP", "hash", "reserveBaseXRP", "reserveIncrementXRP", "ledgerVersion"]
     },
     "validationQuorum": {
       "type": "number",
       "description": "Minimum number of trusted validations required in order to validate a ledger version. Some circumstances may cause the server to require more validations."
     }
   },
-  "required": ["buildVersion", "completeLedgers", "hostid", "ioLatencyMs", "lastClose", "loadFactor", "peers", "pubkeyNode", "serverState", "validatedLedger", "validationQuorum"],
+  "required": ["buildVersion", "completeLedgers", "hostID", "ioLatencyMs", "lastClose", "loadFactor", "peers", "pubkeyNode", "serverState", "validatedLedger", "validationQuorum"],
   "additionalProperties": false
 }
