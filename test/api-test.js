@@ -119,6 +119,13 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.prepareSettings.regularKey, 'prepare'));
   });
 
+  it('prepareSettings - remove regularKey', function() {
+    const regularKey = {regularKey: null};
+    return this.api.prepareSettings(address, regularKey, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.removeRegularKey,
+        'prepare'));
+  });
+
   it('prepareSettings - flag set', function() {
     const settings = {requireDestinationTag: true};
     return this.api.prepareSettings(address, settings, instructions).then(
