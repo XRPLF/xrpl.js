@@ -3,10 +3,6 @@
   "title": "getLedger",
   "type": "object",
   "properties": {
-    "closed": {
-      "type": "boolean",
-      "description": "Whether or not this ledger has been closed. This should always be true."
-    },
     "stateHash": {
       "$ref": "hash256",
       "description": "Hash of all state information in this ledger."
@@ -83,7 +79,6 @@
     }
   },
   "required": [
-    "closed",
     "stateHash",
     "closeTime",
     "closeTimeResolution",

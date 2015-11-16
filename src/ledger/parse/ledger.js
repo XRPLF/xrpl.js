@@ -42,7 +42,6 @@ function parseState(state) {
 function parseLedger(ledger: Object): GetLedger {
   const ledgerVersion = parseInt(ledger.ledger_index || ledger.seqNum, 10);
   return removeUndefined(_.assign({
-    closed: ledger.closed,
     stateHash: ledger.account_hash,
     closeTime: rippleTimeToISO8601(ledger.close_time),
     closeTimeResolution: ledger.close_time_resolution,

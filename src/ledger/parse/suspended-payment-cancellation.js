@@ -9,7 +9,7 @@ function parseSuspendedPaymentCancellation(tx: Object): Object {
   return utils.removeUndefined({
     memos: utils.parseMemos(tx),
     owner: tx.Owner,
-    paymentSequence: tx.OfferSequence
+    suspensionSequence: tx.OfferSequence
   });
 }
 

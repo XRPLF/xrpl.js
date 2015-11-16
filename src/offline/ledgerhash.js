@@ -6,8 +6,6 @@ const hashes = require('ripple-hashes');
 
 function convertLedgerHeader(header) {
   return {
-    accepted: header.accepted,
-    closed: header.closed,
     account_hash: header.stateHash,
     close_time: common.iso8601ToRippleTime(header.closeTime),
     close_time_resolution: header.closeTimeResolution,

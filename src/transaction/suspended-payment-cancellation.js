@@ -8,7 +8,7 @@ import type {Memo} from '../common/types.js';
 
 type SuspendedPaymentCancellation = {
   owner: string,
-  paymentSequence: number,
+  suspensionSequence: number,
   memos?: Array<Memo>
 }
 
@@ -19,7 +19,7 @@ function createSuspendedPaymentCancellationTransaction(account: string,
     TransactionType: 'SuspendedPaymentCancel',
     Account: account,
     Owner: payment.owner,
-    OfferSequence: payment.paymentSequence
+    OfferSequence: payment.suspensionSequence
   };
   if (payment.memos !== undefined) {
     txJSON.Memos = _.map(payment.memos, utils.convertMemo);

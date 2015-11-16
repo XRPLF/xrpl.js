@@ -8,7 +8,7 @@ import type {Memo} from '../common/types.js';
 
 type SuspendedPaymentExecution = {
   owner: string,
-  paymentSequence: number,
+  suspensionSequence: number,
   memos?: Array<Memo>,
   method?: number,
   digest?: string,
@@ -22,7 +22,7 @@ function createSuspendedPaymentExecutionTransaction(account: string,
     TransactionType: 'SuspendedPaymentFinish',
     Account: account,
     Owner: payment.owner,
-    OfferSequence: payment.paymentSequence
+    OfferSequence: payment.suspensionSequence
   };
 
   if (payment.method !== undefined) {

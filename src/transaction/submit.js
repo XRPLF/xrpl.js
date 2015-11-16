@@ -2,7 +2,7 @@
 'use strict';
 const _ = require('lodash');
 const utils = require('./utils');
-const {validate, convertKeysFromSnakeCaseToCamelCase} = utils.common;
+const {validate} = utils.common;
 
 type Submit = {
   success: boolean,
@@ -27,7 +27,10 @@ function formatResponse(response) {
   if (isImmediateRejection(response.engine_result)) {
     throw new utils.common.errors.RippledError('Submit failed');
   }
-  return convertKeysFromSnakeCaseToCamelCase(response);
+  return {
+    resultCode: response.engine_result,
+    resultMessage: response.engine_result_message
+  };
 }
 
 function submit(signedTransaction: string): Promise<Submit> {

@@ -21,8 +21,6 @@ type GetSettings = {
   globalFreeze?: boolean,
   defaultRipple?: boolean,
   emailHash?: ?string,
-  walletLocator?: ?string,
-  walletSize?: ?number,
   messageKey?: string,
   domain?: string,
   transferRate?: ?number,

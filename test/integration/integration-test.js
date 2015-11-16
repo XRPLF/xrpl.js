@@ -45,7 +45,7 @@ function testTransaction(testcase, type, lastClosedLedgerVersion, prepared) {
   console.log('PREPARED...');
   return testcase.api.submit(signedData.signedTransaction).then(data => {
     console.log('SUBMITTED...');
-    assert.strictEqual(data.engineResult, 'tesSUCCESS');
+    assert.strictEqual(data.resultCode, 'tesSUCCESS');
     const options = {
       minLedgerVersion: lastClosedLedgerVersion,
       maxLedgerVersion: txData.LastLedgerSequence

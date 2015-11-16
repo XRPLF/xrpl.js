@@ -46,17 +46,6 @@
         {"$ref": "hash128"}
       ]
     },
-    "walletLocator": {
-      "description": "Not used.",
-      "oneOf": [
-        {"type": "null"},
-        {"$ref": "hash256"}
-      ]
-    },
-    "walletSize": {
-      "type": ["integer", "null"],
-      "description": "Not used."
-    },
     "messageKey": {
       "type": "string",
       "description": "Public key for sending encrypted messages to this account. Conventionally, it should be a secp256k1 key, the same encryption that is used by the rest of Ripple."

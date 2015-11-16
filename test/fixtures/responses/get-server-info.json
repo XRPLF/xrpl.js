@@ -1,7 +1,7 @@
 {
   "buildVersion": "0.24.0-rc1",
   "completeLedgers": "32570-6595042",
-  "hostid": "ARTS",
+  "hostID": "ARTS",
   "ioLatencyMs": 1,
   "lastClose": {
     "convergeTimeS": 2.007,
@@ -13,11 +13,11 @@
   "serverState": "full",
   "validatedLedger": {
     "age": 5,
-    "baseFeeXrp": 0.00001,
+    "baseFeeXRP": 0.00001,
     "hash": "4482DEE5362332F54A4036ED57EE1767C9F33CF7CE5A6670355C16CECE381D46",
-    "reserveBaseXrp": 20,
-    "reserveIncXrp": 5,
-    "seq": 6595042
+    "reserveBaseXRP": 20,
+    "reserveIncrementXRP": 5,
+    "ledgerVersion": 6595042
   },
   "validationQuorum": 3
 }
