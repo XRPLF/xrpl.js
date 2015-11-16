@@ -9,11 +9,11 @@
       "$ref": "address",
       "description": "The address of the owner of the suspended payment to cancel."
     },
-    "paymentSequence": {
+    "suspensionSequence": {
       "$ref": "sequence",
       "description": "The [account sequence number](#account-sequence-number) of the [Suspended Payment Creation](#suspended-payment-creation) transaction for the suspended payment to cancel."
     }
   },
-  "required": ["owner", "paymentSequence"],
+  "required": ["owner", "suspensionSequence"],
   "additionalProperties": false
 }

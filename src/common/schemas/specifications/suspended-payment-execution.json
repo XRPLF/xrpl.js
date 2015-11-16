@@ -9,7 +9,7 @@
       "$ref": "address",
       "description": "The address of the owner of the suspended payment to execute."
     },
-    "paymentSequence": {
+    "suspensionSequence": {
       "$ref": "sequence",
       "description": "The [account sequence number](#account-sequence-number) of the [Suspended Payment Creation](#suspended-payment-creation) transaction for the suspended payment to execute."
     },
@@ -28,6 +28,6 @@
       "description": "This value will be hashed to produce the digest."
     }
   },
-  "required": ["owner", "paymentSequence"],
+  "required": ["owner", "suspensionSequence"],
   "additionalProperties": false
 }
