@@ -6,6 +6,7 @@ module.exports = {
     sell: require('./prepare-order-sell'),
     expiration: require('./prepare-order-expiration')
   },
+  prepareOrderCancellation: require('./prepare-order-cancellation'),
   preparePayment: require('./prepare-payment'),
   preparePaymentAllOptions: require('./prepare-payment-all-options'),
   preparePaymentNoCounterparty: require('./prepare-payment-no-counterparty'),
