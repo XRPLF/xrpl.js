@@ -22,6 +22,7 @@ module.exports = {
     complex: require('./prepare-trustline')
   },
   sign: require('./sign'),
+  signSuspended: require('./sign-suspended.json'),
   getPaths: {
     normal: require('./getpaths/normal'),
     UsdToUsd: require('./getpaths/usd2usd'),

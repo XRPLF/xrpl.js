@@ -21,11 +21,12 @@
     },
     "digest": {
       "$ref": "hash256",
-      "description": "The original `digest` from the suspended payment creation transaction."
+      "description": "The original `digest` from the suspended payment creation transaction. This is sha256 hash of `proof` string."
     },
     "proof": {
       "type": "string",
-      "description": "A value that produces the digest when hashed."
+      "description": "A value that produces the digest when hashed. It must be 32 charaters long and contain only 8-bit characters.",
+      "pattern": "^[\\x00-\\xFF]{32}$"
     }
   },
   "required": ["owner", "suspensionSequence"],

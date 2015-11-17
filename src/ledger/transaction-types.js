@@ -8,7 +8,13 @@ type Outcome = {
   ledgerVersion: number,
   indexInLedger: number,
   fee: string,
-  balanceChanges: Object,
+  balanceChanges: {
+    [key: string]: [{
+     currency: string,
+     counterparty?: string,
+     value: string
+    }]
+  },
   orderbookChanges: Object,
   timestamp?: string
 }

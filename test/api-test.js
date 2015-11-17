@@ -188,6 +188,13 @@ describe('RippleAPI', function() {
     schemaValidator.schemaValidate('sign', result);
   });
 
+  it('sign - SuspendedPaymentExecution', function() {
+    const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+    const result = this.api.sign(requests.signSuspended.txJSON, secret);
+    assert.deepEqual(result, responses.signSuspended);
+    schemaValidator.schemaValidate('sign', result);
+  });
+
   it('submit', function() {
     return this.api.submit(responses.sign.signedTransaction).then(
       _.partial(checkResult, responses.submit, 'submit'));
@@ -438,6 +445,34 @@ describe('RippleAPI', function() {
         assert(error instanceof this.api.errors.UnexpectedError);
       });
     });
+
+    it('getTransaction - SuspendedPaymentCreation', function() {
+      const hash =
+        '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE1';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.suspendedPaymentCreation,
+          'getTransaction'));
+    });
+
+    it('getTransaction - SuspendedPaymentCancellation', function() {
+      const hash =
+        'F346E542FFB7A8398C30A87B952668DAB48B7D421094F8B71776DA19775A3B22';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.suspendedPaymentCancellation,
+          'getTransaction'));
+    });
+
+    it('getTransaction - SuspendedPaymentExecution', function() {
+      const hash =
+        'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD136993B';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.suspendedPaymentExecution,
+          'getTransaction'));
+    });
+
   });
 
   it('getTransactions', function() {

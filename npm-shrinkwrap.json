@@ -95,9 +95,19 @@
       }
     },
     "ripple-binary-codec": {
-      "version": "0.0.6",
-      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.0.6.tgz",
+      "version": "0.0.7",
+      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.0.7.tgz",
       "dependencies": {
+        "babel-runtime": {
+          "version": "5.8.34",
+          "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.34.tgz",
+          "dependencies": {
+            "core-js": {
+              "version": "1.2.6",
+              "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz"
+            }
+          }
+        },
         "bn.js": {
           "version": "3.3.0",
           "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.3.0.tgz"
@@ -127,6 +137,30 @@
         "inherits": {
           "version": "2.0.1",
           "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+        },
+        "lodash": {
+          "version": "3.10.1",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
+        },
+        "ripple-address-codec": {
+          "version": "2.0.1",
+          "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz",
+          "dependencies": {
+            "hash.js": {
+              "version": "1.0.3",
+              "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz"
+            },
+            "x-address-codec": {
+              "version": "0.7.2",
+              "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.7.2.tgz",
+              "dependencies": {
+                "base-x": {
+                  "version": "1.0.1",
+                  "resolved": "https://registry.npmjs.org/base-x/-/base-x-1.0.1.tgz"
+                }
+              }
+            }
+          }
         }
       }
     },
