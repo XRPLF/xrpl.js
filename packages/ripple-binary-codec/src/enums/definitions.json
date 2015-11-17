@@ -455,6 +455,28 @@
       }
     ],
     [
+      "CancelAfter",
+      {
+        "nth": 36,
+        "isVLEncoded": false,
+        "bytes": "2024",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "FinishAfter",
+      {
+        "nth": 37,
+        "isVLEncoded": false,
+        "bytes": "2025",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "nth": 1,
@@ -702,6 +724,17 @@
         "nth": 20,
         "isVLEncoded": false,
         "bytes": "5014",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "Digest",
+      {
+        "nth": 21,
+        "isVLEncoded": false,
+        "bytes": "5015",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -1038,6 +1071,17 @@
       }
     ],
     [
+      "Proof",
+      {
+        "nth": 17,
+        "isVLEncoded": true,
+        "bytes": "7011",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
       "Account",
       {
         "nth": 1,
@@ -1335,7 +1379,7 @@
       }
     ],
     [
-      "TemplateEntryType",
+      "Method",
       {
         "nth": 2,
         "isVLEncoded": false,

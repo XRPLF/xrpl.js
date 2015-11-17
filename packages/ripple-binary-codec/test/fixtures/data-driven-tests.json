@@ -309,6 +309,27 @@
             "expected_hex": "2022"
         },
         {
+            "type_name": "UInt32",
+            "name": "SignerQuorum",
+            "nth_of_type": 35,
+            "type": 2,
+            "expected_hex": "2023"
+        },
+        {
+            "type_name": "UInt32",
+            "name": "CancelAfter",
+            "nth_of_type": 36,
+            "type": 2,
+            "expected_hex": "2024"
+        },
+        {
+            "type_name": "UInt32",
+            "name": "FinishAfter",
+            "nth_of_type": 37,
+            "type": 2,
+            "expected_hex": "2025"
+        },
+        {
             "type_name": "UInt64",
             "name": "IndexNext",
             "nth_of_type": 1,
@@ -468,6 +489,13 @@
             "nth_of_type": 20,
             "type": 5,
             "expected_hex": "5014"
+        },
+        {
+            "type_name": "Hash256",
+            "name": "Digest",
+            "nth_of_type": 21,
+            "type": 5,
+            "expected_hex": "5015"
         },
         {
             "type_name": "Amount",
@@ -652,6 +680,13 @@
             "expected_hex": "7E"
         },
         {
+            "type_name": "Blob",
+            "name": "Proof",
+            "nth_of_type": 17,
+            "type": 7,
+            "expected_hex": "7011"
+        },
+        {
             "type_name": "AccountID",
             "name": "Account",
             "nth_of_type": 1,
@@ -828,7 +863,7 @@
         },
         {
             "type_name": "UInt8",
-            "name": "TemplateEntryType",
+            "name": "Method",
             "nth_of_type": 2,
             "type": 16,
             "expected_hex": "0210"
