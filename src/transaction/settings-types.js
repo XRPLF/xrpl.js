@@ -40,14 +40,11 @@ type SettingDomain = {
 type SettingTransferRate = {
   transferRate?: ?number,
 }
-type SettingSigners = {
-  signers?: string,
-}
 type SettingRegularKey = {
   regularKey?: string
 }
 
-export type Settings = SettingRegularKey | SettingSigners |
+export type Settings = SettingRegularKey |
   SettingTransferRate | SettingDomain | SettingMessageKey |
   SettingEmailHash | SettingDefaultRipple |
   SettingGlobalFreeze | SettingNoFreeze | SettingEnableTransactionIDTracking |
