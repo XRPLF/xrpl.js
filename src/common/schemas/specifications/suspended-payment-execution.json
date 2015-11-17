@@ -21,11 +21,11 @@
     },
     "digest": {
       "$ref": "hash256",
-      "description": "TODO"
+      "description": "The original `digest` from the suspended payment creation transaction."
     },
     "proof": {
       "type": "string",
-      "description": "This value will be hashed to produce the digest."
+      "description": "A value that produces the digest when hashed."
     }
   },
   "required": ["owner", "suspensionSequence"],

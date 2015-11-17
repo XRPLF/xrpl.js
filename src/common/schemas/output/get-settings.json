@@ -61,10 +61,6 @@
         {"type": "number", "minimum": 1, "maximum": 4.294967295}
       ]
     },
-    "signers": {
-      "type": "string",
-      "description": "TODO"
-    },
     "regularKey": {
       "oneOf": [
         {"$ref": "address"},

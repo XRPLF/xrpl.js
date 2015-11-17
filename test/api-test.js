@@ -91,8 +91,10 @@ describe('RippleAPI', function() {
   });
 
   it('prepareOrderCancellation', function() {
-    return this.api.prepareOrderCancellation(address, 23, instructions).then(
-      _.partial(checkResult, responses.prepareOrderCancellation, 'prepare'));
+    const request = requests.prepareOrderCancellation;
+    return this.api.prepareOrderCancellation(address, request, instructions)
+      .then(_.partial(checkResult, responses.prepareOrderCancellation,
+        'prepare'));
   });
 
   it('prepareTrustline - simple', function() {
