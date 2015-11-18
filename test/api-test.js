@@ -205,6 +205,7 @@ describe('RippleAPI', function() {
       assert(false, 'Should throw RippledError');
     }).catch(error => {
       assert(error instanceof this.api.errors.RippledError);
+      assert.strictEqual(error.data.resultCode, 'temBAD_FEE');
     });
   });
 
