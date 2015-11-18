@@ -24,15 +24,14 @@ function isImmediateRejection(engineResult: string): boolean {
 }
 
 function formatResponse(response) {
-  if (isImmediateRejection(response.engine_result)) {
-    const error = new utils.common.errors.RippledError('Submit failed');
-    error.data = response;
-    throw error;
-  }
-  return {
+  const data = {
     resultCode: response.engine_result,
     resultMessage: response.engine_result_message
   };
+  if (isImmediateRejection(response.engine_result)) {
+    throw new utils.common.errors.RippledError('Submit failed', data);
+  }
+  return data;
 }
 
 function submit(signedTransaction: string): Promise<Submit> {
