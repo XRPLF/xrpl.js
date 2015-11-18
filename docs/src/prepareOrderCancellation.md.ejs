@@ -1,0 +1,30 @@
+## prepareOrderCancellation
+
+`prepareOrderCancellation(address: string, sequence: number, instructions: Object): Promise<Object>`
+
+Prepare an order cancellation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+### Parameters
+
+<%- renderSchema("input/prepare-order-cancellation.json") %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare" methods have the same return type.
+</aside>
+
+<%- renderSchema("output/prepare.json") %>
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+const sequence = 123;
+return api.prepareOrderCancellation(address, sequence)
+  .then(prepared => {/* ... */});
+```
+
+<%- renderFixture("responses/prepare-order-cancellation.json") %>

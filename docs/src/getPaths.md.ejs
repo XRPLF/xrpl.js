@@ -1,0 +1,25 @@
+## getPaths
+
+`getPaths(pathfind: Object): Promise<Array<Object>>`
+
+Finds paths to send a payment. Paths are options for how to route a payment.
+
+### Parameters
+
+<%- renderSchema("input/get-paths.json") %>
+
+### Return Value
+
+This method returns a promise that resolves with an array of objects with the following structure:
+
+<%- renderSchema("output/get-paths.json") %>
+
+### Example
+
+```javascript
+const pathfind = <%- importFile('test/fixtures/requests/getpaths/normal.json') %>;
+return api.getPaths(pathfind)
+  .then(paths => {/* ... */});
+```
+
+<%- renderFixture("responses/get-paths.json") %>

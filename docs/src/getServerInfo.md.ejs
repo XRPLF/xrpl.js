@@ -1,0 +1,23 @@
+## getServerInfo
+
+`getServerInfo(): Promise<object>`
+
+Get status information about the server that the RippleAPI instance is connected to.
+
+### Parameters
+
+This method has no parameters.
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<%- renderSchema('output/get-server-info.json') %>
+
+### Example
+
+```javascript
+return api.getServerInfo().then(info => {/* ... */});
+```
+
+<%- renderFixture('responses/get-server-info.json') %>

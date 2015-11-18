@@ -36,7 +36,14 @@ integrationtest() {
   mocha test/integration/integration-test.js
 }
 
+doctest() {
+  node --harmony scripts/build_docs.js docs/index.md.test
+  cmp docs/index.md docs/index.md.test
+  rm docs/index.md.test
+}
+
 oneNode() {
+  doctest
   lint
   typecheck
   unittest
@@ -45,7 +52,7 @@ oneNode() {
 
 twoNodes() {
   case "$NODE_INDEX" in
-    0) lint && integrationtest;;
+    0) doctest && lint && integrationtest;;
     1) typecheck && unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;
   esac
@@ -53,7 +60,7 @@ twoNodes() {
 
 threeNodes() {
   case "$NODE_INDEX" in
-    0) lint && integrationtest;;
+    0) doctest && lint && integrationtest;;
     1) typecheck;;
     2) unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;

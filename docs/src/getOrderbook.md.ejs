@@ -1,0 +1,26 @@
+## getOrderbook
+
+`getOrderbook(address: string, orderbook: Object, options: Object): Promise<Object>`
+
+Returns open orders for the specified account. Open orders are orders that have not yet been fully executed and are still in the order book.
+
+### Parameters
+
+<%- renderSchema('input/get-orderbook.json') %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure (Note: the structures of `bids` and `asks` are identical):
+
+<%- renderSchema('output/get-orderbook.json') %>
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+const orderbook = <%- importFile('test/fixtures/requests/get-orderbook.json') %>;
+return api.getOrderbook(address, orderbook)
+  .then(orderbook => {/* ... */});
+```
+
+<%- renderFixture('responses/get-orderbook.json') %>
