@@ -28,7 +28,13 @@ module.exports = {
     setRegularKey: require('./get-transaction-settings-set-regular-key.json'),
     trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
     trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
-    notValidated: require('./get-transaction-not-validated.json')
+    notValidated: require('./get-transaction-not-validated.json'),
+    suspendedPaymentCreation:
+      require('./get-transaction-suspended-payment-create.json'),
+    suspendedPaymentCancellation:
+      require('./get-transaction-suspended-payment-cancellation.json'),
+    suspendedPaymentExecution:
+      require('./get-transaction-suspended-payment-execution.json')
   },
   getTransactions: require('./get-transactions.json'),
   getTrustlines: require('./get-trustlines.json'),
@@ -69,6 +75,7 @@ module.exports = {
     complex: require('./prepare-trustline.json')
   },
   sign: require('./sign.json'),
+  signSuspended: require('./sign-suspended.json'),
   submit: require('./submit.json'),
   ledgerClosed: require('./ledger-closed.json')
 };

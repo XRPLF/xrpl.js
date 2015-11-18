@@ -25,7 +25,9 @@ function isImmediateRejection(engineResult: string): boolean {
 
 function formatResponse(response) {
   if (isImmediateRejection(response.engine_result)) {
-    throw new utils.common.errors.RippledError('Submit failed');
+    const error = new utils.common.errors.RippledError('Submit failed');
+    error.data = response;
+    throw error;
   }
   return {
     resultCode: response.engine_result,

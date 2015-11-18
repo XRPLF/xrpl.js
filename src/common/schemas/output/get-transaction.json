@@ -56,6 +56,24 @@
         "type": {"enum": ["settings"]},
         "specification": {"$ref": "getSettings"}
       }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["suspendedPaymentCreation"]},
+        "specification": {"$ref": "suspendedPaymentCreation"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["suspendedPaymentCancellation"]},
+        "specification": {"$ref": "suspendedPaymentCancellation"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["suspendedPaymentExecution"]},
+        "specification": {"$ref": "suspendedPaymentExecution"}
+      }
     }
   ]
 }

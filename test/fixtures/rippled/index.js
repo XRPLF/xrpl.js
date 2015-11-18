@@ -44,6 +44,10 @@ module.exports = {
     NoLedgerFound: require('./tx/no-ledger-found.json'),
     LedgerWithoutTime: require('./tx/ledger-without-time.json'),
     NotValidated: require('./tx/not-validated.json'),
-    OfferWithExpiration: require('./tx/order-with-expiration.json')
+    OfferWithExpiration: require('./tx/order-with-expiration.json'),
+    SuspendedPaymentCreation: require('./tx/suspended-payment-creation.json'),
+    SuspendedPaymentCancellation:
+      require('./tx/suspended-payment-cancellation.json'),
+    SuspendedPaymentExecution: require('./tx/suspended-payment-execution.json')
   }
 };
