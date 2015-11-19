@@ -52,15 +52,15 @@ oneNode() {
 
 twoNodes() {
   case "$NODE_INDEX" in
-    0) doctest && lint && integrationtest;;
-    1) typecheck && unittest;;
+    0) doctest; lint; integrationtest;;
+    1) typecheck; unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;
   esac
 }
 
 threeNodes() {
   case "$NODE_INDEX" in
-    0) doctest && lint && integrationtest;;
+    0) doctest; lint; integrationtest;;
     1) typecheck;;
     2) unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;
