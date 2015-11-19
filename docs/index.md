@@ -55,6 +55,9 @@
   - [submit](#submit)
   - [generateAddress](#generateaddress)
   - [computeLedgerHash](#computeledgerhash)
+- [API Events](#api-events)
+  - [ledgerClosed](#ledgerclosed)
+  - [error](#error)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -211,7 +214,7 @@ A *transaction specification* specifies what a transaction should do. Each [Tran
 
 ## Payment
 
-See [Transcation Types](#transaction-types) for a description.
+See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -264,7 +267,7 @@ paths | string | *Optional* The paths of trustlines and orders to use in executi
 
 ## Trustline
 
-See [Transcation Types](#transaction-types) for a description.
+See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -295,7 +298,7 @@ ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through 
 
 ## Order
 
-See [Transcation Types](#transaction-types) for a description.
+See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -329,7 +332,7 @@ passive | boolean | *Optional* If enabled, the offer will not consume offers tha
 
 ## Order Cancellation
 
-See [Transcation Types](#transaction-types) for a description.
+See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -345,7 +348,7 @@ orderSequence | [sequence](#account-sequence-number) | The [account sequence num
 
 ## Settings
 
-See [Transcation Types](#transaction-types) for a description.
+See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -376,7 +379,7 @@ transferRate | number,null | *Optional*  The fee to charge when users transfer t
 
 ## Suspended Payment Creation
 
-See [Transcation Types](#transaction-types) for a description.
+See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -425,7 +428,7 @@ memos[] | object | Memo objects represent arbitrary data that can be included in
 
 ## Suspended Payment Cancellation
 
-See [Transcation Types](#transaction-types) for a description.
+See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -450,7 +453,7 @@ memos[] | object | Memo objects represent arbitrary data that can be included in
 
 ## Suspended Payment Execution
 
-See [Transcation Types](#transaction-types) for a description.
+See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -3304,5 +3307,69 @@ return api.computeLedgerHash(ledger);
 
 ```json
 "F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349"
+```
+
+# API Events
+
+## ledgerClosed
+
+This event is emitted whenever a new ledger version is validated on the connected server.
+
+### Return Value
+
+Name | Type | Description
+---- | ---- | -----------
+feeBase | integer | Base fee, in drops.
+feeReference | integer | Cost of the 'reference transaction' in 'fee units'.
+ledgerHash | string | Unique hash of the ledger that was closed, as hex.
+ledgerTimestamp | date-time string | The time at which this ledger closed.
+reserveBase | integer | The minimum reserve, in drops of XRP, that is required for an account.
+reserveIncrement | integer | The increase in account reserve that is added for each item the account owns, such as offers or trust lines.
+transactionCount | integer | Number of new transactions included in this ledger.
+ledgerVersion | integer | Ledger version of the ledger that closed.
+validatedLedgerVersions | string | Range of ledgers that the server has available. This may be discontiguous.
+
+### Example
+
+```javascript
+api.on('ledgerClosed', ledger => {
+  console.log(JSON.stringify(ledger, null, 2));
+});
+```
+
+
+```json
+{
+  "feeBase": 10,
+  "feeReference": 10,
+  "ledgerVersion": 14804627,
+  "ledgerHash": "9141FA171F2C0CE63E609466AF728FF66C12F7ACD4B4B50B0947A7F3409D593A",
+  "ledgerTimestamp": "2015-07-23T05:50:40.000Z",
+  "reserveBase": 20000000,
+  "reserveIncrement": 5000000,
+  "transactionCount": 19,
+  "validatedLedgerVersions": "13983423-14804627"
+}
+```
+
+
+## error
+
+This event is emitted when there is an error on the connection to the server.
+
+### Return Value
+
+The first parameter is a string indicating the error type, which may be `badMessage` (meaning that rippled returned a malformed message), or one of the [rippled Universal Errors](https://ripple.com/build/rippled-apis/#universal-errors). The second parameter is a message explaining the error, or the message that caused the error in the case of `badMessage`.
+
+### Example
+
+```javascript
+api.on('error', (errorCode, errorMessage) => {
+  console.log(errorCode + ': ' + errorMessage);
+});
+```
+
+```
+tooBusy: The server is too busy to help you now.
 ```
 
