@@ -21,7 +21,7 @@
     },
     "digest": {
       "$ref": "hash256",
-      "description": "The original `digest` from the suspended payment creation transaction. This is sha256 hash of `proof` string."
+      "description": "The original `digest` from the suspended payment creation transaction. This is sha256 hash of `proof` string. It is replicated here so that the relatively expensive hashing operation can be delegated to a server without ledger history and the server with ledger history only has to do a quick comparison of the old digest with the new digest."
     },
     "proof": {
       "type": "string",

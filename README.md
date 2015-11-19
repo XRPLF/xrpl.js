@@ -20,7 +20,7 @@ Install `ripple-lib` using npm:
   $ npm install ripple-lib
 ```
 
-Then see the sample code in `docs/samples`.
+Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md) and [code samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
 
 ##Running tests
 
