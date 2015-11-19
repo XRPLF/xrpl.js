@@ -37,7 +37,10 @@ integrationtest() {
 }
 
 doctest() {
-  node --harmony scripts/build_docs.js docs/index.md.test
+  mv docs/index.md docs/index.md.save
+  npm run docgen
+  mv docs/index.md docs/index.md.test
+  mv docs/index.md.save docs/index.md
   cmp docs/index.md docs/index.md.test
   rm docs/index.md.test
 }

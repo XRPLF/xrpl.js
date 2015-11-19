@@ -28,6 +28,10 @@ Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/d
 2. `cd` into the repository and install dependencies with `npm install`
 3. `npm test` or `npm test --coverage` (`istanbul` will create coverage reports in coverage/lcov-report/`)
 
+##Generating Documentation
+
+The continuous integration tests require that the documentation stays up-to-date. If you make changes the the JSON schemas, fixtures, or documentation sources, you must update the documentation by running `npm run docgen`.
+
 ##More Information
 
 + [Ripple Dev Portal](https://ripple.com/build/)

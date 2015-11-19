@@ -1,6 +1,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const execSync = require('child_process').execSync;
 const ejs = require('ejs');
 const renderFromPaths =
   require('json-schema-to-markdown-table').renderFromPaths;
@@ -39,9 +40,9 @@ function main() {
       console.error(error);
       process.exit(1);
     } else {
-      const outputPath = process.argv.length > 2 ? process.argv[2] :
-        path.join(ROOT, 'docs', 'index.md');
+      const outputPath = path.join(ROOT, 'docs', 'index.md');
       fs.writeFileSync(outputPath, output);
+      execSync('npm run doctoc', {cwd: ROOT});
       process.exit(0);
     }
   });
