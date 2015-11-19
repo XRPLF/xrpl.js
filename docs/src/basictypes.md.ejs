@@ -1,0 +1,49 @@
+# Basic Types
+
+## Ripple Address
+
+```json
+"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
+```
+
+Every Ripple account has an *address*, which is a base58-encoding of a hash of the account's public key.
+
+## Account Sequence Number
+
+Every Ripple account has a *sequence number* that is used to order transactions. Every transaction must have a sequence number and transaction can only be executed in order by sequence number. This prevents one transaction from executing twice and transactions executing out of order. The sequence number starts at `1` and increments for each transaction that the account makes.
+
+## Currency
+
+Currencies are represented as either 3-character currency codes or 40-character uppercase hexadecimal strings. We recommend using uppercase [ISO 4217 Currency Codes](http://www.xe.com/iso4217.php) only. The string "XRP" is disallowed on trustlines because it is reserved for the Ripple native currency. The following characters are permitted: all uppercase and lowercase letters, digits, as well as the symbols `?`, `!`, `@`, `#`, `$`, `%`, `^`, `&`, `*`, `<`, `>`, `(`, `)`, `{`, `}`, `[`, `]`, and `|`.
+
+## Value
+A *value* is a quantity of a currency represented as a decimal string (string encoding is used because javascript numbers do not have sufficient precision).
+
+An XRP value has 6 significant digits past the decimal point. A non-XRP value has 16 total digits of precision.
+
+## Amount
+
+```json
+{
+  "currency": "USD",
+  "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+  "value": "100"
+}
+```
+
+```json
+{
+  "currency": "XRP",
+  "value": "2000"
+}
+```
+
+An *amount* is data structure representing a currency, a quantity of that currency, and the counterparty on the trustline that holds the value (for all currencies besides "XRP").
+
+A *lax amount* allows the counterparty to be omitted for all currencies. If the counterparty is not specified in an amount within a transaction specification, then any counterparty may be used for that amount.
+
+A *lax lax amount* allows either or both the counterparty and value to be omitted.
+
+A *balance* is an amount than can have a negative value.
+
+<%- renderSchema('objects/amount-base.json') %>

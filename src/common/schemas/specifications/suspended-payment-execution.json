@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "suspendedPaymentExecution",
+  "link": "suspended-payment-execution",
+  "type": "object",
+  "properties": {
+    "memos": {"$ref": "memos"},
+    "owner": {
+      "$ref": "address",
+      "description": "The address of the owner of the suspended payment to execute."
+    },
+    "suspensionSequence": {
+      "$ref": "sequence",
+      "description": "The [account sequence number](#account-sequence-number) of the [Suspended Payment Creation](#suspended-payment-creation) transaction for the suspended payment to execute."
+    },
+    "method": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "description": "The method for verifying the proof; only method `1` is supported."
+    },
+    "digest": {
+      "$ref": "hash256",
+      "description": "The original `digest` from the suspended payment creation transaction. This is sha256 hash of `proof` string. It is replicated here so that the relatively expensive hashing operation can be delegated to a server without ledger history and the server with ledger history only has to do a quick comparison of the old digest with the new digest."
+    },
+    "proof": {
+      "type": "string",
+      "description": "A value that produces the digest when hashed. It must be 32 charaters long and contain only 8-bit characters.",
+      "pattern": "^[\\x00-\\xFF]{32}$"
+    }
+  },
+  "required": ["owner", "suspensionSequence"],
+  "additionalProperties": false
+}

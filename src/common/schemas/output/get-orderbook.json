@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getOrderbook",
+  "type": "object",
+  "properties": {
+    "bids": {
+      "$ref": "orderbookOrders",
+      "description": "The buy orders in the order book."
+    },
+    "asks": {
+      "$ref": "orderbookOrders",
+      "description": "The sell orders in the order book."
+    }
+  },
+  "required": ["bids", "asks"],
+  "additionalProperties": false
+}

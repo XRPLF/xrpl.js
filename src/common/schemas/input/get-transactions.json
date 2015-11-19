@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getTransactionsParameters",
+  "description": "Parameters for getTransactions",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account to get transactions for."
+    },
+    "options": {
+      "description": "Options to filter the resulting transactions.",
+      "properties": {
+        "start": {
+          "$ref": "hash256",
+          "description": "If specified, this transaction will be the first transaction in the result."
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "If specified, return at most this many transactions."
+        },
+        "minLedgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "Return only transactions in this ledger verion or higher."
+        },
+        "maxLedgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "Return only transactions in this ledger version or lower."
+        },
+        "earliestFirst": {
+          "type": "boolean",
+          "description": "If true, sort transactions so that the earliest ones come first. By default, the newest transactions will come first."
+        },
+        "excludeFailures": {
+          "type": "boolean",
+          "description": "If true, the result will omit transactions that did not succeed."
+        },
+        "initiated": {
+          "type": "boolean",
+          "description": "If true, return only transactions initiated by the account specified by `address`. If false, return only transactions not initiated by the account specified by `address`."
+        },
+        "counterparty": {
+          "$ref": "address",
+          "description": "If provided, only return transactions with this account as a counterparty to the transaction."
+        },
+        "types": {
+          "type": "array",
+          "items": {"$ref": "transactionType"},
+          "description": "Only return transactions of the specified [Transaction Types](#transaction-types)."
+        },
+        "binary": {
+          "type": "boolean",
+          "description": "If true, the transactions will be sent from the server in a condensed binary format rather than JSON."
+        }
+      },
+      "additionalProperties": false,
+      "not": {
+        "anyOf": [
+          {"required": ["start", "minLedgerVersion"]},
+          {"required": ["start", "maxLedgerVersion"]}
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": ["address"]
+}

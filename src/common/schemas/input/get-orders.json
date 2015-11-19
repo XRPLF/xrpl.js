@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getOrdersParameters",
+  "description": "Parameters for getOrders",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The Ripple address of the account to get open orders for."
+    },
+    "options": {
+      "description": "Options that determine what orders will be returned.",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "At most this many orders will be returned."
+        },
+        "ledgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "Return orders as of this historical ledger version."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["address"],
+  "additionalProperties": false
+}

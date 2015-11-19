@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "balance",
+  "description": "Balance amount",
+  "link": "amount",
+  "type": "object",
+  "properties": {
+    "value": {
+      "description": "The balance on the trustline",
+      "$ref": "signedValue"
+    },
+    "currency": {
+      "description": "The three-character code or hexadecimal string used to denote currencies",
+      "$ref": "currency"
+    },
+    "counterparty": {
+      "description": "The Ripple address of the account that owes or is owed the funds.",
+      "$ref": "address"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["currency", "value"],
+  "oneOf": [
+    {
+      "properties": {
+        "currency": {
+          "not": {
+            "enum": ["XRP"]
+          }
+        }
+      },
+      "required": ["counterparty"]
+    },
+    {
+      "properties": {
+        "currency": {
+          "enum": ["XRP"]
+        }
+      },
+      "not": {
+        "required": ["counterparty"]
+      }
+    }
+  ]
+}

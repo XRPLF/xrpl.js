@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getBalancesParameters",
+  "description": "Parameters for getBalances",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account to get balances for."
+    },
+    "options": {
+      "description": "Options to filter and determine which balances to return.",
+      "properties": {
+        "counterparty": {
+          "$ref": "address",
+          "description": "Only return balances with this counterparty."
+        },
+        "currency": {
+          "$ref": "currency",
+          "description": "Only return balances for this currency."
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Return at most this many balances."
+        },
+        "ledgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "Return balances as they were in this historical ledger version."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": ["address"]
+}

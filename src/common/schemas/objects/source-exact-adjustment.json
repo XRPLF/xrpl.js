@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "sourceExactAdjustment",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address to send from."
+    },
+    "amount": {
+      "$ref": "laxAmount",
+      "description": "An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with source.maxAmount)"
+    },
+    "tag": {"$ref": "tag"}
+  },
+  "required": ["address", "amount"],
+  "additionalProperties": false
+}

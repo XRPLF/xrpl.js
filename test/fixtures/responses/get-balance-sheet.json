@@ -1,0 +1,54 @@
+{
+  "balances": [
+    {
+    "counterparty": "rKm4uWpg9tfwbVSeATv4KxDe6mpE9yPkgJ",
+    "currency": "EUR",
+    "value": "29826.1965999999"
+  },
+  {
+    "counterparty": "rKm4uWpg9tfwbVSeATv4KxDe6mpE9yPkgJ",
+    "currency": "USD",
+    "value": "10.0"
+  },
+  {
+    "counterparty": "ra7JkEzrgeKHdzKgo4EUUVBnxggY4z37kt",
+    "currency": "USD",
+    "value": "13857.70416"
+  }
+  ],
+  "assets": [
+    {
+    "counterparty": "r9F6wk8HkXrgYWoJ7fsv4VrUBVoqDVtzkH",
+    "currency": "BTC",
+    "value": "5444166510000000e-26"
+  },
+  {
+    "counterparty": "r9F6wk8HkXrgYWoJ7fsv4VrUBVoqDVtzkH",
+    "currency": "USD",
+    "value": "100.0"
+  },
+  {
+    "counterparty": "rwmUaXsWtXU4Z843xSYwgt1is97bgY8yj6",
+    "currency": "BTC",
+    "value": "8700000000000000e-30"
+  }
+  ],
+  "obligations": [
+    {
+      "currency": "BTC",
+      "value": "5908.324927635318"
+    },
+    {
+      "currency": "EUR",
+      "value": "992471.7419793958"
+    },
+    {
+      "currency": "GBP",
+      "value": "4991.38706013193"
+    },
+    {
+      "currency": "USD",
+      "value": "1997134.20229482"
+    }
+  ]
+}

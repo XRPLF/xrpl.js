@@ -1,0 +1,83 @@
+# Transaction Specifications
+
+A *transaction specification* specifies what a transaction should do. Each [Transaction Type](#transaction-types) has its own type of specification.
+
+## Payment
+
+See [Transcation Types](#transaction-types) for a description.
+
+<%- renderSchema('specifications/payment.json') %>
+
+### Example
+
+<%- renderFixture('requests/prepare-payment.json') %>
+
+## Trustline
+
+See [Transcation Types](#transaction-types) for a description.
+
+<%- renderSchema('specifications/trustline.json') %>
+
+### Example
+
+<%- renderFixture('requests/prepare-trustline.json') %>
+
+## Order
+
+See [Transcation Types](#transaction-types) for a description.
+
+<%- renderSchema('specifications/order.json') %>
+
+### Example
+
+<%- renderFixture('requests/prepare-order.json') %>
+
+## Order Cancellation
+
+See [Transcation Types](#transaction-types) for a description.
+
+<%- renderSchema('specifications/order-cancellation.json') %>
+
+### Example
+
+<%- renderFixture('requests/prepare-order-cancellation.json') %>
+
+## Settings
+
+See [Transcation Types](#transaction-types) for a description.
+
+<%- renderSchema('output/get-settings.json') %>
+
+### Example
+
+<%- renderFixture('requests/prepare-settings.json') %>
+
+## Suspended Payment Creation
+
+See [Transcation Types](#transaction-types) for a description.
+
+<%- renderSchema('specifications/suspended-payment-creation.json') %>
+
+### Example
+
+<%- renderFixture('requests/prepare-suspended-payment-creation.json') %>
+
+## Suspended Payment Cancellation
+
+See [Transcation Types](#transaction-types) for a description.
+
+<%- renderSchema('specifications/suspended-payment-cancellation.json') %>
+
+### Example
+
+<%- renderFixture('requests/prepare-suspended-payment-cancellation.json') %>
+
+## Suspended Payment Execution
+
+See [Transcation Types](#transaction-types) for a description.
+
+<%- renderSchema('specifications/suspended-payment-execution.json') %>
+
+### Example
+
+<%- renderFixture('requests/prepare-suspended-payment-execution.json') %>

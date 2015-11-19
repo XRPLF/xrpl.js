@@ -1,0 +1,11 @@
+{
+  "feeBase": 10,
+  "feeReference": 10,
+  "ledgerVersion": 14804627,
+  "ledgerHash": "9141FA171F2C0CE63E609466AF728FF66C12F7ACD4B4B50B0947A7F3409D593A",
+  "ledgerTimestamp": "2015-07-23T05:50:40.000Z",
+  "reserveBase": 20000000,
+  "reserveIncrement": 5000000,
+  "transactionCount": 19,
+  "validatedLedgerVersions": "13983423-14804627"
+}

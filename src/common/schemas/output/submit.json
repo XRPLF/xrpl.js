@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "submit",
+  "type": "object",
+  "properties": {
+    "resultCode": {
+      "type": "string",
+      "description": "The result code returned by rippled. [List of tranasction responses](http://pages.lightthenight.org/gba/SanFran15/ripple)"
+    },
+    "resultMessage": {
+      "type": "string",
+      "description": "Human-readable explanation of the status of the transaction."
+    }
+  },
+  "required": ["resultCode", "resultMessage"],
+  "additionalProperties": false
+}

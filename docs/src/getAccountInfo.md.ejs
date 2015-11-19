@@ -1,0 +1,25 @@
+## getAccountInfo
+
+`getAccountInfo(address: string, options: Object): Promise<Object>`
+
+Returns information for the specified account. Note: For account data that is modifiable by the user, see [getSettings](#getsettings).
+
+### Parameters
+
+<%- renderSchema('input/get-account-info.json') %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<%- renderSchema('output/get-account-info.json') %>
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+return api.getAccountInfo(address).then(info =>
+  {/* ... */});
+```
+
+<%- renderFixture('responses/get-account-info.json') %>

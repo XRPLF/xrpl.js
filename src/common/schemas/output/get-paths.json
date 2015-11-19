@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getPaths",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "$ref": "sourceAdjustment",
+        "description": "Properties of the source of the payment."
+      },
+      "destination": {
+        "$ref": "destinationAdjustment",
+        "description": "Properties of the destination of the payment."
+      },
+      "paths": {
+        "type": "string",
+        "description": "The paths of trustlines and orders to use in executing the payment."
+      }
+    },
+    "required": ["source", "destination", "paths"],
+    "additionalProperties": false
+  }
+}

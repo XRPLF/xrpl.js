@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getTrustlines",
+  "type": "array",
+  "items": {
+    "properties": {
+      "specification": {
+        "$ref": "trustline",
+        "description": "A trustline specification that would produce this trustline in its current state."
+      },
+      "counterparty": {
+        "properties": {
+          "limit": {
+            "$ref": "value",
+            "description": "The maximum amount that the counterparty can be owed through the trustline."
+          },
+          "ripplingDisabled": {
+            "type": "boolean",
+            "description": "If true, payments cannot ripple through this trustline."
+          },
+          "frozen": {
+            "type": "boolean",
+            "description": "If true, the trustline is frozen, which means that funds can only be sent to the counterparty."
+          },
+          "authorized": {
+            "type": "boolean",
+            "description": "If true, the counterparty authorizes this party to hold issuances from the counterparty."
+          }
+        },
+        "description": "Properties of the trustline from the perspective of the counterparty.",
+        "required": ["limit"],
+        "additionalProperties": false
+      },
+      "state": {
+        "properties": {
+          "balance": {
+            "$ref": "value",
+            "description": "The balance on the trustline, representing which party owes the other and by how much."
+          }
+        },
+        "description": "Properties of the trustline regarding it's current state that are not part of the specification.",
+        "required": ["balance"],
+        "additionalProperties": false
+      }
+    },
+    "required": ["specification", "counterparty", "state"],
+    "additionalProperties": false
+  }
+}

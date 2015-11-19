@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "generateAddress",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "A randomly generated Ripple account address."
+    },
+    "secret": {
+      "type": "string",
+      "format": "secret",
+      "description": "The secret corresponding to the `address`."
+    }
+  },
+  "required": ["address", "secret"],
+  "additionalProperties": false
+}

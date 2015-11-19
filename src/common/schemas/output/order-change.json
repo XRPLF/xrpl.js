@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "orderChange",
+  "type": "object",
+  "description": "A change to an order.",
+  "properties": {
+    "direction": {
+      "type": "string",
+      "enum": ["buy", "sell"],
+      "description": "Equal to \"buy\" for buy orders and \"sell\" for sell orders."
+    },
+    "quantity": {
+      "$ref": "amount",
+      "description": "The amount to be bought or sold by the maker."
+    },
+    "totalPrice": {
+      "$ref": "amount",
+      "description": "The total amount to be paid or received by the taker."
+    },
+    "makerExchangeRate": {
+      "$ref": "value",
+      "description": "The exchange rate between the `quantity` currency and the `totalPrice` currency from the point of view of the maker."
+    },
+    "sequence": {
+      "$ref": "sequence",
+      "description": "The order sequence number, used to identify the order for cancellation"
+    },
+    "status": {
+      "enum": ["created", "filled", "partially-filled", "cancelled"],
+      "description": "The status of the order. One of \"created\", \"filled\", \"partially-filled\", \"cancelled\"."
+    },
+    "expirationTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time after which the order expires, if any."
+    }
+  },
+  "required": ["direction", "quantity", "totalPrice", "sequence", "status"],
+  "additionalProperties": false
+}

@@ -1,0 +1,24 @@
+## getLedger
+
+`getLedger(options: Object): Promise<Object>`
+
+Returns header information for the specified ledger (or the most recent validated ledger if no ledger is specified). Optionally, all the transactions that were validated in the ledger or the account state information can be returned with the ledger header.
+
+### Parameters
+
+<%- renderSchema('input/get-ledger.json') %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<%- renderSchema('output/get-ledger.json') %>
+
+### Example
+
+```javascript
+return api.getLedger()
+  .then(ledger => {/* ... */});
+```
+
+<%- renderFixture('responses/get-ledger.json') %>

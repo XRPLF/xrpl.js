@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "minAdjustment",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address to send to."
+    },
+    "minAmount": {
+      "$ref": "laxAmount",
+      "description": "The minimum amount to be delivered. (This field is exclusive with destination.amount)"
+    },
+    "tag": {"$ref": "tag"}
+  },
+  "required": ["address", "minAmount"],
+  "additionalProperties": false
+}

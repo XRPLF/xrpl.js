@@ -1,0 +1,25 @@
+## getTrustlines
+
+`getTrustlines(address: string, options: Object): Promise<Array<Object>>`
+
+Returns trustlines for a specified account.
+
+### Parameters
+
+<%- renderSchema("input/get-trustlines.json") %>
+
+### Return Value
+
+This method returns a promise that resolves with an array of objects with the following structure.
+
+<%- renderSchema("output/get-trustlines.json") %>
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+return api.getTrustlines(address).then(trustlines =>
+  {/* ... */});
+```
+
+<%- renderFixture("responses/get-trustlines.json") %>

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "maxAdjustment",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address to send from."
+    },
+    "maxAmount": {
+      "$ref": "laxAmount",
+      "description": "The maximum amount to send. (This field is exclusive with source.amount)"
+    },
+    "tag": {"$ref": "tag"}
+  },
+  "required": ["address", "maxAmount"],
+  "additionalProperties": false
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "outcome",
+  "type": "object",
+  "description": "The outcome of the transaction (what effects it had).",
+  "properties": {
+    "result": {
+      "type": "string",
+      "description": "Result code returned by rippled. See [Transaction Results](https://ripple.com/build/transactions/#full-transaction-response-list) for a complete list."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp when the transaction was validated. (May be missing when requesting transactions in binary mode.)"
+    },
+    "fee": {
+      "$ref": "value",
+      "description": "The XRP fee that was charged for the transaction."
+    },
+    "balanceChanges": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "description": "Key is the ripple address; value is an array of signed amounts representing changes of balances for that address.",
+        "items": {"$ref": "balance"}
+      }
+    },
+    "orderbookChanges": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "description": "Key is the maker's ripple address; value is an array of changes",
+        "items": {"$ref": "orderChange"}
+      }
+    },
+    "ledgerVersion": {
+      "$ref": "ledgerVersion",
+      "description": "The ledger version that the transaction was validated in."
+    },
+    "indexInLedger": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The ordering index of the transaction in the ledger."
+    }
+  },
+  "required": ["result", "fee", "balanceChanges",
+    "orderbookChanges", "ledgerVersion", "indexInLedger"],
+  "additionalProperties": false
+}

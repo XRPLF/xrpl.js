@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "ledgerClosed",
+  "description": "A ledgerClosed event message",
+  "type": "object",
+  "properties": {
+    "feeBase": {"type": "integer", "minimum": 0},
+    "feeReference": {"type": "integer", "minimum": 0},
+    "ledgerHash": {"$ref": "hash256"},
+    "ledgerVersion": {"$ref": "ledgerVersion"},
+    "ledgerTimestamp": {"type": "string", "format": "date-time"},
+    "reserveBase": {"type": "integer", "minimum": 0},
+    "reserveIncrement": {"type": "integer", "minimum": 0},
+    "transactionCount": {"type": "integer", "minimum": 0},
+    "validatedLedgerVersions": {"type": "string"}
+  },
+  "addtionalProperties": false,
+  "required": ["feeBase", "feeReference", "ledgerHash", "ledgerTimestamp",
+    "reserveBase", "reserveIncrement", "transactionCount",
+    "ledgerVersion", "validatedLedgerVersions"]
+}

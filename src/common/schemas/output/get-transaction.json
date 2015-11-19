@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getTransaction",
+  "link": "gettransaction",
+  "properties": {
+    "type": {"$ref": "transactionType"},
+    "specification": {
+      "description": "A specification that would produce the same outcome as this transaction. The structure of the specification depends on the value of the `type` field (see [Transaction Types](#transaction-types) for details). *Note:* This is **not** necessarily the same as the original specification."
+    },
+    "outcome": {
+      "$ref": "outcome",
+      "description": "The outcome of the transaction (what effects it had)."
+    },
+    "id": {
+      "$ref": "id",
+      "description": "A hash of the transaction that can be used to identify it."
+    },
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that initiated the transaction."
+    },
+    "sequence": {
+      "$ref": "sequence",
+      "description": "The account sequence number of the transaction for the account that initiated it."
+    }
+  },
+  "required": ["id", "address", "sequence", "type", "specification", "outcome"],
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "properties": {
+        "type": {"enum": ["payment"]},
+        "specification": {"$ref": "payment"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["order"]},
+        "specification": {"$ref": "order"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["orderCancellation"]},
+        "specification": {"$ref": "orderCancellation"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["trustline"]},
+        "specification": {"$ref": "trustline"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["settings"]},
+        "specification": {"$ref": "getSettings"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["suspendedPaymentCreation"]},
+        "specification": {"$ref": "suspendedPaymentCreation"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["suspendedPaymentCancellation"]},
+        "specification": {"$ref": "suspendedPaymentCancellation"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["suspendedPaymentExecution"]},
+        "specification": {"$ref": "suspendedPaymentExecution"}
+      }
+    }
+  ]
+}

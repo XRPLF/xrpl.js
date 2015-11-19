@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "tx",
+  "link": "https://ripple.com/build/transactions/",
+  "description": "An object in rippled txJSON format",
+  "type": "object",
+  "properties": {
+    "Account": {"$ref": "address"}
+  },
+  "required": ["Account"]
+}

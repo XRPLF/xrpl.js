@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "submitParameters",
+  "type": "object",
+  "properties": {
+    "signedTransaction": {
+      "$ref": "blob",
+      "description": "A signed transaction as returned by [sign](#sign)."
+    }
+  },
+  "additionalProperties": false,
+  "required": ["signedTransaction"]
+}

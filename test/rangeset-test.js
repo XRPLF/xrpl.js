@@ -1,78 +1,80 @@
-var assert = require('assert');
-var RangeSet = require('ripple-lib').RangeSet;
+'use strict';
+const assert = require('assert');
+const RangeSet = require('ripple-api').RippleAPI._PRIVATE.RangeSet;
 
 describe('RangeSet', function() {
-  it('add()', function() {
-    var r = new RangeSet();
+  it('addRange()/addValue()', function() {
+    const r = new RangeSet();
 
-    r.add('4-5');
-    r.add('7-10');
-    r.add('1-2');
-    r.add('3');
+    r.addRange(4, 5);
+    r.addRange(7, 10);
+    r.addRange(1, 2);
+    r.addValue(3);
 
-    assert.deepEqual(r._ranges, [
-      { start: 1, end: 2 },
-      { start: 3, end: 3 },
-      { start: 4, end: 5 },
-      { start: 7, end: 10 }
-    ]);
+    assert.deepEqual(r.serialize(), '1-5,7-10');
   });
 
-  it('add() -- malformed range', function() {
-    var r = new RangeSet();
-
+  it('addValue()/addRange() -- malformed', function() {
+    const r = new RangeSet();
     assert.throws(function() {
-      r.add(null);
-    });
-    assert.throws(function() {
-      r.add(void(0));
-    });
-    assert.throws(function() {
-      r.add('a');
-    });
-    assert.throws(function() {
-      r.add('2-1');
+      r.addRange(2, 1);
     });
   });
 
-  it('contains()', function() {
-    var r = new RangeSet();
+  it('parseAndAddRanges()', function() {
+    const r = new RangeSet();
+    r.parseAndAddRanges('4-5,7-10,1-2,3-3');
+    assert.deepEqual(r.serialize(), '1-5,7-10');
+  });
+  it('parseAndAddRanges() -- single ledger', function() {
+    const r = new RangeSet();
 
-    r.add('32570-11005146');
-    r.add('11005147');
+    r.parseAndAddRanges('3');
+    assert.strictEqual(r.serialize(), '3-3');
+    assert(r.containsValue(3));
+    assert(!r.containsValue(0));
+    assert(!r.containsValue(2));
+    assert(!r.containsValue(4));
+    assert(r.containsRange(3, 3));
+    assert(!r.containsRange(2, 3));
+    assert(!r.containsRange(3, 4));
 
-    assert.strictEqual(r.contains(1), false);
-    assert.strictEqual(r.contains(32569), false);
-    assert.strictEqual(r.contains(32570), true);
-    assert.strictEqual(r.contains('32570'), true);
-    assert.strictEqual(r.contains(50000), true);
-    assert.strictEqual(r.contains(11005146), true);
-    assert.strictEqual(r.contains(11005147), true);
-    assert.strictEqual(r.contains(11005148), false);
-    assert.strictEqual(r.contains(12000000), false);
+    r.parseAndAddRanges('1-5');
+    assert.strictEqual(r.serialize(), '1-5');
+    assert(r.containsValue(3));
+    assert(r.containsValue(1));
+    assert(r.containsValue(5));
+    assert(!r.containsValue(6));
+    assert(!r.containsValue(0));
+    assert(r.containsRange(1, 5));
+    assert(r.containsRange(2, 4));
+    assert(!r.containsRange(1, 6));
+    assert(!r.containsRange(0, 3));
   });
 
-  it('contains() -- invalid ledger', function() {
-    var r = new RangeSet();
+  it('containsValue()', function() {
+    const r = new RangeSet();
 
-    assert.throws(function() {
-      r.contains(null);
-    });
-    assert.throws(function() {
-      r.contains(void(0));
-    });
-    assert.throws(function() {
-      r.contains('a');
-    });
+    r.addRange(32570, 11005146);
+    r.addValue(11005147);
+
+    assert.strictEqual(r.containsValue(1), false);
+    assert.strictEqual(r.containsValue(32569), false);
+    assert.strictEqual(r.containsValue(32570), true);
+    assert.strictEqual(r.containsValue(50000), true);
+    assert.strictEqual(r.containsValue(11005146), true);
+    assert.strictEqual(r.containsValue(11005147), true);
+    assert.strictEqual(r.containsValue(11005148), false);
+    assert.strictEqual(r.containsValue(12000000), false);
   });
 
   it('reset()', function() {
-    var r = new RangeSet();
+    const r = new RangeSet();
 
-    r.add('4-5');
-    r.add('7-10');
+    r.addRange(4, 5);
+    r.addRange(7, 10);
     r.reset();
 
-    assert.deepEqual(r._ranges, [ ]);
+    assert.deepEqual(r.serialize(), '');
   });
 });

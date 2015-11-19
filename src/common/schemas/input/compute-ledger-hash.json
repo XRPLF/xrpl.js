@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "computeLedgerHashParameters",
+  "type": "object",
+  "properties": {
+    "ledger": {
+      "$ref": "getLedger",
+      "description": "The ledger header to hash."
+    }
+  },
+  "additionalProperties": false,
+  "required": ["ledger"]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "api-options",
+  "type": "object",
+  "properties": {
+    "trace": {"type": "boolean"},
+    "feeCushion": {"$ref": "value"},
+    "servers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^wss?://"
+      }
+    },
+    "proxy": {
+      "format": "uri"
+    },
+    "authorization": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

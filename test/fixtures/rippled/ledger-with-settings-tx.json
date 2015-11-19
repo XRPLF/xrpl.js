@@ -1,0 +1,64 @@
+{
+  "id": 1,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "ledger": {
+      "accepted": true,
+      "account_hash": "2FC964BBFE22DF77A132FE12B5D2B58A09226EBCA73EF2CFF5BE29E56B3315F5",
+      "close_time": 441849810,
+      "parent_close_time": 441849790,
+      "close_time_human": "2014-Jan-01 00:03:30",
+      "close_time_resolution": 10,
+      "closed": true,
+      "hash": "B52AC083396E9119B6CEED69C155B663D58FCA9245917B904BE57FB089E677A4",
+      "ledger_hash": "B52AC083396E9119B6CEED69C155B663D58FCA9245917B904BE57FB089E677A4",
+      "ledger_index": "4181996",
+      "parent_hash": "599820AB83EF490BA04019E88A90202516D7F39CA169CF639ADCD0A434C7D7DF",
+      "seqNum": "4181996",
+      "totalCoins": "99999998243206519",
+      "total_coins": "99999998243206519",
+      "transaction_hash": "49B500E719BB3AC7CB74E3E0D028A01BFE626484F4659CDD98CB4E32BFE0D601",
+      "transactions": [
+        {
+          "Account": "rEGy9CxMTFGXFgUHUMreTy2FbqArabGy38",
+          "Fee": "10",
+          "Flags": 0,
+          "Sequence": 6478,
+          "SigningPubKey": "02CAB6F3A798712136DB5F105A98B0DE27C99AEDB68500181706B087CF1B6D0F2D",
+          "TransactionType": "AccountSet",
+          "TxnSignature": "304402202144BD33CC30793455B0F90954576EEE80F13C4C73538D2AEE012564C48E522E02207A8A4AD2CF2B4DB549FB2F05D38E065B5DD1EAA386310698E5247F1BB515E99F",
+          "hash": "FEEFC959B0351156F58A2275F5A6B37B07AA85CCCE2C4AF8A1342A0196A3CD4D",
+          "metaData": {
+            "AffectedNodes": [
+              {
+                "ModifiedNode": {
+                  "FinalFields": {
+                    "Account": "rEGy9CxMTFGXFgUHUMreTy2FbqArabGy38",
+                    "Balance": "403657865",
+                    "Flags": 0,
+                    "OwnerCount": 2,
+                    "Sequence": 6479
+                  },
+                  "LedgerEntryType": "AccountRoot",
+                  "LedgerIndex": "F64FAA4CAFDB9931DC06890FE30B4E29C32F7AD574FC7C3362B81265682BFAEA",
+                  "PreviousFields": {
+                    "Balance": "403657875",
+                    "Sequence": 6478
+                  },
+                  "PreviousTxnID": "B257B95A637C6C396507AD0AE122161A849C701F065B67009BB939690DB74BC9",
+                  "PreviousTxnLgrSeq": 4181972
+                }
+              }
+            ],
+            "TransactionIndex": 0,
+            "TransactionResult": "tesSUCCESS"
+          }
+        }
+      ]
+    },
+    "ledger_hash": "B52AC083396E9119B6CEED69C155B663D58FCA9245917B904BE57FB089E677A4",
+    "ledger_index": 4181996,
+    "validated": true
+  }
+}

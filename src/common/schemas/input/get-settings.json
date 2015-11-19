@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getSettingsParameters",
+  "description": "Parameters for getSettings",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account to get the settings of."
+    },
+    "options": {
+      "description": "Options that affect what to return.",
+      "properties": {
+        "ledgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "Get the settings as of this historical ledger version."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["address"],
+  "additionalProperties": false
+}

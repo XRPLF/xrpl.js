@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getTransactionParameters",
+  "description": "Parameters for getTransaction",
+  "type": "object",
+  "properties": {
+    "id": {"$ref": "id"},
+    "options": {
+      "description": "Options to limit the ledger versions to search.",
+      "properties": {
+        "minLedgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "The lowest ledger version to search."
+        },
+        "maxLedgerVersion": {
+          "$ref": "ledgerVersion",
+          "description": "The highest ledger version to search"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": ["id"]
+}

@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getPathsParameters",
+  "type": "object",
+  "properties": {
+    "pathfind": {
+      "description": "Specification of a pathfind request.",
+      "properties": {
+        "source": {
+          "description": "Properties of the source of funds.",
+          "type": "object",
+          "properties": {
+            "address": {
+              "$ref": "address",
+              "description": "The Ripple address of the account where funds will come from."
+            },
+            "amount": {
+              "$ref": "laxAmount",
+              "description": "The amount of funds to send."
+            },
+            "currencies": {
+              "description": "An array of currencies (with optional counterparty) that may be used in the payment paths.",
+              "type": "array",
+              "items": {
+                "description": "A currency with optional counterparty.",
+                "type": "object",
+                "properties": {
+                  "currency": {"$ref": "currency"},
+                  "counterparty": {
+                    "$ref": "address",
+                    "description": "The counterparty for the currency; if omitted any counterparty may be used."
+                  }
+                },
+                "required": ["currency"],
+                "additionalProperties": false
+              },
+              "uniqueItems": true
+            }
+          },
+          "not": {
+            "required": ["amount", "currencies"]
+          },
+          "additionalProperties": false,
+          "required": ["address"]
+        },
+        "destination": {
+          "description": "Properties of the destination of funds.",
+          "type": "object",
+          "properties": {
+            "address": {
+              "$ref": "address",
+              "description": "The address to send to."
+            },
+            "amount": {
+              "$ref": "laxLaxAmount",
+              "description": "The amount to be received by the receiver (`value` may be ommitted if a source amount is specified)."
+            }
+          },
+          "required": ["address", "amount"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["source", "destination"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": ["pathfind"]
+}

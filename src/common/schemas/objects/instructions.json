@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "instructions",
+  "link": "transaction-instructions",
+  "description": "Instructions for executing the transaction",
+  "type": "object",
+  "properties": {
+    "sequence": {
+      "description": "The initiating account's sequence number for this transaction.",
+      "$ref": "sequence"
+    },
+    "fee": {
+      "description": "An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.",
+      "$ref": "value"
+    },
+    "maxFee": {
+      "description": "The maximum fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.",
+      "$ref": "value"
+    },
+    "maxLedgerVersion": {
+      "description": "The highest ledger version that the transaction can be included in.",
+      "$ref": "ledgerVersion"
+    },
+    "maxLedgerVersionOffset": {
+      "description": "Offset from current legder version to highest ledger version that the transaction can be included in.",
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": false,
+  "not": {
+    "anyOf": [
+      {
+        "description": "fee and maxFee are mutually exclusive",
+        "required": ["fee", "maxFee"]
+      },
+      {
+        "description": "maxLedgerVersion and maxLedgerVersionOffset are mutually exclusive",
+        "required": ["maxLedgerVersion", "maxLedgerVersionOffset"]
+      }
+    ]
+  }
+}
