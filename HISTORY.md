@@ -1,3 +1,15 @@
+##0.13.2
+
+**Changes**
++ [Fix: Specify send_max when pathfinding with a source amount](https://github.com/ripple/ripple-lib/commit/75142139184625c8b9fcc480b1825d9985337813)
+
+##0.13.1
++ [Add documentation for API events](https://github.com/ripple/ripple-lib/commit/25d1ac0c5f95cad32ea4ceebb))
+
+**Changes**
++ [Fix: Add babel-polyfill](https://github.com/ripple/ripple-lib/commit/8a53abc32f6ec6c7d50cd182492d6fb511b86704)
++ [Fix: Bump version on ripple-hashes](https://github.com/ripple/ripple-lib/commit/12e5765c64aea31b3c2fb65ff989cf01e6368f58)
+
 ##0.13.0
 
 **Breaking Changes**
