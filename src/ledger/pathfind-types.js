@@ -30,8 +30,8 @@ export type PathFindRequest = {
   source_account: string,
   destination_amount: RippledAmount,
   destination_account: string,
-  source_amount?: RippledAmount,
-  source_currencies?: Array<string>
+  source_currencies?: Array<string>,
+  send_max?: RippledAmount
 }
 
 export type RippledPathsResponse = {

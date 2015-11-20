@@ -289,6 +289,21 @@ describe('integration tests', function() {
     });
   });
 
+  it('getPaths - send all', function() {
+    const pathfind = requests.getPaths.sendAll;
+    return this.api.getPaths(pathfind).then(data => {
+      assert(data && data.length > 0);
+      assert(_.every(data, path => {
+        return parseFloat(path.source.amount.value)
+        <= parseFloat(pathfind.source.amount.value);
+      }));
+      const path = data[0];
+      assert(path && path.source);
+      assert.strictEqual(path.source.address, pathfind.source.address);
+      assert(path.paths && path.paths.length > 0);
+    });
+  });
+
 
   it('generateWallet', function() {
     const newWallet = this.api.generateAddress();
