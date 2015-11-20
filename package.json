@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "ajv": "^1.4.8",
+    "babel-polyfill": "^6.2.0",
     "babel-runtime": "^5.5.4",
     "bignumber.js": "^2.0.3",
     "https-proxy-agent": "^1.0.0",
