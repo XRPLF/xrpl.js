@@ -46,9 +46,9 @@ function requestPathFind(connection: Connection, pathfind: PathFind): Promise {
       throw new ValidationError('Cannot specify both source.amount'
         + ' and destination.amount.value in getPaths');
     }
-    request.source_amount = toRippledAmount(pathfind.source.amount);
-    if (request.source_amount.currency && !request.source_amount.issuer) {
-      request.source_amount.issuer = pathfind.source.address;
+    request.send_max = toRippledAmount(pathfind.source.amount);
+    if (request.send_max.currency && !request.send_max.issuer) {
+      request.send_max.issuer = pathfind.source.address;
     }
   }
 
