@@ -63,17 +63,26 @@
 
 # Introduction
 
-RippleAPI allows you to query and submit transactions to a node on the Ripple network.
+RippleAPI is the official client library to the Ripple Consensus Ledger. Currently, RippleAPI is only available in JavaScript. 
+Using RippleAPI, you can:
+
+* [Query transactions from the network](#gettransaction)
+* [Sign](#sign) transactions securely without connecting to any server
+* [Submit](#submit) transactions to the Ripple Consensus Ledger, including [Payments](#payment), [Orders](#order), [Settings changes](#settings), and [other types](#transaction-types)
+* [Generate a new Ripple Address](#generateaddress)
+* ... and [much more](#api-methods).
 
 RippleAPI only provides access to *validated*, *immutable* transaction data.
 
 ## Boilerplate
 
+Use the following [boilerplate code](https://en.wikipedia.org/wiki/Boilerplate_code) to wrap your custom code using RippleAPI.
+
 ```javascript
 const {RippleAPI} = require('ripple-lib');
 
 const api = new RippleAPI({
-  servers: ['wss://s1.ripple.com']
+  servers: ['wss://s1.ripple.com'] //Public rippled server hosted by Ripple, Inc.
 });
 api.connect().then(() => {
   /* insert code here */
@@ -82,25 +91,34 @@ api.connect().then(() => {
 }).catch(console.error);
 ```
 
-To get started, first install [nodejs](https://nodejs.org) version `0.12.0` or greater, then:
+RippleAPI is designed to work in [NodeJS](https://nodejs.org) (version `0.12.0` or greater) using [Babel](https://babeljs.io/) for [ECMAScript 6](https://babeljs.io/docs/learn-es2015/) support.
 
-`npm install -g babel`
-
-`npm install ripple-lib`
-
-Then create a script based on the boilerplate shown here and run with:
-
-`babel-node script.js`
-
-The code samples in this documentation are written in ES6, but `RippleAPI` will work with ES5 also. Regardless of whether you use ES5 or ES6, the methods that return promises will return ES6-style promises.
+The code samples in this documentation are written in ES6, but `RippleAPI` will work with ES5 also. Regardless of whether you use ES5 or ES6, the methods that return promises will return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise_).
 
 <aside class="notice">
 All the code snippets in this documentation assume that you have surrounded them with this boilerplate.
 </aside>
 
 <aside class="notice">
-Dont forget the "catch" or errors may not be visible.
+If you omit the "catch" section, errors may not be visible.
 </aside>
+
+
+### Installation ###
+
+1. Install [NodeJS](https://nodejs.org) and the Node Package Manager (npm). Most Linux distros have a package for NodeJS, but make sure you have version `0.12.0` or higher.
+2. Use npm to install [Babel](https://babeljs.io/) globally:
+      npm install -g babel
+3. Use npm to install RippleAPI:
+      npm install ripple-lib
+
+After you have installed ripple-lib, you can create scripts using the [boilerplate](#boilerplate) and run them using babel-node:
+      babel-node script.js
+
+<aside class="notice">
+Instead of using babel-node in production, we recommend using Babel to transpile to ECMAScript 5 first.
+</aside>
+
 
 # Basic Types
 
