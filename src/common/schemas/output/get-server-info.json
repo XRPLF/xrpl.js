@@ -93,12 +93,12 @@
         "reserveBaseXRP": {
           "type": "integer",
           "minimum": 0,
-          "description": "Minimum amount of XRP (not drops) necessary for every account to keep in reserve."
+          "description": "Minimum amount of XRP necessary for every account to keep in reserve."
         },
         "reserveIncrementXRP": {
           "type": "integer",
           "minimum": 0,
-          "description": "Amount of XRP (not drops) added to the account reserve for each object an account is responsible for in the ledger."
+          "description": "Amount of XRP added to the account reserve for each object an account is responsible for in the ledger."
         },
         "ledgerVersion": {
           "type": "integer",

@@ -1,18 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "ledgerClosed",
-  "description": "A ledgerClosed event message",
+  "title": "ledgerEvent",
+  "description": "A ledger event message",
   "type": "object",
   "properties": {
-    "feeBase": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "Base fee, in drops."
-    },
-    "feeReference": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "Cost of the 'reference transaction' in 'fee units'."
+    "baseFeeXRP": {
+      "$ref": "value",
+      "description": "Base fee, in XRP."
     },
     "ledgerHash": {
       "$ref": "hash256",
@@ -27,14 +21,12 @@
       "format": "date-time",
       "description": "The time at which this ledger closed."
     },
-    "reserveBase": {
-      "type": "integer",
-      "minimum": 0,
+    "reserveBaseXRP": {
+      "$ref": "value",
       "description": "The minimum reserve, in drops of XRP, that is required for an account."
     },
-    "reserveIncrement": {
-      "type": "integer",
-      "minimum": 0,
+    "reserveIncrementXRP": {
+      "$ref": "value",
       "description": "The increase in account reserve that is added for each item the account owns, such as offers or trust lines."
     },
     "transactionCount": {
@@ -48,7 +40,7 @@
     }
   },
   "addtionalProperties": false,
-  "required": ["feeBase", "feeReference", "ledgerHash", "ledgerTimestamp",
-    "reserveBase", "reserveIncrement", "transactionCount",
+  "required": ["baseFeeXRP", "ledgerHash", "ledgerTimestamp",
+    "reserveBaseXRP", "reserveIncrementXRP", "transactionCount",
     "ledgerVersion", "validatedLedgerVersions"]
 }

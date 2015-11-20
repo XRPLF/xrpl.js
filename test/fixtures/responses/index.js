@@ -77,5 +77,5 @@ module.exports = {
   sign: require('./sign.json'),
   signSuspended: require('./sign-suspended.json'),
   submit: require('./submit.json'),
-  ledgerClosed: require('./ledger-closed.json')
+  ledgerEvent: require('./ledger-event.json')
 };

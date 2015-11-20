@@ -61,7 +61,7 @@ function loadSchemas() {
     require('./schemas/output/get-orders.json'),
     require('./schemas/output/order-change.json'),
     require('./schemas/output/prepare.json'),
-    require('./schemas/output/ledger-closed.json'),
+    require('./schemas/output/ledger-event.json'),
     require('./schemas/output/get-paths.json'),
     require('./schemas/output/get-server-info.json'),
     require('./schemas/output/get-settings.json'),
