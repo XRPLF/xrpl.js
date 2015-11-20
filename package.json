@@ -16,13 +16,14 @@
   },
   "dependencies": {
     "ajv": "^1.4.8",
+    "babel-polyfill": "^6.2.0",
     "babel-runtime": "^5.5.4",
     "bignumber.js": "^2.0.3",
     "https-proxy-agent": "^1.0.0",
     "lodash": "^3.1.0",
     "ripple-address-codec": "^2.0.1",
     "ripple-binary-codec": "^0.1.0",
-    "ripple-hashes": "^0.0.1",
+    "ripple-hashes": "^0.1.0",
     "ripple-keypairs": "^0.10.0",
     "ripple-lib-transactionparser": "^0.6.0",
     "ws": "^0.7.1"
