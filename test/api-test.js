@@ -896,9 +896,9 @@ describe('RippleAPI', function() {
 
   });
 
-  it('ledgerClosed', function(done) {
-    this.api.on('ledgerClosed', message => {
-      checkResult(responses.ledgerClosed, 'ledgerClosed', message);
+  it('ledger event', function(done) {
+    this.api.on('ledger', message => {
+      checkResult(responses.ledgerEvent, 'ledgerEvent', message);
       done();
     });
     closeLedger(this.api.connection);

@@ -1,22 +1,22 @@
 # API Events
 
-## ledgerClosed
+## ledger
 
 This event is emitted whenever a new ledger version is validated on the connected server.
 
 ### Return Value
 
-<%- renderSchema('output/ledger-closed.json') %>
+<%- renderSchema('output/ledger-event.json') %>
 
 ### Example
 
 ```javascript
-api.on('ledgerClosed', ledger => {
+api.on('ledger', ledger => {
   console.log(JSON.stringify(ledger, null, 2));
 });
 ```
 
-<%- renderFixture('responses/ledger-closed.json') %>
+<%- renderFixture('responses/ledger-event.json') %>
 
 ## error
 

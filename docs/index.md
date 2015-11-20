@@ -56,7 +56,7 @@
   - [generateAddress](#generateaddress)
   - [computeLedgerHash](#computeledgerhash)
 - [API Events](#api-events)
-  - [ledgerClosed](#ledgerclosed)
+  - [ledger](#ledger)
   - [error](#error)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -575,8 +575,8 @@ validatedLedger | object | Information about the fully-validated ledger with the
 *validatedLedger.* age | integer | The time since the ledger was closed, in seconds.
 *validatedLedger.* baseFeeXRP | number | Base fee, in XRP. This may be represented in scientific notation such as 1e-05 for 0.00005.
 *validatedLedger.* hash | string | Unique hash for the ledger, as an uppercase hexadecimal string.
-*validatedLedger.* reserveBaseXRP | integer | Minimum amount of XRP (not drops) necessary for every account to keep in reserve.
-*validatedLedger.* reserveIncrementXRP | integer | Amount of XRP (not drops) added to the account reserve for each object an account is responsible for in the ledger.
+*validatedLedger.* reserveBaseXRP | integer | Minimum amount of XRP necessary for every account to keep in reserve.
+*validatedLedger.* reserveIncrementXRP | integer | Amount of XRP added to the account reserve for each object an account is responsible for in the ledger.
 *validatedLedger.* ledgerVersion | integer | Identifying sequence number of this ledger version.
 validationQuorum | number | Minimum number of trusted validations required in order to validate a ledger version. Some circumstances may cause the server to require more validations.
 load | object | *Optional* *(Admin only)* Detailed information about the current load state of the server.
@@ -3311,7 +3311,7 @@ return api.computeLedgerHash(ledger);
 
 # API Events
 
-## ledgerClosed
+## ledger
 
 This event is emitted whenever a new ledger version is validated on the connected server.
 
@@ -3319,12 +3319,11 @@ This event is emitted whenever a new ledger version is validated on the connecte
 
 Name | Type | Description
 ---- | ---- | -----------
-feeBase | integer | Base fee, in drops.
-feeReference | integer | Cost of the 'reference transaction' in 'fee units'.
+baseFeeXRP | [value](#value) | Base fee, in XRP.
 ledgerHash | string | Unique hash of the ledger that was closed, as hex.
 ledgerTimestamp | date-time string | The time at which this ledger closed.
-reserveBase | integer | The minimum reserve, in drops of XRP, that is required for an account.
-reserveIncrement | integer | The increase in account reserve that is added for each item the account owns, such as offers or trust lines.
+reserveBaseXRP | [value](#value) | The minimum reserve, in drops of XRP, that is required for an account.
+reserveIncrementXRP | [value](#value) | The increase in account reserve that is added for each item the account owns, such as offers or trust lines.
 transactionCount | integer | Number of new transactions included in this ledger.
 ledgerVersion | integer | Ledger version of the ledger that closed.
 validatedLedgerVersions | string | Range of ledgers that the server has available. This may be discontiguous.
@@ -3332,7 +3331,7 @@ validatedLedgerVersions | string | Range of ledgers that the server has availabl
 ### Example
 
 ```javascript
-api.on('ledgerClosed', ledger => {
+api.on('ledger', ledger => {
   console.log(JSON.stringify(ledger, null, 2));
 });
 ```
@@ -3340,13 +3339,12 @@ api.on('ledgerClosed', ledger => {
 
 ```json
 {
-  "feeBase": 10,
-  "feeReference": 10,
+  "baseFeeXRP": "0.00001",
   "ledgerVersion": 14804627,
   "ledgerHash": "9141FA171F2C0CE63E609466AF728FF66C12F7ACD4B4B50B0947A7F3409D593A",
   "ledgerTimestamp": "2015-07-23T05:50:40.000Z",
-  "reserveBase": 20000000,
-  "reserveIncrement": 5000000,
+  "reserveBaseXRP": "20",
+  "reserveIncrementXRP": "5",
   "transactionCount": 19,
   "validatedLedgerVersions": "13983423-14804627"
 }

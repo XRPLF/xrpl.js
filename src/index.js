@@ -82,7 +82,7 @@ class RippleAPI extends EventEmitter {
       if (servers.length === 1) {
         this.connection = new RestrictedConnection(servers[0], options);
         this.connection.on('ledgerClosed', message => {
-          this.emit('ledgerClosed', server.formatLedgerClose(message));
+          this.emit('ledger', server.formatLedgerClose(message));
         });
         this.connection.on('error', (type, info) => {
           this.emit('error', type, info);
