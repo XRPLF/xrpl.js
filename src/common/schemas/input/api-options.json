@@ -16,8 +16,17 @@
     "proxy": {
       "format": "uri"
     },
+    "proxyAuthorization": {
+      "type": "string"
+    },
     "authorization": {
       "type": "string"
+    },
+    "trustedCertificates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "additionalProperties": false
