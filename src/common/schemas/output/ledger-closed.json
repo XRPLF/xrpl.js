@@ -4,15 +4,48 @@
   "description": "A ledgerClosed event message",
   "type": "object",
   "properties": {
-    "feeBase": {"type": "integer", "minimum": 0},
-    "feeReference": {"type": "integer", "minimum": 0},
-    "ledgerHash": {"$ref": "hash256"},
-    "ledgerVersion": {"$ref": "ledgerVersion"},
-    "ledgerTimestamp": {"type": "string", "format": "date-time"},
-    "reserveBase": {"type": "integer", "minimum": 0},
-    "reserveIncrement": {"type": "integer", "minimum": 0},
-    "transactionCount": {"type": "integer", "minimum": 0},
-    "validatedLedgerVersions": {"type": "string"}
+    "feeBase": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Base fee, in drops."
+    },
+    "feeReference": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Cost of the 'reference transaction' in 'fee units'."
+    },
+    "ledgerHash": {
+      "$ref": "hash256",
+      "description": "Unique hash of the ledger that was closed, as hex."
+    },
+    "ledgerVersion": {
+      "$ref": "ledgerVersion",
+      "description": "Ledger version of the ledger that closed."
+    },
+    "ledgerTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The time at which this ledger closed."
+    },
+    "reserveBase": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The minimum reserve, in drops of XRP, that is required for an account."
+    },
+    "reserveIncrement": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The increase in account reserve that is added for each item the account owns, such as offers or trust lines."
+    },
+    "transactionCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of new transactions included in this ledger."
+    },
+    "validatedLedgerVersions": {
+      "type": "string",
+      "description": "Range of ledgers that the server has available. This may be discontiguous."
+    }
   },
   "addtionalProperties": false,
   "required": ["feeBase", "feeReference", "ledgerHash", "ledgerTimestamp",

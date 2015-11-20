@@ -1,0 +1,39 @@
+# API Events
+
+## ledgerClosed
+
+This event is emitted whenever a new ledger version is validated on the connected server.
+
+### Return Value
+
+<%- renderSchema('output/ledger-closed.json') %>
+
+### Example
+
+```javascript
+api.on('ledgerClosed', ledger => {
+  console.log(JSON.stringify(ledger, null, 2));
+});
+```
+
+<%- renderFixture('responses/ledger-closed.json') %>
+
+## error
+
+This event is emitted when there is an error on the connection to the server.
+
+### Return Value
+
+The first parameter is a string indicating the error type, which may be `badMessage` (meaning that rippled returned a malformed message), or one of the [rippled Universal Errors](https://ripple.com/build/rippled-apis/#universal-errors). The second parameter is a message explaining the error, or the message that caused the error in the case of `badMessage`.
+
+### Example
+
+```javascript
+api.on('error', (errorCode, errorMessage) => {
+  console.log(errorCode + ': ' + errorMessage);
+});
+```
+
+```
+tooBusy: The server is too busy to help you now.
+```
