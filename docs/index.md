@@ -108,12 +108,12 @@ If you omit the "catch" section, errors may not be visible.
 
 1. Install [NodeJS](https://nodejs.org) and the Node Package Manager (npm). Most Linux distros have a package for NodeJS, but make sure you have version `0.12.0` or higher.
 2. Use npm to install [Babel](https://babeljs.io/) globally:
-      npm install -g babel
+      `npm install -g babel`
 3. Use npm to install RippleAPI:
-      npm install ripple-lib
+      `npm install ripple-lib`
 
 After you have installed ripple-lib, you can create scripts using the [boilerplate](#boilerplate) and run them using babel-node:
-      babel-node script.js
+      `babel-node script.js`
 
 <aside class="notice">
 Instead of using babel-node in production, we recommend using Babel to transpile to ECMAScript 5 first.
@@ -128,22 +128,27 @@ Instead of using babel-node in production, we recommend using Babel to transpile
 "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
 ```
 
-Every Ripple account has an *address*, which is a base58-encoding of a hash of the account's public key.
+Every Ripple account has an *address*, which is a base58-encoding of a hash of the account's public key. Ripple addresses always start with the lowercase letter `r`.
 
 ## Account Sequence Number
 
-Every Ripple account has a *sequence number* that is used to order transactions. Every transaction must have a sequence number and transaction can only be executed in order by sequence number. This prevents one transaction from executing twice and transactions executing out of order. The sequence number starts at `1` and increments for each transaction that the account makes.
+Every Ripple account has a *sequence number* that is used to keep transactions in order. Every transaction must have a sequence number. A transaction can only be executed if it has the next sequence number in order, of the account sending it. This prevents one transaction from executing twice and transactions executing out of order. The sequence number starts at `1` and increments for each transaction that the account makes.
 
 ## Currency
 
 Currencies are represented as either 3-character currency codes or 40-character uppercase hexadecimal strings. We recommend using uppercase [ISO 4217 Currency Codes](http://www.xe.com/iso4217.php) only. The string "XRP" is disallowed on trustlines because it is reserved for the Ripple native currency. The following characters are permitted: all uppercase and lowercase letters, digits, as well as the symbols `?`, `!`, `@`, `#`, `$`, `%`, `^`, `&`, `*`, `<`, `>`, `(`, `)`, `{`, `}`, `[`, `]`, and `|`.
 
 ## Value
-A *value* is a quantity of a currency represented as a decimal string (string encoding is used because javascript numbers do not have sufficient precision).
+A *value* is a quantity of a currency represented as a decimal string. Be careful: JavaScript's native number format does not have sufficient precision to represent all values. XRP has different precision from other currencies.
 
-An XRP value has 6 significant digits past the decimal point. A non-XRP value has 16 total digits of precision.
+**XRP** has 6 significant digits past the decimal point. In other words, XRP cannot be divided into positive values smaller than `0.000001` (1e-6). XRP has a maximum value of `100000000000` (1e11).
+
+**Non-XRP values** have 15 decimal digits of precision, with a maximum value of `9999999999999999e80`. The smallest positive non-XRP value is `1e-81`.
+
 
 ## Amount
+
+Example amount:
 
 ```json
 {
@@ -153,6 +158,7 @@ An XRP value has 6 significant digits past the decimal point. A non-XRP value ha
 }
 ```
 
+Example XRP amount:
 ```json
 {
   "currency": "XRP",
@@ -160,7 +166,7 @@ An XRP value has 6 significant digits past the decimal point. A non-XRP value ha
 }
 ```
 
-An *amount* is data structure representing a currency, a quantity of that currency, and the counterparty on the trustline that holds the value (for all currencies besides "XRP").
+An *amount* is data structure representing a currency, a quantity of that currency, and the counterparty on the trustline that holds the value. For XRP, there is no counterparty.
 
 A *lax amount* allows the counterparty to be omitted for all currencies. If the counterparty is not specified in an amount within a transaction specification, then any counterparty may be used for that amount.
 
@@ -182,7 +188,7 @@ A transaction type is specified by the strings in the first column in the table 
 
 Type | Description
 ---- | -----------
-[payment](#payment) | A `payment` transaction represents a transfer of value from one account to another. Depending on the path taken, additional exchanges of value may occur atomically to facilitate the payment.
+[payment](#payment) | A `payment` transaction represents a transfer of value from one account to another. Depending on the [path](https://ripple.com/build/paths/) taken, additional exchanges of value may occur atomically to facilitate the payment.
 [order](#order) | An `order` transaction creates a limit order. It defines an intent to exchange currencies, and creates an order in the Ripple Consensus Ledger's order book if not completely fulfilled when placed. Orders can be partially fulfilled.
 [orderCancellation](#order-cancellation) | An `orderCancellation` transaction cancels an order in the Ripple Consensus Ledger's order book.
 [trustline](#trustline) | A `trustline` transactions creates or modifies a trust line between two accounts.
@@ -195,20 +201,28 @@ Type | Description
 
 Executing a transaction with `RippleAPI` requires the following four steps:
 
-1. prepare - Create an unsigned transaction based on a [specification](#transaction-specifications) and [instructions](#transaction-instructions).
-2. sign - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place.
-3. submit - Submit the transaction to the connected server.
-4. verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted. It is recommended that you specify a `maxLedgerVersion` in the instructions when preparing a transaction because without it there is no way to know that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the `maxLedgerVersion` provided in the transaction instructions.
+1. Prepare - Create an unsigned transaction based on a [specification](#transaction-specifications) and [instructions](#transaction-instructions). There is a method to prepare each type of transaction:
+    * [preparePayment](#preparepayment)
+    * [prepareTrustline](#preparetrustline)
+    * [prepareOrder](#prepareorder)
+    * [prepareOrderCancellation](#prepareordercancellation)
+    * [prepareSettings](#preparesettings)
+    * [prepareSuspendedPaymentCreation](#preparesuspendedpaymentcreation)
+    * [prepareSuspendedPaymentCancellation](#preparesuspendedpaymentcancellation)
+    * [prepareSuspendedPaymentExecution](#preparesuspendedpaymentexecution)
+2. [Sign](#sign) - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place.
+3. [Submit](#submit) - Submit the transaction to the connected server.
+4. Verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted.
 
 ## Transaction Fees
 
-Every transaction requires a *fee* to be paid in XRP. The fee is destroyed; it is not sent to any other party. The purpose of the fee is to prevent denial of service attacks on the Ripple network.
+Every transaction must destroy a small amount of XRP as a cost to send the transaction. This is also called a *transaction fee*. The transaction cost is designed to increase along with the load on the Ripple network, making it very expensive to deliberately or inadvertently overload the network.
 
-You can choose the size of the fee you want to pay or let a default be used. The fee is like a bid in an auction for slots in the next ledger closing. If the fee you choose is too low, your transaction will not be included in the next ledger closing. You can get an estimate of the fee required to be included in the next ledger closing with the [getFee](#getfee) method.
+You can choose the size of the fee you want to pay or let a default be used. You can get an estimate of the fee required to be included in the next ledger closing with the [getFee](#getfee) method.
 
 ## Transaction Instructions
 
-Transactions instructions indicates how to execute a transaction, complementary with the [transaction specification](#transaction-specifications).
+Transaction instructions indicate how to execute a transaction, complementary with the [transaction specification](#transaction-specifications).
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -218,13 +232,17 @@ maxLedgerVersion | integer | *Optional* The highest ledger version that the tran
 maxLedgerVersionOffset | integer | *Optional* Offset from current legder version to highest ledger version that the transaction can be included in.
 sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
 
+We recommended that you specify a `maxLedgerVersion` because without it there is no way to know that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the transaction's `maxLedgerVersion`.
+
 ## Transaction ID
 
 ```json
 "F4AB442A6D4CBB935D66E1DA7309A5FC71C7143ED4049053EC14E3875B0CF9BF"
 ```
 
-A hash of the transaction that can be used to identify it. A transaction can be looked up by its ID using the [getTransaction](#gettransaction) method.
+A transaction ID is a 64-bit hexadecimal string that uniquely identifies the transaction. The transaction ID is derived from the transaction instruction and specifications, using a strong hash function.
+
+You can look up a transaction by ID using the [getTransaction](#gettransaction) method.
 
 # Transaction Specifications
 
