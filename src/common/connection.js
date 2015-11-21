@@ -16,8 +16,10 @@ class Connection extends EventEmitter {
   constructor(url, options = {}) {
     super();
     this._url = url;
-    this._proxyURL = options.proxyURL;
+    this._proxyURL = options.proxy;
+    this._proxyAuthorization = options.proxyAuthorization;
     this._authorization = options.authorization;
+    this._trustedCertificates = options.trustedCertificates;
     this._timeout = options.timeout || (20 * 1000);
     this._isReady = false;
     this._ws = null;
@@ -92,12 +94,18 @@ class Connection extends EventEmitter {
     });
   }
 
-  _createWebSocket(url, proxyURL, authorization) {
+  _createWebSocket(url, proxyURL, proxyAuthorization, authorization,
+      trustedCertificates) {
     const options = {};
     if (proxyURL !== undefined) {
       const parsedURL = parseURL(url);
       const proxyOptions = parseURL(proxyURL);
       proxyOptions.secureEndpoint = (parsedURL.protocol === 'wss:');
+      proxyOptions.secureProxy = (proxyOptions.protocol === 'https:');
+      proxyOptions.auth = proxyAuthorization;
+      if (trustedCertificates) {
+        proxyOptions.ca = trustedCertificates;
+      }
       let HttpsProxyAgent;
       try {
         HttpsProxyAgent = require('https-proxy-agent');
@@ -125,7 +133,8 @@ class Connection extends EventEmitter {
         this._ws.once('open', resolve);
       } else {
         this._ws = this._createWebSocket(this._url, this._proxyURL,
-          this._authorization);
+          this._proxyAuthorization, this._authorization,
+          this._trustedCertificates);
         this._ws.on('message', this._onMessage.bind(this));
         this._ws.once('close', () => this._onUnexpectedClose);
         this._ws.once('open', () => this._onOpen().then(resolve, reject));
