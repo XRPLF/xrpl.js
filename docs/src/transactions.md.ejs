@@ -6,7 +6,7 @@ A transaction type is specified by the strings in the first column in the table 
 
 Type | Description
 ---- | -----------
-[payment](#payment) | A `payment` transaction represents a transfer of value from one account to another. Depending on the path taken, additional exchanges of value may occur atomically to facilitate the payment.
+[payment](#payment) | A `payment` transaction represents a transfer of value from one account to another. Depending on the [path](https://ripple.com/build/paths/) taken, additional exchanges of value may occur atomically to facilitate the payment.
 [order](#order) | An `order` transaction creates a limit order. It defines an intent to exchange currencies, and creates an order in the Ripple Consensus Ledger's order book if not completely fulfilled when placed. Orders can be partially fulfilled.
 [orderCancellation](#order-cancellation) | An `orderCancellation` transaction cancels an order in the Ripple Consensus Ledger's order book.
 [trustline](#trustline) | A `trustline` transactions creates or modifies a trust line between two accounts.
@@ -19,22 +19,32 @@ Type | Description
 
 Executing a transaction with `RippleAPI` requires the following four steps:
 
-1. prepare - Create an unsigned transaction based on a [specification](#transaction-specifications) and [instructions](#transaction-instructions).
-2. sign - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place.
-3. submit - Submit the transaction to the connected server.
-4. verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted. It is recommended that you specify a `maxLedgerVersion` in the instructions when preparing a transaction because without it there is no way to know that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the `maxLedgerVersion` provided in the transaction instructions.
+1. Prepare - Create an unsigned transaction based on a [specification](#transaction-specifications) and [instructions](#transaction-instructions). There is a method to prepare each type of transaction:
+    * [preparePayment](#preparepayment)
+    * [prepareTrustline](#preparetrustline)
+    * [prepareOrder](#prepareorder)
+    * [prepareOrderCancellation](#prepareordercancellation)
+    * [prepareSettings](#preparesettings)
+    * [prepareSuspendedPaymentCreation](#preparesuspendedpaymentcreation)
+    * [prepareSuspendedPaymentCancellation](#preparesuspendedpaymentcancellation)
+    * [prepareSuspendedPaymentExecution](#preparesuspendedpaymentexecution)
+2. [Sign](#sign) - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place.
+3. [Submit](#submit) - Submit the transaction to the connected server.
+4. Verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted.
 
 ## Transaction Fees
 
-Every transaction requires a *fee* to be paid in XRP. The fee is destroyed; it is not sent to any other party. The purpose of the fee is to prevent denial of service attacks on the Ripple network.
+Every transaction must destroy a small amount of XRP as a cost to send the transaction. This is also called a *transaction fee*. The transaction cost is designed to increase along with the load on the Ripple network, making it very expensive to deliberately or inadvertently overload the network.
 
-You can choose the size of the fee you want to pay or let a default be used. The fee is like a bid in an auction for slots in the next ledger closing. If the fee you choose is too low, your transaction will not be included in the next ledger closing. You can get an estimate of the fee required to be included in the next ledger closing with the [getFee](#getfee) method.
+You can choose the size of the fee you want to pay or let a default be used. You can get an estimate of the fee required to be included in the next ledger closing with the [getFee](#getfee) method.
 
 ## Transaction Instructions
 
-Transactions instructions indicates how to execute a transaction, complementary with the [transaction specification](#transaction-specifications).
+Transaction instructions indicate how to execute a transaction, complementary with the [transaction specification](#transaction-specifications).
 
 <%- renderSchema("objects/instructions.json") %>
+
+We recommended that you specify a `maxLedgerVersion` because without it there is no way to know that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the transaction's `maxLedgerVersion`.
 
 ## Transaction ID
 
@@ -42,4 +52,6 @@ Transactions instructions indicates how to execute a transaction, complementary 
 "F4AB442A6D4CBB935D66E1DA7309A5FC71C7143ED4049053EC14E3875B0CF9BF"
 ```
 
-A hash of the transaction that can be used to identify it. A transaction can be looked up by its ID using the [getTransaction](#gettransaction) method.
+A transaction ID is a 64-bit hexadecimal string that uniquely identifies the transaction. The transaction ID is derived from the transaction instruction and specifications, using a strong hash function.
+
+You can look up a transaction by ID using the [getTransaction](#gettransaction) method.
