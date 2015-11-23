@@ -5,20 +5,20 @@ const validate = utils.common.validate;
 import type {Instructions, Prepare} from './types.js';
 
 function createOrderCancellationTransaction(account: string,
-    sequence: number
+    orderCancellation: Object
 ): Object {
   return {
     TransactionType: 'OfferCancel',
     Account: account,
-    OfferSequence: sequence
+    OfferSequence: orderCancellation.orderSequence
   };
 }
 
-function prepareOrderCancellation(address: string, sequence: number,
+function prepareOrderCancellation(address: string, orderCancellation: Object,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareOrderCancellation({address, sequence, instructions});
-  const txJSON = createOrderCancellationTransaction(address, sequence);
+  validate.prepareOrderCancellation({address, orderCancellation, instructions});
+  const txJSON = createOrderCancellationTransaction(address, orderCancellation);
   return utils.prepareTransaction(txJSON, this, instructions);
 }
 
