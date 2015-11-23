@@ -7,12 +7,12 @@
       "$ref": "address",
       "description": "The address of the account that is creating the transaction."
     },
-    "sequence": {
-      "$ref": "sequence",
-      "description": "The account sequence number of the transaction that created the order to cancel."
+    "orderCancellation": {
+      "$ref": "orderCancellation",
+      "description": "The specification of the order cancellation to prepare."
     },
     "instructions": {"$ref": "instructions"}
   },
   "additionalProperties": false,
-  "required": ["address", "sequence"]
+  "required": ["address", "orderCancellation"]
 }

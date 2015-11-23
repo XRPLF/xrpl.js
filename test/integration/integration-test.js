@@ -156,9 +156,9 @@ describe('integration tests', function() {
             return txData;
           });
         }).then(txData => this.api.prepareOrderCancellation(
-            address, txData.Sequence, instructions).then(prepared =>
-              testTransaction(this, 'orderCancellation', ledgerVersion,
-                              prepared))
+            address, {orderSequence: txData.Sequence}, instructions)
+            .then(prepared => testTransaction(this, 'orderCancellation',
+              ledgerVersion, prepared))
         );
     });
   });

@@ -390,7 +390,9 @@ orderSequence | [sequence](#account-sequence-number) | The [account sequence num
 
 
 ```json
-23
+{
+  "orderSequence": 23
+}
 ```
 
 
@@ -2916,7 +2918,7 @@ Prepare an order cancellation transaction. The prepared transaction must subsequ
 Name | Type | Description
 ---- | ---- | -----------
 address | [address](#ripple-address) | The address of the account that is creating the transaction.
-sequence | [sequence](#account-sequence-number) | The account sequence number of the transaction that created the order to cancel.
+orderCancellation | [orderCancellation](#order-cancellation) | The specification of the order cancellation to prepare.
 instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
 
 ### Return Value
@@ -2939,7 +2941,7 @@ instructions | object | The instructions for how to execute the transaction afte
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const sequence = 123;
+const orderCancellation = {orderSequence: 123};
 return api.prepareOrderCancellation(address, sequence)
   .then(prepared => {/* ... */});
 ```

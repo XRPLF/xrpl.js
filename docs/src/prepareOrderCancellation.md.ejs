@@ -22,7 +22,7 @@ All "prepare" methods have the same return type.
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const sequence = 123;
+const orderCancellation = {orderSequence: 123};
 return api.prepareOrderCancellation(address, sequence)
   .then(prepared => {/* ... */});
 ```
