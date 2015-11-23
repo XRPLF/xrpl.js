@@ -54,7 +54,8 @@ type APIOptions = {
   servers?: Array<string>,
   feeCushion?: number,
   trace?: boolean,
-  proxy?: string
+  proxy?: string,
+  timeout?: number
 }
 
 // prevent access to non-validated ledger versions

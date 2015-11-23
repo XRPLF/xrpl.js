@@ -16,6 +16,10 @@
     "proxy": {
       "format": "uri"
     },
+    "timeout": {
+      "type": "integer",
+      "minimum": 1
+    },
     "proxyAuthorization": {
       "type": "string"
     },

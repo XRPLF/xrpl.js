@@ -24,6 +24,7 @@ module.exports = function(request, options = {}) {
             'issuer': 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',
             'value': '17.70155237781915'
           },
+          'quality': '63.44025128030504',
           'taker_pays': {
             'currency': 'USD',
             'issuer': 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q',

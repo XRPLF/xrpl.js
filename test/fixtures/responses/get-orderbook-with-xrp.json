@@ -1,0 +1,44 @@
+{
+  "bids": [
+    {
+      "specification": {
+        "direction": "buy",
+        "quantity": {
+          "currency": "USD",
+          "value": "10.1",
+          "counterparty": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
+        },
+        "totalPrice": {
+          "currency": "XRP",
+          "value": "254391353"
+        }
+      },
+      "properties": {
+        "maker": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "sequence": 5,
+        "makerExchangeRate": "3.970260734451929e-8"
+      }
+    }
+  ],
+  "asks": [
+    {
+      "specification": {
+        "direction": "sell",
+        "quantity": {
+          "currency": "USD",
+          "value": "10453252347.1",
+          "counterparty": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
+        },
+        "totalPrice": {
+          "currency": "XRP",
+          "value": "134"
+        }
+      },
+      "properties": {
+        "maker": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "sequence": 6,
+        "makerExchangeRate": "0.0000780093458738806"
+      }
+    }
+  ]
+}
