@@ -1,0 +1,27 @@
+[
+  {
+    "type": "settings",
+    "address": "r9UHu5CWni1qRY7Q4CfFZLGvXo2pGQy96b",
+    "sequence": 491,
+    "id": "D868CFF0DF8C8AAF205404460EA764ACB3B8862527FA414BC8C1CA9A45B1F276",
+    "specification": {
+      "domain": "ripple.com"
+    },
+    "outcome": {
+      "result": "tesSUCCESS",
+      "timestamp": "2015-10-23T02:07:00.000Z",
+      "fee": "0.012",
+      "balanceChanges": {
+        "r9UHu5CWni1qRY7Q4CfFZLGvXo2pGQy96b": [
+          {
+            "currency": "XRP",
+            "value": "-0.012"
+          }
+        ]
+      },
+      "orderbookChanges": {},
+      "ledgerVersion": 16635149,
+      "indexInLedger": 4
+    }
+  }
+]

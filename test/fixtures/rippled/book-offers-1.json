@@ -1,0 +1,31 @@
+{
+  "id": 0,
+  "result": {
+    "ledger_hash": "36783BEDBDEFC0402EB5347B8D9545AC69E70B0F14A95E0879CE2D3C2B4CE748",
+    "ledger_index": 13,
+    "offers": [
+      {
+        "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "BookDirectory": "A118405CF7C2C89AB0CC084417187B86870DC14325C861A0561BB6E89EFF509C",
+        "BookNode": "0000000000000000",
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "CFB5786459E568DFC504E7319C515658DED657A7F4EFB5957B33E5E3BD9A1353",
+        "PreviousTxnLgrSeq": 13,
+        "Sequence": 6,
+        "TakerPays": "134000000",
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw",
+          "value": "10453252347.1"
+        },
+        "index": "C72CDC1BA4DA529B062871F22C6D175A4D97D4F1160D0D7E646E60699278B5B5",
+        "quality": "78.0093458738806"
+      }
+    ],
+    "validated": true
+  },
+  "status": "success",
+  "type": "response"
+}

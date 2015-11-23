@@ -70,7 +70,7 @@ module.exports = function(port) {
     mock.expectedRequests = expectedRequests;
   };
 
-  mock.once('connection', function(conn) {
+  mock.on('connection', function(conn) {
     conn.on('message', function(requestJSON) {
       const request = JSON.parse(requestJSON);
       mock.emit('request_' + request.command, request, conn);
@@ -140,6 +140,8 @@ module.exports = function(port) {
     assert.strictEqual(request.command, 'ledger');
     if (request.ledger_index === 34) {
       conn.send(createLedgerResponse(request, fixtures.ledgerNotFound));
+    } else if (request.ledger_index === 6) {
+      conn.send(createResponse(request, fixtures.ledgerWithStateAsHashes));
     } else if (request.ledger_index === 9038215) {
       conn.send(createLedgerResponse(request, fixtures.ledgerWithoutCloseTime));
     } else if (request.ledger_index === 4181996) {
@@ -173,6 +175,9 @@ module.exports = function(port) {
         '10A6FB4A66EE80BED46AAE4815D7DC43B97E944984CCD5B93BCF3F8538CABC51') {
       conn.send(createResponse(request, fixtures.tx.OfferCreate));
     } else if (request.transaction ===
+        '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2') {
+      conn.send(createResponse(request, fixtures.tx.OfferCreateSell));
+    } else if (request.transaction ===
         '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E') {
       conn.send(createResponse(request, fixtures.tx.OfferCancel));
     } else if (request.transaction ===
@@ -205,12 +210,29 @@ module.exports = function(port) {
         '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE1') {
       conn.send(createResponse(request, fixtures.tx.SuspendedPaymentCreation));
     } else if (request.transaction ===
+        '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE2') {
+      conn.send(createResponse(request,
+        fixtures.tx.SuspendedPaymentCreationIOU));
+    } else if (request.transaction ===
         'F346E542FFB7A8398C30A87B952668DAB48B7D421094F8B71776DA19775A3B22') {
       conn.send(createResponse(request,
         fixtures.tx.SuspendedPaymentCancellation));
     } else if (request.transaction ===
         'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD136993B') {
       conn.send(createResponse(request, fixtures.tx.SuspendedPaymentExecution));
+    } else if (request.transaction ===
+        'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD1369931') {
+      conn.send(createResponse(request,
+        fixtures.tx.SuspendedPaymentExecutionSimple));
+    } else if (request.transaction ===
+        'AFB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11') {
+      conn.send(createResponse(request, fixtures.tx.Unrecognized));
+    } else if (request.transaction ===
+        'AFB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B') {
+      conn.send(createResponse(request, fixtures.tx.NoMeta));
+    } else if (request.transaction ===
+        '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA13') {
+      conn.send(createResponse(request, fixtures.tx.LedgerZero));
     } else {
       assert(false, 'Unrecognized transaction hash: ' + request.transaction);
     }
@@ -240,6 +262,8 @@ module.exports = function(port) {
   mock.on('request_account_tx', function(request, conn) {
     if (request.account === addresses.ACCOUNT) {
       conn.send(transactionsResponse(request));
+    } else if (request.account === addresses.OTHER_ACCOUNT) {
+      conn.send(createResponse(request, fixtures.account_tx_one));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
@@ -254,7 +278,12 @@ module.exports = function(port) {
   });
 
   mock.on('request_book_offers', function(request, conn) {
-    if (isBTC(request.taker_gets.currency)
+    if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
+      conn.send(createResponse(request, fixtures.book_offers_2));
+    } else if (request.taker_gets.issuer
+        === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
+      conn.send(createResponse(request, fixtures.book_offers_1));
+    } else if (isBTC(request.taker_gets.currency)
         && isUSD(request.taker_pays.currency)) {
       conn.send(fixtures.book_offers.requestBookOffersBidsResponse(request));
     } else if (isUSD(request.taker_gets.currency)
@@ -296,7 +325,11 @@ module.exports = function(port) {
   });
 
   mock.on('request_gateway_balances', function(request, conn) {
-    conn.send(createResponse(request, fixtures.gateway_balances));
+    if (request.ledger_index === 123456) {
+      conn.send(createResponse(request, fixtures.unsubscribe));
+    } else {
+      conn.send(createResponse(request, fixtures.gateway_balances));
+    }
   });
 
   return mock;

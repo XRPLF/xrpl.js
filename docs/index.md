@@ -112,6 +112,7 @@ feeCushion | number | *Optional* Factor to multiply estimated fee by to provide 
 proxy | uri string | *Optional* URI for HTTP/HTTPS proxy to use to connect to the rippled server.
 proxyAuthorization | string | *Optional* Username and password for HTTP basic authentication to the proxy in the format **username:password**.
 servers | array\<uri string\> | *Optional* Array of rippled servers to connect to. Currently only one server is supported.
+timeout | integer | *Optional* Timeout in milliseconds before considering a request to have failed.
 trace | boolean | *Optional* If true, log rippled requests and responses to stdout.
 trustedCertificates | array\<string\> | *Optional* Array of PEM-formatted SSL certificates to trust when connecting to a proxy. This is useful if you want to use a self-signed certificate on the proxy server. Note: Each element must contain a single certificate; concatenated certificates are not valid.
 
@@ -373,7 +374,8 @@ passive | boolean | *Optional* If enabled, the offer will not consume offers tha
     "currency": "XRP",
     "value": "2"
   },
-  "immediateOrCancel": true
+  "passive": true,
+  "fillOrKill": true
 }
 ```
 
@@ -1120,7 +1122,7 @@ counterparty | object | Properties of the trustline from the perspective of the 
 *counterparty.* frozen | boolean | *Optional* If true, the trustline is frozen, which means that funds can only be sent to the counterparty.
 *counterparty.* ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through this trustline.
 state | object | Properties of the trustline regarding it's current state that are not part of the specification.
-*state.* balance | [value](#value) | The balance on the trustline, representing which party owes the other and by how much.
+*state.* balance | [signedValue](#value) | The balance on the trustline, representing which party owes the other and by how much.
 
 ### Example
 
@@ -2888,7 +2890,8 @@ const order = {
     "currency": "XRP",
     "value": "2"
   },
-  "immediateOrCancel": true
+  "passive": true,
+  "fillOrKill": true
 };
 return api.prepareOrder(address, order)
   .then(prepared => {/* ... */});
@@ -2897,11 +2900,11 @@ return api.prepareOrder(address, order)
 
 ```json
 {
-  "txJSON": "{\"Flags\":2147614720,\"TransactionType\":\"OfferCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"TakerGets\":\"2000000\",\"TakerPays\":{\"value\":\"10.1\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"Flags\":2147811328,\"TransactionType\":\"OfferCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"TakerGets\":\"2000000\",\"TakerPays\":{\"value\":\"10.1\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8819954,\"Fee\":\"12\",\"Sequence\":23}",
   "instructions": {
     "fee": "0.000012",
     "sequence": 23,
-    "maxLedgerVersion": 8820051
+    "maxLedgerVersion": 8819954
   }
 }
 ```

@@ -34,7 +34,7 @@
       "state": {
         "properties": {
           "balance": {
-            "$ref": "value",
+            "$ref": "signedValue",
             "description": "The balance on the trustline, representing which party owes the other and by how much."
           }
         },

@@ -1,0 +1,28 @@
+{
+  "source": {
+    "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+    "maxAmount": {
+      "value": "0.01",
+      "currency": "USD",
+      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+    },
+    "tag": 1
+  },
+  "destination": {
+    "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+    "amount": {
+      "value": "0.01",
+      "currency": "USD",
+      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+    },
+    "tag": 2
+  },
+  "digest": "8F434346648F6B96DF89DDA901C5176B10A6D83961DD3C1AC88B59B2DC327AA4",
+  "allowExecuteAfter": "2014-09-24T21:21:50.000Z",
+  "memos": [
+    {
+      "type": "test",
+      "data": "texted data"
+    }
+  ]
+}
