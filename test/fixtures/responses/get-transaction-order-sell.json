@@ -1,0 +1,34 @@
+{
+  "type": "order",
+  "address": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+  "sequence": 2,
+  "id": "458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2",
+  "specification": {
+    "direction": "sell",
+    "quantity": {
+      "currency": "USD",
+      "value": "10.1",
+      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+    },
+    "totalPrice": {
+      "currency": "XRP",
+      "value": "254391353"
+    }
+  },
+  "outcome": {
+    "result": "tecUNFUNDED_OFFER",
+    "timestamp": "2015-11-18T20:56:30.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh": [
+        {
+          "currency": "XRP",
+          "value": "-0.000012"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 6,
+    "indexInLedger": 0
+  }
+}

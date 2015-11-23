@@ -1,0 +1,44 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+    "Amount": {
+      "currency": "USD",
+      "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+      "value": "0.001"
+    },
+    "Destination": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+    "Fee": "10",
+    "Flags": 0,
+    "Paths": [
+      [
+        {
+          "currency": "USD",
+          "issuer": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "type": 48,
+          "type_hex": "0000000000000030"
+        },
+        {
+          "account": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "currency": "USD",
+          "issuer": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "type": 49,
+          "type_hex": "0000000000000031"
+        }
+      ]
+    ],
+    "SendMax": "1112209",
+    "Sequence": 4,
+    "SigningPubKey": "02BC8C02199949B15C005B997E7C8594574E9B02BA2D0628902E0532989976CF9D",
+    "TransactionType": "Payment",
+    "TxnSignature": "304502204EE3E9D1B01D8959B08450FCA9E22025AF503DEF310E34A93863A85CAB3C0BC5022100B61F5B567F77026E8DEED89EED0B7CAF0E6C96C228A2A65216F0DC2D04D52083",
+    "date": 416447810,
+    "hash": "AFB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B",
+    "inLedger": 348860,
+    "ledger_index": 348860,
+    "validated": true,
+    "validated": true
+  }
+}

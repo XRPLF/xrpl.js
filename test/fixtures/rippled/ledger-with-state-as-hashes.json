@@ -1,0 +1,33 @@
+{
+  "id": 2,
+  "result": {
+    "ledger": {
+      "accepted": true,
+      "accountState": [
+        "2B6AC232AA4C4BE41BF49D2459FA4A0347E1B543A4C92FCEE0821C0201E2E9A8",
+        "8B24E55376A65D68542C17F3BF446231AC7062CB43BED28817570128A1849819",
+        "B4979A36CDC7F3D3D5C31A4EAE2AC7D7209DDA877588B9AFC66799692AB0D66B"
+      ],
+      "account_hash": "8DBB7FA4036704D96AD32A4573BEE461FDDBDCB1B6F62CB17EDB5182F52AE9F1",
+      "close_flags": 0,
+      "close_time": 501159630,
+      "close_time_human": "2015-Nov-18 11:00:30",
+      "close_time_resolution": 30,
+      "closed": true,
+      "ledger_hash": "3D7115EDB5EC72FEF4ADDF46CA5B7770CBDECEAB3A97EA210BCC04E8C54A7CEE",
+      "parent_close_time": 501148381,
+      "parent_hash": "6D36AEFD3639EE22A27DDE0FA6C57525D103941F11D7FD6D91AC8D439DE2B3EE",
+      "seqNum": "6",
+      "totalCoins": "99999999999999964",
+      "transaction_hash": "B8D716B82BFFF4186BBBE7B7341AE0E1CBD2558952408B96E925EC0A51A6AEC2",
+      "transactions": [
+        "B22E27F35F3F7679F76A474E4FF8E71EFA21B313DF2FC6678037A053A00FD084"
+      ]
+    },
+    "ledger_hash": "3D7115EDB5EC72FEF4ADDF46CA5B7770CBDECEAB3A97EA210BCC04E8C54A7CEE",
+    "ledger_index": 6,
+    "validated": true
+  },
+  "status": "success",
+  "type": "response"
+}

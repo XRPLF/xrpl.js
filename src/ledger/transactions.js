@@ -47,9 +47,6 @@ function parseAccountTxTransaction(tx) {
 }
 
 function counterpartyFilter(filters, tx: TransactionType) {
-  if (!filters.counterparty) {
-    return true;
-  }
   if (tx.address === filters.counterparty || (
     tx.specification && (
       (tx.specification.destination &&
