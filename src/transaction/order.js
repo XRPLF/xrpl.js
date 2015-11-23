@@ -1,5 +1,6 @@
 /* @flow */
 'use strict';
+const _ = require('lodash');
 const utils = require('./utils');
 const offerFlags = utils.common.txFlags.OfferCreate;
 const {validate, iso8601ToRippleTime} = utils.common;
@@ -33,6 +34,9 @@ function createOrderTransaction(account: string, order: Order): Object {
   }
   if (order.expirationTime !== undefined) {
     txJSON.Expiration = iso8601ToRippleTime(order.expirationTime);
+  }
+  if (order.memos !== undefined) {
+    txJSON.Memos = _.map(order.memos, utils.convertMemo);
   }
   return txJSON;
 }

@@ -55,3 +55,9 @@ We recommended that you specify a `maxLedgerVersion` because without it there is
 A transaction ID is a 64-bit hexadecimal string that uniquely identifies the transaction. The transaction ID is derived from the transaction instruction and specifications, using a strong hash function.
 
 You can look up a transaction by ID using the [getTransaction](#gettransaction) method.
+
+## Transaction Memos
+
+Every transaction can optionally have an array of memos for user applications. The `memos` field in each [transaction specification](#transaction-specifications) is an array of objects with the following structure:
+
+<%- renderSchema('objects/memos.json') %>

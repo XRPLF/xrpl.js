@@ -93,6 +93,9 @@ function createSettingsTransaction(account: string, settings: Settings
   if (txJSON.TransferRate !== undefined) {
     txJSON.TransferRate = convertTransferRate(txJSON.TransferRate);
   }
+  if (settings.memos !== undefined) {
+    txJSON.Memos = _.map(settings.memos, utils.convertMemo);
+  }
   return txJSON;
 }
 

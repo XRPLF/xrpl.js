@@ -16,6 +16,7 @@
   - [Transaction Fees](#transaction-fees)
   - [Transaction Instructions](#transaction-instructions)
   - [Transaction ID](#transaction-id)
+  - [Transaction Memos](#transaction-memos)
 - [Transaction Specifications](#transaction-specifications)
   - [Payment](#payment)
   - [Trustline](#trustline)
@@ -256,6 +257,16 @@ A transaction ID is a 64-bit hexadecimal string that uniquely identifies the tra
 
 You can look up a transaction by ID using the [getTransaction](#gettransaction) method.
 
+## Transaction Memos
+
+Every transaction can optionally have an array of memos for user applications. The `memos` field in each [transaction specification](#transaction-specifications) is an array of objects with the following structure:
+
+Name | Type | Description
+---- | ---- | -----------
+data | string | *Optional* Arbitrary string, conventionally containing the content of the memo.
+format | string | *Optional* Conventionally containing information on how the memo is encoded, for example as a [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml). Only characters allowed in URLs are permitted.
+type | string | *Optional* Conventionally, a unique relation (according to [RFC 5988](http://tools.ietf.org/html/rfc5988#section-4)) that defines the format of this memo. Only characters allowed in URLs are permitted.
+
 # Transaction Specifications
 
 A *transaction specification* specifies what a transaction should do. Each [Transaction Type](#transaction-types) has its own type of specification.
@@ -280,11 +291,7 @@ destination | object | The destination of the funds to be sent.
 allowPartialPayment | boolean | *Optional* A boolean that, if set to true, indicates that this payment should go through even if the whole amount cannot be delivered because of a lack of liquidity or funds in the source account account
 invoiceID | string | *Optional* A 256-bit hash that can be used to identify a particular payment.
 limitQuality | boolean | *Optional* Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of destination.amount:source.maxAmount.
-memos | array | *Optional* Array of memos to attach to the transaction.
-memos[] | object | Memo objects represent arbitrary data that can be included in a transaction
-*memos[].* data | string | *Optional* Arbitrary string, conventionally containing the content of the memo.
-*memos[].* format | string | *Optional* Conventionally containing information on how the memo is encoded, for example as a [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml). Only characters allowed in URLs are permitted.
-*memos[].* type | string | *Optional* Conventionally, a unique relation (according to [RFC 5988](http://tools.ietf.org/html/rfc5988#section-4)) that defines the format of this memo. Only characters allowed in URLs are permitted.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 noDirectRipple | boolean | *Optional* A boolean that can be set to true if paths are specified and the sender would like the Ripple Network to disregard any direct paths from the source account to the destination account. This may be used to take advantage of an arbitrage opportunity or by gateways wishing to issue balances from a hot wallet to a user who has mistakenly set a trustline directly to the hot wallet
 paths | string | *Optional* The paths of trustlines and orders to use in executing the payment.
 
@@ -324,6 +331,7 @@ counterparty | [address](#ripple-address) | The address of the account this trus
 limit | [value](#value) | The maximum amount that the owner of the trustline can be owed through the trustline.
 authorized | boolean | *Optional* If true, authorize the counterparty to hold issuances from this account.
 frozen | boolean | *Optional* If true, the trustline is frozen, which means that funds can only be sent to the owner.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 qualityIn | number | *Optional* Incoming balances on this trustline are valued at this ratio.
 qualityOut | number | *Optional* Outgoing balances on this trustline are valued at this ratio.
 ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through this trustline.
@@ -356,6 +364,7 @@ totalPrice | [amount](#amount) | The total price to be paid for the `quantity` t
 expirationTime | date-time string | *Optional* Time after which the offer is no longer active, as an [ISO 8601 date-time](https://en.wikipedia.org/wiki/ISO_8601).
 fillOrKill | boolean | *Optional* Treat the offer as a [Fill or Kill order](http://en.wikipedia.org/wiki/Fill_or_kill). Only attempt to match existing offers in the ledger, and only do so if the entire quantity can be exchanged.
 immediateOrCancel | boolean | *Optional* Treat the offer as an [Immediate or Cancel order](http://en.wikipedia.org/wiki/Immediate_or_cancel). If enabled, the offer will never become a ledger node: it only attempts to match existing offers in the ledger.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 passive | boolean | *Optional* If enabled, the offer will not consume offers that exactly match it, and instead becomes an Offer node in the ledger. It will still consume offers that cross it.
 
 ### Example
@@ -385,6 +394,7 @@ See [Transaction Types](#transaction-types) for a description.
 Name | Type | Description
 ---- | ---- | -----------
 orderSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the order to cancel.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 ### Example
 
@@ -409,6 +419,7 @@ domain | string | *Optional*  The domain that owns this account, as a hexadecima
 emailHash | string,null | *Optional* Hash of an email address to be used for generating an avatar image. Conventionally, clients use Gravatar to display this image. Use `null` to clear.
 enableTransactionIDTracking | boolean | *Optional* Track the ID of this account’s most recent transaction.
 globalFreeze | boolean | *Optional* Freeze all assets issued by this account.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 messageKey | string | *Optional* Public key for sending encrypted messages to this account. Conventionally, it should be a secp256k1 key, the same encryption that is used by the rest of Ripple.
 noFreeze | boolean | *Optional* Permanently give up the ability to freeze individual trust lines. This flag can never be disabled after being enabled.
 passwordSpent | boolean | *Optional* Indicates that the account has used its free SetRegularKey transaction.
@@ -444,11 +455,7 @@ destination | object | Fields pertaining to the destination of the payment.
 allowCancelAfter | date-time string | *Optional* If present, the suspended payment may be cancelled after this time.
 allowExecuteAfter | date-time string | *Optional* If present, the suspended payment can not be executed before this time.
 digest | string | *Optional* If present, proof is required upon execution.
-memos | array | *Optional* Array of memos to attach to the transaction.
-memos[] | object | Memo objects represent arbitrary data that can be included in a transaction
-*memos[].* data | string | *Optional* Arbitrary string, conventionally containing the content of the memo.
-*memos[].* format | string | *Optional* Conventionally containing information on how the memo is encoded, for example as a [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml). Only characters allowed in URLs are permitted.
-*memos[].* type | string | *Optional* Conventionally, a unique relation (according to [RFC 5988](http://tools.ietf.org/html/rfc5988#section-4)) that defines the format of this memo. Only characters allowed in URLs are permitted.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 ### Example
 
@@ -484,11 +491,7 @@ Name | Type | Description
 ---- | ---- | -----------
 owner | [address](#ripple-address) | The address of the owner of the suspended payment to cancel.
 suspensionSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Suspended Payment Creation](#suspended-payment-creation) transaction for the suspended payment to cancel.
-memos | array | *Optional* Array of memos to attach to the transaction.
-memos[] | object | Memo objects represent arbitrary data that can be included in a transaction
-*memos[].* data | string | *Optional* Arbitrary string, conventionally containing the content of the memo.
-*memos[].* format | string | *Optional* Conventionally containing information on how the memo is encoded, for example as a [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml). Only characters allowed in URLs are permitted.
-*memos[].* type | string | *Optional* Conventionally, a unique relation (according to [RFC 5988](http://tools.ietf.org/html/rfc5988#section-4)) that defines the format of this memo. Only characters allowed in URLs are permitted.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 ### Example
 
@@ -510,11 +513,7 @@ Name | Type | Description
 owner | [address](#ripple-address) | The address of the owner of the suspended payment to execute.
 suspensionSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Suspended Payment Creation](#suspended-payment-creation) transaction for the suspended payment to execute.
 digest | string | *Optional* The original `digest` from the suspended payment creation transaction. This is sha256 hash of `proof` string. It is replicated here so that the relatively expensive hashing operation can be delegated to a server without ledger history and the server with ledger history only has to do a quick comparison of the old digest with the new digest.
-memos | array | *Optional* Array of memos to attach to the transaction.
-memos[] | object | Memo objects represent arbitrary data that can be included in a transaction
-*memos[].* data | string | *Optional* Arbitrary string, conventionally containing the content of the memo.
-*memos[].* format | string | *Optional* Conventionally containing information on how the memo is encoded, for example as a [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml). Only characters allowed in URLs are permitted.
-*memos[].* type | string | *Optional* Conventionally, a unique relation (according to [RFC 5988](http://tools.ietf.org/html/rfc5988#section-4)) that defines the format of this memo. Only characters allowed in URLs are permitted.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 method | integer | *Optional* The method for verifying the proof; only method `1` is supported.
 proof | string | *Optional* A value that produces the digest when hashed. It must be 32 charaters long and contain only 8-bit characters.
 
@@ -2577,6 +2576,7 @@ domain | string | *Optional*  The domain that owns this account, as a hexadecima
 emailHash | string,null | *Optional* Hash of an email address to be used for generating an avatar image. Conventionally, clients use Gravatar to display this image. Use `null` to clear.
 enableTransactionIDTracking | boolean | *Optional* Track the ID of this account’s most recent transaction.
 globalFreeze | boolean | *Optional* Freeze all assets issued by this account.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 messageKey | string | *Optional* Public key for sending encrypted messages to this account. Conventionally, it should be a secp256k1 key, the same encryption that is used by the rest of Ripple.
 noFreeze | boolean | *Optional* Permanently give up the ability to freeze individual trust lines. This flag can never be disabled after being enabled.
 passwordSpent | boolean | *Optional* Indicates that the account has used its free SetRegularKey transaction.

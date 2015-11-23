@@ -43,6 +43,7 @@ function loadSchemas() {
     require('./schemas/objects/signed-value.json'),
     require('./schemas/objects/orderbook.json'),
     require('./schemas/objects/instructions.json'),
+    require('./schemas/objects/settings.json'),
     require('./schemas/specifications/settings.json'),
     require('./schemas/specifications/payment.json'),
     require('./schemas/specifications/suspended-payment-cancellation.json'),

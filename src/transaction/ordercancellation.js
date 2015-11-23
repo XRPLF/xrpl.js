@@ -1,5 +1,6 @@
 /* @flow */
 'use strict';
+const _ = require('lodash');
 const utils = require('./utils');
 const validate = utils.common.validate;
 import type {Instructions, Prepare} from './types.js';
@@ -7,11 +8,15 @@ import type {Instructions, Prepare} from './types.js';
 function createOrderCancellationTransaction(account: string,
     orderCancellation: Object
 ): Object {
-  return {
+  const txJSON: Object = {
     TransactionType: 'OfferCancel',
     Account: account,
     OfferSequence: orderCancellation.orderSequence
   };
+  if (orderCancellation.memos !== undefined) {
+    txJSON.Memos = _.map(orderCancellation.memos, utils.convertMemo);
+  }
+  return txJSON;
 }
 
 function prepareOrderCancellation(address: string, orderCancellation: Object,

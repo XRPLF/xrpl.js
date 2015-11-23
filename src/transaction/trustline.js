@@ -1,5 +1,6 @@
 /* @flow */
 'use strict';
+const _ = require('lodash');
 const utils = require('./utils');
 const validate = utils.common.validate;
 const trustlineFlags = utils.common.txFlags.TrustSet;
@@ -43,6 +44,9 @@ function createTrustlineTransaction(account: string,
   if (trustline.frozen !== undefined) {
     txJSON.Flags |= trustline.frozen ?
       trustlineFlags.SetFreeze : trustlineFlags.ClearFreeze;
+  }
+  if (trustline.memos !== undefined) {
+    txJSON.Memos = _.map(trustline.memos, utils.convertMemo);
   }
   return txJSON;
 }

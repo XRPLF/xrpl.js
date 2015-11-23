@@ -7,7 +7,8 @@
     "orderSequence": {
       "$ref": "sequence",
       "description": "The [account sequence number](#account-sequence-number) of the order to cancel."
-    }
+    },
+    "memos": {"$ref": "memos"}
   },
   "required": ["orderSequence"],
   "additionalProperties": false
