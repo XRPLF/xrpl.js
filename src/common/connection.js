@@ -16,6 +16,7 @@ class Connection extends EventEmitter {
   constructor(url, options = {}) {
     super();
     this._url = url;
+    this._trace = options.trace;
     this._proxyURL = options.proxy;
     this._proxyAuthorization = options.proxyAuthorization;
     this._authorization = options.authorization;
@@ -52,6 +53,9 @@ class Connection extends EventEmitter {
 
   _onMessage(message) {
     let parameters;
+    if (this._trace) {
+      console.log(message);
+    }
     try {
       parameters = this._parseMessage(message);
     } catch (error) {
@@ -191,6 +195,9 @@ class Connection extends EventEmitter {
   }
 
   _send(message) {
+    if (this._trace) {
+      console.log(message);
+    }
     return new Promise((resolve, reject) => {
       this._ws.send(message, undefined, (error, result) => {
         if (error) {
