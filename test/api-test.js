@@ -79,8 +79,8 @@ describe('RippleAPI', function() {
       }, /XRP to XRP payments cannot be partial payments/);
     });
 
-    it('preparePayment - address must match payment.source.address',
-        function() {
+    it('preparePayment - address must match payment.source.address', function(
+    ) {
       assert.throws(() => {
         this.api.preparePayment(address, requests.preparePayment.wrongAddress);
       }, /address must match payment.source.address/);
@@ -1300,7 +1300,7 @@ describe('RippleAPI - offline', function() {
 
 /* eslint-disable no-unused-vars */
   it('RippleAPI - implicit server port', function() {
-    const api = new RippleAPI({servers: ['wss://s1.ripple.com']});
+    const api = new RippleAPI({server: 'wss://s1.ripple.com'});
   });
 /* eslint-enable no-unused-vars */
   it('RippleAPI invalid options', function() {
@@ -1308,12 +1308,12 @@ describe('RippleAPI - offline', function() {
   });
 
   it('RippleAPI valid options', function() {
-    const api = new RippleAPI({servers: ['wss://s:1']});
+    const api = new RippleAPI({server: 'wss://s:1'});
     assert.deepEqual(api.connection._url, 'wss://s:1');
   });
 
   it('RippleAPI invalid server uri', function() {
-    assert.throws(() => new RippleAPI({servers: ['wss//s:1']}));
+    assert.throws(() => new RippleAPI({server: 'wss//s:1'}));
   });
 
 });
