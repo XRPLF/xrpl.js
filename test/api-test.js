@@ -1,7 +1,6 @@
 /* eslint-disable max-nested-callbacks */
 'use strict';
 const _ = require('lodash');
-const net = require('net');
 const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
 const RippleAPI = require('ripple-api').RippleAPI;
@@ -35,314 +34,90 @@ function checkResult(expected, schemaName, response) {
   return response;
 }
 
-function createServer() {
-  return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    server.on('listening', function() {
-      resolve(server);
-    });
-    server.on('error', function(error) {
-      reject(error);
-    });
-    server.listen(0, '0.0.0.0');
-  });
-}
-
 
 describe('RippleAPI', function() {
   const instructions = {maxLedgerVersionOffset: 100};
   beforeEach(setupAPI.setup);
   afterEach(setupAPI.teardown);
 
-  describe('Connection', function() {
-
-    it('connection default options', function() {
-      const connection = new utils.common.Connection('url');
-      assert.strictEqual(connection._url, 'url');
-      assert(_.isUndefined(connection._proxyURL));
-      assert(_.isUndefined(connection._authorization));
-    });
-
-    it('with proxy', function(done) {
-      createServer().then((server) => {
-        const port = server.address().port;
-        const expect = 'CONNECT localhost';
-        server.on('connection', (socket) => {
-          socket.on('data', (data) => {
-            const got = data.toString('ascii', 0, expect.length);
-            assert.strictEqual(got, expect);
-            server.close();
-            done();
-          });
-        });
-
-        const options = {
-          proxy: 'ws://localhost:' + port,
-          authorization: 'authorization',
-          trustedCertificates: 'something'
-        };
-        const connection =
-          new utils.common.Connection(this.api.connection._url, options);
-        connection.connect().catch(done);
-        connection.connect().catch(done);
-      }, done);
-    });
-
-    it('Multiply disconnect calls', function() {
-      this.api.disconnect();
-      return this.api.disconnect();
-    });
-
-    it('reconnect', function() {
-      return this.api.connection.reconnect();
-    });
-
-    it('NotConnectedError', function() {
-      const connection = new utils.common.Connection('url');
-      return connection.getLedgerVersion().then(() => {
-        assert(false, 'Should throw NotConnectedError');
-      }).catch(error => {
-        assert(error instanceof this.api.errors.NotConnectedError);
-      });
-    });
-
-    it('DisconnectedError', function() {
-      this.api.connection._send = function() {
-        this._ws.close();
-      };
-      return this.api.getServerInfo().then(() => {
-        assert(false, 'Should throw DisconnectedError');
-      }).catch(error => {
-        assert(error instanceof this.api.errors.DisconnectedError);
-      });
-    });
-
-    it('TimeoutError', function() {
-      this.api.connection._send = function() {
-        return Promise.resolve({});
-      };
-      const request = {command: 'server_info'};
-      return this.api.connection.request(request, 1).then(() => {
-        assert(false, 'Should throw TimeoutError');
-      }).catch(error => {
-        assert(error instanceof this.api.errors.TimeoutError);
-      });
-    });
-
-    it('DisconnectedError on send', function() {
-      this.api.connection._ws.send = function(message, options, callback) {
-        unused(message, options);
-        callback({message: 'not connected'});
-      };
-      return this.api.getServerInfo().then(() => {
-        assert(false, 'Should throw DisconnectedError');
-      }).catch(error => {
-        assert(error instanceof this.api.errors.DisconnectedError);
-        assert.strictEqual(error.message, 'not connected');
-      });
-    });
-
-    it('ResponseFormatError', function() {
-      this.api.connection._send = function(message) {
-        const parsed = JSON.parse(message);
-        setTimeout(() => {
-          this._ws.emit('message', JSON.stringify({
-            id: parsed.id,
-            type: 'response',
-            status: 'unrecognized'
-          }));
-        }, 2);
-        return new Promise(() => {});
-      };
-      return this.api.getServerInfo().then(() => {
-        assert(false, 'Should throw ResponseFormatError');
-      }).catch(error => {
-        assert(error instanceof this.api.errors.ResponseFormatError);
-      });
-    });
-
-    it('reconnect on unexpected close ', function(done) {
-      this.api.connection.on('connected', () => {
-        done();
-      });
-
-      setTimeout(() => {
-        this.api.connection._ws.close();
-      }, 1);
-    });
-
-    it('Multiply connect calls', function() {
-      return this.api.connect().then(() => {
-        return this.api.connect();
-      });
-    });
-
-    it('hasLedgerVersion', function() {
-      return this.api.connection.hasLedgerVersion(8819951).then((result) => {
-        assert(result);
-      });
-    });
-
-    it('Cannot connect because no server', function() {
-      const connection = new utils.common.Connection();
-      return connection.connect().then(() => {
-        assert(false, 'Should throw ConnectionError');
-      }).catch(error => {
-        assert(error instanceof this.api.errors.ConnectionError);
-      });
-    });
-
-    it('connect multiserver error', function() {
-      const options = {
-        servers: ['wss://server1.com', 'wss://server2.com']
-      };
-      assert.throws(function() {
-        const api = new RippleAPI(options);
-        unused(api);
-      }, this.api.errors.RippleError);
-    });
-
-    it('connect throws error', function(done) {
-      this.api.once('error', (type, info) => {
-        assert.strictEqual(type, 'type');
-        assert.strictEqual(info, 'info');
-        done();
-      });
-      this.api.connection.emit('error', 'type', 'info');
-    });
-
-    it('connection emit stream messages', function(done) {
-      let transactionCount = 0;
-      let pathFindCount = 0;
-      this.api.connection.on('transaction', () => {
-        transactionCount++;
-      });
-      this.api.connection.on('path_find', () => {
-        pathFindCount++;
-      });
-      this.api.connection.on('1', () => {
-        assert.strictEqual(transactionCount, 1);
-        assert.strictEqual(pathFindCount, 1);
-        done();
-      });
-
-      this.api.connection._onMessage(JSON.stringify({
-        type: 'transaction'
-      }));
-      this.api.connection._onMessage(JSON.stringify({
-        type: 'path_find'
-      }));
-      this.api.connection._onMessage(JSON.stringify({
-        type: 'response', id: 1
-      }));
-    });
-
-    it('connection - invalid message id', function(done) {
-      this.api.on('error', (type, message) => {
-        assert.strictEqual(type, 'badMessage');
-        assert.strictEqual(message,
-          '{"type":"response","id":"must be integer"}');
-        done();
-      });
-      this.api.connection._onMessage(JSON.stringify({
-        type: 'response', id: 'must be integer'
-      }));
-    });
-
-    it('connection - error message', function(done) {
-      this.api.on('error', (type, message) => {
-        assert.strictEqual(type, 'slowDown');
-        assert.strictEqual(message, 'slow down');
-        done();
-      });
-      this.api.connection._onMessage(JSON.stringify({
-        error: 'slowDown', error_message: 'slow down'
-      }));
-    });
-
-    it('connection - unrecognized message type', function(done) {
-      this.api.on('error', (type, message) => {
-        assert.strictEqual(type, 'badMessage');
-        assert.strictEqual(message, '{"type":"unknown"}');
-        done();
-      });
-
-      this.api.connection._onMessage(JSON.stringify({type: 'unknown'}));
-    });
-  });
-
   it('error inspect', function() {
     const error = new this.api.errors.RippleError('mess', {data: 1});
     assert.strictEqual(error.inspect(), '[RippleError(mess, { data: 1 })]');
   });
 
-  it('preparePayment', function() {
-    const localInstructions = _.defaults({
-      maxFee: '0.000012'
-    }, instructions);
-    return this.api.preparePayment(
-      address, requests.preparePayment, localInstructions).then(
-      _.partial(checkResult, responses.preparePayment.normal, 'prepare'));
-  });
+  describe('preparePayment', function() {
 
-  it('preparePayment - min amount xrp', function() {
-    const localInstructions = _.defaults({
-      maxFee: '0.000012'
-    }, instructions);
-    return this.api.preparePayment(
-      address, requests.preparePaymentMinAmountXRP, localInstructions).then(
-      _.partial(checkResult, responses.preparePayment.minAmountXRP, 'prepare'));
-  });
-
-  it('preparePayment - min amount xrp2xrp', function() {
-    return this.api.preparePayment(
-      address, requests.preparePaymentMinAmount, instructions).then(
-      _.partial(checkResult,
-        responses.preparePayment.minAmountXRPXRP, 'prepare'));
-  });
-
-  it('preparePayment - XRP to XRP no partial', function() {
-    assert.throws(() => {
-      this.api.preparePayment(address, requests.preparePaymentWrongPartial);
-    }, /XRP to XRP payments cannot be partial payments/);
-  });
-
-  it('preparePayment - address must match payment.source.address', function() {
-    assert.throws(() => {
-      this.api.preparePayment(address, requests.preparePaymentWrongAddress);
-    }, /address must match payment.source.address/);
-  });
-
-  it('preparePayment - wrong amount', function() {
-    assert.throws(() => {
-      this.api.preparePayment(address, requests.preparePaymentWrongAmount);
-    }, this.api.errors.ValidationError);
-  });
-
-  it('preparePayment with all options specified', function() {
-    return this.api.getLedgerVersion().then((ver) => {
-      const localInstructions = {
-        maxLedgerVersion: ver + 100,
-        fee: '0.000012'
-      };
+    it('normal', function() {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012'
+      }, instructions);
       return this.api.preparePayment(
-        address, requests.preparePaymentAllOptions, localInstructions).then(
-        _.partial(checkResult, responses.preparePayment.allOptions, 'prepare'));
+        address, requests.preparePayment.normal, localInstructions).then(
+        _.partial(checkResult, responses.preparePayment.normal, 'prepare'));
     });
-  });
 
-  it('preparePayment without counterparty set', function() {
-    const localInstructions = _.defaults({sequence: 23}, instructions);
-    return this.api.preparePayment(
-      address, requests.preparePaymentNoCounterparty, localInstructions).then(
-      _.partial(checkResult, responses.preparePayment.noCounterparty,
-        'prepare'));
-  });
+    it('preparePayment - min amount xrp', function() {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012'
+      }, instructions);
+      return this.api.preparePayment(
+        address, requests.preparePayment.minAmountXRP, localInstructions).then(
+        _.partial(checkResult,
+          responses.preparePayment.minAmountXRP, 'prepare'));
+    });
 
-  it('preparePayment - destination.minAmount', function() {
-    return this.api.preparePayment(address, responses.getPaths.sendAll[0],
-      instructions).then(_.partial(checkResult,
-        responses.preparePayment.minAmount, 'prepare'));
+    it('preparePayment - min amount xrp2xrp', function() {
+      return this.api.preparePayment(
+        address, requests.preparePayment.minAmount, instructions).then(
+        _.partial(checkResult,
+          responses.preparePayment.minAmountXRPXRP, 'prepare'));
+    });
+
+    it('preparePayment - XRP to XRP no partial', function() {
+      assert.throws(() => {
+        this.api.preparePayment(address, requests.preparePayment.wrongPartial);
+      }, /XRP to XRP payments cannot be partial payments/);
+    });
+
+    it('preparePayment - address must match payment.source.address',
+        function() {
+      assert.throws(() => {
+        this.api.preparePayment(address, requests.preparePayment.wrongAddress);
+      }, /address must match payment.source.address/);
+    });
+
+    it('preparePayment - wrong amount', function() {
+      assert.throws(() => {
+        this.api.preparePayment(address, requests.preparePayment.wrongAmount);
+      }, this.api.errors.ValidationError);
+    });
+
+    it('preparePayment with all options specified', function() {
+      return this.api.getLedgerVersion().then((ver) => {
+        const localInstructions = {
+          maxLedgerVersion: ver + 100,
+          fee: '0.000012'
+        };
+        return this.api.preparePayment(
+          address, requests.preparePayment.allOptions, localInstructions).then(
+          _.partial(checkResult,
+            responses.preparePayment.allOptions, 'prepare'));
+      });
+    });
+
+    it('preparePayment without counterparty set', function() {
+      const localInstructions = _.defaults({sequence: 23}, instructions);
+      return this.api.preparePayment(
+        address, requests.preparePayment.noCounterparty, localInstructions)
+          .then(_.partial(checkResult, responses.preparePayment.noCounterparty,
+            'prepare'));
+    });
+
+    it('preparePayment - destination.minAmount', function() {
+      return this.api.preparePayment(address, responses.getPaths.sendAll[0],
+        instructions).then(_.partial(checkResult,
+          responses.preparePayment.minAmount, 'prepare'));
+    });
   });
 
   it('prepareOrder - buy order', function() {
@@ -365,17 +140,25 @@ describe('RippleAPI', function() {
   });
 
   it('prepareOrderCancellation', function() {
-    const request = requests.prepareOrderCancellation;
+    const request = requests.prepareOrderCancellation.simple;
     return this.api.prepareOrderCancellation(address, request, instructions)
-      .then(_.partial(checkResult, responses.prepareOrder.cancellation,
+      .then(_.partial(checkResult, responses.prepareOrderCancellation.normal,
         'prepare'));
   });
 
   it('prepareOrderCancellation - no instructions', function() {
-    const request = requests.prepareOrderCancellation;
+    const request = requests.prepareOrderCancellation.simple;
     return this.api.prepareOrderCancellation(address, request)
       .then(_.partial(checkResult,
-        responses.prepareOrder.cancellationNoInstructions,
+        responses.prepareOrderCancellation.noInstructions,
+        'prepare'));
+  });
+
+  it('prepareOrderCancellation - with memos', function() {
+    const request = requests.prepareOrderCancellation.withMemos;
+    return this.api.prepareOrderCancellation(address, request)
+      .then(_.partial(checkResult,
+        responses.prepareOrderCancellation.withMemos,
         'prepare'));
   });
 
@@ -458,63 +241,71 @@ describe('RippleAPI', function() {
       maxFee: '0.000012'
     }, instructions);
     return this.api.prepareSuspendedPaymentCreation(
-      address, requests.prepareSuspendedPaymentCreation,
+      address, requests.prepareSuspendedPaymentCreation.normal,
       localInstructions).then(
-        _.partial(checkResult, responses.prepareSuspendedPaymentCreation,
+        _.partial(checkResult, responses.prepareSuspendedPaymentCreation.normal,
           'prepare'));
   });
 
   it('prepareSuspendedPaymentCreation full', function() {
     return this.api.prepareSuspendedPaymentCreation(
-      address, requests.prepareSuspendedPaymentCreationFull).then(
-        _.partial(checkResult, responses.prepareSuspendedPaymentCreationFull,
+      address, requests.prepareSuspendedPaymentCreation.full).then(
+        _.partial(checkResult, responses.prepareSuspendedPaymentCreation.full,
           'prepare'));
   });
 
   it('prepareSuspendedPaymentExecution', function() {
     return this.api.prepareSuspendedPaymentExecution(
-      address, requests.prepareSuspendedPaymentExecution, instructions).then(
-      _.partial(checkResult, responses.prepareSuspendedPaymentExecution,
-        'prepare'));
+      address,
+      requests.prepareSuspendedPaymentExecution.normal, instructions).then(
+        _.partial(checkResult,
+          responses.prepareSuspendedPaymentExecution.normal,
+          'prepare'));
   });
 
   it('prepareSuspendedPaymentExecution - simple', function() {
     return this.api.prepareSuspendedPaymentExecution(
-      address, requests.prepareSuspendedPaymentExecutionSimple).then(
-      _.partial(checkResult, responses.prepareSuspendedPaymentExecutionSimple,
-        'prepare'));
+      address,
+      requests.prepareSuspendedPaymentExecution.simple).then(
+        _.partial(checkResult,
+          responses.prepareSuspendedPaymentExecution.simple,
+          'prepare'));
   });
 
   it('prepareSuspendedPaymentCancellation', function() {
     return this.api.prepareSuspendedPaymentCancellation(
-      address, requests.prepareSuspendedPaymentCancellation, instructions).then(
-      _.partial(checkResult, responses.prepareSuspendedPaymentCancellation,
-        'prepare'));
+      address,
+      requests.prepareSuspendedPaymentCancellation.normal, instructions).then(
+        _.partial(checkResult,
+          responses.prepareSuspendedPaymentCancellation.normal,
+          'prepare'));
   });
 
   it('prepareSuspendedPaymentCancellation with memos', function() {
     return this.api.prepareSuspendedPaymentCancellation(
-      address, requests.prepareSuspendedPaymentCancellationMemos).then(
-      _.partial(checkResult, responses.prepareSuspendedPaymentCancellationMemos,
-        'prepare'));
+      address,
+      requests.prepareSuspendedPaymentCancellation.memos).then(
+        _.partial(checkResult,
+          responses.prepareSuspendedPaymentCancellation.memos,
+          'prepare'));
   });
 
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
-    const result = this.api.sign(requests.sign.txJSON, secret);
-    assert.deepEqual(result, responses.sign);
+    const result = this.api.sign(requests.sign.normal.txJSON, secret);
+    assert.deepEqual(result, responses.sign.normal);
     schemaValidator.schemaValidate('sign', result);
   });
 
   it('sign - SuspendedPaymentExecution', function() {
     const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
-    const result = this.api.sign(requests.signSuspended.txJSON, secret);
-    assert.deepEqual(result, responses.signSuspended);
+    const result = this.api.sign(requests.sign.suspended.txJSON, secret);
+    assert.deepEqual(result, responses.sign.suspended);
     schemaValidator.schemaValidate('sign', result);
   });
 
   it('submit', function() {
-    return this.api.submit(responses.sign.signedTransaction).then(
+    return this.api.submit(responses.sign.normal.signedTransaction).then(
       _.partial(checkResult, responses.submit, 'submit'));
   });
 
@@ -860,7 +651,7 @@ describe('RippleAPI', function() {
   it('getTransactions', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2};
     return this.api.getTransactions(address, options).then(
-      _.partial(checkResult, responses.getTransactions,
+      _.partial(checkResult, responses.getTransactions.normal,
         'getTransactions'));
   });
 
@@ -868,7 +659,7 @@ describe('RippleAPI', function() {
     const options = {types: ['payment', 'order'], initiated: true, limit: 2,
       earliestFirst: true
     };
-    const expected = _.cloneDeep(responses.getTransactions)
+    const expected = _.cloneDeep(responses.getTransactions.normal)
       .sort(utils.compareTransactions);
     return this.api.getTransactions(address, options).then(
       _.partial(checkResult, expected, 'getTransactions'));
@@ -951,7 +742,8 @@ describe('RippleAPI', function() {
       limit: 2
     };
     return this.api.getTransactions(address, options).then(
-      _.partial(checkResult, responses.getTransactions, 'getTransactions'));
+      _.partial(checkResult, responses.getTransactions.normal,
+        'getTransactions'));
   });
 
   it('getTransactions - start transaction with zero ledger version', function(
@@ -966,18 +758,19 @@ describe('RippleAPI', function() {
 
   it('getTransactions - no options', function() {
     return this.api.getTransactions(addresses.OTHER_ACCOUNT).then(
-      _.partial(checkResult, responses.getTransactionsOne, 'getTransactions'));
+      _.partial(checkResult, responses.getTransactions.one, 'getTransactions'));
   });
 
-  it('getTrustlines', function() {
+  it('getTrustlines - filtered', function() {
     const options = {currency: 'USD'};
     return this.api.getTrustlines(address, options).then(
-      _.partial(checkResult, responses.getTrustlines, 'getTrustlines'));
+      _.partial(checkResult,
+        responses.getTrustlines.filtered, 'getTrustlines'));
   });
 
-  it('getTrustlines - ono options', function() {
+  it('getTrustlines - no options', function() {
     return this.api.getTrustlines(address).then(
-      _.partial(checkResult, responses.getTrustlinesAll, 'getTrustlines'));
+      _.partial(checkResult, responses.getTrustlines.all, 'getTrustlines'));
   });
 
   it('generateAddress', function() {
@@ -1045,59 +838,66 @@ describe('RippleAPI', function() {
     }, this.api.errors.ValidationError);
   });
 
-  it('getOrderbook', function() {
-    return this.api.getOrderbook(address, requests.getOrderbook, undefined)
-      .then(
-        _.partial(checkResult, responses.getOrderbook, 'getOrderbook'));
-  });
+  describe('getOrderbook', function() {
 
-  it('getOrderbook - invalid options', function() {
-    assert.throws(() => {
-      this.api.getOrderbook(address, requests.getOrderbook,
-        {invalid: 'options'});
-    }, this.api.errors.ValidationError);
-  });
-
-  it('getOrderbook with XRP', function() {
-    return this.api.getOrderbook(address, requests.getOrderbookWithXRP).then(
-      _.partial(checkResult, responses.getOrderbookWithXRP, 'getOrderbook'));
-  });
-
-  it('getOrderbook - sorted so that best deals come first', function() {
-    return this.api.getOrderbook(address, requests.getOrderbook)
-    .then(data => {
-      const bidRates = data.bids.map(bid => bid.properties.makerExchangeRate);
-      const askRates = data.asks.map(ask => ask.properties.makerExchangeRate);
-      // makerExchangeRate = quality = takerPays.value/takerGets.value
-      // so the best deal for the taker is the lowest makerExchangeRate
-      // bids and asks should be sorted so that the best deals come first
-      assert.deepEqual(_.sortBy(bidRates, x => Number(x)), bidRates);
-      assert.deepEqual(_.sortBy(askRates, x => Number(x)), askRates);
+    it('normal', function() {
+      return this.api.getOrderbook(address,
+        requests.getOrderbook.normal, undefined).then(
+          _.partial(checkResult,
+            responses.getOrderbook.normal, 'getOrderbook'));
     });
-  });
 
-  it('getOrderbook - currency & counterparty are correct', function() {
-    return this.api.getOrderbook(address, requests.getOrderbook)
-    .then(data => {
-      const orders = _.flatten([data.bids, data.asks]);
-      _.forEach(orders, order => {
-        const quantity = order.specification.quantity;
-        const totalPrice = order.specification.totalPrice;
-        const {base, counter} = requests.getOrderbook;
-        assert.strictEqual(quantity.currency, base.currency);
-        assert.strictEqual(quantity.counterparty, base.counterparty);
-        assert.strictEqual(totalPrice.currency, counter.currency);
-        assert.strictEqual(totalPrice.counterparty, counter.counterparty);
+    it('invalid options', function() {
+      assert.throws(() => {
+        this.api.getOrderbook(address, requests.getOrderbook.normal,
+          {invalid: 'options'});
+      }, this.api.errors.ValidationError);
+    });
+
+    it('with XRP', function() {
+      return this.api.getOrderbook(address, requests.getOrderbook.withXRP).then(
+        _.partial(checkResult, responses.getOrderbook.withXRP, 'getOrderbook'));
+    });
+
+    it('sorted so that best deals come first', function() {
+      return this.api.getOrderbook(address, requests.getOrderbook.normal)
+      .then(data => {
+        const bidRates = data.bids.map(bid => bid.properties.makerExchangeRate);
+        const askRates = data.asks.map(ask => ask.properties.makerExchangeRate);
+        // makerExchangeRate = quality = takerPays.value/takerGets.value
+        // so the best deal for the taker is the lowest makerExchangeRate
+        // bids and asks should be sorted so that the best deals come first
+        assert.deepEqual(_.sortBy(bidRates, x => Number(x)), bidRates);
+        assert.deepEqual(_.sortBy(askRates, x => Number(x)), askRates);
       });
     });
-  });
 
-  it('getOrderbook - direction is correct for bids and asks', function() {
-    return this.api.getOrderbook(address, requests.getOrderbook)
-    .then(data => {
-      assert(_.every(data.bids, bid => bid.specification.direction === 'buy'));
-      assert(_.every(data.asks, ask => ask.specification.direction === 'sell'));
+    it('currency & counterparty are correct', function() {
+      return this.api.getOrderbook(address, requests.getOrderbook.normal)
+      .then(data => {
+        const orders = _.flatten([data.bids, data.asks]);
+        _.forEach(orders, order => {
+          const quantity = order.specification.quantity;
+          const totalPrice = order.specification.totalPrice;
+          const {base, counter} = requests.getOrderbook.normal;
+          assert.strictEqual(quantity.currency, base.currency);
+          assert.strictEqual(quantity.counterparty, base.counterparty);
+          assert.strictEqual(totalPrice.currency, counter.currency);
+          assert.strictEqual(totalPrice.counterparty, counter.counterparty);
+        });
+      });
     });
+
+    it('direction is correct for bids and asks', function() {
+      return this.api.getOrderbook(address, requests.getOrderbook.normal)
+      .then(data => {
+        assert(
+          _.every(data.bids, bid => bid.specification.direction === 'buy'));
+        assert(
+          _.every(data.asks, ask => ask.specification.direction === 'sell'));
+      });
+    });
+
   });
 
   it('getServerInfo', function() {
@@ -1455,7 +1255,8 @@ describe('RippleAPI - offline', function() {
     };
     return api.prepareSettings(address, settings, instructions).then(data => {
       checkResult(responses.prepareSettings.flags, 'prepare', data);
-      assert.deepEqual(api.sign(data.txJSON, secret), responses.sign);
+      assert.deepEqual(api.sign(data.txJSON, secret),
+        responses.prepareSettings.signed);
     });
   });
 

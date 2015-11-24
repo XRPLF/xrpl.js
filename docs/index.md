@@ -348,7 +348,14 @@ ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through 
   "qualityIn": 0.91,
   "qualityOut": 0.87,
   "ripplingDisabled": true,
-  "frozen": false
+  "frozen": false,
+  "memos": [
+    {
+      "type": "test",
+      "format": "plain/text",
+      "data": "texted data"
+    }
+  ]
 }
 ```
 
@@ -435,7 +442,14 @@ transferRate | number,null | *Optional*  The fee to charge when users transfer t
 
 ```json
 {
-  "domain": "ripple.com"
+  "domain": "ripple.com",
+  "memos": [
+    {
+      "type": "test",
+      "format": "plain/text",
+      "data": "texted data"
+    }
+  ]
 }
 ```
 
@@ -2826,7 +2840,14 @@ const trustline = {
   "qualityIn": 0.91,
   "qualityOut": 0.87,
   "ripplingDisabled": true,
-  "frozen": false
+  "frozen": false,
+  "memos": [
+    {
+      "type": "test",
+      "format": "plain/text",
+      "data": "texted data"
+    }
+  ]
 };
 return api.preparePayment(address, trustline).then(prepared =>
   {/* ... */});
@@ -2835,7 +2856,7 @@ return api.preparePayment(address, trustline).then(prepared =>
 
 ```json
 {
-  "txJSON": "{\"Flags\":2149711872,\"TransactionType\":\"TrustSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"LimitAmount\":{\"value\":\"10000\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"QualityIn\":910000000,\"QualityOut\":870000000,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"TransactionType\":\"TrustSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"LimitAmount\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"10000\"},\"Flags\":2149711872,\"QualityIn\":910000000,\"QualityOut\":870000000,\"Memos\":[{\"Memo\":{\"MemoData\":\"7465787465642064617461\",\"MemoType\":\"74657374\",\"MemoFormat\":\"706C61696E2F74657874\"}}],\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
   "instructions": {
     "fee": "0.000012",
     "sequence": 23,
@@ -2997,7 +3018,14 @@ instructions | object | The instructions for how to execute the transaction afte
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
 const settings = {
-  "domain": "ripple.com"
+  "domain": "ripple.com",
+  "memos": [
+    {
+      "type": "test",
+      "format": "plain/text",
+      "data": "texted data"
+    }
+  ]
 };
 return api.prepareSettings(address, settings)
   .then(prepared => {/* ... */});
@@ -3006,7 +3034,14 @@ return api.prepareSettings(address, settings)
 
 ```json
 {
-  "domain": "ripple.com"
+  "domain": "ripple.com",
+  "memos": [
+    {
+      "type": "test",
+      "format": "plain/text",
+      "data": "texted data"
+    }
+  ]
 }
 ```
 

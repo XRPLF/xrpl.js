@@ -1,5 +1,5 @@
 {
-  "domain": "ripple.com",
+  "orderSequence": 23,
   "memos": [
     {
       "type": "test",

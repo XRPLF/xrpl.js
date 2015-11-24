@@ -5,8 +5,10 @@ module.exports = {
   getAccountInfo: require('./get-account-info.json'),
   getBalances: require('./get-balances.json'),
   getBalanceSheet: require('./get-balance-sheet.json'),
-  getOrderbook: require('./get-orderbook.json'),
-  getOrderbookWithXRP: require('./get-orderbook-with-xrp.json'),
+  getOrderbook: {
+    normal: require('./get-orderbook.json'),
+    withXRP: require('./get-orderbook-with-xrp.json')
+  },
   getOrders: require('./get-orders.json'),
   getPaths: {
     XrpToUsd: require('./get-paths.json'),
@@ -43,10 +45,14 @@ module.exports = {
     suspendedPaymentExecutionSimple:
       require('./get-transaction-suspended-payment-execution-simple.json')
   },
-  getTransactions: require('./get-transactions.json'),
-  getTransactionsOne: require('./get-transactions-one.json'),
-  getTrustlines: require('./get-trustlines.json'),
-  getTrustlinesAll: require('./get-trustlines-all.json'),
+  getTransactions: {
+    normal: require('./get-transactions.json'),
+    one: require('./get-transactions-one.json')
+  },
+  getTrustlines: {
+    filtered: require('./get-trustlines.json'),
+    all: require('./get-trustlines-all.json')
+  },
   getLedger: {
     header: require('./get-ledger'),
     full: require('./get-ledger-full'),
@@ -56,10 +62,12 @@ module.exports = {
   prepareOrder: {
     buy: require('./prepare-order.json'),
     sell: require('./prepare-order-sell.json'),
-    expiration: require('./prepare-order-expiration'),
-    cancellation: require('./prepare-order-cancellation.json'),
-    cancellationNoInstructions:
-      require('./prepare-order-cancellation-no-instructions.json')
+    expiration: require('./prepare-order-expiration')
+  },
+  prepareOrderCancellation: {
+    normal: require('./prepare-order-cancellation.json'),
+    withMemos: require('./prepare-order-cancellation-memos.json'),
+    noInstructions: require('./prepare-order-cancellation-no-instructions.json')
   },
   preparePayment: {
     normal: require('./prepare-payment.json'),
@@ -77,27 +85,30 @@ module.exports = {
     flagClear: require('./prepare-settings-flag-clear.json'),
     setTransferRate: require('./prepare-settings-set-transfer-rate.json'),
     fieldClear: require('./prepare-settings-field-clear.json'),
-    noInstructions: require('./prepare-settings-no-instructions.json')
+    noInstructions: require('./prepare-settings-no-instructions.json'),
+    signed: require('./prepare-settings-signed.json')
   },
-  prepareSuspendedPaymentCreation:
-    require('./prepare-suspended-payment-creation'),
-  prepareSuspendedPaymentCreationFull:
-    require('./prepare-suspended-payment-creation-full'),
-  prepareSuspendedPaymentExecution:
-    require('./prepare-suspended-payment-execution'),
-  prepareSuspendedPaymentExecutionSimple:
-    require('./prepare-suspended-payment-execution-simple'),
-  prepareSuspendedPaymentCancellation:
-    require('./prepare-suspended-payment-cancellation'),
-  prepareSuspendedPaymentCancellationMemos:
-    require('./prepare-suspended-payment-cancellation-memos'),
+  prepareSuspendedPaymentCreation: {
+    normal: require('./prepare-suspended-payment-creation'),
+    full: require('./prepare-suspended-payment-creation-full')
+  },
+  prepareSuspendedPaymentExecution: {
+    normal: require('./prepare-suspended-payment-execution'),
+    simple: require('./prepare-suspended-payment-execution-simple')
+  },
+  prepareSuspendedPaymentCancellation: {
+    normal: require('./prepare-suspended-payment-cancellation'),
+    memos: require('./prepare-suspended-payment-cancellation-memos')
+  },
   prepareTrustline: {
     simple: require('./prepare-trustline-simple.json'),
     frozen: require('./prepare-trustline-frozen.json'),
     complex: require('./prepare-trustline.json')
   },
-  sign: require('./sign.json'),
-  signSuspended: require('./sign-suspended.json'),
+  sign: {
+    normal: require('./sign.json'),
+    suspended: require('./sign-suspended.json')
+  },
   submit: require('./submit.json'),
   ledgerEvent: require('./ledger-event.json')
 };

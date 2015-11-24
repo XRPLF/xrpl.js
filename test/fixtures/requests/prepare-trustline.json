@@ -5,5 +5,12 @@
   "qualityIn": 0.91,
   "qualityOut": 0.87,
   "ripplingDisabled": true,
-  "frozen": false
+  "frozen": false,
+  "memos": [
+    {
+      "type": "test",
+      "format": "plain/text",
+      "data": "texted data"
+    }
+  ]
 }
