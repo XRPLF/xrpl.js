@@ -1,3 +1,17 @@
+##0.14.0
+**Breaking Changes**
++ [prepareOrderCancellation now takes orderCancellation specification](https://github.com/ripple/ripple-lib/commit/7f33d8a71e56289e5a5e0ead1c74f75ebcde72bc)
++ [Rename "ledgerClosed" event to "ledger" and change format](https://github.com/ripple/ripple-lib/commit/8a3d4a64db5fbf560ebf87dc62e0212513c5e18a)
+
+**Changes**
++ [Fix proxy support and add support for proxy authorization](https://github.com/ripple/ripple-lib/commit/14b840f3feca758e0384b746c94e36d8bf59b8c2)
++ [Fix trace option](https://github.com/ripple/ripple-lib/commit/af620755c53556c55eed12de4b0013ef5a349ce2)
++ [Allow memos on all transaction types](https://github.com/ripple/ripple-lib/commit/b5081344da8e66fbd3a5113cc3313325ef72a494)
++ [Add documentation for RippleAPI options](https://github.com/ripple/ripple-lib/commit/a76b554cadb9f9f918b06f8386bc29355682a1a4)
++ [Docs: more on basic types, tx types](https://github.com/ripple/ripple-lib/commit/fdbac63f466b4fd3be701d4878800d856692e26e)
++ [Docs: revised introductory material](https://github.com/ripple/ripple-lib/commit/ef2515507dbd3c6a426ab5b31332a1bdf72d5b2d)
++ [boost coverage to almost 100%](https://github.com/ripple/ripple-lib/commit/995606b1e6f3643af34d9fd442ccd31f320b03eb)
+
 ##0.13.2
 
 **Changes**
