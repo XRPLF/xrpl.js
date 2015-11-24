@@ -35,7 +35,8 @@
     "frozen": {
       "type": "boolean",
       "description": "If true, the trustline is frozen, which means that funds can only be sent to the owner."
-    }
+    },
+    "memos": {"$ref": "memos"}
   },
   "required": ["currency", "counterparty", "limit"],
   "additionalProperties": false

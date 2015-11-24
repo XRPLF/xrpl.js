@@ -33,7 +33,8 @@
       "type": "string",
       "format": "date-time",
       "description": "Time after which the offer is no longer active, as an [ISO 8601 date-time](https://en.wikipedia.org/wiki/ISO_8601)."
-    }
+    },
+    "memos": {"$ref": "memos"}
   },
   "required": ["direction", "quantity", "totalPrice"],
   "additionalProperties": false,

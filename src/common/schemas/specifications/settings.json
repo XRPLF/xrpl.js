@@ -2,11 +2,17 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "settings",
   "link": "settings",
-  "allOf": [
+  "$ref": "settingsPlusMemos",
+  "oneOf": [
     {
-      "$ref": "getSettings"
+      "required": ["memos"],
+      "minProperties": 2,
+      "maxProperties": 2
     },
     {
+      "not": {
+        "required": ["memos"]
+      },
       "minProperties": 1,
       "maxProperties": 1
     }
