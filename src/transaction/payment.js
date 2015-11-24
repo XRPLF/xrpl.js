@@ -33,8 +33,10 @@ type Payment = {
 }
 
 function isXRPToXRPPayment(payment: Payment): boolean {
-  const sourceCurrency = _.get(payment, 'source.maxAmount.currency');
-  const destinationCurrency = _.get(payment, 'destination.amount.currency');
+  const sourceCurrency = _.get(payment, 'source.maxAmount.currency',
+    _.get(payment, 'source.amount.currency'));
+  const destinationCurrency = _.get(payment, 'destination.amount.currency',
+    _.get(payment, 'destination.minAmount.currency'));
   return sourceCurrency === 'XRP' && destinationCurrency === 'XRP';
 }
 

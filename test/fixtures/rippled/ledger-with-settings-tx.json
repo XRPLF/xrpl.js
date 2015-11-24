@@ -23,6 +23,7 @@
         {
           "Account": "rEGy9CxMTFGXFgUHUMreTy2FbqArabGy38",
           "Fee": "10",
+          "ledger_index": 4181996,
           "Flags": 0,
           "Sequence": 6478,
           "SigningPubKey": "02CAB6F3A798712136DB5F105A98B0DE27C99AEDB68500181706B087CF1B6D0F2D",

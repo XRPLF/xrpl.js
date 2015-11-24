@@ -9,5 +9,6 @@
     "currency": "XRP",
     "value": "2"
   },
-  "immediateOrCancel": true
+  "passive": true,
+  "fillOrKill": true
 }

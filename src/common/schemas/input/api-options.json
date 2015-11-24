@@ -26,6 +26,11 @@
       "format": "uri",
       "description": "URI for HTTP/HTTPS proxy to use to connect to the rippled server."
     },
+    "timeout": {
+      "type": "integer",
+      "description": "Timeout in milliseconds before considering a request to have failed.",
+      "minimum": 1
+    },
     "proxyAuthorization": {
       "type": "string",
       "description": "Username and password for HTTP basic authentication to the proxy in the format **username:password**."

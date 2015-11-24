@@ -8,8 +8,7 @@ import type {Instructions, Prepare} from './types.js';
 import type {TrustLineSpecification} from '../ledger/trustlines-types.js';
 
 function convertQuality(quality) {
-  return quality === undefined ? undefined :
-    (new BigNumber(quality)).shift(9).truncated().toNumber();
+  return (new BigNumber(quality)).shift(9).truncated().toNumber();
 }
 
 function createTrustlineTransaction(account: string,
