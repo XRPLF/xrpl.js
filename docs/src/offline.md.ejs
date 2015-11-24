@@ -1,0 +1,27 @@
+## Offline functionality
+
+RippleAPI can also function without internet connectivity. This can be useful in order to generate secrets and sign transactions from a secure, isolated machine.
+
+To instantiate RippleAPI in offline mode, use the following boilerplate code:
+
+```javascript
+const {RippleAPI} = require('ripple-lib');
+
+const api = new RippleAPI();
+/* insert code here */
+```
+
+Methods that depend on the state of the Ripple Consensus Ledger are unavailable in offline mode. To prepare transactions offline, you **must** specify  the `fee`, `sequence`, and `maxLedgerVersion` parameters in the [transaction instructions](#transaction-instructions). The following methods should work offline:
+
+* [preparePayment](#preparepayment)
+* [prepareTrustline](#preparetrustline)
+* [prepareOrder](#prepareorder)
+* [prepareOrderCancellation](#prepareordercancellation)
+* [prepareSettings](#preparesettings)
+* [prepareSuspendedPaymentCreation](#preparesuspendedpaymentcreation)
+* [prepareSuspendedPaymentCancellation](#preparesuspendedpaymentcancellation)
+* [prepareSuspendedPaymentExecution](#preparesuspendedpaymentexecution)
+* [sign](#sign)
+* [generateAddress](#generateaddress)
+* [computeLedgerHash](#computeledgerhash)
+
