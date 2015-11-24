@@ -2864,7 +2864,7 @@ instructions | [instructions](#transaction-instructions) | *Optional* Instructio
 This method returns a promise that resolves with an object with the following structure:
 
 <aside class="notice">
-All "prepare" methods have the same return type.
+All "prepare*" methods have the same return type.
 </aside>
 
 Name | Type | Description
@@ -2912,7 +2912,7 @@ return api.prepareOrder(address, order)
 
 ## prepareOrderCancellation
 
-`prepareOrderCancellation(address: string, sequence: number, instructions: Object): Promise<Object>`
+`prepareOrderCancellation(address: string, orderCancellation: Object, instructions: Object): Promise<Object>`
 
 Prepare an order cancellation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -2929,7 +2929,7 @@ instructions | [instructions](#transaction-instructions) | *Optional* Instructio
 This method returns a promise that resolves with an object with the following structure:
 
 <aside class="notice">
-All "prepare" methods have the same return type.
+All "prepare*" methods have the same return type.
 </aside>
 
 Name | Type | Description
