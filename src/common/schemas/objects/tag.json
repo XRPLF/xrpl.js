@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "tag",
-  "description": "An arbitrary unsigned 32-bit integer most commonly used to identify a non-Ripple account.",
+  "description": "An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.",
   "type": "integer",
   "$ref": "uint32"
 }

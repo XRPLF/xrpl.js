@@ -15,6 +15,8 @@ Type | Description
 [suspendedPaymentCancellation](#suspended-payment-cancellation) | A `suspendedPaymentCancellation` transaction unlocks the funds in a suspended payment and sends them back to the creator of the suspended payment, but it will only work after the suspended payment expires.
 [suspendedPaymentExecution](#suspended-payment-execution) | A `suspendedPaymentExecution` transaction unlocks the funds in a suspended payment and sends them to the destination of the suspended payment, but it will only work if the cryptographic condition is provided.
 
+The three "suspended payment" transaction types are not supported by the production Ripple peer-to-peer network at this time. They are available for testing purposes if you [configure RippleAPI](#boilerplate) to connect to the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) instead.
+
 ## Transaction Flow
 
 Executing a transaction with `RippleAPI` requires the following four steps:
@@ -44,7 +46,7 @@ Transaction instructions indicate how to execute a transaction, complementary wi
 
 <%- renderSchema("objects/instructions.json") %>
 
-We recommended that you specify a `maxLedgerVersion` because without it there is no way to know that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the transaction's `maxLedgerVersion`.
+We recommended that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare*" method.
 
 ## Transaction ID
 

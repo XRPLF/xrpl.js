@@ -6,7 +6,7 @@ Use the following [boilerplate code](https://en.wikipedia.org/wiki/Boilerplate_c
 const {RippleAPI} = require('ripple-lib');
 
 const api = new RippleAPI({
-  servers: ['wss://s1.ripple.com'] //Public rippled server hosted by Ripple, Inc.
+  server: 'wss://s1.ripple.com' // Public rippled server hosted by Ripple, Inc.
 });
 api.connect().then(() => {
   /* insert code here */
@@ -17,7 +17,7 @@ api.connect().then(() => {
 
 RippleAPI is designed to work in [NodeJS](https://nodejs.org) (version `0.12.0` or greater) using [Babel](https://babeljs.io/) for [ECMAScript 6](https://babeljs.io/docs/learn-es2015/) support.
 
-The code samples in this documentation are written in ES6, but `RippleAPI` will work with ES5 also. Regardless of whether you use ES5 or ES6, the methods that return promises will return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise_).
+The code samples in this documentation are written in ES6, but `RippleAPI` will work with ES5 also. Regardless of whether you use ES5 or ES6, the methods that return promises will return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 
 <aside class="notice">
 All the code snippets in this documentation assume that you have surrounded them with this boilerplate.
@@ -29,7 +29,11 @@ If you omit the "catch" section, errors may not be visible.
 
 ### Parameters
 
+The RippleAPI constructor optionally takes one argument, an object with the following options:
+
 <%- renderSchema('input/api-options.json') %>
+
+If you omit the `server` parameter, RippleAPI operates [offline](#offline-functionality).
 
 
 ### Installation ###

@@ -4,6 +4,7 @@
 
 - [Introduction](#introduction)
   - [Boilerplate](#boilerplate)
+  - [Offline functionality](#offline-functionality)
 - [Basic Types](#basic-types)
   - [Ripple Address](#ripple-address)
   - [Account Sequence Number](#account-sequence-number)
@@ -83,7 +84,7 @@ Use the following [boilerplate code](https://en.wikipedia.org/wiki/Boilerplate_c
 const {RippleAPI} = require('ripple-lib');
 
 const api = new RippleAPI({
-  servers: ['wss://s1.ripple.com'] //Public rippled server hosted by Ripple, Inc.
+  server: 'wss://s1.ripple.com' // Public rippled server hosted by Ripple, Inc.
 });
 api.connect().then(() => {
   /* insert code here */
@@ -94,7 +95,7 @@ api.connect().then(() => {
 
 RippleAPI is designed to work in [NodeJS](https://nodejs.org) (version `0.12.0` or greater) using [Babel](https://babeljs.io/) for [ECMAScript 6](https://babeljs.io/docs/learn-es2015/) support.
 
-The code samples in this documentation are written in ES6, but `RippleAPI` will work with ES5 also. Regardless of whether you use ES5 or ES6, the methods that return promises will return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise_).
+The code samples in this documentation are written in ES6, but `RippleAPI` will work with ES5 also. Regardless of whether you use ES5 or ES6, the methods that return promises will return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 
 <aside class="notice">
 All the code snippets in this documentation assume that you have surrounded them with this boilerplate.
@@ -106,6 +107,8 @@ If you omit the "catch" section, errors may not be visible.
 
 ### Parameters
 
+The RippleAPI constructor optionally takes one argument, an object with the following options:
+
 Name | Type | Description
 ---- | ---- | -----------
 authorization | string | *Optional* Username and password for HTTP basic authentication to the rippled server in the format **username:password**.
@@ -116,6 +119,8 @@ server | uri string | *Optional* URI for rippled websocket port to connect to. M
 timeout | integer | *Optional* Timeout in milliseconds before considering a request to have failed.
 trace | boolean | *Optional* If true, log rippled requests and responses to stdout.
 trustedCertificates | array\<string\> | *Optional* Array of PEM-formatted SSL certificates to trust when connecting to a proxy. This is useful if you want to use a self-signed certificate on the proxy server. Note: Each element must contain a single certificate; concatenated certificates are not valid.
+
+If you omit the `server` parameter, RippleAPI operates [offline](#offline-functionality).
 
 
 ### Installation ###
@@ -132,6 +137,34 @@ After you have installed ripple-lib, you can create scripts using the [boilerpla
 <aside class="notice">
 Instead of using babel-node in production, we recommend using Babel to transpile to ECMAScript 5 first.
 </aside>
+
+
+## Offline functionality
+
+RippleAPI can also function without internet connectivity. This can be useful in order to generate secrets and sign transactions from a secure, isolated machine.
+
+To instantiate RippleAPI in offline mode, use the following boilerplate code:
+
+```javascript
+const {RippleAPI} = require('ripple-lib');
+
+const api = new RippleAPI();
+/* insert code here */
+```
+
+Methods that depend on the state of the Ripple Consensus Ledger are unavailable in offline mode. To prepare transactions offline, you **must** specify  the `fee`, `sequence`, and `maxLedgerVersion` parameters in the [transaction instructions](#transaction-instructions). The following methods should work offline:
+
+* [preparePayment](#preparepayment)
+* [prepareTrustline](#preparetrustline)
+* [prepareOrder](#prepareorder)
+* [prepareOrderCancellation](#prepareordercancellation)
+* [prepareSettings](#preparesettings)
+* [prepareSuspendedPaymentCreation](#preparesuspendedpaymentcreation)
+* [prepareSuspendedPaymentCancellation](#preparesuspendedpaymentcancellation)
+* [prepareSuspendedPaymentExecution](#preparesuspendedpaymentexecution)
+* [sign](#sign)
+* [generateAddress](#generateaddress)
+* [computeLedgerHash](#computeledgerhash)
 
 
 # Basic Types
@@ -211,6 +244,8 @@ Type | Description
 [suspendedPaymentCancellation](#suspended-payment-cancellation) | A `suspendedPaymentCancellation` transaction unlocks the funds in a suspended payment and sends them back to the creator of the suspended payment, but it will only work after the suspended payment expires.
 [suspendedPaymentExecution](#suspended-payment-execution) | A `suspendedPaymentExecution` transaction unlocks the funds in a suspended payment and sends them to the destination of the suspended payment, but it will only work if the cryptographic condition is provided.
 
+The three "suspended payment" transaction types are not supported by the production Ripple peer-to-peer network at this time. They are available for testing purposes if you [configure RippleAPI](#boilerplate) to connect to the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) instead.
+
 ## Transaction Flow
 
 Executing a transaction with `RippleAPI` requires the following four steps:
@@ -246,7 +281,7 @@ maxLedgerVersion | integer | *Optional* The highest ledger version that the tran
 maxLedgerVersionOffset | integer | *Optional* Offset from current legder version to highest ledger version that the transaction can be included in.
 sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
 
-We recommended that you specify a `maxLedgerVersion` because without it there is no way to know that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the transaction's `maxLedgerVersion`.
+We recommended that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare*" method.
 
 ## Transaction ID
 
@@ -281,12 +316,12 @@ Name | Type | Description
 source | object | The source of the funds to be sent.
 *source.* address | [address](#ripple-address) | The address to send from.
 *source.* amount | [laxAmount](#amount) | An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with source.maxAmount)
-*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer most commonly used to identify a non-Ripple account.
+*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
 destination | object | The destination of the funds to be sent.
 *destination.* address | [address](#ripple-address) | The address to receive at.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
-*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer most commonly used to identify a non-Ripple account.
+*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *destination.* address | [address](#ripple-address) | The address to send to.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field is exclusive with destination.amount)
 allowPartialPayment | boolean | *Optional* A boolean that, if set to true, indicates that this payment should go through even if the whole amount cannot be delivered because of a lack of liquidity or funds in the source account account
@@ -463,11 +498,11 @@ Name | Type | Description
 source | object | Fields pertaining to the source of the payment.
 *source.* address | [address](#ripple-address) | The address to send from.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
-*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer most commonly used to identify a non-Ripple account.
+*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 destination | object | Fields pertaining to the destination of the payment.
 *destination.* address | [address](#ripple-address) | The address to receive at.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
-*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer most commonly used to identify a non-Ripple account.
+*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 allowCancelAfter | date-time string | *Optional* If present, the suspended payment may be cancelled after this time.
 allowExecuteAfter | date-time string | *Optional* If present, the suspended payment can not be executed before this time.
 digest | string | *Optional* If present, proof is required upon execution.
@@ -553,7 +588,7 @@ proof | string | *Optional* A value that produces the digest when hashed. It mus
 
 `connect(): Promise<void>`
 
-Tells the RippleAPI instance to connect to its server(s).
+Tells the RippleAPI instance to connect to its rippled server.
 
 ### Parameters
 
@@ -571,7 +606,7 @@ See [Boilerplate](#boilerplate) for code sample.
 
 `disconnect(): Promise<void>`
 
-Tells the RippleAPI instance to disconnect from its server(s).
+Tells the RippleAPI instance to disconnect from its rippled server.
 
 ### Parameters
 
@@ -589,7 +624,7 @@ See [Boilerplate](#boilerplate) for code sample
 
 `isConnected(): boolean`
 
-Checks if the RippleAPI instance is connected to its server(s).
+Checks if the RippleAPI instance is connected to its rippled server.
 
 ### Parameters
 
@@ -687,7 +722,7 @@ return api.getServerInfo().then(info => {/* ... */});
 
 `getFee(): Promise<number>`
 
-Returns the estimated transaction fee for the server(s) the RippleAPI instance is connected to.
+Returns the estimated transaction fee for the rippled server the RippleAPI instance is connected to.
 
 ### Parameters
 
@@ -1541,12 +1576,12 @@ Name | Type | Description
 source | object | Properties of the source of the payment.
 *source.* address | [address](#ripple-address) | The address to send from.
 *source.* amount | [laxAmount](#amount) | An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with source.maxAmount)
-*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer most commonly used to identify a non-Ripple account.
+*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
 destination | object | Properties of the destination of the payment.
 *destination.* address | [address](#ripple-address) | The address to receive at.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
-*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer most commonly used to identify a non-Ripple account.
+*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *destination.* address | [address](#ripple-address) | The address to send to.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field is exclusive with destination.amount)
 paths | string | The paths of trustlines and orders to use in executing the payment.
@@ -3052,6 +3087,8 @@ return api.prepareSettings(address, settings)
 
 Prepare a suspended payment creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
+**Caution:** Suspended Payments are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
+
 ### Parameters
 
 Name | Type | Description
@@ -3122,6 +3159,8 @@ return api.prepareSuspendedPaymentCreation(address, suspendedPaymentCreation).th
 
 Prepare a suspended payment cancellation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
+**Caution:** Suspended Payments are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
+
 ### Parameters
 
 Name | Type | Description
@@ -3176,6 +3215,8 @@ return api.prepareSuspendedPaymentCancellation(address, suspendedPaymentCancella
 `prepareSuspendedPaymentExecution(address: string, suspendedPaymentExecution: Object, instructions: Object): Promise<Object>`
 
 Prepare a suspended payment execution transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+**Caution:** Suspended Payments are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
 
 ### Parameters
 
