@@ -1,3 +1,7 @@
+##0.15.2
+**Changes**
++ [Fix support for proxy credentials in proxy URL and fix error when there are more than 10 outstanding requests](https://github.com/ripple/ripple-lib/commit/0990ad4a6f1d59ca9d2cb859b4e2d71693f3fc4b)
+
 ##0.15.1
 **Changes**
 + [Fix babel-polyfill require](https://github.com/ripple/ripple-lib/commit/062148674c3b1293ab82c28e25615ddd530339fa)
