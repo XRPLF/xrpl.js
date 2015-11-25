@@ -9,5 +9,12 @@
     "currency": "XRP",
     "value": "2"
   },
-  "immediateOrCancel": true
+  "immediateOrCancel": true,
+  "memos": [
+    {
+      "type": "test",
+      "format": "plain/text",
+      "data": "texted data"
+    }
+  ]
 }

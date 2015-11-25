@@ -87,14 +87,16 @@ function createSettingsTransaction(account: string, settings: Settings
     TransactionType: 'AccountSet',
     Account: account
   };
-  setTransactionFlags(txJSON, settings);
+
+  if (settings.memos !== undefined) {
+    txJSON.Memos = _.map(settings.memos, utils.convertMemo);
+  }
+
+  setTransactionFlags(txJSON, _.omit(settings, 'memos'));
   setTransactionFields(txJSON, settings);
 
   if (txJSON.TransferRate !== undefined) {
     txJSON.TransferRate = convertTransferRate(txJSON.TransferRate);
-  }
-  if (settings.memos !== undefined) {
-    txJSON.Memos = _.map(settings.memos, utils.convertMemo);
   }
   return txJSON;
 }

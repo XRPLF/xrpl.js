@@ -6,35 +6,42 @@ module.exports = {
     sell: require('./prepare-order-sell'),
     expiration: require('./prepare-order-expiration')
   },
-  prepareOrderCancellation: require('./prepare-order-cancellation'),
-  preparePayment: require('./prepare-payment'),
-  preparePaymentMinAmountXRP: require('./prepare-payment-min-xrp'),
-  preparePaymentMinAmount: require('./prepare-payment-min'),
-  preparePaymentWrongAddress: require('./prepare-payment-wrong-address'),
-  preparePaymentWrongAmount: require('./prepare-payment-wrong-amount'),
-  preparePaymentWrongPartial: require('./prepare-payment-wrong-partial'),
-  preparePaymentAllOptions: require('./prepare-payment-all-options'),
-  preparePaymentNoCounterparty: require('./prepare-payment-no-counterparty'),
+  prepareOrderCancellation: {
+    simple: require('./prepare-order-cancellation'),
+    withMemos: require('./prepare-order-cancellation-memos')
+  },
+  preparePayment: {
+    normal: require('./prepare-payment'),
+    minAmountXRP: require('./prepare-payment-min-xrp'),
+    minAmount: require('./prepare-payment-min'),
+    wrongAddress: require('./prepare-payment-wrong-address'),
+    wrongAmount: require('./prepare-payment-wrong-amount'),
+    wrongPartial: require('./prepare-payment-wrong-partial'),
+    allOptions: require('./prepare-payment-all-options'),
+    noCounterparty: require('./prepare-payment-no-counterparty')
+  },
   prepareSettings: require('./prepare-settings'),
-  prepareSuspendedPaymentCreation:
-    require('./prepare-suspended-payment-creation'),
-  prepareSuspendedPaymentCreationFull:
-    require('./prepare-suspended-payment-creation-full'),
-  prepareSuspendedPaymentExecution:
-    require('./prepare-suspended-payment-execution'),
-  prepareSuspendedPaymentExecutionSimple:
-    require('./prepare-suspended-payment-execution-simple'),
-  prepareSuspendedPaymentCancellation:
-    require('./prepare-suspended-payment-cancellation'),
-  prepareSuspendedPaymentCancellationMemos:
-    require('./prepare-suspended-payment-cancellation-memos'),
+  prepareSuspendedPaymentCreation: {
+    normal: require('./prepare-suspended-payment-creation'),
+    full: require('./prepare-suspended-payment-creation-full')
+  },
+  prepareSuspendedPaymentExecution: {
+    normal: require('./prepare-suspended-payment-execution'),
+    simple: require('./prepare-suspended-payment-execution-simple')
+  },
+  prepareSuspendedPaymentCancellation: {
+    normal: require('./prepare-suspended-payment-cancellation'),
+    memos: require('./prepare-suspended-payment-cancellation-memos')
+  },
   prepareTrustline: {
     simple: require('./prepare-trustline-simple'),
     complex: require('./prepare-trustline'),
     frozen: require('./prepare-trustline-frozen.json')
   },
-  sign: require('./sign'),
-  signSuspended: require('./sign-suspended.json'),
+  sign: {
+    normal: require('./sign'),
+    suspended: require('./sign-suspended.json')
+  },
   getPaths: {
     normal: require('./getpaths/normal'),
     UsdToUsd: require('./getpaths/usd2usd'),
@@ -47,8 +54,10 @@ module.exports = {
     invalid: require('./getpaths/invalid'),
     issuer: require('./getpaths/issuer')
   },
-  getOrderbook: require('./get-orderbook'),
-  getOrderbookWithXRP: require('./get-orderbook-with-xrp'),
+  getOrderbook: {
+    normal: require('./get-orderbook'),
+    withXRP: require('./get-orderbook-with-xrp')
+  },
   computeLedgerHash: {
     header: require('./compute-ledger-hash'),
     transactions: require('./compute-ledger-hash-transactions')

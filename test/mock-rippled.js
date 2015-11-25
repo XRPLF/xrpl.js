@@ -97,9 +97,9 @@ module.exports = function(port) {
   mock.on('request_server_info', function(request, conn) {
     assert.strictEqual(request.command, 'server_info');
     if (mock.returnErrorOnServerInfo) {
-      conn.send(createResponse(request, fixtures.server_info_error));
+      conn.send(createResponse(request, fixtures.server_info.error));
     } else {
-      conn.send(createResponse(request, fixtures.server_info));
+      conn.send(createResponse(request, fixtures.server_info.normal));
     }
   });
 
@@ -139,19 +139,20 @@ module.exports = function(port) {
   mock.on('request_ledger', function(request, conn) {
     assert.strictEqual(request.command, 'ledger');
     if (request.ledger_index === 34) {
-      conn.send(createLedgerResponse(request, fixtures.ledgerNotFound));
+      conn.send(createLedgerResponse(request, fixtures.ledger.notFound));
     } else if (request.ledger_index === 6) {
-      conn.send(createResponse(request, fixtures.ledgerWithStateAsHashes));
+      conn.send(createResponse(request, fixtures.ledger.withStateAsHashes));
     } else if (request.ledger_index === 9038215) {
-      conn.send(createLedgerResponse(request, fixtures.ledgerWithoutCloseTime));
+      conn.send(
+        createLedgerResponse(request, fixtures.ledger.withoutCloseTime));
     } else if (request.ledger_index === 4181996) {
-      conn.send(createLedgerResponse(request, fixtures.ledgerWithSettingsTx));
+      conn.send(createLedgerResponse(request, fixtures.ledger.withSettingsTx));
     } else if (request.ledger_index === 38129) {
-      const response = _.assign({}, fixtures.ledger,
+      const response = _.assign({}, fixtures.ledger.normal,
         {result: {ledger: fullLedger}});
       conn.send(createLedgerResponse(request, response));
     } else {
-      conn.send(createLedgerResponse(request, fixtures.ledger));
+      conn.send(createLedgerResponse(request, fixtures.ledger.normal));
     }
   });
 
@@ -263,7 +264,7 @@ module.exports = function(port) {
     if (request.account === addresses.ACCOUNT) {
       conn.send(transactionsResponse(request));
     } else if (request.account === addresses.OTHER_ACCOUNT) {
-      conn.send(createResponse(request, fixtures.account_tx_one));
+      conn.send(createResponse(request, fixtures.account_tx.one));
     } else {
       assert(false, 'Unrecognized account address: ' + request.account);
     }
@@ -279,16 +280,18 @@ module.exports = function(port) {
 
   mock.on('request_book_offers', function(request, conn) {
     if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
-      conn.send(createResponse(request, fixtures.book_offers_2));
+      conn.send(createResponse(request, fixtures.book_offers.xrp_usd));
     } else if (request.taker_gets.issuer
         === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
-      conn.send(createResponse(request, fixtures.book_offers_1));
+      conn.send(createResponse(request, fixtures.book_offers.usd_xrp));
     } else if (isBTC(request.taker_gets.currency)
         && isUSD(request.taker_pays.currency)) {
-      conn.send(fixtures.book_offers.requestBookOffersBidsResponse(request));
+      conn.send(
+        fixtures.book_offers.fabric.requestBookOffersBidsResponse(request));
     } else if (isUSD(request.taker_gets.currency)
         && isBTC(request.taker_pays.currency)) {
-      conn.send(fixtures.book_offers.requestBookOffersAsksResponse(request));
+      conn.send(
+        fixtures.book_offers.fabric.requestBookOffersAsksResponse(request));
     } else {
       assert(false, 'Unrecognized order book: ' + JSON.stringify(request));
     }

@@ -5,11 +5,13 @@ module.exports = {
     success: require('./submit'),
     failure: require('./submit-failed')
   },
-  ledger: require('./ledger'),
-  ledgerNotFound: require('./ledger-not-found'),
-  ledgerWithoutCloseTime: require('./ledger-without-close-time'),
-  ledgerWithSettingsTx: require('./ledger-with-settings-tx'),
-  ledgerWithStateAsHashes: require('./ledger-with-state-as-hashes'),
+  ledger: {
+    normal: require('./ledger'),
+    notFound: require('./ledger-not-found'),
+    withoutCloseTime: require('./ledger-without-close-time'),
+    withSettingsTx: require('./ledger-with-settings-tx'),
+    withStateAsHashes: require('./ledger-with-state-as-hashes')
+  },
   subscribe: require('./subscribe'),
   unsubscribe: require('./unsubscribe'),
   account_info: {
@@ -17,14 +19,20 @@ module.exports = {
     notfound: require('./account-info-not-found')
   },
   account_offers: require('./account-offers'),
-  account_tx: require('./account-tx'),
-  account_tx_one: require('./get-transactions-one'),
+  account_tx: {
+    normal: require('./account-tx'),
+    one: require('./get-transactions-one')
+  },
   gateway_balances: require('./gateway-balances'),
-  book_offers: require('./book-offers'),
-  book_offers_1: require('./book-offers-1'),
-  book_offers_2: require('./book-offers-2'),
-  server_info: require('./server-info'),
-  server_info_error: require('./server-info-error'),
+  book_offers: {
+    fabric: require('./book-offers'),
+    usd_xrp: require('./book-offers-usd-xrp'),
+    xrp_usd: require('./book-offers-xrp-usd')
+  },
+  server_info: {
+    normal: require('./server-info'),
+    error: require('./server-info-error')
+  },
   path_find: {
     generate: require('./path-find'),
     sendUSD: require('./path-find-send-usd'),
