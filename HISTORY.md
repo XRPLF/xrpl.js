@@ -1,3 +1,9 @@
+##0.15.1
+**Changes**
++ [Fix babel-polyfill require](https://github.com/ripple/ripple-lib/commit/062148674c3b1293ab82c28e25615ddd530339fa)
++ [Fix samples](https://github.com/ripple/ripple-lib/commit/5d5cf868a2ddb1b1cd40e4a4f0a782d0066c2055)
++ [add unit tests for RippleAPIBroadcast](https://github.com/ripple/ripple-lib/commit/ddf8fe5b1a9c750490dca98fb9ffaaf8017f87e0)
+
 ##0.15.0
 **Breaking Changes**
 + ["servers" parameter changed to single "server"](https://github.com/ripple/ripple-lib/commit/7061e9afe46f0682254d098adeff3dd7157521a1)
