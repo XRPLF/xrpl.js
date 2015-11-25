@@ -1,3 +1,12 @@
+##0.15.0
+**Breaking Changes**
++ ["servers" parameter changed to single "server"](https://github.com/ripple/ripple-lib/commit/7061e9afe46f0682254d098adeff3dd7157521a1)
+
+**Changes**
++ [fix handling memos in prepareSettings](https://github.com/ripple/ripple-lib/commit/c9704137b7b538e8dbf31c483bcdcf2dcfd7cd75)
++ [Docs: SusPay warnings, offline mode, and other tweaks](https://github.com/ripple/ripple-lib/commit/4b4fc36ebd93f1360781a65f2869bd2c4f0a5093)
++ [Fix prepareOrderCancellation documentation](https://github.com/ripple/ripple-lib/commit/5e720891f579fd73d43c64e5ec519d9121023c10)
+
 ##0.14.0
 **Breaking Changes**
 + [prepareOrderCancellation now takes orderCancellation specification](https://github.com/ripple/ripple-lib/commit/7f33d8a71e56289e5a5e0ead1c74f75ebcde72bc)
