@@ -12,15 +12,11 @@
       "minimum": 1,
       "description": "Factor to multiply estimated fee by to provide a cushion in case the required fee rises during submission of a transaction. Defaults to `1.2`."
     },
-    "servers": {
-      "type": "array",
-      "description": "Array of rippled servers to connect to. Currently only one server is supported.",
-      "items": {
-        "type": "string",
-        "description": "URI for rippled websocket port. Must start with `wss://` or `ws://`.",
-        "format": "uri",
-        "pattern": "^wss?://"
-      }
+    "server": {
+      "type": "string",
+      "description": "URI for rippled websocket port to connect to. Must start with `wss://` or `ws://`.",
+      "format": "uri",
+      "pattern": "^wss?://"
     },
     "proxy": {
       "format": "uri",

@@ -58,7 +58,7 @@ function testTransaction(testcase, type, lastClosedLedgerVersion, prepared) {
 }
 
 function setup() {
-  this.api = new RippleAPI({servers: ['wss://s1.ripple.com']});
+  this.api = new RippleAPI({server: 'wss://s1.ripple.com'});
   console.log('CONNECTING...');
   return this.api.connect().then(() => {
     console.log('CONNECTED...');

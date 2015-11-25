@@ -23,7 +23,7 @@ function getFreePort(callback) {
 
 function setupMockRippledConnection(testcase, port, done) {
   testcase.mockRippled = createMockRippled(port);
-  testcase.api = new RippleAPI({servers: ['ws://localhost:' + port]});
+  testcase.api = new RippleAPI({server: 'ws://localhost:' + port});
   testcase.api.connect().then(() => {
     testcase.api.once('ledger', () => done());
     testcase.api.connection._ws.emit('message', JSON.stringify(ledgerClosed));

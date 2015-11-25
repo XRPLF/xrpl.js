@@ -112,7 +112,7 @@ authorization | string | *Optional* Username and password for HTTP basic authent
 feeCushion | number | *Optional* Factor to multiply estimated fee by to provide a cushion in case the required fee rises during submission of a transaction. Defaults to `1.2`.
 proxy | uri string | *Optional* URI for HTTP/HTTPS proxy to use to connect to the rippled server.
 proxyAuthorization | string | *Optional* Username and password for HTTP basic authentication to the proxy in the format **username:password**.
-servers | array\<uri string\> | *Optional* Array of rippled servers to connect to. Currently only one server is supported.
+server | uri string | *Optional* URI for rippled websocket port to connect to. Must start with `wss://` or `ws://`.
 timeout | integer | *Optional* Timeout in milliseconds before considering a request to have failed.
 trace | boolean | *Optional* If true, log rippled requests and responses to stdout.
 trustedCertificates | array\<string\> | *Optional* Array of PEM-formatted SSL certificates to trust when connecting to a proxy. This is useful if you want to use a self-signed certificate on the proxy server. Note: Each element must contain a single certificate; concatenated certificates are not valid.
