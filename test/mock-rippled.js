@@ -71,6 +71,7 @@ module.exports = function(port) {
   };
 
   mock.on('connection', function(conn) {
+    this.socket = conn;
     conn.on('message', function(requestJSON) {
       const request = JSON.parse(requestJSON);
       mock.emit('request_' + request.command, request, conn);
