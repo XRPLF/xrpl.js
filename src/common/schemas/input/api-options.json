@@ -42,6 +42,18 @@
         "type": "string",
         "description": "A PEM-formatted SSL certificate to trust when connecting to a proxy."
       }
+    },
+    "key": {
+      "type": "string",
+      "description": "A string containing the private key of the client in PEM format. (Can be an array of keys)."
+    },
+    "passphrase": {
+      "type": "string",
+      "description": "The passphrase for the private key of the client."
+    },
+    "certificate": {
+      "type": "string",
+      "description": "A string containing the certificate key of the client in PEM format. (Can be an array of certificates)."
     }
   },
   "additionalProperties": false
