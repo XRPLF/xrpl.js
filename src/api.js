@@ -46,7 +46,8 @@ const prepareSettings = require('./transaction/settings');
 const sign = require('./transaction/sign');
 const submit = require('./transaction/submit');
 const errors = require('./common').errors;
-const generateAddress = common.generateAddressAPI;
+const generateAddress =
+  require('./offline/generate-address').generateAddressAPI;
 const computeLedgerHash = require('./offline/ledgerhash');
 const getLedger = require('./ledger/ledger');
 

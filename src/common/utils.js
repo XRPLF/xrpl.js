@@ -2,8 +2,6 @@
 'use strict';
 const _ = require('lodash');
 const BigNumber = require('bignumber.js');
-const errors = require('./errors');
-const keypairs = require('ripple-keypairs');
 const {deriveKeypair} = require('ripple-keypairs');
 
 import type {Amount, RippledAmount} from './types.js';
@@ -35,21 +33,6 @@ function toRippledAmount(amount: Amount): RippledAmount {
       (amount.issuer ? amount.issuer : undefined),
     value: amount.value
   };
-}
-
-function generateAddress(options?: Object): Object {
-  const secret = keypairs.generateSeed(options);
-  const keypair = keypairs.deriveKeypair(secret);
-  const address = keypairs.deriveAddress(keypair.publicKey);
-  return {secret, address};
-}
-
-function generateAddressAPI(options?: Object): Object {
-  try {
-    return generateAddress(options);
-  } catch (error) {
-    throw new errors.UnexpectedError(error.message);
-  }
 }
 
 const FINDSNAKE = /([a-zA-Z]_[a-zA-Z])/g;
@@ -101,8 +84,6 @@ module.exports = {
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,
-  generateAddress,
-  generateAddressAPI,
   convertKeysFromSnakeCaseToCamelCase,
   removeUndefined,
   rippleTimeToISO8601,

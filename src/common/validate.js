@@ -49,6 +49,7 @@ module.exports = {
   sign: _.partial(schemaValidate, 'signParameters'),
   submit: _.partial(schemaValidate, 'submitParameters'),
   computeLedgerHash: _.partial(schemaValidate, 'computeLedgerHashParameters'),
+  generateAddress: _.partial(schemaValidate, 'generateAddressParameters'),
   apiOptions: _.partial(schemaValidate, 'api-options'),
   instructions: _.partial(schemaValidate, 'instructions')
 };

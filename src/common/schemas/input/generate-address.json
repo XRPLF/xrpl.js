@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "generateAddressParameters",
+  "type": "object",
+  "properties": {
+    "options": {
+      "type": "object",
+      "description": "Options to control how the address and secret are generated.",
+      "properties": {
+        "entropy": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "description": "The entropy to use to generate the seed."
+        },
+        "algorithm": {
+          "type": "string",
+          "enum": ["ecdsa-secp256k1", "ed25519"],
+          "description": "The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
