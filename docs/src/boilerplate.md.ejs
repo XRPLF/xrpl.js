@@ -8,6 +8,9 @@ const {RippleAPI} = require('ripple-lib');
 const api = new RippleAPI({
   server: 'wss://s1.ripple.com' // Public rippled server hosted by Ripple, Inc.
 });
+api.on('error', (errorCode, errorMessage) => {
+  console.log(errorCode + ': ' + errorMessage);
+});
 api.connect().then(() => {
   /* insert code here */
 }).then(() => {
@@ -25,6 +28,10 @@ All the code snippets in this documentation assume that you have surrounded them
 
 <aside class="notice">
 If you omit the "catch" section, errors may not be visible.
+</aside>
+
+<aside class="notice">
+The "error" event is emitted whenever an error occurs that cannot be associated with a specific request. If the listener is not registered, an exception will be thrown whenever the event is emitted.
 </aside>
 
 ### Parameters

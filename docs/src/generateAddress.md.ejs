@@ -6,7 +6,7 @@ Generate a new Ripple address and corresponding secret.
 
 ### Parameters
 
-This method has no parameters.
+<%- renderSchema('input/generate-address.json') %>
 
 ### Return Value
 
@@ -17,8 +17,7 @@ This method returns an object with the following structure:
 ### Example
 
 ```javascript
-return api.generateAddress()
-  .then(result => {/* ... */});
+return api.generateAddress();
 ```
 
 <%- renderFixture('responses/generate-address.json') %>

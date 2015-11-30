@@ -92,8 +92,9 @@ function loadSchemas() {
     require('./schemas/input/prepare-suspended-payment-cancellation.json'),
     require('./schemas/input/prepare-suspended-payment-execution.json'),
     require('./schemas/input/compute-ledger-hash'),
-    require('./schemas/input/sign'),
-    require('./schemas/input/submit')
+    require('./schemas/input/sign.json'),
+    require('./schemas/input/submit.json'),
+    require('./schemas/input/generate-address.json')
   ];
   const titles = _.map(schemas, schema => schema.title);
   const duplicates = _.keys(_.pick(_.countBy(titles), count => count > 1));

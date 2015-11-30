@@ -86,6 +86,9 @@ const {RippleAPI} = require('ripple-lib');
 const api = new RippleAPI({
   server: 'wss://s1.ripple.com' // Public rippled server hosted by Ripple, Inc.
 });
+api.on('error', (errorCode, errorMessage) => {
+  console.log(errorCode + ': ' + errorMessage);
+});
 api.connect().then(() => {
   /* insert code here */
 }).then(() => {
@@ -103,6 +106,10 @@ All the code snippets in this documentation assume that you have surrounded them
 
 <aside class="notice">
 If you omit the "catch" section, errors may not be visible.
+</aside>
+
+<aside class="notice">
+The "error" event is emitted whenever an error occurs that cannot be associated with a specific request. If the listener is not registered, an exception will be thrown whenever the event is emitted.
 </aside>
 
 ### Parameters
@@ -3355,7 +3362,11 @@ Generate a new Ripple address and corresponding secret.
 
 ### Parameters
 
-This method has no parameters.
+Name | Type | Description
+---- | ---- | -----------
+options | object | *Optional* Options to control how the address and secret are generated.
+*options.* algorithm | string | *Optional* The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
+*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed.
 
 ### Return Value
 
@@ -3369,8 +3380,7 @@ secret | secret string | The secret corresponding to the `address`.
 ### Example
 
 ```javascript
-return api.generateAddress()
-  .then(result => {/* ... */});
+return api.generateAddress();
 ```
 
 
@@ -3482,7 +3492,7 @@ api.on('ledger', ledger => {
 
 ## error
 
-This event is emitted when there is an error on the connection to the server.
+This event is emitted when there is an error on the connection to the server that cannot be associated to a specific request.
 
 ### Return Value
 
