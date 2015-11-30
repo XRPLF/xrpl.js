@@ -10,7 +10,8 @@ function formatPrepareResponse(txJSON: Object): Object {
   const instructions = {
     fee: common.dropsToXrp(txJSON.Fee),
     sequence: txJSON.Sequence,
-    maxLedgerVersion: txJSON.LastLedgerSequence
+    maxLedgerVersion: txJSON.LastLedgerSequence === undefined ?
+      null : txJSON.LastLedgerSequence
   };
   return {
     txJSON: JSON.stringify(txJSON),
@@ -36,7 +37,9 @@ function prepareTransaction(txJSON: Object, api: Object,
 
   function prepareMaxLedgerVersion(): Promise<Object> {
     if (instructions.maxLedgerVersion !== undefined) {
-      txJSON.LastLedgerSequence = instructions.maxLedgerVersion;
+      if (instructions.maxLedgerVersion !== null) {
+        txJSON.LastLedgerSequence = instructions.maxLedgerVersion;
+      }
       return Promise.resolve(txJSON);
     }
     const offset = instructions.maxLedgerVersionOffset !== undefined ?

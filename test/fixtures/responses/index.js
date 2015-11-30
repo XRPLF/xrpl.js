@@ -86,7 +86,8 @@ module.exports = {
     setTransferRate: require('./prepare-settings-set-transfer-rate.json'),
     fieldClear: require('./prepare-settings-field-clear.json'),
     noInstructions: require('./prepare-settings-no-instructions.json'),
-    signed: require('./prepare-settings-signed.json')
+    signed: require('./prepare-settings-signed.json'),
+    noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json')
   },
   prepareSuspendedPaymentCreation: {
     normal: require('./prepare-suspended-payment-creation'),
