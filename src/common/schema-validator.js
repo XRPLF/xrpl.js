@@ -91,6 +91,7 @@ function loadSchemas() {
     require('./schemas/input/prepare-suspended-payment-creation.json'),
     require('./schemas/input/prepare-suspended-payment-cancellation.json'),
     require('./schemas/input/prepare-suspended-payment-execution.json'),
+    require('./schemas/input/prepare-signers.json'),
     require('./schemas/input/compute-ledger-hash'),
     require('./schemas/input/sign.json'),
     require('./schemas/input/submit.json'),

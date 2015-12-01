@@ -297,6 +297,23 @@ describe('RippleAPI', function() {
           'prepare'));
   });
 
+  describe('prepareSigners', function() {
+    it('normal', function() {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012'
+      }, instructions);
+
+      return this.api.prepareSigners(address, {
+        quorum: 3,
+        entries: [
+          { address: 'rJR3QuBt2JHsDjjHrTtVrNPmhiJXHXSGTD', weight: 1 },
+          { address: 'rEjaSu8Yf6CFZL5uUWxXUgHSpUGp6aJEgz', weight: 1 },
+          { address: 'rU85t3y6Ukte6hVFNswVoNguRkPrCefWn7', weight: 1 }
+        ]
+      }, localInstructions).then(_.partial(checkResult, responses.prepareSigners.normal, 'prepare'));
+    });
+  });
+
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
     const result = this.api.sign(requests.sign.normal.txJSON, secret);

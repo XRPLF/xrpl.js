@@ -106,6 +106,9 @@ module.exports = {
     frozen: require('./prepare-trustline-frozen.json'),
     complex: require('./prepare-trustline.json')
   },
+  prepareSigners: {
+    normal: require('./prepare-signers-normal.json')
+  },
   sign: {
     normal: require('./sign.json'),
     suspended: require('./sign-suspended.json')
