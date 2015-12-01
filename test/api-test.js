@@ -186,6 +186,13 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.prepareSettings.flags, 'prepare'));
   });
 
+  it('prepareSettings - no maxLedgerVersion', function() {
+    return this.api.prepareSettings(
+      address, requests.prepareSettings, {maxLedgerVersion: null}).then(
+      _.partial(checkResult, responses.prepareSettings.noMaxLedgerVersion,
+        'prepare'));
+  });
+
   it('prepareSettings - no instructions', function() {
     return this.api.prepareSettings(
       address, requests.prepareSettings).then(
