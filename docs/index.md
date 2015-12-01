@@ -119,7 +119,10 @@ The RippleAPI constructor optionally takes one argument, an object with the foll
 Name | Type | Description
 ---- | ---- | -----------
 authorization | string | *Optional* Username and password for HTTP basic authentication to the rippled server in the format **username:password**.
+certificate | string | *Optional* A string containing the certificate key of the client in PEM format. (Can be an array of certificates).
 feeCushion | number | *Optional* Factor to multiply estimated fee by to provide a cushion in case the required fee rises during submission of a transaction. Defaults to `1.2`.
+key | string | *Optional* A string containing the private key of the client in PEM format. (Can be an array of keys).
+passphrase | string | *Optional* The passphrase for the private key of the client.
 proxy | uri string | *Optional* URI for HTTP/HTTPS proxy to use to connect to the rippled server.
 proxyAuthorization | string | *Optional* Username and password for HTTP basic authentication to the proxy in the format **username:password**.
 server | uri string | *Optional* URI for rippled websocket port to connect to. Must start with `wss://` or `ws://`.
