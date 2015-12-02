@@ -740,7 +740,7 @@ This method has no parameters.
 
 ### Return Value
 
-This method returns a promise that resolves with a floating point value representing the estimated fee to submit a transaction, expressed in XRP.
+This method returns a promise that resolves with a string encoded floating point value representing the estimated fee to submit a transaction, expressed in XRP.
 
 ### Example
 
@@ -749,7 +749,7 @@ return api.getFee().then(fee => {/* ... */});
 ```
 
 ```json
-0.012
+"0.012"
 ```
 
 ## getLedgerVersion
