@@ -71,8 +71,8 @@ module.exports = {
   },
   preparePayment: {
     normal: require('./prepare-payment.json'),
-    minAmountXRP: require('./prepare-payment-min-amont-xrp.json'),
-    minAmountXRPXRP: require('./prepare-payment-min-amont-xrp-xrp.json'),
+    minAmountXRP: require('./prepare-payment-min-amount-xrp.json'),
+    minAmountXRPXRP: require('./prepare-payment-min-amount-xrp-xrp.json'),
     allOptions: require('./prepare-payment-all-options.json'),
     noCounterparty: require('./prepare-payment-no-counterparty.json'),
     minAmount: require('./prepare-payment-min-amount.json')
