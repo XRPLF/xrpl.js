@@ -83,10 +83,18 @@ function prepareTransaction(txJSON: Object, api: Object,
     });
   }
 
+  function prepareSigners() {
+    if (instructions.signers !== undefined) {
+      txJSON.Signers = instructions.signers;
+    }
+    return Promise.resolve(txJSON);
+  }
+
   return Promise.all([
     prepareMaxLedgerVersion(),
     prepareFee(),
-    prepareSequence()
+    prepareSequence(),
+    prepareSigners(),
   ]).then(() => formatPrepareResponse(txJSON));
 }
 

@@ -297,6 +297,23 @@ describe('RippleAPI', function() {
           'prepare'));
   });
 
+  describe('prepareSigners', function() {
+    it('normal', function() {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012'
+      }, instructions);
+
+      return this.api.prepareSigners(address, {
+        quorum: 3,
+        entries: [
+          { address: 'rJR3QuBt2JHsDjjHrTtVrNPmhiJXHXSGTD', weight: 1 },
+          { address: 'rEjaSu8Yf6CFZL5uUWxXUgHSpUGp6aJEgz', weight: 1 },
+          { address: 'rU85t3y6Ukte6hVFNswVoNguRkPrCefWn7', weight: 1 }
+        ]
+      }, localInstructions).then(_.partial(checkResult, responses.prepareSigners.normal, 'prepare'));
+    });
+  });
+
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
     const result = this.api.sign(requests.sign.normal.txJSON, secret);
@@ -309,6 +326,26 @@ describe('RippleAPI', function() {
     const result = this.api.sign(requests.sign.suspended.txJSON, secret);
     assert.deepEqual(result, responses.sign.suspended);
     schemaValidator.schemaValidate('sign', result);
+  });
+
+  it('sign - multisigned', function() {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const txJSON = this.api.addSigner(requests.sign.normal.txJSON, responses.signers.signer1);
+    const result = this.api.sign(txJSON, secret);
+    assert.deepEqual(result, responses.sign.multisigned);
+  });
+
+  it('prepareSigner', function() {
+    const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+    const result = this.api.prepareSigner(requests.sign.normal.txJSON, secret);
+    assert.deepEqual(result, responses.signers.signer1);
+  });
+
+  it('addSigner', function() {
+    const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+    let result = this.api.addSigner(requests.sign.normal.txJSON, responses.signers.signer1);
+    result = this.api.addSigner(result, responses.signers.signer2);
+    assert.deepEqual(JSON.parse(result), responses.addSigner.normal);
   });
 
   it('submit', function() {

@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "signers",
+  "type": "array",
+  "items": {
+    "properties": {
+      "Account": {"$ref": "address"},
+      "SigningPubKey": {
+        "type": "string",
+        "pattern": "/^[0-9A-F]+$/"
+      },
+      "TxnSignature": {
+        "type": "string",
+        "pattern": "/^[0-9A-F]+$/"
+      }
+    },
+    "additionalProperties": false
+  },
+  "uniqueItems": true
+}

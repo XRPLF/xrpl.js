@@ -43,6 +43,9 @@ const prepareSuspendedPaymentExecution =
 const prepareSuspendedPaymentCancellation =
   require('./transaction/suspended-payment-cancellation');
 const prepareSettings = require('./transaction/settings');
+const prepareSigners = require('./transaction/signers');
+const prepareSigner = require('./transaction/multisign').prepareSigner;
+const addSigner = require('./transaction/multisign').addSigner;
 const sign = require('./transaction/sign');
 const submit = require('./transaction/submit');
 const errors = require('./common').errors;
@@ -124,6 +127,9 @@ _.assign(RippleAPI.prototype, {
   prepareSuspendedPaymentExecution,
   prepareSuspendedPaymentCancellation,
   prepareSettings,
+  prepareSigners,
+  prepareSigner,
+  addSigner,
   sign,
   submit,
 

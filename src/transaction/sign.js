@@ -18,12 +18,19 @@ function sign(txJSON: string, secret: string
   // the secret could correspond to the regular key
 
   const tx = JSON.parse(txJSON);
-  const keypair = keypairs.deriveKeypair(secret);
-  if (tx.SigningPubKey === undefined) {
-    tx.SigningPubKey = keypair.publicKey;
+
+  if (tx.Signers === undefined) {
+    const keypair = keypairs.deriveKeypair(secret);
+    if (tx.SigningPubKey === undefined) {
+      tx.SigningPubKey = keypair.publicKey;
+    }
+    tx.TxnSignature = computeSignature(tx, keypair.privateKey);
+  } else {
+    tx.SigningPubKey = '';
   }
-  tx.TxnSignature = computeSignature(tx, keypair.privateKey);
+
   const serialized = binary.encode(tx);
+
   return {
     signedTransaction: serialized,
     id: computeBinaryTransactionHash(serialized)

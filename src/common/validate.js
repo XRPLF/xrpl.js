@@ -40,6 +40,7 @@ module.exports = {
     _.partial(schemaValidate, 'prepareOrderCancellationParameters'),
   prepareTrustline: _.partial(schemaValidate, 'prepareTrustlineParameters'),
   prepareSettings: _.partial(schemaValidate, 'prepareSettingsParameters'),
+  prepareSigners: _.partial(schemaValidate, 'prepareSignersParameters'),
   prepareSuspendedPaymentCreation: _.partial(schemaValidate,
     'prepareSuspendedPaymentCreationParameters'),
   prepareSuspendedPaymentCancellation: _.partial(schemaValidate,
