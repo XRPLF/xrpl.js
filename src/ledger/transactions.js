@@ -170,11 +170,11 @@ function getTransactions(address: string, options: TransactionsOptions = {}
       const ledgerVersion = tx.outcome.ledgerVersion;
       const bound = options.earliestFirst ?
         {minLedgerVersion: ledgerVersion} : {maxLedgerVersion: ledgerVersion};
-      const newOptions = _.assign(defaults, options, {startTx: tx}, bound);
+      const newOptions = _.assign({}, defaults, options, {startTx: tx}, bound);
       return getTransactionsInternal(this.connection, address, newOptions);
     });
   }
-  const newOptions = _.assign(defaults, options);
+  const newOptions = _.assign({}, defaults, options);
   return getTransactionsInternal(this.connection, address, newOptions);
 }
 

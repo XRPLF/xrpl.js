@@ -64,7 +64,7 @@ function createMaximalAmount(amount: Amount): Amount {
   const maxXRPValue = '100000000000';
   const maxIOUValue = '9999999999999999e80';
   const maxValue = amount.currency === 'XRP' ? maxXRPValue : maxIOUValue;
-  return _.assign(amount, {value: maxValue});
+  return _.assign({}, amount, {value: maxValue});
 }
 
 function createPaymentTransaction(address: string, paymentArgument: Payment
