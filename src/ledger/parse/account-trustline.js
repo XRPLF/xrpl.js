@@ -24,8 +24,8 @@ function parseAccountTrustline(trustline: Trustline): AccountTrustline {
     limit: trustline.limit,
     currency: trustline.currency,
     counterparty: trustline.account,
-    qualityIn: trustline.quality_in || undefined,
-    qualityOut: trustline.quality_out || undefined,
+    qualityIn: utils.parseQuality(trustline.quality_in) || undefined,
+    qualityOut: utils.parseQuality(trustline.quality_out) || undefined,
     ripplingDisabled: trustline.no_ripple || undefined,
     frozen: trustline.freeze || undefined,
     authorized: trustline.authorized || undefined
