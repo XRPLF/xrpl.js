@@ -328,6 +328,26 @@ describe('RippleAPI', function() {
     schemaValidator.schemaValidate('sign', result);
   });
 
+  it('sign - multisigned', function() {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const txJSON = this.api.addSigner(requests.sign.normal.txJSON, responses.signers.signer1);
+    const result = this.api.sign(txJSON, secret);
+    assert.deepEqual(result, responses.sign.multisigned);
+  });
+
+  it('prepareSigner', function() {
+    const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+    const result = this.api.prepareSigner(requests.sign.normal.txJSON, secret);
+    assert.deepEqual(result, responses.signers.signer1);
+  });
+
+  it('addSigner', function() {
+    const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+    let result = this.api.addSigner(requests.sign.normal.txJSON, responses.signers.signer1);
+    result = this.api.addSigner(result, responses.signers.signer2);
+    assert.deepEqual(JSON.parse(result), responses.addSigner.normal);
+  });
+
   it('submit', function() {
     return this.api.submit(responses.sign.normal.signedTransaction).then(
       _.partial(checkResult, responses.submit, 'submit'));

@@ -109,9 +109,17 @@ module.exports = {
   prepareSigners: {
     normal: require('./prepare-signers-normal.json')
   },
+  addSigner: {
+    normal: require('./add-signer.json')
+  },
+  signers: {
+    signer1: require('./signer1.json'),
+    signer2: require('./signer2.json')
+  },
   sign: {
     normal: require('./sign.json'),
-    suspended: require('./sign-suspended.json')
+    suspended: require('./sign-suspended.json'),
+    multisigned: require('./sign-multisigned.json')
   },
   submit: require('./submit.json'),
   ledgerEvent: require('./ledger-event.json')
