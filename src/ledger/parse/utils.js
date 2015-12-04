@@ -17,6 +17,13 @@ function adjustQualityForXRP(
     (new BigNumber(quality)).shift(shift).toString();
 }
 
+function parseQuality(quality: ?number) {
+  if (typeof quality === 'number') {
+    return (new BigNumber(quality)).shift(-9).toNumber();
+  }
+  return undefined;
+}
+
 function parseTimestamp(rippleTime: number): string | void {
   return rippleTime ? utils.common.rippleTimeToISO8601(rippleTime) : undefined;
 }
@@ -80,6 +87,7 @@ function parseMemos(tx: Object): ?Array<Object> {
 }
 
 module.exports = {
+  parseQuality,
   parseOutcome,
   parseMemos,
   hexToString,

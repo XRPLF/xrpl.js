@@ -3,7 +3,8 @@
     "specification": {
       "limit": "0",
       "currency": "ASP",
-      "counterparty": "r3vi7mWxru9rJCxETCyA1CHvzL96eZWx5z"
+      "counterparty": "r3vi7mWxru9rJCxETCyA1CHvzL96eZWx5z",
+      "qualityIn": 1
     },
     "counterparty": {
       "limit": "10"

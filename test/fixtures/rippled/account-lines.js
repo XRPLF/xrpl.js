@@ -22,7 +22,7 @@ module.exports.normal = function(request, options = {}) {
         currency: 'ASP',
         limit: '0',
         limit_peer: '10',
-        quality_in: 0,
+        quality_in: 1000000000,
         quality_out: 0
       },
       {
