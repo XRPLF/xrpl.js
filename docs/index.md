@@ -683,10 +683,10 @@ pubkeyNode | string | Public key used to verify this node for internal communica
 serverState | string | A string indicating to what extent the server is participating in the network. See [Possible Server States](https://ripple.com/build/rippled-apis/#possible-server-states) for more details.
 validatedLedger | object | Information about the fully-validated ledger with the highest sequence number (the most recent).
 *validatedLedger.* age | integer | The time since the ledger was closed, in seconds.
-*validatedLedger.* baseFeeXRP | number | Base fee, in XRP. This may be represented in scientific notation such as 1e-05 for 0.00005.
+*validatedLedger.* baseFeeXRP | [value](#value) | Base fee, in XRP. This may be represented in scientific notation such as 1e-05 for 0.00005.
 *validatedLedger.* hash | string | Unique hash for the ledger, as an uppercase hexadecimal string.
-*validatedLedger.* reserveBaseXRP | integer | Minimum amount of XRP necessary for every account to keep in reserve.
-*validatedLedger.* reserveIncrementXRP | integer | Amount of XRP added to the account reserve for each object an account is responsible for in the ledger.
+*validatedLedger.* reserveBaseXRP | [value](#value) | Minimum amount of XRP necessary for every account to keep in reserve.
+*validatedLedger.* reserveIncrementXRP | [value](#value) | Amount of XRP added to the account reserve for each object an account is responsible for in the ledger.
 *validatedLedger.* ledgerVersion | integer | Identifying sequence number of this ledger version.
 validationQuorum | number | Minimum number of trusted validations required in order to validate a ledger version. Some circumstances may cause the server to require more validations.
 load | object | *Optional* *(Admin only)* Detailed information about the current load state of the server.
@@ -717,10 +717,10 @@ return api.getServerInfo().then(info => {/* ... */});
   "serverState": "full",
   "validatedLedger": {
     "age": 5,
-    "baseFeeXRP": 0.00001,
+    "baseFeeXRP": "0.00001",
     "hash": "4482DEE5362332F54A4036ED57EE1767C9F33CF7CE5A6670355C16CECE381D46",
-    "reserveBaseXRP": 20,
-    "reserveIncrementXRP": 5,
+    "reserveBaseXRP": "20",
+    "reserveIncrementXRP": "5",
     "ledgerVersion": 6595042
   },
   "validationQuorum": 3
@@ -3464,7 +3464,7 @@ Name | Type | Description
 baseFeeXRP | [value](#value) | Base fee, in XRP.
 ledgerHash | string | Unique hash of the ledger that was closed, as hex.
 ledgerTimestamp | date-time string | The time at which this ledger closed.
-reserveBaseXRP | [value](#value) | The minimum reserve, in drops of XRP, that is required for an account.
+reserveBaseXRP | [value](#value) | The minimum reserve, in XRP, that is required for an account.
 reserveIncrementXRP | [value](#value) | The increase in account reserve that is added for each item the account owns, such as offers or trust lines.
 transactionCount | integer | Number of new transactions included in this ledger.
 ledgerVersion | integer | Ledger version of the ledger that closed.

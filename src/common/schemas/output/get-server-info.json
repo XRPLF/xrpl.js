@@ -83,7 +83,7 @@
           "description": "The time since the ledger was closed, in seconds."
         },
         "baseFeeXRP": {
-          "type": "number",
+          "$ref": "value",
           "description": "Base fee, in XRP. This may be represented in scientific notation such as 1e-05 for 0.00005."
         },
         "hash": {
@@ -91,13 +91,11 @@
           "description": "Unique hash for the ledger, as an uppercase hexadecimal string."
         },
         "reserveBaseXRP": {
-          "type": "integer",
-          "minimum": 0,
+          "$ref": "value",
           "description": "Minimum amount of XRP necessary for every account to keep in reserve."
         },
         "reserveIncrementXRP": {
-          "type": "integer",
-          "minimum": 0,
+          "$ref": "value",
           "description": "Amount of XRP added to the account reserve for each object an account is responsible for in the ledger."
         },
         "ledgerVersion": {
