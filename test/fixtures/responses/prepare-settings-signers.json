@@ -1,0 +1,8 @@
+{
+  "txJSON": "{\"TransactionType\":\"SignerListSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"SignerQuorum\":2,\"SignerEntries\":[{\"SignerEntry\":{\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"SignerWeight\":1}},{\"SignerEntry\":{\"Account\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"SignerWeight\":1}},{\"SignerEntry\":{\"Account\":\"rwBYyfufTzk77zUSKEu4MvixfarC35av1J\",\"SignerWeight\":1}}],\"Flags\":2147483648,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+  "instructions": {
+    "fee": "0.000012",
+    "sequence": 23,
+    "maxLedgerVersion": 8820051
+  }
+}

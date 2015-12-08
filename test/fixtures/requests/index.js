@@ -20,7 +20,10 @@ module.exports = {
     allOptions: require('./prepare-payment-all-options'),
     noCounterparty: require('./prepare-payment-no-counterparty')
   },
-  prepareSettings: require('./prepare-settings'),
+  prepareSettings: {
+    domain: require('./prepare-settings'),
+    signers: require('./prepare-settings-signers')
+  },
   prepareSuspendedPaymentCreation: {
     normal: require('./prepare-suspended-payment-creation'),
     full: require('./prepare-suspended-payment-creation-full')
@@ -40,7 +43,8 @@ module.exports = {
   },
   sign: {
     normal: require('./sign'),
-    suspended: require('./sign-suspended.json')
+    suspended: require('./sign-suspended.json'),
+    signAs: require('./sign-as')
   },
   getPaths: {
     normal: require('./getpaths/normal'),
@@ -61,5 +65,8 @@ module.exports = {
   computeLedgerHash: {
     header: require('./compute-ledger-hash'),
     transactions: require('./compute-ledger-hash-transactions')
+  },
+  combine: {
+    setDomain: require('./combine.json')
   }
 };

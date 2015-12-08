@@ -3,15 +3,7 @@
 const _ = require('lodash');
 const utils = require('./utils');
 const {validate} = utils.common;
-
-type Submit = {
-  success: boolean,
-  engineResult: string,
-  engineResultCode: number,
-  engineResultMessage?: string,
-  txBlob?: string,
-  txJson?: Object
-}
+import type {Submit} from './types.js';
 
 function isImmediateRejection(engineResult: string): boolean {
   // note: "tel" errors mean the local server refused to process the
@@ -23,7 +15,7 @@ function isImmediateRejection(engineResult: string): boolean {
   return _.startsWith(engineResult, 'tem') || _.startsWith(engineResult, 'tej');
 }
 
-function formatResponse(response) {
+function formatSubmitResponse(response) {
   const data = {
     resultCode: response.engine_result,
     resultMessage: response.engine_result_message
@@ -36,11 +28,12 @@ function formatResponse(response) {
 
 function submit(signedTransaction: string): Promise<Submit> {
   validate.submit({signedTransaction});
+
   const request = {
     command: 'submit',
     tx_blob: signedTransaction
   };
-  return this.connection.request(request).then(formatResponse);
+  return this.connection.request(request).then(formatSubmitResponse);
 }
 
 module.exports = submit;

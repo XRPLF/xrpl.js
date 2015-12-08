@@ -70,7 +70,17 @@ function convertTransferRate(transferRate: number | string): number | string {
   return (new BigNumber(transferRate)).shift(9).toNumber();
 }
 
-function createSettingsTransaction(account: string, settings: Settings
+function formatSignerEntry(signer: Object): Object {
+  return {
+    SignerEntry: {
+      Account: signer.address,
+      SignerWeight: signer.weight
+    }
+  };
+}
+
+function createSettingsTransactionWithoutMemos(
+  account: string, settings: Settings
 ): Object {
   if (settings.regularKey !== undefined) {
     const removeRegularKey = {
@@ -83,20 +93,34 @@ function createSettingsTransaction(account: string, settings: Settings
     return _.assign({}, removeRegularKey, {RegularKey: settings.regularKey});
   }
 
+  if (settings.signers !== undefined) {
+    return {
+      TransactionType: 'SignerListSet',
+      Account: account,
+      SignerQuorum: settings.signers.threshold,
+      SignerEntries: _.map(settings.signers.weights, formatSignerEntry)
+    };
+  }
+
   const txJSON: Object = {
     TransactionType: 'AccountSet',
     Account: account
   };
-
-  if (settings.memos !== undefined) {
-    txJSON.Memos = _.map(settings.memos, utils.convertMemo);
-  }
 
   setTransactionFlags(txJSON, _.omit(settings, 'memos'));
   setTransactionFields(txJSON, settings);
 
   if (txJSON.TransferRate !== undefined) {
     txJSON.TransferRate = convertTransferRate(txJSON.TransferRate);
+  }
+  return txJSON;
+}
+
+function createSettingsTransaction(account: string, settings: Settings
+): Object {
+  const txJSON = createSettingsTransactionWithoutMemos(account, settings);
+  if (settings.memos !== undefined) {
+    txJSON.Memos = _.map(settings.memos, utils.convertMemo);
   }
   return txJSON;
 }

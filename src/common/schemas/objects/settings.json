@@ -68,6 +68,35 @@
       ],
       "description": "The public key of a new keypair, to use as the regular key to this account, as a base-58-encoded string in the same format as an account address. Use `null` to remove the regular key."
     },
+    "signers": {
+      "type": "object",
+      "description": "Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.",
+      "properties": {
+        "threshold": {
+          "$ref": "uint32",
+          "description": "A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`."
+        },
+        "weights": {
+          "type": "array",
+          "description": "Weights of signatures for each signer.",
+          "items": {
+            "type": "object",
+            "description": "An association of an address and a weight.",
+            "properties": {
+              "address": {"$ref": "address"},
+              "weight": {
+                "$ref": "uint32",
+                "description": "The weight that the signature of this account counts as towards the threshold."
+              }
+            },
+            "required": ["address", "weight"],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 8
+        }
+      }
+    },
     "memos": {"$ref": "memos"}
   },
   "additionalProperties": false

@@ -183,20 +183,20 @@ describe('RippleAPI', function() {
 
   it('prepareSettings', function() {
     return this.api.prepareSettings(
-      address, requests.prepareSettings, instructions).then(
+      address, requests.prepareSettings.domain, instructions).then(
       _.partial(checkResult, responses.prepareSettings.flags, 'prepare'));
   });
 
   it('prepareSettings - no maxLedgerVersion', function() {
     return this.api.prepareSettings(
-      address, requests.prepareSettings, {maxLedgerVersion: null}).then(
+      address, requests.prepareSettings.domain, {maxLedgerVersion: null}).then(
       _.partial(checkResult, responses.prepareSettings.noMaxLedgerVersion,
         'prepare'));
   });
 
   it('prepareSettings - no instructions', function() {
     return this.api.prepareSettings(
-      address, requests.prepareSettings).then(
+      address, requests.prepareSettings.domain).then(
       _.partial(
         checkResult,
         responses.prepareSettings.noInstructions,
@@ -241,6 +241,13 @@ describe('RippleAPI', function() {
     const settings = {transferRate: 1};
     return this.api.prepareSettings(address, settings, instructions).then(
       _.partial(checkResult, responses.prepareSettings.setTransferRate,
+        'prepare'));
+  });
+
+  it('prepareSettings - set signers', function() {
+    const settings = requests.prepareSettings.signers;
+    return this.api.prepareSettings(address, settings, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.signers,
         'prepare'));
   });
 
@@ -312,6 +319,14 @@ describe('RippleAPI', function() {
     schemaValidator.schemaValidate('sign', result);
   });
 
+  it('sign - signAs', function() {
+    const txJSON = requests.sign.signAs;
+    const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+    const signature = this.api.sign(JSON.stringify(txJSON), secret,
+      {signAs: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'});
+    assert.deepEqual(signature, responses.sign.signAs);
+  });
+
   it('submit', function() {
     return this.api.submit(responses.sign.normal.signedTransaction).then(
       _.partial(checkResult, responses.submit, 'submit'));
@@ -324,6 +339,11 @@ describe('RippleAPI', function() {
       assert(error instanceof this.api.errors.RippledError);
       assert.strictEqual(error.data.resultCode, 'temBAD_FEE');
     });
+  });
+
+  it('combine', function() {
+    const combined = this.api.combine(requests.combine.setDomain);
+    checkResult(responses.combine.single, 'sign', combined);
   });
 
   describe('RippleAPI', function() {
@@ -1255,7 +1275,7 @@ describe('RippleAPI - offline', function() {
   it('prepareSettings and sign', function() {
     const api = new RippleAPI();
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
-    const settings = requests.prepareSettings;
+    const settings = requests.prepareSettings.domain;
     const instructions = {
       sequence: 23,
       maxLedgerVersion: 8820051,
