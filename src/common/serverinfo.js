@@ -6,7 +6,7 @@ import type {Connection} from './connection';
 export type GetServerInfoResponse = {
   buildVersion: string,
   completeLedgers: string,
-  hostid: string,
+  hostID: string,
   ioLatencyMs: number,
   load?: {
     jobTypes: Array<Object>,
@@ -23,11 +23,11 @@ export type GetServerInfoResponse = {
   serverState: string,
   validatedLedger: {
     age: number,
-    baseFeeXrp: number,
+    baseFeeXRP: string,
     hash: string,
-    reserveBaseXrp: number,
-    reserveIncXrp: number,
-    seq: number
+    reserveBaseXRP: string,
+    reserveIncrementXRP: string,
+    ledgerVersion: number
   },
   validationQuorum: number
 }
@@ -49,6 +49,12 @@ function getServerInfo(connection: Connection): Promise<GetServerInfoResponse> {
       reserveIncXrp: 'reserveIncrementXRP',
       seq: 'ledgerVersion'
     });
+    info.validatedLedger.baseFeeXRP =
+      info.validatedLedger.baseFeeXRP.toString();
+    info.validatedLedger.reserveBaseXRP =
+      info.validatedLedger.reserveBaseXRP.toString();
+    info.validatedLedger.reserveIncrementXRP =
+      info.validatedLedger.reserveIncrementXRP.toString();
     return info;
   });
 }

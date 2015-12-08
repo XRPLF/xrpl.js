@@ -14,6 +14,7 @@ const address = addresses.ACCOUNT;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
+assert.options.strict = true;
 
 function unused() {
 }

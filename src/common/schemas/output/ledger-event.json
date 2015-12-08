@@ -23,7 +23,7 @@
     },
     "reserveBaseXRP": {
       "$ref": "value",
-      "description": "The minimum reserve, in drops of XRP, that is required for an account."
+      "description": "The minimum reserve, in XRP, that is required for an account."
     },
     "reserveIncrementXRP": {
       "$ref": "value",
