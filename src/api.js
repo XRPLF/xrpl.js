@@ -85,8 +85,8 @@ class RippleAPI extends EventEmitter {
       this.connection.on('ledgerClosed', message => {
         this.emit('ledger', server.formatLedgerClose(message));
       });
-      this.connection.on('error', (type, info) => {
-        this.emit('error', type, info);
+      this.connection.on('error', (errorCode, errorMessage, data) => {
+        this.emit('error', errorCode, errorMessage, data);
       });
     } else {
       // use null object pattern to provide better error message if user
