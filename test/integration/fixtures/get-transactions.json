@@ -1,0 +1,72 @@
+{
+  "jsonrpc": "2.0",
+  "id": "3",
+  "result": [
+    {
+      "type": "order",
+      "address": "rpP2JgiMyTF5jR5hLG3xHCPi1knBb1v9cM",
+      "sequence": 3372206,
+      "id": "848397FA686BD4A59F91EC1F4DE717360470EE8BD67CAA01D5FD333EDA8D97B3",
+      "specification": {
+        "direction": "buy",
+        "quantity": {
+          "currency": "JPY",
+          "value": "27865.90216965619",
+          "counterparty": "rJRi8WW24gt9X85PHAxfWNPCizMMhqUQwg"
+        },
+        "totalPrice": {
+          "currency": "XRP",
+          "value": "40000"
+        }
+      },
+      "outcome": {
+        "result": "tesSUCCESS",
+        "fee": "0.011",
+        "balanceChanges": {
+          "rpP2JgiMyTF5jR5hLG3xHCPi1knBb1v9cM": [
+            {
+              "currency": "XRP",
+              "value": "-0.011"
+            }
+          ]
+        },
+        "orderbookChanges": {
+          "rpP2JgiMyTF5jR5hLG3xHCPi1knBb1v9cM": [
+            {
+              "direction": "buy",
+              "quantity": {
+                "currency": "JPY",
+                "counterparty": "rJRi8WW24gt9X85PHAxfWNPCizMMhqUQwg",
+                "value": "27880.6855384734"
+              },
+              "totalPrice": {
+                "currency": "XRP",
+                "value": "40000"
+              },
+              "sequence": 3372204,
+              "status": "cancelled",
+              "makerExchangeRate": "0.697017138461835"
+            },
+            {
+              "direction": "buy",
+              "quantity": {
+                "currency": "JPY",
+                "counterparty": "rJRi8WW24gt9X85PHAxfWNPCizMMhqUQwg",
+                "value": "27865.90216965619"
+              },
+              "totalPrice": {
+                "currency": "XRP",
+                "value": "40000"
+              },
+              "sequence": 3372206,
+              "status": "created",
+              "makerExchangeRate": "0.6966475542414048"
+            }
+          ]
+        },
+        "ledgerVersion": 17533547,
+        "indexInLedger": 12
+      }
+    }
+  ]
+}

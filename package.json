@@ -20,6 +20,7 @@
     "babel-runtime": "^5.5.4",
     "bignumber.js": "^2.0.3",
     "https-proxy-agent": "^1.0.0",
+    "jayson": "^1.2.2",
     "lodash": "^3.1.0",
     "ripple-address-codec": "^2.0.1",
     "ripple-binary-codec": "^0.1.0",
@@ -65,7 +66,8 @@
     "test": "istanbul test _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; echo 'parser: babel-eslint' >> eslintrc; fi; eslint -c eslintrc src/",
-    "perf": "./scripts/perf_test.sh"
+    "perf": "./scripts/perf_test.sh",
+    "start": "babel-node scripts/http.js"
   },
   "repository": {
     "type": "git",

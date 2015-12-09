@@ -34,6 +34,7 @@ unittest() {
 
 integrationtest() {
   mocha test/integration/integration-test.js
+  mocha test/integration/http-integration-test.js
 }
 
 doctest() {

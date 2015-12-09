@@ -2,5 +2,8 @@
 
 module.exports = {
   RippleAPI: require('./api').RippleAPI,
-  RippleAPIBroadcast: require('./broadcast').RippleAPIBroadcast
+  // Broadcast api is experimental
+  RippleAPIBroadcast: require('./broadcast').RippleAPIBroadcast,
+  // HTTP server is experimental
+  createHTTPServer: require('./http').createHTTPServer
 };
