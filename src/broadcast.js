@@ -37,7 +37,8 @@ class RippleAPIBroadcast extends RippleAPI {
 
     apis.forEach(api => {
       api.on('ledger', this.onLedgerEvent.bind(this));
-      api.on('error', (type, info) => this.emit('error', type, info));
+      api.on('error', (errorCode, errorMessage, data) =>
+        this.emit('error', errorCode, errorMessage, data));
     });
   }
 

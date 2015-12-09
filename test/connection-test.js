@@ -227,8 +227,9 @@ describe('Connection', function() {
   });
 
   it('invalid message id', function(done) {
-    this.api.on('error', (type, message) => {
-      assert.strictEqual(type, 'badMessage');
+    this.api.on('error', (errorCode, errorMessage, message) => {
+      assert.strictEqual(errorCode, 'badMessage');
+      assert.strictEqual(errorMessage, 'valid id not found in response');
       assert.strictEqual(message,
         '{"type":"response","id":"must be integer"}');
       done();
@@ -239,9 +240,10 @@ describe('Connection', function() {
   });
 
   it('propagate error message', function(done) {
-    this.api.on('error', (type, message) => {
-      assert.strictEqual(type, 'slowDown');
-      assert.strictEqual(message, 'slow down');
+    this.api.on('error', (errorCode, errorMessage, data) => {
+      assert.strictEqual(errorCode, 'slowDown');
+      assert.strictEqual(errorMessage, 'slow down');
+      assert.deepEqual(data, {error: 'slowDown', error_message: 'slow down'});
       done();
     });
     this.api.connection._onMessage(JSON.stringify({
@@ -250,8 +252,9 @@ describe('Connection', function() {
   });
 
   it('unrecognized message type', function(done) {
-    this.api.on('error', (type, message) => {
-      assert.strictEqual(type, 'badMessage');
+    this.api.on('error', (errorCode, errorMessage, message) => {
+      assert.strictEqual(errorCode, 'badMessage');
+      assert.strictEqual(errorMessage, 'unrecognized message type: unknown');
       assert.strictEqual(message, '{"type":"unknown"}');
       done();
     });

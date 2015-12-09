@@ -3499,12 +3499,22 @@ This event is emitted when there is an error on the connection to the server tha
 
 ### Return Value
 
-The first parameter is a string indicating the error type, which may be `badMessage` (meaning that rippled returned a malformed message), or one of the [rippled Universal Errors](https://ripple.com/build/rippled-apis/#universal-errors). The second parameter is a message explaining the error, or the message that caused the error in the case of `badMessage`.
+The first parameter is a string indicating the error type:
+* `badMessage` - rippled returned a malformed message
+* `websocket` - the websocket library emitted an error
+* one of the error codes found in the [rippled Universal Errors](https://ripple.com/build/rippled-apis/#universal-errors).
+
+The second parameter is a message explaining the error.
+
+The third parameter is:
+* the message that caused the error for `badMessage`
+* the error object emitted for `websocket`
+* the parsed response for rippled errors
 
 ### Example
 
 ```javascript
-api.on('error', (errorCode, errorMessage) => {
+api.on('error', (errorCode, errorMessage, data) => {
   console.log(errorCode + ': ' + errorMessage);
 });
 ```

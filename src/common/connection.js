@@ -55,7 +55,7 @@ class Connection extends EventEmitter {
       }
       return [data.type, data];
     } else if (data.type === undefined && data.error) {
-      return ['error', data.error, data.error_message];  // e.g. slowDown
+      return ['error', data.error, data.error_message, data];  // e.g. slowDown
     }
     throw new ResponseFormatError('unrecognized message type: ' + data.type);
   }
@@ -68,7 +68,7 @@ class Connection extends EventEmitter {
     try {
       parameters = this._parseMessage(message);
     } catch (error) {
-      this.emit('error', 'badMessage', message);
+      this.emit('error', 'badMessage', error.message, message);
       return;
     }
     // we don't want this inside the try/catch or exceptions in listener
@@ -161,6 +161,12 @@ class Connection extends EventEmitter {
         this._ws.once('open', resolve);
       } else {
         this._ws = this._createWebSocket();
+        // when an error causes the connection to close, the close event
+        // should still be emitted; the "ws" documentation says: "The close
+        // event is also emitted when then underlying net.Socket closes the
+        // connection (end or close)."
+        this._ws.on('error', error =>
+          this.emit('error', 'websocket', error.messsage, error));
         this._ws.on('message', this._onMessage.bind(this));
         this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this);
         this._ws.once('close', this._onUnexpectedCloseBound);
