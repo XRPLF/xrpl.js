@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.15.2",
+  "version": "0.16.0",
   "dependencies": {
     "ajv": {
       "version": "1.4.8",
