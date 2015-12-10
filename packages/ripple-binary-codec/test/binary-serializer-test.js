@@ -5,10 +5,13 @@
 const BN = require('bn.js');
 const assert = require('assert-diff');
 const lib = require('../src/coretypes');
+const encode = require('../src').encode;
 const {binary: {makeParser, BytesList, BinarySerializer}} = lib;
 const {UInt8, UInt16, UInt32, UInt64, STObject} = lib;
 const {loadFixture} = require('./utils');
 const fixtures = loadFixture('data-driven-tests.json');
+const deliverMinTx = require('./fixtures/delivermin-tx.json');
+const deliverMinTxBinary = require('./fixtures/delivermin-tx-binary.json');
 
 function bytesListTest() {
   const list = new BytesList().put([0]).put([2, 3]).put([4, 5]);
@@ -85,9 +88,16 @@ function parseLedger4320278() {
   });
 }
 
+function deliverMinTest() {
+  it(`can serialize DeliverMin`, () => {
+    assert.strictEqual(encode(deliverMinTx), deliverMinTxBinary);
+  });
+}
+
 describe('Binary Serialization', function() {
   describe.skip('parseLedger4320278', parseLedger4320278);
   describe('nestedObjectTests', nestedObjectTests);
   describe('UIntTest', UIntTest);
   describe('BytesList', bytesListTest);
+  describe('DeliverMin', deliverMinTest);
 });

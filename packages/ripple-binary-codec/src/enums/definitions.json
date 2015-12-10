@@ -862,6 +862,17 @@
       }
     ],
     [
+      "DeliverMin",
+      {
+        "nth": 10,
+        "isVLEncoded": false,
+        "bytes": "6A",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Amount"
+      }
+    ],
+    [
       "MinimumOffer",
       {
         "nth": 16,
