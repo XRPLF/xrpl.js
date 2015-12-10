@@ -1,3 +1,11 @@
+##0.16.2
+**Changes**
++ [Bump ripple-binary-codec dependency version to 0.1.1 to fix issue with computeLedgerHash for transactions with DeliverMin]
+
+##0.16.1
+**Changes**
++ [FIX: Use assert not assert-diff](https://github.com/ripple/ripple-lib/commit/f6ebe325193e7208c5ee8d8e84a7504714f0009e)
+
 ##0.16.0
 **Breaking Changes**
 + [Fix types of XRP values in getServerInfo response](https://github.com/ripple/ripple-lib/commit/99d08065e4bda3dda6ae1f183adbd11abc70a9b7)
