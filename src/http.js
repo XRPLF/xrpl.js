@@ -1,7 +1,7 @@
 /* eslint-disable new-cap */
 'use strict';
 
-const assert = require('assert-diff');
+const assert = require('assert');
 const _ = require('lodash');
 const jayson = require('jayson');
 
