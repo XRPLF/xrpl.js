@@ -81,6 +81,7 @@ module.exports = {
     regularKey: require('./prepare-settings-regular-key.json'),
     removeRegularKey: require('./prepare-settings-remove-regular-key.json'),
     flags: require('./prepare-settings.json'),
+    flagsMultisign: require('./prepare-settings-multisign.json'),
     flagSet: require('./prepare-settings-flag-set.json'),
     flagClear: require('./prepare-settings-flag-clear.json'),
     setTransferRate: require('./prepare-settings-set-transfer-rate.json'),

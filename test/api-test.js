@@ -251,6 +251,16 @@ describe('RippleAPI', function() {
         'prepare'));
   });
 
+  it('prepareSettings - fee for multisign', function() {
+    const localInstructions = _.defaults({
+      signersCount: 4
+    }, instructions);
+    return this.api.prepareSettings(
+      address, requests.prepareSettings.domain, localInstructions).then(
+      _.partial(checkResult, responses.prepareSettings.flagsMultisign,
+        'prepare'));
+  });
+
   it('prepareSuspendedPaymentCreation', function() {
     const localInstructions = _.defaults({
       maxFee: '0.000012'

@@ -6,7 +6,8 @@ export type Instructions = {
   fee?: string,
   maxFee?: string,
   maxLedgerVersion?: number,
-  maxLedgerVersionOffset?: number
+  maxLedgerVersionOffset?: number,
+  signersCount?: number
 }
 
 export type Prepare = {

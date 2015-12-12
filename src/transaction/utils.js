@@ -55,7 +55,8 @@ function prepareTransaction(txJSON: Object, api: Object,
   }
 
   function prepareFee(): Promise<Object> {
-    const multiplier = (txJSON.Signers || []).length + 1;
+    const multiplier = instructions.signersCount === undefined ? 1 :
+      instructions.signersCount + 1;
     if (instructions.fee !== undefined) {
       txJSON.Fee = scaleValue(common.xrpToDrops(instructions.fee), multiplier);
       return Promise.resolve(txJSON);
