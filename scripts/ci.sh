@@ -3,6 +3,10 @@
 NODE_INDEX="$1"
 TOTAL_NODES="$2"
 
+function checkEOL {
+  ./scripts/checkeol.sh
+}
+
 typecheck() {
   npm install -g flow-bin
   flow --version
@@ -47,6 +51,7 @@ doctest() {
 }
 
 oneNode() {
+  checkEOL
   doctest
   lint
   typecheck
@@ -57,7 +62,7 @@ oneNode() {
 twoNodes() {
   case "$NODE_INDEX" in
     0) doctest; lint; integrationtest;;
-    1) typecheck; unittest;;
+    1) checkEOL; typecheck; unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;
   esac
 }
@@ -65,7 +70,7 @@ twoNodes() {
 threeNodes() {
   case "$NODE_INDEX" in
     0) doctest; lint; integrationtest;;
-    1) typecheck;;
+    1) checkEOL; typecheck;;
     2) unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;
   esac
