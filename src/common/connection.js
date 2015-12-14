@@ -38,6 +38,17 @@ class Connection extends EventEmitter {
     this._nextRequestID = 1;
   }
 
+  _updateLedgerVersions(data) {
+    this._ledgerVersion = Number(data.ledger_index);
+    if (data.validated_ledgers) {
+      this._availableLedgerVersions.reset();
+      this._availableLedgerVersions.parseAndAddRanges(
+        data.validated_ledgers);
+    } else {
+      this._availableLedgerVersions.addValue(this._ledgerVersion);
+    }
+  }
+
   // return value is array of arguments to Connection.emit
   _parseMessage(message) {
     const data = JSON.parse(message);
@@ -48,10 +59,7 @@ class Connection extends EventEmitter {
       return [data.id.toString(), data];
     } else if (isStreamMessageType(data.type)) {
       if (data.type === 'ledgerClosed') {
-        this._ledgerVersion = Number(data.ledger_index);
-        this._availableLedgerVersions.reset();
-        this._availableLedgerVersions.parseAndAddRanges(
-          data.validated_ledgers);
+        this._updateLedgerVersions(data);
       }
       return [data.type, data];
     } else if (data.type === undefined && data.error) {
@@ -99,10 +107,8 @@ class Connection extends EventEmitter {
       command: 'subscribe',
       streams: ['ledger']
     };
-    return this.request(request).then(response => {
-      this._ledgerVersion = Number(response.ledger_index);
-      this._availableLedgerVersions.parseAndAddRanges(
-        response.validated_ledgers);
+    return this.request(request).then(data => {
+      this._updateLedgerVersions(data);
       this._isReady = true;
       this.emit('connected');
     });

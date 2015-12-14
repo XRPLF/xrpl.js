@@ -42,7 +42,6 @@ describe('RippleAPIBroadcast', function() {
     this.mocks.forEach(mock => mock.socket.send(JSON.stringify(ledgerNext)));
 
     setTimeout(() => {
-      console.log('-- ledgerVersion', this.api.ledgerVersion);
       assert.strictEqual(gotLedger, 1);
       done();
     }, 50);
