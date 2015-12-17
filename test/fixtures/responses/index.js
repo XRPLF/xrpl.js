@@ -87,7 +87,8 @@ module.exports = {
     fieldClear: require('./prepare-settings-field-clear.json'),
     noInstructions: require('./prepare-settings-no-instructions.json'),
     signed: require('./prepare-settings-signed.json'),
-    noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json')
+    noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json'),
+    signers: require('./prepare-settings-signers.json')
   },
   prepareSuspendedPaymentCreation: {
     normal: require('./prepare-suspended-payment-creation'),
@@ -108,7 +109,11 @@ module.exports = {
   },
   sign: {
     normal: require('./sign.json'),
-    suspended: require('./sign-suspended.json')
+    suspended: require('./sign-suspended.json'),
+    signAs: require('./sign-as')
+  },
+  combine: {
+    single: require('./combine.json')
   },
   submit: require('./submit.json'),
   ledgerEvent: require('./ledger-event.json')

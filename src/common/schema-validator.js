@@ -94,7 +94,8 @@ function loadSchemas() {
     require('./schemas/input/compute-ledger-hash'),
     require('./schemas/input/sign.json'),
     require('./schemas/input/submit.json'),
-    require('./schemas/input/generate-address.json')
+    require('./schemas/input/generate-address.json'),
+    require('./schemas/input/combine.json')
   ];
   const titles = _.map(schemas, schema => schema.title);
   const duplicates = _.keys(_.pick(_.countBy(titles), count => count > 1));

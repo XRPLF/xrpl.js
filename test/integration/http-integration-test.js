@@ -110,7 +110,7 @@ describe('http server integration tests', function() {
     'prepareSettings',
     [
       {address},
-      {settings: apiRequests.prepareSettings},
+      {settings: apiRequests.prepareSettings.domain},
       {instructions: {
         maxFee: '0.000012',
         sequence: 23,

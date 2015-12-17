@@ -47,6 +47,7 @@ module.exports = {
   prepareSuspendedPaymentExecution: _.partial(schemaValidate,
     'prepareSuspendedPaymentExecutionParameters'),
   sign: _.partial(schemaValidate, 'signParameters'),
+  combine: _.partial(schemaValidate, 'combineParameters'),
   submit: _.partial(schemaValidate, 'submitParameters'),
   computeLedgerHash: _.partial(schemaValidate, 'computeLedgerHashParameters'),
   generateAddress: _.partial(schemaValidate, 'generateAddressParameters'),

@@ -22,7 +22,8 @@ function parseTransactionType(type) {
     SetRegularKey: 'settings',
     SuspendedPaymentCreate: 'suspendedPaymentCreation',
     SuspendedPaymentFinish: 'suspendedPaymentExecution',
-    SuspendedPaymentCancel: 'suspendedPaymentCancellation'
+    SuspendedPaymentCancel: 'suspendedPaymentCancellation',
+    SignerListSet: 'settings'
   };
   return mapping[type] || null;
 }

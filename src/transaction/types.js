@@ -17,3 +17,12 @@ export type Prepare = {
    maxLedgerVersion?: number
  }
 }
+
+export type Submit = {
+  success: boolean,
+  engineResult: string,
+  engineResultCode: number,
+  engineResultMessage?: string,
+  txBlob?: string,
+  txJson?: Object
+}

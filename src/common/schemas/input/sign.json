@@ -11,6 +11,17 @@
       "type": "string",
       "format": "secret",
       "description": "The secret of the account that is initiating the transaction."
+    },
+    "options": {
+      "type": "object",
+      "description": "Options that control the type of signature that will be generated.",
+      "properties": {
+        "signAs": {
+          "$ref": "address",
+          "description": "The account that the signature should count for in multisigning."
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,

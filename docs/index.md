@@ -54,6 +54,7 @@
   - [prepareSuspendedPaymentCancellation](#preparesuspendedpaymentcancellation)
   - [prepareSuspendedPaymentExecution](#preparesuspendedpaymentexecution)
   - [sign](#sign)
+  - [combine](#combine)
   - [submit](#submit)
   - [generateAddress](#generateaddress)
   - [computeLedgerHash](#computeledgerhash)
@@ -269,7 +270,7 @@ Executing a transaction with `RippleAPI` requires the following four steps:
     * [prepareSuspendedPaymentCreation](#preparesuspendedpaymentcreation)
     * [prepareSuspendedPaymentCancellation](#preparesuspendedpaymentcancellation)
     * [prepareSuspendedPaymentExecution](#preparesuspendedpaymentexecution)
-2. [Sign](#sign) - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place.
+2. [Sign](#sign) - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place. For multisignature transactions, the `signedTransaction` fields returned by `sign` must be collected and passed to the [combine](#combine) method.
 3. [Submit](#submit) - Submit the transaction to the connected server.
 4. Verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted.
 
@@ -480,6 +481,12 @@ passwordSpent | boolean | *Optional* Indicates that the account has used its fre
 regularKey | [address](#ripple-address),null | *Optional* The public key of a new keypair, to use as the regular key to this account, as a base-58-encoded string in the same format as an account address. Use `null` to remove the regular key.
 requireAuthorization | boolean | *Optional* If set, this account must individually approve other users in order for those users to hold this account’s issuances.
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
+signers | object | *Optional* Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.
+*signers.* threshold | integer | *Optional* A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
+*signers.* weights | array | *Optional* Weights of signatures for each signer.
+*signers.* weights[] | object | An association of an address and a weight.
+*signers.weights[].* address | [address](#ripple-address) | A Ripple account address
+*signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
 transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, represented as billionths of a unit. Use `null` to set no fee.
 
 ### Example
@@ -2644,6 +2651,12 @@ passwordSpent | boolean | *Optional* Indicates that the account has used its fre
 regularKey | [address](#ripple-address),null | *Optional* The public key of a new keypair, to use as the regular key to this account, as a base-58-encoded string in the same format as an account address. Use `null` to remove the regular key.
 requireAuthorization | boolean | *Optional* If set, this account must individually approve other users in order for those users to hold this account’s issuances.
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
+signers | object | *Optional* Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.
+*signers.* threshold | integer | *Optional* A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
+*signers.* weights | array | *Optional* Weights of signatures for each signer.
+*signers.* weights[] | object | An association of an address and a weight.
+*signers.weights[].* address | [address](#ripple-address) | A Ripple account address
+*signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
 transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, represented as billionths of a unit. Use `null` to set no fee.
 
 ### Example
@@ -3282,7 +3295,7 @@ return api.prepareSuspendedPaymentExecution(address, suspendedPaymentExecution).
 
 ## sign
 
-`sign(txJSON: string, secret: string): {signedTransaction: string, id: string}`
+`sign(txJSON: string, secret: string, options: Object): {signedTransaction: string, id: string}`
 
 Sign a prepared transaction. The signed transaction must subsequently be [submitted](#submit).
 
@@ -3292,6 +3305,8 @@ Name | Type | Description
 ---- | ---- | -----------
 txJSON | string | Transaction represented as a JSON string in rippled format.
 secret | secret string | The secret of the account that is initiating the transaction.
+options | object | *Optional* Options that control the type of signature that will be generated.
+*options.* signAs | [address](#ripple-address) | *Optional* The account that the signature should count for in multisigning.
 
 ### Return Value
 
@@ -3315,6 +3330,44 @@ return api.sign(txJSON, secret);
 {
   "signedTransaction": "12000322800000002400000017201B0086955368400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100BDE09A1F6670403F341C21A77CF35BA47E45CDE974096E1AA5FC39811D8269E702203D60291B9A27F1DCABA9CF5DED307B4F23223E0B6F156991DB601DFB9C41CE1C770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304",
   "id": "02ACE87F1996E3A23690A5BB7F1774BF71CCBA68F79805831B42ABAD5913D6F4"
+}
+```
+
+
+## combine
+
+`combine(signedTransactions: Array<string>): {signedTransaction: string, id: string}`
+
+Combines signed transactions from multiple accounts for a multisignature transaction. The signed transaction must subsequently be [submitted](#submit).
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+signedTransactions | array\<string\> | An array of signed transactions (from the output of [sign](#sign)) to combine.
+
+### Return Value
+
+This method returns an object with the following structure:
+
+Name | Type | Description
+---- | ---- | -----------
+signedTransaction | string | The signed transaction represented as an uppercase hexadecimal string.
+id | [id](#transaction-id) | The [Transaction ID](#transaction-id) of the signed transaction.
+
+### Example
+
+```javascript
+const signedTransactions = [ "12000322800000002400000004201B000000116840000000000F42407300770B6578616D706C652E636F6D811407C532442A675C881BA1235354D4AB9D023243A6F3E0107321026C784C1987F83BACBF02CD3E484AFC84ADE5CA6B36ED4DCA06D5BA233B9D382774473045022100E484F54FF909469FA2033E22EFF3DF8EDFE62217062680BB2F3EDF2F185074FE0220350DB29001C710F0450DAF466C5D819DC6D6A3340602DE9B6CB7DA8E17C90F798114FE9337B0574213FA5BCC0A319DBB4A7AC0CCA894E1F1",
+  "12000322800000002400000004201B000000116840000000000F42407300770B6578616D706C652E636F6D811407C532442A675C881BA1235354D4AB9D023243A6F3E01073210287AAAB8FBE8C4C4A47F6F1228C6E5123A7ED844BFE88A9B22C2F7CC34279EEAA74473045022100B09DDF23144595B5A9523B20E605E138DC6549F5CA7B5984D7C32B0E3469DF6B022018845CA6C203D4B6288C87DDA439134C83E7ADF8358BD41A8A9141A9B631419F8114517D9B9609229E0CDFE2428B586738C5B2E84D45E1F1" ];
+return api.combine(signedTransactions);
+```
+
+
+```json
+{
+  "signedTransaction": "12000322800000002400000004201B000000116840000000000F42407300770B6578616D706C652E636F6D811407C532442A675C881BA1235354D4AB9D023243A6F3E01073210287AAAB8FBE8C4C4A47F6F1228C6E5123A7ED844BFE88A9B22C2F7CC34279EEAA74473045022100B09DDF23144595B5A9523B20E605E138DC6549F5CA7B5984D7C32B0E3469DF6B022018845CA6C203D4B6288C87DDA439134C83E7ADF8358BD41A8A9141A9B631419F8114517D9B9609229E0CDFE2428B586738C5B2E84D45E1E0107321026C784C1987F83BACBF02CD3E484AFC84ADE5CA6B36ED4DCA06D5BA233B9D382774473045022100E484F54FF909469FA2033E22EFF3DF8EDFE62217062680BB2F3EDF2F185074FE0220350DB29001C710F0450DAF466C5D819DC6D6A3340602DE9B6CB7DA8E17C90F798114FE9337B0574213FA5BCC0A319DBB4A7AC0CCA894E1F1",
+  "id": "8A3BFD2214B4C8271ED62648FCE9ADE4EE82EF01827CF7D1F7ED497549A368CC"
 }
 ```
 

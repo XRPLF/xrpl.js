@@ -52,10 +52,10 @@ function parseFlags(tx: Object) {
 
 function parseSettings(tx: Object) {
   const txType = tx.TransactionType;
-  assert(txType === 'AccountSet' || txType === 'SetRegularKey');
+  assert(txType === 'AccountSet' || txType === 'SetRegularKey' ||
+         txType === 'SignerListSet');
 
-  const regularKey = tx.RegularKey ? {regularKey: tx.RegularKey} : {};
-  return _.assign(regularKey, parseFlags(tx), parseFields(tx));
+  return _.assign({}, parseFlags(tx), parseFields(tx));
 }
 
 module.exports = parseSettings;

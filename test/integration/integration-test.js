@@ -14,36 +14,45 @@ const {isValidSecret} = require('../../src/common');
 const TIMEOUT = 30000;   // how long before each test case times out
 const INTERVAL = 1000;   // how long to wait between checks for validated ledger
 
+function acceptLedger(api) {
+  return api.connection.request({command: 'ledger_accept'});
+}
 
-function verifyTransaction(testcase, hash, type, options, txData) {
+function verifyTransaction(testcase, hash, type, options, txData, address) {
   console.log('VERIFY...');
   return testcase.api.getTransaction(hash, options).then(data => {
     assert(data && data.outcome);
     assert.strictEqual(data.type, type);
-    assert.strictEqual(data.address, wallet.getAddress());
+    assert.strictEqual(data.address, address);
     assert.strictEqual(data.outcome.result, 'tesSUCCESS');
-    testcase.transactions.push(hash);
+    if (testcase.transactions !== undefined) {
+      testcase.transactions.push(hash);
+    }
     return {txJSON: JSON.stringify(txData), id: hash, tx: data};
   }).catch(error => {
     if (error instanceof errors.PendingLedgerVersionError) {
       console.log('NOT VALIDATED YET...');
       return new Promise((resolve, reject) => {
         setTimeout(() => verifyTransaction(testcase, hash, type,
-          options, txData).then(resolve, reject), INTERVAL);
+          options, txData, address).then(resolve, reject), INTERVAL);
       });
     }
+    console.log(error.stack);
     assert(false, 'Transaction not successful: ' + error.message);
   });
 }
 
-function testTransaction(testcase, type, lastClosedLedgerVersion, prepared) {
+function testTransaction(testcase, type, lastClosedLedgerVersion, prepared,
+    address = wallet.getAddress(), secret = wallet.getSecret()) {
   const txJSON = prepared.txJSON;
   assert(txJSON, 'missing txJSON');
   const txData = JSON.parse(txJSON);
-  assert.strictEqual(txData.Account, wallet.getAddress());
-  const signedData = testcase.api.sign(txJSON, wallet.getSecret());
+  assert.strictEqual(txData.Account, address);
+  const signedData = testcase.api.sign(txJSON, secret);
   console.log('PREPARED...');
-  return testcase.api.submit(signedData.signedTransaction).then(data => {
+  return testcase.api.submit(signedData.signedTransaction)
+  .then(data => testcase.test.title.indexOf('multisign') !== -1 ?
+  acceptLedger(testcase.api).then(() => data) : data).then(data => {
     console.log('SUBMITTED...');
     assert.strictEqual(data.resultCode, 'tesSUCCESS');
     const options = {
@@ -52,13 +61,13 @@ function testTransaction(testcase, type, lastClosedLedgerVersion, prepared) {
     };
     return new Promise((resolve, reject) => {
       setTimeout(() => verifyTransaction(testcase, signedData.id, type,
-        options, txData).then(resolve, reject), INTERVAL);
+        options, txData, address).then(resolve, reject), INTERVAL);
     });
   });
 }
 
-function setup() {
-  this.api = new RippleAPI({server: 'wss://s1.ripple.com'});
+function setup(server = 'wss://s1.ripple.com') {
+  this.api = new RippleAPI({server});
   console.log('CONNECTING...');
   return this.api.connect().then(() => {
     console.log('CONNECTED...');
@@ -91,7 +100,7 @@ describe('integration tests', function() {
   it('settings', function() {
     return this.api.getLedgerVersion().then(ledgerVersion => {
       return this.api.prepareSettings(address,
-        requests.prepareSettings, instructions).then(prepared =>
+        requests.prepareSettings.domain, instructions).then(prepared =>
           testTransaction(this, 'settings', ledgerVersion, prepared));
     });
   });
@@ -232,7 +241,7 @@ describe('integration tests', function() {
   it('getSettings', function() {
     return this.api.getSettings(address).then(data => {
       assert(data);
-      assert.strictEqual(data.domain, requests.prepareSettings.domain);
+      assert.strictEqual(data.domain, requests.prepareSettings.domain.domain);
     });
   });
 
@@ -312,4 +321,81 @@ describe('integration tests', function() {
     assert(isValidSecret(newWallet.secret));
   });
 
+});
+
+function createAccount(api, address) {
+  const root = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
+  const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+  const amount = {
+    currency: 'XRP',
+    value: '10000'
+  };
+  return api.preparePayment(root, {
+    source: {address: root, maxAmount: amount},
+    destination: {address, amount}
+  }).then(prepared => {
+    return api.submit(api.sign(prepared.txJSON, secret).signedTransaction);
+  }).then(() => {
+    return acceptLedger(api);
+  });
+}
+
+describe.skip('integration tests - standalone rippled', function() {
+  const instructions = {maxLedgerVersionOffset: 10, fee: '1'};
+  this.timeout(TIMEOUT);
+
+  const url = 'ws://127.0.0.1:6006';
+  // const url = 'wss://s.altnet.rippletest.net:51233';
+  beforeEach(_.partial(setup, url));
+  afterEach(teardown);
+  const address = 'r5nx8ZkwEbFztnc8Qyi22DE9JYjRzNmvs';
+  const secret = 'ss6F8381Br6wwpy9p582H8sBt19J3';
+  const signer1address = 'rQDhz2ZNXmhxzCYwxU6qAbdxsHA4HV45Y2';
+  const signer1secret = 'shK6YXzwYfnFVn3YZSaMh5zuAddKx';
+  const signer2address = 'r3RtUvGw9nMoJ5FuHxuoVJvcENhKtuF9ud';
+  const signer2secret = 'shUHQnL4EH27V4EiBrj6EfhWvZngF';
+
+  it('submit multisigned transaction', function() {
+    const signers = {
+      threshold: 2,
+      weights: [
+        {address: signer1address, weight: 1},
+        {address: signer2address, weight: 1}
+      ]
+    };
+    let minLedgerVersion = null;
+    return createAccount(this.api, address).then(() => {
+      return this.api.getLedgerVersion().then(ledgerVersion => {
+        minLedgerVersion = ledgerVersion;
+        return this.api.prepareSettings(address, {signers}, instructions)
+        .then(prepared => {
+          return testTransaction(this, 'settings', ledgerVersion, prepared,
+            address, secret);
+        });
+      });
+    }).then(() => {
+      return this.api.prepareSettings(
+        address, {domain: 'example.com'}, instructions)
+      .then(prepared => {
+        const signed1 = this.api.sign(
+          prepared.txJSON, signer1secret, {signAs: signer1address});
+        const signed2 = this.api.sign(
+          prepared.txJSON, signer2secret, {signAs: signer2address});
+        const combined = this.api.combine([
+          signed1.signedTransaction, signed2.signedTransaction
+        ]);
+        return this.api.submit(combined.signedTransaction)
+        .then(response => acceptLedger(this.api).then(() => response))
+        .then(response => {
+          assert.strictEqual(response.resultCode, 'tesSUCCESS');
+          const options = {minLedgerVersion};
+          return verifyTransaction(this, combined.id, 'settings',
+            options, {}, address);
+        }).catch(error => {
+          console.log(error.message);
+          throw error;
+        });
+      });
+    });
+  });
 });
