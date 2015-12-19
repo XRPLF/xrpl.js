@@ -9,10 +9,13 @@ const requests = require('../fixtures/requests');
 const RippleAPI = require('../../src').RippleAPI;
 const {isValidAddress} = require('ripple-address-codec');
 const {isValidSecret} = require('../../src/common');
+const {payTo, ledgerAccept} = require('./utils');
 
 
-const TIMEOUT = 30000;   // how long before each test case times out
+const TIMEOUT = 10000;   // how long before each test case times out
 const INTERVAL = 1000;   // how long to wait between checks for validated ledger
+
+const serverUrl = 'ws://127.0.0.1:6006';
 
 function acceptLedger(api) {
   return api.connection.request({command: 'ledger_accept'});
@@ -59,6 +62,7 @@ function testTransaction(testcase, type, lastClosedLedgerVersion, prepared,
       minLedgerVersion: lastClosedLedgerVersion,
       maxLedgerVersion: txData.LastLedgerSequence
     };
+    ledgerAccept(testcase.api);
     return new Promise((resolve, reject) => {
       setTimeout(() => verifyTransaction(testcase, signedData.id, type,
         options, txData, address).then(resolve, reject), INTERVAL);
@@ -74,17 +78,110 @@ function setup(server = 'wss://s1.ripple.com') {
   });
 }
 
+const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
+const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
+
+function makeTrustLine(testcase, address, secret) {
+  const api = testcase.api;
+  const specification = {
+    currency: 'USD',
+    counterparty: masterAccount,
+    limit: '1341.1',
+    ripplingDisabled: true
+  };
+  const trust = api.prepareTrustline(address, specification, {})
+    .then(data => {
+      const signed = api.sign(data.txJSON, secret);
+      if (address === wallet.getAddress()) {
+        testcase.transactions.push(signed.id);
+      }
+      return api.submit(signed.signedTransaction);
+    })
+    .then(() => ledgerAccept(api));
+  return trust;
+}
+
+function makeOrder(api, address, specification, secret) {
+  return api.prepareOrder(address, specification)
+    .then(data => api.sign(data.txJSON, secret))
+    .then(signed => api.submit(signed.signedTransaction))
+    .then(() => ledgerAccept(api));
+}
+
+function setupAccounts(testcase) {
+  const api = testcase.api;
+
+  const promise = payTo(api, 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM')
+    .then(() => payTo(api, wallet.getAddress()))
+    .then(() => payTo(api, testcase.newWallet.address))
+    .then(() => payTo(api, 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc'))
+    .then(() => payTo(api, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'))
+    .then(() => {
+      return api.prepareSettings(masterAccount, {defaultRipple: true})
+      .then(data => api.sign(data.txJSON, masterSecret))
+      .then(signed => api.submit(signed.signedTransaction))
+      .then(() => ledgerAccept(api));
+    })
+    .then(() => makeTrustLine(testcase, wallet.getAddress(),
+      wallet.getSecret()))
+    .then(() => makeTrustLine(testcase, testcase.newWallet.address,
+      testcase.newWallet.secret))
+    .then(() => payTo(api, wallet.getAddress(), '123', 'USD', masterAccount))
+    .then(() => payTo(api, 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'))
+    .then(() => {
+      const orderSpecification = {
+        direction: 'buy',
+        quantity: {
+          currency: 'USD',
+          value: '432',
+          counterparty: masterAccount
+        },
+        totalPrice: {
+          currency: 'XRP',
+          value: '432'
+        }
+      };
+      return makeOrder(testcase.api, testcase.newWallet.address,
+        orderSpecification, testcase.newWallet.secret);
+    })
+    .then(() => {
+      const orderSpecification = {
+        direction: 'buy',
+        quantity: {
+          currency: 'XRP',
+          value: '1741'
+        },
+        totalPrice: {
+          currency: 'USD',
+          value: '171',
+          counterparty: masterAccount
+        }
+      };
+      return makeOrder(testcase.api, masterAccount, orderSpecification,
+        masterSecret);
+    });
+  return promise;
+}
+
 function teardown() {
   return this.api.disconnect();
 }
 
 function suiteSetup() {
   this.transactions = [];
-  return setup.bind(this)().then(() => {
-    return this.api.getLedgerVersion().then(ledgerVersion => {
+
+  return setup.bind(this)(serverUrl)
+    .then(() => ledgerAccept(this.api))
+    .then(() => this.newWallet = this.api.generateAddress())
+    // two times to give time to server to send `ledgerClosed` event
+    // so getLedgerVersion will return right value
+    .then(() => ledgerAccept(this.api))
+    .then(() => this.api.getLedgerVersion())
+    .then(ledgerVersion => {
       this.startLedgerVersion = ledgerVersion;
-    });
-  }).then(teardown.bind(this));
+    })
+    .then(() => setupAccounts(this))
+    .then(() => teardown.bind(this)());
 }
 
 describe('integration tests', function() {
@@ -93,7 +190,7 @@ describe('integration tests', function() {
   this.timeout(TIMEOUT);
 
   before(suiteSetup);
-  beforeEach(setup);
+  beforeEach(_.partial(setup, serverUrl));
   afterEach(teardown);
 
 
@@ -149,10 +246,10 @@ describe('integration tests', function() {
       }
     };
     return this.api.getLedgerVersion().then(ledgerVersion => {
-      return this.api.prepareOrder(address,
-        orderSpecification, instructions).then(prepared =>
-          testTransaction(this, 'order', ledgerVersion, prepared)
-        ).then(result => {
+      return this.api.prepareOrder(address, orderSpecification, instructions)
+        .then(prepared =>
+          testTransaction(this, 'order', ledgerVersion, prepared))
+        .then(result => {
           const txData = JSON.parse(result.txJSON);
           return this.api.getOrders(address).then(orders => {
             assert(orders && orders.length > 0);
@@ -164,8 +261,9 @@ describe('integration tests', function() {
             assert.deepEqual(createdOrder.specification, orderSpecification);
             return txData;
           });
-        }).then(txData => this.api.prepareOrderCancellation(
-            address, {orderSequence: txData.Sequence}, instructions)
+        })
+        .then(txData => this.api.prepareOrderCancellation(
+          address, {orderSequence: txData.Sequence}, instructions)
             .then(prepared => testTransaction(this, 'orderCancellation',
               ledgerVersion, prepared))
         );
@@ -253,7 +351,7 @@ describe('integration tests', function() {
       },
       counter: {
         currency: 'USD',
-        counterparty: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'
+        counterparty: masterAccount
       }
     };
     return this.api.getOrderbook(address, orderbook).then(book => {
@@ -281,11 +379,11 @@ describe('integration tests', function() {
         address: address
       },
       destination: {
-        address: 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc',
+        address: this.newWallet.address,
         amount: {
-          value: '0.000001',
+          value: '1',
           currency: 'USD',
-          counterparty: 'rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q'
+          counterparty: masterAccount
         }
       }
     };
@@ -298,8 +396,24 @@ describe('integration tests', function() {
     });
   });
 
+
   it('getPaths - send all', function() {
-    const pathfind = requests.getPaths.sendAll;
+    const pathfind = {
+      source: {
+        address: address,
+        amount: {
+          currency: 'USD',
+          value: '0.005'
+        }
+      },
+      destination: {
+        address: this.newWallet.address,
+        amount: {
+          currency: 'USD'
+        }
+      }
+    };
+
     return this.api.getPaths(pathfind).then(data => {
       assert(data && data.length > 0);
       assert(_.every(data, path => {
@@ -323,30 +437,11 @@ describe('integration tests', function() {
 
 });
 
-function createAccount(api, address) {
-  const root = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
-  const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
-  const amount = {
-    currency: 'XRP',
-    value: '10000'
-  };
-  return api.preparePayment(root, {
-    source: {address: root, maxAmount: amount},
-    destination: {address, amount}
-  }).then(prepared => {
-    return api.submit(api.sign(prepared.txJSON, secret).signedTransaction);
-  }).then(() => {
-    return acceptLedger(api);
-  });
-}
-
-describe.skip('integration tests - standalone rippled', function() {
-  const instructions = {maxLedgerVersionOffset: 10, fee: '1'};
+describe('integration tests - standalone rippled', function() {
+  const instructions = {maxLedgerVersionOffset: 10};
   this.timeout(TIMEOUT);
 
-  const url = 'ws://127.0.0.1:6006';
-  // const url = 'wss://s.altnet.rippletest.net:51233';
-  beforeEach(_.partial(setup, url));
+  beforeEach(_.partial(setup, serverUrl));
   afterEach(teardown);
   const address = 'r5nx8ZkwEbFztnc8Qyi22DE9JYjRzNmvs';
   const secret = 'ss6F8381Br6wwpy9p582H8sBt19J3';
@@ -364,7 +459,7 @@ describe.skip('integration tests - standalone rippled', function() {
       ]
     };
     let minLedgerVersion = null;
-    return createAccount(this.api, address).then(() => {
+    return payTo(this.api, address).then(() => {
       return this.api.getLedgerVersion().then(ledgerVersion => {
         minLedgerVersion = ledgerVersion;
         return this.api.prepareSettings(address, {signers}, instructions)
@@ -374,8 +469,10 @@ describe.skip('integration tests - standalone rippled', function() {
         });
       });
     }).then(() => {
+      const multisignInstructions =
+        _.assign({}, instructions, {signersCount: 2});
       return this.api.prepareSettings(
-        address, {domain: 'example.com'}, instructions)
+        address, {domain: 'example.com'}, multisignInstructions)
       .then(prepared => {
         const signed1 = this.api.sign(
           prepared.txJSON, signer1secret, {signAs: signer1address});

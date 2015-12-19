@@ -291,6 +291,7 @@ maxFee | [value](#value) | *Optional* The maximum fee to pay for the transaction
 maxLedgerVersion | integer,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version.
 maxLedgerVersionOffset | integer | *Optional* Offset from current validated legder version to highest ledger version that the transaction can be included in.
 sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+signersCount | integer | *Optional* Number of signers that will be signing this transaction.
 
 We recommended that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare*" method.
 
