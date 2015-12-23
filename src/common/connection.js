@@ -148,10 +148,12 @@ class Connection extends EventEmitter {
       cert: this._certificate
     }, _.isUndefined);
     const websocketOptions = _.assign({}, options, optionsOverrides);
-    const websocket = new WebSocket(this._url, websocketOptions);
+    const websocket = new WebSocket(this._url, null, websocketOptions);
     // we will have a listener for each outstanding request,
     // so we have to raise the limit (the default is 10)
-    websocket.setMaxListeners(Infinity);
+    if (typeof websocket.setMaxListeners === 'function') {
+      websocket.setMaxListeners(Infinity);
+    }
     return websocket;
   }
 

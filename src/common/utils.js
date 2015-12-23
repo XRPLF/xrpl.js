@@ -35,12 +35,13 @@ function toRippledAmount(amount: Amount): RippledAmount {
   };
 }
 
-const FINDSNAKE = /([a-zA-Z]_[a-zA-Z])/g;
 function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
   if (typeof obj === 'object') {
     let newKey;
     return _.reduce(obj, (result, value, key) => {
       newKey = key;
+      // taking this out of function leads to error in PhantomJS
+      const FINDSNAKE = /([a-zA-Z]_[a-zA-Z])/g;
       if (FINDSNAKE.test(key)) {
         newKey = key.replace(FINDSNAKE, r => r[0] + r[2].toUpperCase());
       }

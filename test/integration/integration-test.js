@@ -12,7 +12,8 @@ const {isValidSecret} = require('../../src/common');
 const {payTo, ledgerAccept} = require('./utils');
 
 
-const TIMEOUT = 10000;   // how long before each test case times out
+// how long before each test case times out
+const TIMEOUT = process.browser ? 25000 : 10000;
 const INTERVAL = 1000;   // how long to wait between checks for validated ledger
 
 const serverUrl = 'ws://127.0.0.1:6006';

@@ -7,7 +7,9 @@ class RippleError extends Error {
     this.name = this.constructor.name;
     this.message = message;
     this.data = data;
-    Error.captureStackTrace(this, this.constructor.name);
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor.name);
+    }
   }
 
   toString() {

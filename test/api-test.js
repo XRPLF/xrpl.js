@@ -16,6 +16,8 @@ const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 assert.options.strict = true;
 
+const TIMEOUT = 10000;   // how long before each test case times out
+
 function unused() {
 }
 
@@ -37,6 +39,7 @@ function checkResult(expected, schemaName, response) {
 
 
 describe('RippleAPI', function() {
+  this.timeout(TIMEOUT);
   const instructions = {maxLedgerVersionOffset: 100};
   beforeEach(setupAPI.setup);
   afterEach(setupAPI.teardown);
@@ -944,7 +947,11 @@ describe('RippleAPI', function() {
   });
 
   it('getServerInfo - error', function() {
-    this.mockRippled.returnErrorOnServerInfo = true;
+    this.api.connection._send(JSON.stringify({
+      command: 'config',
+      data: {returnErrorOnServerInfo: true}
+    }));
+
     return this.api.getServerInfo().then(() => {
       assert(false, 'Should throw NetworkError');
     }).catch(error => {
