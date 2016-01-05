@@ -1,3 +1,7 @@
+##0.16.3
+**Changes**
++ [Update ws to 1.0.1](https://github.com/ripple/ripple-lib/pull/682)
+
 ##0.16.2
 **Changes**
 + [Bump ripple-binary-codec dependency version to 0.1.1 to fix issue with computeLedgerHash for transactions with DeliverMin]
