@@ -1,4 +1,4 @@
-##0.16.3
+##0.16.4
 **Changes**
 + [Update ws to 1.0.1](https://github.com/ripple/ripple-lib/pull/682)
 
