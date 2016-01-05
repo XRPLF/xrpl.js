@@ -7,6 +7,7 @@ const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
 const RippleAPI = require('ripple-api').RippleAPI;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
+const ledgerClose = require('./fixtures/rippled/ledger-close.json');
 
 
 function unused() {
@@ -260,5 +261,14 @@ describe('Connection', function() {
     });
 
     this.api.connection._onMessage(JSON.stringify({type: 'unknown'}));
+  });
+
+  it('ledger close without validated_ledgers', function(done) {
+    const message = _.omit(ledgerClose, 'validated_ledgers');
+    this.api.on('ledger', function(ledger) {
+      assert.strictEqual(ledger.ledgerVersion, 8819951);
+      done();
+    });
+    this.api.connection._ws.emit('message', JSON.stringify(message));
   });
 });

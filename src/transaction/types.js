@@ -6,7 +6,8 @@ export type Instructions = {
   fee?: string,
   maxFee?: string,
   maxLedgerVersion?: number,
-  maxLedgerVersionOffset?: number
+  maxLedgerVersionOffset?: number,
+  signersCount?: number
 }
 
 export type Prepare = {
@@ -16,4 +17,13 @@ export type Prepare = {
    sequence: number,
    maxLedgerVersion?: number
  }
+}
+
+export type Submit = {
+  success: boolean,
+  engineResult: string,
+  engineResultCode: number,
+  engineResultMessage?: string,
+  txBlob?: string,
+  txJson?: Object
 }
