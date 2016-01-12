@@ -1,7 +1,18 @@
 'use strict';
 const util = require('util');
 
-class RippleError extends Error {
+// this is needed because extending builtins doesn't work in babel 6.x
+function extendableBuiltin(cls) {
+  function ExtendableBuiltin() {
+    cls.apply(this, arguments);
+  }
+  ExtendableBuiltin.prototype = Object.create(cls.prototype);
+  Object.setPrototypeOf(ExtendableBuiltin, cls);
+
+  return ExtendableBuiltin;
+}
+
+class RippleError extends extendableBuiltin(Error) {
   constructor(message, data) {
     super(message);
     this.name = this.constructor.name;

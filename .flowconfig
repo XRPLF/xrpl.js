@@ -4,6 +4,11 @@
 .*/ripple-lib/test/fixtures/.*
 .*/node_modules/flow-bin/.*
 .*/node_modules/webpack/.*
+.*/node_modules/babel-core/.*
+.*/node_modules/babel-eslint/.*
+.*/node_modules/babel-preset-es2015/.*
+.*/node_modules/babel-preset-stage-1/.*
+.*/node_modules/babel-register/.*
 
 [include]
 ./node_modules/
