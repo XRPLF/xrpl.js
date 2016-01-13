@@ -24,6 +24,7 @@ lint() {
 
 unittest() {
   # test "src"
+  mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/test-results.xml
   npm test --coverage
   npm run coveralls
 
@@ -33,12 +34,26 @@ unittest() {
   mkdir -p test-compiled/node_modules
   ln -nfs ../../dist/npm test-compiled/node_modules/ripple-api
   mocha --opts test-compiled/mocha.opts test-compiled
+
+  # compile tests for browser testing
+  gulp build-tests build-for-web-tests
+  node --harmony test-compiled/mocked-server.js > /dev/null &
+
+  echo "Running tests in PhantomJS"
+  mocha-phantomjs test/localrunner.html
+
+  pkill -f mocked-server.js
   rm -rf test-compiled
 }
 
 integrationtest() {
   mocha test/integration/integration-test.js
   mocha test/integration/http-integration-test.js
+
+  # run integration tests in PhantomJS
+  gulp build-tests build-for-web-tests
+  echo "Running integragtion tests in PhantomJS"
+  mocha-phantomjs test/localintegrationrunner.html
 }
 
 doctest() {

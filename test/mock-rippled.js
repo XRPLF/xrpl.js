@@ -72,6 +72,7 @@ module.exports = function(port) {
 
   mock.on('connection', function(conn) {
     this.socket = conn;
+    conn.config = {};
     conn.on('message', function(requestJSON) {
       const request = JSON.parse(requestJSON);
       mock.emit('request_' + request.command, request, conn);
@@ -95,10 +96,22 @@ module.exports = function(port) {
     mock.expectedRequests[this.event] -= 1;
   });
 
+  mock.on('request_config', function(request, conn) {
+    assert.strictEqual(request.command, 'config');
+    conn.config = _.assign(conn.config, request.data);
+  });
+
+  mock.on('request_echo', function(request, conn) {
+    assert.strictEqual(request.command, 'echo');
+    conn.send(JSON.stringify(request.data));
+  });
+
   mock.on('request_server_info', function(request, conn) {
     assert.strictEqual(request.command, 'server_info');
-    if (mock.returnErrorOnServerInfo) {
+    if (conn.config.returnErrorOnServerInfo) {
       conn.send(createResponse(request, fixtures.server_info.error));
+    } else if (conn.config.disconnectOnServerInfo) {
+      conn.terminate();
     } else {
       conn.send(createResponse(request, fixtures.server_info.normal));
     }

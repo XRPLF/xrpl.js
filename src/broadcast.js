@@ -11,6 +11,9 @@ class RippleAPIBroadcast extends RippleAPI {
       _.assign({}, options, {server})
     ));
 
+    // exposed for testing
+    this._apis = apis;
+
     this.getMethodNames().forEach(name => {
       this[name] = function() { // eslint-disable-line no-loop-func
         return Promise.race(apis.map(api => api[name].apply(api, arguments)));

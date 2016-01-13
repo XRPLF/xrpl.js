@@ -10,6 +10,8 @@ const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClose = require('./fixtures/rippled/ledger-close.json');
 
 
+const TIMEOUT = 10000;   // how long before each test case times out
+
 function unused() {
 }
 
@@ -27,6 +29,7 @@ function createServer() {
 }
 
 describe('Connection', function() {
+  this.timeout(TIMEOUT);
   beforeEach(setupAPI.setup);
   afterEach(setupAPI.teardown);
 
@@ -47,6 +50,9 @@ describe('Connection', function() {
         messages.push(message);
       }
     };
+    connection._ws = {
+      send: function() {}
+    };
     connection._onMessage(message1);
     connection._send(message2);
 
@@ -54,6 +60,10 @@ describe('Connection', function() {
   });
 
   it('with proxy', function(done) {
+    if (process.browser) {
+      done();
+      return;
+    }
     createServer().then((server) => {
       const port = server.address().port;
       const expect = 'CONNECT localhost';
@@ -97,9 +107,10 @@ describe('Connection', function() {
   });
 
   it('DisconnectedError', function() {
-    this.api.connection._send = function() {
-      this._ws.close();
-    };
+    this.api.connection._send(JSON.stringify({
+      command: 'config',
+      data: {disconnectOnServerInfo: true}
+    }));
     return this.api.getServerInfo().then(() => {
       assert(false, 'Should throw DisconnectedError');
     }).catch(error => {

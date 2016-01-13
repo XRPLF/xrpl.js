@@ -8,6 +8,7 @@ var rename = require('gulp-rename');
 var webpack = require('webpack');
 var bump = require('gulp-bump');
 var argv = require('yargs').argv;
+var assert = require('assert');
 
 var pkg = require('./package.json');
 
@@ -21,10 +22,19 @@ function webpackConfig(extension, overrides) {
       path: './build/',
       filename: ['ripple-', extension].join(pkg.version)
     },
+    plugins: [
+      new webpack.NormalModuleReplacementPlugin(/^ws$/, './wswrapper'),
+      new webpack.NormalModuleReplacementPlugin(/^\.\/wallet$/, './wallet-web'),
+      new webpack.NormalModuleReplacementPlugin(/^.*setup-api$/,
+        './setup-api-web')
+    ],
     module: {
       loaders: [{
+        test: /jayson/,
+        loader: 'null'
+      }, {
         test: /\.js$/,
-        exclude: /node_modules/,
+        exclude: [/node_modules/],
         loader: 'babel-loader?optional=runtime'
       }, {
         test: /\.json/,
@@ -34,6 +44,53 @@ function webpackConfig(extension, overrides) {
   };
   return _.assign({}, defaults, overrides);
 }
+
+function webpackConfigForWebTest(testFileName, path) {
+  var match = testFileName.match(/\/?([^\/]*)-test.js$/);
+  if (!match) {
+    assert(false, 'wrong filename:' + testFileName);
+  }
+  var configOverrides = {
+    externals: [{
+      'ripple-api': 'ripple',
+      'net': 'null'
+    }],
+    entry: testFileName,
+    output: {
+      library: match[1].replace(/-/g, '_'),
+      path: './test-compiled-for-web/' + (path ? path : ''),
+      filename: match[1] + '-test.js'
+    }
+  };
+  return webpackConfig('.js', configOverrides);
+}
+
+gulp.task('build-for-web-tests', function(callback) {
+  var configOverrides = {
+    output: {
+      library: 'ripple',
+      path: './test-compiled-for-web/',
+      filename: 'ripple-for-web-tests.js'
+    }
+  };
+  var config = webpackConfig('-debug.js', configOverrides);
+  webpack(config, callback);
+});
+
+gulp.task('build-tests', function(callback) {
+  var times = 0;
+  function done() {
+    if (++times >= 5) {
+      callback();
+    }
+  }
+  webpack(webpackConfigForWebTest('./test/rangeset-test.js'), done);
+  webpack(webpackConfigForWebTest('./test/connection-test.js'), done);
+  webpack(webpackConfigForWebTest('./test/api-test.js'), done);
+  webpack(webpackConfigForWebTest('./test/broadcast-api-test.js'), done);
+  webpack(webpackConfigForWebTest('./test/integration/integration-test.js',
+    'integration/'), done);
+});
 
 gulp.task('build', function(callback) {
   webpack(webpackConfig('.js'), callback);
