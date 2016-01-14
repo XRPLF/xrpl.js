@@ -13,7 +13,7 @@ const {payTo, ledgerAccept} = require('./utils');
 
 
 // how long before each test case times out
-const TIMEOUT = process.browser ? 45000 : 10000;
+const TIMEOUT = process.browser ? 85000 : 10000;
 const INTERVAL = 1000;   // how long to wait between checks for validated ledger
 
 const serverUrl = 'ws://127.0.0.1:6006';
@@ -76,6 +76,9 @@ function setup(server = 'wss://s1.ripple.com') {
   console.log('CONNECTING...');
   return this.api.connect().then(() => {
     console.log('CONNECTED...');
+  }, error => {
+    console.log('ERROR:', error);
+    throw error;
   });
 }
 

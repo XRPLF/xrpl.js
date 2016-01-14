@@ -14,6 +14,7 @@ const address = addresses.ACCOUNT;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
+const binary = require('ripple-binary-codec');
 assert.options.strict = true;
 
 const TIMEOUT = 10000;   // how long before each test case times out
@@ -325,6 +326,15 @@ describe('RippleAPI', function() {
     schemaValidator.schemaValidate('sign', result);
   });
 
+  it('sign - already signed', function() {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const result = this.api.sign(requests.sign.normal.txJSON, secret);
+    assert.throws(() => {
+      const tx = JSON.stringify(binary.decode(result.signedTransaction));
+      this.api.sign(tx, secret);
+    }, /txJSON must not contain "TxnSignature" or "Signers" properties/);
+  });
+
   it('sign - SuspendedPaymentExecution', function() {
     const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
     const result = this.api.sign(requests.sign.suspended.txJSON, secret);
@@ -357,6 +367,16 @@ describe('RippleAPI', function() {
   it('combine', function() {
     const combined = this.api.combine(requests.combine.setDomain);
     checkResult(responses.combine.single, 'sign', combined);
+  });
+
+  it('combine - different transactions', function() {
+    const request = [requests.combine.setDomain[0]];
+    const tx = binary.decode(requests.combine.setDomain[0]);
+    tx.Flags = 0;
+    request.push(binary.encode(tx));
+    assert.throws(() => {
+      this.api.combine(request);
+    }, /txJSON is not the same for all signedTransactions/);
   });
 
   describe('RippleAPI', function() {
