@@ -323,6 +323,8 @@ module.exports = function(port) {
     }
     if (request.source_account === addresses.NOTFOUND) {
       response = createResponse(request, fixtures.path_find.srcActNotFound);
+    } else if (request.source_account === addresses.SOURCE_LOW_FUNDS) {
+      response = createResponse(request, fixtures.path_find.sourceAmountLow);
     } else if (request.source_account === addresses.OTHER_ACCOUNT) {
       response = createResponse(request, fixtures.path_find.sendUSD);
     } else if (request.source_account === addresses.THIRD_ACCOUNT) {

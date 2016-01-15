@@ -6,5 +6,6 @@ module.exports = {
   FOURTH_ACCOUNT: 'rJnZ4YHCUsHvQu7R6mZohevKJDHFzVD6Zr',
   ISSUER: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
   NOTFOUND: 'rajTAg3hon5Lcu1RxQQPxTgHvqfhc1EaUS',
-  SECRET: 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+  SECRET: 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV',
+  SOURCE_LOW_FUNDS: 'rhVgDEfS1r1fLyRUZCpab4TdowZcAJwHy2'
 };
