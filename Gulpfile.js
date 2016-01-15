@@ -16,6 +16,9 @@ function webpackConfig(extension, overrides) {
   overrides = overrides || {};
   var defaults = {
     cache: true,
+    externals: [{
+      'lodash': '_'
+    }],
     entry: './src/index.js',
     output: {
       library: 'ripple',
@@ -52,6 +55,7 @@ function webpackConfigForWebTest(testFileName, path) {
   }
   var configOverrides = {
     externals: [{
+      'lodash': '_',
       'ripple-api': 'ripple',
       'net': 'null'
     }],
