@@ -1,3 +1,7 @@
+##0.16.5
+**Changes**
++ [Filter insufficient source funds paths from pathfind results](https://github.com/ripple/ripple-lib/pull/688)
+
 ##0.16.4
 **Changes**
 + [Update ws to 1.0.1](https://github.com/ripple/ripple-lib/pull/682)
