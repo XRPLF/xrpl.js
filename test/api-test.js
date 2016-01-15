@@ -1049,6 +1049,15 @@ describe('RippleAPI', function() {
     });
   });
 
+  it('getPaths - no paths source amount', function() {
+    return this.api.getPaths(requests.getPaths.NoPathsSource).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.NotFoundError);
+    });
+  });
+
+
   it('getPaths - no paths with source currencies', function() {
     const pathfind = requests.getPaths.NoPathsWithCurrencies;
     return this.api.getPaths(pathfind).then(() => {

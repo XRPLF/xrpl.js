@@ -38,7 +38,8 @@ module.exports = {
     sendUSD: require('./path-find-send-usd'),
     sendAll: require('./path-find-send-all'),
     XrpToXrp: require('./path-find-xrp-to-xrp'),
-    srcActNotFound: require('./path-find-srcActNotFound')
+    srcActNotFound: require('./path-find-srcActNotFound'),
+    sourceAmountLow: require('./path-find-srcAmtLow')
   },
   tx: {
     Payment: require('./tx/payment.json'),

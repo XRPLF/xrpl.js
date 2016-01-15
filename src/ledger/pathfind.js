@@ -85,6 +85,20 @@ function conditionallyAddDirectXRPPath(connection: Connection, address: string,
     xrpBalance => addDirectXrpPath(paths, xrpBalance));
 }
 
+function filterSourceFundsLowPaths(pathfind: PathFind,
+                                   paths: RippledPathsResponse
+): RippledPathsResponse {
+  if (pathfind.source.amount &&
+      pathfind.destination.amount.value === undefined && paths.alternatives) {
+    paths.alternatives = _.filter(paths.alternatives, alt => {
+      return alt.source_amount &&
+        pathfind.source.amount &&
+        alt.source_amount.value === pathfind.source.amount.value;
+    });
+  }
+  return paths;
+}
+
 function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
   if (paths.alternatives && paths.alternatives.length > 0) {
     return parsePathfind(paths);
@@ -116,7 +130,9 @@ function getPaths(pathfind: PathFind): Promise<GetPaths> {
   const address = pathfind.source.address;
   return requestPathFind(this.connection, pathfind).then(paths =>
     conditionallyAddDirectXRPPath(this.connection, address, paths)
-  ).then(paths => formatResponse(pathfind, paths));
+  )
+  .then(paths => filterSourceFundsLowPaths(pathfind, paths))
+  .then(paths => formatResponse(pathfind, paths));
 }
 
 module.exports = getPaths;

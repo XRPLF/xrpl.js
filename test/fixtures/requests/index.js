@@ -53,6 +53,7 @@ module.exports = {
     XrpToXrpNotEnough: require('./getpaths/xrp2xrp-not-enough'),
     NotAcceptCurrency: require('./getpaths/not-accept-currency'),
     NoPaths: require('./getpaths/no-paths'),
+    NoPathsSource: require('./getpaths/no-paths-source-amount'),
     NoPathsWithCurrencies: require('./getpaths/no-paths-with-currencies'),
     sendAll: require('./getpaths/send-all'),
     invalid: require('./getpaths/invalid'),
