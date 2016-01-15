@@ -96,13 +96,17 @@ class Connection extends EventEmitter {
     return this._state === WebSocket.OPEN && this._isReady;
   }
 
-  _onUnexpectedClose() {
+  _onUnexpectedClose(resolve = function() {}, reject = function() {}) {
     this._ws = null;
     this._isReady = false;
-    this.connect().then();
+    this.connect().then(resolve, reject);
   }
 
   _onOpen() {
+    this._ws.removeListener('close', this._onUnexpectedCloseBound);
+    this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this);
+    this._ws.once('close', this._onUnexpectedCloseBound);
+
     const request = {
       command: 'subscribe',
       streams: ['ledger']
@@ -176,7 +180,12 @@ class Connection extends EventEmitter {
         this._ws.on('error', error =>
           this.emit('error', 'websocket', error.messsage, error));
         this._ws.on('message', this._onMessage.bind(this));
-        this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this);
+        // in browser close event can came before open event, so we must
+        // resolve connect's promise after reconnect in that case.
+        // after open event we will rebound _onUnexpectedCloseBound
+        // without resolve and reject functions
+        this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this,
+          resolve, reject);
         this._ws.once('close', this._onUnexpectedCloseBound);
         this._ws.once('open', () => this._onOpen().then(resolve, reject));
       }
