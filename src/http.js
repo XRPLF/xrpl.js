@@ -8,6 +8,7 @@ const jayson = require('jayson');
 const RippleAPI = require('./api').RippleAPI;
 
 
+/* istanbul ignore next */
 function createHTTPServer(options, httpPort) {
   const rippleAPI = new RippleAPI(options);
 

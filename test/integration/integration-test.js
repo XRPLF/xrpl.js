@@ -6,7 +6,7 @@ const assert = require('assert');
 const errors = require('../../src/common/errors');
 const wallet = require('./wallet');
 const requests = require('../fixtures/requests');
-const RippleAPI = require('../../src').RippleAPI;
+const RippleAPI = require('ripple-api').RippleAPI;
 const {isValidAddress} = require('ripple-address-codec');
 const {isValidSecret} = require('../../src/common');
 const {payTo, ledgerAccept} = require('./utils');
@@ -76,6 +76,9 @@ function setup(server = 'wss://s1.ripple.com') {
   console.log('CONNECTING...');
   return this.api.connect().then(() => {
     console.log('CONNECTED...');
+  }, error => {
+    console.log('ERROR:', error);
+    throw error;
   });
 }
 
