@@ -111,7 +111,7 @@ module.exports = function(port) {
     if (conn.config.returnErrorOnServerInfo) {
       conn.send(createResponse(request, fixtures.server_info.error));
     } else if (conn.config.disconnectOnServerInfo) {
-      conn.terminate();
+      conn.close();
     } else {
       conn.send(createResponse(request, fixtures.server_info.normal));
     }

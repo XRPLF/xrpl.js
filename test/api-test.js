@@ -17,7 +17,8 @@ const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 const binary = require('ripple-binary-codec');
 assert.options.strict = true;
 
-const TIMEOUT = 10000;   // how long before each test case times out
+// how long before each test case times out
+const TIMEOUT = process.browser ? 25000 : 10000;
 
 function unused() {
 }
@@ -98,7 +99,7 @@ describe('RippleAPI', function() {
     });
 
     it('preparePayment with all options specified', function() {
-      return this.api.getLedgerVersion().then((ver) => {
+      return this.api.getLedgerVersion().then(ver => {
         const localInstructions = {
           maxLedgerVersion: ver + 100,
           fee: '0.000012'
@@ -1101,7 +1102,7 @@ describe('RippleAPI', function() {
   });
 
   it('getLedgerVersion', function(done) {
-    this.api.getLedgerVersion().then((ver) => {
+    this.api.getLedgerVersion().then(ver => {
       assert.strictEqual(ver, 8819951);
       done();
     }, done);

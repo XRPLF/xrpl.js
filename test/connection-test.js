@@ -10,7 +10,7 @@ const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClose = require('./fixtures/rippled/ledger-close.json');
 
 
-const TIMEOUT = 10000;   // how long before each test case times out
+const TIMEOUT = 200000;   // how long before each test case times out
 
 function unused() {
 }
@@ -64,11 +64,11 @@ describe('Connection', function() {
       done();
       return;
     }
-    createServer().then((server) => {
+    createServer().then(server => {
       const port = server.address().port;
       const expect = 'CONNECT localhost';
-      server.on('connection', (socket) => {
-        socket.on('data', (data) => {
+      server.on('connection', socket => {
+        socket.on('data', data => {
           const got = data.toString('ascii', 0, expect.length);
           assert.strictEqual(got, expect);
           server.close();
@@ -179,7 +179,7 @@ describe('Connection', function() {
   });
 
   it('hasLedgerVersion', function() {
-    return this.api.connection.hasLedgerVersion(8819951).then((result) => {
+    return this.api.connection.hasLedgerVersion(8819951).then(result => {
       assert(result);
     });
   });

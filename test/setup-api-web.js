@@ -5,10 +5,11 @@ const {RippleAPI, RippleAPIBroadcast} = require('ripple-api');
 const ledgerClosed = require('./fixtures/rippled/ledger-close');
 
 const port = 34371;
+const baseUrl = 'ws://testripple.circleci.com:';
 
 function setup(port_ = port) {
   return new Promise((resolve, reject) => {
-    this.api = new RippleAPI({server: 'ws://localhost:' + port_});
+    this.api = new RippleAPI({server: baseUrl + port_});
     this.api.connect().then(() => {
       this.api.once('ledger', () => resolve());
       this.api.connection._ws.emit('message', JSON.stringify(ledgerClosed));
@@ -17,7 +18,7 @@ function setup(port_ = port) {
 }
 
 function setupBroadcast() {
-  const servers = [port, port + 1].map(port_ => 'ws://localhost:' + port_);
+  const servers = [port, port + 1].map(port_ => baseUrl + port_);
   this.api = new RippleAPIBroadcast(servers);
   return new Promise((resolve, reject) => {
     this.api.connect().then(() => {

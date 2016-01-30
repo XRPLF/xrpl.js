@@ -1,5 +1,6 @@
 'use strict';
 const util = require('util');
+const browserHacks = require('./browser-hacks');
 
 // this is needed because extending builtins doesn't work in babel 6.x
 function extendableBuiltin(cls) {
@@ -7,15 +8,15 @@ function extendableBuiltin(cls) {
     cls.apply(this, arguments);
   }
   ExtendableBuiltin.prototype = Object.create(cls.prototype);
-  Object.setPrototypeOf(ExtendableBuiltin, cls);
-
+  browserHacks.setPrototypeOf(ExtendableBuiltin, cls);
   return ExtendableBuiltin;
 }
 
 class RippleError extends extendableBuiltin(Error) {
   constructor(message, data) {
     super(message);
-    this.name = this.constructor.name;
+
+    this.name = browserHacks.getConstructorName(this);
     this.message = message;
     this.data = data;
     if (Error.captureStackTrace) {
