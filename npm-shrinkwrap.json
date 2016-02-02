@@ -179,12 +179,58 @@
         "inherits": {
           "version": "2.0.1",
           "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+        },
+        "create-hash": {
+          "version": "1.1.2",
+          "resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
+          "dependencies": {
+            "cipher-base": {
+              "version": "1.0.2",
+              "resolved": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.2.tgz"
+            },
+            "inherits": {
+              "version": "2.0.1",
+              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+            },
+            "ripemd160": {
+              "version": "1.0.1",
+              "resolved": "https://registry.npmjs.org/ripemd160/-/ripemd160-1.0.1.tgz"
+            },
+            "sha.js": {
+              "version": "2.4.4",
+              "resolved": "https://registry.npmjs.org/sha.js/-/sha.js-2.4.4.tgz"
+            }
+          }
         }
       }
     },
     "ripple-hashes": {
       "version": "0.1.0",
-      "resolved": "https://registry.npmjs.org/ripple-hashes/-/ripple-hashes-0.1.0.tgz"
+      "resolved": "https://registry.npmjs.org/ripple-hashes/-/ripple-hashes-0.1.0.tgz",
+      "dependencies": {
+        "create-hash": {
+          "version": "1.1.2",
+          "resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
+          "dependencies": {
+            "cipher-base": {
+              "version": "1.0.2",
+              "resolved": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.2.tgz"
+            },
+            "inherits": {
+              "version": "2.0.1",
+              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+            },
+            "ripemd160": {
+              "version": "1.0.1",
+              "resolved": "https://registry.npmjs.org/ripemd160/-/ripemd160-1.0.1.tgz"
+            },
+            "sha.js": {
+              "version": "2.4.4",
+              "resolved": "https://registry.npmjs.org/sha.js/-/sha.js-2.4.4.tgz"
+            }
+          }
+        }
+      }
     },
     "ripple-keypairs": {
       "version": "0.10.0",

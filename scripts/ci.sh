@@ -37,7 +37,8 @@ unittest() {
 
   # compile tests for browser testing
   gulp build-tests build-for-web-tests
-  node --harmony test-compiled/mocked-server.js > /dev/null &
+  echo "starting mocked server"
+  node --harmony test-compiled/mocked-server.js &
 
   echo "Running tests in PhantomJS"
   mocha-phantomjs test/localrunner.html
