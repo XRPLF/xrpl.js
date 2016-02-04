@@ -12,7 +12,7 @@ const {sha512Half, transactionID} = require('./hashes');
 
 const makeParser = bytes => new BinaryParser(bytes);
 const readJSON = parser => parser.readType(types.STObject).toJSON();
-const binaryToJSON = (bytes) => readJSON(makeParser(bytes));
+const binaryToJSON = bytes => readJSON(makeParser(bytes));
 
 function serializeObject(object, opts = {}) {
   const {prefix, suffix, signingFieldsOnly = false} = opts;

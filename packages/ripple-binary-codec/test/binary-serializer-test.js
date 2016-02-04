@@ -78,10 +78,10 @@ function UIntTest() {
 
 
 function parseLedger4320278() {
-  it(`can parse object`, (done) => {
+  it(`can parse object`, done => {
     this.timeout(30e3);
     const json = loadFixture('as-ledger-4320278.json');
-    json.forEach((e) => {
+    json.forEach(e => {
       assertRecycles(e.binary);
     });
     done();

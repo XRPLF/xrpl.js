@@ -15,7 +15,7 @@ const {
 const FULL_CANONICAL_SIGNATURE = 0x80000000;
 
 const toHex = v => bytesToHex(v);
-const getSigner = (o) => AccountID.from(o.Signer.Account);
+const getSigner = o => AccountID.from(o.Signer.Account);
 const signerComparator = (a, b) => getSigner(a).compareTo(getSigner(b));
 
 function setCanonicalSignatureFlag(tx_json) {

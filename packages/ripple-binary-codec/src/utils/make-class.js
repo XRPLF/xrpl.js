@@ -38,8 +38,8 @@ module.exports = function makeClass(klass_, definition_) {
     klass = function() {};
   }
   const proto = klass.prototype;
-  function addFunc(original, wrapper) {
-    proto[original.name] = wrapper || original;
+  function addFunc(original, name, wrapper) {
+    proto[name] = wrapper || original;
   }
   (definition.getters || []).forEach(k => {
     const key = '_' + k;
@@ -47,24 +47,24 @@ module.exports = function makeClass(klass_, definition_) {
       return this[key];
     };
   });
-  forEach(definition.virtuals, f => {
-    addFunc(f, function() {
+  forEach(definition.virtuals, (f, n) => {
+    addFunc(f, n, function() {
       throw new Error('unimplemented');
     });
   });
   forEach(definition.methods, addFunc);
-  forEach(definition, f => {
+  forEach(definition, (f, n) => {
     if (_.isFunction(f) && f !== klass) {
-      addFunc(f);
+      addFunc(f, n);
     }
   });
   _.assign(klass, definition.statics);
   if (typeof klass.init === 'function') {
     klass.init();
   }
-  forEach(definition.cached, f => {
-    const key = '_' + f.name;
-    addFunc(f, function() {
+  forEach(definition.cached, (f, n) => {
+    const key = '_' + n;
+    addFunc(f, n, function() {
       let value = this[key];
       if (value === undefined) {
         value = this[key] = f.call(this);
