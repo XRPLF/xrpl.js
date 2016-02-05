@@ -9,6 +9,7 @@ var webpack = require('webpack');
 var bump = require('gulp-bump');
 var argv = require('yargs').argv;
 var assert = require('assert');
+var fs = require('fs');
 
 var pkg = require('./package.json');
 
@@ -69,18 +70,6 @@ function webpackConfigForWebTest(testFileName, path) {
   return webpackConfig('.js', configOverrides);
 }
 
-gulp.task('build-for-web-tests', function(callback) {
-  var configOverrides = {
-    output: {
-      library: 'ripple',
-      path: './test-compiled-for-web/',
-      filename: 'ripple-for-web-tests.js'
-    }
-  };
-  var config = webpackConfig('-debug.js', configOverrides);
-  webpack(config, callback);
-});
-
 gulp.task('build-tests', function(callback) {
   var times = 0;
   function done() {
@@ -96,8 +85,19 @@ gulp.task('build-tests', function(callback) {
     'integration/'), done);
 });
 
+function createBuildLink(callback) {
+  return function(err, res) {
+    var latestBuildName = './build/ripple-latest.js';
+    if (fs.existsSync(latestBuildName)) {
+      fs.unlinkSync(latestBuildName);
+    }
+    fs.linkSync('./build/ripple-' + pkg.version + '.js', latestBuildName);
+    callback(err, res);
+  };
+}
+
 gulp.task('build', function(callback) {
-  webpack(webpackConfig('.js'), callback);
+  webpack(webpackConfig('.js'), createBuildLink(callback));
 });
 
 gulp.task('build-min', ['build'], function() {

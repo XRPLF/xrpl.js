@@ -36,13 +36,18 @@ unittest() {
   mocha --opts test-compiled/mocha.opts test-compiled
 
   # compile tests for browser testing
-  gulp build-tests build-for-web-tests
+  gulp build build-tests
   node --harmony test-compiled/mocked-server.js > /dev/null &
 
   echo "Running tests in PhantomJS"
   mocha-phantomjs test/localrunner.html
 
+  echo "Running tests in SauceLabs"
+  http-server &
+  npm run sauce
+
   pkill -f mocked-server.js
+  pkill -f http-server
   rm -rf test-compiled
 }
 
@@ -51,7 +56,7 @@ integrationtest() {
   mocha test/integration/http-integration-test.js
 
   # run integration tests in PhantomJS
-  gulp build-tests build-for-web-tests
+  gulp build-tests build
   echo "Running integragtion tests in PhantomJS"
   mocha-phantomjs test/localintegrationrunner.html
 }

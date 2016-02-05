@@ -8,6 +8,8 @@ const ledgerClosed = require('./fixtures/rippled/ledger-close');
 const RippleAPI = require('ripple-api').RippleAPI;
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 
+const TIMEOUT = process.browser ? 25000 : 10000;
+
 function checkResult(expected, schemaName, response) {
   if (expected.txJSON) {
     assert(response.txJSON);
@@ -21,6 +23,7 @@ function checkResult(expected, schemaName, response) {
 }
 
 describe('RippleAPIBroadcast', function() {
+  this.timeout(TIMEOUT);
   beforeEach(setupAPI.setupBroadcast);
   afterEach(setupAPI.teardown);
 
@@ -50,7 +53,7 @@ describe('RippleAPIBroadcast', function() {
     setTimeout(() => {
       assert.strictEqual(gotLedger, 1);
       done();
-    }, 250);
+    }, 1250);
   });
 
   it('error propagation', function(done) {
