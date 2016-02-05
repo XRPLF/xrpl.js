@@ -27,7 +27,7 @@
     "babel-eslint": "^4.0.5",
     "babel-loader": "^5.3.2",
     "codecov.io": "^0.1.6",
-    "eslint": "^1.2.1",
+    "eslint": "^1.10.3",
     "fs-extra": "^0.24.0",
     "intercept-stdout": "^0.1.2",
     "istanbul": "~0.3.5",
