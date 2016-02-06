@@ -11,7 +11,7 @@ function setPrototypeOf(object, prototype) {
 function getConstructorName(object) {
   // hack for internet explorer
   return process.browser ?
-    object.constructor.toString().match(/^function\s(.+)\(/)[1] :
+    object.constructor.toString().match(/^function\s+([^(]*)/)[1] :
     object.constructor.name;
 }
 

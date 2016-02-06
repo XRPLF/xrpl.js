@@ -155,8 +155,8 @@
       }
     },
     "ripple-binary-codec": {
-      "version": "0.1.1",
-      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.1.1.tgz",
+      "version": "0.1.2",
+      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.1.2.tgz",
       "dependencies": {
         "babel-runtime": {
           "version": "5.8.34",
