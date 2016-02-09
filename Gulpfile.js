@@ -13,6 +13,17 @@ var fs = require('fs');
 
 var pkg = require('./package.json');
 
+var uglifyOptions = {
+  mangle: {
+    except: ['_', 'RippleError', 'RippledError', 'UnexpectedError',
+    'LedgerVersionError', 'ConnectionError', 'NotConnectedError',
+    'DisconnectedError', 'TimeoutError', 'ResponseFormatError',
+    'ValidationError', 'NotFoundError', 'MissingLedgerHistoryError',
+    'PendingLedgerVersionError'
+    ]
+  }
+};
+
 function webpackConfig(extension, overrides) {
   overrides = overrides || {};
   var defaults = {
@@ -85,13 +96,17 @@ gulp.task('build-tests', function(callback) {
     'integration/'), done);
 });
 
+function createLink(from, to) {
+  if (fs.existsSync(to)) {
+    fs.unlinkSync(to);
+  }
+  fs.linkSync(from, to);
+}
+
 function createBuildLink(callback) {
   return function(err, res) {
-    var latestBuildName = './build/ripple-latest.js';
-    if (fs.existsSync(latestBuildName)) {
-      fs.unlinkSync(latestBuildName);
-    }
-    fs.linkSync('./build/ripple-' + pkg.version + '.js', latestBuildName);
+    createLink('./build/ripple-' + pkg.version + '.js',
+      './build/ripple-latest.js');
     callback(err, res);
   };
 }
@@ -102,9 +117,13 @@ gulp.task('build', function(callback) {
 
 gulp.task('build-min', ['build'], function() {
   return gulp.src(['./build/ripple-', '.js'].join(pkg.version))
-  .pipe(uglify())
+  .pipe(uglify(uglifyOptions))
   .pipe(rename(['ripple-', '-min.js'].join(pkg.version)))
-  .pipe(gulp.dest('./build/'));
+  .pipe(gulp.dest('./build/'))
+  .on('end', function() {
+    createLink('./build/ripple-' + pkg.version + '-min.js',
+      './build/ripple-latest-min.js');
+  });
 });
 
 gulp.task('build-debug', function(callback) {
