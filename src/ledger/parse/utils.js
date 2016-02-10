@@ -4,6 +4,7 @@ const _ = require('lodash');
 const transactionParser = require('ripple-lib-transactionparser');
 const utils = require('../utils');
 const BigNumber = require('bignumber.js');
+const parseAmount = require('./amount');
 
 function adjustQualityForXRP(
   quality: string, takerGetsCurrency: string, takerPaysCurrency: string
@@ -58,6 +59,13 @@ function parseOutcome(tx: Object): ?Object {
   removeEmptyCounterpartyInBalanceChanges(balanceChanges);
   removeEmptyCounterpartyInOrderbookChanges(orderbookChanges);
 
+  let deliveredAmount;
+  if (tx.meta.delivered_amount) {
+    deliveredAmount = parseAmount(tx.meta.delivered_amount);
+  } else if (tx.Amount) {
+    deliveredAmount = parseAmount(tx.Amount);
+  }
+
   return {
     result: tx.meta.TransactionResult,
     timestamp: parseTimestamp(tx.date),
@@ -65,7 +73,8 @@ function parseOutcome(tx: Object): ?Object {
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
     ledgerVersion: tx.ledger_index,
-    indexInLedger: tx.meta.TransactionIndex
+    indexInLedger: tx.meta.TransactionIndex,
+    deliveredAmount
   };
 }
 

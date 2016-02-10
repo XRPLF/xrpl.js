@@ -36,6 +36,11 @@
     "result": "tesSUCCESS",
     "timestamp": "2015-11-16T06:43:00.000Z",
     "fee": "0.000012",
+    "deliveredAmount": {
+      "currency": "USD",
+      "value": "2",
+      "counterparty": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh"
+    },
     "balanceChanges": {
       "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh": [
         {
