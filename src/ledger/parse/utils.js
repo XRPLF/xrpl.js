@@ -4,6 +4,9 @@ const _ = require('lodash');
 const transactionParser = require('ripple-lib-transactionparser');
 const utils = require('../utils');
 const BigNumber = require('bignumber.js');
+const parseAmount = require('./amount');
+
+import type {Amount} from '../common/types.js';
 
 function adjustQualityForXRP(
   quality: string, takerGetsCurrency: string, takerPaysCurrency: string
@@ -48,6 +51,24 @@ function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges) {
   });
 }
 
+function isPartialPayment(tx) {
+  return (tx.Flags & utils.common.txFlags.Payment.PartialPayment) !== 0;
+}
+
+function parseDeliveredAmount(tx: Object): Amount | void {
+  let deliveredAmount;
+
+  if (tx.TransactionType === 'Payment') {
+    if (tx.meta.delivered_amount) {
+      deliveredAmount = parseAmount(tx.meta.delivered_amount);
+    } else if (tx.Amount && !isPartialPayment(tx)) {
+      deliveredAmount = parseAmount(tx.Amount);
+    }
+  }
+
+  return deliveredAmount;
+}
+
 function parseOutcome(tx: Object): ?Object {
   const metadata = tx.meta || tx.metaData;
   if (!metadata) {
@@ -58,15 +79,16 @@ function parseOutcome(tx: Object): ?Object {
   removeEmptyCounterpartyInBalanceChanges(balanceChanges);
   removeEmptyCounterpartyInOrderbookChanges(orderbookChanges);
 
-  return {
+  return utils.common.removeUndefined({
     result: tx.meta.TransactionResult,
     timestamp: parseTimestamp(tx.date),
     fee: utils.common.dropsToXrp(tx.Fee),
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
     ledgerVersion: tx.ledger_index,
-    indexInLedger: tx.meta.TransactionIndex
-  };
+    indexInLedger: tx.meta.TransactionIndex,
+    deliveredAmount: parseDeliveredAmount(tx)
+  });
 }
 
 function hexToString(hex: string): ?string {
@@ -93,6 +115,7 @@ module.exports = {
   hexToString,
   parseTimestamp,
   adjustQualityForXRP,
+  isPartialPayment,
   dropsToXrp: utils.common.dropsToXrp,
   constants: utils.common.constants,
   txFlags: utils.common.txFlags,

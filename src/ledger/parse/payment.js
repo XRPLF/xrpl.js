@@ -6,10 +6,6 @@ const utils = require('./utils');
 const parseAmount = require('./amount');
 const txFlags = utils.txFlags;
 
-function isPartialPayment(tx) {
-  return (tx.Flags & txFlags.Payment.PartialPayment) !== 0;
-}
-
 function isNoDirectRipple(tx) {
   return (tx.Flags & txFlags.Payment.NoRippleDirect) !== 0;
 }
@@ -45,7 +41,7 @@ function parsePayment(tx: Object): Object {
     memos: utils.parseMemos(tx),
     invoiceID: tx.InvoiceID,
     paths: tx.Paths ? JSON.stringify(tx.Paths) : undefined,
-    allowPartialPayment: isPartialPayment(tx) || undefined,
+    allowPartialPayment: utils.isPartialPayment(tx) || undefined,
     noDirectRipple: isNoDirectRipple(tx) || undefined,
     limitQuality: isQualityLimited(tx) || undefined
   });

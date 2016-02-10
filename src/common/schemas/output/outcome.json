@@ -17,6 +17,10 @@
       "$ref": "value",
       "description": "The XRP fee that was charged for the transaction."
     },
+    "deliveredAmount": {
+      "$ref": "amount",
+      "description": "For payment transactions, it is impossible to reliably compute the actual delivered amount from the balanceChanges due to fixed precision. If the payment is not a partial payment and the transaction succeeded, the deliveredAmount should always be considered to be the amount specified in the transaction."
+    },
     "balanceChanges": {
       "type": "object",
       "additionalProperties": {
