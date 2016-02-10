@@ -24,6 +24,11 @@
     "result": "tesSUCCESS",
     "timestamp": "2013-03-12T23:56:50.000Z",
     "fee": "0.00001",
+    "deliveredAmount": {
+      "currency": "USD",
+      "value": "0.001",
+      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+    },
     "balanceChanges": {
       "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo": [
         {

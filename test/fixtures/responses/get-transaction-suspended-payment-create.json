@@ -35,6 +35,10 @@
     "result": "tesSUCCESS",
     "timestamp": "2015-11-16T06:43:00.000Z",
     "fee": "0.000012",
+    "deliveredAmount": {
+      "currency": "XRP",
+      "value": "0.000002"
+    },
     "balanceChanges": {
       "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh": [
         {

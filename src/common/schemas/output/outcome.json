@@ -17,6 +17,10 @@
       "$ref": "value",
       "description": "The XRP fee that was charged for the transaction."
     },
+    "deliveredAmount": {
+      "$ref": "amount",
+      "description": "The amount delivered to the destination address if the transaction is a payent"
+    },
     "balanceChanges": {
       "type": "object",
       "additionalProperties": {
