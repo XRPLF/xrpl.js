@@ -81,7 +81,7 @@ class Connection extends EventEmitter {
     }
     // we don't want this inside the try/catch or exceptions in listener
     // will be caught
-    this.emit.apply(this, parameters);
+    this.emit(...parameters);
   }
 
   get _state() {
