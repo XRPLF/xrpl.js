@@ -178,7 +178,7 @@ class Connection extends EventEmitter {
         // event is also emitted when then underlying net.Socket closes the
         // connection (end or close)."
         this._ws.on('error', error =>
-          this.emit('error', 'websocket', error.messsage, error));
+          this.emit('error', 'websocket', error.message, error));
         this._ws.on('message', this._onMessage.bind(this));
         // in browser close event can came before open event, so we must
         // resolve connect's promise after reconnect in that case.
