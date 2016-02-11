@@ -38,14 +38,14 @@ function removeEmptyCounterparty(amount) {
 }
 
 function removeEmptyCounterpartyInBalanceChanges(balanceChanges) {
-  _.forEach(balanceChanges, (changes) => {
+  _.forEach(balanceChanges, changes => {
     _.forEach(changes, removeEmptyCounterparty);
   });
 }
 
 function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges) {
-  _.forEach(orderbookChanges, (changes) => {
-    _.forEach(changes, (change) => {
+  _.forEach(orderbookChanges, changes => {
+    _.forEach(changes, change => {
       _.forEach(change, removeEmptyCounterparty);
     });
   });
@@ -99,7 +99,7 @@ function parseMemos(tx: Object): ?Array<Object> {
   if (!Array.isArray(tx.Memos) || tx.Memos.length === 0) {
     return undefined;
   }
-  return tx.Memos.map((m) => {
+  return tx.Memos.map(m => {
     return utils.common.removeUndefined({
       type: m.Memo.parsed_memo_type || hexToString(m.Memo.MemoType),
       format: m.Memo.parsed_memo_format || hexToString(m.Memo.MemoFormat),
