@@ -4,6 +4,9 @@ const _ = require('lodash');
 const transactionParser = require('ripple-lib-transactionparser');
 const utils = require('../utils');
 const BigNumber = require('bignumber.js');
+const parseAmount = require('./amount');
+
+import type {Amount} from '../common/types.js';
 
 function adjustQualityForXRP(
   quality: string, takerGetsCurrency: string, takerPaysCurrency: string
@@ -35,17 +38,37 @@ function removeEmptyCounterparty(amount) {
 }
 
 function removeEmptyCounterpartyInBalanceChanges(balanceChanges) {
-  _.forEach(balanceChanges, (changes) => {
+  _.forEach(balanceChanges, changes => {
     _.forEach(changes, removeEmptyCounterparty);
   });
 }
 
 function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges) {
-  _.forEach(orderbookChanges, (changes) => {
-    _.forEach(changes, (change) => {
+  _.forEach(orderbookChanges, changes => {
+    _.forEach(changes, change => {
       _.forEach(change, removeEmptyCounterparty);
     });
   });
+}
+
+function isPartialPayment(tx) {
+  return (tx.Flags & utils.common.txFlags.Payment.PartialPayment) !== 0;
+}
+
+function parseDeliveredAmount(tx: Object): Amount | void {
+  let deliveredAmount;
+
+  // TODO: Workaround for existing rippled bug where delivered_amount may not be
+  // provided for account_tx
+  if (tx.TransactionType === 'Payment') {
+    if (tx.meta.delivered_amount) {
+      deliveredAmount = parseAmount(tx.meta.delivered_amount);
+    } else if (tx.Amount && !isPartialPayment(tx)) {
+      deliveredAmount = parseAmount(tx.Amount);
+    }
+  }
+
+  return deliveredAmount;
 }
 
 function parseOutcome(tx: Object): ?Object {
@@ -58,15 +81,16 @@ function parseOutcome(tx: Object): ?Object {
   removeEmptyCounterpartyInBalanceChanges(balanceChanges);
   removeEmptyCounterpartyInOrderbookChanges(orderbookChanges);
 
-  return {
+  return utils.common.removeUndefined({
     result: tx.meta.TransactionResult,
     timestamp: parseTimestamp(tx.date),
     fee: utils.common.dropsToXrp(tx.Fee),
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
     ledgerVersion: tx.ledger_index,
-    indexInLedger: tx.meta.TransactionIndex
-  };
+    indexInLedger: tx.meta.TransactionIndex,
+    deliveredAmount: parseDeliveredAmount(tx)
+  });
 }
 
 function hexToString(hex: string): ?string {
@@ -77,7 +101,7 @@ function parseMemos(tx: Object): ?Array<Object> {
   if (!Array.isArray(tx.Memos) || tx.Memos.length === 0) {
     return undefined;
   }
-  return tx.Memos.map((m) => {
+  return tx.Memos.map(m => {
     return utils.common.removeUndefined({
       type: m.Memo.parsed_memo_type || hexToString(m.Memo.MemoType),
       format: m.Memo.parsed_memo_format || hexToString(m.Memo.MemoFormat),
@@ -93,6 +117,7 @@ module.exports = {
   hexToString,
   parseTimestamp,
   adjustQualityForXRP,
+  isPartialPayment,
   dropsToXrp: utils.common.dropsToXrp,
   constants: utils.common.constants,
   txFlags: utils.common.txFlags,

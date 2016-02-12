@@ -828,6 +828,7 @@ outcome | object | The outcome of the transaction (what effects it had).
 *outcome.orderbookChanges.\*[].* makerExchangeRate | [value](#value) | *Optional* The exchange rate between the `quantity` currency and the `totalPrice` currency from the point of view of the maker.
 *outcome.* ledgerVersion | integer | The ledger version that the transaction was validated in.
 *outcome.* indexInLedger | integer | The ordering index of the transaction in the ledger.
+*outcome.* deliveredAmount | [amount](#amount) | *Optional* For payment transactions, it is impossible to reliably compute the actual delivered amount from the balanceChanges due to fixed precision. If the payment is not a partial payment and the transaction succeeded, the deliveredAmount should always be considered to be the amount specified in the transaction.
 *outcome.* timestamp | date-time string | *Optional* The timestamp when the transaction was validated. (May be missing when requesting transactions in binary mode.)
 
 ### Example
@@ -867,6 +868,11 @@ return api.getTransaction(id).then(transaction => {
     "result": "tesSUCCESS",
     "timestamp": "2013-03-12T23:56:50.000Z",
     "fee": "0.00001",
+    "deliveredAmount": {
+      "currency": "USD",
+      "value": "0.001",
+      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+    },
     "balanceChanges": {
       "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo": [
         {
@@ -1001,6 +1007,11 @@ return api.getTransactions(address).then(transaction => {
     "outcome": {
       "result": "tesSUCCESS",
       "fee": "0.00001",
+      "deliveredAmount": {
+        "currency": "USD",
+        "value": "0.001",
+        "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      },
       "balanceChanges": {
         "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo": [
           {
@@ -1093,6 +1104,11 @@ return api.getTransactions(address).then(transaction => {
     "outcome": {
       "result": "tesSUCCESS",
       "fee": "0.00001",
+      "deliveredAmount": {
+        "currency": "USD",
+        "value": "0.001",
+        "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      },
       "balanceChanges": {
         "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo": [
           {
