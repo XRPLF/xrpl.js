@@ -58,6 +58,8 @@ function isPartialPayment(tx) {
 function parseDeliveredAmount(tx: Object): Amount | void {
   let deliveredAmount;
 
+  // TODO: Workaround for existing rippled bug where delivered_amount may not be
+  // provided for account_tx
   if (tx.TransactionType === 'Payment') {
     if (tx.meta.delivered_amount) {
       deliveredAmount = parseAmount(tx.meta.delivered_amount);
