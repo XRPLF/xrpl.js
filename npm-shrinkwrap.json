@@ -1,19 +1,20 @@
 {
   "name": "ripple-lib",
-  "version": "0.16.5",
-  "npm-shrinkwrap-version": "200.4.0",
-  "node-version": "v0.12.2",
+  "version": "0.16.6",
   "dependencies": {
     "ajv": {
       "version": "1.4.10",
+      "from": "https://registry.npmjs.org/ajv/-/ajv-1.4.10.tgz",
       "resolved": "https://registry.npmjs.org/ajv/-/ajv-1.4.10.tgz",
       "dependencies": {
         "json-stable-stringify": {
           "version": "1.0.0",
+          "from": "https://registry.npmjs.org/json-stable-stringify/-/json-stable-stringify-1.0.0.tgz",
           "resolved": "https://registry.npmjs.org/json-stable-stringify/-/json-stable-stringify-1.0.0.tgz",
           "dependencies": {
             "jsonify": {
               "version": "0.0.0",
+              "from": "https://registry.npmjs.org/jsonify/-/jsonify-0.0.0.tgz",
               "resolved": "https://registry.npmjs.org/jsonify/-/jsonify-0.0.0.tgz"
             }
           }
@@ -22,132 +23,160 @@
     },
     "ajv-i18n": {
       "version": "0.1.1",
+      "from": "https://registry.npmjs.org/ajv-i18n/-/ajv-i18n-0.1.1.tgz",
       "resolved": "https://registry.npmjs.org/ajv-i18n/-/ajv-i18n-0.1.1.tgz"
     },
     "babel-polyfill": {
       "version": "6.3.14",
+      "from": "https://registry.npmjs.org/babel-polyfill/-/babel-polyfill-6.3.14.tgz",
       "resolved": "https://registry.npmjs.org/babel-polyfill/-/babel-polyfill-6.3.14.tgz",
       "dependencies": {
+        "core-js": {
+          "version": "1.2.6",
+          "from": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz",
+          "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz"
+        },
         "babel-regenerator-runtime": {
           "version": "6.3.13",
+          "from": "https://registry.npmjs.org/babel-regenerator-runtime/-/babel-regenerator-runtime-6.3.13.tgz",
           "resolved": "https://registry.npmjs.org/babel-regenerator-runtime/-/babel-regenerator-runtime-6.3.13.tgz"
         },
         "babel-runtime": {
           "version": "5.8.34",
+          "from": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.34.tgz",
           "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.34.tgz"
-        },
-        "core-js": {
-          "version": "1.2.6",
-          "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz"
         }
       }
     },
     "babel-runtime": {
       "version": "6.3.19",
+      "from": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-6.3.19.tgz",
       "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-6.3.19.tgz",
       "dependencies": {
         "core-js": {
           "version": "1.2.6",
+          "from": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz",
           "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz"
         }
       }
     },
     "bignumber.js": {
       "version": "2.1.2",
+      "from": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.1.2.tgz",
       "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-2.1.2.tgz"
     },
     "https-proxy-agent": {
       "version": "1.0.0",
+      "from": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-1.0.0.tgz",
       "resolved": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-1.0.0.tgz",
       "dependencies": {
         "agent-base": {
           "version": "2.0.1",
+          "from": "https://registry.npmjs.org/agent-base/-/agent-base-2.0.1.tgz",
           "resolved": "https://registry.npmjs.org/agent-base/-/agent-base-2.0.1.tgz",
           "dependencies": {
             "semver": {
               "version": "5.0.3",
+              "from": "https://registry.npmjs.org/semver/-/semver-5.0.3.tgz",
               "resolved": "https://registry.npmjs.org/semver/-/semver-5.0.3.tgz"
             }
           }
         },
         "debug": {
           "version": "2.2.0",
+          "from": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz",
           "resolved": "https://registry.npmjs.org/debug/-/debug-2.2.0.tgz",
           "dependencies": {
             "ms": {
               "version": "0.7.1",
+              "from": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz",
               "resolved": "https://registry.npmjs.org/ms/-/ms-0.7.1.tgz"
             }
           }
         },
         "extend": {
           "version": "3.0.0",
+          "from": "https://registry.npmjs.org/extend/-/extend-3.0.0.tgz",
           "resolved": "https://registry.npmjs.org/extend/-/extend-3.0.0.tgz"
         }
       }
     },
     "jayson": {
       "version": "1.2.2",
+      "from": "https://registry.npmjs.org/jayson/-/jayson-1.2.2.tgz",
       "resolved": "https://registry.npmjs.org/jayson/-/jayson-1.2.2.tgz",
       "dependencies": {
         "JSONStream": {
           "version": "1.0.3",
+          "from": "https://registry.npmjs.org/JSONStream/-/JSONStream-1.0.3.tgz",
           "resolved": "https://registry.npmjs.org/JSONStream/-/JSONStream-1.0.3.tgz",
           "dependencies": {
             "jsonparse": {
               "version": "1.0.0",
+              "from": "https://registry.npmjs.org/jsonparse/-/jsonparse-1.0.0.tgz",
               "resolved": "https://registry.npmjs.org/jsonparse/-/jsonparse-1.0.0.tgz"
             },
             "through": {
               "version": "2.3.8",
+              "from": "https://registry.npmjs.org/through/-/through-2.3.8.tgz",
               "resolved": "https://registry.npmjs.org/through/-/through-2.3.8.tgz"
             }
           }
         },
         "commander": {
           "version": "1.3.2",
+          "from": "https://registry.npmjs.org/commander/-/commander-1.3.2.tgz",
           "resolved": "https://registry.npmjs.org/commander/-/commander-1.3.2.tgz",
           "dependencies": {
             "keypress": {
               "version": "0.1.0",
+              "from": "https://registry.npmjs.org/keypress/-/keypress-0.1.0.tgz",
               "resolved": "https://registry.npmjs.org/keypress/-/keypress-0.1.0.tgz"
             }
           }
         },
         "eyes": {
           "version": "0.1.8",
+          "from": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz",
           "resolved": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
         },
         "lodash": {
           "version": "3.6.0",
+          "from": "https://registry.npmjs.org/lodash/-/lodash-3.6.0.tgz",
           "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.6.0.tgz"
         }
       }
     },
     "lodash": {
       "version": "3.10.1",
+      "from": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
     },
     "ripple-address-codec": {
       "version": "2.0.1",
+      "from": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz",
       "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz",
       "dependencies": {
         "hash.js": {
           "version": "1.0.3",
+          "from": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
           "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
+              "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
               "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             }
           }
         },
         "x-address-codec": {
           "version": "0.7.2",
+          "from": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.7.2.tgz",
           "resolved": "https://registry.npmjs.org/x-address-codec/-/x-address-codec-0.7.2.tgz",
           "dependencies": {
             "base-x": {
               "version": "1.0.1",
+              "from": "https://registry.npmjs.org/base-x/-/base-x-1.0.1.tgz",
               "resolved": "https://registry.npmjs.org/base-x/-/base-x-1.0.1.tgz"
             }
           }
@@ -156,76 +185,88 @@
     },
     "ripple-binary-codec": {
       "version": "0.1.2",
+      "from": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.1.2.tgz",
       "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.1.2.tgz",
       "dependencies": {
         "babel-runtime": {
           "version": "5.8.34",
+          "from": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.34.tgz",
           "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.34.tgz",
           "dependencies": {
             "core-js": {
               "version": "1.2.6",
+              "from": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz",
               "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz"
             }
           }
         },
         "bn.js": {
           "version": "3.3.0",
+          "from": "https://registry.npmjs.org/bn.js/-/bn.js-3.3.0.tgz",
           "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.3.0.tgz"
-        },
-        "decimal.js": {
-          "version": "4.0.3",
-          "resolved": "https://registry.npmjs.org/decimal.js/-/decimal.js-4.0.3.tgz"
-        },
-        "inherits": {
-          "version": "2.0.1",
-          "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
         },
         "create-hash": {
           "version": "1.1.2",
+          "from": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
           "resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
           "dependencies": {
             "cipher-base": {
               "version": "1.0.2",
+              "from": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.2.tgz",
               "resolved": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.2.tgz"
-            },
-            "inherits": {
-              "version": "2.0.1",
-              "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             },
             "ripemd160": {
               "version": "1.0.1",
+              "from": "https://registry.npmjs.org/ripemd160/-/ripemd160-1.0.1.tgz",
               "resolved": "https://registry.npmjs.org/ripemd160/-/ripemd160-1.0.1.tgz"
             },
             "sha.js": {
               "version": "2.4.4",
+              "from": "https://registry.npmjs.org/sha.js/-/sha.js-2.4.4.tgz",
               "resolved": "https://registry.npmjs.org/sha.js/-/sha.js-2.4.4.tgz"
             }
           }
+        },
+        "decimal.js": {
+          "version": "4.0.3",
+          "from": "https://registry.npmjs.org/decimal.js/-/decimal.js-4.0.3.tgz",
+          "resolved": "https://registry.npmjs.org/decimal.js/-/decimal.js-4.0.3.tgz"
+        },
+        "inherits": {
+          "version": "2.0.1",
+          "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
+          "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
         }
       }
     },
     "ripple-hashes": {
       "version": "0.1.0",
+      "from": "https://registry.npmjs.org/ripple-hashes/-/ripple-hashes-0.1.0.tgz",
       "resolved": "https://registry.npmjs.org/ripple-hashes/-/ripple-hashes-0.1.0.tgz",
       "dependencies": {
         "create-hash": {
           "version": "1.1.2",
+          "from": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
           "resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.1.2.tgz",
           "dependencies": {
             "cipher-base": {
               "version": "1.0.2",
+              "from": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.2.tgz",
               "resolved": "https://registry.npmjs.org/cipher-base/-/cipher-base-1.0.2.tgz"
             },
             "inherits": {
               "version": "2.0.1",
+              "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
               "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             },
             "ripemd160": {
               "version": "1.0.1",
+              "from": "https://registry.npmjs.org/ripemd160/-/ripemd160-1.0.1.tgz",
               "resolved": "https://registry.npmjs.org/ripemd160/-/ripemd160-1.0.1.tgz"
             },
             "sha.js": {
               "version": "2.4.4",
+              "from": "https://registry.npmjs.org/sha.js/-/sha.js-2.4.4.tgz",
               "resolved": "https://registry.npmjs.org/sha.js/-/sha.js-2.4.4.tgz"
             }
           }
@@ -234,42 +275,51 @@
     },
     "ripple-keypairs": {
       "version": "0.10.0",
+      "from": "https://registry.npmjs.org/ripple-keypairs/-/ripple-keypairs-0.10.0.tgz",
       "resolved": "https://registry.npmjs.org/ripple-keypairs/-/ripple-keypairs-0.10.0.tgz",
       "dependencies": {
         "babel-runtime": {
           "version": "5.8.34",
+          "from": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.34.tgz",
           "resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-5.8.34.tgz",
           "dependencies": {
             "core-js": {
               "version": "1.2.6",
+              "from": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz",
               "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz"
             }
           }
         },
         "bn.js": {
           "version": "3.3.0",
+          "from": "https://registry.npmjs.org/bn.js/-/bn.js-3.3.0.tgz",
           "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-3.3.0.tgz"
         },
         "brorand": {
           "version": "1.0.5",
+          "from": "https://registry.npmjs.org/brorand/-/brorand-1.0.5.tgz",
           "resolved": "https://registry.npmjs.org/brorand/-/brorand-1.0.5.tgz"
         },
         "elliptic": {
           "version": "5.2.1",
+          "from": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
           "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
+              "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
               "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             }
           }
         },
         "hash.js": {
           "version": "1.0.3",
+          "from": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
           "resolved": "https://registry.npmjs.org/hash.js/-/hash.js-1.0.3.tgz",
           "dependencies": {
             "inherits": {
               "version": "2.0.1",
+              "from": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz",
               "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
             }
           }
@@ -278,18 +328,22 @@
     },
     "ripple-lib-transactionparser": {
       "version": "0.6.0",
+      "from": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.6.0.tgz",
       "resolved": "https://registry.npmjs.org/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.6.0.tgz"
     },
     "ws": {
       "version": "1.0.1",
+      "from": "https://registry.npmjs.org/ws/-/ws-1.0.1.tgz",
       "resolved": "https://registry.npmjs.org/ws/-/ws-1.0.1.tgz",
       "dependencies": {
         "options": {
           "version": "0.0.6",
+          "from": "https://registry.npmjs.org/options/-/options-0.0.6.tgz",
           "resolved": "https://registry.npmjs.org/options/-/options-0.0.6.tgz"
         },
         "ultron": {
           "version": "1.0.2",
+          "from": "https://registry.npmjs.org/ultron/-/ultron-1.0.2.tgz",
           "resolved": "https://registry.npmjs.org/ultron/-/ultron-1.0.2.tgz"
         }
       }
