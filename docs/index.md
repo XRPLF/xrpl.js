@@ -2924,7 +2924,7 @@ const trustline = {
     }
   ]
 };
-return api.preparePayment(address, trustline).then(prepared =>
+return api.prepareTrustline(address, trustline).then(prepared =>
   {/* ... */});
 ```
 
