@@ -1,5 +1,4 @@
 /* eslint-disable max-nested-callbacks */
-'use strict';
 
 const _ = require('lodash');
 const net = require('net');
@@ -103,6 +102,26 @@ describe('Connection', function() {
       assert(false, 'Should throw NotConnectedError');
     }).catch(error => {
       assert(error instanceof this.api.errors.NotConnectedError);
+    });
+  });
+
+  it('should throw NotConnectedError if server not responding ', function(
+    done
+  ) {
+    if (process.browser) {
+      const phantomTest = /PhantomJS/;
+      if (phantomTest.test(navigator.userAgent)) {
+        // inside PhantomJS this one just hangs, so skip as not very relevant
+        done();
+        return;
+      }
+    }
+
+    const connection = new utils.common.Connection('ws://127.0.0.1:321');
+    connection.on('error', done);
+    connection.connect().catch(error => {
+      assert(error instanceof this.api.errors.NotConnectedError);
+      done();
     });
   });
 
