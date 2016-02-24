@@ -1,5 +1,4 @@
 /* eslint-disable max-nested-callbacks */
-'use strict';
 
 const _ = require('lodash');
 const net = require('net');
