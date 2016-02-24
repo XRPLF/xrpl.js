@@ -97,6 +97,10 @@ class Connection extends EventEmitter {
   }
 
   _onUnexpectedClose(resolve = function() {}, reject = function() {}) {
+    if (this._onOpenErrorBound) {
+      this._ws.removeListener('error', this._onOpenErrorBound);
+      this._onOpenErrorBound = null;
+    }
     this._ws = null;
     this._isReady = false;
     this.connect().then(resolve, reject);
@@ -107,6 +111,11 @@ class Connection extends EventEmitter {
     this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this);
     this._ws.once('close', this._onUnexpectedCloseBound);
 
+    this._ws.removeListener('error', this._onOpenErrorBound);
+    this._onOpenErrorBound = null;
+    this._ws.on('error', error =>
+      this.emit('error', 'websocket', error.message, error));
+
     const request = {
       command: 'subscribe',
       streams: ['ledger']
@@ -116,6 +125,10 @@ class Connection extends EventEmitter {
       this._isReady = true;
       this.emit('connected');
     });
+  }
+
+  _onOpenError(reject, error) {
+    reject(new NotConnectedError(error && error.message));
   }
 
   _createWebSocket() {
@@ -177,8 +190,11 @@ class Connection extends EventEmitter {
         // should still be emitted; the "ws" documentation says: "The close
         // event is also emitted when then underlying net.Socket closes the
         // connection (end or close)."
-        this._ws.on('error', error =>
-          this.emit('error', 'websocket', error.message, error));
+        // In case if there is connection error (say, server is not responding)
+        // we must return this error to connection's caller. After successful
+        // opening, we will forward all errors to main api object.
+        this._onOpenErrorBound = this._onOpenError.bind(this, reject);
+        this._ws.once('error', this._onOpenErrorBound);
         this._ws.on('message', this._onMessage.bind(this));
         // in browser close event can came before open event, so we must
         // resolve connect's promise after reconnect in that case.
