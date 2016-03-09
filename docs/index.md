@@ -811,7 +811,7 @@ Name | Type | Description
 id | [id](#transaction-id) | A hash of the transaction that can be used to identify it.
 address | [address](#ripple-address) | The address of the account that initiated the transaction.
 sequence | [sequence](#account-sequence-number) | The account sequence number of the transaction for the account that initiated it.
-type | [transactionType](#transaction-types) | The type of the tranasction.
+type | [transactionType](#transaction-types) | The type of the transaction.
 specification | object | A specification that would produce the same outcome as this transaction. The structure of the specification depends on the value of the `type` field (see [Transaction Types](#transaction-types) for details). *Note:* This is **not** necessarily the same as the original specification.
 outcome | object | The outcome of the transaction (what effects it had).
 *outcome.* result | string | Result code returned by rippled. See [Transaction Results](https://ripple.com/build/transactions/#full-transaction-response-list) for a complete list.
