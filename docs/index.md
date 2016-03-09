@@ -3407,7 +3407,7 @@ This method returns an object with the following structure:
 
 Name | Type | Description
 ---- | ---- | -----------
-resultCode | string | The result code returned by rippled. [List of tranasction responses](http://pages.lightthenight.org/gba/SanFran15/ripple)
+resultCode | string | The result code returned by rippled. [List of transaction responses](https://ripple.com/build/transactions/#full-transaction-response-list)
 resultMessage | string | Human-readable explanation of the status of the transaction.
 
 ### Example

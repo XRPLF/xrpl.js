@@ -5,7 +5,7 @@
   "properties": {
     "resultCode": {
       "type": "string",
-      "description": "The result code returned by rippled. [List of tranasction responses](http://pages.lightthenight.org/gba/SanFran15/ripple)"
+      "description": "The result code returned by rippled. [List of transaction responses](https://ripple.com/build/transactions/#full-transaction-response-list)"
     },
     "resultMessage": {
       "type": "string",
