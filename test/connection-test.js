@@ -117,6 +117,7 @@ describe('Connection', function() {
       }
     }
 
+    // Address where no one listens
     const connection =
       new utils.common.Connection('ws://testripple.circleci.com:129');
     connection.on('error', done);
