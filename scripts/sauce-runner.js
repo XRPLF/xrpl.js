@@ -1,4 +1,3 @@
-'use strict';
 
 const _ = require('lodash');
 const MochaSauce = require('mocha-in-sauce');
@@ -18,7 +17,6 @@ function main() {
     maxDuration: 180000,
     // the current build name (optional)
     build: Date.now(),
-    seleniumVersion: '2.50.1',
     url: testUrl,
     runSauceConnect: true
   };
