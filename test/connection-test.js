@@ -117,7 +117,8 @@ describe('Connection', function() {
       }
     }
 
-    const connection = new utils.common.Connection('ws://127.0.0.1:321');
+    const connection =
+      new utils.common.Connection('ws://testripple.circleci.com:129');
     connection.on('error', done);
     connection.connect().catch(error => {
       assert(error instanceof this.api.errors.NotConnectedError);
