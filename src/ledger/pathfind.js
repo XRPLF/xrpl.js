@@ -93,7 +93,7 @@ function filterSourceFundsLowPaths(pathfind: PathFind,
     paths.alternatives = _.filter(paths.alternatives, alt => {
       return alt.source_amount &&
         pathfind.source.amount &&
-        alt.source_amount.value === pathfind.source.amount.value;
+        new BigNumber(alt.source_amount.value).eq(pathfind.source.amount.value);
     });
   }
   return paths;
