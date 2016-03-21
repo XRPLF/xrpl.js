@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; // eslint-disable-line strict
 const _ = require('lodash');
 const addresses = require('../addresses');
 
@@ -160,6 +160,7 @@ module.exports = function(request, options = {}) {
         {
           'flags': 0,
           'seq': 814018,
+          'quality': '16922629533.64839',
           'taker_gets': {
             'currency': 'NZD',
             'issuer': 'rsP3mgGb2tcYUrxiLFiHJiQXhsziegtwBc',
