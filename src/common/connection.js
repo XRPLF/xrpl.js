@@ -35,6 +35,8 @@ class Connection extends EventEmitter {
     this._ledgerVersion = null;
     this._availableLedgerVersions = new RangeSet();
     this._nextRequestID = 1;
+    this._retry = 0;
+    this._retryTimer = null;
   }
 
   _updateLedgerVersions(data) {
@@ -95,14 +97,44 @@ class Connection extends EventEmitter {
     return this._state === WebSocket.OPEN && this._isReady;
   }
 
-  _onUnexpectedClose(resolve = function() {}, reject = function() {}) {
+  _onUnexpectedClose(resolve, reject) {
     if (this._onOpenErrorBound) {
       this._ws.removeListener('error', this._onOpenErrorBound);
       this._onOpenErrorBound = null;
     }
     this._ws = null;
     this._isReady = false;
-    this.connect().then(resolve, reject);
+    if (_.isFunction(resolve)) {
+      // connection was closed before it was properly opened, so we must return
+      // error to connect's caller
+      this.connect().then(resolve, reject);
+    } else {
+      this.emit('disconnected', true);
+      this._retryConnect();
+    }
+  }
+
+  _retryConnect() {
+    this._retry += 1;
+    const retryTimeout = (this._retry < 40)
+      // First, for 2 seconds: 20 times per second
+      ? (1000 / 20)
+      : (this._retry < 40 + 60)
+        // Then, for 1 minute: once per second
+        ? (1000)
+        : (this._retry < 40 + 60 + 60)
+          // Then, for 10 minutes: once every 10 seconds
+          ? (10 * 1000)
+          // Then: once every 30 seconds
+          : (30 * 1000);
+    this._retryTimer = setTimeout(() => {
+      this.connect().catch(this._retryConnect.bind(this));
+    }, retryTimeout);
+  }
+
+  _clearReconnectTimer() {
+    clearTimeout(this._retryTimer);
+    this._retryTimer = null;
   }
 
   _onOpen() {
@@ -112,6 +144,7 @@ class Connection extends EventEmitter {
 
     this._ws.removeListener('error', this._onOpenErrorBound);
     this._onOpenErrorBound = null;
+    this._retry = 0;
     this._ws.on('error', error =>
       this.emit('error', 'websocket', error.message, error));
 
@@ -127,6 +160,7 @@ class Connection extends EventEmitter {
   }
 
   _onOpenError(reject, error) {
+    this._onOpenErrorBound = null;
     reject(new NotConnectedError(error && error.message));
   }
 
@@ -174,6 +208,7 @@ class Connection extends EventEmitter {
   }
 
   connect() {
+    this._clearReconnectTimer();
     return new Promise((resolve, reject) => {
       if (!this._url) {
         reject(new ConnectionError(
@@ -208,6 +243,8 @@ class Connection extends EventEmitter {
   }
 
   disconnect() {
+    this._clearReconnectTimer();
+    this._retry = 0;
     return new Promise(resolve => {
       if (this._state === WebSocket.CLOSED) {
         resolve();
@@ -218,6 +255,7 @@ class Connection extends EventEmitter {
         this._ws.once('close', () => {
           this._ws = null;
           this._isReady = false;
+          this.emit('disconnected', false);
           resolve();
         });
         this._ws.close();

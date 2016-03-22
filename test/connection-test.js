@@ -193,6 +193,46 @@ describe('Connection', function() {
     }, 1);
   });
 
+  it('reconnect on several unexpected close', function(done) {
+    if (process.browser) {
+      // can't be tested in browser this way, so skipping
+      done();
+      return;
+    }
+    this.timeout(7000);
+    const self = this;
+    function breakConnection() {
+      setTimeout(() => {
+        self.mockRippled.close();
+        setTimeout(() => {
+          self.mockRippled = setupAPI.createMockRippled(self._mockedServerPort);
+        }, 1500);
+      }, 21);
+    }
+
+    let connectsCount = 0;
+    let disconnectsCount = 0;
+    this.api.connection.on('disconnected', () => {
+      disconnectsCount += 1;
+    });
+    this.api.connection.on('connected', () => {
+      connectsCount += 1;
+      if (connectsCount < 3) {
+        breakConnection();
+      }
+      if (connectsCount === 3) {
+        if (disconnectsCount !== 3) {
+          done(new Error('disconnectsCount must be equal to 3 (got ' +
+            disconnectsCount + ' instead)'));
+        } else {
+          done();
+        }
+      }
+    });
+
+    breakConnection();
+  });
+
   it('Multiply connect calls', function() {
     return this.api.connect().then(() => {
       return this.api.connect();
