@@ -1,5 +1,5 @@
 /* @flow */
-'use strict';
+'use strict'; // eslint-disable-line strict
 const utils = require('./utils');
 const flags = require('./flags').orderFlags;
 const parseAmount = require('./amount');
@@ -31,11 +31,14 @@ function parseAccountOrder(address: string, order: Object): Object {
     expirationTime: utils.parseTimestamp(order.expiration)
   });
 
+  const makerExchangeRate = order.quality ?
+      utils.adjustQualityForXRP(order.quality.toString(),
+        takerGetsAmount.currency, takerPaysAmount.currency) :
+      computeQuality(takerGetsAmount, takerPaysAmount);
   const properties = {
     maker: address,
     sequence: order.seq,
-    makerExchangeRate: order.quality ? order.quality.toString()
-      : computeQuality(takerGetsAmount, takerPaysAmount)
+    makerExchangeRate: makerExchangeRate
   };
 
   return {specification, properties};
