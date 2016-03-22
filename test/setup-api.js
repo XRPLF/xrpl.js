@@ -1,3 +1,5 @@
+'use strict'; // eslint-disable-line 
+
 const net = require('net');
 const RippleAPI = require('ripple-api').RippleAPI;
 const RippleAPIBroadcast = require('ripple-api').RippleAPIBroadcast;

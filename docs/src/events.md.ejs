@@ -47,3 +47,35 @@ api.on('error', (errorCode, errorMessage, data) => {
 ```
 tooBusy: The server is too busy to help you now.
 ```
+
+## connected
+
+This event is emitted after connection successfully opened.
+
+### Example
+
+```javascript
+api.on('connected', () => {
+  console.log('Connection is open now.');
+});
+```
+
+## disconnected
+
+This event is emitted when connection is closed.
+
+### Return Value
+
+The only parameter is a number containing the [close code](https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent) send by the server.
+
+### Example
+
+```javascript
+api.on('disconnected', (code) => {
+  if (code !== 1000) {
+    console.log('Connection is closed due to error.');
+  } else {
+    console.log('Connection is closed normally.');
+  }
+});
+```

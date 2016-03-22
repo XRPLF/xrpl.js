@@ -1,3 +1,4 @@
+'use strict'; // eslint-disable-line 
 /* eslint-disable max-nested-callbacks */
 
 const _ = require('lodash');
@@ -212,7 +213,9 @@ describe('Connection', function() {
 
     let connectsCount = 0;
     let disconnectsCount = 0;
-    this.api.connection.on('disconnected', () => {
+    let code = 0;
+    this.api.connection.on('disconnected', _code => {
+      code = _code;
       disconnectsCount += 1;
     });
     this.api.connection.on('connected', () => {
@@ -224,6 +227,9 @@ describe('Connection', function() {
         if (disconnectsCount !== 3) {
           done(new Error('disconnectsCount must be equal to 3 (got ' +
             disconnectsCount + ' instead)'));
+        } else if (code !== 1006) {
+          done(new Error('disconnect must send code 1006 (got ' + code +
+            ' instead)'));
         } else {
           done();
         }
@@ -231,6 +237,36 @@ describe('Connection', function() {
     });
 
     breakConnection();
+  });
+
+  it('should emit disconnected event with code 1000 (CLOSE_NORMAL)',
+  function(done
+  ) {
+    this.api.once('disconnected', code => {
+      assert.strictEqual(code, 1000);
+      done();
+    });
+    this.api.disconnect();
+  });
+
+  it('should emit disconnected event with code 1006 (CLOSE_ABNORMAL)',
+  function(done
+  ) {
+    if (process.browser) {
+      // can't be tested in browser this way, so skipping
+      done();
+      return;
+    }
+    this.api.once('disconnected', code => {
+      assert.strictEqual(code, 1006);
+      done();
+    });
+    this.mockRippled.close();
+  });
+
+  it('should emit connected event on after reconnect', function(done) {
+    this.api.once('connected', done);
+    this.api.connection._ws.close();
   });
 
   it('Multiply connect calls', function() {
