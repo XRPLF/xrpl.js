@@ -1,5 +1,5 @@
 /* @flow */
-'use strict';
+'use strict'; // eslint-disable-line 
 
 /* eslint-disable max-len */
 // Enable core-js polyfills. This allows use of ES6/7 extensions listed here:
@@ -88,6 +88,12 @@ class RippleAPI extends EventEmitter {
       });
       this.connection.on('error', (errorCode, errorMessage, data) => {
         this.emit('error', errorCode, errorMessage, data);
+      });
+      this.connection.on('connected', () => {
+        this.emit('connected');
+      });
+      this.connection.on('disconnected', onError => {
+        this.emit('disconnected', onError);
       });
     } else {
       // use null object pattern to provide better error message if user

@@ -61,6 +61,8 @@
 - [API Events](#api-events)
   - [ledger](#ledger)
   - [error](#error)
+  - [connected](#connected)
+  - [disconnected](#disconnected)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -89,6 +91,14 @@ const api = new RippleAPI({
 });
 api.on('error', (errorCode, errorMessage) => {
   console.log(errorCode + ': ' + errorMessage);
+});
+api.on('connected', () => {
+  console.log('connected');
+});
+api.on('disconnected', (code) => {
+  // code - [close code](https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent) sent by the server
+  // will be 1000 if this was normal closure
+  console.log('disconnected, code:', code);
 });
 api.connect().then(() => {
   /* insert code here */
@@ -3591,5 +3601,37 @@ api.on('error', (errorCode, errorMessage, data) => {
 
 ```
 tooBusy: The server is too busy to help you now.
+```
+
+## connected
+
+This event is emitted after connection successfully opened.
+
+### Example
+
+```javascript
+api.on('connected', () => {
+  console.log('Connection is open now.');
+});
+```
+
+## disconnected
+
+This event is emitted when connection is closed.
+
+### Return Value
+
+The only parameter is a number containing the [close code](https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent) send by the server.
+
+### Example
+
+```javascript
+api.on('disconnected', (code) => {
+  if (code !== 1000) {
+    console.log('Connection is closed due to error.');
+  } else {
+    console.log('Connection is closed normally.');
+  }
+});
 ```
 

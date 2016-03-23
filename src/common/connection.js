@@ -1,3 +1,5 @@
+'use strict'; // eslint-disable-line 
+
 const _ = require('lodash');
 const {EventEmitter} = require('events');
 const WebSocket = require('ws');
@@ -35,6 +37,8 @@ class Connection extends EventEmitter {
     this._ledgerVersion = null;
     this._availableLedgerVersions = new RangeSet();
     this._nextRequestID = 1;
+    this._retry = 0;
+    this._retryTimer = null;
   }
 
   _updateLedgerVersions(data) {
@@ -95,23 +99,61 @@ class Connection extends EventEmitter {
     return this._state === WebSocket.OPEN && this._isReady;
   }
 
-  _onUnexpectedClose(resolve = function() {}, reject = function() {}) {
+  _onUnexpectedClose(beforeOpen, resolve, reject, code) {
     if (this._onOpenErrorBound) {
       this._ws.removeListener('error', this._onOpenErrorBound);
       this._onOpenErrorBound = null;
     }
     this._ws = null;
     this._isReady = false;
-    this.connect().then(resolve, reject);
+    if (beforeOpen) {
+      // connection was closed before it was properly opened, so we must return
+      // error to connect's caller
+      this.connect().then(resolve, reject);
+    } else {
+      // if first parameter ws lib sends close code,
+      // but sometimes it forgots about it, so default to 1006 - CLOSE_ABNORMAL
+      this.emit('disconnected', code || 1006);
+      this._retryConnect();
+    }
+  }
+
+  _calculateTimeout(retriesCount) {
+    return (retriesCount < 40)
+      // First, for 2 seconds: 20 times per second
+      ? (1000 / 20)
+      : (retriesCount < 40 + 60)
+        // Then, for 1 minute: once per second
+        ? (1000)
+        : (retriesCount < 40 + 60 + 60)
+          // Then, for 10 minutes: once every 10 seconds
+          ? (10 * 1000)
+          // Then: once every 30 seconds
+          : (30 * 1000);
+  }
+
+  _retryConnect() {
+    this._retry += 1;
+    const retryTimeout = this._calculateTimeout(this._retry);
+    this._retryTimer = setTimeout(() => {
+      this.connect().catch(this._retryConnect.bind(this));
+    }, retryTimeout);
+  }
+
+  _clearReconnectTimer() {
+    clearTimeout(this._retryTimer);
+    this._retryTimer = null;
   }
 
   _onOpen() {
     this._ws.removeListener('close', this._onUnexpectedCloseBound);
-    this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this);
+    this._onUnexpectedCloseBound =
+      this._onUnexpectedClose.bind(this, false, null, null);
     this._ws.once('close', this._onUnexpectedCloseBound);
 
     this._ws.removeListener('error', this._onOpenErrorBound);
     this._onOpenErrorBound = null;
+    this._retry = 0;
     this._ws.on('error', error =>
       this.emit('error', 'websocket', error.message, error));
 
@@ -127,6 +169,7 @@ class Connection extends EventEmitter {
   }
 
   _onOpenError(reject, error) {
+    this._onOpenErrorBound = null;
     reject(new NotConnectedError(error && error.message));
   }
 
@@ -174,6 +217,7 @@ class Connection extends EventEmitter {
   }
 
   connect() {
+    this._clearReconnectTimer();
     return new Promise((resolve, reject) => {
       if (!this._url) {
         reject(new ConnectionError(
@@ -199,7 +243,7 @@ class Connection extends EventEmitter {
         // resolve connect's promise after reconnect in that case.
         // after open event we will rebound _onUnexpectedCloseBound
         // without resolve and reject functions
-        this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this,
+        this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this, true,
           resolve, reject);
         this._ws.once('close', this._onUnexpectedCloseBound);
         this._ws.once('open', () => this._onOpen().then(resolve, reject));
@@ -208,6 +252,8 @@ class Connection extends EventEmitter {
   }
 
   disconnect() {
+    this._clearReconnectTimer();
+    this._retry = 0;
     return new Promise(resolve => {
       if (this._state === WebSocket.CLOSED) {
         resolve();
@@ -215,9 +261,10 @@ class Connection extends EventEmitter {
         this._ws.once('close', resolve);
       } else {
         this._ws.removeListener('close', this._onUnexpectedCloseBound);
-        this._ws.once('close', () => {
+        this._ws.once('close', code => {
           this._ws = null;
           this._isReady = false;
+          this.emit('disconnected', code || 1000); // 1000 - CLOSE_NORMAL
           resolve();
         });
         this._ws.close();

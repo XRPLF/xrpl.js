@@ -1,4 +1,5 @@
-'use strict';
+'use strict'; // eslint-disable-line 
+
 const net = require('net');
 const RippleAPI = require('ripple-api').RippleAPI;
 const RippleAPIBroadcast = require('ripple-api').RippleAPIBroadcast;
@@ -27,6 +28,7 @@ function getFreePort() {
 function setupMockRippledConnection(testcase, port) {
   return new Promise((resolve, reject) => {
     testcase.mockRippled = createMockRippled(port);
+    testcase._mockedServerPort = port;
     testcase.api = new RippleAPI({server: 'ws://localhost:' + port});
     testcase.api.connect().then(() => {
       testcase.api.once('ledger', () => resolve());
@@ -73,5 +75,6 @@ function teardown(done) {
 module.exports = {
   setup: setup,
   teardown: teardown,
-  setupBroadcast: setupBroadcast
+  setupBroadcast: setupBroadcast,
+  createMockRippled: createMockRippled
 };
