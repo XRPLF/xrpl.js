@@ -379,4 +379,58 @@ describe('Connection', function() {
     });
     this.api.connection._ws.emit('message', JSON.stringify(message));
   });
+
+  it('should throw NotConnectedError if server does not have validated ledgers',
+  function() {
+    if (process.browser) {
+      // do not work in browser now, skipping
+      return false;
+    }
+    this.timeout(3000);
+
+    this.api.connection._send(JSON.stringify({
+      command: 'global_config',
+      data: {returnEmptySubscribeRequest: 1}
+    }));
+
+    const api = new RippleAPI({server: this.api.connection._url});
+    return api.connect().then(() => {
+      assert(false, 'Must have thrown!');
+    }, error => {
+      assert(error instanceof this.api.errors.NotConnectedError,
+        'Must throw NotConnectedError, got instead ' + String(error));
+    });
+  });
+
+  it('should try to reconnect on empty subscribe response on reconnect',
+  function(done) {
+    if (process.browser) {
+      // do not work in browser now, skipping
+      done();
+      return;
+    }
+    this.timeout(23000);
+
+    this.api.on('error', error => {
+      done(error || new Error('Should not emit error.'));
+    });
+    let disconncedCount = 0;
+    this.api.on('connected', () => {
+      done(disconncedCount !== 1 ?
+        new Error('Wrong number of disconnects') : undefined);
+    });
+    this.api.on('disconnected', () => {
+      disconncedCount++;
+    });
+
+    this.api.connection._send(JSON.stringify({
+      command: 'global_config',
+      data: {returnEmptySubscribeRequest: 3}
+    }));
+
+    this.api.connection._send(JSON.stringify({
+      command: 'test_command',
+      data: {disconnectIn: 10}
+    }));
+  });
 });

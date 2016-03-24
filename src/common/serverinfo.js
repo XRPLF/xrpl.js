@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; // eslint-disable-line 
 const _ = require('lodash');
 const {convertKeysFromSnakeCaseToCamelCase} = require('./utils');
 import type {Connection} from './connection';
@@ -43,18 +43,20 @@ function getServerInfo(connection: Connection): Promise<GetServerInfoResponse> {
   return connection.request({command: 'server_info'}).then(response => {
     const info = convertKeysFromSnakeCaseToCamelCase(response.info);
     renameKeys(info, {hostid: 'hostID'});
-    renameKeys(info.validatedLedger, {
-      baseFeeXrp: 'baseFeeXRP',
-      reserveBaseXrp: 'reserveBaseXRP',
-      reserveIncXrp: 'reserveIncrementXRP',
-      seq: 'ledgerVersion'
-    });
-    info.validatedLedger.baseFeeXRP =
-      info.validatedLedger.baseFeeXRP.toString();
-    info.validatedLedger.reserveBaseXRP =
-      info.validatedLedger.reserveBaseXRP.toString();
-    info.validatedLedger.reserveIncrementXRP =
-      info.validatedLedger.reserveIncrementXRP.toString();
+    if (info.validatedLedger) {
+      renameKeys(info.validatedLedger, {
+        baseFeeXrp: 'baseFeeXRP',
+        reserveBaseXrp: 'reserveBaseXRP',
+        reserveIncXrp: 'reserveIncrementXRP',
+        seq: 'ledgerVersion'
+      });
+      info.validatedLedger.baseFeeXRP =
+        info.validatedLedger.baseFeeXRP.toString();
+      info.validatedLedger.reserveBaseXRP =
+        info.validatedLedger.reserveBaseXRP.toString();
+      info.validatedLedger.reserveIncrementXRP =
+        info.validatedLedger.reserveIncrementXRP.toString();
+    }
     return info;
   });
 }
