@@ -146,25 +146,36 @@ class Connection extends EventEmitter {
   }
 
   _onOpen() {
-    this._ws.removeListener('close', this._onUnexpectedCloseBound);
-    this._onUnexpectedCloseBound =
-      this._onUnexpectedClose.bind(this, false, null, null);
-    this._ws.once('close', this._onUnexpectedCloseBound);
-
     this._ws.removeListener('error', this._onOpenErrorBound);
     this._onOpenErrorBound = null;
-    this._retry = 0;
-    this._ws.on('error', error =>
-      this.emit('error', 'websocket', error.message, error));
 
     const request = {
       command: 'subscribe',
       streams: ['ledger']
     };
     return this.request(request).then(data => {
+      if (_.isEmpty(data) || !data.ledger_index) {
+        // rippled instance doesn't have validated ledgers
+        return this._disconnect(false).then(() => {
+          throw new NotConnectedError('Rippled not initialized');
+        });
+      }
+
       this._updateLedgerVersions(data);
+
+      this._ws.removeListener('close', this._onUnexpectedCloseBound);
+      this._onUnexpectedCloseBound =
+        this._onUnexpectedClose.bind(this, false, null, null);
+      this._ws.once('close', this._onUnexpectedCloseBound);
+
+      this._retry = 0;
+      this._ws.on('error', error =>
+        this.emit('error', 'websocket', error.message, error));
+
       this._isReady = true;
       this.emit('connected');
+
+      return undefined;
     });
   }
 
@@ -252,8 +263,14 @@ class Connection extends EventEmitter {
   }
 
   disconnect() {
-    this._clearReconnectTimer();
-    this._retry = 0;
+    return this._disconnect(true);
+  }
+
+  _disconnect(calledByUser) {
+    if (calledByUser) {
+      this._clearReconnectTimer();
+      this._retry = 0;
+    }
     return new Promise(resolve => {
       if (this._state === WebSocket.CLOSED) {
         resolve();
@@ -264,7 +281,9 @@ class Connection extends EventEmitter {
         this._ws.once('close', code => {
           this._ws = null;
           this._isReady = false;
-          this.emit('disconnected', code || 1000); // 1000 - CLOSE_NORMAL
+          if (calledByUser) {
+            this.emit('disconnected', code || 1000); // 1000 - CLOSE_NORMAL
+          }
           resolve();
         });
         this._ws.close();

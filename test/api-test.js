@@ -1,5 +1,5 @@
 /* eslint-disable max-nested-callbacks */
-'use strict';
+'use strict'; // eslint-disable-line 
 const _ = require('lodash');
 const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
@@ -978,6 +978,19 @@ describe('RippleAPI', function() {
     }).catch(error => {
       assert(error instanceof this.api.errors.RippledError);
       assert(_.includes(error.message, 'slowDown'));
+    });
+  });
+
+  it('getServerInfo - no validated ledger', function() {
+    this.api.connection._send(JSON.stringify({
+      command: 'config',
+      data: {serverInfoWithoutValidated: true}
+    }));
+
+    return this.api.getServerInfo().then(info => {
+      assert.strictEqual(info.networkLedger, 'waiting');
+    }).catch(error => {
+      assert(false, 'Should not throw Error, got ' + String(error));
     });
   });
 

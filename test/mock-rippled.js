@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; // eslint-disable-line 
 const _ = require('lodash');
 const assert = require('assert');
 const WebSocketServer = require('ws').Server;
@@ -79,6 +79,8 @@ module.exports = function(port) {
     });
   });
 
+  mock.config = {};
+
   mock.onAny(function() {
     if (this.event.indexOf('request_') !== 0) {
       return;
@@ -101,6 +103,18 @@ module.exports = function(port) {
     conn.config = _.assign(conn.config, request.data);
   });
 
+  mock.on('request_test_command', function(request, conn) {
+    assert.strictEqual(request.command, 'test_command');
+    if (request.data.disconnectIn) {
+      setTimeout(conn.terminate.bind(conn), request.data.disconnectIn);
+    }
+  });
+
+  mock.on('request_global_config', function(request, conn) {
+    assert.strictEqual(request.command, 'global_config');
+    mock.config = _.assign(conn.config, request.data);
+  });
+
   mock.on('request_echo', function(request, conn) {
     assert.strictEqual(request.command, 'echo');
     conn.send(JSON.stringify(request.data));
@@ -112,6 +126,8 @@ module.exports = function(port) {
       conn.send(createResponse(request, fixtures.server_info.error));
     } else if (conn.config.disconnectOnServerInfo) {
       conn.close();
+    } else if (conn.config.serverInfoWithoutValidated) {
+      conn.send(createResponse(request, fixtures.server_info.noValidated));
     } else {
       conn.send(createResponse(request, fixtures.server_info.normal));
     }
@@ -119,7 +135,10 @@ module.exports = function(port) {
 
   mock.on('request_subscribe', function(request, conn) {
     assert.strictEqual(request.command, 'subscribe');
-    if (request.accounts) {
+    if (mock.config.returnEmptySubscribeRequest) {
+      mock.config.returnEmptySubscribeRequest--;
+      conn.send(createResponse(request, fixtures.empty));
+    } else if (request.accounts) {
       assert(_.indexOf(_.values(addresses), request.accounts[0]) !== -1);
     }
     conn.send(createResponse(request, fixtures.subscribe));

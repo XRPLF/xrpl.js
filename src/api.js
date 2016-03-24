@@ -92,8 +92,8 @@ class RippleAPI extends EventEmitter {
       this.connection.on('connected', () => {
         this.emit('connected');
       });
-      this.connection.on('disconnected', onError => {
-        this.emit('disconnected', onError);
+      this.connection.on('disconnected', code => {
+        this.emit('disconnected', code);
       });
     } else {
       // use null object pattern to provide better error message if user
