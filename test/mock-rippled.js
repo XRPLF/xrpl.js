@@ -9,6 +9,7 @@ const hashes = require('./fixtures/hashes');
 const transactionsResponse = require('./fixtures/rippled/account-tx');
 const accountLinesResponse = require('./fixtures/rippled/account-lines');
 const fullLedger = require('./fixtures/rippled/ledger-full-38129.json');
+const {getFreePort} = require('./utils/net-utils');
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';
@@ -46,7 +47,7 @@ function createLedgerResponse(request, response) {
   return JSON.stringify(newResponse);
 }
 
-module.exports = function(port) {
+module.exports = function createMockRippled(port) {
   const mock = new WebSocketServer({port: port});
   _.assign(mock, EventEmitter2.prototype);
 
@@ -71,6 +72,11 @@ module.exports = function(port) {
   };
 
   mock.on('connection', function(conn) {
+    if (mock.config.breakNextConnection) {
+      mock.config.breakNextConnection = false;
+      conn.terminate();
+      return;
+    }
     this.socket = conn;
     conn.config = {};
     conn.on('message', function(requestJSON) {
@@ -107,6 +113,22 @@ module.exports = function(port) {
     assert.strictEqual(request.command, 'test_command');
     if (request.data.disconnectIn) {
       setTimeout(conn.terminate.bind(conn), request.data.disconnectIn);
+    } else if (request.data.openOnOtherPort) {
+      getFreePort().then(newPort => {
+        createMockRippled(newPort);
+        conn.send(createResponse(request, {status: 'success', type: 'response',
+          result: {port: newPort}}
+        ));
+      });
+    } else if (request.data.closeServerAndReopen) {
+      setTimeout(() => {
+        conn.terminate();
+        close.call(mock, () => {
+          setTimeout(() => {
+            createMockRippled(port);
+          }, request.data.closeServerAndReopen);
+        });
+      }, 10);
     }
   });
 
@@ -128,6 +150,9 @@ module.exports = function(port) {
       conn.close();
     } else if (conn.config.serverInfoWithoutValidated) {
       conn.send(createResponse(request, fixtures.server_info.noValidated));
+    } else if (mock.config.returnSyncingServerInfo) {
+      mock.config.returnSyncingServerInfo--;
+      conn.send(createResponse(request, fixtures.server_info.syncing));
     } else {
       conn.send(createResponse(request, fixtures.server_info.normal));
     }

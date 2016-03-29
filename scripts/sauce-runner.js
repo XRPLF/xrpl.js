@@ -40,6 +40,10 @@ function main() {
    version: '43'});
   sauce.browser({browserName: 'safari', platform: 'OS X 10.11',
     version: '9'});
+  sauce.browser({browserName: 'safari', platform: 'OS X 10.10',
+    version: '8'});
+  sauce.browser({browserName: 'safari', platform: 'OS X 10.9',
+    version: '7'});
   sauce.browser({browserName: 'chrome', platform: 'OS X 10.11',
     version: '47'});
   sauce.browser({browserName: 'chrome', platform: 'Linux',

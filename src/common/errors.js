@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; // eslint-disable-line 
 const util = require('util');
 const browserHacks = require('./browser-hacks');
 
@@ -53,6 +53,8 @@ class NotConnectedError extends ConnectionError {}
 
 class DisconnectedError extends ConnectionError {}
 
+class RippledNotInitializedError extends ConnectionError {}
+
 class TimeoutError extends ConnectionError {}
 
 class ResponseFormatError extends ConnectionError {}
@@ -85,6 +87,7 @@ module.exports = {
   RippledError,
   NotConnectedError,
   DisconnectedError,
+  RippledNotInitializedError,
   TimeoutError,
   ResponseFormatError,
   ValidationError,

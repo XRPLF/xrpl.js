@@ -194,49 +194,81 @@ describe('Connection', function() {
     }, 1);
   });
 
-  it('reconnect on several unexpected close', function(done) {
-    if (process.browser) {
-      // can't be tested in browser this way, so skipping
-      done();
-      return;
-    }
-    this.timeout(7000);
-    const self = this;
-    function breakConnection() {
-      setTimeout(() => {
-        self.mockRippled.close();
-        setTimeout(() => {
-          self.mockRippled = setupAPI.createMockRippled(self._mockedServerPort);
-        }, 1500);
-      }, 21);
-    }
-
-    let connectsCount = 0;
-    let disconnectsCount = 0;
-    let code = 0;
-    this.api.connection.on('disconnected', _code => {
-      code = _code;
-      disconnectsCount += 1;
+  describe('reconnection test', function() {
+    beforeEach(function() {
+      this.api.connection.__workingUrl = this.api.connection._url;
+      this.api.connection.__doReturnBad = function() {
+        this._url = this.__badUrl;
+        const self = this;
+        function onReconnect(num) {
+          if (num >= 2) {
+            self._url = self.__workingUrl;
+            self.removeListener('reconnecting', onReconnect);
+          }
+        }
+        this.on('reconnecting', onReconnect);
+      };
     });
-    this.api.connection.on('connected', () => {
-      connectsCount += 1;
-      if (connectsCount < 3) {
-        breakConnection();
-      }
-      if (connectsCount === 3) {
-        if (disconnectsCount !== 3) {
-          done(new Error('disconnectsCount must be equal to 3 (got ' +
-            disconnectsCount + ' instead)'));
-        } else if (code !== 1006) {
-          done(new Error('disconnect must send code 1006 (got ' + code +
-            ' instead)'));
-        } else {
+
+    afterEach(function() {
+
+    });
+
+    it('reconnect on several unexpected close', function(done) {
+      if (process.browser) {
+        const phantomTest = /PhantomJS/;
+        if (phantomTest.test(navigator.userAgent)) {
+          // inside PhantomJS this one just hangs, so skip as not very relevant
           done();
+          return;
         }
       }
-    });
+      this.timeout(70001);
+      const self = this;
+      self.api.connection.__badUrl = 'ws://testripple.circleci.com:129';
+      function breakConnection() {
+        self.api.connection.__doReturnBad();
+        self.api.connection._send(JSON.stringify({
+          command: 'test_command',
+          data: {disconnectIn: 10}
+        }));
+      }
 
-    breakConnection();
+      let connectsCount = 0;
+      let disconnectsCount = 0;
+      let reconnectsCount = 0;
+      let code = 0;
+      this.api.connection.on('reconnecting', () => {
+        reconnectsCount += 1;
+      });
+      this.api.connection.on('disconnected', _code => {
+        code = _code;
+        disconnectsCount += 1;
+      });
+      const num = 3;
+      this.api.connection.on('connected', () => {
+        connectsCount += 1;
+        if (connectsCount < num) {
+          breakConnection();
+        }
+        if (connectsCount === num) {
+          if (disconnectsCount !== num) {
+            done(new Error('disconnectsCount must be equal to ' + num +
+              '(got ' + disconnectsCount + ' instead)'));
+          } else if (reconnectsCount !== num * 2) {
+            done(new Error('reconnectsCount must be equal to ' + num * 2 +
+              ' (got ' + reconnectsCount + ' instead)'));
+          } else if (code !== 1006) {
+            done(new Error('disconnect must send code 1006 (got ' + code +
+              ' instead)'));
+          } else {
+            done();
+          }
+        }
+      });
+
+      breakConnection();
+    });
   });
 
   it('should emit disconnected event with code 1000 (CLOSE_NORMAL)',
@@ -252,16 +284,17 @@ describe('Connection', function() {
   it('should emit disconnected event with code 1006 (CLOSE_ABNORMAL)',
   function(done
   ) {
-    if (process.browser) {
-      // can't be tested in browser this way, so skipping
-      done();
-      return;
-    }
+    this.api.once('error', error => {
+      done(new Error('should not throw error, got ' + String(error)));
+    });
     this.api.once('disconnected', code => {
       assert.strictEqual(code, 1006);
       done();
     });
-    this.mockRippled.close();
+    this.api.connection._send(JSON.stringify({
+      command: 'test_command',
+      data: {disconnectIn: 10}
+    }));
   });
 
   it('should emit connected event on after reconnect', function(done) {
@@ -380,12 +413,9 @@ describe('Connection', function() {
     this.api.connection._ws.emit('message', JSON.stringify(message));
   });
 
-  it('should throw NotConnectedError if server does not have validated ledgers',
+  it('should throw RippledNotInitializedError if server does not have ' +
+  'validated ledgers',
   function() {
-    if (process.browser) {
-      // do not work in browser now, skipping
-      return false;
-    }
     this.timeout(3000);
 
     this.api.connection._send(JSON.stringify({
@@ -397,18 +427,13 @@ describe('Connection', function() {
     return api.connect().then(() => {
       assert(false, 'Must have thrown!');
     }, error => {
-      assert(error instanceof this.api.errors.NotConnectedError,
-        'Must throw NotConnectedError, got instead ' + String(error));
+      assert(error instanceof this.api.errors.RippledNotInitializedError,
+        'Must throw RippledNotInitializedError, got instead ' + String(error));
     });
   });
 
   it('should try to reconnect on empty subscribe response on reconnect',
   function(done) {
-    if (process.browser) {
-      // do not work in browser now, skipping
-      done();
-      return;
-    }
     this.timeout(23000);
 
     this.api.on('error', error => {
