@@ -6,7 +6,8 @@ const WebSocket = require('ws');
 const parseURL = require('url').parse;
 const RangeSet = require('./rangeset').RangeSet;
 const {RippledError, DisconnectedError, NotConnectedError,
-  TimeoutError, ResponseFormatError, ConnectionError} = require('./errors');
+  TimeoutError, ResponseFormatError, ConnectionError,
+  RippledNotInitializedError} = require('./errors');
 
 function isStreamMessageType(type) {
   return type === 'ledgerClosed' ||
@@ -39,6 +40,8 @@ class Connection extends EventEmitter {
     this._nextRequestID = 1;
     this._retry = 0;
     this._retryTimer = null;
+    this._onOpenErrorBound = null;
+    this._onUnexpectedCloseBound = null;
   }
 
   _updateLedgerVersions(data) {
@@ -104,6 +107,8 @@ class Connection extends EventEmitter {
       this._ws.removeListener('error', this._onOpenErrorBound);
       this._onOpenErrorBound = null;
     }
+    // just in case
+    this._ws.removeAllListeners('open');
     this._ws = null;
     this._isReady = false;
     if (beforeOpen) {
@@ -136,6 +141,7 @@ class Connection extends EventEmitter {
     this._retry += 1;
     const retryTimeout = this._calculateTimeout(this._retry);
     this._retryTimer = setTimeout(() => {
+      this.emit('reconnecting', this._retry);
       this.connect().catch(this._retryConnect.bind(this));
     }, retryTimeout);
   }
@@ -146,8 +152,13 @@ class Connection extends EventEmitter {
   }
 
   _onOpen() {
-    this._ws.removeListener('error', this._onOpenErrorBound);
-    this._onOpenErrorBound = null;
+    if (!this._ws) {
+      return Promise.reject(new DisconnectedError());
+    }
+    if (this._onOpenErrorBound) {
+      this._ws.removeListener('error', this._onOpenErrorBound);
+      this._onOpenErrorBound = null;
+    }
 
     const request = {
       command: 'subscribe',
@@ -157,20 +168,22 @@ class Connection extends EventEmitter {
       if (_.isEmpty(data) || !data.ledger_index) {
         // rippled instance doesn't have validated ledgers
         return this._disconnect(false).then(() => {
-          throw new NotConnectedError('Rippled not initialized');
+          throw new RippledNotInitializedError('Rippled not initialized');
         });
       }
 
       this._updateLedgerVersions(data);
-
-      this._ws.removeListener('close', this._onUnexpectedCloseBound);
-      this._onUnexpectedCloseBound =
-        this._onUnexpectedClose.bind(this, false, null, null);
-      this._ws.once('close', this._onUnexpectedCloseBound);
+      this._rebindOnUnxpectedClose();
 
       this._retry = 0;
-      this._ws.on('error', error =>
-        this.emit('error', 'websocket', error.message, error));
+      this._ws.on('error', error => {
+        if (process.browser && error && error.type === 'error') {
+          // we are in browser, ignore error - `close` event will be fired
+          // after error
+          return;
+        }
+        this.emit('error', 'websocket', error.message, error);
+      });
 
       this._isReady = true;
       this.emit('connected');
@@ -179,8 +192,25 @@ class Connection extends EventEmitter {
     });
   }
 
+  _rebindOnUnxpectedClose() {
+    if (this._onUnexpectedCloseBound) {
+      this._ws.removeListener('close', this._onUnexpectedCloseBound);
+    }
+    this._onUnexpectedCloseBound =
+      this._onUnexpectedClose.bind(this, false, null, null);
+    this._ws.once('close', this._onUnexpectedCloseBound);
+  }
+
+  _unbindOnUnxpectedClose() {
+    if (this._onUnexpectedCloseBound) {
+      this._ws.removeListener('close', this._onUnexpectedCloseBound);
+    }
+    this._onUnexpectedCloseBound = null;
+  }
+
   _onOpenError(reject, error) {
     this._onOpenErrorBound = null;
+    this._unbindOnUnxpectedClose();
     reject(new NotConnectedError(error && error.message));
   }
 
@@ -277,7 +307,10 @@ class Connection extends EventEmitter {
       } else if (this._state === WebSocket.CLOSING) {
         this._ws.once('close', resolve);
       } else {
-        this._ws.removeListener('close', this._onUnexpectedCloseBound);
+        if (this._onUnexpectedCloseBound) {
+          this._ws.removeListener('close', this._onUnexpectedCloseBound);
+          this._onUnexpectedCloseBound = null;
+        }
         this._ws.once('close', code => {
           this._ws = null;
           this._isReady = false;

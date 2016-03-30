@@ -1,29 +1,11 @@
 'use strict'; // eslint-disable-line 
 
-const net = require('net');
 const RippleAPI = require('ripple-api').RippleAPI;
 const RippleAPIBroadcast = require('ripple-api').RippleAPIBroadcast;
 const ledgerClosed = require('./fixtures/rippled/ledger-close');
 const createMockRippled = require('./mock-rippled');
+const {getFreePort} = require('./utils/net-utils');
 
-// using a free port instead of a constant port enables parallelization
-function getFreePort() {
-  return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    let port;
-    server.on('listening', function() {
-      port = server.address().port;
-      server.close();
-    });
-    server.on('close', function() {
-      resolve(port);
-    });
-    server.on('error', function(error) {
-      reject(error);
-    });
-    server.listen(0);
-  });
-}
 
 function setupMockRippledConnection(testcase, port) {
   return new Promise((resolve, reject) => {

@@ -33,6 +33,7 @@ module.exports = {
   server_info: {
     normal: require('./server-info'),
     noValidated: require('./server-info-no-validated'),
+    syncing: require('./server-info-syncing'),
     error: require('./server-info-error')
   },
   path_find: {
