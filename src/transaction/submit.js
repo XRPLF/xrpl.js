@@ -1,5 +1,5 @@
 /* @flow */
-'use strict';
+'use strict'; // eslint-disable-line 
 const _ = require('lodash');
 const utils = require('./utils');
 const {validate} = utils.common;
@@ -12,7 +12,7 @@ function isImmediateRejection(engineResult: string): boolean {
   // if the required fee changes (this does not occur at the time of
   // this writing, but it could change in the future)
   // all other error classes can potentially result in transcation validation
-  return _.startsWith(engineResult, 'tem') || _.startsWith(engineResult, 'tej');
+  return _.startsWith(engineResult, 'tem');
 }
 
 function formatSubmitResponse(response) {
