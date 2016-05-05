@@ -1,5 +1,5 @@
 /* @flow */
-'use strict';
+'use strict'; // eslint-disable-line strict
 const _ = require('lodash');
 const utils = require('./utils');
 const parseTransaction = require('./parse/transaction');
@@ -13,15 +13,18 @@ function attachTransactionDate(connection: Connection, tx: Object
     return Promise.resolve(tx);
   }
 
-  if (!tx.ledger_index) {
+  const ledgerVersion = tx.ledger_index || tx.LedgerSequence;
+
+  if (!ledgerVersion) {
     return new Promise(() => {
-      throw new errors.NotFoundError('ledger_index not found in tx');
+      throw new errors.NotFoundError(
+        'ledger_index and LedgerSequence not found in tx');
     });
   }
 
   const request = {
     command: 'ledger',
-    ledger_index: tx.ledger_index
+    ledger_index: ledgerVersion
   };
 
   return connection.request(request).then(data => {

@@ -1,0 +1,43 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "hash": "C6A40F56127436DCD830B1B35FF939FD05B5747D30D6542572B7A835239817AF",
+    "ledger_index": 3717633,
+    "date": 460832270,
+    "TransactionType": "SetFee",
+    "Sequence": 0,
+    "ReferenceFeeUnits": 10,
+    "ReserveBase": 50000000,
+    "ReserveIncrement": 12500000,
+    "BaseFee": "000000000000000A",
+    "Fee": "0",
+    "SigningPubKey": "",
+    "Account": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+    "meta": {
+      "TransactionIndex": 3,
+      "AffectedNodes": [
+        {
+          "ModifiedNode": {
+            "LedgerEntryType": "FeeSettings",
+            "LedgerIndex": "4BC50C9B0D8515D3EAAE1E74B29A95804346C491EE1A95BF25E4AAB854A6A651",
+            "PreviousFields": {
+              "ReserveBase": 20000000,
+              "ReserveIncrement": 5000000
+            },
+            "FinalFields": {
+              "Flags": 0,
+              "ReferenceFeeUnits": 10,
+              "ReserveBase": 50000000,
+              "ReserveIncrement": 12500000,
+              "BaseFee": "000000000000000A"
+            }
+          }
+        }
+      ],
+      "TransactionResult": "tesSUCCESS"
+    },
+    "validated": true
+  }
+}

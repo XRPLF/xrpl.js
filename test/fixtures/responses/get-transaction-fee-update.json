@@ -1,0 +1,21 @@
+{
+  "type": "feeUpdate",
+  "address": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+  "sequence": 0,
+  "id": "C6A40F56127436DCD830B1B35FF939FD05B5747D30D6542572B7A835239817AF",
+  "specification": {
+    "baseFeeXRP": "0.00001",
+    "referenceFeeUnits": 10,
+    "reserveBaseXRP": "50",
+    "reserveIncrementXRP": "12.5"
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2014-08-08T16:57:50.000Z",
+    "fee": "0",
+    "balanceChanges": {},
+    "orderbookChanges": {},
+    "ledgerVersion": 3717633,
+    "indexInLedger": 3
+  }
+}

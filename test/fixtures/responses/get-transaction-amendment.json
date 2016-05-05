@@ -1,0 +1,17 @@
+{
+  "type": "amendment",
+  "address": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+  "sequence": 0,
+  "id": "A971B83ABED51D83749B73F3C1AAA627CD965AFF74BE8CD98299512D6FB0658F",
+  "specification": {
+    "amendment": "42426C4D4F1009EE67080A9B7965B44656D7714D104A72F9B4369F97ABF044EE"
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2016-05-05T16:33:30.000Z",
+    "fee": "0",
+    "balanceChanges": {},
+    "orderbookChanges": {},
+    "indexInLedger": 0
+  }
+}

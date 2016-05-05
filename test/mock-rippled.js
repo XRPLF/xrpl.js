@@ -1,4 +1,4 @@
-'use strict'; // eslint-disable-line 
+'use strict'; // eslint-disable-line
 const _ = require('lodash');
 const assert = require('assert');
 const WebSocketServer = require('ws').Server;
@@ -292,6 +292,12 @@ module.exports = function createMockRippled(port) {
     } else if (request.transaction ===
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA13') {
       conn.send(createResponse(request, fixtures.tx.LedgerZero));
+    } else if (request.transaction ===
+        'A971B83ABED51D83749B73F3C1AAA627CD965AFF74BE8CD98299512D6FB0658F') {
+      conn.send(createResponse(request, fixtures.tx.Amendment));
+    } else if (request.transaction ===
+        'C6A40F56127436DCD830B1B35FF939FD05B5747D30D6542572B7A835239817AF') {
+      conn.send(createResponse(request, fixtures.tx.SetFee));
     } else {
       assert(false, 'Unrecognized transaction hash: ' + request.transaction);
     }

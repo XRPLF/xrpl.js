@@ -1,5 +1,5 @@
 /* @flow */
-'use strict';
+'use strict'; // eslint-disable-line strict
 const assert = require('assert');
 const utils = require('./utils');
 const parsePayment = require('./payment');
@@ -11,6 +11,8 @@ const parseSuspendedPaymentCreation = require('./suspended-payment-creation');
 const parseSuspendedPaymentExecution = require('./suspended-payment-execution');
 const parseSuspendedPaymentCancellation =
   require('./suspended-payment-cancellation');
+const parseFeeUpdate = require('./fee-update');
+const parseAmendment = require('./amendment');
 
 function parseTransactionType(type) {
   const mapping = {
@@ -23,7 +25,9 @@ function parseTransactionType(type) {
     SuspendedPaymentCreate: 'suspendedPaymentCreation',
     SuspendedPaymentFinish: 'suspendedPaymentExecution',
     SuspendedPaymentCancel: 'suspendedPaymentCancellation',
-    SignerListSet: 'settings'
+    SignerListSet: 'settings',
+    SetFee: 'feeUpdate',          // pseudo-transaction
+    EnableAmendment: 'amendment'  // pseudo-transaction
   };
   return mapping[type] || null;
 }
@@ -38,7 +42,9 @@ function parseTransaction(tx: Object): Object {
     'settings': parseSettings,
     'suspendedPaymentCreation': parseSuspendedPaymentCreation,
     'suspendedPaymentExecution': parseSuspendedPaymentExecution,
-    'suspendedPaymentCancellation': parseSuspendedPaymentCancellation
+    'suspendedPaymentCancellation': parseSuspendedPaymentCancellation,
+    'feeUpdate': parseFeeUpdate,
+    'amendment': parseAmendment
   };
   const parser = mapping[type];
   assert(parser !== undefined, 'Unrecognized transaction type');
