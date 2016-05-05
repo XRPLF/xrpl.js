@@ -1,5 +1,5 @@
 /* eslint-disable max-nested-callbacks */
-'use strict'; // eslint-disable-line 
+'use strict'; // eslint-disable-line
 const _ = require('lodash');
 const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
@@ -708,6 +708,21 @@ describe('RippleAPI', function() {
       });
     });
 
+    it('getTransaction - amendment', function() {
+      const hash =
+        'A971B83ABED51D83749B73F3C1AAA627CD965AFF74BE8CD98299512D6FB0658F';
+      return this.api.getTransaction(hash).then(result => {
+        assert.deepEqual(result, responses.getTransaction.amendment);
+      });
+    });
+
+    it('getTransaction - feeUpdate', function() {
+      const hash =
+        'C6A40F56127436DCD830B1B35FF939FD05B5747D30D6542572B7A835239817AF';
+      return this.api.getTransaction(hash).then(result => {
+        assert.deepEqual(result, responses.getTransaction.feeUpdate);
+      });
+    });
   });
 
   it('getTransactions', function() {

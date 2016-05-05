@@ -72,6 +72,8 @@ module.exports = {
       require('./tx/suspended-payment-execution-simple.json'),
     Unrecognized: require('./tx/unrecognized.json'),
     NoMeta: require('./tx/no-meta.json'),
-    LedgerZero: require('./tx/ledger-zero.json')
+    LedgerZero: require('./tx/ledger-zero.json'),
+    Amendment: require('./tx/amendment.json'),
+    SetFee: require('./tx/set-fee.json')
   }
 };

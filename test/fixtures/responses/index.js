@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; // eslint-disable-line strict
 
 module.exports = {
   generateAddress: require('./generate-address.json'),
@@ -43,7 +43,9 @@ module.exports = {
     suspendedPaymentExecution:
       require('./get-transaction-suspended-payment-execution.json'),
     suspendedPaymentExecutionSimple:
-      require('./get-transaction-suspended-payment-execution-simple.json')
+      require('./get-transaction-suspended-payment-execution-simple.json'),
+    amendment: require('./get-transaction-amendment.json'),
+    feeUpdate: require('./get-transaction-fee-update.json')
   },
   getTransactions: {
     normal: require('./get-transactions.json'),
