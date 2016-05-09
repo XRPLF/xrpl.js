@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert-diff');
 const {Amount} = require('../src/coretypes');
 

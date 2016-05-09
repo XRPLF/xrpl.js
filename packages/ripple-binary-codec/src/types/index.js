@@ -1,5 +1,3 @@
-'use strict';
-
 const enums = require('../enums');
 const {Field} = enums;
 const {AccountID} = require('./account-id');

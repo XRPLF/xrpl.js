@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert');
 const coreTypes = require('../src/coretypes');
 /* eslint-disable no-unused-vars */

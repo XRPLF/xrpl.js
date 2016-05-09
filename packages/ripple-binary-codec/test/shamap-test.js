@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert-diff');
 const {ShaMap} = require('../src/shamap.js');
 const {binary: {serializeObject}, Hash256, HashPrefix}

@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const makeClass = require('../utils/make-class');
 const {slice} = require('../utils/bytes-utils');

@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert-diff');
 const {Hash160, Hash256, Currency, AccountID} = require('../src/coretypes');
 

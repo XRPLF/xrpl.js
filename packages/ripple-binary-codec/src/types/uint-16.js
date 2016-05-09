@@ -1,5 +1,3 @@
-'use strict';
-
 const makeClass = require('../utils/make-class');
 const {UInt} = require('./uint');
 

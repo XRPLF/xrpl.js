@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const BN = require('bn.js');
 const assert = require('assert');

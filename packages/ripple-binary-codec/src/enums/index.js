@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert');
 const _ = require('lodash');
 const {parseBytes, serializeUIntN} = require('./../utils/bytes-utils');
@@ -102,7 +100,7 @@ Enums.Field = makeClass({
         const extra = {ordinal, name, type, bytes};
         return new this(_.assign(definition, extra));
       });
-      return _.indexBy(fields, 'name');
+      return _.keyBy(fields, 'name');
     },
     header(type, nth) {
       const name = nth;

@@ -1,7 +1,5 @@
 /* eslint-disable func-style */
 
-'use strict';
-
 const BN = require('bn.js');
 const assert = require('assert-diff');
 const lib = require('../src/coretypes');
@@ -78,7 +76,7 @@ function UIntTest() {
 
 
 function parseLedger4320278() {
-  it(`can parse object`, done => {
+  it('can parse object', done => {
     this.timeout(30e3);
     const json = loadFixture('as-ledger-4320278.json');
     json.forEach(e => {
@@ -89,7 +87,7 @@ function parseLedger4320278() {
 }
 
 function deliverMinTest() {
-  it(`can serialize DeliverMin`, () => {
+  it('can serialize DeliverMin', () => {
     assert.strictEqual(encode(deliverMinTx), deliverMinTxBinary);
   });
 }

@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const assert = require('assert');
 const BN = require('bn.js');
@@ -58,7 +56,7 @@ const Amount = makeClass({
 
       const isIOU = b1 & 0x80;
       const isPositive = b1 & 0x40;
-      const sign = isPositive ? '+' : '-';
+      const sign = isPositive ? '' : '-';
 
       if (isIOU) {
         mantissa[0] = 0;
@@ -67,13 +65,13 @@ const Amount = makeClass({
         const exponent = ((b1 & 0x3F) << 2) + ((b2 & 0xff) >> 6) - 97;
         mantissa[1] &= 0x3F;
         // decimal.js won't accept e notation with hex
-        const value = new Decimal(sign + bytesToHex(mantissa), 16)
+        const value = new Decimal(`${sign}0x${bytesToHex(mantissa)}`)
                                  .times('1e' + exponent);
         return new this(value, currency, issuer);
       }
 
       mantissa[0] &= 0x3F;
-      const drops = new Decimal(sign + bytesToHex(mantissa), 16);
+      const drops = new Decimal(`${sign}0x${bytesToHex(mantissa)}`);
       const xrpValue = drops.dividedBy('1e6');
       return new this(xrpValue, Currency.XRP);
     }

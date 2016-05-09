@@ -1,5 +1,3 @@
-'use strict';
-
 const makeClass = require('../utils/make-class');
 const {ensureArrayLikeIs, SerializedType} = require('./serialized-type');
 const {Field} = require('../enums');

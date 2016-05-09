@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert');
 const makeClass = require('./utils/make-class');
 const {Hash256} = require('./types');

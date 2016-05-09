@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert');
 const {parseBytes, bytesToHex} = require('../utils/bytes-utils');
 const makeClass = require('../utils/make-class');

@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert');
 const {loadFixture} = require('./utils');
 const ledgerHashes = require('../src/ledger-hashes');

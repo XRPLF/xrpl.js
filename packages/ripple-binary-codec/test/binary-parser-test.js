@@ -1,7 +1,5 @@
 /* eslint-disable func-style */
 
-'use strict';
-
 const coreTypes = require('../src/coretypes');
 
 const _ = require('lodash');
@@ -157,10 +155,18 @@ function transactionParsingTests() {
     }
     assert(parser.end());
   });
+
   it('can be done with higher level apis', () => {
     const parser = makeParser(transaction.binary);
     const jsonFromBinary = readJSON(parser);
     assert.deepEqual(jsonFromBinary, tx_json);
+  });
+
+  it('readJSON (binary.decode) does not return STObject ', () => {
+    const parser = makeParser(transaction.binary);
+    const jsonFromBinary = readJSON(parser);
+    assert((jsonFromBinary instanceof coreTypes.STObject) === false);
+    assert(_.isPlainObject(jsonFromBinary));
   });
 }
 
@@ -322,35 +328,8 @@ function pathSetBinaryTests() {
   });
 }
 
-function parseLedger4320278() {
-  let ripple = require('ripple-lib');
-  if (ripple._DEPRECATED) {
-    ripple = ripple._DEPRECATED;
-  }
-  ripple.Amount.strict_mode = false;
-  ripple = false;
-
-  it(`can parse object`, () => {
-    this.timeout(30e3);
-    const json = loadFixture('as-ledger-4320278.json');
-
-    json.forEach((e, i) => {
-      const expected = e.json;
-      const actual = readJSON(makeParser(e.binary));
-      actual.index = expected.index;
-      // const actual = new ripple.SerializedObject(e.binary).to_json();
-      try {
-        assert.deepEqual(actual, expected);
-      } catch (error) {
-        console.log('error', i, !ripple && error);
-      }
-    });
-  });
-}
-
 describe('BinaryParser', function() {
   function dataDrivenTests() {
-    describe.skip('as-ledger-4320278.json', parseLedger4320278);
     describe('Amount parsing tests', amountParsingTests);
     describe('Field Tests', fieldParsingTests);
     describe('Parsing nested objects', nestedObjectTests);

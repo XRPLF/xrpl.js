@@ -1,5 +1,3 @@
-'use strict';
-
 const {bytesToHex, slice} = require('../utils/bytes-utils');
 const {BytesList} = require('../serdes/binary-serializer');
 

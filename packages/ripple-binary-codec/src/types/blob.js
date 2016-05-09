@@ -1,5 +1,3 @@
-'use strict';
-
 const makeClass = require('../utils/make-class');
 const {parseBytes} = require('../utils/bytes-utils');
 const {SerializedType} = require('./serialized-type');

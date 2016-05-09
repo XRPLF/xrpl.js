@@ -1,5 +1,3 @@
-'use strict';
-
 const intercept = require('intercept-stdout');
 const fs = require('fs');
 const fsExtra = require('fs-extra');

@@ -1,5 +1,3 @@
-'use strict';
-
 const makeClass = require('../utils/make-class');
 const {Hash256} = require('./hash-256');
 const {ensureArrayLikeIs, SerializedType} = require('./serialized-type');

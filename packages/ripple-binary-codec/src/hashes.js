@@ -1,5 +1,3 @@
-'use strict';
-
 const makeClass = require('./utils/make-class');
 const {HashPrefix} = require('./hash-prefixes');
 const {Hash256} = require('./types');

@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert');
 const fixtures = require('./fixtures/codec-fixtures.json');
 const {decode, encode} = require('../src');

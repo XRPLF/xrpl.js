@@ -1,6 +1,4 @@
-'use strict';
-
-// const assert = require('assert');
+const assert = require('assert');
 const _ = require('lodash');
 const makeClass = require('../utils/make-class');
 const {Field} = require('../enums');
@@ -44,9 +42,11 @@ const STObject = makeClass({
     return Object.keys(this).map((k) => Field[k]).filter(Boolean);
   },
   toJSON() {
+    // Otherwise seemingly result will have same prototype as `this`
+    const accumulator = {}; // of only `own` properties
     return _.transform(this, (result, value, key) => {
       result[key] = value && value.toJSON ? value.toJSON() : value;
-    });
+    }, accumulator);
   },
   toBytesSink(sink, filter = () => true) {
     const serializer = new BinarySerializer(sink);

@@ -24,12 +24,13 @@
   "LEDGER_ENTRY_TYPES": {
     "Ticket": 84,
     "LedgerHashes": 104,
-    "EnabledAmendments": 102,
+    "Amendments": 102,
     "SignerList": 83,
     "Offer": 111,
     "AccountRoot": 97,
     "RippleState": 114,
     "FeeSettings": 115,
+    "SuspendedPayment": 117,
     "DirectoryNode": 100,
     "GeneratorMap": 103,
     "Contract": 99,
@@ -41,7 +42,6 @@
       {
         "nth": 0,
         "isVLEncoded": false,
-        "bytes": "E0",
         "isSerialized": false,
         "isSigningField": false,
         "type": "Unknown"
@@ -52,7 +52,6 @@
       {
         "nth": -1,
         "isVLEncoded": false,
-        "bytes": "FF",
         "isSerialized": false,
         "isSigningField": false,
         "type": "Unknown"
@@ -63,7 +62,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "11",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt16"
@@ -74,7 +72,6 @@
       {
         "nth": 2,
         "isVLEncoded": false,
-        "bytes": "12",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt16"
@@ -85,7 +82,6 @@
       {
         "nth": 3,
         "isVLEncoded": false,
-        "bytes": "13",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt16"
@@ -96,7 +92,6 @@
       {
         "nth": 2,
         "isVLEncoded": false,
-        "bytes": "22",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -107,7 +102,6 @@
       {
         "nth": 3,
         "isVLEncoded": false,
-        "bytes": "23",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -118,7 +112,6 @@
       {
         "nth": 4,
         "isVLEncoded": false,
-        "bytes": "24",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -129,7 +122,6 @@
       {
         "nth": 5,
         "isVLEncoded": false,
-        "bytes": "25",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -140,7 +132,6 @@
       {
         "nth": 6,
         "isVLEncoded": false,
-        "bytes": "26",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -151,7 +142,6 @@
       {
         "nth": 7,
         "isVLEncoded": false,
-        "bytes": "27",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -162,7 +152,6 @@
       {
         "nth": 8,
         "isVLEncoded": false,
-        "bytes": "28",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -173,7 +162,6 @@
       {
         "nth": 9,
         "isVLEncoded": false,
-        "bytes": "29",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -184,7 +172,6 @@
       {
         "nth": 10,
         "isVLEncoded": false,
-        "bytes": "2A",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -195,7 +182,6 @@
       {
         "nth": 11,
         "isVLEncoded": false,
-        "bytes": "2B",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -206,7 +192,6 @@
       {
         "nth": 12,
         "isVLEncoded": false,
-        "bytes": "2C",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -217,7 +202,6 @@
       {
         "nth": 13,
         "isVLEncoded": false,
-        "bytes": "2D",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -228,7 +212,6 @@
       {
         "nth": 14,
         "isVLEncoded": false,
-        "bytes": "2E",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -239,7 +222,6 @@
       {
         "nth": 16,
         "isVLEncoded": false,
-        "bytes": "2010",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -250,7 +232,6 @@
       {
         "nth": 17,
         "isVLEncoded": false,
-        "bytes": "2011",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -261,7 +242,6 @@
       {
         "nth": 18,
         "isVLEncoded": false,
-        "bytes": "2012",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -272,7 +252,6 @@
       {
         "nth": 19,
         "isVLEncoded": false,
-        "bytes": "2013",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -283,7 +262,6 @@
       {
         "nth": 20,
         "isVLEncoded": false,
-        "bytes": "2014",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -294,7 +272,6 @@
       {
         "nth": 21,
         "isVLEncoded": false,
-        "bytes": "2015",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -305,7 +282,6 @@
       {
         "nth": 22,
         "isVLEncoded": false,
-        "bytes": "2016",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -316,7 +292,6 @@
       {
         "nth": 23,
         "isVLEncoded": false,
-        "bytes": "2017",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -327,7 +302,6 @@
       {
         "nth": 24,
         "isVLEncoded": false,
-        "bytes": "2018",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -338,7 +312,6 @@
       {
         "nth": 25,
         "isVLEncoded": false,
-        "bytes": "2019",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -349,7 +322,6 @@
       {
         "nth": 26,
         "isVLEncoded": false,
-        "bytes": "201A",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -360,7 +332,6 @@
       {
         "nth": 27,
         "isVLEncoded": false,
-        "bytes": "201B",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -371,7 +342,6 @@
       {
         "nth": 28,
         "isVLEncoded": false,
-        "bytes": "201C",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -382,7 +352,6 @@
       {
         "nth": 29,
         "isVLEncoded": false,
-        "bytes": "201D",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -393,7 +362,6 @@
       {
         "nth": 30,
         "isVLEncoded": false,
-        "bytes": "201E",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -404,7 +372,6 @@
       {
         "nth": 31,
         "isVLEncoded": false,
-        "bytes": "201F",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -415,7 +382,6 @@
       {
         "nth": 32,
         "isVLEncoded": false,
-        "bytes": "2020",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -426,7 +392,6 @@
       {
         "nth": 33,
         "isVLEncoded": false,
-        "bytes": "2021",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -437,7 +402,6 @@
       {
         "nth": 34,
         "isVLEncoded": false,
-        "bytes": "2022",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -448,7 +412,6 @@
       {
         "nth": 35,
         "isVLEncoded": false,
-        "bytes": "2023",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -459,7 +422,6 @@
       {
         "nth": 36,
         "isVLEncoded": false,
-        "bytes": "2024",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -470,7 +432,6 @@
       {
         "nth": 37,
         "isVLEncoded": false,
-        "bytes": "2025",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt32"
@@ -481,7 +442,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "31",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt64"
@@ -492,7 +452,6 @@
       {
         "nth": 2,
         "isVLEncoded": false,
-        "bytes": "32",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt64"
@@ -503,7 +462,6 @@
       {
         "nth": 3,
         "isVLEncoded": false,
-        "bytes": "33",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt64"
@@ -514,7 +472,6 @@
       {
         "nth": 4,
         "isVLEncoded": false,
-        "bytes": "34",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt64"
@@ -525,7 +482,6 @@
       {
         "nth": 5,
         "isVLEncoded": false,
-        "bytes": "35",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt64"
@@ -536,7 +492,6 @@
       {
         "nth": 6,
         "isVLEncoded": false,
-        "bytes": "36",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt64"
@@ -547,7 +502,6 @@
       {
         "nth": 7,
         "isVLEncoded": false,
-        "bytes": "37",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt64"
@@ -558,7 +512,6 @@
       {
         "nth": 8,
         "isVLEncoded": false,
-        "bytes": "38",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt64"
@@ -569,7 +522,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "41",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash128"
@@ -580,7 +532,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "51",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -591,7 +542,6 @@
       {
         "nth": 2,
         "isVLEncoded": false,
-        "bytes": "52",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -602,7 +552,6 @@
       {
         "nth": 3,
         "isVLEncoded": false,
-        "bytes": "53",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -613,7 +562,6 @@
       {
         "nth": 4,
         "isVLEncoded": false,
-        "bytes": "54",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -624,7 +572,6 @@
       {
         "nth": 5,
         "isVLEncoded": false,
-        "bytes": "55",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -635,7 +582,6 @@
       {
         "nth": 6,
         "isVLEncoded": false,
-        "bytes": "56",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -646,7 +592,6 @@
       {
         "nth": 7,
         "isVLEncoded": false,
-        "bytes": "57",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -657,7 +602,6 @@
       {
         "nth": 8,
         "isVLEncoded": false,
-        "bytes": "58",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -668,7 +612,6 @@
       {
         "nth": 9,
         "isVLEncoded": false,
-        "bytes": "59",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -679,7 +622,6 @@
       {
         "nth": 16,
         "isVLEncoded": false,
-        "bytes": "5010",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -690,7 +632,6 @@
       {
         "nth": 17,
         "isVLEncoded": false,
-        "bytes": "5011",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -701,7 +642,6 @@
       {
         "nth": 18,
         "isVLEncoded": false,
-        "bytes": "5012",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -712,7 +652,6 @@
       {
         "nth": 19,
         "isVLEncoded": false,
-        "bytes": "5013",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -723,7 +662,6 @@
       {
         "nth": 20,
         "isVLEncoded": false,
-        "bytes": "5014",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -734,7 +672,6 @@
       {
         "nth": 21,
         "isVLEncoded": false,
-        "bytes": "5015",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash256"
@@ -745,7 +682,6 @@
       {
         "nth": 257,
         "isVLEncoded": false,
-        "bytes": "5001",
         "isSerialized": false,
         "isSigningField": false,
         "type": "Hash256"
@@ -756,7 +692,6 @@
       {
         "nth": 258,
         "isVLEncoded": false,
-        "bytes": "5002",
         "isSerialized": false,
         "isSigningField": false,
         "type": "Hash256"
@@ -767,7 +702,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "61",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -778,7 +712,6 @@
       {
         "nth": 2,
         "isVLEncoded": false,
-        "bytes": "62",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -789,7 +722,6 @@
       {
         "nth": 3,
         "isVLEncoded": false,
-        "bytes": "63",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -800,7 +732,6 @@
       {
         "nth": 4,
         "isVLEncoded": false,
-        "bytes": "64",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -811,7 +742,6 @@
       {
         "nth": 5,
         "isVLEncoded": false,
-        "bytes": "65",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -822,7 +752,6 @@
       {
         "nth": 6,
         "isVLEncoded": false,
-        "bytes": "66",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -833,7 +762,6 @@
       {
         "nth": 7,
         "isVLEncoded": false,
-        "bytes": "67",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -844,7 +772,6 @@
       {
         "nth": 8,
         "isVLEncoded": false,
-        "bytes": "68",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -855,7 +782,6 @@
       {
         "nth": 9,
         "isVLEncoded": false,
-        "bytes": "69",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -866,7 +792,6 @@
       {
         "nth": 10,
         "isVLEncoded": false,
-        "bytes": "6A",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -877,7 +802,6 @@
       {
         "nth": 16,
         "isVLEncoded": false,
-        "bytes": "6010",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -888,7 +812,6 @@
       {
         "nth": 17,
         "isVLEncoded": false,
-        "bytes": "6011",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -899,7 +822,6 @@
       {
         "nth": 18,
         "isVLEncoded": false,
-        "bytes": "6012",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Amount"
@@ -910,7 +832,6 @@
       {
         "nth": 258,
         "isVLEncoded": false,
-        "bytes": "6002",
         "isSerialized": false,
         "isSigningField": false,
         "type": "Amount"
@@ -921,7 +842,6 @@
       {
         "nth": 259,
         "isVLEncoded": false,
-        "bytes": "6003",
         "isSerialized": false,
         "isSigningField": false,
         "type": "Amount"
@@ -932,7 +852,6 @@
       {
         "nth": 1,
         "isVLEncoded": true,
-        "bytes": "71",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -943,7 +862,6 @@
       {
         "nth": 2,
         "isVLEncoded": true,
-        "bytes": "72",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -954,7 +872,6 @@
       {
         "nth": 3,
         "isVLEncoded": true,
-        "bytes": "73",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -965,7 +882,6 @@
       {
         "nth": 4,
         "isVLEncoded": true,
-        "bytes": "74",
         "isSerialized": true,
         "isSigningField": false,
         "type": "Blob"
@@ -976,7 +892,6 @@
       {
         "nth": 5,
         "isVLEncoded": true,
-        "bytes": "75",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -987,7 +902,6 @@
       {
         "nth": 6,
         "isVLEncoded": true,
-        "bytes": "76",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -998,7 +912,6 @@
       {
         "nth": 7,
         "isVLEncoded": true,
-        "bytes": "77",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -1009,7 +922,6 @@
       {
         "nth": 8,
         "isVLEncoded": true,
-        "bytes": "78",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -1020,7 +932,6 @@
       {
         "nth": 9,
         "isVLEncoded": true,
-        "bytes": "79",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -1031,7 +942,6 @@
       {
         "nth": 10,
         "isVLEncoded": true,
-        "bytes": "7A",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -1042,7 +952,6 @@
       {
         "nth": 11,
         "isVLEncoded": true,
-        "bytes": "7B",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -1053,7 +962,6 @@
       {
         "nth": 12,
         "isVLEncoded": true,
-        "bytes": "7C",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -1064,7 +972,6 @@
       {
         "nth": 13,
         "isVLEncoded": true,
-        "bytes": "7D",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -1075,7 +982,6 @@
       {
         "nth": 14,
         "isVLEncoded": true,
-        "bytes": "7E",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -1086,7 +992,6 @@
       {
         "nth": 17,
         "isVLEncoded": true,
-        "bytes": "7011",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Blob"
@@ -1097,7 +1002,6 @@
       {
         "nth": 1,
         "isVLEncoded": true,
-        "bytes": "81",
         "isSerialized": true,
         "isSigningField": true,
         "type": "AccountID"
@@ -1108,7 +1012,6 @@
       {
         "nth": 2,
         "isVLEncoded": true,
-        "bytes": "82",
         "isSerialized": true,
         "isSigningField": true,
         "type": "AccountID"
@@ -1119,7 +1022,6 @@
       {
         "nth": 3,
         "isVLEncoded": true,
-        "bytes": "83",
         "isSerialized": true,
         "isSigningField": true,
         "type": "AccountID"
@@ -1130,7 +1032,6 @@
       {
         "nth": 4,
         "isVLEncoded": true,
-        "bytes": "84",
         "isSerialized": true,
         "isSigningField": true,
         "type": "AccountID"
@@ -1141,7 +1042,6 @@
       {
         "nth": 7,
         "isVLEncoded": true,
-        "bytes": "87",
         "isSerialized": true,
         "isSigningField": true,
         "type": "AccountID"
@@ -1152,7 +1052,6 @@
       {
         "nth": 8,
         "isVLEncoded": true,
-        "bytes": "88",
         "isSerialized": true,
         "isSigningField": true,
         "type": "AccountID"
@@ -1163,7 +1062,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "E1",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1174,7 +1072,6 @@
       {
         "nth": 2,
         "isVLEncoded": false,
-        "bytes": "E2",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1185,7 +1082,6 @@
       {
         "nth": 3,
         "isVLEncoded": false,
-        "bytes": "E3",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1196,7 +1092,6 @@
       {
         "nth": 4,
         "isVLEncoded": false,
-        "bytes": "E4",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1207,7 +1102,6 @@
       {
         "nth": 5,
         "isVLEncoded": false,
-        "bytes": "E5",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1218,7 +1112,6 @@
       {
         "nth": 6,
         "isVLEncoded": false,
-        "bytes": "E6",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1229,7 +1122,6 @@
       {
         "nth": 7,
         "isVLEncoded": false,
-        "bytes": "E7",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1240,7 +1132,6 @@
       {
         "nth": 8,
         "isVLEncoded": false,
-        "bytes": "E8",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1251,7 +1142,6 @@
       {
         "nth": 9,
         "isVLEncoded": false,
-        "bytes": "E9",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1262,7 +1152,6 @@
       {
         "nth": 10,
         "isVLEncoded": false,
-        "bytes": "EA",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1273,7 +1162,6 @@
       {
         "nth": 11,
         "isVLEncoded": false,
-        "bytes": "EB",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1284,7 +1172,16 @@
       {
         "nth": 16,
         "isVLEncoded": false,
-        "bytes": "E010",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
+      "Majority",
+      {
+        "nth": 18,
+        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
         "type": "STObject"
@@ -1295,7 +1192,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "F1",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STArray"
@@ -1306,7 +1202,6 @@
       {
         "nth": 3,
         "isVLEncoded": false,
-        "bytes": "F3",
         "isSerialized": true,
         "isSigningField": false,
         "type": "STArray"
@@ -1317,7 +1212,6 @@
       {
         "nth": 4,
         "isVLEncoded": false,
-        "bytes": "F4",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STArray"
@@ -1328,7 +1222,6 @@
       {
         "nth": 5,
         "isVLEncoded": false,
-        "bytes": "F5",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STArray"
@@ -1339,7 +1232,6 @@
       {
         "nth": 6,
         "isVLEncoded": false,
-        "bytes": "F6",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STArray"
@@ -1350,7 +1242,6 @@
       {
         "nth": 7,
         "isVLEncoded": false,
-        "bytes": "F7",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STArray"
@@ -1361,7 +1252,6 @@
       {
         "nth": 8,
         "isVLEncoded": false,
-        "bytes": "F8",
         "isSerialized": true,
         "isSigningField": true,
         "type": "STArray"
@@ -1372,7 +1262,16 @@
       {
         "nth": 9,
         "isVLEncoded": false,
-        "bytes": "F9",
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "Majorities",
+      {
+        "nth": 16,
+        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
         "type": "STArray"
@@ -1383,7 +1282,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "0110",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt8"
@@ -1394,7 +1292,6 @@
       {
         "nth": 2,
         "isVLEncoded": false,
-        "bytes": "0210",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt8"
@@ -1405,7 +1302,6 @@
       {
         "nth": 3,
         "isVLEncoded": false,
-        "bytes": "0310",
         "isSerialized": true,
         "isSigningField": true,
         "type": "UInt8"
@@ -1416,7 +1312,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "0111",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash160"
@@ -1427,7 +1322,6 @@
       {
         "nth": 2,
         "isVLEncoded": false,
-        "bytes": "0211",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash160"
@@ -1438,7 +1332,6 @@
       {
         "nth": 3,
         "isVLEncoded": false,
-        "bytes": "0311",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash160"
@@ -1449,7 +1342,6 @@
       {
         "nth": 4,
         "isVLEncoded": false,
-        "bytes": "0411",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Hash160"
@@ -1460,7 +1352,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "0112",
         "isSerialized": true,
         "isSigningField": true,
         "type": "PathSet"
@@ -1471,7 +1362,6 @@
       {
         "nth": 1,
         "isVLEncoded": true,
-        "bytes": "0113",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Vector256"
@@ -1482,18 +1372,16 @@
       {
         "nth": 2,
         "isVLEncoded": true,
-        "bytes": "0213",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Vector256"
       }
     ],
     [
-      "Features",
+      "Amendments",
       {
         "nth": 3,
         "isVLEncoded": true,
-        "bytes": "0313",
         "isSerialized": true,
         "isSigningField": true,
         "type": "Vector256"
@@ -1504,7 +1392,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "0111",
         "isSerialized": false,
         "isSigningField": false,
         "type": "Transaction"
@@ -1515,7 +1402,6 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "0112",
         "isSerialized": false,
         "isSigningField": false,
         "type": "LedgerEntry"
@@ -1526,14 +1412,12 @@
       {
         "nth": 1,
         "isVLEncoded": false,
-        "bytes": "0113",
         "isSerialized": false,
         "isSigningField": false,
         "type": "Validation"
       }
     ]
   ],
-  "date-generated": "Fri Sep 11 11:35:38 ICT 2015",
   "TRANSACTION_RESULTS": {
     "tecINSUFFICIENT_RESERVE": 141,
     "telNO_DST_PARTIAL": -393,

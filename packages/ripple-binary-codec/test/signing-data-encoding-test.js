@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const assert = require('assert-diff');
 const {encodeForSigning, encodeForMultisigning} = require('../src');

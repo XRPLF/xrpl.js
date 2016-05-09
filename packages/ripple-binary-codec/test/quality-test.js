@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert-diff');
 const {quality, binary: {bytesToHex}} = require('../src/coretypes');
 

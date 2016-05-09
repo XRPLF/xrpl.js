@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert');
 const BN = require('bn.js');
 const makeClass = require('../utils/make-class');

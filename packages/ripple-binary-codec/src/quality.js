@@ -1,4 +1,3 @@
-'use strict';
 const Decimal = require('decimal.js');
 const {bytesToHex, slice, parseBytes} = require('./utils/bytes-utils');
 const {UInt64} = require('./types');
@@ -16,7 +15,7 @@ module.exports = {
   decode(arg) {
     const bytes = slice(parseBytes(arg), -8);
     const exponent = bytes[0] - 100;
-    const mantissa = new Decimal(bytesToHex(slice(bytes, 1)), 16);
+    const mantissa = new Decimal('0x' + bytesToHex(slice(bytes, 1)));
     return mantissa.times('1e' + exponent);
   }
 };

@@ -926,7 +926,7 @@
         },
         {
             "type_name": "Vector256",
-            "name": "Features",
+            "name": "Amendments",
             "nth_of_type": 3,
             "type": 19,
             "expected_hex": "0313"

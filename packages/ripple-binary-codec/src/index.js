@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert');
 const coreTypes = require('./coretypes');
 const {quality,

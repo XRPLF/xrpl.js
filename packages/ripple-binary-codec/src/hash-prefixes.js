@@ -1,5 +1,3 @@
-'use strict';
-
 const {serializeUIntN} = require('./utils/bytes-utils');
 
 function bytes(uint32) {

@@ -1,7 +1,5 @@
 /* eslint-disable func-style */
 
-'use strict';
-
 const types = require('./types');
 const {HashPrefix} = require('./hash-prefixes');
 const {BinaryParser} = require('./serdes/binary-parser');

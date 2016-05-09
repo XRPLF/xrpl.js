@@ -1,5 +1,3 @@
-'use strict';
-
 const makeClass = require('../utils/make-class');
 const {decodeAccountID, encodeAccountID} = require('ripple-address-codec');
 const {Hash160} = require('./hash-160');

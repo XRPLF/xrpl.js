@@ -1,4 +1,3 @@
-'use strict';
 /* eslint-disable func-style */
 
 const _ = require('lodash');
