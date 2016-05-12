@@ -39,10 +39,10 @@ unittest() {
   gulp build-min build-tests
   node --harmony test-compiled/mocked-server.js > /dev/null &
 
-  echo "Running tests in PhantomJS"
-  mocha-phantomjs test/localrunner.html
-  echo "Running tests using minified version in PhantomJS"
-  mocha-phantomjs test/localrunnermin.html
+  #echo "Running tests in PhantomJS"
+  #mocha-phantomjs test/localrunner.html
+  #echo "Running tests using minified version in PhantomJS"
+  #mocha-phantomjs test/localrunnermin.html
 
   echo "Running tests in SauceLabs"
   http-server &
@@ -58,9 +58,9 @@ integrationtest() {
   mocha test/integration/http-integration-test.js
 
   # run integration tests in PhantomJS
-  gulp build-tests build-min
-  echo "Running integragtion tests in PhantomJS"
-  mocha-phantomjs test/localintegrationrunner.html
+  #gulp build-tests build-min
+  #echo "Running integragtion tests in PhantomJS"
+  #mocha-phantomjs test/localintegrationrunner.html
 }
 
 doctest() {
