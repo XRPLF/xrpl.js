@@ -498,7 +498,7 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#ripple-address) | A Ripple account address
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
-transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, represented as billionths of a unit. Use `null` to set no fee.
+transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 
 ### Example
 
@@ -2684,7 +2684,7 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#ripple-address) | A Ripple account address
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
-transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, represented as billionths of a unit. Use `null` to set no fee.
+transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 
 ### Example
 

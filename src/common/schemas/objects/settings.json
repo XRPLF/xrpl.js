@@ -55,7 +55,7 @@
       "description": " The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase."
     },
     "transferRate": {
-      "description": " The fee to charge when users transfer this account’s issuances, represented as billionths of a unit. Use `null` to set no fee.",
+      "description": " The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.",
       "oneOf": [
         {"type": "null"},
         {"type": "number", "minimum": 1, "maximum": 4.294967295}
