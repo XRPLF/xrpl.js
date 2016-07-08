@@ -35,21 +35,21 @@ unittest() {
   ln -nfs ../../dist/npm test-compiled/node_modules/ripple-api
   mocha --opts test-compiled/mocha.opts test-compiled
 
-  # compile tests for browser testing
-  gulp build-min build-tests
-  node --harmony test-compiled/mocked-server.js > /dev/null &
+  #compile tests for browser testing
+  #gulp build-min build-tests
+  #node --harmony test-compiled/mocked-server.js > /dev/null &
 
   #echo "Running tests in PhantomJS"
   #mocha-phantomjs test/localrunner.html
   #echo "Running tests using minified version in PhantomJS"
   #mocha-phantomjs test/localrunnermin.html
 
-  echo "Running tests in SauceLabs"
-  http-server &
-  npm run sauce
+  #echo "Running tests in SauceLabs"
+  #http-server &
+  #npm run sauce
 
-  pkill -f mocked-server.js
-  pkill -f http-server
+  #pkill -f mocked-server.js
+  #pkill -f http-server
   rm -rf test-compiled
 }
 
