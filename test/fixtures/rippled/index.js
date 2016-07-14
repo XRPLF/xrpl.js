@@ -1,4 +1,4 @@
-'use strict'; // eslint-disable-line 
+'use strict'; // eslint-disable-line
 
 module.exports = {
   submit: {
@@ -10,7 +10,8 @@ module.exports = {
     notFound: require('./ledger-not-found'),
     withoutCloseTime: require('./ledger-without-close-time'),
     withSettingsTx: require('./ledger-with-settings-tx'),
-    withStateAsHashes: require('./ledger-with-state-as-hashes')
+    withStateAsHashes: require('./ledger-with-state-as-hashes'),
+    withPartialPayment: require('./ledger-with-partial-payment')
   },
   empty: require('./empty'),
   subscribe: require('./subscribe'),
