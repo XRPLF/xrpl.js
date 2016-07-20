@@ -205,6 +205,12 @@ module.exports = function createMockRippled(port) {
         createLedgerResponse(request, fixtures.ledger.withoutCloseTime));
     } else if (request.ledger_index === 4181996) {
       conn.send(createLedgerResponse(request, fixtures.ledger.withSettingsTx));
+    } else if (request.ledger_index === 100000) {
+      conn.send(
+        createLedgerResponse(request, fixtures.ledger.withPartialPayment));
+    } else if (request.ledger_index === 100001) {
+      conn.send(
+        createLedgerResponse(request, fixtures.ledger.pre2014withPartial));
     } else if (request.ledger_index === 38129) {
       const response = _.assign({}, fixtures.ledger.normal,
         {result: {ledger: fullLedger}});

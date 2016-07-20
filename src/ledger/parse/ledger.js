@@ -1,13 +1,15 @@
 /* @flow */
-'use strict';
+'use strict'; // eslint-disable-line
 const _ = require('lodash');
 const {removeUndefined, rippleTimeToISO8601} = require('./utils');
 const parseTransaction = require('./transaction');
 import type {GetLedger} from '../types.js';
 
 function parseTransactionWrapper(ledgerVersion, tx) {
-  const transaction = _.assign({}, _.omit(tx, 'metaData'),
-    {meta: tx.metaData});
+  const transaction = _.assign({}, _.omit(tx, 'metaData'), {
+    meta: tx.metaData,
+    ledger_index: ledgerVersion
+  });
   const result = parseTransaction(transaction);
   if (!result.outcome.ledgerVersion) {
     result.outcome.ledgerVersion = ledgerVersion;
