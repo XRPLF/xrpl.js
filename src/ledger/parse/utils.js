@@ -1,5 +1,5 @@
 /* @flow */
-'use strict';
+'use strict'; // eslint-disable-line
 const _ = require('lodash');
 const transactionParser = require('ripple-lib-transactionparser');
 const utils = require('../utils');
@@ -56,19 +56,43 @@ function isPartialPayment(tx) {
 }
 
 function parseDeliveredAmount(tx: Object): Amount | void {
-  let deliveredAmount;
 
-  // TODO: Workaround for existing rippled bug where delivered_amount may not be
-  // provided for account_tx
-  if (tx.TransactionType === 'Payment') {
-    if (tx.meta.delivered_amount) {
-      deliveredAmount = parseAmount(tx.meta.delivered_amount);
-    } else if (tx.Amount && !isPartialPayment(tx)) {
-      deliveredAmount = parseAmount(tx.Amount);
-    }
+  if (tx.TransactionType !== 'Payment' ||
+      tx.meta.TransactionResult !== 'tesSUCCESS') {
+    return undefined;
   }
 
-  return deliveredAmount;
+  if (tx.meta.delivered_amount &&
+      tx.meta.delivered_amount === 'unavailable') {
+    return undefined;
+  }
+
+  // parsable delivered_amount
+  if (tx.meta.delivered_amount) {
+    return parseAmount(tx.meta.delivered_amount);
+  }
+
+  // DeliveredAmount only present on partial payments
+  if (tx.meta.DeliveredAmount) {
+    return parseAmount(tx.meta.DeliveredAmount);
+  }
+
+  // no partial payment flag, use tx.Amount
+  if (tx.Amount && !isPartialPayment(tx)) {
+    return parseAmount(tx.Amount);
+  }
+
+  // DeliveredAmount field was introduced at
+  // ledger 4594095 - after that point its absence
+  // on a tx flagged as partial payment indicates
+  // the full amount was transferred. The amount
+  // transferred with a partial payment before
+  // that date must be derived from metadata.
+  if (tx.Amount && tx.ledger_index > 4594094) {
+    return parseAmount(tx.Amount);
+  }
+
+  return undefined;
 }
 
 function parseOutcome(tx: Object): ?Object {
