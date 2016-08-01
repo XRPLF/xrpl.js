@@ -1171,6 +1171,28 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getLedger.withSettingsTx, 'getLedger'));
   });
 
+  it('getLedger - with partial payment', function() {
+    const request = {
+      includeTransactions: true,
+      includeAllData: true,
+      ledgerVersion: 100000
+    };
+    return this.api.getLedger(request).then(
+      _.partial(checkResult, responses.getLedger.withPartial, 'getLedger'));
+  });
+
+  it('getLedger - pre 2014 with partial payment', function() {
+    const request = {
+      includeTransactions: true,
+      includeAllData: true,
+      ledgerVersion: 100001
+    };
+    return this.api.getLedger(request).then(
+      _.partial(checkResult,
+                responses.getLedger.pre2014withPartial,
+                'getLedger'));
+  });
+
   it('getLedger - full, then computeLedgerHash', function() {
     const request = {
       includeTransactions: true,

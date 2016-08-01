@@ -59,7 +59,9 @@ module.exports = {
     header: require('./get-ledger'),
     full: require('./get-ledger-full'),
     withSettingsTx: require('./get-ledger-with-settings-tx'),
-    withStateAsHashes: require('./get-ledger-with-state-as-hashes')
+    withStateAsHashes: require('./get-ledger-with-state-as-hashes'),
+    withPartial: require('./get-ledger-with-partial-payment'),
+    pre2014withPartial: require('./get-ledger-pre2014-with-partial')
   },
   prepareOrder: {
     buy: require('./prepare-order.json'),
