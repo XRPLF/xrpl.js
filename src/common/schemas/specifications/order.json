@@ -34,6 +34,10 @@
       "format": "date-time",
       "description": "Time after which the offer is no longer active, as an [ISO 8601 date-time](https://en.wikipedia.org/wiki/ISO_8601)."
     },
+    "orderToReplace": {
+      "$ref": "sequence",
+      "description": "The [account sequence number](#account-sequence-number) of an order to cancel before the new order is created, effectively replacing the old order."
+    },
     "memos": {"$ref": "memos"}
   },
   "required": ["direction", "quantity", "totalPrice"],
