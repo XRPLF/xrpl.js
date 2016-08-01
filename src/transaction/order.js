@@ -1,5 +1,5 @@
 /* @flow */
-'use strict';
+'use strict'; // eslint-disable-line
 const _ = require('lodash');
 const utils = require('./utils');
 const offerFlags = utils.common.txFlags.OfferCreate;
@@ -34,6 +34,9 @@ function createOrderTransaction(account: string, order: Order): Object {
   }
   if (order.expirationTime !== undefined) {
     txJSON.Expiration = iso8601ToRippleTime(order.expirationTime);
+  }
+  if (order.orderToReplace !== undefined) {
+    txJSON.OfferSequence = order.orderToReplace;
   }
   if (order.memos !== undefined) {
     txJSON.Memos = _.map(order.memos, utils.convertMemo);

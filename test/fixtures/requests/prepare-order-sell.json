@@ -10,6 +10,7 @@
     "value": "2"
   },
   "immediateOrCancel": true,
+  "orderToReplace": 12345,
   "memos": [
     {
       "type": "test",
