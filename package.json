@@ -46,7 +46,7 @@
     "ejs": "^2.3.4",
     "eslint": "^2.9.0",
     "eventemitter2": "^0.4.14",
-    "flow-bin": "^0.24.2",
+    "flow-bin": "^0.30.0",
     "gulp": "^3.8.10",
     "gulp-bump": "^0.1.13",
     "gulp-rename": "^1.2.0",
