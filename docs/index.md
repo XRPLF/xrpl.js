@@ -1511,7 +1511,7 @@ options | object | *Optional* Options to determine how the balances will be calc
 
 ### Return Value
 
-This method returns a promise that resolves with an array of objects with the following structure:
+This method returns a promise that resolves with an object with the following structure:
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -3051,7 +3051,7 @@ instructions | object | The instructions for how to execute the transaction afte
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
 const orderCancellation = {orderSequence: 123};
-return api.prepareOrderCancellation(address, sequence)
+return api.prepareOrderCancellation(address, orderCancellation)
   .then(prepared => {/* ... */});
 ```
 
