@@ -1416,6 +1416,16 @@
         "isSigningField": false,
         "type": "Validation"
       }
+    ],
+    [
+      "SignerListID",
+      {
+        "nth": 38,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
     ]
   ],
   "TRANSACTION_RESULTS": {

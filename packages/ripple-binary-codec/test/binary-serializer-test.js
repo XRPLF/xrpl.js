@@ -10,6 +10,11 @@ const {loadFixture} = require('./utils');
 const fixtures = loadFixture('data-driven-tests.json');
 const deliverMinTx = require('./fixtures/delivermin-tx.json');
 const deliverMinTxBinary = require('./fixtures/delivermin-tx-binary.json');
+const SignerListSet = {
+  tx: require('./fixtures/signerlistset-tx.json'),
+  binary: require('./fixtures/signerlistset-tx-binary.json'),
+  meta: require('./fixtures/signerlistset-tx-meta-binary.json')
+};
 
 function bytesListTest() {
   const list = new BytesList().put([0]).put([2, 3]).put([4, 5]);
@@ -92,10 +97,20 @@ function deliverMinTest() {
   });
 }
 
+function SignerListSetTest() {
+  it('can serialize SignerListSet', () => {
+    assert.strictEqual(encode(SignerListSet.tx), SignerListSet.binary);
+  });
+  it('can serialize SignerListSet metadata', () => {
+    assert.strictEqual(encode(SignerListSet.tx.meta), SignerListSet.meta);
+  });
+}
+
 describe('Binary Serialization', function() {
   describe.skip('parseLedger4320278', parseLedger4320278);
   describe('nestedObjectTests', nestedObjectTests);
   describe('UIntTest', UIntTest);
   describe('BytesList', bytesListTest);
   describe('DeliverMin', deliverMinTest);
+  describe('SignerListSet', SignerListSetTest);
 });
