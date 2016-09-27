@@ -3249,9 +3249,9 @@
       "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz"
     },
     "ripple-binary-codec": {
-      "version": "0.1.3",
-      "from": "ripple-binary-codec@>=0.1.3 <0.2.0",
-      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.1.3.tgz",
+      "version": "0.1.4",
+      "from": "ripple-binary-codec@>=0.1.4 <0.2.0",
+      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.1.4.tgz",
       "dependencies": {
         "lodash": {
           "version": "4.13.1",
