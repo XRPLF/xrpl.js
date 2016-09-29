@@ -6,7 +6,6 @@ machine:
 dependencies:
   pre:
     - npm -g install npm@latest-2
-    - npm install flow-bin
     - wget https://s3-us-west-2.amazonaws.com/ripple-debs/rippled_0.30.1-b11-1.deb
     - sudo dpkg -i rippled_0.30.1-b11-1.deb
 test:
