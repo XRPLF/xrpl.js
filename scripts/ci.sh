@@ -76,7 +76,6 @@ oneNode() {
   checkEOL
   doctest
   lint
-  typecheck
   unittest
   integrationtest
 }
@@ -84,7 +83,7 @@ oneNode() {
 twoNodes() {
   case "$NODE_INDEX" in
     0) doctest; lint; integrationtest;;
-    1) checkEOL; typecheck; unittest;;
+    1) checkEOL; unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;
   esac
 }
@@ -92,7 +91,7 @@ twoNodes() {
 threeNodes() {
   case "$NODE_INDEX" in
     0) doctest; lint; integrationtest;;
-    1) checkEOL; typecheck;;
+    1) checkEOL;;
     2) unittest;;
     *) echo "ERROR: invalid usage"; exit 2;;
   esac
