@@ -23,7 +23,7 @@ const Vector256 = makeClass({
     this.forEach(h => h.toBytesSink(sink));
   },
   toJSON() {
-    return this.map((hash) => hash.toJSON());
+    return this.map(hash => hash.toJSON());
   }
 });
 

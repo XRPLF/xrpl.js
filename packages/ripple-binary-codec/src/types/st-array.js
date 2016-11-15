@@ -26,7 +26,7 @@ const STArray = makeClass({
     }
   },
   toJSON() {
-    return this.map((v) => v.toJSON());
+    return this.map(v => v.toJSON());
   },
   toBytesSink(sink) {
     this.forEach(so => so.toBytesSink(sink));

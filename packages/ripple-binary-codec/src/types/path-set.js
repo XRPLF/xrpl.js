@@ -1,4 +1,3 @@
-'use strict';
 /* eslint-disable no-unused-expressions */
 
 const makeClass = require('../utils/make-class');
@@ -94,11 +93,11 @@ const PathSet = makeClass({
   },
   toBytesSink(sink) {
     let n = 0;
-    this.forEach((path) => {
+    this.forEach(path => {
       if (n++ !== 0) {
         sink.put([PATH_SEPARATOR_BYTE]);
       }
-      path.forEach((hop) => {
+      path.forEach(hop => {
         sink.put([hop.type()]);
         hop.account && (hop.account.toBytesSink(sink));
         hop.currency && (hop.currency.toBytesSink(sink));

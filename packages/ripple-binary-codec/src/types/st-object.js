@@ -1,4 +1,3 @@
-const assert = require('assert');
 const _ = require('lodash');
 const makeClass = require('../utils/make-class');
 const {Field} = require('../enums');
@@ -39,7 +38,7 @@ const STObject = makeClass({
     }
   },
   fieldKeys() {
-    return Object.keys(this).map((k) => Field[k]).filter(Boolean);
+    return Object.keys(this).map(k => Field[k]).filter(Boolean);
   },
   toJSON() {
     // Otherwise seemingly result will have same prototype as `this`
@@ -52,7 +51,7 @@ const STObject = makeClass({
     const serializer = new BinarySerializer(sink);
     const fields = this.fieldKeys();
     const sorted = _.sortBy(fields, 'ordinal');
-    sorted.filter(filter).forEach((field) => {
+    sorted.filter(filter).forEach(field => {
       const value = this[field];
       if (!field.isSerialized) {
         return;

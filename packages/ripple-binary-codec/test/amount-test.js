@@ -1,5 +1,25 @@
+const _ = require('lodash');
 const assert = require('assert-diff');
+const utils = require('./utils');
 const {Amount} = require('../src/coretypes');
+const {loadFixture} = utils;
+const fixtures = loadFixture('data-driven-tests.json');
+
+function amountErrorTests() {
+  _.filter(fixtures.values_tests, {type: 'Amount'}).forEach(f => {
+    // We only want these with errors
+    if (!f.error) {
+      return
+    }
+    const testName = `${JSON.stringify(f.test_json)}\n\tis invalid ` +
+                     `because: ${f.error}`
+    it(testName, () => {
+      assert.throws(() => {
+        Amount.from(f.test_json);
+      }, JSON.stringify(f.test_json));
+    });
+  });
+}
 
 describe('Amount', function() {
   it('can be parsed from', function() {
@@ -18,5 +38,6 @@ describe('Amount', function() {
     };
     assert.deepEqual(amt.toJSON(), rewritten);
   });
+  amountErrorTests()
 });
 

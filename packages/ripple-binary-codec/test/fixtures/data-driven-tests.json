@@ -2878,6 +2878,15 @@
         {
             "test_json": {
                 "currency": "USD",
+                "value": "9999999999999999000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji"
+            },
+            "type": "Amount",
+            "error": "exponent is too large"
+        },
+        {
+            "test_json": {
+                "currency": "USD",
                 "value": "11111000.00000001",
                 "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji"
             },
