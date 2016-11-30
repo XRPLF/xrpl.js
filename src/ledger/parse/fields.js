@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const BigNumber = require('bignumber.js');
 const AccountFields = require('./utils').constants.AccountFields;
+const utils = require('./utils');
 
 function parseField(info, value) {
   if (info.encoding === 'hex' && !info.length) {  // e.g. "domain"
@@ -22,6 +23,10 @@ function parseFields(data: Object): Object {
       const info = AccountFields[fieldName];
       settings[info.name] = parseField(info, fieldValue);
     }
+  }
+
+  if (data.Memos) {
+    settings.memos = utils.parseMemos(data);
   }
 
   if (data.RegularKey) {
