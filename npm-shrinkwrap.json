@@ -3249,9 +3249,9 @@
       "resolved": "https://registry.npmjs.org/ripple-address-codec/-/ripple-address-codec-2.0.1.tgz"
     },
     "ripple-binary-codec": {
-      "version": "0.1.4",
-      "from": "ripple-binary-codec@>=0.1.4 <0.2.0",
-      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.1.4.tgz",
+      "version": "0.1.5",
+      "from": "ripple-binary-codec@>=0.1.5 <0.2.0",
+      "resolved": "https://registry.npmjs.org/ripple-binary-codec/-/ripple-binary-codec-0.1.5.tgz",
       "dependencies": {
         "lodash": {
           "version": "4.13.1",
@@ -3261,9 +3261,9 @@
       }
     },
     "ripple-hashes": {
-      "version": "0.1.0",
-      "from": "ripple-hashes@>=0.1.0 <0.2.0",
-      "resolved": "https://registry.npmjs.org/ripple-hashes/-/ripple-hashes-0.1.0.tgz"
+      "version": "0.2.0",
+      "from": "ripple-hashes@>=0.2.0 <0.3.0",
+      "resolved": "https://registry.npmjs.org/ripple-hashes/-/ripple-hashes-0.2.0.tgz"
     },
     "ripple-keypairs": {
       "version": "0.10.0",
