@@ -1,6 +1,6 @@
-'use strict';
+'use strict' // eslint-disable-line strict
 
-const {EventEmitter} = require('events');
+const {EventEmitter} = require('events')
 
 function unsused() {}
 
@@ -10,50 +10,50 @@ function unsused() {}
  */
 class WSWrapper extends EventEmitter {
   constructor(url, protocols = null, websocketOptions = {}) {
-    super();
-    unsused(protocols);
-    unsused(websocketOptions);
-    this.setMaxListeners(Infinity);
+    super()
+    unsused(protocols)
+    unsused(websocketOptions)
+    this.setMaxListeners(Infinity)
 
-    this._ws = new WebSocket(url);
+    this._ws = new WebSocket(url)
 
     this._ws.onclose = () => {
-      this.emit('close');
-    };
+      this.emit('close')
+    }
 
     this._ws.onopen = () => {
-      this.emit('open');
-    };
+      this.emit('open')
+    }
 
     this._ws.onerror = error => {
-      this.emit('error', error);
-    };
+      this.emit('error', error)
+    }
 
     this._ws.onmessage = message => {
-      this.emit('message', message.data);
-    };
+      this.emit('message', message.data)
+    }
   }
 
   close() {
     if (this.readyState === 1) {
-      this._ws.close();
+      this._ws.close()
     }
   }
 
   send(message) {
-    this._ws.send(message);
+    this._ws.send(message)
   }
 
   get readyState() {
-    return this._ws.readyState;
+    return this._ws.readyState
   }
 
 }
 
-WSWrapper.CONNECTING = 0;
-WSWrapper.OPEN = 1;
-WSWrapper.CLOSING = 2;
-WSWrapper.CLOSED = 3;
+WSWrapper.CONNECTING = 0
+WSWrapper.OPEN = 1
+WSWrapper.CLOSING = 2
+WSWrapper.CLOSED = 3
 
-module.exports = WSWrapper;
+module.exports = WSWrapper
 

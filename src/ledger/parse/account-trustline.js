@@ -1,6 +1,6 @@
 /* @flow */
-'use strict';
-const utils = require('./utils');
+'use strict' // eslint-disable-line strict
+const utils = require('./utils')
 
 type Trustline = {
   account: string, limit: number, currency: string, quality_in: ?number,
@@ -29,18 +29,18 @@ function parseAccountTrustline(trustline: Trustline): AccountTrustline {
     ripplingDisabled: trustline.no_ripple || undefined,
     frozen: trustline.freeze || undefined,
     authorized: trustline.authorized || undefined
-  });
+  })
   // rippled doesn't provide the counterparty's qualities
   const counterparty = utils.removeUndefined({
     limit: trustline.limit_peer,
     ripplingDisabled: trustline.no_ripple_peer || undefined,
     frozen: trustline.freeze_peer || undefined,
     authorized: trustline.peer_authorized || undefined
-  });
+  })
   const state = {
     balance: trustline.balance
-  };
-  return {specification, counterparty, state};
+  }
+  return {specification, counterparty, state}
 }
 
-module.exports = parseAccountTrustline;
+module.exports = parseAccountTrustline

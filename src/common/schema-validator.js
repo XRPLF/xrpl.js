@@ -1,12 +1,12 @@
 // flow is disabled for this file until support for requiring json is added:
 // https://github.com/facebook/flow/issues/167
-'use strict';
-const _ = require('lodash');
-const assert = require('assert');
-const Ajv = require('ajv');
-const ValidationError = require('./errors').ValidationError;
-const {isValidAddress} = require('ripple-address-codec');
-const {isValidSecret} = require('./utils');
+'use strict' // eslint-disable-line strict
+const _ = require('lodash')
+const assert = require('assert')
+const Ajv = require('ajv')
+const ValidationError = require('./errors').ValidationError
+const {isValidAddress} = require('ripple-address-codec')
+const {isValidSecret} = require('./utils')
 
 function loadSchemas() {
   // listed explicitly for webpack (instead of scanning schemas directory)
@@ -96,27 +96,27 @@ function loadSchemas() {
     require('./schemas/input/submit.json'),
     require('./schemas/input/generate-address.json'),
     require('./schemas/input/combine.json')
-  ];
-  const titles = _.map(schemas, schema => schema.title);
-  const duplicates = _.keys(_.pick(_.countBy(titles), count => count > 1));
-  assert(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates);
-  const ajv = new Ajv();
-  _.forEach(schemas, schema => ajv.addSchema(schema, schema.title));
-  ajv.addFormat('address', isValidAddress);
-  ajv.addFormat('secret', isValidSecret);
-  return ajv;
+  ]
+  const titles = _.map(schemas, schema => schema.title)
+  const duplicates = _.keys(_.pick(_.countBy(titles), count => count > 1))
+  assert(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
+  const ajv = new Ajv()
+  _.forEach(schemas, schema => ajv.addSchema(schema, schema.title))
+  ajv.addFormat('address', isValidAddress)
+  ajv.addFormat('secret', isValidSecret)
+  return ajv
 }
 
-const ajv = loadSchemas();
+const ajv = loadSchemas()
 
 function schemaValidate(schemaName: string, object: any): void {
-  const isValid = ajv.validate(schemaName, object);
+  const isValid = ajv.validate(schemaName, object)
   if (!isValid) {
-    throw new ValidationError(ajv.errorsText());
+    throw new ValidationError(ajv.errorsText())
   }
 }
 
 module.exports = {
   schemaValidate,
   isValidSecret
-};
+}

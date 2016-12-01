@@ -1,31 +1,31 @@
 /* @flow */
-'use strict';
-const common = require('../common');
-import type {GetServerInfoResponse} from '../common/serverinfo';
+'use strict' // eslint-disable-line strict
+const common = require('../common')
+import type {GetServerInfoResponse} from '../common/serverinfo'
 
 function isConnected(): boolean {
-  return this.connection.isConnected();
+  return this.connection.isConnected()
 }
 
 function getLedgerVersion(): Promise<number> {
-  return this.connection.getLedgerVersion();
+  return this.connection.getLedgerVersion()
 }
 
 function connect(): Promise<void> {
-  return this.connection.connect();
+  return this.connection.connect()
 }
 
 function disconnect(): Promise<void> {
-  return this.connection.disconnect();
+  return this.connection.disconnect()
 }
 
 function getServerInfo(): Promise<GetServerInfoResponse> {
-  return common.serverInfo.getServerInfo(this.connection);
+  return common.serverInfo.getServerInfo(this.connection)
 }
 
 function getFee(): Promise<number> {
-  const cushion = this._feeCushion || 1.2;
-  return common.serverInfo.getFee(this.connection, cushion);
+  const cushion = this._feeCushion || 1.2
+  return common.serverInfo.getFee(this.connection, cushion)
 }
 
 function formatLedgerClose(ledgerClose: Object): Object {
@@ -38,7 +38,7 @@ function formatLedgerClose(ledgerClose: Object): Object {
     reserveIncrementXRP: common.dropsToXrp(ledgerClose.reserve_inc),
     transactionCount: ledgerClose.txn_count,
     validatedLedgerVersions: ledgerClose.validated_ledgers
-  };
+  }
 }
 
 module.exports = {
@@ -49,4 +49,4 @@ module.exports = {
   getFee,
   getLedgerVersion,
   formatLedgerClose
-};
+}

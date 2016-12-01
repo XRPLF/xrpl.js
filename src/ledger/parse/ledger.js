@@ -1,48 +1,48 @@
 /* @flow */
-'use strict'; // eslint-disable-line
-const _ = require('lodash');
-const {removeUndefined, rippleTimeToISO8601} = require('./utils');
-const parseTransaction = require('./transaction');
-import type {GetLedger} from '../types.js';
+'use strict' // eslint-disable-line strict
+const _ = require('lodash')
+const {removeUndefined, rippleTimeToISO8601} = require('./utils')
+const parseTransaction = require('./transaction')
+import type {GetLedger} from '../types.js'
 
 function parseTransactionWrapper(ledgerVersion, tx) {
   const transaction = _.assign({}, _.omit(tx, 'metaData'), {
     meta: tx.metaData,
     ledger_index: ledgerVersion
-  });
-  const result = parseTransaction(transaction);
+  })
+  const result = parseTransaction(transaction)
   if (!result.outcome.ledgerVersion) {
-    result.outcome.ledgerVersion = ledgerVersion;
+    result.outcome.ledgerVersion = ledgerVersion
   }
-  return result;
+  return result
 }
 
 function parseTransactions(transactions, ledgerVersion) {
   if (_.isEmpty(transactions)) {
-    return {};
+    return {}
   }
   if (_.isString(transactions[0])) {
-    return {transactionHashes: transactions};
+    return {transactionHashes: transactions}
   }
   return {
     transactions: _.map(transactions,
       _.partial(parseTransactionWrapper, ledgerVersion)),
     rawTransactions: JSON.stringify(transactions)
-  };
+  }
 }
 
 function parseState(state) {
   if (_.isEmpty(state)) {
-    return {};
+    return {}
   }
   if (_.isString(state[0])) {
-    return {stateHashes: state};
+    return {stateHashes: state}
   }
-  return {rawState: JSON.stringify(state)};
+  return {rawState: JSON.stringify(state)}
 }
 
 function parseLedger(ledger: Object): GetLedger {
-  const ledgerVersion = parseInt(ledger.ledger_index || ledger.seqNum, 10);
+  const ledgerVersion = parseInt(ledger.ledger_index || ledger.seqNum, 10)
   return removeUndefined(_.assign({
     stateHash: ledger.account_hash,
     closeTime: rippleTimeToISO8601(ledger.close_time),
@@ -57,7 +57,7 @@ function parseLedger(ledger: Object): GetLedger {
   },
   parseTransactions(ledger.transactions, ledgerVersion),
   parseState(ledger.accountState)
-  ));
+  ))
 }
 
-module.exports = parseLedger;
+module.exports = parseLedger

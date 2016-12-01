@@ -1,10 +1,10 @@
 /* @flow */
-'use strict';
-const _ = require('lodash');
-const BigNumber = require('bignumber.js');
-const common = require('../common');
-const txFlags = common.txFlags;
-import type {Instructions, Prepare} from './types.js';
+'use strict' // eslint-disable-line strict
+const _ = require('lodash')
+const BigNumber = require('bignumber.js')
+const common = require('../common')
+const txFlags = common.txFlags
+import type {Instructions, Prepare} from './types.js'
 
 function formatPrepareResponse(txJSON: Object): Object {
   const instructions = {
@@ -12,94 +12,94 @@ function formatPrepareResponse(txJSON: Object): Object {
     sequence: txJSON.Sequence,
     maxLedgerVersion: txJSON.LastLedgerSequence === undefined ?
       null : txJSON.LastLedgerSequence
-  };
+  }
   return {
     txJSON: JSON.stringify(txJSON),
     instructions: _.omit(instructions, _.isUndefined)
-  };
+  }
 }
 
 function setCanonicalFlag(txJSON) {
-  txJSON.Flags |= txFlags.Universal.FullyCanonicalSig;
+  txJSON.Flags |= txFlags.Universal.FullyCanonicalSig
 
   // JavaScript converts operands to 32-bit signed ints before doing bitwise
   // operations. We need to convert it back to an unsigned int.
-  txJSON.Flags = txJSON.Flags >>> 0;
+  txJSON.Flags = txJSON.Flags >>> 0
 }
 
 function scaleValue(value, multiplier) {
-  return (new BigNumber(value)).times(multiplier).toString();
+  return (new BigNumber(value)).times(multiplier).toString()
 }
 
 function prepareTransaction(txJSON: Object, api: Object,
     instructions: Instructions
 ): Promise<Prepare> {
-  common.validate.instructions(instructions);
+  common.validate.instructions(instructions)
 
-  const account = txJSON.Account;
-  setCanonicalFlag(txJSON);
+  const account = txJSON.Account
+  setCanonicalFlag(txJSON)
 
   function prepareMaxLedgerVersion(): Promise<Object> {
     if (instructions.maxLedgerVersion !== undefined) {
       if (instructions.maxLedgerVersion !== null) {
-        txJSON.LastLedgerSequence = instructions.maxLedgerVersion;
+        txJSON.LastLedgerSequence = instructions.maxLedgerVersion
       }
-      return Promise.resolve(txJSON);
+      return Promise.resolve(txJSON)
     }
     const offset = instructions.maxLedgerVersionOffset !== undefined ?
-      instructions.maxLedgerVersionOffset : 3;
+      instructions.maxLedgerVersionOffset : 3
     return api.connection.getLedgerVersion().then(ledgerVersion => {
-      txJSON.LastLedgerSequence = ledgerVersion + offset;
-      return txJSON;
-    });
+      txJSON.LastLedgerSequence = ledgerVersion + offset
+      return txJSON
+    })
   }
 
   function prepareFee(): Promise<Object> {
     const multiplier = instructions.signersCount === undefined ? 1 :
-      instructions.signersCount + 1;
+      instructions.signersCount + 1
     if (instructions.fee !== undefined) {
-      txJSON.Fee = scaleValue(common.xrpToDrops(instructions.fee), multiplier);
-      return Promise.resolve(txJSON);
+      txJSON.Fee = scaleValue(common.xrpToDrops(instructions.fee), multiplier)
+      return Promise.resolve(txJSON)
     }
-    const cushion = api._feeCushion;
+    const cushion = api._feeCushion
     return common.serverInfo.getFee(api.connection, cushion).then(fee => {
-      const feeDrops = common.xrpToDrops(fee);
+      const feeDrops = common.xrpToDrops(fee)
       if (instructions.maxFee !== undefined) {
-        const maxFeeDrops = common.xrpToDrops(instructions.maxFee);
-        const normalFee = BigNumber.min(feeDrops, maxFeeDrops).toString();
-        txJSON.Fee = scaleValue(normalFee, multiplier);
+        const maxFeeDrops = common.xrpToDrops(instructions.maxFee)
+        const normalFee = BigNumber.min(feeDrops, maxFeeDrops).toString()
+        txJSON.Fee = scaleValue(normalFee, multiplier)
       } else {
-        txJSON.Fee = scaleValue(feeDrops, multiplier);
+        txJSON.Fee = scaleValue(feeDrops, multiplier)
       }
-      return txJSON;
-    });
+      return txJSON
+    })
   }
 
   function prepareSequence(): Promise<Object> {
     if (instructions.sequence !== undefined) {
-      txJSON.Sequence = instructions.sequence;
-      return Promise.resolve(txJSON);
+      txJSON.Sequence = instructions.sequence
+      return Promise.resolve(txJSON)
     }
     const request = {
       command: 'account_info',
       account: account
-    };
+    }
     return api.connection.request(request).then(response => {
-      txJSON.Sequence = response.account_data.Sequence;
-      return txJSON;
-    });
+      txJSON.Sequence = response.account_data.Sequence
+      return txJSON
+    })
   }
 
   return Promise.all([
     prepareMaxLedgerVersion(),
     prepareFee(),
     prepareSequence()
-  ]).then(() => formatPrepareResponse(txJSON));
+  ]).then(() => formatPrepareResponse(txJSON))
 }
 
 function convertStringToHex(string: string) {
   return string ? (new Buffer(string, 'utf8')).toString('hex').toUpperCase() :
-    undefined;
+    undefined
 }
 
 function convertMemo(memo: Object): Object {
@@ -109,7 +109,7 @@ function convertMemo(memo: Object): Object {
       MemoType: convertStringToHex(memo.type),
       MemoFormat: convertStringToHex(memo.format)
     })
-  };
+  }
 }
 
 module.exports = {
@@ -117,4 +117,4 @@ module.exports = {
   convertMemo,
   prepareTransaction,
   common
-};
+}

@@ -1,4 +1,4 @@
-'use strict';
+'use strict' // eslint-disable-line strict
 
 module.exports = {
   RippleAPI: require('./api').RippleAPI,
@@ -6,4 +6,4 @@ module.exports = {
   RippleAPIBroadcast: require('./broadcast').RippleAPIBroadcast,
   // HTTP server is experimental
   createHTTPServer: require('./http').createHTTPServer
-};
+}

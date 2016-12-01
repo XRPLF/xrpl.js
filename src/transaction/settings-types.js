@@ -1,5 +1,5 @@
 /* @flow */
-'use strict';
+'use strict' // eslint-disable-line strict
 
 type SettingPasswordSpent = {
   passwordSpent?: boolean,
