@@ -27,7 +27,7 @@ function hashLedgerHeader(ledgerHeader) {
   return hashes.computeLedgerHash(header)
 }
 
-function computeTransactionHash(ledger) {
+function computeTransactionHash(ledger, version) {
   if (ledger.rawTransactions === undefined) {
     return ledger.transactionHash
   }
@@ -38,7 +38,7 @@ function computeTransactionHash(ledger) {
       tx.meta ? {metaData: tx.meta} : {})
     return renameMeta
   })
-  const transactionHash = hashes.computeTransactionTreeHash(txs)
+  const transactionHash = hashes.computeTransactionTreeHash(txs, version)
   if (ledger.transactionHash !== undefined
       && ledger.transactionHash !== transactionHash) {
     throw new common.errors.ValidationError('transactionHash in header'
@@ -47,12 +47,12 @@ function computeTransactionHash(ledger) {
   return transactionHash
 }
 
-function computeStateHash(ledger) {
+function computeStateHash(ledger, version) {
   if (ledger.rawState === undefined) {
     return ledger.stateHash
   }
   const state = JSON.parse(ledger.rawState)
-  const stateHash = hashes.computeStateTreeHash(state)
+  const stateHash = hashes.computeStateTreeHash(state, version)
   if (ledger.stateHash !== undefined && ledger.stateHash !== stateHash) {
     throw new common.errors.ValidationError('stateHash in header'
       + ' does not match computed hash of state')
@@ -60,10 +60,13 @@ function computeStateHash(ledger) {
   return stateHash
 }
 
+const sLCF_SHAMapV2 = 0x02
+
 function computeLedgerHash(ledger: Object): string {
+  const version = ((ledger.closeFlags & sLCF_SHAMapV2) === 0) ? 1 : 2
   const subhashes = {
-    transactionHash: computeTransactionHash(ledger),
-    stateHash: computeStateHash(ledger)
+    transactionHash: computeTransactionHash(ledger, version),
+    stateHash: computeStateHash(ledger, version)
   }
   return hashLedgerHeader(_.assign({}, ledger, subhashes))
 }
