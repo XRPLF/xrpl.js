@@ -30,7 +30,7 @@ Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/d
 
 ##Generating Documentation
 
-The continuous integration tests require that the documentation stays up-to-date. If you make changes the the JSON schemas, fixtures, or documentation sources, you must update the documentation by running `npm run docgen`.
+The continuous integration tests require that the documentation stays up-to-date. If you make changes to the JSON schemas, fixtures, or documentation sources, you must update the documentation by running `npm run docgen`.
 
 ##More Information
 
