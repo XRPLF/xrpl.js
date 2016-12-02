@@ -1,10 +1,10 @@
 /* @flow */
-'use strict';
-const _ = require('lodash');
-const utils = require('./utils');
-const validate = utils.common.validate;
-import type {Instructions, Prepare} from './types.js';
-import type {Memo} from '../common/types.js';
+'use strict' // eslint-disable-line strict
+const _ = require('lodash')
+const utils = require('./utils')
+const validate = utils.common.validate
+import type {Instructions, Prepare} from './types.js'
+import type {Memo} from '../common/types.js'
 
 type SuspendedPaymentExecution = {
   owner: string,
@@ -23,21 +23,21 @@ function createSuspendedPaymentExecutionTransaction(account: string,
     Account: account,
     Owner: payment.owner,
     OfferSequence: payment.suspensionSequence
-  };
+  }
 
   if (payment.method !== undefined) {
-    txJSON.Method = payment.method;
+    txJSON.Method = payment.method
   }
   if (payment.digest !== undefined) {
-    txJSON.Digest = payment.digest;
+    txJSON.Digest = payment.digest
   }
   if (payment.proof !== undefined) {
-    txJSON.Proof = utils.convertStringToHex(payment.proof);
+    txJSON.Proof = utils.convertStringToHex(payment.proof)
   }
   if (payment.memos !== undefined) {
-    txJSON.Memos = _.map(payment.memos, utils.convertMemo);
+    txJSON.Memos = _.map(payment.memos, utils.convertMemo)
   }
-  return txJSON;
+  return txJSON
 }
 
 function prepareSuspendedPaymentExecution(address: string,
@@ -45,10 +45,10 @@ function prepareSuspendedPaymentExecution(address: string,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   validate.prepareSuspendedPaymentExecution(
-    {address, suspendedPaymentExecution, instructions});
+    {address, suspendedPaymentExecution, instructions})
   const txJSON = createSuspendedPaymentExecutionTransaction(
-    address, suspendedPaymentExecution);
-  return utils.prepareTransaction(txJSON, this, instructions);
+    address, suspendedPaymentExecution)
+  return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareSuspendedPaymentExecution;
+module.exports = prepareSuspendedPaymentExecution

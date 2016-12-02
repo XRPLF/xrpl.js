@@ -1,8 +1,8 @@
 /* @flow */
 
-'use strict';
-const utils = require('./utils');
-const {validate, removeUndefined} = utils.common;
+'use strict' // eslint-disable-line strict
+const utils = require('./utils')
+const {validate, removeUndefined} = utils.common
 
 type AccountData = {
   Sequence: number,
@@ -39,7 +39,7 @@ type AccountInfoResponse = {
 }
 
 function formatAccountInfo(response: AccountDataResponse) {
-  const data = response.account_data;
+  const data = response.account_data
   return removeUndefined({
     sequence: data.Sequence,
     xrpBalance: utils.common.dropsToXrp(data.Balance),
@@ -47,20 +47,20 @@ function formatAccountInfo(response: AccountDataResponse) {
     previousInitiatedTransactionID: data.AccountTxnID,
     previousAffectingTransactionID: data.PreviousTxnID,
     previousAffectingTransactionLedgerVersion: data.PreviousTxnLgrSeq
-  });
+  })
 }
 
 function getAccountInfo(address: string, options: AccountInfoOptions = {}
 ): Promise<AccountInfoResponse> {
-  validate.getAccountInfo({address, options});
+  validate.getAccountInfo({address, options})
 
   const request = {
     command: 'account_info',
     account: address,
     ledger_index: options.ledgerVersion || 'validated'
-  };
+  }
 
-  return this.connection.request(request).then(formatAccountInfo);
+  return this.connection.request(request).then(formatAccountInfo)
 }
 
-module.exports = getAccountInfo;
+module.exports = getAccountInfo

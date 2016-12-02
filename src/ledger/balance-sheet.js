@@ -1,10 +1,10 @@
 /* @flow */
-'use strict';
+'use strict' // eslint-disable-line strict
 
-const _ = require('lodash');
-const utils = require('./utils');
-const {validate} = utils.common;
-import type {Amount} from '../common/types.js';
+const _ = require('lodash')
+const utils = require('./utils')
+const {validate} = utils.common
+import type {Amount} from '../common/types.js'
 
 type BalanceSheetOptions = {
   excludeAddresses?: Array<string>,
@@ -21,35 +21,35 @@ type GetBalanceSheet = {
 }
 
 function formatBalanceSheet(balanceSheet): GetBalanceSheet {
-  const result = {};
+  const result = {}
 
   if (!_.isUndefined(balanceSheet.balances)) {
-    result.balances = [];
+    result.balances = []
     _.forEach(balanceSheet.balances, (balances, counterparty) => {
-      _.forEach(balances, (balance) => {
-        result.balances.push(Object.assign({counterparty}, balance));
-      });
-    });
+      _.forEach(balances, balance => {
+        result.balances.push(Object.assign({counterparty}, balance))
+      })
+    })
   }
   if (!_.isUndefined(balanceSheet.assets)) {
-    result.assets = [];
+    result.assets = []
     _.forEach(balanceSheet.assets, (assets, counterparty) => {
-      _.forEach(assets, (balance) => {
-        result.assets.push(Object.assign({counterparty}, balance));
-      });
-    });
+      _.forEach(assets, balance => {
+        result.assets.push(Object.assign({counterparty}, balance))
+      })
+    })
   }
   if (!_.isUndefined(balanceSheet.obligations)) {
     result.obligations = _.map(balanceSheet.obligations, (value, currency) =>
-                               ({currency, value}));
+                               ({currency, value}))
   }
 
-  return result;
+  return result
 }
 
 function getBalanceSheet(address: string, options: BalanceSheetOptions = {}
 ): Promise<GetBalanceSheet> {
-  validate.getBalanceSheet({address, options});
+  validate.getBalanceSheet({address, options})
 
   return utils.ensureLedgerVersion.call(this, options).then(_options => {
     const request = {
@@ -58,10 +58,10 @@ function getBalanceSheet(address: string, options: BalanceSheetOptions = {}
       strict: true,
       hotwallet: _options.excludeAddresses,
       ledger_index: _options.ledgerVersion
-    };
+    }
 
-    return this.connection.request(request).then(formatBalanceSheet);
-  });
+    return this.connection.request(request).then(formatBalanceSheet)
+  })
 }
 
-module.exports = getBalanceSheet;
+module.exports = getBalanceSheet

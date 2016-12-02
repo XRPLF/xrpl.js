@@ -1,14 +1,14 @@
 /* @flow */
-'use strict';
-const _ = require('lodash');
-const utils = require('./utils');
-const validate = utils.common.validate;
-const toRippledAmount = utils.common.toRippledAmount;
-const paymentFlags = utils.common.txFlags.Payment;
-const ValidationError = utils.common.errors.ValidationError;
-import type {Instructions, Prepare} from './types.js';
+'use strict' // eslint-disable-line strict
+const _ = require('lodash')
+const utils = require('./utils')
+const validate = utils.common.validate
+const toRippledAmount = utils.common.toRippledAmount
+const paymentFlags = utils.common.txFlags.Payment
+const ValidationError = utils.common.errors.ValidationError
+import type {Instructions, Prepare} from './types.js'
 import type {Amount, Adjustment, MaxAdjustment,
-  MinAdjustment, Memo} from '../common/types.js';
+  MinAdjustment, Memo} from '../common/types.js'
 
 
 type Payment = {
@@ -34,15 +34,15 @@ type Payment = {
 
 function isXRPToXRPPayment(payment: Payment): boolean {
   const sourceCurrency = _.get(payment, 'source.maxAmount.currency',
-    _.get(payment, 'source.amount.currency'));
+    _.get(payment, 'source.amount.currency'))
   const destinationCurrency = _.get(payment, 'destination.amount.currency',
-    _.get(payment, 'destination.minAmount.currency'));
-  return sourceCurrency === 'XRP' && destinationCurrency === 'XRP';
+    _.get(payment, 'destination.minAmount.currency'))
+  return sourceCurrency === 'XRP' && destinationCurrency === 'XRP'
 }
 
 function isIOUWithoutCounterparty(amount: Amount): boolean {
   return amount && amount.currency !== 'XRP'
-    && amount.counterparty === undefined;
+    && amount.counterparty === undefined
 }
 
 function applyAnyCounterpartyEncoding(payment: Payment): void {
@@ -51,35 +51,35 @@ function applyAnyCounterpartyEncoding(payment: Payment): void {
   // https://ripple.com/build/transactions/
   //    #special-issuer-values-for-sendmax-and-amount
   // https://ripple.com/build/ripple-rest/#counterparties-in-payments
-  _.forEach([payment.source, payment.destination], (adjustment) => {
-    _.forEach(['amount', 'minAmount', 'maxAmount'], (key) => {
+  _.forEach([payment.source, payment.destination], adjustment => {
+    _.forEach(['amount', 'minAmount', 'maxAmount'], key => {
       if (isIOUWithoutCounterparty(adjustment[key])) {
-        adjustment[key].counterparty = adjustment.address;
+        adjustment[key].counterparty = adjustment.address
       }
-    });
-  });
+    })
+  })
 }
 
 function createMaximalAmount(amount: Amount): Amount {
-  const maxXRPValue = '100000000000';
-  const maxIOUValue = '9999999999999999e80';
-  const maxValue = amount.currency === 'XRP' ? maxXRPValue : maxIOUValue;
-  return _.assign({}, amount, {value: maxValue});
+  const maxXRPValue = '100000000000'
+  const maxIOUValue = '9999999999999999e80'
+  const maxValue = amount.currency === 'XRP' ? maxXRPValue : maxIOUValue
+  return _.assign({}, amount, {value: maxValue})
 }
 
 function createPaymentTransaction(address: string, paymentArgument: Payment
 ): Object {
-  const payment = _.cloneDeep(paymentArgument);
-  applyAnyCounterpartyEncoding(payment);
+  const payment = _.cloneDeep(paymentArgument)
+  applyAnyCounterpartyEncoding(payment)
 
   if (address !== payment.source.address) {
-    throw new ValidationError('address must match payment.source.address');
+    throw new ValidationError('address must match payment.source.address')
   }
 
   if ((payment.source.maxAmount && payment.destination.minAmount) ||
       (payment.source.amount && payment.destination.amount)) {
     throw new ValidationError('payment must specify either (source.maxAmount '
-      + 'and destination.amount) or (source.amount and destination.minAmount)');
+      + 'and destination.amount) or (source.amount and destination.minAmount)')
   }
 
   // when using destination.minAmount, rippled still requires that we set
@@ -90,7 +90,7 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
   // cap could be hit before the source cap.
   const amount = payment.destination.minAmount && !isXRPToXRPPayment(payment) ?
     createMaximalAmount(payment.destination.minAmount) :
-    (payment.destination.amount || payment.destination.minAmount);
+    (payment.destination.amount || payment.destination.minAmount)
 
   const txJSON: Object = {
     TransactionType: 'Payment',
@@ -98,25 +98,25 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
     Destination: payment.destination.address,
     Amount: toRippledAmount(amount),
     Flags: 0
-  };
+  }
 
   if (payment.invoiceID !== undefined) {
-    txJSON.InvoiceID = payment.invoiceID;
+    txJSON.InvoiceID = payment.invoiceID
   }
   if (payment.source.tag !== undefined) {
-    txJSON.SourceTag = payment.source.tag;
+    txJSON.SourceTag = payment.source.tag
   }
   if (payment.destination.tag !== undefined) {
-    txJSON.DestinationTag = payment.destination.tag;
+    txJSON.DestinationTag = payment.destination.tag
   }
   if (payment.memos !== undefined) {
-    txJSON.Memos = _.map(payment.memos, utils.convertMemo);
+    txJSON.Memos = _.map(payment.memos, utils.convertMemo)
   }
   if (payment.noDirectRipple === true) {
-    txJSON.Flags |= paymentFlags.NoRippleDirect;
+    txJSON.Flags |= paymentFlags.NoRippleDirect
   }
   if (payment.limitQuality === true) {
-    txJSON.Flags |= paymentFlags.LimitQuality;
+    txJSON.Flags |= paymentFlags.LimitQuality
   }
   if (!isXRPToXRPPayment(payment)) {
     // Don't set SendMax for XRP->XRP payment
@@ -125,32 +125,32 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
     //  c522ffa6db2648f1d8a987843e7feabf1a0b7de8/
     if (payment.allowPartialPayment === true
         || payment.destination.minAmount !== undefined) {
-      txJSON.Flags |= paymentFlags.PartialPayment;
+      txJSON.Flags |= paymentFlags.PartialPayment
     }
 
     txJSON.SendMax = toRippledAmount(
-      payment.source.maxAmount || payment.source.amount);
+      payment.source.maxAmount || payment.source.amount)
 
     if (payment.destination.minAmount !== undefined) {
-      txJSON.DeliverMin = toRippledAmount(payment.destination.minAmount);
+      txJSON.DeliverMin = toRippledAmount(payment.destination.minAmount)
     }
 
     if (payment.paths !== undefined) {
-      txJSON.Paths = JSON.parse(payment.paths);
+      txJSON.Paths = JSON.parse(payment.paths)
     }
   } else if (payment.allowPartialPayment === true) {
-    throw new ValidationError('XRP to XRP payments cannot be partial payments');
+    throw new ValidationError('XRP to XRP payments cannot be partial payments')
   }
 
-  return txJSON;
+  return txJSON
 }
 
 function preparePayment(address: string, payment: Payment,
     instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.preparePayment({address, payment, instructions});
-  const txJSON = createPaymentTransaction(address, payment);
-  return utils.prepareTransaction(txJSON, this, instructions);
+  validate.preparePayment({address, payment, instructions})
+  const txJSON = createPaymentTransaction(address, payment)
+  return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = preparePayment;
+module.exports = preparePayment

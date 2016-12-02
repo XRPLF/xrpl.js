@@ -1,25 +1,25 @@
 /* @flow */
-'use strict';
-const _ = require('lodash');
-const ValidationError = require('./errors').ValidationError;
-const schemaValidate = require('./schema-validator').schemaValidate;
+'use strict' // eslint-disable-line strict
+const _ = require('lodash')
+const ValidationError = require('./errors').ValidationError
+const schemaValidate = require('./schema-validator').schemaValidate
 
 function error(text) {
-  return new ValidationError(text);
+  return new ValidationError(text)
 }
 
 function validateLedgerRange(options) {
   if (!_.isUndefined(options) && !_.isUndefined(options.minLedgerVersion)
       && !_.isUndefined(options.maxLedgerVersion)) {
     if (Number(options.minLedgerVersion) > Number(options.maxLedgerVersion)) {
-      throw error('minLedgerVersion must not be greater than maxLedgerVersion');
+      throw error('minLedgerVersion must not be greater than maxLedgerVersion')
     }
   }
 }
 
 function validateOptions(schema, instance) {
-  schemaValidate(schema, instance);
-  validateLedgerRange(instance.options);
+  schemaValidate(schema, instance)
+  validateLedgerRange(instance.options)
 }
 
 module.exports = {
@@ -53,4 +53,4 @@ module.exports = {
   generateAddress: _.partial(schemaValidate, 'generateAddressParameters'),
   apiOptions: _.partial(schemaValidate, 'api-options'),
   instructions: _.partial(schemaValidate, 'instructions')
-};
+}

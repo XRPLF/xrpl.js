@@ -1,8 +1,8 @@
 /* @flow */
-'use strict';
+'use strict' // eslint-disable-line strict
 
 import type {Amount, LaxLaxAmount, RippledAmount, Adjustment, MaxAdjustment,
-  MinAdjustment} from '../common/types.js';
+  MinAdjustment} from '../common/types.js'
 
 
 type Path = {

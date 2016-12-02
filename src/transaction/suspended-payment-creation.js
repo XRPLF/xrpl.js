@@ -1,10 +1,10 @@
 /* @flow */
-'use strict';
-const _ = require('lodash');
-const utils = require('./utils');
-const {validate, iso8601ToRippleTime, toRippledAmount} = utils.common;
-import type {Instructions, Prepare} from './types.js';
-import type {Adjustment, MaxAdjustment, Memo} from '../common/types.js';
+'use strict' // eslint-disable-line strict
+const _ = require('lodash')
+const utils = require('./utils')
+const {validate, iso8601ToRippleTime, toRippledAmount} = utils.common
+import type {Instructions, Prepare} from './types.js'
+import type {Adjustment, MaxAdjustment, Memo} from '../common/types.js'
 
 type SuspendedPaymentCreation = {
   source: MaxAdjustment,
@@ -23,27 +23,27 @@ function createSuspendedPaymentCreationTransaction(account: string,
     Account: account,
     Destination: payment.destination.address,
     Amount: toRippledAmount(payment.destination.amount)
-  };
+  }
 
   if (payment.digest !== undefined) {
-    txJSON.Digest = payment.digest;
+    txJSON.Digest = payment.digest
   }
   if (payment.allowCancelAfter !== undefined) {
-    txJSON.CancelAfter = iso8601ToRippleTime(payment.allowCancelAfter);
+    txJSON.CancelAfter = iso8601ToRippleTime(payment.allowCancelAfter)
   }
   if (payment.allowExecuteAfter !== undefined) {
-    txJSON.FinishAfter = iso8601ToRippleTime(payment.allowExecuteAfter);
+    txJSON.FinishAfter = iso8601ToRippleTime(payment.allowExecuteAfter)
   }
   if (payment.source.tag !== undefined) {
-    txJSON.SourceTag = payment.source.tag;
+    txJSON.SourceTag = payment.source.tag
   }
   if (payment.destination.tag !== undefined) {
-    txJSON.DestinationTag = payment.destination.tag;
+    txJSON.DestinationTag = payment.destination.tag
   }
   if (payment.memos !== undefined) {
-    txJSON.Memos = _.map(payment.memos, utils.convertMemo);
+    txJSON.Memos = _.map(payment.memos, utils.convertMemo)
   }
-  return txJSON;
+  return txJSON
 }
 
 function prepareSuspendedPaymentCreation(address: string,
@@ -51,10 +51,10 @@ function prepareSuspendedPaymentCreation(address: string,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   validate.prepareSuspendedPaymentCreation(
-    {address, suspendedPaymentCreation, instructions});
+    {address, suspendedPaymentCreation, instructions})
   const txJSON = createSuspendedPaymentCreationTransaction(
-    address, suspendedPaymentCreation);
-  return utils.prepareTransaction(txJSON, this, instructions);
+    address, suspendedPaymentCreation)
+  return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareSuspendedPaymentCreation;
+module.exports = prepareSuspendedPaymentCreation
