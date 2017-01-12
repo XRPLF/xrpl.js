@@ -28,7 +28,7 @@
     "ripple-hashes": "^0.2.0",
     "ripple-keypairs": "^0.10.0",
     "ripple-lib-transactionparser": "^0.6.0",
-    "ws": "^1.0.1"
+    "ws": "^1.1.1"
   },
   "devDependencies": {
     "assert-diff": "^1.0.1",
