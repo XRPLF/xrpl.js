@@ -6,5 +6,6 @@
   "type": "string",
   "enum": ["payment", "order", "orderCancellation", "trustline", "settings",
            "escrowCreation", "escrowCancellation",
-           "escrowExecution"]
+           "escrowExecution", "paymentChannelCreate",
+           "paymentChannelFund", "paymentChannelClaim"]
 }

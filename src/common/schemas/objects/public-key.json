@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "publicKey",
+  "description": "The hexadecimal representation of a secp256k1 or Ed25519 public key.",
+  "type": "string",
+  "pattern": "^[A-F0-9]+$"
+}

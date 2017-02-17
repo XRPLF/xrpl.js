@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "signature",
+  "description": "The hexadecimal representation of a signature.",
+  "type": "string",
+  "pattern": "^[A-F0-9]+$"
+}

@@ -320,6 +320,93 @@ describe('RippleAPI', function() {
           'prepare'));
   });
 
+  it('preparePaymentChannelCreate', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelCreate(
+      address, requests.preparePaymentChannelCreate.normal,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelCreate.normal,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelCreate full', function() {
+    return this.api.preparePaymentChannelCreate(
+      address, requests.preparePaymentChannelCreate.full).then(
+        _.partial(checkResult, responses.preparePaymentChannelCreate.full,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelFund', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelFund(
+      address, requests.preparePaymentChannelFund.normal,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelFund.normal,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelFund full', function() {
+    return this.api.preparePaymentChannelFund(
+      address, requests.preparePaymentChannelFund.full).then(
+        _.partial(checkResult, responses.preparePaymentChannelFund.full,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelClaim', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelClaim(
+      address, requests.preparePaymentChannelClaim.normal,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelClaim.normal,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelClaim with renew', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelClaim(
+      address, requests.preparePaymentChannelClaim.renew,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelClaim.renew,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelClaim with close', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelClaim(
+      address, requests.preparePaymentChannelClaim.close,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelClaim.close,
+          'prepare'));
+  });
+
+  it('throws on preparePaymentChannelClaim with renew and close', function() {
+    assert.throws(() => {
+      this.api.preparePaymentChannelClaim(
+        address, requests.preparePaymentChannelClaim.full).then(
+          _.partial(checkResult, responses.preparePaymentChannelClaim.full,
+            'prepare'));
+    }, this.api.errors.ValidationError);
+  });
+
+  it('throws on preparePaymentChannelClaim with no signature', function() {
+    assert.throws(() => {
+      this.api.preparePaymentChannelClaim(
+        address, requests.preparePaymentChannelClaim.noSignature).then(
+          _.partial(checkResult, responses.preparePaymentChannelClaim.noSignature,
+            'prepare'));
+    }, this.api.errors.ValidationError);
+  });
+
   it('sign', function() {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
     const result = this.api.sign(requests.sign.normal.txJSON, secret);
@@ -677,6 +764,33 @@ describe('RippleAPI', function() {
       return this.api.getTransaction(hash).then(
         _.partial(checkResult,
           responses.getTransaction.escrowExecutionSimple,
+          'getTransaction'));
+    });
+
+    it('getTransaction - PaymentChannelCreate', function() {
+      const hash =
+        '0E9CA3AB1053FC0C1CBAA75F636FE1EC92F118C7056BBEF5D63E4C116458A16D';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.paymentChannelCreate,
+          'getTransaction'));
+    });
+
+    it('getTransaction - PaymentChannelFund', function() {
+      const hash =
+        'CD053D8867007A6A4ACB7A432605FE476D088DCB515AFFC886CF2B4EB6D2AE8B';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.paymentChannelFund,
+          'getTransaction'));
+    });
+
+    it('getTransaction - PaymentChannelClaim', function() {
+      const hash =
+        '81B9ECAE7195EB6E8034AEDF44D8415A7A803E14513FDBB34FA984AB37D59563';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.paymentChannelClaim,
           'getTransaction'));
     });
 

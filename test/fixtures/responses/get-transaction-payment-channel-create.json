@@ -1,0 +1,29 @@
+{
+  "type": "paymentChannelCreate",
+  "address": "rfAuMkVuZQnQhvdMcUKg4ndBb9SPDhzNmK",
+  "sequence": 113,
+  "id": "0E9CA3AB1053FC0C1CBAA75F636FE1EC92F118C7056BBEF5D63E4C116458A16D",
+  "specification": {
+    "amount": "1",
+    "destination": "rBmNDZ7vbTCwakKXsX3pDAwDdQuxM7yBRa",
+    "sourceTag": 3444675312,
+    "publicKey": "EDE059A23CBE00BDD465910EBDA67C86BAD046FA52E1BBBB27159E31980BAFEFB9",
+    "settleDelay": 90000
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2017-03-09T14:09:50.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rfAuMkVuZQnQhvdMcUKg4ndBb9SPDhzNmK": [
+        {
+          "currency": "XRP",
+          "value": "-1.000012"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 786309,
+    "indexInLedger": 0
+  }
+}

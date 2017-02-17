@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "paymentChannelClaim",
+  "link": "payment-channel-claim",
+  "type": "object",
+  "properties": {
+    "channel": {
+      "$ref": "hash256",
+      "description": "256-bit hexadecimal channel identifier."
+    },
+    "amount": {
+      "$ref": "value",
+      "description": "XRP balance of this channel after claim is processed."
+    },
+    "balance": {
+      "$ref": "value",
+      "description": "Amount of XRP authorized by signature."
+    },
+    "signature": {
+      "$ref": "signature",
+      "description": "Signature of this claim."
+    },
+    "publicKey": {
+      "$ref": "publicKey",
+      "description": "Public key of the channel's sender"
+    },
+    "renew": {
+      "type": "boolean",
+      "description": "Clear the channel's expiration time."
+    },
+    "close": {
+      "type": "boolean",
+      "description": "Request to close the channel."
+    }
+  },
+  "required": ["channel"],
+  "additionalProperties": false
+}

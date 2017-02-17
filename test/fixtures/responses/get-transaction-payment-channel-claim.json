@@ -1,0 +1,28 @@
+{
+  "type": "paymentChannelClaim",
+  "address": "rBmNDZ7vbTCwakKXsX3pDAwDdQuxM7yBRa",
+  "sequence": 99,
+  "id": "81B9ECAE7195EB6E8034AEDF44D8415A7A803E14513FDBB34FA984AB37D59563",
+  "specification": {
+    "channel": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
+    "balance": "0.801",
+    "publicKey": "EDE059A23CBE00BDD465910EBDA67C86BAD046FA52E1BBBB27159E31980BAFEFB9",
+    "signature": "5567FB8A27D8BF0C556D3D31D034476FC04F43846A6613EB4B1B64C396C833600BE251CE3104CF02DA0085B473E02BA0BA21F794FB1DC95DAD702F3EA761CA02"
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2017-03-09T14:09:51.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rBmNDZ7vbTCwakKXsX3pDAwDdQuxM7yBRa": [
+        {
+          "currency": "XRP",
+          "value": "0.800988"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 786310,
+    "indexInLedger": 0
+  }
+}

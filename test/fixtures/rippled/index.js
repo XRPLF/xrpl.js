@@ -70,6 +70,9 @@ module.exports = {
     EscrowExecution: require('./tx/escrow-execution.json'),
     EscrowExecutionSimple:
       require('./tx/escrow-execution-simple.json'),
+    PaymentChannelCreate: require('./tx/payment-channel-create.json'),
+    PaymentChannelFund: require('./tx/payment-channel-fund.json'),
+    PaymentChannelClaim: require('./tx/payment-channel-claim.json'),
     Unrecognized: require('./tx/unrecognized.json'),
     NoMeta: require('./tx/no-meta.json'),
     LedgerZero: require('./tx/ledger-zero.json'),
