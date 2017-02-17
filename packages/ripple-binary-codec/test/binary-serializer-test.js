@@ -15,6 +15,20 @@ const SignerListSet = {
   binary: require('./fixtures/signerlistset-tx-binary.json'),
   meta: require('./fixtures/signerlistset-tx-meta-binary.json')
 };
+const PaymentChannel = {
+  create: {
+    tx: require('./fixtures/payment-channel-create-tx.json'),
+    binary: require('./fixtures/payment-channel-create-binary.json')
+  },
+  fund: {
+    tx: require('./fixtures/payment-channel-fund-tx.json'),
+    binary: require('./fixtures/payment-channel-fund-binary.json')
+  },
+  claim: {
+    tx: require('./fixtures/payment-channel-claim-tx.json'),
+    binary: require('./fixtures/payment-channel-claim-binary.json')
+  }
+}
 
 function bytesListTest() {
   const list = new BytesList().put([0]).put([2, 3]).put([4, 5]);
@@ -106,6 +120,21 @@ function SignerListSetTest() {
   });
 }
 
+function PaymentChannelTest() {
+  it('can serialize PaymentChannelCreate', () => {
+    assert.strictEqual(encode(PaymentChannel.create.tx),
+      PaymentChannel.create.binary);
+  });
+  it('can serialize PaymentChannelFund', () => {
+    assert.strictEqual(encode(PaymentChannel.fund.tx),
+      PaymentChannel.fund.binary);
+  });
+  it('can serialize PaymentChannelClaim', () => {
+    assert.strictEqual(encode(PaymentChannel.claim.tx),
+      PaymentChannel.claim.binary);
+  });
+}
+
 describe('Binary Serialization', function() {
   describe.skip('parseLedger4320278', parseLedger4320278);
   describe('nestedObjectTests', nestedObjectTests);
@@ -113,4 +142,5 @@ describe('Binary Serialization', function() {
   describe('BytesList', bytesListTest);
   describe('DeliverMin', deliverMinTest);
   describe('SignerListSet', SignerListSetTest);
+  describe('PaymentChannel', PaymentChannelTest);
 });

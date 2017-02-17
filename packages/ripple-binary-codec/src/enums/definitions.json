@@ -1426,6 +1426,26 @@
         "isSigningField": true,
         "type": "UInt32"
       }
+    ],
+    [
+      "SettleDelay",
+      {
+        "nth": 39,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "Channel",
+      {
+        "nth": 22,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
     ]
   ],
   "TRANSACTION_RESULTS": {
@@ -1539,6 +1559,9 @@
     "SuspendedPaymentCreate": 1,
     "SuspendedPaymentFinish": 2,
     "SuspendedPaymentCancel": 4,
+    "PaymentChannelCreate": 13,
+    "PaymentChannelFund": 14,
+    "PaymentChannelClaim": 15,
     "Invalid": -1
   }
 }
