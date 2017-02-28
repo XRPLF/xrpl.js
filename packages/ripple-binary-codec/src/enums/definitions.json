@@ -903,7 +903,7 @@
         "nth": 6,
         "isVLEncoded": true,
         "isSerialized": true,
-        "isSigningField": true,
+        "isSigningField": false,
         "type": "Blob"
       }
     ],
