@@ -1,0 +1,10 @@
+{
+  "Account" : "r4jQDHCUvgcBAa5EzcB1D8BHGcjYP9eBC2",
+  "Amount" : "100",
+  "CancelAfter" : 630000001,
+  "Condition" : "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+  "Destination" : "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+  "DestinationTag" : 23480,
+  "FinishAfter" : 630000000,
+  "TransactionType": "EscrowCreate"
+}

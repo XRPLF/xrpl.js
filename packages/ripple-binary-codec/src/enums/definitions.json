@@ -30,10 +30,11 @@
     "AccountRoot": 97,
     "RippleState": 114,
     "FeeSettings": 115,
-    "SuspendedPayment": 117,
+    "Escrow": 117,
     "DirectoryNode": 100,
     "GeneratorMap": 103,
     "Contract": 99,
+    "PayChannel": 120,
     "Invalid": -1
   },
   "FIELDS": [
@@ -988,7 +989,17 @@
       }
     ],
     [
-      "Proof",
+      "Fulfillment",
+      {
+        "nth": 16,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
+      "Condition",
       {
         "nth": 17,
         "isVLEncoded": true,
@@ -1556,9 +1567,9 @@
     "OfferCreate": 7,
     "SignerListSet": 12,
     "Contract": 9,
-    "SuspendedPaymentCreate": 1,
-    "SuspendedPaymentFinish": 2,
-    "SuspendedPaymentCancel": 4,
+    "EscrowCreate": 1,
+    "EscrowFinish": 2,
+    "EscrowCancel": 4,
     "PaymentChannelCreate": 13,
     "PaymentChannelFund": 14,
     "PaymentChannelClaim": 15,

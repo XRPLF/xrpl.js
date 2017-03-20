@@ -15,6 +15,20 @@ const SignerListSet = {
   binary: require('./fixtures/signerlistset-tx-binary.json'),
   meta: require('./fixtures/signerlistset-tx-meta-binary.json')
 };
+const Escrow = {
+  create: {
+    tx: require('./fixtures/escrow-create-tx.json'),
+    binary: require('./fixtures/escrow-create-binary.json')
+  },
+  finish: {
+    tx: require('./fixtures/escrow-finish-tx.json'),
+    binary: require('./fixtures/escrow-finish-binary.json')
+  },
+  cancel: {
+    tx: require('./fixtures/escrow-cancel-tx.json'),
+    binary: require('./fixtures/escrow-cancel-binary.json')
+  }
+}
 const PaymentChannel = {
   create: {
     tx: require('./fixtures/payment-channel-create-tx.json'),
@@ -120,6 +134,21 @@ function SignerListSetTest() {
   });
 }
 
+function EscrowTest() {
+  it('can serialize EscrowCreate', () => {
+    assert.strictEqual(encode(Escrow.create.tx),
+      Escrow.create.binary);
+  });
+  it('can serialize EscrowFinish', () => {
+    assert.strictEqual(encode(Escrow.finish.tx),
+      Escrow.finish.binary);
+  });
+  it('can serialize EscrowCancel', () => {
+    assert.strictEqual(encode(Escrow.cancel.tx),
+      Escrow.cancel.binary);
+  });
+}
+
 function PaymentChannelTest() {
   it('can serialize PaymentChannelCreate', () => {
     assert.strictEqual(encode(PaymentChannel.create.tx),
@@ -142,5 +171,6 @@ describe('Binary Serialization', function() {
   describe('BytesList', bytesListTest);
   describe('DeliverMin', deliverMinTest);
   describe('SignerListSet', SignerListSetTest);
+  describe('Escrow', EscrowTest);
   describe('PaymentChannel', PaymentChannelTest);
 });

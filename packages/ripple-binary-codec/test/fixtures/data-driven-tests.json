@@ -681,7 +681,14 @@
         },
         {
             "type_name": "Blob",
-            "name": "Proof",
+            "name": "Fulfillment",
+            "nth_of_type": 16,
+            "type": 7,
+            "expected_hex": "7010"
+        },
+        {
+            "type_name": "Blob",
+            "name": "Condition",
             "nth_of_type": 17,
             "type": 7,
             "expected_hex": "7011"
@@ -2924,7 +2931,7 @@
             "expected_hex": "0000"
         },
         {
-            "test_json": "SuspendedPaymentCreate",
+            "test_json": "EscrowCreate",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
@@ -2932,14 +2939,14 @@
         },
         {
             "test_json": 1,
-            "canonical_json": "SuspendedPaymentCreate",
+            "canonical_json": "EscrowCreate",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
             "expected_hex": "0001"
         },
         {
-            "test_json": "SuspendedPaymentFinish",
+            "test_json": "EscrowFinish",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
@@ -2947,7 +2954,7 @@
         },
         {
             "test_json": 2,
-            "canonical_json": "SuspendedPaymentFinish",
+            "canonical_json": "EscrowFinish",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
@@ -2969,7 +2976,7 @@
             "expected_hex": "0003"
         },
         {
-            "test_json": "SuspendedPaymentCancel",
+            "test_json": "EscrowCancel",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
@@ -2977,7 +2984,7 @@
         },
         {
             "test_json": 4,
-            "canonical_json": "SuspendedPaymentCancel",
+            "canonical_json": "EscrowCancel",
             "type_id": 1,
             "type_specialisation_field": "TransactionType",
             "type": "UInt16",
