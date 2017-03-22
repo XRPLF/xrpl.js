@@ -937,6 +937,13 @@
             "nth_of_type": 3,
             "type": 19,
             "expected_hex": "0313"
+        },
+        {
+            "type_name": "UInt8",
+            "name": "TickSize",
+            "nth_of_type": 16,
+            "type": 16,
+            "expected_hex": "01010"
         }
     ],
     "whole_objects": [
