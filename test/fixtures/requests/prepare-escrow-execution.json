@@ -1,7 +1,6 @@
 {
   "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "suspensionSequence": 1234,
-  "method": 1,
-  "digest": "712C36933822AD3A3D136C5DF97AA863B69F9CE88B2D6CE6BDD11BFDE290C19D",
-  "proof": "this must have 32 characters...."
+  "escrowSequence": 1234,
+  "condition": "712C36933822AD3A3D136C5DF97AA863B69F9CE88B2D6CE6BDD11BFDE290C19D",
+  "fulfillment": "this must have 32 characters...."
 }

@@ -3,14 +3,14 @@
 const assert = require('assert')
 const utils = require('./utils')
 
-function parseSuspendedPaymentCancellation(tx: Object): Object {
-  assert(tx.TransactionType === 'SuspendedPaymentCancel')
+function parseEscrowCancellation(tx: Object): Object {
+  assert(tx.TransactionType === 'EscrowCancel')
 
   return utils.removeUndefined({
     memos: utils.parseMemos(tx),
     owner: tx.Owner,
-    suspensionSequence: tx.OfferSequence
+    escrowSequence: tx.OfferSequence
   })
 }
 
-module.exports = parseSuspendedPaymentCancellation
+module.exports = parseEscrowCancellation

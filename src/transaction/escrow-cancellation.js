@@ -6,20 +6,20 @@ const validate = utils.common.validate
 import type {Instructions, Prepare} from './types.js'
 import type {Memo} from '../common/types.js'
 
-type SuspendedPaymentCancellation = {
+type EscrowCancellation = {
   owner: string,
-  suspensionSequence: number,
+  escrowSequence: number,
   memos?: Array<Memo>
 }
 
-function createSuspendedPaymentCancellationTransaction(account: string,
-  payment: SuspendedPaymentCancellation
+function createEscrowCancellationTransaction(account: string,
+  payment: EscrowCancellation
 ): Object {
   const txJSON: Object = {
-    TransactionType: 'SuspendedPaymentCancel',
+    TransactionType: 'EscrowCancel',
     Account: account,
     Owner: payment.owner,
-    OfferSequence: payment.suspensionSequence
+    OfferSequence: payment.escrowSequence
   }
   if (payment.memos !== undefined) {
     txJSON.Memos = _.map(payment.memos, utils.convertMemo)
@@ -27,15 +27,15 @@ function createSuspendedPaymentCancellationTransaction(account: string,
   return txJSON
 }
 
-function prepareSuspendedPaymentCancellation(address: string,
-  suspendedPaymentCancellation: SuspendedPaymentCancellation,
+function prepareEscrowCancellation(address: string,
+  escrowCancellation: EscrowCancellation,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareSuspendedPaymentCancellation(
-    {address, suspendedPaymentCancellation, instructions})
-  const txJSON = createSuspendedPaymentCancellationTransaction(
-    address, suspendedPaymentCancellation)
+  validate.prepareEscrowCancellation(
+    {address, escrowCancellation, instructions})
+  const txJSON = createEscrowCancellationTransaction(
+    address, escrowCancellation)
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareSuspendedPaymentCancellation
+module.exports = prepareEscrowCancellation

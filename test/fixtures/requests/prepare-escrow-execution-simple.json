@@ -1,6 +1,6 @@
 {
   "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "suspensionSequence": 1234,
+  "escrowSequence": 1234,
   "memos": [
     {
       "type": "test",
