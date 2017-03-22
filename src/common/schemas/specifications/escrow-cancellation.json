@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "escrowCancellation",
+  "link": "escrow-cancellation",
+  "type": "object",
+  "properties": {
+    "memos": {"$ref": "memos"},
+    "owner": {
+      "$ref": "address",
+      "description": "The address of the owner of the escrow to cancel."
+    },
+    "escrowSequence": {
+      "$ref": "sequence",
+      "description": "The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to cancel."
+    }
+  },
+  "required": ["owner", "escrowSequence"],
+  "additionalProperties": false
+}

@@ -266,57 +266,57 @@ describe('RippleAPI', function() {
         'prepare'));
   });
 
-  it('prepareSuspendedPaymentCreation', function() {
+  it('prepareEscrowCreation', function() {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
     }, instructions);
-    return this.api.prepareSuspendedPaymentCreation(
-      address, requests.prepareSuspendedPaymentCreation.normal,
+    return this.api.prepareEscrowCreation(
+      address, requests.prepareEscrowCreation.normal,
       localInstructions).then(
-        _.partial(checkResult, responses.prepareSuspendedPaymentCreation.normal,
+        _.partial(checkResult, responses.prepareEscrowCreation.normal,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentCreation full', function() {
-    return this.api.prepareSuspendedPaymentCreation(
-      address, requests.prepareSuspendedPaymentCreation.full).then(
-        _.partial(checkResult, responses.prepareSuspendedPaymentCreation.full,
+  it('prepareEscrowCreation full', function() {
+    return this.api.prepareEscrowCreation(
+      address, requests.prepareEscrowCreation.full).then(
+        _.partial(checkResult, responses.prepareEscrowCreation.full,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentExecution', function() {
-    return this.api.prepareSuspendedPaymentExecution(
+  it('prepareEscrowExecution', function() {
+    return this.api.prepareEscrowExecution(
       address,
-      requests.prepareSuspendedPaymentExecution.normal, instructions).then(
+      requests.prepareEscrowExecution.normal, instructions).then(
         _.partial(checkResult,
-          responses.prepareSuspendedPaymentExecution.normal,
+          responses.prepareEscrowExecution.normal,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentExecution - simple', function() {
-    return this.api.prepareSuspendedPaymentExecution(
+  it('prepareEscrowExecution - simple', function() {
+    return this.api.prepareEscrowExecution(
       address,
-      requests.prepareSuspendedPaymentExecution.simple).then(
+      requests.prepareEscrowExecution.simple).then(
         _.partial(checkResult,
-          responses.prepareSuspendedPaymentExecution.simple,
+          responses.prepareEscrowExecution.simple,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentCancellation', function() {
-    return this.api.prepareSuspendedPaymentCancellation(
+  it('prepareEscrowCancellation', function() {
+    return this.api.prepareEscrowCancellation(
       address,
-      requests.prepareSuspendedPaymentCancellation.normal, instructions).then(
+      requests.prepareEscrowCancellation.normal, instructions).then(
         _.partial(checkResult,
-          responses.prepareSuspendedPaymentCancellation.normal,
+          responses.prepareEscrowCancellation.normal,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentCancellation with memos', function() {
-    return this.api.prepareSuspendedPaymentCancellation(
+  it('prepareEscrowCancellation with memos', function() {
+    return this.api.prepareEscrowCancellation(
       address,
-      requests.prepareSuspendedPaymentCancellation.memos).then(
+      requests.prepareEscrowCancellation.memos).then(
         _.partial(checkResult,
-          responses.prepareSuspendedPaymentCancellation.memos,
+          responses.prepareEscrowCancellation.memos,
           'prepare'));
   });
 
@@ -336,10 +336,10 @@ describe('RippleAPI', function() {
     }, /txJSON must not contain "TxnSignature" or "Signers" properties/);
   });
 
-  it('sign - SuspendedPaymentExecution', function() {
+  it('sign - EscrowExecution', function() {
     const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
-    const result = this.api.sign(requests.sign.suspended.txJSON, secret);
-    assert.deepEqual(result, responses.sign.suspended);
+    const result = this.api.sign(requests.sign.escrow.txJSON, secret);
+    assert.deepEqual(result, responses.sign.escrow);
     schemaValidator.schemaValidate('sign', result);
   });
 
@@ -640,34 +640,34 @@ describe('RippleAPI', function() {
       });
     });
 
-    it('getTransaction - SuspendedPaymentCreation', function() {
+    it('getTransaction - EscrowCreation', function() {
       const hash =
         '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE1';
       return this.api.getTransaction(hash).then(
         _.partial(checkResult,
-          responses.getTransaction.suspendedPaymentCreation,
+          responses.getTransaction.escrowCreation,
           'getTransaction'));
     });
 
-    it('getTransaction - SuspendedPaymentCreation iou', function() {
+    it('getTransaction - EscrowCreation iou', function() {
       const hash =
         '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE2';
       return this.api.getTransaction(hash).then(
         _.partial(checkResult,
-          responses.getTransaction.SuspendedPaymentCreationIOU,
+          responses.getTransaction.EscrowCreationIOU,
           'getTransaction'));
     });
 
-    it('getTransaction - SuspendedPaymentCancellation', function() {
+    it('getTransaction - EscrowCancellation', function() {
       const hash =
         'F346E542FFB7A8398C30A87B952668DAB48B7D421094F8B71776DA19775A3B22';
       return this.api.getTransaction(hash).then(
         _.partial(checkResult,
-          responses.getTransaction.suspendedPaymentCancellation,
+          responses.getTransaction.escrowCancellation,
           'getTransaction'));
     });
 
-    it('getTransaction - SuspendedPaymentExecution', function() {
+    it('getTransaction - EscrowExecution', function() {
       const options = {
         minLedgerVersion: 10,
         maxLedgerVersion: 15
@@ -676,16 +676,16 @@ describe('RippleAPI', function() {
         'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD136993B';
       return this.api.getTransaction(hash, options).then(
         _.partial(checkResult,
-          responses.getTransaction.suspendedPaymentExecution,
+          responses.getTransaction.escrowExecution,
           'getTransaction'));
     });
 
-    it('getTransaction - SuspendedPaymentExecution simple', function() {
+    it('getTransaction - EscrowExecution simple', function() {
       const hash =
         'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD1369931';
       return this.api.getTransaction(hash).then(
         _.partial(checkResult,
-          responses.getTransaction.suspendedPaymentExecutionSimple,
+          responses.getTransaction.escrowExecutionSimple,
           'getTransaction'));
     });
 

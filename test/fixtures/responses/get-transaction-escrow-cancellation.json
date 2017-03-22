@@ -1,0 +1,26 @@
+{
+  "type": "escrowCancellation",
+  "address": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+  "sequence": 9,
+  "id": "F346E542FFB7A8398C30A87B952668DAB48B7D421094F8B71776DA19775A3B22",
+  "specification": {
+    "owner": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+    "escrowSequence": 7
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2015-11-16T04:50:20.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh": [
+        {
+          "currency": "XRP",
+          "value": "-0.00001"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 14,
+    "indexInLedger": 0
+  }
+}
