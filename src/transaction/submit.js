@@ -11,7 +11,7 @@ function isImmediateRejection(engineResult: string): boolean {
   // transaction and then process it at a later time, for example
   // if the required fee changes (this does not occur at the time of
   // this writing, but it could change in the future)
-  // all other error classes can potentially result in transcation validation
+  // all other error classes can potentially result in transaction validation
   return _.startsWith(engineResult, 'tem')
 }
 

@@ -1,18 +1,18 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "prepareSuspendedPaymentCreationParameters",
+  "title": "prepareEscrowCreationParameters",
   "type": "object",
   "properties": {
     "address": {
       "$ref": "address",
       "description": "The address of the account that is creating the transaction."
     },
-    "suspendedPaymentCreation": {
-      "$ref": "suspendedPaymentCreation",
-      "description": "The specification of the suspended payment creation to prepare."
+    "escrowCreation": {
+      "$ref": "escrowCreation",
+      "description": "The specification of the escrow creation to prepare."
     },
     "instructions": {"$ref": "instructions"}
   },
   "additionalProperties": false,
-  "required": ["address", "suspendedPaymentCreation"]
+  "required": ["address", "escrowCreation"]
 }

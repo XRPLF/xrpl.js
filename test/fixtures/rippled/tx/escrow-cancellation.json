@@ -9,7 +9,7 @@
     "Owner": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
     "Sequence": 9,
     "SigningPubKey": "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020",
-    "TransactionType": "SuspendedPaymentCancel",
+    "TransactionType": "EscrowCancel",
     "TxnSignature": "304502210095453956DB908E99386D12F266F48C225CD48F076773F577A4EF676F265B7A18022041E45BB638E64D92EC7FB9B99BEDE1A0B28C245804999656BDBE6043D97BB4A1",
     "date": 500964620,
     "hash": "F346E542FFB7A8398C30A87B952668DAB48B7D421094F8B71776DA19775A3B22",
@@ -59,7 +59,7 @@
               "PreviousTxnLgrSeq": 12,
               "SourceTag": 1
             },
-            "LedgerEntryType": "SuspendedPayment",
+            "LedgerEntryType": "Escrow",
             "LedgerIndex": "B366B476EFE3A621C96835A36BFDF83C2A5B0008F0EF4A83D751380F53EFCE71"
           }
         },

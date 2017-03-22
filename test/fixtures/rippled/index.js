@@ -64,14 +64,14 @@ module.exports = {
     LedgerWithoutTime: require('./tx/ledger-without-time.json'),
     NotValidated: require('./tx/not-validated.json'),
     OfferWithExpiration: require('./tx/order-with-expiration.json'),
-    SuspendedPaymentCreation: require('./tx/suspended-payment-creation.json'),
-    SuspendedPaymentCreationIOU:
-      require('./tx/suspended-payment-creation-iou.json'),
-    SuspendedPaymentCancellation:
-      require('./tx/suspended-payment-cancellation.json'),
-    SuspendedPaymentExecution: require('./tx/suspended-payment-execution.json'),
-    SuspendedPaymentExecutionSimple:
-      require('./tx/suspended-payment-execution-simple.json'),
+    EscrowCreation: require('./tx/escrow-creation.json'),
+    EscrowCreationIOU:
+      require('./tx/escrow-creation-iou.json'),
+    EscrowCancellation:
+      require('./tx/escrow-cancellation.json'),
+    EscrowExecution: require('./tx/escrow-execution.json'),
+    EscrowExecutionSimple:
+      require('./tx/escrow-execution-simple.json'),
     Unrecognized: require('./tx/unrecognized.json'),
     NoMeta: require('./tx/no-meta.json'),
     LedgerZero: require('./tx/ledger-zero.json'),

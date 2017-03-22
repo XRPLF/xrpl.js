@@ -6,27 +6,27 @@ const {validate, iso8601ToRippleTime, toRippledAmount} = utils.common
 import type {Instructions, Prepare} from './types.js'
 import type {Adjustment, MaxAdjustment, Memo} from '../common/types.js'
 
-type SuspendedPaymentCreation = {
+type EscrowCreation = {
   source: MaxAdjustment,
   destination: Adjustment,
   memos?: Array<Memo>,
-  digest?: string,
+  condition?: string,
   allowCancelAfter?: string,
   allowExecuteAfter?: string
 }
 
-function createSuspendedPaymentCreationTransaction(account: string,
-    payment: SuspendedPaymentCreation
+function createEscrowCreationTransaction(account: string,
+    payment: EscrowCreation
 ): Object {
   const txJSON: Object = {
-    TransactionType: 'SuspendedPaymentCreate',
+    TransactionType: 'EscrowCreate',
     Account: account,
     Destination: payment.destination.address,
     Amount: toRippledAmount(payment.destination.amount)
   }
 
-  if (payment.digest !== undefined) {
-    txJSON.Digest = payment.digest
+  if (payment.condition !== undefined) {
+    txJSON.Condition = payment.condition
   }
   if (payment.allowCancelAfter !== undefined) {
     txJSON.CancelAfter = iso8601ToRippleTime(payment.allowCancelAfter)
@@ -43,18 +43,23 @@ function createSuspendedPaymentCreationTransaction(account: string,
   if (payment.memos !== undefined) {
     txJSON.Memos = _.map(payment.memos, utils.convertMemo)
   }
+  if (Boolean(payment.allowCancelAfter) && Boolean(payment.allowExecuteAfter) &&
+      payment.CancelAfter <= payment.FinishAfter) {
+    throw new ValidationError('"CancelAfter" must be after "FinishAfter" on'
+      + ' EscrowCreate.')
+  }
   return txJSON
 }
 
-function prepareSuspendedPaymentCreation(address: string,
-  suspendedPaymentCreation: SuspendedPaymentCreation,
+function prepareEscrowCreation(address: string,
+  escrowCreation: EscrowCreation,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareSuspendedPaymentCreation(
-    {address, suspendedPaymentCreation, instructions})
-  const txJSON = createSuspendedPaymentCreationTransaction(
-    address, suspendedPaymentCreation)
+  validate.prepareEscrowCreation(
+    {address, escrowCreation, instructions})
+  const txJSON = createEscrowCreationTransaction(
+    address, escrowCreation)
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareSuspendedPaymentCreation
+module.exports = prepareEscrowCreation

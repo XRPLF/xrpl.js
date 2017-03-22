@@ -7,10 +7,9 @@ const parseTrustline = require('./trustline')
 const parseOrder = require('./order')
 const parseOrderCancellation = require('./cancellation')
 const parseSettings = require('./settings')
-const parseSuspendedPaymentCreation = require('./suspended-payment-creation')
-const parseSuspendedPaymentExecution = require('./suspended-payment-execution')
-const parseSuspendedPaymentCancellation =
-  require('./suspended-payment-cancellation')
+const parseEscrowCreation = require('./escrow-creation')
+const parseEscrowExecution = require('./escrow-execution')
+const parseEscrowCancellation = require('./escrow-cancellation')
 const parseFeeUpdate = require('./fee-update')
 const parseAmendment = require('./amendment')
 
@@ -22,9 +21,9 @@ function parseTransactionType(type) {
     OfferCancel: 'orderCancellation',
     AccountSet: 'settings',
     SetRegularKey: 'settings',
-    SuspendedPaymentCreate: 'suspendedPaymentCreation',
-    SuspendedPaymentFinish: 'suspendedPaymentExecution',
-    SuspendedPaymentCancel: 'suspendedPaymentCancellation',
+    EscrowCreate: 'escrowCreation',
+    EscrowFinish: 'escrowExecution',
+    EscrowCancel: 'escrowCancellation',
     SignerListSet: 'settings',
     SetFee: 'feeUpdate',          // pseudo-transaction
     EnableAmendment: 'amendment'  // pseudo-transaction
@@ -40,9 +39,9 @@ function parseTransaction(tx: Object): Object {
     'order': parseOrder,
     'orderCancellation': parseOrderCancellation,
     'settings': parseSettings,
-    'suspendedPaymentCreation': parseSuspendedPaymentCreation,
-    'suspendedPaymentExecution': parseSuspendedPaymentExecution,
-    'suspendedPaymentCancellation': parseSuspendedPaymentCancellation,
+    'escrowCreation': parseEscrowCreation,
+    'escrowExecution': parseEscrowExecution,
+    'escrowCancellation': parseEscrowCancellation,
     'feeUpdate': parseFeeUpdate,
     'amendment': parseAmendment
   }

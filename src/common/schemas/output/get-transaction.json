@@ -59,20 +59,20 @@
     },
     {
       "properties": {
-        "type": {"enum": ["suspendedPaymentCreation"]},
-        "specification": {"$ref": "suspendedPaymentCreation"}
+        "type": {"enum": ["escrowCreation"]},
+        "specification": {"$ref": "escrowCreation"}
       }
     },
     {
       "properties": {
-        "type": {"enum": ["suspendedPaymentCancellation"]},
-        "specification": {"$ref": "suspendedPaymentCancellation"}
+        "type": {"enum": ["escrowCancellation"]},
+        "specification": {"$ref": "escrowCancellation"}
       }
     },
     {
       "properties": {
-        "type": {"enum": ["suspendedPaymentExecution"]},
-        "specification": {"$ref": "suspendedPaymentExecution"}
+        "type": {"enum": ["escrowExecution"]},
+        "specification": {"$ref": "escrowExecution"}
       }
     }
   ]

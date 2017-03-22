@@ -1,14 +1,14 @@
-## prepareSuspendedPaymentExecution
+## prepareEscrowExecution
 
-`prepareSuspendedPaymentExecution(address: string, suspendedPaymentExecution: Object, instructions: Object): Promise<Object>`
+`prepareEscrowExecution(address: string, escrowExecution: Object, instructions: Object): Promise<Object>`
 
-Prepare a suspended payment execution transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+Prepare an escrow execution transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Suspended Payments are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
+**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
 
 ### Parameters
 
-<%- renderSchema('input/prepare-suspended-payment-execution.json') %>
+<%- renderSchema('input/prepare-escrow-execution.json') %>
 
 ### Return Value
 
@@ -24,9 +24,9 @@ All "prepare*" methods have the same return type.
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const suspendedPaymentExecution = <%- importFile('test/fixtures/requests/prepare-suspended-payment-execution.json') %>;
-return api.prepareSuspendedPaymentExecution(address, suspendedPaymentExecution).then(prepared =>
+const escrowExecution = <%- importFile('test/fixtures/requests/prepare-escrow-execution.json') %>;
+return api.prepareEscrowExecution(address, escrowExecution).then(prepared =>
   {/* ... */});
 ```
 
-<%- renderFixture('responses/prepare-suspended-payment-execution.json') %>
+<%- renderFixture('responses/prepare-escrow-execution.json') %>

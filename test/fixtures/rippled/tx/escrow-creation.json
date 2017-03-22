@@ -6,7 +6,7 @@
     "CancelAfter": 500972022,
     "Destination": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw",
     "DestinationTag": 2,
-    "Digest": "8F434346648F6B96DF89DDA901C5176B10A6D83961DD3C1AC88B59B2DC327AA4",
+    "Condition": "8F434346648F6B96DF89DDA901C5176B10A6D83961DD3C1AC88B59B2DC327AA4",
     "Fee": "12",
     "FinishAfter": 500971662,
     "Flags": 2147483648,
@@ -23,7 +23,7 @@
     "Sequence": 10,
     "SigningPubKey": "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020",
     "SourceTag": 1,
-    "TransactionType": "SuspendedPaymentCreate",
+    "TransactionType": "EscrowCreate",
     "TxnSignature": "3045022100EA1C5433AFA3F0BAAAF7C4146B032B86A0212EB4E2A3551DE9717651A538AE260220228C9E9FC857EC8143F01C2F959A8F134B285B67D8261B49E57BFF8DF76D2255",
     "date": 500971380,
     "hash": "144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE1",
@@ -33,7 +33,7 @@
       "AffectedNodes": [
         {
           "CreatedNode": {
-            "LedgerEntryType": "SuspendedPayment",
+            "LedgerEntryType": "Escrow",
             "LedgerIndex": "0D7629A23BC20F25C48D9423E2485582255A74B76A25F26EDB46766982E4C2C4",
             "NewFields": {
               "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
@@ -41,7 +41,7 @@
               "CancelAfter": 500972022,
               "Destination": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw",
               "DestinationTag": 2,
-              "Digest": "8F434346648F6B96DF89DDA901C5176B10A6D83961DD3C1AC88B59B2DC327AA4",
+              "Condition": "8F434346648F6B96DF89DDA901C5176B10A6D83961DD3C1AC88B59B2DC327AA4",
               "FinishAfter": 500971662,
               "SourceTag": 1
             }

@@ -34,16 +34,16 @@ module.exports = {
     trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
     trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
     notValidated: require('./get-transaction-not-validated.json'),
-    suspendedPaymentCreation:
-      require('./get-transaction-suspended-payment-create.json'),
-    SuspendedPaymentCreationIOU:
-      require('./get-transaction-suspended-payment-create-iou.json'),
-    suspendedPaymentCancellation:
-      require('./get-transaction-suspended-payment-cancellation.json'),
-    suspendedPaymentExecution:
-      require('./get-transaction-suspended-payment-execution.json'),
-    suspendedPaymentExecutionSimple:
-      require('./get-transaction-suspended-payment-execution-simple.json'),
+    escrowCreation:
+      require('./get-transaction-escrow-create.json'),
+    EscrowCreationIOU:
+      require('./get-transaction-escrow-create-iou.json'),
+    escrowCancellation:
+      require('./get-transaction-escrow-cancellation.json'),
+    escrowExecution:
+      require('./get-transaction-escrow-execution.json'),
+    escrowExecutionSimple:
+      require('./get-transaction-escrow-execution-simple.json'),
     amendment: require('./get-transaction-amendment.json'),
     feeUpdate: require('./get-transaction-fee-update.json')
   },
@@ -95,17 +95,17 @@ module.exports = {
     noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json'),
     signers: require('./prepare-settings-signers.json')
   },
-  prepareSuspendedPaymentCreation: {
-    normal: require('./prepare-suspended-payment-creation'),
-    full: require('./prepare-suspended-payment-creation-full')
+  prepareEscrowCreation: {
+    normal: require('./prepare-escrow-creation'),
+    full: require('./prepare-escrow-creation-full')
   },
-  prepareSuspendedPaymentExecution: {
-    normal: require('./prepare-suspended-payment-execution'),
-    simple: require('./prepare-suspended-payment-execution-simple')
+  prepareEscrowExecution: {
+    normal: require('./prepare-escrow-execution'),
+    simple: require('./prepare-escrow-execution-simple')
   },
-  prepareSuspendedPaymentCancellation: {
-    normal: require('./prepare-suspended-payment-cancellation'),
-    memos: require('./prepare-suspended-payment-cancellation-memos')
+  prepareEscrowCancellation: {
+    normal: require('./prepare-escrow-cancellation'),
+    memos: require('./prepare-escrow-cancellation-memos')
   },
   prepareTrustline: {
     simple: require('./prepare-trustline-simple.json'),
@@ -114,7 +114,7 @@ module.exports = {
   },
   sign: {
     normal: require('./sign.json'),
-    suspended: require('./sign-suspended.json'),
+    escrow: require('./sign-escrow.json'),
     signAs: require('./sign-as')
   },
   combine: {

@@ -10,8 +10,8 @@ function removeGenericCounterparty(amount, address) {
     _.omit(amount, 'counterparty') : amount
 }
 
-function parseSuspendedPaymentCreation(tx: Object): Object {
-  assert(tx.TransactionType === 'SuspendedPaymentCreate')
+function parseEscrowCreation(tx: Object): Object {
+  assert(tx.TransactionType === 'EscrowCreate')
 
   const source = {
     address: tx.Account,
@@ -30,10 +30,10 @@ function parseSuspendedPaymentCreation(tx: Object): Object {
     source: utils.removeUndefined(source),
     destination: utils.removeUndefined(destination),
     memos: utils.parseMemos(tx),
-    digest: tx.Digest,
+    condition: tx.Condition,
     allowCancelAfter: utils.parseTimestamp(tx.CancelAfter),
     allowExecuteAfter: utils.parseTimestamp(tx.FinishAfter)
   })
 }
 
-module.exports = parseSuspendedPaymentCreation
+module.exports = parseEscrowCreation

@@ -6,33 +6,34 @@ const validate = utils.common.validate
 import type {Instructions, Prepare} from './types.js'
 import type {Memo} from '../common/types.js'
 
-type SuspendedPaymentExecution = {
+type EscrowExecution = {
   owner: string,
-  suspensionSequence: number,
+  escrowSequence: number,
   memos?: Array<Memo>,
-  method?: number,
-  digest?: string,
-  proof?: string
+  condition?: string,
+  fulfillment?: string
 }
 
-function createSuspendedPaymentExecutionTransaction(account: string,
-      payment: SuspendedPaymentExecution
+function createEscrowExecutionTransaction(account: string,
+      payment: EscrowExecution
 ): Object {
   const txJSON: Object = {
-    TransactionType: 'SuspendedPaymentFinish',
+    TransactionType: 'EscrowFinish',
     Account: account,
     Owner: payment.owner,
-    OfferSequence: payment.suspensionSequence
+    OfferSequence: payment.escrowSequence
   }
 
-  if (payment.method !== undefined) {
-    txJSON.Method = payment.method
+  if (Boolean(payment.condition) !== Boolean(payment.fulfillment)) {
+    throw new ValidationError('"condition" and "fulfillment" fields on'
+      + ' EscrowFinish must only be specified together.')
   }
-  if (payment.digest !== undefined) {
-    txJSON.Digest = payment.digest
+
+  if (payment.condition !== undefined) {
+    txJSON.Condition = payment.condition
   }
-  if (payment.proof !== undefined) {
-    txJSON.Proof = utils.convertStringToHex(payment.proof)
+  if (payment.fulfillment !== undefined) {
+    txJSON.Fulfillment = utils.convertStringToHex(payment.fulfillment)
   }
   if (payment.memos !== undefined) {
     txJSON.Memos = _.map(payment.memos, utils.convertMemo)
@@ -40,15 +41,15 @@ function createSuspendedPaymentExecutionTransaction(account: string,
   return txJSON
 }
 
-function prepareSuspendedPaymentExecution(address: string,
-  suspendedPaymentExecution: SuspendedPaymentExecution,
+function prepareEscrowExecution(address: string,
+  escrowExecution: EscrowExecution,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareSuspendedPaymentExecution(
-    {address, suspendedPaymentExecution, instructions})
-  const txJSON = createSuspendedPaymentExecutionTransaction(
-    address, suspendedPaymentExecution)
+  validate.prepareEscrowExecution(
+    {address, escrowExecution, instructions})
+  const txJSON = createEscrowExecutionTransaction(
+    address, escrowExecution)
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareSuspendedPaymentExecution
+module.exports = prepareEscrowExecution

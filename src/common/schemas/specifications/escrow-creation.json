@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "suspendedPaymentCreation",
-  "link": "suspended-payment-creation",
+  "title": "escrowCreation",
+  "link": "escrow-creation",
   "type": "object",
   "properties": {
     "source": {
@@ -13,19 +13,19 @@
       "description": "Fields pertaining to the destination of the payment."
     },
     "memos": {"$ref": "memos"},
-    "digest": {
+    "condition": {
       "$ref": "hash256",
-      "description": "If present, proof is required upon execution."
+      "description": "If present, fulfillment is required upon execution."
     },
     "allowCancelAfter": {
       "type": "string",
       "format": "date-time",
-      "description": "If present, the suspended payment may be cancelled after this time."
+      "description": "If present, the escrow may be cancelled after this time."
     },
     "allowExecuteAfter": {
       "type": "string",
       "format": "date-time",
-      "description": "If present, the suspended payment can not be executed before this time."
+      "description": "If present, the escrow can not be executed before this time."
     }
   },
   "required": ["source", "destination"],
