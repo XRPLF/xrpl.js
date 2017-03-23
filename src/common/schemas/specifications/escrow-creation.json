@@ -14,8 +14,9 @@
     },
     "memos": {"$ref": "memos"},
     "condition": {
-      "$ref": "hash256",
-      "description": "If present, fulfillment is required upon execution."
+      "type": "string",
+      "description": "If present, fulfillment is required upon execution.",
+      "pattern": "^[A-F0-9]{0,256}$"
     },
     "allowCancelAfter": {
       "type": "string",

@@ -1136,6 +1136,20 @@ describe('RippleAPI', function() {
     }, done);
   });
 
+  it('getFeeBase', function(done) {
+    this.api.connection.getFeeBase().then(fee => {
+      assert.strictEqual(fee, 10);
+      done();
+    }, done);
+  });
+
+  it('getFeeRef', function(done) {
+    this.api.connection.getFeeRef().then(fee => {
+      assert.strictEqual(fee, 10);
+      done();
+    }, done);
+  });
+
   it('getLedger', function() {
     return this.api.getLedger().then(
       _.partial(checkResult, responses.getLedger.header, 'getLedger'));

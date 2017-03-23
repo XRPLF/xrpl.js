@@ -33,7 +33,7 @@ function createEscrowExecutionTransaction(account: string,
     txJSON.Condition = payment.condition
   }
   if (payment.fulfillment !== undefined) {
-    txJSON.Fulfillment = utils.convertStringToHex(payment.fulfillment)
+    txJSON.Fulfillment = payment.fulfillment
   }
   if (payment.memos !== undefined) {
     txJSON.Memos = _.map(payment.memos, utils.convertMemo)

@@ -6,8 +6,8 @@
   "specification": {
     "owner": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
     "escrowSequence": 5,
-    "condition": "632F2F3E437AE720C397994A985B5D21FE186DE61523A9CA3E8709CC581671A1",
-    "fulfillment": "whateverthis bemusthave 32 chars"
+    "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+    "fulfillment": "A0028000"
   },
   "outcome": {
     "result": "tesSUCCESS",

@@ -42,6 +42,8 @@ class Connection extends EventEmitter {
     this._retryTimer = null
     this._onOpenErrorBound = null
     this._onUnexpectedCloseBound = null
+    this._fee_base = null
+    this._fee_ref = null
   }
 
   _updateLedgerVersions(data) {
@@ -55,6 +57,11 @@ class Connection extends EventEmitter {
     }
   }
 
+  _updateFees(data) {
+    this._fee_base = Number(data.fee_base)
+    this._fee_ref = Number(data.fee_ref)
+  }
+
   // return value is array of arguments to Connection.emit
   _parseMessage(message) {
     const data = JSON.parse(message)
@@ -66,6 +73,7 @@ class Connection extends EventEmitter {
     } else if (isStreamMessageType(data.type)) {
       if (data.type === 'ledgerClosed') {
         this._updateLedgerVersions(data)
+        this._updateFees(data)
       }
       return [data.type, data]
     } else if (data.type === undefined && data.error) {
@@ -173,6 +181,7 @@ class Connection extends EventEmitter {
       }
 
       this._updateLedgerVersions(data)
+      this._updateFees(data)
       this._rebindOnUnxpectedClose()
 
       this._retry = 0
@@ -352,6 +361,14 @@ class Connection extends EventEmitter {
 
   hasLedgerVersion(ledgerVersion) {
     return this.hasLedgerVersions(ledgerVersion, ledgerVersion)
+  }
+
+  getFeeBase() {
+    return this._whenReady(Promise.resolve(Number(this._fee_base)))
+  }
+
+  getFeeRef() {
+    return this._whenReady(Promise.resolve(Number(this._fee_ref)))
   }
 
   _send(message) {

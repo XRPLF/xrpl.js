@@ -3,6 +3,7 @@
 const _ = require('lodash')
 const utils = require('./utils')
 const {validate, iso8601ToRippleTime, toRippledAmount} = utils.common
+const ValidationError = utils.common.errors.ValidationError
 import type {Instructions, Prepare} from './types.js'
 import type {Adjustment, MaxAdjustment, Memo} from '../common/types.js'
 
@@ -44,9 +45,9 @@ function createEscrowCreationTransaction(account: string,
     txJSON.Memos = _.map(payment.memos, utils.convertMemo)
   }
   if (Boolean(payment.allowCancelAfter) && Boolean(payment.allowExecuteAfter) &&
-      payment.CancelAfter <= payment.FinishAfter) {
-    throw new ValidationError('"CancelAfter" must be after "FinishAfter" on'
-      + ' EscrowCreate.')
+      txJSON.CancelAfter <= txJSON.FinishAfter) {
+    throw new ValidationError('"CancelAfter" must be after "FinishAfter" for'
+      + ' EscrowCreate')
   }
   return txJSON
 }

@@ -14,13 +14,14 @@
       "description": "The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to execute."
     },
     "condition": {
-      "$ref": "hash256",
-      "description": "The original `condition` from the escrow creation transaction. This is sha256 hash of `fulfillment` string. It is replicated here so that the relatively expensive hashing operation can be delegated to a server without ledger history and the server with ledger history only has to do a quick comparison of the old condition with the new condition."
+      "type": "string",
+      "description": "The original `condition` from the escrow creation transaction. This is sha256 hash of `fulfillment` string. It is replicated here so that the relatively expensive hashing operation can be delegated to a server without ledger history and the server with ledger history only has to do a quick comparison of the old condition with the new condition.",
+      "pattern": "^[A-F0-9]{0,256}$"
     },
     "fulfillment": {
       "type": "string",
       "description": "A value that produces the condition when hashed. It must be 32 charaters long and contain only 8-bit characters.",
-      "pattern": "^[\\x00-\\xFF]{32}$"
+      "pattern": "^[A-F0-9]+$"
     }
   },
   "required": ["owner", "escrowSequence"],
