@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "escrowCreation",
+  "link": "escrow-creation",
+  "type": "object",
+  "properties": {
+    "source": {
+      "$ref": "maxAdjustment",
+      "description": "Fields pertaining to the source of the payment."
+    },
+    "destination": {
+      "$ref": "destinationExactAdjustment",
+      "description": "Fields pertaining to the destination of the payment."
+    },
+    "memos": {"$ref": "memos"},
+    "condition": {
+      "type": "string",
+      "description": "If present, fulfillment is required upon execution.",
+      "pattern": "^[A-F0-9]{0,256}$"
+    },
+    "allowCancelAfter": {
+      "type": "string",
+      "format": "date-time",
+      "description": "If present, the escrow may be cancelled after this time."
+    },
+    "allowExecuteAfter": {
+      "type": "string",
+      "format": "date-time",
+      "description": "If present, the escrow can not be executed before this time."
+    }
+  },
+  "required": ["source", "destination"],
+  "additionalProperties": false
+}

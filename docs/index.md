@@ -24,9 +24,9 @@
   - [Order](#order)
   - [Order Cancellation](#order-cancellation)
   - [Settings](#settings)
-  - [Suspended Payment Creation](#suspended-payment-creation)
-  - [Suspended Payment Cancellation](#suspended-payment-cancellation)
-  - [Suspended Payment Execution](#suspended-payment-execution)
+  - [Escrow Creation](#escrow-creation)
+  - [Escrow Cancellation](#escrow-cancellation)
+  - [Escrow Execution](#escrow-execution)
 - [API Methods](#api-methods)
   - [connect](#connect)
   - [disconnect](#disconnect)
@@ -50,9 +50,9 @@
   - [prepareOrder](#prepareorder)
   - [prepareOrderCancellation](#prepareordercancellation)
   - [prepareSettings](#preparesettings)
-  - [prepareSuspendedPaymentCreation](#preparesuspendedpaymentcreation)
-  - [prepareSuspendedPaymentCancellation](#preparesuspendedpaymentcancellation)
-  - [prepareSuspendedPaymentExecution](#preparesuspendedpaymentexecution)
+  - [prepareEscrowCreation](#prepareescrowcreation)
+  - [prepareEscrowCancellation](#prepareescrowcancellation)
+  - [prepareEscrowExecution](#prepareescrowexecution)
   - [sign](#sign)
   - [combine](#combine)
   - [submit](#submit)
@@ -180,9 +180,9 @@ Methods that depend on the state of the Ripple Consensus Ledger are unavailable 
 * [prepareOrder](#prepareorder)
 * [prepareOrderCancellation](#prepareordercancellation)
 * [prepareSettings](#preparesettings)
-* [prepareSuspendedPaymentCreation](#preparesuspendedpaymentcreation)
-* [prepareSuspendedPaymentCancellation](#preparesuspendedpaymentcancellation)
-* [prepareSuspendedPaymentExecution](#preparesuspendedpaymentexecution)
+* [prepareEscrowCreation](#prepareescrowcreation)
+* [prepareEscrowCancellation](#prepareescrowcancellation)
+* [prepareEscrowExecution](#prepareescrowexecution)
 * [sign](#sign)
 * [generateAddress](#generateaddress)
 * [computeLedgerHash](#computeledgerhash)
@@ -261,11 +261,11 @@ Type | Description
 [orderCancellation](#order-cancellation) | An `orderCancellation` transaction cancels an order in the Ripple Consensus Ledger's order book.
 [trustline](#trustline) | A `trustline` transactions creates or modifies a trust line between two accounts.
 [settings](#settings) | A `settings` transaction modifies the settings of an account in the Ripple Consensus Ledger.
-[suspendedPaymentCreation](#suspended-payment-creation) | A `suspendedPaymentCreation` transaction creates a suspended payment on the ledger, which locks XRP until a cryptographic condition is met or it expires. It is like an escrow service where the Ripple network acts as the escrow agent.
-[suspendedPaymentCancellation](#suspended-payment-cancellation) | A `suspendedPaymentCancellation` transaction unlocks the funds in a suspended payment and sends them back to the creator of the suspended payment, but it will only work after the suspended payment expires.
-[suspendedPaymentExecution](#suspended-payment-execution) | A `suspendedPaymentExecution` transaction unlocks the funds in a suspended payment and sends them to the destination of the suspended payment, but it will only work if the cryptographic condition is provided.
+[escrowCreation](#escrow-creation) | An `escrowCreation` transaction creates an escrow on the ledger, which locks XRP until a cryptographic condition is met or it expires. It is like an escrow service where the Ripple network acts as the escrow agent.
+[escrowCancellation](#escrow-cancellation) | An `escrowCancellation` transaction unlocks the funds in an escrow and sends them back to the creator of the escrow, but it will only work after the escrow expires.
+[escrowExecution](#escrow-execution) | An `escrowExecution` transaction unlocks the funds in an escrow and sends them to the destination of the escrow, but it will only work if the cryptographic condition is provided.
 
-The three "suspended payment" transaction types are not supported by the production Ripple peer-to-peer network at this time. They are available for testing purposes if you [configure RippleAPI](#boilerplate) to connect to the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) instead.
+The three "escrow" transaction types are not supported by the production Ripple peer-to-peer network at this time. They are available for testing purposes if you [configure RippleAPI](#boilerplate) to connect to the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) instead.
 
 ## Transaction Flow
 
@@ -277,9 +277,9 @@ Executing a transaction with `RippleAPI` requires the following four steps:
     * [prepareOrder](#prepareorder)
     * [prepareOrderCancellation](#prepareordercancellation)
     * [prepareSettings](#preparesettings)
-    * [prepareSuspendedPaymentCreation](#preparesuspendedpaymentcreation)
-    * [prepareSuspendedPaymentCancellation](#preparesuspendedpaymentcancellation)
-    * [prepareSuspendedPaymentExecution](#preparesuspendedpaymentexecution)
+    * [prepareEscrowCreation](#prepareescrowcreation)
+    * [prepareEscrowCancellation](#prepareescrowcancellation)
+    * [prepareEscrowExecution](#prepareescrowexecution)
 2. [Sign](#sign) - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place. For multisignature transactions, the `signedTransaction` fields returned by `sign` must be collected and passed to the [combine](#combine) method.
 3. [Submit](#submit) - Submit the transaction to the connected server.
 4. Verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted.
@@ -518,7 +518,7 @@ transferRate | number,null | *Optional*  The fee to charge when users transfer t
 ```
 
 
-## Suspended Payment Creation
+## Escrow Creation
 
 See [Transaction Types](#transaction-types) for a description.
 
@@ -532,9 +532,9 @@ destination | object | Fields pertaining to the destination of the payment.
 *destination.* address | [address](#ripple-address) | The address to receive at.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
 *destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
-allowCancelAfter | date-time string | *Optional* If present, the suspended payment may be cancelled after this time.
-allowExecuteAfter | date-time string | *Optional* If present, the suspended payment can not be executed before this time.
-digest | string | *Optional* If present, proof is required upon execution.
+allowCancelAfter | date-time string | *Optional* If present, the escrow may be cancelled after this time.
+allowExecuteAfter | date-time string | *Optional* If present, the escrow can not be executed before this time.
+condition | string | *Optional* If present, fulfillment is required upon execution.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 ### Example
@@ -563,14 +563,14 @@ memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the
 ```
 
 
-## Suspended Payment Cancellation
+## Escrow Cancellation
 
 See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
-owner | [address](#ripple-address) | The address of the owner of the suspended payment to cancel.
-suspensionSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Suspended Payment Creation](#suspended-payment-creation) transaction for the suspended payment to cancel.
+owner | [address](#ripple-address) | The address of the owner of the escrow to cancel.
+escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to cancel.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 ### Example
@@ -579,23 +579,22 @@ memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the
 ```json
 {
   "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "suspensionSequence": 1234
+  "escrowSequence": 1234
 }
 ```
 
 
-## Suspended Payment Execution
+## Escrow Execution
 
 See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
-owner | [address](#ripple-address) | The address of the owner of the suspended payment to execute.
-suspensionSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Suspended Payment Creation](#suspended-payment-creation) transaction for the suspended payment to execute.
-digest | string | *Optional* The original `digest` from the suspended payment creation transaction. This is sha256 hash of `proof` string. It is replicated here so that the relatively expensive hashing operation can be delegated to a server without ledger history and the server with ledger history only has to do a quick comparison of the old digest with the new digest.
+owner | [address](#ripple-address) | The address of the owner of the escrow to execute.
+escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to execute.
+condition | string | *Optional* The original `condition` from the escrow creation transaction. This is sha256 hash of `fulfillment` string. It is replicated here so that the relatively expensive hashing operation can be delegated to a server without ledger history and the server with ledger history only has to do a quick comparison of the old condition with the new condition.
+fulfillment | string | *Optional* A value that produces the condition when hashed. It must be 32 charaters long and contain only 8-bit characters.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-method | integer | *Optional* The method for verifying the proof; only method `1` is supported.
-proof | string | *Optional* A value that produces the digest when hashed. It must be 32 charaters long and contain only 8-bit characters.
 
 ### Example
 
@@ -603,10 +602,9 @@ proof | string | *Optional* A value that produces the digest when hashed. It mus
 ```json
 {
   "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "suspensionSequence": 1234,
-  "method": 1,
-  "digest": "712C36933822AD3A3D136C5DF97AA863B69F9CE88B2D6CE6BDD11BFDE290C19D",
-  "proof": "this must have 32 characters...."
+  "escrowSequence": 1234,
+  "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+  "fulfillment": "A0028000"
 }
 ```
 
@@ -3132,20 +3130,20 @@ return api.prepareSettings(address, settings)
 ```
 
 
-## prepareSuspendedPaymentCreation
+## prepareEscrowCreation
 
-`prepareSuspendedPaymentCreation(address: string, suspendedPaymentCreation: Object, instructions: Object): Promise<Object>`
+`prepareEscrowCreation(address: string, escrowCreation: Object, instructions: Object): Promise<Object>`
 
-Prepare a suspended payment creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+Prepare an escrow creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Suspended Payments are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
+**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
 
 ### Parameters
 
 Name | Type | Description
 ---- | ---- | -----------
 address | [address](#ripple-address) | The address of the account that is creating the transaction.
-suspendedPaymentCreation | [suspendedPaymentCreation](#suspended-payment-creation) | The specification of the suspended payment creation to prepare.
+escrowCreation | [escrowCreation](#escrow-creation) | The specification of the escrow creation to prepare.
 instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
 
 ### Return Value
@@ -3168,7 +3166,7 @@ instructions | object | The instructions for how to execute the transaction afte
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const suspendedPaymentCreation = {
+const escrowCreation = {
   "source": {
     "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
     "maxAmount": {
@@ -3187,14 +3185,14 @@ const suspendedPaymentCreation = {
   },
   "allowCancelAfter": "2014-09-24T21:21:50.000Z"
 };
-return api.prepareSuspendedPaymentCreation(address, suspendedPaymentCreation).then(prepared =>
+return api.prepareEscrowCreation(address, escrowCreation).then(prepared =>
   {/* ... */});
 ```
 
 
 ```json
 {
-  "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"SuspendedPaymentCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"CancelAfter\":464908910,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"EscrowCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"CancelAfter\":464908910,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
   "instructions": {
     "fee": "0.000012",
     "sequence": 23,
@@ -3204,20 +3202,20 @@ return api.prepareSuspendedPaymentCreation(address, suspendedPaymentCreation).th
 ```
 
 
-## prepareSuspendedPaymentCancellation
+## prepareEscrowCancellation
 
-`prepareSuspendedPaymentCancellation(address: string, suspendedPaymentCancellation: Object, instructions: Object): Promise<Object>`
+`prepareEscrowCancellation(address: string, escrowCancellation: Object, instructions: Object): Promise<Object>`
 
-Prepare a suspended payment cancellation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+Prepare an escrow cancellation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Suspended Payments are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
+**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
 
 ### Parameters
 
 Name | Type | Description
 ---- | ---- | -----------
 address | [address](#ripple-address) | The address of the account that is creating the transaction.
-suspendedPaymentCancellation | [suspendedPaymentCancellation](#suspended-payment-cancellation) | The specification of the suspended payment cancellation to prepare.
+escrowCancellation | [escrowCancellation](#escrow-cancellation) | The specification of the escrow cancellation to prepare.
 instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
 
 ### Return Value
@@ -3240,18 +3238,18 @@ instructions | object | The instructions for how to execute the transaction afte
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const suspendedPaymentCancellation = {
+const escrowCancellation = {
   "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "suspensionSequence": 1234
+  "escrowSequence": 1234
 };
-return api.prepareSuspendedPaymentCancellation(address, suspendedPaymentCancellation).then(prepared =>
+return api.prepareEscrowCancellation(address, escrowCancellation).then(prepared =>
   {/* ... */});
 ```
 
 
 ```json
 {
-  "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"SuspendedPaymentCancel\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Owner\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"OfferSequence\":1234,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"EscrowCancel\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Owner\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"OfferSequence\":1234,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
   "instructions": {
     "fee": "0.000012",
     "sequence": 23,
@@ -3261,20 +3259,20 @@ return api.prepareSuspendedPaymentCancellation(address, suspendedPaymentCancella
 ```
 
 
-## prepareSuspendedPaymentExecution
+## prepareEscrowExecution
 
-`prepareSuspendedPaymentExecution(address: string, suspendedPaymentExecution: Object, instructions: Object): Promise<Object>`
+`prepareEscrowExecution(address: string, escrowExecution: Object, instructions: Object): Promise<Object>`
 
-Prepare a suspended payment execution transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+Prepare an escrow execution transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Suspended Payments are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
+**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
 
 ### Parameters
 
 Name | Type | Description
 ---- | ---- | -----------
 address | [address](#ripple-address) | The address of the account that is creating the transaction.
-suspendedPaymentExecution | [suspendedPaymentExecution](#suspended-payment-execution) | The specification of the suspended payment execution to prepare.
+escrowExecution | [escrowExecution](#escrow-execution) | The specification of the escrow execution to prepare.
 instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
 
 ### Return Value
@@ -3297,23 +3295,22 @@ instructions | object | The instructions for how to execute the transaction afte
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-const suspendedPaymentExecution = {
+const escrowExecution = {
   "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "suspensionSequence": 1234,
-  "method": 1,
-  "digest": "712C36933822AD3A3D136C5DF97AA863B69F9CE88B2D6CE6BDD11BFDE290C19D",
-  "proof": "this must have 32 characters...."
+  "escrowSequence": 1234,
+  "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+  "fulfillment": "A0028000"
 };
-return api.prepareSuspendedPaymentExecution(address, suspendedPaymentExecution).then(prepared =>
+return api.prepareEscrowExecution(address, escrowExecution).then(prepared =>
   {/* ... */});
 ```
 
 
 ```json
 {
-  "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"SuspendedPaymentFinish\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Owner\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"OfferSequence\":1234,\"Method\":1,\"Digest\":\"712C36933822AD3A3D136C5DF97AA863B69F9CE88B2D6CE6BDD11BFDE290C19D\",\"Proof\":\"74686973206D757374206861766520333220636861726163746572732E2E2E2E\",\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"EscrowFinish\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Owner\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"OfferSequence\":1234,\"Condition\":\"A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100\",\"Fulfillment\":\"A0028000\",\"LastLedgerSequence\":8820051,\"Fee\":\"396\",\"Sequence\":23}",
   "instructions": {
-    "fee": "0.000012",
+    "fee": "0.000396",
     "sequence": 23,
     "maxLedgerVersion": 8820051
   }

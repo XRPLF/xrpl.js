@@ -24,17 +24,17 @@ module.exports = {
     domain: require('./prepare-settings'),
     signers: require('./prepare-settings-signers')
   },
-  prepareSuspendedPaymentCreation: {
-    normal: require('./prepare-suspended-payment-creation'),
-    full: require('./prepare-suspended-payment-creation-full')
+  prepareEscrowCreation: {
+    normal: require('./prepare-escrow-creation'),
+    full: require('./prepare-escrow-creation-full')
   },
-  prepareSuspendedPaymentExecution: {
-    normal: require('./prepare-suspended-payment-execution'),
-    simple: require('./prepare-suspended-payment-execution-simple')
+  prepareEscrowExecution: {
+    normal: require('./prepare-escrow-execution'),
+    simple: require('./prepare-escrow-execution-simple')
   },
-  prepareSuspendedPaymentCancellation: {
-    normal: require('./prepare-suspended-payment-cancellation'),
-    memos: require('./prepare-suspended-payment-cancellation-memos')
+  prepareEscrowCancellation: {
+    normal: require('./prepare-escrow-cancellation'),
+    memos: require('./prepare-escrow-cancellation-memos')
   },
   prepareTrustline: {
     simple: require('./prepare-trustline-simple'),
@@ -43,7 +43,7 @@ module.exports = {
   },
   sign: {
     normal: require('./sign'),
-    suspended: require('./sign-suspended.json'),
+    escrow: require('./sign-escrow.json'),
     signAs: require('./sign-as')
   },
   getPaths: {

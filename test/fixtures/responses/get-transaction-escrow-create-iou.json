@@ -1,0 +1,51 @@
+{
+  "type": "escrowCreation",
+  "address": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+  "sequence": 10,
+  "id": "144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE2",
+  "specification": {
+    "source": {
+      "address": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+      "maxAmount": {
+        "currency": "USD",
+        "value": "2"
+      },
+      "tag": 1
+    },
+    "destination": {
+      "address": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw",
+      "amount": {
+        "currency": "USD",
+        "value": "2",
+        "counterparty": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh"
+      },
+      "tag": 2
+    },
+    "memos": [
+      {
+        "type": "x2",
+        "format": "text/plain",
+        "data": "mema data"
+      }
+    ],
+    "condition": "8F434346648F6B96DF89DDA901C5176B10A6D83961DD3C1AC88B59B2DC327AA4",
+    "allowCancelAfter": "2015-11-16T06:53:42.000Z",
+    "allowExecuteAfter": "2015-11-16T06:47:42.000Z"
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2015-11-16T06:43:00.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh": [
+        {
+          "currency": "XRP",
+          "value": "-0.000014"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 15,
+    "indexInLedger": 0
+  }
+}

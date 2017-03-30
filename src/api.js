@@ -36,12 +36,12 @@ const preparePayment = require('./transaction/payment')
 const prepareTrustline = require('./transaction/trustline')
 const prepareOrder = require('./transaction/order')
 const prepareOrderCancellation = require('./transaction/ordercancellation')
-const prepareSuspendedPaymentCreation =
-  require('./transaction/suspended-payment-creation')
-const prepareSuspendedPaymentExecution =
-  require('./transaction/suspended-payment-execution')
-const prepareSuspendedPaymentCancellation =
-  require('./transaction/suspended-payment-cancellation')
+const prepareEscrowCreation =
+  require('./transaction/escrow-creation')
+const prepareEscrowExecution =
+  require('./transaction/escrow-execution')
+const prepareEscrowCancellation =
+  require('./transaction/escrow-cancellation')
 const prepareSettings = require('./transaction/settings')
 const sign = require('./transaction/sign')
 const combine = require('./transaction/combine')
@@ -127,9 +127,9 @@ _.assign(RippleAPI.prototype, {
   prepareTrustline,
   prepareOrder,
   prepareOrderCancellation,
-  prepareSuspendedPaymentCreation,
-  prepareSuspendedPaymentExecution,
-  prepareSuspendedPaymentCancellation,
+  prepareEscrowCreation,
+  prepareEscrowExecution,
+  prepareEscrowCancellation,
   prepareSettings,
   sign,
   combine,

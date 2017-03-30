@@ -273,22 +273,20 @@ module.exports = function createMockRippled(port) {
       conn.send(createResponse(request, fixtures.tx.OfferWithExpiration));
     } else if (request.transaction ===
         '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE1') {
-      conn.send(createResponse(request, fixtures.tx.SuspendedPaymentCreation));
+      conn.send(createResponse(request, fixtures.tx.EscrowCreation));
     } else if (request.transaction ===
         '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE2') {
-      conn.send(createResponse(request,
-        fixtures.tx.SuspendedPaymentCreationIOU));
+      conn.send(createResponse(request, fixtures.tx.EscrowCreationIOU));
     } else if (request.transaction ===
         'F346E542FFB7A8398C30A87B952668DAB48B7D421094F8B71776DA19775A3B22') {
-      conn.send(createResponse(request,
-        fixtures.tx.SuspendedPaymentCancellation));
+      conn.send(createResponse(request, fixtures.tx.EscrowCancellation));
     } else if (request.transaction ===
         'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD136993B') {
-      conn.send(createResponse(request, fixtures.tx.SuspendedPaymentExecution));
+      conn.send(createResponse(request, fixtures.tx.EscrowExecution));
     } else if (request.transaction ===
         'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD1369931') {
       conn.send(createResponse(request,
-        fixtures.tx.SuspendedPaymentExecutionSimple));
+        fixtures.tx.EscrowExecutionSimple));
     } else if (request.transaction ===
         'AFB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11') {
       conn.send(createResponse(request, fixtures.tx.Unrecognized));
