@@ -21,7 +21,9 @@ const HashPrefix = {
   // validation for signing
   validation: bytes(0x56414C00),
   // proposal for signing
-  proposal: bytes(0x50525000)
+  proposal: bytes(0x50525000),
+  // payment channel claim
+  paymentChannelClaim: bytes(0x434C4D00)
 };
 
 module.exports = {

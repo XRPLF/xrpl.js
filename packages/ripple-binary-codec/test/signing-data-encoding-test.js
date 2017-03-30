@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const assert = require('assert-diff');
-const {encodeForSigning, encodeForMultisigning} = require('../src');
+const {encodeForSigning, encodeForSigningClaim, encodeForMultisigning} =
+  require('../src');
 
 const tx_json = {
   Account: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
@@ -101,4 +102,19 @@ describe('Signing data', function() {
           'C0A5ABEF242802EFED4B041E8F2D4A8CC86AE3D1'].join('')
       );
   });
+  it('can create claim blob', function() {
+    const channel =
+      '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1'
+    const amount = '1000'
+    const json = {channel, amount}
+    const actual = encodeForSigningClaim(json)
+    assert.equal(actual, [
+      // hash prefix
+      '434C4D00',
+      // channel ID
+      '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1',
+      // amount as a uint64
+      '00000000000003E8'
+    ].join(''))
+  })
 });

@@ -3,6 +3,7 @@ const coreTypes = require('./coretypes');
 const {quality,
        binary: {bytesToHex,
                 signingData,
+                signingClaimData,
                 multiSigningData,
                 binaryToJSON,
                 serializeObject}} = coreTypes;
@@ -20,6 +21,11 @@ function encode(json) {
 function encodeForSigning(json) {
   assert(typeof json === 'object');
   return bytesToHex(signingData(json));
+}
+
+function encodeForSigningClaim(json) {
+  assert(typeof json === 'object');
+  return bytesToHex(signingClaimData(json));
 }
 
 function encodeForMultisigning(json, signer) {
@@ -42,6 +48,7 @@ module.exports = {
   decode,
   encode,
   encodeForSigning,
+  encodeForSigningClaim,
   encodeForMultisigning,
   encodeQuality,
   decodeQuality

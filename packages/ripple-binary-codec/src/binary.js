@@ -1,5 +1,6 @@
 /* eslint-disable func-style */
 
+const BN = require('bn.js');
 const types = require('./types');
 const {HashPrefix} = require('./hash-prefixes');
 const {BinaryParser} = require('./serdes/binary-parser');
@@ -30,6 +31,19 @@ function signingData(tx, prefix = HashPrefix.transactionSig) {
   return serializeObject(tx, {prefix, signingFieldsOnly: true});
 }
 
+function signingClaimData(claim) {
+  const prefix = HashPrefix.paymentChannelClaim
+  const channel = types.Hash256.from(claim.channel).toBytes()
+  const amount = new types.UInt64(new BN(claim.amount)).toBytes();
+
+  const bytesList = new BytesList();
+
+  bytesList.put(prefix)
+  bytesList.put(channel)
+  bytesList.put(amount)
+  return bytesList.toBytes()
+}
+
 function multiSigningData(tx, signingAccount) {
   const prefix = HashPrefix.transactionMultiSig;
   const suffix = types.AccountID.from(signingAccount).toBytes();
@@ -47,6 +61,7 @@ module.exports = {
   parseBytes,
   multiSigningData,
   signingData,
+  signingClaimData,
   binaryToJSON,
   sha512Half,
   transactionID,
