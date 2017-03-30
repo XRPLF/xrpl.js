@@ -3,16 +3,14 @@
     "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
     "maxAmount": {
       "value": "0.01",
-      "currency": "USD",
-      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      "currency": "XRP"
     }
   },
   "destination": {
     "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
     "amount": {
       "value": "0.01",
-      "currency": "USD",
-      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      "currency": "XRP"
     }
   },
   "allowCancelAfter": "2014-09-24T21:21:50.000Z"

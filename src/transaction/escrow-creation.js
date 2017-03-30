@@ -26,6 +26,9 @@ function createEscrowCreationTransaction(account: string,
     Amount: toRippledAmount(payment.destination.amount)
   }
 
+  if (txJSON.Amount.currency !== undefined) {
+    throw new ValidationError('"Amount" currency must be XRP')
+  }
   if (payment.condition !== undefined) {
     txJSON.Condition = payment.condition
   }
