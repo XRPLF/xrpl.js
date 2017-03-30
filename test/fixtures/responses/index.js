@@ -36,8 +36,6 @@ module.exports = {
     notValidated: require('./get-transaction-not-validated.json'),
     escrowCreation:
       require('./get-transaction-escrow-create.json'),
-    EscrowCreationIOU:
-      require('./get-transaction-escrow-create-iou.json'),
     escrowCancellation:
       require('./get-transaction-escrow-cancellation.json'),
     escrowExecution:

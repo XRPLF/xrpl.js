@@ -65,8 +65,6 @@ module.exports = {
     NotValidated: require('./tx/not-validated.json'),
     OfferWithExpiration: require('./tx/order-with-expiration.json'),
     EscrowCreation: require('./tx/escrow-creation.json'),
-    EscrowCreationIOU:
-      require('./tx/escrow-creation-iou.json'),
     EscrowCancellation:
       require('./tx/escrow-cancellation.json'),
     EscrowExecution: require('./tx/escrow-execution.json'),

@@ -546,16 +546,14 @@ memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the
     "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
     "maxAmount": {
       "value": "0.01",
-      "currency": "USD",
-      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      "currency": "XRP"
     }
   },
   "destination": {
     "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
     "amount": {
       "value": "0.01",
-      "currency": "USD",
-      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      "currency": "XRP"
     }
   },
   "allowCancelAfter": "2014-09-24T21:21:50.000Z"
@@ -3171,16 +3169,14 @@ const escrowCreation = {
     "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
     "maxAmount": {
       "value": "0.01",
-      "currency": "USD",
-      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      "currency": "XRP"
     }
   },
   "destination": {
     "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
     "amount": {
       "value": "0.01",
-      "currency": "USD",
-      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+      "currency": "XRP"
     }
   },
   "allowCancelAfter": "2014-09-24T21:21:50.000Z"
@@ -3192,7 +3188,7 @@ return api.prepareEscrowCreation(address, escrowCreation).then(prepared =>
 
 ```json
 {
-  "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"EscrowCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"CancelAfter\":464908910,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"EscrowCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":\"10000\",\"CancelAfter\":464908910,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
   "instructions": {
     "fee": "0.000012",
     "sequence": 23,

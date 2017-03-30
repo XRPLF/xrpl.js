@@ -275,9 +275,6 @@ module.exports = function createMockRippled(port) {
         '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE1') {
       conn.send(createResponse(request, fixtures.tx.EscrowCreation));
     } else if (request.transaction ===
-        '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE2') {
-      conn.send(createResponse(request, fixtures.tx.EscrowCreationIOU));
-    } else if (request.transaction ===
         'F346E542FFB7A8398C30A87B952668DAB48B7D421094F8B71776DA19775A3B22') {
       conn.send(createResponse(request, fixtures.tx.EscrowCancellation));
     } else if (request.transaction ===

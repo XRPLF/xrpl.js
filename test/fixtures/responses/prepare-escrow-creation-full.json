@@ -1,5 +1,5 @@
 {
-  "txJSON": "{\"TransactionType\":\"EscrowCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"0.01\"},\"Condition\":\"8F434346648F6B96DF89DDA901C5176B10A6D83961DD3C1AC88B59B2DC327AA4\",\"FinishAfter\":464908910,\"SourceTag\":1,\"DestinationTag\":2,\"Memos\":[{\"Memo\":{\"MemoData\":\"7465787465642064617461\",\"MemoType\":\"74657374\"}}],\"Flags\":2147483648,\"LastLedgerSequence\":8819954,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"TransactionType\":\"EscrowCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":\"10000\",\"Condition\":\"8F434346648F6B96DF89DDA901C5176B10A6D83961DD3C1AC88B59B2DC327AA4\",\"FinishAfter\":464908910,\"SourceTag\":1,\"DestinationTag\":2,\"Memos\":[{\"Memo\":{\"MemoData\":\"7465787465642064617461\",\"MemoType\":\"74657374\"}}],\"Flags\":2147483648,\"LastLedgerSequence\":8819954,\"Fee\":\"12\",\"Sequence\":23}",
   "instructions": {
     "fee": "0.000012",
     "sequence": 23,

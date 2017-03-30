@@ -649,15 +649,6 @@ describe('RippleAPI', function() {
           'getTransaction'));
     });
 
-    it('getTransaction - EscrowCreation iou', function() {
-      const hash =
-        '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE2';
-      return this.api.getTransaction(hash).then(
-        _.partial(checkResult,
-          responses.getTransaction.EscrowCreationIOU,
-          'getTransaction'));
-    });
-
     it('getTransaction - EscrowCancellation', function() {
       const hash =
         'F346E542FFB7A8398C30A87B952668DAB48B7D421094F8B71776DA19775A3B22';
