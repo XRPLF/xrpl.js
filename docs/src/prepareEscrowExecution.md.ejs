@@ -1,0 +1,32 @@
+## prepareEscrowExecution
+
+`prepareEscrowExecution(address: string, escrowExecution: Object, instructions: Object): Promise<Object>`
+
+Prepare an escrow execution transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
+
+### Parameters
+
+<%- renderSchema('input/prepare-escrow-execution.json') %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare*" methods have the same return type.
+</aside>
+
+<%- renderSchema('output/prepare.json') %>
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+const escrowExecution = <%- importFile('test/fixtures/requests/prepare-escrow-execution.json') %>;
+return api.prepareEscrowExecution(address, escrowExecution).then(prepared =>
+  {/* ... */});
+```
+
+<%- renderFixture('responses/prepare-escrow-execution.json') %>

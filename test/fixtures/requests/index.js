@@ -24,17 +24,32 @@ module.exports = {
     domain: require('./prepare-settings'),
     signers: require('./prepare-settings-signers')
   },
-  prepareSuspendedPaymentCreation: {
-    normal: require('./prepare-suspended-payment-creation'),
-    full: require('./prepare-suspended-payment-creation-full')
+  prepareEscrowCreation: {
+    normal: require('./prepare-escrow-creation'),
+    full: require('./prepare-escrow-creation-full')
   },
-  prepareSuspendedPaymentExecution: {
-    normal: require('./prepare-suspended-payment-execution'),
-    simple: require('./prepare-suspended-payment-execution-simple')
+  prepareEscrowExecution: {
+    normal: require('./prepare-escrow-execution'),
+    simple: require('./prepare-escrow-execution-simple')
   },
-  prepareSuspendedPaymentCancellation: {
-    normal: require('./prepare-suspended-payment-cancellation'),
-    memos: require('./prepare-suspended-payment-cancellation-memos')
+  prepareEscrowCancellation: {
+    normal: require('./prepare-escrow-cancellation'),
+    memos: require('./prepare-escrow-cancellation-memos')
+  },
+  preparePaymentChannelCreate: {
+    normal: require('./prepare-payment-channel-create'),
+    full: require('./prepare-payment-channel-create-full')
+  },
+  preparePaymentChannelFund: {
+    normal: require('./prepare-payment-channel-fund'),
+    full: require('./prepare-payment-channel-fund-full')
+  },
+  preparePaymentChannelClaim: {
+    normal: require('./prepare-payment-channel-claim'),
+    full: require('./prepare-payment-channel-claim-full'),
+    close: require('./prepare-payment-channel-claim-close'),
+    renew: require('./prepare-payment-channel-claim-renew'),
+    noSignature: require('./prepare-payment-channel-claim-no-signature')
   },
   prepareTrustline: {
     simple: require('./prepare-trustline-simple'),
@@ -43,7 +58,7 @@ module.exports = {
   },
   sign: {
     normal: require('./sign'),
-    suspended: require('./sign-suspended.json'),
+    escrow: require('./sign-escrow.json'),
     signAs: require('./sign-as')
   },
   getPaths: {

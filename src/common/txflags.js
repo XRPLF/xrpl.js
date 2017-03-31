@@ -35,6 +35,11 @@ const txFlags = {
     NoRippleDirect: 0x00010000,
     PartialPayment: 0x00020000,
     LimitQuality: 0x00040000
+  },
+
+  PaymentChannelClaim: {
+    Renew: 0x00010000,
+    Close: 0x00020000
   }
 }
 

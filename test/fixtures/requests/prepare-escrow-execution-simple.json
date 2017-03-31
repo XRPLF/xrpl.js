@@ -1,0 +1,11 @@
+{
+  "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+  "escrowSequence": 1234,
+  "memos": [
+    {
+      "type": "test",
+      "format": "plain/text",
+      "data": "texted data"
+    }
+  ]
+}

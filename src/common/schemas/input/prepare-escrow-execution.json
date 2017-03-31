@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "prepareEscrowExecutionParameters",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that is creating the transaction."
+    },
+    "escrowExecution": {
+      "$ref": "escrowExecution",
+      "description": "The specification of the escrow execution to prepare."
+    },
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "escrowExecution"]
+}

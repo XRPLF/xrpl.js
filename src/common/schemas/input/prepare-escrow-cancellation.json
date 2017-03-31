@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "prepareEscrowCancellationParameters",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that is creating the transaction."
+    },
+    "escrowCancellation": {
+      "$ref": "escrowCancellation",
+      "description": "The specification of the escrow cancellation to prepare."
+    },
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "escrowCancellation"]
+}

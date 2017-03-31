@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "escrowExecution",
+  "link": "escrow-execution",
+  "type": "object",
+  "properties": {
+    "memos": {"$ref": "memos"},
+    "owner": {
+      "$ref": "address",
+      "description": "The address of the owner of the escrow to execute."
+    },
+    "escrowSequence": {
+      "$ref": "sequence",
+      "description": "The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to execute."
+    },
+    "condition": {
+      "type": "string",
+      "description": "The original `condition` from the escrow creation transaction. This is sha256 hash of `fulfillment` string. It is replicated here so that the relatively expensive hashing operation can be delegated to a server without ledger history and the server with ledger history only has to do a quick comparison of the old condition with the new condition.",
+      "pattern": "^[A-F0-9]{0,256}$"
+    },
+    "fulfillment": {
+      "type": "string",
+      "description": "A value that produces the condition when hashed. It must be 32 charaters long and contain only 8-bit characters.",
+      "pattern": "^[A-F0-9]+$"
+    }
+  },
+  "required": ["owner", "escrowSequence"],
+  "additionalProperties": false
+}
