@@ -524,38 +524,22 @@ See [Transaction Types](#transaction-types) for a description.
 
 Name | Type | Description
 ---- | ---- | -----------
-source | object | Fields pertaining to the source of the payment.
-*source.* address | [address](#ripple-address) | The address to send from.
-*source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
-*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
-destination | object | Fields pertaining to the destination of the payment.
-*destination.* address | [address](#ripple-address) | The address to receive at.
-*destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
-*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
+amount | [value](#value) | Amount of XRP for sender to escrow.
+destination | [address](#ripple-address) | Address to receive escrowed XRP.
 allowCancelAfter | date-time string | *Optional* If present, the escrow may be cancelled after this time.
 allowExecuteAfter | date-time string | *Optional* If present, the escrow can not be executed before this time.
 condition | string | *Optional* If present, fulfillment is required upon execution.
+destinationTag | integer | *Optional* Destination tag.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+sourceTag | integer | *Optional* Source tag.
 
 ### Example
 
 
 ```json
 {
-  "source": {
-    "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-    "maxAmount": {
-      "value": "0.01",
-      "currency": "XRP"
-    }
-  },
-  "destination": {
-    "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    "amount": {
-      "value": "0.01",
-      "currency": "XRP"
-    }
-  },
+  "destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  "amount": "0.01",
   "allowCancelAfter": "2014-09-24T21:21:50.000Z"
 }
 ```
@@ -3165,20 +3149,8 @@ instructions | object | The instructions for how to execute the transaction afte
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
 const escrowCreation = {
-  "source": {
-    "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-    "maxAmount": {
-      "value": "0.01",
-      "currency": "XRP"
-    }
-  },
-  "destination": {
-    "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    "amount": {
-      "value": "0.01",
-      "currency": "XRP"
-    }
-  },
+  "destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  "amount": "0.01",
   "allowCancelAfter": "2014-09-24T21:21:50.000Z"
 };
 return api.prepareEscrowCreation(address, escrowCreation).then(prepared =>

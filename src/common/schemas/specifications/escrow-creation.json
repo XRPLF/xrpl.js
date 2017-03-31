@@ -4,13 +4,13 @@
   "link": "escrow-creation",
   "type": "object",
   "properties": {
-    "source": {
-      "$ref": "maxAdjustment",
-      "description": "Fields pertaining to the source of the payment."
+    "amount": {
+      "$ref": "value",
+      "description": "Amount of XRP for sender to escrow."
     },
     "destination": {
-      "$ref": "destinationExactAdjustment",
-      "description": "Fields pertaining to the destination of the payment."
+      "$ref": "address",
+      "description": "Address to receive escrowed XRP."
     },
     "memos": {"$ref": "memos"},
     "condition": {
@@ -27,8 +27,16 @@
       "type": "string",
       "format": "date-time",
       "description": "If present, the escrow can not be executed before this time."
+    },
+    "sourceTag": {
+      "$ref": "tag",
+      "description": "Source tag."
+    },
+    "destinationTag": {
+      "$ref": "tag",
+      "description": "Destination tag."
     }
   },
-  "required": ["source", "destination"],
+  "required": ["amount", "destination"],
   "additionalProperties": false
 }
