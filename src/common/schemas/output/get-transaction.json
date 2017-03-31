@@ -74,6 +74,24 @@
         "type": {"enum": ["escrowExecution"]},
         "specification": {"$ref": "escrowExecution"}
       }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["paymentChannelCreate"]},
+        "specification": {"$ref": "paymentChannelCreate"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["paymentChannelFund"]},
+        "specification": {"$ref": "paymentChannelFund"}
+      }
+    },
+    {
+      "properties": {
+        "type": {"enum": ["paymentChannelClaim"]},
+        "specification": {"$ref": "paymentChannelClaim"}
+      }
     }
   ]
 }

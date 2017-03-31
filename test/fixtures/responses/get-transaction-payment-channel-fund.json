@@ -1,0 +1,26 @@
+{
+  "type": "paymentChannelFund",
+  "address": "rfAuMkVuZQnQhvdMcUKg4ndBb9SPDhzNmK",
+  "sequence": 114,
+  "id": "CD053D8867007A6A4ACB7A432605FE476D088DCB515AFFC886CF2B4EB6D2AE8B",
+  "specification": {
+    "channel": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
+    "amount": "1"
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2017-03-09T14:09:51.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rfAuMkVuZQnQhvdMcUKg4ndBb9SPDhzNmK": [
+        {
+          "currency": "XRP",
+          "value": "-1.000012"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 786310,
+    "indexInLedger": 1
+  }
+}

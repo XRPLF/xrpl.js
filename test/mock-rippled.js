@@ -285,6 +285,15 @@ module.exports = function createMockRippled(port) {
       conn.send(createResponse(request,
         fixtures.tx.EscrowExecutionSimple));
     } else if (request.transaction ===
+        '0E9CA3AB1053FC0C1CBAA75F636FE1EC92F118C7056BBEF5D63E4C116458A16D') {
+      conn.send(createResponse(request, fixtures.tx.PaymentChannelCreate));
+    } else if (request.transaction ===
+        'CD053D8867007A6A4ACB7A432605FE476D088DCB515AFFC886CF2B4EB6D2AE8B') {
+      conn.send(createResponse(request, fixtures.tx.PaymentChannelFund));
+    } else if (request.transaction ===
+        '81B9ECAE7195EB6E8034AEDF44D8415A7A803E14513FDBB34FA984AB37D59563') {
+      conn.send(createResponse(request, fixtures.tx.PaymentChannelClaim));
+    } else if (request.transaction ===
         'AFB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11') {
       conn.send(createResponse(request, fixtures.tx.Unrecognized));
     } else if (request.transaction ===

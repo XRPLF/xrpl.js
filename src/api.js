@@ -42,6 +42,12 @@ const prepareEscrowExecution =
   require('./transaction/escrow-execution')
 const prepareEscrowCancellation =
   require('./transaction/escrow-cancellation')
+const preparePaymentChannelCreate =
+  require('./transaction/payment-channel-create')
+const preparePaymentChannelFund =
+  require('./transaction/payment-channel-fund')
+const preparePaymentChannelClaim =
+  require('./transaction/payment-channel-claim')
 const prepareSettings = require('./transaction/settings')
 const sign = require('./transaction/sign')
 const combine = require('./transaction/combine')
@@ -130,6 +136,9 @@ _.assign(RippleAPI.prototype, {
   prepareEscrowCreation,
   prepareEscrowExecution,
   prepareEscrowCancellation,
+  preparePaymentChannelCreate,
+  preparePaymentChannelFund,
+  preparePaymentChannelClaim,
   prepareSettings,
   sign,
   combine,

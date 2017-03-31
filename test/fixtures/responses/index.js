@@ -42,6 +42,12 @@ module.exports = {
       require('./get-transaction-escrow-execution.json'),
     escrowExecutionSimple:
       require('./get-transaction-escrow-execution-simple.json'),
+    paymentChannelCreate:
+      require('./get-transaction-payment-channel-create.json'),
+    paymentChannelFund:
+      require('./get-transaction-payment-channel-fund.json'),
+    paymentChannelClaim:
+      require('./get-transaction-payment-channel-claim.json'),
     amendment: require('./get-transaction-amendment.json'),
     feeUpdate: require('./get-transaction-fee-update.json')
   },
@@ -104,6 +110,19 @@ module.exports = {
   prepareEscrowCancellation: {
     normal: require('./prepare-escrow-cancellation'),
     memos: require('./prepare-escrow-cancellation-memos')
+  },
+  preparePaymentChannelCreate: {
+    normal: require('./prepare-payment-channel-create'),
+    full: require('./prepare-payment-channel-create-full')
+  },
+  preparePaymentChannelFund: {
+    normal: require('./prepare-payment-channel-fund'),
+    full: require('./prepare-payment-channel-fund-full')
+  },
+  preparePaymentChannelClaim: {
+    normal: require('./prepare-payment-channel-claim'),
+    renew: require('./prepare-payment-channel-claim-renew'),
+    close: require('./prepare-payment-channel-claim-close')
   },
   prepareTrustline: {
     simple: require('./prepare-trustline-simple.json'),

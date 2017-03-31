@@ -1,0 +1,32 @@
+## preparePaymentChannelCreate
+
+`preparePaymentChannelCreate(address: string, paymentChannelCreate: Object, instructions: Object): Promise<Object>`
+
+Prepare a payment channel creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+**Caution:** Payment channels are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
+
+### Parameters
+
+<%- renderSchema('input/prepare-payment-channel-create.json') %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare*" methods have the same return type.
+</aside>
+
+<%- renderSchema('output/prepare.json') %>
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+const paymentChannelCreate = <%- importFile('test/fixtures/requests/prepare-payment-channel-create.json') %>;
+return api.preparePaymentChannelCreate(address, paymentChannelCreate).then(prepared =>
+  {/* ... */});
+```
+
+<%- renderFixture('responses/prepare-payment-channel-create.json') %>

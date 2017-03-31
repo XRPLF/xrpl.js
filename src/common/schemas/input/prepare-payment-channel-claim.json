@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "preparePaymentChannelClaimParameters",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that is creating the transaction."
+    },
+    "paymentChannelClaim": {
+      "$ref": "paymentChannelClaim",
+      "description": "Details of the channel and claim."
+    },
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "paymentChannelClaim"]
+}

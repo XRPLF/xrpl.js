@@ -36,6 +36,21 @@ module.exports = {
     normal: require('./prepare-escrow-cancellation'),
     memos: require('./prepare-escrow-cancellation-memos')
   },
+  preparePaymentChannelCreate: {
+    normal: require('./prepare-payment-channel-create'),
+    full: require('./prepare-payment-channel-create-full')
+  },
+  preparePaymentChannelFund: {
+    normal: require('./prepare-payment-channel-fund'),
+    full: require('./prepare-payment-channel-fund-full')
+  },
+  preparePaymentChannelClaim: {
+    normal: require('./prepare-payment-channel-claim'),
+    full: require('./prepare-payment-channel-claim-full'),
+    close: require('./prepare-payment-channel-claim-close'),
+    renew: require('./prepare-payment-channel-claim-renew'),
+    noSignature: require('./prepare-payment-channel-claim-no-signature')
+  },
   prepareTrustline: {
     simple: require('./prepare-trustline-simple'),
     complex: require('./prepare-trustline'),
