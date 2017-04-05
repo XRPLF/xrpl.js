@@ -57,6 +57,10 @@ module.exports = {
   submit: _.partial(schemaValidate, 'submitParameters'),
   computeLedgerHash: _.partial(schemaValidate, 'computeLedgerHashParameters'),
   generateAddress: _.partial(schemaValidate, 'generateAddressParameters'),
+  signPaymentChannelClaim: _.partial(schemaValidate,
+    'signPaymentChannelClaimParameters'),
+  verifyPaymentChannelClaim: _.partial(schemaValidate,
+    'verifyPaymentChannelClaimParameters'),
   apiOptions: _.partial(schemaValidate, 'api-options'),
   instructions: _.partial(schemaValidate, 'instructions')
 }

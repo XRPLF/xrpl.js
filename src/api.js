@@ -56,6 +56,10 @@ const errors = require('./common').errors
 const generateAddress =
   require('./offline/generate-address').generateAddressAPI
 const computeLedgerHash = require('./offline/ledgerhash')
+const signPaymentChannelClaim =
+  require('./offline/sign-payment-channel-claim')
+const verifyPaymentChannelClaim =
+  require('./offline/verify-payment-channel-claim')
 const getLedger = require('./ledger/ledger')
 
 type APIOptions = {
@@ -146,6 +150,8 @@ _.assign(RippleAPI.prototype, {
 
   generateAddress,
   computeLedgerHash,
+  signPaymentChannelClaim,
+  verifyPaymentChannelClaim,
   errors
 })
 

@@ -452,6 +452,37 @@ describe('RippleAPI', function() {
     });
   });
 
+  it('signPaymentChannelClaim', function() {
+    const privateKey =
+      'ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A';
+    const result = this.api.signPaymentChannelClaim(
+      requests.signPaymentChannelClaim.channel,
+      requests.signPaymentChannelClaim.amount, privateKey);
+    checkResult(responses.signPaymentChannelClaim,
+      'signPaymentChannelClaim', result)
+  });
+
+  it('verifyPaymentChannelClaim', function() {
+    const publicKey =
+      '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8';
+    const result = this.api.verifyPaymentChannelClaim(
+      requests.signPaymentChannelClaim.channel,
+      requests.signPaymentChannelClaim.amount,
+      responses.signPaymentChannelClaim, publicKey);
+    checkResult(true, 'verifyPaymentChannelClaim', result)
+  });
+
+  it('verifyPaymentChannelClaim - invalid', function() {
+    const publicKey =
+      '03A6523FE4281DA48A6FD77FAF3CB77F5C7001ABA0B32BCEDE0369AC009758D7D9';
+    const result = this.api.verifyPaymentChannelClaim(
+      requests.signPaymentChannelClaim.channel,
+      requests.signPaymentChannelClaim.amount,
+      responses.signPaymentChannelClaim, publicKey);
+    checkResult(false,
+      'verifyPaymentChannelClaim', result)
+  });
+
   it('combine', function() {
     const combined = this.api.combine(requests.combine.setDomain);
     checkResult(responses.combine.single, 'sign', combined);

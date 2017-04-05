@@ -63,6 +63,8 @@
   - [combine](#combine)
   - [submit](#submit)
   - [generateAddress](#generateaddress)
+  - [signPaymentChannelClaim](#signpaymentchannelclaim)
+  - [verifyPaymentChannelClaim](#verifypaymentchannelclaim)
   - [computeLedgerHash](#computeledgerhash)
 - [API Events](#api-events)
   - [ledger](#ledger)
@@ -3690,6 +3692,84 @@ return api.generateAddress();
 }
 ```
 
+
+## signPaymentChannelClaim
+
+`signPaymentChannelClaim(channel: string, amount: string, privateKey: string): string`
+
+Sign a payment channel claim. The signature can be submitted in a subsequent [PaymentChannelClaim](#preparePaymmentChannelClaim) transaction.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+channel | string | 256-bit hexadecimal channel identifier.
+amount | [value](#value) | Amount of XRP authorized by the claim.
+privateKey | string | The private key to sign the payment channel claim.
+
+### Return Value
+
+This method returns a signature string:
+
+Name | Type | Description
+---- | ---- | -----------
+ | string | The hexadecimal representation of a signature.
+
+### Example
+
+```javascript
+const channel =
+  '3E18C05AD40319B809520F1A136370C4075321B285217323396D6FD9EE1E9037';
+const amount = '.00001';
+const privateKey =
+  'ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A';
+return api.signPaymentChannelClaim(channel, amount, privateKey);
+```
+
+
+```json
+"3045022100B5C54654221F154347679B97AE7791CBEF5E6772A3F894F9C781B8F1B400F89F022021E466D29DC5AEB5DFAFC76E8A88D2E388EBD25A84143B6AC3B647F479CB89B7"
+```
+
+
+## verifyPaymentChannelClaim
+
+`verifyPaymentChannelClaim(channel: string, amount: string, signature: string, publicKey: string): boolean`
+
+Verify a payment channel claim signature.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+channel | string | 256-bit hexadecimal channel identifier.
+amount | [value](#value) | Amount of XRP authorized by the claim.
+signature | string | Signature of this claim.
+publicKey | string | Public key of the channel's sender
+
+### Return Value
+
+This method returns `true` if the claim signature is valid.
+
+Name | Type | Description
+---- | ---- | -----------
+ | boolean | 
+
+### Example
+
+```javascript
+const channel =
+  '3E18C05AD40319B809520F1A136370C4075321B285217323396D6FD9EE1E9037';
+const amount = '.00001';
+const signature = "3045022100B5C54654221F154347679B97AE7791CBEF5E6772A3F894F9C781B8F1B400F89F022021E466D29DC5AEB5DFAFC76E8A88D2E388EBD25A84143B6AC3B647F479CB89B7";
+const publicKey =
+  '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8';
+return api.verifyPaymentChannelClaim(channel, amount, signature, publicKey);
+```
+
+```json
+true
+```
 
 ## computeLedgerHash
 
