@@ -14,7 +14,7 @@
     },
     "settleDelay": {
       "type": "number",
-      "description": "Amount of time the source address must wait before closing the channel if it has unclaimed XRP."
+      "description": "Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP."
     },
     "publicKey": {
       "$ref": "publicKey",

@@ -1,0 +1,27 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result" : {
+    "node" : {
+      "Account" : "r6ZtfQFWbCkp4XqaUygzHaXsQXBT67xLj",
+      "Amount" : "10000000",
+      "Balance" : "3000000",
+      "CancelAfter" : 544924800,
+      "Destination" : "rQf9vCwQtzQQwtnGvr6zc1fqzqg7QBuj7G",
+      "Expiration" : 544860571,
+      "Flags" : 0,
+      "LedgerEntryType" : "PayChannel",
+      "OwnerNode" : "0000000000000000",
+      "PreviousTxnID" : "39C47AD0AF1532D6A796EEB90BDA1A61B3EE4FA96C7A08070B78B33CE24F2160",
+      "PreviousTxnLgrSeq" : 156978,
+      "PublicKey" : "02A05282CB6197E34490BACCD9405E81D9DFBE123B0969F9F40EC3F9987AD9A97D",
+      "SettleDelay" : 10000,
+      "index" : "D77CD4713AA08195E6B6D0E5BC023DA11B052EBFF0B5B22EDA8AE85345BCF661"
+    },
+    "index" : "D77CD4713AA08195E6B6D0E5BC023DA11B052EBFF0B5B22EDA8AE85345BCF661",
+    "validated" : true,
+    "ledger_hash" : "15CEA3135B7F450C12E4CD0B01140551FA16E5FDA3A7083F9B96BBE24CCBABB9",
+    "ledger_index" : 157007
+  }
+}

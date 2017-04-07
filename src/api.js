@@ -32,6 +32,7 @@ const getOrders = require('./ledger/orders')
 const getOrderbook = require('./ledger/orderbook')
 const getSettings = require('./ledger/settings')
 const getAccountInfo = require('./ledger/accountinfo')
+const getPaymentChannel = require('./ledger/payment-channel')
 const preparePayment = require('./transaction/payment')
 const prepareTrustline = require('./transaction/trustline')
 const prepareOrder = require('./transaction/order')
@@ -131,6 +132,7 @@ _.assign(RippleAPI.prototype, {
   getOrderbook,
   getSettings,
   getAccountInfo,
+  getPaymentChannel,
   getLedger,
 
   preparePayment,

@@ -16,6 +16,10 @@ module.exports = {
     XrpToXrp: require('./get-paths-xrp-to-xrp.json'),
     sendAll: require('./get-paths-send-all.json')
   },
+  getPaymentChannel: {
+    normal: require('./get-payment-channel.json'),
+    full: require('./get-payment-channel-full.json')
+  },
   getServerInfo: require('./get-server-info.json'),
   getSettings: require('./get-settings.json'),
   getTransaction: {

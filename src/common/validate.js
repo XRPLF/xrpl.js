@@ -33,6 +33,7 @@ module.exports = {
   getOrders: _.partial(validateOptions, 'getOrdersParameters'),
   getOrderbook: _.partial(validateOptions, 'getOrderbookParameters'),
   getTransaction: _.partial(validateOptions, 'getTransactionParameters'),
+  getPaymentChannel: _.partial(validateOptions, 'getPaymentChannelParameters'),
   getLedger: _.partial(validateOptions, 'getLedgerParameters'),
   preparePayment: _.partial(schemaValidate, 'preparePaymentParameters'),
   prepareOrder: _.partial(schemaValidate, 'prepareOrderParameters'),

@@ -47,6 +47,7 @@
   - [getOrderbook](#getorderbook)
   - [getSettings](#getsettings)
   - [getAccountInfo](#getaccountinfo)
+  - [getPaymentChannel](#getpaymentchannel)
   - [getLedger](#getledger)
   - [preparePayment](#preparepayment)
   - [prepareTrustline](#preparetrustline)
@@ -607,7 +608,7 @@ Name | Type | Description
 ---- | ---- | -----------
 amount | [value](#value) | Amount of XRP for sender to set aside in this channel.
 destination | [address](#ripple-address) | Address to receive XRP claims against this channel.
-settleDelay | number | Amount of time the source address must wait before closing the channel if it has unclaimed XRP.
+settleDelay | number | Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP.
 publicKey | string | Public key of the key pair the source will use to sign claims against this channel.
 cancelAfter | date-time string | *Optional* Time when this channel expires.
 destinationTag | integer | *Optional* Destination tag.
@@ -2810,6 +2811,61 @@ return api.getAccountInfo(address).then(info =>
   "ownerCount": 1,
   "previousAffectingTransactionID": "19899273706A9E040FDB5885EE991A1DC2BAD878A0D6E7DBCFB714E63BF737F7",
   "previousAffectingTransactionLedgerVersion": 6614625
+}
+```
+
+
+## getPaymentChannel
+
+`getPaymentChannel(id: string): Promise<Object>`
+
+Returns specified payment channel.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+id | string | 256-bit hexadecimal channel identifier.
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+Name | Type | Description
+---- | ---- | -----------
+account | [address](#ripple-address) | Address that created the payment channel.
+destination | [address](#ripple-address) | Address to receive XRP claims against this channel.
+amount | [value](#value) | The total amount of XRP funded in this channel.
+balance | [value](#value) | The total amount of XRP delivered by this channel.
+settleDelay | number | Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP.
+previousAffectingTransactionID | string | Hash value representing the most recent transaction that affected this payment channel.
+previousAffectingTransactionLedgerVersion | integer | The ledger version that the transaction identified by the `previousAffectingTransactionID` was validated in.
+cancelAfter | date-time string | *Optional* Time when this channel expires as specified at creation.
+destinationTag | integer | *Optional* Destination tag.
+expiration | date-time string | *Optional* Time when this channel expires.
+publicKey | string | *Optional* Public key of the key pair the source will use to sign claims against this channel.
+sourceTag | integer | *Optional* Source tag.
+
+### Example
+
+```javascript
+const channelId =
+  'E30E709CF009A1F26E0E5C48F7AA1BFB79393764F15FB108BDC6E06D3CBD8415';
+return api.getPaymentChannel(channelId).then(channel =>
+  {/* ... */});
+```
+
+
+```json
+{
+  "account": "r6ZtfQFWbCkp4XqaUygzHaXsQXBT67xLj",
+  "amount": "10",
+  "balance": "0",
+  "destination": "rQf9vCwQtzQQwtnGvr6zc1fqzqg7QBuj7G",
+  "publicKey": "02A05282CB6197E34490BACCD9405E81D9DFBE123B0969F9F40EC3F9987AD9A97D",
+  "settleDelay": 10000,
+  "previousAffectingTransactionID": "F939A0BEF139465403C56CCDC49F59A77C868C78C5AEC184E29D15E9CD1FF675",
+  "previousAffectingTransactionLedgerVersion": 151322
 }
 ```
 
