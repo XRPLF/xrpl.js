@@ -274,8 +274,6 @@ Type | Description
 [escrowCancellation](#escrow-cancellation) | An `escrowCancellation` transaction unlocks the funds in an escrow and sends them back to the creator of the escrow, but it will only work after the escrow expires.
 [escrowExecution](#escrow-execution) | An `escrowExecution` transaction unlocks the funds in an escrow and sends them to the destination of the escrow, but it will only work if the cryptographic condition is provided.
 
-The three "escrow" transaction types are not supported by the production Ripple peer-to-peer network at this time. They are available for testing purposes if you [configure RippleAPI](#boilerplate) to connect to the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) instead.
-
 ## Transaction Flow
 
 Executing a transaction with `RippleAPI` requires the following four steps:
@@ -3254,8 +3252,6 @@ return api.prepareSettings(address, settings)
 
 Prepare an escrow creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
-
 ### Parameters
 
 Name | Type | Description
@@ -3312,8 +3308,6 @@ return api.prepareEscrowCreation(address, escrowCreation).then(prepared =>
 
 Prepare an escrow cancellation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
-
 ### Parameters
 
 Name | Type | Description
@@ -3368,8 +3362,6 @@ return api.prepareEscrowCancellation(address, escrowCancellation).then(prepared 
 `prepareEscrowExecution(address: string, escrowExecution: Object, instructions: Object): Promise<Object>`
 
 Prepare an escrow execution transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
-
-**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
 
 ### Parameters
 
@@ -3428,8 +3420,6 @@ return api.prepareEscrowExecution(address, escrowExecution).then(prepared =>
 
 Prepare a payment channel creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Payment channels are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
-
 ### Parameters
 
 Name | Type | Description
@@ -3487,8 +3477,6 @@ return api.preparePaymentChannelCreate(address, paymentChannelCreate).then(prepa
 
 Prepare a payment channel claim transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Payment channels are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
-
 ### Parameters
 
 Name | Type | Description
@@ -3542,8 +3530,6 @@ return api.preparePaymentChannelClaim(address, paymentChannelClaim).then(prepare
 `preparePaymentChannelFund(address: string, paymentChannelFund: Object, instructions: Object): Promise<Object>`
 
 Prepare a payment channel fund transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
-
-**Caution:** Payment channels are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
 
 ### Parameters
 
