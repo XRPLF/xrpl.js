@@ -15,7 +15,7 @@
     "memos": {"$ref": "memos"},
     "condition": {
       "type": "string",
-      "description": "If present, fulfillment is required upon execution.",
+      "description": "A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). If present, `fulfillment` is required upon execution.",
       "pattern": "^[A-F0-9]{0,256}$"
     },
     "allowCancelAfter": {
