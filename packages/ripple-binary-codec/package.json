@@ -1,6 +1,6 @@
 {
   "name": "ripple-binary-codec",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "ripple binary codec",
   "files": [
     "distrib/npm/*",
