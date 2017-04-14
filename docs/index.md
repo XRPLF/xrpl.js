@@ -535,7 +535,7 @@ amount | [value](#value) | Amount of XRP for sender to escrow.
 destination | [address](#ripple-address) | Address to receive escrowed XRP.
 allowCancelAfter | date-time string | *Optional* If present, the escrow may be cancelled after this time.
 allowExecuteAfter | date-time string | *Optional* If present, the escrow can not be executed before this time.
-condition | string | *Optional* If present, fulfillment is required upon execution.
+condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). If present, `fulfillment` is required upon execution.
 destinationTag | integer | *Optional* Destination tag.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 sourceTag | integer | *Optional* Source tag.
@@ -581,8 +581,8 @@ Name | Type | Description
 ---- | ---- | -----------
 owner | [address](#ripple-address) | The address of the owner of the escrow to execute.
 escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to execute.
-condition | string | *Optional* The original `condition` from the escrow creation transaction. This is sha256 hash of `fulfillment` string. It is replicated here so that the relatively expensive hashing operation can be delegated to a server without ledger history and the server with ledger history only has to do a quick comparison of the old condition with the new condition.
-fulfillment | string | *Optional* A value that produces the condition when hashed. It must be 32 charaters long and contain only 8-bit characters.
+condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). This must match the original `condition` from the escrow creation transaction.
+fulfillment | string | *Optional* A hex value representing the [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1) fulfillment for `condition`.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 ### Example
