@@ -1,0 +1,26 @@
+## getPaymentChannel
+
+`getPaymentChannel(id: string): Promise<Object>`
+
+Returns specified payment channel.
+
+### Parameters
+
+<%- renderSchema('input/get-payment-channel.json') %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<%- renderSchema('output/get-payment-channel.json') %>
+
+### Example
+
+```javascript
+const channelId =
+  'E30E709CF009A1F26E0E5C48F7AA1BFB79393764F15FB108BDC6E06D3CBD8415';
+return api.getPaymentChannel(channelId).then(channel =>
+  {/* ... */});
+```
+
+<%- renderFixture('responses/get-payment-channel.json') %>

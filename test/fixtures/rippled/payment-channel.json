@@ -1,0 +1,25 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result" : {
+    "node" : {
+      "Balance" : "0",
+      "SettleDelay" : 10000,
+      "LedgerEntryType" : "PayChannel",
+      "Flags" : 0,
+      "Amount" : "10000000",
+      "index" : "E30E709CF009A1F26E0E5C48F7AA1BFB79393764F15FB108BDC6E06D3CBD8415",
+      "Destination" : "rQf9vCwQtzQQwtnGvr6zc1fqzqg7QBuj7G",
+      "OwnerNode" : "0000000000000000",
+      "Account" : "r6ZtfQFWbCkp4XqaUygzHaXsQXBT67xLj",
+      "PublicKey" : "02A05282CB6197E34490BACCD9405E81D9DFBE123B0969F9F40EC3F9987AD9A97D",
+      "PreviousTxnID" : "F939A0BEF139465403C56CCDC49F59A77C868C78C5AEC184E29D15E9CD1FF675",
+      "PreviousTxnLgrSeq" : 151322
+    },
+    "index" : "E30E709CF009A1F26E0E5C48F7AA1BFB79393764F15FB108BDC6E06D3CBD8415",
+    "validated" : true,
+    "ledger_hash" : "5EFF42C5C5DD539D62DC176AF638ED11F2B8B13ACD007D973FF40C44CDC49870",
+    "ledger_index" : 151336
+  }
+}

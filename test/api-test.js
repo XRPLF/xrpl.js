@@ -452,6 +452,37 @@ describe('RippleAPI', function() {
     });
   });
 
+  it('signPaymentChannelClaim', function() {
+    const privateKey =
+      'ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A';
+    const result = this.api.signPaymentChannelClaim(
+      requests.signPaymentChannelClaim.channel,
+      requests.signPaymentChannelClaim.amount, privateKey);
+    checkResult(responses.signPaymentChannelClaim,
+      'signPaymentChannelClaim', result)
+  });
+
+  it('verifyPaymentChannelClaim', function() {
+    const publicKey =
+      '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8';
+    const result = this.api.verifyPaymentChannelClaim(
+      requests.signPaymentChannelClaim.channel,
+      requests.signPaymentChannelClaim.amount,
+      responses.signPaymentChannelClaim, publicKey);
+    checkResult(true, 'verifyPaymentChannelClaim', result)
+  });
+
+  it('verifyPaymentChannelClaim - invalid', function() {
+    const publicKey =
+      '03A6523FE4281DA48A6FD77FAF3CB77F5C7001ABA0B32BCEDE0369AC009758D7D9';
+    const result = this.api.verifyPaymentChannelClaim(
+      requests.signPaymentChannelClaim.channel,
+      requests.signPaymentChannelClaim.amount,
+      responses.signPaymentChannelClaim, publicKey);
+    checkResult(false,
+      'verifyPaymentChannelClaim', result)
+  });
+
   it('combine', function() {
     const combined = this.api.combine(requests.combine.setDomain);
     checkResult(responses.combine.single, 'sign', combined);
@@ -1080,6 +1111,45 @@ describe('RippleAPI', function() {
       });
     });
 
+  });
+
+  it('getPaymentChannel', function() {
+    const channelId =
+      'E30E709CF009A1F26E0E5C48F7AA1BFB79393764F15FB108BDC6E06D3CBD8415';
+    return this.api.getPaymentChannel(channelId).then(
+      _.partial(checkResult, responses.getPaymentChannel.normal,
+        'getPaymentChannel'));
+  });
+
+  it('getPaymentChannel - full', function() {
+    const channelId =
+      'D77CD4713AA08195E6B6D0E5BC023DA11B052EBFF0B5B22EDA8AE85345BCF661';
+    return this.api.getPaymentChannel(channelId).then(
+      _.partial(checkResult, responses.getPaymentChannel.full,
+        'getPaymentChannel'));
+  });
+
+  it('getPaymentChannel - not found', function() {
+    const channelId =
+      'DFA557EA3497585BFE83F0F97CC8E4530BBB99967736BB95225C7F0C13ACE708';
+    return this.api.getPaymentChannel(channelId).then(() => {
+      assert(false, 'Should throw entryNotFound');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.RippledError);
+      assert(_.includes(error.message, 'entryNotFound'));
+    });
+  });
+
+  it('getPaymentChannel - wrong type', function() {
+    const channelId =
+      '8EF9CCB9D85458C8D020B3452848BBB42EAFDDDB69A93DD9D1223741A4CA562B';
+    return this.api.getPaymentChannel(channelId).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
+      assert(_.includes(error.message,
+        'Payment channel ledger entry not found'));
+      assert(error instanceof this.api.errors.NotFoundError);
+    });
   });
 
   it('getServerInfo', function() {

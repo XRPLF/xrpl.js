@@ -1,0 +1,14 @@
+{
+  "ledger_index" : 172450,
+  "validated" : true,
+  "error" : "entryNotFound",
+  "ledger_hash" : "9A8B034D72FA6CAE2D69425335FDD59D67DEB18A40DD83DF7331D08B19669A19",
+  "status" : "error",
+  "request" : {
+     "index" : "DFA557EA3497585BFE83F0F97CC8E4530BBB99967736BB95225C7F0C13ACE708",
+     "binary" : false,
+     "ledger_index" : "validated",
+     "command" : "ledger_entry"
+  },
+  "type": "response"
+}

@@ -1,0 +1,31 @@
+## verifyPaymentChannelClaim
+
+`verifyPaymentChannelClaim(channel: string, amount: string, signature: string, publicKey: string): boolean`
+
+Verify a payment channel claim signature.
+
+### Parameters
+
+<%- renderSchema("input/verify-payment-channel-claim.json") %>
+
+### Return Value
+
+This method returns `true` if the claim signature is valid.
+
+<%- renderSchema("output/verify-payment-channel-claim.json") %>
+
+### Example
+
+```javascript
+const channel =
+  '3E18C05AD40319B809520F1A136370C4075321B285217323396D6FD9EE1E9037';
+const amount = '.00001';
+const signature = <%- importFile("test/fixtures/responses/sign-payment-channel-claim.json") %>;
+const publicKey =
+  '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8';
+return api.verifyPaymentChannelClaim(channel, amount, signature, publicKey);
+```
+
+```json
+true
+```

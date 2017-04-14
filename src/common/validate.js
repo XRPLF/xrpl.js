@@ -33,6 +33,7 @@ module.exports = {
   getOrders: _.partial(validateOptions, 'getOrdersParameters'),
   getOrderbook: _.partial(validateOptions, 'getOrderbookParameters'),
   getTransaction: _.partial(validateOptions, 'getTransactionParameters'),
+  getPaymentChannel: _.partial(validateOptions, 'getPaymentChannelParameters'),
   getLedger: _.partial(validateOptions, 'getLedgerParameters'),
   preparePayment: _.partial(schemaValidate, 'preparePaymentParameters'),
   prepareOrder: _.partial(schemaValidate, 'prepareOrderParameters'),
@@ -57,6 +58,10 @@ module.exports = {
   submit: _.partial(schemaValidate, 'submitParameters'),
   computeLedgerHash: _.partial(schemaValidate, 'computeLedgerHashParameters'),
   generateAddress: _.partial(schemaValidate, 'generateAddressParameters'),
+  signPaymentChannelClaim: _.partial(schemaValidate,
+    'signPaymentChannelClaimParameters'),
+  verifyPaymentChannelClaim: _.partial(schemaValidate,
+    'verifyPaymentChannelClaimParameters'),
   apiOptions: _.partial(schemaValidate, 'api-options'),
   instructions: _.partial(schemaValidate, 'instructions')
 }

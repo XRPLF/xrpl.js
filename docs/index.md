@@ -47,6 +47,7 @@
   - [getOrderbook](#getorderbook)
   - [getSettings](#getsettings)
   - [getAccountInfo](#getaccountinfo)
+  - [getPaymentChannel](#getpaymentchannel)
   - [getLedger](#getledger)
   - [preparePayment](#preparepayment)
   - [prepareTrustline](#preparetrustline)
@@ -63,6 +64,8 @@
   - [combine](#combine)
   - [submit](#submit)
   - [generateAddress](#generateaddress)
+  - [signPaymentChannelClaim](#signpaymentchannelclaim)
+  - [verifyPaymentChannelClaim](#verifypaymentchannelclaim)
   - [computeLedgerHash](#computeledgerhash)
 - [API Events](#api-events)
   - [ledger](#ledger)
@@ -270,8 +273,6 @@ Type | Description
 [escrowCreation](#escrow-creation) | An `escrowCreation` transaction creates an escrow on the ledger, which locks XRP until a cryptographic condition is met or it expires. It is like an escrow service where the Ripple network acts as the escrow agent.
 [escrowCancellation](#escrow-cancellation) | An `escrowCancellation` transaction unlocks the funds in an escrow and sends them back to the creator of the escrow, but it will only work after the escrow expires.
 [escrowExecution](#escrow-execution) | An `escrowExecution` transaction unlocks the funds in an escrow and sends them to the destination of the escrow, but it will only work if the cryptographic condition is provided.
-
-The three "escrow" transaction types are not supported by the production Ripple peer-to-peer network at this time. They are available for testing purposes if you [configure RippleAPI](#boilerplate) to connect to the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) instead.
 
 ## Transaction Flow
 
@@ -605,7 +606,7 @@ Name | Type | Description
 ---- | ---- | -----------
 amount | [value](#value) | Amount of XRP for sender to set aside in this channel.
 destination | [address](#ripple-address) | Address to receive XRP claims against this channel.
-settleDelay | number | Amount of time the source address must wait before closing the channel if it has unclaimed XRP.
+settleDelay | number | Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP.
 publicKey | string | Public key of the key pair the source will use to sign claims against this channel.
 cancelAfter | date-time string | *Optional* Time when this channel expires.
 destinationTag | integer | *Optional* Destination tag.
@@ -2812,6 +2813,61 @@ return api.getAccountInfo(address).then(info =>
 ```
 
 
+## getPaymentChannel
+
+`getPaymentChannel(id: string): Promise<Object>`
+
+Returns specified payment channel.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+id | string | 256-bit hexadecimal channel identifier.
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+Name | Type | Description
+---- | ---- | -----------
+account | [address](#ripple-address) | Address that created the payment channel.
+destination | [address](#ripple-address) | Address to receive XRP claims against this channel.
+amount | [value](#value) | The total amount of XRP funded in this channel.
+balance | [value](#value) | The total amount of XRP delivered by this channel.
+settleDelay | number | Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP.
+previousAffectingTransactionID | string | Hash value representing the most recent transaction that affected this payment channel.
+previousAffectingTransactionLedgerVersion | integer | The ledger version that the transaction identified by the `previousAffectingTransactionID` was validated in.
+cancelAfter | date-time string | *Optional* Time when this channel expires as specified at creation.
+destinationTag | integer | *Optional* Destination tag.
+expiration | date-time string | *Optional* Time when this channel expires.
+publicKey | string | *Optional* Public key of the key pair the source will use to sign claims against this channel.
+sourceTag | integer | *Optional* Source tag.
+
+### Example
+
+```javascript
+const channelId =
+  'E30E709CF009A1F26E0E5C48F7AA1BFB79393764F15FB108BDC6E06D3CBD8415';
+return api.getPaymentChannel(channelId).then(channel =>
+  {/* ... */});
+```
+
+
+```json
+{
+  "account": "r6ZtfQFWbCkp4XqaUygzHaXsQXBT67xLj",
+  "amount": "10",
+  "balance": "0",
+  "destination": "rQf9vCwQtzQQwtnGvr6zc1fqzqg7QBuj7G",
+  "publicKey": "02A05282CB6197E34490BACCD9405E81D9DFBE123B0969F9F40EC3F9987AD9A97D",
+  "settleDelay": 10000,
+  "previousAffectingTransactionID": "F939A0BEF139465403C56CCDC49F59A77C868C78C5AEC184E29D15E9CD1FF675",
+  "previousAffectingTransactionLedgerVersion": 151322
+}
+```
+
+
 ## getLedger
 
 `getLedger(options: Object): Promise<Object>`
@@ -3196,8 +3252,6 @@ return api.prepareSettings(address, settings)
 
 Prepare an escrow creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
-
 ### Parameters
 
 Name | Type | Description
@@ -3254,8 +3308,6 @@ return api.prepareEscrowCreation(address, escrowCreation).then(prepared =>
 
 Prepare an escrow cancellation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
-
 ### Parameters
 
 Name | Type | Description
@@ -3310,8 +3362,6 @@ return api.prepareEscrowCancellation(address, escrowCancellation).then(prepared 
 `prepareEscrowExecution(address: string, escrowExecution: Object, instructions: Object): Promise<Object>`
 
 Prepare an escrow execution transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
-
-**Caution:** Escrow is currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
 
 ### Parameters
 
@@ -3370,8 +3420,6 @@ return api.prepareEscrowExecution(address, escrowExecution).then(prepared =>
 
 Prepare a payment channel creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Payment channels are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
-
 ### Parameters
 
 Name | Type | Description
@@ -3429,8 +3477,6 @@ return api.preparePaymentChannelCreate(address, paymentChannelCreate).then(prepa
 
 Prepare a payment channel claim transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
-**Caution:** Payment channels are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
-
 ### Parameters
 
 Name | Type | Description
@@ -3484,8 +3530,6 @@ return api.preparePaymentChannelClaim(address, paymentChannelClaim).then(prepare
 `preparePaymentChannelFund(address: string, paymentChannelFund: Object, instructions: Object): Promise<Object>`
 
 Prepare a payment channel fund transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
-
-**Caution:** Payment channels are currently available on the [Ripple Test Net](https://ripple.com/build/ripple-test-net/) only.
 
 ### Parameters
 
@@ -3690,6 +3734,84 @@ return api.generateAddress();
 }
 ```
 
+
+## signPaymentChannelClaim
+
+`signPaymentChannelClaim(channel: string, amount: string, privateKey: string): string`
+
+Sign a payment channel claim. The signature can be submitted in a subsequent [PaymentChannelClaim](#preparePaymmentChannelClaim) transaction.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+channel | string | 256-bit hexadecimal channel identifier.
+amount | [value](#value) | Amount of XRP authorized by the claim.
+privateKey | string | The private key to sign the payment channel claim.
+
+### Return Value
+
+This method returns a signature string:
+
+Name | Type | Description
+---- | ---- | -----------
+ | string | The hexadecimal representation of a signature.
+
+### Example
+
+```javascript
+const channel =
+  '3E18C05AD40319B809520F1A136370C4075321B285217323396D6FD9EE1E9037';
+const amount = '.00001';
+const privateKey =
+  'ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A';
+return api.signPaymentChannelClaim(channel, amount, privateKey);
+```
+
+
+```json
+"3045022100B5C54654221F154347679B97AE7791CBEF5E6772A3F894F9C781B8F1B400F89F022021E466D29DC5AEB5DFAFC76E8A88D2E388EBD25A84143B6AC3B647F479CB89B7"
+```
+
+
+## verifyPaymentChannelClaim
+
+`verifyPaymentChannelClaim(channel: string, amount: string, signature: string, publicKey: string): boolean`
+
+Verify a payment channel claim signature.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+channel | string | 256-bit hexadecimal channel identifier.
+amount | [value](#value) | Amount of XRP authorized by the claim.
+signature | string | Signature of this claim.
+publicKey | string | Public key of the channel's sender
+
+### Return Value
+
+This method returns `true` if the claim signature is valid.
+
+Name | Type | Description
+---- | ---- | -----------
+ | boolean | 
+
+### Example
+
+```javascript
+const channel =
+  '3E18C05AD40319B809520F1A136370C4075321B285217323396D6FD9EE1E9037';
+const amount = '.00001';
+const signature = "3045022100B5C54654221F154347679B97AE7791CBEF5E6772A3F894F9C781B8F1B400F89F022021E466D29DC5AEB5DFAFC76E8A88D2E388EBD25A84143B6AC3B647F479CB89B7";
+const publicKey =
+  '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8';
+return api.verifyPaymentChannelClaim(channel, amount, signature, publicKey);
+```
+
+```json
+true
+```
 
 ## computeLedgerHash
 

@@ -26,11 +26,15 @@ module.exports = {
     normal: require('./account-tx'),
     one: require('./get-transactions-one')
   },
+  escrow: require('./escrow'),
   gateway_balances: require('./gateway-balances'),
   book_offers: {
     fabric: require('./book-offers'),
     usd_xrp: require('./book-offers-usd-xrp'),
     xrp_usd: require('./book-offers-xrp-usd')
+  },
+  ledger_entry: {
+    error: require('./ledger-entry-error')
   },
   server_info: {
     normal: require('./server-info'),
@@ -45,6 +49,10 @@ module.exports = {
     XrpToXrp: require('./path-find-xrp-to-xrp'),
     srcActNotFound: require('./path-find-srcActNotFound'),
     sourceAmountLow: require('./path-find-srcAmtLow')
+  },
+  payment_channel: {
+    normal: require('./payment-channel'),
+    full: require('./payment-channel-full')
   },
   tx: {
     Payment: require('./tx/payment.json'),

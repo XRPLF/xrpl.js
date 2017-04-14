@@ -1,0 +1,12 @@
+{
+  "account": "r6ZtfQFWbCkp4XqaUygzHaXsQXBT67xLj",
+  "amount": "10",
+  "balance": "3",
+  "destination": "rQf9vCwQtzQQwtnGvr6zc1fqzqg7QBuj7G",
+  "publicKey": "02A05282CB6197E34490BACCD9405E81D9DFBE123B0969F9F40EC3F9987AD9A97D",
+  "settleDelay": 10000,
+  "cancelAfter": "2017-04-08T00:00:00.000Z",
+  "expiration": "2017-04-07T06:09:31.000Z",
+  "previousAffectingTransactionID": "39C47AD0AF1532D6A796EEB90BDA1A61B3EE4FA96C7A08070B78B33CE24F2160",
+  "previousAffectingTransactionLedgerVersion": 156978
+}

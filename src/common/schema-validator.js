@@ -66,6 +66,7 @@ function loadSchemas() {
     require('./schemas/output/get-orderbook.json'),
     require('./schemas/output/get-orders.json'),
     require('./schemas/output/order-change.json'),
+    require('./schemas/output/get-payment-channel.json'),
     require('./schemas/output/prepare.json'),
     require('./schemas/output/ledger-event.json'),
     require('./schemas/output/get-paths.json'),
@@ -76,12 +77,15 @@ function loadSchemas() {
     require('./schemas/output/get-transaction.json'),
     require('./schemas/output/get-transactions.json'),
     require('./schemas/output/get-trustlines.json'),
+    require('./schemas/output/sign-payment-channel-claim.json'),
+    require('./schemas/output/verify-payment-channel-claim.json'),
     require('./schemas/input/get-balances.json'),
     require('./schemas/input/get-balance-sheet.json'),
     require('./schemas/input/get-ledger.json'),
     require('./schemas/input/get-orders.json'),
     require('./schemas/input/get-orderbook.json'),
     require('./schemas/input/get-paths.json'),
+    require('./schemas/input/get-payment-channel.json'),
     require('./schemas/input/api-options.json'),
     require('./schemas/input/get-settings.json'),
     require('./schemas/input/get-account-info.json'),
@@ -103,6 +107,8 @@ function loadSchemas() {
     require('./schemas/input/sign.json'),
     require('./schemas/input/submit.json'),
     require('./schemas/input/generate-address.json'),
+    require('./schemas/input/sign-payment-channel-claim.json'),
+    require('./schemas/input/verify-payment-channel-claim.json'),
     require('./schemas/input/combine.json')
   ]
   const titles = _.map(schemas, schema => schema.title)

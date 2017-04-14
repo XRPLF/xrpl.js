@@ -32,6 +32,7 @@ const getOrders = require('./ledger/orders')
 const getOrderbook = require('./ledger/orderbook')
 const getSettings = require('./ledger/settings')
 const getAccountInfo = require('./ledger/accountinfo')
+const getPaymentChannel = require('./ledger/payment-channel')
 const preparePayment = require('./transaction/payment')
 const prepareTrustline = require('./transaction/trustline')
 const prepareOrder = require('./transaction/order')
@@ -56,6 +57,10 @@ const errors = require('./common').errors
 const generateAddress =
   require('./offline/generate-address').generateAddressAPI
 const computeLedgerHash = require('./offline/ledgerhash')
+const signPaymentChannelClaim =
+  require('./offline/sign-payment-channel-claim')
+const verifyPaymentChannelClaim =
+  require('./offline/verify-payment-channel-claim')
 const getLedger = require('./ledger/ledger')
 
 type APIOptions = {
@@ -127,6 +132,7 @@ _.assign(RippleAPI.prototype, {
   getOrderbook,
   getSettings,
   getAccountInfo,
+  getPaymentChannel,
   getLedger,
 
   preparePayment,
@@ -146,6 +152,8 @@ _.assign(RippleAPI.prototype, {
 
   generateAddress,
   computeLedgerHash,
+  signPaymentChannelClaim,
+  verifyPaymentChannelClaim,
   errors
 })
 
