@@ -3,7 +3,7 @@
 'use strict' // eslint-disable-line strict
 const _ = require('lodash')
 const assert = require('assert')
-const Ajv = require('ajv')
+const Validator = require('jsonschema').Validator
 const ValidationError = require('./errors').ValidationError
 const {isValidAddress} = require('ripple-address-codec')
 const {isValidSecret} = require('./utils')
@@ -114,19 +114,39 @@ function loadSchemas() {
   const titles = _.map(schemas, schema => schema.title)
   const duplicates = _.keys(_.pick(_.countBy(titles), count => count > 1))
   assert(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
-  const ajv = new Ajv()
-  _.forEach(schemas, schema => ajv.addSchema(schema, schema.title))
-  ajv.addFormat('address', isValidAddress)
-  ajv.addFormat('secret', isValidSecret)
-  return ajv
+  const v = new Validator()
+  // Register custom format validators that ignore undefined instances
+  // since jsonschema will still call the format validator on a missing
+  // (optional)  property
+  v.customFormats.address = function(instance) {
+    if (instance === undefined) {
+      return true
+    }
+    return isValidAddress(instance)
+  }
+  v.customFormats.secret = function(instance) {
+    if (instance === undefined) {
+      return true
+    }
+    return isValidSecret(instance)
+  }
+
+  // Register under the root URI '/'
+  _.forEach(schemas, schema => v.addSchema(schema, '/' + schema.title))
+  return v
 }
 
-const ajv = loadSchemas()
+const v = loadSchemas()
 
 function schemaValidate(schemaName: string, object: any): void {
-  const isValid = ajv.validate(schemaName, object)
-  if (!isValid) {
-    throw new ValidationError(ajv.errorsText())
+  // Lookup under the root URI '/'
+  const schema = v.getSchema('/' + schemaName)
+  if (schema === undefined) {
+    throw new ValidationError('no schema for ' + schemaName)
+  }
+  const result = v.validate(object, schema)
+  if (!result.valid) {
+    throw new ValidationError(result.errors.join())
   }
 }
 

@@ -15,13 +15,12 @@
     "test": "test"
   },
   "dependencies": {
-    "ajv": "^4.0.5",
-    "ajv-i18n": "^1.2.0",
     "babel-polyfill": "^6.3.14",
     "babel-runtime": "^6.3.19",
     "bignumber.js": "^2.0.3",
     "https-proxy-agent": "^1.0.0",
     "jayson": "^1.2.2",
+    "jsonschema": "^1.1.1",
     "lodash": "^3.1.0",
     "ripple-address-codec": "^2.0.1",
     "ripple-binary-codec": "^0.1.10",
