@@ -5,7 +5,7 @@ const _ = require('lodash');
 const jayson = require('jayson');
 
 const RippleAPI = require('../../src').RippleAPI;
-const createHTTPServer = require('../../src/index').createHTTPServer;
+const createHTTPServer = require('../../src/http').createHTTPServer;
 const {payTo, ledgerAccept} = require('./utils');
 
 const apiFixtures = require('../fixtures');
