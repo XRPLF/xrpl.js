@@ -93,7 +93,7 @@ RippleAPI only provides access to *validated*, *immutable* transaction data.
 Use the following [boilerplate code](https://en.wikipedia.org/wiki/Boilerplate_code) to wrap your custom code using RippleAPI.
 
 ```javascript
-const {RippleAPI} = require('ripple-lib');
+const RippleAPI = require('ripple-lib').RippleAPI;
 
 const api = new RippleAPI({
   server: 'wss://s1.ripple.com' // Public rippled server hosted by Ripple, Inc.
@@ -116,9 +116,9 @@ api.connect().then(() => {
 }).catch(console.error);
 ```
 
-RippleAPI is designed to work in [NodeJS](https://nodejs.org) (version `0.12.0` or greater) using [Babel](https://babeljs.io/) for [ECMAScript 6](https://babeljs.io/docs/learn-es2015/) support.
+RippleAPI is designed to work in [Node.js](https://nodejs.org) version **6.9.0** or later. RippleAPI may work on older Node.js versions if you use [Babel](https://babeljs.io/) for [ECMAScript 6](https://babeljs.io/docs/learn-es2015/) support.
 
-The code samples in this documentation are written in ES6, but `RippleAPI` will work with ES5 also. Regardless of whether you use ES5 or ES6, the methods that return promises will return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+The code samples in this documentation are written with ECMAScript 6 (ES6) features, but `RippleAPI` also works with ECMAScript 5 (ES5). Regardless of whether you use ES5 or ES6, the methods that return Promises return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 
 <aside class="notice">
 All the code snippets in this documentation assume that you have surrounded them with this boilerplate.
@@ -155,19 +155,13 @@ If you omit the `server` parameter, RippleAPI operates [offline](#offline-functi
 
 ### Installation ###
 
-1. Install [NodeJS](https://nodejs.org) and the Node Package Manager (npm). Most Linux distros have a package for NodeJS, but make sure you have version `0.12.0` or higher.
-2. Use npm to install [Babel](https://babeljs.io/) globally:
-      `npm install -g babel-cli`
-3. Use npm to install RippleAPI:
+1. Install [Node.js](https://nodejs.org) and the Node Package Manager (npm). Most Linux distros have a package for Node.js, but make sure you have version **6.9.0** or higher.
+2. Use npm to install RippleAPI:
       `npm install ripple-lib`
 
-After you have installed ripple-lib, you can create scripts using the [boilerplate](#boilerplate) and run them using babel-node:
-      `babel-node script.js`
+After you have installed ripple-lib, you can create scripts using the [boilerplate](#boilerplate) and run them using the Node.js executable, typically named `node`:
 
-<aside class="notice">
-Instead of using babel-node in production, we recommend using Babel to transpile to ECMAScript 5 first.
-</aside>
-
+      `node script.js`
 
 ## Offline functionality
 
@@ -176,7 +170,7 @@ RippleAPI can also function without internet connectivity. This can be useful in
 To instantiate RippleAPI in offline mode, use the following boilerplate code:
 
 ```javascript
-const {RippleAPI} = require('ripple-lib');
+const RippleAPI = require('ripple-lib').RippleAPI;
 
 const api = new RippleAPI();
 /* insert code here */
@@ -195,7 +189,6 @@ Methods that depend on the state of the Ripple Consensus Ledger are unavailable 
 * [sign](#sign)
 * [generateAddress](#generateaddress)
 * [computeLedgerHash](#computeledgerhash)
-
 
 # Basic Types
 

@@ -5,7 +5,7 @@ RippleAPI can also function without internet connectivity. This can be useful in
 To instantiate RippleAPI in offline mode, use the following boilerplate code:
 
 ```javascript
-const {RippleAPI} = require('ripple-lib');
+const RippleAPI = require('ripple-lib').RippleAPI;
 
 const api = new RippleAPI();
 /* insert code here */
@@ -24,4 +24,3 @@ Methods that depend on the state of the Ripple Consensus Ledger are unavailable 
 * [sign](#sign)
 * [generateAddress](#generateaddress)
 * [computeLedgerHash](#computeledgerhash)
-
