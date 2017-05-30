@@ -51,6 +51,7 @@ const preparePaymentChannelClaim =
   require('./transaction/payment-channel-claim')
 const prepareSettings = require('./transaction/settings')
 const sign = require('./transaction/sign')
+const signWithKeypair = require('./transaction/signWithKeypair')
 const combine = require('./transaction/combine')
 const submit = require('./transaction/submit')
 const errors = require('./common').errors
@@ -147,6 +148,7 @@ _.assign(RippleAPI.prototype, {
   preparePaymentChannelClaim,
   prepareSettings,
   sign,
+  signWithKeypair,
   combine,
   submit,
 
