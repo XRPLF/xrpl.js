@@ -168,6 +168,15 @@ describe('http server integration tests', function() {
   );
 
   createTest(
+    'sign',
+    [{txJSON: apiRequests.sign.normal.txJSON},
+    {keypair: {
+      privateKey: '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A',
+      publicKey: '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8' }}],
+    result => assert.deepEqual(result.result, apiResponses.sign.normal)
+  );
+
+  createTest(
     'generateAddress',
     [{options: {entropy: random()}}],
     result => assert.deepEqual(result.result, apiResponses.generateAddress)
