@@ -1,6 +1,7 @@
 /* @flow */
 'use strict' // eslint-disable-line strict
 const utils = require('./utils')
+const keypairs = require('ripple-keypairs')
 const binary = require('ripple-binary-codec')
 const {computeBinaryTransactionHash} = require('ripple-hashes')
 const validate = utils.common.validate
