@@ -438,6 +438,41 @@ describe('RippleAPI', function() {
     assert.deepEqual(signature, responses.sign.signAs);
   });
 
+  it('signWithKeypair', function() {
+      const keypair = { privateKey: '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
+                       publicKey: '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020' };
+      const result = this.api.signWithKeypair(requests.sign.normal.txJSON, keypair);
+      assert.deepEqual(result, responses.sign.normal);
+      schemaValidator.schemaValidate('sign', result);
+    });
+
+  it('signWithKeypair - already signed', function() {
+    const keypair = { privateKey: '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
+                     publicKey: '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020' };
+    const result = this.api.signWithKeypair(requests.sign.normal.txJSON, keypair);
+    assert.throws(() => {
+      const tx = JSON.stringify(binary.decode(result.signedTransaction));
+      this.api.signWithKeypair(tx, keypair);
+    }, /txJSON must not contain "TxnSignature" or "Signers" properties/);
+  });
+
+  it('signWithKeypair - EscrowExecution', function() {
+    const keypair = { privateKey: '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
+                     publicKey: '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020' };
+    const result = this.api.signWithKeypair(requests.sign.escrow.txJSON, keypair);
+    assert.deepEqual(result, responses.sign.escrow);
+    schemaValidator.schemaValidate('sign', result);
+  });
+
+  it('signWithKeypair - signAs', function() {
+    const txJSON = requests.sign.signAs;
+    const keypair = { privateKey: '001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7',
+                     publicKey: '0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020' };
+    const signature = this.api.signWithKeypair(JSON.stringify(txJSON), keypair,
+      {signAs: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'});
+    assert.deepEqual(signature, responses.sign.signAs);
+  });
+
   it('submit', function() {
     return this.api.submit(responses.sign.normal.signedTransaction).then(
       _.partial(checkResult, responses.submit, 'submit'));
