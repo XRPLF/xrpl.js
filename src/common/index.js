@@ -1,5 +1,5 @@
-'use strict';
-const utils = require('./utils');
+'use strict' // eslint-disable-line strict
+const utils = require('./utils')
 
 module.exports = {
   Connection: require('./connection'),
@@ -19,4 +19,4 @@ module.exports = {
   iso8601ToRippleTime: utils.iso8601ToRippleTime,
   rippleTimeToISO8601: utils.rippleTimeToISO8601,
   isValidSecret: utils.isValidSecret
-};
+}

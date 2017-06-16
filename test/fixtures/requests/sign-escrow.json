@@ -1,0 +1,8 @@
+{
+  "txJSON": "{\"TransactionType\":\"EscrowFinish\",\"Account\":\"rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh\",\"Owner\":\"rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh\",\"OfferSequence\":2,\"Condition\":\"712C36933822AD3A3D136C5DF97AA863B69F9CE88B2D6CE6BDD11BFDE290C19D\",\"Fulfillment\":\"74686973206D757374206861766520333220636861726163746572732E2E2E2E\",\"Flags\":2147483648,\"LastLedgerSequence\":102,\"Fee\":\"12\",\"Sequence\":1}",
+  "instructions": {
+    "fee": "0.000012",
+    "sequence": 1,
+    "maxLedgerVersion": 102
+  }
+}

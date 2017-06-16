@@ -1,0 +1,38 @@
+{
+  "type": "escrowCreation",
+  "address": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+  "sequence": 10,
+  "id": "144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE1",
+  "specification": {
+    "amount": "0.000002",
+    "destination": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw",
+    "memos": [
+      {
+        "type": "x2",
+        "format": "text/plain",
+        "data": "mema data"
+      }
+    ],
+    "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+    "allowCancelAfter": "2015-11-16T06:53:42.000Z",
+    "allowExecuteAfter": "2015-11-16T06:47:42.000Z",
+    "destinationTag": 2,
+    "sourceTag": 1
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2015-11-16T06:43:00.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh": [
+        {
+          "currency": "XRP",
+          "value": "-0.000014"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 15,
+    "indexInLedger": 0
+  }
+}

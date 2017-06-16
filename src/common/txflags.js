@@ -1,4 +1,4 @@
-'use strict';
+'use strict' // eslint-disable-line strict
 
 const txFlags = {
   // Universal flags can apply to any transaction type
@@ -35,8 +35,13 @@ const txFlags = {
     NoRippleDirect: 0x00010000,
     PartialPayment: 0x00020000,
     LimitQuality: 0x00040000
+  },
+
+  PaymentChannelClaim: {
+    Renew: 0x00010000,
+    Close: 0x00020000
   }
-};
+}
 
 // The following are integer (as opposed to bit) flags
 // that can be set for particular transactions in the
@@ -52,9 +57,9 @@ const txFlagIndices = {
     asfGlobalFreeze: 7,
     asfDefaultRipple: 8
   }
-};
+}
 
 module.exports = {
   txFlags,
   txFlagIndices
-};
+}

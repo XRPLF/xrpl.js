@@ -26,11 +26,15 @@ module.exports = {
     normal: require('./account-tx'),
     one: require('./get-transactions-one')
   },
+  escrow: require('./escrow'),
   gateway_balances: require('./gateway-balances'),
   book_offers: {
     fabric: require('./book-offers'),
     usd_xrp: require('./book-offers-usd-xrp'),
     xrp_usd: require('./book-offers-xrp-usd')
+  },
+  ledger_entry: {
+    error: require('./ledger-entry-error')
   },
   server_info: {
     normal: require('./server-info'),
@@ -45,6 +49,10 @@ module.exports = {
     XrpToXrp: require('./path-find-xrp-to-xrp'),
     srcActNotFound: require('./path-find-srcActNotFound'),
     sourceAmountLow: require('./path-find-srcAmtLow')
+  },
+  payment_channel: {
+    normal: require('./payment-channel'),
+    full: require('./payment-channel-full')
   },
   tx: {
     Payment: require('./tx/payment.json'),
@@ -64,14 +72,15 @@ module.exports = {
     LedgerWithoutTime: require('./tx/ledger-without-time.json'),
     NotValidated: require('./tx/not-validated.json'),
     OfferWithExpiration: require('./tx/order-with-expiration.json'),
-    SuspendedPaymentCreation: require('./tx/suspended-payment-creation.json'),
-    SuspendedPaymentCreationIOU:
-      require('./tx/suspended-payment-creation-iou.json'),
-    SuspendedPaymentCancellation:
-      require('./tx/suspended-payment-cancellation.json'),
-    SuspendedPaymentExecution: require('./tx/suspended-payment-execution.json'),
-    SuspendedPaymentExecutionSimple:
-      require('./tx/suspended-payment-execution-simple.json'),
+    EscrowCreation: require('./tx/escrow-creation.json'),
+    EscrowCancellation:
+      require('./tx/escrow-cancellation.json'),
+    EscrowExecution: require('./tx/escrow-execution.json'),
+    EscrowExecutionSimple:
+      require('./tx/escrow-execution-simple.json'),
+    PaymentChannelCreate: require('./tx/payment-channel-create.json'),
+    PaymentChannelFund: require('./tx/payment-channel-fund.json'),
+    PaymentChannelClaim: require('./tx/payment-channel-claim.json'),
     Unrecognized: require('./tx/unrecognized.json'),
     NoMeta: require('./tx/no-meta.json'),
     LedgerZero: require('./tx/ledger-zero.json'),

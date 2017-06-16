@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "paymentChannelFund",
+  "link": "payment-channel-fund",
+  "type": "object",
+  "properties": {
+    "amount": {
+      "$ref": "value",
+      "description": "Amount of XRP to fund the channel with."
+    },
+    "channel": {
+      "$ref": "hash256",
+      "description": "256-bit hexadecimal channel identifier."
+    },
+    "expiration": {
+      "type": "string",
+      "format": "date-time",
+      "description": "New expiration for this channel."
+    }
+  },
+  "required": ["amount", "channel"],
+  "additionalProperties": false
+}

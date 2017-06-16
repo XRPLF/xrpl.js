@@ -1,0 +1,10 @@
+{
+  "account": "r6ZtfQFWbCkp4XqaUygzHaXsQXBT67xLj",
+  "amount": "10",
+  "balance": "0",
+  "destination": "rQf9vCwQtzQQwtnGvr6zc1fqzqg7QBuj7G",
+  "publicKey": "02A05282CB6197E34490BACCD9405E81D9DFBE123B0969F9F40EC3F9987AD9A97D",
+  "settleDelay": 10000,
+  "previousAffectingTransactionID": "F939A0BEF139465403C56CCDC49F59A77C868C78C5AEC184E29D15E9CD1FF675",
+  "previousAffectingTransactionLedgerVersion": 151322
+}

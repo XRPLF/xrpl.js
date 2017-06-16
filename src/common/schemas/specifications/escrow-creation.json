@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "escrowCreation",
+  "link": "escrow-creation",
+  "type": "object",
+  "properties": {
+    "amount": {
+      "$ref": "value",
+      "description": "Amount of XRP for sender to escrow."
+    },
+    "destination": {
+      "$ref": "address",
+      "description": "Address to receive escrowed XRP."
+    },
+    "memos": {"$ref": "memos"},
+    "condition": {
+      "type": "string",
+      "description": "A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). If present, `fulfillment` is required upon execution.",
+      "pattern": "^[A-F0-9]{0,256}$"
+    },
+    "allowCancelAfter": {
+      "type": "string",
+      "format": "date-time",
+      "description": "If present, the escrow may be cancelled after this time."
+    },
+    "allowExecuteAfter": {
+      "type": "string",
+      "format": "date-time",
+      "description": "If present, the escrow can not be executed before this time."
+    },
+    "sourceTag": {
+      "$ref": "tag",
+      "description": "Source tag."
+    },
+    "destinationTag": {
+      "$ref": "tag",
+      "description": "Destination tag."
+    }
+  },
+  "required": ["amount", "destination"],
+  "additionalProperties": false
+}

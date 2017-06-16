@@ -1,0 +1,14 @@
+{
+  "destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  "amount": "0.01",
+  "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+  "allowExecuteAfter": "2014-09-24T21:21:50.000Z",
+  "memos": [
+    {
+      "type": "test",
+      "data": "texted data"
+    }
+  ],
+  "destinationTag": 2,
+  "sourceTag": 1
+}

@@ -266,58 +266,145 @@ describe('RippleAPI', function() {
         'prepare'));
   });
 
-  it('prepareSuspendedPaymentCreation', function() {
+  it('prepareEscrowCreation', function() {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
     }, instructions);
-    return this.api.prepareSuspendedPaymentCreation(
-      address, requests.prepareSuspendedPaymentCreation.normal,
+    return this.api.prepareEscrowCreation(
+      address, requests.prepareEscrowCreation.normal,
       localInstructions).then(
-        _.partial(checkResult, responses.prepareSuspendedPaymentCreation.normal,
+        _.partial(checkResult, responses.prepareEscrowCreation.normal,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentCreation full', function() {
-    return this.api.prepareSuspendedPaymentCreation(
-      address, requests.prepareSuspendedPaymentCreation.full).then(
-        _.partial(checkResult, responses.prepareSuspendedPaymentCreation.full,
+  it('prepareEscrowCreation full', function() {
+    return this.api.prepareEscrowCreation(
+      address, requests.prepareEscrowCreation.full).then(
+        _.partial(checkResult, responses.prepareEscrowCreation.full,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentExecution', function() {
-    return this.api.prepareSuspendedPaymentExecution(
+  it('prepareEscrowExecution', function() {
+    return this.api.prepareEscrowExecution(
       address,
-      requests.prepareSuspendedPaymentExecution.normal, instructions).then(
+      requests.prepareEscrowExecution.normal, instructions).then(
         _.partial(checkResult,
-          responses.prepareSuspendedPaymentExecution.normal,
+          responses.prepareEscrowExecution.normal,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentExecution - simple', function() {
-    return this.api.prepareSuspendedPaymentExecution(
+  it('prepareEscrowExecution - simple', function() {
+    return this.api.prepareEscrowExecution(
       address,
-      requests.prepareSuspendedPaymentExecution.simple).then(
+      requests.prepareEscrowExecution.simple).then(
         _.partial(checkResult,
-          responses.prepareSuspendedPaymentExecution.simple,
+          responses.prepareEscrowExecution.simple,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentCancellation', function() {
-    return this.api.prepareSuspendedPaymentCancellation(
+  it('prepareEscrowCancellation', function() {
+    return this.api.prepareEscrowCancellation(
       address,
-      requests.prepareSuspendedPaymentCancellation.normal, instructions).then(
+      requests.prepareEscrowCancellation.normal, instructions).then(
         _.partial(checkResult,
-          responses.prepareSuspendedPaymentCancellation.normal,
+          responses.prepareEscrowCancellation.normal,
           'prepare'));
   });
 
-  it('prepareSuspendedPaymentCancellation with memos', function() {
-    return this.api.prepareSuspendedPaymentCancellation(
+  it('prepareEscrowCancellation with memos', function() {
+    return this.api.prepareEscrowCancellation(
       address,
-      requests.prepareSuspendedPaymentCancellation.memos).then(
+      requests.prepareEscrowCancellation.memos).then(
         _.partial(checkResult,
-          responses.prepareSuspendedPaymentCancellation.memos,
+          responses.prepareEscrowCancellation.memos,
           'prepare'));
+  });
+
+  it('preparePaymentChannelCreate', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelCreate(
+      address, requests.preparePaymentChannelCreate.normal,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelCreate.normal,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelCreate full', function() {
+    return this.api.preparePaymentChannelCreate(
+      address, requests.preparePaymentChannelCreate.full).then(
+        _.partial(checkResult, responses.preparePaymentChannelCreate.full,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelFund', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelFund(
+      address, requests.preparePaymentChannelFund.normal,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelFund.normal,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelFund full', function() {
+    return this.api.preparePaymentChannelFund(
+      address, requests.preparePaymentChannelFund.full).then(
+        _.partial(checkResult, responses.preparePaymentChannelFund.full,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelClaim', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelClaim(
+      address, requests.preparePaymentChannelClaim.normal,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelClaim.normal,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelClaim with renew', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelClaim(
+      address, requests.preparePaymentChannelClaim.renew,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelClaim.renew,
+          'prepare'));
+  });
+
+  it('preparePaymentChannelClaim with close', function() {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.preparePaymentChannelClaim(
+      address, requests.preparePaymentChannelClaim.close,
+      localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelClaim.close,
+          'prepare'));
+  });
+
+  it('throws on preparePaymentChannelClaim with renew and close', function() {
+    assert.throws(() => {
+      this.api.preparePaymentChannelClaim(
+        address, requests.preparePaymentChannelClaim.full).then(
+          _.partial(checkResult, responses.preparePaymentChannelClaim.full,
+            'prepare'));
+    }, this.api.errors.ValidationError);
+  });
+
+  it('throws on preparePaymentChannelClaim with no signature', function() {
+    assert.throws(() => {
+      this.api.preparePaymentChannelClaim(
+        address, requests.preparePaymentChannelClaim.noSignature).then(
+          _.partial(checkResult, responses.preparePaymentChannelClaim.noSignature,
+            'prepare'));
+    }, this.api.errors.ValidationError);
   });
 
   it('sign', function() {
@@ -336,10 +423,10 @@ describe('RippleAPI', function() {
     }, /txJSON must not contain "TxnSignature" or "Signers" properties/);
   });
 
-  it('sign - SuspendedPaymentExecution', function() {
+  it('sign - EscrowExecution', function() {
     const secret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
-    const result = this.api.sign(requests.sign.suspended.txJSON, secret);
-    assert.deepEqual(result, responses.sign.suspended);
+    const result = this.api.sign(requests.sign.escrow.txJSON, secret);
+    assert.deepEqual(result, responses.sign.escrow);
     schemaValidator.schemaValidate('sign', result);
   });
 
@@ -363,6 +450,37 @@ describe('RippleAPI', function() {
       assert(error instanceof this.api.errors.RippledError);
       assert.strictEqual(error.data.resultCode, 'temBAD_FEE');
     });
+  });
+
+  it('signPaymentChannelClaim', function() {
+    const privateKey =
+      'ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A';
+    const result = this.api.signPaymentChannelClaim(
+      requests.signPaymentChannelClaim.channel,
+      requests.signPaymentChannelClaim.amount, privateKey);
+    checkResult(responses.signPaymentChannelClaim,
+      'signPaymentChannelClaim', result)
+  });
+
+  it('verifyPaymentChannelClaim', function() {
+    const publicKey =
+      '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8';
+    const result = this.api.verifyPaymentChannelClaim(
+      requests.signPaymentChannelClaim.channel,
+      requests.signPaymentChannelClaim.amount,
+      responses.signPaymentChannelClaim, publicKey);
+    checkResult(true, 'verifyPaymentChannelClaim', result)
+  });
+
+  it('verifyPaymentChannelClaim - invalid', function() {
+    const publicKey =
+      '03A6523FE4281DA48A6FD77FAF3CB77F5C7001ABA0B32BCEDE0369AC009758D7D9';
+    const result = this.api.verifyPaymentChannelClaim(
+      requests.signPaymentChannelClaim.channel,
+      requests.signPaymentChannelClaim.amount,
+      responses.signPaymentChannelClaim, publicKey);
+    checkResult(false,
+      'verifyPaymentChannelClaim', result)
   });
 
   it('combine', function() {
@@ -640,34 +758,25 @@ describe('RippleAPI', function() {
       });
     });
 
-    it('getTransaction - SuspendedPaymentCreation', function() {
+    it('getTransaction - EscrowCreation', function() {
       const hash =
         '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE1';
       return this.api.getTransaction(hash).then(
         _.partial(checkResult,
-          responses.getTransaction.suspendedPaymentCreation,
+          responses.getTransaction.escrowCreation,
           'getTransaction'));
     });
 
-    it('getTransaction - SuspendedPaymentCreation iou', function() {
-      const hash =
-        '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE2';
-      return this.api.getTransaction(hash).then(
-        _.partial(checkResult,
-          responses.getTransaction.SuspendedPaymentCreationIOU,
-          'getTransaction'));
-    });
-
-    it('getTransaction - SuspendedPaymentCancellation', function() {
+    it('getTransaction - EscrowCancellation', function() {
       const hash =
         'F346E542FFB7A8398C30A87B952668DAB48B7D421094F8B71776DA19775A3B22';
       return this.api.getTransaction(hash).then(
         _.partial(checkResult,
-          responses.getTransaction.suspendedPaymentCancellation,
+          responses.getTransaction.escrowCancellation,
           'getTransaction'));
     });
 
-    it('getTransaction - SuspendedPaymentExecution', function() {
+    it('getTransaction - EscrowExecution', function() {
       const options = {
         minLedgerVersion: 10,
         maxLedgerVersion: 15
@@ -676,16 +785,43 @@ describe('RippleAPI', function() {
         'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD136993B';
       return this.api.getTransaction(hash, options).then(
         _.partial(checkResult,
-          responses.getTransaction.suspendedPaymentExecution,
+          responses.getTransaction.escrowExecution,
           'getTransaction'));
     });
 
-    it('getTransaction - SuspendedPaymentExecution simple', function() {
+    it('getTransaction - EscrowExecution simple', function() {
       const hash =
         'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD1369931';
       return this.api.getTransaction(hash).then(
         _.partial(checkResult,
-          responses.getTransaction.suspendedPaymentExecutionSimple,
+          responses.getTransaction.escrowExecutionSimple,
+          'getTransaction'));
+    });
+
+    it('getTransaction - PaymentChannelCreate', function() {
+      const hash =
+        '0E9CA3AB1053FC0C1CBAA75F636FE1EC92F118C7056BBEF5D63E4C116458A16D';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.paymentChannelCreate,
+          'getTransaction'));
+    });
+
+    it('getTransaction - PaymentChannelFund', function() {
+      const hash =
+        'CD053D8867007A6A4ACB7A432605FE476D088DCB515AFFC886CF2B4EB6D2AE8B';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.paymentChannelFund,
+          'getTransaction'));
+    });
+
+    it('getTransaction - PaymentChannelClaim', function() {
+      const hash =
+        '81B9ECAE7195EB6E8034AEDF44D8415A7A803E14513FDBB34FA984AB37D59563';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.paymentChannelClaim,
           'getTransaction'));
     });
 
@@ -977,6 +1113,45 @@ describe('RippleAPI', function() {
 
   });
 
+  it('getPaymentChannel', function() {
+    const channelId =
+      'E30E709CF009A1F26E0E5C48F7AA1BFB79393764F15FB108BDC6E06D3CBD8415';
+    return this.api.getPaymentChannel(channelId).then(
+      _.partial(checkResult, responses.getPaymentChannel.normal,
+        'getPaymentChannel'));
+  });
+
+  it('getPaymentChannel - full', function() {
+    const channelId =
+      'D77CD4713AA08195E6B6D0E5BC023DA11B052EBFF0B5B22EDA8AE85345BCF661';
+    return this.api.getPaymentChannel(channelId).then(
+      _.partial(checkResult, responses.getPaymentChannel.full,
+        'getPaymentChannel'));
+  });
+
+  it('getPaymentChannel - not found', function() {
+    const channelId =
+      'DFA557EA3497585BFE83F0F97CC8E4530BBB99967736BB95225C7F0C13ACE708';
+    return this.api.getPaymentChannel(channelId).then(() => {
+      assert(false, 'Should throw entryNotFound');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.RippledError);
+      assert(_.includes(error.message, 'entryNotFound'));
+    });
+  });
+
+  it('getPaymentChannel - wrong type', function() {
+    const channelId =
+      '8EF9CCB9D85458C8D020B3452848BBB42EAFDDDB69A93DD9D1223741A4CA562B';
+    return this.api.getPaymentChannel(channelId).then(() => {
+      assert(false, 'Should throw NotFoundError');
+    }).catch(error => {
+      assert(_.includes(error.message,
+        'Payment channel ledger entry not found'));
+      assert(error instanceof this.api.errors.NotFoundError);
+    });
+  });
+
   it('getServerInfo', function() {
     return this.api.getServerInfo().then(
       _.partial(checkResult, responses.getServerInfo, 'getServerInfo'));
@@ -1132,6 +1307,20 @@ describe('RippleAPI', function() {
   it('getLedgerVersion', function(done) {
     this.api.getLedgerVersion().then(ver => {
       assert.strictEqual(ver, 8819951);
+      done();
+    }, done);
+  });
+
+  it('getFeeBase', function(done) {
+    this.api.connection.getFeeBase().then(fee => {
+      assert.strictEqual(fee, 10);
+      done();
+    }, done);
+  });
+
+  it('getFeeRef', function(done) {
+    this.api.connection.getFeeRef().then(fee => {
+      assert.strictEqual(fee, 10);
       done();
     }, done);
   });

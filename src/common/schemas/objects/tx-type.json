@@ -5,6 +5,7 @@
   "description": "The type of the transaction.",
   "type": "string",
   "enum": ["payment", "order", "orderCancellation", "trustline", "settings",
-           "suspendedPaymentCreation", "suspendedPaymentCancellation",
-           "suspendedPaymentExecution"]
+           "escrowCreation", "escrowCancellation",
+           "escrowExecution", "paymentChannelCreate",
+           "paymentChannelFund", "paymentChannelClaim"]
 }

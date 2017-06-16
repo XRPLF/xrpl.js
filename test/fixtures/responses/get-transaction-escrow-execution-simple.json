@@ -1,0 +1,33 @@
+{
+  "type": "escrowExecution",
+  "address": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+  "sequence": 6,
+  "id": "CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD1369931",
+  "specification": {
+    "owner": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+    "escrowSequence": 5,
+    "condition": "632F2F3E437AE720C397994A985B5D21FE186DE61523A9CA3E8709CC581671A1"
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2015-11-17T01:47:40.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh": [
+        {
+          "currency": "XRP",
+          "value": "-0.000012"
+        }
+      ],
+      "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw": [
+        {
+          "currency": "XRP",
+          "value": "10.000043"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 14,
+    "indexInLedger": 0
+  }
+}
