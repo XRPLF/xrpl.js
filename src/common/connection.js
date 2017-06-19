@@ -441,6 +441,7 @@ class Connection extends EventEmitter {
       this._whenReady(this._send(message)).then(() => {
         const delay = timeout || this._timeout
         timer = setTimeout(() => _reject(new TimeoutError()), delay)
+        timer.unref()
       }).catch(_reject)
     })
   }
