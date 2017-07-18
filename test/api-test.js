@@ -127,7 +127,7 @@ describe('RippleAPI', function() {
 
     it('throws on preparePayment XRP-to-XRP with source.maxAmount specified', function() {
       assert.throws(() => {
-        this.api.preparePaymentChannelClaim(
+        this.api.preparePayment(
           address, requests.preparePayment.maxAmountXRP).then(
             _.partial(checkResult, responses.preparePayment.maxAmountXRP,
               'prepare'));
