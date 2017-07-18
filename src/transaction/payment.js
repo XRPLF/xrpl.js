@@ -76,8 +76,18 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
     throw new ValidationError('address must match payment.source.address')
   }
 
-  if ((payment.source.maxAmount && payment.destination.minAmount) ||
-      (payment.source.amount && payment.destination.amount)) {
+  if (isXRPToXRPPayment(payment)) {
+    if (payment.source.maxAmount) {
+      throw new ValidationError('XRP-to-XRP payments must not specify '
+        + 'source.maxAmount')
+    }
+
+    if (payment.source.amount && payment.destination.amount) {
+      throw new ValidationError('XRP-to-XRP payments must specify'
+        + '(source.amount and destination.minAmount)')
+    }
+  } else if ((payment.source.maxAmount && payment.destination.minAmount) ||
+            (payment.source.amount && payment.destination.amount)) {
     throw new ValidationError('payment must specify either (source.maxAmount '
       + 'and destination.amount) or (source.amount and destination.minAmount)')
   }

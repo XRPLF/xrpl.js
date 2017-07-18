@@ -13,6 +13,7 @@ module.exports = {
   preparePayment: {
     normal: require('./prepare-payment'),
     minAmountXRP: require('./prepare-payment-min-xrp'),
+    maxAmountXRP: require('./prepare-payment-max-xrp'),
     minAmount: require('./prepare-payment-min'),
     wrongAddress: require('./prepare-payment-wrong-address'),
     wrongAmount: require('./prepare-payment-wrong-amount'),
