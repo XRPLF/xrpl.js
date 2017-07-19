@@ -54,11 +54,8 @@ describe('RippleAPI', function() {
   describe('preparePayment', function() {
 
     it('normal', function() {
-      const localInstructions = _.defaults({
-        maxFee: '0.000012'
-      }, instructions);
       return this.api.preparePayment(
-        address, requests.preparePayment.normal, localInstructions).then(
+        address, requests.preparePayment.normal, instructions).then(
         _.partial(checkResult, responses.preparePayment.normal, 'prepare'));
     });
 
@@ -83,6 +80,12 @@ describe('RippleAPI', function() {
       assert.throws(() => {
         this.api.preparePayment(address, requests.preparePayment.wrongPartial);
       }, /XRP to XRP payments cannot be partial payments/);
+    });
+
+    it('throws when maxAmount is specified for xrp2xrp payment', function() {
+      assert.throws(() => {
+        this.api.preparePayment(address, requests.preparePayment.xrp2xrpWithMaxAmount, instructions);
+      }, /maxAmount must be omitted for XRP to XRP payments/);
     });
 
     it('preparePayment - address must match payment.source.address', function(

@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 + [Update ws dependency to 3.3.1](https://github.com/ripple/ripple-lib/pull/804)
++ Throw error when XRP-to-XRP payment has maxAmount. source.maxAmount must be omitted for XRP-to-XRP payments
 
 ## 0.17.8 (2017-11-06)
 
