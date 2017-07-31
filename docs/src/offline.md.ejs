@@ -11,7 +11,7 @@ const api = new RippleAPI();
 /* insert code here */
 ```
 
-Methods that depend on the state of the Ripple Consensus Ledger are unavailable in offline mode. To prepare transactions offline, you **must** specify  the `fee`, `sequence`, and `maxLedgerVersion` parameters in the [transaction instructions](#transaction-instructions). The following methods should work offline:
+Methods that depend on the state of the XRP Ledger are unavailable in offline mode. To prepare transactions offline, you **must** specify  the `fee`, `sequence`, and `maxLedgerVersion` parameters in the [transaction instructions](#transaction-instructions). You can use the following methods while offline:
 
 * [preparePayment](#preparepayment)
 * [prepareTrustline](#preparetrustline)
