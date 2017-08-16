@@ -1,6 +1,6 @@
 const assert = require('assert');
 const fixtures = require('./fixtures/codec-fixtures.json');
-const {decode, encode} = require('../src');
+const {decode, encode, decodeLedgerData} = require('../src');
 
 function json(object) {
   return JSON.stringify(object);
@@ -24,4 +24,14 @@ describe('ripple-binary-codec', function() {
   }
   makeSuite('transactions', fixtures.transactions);
   makeSuite('accountState', fixtures.accountState);
+
+  describe('ledgerData', function() {
+    fixtures.ledgerData.forEach((t, test_n) => {
+      it(`ledgerData[${test_n}] can decode ${t.binary} to ${json(t.json)}`,
+      () => {
+        const decoded = decodeLedgerData(t.binary);
+        assert.deepEqual(t.json, decoded);
+      });
+    });
+  })
 });

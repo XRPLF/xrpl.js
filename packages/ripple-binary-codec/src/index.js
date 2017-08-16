@@ -6,7 +6,24 @@ const {quality,
                 signingClaimData,
                 multiSigningData,
                 binaryToJSON,
-                serializeObject}} = coreTypes;
+                serializeObject,
+                BinaryParser}} = coreTypes;
+
+function decodeLedgerData(binary) {
+  assert(typeof binary === 'string', 'binary must be a hex string');
+  const parser = new BinaryParser(binary)
+  return {
+    ledger_index:          parser.readUInt32(),
+    total_coins:           parser.readType(coreTypes.UInt64).valueOf().toString(),
+    parent_hash:           parser.readType(coreTypes.Hash256).toHex(),
+    transaction_hash:      parser.readType(coreTypes.Hash256).toHex(),
+    account_hash:          parser.readType(coreTypes.Hash256).toHex(),
+    parent_close_time:     parser.readUInt32(),
+    close_time:            parser.readUInt32(),
+    close_time_resolution: parser.readUInt8(),
+    close_flags:           parser.readUInt8()
+  }
+}
 
 function decode(binary) {
   assert(typeof binary === 'string', 'binary must be a hex string');
@@ -51,5 +68,6 @@ module.exports = {
   encodeForSigningClaim,
   encodeForMultisigning,
   encodeQuality,
-  decodeQuality
+  decodeQuality,
+  decodeLedgerData
 };
