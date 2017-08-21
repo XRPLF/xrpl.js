@@ -339,7 +339,7 @@ source | object | The source of the funds to be sent.
 *source.* address | [address](#ripple-address) | The address to send from.
 *source.* amount | [laxAmount](#amount) | An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with source.maxAmount)
 *source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
-*source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
+*source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount). Must be excluded for XRP-to-XRP payments.
 destination | object | The destination of the funds to be sent.
 *destination.* address | [address](#ripple-address) | The address to receive at.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
@@ -1674,7 +1674,7 @@ source | object | Properties of the source of the payment.
 *source.* address | [address](#ripple-address) | The address to send from.
 *source.* amount | [laxAmount](#amount) | An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with source.maxAmount)
 *source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
-*source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
+*source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount) Must be excluded for XRP-to-XRP payments.
 destination | object | Properties of the destination of the payment.
 *destination.* address | [address](#ripple-address) | The address to receive at.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
