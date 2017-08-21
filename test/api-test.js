@@ -79,6 +79,12 @@ describe('RippleAPI', function() {
           responses.preparePayment.minAmountXRPXRP, 'prepare'));
     });
 
+    it('preparePayment - xrp2xrp does not allow maxAmount', function() {
+      assert.throws(() => {
+        this.api.preparePayment(address, requests.preparePayment.xrp2xrpMaxAmount, instructions);
+      }, /maxAmount should not be included for XRP to XRP payment/);
+    });
+
     it('preparePayment - XRP to XRP no partial', function() {
       assert.throws(() => {
         this.api.preparePayment(address, requests.preparePayment.wrongPartial);

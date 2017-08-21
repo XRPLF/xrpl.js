@@ -18,7 +18,8 @@ module.exports = {
     wrongAmount: require('./prepare-payment-wrong-amount'),
     wrongPartial: require('./prepare-payment-wrong-partial'),
     allOptions: require('./prepare-payment-all-options'),
-    noCounterparty: require('./prepare-payment-no-counterparty')
+    noCounterparty: require('./prepare-payment-no-counterparty'),
+    xrp2xrpMaxAmount: require('./prepare-payment-xrp2xrp-max-amount')
   },
   prepareSettings: {
     domain: require('./prepare-settings'),
