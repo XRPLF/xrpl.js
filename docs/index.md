@@ -3732,7 +3732,7 @@ return api.generateAddress();
 
 `signPaymentChannelClaim(channel: string, amount: string, privateKey: string): string`
 
-Sign a payment channel claim. The signature can be submitted in a subsequent [PaymentChannelClaim](#preparePaymmentChannelClaim) transaction.
+Sign a payment channel claim. The signature can be submitted in a subsequent [PaymentChannelClaim](#preparePaymentChannelClaim) transaction.
 
 ### Parameters
 
