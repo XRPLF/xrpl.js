@@ -75,6 +75,32 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+TEST TEST TEST
+Name | Type | Description
+---- | ---- | -----------
+defaultRipple | boolean | *Optional* Enable [rippling](https://ripple.com/knowledge_center/understanding-the-noripple-flag/) on this account’s trust lines by default. (New in [rippled 0.27.3](https://github.com/ripple/rippled/releases/tag/0.27.3))
+disableMasterKey | boolean | *Optional* Disallows use of the master key to sign transactions for this account.
+disallowIncomingXRP | boolean | *Optional* Indicates that client applications should not send XRP to this account. Not enforced by rippled.
+domain | string | *Optional*  The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase.
+emailHash | string,null | *Optional* Hash of an email address to be used for generating an avatar image. Conventionally, clients use Gravatar to display this image. Use `null` to clear.
+enableTransactionIDTracking | boolean | *Optional* Track the ID of this account’s most recent transaction.
+globalFreeze | boolean | *Optional* Freeze all assets issued by this account.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+messageKey | string | *Optional* Public key for sending encrypted messages to this account. Conventionally, it should be a secp256k1 key, the same encryption that is used by the rest of Ripple.
+noFreeze | boolean | *Optional* Permanently give up the ability to freeze individual trust lines. This flag can never be disabled after being enabled.
+passwordSpent | boolean | *Optional* Indicates that the account has used its free SetRegularKey transaction.
+regularKey | [address](#address),null | *Optional* The public key of a new keypair, to use as the regular key to this account, as a base-58-encoded string in the same format as an account address. Use `null` to remove the regular key.
+requireAuthorization | boolean | *Optional* If set, this account must individually approve other users in order for those users to hold this account’s issuances.
+requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
+signers | object | *Optional* Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.
+*signers.* threshold | integer | *Optional* A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
+*signers.* weights | array | *Optional* Weights of signatures for each signer.
+*signers.* weights[] | object | An association of an address and a weight.
+*signers.weights[].* address | [address](#address) | A Ripple account address
+*signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
+transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
+END TEST
+
 # Introduction
 
 RippleAPI is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript.
