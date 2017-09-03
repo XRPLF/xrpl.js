@@ -72,6 +72,10 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
   const payment = _.cloneDeep(paymentArgument)
   applyAnyCounterpartyEncoding(payment)
 
+  if (isXRPToXRPPayment(payment) && payment.source.maxAmount) {
+    throw new ValidationError('maxAmount should not be included for XRP to XRP payment');
+  }
+
   if (address !== payment.source.address) {
     throw new ValidationError('address must match payment.source.address')
   }

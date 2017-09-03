@@ -1,3 +1,7 @@
+##Next Version to be released
+**Changes**
++ [Raise error when source.maxAmount is included for XRP to XRP transfer](<link here>)
+
 ##0.16.5
 **Changes**
 + [Filter insufficient source funds paths from pathfind results](https://github.com/ripple/ripple-lib/pull/688)
