@@ -271,7 +271,7 @@ var request = remote.requestAccountOffers(options);
 + Switch account requests to use ledgerSelect rather than ledgerChoose ([278df90](https://github.com/ripple/ripple-lib/commit/278df9025a20228de22379a53c76ca12d40fa591))
 + **Deprecated** setting `ident` and `account_index` on account requests ([278df90](https://github.com/ripple/ripple-lib/commit/278df9025a20228de22379a53c76ca12d40fa591))
 + Change initial account transaction sequence to 1 ([a3c1d06](https://github.com/ripple/ripple-lib/commit/a3c1d06eba883dc84fe2bfe700e4309795c84cac))
-+ Fix: instance transaction withoute remote ([d3b6b81](https://github.com/ripple/ripple-lib/commit/d3b6b8127c7b01e416b400c25abf1719bdd008ca))
++ Fix: instance transaction without remote ([d3b6b81](https://github.com/ripple/ripple-lib/commit/d3b6b8127c7b01e416b400c25abf1719bdd008ca))
 + Fix: account root request ledger argument ([bc1f9f8](https://github.com/ripple/ripple-lib/commit/bc1f9f8a286b187d36ebaf552694e31e73742293))
 + Fix: rsign.js local signing and example ([d3b6b81](https://github.com/ripple/ripple-lib/commit/d3b6b8127c7b01e416b400c25abf1719bdd008ca) and [f1004c6](https://github.com/ripple/ripple-lib/commit/f1004c6db2a0ce59bbabbb8f2b355a9fd9995fd8))
 
@@ -317,7 +317,7 @@ __OTHER CHANGES__
 + Request: `request.broadcast()` now returns the number of servers request was sent to
 + Server: Acquire host information from server without additional request
 + Amount: Add a constant for the maximum canonical value that can be expressed as a Ripple value
-+ Amount: Make Constants static fields on the class, instead of a seperate export
++ Amount: Make Constants static fields on the class, instead of a separate export
 
 ## 0.7.39
 
@@ -358,7 +358,7 @@ __OTHER CHANGES__
 ## 0.7.35
 
 + `LastLedgerSequence` is set by default on outgoing transactions. This refers to the last valid ledger index (AKA sequence) for a transaction. By default, this index is set to the current index (at submission time) plus 8. In theory, this allows ripple-lib to deterministically fail a transaction whose submission request timed out, but whose associated server continues to emit ledger_closed events.
-+ Transactions that err with `telINSUF_FEE_P` will be automatically resubmitted. This error indicates that the `Fee` supplied in the transaction submission request was inadquate. Ideally, the `Fee` is tracked by ripple-lib in real-time, and the resubmitted transaction will most likely succeed.
++ Transactions that err with `telINSUF_FEE_P` will be automatically resubmitted. This error indicates that the `Fee` supplied in the transaction submission request was inadequate. Ideally, the `Fee` is tracked by ripple-lib in real-time, and the resubmitted transaction will most likely succeed.
 + Added Transaction.iff(function(callback) { }). Callback expects first argument to be an Error or null, second argument is a boolean which indicates whether or not to proceed with the transaction submission. If an `iff` function is specified, it will be executed prior to every submission of the transaction (including resubmissions).
 + Transactions will now emit `presubmit` and `postsubmit` events. They will be emitted before and after a transaction is submitted, respectively.
 + Added Transaction.summary(). Returns a summary of a transaction in semi-human-readable form. JSON-stringifiable.
