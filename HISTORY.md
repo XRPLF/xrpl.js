@@ -1,5 +1,8 @@
 # ripple-lib Release History
 
+## UNRELEASED
++ Throw error when XRP-to-XRP payment has maxAmount. source.maxAmount must be omitted for XRP-to-XRP payments
+
 ## 0.16.5 (2016-01-21)
 
 + [Filter insufficient source funds paths from pathfind results](https://github.com/ripple/ripple-lib/pull/688)
