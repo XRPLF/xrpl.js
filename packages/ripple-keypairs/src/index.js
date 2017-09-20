@@ -73,7 +73,14 @@ function select(algorithm) {
 function deriveKeypair(seed, options) {
   const decoded = addressCodec.decodeSeed(seed)
   const algorithm = decoded.type === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
-  return select(algorithm).deriveKeypair(decoded.bytes, options)
+  const method = select(algorithm)
+  const keypair = method.deriveKeypair(decoded.bytes, options)
+  const messageToVerify = hash('This test message should verify.')
+  const signature = method.sign(messageToVerify, keypair.privateKey)
+  if (method.verify(messageToVerify, signature, keypair.publicKey) !== true) {
+    throw new Error('derived keypair did not generate verifiable signature');
+  }
+  return keypair
 }
 
 function getAlgorithmFromKey(key) {
