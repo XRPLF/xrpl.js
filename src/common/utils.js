@@ -53,7 +53,7 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
 }
 
 function removeUndefined(obj: Object): Object {
-  return _.omit(obj, _.isUndefined)
+  return _.omitBy(obj, _.isUndefined)
 }
 
 /**

@@ -15,7 +15,7 @@ function formatPrepareResponse(txJSON: Object): Object {
   }
   return {
     txJSON: JSON.stringify(txJSON),
-    instructions: _.omit(instructions, _.isUndefined)
+    instructions: _.omitBy(instructions, _.isUndefined)
   }
 }
 
