@@ -1,7 +1,7 @@
 {
   "source": {
     "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-    "amount": {
+    "maxAmount": {
       "value": "0.01",
       "currency": "XRP"
     },
@@ -9,7 +9,7 @@
   },
   "destination": {
     "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-    "minAmount": {
+    "amount": {
       "value": "0.01",
       "currency": "XRP"
     },

@@ -9,7 +9,7 @@
     },
     "maxAmount": {
       "$ref": "laxAmount",
-      "description": "The maximum amount to send. (This field is exclusive with source.amount)"
+      "description": "The maximum amount to send. (This field is exclusive with source.amount). Note: maxAmount must be omitted for XRP-to-XRP payments."
     },
     "tag": {"$ref": "tag"}
   },

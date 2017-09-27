@@ -124,6 +124,15 @@ describe('RippleAPI', function() {
         instructions).then(_.partial(checkResult,
           responses.preparePayment.minAmount, 'prepare'));
     });
+
+    it('throws on preparePayment XRP-to-XRP with source.maxAmount specified', function() {
+      assert.throws(() => {
+        this.api.preparePayment(
+          address, requests.preparePayment.maxAmountXRP).then(
+            _.partial(checkResult, responses.preparePayment.maxAmountXRP,
+              'prepare'));
+      }, this.api.errors.ValidationError);
+    });
   });
 
   it('prepareOrder - buy order', function() {

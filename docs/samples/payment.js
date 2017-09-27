@@ -10,14 +10,14 @@ const instructions = {maxLedgerVersionOffset: 5};
 const payment = {
   source: {
     address: address,
-    maxAmount: {
+    amount: {
       value: '0.01',
       currency: 'XRP'
     }
   },
   destination: {
     address: 'rKmBGxocj9Abgy25J51Mk1iqFzW9aVF9Tc',
-    amount: {
+    minAmount: {
       value: '0.01',
       currency: 'XRP'
     }
