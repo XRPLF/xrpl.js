@@ -1,5 +1,10 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
++ Update for Node 6
++ Update to use lodash 4
+
 ## 0.16.5 (2016-01-21)
 
 + [Filter insufficient source funds paths from pathfind results](https://github.com/ripple/ripple-lib/pull/688)
