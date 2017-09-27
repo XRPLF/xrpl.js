@@ -1,5 +1,14 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
++ Update for Node 6
++ Update to use lodash 4
+
+## 0.17.7 (2017-05-08)
+
++ Replace AJV with jsonschema
+
 ## 0.16.5 (2016-01-21)
 
 + [Filter insufficient source funds paths from pathfind results](https://github.com/ripple/ripple-lib/pull/688)
@@ -242,8 +251,8 @@ __BREAKING CHANGES__
 
 __OTHER CHANGES__
 + [Add paging behavior for account requests, `account_lines` and `account_offers`](https://github.com/ripple/ripple-lib/commit/722f4e175dbbf378e51b49142d0285f87acb22d7)
-+ [Add max_fee setter to transactions to set max fee the submitter is willing to pay] (https://github.com/ripple/ripple-lib/commit/24587fab9c8ad3840d7aa345a7037b48839e09d7)
-+ [Fix: cap IOU Amounts to their max and min value] (https://github.com/ripple/ripple-lib/commit/f05941fbc46fdb7c6fe7ad72927af02d527ffeed)
++ [Add max_fee setter to transactions to set max fee the submitter is willing to pay](https://github.com/ripple/ripple-lib/commit/24587fab9c8ad3840d7aa345a7037b48839e09d7)
++ [Fix: cap IOU Amounts to their max and min value](https://github.com/ripple/ripple-lib/commit/f05941fbc46fdb7c6fe7ad72927af02d527ffeed)
 
 Example on how to use paging with `account_offers`:
 ```js

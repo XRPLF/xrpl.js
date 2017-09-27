@@ -29,7 +29,7 @@ unittest() {
   npm run coveralls
 
   # test compiled version in "dist/npm"
-  babel -D --optional runtime --ignore "**/node_modules/**" -d test-compiled/ test/
+  $(npm bin)/babel -D --optional runtime --ignore "**/node_modules/**" -d test-compiled/ test/
   echo "--reporter spec --timeout 5000 --slow 500" > test-compiled/mocha.opts
   mkdir -p test-compiled/node_modules
   ln -nfs ../../dist/npm test-compiled/node_modules/ripple-api

@@ -15,7 +15,7 @@ function formatPrepareResponse(txJSON: Object): Object {
   }
   return {
     txJSON: JSON.stringify(txJSON),
-    instructions: _.omit(instructions, _.isUndefined)
+    instructions: _.omitBy(instructions, _.isUndefined)
   }
 }
 
@@ -27,7 +27,7 @@ function setCanonicalFlag(txJSON) {
   txJSON.Flags = txJSON.Flags >>> 0
 }
 
-function scaleValue(value, multiplier, extra=0) {
+function scaleValue(value, multiplier, extra = 0) {
   return (new BigNumber(value)).times(multiplier).plus(extra).toString()
 }
 
@@ -73,7 +73,7 @@ function prepareTransaction(txJSON: Object, api: Object,
         if (instructions.maxFee !== undefined) {
           const maxFeeDrops = common.xrpToDrops(instructions.maxFee)
           const normalFee = scaleValue(feeDrops, multiplier, extraFee)
-          txJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString();
+          txJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString()
         } else {
           txJSON.Fee = scaleValue(feeDrops, multiplier, extraFee)
         }

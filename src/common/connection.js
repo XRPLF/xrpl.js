@@ -228,7 +228,7 @@ class Connection extends EventEmitter {
     if (this._proxyURL !== undefined) {
       const parsedURL = parseURL(this._url)
       const parsedProxyURL = parseURL(this._proxyURL)
-      const proxyOverrides = _.omit({
+      const proxyOverrides = _.omitBy({
         secureEndpoint: (parsedURL.protocol === 'wss:'),
         secureProxy: (parsedProxyURL.protocol === 'https:'),
         auth: this._proxyAuthorization,
@@ -250,7 +250,7 @@ class Connection extends EventEmitter {
       const base64 = new Buffer(this._authorization).toString('base64')
       options.headers = {Authorization: `Basic ${base64}`}
     }
-    const optionsOverrides = _.omit({
+    const optionsOverrides = _.omitBy({
       ca: this._trustedCertificates,
       key: this._key,
       passphrase: this._passphrase,
