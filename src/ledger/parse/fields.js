@@ -28,14 +28,15 @@ function parseFields(data: Object): Object {
     settings.regularKey = data.RegularKey
   }
 
-  // TODO: this isn't implemented in rippled yet, may have to change this later
-  if (data.SignerQuorum || data.SignerEntries) {
+  // Since an account can own at most one SignerList,
+  // this array must have exactly one member if it is present.
+  if (data.signer_lists && data.signer_lists.length === 1) {
     settings.signers = {}
-    if (data.SignerQuorum) {
-      settings.signers.threshold = data.SignerQuorum
+    if (data.signer_lists[0].SignerQuorum) {
+      settings.signers.threshold = data.signer_lists[0].SignerQuorum
     }
-    if (data.SignerEntries) {
-      settings.signers.weights = _.map(data.SignerEntries, entry => {
+    if (data.signer_lists[0].SignerEntries) {
+      settings.signers.weights = _.map(data.signer_lists[0].SignerEntries, entry => {
         return {
           address: entry.SignerEntry.Account,
           weight: entry.SignerEntry.SignerWeight

@@ -52,7 +52,8 @@ function getSettings(address: string, options: SettingsOptions = {}
   const request = {
     command: 'account_info',
     account: address,
-    ledger_index: options.ledgerVersion || 'validated'
+    ledger_index: options.ledgerVersion || 'validated',
+    signer_lists: true
   }
 
   return this.connection.request(request).then(formatSettings)
