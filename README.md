@@ -17,9 +17,13 @@ A JavaScript API for interacting with the XRP Ledger
 
 See also: [RippleAPI Beginners Guide](https://ripple.com/build/rippleapi-beginners-guide/)
 
-Install `ripple-lib` using npm:
+You can use `npm`, but we recommend using `yarn` for the added assurance provided by `yarn.lock`.
+
++ [Yarn Installation Instructions](https://yarnpkg.com/en/docs/install)
+
+Install `ripple-lib`:
 ```
-$ npm install ripple-lib
+$ yarn install ripple-lib
 ```
 
 Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md) and [code samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
@@ -27,12 +31,14 @@ Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/d
 ## Running tests
 
 1. Clone the repository
-2. `cd` into the repository and install dependencies with `npm install`
-3. `npm test` or `npm test --coverage` (`istanbul` will create coverage reports in `coverage/lcov-report/`)
+2. `cd` into the repository and install dependencies with `yarn install`
+3. `yarn test` or `yarn test --coverage` (`istanbul` will create coverage reports in `coverage/lcov-report/`)
 
 ## Generating Documentation
 
-The continuous integration tests require that the documentation stays up-to-date. If you make changes to the JSON schemas, fixtures, or documentation sources, you must update the documentation by running `npm run docgen`.
+The continuous integration tests require that the documentation stays up-to-date. If you make changes to the JSON schemas, fixtures, or documentation sources, you must update the documentation by running `yarn run docgen`.
+
+`npm` may be used instead of `yarn` in the commands above.
 
 ## More Information
 

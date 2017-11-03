@@ -155,9 +155,9 @@ If you omit the `server` parameter, RippleAPI operates [offline](#offline-functi
 
 ### Installation ###
 
-1. Install [Node.js](https://nodejs.org) and the Node Package Manager (npm). Most Linux distros have a package for Node.js; check that it's the version you want.
-2. Use npm to install RippleAPI:
-      `npm install ripple-lib`
+1. Install [Node.js](https://nodejs.org) and [Yarn](https://yarnpkg.com/en/docs/install). Most Linux distros have a package for Node.js; check that it's the version you want.
+2. Use yarn to install RippleAPI:
+      `yarn install ripple-lib`
 
 After you have installed ripple-lib, you can create scripts using the [boilerplate](#boilerplate) and run them using the Node.js executable, typically named `node`:
 
@@ -2754,7 +2754,22 @@ return api.getSettings(address).then(settings =>
   "disallowIncomingXRP": true,
   "emailHash": "23463B99B62A72F26ED677CC556C44E8",
   "domain": "example.com",
-  "transferRate": 1.002
+  "transferRate": 1.002,
+  "signers": {
+    "threshold": 3,
+    "weights": [
+      {
+        "address": "rpHit3GvUR1VSGh2PXcaaZKEEUnCVxWU2i",
+        "weight": 1
+      }, {
+        "address": "rN4oCm1c6BQz6nru83H52FBSpNbC9VQcRc",
+        "weight": 1
+      }, {
+        "address": "rJ8KhCi67VgbapiKCQN3r1ZA6BMUxUvvnD",
+        "weight": 1
+      }
+    ]
+  }
 }
 ```
 
