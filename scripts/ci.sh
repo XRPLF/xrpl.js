@@ -8,14 +8,14 @@ function checkEOL {
 }
 
 typecheck() {
-  npm install -g flow-bin
+  yarn install -g flow-bin
   flow --version
-  npm run typecheck
+  yarn run typecheck
 }
 
 lint() {
   echo "eslint $(node_modules/.bin/eslint --version)"
-  npm list babel-eslint
+  yarn list babel-eslint
   REPO_URL="https://raw.githubusercontent.com/ripple/javascript-style-guide"
   curl "$REPO_URL/es6/eslintrc" > ./eslintrc
   echo "parser: babel-eslint" >> ./eslintrc
@@ -25,8 +25,8 @@ lint() {
 unittest() {
   # test "src"
   mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/test-results.xml
-  npm test --coverage
-  npm run coveralls
+  yarn test --coverage
+  yarn run coveralls
 
   # test compiled version in "dist/npm"
   $(npm bin)/babel -D --optional runtime --ignore "**/node_modules/**" -d test-compiled/ test/
@@ -46,7 +46,7 @@ unittest() {
 
   #echo "Running tests in SauceLabs"
   #http-server &
-  #npm run sauce
+  #yarn run sauce
 
   #pkill -f mocked-server.js
   #pkill -f http-server
@@ -65,7 +65,7 @@ integrationtest() {
 
 doctest() {
   mv docs/index.md docs/index.md.save
-  npm run docgen
+  yarn run docgen
   mv docs/index.md docs/index.md.test
   mv docs/index.md.save docs/index.md
   cmp docs/index.md docs/index.md.test
