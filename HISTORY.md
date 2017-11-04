@@ -1,9 +1,11 @@
 # ripple-lib Release History
 
-## UNRELEASED
+## 0.17.8 (UNRELEASED)
 
++ Fix: Freezing in Safari 10.1
 + Update for Node 6
-+ Update to use lodash 4
++ Update dependencies: lodash and bignumber.js
++ Migrate to yarn
 
 ## 0.17.7 (2017-05-08)
 
