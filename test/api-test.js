@@ -302,6 +302,20 @@ describe('RippleAPI', function() {
           'prepare'));
   });
 
+  it('prepareEscrowExecution - no condition', function() {
+    assert.throws(() => {
+      this.api.prepareEscrowExecution(address,
+      requests.prepareEscrowExecution.noCondition, instructions);
+    }, /"condition" and "fulfillment" fields on EscrowFinish must only be specified together./);
+  });
+
+  it('prepareEscrowExecution - no fulfillment', function() {
+    assert.throws(() => {
+      this.api.prepareEscrowExecution(address,
+      requests.prepareEscrowExecution.noFulfillment, instructions);
+    }, /"condition" and "fulfillment" fields on EscrowFinish must only be specified together./);
+  });
+
   it('prepareEscrowCancellation', function() {
     return this.api.prepareEscrowCancellation(
       address,
