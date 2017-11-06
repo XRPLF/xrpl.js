@@ -1,6 +1,6 @@
 # ripple-lib Release History
 
-## 0.17.8 (UNRELEASED)
+## 0.17.8 (2017-11-06)
 
 + Fix: Freezing in Safari 10.1 (updated bignumber.js) (closes #762)
 + [Fix: `getSettings` should include signers](https://github.com/ripple/ripple-lib/commit/2a90f9b134e168937dceb7da283d63734eac9e7c)
