@@ -2,9 +2,10 @@
 
 ## 0.17.8 (UNRELEASED)
 
-+ Fix: Freezing in Safari 10.1
++ Fix: Freezing in Safari 10.1 (updated bignumber.js) (closes #762)
++ [Fix: `getSettings` should include signers](https://github.com/ripple/ripple-lib/commit/2a90f9b134e168937dceb7da283d63734eac9e7c)
 + Update for Node 6
-+ Update dependencies: lodash and bignumber.js
++ Update lodash dependency
 + Migrate to yarn
 
 ## 0.17.7 (2017-05-08)
