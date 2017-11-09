@@ -1,5 +1,9 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
++ [Update ws dependency to 3.3.1](https://github.com/ripple/ripple-lib/pull/804)
+
 ## 0.17.8 (2017-11-06)
 
 + Fix: Freezing in Safari 10.1 (updated bignumber.js) (closes #762)
