@@ -78,7 +78,7 @@ function deriveKeypair(seed, options) {
   const messageToVerify = hash('This test message should verify.')
   const signature = method.sign(messageToVerify, keypair.privateKey)
   if (method.verify(messageToVerify, signature, keypair.publicKey) !== true) {
-    throw new Error('derived keypair did not generate verifiable signature');
+    throw new Error('derived keypair did not generate verifiable signature')
   }
   return keypair
 }
