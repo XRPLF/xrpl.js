@@ -3960,9 +3960,9 @@ ripple-hashes@^0.3.1:
     ripple-address-codec "^2.0.1"
     ripple-binary-codec "^0.1.0"
 
-ripple-keypairs@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/ripple-keypairs/-/ripple-keypairs-0.10.0.tgz#dcd7e0bc8f0cb8aa8daf9aebcb641f81a8c58132"
+ripple-keypairs@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/ripple-keypairs/-/ripple-keypairs-0.10.1.tgz#ef796b519bb202682515e7cdd6063762636943e6"
   dependencies:
     babel-runtime "^5.8.20"
     bn.js "^3.1.1"
