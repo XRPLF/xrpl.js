@@ -24,7 +24,7 @@
     "ripple-address-codec": "^2.0.1",
     "ripple-binary-codec": "^0.1.10",
     "ripple-hashes": "^0.3.1",
-    "ripple-keypairs": "^0.10.0",
+    "ripple-keypairs": "^0.10.1",
     "ripple-lib-transactionparser": "^0.6.2",
     "ws": "^3.3.1"
   },
