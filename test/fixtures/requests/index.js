@@ -30,7 +30,9 @@ module.exports = {
   },
   prepareEscrowExecution: {
     normal: require('./prepare-escrow-execution'),
-    simple: require('./prepare-escrow-execution-simple')
+    simple: require('./prepare-escrow-execution-simple'),
+    noCondition: require('./prepare-escrow-execution-no-condition'),
+    noFulfillment: require('./prepare-escrow-execution-no-fulfillment')
   },
   prepareEscrowCancellation: {
     normal: require('./prepare-escrow-cancellation'),

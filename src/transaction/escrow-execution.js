@@ -3,6 +3,7 @@
 const _ = require('lodash')
 const utils = require('./utils')
 const validate = utils.common.validate
+const ValidationError = utils.common.errors.ValidationError
 import type {Instructions, Prepare} from './types.js'
 import type {Memo} from '../common/types.js'
 
