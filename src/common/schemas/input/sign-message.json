@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "signMessageParameters",
+  "type": "object",
+  "properties": {
+    "message": {
+      "$ref": "message",
+      "description": "Message text."
+    },
+    "privateKey": {
+      "$ref": "publicKey",
+      "description": "The private key to sign the payment channel claim."
+    }
+  },
+  "additionalProperties": false,
+  "required": ["message", "privateKey"]
+}

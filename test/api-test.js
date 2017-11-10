@@ -452,6 +452,35 @@ describe('RippleAPI', function() {
     });
   });
 
+  it('signMessage', function() {
+    const privateKey =
+      'AC051121672EA8DC119D53AFBD0221607BE6B6B61A720BAB41C144B47E8782B3';
+    const result = this.api.signMessage(
+      requests.signMessage.message,
+      privateKey);
+    checkResult(responses.signMessage,
+      'signMessage', result)
+  });
+
+  it('verifyMessage', function() {
+    const publicKey =
+      '02DCAF8A5B6FBBC3582B87F326176C402B466EEE65FCC23189FC09F0834A78CE3C';
+    const result = this.api.verifyMessage(
+      requests.signMessage.message,
+      responses.signMessage, publicKey);
+    checkResult(true, 'verifyMessage', result)
+  });
+
+  it('verifyMessage - invalid', function() {
+    const publicKey =
+      '02BB1EE6437B0EA8D5DB68EF4FC7CA77F919764A11649ED49EE9C5A0950BA8BF04';
+    const result = this.api.verifyMessage(
+      requests.signMessage.message,
+      responses.signMessage, publicKey);
+    checkResult(false,
+      'verifyMessage', result)
+  });
+
   it('signPaymentChannelClaim', function() {
     const privateKey =
       'ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A';

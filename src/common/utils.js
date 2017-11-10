@@ -81,6 +81,46 @@ function iso8601ToRippleTime(iso8601: string): number {
   return unixToRippleTimestamp(Date.parse(iso8601))
 }
 
+/**
+ * Converts a JS string to a UTF-8 "byte" array.
+ * From {@link https://git.io/v52py|Google's common JavaScript library}.
+ * @param {string} str 16-bit unicode string.
+ * @return {!Array<number>} UTF-8 byte array.
+ */
+function stringToUtf8ByteArray(str) {
+  var out = [], p = 0;
+  for (var i = 0; i < str.length; i++) {
+    var c = str.charCodeAt(i);
+    if (c < 128) {
+      out[p++] = c;
+    } else if (c < 2048) {
+      out[p++] = (c >> 6) | 192;
+      out[p++] = (c & 63) | 128;
+    } else if (
+        ((c & 0xFC00) == 0xD800) && (i + 1) < str.length &&
+        ((str.charCodeAt(i + 1) & 0xFC00) == 0xDC00)) {
+      // Surrogate Pair
+      c = 0x10000 + ((c & 0x03FF) << 10) + (str.charCodeAt(++i) & 0x03FF);
+      out[p++] = (c >> 18) | 240;
+      out[p++] = ((c >> 12) & 63) | 128;
+      out[p++] = ((c >> 6) & 63) | 128;
+      out[p++] = (c & 63) | 128;
+    } else {
+      out[p++] = (c >> 12) | 224;
+      out[p++] = ((c >> 6) & 63) | 128;
+      out[p++] = (c & 63) | 128;
+    }
+  }
+  return out;
+}
+
+function bytesToHex(a) {
+  return a.map(function(byteValue) {
+    const hex = byteValue.toString(16).toUpperCase();
+    return hex.length > 1 ? hex : '0' + hex;
+  }).join('');
+}
+
 module.exports = {
   dropsToXrp,
   xrpToDrops,
@@ -89,5 +129,7 @@ module.exports = {
   removeUndefined,
   rippleTimeToISO8601,
   iso8601ToRippleTime,
-  isValidSecret
+  isValidSecret,
+  stringToUtf8ByteArray,
+  bytesToHex
 }

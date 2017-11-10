@@ -18,5 +18,7 @@ module.exports = {
     utils.convertKeysFromSnakeCaseToCamelCase,
   iso8601ToRippleTime: utils.iso8601ToRippleTime,
   rippleTimeToISO8601: utils.rippleTimeToISO8601,
-  isValidSecret: utils.isValidSecret
+  isValidSecret: utils.isValidSecret,
+  stringToUtf8ByteArray: utils.stringToUtf8ByteArray,
+  bytesToHex: utils.bytesToHex
 }

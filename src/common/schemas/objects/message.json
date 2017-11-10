@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "message",
+  "description": "Message objects represent arbitrary data that can be signed",
+  "type": "string",
+  "additionalProperties": false
+}

@@ -57,6 +57,10 @@ const errors = require('./common').errors
 const generateAddress =
   require('./offline/generate-address').generateAddressAPI
 const computeLedgerHash = require('./offline/ledgerhash')
+const signMessage =
+  require('./offline/sign-message')
+const verifyMessage =
+  require('./offline/verify-message')
 const signPaymentChannelClaim =
   require('./offline/sign-payment-channel-claim')
 const verifyPaymentChannelClaim =
@@ -152,6 +156,8 @@ _.assign(RippleAPI.prototype, {
 
   generateAddress,
   computeLedgerHash,
+  signMessage,
+  verifyMessage,
   signPaymentChannelClaim,
   verifyPaymentChannelClaim,
   errors

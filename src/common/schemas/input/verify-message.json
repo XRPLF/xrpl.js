@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "verifyMessageParameters",
+  "type": "object",
+  "properties": {
+    "message": {
+      "$ref": "message",
+      "description": "Message text."
+    },
+    "signature": {
+      "$ref": "signature",
+      "description": "Signature of this message."
+    },
+    "publicKey": {
+      "$ref": "publicKey",
+      "description": "Public key of the message's sender"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["message", "signature", "publicKey"]
+}

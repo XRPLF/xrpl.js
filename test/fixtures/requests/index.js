@@ -61,6 +61,7 @@ module.exports = {
     escrow: require('./sign-escrow.json'),
     signAs: require('./sign-as')
   },
+  signMessage: require('./sign-message'),
   signPaymentChannelClaim: require('./sign-payment-channel-claim'),
   getPaths: {
     normal: require('./getpaths/normal'),
