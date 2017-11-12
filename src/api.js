@@ -1,17 +1,6 @@
 /* @flow */
 'use strict' // eslint-disable-line strict
 
-/* eslint-disable max-len */
-// Enable core-js polyfills. This allows use of ES6/7 extensions listed here:
-// https://github.com/zloirock/core-js/blob/fb0890f32dabe8d4d88a4350d1b268446127132e/shim.js#L1-L103
-/* eslint-enable max-len */
-
-// In node.js env, polyfill might be already loaded (from any npm package),
-// that's why we do this check.
-if (!global._babelPolyfill) {
-  require('babel-polyfill')
-}
-
 const _ = require('lodash')
 const EventEmitter = require('events').EventEmitter
 const common = require('./common')

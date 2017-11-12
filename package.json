@@ -15,8 +15,6 @@
     "test": "test"
   },
   "dependencies": {
-    "babel-polyfill": "^6.3.14",
-    "babel-runtime": "^6.3.19",
     "bignumber.js": "^4.1.0",
     "https-proxy-agent": "^1.0.0",
     "jsonschema": "^1.1.1",
