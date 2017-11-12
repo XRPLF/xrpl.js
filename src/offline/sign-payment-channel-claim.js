@@ -12,7 +12,7 @@ function signPaymentChannelClaim(channel: string, amount: string,
 
   const signingData = binary.encodeForSigningClaim({
     channel: channel,
-    amount: xrpToDrops(amount),
+    amount: xrpToDrops(amount)
   })
   return keypairs.sign(signingData, privateKey)
 }

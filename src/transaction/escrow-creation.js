@@ -5,7 +5,7 @@ const utils = require('./utils')
 const {validate, iso8601ToRippleTime, xrpToDrops} = utils.common
 const ValidationError = utils.common.errors.ValidationError
 import type {Instructions, Prepare} from './types.js'
-import type {Adjustment, MaxAdjustment, Memo} from '../common/types.js'
+import type {Memo} from '../common/types.js'
 
 type EscrowCreation = {
   amount: string,
@@ -25,7 +25,7 @@ function createEscrowCreationTransaction(account: string,
     TransactionType: 'EscrowCreate',
     Account: account,
     Destination: payment.destination,
-    Amount: xrpToDrops(payment.amount),
+    Amount: xrpToDrops(payment.amount)
   }
 
   if (payment.condition !== undefined) {

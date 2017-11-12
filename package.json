@@ -72,7 +72,7 @@
     "prepublish": "npm run clean && npm run compile",
     "test": "babel-node ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; echo 'parser: babel-eslint' >> eslintrc; fi; eslint -c eslintrc src/",
+    "lint": "if ! [ -f .eslintrc ]; then curl -o .eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; echo 'parser: babel-eslint' >> .eslintrc; fi; eslint -c .eslintrc src/",
     "perf": "./scripts/perf_test.sh",
     "start": "babel-node scripts/http.js",
     "sauce": "babel-node scripts/sauce-runner.js"

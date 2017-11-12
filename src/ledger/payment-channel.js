@@ -1,9 +1,8 @@
 /* @flow */
 'use strict' // eslint-disable-line strict
-const _ = require('lodash')
 const utils = require('./utils')
 const parsePaymentChannel = require('./parse/payment-channel')
-const {validate, removeUndefined} = utils.common
+const {validate} = utils.common
 const NotFoundError = utils.common.errors.NotFoundError
 
 type PaymentChannel = {
@@ -34,15 +33,14 @@ type LedgerEntryResponse = {
 
 function formatResponse(response: LedgerEntryResponse) {
   if (response.node !== undefined &&
-      response.node.LedgerEntryType === 'PayChannel')
-  {
+    response.node.LedgerEntryType === 'PayChannel') {
     return parsePaymentChannel(response.node)
   } else {
     throw new NotFoundError('Payment channel ledger entry not found')
   }
 }
 
-function getPaymentChannel(id: string): Promise<PaymentChannelResponse> {
+function getPaymentChannel(id: string): Promise<PaymentChannel> {
   validate.getPaymentChannel({id})
 
   const request = {
@@ -52,7 +50,7 @@ function getPaymentChannel(id: string): Promise<PaymentChannelResponse> {
     ledger_index: 'validated'
   }
 
-  return this.connection.request(request).then(_.partial(formatResponse))
+  return this.connection.request(request).then(formatResponse)
 }
 
 module.exports = getPaymentChannel

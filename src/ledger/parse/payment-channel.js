@@ -1,6 +1,5 @@
 /* @flow */
 'use strict' // eslint-disable-line strict
-const _ = require('lodash')
 const utils = require('./utils')
 
 type PaymentChannelResponse = {

@@ -36,12 +36,14 @@ function parseFields(data: Object): Object {
       settings.signers.threshold = data.signer_lists[0].SignerQuorum
     }
     if (data.signer_lists[0].SignerEntries) {
-      settings.signers.weights = _.map(data.signer_lists[0].SignerEntries, entry => {
-        return {
-          address: entry.SignerEntry.Account,
-          weight: entry.SignerEntry.SignerWeight
-        }
-      })
+      settings.signers.weights = _.map(
+        data.signer_lists[0].SignerEntries,
+        entry => {
+          return {
+            address: entry.SignerEntry.Account,
+            weight: entry.SignerEntry.SignerWeight
+          }
+        })
     }
   }
   return settings

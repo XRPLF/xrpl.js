@@ -1,6 +1,5 @@
 /* @flow */
 'use strict' // eslint-disable-line strict
-const _ = require('lodash')
 const assert = require('assert')
 const utils = require('./utils')
 const parseAmount = require('./amount')
