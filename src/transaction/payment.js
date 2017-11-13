@@ -82,6 +82,10 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
       + 'and destination.amount) or (source.amount and destination.minAmount)')
   }
 
+  if (isXRPToXRPPayment(payment) && payment.source.maxAmount) {
+    throw new ValidationError('maxAmount must be omitted for XRP to XRP payments')
+  }
+
   // when using destination.minAmount, rippled still requires that we set
   // a destination amount in addition to DeliverMin. the destination amount
   // is interpreted as the maximum amount to send. we want to be sure to
