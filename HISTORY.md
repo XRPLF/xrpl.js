@@ -1,6 +1,6 @@
 # ripple-lib Release History
 
-## 0.17.9 (UNRELEASED)
+## 0.17.9 (2017-11-14)
 
 + [Update ws dependency to 3.3.1](https://github.com/ripple/ripple-lib/pull/804)
 + [Remove unnecessary polyfills](https://github.com/ripple/ripple-lib/pull/807)
