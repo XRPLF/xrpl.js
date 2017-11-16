@@ -35,7 +35,7 @@
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-stage-1": "^6.3.13",
-    "babel-babel-register": "^6.3.13",
+    "babel-register": "^6.3.13",
     "coveralls": "^2.13.1",
     "doctoc": "^0.15.0",
     "ejs": "^2.3.4",
