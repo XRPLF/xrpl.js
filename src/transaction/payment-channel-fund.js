@@ -13,7 +13,7 @@ type PaymentChannelFund = {
 function createPaymentChannelFundTransaction(account: string,
   fund: PaymentChannelFund
 ): Object {
-  const txJSON = {
+  const txJSON: Object = {
     Account: account,
     TransactionType: 'PaymentChannelFund',
     Channel: fund.channel,

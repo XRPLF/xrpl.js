@@ -38,7 +38,7 @@ type GetOrderbook = {
 function getBookOffers(connection: Connection, account: string,
     ledgerVersion?: number, limit?: number, takerGets: Issue,
     takerPays: Issue
-): Promise {
+): Promise<Object[]> {
   return connection.request(utils.renameCounterpartyToIssuerInOrder({
     command: 'book_offers',
     taker_gets: takerGets,

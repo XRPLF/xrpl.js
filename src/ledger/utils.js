@@ -22,7 +22,7 @@ function clamp(value: number, min: number, max: number): number {
 
 function getXRPBalance(connection: Connection, address: string,
   ledgerVersion?: number
-): Promise<number> {
+): Promise<string> {
   const request = {
     command: 'account_info',
     account: address,
@@ -34,7 +34,7 @@ function getXRPBalance(connection: Connection, address: string,
 
 // If the marker is omitted from a response, you have reached the end
 function getRecursiveRecur(getter: Getter, marker?: string, limit: number
-): Promise {
+): Promise<Array<any>> {
   return getter(marker, limit).then(data => {
     const remaining = limit - data.results.length
     if (remaining > 0 && data.marker !== undefined) {
@@ -46,7 +46,7 @@ function getRecursiveRecur(getter: Getter, marker?: string, limit: number
   })
 }
 
-function getRecursive(getter: Getter, limit?: number): Promise {
+function getRecursive(getter: Getter, limit?: number): Promise<Array<any>> {
   return getRecursiveRecur(getter, undefined, limit || Infinity)
 }
 
@@ -112,7 +112,7 @@ function isPendingLedgerVersion(connection: Connection,
 }
 
 function ensureLedgerVersion(options: Object
-): Promise<number> {
+): Promise<Object> {
   if (Boolean(options) && options.ledgerVersion !== undefined &&
     options.ledgerVersion !== null
   ) {

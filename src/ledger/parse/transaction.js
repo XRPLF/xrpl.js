@@ -54,7 +54,7 @@ function parseTransaction(tx: Object): Object {
     'feeUpdate': parseFeeUpdate,
     'amendment': parseAmendment
   }
-  const parser = mapping[type]
+  const parser: Function = (mapping: Object)[type]
   assert(parser !== undefined, 'Unrecognized transaction type')
   const specification = parser(tx)
   const outcome = utils.parseOutcome(tx)

@@ -6,7 +6,7 @@ const utils = require('../utils')
 const BigNumber = require('bignumber.js')
 const parseAmount = require('./amount')
 
-import type {Amount} from '../common/types.js'
+import type {Amount} from '../../common/types.js'
 
 function adjustQualityForXRP(
   quality: string, takerGetsCurrency: string, takerPaysCurrency: string
@@ -51,7 +51,7 @@ function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges) {
   })
 }
 
-function isPartialPayment(tx) {
+function isPartialPayment(tx: Object) {
   return (tx.Flags & utils.common.txFlags.Payment.PartialPayment) !== 0
 }
 
