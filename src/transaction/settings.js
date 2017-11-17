@@ -10,24 +10,24 @@ const AccountFields = utils.common.constants.AccountFields
 import type {Instructions, Prepare} from './types.js'
 
 type Settings = {
-  passwordSpent?: boolean;
-  requireDestinationTag?: boolean;
-  requireAuthorization?: boolean;
-  disallowIncomingXRP?: boolean;
-  disableMasterKey?: boolean;
-  enableTransactionIDTracking?: boolean;
-  noFreeze?: boolean;
-  globalFreeze?: boolean;
-  defaultRipple?: boolean;
-  emailHash?: ?string;
-  messageKey?: string;
-  domain?: string;
-  transferRate?: ?number;
-  regularKey?: string;
+  passwordSpent?: boolean,
+  requireDestinationTag?: boolean,
+  requireAuthorization?: boolean,
+  disallowIncomingXRP?: boolean,
+  disableMasterKey?: boolean,
+  enableTransactionIDTracking?: boolean,
+  noFreeze?: boolean,
+  globalFreeze?: boolean,
+  defaultRipple?: boolean,
+  emailHash?: ?string,
+  messageKey?: string,
+  domain?: string,
+  transferRate?: ?number,
+  regularKey?: string,
   signers?: {
-    threshold?: number;
-    weights: {address: string, weight: number}[];
-  };
+    threshold?: number,
+    weights: {address: string, weight: number}[],
+  },
 }
 
 // Emptry string passed to setting will clear it
