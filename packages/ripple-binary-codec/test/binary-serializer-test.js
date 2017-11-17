@@ -22,7 +22,8 @@ const Escrow = {
   },
   finish: {
     tx: require('./fixtures/escrow-finish-tx.json'),
-    binary: require('./fixtures/escrow-finish-binary.json')
+    binary: require('./fixtures/escrow-finish-binary.json'),
+    meta: require('./fixtures/escrow-finish-meta-binary.json')
   },
   cancel: {
     tx: require('./fixtures/escrow-cancel-tx.json'),
@@ -142,6 +143,8 @@ function EscrowTest() {
   it('can serialize EscrowFinish', () => {
     assert.strictEqual(encode(Escrow.finish.tx),
       Escrow.finish.binary);
+    assert.strictEqual(encode(Escrow.finish.tx.meta),
+      Escrow.finish.meta);
   });
   it('can serialize EscrowCancel', () => {
     assert.strictEqual(encode(Escrow.cancel.tx),

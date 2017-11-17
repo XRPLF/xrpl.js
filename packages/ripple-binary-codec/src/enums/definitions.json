@@ -1477,6 +1477,16 @@
         "isSigningField": true,
         "type": "UInt8"
       }
+    ],
+    [
+      "DestinationNode",
+      {
+        "nth": 9,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
     ]
   ],
   "TRANSACTION_RESULTS": {
