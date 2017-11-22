@@ -88,7 +88,7 @@ function conditionallyAddDirectXRPPath(connection: Connection, address: string,
 }
 
 function filterSourceFundsLowPaths(pathfind: PathFind,
-                                   paths: RippledPathsResponse
+  paths: RippledPathsResponse
 ): RippledPathsResponse {
   if (pathfind.source.amount &&
       pathfind.destination.amount.value === undefined && paths.alternatives) {
@@ -107,7 +107,7 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
   }
   if (paths.destination_currencies !== undefined &&
       !_.includes(paths.destination_currencies,
-      pathfind.destination.amount.currency)) {
+        pathfind.destination.amount.currency)) {
     throw new NotFoundError('No paths found. ' +
       'The destination_account does not accept ' +
       pathfind.destination.amount.currency + ', they only accept: ' +
@@ -133,8 +133,8 @@ function getPaths(pathfind: PathFind): Promise<GetPaths> {
   return requestPathFind(this.connection, pathfind).then(paths =>
     conditionallyAddDirectXRPPath(this.connection, address, paths)
   )
-  .then(paths => filterSourceFundsLowPaths(pathfind, paths))
-  .then(paths => formatResponse(pathfind, paths))
+    .then(paths => filterSourceFundsLowPaths(pathfind, paths))
+    .then(paths => formatResponse(pathfind, paths))
 }
 
 module.exports = getPaths

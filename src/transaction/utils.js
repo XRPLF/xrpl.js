@@ -32,7 +32,7 @@ function scaleValue(value, multiplier, extra = 0) {
 }
 
 function prepareTransaction(txJSON: Object, api: Object,
-    instructions: Instructions
+  instructions: Instructions
 ): Promise<Prepare> {
   common.validate.instructions(instructions)
 
@@ -67,8 +67,8 @@ function prepareTransaction(txJSON: Object, api: Object,
         const extraFee =
           (txJSON.TransactionType !== 'EscrowFinish' ||
             txJSON.Fulfillment === undefined) ? 0 :
-          (cushion * feeRef * (32 + Math.floor(
-            new Buffer(txJSON.Fulfillment, 'hex').length / 16)))
+            (cushion * feeRef * (32 + Math.floor(
+              new Buffer(txJSON.Fulfillment, 'hex').length / 16)))
         const feeDrops = common.xrpToDrops(fee)
         if (instructions.maxFee !== undefined) {
           const maxFeeDrops = common.xrpToDrops(instructions.maxFee)

@@ -6,7 +6,7 @@ const validate = utils.common.validate
 import type {Instructions, Prepare} from './types.js'
 
 function createOrderCancellationTransaction(account: string,
-    orderCancellation: Object
+  orderCancellation: Object
 ): Object {
   const txJSON: Object = {
     TransactionType: 'OfferCancel',

@@ -19,7 +19,7 @@ function createAdjustment(address: string, adjustmentWithoutAddress: Object) {
   const amountKey = _.keys(adjustmentWithoutAddress)[0]
   const amount = adjustmentWithoutAddress[amountKey]
   return _.set({address: address}, amountKey,
-               removeAnyCounterpartyEncoding(address, amount))
+    removeAnyCounterpartyEncoding(address, amount))
 }
 
 function parseAlternative(sourceAddress: string, destinationAddress: string,
@@ -29,9 +29,9 @@ function parseAlternative(sourceAddress: string, destinationAddress: string,
   // directly to preparePayment
   const amounts = (alternative.destination_amount !== undefined) ?
     {source: {amount: parseAmount(alternative.source_amount)},
-     destination: {minAmount: parseAmount(alternative.destination_amount)}} :
+      destination: {minAmount: parseAmount(alternative.destination_amount)}} :
     {source: {maxAmount: parseAmount(alternative.source_amount)},
-     destination: {amount: parseAmount(destinationAmount)}}
+      destination: {amount: parseAmount(destinationAmount)}}
 
   return {
     source: createAdjustment(sourceAddress, amounts.source),

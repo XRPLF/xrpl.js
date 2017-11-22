@@ -31,8 +31,8 @@ function parseTransactionType(type) {
     PaymentChannelFund: 'paymentChannelFund',
     PaymentChannelClaim: 'paymentChannelClaim',
     SignerListSet: 'settings',
-    SetFee: 'feeUpdate',          // pseudo-transaction
-    EnableAmendment: 'amendment'  // pseudo-transaction
+    SetFee: 'feeUpdate', // pseudo-transaction
+    EnableAmendment: 'amendment' // pseudo-transaction
   }
   return mapping[type] || null
 }

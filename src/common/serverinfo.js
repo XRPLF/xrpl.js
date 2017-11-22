@@ -62,7 +62,7 @@ function getServerInfo(connection: Connection): Promise<GetServerInfoResponse> {
 }
 
 function computeFeeFromServerInfo(cushion: number,
-    serverInfo: GetServerInfoResponse
+  serverInfo: GetServerInfoResponse
 ): number {
   return (Number(serverInfo.validatedLedger.baseFeeXRP)
        * Number(serverInfo.loadFactor) * cushion).toString()

@@ -41,7 +41,7 @@ function formatBalanceSheet(balanceSheet): GetBalanceSheet {
   }
   if (!_.isUndefined(balanceSheet.obligations)) {
     result.obligations = _.map(balanceSheet.obligations, (value, currency) =>
-                               ({currency, value}))
+      ({currency, value}))
   }
 
   return result

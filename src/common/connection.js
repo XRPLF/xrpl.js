@@ -77,7 +77,7 @@ class Connection extends EventEmitter {
       }
       return [data.type, data]
     } else if (data.type === undefined && data.error) {
-      return ['error', data.error, data.error_message, data]  // e.g. slowDown
+      return ['error', data.error, data.error_message, data] // e.g. slowDown
     }
     throw new ResponseFormatError('unrecognized message type: ' + data.type)
   }
