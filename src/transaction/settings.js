@@ -8,17 +8,36 @@ const validate = utils.common.validate
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices
 const AccountFields = utils.common.constants.AccountFields
 import type {Instructions, Prepare} from './types.js'
-import type {Settings} from './settings-types.js'
+
+type Settings = {
+  passwordSpent?: boolean,
+  requireDestinationTag?: boolean,
+  requireAuthorization?: boolean,
+  disallowIncomingXRP?: boolean,
+  disableMasterKey?: boolean,
+  enableTransactionIDTracking?: boolean,
+  noFreeze?: boolean,
+  globalFreeze?: boolean,
+  defaultRipple?: boolean,
+  emailHash?: ?string,
+  messageKey?: string,
+  domain?: string,
+  transferRate?: ?number,
+  regularKey?: string,
+  signers?: {
+    threshold?: number,
+    weights: {address: string, weight: number}[],
+  },
+}
 
 // Emptry string passed to setting will clear it
 const CLEAR_SETTING = null
-
 
 function setTransactionFlags(txJSON: Object, values: Settings) {
   const keys = Object.keys(values)
   assert(keys.length === 1, 'ERROR: can only set one setting per transaction')
   const flagName = keys[0]
-  const value = values[flagName]
+  const value = (values: Object)[flagName]
   const index = AccountFlagIndices[flagName]
   if (index !== undefined) {
     if (value) {

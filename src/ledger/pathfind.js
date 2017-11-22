@@ -13,14 +13,16 @@ import type {GetPaths, PathFind, RippledPathsResponse, PathFindRequest}
   from './pathfind-types.js'
 
 
-function addParams(request: PathFindRequest, result: RippledPathsResponse) {
+function addParams(request: PathFindRequest, result: RippledPathsResponse
+): RippledPathsResponse {
   return _.defaults(_.assign({}, result, {
     source_account: request.source_account,
     source_currencies: request.source_currencies
   }), {destination_amount: request.destination_amount})
 }
 
-function requestPathFind(connection: Connection, pathfind: PathFind): Promise {
+function requestPathFind(connection: Connection, pathfind: PathFind
+): Promise<RippledPathsResponse> {
   const destinationAmount = _.assign({value: -1}, pathfind.destination.amount)
   const request: PathFindRequest = {
     command: 'ripple_path_find',
@@ -76,7 +78,7 @@ function isRippledIOUAmount(amount: RippledAmount) {
 
 function conditionallyAddDirectXRPPath(connection: Connection, address: string,
   paths: RippledPathsResponse
-): Promise {
+): Promise<RippledPathsResponse> {
   if (isRippledIOUAmount(paths.destination_amount)
       || !_.includes(paths.destination_currencies, 'XRP')) {
     return Promise.resolve(paths)

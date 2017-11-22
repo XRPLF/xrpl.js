@@ -76,6 +76,18 @@ class RestrictedConnection extends common.Connection {
 }
 
 class RippleAPI extends EventEmitter {
+
+  _feeCushion: number;
+  connection: RestrictedConnection;
+
+  // these are exposed only for use by unit tests; they are not part of the API.
+  static _PRIVATE = {
+    validate: common.validate,
+    RangeSet: require('./common/rangeset').RangeSet,
+    ledgerUtils: require('./ledger/utils'),
+    schemaValidator: require('./common/schema-validator')
+  };
+
   constructor(options: APIOptions = {}) {
     common.validate.apiOptions(options)
     super()
@@ -145,14 +157,6 @@ _.assign(RippleAPI.prototype, {
   verifyPaymentChannelClaim,
   errors
 })
-
-// these are exposed only for use by unit tests; they are not part of the API
-RippleAPI._PRIVATE = {
-  validate: common.validate,
-  RangeSet: require('./common/rangeset').RangeSet,
-  ledgerUtils: require('./ledger/utils'),
-  schemaValidator: require('./common/schema-validator')
-}
 
 module.exports = {
   RippleAPI

@@ -27,6 +27,7 @@ function toRippledAmount(amount: Amount): RippledAmount {
   if (amount.currency === 'XRP') {
     return xrpToDrops(amount.value)
   }
+  // $FlowFixMe: amount.issuer is not a Amount type property. Safe to remove?
   return {
     currency: amount.currency,
     issuer: amount.counterparty ? amount.counterparty :

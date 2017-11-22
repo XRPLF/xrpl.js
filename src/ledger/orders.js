@@ -11,7 +11,7 @@ type GetOrders = Array<Order>
 
 function requestAccountOffers(connection: Connection, address: string,
   ledgerVersion: number, marker: string, limit: number
-): Promise {
+): Promise<Object> {
   return connection.request({
     command: 'account_offers',
     account: address,

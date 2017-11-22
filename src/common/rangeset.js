@@ -2,7 +2,6 @@
 'use strict' // eslint-disable-line strict
 const _ = require('lodash')
 const assert = require('assert')
-const ranges = Symbol()
 
 function mergeIntervals(intervals: Array<[number, number]>) {
   const stack = [[-Infinity, -Infinity]]
@@ -19,22 +18,25 @@ function mergeIntervals(intervals: Array<[number, number]>) {
 }
 
 class RangeSet {
+
+  ranges: Array<[number, number]>;
+
   constructor() {
     this.reset()
   }
 
   reset() {
-    this[ranges] = []
+    this.ranges = []
   }
 
   serialize() {
-    return this[ranges].map(range =>
+    return this.ranges.map(range =>
       range[0].toString() + '-' + range[1].toString()).join(',')
   }
 
   addRange(start: number, end: number) {
     assert(start <= end, 'invalid range')
-    this[ranges] = mergeIntervals(this[ranges].concat([[start, end]]))
+    this.ranges = mergeIntervals(this.ranges.concat([[start, end]]))
   }
 
   addValue(value: number) {
@@ -50,7 +52,7 @@ class RangeSet {
   }
 
   containsRange(start: number, end: number) {
-    return _.some(this[ranges], range => range[0] <= start && range[1] >= end)
+    return _.some(this.ranges, range => range[0] <= start && range[1] >= end)
   }
 
   containsValue(value: number) {
