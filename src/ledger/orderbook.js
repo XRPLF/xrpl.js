@@ -36,8 +36,8 @@ type GetOrderbook = {
 // account is to specify a "perspective", which affects which unfunded offers
 // are returned
 function getBookOffers(connection: Connection, account: string,
-    ledgerVersion?: number, limit?: number, takerGets: Issue,
-    takerPays: Issue
+  ledgerVersion?: number, limit?: number, takerGets: Issue,
+  takerPays: Issue
 ): Promise<Object[]> {
   return connection.request(utils.renameCounterpartyToIssuerInOrder({
     command: 'book_offers',
@@ -92,7 +92,7 @@ function formatBidsAndAsks(orderbook: Orderbook, offers) {
 }
 
 function getOrderbook(address: string, orderbook: Orderbook,
-    options: OrdersOptions = {}
+  options: OrdersOptions = {}
 ): Promise<GetOrderbook> {
   validate.getOrderbook({address, orderbook, options})
 

@@ -30,9 +30,9 @@ function parseOrderbookOrder(order: Object): Object {
   }
 
   const takerGetsFunded = order.taker_gets_funded ?
-      parseAmount(order.taker_gets_funded) : undefined
+    parseAmount(order.taker_gets_funded) : undefined
   const takerPaysFunded = order.taker_pays_funded ?
-      parseAmount(order.taker_pays_funded) : undefined
+    parseAmount(order.taker_pays_funded) : undefined
   const available = utils.removeUndefined({
     fundedAmount: takerGetsFunded,
     priceOfFundedAmount: takerPaysFunded

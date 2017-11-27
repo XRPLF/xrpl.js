@@ -19,7 +19,7 @@ type EscrowCreation = {
 }
 
 function createEscrowCreationTransaction(account: string,
-    payment: EscrowCreation
+  payment: EscrowCreation
 ): Object {
   const txJSON: Object = {
     TransactionType: 'EscrowCreate',

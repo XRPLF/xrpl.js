@@ -32,9 +32,9 @@ function parseAccountOrder(address: string, order: Object): Object {
   })
 
   const makerExchangeRate = order.quality ?
-      utils.adjustQualityForXRP(order.quality.toString(),
-        takerGetsAmount.currency, takerPaysAmount.currency) :
-      computeQuality(takerGetsAmount, takerPaysAmount)
+    utils.adjustQualityForXRP(order.quality.toString(),
+      takerGetsAmount.currency, takerPaysAmount.currency) :
+    computeQuality(takerGetsAmount, takerPaysAmount)
   const properties = {
     maker: address,
     sequence: order.seq,

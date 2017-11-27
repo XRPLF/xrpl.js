@@ -146,7 +146,7 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
 }
 
 function preparePayment(address: string, payment: Payment,
-    instructions: Instructions = {}
+  instructions: Instructions = {}
 ): Promise<Prepare> {
   validate.preparePayment({address, payment, instructions})
   const txJSON = createPaymentTransaction(address, payment)

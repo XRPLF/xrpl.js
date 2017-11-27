@@ -45,7 +45,7 @@ function createOrderTransaction(account: string, order: Order): Object {
 }
 
 function prepareOrder(address: string, order: Order,
-    instructions: Instructions = {}
+  instructions: Instructions = {}
 ): Promise<Prepare> {
   validate.prepareOrder({address, order, instructions})
   const txJSON = createOrderTransaction(address, order)

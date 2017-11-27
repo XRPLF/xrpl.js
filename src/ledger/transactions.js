@@ -59,7 +59,7 @@ function counterpartyFilter(filters, tx: TransactionType) {
 }
 
 function transactionFilter(address: string, filters: TransactionsOptions,
-                           tx: TransactionType
+  tx: TransactionType
 ) {
   if (filters.excludeFailures && tx.outcome.result !== 'tesSUCCESS') {
     return false
@@ -136,14 +136,14 @@ function checkForLedgerGaps(connection: Connection,
 
   return utils.hasCompleteLedgerRange(connection, minLedgerVersion,
     maxLedgerVersion).then(hasCompleteLedgerRange => {
-      if (!hasCompleteLedgerRange) {
-        throw new utils.common.errors.MissingLedgerHistoryError()
-      }
-    })
+    if (!hasCompleteLedgerRange) {
+      throw new utils.common.errors.MissingLedgerHistoryError()
+    }
+  })
 }
 
 function formatResponse(connection: Connection, options: TransactionsOptions,
-                        transactions: GetTransactionsResponse
+  transactions: GetTransactionsResponse
 ) {
   const compare = options.earliestFirst ? utils.compareTransactions :
     _.rearg(utils.compareTransactions, 1, 0)
@@ -153,7 +153,7 @@ function formatResponse(connection: Connection, options: TransactionsOptions,
 }
 
 function getTransactionsInternal(connection: Connection, address: string,
-                                 options: TransactionsOptions
+  options: TransactionsOptions
 ): Promise<GetTransactionsResponse> {
   const getter = _.partial(getAccountTx, connection, address, options)
   const format = _.partial(formatResponse, connection, options)

@@ -55,17 +55,17 @@ function convertError(connection: Connection, options: TransactionOptions,
   if (_error instanceof errors.NotFoundError) {
     return utils.hasCompleteLedgerRange(connection, options.minLedgerVersion,
       options.maxLedgerVersion).then(hasCompleteLedgerRange => {
-        if (!hasCompleteLedgerRange) {
-          return utils.isPendingLedgerVersion(
-            connection, options.maxLedgerVersion)
-            .then(isPendingLedgerVersion => {
-              return isPendingLedgerVersion ?
-                new errors.PendingLedgerVersionError() :
-                new errors.MissingLedgerHistoryError()
-            })
-        }
-        return _error
-      })
+      if (!hasCompleteLedgerRange) {
+        return utils.isPendingLedgerVersion(
+          connection, options.maxLedgerVersion)
+          .then(isPendingLedgerVersion => {
+            return isPendingLedgerVersion ?
+              new errors.PendingLedgerVersionError() :
+              new errors.MissingLedgerHistoryError()
+          })
+      }
+      return _error
+    })
   }
   return Promise.resolve(_error)
 }
@@ -92,11 +92,11 @@ function getTransaction(id: string, options: TransactionOptions = {}
     return this.connection.request(request).then(tx =>
       attachTransactionDate(this.connection, tx)
     ).then(_.partial(formatResponse, _options))
-    .catch(error => {
-      return convertError(this.connection, _options, error).then(_error => {
-        throw _error
+      .catch(error => {
+        return convertError(this.connection, _options, error).then(_error => {
+          throw _error
+        })
       })
-    })
   })
 }
 
