@@ -1455,9 +1455,14 @@ describe('RippleAPI', function() {
   });
 
   it('ledger utils - renameCounterpartyToIssuerInOrder', function() {
-    const order = {taker_gets: {issuer: '1'}};
-    const expected = {taker_gets: {issuer: '1'}};
-
+    const order = {
+      taker_gets: {counterparty: '1'},
+      taker_pays: {counterparty: '1'}
+    };
+    const expected = {
+      taker_gets: {issuer: '1'},
+      taker_pays: {issuer: '1'}
+    };
     assert.deepEqual(utils.renameCounterpartyToIssuerInOrder(order), expected);
   });
 

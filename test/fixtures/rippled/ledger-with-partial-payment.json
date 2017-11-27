@@ -4,7 +4,7 @@
   "type": "response",
   "result": {
     "ledger": {
-      "accepted": true,
+      "ledger-with-partial-payments": true,
       "account_hash": "334EE5F2209538C3099E133D25725E5BFEB40A198EA7028E6317F13E95D533DF",
       "close_flags": 0,
       "close_time": 521225631,
