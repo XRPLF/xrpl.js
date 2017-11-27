@@ -1,4 +1,4 @@
-'use strict' // eslint-disable-line strict
+
 
 const txFlags = {
   // Universal flags can apply to any transaction type
@@ -59,7 +59,7 @@ const txFlagIndices = {
   }
 }
 
-module.exports = {
+export {
   txFlags,
   txFlagIndices
 }

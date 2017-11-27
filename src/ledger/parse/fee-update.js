@@ -1,6 +1,6 @@
-'use strict' // eslint-disable-line strict
-const BigNumber = require('bignumber.js')
-const {dropsToXrp} = require('./utils')
+
+import BigNumber from 'bignumber.js'
+import {dropsToXrp} from '../../common'
 
 function parseFeeUpdate(tx: Object) {
   const baseFeeDrops = (new BigNumber(tx.BaseFee, 16)).toString()
@@ -12,4 +12,4 @@ function parseFeeUpdate(tx: Object) {
   }
 }
 
-module.exports = parseFeeUpdate
+export default parseFeeUpdate

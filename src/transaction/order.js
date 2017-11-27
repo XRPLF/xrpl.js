@@ -1,11 +1,11 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
+
+import * as _ from 'lodash'
+import * as utils from './utils'
 const offerFlags = utils.common.txFlags.OfferCreate
-const {validate, iso8601ToRippleTime} = utils.common
-import type {Instructions, Prepare} from './types.js'
-import type {Order} from '../ledger/transaction-types.js'
+import {validate, iso8601ToRippleTime} from '../common'
+import type {Instructions, Prepare} from './types'
+import type {Order} from '../ledger/transaction-types'
 
 function createOrderTransaction(account: string, order: Order): Object {
   const takerPays = utils.common.toRippledAmount(order.direction === 'buy' ?
@@ -52,4 +52,4 @@ function prepareOrder(address: string, order: Order,
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareOrder
+export default prepareOrder

@@ -1,12 +1,12 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const binary = require('ripple-binary-codec')
-const utils = require('./utils')
-const BigNumber = require('bignumber.js')
-const {decodeAddress} = require('ripple-address-codec')
-const {validate} = utils.common
-const {computeBinaryTransactionHash} = require('ripple-hashes')
+
+import * as _ from 'lodash'
+import binary from 'ripple-binary-codec'
+import * as utils from './utils'
+import BigNumber from 'bignumber.js'
+import {decodeAddress} from 'ripple-address-codec'
+import {validate} from '../common'
+import {computeBinaryTransactionHash} from 'ripple-hashes'
 
 function addressToBigNumber(address) {
   const hex = (new Buffer(decodeAddress(address))).toString('hex')
@@ -36,4 +36,4 @@ function combine(signedTransactions: Array<string>): Object {
   return {signedTransaction, id}
 }
 
-module.exports = combine
+export default combine

@@ -1,9 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
-const keypairs = require('ripple-keypairs')
-const binary = require('ripple-binary-codec')
-const {computeBinaryTransactionHash} = require('ripple-hashes')
+
+import * as utils from './utils'
+import keypairs from 'ripple-keypairs'
+import binary from 'ripple-binary-codec'
+import {computeBinaryTransactionHash} from 'ripple-hashes'
 const validate = utils.common.validate
 
 function computeSignature(tx: Object, privateKey: string, signAs: ?string) {
@@ -45,4 +45,4 @@ function sign(txJSON: string, secret: string, options: Object = {}
   }
 }
 
-module.exports = sign
+export default sign

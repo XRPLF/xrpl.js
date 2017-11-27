@@ -1,8 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const assert = require('assert')
-const utils = require('./utils')
-const flags = utils.txFlags.TrustSet
+
+import assert from 'assert'
+import {parseQuality} from './utils'
+import {txFlags, removeUndefined} from '../../common'
+const flags = txFlags.TrustSet
 
 function parseFlag(flagsValue, trueValue, falseValue) {
   if (flagsValue & trueValue) {
@@ -17,12 +18,12 @@ function parseFlag(flagsValue, trueValue, falseValue) {
 function parseTrustline(tx: Object): Object {
   assert(tx.TransactionType === 'TrustSet')
 
-  return utils.removeUndefined({
+  return removeUndefined({
     limit: tx.LimitAmount.value,
     currency: tx.LimitAmount.currency,
     counterparty: tx.LimitAmount.issuer,
-    qualityIn: utils.parseQuality(tx.QualityIn),
-    qualityOut: utils.parseQuality(tx.QualityOut),
+    qualityIn: parseQuality(tx.QualityIn),
+    qualityOut: parseQuality(tx.QualityOut),
     ripplingDisabled: parseFlag(
       tx.Flags, flags.SetNoRipple, flags.ClearNoRipple),
     frozen: parseFlag(tx.Flags, flags.SetFreeze, flags.ClearFreeze),
@@ -30,4 +31,4 @@ function parseTrustline(tx: Object): Object {
   })
 }
 
-module.exports = parseTrustline
+export default parseTrustline

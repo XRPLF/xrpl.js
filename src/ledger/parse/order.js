@@ -1,9 +1,10 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const assert = require('assert')
-const utils = require('./utils')
-const parseAmount = require('./amount')
-const flags = utils.txFlags.OfferCreate
+
+import assert from 'assert'
+import {parseTimestamp} from './utils'
+import parseAmount from './amount'
+import {removeUndefined, txFlags} from '../../common'
+const flags = txFlags.OfferCreate
 
 function parseOrder(tx: Object): Object {
   assert(tx.TransactionType === 'OfferCreate')
@@ -14,7 +15,7 @@ function parseOrder(tx: Object): Object {
   const quantity = (direction === 'buy') ? takerPaysAmount : takerGetsAmount
   const totalPrice = (direction === 'buy') ? takerGetsAmount : takerPaysAmount
 
-  return utils.removeUndefined({
+  return removeUndefined({
     direction: direction,
     quantity: quantity,
     totalPrice: totalPrice,
@@ -22,8 +23,8 @@ function parseOrder(tx: Object): Object {
     immediateOrCancel: ((tx.Flags & flags.ImmediateOrCancel) !== 0)
       || undefined,
     fillOrKill: ((tx.Flags & flags.FillOrKill) !== 0) || undefined,
-    expirationTime: utils.parseTimestamp(tx.Expiration)
+    expirationTime: parseTimestamp(tx.Expiration)
   })
 }
 
-module.exports = parseOrder
+export default parseOrder

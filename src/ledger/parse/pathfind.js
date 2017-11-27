@@ -1,9 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const parseAmount = require('./amount')
-import type {Amount, RippledAmount} from '../../common/types.js'
-import type {GetPaths, RippledPathsResponse} from '../pathfind-types.js'
+
+import * as _ from 'lodash'
+import parseAmount from './amount'
+import type {Amount, RippledAmount} from '../../common/types'
+import type {GetPaths, RippledPathsResponse} from '../pathfind-types'
 
 function parsePaths(paths) {
   return paths.map(steps => steps.map(step =>
@@ -48,4 +48,4 @@ function parsePathfind(pathfindResult: RippledPathsResponse): GetPaths {
     sourceAddress, destinationAddress, destinationAmount))
 }
 
-module.exports = parsePathfind
+export default parsePathfind

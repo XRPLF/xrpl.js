@@ -1,14 +1,14 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const utils = require('../utils')
-import type {Amount, RippledAmount} from '../../common/types.js'
+
+import * as common from '../../common'
+import type {Amount, RippledAmount} from '../../common/types'
 
 
 function parseAmount(amount: RippledAmount): Amount {
   if (typeof amount === 'string') {
     return {
       currency: 'XRP',
-      value: utils.common.dropsToXrp(amount)
+      value: common.dropsToXrp(amount)
     }
   }
   return {
@@ -18,4 +18,4 @@ function parseAmount(amount: RippledAmount): Amount {
   }
 }
 
-module.exports = parseAmount
+export default parseAmount

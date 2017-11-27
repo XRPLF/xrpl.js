@@ -1,9 +1,10 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
-const flags = require('./flags').orderFlags
-const parseAmount = require('./amount')
-const BigNumber = require('bignumber.js')
+
+import BigNumber from 'bignumber.js'
+import parseAmount from './amount'
+import {parseTimestamp, adjustQualityForXRP} from './utils'
+import {removeUndefined} from '../../common'
+import {orderFlags} from './flags'
 
 // TODO: remove this function once rippled provides quality directly
 function computeQuality(takerGets, takerPays) {
@@ -14,7 +15,7 @@ function computeQuality(takerGets, takerPays) {
 // rippled 'account_offers' returns a different format for orders than 'tx'
 // the flags are also different
 function parseAccountOrder(address: string, order: Object): Object {
-  const direction = (order.flags & flags.Sell) === 0 ? 'buy' : 'sell'
+  const direction = (order.flags & orderFlags.Sell) === 0 ? 'buy' : 'sell'
   const takerGetsAmount = parseAmount(order.taker_gets)
   const takerPaysAmount = parseAmount(order.taker_pays)
   const quantity = (direction === 'buy') ? takerPaysAmount : takerGetsAmount
@@ -22,17 +23,17 @@ function parseAccountOrder(address: string, order: Object): Object {
 
   // note: immediateOrCancel and fillOrKill orders cannot enter the order book
   // so we can omit those flags here
-  const specification = utils.removeUndefined({
+  const specification = removeUndefined({
     direction: direction,
     quantity: quantity,
     totalPrice: totalPrice,
-    passive: ((order.flags & flags.Passive) !== 0) || undefined,
+    passive: ((order.flags & orderFlags.Passive) !== 0) || undefined,
     // rippled currently does not provide "expiration" in account_offers
-    expirationTime: utils.parseTimestamp(order.expiration)
+    expirationTime: parseTimestamp(order.expiration)
   })
 
   const makerExchangeRate = order.quality ?
-    utils.adjustQualityForXRP(order.quality.toString(),
+    adjustQualityForXRP(order.quality.toString(),
       takerGetsAmount.currency, takerPaysAmount.currency) :
     computeQuality(takerGetsAmount, takerPaysAmount)
   const properties = {
@@ -44,4 +45,4 @@ function parseAccountOrder(address: string, order: Object): Object {
   return {specification, properties}
 }
 
-module.exports = parseAccountOrder
+export default parseAccountOrder

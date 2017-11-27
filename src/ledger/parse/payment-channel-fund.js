@@ -1,17 +1,18 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const assert = require('assert')
-const utils = require('./utils')
-const parseAmount = require('./amount')
+
+import assert from 'assert'
+import {parseTimestamp} from './utils'
+import {removeUndefined} from '../../common'
+import parseAmount from './amount'
 
 function parsePaymentChannelFund(tx: Object): Object {
   assert(tx.TransactionType === 'PaymentChannelFund')
 
-  return utils.removeUndefined({
+  return removeUndefined({
     channel: tx.Channel,
     amount: parseAmount(tx.Amount).value,
-    expiration: tx.Expiration && utils.parseTimestamp(tx.Expiration)
+    expiration: tx.Expiration && parseTimestamp(tx.Expiration)
   })
 }
 
-module.exports = parsePaymentChannelFund
+export default parsePaymentChannelFund

@@ -1,20 +1,21 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const assert = require('assert')
-const utils = require('./utils')
-const parsePayment = require('./payment')
-const parseTrustline = require('./trustline')
-const parseOrder = require('./order')
-const parseOrderCancellation = require('./cancellation')
-const parseSettings = require('./settings')
-const parseEscrowCreation = require('./escrow-creation')
-const parseEscrowExecution = require('./escrow-execution')
-const parseEscrowCancellation = require('./escrow-cancellation')
-const parsePaymentChannelCreate = require('./payment-channel-create')
-const parsePaymentChannelFund = require('./payment-channel-fund')
-const parsePaymentChannelClaim = require('./payment-channel-claim')
-const parseFeeUpdate = require('./fee-update')
-const parseAmendment = require('./amendment')
+
+import assert from 'assert'
+import {parseOutcome} from './utils'
+import {removeUndefined} from '../../common'
+import parsePayment from './payment'
+import parseTrustline from './trustline'
+import parseOrder from './order'
+import parseOrderCancellation from './cancellation'
+import parseSettings from './settings'
+import parseEscrowCreation from './escrow-creation'
+import parseEscrowExecution from './escrow-execution'
+import parseEscrowCancellation from './escrow-cancellation'
+import parsePaymentChannelCreate from './payment-channel-create'
+import parsePaymentChannelFund from './payment-channel-fund'
+import parsePaymentChannelClaim from './payment-channel-claim'
+import parseFeeUpdate from './fee-update'
+import parseAmendment from './amendment'
 
 function parseTransactionType(type) {
   const mapping = {
@@ -57,15 +58,15 @@ function parseTransaction(tx: Object): Object {
   const parser: Function = (mapping: Object)[type]
   assert(parser !== undefined, 'Unrecognized transaction type')
   const specification = parser(tx)
-  const outcome = utils.parseOutcome(tx)
-  return utils.removeUndefined({
+  const outcome = parseOutcome(tx)
+  return removeUndefined({
     type: type,
     address: tx.Account,
     sequence: tx.Sequence,
     id: tx.hash,
-    specification: utils.removeUndefined(specification),
-    outcome: outcome ? utils.removeUndefined(outcome) : undefined
+    specification: removeUndefined(specification),
+    outcome: outcome ? removeUndefined(outcome) : undefined
   })
 }
 
-module.exports = parseTransaction
+export default parseTransaction

@@ -1,12 +1,12 @@
 // flow is disabled for this file until support for requiring json is added:
 // https://github.com/facebook/flow/issues/167
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const assert = require('assert')
-const Validator = require('jsonschema').Validator
-const ValidationError = require('./errors').ValidationError
-const {isValidAddress} = require('ripple-address-codec')
-const {isValidSecret} = require('./utils')
+
+import * as _ from 'lodash'
+import assert from 'assert'
+import {Validator} from 'jsonschema'
+import {ValidationError} from './errors'
+import {isValidAddress} from 'ripple-address-codec'
+import {isValidSecret} from './utils'
 
 function loadSchemas() {
   // listed explicitly for webpack (instead of scanning schemas directory)
@@ -150,7 +150,7 @@ function schemaValidate(schemaName: string, object: any): void {
   }
 }
 
-module.exports = {
+export {
   schemaValidate,
   isValidSecret
 }

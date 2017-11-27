@@ -1,14 +1,14 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const assert = require('assert')
-const utils = require('./utils')
-const parseAmount = require('./amount')
-const claimFlags = utils.txFlags.PaymentChannelClaim
+
+import assert from 'assert'
+import {removeUndefined, txFlags} from '../../common'
+import parseAmount from './amount'
+const claimFlags = txFlags.PaymentChannelClaim
 
 function parsePaymentChannelClaim(tx: Object): Object {
   assert(tx.TransactionType === 'PaymentChannelClaim')
 
-  return utils.removeUndefined({
+  return removeUndefined({
     channel: tx.Channel,
     balance: tx.Balance && parseAmount(tx.Balance).value,
     amount: tx.Amount && parseAmount(tx.Amount).value,
@@ -19,4 +19,4 @@ function parsePaymentChannelClaim(tx: Object): Object {
   })
 }
 
-module.exports = parsePaymentChannelClaim
+export default parsePaymentChannelClaim

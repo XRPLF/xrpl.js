@@ -1,9 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const {removeUndefined, rippleTimeToISO8601} = require('./utils')
-const parseTransaction = require('./transaction')
-import type {GetLedger} from '../types.js'
+
+import * as _ from 'lodash'
+import {removeUndefined, rippleTimeToISO8601} from '../../common'
+import parseTransaction from './transaction'
+import type {GetLedger} from '../types'
 
 function parseTransactionWrapper(ledgerVersion, tx) {
   const transaction = _.assign({}, _.omit(tx, 'metaData'), {
@@ -60,4 +60,4 @@ function parseLedger(ledger: Object): GetLedger {
   ))
 }
 
-module.exports = parseLedger
+export default parseLedger

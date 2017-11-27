@@ -1,11 +1,9 @@
 /* eslint-disable new-cap */
-'use strict' // eslint-disable-line strict
 
-const assert = require('assert')
-const _ = require('lodash')
-const jayson = require('jayson')
-
-const RippleAPI = require('./api').RippleAPI
+import assert from 'assert'
+import * as _ from 'lodash'
+import jayson from 'jayson'
+import {RippleAPI} from './api'
 
 
 /* istanbul ignore next */
@@ -81,6 +79,6 @@ function createHTTPServer(options, httpPort) {
   }
 }
 
-module.exports = {
+export {
   createHTTPServer
 }

@@ -1,12 +1,12 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
+
+import * as _ from 'lodash'
+import BigNumber from 'bignumber.js'
+import * as utils from './utils'
 const validate = utils.common.validate
 const trustlineFlags = utils.common.txFlags.TrustSet
-const BigNumber = require('bignumber.js')
-import type {Instructions, Prepare} from './types.js'
-import type {TrustLineSpecification} from '../ledger/trustlines-types.js'
+import type {Instructions, Prepare} from './types'
+import type {TrustLineSpecification} from '../ledger/trustlines-types'
 
 function convertQuality(quality) {
   return (new BigNumber(quality)).shift(9).truncated().toNumber()
@@ -58,4 +58,4 @@ function prepareTrustline(address: string,
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareTrustline
+export default prepareTrustline

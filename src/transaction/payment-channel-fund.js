@@ -1,8 +1,8 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
-const {validate, iso8601ToRippleTime, xrpToDrops} = utils.common
-import type {Instructions, Prepare} from './types.js'
+
+import * as utils from './utils'
+import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
+import type {Instructions, Prepare} from './types'
 
 type PaymentChannelFund = {
   channel: string,
@@ -38,4 +38,4 @@ function preparePaymentChannelFund(address: string,
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = preparePaymentChannelFund
+export default preparePaymentChannelFund

@@ -1,11 +1,11 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
-const {validate, iso8601ToRippleTime, xrpToDrops} = utils.common
+
+import * as _ from 'lodash'
+import * as utils from './utils'
+import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
 const ValidationError = utils.common.errors.ValidationError
-import type {Instructions, Prepare} from './types.js'
-import type {Memo} from '../common/types.js'
+import type {Instructions, Prepare} from './types'
+import type {Memo} from '../common/types'
 
 type EscrowCreation = {
   amount: string,
@@ -65,4 +65,4 @@ function prepareEscrowCreation(address: string,
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareEscrowCreation
+export default prepareEscrowCreation

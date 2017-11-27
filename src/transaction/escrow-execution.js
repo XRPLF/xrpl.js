@@ -1,11 +1,11 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
+
+import * as _ from 'lodash'
+import * as utils from './utils'
 const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
-import type {Instructions, Prepare} from './types.js'
-import type {Memo} from '../common/types.js'
+import type {Instructions, Prepare} from './types'
+import type {Memo} from '../common/types'
 
 type EscrowExecution = {
   owner: string,
@@ -53,4 +53,4 @@ function prepareEscrowExecution(address: string,
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareEscrowExecution
+export default prepareEscrowExecution

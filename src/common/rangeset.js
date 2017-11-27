@@ -1,7 +1,7 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const assert = require('assert')
+
+import * as _ from 'lodash'
+import assert from 'assert'
 
 function mergeIntervals(intervals: Array<[number, number]>) {
   const stack = [[-Infinity, -Infinity]]
@@ -19,7 +19,7 @@ function mergeIntervals(intervals: Array<[number, number]>) {
 
 class RangeSet {
 
-  ranges: Array<[number, number]>;
+  ranges: Array<[number, number]>
 
   constructor() {
     this.reset()
@@ -60,4 +60,4 @@ class RangeSet {
   }
 }
 
-module.exports.RangeSet = RangeSet
+export default RangeSet

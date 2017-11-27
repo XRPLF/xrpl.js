@@ -1,6 +1,6 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const common = require('../common')
+
+import * as common from '../common'
 import type {GetServerInfoResponse} from '../common/serverinfo'
 
 function isConnected(): boolean {
@@ -41,7 +41,7 @@ function formatLedgerClose(ledgerClose: Object): Object {
   }
 }
 
-module.exports = {
+export {
   connect,
   disconnect,
   isConnected,

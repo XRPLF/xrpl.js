@@ -1,6 +1,6 @@
-'use strict' // eslint-disable-line strict
-const util = require('util')
-const browserHacks = require('./browser-hacks')
+
+import util from 'util'
+import * as browserHacks from './browser-hacks'
 
 // this is needed because extending builtins doesn't work in babel 6.x
 function extendableBuiltin(cls) {
@@ -80,7 +80,7 @@ class PendingLedgerVersionError extends RippleError {
   }
 }
 
-module.exports = {
+export {
   RippleError,
   UnexpectedError,
   ConnectionError,

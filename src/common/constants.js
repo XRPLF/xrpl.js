@@ -1,5 +1,5 @@
-'use strict' // eslint-disable-line strict
-const flagIndices = require('./txflags').txFlagIndices.AccountSet
+
+import {txFlagIndices} from './txflags'
 
 const accountRootFlags = {
   PasswordSpent: 0x00010000, // password set fee is spent
@@ -24,14 +24,14 @@ const AccountFlags = {
 }
 
 const AccountFlagIndices = {
-  requireDestinationTag: flagIndices.asfRequireDest,
-  requireAuthorization: flagIndices.asfRequireAuth,
-  disallowIncomingXRP: flagIndices.asfDisallowXRP,
-  disableMasterKey: flagIndices.asfDisableMaster,
-  enableTransactionIDTracking: flagIndices.asfAccountTxnID,
-  noFreeze: flagIndices.asfNoFreeze,
-  globalFreeze: flagIndices.asfGlobalFreeze,
-  defaultRipple: flagIndices.asfDefaultRipple
+  requireDestinationTag: txFlagIndices.AccountSet.asfRequireDest,
+  requireAuthorization: txFlagIndices.AccountSet.asfRequireAuth,
+  disallowIncomingXRP: txFlagIndices.AccountSet.asfDisallowXRP,
+  disableMasterKey: txFlagIndices.AccountSet.asfDisableMaster,
+  enableTransactionIDTracking: txFlagIndices.AccountSet.asfAccountTxnID,
+  noFreeze: txFlagIndices.AccountSet.asfNoFreeze,
+  globalFreeze: txFlagIndices.AccountSet.asfGlobalFreeze,
+  defaultRipple: txFlagIndices.AccountSet.asfDefaultRipple
 }
 
 const AccountFields = {
@@ -42,7 +42,7 @@ const AccountFields = {
   TransferRate: {name: 'transferRate', defaults: 0, shift: 9}
 }
 
-module.exports = {
+export {
   AccountFields,
   AccountFlagIndices,
   AccountFlags

@@ -1,13 +1,13 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const assert = require('assert')
-const BigNumber = require('bignumber.js')
-const utils = require('./utils')
+
+import * as _ from 'lodash'
+import assert from 'assert'
+import BigNumber from 'bignumber.js'
+import * as utils from './utils'
 const validate = utils.common.validate
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices
 const AccountFields = utils.common.constants.AccountFields
-import type {Instructions, Prepare} from './types.js'
+import type {Instructions, Prepare} from './types'
 
 type Settings = {
   passwordSpent?: boolean,
@@ -152,4 +152,4 @@ function prepareSettings(address: string, settings: Settings,
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareSettings
+export default prepareSettings

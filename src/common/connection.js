@@ -1,13 +1,13 @@
-'use strict' // eslint-disable-line strict
 
-const _ = require('lodash')
-const {EventEmitter} = require('events')
-const WebSocket = require('ws')
-const parseURL = require('url').parse
-const RangeSet = require('./rangeset').RangeSet
-const {RippledError, DisconnectedError, NotConnectedError,
+
+import * as _ from 'lodash'
+import events from 'events'
+import WebSocket from 'ws'
+import urlLib from 'url'
+import RangeSet from './rangeset'
+import {RippledError, DisconnectedError, NotConnectedError,
   TimeoutError, ResponseFormatError, ConnectionError,
-  RippledNotInitializedError} = require('./errors')
+  RippledNotInitializedError} from './errors'
 
 function isStreamMessageType(type) {
   return type === 'ledgerClosed' ||
@@ -15,7 +15,7 @@ function isStreamMessageType(type) {
          type === 'path_find'
 }
 
-class Connection extends EventEmitter {
+class Connection extends events.EventEmitter {
   constructor(url, options = {}) {
     super()
     this.setMaxListeners(Infinity)
@@ -226,8 +226,8 @@ class Connection extends EventEmitter {
   _createWebSocket() {
     const options = {}
     if (this._proxyURL !== undefined) {
-      const parsedURL = parseURL(this._url)
-      const parsedProxyURL = parseURL(this._proxyURL)
+      const parsedURL = urlLib.parse(this._url)
+      const parsedProxyURL = urlLib.parse(this._proxyURL)
       const proxyOverrides = _.omitBy({
         secureEndpoint: (parsedURL.protocol === 'wss:'),
         secureProxy: (parsedProxyURL.protocol === 'https:'),
@@ -446,4 +446,4 @@ class Connection extends EventEmitter {
   }
 }
 
-module.exports = Connection
+export default Connection

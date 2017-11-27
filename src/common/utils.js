@@ -1,10 +1,10 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const BigNumber = require('bignumber.js')
-const {deriveKeypair} = require('ripple-keypairs')
 
-import type {Amount, RippledAmount} from './types.js'
+import * as _ from 'lodash'
+import BigNumber from 'bignumber.js'
+import {deriveKeypair} from 'ripple-keypairs'
+
+import type {Amount, RippledAmount} from './types'
 
 function isValidSecret(secret: string): boolean {
   try {
@@ -82,7 +82,7 @@ function iso8601ToRippleTime(iso8601: string): number {
   return unixToRippleTimestamp(Date.parse(iso8601))
 }
 
-module.exports = {
+export {
   dropsToXrp,
   xrpToDrops,
   toRippledAmount,
@@ -92,3 +92,4 @@ module.exports = {
   iso8601ToRippleTime,
   isValidSecret
 }
+
