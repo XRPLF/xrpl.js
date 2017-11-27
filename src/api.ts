@@ -39,6 +39,14 @@ import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
 import getLedger from './ledger/ledger'
 
+import {
+  AccountOffersRequest, AccountOffersResponse,
+  AccountInfoRequest, AccountInfoResponse,
+  AccountLinesRequest, AccountLinesResponse,
+  BookOffersRequest, BookOffersResponse,
+  GatewayBalancesRequest, GatewayBalancesResponse
+} from './common/types/commands'
+
 
 import RangeSet from './common/rangeset'
 import * as ledgerUtils from './ledger/utils'
@@ -50,6 +58,23 @@ type APIOptions = {
   trace?: boolean,
   proxy?: string,
   timeout?: number
+}
+
+/**
+ * Get the response key / property name that contains the listed data for a
+ * command. This varies from command to command, but we need to know it to
+ * properly count across many requests.
+ */
+function getCollectKeyFromCommand(command: string): string|undefined {
+  switch (command) {
+    case 'account_offers':
+    case 'book_offers':
+      return 'offers'
+    case 'account_lines':
+      return 'lines'
+    default:
+      return undefined
+  }
 }
 
 // prevent access to non-validated ledger versions
@@ -104,6 +129,87 @@ class RippleAPI extends EventEmitter {
       // tries to call a method that requires a connection
       this.connection = new RestrictedConnection(null, options)
     }
+  }
+
+  /**
+   * Makes a simple request to the API with the given command and any
+   * additional request body parameters.
+   *
+   * NOTE: This command is under development and should not yet be relied
+   * on by external consumers.
+   */
+  async _request(command: 'account_info', params: AccountInfoRequest):
+    Promise<AccountInfoResponse>
+  async _request(command: 'account_lines', params: AccountLinesRequest):
+    Promise<AccountLinesResponse>
+  async _request(command: 'account_offers', params: AccountOffersRequest):
+  Promise<AccountOffersResponse>
+  async _request(command: 'book_offers', params: BookOffersRequest):
+    Promise<BookOffersResponse>
+  async _request(command: 'gateway_balances', params: GatewayBalancesRequest):
+    Promise<GatewayBalancesResponse>
+  async _request(command: string, params: any = {}) {
+    return this.connection.request({
+      ...params,
+      command
+    })
+  }
+
+  /**
+   * Makes multiple paged requests to the API to return a given number of
+   * resources. __requestAll() will make multiple requests until the `limit`
+   * number of resources is reached (if no `limit` is provided, a single request
+   * will be made).
+   *
+   * If the command is unknown, an additional `collect` property is required to
+   * know which response key contains the array of resources.
+   *
+   * NOTE: This command is under development and should not yet be relied
+   * on by external consumers.
+   */
+  async _requestAll(command: 'account_offers', params: AccountOffersRequest):
+    Promise<AccountOffersResponse[]>
+  async _requestAll(command: 'book_offers', params: BookOffersRequest):
+    Promise<BookOffersResponse[]>
+  async _requestAll(command: 'account_lines', params: AccountLinesRequest):
+    Promise<AccountLinesResponse[]>
+  async _requestAll(
+    command: string,
+    params: any = {},
+    options: {collect?: string} = {}): Promise<any[]> {
+    // If limit wasn't provided, return a single request in the _requestAll
+    // array format.
+    if (params.limit === undefined) {
+      return [await this._request(<any>command, params)]
+    }
+    // The data under collection is keyed based on the command. Fail if command
+    // not recognized and collection key not provided.
+    const collectKey = options.collect || getCollectKeyFromCommand(command)
+    if (!collectKey) {
+      throw new errors.ValidationError(`no collect key for command ${command}`)
+    }
+    const results = []
+    let count = 0
+    const countTo = params.limit
+    let marker = params.marker
+    let lastBatchLength
+    do {
+      const countRemaining = countTo - count
+      const repeatProps = {
+        ...params,
+        limit: countRemaining,
+        marker
+      }
+      // NOTE: We have to generalize the `this._request()` function signature
+      // here until we add support for unknown commands (since command is some
+      // unknown string).
+      const singleResult = await (<Function>this._request)(command, repeatProps)
+      marker = singleResult.marker
+      count += singleResult[collectKey].length
+      lastBatchLength = singleResult[collectKey].length
+      results.push(singleResult)
+    } while(!!marker && count < countTo && lastBatchLength !== 0)
+    return results
   }
 
   connect = connect

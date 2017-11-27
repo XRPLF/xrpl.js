@@ -4,14 +4,14 @@ import * as utils from './utils'
 const validate = utils.common.validate
 const trustlineFlags = utils.common.txFlags.TrustSet
 import {Instructions, Prepare} from './types'
-import {TrustLineSpecification} from '../ledger/trustlines-types'
+import {ParsedTrustlineSpecification} from '../common/types/objects/trustlines'
 
 function convertQuality(quality) {
   return (new BigNumber(quality)).shift(9).truncated().toNumber()
 }
 
 function createTrustlineTransaction(account: string,
-  trustline: TrustLineSpecification
+  trustline: ParsedTrustlineSpecification
 ): Object {
   const limit = {
     currency: trustline.currency,
@@ -49,7 +49,7 @@ function createTrustlineTransaction(account: string,
 }
 
 function prepareTrustline(address: string,
-  trustline: TrustLineSpecification, instructions: Instructions = {}
+  trustline: ParsedTrustlineSpecification, instructions: Instructions = {}
 ): Promise<Prepare> {
   validate.prepareTrustline({address, trustline, instructions})
   const txJSON = createTrustlineTransaction(address, trustline)

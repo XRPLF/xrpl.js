@@ -1,5 +1,5 @@
 
-import {Amount, Memo} from '../common/types'
+import {Amount, Memo} from '../common/types/objects'
 
 type Outcome = {
   result: string,

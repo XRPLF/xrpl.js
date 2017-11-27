@@ -6,7 +6,7 @@ const validate = utils.common.validate
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices
 const AccountFields = utils.common.constants.AccountFields
 import {Instructions, Prepare} from './types'
-import {Memo} from '../common/types'
+import {Memo} from '../common/types/objects'
 
 type WeightedSigner = {address: string, weight: number}
 type SettingsSigners = {
