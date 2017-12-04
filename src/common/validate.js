@@ -1,8 +1,8 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const ValidationError = require('./errors').ValidationError
-const schemaValidate = require('./schema-validator').schemaValidate
+
+import * as _ from 'lodash'
+import {ValidationError} from './errors'
+import {schemaValidate} from './schema-validator'
 
 function error(text) {
   return new ValidationError(text)
@@ -22,46 +22,98 @@ function validateOptions(schema, instance) {
   validateLedgerRange(instance.options)
 }
 
-module.exports = {
-  getPaths: _.partial(schemaValidate, 'getPathsParameters'),
-  getTransactions: _.partial(validateOptions, 'getTransactionsParameters'),
-  getSettings: _.partial(validateOptions, 'getSettingsParameters'),
-  getAccountInfo: _.partial(validateOptions, 'getAccountInfoParameters'),
-  getTrustlines: _.partial(validateOptions, 'getTrustlinesParameters'),
-  getBalances: _.partial(validateOptions, 'getBalancesParameters'),
-  getBalanceSheet: _.partial(validateOptions, 'getBalanceSheetParameters'),
-  getOrders: _.partial(validateOptions, 'getOrdersParameters'),
-  getOrderbook: _.partial(validateOptions, 'getOrderbookParameters'),
-  getTransaction: _.partial(validateOptions, 'getTransactionParameters'),
-  getPaymentChannel: _.partial(validateOptions, 'getPaymentChannelParameters'),
-  getLedger: _.partial(validateOptions, 'getLedgerParameters'),
-  preparePayment: _.partial(schemaValidate, 'preparePaymentParameters'),
-  prepareOrder: _.partial(schemaValidate, 'prepareOrderParameters'),
-  prepareOrderCancellation:
-    _.partial(schemaValidate, 'prepareOrderCancellationParameters'),
-  prepareTrustline: _.partial(schemaValidate, 'prepareTrustlineParameters'),
-  prepareSettings: _.partial(schemaValidate, 'prepareSettingsParameters'),
-  prepareEscrowCreation: _.partial(schemaValidate,
-    'prepareEscrowCreationParameters'),
-  prepareEscrowCancellation: _.partial(schemaValidate,
-    'prepareEscrowCancellationParameters'),
-  prepareEscrowExecution: _.partial(schemaValidate,
-    'prepareEscrowExecutionParameters'),
-  preparePaymentChannelCreate: _.partial(schemaValidate,
-    'preparePaymentChannelCreateParameters'),
-  preparePaymentChannelFund: _.partial(schemaValidate,
-    'preparePaymentChannelFundParameters'),
-  preparePaymentChannelClaim: _.partial(schemaValidate,
-    'preparePaymentChannelClaimParameters'),
-  sign: _.partial(schemaValidate, 'signParameters'),
-  combine: _.partial(schemaValidate, 'combineParameters'),
-  submit: _.partial(schemaValidate, 'submitParameters'),
-  computeLedgerHash: _.partial(schemaValidate, 'computeLedgerHashParameters'),
-  generateAddress: _.partial(schemaValidate, 'generateAddressParameters'),
-  signPaymentChannelClaim: _.partial(schemaValidate,
-    'signPaymentChannelClaimParameters'),
-  verifyPaymentChannelClaim: _.partial(schemaValidate,
-    'verifyPaymentChannelClaimParameters'),
-  apiOptions: _.partial(schemaValidate, 'api-options'),
-  instructions: _.partial(schemaValidate, 'instructions')
-}
+export const getPaths =
+  _.partial(schemaValidate, 'getPathsParameters')
+
+export const getTransactions =
+_.partial(validateOptions, 'getTransactionsParameters')
+
+export const getSettings =
+_.partial(validateOptions, 'getSettingsParameters')
+
+export const getAccountInfo =
+_.partial(validateOptions, 'getAccountInfoParameters')
+
+export const getTrustlines =
+_.partial(validateOptions, 'getTrustlinesParameters')
+
+export const getBalances =
+_.partial(validateOptions, 'getBalancesParameters')
+
+export const getBalanceSheet =
+_.partial(validateOptions, 'getBalanceSheetParameters')
+
+export const getOrders =
+_.partial(validateOptions, 'getOrdersParameters')
+
+export const getOrderbook =
+_.partial(validateOptions, 'getOrderbookParameters')
+
+export const getTransaction =
+_.partial(validateOptions, 'getTransactionParameters')
+
+export const getPaymentChannel =
+_.partial(validateOptions, 'getPaymentChannelParameters')
+
+export const getLedger =
+_.partial(validateOptions, 'getLedgerParameters')
+
+export const preparePayment =
+_.partial(schemaValidate, 'preparePaymentParameters')
+
+export const prepareOrder =
+_.partial(schemaValidate, 'prepareOrderParameters')
+
+export const prepareOrderCancellation =
+_.partial(schemaValidate, 'prepareOrderCancellationParameters')
+
+export const prepareTrustline =
+_.partial(schemaValidate, 'prepareTrustlineParameters')
+
+export const prepareSettings =
+_.partial(schemaValidate, 'prepareSettingsParameters')
+
+export const prepareEscrowCreation =
+_.partial(schemaValidate, 'prepareEscrowCreationParameters')
+
+export const prepareEscrowCancellation =
+_.partial(schemaValidate, 'prepareEscrowCancellationParameters')
+
+export const prepareEscrowExecution =
+_.partial(schemaValidate, 'prepareEscrowExecutionParameters')
+
+export const preparePaymentChannelCreate =
+_.partial(schemaValidate, 'preparePaymentChannelCreateParameters')
+
+export const preparePaymentChannelFund =
+_.partial(schemaValidate, 'preparePaymentChannelFundParameters')
+
+export const preparePaymentChannelClaim =
+_.partial(schemaValidate, 'preparePaymentChannelClaimParameters')
+
+export const sign =
+_.partial(schemaValidate, 'signParameters')
+
+export const combine =
+_.partial(schemaValidate, 'combineParameters')
+
+export const submit =
+_.partial(schemaValidate, 'submitParameters')
+
+export const computeLedgerHash =
+_.partial(schemaValidate, 'computeLedgerHashParameters')
+
+export const generateAddress =
+_.partial(schemaValidate, 'generateAddressParameters')
+
+export const signPaymentChannelClaim =
+_.partial(schemaValidate, 'signPaymentChannelClaimParameters')
+
+export const verifyPaymentChannelClaim =
+_.partial(schemaValidate, 'verifyPaymentChannelClaimParameters')
+
+export const apiOptions =
+_.partial(schemaValidate, 'api-options')
+
+export const instructions =
+_.partial(schemaValidate, 'instructions')

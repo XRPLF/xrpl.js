@@ -1,4 +1,4 @@
-'use strict' // eslint-disable-line strict
+
 
 const orderFlags = {
   Passive: 0x00010000,
@@ -16,7 +16,7 @@ const trustlineFlags = {
   HighFreeze: 0x00800000
 }
 
-module.exports = {
+export {
   orderFlags,
   trustlineFlags
 }

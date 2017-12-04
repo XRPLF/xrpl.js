@@ -1,10 +1,10 @@
-'use strict' // eslint-disable-line strict
+
 
 function setPrototypeOf(object, prototype) {
   // Object.setPrototypeOf not supported on Internet Explorer 9
   /* eslint-disable */
   Object.setPrototypeOf ? Object.setPrototypeOf(object, prototype) :
-    object.__proto__ = prototype;
+    object.__proto__ = prototype
   /* eslint-enable */
 }
 
@@ -15,7 +15,7 @@ function getConstructorName(object) {
     object.constructor.name
 }
 
-module.exports = {
+export {
   getConstructorName,
   setPrototypeOf
 }

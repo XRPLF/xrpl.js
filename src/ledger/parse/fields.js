@@ -1,8 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const BigNumber = require('bignumber.js')
-const AccountFields = require('./utils').constants.AccountFields
+
+import * as _ from 'lodash'
+import BigNumber from 'bignumber.js'
+import {constants} from '../../common'
+const AccountFields = constants.AccountFields
 
 function parseField(info, value) {
   if (info.encoding === 'hex' && !info.length) { // e.g. "domain"
@@ -49,4 +50,4 @@ function parseFields(data: Object): Object {
   return settings
 }
 
-module.exports = parseFields
+export default parseFields

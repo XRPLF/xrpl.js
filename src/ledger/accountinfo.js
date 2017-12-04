@@ -1,8 +1,6 @@
 /* @flow */
 
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
-const {validate, removeUndefined} = utils.common
+import {validate, removeUndefined, dropsToXrp} from '../common'
 
 type AccountData = {
   Sequence: number,
@@ -42,7 +40,7 @@ function formatAccountInfo(response: AccountDataResponse) {
   const data = response.account_data
   return removeUndefined({
     sequence: data.Sequence,
-    xrpBalance: utils.common.dropsToXrp(data.Balance),
+    xrpBalance: dropsToXrp(data.Balance),
     ownerCount: data.OwnerCount,
     previousInitiatedTransactionID: data.AccountTxnID,
     previousAffectingTransactionID: data.PreviousTxnID,
@@ -63,4 +61,4 @@ function getAccountInfo(address: string, options: AccountInfoOptions = {}
   return this.connection.request(request).then(formatAccountInfo)
 }
 
-module.exports = getAccountInfo
+export default getAccountInfo

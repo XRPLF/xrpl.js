@@ -1,9 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
-const {validate} = utils.common
-import type {Submit} from './types.js'
+
+import * as _ from 'lodash'
+import * as utils from './utils'
+import {validate} from '../common'
+import type {Submit} from './types'
 
 function isImmediateRejection(engineResult: string): boolean {
   // note: "tel" errors mean the local server refused to process the
@@ -36,4 +36,4 @@ function submit(signedTransaction: string): Promise<Submit> {
   return this.connection.request(request).then(formatSubmitResponse)
 }
 
-module.exports = submit
+export default submit

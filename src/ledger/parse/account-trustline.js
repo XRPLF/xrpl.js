@@ -1,6 +1,7 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
+
+import {parseQuality} from './utils'
+import {removeUndefined} from '../../common'
 
 type Trustline = {
   account: string, limit: number, currency: string, quality_in: ?number,
@@ -20,18 +21,18 @@ type AccountTrustline = {
 // rippled 'account_lines' returns a different format for
 // trustlines than 'tx'
 function parseAccountTrustline(trustline: Trustline): AccountTrustline {
-  const specification = utils.removeUndefined({
+  const specification = removeUndefined({
     limit: trustline.limit,
     currency: trustline.currency,
     counterparty: trustline.account,
-    qualityIn: utils.parseQuality(trustline.quality_in) || undefined,
-    qualityOut: utils.parseQuality(trustline.quality_out) || undefined,
+    qualityIn: parseQuality(trustline.quality_in) || undefined,
+    qualityOut: parseQuality(trustline.quality_out) || undefined,
     ripplingDisabled: trustline.no_ripple || undefined,
     frozen: trustline.freeze || undefined,
     authorized: trustline.authorized || undefined
   })
   // rippled doesn't provide the counterparty's qualities
-  const counterparty = utils.removeUndefined({
+  const counterparty = removeUndefined({
     limit: trustline.limit_peer,
     ripplingDisabled: trustline.no_ripple_peer || undefined,
     frozen: trustline.freeze_peer || undefined,
@@ -43,4 +44,4 @@ function parseAccountTrustline(trustline: Trustline): AccountTrustline {
   return {specification, counterparty, state}
 }
 
-module.exports = parseAccountTrustline
+export default parseAccountTrustline

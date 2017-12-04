@@ -1,22 +1,23 @@
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
-
-module.exports = {
-  Connection: require('./connection'),
-  constants: require('./constants'),
-  errors: require('./errors'),
-  validate: require('./validate'),
-  txFlags: require('./txflags').txFlags,
-  serverInfo: require('./serverinfo'),
-  dropsToXrp: utils.dropsToXrp,
-  xrpToDrops: utils.xrpToDrops,
-  toRippledAmount: utils.toRippledAmount,
-  generateAddress: utils.generateAddress,
-  generateAddressAPI: utils.generateAddressAPI,
-  removeUndefined: utils.removeUndefined,
-  convertKeysFromSnakeCaseToCamelCase:
-    utils.convertKeysFromSnakeCaseToCamelCase,
-  iso8601ToRippleTime: utils.iso8601ToRippleTime,
-  rippleTimeToISO8601: utils.rippleTimeToISO8601,
-  isValidSecret: utils.isValidSecret
+import * as constants from './constants'
+import * as errors from './errors'
+import * as validate from './validate'
+import * as serverInfo from './serverinfo'
+export {
+  constants,
+  errors,
+  validate,
+  serverInfo
 }
+
+export {
+  dropsToXrp,
+  xrpToDrops,
+  toRippledAmount,
+  removeUndefined,
+  convertKeysFromSnakeCaseToCamelCase,
+  iso8601ToRippleTime,
+  rippleTimeToISO8601
+} from './utils'
+export {default as Connection} from './connection'
+export {txFlags} from './txflags'
+

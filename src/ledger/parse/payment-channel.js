@@ -1,6 +1,7 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
+
+import {parseTimestamp} from './utils'
+import {removeUndefined, dropsToXrp} from '../../common'
 
 type PaymentChannelResponse = {
   account: string,
@@ -17,15 +18,15 @@ type PaymentChannelResponse = {
 }
 
 function parsePaymentChannel(data: Object): PaymentChannelResponse {
-  return utils.removeUndefined({
+  return removeUndefined({
     account: data.Account,
-    amount: utils.dropsToXrp(data.Amount),
-    balance: utils.dropsToXrp(data.Balance),
+    amount: dropsToXrp(data.Amount),
+    balance: dropsToXrp(data.Balance),
     destination: data.Destination,
     publicKey: data.PublicKey,
     settleDelay: data.SettleDelay,
-    expiration: utils.parseTimestamp(data.Expiration),
-    cancelAfter: utils.parseTimestamp(data.CancelAfter),
+    expiration: parseTimestamp(data.Expiration),
+    cancelAfter: parseTimestamp(data.CancelAfter),
     sourceTag: data.SourceTag,
     destinationTag: data.DestinationTag,
     previousAffectingTransactionID: data.PreviousTxnID,
@@ -33,4 +34,4 @@ function parsePaymentChannel(data: Object): PaymentChannelResponse {
   })
 }
 
-module.exports = parsePaymentChannel
+export default parsePaymentChannel

@@ -1,16 +1,17 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const BigNumber = require('bignumber.js')
-const utils = require('./utils')
-const parsePathfind = require('./parse/pathfind')
-const {validate, toRippledAmount} = utils.common
-const NotFoundError = utils.common.errors.NotFoundError
-const ValidationError = utils.common.errors.ValidationError
-import type {Connection} from '../common/connection'
-import type {RippledAmount} from '../common/types.js'
-import type {GetPaths, PathFind, RippledPathsResponse, PathFindRequest}
-  from './pathfind-types.js'
+
+import * as _ from 'lodash'
+import BigNumber from 'bignumber.js'
+import {getXRPBalance} from './utils'
+import {validate, toRippledAmount, errors} from '../common'
+import type {Connection} from '../common'
+import parsePathfind from './parse/pathfind'
+import type {RippledAmount} from '../common/types'
+import type {
+  GetPaths, PathFind, RippledPathsResponse, PathFindRequest
+} from './pathfind-types'
+const NotFoundError = errors.NotFoundError
+const ValidationError = errors.ValidationError
 
 
 function addParams(request: PathFindRequest, result: RippledPathsResponse
@@ -83,7 +84,7 @@ function conditionallyAddDirectXRPPath(connection: Connection, address: string,
       || !_.includes(paths.destination_currencies, 'XRP')) {
     return Promise.resolve(paths)
   }
-  return utils.getXRPBalance(connection, address, undefined).then(
+  return getXRPBalance(connection, address, undefined).then(
     xrpBalance => addDirectXrpPath(paths, xrpBalance))
 }
 
@@ -137,4 +138,4 @@ function getPaths(pathfind: PathFind): Promise<GetPaths> {
     .then(paths => formatResponse(pathfind, paths))
 }
 
-module.exports = getPaths
+export default getPaths

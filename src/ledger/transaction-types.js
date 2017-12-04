@@ -1,7 +1,7 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
 
-import type {Amount, Memo} from '../common/types.js'
+
+import type {Amount, Memo} from '../common/types'
 
 type Outcome = {
   result: string,

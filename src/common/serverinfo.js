@@ -1,7 +1,6 @@
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const {convertKeysFromSnakeCaseToCamelCase} = require('./utils')
-import type {Connection} from './connection'
+import * as _ from 'lodash'
+import {convertKeysFromSnakeCaseToCamelCase} from './utils'
+import type Connection from './connection'
 
 export type GetServerInfoResponse = {
   buildVersion: string,
@@ -73,7 +72,7 @@ function getFee(connection: Connection, cushion: number) {
     _.partial(computeFeeFromServerInfo, cushion))
 }
 
-module.exports = {
+export {
   getServerInfo,
   getFee
 }

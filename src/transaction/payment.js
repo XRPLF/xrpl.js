@@ -1,14 +1,14 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
+
+import * as _ from 'lodash'
+import * as utils from './utils'
 const validate = utils.common.validate
 const toRippledAmount = utils.common.toRippledAmount
 const paymentFlags = utils.common.txFlags.Payment
 const ValidationError = utils.common.errors.ValidationError
-import type {Instructions, Prepare} from './types.js'
+import type {Instructions, Prepare} from './types'
 import type {Amount, Adjustment, MaxAdjustment,
-  MinAdjustment, Memo} from '../common/types.js'
+  MinAdjustment, Memo} from '../common/types'
 
 
 type Payment = {
@@ -153,4 +153,4 @@ function preparePayment(address: string, payment: Payment,
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = preparePayment
+export default preparePayment

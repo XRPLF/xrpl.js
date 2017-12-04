@@ -1,6 +1,6 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const assert = require('assert')
+
+import assert from 'assert'
 
 function parseOrderCancellation(tx: Object): Object {
   assert(tx.TransactionType === 'OfferCancel')
@@ -9,4 +9,4 @@ function parseOrderCancellation(tx: Object): Object {
   }
 }
 
-module.exports = parseOrderCancellation
+export default parseOrderCancellation

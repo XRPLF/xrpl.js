@@ -1,10 +1,10 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
-const parseTransaction = require('./parse/transaction')
-const {validate, errors} = utils.common
-import type {Connection} from '../common/connection.js'
+
+import * as _ from 'lodash'
+import * as utils from './utils'
+import parseTransaction from './parse/transaction'
+import {validate, errors} from '../common'
+import type {Connection} from '../common'
 import type {TransactionType, TransactionOptions} from './transaction-types'
 
 function attachTransactionDate(connection: Connection, tx: Object
@@ -100,4 +100,4 @@ function getTransaction(id: string, options: TransactionOptions = {}
   })
 }
 
-module.exports = getTransaction
+export default getTransaction

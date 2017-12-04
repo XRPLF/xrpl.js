@@ -1,9 +1,8 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
-const parsePaymentChannel = require('./parse/payment-channel')
-const {validate} = utils.common
-const NotFoundError = utils.common.errors.NotFoundError
+
+import parsePaymentChannel from './parse/payment-channel'
+import {validate, errors} from '../common'
+const NotFoundError = errors.NotFoundError
 
 type PaymentChannel = {
   Sequence: number,
@@ -53,4 +52,4 @@ function getPaymentChannel(id: string): Promise<PaymentChannel> {
   return this.connection.request(request).then(formatResponse)
 }
 
-module.exports = getPaymentChannel
+export default getPaymentChannel

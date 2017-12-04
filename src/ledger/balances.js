@@ -1,9 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
-const {validate} = utils.common
-import type {Connection} from '../common/connection.js'
-import type {TrustlinesOptions, Trustline} from './trustlines-types.js'
+
+import * as utils from './utils'
+import {validate} from '../common'
+import type {Connection} from '../common'
+import type {TrustlinesOptions, Trustline} from './trustlines-types'
 
 
 type Balance = {
@@ -61,4 +61,4 @@ function getBalances(address: string, options: TrustlinesOptions = {}
     formatBalances(options, {xrp: results[0], trustlines: results[1]}))
 }
 
-module.exports = getBalances
+export default getBalances

@@ -1,8 +1,8 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const common = require('../common')
-const hashes = require('ripple-hashes')
+
+import * as _ from 'lodash'
+import * as common from '../common'
+import hashes from 'ripple-hashes'
 
 function convertLedgerHeader(header) {
   return {
@@ -71,4 +71,4 @@ function computeLedgerHash(ledger: Object): string {
   return hashLedgerHeader(_.assign({}, ledger, subhashes))
 }
 
-module.exports = computeLedgerHash
+export default computeLedgerHash

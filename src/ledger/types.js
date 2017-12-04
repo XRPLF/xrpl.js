@@ -1,7 +1,7 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
 
-import type {Amount} from '../common/types.js'
+
+import type {Amount} from '../common/types'
 
 export type OrdersOptions = {
   limit?: number,

@@ -1,11 +1,11 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
-const {validate} = utils.common
-const parseAccountTrustline = require('./parse/account-trustline')
-import type {Connection} from '../common/connection.js'
-import type {TrustlinesOptions, Trustline} from './trustlines-types.js'
+
+import * as _ from 'lodash'
+import * as utils from './utils'
+import {validate} from '../common'
+import type {Connection} from '../common'
+import parseAccountTrustline from './parse/account-trustline'
+import type {TrustlinesOptions, Trustline} from './trustlines-types'
 
 
 type GetTrustlinesResponse = Array<Trustline>
@@ -49,4 +49,4 @@ function getTrustlines(address: string, options: TrustlinesOptions = {}
   })
 }
 
-module.exports = getTrustlines
+export default getTrustlines

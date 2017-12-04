@@ -1,56 +1,50 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
 
-const _ = require('lodash')
-const EventEmitter = require('events').EventEmitter
-const common = require('./common')
-const server = require('./server/server')
+import * as _ from 'lodash'
+import events from 'events'
+import {Connection, errors, validate} from './common'
+import * as server from './server/server'
 const connect = server.connect
 const disconnect = server.disconnect
 const getServerInfo = server.getServerInfo
 const getFee = server.getFee
 const isConnected = server.isConnected
 const getLedgerVersion = server.getLedgerVersion
-const getTransaction = require('./ledger/transaction')
-const getTransactions = require('./ledger/transactions')
-const getTrustlines = require('./ledger/trustlines')
-const getBalances = require('./ledger/balances')
-const getBalanceSheet = require('./ledger/balance-sheet')
-const getPaths = require('./ledger/pathfind')
-const getOrders = require('./ledger/orders')
-const getOrderbook = require('./ledger/orderbook')
-const getSettings = require('./ledger/settings')
-const getAccountInfo = require('./ledger/accountinfo')
-const getPaymentChannel = require('./ledger/payment-channel')
-const preparePayment = require('./transaction/payment')
-const prepareTrustline = require('./transaction/trustline')
-const prepareOrder = require('./transaction/order')
-const prepareOrderCancellation = require('./transaction/ordercancellation')
-const prepareEscrowCreation =
-  require('./transaction/escrow-creation')
-const prepareEscrowExecution =
-  require('./transaction/escrow-execution')
-const prepareEscrowCancellation =
-  require('./transaction/escrow-cancellation')
-const preparePaymentChannelCreate =
-  require('./transaction/payment-channel-create')
-const preparePaymentChannelFund =
-  require('./transaction/payment-channel-fund')
-const preparePaymentChannelClaim =
-  require('./transaction/payment-channel-claim')
-const prepareSettings = require('./transaction/settings')
-const sign = require('./transaction/sign')
-const combine = require('./transaction/combine')
-const submit = require('./transaction/submit')
-const errors = require('./common').errors
-const generateAddress =
-  require('./offline/generate-address').generateAddressAPI
-const computeLedgerHash = require('./offline/ledgerhash')
-const signPaymentChannelClaim =
-  require('./offline/sign-payment-channel-claim')
-const verifyPaymentChannelClaim =
-  require('./offline/verify-payment-channel-claim')
-const getLedger = require('./ledger/ledger')
+import getTransaction from './ledger/transaction'
+import getTransactions from './ledger/transactions'
+import getTrustlines from './ledger/trustlines'
+import getBalances from './ledger/balances'
+import getBalanceSheet from './ledger/balance-sheet'
+import getPaths from './ledger/pathfind'
+import getOrders from './ledger/orders'
+import getOrderbook from './ledger/orderbook'
+import getSettings from './ledger/settings'
+import getAccountInfo from './ledger/accountinfo'
+import getPaymentChannel from './ledger/payment-channel'
+import preparePayment from './transaction/payment'
+import prepareTrustline from './transaction/trustline'
+import prepareOrder from './transaction/order'
+import prepareOrderCancellation from './transaction/ordercancellation'
+import prepareEscrowCreation from './transaction/escrow-creation'
+import prepareEscrowExecution from './transaction/escrow-execution'
+import prepareEscrowCancellation from './transaction/escrow-cancellation'
+import preparePaymentChannelCreate from './transaction/payment-channel-create'
+import preparePaymentChannelFund from './transaction/payment-channel-fund'
+import preparePaymentChannelClaim from './transaction/payment-channel-claim'
+import prepareSettings from './transaction/settings'
+import sign from './transaction/sign'
+import combine from './transaction/combine'
+import submit from './transaction/submit'
+import {generateAddressAPI} from './offline/generate-address'
+import computeLedgerHash from './offline/ledgerhash'
+import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
+import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
+import getLedger from './ledger/ledger'
+
+
+import RangeSet from './common/rangeset'
+import * as ledgerUtils from './ledger/utils'
+import * as schemaValidator from './common/schema-validator'
 
 type APIOptions = {
   server?: string,
@@ -61,7 +55,7 @@ type APIOptions = {
 }
 
 // prevent access to non-validated ledger versions
-class RestrictedConnection extends common.Connection {
+class RestrictedConnection extends Connection {
   request(request, timeout) {
     const ledger_index = request.ledger_index
     if (ledger_index !== undefined && ledger_index !== 'validated') {
@@ -75,21 +69,21 @@ class RestrictedConnection extends common.Connection {
   }
 }
 
-class RippleAPI extends EventEmitter {
+class RippleAPI extends events.EventEmitter {
 
-  _feeCushion: number;
-  connection: RestrictedConnection;
+  _feeCushion: number
+  connection: RestrictedConnection
 
   // these are exposed only for use by unit tests; they are not part of the API.
   static _PRIVATE = {
-    validate: common.validate,
-    RangeSet: require('./common/rangeset').RangeSet,
-    ledgerUtils: require('./ledger/utils'),
-    schemaValidator: require('./common/schema-validator')
+    validate: validate,
+    RangeSet,
+    ledgerUtils,
+    schemaValidator
   };
 
   constructor(options: APIOptions = {}) {
-    common.validate.apiOptions(options)
+    validate.apiOptions(options)
     super()
     this._feeCushion = options.feeCushion || 1.2
     const serverURL = options.server
@@ -151,13 +145,13 @@ _.assign(RippleAPI.prototype, {
   combine,
   submit,
 
-  generateAddress,
+  generateAddress: generateAddressAPI,
   computeLedgerHash,
   signPaymentChannelClaim,
   verifyPaymentChannelClaim,
   errors
 })
 
-module.exports = {
+export {
   RippleAPI
 }

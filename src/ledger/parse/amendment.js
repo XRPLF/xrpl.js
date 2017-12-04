@@ -1,4 +1,4 @@
-'use strict' // eslint-disable-line strict
+
 
 function parseAmendment(tx: Object) {
   return {
@@ -6,4 +6,4 @@ function parseAmendment(tx: Object) {
   }
 }
 
-module.exports = parseAmendment
+export default parseAmendment

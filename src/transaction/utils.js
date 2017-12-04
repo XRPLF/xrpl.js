@@ -1,10 +1,10 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const BigNumber = require('bignumber.js')
-const common = require('../common')
+
+import * as _ from 'lodash'
+import BigNumber from 'bignumber.js'
+import * as common from '../common'
 const txFlags = common.txFlags
-import type {Instructions, Prepare} from './types.js'
+import type {Instructions, Prepare} from './types'
 
 function formatPrepareResponse(txJSON: Object): Object {
   const instructions = {
@@ -119,7 +119,7 @@ function convertMemo(memo: Object): Object {
   }
 }
 
-module.exports = {
+export {
   convertStringToHex,
   convertMemo,
   prepareTransaction,

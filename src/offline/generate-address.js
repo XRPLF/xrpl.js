@@ -1,6 +1,7 @@
-'use strict' // eslint-disable-line strict
-const keypairs = require('ripple-keypairs')
-const common = require('../common')
+/* @flow */
+
+import keypairs from 'ripple-keypairs'
+import * as common from '../common'
 const {errors, validate} = common
 
 function generateAddress(options?: Object): Object {
@@ -19,6 +20,6 @@ function generateAddressAPI(options?: Object): Object {
   }
 }
 
-module.exports = {
+export {
   generateAddressAPI
 }

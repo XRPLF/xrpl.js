@@ -1,9 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
+
+import * as _ from 'lodash'
+import * as utils from './utils'
 const validate = utils.common.validate
-import type {Instructions, Prepare} from './types.js'
+import type {Instructions, Prepare} from './types'
 
 function createOrderCancellationTransaction(account: string,
   orderCancellation: Object
@@ -27,4 +27,4 @@ function prepareOrderCancellation(address: string, orderCancellation: Object,
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 
-module.exports = prepareOrderCancellation
+export default prepareOrderCancellation

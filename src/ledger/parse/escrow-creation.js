@@ -1,22 +1,23 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const assert = require('assert')
-const utils = require('./utils')
-const parseAmount = require('./amount')
+
+import assert from 'assert'
+import parseAmount from './amount'
+import {parseTimestamp, parseMemos} from './utils'
+import {removeUndefined} from '../../common'
 
 function parseEscrowCreation(tx: Object): Object {
   assert(tx.TransactionType === 'EscrowCreate')
 
-  return utils.removeUndefined({
+  return removeUndefined({
     amount: parseAmount(tx.Amount).value,
     destination: tx.Destination,
-    memos: utils.parseMemos(tx),
+    memos: parseMemos(tx),
     condition: tx.Condition,
-    allowCancelAfter: utils.parseTimestamp(tx.CancelAfter),
-    allowExecuteAfter: utils.parseTimestamp(tx.FinishAfter),
+    allowCancelAfter: parseTimestamp(tx.CancelAfter),
+    allowExecuteAfter: parseTimestamp(tx.FinishAfter),
     sourceTag: tx.SourceTag,
     destinationTag: tx.DestinationTag
   })
 }
 
-module.exports = parseEscrowCreation
+export default parseEscrowCreation

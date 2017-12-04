@@ -1,11 +1,11 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
-const {validate} = utils.common
-const parseAccountOrder = require('./parse/account-order')
-import type {Connection} from '../common/connection.js'
-import type {OrdersOptions, Order} from './types.js'
+
+import * as _ from 'lodash'
+import * as utils from './utils'
+import {validate} from '../common'
+import type {Connection} from '../common'
+import parseAccountOrder from './parse/account-order'
+import type {OrdersOptions, Order} from './types'
 
 type GetOrders = Array<Order>
 
@@ -38,4 +38,4 @@ function getOrders(address: string, options: OrdersOptions = {}
   })
 }
 
-module.exports = getOrders
+export default getOrders

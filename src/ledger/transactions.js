@@ -1,14 +1,13 @@
 /* @flow */
-/* eslint-disable max-params */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const binary = require('ripple-binary-codec')
-const {computeTransactionHash} = require('ripple-hashes')
-const utils = require('./utils')
-const parseTransaction = require('./parse/transaction')
-const getTransaction = require('./transaction')
-const {validate} = utils.common
-import type {Connection} from '../common/connection.js'
+
+import * as _ from 'lodash'
+import binary from 'ripple-binary-codec'
+import {computeTransactionHash} from 'ripple-hashes'
+import * as utils from './utils'
+import parseTransaction from './parse/transaction'
+import getTransaction from './transaction'
+import {validate, errors} from '../common'
+import type {Connection} from '../common'
 import type {TransactionType} from './transaction-types'
 
 
@@ -137,7 +136,7 @@ function checkForLedgerGaps(connection: Connection,
   return utils.hasCompleteLedgerRange(connection, minLedgerVersion,
     maxLedgerVersion).then(hasCompleteLedgerRange => {
     if (!hasCompleteLedgerRange) {
-      throw new utils.common.errors.MissingLedgerHistoryError()
+      throw new errors.MissingLedgerHistoryError()
     }
   })
 }
@@ -178,4 +177,4 @@ function getTransactions(address: string, options: TransactionsOptions = {}
   return getTransactionsInternal(this.connection, address, newOptions)
 }
 
-module.exports = getTransactions
+export default getTransactions

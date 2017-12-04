@@ -1,6 +1,6 @@
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const RippleAPI = require('./api').RippleAPI
+
+import * as _ from 'lodash'
+import {RippleAPI} from './api'
 
 class RippleAPIBroadcast extends RippleAPI {
   constructor(servers, options) {
@@ -65,6 +65,6 @@ class RippleAPIBroadcast extends RippleAPI {
   }
 }
 
-module.exports = {
+export {
   RippleAPIBroadcast
 }

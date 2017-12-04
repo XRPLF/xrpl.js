@@ -1,10 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
-const parseFields = require('./parse/fields')
-const {validate} = utils.common
-const AccountFlags = utils.common.constants.AccountFlags
+
+import * as _ from 'lodash'
+import parseFields from './parse/fields'
+import {validate, constants} from '../common'
+const AccountFlags = constants.AccountFlags
 
 type SettingsOptions = {
   ledgerVersion?: number
@@ -59,4 +58,4 @@ function getSettings(address: string, options: SettingsOptions = {}
   return this.connection.request(request).then(formatSettings)
 }
 
-module.exports = getSettings
+export default getSettings

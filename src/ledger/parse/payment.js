@@ -1,10 +1,10 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const assert = require('assert')
-const utils = require('./utils')
-const parseAmount = require('./amount')
-const txFlags = utils.txFlags
+
+import * as _ from 'lodash'
+import assert from 'assert'
+import * as utils from './utils'
+import {txFlags, removeUndefined} from '../../common'
+import parseAmount from './amount'
 
 function isNoDirectRipple(tx) {
   return (tx.Flags & txFlags.Payment.NoRippleDirect) !== 0
@@ -35,9 +35,9 @@ function parsePayment(tx: Object): Object {
     tag: tx.DestinationTag
   }
 
-  return utils.removeUndefined({
-    source: utils.removeUndefined(source),
-    destination: utils.removeUndefined(destination),
+  return removeUndefined({
+    source: removeUndefined(source),
+    destination: removeUndefined(destination),
     memos: utils.parseMemos(tx),
     invoiceID: tx.InvoiceID,
     paths: tx.Paths ? JSON.stringify(tx.Paths) : undefined,
@@ -47,4 +47,4 @@ function parsePayment(tx: Object): Object {
   })
 }
 
-module.exports = parsePayment
+export default parsePayment

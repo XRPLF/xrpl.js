@@ -1,12 +1,12 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const utils = require('./utils')
-const {validate} = utils.common
-const parseOrderbookOrder = require('./parse/orderbook-order')
-import type {Connection} from '../common/connection.js'
-import type {OrdersOptions, OrderSpecification} from './types.js'
-import type {Amount, Issue} from '../common/types.js'
+
+import * as _ from 'lodash'
+import * as utils from './utils'
+import parseOrderbookOrder from './parse/orderbook-order'
+import {validate} from '../common'
+import type {Connection} from '../common'
+import type {OrdersOptions, OrderSpecification} from './types'
+import type {Amount, Issue} from '../common/types'
 
 type Orderbook = {
   base: Issue,
@@ -104,4 +104,4 @@ function getOrderbook(address: string, orderbook: Orderbook,
     formatBidsAndAsks(orderbook, _.flatten(data)))
 }
 
-module.exports = getOrderbook
+export default getOrderbook

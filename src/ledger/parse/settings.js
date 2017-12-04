@@ -1,9 +1,10 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const assert = require('assert')
-const AccountFlags = require('./utils').constants.AccountFlags
-const parseFields = require('./fields')
+
+import * as _ from 'lodash'
+import assert from 'assert'
+import {constants} from '../../common'
+const AccountFlags = constants.AccountFlags
+import parseFields from './fields'
 
 function getAccountRootModifiedNode(tx: Object) {
   const modifiedNodes = tx.meta.AffectedNodes.filter(node =>
@@ -58,4 +59,4 @@ function parseSettings(tx: Object) {
   return _.assign({}, parseFlags(tx), parseFields(tx))
 }
 
-module.exports = parseSettings
+export default parseSettings

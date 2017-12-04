@@ -1,8 +1,8 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const common = require('../common')
-const keypairs = require('ripple-keypairs')
-const binary = require('ripple-binary-codec')
+
+import * as common from '../common'
+import keypairs from 'ripple-keypairs'
+import binary from 'ripple-binary-codec'
 const {validate, xrpToDrops} = common
 
 function verifyPaymentChannelClaim(channel: string, amount: string,
@@ -17,4 +17,4 @@ function verifyPaymentChannelClaim(channel: string, amount: string,
   return keypairs.verify(signingData, signature, publicKey)
 }
 
-module.exports = verifyPaymentChannelClaim
+export default verifyPaymentChannelClaim

@@ -1,12 +1,12 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const _ = require('lodash')
-const transactionParser = require('ripple-lib-transactionparser')
-const utils = require('../utils')
-const BigNumber = require('bignumber.js')
-const parseAmount = require('./amount')
 
-import type {Amount} from '../../common/types.js'
+import * as _ from 'lodash'
+import transactionParser from 'ripple-lib-transactionparser'
+import BigNumber from 'bignumber.js'
+import * as common from '../../common'
+import parseAmount from './amount'
+
+import type {Amount} from '../../common/types'
 
 function adjustQualityForXRP(
   quality: string, takerGetsCurrency: string, takerPaysCurrency: string
@@ -28,7 +28,7 @@ function parseQuality(quality: ?number) {
 }
 
 function parseTimestamp(rippleTime: number): string | void {
-  return rippleTime ? utils.common.rippleTimeToISO8601(rippleTime) : undefined
+  return rippleTime ? common.rippleTimeToISO8601(rippleTime) : undefined
 }
 
 function removeEmptyCounterparty(amount) {
@@ -52,7 +52,7 @@ function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges) {
 }
 
 function isPartialPayment(tx: Object) {
-  return (tx.Flags & utils.common.txFlags.Payment.PartialPayment) !== 0
+  return (tx.Flags & common.txFlags.Payment.PartialPayment) !== 0
 }
 
 function parseDeliveredAmount(tx: Object): Amount | void {
@@ -105,10 +105,10 @@ function parseOutcome(tx: Object): ?Object {
   removeEmptyCounterpartyInBalanceChanges(balanceChanges)
   removeEmptyCounterpartyInOrderbookChanges(orderbookChanges)
 
-  return utils.common.removeUndefined({
+  return common.removeUndefined({
     result: tx.meta.TransactionResult,
     timestamp: parseTimestamp(tx.date),
-    fee: utils.common.dropsToXrp(tx.Fee),
+    fee: common.dropsToXrp(tx.Fee),
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
     ledgerVersion: tx.ledger_index,
@@ -126,7 +126,7 @@ function parseMemos(tx: Object): ?Array<Object> {
     return undefined
   }
   return tx.Memos.map(m => {
-    return utils.common.removeUndefined({
+    return common.removeUndefined({
       type: m.Memo.parsed_memo_type || hexToString(m.Memo.MemoType),
       format: m.Memo.parsed_memo_format || hexToString(m.Memo.MemoFormat),
       data: m.Memo.parsed_memo_data || hexToString(m.Memo.MemoData)
@@ -134,17 +134,12 @@ function parseMemos(tx: Object): ?Array<Object> {
   })
 }
 
-module.exports = {
+export {
   parseQuality,
   parseOutcome,
   parseMemos,
   hexToString,
   parseTimestamp,
   adjustQualityForXRP,
-  isPartialPayment,
-  dropsToXrp: utils.common.dropsToXrp,
-  constants: utils.common.constants,
-  txFlags: utils.common.txFlags,
-  removeUndefined: utils.common.removeUndefined,
-  rippleTimeToISO8601: utils.common.rippleTimeToISO8601
+  isPartialPayment
 }

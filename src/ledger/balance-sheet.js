@@ -1,10 +1,9 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
 
-const _ = require('lodash')
-const utils = require('./utils')
-const {validate} = utils.common
-import type {Amount} from '../common/types.js'
+import * as _ from 'lodash'
+import * as utils from './utils'
+import {validate} from '../common'
+import type {Amount} from '../common/types'
 
 type BalanceSheetOptions = {
   excludeAddresses?: Array<string>,
@@ -64,4 +63,4 @@ function getBalanceSheet(address: string, options: BalanceSheetOptions = {}
   })
 }
 
-module.exports = getBalanceSheet
+export default getBalanceSheet

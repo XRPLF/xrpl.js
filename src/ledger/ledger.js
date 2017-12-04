@@ -1,9 +1,8 @@
 /* @flow */
-'use strict' // eslint-disable-line strict
-const utils = require('./utils')
-const {validate} = utils.common
-const parseLedger = require('./parse/ledger')
-import type {GetLedger} from './types.js'
+
+import {validate} from '../common'
+import parseLedger from './parse/ledger'
+import type {GetLedger} from './types'
 
 type LedgerOptions = {
   ledgerVersion?: number,
@@ -28,4 +27,4 @@ function getLedger(options: LedgerOptions = {}): Promise<GetLedger> {
     parseLedger(response.ledger))
 }
 
-module.exports = getLedger
+export default getLedger

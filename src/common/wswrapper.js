@@ -1,6 +1,6 @@
-'use strict' // eslint-disable-line strict
 
-const {EventEmitter} = require('events')
+
+import events from 'events'
 
 function unsused() {}
 
@@ -8,7 +8,7 @@ function unsused() {}
  * Provides `EventEmitter` interface for native browser `WebSocket`,
  * same, as `ws` package provides.
  */
-class WSWrapper extends EventEmitter {
+class WSWrapper extends events.EventEmitter {
   constructor(url, protocols = null, websocketOptions = {}) {
     super()
     unsused(protocols)
@@ -55,5 +55,5 @@ WSWrapper.OPEN = 1
 WSWrapper.CLOSING = 2
 WSWrapper.CLOSED = 3
 
-module.exports = WSWrapper
+export default WSWrapper
 
