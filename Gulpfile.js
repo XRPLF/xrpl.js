@@ -1,21 +1,22 @@
 /* eslint-disable no-var, no-param-reassign */
 /* these eslint rules are disabled because gulp does not support babel yet */
 'use strict';
-var _ = require('lodash');
-var gulp = require('gulp');
-var uglify = require('gulp-uglify');
-var rename = require('gulp-rename');
-var webpack = require('webpack');
-var bump = require('gulp-bump');
-var argv = require('yargs').argv;
-var assert = require('assert');
-var fs = require('fs');
+const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const gulp = require('gulp');
+const rename = require('gulp-rename');
+const webpack = require('webpack');
+const bump = require('gulp-bump');
+const argv = require('yargs').argv;
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 var pkg = require('./package.json');
 
 var uglifyOptions = {
   mangle: {
-    except: ['_', 'RippleError', 'RippledError', 'UnexpectedError',
+    reserved: ['_', 'RippleError', 'RippledError', 'UnexpectedError',
     'LedgerVersionError', 'ConnectionError', 'NotConnectedError',
     'DisconnectedError', 'TimeoutError', 'ResponseFormatError',
     'ValidationError', 'NotFoundError', 'MissingLedgerHistoryError',
@@ -24,17 +25,17 @@ var uglifyOptions = {
   }
 };
 
-function webpackConfig(extension, overrides) {
+function getWebpackConfig(extension, overrides) {
   overrides = overrides || {};
-  var defaults = {
+  let defaults = {
     cache: true,
     externals: [{
       'lodash': '_'
     }],
-    entry: './src/index.js',
+    entry: './src/index.ts',
     output: {
       library: 'ripple',
-      path: './build/',
+      path: path.join(__dirname, 'build/'),
       filename: ['ripple-', extension].join(pkg.version)
     },
     plugins: [
@@ -44,18 +45,21 @@ function webpackConfig(extension, overrides) {
         './setup-api-web')
     ],
     module: {
-      loaders: [{
+      rules: [{
         test: /jayson/,
-        loader: 'null'
+        use: 'null',
       }, {
-        test: /\.js$/,
-        exclude: [/node_modules/],
-        loader: 'babel-loader'
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
       }, {
         test: /\.json/,
-        loader: 'json-loader'
+        use: 'json-loader',
       }]
-    }
+    },
+    resolve: {
+      extensions: [ '.ts', '.js' ]
+    },
   };
   return _.assign({}, defaults, overrides);
 }
@@ -78,7 +82,7 @@ function webpackConfigForWebTest(testFileName, path) {
       filename: match[1] + '-test.js'
     }
   };
-  return webpackConfig('.js', configOverrides);
+  return getWebpackConfig('.js', configOverrides);
 }
 
 gulp.task('build-tests', function(callback) {
@@ -112,30 +116,29 @@ function createBuildLink(callback) {
 }
 
 gulp.task('build', function(callback) {
-  webpack(webpackConfig('.js'), createBuildLink(callback));
+  webpack(getWebpackConfig('.js'), createBuildLink(callback));
 });
 
-gulp.task('build-min', ['build'], function() {
-  return gulp.src(['./build/ripple-', '.js'].join(pkg.version))
-  .pipe(uglify(uglifyOptions))
-  .pipe(rename(['ripple-', '-min.js'].join(pkg.version)))
-  .pipe(gulp.dest('./build/'))
-  .on('end', function() {
+gulp.task('build-min', function(callback) {
+  const webpackConfig = getWebpackConfig('-min.js');
+  webpackConfig.plugins.push(new UglifyJsPlugin({uglifyOptions}));
+  webpack(webpackConfig, function() {
     createLink('./build/ripple-' + pkg.version + '-min.js',
       './build/ripple-latest-min.js');
+    callback();
   });
 });
 
 gulp.task('build-debug', function(callback) {
-  var configOverrides = {debug: true, devtool: 'eval'};
-  webpack(webpackConfig('-debug.js', configOverrides), callback);
+  const webpackConfig = getWebpackConfig('-debug.js', {devtool: 'eval'});
+  webpackConfig.plugins.unshift(new webpack.LoaderOptionsPlugin({debug: true}));
+  webpack(webpackConfig, callback);
 });
 
 /**
  * Generate a WebPack external for a given unavailable module which replaces
  * that module's constructor with an error-thrower
  */
-
 function buildUseError(cons) {
   return ('var {<CONS>:function(){throw new Error('
           + '"Class is unavailable in this build: <CONS>")}}')
@@ -145,7 +148,7 @@ function buildUseError(cons) {
 gulp.task('build-core', function(callback) {
   var configOverrides = {
     cache: false,
-    entry: './src/remote.js',
+    entry: './src/remote.ts',
     externals: [{
       './transaction': buildUseError('Transaction'),
       './orderbook': buildUseError('OrderBook'),
@@ -153,10 +156,10 @@ gulp.task('build-core', function(callback) {
       './serializedobject': buildUseError('SerializedObject')
     }],
     plugins: [
-      new webpack.optimize.UglifyJsPlugin()
+      new UglifyJsPlugin()
     ]
   };
-  webpack(webpackConfig('-core.js', configOverrides), callback);
+  webpack(getWebpackConfig('-core.js', configOverrides), callback);
 });
 
 gulp.task('bower-build', ['build'], function() {
