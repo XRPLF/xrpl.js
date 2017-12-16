@@ -21,8 +21,6 @@ function getServerInfo(): Promise<GetServerInfoResponse> {
   return common.serverInfo.getServerInfo(this.connection)
 }
 
-// TODO: getFee() was originally annotated to return a number, but actually
-// returned a toString'ed number. Should this actually be returning a number?
 function getFee(): Promise<string> {
   const cushion = this._feeCushion || 1.2
   return common.serverInfo.getFee(this.connection, cushion)

@@ -34,7 +34,6 @@ class Connection extends EventEmitter {
   private _proxyAuthorization?: string
   private _authorization?: string
   private _trustedCertificates?: string[]
-  // TODO: options.key never used?
   private _key?: string
   private _passphrase?: string
   private _certificate?: string
