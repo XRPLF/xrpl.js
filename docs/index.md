@@ -540,7 +540,8 @@ sourceTag | integer | *Optional* Source tag.
 {
   "destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
   "amount": "0.01",
-  "allowCancelAfter": "2014-09-24T21:21:50.000Z"
+  "allowExecuteAfter": "2014-09-24T21:21:50.000Z",
+  "allowCancelAfter":  "2017-01-01T00:00:00.000Z"
 }
 ```
 
@@ -3291,7 +3292,8 @@ const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
 const escrowCreation = {
   "destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
   "amount": "0.01",
-  "allowCancelAfter": "2014-09-24T21:21:50.000Z"
+  "allowExecuteAfter": "2014-09-24T21:21:50.000Z",
+  "allowCancelAfter":  "2017-01-01T00:00:00.000Z"
 };
 return api.prepareEscrowCreation(address, escrowCreation).then(prepared =>
   {/* ... */});
