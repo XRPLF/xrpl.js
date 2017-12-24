@@ -1,5 +1,9 @@
 # ripple-lib Release History
 
+## 0.18.0 (UNRELEASED)
+
++ [Convert from Flow to TypeScript](https://github.com/ripple/ripple-lib/pull/816)
+
 ## 0.17.9 (2017-11-14)
 
 + [Update ws dependency to 3.3.1](https://github.com/ripple/ripple-lib/pull/804)
