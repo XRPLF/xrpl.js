@@ -11,6 +11,14 @@
 + Fix lint errors ([#786](https://github.com/ripple/ripple-lib/pull/786), [#808](https://github.com/ripple/ripple-lib/pull/808))
 + [Update ripple-keypairs dependency to 0.10.1](https://github.com/ripple/ripple-lib/pull/805)
 
+The SHA checksums for the browser version of this release can be found below.
+```
+% shasum *
+e1995afc34aef6accd269cfccc55a45619618a41  ripple-0.17.9-debug.js
+e6ad9a9c111ab696f5637bfa372d80999e5ae362  ripple-0.17.9-min.js
+4866494ec5f9095cc34bea142f1e2b8ac5f7fbf8  ripple-0.17.9.js
+```
+
 ## 0.17.8 (2017-11-06)
 
 + Fix: Freezing in Safari 10.1 (updated bignumber.js) (closes #762)
