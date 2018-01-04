@@ -62,7 +62,6 @@
     "doctoc": "doctoc docs/index.md --title '# RippleAPI Reference' --github --maxlevel 2",
     "docgen": "node --harmony scripts/build_docs.js",
     "clean": "rm -rf dist/npm",
-    "typecheck": "flow check",
     "compile": "mkdir -p dist/npm/common && cp -r src/common/schemas dist/npm/common/ && tsc",
     "watch": "tsc -w",
     "compile-with-source-maps": "babel -D --optional runtime -s -t -d dist/npm/ src/",
