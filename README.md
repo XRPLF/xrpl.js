@@ -23,7 +23,7 @@ You can use `npm`, but we recommend using `yarn` for the added assurance provide
 
 Install `ripple-lib`:
 ```
-$ yarn install ripple-lib
+$ yarn add ripple-lib
 ```
 
 Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md) and [code samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
