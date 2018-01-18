@@ -3,6 +3,11 @@
 ## 0.18.0 (UNRELEASED)
 
 + [Convert from Flow to TypeScript](https://github.com/ripple/ripple-lib/pull/816)
++ [Use ES Module syntax](https://github.com/ripple/ripple-lib/pull/815) (Babel still compiles these to common.js modules for
+  distribution)
++ Docs: [Improve escrow creation example/test](https://github.com/ripple/ripple-lib/pull/820)
++ [Fix type errors](https://github.com/ripple/ripple-lib/pull/811)
++ [Fix lint errors](https://github.com/ripple/ripple-lib/pull/813)
 
 ## 0.17.9 (2017-11-14)
 
