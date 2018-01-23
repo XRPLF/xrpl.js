@@ -4,8 +4,7 @@ import {RippleAPI} from './api'
 
 class RippleAPIBroadcast extends RippleAPI {
 
-  // TODO: Should this default to 0, or null/undefined?
-  ledgerVersion: number = 0
+  ledgerVersion: number | undefined = undefined
   private _apis: RippleAPI[]
 
   constructor(servers, options) {
@@ -50,7 +49,8 @@ class RippleAPIBroadcast extends RippleAPI {
   }
 
   onLedgerEvent(ledger) {
-    if (ledger.ledgerVersion > this.ledgerVersion) {
+    if (ledger.ledgerVersion > this.ledgerVersion ||
+        this.ledgerVersion === undefined) {
       this.ledgerVersion = ledger.ledgerVersion
       this.emit('ledger', ledger)
     }
