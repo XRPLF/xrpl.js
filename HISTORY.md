@@ -16,7 +16,15 @@
 + Fix lint errors ([#786](https://github.com/ripple/ripple-lib/pull/786), [#808](https://github.com/ripple/ripple-lib/pull/808))
 + [Update ripple-keypairs dependency to 0.10.1](https://github.com/ripple/ripple-lib/pull/805)
 
-The SHA checksums for the browser version of this release can be found below.
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 *
+b52f251eedac2509d72093eab1e8dba0d0f4a9fe6a28ec1cc90853cfb0fd7110  ripple-0.17.9-debug.js
+d577a2bbdbdf7535c5365a1c52a2a31989d1b966e30abcba65c87133a536b9dc  ripple-0.17.9-min.js
+ff4c3002842fac72ec2ebbd081e9594b0de6050d4d051a8fd6c06adb9a351488  ripple-0.17.9.js
+```
+
+The SHA-1 checksums for the browser version of this release can be found below.
 ```
 % shasum *
 e1995afc34aef6accd269cfccc55a45619618a41  ripple-0.17.9-debug.js
