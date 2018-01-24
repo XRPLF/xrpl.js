@@ -802,7 +802,7 @@ return api.getServerInfo().then(info => {/* ... */});
 
 ## getFee
 
-`getFee(): Promise<number>`
+`getFee(): Promise<string>`
 
 Returns the estimated transaction fee for the rippled server the RippleAPI instance is connected to.
 
