@@ -7,7 +7,7 @@ export type PaymentChannel = {
   Account: string,
   Amount: string,
   Balance: string,
-  PublicKey: number,
+  PublicKey: string,
   Destination: string,
   SettleDelay: number,
   Expiration?: number,
@@ -32,7 +32,7 @@ export type LedgerEntryResponse = {
 type PaymentChannelResponse = {
   account: string,
   balance: string,
-  publicKey: number,
+  publicKey: string,
   destination: string,
   settleDelay: number,
   expiration?: string,
