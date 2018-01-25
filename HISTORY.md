@@ -1,6 +1,6 @@
 # ripple-lib Release History
 
-## 0.18.0 (UNRELEASED)
+## 0.18.0 (2018-01-25)
 
 + [Convert from Flow to TypeScript](https://github.com/ripple/ripple-lib/pull/816)
 + [Use ES Module syntax](https://github.com/ripple/ripple-lib/pull/815) (Babel still compiles these to common.js modules for
