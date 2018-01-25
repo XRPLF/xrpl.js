@@ -9,6 +9,14 @@
 + [Fix type errors](https://github.com/ripple/ripple-lib/pull/811)
 + [Fix lint errors](https://github.com/ripple/ripple-lib/pull/813)
 
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 *
+c97e2c820863b51f9ca8c98714406afb7cb4ba6d10c7dab5443c8c8579878665  ripple-0.18.0-debug.js
+9f2b69045979b76735f436c4aa3e010d195e0407de5ac9c96289b8724c35da66  ripple-0.18.0-min.js
+500db0411fe66e9550a07ee42229641afd7f544481c0cdddfcc87cccdb9f070f  ripple-0.18.0.js
+```
+
 ## 0.17.9 (2017-11-14)
 
 + [Update ws dependency to 3.3.1](https://github.com/ripple/ripple-lib/pull/804)
