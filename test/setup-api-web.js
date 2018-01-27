@@ -19,7 +19,7 @@ function setup(port_ = port) {
       this.api = new RippleAPI({server: baseUrl + got.port});
       this.api.connect().then(() => {
         this.api.once('ledger', () => resolve());
-        this.api.connection._ws.emit('message', JSON.stringify(ledgerClosed));
+        this.api.connection._ws.emit('data', JSON.stringify(ledgerClosed));
       }).catch(reject);
     });
   }).then(() => {
@@ -33,7 +33,7 @@ function setupBroadcast() {
   return new Promise((resolve, reject) => {
     this.api.connect().then(() => {
       this.api.once('ledger', () => resolve());
-      this.api._apis[0].connection._ws.emit('message',
+      this.api._apis[0].connection._ws.emit('data',
         JSON.stringify(ledgerClosed));
     }).catch(reject);
   });

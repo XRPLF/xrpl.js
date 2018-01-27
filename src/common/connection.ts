@@ -395,14 +395,12 @@ class Connection extends EventEmitter {
     if (this._trace) {
       this._console.log(message)
     }
-    return new Promise((resolve, reject) => {
-      if (this._ws.connected && !this._ws.destroyed) {
-        this._ws.send(message);
-        resolve();
-      } else {
-        reject(new DisconnectedError());
-      }
-    })
+    if (this._ws.connected && !this._ws.destroyed) {
+      this._ws.send(message);
+      return Promise.resolve();
+    } else {
+      return Promise.reject(new DisconnectedError());
+    }
   }
 
   request(request, timeout?: number): Promise<any> {
@@ -457,7 +455,7 @@ class Connection extends EventEmitter {
       // JSON.stringify automatically removes keys with value of 'undefined'
       const message = JSON.stringify(Object.assign({}, request, {id}))
 
-      this._whenReady(this._send(message)).then(() => {
+      this._whenReady(this._send(message).catch(_reject)).then(() => {
         const delay = timeout || this._timeout
         timer = setTimeout(() => _reject(new TimeoutError()), delay)
       }).catch(_reject)
