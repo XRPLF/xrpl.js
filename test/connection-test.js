@@ -61,7 +61,7 @@ describe('Connection', function() {
     assert.deepEqual(messages, [message1, message2]);
   });
 
-  xit('with proxy', function(done) {
+  it('with proxy', function(done) {
     if (process.browser) {
       done();
       return;
@@ -69,7 +69,6 @@ describe('Connection', function() {
     createServer().then(server => {
       const port = server.address().port;
       const expect = 'CONNECT localhost';
-      console.log('connection not fired');
       server.on('connection', socket => {
         socket.on('data', data => {
           const got = data.toString('ascii', 0, expect.length);

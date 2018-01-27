@@ -273,13 +273,14 @@ class Connection extends EventEmitter {
       options.headers = {Authorization: `Basic ${base64}`}
     }
     const optionsOverrides = _.omitBy({
+      url: this._url,
       ca: this._trustedCertificates,
       key: this._key,
       passphrase: this._passphrase,
       cert: this._certificate
     }, _.isUndefined)
     const websocketOptions = _.assign({}, options, optionsOverrides)
-    const websocket = new WebSocket(this._url, null, websocketOptions)
+    const websocket = new WebSocket(websocketOptions)
     // we will have a listener for each outstanding request,
     // so we have to raise the limit (the default is 10)
     if (typeof websocket.setMaxListeners === 'function') {
