@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "license": "ISC",
   "description": "A JavaScript API for interacting with Ripple in Node.js and the browser",
   "files": [
@@ -46,9 +46,9 @@
     "mocha-in-sauce": "^0.0.1",
     "mocha-junit-reporter": "^1.9.1",
     "null-loader": "^0.1.1",
-    "ts-loader": "^3.2.0",
     "nyc": "^11.3.0",
     "source-map-support": "^0.5.0",
+    "ts-loader": "^3.2.0",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "tslint-eslint-rules": "^4.1.1",
