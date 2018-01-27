@@ -28,6 +28,22 @@ $ yarn add ripple-lib
 
 Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md) and [code samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
 
+## Development
+
+To build the library for Node.js:
+```
+$ yarn compile
+```
+
+The TypeScript compiler will [output](./tsconfig.json#L7) the resulting JS files in `./dist/npm/`.
+
+To build the library for the browser:
+```
+$ yarn build
+```
+
+Gulp will [output](./Gulpfile.js) the resulting JS files in `./build/`.
+
 ## Running tests
 
 1. Clone the repository
