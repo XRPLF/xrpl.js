@@ -126,7 +126,7 @@ class Connection extends EventEmitter {
   }
 
   isConnected() {
-    return this._ws && this._ws.connected && this._isReady
+    return this._ws ? this._ws.connected && this._isReady : false
   }
 
   _onUnexpectedClose(beforeOpen, resolve, reject, code) {

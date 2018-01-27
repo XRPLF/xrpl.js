@@ -1211,10 +1211,9 @@ describe('RippleAPI', function() {
     });
   });
 
-  xit('disconnect & isConnected', function() {
+  it('disconnect & isConnected', function() {
     assert.strictEqual(this.api.isConnected(), true);
     return this.api.disconnect().then(() => {
-      console.log('isConnected returns null?');
       assert.strictEqual(this.api.isConnected(), false);
     });
   });
