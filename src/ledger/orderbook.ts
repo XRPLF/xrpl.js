@@ -52,7 +52,7 @@ function getBookOffers(connection: Connection, account: string,
 }
 
 function isSameIssue(a: Amount, b: Amount) {
-  return a.currency === b.currency && a.counterparty === b.counterparty
+  return a.currency === b.currency && a.issuer === b.issuer
 }
 
 function directionFilter(direction: string, order: OrderbookItem) {
