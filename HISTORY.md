@@ -1,5 +1,17 @@
 # ripple-lib Release History
 
+## 0.18.1 (2018-01-27)
+
++ [Fix: isSameIssue() should check counterparty](https://github.com/ripple/ripple-lib/pull/836). This bug caused `getOrderbook()` to return incorrect values.
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 *
+6871855a2af1dc591ef557d442c11e8c60e01c5932054e13e8cbb84a182f45e0  ripple-0.18.1-debug.js
+331f0baff46af44933a8fa31f128132945ff82a147acfff0a7315adb446e3de0  ripple-0.18.1-min.js
+26324bb0725d2d484fe3b6086335d49734f45dc647b07c60746e0d8619f1ed3e  ripple-0.18.1.js
+```
+
 ## 0.18.0 (2018-01-25)
 
 + [Convert from Flow to TypeScript](https://github.com/ripple/ripple-lib/pull/816)
@@ -8,14 +20,6 @@
 + Docs: [Improve escrow creation example/test](https://github.com/ripple/ripple-lib/pull/820)
 + [Fix type errors](https://github.com/ripple/ripple-lib/pull/811)
 + [Fix lint errors](https://github.com/ripple/ripple-lib/pull/813)
-
-The SHA-256 checksums for the browser version of this release can be found below.
-```
-% shasum -a 256 *
-c97e2c820863b51f9ca8c98714406afb7cb4ba6d10c7dab5443c8c8579878665  ripple-0.18.0-debug.js
-9f2b69045979b76735f436c4aa3e010d195e0407de5ac9c96289b8724c35da66  ripple-0.18.0-min.js
-500db0411fe66e9550a07ee42229641afd7f544481c0cdddfcc87cccdb9f070f  ripple-0.18.0.js
-```
 
 ## 0.17.9 (2017-11-14)
 
