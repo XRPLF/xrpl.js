@@ -3,7 +3,7 @@ import * as utils from './utils'
 import {validate} from '../common'
 import parseAccountTrustline from './parse/account-trustline'
 import {RippleAPI} from '../api'
-import {ParsedTrustline} from '../common/types/objects/trustlines'
+import {FormattedTrustline} from '../common/types/objects/trustlines'
 
 export type GetTrustlinesOptions = {
   counterparty?: string,
@@ -12,13 +12,13 @@ export type GetTrustlinesOptions = {
   ledgerVersion?: number
 }
 
-function currencyFilter(currency: string, trustline: ParsedTrustline) {
+function currencyFilter(currency: string, trustline: FormattedTrustline) {
   return currency === null || trustline.specification.currency === currency
 }
 
 async function getTrustlines(
   this: RippleAPI, address: string, options: GetTrustlinesOptions = {}
-): Promise<ParsedTrustline[]> {
+): Promise<FormattedTrustline[]> {
   // 1. Validate
   validate.getTrustlines({address, options})
   const ledgerVersion = await this.getLedgerVersion()
