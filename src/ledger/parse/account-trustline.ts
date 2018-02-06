@@ -12,13 +12,15 @@ function parseAccountTrustline(trustline: Trustline): ParsedTrustline {
     qualityIn: parseQuality(trustline.quality_in) || undefined,
     qualityOut: parseQuality(trustline.quality_out) || undefined,
     ripplingDisabled: trustline.no_ripple || undefined,
-    frozen: trustline.freeze || undefined
+    frozen: trustline.freeze || undefined,
+    authorized: trustline.authorized || undefined
   })
   // rippled doesn't provide the counterparty's qualities
   const counterparty = removeUndefined({
     limit: trustline.limit_peer,
     ripplingDisabled: trustline.no_ripple_peer || undefined,
-    frozen: trustline.freeze_peer || undefined
+    frozen: trustline.freeze_peer || undefined,
+    authorized: trustline.peer_authorized || undefined
   })
   const state = {
     balance: trustline.balance

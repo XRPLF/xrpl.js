@@ -11,6 +11,8 @@ export interface Trustline {
   no_ripple_peer?: boolean,
   freeze?: boolean,
   freeze_peer?: boolean,
+  authorized?: boolean,
+  peer_authorized?: boolean,
 }
 
 export type ParsedTrustlineSpecification = {
