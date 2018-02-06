@@ -2,3 +2,7 @@ lib-cov
 coverage.html
 src
 dist/bower
+test
+Gulpfile.js
+HISTORY.md
+build
