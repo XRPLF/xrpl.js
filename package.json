@@ -15,8 +15,6 @@
     "test": "test"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.85",
-    "@types/ws": "^3.2.0",
     "bignumber.js": "^4.1.0",
     "https-proxy-agent": "^1.0.0",
     "jsonschema": "^1.1.1",
@@ -29,7 +27,9 @@
     "ws": "^3.3.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.101",
     "@types/node": "^8.0.53",
+    "@types/ws": "^4.0.0",
     "assert-diff": "^1.0.1",
     "coveralls": "^2.13.1",
     "doctoc": "^0.15.0",
