@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import {parse as parseUrl} from 'url'
-import * as WebSocket from 'ws'
+import * as WebSocket from 'simple-websocket'
 import RangeSet from './rangeset'
 import {RippledError, DisconnectedError, NotConnectedError,
   TimeoutError, ResponseFormatError, ConnectionError,
@@ -121,16 +121,12 @@ class Connection extends EventEmitter {
     this.emit.apply(this, parameters)
   }
 
-  get _state() {
-    return this._ws ? this._ws.readyState : WebSocket.CLOSED
-  }
-
   get _shouldBeConnected() {
     return this._ws !== null
   }
 
   isConnected() {
-    return this._state === WebSocket.OPEN && this._isReady
+    return this._ws ? this._ws.connected && this._isReady : false
   }
 
   _onUnexpectedClose(beforeOpen, resolve, reject, code) {
@@ -139,7 +135,7 @@ class Connection extends EventEmitter {
       this._onOpenErrorBound = null
     }
     // just in case
-    this._ws!.removeAllListeners('open')
+    this._ws!.removeAllListeners('connect')
     this._ws = null
     this._isReady = false
     if (beforeOpen) {
@@ -277,13 +273,14 @@ class Connection extends EventEmitter {
       options.headers = {Authorization: `Basic ${base64}`}
     }
     const optionsOverrides = _.omitBy({
+      url: this._url,
       ca: this._trustedCertificates,
       key: this._key,
       passphrase: this._passphrase,
       cert: this._certificate
     }, _.isUndefined)
     const websocketOptions = _.assign({}, options, optionsOverrides)
-    const websocket = new WebSocket(this._url, null, websocketOptions)
+    const websocket = new WebSocket(websocketOptions)
     // we will have a listener for each outstanding request,
     // so we have to raise the limit (the default is 10)
     if (typeof websocket.setMaxListeners === 'function') {
@@ -299,10 +296,10 @@ class Connection extends EventEmitter {
         reject(new ConnectionError(
           'Cannot connect because no server was specified'))
       }
-      if (this._state === WebSocket.OPEN) {
+      if (this._ws && this._ws.connected && !this._ws.destroyed) {
         resolve()
-      } else if (this._state === WebSocket.CONNECTING) {
-        this._ws.once('open', resolve)
+      } else if (this._ws && !this._ws.connected && !this._ws.destroyed) {
+        this._ws.once('connect', resolve)
       } else {
         this._ws = this._createWebSocket()
         // when an error causes the connection to close, the close event
@@ -314,7 +311,7 @@ class Connection extends EventEmitter {
         // opening, we will forward all errors to main api object.
         this._onOpenErrorBound = this._onOpenError.bind(this, reject)
         this._ws.once('error', this._onOpenErrorBound)
-        this._ws.on('message', this._onMessage.bind(this))
+        this._ws.on('data', this._onMessage.bind(this))
         // in browser close event can came before open event, so we must
         // resolve connect's promise after reconnect in that case.
         // after open event we will rebound _onUnexpectedCloseBound
@@ -322,7 +319,7 @@ class Connection extends EventEmitter {
         this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this, true,
           resolve, reject)
         this._ws.once('close', this._onUnexpectedCloseBound)
-        this._ws.once('open', () => this._onOpen().then(resolve, reject))
+        this._ws.once('connect', () => this._onOpen().then(resolve, reject))
       }
     })
   }
@@ -337,10 +334,8 @@ class Connection extends EventEmitter {
       this._retry = 0
     }
     return new Promise(resolve => {
-      if (this._state === WebSocket.CLOSED) {
+      if (!this._ws || this._ws.destroyed) {
         resolve()
-      } else if (this._state === WebSocket.CLOSING) {
-        this._ws.once('close', resolve)
       } else {
         if (this._onUnexpectedCloseBound) {
           this._ws.removeListener('close', this._onUnexpectedCloseBound)
@@ -354,7 +349,7 @@ class Connection extends EventEmitter {
           }
           resolve()
         })
-        this._ws.close()
+        this._ws.destroy()
       }
     })
   }
@@ -367,7 +362,7 @@ class Connection extends EventEmitter {
     return new Promise((resolve, reject) => {
       if (!this._shouldBeConnected) {
         reject(new NotConnectedError())
-      } else if (this._state === WebSocket.OPEN && this._isReady) {
+      } else if (this.isConnected()) {
         promise.then(resolve, reject)
       } else {
         this.once('connected', () => promise.then(resolve, reject))
@@ -401,15 +396,12 @@ class Connection extends EventEmitter {
     if (this._trace) {
       this._console.log(message)
     }
-    return new Promise((resolve, reject) => {
-      this._ws.send(message, undefined, error => {
-        if (error) {
-          reject(new DisconnectedError(error.message))
-        } else {
-          resolve()
-        }
-      })
-    })
+    if (this._ws.connected && !this._ws.destroyed) {
+      this._ws.send(message);
+      return Promise.resolve();
+    } else {
+      return Promise.reject(new DisconnectedError());
+    }
   }
 
   request(request, timeout?: number): Promise<any> {
@@ -464,7 +456,7 @@ class Connection extends EventEmitter {
       // JSON.stringify automatically removes keys with value of 'undefined'
       const message = JSON.stringify(Object.assign({}, request, {id}))
 
-      this._whenReady(this._send(message)).then(() => {
+      this._whenReady(this._send(message).catch(_reject)).then(() => {
         const delay = timeout || this._timeout
         timer = setTimeout(() => _reject(new TimeoutError()), delay)
       }).catch(_reject)

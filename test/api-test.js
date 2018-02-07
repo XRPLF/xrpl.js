@@ -24,7 +24,7 @@ function unused() {
 }
 
 function closeLedger(connection) {
-  connection._ws.emit('message', JSON.stringify(ledgerClosed));
+  connection._ws.emit('data', JSON.stringify(ledgerClosed));
 }
 
 function checkResult(expected, schemaName, response) {
