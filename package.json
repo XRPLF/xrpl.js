@@ -11,6 +11,7 @@
     "Gulpfile.js"
   ],
   "main": "dist/npm/",
+  "browser": "./build/ripple-latest.js",
   "directories": {
     "test": "test"
   },
