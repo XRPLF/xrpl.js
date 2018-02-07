@@ -51,7 +51,9 @@ function getWebpackConfig(extension, overrides) {
       }, {
         test: /\.ts$/,
         use: 'ts-loader',
-        exclude: /node_modules/,
+        include: [
+          path.resolve(__dirname, 'src')
+        ]
       }, {
         test: /\.json/,
         use: 'json-loader',
