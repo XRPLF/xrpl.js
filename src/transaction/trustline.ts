@@ -4,7 +4,9 @@ import * as utils from './utils'
 const validate = utils.common.validate
 const trustlineFlags = utils.common.txFlags.TrustSet
 import {Instructions, Prepare} from './types'
-import {FormattedTrustlineSpecification} from '../common/types/objects/trustlines'
+import {
+  FormattedTrustlineSpecification
+} from '../common/types/objects/trustlines'
 
 function convertQuality(quality) {
   return (new BigNumber(quality)).shift(9).truncated().toNumber()
