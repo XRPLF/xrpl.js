@@ -11,7 +11,9 @@
     "Gulpfile.js"
   ],
   "main": "dist/npm/",
-  "browser": "./build/ripple-latest.js",
+  "browser": {
+    "ws": "./dist/npm/common/wswrapper.js"
+  },
   "directories": {
     "test": "test"
   },
