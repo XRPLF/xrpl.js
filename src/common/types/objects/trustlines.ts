@@ -1,3 +1,4 @@
+import {Memo} from './memos'
 
 export interface Trustline {
   account: string,
@@ -28,7 +29,7 @@ export type FormattedTrustlineSpecification = {
 }
 
 export type FormattedTrustline = {
-  specification: TrustlineSpecification,
+  specification: FormattedTrustlineSpecification,
   counterparty: {
     limit: string,
     ripplingDisabled?: boolean,

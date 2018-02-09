@@ -2,11 +2,11 @@ export type Amount = {
   value: string,
   currency: string,
   issuer?: string,
-  counterparty?: string,
+  counterparty?: string
 }
 
 
-export type RippledAmount = string | Amount;
+export type RippledAmount = string | Amount
 
 /**
  * Specification of which currency the account taking the offer would pay/
@@ -14,8 +14,8 @@ export type RippledAmount = string | Amount;
  * Similar to currency amounts.
  */
 export interface TakerRequestAmount {
-  currency: string;
-  issuer?: string;
+  currency: string
+  issuer?: string
 }
 
 /**
