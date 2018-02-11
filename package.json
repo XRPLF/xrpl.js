@@ -11,6 +11,9 @@
     "Gulpfile.js"
   ],
   "main": "dist/npm/",
+  "browser": {
+    "ws": "./dist/npm/common/wswrapper.js"
+  },
   "directories": {
     "test": "test"
   },
@@ -78,6 +81,6 @@
   },
   "readmeFilename": "README.md",
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=6.12.3"
   }
 }
