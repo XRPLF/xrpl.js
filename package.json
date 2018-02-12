@@ -67,7 +67,7 @@
     "clean": "rm -rf dist/npm",
     "compile": "mkdir -p dist/npm/common && cp -r src/common/schemas dist/npm/common/ && tsc",
     "watch": "tsc -w",
-    "prepublish": "npm run clean && npm run compile",
+    "prepublish": "npm run clean && npm run compile && npm run build",
     "test": "nyc mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "tslint -p ./",
