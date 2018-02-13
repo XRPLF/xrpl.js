@@ -1,6 +1,29 @@
 # ripple-lib Release History
 
+## 0.18.2 (2018-02-13)
+
++ [Fix: Publish updated browser builds to npm so that users can easily use
+  CDNs](https://github.com/ripple/ripple-lib/pull/849)
++ [Fix: Browserify fails due to dependency on `ws`](https://github.com/ripple/ripple-lib/pull/847)
++ [Fix: `build` script fails when `node_modules` is in path](https://github.com/ripple/ripple-lib/pull/846)
++ [Reduce size of published npm package](https://github.com/ripple/ripple-lib/commit/0c318816ccf25c4c3932934a35ef903cc552edc1)
++ Clean up files from Flow (we migrated to TypeScript)
++ Typos and code cleanup
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+f08ab61137255be3639e9d210ded2a182b6e0388f257a70d9b372ce7e7e518a6  ripple-0.18.2-debug.js
+0604835b8421391167b4314ce93a76b5994780a08bd7edf36d91eb5e8f2643a2  ripple-0.18.2-min.js
+fda56ab5c8256e04355e20064877ef4053f26c87f37cfcf861340f22bf89ee40  ripple-0.18.2.js
+```
+
 ## 0.18.1 (2018-01-27)
+
+Note: The package published to npm for this version did not include updated
+browser builds. If you are using a CDN that pulls from npm, please use 0.18.2 or
+later.
 
 + [Fix: isSameIssue() should check counterparty](https://github.com/ripple/ripple-lib/pull/836). This bug caused `getOrderbook()` to return incorrect values.
 
