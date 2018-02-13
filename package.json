@@ -5,10 +5,7 @@
   "description": "A JavaScript API for interacting with Ripple in Node.js and the browser",
   "files": [
     "dist/npm/*",
-    "bin/*",
-    "build/*",
-    "test/*",
-    "Gulpfile.js"
+    "build/*"
   ],
   "main": "dist/npm/",
   "browser": {
