@@ -1,5 +1,14 @@
 'use strict'; // eslint-disable-line strict
 
+function moreThan400Items() {
+  let items = [];
+  const oneItem = require('./get-trustlines-more-than-400-items.json');
+  for (let i = 0; i < 401; i++) {
+    items.push(oneItem);
+  }
+  return items;
+}
+
 module.exports = {
   generateAddress: require('./generate-address.json'),
   getAccountInfo: require('./get-account-info.json'),
@@ -61,6 +70,7 @@ module.exports = {
   },
   getTrustlines: {
     filtered: require('./get-trustlines.json'),
+    moreThan400Items: moreThan400Items(),
     all: require('./get-trustlines-all.json')
   },
   getLedger: {

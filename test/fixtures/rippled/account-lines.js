@@ -321,3 +321,37 @@ module.exports.counterparty = function(request, options = {}) {
     }
   });
 };
+
+module.exports.manyItems = function(request, options = {}) {
+  _.defaults(options, {
+    ledger: BASE_LEDGER_INDEX
+  });
+
+  options.marker = 'MORE_TO_COME';
+
+  let lines = [];
+  for(let i = 0; i < Math.max(request.limit, 10); i++) {
+    lines.push({
+      account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      balance: '0.3488146605801446',
+      currency: 'CHF',
+      limit: '0',
+      limit_peer: '0',
+      quality_in: 0,
+      quality_out: 0
+    });
+  }
+
+  return JSON.stringify({
+    id: request.id,
+    status: 'success',
+    type: 'response',
+    result: {
+      account: request.account,
+      marker: options.marker,
+      limit: request.limit,
+      ledger_index: options.ledger,
+      lines: lines
+    }
+  });
+};
