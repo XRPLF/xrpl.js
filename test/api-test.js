@@ -995,6 +995,12 @@ describe('RippleAPI', function() {
         responses.getTrustlines.filtered, 'getTrustlines'));
   });
 
+  it('getTrustlines - more than 400 items', function() {
+    const options = {limit: 401};
+    return this.api.getTrustlines(addresses.THIRD_ACCOUNT, options).then(
+      _.partial(checkResult, responses.getTrustlines.moreThan400Items, 'getTrustlines'));
+  });
+
   it('getTrustlines - no options', function() {
     return this.api.getTrustlines(address).then(
       _.partial(checkResult, responses.getTrustlines.all, 'getTrustlines'));
