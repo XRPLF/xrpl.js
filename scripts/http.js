@@ -1,6 +1,6 @@
 'use strict';
 
-const createHTTPServer = require('../src/http').createHTTPServer;
+const createHTTPServer = require('../dist/npm/http').createHTTPServer;
 const port = 5990;
 const serverUrl = 'wss://s1.ripple.com';
 

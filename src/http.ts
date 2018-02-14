@@ -2,7 +2,7 @@
 
 import * as assert from 'assert'
 import * as _ from 'lodash'
-import jayson from 'jayson'
+import * as jayson from 'jayson'
 import {RippleAPI} from './api'
 
 

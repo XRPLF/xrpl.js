@@ -1,6 +1,7 @@
 import * as _ from 'lodash'
 import {convertKeysFromSnakeCaseToCamelCase} from './utils'
 import Connection from './connection'
+import BigNumber from 'bignumber.js'
 
 export type GetServerInfoResponse = {
   buildVersion: string,
@@ -60,13 +61,12 @@ function getServerInfo(connection: Connection): Promise<GetServerInfoResponse> {
   })
 }
 
-// TODO: This was originally annotated to return a number, but actually
-// returned a toString'ed number. Should this actually be returning a number?
 function computeFeeFromServerInfo(cushion: number,
   serverInfo: GetServerInfoResponse
 ): string {
-  return (Number(serverInfo.validatedLedger.baseFeeXRP)
-       * Number(serverInfo.loadFactor) * cushion).toString()
+  return (new BigNumber(serverInfo.validatedLedger.baseFeeXRP)).
+    times(serverInfo.loadFactor).
+    times(cushion).toString()
 }
 
 function getFee(connection: Connection, cushion: number): Promise<string> {

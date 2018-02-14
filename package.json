@@ -1,16 +1,16 @@
 {
   "name": "ripple-lib",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "license": "ISC",
   "description": "A JavaScript API for interacting with Ripple in Node.js and the browser",
   "files": [
     "dist/npm/*",
-    "bin/*",
-    "build/*",
-    "test/*",
-    "Gulpfile.js"
+    "build/*"
   ],
   "main": "dist/npm/",
+  "browser": {
+    "ws": "./dist/npm/common/wswrapper.js"
+  },
   "directories": {
     "test": "test"
   },
@@ -64,14 +64,13 @@
     "clean": "rm -rf dist/npm",
     "compile": "mkdir -p dist/npm/common && cp -r src/common/schemas dist/npm/common/ && tsc",
     "watch": "tsc -w",
-    "compile-with-source-maps": "babel -D --optional runtime -s -t -d dist/npm/ src/",
-    "prepublish": "npm run clean && npm run compile",
+    "prepublish": "npm run clean && npm run compile && npm run build",
     "test": "nyc mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "tslint -p ./",
     "perf": "./scripts/perf_test.sh",
-    "start": "babel-node scripts/http.js",
-    "sauce": "babel-node scripts/sauce-runner.js"
+    "start": "node scripts/http.js",
+    "sauce": "node scripts/sauce-runner.js"
   },
   "repository": {
     "type": "git",
@@ -79,6 +78,6 @@
   },
   "readmeFilename": "README.md",
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=6.12.3"
   }
 }
