@@ -1,7 +1,7 @@
 'use strict'; // eslint-disable-line strict
 
-function moreThan400Items(item) {
-  return new Array(401).fill(item);
+function buildList(options) {
+  return new Array(options.count).fill(options.item);
 }
 
 module.exports = {
@@ -65,7 +65,10 @@ module.exports = {
   },
   getTrustlines: {
     filtered: require('./get-trustlines.json'),
-    moreThan400Items: moreThan400Items(require('./trustline-item.json')),
+    moreThan400Items: buildList({
+      item: require('./trustline-item.json'),
+      count: 401
+    }),
     all: require('./get-trustlines-all.json')
   },
   getLedger: {

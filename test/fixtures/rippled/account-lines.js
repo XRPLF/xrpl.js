@@ -2,6 +2,34 @@
 const _ = require('lodash');
 const BASE_LEDGER_INDEX = 8819951;
 
+function getMarkerAndLinesFromRequest(request) {
+  const itemCount = 401; // Items on the ledger
+  const perRequestLimit = 400;
+  const pageCount = Math.ceil(itemCount / perRequestLimit);
+
+  // marker is the index of the next item to return
+  const startIndex = request.marker ? Number(request.marker) : 0;
+
+  // No minimum: there are only a certain number of results on the ledger.
+  // Maximum: the lowest of (perRequestLimit, itemCount - startIndex, request.limit).
+  const lineCount = Math.min(perRequestLimit, itemCount - startIndex, request.limit);
+
+  const trustline = {
+    account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+    balance: '0.3488146605801446',
+    currency: 'CHF',
+    limit: '0',
+    limit_peer: '0',
+    quality_in: 0,
+    quality_out: 0
+  };
+
+  return {
+    marker: itemCount - lineCount > 0 ? startIndex + lineCount : undefined,
+    lines: new Array(lineCount).fill(trustline)
+  };
+}
+
 module.exports.normal = function(request, options = {}) {
   _.defaults(options, {
     ledger: BASE_LEDGER_INDEX
@@ -327,20 +355,7 @@ module.exports.manyItems = function(request, options = {}) {
     ledger: BASE_LEDGER_INDEX
   });
 
-  options.marker = 'MORE_TO_COME';
-
-  let lines = [];
-  for(let i = 0; i < Math.max(request.limit, 10); i++) {
-    lines.push({
-      account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-      balance: '0.3488146605801446',
-      currency: 'CHF',
-      limit: '0',
-      limit_peer: '0',
-      quality_in: 0,
-      quality_out: 0
-    });
-  }
+  const {marker, lines} = getMarkerAndLinesFromRequest(request);
 
   return JSON.stringify({
     id: request.id,
@@ -348,7 +363,7 @@ module.exports.manyItems = function(request, options = {}) {
     type: 'response',
     result: {
       account: request.account,
-      marker: options.marker,
+      marker: marker,
       limit: request.limit,
       ledger_index: options.ledger,
       lines: lines
