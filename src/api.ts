@@ -186,12 +186,12 @@ class RippleAPI extends EventEmitter {
     }
     // If limit is not provided, fetches all data over multiple requests.
     // NOTE: This may return much more than needed. Set limit when possible.
-    const results = []
     const countTo: number =
-      (params.limit !== undefined) ? params.limit : Infinity
-    let count = 0
-    let marker = params.marker
-    let lastBatchLength
+        (params.limit !== undefined) ? params.limit : Infinity
+    let count: number = 0
+    let marker: string = params.marker
+    let lastBatchLength: number
+    const results = []
     do {
       const countRemaining = clamp(countTo - count, 10, 400)
       const repeatProps = {
@@ -208,7 +208,8 @@ class RippleAPI extends EventEmitter {
       lastBatchLength = singleResult[collectKey].length
       results.push(singleResult)
     } while(!!marker && count < countTo && lastBatchLength !== 0)
-    return results
+    // NOTE: We slice out any additional items over the original requested num
+    return results.slice(0, countTo)
   }
 
   connect = connect
