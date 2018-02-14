@@ -51,6 +51,7 @@ import {
 import RangeSet from './common/rangeset'
 import * as ledgerUtils from './ledger/utils'
 import * as schemaValidator from './common/schema-validator'
+import {clamp} from './ledger/utils'
 
 type APIOptions = {
   server?: string,
@@ -185,13 +186,14 @@ class RippleAPI extends EventEmitter {
     }
     // If limit is not provided, fetches all data over multiple requests.
     // NOTE: This may return much more than needed. Set limit when possible.
-    const countTo = (params.limit !== undefined) ? params.limit : Infinity
     const results = []
+    const countTo: number =
+      (params.limit !== undefined) ? params.limit : Infinity
     let count = 0
     let marker = params.marker
     let lastBatchLength
     do {
-      const countRemaining = countTo - count
+      const countRemaining = clamp(countTo - count, 10, 400)
       const repeatProps = {
         ...params,
         limit: countRemaining,

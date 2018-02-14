@@ -1,5 +1,4 @@
 import * as _ from 'lodash'
-import * as utils from './utils'
 import {validate} from '../common'
 import parseAccountOrder from './parse/account-order'
 import {Order} from './types'
@@ -33,7 +32,7 @@ export default async function getOrders(
   const responses = await this._requestAll('account_offers', {
     account: address,
     ledger_index: options.ledgerVersion || await this.getLedgerVersion(),
-    limit: utils.clamp(options.limit, 10, 400) || undefined
+    limit: options.limit
   })
   // 3. Return Formatted Response
   return formatResponse(address, responses)

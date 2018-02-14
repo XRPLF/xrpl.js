@@ -1,5 +1,4 @@
 import * as _ from 'lodash'
-import * as utils from './utils'
 import {validate} from '../common'
 import parseAccountTrustline from './parse/account-trustline'
 import {RippleAPI} from '../api'
@@ -26,7 +25,7 @@ async function getTrustlines(
   const responses = await this._requestAll('account_lines', {
     account: address,
     ledger_index: ledgerVersion,
-    limit: utils.clamp(options.limit, 10, 400),
+    limit: options.limit,
     peer: options.counterparty
   })
   // 3. Return Formatted Response
