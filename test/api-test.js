@@ -1060,6 +1060,11 @@ describe('RippleAPI', function() {
   });
 
   it('getOrders', function() {
+    return this.api.getOrders(address).then(
+      _.partial(checkResult, responses.getOrders, 'getOrders'));
+  });
+
+  it('getOrders - limit', function() {
     return this.api.getOrders(address, {limit: 20}).then(
       _.partial(checkResult, responses.getOrders, 'getOrders'));
   });

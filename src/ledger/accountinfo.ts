@@ -6,7 +6,7 @@ type GetAccountInfoOptions = {
   ledgerVersion?: number
 }
 
-type GetAccountInfoFormattedResponse = {
+type FormattedGetAccountInfoResponse = {
   sequence: number,
   xrpBalance: string,
   ownerCount: number,
@@ -17,7 +17,7 @@ type GetAccountInfoFormattedResponse = {
 
 function formatAccountInfo(
   response: AccountInfoResponse
-): GetAccountInfoFormattedResponse {
+): FormattedGetAccountInfoResponse {
   const data = response.account_data
   return removeUndefined({
     sequence: data.Sequence,
@@ -31,7 +31,7 @@ function formatAccountInfo(
 
 export default async function getAccountInfo(
   this: RippleAPI, address: string, options: GetAccountInfoOptions = {}
-): Promise<GetAccountInfoFormattedResponse> {
+): Promise<FormattedGetAccountInfoResponse> {
   // 1. Validate
   validate.getAccountInfo({address, options})
   // 2. Make Request

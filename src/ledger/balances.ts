@@ -2,7 +2,7 @@ import * as utils from './utils'
 import {validate} from '../common'
 import {Connection} from '../common'
 import {GetTrustlinesOptions} from './trustlines'
-import {ParsedTrustline} from '../common/types/objects/trustlines'
+import {FormattedTrustline} from '../common/types/objects/trustlines'
 
 
 type Balance = {
@@ -13,7 +13,7 @@ type Balance = {
 
 type GetBalances = Array<Balance>
 
-function getTrustlineBalanceAmount(trustline: ParsedTrustline) {
+function getTrustlineBalanceAmount(trustline: FormattedTrustline) {
   return {
     currency: trustline.specification.currency,
     counterparty: trustline.specification.counterparty,

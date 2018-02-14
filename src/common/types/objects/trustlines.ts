@@ -1,3 +1,4 @@
+import {Memo} from './memos'
 
 export interface Trustline {
   account: string,
@@ -11,9 +12,11 @@ export interface Trustline {
   no_ripple_peer?: boolean,
   freeze?: boolean,
   freeze_peer?: boolean,
+  authorized?: boolean,
+  peer_authorized?: boolean,
 }
 
-export type ParsedTrustlineSpecification = {
+export type FormattedTrustlineSpecification = {
   currency: string,
   counterparty: string,
   limit: string,
@@ -25,8 +28,8 @@ export type ParsedTrustlineSpecification = {
   memos?: Memo[]
 }
 
-export type ParsedTrustline = {
-  specification: TrustlineSpecification,
+export type FormattedTrustline = {
+  specification: FormattedTrustlineSpecification,
   counterparty: {
     limit: string,
     ripplingDisabled?: boolean,

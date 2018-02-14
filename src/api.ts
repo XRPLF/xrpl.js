@@ -177,20 +177,17 @@ class RippleAPI extends EventEmitter {
     command: string,
     params: any = {},
     options: {collect?: string} = {}): Promise<any[]> {
-    // If limit wasn't provided, return a single request in the _requestAll
-    // array format.
-    if (params.limit === undefined) {
-      return [await this._request(<any>command, params)]
-    }
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
     const collectKey = options.collect || getCollectKeyFromCommand(command)
     if (!collectKey) {
       throw new errors.ValidationError(`no collect key for command ${command}`)
     }
+    // If limit is not provided, fetches all data over multiple requests.
+    // NOTE: This may return much more than needed. Set limit when possible.
+    const countTo = (params.limit !== undefined) ? params.limit : Infinity
     const results = []
     let count = 0
-    const countTo = params.limit
     let marker = params.marker
     let lastBatchLength
     do {
