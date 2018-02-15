@@ -3,41 +3,21 @@
   "title": "settingsPlusMemos",
   "type": "object",
   "properties": {
-    "passwordSpent": {
+    "defaultRipple": {
       "type": "boolean",
-      "description": "Indicates that the account has used its free SetRegularKey transaction."
-    },
-    "requireDestinationTag": {
-      "type": "boolean",
-      "description": "Requires incoming payments to specify a destination tag."
-    },
-    "requireAuthorization": {
-      "type": "boolean",
-      "description": "If set, this account must individually approve other users in order for those users to hold this account’s issuances."
-    },
-    "disallowIncomingXRP": {
-      "type": "boolean",
-      "description": "Indicates that client applications should not send XRP to this account. Not enforced by rippled."
+      "description": "Enable [rippling](https://ripple.com/knowledge_center/understanding-the-noripple-flag/) on this account’s trust lines by default. (New in [rippled 0.27.3](https://github.com/ripple/rippled/releases/tag/0.27.3))"
     },
     "disableMasterKey": {
       "type": "boolean",
       "description": "Disallows use of the master key to sign transactions for this account."
     },
-    "enableTransactionIDTracking": {
+    "disallowIncomingXRP": {
       "type": "boolean",
-      "description": "Track the ID of this account’s most recent transaction."
+      "description": "Indicates that client applications should not send XRP to this account. Not enforced by rippled."
     },
-    "noFreeze": {
-      "type": "boolean",
-      "description": "Permanently give up the ability to freeze individual trust lines. This flag can never be disabled after being enabled."
-    },
-    "globalFreeze": {
-      "type": "boolean",
-      "description": "Freeze all assets issued by this account."
-    },
-    "defaultRipple": {
-      "type": "boolean",
-      "description": "Enable [rippling](https://ripple.com/knowledge_center/understanding-the-noripple-flag/) on this account’s trust lines by default. (New in [rippled 0.27.3](https://github.com/ripple/rippled/releases/tag/0.27.3))"
+    "domain": {
+      "type": "string",
+      "description": " The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase."
     },
     "emailHash": {
       "description": "Hash of an email address to be used for generating an avatar image. Conventionally, clients use Gravatar to display this image. Use `null` to clear.",
@@ -46,20 +26,26 @@
         {"$ref": "hash128"}
       ]
     },
+    "enableTransactionIDTracking": {
+      "type": "boolean",
+      "description": "Track the ID of this account’s most recent transaction."
+    },
+    "globalFreeze": {
+      "type": "boolean",
+      "description": "Freeze all assets issued by this account."
+    },
+    "memos": {"$ref": "memos"},
     "messageKey": {
       "type": "string",
       "description": "Public key for sending encrypted messages to this account. Conventionally, it should be a secp256k1 key, the same encryption that is used by the rest of Ripple."
     },
-    "domain": {
-      "type": "string",
-      "description": " The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase."
+    "noFreeze": {
+      "type": "boolean",
+      "description": "Permanently give up the ability to freeze individual trust lines. This flag can never be disabled after being enabled."
     },
-    "transferRate": {
-      "description": " The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.",
-      "oneOf": [
-        {"type": "null"},
-        {"type": "number", "minimum": 1, "maximum": 4.294967295}
-      ]
+    "passwordSpent": {
+      "type": "boolean",
+      "description": "Indicates that the account has used its free SetRegularKey transaction."
     },
     "regularKey": {
       "oneOf": [
@@ -67,6 +53,14 @@
         {"type": "null"}
       ],
       "description": "The public key of a new keypair, to use as the regular key to this account, as a base-58-encoded string in the same format as an account address. Use `null` to remove the regular key."
+    },
+    "requireAuthorization": {
+      "type": "boolean",
+      "description": "If set, this account must individually approve other users in order for those users to hold this account’s issuances."
+    },
+    "requireDestinationTag": {
+      "type": "boolean",
+      "description": "Requires incoming payments to specify a destination tag."
     },
     "signers": {
       "type": "object",
@@ -97,7 +91,13 @@
         }
       }
     },
-    "memos": {"$ref": "memos"}
+    "transferRate": {
+      "description": " The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.",
+      "oneOf": [
+        {"type": "null"},
+        {"type": "number", "minimum": 1, "maximum": 4.294967295}
+      ]
+    }
   },
   "additionalProperties": false
 }
