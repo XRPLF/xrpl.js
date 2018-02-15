@@ -55,7 +55,8 @@ const txFlagIndices = {
     asfAccountTxnID: 5,
     asfNoFreeze: 6,
     asfGlobalFreeze: 7,
-    asfDefaultRipple: 8
+    asfDefaultRipple: 8,
+    asfDepositAuth: 9
   }
 }
 
