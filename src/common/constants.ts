@@ -4,7 +4,8 @@ import {txFlagIndices} from './txflags'
 const accountRootFlags = {
   PasswordSpent: 0x00010000, // password set fee is spent
   RequireDestTag: 0x00020000, // require a DestinationTag for payments
-  RequireAuth: 0x00040000, // require a authorization to hold IOUs
+  RequireAuth: 0x00040000, // require authorization to hold IOUs
+  DepositAuth: 0x01000000, // require account to auth deposits
   DisallowXRP: 0x00080000, // disallow sending XRP
   DisableMaster: 0x00100000, // force regular key
   NoFreeze: 0x00200000, // permanently disallowed freezing trustlines
@@ -16,6 +17,7 @@ const AccountFlags = {
   passwordSpent: accountRootFlags.PasswordSpent,
   requireDestinationTag: accountRootFlags.RequireDestTag,
   requireAuthorization: accountRootFlags.RequireAuth,
+  depositAuth: accountRootFlags.DepositAuth,
   disallowIncomingXRP: accountRootFlags.DisallowXRP,
   disableMasterKey: accountRootFlags.DisableMaster,
   noFreeze: accountRootFlags.NoFreeze,
@@ -26,6 +28,7 @@ const AccountFlags = {
 const AccountFlagIndices = {
   requireDestinationTag: txFlagIndices.AccountSet.asfRequireDest,
   requireAuthorization: txFlagIndices.AccountSet.asfRequireAuth,
+  depositAuth: txFlagIndices.AccountSet.asfDepositAuth,
   disallowIncomingXRP: txFlagIndices.AccountSet.asfDisallowXRP,
   disableMasterKey: txFlagIndices.AccountSet.asfDisableMaster,
   enableTransactionIDTracking: txFlagIndices.AccountSet.asfAccountTxnID,
