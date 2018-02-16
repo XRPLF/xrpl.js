@@ -203,13 +203,19 @@ class RippleAPI extends EventEmitter {
       // here until we add support for unknown commands (since command is some
       // unknown string).
       const singleResult = await (<Function>this._request)(command, repeatProps)
+      const collectedData = singleResult[collectKey]
       marker = singleResult.marker
-      count += singleResult[collectKey].length
-      lastBatchLength = singleResult[collectKey].length
       results.push(singleResult)
+      // Make sure we handle when no data (not even an empty array) is returned.
+      const isExpectedFormat = Array.isArray(collectedData)
+      if (isExpectedFormat) {
+        count += collectedData.length
+        lastBatchLength = collectedData.length
+      } else {
+        lastBatchLength = 0
+      }
     } while(!!marker && count < countTo && lastBatchLength !== 0)
-    // NOTE: We slice out any additional items over the original requested num
-    return results.slice(0, countTo)
+    return results
   }
 
   connect = connect

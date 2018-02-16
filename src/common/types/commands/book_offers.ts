@@ -15,7 +15,6 @@ export interface BookOffersRequest {
 }
 
 export interface BookOffersResponse {
-  account: string,
   offers: OrderBookOffer[],
   ledger_hash?: string,
   ledger_current_index?: number,
