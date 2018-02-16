@@ -160,7 +160,6 @@ __OTHER CHANGES__
 __BREAKING CHANGES__
 + Add new RippleAPI interface and delete old API
     - [RippleAPI README and samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
-    - [Method documentation](https://rawgit.com/ripple/ripple-lib/develop/docs/api.html)
 
 __OTHER CHANGES__
 + [Removed timeout method of Request and added default timeout](https://github.com/ripple/ripple-lib/commit/634fe5683a9082e57682ff7d5c4fb9483b4af818)

@@ -363,10 +363,10 @@ module.exports.manyItems = function(request, options = {}) {
     type: 'response',
     result: {
       account: request.account,
-      marker: marker,
+      marker,
       limit: request.limit,
       ledger_index: options.ledger,
-      lines: lines
+      lines
     }
   });
 };
