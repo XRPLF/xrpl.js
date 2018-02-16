@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "prepareCheckCancelParameters",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that is creating the transaction."
+    },
+    "checkCancel": {
+      "$ref": "checkCancel",
+      "description": "The specification of the Check cancellation to prepare."
+    },
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "checkCancel"]
+}

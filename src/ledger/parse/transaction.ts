@@ -9,6 +9,9 @@ import parseSettings from './settings'
 import parseEscrowCreation from './escrow-creation'
 import parseEscrowExecution from './escrow-execution'
 import parseEscrowCancellation from './escrow-cancellation'
+import parseCheckCreate from './check-create'
+import parseCheckCash from './check-cash'
+import parseCheckCancel from './check-cancel'
 import parsePaymentChannelCreate from './payment-channel-create'
 import parsePaymentChannelFund from './payment-channel-fund'
 import parsePaymentChannelClaim from './payment-channel-claim'
@@ -26,6 +29,9 @@ function parseTransactionType(type) {
     EscrowCreate: 'escrowCreation',
     EscrowFinish: 'escrowExecution',
     EscrowCancel: 'escrowCancellation',
+    CheckCreate: 'checkCreate',
+    CheckCash: 'checkCash',
+    CheckCancel: 'checkCancel',
     PaymentChannelCreate: 'paymentChannelCreate',
     PaymentChannelFund: 'paymentChannelFund',
     PaymentChannelClaim: 'paymentChannelClaim',
@@ -47,6 +53,9 @@ function parseTransaction(tx: any): any {
     'escrowCreation': parseEscrowCreation,
     'escrowExecution': parseEscrowExecution,
     'escrowCancellation': parseEscrowCancellation,
+    'checkCreate': parseCheckCreate,
+    'checkCash': parseCheckCash,
+    'checkCancel': parseCheckCancel,
     'paymentChannelCreate': parsePaymentChannelCreate,
     'paymentChannelFund': parsePaymentChannelFund,
     'paymentChannelClaim': parsePaymentChannelClaim,
