@@ -1473,6 +1473,26 @@
       }
     ],
     [
+      "ConsensusHash",
+      {
+        "nth": 23,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "CheckID",
+      {
+        "nth": 24,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
       "TickSize",
       {
         "nth": 16,
