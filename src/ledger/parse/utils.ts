@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 import * as common from '../../common'
 import parseAmount from './amount'
 
-import {Amount, Memo} from '../../common/types'
+import {Amount, Memo} from '../../common/types/objects'
 
 function adjustQualityForXRP(
   quality: string, takerGetsCurrency: string, takerPaysCurrency: string

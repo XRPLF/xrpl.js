@@ -1,9 +1,15 @@
 import BigNumber from 'bignumber.js'
 import * as common from '../common'
-import {Memo, ApiMemo} from '../common/types'
+import {Memo} from '../common/types/objects'
 const txFlags = common.txFlags
 import {Instructions, Prepare} from './types'
 import {RippleAPI} from '../api'
+
+export type ApiMemo = {
+  MemoData?: string,
+  MemoType?: string,
+  MemoFormat?: string
+}
 
 function formatPrepareResponse(txJSON: any): Prepare {
   const instructions = {

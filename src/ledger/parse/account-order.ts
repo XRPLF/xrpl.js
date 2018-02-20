@@ -3,6 +3,7 @@ import parseAmount from './amount'
 import {parseTimestamp, adjustQualityForXRP} from './utils'
 import {removeUndefined} from '../../common'
 import {orderFlags} from './flags'
+import {Order} from '../types'
 
 // TODO: remove this function once rippled provides quality directly
 function computeQuality(takerGets, takerPays) {
@@ -12,7 +13,7 @@ function computeQuality(takerGets, takerPays) {
 
 // rippled 'account_offers' returns a different format for orders than 'tx'
 // the flags are also different
-function parseAccountOrder(address: string, order: any): Object {
+function parseAccountOrder(address: string, order: any): Order {
   const direction = (order.flags & orderFlags.Sell) === 0 ? 'buy' : 'sell'
   const takerGetsAmount = parseAmount(order.taker_gets)
   const takerPaysAmount = parseAmount(order.taker_pays)

@@ -1,24 +1,13 @@
 import {parseQuality} from './utils'
 import {removeUndefined} from '../../common'
-
-type Trustline = {
-  account: string, limit: number, currency: string, quality_in: number|null,
-  quality_out: number|null, no_ripple: boolean, freeze: boolean,
-  authorized: boolean, limit_peer: string, no_ripple_peer: boolean,
-  freeze_peer: boolean, peer_authorized: boolean, balance: any
-}
-
-type TrustlineSpecification = {}
-type TrustlineCounterParty = {}
-type TrustlineState = {balance: number}
-type AccountTrustline = {
-  specification: TrustlineSpecification, counterparty: TrustlineCounterParty,
-  state: TrustlineState
-}
+import {
+  Trustline,
+  FormattedTrustline
+} from '../../common/types/objects/trustlines'
 
 // rippled 'account_lines' returns a different format for
 // trustlines than 'tx'
-function parseAccountTrustline(trustline: Trustline): AccountTrustline {
+function parseAccountTrustline(trustline: Trustline): FormattedTrustline {
   const specification = removeUndefined({
     limit: trustline.limit,
     currency: trustline.currency,

@@ -1,7 +1,8 @@
 import * as _ from 'lodash'
-import * as utils from './utils'
 import {validate} from '../common'
-import {Amount} from '../common/types'
+import {Amount} from '../common/types/objects'
+import {ensureLedgerVersion} from './utils'
+import {RippleAPI} from '../api'
 
 type BalanceSheetOptions = {
   excludeAddresses?: Array<string>,
@@ -46,21 +47,21 @@ function formatBalanceSheet(balanceSheet): GetBalanceSheet {
   return result
 }
 
-function getBalanceSheet(address: string, options: BalanceSheetOptions = {}
+async function getBalanceSheet(
+  this: RippleAPI, address: string, options: BalanceSheetOptions = {}
 ): Promise<GetBalanceSheet> {
+  // 1. Validate
   validate.getBalanceSheet({address, options})
-
-  return utils.ensureLedgerVersion.call(this, options).then(_options => {
-    const request = {
-      command: 'gateway_balances',
-      account: address,
-      strict: true,
-      hotwallet: _options.excludeAddresses,
-      ledger_index: _options.ledgerVersion
-    }
-
-    return this.connection.request(request).then(formatBalanceSheet)
+  options = await ensureLedgerVersion.call(this, options)
+  // 2. Make Request
+  const response = await this._request('gateway_balances', {
+    account: address,
+    strict: true,
+    hotwallet: options.excludeAddresses,
+    ledger_index: options.ledgerVersion
   })
+  // 3. Return Formatted Response
+  return formatBalanceSheet(response)
 }
 
 export default getBalanceSheet

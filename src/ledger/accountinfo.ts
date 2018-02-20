@@ -1,31 +1,12 @@
 import {validate, removeUndefined, dropsToXrp} from '../common'
+import {RippleAPI} from '../api'
+import {AccountInfoResponse} from '../common/types/commands/account_info'
 
-type AccountData = {
-  Sequence: number,
-  Account: string,
-  Balance: string,
-  Flags: number,
-  LedgerEntryType: string,
-  OwnerCount: number,
-  PreviousTxnID: string,
-  AccountTxnID?: string,
-  PreviousTxnLgrSeq: number,
-  index: string
-}
-
-type AccountDataResponse = {
-  account_data: AccountData,
-  ledger_current_index?: number,
-  ledger_hash?: string,
-  ledger_index: number,
-  validated: boolean
-}
-
-type AccountInfoOptions = {
+type GetAccountInfoOptions = {
   ledgerVersion?: number
 }
 
-type AccountInfoResponse = {
+type FormattedGetAccountInfoResponse = {
   sequence: number,
   xrpBalance: string,
   ownerCount: number,
@@ -34,7 +15,9 @@ type AccountInfoResponse = {
   previousAffectingTransactionLedgerVersion: number
 }
 
-function formatAccountInfo(response: AccountDataResponse) {
+function formatAccountInfo(
+  response: AccountInfoResponse
+): FormattedGetAccountInfoResponse {
   const data = response.account_data
   return removeUndefined({
     sequence: data.Sequence,
@@ -46,17 +29,16 @@ function formatAccountInfo(response: AccountDataResponse) {
   })
 }
 
-function getAccountInfo(address: string, options: AccountInfoOptions = {}
-): Promise<AccountInfoResponse> {
+export default async function getAccountInfo(
+  this: RippleAPI, address: string, options: GetAccountInfoOptions = {}
+): Promise<FormattedGetAccountInfoResponse> {
+  // 1. Validate
   validate.getAccountInfo({address, options})
-
-  const request = {
-    command: 'account_info',
+  // 2. Make Request
+  const response = await this._request('account_info', {
     account: address,
     ledger_index: options.ledgerVersion || 'validated'
-  }
-
-  return this.connection.request(request).then(formatAccountInfo)
+  })
+  // 3. Return Formatted Response
+  return formatAccountInfo(response)
 }
-
-export default getAccountInfo

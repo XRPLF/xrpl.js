@@ -3,7 +3,7 @@ import * as assert from 'assert'
 import * as common from '../common'
 import {Connection} from '../common'
 import {TransactionType} from './transaction-types'
-import {Issue} from '../common/types'
+import {Issue} from '../common/types/objects'
 
 type RecursiveData = {
   marker: string,

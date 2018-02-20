@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import * as utils from './utils'
 const validate = utils.common.validate
 import {Instructions, Prepare} from './types'
-import {Memo} from '../common/types'
+import {Memo} from '../common/types/objects'
 
 type EscrowCancellation = {
   owner: string,

@@ -560,9 +560,11 @@ describe('RippleAPI', function() {
   });
 
   it('getBalanceSheet - invalid options', function() {
-    assert.throws(() => {
-      this.api.getBalanceSheet(address, {invalid: 'options'});
-    }, this.api.errors.ValidationError);
+    return this.api.getBalanceSheet(address, {invalid: 'options'}).then(() => {
+      assert(false, 'Should throw ValidationError');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.ValidationError);
+    });
   });
 
   it('getBalanceSheet - empty', function() {
@@ -1050,9 +1052,11 @@ describe('RippleAPI', function() {
   });
 
   it('getAccountInfo - invalid options', function() {
-    assert.throws(() => {
-      this.api.getAccountInfo(address, {invalid: 'options'});
-    }, this.api.errors.ValidationError);
+    return this.api.getAccountInfo(address, {invalid: 'options'}).then(() => {
+      assert(false, 'Should throw ValidationError');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.ValidationError);
+    });
   });
 
   it('getOrders', function() {
@@ -1060,31 +1064,36 @@ describe('RippleAPI', function() {
       _.partial(checkResult, responses.getOrders, 'getOrders'));
   });
 
-  it('getOrders', function() {
-    return this.api.getOrders(address, undefined).then(
+  it('getOrders - limit', function() {
+    return this.api.getOrders(address, {limit: 20}).then(
       _.partial(checkResult, responses.getOrders, 'getOrders'));
   });
 
   it('getOrders - invalid options', function() {
-    assert.throws(() => {
-      this.api.getOrders(address, {invalid: 'options'});
-    }, this.api.errors.ValidationError);
+    return this.api.getOrders(address, {invalid: 'options'}).then(() => {
+      assert(false, 'Should throw ValidationError');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.ValidationError);
+    });
   });
 
   describe('getOrderbook', function() {
 
     it('normal', function() {
       return this.api.getOrderbook(address,
-        requests.getOrderbook.normal, undefined).then(
+        requests.getOrderbook.normal, {limit: 20}).then(
           _.partial(checkResult,
             responses.getOrderbook.normal, 'getOrderbook'));
     });
 
     it('invalid options', function() {
-      assert.throws(() => {
-        this.api.getOrderbook(address, requests.getOrderbook.normal,
-          {invalid: 'options'});
-      }, this.api.errors.ValidationError);
+      return this.api.getOrderbook(
+          address, requests.getOrderbook.normal, {invalid: 'options'}
+        ).then(() => {
+          assert(false, 'Should throw ValidationError');
+        }).catch(error => {
+          assert(error instanceof this.api.errors.ValidationError);
+        });
     });
 
     it('with XRP', function() {
