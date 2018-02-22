@@ -3,7 +3,7 @@ import * as utils from './utils'
 import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
 const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare} from './types'
-import {Memo} from '../common/types'
+import {Memo} from '../common/types/objects'
 
 type EscrowCreation = {
   amount: string,

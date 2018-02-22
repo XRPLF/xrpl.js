@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
 const {deriveKeypair} = require('ripple-keypairs')
 
-import {Amount, RippledAmount} from './types'
+import {Amount, RippledAmount} from './types/objects'
 
 function isValidSecret(secret: string): boolean {
   try {

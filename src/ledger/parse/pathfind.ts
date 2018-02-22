@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import parseAmount from './amount'
-import {Amount, RippledAmount} from '../../common/types'
+import {Amount, RippledAmount} from '../../common/types/objects'
 import {Path, GetPaths, RippledPathsResponse} from '../pathfind-types'
 
 function parsePaths(paths) {

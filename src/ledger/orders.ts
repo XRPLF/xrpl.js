@@ -1,37 +1,39 @@
 import * as _ from 'lodash'
-import * as utils from './utils'
 import {validate} from '../common'
-import {Connection} from '../common'
 import parseAccountOrder from './parse/account-order'
-import {OrdersOptions, Order} from './types'
+import {Order} from './types'
+import {RippleAPI} from '../api'
+import {AccountOffersResponse} from '../common/types/commands/account_offers'
 
-type GetOrders = Array<Order>
-
-function requestAccountOffers(connection: Connection, address: string,
-  ledgerVersion: number, marker: string, limit: number
-): Promise<Object> {
-  return connection.request({
-    command: 'account_offers',
-    account: address,
-    marker: marker,
-    limit: utils.clamp(limit, 10, 400),
-    ledger_index: ledgerVersion
-  }).then(data => ({
-    marker: data.marker,
-    results: data.offers.map(_.partial(parseAccountOrder, address))
-  }))
+export type GetOrdersOptions = {
+  limit?: number,
+  ledgerVersion?: number
 }
 
-function getOrders(address: string, options: OrdersOptions = {}
-): Promise<GetOrders> {
+function formatResponse(
+  address: string, responses: AccountOffersResponse[]
+): Order[] {
+  let orders: Order[] = []
+  for (const response of responses) {
+    const offers = response.offers.map(offer => {
+      return parseAccountOrder(address, offer)
+    })
+    orders = orders.concat(offers)
+  }
+  return _.sortBy(orders, order => order.properties.sequence)
+}
+
+export default async function getOrders(
+  this: RippleAPI, address: string, options: GetOrdersOptions = {}
+): Promise<Order[]> {
+  // 1. Validate
   validate.getOrders({address, options})
-
-  return utils.ensureLedgerVersion.call(this, options).then(_options => {
-    const getter = _.partial(requestAccountOffers, this.connection, address,
-      _options.ledgerVersion)
-    return utils.getRecursive(getter, _options.limit).then(orders =>
-      _.sortBy(orders, order => order.properties.sequence))
+  // 2. Make Request
+  const responses = await this._requestAll('account_offers', {
+    account: address,
+    ledger_index: options.ledgerVersion || await this.getLedgerVersion(),
+    limit: options.limit
   })
+  // 3. Return Formatted Response
+  return formatResponse(address, responses)
 }
-
-export default getOrders

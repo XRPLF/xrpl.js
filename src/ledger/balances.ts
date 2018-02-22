@@ -1,7 +1,8 @@
 import * as utils from './utils'
 import {validate} from '../common'
 import {Connection} from '../common'
-import {TrustlinesOptions, Trustline} from './trustlines-types'
+import {GetTrustlinesOptions} from './trustlines'
+import {FormattedTrustline} from '../common/types/objects/trustlines'
 
 
 type Balance = {
@@ -12,7 +13,7 @@ type Balance = {
 
 type GetBalances = Array<Balance>
 
-function getTrustlineBalanceAmount(trustline: Trustline) {
+function getTrustlineBalanceAmount(trustline: FormattedTrustline) {
   return {
     currency: trustline.specification.currency,
     counterparty: trustline.specification.counterparty,
@@ -46,7 +47,7 @@ function getLedgerVersionHelper(connection: Connection, optionValue?: number
   return connection.getLedgerVersion()
 }
 
-function getBalances(address: string, options: TrustlinesOptions = {}
+function getBalances(address: string, options: GetTrustlinesOptions = {}
 ): Promise<GetBalances> {
   validate.getTrustlines({address, options})
 

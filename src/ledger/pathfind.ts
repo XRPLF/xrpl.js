@@ -4,7 +4,7 @@ import {getXRPBalance, renameCounterpartyToIssuer} from './utils'
 import {validate, toRippledAmount, errors} from '../common'
 import {Connection} from '../common'
 import parsePathfind from './parse/pathfind'
-import {RippledAmount, Amount} from '../common/types'
+import {RippledAmount, Amount} from '../common/types/objects'
 import {
   GetPaths, PathFind, RippledPathsResponse, PathFindRequest
 } from './pathfind-types'

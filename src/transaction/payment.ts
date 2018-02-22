@@ -6,7 +6,7 @@ const paymentFlags = utils.common.txFlags.Payment
 const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare} from './types'
 import {Amount, Adjustment, MaxAdjustment,
-  MinAdjustment, Memo} from '../common/types'
+  MinAdjustment, Memo} from '../common/types/objects'
 
 
 type Payment = {
