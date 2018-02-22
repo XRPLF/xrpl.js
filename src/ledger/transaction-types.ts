@@ -42,6 +42,7 @@ type Settings = {
   passwordSpent?: boolean,
   requireDestinationTag?: boolean,
   requireAuthorization?: boolean,
+  depositAuthorization?: boolean,
   disallowIncomingXRP?: boolean,
   disableMasterKey?: boolean,
   enableTransactionIDTracking?: boolean,

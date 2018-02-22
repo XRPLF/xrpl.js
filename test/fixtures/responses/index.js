@@ -104,6 +104,8 @@ module.exports = {
     flagsMultisign: require('./prepare-settings-multisign.json'),
     flagSet: require('./prepare-settings-flag-set.json'),
     flagClear: require('./prepare-settings-flag-clear.json'),
+    flagSetDepositAuth: require('./prepare-settings-flag-set-deposit-auth.json'),
+    flagClearDepositAuth: require('./prepare-settings-flag-clear-deposit-auth.json'),
     setTransferRate: require('./prepare-settings-set-transfer-rate.json'),
     fieldClear: require('./prepare-settings-field-clear.json'),
     noInstructions: require('./prepare-settings-no-instructions.json'),

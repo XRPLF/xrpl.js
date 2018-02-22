@@ -233,6 +233,18 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.prepareSettings.flagClear, 'prepare'));
   });
 
+  it('prepareSettings - set depositAuth flag', function () {
+    const settings = { depositAuth: true };
+    return this.api.prepareSettings(address, settings, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.flagSetDepositAuth, 'prepare'));
+  });
+
+  it('prepareSettings - clear depositAuth flag', function () {
+    const settings = { depositAuth: false };
+    return this.api.prepareSettings(address, settings, instructions).then(
+      _.partial(checkResult, responses.prepareSettings.flagClearDepositAuth, 'prepare'));
+  });
+
   it('prepareSettings - integer field clear', function () {
     const settings = { transferRate: null };
     return this.api.prepareSettings(address, settings, instructions)
