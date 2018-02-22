@@ -113,6 +113,17 @@ module.exports = {
     noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json'),
     signers: require('./prepare-settings-signers.json')
   },
+  prepareCheckCreate: {
+    normal: require('./prepare-check-create'),
+    full: require('./prepare-check-create-full')
+  },
+  prepareCheckCash: {
+    amount: require('./prepare-check-cash-amount'),
+    deliverMin: require('./prepare-check-cash-delivermin')
+  },
+  prepareCheckCancel: {
+    normal: require('./prepare-check-cancel')
+  },
   prepareEscrowCreation: {
     normal: require('./prepare-escrow-creation'),
     full: require('./prepare-escrow-creation-full')

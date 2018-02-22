@@ -233,14 +233,14 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.prepareSettings.flagClear, 'prepare'));
   });
 
-  it('prepareSettings - set depositAuth flag', function() {
-    const settings = {depositAuth: true};
+  it('prepareSettings - set depositAuth flag', function () {
+    const settings = { depositAuth: true };
     return this.api.prepareSettings(address, settings, instructions).then(
       _.partial(checkResult, responses.prepareSettings.flagSetDepositAuth, 'prepare'));
   });
 
-  it('prepareSettings - clear depositAuth flag', function() {
-    const settings = {depositAuth: false};
+  it('prepareSettings - clear depositAuth flag', function () {
+    const settings = { depositAuth: false };
     return this.api.prepareSettings(address, settings, instructions).then(
       _.partial(checkResult, responses.prepareSettings.flagClearDepositAuth, 'prepare'));
   });
@@ -343,6 +343,45 @@ describe('RippleAPI', function () {
       requests.prepareEscrowCancellation.memos).then(
         _.partial(checkResult,
           responses.prepareEscrowCancellation.memos,
+          'prepare'));
+  });
+
+  it('prepareCheckCreate', function () {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.prepareCheckCreate(
+      address, requests.prepareCheckCreate.normal,
+      localInstructions).then(
+        _.partial(checkResult, responses.prepareCheckCreate.normal,
+          'prepare'));
+  });
+
+  it('prepareCheckCreate full', function () {
+    return this.api.prepareCheckCreate(
+      address, requests.prepareCheckCreate.full).then(
+        _.partial(checkResult, responses.prepareCheckCreate.full,
+          'prepare'));
+  });
+
+  it('prepareCheckCash amount', function () {
+    return this.api.prepareCheckCash(
+      address, requests.prepareCheckCash.amount).then(
+        _.partial(checkResult, responses.prepareCheckCash.amount,
+          'prepare'));
+  });
+
+  it('prepareCheckCash deliverMin', function () {
+    return this.api.prepareCheckCash(
+      address, requests.prepareCheckCash.deliverMin).then(
+        _.partial(checkResult, responses.prepareCheckCash.deliverMin,
+          'prepare'));
+  });
+
+  it('prepareCheckCancel', function () {
+    return this.api.prepareCheckCancel(
+      address, requests.prepareCheckCancel.normal).then(
+        _.partial(checkResult, responses.prepareCheckCancel.normal,
           'prepare'));
   });
 

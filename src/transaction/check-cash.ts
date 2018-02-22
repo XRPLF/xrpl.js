@@ -3,7 +3,7 @@ const ValidationError = utils.common.errors.ValidationError
 const toRippledAmount = utils.common.toRippledAmount
 import {validate} from '../common'
 import {Instructions, Prepare} from './types'
-import {Amount} from '../common/types'
+import {Amount} from '../common/types/objects'
 
 type CheckCash = {
   checkID: string,

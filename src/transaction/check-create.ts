@@ -2,7 +2,7 @@ import * as utils from './utils'
 const toRippledAmount = utils.common.toRippledAmount
 import {validate, iso8601ToRippleTime} from '../common'
 import {Instructions, Prepare} from './types'
-import {Amount} from '../common/types'
+import {Amount} from '../common/types/objects'
 
 type CheckCreate = {
   destination: string,
