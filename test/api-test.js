@@ -846,10 +846,6 @@ describe('RippleAPI', function () {
     });
 
     it('getTransaction - CheckCash', function () {
-      // const options = {
-      //   minLedgerVersion: 10,
-      //   maxLedgerVersion: 15
-      // };
       const hash =
         '8321208465F70BA52C28BCC4F646BAF3B012BA13B57576C0336F42D77E3E0749';
       return this.api.getTransaction(hash/*, options*/).then(
