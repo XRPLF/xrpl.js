@@ -3,7 +3,9 @@
   "title": "getTransaction",
   "link": "gettransaction",
   "properties": {
-    "type": {"$ref": "transactionType"},
+    "type": {
+      "$ref": "transactionType"
+    },
     "specification": {
       "description": "A specification that would produce the same outcome as this transaction. The structure of the specification depends on the value of the `type` field (see [Transaction Types](#transaction-types) for details). *Note:* This is **not** necessarily the same as the original specification."
     },
@@ -24,73 +26,146 @@
       "description": "The account sequence number of the transaction for the account that initiated it."
     }
   },
-  "required": ["id", "address", "sequence", "type", "specification", "outcome"],
+  "required": [
+    "id",
+    "address",
+    "sequence",
+    "type",
+    "specification",
+    "outcome"
+  ],
   "additionalProperties": false,
   "oneOf": [
     {
       "properties": {
-        "type": {"enum": ["payment"]},
-        "specification": {"$ref": "payment"}
+        "type": {
+          "enum": [
+            "payment"
+          ]
+        },
+        "specification": {
+          "$ref": "payment"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["order"]},
-        "specification": {"$ref": "order"}
+        "type": {
+          "enum": [
+            "order"
+          ]
+        },
+        "specification": {
+          "$ref": "order"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["orderCancellation"]},
-        "specification": {"$ref": "orderCancellation"}
+        "type": {
+          "enum": [
+            "orderCancellation"
+          ]
+        },
+        "specification": {
+          "$ref": "orderCancellation"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["trustline"]},
-        "specification": {"$ref": "trustline"}
+        "type": {
+          "enum": [
+            "trustline"
+          ]
+        },
+        "specification": {
+          "$ref": "trustline"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["settings"]},
-        "specification": {"$ref": "getSettings"}
+        "type": {
+          "enum": [
+            "settings"
+          ]
+        },
+        "specification": {
+          "$ref": "getSettings"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["escrowCreation"]},
-        "specification": {"$ref": "escrowCreation"}
+        "type": {
+          "enum": [
+            "escrowCreation"
+          ]
+        },
+        "specification": {
+          "$ref": "escrowCreation"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["escrowCancellation"]},
-        "specification": {"$ref": "escrowCancellation"}
+        "type": {
+          "enum": [
+            "escrowCancellation"
+          ]
+        },
+        "specification": {
+          "$ref": "escrowCancellation"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["escrowExecution"]},
-        "specification": {"$ref": "escrowExecution"}
+        "type": {
+          "enum": [
+            "escrowExecution"
+          ]
+        },
+        "specification": {
+          "$ref": "escrowExecution"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["paymentChannelCreate"]},
-        "specification": {"$ref": "paymentChannelCreate"}
+        "type": {
+          "enum": [
+            "paymentChannelCreate"
+          ]
+        },
+        "specification": {
+          "$ref": "paymentChannelCreate"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["paymentChannelFund"]},
-        "specification": {"$ref": "paymentChannelFund"}
+        "type": {
+          "enum": [
+            "paymentChannelFund"
+          ]
+        },
+        "specification": {
+          "$ref": "paymentChannelFund"
+        }
       }
     },
     {
       "properties": {
-        "type": {"enum": ["paymentChannelClaim"]},
-        "specification": {"$ref": "paymentChannelClaim"}
+        "type": {
+          "enum": [
+            "paymentChannelClaim"
+          ]
+        },
+        "specification": {
+          "$ref": "paymentChannelClaim"
+        }
       }
     }
   ]

@@ -2,5 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "getTransactions",
   "type": "array",
-  "items": {"$ref": "getTransaction"}
+  "items": {
+    "$ref": "getTransaction"
+  }
 }
