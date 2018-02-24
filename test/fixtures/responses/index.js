@@ -42,8 +42,14 @@ module.exports = {
     trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
     trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
     notValidated: require('./get-transaction-not-validated.json'),
+    checkCreate:
+      require('./get-transaction-check-create.json'),
+    checkCancel:
+      require('./get-transaction-check-cancel.json'),
+    checkCash:
+      require('./get-transaction-check-cash.json'),
     escrowCreation:
-      require('./get-transaction-escrow-create.json'),
+      require('./get-transaction-escrow-creation.json'),
     escrowCancellation:
       require('./get-transaction-escrow-cancellation.json'),
     escrowExecution:

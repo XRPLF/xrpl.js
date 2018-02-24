@@ -29,7 +29,7 @@ class RippleError extends Error {
   }
 
   /* console.log in node uses util.inspect on object, and util.inspect allows
-  us to cutomize its output:
+  us to customize its output:
   https://nodejs.org/api/util.html#util_custom_inspect_function_on_objects */
   inspect() {
     return this.toString()

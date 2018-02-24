@@ -1,0 +1,25 @@
+{
+  "type": "checkCancel",
+  "address": "rNpdNFXNMvEcaXDqMypi48gdSABZkYuyQE",
+  "sequence": 6,
+  "id": "B4105D1B2D83819647E4692B7C5843D674283F669524BD50C9614182E3A12CD4",
+  "specification": {
+    "checkID": "6EE1727598693635183A3D967342A46C739FC06F973CA6A3277A92E8D997E7A8"
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2018-02-23T22:45:41.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rNpdNFXNMvEcaXDqMypi48gdSABZkYuyQE": [
+        {
+          "currency": "XRP",
+          "value": "-0.000012"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 6967970,
+    "indexInLedger": 4
+  }
+}

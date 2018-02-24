@@ -72,6 +72,9 @@ module.exports = {
     LedgerWithoutTime: require('./tx/ledger-without-time.json'),
     NotValidated: require('./tx/not-validated.json'),
     OfferWithExpiration: require('./tx/order-with-expiration.json'),
+    CheckCreate: require('./tx/check-create.json'),
+    CheckCancel: require('./tx/check-cancel.json'),
+    CheckCash: require('./tx/check-cash.json'),
     EscrowCreation: require('./tx/escrow-creation.json'),
     EscrowCancellation:
       require('./tx/escrow-cancellation.json'),

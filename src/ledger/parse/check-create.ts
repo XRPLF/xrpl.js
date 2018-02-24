@@ -8,19 +8,20 @@ function parseCheckCreate(tx: any): Object {
 
   return removeUndefined({
 
-    // account that can cash the check
+    // account that can cash the check.
     destination: tx.Destination,
 
-    // amount the check is allowed to debit the sender
-    sendMax: parseAmount(tx.SendMax).value,
+    // amount the check is allowed to debit the sender,
+    // including transfer fees on non-XRP currencies.
+    sendMax: parseAmount(tx.SendMax),
 
-    // identifies the reason for the check, or a hosted recipient
+    // (Optional) identifies the reason for the check, or a hosted recipient.
     destinationTag: tx.DestinationTag,
 
-    // time in seconds since the Ripple Epoch
+    // (Optional) time in seconds since the Ripple Epoch.
     expiration: tx.Expiration && parseTimestamp(tx.Expiration),
 
-    // 256-bit hash representing a specific reason or identifier
+    // (Optional) 256-bit hash representing a specific reason or identifier.
     invoiceID: tx.InvoiceID
   })
 }
