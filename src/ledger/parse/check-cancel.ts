@@ -6,7 +6,7 @@ function parseCheckCancel(tx: any): Object {
 
   return removeUndefined({
 
-    // ID of the Check ledger object to cancel
+    // ID of the Check ledger object to cancel.
     checkID: tx.CheckID
   })
 }

@@ -27,6 +27,9 @@
   - [Escrow Creation](#escrow-creation)
   - [Escrow Cancellation](#escrow-cancellation)
   - [Escrow Execution](#escrow-execution)
+  - [Check Create](#check-create)
+  - [Check Cancel](#check-cancel)
+  - [Check Cash](#check-cash)
   - [Payment Channel Create](#payment-channel-create)
   - [Payment Channel Fund](#payment-channel-fund)
   - [Payment Channel Claim](#payment-channel-claim)
@@ -598,6 +601,74 @@ memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the
   "escrowSequence": 1234,
   "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
   "fulfillment": "A0028000"
+}
+```
+
+
+## Check Create
+
+See [Transaction Types](#transaction-types) for a description.
+
+Name | Type | Description
+---- | ---- | -----------
+destination | [address](#address) | Address of the account that can cash the check.
+sendMax | [laxAmount](#amount) | Amount of source currency the check is allowed to debit the sender, including transfer fees on non-XRP currencies.
+destinationTag | integer | *Optional* Destination tag that identifies the reason for the check, or a hosted recipient to pay.
+expiration | date-time string | *Optional* Time after which the check is no longer valid.
+invoiceID | string | *Optional* 256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check.
+
+### Example
+
+
+```json
+{
+  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+  "sendMax": {
+    "currency": "XRP",
+    "value": "1"
+  }
+}
+```
+
+
+## Check Cancel
+
+See [Transaction Types](#transaction-types) for a description.
+
+Name | Type | Description
+---- | ---- | -----------
+checkID | string | The ID of the Check ledger object to cancel, as a 64-character hexadecimal string.
+
+### Example
+
+
+```json
+{
+  "checkID": "49647F0D748DC3FE26BDACBC57F251AADEFFF391403EC9BF87C97F67E9977FB0"
+}
+```
+
+
+## Check Cash
+
+See [Transaction Types](#transaction-types) for a description.
+
+Name | Type | Description
+---- | ---- | -----------
+checkID | string | The ID of the Check ledger object to cash, as a 64-character hexadecimal string.
+amount | [laxAmount](#amount) | *Optional* Redeem the Check for exactly this amount, if possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or deliverMin.
+deliverMin | [laxAmount](#amount) | *Optional* Redeem the Check for at least this amount and for as much as possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or amount.
+
+### Example
+
+
+```json
+{
+  "amount": {
+    "currency": "XRP",
+    "value": "1"
+  },
+  "checkID": "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334"
 }
 ```
 
