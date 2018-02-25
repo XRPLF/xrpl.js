@@ -1,29 +1,35 @@
-import parsePaymentChannel, {
-  LedgerEntryResponse, PaymentChannel
+import {
+  parsePaymentChannel,
+  FormattedPaymentChannel
 } from './parse/payment-channel'
 import {validate, errors} from '../common'
+import {RippleAPI} from '../api'
+import {LedgerEntryResponse} from '../common/types/commands'
 const NotFoundError = errors.NotFoundError
 
-function formatResponse(response: LedgerEntryResponse) {
-  if (response.node !== undefined &&
-    response.node.LedgerEntryType === 'PayChannel') {
-    return parsePaymentChannel(response.node)
-  } else {
+function formatResponse(
+  response: LedgerEntryResponse
+): FormattedPaymentChannel {
+  if (response.node === undefined ||
+    response.node.LedgerEntryType !== 'PayChannel') {
     throw new NotFoundError('Payment channel ledger entry not found')
   }
+  return parsePaymentChannel(response.node)
 }
 
-function getPaymentChannel(id: string): Promise<PaymentChannel> {
+async function getPaymentChannel(
+  this: RippleAPI, id: string
+): Promise<FormattedPaymentChannel> {
+  // 1. Validate
   validate.getPaymentChannel({id})
-
-  const request = {
-    command: 'ledger_entry',
+  // 2. Make Request
+  const response = await this._request('ledger_entry', {
     index: id,
     binary: false,
     ledger_index: 'validated'
-  }
-
-  return this.connection.request(request).then(formatResponse)
+  })
+  // 3. Return Formatted Response
+  return formatResponse(response)
 }
 
 export default getPaymentChannel

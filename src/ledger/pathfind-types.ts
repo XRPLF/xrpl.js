@@ -3,7 +3,7 @@ import {Amount, RippledAmount, Adjustment, MaxAdjustment,
   MinAdjustment} from '../common/types/objects'
 
 // Amount where counterparty and value are optional
-export type LaxLaxAmount = {
+type LaxLaxAmount = {
   currency: string,
   value?: string,
   issuer?: string,

@@ -1054,9 +1054,11 @@ describe('RippleAPI', function () {
   });
 
   it('getSettings - invalid options', function () {
-    assert.throws(() => {
-      this.api.getSettings(address, { invalid: 'options' });
-    }, this.api.errors.ValidationError);
+    return this.api.getSettings(address, { invalid: 'options' }).then(() => {
+      assert(false, 'Should throw ValidationError');
+    }).catch(error => {
+      assert(error instanceof this.api.errors.ValidationError);
+    });
   });
 
   it('getAccountInfo', function () {
