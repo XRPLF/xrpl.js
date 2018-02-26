@@ -14,7 +14,7 @@ type CheckCreate = {
 
 function createCheckCreateTransaction(account: string,
   check: CheckCreate
-): Object {
+): object {
   const txJSON: any = {
     Account: account,
     TransactionType: 'CheckCreate',

@@ -8,8 +8,8 @@ type CheckCancel = {
 
 function createCheckCancelTransaction(account: string,
   cancel: CheckCancel
-): Object {
-  const txJSON: any = {
+): object {
+  const txJSON = {
     Account: account,
     TransactionType: 'CheckCancel',
     CheckID: cancel.checkID

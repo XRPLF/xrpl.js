@@ -13,16 +13,16 @@ type CheckCash = {
 
 function createCheckCashTransaction(account: string,
   checkCash: CheckCash
-): Object {
+): object {
+  if (checkCash.amount && checkCash.deliverMin) {
+    throw new ValidationError('"amount" and "deliverMin" properties on '
+      + 'CheckCash are mutually exclusive')
+  }
+
   const txJSON: any = {
     Account: account,
     TransactionType: 'CheckCash',
     CheckID: checkCash.checkID
-  }
-
-  if (checkCash.amount && checkCash.deliverMin) {
-    throw new ValidationError('"amount" and "deliverMin" properties on '
-      + 'CheckCash are mutually exclusive')
   }
 
   if (checkCash.amount !== undefined) {
