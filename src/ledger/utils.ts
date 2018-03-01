@@ -5,12 +5,12 @@ import {Connection} from '../common'
 import {TransactionType} from './transaction-types'
 import {Issue} from '../common/types/objects'
 
-type RecursiveData = {
+export type RecursiveData = {
   marker: string,
   results: Array<any>
 }
 
-type Getter = (marker?: string, limit?: number) => Promise<RecursiveData>
+export type Getter = (marker?: string, limit?: number) => Promise<RecursiveData>
 
 function clamp(value: number, min: number, max: number): number {
   assert(min <= max, 'Illegal clamp bounds')
@@ -59,7 +59,7 @@ function renameCounterpartyToIssuer<T>(
   return withIssuer
 }
 
-type RequestBookOffersArgs = {taker_gets: Issue, taker_pays: Issue}
+export type RequestBookOffersArgs = {taker_gets: Issue, taker_pays: Issue}
 
 function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
   const taker_gets = renameCounterpartyToIssuer(order.taker_gets)

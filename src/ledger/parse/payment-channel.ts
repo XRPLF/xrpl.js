@@ -29,7 +29,7 @@ export type LedgerEntryResponse = {
   validated: boolean
 }
 
-type PaymentChannelResponse = {
+export type PaymentChannelResponse = {
   account: string,
   balance: string,
   publicKey: string,

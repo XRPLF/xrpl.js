@@ -22,7 +22,7 @@ export interface BookOffersResponse {
   marker?: any
 }
 
-interface OrderBookOffer extends OfferCreateTransaction {
+export interface OrderBookOffer extends OfferCreateTransaction {
   quality?: number
   owner_funds?: string,
   taker_gets_funded?: RippledAmount,

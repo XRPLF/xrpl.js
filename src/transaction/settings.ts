@@ -8,12 +8,12 @@ const AccountFields = utils.common.constants.AccountFields
 import {Instructions, Prepare} from './types'
 import {Memo} from '../common/types/objects'
 
-type WeightedSigner = {address: string, weight: number}
-type SettingsSigners = {
+export type WeightedSigner = {address: string, weight: number}
+export type SettingsSigners = {
   threshold?: number,
   weights: WeightedSigner[]
 }
-type Settings = {
+export type Settings = {
   passwordSpent?: boolean,
   requireDestinationTag?: boolean,
   requireAuthorization?: boolean,

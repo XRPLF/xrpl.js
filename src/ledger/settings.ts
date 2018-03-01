@@ -3,11 +3,11 @@ import parseFields from './parse/fields'
 import {validate, constants} from '../common'
 const AccountFlags = constants.AccountFlags
 
-type SettingsOptions = {
+export type SettingsOptions = {
   ledgerVersion?: number
 }
 
-type GetSettings = {
+export type GetSettings = {
   passwordSpent?: boolean,
   requireDestinationTag?: boolean,
   requireAuthorization?: boolean,

@@ -13,7 +13,7 @@ function isStreamMessageType(type) {
          type === 'path_find'
 }
 
-interface ConnectionOptions {
+export interface ConnectionOptions {
   trace?: boolean,
   proxy?: string
   proxyAuthorization?: string

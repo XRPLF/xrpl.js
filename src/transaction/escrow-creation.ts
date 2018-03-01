@@ -5,7 +5,7 @@ const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare} from './types'
 import {Memo} from '../common/types/objects'
 
-type EscrowCreation = {
+export type EscrowCreation = {
   amount: string,
   destination: string,
   memos?: Array<Memo>,

@@ -4,7 +4,7 @@ const claimFlags = utils.common.txFlags.PaymentChannelClaim
 import {validate, xrpToDrops} from '../common'
 import {Instructions, Prepare} from './types'
 
-type PaymentChannelClaim = {
+export type PaymentChannelClaim = {
   channel: string,
   balance?: string,
   amount?: string,

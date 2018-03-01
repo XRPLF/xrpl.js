@@ -2,7 +2,7 @@ import * as utils from './utils'
 import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
 import {Instructions, Prepare} from './types'
 
-type PaymentChannelCreate = {
+export type PaymentChannelCreate = {
   amount: string,
   destination: string,
   settleDelay: number,

@@ -2,7 +2,7 @@ import {validate} from '../common'
 import parseLedger from './parse/ledger'
 import {GetLedger} from './types'
 
-type LedgerOptions = {
+export type LedgerOptions = {
   ledgerVersion?: number,
   includeAllData?: boolean,
   includeTransactions?: boolean,

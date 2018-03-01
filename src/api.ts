@@ -53,7 +53,7 @@ import * as ledgerUtils from './ledger/utils'
 import * as schemaValidator from './common/schema-validator'
 import {clamp} from './ledger/utils'
 
-type APIOptions = {
+export type APIOptions = {
   server?: string,
   feeCushion?: number,
   trace?: boolean,
@@ -79,7 +79,7 @@ function getCollectKeyFromCommand(command: string): string|undefined {
 }
 
 // prevent access to non-validated ledger versions
-class RestrictedConnection extends Connection {
+export class RestrictedConnection extends Connection {
   request(request: any, timeout?: number) {
     const ledger_index = request.ledger_index
     if (ledger_index !== undefined && ledger_index !== 'validated') {
