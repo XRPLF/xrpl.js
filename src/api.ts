@@ -31,6 +31,9 @@ import prepareEscrowCancellation from './transaction/escrow-cancellation'
 import preparePaymentChannelCreate from './transaction/payment-channel-create'
 import preparePaymentChannelFund from './transaction/payment-channel-fund'
 import preparePaymentChannelClaim from './transaction/payment-channel-claim'
+import prepareCheckCreate from './transaction/check-create'
+import prepareCheckCancel from './transaction/check-cancel'
+import prepareCheckCash from './transaction/check-cash'
 import prepareSettings from './transaction/settings'
 import sign from './transaction/sign'
 import combine from './transaction/combine'
@@ -250,6 +253,9 @@ class RippleAPI extends EventEmitter {
   preparePaymentChannelCreate = preparePaymentChannelCreate
   preparePaymentChannelFund = preparePaymentChannelFund
   preparePaymentChannelClaim = preparePaymentChannelClaim
+  prepareCheckCreate = prepareCheckCreate
+  prepareCheckCash = prepareCheckCash
+  prepareCheckCancel = prepareCheckCancel
   prepareSettings = prepareSettings
   sign = sign
   combine = combine

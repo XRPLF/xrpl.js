@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "checkCreate",
+  "link": "check-create",
+  "type": "object",
+  "properties": {
+    "destination": {
+      "$ref": "address",
+      "description": "Address of the account that can cash the check."
+    },
+    "sendMax": {
+      "$ref": "laxAmount",
+      "description": "Amount of source currency the check is allowed to debit the sender, including transfer fees on non-XRP currencies."
+    },
+    "destinationTag": {
+      "$ref": "tag",
+      "description": "Destination tag that identifies the reason for the check, or a hosted recipient to pay."
+    },
+    "expiration": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time after which the check is no longer valid."
+    },
+    "invoiceID": {
+      "$ref": "hash256",
+      "description": "256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check."
+    }
+  },
+  "required": ["destination", "sendMax"],
+  "additionalProperties": false
+}

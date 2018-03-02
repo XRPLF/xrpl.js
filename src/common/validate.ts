@@ -89,6 +89,15 @@ _.partial(schemaValidate, 'preparePaymentChannelFundParameters')
 export const preparePaymentChannelClaim =
 _.partial(schemaValidate, 'preparePaymentChannelClaimParameters')
 
+export const prepareCheckCreate =
+_.partial(schemaValidate, 'prepareCheckCreateParameters')
+
+export const prepareCheckCash =
+_.partial(schemaValidate, 'prepareCheckCashParameters')
+
+export const prepareCheckCancel =
+_.partial(schemaValidate, 'prepareCheckCancelParameters')
+
 export const sign =
 _.partial(schemaValidate, 'signParameters')
 

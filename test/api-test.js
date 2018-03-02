@@ -346,6 +346,45 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
+  it('prepareCheckCreate', function () {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.prepareCheckCreate(
+      address, requests.prepareCheckCreate.normal,
+      localInstructions).then(
+        _.partial(checkResult, responses.prepareCheckCreate.normal,
+          'prepare'));
+  });
+
+  it('prepareCheckCreate full', function () {
+    return this.api.prepareCheckCreate(
+      address, requests.prepareCheckCreate.full).then(
+        _.partial(checkResult, responses.prepareCheckCreate.full,
+          'prepare'));
+  });
+
+  it('prepareCheckCash amount', function () {
+    return this.api.prepareCheckCash(
+      address, requests.prepareCheckCash.amount).then(
+        _.partial(checkResult, responses.prepareCheckCash.amount,
+          'prepare'));
+  });
+
+  it('prepareCheckCash deliverMin', function () {
+    return this.api.prepareCheckCash(
+      address, requests.prepareCheckCash.deliverMin).then(
+        _.partial(checkResult, responses.prepareCheckCash.deliverMin,
+          'prepare'));
+  });
+
+  it('prepareCheckCancel', function () {
+    return this.api.prepareCheckCancel(
+      address, requests.prepareCheckCancel.normal).then(
+        _.partial(checkResult, responses.prepareCheckCancel.normal,
+          'prepare'));
+  });
+
   it('preparePaymentChannelCreate', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
@@ -785,6 +824,37 @@ describe('RippleAPI', function () {
         assert(error instanceof this.api.errors.UnexpectedError);
       });
     });
+
+    // Checks
+
+    it('getTransaction - CheckCreate', function () {
+      const hash =
+        '605A2E2C8E48AECAF5C56085D1AEAA0348DC838CE122C9188F94EB19DA05C2FE';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.checkCreate,
+          'getTransaction'));
+    });
+
+    it('getTransaction - CheckCancel', function () {
+      const hash =
+        'B4105D1B2D83819647E4692B7C5843D674283F669524BD50C9614182E3A12CD4';
+      return this.api.getTransaction(hash).then(
+        _.partial(checkResult,
+          responses.getTransaction.checkCancel,
+          'getTransaction'));
+    });
+
+    it('getTransaction - CheckCash', function () {
+      const hash =
+        '8321208465F70BA52C28BCC4F646BAF3B012BA13B57576C0336F42D77E3E0749';
+      return this.api.getTransaction(hash/*, options*/).then(
+        _.partial(checkResult,
+          responses.getTransaction.checkCash,
+          'getTransaction'));
+    });
+
+    // Escrows
 
     it('getTransaction - EscrowCreation', function () {
       const hash =

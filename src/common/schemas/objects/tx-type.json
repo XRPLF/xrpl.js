@@ -15,6 +15,9 @@
     "escrowExecution",
     "paymentChannelCreate",
     "paymentChannelFund",
-    "paymentChannelClaim"
+    "paymentChannelClaim",
+    "checkCreate",
+    "checkCancel",
+    "checkCash"
   ]
 }

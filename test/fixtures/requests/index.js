@@ -38,6 +38,17 @@ module.exports = {
     normal: require('./prepare-escrow-cancellation'),
     memos: require('./prepare-escrow-cancellation-memos')
   },
+  prepareCheckCreate: {
+    normal: require('./prepare-check-create'),
+    full: require('./prepare-check-create-full')
+  },
+  prepareCheckCash: {
+    amount: require('./prepare-check-cash-amount'),
+    deliverMin: require('./prepare-check-cash-delivermin')
+  },
+  prepareCheckCancel: {
+    normal: require('./prepare-check-cancel')
+  },
   preparePaymentChannelCreate: {
     normal: require('./prepare-payment-channel-create'),
     full: require('./prepare-payment-channel-create-full')
