@@ -2,7 +2,7 @@ import * as utils from './utils'
 import {validate} from '../common'
 import {Instructions, Prepare} from './types'
 
-type CheckCancel = {
+export type CheckCancel = {
   checkID: string
 }
 

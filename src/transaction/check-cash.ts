@@ -5,7 +5,7 @@ import {validate} from '../common'
 import {Instructions, Prepare} from './types'
 import {Amount} from '../common/types/objects'
 
-type CheckCash = {
+export type CheckCash = {
   checkID: string,
   amount?: Amount,
   deliverMin?: Amount

@@ -4,7 +4,7 @@ import {validate, iso8601ToRippleTime} from '../common'
 import {Instructions, Prepare} from './types'
 import {Amount} from '../common/types/objects'
 
-type CheckCreate = {
+export type CheckCreate = {
   destination: string,
   sendMax: Amount,
   destinationTag?: number,
