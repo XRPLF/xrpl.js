@@ -4,12 +4,12 @@ import {Amount} from '../common/types/objects'
 import {ensureLedgerVersion} from './utils'
 import {RippleAPI} from '../api'
 
-type BalanceSheetOptions = {
+export type BalanceSheetOptions = {
   excludeAddresses?: Array<string>,
   ledgerVersion?: number
 }
 
-type GetBalanceSheet = {
+export type GetBalanceSheet = {
   balances?: Array<Amount>,
   assets?: Array<Amount>,
   obligations?: Array<{

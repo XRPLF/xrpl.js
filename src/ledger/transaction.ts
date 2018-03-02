@@ -5,7 +5,7 @@ import {validate, errors} from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 
-type TransactionOptions = {
+export type TransactionOptions = {
   minLedgerVersion?: number,
   maxLedgerVersion?: number
 }

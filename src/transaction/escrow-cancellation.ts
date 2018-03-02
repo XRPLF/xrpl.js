@@ -4,7 +4,7 @@ const validate = utils.common.validate
 import {Instructions, Prepare} from './types'
 import {Memo} from '../common/types/objects'
 
-type EscrowCancellation = {
+export type EscrowCancellation = {
   owner: string,
   escrowSequence: number,
   memos?: Array<Memo>

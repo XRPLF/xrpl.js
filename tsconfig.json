@@ -15,7 +15,7 @@
     "removeComments": false,
     "preserveConstEnums": false,
     "suppressImplicitAnyIndexErrors": false,
-    "declaration": false,
+    "declaration": true,
     "sourceMap": true,
     "skipLibCheck": true
   },

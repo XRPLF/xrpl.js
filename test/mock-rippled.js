@@ -289,7 +289,24 @@ module.exports = function createMockRippled(port) {
     } else if (request.transaction ===
       '097B9491CC76B64831F1FEA82EAA93BCD728106D90B65A072C933888E946C40B') {
       conn.send(createResponse(request, fixtures.tx.OfferWithExpiration));
+    }
+
+    // Checks
+
+    else if (request.transaction ===
+      '605A2E2C8E48AECAF5C56085D1AEAA0348DC838CE122C9188F94EB19DA05C2FE') {
+      conn.send(createResponse(request, fixtures.tx.CheckCreate));
     } else if (request.transaction ===
+      'B4105D1B2D83819647E4692B7C5843D674283F669524BD50C9614182E3A12CD4') {
+      conn.send(createResponse(request, fixtures.tx.CheckCancel));
+    } else if (request.transaction ===
+      '8321208465F70BA52C28BCC4F646BAF3B012BA13B57576C0336F42D77E3E0749') {
+      conn.send(createResponse(request, fixtures.tx.CheckCash));
+    }
+
+    // Escrows
+
+    else if (request.transaction ===
       '144F272380BDB4F1BD92329A2178BABB70C20F59042C495E10BF72EBFB408EE1') {
       conn.send(createResponse(request, fixtures.tx.EscrowCreation));
     } else if (request.transaction ===
@@ -302,7 +319,11 @@ module.exports = function createMockRippled(port) {
       'CC5277137B3F25EE8B86259C83CB0EAADE818505E4E9BCBF19B1AC6FD1369931') {
       conn.send(createResponse(request,
         fixtures.tx.EscrowExecutionSimple));
-    } else if (request.transaction ===
+    }
+
+    // Payment Channels
+
+    else if (request.transaction ===
       '0E9CA3AB1053FC0C1CBAA75F636FE1EC92F118C7056BBEF5D63E4C116458A16D') {
       conn.send(createResponse(request, fixtures.tx.PaymentChannelCreate));
     } else if (request.transaction ===

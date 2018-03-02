@@ -77,12 +77,12 @@ async function makeRequest(
 }
 
 
-type GetOrderbookOptions = {
+export type GetOrderbookOptions = {
   limit?: number,
   ledgerVersion?: number
 }
 
-type OrderbookInfo = {
+export type OrderbookInfo = {
   base: Issue,
   counter: Issue
 }

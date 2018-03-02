@@ -42,8 +42,14 @@ module.exports = {
     trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
     trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
     notValidated: require('./get-transaction-not-validated.json'),
+    checkCreate:
+      require('./get-transaction-check-create.json'),
+    checkCancel:
+      require('./get-transaction-check-cancel.json'),
+    checkCash:
+      require('./get-transaction-check-cash.json'),
     escrowCreation:
-      require('./get-transaction-escrow-create.json'),
+      require('./get-transaction-escrow-creation.json'),
     escrowCancellation:
       require('./get-transaction-escrow-cancellation.json'),
     escrowExecution:
@@ -112,6 +118,17 @@ module.exports = {
     signed: require('./prepare-settings-signed.json'),
     noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json'),
     signers: require('./prepare-settings-signers.json')
+  },
+  prepareCheckCreate: {
+    normal: require('./prepare-check-create'),
+    full: require('./prepare-check-create-full')
+  },
+  prepareCheckCash: {
+    amount: require('./prepare-check-cash-amount'),
+    deliverMin: require('./prepare-check-cash-delivermin')
+  },
+  prepareCheckCancel: {
+    normal: require('./prepare-check-cancel')
   },
   prepareEscrowCreation: {
     normal: require('./prepare-escrow-creation'),

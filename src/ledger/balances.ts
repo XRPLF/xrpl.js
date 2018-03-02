@@ -5,13 +5,13 @@ import {GetTrustlinesOptions} from './trustlines'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 
 
-type Balance = {
+export type Balance = {
   value: string,
   currency: string,
   counterparty?: string
 }
 
-type GetBalances = Array<Balance>
+export type GetBalances = Array<Balance>
 
 function getTrustlineBalanceAmount(trustline: FormattedTrustline) {
   return {

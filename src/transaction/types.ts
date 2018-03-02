@@ -50,7 +50,7 @@ export interface OfferCreateTransaction {
   Memos: {Memo: ApiMemo}[]
 }
 
-type Outcome = {
+export type Outcome = {
   result: string,
   ledgerVersion: number,
   indexInLedger: number,
@@ -66,11 +66,11 @@ type Outcome = {
   timestamp?: string
 }
 
-type FormattedOrderCancellation = {
+export type FormattedOrderCancellation = {
   orderSequence: number
 }
 
-type FormattedPayment = {
+export type FormattedPayment = {
   source: Adjustment,
   destination: Adjustment,
   paths?: string,
@@ -81,7 +81,7 @@ type FormattedPayment = {
   limitQuality?: boolean
 }
 
-type FormattedPaymentTransaction = {
+export type FormattedPaymentTransaction = {
   type: string,
   specification: FormattedPayment,
   outcome: Outcome,
@@ -90,7 +90,7 @@ type FormattedPaymentTransaction = {
   sequence: number
 }
 
-type FormattedOrderTransaction = {
+export type FormattedOrderTransaction = {
   type: string,
   specification: FormattedOrderSpecification,
   outcome: Outcome,
@@ -99,7 +99,7 @@ type FormattedOrderTransaction = {
   sequence: number
 }
 
-type FormattedOrderCancellationTransaction = {
+export type FormattedOrderCancellationTransaction = {
   type: string,
   specification: FormattedOrderCancellation,
   outcome: Outcome,
@@ -108,7 +108,7 @@ type FormattedOrderCancellationTransaction = {
   sequence: number
 }
 
-type FormattedTrustlineTransaction = {
+export type FormattedTrustlineTransaction = {
   type: string,
   specification: FormattedTrustline,
   outcome: Outcome,
@@ -117,7 +117,7 @@ type FormattedTrustlineTransaction = {
   sequence: number
 }
 
-type FormattedSettingsTransaction = {
+export type FormattedSettingsTransaction = {
   type: string,
   specification: FormattedSettings,
   outcome: Outcome,

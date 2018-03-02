@@ -13,7 +13,7 @@
       "properties": {
         "start": {
           "$ref": "hash256",
-          "description": "If specified, this transaction will be the first transaction in the result."
+          "description": "If specified, this transaction will be the first transaction in the result. You cannot use `start` with `minLedgerVersion` or `maxLedgerVersion`. When `start` is specified, these ledger versions will be determined internally."
         },
         "limit": {
           "type": "integer",

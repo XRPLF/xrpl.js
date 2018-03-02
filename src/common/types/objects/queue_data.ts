@@ -1,4 +1,4 @@
-interface QueueTransaction {
+export interface QueueTransaction {
   auth_change: boolean,
   fee: string,
   fee_level: string,

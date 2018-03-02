@@ -100,6 +100,42 @@
       "properties": {
         "type": {
           "enum": [
+            "checkCreate"
+          ]
+        },
+        "specification": {
+          "$ref": "checkCreate"
+        }
+      }
+    },
+    {
+      "properties": {
+        "type": {
+          "enum": [
+            "checkCancel"
+          ]
+        },
+        "specification": {
+          "$ref": "checkCancel"
+        }
+      }
+    },
+    {
+      "properties": {
+        "type": {
+          "enum": [
+            "checkCash"
+          ]
+        },
+        "specification": {
+          "$ref": "checkCash"
+        }
+      }
+    },
+    {
+      "properties": {
+        "type": {
+          "enum": [
             "escrowCreation"
           ]
         },

@@ -8,7 +8,7 @@ import {validate, errors, Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 
 
-type TransactionsOptions = {
+export type TransactionsOptions = {
   start?: string,
   limit?: number,
   minLedgerVersion?: number,
@@ -22,7 +22,7 @@ type TransactionsOptions = {
   startTx?: FormattedTransactionType
 }
 
-type GetTransactionsResponse = Array<FormattedTransactionType>
+export type GetTransactionsResponse = Array<FormattedTransactionType>
 
 function parseBinaryTransaction(transaction) {
   const tx = binary.decode(transaction.tx_blob)

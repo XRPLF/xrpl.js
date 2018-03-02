@@ -6,7 +6,7 @@ import {AccountInfoResponse} from '../common/types/commands'
 import {RippleAPI} from '../api'
 const AccountFlags = constants.AccountFlags
 
-type SettingsOptions = {
+export type SettingsOptions = {
   ledgerVersion?: number
 }
 

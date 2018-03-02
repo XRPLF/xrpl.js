@@ -2,7 +2,7 @@ import {validate} from '../common'
 import {FormattedLedger, parseLedger} from './parse/ledger'
 import {RippleAPI} from '../api'
 
-type GetLedgerOptions = {
+export type GetLedgerOptions = {
   ledgerVersion?: number,
   includeAllData?: boolean,
   includeTransactions?: boolean,
