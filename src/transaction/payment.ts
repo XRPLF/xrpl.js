@@ -9,7 +9,7 @@ import {Amount, Adjustment, MaxAdjustment,
   MinAdjustment, Memo} from '../common/types/objects'
 
 
-type Payment = {
+  export type Payment = {
   source: Adjustment & MaxAdjustment,
   destination: Adjustment & MinAdjustment,
   paths?: string,

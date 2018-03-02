@@ -12,11 +12,12 @@ export type OrdersOptions = {
   ledgerVersion?: number
 }
 
-type Orderbook = {
+export type Orderbook = {
   base: Issue,
   counter: Issue
 }
-type OrderbookItem = {
+
+export type OrderbookItem = {
    specification: OrderSpecification,
    properties: {
     maker: string,
@@ -29,9 +30,9 @@ type OrderbookItem = {
   }
 }
 
-type OrderbookOrders = Array<OrderbookItem>
+export type OrderbookOrders = Array<OrderbookItem>
 
-type GetOrderbook = {
+export type GetOrderbook = {
   bids: OrderbookOrders,
   asks: OrderbookOrders
 }

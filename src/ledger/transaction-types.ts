@@ -1,7 +1,7 @@
 
 import {Amount, Memo} from '../common/types/objects'
 
-type Outcome = {
+export type Outcome = {
   result: string,
   ledgerVersion: number,
   indexInLedger: number,
@@ -17,7 +17,7 @@ type Outcome = {
   timestamp?: string
 }
 
-type Adjustment = {
+export type Adjustment = {
   address: string,
   amount: {
    currency: string,
@@ -27,7 +27,7 @@ type Adjustment = {
   tag?: number
 }
 
-type Trustline = {
+export type Trustline = {
   currency: string,
   counterparty: string,
   limit: string,
@@ -38,7 +38,7 @@ type Trustline = {
   frozen?: boolean
 }
 
-type Settings = {
+export type Settings = {
   passwordSpent?: boolean,
   requireDestinationTag?: boolean,
   requireAuthorization?: boolean,
@@ -56,11 +56,11 @@ type Settings = {
   regularKey?: string
 }
 
-type OrderCancellation = {
+export type OrderCancellation = {
   orderSequence: number
 }
 
-type Payment = {
+export type Payment = {
   source: Adjustment,
   destination: Adjustment,
   paths?: string,
@@ -71,7 +71,7 @@ type Payment = {
   limitQuality?: boolean
 }
 
-type PaymentTransaction = {
+export type PaymentTransaction = {
   type: string,
   specification: Payment,
   outcome: Outcome,
@@ -92,7 +92,7 @@ export type Order = {
   memos?: Memo[]
 }
 
-type OrderTransaction = {
+export type OrderTransaction = {
   type: string,
   specification: Order,
   outcome: Outcome,
@@ -101,7 +101,7 @@ type OrderTransaction = {
   sequence: number
 }
 
-type OrderCancellationTransaction = {
+export type OrderCancellationTransaction = {
   type: string,
   specification: OrderCancellation,
   outcome: Outcome,
@@ -110,7 +110,7 @@ type OrderCancellationTransaction = {
   sequence: number
 }
 
-type TrustlineTransaction = {
+export type TrustlineTransaction = {
   type: string,
   specification: Trustline,
   outcome: Outcome,
@@ -119,7 +119,7 @@ type TrustlineTransaction = {
   sequence: number
 }
 
-type SettingsTransaction = {
+export type SettingsTransaction = {
   type: string,
   specification: Settings,
   outcome: Outcome,

@@ -18,7 +18,7 @@ export interface AccountInfoResponse {
   validated?: boolean
 }
 
-interface QueueData {
+export interface QueueData {
   txn_count: number,
   auth_change_queued?: boolean,
   lowest_sequence?: number,
@@ -27,7 +27,7 @@ interface QueueData {
   transactions?: TransactionData[]
 }
 
-interface TransactionData {
+export interface TransactionData {
   auth_change?: boolean,
   fee?: string,
   fee_level?: string,

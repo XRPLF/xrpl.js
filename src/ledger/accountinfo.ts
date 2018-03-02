@@ -2,11 +2,11 @@ import {validate, removeUndefined, dropsToXrp} from '../common'
 import {RippleAPI} from '../api'
 import {AccountInfoResponse} from '../common/types/commands/account_info'
 
-type GetAccountInfoOptions = {
+export type GetAccountInfoOptions = {
   ledgerVersion?: number
 }
 
-type FormattedGetAccountInfoResponse = {
+export type FormattedGetAccountInfoResponse = {
   sequence: number,
   xrpBalance: string,
   ownerCount: number,
