@@ -45,6 +45,7 @@ import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
 import getLedger from './ledger/ledger'
 
 import {
+  AccountObjectsRequest, AccountObjectsResponse,
   AccountOffersRequest, AccountOffersResponse,
   AccountInfoRequest, AccountInfoResponse,
   AccountLinesRequest, AccountLinesResponse,
@@ -168,8 +169,39 @@ class RippleAPI extends EventEmitter {
   }
 
   /**
+   * Returns objects owned by an account.
+   * For an account's trust lines and balances,
+   * see `getTrustlines` and `getBalances`.
+   */
+  async requestAll(
+    command: 'account_objects',
+    params: AccountObjectsRequest
+  ): Promise<AccountObjectsResponse[]> {
+    // TODO: Prevent access to non-validated ledger versions
+    const results = await (<Function>this._requestAll)(command, params, {
+      collect: 'account_objects'
+    })
+
+    return results.reduce((result, singleResult) => {
+      const invariants = ['account', 'ledger_hash',
+        'ledger_index', 'ledger_current_index', 'validated']
+
+      invariants.forEach(field => {
+        if (result[field] !== singleResult[field]) {
+          throw new errors.UnexpectedError(
+            `paginated response contains mismatched ${field}: ` +
+            `${result[field]} !== ${singleResult[field]}`
+          )
+        }
+      })
+
+      result.account_objects.push(singleResult.account_objects)
+    })
+  }
+
+  /**
    * Makes multiple paged requests to the API to return a given number of
-   * resources. __requestAll() will make multiple requests until the `limit`
+   * resources. _requestAll() will make multiple requests until the `limit`
    * number of resources is reached (if no `limit` is provided, a single request
    * will be made).
    *
