@@ -6,36 +6,12 @@ const validate = utils.common.validate
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices
 const AccountFields = utils.common.constants.AccountFields
 import {Instructions, Prepare} from './types'
-import {Memo} from '../common/types/objects'
-
-export type WeightedSigner = {address: string, weight: number}
-export type SettingsSigners = {
-  threshold?: number,
-  weights: WeightedSigner[]
-}
-export type Settings = {
-  passwordSpent?: boolean,
-  requireDestinationTag?: boolean,
-  requireAuthorization?: boolean,
-  disallowIncomingXRP?: boolean,
-  disableMasterKey?: boolean,
-  enableTransactionIDTracking?: boolean,
-  noFreeze?: boolean,
-  globalFreeze?: boolean,
-  defaultRipple?: boolean,
-  emailHash?: string,
-  messageKey?: string,
-  domain?: string,
-  transferRate?: number,
-  regularKey?: string,
-  signers?: SettingsSigners,
-  memos?: Memo[]
-}
+import {FormattedSettings, WeightedSigner} from '../common/types/objects'
 
 // Emptry string passed to setting will clear it
 const CLEAR_SETTING = null
 
-function setTransactionFlags(txJSON: any, values: Settings) {
+function setTransactionFlags(txJSON: any, values: FormattedSettings) {
   const keys = Object.keys(values)
   assert(keys.length === 1, 'ERROR: can only set one setting per transaction')
   const flagName = keys[0]
@@ -50,7 +26,7 @@ function setTransactionFlags(txJSON: any, values: Settings) {
   }
 }
 
-function setTransactionFields(txJSON: Object, input: Settings) {
+function setTransactionFields(txJSON: Object, input: FormattedSettings) {
   const fieldSchema = AccountFields
   for (const fieldName in fieldSchema) {
     const field = fieldSchema[fieldName]
@@ -101,7 +77,7 @@ function formatSignerEntry(signer: WeightedSigner): Object {
 }
 
 function createSettingsTransactionWithoutMemos(
-  account: string, settings: Settings
+  account: string, settings: FormattedSettings
 ): any {
   if (settings.regularKey !== undefined) {
     const removeRegularKey = {
@@ -137,7 +113,7 @@ function createSettingsTransactionWithoutMemos(
   return txJSON
 }
 
-function createSettingsTransaction(account: string, settings: Settings
+function createSettingsTransaction(account: string, settings: FormattedSettings
 ): Object {
   const txJSON = createSettingsTransactionWithoutMemos(account, settings)
   if (settings.memos !== undefined) {
@@ -146,7 +122,7 @@ function createSettingsTransaction(account: string, settings: Settings
   return txJSON
 }
 
-function prepareSettings(address: string, settings: Settings,
+function prepareSettings(address: string, settings: FormattedSettings,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   validate.prepareSettings({address, settings, instructions})

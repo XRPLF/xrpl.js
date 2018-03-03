@@ -1,7 +1,28 @@
 import * as _ from 'lodash'
 import {removeUndefined, rippleTimeToISO8601} from '../../common'
 import parseTransaction from './transaction'
-import {GetLedger} from '../types'
+import {Ledger} from '../../common/types/objects'
+
+export type FormattedLedger = {
+  // TODO: properties in type don't match response object. Fix!
+  // accepted: boolean,
+  // closed: boolean,
+  stateHash: string,
+  closeTime: string,
+  closeTimeResolution: number,
+  closeFlags: number,
+  ledgerHash: string,
+  ledgerVersion: number,
+  parentLedgerHash: string,
+  parentCloseTime: string,
+  totalDrops: string,
+  transactionHash: string,
+  transactions?: Array<Object>,
+  rawTransactions?: string,
+  transactionHashes?: Array<string>,
+  rawState?: string,
+  stateHashes?: Array<string>
+}
 
 function parseTransactionWrapper(ledgerVersion, tx) {
   const transaction = _.assign({}, _.omit(tx, 'metaData'), {
@@ -39,7 +60,7 @@ function parseState(state) {
   return {rawState: JSON.stringify(state)}
 }
 
-function parseLedger(ledger: any): GetLedger {
+export function parseLedger(ledger: Ledger): FormattedLedger {
   const ledgerVersion = parseInt(ledger.ledger_index || ledger.seqNum, 10)
   return removeUndefined(Object.assign({
     stateHash: ledger.account_hash,
@@ -57,5 +78,3 @@ function parseLedger(ledger: any): GetLedger {
   parseState(ledger.accountState)
   ))
 }
-
-export default parseLedger

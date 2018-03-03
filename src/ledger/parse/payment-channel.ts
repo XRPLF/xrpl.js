@@ -1,35 +1,8 @@
 import {parseTimestamp} from './utils'
 import {removeUndefined, dropsToXrp} from '../../common'
+import {PayChannelLedgerEntry} from '../../common/types/objects'
 
-
-export type PaymentChannel = {
-  Sequence: number,
-  Account: string,
-  Amount: string,
-  Balance: string,
-  PublicKey: string,
-  Destination: string,
-  SettleDelay: number,
-  Expiration?: number,
-  CancelAfter?: number,
-  SourceTag?: number,
-  DestinationTag?: number,
-  OwnerNode: string,
-  LedgerEntryType: string,
-  PreviousTxnID: string,
-  PreviousTxnLgrSeq: number,
-  index: string
-}
-
-export type LedgerEntryResponse = {
-  node: PaymentChannel,
-  ledger_current_index?: number,
-  ledger_hash?: string,
-  ledger_index: number,
-  validated: boolean
-}
-
-export type PaymentChannelResponse = {
+export type FormattedPaymentChannel = {
   account: string,
   balance: string,
   publicKey: string,
@@ -43,7 +16,9 @@ export type PaymentChannelResponse = {
   previousAffectingTransactionLedgerVersion: number
 }
 
-function parsePaymentChannel(data: PaymentChannel): PaymentChannelResponse {
+export function parsePaymentChannel(
+  data: PayChannelLedgerEntry
+): FormattedPaymentChannel {
   return removeUndefined({
     account: data.Account,
     amount: dropsToXrp(data.Amount),
@@ -59,5 +34,3 @@ function parsePaymentChannel(data: PaymentChannel): PaymentChannelResponse {
     previousAffectingTransactionLedgerVersion: data.PreviousTxnLgrSeq
   })
 }
-
-export default parsePaymentChannel

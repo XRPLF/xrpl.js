@@ -2,16 +2,18 @@ import * as _ from 'lodash'
 import * as utils from './utils'
 const offerFlags = utils.common.txFlags.OfferCreate
 import {validate, iso8601ToRippleTime} from '../common'
-import {Instructions, Prepare} from './types'
-import {Order} from '../ledger/transaction-types'
+import {Instructions, Prepare, OfferCreateTransaction} from './types'
+import {FormattedOrderSpecification} from '../common/types/objects/index'
 
-function createOrderTransaction(account: string, order: Order): Object {
+function createOrderTransaction(
+  account: string, order: FormattedOrderSpecification
+): OfferCreateTransaction {
   const takerPays = utils.common.toRippledAmount(order.direction === 'buy' ?
     order.quantity : order.totalPrice)
   const takerGets = utils.common.toRippledAmount(order.direction === 'buy' ?
     order.totalPrice : order.quantity)
 
-  const txJSON: any = {
+  const txJSON: Partial<OfferCreateTransaction> = {
     TransactionType: 'OfferCreate',
     Account: account,
     TakerGets: takerGets,
@@ -39,10 +41,10 @@ function createOrderTransaction(account: string, order: Order): Object {
   if (order.memos !== undefined) {
     txJSON.Memos = _.map(order.memos, utils.convertMemo)
   }
-  return txJSON
+  return txJSON as OfferCreateTransaction
 }
 
-function prepareOrder(address: string, order: Order,
+function prepareOrder(address: string, order: FormattedOrderSpecification,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   validate.prepareOrder({address, order, instructions})

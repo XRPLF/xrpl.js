@@ -4,8 +4,25 @@ import {removeUndefined} from '../../common'
 
 import {orderFlags} from './flags'
 import parseAmount from './amount'
+import {BookOffer} from '../../common/types/commands'
+import {Amount, FormattedOrderSpecification} from '../../common/types/objects'
 
-function parseOrderbookOrder(order: any): Object {
+export type FormattedOrderbookOrder = {
+  specification: FormattedOrderSpecification,
+  properties: {
+    maker: string,
+    sequence: number,
+    makerExchangeRate: string
+  },
+  state?: {
+    fundedAmount: Amount,
+    priceOfFundedAmount: Amount
+  }
+}
+
+export function parseOrderbookOrder(
+  order: BookOffer
+): FormattedOrderbookOrder {
   const direction = (order.Flags & orderFlags.Sell) === 0 ? 'buy' : 'sell'
   const takerGetsAmount = parseAmount(order.TakerGets)
   const takerPaysAmount = parseAmount(order.TakerPays)
@@ -14,7 +31,7 @@ function parseOrderbookOrder(order: any): Object {
 
   // note: immediateOrCancel and fillOrKill orders cannot enter the order book
   // so we can omit those flags here
-  const specification = removeUndefined({
+  const specification: FormattedOrderSpecification = removeUndefined({
     direction: direction,
     quantity: quantity,
     totalPrice: totalPrice,
@@ -40,5 +57,3 @@ function parseOrderbookOrder(order: any): Object {
   const state = _.isEmpty(available) ? undefined : available
   return removeUndefined({specification, properties, state})
 }
-
-export default parseOrderbookOrder

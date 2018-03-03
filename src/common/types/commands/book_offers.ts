@@ -1,7 +1,7 @@
 import {
   TakerRequestAmount,
-  OfferCreateTransaction,
-  RippledAmount
+  RippledAmount,
+  OfferCreateTransaction
 } from '../objects'
 
 export interface BookOffersRequest {
@@ -15,15 +15,15 @@ export interface BookOffersRequest {
 }
 
 export interface BookOffersResponse {
-  offers: OrderBookOffer[],
+  offers: BookOffer[],
   ledger_hash?: string,
   ledger_current_index?: number,
   ledger_index?: number,
   marker?: any
 }
 
-export interface OrderBookOffer extends OfferCreateTransaction {
-  quality?: number
+export interface BookOffer extends OfferCreateTransaction {
+  quality?: string
   owner_funds?: string,
   taker_gets_funded?: RippledAmount,
   taker_pays_funded?: RippledAmount

@@ -2,9 +2,14 @@ import * as assert from 'assert'
 import {parseTimestamp} from './utils'
 import parseAmount from './amount'
 import {removeUndefined, txFlags} from '../../common'
+import {
+  FormattedOrderSpecification,
+  OfferCreateTransaction
+} from '../../common/types/objects/index'
+
 const flags = txFlags.OfferCreate
 
-function parseOrder(tx: any): Object {
+function parseOrder(tx: OfferCreateTransaction): FormattedOrderSpecification {
   assert(tx.TransactionType === 'OfferCreate')
 
   const direction = (tx.Flags & flags.Sell) === 0 ? 'buy' : 'sell'

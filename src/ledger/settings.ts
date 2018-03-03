@@ -1,30 +1,14 @@
 import * as _ from 'lodash'
 import parseFields from './parse/fields'
 import {validate, constants} from '../common'
+import {FormattedSettings} from '../common/types/objects'
+import {AccountInfoResponse} from '../common/types/commands'
+import {RippleAPI} from '../api'
 const AccountFlags = constants.AccountFlags
 
 export type SettingsOptions = {
   ledgerVersion?: number
 }
-
-export type GetSettings = {
-  passwordSpent?: boolean,
-  requireDestinationTag?: boolean,
-  requireAuthorization?: boolean,
-  depositAuthorization?: boolean,
-  disallowIncomingXRP?: boolean,
-  disableMasterKey?: boolean,
-  enableTransactionIDTracking?: boolean,
-  noFreeze?: boolean,
-  globalFreeze?: boolean,
-  defaultRipple?: boolean,
-  emailHash?: string|null,
-  messageKey?: string,
-  domain?: string,
-  transferRate?: number|null,
-  regularKey?: string
-}
-
 
 function parseFlags(value) {
   const settings = {}
@@ -36,25 +20,26 @@ function parseFlags(value) {
   return settings
 }
 
-function formatSettings(response) {
+function formatSettings(response: AccountInfoResponse) {
   const data = response.account_data
   const parsedFlags = parseFlags(data.Flags)
   const parsedFields = parseFields(data)
   return _.assign({}, parsedFlags, parsedFields)
 }
 
-function getSettings(address: string, options: SettingsOptions = {}
-): Promise<GetSettings> {
+async function getSettings(
+  this: RippleAPI, address: string, options: SettingsOptions = {}
+): Promise<FormattedSettings> {
+  // 1. Validate
   validate.getSettings({address, options})
-
-  const request = {
-    command: 'account_info',
+  // 2. Make Request
+  const response = await this._request('account_info', {
     account: address,
     ledger_index: options.ledgerVersion || 'validated',
     signer_lists: true
-  }
-
-  return this.connection.request(request).then(formatSettings)
+  })
+  // 3. Return Formatted Response
+  return formatSettings(response)
 }
 
 export default getSettings

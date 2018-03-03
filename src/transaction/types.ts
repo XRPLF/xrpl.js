@@ -1,4 +1,14 @@
 
+import {
+  FormattedOrderSpecification,
+  FormattedTrustline,
+  Adjustment,
+  RippledAmount,
+  Memo,
+  FormattedSettings
+} from '../common/types/objects'
+import {ApiMemo} from './utils'
+
 export type Instructions = {
   sequence?: number,
   fee?: string,
@@ -25,3 +35,100 @@ export type Submit = {
   txBlob?: string,
   txJson?: Object
 }
+
+export interface OfferCreateTransaction {
+  TransactionType: 'OfferCreate',
+  Account: string,
+  Fee: string,
+  Flags: number,
+  LastLedgerSequence: number,
+  Sequence: number,
+  TakerGets: RippledAmount,
+  TakerPays: RippledAmount,
+  Expiration?: number,
+  OfferSequence?: number,
+  Memos: {Memo: ApiMemo}[]
+}
+
+export type Outcome = {
+  result: string,
+  ledgerVersion: number,
+  indexInLedger: number,
+  fee: string,
+  balanceChanges: {
+    [key: string]: [{
+     currency: string,
+     counterparty?: string,
+     value: string
+    }]
+  },
+  orderbookChanges: Object,
+  timestamp?: string
+}
+
+export type FormattedOrderCancellation = {
+  orderSequence: number
+}
+
+export type FormattedPayment = {
+  source: Adjustment,
+  destination: Adjustment,
+  paths?: string,
+  memos?: Array<Memo>,
+  invoiceID?: string,
+  allowPartialPayment?: boolean,
+  noDirectRipple?: boolean,
+  limitQuality?: boolean
+}
+
+export type FormattedPaymentTransaction = {
+  type: string,
+  specification: FormattedPayment,
+  outcome: Outcome,
+  id: string,
+  address: string,
+  sequence: number
+}
+
+export type FormattedOrderTransaction = {
+  type: string,
+  specification: FormattedOrderSpecification,
+  outcome: Outcome,
+  id: string,
+  address: string,
+  sequence: number
+}
+
+export type FormattedOrderCancellationTransaction = {
+  type: string,
+  specification: FormattedOrderCancellation,
+  outcome: Outcome,
+  id: string,
+  address: string,
+  sequence: number
+}
+
+export type FormattedTrustlineTransaction = {
+  type: string,
+  specification: FormattedTrustline,
+  outcome: Outcome,
+  id: string,
+  address: string,
+  sequence: number
+}
+
+export type FormattedSettingsTransaction = {
+  type: string,
+  specification: FormattedSettings,
+  outcome: Outcome,
+  id: string,
+  address: string,
+  sequence: number
+}
+
+export type FormattedTransactionType =
+  FormattedPaymentTransaction |
+  FormattedOrderTransaction |
+  FormattedOrderCancellationTransaction |
+  FormattedTrustlineTransaction |
+  FormattedSettingsTransaction

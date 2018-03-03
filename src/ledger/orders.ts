@@ -1,9 +1,8 @@
 import * as _ from 'lodash'
 import {validate} from '../common'
-import parseAccountOrder from './parse/account-order'
-import {Order} from './types'
+import {FormattedAccountOrder, parseAccountOrder} from './parse/account-order'
 import {RippleAPI} from '../api'
-import {AccountOffersResponse} from '../common/types/commands/account_offers'
+import {AccountOffersResponse} from '../common/types/commands'
 
 export type GetOrdersOptions = {
   limit?: number,
@@ -12,8 +11,8 @@ export type GetOrdersOptions = {
 
 function formatResponse(
   address: string, responses: AccountOffersResponse[]
-): Order[] {
-  let orders: Order[] = []
+): FormattedAccountOrder[] {
+  let orders: FormattedAccountOrder[] = []
   for (const response of responses) {
     const offers = response.offers.map(offer => {
       return parseAccountOrder(address, offer)
@@ -25,7 +24,7 @@ function formatResponse(
 
 export default async function getOrders(
   this: RippleAPI, address: string, options: GetOrdersOptions = {}
-): Promise<Order[]> {
+): Promise<FormattedAccountOrder[]> {
   // 1. Validate
   validate.getOrders({address, options})
   // 2. Make Request
