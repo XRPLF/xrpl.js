@@ -8,6 +8,7 @@ const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
 const transactionsResponse = require('./fixtures/rippled/account-tx');
 const accountLinesResponse = require('./fixtures/rippled/account-lines');
+const accountObjectsResponse = require('./fixtures/rippled/account-objects');
 const fullLedger = require('./fixtures/rippled/ledger-full-38129.json');
 const { getFreePort } = require('./utils/net-utils');
 
@@ -80,8 +81,13 @@ module.exports = function createMockRippled(port) {
     this.socket = conn;
     conn.config = {};
     conn.on('message', function (requestJSON) {
-      const request = JSON.parse(requestJSON);
-      mock.emit('request_' + request.command, request, conn);
+      try {
+        const request = JSON.parse(requestJSON);
+        mock.emit('request_' + request.command, request, conn);
+      } catch(err) {
+        console.error('Error: ' + err.message);
+        assert(false, err.message);
+      }
     });
   });
 
@@ -179,6 +185,15 @@ module.exports = function createMockRippled(port) {
       assert.deepEqual(request.streams, ['ledger', 'server']);
     }
     conn.send(createResponse(request, fixtures.unsubscribe));
+  });
+
+  mock.on('request_account_objects', function (request, conn) {
+    assert.strictEqual(request.command, 'account_objects');
+    if (request.account === addresses.ACCOUNT) {
+      conn.send(accountObjectsResponse(request));
+    } else {
+      assert(false, 'Unrecognized account address: ' + request.account);
+    }
   });
 
   mock.on('request_account_info', function (request, conn) {
