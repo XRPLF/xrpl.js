@@ -1,6 +1,6 @@
 import {SignerEntry} from './index'
 
-export type PayChannelLedgerEntry = {
+export interface PayChannelLedgerEntry {
   LedgerEntryType: 'PayChannel',
   Sequence: number,
   Account: string,
