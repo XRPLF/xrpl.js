@@ -17,6 +17,10 @@ module.exports = {
   empty: require('./empty'),
   subscribe: require('./subscribe'),
   unsubscribe: require('./unsubscribe'),
+  account_objects: {
+    normal: require('./account-objects'),
+    // notfound: require('./account-objects-not-found')
+  },
   account_info: {
     normal: require('./account-info'),
     notfound: require('./account-info-not-found')

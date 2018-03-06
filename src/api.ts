@@ -177,12 +177,18 @@ class RippleAPI extends EventEmitter {
     command: 'account_objects',
     params: AccountObjectsRequest
   ): Promise<AccountObjectsResponse[]> {
+    // 1. Validate
+    validate.getAccountObjects(params)
+
     // TODO: Prevent access to non-validated ledger versions
+
+    // 2. Make request(s)
     const results = await (<Function>this._requestAll)(command, params, {
       collect: 'account_objects'
     })
 
-    return results.reduce((result, singleResult) => {
+    // 3. Return consolidated response
+    const {marker, ...response} = results.reduce((result, singleResult) => {
       const invariants = ['account', 'ledger_hash',
         'ledger_index', 'ledger_current_index', 'validated']
 
@@ -195,8 +201,13 @@ class RippleAPI extends EventEmitter {
         }
       })
 
-      result.account_objects.push(singleResult.account_objects)
+      return Object.assign({}, result, {
+        account_objects: result.account_objects.concat(
+          singleResult.account_objects
+        )
+      })
     })
+    return response
   }
 
   /**

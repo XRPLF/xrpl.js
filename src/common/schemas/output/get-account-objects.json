@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "account_objects Response",
+  "title": "AccountObjectsResponse",
   "description": "Response format for account_objects",
   "type": "object",
   "properties": {
