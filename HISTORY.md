@@ -1,5 +1,22 @@
 # ripple-lib Release History
 
+## 0.19.0 (2018-03-02)
+
++ [Add support for Checks](https://github.com/ripple/ripple-lib/pull/853)
++ [Add support for the Deposit Authorization account root flag](https://github.com/ripple/ripple-lib/pull/852)
++ [Generate .ts.d TypeScript declaration files](https://github.com/ripple/ripple-lib/pull/851)
++ [Improve documentation of getTransactions params](https://github.com/ripple/ripple-lib/pull/856)
++ [Add new request interface](https://github.com/ripple/ripple-lib/pull/843) (private for now)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+0e7ce4594b7e455fbc57ad81f6fddc391d1e1f349a49c96ad783be50f80fdc14  ripple-0.19.0-debug.js
+6d716a0357929e51e476f22136880f7a0e5458fd396ac145ce9308f278ff7cc1  ripple-0.19.0-min.js
+6715db1af638f99226ab7f8f244103306aa6e04d1b8c1da47a63431053bacb84  ripple-0.19.0.js
+```
+
 ## 0.18.2 (2018-02-13)
 
 + [Fix: Publish updated browser builds to npm so that users can easily use
