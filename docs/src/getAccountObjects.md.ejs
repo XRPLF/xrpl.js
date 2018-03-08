@@ -1,6 +1,6 @@
 ## Request account_objects
 
-`requestAll('account_objects', params: AccountObjectsRequest): Promise<AccountObjectsResponse[]>`
+`request('account_objects', params: AccountObjectsRequest): Promise<AccountObjectsResponse>`
 
 Returns objects owned by an account. For an account's trust lines and balances, see `getTrustlines` and `getBalances`.
 
@@ -26,7 +26,7 @@ The types of objects that may be returned include:
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-return api.requestAll('account_objects', {account: address}).then(objects =>
+return api.request('account_objects', {account: address}).then(objects =>
   {/* ... */});
 ```
 
