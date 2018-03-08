@@ -86,6 +86,85 @@ function getCollectKeyFromCommand(command: string): string|undefined {
   }
 }
 
+// function validateRequest(
+//   command: 'account_info',
+//   params: AccountInfoRequest
+// ): void
+// function validateRequest(
+//   command: 'gateway_balances',
+//   params: GatewayBalancesRequest
+// ): void
+
+/**
+ * Validate the request.
+ *
+ * Throws if `params` are invalid for `command`.
+ */
+function validateRequest(command: string, params: any): void {
+  switch (command) {
+    case 'account_info':
+      // getSettings sets `signer_lists: true`
+      if (params.signer_lists) {
+        validate.getSettings({
+          address: params.account,
+          options: {
+            ledgerVersion: params.ledger_index
+          }
+        })
+      } else {
+        validate.getAccountInfo({
+          address: params.account,
+          options: {
+            ledgerVersion: params.ledger_index
+          }
+        })
+      }
+      return
+    case 'gateway_balances':
+      validate.getBalanceSheet({
+        address: params.account,
+        options: {
+          excludeAddresses: params.hotwallet,
+          ledgerVersion: params.ledger_index
+        }
+      })
+      return
+    case 'ledger':
+      validate.getLedger({
+        options: {
+          ledgerVersion: params.ledger_index,
+          includeAllData: params.expand,
+          includeTransactions: params.transactions,
+          includeState: params.accounts
+        }
+      })
+      return
+    case 'ledger_entry':
+      // Validate only if `index` is present.
+      // rippled's `ledger_entry` command supports other fields
+      // which are not validated here:
+      // - account_root
+      // - directory
+      // - offer
+      // - ripple_state
+      if (params.index) {
+        validate.getPaymentChannel({
+          id: params.index
+        })
+      }
+      return
+    case 'account_objects':
+      validate.getAccountObjects(params)
+      return
+    case 'account_offers':
+    case 'book_offers':
+    case 'account_lines':
+    default:
+      // Unrecognized command - anything goes
+      return
+  }
+}
+
 // prevent access to non-validated ledger versions
 export class RestrictedConnection extends Connection {
   request(request: any, timeout?: number) {
@@ -140,74 +219,47 @@ class RippleAPI extends EventEmitter {
     }
   }
 
-  /**
-   * Makes a simple request to the API with the given command and any
-   * additional request body parameters.
-   *
-   * NOTE: This command is under development and should not yet be relied
-   * on by external consumers.
-   */
-  async _request(command: 'account_info', params: AccountInfoRequest):
+
+  async request(command: 'account_info', params: AccountInfoRequest):
     Promise<AccountInfoResponse>
-  async _request(command: 'account_lines', params: AccountLinesRequest):
+  async request(command: 'account_lines', params: AccountLinesRequest):
     Promise<AccountLinesResponse>
-  async _request(command: 'account_offers', params: AccountOffersRequest):
-  Promise<AccountOffersResponse>
-  async _request(command: 'book_offers', params: BookOffersRequest):
-    Promise<BookOffersResponse>
-  async _request(command: 'gateway_balances', params: GatewayBalancesRequest):
-    Promise<GatewayBalancesResponse>
-  async _request(command: 'ledger', params: LedgerRequest):
-    Promise<LedgerResponse>
-  async _request(command: 'ledger_entry', params: LedgerEntryRequest):
-    Promise<LedgerEntryResponse>
-  async _request(command: string, params: any = {}) {
-    return this.connection.request({
-      ...params,
-      command
-    })
-  }
 
   /**
    * Returns objects owned by an account.
    * For an account's trust lines and balances,
    * see `getTrustlines` and `getBalances`.
    */
-  async requestAll(
-    command: 'account_objects',
-    params: AccountObjectsRequest
-  ): Promise<AccountObjectsResponse[]> {
-    // 1. Validate
-    validate.getAccountObjects(params)
+  async request(command: 'account_objects', params: AccountObjectsRequest):
+    Promise<AccountObjectsResponse>
+
+  async request(command: 'account_offers', params: AccountOffersRequest):
+  Promise<AccountOffersResponse>
+  async request(command: 'book_offers', params: BookOffersRequest):
+    Promise<BookOffersResponse>
+  async request(command: 'gateway_balances', params: GatewayBalancesRequest):
+    Promise<GatewayBalancesResponse>
+  async request(command: 'ledger', params: LedgerRequest):
+    Promise<LedgerResponse>
+  async request(command: 'ledger_entry', params: LedgerEntryRequest):
+    Promise<LedgerEntryResponse>
+
+  /**
+   * Makes a request to the API with the given command and
+   * additional request body parameters.
+   *
+   * NOTE: This command is under development.
+   */
+  async request(command: string, params: object = {}) {
+    // Throw if `params` are invalid for `command`
+    validateRequest(command, params)
 
     // TODO: Prevent access to non-validated ledger versions
 
-    // 2. Make request(s)
-    const results = await (<Function>this._requestAll)(command, params, {
-      collect: 'account_objects'
+    return this.connection.request({
+      ...params,
+      command
     })
-
-    // 3. Return consolidated response
-    const {marker, ...response} = results.reduce((result, singleResult) => {
-      const invariants = ['account', 'ledger_hash',
-        'ledger_index', 'ledger_current_index', 'validated']
-
-      invariants.forEach(field => {
-        if (result[field] !== singleResult[field]) {
-          throw new errors.UnexpectedError(
-            `paginated response contains mismatched ${field}: ` +
-            `${result[field]} !== ${singleResult[field]}`
-          )
-        }
-      })
-
-      return Object.assign({}, result, {
-        account_objects: result.account_objects.concat(
-          singleResult.account_objects
-        )
-      })
-    })
-    return response
   }
 
   /**
@@ -253,10 +305,10 @@ class RippleAPI extends EventEmitter {
         limit: countRemaining,
         marker
       }
-      // NOTE: We have to generalize the `this._request()` function signature
+      // NOTE: We have to generalize the `this.request()` function signature
       // here until we add support for unknown commands (since command is some
       // unknown string).
-      const singleResult = await (<Function>this._request)(command, repeatProps)
+      const singleResult = await (<Function>this.request)(command, repeatProps)
       const collectedData = singleResult[collectKey]
       marker = singleResult.marker
       results.push(singleResult)
