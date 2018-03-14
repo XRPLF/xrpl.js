@@ -1,51 +1,28 @@
 import * as _ from 'lodash'
 import * as utils from './utils'
-import parseOrderbookOrder from './parse/orderbook-order'
+import {
+  parseOrderbookOrder,
+  FormattedOrderbookOrder
+} from './parse/orderbook-order'
 import {validate} from '../common'
-import {OrderSpecification} from './types'
 import {Amount, Issue} from '../common/types/objects'
+import {BookOffer} from '../common/types/commands'
 import {RippleAPI} from '../api'
-import {OfferCreateTransaction} from '../common/types/objects'
 
-export type OrdersOptions = {
-  limit?: number,
-  ledgerVersion?: number
-}
-
-export type Orderbook = {
-  base: Issue,
-  counter: Issue
-}
-
-export type OrderbookItem = {
-   specification: OrderSpecification,
-   properties: {
-    maker: string,
-    sequence: number,
-    makerExchangeRate: string
-  },
-  state?: {
-    fundedAmount: Amount,
-    priceOfFundedAmount: Amount
-  }
-}
-
-export type OrderbookOrders = Array<OrderbookItem>
-
-export type GetOrderbook = {
-  bids: OrderbookOrders,
-  asks: OrderbookOrders
+export type FormattedOrderbook = {
+  bids: FormattedOrderbookOrder[],
+  asks: FormattedOrderbookOrder[]
 }
 
 function isSameIssue(a: Amount, b: Amount) {
   return a.currency === b.currency && a.counterparty === b.counterparty
 }
 
-function directionFilter(direction: string, order: OrderbookItem) {
+function directionFilter(direction: string, order: FormattedOrderbookOrder) {
   return order.specification.direction === direction
 }
 
-function flipOrder(order: OrderbookItem) {
+function flipOrder(order: FormattedOrderbookOrder) {
   const specification = order.specification
   const flippedSpecification = {
     quantity: specification.totalPrice,
@@ -56,13 +33,13 @@ function flipOrder(order: OrderbookItem) {
   return _.merge({}, order, {specification: newSpecification})
 }
 
-function alignOrder(base: Amount, order: OrderbookItem) {
+function alignOrder(base: Amount, order: FormattedOrderbookOrder) {
   const quantity = order.specification.quantity
   return isSameIssue(quantity, base) ? order : flipOrder(order)
 }
 
 function formatBidsAndAsks(
-  orderbook: Orderbook, offers: OfferCreateTransaction[]) {
+  orderbook: OrderbookInfo, offers: BookOffer[]) {
   // the "base" currency is the currency that you are buying or selling
   // the "counter" is the currency that the "base" is priced in
   // a "bid"/"ask" is an order to buy/sell the base, respectively
@@ -83,7 +60,7 @@ function formatBidsAndAsks(
 // account is to specify a "perspective", which affects which unfunded offers
 // are returned
 async function makeRequest(
-  api: RippleAPI, taker: string, options: OrdersOptions,
+  api: RippleAPI, taker: string, options: GetOrderbookOptions,
   takerGets: Issue, takerPays: Issue
 ) {
   const orderData = utils.renameCounterpartyToIssuerInOrder({
@@ -99,12 +76,23 @@ async function makeRequest(
 })
 }
 
+
+export type GetOrderbookOptions = {
+  limit?: number,
+  ledgerVersion?: number
+}
+
+export type OrderbookInfo = {
+  base: Issue,
+  counter: Issue
+}
+
 export default async function getOrderbook(
   this: RippleAPI,
   address: string,
-  orderbook: Orderbook,
-  options: OrdersOptions = {}
-): Promise<GetOrderbook> {
+  orderbook: OrderbookInfo,
+  options: GetOrderbookOptions = {}
+): Promise<FormattedOrderbook> {
   // 1. Validate
   validate.getOrderbook({address, orderbook, options})
   // 2. Make Request

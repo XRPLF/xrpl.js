@@ -1,4 +1,8 @@
-import {AccountRoot, SignerList} from '../objects'
+import {
+  AccountRootLedgerEntry,
+  SignerListLedgerEntry,
+  QueueData
+} from '../objects'
 
 export interface AccountInfoRequest {
   account: string,
@@ -10,27 +14,10 @@ export interface AccountInfoRequest {
 }
 
 export interface AccountInfoResponse {
-  account_data: AccountRoot,
-  signer_lists?: SignerList[],
+  account_data: AccountRootLedgerEntry,
+  signer_lists?: SignerListLedgerEntry[],
   ledger_current_index?: number,
   ledger_index?: number,
   queue_data?: QueueData,
   validated?: boolean
-}
-
-export interface QueueData {
-  txn_count: number,
-  auth_change_queued?: boolean,
-  lowest_sequence?: number,
-  highest_sequence?: number,
-  max_spend_drops_total?: string,
-  transactions?: TransactionData[]
-}
-
-export interface TransactionData {
-  auth_change?: boolean,
-  fee?: string,
-  fee_level?: string,
-  max_spend_drops?: string,
-  seq?: number
 }

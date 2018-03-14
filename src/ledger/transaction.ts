@@ -3,12 +3,22 @@ import * as utils from './utils'
 import parseTransaction from './parse/transaction'
 import {validate, errors} from '../common'
 import {Connection} from '../common'
-import {
-  TransactionType, TransactionResponse, TransactionOptions
-} from './transaction-types'
+import {FormattedTransactionType} from '../transaction/types'
+
+export type TransactionOptions = {
+  minLedgerVersion?: number,
+  maxLedgerVersion?: number
+}
+type TransactionResponse = FormattedTransactionType & {
+    hash: string,
+    ledger_index: number,
+    meta: any,
+    validated?: boolean
+}
+
 
 function attachTransactionDate(connection: Connection, tx: any
-): Promise<TransactionType> {
+): Promise<FormattedTransactionType> {
   if (tx.date) {
     return Promise.resolve(tx)
   }
@@ -71,7 +81,7 @@ function convertError(connection: Connection, options: TransactionOptions,
 }
 
 function formatResponse(options: TransactionOptions, tx: TransactionResponse
-): TransactionType {
+): FormattedTransactionType {
   if (tx.validated !== true || !isTransactionInRange(tx, options)) {
   throw new errors.NotFoundError('Transaction not found')
   }
@@ -79,7 +89,7 @@ function formatResponse(options: TransactionOptions, tx: TransactionResponse
 }
 
 function getTransaction(id: string, options: TransactionOptions = {}
-): Promise<TransactionType> {
+): Promise<FormattedTransactionType> {
   validate.getTransaction({id, options})
 
   const request = {

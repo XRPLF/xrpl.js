@@ -4,9 +4,8 @@ const {computeTransactionHash} = require('ripple-hashes')
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
 import getTransaction from './transaction'
-import {validate, errors} from '../common'
-import {Connection} from '../common'
-import {TransactionType} from './transaction-types'
+import {validate, errors, Connection} from '../common'
+import {FormattedTransactionType} from '../transaction/types'
 
 
 export type TransactionsOptions = {
@@ -20,10 +19,10 @@ export type TransactionsOptions = {
   counterparty?: string,
   types?: Array<string>,
   binary?: boolean,
-  startTx?: TransactionType
+  startTx?: FormattedTransactionType
 }
 
-export type GetTransactionsResponse = Array<TransactionType>
+export type GetTransactionsResponse = Array<FormattedTransactionType>
 
 function parseBinaryTransaction(transaction) {
   const tx = binary.decode(transaction.tx_blob)
@@ -43,7 +42,7 @@ function parseAccountTxTransaction(tx) {
     {meta: _tx.meta, validated: _tx.validated}))
 }
 
-function counterpartyFilter(filters, tx: TransactionType) {
+function counterpartyFilter(filters, tx: FormattedTransactionType) {
   if (tx.address === filters.counterparty) {
     return true
   }
@@ -57,7 +56,7 @@ function counterpartyFilter(filters, tx: TransactionType) {
 }
 
 function transactionFilter(address: string, filters: TransactionsOptions,
-  tx: TransactionType
+  tx: FormattedTransactionType
 ) {
   if (filters.excludeFailures && tx.outcome.result !== 'tesSUCCESS') {
     return false
@@ -77,7 +76,9 @@ function transactionFilter(address: string, filters: TransactionsOptions,
   return true
 }
 
-function orderFilter(options: TransactionsOptions, tx: TransactionType) {
+function orderFilter(
+  options: TransactionsOptions, tx: FormattedTransactionType
+) {
   return !options.startTx || (options.earliestFirst ?
     utils.compareTransactions(tx, options.startTx) > 0 :
     utils.compareTransactions(tx, options.startTx) < 0)

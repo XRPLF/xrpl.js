@@ -49,7 +49,9 @@ import {
   AccountInfoRequest, AccountInfoResponse,
   AccountLinesRequest, AccountLinesResponse,
   BookOffersRequest, BookOffersResponse,
-  GatewayBalancesRequest, GatewayBalancesResponse
+  GatewayBalancesRequest, GatewayBalancesResponse,
+  LedgerRequest, LedgerResponse,
+  LedgerEntryRequest, LedgerEntryResponse
 } from './common/types/commands'
 
 
@@ -154,6 +156,10 @@ class RippleAPI extends EventEmitter {
     Promise<BookOffersResponse>
   async _request(command: 'gateway_balances', params: GatewayBalancesRequest):
     Promise<GatewayBalancesResponse>
+  async _request(command: 'ledger', params: LedgerRequest):
+    Promise<LedgerResponse>
+  async _request(command: 'ledger_entry', params: LedgerEntryRequest):
+    Promise<LedgerEntryResponse>
   async _request(command: string, params: any = {}) {
     return this.connection.request({
       ...params,

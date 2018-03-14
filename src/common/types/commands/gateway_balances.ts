@@ -1,6 +1,5 @@
 import {Amount} from '../objects'
 
-
 export interface GatewayBalancesRequest {
   account: string,
   strict?: boolean,

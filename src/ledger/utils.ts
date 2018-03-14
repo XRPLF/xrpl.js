@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import * as assert from 'assert'
 import * as common from '../common'
 import {Connection} from '../common'
-import {TransactionType} from './transaction-types'
+import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
 
 export type RecursiveData = {
@@ -78,7 +78,8 @@ function signum(num) {
  *  them based on TransactionIndex
  *  See: https://ripple.com/build/transactions/
  */
-function compareTransactions(first: TransactionType, second: TransactionType
+function compareTransactions(
+  first: FormattedTransactionType, second: FormattedTransactionType
 ): number {
   if (!first.outcome || !second.outcome) {
     return 0
