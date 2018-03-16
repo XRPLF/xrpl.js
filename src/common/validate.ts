@@ -32,9 +32,6 @@ _.partial(validateOptions, 'getSettingsParameters')
 export const getAccountInfo =
 _.partial(validateOptions, 'getAccountInfoParameters')
 
-export const getAccountObjects =
-_.partial(validateOptions, 'AccountObjectsRequest')
-
 export const getTrustlines =
 _.partial(validateOptions, 'getTrustlinesParameters')
 

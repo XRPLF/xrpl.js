@@ -20,6 +20,7 @@ import getOrders from './ledger/orders'
 import getOrderbook from './ledger/orderbook'
 import getSettings from './ledger/settings'
 import getAccountInfo from './ledger/accountinfo'
+import getAccountObjects from './ledger/accountobjects'
 import getPaymentChannel from './ledger/payment-channel'
 import preparePayment from './transaction/payment'
 import prepareTrustline from './transaction/trustline'
@@ -145,8 +146,6 @@ function _validateRequest(command: string, params: any): void {
       }
       return
     case 'account_objects':
-      validate.getAccountObjects(params)
-      return
     case 'account_offers':
     case 'book_offers':
     case 'account_lines':
@@ -332,6 +331,7 @@ class RippleAPI extends EventEmitter {
   getOrderbook = getOrderbook
   getSettings = getSettings
   getAccountInfo = getAccountInfo
+  getAccountObjects = getAccountObjects
   getPaymentChannel = getPaymentChannel
   getLedger = getLedger
 

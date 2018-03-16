@@ -1,50 +1,56 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "AccountObjectsRequest",
-  "description": "Request parameters for account_objects",
+  "title": "getAccountObjectsOptions",
+  "description": "Request options for getAccountObjects",
   "type": "object",
   "properties": {
-    "account": {
+    "address": {
       "$ref": "address",
       "description": "The address of the account to get the account objects of."
     },
-    "type": {
-      "type": "string",
-      "enum": [
-        "check",
-        "escrow",
-        "offer",
-        "payment_channel",
-        "signer_list",
-        "state"
-      ],
-      "description":
-        "(Optional) Filter results to include only this type of ledger object. The valid types are: `check`, `escrow`, `offer`, `payment_channel`, `signer_list`, and `state` (trust line)."
-    },
-    "ledger_hash": {
-      "type": "string",
-      "description":
-        "(Optional) A 20-byte hex string for the ledger version to use."
-    },
-    "ledger_index": {
-      "oneOf": [
-        {
-          "$ref": "ledgerVersion"
+    "options": {
+      "description": "Options that affect what to return.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "check",
+            "escrow",
+            "offer",
+            "payment_channel",
+            "signer_list",
+            "state"
+          ],
+          "description":
+            "(Optional) Filter results to include only this type of ledger object. The valid types are: `check`, `escrow`, `offer`, `payment_channel`, `signer_list`, and `state` (trust line)."
         },
-        {
-          "type": "string"
+        "ledgerHash": {
+          "type": "string",
+          "description":
+            "(Optional) A 20-byte hex string for the ledger version to use."
+        },
+        "ledgerIndex": {
+          "oneOf": [
+            {
+              "$ref": "ledgerVersion"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description":
+            "(Optional) The sequence number of the ledger to use, or a shortcut string to choose a ledger automatically."
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description":
+            "(Optional) The maximum number of objects to include in the results."
         }
-      ],
-      "description":
-        "(Optional) The sequence number of the ledger to use, or a shortcut string to choose a ledger automatically."
-    },
-    "limit": {
-      "type": "integer",
-      "minimum": 1,
-      "description":
-        "(Optional) The maximum number of objects to include in the results."
+      },
+      "additionalProperties": false
     }
   },
-  "required": ["account"],
+  "required": ["address"],
   "additionalProperties": false
 }
