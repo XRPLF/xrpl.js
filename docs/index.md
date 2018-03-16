@@ -50,7 +50,7 @@
   - [getOrderbook](#getorderbook)
   - [getSettings](#getsettings)
   - [getAccountInfo](#getaccountinfo)
-  - [Request account_objects](#request-account_objects)
+  - [getAccountObjects](#getaccountobjects)
   - [getPaymentChannel](#getpaymentchannel)
   - [getLedger](#getledger)
   - [preparePayment](#preparepayment)
@@ -2919,9 +2919,9 @@ return api.getAccountInfo(address).then(info =>
 ```
 
 
-## Request account_objects
+## getAccountObjects
 
-`request('account_objects', params: AccountObjectsRequest): Promise<AccountObjectsResponse>`
+`getAccountObjects(address: string, options: object): Promise<AccountObjectsResponse>`
 
 Returns objects owned by an account. For an account's trust lines and balances, see `getTrustlines` and `getBalances`.
 
@@ -2929,12 +2929,13 @@ Returns objects owned by an account. For an account's trust lines and balances, 
 
 Name | Type | Description
 ---- | ---- | -----------
-account | [address](#address) | The address of the account to get the account objects of.
-ledger_hash | string | *Optional* (Optional) A 20-byte hex string for the ledger version to use.
-ledger_index | integer | *Optional* (Optional) The sequence number of the ledger to use, or a shortcut string to choose a ledger automatically.
-ledger_index | string | *Optional* (Optional) The sequence number of the ledger to use, or a shortcut string to choose a ledger automatically.
-limit | integer | *Optional* (Optional) The maximum number of objects to include in the results.
-type | string | *Optional* (Optional) Filter results to include only this type of ledger object. The valid types are: `check`, `escrow`, `offer`, `payment_channel`, `signer_list`, and `state` (trust line).
+address | [address](#address) | The address of the account to get the account objects of.
+options | object | *Optional* Options that affect what to return.
+*options.* ledgerHash | string | *Optional* (Optional) A 20-byte hex string for the ledger version to use.
+*options.* ledgerIndex | integer | *Optional* (Optional) The sequence number of the ledger to use, or a shortcut string to choose a ledger automatically.
+*options.* ledgerIndex | string | *Optional* (Optional) The sequence number of the ledger to use, or a shortcut string to choose a ledger automatically.
+*options.* limit | integer | *Optional* (Optional) The maximum number of objects to include in the results.
+*options.* type | string | *Optional* (Optional) Filter results to include only this type of ledger object. The valid types are: `check`, `escrow`, `offer`, `payment_channel`, `signer_list`, and `state` (trust line).
 
 ### Return Value
 
@@ -2964,7 +2965,7 @@ The types of objects that may be returned include:
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-return api.request('account_objects', {account: address}).then(objects =>
+return api.getAccountObjects(address: address).then(objects =>
   {/* ... */});
 ```
 
