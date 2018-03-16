@@ -1,24 +1,5 @@
 import {SignerEntry} from './index'
 
-export interface PayChannelLedgerEntry {
-  LedgerEntryType: 'PayChannel',
-  Sequence: number,
-  Account: string,
-  Amount: string,
-  Balance: string,
-  PublicKey: string,
-  Destination: string,
-  SettleDelay: number,
-  Expiration?: number,
-  CancelAfter?: number,
-  SourceTag?: number,
-  DestinationTag?: number,
-  OwnerNode: string,
-  PreviousTxnID: string,
-  PreviousTxnLgrSeq: number,
-  index: string
-}
-
 export interface AccountRootLedgerEntry {
   LedgerEntryType: 'AccountRoot',
   Account: string,
@@ -38,10 +19,10 @@ export interface AccountRootLedgerEntry {
 }
 
 export interface AmendmentsLedgerEntry {
+  LedgerEntryType: 'Amendments',
   Amendments?: string[],
   Majorities?: any[],
-  Flags: 0,
-  LedgerEntryType: 'Amendments'
+  Flags: 0
 }
 
 export interface CheckLedgerEntry {

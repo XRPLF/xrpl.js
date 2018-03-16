@@ -86,21 +86,12 @@ function getCollectKeyFromCommand(command: string): string|undefined {
   }
 }
 
-// function validateRequest(
-//   command: 'account_info',
-//   params: AccountInfoRequest
-// ): void
-// function validateRequest(
-//   command: 'gateway_balances',
-//   params: GatewayBalancesRequest
-// ): void
-
 /**
  * Validate the request.
  *
  * Throws if `params` are invalid for `command`.
  */
-function validateRequest(command: string, params: any): void {
+function _validateRequest(command: string, params: any): void {
   switch (command) {
     case 'account_info':
       // getSettings sets `signer_lists: true`
@@ -220,9 +211,9 @@ class RippleAPI extends EventEmitter {
   }
 
 
-  async request(command: 'account_info', params: AccountInfoRequest):
+  async _request(command: 'account_info', params: AccountInfoRequest):
     Promise<AccountInfoResponse>
-  async request(command: 'account_lines', params: AccountLinesRequest):
+  async _request(command: 'account_lines', params: AccountLinesRequest):
     Promise<AccountLinesResponse>
 
   /**
@@ -230,18 +221,18 @@ class RippleAPI extends EventEmitter {
    * For an account's trust lines and balances,
    * see `getTrustlines` and `getBalances`.
    */
-  async request(command: 'account_objects', params: AccountObjectsRequest):
+  async _request(command: 'account_objects', params: AccountObjectsRequest):
     Promise<AccountObjectsResponse>
 
-  async request(command: 'account_offers', params: AccountOffersRequest):
+  async _request(command: 'account_offers', params: AccountOffersRequest):
   Promise<AccountOffersResponse>
-  async request(command: 'book_offers', params: BookOffersRequest):
+  async _request(command: 'book_offers', params: BookOffersRequest):
     Promise<BookOffersResponse>
-  async request(command: 'gateway_balances', params: GatewayBalancesRequest):
+  async _request(command: 'gateway_balances', params: GatewayBalancesRequest):
     Promise<GatewayBalancesResponse>
-  async request(command: 'ledger', params: LedgerRequest):
+  async _request(command: 'ledger', params: LedgerRequest):
     Promise<LedgerResponse>
-  async request(command: 'ledger_entry', params: LedgerEntryRequest):
+  async _request(command: 'ledger_entry', params: LedgerEntryRequest):
     Promise<LedgerEntryResponse>
 
   /**
@@ -250,9 +241,9 @@ class RippleAPI extends EventEmitter {
    *
    * NOTE: This command is under development.
    */
-  async request(command: string, params: object = {}) {
+  async _request(command: string, params: object = {}) {
     // Throw if `params` are invalid for `command`
-    validateRequest(command, params)
+    _validateRequest(command, params)
 
     // TODO: Prevent access to non-validated ledger versions
 
@@ -305,10 +296,10 @@ class RippleAPI extends EventEmitter {
         limit: countRemaining,
         marker
       }
-      // NOTE: We have to generalize the `this.request()` function signature
+      // NOTE: We have to generalize the `this._request()` function signature
       // here until we add support for unknown commands (since command is some
       // unknown string).
-      const singleResult = await (<Function>this.request)(command, repeatProps)
+      const singleResult = await (<Function>this._request)(command, repeatProps)
       const collectedData = singleResult[collectKey]
       marker = singleResult.marker
       results.push(singleResult)
