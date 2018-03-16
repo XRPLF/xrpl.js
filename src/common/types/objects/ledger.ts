@@ -16,10 +16,7 @@ export interface Ledger {
   totalCoins?: string,
   // @deprecated
   hash?: string,
-  // TODO: undocumented
   close_flags?: number,
-  // TODO: undocumented
   parent_close_time?: number,
-  // TODO: undocumented
   accountState?: any[]
 }
