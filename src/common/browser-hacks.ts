@@ -9,7 +9,10 @@ function setPrototypeOf(object, prototype) {
 function getConstructorName(object: Object): string {
   // hack for internet explorer
   if (!object.constructor.name) {
-    return object.constructor.toString().match(/^function\s+([^(]*)/)![1]
+    const ctorStr = object.constructor.toString()
+    const fnMatch=ctorStr.match(/^function\s+([^(]*)/)
+    const classMatch=ctorStr.match(/^class\sextends\s+([^{]*)/)
+    return classMatch?classMatch[1]:fnMatch[1]
   }
   return object.constructor.name
 }
