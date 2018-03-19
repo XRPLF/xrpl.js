@@ -1,6 +1,5 @@
 export interface Ledger {
   account_hash: string,
-  accounts?: any[],
   close_time: number,
   close_time_human: string,
   close_time_resolution: number,
@@ -17,10 +16,7 @@ export interface Ledger {
   totalCoins?: string,
   // @deprecated
   hash?: string,
-  // TODO: undocumented
   close_flags?: number,
-  // TODO: undocumented
   parent_close_time?: number,
-  // TODO: undocumented
-  accountState?: any
+  accountState?: any[]
 }
