@@ -9,7 +9,7 @@ import {Amount, Adjustment, MaxAdjustment,
   MinAdjustment, Memo} from '../common/types/objects'
 
 
-export type Payment = {
+export interface Payment {
   source: Adjustment | MaxAdjustment,
   destination: Adjustment | MinAdjustment,
   paths?: string,
