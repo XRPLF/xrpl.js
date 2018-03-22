@@ -9,7 +9,7 @@ import {Amount, Adjustment, MaxAdjustment,
   MinAdjustment, Memo} from '../common/types/objects'
 
 
-  export type Payment = {
+export interface Payment {
   source: Adjustment | MaxAdjustment,
   destination: Adjustment | MinAdjustment,
   paths?: string,
@@ -30,11 +30,22 @@ import {Amount, Adjustment, MaxAdjustment,
   limitQuality?: boolean
 }
 
+function isMaxAdjustment(
+  source: Adjustment | MaxAdjustment): source is MaxAdjustment {
+return (source as MaxAdjustment).maxAmount !== undefined
+}
+
+function isMinAdjustment(
+  destination: Adjustment | MinAdjustment): destination is MinAdjustment {
+return (destination as MinAdjustment).minAmount !== undefined
+}
+
 function isXRPToXRPPayment(payment: Payment): boolean {
-  const sourceCurrency = _.get(payment, 'source.maxAmount.currency',
-    _.get(payment, 'source.amount.currency'))
-  const destinationCurrency = _.get(payment, 'destination.amount.currency',
-    _.get(payment, 'destination.minAmount.currency'))
+  const {source, destination} = payment
+  const sourceCurrency = isMaxAdjustment(source)
+      ? source.maxAmount.currency : source.amount.currency
+  const destinationCurrency = isMinAdjustment(destination)
+      ? destination.minAmount.currency : destination.amount.currency
   return sourceCurrency === 'XRP' && destinationCurrency === 'XRP'
 }
 
@@ -74,11 +85,19 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
     throw new ValidationError('address must match payment.source.address')
   }
 
-  if (((<MaxAdjustment>payment.source).maxAmount && (<MinAdjustment>payment.destination).minAmount) ||
-      ((<Adjustment>payment.source).amount && (<Adjustment>payment.destination).amount)) {
+  if (
+    (isMaxAdjustment(payment.source) && isMinAdjustment(payment.destination))
+    ||
+    (!isMaxAdjustment(payment.source) && !isMinAdjustment(payment.destination))
+  ) {
     throw new ValidationError('payment must specify either (source.maxAmount '
       + 'and destination.amount) or (source.amount and destination.minAmount)')
   }
+
+  const destinationAmount = isMinAdjustment(payment.destination)
+    ? payment.destination.minAmount : payment.destination.amount
+  const sourceAmount = isMaxAdjustment(payment.source)
+    ? payment.source.maxAmount : payment.source.amount
 
   // when using destination.minAmount, rippled still requires that we set
   // a destination amount in addition to DeliverMin. the destination amount
@@ -86,9 +105,9 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
   // send the whole source amount, so we set the destination amount to the
   // maximum possible amount. otherwise it's possible that the destination
   // cap could be hit before the source cap.
-  const amount = (<MinAdjustment>payment.destination).minAmount && !isXRPToXRPPayment(payment) ?
-    createMaximalAmount((<MinAdjustment>payment.destination).minAmount) :
-    ((<Adjustment>payment.destination).amount || (<MinAdjustment>payment.destination).minAmount)
+  const amount =
+    (isMinAdjustment(payment.destination) && !isXRPToXRPPayment(payment))
+    ? createMaximalAmount(destinationAmount) : destinationAmount
 
   const txJSON: any = {
     TransactionType: 'Payment',
@@ -121,16 +140,14 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
     // temREDUNDANT_SEND_MAX removed in:
     // https://github.com/ripple/rippled/commit/
     //  c522ffa6db2648f1d8a987843e7feabf1a0b7de8/
-    if (payment.allowPartialPayment === true
-        || (<MinAdjustment>payment.destination).minAmount !== undefined) {
+    if (payment.allowPartialPayment || isMinAdjustment(payment.destination)) {
       txJSON.Flags |= paymentFlags.PartialPayment
     }
 
-    txJSON.SendMax = toRippledAmount(
-      (<MaxAdjustment>payment.source).maxAmount || (<Adjustment>payment.source).amount)
+    txJSON.SendMax = toRippledAmount(sourceAmount)
 
-    if ((<MinAdjustment>payment.destination).minAmount !== undefined) {
-      txJSON.DeliverMin = toRippledAmount((<MinAdjustment>payment.destination).minAmount)
+    if (isMinAdjustment(payment.destination)) {
+      txJSON.DeliverMin = toRippledAmount(destinationAmount)
     }
 
     if (payment.paths !== undefined) {
