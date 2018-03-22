@@ -32,12 +32,12 @@ export interface Payment {
 
 function isMaxAdjustment(
   source: Adjustment | MaxAdjustment): source is MaxAdjustment {
-return (<MaxAdjustment>source).maxAmount !== undefined
+return (source as MaxAdjustment).maxAmount !== undefined
 }
 
 function isMinAdjustment(
   destination: Adjustment | MinAdjustment): destination is MinAdjustment {
-return (<MinAdjustment>destination).minAmount !== undefined
+return (destination as MinAdjustment).minAmount !== undefined
 }
 
 function isXRPToXRPPayment(payment: Payment): boolean {
