@@ -275,6 +275,9 @@ Type | Description
 [checkCreate](#check-create) | A `checkCreate` transaction creates a check on the ledger, which is a deferred payment that can be cashed by its intended destination.
 [checkCancel](#check-cancel) | A `checkCancel` transaction cancels an unreedemed Check, removing it from the ledger without sending any money.
 [checkCash](#check-cash) | A `checkCash` transaction redeems a Check to receive up to the amount authorized by the corresponding `checkCreate` transaction. Only the `destination` address of a Check can cash it.
+[paymentChannelCreate](#payment-channel-create) | A `paymentChannelCreate` transaction opens a payment channel between two addresses with XRP set aside for asynchronous payments.
+[paymentChannelFund](#payment-channel-fund) | A `paymentChannelFund` transaction adds XRP to a payment channel and optionally sets a new expiration for the channel.
+[paymentChannelClaim](#payment-channel-claim) | A `paymentChannelClaim` transaction withdraws XRP from a channel and optionally requests to close it.
 
 ## Transaction Flow
 
@@ -682,8 +685,8 @@ Name | Type | Description
 amount | [value](#value) | Amount of XRP for sender to set aside in this channel.
 destination | [address](#address) | Address to receive XRP claims against this channel.
 settleDelay | number | Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP.
-publicKey | string | Public key of the key pair the source will use to sign claims against this channel.
-cancelAfter | date-time string | *Optional* Time when this channel expires.
+publicKey | string | Public key of the key pair the source may use to sign claims against this channel.
+cancelAfter | date-time string | *Optional* Time when this channel expires. This expiration cannot be changed after creating the channel.
 destinationTag | integer | *Optional* Destination tag.
 sourceTag | integer | *Optional* Source tag.
 
@@ -708,7 +711,7 @@ Name | Type | Description
 ---- | ---- | -----------
 amount | [value](#value) | Amount of XRP to fund the channel with.
 channel | string | 256-bit hexadecimal channel identifier.
-expiration | date-time string | *Optional* New expiration for this channel.
+expiration | date-time string | *Optional* New expiration for this channel. (This does not change the cancelAfter expiration, if the channel has one.) Cannot move the expiration sooner than settleDelay seconds from time of the request.
 
 ### Example
 
@@ -728,12 +731,12 @@ See [Transaction Types](#transaction-types) for a description.
 Name | Type | Description
 ---- | ---- | -----------
 channel | string | 256-bit hexadecimal channel identifier.
-amount | [value](#value) | *Optional* XRP balance of this channel after claim is processed.
-balance | [value](#value) | *Optional* Amount of XRP authorized by signature.
-close | boolean | *Optional* Request to close the channel.
-publicKey | string | *Optional* Public key of the channel's sender
+amount | [value](#value) | *Optional* Amount of XRP authorized by this signature.
+balance | [value](#value) | *Optional* Total XRP balance delivered by this channel after claim is processed.
+close | boolean | *Optional* Request to close the channel. If the channel has no XRP remaining or the destination address requests it, closes the channel immediately (returning unclaimed XRP to the source address). Otherwise, sets the channel to expire after settleDelay seconds have passed.
+publicKey | string | *Optional* Public key of the channel. (For verifying the signature.)
 renew | boolean | *Optional* Clear the channel's expiration time.
-signature | string | *Optional* Signature of this claim.
+signature | string | *Optional* Signed claim authorizing withdrawal of XRP from the channel. (Required except from the channel's source address.)
 
 ### Example
 
