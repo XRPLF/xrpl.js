@@ -1,17 +1,17 @@
-'use strict';
+'use strict'
 
-var createHash = require('create-hash');
-var apiFactory = require('x-address-codec');
+const createHash = require('create-hash')
+const apiFactory = require('x-address-codec')
 
-var NODE_PUBLIC = 28;
-var NODE_PRIVATE = 32;
-var ACCOUNT_ID = 0;
-var FAMILY_SEED = 33;
-var ED25519_SEED = [0x01, 0xE1, 0x4B];
+const NODE_PUBLIC = 28
+const NODE_PRIVATE = 32
+const ACCOUNT_ID = 0
+const FAMILY_SEED = 33
+const ED25519_SEED = [0x01, 0xE1, 0x4B]
 
 module.exports = apiFactory({
   sha256: function(bytes) {
-    return createHash('sha256').update(new Buffer(bytes)).digest();
+    return createHash('sha256').update(new Buffer(bytes)).digest()
   },
   defaultAlphabet: 'ripple',
   codecMethods: {
@@ -30,4 +30,4 @@ module.exports = apiFactory({
     NodePublic: {version: NODE_PUBLIC, expectedLength: 33},
     NodePrivate: {version: NODE_PRIVATE, expectedLength: 32},
     K256Seed: {version: FAMILY_SEED, expectedLength: 16}}
-});
+})

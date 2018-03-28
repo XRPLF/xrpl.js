@@ -21,9 +21,10 @@
   "devDependencies": {
     "codecov.io": "^0.1.6",
     "coveralls": "~2.11.4",
-    "eslint": "^1.6.0",
+    "eslint": "^4.19.1",
+    "eslint-plugin-no-unused-expressions": "^0.1.0",
     "istanbul": "~0.3.21",
-    "mocha": "^2.3.3"
+    "mocha": "^5.0.5"
   },
   "readmeFilename": "README.md",
   "engines": {
