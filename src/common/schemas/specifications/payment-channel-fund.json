@@ -15,7 +15,7 @@
     "expiration": {
       "type": "string",
       "format": "date-time",
-      "description": "New expiration for this channel."
+      "description": "New expiration for this channel. (This does not change the cancelAfter expiration, if the channel has one.) Cannot move the expiration sooner than settleDelay seconds from time of the request."
     }
   },
   "required": ["amount", "channel"],
