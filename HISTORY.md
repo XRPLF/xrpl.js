@@ -1,5 +1,21 @@
 # ripple-lib Release History
 
+## 0.19.1 (2018-03-22)
+
++ [Fix: Include TypeScript declarations in npm package](https://github.com/ripple/ripple-lib/pull/863)
++ [Fix: Documentation link to checkCash](https://github.com/ripple/ripple-lib/pull/871)
++ [Internal: Clean up types and migrate more APIs to new request method](https://github.com/ripple/ripple-lib/pull/857)
++ [Internal: Fix Payment source and destination types](https://github.com/ripple/ripple-lib/pull/870)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+3ed5332aa035c07bae6c1abfdfc8ca77cdbb05cc4b88878f544f1ea4cb793f4d  ripple-0.19.1-debug.js
+2f5507aa00a40ab6a94de1822af87db5e927edef3885aef5d9b39ccb623ccb54  ripple-0.19.1-min.js
+1e439aee1b220242d56ea687a9b55a67b8614212c1ddbd70a4fcf34503fc487a  ripple-0.19.1.js
+```
+
 ## 0.19.0 (2018-03-02)
 
 + [Add support for Checks](https://github.com/ripple/ripple-lib/pull/853)
