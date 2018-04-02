@@ -1,0 +1,33 @@
+## getAccountObjects
+
+`getAccountObjects(address: string, options: object): Promise<AccountObjectsResponse>`
+
+Returns objects owned by an account. For an account's trust lines and balances, see `getTrustlines` and `getBalances`.
+
+### Parameters
+
+<%- renderSchema('input/get-account-objects.json') %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<%- renderSchema('output/get-account-objects.json') %>
+
+The types of objects that may be returned include:
+* Offer objects for orders that are currently live, unfunded, or expired but not yet removed.
+* RippleState objects for trust lines where this account's side is not in the default state.
+* A SignerList object if the account has multi-signing enabled.
+* Escrow objects for held payments that have not yet been executed or canceled.
+* PayChannel objects for open payment channels.
+* Check objects for pending checks.
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+return api.getAccountObjects(address: address).then(objects =>
+  {/* ... */});
+```
+
+<%- renderFixture('responses/get-account-objects.json') %>
