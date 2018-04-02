@@ -20,6 +20,7 @@ import getOrders from './ledger/orders'
 import getOrderbook from './ledger/orderbook'
 import getSettings from './ledger/settings'
 import getAccountInfo from './ledger/accountinfo'
+import getAccountObjects from './ledger/accountobjects'
 import getPaymentChannel from './ledger/payment-channel'
 import preparePayment from './transaction/payment'
 import prepareTrustline from './transaction/trustline'
@@ -45,6 +46,7 @@ import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
 import getLedger from './ledger/ledger'
 
 import {
+  AccountObjectsRequest, AccountObjectsResponse,
   AccountOffersRequest, AccountOffersResponse,
   AccountInfoRequest, AccountInfoResponse,
   AccountLinesRequest, AccountLinesResponse,
@@ -82,6 +84,74 @@ function getCollectKeyFromCommand(command: string): string|undefined {
       return 'lines'
     default:
       return undefined
+  }
+}
+
+/**
+ * Validate the request.
+ *
+ * Throws if `params` are invalid for `command`.
+ */
+function _validateRequest(command: string, params: any): void {
+  switch (command) {
+    case 'account_info':
+      // getSettings sets `signer_lists: true`
+      if (params.signer_lists) {
+        validate.getSettings({
+          address: params.account,
+          options: {
+            ledgerVersion: params.ledger_index
+          }
+        })
+      } else {
+        validate.getAccountInfo({
+          address: params.account,
+          options: {
+            ledgerVersion: params.ledger_index
+          }
+        })
+      }
+      return
+    case 'gateway_balances':
+      validate.getBalanceSheet({
+        address: params.account,
+        options: {
+          excludeAddresses: params.hotwallet,
+          ledgerVersion: params.ledger_index
+        }
+      })
+      return
+    case 'ledger':
+      validate.getLedger({
+        options: {
+          ledgerVersion: params.ledger_index,
+          includeAllData: params.expand,
+          includeTransactions: params.transactions,
+          includeState: params.accounts
+        }
+      })
+      return
+    case 'ledger_entry':
+      // Validate only if `index` is present.
+      // rippled's `ledger_entry` command supports other fields
+      // which are not validated here:
+      // - account_root
+      // - directory
+      // - offer
+      // - ripple_state
+      if (params.index) {
+        validate.getPaymentChannel({
+          id: params.index
+        })
+      }
+      return
+    case 'account_objects':
+    case 'account_offers':
+    case 'book_offers':
+    case 'account_lines':
+    default:
+      // Unrecognized command - anything goes
+      return
   }
 }
 
@@ -139,17 +209,20 @@ class RippleAPI extends EventEmitter {
     }
   }
 
-  /**
-   * Makes a simple request to the API with the given command and any
-   * additional request body parameters.
-   *
-   * NOTE: This command is under development and should not yet be relied
-   * on by external consumers.
-   */
+
   async _request(command: 'account_info', params: AccountInfoRequest):
     Promise<AccountInfoResponse>
   async _request(command: 'account_lines', params: AccountLinesRequest):
     Promise<AccountLinesResponse>
+
+  /**
+   * Returns objects owned by an account.
+   * For an account's trust lines and balances,
+   * see `getTrustlines` and `getBalances`.
+   */
+  async _request(command: 'account_objects', params: AccountObjectsRequest):
+    Promise<AccountObjectsResponse>
+
   async _request(command: 'account_offers', params: AccountOffersRequest):
   Promise<AccountOffersResponse>
   async _request(command: 'book_offers', params: BookOffersRequest):
@@ -160,7 +233,19 @@ class RippleAPI extends EventEmitter {
     Promise<LedgerResponse>
   async _request(command: 'ledger_entry', params: LedgerEntryRequest):
     Promise<LedgerEntryResponse>
-  async _request(command: string, params: any = {}) {
+
+  /**
+   * Makes a request to the API with the given command and
+   * additional request body parameters.
+   *
+   * NOTE: This command is under development.
+   */
+  async _request(command: string, params: object = {}) {
+    // Throw if `params` are invalid for `command`
+    _validateRequest(command, params)
+
+    // TODO: Prevent access to non-validated ledger versions
+
     return this.connection.request({
       ...params,
       command
@@ -169,7 +254,7 @@ class RippleAPI extends EventEmitter {
 
   /**
    * Makes multiple paged requests to the API to return a given number of
-   * resources. __requestAll() will make multiple requests until the `limit`
+   * resources. _requestAll() will make multiple requests until the `limit`
    * number of resources is reached (if no `limit` is provided, a single request
    * will be made).
    *
@@ -246,6 +331,7 @@ class RippleAPI extends EventEmitter {
   getOrderbook = getOrderbook
   getSettings = getSettings
   getAccountInfo = getAccountInfo
+  getAccountObjects = getAccountObjects
   getPaymentChannel = getPaymentChannel
   getLedger = getLedger
 
