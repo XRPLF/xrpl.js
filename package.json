@@ -20,7 +20,7 @@
     "@types/ws": "^3.2.0",
     "bignumber.js": "^4.1.0",
     "https-proxy-agent": "^1.0.0",
-    "jsonschema": "^1.1.1",
+    "jsonschema": "1.2.2",
     "lodash": "^4.17.4",
     "ripple-address-codec": "^2.0.1",
     "ripple-binary-codec": "^0.1.13",
