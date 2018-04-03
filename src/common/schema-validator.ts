@@ -20,6 +20,7 @@ function loadSchemas() {
     require('./schemas/objects/memo.json'),
     require('./schemas/objects/memos.json'),
     require('./schemas/objects/public-key.json'),
+    require('./schemas/objects/private-key.json'),
     require('./schemas/objects/uint32.json'),
     require('./schemas/objects/value.json'),
     require('./schemas/objects/source-adjustment.json'),

@@ -3847,7 +3847,10 @@ return api.prepareCheckCash(address, checkCash).then(prepared =>
 
 ## sign
 
-`sign(txJSON: string, secret: string, options: Object): {signedTransaction: string, id: string}`
+```
+sign(txJSON: string, secret: string, options: Object): {signedTransaction: string, id: string}
+sign(txJSON: string, keypair: Object, options: Object): {signedTransaction: string, id: string}
+```
 
 Sign a prepared transaction. The signed transaction must subsequently be [submitted](#submit).
 
@@ -3856,9 +3859,12 @@ Sign a prepared transaction. The signed transaction must subsequently be [submit
 Name | Type | Description
 ---- | ---- | -----------
 txJSON | string | Transaction represented as a JSON string in rippled format.
-secret | secret string | The secret of the account that is initiating the transaction.
+keypair | object | *Optional* The private and public key of the account that is initiating the transaction. (This field is exclusive with secret).
+*keypair.* privateKey | privateKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 private key.
+*keypair.* publicKey | publicKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 public key.
 options | object | *Optional* Options that control the type of signature that will be generated.
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
+secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field is exclusive with keypair).
 
 ### Return Value
 
@@ -3874,7 +3880,8 @@ id | [id](#transaction-id) | The [Transaction ID](#transaction-id) of the signed
 ```javascript
 const txJSON = '{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"726970706C652E636F6D","LastLedgerSequence":8820051,"Fee":"12","Sequence":23}';
 const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
-return api.sign(txJSON, secret);
+const keypair = { privateKey: '00ACCD3309DB14D1A4FC9B1DAE608031F4408C85C73EE05E035B7DC8B25840107A', publicKey: '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8' };
+return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
 ```
 
 

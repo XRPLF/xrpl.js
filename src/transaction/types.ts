@@ -50,6 +50,15 @@ export interface OfferCreateTransaction {
   Memos: {Memo: ApiMemo}[]
 }
 
+export type KeyPair = {
+  publicKey: string,
+  privateKey: string
+}
+
+export type SignOptions = {
+  signAs: string
+}
+
 export type Outcome = {
   result: string,
   ledgerVersion: number,
