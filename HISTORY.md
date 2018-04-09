@@ -1,5 +1,20 @@
 # ripple-lib Release History
 
+## 0.20.0 (2018-04-09)
+
++ [Add support for using a keypair with sign()](https://github.com/ripple/ripple-lib/pull/769)
++ [Fix a bug caused by jsonschema v1.2.3 by pinning to v1.2.2](https://github.com/ripple/ripple-lib/pull/882)
++ [Improve Payment Channel documentation](https://github.com/ripple/ripple-lib/pull/877)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+389811a9baa72f77e2a43d0b48045762d29a6f616ed5fd2660ba76fc12a3ecc5  ripple-0.20.0-debug.js
+c1746ea0dd55318cb4e1ef3955ef14759d9d70861437c69abafc10169916f068  ripple-0.20.0-min.js
+17958b0e46395d2b2a35a003693c0babdfb5382513d3cc58a62f8648ad710b0e  ripple-0.20.0.js
+```
+
 ## 0.19.1 (2018-03-22)
 
 + [Fix: Include TypeScript declarations in npm package](https://github.com/ripple/ripple-lib/pull/863)
