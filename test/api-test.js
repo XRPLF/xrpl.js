@@ -1201,6 +1201,33 @@ describe('RippleAPI', function () {
     });
   });
 
+  it('getAccountObjects', function () {
+    return this.api.getAccountObjects(address).then(response =>
+      checkResult(responses.getAccountObjects, 'AccountObjectsResponse', response));
+  });
+
+  it('getAccountObjects - invalid options', function () {
+    // Intentionally no local validation of these options
+    return this.api.getAccountObjects(address, {invalid: 'options'}).then(response =>
+      checkResult(responses.getAccountObjects, 'AccountObjectsResponse', response));
+  });
+
+  it('request account_objects', function () {
+    return this.api._request('account_objects', {
+      account: address
+    }).then(response =>
+      checkResult(responses.getAccountObjects, 'AccountObjectsResponse', response));
+  });
+
+  it('request account_objects - invalid options', function () {
+    // Intentionally no local validation of these options
+    return this.api._request('account_objects', {
+      account: address,
+      invalid: 'options'
+    }).then(response =>
+      checkResult(responses.getAccountObjects, 'AccountObjectsResponse', response));
+  });
+
   it('getOrders', function () {
     return this.api.getOrders(address).then(
       _.partial(checkResult, responses.getOrders, 'getOrders'));
