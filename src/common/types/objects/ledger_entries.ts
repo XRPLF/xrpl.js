@@ -3,19 +3,21 @@ import {SignerEntry} from './index'
 export interface AccountRootLedgerEntry {
   LedgerEntryType: 'AccountRoot',
   Account: string,
-  Flags: number,
-  Sequence: number,
   Balance: string,
+  Flags: number,
   OwnerCount: number,
   PreviousTxnID: string,
   PreviousTxnLgrSeq: number,
+  Sequence: number,
   AccountTxnID?: string,
-  RegularKey?: string,
+  Domain?: string,
   EmailHash?: string,
   MessageKey?: string
+  RegularKey?: string,
   TickSize?: number,
   TransferRate?: number,
-  Domain?: string
+  WalletLocator?: string, // DEPRECATED
+  WalletSize?: number // DEPRECATED
 }
 
 export interface AmendmentsLedgerEntry {

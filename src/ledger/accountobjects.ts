@@ -19,7 +19,8 @@ export default async function getAccountObjects(
     type: options.type,
     ledger_hash: options.ledgerHash,
     ledger_index: options.ledgerIndex,
-    limit: options.limit
+    limit: options.limit,
+    marker: options.marker
   }))
   // Return Response
   return response

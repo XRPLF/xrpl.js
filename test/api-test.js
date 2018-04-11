@@ -1176,14 +1176,6 @@ describe('RippleAPI', function () {
       checkResult(responses.getAccountObjects, 'AccountObjectsResponse', response));
   });
 
-  xit('request account_objects - multiple pages', function () {
-    return this.api._request('account_objects', {
-      account: address,
-      ledger_hash: 'TEST_LEDGER_HASH_MULTIPLE_PAGES'
-    }).then(response =>
-      checkResult(responses.getAccountObjects, 'AccountObjectsResponse', response));
-  });
-
   it('getOrders', function () {
     return this.api.getOrders(address).then(
       _.partial(checkResult, responses.getOrders, 'getOrders'));

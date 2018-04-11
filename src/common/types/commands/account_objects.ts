@@ -11,7 +11,8 @@ export interface GetAccountObjectsOptions {
   ),
   ledgerHash?: string,
   ledgerIndex?: number | ('validated' | 'closed' | 'current'),
-  limit?: number
+  limit?: number,
+  marker?: string
 }
 
 export interface AccountObjectsRequest {
@@ -34,7 +35,9 @@ export interface AccountObjectsRequest {
   // or a shortcut string to choose a ledger automatically.
   ledger_index?: number | ('validated' | 'closed' | 'current'),
 
-  limit?: number
+  limit?: number,
+
+  marker?: string
 }
 
 export interface AccountObjectsResponse {
@@ -54,6 +57,14 @@ export interface AccountObjectsResponse {
   // (May be omitted) The sequence number of the current in-progress ledger
   // version that was used to generate this response.
   ledger_current_index?: number,
+
+  // The limit that was used in this request, if any.
+  limit?: number,
+
+  // Server-defined value indicating the response is paginated. Pass this
+  // to the next call to resume where this call left off. Omitted when there
+  // are no additional pages after this one.
+  marker?: string,
 
   // If true, this information comes from a ledger version
   // that has been validated by consensus.
