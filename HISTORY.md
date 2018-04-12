@@ -1,5 +1,19 @@
 # ripple-lib Release History
 
+## 0.21.0 (2018-04-11)
+
++ [Upgrade https-proxy-agent](https://github.com/ripple/ripple-lib/pull/883)
++ [Add getAccountObjects](https://github.com/ripple/ripple-lib/pull/881)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *  
+3ab52209ad4a80393c8c08ef3f4aa9cfb47bc76c0ede2ee9fa7f5ca180ba4d67  ripple-0.21.0-debug.js
+3b1efccded347bed5f64757098a1ea6a513bb8932d922d00af47cd24e001dc14  ripple-0.21.0-min.js
+db08e5a3eab1f659b4c803543374398004d950ba720adc4b9a7658817cb5c94b  ripple-0.21.0.js
+```
+
 ## 0.20.0 (2018-04-09)
 
 + [Add support for using a keypair with sign()](https://github.com/ripple/ripple-lib/pull/769)
