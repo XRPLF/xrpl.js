@@ -17,6 +17,26 @@
         "maker": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
         "sequence": 5,
         "makerExchangeRate": "3.970260734451929e-8"
+      },
+      "data": {
+        "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "BookDirectory": "A118405CF7C2C89AB0CC084417187B86870DC14325C861A0470E1AEE5CBE20D9",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "9DD36CC7338FEB9E501A33EAAA4C00DBE4ED3A692704C62DDBD1848EE1F6E762",
+        "PreviousTxnLgrSeq": 11,
+        "Sequence": 5,
+        "TakerGets": "254391353000000",
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw",
+          "value": "10.1"
+        },
+        "index": "BF656DABDD84E6128A45039F8D557C9477D4DA31F5B00868F2191F0A11FE3798",
+        "owner_funds": "99999998959999928",
+        "quality": "3970260734451929e-29"
       }
     }
   ],
@@ -38,6 +58,25 @@
         "maker": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
         "sequence": 6,
         "makerExchangeRate": "0.0000780093458738806"
+      },
+      "data": {
+        "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
+        "BookDirectory": "A118405CF7C2C89AB0CC084417187B86870DC14325C861A0561BB6E89EFF509C",
+        "BookNode": "0000000000000000",
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "CFB5786459E568DFC504E7319C515658DED657A7F4EFB5957B33E5E3BD9A1353",
+        "PreviousTxnLgrSeq": 13,
+        "Sequence": 6,
+        "TakerPays": "134000000",
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw",
+          "value": "10453252347.1"
+        },
+        "index": "C72CDC1BA4DA529B062871F22C6D175A4D97D4F1160D0D7E646E60699278B5B5",
+        "quality": "78.0093458738806"
       }
     }
   ]

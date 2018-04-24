@@ -73,7 +73,7 @@ async function makeRequest(
     ledger_index: options.ledgerVersion || 'validated',
     limit: options.limit,
     taker
-})
+  })
 }
 
 
