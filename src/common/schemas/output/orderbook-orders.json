@@ -47,7 +47,7 @@
         "additionalProperties": false
       },
       "data": {
-        "description": "The raw order data.",
+        "description": "The raw order data. This may include `owner_funds`, `Flags`, and other fields.",
         "type": "object",
         "additionalProperties": true
       }
