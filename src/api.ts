@@ -153,13 +153,13 @@ class RippleAPI extends EventEmitter {
     Promise<LedgerEntryResponse>
 
   async request(command: string, params: object):
-    Promise<any>
+    Promise<object>
 
   /**
    * Makes a request to the API with the given command and
    * additional request body parameters.
    */
-  async request(command: string, params: object = {}) {
+  async request(command: string, params: object = {}): Promise<object> {
     return this.connection.request({
       ...params,
       command
@@ -174,7 +174,7 @@ class RippleAPI extends EventEmitter {
    *
    * See https://ripple.com/build/rippled-apis/#markers-and-pagination
    */
-  hasNextPage<T extends {marker?: string}>(currentResponse: T) {
+  hasNextPage<T extends {marker?: string}>(currentResponse: T): boolean {
     return !!currentResponse.marker
   }
 
@@ -182,7 +182,7 @@ class RippleAPI extends EventEmitter {
     command: string,
     params: object = {},
     currentResponse: T
-  ) {
+  ): Promise<object> {
     if (!currentResponse.marker) {
       return Promise.reject(
         new errors.NotFoundError('response does not have a next page')
