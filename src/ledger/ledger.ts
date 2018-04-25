@@ -15,7 +15,7 @@ async function getLedger(
   // 1. Validate
   validate.getLedger({options})
   // 2. Make Request
-  const response = await this._request('ledger', {
+  const response = await this.request('ledger', {
     ledger_index: options.ledgerVersion || 'validated',
     expand: options.includeAllData,
     transactions: options.includeTransactions,

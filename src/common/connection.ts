@@ -427,7 +427,7 @@ class Connection extends EventEmitter {
       function onDisconnect() {
         clearTimeout(timer)
         self.removeAllListeners(eventName)
-        reject(new DisconnectedError())
+        reject(new DisconnectedError('websocket was closed'))
       }
 
       function cleanup() {

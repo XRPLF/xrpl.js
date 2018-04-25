@@ -237,6 +237,15 @@ module.exports = function createMockRippled(port) {
     }
   });
 
+  mock.on('request_ledger_data', function (request, conn) {
+    assert.strictEqual(request.command, 'ledger_data');
+    if (request.marker) {
+      conn.send(createResponse(request, fixtures.ledger_data.last_page));
+    } else {
+      conn.send(createResponse(request, fixtures.ledger_data.first_page));
+    }
+  });
+
   mock.on('request_ledger_entry', function (request, conn) {
     assert.strictEqual(request.command, 'ledger_entry');
     if (request.index ===

@@ -35,7 +35,7 @@ export default async function getAccountInfo(
   // 1. Validate
   validate.getAccountInfo({address, options})
   // 2. Make Request
-  const response = await this._request('account_info', {
+  const response = await this.request('account_info', {
     account: address,
     ledger_index: options.ledgerVersion || 'validated'
   })

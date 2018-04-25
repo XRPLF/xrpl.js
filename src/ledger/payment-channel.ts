@@ -23,7 +23,7 @@ async function getPaymentChannel(
   // 1. Validate
   validate.getPaymentChannel({id})
   // 2. Make Request
-  const response = await this._request('ledger_entry', {
+  const response = await this.request('ledger_entry', {
     index: id,
     binary: false,
     ledger_index: 'validated'
