@@ -25,6 +25,9 @@ function toRippledAmount(amount: Amount): RippledAmount {
   if (amount.currency === 'XRP') {
     return xrpToDrops(amount.value)
   }
+  if (amount.currency === 'drops') {
+    return amount.value
+  }
   return {
     currency: amount.currency,
     issuer: amount.counterparty ? amount.counterparty :
