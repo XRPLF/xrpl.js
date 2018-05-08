@@ -17,15 +17,16 @@ export type FormattedOrderbookOrder = {
   state?: {
     fundedAmount: Amount,
     priceOfFundedAmount: Amount
-  }
+  },
+  data: BookOffer
 }
 
 export function parseOrderbookOrder(
-  order: BookOffer
+  data: BookOffer
 ): FormattedOrderbookOrder {
-  const direction = (order.Flags & orderFlags.Sell) === 0 ? 'buy' : 'sell'
-  const takerGetsAmount = parseAmount(order.TakerGets)
-  const takerPaysAmount = parseAmount(order.TakerPays)
+  const direction = (data.Flags & orderFlags.Sell) === 0 ? 'buy' : 'sell'
+  const takerGetsAmount = parseAmount(data.TakerGets)
+  const takerPaysAmount = parseAmount(data.TakerPays)
   const quantity = (direction === 'buy') ? takerPaysAmount : takerGetsAmount
   const totalPrice = (direction === 'buy') ? takerGetsAmount : takerPaysAmount
 
@@ -35,25 +36,25 @@ export function parseOrderbookOrder(
     direction: direction,
     quantity: quantity,
     totalPrice: totalPrice,
-    passive: ((order.Flags & orderFlags.Passive) !== 0) || undefined,
-    expirationTime: parseTimestamp(order.Expiration)
+    passive: ((data.Flags & orderFlags.Passive) !== 0) || undefined,
+    expirationTime: parseTimestamp(data.Expiration)
   })
 
   const properties = {
-    maker: order.Account,
-    sequence: order.Sequence,
-    makerExchangeRate: adjustQualityForXRP(order.quality,
+    maker: data.Account,
+    sequence: data.Sequence,
+    makerExchangeRate: adjustQualityForXRP(data.quality,
       takerGetsAmount.currency, takerPaysAmount.currency)
   }
 
-  const takerGetsFunded = order.taker_gets_funded ?
-    parseAmount(order.taker_gets_funded) : undefined
-  const takerPaysFunded = order.taker_pays_funded ?
-    parseAmount(order.taker_pays_funded) : undefined
+  const takerGetsFunded = data.taker_gets_funded ?
+    parseAmount(data.taker_gets_funded) : undefined
+  const takerPaysFunded = data.taker_pays_funded ?
+    parseAmount(data.taker_pays_funded) : undefined
   const available = removeUndefined({
     fundedAmount: takerGetsFunded,
     priceOfFundedAmount: takerPaysFunded
   })
   const state = _.isEmpty(available) ? undefined : available
-  return removeUndefined({specification, properties, state})
+  return removeUndefined({specification, properties, state, data})
 }
