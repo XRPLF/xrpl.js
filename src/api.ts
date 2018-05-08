@@ -238,12 +238,9 @@ class RippleAPI extends EventEmitter {
         limit: countRemaining,
         marker
       }
-      // NOTE: We have to generalize the `this._request()` function signature
-      // here until we add support for unknown commands (since command is some
-      // unknown string).
-      const singleResult = await (<Function>this.request)(command, repeatProps)
+      const singleResult = await this.request(command, repeatProps)
       const collectedData = singleResult[collectKey]
-      marker = singleResult.marker
+      marker = singleResult['marker']
       results.push(singleResult)
       // Make sure we handle when no data (not even an empty array) is returned.
       const isExpectedFormat = Array.isArray(collectedData)

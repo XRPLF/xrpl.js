@@ -89,7 +89,7 @@
 
 # Introduction
 
-RippleAPI is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript.
+RippleAPI (ripple-lib) is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript.
 Using RippleAPI, you can:
 
 * [Query transactions from the XRP Ledger history](#gettransaction)
@@ -97,8 +97,6 @@ Using RippleAPI, you can:
 * [Submit](#submit) transactions to the XRP Ledger, including [Payments](#payment), [Orders](#order), [Settings changes](#settings), and [other types](#transaction-types)
 * [Generate a new XRP Ledger Address](#generateaddress)
 * ... and [much more](#api-methods).
-
-RippleAPI only provides access to *validated*, *immutable* transaction data.
 
 ## Boilerplate
 
@@ -771,7 +769,7 @@ When you subscribe to a stream, you must also listen to the relevant message typ
 Type | Description
 ---- | -----------
 `ledgerClosed` | Sent by the `ledger` stream when the consensus process declares a new fully validated ledger. The message identifies the ledger and provides some information about its contents.
-`validationReceived` | Sent by the validations stream when the server receives validation messages, also called validation votes, from validators it trusts.
+`validationReceived` | Sent by the `validations` stream when the server receives a validation message, also called a validation vote, regardless of whether the server trusts the validator.
 `transaction` | Sent by many subscriptions including `transactions`, `transactions_proposed`, `accounts`, `accounts_proposed`, and `book` (Order Book). See [Transaction Streams](https://ripple.com/build/rippled-apis/#transaction-streams) for details.
 `peerStatusChange` | Admin-only. Reports a large amount of information on the activities of other `rippled` servers to which the server is connected.
 
@@ -893,7 +891,7 @@ return api.request('ledger_data', {
 
 Requests the next page of data.
 
-You can use this convenience method, or include `currentResponse.marker` in your `params` yourself.
+You can use this convenience method, or include `currentResponse.marker` in `params` yourself, when using `request`.
 
 See [Markers and Pagination](https://ripple.com/build/rippled-apis/#markers-and-pagination).
 

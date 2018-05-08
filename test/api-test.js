@@ -86,6 +86,7 @@ describe('RippleAPI', function () {
         return this.api.request('ledger_data').then(response => {
           return this.api.requestNextPage('ledger_data', {}, response);
         }).then(response => {
+          assert(!this.api.hasNextPage(response))
           return this.api.requestNextPage('ledger_data', {}, response);
         }).then(() => {
           assert(false, 'Should reject');
