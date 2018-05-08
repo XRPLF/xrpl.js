@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import {EventEmitter} from 'events'
-import {Connection, errors, validate} from './common'
+import {Connection, errors, validate, xrpToDrops, dropsToXrp} from './common'
 import {
   connect,
   disconnect,
@@ -285,6 +285,9 @@ class RippleAPI extends EventEmitter {
   signPaymentChannelClaim = signPaymentChannelClaim
   verifyPaymentChannelClaim = verifyPaymentChannelClaim
   errors = errors
+
+  xrpToDrops = xrpToDrops
+  dropsToXrp = dropsToXrp
 }
 
 export {

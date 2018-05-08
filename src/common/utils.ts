@@ -1,8 +1,8 @@
 import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
-const {deriveKeypair} = require('ripple-keypairs')
-
+import {deriveKeypair} from 'ripple-keypairs'
 import {Amount, RippledAmount} from './types/objects'
+import {ValidationError} from './errors'
 
 function isValidSecret(secret: string): boolean {
   try {
@@ -13,12 +13,64 @@ function isValidSecret(secret: string): boolean {
   }
 }
 
-function dropsToXrp(drops: string): string {
-  return (new BigNumber(drops)).dividedBy(1000000.0).toString()
+function dropsToXrp(drops: string | BigNumber): string {
+  if (typeof drops === 'string' && !drops.match(/^-?[0-9.]+$/)) {
+    throw new ValidationError(`dropsToXrp: invalid value '${drops}',` +
+      ` should be a number matching (^-?[0-9.]+).`)
+  }
+
+  // Important: specify base 10 to avoid exponential notation e.g. '1e-7'
+  drops = (new BigNumber(drops)).toString(10)
+
+  // drops are only whole units
+  if (drops.includes('.')) {
+    throw new ValidationError(`dropsToXrp: value '${drops}' has` +
+      ` too many decimal places.`)
+  }
+
+  if (!drops.match(/^-?[0-9]+$/)) {
+    throw new ValidationError(`dropsToXrp: failed sanity check -` +
+      ` invalid value '${drops}',` +
+      ` should be a number matching (^-?[0-9]+).`)
+  }
+
+  return (new BigNumber(drops)).dividedBy(1000000.0).toString(10)
 }
 
-function xrpToDrops(xrp: string): string {
-  return (new BigNumber(xrp)).times(1000000.0).floor().toString()
+function xrpToDrops(xrp: string | BigNumber): string {
+  if (typeof xrp === 'string' && !xrp.match(/^-?[0-9.]+$/)) {
+    throw new ValidationError(`xrpToDrops: invalid value '${xrp}',` +
+      ` should be a number matching (^-?[0-9.]+).`)
+  }
+
+  // Important: specify base 10 to avoid exponential notation e.g. '1e-7'
+  xrp = (new BigNumber(xrp)).toString(10)
+
+  if (!xrp.match(/^-?[0-9.]+$/)) {
+    throw new ValidationError(`xrpToDrops: failed sanity check -` +
+      ` invalid value '${xrp}',` +
+      ` should be a number matching (^-?[0-9.]+).`)
+  }
+
+  if (xrp === '.') {
+    throw new ValidationError(`xrpToDrops: failed sanity check -` +
+      ` invalid value '.'.`)
+  }
+
+  const components = xrp.split('.')
+  if (components.length > 2) {
+    throw new ValidationError(`xrpToDrops: failed sanity check -` +
+      ` value '${xrp}' has` +
+      ` too many decimal points.`)
+  }
+
+  const fraction = components[1] || '0'
+  if (fraction.length > 6) {
+    throw new ValidationError(`xrpToDrops: value '${xrp}' has` +
+      ` too many decimal places.`)
+  }
+
+  return (new BigNumber(xrp)).times(1000000.0).floor().toString(10)
 }
 
 function toRippledAmount(amount: Amount): RippledAmount {
