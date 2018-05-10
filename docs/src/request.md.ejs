@@ -1,0 +1,27 @@
+## request
+
+`request(command: string, options: object): Promise<object>`
+
+Returns the response from invoking the specified command, with the specified options, on the connected rippled server.
+
+Refer to [rippled APIs](https://ripple.com/build/rippled-apis/) for commands and options. All XRP amounts must be specified in drops. One drop is equal to 0.000001 XRP. See [Specifying Currency Amounts](https://ripple.com/build/rippled-apis/#specifying-currency-amounts).
+
+Most commands return data for the `current` (in-progress, open) ledger by default. Do not rely on this. Always specify a ledger version in your request. In the example below, the 'validated' ledger is requested, which is the most recent ledger that has been validated by the whole network. See [Specifying Ledgers](https://ripple.com/build/rippled-apis/#specifying-ledgers).
+
+### Return Value
+
+This method returns a promise that resolves with the response from rippled.
+
+### Example
+
+```javascript
+// Replace 'ledger' with your desired rippled command
+return api.request('ledger', {
+  ledger_index: 'validated'
+}).then(response => {
+  /* Do something useful with response */
+  console.log(JSON.stringify(response, null, 2))
+}).catch(console.error);
+```
+
+<%- renderFixture('responses/ledger.json') %>

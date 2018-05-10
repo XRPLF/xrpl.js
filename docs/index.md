@@ -33,6 +33,11 @@
   - [Payment Channel Create](#payment-channel-create)
   - [Payment Channel Fund](#payment-channel-fund)
   - [Payment Channel Claim](#payment-channel-claim)
+- [rippled APIs](#rippled-apis)
+  - [Listening to streams](#listening-to-streams)
+  - [request](#request)
+  - [hasNextPage](#hasnextpage)
+  - [requestNextPage](#requestnextpage)
 - [API Methods](#api-methods)
   - [connect](#connect)
   - [disconnect](#disconnect)
@@ -84,7 +89,7 @@
 
 # Introduction
 
-RippleAPI is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript.
+RippleAPI (ripple-lib) is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript.
 Using RippleAPI, you can:
 
 * [Query transactions from the XRP Ledger history](#gettransaction)
@@ -92,8 +97,6 @@ Using RippleAPI, you can:
 * [Submit](#submit) transactions to the XRP Ledger, including [Payments](#payment), [Orders](#order), [Settings changes](#settings), and [other types](#transaction-types)
 * [Generate a new XRP Ledger Address](#generateaddress)
 * ... and [much more](#api-methods).
-
-RippleAPI only provides access to *validated*, *immutable* transaction data.
 
 ## Boilerplate
 
@@ -749,6 +752,185 @@ signature | string | *Optional* Signed claim authorizing withdrawal of XRP from 
 }
 ```
 
+
+# rippled APIs
+
+ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for all online functionality. With ripple-lib version 1.0.0 and higher, you can easily access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
+* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods). 
+* Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
+* Use `requestNextPage()` to request the next page of data.
+
+When using rippled APIs, [specify XRP amounts in drops](https://ripple.com/build/rippled-apis/#specifying-currency-amounts). 1 XRP = 1000000 drops.
+
+## Listening to streams
+
+The `rippled` server can push updates to your client when various events happen. Refer to [Subscriptions in the `rippled` API docs](https://ripple.com/build/rippled-apis/#subscriptions) for details.
+
+Note that the `streams` parameter for generic streams takes an array. For example, to subscribe to the `validations` stream, use `{ streams: [ 'validations' ] }`.
+
+The string names of some generic streams to subscribe to are in the table below. (Refer to `rippled` for an up-to-date list of streams.)
+
+Type | Description
+---- | -----------
+`server` | Sends a message whenever the status of the `rippled` server (for example, network connectivity) changes.
+`ledger` | Sends a message whenever the consensus process declares a new validated ledger.
+`transactions` | Sends a message whenever a transaction is included in a closed ledger.
+`transactions_proposed` | Sends a message whenever a transaction is included in a closed ledger, as well as some transactions that have not yet been included in a validated ledger and may never be. Not all proposed transactions appear before validation. Even some transactions that don't succeed are included in validated ledgers because they take the anti-spam transaction fee.
+`validations` | Sends a message whenever the server receives a validation message, also called a validation vote, regardless of whether the server trusts the validator.
+`manifests` | Sends a message whenever the server receives a manifest.
+`peer_status` | (Admin-only) Information about connected peer `rippled` servers, especially with regards to the consensus process.
+
+When you subscribe to a stream, you must also listen to the relevant message type(s). Some of the available message types are in the table below. (Refer to `rippled` for an up-to-date list of message types.)
+
+Type | Description
+---- | -----------
+`ledgerClosed` | Sent by the `ledger` stream when the consensus process declares a new fully validated ledger. The message identifies the ledger and provides some information about its contents.
+`validationReceived` | Sent by the `validations` stream when the server receives a validation message, also called a validation vote, regardless of whether the server trusts the validator.
+`manifestReceived` | Sent by the `manifests` stream when the server receives a manifest.
+`transaction` | Sent by many subscriptions including `transactions`, `transactions_proposed`, `accounts`, `accounts_proposed`, and `book` (Order Book). See [Transaction Streams](https://ripple.com/build/rippled-apis/#transaction-streams) for details.
+`peerStatusChange` | (Admin-only) Reports a large amount of information on the activities of other `rippled` servers to which the server is connected.
+
+To register your listener function, use `connection.on(type, handler)`.
+
+Here is an example of listening for transactions on given account(s):
+```
+const account = 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn' // Replace with the account you want notifications for
+api.connect().then(() => { // Omit this if you are already connected
+
+  // 'transaction' can be replaced with the relevant `type` from the table above
+  api.connection.on('transaction', (event) => {
+
+      // Do something useful with `event`
+      console.log(JSON.stringify(event, null, 2))
+  })
+
+  api.request('subscribe', {
+      accounts: [ account ]
+  }).then(response => {
+      if (response.status === 'success') {
+          console.log('Successfully subscribed')
+      }
+  }).catch(error => {
+      // Handle `error`
+  })
+})
+```
+
+The subscription ends when you unsubscribe or the WebSocket connection is closed.
+
+For full details, see [rippled Subscriptions](https://ripple.com/build/rippled-apis/#subscriptions).
+
+## request
+
+`request(command: string, options: object): Promise<object>`
+
+Returns the response from invoking the specified command, with the specified options, on the connected rippled server.
+
+Refer to [rippled APIs](https://ripple.com/build/rippled-apis/) for commands and options. All XRP amounts must be specified in drops. One drop is equal to 0.000001 XRP. See [Specifying Currency Amounts](https://ripple.com/build/rippled-apis/#specifying-currency-amounts).
+
+Most commands return data for the `current` (in-progress, open) ledger by default. Do not rely on this. Always specify a ledger version in your request. In the example below, the 'validated' ledger is requested, which is the most recent ledger that has been validated by the whole network. See [Specifying Ledgers](https://ripple.com/build/rippled-apis/#specifying-ledgers).
+
+### Return Value
+
+This method returns a promise that resolves with the response from rippled.
+
+### Example
+
+```javascript
+// Replace 'ledger' with your desired rippled command
+return api.request('ledger', {
+  ledger_index: 'validated'
+}).then(response => {
+  /* Do something useful with response */
+  console.log(JSON.stringify(response, null, 2))
+}).catch(console.error);
+```
+
+
+```json
+{
+  "ledger": {
+    "accepted": true,
+    "account_hash": "F9E9653EA76EA0AEA58AC98A8E19EDCEC8299C2940519A190674FFAED3639A1F",
+    "close_flags": 0,
+    "close_time": 577999430,
+    "close_time_human": "2018-Apr-25 19:23:50",
+    "close_time_resolution": 10,
+    "closed": true,
+    "hash": "450E5CB0A39495839DA9CD9A0FED74BD71CBB929423A907ADC00F14FC7E7F920",
+    "ledger_hash": "450E5CB0A39495839DA9CD9A0FED74BD71CBB929423A907ADC00F14FC7E7F920",
+    "ledger_index": "38217406",
+    "parent_close_time": 577999422,
+    "parent_hash": "B8B364C63EB9E13FDB89CB729FEF833089B8438CBEB8FC41744CB667209221B3",
+    "seqNum": "38217406",
+    "totalCoins": "99992286058637091",
+    "total_coins": "99992286058637091",
+    "transaction_hash": "5BDD3D2780C28FB2C91C3404BD8ED04786B764B1E18CF319888EDE2C09834726"
+  },
+  "ledger_hash": "450E5CB0A39495839DA9CD9A0FED74BD71CBB929423A907ADC00F14FC7E7F920",
+  "ledger_index": 38217406,
+  "validated": true
+}
+```
+
+
+## hasNextPage
+
+`hasNextPage(currentResponse): boolean`
+
+Returns `true` when there are more pages available.
+
+When there are more results than contained in the response, the response includes a `marker` field. You can use this convenience method, or check for `marker` yourself.
+
+See [Markers and Pagination](https://ripple.com/build/rippled-apis/#markers-and-pagination).
+
+### Return Value
+
+This method returns `true` if `currentResponse` includes a `marker`.
+
+### Example
+
+```javascript
+return api.request('ledger_data', {
+  ledger_index: 'validated'
+}).then(response => {
+  /* Do something useful with response */
+
+  if (api.hasNextPage(response)) {
+    /* There are more pages available */
+  }
+}).catch(console.error);
+```
+
+## requestNextPage
+
+`requestNextPage(command: string, params: object = {}, currentResponse: object): Promise<object>`
+
+Requests the next page of data.
+
+You can use this convenience method, or include `currentResponse.marker` in `params` yourself, when using `request`.
+
+See [Markers and Pagination](https://ripple.com/build/rippled-apis/#markers-and-pagination).
+
+### Return Value
+
+This method returns a promise that resolves with the next page of data from rippled.
+
+If the response does not have a next page, the promise will reject with `new errors.NotFoundError('response does not have a next page')`.
+
+### Example
+
+```javascript
+const command = 'ledger_data'
+const params = {
+  ledger_index: 'validated'
+}
+return api.request(command, params).then(response => {
+  return api.requestNextPage(command, params, response)
+}).then(response_page_2 => {
+  /* Do something useful with second page of response */
+}).catch(console.error);
+```
 
 # API Methods
 

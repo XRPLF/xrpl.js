@@ -1,4 +1,3 @@
-import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import {Connection, errors, validate} from './common'
 import {
@@ -87,25 +86,12 @@ function getCollectKeyFromCommand(command: string): string|undefined {
   }
 }
 
-// prevent access to non-validated ledger versions
-export class RestrictedConnection extends Connection {
-  request(request: any, timeout?: number) {
-    const ledger_index = request.ledger_index
-    if (ledger_index !== undefined && ledger_index !== 'validated') {
-      if (!_.isNumber(ledger_index) || ledger_index > this._ledgerVersion) {
-        return Promise.reject(new errors.LedgerVersionError(
-          `ledgerVersion ${ledger_index} is greater than server\'s ` +
-          `most recent validated ledger: ${this._ledgerVersion}`))
-      }
-    }
-    return super.request(request, timeout)
-  }
-}
-
 class RippleAPI extends EventEmitter {
-
   _feeCushion: number
-  connection: RestrictedConnection
+
+  // New in > 0.21.0
+  // non-validated ledger versions are allowed, and passed to rippled as-is.
+  connection: Connection
 
   // these are exposed only for use by unit tests; they are not part of the API.
   static _PRIVATE = {
@@ -121,7 +107,7 @@ class RippleAPI extends EventEmitter {
     this._feeCushion = options.feeCushion || 1.2
     const serverURL = options.server
     if (serverURL !== undefined) {
-      this.connection = new RestrictedConnection(serverURL, options)
+      this.connection = new Connection(serverURL, options)
       this.connection.on('ledgerClosed', message => {
         this.emit('ledger', formatLedgerClose(message))
       })
@@ -137,14 +123,14 @@ class RippleAPI extends EventEmitter {
     } else {
       // use null object pattern to provide better error message if user
       // tries to call a method that requires a connection
-      this.connection = new RestrictedConnection(null, options)
+      this.connection = new Connection(null, options)
     }
   }
 
 
-  async _request(command: 'account_info', params: AccountInfoRequest):
+  async request(command: 'account_info', params: AccountInfoRequest):
     Promise<AccountInfoResponse>
-  async _request(command: 'account_lines', params: AccountLinesRequest):
+  async request(command: 'account_lines', params: AccountLinesRequest):
     Promise<AccountLinesResponse>
 
   /**
@@ -152,31 +138,60 @@ class RippleAPI extends EventEmitter {
    * For an account's trust lines and balances,
    * see `getTrustlines` and `getBalances`.
    */
-  async _request(command: 'account_objects', params: AccountObjectsRequest):
+  async request(command: 'account_objects', params: AccountObjectsRequest):
     Promise<AccountObjectsResponse>
 
-  async _request(command: 'account_offers', params: AccountOffersRequest):
+  async request(command: 'account_offers', params: AccountOffersRequest):
   Promise<AccountOffersResponse>
-  async _request(command: 'book_offers', params: BookOffersRequest):
+  async request(command: 'book_offers', params: BookOffersRequest):
     Promise<BookOffersResponse>
-  async _request(command: 'gateway_balances', params: GatewayBalancesRequest):
+  async request(command: 'gateway_balances', params: GatewayBalancesRequest):
     Promise<GatewayBalancesResponse>
-  async _request(command: 'ledger', params: LedgerRequest):
+  async request(command: 'ledger', params: LedgerRequest):
     Promise<LedgerResponse>
-  async _request(command: 'ledger_entry', params: LedgerEntryRequest):
+  async request(command: 'ledger_entry', params: LedgerEntryRequest):
     Promise<LedgerEntryResponse>
+
+  async request(command: string, params: object):
+    Promise<object>
 
   /**
    * Makes a request to the API with the given command and
    * additional request body parameters.
-   *
-   * NOTE: This command is under development.
    */
-  async _request(command: string, params: object = {}) {
+  async request(command: string, params: object = {}): Promise<object> {
     return this.connection.request({
       ...params,
       command
     })
+  }
+
+  /**
+   * Returns true if there are more pages of data.
+   *
+   * When there are more results than contained in the response, the response
+   * includes a `marker` field.
+   *
+   * See https://ripple.com/build/rippled-apis/#markers-and-pagination
+   */
+  hasNextPage<T extends {marker?: string}>(currentResponse: T): boolean {
+    return !!currentResponse.marker
+  }
+
+  async requestNextPage<T extends {marker?: string}>(
+    command: string,
+    params: object = {},
+    currentResponse: T
+  ): Promise<object> {
+    if (!currentResponse.marker) {
+      return Promise.reject(
+        new errors.NotFoundError('response does not have a next page')
+      )
+    }
+    const nextPageParams = Object.assign({}, params, {
+      marker: currentResponse.marker
+    })
+    return this.request(command, nextPageParams)
   }
 
   /**
@@ -188,8 +203,9 @@ class RippleAPI extends EventEmitter {
    * If the command is unknown, an additional `collect` property is required to
    * know which response key contains the array of resources.
    *
-   * NOTE: This command is under development and should not yet be relied
-   * on by external consumers.
+   * NOTE: This command is used by existing methods and is not recommended for
+   * general use. Instead, use rippled's built-in pagination and make multiple
+   * requests as needed.
    */
   async _requestAll(command: 'account_offers', params: AccountOffersRequest):
     Promise<AccountOffersResponse[]>
@@ -222,12 +238,9 @@ class RippleAPI extends EventEmitter {
         limit: countRemaining,
         marker
       }
-      // NOTE: We have to generalize the `this._request()` function signature
-      // here until we add support for unknown commands (since command is some
-      // unknown string).
-      const singleResult = await (<Function>this._request)(command, repeatProps)
+      const singleResult = await this.request(command, repeatProps)
       const collectedData = singleResult[collectKey]
-      marker = singleResult.marker
+      marker = singleResult['marker']
       results.push(singleResult)
       // Make sure we handle when no data (not even an empty array) is returned.
       const isExpectedFormat = Array.isArray(collectedData)

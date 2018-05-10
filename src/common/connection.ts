@@ -7,12 +7,6 @@ import {RippledError, DisconnectedError, NotConnectedError,
   TimeoutError, ResponseFormatError, ConnectionError,
   RippledNotInitializedError} from './errors'
 
-function isStreamMessageType(type) {
-  return type === 'ledgerClosed' ||
-         type === 'transaction' ||
-         type === 'path_find'
-}
-
 export interface ConnectionOptions {
   trace?: boolean,
   proxy?: string
@@ -93,16 +87,17 @@ class Connection extends EventEmitter {
         throw new ResponseFormatError('valid id not found in response')
       }
       return [data.id.toString(), data]
-    } else if (isStreamMessageType(data.type)) {
-      if (data.type === 'ledgerClosed') {
-        this._updateLedgerVersions(data)
-        this._updateFees(data)
-      }
-      return [data.type, data]
     } else if (data.type === undefined && data.error) {
       return ['error', data.error, data.error_message, data] // e.g. slowDown
     }
-    throw new ResponseFormatError('unrecognized message type: ' + data.type)
+
+    // Possible `data.type` values include 'ledgerClosed',
+    // 'transaction', 'path_find', and many others.
+    if (data.type === 'ledgerClosed') {
+      this._updateLedgerVersions(data)
+      this._updateFees(data)
+    }
+    return [data.type, data]
   }
 
   _onMessage(message) {
@@ -427,7 +422,7 @@ class Connection extends EventEmitter {
       function onDisconnect() {
         clearTimeout(timer)
         self.removeAllListeners(eventName)
-        reject(new DisconnectedError())
+        reject(new DisconnectedError('websocket was closed'))
       }
 
       function cleanup() {

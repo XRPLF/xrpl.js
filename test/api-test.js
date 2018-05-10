@@ -51,6 +51,55 @@ describe('RippleAPI', function () {
     assert.strictEqual(error.inspect(), '[RippleError(mess, { data: 1 })]');
   });
 
+  describe('pagination', function () {
+
+    describe('hasNextPage', function () {
+
+      it('returns true when there is another page', function () {
+        return this.api.request('ledger_data').then(response => {
+            assert(this.api.hasNextPage(response));
+          }
+        );
+      });
+
+      it('returns false when there are no more pages', function () {
+        return this.api.request('ledger_data').then(response => {
+          return this.api.requestNextPage('ledger_data', {}, response);
+        }).then(response => {
+          assert(!this.api.hasNextPage(response));
+        });
+      });
+
+    });
+
+    describe('requestNextPage', function () {
+
+      it('requests the next page', function () {
+        return this.api.request('ledger_data').then(response => {
+          return this.api.requestNextPage('ledger_data', {}, response);
+        }).then(response => {
+          assert.equal(response.state[0].index, '000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D731')
+        });
+      });
+
+      it('rejects when there are no more pages', function () {
+        return this.api.request('ledger_data').then(response => {
+          return this.api.requestNextPage('ledger_data', {}, response);
+        }).then(response => {
+          assert(!this.api.hasNextPage(response))
+          return this.api.requestNextPage('ledger_data', {}, response);
+        }).then(() => {
+          assert(false, 'Should reject');
+        }).catch(error => {
+          assert(error instanceof Error);
+          assert.equal(error.message, 'response does not have a next page')
+        });
+      });
+
+    });
+
+  });
+
   describe('preparePayment', function () {
 
     it('normal', function () {
@@ -1213,7 +1262,7 @@ describe('RippleAPI', function () {
   });
 
   it('request account_objects', function () {
-    return this.api._request('account_objects', {
+    return this.api.request('account_objects', {
       account: address
     }).then(response =>
       checkResult(responses.getAccountObjects, 'AccountObjectsResponse', response));
@@ -1221,7 +1270,7 @@ describe('RippleAPI', function () {
 
   it('request account_objects - invalid options', function () {
     // Intentionally no local validation of these options
-    return this.api._request('account_objects', {
+    return this.api.request('account_objects', {
       account: address,
       invalid: 'options'
     }).then(response =>
@@ -1528,12 +1577,12 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.getLedger.header, 'getLedger'));
   });
 
+  // New in > 0.21.0
+  // future ledger versions are allowed, and passed to rippled as-is.
   it('getLedger - future ledger version', function () {
-    return this.api.getLedger({ ledgerVersion: 14661789 }).then(() => {
-      assert(false, 'Should throw LedgerVersionError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.LedgerVersionError);
-    });
+    return this.api.getLedger({ ledgerVersion: 14661789 }).then(response => {
+      assert(response)
+    })
   });
 
   it('getLedger - with state as hashes', function () {
