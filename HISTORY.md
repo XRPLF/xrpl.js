@@ -4,6 +4,15 @@
 
 + [`getOrderbook` - return raw order data](https://github.com/ripple/ripple-lib/pull/886). The full `BookOffer` data is now provided under `data`.
 
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+33f71b55c4adec4452826e44fe7809377364df04222b60f0fce01e7de2daff33  ripple-0.22.0-debug.js
+63232888a4ea77065e8e8eb8fdaa8ebfe3a785428fe935e2667c1ea54c837f29  ripple-0.22.0-min.js
+ab98026fabe296bd938297c48cb58e01dfdbe90f3c66c9617d6a3e1efd4c6b93  ripple-0.22.0.js
+```
+
 ## 0.21.0 (2018-04-11)
 
 + [Upgrade https-proxy-agent](https://github.com/ripple/ripple-lib/pull/883)
@@ -12,7 +21,7 @@
 The SHA-256 checksums for the browser version of this release can be found
 below.
 ```
-% shasum -a 256 *  
+% shasum -a 256 *
 3ab52209ad4a80393c8c08ef3f4aa9cfb47bc76c0ede2ee9fa7f5ca180ba4d67  ripple-0.21.0-debug.js
 3b1efccded347bed5f64757098a1ea6a513bb8932d922d00af47cd24e001dc14  ripple-0.21.0-min.js
 db08e5a3eab1f659b4c803543374398004d950ba720adc4b9a7658817cb5c94b  ripple-0.21.0.js
