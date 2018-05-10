@@ -1,5 +1,20 @@
 # ripple-lib Release History
 
+## 1.0.0 (UNRELEASED)
+
+### Breaking Changes
+
++ Amounts in drops (recommended) and XRP are checked for validity. Some
+  methods may now throw a `BigNumber Error` or `ValidationError` if the amount
+  is invalid. This may include methods that previously did not throw.
++ Note that 1 drop is equivalent to 0.000001 XRP and 1 XRP is equivalent to 1,000,000 drops.
+
+### Other Changes
+
++ Allow specifying amounts in drops for consistency with the `rippled`
+  APIs.
++ Export `xrpToDrops()` and `dropsToXrp()` functions.
+
 ## 0.21.0 (2018-04-11)
 
 + [Upgrade https-proxy-agent](https://github.com/ripple/ripple-lib/pull/883)
