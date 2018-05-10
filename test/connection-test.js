@@ -394,10 +394,10 @@ describe('Connection', function() {
   });
 
   it('unrecognized message type', function(done) {
-    this.api.on('error', (errorCode, errorMessage, message) => {
-      assert.strictEqual(errorCode, 'badMessage');
-      assert.strictEqual(errorMessage, 'unrecognized message type: unknown');
-      assert.strictEqual(message, '{"type":"unknown"}');
+    // This enables us to automatically support any
+    // new messages added by rippled in the future.
+    this.api.connection.on('unknown', (event) => {
+      assert.deepEqual(event, {type: 'unknown'})
       done();
     });
 
