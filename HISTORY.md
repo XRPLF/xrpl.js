@@ -1,5 +1,12 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
++ Potentially breaking change: Improve errors. For example, `RippledError` now includes the full response from
+  the `rippled` server
+([#687](https://github.com/ripple/ripple-lib/issues/687)). `NotConnectedError`
+may be thrown with a different message than before.
+
 ## 0.21.0 (2018-04-11)
 
 + [Upgrade https-proxy-agent](https://github.com/ripple/ripple-lib/pull/883)
