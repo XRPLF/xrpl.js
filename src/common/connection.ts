@@ -91,8 +91,8 @@ class Connection extends EventEmitter {
       return ['error', data.error, data.error_message, data] // e.g. slowDown
     }
 
-    // Possible data.type values include 'ledgerClosed',
-    // 'transaction', and 'path_find'.
+    // Possible `data.type` values include 'ledgerClosed',
+    // 'transaction', 'path_find', and many others.
     if (data.type === 'ledgerClosed') {
       this._updateLedgerVersions(data)
       this._updateFees(data)
