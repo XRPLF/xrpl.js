@@ -1,0 +1,27 @@
+## hasNextPage
+
+`hasNextPage(currentResponse): boolean`
+
+Returns `true` when there are more pages available.
+
+When there are more results than contained in the response, the response includes a `marker` field. You can use this convenience method, or check for `marker` yourself.
+
+See [Markers and Pagination](https://ripple.com/build/rippled-apis/#markers-and-pagination).
+
+### Return Value
+
+This method returns `true` if `currentResponse` includes a `marker`.
+
+### Example
+
+```javascript
+return api.request('ledger_data', {
+  ledger_index: 'validated'
+}).then(response => {
+  /* Do something useful with response */
+
+  if (api.hasNextPage(response)) {
+    /* There are more pages available */
+  }
+}).catch(console.error);
+```
