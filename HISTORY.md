@@ -1,5 +1,9 @@
 # ripple-lib Release History
 
+## 0.22.0 (2018-05-10)
+
++ [`getOrderbook` - return raw order data](https://github.com/ripple/ripple-lib/pull/886). The full `BookOffer` data is now provided under `data`.
+
 ## 0.21.0 (2018-04-11)
 
 + [Upgrade https-proxy-agent](https://github.com/ripple/ripple-lib/pull/883)
