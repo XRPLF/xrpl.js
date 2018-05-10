@@ -16,6 +16,7 @@ module.exports = {
   },
   empty: require('./empty'),
   subscribe: require('./subscribe'),
+  subscribe_error: require('./subscribe_error'),
   unsubscribe: require('./unsubscribe'),
   account_objects: {
     normal: require('./account-objects'),
