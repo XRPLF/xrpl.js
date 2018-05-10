@@ -762,16 +762,31 @@ ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for 
 
 ## Listening to streams
 
-The rippled server can push updates to your client when various events happen.
+The `rippled` server can push updates to your client when various events happen. Refer to [Subscriptions in the `rippled` API docs](https://ripple.com/build/rippled-apis/#subscriptions) for details.
 
-When you subscribe to a stream, you must also listen to the relevant message type(s). The available types in the table below.
+Note that the `streams` parameter for generic streams takes an array. For example, to subscribe to the `validations` stream, use `{ streams: [ 'validations' ] }`.
+
+The string names of some generic streams to subscribe to are in the table below. (Refer to `rippled` for an up-to-date list of streams.)
+
+Type | Description
+---- | -----------
+`server` | Sends a message whenever the status of the `rippled` server (for example, network connectivity) changes.
+`ledger` | Sends a message whenever the consensus process declares a new validated ledger.
+`transactions` | Sends a message whenever a transaction is included in a closed ledger.
+`transactions_proposed` | Sends a message whenever a transaction is included in a closed ledger, as well as some transactions that have not yet been included in a validated ledger and may never be. Not all proposed transactions appear before validation. Even some transactions that don't succeed are included in validated ledgers because they take the anti-spam transaction fee.
+`validations` | Sends a message whenever the server receives a validation message, also called a validation vote, regardless of whether the server trusts the validator.
+`manifests` | Sends a message whenever the server receives a manifest.
+`peer_status` | (Admin-only) Information about connected peer `rippled` servers, especially with regards to the consensus process.
+
+When you subscribe to a stream, you must also listen to the relevant message type(s). Some of the available message types are in the table below. (Refer to `rippled` for an up-to-date list of message types.)
 
 Type | Description
 ---- | -----------
 `ledgerClosed` | Sent by the `ledger` stream when the consensus process declares a new fully validated ledger. The message identifies the ledger and provides some information about its contents.
 `validationReceived` | Sent by the `validations` stream when the server receives a validation message, also called a validation vote, regardless of whether the server trusts the validator.
+`manifestReceived` | Sent by the `manifests` stream when the server receives a manifest.
 `transaction` | Sent by many subscriptions including `transactions`, `transactions_proposed`, `accounts`, `accounts_proposed`, and `book` (Order Book). See [Transaction Streams](https://ripple.com/build/rippled-apis/#transaction-streams) for details.
-`peerStatusChange` | Admin-only. Reports a large amount of information on the activities of other `rippled` servers to which the server is connected.
+`peerStatusChange` | (Admin-only) Reports a large amount of information on the activities of other `rippled` servers to which the server is connected.
 
 To register your listener function, use `connection.on(type, handler)`.
 
