@@ -26,7 +26,17 @@ Install `ripple-lib`:
 $ yarn add ripple-lib
 ```
 
-Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md) and [code samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples)
+Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md) and [code samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples).
+
+### Mailing lists
+
+We have a low-traffic mailing list for announcements of new ripple-lib releases. (About 1 email per week)
+
++ [Subscribe to ripple-lib-announce](https://groups.google.com/forum/#!forum/ripple-lib-announce)
+
+If you're using the XRP Ledger in production, you should run a [rippled server](https://github.com/ripple/rippled) and subscribe to the ripple-server mailing list as well.
+
++ [Subscribe to ripple-server](https://groups.google.com/forum/#!forum/ripple-server)
 
 ## Running tests
 
