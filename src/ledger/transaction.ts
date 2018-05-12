@@ -18,7 +18,7 @@ type TransactionResponse = FormattedTransactionType & {
 
 
 function attachTransactionDate(connection: Connection, tx: any
-): Promise<FormattedTransactionType> {
+): Promise<TransactionResponse> {
   if (tx.date) {
     return Promise.resolve(tx)
   }
@@ -88,26 +88,20 @@ function formatResponse(options: TransactionOptions, tx: TransactionResponse
   return parseTransaction(tx)
 }
 
-function getTransaction(id: string, options: TransactionOptions = {}
+async function getTransaction(id: string, options: TransactionOptions = {}
 ): Promise<FormattedTransactionType> {
   validate.getTransaction({id, options})
-
-  const request = {
-    command: 'tx',
-    transaction: id,
-    binary: false
+  const _options = await utils.ensureLedgerVersion.call(this, options)
+  try {
+    const tx = await this.request('tx', {
+      transaction: id,
+      binary: false
+    })
+    const txWithDate = await attachTransactionDate(this.connection, tx)
+    return formatResponse(_options, txWithDate)
+  } catch (error) {
+    throw (await convertError(this.connection, _options, error))
   }
-
-  return utils.ensureLedgerVersion.call(this, options).then(_options => {
-    return this.connection.request(request).then((tx: TransactionResponse) =>
-      attachTransactionDate(this.connection, tx)
-    ).then(_.partial(formatResponse, _options))
-      .catch(error => {
-        return convertError(this.connection, _options, error).then(_error => {
-          throw _error
-        })
-      })
-  })
 }
 
 export default getTransaction
