@@ -84,7 +84,7 @@ class Connection extends EventEmitter {
     const data = JSON.parse(message)
     if (data.type === 'response') {
       if (!(Number.isInteger(data.id) && data.id >= 0)) {
-        throw new ResponseFormatError('valid id not found in response')
+        throw new ResponseFormatError('valid id not found in response', data)
       }
       return [data.id.toString(), data]
     } else if (data.type === undefined && data.error) {
@@ -241,7 +241,7 @@ class Connection extends EventEmitter {
   _onOpenError(reject, error) {
     this._onOpenErrorBound = null
     this._unbindOnUnxpectedClose()
-    reject(new NotConnectedError(error && error.message))
+    reject(new NotConnectedError(error.message, error))
   }
 
   _createWebSocket(): WebSocket {
@@ -399,7 +399,7 @@ class Connection extends EventEmitter {
     return new Promise((resolve, reject) => {
       this._ws.send(message, undefined, error => {
         if (error) {
-          reject(new DisconnectedError(error.message))
+          reject(new DisconnectedError(error.message, error))
         } else {
           resolve()
         }
@@ -445,12 +445,12 @@ class Connection extends EventEmitter {
 
       this.once(eventName, response => {
         if (response.status === 'error') {
-          _reject(new RippledError(response.error))
+          _reject(new RippledError(response.error, response))
         } else if (response.status === 'success') {
           _resolve(response.result)
         } else {
           _reject(new ResponseFormatError(
-            'unrecognized status: ' + response.status))
+            'unrecognized status: ' + response.status, response))
         }
       })
 

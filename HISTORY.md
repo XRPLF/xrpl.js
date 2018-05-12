@@ -1,5 +1,11 @@
 # ripple-lib Release History
 
+## 1.0.0 (UNRELEASED)
+
++ Potentially breaking change: Improve errors. For example, `RippledError` now includes the full response from
+  the `rippled` server ([#687](https://github.com/ripple/ripple-lib/issues/687)). `NotConnectedError`
+  may be thrown with a different message than before.
+
 ## 1.0.0-beta.0 (2018-05-10)
 
 + [Add `request`, `hasNextPage`, and

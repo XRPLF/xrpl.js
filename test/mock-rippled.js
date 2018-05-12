@@ -168,7 +168,9 @@ module.exports = function createMockRippled(port) {
 
   mock.on('request_subscribe', function (request, conn) {
     assert.strictEqual(request.command, 'subscribe');
-    if (mock.config.returnEmptySubscribeRequest) {
+    if (request && request.streams === 'validations') {
+      conn.send(createResponse(request, fixtures.subscribe_error))
+    } else if (mock.config.returnEmptySubscribeRequest) {
       mock.config.returnEmptySubscribeRequest--;
       conn.send(createResponse(request, fixtures.empty));
     } else if (request.accounts) {
