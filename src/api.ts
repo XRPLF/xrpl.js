@@ -4,8 +4,6 @@ import {
   connect,
   disconnect,
   isConnected,
-  getServerInfo,
-  getFee,
   getLedgerVersion,
   formatLedgerClose
 } from './server/server'
@@ -52,13 +50,15 @@ import {
   BookOffersRequest, BookOffersResponse,
   GatewayBalancesRequest, GatewayBalancesResponse,
   LedgerRequest, LedgerResponse,
-  LedgerEntryRequest, LedgerEntryResponse
+  LedgerEntryRequest, LedgerEntryResponse,
+  ServerInfoRequest, ServerInfoResponse
 } from './common/types/commands'
 
 
 import RangeSet from './common/rangeset'
 import * as ledgerUtils from './ledger/utils'
 import * as schemaValidator from './common/schema-validator'
+import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp} from './ledger/utils'
 
 export type APIOptions = {
@@ -151,6 +151,8 @@ class RippleAPI extends EventEmitter {
     Promise<LedgerResponse>
   async request(command: 'ledger_entry', params: LedgerEntryRequest):
     Promise<LedgerEntryResponse>
+  async request(command: 'server_info', params?: ServerInfoRequest):
+    Promise<ServerInfoResponse>
 
   async request(command: string, params: object):
     Promise<object>
