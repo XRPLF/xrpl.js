@@ -1,5 +1,4 @@
 import * as common from '../common'
-import {GetServerInfoResponse} from '../common/serverinfo'
 
 function isConnected(): boolean {
   return this.connection.isConnected()
@@ -15,15 +14,6 @@ function connect(): Promise<void> {
 
 function disconnect(): Promise<void> {
   return this.connection.disconnect()
-}
-
-function getServerInfo(): Promise<GetServerInfoResponse> {
-  return common.serverInfo.getServerInfo(this.connection)
-}
-
-function getFee(): Promise<string> {
-  const cushion = this._feeCushion || 1.2
-  return common.serverInfo.getFee(this.connection, cushion)
 }
 
 function formatLedgerClose(ledgerClose: any): Object {
@@ -43,8 +33,6 @@ export {
   connect,
   disconnect,
   isConnected,
-  getServerInfo,
-  getFee,
   getLedgerVersion,
   formatLedgerClose
 }
