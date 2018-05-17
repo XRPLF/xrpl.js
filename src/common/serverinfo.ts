@@ -1,7 +1,8 @@
 import * as _ from 'lodash'
 import {convertKeysFromSnakeCaseToCamelCase} from './utils'
-import Connection from './connection'
 import BigNumber from 'bignumber.js'
+import {RippleAPI} from '../index'
+import {ServerInfoResponse} from './types/commands'
 
 export type GetServerInfoResponse = {
   buildVersion: string,
@@ -39,8 +40,16 @@ function renameKeys(object, mapping) {
   })
 }
 
-function getServerInfo(connection: Connection): Promise<GetServerInfoResponse> {
-  return connection.request({command: 'server_info'}).then(response => {
+function computeFeeFromServerInfo(
+  cushion: number, serverInfo: ServerInfoResponse
+): string {
+  return (new BigNumber(serverInfo.info.validated_ledger.base_fee_xrp)).
+    times(serverInfo.info.load_factor).
+    times(cushion).toString()
+}
+
+function getServerInfo(this: RippleAPI): Promise<GetServerInfoResponse> {
+  return this.request('server_info').then(response => {
     const info = convertKeysFromSnakeCaseToCamelCase(response.info)
     renameKeys(info, {hostid: 'hostID'})
     if (info.validatedLedger) {
@@ -61,18 +70,15 @@ function getServerInfo(connection: Connection): Promise<GetServerInfoResponse> {
   })
 }
 
-function computeFeeFromServerInfo(cushion: number,
-  serverInfo: GetServerInfoResponse
-): string {
-  return (new BigNumber(serverInfo.validatedLedger.baseFeeXRP)).
-    times(serverInfo.loadFactor).
-    times(cushion).toString()
-}
-
-function getFee(connection: Connection, cushion: number): Promise<string> {
-  return getServerInfo(connection).then(serverInfo => {
-    return computeFeeFromServerInfo(cushion, serverInfo)
-  })
+async function getFee(this: RippleAPI, cushion?: number): Promise<string> {
+  if (cushion === undefined) {
+    cushion = this._feeCushion
+  }
+  if (cushion === undefined) {
+    cushion = 1.2
+  }
+  const response = await this.request('server_info')
+  return computeFeeFromServerInfo(cushion, response)
 }
 
 export {

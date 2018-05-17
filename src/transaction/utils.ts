@@ -67,7 +67,7 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
       return Promise.resolve(txJSON)
     }
     const cushion = api._feeCushion
-    return common.serverInfo.getFee(api.connection, cushion).then(fee => {
+    return api.getFee(cushion).then(fee => {
       return api.connection.getFeeRef().then(feeRef => {
         const extraFee =
           (txJSON.TransactionType !== 'EscrowFinish' ||

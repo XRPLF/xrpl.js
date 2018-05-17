@@ -14,6 +14,38 @@
 + Allow specifying amounts in drops for consistency with the `rippled`
   APIs.
 + Export `xrpToDrops()` and `dropsToXrp()` functions.
++ Potentially breaking change: Improve errors. For example, `RippledError` now includes the full response from
+  the `rippled` server ([#687](https://github.com/ripple/ripple-lib/issues/687)). `NotConnectedError`
+  may be thrown with a different message than before.
+
+## 1.0.0-beta.0 (2018-05-10)
+
++ [Add `request`, `hasNextPage`, and
+  `requestNextPage`](https://github.com/ripple/ripple-lib/pull/887).
+  + This provides support for all rippled APIs, including subscriptions.
+  + Note that rippled APIs take XRP amounts in drops (1 drop = 0.000001 XRP).
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+ab2094979a3d6b320c7bc22bc5946c50fa5e29af0976d352e7689b0a4d840c55  ripple-1.0.0-beta.0-debug.js
+0e7f7d740606c2866ebf63776b13b41a555848e1a1419e2c8058d2e6c562d7fd  ripple-1.0.0-beta.0-min.js
+bd05e8806832ca4192aea7ba2d0362baa9f44605f8e8e6676acd25eb0b94b778  ripple-1.0.0-beta.0.js
+```
+
+## 0.22.0 (2018-05-10)
+
++ [`getOrderbook` - return raw order data](https://github.com/ripple/ripple-lib/pull/886). The full `BookOffer` data is now provided under `data`.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+33f71b55c4adec4452826e44fe7809377364df04222b60f0fce01e7de2daff33  ripple-0.22.0-debug.js
+63232888a4ea77065e8e8eb8fdaa8ebfe3a785428fe935e2667c1ea54c837f29  ripple-0.22.0-min.js
+ab98026fabe296bd938297c48cb58e01dfdbe90f3c66c9617d6a3e1efd4c6b93  ripple-0.22.0.js
+```
 
 ## 0.21.0 (2018-04-11)
 
@@ -23,7 +55,7 @@
 The SHA-256 checksums for the browser version of this release can be found
 below.
 ```
-% shasum -a 256 *  
+% shasum -a 256 *
 3ab52209ad4a80393c8c08ef3f4aa9cfb47bc76c0ede2ee9fa7f5ca180ba4d67  ripple-0.21.0-debug.js
 3b1efccded347bed5f64757098a1ea6a513bb8932d922d00af47cd24e001dc14  ripple-0.21.0-min.js
 db08e5a3eab1f659b4c803543374398004d950ba720adc4b9a7658817cb5c94b  ripple-0.21.0.js

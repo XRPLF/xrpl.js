@@ -14,7 +14,7 @@ export default async function getAccountObjects(
   // through to rippled. rippled validates requests.
 
   // Make Request
-  const response = await this._request('account_objects', removeUndefined({
+  const response = await this.request('account_objects', removeUndefined({
     account: address,
     type: options.type,
     ledger_hash: options.ledgerHash,

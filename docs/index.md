@@ -33,6 +33,11 @@
   - [Payment Channel Create](#payment-channel-create)
   - [Payment Channel Fund](#payment-channel-fund)
   - [Payment Channel Claim](#payment-channel-claim)
+- [rippled APIs](#rippled-apis)
+  - [Listening to streams](#listening-to-streams)
+  - [request](#request)
+  - [hasNextPage](#hasnextpage)
+  - [requestNextPage](#requestnextpage)
 - [API Methods](#api-methods)
   - [connect](#connect)
   - [disconnect](#disconnect)
@@ -84,7 +89,7 @@
 
 # Introduction
 
-RippleAPI is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript.
+RippleAPI (ripple-lib) is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript.
 Using RippleAPI, you can:
 
 * [Query transactions from the XRP Ledger history](#gettransaction)
@@ -92,8 +97,6 @@ Using RippleAPI, you can:
 * [Submit](#submit) transactions to the XRP Ledger, including [Payments](#payment), [Orders](#order), [Settings changes](#settings), and [other types](#transaction-types)
 * [Generate a new XRP Ledger Address](#generateaddress)
 * ... and [much more](#api-methods).
-
-RippleAPI only provides access to *validated*, *immutable* transaction data.
 
 ## Boilerplate
 
@@ -749,6 +752,185 @@ signature | string | *Optional* Signed claim authorizing withdrawal of XRP from 
 }
 ```
 
+
+# rippled APIs
+
+ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for all online functionality. With ripple-lib version 1.0.0 and higher, you can easily access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
+* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods). 
+* Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
+* Use `requestNextPage()` to request the next page of data.
+
+When using rippled APIs, [specify XRP amounts in drops](https://ripple.com/build/rippled-apis/#specifying-currency-amounts). 1 XRP = 1000000 drops.
+
+## Listening to streams
+
+The `rippled` server can push updates to your client when various events happen. Refer to [Subscriptions in the `rippled` API docs](https://ripple.com/build/rippled-apis/#subscriptions) for details.
+
+Note that the `streams` parameter for generic streams takes an array. For example, to subscribe to the `validations` stream, use `{ streams: [ 'validations' ] }`.
+
+The string names of some generic streams to subscribe to are in the table below. (Refer to `rippled` for an up-to-date list of streams.)
+
+Type | Description
+---- | -----------
+`server` | Sends a message whenever the status of the `rippled` server (for example, network connectivity) changes.
+`ledger` | Sends a message whenever the consensus process declares a new validated ledger.
+`transactions` | Sends a message whenever a transaction is included in a closed ledger.
+`transactions_proposed` | Sends a message whenever a transaction is included in a closed ledger, as well as some transactions that have not yet been included in a validated ledger and may never be. Not all proposed transactions appear before validation. Even some transactions that don't succeed are included in validated ledgers because they take the anti-spam transaction fee.
+`validations` | Sends a message whenever the server receives a validation message, also called a validation vote, regardless of whether the server trusts the validator.
+`manifests` | Sends a message whenever the server receives a manifest.
+`peer_status` | (Admin-only) Information about connected peer `rippled` servers, especially with regards to the consensus process.
+
+When you subscribe to a stream, you must also listen to the relevant message type(s). Some of the available message types are in the table below. (Refer to `rippled` for an up-to-date list of message types.)
+
+Type | Description
+---- | -----------
+`ledgerClosed` | Sent by the `ledger` stream when the consensus process declares a new fully validated ledger. The message identifies the ledger and provides some information about its contents.
+`validationReceived` | Sent by the `validations` stream when the server receives a validation message, also called a validation vote, regardless of whether the server trusts the validator.
+`manifestReceived` | Sent by the `manifests` stream when the server receives a manifest.
+`transaction` | Sent by many subscriptions including `transactions`, `transactions_proposed`, `accounts`, `accounts_proposed`, and `book` (Order Book). See [Transaction Streams](https://ripple.com/build/rippled-apis/#transaction-streams) for details.
+`peerStatusChange` | (Admin-only) Reports a large amount of information on the activities of other `rippled` servers to which the server is connected.
+
+To register your listener function, use `connection.on(type, handler)`.
+
+Here is an example of listening for transactions on given account(s):
+```
+const account = 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn' // Replace with the account you want notifications for
+api.connect().then(() => { // Omit this if you are already connected
+
+  // 'transaction' can be replaced with the relevant `type` from the table above
+  api.connection.on('transaction', (event) => {
+
+      // Do something useful with `event`
+      console.log(JSON.stringify(event, null, 2))
+  })
+
+  api.request('subscribe', {
+      accounts: [ account ]
+  }).then(response => {
+      if (response.status === 'success') {
+          console.log('Successfully subscribed')
+      }
+  }).catch(error => {
+      // Handle `error`
+  })
+})
+```
+
+The subscription ends when you unsubscribe or the WebSocket connection is closed.
+
+For full details, see [rippled Subscriptions](https://ripple.com/build/rippled-apis/#subscriptions).
+
+## request
+
+`request(command: string, options: object): Promise<object>`
+
+Returns the response from invoking the specified command, with the specified options, on the connected rippled server.
+
+Refer to [rippled APIs](https://ripple.com/build/rippled-apis/) for commands and options. All XRP amounts must be specified in drops. One drop is equal to 0.000001 XRP. See [Specifying Currency Amounts](https://ripple.com/build/rippled-apis/#specifying-currency-amounts).
+
+Most commands return data for the `current` (in-progress, open) ledger by default. Do not rely on this. Always specify a ledger version in your request. In the example below, the 'validated' ledger is requested, which is the most recent ledger that has been validated by the whole network. See [Specifying Ledgers](https://ripple.com/build/rippled-apis/#specifying-ledgers).
+
+### Return Value
+
+This method returns a promise that resolves with the response from rippled.
+
+### Example
+
+```javascript
+// Replace 'ledger' with your desired rippled command
+return api.request('ledger', {
+  ledger_index: 'validated'
+}).then(response => {
+  /* Do something useful with response */
+  console.log(JSON.stringify(response, null, 2))
+}).catch(console.error);
+```
+
+
+```json
+{
+  "ledger": {
+    "accepted": true,
+    "account_hash": "F9E9653EA76EA0AEA58AC98A8E19EDCEC8299C2940519A190674FFAED3639A1F",
+    "close_flags": 0,
+    "close_time": 577999430,
+    "close_time_human": "2018-Apr-25 19:23:50",
+    "close_time_resolution": 10,
+    "closed": true,
+    "hash": "450E5CB0A39495839DA9CD9A0FED74BD71CBB929423A907ADC00F14FC7E7F920",
+    "ledger_hash": "450E5CB0A39495839DA9CD9A0FED74BD71CBB929423A907ADC00F14FC7E7F920",
+    "ledger_index": "38217406",
+    "parent_close_time": 577999422,
+    "parent_hash": "B8B364C63EB9E13FDB89CB729FEF833089B8438CBEB8FC41744CB667209221B3",
+    "seqNum": "38217406",
+    "totalCoins": "99992286058637091",
+    "total_coins": "99992286058637091",
+    "transaction_hash": "5BDD3D2780C28FB2C91C3404BD8ED04786B764B1E18CF319888EDE2C09834726"
+  },
+  "ledger_hash": "450E5CB0A39495839DA9CD9A0FED74BD71CBB929423A907ADC00F14FC7E7F920",
+  "ledger_index": 38217406,
+  "validated": true
+}
+```
+
+
+## hasNextPage
+
+`hasNextPage(currentResponse): boolean`
+
+Returns `true` when there are more pages available.
+
+When there are more results than contained in the response, the response includes a `marker` field. You can use this convenience method, or check for `marker` yourself.
+
+See [Markers and Pagination](https://ripple.com/build/rippled-apis/#markers-and-pagination).
+
+### Return Value
+
+This method returns `true` if `currentResponse` includes a `marker`.
+
+### Example
+
+```javascript
+return api.request('ledger_data', {
+  ledger_index: 'validated'
+}).then(response => {
+  /* Do something useful with response */
+
+  if (api.hasNextPage(response)) {
+    /* There are more pages available */
+  }
+}).catch(console.error);
+```
+
+## requestNextPage
+
+`requestNextPage(command: string, params: object = {}, currentResponse: object): Promise<object>`
+
+Requests the next page of data.
+
+You can use this convenience method, or include `currentResponse.marker` in `params` yourself, when using `request`.
+
+See [Markers and Pagination](https://ripple.com/build/rippled-apis/#markers-and-pagination).
+
+### Return Value
+
+This method returns a promise that resolves with the next page of data from rippled.
+
+If the response does not have a next page, the promise will reject with `new errors.NotFoundError('response does not have a next page')`.
+
+### Example
+
+```javascript
+const command = 'ledger_data'
+const params = {
+  ledger_index: 'validated'
+}
+return api.request(command, params).then(response => {
+  return api.requestNextPage(command, params, response)
+}).then(response_page_2 => {
+  /* Do something useful with second page of response */
+}).catch(console.error);
+```
 
 # API Methods
 
@@ -2272,6 +2454,7 @@ bids[] | object | An order in the order book.
 *bids[].properties.* maker | [address](#address) | The address of the account that submitted the order.
 *bids[].properties.* sequence | [sequence](#account-sequence-number) | The account sequence number of the transaction that created this order.
 *bids[].properties.* makerExchangeRate | [value](#value) | The exchange rate from the point of view of the account that submitted the order (also known as "quality").
+*bids[].data.* \* | object | 
 *bids[].* state | object | *Optional* The state of the order.
 *bids[].state.* fundedAmount | [amount](#amount) | How much of the amount the maker would have to pay that the maker currently holds.
 *bids[].state.* priceOfFundedAmount | [amount](#amount) | How much the `fundedAmount` would convert to through the exchange rate of this order.
@@ -2282,9 +2465,16 @@ asks[] | object | An order in the order book.
 *asks[].properties.* maker | [address](#address) | The address of the account that submitted the order.
 *asks[].properties.* sequence | [sequence](#account-sequence-number) | The account sequence number of the transaction that created this order.
 *asks[].properties.* makerExchangeRate | [value](#value) | The exchange rate from the point of view of the account that submitted the order (also known as "quality").
+*asks[].data.* \* | object | 
 *asks[].* state | object | *Optional* The state of the order.
 *asks[].state.* fundedAmount | [amount](#amount) | How much of the amount the maker would have to pay that the maker currently holds.
 *asks[].state.* priceOfFundedAmount | [amount](#amount) | How much the `fundedAmount` would convert to through the exchange rate of this order.
+
+### New in ripple-lib 0.22.0 and higher
+
+The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
+
+For details, see the rippled method [book_offers](https://ripple.com/build/rippled-apis/#book-offers).
 
 ### Example
 
@@ -2326,6 +2516,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "rwBYyfufTzk77zUSKEu4MvixfarC35av1J",
         "sequence": 386940,
         "makerExchangeRate": "326.5003614141928"
+      },
+      "data": {
+        "Account": "rwBYyfufTzk77zUSKEu4MvixfarC35av1J",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570B9980E49C7DE8",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000008",
+        "PreviousTxnID": "92DBA0BE18B331AC61FB277211477A255D3B5EA9C5FE689171DE689FB45FE18A",
+        "PreviousTxnLgrSeq": 10714030,
+        "Sequence": 386940,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.2849323720855092"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "93.030522464522"
+        },
+        "index": "8092033091034D94219BC1131AF7A6B469D790D81831CB479AB6F67A32BE4E13",
+        "owner_funds": "31.77682120227525",
+        "quality": "326.5003614141928"
       }
     },
     {
@@ -2346,6 +2560,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "rwjsRktX1eguUr1pHTffyHnC4uyrvX58V1",
         "sequence": 207855,
         "makerExchangeRate": "330.6364334177034"
+      },
+      "data": {
+        "Account": "rwjsRktX1eguUr1pHTffyHnC4uyrvX58V1",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570BBF1EEFA2FB0A",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "C6BDA152363E3CFE18688A6830B49F3DB2B05976110B5908EA4EB66D93DEEB1F",
+        "PreviousTxnLgrSeq": 10714031,
+        "Sequence": 207855,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.00302447007930511"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "1"
+        },
+        "index": "8DB3520FF9CB16A0EA955056C49115F8CFB03A587D0A4AFC844F1D220EFCE0B9",
+        "owner_funds": "0.0670537912615556",
+        "quality": "330.6364334177034"
       }
     },
     {
@@ -2367,6 +2605,31 @@ return api.getOrderbook(address, orderbook)
         "maker": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
         "sequence": 110103,
         "makerExchangeRate": "331.1338298016111"
+      },
+      "data": {
+        "Account": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570BC3A506FC016F",
+        "BookNode": "0000000000000000",
+        "Expiration": 472785283,
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "00000000000008F0",
+        "PreviousTxnID": "77E763F1D02F58965CD1AD94F557B37A582FAC7760B71F391B856959836C2F7B",
+        "PreviousTxnLgrSeq": 10713576,
+        "Sequence": 110103,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.3"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "99.34014894048333"
+        },
+        "index": "9ECDFD31B28643FD3A54658398C5715D6DAD574F83F04529CB24765770F9084D",
+        "owner_funds": "4.021116654525635",
+        "quality": "331.1338298016111"
       }
     },
     {
@@ -2399,6 +2662,40 @@ return api.getOrderbook(address, orderbook)
           "value": "268.2219496064341",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
+      },
+      "data": {
+        "Account": "rPyYxUGK8L4dgEvjPs3aRc1B1jEiLr3Hx5",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570BCB85BCA78000",
+        "BookNode": "0000000000000000",
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "D22993C68C94ACE3F2FCE4A334EBEA98CC46DCA92886C12B5E5B4780B5E17D4E",
+        "PreviousTxnLgrSeq": 10711938,
+        "Sequence": 392,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.8095"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "268.754"
+        },
+        "index": "18B136E08EF50F0DEE8521EA22D16A950CD8B6DDF5F6E07C35F7FDDBBB09718D",
+        "owner_funds": "0.8095132334507441",
+        "quality": "332",
+        "taker_gets_funded": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.8078974385735969"
+        },
+        "taker_pays_funded": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "268.2219496064341"
+        }
       }
     },
     {
@@ -2420,6 +2717,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
         "sequence": 110105,
         "makerExchangeRate": "337.7996295968016"
+      },
+      "data": {
+        "Account": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570C00450D461510",
+        "BookNode": "0000000000000000",
+        "Expiration": 472785284,
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "00000000000008F0",
+        "PreviousTxnID": "1F4D9D859D9AABA888C0708A572B38919A3AEF2C8C1F5A13F58F44C92E5FF3FB",
+        "PreviousTxnLgrSeq": 10713576,
+        "Sequence": 110105,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.4499999999999999"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "152.0098333185607"
+        },
+        "index": "9F380E0B39E2AF8AA9608C3E39A5A8628E6D0F44385C6D12BE06F4FEC8D83351",
+        "quality": "337.7996295968016"
       }
     },
     {
@@ -2440,6 +2761,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "rDbsCJr5m8gHDCNEHCZtFxcXHsD4S9jH83",
         "sequence": 110061,
         "makerExchangeRate": "347.2306949944844"
+      },
+      "data": {
+        "Account": "rDbsCJr5m8gHDCNEHCZtFxcXHsD4S9jH83",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570C560B764D760C",
+        "BookNode": "0000000000000000",
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000001",
+        "PreviousTxnID": "9A0B6B76F0D86614F965A2FFCC8859D8607F4E424351D4CFE2FBE24510F93F25",
+        "PreviousTxnLgrSeq": 10708382,
+        "Sequence": 110061,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.003768001830745216"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "1.308365894430151"
+        },
+        "index": "B971769686CE1B9139502770158A4E7C011CFF8E865E5AAE5428E23AAA0E146D",
+        "owner_funds": "0.2229210189326514",
+        "quality": "347.2306949944844"
       }
     },
     {
@@ -2461,6 +2806,31 @@ return api.getOrderbook(address, orderbook)
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
         "sequence": 35788,
         "makerExchangeRate": "352.7092203179974"
+      },
+      "data": {
+        "Account": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570C87DF25DC4FC6",
+        "BookNode": "0000000000000000",
+        "Expiration": 472783298,
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "00000000000003D2",
+        "PreviousTxnID": "E5F9A10F29A4BB3634D5A84FC96931E17267B58E0D2D5ADE24FFB751E52ADB9E",
+        "PreviousTxnLgrSeq": 10713533,
+        "Sequence": 35788,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.5"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "176.3546101589987"
+        },
+        "index": "D2CB71038AD0ECAF4B5FF0A953AD1257225D0071E6F3AF9ADE67F05590B45C6E",
+        "owner_funds": "6.617688680663627",
+        "quality": "352.7092203179974"
       }
     },
     {
@@ -2493,6 +2863,40 @@ return api.getOrderbook(address, orderbook)
           "value": "179.1217564870259",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
+      },
+      "data": {
+        "Account": "rN6jbxx4H6NxcnmkzBxQnbCWLECNKrgSSf",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570CC0B8E0E2C000",
+        "BookNode": "0000000000000000",
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "2E16ACFEAC2306E3B3483D445787F3496FACF9504F7A5E909620C1A73E2EDE54",
+        "PreviousTxnLgrSeq": 10558020,
+        "Sequence": 491,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.5"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "179.48"
+        },
+        "index": "DA853913C8013C9471957349EDAEE4DF4846833B8CCB92008E2A8994E37BEF0D",
+        "owner_funds": "0.5",
+        "quality": "358.96",
+        "taker_gets_funded": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.499001996007984"
+        },
+        "taker_pays_funded": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "179.1217564870259"
+        }
       }
     },
     {
@@ -2514,6 +2918,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
         "sequence": 35789,
         "makerExchangeRate": "360.9637829743709"
+      },
+      "data": {
+        "Account": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570CD2F24C9C145D",
+        "BookNode": "0000000000000000",
+        "Expiration": 472783299,
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "00000000000003D2",
+        "PreviousTxnID": "B1B12E47043B4260223A2C4240D19E93526B55B1DB38DEED335DACE7C04FEB23",
+        "PreviousTxnLgrSeq": 10713534,
+        "Sequence": 35789,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.8"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "288.7710263794967"
+        },
+        "index": "B89AD580E908F7337CCBB47A0BAAC6417EF13AC3465E34E8B7DD3BED016EA833",
+        "quality": "360.9637829743709"
       }
     },
     {
@@ -2546,6 +2974,40 @@ return api.getOrderbook(address, orderbook)
           "value": "82.50309772176658",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
+      },
+      "data": {
+        "Account": "rUeCeioKJkbYhv4mRGuAbZpPcqkMCoYq6N",
+        "BookDirectory": "6EAB7C172DEFA430DBFAD120FDC373B5F5AF8B191649EC98570D0069F50EA028",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000012",
+        "PreviousTxnID": "F0E8ABF07F83DF0B5EF5B417E8E29A45A5503BA8F26FBC86447CC6B1FAD6A1C4",
+        "PreviousTxnLgrSeq": 10447672,
+        "Sequence": 5255,
+        "TakerGets": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.5"
+        },
+        "TakerPays": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "182.9814890090516"
+        },
+        "index": "D652DCE4B19C6CB43912651D3A975371D3B2A16A034EDF07BC11BF721AEF94A4",
+        "owner_funds": "0.225891986027944",
+        "quality": "365.9629780181032",
+        "taker_gets_funded": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.2254411038203033"
+        },
+        "taker_pays_funded": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "82.50309772176658"
+        }
       }
     }
   ],
@@ -2568,6 +3030,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ",
         "sequence": 434,
         "makerExchangeRate": "0.003120027456241615"
+      },
+      "data": {
+        "Account": "r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B15A60037FFCF",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "544932DC56D72E845AF2B738821FE07865E32EC196270678AB0D947F54E9F49F",
+        "PreviousTxnLgrSeq": 10679000,
+        "Sequence": 434,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "3205.1"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "10"
+        },
+        "index": "CE457115A4ADCC8CB351B3E35A0851E48DE16605C23E305017A9B697B156DE5A",
+        "owner_funds": "41952.95917199965",
+        "quality": "0.003120027456241615"
       }
     },
     {
@@ -2588,6 +3074,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "rDYCRhpahKEhCFV25xScg67Bwf4W9sTYAm",
         "sequence": 233,
         "makerExchangeRate": "0.003125"
+      },
+      "data": {
+        "Account": "rDYCRhpahKEhCFV25xScg67Bwf4W9sTYAm",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B1A2BC2EC5000",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "F68F9658AB3D462FEB027E6C380F054BC6D2514B43EC3C6AD46EE19C59BF1CC3",
+        "PreviousTxnLgrSeq": 10704238,
+        "Sequence": 233,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "1599.063669386278"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "4.99707396683212"
+        },
+        "index": "BF14FBB305159DBCAEA91B7E848408F5B559A91B160EBCB6D244958A6A16EA6B",
+        "owner_funds": "3169.910902910102",
+        "quality": "0.003125"
       }
     },
     {
@@ -2620,6 +3130,41 @@ return api.getOrderbook(address, orderbook)
           "currency": "BTC",
           "value": "0",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      },
+      "data": {
+        "Account": "raudnGKfTK23YKfnS7ixejHrqGERTYNFXk",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B2BF1C2F4D4C9",
+        "BookNode": "0000000000000000",
+        "Expiration": 472785284,
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "00000000000008F0",
+        "PreviousTxnID": "446410E1CD718AC01929DD16B558FCF6B3A7B8BF208C420E67A280C089C5C59B",
+        "PreviousTxnLgrSeq": 10713576,
+        "Sequence": 110104,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "143.1050962074379"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.4499999999999999"
+        },
+        "index": "67924B0EAA15784CC00CCD5FDD655EE2D6D2AE40341776B5F14E52341E7FC73E",
+        "owner_funds": "0",
+        "quality": "0.003144542101755081",
+        "taker_gets_funded": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0"
+        },
+        "taker_pays_funded": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0"
         }
       }
     },
@@ -2654,6 +3199,41 @@ return api.getOrderbook(address, orderbook)
           "value": "0",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
+      },
+      "data": {
+        "Account": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B2CD7A2BFBB75",
+        "BookNode": "0000000000000000",
+        "Expiration": 472772651,
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "00000000000003CD",
+        "PreviousTxnID": "D49164AB68DDA3AEC9DFCC69A35685C4F532B5C231D3C1D25FEA7D5D0224FB84",
+        "PreviousTxnLgrSeq": 10711128,
+        "Sequence": 35625,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "254.329207354604"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.8"
+        },
+        "index": "567BF2825173E3FB28FC94E436B6EB30D9A415FC2335E6D25CDE1BE47B25D120",
+        "owner_funds": "0",
+        "quality": "0.003145529403882357",
+        "taker_gets_funded": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0"
+        },
+        "taker_pays_funded": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0"
+        }
       }
     },
     {
@@ -2674,6 +3254,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "rwBYyfufTzk77zUSKEu4MvixfarC35av1J",
         "sequence": 387756,
         "makerExchangeRate": "0.003155743848271834"
+      },
+      "data": {
+        "Account": "rwBYyfufTzk77zUSKEu4MvixfarC35av1J",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B3621DF140FDA",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000008",
+        "PreviousTxnID": "2E371E2B287C8A9FBB3424E4204B17AD9FA1BAA9F3B33C7D2261E3B038AFF083",
+        "PreviousTxnLgrSeq": 10716291,
+        "Sequence": 387756,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "390.4979"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "1.23231134568807"
+        },
+        "index": "8CA23E55BF9F46AC7E803D3DB40FD03225EFCA66650D4CF0CBDD28A7CCDC8400",
+        "owner_funds": "5704.824764087842",
+        "quality": "0.003155743848271834"
       }
     },
     {
@@ -2694,6 +3298,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "rwjsRktX1eguUr1pHTffyHnC4uyrvX58V1",
         "sequence": 208927,
         "makerExchangeRate": "0.003160328237957649"
+      },
+      "data": {
+        "Account": "rwjsRktX1eguUr1pHTffyHnC4uyrvX58V1",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B3A4D41FF4211",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "91763FA7089C63CC4D5D14CBA6A5A5BF7ECE949B0D34F00FD35E733AF9F05AF1",
+        "PreviousTxnLgrSeq": 10716292,
+        "Sequence": 208927,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "1"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.003160328237957649"
+        },
+        "index": "7206866E39D9843623EE79E570242753DEE3C597F3856AEFB4631DD5AD8B0557",
+        "owner_funds": "45.55665106096075",
+        "quality": "0.003160328237957649"
       }
     },
     {
@@ -2714,6 +3342,29 @@ return api.getOrderbook(address, orderbook)
         "maker": "r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ",
         "sequence": 429,
         "makerExchangeRate": "0.003174603174603175"
+      },
+      "data": {
+        "Account": "r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B4748E68669A7",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "3B3CF6FF1A336335E78513CF77AFD3A784ACDD7B1B4D3F1F16E22957A060BFAE",
+        "PreviousTxnLgrSeq": 10639969,
+        "Sequence": 429,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "4725"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "15"
+        },
+        "index": "42894809370C7E6B23498EF8E22AD4B05F02B94F08E6983357A51EA96A95FF7F",
+        "quality": "0.003174603174603175"
       }
     },
     {
@@ -2734,6 +3385,30 @@ return api.getOrderbook(address, orderbook)
         "maker": "rDbsCJr5m8gHDCNEHCZtFxcXHsD4S9jH83",
         "sequence": 110099,
         "makerExchangeRate": "0.003193013959408667"
+      },
+      "data": {
+        "Account": "rDbsCJr5m8gHDCNEHCZtFxcXHsD4S9jH83",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B58077ED03C1B",
+        "BookNode": "0000000000000000",
+        "Flags": 131072,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000001",
+        "PreviousTxnID": "98F3F2D02D3BB0AEAC09EECCF2F24BBE5E1AB2C71C40D7BD0A5199E12541B6E2",
+        "PreviousTxnLgrSeq": 10715839,
+        "Sequence": 110099,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "1.24252537879871"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0.003967400879423823"
+        },
+        "index": "F4404D6547149419D3607F81D7080979FBB3AFE2661F9A933E2F6C07AC1D1F6D",
+        "owner_funds": "73.52163803897041",
+        "quality": "0.003193013959408667"
       }
     },
     {
@@ -2767,6 +3442,40 @@ return api.getOrderbook(address, orderbook)
           "value": "0",
           "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
         }
+      },
+      "data": {
+        "Account": "rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B72A555B981A3",
+        "BookNode": "0000000000000000",
+        "Expiration": 472772652,
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "00000000000003CD",
+        "PreviousTxnID": "146C8DBB047BAAFAE5B8C8DECCCDACD9DFCD7A464E5AB273230FF975E9B83CF7",
+        "PreviousTxnLgrSeq": 10711128,
+        "Sequence": 35627,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "496.5429474010489"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "1.6"
+        },
+        "index": "50CAA04E81D0009115B61C132FC9887FA9E5336E0CB8A2E7D3280ADBF6ABC043",
+        "quality": "0.003222279177208227",
+        "taker_gets_funded": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0"
+        },
+        "taker_pays_funded": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "0"
+        }
       }
     },
     {
@@ -2787,6 +3496,29 @@ return api.getOrderbook(address, orderbook)
         "maker": "r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ",
         "sequence": 431,
         "makerExchangeRate": "0.003222687721559781"
+      },
+      "data": {
+        "Account": "r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ",
+        "BookDirectory": "20294C923E80A51B487EB9547B3835FD483748B170D2D0A4520B730474DD96E5",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID": "624F9ADA85EC3BE845EAC075B47E01E4F89288EAF27823C715777B3DFFB21F24",
+        "PreviousTxnLgrSeq": 10639989,
+        "Sequence": 431,
+        "TakerGets": {
+          "currency": "USD",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "3103"
+        },
+        "TakerPays": {
+          "currency": "BTC",
+          "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+          "value": "10"
+        },
+        "index": "8A319A496288228AD9CAD74375E32FA81805C56A9AD84798A26756A8B3F9EE23",
+        "quality": "0.003222687721559781"
       }
     }
   ]

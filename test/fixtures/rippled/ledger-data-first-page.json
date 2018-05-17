@@ -1,0 +1,40 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "ledger_hash":
+      "102A6E70FFB18C18E97BB56E3047B0E45EA1BCC90BFCCB8CBB0D07BF0E2AB449",
+    "ledger_index": 38202000,
+    "marker":
+      "000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D730",
+    "state": [
+      {
+        "Flags": 0,
+        "Indexes": [
+          "B32769DB3BE790E959A96CF37A62414479E3EB20A5AEC7156B2BF8FD816DBFF8"
+        ],
+        "LedgerEntryType": "DirectoryNode",
+        "Owner": "rwt5iiE1mRbBgNhH6spU4nKgHcE7xK9joN",
+        "RootIndex":
+          "0005C961C890079D3C4CC8317F9735D388C3CE3D9BCDC152D3C9A7C08F508D1B",
+        "index":
+          "0005C961C890079D3C4CC8317F9735D388C3CE3D9BCDC152D3C9A7C08F508D1B"
+      },
+      {
+        "Account": "rpzpyUjdWKmz7yyMvirk3abcaNvSPmDpJn",
+        "Balance": "91508000",
+        "Flags": 0,
+        "LedgerEntryType": "AccountRoot",
+        "OwnerCount": 0,
+        "PreviousTxnID":
+          "F62A5A5EC92DE4E52663B9C7B44A2B76DAB1371737C83A5A81127CBDA84DFE9E",
+        "PreviousTxnLgrSeq": 35672898,
+        "Sequence": 1,
+        "index":
+          "000B6A1287DB6174F61B1BF987E630CF41DA2A2131CFEB6C5C8143A8F539E9D1"
+      }
+    ],
+    "validated": true
+  }
+}

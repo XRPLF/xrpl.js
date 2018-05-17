@@ -7,12 +7,6 @@ import {RippledError, DisconnectedError, NotConnectedError,
   TimeoutError, ResponseFormatError, ConnectionError,
   RippledNotInitializedError} from './errors'
 
-function isStreamMessageType(type) {
-  return type === 'ledgerClosed' ||
-         type === 'transaction' ||
-         type === 'path_find'
-}
-
 export interface ConnectionOptions {
   trace?: boolean,
   proxy?: string
@@ -90,19 +84,20 @@ class Connection extends EventEmitter {
     const data = JSON.parse(message)
     if (data.type === 'response') {
       if (!(Number.isInteger(data.id) && data.id >= 0)) {
-        throw new ResponseFormatError('valid id not found in response')
+        throw new ResponseFormatError('valid id not found in response', data)
       }
       return [data.id.toString(), data]
-    } else if (isStreamMessageType(data.type)) {
-      if (data.type === 'ledgerClosed') {
-        this._updateLedgerVersions(data)
-        this._updateFees(data)
-      }
-      return [data.type, data]
     } else if (data.type === undefined && data.error) {
       return ['error', data.error, data.error_message, data] // e.g. slowDown
     }
-    throw new ResponseFormatError('unrecognized message type: ' + data.type)
+
+    // Possible `data.type` values include 'ledgerClosed',
+    // 'transaction', 'path_find', and many others.
+    if (data.type === 'ledgerClosed') {
+      this._updateLedgerVersions(data)
+      this._updateFees(data)
+    }
+    return [data.type, data]
   }
 
   _onMessage(message) {
@@ -246,7 +241,7 @@ class Connection extends EventEmitter {
   _onOpenError(reject, error) {
     this._onOpenErrorBound = null
     this._unbindOnUnxpectedClose()
-    reject(new NotConnectedError(error && error.message))
+    reject(new NotConnectedError(error.message, error))
   }
 
   _createWebSocket(): WebSocket {
@@ -404,7 +399,7 @@ class Connection extends EventEmitter {
     return new Promise((resolve, reject) => {
       this._ws.send(message, undefined, error => {
         if (error) {
-          reject(new DisconnectedError(error.message))
+          reject(new DisconnectedError(error.message, error))
         } else {
           resolve()
         }
@@ -427,7 +422,7 @@ class Connection extends EventEmitter {
       function onDisconnect() {
         clearTimeout(timer)
         self.removeAllListeners(eventName)
-        reject(new DisconnectedError())
+        reject(new DisconnectedError('websocket was closed'))
       }
 
       function cleanup() {
@@ -450,12 +445,12 @@ class Connection extends EventEmitter {
 
       this.once(eventName, response => {
         if (response.status === 'error') {
-          _reject(new RippledError(response.error))
+          _reject(new RippledError(response.error, response))
         } else if (response.status === 'success') {
           _resolve(response.result)
         } else {
           _reject(new ResponseFormatError(
-            'unrecognized status: ' + response.status))
+            'unrecognized status: ' + response.status, response))
         }
       })
 

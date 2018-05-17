@@ -168,7 +168,9 @@ module.exports = function createMockRippled(port) {
 
   mock.on('request_subscribe', function (request, conn) {
     assert.strictEqual(request.command, 'subscribe');
-    if (mock.config.returnEmptySubscribeRequest) {
+    if (request && request.streams === 'validations') {
+      conn.send(createResponse(request, fixtures.subscribe_error))
+    } else if (mock.config.returnEmptySubscribeRequest) {
       mock.config.returnEmptySubscribeRequest--;
       conn.send(createResponse(request, fixtures.empty));
     } else if (request.accounts) {
@@ -234,6 +236,15 @@ module.exports = function createMockRippled(port) {
       conn.send(createLedgerResponse(request, response));
     } else {
       conn.send(createLedgerResponse(request, fixtures.ledger.normal));
+    }
+  });
+
+  mock.on('request_ledger_data', function (request, conn) {
+    assert.strictEqual(request.command, 'ledger_data');
+    if (request.marker) {
+      conn.send(createResponse(request, fixtures.ledger_data.last_page));
+    } else {
+      conn.send(createResponse(request, fixtures.ledger_data.first_page));
     }
   });
 
