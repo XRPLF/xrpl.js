@@ -215,8 +215,7 @@ describe('RippleAPI', function () {
 
     it('throws with an amount with too many decimal places', function () {
       assert.throws(() => {
-        const a = this.api.dropsToXrp('1.2')
-        console.log('a', a)
+        this.api.dropsToXrp('1.2')
       }, /has too many decimal places/)
 
       assert.throws(() => {
