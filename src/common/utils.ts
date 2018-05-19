@@ -14,9 +14,14 @@ function isValidSecret(secret: string): boolean {
 }
 
 function dropsToXrp(drops: string | BigNumber): string {
-  if (typeof drops === 'string' && !drops.match(/^-?[0-9.]+$/)) {
-    throw new ValidationError(`dropsToXrp: invalid value '${drops}',` +
-      ` should be a number matching (^-?[0-9.]+).`)
+  if (typeof drops === 'string') {
+    if (!drops.match(/^-?[0-9]*\.?[0-9]*$/)) {
+      throw new ValidationError(`dropsToXrp: invalid value '${drops}',` +
+        ` should be a number matching (^-?[0-9]*\.?[0-9]*$).`)
+    } else if (drops === '.') {
+      throw new ValidationError(`dropsToXrp: invalid value '${drops}',` +
+        ` should be a BigNumber or string-encoded number.`)
+    }
   }
 
   // Important: specify base 10 to avoid exponential notation e.g. '1e-7'
@@ -38,9 +43,14 @@ function dropsToXrp(drops: string | BigNumber): string {
 }
 
 function xrpToDrops(xrp: string | BigNumber): string {
-  if (typeof xrp === 'string' && !xrp.match(/^-?[0-9.]+$/)) {
-    throw new ValidationError(`xrpToDrops: invalid value '${xrp}',` +
-      ` should be a number matching (^-?[0-9.]+).`)
+  if (typeof xrp === 'string') {
+    if (!xrp.match(/^-?[0-9]*\.?[0-9]*$/)) {
+      throw new ValidationError(`xrpToDrops: invalid value '${xrp}',` +
+        ` should be a number matching (^-?[0-9]*\.?[0-9]*$).`)
+    } else if (xrp === '.') {
+      throw new ValidationError(`xrpToDrops: invalid value '${xrp}',` +
+        ` should be a BigNumber or string-encoded number.`)
+    }
   }
 
   // Important: specify base 10 to avoid exponential notation e.g. '1e-7'

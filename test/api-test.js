@@ -92,6 +92,14 @@ describe('RippleAPI', function () {
       assert.strictEqual(drops, '-2000000', '-2 XRP equals -2 million drops')
     })
 
+    it('works with a value ending with a decimal point', function () {
+      let drops = this.api.xrpToDrops('2.')
+      assert.strictEqual(drops, '2000000', '2. XRP equals 2000000 drops')
+
+      drops = this.api.xrpToDrops('-2.')
+      assert.strictEqual(drops, '-2000000', '-2. XRP equals -2000000 drops')
+    })
+
     it('works with BigNumber objects', function () {
       let drops = this.api.xrpToDrops(new BigNumber(2))
       assert.strictEqual(drops, '2000000', '(BigNumber) 2 XRP equals 2 million drops')
@@ -135,17 +143,17 @@ describe('RippleAPI', function () {
 
       assert.throws(() => {
         this.api.xrpToDrops('.')
-      }, /BigNumber Error: new BigNumber\(\) not a number: \./)
+      }, /xrpToDrops\: invalid value '\.', should be a BigNumber or string-encoded number\./)
     })
 
     it('throws with an amount more than one decimal point', function () {
       assert.throws(() => {
         this.api.xrpToDrops('1.0.0')
-      }, /BigNumber Error: new BigNumber\(\) not a number: 1\.0\.0/)
+      }, /xrpToDrops:\ invalid\ value\ '1\.0\.0'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
 
       assert.throws(() => {
         this.api.xrpToDrops('...')
-      }, /BigNumber Error: new BigNumber\(\) not a number: \.\.\./)
+      }, /xrpToDrops:\ invalid\ value\ '\.\.\.'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
     })
   })
 
@@ -187,6 +195,14 @@ describe('RippleAPI', function () {
     it('works with a negative value', function () {
       const xrp = this.api.dropsToXrp('-2000000')
       assert.strictEqual(xrp, '-2', '-2 million drops equals -2 XRP')
+    })
+
+    it('works with a value ending with a decimal point', function () {
+      let xrp = this.api.dropsToXrp('2000000.')
+      assert.strictEqual(xrp, '2', '2000000. drops equals 2 XRP')
+
+      xrp = this.api.dropsToXrp('-2000000.')
+      assert.strictEqual(xrp, '-2', '-2000000. drops equals -2 XRP')
     })
 
     it('works with BigNumber objects', function () {
@@ -238,17 +254,17 @@ describe('RippleAPI', function () {
 
       assert.throws(() => {
         this.api.dropsToXrp('.')
-      }, /BigNumber Error: new BigNumber\(\) not a number: \./)
+      }, /dropsToXrp\: invalid value '\.', should be a BigNumber or string-encoded number\./)
     })
 
     it('throws with an amount more than one decimal point', function () {
       assert.throws(() => {
         this.api.dropsToXrp('1.0.0')
-      }, /BigNumber Error: new BigNumber\(\) not a number: 1\.0\.0/)
+      }, /dropsToXrp:\ invalid\ value\ '1\.0\.0'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
 
       assert.throws(() => {
         this.api.dropsToXrp('...')
-      }, /BigNumber Error: new BigNumber\(\) not a number: \.\.\./)
+      }, /dropsToXrp:\ invalid\ value\ '\.\.\.'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
     })
   })
   describe('pagination', function () {
