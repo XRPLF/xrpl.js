@@ -434,6 +434,27 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
+  it('prepareTransaction - PaymentChannelCreate', function () {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions);
+    return this.api.prepareTransaction({
+      Account: address,
+      TransactionType: 'PaymentChannelCreate',
+      Amount: '1000000', // 1 XRP in drops. Use a string-encoded integer.
+      Destination: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
+      SettleDelay: 86400,
+      PublicKey: '32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A'
+      // If cancelAfter is used, you must use RippleTime.
+      // You can use `iso8601ToRippleTime()` to convert to RippleTime.
+
+      // Other fields are available (but not used in this test),
+      // including `sourceTag` and `destinationTag`.
+    }, localInstructions).then(
+        _.partial(checkResult, responses.preparePaymentChannelCreate.normal,
+          'prepare'));
+  });
+
   it('preparePaymentChannelCreate', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'

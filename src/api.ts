@@ -57,6 +57,7 @@ import {
 
 import RangeSet from './common/rangeset'
 import * as ledgerUtils from './ledger/utils'
+import * as transactionUtils from './transaction/utils'
 import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp} from './ledger/utils'
@@ -194,6 +195,15 @@ class RippleAPI extends EventEmitter {
       marker: currentResponse.marker
     })
     return this.request(command, nextPageParams)
+  }
+
+  /**
+   * Prepare a transaction.
+   *
+   * You can later submit the transaction with `submit()`.
+   */
+  async prepareTransaction(txJSON: object, instructions) {
+    return transactionUtils.prepareTransaction(txJSON, this, instructions)
   }
 
   /**
