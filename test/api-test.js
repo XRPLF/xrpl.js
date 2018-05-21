@@ -15,6 +15,7 @@ const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 const binary = require('ripple-binary-codec');
+const BigNumber = require('bignumber.js')
 assert.options.strict = true;
 
 // how long before each test case times out
@@ -51,6 +52,224 @@ describe('RippleAPI', function () {
     assert.strictEqual(error.inspect(), '[RippleError(mess, { data: 1 })]');
   });
 
+  describe('xrpToDrops', function () {
+    it('works with a typical amount', function () {
+      const drops = this.api.xrpToDrops('2')
+      assert.strictEqual(drops, '2000000', '2 XRP equals 2 million drops')
+    })
+
+    it('works with fractions', function () {
+      let drops = this.api.xrpToDrops('3.456789')
+      assert.strictEqual(drops, '3456789', '3.456789 XRP equals 3,456,789 drops')
+
+      drops = this.api.xrpToDrops('3.400000')
+      assert.strictEqual(drops, '3400000', '3.400000 XRP equals 3,400,000 drops')
+
+      drops = this.api.xrpToDrops('0.000001')
+      assert.strictEqual(drops, '1', '0.000001 XRP equals 1 drop')
+
+      drops = this.api.xrpToDrops('0.0000010')
+      assert.strictEqual(drops, '1', '0.0000010 XRP equals 1 drop')
+    })
+
+    it('works with zero', function () {
+      let drops = this.api.xrpToDrops('0')
+      assert.strictEqual(drops, '0', '0 XRP equals 0 drops')
+
+      // negative zero is equivalent to zero
+      drops = this.api.xrpToDrops('-0')
+      assert.strictEqual(drops, '0', '-0 XRP equals 0 drops')
+
+      drops = this.api.xrpToDrops('0.000000')
+      assert.strictEqual(drops, '0', '0.000000 XRP equals 0 drops')
+
+      drops = this.api.xrpToDrops('0.0000000')
+      assert.strictEqual(drops, '0', '0.0000000 XRP equals 0 drops')
+    })
+
+    it('works with a negative value', function () {
+      const drops = this.api.xrpToDrops('-2')
+      assert.strictEqual(drops, '-2000000', '-2 XRP equals -2 million drops')
+    })
+
+    it('works with a value ending with a decimal point', function () {
+      let drops = this.api.xrpToDrops('2.')
+      assert.strictEqual(drops, '2000000', '2. XRP equals 2000000 drops')
+
+      drops = this.api.xrpToDrops('-2.')
+      assert.strictEqual(drops, '-2000000', '-2. XRP equals -2000000 drops')
+    })
+
+    it('works with BigNumber objects', function () {
+      let drops = this.api.xrpToDrops(new BigNumber(2))
+      assert.strictEqual(drops, '2000000', '(BigNumber) 2 XRP equals 2 million drops')
+
+      drops = this.api.xrpToDrops(new BigNumber(-2))
+      assert.strictEqual(drops, '-2000000', '(BigNumber) -2 XRP equals -2 million drops')
+    })
+
+    it('works with a number', function() {
+      // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
+
+      let drops = this.api.xrpToDrops(2)
+      assert.strictEqual(drops, '2000000', '(number) 2 XRP equals 2 million drops')
+
+      drops = this.api.xrpToDrops(-2)
+      assert.strictEqual(drops, '-2000000', '(number) -2 XRP equals -2 million drops')
+    })
+
+    it('throws with an amount with too many decimal places', function () {
+      assert.throws(() => {
+        this.api.xrpToDrops('1.1234567')
+      }, /has too many decimal places/)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('0.0000001')
+      }, /has too many decimal places/)
+    })
+
+    it('throws with an invalid value', function () {
+      assert.throws(() => {
+        this.api.xrpToDrops('FOO')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('1e-7')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('2,0')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('.')
+      }, /xrpToDrops\: invalid value '\.', should be a BigNumber or string-encoded number\./)
+    })
+
+    it('throws with an amount more than one decimal point', function () {
+      assert.throws(() => {
+        this.api.xrpToDrops('1.0.0')
+      }, /xrpToDrops:\ invalid\ value\ '1\.0\.0'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('...')
+      }, /xrpToDrops:\ invalid\ value\ '\.\.\.'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+    })
+  })
+
+  describe('dropsToXrp', function () {
+    it('works with a typical amount', function () {
+      const xrp = this.api.dropsToXrp('2000000')
+      assert.strictEqual(xrp, '2', '2 million drops equals 2 XRP')
+    })
+
+    it('works with fractions', function () {
+      let xrp = this.api.dropsToXrp('3456789')
+      assert.strictEqual(xrp, '3.456789', '3,456,789 drops equals 3.456789 XRP')
+
+      xrp = this.api.dropsToXrp('3400000')
+      assert.strictEqual(xrp, '3.4', '3,400,000 drops equals 3.4 XRP')
+
+      xrp = this.api.dropsToXrp('1')
+      assert.strictEqual(xrp, '0.000001', '1 drop equals 0.000001 XRP')
+
+      xrp = this.api.dropsToXrp('1.0')
+      assert.strictEqual(xrp, '0.000001', '1.0 drops equals 0.000001 XRP')
+
+      xrp = this.api.dropsToXrp('1.00')
+      assert.strictEqual(xrp, '0.000001', '1.00 drops equals 0.000001 XRP')
+    })
+
+    it('works with zero', function () {
+      let xrp = this.api.dropsToXrp('0')
+      assert.strictEqual(xrp, '0', '0 drops equals 0 XRP')
+
+      // negative zero is equivalent to zero
+      xrp = this.api.dropsToXrp('-0')
+      assert.strictEqual(xrp, '0', '-0 drops equals 0 XRP')
+
+      xrp = this.api.dropsToXrp('0.00')
+      assert.strictEqual(xrp, '0', '0.00 drops equals 0 XRP')
+
+      xrp = this.api.dropsToXrp('000000000')
+      assert.strictEqual(xrp, '0', '000000000 drops equals 0 XRP')
+    })
+
+    it('works with a negative value', function () {
+      const xrp = this.api.dropsToXrp('-2000000')
+      assert.strictEqual(xrp, '-2', '-2 million drops equals -2 XRP')
+    })
+
+    it('works with a value ending with a decimal point', function () {
+      let xrp = this.api.dropsToXrp('2000000.')
+      assert.strictEqual(xrp, '2', '2000000. drops equals 2 XRP')
+
+      xrp = this.api.dropsToXrp('-2000000.')
+      assert.strictEqual(xrp, '-2', '-2000000. drops equals -2 XRP')
+    })
+
+    it('works with BigNumber objects', function () {
+      let xrp = this.api.dropsToXrp(new BigNumber(2000000))
+      assert.strictEqual(xrp, '2', '(BigNumber) 2 million drops equals 2 XRP')
+
+      xrp = this.api.dropsToXrp(new BigNumber(-2000000))
+      assert.strictEqual(xrp, '-2', '(BigNumber) -2 million drops equals -2 XRP')
+
+      xrp = this.api.dropsToXrp(new BigNumber(2345678))
+      assert.strictEqual(xrp, '2.345678', '(BigNumber) 2,345,678 drops equals 2.345678 XRP')
+
+      xrp = this.api.dropsToXrp(new BigNumber(-2345678))
+      assert.strictEqual(xrp, '-2.345678', '(BigNumber) -2,345,678 drops equals -2.345678 XRP')
+    })
+
+    it('works with a number', function() {
+      // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
+
+      let xrp = this.api.dropsToXrp(2000000)
+      assert.strictEqual(xrp, '2', '(number) 2 million drops equals 2 XRP')
+
+      xrp = this.api.dropsToXrp(-2000000)
+      assert.strictEqual(xrp, '-2', '(number) -2 million drops equals -2 XRP')
+    })
+
+    it('throws with an amount with too many decimal places', function () {
+      assert.throws(() => {
+        this.api.dropsToXrp('1.2')
+      }, /has too many decimal places/)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('0.10')
+      }, /has too many decimal places/)
+    })
+
+    it('throws with an invalid value', function () {
+      assert.throws(() => {
+        this.api.dropsToXrp('FOO')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('1e-7')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('2,0')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('.')
+      }, /dropsToXrp\: invalid value '\.', should be a BigNumber or string-encoded number\./)
+    })
+
+    it('throws with an amount more than one decimal point', function () {
+      assert.throws(() => {
+        this.api.dropsToXrp('1.0.0')
+      }, /dropsToXrp:\ invalid\ value\ '1\.0\.0'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('...')
+      }, /dropsToXrp:\ invalid\ value\ '\.\.\.'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+    })
+  })
   describe('pagination', function () {
 
     describe('hasNextPage', function () {

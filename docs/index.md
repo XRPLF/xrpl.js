@@ -221,14 +221,13 @@ Currencies are represented as either 3-character currency codes or 40-character 
 ## Value
 A *value* is a quantity of a currency represented as a decimal string. Be careful: JavaScript's native number format does not have sufficient precision to represent all values. XRP has different precision from other currencies.
 
-**XRP** has 6 significant digits past the decimal point. In other words, XRP cannot be divided into positive values smaller than `0.000001` (1e-6). XRP has a maximum value of `100000000000` (1e11).
+**XRP** has 6 significant digits past the decimal point. In other words, XRP cannot be divided into positive values smaller than `0.000001` (1e-6). This smallest unit is called a "drop". XRP has a maximum value of `100000000000` (1e11). Some RippleAPI methods accept XRP in order to maintain compatibility with older versions of the API. For consistency with the `rippled` APIs, we recommend formally specifying XRP values in *drops* in all API requests, and converting them to XRP for display. This is similar to Bitcoin's *satoshis* and Ethereum's *wei*. 1 XRP = 1,000,000 drops.
 
 **Non-XRP values** have 16 decimal digits of precision, with a maximum value of `9999999999999999e80`. The smallest positive non-XRP value is `1e-81`.
 
-
 ## Amount
 
-Example amount:
+Example 100.00 USD amount:
 
 ```json
 {
@@ -238,15 +237,16 @@ Example amount:
 }
 ```
 
-Example XRP amount:
+Example 3.0 XRP amount, in drops:
 ```json
 {
-  "currency": "XRP",
-  "value": "2000"
+  "currency": "drops",
+  "value": "3000000"
 }
 ```
+(Requires `ripple-lib` version 1.0.0 or higher.)
 
-An *amount* is data structure representing a currency, a quantity of that currency, and the counterparty on the trustline that holds the value. For XRP, there is no counterparty.
+An *amount* is an object specifying a currency, a quantity of that currency, and the counterparty (issuer) on the trustline that holds the value. For XRP, there is no counterparty.
 
 A *lax amount* allows the counterparty to be omitted for all currencies. If the counterparty is not specified in an amount within a transaction specification, then any counterparty may be used for that amount.
 
@@ -256,8 +256,8 @@ A *balance* is an amount than can have a negative value.
 
 Name | Type | Description
 ---- | ---- | -----------
-currency | [currency](#currency) | The three-character code or hexadecimal string used to denote currencies
-counterparty | [address](#address) | *Optional* The Ripple address of the account that owes or is owed the funds (omitted if `currency` is "XRP")
+currency | [currency](#currency) | The three-character code or hexadecimal string used to denote currencies, or "drops" for the smallest unit of XRP.
+counterparty | [address](#address) | *Optional* The Ripple address of the account that owes or is owed the funds (omitted if `currency` is "XRP" or "drops")
 value | [value](#value) | *Optional* The quantity of the currency, denoted as a string to retain floating point precision
 
 # Transaction Overview
@@ -323,7 +323,7 @@ maxLedgerVersionOffset | integer | *Optional* Offset from current validated ledg
 sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
 signersCount | integer | *Optional* Number of signers that will be signing this transaction.
 
-We recommended that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the XRP Ledger's consensus-validated ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare*" method.
+We recommend that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the XRP Ledger's consensus-validated ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare\*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare\*" method.
 
 ## Transaction ID
 
@@ -465,10 +465,10 @@ passive | boolean | *Optional* If enabled, the offer will not consume offers tha
     "value": "10.1"
   },
   "totalPrice": {
-    "currency": "XRP",
-    "value": "2"
+    "currency": "drops",
+    "value": "2000000"
   },
-  "passive": true,
+  "passive": false,
   "fillOrKill": true
 }
 ```
@@ -632,8 +632,8 @@ invoiceID | string | *Optional* 256-bit hash, as a 64-character hexadecimal stri
 {
   "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
   "sendMax": {
-    "currency": "XRP",
-    "value": "1"
+    "currency": "drops",
+    "value": "1000000"
   }
 }
 ```
@@ -673,8 +673,8 @@ deliverMin | [laxAmount](#amount) | *Optional* Redeem the Check for at least thi
 ```json
 {
   "amount": {
-    "currency": "XRP",
-    "value": "1"
+    "currency": "drops",
+    "value": "1000000"
   },
   "checkID": "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334"
 }
@@ -4271,6 +4271,8 @@ instructions | object | The instructions for how to execute the transaction afte
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+
+// Buy 10.10 USD (of the specified issuer) for 2.0 XRP (2000000 drops), fill or kill.
 const order = {
   "direction": "buy",
   "quantity": {
@@ -4279,10 +4281,10 @@ const order = {
     "value": "10.1"
   },
   "totalPrice": {
-    "currency": "XRP",
-    "value": "2"
+    "currency": "drops",
+    "value": "2000000"
   },
-  "passive": true,
+  "passive": false,
   "fillOrKill": true
 };
 return api.prepareOrder(address, order)
@@ -4292,7 +4294,7 @@ return api.prepareOrder(address, order)
 
 ```json
 {
-  "txJSON": "{\"Flags\":2147811328,\"TransactionType\":\"OfferCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"TakerGets\":\"2000000\",\"TakerPays\":{\"value\":\"10.1\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8819954,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"Flags\":2147745792,\"TransactionType\":\"OfferCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"TakerGets\":\"2000000\",\"TakerPays\":{\"value\":\"10.1\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8819954,\"Fee\":\"12\",\"Sequence\":23}",
   "instructions": {
     "fee": "0.000012",
     "sequence": 23,
@@ -4798,8 +4800,8 @@ const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
 const checkCreate = {
   "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
   "sendMax": {
-    "currency": "XRP",
-    "value": "1"
+    "currency": "drops",
+    "value": "1000000"
   }
 };
 return api.prepareCheckCreate(address, checkCreate).then(prepared =>
@@ -4911,8 +4913,8 @@ instructions | object | The instructions for how to execute the transaction afte
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
 const checkCash = {
   "amount": {
-    "currency": "XRP",
-    "value": "1"
+    "currency": "drops",
+    "value": "1000000"
   },
   "checkID": "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334"
 };
