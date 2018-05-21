@@ -24,7 +24,9 @@ function dropsToXrp(drops: string | BigNumber): string {
     }
   }
 
-  // Important: specify base 10 to avoid exponential notation e.g. '1e-7'
+  // Converting to BigNumber and then back to string should remove any
+  // decimal point followed by zeros, e.g. '1.00'.
+  // Important: specify base 10 to avoid exponential notation, e.g. '1e-7'.
   drops = (new BigNumber(drops)).toString(10)
 
   // drops are only whole units
@@ -33,10 +35,13 @@ function dropsToXrp(drops: string | BigNumber): string {
       ` too many decimal places.`)
   }
 
+  // This should never happen; the value has already been
+  // validated above. This just ensures BigNumber did not do
+  // something unexpected.
   if (!drops.match(/^-?[0-9]+$/)) {
     throw new ValidationError(`dropsToXrp: failed sanity check -` +
-      ` invalid value '${drops}',` +
-      ` should be a number matching (^-?[0-9]+).`)
+      ` value '${drops}',` +
+      ` does not match (^-?[0-9]+$).`)
   }
 
   return (new BigNumber(drops)).dividedBy(1000000.0).toString(10)
@@ -53,18 +58,16 @@ function xrpToDrops(xrp: string | BigNumber): string {
     }
   }
 
-  // Important: specify base 10 to avoid exponential notation e.g. '1e-7'
+  // Important: specify base 10 to avoid exponential notation, e.g. '1e-7'.
   xrp = (new BigNumber(xrp)).toString(10)
 
+  // This should never happen; the value has already been
+  // validated above. This just ensures BigNumber did not do
+  // something unexpected.
   if (!xrp.match(/^-?[0-9.]+$/)) {
     throw new ValidationError(`xrpToDrops: failed sanity check -` +
-      ` invalid value '${xrp}',` +
-      ` should be a number matching (^-?[0-9.]+).`)
-  }
-
-  if (xrp === '.') {
-    throw new ValidationError(`xrpToDrops: failed sanity check -` +
-      ` invalid value '.'.`)
+      ` value '${xrp}',` +
+      ` does not match (^-?[0-9.]+$).`)
   }
 
   const components = xrp.split('.')

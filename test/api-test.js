@@ -175,6 +175,9 @@ describe('RippleAPI', function () {
 
       xrp = this.api.dropsToXrp('1.0')
       assert.strictEqual(xrp, '0.000001', '1.0 drops equals 0.000001 XRP')
+
+      xrp = this.api.dropsToXrp('1.00')
+      assert.strictEqual(xrp, '0.000001', '1.00 drops equals 0.000001 XRP')
     })
 
     it('works with zero', function () {
