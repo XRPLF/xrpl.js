@@ -6,9 +6,9 @@
     "value": "10.1"
   },
   "totalPrice": {
-    "currency": "XRP",
-    "value": "2"
+    "currency": "drops",
+    "value": "2000000"
   },
-  "passive": true,
+  "passive": false,
   "fillOrKill": true
 }

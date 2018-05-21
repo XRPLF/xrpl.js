@@ -1,7 +1,7 @@
 {
   "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
   "sendMax": {
-    "currency": "XRP",
-    "value": "1"
+    "currency": "drops",
+    "value": "1000000"
   }
 }

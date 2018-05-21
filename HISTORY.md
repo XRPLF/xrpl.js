@@ -2,6 +2,18 @@
 
 ## 1.0.0 (UNRELEASED)
 
+### Breaking Changes
+
++ Amounts in drops (recommended) and XRP are checked for validity. Some
+  methods may now throw a `BigNumber Error` or `ValidationError` if the amount
+  is invalid. This may include methods that previously did not throw.
++ Note that 1 drop is equivalent to 0.000001 XRP and 1 XRP is equivalent to 1,000,000 drops.
+
+### Other Changes
+
++ Allow specifying amounts in drops for consistency with the `rippled`
+  APIs.
++ Export `xrpToDrops()` and `dropsToXrp()` functions.
 + Potentially breaking change: Improve errors. For example, `RippledError` now includes the full response from
   the `rippled` server ([#687](https://github.com/ripple/ripple-lib/issues/687)). `NotConnectedError`
   may be thrown with a different message than before.
