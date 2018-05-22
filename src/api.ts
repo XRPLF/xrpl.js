@@ -1,5 +1,13 @@
 import {EventEmitter} from 'events'
-import {Connection, errors, validate, xrpToDrops, dropsToXrp} from './common'
+import {
+  Connection,
+  errors,
+  validate,
+  xrpToDrops,
+  dropsToXrp,
+  iso8601ToRippleTime,
+  txFlags
+} from './common'
 import {
   connect,
   disconnect,
@@ -61,6 +69,7 @@ import * as transactionUtils from './transaction/utils'
 import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp} from './ledger/utils'
+import {Instructions} from './transaction/types'
 
 export type APIOptions = {
   server?: string,
@@ -202,7 +211,7 @@ class RippleAPI extends EventEmitter {
    *
    * You can later submit the transaction with `submit()`.
    */
-  async prepareTransaction(txJSON: object, instructions) {
+  async prepareTransaction(txJSON: object, instructions: Instructions = {}) {
     return transactionUtils.prepareTransaction(txJSON, this, instructions)
   }
 
@@ -313,6 +322,8 @@ class RippleAPI extends EventEmitter {
 
   xrpToDrops = xrpToDrops
   dropsToXrp = dropsToXrp
+  iso8601ToRippleTime = iso8601ToRippleTime
+  txFlags = txFlags
 }
 
 export {
