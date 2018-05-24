@@ -1663,6 +1663,17 @@ describe('RippleAPI', function () {
     });
   });
 
+  it('getFee - high load_factor', function () {
+    this.api.connection._send(JSON.stringify({
+      command: 'config',
+      data: { highLoadFactor: true }
+    }));
+
+    return this.api.getFee().then(fee => {
+      assert.strictEqual(fee, '1');
+    });
+  });
+
   it('disconnect & isConnected', function () {
     assert.strictEqual(this.api.isConnected(), true);
     return this.api.disconnect().then(() => {
