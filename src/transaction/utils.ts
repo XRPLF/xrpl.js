@@ -75,13 +75,16 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
             (cushion * feeRef * (32 + Math.floor(
               new Buffer(txJSON.Fulfillment, 'hex').length / 16)))
         const feeDrops = common.xrpToDrops(fee)
-        if (instructions.maxFee !== undefined) {
-          const maxFeeDrops = common.xrpToDrops(instructions.maxFee)
-          const normalFee = scaleValue(feeDrops, multiplier, extraFee)
-          txJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString()
-        } else {
-          txJSON.Fee = scaleValue(feeDrops, multiplier, extraFee)
+
+        let maxFee = instructions.maxFee
+        if (maxFee === undefined) {
+          maxFee = '2' // Default maxFee of 2.0 XRP
         }
+
+        const maxFeeDrops = common.xrpToDrops(maxFee)
+        const normalFee = scaleValue(feeDrops, multiplier, extraFee)
+        txJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString()
+
         return txJSON
       })
     })

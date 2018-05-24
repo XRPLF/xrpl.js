@@ -14,7 +14,7 @@
       "$ref": "value"
     },
     "maxFee": {
-      "description": "The maximum fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.",
+      "description": "The maximum fee to pay for the transaction (in v1.0.0 and later, this is `'2'` XRP by default). See [Transaction Fees](#transaction-fees) for more information.",
       "$ref": "value"
     },
     "maxLedgerVersion": {
