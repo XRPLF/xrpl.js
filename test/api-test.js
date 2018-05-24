@@ -653,6 +653,111 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
+  /**
+   * prepareTransaction() - new in ripple-lib 1.0.0
+   */
+
+  describe('prepareTransaction - Payment', function () {
+
+    it('normal', function () {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012'
+      }, instructions);
+
+      const txJSON = {
+        TransactionType: 'Payment',
+        Account: address,
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Amount: {
+          currency: 'USD',
+          issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
+          value: '0.01'
+        },
+        SendMax: {
+          currency: 'USD',
+          issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
+          value: '0.01'
+        },
+        Flags: 0
+      }
+
+      return this.api.prepareTransaction(txJSON, localInstructions).then(
+          _.partial(checkResult, responses.preparePayment.normal, 'prepare'));
+    });
+
+    it('prepareTransaction - Payment - min amount xrp', function () {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012'
+      }, instructions);
+
+      const txJSON = {
+        TransactionType: 'Payment',
+        Account: address,
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+
+        // Max amount to send. Use 100 billion XRP to
+        // ensure that we send the full SendMax amount.
+        Amount: '100000000000000000',
+
+        SendMax: {
+          currency: 'USD',
+          issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
+          value: '0.01'
+        },
+        DeliverMin: '10000',
+        Flags: this.api.txFlags.Payment.PartialPayment
+      }
+      
+      return this.api.prepareTransaction(txJSON, localInstructions).then(
+          _.partial(checkResult,
+            responses.preparePayment.minAmountXRP, 'prepare'));
+    });
+
+    it('prepareTransaction - Payment - min amount xrp2xrp', function () {
+      const txJSON = {
+        TransactionType: 'Payment',
+        Account: address,
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Amount: '10000',
+        Flags: 0
+      }
+      return this.api.prepareTransaction(txJSON, instructions).then(
+          _.partial(checkResult,
+            responses.preparePayment.minAmountXRPXRP, 'prepare'));
+    });
+
+    it('prepareTransaction - Payment with all options specified', function () {
+      return this.api.getLedgerVersion().then(ver => {
+        const localInstructions = {
+          maxLedgerVersion: ver + 100,
+          fee: '0.000012'
+        };
+        const txJSON = {
+          TransactionType: 'Payment',
+          Account: address,
+          Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+          Amount: '10000',
+          InvoiceID: 'A98FD36C17BE2B8511AD36DC335478E7E89F06262949F36EB88E2D683BBCC50A',
+          SourceTag: 14,
+          DestinationTag: 58,
+          Memos: [
+            {
+              Memo: {
+                MemoType: this.api.convertStringToHex('test'),
+                MemoFormat: this.api.convertStringToHex('plain/text'),
+                MemoData: this.api.convertStringToHex('texted data')
+              }
+            }
+          ],
+          Flags: 0 | this.api.txFlags.Payment.NoRippleDirect | this.api.txFlags.Payment.LimitQuality
+        }
+        return this.api.prepareTransaction(txJSON, localInstructions).then(
+            _.partial(checkResult,
+              responses.preparePayment.allOptions, 'prepare'));
+      });
+    });
+  });
+
   it('prepareTransaction - PaymentChannelCreate', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'

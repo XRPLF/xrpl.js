@@ -7,6 +7,7 @@ const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare} from './types'
 import {Amount, Adjustment, MaxAdjustment,
   MinAdjustment, Memo} from '../common/types/objects'
+import {xrpToDrops} from '../common'
 
 
 export interface Payment {
@@ -32,12 +33,12 @@ export interface Payment {
 
 function isMaxAdjustment(
   source: Adjustment | MaxAdjustment): source is MaxAdjustment {
-return (source as MaxAdjustment).maxAmount !== undefined
+    return (source as MaxAdjustment).maxAmount !== undefined
 }
 
 function isMinAdjustment(
   destination: Adjustment | MinAdjustment): destination is MinAdjustment {
-return (destination as MinAdjustment).minAmount !== undefined
+    return (destination as MinAdjustment).minAmount !== undefined
 }
 
 function isXRPToXRPPayment(payment: Payment): boolean {
@@ -50,7 +51,7 @@ function isXRPToXRPPayment(payment: Payment): boolean {
 }
 
 function isIOUWithoutCounterparty(amount: Amount): boolean {
-  return amount && amount.currency !== 'XRP'
+  return amount && amount.currency !== 'XRP' && amount.currency !== 'drops'
     && amount.counterparty === undefined
 }
 
@@ -72,7 +73,14 @@ function applyAnyCounterpartyEncoding(payment: Payment): void {
 function createMaximalAmount(amount: Amount): Amount {
   const maxXRPValue = '100000000000'
   const maxIOUValue = '9999999999999999e80'
-  const maxValue = amount.currency === 'XRP' ? maxXRPValue : maxIOUValue
+  let maxValue
+  if (amount.currency === 'XRP') {
+    maxValue = maxXRPValue
+  } else if (amount.currency === 'drops') {
+    maxValue = xrpToDrops(maxXRPValue)
+  } else {
+    maxValue = maxIOUValue
+  }
   return _.assign({}, amount, {value: maxValue})
 }
 

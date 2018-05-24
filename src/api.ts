@@ -216,6 +216,17 @@ class RippleAPI extends EventEmitter {
   }
 
   /**
+   * Convert a string to hex.
+   *
+   * This can be used to generate `MemoData`, `MemoType`, and `MemoFormat`.
+   *
+   * @param string string to convert to hex
+   */
+  convertStringToHex(string: string): string {
+    return transactionUtils.convertStringToHex(string)
+  }
+
+  /**
    * Makes multiple paged requests to the API to return a given number of
    * resources. _requestAll() will make multiple requests until the `limit`
    * number of resources is reached (if no `limit` is provided, a single request
