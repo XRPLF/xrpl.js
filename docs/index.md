@@ -167,7 +167,7 @@ If you omit the `server` parameter, RippleAPI operates [offline](#offline-functi
 
 1. Install [Node.js](https://nodejs.org) and [Yarn](https://yarnpkg.com/en/docs/install). Most Linux distros have a package for Node.js; check that it's the version you want.
 2. Use yarn to install RippleAPI:
-      `yarn install ripple-lib`
+      `yarn add ripple-lib`
 
 After you have installed ripple-lib, you can create scripts using the [boilerplate](#boilerplate) and run them using the Node.js executable, typically named `node`:
 
