@@ -1,13 +1,15 @@
 # ripple-lib Release History
 
-## 1.0.0 (UNRELEASED)
+## 1.0.0-beta.1 (2018-05-24)
 
 ### Breaking Changes
 
-+ Amounts in drops (recommended) and XRP are checked for validity. Some
++ Amounts in drops and XRP are checked for validity. Some
   methods may now throw a `BigNumber Error` or `ValidationError` if the amount
   is invalid. This may include methods that previously did not throw.
 + Note that 1 drop is equivalent to 0.000001 XRP and 1 XRP is equivalent to 1,000,000 drops.
++ Using drops is recommended. All rippled APIs require XRP amounts to be
+  expressed in drops.
 
 ### Other Changes
 
@@ -18,12 +20,24 @@
   the `rippled` server ([#687](https://github.com/ripple/ripple-lib/issues/687)). `NotConnectedError`
   may be thrown with a different message than before.
 
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+a80ebb39e186640246306eadb2879147458c8271fd3c6cb32e6ef78d0b4b01a5  ripple-1.0.0-beta.1-debug.js
+81bcc4b5fd6fd52220ed151242eaddd63eb29c4078845edc68f65b769557d126  ripple-1.0.0-beta.1-min.js
+738b4d65b58cf4e3542fa396f8d319a24cd7d0b7aff5ff629a900e244f735ff4  ripple-1.0.0-beta.1.js
+```
+
 ## 1.0.0-beta.0 (2018-05-10)
 
 + [Add `request`, `hasNextPage`, and
   `requestNextPage`](https://github.com/ripple/ripple-lib/pull/887).
   + This provides support for all rippled APIs, including subscriptions.
-  + Note that rippled APIs take XRP amounts in drops (1 drop = 0.000001 XRP).
+
+When using rippled APIs, you must:
++ For all XRP amounts, use drops (1 drop = 0.000001 XRP).
++ Instead of `counterparty`, use `issuer`.
 
 The SHA-256 checksums for the browser version of this release can be found
 below.
