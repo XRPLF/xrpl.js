@@ -67,7 +67,7 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
       return Promise.resolve(txJSON)
     }
     const cushion = api._feeCushion
-    return api.getFee(cushion).then(fee => {
+    return api.getFee(cushion, null).then(fee => {
       return api.connection.getFeeRef().then(feeRef => {
         const extraFee =
           (txJSON.TransactionType !== 'EscrowFinish' ||
@@ -77,7 +77,7 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
         const feeDrops = common.xrpToDrops(fee)
 
         let maxFee = instructions.maxFee
-        if (maxFee === undefined) {
+        if (!maxFee) {
           maxFee = '2' // Default maxFee of 2.0 XRP
         }
 
