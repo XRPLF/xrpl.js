@@ -3,6 +3,7 @@ import keypairs = require('ripple-keypairs')
 import binary = require('ripple-binary-codec')
 import {computeBinaryTransactionHash} from 'ripple-hashes'
 import {SignOptions, KeyPair} from './types'
+import { BigNumber } from 'bignumber.js';
 const validate = utils.common.validate
 
 function computeSignature(tx: Object, privateKey: string, signAs?: string) {
@@ -26,6 +27,15 @@ function signWithKeypair(
     throw new utils.common.errors.ValidationError(
       'txJSON must not contain "TxnSignature" or "Signers" properties'
     )
+  }
+  if (options.allowHighFee !== true) {
+    const fee = new BigNumber(tx.Fee)
+    if (fee.greaterThan('2000000')) {
+      throw new utils.common.errors.ValidationError(
+        '"Fee" should not exceed "2000000". ' +
+        'To use a high fee, set `options.allowHighFee = true`.'
+      )
+    }
   }
 
   tx.SigningPubKey = options.signAs ? '' : keypair.publicKey

@@ -57,7 +57,8 @@ export type KeyPair = {
 }
 
 export type SignOptions = {
-  signAs: string
+  signAs: string,
+  allowHighFee?: boolean
 }
 
 export type Outcome = {

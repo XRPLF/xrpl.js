@@ -35,6 +35,10 @@
         "signAs": {
           "$ref": "address",
           "description": "The account that the signature should count for in multisigning."
+        },
+        "allowHighFee": {
+          "type": "boolean",
+          "description": "If true, permit transactions to pay a fee greater than 2000000 drops (2 XRP)."
         }
       },
       "additionalProperties": false

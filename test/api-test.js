@@ -854,6 +854,44 @@ describe('RippleAPI', function () {
     assert.deepEqual(signature, responses.sign.signAs);
   });
 
+  it('sign - throws when Fee exceeds 2000000 drops', function () {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const request = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"AccountSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Domain\":\"726970706C652E636F6D\",\"LastLedgerSequence\":8820051,\"Fee\":\"2010000\",\"Sequence\":23,\"SigningPubKey\":\"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8\"}",
+      "instructions": {
+        "fee": "2.01",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }
+    
+    assert.throws(() => {
+      this.api.sign(request.txJSON, secret)
+    }, /"Fee" should not exceed "2000000". To use a high fee, set `options.allowHighFee = true`./)
+  });
+
+  it('sign - permits fee exceeding 2000000 drops when allowHighFee is set', function () {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const request = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"AccountSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Domain\":\"726970706C652E636F6D\",\"LastLedgerSequence\":8820051,\"Fee\":\"2010000\",\"Sequence\":23,\"SigningPubKey\":\"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8\"}",
+      "instructions": {
+        "fee": "2.01",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }
+
+    const result = this.api.sign(request.txJSON, secret, {allowHighFee: true})
+
+    const expectedResponse =  {
+      signedTransaction: "12000322800000002400000017201B008695536840000000001EAB90732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8744630440220384FBB48EEE7B0E58BD89294A609F9407C51FBE8FA08A4B305B22E9A7489D66602200152315EFE752DA381E74493419871550D206AC6503841DA5F8C30E35D9E3892770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304",
+      id: "A1586D6AF7B0821E7075E12A0132D9EB50BC1874A0749441201497F7561795FB"
+    }
+
+    assert.deepEqual(result, expectedResponse)
+    schemaValidator.schemaValidate('sign', result)
+  });
+
   it('submit', function () {
     return this.api.submit(responses.sign.normal.signedTransaction).then(
       _.partial(checkResult, responses.submit, 'submit'));

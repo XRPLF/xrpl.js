@@ -4,7 +4,7 @@ import {Memo} from '../common/types/objects'
 const txFlags = common.txFlags
 import {Instructions, Prepare} from './types'
 import {RippleAPI} from '../api'
-import { ValidationError } from '../common/errors';
+import {ValidationError} from '../common/errors'
 
 export type ApiMemo = {
   MemoData?: string,
