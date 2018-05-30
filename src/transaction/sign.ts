@@ -3,7 +3,7 @@ import keypairs = require('ripple-keypairs')
 import binary = require('ripple-binary-codec')
 import {computeBinaryTransactionHash} from 'ripple-hashes'
 import {SignOptions, KeyPair} from './types'
-import { BigNumber } from 'bignumber.js';
+import {BigNumber} from 'bignumber.js'
 const validate = utils.common.validate
 
 function computeSignature(tx: Object, privateKey: string, signAs?: string) {
