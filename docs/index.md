@@ -2470,9 +2470,9 @@ asks[] | object | An order in the order book.
 *asks[].state.* fundedAmount | [amount](#amount) | How much of the amount the maker would have to pay that the maker currently holds.
 *asks[].state.* priceOfFundedAmount | [amount](#amount) | How much the `fundedAmount` would convert to through the exchange rate of this order.
 
-### New in ripple-lib 0.22.0 and higher
+### Raw order data
 
-The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
+(Requires ripple-lib 0.22.0 or higher.) The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
 
 For details, see the rippled method [book_offers](https://ripple.com/build/rippled-apis/#book-offers).
 
