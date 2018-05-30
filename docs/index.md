@@ -315,6 +315,7 @@ Transaction instructions indicate how to execute a transaction, complementary wi
 
 Name | Type | Description
 ---- | ---- | -----------
+allowHighFee | boolean | *Optional* If `true`, then `fee` is permitted to exceed 2 XRP. Warning: In most cases, this is an abnormally high fee.
 fee | [value](#value) | *Optional* An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.
 maxFee | [value](#value) | *Optional* The maximum fee to pay for the transaction (in v1.0.0 and later, this is `'2'` XRP by default). See [Transaction Fees](#transaction-fees) for more information.
 maxLedgerVersion | integer,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version.

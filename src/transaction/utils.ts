@@ -4,6 +4,7 @@ import {Memo} from '../common/types/objects'
 const txFlags = common.txFlags
 import {Instructions, Prepare} from './types'
 import {RippleAPI} from '../api'
+import { ValidationError } from '../common/errors';
 
 export type ApiMemo = {
   MemoData?: string,
@@ -63,6 +64,13 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
     const multiplier = instructions.signersCount === undefined ? 1 :
       instructions.signersCount + 1
     if (instructions.fee !== undefined) {
+      const fee = new BigNumber(instructions.fee)
+      if (fee.greaterThan('2') && instructions.allowHighFee !== true) {
+        const errorMessage = `Fee of ${fee.toString(10)} XRP exceeds ` +
+          'soft limit of 2 XRP. To use this fee, set ' +
+          '`instructions.allowHighFee = true`.'
+        throw new ValidationError(errorMessage)
+      }
       txJSON.Fee = scaleValue(common.xrpToDrops(instructions.fee), multiplier)
       return Promise.resolve(txJSON)
     }

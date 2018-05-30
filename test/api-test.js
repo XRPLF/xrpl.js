@@ -392,6 +392,37 @@ describe('RippleAPI', function () {
         instructions).then(_.partial(checkResult,
           responses.preparePayment.minAmount, 'prepare'));
     });
+
+    it('throws when fee exceeds 2 XRP', function () {
+      const localInstructions = _.defaults({
+        fee: '2.1'
+      }, instructions);
+
+      assert.throws(() => {
+        this.api.preparePayment(
+          address, requests.preparePayment.normal, localInstructions)
+      }, /Fee of 2.1 XRP exceeds soft limit of 2 XRP. To use this fee, set `instructions.allowHighFee = true`./)
+    });
+
+    it('allows fee exceeding 2 XRP when allowHighFee is set', function () {
+      const localInstructions = _.defaults({
+        fee: '2.1',
+        allowHighFee: true
+      }, instructions);
+
+      const expectedResponse = {
+        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"2100000\",\"Sequence\":23}",
+        "instructions": {
+          "fee": "2.1",
+          "sequence": 23,
+          "maxLedgerVersion": 8820051
+        }
+      }
+
+      return this.api.preparePayment(
+        address, requests.preparePayment.normal, localInstructions).then(
+          _.partial(checkResult, expectedResponse, 'prepare'));
+    });
   });
 
   it('prepareOrder - buy order', function () {
