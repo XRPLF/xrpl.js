@@ -1,5 +1,11 @@
 # ripple-lib Release History
 
+## 1.0.0 (UNRELEASED)
+
+### Breaking Changes
+
++ There is now a soft limit of 2 XRP on the fee specified in transaction instructions. Attempting to set a high fee will cause a `ValidationError` to be thrown. This error can be bypassed by setting `allowHighFee: true`.
+
 ## 1.0.0-beta.1 (2018-05-24)
 
 ### Breaking Changes
