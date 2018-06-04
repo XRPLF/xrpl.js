@@ -1077,7 +1077,10 @@ Returns the estimated transaction fee for the rippled server the RippleAPI insta
 
 ### Parameters
 
-This method has no parameters.
+Name | Type | Description
+---- | ---- | -----------
+cushion | number | *Optional* The fee is the product of the base fee, the `load_factor`, and this cushion. Default is provided by the `RippleAPI` constructor's `feeCushion`.
+maximum | number,object,null | *Optional* Maximum value to return. Default is `1`. Use `null` for no maximum.
 
 ### Return Value
 
@@ -4954,6 +4957,7 @@ keypair | object | *Optional* The private and public key of the account that is 
 *keypair.* privateKey | privateKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 private key.
 *keypair.* publicKey | publicKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 public key.
 options | object | *Optional* Options that control the type of signature that will be generated.
+*options.* allowHighFee | boolean | *Optional* If true, permit transactions to pay a fee greater than 2000000 drops (2 XRP).
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
 secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field is exclusive with keypair).
 
