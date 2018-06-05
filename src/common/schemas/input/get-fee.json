@@ -7,10 +7,6 @@
     "cushion": {
       "type": "number",
       "description": "The fee is the product of the base fee, the `load_factor`, and this cushion. Default is provided by the `RippleAPI` constructor's `feeCushion`."
-    },
-    "maximum": {
-      "type": ["number", "object", "null"],
-      "description": "Maximum value to return. Default is `1`. Use `null` for no maximum."
     }
   },
   "additionalProperties": false

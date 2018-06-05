@@ -1080,7 +1080,6 @@ Returns the estimated transaction fee for the rippled server the RippleAPI insta
 Name | Type | Description
 ---- | ---- | -----------
 cushion | number | *Optional* The fee is the product of the base fee, the `load_factor`, and this cushion. Default is provided by the `RippleAPI` constructor's `feeCushion`.
-maximum | number,object,null | *Optional* Maximum value to return. Default is `1`. Use `null` for no maximum.
 
 ### Return Value
 
