@@ -13,12 +13,8 @@
       "description": "An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.",
       "$ref": "value"
     },
-    "allowHighFee": {
-      "description": "If `true`, then `fee` is permitted to exceed 2 XRP. Warning: In most cases, this is an abnormally high fee.",
-      "type": "boolean"
-    },
     "maxFee": {
-      "description": "The maximum fee to pay for the transaction (in v1.0.0 and later, this is `'2'` XRP by default). See [Transaction Fees](#transaction-fees) for more information.",
+      "description": "The maximum fee to pay for this transaction. If this exceeds the `maxFeeXRP` set in the RippleAPI constructor, `maxFeeXRP` will be used instead. See [Transaction Fees](#transaction-fees) for more information.",
       "$ref": "value"
     },
     "maxLedgerVersion": {

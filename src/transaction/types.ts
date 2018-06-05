@@ -12,7 +12,6 @@ import {ApiMemo} from './utils'
 export type Instructions = {
   sequence?: number,
   fee?: string,
-  allowHighFee?: boolean,
   maxFee?: string,
   maxLedgerVersion?: number,
   maxLedgerVersionOffset?: number,
@@ -57,8 +56,7 @@ export type KeyPair = {
 }
 
 export type SignOptions = {
-  signAs: string,
-  allowHighFee?: boolean
+  signAs: string
 }
 
 export type Outcome = {

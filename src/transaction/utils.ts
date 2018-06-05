@@ -65,17 +65,17 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
       instructions.signersCount + 1
     if (instructions.fee !== undefined) {
       const fee = new BigNumber(instructions.fee)
-      if (fee.greaterThan('2') && instructions.allowHighFee !== true) {
+      if (fee.greaterThan(api._maxFeeXRP)) {
         const errorMessage = `Fee of ${fee.toString(10)} XRP exceeds ` +
-          'soft limit of 2 XRP. To use this fee, set ' +
-          '`instructions.allowHighFee = true`.'
+          `max of ${api._maxFeeXRP} XRP. To use this fee, increase ` +
+          '`maxFeeXRP` in the RippleAPI constructor.'
         throw new ValidationError(errorMessage)
       }
       txJSON.Fee = scaleValue(common.xrpToDrops(instructions.fee), multiplier)
       return Promise.resolve(txJSON)
     }
     const cushion = api._feeCushion
-    return api.getFee(cushion, null).then(fee => {
+    return api.getFee(cushion).then(fee => {
       return api.connection.getFeeRef().then(feeRef => {
         const extraFee =
           (txJSON.TransactionType !== 'EscrowFinish' ||
@@ -83,10 +83,11 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
             (cushion * feeRef * (32 + Math.floor(
               new Buffer(txJSON.Fulfillment, 'hex').length / 16)))
         const feeDrops = common.xrpToDrops(fee)
-        const maxFee = instructions.maxFee || '2' // Default maxFee of 2.0 XRP
-        const maxFeeDrops = common.xrpToDrops(maxFee)
+        const maxFeeXRP = instructions.maxFee ?
+          BigNumber.min(api._maxFeeXRP, instructions.maxFee) : api._maxFeeXRP
+        const maxFeeDrops = common.xrpToDrops(maxFeeXRP)
         const normalFee = scaleValue(feeDrops, multiplier, extraFee)
-        txJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString()
+        txJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
 
         return txJSON
       })

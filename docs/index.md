@@ -152,6 +152,7 @@ authorization | string | *Optional* Username and password for HTTP basic authent
 certificate | string | *Optional* A string containing the certificate key of the client in PEM format. (Can be an array of certificates).
 feeCushion | number | *Optional* Factor to multiply estimated fee by to provide a cushion in case the required fee rises during submission of a transaction. Defaults to `1.2`.
 key | string | *Optional* A string containing the private key of the client in PEM format. (Can be an array of keys).
+maxFeeXRP | string | *Optional* Maximum fee to use with transactions, in XRP. Must be a string-encoded number. Defaults to `'2'`.
 passphrase | string | *Optional* The passphrase for the private key of the client.
 proxy | uri string | *Optional* URI for HTTP/HTTPS proxy to use to connect to the rippled server.
 proxyAuthorization | string | *Optional* Username and password for HTTP basic authentication to the proxy in the format **username:password**.
@@ -315,9 +316,8 @@ Transaction instructions indicate how to execute a transaction, complementary wi
 
 Name | Type | Description
 ---- | ---- | -----------
-allowHighFee | boolean | *Optional* If `true`, then `fee` is permitted to exceed 2 XRP. Warning: In most cases, this is an abnormally high fee.
 fee | [value](#value) | *Optional* An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.
-maxFee | [value](#value) | *Optional* The maximum fee to pay for the transaction (in v1.0.0 and later, this is `'2'` XRP by default). See [Transaction Fees](#transaction-fees) for more information.
+maxFee | [value](#value) | *Optional* The maximum fee to pay for this transaction. If this exceeds the `maxFeeXRP` set in the RippleAPI constructor, `maxFeeXRP` will be used instead. See [Transaction Fees](#transaction-fees) for more information.
 maxLedgerVersion | integer,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version.
 maxLedgerVersion | string,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version.
 maxLedgerVersionOffset | integer | *Optional* Offset from current validated ledger version to highest ledger version that the transaction can be included in.
@@ -4957,7 +4957,6 @@ keypair | object | *Optional* The private and public key of the account that is 
 *keypair.* privateKey | privateKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 private key.
 *keypair.* publicKey | publicKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 public key.
 options | object | *Optional* Options that control the type of signature that will be generated.
-*options.* allowHighFee | boolean | *Optional* If true, permit transactions to pay a fee greater than 2000000 drops (2 XRP).
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
 secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field is exclusive with keypair).
 

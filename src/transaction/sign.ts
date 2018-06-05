@@ -4,6 +4,8 @@ import binary = require('ripple-binary-codec')
 import {computeBinaryTransactionHash} from 'ripple-hashes'
 import {SignOptions, KeyPair} from './types'
 import {BigNumber} from 'bignumber.js'
+import {xrpToDrops} from '../common'
+import {RippleAPI} from '../api'
 const validate = utils.common.validate
 
 function computeSignature(tx: Object, privateKey: string, signAs?: string) {
@@ -14,6 +16,7 @@ function computeSignature(tx: Object, privateKey: string, signAs?: string) {
 }
 
 function signWithKeypair(
+  api: RippleAPI,
   txJSON: string,
   keypair: KeyPair,
   options: SignOptions = {
@@ -28,14 +31,14 @@ function signWithKeypair(
       'txJSON must not contain "TxnSignature" or "Signers" properties'
     )
   }
-  if (options.allowHighFee !== true) {
-    const fee = new BigNumber(tx.Fee)
-    if (fee.greaterThan('2000000')) {
-      throw new utils.common.errors.ValidationError(
-        '"Fee" should not exceed "2000000". ' +
-        'To use a high fee, set `options.allowHighFee = true`.'
-      )
-    }
+
+  const fee = new BigNumber(tx.Fee)
+  const maxFeeDrops = xrpToDrops(api._maxFeeXRP)
+  if (fee.greaterThan(maxFeeDrops)) {
+    throw new utils.common.errors.ValidationError(
+      `"Fee" should not exceed "${maxFeeDrops}". ` +
+      'To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor.'
+    )
   }
 
   tx.SigningPubKey = options.signAs ? '' : keypair.publicKey
@@ -59,6 +62,7 @@ function signWithKeypair(
 }
 
 function sign(
+  this: RippleAPI,
   txJSON: string,
   secret?: any,
   options?: SignOptions,
@@ -68,9 +72,18 @@ function sign(
     // we can't validate that the secret matches the account because
     // the secret could correspond to the regular key
     validate.sign({txJSON, secret})
-    return signWithKeypair(txJSON, keypairs.deriveKeypair(secret), options)
+    return signWithKeypair(
+      this,
+      txJSON,
+      keypairs.deriveKeypair(secret),
+      options
+    )
   } else {
-    return signWithKeypair(txJSON, keypair ? keypair : secret, options)
+    return signWithKeypair(
+      this,
+      txJSON,
+      keypair ? keypair : secret,
+      options)
   }
 }
 

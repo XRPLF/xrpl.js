@@ -4,17 +4,18 @@
 
 ### Breaking Changes
 
-+ There is now a soft limit of 2 XRP on the fee specified in transaction instructions. Attempting to set a high fee will cause a `ValidationError` to be thrown. This error can be bypassed by setting `allowHighFee: true`.
-+ The value returned by `getFee()` is capped at 1 XRP. You can ignore this cap by setting `maximum` to `null`.
-+ When using `prepare*` methods, the `maxFee` parameter now has a default value of `'2'`.
++ During transaction preparation, there is now a maximum fee. Also, when a transaction is signed, its fee is checked and an error is thrown if the fee exceeds the maximum. The default `maxFeeXRP` is `'2'` (2 XRP). Override this value in the RippleAPI constructor.
++ Attempting to prepare a transaction with an exact `fee` higher than `maxFeeXRP` causes a `ValidationError` to be thrown.
++ Attempting to sign a transaction with a fee higher than `maxFeeXRP` causes a `ValidationError` to be thrown.
++ The value returned by `getFee()` is capped at `maxFeeXRP`.
++ When using `prepare*` methods, the `maxFee` parameter is capped by `maxFeeXRP`.
 
 #### Overview of fee limits
 
-Most users of ripple-lib do not need to make any code changes to accommodate the new soft limits on fees. These limits are designed to protect against the most severe cases where an unintentionally high fee may be used.
+Most users of ripple-lib do not need to make any code changes to accommodate the new soft limit on fees. The limit is designed to protect against the most severe cases where an unintentionally high fee may be used.
 
-+ When having ripple-lib provide the fee with a `prepare*` method, a default `maxFee` of `'2'` applies. You can prepare more economical transactions by setting `maxFee` lower, or support high-priority transactions by setting `maxFee` higher.
-+ To set a specific fee higher than 2 XRP, set `allowHighFee: true`. Such a high fee is not typical, but ripple-lib permits it with this override.
-+ When using `sign` with a Fee higher than 2 XRP, a `ValidationError` is thrown unless `allowHighFee` is set.
++ When having ripple-lib provide the fee with a `prepare*` method, a maximum fee of `maxFeeXRP` (default 2 XRP) applies. You can prepare more economical transactions by setting `maxFee` lower, or support high-priority transactions by setting a higher `maxFeeXRP` in the RippleAPI constructor.
++ When using `sign` with a Fee higher than `maxFeeXRP`, a `ValidationError` is thrown.
 
 If you have any questions or concerns, please open an issue on GitHub.
 

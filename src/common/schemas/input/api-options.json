@@ -12,6 +12,10 @@
       "minimum": 1,
       "description": "Factor to multiply estimated fee by to provide a cushion in case the required fee rises during submission of a transaction. Defaults to `1.2`."
     },
+    "maxFeeXRP": {
+      "type": "string",
+      "description": "Maximum fee to use with transactions, in XRP. Must be a string-encoded number. Defaults to `'2'`."
+    },
     "server": {
       "type": "string",
       "description": "URI for rippled websocket port to connect to. Must start with `wss://` or `ws://`.",

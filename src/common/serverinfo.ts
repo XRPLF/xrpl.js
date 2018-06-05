@@ -63,8 +63,7 @@ function getServerInfo(this: RippleAPI): Promise<GetServerInfoResponse> {
 
 async function getFee(
   this: RippleAPI,
-  cushion?: number,
-  maximum: number | BigNumber | null = 1
+  cushion?: number
 ): Promise<string> {
   if (cushion === undefined) {
     cushion = this._feeCushion
@@ -77,12 +76,10 @@ async function getFee(
   const baseFeeXrp = new BigNumber(serverInfo.validated_ledger.base_fee_xrp)
   const fee = baseFeeXrp.times(serverInfo.load_factor).times(cushion)
 
-  if (maximum) {
-    // Cap fee to `maximum` XRP
-    maximum = new BigNumber(maximum)
-    if (fee.greaterThan(maximum)) {
-      return maximum.toString(10)
-    }
+  // Cap fee to `this._maxFeeXRP`
+  const maxFeeXRP = new BigNumber(this._maxFeeXRP)
+  if (fee.greaterThan(maxFeeXRP)) {
+    return maxFeeXRP.toString(10)
   }
 
   return fee.toString(10)
