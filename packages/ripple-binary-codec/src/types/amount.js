@@ -33,7 +33,7 @@ This must be an integer number, with the absolute value not exceeding \
 ${MAX_NETWORK_DROPS}
 
 IOU values must have a maximum precision of ${MAX_IOU_PRECISION} significant \
-digits. They are serialized as\na canonicalised mantissa and exponent. 
+digits. They are serialized as\na canonicalised mantissa and exponent.
 
 The valid range for a mantissa is between ${MIN_IOU_MANTISSA} and \
 ${MAX_IOU_MANTISSA}
@@ -72,11 +72,11 @@ const parsers = {
 };
 
 const Amount = makeClass({
-  Amount(value, currency, issuer) {
+  Amount(value, currency, issuer, validate = true) {
     this.value = value || new Decimal('0');
     this.currency = currency || Currency.XRP;
     this.issuer = issuer || null;
-    this.assertValueIsValid();
+    validate && this.assertValueIsValid();
   },
   mixins: SerializedType,
   statics: {
@@ -108,13 +108,13 @@ const Amount = makeClass({
         // decimal.js won't accept e notation with hex
         const value = new Decimal(`${sign}0x${bytesToHex(mantissa)}`)
                                  .times('1e' + exponent);
-        return new this(value, currency, issuer);
+        return new this(value, currency, issuer, false);
       }
 
       mantissa[0] &= 0x3F;
       const drops = new Decimal(`${sign}0x${bytesToHex(mantissa)}`);
       const xrpValue = drops.dividedBy(DROPS_PER_XRP);
-      return new this(xrpValue, Currency.XRP);
+      return new this(xrpValue, Currency.XRP, null, false);
     }
   },
   assertValueIsValid() {
