@@ -8,13 +8,16 @@
 + Attempting to prepare a transaction with an exact `fee` higher than `maxFeeXRP` causes a `ValidationError` to be thrown.
 + Attempting to sign a transaction with a fee higher than `maxFeeXRP` causes a `ValidationError` to be thrown.
 + The value returned by `getFee()` is capped at `maxFeeXRP`.
-+ When using `prepare*` methods, the `maxFee` parameter is capped by `maxFeeXRP`.
+
+### Other Changes
+
++ In Transaction Instructions, the `maxFee` parameter is deprecated. Use the `maxFeeXRP` parameter in the RippleAPI constructor.
 
 #### Overview of fee limits
 
 Most users of ripple-lib do not need to make any code changes to accommodate the new soft limit on fees. The limit is designed to protect against the most severe cases where an unintentionally high fee may be used.
 
-+ When having ripple-lib provide the fee with a `prepare*` method, a maximum fee of `maxFeeXRP` (default 2 XRP) applies. You can prepare more economical transactions by setting `maxFee` lower, or support high-priority transactions by setting a higher `maxFeeXRP` in the RippleAPI constructor.
++ When having ripple-lib provide the fee with a `prepare*` method, a maximum fee of `maxFeeXRP` (default 2 XRP) applies. You can prepare more economical transactions by setting a lower `maxFeeXRP`, or support high-priority transactions by setting a higher `maxFeeXRP` in the RippleAPI constructor.
 + When using `sign` with a Fee higher than `maxFeeXRP`, a `ValidationError` is thrown.
 
 If you have any questions or concerns, please open an issue on GitHub.
