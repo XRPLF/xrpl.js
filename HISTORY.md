@@ -1,6 +1,6 @@
 # ripple-lib Release History
 
-## 1.0.0 (UNRELEASED)
+## 1.0.0-beta.2 (2018-06-08)
 
 ### Breaking Changes
 
@@ -13,7 +13,7 @@
 
 + In Transaction Instructions, the `maxFee` parameter is deprecated. Use the `maxFeeXRP` parameter in the RippleAPI constructor.
 
-#### Overview of fee limits
+#### Overview of new fee limit
 
 Most users of ripple-lib do not need to make any code changes to accommodate the new soft limit on fees. The limit is designed to protect against the most severe cases where an unintentionally high fee may be used.
 
@@ -21,6 +21,15 @@ Most users of ripple-lib do not need to make any code changes to accommodate the
 + When using `sign` with a Fee higher than `maxFeeXRP`, a `ValidationError` is thrown.
 
 If you have any questions or concerns, please open an issue on GitHub.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+ef348a2805098e61395b689b410cbf4bfd35e4d72e38c89f4ab74ec5e19793f5  ripple-1.0.0-beta.2-debug.js
+ea33fd53df8c7176d5fbf52dae0b64aade7180860f26449062cdbefaf8bd4d9b  ripple-1.0.0-beta.2-min.js
+fe5cc6e97c9b8a1470dacb34f16a64255cd639a25381abe9db1ba79e102456f2  ripple-1.0.0-beta.2.js
+```
 
 ## 1.0.0-beta.1 (2018-05-24)
 
