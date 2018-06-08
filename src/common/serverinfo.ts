@@ -77,12 +77,7 @@ async function getFee(
   const fee = baseFeeXrp.times(serverInfo.load_factor).times(cushion)
 
   // Cap fee to `this._maxFeeXRP`
-  const maxFeeXRP = new BigNumber(this._maxFeeXRP)
-  if (fee.greaterThan(maxFeeXRP)) {
-    return maxFeeXRP.toString(10)
-  }
-
-  return fee.toString(10)
+  return BigNumber.min(fee, this._maxFeeXRP).toString(10)
 }
 
 export {
