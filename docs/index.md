@@ -152,6 +152,7 @@ authorization | string | *Optional* Username and password for HTTP basic authent
 certificate | string | *Optional* A string containing the certificate key of the client in PEM format. (Can be an array of certificates).
 feeCushion | number | *Optional* Factor to multiply estimated fee by to provide a cushion in case the required fee rises during submission of a transaction. Defaults to `1.2`.
 key | string | *Optional* A string containing the private key of the client in PEM format. (Can be an array of keys).
+maxFeeXRP | string | *Optional* Maximum fee to use with transactions, in XRP. Must be a string-encoded number. Defaults to `'2'`.
 passphrase | string | *Optional* The passphrase for the private key of the client.
 proxy | uri string | *Optional* URI for HTTP/HTTPS proxy to use to connect to the rippled server.
 proxyAuthorization | string | *Optional* Username and password for HTTP basic authentication to the proxy in the format **username:password**.
@@ -316,7 +317,7 @@ Transaction instructions indicate how to execute a transaction, complementary wi
 Name | Type | Description
 ---- | ---- | -----------
 fee | [value](#value) | *Optional* An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.
-maxFee | [value](#value) | *Optional* The maximum fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.
+maxFee | [value](#value) | *Optional* Deprecated: Use `maxFeeXRP` in the RippleAPI constructor instead. The maximum fee to pay for this transaction. If this exceeds `maxFeeXRP`, `maxFeeXRP` will be used instead. See [Transaction Fees](#transaction-fees) for more information.
 maxLedgerVersion | integer,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version.
 maxLedgerVersion | string,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version.
 maxLedgerVersionOffset | integer | *Optional* Offset from current validated ledger version to highest ledger version that the transaction can be included in.
@@ -1076,7 +1077,9 @@ Returns the estimated transaction fee for the rippled server the RippleAPI insta
 
 ### Parameters
 
-This method has no parameters.
+Name | Type | Description
+---- | ---- | -----------
+cushion | number | *Optional* The fee is the product of the base fee, the `load_factor`, and this cushion. Default is provided by the `RippleAPI` constructor's `feeCushion`.
 
 ### Return Value
 

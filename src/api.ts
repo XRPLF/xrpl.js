@@ -64,6 +64,7 @@ import {clamp} from './ledger/utils'
 export type APIOptions = {
   server?: string,
   feeCushion?: number,
+  maxFeeXRP?: string,
   trace?: boolean,
   proxy?: string,
   timeout?: number
@@ -88,6 +89,7 @@ function getCollectKeyFromCommand(command: string): string|undefined {
 
 class RippleAPI extends EventEmitter {
   _feeCushion: number
+  _maxFeeXRP: string
 
   // New in > 0.21.0
   // non-validated ledger versions are allowed, and passed to rippled as-is.
@@ -105,6 +107,7 @@ class RippleAPI extends EventEmitter {
     super()
     validate.apiOptions(options)
     this._feeCushion = options.feeCushion || 1.2
+    this._maxFeeXRP = options.maxFeeXRP || '2'
     const serverURL = options.server
     if (serverURL !== undefined) {
       this.connection = new Connection(serverURL, options)
