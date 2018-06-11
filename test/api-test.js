@@ -444,6 +444,33 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.prepareOrder.sell, 'prepare'));
   });
 
+  it('prepareOrder - XRP value with more than 6 decimal places', function () {
+    const request = {
+      "direction": "sell",
+      "quantity": {
+        "currency": "BCH",
+        "counterparty": "rcyS4CeCZVYvTiKcxj6Sx32ibKwcDHLds",
+        "value": "10.42696400"
+      },
+      "totalPrice": {
+        "currency": "XRP",
+        "value": "19792.80964382"
+      }
+    }
+
+    const response = {
+      "txJSON": "{\"TransactionType\":\"OfferCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"TakerGets\":{\"currency\":\"BCH\",\"issuer\":\"rcyS4CeCZVYvTiKcxj6Sx32ibKwcDHLds\",\"value\":\"10.42696400\"},\"TakerPays\":\"19792809643\",\"Flags\":2148007936,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+      "instructions": {
+        "fee": "0.000012",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }
+
+    return this.api.prepareOrder(address, request, instructions).then(
+      _.partial(checkResult, response, 'prepare'));
+  })
+
   it('prepareOrderCancellation', function () {
     const request = requests.prepareOrderCancellation.simple;
     return this.api.prepareOrderCancellation(address, request, instructions)
