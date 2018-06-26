@@ -118,14 +118,12 @@ describe('RippleAPI', function () {
       assert.strictEqual(drops, '-2000000', '(number) -2 XRP equals -2 million drops')
     })
 
-    it('throws with an amount with too many decimal places', function () {
-      assert.throws(() => {
-        this.api.xrpToDrops('1.1234567')
-      }, /has too many decimal places/)
-
-      assert.throws(() => {
-        this.api.xrpToDrops('0.0000001')
-      }, /has too many decimal places/)
+    it('truncates an amount with too many decimal places', function () {
+      let drops = this.api.xrpToDrops('1.1234567')
+      assert.strictEqual(drops, '1123456', '1.1234567 XRP rounds down to 1123456 drops')
+      
+      drops = this.api.xrpToDrops('0.0000001')
+      assert.strictEqual(drops, '0', '0.0000001 XRP rounds down to 0 drops')
     })
 
     it('throws with an invalid value', function () {
