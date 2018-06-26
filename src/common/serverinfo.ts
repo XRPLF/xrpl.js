@@ -77,7 +77,7 @@ async function getFee(
   const fee = baseFeeXrp.times(serverInfo.load_factor).times(cushion)
 
   // Cap fee to `this._maxFeeXRP`
-  return BigNumber.min(fee, this._maxFeeXRP).toString(10)
+  return (new BigNumber(BigNumber.min(fee, this._maxFeeXRP).toFormat(6))).toString(10)
 }
 
 export {

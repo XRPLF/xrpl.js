@@ -152,7 +152,7 @@ module.exports = function createMockRippled(port) {
 
   mock.on('request_server_info', function (request, conn) {
     assert.strictEqual(request.command, 'server_info');
-    if (conn.config.highLoadFactor) {
+    if (conn.config.highLoadFactor || conn.config.loadFactor) {
       const response = {
         "id": 0,
         "status": "success",
@@ -167,7 +167,7 @@ module.exports = function createMockRippled(port) {
               "converge_time_s": 2.007,
               "proposers": 4
             },
-            "load_factor": 4294967296,
+            "load_factor": conn.config.loadFactor || 4294967296,
             "peers": 53,
             "pubkey_node": "n94wWvFUmaKGYrKUGgpv1DyYgDeXRGdACkNQaSe7zJiy5Znio7UC",
             "server_state": "full",
