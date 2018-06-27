@@ -1826,10 +1826,6 @@ describe('RippleAPI', function () {
       data: { loadFactor: 5407.96875 }
     }));
 
-    const localInstructions = _.defaults({
-      maxFee: '4'
-    }, instructions);
-
     const expectedResponse = {
       "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"64896\",\"Sequence\":23}",
       "instructions": {
@@ -1840,7 +1836,7 @@ describe('RippleAPI', function () {
     }    
 
     return this.api.preparePayment(
-      address, requests.preparePayment.normal, localInstructions).then(
+      address, requests.preparePayment.normal, instructions).then(
         _.partial(checkResult, expectedResponse, 'prepare'));
   });
 
