@@ -430,7 +430,7 @@ ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through 
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -532,7 +532,7 @@ transferRate | number,null | *Optional*  The fee to charge when users transfer t
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -4217,7 +4217,7 @@ const trustline = {
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -4400,7 +4400,7 @@ const settings = {
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -4416,7 +4416,7 @@ return api.prepareSettings(address, settings)
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
