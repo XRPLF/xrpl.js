@@ -74,10 +74,12 @@ async function getFee(
 
   const serverInfo = (await this.request('server_info')).info
   const baseFeeXrp = new BigNumber(serverInfo.validated_ledger.base_fee_xrp)
-  const fee = baseFeeXrp.times(serverInfo.load_factor).times(cushion)
+  let fee = baseFeeXrp.times(serverInfo.load_factor).times(cushion)
 
   // Cap fee to `this._maxFeeXRP`
-  return BigNumber.min(fee, this._maxFeeXRP).toString(10)
+  fee = BigNumber.min(fee, this._maxFeeXRP)
+  // Round fee to 6 decimal places
+  return (new BigNumber(fee.toFormat(6))).toString(10)
 }
 
 export {

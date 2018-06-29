@@ -1820,6 +1820,26 @@ describe('RippleAPI', function () {
         _.partial(checkResult, expectedResponse, 'prepare'));
   });
 
+  it('fee - calculated fee does not use more than 6 decimal places', function () {
+    this.api.connection._send(JSON.stringify({
+      command: 'config',
+      data: { loadFactor: 5407.96875 }
+    }));
+
+    const expectedResponse = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"64896\",\"Sequence\":23}",
+      "instructions": {
+        "fee": "0.064896",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }    
+
+    return this.api.preparePayment(
+      address, requests.preparePayment.normal, instructions).then(
+        _.partial(checkResult, expectedResponse, 'prepare'));
+  });
+
   it('disconnect & isConnected', function () {
     assert.strictEqual(this.api.isConnected(), true);
     return this.api.disconnect().then(() => {
