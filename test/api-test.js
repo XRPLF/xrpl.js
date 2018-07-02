@@ -561,10 +561,24 @@ describe('RippleAPI', function () {
   });
 
   it('prepareSettings - set signers', function () {
-    const settings = requests.prepareSettings.signers;
+    const settings = requests.prepareSettings.signers.normal;
     return this.api.prepareSettings(address, settings, instructions).then(
       _.partial(checkResult, responses.prepareSettings.signers,
         'prepare'));
+  });
+
+  it('prepareSettings - signers no threshold', function () {
+    const settings = requests.prepareSettings.signers.noThreshold;
+    assert.throws(() => {
+      this.api.prepareSettings(address, settings, instructions);
+    }, this.api.errors.ValidationError);
+  });
+
+  it('prepareSettings - signers no weights', function () {
+    const settings = requests.prepareSettings.signers.noWeights;
+    assert.throws(() => {
+      this.api.prepareSettings(address, settings, instructions);
+    }, this.api.errors.ValidationError);
   });
 
   it('prepareSettings - fee for multisign', function () {
