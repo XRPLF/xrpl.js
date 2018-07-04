@@ -4,6 +4,7 @@ import {Memo} from '../common/types/objects'
 const txFlags = common.txFlags
 import {Instructions, Prepare} from './types'
 import {RippleAPI} from '../api'
+import {ValidationError} from '../common/errors'
 
 export type ApiMemo = {
   MemoData?: string,
@@ -63,6 +64,13 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
     const multiplier = instructions.signersCount === undefined ? 1 :
       instructions.signersCount + 1
     if (instructions.fee !== undefined) {
+      const fee = new BigNumber(instructions.fee)
+      if (fee.greaterThan(api._maxFeeXRP)) {
+        const errorMessage = `Fee of ${fee.toString(10)} XRP exceeds ` +
+          `max of ${api._maxFeeXRP} XRP. To use this fee, increase ` +
+          '`maxFeeXRP` in the RippleAPI constructor.'
+        throw new ValidationError(errorMessage)
+      }
       txJSON.Fee = scaleValue(common.xrpToDrops(instructions.fee), multiplier)
       return Promise.resolve(txJSON)
     }
@@ -75,13 +83,12 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
             (cushion * feeRef * (32 + Math.floor(
               new Buffer(txJSON.Fulfillment, 'hex').length / 16)))
         const feeDrops = common.xrpToDrops(fee)
-        if (instructions.maxFee !== undefined) {
-          const maxFeeDrops = common.xrpToDrops(instructions.maxFee)
-          const normalFee = scaleValue(feeDrops, multiplier, extraFee)
-          txJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString()
-        } else {
-          txJSON.Fee = scaleValue(feeDrops, multiplier, extraFee)
-        }
+        const maxFeeXRP = instructions.maxFee ?
+          BigNumber.min(api._maxFeeXRP, instructions.maxFee) : api._maxFeeXRP
+        const maxFeeDrops = common.xrpToDrops(maxFeeXRP)
+        const normalFee = scaleValue(feeDrops, multiplier, extraFee)
+        txJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
+
         return txJSON
       })
     })

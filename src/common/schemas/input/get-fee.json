@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getFeeParameters",
+  "description": "Parameters for getFee",
+  "type": "object",
+  "properties": {
+    "cushion": {
+      "type": "number",
+      "description": "The fee is the product of the base fee, the `load_factor`, and this cushion. Default is provided by the `RippleAPI` constructor's `feeCushion`."
+    }
+  },
+  "additionalProperties": false
+}

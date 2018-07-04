@@ -93,7 +93,9 @@
           "minItems": 1,
           "maxItems": 8
         }
-      }
+      },
+      "required": ["threshold", "weights"],
+      "additionalProperties": false
     },
     "transferRate": {
       "description": " The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.",

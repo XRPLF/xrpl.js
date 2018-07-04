@@ -14,7 +14,7 @@
       "$ref": "value"
     },
     "maxFee": {
-      "description": "The maximum fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.",
+      "description": "Deprecated: Use `maxFeeXRP` in the RippleAPI constructor instead. The maximum fee to pay for this transaction. If this exceeds `maxFeeXRP`, `maxFeeXRP` will be used instead. See [Transaction Fees](#transaction-fees) for more information.",
       "$ref": "value"
     },
     "maxLedgerVersion": {

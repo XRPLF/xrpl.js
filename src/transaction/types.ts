@@ -12,6 +12,7 @@ import {ApiMemo} from './utils'
 export type Instructions = {
   sequence?: number,
   fee?: string,
+  // @deprecated
   maxFee?: string,
   maxLedgerVersion?: number,
   maxLedgerVersionOffset?: number,

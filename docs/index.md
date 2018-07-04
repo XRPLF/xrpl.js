@@ -152,6 +152,7 @@ authorization | string | *Optional* Username and password for HTTP basic authent
 certificate | string | *Optional* A string containing the certificate key of the client in PEM format. (Can be an array of certificates).
 feeCushion | number | *Optional* Factor to multiply estimated fee by to provide a cushion in case the required fee rises during submission of a transaction. Defaults to `1.2`.
 key | string | *Optional* A string containing the private key of the client in PEM format. (Can be an array of keys).
+maxFeeXRP | string | *Optional* Maximum fee to use with transactions, in XRP. Must be a string-encoded number. Defaults to `'2'`.
 passphrase | string | *Optional* The passphrase for the private key of the client.
 proxy | uri string | *Optional* URI for HTTP/HTTPS proxy to use to connect to the rippled server.
 proxyAuthorization | string | *Optional* Username and password for HTTP basic authentication to the proxy in the format **username:password**.
@@ -167,7 +168,7 @@ If you omit the `server` parameter, RippleAPI operates [offline](#offline-functi
 
 1. Install [Node.js](https://nodejs.org) and [Yarn](https://yarnpkg.com/en/docs/install). Most Linux distros have a package for Node.js; check that it's the version you want.
 2. Use yarn to install RippleAPI:
-      `yarn install ripple-lib`
+      `yarn add ripple-lib`
 
 After you have installed ripple-lib, you can create scripts using the [boilerplate](#boilerplate) and run them using the Node.js executable, typically named `node`:
 
@@ -316,7 +317,7 @@ Transaction instructions indicate how to execute a transaction, complementary wi
 Name | Type | Description
 ---- | ---- | -----------
 fee | [value](#value) | *Optional* An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.
-maxFee | [value](#value) | *Optional* The maximum fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.
+maxFee | [value](#value) | *Optional* Deprecated: Use `maxFeeXRP` in the RippleAPI constructor instead. The maximum fee to pay for this transaction. If this exceeds `maxFeeXRP`, `maxFeeXRP` will be used instead. See [Transaction Fees](#transaction-fees) for more information.
 maxLedgerVersion | integer,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version.
 maxLedgerVersion | string,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version.
 maxLedgerVersionOffset | integer | *Optional* Offset from current validated ledger version to highest ledger version that the transaction can be included in.
@@ -429,7 +430,7 @@ ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through 
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -531,7 +532,7 @@ transferRate | number,null | *Optional*  The fee to charge when users transfer t
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -1076,7 +1077,9 @@ Returns the estimated transaction fee for the rippled server the RippleAPI insta
 
 ### Parameters
 
-This method has no parameters.
+Name | Type | Description
+---- | ---- | -----------
+cushion | number | *Optional* The fee is the product of the base fee, the `load_factor`, and this cushion. Default is provided by the `RippleAPI` constructor's `feeCushion`.
 
 ### Return Value
 
@@ -2470,9 +2473,9 @@ asks[] | object | An order in the order book.
 *asks[].state.* fundedAmount | [amount](#amount) | How much of the amount the maker would have to pay that the maker currently holds.
 *asks[].state.* priceOfFundedAmount | [amount](#amount) | How much the `fundedAmount` would convert to through the exchange rate of this order.
 
-### New in ripple-lib 0.22.0 and higher
+### Raw order data
 
-The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
+(Requires ripple-lib 0.22.0 or higher.) The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
 
 For details, see the rippled method [book_offers](https://ripple.com/build/rippled-apis/#book-offers).
 
@@ -4214,7 +4217,7 @@ const trustline = {
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -4226,7 +4229,7 @@ return api.prepareTrustline(address, trustline).then(prepared =>
 
 ```json
 {
-  "txJSON": "{\"TransactionType\":\"TrustSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"LimitAmount\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"10000\"},\"Flags\":2149711872,\"QualityIn\":910000000,\"QualityOut\":870000000,\"Memos\":[{\"Memo\":{\"MemoData\":\"7465787465642064617461\",\"MemoType\":\"74657374\",\"MemoFormat\":\"706C61696E2F74657874\"}}],\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"TransactionType\":\"TrustSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"LimitAmount\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"10000\"},\"Flags\":2149711872,\"QualityIn\":910000000,\"QualityOut\":870000000,\"Memos\":[{\"Memo\":{\"MemoData\":\"7465787465642064617461\",\"MemoType\":\"74657374\",\"MemoFormat\":\"746578742F706C61696E\"}}],\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
   "instructions": {
     "fee": "0.000012",
     "sequence": 23,
@@ -4397,7 +4400,7 @@ const settings = {
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -4413,7 +4416,7 @@ return api.prepareSettings(address, settings)
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
