@@ -789,7 +789,7 @@ describe('RippleAPI', function () {
             {
               Memo: {
                 MemoType: this.api.convertStringToHex('test'),
-                MemoFormat: this.api.convertStringToHex('plain/text'),
+                MemoFormat: this.api.convertStringToHex('text/plain'),
                 MemoData: this.api.convertStringToHex('texted data')
               }
             }
