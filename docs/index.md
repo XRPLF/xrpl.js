@@ -430,7 +430,7 @@ ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through 
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -532,7 +532,7 @@ transferRate | number,null | *Optional*  The fee to charge when users transfer t
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -4217,7 +4217,7 @@ const trustline = {
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -4229,7 +4229,7 @@ return api.prepareTrustline(address, trustline).then(prepared =>
 
 ```json
 {
-  "txJSON": "{\"TransactionType\":\"TrustSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"LimitAmount\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"10000\"},\"Flags\":2149711872,\"QualityIn\":910000000,\"QualityOut\":870000000,\"Memos\":[{\"Memo\":{\"MemoData\":\"7465787465642064617461\",\"MemoType\":\"74657374\",\"MemoFormat\":\"706C61696E2F74657874\"}}],\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+  "txJSON": "{\"TransactionType\":\"TrustSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"LimitAmount\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"10000\"},\"Flags\":2149711872,\"QualityIn\":910000000,\"QualityOut\":870000000,\"Memos\":[{\"Memo\":{\"MemoData\":\"7465787465642064617461\",\"MemoType\":\"74657374\",\"MemoFormat\":\"746578742F706C61696E\"}}],\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
   "instructions": {
     "fee": "0.000012",
     "sequence": 23,
@@ -4400,7 +4400,7 @@ const settings = {
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
@@ -4416,7 +4416,7 @@ return api.prepareSettings(address, settings)
   "memos": [
     {
       "type": "test",
-      "format": "plain/text",
+      "format": "text/plain",
       "data": "texted data"
     }
   ]
