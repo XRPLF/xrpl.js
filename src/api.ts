@@ -1,11 +1,9 @@
 import {EventEmitter} from 'events'
-import {Connection, errors, validate} from './common'
+import {Connection, errors, validate, xrpToDrops, dropsToXrp} from './common'
 import {
   connect,
   disconnect,
   isConnected,
-  getServerInfo,
-  getFee,
   getLedgerVersion,
   formatLedgerClose
 } from './server/server'
@@ -52,18 +50,21 @@ import {
   BookOffersRequest, BookOffersResponse,
   GatewayBalancesRequest, GatewayBalancesResponse,
   LedgerRequest, LedgerResponse,
-  LedgerEntryRequest, LedgerEntryResponse
+  LedgerEntryRequest, LedgerEntryResponse,
+  ServerInfoRequest, ServerInfoResponse
 } from './common/types/commands'
 
 
 import RangeSet from './common/rangeset'
 import * as ledgerUtils from './ledger/utils'
 import * as schemaValidator from './common/schema-validator'
+import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp} from './ledger/utils'
 
 export type APIOptions = {
   server?: string,
   feeCushion?: number,
+  maxFeeXRP?: string,
   trace?: boolean,
   proxy?: string,
   timeout?: number
@@ -88,6 +89,7 @@ function getCollectKeyFromCommand(command: string): string|undefined {
 
 class RippleAPI extends EventEmitter {
   _feeCushion: number
+  _maxFeeXRP: string
 
   // New in > 0.21.0
   // non-validated ledger versions are allowed, and passed to rippled as-is.
@@ -105,6 +107,7 @@ class RippleAPI extends EventEmitter {
     super()
     validate.apiOptions(options)
     this._feeCushion = options.feeCushion || 1.2
+    this._maxFeeXRP = options.maxFeeXRP || '2'
     const serverURL = options.server
     if (serverURL !== undefined) {
       this.connection = new Connection(serverURL, options)
@@ -148,6 +151,8 @@ class RippleAPI extends EventEmitter {
     Promise<LedgerResponse>
   async request(command: 'ledger_entry', params: LedgerEntryRequest):
     Promise<LedgerEntryResponse>
+  async request(command: 'server_info', params?: ServerInfoRequest):
+    Promise<ServerInfoResponse>
   async request(command: string, params: any):
     Promise<any>
   async request(command: string, params: any = {}): Promise<any> {
@@ -289,6 +294,9 @@ class RippleAPI extends EventEmitter {
   signPaymentChannelClaim = signPaymentChannelClaim
   verifyPaymentChannelClaim = verifyPaymentChannelClaim
   errors = errors
+
+  xrpToDrops = xrpToDrops
+  dropsToXrp = dropsToXrp
 }
 
 export {

@@ -9,11 +9,11 @@
       "$ref": "value"
     },
     "currency": {
-      "description": "The three-character code or hexadecimal string used to denote currencies",
+      "description": "The three-character code or hexadecimal string used to denote currencies, or \"drops\" for the smallest unit of XRP.",
       "$ref": "currency"
     },
     "counterparty": {
-      "description": "The Ripple address of the account that owes or is owed the funds (omitted if `currency` is \"XRP\")",
+      "description": "The Ripple address of the account that owes or is owed the funds (omitted if `currency` is \"XRP\" or \"drops\")",
       "$ref": "address"
     }
   },
@@ -24,7 +24,7 @@
       "properties": {
         "currency": {
           "not": {
-            "enum": ["XRP"]
+            "enum": ["XRP", "drops"]
           }
         }
       },
@@ -33,7 +33,7 @@
     {
       "properties": {
         "currency": {
-          "enum": ["XRP"]
+          "enum": ["XRP", "drops"]
         }
       },
       "not": {

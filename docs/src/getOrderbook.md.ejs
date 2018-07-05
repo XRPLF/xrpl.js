@@ -14,9 +14,9 @@ This method returns a promise that resolves with an object with the following st
 
 <%- renderSchema('output/get-orderbook.json') %>
 
-### New in ripple-lib 0.22.0 and higher
+### Raw order data
 
-The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
+(Requires ripple-lib 0.22.0 or higher.) The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
 
 For details, see the rippled method [book_offers](https://ripple.com/build/rippled-apis/#book-offers).
 

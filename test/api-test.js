@@ -15,6 +15,7 @@ const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 const binary = require('ripple-binary-codec');
+const BigNumber = require('bignumber.js')
 assert.options.strict = true;
 
 // how long before each test case times out
@@ -51,6 +52,224 @@ describe('RippleAPI', function () {
     assert.strictEqual(error.inspect(), '[RippleError(mess, { data: 1 })]');
   });
 
+  describe('xrpToDrops', function () {
+    it('works with a typical amount', function () {
+      const drops = this.api.xrpToDrops('2')
+      assert.strictEqual(drops, '2000000', '2 XRP equals 2 million drops')
+    })
+
+    it('works with fractions', function () {
+      let drops = this.api.xrpToDrops('3.456789')
+      assert.strictEqual(drops, '3456789', '3.456789 XRP equals 3,456,789 drops')
+
+      drops = this.api.xrpToDrops('3.400000')
+      assert.strictEqual(drops, '3400000', '3.400000 XRP equals 3,400,000 drops')
+
+      drops = this.api.xrpToDrops('0.000001')
+      assert.strictEqual(drops, '1', '0.000001 XRP equals 1 drop')
+
+      drops = this.api.xrpToDrops('0.0000010')
+      assert.strictEqual(drops, '1', '0.0000010 XRP equals 1 drop')
+    })
+
+    it('works with zero', function () {
+      let drops = this.api.xrpToDrops('0')
+      assert.strictEqual(drops, '0', '0 XRP equals 0 drops')
+
+      // negative zero is equivalent to zero
+      drops = this.api.xrpToDrops('-0')
+      assert.strictEqual(drops, '0', '-0 XRP equals 0 drops')
+
+      drops = this.api.xrpToDrops('0.000000')
+      assert.strictEqual(drops, '0', '0.000000 XRP equals 0 drops')
+
+      drops = this.api.xrpToDrops('0.0000000')
+      assert.strictEqual(drops, '0', '0.0000000 XRP equals 0 drops')
+    })
+
+    it('works with a negative value', function () {
+      const drops = this.api.xrpToDrops('-2')
+      assert.strictEqual(drops, '-2000000', '-2 XRP equals -2 million drops')
+    })
+
+    it('works with a value ending with a decimal point', function () {
+      let drops = this.api.xrpToDrops('2.')
+      assert.strictEqual(drops, '2000000', '2. XRP equals 2000000 drops')
+
+      drops = this.api.xrpToDrops('-2.')
+      assert.strictEqual(drops, '-2000000', '-2. XRP equals -2000000 drops')
+    })
+
+    it('works with BigNumber objects', function () {
+      let drops = this.api.xrpToDrops(new BigNumber(2))
+      assert.strictEqual(drops, '2000000', '(BigNumber) 2 XRP equals 2 million drops')
+
+      drops = this.api.xrpToDrops(new BigNumber(-2))
+      assert.strictEqual(drops, '-2000000', '(BigNumber) -2 XRP equals -2 million drops')
+    })
+
+    it('works with a number', function() {
+      // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
+
+      let drops = this.api.xrpToDrops(2)
+      assert.strictEqual(drops, '2000000', '(number) 2 XRP equals 2 million drops')
+
+      drops = this.api.xrpToDrops(-2)
+      assert.strictEqual(drops, '-2000000', '(number) -2 XRP equals -2 million drops')
+    })
+
+    it('throws with an amount with too many decimal places', function () {
+      assert.throws(() => {
+        this.api.xrpToDrops('1.1234567')
+      }, /has too many decimal places/)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('0.0000001')
+      }, /has too many decimal places/)
+    })
+
+    it('throws with an invalid value', function () {
+      assert.throws(() => {
+        this.api.xrpToDrops('FOO')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('1e-7')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('2,0')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('.')
+      }, /xrpToDrops\: invalid value '\.', should be a BigNumber or string-encoded number\./)
+    })
+
+    it('throws with an amount more than one decimal point', function () {
+      assert.throws(() => {
+        this.api.xrpToDrops('1.0.0')
+      }, /xrpToDrops:\ invalid\ value\ '1\.0\.0'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+
+      assert.throws(() => {
+        this.api.xrpToDrops('...')
+      }, /xrpToDrops:\ invalid\ value\ '\.\.\.'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+    })
+  })
+
+  describe('dropsToXrp', function () {
+    it('works with a typical amount', function () {
+      const xrp = this.api.dropsToXrp('2000000')
+      assert.strictEqual(xrp, '2', '2 million drops equals 2 XRP')
+    })
+
+    it('works with fractions', function () {
+      let xrp = this.api.dropsToXrp('3456789')
+      assert.strictEqual(xrp, '3.456789', '3,456,789 drops equals 3.456789 XRP')
+
+      xrp = this.api.dropsToXrp('3400000')
+      assert.strictEqual(xrp, '3.4', '3,400,000 drops equals 3.4 XRP')
+
+      xrp = this.api.dropsToXrp('1')
+      assert.strictEqual(xrp, '0.000001', '1 drop equals 0.000001 XRP')
+
+      xrp = this.api.dropsToXrp('1.0')
+      assert.strictEqual(xrp, '0.000001', '1.0 drops equals 0.000001 XRP')
+
+      xrp = this.api.dropsToXrp('1.00')
+      assert.strictEqual(xrp, '0.000001', '1.00 drops equals 0.000001 XRP')
+    })
+
+    it('works with zero', function () {
+      let xrp = this.api.dropsToXrp('0')
+      assert.strictEqual(xrp, '0', '0 drops equals 0 XRP')
+
+      // negative zero is equivalent to zero
+      xrp = this.api.dropsToXrp('-0')
+      assert.strictEqual(xrp, '0', '-0 drops equals 0 XRP')
+
+      xrp = this.api.dropsToXrp('0.00')
+      assert.strictEqual(xrp, '0', '0.00 drops equals 0 XRP')
+
+      xrp = this.api.dropsToXrp('000000000')
+      assert.strictEqual(xrp, '0', '000000000 drops equals 0 XRP')
+    })
+
+    it('works with a negative value', function () {
+      const xrp = this.api.dropsToXrp('-2000000')
+      assert.strictEqual(xrp, '-2', '-2 million drops equals -2 XRP')
+    })
+
+    it('works with a value ending with a decimal point', function () {
+      let xrp = this.api.dropsToXrp('2000000.')
+      assert.strictEqual(xrp, '2', '2000000. drops equals 2 XRP')
+
+      xrp = this.api.dropsToXrp('-2000000.')
+      assert.strictEqual(xrp, '-2', '-2000000. drops equals -2 XRP')
+    })
+
+    it('works with BigNumber objects', function () {
+      let xrp = this.api.dropsToXrp(new BigNumber(2000000))
+      assert.strictEqual(xrp, '2', '(BigNumber) 2 million drops equals 2 XRP')
+
+      xrp = this.api.dropsToXrp(new BigNumber(-2000000))
+      assert.strictEqual(xrp, '-2', '(BigNumber) -2 million drops equals -2 XRP')
+
+      xrp = this.api.dropsToXrp(new BigNumber(2345678))
+      assert.strictEqual(xrp, '2.345678', '(BigNumber) 2,345,678 drops equals 2.345678 XRP')
+
+      xrp = this.api.dropsToXrp(new BigNumber(-2345678))
+      assert.strictEqual(xrp, '-2.345678', '(BigNumber) -2,345,678 drops equals -2.345678 XRP')
+    })
+
+    it('works with a number', function() {
+      // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
+
+      let xrp = this.api.dropsToXrp(2000000)
+      assert.strictEqual(xrp, '2', '(number) 2 million drops equals 2 XRP')
+
+      xrp = this.api.dropsToXrp(-2000000)
+      assert.strictEqual(xrp, '-2', '(number) -2 million drops equals -2 XRP')
+    })
+
+    it('throws with an amount with too many decimal places', function () {
+      assert.throws(() => {
+        this.api.dropsToXrp('1.2')
+      }, /has too many decimal places/)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('0.10')
+      }, /has too many decimal places/)
+    })
+
+    it('throws with an invalid value', function () {
+      assert.throws(() => {
+        this.api.dropsToXrp('FOO')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('1e-7')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('2,0')
+      }, /invalid value/)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('.')
+      }, /dropsToXrp\: invalid value '\.', should be a BigNumber or string-encoded number\./)
+    })
+
+    it('throws with an amount more than one decimal point', function () {
+      assert.throws(() => {
+        this.api.dropsToXrp('1.0.0')
+      }, /dropsToXrp:\ invalid\ value\ '1\.0\.0'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+
+      assert.throws(() => {
+        this.api.dropsToXrp('...')
+      }, /dropsToXrp:\ invalid\ value\ '\.\.\.'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+    })
+  })
   describe('pagination', function () {
 
     describe('hasNextPage', function () {
@@ -172,6 +391,37 @@ describe('RippleAPI', function () {
       return this.api.preparePayment(address, responses.getPaths.sendAll[0],
         instructions).then(_.partial(checkResult,
           responses.preparePayment.minAmount, 'prepare'));
+    });
+
+    it('preparePayment - throws when fee exceeds 2 XRP', function () {
+      const localInstructions = _.defaults({
+        fee: '2.1'
+      }, instructions);
+
+      assert.throws(() => {
+        this.api.preparePayment(
+          address, requests.preparePayment.normal, localInstructions)
+      }, /Fee of 2\.1 XRP exceeds max of 2 XRP\. To use this fee, increase `maxFeeXRP` in the RippleAPI constructor\./)
+    });
+
+    it('preparePayment - allows fee exceeding 2 XRP when maxFeeXRP is higher', function () {
+      this.api._maxFeeXRP = '2.2'
+      const localInstructions = _.defaults({
+        fee: '2.1'
+      }, instructions);
+
+      const expectedResponse = {
+        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"2100000\",\"Sequence\":23}",
+        "instructions": {
+          "fee": "2.1",
+          "sequence": 23,
+          "maxLedgerVersion": 8820051
+        }
+      }
+
+      return this.api.preparePayment(
+        address, requests.preparePayment.normal, localInstructions).then(
+          _.partial(checkResult, expectedResponse, 'prepare'));
     });
   });
 
@@ -311,10 +561,24 @@ describe('RippleAPI', function () {
   });
 
   it('prepareSettings - set signers', function () {
-    const settings = requests.prepareSettings.signers;
+    const settings = requests.prepareSettings.signers.normal;
     return this.api.prepareSettings(address, settings, instructions).then(
       _.partial(checkResult, responses.prepareSettings.signers,
         'prepare'));
+  });
+
+  it('prepareSettings - signers no threshold', function () {
+    const settings = requests.prepareSettings.signers.noThreshold;
+    assert.throws(() => {
+      this.api.prepareSettings(address, settings, instructions);
+    }, this.api.errors.ValidationError);
+  });
+
+  it('prepareSettings - signers no weights', function () {
+    const settings = requests.prepareSettings.signers.noWeights;
+    assert.throws(() => {
+      this.api.prepareSettings(address, settings, instructions);
+    }, this.api.errors.ValidationError);
   });
 
   it('prepareSettings - fee for multisign', function () {
@@ -602,6 +866,62 @@ describe('RippleAPI', function () {
       signAs: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
     });
     assert.deepEqual(signature, responses.sign.signAs);
+  });
+
+  it('sign - throws when Fee exceeds maxFeeXRP (in drops)', function () {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const request = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"AccountSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Domain\":\"726970706C652E636F6D\",\"LastLedgerSequence\":8820051,\"Fee\":\"2010000\",\"Sequence\":23,\"SigningPubKey\":\"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8\"}",
+      "instructions": {
+        "fee": "2.01",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }
+    
+    assert.throws(() => {
+      this.api.sign(request.txJSON, secret)
+    }, /Fee" should not exceed "2000000"\. To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor\./)
+  });
+
+  it('sign - throws when Fee exceeds maxFeeXRP (in drops) - custom maxFeeXRP', function () {
+    this.api._maxFeeXRP = '1.9'
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const request = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"AccountSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Domain\":\"726970706C652E636F6D\",\"LastLedgerSequence\":8820051,\"Fee\":\"2010000\",\"Sequence\":23,\"SigningPubKey\":\"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8\"}",
+      "instructions": {
+        "fee": "2.01",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }
+    
+    assert.throws(() => {
+      this.api.sign(request.txJSON, secret)
+    }, /Fee" should not exceed "1900000"\. To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor\./)
+  });
+
+  it('sign - permits fee exceeding 2000000 drops when maxFeeXRP is higher than 2 XRP', function () {
+    this.api._maxFeeXRP = '2.1'
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const request = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"AccountSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Domain\":\"726970706C652E636F6D\",\"LastLedgerSequence\":8820051,\"Fee\":\"2010000\",\"Sequence\":23,\"SigningPubKey\":\"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8\"}",
+      "instructions": {
+        "fee": "2.01",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }
+
+    const result = this.api.sign(request.txJSON, secret)
+
+    const expectedResponse =  {
+      signedTransaction: "12000322800000002400000017201B008695536840000000001EAB90732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8744630440220384FBB48EEE7B0E58BD89294A609F9407C51FBE8FA08A4B305B22E9A7489D66602200152315EFE752DA381E74493419871550D206AC6503841DA5F8C30E35D9E3892770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304",
+      id: "A1586D6AF7B0821E7075E12A0132D9EB50BC1874A0749441201497F7561795FB"
+    }
+
+    assert.deepEqual(result, expectedResponse)
+    schemaValidator.schemaValidate('sign', result)
   });
 
   it('submit', function () {
@@ -1442,6 +1762,96 @@ describe('RippleAPI', function () {
     return this.api.getFee().then(fee => {
       assert.strictEqual(fee, '0.000012');
     });
+  });
+
+  it('getFee - high load_factor', function () {
+    this.api.connection._send(JSON.stringify({
+      command: 'config',
+      data: { highLoadFactor: true }
+    }));
+
+    return this.api.getFee().then(fee => {
+      assert.strictEqual(fee, '2');
+    });
+  });
+  
+  it('fee - default maxFee of 2 XRP', function () {
+    this.api._feeCushion = 1000000;
+
+    const expectedResponse = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"2000000\",\"Sequence\":23}",
+      "instructions": {
+        "fee": "2",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }    
+
+    return this.api.preparePayment(
+      address, requests.preparePayment.normal, instructions).then(
+        _.partial(checkResult, expectedResponse, 'prepare'));
+  });
+
+  it('fee - capped to maxFeeXRP when maxFee exceeds maxFeeXRP', function () {
+    this.api._feeCushion = 1000000
+    this.api._maxFeeXRP = '3'
+    const localInstructions = _.defaults({
+      maxFee: '4'
+    }, instructions);
+
+    const expectedResponse = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"3000000\",\"Sequence\":23}",
+      "instructions": {
+        "fee": "3",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }    
+
+    return this.api.preparePayment(
+      address, requests.preparePayment.normal, localInstructions).then(
+        _.partial(checkResult, expectedResponse, 'prepare'));
+  });
+
+  it('fee - capped to maxFee', function () {
+    this.api._feeCushion = 1000000
+    this.api._maxFeeXRP = '5'
+    const localInstructions = _.defaults({
+      maxFee: '4'
+    }, instructions);
+
+    const expectedResponse = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"4000000\",\"Sequence\":23}",
+      "instructions": {
+        "fee": "4",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }    
+
+    return this.api.preparePayment(
+      address, requests.preparePayment.normal, localInstructions).then(
+        _.partial(checkResult, expectedResponse, 'prepare'));
+  });
+
+  it('fee - calculated fee does not use more than 6 decimal places', function () {
+    this.api.connection._send(JSON.stringify({
+      command: 'config',
+      data: { loadFactor: 5407.96875 }
+    }));
+
+    const expectedResponse = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"64896\",\"Sequence\":23}",
+      "instructions": {
+        "fee": "0.064896",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }    
+
+    return this.api.preparePayment(
+      address, requests.preparePayment.normal, instructions).then(
+        _.partial(checkResult, expectedResponse, 'prepare'));
   });
 
   it('disconnect & isConnected', function () {
