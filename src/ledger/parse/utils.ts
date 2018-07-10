@@ -103,6 +103,8 @@ function parseOutcome(tx: any): any|undefined {
   }
   const balanceChanges = transactionParser.parseBalanceChanges(metadata)
   const orderbookChanges = transactionParser.parseOrderbookChanges(metadata)
+  const channel = transactionParser.parseChannelDetails(metadata)
+
   removeEmptyCounterpartyInBalanceChanges(balanceChanges)
   removeEmptyCounterpartyInOrderbookChanges(orderbookChanges)
 
@@ -112,6 +114,7 @@ function parseOutcome(tx: any): any|undefined {
     fee: common.dropsToXrp(tx.Fee),
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
+    channel: channel,
     ledgerVersion: tx.ledger_index,
     indexInLedger: tx.meta.TransactionIndex,
     deliveredAmount: parseDeliveredAmount(tx)
