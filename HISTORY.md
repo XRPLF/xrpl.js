@@ -1,5 +1,28 @@
 # ripple-lib Release History
 
+## 1.0.0-beta.3 (2018-07-17)
+
++ For payment channel transactions, `getTransaction` includes a new
+  `channelChanges` property that describes the details of the payment channel.
+  (#920)
+
+### Bug Fixes
+
++ A bug caused calculated fees to use too many decimal places. This was fixed by
+  rounding fees to 6 decimal places. (#912)
++ When using the Settings transaction to set up a multi-signing list, the
+  threshold and weights fields are required. (#909)
++ Docs: Fix the MIMETYPE in examples with memos. (#914)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+460dbb521e24c44cb53dabc1a74feeca33d031b44d889dd5b51103ca92d51de6  ripple-1.0.0-beta.3-debug.js
+cccfd24973c6b7990d9e933a589175dae26249825737fff4f2f73d8558a3f186  ripple-1.0.0-beta.3-min.js
+0dc456a58fb078347d9920310621595905085595d73c2b8fe96bea73bcf35450  ripple-1.0.0-beta.3.js
+```
+
 ## 1.0.0-beta.2 (2018-06-08)
 
 ### Breaking Changes
