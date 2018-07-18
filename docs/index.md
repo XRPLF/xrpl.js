@@ -757,7 +757,7 @@ signature | string | *Optional* Signed claim authorizing withdrawal of XRP from 
 # rippled APIs
 
 ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for all online functionality. With ripple-lib version 1.0.0 and higher, you can easily access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
-* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods). 
+* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods).
 * Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
 * Use `requestNextPage()` to request the next page of data.
 
@@ -805,7 +805,7 @@ api.connect().then(() => { // Omit this if you are already connected
       console.log(JSON.stringify(event, null, 2))
   })
 
-  api.request('subscribe', {
+  api.connection.request('subscribe', {
       accounts: [ account ]
   }).then(response => {
       if (response.status === 'success') {
@@ -2457,7 +2457,7 @@ bids[] | object | An order in the order book.
 *bids[].properties.* maker | [address](#address) | The address of the account that submitted the order.
 *bids[].properties.* sequence | [sequence](#account-sequence-number) | The account sequence number of the transaction that created this order.
 *bids[].properties.* makerExchangeRate | [value](#value) | The exchange rate from the point of view of the account that submitted the order (also known as "quality").
-*bids[].data.* \* | object | 
+*bids[].data.* \* | object |
 *bids[].* state | object | *Optional* The state of the order.
 *bids[].state.* fundedAmount | [amount](#amount) | How much of the amount the maker would have to pay that the maker currently holds.
 *bids[].state.* priceOfFundedAmount | [amount](#amount) | How much the `fundedAmount` would convert to through the exchange rate of this order.
@@ -2468,7 +2468,7 @@ asks[] | object | An order in the order book.
 *asks[].properties.* maker | [address](#address) | The address of the account that submitted the order.
 *asks[].properties.* sequence | [sequence](#account-sequence-number) | The account sequence number of the transaction that created this order.
 *asks[].properties.* makerExchangeRate | [value](#value) | The exchange rate from the point of view of the account that submitted the order (also known as "quality").
-*asks[].data.* \* | object | 
+*asks[].data.* \* | object |
 *asks[].* state | object | *Optional* The state of the order.
 *asks[].state.* fundedAmount | [amount](#amount) | How much of the amount the maker would have to pay that the maker currently holds.
 *asks[].state.* priceOfFundedAmount | [amount](#amount) | How much the `fundedAmount` would convert to through the exchange rate of this order.
@@ -5160,7 +5160,7 @@ This method returns `true` if the claim signature is valid.
 
 Name | Type | Description
 ---- | ---- | -----------
- | boolean | 
+ | boolean |
 
 ### Example
 
@@ -5339,4 +5339,3 @@ api.on('disconnected', (code) => {
   }
 });
 ```
-
