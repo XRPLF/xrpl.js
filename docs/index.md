@@ -516,8 +516,8 @@ regularKey | [address](#address),null | *Optional* The public key of a new keypa
 requireAuthorization | boolean | *Optional* If set, this account must individually approve other users in order for those users to hold this account’s issuances.
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
 signers | object | *Optional* Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.
-*signers.* threshold | integer | *Optional* A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
-*signers.* weights | array | *Optional* Weights of signatures for each signer.
+*signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
+*signers.* weights | array | Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#address) | A Ripple account address
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
@@ -1153,8 +1153,8 @@ specification | object | A specification that would produce the same outcome as 
 outcome | object | The outcome of the transaction (what effects it had).
 *outcome.* result | string | Result code returned by rippled. See [Transaction Results](https://ripple.com/build/transactions/#full-transaction-response-list) for a complete list.
 *outcome.* fee | [value](#value) | The XRP fee that was charged for the transaction.
-*outcome.balanceChanges.* \* | array\<[balance](#amount)\> | Key is the ripple address; value is an array of signed amounts representing changes of balances for that address.
-*outcome.orderbookChanges.* \* | array | Key is the maker's ripple address; value is an array of changes
+*outcome.balanceChanges.* \* | array\<[balance](#amount)\> | Key is the XRP Ledger address; value is an array of signed amounts representing changes of balances for that address.
+*outcome.orderbookChanges.* \* | array | Key is the maker's XRP Ledger address; value is an array of changes
 *outcome.orderbookChanges.* \*[] | object | A change to an order.
 *outcome.orderbookChanges.\*[].* direction | string | Equal to "buy" for buy orders and "sell" for sell orders.
 *outcome.orderbookChanges.\*[].* quantity | [amount](#amount) | The amount to be bought or sold by the maker.
@@ -1166,6 +1166,7 @@ outcome | object | The outcome of the transaction (what effects it had).
 *outcome.* ledgerVersion | integer | The ledger version that the transaction was validated in.
 *outcome.* ledgerVersion | string | The ledger version that the transaction was validated in.
 *outcome.* indexInLedger | integer | The ordering index of the transaction in the ledger.
+*outcome.* channelChanges | object | *Optional* Properties reflecting the details of the payment channel.
 *outcome.* deliveredAmount | [amount](#amount) | *Optional* For payment transactions, it is impossible to reliably compute the actual delivered amount from the balanceChanges due to fixed precision. If the payment is not a partial payment and the transaction succeeded, the deliveredAmount should always be considered to be the amount specified in the transaction.
 *outcome.* timestamp | date-time string | *Optional* The timestamp when the transaction was validated. (May be missing when requesting transactions in binary mode.)
 
@@ -3566,8 +3567,8 @@ regularKey | [address](#address),null | *Optional* The public key of a new keypa
 requireAuthorization | boolean | *Optional* If set, this account must individually approve other users in order for those users to hold this account’s issuances.
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
 signers | object | *Optional* Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.
-*signers.* threshold | integer | *Optional* A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
-*signers.* weights | array | *Optional* Weights of signatures for each signer.
+*signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
+*signers.* weights | array | Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#address) | A Ripple account address
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
