@@ -25,7 +25,7 @@
       "type": "object",
       "additionalProperties": {
         "type": "array",
-        "description": "Key is the ripple address; value is an array of signed amounts representing changes of balances for that address.",
+        "description": "Key is the XRP Ledger address; value is an array of signed amounts representing changes of balances for that address.",
         "items": {"$ref": "balance"}
       }
     },
@@ -33,9 +33,13 @@
       "type": "object",
       "additionalProperties": {
         "type": "array",
-        "description": "Key is the maker's ripple address; value is an array of changes",
+        "description": "Key is the maker's XRP Ledger address; value is an array of changes",
         "items": {"$ref": "orderChange"}
       }
+    },
+    "channelChanges": {
+      "type": "object",
+      "description": "Properties reflecting the details of the payment channel."
     },
     "ledgerVersion": {
       "$ref": "ledgerVersion",

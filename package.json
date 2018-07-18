@@ -26,7 +26,7 @@
     "ripple-binary-codec": "^0.1.13",
     "ripple-hashes": "^0.3.1",
     "ripple-keypairs": "^0.10.1",
-    "ripple-lib-transactionparser": "^0.6.2",
+    "ripple-lib-transactionparser": "0.7.1",
     "ws": "^3.3.1"
   },
   "devDependencies": {
