@@ -21,6 +21,16 @@
     },
     "orderbookChanges": {},
     "ledgerVersion": 786310,
-    "indexInLedger": 1
+    "indexInLedger": 1,
+    "channelChanges": {
+      "status": "modified",
+      "channelId": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
+      "source": "rfAuMkVuZQnQhvdMcUKg4ndBb9SPDhzNmK",
+      "destination": "rBmNDZ7vbTCwakKXsX3pDAwDdQuxM7yBRa",
+      "channelAmountChangeDrops": "1000000",
+      "channelAmountDrops": "2000000",
+      "channelBalanceDrops": "801000",
+      "previousTxnId": "81B9ECAE7195EB6E8034AEDF44D8415A7A803E14513FDBB34FA984AB37D59563"
+    }
   }
 }
