@@ -77,12 +77,6 @@ function xrpToDrops(xrp: string | BigNumber): string {
       ` too many decimal points.`)
   }
 
-  const fraction = components[1] || '0'
-  if (fraction.length > 6) {
-    throw new ValidationError(`xrpToDrops: value '${xrp}' has` +
-      ` too many decimal places.`)
-  }
-
   return (new BigNumber(xrp)).times(1000000.0).floor().toString(10)
 }
 

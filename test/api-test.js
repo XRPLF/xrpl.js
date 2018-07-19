@@ -118,14 +118,12 @@ describe('RippleAPI', function () {
       assert.strictEqual(drops, '-2000000', '(number) -2 XRP equals -2 million drops')
     })
 
-    it('throws with an amount with too many decimal places', function () {
-      assert.throws(() => {
-        this.api.xrpToDrops('1.1234567')
-      }, /has too many decimal places/)
-
-      assert.throws(() => {
-        this.api.xrpToDrops('0.0000001')
-      }, /has too many decimal places/)
+    it('truncates an amount with too many decimal places', function () {
+      let drops = this.api.xrpToDrops('1.1234567')
+      assert.strictEqual(drops, '1123456', '1.1234567 XRP rounds down to 1123456 drops')
+      
+      drops = this.api.xrpToDrops('0.0000001')
+      assert.strictEqual(drops, '0', '0.0000001 XRP rounds down to 0 drops')
     })
 
     it('throws with an invalid value', function () {
@@ -443,6 +441,33 @@ describe('RippleAPI', function () {
     return this.api.prepareOrder(address, request, instructions).then(
       _.partial(checkResult, responses.prepareOrder.sell, 'prepare'));
   });
+
+  it('prepareOrder - XRP value with more than 6 decimal places', function () {
+    const request = {
+      "direction": "sell",
+      "quantity": {
+        "currency": "BCH",
+        "counterparty": "rcyS4CeCZVYvTiKcxj6Sx32ibKwcDHLds",
+        "value": "10.42696400"
+      },
+      "totalPrice": {
+        "currency": "XRP",
+        "value": "19792.80964382"
+      }
+    }
+
+    const response = {
+      "txJSON": "{\"TransactionType\":\"OfferCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"TakerGets\":{\"currency\":\"BCH\",\"issuer\":\"rcyS4CeCZVYvTiKcxj6Sx32ibKwcDHLds\",\"value\":\"10.42696400\"},\"TakerPays\":\"19792809643\",\"Flags\":2148007936,\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":23}",
+      "instructions": {
+        "fee": "0.000012",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }
+
+    return this.api.prepareOrder(address, request, instructions).then(
+      _.partial(checkResult, response, 'prepare'));
+  })
 
   it('prepareOrderCancellation', function () {
     const request = requests.prepareOrderCancellation.simple;
