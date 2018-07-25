@@ -1075,6 +1075,8 @@ return api.getServerInfo().then(info => {/* ... */});
 
 Returns the estimated transaction fee for the rippled server the RippleAPI instance is connected to.
 
+This will use the [feeCushion parameter](#parameters) provided to the RippleAPI constructor, or the default value of `1.2`.
+
 ### Parameters
 
 Name | Type | Description
@@ -1083,7 +1085,7 @@ cushion | number | *Optional* The fee is the product of the base fee, the `load_
 
 ### Return Value
 
-This method returns a promise that resolves with a string encoded floating point value representing the estimated fee to submit a transaction, expressed in XRP.
+This method returns a promise that resolves with a string-encoded floating point value representing the estimated fee to submit a transaction, expressed in XRP.
 
 ### Example
 
@@ -1092,7 +1094,7 @@ return api.getFee().then(fee => {/* ... */});
 ```
 
 ```json
-"0.012"
+"0.000012"
 ```
 
 ## getLedgerVersion

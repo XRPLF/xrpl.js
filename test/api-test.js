@@ -1853,6 +1853,23 @@ describe('RippleAPI', function () {
       address, requests.preparePayment.normal, instructions).then(
         _.partial(checkResult, expectedResponse, 'prepare'));
   });
+  
+  it('getFee custom cushion', function () {
+    this.api._feeCushion = 1.4;
+    return this.api.getFee().then(fee => {
+      assert.strictEqual(fee, '0.000014');
+    });
+  });
+
+  // This is not recommended since it may result in attempting to pay
+  // less than the base fee. However, this test verifies
+  // the existing behavior.
+  it('getFee cushion less than 1.0', function () {
+    this.api._feeCushion = 0.9;
+    return this.api.getFee().then(fee => {
+      assert.strictEqual(fee, '0.000009');
+    });
+  });
 
   it('disconnect & isConnected', function () {
     assert.strictEqual(this.api.isConnected(), true);
