@@ -4164,9 +4164,9 @@ ripple-keypairs@^0.10.1:
     hash.js "^1.0.3"
     ripple-address-codec "^2.0.1"
 
-ripple-lib-transactionparser@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.6.2.tgz#eb117834816cab3398445a74ec3cacec95b6b5fa"
+ripple-lib-transactionparser@0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.7.1.tgz#5ececb1e03d65d05605343f4b9dbb76d1089145b"
   dependencies:
     bignumber.js "^4.1.0"
     lodash "^4.17.4"

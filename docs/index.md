@@ -1155,8 +1155,8 @@ specification | object | A specification that would produce the same outcome as 
 outcome | object | The outcome of the transaction (what effects it had).
 *outcome.* result | string | Result code returned by rippled. See [Transaction Results](https://ripple.com/build/transactions/#full-transaction-response-list) for a complete list.
 *outcome.* fee | [value](#value) | The XRP fee that was charged for the transaction.
-*outcome.balanceChanges.* \* | array\<[balance](#amount)\> | Key is the ripple address; value is an array of signed amounts representing changes of balances for that address.
-*outcome.orderbookChanges.* \* | array | Key is the maker's ripple address; value is an array of changes
+*outcome.balanceChanges.* \* | array\<[balance](#amount)\> | Key is the XRP Ledger address; value is an array of signed amounts representing changes of balances for that address.
+*outcome.orderbookChanges.* \* | array | Key is the maker's XRP Ledger address; value is an array of changes
 *outcome.orderbookChanges.* \*[] | object | A change to an order.
 *outcome.orderbookChanges.\*[].* direction | string | Equal to "buy" for buy orders and "sell" for sell orders.
 *outcome.orderbookChanges.\*[].* quantity | [amount](#amount) | The amount to be bought or sold by the maker.
@@ -1168,6 +1168,7 @@ outcome | object | The outcome of the transaction (what effects it had).
 *outcome.* ledgerVersion | integer | The ledger version that the transaction was validated in.
 *outcome.* ledgerVersion | string | The ledger version that the transaction was validated in.
 *outcome.* indexInLedger | integer | The ordering index of the transaction in the ledger.
+*outcome.* channelChanges | object | *Optional* Properties reflecting the details of the payment channel.
 *outcome.* deliveredAmount | [amount](#amount) | *Optional* For payment transactions, it is impossible to reliably compute the actual delivered amount from the balanceChanges due to fixed precision. If the payment is not a partial payment and the transaction succeeded, the deliveredAmount should always be considered to be the amount specified in the transaction.
 *outcome.* timestamp | date-time string | *Optional* The timestamp when the transaction was validated. (May be missing when requesting transactions in binary mode.)
 
