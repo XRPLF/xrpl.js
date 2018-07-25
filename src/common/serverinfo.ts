@@ -61,6 +61,8 @@ function getServerInfo(this: RippleAPI): Promise<GetServerInfoResponse> {
   })
 }
 
+// This is a public API that can be called directly.
+// This is not used by the `prepare*` methods. See `src/transaction/utils.ts`
 async function getFee(
   this: RippleAPI,
   cushion?: number
@@ -79,7 +81,7 @@ async function getFee(
   // Cap fee to `this._maxFeeXRP`
   fee = BigNumber.min(fee, this._maxFeeXRP)
   // Round fee to 6 decimal places
-  return (new BigNumber(fee.toFormat(6))).toString(10)
+  return (new BigNumber(fee.toFixed(6))).toString(10)
 }
 
 export {

@@ -404,6 +404,23 @@ describe('RippleAPI', function () {
       }, /Fee of 2\.1 XRP exceeds max of 2 XRP\. To use this fee, increase `maxFeeXRP` in the RippleAPI constructor\./)
     });
 
+    it('preparePayment - caps fee at 2 XRP by default', function () {
+      this.api._feeCushion = 1000000;
+
+      const expectedResponse = {
+        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"2000000\",\"Sequence\":23}",
+        "instructions": {
+          "fee": "2",
+          "sequence": 23,
+          "maxLedgerVersion": 8820051
+        }
+      }
+
+      return this.api.preparePayment(
+        address, requests.preparePayment.normal, instructions).then(
+          _.partial(checkResult, expectedResponse, 'prepare'));
+    });
+
     it('preparePayment - allows fee exceeding 2 XRP when maxFeeXRP is higher', function () {
       this.api._maxFeeXRP = '2.2'
       const localInstructions = _.defaults({
@@ -730,7 +747,8 @@ describe('RippleAPI', function () {
           _.partial(checkResult, responses.preparePayment.normal, 'prepare'));
     });
 
-    it('prepareTransaction - Payment - min amount xrp', function () {
+    // prepareTransaction - Payment
+    it('min amount xrp', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012'
       }, instructions);
@@ -758,7 +776,8 @@ describe('RippleAPI', function () {
             responses.preparePayment.minAmountXRP, 'prepare'));
     });
 
-    it('prepareTransaction - Payment - min amount xrp2xrp', function () {
+    // prepareTransaction - Payment
+    it('min amount xrp2xrp', function () {
       const txJSON = {
         TransactionType: 'Payment',
         Account: address,
@@ -771,7 +790,8 @@ describe('RippleAPI', function () {
             responses.preparePayment.minAmountXRPXRP, 'prepare'));
     });
 
-    it('prepareTransaction - Payment with all options specified', function () {
+    // prepareTransaction - Payment
+    it('with all options specified', function () {
       return this.api.getLedgerVersion().then(ver => {
         const localInstructions = {
           maxLedgerVersion: ver + 100,
@@ -800,6 +820,146 @@ describe('RippleAPI', function () {
             _.partial(checkResult,
               responses.preparePayment.allOptions, 'prepare'));
       });
+    });
+
+    // prepareTransaction - Payment
+    it('fee is capped at default maxFee of 2 XRP', function () {
+      this.api._feeCushion = 1000000;
+
+      const txJSON = {
+        "Flags": 2147483648,
+        "TransactionType": "Payment",
+        "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+        "Destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        "Amount": {
+          "value": "0.01",
+          "currency": "USD",
+          "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        },
+        "SendMax": {
+          "value": "0.01",
+          "currency": "USD",
+          "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        },
+        "LastLedgerSequence": 8820051
+      }
+
+      const localInstructions = {
+        "maxLedgerVersion": 8820051
+      }
+  
+      const expectedResponse = {
+        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"2000000\",\"Sequence\":23}",
+        "instructions": {
+          "fee": "2",
+          "sequence": 23,
+          "maxLedgerVersion": 8820051
+        }
+      }    
+  
+      return this.api.prepareTransaction(txJSON, localInstructions).then(
+        _.partial(checkResult,
+          expectedResponse, 'prepare'));
+    });
+  
+    // prepareTransaction - Payment
+    it('fee is capped to custom maxFeeXRP when maxFee exceeds maxFeeXRP', function () {
+      this.api._feeCushion = 1000000
+      this.api._maxFeeXRP = '3'
+      const localInstructions = _.defaults({
+        maxFee: '4' // We are testing that this does not matter; fee is still capped to maxFeeXRP
+      }, instructions);
+
+      const txJSON = {
+        "Flags": 2147483648,
+        "TransactionType": "Payment",
+        "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+        "Destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        "Amount": {
+          "value": "0.01",
+          "currency": "USD",
+          "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        },
+        "SendMax": {
+          "value": "0.01",
+          "currency": "USD",
+          "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        },
+        "LastLedgerSequence": 8820051
+      }
+  
+      const expectedResponse = {
+        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"3000000\",\"Sequence\":23}",
+        "instructions": {
+          "fee": "3",
+          "sequence": 23,
+          "maxLedgerVersion": 8820051
+        }
+      }    
+  
+      return this.api.prepareTransaction(txJSON, localInstructions).then(
+        _.partial(checkResult,
+          expectedResponse, 'prepare'));
+    });
+  
+    // prepareTransaction - Payment
+    it('fee is capped to maxFee', function () {
+      this.api._feeCushion = 1000000
+      this.api._maxFeeXRP = '5'
+      const localInstructions = _.defaults({
+        maxFee: '4' // maxFeeXRP does not matter if maxFee is lower than maxFeeXRP
+      }, instructions);
+
+      const txJSON = {
+        "Flags": 2147483648,
+        "TransactionType": "Payment",
+        "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+        "Destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        "Amount": {
+          "value": "0.01",
+          "currency": "USD",
+          "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        },
+        "SendMax": {
+          "value": "0.01",
+          "currency": "USD",
+          "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        },
+        "LastLedgerSequence": 8820051,
+      }
+  
+      const expectedResponse = {
+        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"4000000\",\"Sequence\":23}",
+        "instructions": {
+          "fee": "4",
+          "sequence": 23,
+          "maxLedgerVersion": 8820051
+        }
+      }    
+  
+      return this.api.prepareTransaction(txJSON, localInstructions).then(
+        _.partial(checkResult,
+          expectedResponse, 'prepare'));
+    });
+  
+    it('fee - calculated fee does not use more than 6 decimal places', function () {
+      this.api.connection._send(JSON.stringify({
+        command: 'config',
+        data: { loadFactor: 5407.96875 }
+      }));
+  
+      const expectedResponse = {
+        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"64896\",\"Sequence\":23}",
+        "instructions": {
+          "fee": "0.064896",
+          "sequence": 23,
+          "maxLedgerVersion": 8820051
+        }
+      }    
+  
+      return this.api.preparePayment(
+        address, requests.preparePayment.normal, instructions).then(
+          _.partial(checkResult, expectedResponse, 'prepare'));
     });
   });
 
@@ -2013,7 +2173,21 @@ describe('RippleAPI', function () {
       assert.strictEqual(fee, '2');
     });
   });
-  
+
+  it('getFee - high load_factor with custom maxFeeXRP', function () {
+    // Ensure that overriding with high maxFeeXRP of '51540' causes no errors.
+    // (fee will actually be 51539.607552)
+    this.api._maxFeeXRP = '51540'
+    this.api.connection._send(JSON.stringify({
+      command: 'config',
+      data: { highLoadFactor: true }
+    }));
+
+    return this.api.getFee().then(fee => {
+      assert.strictEqual(fee, '51539.607552');
+    });
+  });
+
   it('fee - default maxFee of 2 XRP', function () {
     this.api._feeCushion = 1000000;
 
