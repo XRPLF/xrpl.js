@@ -44,6 +44,8 @@ $ yarn build
 
 Gulp will [output](./Gulpfile.js) the resulting JS files in `./build/`.
 
+For more details, see the `scripts` in `package.json`.
+
 ## Running tests
 
 1. Clone the repository
