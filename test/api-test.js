@@ -715,10 +715,6 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
-  /**
-   * prepareTransaction() - new in ripple-lib 1.0.0
-   */
-
   describe('prepareTransaction - Payment', function () {
 
     it('normal', function () {
