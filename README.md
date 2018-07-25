@@ -38,6 +38,24 @@ If you're using the XRP Ledger in production, you should run a [rippled server](
 
 + [Subscribe to ripple-server](https://groups.google.com/forum/#!forum/ripple-server)
 
+## Development
+
+To build the library for Node.js:
+```
+$ yarn compile
+```
+
+The TypeScript compiler will [output](./tsconfig.json#L7) the resulting JS files in `./dist/npm/`.
+
+To build the library for the browser:
+```
+$ yarn build
+```
+
+Gulp will [output](./Gulpfile.js) the resulting JS files in `./build/`.
+
+For more details, see the `scripts` in `package.json`.
+
 ## Running tests
 
 1. Clone the repository
