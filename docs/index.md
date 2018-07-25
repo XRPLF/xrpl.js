@@ -516,8 +516,8 @@ regularKey | [address](#address),null | *Optional* The public key of a new keypa
 requireAuthorization | boolean | *Optional* If set, this account must individually approve other users in order for those users to hold this account’s issuances.
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
 signers | object | *Optional* Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.
-*signers.* threshold | integer | *Optional* A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
-*signers.* weights | array | *Optional* Weights of signatures for each signer.
+*signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
+*signers.* weights | array | Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#address) | A Ripple account address
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
@@ -1075,7 +1075,7 @@ return api.getServerInfo().then(info => {/* ... */});
 
 Returns the estimated transaction fee for the rippled server the RippleAPI instance is connected to.
 
-This will use the [feeCushion parameter](#parameters) provided to the RippleAPI constructor, or the default value of 1.2.
+This will use the [feeCushion parameter](#parameters) provided to the RippleAPI constructor, or the default value of `1.2`.
 
 ### Parameters
 
@@ -3568,8 +3568,8 @@ regularKey | [address](#address),null | *Optional* The public key of a new keypa
 requireAuthorization | boolean | *Optional* If set, this account must individually approve other users in order for those users to hold this account’s issuances.
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
 signers | object | *Optional* Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.
-*signers.* threshold | integer | *Optional* A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
-*signers.* weights | array | *Optional* Weights of signatures for each signer.
+*signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
+*signers.* weights | array | Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#address) | A Ripple account address
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
