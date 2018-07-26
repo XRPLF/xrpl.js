@@ -131,19 +131,16 @@ class RippleAPI extends EventEmitter {
   }
 
 
+  /**
+   * Makes a request to the API with the given command and
+   * additional request body parameters.
+   */
   async request(command: 'account_info', params: AccountInfoRequest):
     Promise<AccountInfoResponse>
   async request(command: 'account_lines', params: AccountLinesRequest):
     Promise<AccountLinesResponse>
-
-  /**
-   * Returns objects owned by an account.
-   * For an account's trust lines and balances,
-   * see `getTrustlines` and `getBalances`.
-   */
   async request(command: 'account_objects', params: AccountObjectsRequest):
     Promise<AccountObjectsResponse>
-
   async request(command: 'account_offers', params: AccountOffersRequest):
   Promise<AccountOffersResponse>
   async request(command: 'book_offers', params: BookOffersRequest):
@@ -156,15 +153,9 @@ class RippleAPI extends EventEmitter {
     Promise<LedgerEntryResponse>
   async request(command: 'server_info', params?: ServerInfoRequest):
     Promise<ServerInfoResponse>
-
-  async request(command: string, params: object):
-    Promise<object>
-
-  /**
-   * Makes a request to the API with the given command and
-   * additional request body parameters.
-   */
-  async request(command: string, params: object = {}): Promise<object> {
+  async request(command: string, params: any):
+    Promise<any>
+  async request(command: string, params: any = {}): Promise<any> {
     return this.connection.request({
       ...params,
       command

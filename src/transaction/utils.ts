@@ -94,19 +94,16 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
     })
   }
 
-  function prepareSequence(): Promise<Object> {
+  async function prepareSequence(): Promise<Object> {
     if (instructions.sequence !== undefined) {
       txJSON.Sequence = instructions.sequence
       return Promise.resolve(txJSON)
     }
-    const request = {
-      command: 'account_info',
-      account: account
-    }
-    return api.connection.request(request).then(response => {
-      txJSON.Sequence = response.account_data.Sequence
-      return txJSON
+    const response = await api.request('account_info', {
+      account: account as string
     })
+    txJSON.Sequence = response.account_data.Sequence
+    return txJSON
   }
 
   return Promise.all([
