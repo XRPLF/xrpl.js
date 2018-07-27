@@ -84,7 +84,8 @@ function createMaximalAmount(amount: Amount): Amount {
   return _.assign({}, amount, {value: maxValue})
 }
 
-function createPaymentTransaction(address: string, paymentArgument: Payment
+export function createPaymentTransaction(address: string,
+                                         paymentArgument: Payment
 ): Object {
   const payment = _.cloneDeep(paymentArgument)
   applyAnyCounterpartyEncoding(payment)
@@ -168,12 +169,10 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
   return txJSON
 }
 
-function preparePayment(address: string, payment: Payment,
+export default function preparePayment(address: string, payment: Payment,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   validate.preparePayment({address, payment, instructions})
   const txJSON = createPaymentTransaction(address, payment)
   return utils.prepareTransaction(txJSON, this, instructions)
 }
-
-export default preparePayment

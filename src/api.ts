@@ -28,6 +28,7 @@ import getAccountInfo from './ledger/accountinfo'
 import getAccountObjects from './ledger/accountobjects'
 import getPaymentChannel from './ledger/payment-channel'
 import preparePayment from './transaction/payment'
+import createPaymentTransaction from './transaction/payment'
 import prepareTrustline from './transaction/trustline'
 import prepareOrder from './transaction/order'
 import prepareOrderCancellation from './transaction/ordercancellation'
@@ -302,6 +303,7 @@ class RippleAPI extends EventEmitter {
   getLedger = getLedger
 
   preparePayment = preparePayment
+  createPaymentTransaction = createPaymentTransaction
   prepareTrustline = prepareTrustline
   prepareOrder = prepareOrder
   prepareOrderCancellation = prepareOrderCancellation
