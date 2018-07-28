@@ -53,7 +53,7 @@
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "tslint-eslint-rules": "^4.1.1",
-    "typescript": "^2.6.1",
+    "typescript": "2.9.2",
     "uglifyjs-webpack-plugin": "^1.1.4",
     "webpack": "^3.10.0",
     "yargs": "^8.0.2"
