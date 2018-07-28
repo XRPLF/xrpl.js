@@ -107,7 +107,7 @@ class RippleAPI extends EventEmitter {
 
   // these are exposed only for use by unit tests; they are not part of the API.
   static _PRIVATE = {
-    validate: validate,
+    validate,
     RangeSet,
     ledgerUtils,
     schemaValidator
