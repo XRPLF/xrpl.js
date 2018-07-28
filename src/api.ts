@@ -109,8 +109,7 @@ class RippleAPI extends EventEmitter {
   static _PRIVATE = {
     validate,
     RangeSet,
-    ledgerUtils,
-    schemaValidator
+    ledgerUtils
   }
 
   constructor(options: APIOptions = {}) {
@@ -329,6 +328,8 @@ class RippleAPI extends EventEmitter {
   dropsToXrp = dropsToXrp
   iso8601ToRippleTime = iso8601ToRippleTime
   txFlags = txFlags
+
+  static schemaValidator = schemaValidator
 }
 
 export {
