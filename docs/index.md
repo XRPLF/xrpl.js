@@ -364,6 +364,7 @@ source | object | The source of the funds to be sent.
 destination | object | The destination of the funds to be sent.
 *destination.* address | [address](#address) | The address to receive at.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
+*destination.* amountInfo | string | *Optional* (Optional) A message explaining the 'amount' field. When present, the 'amount' was set to 0 XRP to prevent misuse when processing a partial payment. See: https://developers.ripple.com/partial-payments.html
 *destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *destination.* address | [address](#address) | The address to send to.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field is exclusive with destination.amount)
@@ -1961,6 +1962,7 @@ source | object | Properties of the source of the payment.
 destination | object | Properties of the destination of the payment.
 *destination.* address | [address](#address) | The address to receive at.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
+*destination.* amountInfo | string | *Optional* (Optional) A message explaining the 'amount' field. When present, the 'amount' was set to 0 XRP to prevent misuse when processing a partial payment. See: https://developers.ripple.com/partial-payments.html
 *destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *destination.* address | [address](#address) | The address to send to.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field is exclusive with destination.amount)

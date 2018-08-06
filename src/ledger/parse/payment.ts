@@ -27,10 +27,25 @@ function parsePayment(tx: any): Object {
     tag: tx.SourceTag
   }
 
-  const destination = {
+  const destination: {
+    address: string,
+    amount: any,
+    amountInfo?: string,
+    tag: number | undefined
+  } = {
     address: tx.Destination,
-    amount: removeGenericCounterparty(parseAmount(tx.Amount), tx.Destination),
+    amount: undefined,
     tag: tx.DestinationTag
+  }
+
+  if (!tx.Amount || utils.isPartialPayment(tx)) {
+    destination.amount = parseAmount('0')
+    destination.amountInfo = '"amount" is omitted from this API response, ' +
+      'and set to 0 XRP to prevent misuse. ' +
+      'You must use "deliveredAmount" in order to process payments correctly.'
+  } else {
+    destination.amount = removeGenericCounterparty(
+      parseAmount(tx.Amount || '0'), tx.Destination)
   }
 
   return removeUndefined({

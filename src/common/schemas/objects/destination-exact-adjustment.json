@@ -11,6 +11,10 @@
       "$ref": "laxAmount",
       "description": "An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount)."
     },
+    "amountInfo": {
+      "type": "string",
+      "description": "(Optional) A message explaining the 'amount' field. When present, the 'amount' was set to 0 XRP to prevent misuse when processing a partial payment. See: https://developers.ripple.com/partial-payments.html"
+    },
     "tag": {"$ref": "tag"}
   },
   "required": ["address", "amount"],
