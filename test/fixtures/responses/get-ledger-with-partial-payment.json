@@ -25,12 +25,7 @@
           }
         },
         "destination": {
-          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4",
-          "amount": {
-            "currency": "XRP",
-            "value": "0"
-          },
-          "amountInfo": "\"amount\" is omitted from this API response, and set to 0 XRP to prevent misuse. You must use \"deliveredAmount\" in order to process payments correctly."
+          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4"
         },
         "allowPartialPayment": true
       },
@@ -94,12 +89,7 @@
           }
         },
         "destination": {
-          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4",
-          "amount": {
-            "currency": "XRP",
-            "value": "0"
-          },
-          "amountInfo": "\"amount\" is omitted from this API response, and set to 0 XRP to prevent misuse. You must use \"deliveredAmount\" in order to process payments correctly."
+          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4"
         },
         "allowPartialPayment": true
       },
@@ -158,12 +148,7 @@
           }
         },
         "destination": {
-          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4",
-          "amount": {
-            "currency": "XRP",
-            "value": "0"
-          },
-          "amountInfo": "\"amount\" is omitted from this API response, and set to 0 XRP to prevent misuse. You must use \"deliveredAmount\" in order to process payments correctly."
+          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4"
         },
         "allowPartialPayment": true
       },
@@ -227,12 +212,7 @@
           }
         },
         "destination": {
-          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4",
-          "amount": {
-            "currency": "XRP",
-            "value": "0"
-          },
-          "amountInfo": "\"amount\" is omitted from this API response, and set to 0 XRP to prevent misuse. You must use \"deliveredAmount\" in order to process payments correctly."
+          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4"
         },
         "allowPartialPayment": true
       },

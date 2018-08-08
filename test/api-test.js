@@ -1447,6 +1447,17 @@ describe('RippleAPI', function () {
           'getTransaction'));
     });
 
+    it('getTransaction - payment - include raw transaction', function () {
+      const options = {
+        includeRawTransaction: true
+      }
+      return this.api.getTransaction(
+        hashes.VALID_TRANSACTION_HASH, options
+      ).then(
+        _.partial(checkResult, responses.getTransaction.paymentIncludeRawTransaction,
+          'getTransaction'));
+    });
+
     it('getTransaction - settings', function () {
       const hash =
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
@@ -1779,6 +1790,18 @@ describe('RippleAPI', function () {
     const options = { types: ['payment', 'order'], initiated: true, limit: 2 };
     return this.api.getTransactions(address, options).then(
       _.partial(checkResult, responses.getTransactions.normal,
+        'getTransactions'));
+  });
+
+  it('getTransactions - include raw transactions', function () {
+    const options = {
+      types: ['payment', 'order'],
+      initiated: true,
+      limit: 2,
+      includeRawTransactions: true
+    };
+    return this.api.getTransactions(address, options).then(
+      _.partial(checkResult, responses.getTransactions.includeRawTransactions,
         'getTransactions'));
   });
 

@@ -18,6 +18,7 @@ export type TransactionsOptions = {
   initiated?: boolean,
   counterparty?: string,
   types?: Array<string>,
+  includeRawTransactions?: boolean,
   binary?: boolean,
   startTx?: FormattedTransactionType
 }
@@ -35,11 +36,11 @@ function parseBinaryTransaction(transaction) {
   }
 }
 
-function parseAccountTxTransaction(tx) {
+function parseAccountTxTransaction(tx, includeRawTransaction: boolean) {
   const _tx = tx.tx_blob ? parseBinaryTransaction(tx) : tx
   // rippled uses a different response format for 'account_tx' than 'tx'
   return parseTransaction(_.assign({}, _tx.tx,
-    {meta: _tx.meta, validated: _tx.validated}))
+    {meta: _tx.meta, validated: _tx.validated}), includeRawTransaction)
 }
 
 function counterpartyFilter(filters, tx: FormattedTransactionType) {
@@ -87,11 +88,13 @@ function orderFilter(
 function formatPartialResponse(address: string,
   options: TransactionsOptions, data
 ) {
+  const parse = tx =>
+    parseAccountTxTransaction(tx, options.includeRawTransactions)
   return {
     marker: data.marker,
     results: data.transactions
       .filter(tx => tx.validated)
-      .map(parseAccountTxTransaction)
+      .map(parse)
       .filter(_.partial(transactionFilter, address, options))
       .filter(_.partial(orderFilter, options))
   }

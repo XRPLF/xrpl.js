@@ -363,8 +363,7 @@ source | object | The source of the funds to be sent.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
 destination | object | The destination of the funds to be sent.
 *destination.* address | [address](#address) | The address to receive at.
-*destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
-*destination.* amountInfo | string | *Optional* (Optional) A message explaining the 'amount' field. When present, the 'amount' was set to 0 XRP to prevent misuse when processing a partial payment. See: https://developers.ripple.com/partial-payments.html
+*destination.* amount | [laxAmount](#amount) | *Optional* An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount.) When parsing a partial payment, this field may be hidden; for the amount that the transaction delivered, see 'deliveredAmount'.
 *destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *destination.* address | [address](#address) | The address to send to.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field is exclusive with destination.amount)
@@ -374,6 +373,7 @@ limitQuality | boolean | *Optional* Only take paths where all the conversions ha
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 noDirectRipple | boolean | *Optional* If true and paths are specified, the sender would like the XRP Ledger to disregard any direct paths from the source account to the destination account. This may be used to take advantage of an arbitrage opportunity or by gateways wishing to issue balances from a hot wallet to a user who has mistakenly set a trustline directly to the hot wallet.
 paths | string | *Optional* The paths of trustlines and orders to use in executing the payment.
+rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -1136,7 +1136,8 @@ Retrieves a transaction by its [Transaction ID](#transaction-id).
 Name | Type | Description
 ---- | ---- | -----------
 id | [id](#transaction-id) | A hash of a transaction used to identify the transaction, represented in hexadecimal.
-options | object | *Optional* Options to limit the ledger versions to search.
+options | object | *Optional* Options to limit the ledger versions to search and/or to include raw transaction data.
+*options.* includeRawTransaction | object | *Optional* Include raw transaction data. For advanced users; exercise caution when interpreting this data. 
 *options.* maxLedgerVersion | integer | *Optional* The highest ledger version to search
 *options.* maxLedgerVersion | string | *Optional* The highest ledger version to search
 *options.* minLedgerVersion | integer | *Optional* The lowest ledger version to search.
@@ -1295,6 +1296,7 @@ options | object | *Optional* Options to filter the resulting transactions.
 *options.* counterparty | [address](#address) | *Optional* If provided, only return transactions with this account as a counterparty to the transaction.
 *options.* earliestFirst | boolean | *Optional* If true, sort transactions so that the earliest ones come first. By default, the newest transactions will come first.
 *options.* excludeFailures | boolean | *Optional* If true, the result will omit transactions that did not succeed.
+*options.* includeRawTransactions | object | *Optional* Include raw transaction data. For advanced users; exercise caution when interpreting this data. 
 *options.* initiated | boolean | *Optional* If true, return only transactions initiated by the account specified by `address`. If false, return only transactions not initiated by the account specified by `address`.
 *options.* limit | integer | *Optional* If specified, return at most this many transactions.
 *options.* maxLedgerVersion | integer | *Optional* Return only transactions in this ledger version or lower.
@@ -1961,8 +1963,7 @@ source | object | Properties of the source of the payment.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
 destination | object | Properties of the destination of the payment.
 *destination.* address | [address](#address) | The address to receive at.
-*destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
-*destination.* amountInfo | string | *Optional* (Optional) A message explaining the 'amount' field. When present, the 'amount' was set to 0 XRP to prevent misuse when processing a partial payment. See: https://developers.ripple.com/partial-payments.html
+*destination.* amount | [laxAmount](#amount) | *Optional* An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount.) When parsing a partial payment, this field may be hidden; for the amount that the transaction delivered, see 'deliveredAmount'.
 *destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *destination.* address | [address](#address) | The address to send to.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field is exclusive with destination.amount)

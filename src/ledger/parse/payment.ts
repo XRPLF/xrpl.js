@@ -3,6 +3,7 @@ import * as assert from 'assert'
 import * as utils from './utils'
 import {txFlags, removeUndefined} from '../../common'
 import parseAmount from './amount'
+import {Amount} from '../../common/types/objects'
 
 function isNoDirectRipple(tx) {
   return (tx.Flags & txFlags.Payment.NoRippleDirect) !== 0
@@ -17,7 +18,7 @@ function removeGenericCounterparty(amount, address) {
     _.omit(amount, 'counterparty') : amount
 }
 
-function parsePayment(tx: any): Object {
+function parsePayment(tx: any, includeRawTransaction: boolean): Object {
   assert(tx.TransactionType === 'Payment')
 
   const source = {
@@ -29,21 +30,16 @@ function parsePayment(tx: any): Object {
 
   const destination: {
     address: string,
-    amount: any,
+    amount?: Amount,
     amountInfo?: string,
     tag: number | undefined
   } = {
     address: tx.Destination,
-    amount: undefined,
     tag: tx.DestinationTag
   }
 
-  if (!tx.Amount || utils.isPartialPayment(tx)) {
-    destination.amount = parseAmount('0')
-    destination.amountInfo = '"amount" is omitted from this API response, ' +
-      'and set to 0 XRP to prevent misuse. ' +
-      'You must use "deliveredAmount" in order to process payments correctly.'
-  } else {
+  // Omit 'amount' for partial payments to prevent misuse
+  if (tx.Amount && !utils.isPartialPayment(tx)) {
     destination.amount = removeGenericCounterparty(
       parseAmount(tx.Amount || '0'), tx.Destination)
   }
@@ -56,7 +52,8 @@ function parsePayment(tx: any): Object {
     paths: tx.Paths ? JSON.stringify(tx.Paths) : undefined,
     allowPartialPayment: utils.isPartialPayment(tx) || undefined,
     noDirectRipple: isNoDirectRipple(tx) || undefined,
-    limitQuality: isQualityLimited(tx) || undefined
+    limitQuality: isQualityLimited(tx) || undefined,
+    rawTransaction: includeRawTransaction ? JSON.stringify(tx) : undefined
   })
 }
 

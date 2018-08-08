@@ -42,10 +42,11 @@ function parseTransactionType(type) {
   return mapping[type] || null
 }
 
-function parseTransaction(tx: any): any {
+function parseTransaction(tx: any, includeRawTransaction: boolean): any {
   const type = parseTransactionType(tx.TransactionType)
+  const _parsePayment = payment => parsePayment(payment, includeRawTransaction)
   const mapping = {
-    'payment': parsePayment,
+    'payment': _parsePayment,
     'trustline': parseTrustline,
     'order': parseOrder,
     'orderCancellation': parseOrderCancellation,

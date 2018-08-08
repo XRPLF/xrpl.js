@@ -29,7 +29,7 @@ function parseTransactionWrapper(ledgerVersion, tx) {
     meta: tx.metaData,
     ledger_index: ledgerVersion
   })
-  const result = parseTransaction(transaction)
+  const result = parseTransaction(transaction, false)
   if (!result.outcome.ledgerVersion) {
     result.outcome.ledgerVersion = ledgerVersion
   }

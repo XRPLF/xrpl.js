@@ -1,5 +1,16 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
+### Breaking Changes
+
++ The `specification.destination.amount` field is now optional in parsed transactions. It is omitted for partial payments.
++ To determine the amount that a transaction delivered, use `outcome.deliveredAmount`.
++ If you require the provisional requested `Amount` from the original transaction:
+  + Use `getTransaction`'s `includeRawTransaction` option, or
+  + Use `getTransactions`'s `includeRawTransactions` option, or
+  + Use the rippled APIs directly with `request`. For example, call the API methods `tx`, `account_tx`, etc.
+
 ## 1.0.0-beta.3 (2018-07-17)
 
 + For payment channel transactions, `getTransaction` includes a new
