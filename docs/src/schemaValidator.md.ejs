@@ -1,0 +1,87 @@
+## schemaValidator
+
+Unlike the rest of the ripple-lib API, schemaValidator is a static object on RippleAPI. It provides utility methods that do not use a server.
+
+## schemaValidate
+
+`RippleAPI.schemaValidator.schemaValidate(schemaName: string, object: any): void`
+
+This method checks an object for conformance to a specified schema. It does not return anything, but will throw a `ValidationError` if the object does not conform to the schema.
+
+## isValidAddress
+
+`RippleAPI.schemaValidator.isValidAddress(address: string): boolean`
+
+This method checks an address for validity. It does this by attempting to decoding the address. If decoding succeeds, this method returns `true`. Otherwise, it returns `false`.
+
+### Example
+
+```javascript
+RippleAPI.schemaValidator.isValidAddress('rDTXLQ7ZKZVKz33zJbHjgVShjsBnqMBhmN');
+```
+
+```json
+true
+```
+
+## isValidSecret
+
+`RippleAPI.schemaValidator.isValidSecret(secret: string): boolean`
+
+This method checks a secret for validity. It does this by attempting to decoding the secret. If decoding succeeds, this method returns `true`. Otherwise, it returns `false`.
+
+### Example
+
+```javascript
+RippleAPI.schemaValidator.isValidSecret('snoPBrXtMeMyMHUVTgbuqAfg1SUTb');
+```
+
+```json
+true
+```
+
+Warning: Do not use the above secret, which is shown here as an example only.
+
+## deriveKeypair
+
+```
+RippleAPI.schemaValidator.deriveKeypair(secret: string): {
+    privateKey: string,
+    publicKey: string
+}
+```
+
+This method derives a private key and public key from a given secret.
+
+### Example
+
+```javascript
+RippleAPI.schemaValidator.deriveKeypair('snoPBrXtMeMyMHUVTgbuqAfg1SUTb');
+```
+
+```json
+{
+    "privateKey": "001ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7",
+    "publicKey": "0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020"
+}
+```
+
+Warning: Do not use the above secret, which is shown here as an example only.
+
+## deriveAddress
+
+```
+RippleAPI.schemaValidator.deriveAddress(publicKeyHex: string): string
+```
+
+This method derives an address from the given public key. The public key should be provided in hex format.
+
+### Example
+
+```javascript
+RippleAPI.schemaValidator.deriveAddress('0330E7FC9D56BB25D6893BA3F317AE5BCF33B3291BD63DB32654A313222F7FD020');
+```
+
+```json
+"rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh"
+```

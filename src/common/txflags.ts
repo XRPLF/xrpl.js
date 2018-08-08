@@ -1,5 +1,3 @@
-
-
 const txFlags = {
   // Universal flags can apply to any transaction type
   Universal: {

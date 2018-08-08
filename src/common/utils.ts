@@ -133,7 +133,7 @@ function rippleToUnixTimestamp(rpepoch: number): number {
 
 /**
  * @param {Number|Date} timestamp (ms since unix epoch)
- * @return {Number} seconds since ripple epoch ( 1/1/2000 GMT)
+ * @return {Number} seconds since ripple epoch (1/1/2000 GMT)
  */
 function unixToRippleTimestamp(timestamp: number): number {
   return Math.round(timestamp / 1000) - 0x386D4380
@@ -143,6 +143,10 @@ function rippleTimeToISO8601(rippleTime: number): string {
   return new Date(rippleToUnixTimestamp(rippleTime)).toISOString()
 }
 
+/**
+ * @param {string} iso8601 international standard date format
+ * @return {number} seconds since ripple epoch (1/1/2000 GMT)
+ */
 function iso8601ToRippleTime(iso8601: string): number {
   return unixToRippleTimestamp(Date.parse(iso8601))
 }
