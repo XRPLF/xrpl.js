@@ -20,7 +20,7 @@ Applies globally to all transactions.
 
 `txFlags.Payment.PartialPayment`: If the specified destination amount cannot be sent without spending more than the source maxAmount, reduce the received amount instead of failing outright. See [Partial Payments](https://developers.ripple.com/partial-payments.html) for more details.
 
-`txFlags.Payment.PartialPayment`: Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of `Amount`:`SendMax`. See [Limit Quality](https://developers.ripple.com/payment.html#limit-quality) for details.
+`txFlags.Payment.LimitQuality`: Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of `destination.amount`:`source.maxAmount`. See [Limit Quality](https://developers.ripple.com/payment.html#limit-quality) for details.
 
 ### OfferCreate Flags
 
@@ -28,19 +28,19 @@ Applies globally to all transactions.
 
 `txFlags.OfferCreate.ImmediateOrCancel`: Treat the offer as an Immediate or Cancel order. If enabled, the offer never becomes a ledger object: it only tries to match existing offers in the ledger.
 
-`txFlags.OfferCreate.FillOrKill`: Treat the offer as a Fill or Kill order. Only try to match existing offers in the ledger, and only do so if the entire TakerPays quantity can be obtained.
+`txFlags.OfferCreate.FillOrKill`: Treat the offer as a Fill or Kill order.
 
-`txFlags.OfferCreate.Sell`: Exchange the entire TakerGets amount, even if it means obtaining more than the TakerPays amount in exchange.
+`txFlags.OfferCreate.Sell`: Treat the offer as a Sell order. With `order.direction = 'sell'`, exchange the entire `order.quantity`, even if it means obtaining more than the `order.totalPrice` amount in exchange. If using `prepareOrder`, ripple-lib sets this flag for you.
 
 ### TrustSet Flags
 
-`txFlags.TrustSet.SetAuth`: Authorize the other party to hold issuances from this account. (No effect unless using the asfRequireAuth AccountSet flag.) Cannot be unset.
+`txFlags.TrustSet.SetAuth`: Authorize the other party to hold issuances from this account. (No effect unless using the AccountSet.RequireAuth flag.) Cannot be unset.
 
 `txFlags.TrustSet.NoRipple`:  Obsolete.
 
-`txFlags.TrustSet.SetNoRipple`: Blocks rippling between two trustlines of the same currency, if this flag is set on both. (See No Ripple for details.)
+`txFlags.TrustSet.SetNoRipple`: Blocks [rippling](https://developers.ripple.com/rippling.html) between two trustlines of the same currency, if this flag is set on both.
 
-`txFlags.TrustSet.ClearNoRipple`: Clears the No-Rippling flag. (See NoRipple for details.)
+`txFlags.TrustSet.ClearNoRipple`: Clears the No-[Rippling](https://developers.ripple.com/rippling.html) flag.
 
 `txFlags.TrustSet.SetFreeze`: Freeze the trustline. A non-XRP currency can be frozen by the exchange or gateway that issued it. XRP cannot be frozen.
 
@@ -48,7 +48,9 @@ Applies globally to all transactions.
 
 ### AccountSet Flags
 
-Account Flags can be enabled and disabled with the SetFlag and ClearFlag parameters. See [AccountSet Flags](https://developers.ripple.com/accountset.html#accountset-flags).
+You can use the `prepareSettings` method to change your account flags. This method uses AccountSet flags internally.
+
+In the rippled API, Account Flags can be enabled and disabled with the SetFlag and ClearFlag parameters. See [AccountSet Flags](https://developers.ripple.com/accountset.html#accountset-flags).
 
 The AccountSet transaction type has some transaction flags, but their use is discouraged.
 
