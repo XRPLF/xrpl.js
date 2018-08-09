@@ -5280,7 +5280,7 @@ Converts an amount of drops to XRP. 1 drop = 0.000001 XRP, so 1 XRP = 1,000,000 
 
 ### Parameters
 
-`drops`: A string or BigNumber representing an amount of drops. If `drops` is a string, it may start with `-`, must contain at least one number, and must not contain `.`. This method throws a `ValidationError` for invalid input.
+`drops`: A string or BigNumber representing an amount of drops. If `drops` is a string, it may start with `-` and must contain at least one number. This method throws a `ValidationError` for invalid input.
 
 ### Return Value
 
@@ -5346,7 +5346,7 @@ Applies globally to all transactions.
 
 `txFlags.Payment.PartialPayment`: If the specified destination amount cannot be sent without spending more than the source maxAmount, reduce the received amount instead of failing outright. See [Partial Payments](https://developers.ripple.com/partial-payments.html) for more details.
 
-`txFlags.Payment.PartialPayment`: Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of `Amount`:`SendMax`. See [Limit Quality](https://developers.ripple.com/payment.html#limit-quality) for details.
+`txFlags.Payment.LimitQuality`: Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of `destination.amount`:`source.maxAmount`. See [Limit Quality](https://developers.ripple.com/payment.html#limit-quality) for details.
 
 ### OfferCreate Flags
 
@@ -5354,19 +5354,19 @@ Applies globally to all transactions.
 
 `txFlags.OfferCreate.ImmediateOrCancel`: Treat the offer as an Immediate or Cancel order. If enabled, the offer never becomes a ledger object: it only tries to match existing offers in the ledger.
 
-`txFlags.OfferCreate.FillOrKill`: Treat the offer as a Fill or Kill order. Only try to match existing offers in the ledger, and only do so if the entire TakerPays quantity can be obtained.
+`txFlags.OfferCreate.FillOrKill`: Treat the offer as a Fill or Kill order.
 
-`txFlags.OfferCreate.Sell`: Exchange the entire TakerGets amount, even if it means obtaining more than the TakerPays amount in exchange.
+`txFlags.OfferCreate.Sell`: Treat the offer as a Sell order. With `order.direction = 'sell'`, exchange the entire `order.quantity`, even if it means obtaining more than the `order.totalPrice` amount in exchange. If using `prepareOrder`, ripple-lib sets this flag for you.
 
 ### TrustSet Flags
 
-`txFlags.TrustSet.SetAuth`: Authorize the other party to hold issuances from this account. (No effect unless using the asfRequireAuth AccountSet flag.) Cannot be unset.
+`txFlags.TrustSet.SetAuth`: Authorize the other party to hold issuances from this account. (No effect unless using the AccountSet.RequireAuth flag.) Cannot be unset.
 
 `txFlags.TrustSet.NoRipple`:  Obsolete.
 
-`txFlags.TrustSet.SetNoRipple`: Blocks rippling between two trustlines of the same currency, if this flag is set on both. (See No Ripple for details.)
+`txFlags.TrustSet.SetNoRipple`: Blocks [rippling](https://developers.ripple.com/rippling.html) between two trustlines of the same currency, if this flag is set on both.
 
-`txFlags.TrustSet.ClearNoRipple`: Clears the No-Rippling flag. (See NoRipple for details.)
+`txFlags.TrustSet.ClearNoRipple`: Clears the No-[Rippling](https://developers.ripple.com/rippling.html) flag.
 
 `txFlags.TrustSet.SetFreeze`: Freeze the trustline. A non-XRP currency can be frozen by the exchange or gateway that issued it. XRP cannot be frozen.
 
@@ -5374,7 +5374,9 @@ Applies globally to all transactions.
 
 ### AccountSet Flags
 
-Account Flags can be enabled and disabled with the SetFlag and ClearFlag parameters. See [AccountSet Flags](https://developers.ripple.com/accountset.html#accountset-flags).
+You can use the `prepareSettings` method to change your account flags. This method uses AccountSet flags internally.
+
+In the rippled API, Account Flags can be enabled and disabled with the SetFlag and ClearFlag parameters. See [AccountSet Flags](https://developers.ripple.com/accountset.html#accountset-flags).
 
 The AccountSet transaction type has some transaction flags, but their use is discouraged.
 
@@ -5414,11 +5416,37 @@ Unlike the rest of the ripple-lib API, schemaValidator is a static object on Rip
 
 This method checks an object for conformance to a specified schema. It does not return anything, but will throw a `ValidationError` if the object does not conform to the schema.
 
+### Example
+
+```javascript
+RippleAPI.schemaValidator.schemaValidate('sign', {
+    signedTransaction: '12000322800000002400000017201B0086955368400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100BDE09A1F6670403F341C21A77CF35BA47E45CDE974096E1AA5FC39811D8269E702203D60291B9A27F1DCABA9CF5DED307B4F23223E0B6F156991DB601DFB9C41CE1C770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304',
+    id: '02ACE87F1996E3A23690A5BB7F1774BF71CCBA68F79805831B42ABAD5913D6F4'
+})
+```
+
+```json
+undefined
+```
+
+If the object is valid (conforms to the schema), nothing is returned. Otherwise, `schemaValidate` throws an error:
+
+```javascript
+RippleAPI.schemaValidator.schemaValidate('sign', {
+    signedTransaction: '12000322800000002400000017201B0086955368400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100BDE09A1F6670403F341C21A77CF35BA47E45CDE974096E1AA5FC39811D8269E702203D60291B9A27F1DCABA9CF5DED307B4F23223E0B6F156991DB601DFB9C41CE1C770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304',
+    id: '123'
+})
+```
+
+```
+[ValidationError(instance.id does not match pattern "^[A-F0-9]{64}$")]
+```
+
 ## isValidAddress
 
 `RippleAPI.schemaValidator.isValidAddress(address: string): boolean`
 
-This method checks an address for validity. It does this by attempting to decoding the address. If decoding succeeds, this method returns `true`. Otherwise, it returns `false`.
+This method checks an address for validity. It does this by attempting to decode the address. If decoding succeeds, this method returns `true`. Otherwise, it returns `false`.
 
 ### Example
 
@@ -5434,7 +5462,7 @@ true
 
 `RippleAPI.schemaValidator.isValidSecret(secret: string): boolean`
 
-This method checks a secret for validity. It does this by attempting to decoding the secret. If decoding succeeds, this method returns `true`. Otherwise, it returns `false`.
+This method checks a secret for validity. It does this by attempting to decode the secret. If decoding succeeds, this method returns `true`. Otherwise, it returns `false`.
 
 ### Example
 
