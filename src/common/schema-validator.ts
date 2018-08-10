@@ -3,7 +3,7 @@ import * as assert from 'assert'
 const {Validator} = require('jsonschema')
 import {ValidationError} from './errors'
 import {isValidAddress} from 'ripple-address-codec'
-import {isValidSecret,deriveKeypair,deriveAddress} from './utils'
+import {isValidSecret} from './utils'
 
 function loadSchemas() {
   // listed explicitly for webpack (instead of scanning schemas directory)
@@ -158,8 +158,5 @@ function schemaValidate(schemaName: string, object: any): void {
 
 export {
   schemaValidate,
-  isValidAddress,
-  isValidSecret,
-  deriveKeypair,
-  deriveAddress
+  isValidSecret
 }
