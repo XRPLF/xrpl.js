@@ -18,6 +18,7 @@ function removeGenericCounterparty(amount, address) {
     _.omit(amount, 'counterparty') : amount
 }
 
+// Payment specification
 function parsePayment(tx: any, includeRawTransaction: boolean): Object {
   assert(tx.TransactionType === 'Payment')
 
