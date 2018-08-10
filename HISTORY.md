@@ -1,5 +1,10 @@
 # ripple-lib Release History
 
+## 1.0.0-beta.4 (2018-08-10)
+
++ [Add `prepareTransaction()`](https://github.com/ripple/ripple-lib/pull/898)
++ Internal improvements and cleanup
+
 ## 1.0.0-beta.3 (2018-07-17)
 
 + For payment channel transactions, `getTransaction` includes a new
