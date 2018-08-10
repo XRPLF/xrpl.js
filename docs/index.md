@@ -76,6 +76,8 @@
   - [combine](#combine)
   - [submit](#submit)
   - [generateAddress](#generateaddress)
+  - [deriveKeypair](#derivekeypair)
+  - [deriveAddress](#deriveaddress)
   - [signPaymentChannelClaim](#signpaymentchannelclaim)
   - [verifyPaymentChannelClaim](#verifypaymentchannelclaim)
   - [computeLedgerHash](#computeledgerhash)
@@ -5102,6 +5104,48 @@ return api.generateAddress();
 }
 ```
 
+
+## deriveKeypair
+
+`deriveKeypair(seed: string) -> {privateKey: string, publicKey: string}`
+
+Derive a public and private key from a seed.
+
+### Parameters
+
+This method takes one parameter, the seed from which to derive the public and private key.
+
+### Return Value
+
+The method return an object containing the public and private components of the keypair corresponding to the seed.
+
+### Example
+
+```javascript
+var keypair = api.schemaValidator.deriveKeypair(seed)
+var public_key = keypair.publicKey;
+var private_key = keypair.privateKey;
+```
+
+## deriveAddress
+
+`deriveAddress(publicKey: string) -> string
+
+Derive a Ripple address from a public key.
+
+### Parameters
+
+This method takes one parameter, the public key from which to derive the address.
+
+### Return Value
+
+The method return a string corresponding to the address derived from the public key.
+
+### Example
+
+```javascript
+var address = api.schemaValidator.derviceAddress(public_key);
+```
 
 ## signPaymentChannelClaim
 
