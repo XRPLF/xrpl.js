@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "license": "ISC",
   "description": "A JavaScript API for interacting with Ripple in Node.js and the browser",
   "files": [
