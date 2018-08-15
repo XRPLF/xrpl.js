@@ -11,6 +11,15 @@
   + Use `getTransactions`'s `includeRawTransactions` option, or
   + Use the rippled APIs directly with `request`. For example, call the API methods `tx`, `account_tx`, etc.
 
+## 1.0.0-beta.5 (2018-08-11)
+
++ [Fix a TypeScript error by importing the `Prepare` type](https://github.com/ripple/ripple-lib/commit/7cd517268bda5fe74b91dad02fedf8b51b7eae9b)
+
+## 1.0.0-beta.4 (2018-08-10)
+
++ [Add `prepareTransaction()`](https://github.com/ripple/ripple-lib/pull/898)
++ Internal improvements and cleanup
+
 ## 1.0.0-beta.3 (2018-07-17)
 
 + For payment channel transactions, `getTransaction` includes a new

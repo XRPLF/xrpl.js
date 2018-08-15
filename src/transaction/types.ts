@@ -22,10 +22,10 @@ export type Instructions = {
 export type Prepare = {
   txJSON: string,
   instructions: {
-   fee: string,
-   sequence: number,
-   maxLedgerVersion?: number
- }
+    fee: string,
+    sequence: number,
+    maxLedgerVersion?: number
+  }
 }
 
 export type Submit = {
