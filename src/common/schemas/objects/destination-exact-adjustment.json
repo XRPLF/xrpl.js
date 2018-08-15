@@ -9,10 +9,10 @@
     },
     "amount": {
       "$ref": "laxAmount",
-      "description": "An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount.) When parsing a partial payment, this field may be hidden; for the amount that the transaction delivered, see 'deliveredAmount'."
+      "description": "An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount.)"
     },
     "tag": {"$ref": "tag"}
   },
-  "required": ["address"],
+  "required": ["address", "amount"],
   "additionalProperties": false
 }

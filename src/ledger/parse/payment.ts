@@ -37,12 +37,7 @@ function parsePayment(tx: any, includeRawTransaction: boolean): Object {
   } = {
     address: tx.Destination,
     tag: tx.DestinationTag
-  }
-
-  // Omit 'amount' for partial payments to prevent misuse
-  if (tx.Amount && !utils.isPartialPayment(tx)) {
-    destination.amount = removeGenericCounterparty(
-      parseAmount(tx.Amount || '0'), tx.Destination)
+    // Notice that `amount` is omitted to prevent misinterpretation
   }
 
   return removeUndefined({

@@ -12,11 +12,7 @@
       }
     },
     "destination": {
-      "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-      "amount": {
-        "currency": "USD",
-        "value": "0.001"
-      }
+      "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
     },
     "paths": "[[{\"currency\":\"USD\",\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"type\":48,\"type_hex\":\"0000000000000030\"},{\"account\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\",\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"type\":49,\"type_hex\":\"0000000000000031\"}]]"
   }

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "destinationAddressTag",
+  "description": "A destination address and optional tag, with no amount included. When parsing an incoming transaction, the original specification's amount is hidden to prevent misinterpretation. For the amount that the transaction delivered, see `outcome.deliveredAmount`.",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address to receive at."
+    },
+    "tag": {"$ref": "tag"}
+  },
+  "required": ["address"],
+  "additionalProperties": false
+}
