@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "id",
+  "title": "transactionHash",
   "link": "transaction-id",
   "description": "A hash of a transaction used to identify the transaction, represented in hexadecimal.",
   "type": "string",

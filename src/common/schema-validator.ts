@@ -31,7 +31,7 @@ function loadSchemas() {
     require('./schemas/objects/min-adjustment.json'),
     require('./schemas/objects/source-exact-adjustment.json'),
     require('./schemas/objects/destination-exact-adjustment.json'),
-    require('./schemas/objects/tx-hash.json'),
+    require('./schemas/objects/transaction-hash.json'),
     require('./schemas/objects/address.json'),
     require('./schemas/objects/adjustment.json'),
     require('./schemas/objects/quality.json'),
