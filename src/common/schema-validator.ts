@@ -9,7 +9,7 @@ function loadSchemas() {
   // listed explicitly for webpack (instead of scanning schemas directory)
   const schemas = [
     require('./schemas/objects/tx-json.json'),
-    require('./schemas/objects/tx-type.json'),
+    require('./schemas/objects/transaction-type.json'),
     require('./schemas/objects/hash128.json'),
     require('./schemas/objects/hash256.json'),
     require('./schemas/objects/sequence.json'),

@@ -1136,7 +1136,7 @@ Retrieves a transaction by its [Transaction ID](#transaction-id).
 
 Name | Type | Description
 ---- | ---- | -----------
-id | [id](#transaction-id) | A hash of a transaction used to identify the transaction, represented in hexadecimal.
+id | [transactionHash](#transaction-id) | A hash of a transaction used to identify the transaction, represented in hexadecimal.
 options | object | *Optional* Options to limit the ledger versions to search.
 *options.* maxLedgerVersion | integer | *Optional* The highest ledger version to search
 *options.* maxLedgerVersion | string | *Optional* The highest ledger version to search
@@ -1149,7 +1149,7 @@ This method returns a promise that resolves with a transaction object containing
 
 Name | Type | Description
 ---- | ---- | -----------
-id | [id](#transaction-id) | A hash of the transaction that can be used to identify it.
+id | [transactionHash](#transaction-id) | A hash of the transaction that can be used to identify it.
 address | [address](#address) | The address of the account that initiated the transaction.
 sequence | [sequence](#account-sequence-number) | The account sequence number of the transaction for the account that initiated it.
 type | [transactionType](#transaction-types) | The type of the transaction.
@@ -4079,7 +4079,7 @@ transactionHash | string | Hash of the transaction information included in this 
 rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.
 rawTransactions | string | *Optional* A JSON string containing rippled format transaction JSON for all transactions that were validated in this ledger.
 stateHashes | array\<string\> | *Optional* An array of hashes of all state data in this ledger.
-transactionHashes | array\<[id](#transaction-id)\> | *Optional* An array of hashes of all transactions that were validated in this ledger.
+transactionHashes | array\<[transactionHash](#transaction-id)\> | *Optional* An array of hashes of all transactions that were validated in this ledger.
 transactions | array\<[getTransaction](#gettransaction)\> | *Optional* Array of all transactions that were validated in this ledger. Transactions are represented in the same format as the return value of [getTransaction](#gettransaction).
 
 ### Example
@@ -4971,7 +4971,7 @@ This method returns an object with the following structure:
 Name | Type | Description
 ---- | ---- | -----------
 signedTransaction | string | The signed transaction represented as an uppercase hexadecimal string.
-id | [id](#transaction-id) | The [Transaction ID](#transaction-id) of the signed transaction.
+id | [transactionHash](#transaction-id) | The [Transaction ID](#transaction-id) of the signed transaction.
 
 ### Example
 
@@ -5010,7 +5010,7 @@ This method returns an object with the following structure:
 Name | Type | Description
 ---- | ---- | -----------
 signedTransaction | string | The signed transaction represented as an uppercase hexadecimal string.
-id | [id](#transaction-id) | The [Transaction ID](#transaction-id) of the signed transaction.
+id | [transactionHash](#transaction-id) | The [Transaction ID](#transaction-id) of the signed transaction.
 
 ### Example
 
@@ -5212,7 +5212,7 @@ ledger | object | The ledger header to hash.
 *ledger.* rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.
 *ledger.* rawTransactions | string | *Optional* A JSON string containing rippled format transaction JSON for all transactions that were validated in this ledger.
 *ledger.* stateHashes | array\<string\> | *Optional* An array of hashes of all state data in this ledger.
-*ledger.* transactionHashes | array\<[id](#transaction-id)\> | *Optional* An array of hashes of all transactions that were validated in this ledger.
+*ledger.* transactionHashes | array\<[transactionHash](#transaction-id)\> | *Optional* An array of hashes of all transactions that were validated in this ledger.
 *ledger.* transactions | array\<[getTransaction](#gettransaction)\> | *Optional* Array of all transactions that were validated in this ledger. Transactions are represented in the same format as the return value of [getTransaction](#gettransaction).
 
 ### Return Value
