@@ -480,7 +480,57 @@ module.exports = function createMockRippled(port) {
     if (request.subcommand === 'close') {   // for path_find command
       return;
     }
-    if (request.source_account === addresses.NOTFOUND) {
+    if (request.source_account === 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx') {
+      // getPaths - result path has source_amount in drops
+      response = createResponse(request, {
+        "id": 0,
+        "type": "response",
+        "status": "success",
+        "result": {
+          "alternatives": [
+            {
+              "destination_amount": {
+                "currency": "EUR",
+                "issuer": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u",
+                "value": "1"
+              },
+              "paths_canonical": [],
+              "paths_computed": [
+                [
+                  {
+                    "currency": "USD",
+                    "issuer": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u",
+                    "type": 48,
+                    "type_hex": "0000000000000030"
+                  },
+                  {
+                    "currency": "EUR",
+                    "issuer": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u",
+                    "type": 48,
+                    "type_hex": "0000000000000030"
+                  }
+                ]
+              ],
+              "source_amount": "1000000"
+            }
+          ],
+          "destination_account": "rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5",
+          "destination_amount": {
+            "currency": "EUR",
+            "issuer": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u",
+            "value": "-1"
+          },
+          "destination_currencies": [
+            "EUR",
+            "XRP"
+          ],
+          "full_reply": true,
+          "id": 2,
+          "source_account": "rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx",
+          "status": "success"
+        }
+      })
+    } else if (request.source_account === addresses.NOTFOUND) {
       response = createResponse(request, fixtures.path_find.srcActNotFound);
     } else if (request.source_account === addresses.SOURCE_LOW_FUNDS) {
       response = createResponse(request, fixtures.path_find.sourceAmountLow);
