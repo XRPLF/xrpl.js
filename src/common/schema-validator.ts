@@ -36,7 +36,7 @@ function loadSchemas() {
     require('./schemas/objects/adjustment.json'),
     require('./schemas/objects/quality.json'),
     require('./schemas/objects/amount.json'),
-    require('./schemas/objects/amount-base.json'),
+    require('./schemas/objects/amountbase.json'),
     require('./schemas/objects/balance.json'),
     require('./schemas/objects/blob.json'),
     require('./schemas/objects/currency.json'),
