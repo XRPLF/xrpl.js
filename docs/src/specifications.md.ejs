@@ -28,6 +28,8 @@ See [Transaction Types](#transaction-types) for a description.
 
 <%- renderSchema('specifications/order.json') %>
 
+The following invalid flag combination causes a `ValidationError`: `immediateOrCancel` and `fillOrKill`. These fields are mutually exclusive, and cannot both be set at the same time.
+
 ### Example
 
 <%- renderFixture('requests/prepare-order.json') %>
