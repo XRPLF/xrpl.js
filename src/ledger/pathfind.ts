@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import {getXRPBalance, renameCounterpartyToIssuer} from './utils'
-import {validate, toRippledAmount, errors} from '../common'
+import {validate, toRippledAmount, errors, xrpToDrops} from '../common'
 import {Connection} from '../common'
 import parsePathfind from './parse/pathfind'
 import {RippledAmount, Amount} from '../common/types/objects'
@@ -95,13 +95,23 @@ function filterSourceFundsLowPaths(pathfind: PathFind,
 ): RippledPathsResponse {
   if (pathfind.source.amount &&
       pathfind.destination.amount.value === undefined && paths.alternatives) {
-    paths.alternatives = _.filter(paths.alternatives, alt =>
-        !!alt.source_amount &&
-        !!pathfind.source.amount &&
-        // TODO: Returns false when alt.source_amount is a string. Fix?
-        typeof alt.source_amount !== 'string' &&
-        new BigNumber(alt.source_amount.value).eq(pathfind.source.amount.value)
-    )
+    paths.alternatives = _.filter(paths.alternatives, alt => {
+      let altSourceAmountValue: BigNumber
+      let pathfindSourceAmountValue: BigNumber
+      if (typeof alt.source_amount === 'string') {
+        altSourceAmountValue = new BigNumber(alt.source_amount)
+      } else {
+        altSourceAmountValue = new BigNumber(alt.source_amount.value)
+      }
+      if (pathfind.source.amount.currency === 'XRP') {
+        pathfindSourceAmountValue =
+          new BigNumber(xrpToDrops(pathfind.source.amount.value))
+      } else {
+        pathfindSourceAmountValue = new BigNumber(pathfind.source.amount.value)
+      }
+      return !!alt.source_amount &&
+        altSourceAmountValue.eq(pathfindSourceAmountValue)
+    })
   }
   return paths
 }
