@@ -2308,7 +2308,7 @@ describe('RippleAPI', function () {
               currency: 'EUR'
           }
       }
-  }).then(
+    }).then(
       _.partial(checkResult, [
         {
           "source": {

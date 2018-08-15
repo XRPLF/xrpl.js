@@ -100,8 +100,11 @@ function filterSourceFundsLowPaths(pathfind: PathFind,
       let pathfindSourceAmountValue: BigNumber
       if (typeof alt.source_amount === 'string') {
         altSourceAmountValue = new BigNumber(alt.source_amount)
-      } else {
+      } else if (alt.source_amount) {
         altSourceAmountValue = new BigNumber(alt.source_amount.value)
+      } else {
+        // No alt.source_amount
+        return false
       }
       if (pathfind.source.amount.currency === 'XRP') {
         pathfindSourceAmountValue =
@@ -109,8 +112,7 @@ function filterSourceFundsLowPaths(pathfind: PathFind,
       } else {
         pathfindSourceAmountValue = new BigNumber(pathfind.source.amount.value)
       }
-      return !!alt.source_amount &&
-        altSourceAmountValue.eq(pathfindSourceAmountValue)
+      return altSourceAmountValue.eq(pathfindSourceAmountValue)
     })
   }
   return paths
