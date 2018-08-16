@@ -32,7 +32,6 @@ function parsePayment(tx: any, includeRawTransaction: boolean): Object {
   const destination: {
     address: string,
     amount?: Amount,
-    amountInfo?: string,
     tag: number | undefined
   } = {
     address: tx.Destination,
