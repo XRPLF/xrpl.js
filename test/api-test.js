@@ -2295,18 +2295,18 @@ describe('RippleAPI', function () {
   it('getPaths - result path has source_amount in drops', function () {
     return this.api.getPaths({
       source: {
-          address: 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx',
-          amount: {
-              value: this.api.dropsToXrp(1000000),
-              currency: 'XRP'
-          }
+        address: 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx',
+        amount: {
+          value: this.api.dropsToXrp(1000000),
+          currency: 'XRP'
+        }
       },
       destination: {
-          address: 'rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5',
-          amount: {
-              counterparty: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
-              currency: 'EUR'
-          }
+        address: 'rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5',
+        amount: {
+          counterparty: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
+          currency: 'EUR'
+        }
       }
     }).then(
       _.partial(checkResult, [
