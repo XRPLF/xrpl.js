@@ -2436,8 +2436,6 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.getLedger.header, 'getLedger'));
   });
 
-  // New in > 0.21.0
-  // future ledger versions are allowed, and passed to rippled as-is.
   it('getLedger - future ledger version', function () {
     return this.api.getLedger({ ledgerVersion: 14661789 }).then(response => {
       assert(response)
@@ -2470,7 +2468,7 @@ describe('RippleAPI', function () {
     const request = {
       includeTransactions: true,
       includeAllData: true,
-      ledgerVersion: 100000
+      ledgerVersion: 22420574
     };
     return this.api.getLedger(request).then(
       _.partial(checkResult, responses.getLedger.withPartial, 'getLedger'));

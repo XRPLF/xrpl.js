@@ -256,7 +256,8 @@ module.exports = function createMockRippled(port) {
         createLedgerResponse(request, fixtures.ledger.withoutCloseTime));
     } else if (request.ledger_index === 4181996) {
       conn.send(createLedgerResponse(request, fixtures.ledger.withSettingsTx));
-    } else if (request.ledger_index === 100000) {
+    } else if (request.ledger_index === 22420574 &&
+        request.expand === true && request.transactions === true) {
       conn.send(
         createLedgerResponse(request, fixtures.ledger.withPartialPayment));
     } else if (request.ledger_index === 100001) {
@@ -266,8 +267,12 @@ module.exports = function createMockRippled(port) {
       const response = _.assign({}, fixtures.ledger.normal,
         { result: { ledger: fullLedger } });
       conn.send(createLedgerResponse(request, response));
-    } else {
+    } else if (request.ledger_index === 'validated' ||
+        request.ledger_index === 14661789 ||
+        request.ledger_index === 14661788 /* getTransaction - order */) {
       conn.send(createLedgerResponse(request, fixtures.ledger.normal));
+    } else {
+      assert(false, 'Unrecognized ledger request: ' + JSON.stringify(request));
     }
   });
 
