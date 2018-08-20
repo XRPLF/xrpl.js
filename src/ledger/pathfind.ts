@@ -1,7 +1,13 @@
 import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import {getXRPBalance, renameCounterpartyToIssuer} from './utils'
-import {validate, toRippledAmount, errors, xrpToDrops} from '../common'
+import {
+  validate,
+  toRippledAmount,
+  errors,
+  xrpToDrops,
+  dropsToXrp
+} from '../common'
 import {Connection} from '../common'
 import parsePathfind from './parse/pathfind'
 import {RippledAmount, Amount} from '../common/types/objects'
@@ -23,7 +29,11 @@ function addParams(request: PathFindRequest, result: RippledPathsResponse
 function requestPathFind(connection: Connection, pathfind: PathFind
 ): Promise<RippledPathsResponse> {
   const destinationAmount: Amount = _.assign(
-    {value: '-1'},
+    {
+      // This is converted back to drops by toRippledAmount()
+      value: pathfind.destination.amount.currency === 'XRP' ?
+        dropsToXrp('-1') : '-1'
+    },
     pathfind.destination.amount
   )
   const request: PathFindRequest = {

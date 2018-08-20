@@ -542,8 +542,9 @@ module.exports = function createMockRippled(port) {
         destination_address: request.destination_address
       });
     } else if (request.source_account === addresses.ACCOUNT) {
-      if (request.destination_account ===
-        'ra5nK24KXen9AHvsdFTKHSANinZseWnPcX') {
+      if (request.destination_account === 'ra5nK24KXen9AHvsdFTKHSANinZseWnPcX' &&
+          // Important: Ensure that destination_amount.value is correct
+          request.destination_amount.value === "-1") {
         response = createResponse(request, fixtures.path_find.sendAll);
       } else {
         response = fixtures.path_find.generate.generateIOUPaymentPaths(
