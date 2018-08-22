@@ -24,6 +24,10 @@
     "invoiceID": {
       "$ref": "hash256",
       "description": "256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check."
+    },
+    "rawTransaction": {
+      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
+      "type": "string"
     }
   },
   "required": ["destination", "sendMax"],

@@ -22,6 +22,10 @@
       "type": "string",
       "description": "A hex value representing the [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1) fulfillment for `condition`.",
       "pattern": "^[A-F0-9]+$"
+    },
+    "rawTransaction": {
+      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
+      "type": "string"
     }
   },
   "required": ["owner", "escrowSequence"],

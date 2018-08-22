@@ -3,7 +3,6 @@ import * as assert from 'assert'
 import * as utils from './utils'
 import {txFlags, removeUndefined} from '../../common'
 import parseAmount from './amount'
-import {Amount} from '../../common/types/objects'
 
 function isNoDirectRipple(tx) {
   return (tx.Flags & txFlags.Payment.NoRippleDirect) !== 0
@@ -19,7 +18,7 @@ function removeGenericCounterparty(amount, address) {
 }
 
 // Payment specification
-function parsePayment(tx: any, includeRawTransaction: boolean): Object {
+function parsePayment(tx: any): Object {
   assert(tx.TransactionType === 'Payment')
 
   const source = {
@@ -31,7 +30,6 @@ function parsePayment(tx: any, includeRawTransaction: boolean): Object {
 
   const destination: {
     address: string,
-    amount?: Amount,
     tag: number | undefined
   } = {
     address: tx.Destination,
@@ -47,8 +45,7 @@ function parsePayment(tx: any, includeRawTransaction: boolean): Object {
     paths: tx.Paths ? JSON.stringify(tx.Paths) : undefined,
     allowPartialPayment: utils.isPartialPayment(tx) || undefined,
     noDirectRipple: isNoDirectRipple(tx) || undefined,
-    limitQuality: isQualityLimited(tx) || undefined,
-    rawTransaction: includeRawTransaction ? JSON.stringify(tx) : undefined
+    limitQuality: isQualityLimited(tx) || undefined
   })
 }
 

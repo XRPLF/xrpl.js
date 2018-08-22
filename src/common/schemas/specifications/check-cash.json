@@ -15,6 +15,10 @@
     "deliverMin": {
       "$ref": "laxAmount",
       "description": "Redeem the Check for at least this amount and for as much as possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or amount."
+    },
+    "rawTransaction": {
+      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
+      "type": "string"
     }
   },
   "required": ["checkID"],

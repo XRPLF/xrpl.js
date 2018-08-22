@@ -63,7 +63,7 @@
       "description": "An array of hashes of all transactions that were validated in this ledger.",
       "type": "array",
       "items": {
-        "$ref": "id"
+        "$ref": "transactionHash"
       }
     },
     "rawState": {

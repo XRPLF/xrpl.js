@@ -8,7 +8,11 @@
       "$ref": "sequence",
       "description": "The [account sequence number](#account-sequence-number) of the order to cancel."
     },
-    "memos": {"$ref": "memos"}
+    "memos": {"$ref": "memos"},
+    "rawTransaction": {
+      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
+      "type": "string"
+    }
   },
   "required": ["orderSequence"],
   "additionalProperties": false

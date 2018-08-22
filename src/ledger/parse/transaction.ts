@@ -44,9 +44,8 @@ function parseTransactionType(type) {
 
 function parseTransaction(tx: any, includeRawTransaction: boolean): any {
   const type = parseTransactionType(tx.TransactionType)
-  const _parsePayment = payment => parsePayment(payment, includeRawTransaction)
   const mapping = {
-    'payment': _parsePayment,
+    'payment': parsePayment,
     'trustline': parseTrustline,
     'order': parseOrder,
     'orderCancellation': parseOrderCancellation,
@@ -65,7 +64,9 @@ function parseTransaction(tx: any, includeRawTransaction: boolean): any {
   }
   const parser: Function = mapping[type]
   assert(parser !== undefined, 'Unrecognized transaction type')
-  const specification = parser(tx)
+  const specification = Object.assign({}, parser(tx), {
+    rawTransaction: includeRawTransaction ? JSON.stringify(tx) : undefined
+  })
   const outcome = parseOutcome(tx)
   return removeUndefined({
     type: type,
