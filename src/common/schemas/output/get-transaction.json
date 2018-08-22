@@ -14,7 +14,7 @@
       "description": "The outcome of the transaction (what effects it had)."
     },
     "id": {
-      "$ref": "id",
+      "$ref": "transactionHash",
       "description": "A hash of the transaction that can be used to identify it."
     },
     "address": {

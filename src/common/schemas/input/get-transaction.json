@@ -4,7 +4,7 @@
   "description": "Parameters for getTransaction",
   "type": "object",
   "properties": {
-    "id": {"$ref": "id"},
+    "id": {"$ref": "transactionHash"},
     "options": {
       "description": "Options to limit the ledger versions to search.",
       "properties": {
