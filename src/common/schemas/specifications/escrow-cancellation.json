@@ -12,10 +12,6 @@
     "escrowSequence": {
       "$ref": "sequence",
       "description": "The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to cancel."
-    },
-    "rawTransaction": {
-      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
-      "type": "string"
     }
   },
   "required": ["owner", "escrowSequence"],

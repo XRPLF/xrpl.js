@@ -64,9 +64,7 @@ function parseTransaction(tx: any, includeRawTransaction: boolean): any {
   }
   const parser: Function = mapping[type]
   assert(parser !== undefined, 'Unrecognized transaction type')
-  const specification = Object.assign({}, parser(tx), {
-    rawTransaction: includeRawTransaction ? JSON.stringify(tx) : undefined
-  })
+  const specification = parser(tx)
   const outcome = parseOutcome(tx)
   return removeUndefined({
     type: type,
@@ -74,7 +72,8 @@ function parseTransaction(tx: any, includeRawTransaction: boolean): any {
     sequence: tx.Sequence,
     id: tx.hash,
     specification: removeUndefined(specification),
-    outcome: outcome ? removeUndefined(outcome) : undefined
+    outcome: outcome ? removeUndefined(outcome) : undefined,
+    rawTransaction: includeRawTransaction ? JSON.stringify(tx) : undefined
   })
 }
 

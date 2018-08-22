@@ -7,10 +7,6 @@
     "checkID": {
       "$ref": "hash256",
       "description": "The ID of the Check ledger object to cancel, as a 64-character hexadecimal string."
-    },
-    "rawTransaction": {
-      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
-      "type": "string"
     }
   },
   "required": ["checkID"],

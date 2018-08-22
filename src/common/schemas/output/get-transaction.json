@@ -25,6 +25,10 @@
     "sequence": {
       "$ref": "sequence",
       "description": "The account sequence number of the transaction for the account that initiated it."
+    },
+    "rawTransaction": {
+      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
+      "type": "string"
     }
   },
   "required": [

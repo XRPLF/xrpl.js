@@ -38,11 +38,7 @@
       "$ref": "sequence",
       "description": "The [account sequence number](#account-sequence-number) of an order to cancel before the new order is created, effectively replacing the old order."
     },
-    "memos": {"$ref": "memos"},
-    "rawTransaction": {
-      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
-      "type": "string"
-    }
+    "memos": {"$ref": "memos"}
   },
   "required": ["direction", "quantity", "totalPrice"],
   "additionalProperties": false,

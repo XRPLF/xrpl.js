@@ -35,10 +35,6 @@
     "destinationTag": {
       "$ref": "tag",
       "description": "Destination tag."
-    },
-    "rawTransaction": {
-      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
-      "type": "string"
     }
   },
   "required": ["amount", "destination"],

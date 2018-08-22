@@ -32,10 +32,6 @@
     "limitQuality": {
       "description": "Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of destination.amount:source.maxAmount.",
       "type": "boolean"
-    },
-    "rawTransaction": {
-      "description": "The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.",
-      "type": "string"
     }
   },
   "required": ["source", "destination"],
