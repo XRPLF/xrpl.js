@@ -373,7 +373,6 @@ limitQuality | boolean | *Optional* Only take paths where all the conversions ha
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 noDirectRipple | boolean | *Optional* If true and paths are specified, the sender would like the XRP Ledger to disregard any direct paths from the source account to the destination account. This may be used to take advantage of an arbitrage opportunity or by gateways wishing to issue balances from a hot wallet to a user who has mistakenly set a trustline directly to the hot wallet.
 paths | string | *Optional* The paths of trustlines and orders to use in executing the payment.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -414,7 +413,6 @@ frozen | boolean | *Optional* If true, the trustline is frozen, which means that
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 qualityIn | number | *Optional* Incoming balances on this trustline are valued at this ratio.
 qualityOut | number | *Optional* Outgoing balances on this trustline are valued at this ratio.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through this trustline.
 
 ### Example
@@ -455,7 +453,6 @@ immediateOrCancel | boolean | *Optional* Treat the offer as an [Immediate or Can
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 orderToReplace | [sequence](#account-sequence-number) | *Optional* The [account sequence number](#account-sequence-number) of an order to cancel before the new order is created, effectively replacing the old order.
 passive | boolean | *Optional* If enabled, the offer will not consume offers that exactly match it, and instead becomes an Offer node in the ledger. It will still consume offers that cross it.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 The following invalid flag combination causes a `ValidationError`: `immediateOrCancel` and `fillOrKill`. These fields are mutually exclusive, and cannot both be set at the same time.
 
@@ -488,7 +485,6 @@ Name | Type | Description
 ---- | ---- | -----------
 orderSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the order to cancel.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -518,7 +514,6 @@ memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the
 messageKey | string | *Optional* Public key for sending encrypted messages to this account. Conventionally, it should be a secp256k1 key, the same encryption that is used by the rest of Ripple.
 noFreeze | boolean | *Optional* Permanently give up the ability to freeze individual trust lines. This flag can never be disabled after being enabled.
 passwordSpent | boolean | *Optional* Indicates that the account has used its free SetRegularKey transaction.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 regularKey | [address](#address),null | *Optional* The public key of a new keypair, to use as the regular key to this account, as a base-58-encoded string in the same format as an account address. Use `null` to remove the regular key.
 requireAuthorization | boolean | *Optional* If set, this account must individually approve other users in order for those users to hold this account’s issuances.
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
@@ -560,7 +555,6 @@ allowExecuteAfter | date-time string | *Optional* If present, the escrow can not
 condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). If present, `fulfillment` is required upon execution.
 destinationTag | integer | *Optional* Destination tag.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 sourceTag | integer | *Optional* Source tag.
 
 ### Example
@@ -585,7 +579,6 @@ Name | Type | Description
 owner | [address](#address) | The address of the owner of the escrow to cancel.
 escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to cancel.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -609,7 +602,6 @@ escrowSequence | [sequence](#account-sequence-number) | The [account sequence nu
 condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). This must match the original `condition` from the escrow creation transaction.
 fulfillment | string | *Optional* A hex value representing the [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1) fulfillment for `condition`.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -635,7 +627,6 @@ sendMax | [laxAmount](#amount) | Amount of source currency the check is allowed 
 destinationTag | integer | *Optional* Destination tag that identifies the reason for the check, or a hosted recipient to pay.
 expiration | date-time string | *Optional* Time after which the check is no longer valid.
 invoiceID | string | *Optional* 256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -658,7 +649,6 @@ See [Transaction Types](#transaction-types) for a description.
 Name | Type | Description
 ---- | ---- | -----------
 checkID | string | The ID of the Check ledger object to cancel, as a 64-character hexadecimal string.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -679,7 +669,6 @@ Name | Type | Description
 checkID | string | The ID of the Check ledger object to cash, as a 64-character hexadecimal string.
 amount | [laxAmount](#amount) | *Optional* Redeem the Check for exactly this amount, if possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or deliverMin.
 deliverMin | [laxAmount](#amount) | *Optional* Redeem the Check for at least this amount and for as much as possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or amount.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -707,7 +696,6 @@ settleDelay | number | Amount of seconds the source address must wait before clo
 publicKey | string | Public key of the key pair the source may use to sign claims against this channel.
 cancelAfter | date-time string | *Optional* Time when this channel expires. This expiration cannot be changed after creating the channel.
 destinationTag | integer | *Optional* Destination tag.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 sourceTag | integer | *Optional* Source tag.
 
 ### Example
@@ -732,7 +720,6 @@ Name | Type | Description
 amount | [value](#value) | Amount of XRP to fund the channel with.
 channel | string | 256-bit hexadecimal channel identifier.
 expiration | date-time string | *Optional* New expiration for this channel. (This does not change the cancelAfter expiration, if the channel has one.) Cannot move the expiration sooner than settleDelay seconds from time of the request.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -756,7 +743,6 @@ amount | [value](#value) | *Optional* Amount of XRP authorized by this signature
 balance | [value](#value) | *Optional* Total XRP balance delivered by this channel after claim is processed.
 close | boolean | *Optional* Request to close the channel. If the channel has no XRP remaining or the destination address requests it, closes the channel immediately (returning unclaimed XRP to the source address). Otherwise, sets the channel to expire after settleDelay seconds have passed.
 publicKey | string | *Optional* Public key of the channel. (For verifying the signature.)
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 renew | boolean | *Optional* Clear the channel's expiration time.
 signature | string | *Optional* Signed claim authorizing withdrawal of XRP from the channel. (Required except from the channel's source address.)
 
@@ -777,7 +763,7 @@ ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for 
 * Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
 * Use `requestNextPage()` to request the next page of data.
 
-When using rippled APIs, [specify XRP amounts in drops](https://ripple.com/build/rippled-apis/#specifying-currency-amounts). 1 XRP = 1000000 drops.
+When using rippled APIs, [specify XRP amounts in drops and timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts).
 
 ## Listening to streams
 
@@ -1188,6 +1174,7 @@ outcome | object | The outcome of the transaction (what effects it had).
 *outcome.* channelChanges | object | *Optional* Properties reflecting the details of the payment channel.
 *outcome.* deliveredAmount | [amount](#amount) | *Optional* For payment transactions, it is impossible to reliably compute the actual delivered amount from the balanceChanges due to fixed precision. If the payment is not a partial payment and the transaction succeeded, the deliveredAmount should always be considered to be the amount specified in the transaction.
 *outcome.* timestamp | date-time string | *Optional* The timestamp when the transaction was validated. (May be missing when requesting transactions in binary mode.)
+rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -3571,7 +3558,6 @@ memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the
 messageKey | string | *Optional* Public key for sending encrypted messages to this account. Conventionally, it should be a secp256k1 key, the same encryption that is used by the rest of Ripple.
 noFreeze | boolean | *Optional* Permanently give up the ability to freeze individual trust lines. This flag can never be disabled after being enabled.
 passwordSpent | boolean | *Optional* Indicates that the account has used its free SetRegularKey transaction.
-rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 regularKey | [address](#address),null | *Optional* The public key of a new keypair, to use as the regular key to this account, as a base-58-encoded string in the same format as an account address. Use `null` to remove the regular key.
 requireAuthorization | boolean | *Optional* If set, this account must individually approve other users in order for those users to hold this account’s issuances.
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
