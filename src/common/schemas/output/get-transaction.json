@@ -8,7 +8,7 @@
       "$ref": "transactionType"
     },
     "specification": {
-      "description": "A specification that would produce the same outcome as this transaction, but for payment transactions, without the `destination.amount`. The structure of the specification depends on the value of the `type` field (see [Transaction Types](#transaction-types) for details). *Note:* This is **not** necessarily the same as the original specification."
+      "description": "A specification that would produce the same outcome as this transaction. *Exception:* For payment transactions, this omits the `destination.amount` field, to prevent misunderstanding. The structure of the specification depends on the value of the `type` field (see [Transaction Types](#transaction-types) for details). *Note:* This is **not** necessarily the same as the original specification."
     },
     "outcome": {
       "$ref": "outcome",
