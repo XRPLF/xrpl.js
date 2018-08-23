@@ -1447,11 +1447,35 @@ describe('RippleAPI', function () {
           'getTransaction'));
     });
 
+    it('getTransaction - payment - include raw transaction', function () {
+      const options = {
+        includeRawTransaction: true
+      }
+      return this.api.getTransaction(
+        hashes.VALID_TRANSACTION_HASH, options
+      ).then(
+        _.partial(checkResult, responses.getTransaction.paymentIncludeRawTransaction,
+          'getTransaction'));
+    });
+
     it('getTransaction - settings', function () {
       const hash =
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
       return this.api.getTransaction(hash).then(
         _.partial(checkResult, responses.getTransaction.settings,
+          'getTransaction'));
+    });
+
+    it('getTransaction - settings - include raw transaction', function () {
+      const hash =
+        '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B';
+      const options = {
+        includeRawTransaction: true
+      }
+      const expected = responses.getTransaction.settings
+      expected.rawTransaction = "{\"Account\":\"rLVKsA4F9iJBbA6rX2x4wCmkj6drgtqpQe\",\"Fee\":\"10\",\"Flags\":2147483648,\"Sequence\":1,\"SetFlag\":2,\"SigningPubKey\":\"03EA3ADCA632F125EC2CC4F7F6A82DE0DCE2B65290CAC1F22242C5163F0DA9652D\",\"TransactionType\":\"AccountSet\",\"TxnSignature\":\"3045022100DE8B666B1A31EA65011B0F32130AB91A5747E32FA49B3054CEE8E8362DBAB98A022040CF0CF254677A8E5CD04C59CA2ED7F6F15F7E184641BAE169C561650967B226\",\"date\":460832270,\"hash\":\"4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA1B\",\"inLedger\":8206418,\"ledger_index\":8206418,\"meta\":{\"AffectedNodes\":[{\"ModifiedNode\":{\"FinalFields\":{\"Account\":\"rLVKsA4F9iJBbA6rX2x4wCmkj6drgtqpQe\",\"Balance\":\"29999990\",\"Flags\":786432,\"OwnerCount\":0,\"Sequence\":2},\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"3F5072C4875F32ED770DAF3610A716600ED7C7BB0348FADC7A98E011BB2CD36F\",\"PreviousFields\":{\"Balance\":\"30000000\",\"Flags\":4194304,\"Sequence\":1},\"PreviousTxnID\":\"3FB0350A3742BBCC0D8AA3C5247D1AEC01177D0A24D9C34762BAA2FEA8AD88B3\",\"PreviousTxnLgrSeq\":8206397}}],\"TransactionIndex\":5,\"TransactionResult\":\"tesSUCCESS\"},\"validated\":true}"
+      return this.api.getTransaction(hash, options).then(
+        _.partial(checkResult, expected,
           'getTransaction'));
     });
 
@@ -1779,6 +1803,18 @@ describe('RippleAPI', function () {
     const options = { types: ['payment', 'order'], initiated: true, limit: 2 };
     return this.api.getTransactions(address, options).then(
       _.partial(checkResult, responses.getTransactions.normal,
+        'getTransactions'));
+  });
+
+  it('getTransactions - include raw transactions', function () {
+    const options = {
+      types: ['payment', 'order'],
+      initiated: true,
+      limit: 2,
+      includeRawTransactions: true
+    };
+    return this.api.getTransactions(address, options).then(
+      _.partial(checkResult, responses.getTransactions.includeRawTransactions,
         'getTransactions'));
   });
 
@@ -2413,8 +2449,6 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.getLedger.header, 'getLedger'));
   });
 
-  // New in > 0.21.0
-  // future ledger versions are allowed, and passed to rippled as-is.
   it('getLedger - future ledger version', function () {
     return this.api.getLedger({ ledgerVersion: 14661789 }).then(response => {
       assert(response)
@@ -2447,7 +2481,7 @@ describe('RippleAPI', function () {
     const request = {
       includeTransactions: true,
       includeAllData: true,
-      ledgerVersion: 100000
+      ledgerVersion: 22420574
     };
     return this.api.getLedger(request).then(
       _.partial(checkResult, responses.getLedger.withPartial, 'getLedger'));

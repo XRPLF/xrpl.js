@@ -24,11 +24,7 @@
           }
         },
         "destination": {
-          "address": "rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj",
-          "amount": {
-            "currency": "XRP",
-            "value": "10000"
-          }
+          "address": "rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj"
         }
       },
       "outcome": {

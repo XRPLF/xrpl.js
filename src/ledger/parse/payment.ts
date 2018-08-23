@@ -28,10 +28,13 @@ function parsePayment(tx: any): Object {
     tag: tx.SourceTag
   }
 
-  const destination = {
+  const destination: {
+    address: string,
+    tag: number | undefined
+  } = {
     address: tx.Destination,
-    amount: removeGenericCounterparty(parseAmount(tx.Amount), tx.Destination),
     tag: tx.DestinationTag
+    // Notice that `amount` is omitted to prevent misinterpretation
   }
 
   return removeUndefined({

@@ -35,6 +35,7 @@ module.exports = {
     orderSell: require('./get-transaction-order-sell.json'),
     noMeta: require('./get-transaction-no-meta.json'),
     payment: require('./get-transaction-payment.json'),
+    paymentIncludeRawTransaction: require('./get-transaction-payment-include-raw-transaction.json'),
     settings: require('./get-transaction-settings.json'),
     trustline: require('./get-transaction-trustline-set.json'),
     trackingOn: require('./get-transaction-settings-tracking-on.json'),
@@ -68,6 +69,7 @@ module.exports = {
   },
   getTransactions: {
     normal: require('./get-transactions.json'),
+    includeRawTransactions: require('./get-transactions-include-raw-transactions.json'),
     one: require('./get-transactions-one.json')
   },
   getTrustlines: {

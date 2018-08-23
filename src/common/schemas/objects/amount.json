@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "amount",
   "link": "amount",
-  "description": "An Amount on the Ripple Protocol",
+  "description": "An Amount on the XRP Ledger",
   "allOf": [
     {"$ref": "amountbase"},
     {"required": ["value"]}

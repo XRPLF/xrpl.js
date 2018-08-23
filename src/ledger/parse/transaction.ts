@@ -42,7 +42,7 @@ function parseTransactionType(type) {
   return mapping[type] || null
 }
 
-function parseTransaction(tx: any): any {
+function parseTransaction(tx: any, includeRawTransaction: boolean): any {
   const type = parseTransactionType(tx.TransactionType)
   const mapping = {
     'payment': parsePayment,
@@ -72,7 +72,8 @@ function parseTransaction(tx: any): any {
     sequence: tx.Sequence,
     id: tx.hash,
     specification: removeUndefined(specification),
-    outcome: outcome ? removeUndefined(outcome) : undefined
+    outcome: outcome ? removeUndefined(outcome) : undefined,
+    rawTransaction: includeRawTransaction ? JSON.stringify(tx) : undefined
   })
 }
 

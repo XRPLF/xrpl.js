@@ -1,5 +1,17 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
+### Breaking Changes
+
++ `getTransaction()` and `getTransactions()`
+  + The `specification.destination.amount` field has been removed from the parsed transaction response.
+  + To determine the amount that a transaction delivered, use `outcome.deliveredAmount`.
+  + If you require the provisional requested `Amount` from the original transaction:
+    + Use `getTransaction`'s `includeRawTransaction` option, or
+    + Use `getTransactions`'s `includeRawTransactions` option, or
+    + Use the rippled APIs directly with `request`. For example, call the API methods `tx`, `account_tx`, etc.
+
 ## 1.0.0-beta.5 (2018-08-11)
 
 + [Fix a TypeScript error by importing the `Prepare` type](https://github.com/ripple/ripple-lib/commit/7cd517268bda5fe74b91dad02fedf8b51b7eae9b)

@@ -363,7 +363,7 @@ source | object | The source of the funds to be sent.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
 destination | object | The destination of the funds to be sent.
 *destination.* address | [address](#address) | The address to receive at.
-*destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
+*destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with `destination.minAmount`.)
 *destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *destination.* address | [address](#address) | The address to send to.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field is exclusive with destination.amount)
@@ -763,7 +763,7 @@ ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for 
 * Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
 * Use `requestNextPage()` to request the next page of data.
 
-When using rippled APIs, [specify XRP amounts in drops](https://ripple.com/build/rippled-apis/#specifying-currency-amounts). 1 XRP = 1000000 drops.
+When using rippled APIs, [specify XRP amounts in drops](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts) and [timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-time).
 
 ## Listening to streams
 
@@ -1137,7 +1137,8 @@ Retrieves a transaction by its [Transaction ID](#transaction-id).
 Name | Type | Description
 ---- | ---- | -----------
 id | [transactionHash](#transaction-id) | A hash of a transaction used to identify the transaction, represented in hexadecimal.
-options | object | *Optional* Options to limit the ledger versions to search.
+options | object | *Optional* Options to limit the ledger versions to search and/or to include raw transaction data.
+*options.* includeRawTransaction | object | *Optional* Include raw transaction data. For advanced users; exercise caution when interpreting this data. 
 *options.* maxLedgerVersion | integer | *Optional* The highest ledger version to search
 *options.* maxLedgerVersion | string | *Optional* The highest ledger version to search
 *options.* minLedgerVersion | integer | *Optional* The lowest ledger version to search.
@@ -1153,7 +1154,7 @@ id | [transactionHash](#transaction-id) | A hash of the transaction that can be 
 address | [address](#address) | The address of the account that initiated the transaction.
 sequence | [sequence](#account-sequence-number) | The account sequence number of the transaction for the account that initiated it.
 type | [transactionType](#transaction-types) | The type of the transaction.
-specification | object | A specification that would produce the same outcome as this transaction. The structure of the specification depends on the value of the `type` field (see [Transaction Types](#transaction-types) for details). *Note:* This is **not** necessarily the same as the original specification.
+specification | object | A specification that would produce the same outcome as this transaction. *Exception:* For payment transactions, this omits the `destination.amount` field, to prevent misunderstanding. The structure of the specification depends on the value of the `type` field (see [Transaction Types](#transaction-types) for details). *Note:* This is **not** necessarily the same as the original specification.
 outcome | object | The outcome of the transaction (what effects it had).
 *outcome.* result | string | Result code returned by rippled. See [Transaction Results](https://ripple.com/build/transactions/#full-transaction-response-list) for a complete list.
 *outcome.* fee | [value](#value) | The XRP fee that was charged for the transaction.
@@ -1173,6 +1174,7 @@ outcome | object | The outcome of the transaction (what effects it had).
 *outcome.* channelChanges | object | *Optional* Properties reflecting the details of the payment channel.
 *outcome.* deliveredAmount | [amount](#amount) | *Optional* For payment transactions, it is impossible to reliably compute the actual delivered amount from the balanceChanges due to fixed precision. If the payment is not a partial payment and the transaction succeeded, the deliveredAmount should always be considered to be the amount specified in the transaction.
 *outcome.* timestamp | date-time string | *Optional* The timestamp when the transaction was validated. (May be missing when requesting transactions in binary mode.)
+rawTransaction | string | *Optional* The raw transaction data as a JSON string. For advanced users only; exercise caution when interpreting this data.
 
 ### Example
 
@@ -1199,11 +1201,7 @@ return api.getTransaction(id).then(transaction => {
       }
     },
     "destination": {
-      "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-      "amount": {
-        "currency": "USD",
-        "value": "0.001"
-      }
+      "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
     },
     "paths": "[[{\"currency\":\"USD\",\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"type\":48,\"type_hex\":\"0000000000000030\"},{\"account\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\",\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"type\":49,\"type_hex\":\"0000000000000031\"}]]"
   },
@@ -1296,6 +1294,7 @@ options | object | *Optional* Options to filter the resulting transactions.
 *options.* counterparty | [address](#address) | *Optional* If provided, only return transactions with this account as a counterparty to the transaction.
 *options.* earliestFirst | boolean | *Optional* If true, sort transactions so that the earliest ones come first. By default, the newest transactions will come first.
 *options.* excludeFailures | boolean | *Optional* If true, the result will omit transactions that did not succeed.
+*options.* includeRawTransactions | object | *Optional* Include raw transaction data. For advanced users; exercise caution when interpreting this data. 
 *options.* initiated | boolean | *Optional* If true, return only transactions initiated by the account specified by `address`. If false, return only transactions not initiated by the account specified by `address`.
 *options.* limit | integer | *Optional* If specified, return at most this many transactions.
 *options.* maxLedgerVersion | integer | *Optional* Return only transactions in this ledger version or lower.
@@ -1341,11 +1340,7 @@ return api.getTransactions(address).then(transaction => {
         }
       },
       "destination": {
-        "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-        "amount": {
-          "currency": "USD",
-          "value": "0.001"
-        }
+        "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
       },
       "paths": "[[{\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\"},{\"account\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\"}]]"
     },
@@ -1438,11 +1433,7 @@ return api.getTransactions(address).then(transaction => {
         }
       },
       "destination": {
-        "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-        "amount": {
-          "currency": "USD",
-          "value": "0.001"
-        }
+        "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
       },
       "paths": "[[{\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\"},{\"account\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\"}]]"
     },
@@ -1962,7 +1953,7 @@ source | object | Properties of the source of the payment.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field is exclusive with source.amount)
 destination | object | Properties of the destination of the payment.
 *destination.* address | [address](#address) | The address to receive at.
-*destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount).
+*destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with `destination.minAmount`.)
 *destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
 *destination.* address | [address](#address) | The address to send to.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field is exclusive with destination.amount)

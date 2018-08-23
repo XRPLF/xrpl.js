@@ -25,12 +25,7 @@
           }
         },
         "destination": {
-          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4",
-          "amount": {
-            "currency": "USD",
-            "value": "10",
-            "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
-          }
+          "address": "rNNuQMuExCiEjeZ4h9JJnj5PSWypdMXDj4"
         },
         "allowPartialPayment": true
       },

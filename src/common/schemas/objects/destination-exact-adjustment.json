@@ -9,7 +9,7 @@
     },
     "amount": {
       "$ref": "laxAmount",
-      "description": "An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with destination.minAmount)."
+      "description": "An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with `destination.minAmount`.)"
     },
     "tag": {"$ref": "tag"}
   },

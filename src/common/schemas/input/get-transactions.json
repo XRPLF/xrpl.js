@@ -49,6 +49,9 @@
           "items": {"$ref": "transactionType"},
           "description": "Only return transactions of the specified [Transaction Types](#transaction-types)."
         },
+        "includeRawTransactions": {
+          "description": "Include raw transaction data. For advanced users; exercise caution when interpreting this data. "
+        },
         "binary": {
           "type": "boolean",
           "description": "If true, the transactions will be sent from the server in a condensed binary format rather than JSON."

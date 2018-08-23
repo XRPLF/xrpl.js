@@ -7,7 +7,8 @@ import {FormattedTransactionType} from '../transaction/types'
 
 export type TransactionOptions = {
   minLedgerVersion?: number,
-  maxLedgerVersion?: number
+  maxLedgerVersion?: number,
+  includeRawTransaction?: boolean
 }
 type TransactionResponse = FormattedTransactionType & {
     hash: string,
@@ -83,9 +84,9 @@ function convertError(connection: Connection, options: TransactionOptions,
 function formatResponse(options: TransactionOptions, tx: TransactionResponse
 ): FormattedTransactionType {
   if (tx.validated !== true || !isTransactionInRange(tx, options)) {
-  throw new errors.NotFoundError('Transaction not found')
+    throw new errors.NotFoundError('Transaction not found')
   }
-  return parseTransaction(tx)
+  return parseTransaction(tx, options.includeRawTransaction)
 }
 
 async function getTransaction(id: string, options: TransactionOptions = {}

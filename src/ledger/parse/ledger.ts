@@ -29,7 +29,7 @@ function parseTransactionWrapper(ledgerVersion, tx) {
     meta: tx.metaData,
     ledger_index: ledgerVersion
   })
-  const result = parseTransaction(transaction)
+  const result = parseTransaction(transaction, false)
   if (!result.outcome.ledgerVersion) {
     result.outcome.ledgerVersion = ledgerVersion
   }
@@ -62,19 +62,20 @@ function parseState(state) {
 
 export function parseLedger(ledger: Ledger): FormattedLedger {
   const ledgerVersion = parseInt(ledger.ledger_index || ledger.seqNum, 10)
-  return removeUndefined(Object.assign({
-    stateHash: ledger.account_hash,
-    closeTime: rippleTimeToISO8601(ledger.close_time),
-    closeTimeResolution: ledger.close_time_resolution,
-    closeFlags: ledger.close_flags,
-    ledgerHash: ledger.hash || ledger.ledger_hash,
-    ledgerVersion: ledgerVersion,
-    parentLedgerHash: ledger.parent_hash,
-    parentCloseTime: rippleTimeToISO8601(ledger.parent_close_time),
-    totalDrops: ledger.total_coins || ledger.totalCoins,
-    transactionHash: ledger.transaction_hash
-  },
-  parseTransactions(ledger.transactions, ledgerVersion),
-  parseState(ledger.accountState)
+  return removeUndefined(Object.assign(
+    {
+      stateHash: ledger.account_hash,
+      closeTime: rippleTimeToISO8601(ledger.close_time),
+      closeTimeResolution: ledger.close_time_resolution,
+      closeFlags: ledger.close_flags,
+      ledgerHash: ledger.hash || ledger.ledger_hash,
+      ledgerVersion: ledgerVersion,
+      parentLedgerHash: ledger.parent_hash,
+      parentCloseTime: rippleTimeToISO8601(ledger.parent_close_time),
+      totalDrops: ledger.total_coins || ledger.totalCoins,
+      transactionHash: ledger.transaction_hash
+    },
+    parseTransactions(ledger.transactions, ledgerVersion),
+    parseState(ledger.accountState)
   ))
 }
