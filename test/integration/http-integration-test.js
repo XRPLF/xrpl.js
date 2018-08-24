@@ -183,6 +183,12 @@ describe('http server integration tests', function() {
   );
 
   createTest(
+    'deriveAddress',
+    [{secret: 'snUneA3NnRJDULZRaJBJdUtducjWK'}],
+    result => assert.deepEqual(result.result, apiResponses.deriveAddress)
+  );
+
+  createTest(
     'computeLedgerHash',
     [{ledger: _.assign({}, apiResponses.getLedger.full,
       {parentCloseTime: apiResponses.getLedger.full.closeTime})

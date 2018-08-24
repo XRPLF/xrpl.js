@@ -76,6 +76,7 @@
   - [combine](#combine)
   - [submit](#submit)
   - [generateAddress](#generateaddress)
+  - [deriveAddress](#deriveaddress)
   - [signPaymentChannelClaim](#signpaymentchannelclaim)
   - [verifyPaymentChannelClaim](#verifypaymentchannelclaim)
   - [computeLedgerHash](#computeledgerhash)
@@ -199,6 +200,7 @@ Methods that depend on the state of the XRP Ledger are unavailable in offline mo
 * [prepareEscrowExecution](#prepareescrowexecution)
 * [sign](#sign)
 * [generateAddress](#generateaddress)
+* [deriveAddress](#deriveaddress)
 * [computeLedgerHash](#computeledgerhash)
 
 # Basic Types
@@ -5092,6 +5094,42 @@ return api.generateAddress();
 {
   "address": "rGCkuB7PBr5tNy68tPEABEtcdno4hE6Y7f",
   "secret": "sp6JS7f14BuwFY8Mw6bTtLKWauoUs"
+}
+```
+
+
+## deriveAddress
+
+`deriveAddress(secret: string): {address: string, secret: string}`
+
+Derive the corresponding address for the provided secret.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+secret | secret string | The secret of the account to derive the address for.
+
+### Return Value
+
+This method returns an object with the following structure:
+
+Name | Type | Description
+---- | ---- | -----------
+address | [address](#address) | A Ripple account address corresponding to the secret.
+secret | secret string | The provided secret.
+
+### Example
+
+```javascript
+return api.deriveAddress("snUneA3NnRJDULZRaJBJdUtducjWK");
+```
+
+
+```json
+{
+  "address": "r4B7t5BqmHp3oPVHAnsMpPnw1QkuuJq7Z3",
+  "secret": "snUneA3NnRJDULZRaJBJdUtducjWK"
 }
 ```
 

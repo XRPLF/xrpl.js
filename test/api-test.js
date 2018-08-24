@@ -1965,6 +1965,17 @@ describe('RippleAPI', function () {
     }, this.api.errors.UnexpectedError);
   });
 
+  it('deriveAddress', function() {
+    assert.deepEqual(this.api.deriveAddress('snUneA3NnRJDULZRaJBJdUtducjWK'),
+                     responses.deriveAddress);
+  });
+
+  it('deriveAddress invalid', function() {
+    assert.throws(() => {
+      this.api.deriveAddress('invalidsecret');
+    }, this.api.errors.ValidationError);
+  });
+
   it('getSettings', function () {
     return this.api.getSettings(address).then(
       _.partial(checkResult, responses.getSettings, 'getSettings'));

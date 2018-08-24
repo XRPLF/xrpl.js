@@ -439,6 +439,15 @@ describe('integration tests', function() {
     assert(isValidSecret(newWallet.secret));
   });
 
+  it('deriveWallet', function() {
+    const secret = 'snUneA3NnRJDULZRaJBJdUtducjWK';
+    const address = 'r4B7t5BqmHp3oPVHAnsMpPnw1QkuuJq7Z3';
+    const wallet = this.api.deriveAddress(secret);
+    assert(wallet && wallet.address && wallet.secret);
+    assert(address == wallet.address);
+    assert(secret == wallet.secret);
+  });
+
 });
 
 describe('integration tests - standalone rippled', function() {
