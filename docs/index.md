@@ -4068,7 +4068,6 @@ parentCloseTime | date-time string | The time at which the previous ledger was c
 totalDrops | [value](#value) | Total number of drops (1/1,000,000th of an XRP) in the network, as a quoted integer. (This decreases as transaction fees cause XRP to be destroyed.)
 transactionHash | string | Hash of the transaction information included in this ledger.
 rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.
-rawTransactions | string | *Optional* A JSON string containing rippled format transaction JSON for all transactions that were validated in this ledger.
 stateHashes | array\<string\> | *Optional* An array of hashes of all state data in this ledger.
 transactionHashes | array\<[transactionHash](#transaction-id)\> | *Optional* An array of hashes of all transactions that were validated in this ledger.
 transactions | array\<[getTransaction](#gettransaction)\> | *Optional* Array of all transactions that were validated in this ledger. Transactions are represented in the same format as the return value of [getTransaction](#gettransaction).
@@ -5207,7 +5206,6 @@ ledger | object | The ledger header to hash.
 *ledger.* totalDrops | [value](#value) | Total number of drops (1/1,000,000th of an XRP) in the network, as a quoted integer. (This decreases as transaction fees cause XRP to be destroyed.)
 *ledger.* transactionHash | string | Hash of the transaction information included in this ledger.
 *ledger.* rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.
-*ledger.* rawTransactions | string | *Optional* A JSON string containing rippled format transaction JSON for all transactions that were validated in this ledger.
 *ledger.* stateHashes | array\<string\> | *Optional* An array of hashes of all state data in this ledger.
 *ledger.* transactionHashes | array\<[transactionHash](#transaction-id)\> | *Optional* An array of hashes of all transactions that were validated in this ledger.
 *ledger.* transactions | array\<[getTransaction](#gettransaction)\> | *Optional* Array of all transactions that were validated in this ledger. Transactions are represented in the same format as the return value of [getTransaction](#gettransaction).
