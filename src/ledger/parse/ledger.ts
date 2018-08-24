@@ -25,11 +25,12 @@ export type FormattedLedger = {
 }
 
 function parseTransactionWrapper(ledgerVersion, tx) {
+  // renames metaData to meta and adds ledger_index
   const transaction = _.assign({}, _.omit(tx, 'metaData'), {
     meta: tx.metaData,
     ledger_index: ledgerVersion
   })
-  const result = parseTransaction(transaction, false)
+  const result = parseTransaction(transaction, true)
   if (!result.outcome.ledgerVersion) {
     result.outcome.ledgerVersion = ledgerVersion
   }
@@ -45,8 +46,7 @@ function parseTransactions(transactions, ledgerVersion) {
   }
   return {
     transactions: _.map(transactions,
-      _.partial(parseTransactionWrapper, ledgerVersion)),
-    rawTransactions: JSON.stringify(transactions)
+      _.partial(parseTransactionWrapper, ledgerVersion))
   }
 }
 
