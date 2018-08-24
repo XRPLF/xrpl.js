@@ -85,7 +85,7 @@ function createMaximalAmount(amount: Amount): Amount {
 }
 
 function createPaymentTransaction(address: string, paymentArgument: Payment
-): Object {
+): object {
   const payment = _.cloneDeep(paymentArgument)
   applyAnyCounterpartyEncoding(payment)
 

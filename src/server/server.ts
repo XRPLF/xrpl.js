@@ -16,7 +16,7 @@ function disconnect(): Promise<void> {
   return this.connection.disconnect()
 }
 
-function formatLedgerClose(ledgerClose: any): Object {
+function formatLedgerClose(ledgerClose: any): object {
   return {
     baseFeeXRP: common.dropsToXrp(ledgerClose.fee_base),
     ledgerHash: ledgerClose.ledger_hash,

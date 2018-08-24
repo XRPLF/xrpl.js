@@ -45,7 +45,7 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
   const account = txJSON.Account
   setCanonicalFlag(txJSON)
 
-  function prepareMaxLedgerVersion(): Promise<Object> {
+  function prepareMaxLedgerVersion(): Promise<object> {
     if (instructions.maxLedgerVersion !== undefined) {
       if (instructions.maxLedgerVersion !== null) {
         txJSON.LastLedgerSequence = instructions.maxLedgerVersion
@@ -60,7 +60,7 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
     })
   }
 
-  function prepareFee(): Promise<Object> {
+  function prepareFee(): Promise<object> {
     const multiplier = instructions.signersCount === undefined ? 1 :
       instructions.signersCount + 1
     if (instructions.fee !== undefined) {
@@ -94,7 +94,7 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
     })
   }
 
-  async function prepareSequence(): Promise<Object> {
+  async function prepareSequence(): Promise<object> {
     if (instructions.sequence !== undefined) {
       txJSON.Sequence = instructions.sequence
       return Promise.resolve(txJSON)

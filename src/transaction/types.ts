@@ -34,7 +34,7 @@ export type Submit = {
   engineResultCode: number,
   engineResultMessage?: string,
   txBlob?: string,
-  txJson?: Object
+  txJson?: object
 }
 
 export interface OfferCreateTransaction {
@@ -72,7 +72,7 @@ export type Outcome = {
      value: string
     }]
   },
-  orderbookChanges: Object,
+  orderbookChanges: object,
   timestamp?: string
 }
 

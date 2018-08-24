@@ -13,7 +13,7 @@ function parseField(info, value) {
   return value
 }
 
-function parseFields(data: any): Object {
+function parseFields(data: any): object {
   const settings: any = {}
   for (const fieldName in AccountFields) {
     const fieldValue = data[fieldName]

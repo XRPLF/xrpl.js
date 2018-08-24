@@ -3,7 +3,7 @@ import {removeUndefined, txFlags} from '../../common'
 import parseAmount from './amount'
 const claimFlags = txFlags.PaymentChannelClaim
 
-function parsePaymentChannelClaim(tx: any): Object {
+function parsePaymentChannelClaim(tx: any): object {
   assert(tx.TransactionType === 'PaymentChannelClaim')
 
   return removeUndefined({

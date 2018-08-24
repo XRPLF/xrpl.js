@@ -10,7 +10,7 @@ export type PaymentChannelFund = {
 
 function createPaymentChannelFundTransaction(account: string,
   fund: PaymentChannelFund
-): Object {
+): object {
   const txJSON: any = {
     Account: account,
     TransactionType: 'PaymentChannelFund',

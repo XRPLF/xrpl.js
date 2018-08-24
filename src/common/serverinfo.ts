@@ -9,7 +9,7 @@ export type GetServerInfoResponse = {
   hostID: string,
   ioLatencyMs: number,
   load?: {
-    jobTypes: Array<Object>,
+    jobTypes: Array<object>,
     threads: number
   },
   lastClose: {

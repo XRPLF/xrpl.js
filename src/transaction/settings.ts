@@ -26,7 +26,7 @@ function setTransactionFlags(txJSON: any, values: FormattedSettings) {
   }
 }
 
-function setTransactionFields(txJSON: Object, input: FormattedSettings) {
+function setTransactionFields(txJSON: object, input: FormattedSettings) {
   const fieldSchema = AccountFields
   for (const fieldName in fieldSchema) {
     const field = fieldSchema[fieldName]
@@ -67,7 +67,7 @@ function convertTransferRate(transferRate: number | string): number | string {
   return (new BigNumber(transferRate)).shift(9).toNumber()
 }
 
-function formatSignerEntry(signer: WeightedSigner): Object {
+function formatSignerEntry(signer: WeightedSigner): object {
   return {
     SignerEntry: {
       Account: signer.address,
@@ -114,7 +114,7 @@ function createSettingsTransactionWithoutMemos(
 }
 
 function createSettingsTransaction(account: string, settings: FormattedSettings
-): Object {
+): object {
   const txJSON = createSettingsTransactionWithoutMemos(account, settings)
   if (settings.memos !== undefined) {
     txJSON.Memos = _.map(settings.memos, utils.convertMemo)

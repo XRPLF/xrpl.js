@@ -12,7 +12,7 @@ export type EscrowCancellation = {
 
 function createEscrowCancellationTransaction(account: string,
   payment: EscrowCancellation
-): Object {
+): object {
   const txJSON: any = {
     TransactionType: 'EscrowCancel',
     Account: account,

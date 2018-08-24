@@ -15,7 +15,7 @@ export type EscrowExecution = {
 
 function createEscrowExecutionTransaction(account: string,
   payment: EscrowExecution
-): Object {
+): object {
   const txJSON: any = {
     TransactionType: 'EscrowFinish',
     Account: account,
