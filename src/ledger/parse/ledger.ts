@@ -18,7 +18,6 @@ export type FormattedLedger = {
   totalDrops: string,
   transactionHash: string,
   transactions?: Array<Object>,
-  rawTransactions?: string,
   transactionHashes?: Array<string>,
   rawState?: string,
   stateHashes?: Array<string>
