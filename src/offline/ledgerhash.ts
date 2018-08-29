@@ -25,9 +25,15 @@ function hashLedgerHeader(ledgerHeader) {
   return hashes.computeLedgerHash(header)
 }
 
-function computeTransactionHash(ledger, version) {
+function computeTransactionHash(ledger, version,
+    options: ComputeLedgerHashOptions) {
   if (ledger.rawTransactions === undefined) {
-    return ledger.transactionHash
+    if (options.requireRawTransactions !== true) {
+      return ledger.transactionHash
+    } else {
+      throw new common.errors.ValidationError('rawTransactions'
+      + ' property is missing from the ledger')
+    }
   }
   const transactions: any[] = JSON.parse(ledger.rawTransactions)
   const txs = _.map(transactions, tx => {
@@ -60,10 +66,15 @@ function computeStateHash(ledger, version) {
 
 const sLCF_SHAMapV2 = 0x02
 
-function computeLedgerHash(ledger: any): string {
+export type ComputeLedgerHashOptions = {
+  requireRawTransactions?: boolean
+}
+
+function computeLedgerHash(ledger: any,
+    options: ComputeLedgerHashOptions = {}): string {
   const version = ((ledger.closeFlags & sLCF_SHAMapV2) === 0) ? 1 : 2
   const subhashes = {
-    transactionHash: computeTransactionHash(ledger, version),
+    transactionHash: computeTransactionHash(ledger, version, options),
     stateHash: computeStateHash(ledger, version)
   }
   return hashLedgerHeader(_.assign({}, ledger, subhashes))

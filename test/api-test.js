@@ -2550,7 +2550,7 @@ describe('RippleAPI', function () {
       .then(response => {
         const ledger = _.assign({}, response,
           { parentCloseTime: response.closeTime });
-        const hash = this.api.computeLedgerHash(ledger);
+        const hash = this.api.computeLedgerHash(ledger, {requireRawTransactions: true});
         assert.strictEqual(hash,
           'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
       });
