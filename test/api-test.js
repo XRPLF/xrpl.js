@@ -2328,6 +2328,45 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.getPaths.XrpToUsd, 'getPaths'));
   });
 
+  it('getPaths - result path has source_amount in drops', function () {
+    return this.api.getPaths({
+      source: {
+        address: 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx',
+        amount: {
+          value: this.api.dropsToXrp(1000000),
+          currency: 'XRP'
+        }
+      },
+      destination: {
+        address: 'rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5',
+        amount: {
+          counterparty: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
+          currency: 'EUR'
+        }
+      }
+    }).then(
+      _.partial(checkResult, [
+        {
+          "source": {
+            "address": "rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx",
+            "amount": {
+              "currency": "XRP",
+              "value": "1"
+            }
+          },
+          "destination": {
+            "address": "rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5",
+            "minAmount": {
+              "currency": "EUR",
+              "value": "1",
+              "counterparty": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u"
+            }
+          },
+          "paths": "[[{\"currency\":\"USD\",\"issuer\":\"rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u\"},{\"currency\":\"EUR\",\"issuer\":\"rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u\"}]]"
+        }
+      ], 'getPaths'));
+  });
+
   it('getPaths - queuing', function () {
     return Promise.all([
       this.api.getPaths(requests.getPaths.normal),
@@ -2511,7 +2550,7 @@ describe('RippleAPI', function () {
       .then(response => {
         const ledger = _.assign({}, response,
           { parentCloseTime: response.closeTime });
-        const hash = this.api.computeLedgerHash(ledger);
+        const hash = this.api.computeLedgerHash(ledger, {requireRawTransactions: true});
         assert.strictEqual(hash,
           'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
       });
