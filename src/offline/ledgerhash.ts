@@ -28,27 +28,25 @@ function hashLedgerHeader(ledgerHeader) {
 function computeTransactionHash(ledger, version,
     options: ComputeLedgerHashOptions) {
   let transactions: any[]
-  if (options.headerOnly === undefined) {
-    options.headerOnly = true // by default, allow rawTransactions to be omitted
-  }
-  if (ledger.rawTransactions === undefined) {
-    if (options.headerOnly === true) {
-      return ledger.transactionHash
-    } else {
-      try {
-        transactions = ledger.transactions.map(tx =>
-          JSON.parse(tx.rawTransaction))
-      } catch (e) {
-        if (e.toString() === 'SyntaxError: Unexpected' +
-            ' token u in JSON at position 0') {
-          // one or more of the `tx.rawTransaction`s is undefined
-          throw new common.errors.ValidationError('ledger'
-            + ' is missing raw transactions')
-        }
+  if (ledger.rawTransactions) {
+    transactions = JSON.parse(ledger.rawTransactions)
+  } else if (ledger.transactions) {
+    try {
+      transactions = ledger.transactions.map(tx =>
+        JSON.parse(tx.rawTransaction))
+    } catch (e) {
+      if (e.toString() === 'SyntaxError: Unexpected' +
+          ' token u in JSON at position 0') {
+        // one or more of the `tx.rawTransaction`s is undefined
+        throw new common.errors.ValidationError('ledger'
+          + ' is missing raw transactions')
       }
     }
   } else {
-    transactions = JSON.parse(ledger.rawTransactions)
+    if (options.computeTreeHashes)
+      throw new common.errors.ValidationError('transactions'
+      + ' property is missing from the ledger')
+    return ledger.transactionHash
   }
   const txs = _.map(transactions, tx => {
     const mergeTx = _.assign({}, _.omit(tx, 'tx'), tx.tx || {})
@@ -69,8 +67,12 @@ function computeTransactionHash(ledger, version,
   return transactionHash
 }
 
-function computeStateHash(ledger, version) {
+function computeStateHash(ledger, version,
+    options: ComputeLedgerHashOptions) {
   if (ledger.rawState === undefined) {
+    if (options.computeTreeHashes)
+      throw new common.errors.ValidationError('rawState'
+      + ' property is missing from the ledger')
     return ledger.stateHash
   }
   const state = JSON.parse(ledger.rawState)
@@ -85,7 +87,7 @@ function computeStateHash(ledger, version) {
 const sLCF_SHAMapV2 = 0x02
 
 export type ComputeLedgerHashOptions = {
-  headerOnly?: boolean
+  computeTreeHashes?: boolean
 }
 
 function computeLedgerHash(ledger: any,
@@ -93,7 +95,7 @@ function computeLedgerHash(ledger: any,
   const version = ((ledger.closeFlags & sLCF_SHAMapV2) === 0) ? 1 : 2
   const subhashes = {
     transactionHash: computeTransactionHash(ledger, version, options),
-    stateHash: computeStateHash(ledger, version)
+    stateHash: computeStateHash(ledger, version, options)
   }
   return hashLedgerHeader(_.assign({}, ledger, subhashes))
 }
