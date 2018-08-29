@@ -28,8 +28,11 @@ function hashLedgerHeader(ledgerHeader) {
 function computeTransactionHash(ledger, version,
     options: ComputeLedgerHashOptions) {
   let transactions: any[]
+  if (options.headerOnly === undefined) {
+    options.headerOnly = true // by default, allow rawTransactions to be omitted
+  }
   if (ledger.rawTransactions === undefined) {
-    if (options.requireRawTransactions !== true) {
+    if (options.headerOnly === true) {
       return ledger.transactionHash
     } else {
       try {
@@ -82,7 +85,7 @@ function computeStateHash(ledger, version) {
 const sLCF_SHAMapV2 = 0x02
 
 export type ComputeLedgerHashOptions = {
-  requireRawTransactions?: boolean
+  headerOnly?: boolean
 }
 
 function computeLedgerHash(ledger: any,
