@@ -27,17 +27,29 @@ function hashLedgerHeader(ledgerHeader) {
 
 function computeTransactionHash(ledger, version,
     options: ComputeLedgerHashOptions) {
+  let transactions: any[]
   if (ledger.rawTransactions === undefined) {
     if (options.requireRawTransactions !== true) {
       return ledger.transactionHash
     } else {
-      throw new common.errors.ValidationError('rawTransactions'
-      + ' property is missing from the ledger')
+      try {
+        transactions = ledger.transactions.map(tx =>
+          JSON.parse(tx.rawTransaction))
+      } catch (e) {
+        if (e.toString() === 'SyntaxError: Unexpected' +
+            ' token u in JSON at position 0') {
+          // one or more of the `tx.rawTransaction`s is undefined
+          throw new common.errors.ValidationError('ledger'
+            + ' is missing raw transactions')
+        }
+      }
     }
+  } else {
+    transactions = JSON.parse(ledger.rawTransactions)
   }
-  const transactions: any[] = JSON.parse(ledger.rawTransactions)
   const txs = _.map(transactions, tx => {
     const mergeTx = _.assign({}, _.omit(tx, 'tx'), tx.tx || {})
+    // rename `meta` back to `metaData`
     const renameMeta = _.assign({}, _.omit(mergeTx, 'meta'),
       tx.meta ? {metaData: tx.meta} : {})
     return renameMeta

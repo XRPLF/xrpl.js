@@ -12,7 +12,7 @@
     + Use `getTransactions`'s `includeRawTransactions` option, or
     + Use the rippled APIs directly with `request`. For example, call the API methods `tx`, `account_tx`, etc.
 + `getLedger()` response object
-  + For consistency with `getTransaction()` and `getTransactions()`, the `rawTransactions` field has been removed.
+  + The `rawTransactions` field has been removed (for consistency with `getTransaction()` and `getTransactions()`).
   + Instead, within each `transaction`, use the new `rawTransaction` JSON string.
   + The `metaData` field has been renamed to `meta` for consistency with rippled's `tx` method.
   + `ledger_index` has been added to each raw transaction.
