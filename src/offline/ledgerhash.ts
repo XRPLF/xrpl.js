@@ -58,7 +58,10 @@ function computeTransactionHash(ledger, version,
   if (ledger.transactionHash !== undefined
       && ledger.transactionHash !== transactionHash) {
     throw new common.errors.ValidationError('transactionHash in header'
-      + ' does not match computed hash of transactions')
+      + ' does not match computed hash of transactions', {
+        transactionHashInHeader: ledger.transactionHash,
+        computedHashOfTransactions: transactionHash
+      })
   }
   return transactionHash
 }
