@@ -1,8 +1,43 @@
 # ripple-lib Release History
 
-## UNRELEASED
+## 1.0.0 (2018-08-30)
+
+We are pleased to announce the release of `ripple-lib` version 1.0.0.
+
+This version features a range of changes and improvements that make the library
+more capable and flexible. It includes new methods for accessing rippled APIs,
+including subscriptions.
+
+When using this version with `rippled` for online functionality, we recommend
+using `rippled` version 1.0.1 or later.
+
+Here is a summary of the changes since `ripple-lib` version 0.22.0, which was
+the last non-beta version.
+
+### New Features
+
++ [Add `request()`, `hasNextPage()`, and `requestNextPage()` for accessing `rippled`
+  APIs](https://github.com/ripple/ripple-lib/blob/09541dae86bc859bf5928ac65b2645dfaaf7f8b1/docs/index.md#rippled-apis).
++ Add `prepareTransaction()` for preparing raw `txJSON`.
++ XRP amounts can be specified in drops. Also, `xrpToDrops()` and `dropsToXrp()`
+  are available to make conversions.
++ `getTransaction` responses can include a new `channelChanges` property that
+  describes the details of a payment channel.
+
+### Data Validation and Errors
+
++ [Amounts in drops and XRP are checked for
+  validity](https://github.com/ripple/ripple-lib/blob/develop/HISTORY.md#100-beta1-2018-05-24).
++ [A maximum fee is now
+  imposed](https://github.com/ripple/ripple-lib/blob/develop/HISTORY.md#100-beta2-2018-06-08). Exceeding it causes a `ValidationError` to be
+  thrown.
++ Errors are improved and more data validation was added.
++ Bug fix: `getPaths` now filters paths correctly and works correctly when the
+  destination currency is XRP.
 
 ### Breaking Changes
+
+The following changes were introduced in 1.0.0.
 
 + `getTransaction()` and `getTransactions()`
   + The `specification.destination.amount` field has been removed from the parsed transaction response.
@@ -16,6 +51,15 @@
   + Instead, within each `transaction`, use the new `rawTransaction` JSON string.
   + The `metaData` field has been renamed to `meta` for consistency with rippled's `tx` method.
   + `ledger_index` has been added to each raw transaction.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+a6c5efe3b485f69c0e9229c929da84a087fb94481f885bcfc6016e5b7cff8da4  ripple-1.0.0-debug.js
+3d8738f3adda86583f4ac143a8020cdec3e26ea1be05e2f533233994f1104568  ripple-1.0.0-min.js
+561988f8c85b9044eaa066f75f259556698f5022841da287afff540ef0d513df  ripple-1.0.0.js
+```
 
 ## 1.0.0-beta.5 (2018-08-11)
 
