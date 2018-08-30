@@ -763,7 +763,10 @@ ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for 
 * Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
 * Use `requestNextPage()` to request the next page of data.
 
-When using rippled APIs, [specify XRP amounts in drops](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts) and [timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-time).
+When using rippled APIs:
+* [Specify XRP amounts in drops](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts).
+* [Specify timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-time).
+* Instead of `counterparty`, use `issuer`.
 
 ## Listening to streams
 
