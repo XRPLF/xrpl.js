@@ -4434,6 +4434,12 @@ address | [address](#address) | The address of the account that is creating the 
 escrowCreation | [escrowCreation](#escrow-creation) | The specification of the escrow creation to prepare.
 instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
 
+This is a convenience method for generating the EscrowCreate JSON used by rippled, so the same restrictions apply.
+
+Field mapping: `allowCancelAfter` is equivalent to rippled's `CancelAfter`; `allowExecuteAfter` is equivalent to `FinishAfter`. At the `allowCancelAfter` time, the escrow is considered expired. This means that the funds can only be returned to the sender. At the `allowExecuteAfter` time, the escrow is permitted to be released to the recipient (if the `condition` is fulfilled).
+
+Note that `allowCancelAfter` must be chronologically later than `allowExecuteAfter`.
+
 ### Return Value
 
 This method returns a promise that resolves with an object with the following structure:
