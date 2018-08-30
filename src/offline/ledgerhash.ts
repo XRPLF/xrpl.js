@@ -43,9 +43,10 @@ function computeTransactionHash(ledger, version,
       }
     }
   } else {
-    if (options.computeTreeHashes)
+    if (options.computeTreeHashes) {
       throw new common.errors.ValidationError('transactions'
-      + ' property is missing from the ledger')
+        + ' property is missing from the ledger')
+    }
     return ledger.transactionHash
   }
   const txs = _.map(transactions, tx => {
@@ -70,9 +71,10 @@ function computeTransactionHash(ledger, version,
 function computeStateHash(ledger, version,
     options: ComputeLedgerHashOptions) {
   if (ledger.rawState === undefined) {
-    if (options.computeTreeHashes)
+    if (options.computeTreeHashes) {
       throw new common.errors.ValidationError('rawState'
-      + ' property is missing from the ledger')
+        + ' property is missing from the ledger')
+    }
     return ledger.stateHash
   }
   const state = JSON.parse(ledger.rawState)
