@@ -1629,6 +1629,8 @@ describe('RippleAPI', function () {
         assert(false, 'Should throw PendingLedgerVersionError');
       }).catch(error => {
         assert(error instanceof this.api.errors.PendingLedgerVersionError);
+        assert.strictEqual(error.message, 'maxLedgerVersion is greater than server\'s'
+          + ' most recent validated ledger')
       });
     });
 
