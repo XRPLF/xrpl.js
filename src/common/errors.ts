@@ -70,7 +70,7 @@ class MissingLedgerHistoryError extends RippleError {
 
 class PendingLedgerVersionError extends RippleError {
   constructor(message?: string) {
-    super(message || 'maxLedgerVersion is greater than server\'s most recent ' +
+    super(message || 'maxLedgerVersion is greater than server\'s most recent' +
       ' validated ledger')
   }
 }
