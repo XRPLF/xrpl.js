@@ -76,7 +76,9 @@ const Amount = makeClass({
     this.value = value || new Decimal('0');
     this.currency = currency || Currency.XRP;
     this.issuer = issuer || null;
-    validate && this.assertValueIsValid();
+    if (validate) {
+      this.assertValueIsValid();
+    }
   },
   mixins: SerializedType,
   statics: {
