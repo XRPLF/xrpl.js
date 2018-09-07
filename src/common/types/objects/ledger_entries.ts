@@ -165,7 +165,7 @@ export type LedgerEntry =
   EscrowLedgerEntry |
   FeeSettingsLedgerEntry |
   LedgerHashesLedgerEntry |
-  OfferLedgerEntry | 
+  OfferLedgerEntry |
   PayChannelLedgerEntry |
   RippleStateLedgerEntry |
   SignerListLedgerEntry
