@@ -1,5 +1,5 @@
 import {SignerEntry} from './index'
-import { Amount, RippledAmount } from './amounts'
+import {Amount, RippledAmount} from './amounts'
 
 export interface AccountRootLedgerEntry {
   LedgerEntryType: 'AccountRoot',
@@ -46,68 +46,68 @@ export interface CheckLedgerEntry {
 }
 
 export interface DirectoryNodeLedgerEntry {
-  LedgerEntryType: 'DirectoryNode';
-  Flags: number;
-  RootIndex: number;
-  Indexes: string[];
-  IndexNext?: number;
-  IndexPrevious?: number;
+  LedgerEntryType: 'DirectoryNode',
+  Flags: number,
+  RootIndex: number,
+  Indexes: string[],
+  IndexNext?: number,
+  IndexPrevious?: number
 }
 
 export interface OfferDirectoryNodeLedgerEntry extends DirectoryNodeLedgerEntry {
-  Owner?: string;
-  TakerPaysCurrency?: string;
-  TakerPaysIssuer?: string;
-  TakerGetsCurrency?: string;
-  TakerGetsIssuer?: string;
-};
+  Owner?: string,
+  TakerPaysCurrency?: string,
+  TakerPaysIssuer?: string,
+  TakerGetsCurrency?: string,
+  TakerGetsIssuer?: string
+}
 
 export interface EscrowLedgerEntry {
-  LedgerEntryType: 'Escrow';
-  Account: string;
-  Destination: string;
-  Amount: string;
-  Condition?: string;
-  CancelAfter?: number;
-  FinishAfter?: number;
-  Flags: number;
-  SourceTag?: number;
-  DestinationTag?: number;
-  OwnerNode: string;
-  DestinationNode?: string;
-  PreviousTxnID: string;
-  PreviousTxnLgrSeq: number;
+  LedgerEntryType: 'Escrow',
+  Account: string,
+  Destination: string,
+  Amount: string,
+  Condition?: string,
+  CancelAfter?: number,
+  FinishAfter?: number,
+  Flags: number,
+  SourceTag?: number,
+  DestinationTag?: number,
+  OwnerNode: string,
+  DestinationNode?: string,
+  PreviousTxnID: string,
+  PreviousTxnLgrSeq: number
 }
 
 export interface FeeSettingsLedgerEntry {
-  LedgerEntryType: 'FeeSettings';
-  BaseFee: string;
-  ReferenceFeeUnits: number;
-  ReserveBase: number;
-  ReserveIncrement: number;
-  Flags: number;
-};
+  LedgerEntryType: 'FeeSettings',
+  BaseFee: string,
+  ReferenceFeeUnits: number,
+  ReserveBase: number,
+  ReserveIncrement: number,
+  Flags: number
+}
 
 export interface LedgerHashesLedgerEntry {
-  LedgerEntryType: 'LedgerHashes';
-  LastLedgerSequence: number;
-  Hashes: string[];
-  Flags: number;
+  LedgerEntryType: 'LedgerHashes',
+  LastLedgerSequence: number,
+  Hashes: string[],
+  Flags: number
 }
 
 export interface OfferLedgerEntry {
-  LedgerEntryType: 'Offer';
-  Flags: number;
-  Account: string;
-  Sequence: number;
-  TakerPays: RippledAmount;
-  TakerGets: RippledAmount;
-  BookDirectory: string;
-  BookNode: string;
-  OwnerNode: string;
-  PreviousTxnID: string;
-  PreviousTxnLgrSeq: number;
-  Expiration?: number;
+  LedgerEntryType: 'Offer',
+  Flags: number,
+  Account: string,
+  Sequence: number,
+  TakerPays: RippledAmount,
+  TakerGets: RippledAmount,
+  BookDirectory: string,
+  BookNode: string,
+  OwnerNode: string,
+  PreviousTxnID: string,
+  PreviousTxnLgrSeq: number,
+  Expiration?: number
 }
 
 export interface PayChannelLedgerEntry {
@@ -130,20 +130,19 @@ export interface PayChannelLedgerEntry {
 }
 
 export interface RippleStateLedgerEntry {
-  LedgerEntryType: 'RippleState';
-  Flags: number;
-  Balance: Amount;
-  LowLimit: Amount;
-  HighLimit: Amount;
-  PreviousTxnID: string;
-  PreviousTxnLgrSeq: number;
-  LowNode?: string;
-  HighNode?: string;
-  LowQualityIn?: number;
-  LowQualityOut?: number;
-  HighQualityIn?: number;
-  HighQualityOut?: number;
-
+  LedgerEntryType: 'RippleState',
+  Flags: number,
+  Balance: Amount,
+  LowLimit: Amount,
+  HighLimit: Amount,
+  PreviousTxnID: string,
+  PreviousTxnLgrSeq: number,
+  LowNode?: string,
+  HighNode?: string,
+  LowQualityIn?: number,
+  LowQualityOut?: number,
+  HighQualityIn?: number,
+  HighQualityOut?: number
 }
 
 export interface SignerListLedgerEntry {
