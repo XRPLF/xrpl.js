@@ -54,7 +54,8 @@ export interface DirectoryNodeLedgerEntry {
   IndexPrevious?: number
 }
 
-export interface OfferDirectoryNodeLedgerEntry extends DirectoryNodeLedgerEntry {
+export interface OfferDirectoryNodeLedgerEntry
+       extends DirectoryNodeLedgerEntry {
   Owner?: string,
   TakerPaysCurrency?: string,
   TakerPaysIssuer?: string,
