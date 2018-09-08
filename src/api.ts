@@ -45,6 +45,7 @@ import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
 import {generateAddressAPI} from './offline/generate-address'
+import {deriveKeypair, deriveAddress} from './offline/derive'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
@@ -66,7 +67,6 @@ import {
 import RangeSet from './common/rangeset'
 import * as ledgerUtils from './ledger/utils'
 import * as transactionUtils from './transaction/utils'
-import * as commonUtils from './common/utils'
 import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp} from './ledger/utils'
@@ -111,7 +111,6 @@ class RippleAPI extends EventEmitter {
     validate,
     RangeSet,
     ledgerUtils,
-    commonUtils,
     schemaValidator
   }
 
@@ -323,6 +322,8 @@ class RippleAPI extends EventEmitter {
   submit = submit
 
   generateAddress = generateAddressAPI
+  deriveKeypair = deriveKeypair
+  deriveAddress = deriveAddress
   computeLedgerHash = computeLedgerHash
   signPaymentChannelClaim = signPaymentChannelClaim
   verifyPaymentChannelClaim = verifyPaymentChannelClaim
@@ -335,9 +336,6 @@ class RippleAPI extends EventEmitter {
 
   isValidAddress = schemaValidator.isValidAddress
   isValidSecret = schemaValidator.isValidSecret
-
-  deriveKeypair = commonUtils.deriveKeypair
-  deriveAddress = commonUtils.deriveAddress
 }
 
 export {
