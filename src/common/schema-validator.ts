@@ -160,5 +160,6 @@ function schemaValidate(schemaName: string, object: any): void {
 
 export {
   schemaValidate,
-  isValidSecret
+  isValidSecret,
+  isValidAddress
 }

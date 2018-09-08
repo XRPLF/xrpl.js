@@ -66,6 +66,7 @@ import {
 import RangeSet from './common/rangeset'
 import * as ledgerUtils from './ledger/utils'
 import * as transactionUtils from './transaction/utils'
+import * as commonUtils from './common/utils'
 import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp} from './ledger/utils'
@@ -110,6 +111,7 @@ class RippleAPI extends EventEmitter {
     validate,
     RangeSet,
     ledgerUtils,
+    commonUtils,
     schemaValidator
   }
 
@@ -330,6 +332,12 @@ class RippleAPI extends EventEmitter {
   dropsToXrp = dropsToXrp
   iso8601ToRippleTime = iso8601ToRippleTime
   txFlags = txFlags
+
+  isValidAddress = schemaValidator.isValidAddress
+  isValidSecret = schemaValidator.isValidSecret
+
+  deriveKeypair = commonUtils.deriveKeypair
+  deriveAddress = commonUtils.deriveAddress
 }
 
 export {

@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
-import {deriveKeypair} from 'ripple-keypairs'
+import {deriveKeypair, deriveAddress} from 'ripple-keypairs'
 import {Amount, RippledAmount} from './types/objects'
 import {ValidationError} from './errors'
 
@@ -155,6 +155,8 @@ export {
   removeUndefined,
   rippleTimeToISO8601,
   iso8601ToRippleTime,
-  isValidSecret
+  isValidSecret,
+  deriveKeypair,
+  deriveAddress
 }
 
