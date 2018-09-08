@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "deriveAddress",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "A Ripple account address corresponding to the secret."
+    },
+    "secret": {
+      "type": "string",
+      "format": "secret",
+      "description": "The provided secret."
+    }
+  },
+  "required": ["address", "secret"],
+  "additionalProperties": false
+}

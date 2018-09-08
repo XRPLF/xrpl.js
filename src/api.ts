@@ -45,6 +45,7 @@ import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
 import {generateAddressAPI} from './offline/generate-address'
+import {deriveAddressAPI} from './offline/derive-address'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
@@ -321,6 +322,7 @@ class RippleAPI extends EventEmitter {
   submit = submit
 
   generateAddress = generateAddressAPI
+  deriveAddress = deriveAddressAPI
   computeLedgerHash = computeLedgerHash
   signPaymentChannelClaim = signPaymentChannelClaim
   verifyPaymentChannelClaim = verifyPaymentChannelClaim

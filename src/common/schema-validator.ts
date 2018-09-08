@@ -115,6 +115,7 @@ function loadSchemas() {
     require('./schemas/input/sign.json'),
     require('./schemas/input/submit.json'),
     require('./schemas/input/generate-address.json'),
+    require('./schemas/input/derive-address.json'),
     require('./schemas/input/sign-payment-channel-claim.json'),
     require('./schemas/input/verify-payment-channel-claim.json'),
     require('./schemas/input/combine.json')

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "deriveAddressParameters",
+  "type": "object",
+  "properties": {
+    "secret": {
+      "type": "string",
+      "format": "secret",
+      "description": "The secret of the account to derive the address for."
+    }
+  },
+  "additionalProperties": false,
+  "required": ["secret"]
+}

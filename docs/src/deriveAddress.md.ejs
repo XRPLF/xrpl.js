@@ -1,0 +1,23 @@
+## deriveAddress
+
+`deriveAddress(secret: string): {address: string, secret: string}`
+
+Derive the corresponding address for the provided secret.
+
+### Parameters
+
+<%- renderSchema('input/derive-address.json') %>
+
+### Return Value
+
+This method returns an object with the following structure:
+
+<%- renderSchema('output/derive-address.json') %>
+
+### Example
+
+```javascript
+return api.deriveAddress("snUneA3NnRJDULZRaJBJdUtducjWK");
+```
+
+<%- renderFixture('responses/derive-address.json') %>
