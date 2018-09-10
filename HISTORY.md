@@ -56,9 +56,9 @@ The SHA-256 checksums for the browser version of this release can be found
 below.
 ```
 % shasum -a 256 *
-a6c5efe3b485f69c0e9229c929da84a087fb94481f885bcfc6016e5b7cff8da4  ripple-1.0.0-debug.js
-3d8738f3adda86583f4ac143a8020cdec3e26ea1be05e2f533233994f1104568  ripple-1.0.0-min.js
-561988f8c85b9044eaa066f75f259556698f5022841da287afff540ef0d513df  ripple-1.0.0.js
+06e5efcb6846ad45dedfd85cfa2ef4bdeb608b15ccbfb60b872c995d97342426  ripple-1.0.0-debug.js
+cdb26b928a89ce228c727d1ff966df266eb46b2f76bd94f81cbeb0a9d75febf0  ripple-1.0.0-min.js
+f74ee804e8a945a994e4e3901a0a3eb52292fbdcbff61ed30cefb8ffbcba50c3  ripple-1.0.0.js
 ```
 
 ## 1.0.0-beta.5 (2018-08-11)
