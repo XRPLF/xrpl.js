@@ -160,6 +160,7 @@ export interface SignerListLedgerEntry {
 export type LedgerEntry =
   AccountRootLedgerEntry |
   AmendmentsLedgerEntry |
+  CheckLedgerEntry |
   DirectoryNodeLedgerEntry |
   OfferDirectoryNodeLedgerEntry |
   EscrowLedgerEntry |
