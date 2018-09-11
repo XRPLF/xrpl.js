@@ -106,7 +106,7 @@ export interface FeeSettingsLedgerEntry {
 export interface LedgerHashesLedgerEntry {
   LedgerEntryType: 'LedgerHashes',
   Hashes: string[],
-  Flags: number, 
+  Flags: number,
   FirstLedgerSequence?: number,  // DEPRECIATED
   LastLedgerSequence?: number
 }
