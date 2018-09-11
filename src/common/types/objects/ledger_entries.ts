@@ -45,10 +45,19 @@ export interface CheckLedgerEntry {
   SourceTag: number
 }
 
+export interface DepositPreauthLedgerEntry {
+  LedgerEntryType: 'DepositPreauth',
+  Account: string,
+  Authorize: string,
+  OwnerNode: string,
+  PreviousTxnID: string,
+  PreviousTxnLgrSeq: number
+}
+
 export interface DirectoryNodeLedgerEntry {
   LedgerEntryType: 'DirectoryNode',
   Flags: number,
-  RootIndex: number,
+  RootIndex: string,
   Indexes: string[],
   IndexNext?: number,
   IndexPrevious?: number
@@ -56,11 +65,16 @@ export interface DirectoryNodeLedgerEntry {
 
 export interface OfferDirectoryNodeLedgerEntry
        extends DirectoryNodeLedgerEntry {
-  Owner?: string,
-  TakerPaysCurrency?: string,
-  TakerPaysIssuer?: string,
-  TakerGetsCurrency?: string,
-  TakerGetsIssuer?: string
+  TakerPaysCurrency: string,
+  TakerPaysIssuer: string,
+  TakerGetsCurrency: string,
+  TakerGetsIssuer: string,
+  ExchangeRate?: number  // DEPRECIATED
+}
+
+export interface OwnerDirectoryNodeLedgerEntry
+  extends DirectoryNodeLedgerEntry {
+  Owner: string,
 }
 
 export interface EscrowLedgerEntry {
@@ -91,9 +105,10 @@ export interface FeeSettingsLedgerEntry {
 
 export interface LedgerHashesLedgerEntry {
   LedgerEntryType: 'LedgerHashes',
-  LastLedgerSequence: number,
   Hashes: string[],
-  Flags: number
+  Flags: number, 
+  FirstLedgerSequence?: number,  // DEPRECIATED
+  LastLedgerSequence?: number
 }
 
 export interface OfferLedgerEntry {
@@ -161,8 +176,10 @@ export type LedgerEntry =
   AccountRootLedgerEntry |
   AmendmentsLedgerEntry |
   CheckLedgerEntry |
+  DepositPreauthLedgerEntry |
   DirectoryNodeLedgerEntry |
   OfferDirectoryNodeLedgerEntry |
+  OwnerDirectoryNodeLedgerEntry |
   EscrowLedgerEntry |
   FeeSettingsLedgerEntry |
   LedgerHashesLedgerEntry |
