@@ -5110,13 +5110,13 @@ return api.generateAddress();
 
 ## isValidAddress
 
-`isValidAddress(address: string) : boolean
+`isValidAddress(address: string): boolean`
 
-Checks if the specified string contains a valid ledger address.
+Checks if the specified string contains a valid address.
 
 ### Parameters
 
-This method takes one parameter, the address which to validate.
+This method takes one parameter, the address to validate.
 
 ### Return Value
 
@@ -5130,9 +5130,9 @@ return api.isValidAddress("address")
 
 ## isValidSecret
 
-`isValidSecret(secret: string) : boolean
+`isValidSecret(secret: string): boolean`
 
-Checks if the specified string contains a valid ledger secret.
+Checks if the specified string contains a valid secret.
 
 ### Parameters
 
@@ -5150,7 +5150,7 @@ return api.isValidSecret("secret")
 
 ## deriveKeypair
 
-`deriveKeypair(seed: string) : {privateKey: string, publicKey: string}`
+`deriveKeypair(seed: string): {privateKey: string, publicKey: string}`
 
 Derive a public and private key from a seed.
 
@@ -5172,7 +5172,7 @@ var private_key = keypair.privateKey;
 
 ## deriveAddress
 
-`deriveAddress(publicKey: string) : string
+`deriveAddress(publicKey: string): string`
 
 Derive an XRP Ledger address from a public key.
 

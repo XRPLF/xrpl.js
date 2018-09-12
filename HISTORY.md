@@ -1,5 +1,17 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
++ Add address/secret/key validation and derivation methods ([#932](https://github.com/ripple/ripple-lib/pull/932))
+  + `isValidAddress(address: string) : boolean`: Checks if the specified string contains a valid address.
+  + `isValidSecret(secret: string): boolean`: Checks if the specified string contains a valid secret.
+  + `deriveKeypair(seed: string): {privateKey: string, publicKey: string}`: Derive a public and private key from a seed.
+  + `deriveAddress(publicKey: string): string`: Derive an XRP Ledger address from a public key.
++ To derive an address from a secret:
+  1. Derive the public key from the secret.
+  2. Derive the address from the public key.
+  + Example: `const address = api.deriveAddress(api.deriveKeypair(secret).publicKey)`
+
 ## 1.0.0 (2018-08-30)
 
 We are pleased to announce the release of `ripple-lib` version 1.0.0.
