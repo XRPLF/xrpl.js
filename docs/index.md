@@ -76,6 +76,10 @@
   - [combine](#combine)
   - [submit](#submit)
   - [generateAddress](#generateaddress)
+  - [isValidAddress](#isvalidaddress)
+  - [isValidSecret](#isvalidsecret)
+  - [deriveKeypair](#derivekeypair)
+  - [deriveAddress](#deriveaddress)
   - [signPaymentChannelClaim](#signpaymentchannelclaim)
   - [verifyPaymentChannelClaim](#verifypaymentchannelclaim)
   - [computeLedgerHash](#computeledgerhash)
@@ -5103,6 +5107,88 @@ return api.generateAddress();
 }
 ```
 
+
+## isValidAddress
+
+`isValidAddress(address: string) : boolean
+
+Checks if the specified string contains a valid ledger address.
+
+### Parameters
+
+This method takes one parameter, the address which to validate.
+
+### Return Value
+
+This method returns `true` if the address is valid and `false` if it is not.
+
+### Example
+
+```javascript
+return api.isValidAddress("address")
+```
+
+## isValidSecret
+
+`isValidSecret(secret: string) : boolean
+
+Checks if the specified string contains a valid ledger secret.
+
+### Parameters
+
+This method takes one parameter, the secret which to validate.
+
+### Return Value
+
+This method returns `true` if the secret is valid and `false` if it is not.
+
+### Example
+
+```javascript
+return api.isValidSecret("secret")
+```
+
+## deriveKeypair
+
+`deriveKeypair(seed: string) : {privateKey: string, publicKey: string}`
+
+Derive a public and private key from a seed.
+
+### Parameters
+
+This method takes one parameter, the seed from which to derive the public and private key.
+
+### Return Value
+
+This method returns an object containing the public and private components of the keypair corresponding to the seed.
+
+### Example
+
+```javascript
+var keypair = api.deriveKeypair(seed)
+var public_key = keypair.publicKey;
+var private_key = keypair.privateKey;
+```
+
+## deriveAddress
+
+`deriveAddress(publicKey: string) : string
+
+Derive an XRP Ledger address from a public key.
+
+### Parameters
+
+This method takes one parameter, the public key from which to derive the address.
+
+### Return Value
+
+This method returns a string corresponding to the address derived from the public key.
+
+### Example
+
+```javascript
+var address = api.deriveAddress(public_key);
+```
 
 ## signPaymentChannelClaim
 
