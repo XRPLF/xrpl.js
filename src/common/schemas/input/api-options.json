@@ -18,9 +18,9 @@
     },
     "server": {
       "type": "string",
-      "description": "URI for rippled websocket port to connect to. Must start with `wss://` or `ws://`.",
+      "description": "URI for rippled websocket port to connect to. Must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.",
       "format": "uri",
-      "pattern": "^wss?://"
+      "pattern": "^(wss?|wss?\\+unix)://"
     },
     "proxy": {
       "format": "uri",
