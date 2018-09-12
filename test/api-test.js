@@ -298,6 +298,12 @@ describe('RippleAPI', function () {
       assert.equal(keypair.publicKey, '035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06');
     })
 
+    it('returns keypair for ed25519 secret', function () {
+      var keypair = this.api.deriveKeypair('sEdV9eHWbibBnTj7b1H5kHfPfv7gudx');
+      assert.equal(keypair.privateKey, 'ED5C2EF6C2E3200DFA6B72F47935C7F64D35453646EA34919192538F458C7BC30F');
+      assert.equal(keypair.publicKey, 'ED0805EC4E728DB87C0CA6C420751F296C57A5F42D02E9E6150CE60694A44593E5');
+    })
+
     it('throws with an invalid secret', function (){
       assert.throws(() => {
         this.api.deriveKeypair('...');
