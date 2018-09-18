@@ -20,6 +20,7 @@ function parseTrustline(tx: any): Object {
     limit: tx.LimitAmount.value,
     currency: tx.LimitAmount.currency,
     counterparty: tx.LimitAmount.issuer,
+    memos: parseQuality.parseMemos(tx),
     qualityIn: parseQuality(tx.QualityIn),
     qualityOut: parseQuality(tx.QualityOut),
     ripplingDisabled: parseFlag(
