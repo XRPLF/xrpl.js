@@ -1587,6 +1587,14 @@ describe('RippleAPI', function () {
           'getTransaction'));
     });
 
+    it('getTransaction - trustline add memo', function () {
+        const hash =
+            '9D6AC5FD6545B2584885B85E36759EB6440CDD41B6C55859F84AFDEE2B428220';
+        return this.api.getTransaction(hash).then(
+            _.partial(checkResult, responses.getTransaction.trustlineAddMemo,
+                'getTransaction'));
+    });
+
     it('getTransaction - not validated', function () {
       const hash =
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';

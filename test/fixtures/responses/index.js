@@ -43,6 +43,7 @@ module.exports = {
     setRegularKey: require('./get-transaction-settings-set-regular-key.json'),
     trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
     trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
+    trustlineAddMemo: require('./get-transaction-trust-add-memo.json'),
     notValidated: require('./get-transaction-not-validated.json'),
     checkCreate:
       require('./get-transaction-check-create.json'),
