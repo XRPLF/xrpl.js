@@ -75,6 +75,7 @@ module.exports = {
     TrustSet: require('./tx/trust-set.json'),
     TrustSetFrozenOff: require('./tx/trust-set-frozen-off.json'),
     TrustSetNoQuality: require('./tx/trust-set-no-quality.json'),
+    TrustSetAddMemo: require('./tx/trust-set-add-memo.json'),
     NotFound: require('./tx/not-found.json'),
     NoLedgerIndex: require('./tx/no-ledger-index.json'),
     NoLedgerFound: require('./tx/no-ledger-found.json'),

@@ -1,0 +1,34 @@
+{
+  "type": "trustline",
+  "address": "r9nNHpMW4TfPnmWcRHi3Qmev2jjCJ2koi4",
+  "sequence": 40,
+  "id": "9D6AC5FD6545B2584885B85E36759EB6440CDD41B6C55859F84AFDEE2B428220",
+  "specification": {
+    "limit": "2000",
+    "currency": "USD",
+    "counterparty": "rkrbFLphJzLvyLE1obALNARQAnoVypoNX",
+    "memos": [
+      {
+        "type": "test",
+        "format": "plain/text",
+        "data": "test trust"
+      }
+    ]
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2018-09-18T03:36:51.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "r9nNHpMW4TfPnmWcRHi3Qmev2jjCJ2koi4": [
+        {
+          "currency": "XRP",
+          "value": "-0.000012"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 41608182,
+    "indexInLedger": 5
+  }
+}
