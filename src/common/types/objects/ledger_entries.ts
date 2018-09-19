@@ -69,7 +69,7 @@ export interface OfferDirectoryNodeLedgerEntry
   TakerPaysIssuer: string,
   TakerGetsCurrency: string,
   TakerGetsIssuer: string,
-  ExchangeRate?: number  // DEPRECIATED
+  ExchangeRate?: number // DEPRECATED
 }
 
 export interface OwnerDirectoryNodeLedgerEntry
@@ -107,7 +107,7 @@ export interface LedgerHashesLedgerEntry {
   LedgerEntryType: 'LedgerHashes',
   Hashes: string[],
   Flags: number,
-  FirstLedgerSequence?: number,  // DEPRECIATED
+  FirstLedgerSequence?: number, // DEPRECATED
   LastLedgerSequence?: number
 }
 
