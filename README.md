@@ -28,7 +28,7 @@ $ yarn add ripple-lib
 
 Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md) and [code samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples).
 
-### Mailing lists
+### Mailing Lists
 
 We have a low-traffic mailing list for announcements of new ripple-lib releases. (About 1 email per week)
 
@@ -56,11 +56,11 @@ Gulp will [output](./Gulpfile.js) the resulting JS files in `./build/`.
 
 For more details, see the `scripts` in `package.json`.
 
-## Running tests
+## Running Tests
 
 1. Clone the repository
 2. `cd` into the repository and install dependencies with `yarn install`
-3. `yarn test` or `yarn test --coverage` (`istanbul` will create coverage reports in `coverage/lcov-report/`)
+3. `yarn test`
 
 ## Generating Documentation
 

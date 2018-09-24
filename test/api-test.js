@@ -270,6 +270,54 @@ describe('RippleAPI', function () {
       }, /dropsToXrp:\ invalid\ value\ '\.\.\.'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
     })
   })
+
+  describe('isValidAddress', function () {
+    it('returns true for valid address', function () {
+      assert(this.api.isValidAddress('rLczgQHxPhWtjkaQqn3Q6UM8AbRbbRvs5K'));
+    })
+
+    it('returns false for invalid address', function () {
+      assert(!this.api.isValidAddress('foobar'));
+    })
+  })
+
+  describe('isValidSecret', function () {
+    it('returns true for valid secret', function () {
+      assert(this.api.isValidSecret('snsakdSrZSLkYpCXxfRkS4Sh96PMK'));
+    })
+
+    it('returns false for invalid secret', function () {
+      assert(!this.api.isValidSecret('foobar'));
+    })
+  })
+
+  describe('deriveKeypair', function () {
+    it('returns keypair for secret', function () {
+      var keypair = this.api.deriveKeypair('snsakdSrZSLkYpCXxfRkS4Sh96PMK');
+      assert.equal(keypair.privateKey, '008850736302221AFD59FF9CA1A29D4975F491D726249302EE48A3078A8934D335');
+      assert.equal(keypair.publicKey, '035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06');
+    })
+
+    it('returns keypair for ed25519 secret', function () {
+      var keypair = this.api.deriveKeypair('sEdV9eHWbibBnTj7b1H5kHfPfv7gudx');
+      assert.equal(keypair.privateKey, 'ED5C2EF6C2E3200DFA6B72F47935C7F64D35453646EA34919192538F458C7BC30F');
+      assert.equal(keypair.publicKey, 'ED0805EC4E728DB87C0CA6C420751F296C57A5F42D02E9E6150CE60694A44593E5');
+    })
+
+    it('throws with an invalid secret', function (){
+      assert.throws(() => {
+        this.api.deriveKeypair('...');
+      }, /^Error\: Non\-base58 character$/)
+    })
+  })
+
+  describe('deriveAddress', function () {
+    it('returns address for public key', function () {
+      var address = this.api.deriveAddress('035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06');
+      assert.equal(address, 'rLczgQHxPhWtjkaQqn3Q6UM8AbRbbRvs5K');
+    })
+  })
+
   describe('pagination', function () {
 
     describe('hasNextPage', function () {
@@ -1539,6 +1587,14 @@ describe('RippleAPI', function () {
           'getTransaction'));
     });
 
+    it('getTransaction - trustline add memo', function () {
+        const hash =
+            '9D6AC5FD6545B2584885B85E36759EB6440CDD41B6C55859F84AFDEE2B428220';
+        return this.api.getTransaction(hash).then(
+            _.partial(checkResult, responses.getTransaction.trustlineAddMemo,
+                'getTransaction'));
+    });
+
     it('getTransaction - not validated', function () {
       const hash =
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';
@@ -1629,6 +1685,8 @@ describe('RippleAPI', function () {
         assert(false, 'Should throw PendingLedgerVersionError');
       }).catch(error => {
         assert(error instanceof this.api.errors.PendingLedgerVersionError);
+        assert.strictEqual(error.message, 'maxLedgerVersion is greater than server\'s'
+          + ' most recent validated ledger')
       });
     });
 
@@ -2328,6 +2386,45 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.getPaths.XrpToUsd, 'getPaths'));
   });
 
+  it('getPaths - result path has source_amount in drops', function () {
+    return this.api.getPaths({
+      source: {
+        address: 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx',
+        amount: {
+          value: this.api.dropsToXrp(1000000),
+          currency: 'XRP'
+        }
+      },
+      destination: {
+        address: 'rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5',
+        amount: {
+          counterparty: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
+          currency: 'EUR'
+        }
+      }
+    }).then(
+      _.partial(checkResult, [
+        {
+          "source": {
+            "address": "rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx",
+            "amount": {
+              "currency": "XRP",
+              "value": "1"
+            }
+          },
+          "destination": {
+            "address": "rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5",
+            "minAmount": {
+              "currency": "EUR",
+              "value": "1",
+              "counterparty": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u"
+            }
+          },
+          "paths": "[[{\"currency\":\"USD\",\"issuer\":\"rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u\"},{\"currency\":\"EUR\",\"issuer\":\"rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u\"}]]"
+        }
+      ], 'getPaths'));
+  });
+
   it('getPaths - queuing', function () {
     return Promise.all([
       this.api.getPaths(requests.getPaths.normal),
@@ -2511,10 +2608,110 @@ describe('RippleAPI', function () {
       .then(response => {
         const ledger = _.assign({}, response,
           { parentCloseTime: response.closeTime });
-        const hash = this.api.computeLedgerHash(ledger);
+        const hash = this.api.computeLedgerHash(ledger, {computeTreeHashes: true});
         assert.strictEqual(hash,
           'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
       });
+  });
+
+  it('computeLedgerHash - given corrupt data - should fail', function () {
+    const request = {
+      includeTransactions: true,
+      includeState: true,
+      includeAllData: true,
+      ledgerVersion: 38129
+    };
+    return this.api.getLedger(request).then(ledger => {
+      assert.strictEqual(ledger.transactions[0].rawTransaction, "{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Amount\":\"10000000000\",\"Destination\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Fee\":\"10\",\"Flags\":0,\"Sequence\":62,\"SigningPubKey\":\"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E\",\"TransactionType\":\"Payment\",\"TxnSignature\":\"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639\",\"hash\":\"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF\",\"meta\":{\"AffectedNodes\":[{\"CreatedNode\":{\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E\",\"NewFields\":{\"Account\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Balance\":\"10000000000\",\"Sequence\":1}}},{\"ModifiedNode\":{\"FinalFields\":{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Balance\":\"981481999380\",\"Flags\":0,\"OwnerCount\":0,\"Sequence\":63},\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A\",\"PreviousFields\":{\"Balance\":\"991481999390\",\"Sequence\":62},\"PreviousTxnID\":\"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F\",\"PreviousTxnLgrSeq\":31317}}],\"TransactionIndex\":0,\"TransactionResult\":\"tesSUCCESS\"},\"ledger_index\":38129}");
+
+      // Change Amount to 12000000000
+      ledger.transactions[0].rawTransaction = "{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Amount\":\"12000000000\",\"Destination\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Fee\":\"10\",\"Flags\":0,\"Sequence\":62,\"SigningPubKey\":\"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E\",\"TransactionType\":\"Payment\",\"TxnSignature\":\"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639\",\"hash\":\"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF\",\"meta\":{\"AffectedNodes\":[{\"CreatedNode\":{\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E\",\"NewFields\":{\"Account\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Balance\":\"10000000000\",\"Sequence\":1}}},{\"ModifiedNode\":{\"FinalFields\":{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Balance\":\"981481999380\",\"Flags\":0,\"OwnerCount\":0,\"Sequence\":63},\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A\",\"PreviousFields\":{\"Balance\":\"991481999390\",\"Sequence\":62},\"PreviousTxnID\":\"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F\",\"PreviousTxnLgrSeq\":31317}}],\"TransactionIndex\":0,\"TransactionResult\":\"tesSUCCESS\"},\"ledger_index\":38129}";
+
+      ledger.parentCloseTime = ledger.closeTime;
+
+      let hash;
+      try {
+        hash = this.api.computeLedgerHash(ledger, {computeTreeHashes: true});
+      } catch (error) {
+        assert(error instanceof this.api.errors.ValidationError);
+        assert.strictEqual(error.message, 'transactionHash in header does not match computed hash of transactions');
+        assert.deepStrictEqual(error.data, {
+          transactionHashInHeader: 'DB83BF807416C5B3499A73130F843CF615AB8E797D79FE7D330ADF1BFA93951A',
+          computedHashOfTransactions: 'EAA1ADF4D627339450F0E95EA88B7069186DD64230BAEBDCF3EEC4D616A9FC68'
+        });
+        return;
+      }
+      assert(false, 'Should throw ValidationError instead of producing hash: ' + hash);
+    });
+  });
+
+  it('computeLedgerHash - given ledger without raw transactions - should throw', function () {
+    const request = {
+      includeTransactions: true,
+      includeState: true,
+      includeAllData: true,
+      ledgerVersion: 38129
+    };
+    return this.api.getLedger(request).then(ledger => {
+      assert.strictEqual(ledger.transactions[0].rawTransaction, "{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Amount\":\"10000000000\",\"Destination\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Fee\":\"10\",\"Flags\":0,\"Sequence\":62,\"SigningPubKey\":\"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E\",\"TransactionType\":\"Payment\",\"TxnSignature\":\"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639\",\"hash\":\"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF\",\"meta\":{\"AffectedNodes\":[{\"CreatedNode\":{\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E\",\"NewFields\":{\"Account\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Balance\":\"10000000000\",\"Sequence\":1}}},{\"ModifiedNode\":{\"FinalFields\":{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Balance\":\"981481999380\",\"Flags\":0,\"OwnerCount\":0,\"Sequence\":63},\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A\",\"PreviousFields\":{\"Balance\":\"991481999390\",\"Sequence\":62},\"PreviousTxnID\":\"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F\",\"PreviousTxnLgrSeq\":31317}}],\"TransactionIndex\":0,\"TransactionResult\":\"tesSUCCESS\"},\"ledger_index\":38129}");
+
+      // Delete rawTransaction
+      delete ledger.transactions[0].rawTransaction;
+
+      ledger.parentCloseTime = ledger.closeTime;
+
+      let hash;
+      try {
+        hash = this.api.computeLedgerHash(ledger, {computeTreeHashes: true});
+      } catch (error) {
+        assert(error instanceof this.api.errors.ValidationError);
+        assert.strictEqual(error.message, 'ledger'
+          + ' is missing raw transactions');
+        return;
+      }
+      assert(false, 'Should throw ValidationError instead of producing hash: ' + hash);
+    });
+  });
+
+
+  it('computeLedgerHash - given ledger without state or transactions - only compute ledger hash', function () {
+    const request = {
+      includeTransactions: true,
+      includeState: true,
+      includeAllData: true,
+      ledgerVersion: 38129
+    };
+    return this.api.getLedger(request).then(ledger => {
+      assert.strictEqual(ledger.transactions[0].rawTransaction, "{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Amount\":\"10000000000\",\"Destination\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Fee\":\"10\",\"Flags\":0,\"Sequence\":62,\"SigningPubKey\":\"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E\",\"TransactionType\":\"Payment\",\"TxnSignature\":\"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639\",\"hash\":\"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF\",\"meta\":{\"AffectedNodes\":[{\"CreatedNode\":{\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E\",\"NewFields\":{\"Account\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Balance\":\"10000000000\",\"Sequence\":1}}},{\"ModifiedNode\":{\"FinalFields\":{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Balance\":\"981481999380\",\"Flags\":0,\"OwnerCount\":0,\"Sequence\":63},\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A\",\"PreviousFields\":{\"Balance\":\"991481999390\",\"Sequence\":62},\"PreviousTxnID\":\"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F\",\"PreviousTxnLgrSeq\":31317}}],\"TransactionIndex\":0,\"TransactionResult\":\"tesSUCCESS\"},\"ledger_index\":38129}");
+
+      ledger.parentCloseTime = ledger.closeTime;
+
+      const computeLedgerHash = this.api.computeLedgerHash;
+      const ValidationError = this.api.errors.ValidationError
+      function testCompute(ledger, expectedError) {
+        let hash = computeLedgerHash(ledger);
+        assert.strictEqual(hash,
+            'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
+
+        // fail if required to compute tree hashes
+        try {
+          hash = computeLedgerHash(ledger, {computeTreeHashes: true});
+        } catch (error) {
+          assert(error instanceof ValidationError);
+          assert.strictEqual(error.message, expectedError);
+          return;
+        }
+        assert(false, 'Should throw ValidationError instead of producing hash: ' + hash);
+      }
+
+      const transactions = ledger.transactions;
+      delete ledger.transactions;
+      testCompute(ledger, 'transactions property is missing from the ledger');
+      delete ledger.rawState;
+      testCompute(ledger, 'transactions property is missing from the ledger');
+      ledger.transactions = transactions;
+      testCompute(ledger, 'rawState property is missing from the ledger');
+    });
   });
 
   it('computeLedgerHash - wrong hash', function () {

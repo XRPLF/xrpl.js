@@ -345,6 +345,9 @@ module.exports = function createMockRippled(port) {
       'BAF1C678323C37CCB7735550C379287667D8288C30F83148AD3C1CB019FC9002') {
       conn.send(createResponse(request, fixtures.tx.TrustSetNoQuality));
     } else if (request.transaction ===
+        '9D6AC5FD6545B2584885B85E36759EB6440CDD41B6C55859F84AFDEE2B428220') {
+        conn.send(createResponse(request, fixtures.tx.TrustSetAddMemo));
+    }else if (request.transaction ===
       '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10') {
       conn.send(createResponse(request, fixtures.tx.NotValidated));
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
@@ -485,7 +488,57 @@ module.exports = function createMockRippled(port) {
     if (request.subcommand === 'close') {   // for path_find command
       return;
     }
-    if (request.source_account === addresses.NOTFOUND) {
+    if (request.source_account === 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx') {
+      // getPaths - result path has source_amount in drops
+      response = createResponse(request, {
+        "id": 0,
+        "type": "response",
+        "status": "success",
+        "result": {
+          "alternatives": [
+            {
+              "destination_amount": {
+                "currency": "EUR",
+                "issuer": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u",
+                "value": "1"
+              },
+              "paths_canonical": [],
+              "paths_computed": [
+                [
+                  {
+                    "currency": "USD",
+                    "issuer": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u",
+                    "type": 48,
+                    "type_hex": "0000000000000030"
+                  },
+                  {
+                    "currency": "EUR",
+                    "issuer": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u",
+                    "type": 48,
+                    "type_hex": "0000000000000030"
+                  }
+                ]
+              ],
+              "source_amount": "1000000"
+            }
+          ],
+          "destination_account": "rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5",
+          "destination_amount": {
+            "currency": "EUR",
+            "issuer": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u",
+            "value": "-1"
+          },
+          "destination_currencies": [
+            "EUR",
+            "XRP"
+          ],
+          "full_reply": true,
+          "id": 2,
+          "source_account": "rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx",
+          "status": "success"
+        }
+      })
+    } else if (request.source_account === addresses.NOTFOUND) {
       response = createResponse(request, fixtures.path_find.srcActNotFound);
     } else if (request.source_account === addresses.SOURCE_LOW_FUNDS) {
       response = createResponse(request, fixtures.path_find.sourceAmountLow);
@@ -497,8 +550,9 @@ module.exports = function createMockRippled(port) {
         destination_address: request.destination_address
       });
     } else if (request.source_account === addresses.ACCOUNT) {
-      if (request.destination_account ===
-        'ra5nK24KXen9AHvsdFTKHSANinZseWnPcX') {
+      if (request.destination_account === 'ra5nK24KXen9AHvsdFTKHSANinZseWnPcX' &&
+          // Important: Ensure that destination_amount.value is correct
+          request.destination_amount.value === "-1") {
         response = createResponse(request, fixtures.path_find.sendAll);
       } else {
         response = fixtures.path_find.generate.generateIOUPaymentPaths(

@@ -45,6 +45,7 @@ import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
 import {generateAddressAPI} from './offline/generate-address'
+import {deriveKeypair, deriveAddress} from './offline/derive'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
@@ -321,6 +322,8 @@ class RippleAPI extends EventEmitter {
   submit = submit
 
   generateAddress = generateAddressAPI
+  deriveKeypair = deriveKeypair
+  deriveAddress = deriveAddress
   computeLedgerHash = computeLedgerHash
   signPaymentChannelClaim = signPaymentChannelClaim
   verifyPaymentChannelClaim = verifyPaymentChannelClaim
@@ -330,6 +333,9 @@ class RippleAPI extends EventEmitter {
   dropsToXrp = dropsToXrp
   iso8601ToRippleTime = iso8601ToRippleTime
   txFlags = txFlags
+
+  isValidAddress = schemaValidator.isValidAddress
+  isValidSecret = schemaValidator.isValidSecret
 }
 
 export {

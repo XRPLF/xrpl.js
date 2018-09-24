@@ -46,8 +46,8 @@ function createEscrowCreationTransaction(account: string,
   }
   if (Boolean(payment.allowCancelAfter) && Boolean(payment.allowExecuteAfter) &&
       txJSON.CancelAfter <= txJSON.FinishAfter) {
-    throw new ValidationError('"CancelAfter" must be after "FinishAfter" for'
-      + ' EscrowCreate')
+    throw new ValidationError('prepareEscrowCreation: ' +
+      '"allowCancelAfter" must be after "allowExecuteAfter"')
   }
   return txJSON
 }

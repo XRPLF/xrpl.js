@@ -2,7 +2,54 @@
 
 ## UNRELEASED
 
++ Add address/secret/key validation and derivation methods ([#932](https://github.com/ripple/ripple-lib/pull/932))
+  + `isValidAddress(address: string) : boolean`: Checks if the specified string contains a valid address.
+  + `isValidSecret(secret: string): boolean`: Checks if the specified string contains a valid secret.
+  + `deriveKeypair(seed: string): {privateKey: string, publicKey: string}`: Derive a public and private key from a seed.
+  + `deriveAddress(publicKey: string): string`: Derive an XRP Ledger address from a public key.
++ To derive an address from a secret:
+  1. Derive the public key from the secret.
+  2. Derive the address from the public key.
+  + Example: `const address = api.deriveAddress(api.deriveKeypair(secret).publicKey)`
+
+## 1.0.0 (2018-08-30)
+
+We are pleased to announce the release of `ripple-lib` version 1.0.0.
+
+This version features a range of changes and improvements that make the library
+more capable and flexible. It includes new methods for accessing rippled APIs,
+including subscriptions.
+
+When using this version with `rippled` for online functionality, we recommend
+using `rippled` version 1.0.1 or later.
+
+Here is a summary of the changes since `ripple-lib` version 0.22.0, which was
+the last non-beta version.
+
+### New Features
+
++ [Add `request()`, `hasNextPage()`, and `requestNextPage()` for accessing `rippled`
+  APIs](https://github.com/ripple/ripple-lib/blob/09541dae86bc859bf5928ac65b2645dfaaf7f8b1/docs/index.md#rippled-apis).
++ Add `prepareTransaction()` for preparing raw `txJSON`.
++ XRP amounts can be specified in drops. Also, `xrpToDrops()` and `dropsToXrp()`
+  are available to make conversions.
++ `getTransaction` responses can include a new `channelChanges` property that
+  describes the details of a payment channel.
+
+### Data Validation and Errors
+
++ [Amounts in drops and XRP are checked for
+  validity](https://github.com/ripple/ripple-lib/blob/develop/HISTORY.md#100-beta1-2018-05-24).
++ [A maximum fee is now
+  imposed](https://github.com/ripple/ripple-lib/blob/develop/HISTORY.md#100-beta2-2018-06-08). Exceeding it causes a `ValidationError` to be
+  thrown.
++ Errors are improved and more data validation was added.
++ Bug fix: `getPaths` now filters paths correctly and works correctly when the
+  destination currency is XRP.
+
 ### Breaking Changes
+
+The following changes were introduced in 1.0.0.
 
 + `getTransaction()` and `getTransactions()`
   + The `specification.destination.amount` field has been removed from the parsed transaction response.
@@ -11,6 +58,20 @@
     + Use `getTransaction`'s `includeRawTransaction` option, or
     + Use `getTransactions`'s `includeRawTransactions` option, or
     + Use the rippled APIs directly with `request`. For example, call the API methods `tx`, `account_tx`, etc.
++ `getLedger()` response object
+  + The `rawTransactions` field has been removed (for consistency with `getTransaction()` and `getTransactions()`).
+  + Instead, within each `transaction`, use the new `rawTransaction` JSON string.
+  + The `metaData` field has been renamed to `meta` for consistency with rippled's `tx` method.
+  + `ledger_index` has been added to each raw transaction.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+06e5efcb6846ad45dedfd85cfa2ef4bdeb608b15ccbfb60b872c995d97342426  ripple-1.0.0-debug.js
+cdb26b928a89ce228c727d1ff966df266eb46b2f76bd94f81cbeb0a9d75febf0  ripple-1.0.0-min.js
+f74ee804e8a945a994e4e3901a0a3eb52292fbdcbff61ed30cefb8ffbcba50c3  ripple-1.0.0.js
+```
 
 ## 1.0.0-beta.5 (2018-08-11)
 

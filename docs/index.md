@@ -76,6 +76,10 @@
   - [combine](#combine)
   - [submit](#submit)
   - [generateAddress](#generateaddress)
+  - [isValidAddress](#isvalidaddress)
+  - [isValidSecret](#isvalidsecret)
+  - [deriveKeypair](#derivekeypair)
+  - [deriveAddress](#deriveaddress)
   - [signPaymentChannelClaim](#signpaymentchannelclaim)
   - [verifyPaymentChannelClaim](#verifypaymentchannelclaim)
   - [computeLedgerHash](#computeledgerhash)
@@ -156,7 +160,7 @@ maxFeeXRP | string | *Optional* Maximum fee to use with transactions, in XRP. Mu
 passphrase | string | *Optional* The passphrase for the private key of the client.
 proxy | uri string | *Optional* URI for HTTP/HTTPS proxy to use to connect to the rippled server.
 proxyAuthorization | string | *Optional* Username and password for HTTP basic authentication to the proxy in the format **username:password**.
-server | uri string | *Optional* URI for rippled websocket port to connect to. Must start with `wss://` or `ws://`.
+server | uri string | *Optional* URI for rippled websocket port to connect to. Must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.
 timeout | integer | *Optional* Timeout in milliseconds before considering a request to have failed.
 trace | boolean | *Optional* If true, log rippled requests and responses to stdout.
 trustedCertificates | array\<string\> | *Optional* Array of PEM-formatted SSL certificates to trust when connecting to a proxy. This is useful if you want to use a self-signed certificate on the proxy server. Note: Each element must contain a single certificate; concatenated certificates are not valid.
@@ -763,7 +767,10 @@ ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for 
 * Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
 * Use `requestNextPage()` to request the next page of data.
 
-When using rippled APIs, [specify XRP amounts in drops](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts) and [timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-time).
+When using rippled APIs:
+* [Specify XRP amounts in drops](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts).
+* [Specify timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-time).
+* Instead of `counterparty`, use `issuer`.
 
 ## Listening to streams
 
@@ -4068,7 +4075,6 @@ parentCloseTime | date-time string | The time at which the previous ledger was c
 totalDrops | [value](#value) | Total number of drops (1/1,000,000th of an XRP) in the network, as a quoted integer. (This decreases as transaction fees cause XRP to be destroyed.)
 transactionHash | string | Hash of the transaction information included in this ledger.
 rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.
-rawTransactions | string | *Optional* A JSON string containing rippled format transaction JSON for all transactions that were validated in this ledger.
 stateHashes | array\<string\> | *Optional* An array of hashes of all state data in this ledger.
 transactionHashes | array\<[transactionHash](#transaction-id)\> | *Optional* An array of hashes of all transactions that were validated in this ledger.
 transactions | array\<[getTransaction](#gettransaction)\> | *Optional* Array of all transactions that were validated in this ledger. Transactions are represented in the same format as the return value of [getTransaction](#gettransaction).
@@ -4433,6 +4439,12 @@ Name | Type | Description
 address | [address](#address) | The address of the account that is creating the transaction.
 escrowCreation | [escrowCreation](#escrow-creation) | The specification of the escrow creation to prepare.
 instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
+
+This is a convenience method for generating the EscrowCreate JSON used by rippled, so the same restrictions apply.
+
+Field mapping: `allowCancelAfter` is equivalent to rippled's `CancelAfter`; `allowExecuteAfter` is equivalent to `FinishAfter`. At the `allowCancelAfter` time, the escrow is considered expired. This means that the funds can only be returned to the sender. At the `allowExecuteAfter` time, the escrow is permitted to be released to the recipient (if the `condition` is fulfilled).
+
+Note that `allowCancelAfter` must be chronologically later than `allowExecuteAfter`.
 
 ### Return Value
 
@@ -5096,6 +5108,88 @@ return api.generateAddress();
 ```
 
 
+## isValidAddress
+
+`isValidAddress(address: string): boolean`
+
+Checks if the specified string contains a valid address.
+
+### Parameters
+
+This method takes one parameter, the address to validate.
+
+### Return Value
+
+This method returns `true` if the address is valid and `false` if it is not.
+
+### Example
+
+```javascript
+return api.isValidAddress("address")
+```
+
+## isValidSecret
+
+`isValidSecret(secret: string): boolean`
+
+Checks if the specified string contains a valid secret.
+
+### Parameters
+
+This method takes one parameter, the secret which to validate.
+
+### Return Value
+
+This method returns `true` if the secret is valid and `false` if it is not.
+
+### Example
+
+```javascript
+return api.isValidSecret("secret")
+```
+
+## deriveKeypair
+
+`deriveKeypair(seed: string): {privateKey: string, publicKey: string}`
+
+Derive a public and private key from a seed.
+
+### Parameters
+
+This method takes one parameter, the seed from which to derive the public and private key.
+
+### Return Value
+
+This method returns an object containing the public and private components of the keypair corresponding to the seed.
+
+### Example
+
+```javascript
+var keypair = api.deriveKeypair(seed)
+var public_key = keypair.publicKey;
+var private_key = keypair.privateKey;
+```
+
+## deriveAddress
+
+`deriveAddress(publicKey: string): string`
+
+Derive an XRP Ledger address from a public key.
+
+### Parameters
+
+This method takes one parameter, the public key from which to derive the address.
+
+### Return Value
+
+This method returns a string corresponding to the address derived from the public key.
+
+### Example
+
+```javascript
+var address = api.deriveAddress(public_key);
+```
+
 ## signPaymentChannelClaim
 
 `signPaymentChannelClaim(channel: string, amount: string, privateKey: string): string`
@@ -5201,7 +5295,6 @@ ledger | object | The ledger header to hash.
 *ledger.* totalDrops | [value](#value) | Total number of drops (1/1,000,000th of an XRP) in the network, as a quoted integer. (This decreases as transaction fees cause XRP to be destroyed.)
 *ledger.* transactionHash | string | Hash of the transaction information included in this ledger.
 *ledger.* rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.
-*ledger.* rawTransactions | string | *Optional* A JSON string containing rippled format transaction JSON for all transactions that were validated in this ledger.
 *ledger.* stateHashes | array\<string\> | *Optional* An array of hashes of all state data in this ledger.
 *ledger.* transactionHashes | array\<[transactionHash](#transaction-id)\> | *Optional* An array of hashes of all transactions that were validated in this ledger.
 *ledger.* transactions | array\<[getTransaction](#gettransaction)\> | *Optional* Array of all transactions that were validated in this ledger. Transactions are represented in the same format as the return value of [getTransaction](#gettransaction).
