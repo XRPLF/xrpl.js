@@ -1,7 +1,7 @@
 import {
   TakerRequestAmount,
   RippledAmount,
-  OfferCreateTransaction
+  OfferLedgerEntry
 } from '../objects'
 
 export interface BookOffersRequest {
@@ -22,7 +22,7 @@ export interface BookOffersResponse {
   marker?: any
 }
 
-export interface BookOffer extends OfferCreateTransaction {
+export interface BookOffer extends OfferLedgerEntry {
   quality?: string
   owner_funds?: string,
   taker_gets_funded?: RippledAmount,
