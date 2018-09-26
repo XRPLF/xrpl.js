@@ -1,4 +1,9 @@
-import {CheckLedgerEntry, RippleStateLedgerEntry, OfferLedgerEntry, SignerListLedgerEntry, EscrowLedgerEntry, PayChannelLedgerEntry, DepositPreauthLedgerEntry} from '../objects'
+import {
+  CheckLedgerEntry, RippleStateLedgerEntry,
+  OfferLedgerEntry, SignerListLedgerEntry,
+  EscrowLedgerEntry, PayChannelLedgerEntry,
+  DepositPreauthLedgerEntry
+} from '../objects'
 
 export interface GetAccountObjectsOptions {
   type?: string | (
@@ -44,7 +49,7 @@ export interface AccountObjectsResponse {
   account: string,
 
   // Array of objects owned by this account.
-  // per https://developers.ripple.com/rippleapi-reference.html#getaccountobjects
+  // from the getAccountObjects section of the dev center
   account_objects: Array<
     CheckLedgerEntry |
     RippleStateLedgerEntry |
