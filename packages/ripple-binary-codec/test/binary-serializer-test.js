@@ -15,6 +15,11 @@ const SignerListSet = {
   binary: require('./fixtures/signerlistset-tx-binary.json'),
   meta: require('./fixtures/signerlistset-tx-meta-binary.json')
 };
+const DepositPreauth = {
+  tx: require('./fixtures/deposit-preauth-tx.json'),
+  binary: require('./fixtures/deposit-preauth-tx-binary.json'),
+  meta: require('./fixtures/deposit-preauth-tx-meta-binary.json')
+};
 const Escrow = {
   create: {
     tx: require('./fixtures/escrow-create-tx.json'),
@@ -135,6 +140,15 @@ function SignerListSetTest() {
   });
 }
 
+function DepositPreauthTest() {
+  it('can serialize DepositPreauth', () => {
+    assert.strictEqual(encode(DepositPreauth.tx), DepositPreauth.binary);
+  });
+  it('can serialize DepositPreauth metadata', () => {
+    assert.strictEqual(encode(DepositPreauth.tx.meta), DepositPreauth.meta);
+  });
+}
+
 function EscrowTest() {
   it('can serialize EscrowCreate', () => {
     assert.strictEqual(encode(Escrow.create.tx),
@@ -173,6 +187,7 @@ describe('Binary Serialization', function() {
   describe('UIntTest', UIntTest);
   describe('BytesList', bytesListTest);
   describe('DeliverMin', deliverMinTest);
+  describe('DepositPreauth', DepositPreauthTest);
   describe('SignerListSet', SignerListSetTest);
   describe('Escrow', EscrowTest);
   describe('PaymentChannel', PaymentChannelTest);

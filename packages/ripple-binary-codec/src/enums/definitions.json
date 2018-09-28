@@ -36,6 +36,7 @@
     "FeeSettings": 115,
     "Escrow": 117,
     "PayChannel": 120,
+    "DepositPreauth": 112,
     "Check": 67,
     "Nickname": 110,
     "Contract": 99,
@@ -1063,6 +1064,26 @@
       }
     ],
     [
+      "Authorize",
+      {
+        "nth": 5,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "Unauthorize",
+      {
+        "nth": 6,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "AccountID"
+      }
+    ],
+    [
       "Target",
       {
         "nth": 7,
@@ -1610,7 +1631,8 @@
     "tecOVERSIZE": 145,
     "tecCRYPTOCONDITION_ERROR": 146,
     "tecINVARIANT_FAILED": 147,
-    "tecEXPIRED": 148
+    "tecEXPIRED": 148,
+    "tecDUPLICATE": 149
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
@@ -1633,6 +1655,7 @@
     "CheckCreate": 16,
     "CheckCash": 17,
     "CheckCancel": 18,
+    "DepositPreauth": 19,
     "TrustSet": 20,
     "EnableAmendment": 100,
     "SetFee": 101
