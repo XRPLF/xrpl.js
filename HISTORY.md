@@ -1,6 +1,6 @@
 # ripple-lib Release History
 
-## UNRELEASED
+## 1.0.1 (2018-09-27)
 
 + Add address/secret/key validation and derivation methods ([#932](https://github.com/ripple/ripple-lib/pull/932))
   + `isValidAddress(address: string) : boolean`: Checks if the specified string contains a valid address.
@@ -11,6 +11,18 @@
   1. Derive the public key from the secret.
   2. Derive the address from the public key.
   + Example: `const address = api.deriveAddress(api.deriveKeypair(secret).publicKey)`
++ Update server regex to accommodate UDS (#944)
++ Include memos when parsing trustlines (#949)
++ Add remaining LedgerEntry types (#943)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+9b6408641ce83659afcd5765c256c35829a4fcb4c3244dc9ca6bf27c871a45c4  ripple-1.0.1-debug.js
+7ab2b69fe59c2d4a74638116e2ba3b387155eb2d23e48a01bbf7beb72911f898  ripple-1.0.1-min.js
+8bb4dcad9ce25a27003b1d73d71ddf41b8a5af02ece4ebbfeaff4aeb91f3b8c4  ripple-1.0.1.js
+```
 
 ## 1.0.0 (2018-08-30)
 
