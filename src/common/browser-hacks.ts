@@ -6,7 +6,7 @@ function setPrototypeOf(object, prototype) {
     object.__proto__ = prototype
 }
 
-function getConstructorName(object: Object): string {
+function getConstructorName(object: object): string {
   // hack for internet explorer
   if (!object.constructor.name) {
     return object.constructor.toString().match(/^function\s+([^(]*)/)![1]

@@ -13,7 +13,7 @@ function parseFlag(flagsValue, trueValue, falseValue) {
   return undefined
 }
 
-function parseTrustline(tx: any): Object {
+function parseTrustline(tx: any): object {
   assert(tx.TransactionType === 'TrustSet')
 
   return removeUndefined({

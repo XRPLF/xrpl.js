@@ -16,7 +16,7 @@ function compareSigners(a, b) {
     .comparedTo(addressToBigNumber(b.Signer.Account))
 }
 
-function combine(signedTransactions: Array<string>): Object {
+function combine(signedTransactions: Array<string>): object {
   validate.combine({signedTransactions})
 
   // TODO: signedTransactions is an array of strings in the documentation, but

@@ -2,7 +2,7 @@ import * as assert from 'assert'
 import {parseMemos} from './utils'
 import {removeUndefined} from '../../common'
 
-function parseEscrowExecution(tx: any): Object {
+function parseEscrowExecution(tx: any): object {
   assert(tx.TransactionType === 'EscrowFinish')
 
   return removeUndefined({

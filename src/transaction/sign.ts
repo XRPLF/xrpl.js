@@ -8,7 +8,7 @@ import {xrpToDrops} from '../common'
 import {RippleAPI} from '../api'
 const validate = utils.common.validate
 
-function computeSignature(tx: Object, privateKey: string, signAs?: string) {
+function computeSignature(tx: object, privateKey: string, signAs?: string) {
   const signingData = signAs
     ? binary.encodeForMultisigning(tx, signAs)
     : binary.encodeForSigning(tx)

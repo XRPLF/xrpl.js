@@ -106,7 +106,7 @@ function isPendingLedgerVersion(connection: Connection,
 }
 
 function ensureLedgerVersion(options: any
-): Promise<Object> {
+): Promise<object> {
   if (Boolean(options) && options.ledgerVersion !== undefined &&
     options.ledgerVersion !== null
   ) {

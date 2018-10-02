@@ -14,7 +14,7 @@ function convertQuality(quality) {
 
 function createTrustlineTransaction(account: string,
   trustline: FormattedTrustlineSpecification
-): Object {
+): object {
   const limit = {
     currency: trustline.currency,
     issuer: trustline.counterparty,

@@ -1135,7 +1135,7 @@ return api.getLedgerVersion().then(ledgerVersion => {
 
 ## getTransaction
 
-`getTransaction(id: string, options: Object): Promise<Object>`
+`getTransaction(id: string, options: object): Promise<object>`
 
 Retrieves a transaction by its [Transaction ID](#transaction-id).
 
@@ -1287,7 +1287,7 @@ return api.getTransaction(id).then(transaction => {
 
 ## getTransactions
 
-`getTransactions(address: string, options: Object): Promise<Array<Object>>`
+`getTransactions(address: string, options: object): Promise<Array<object>>`
 
 Retrieves historical transactions of an account.
 
@@ -1519,7 +1519,7 @@ return api.getTransactions(address).then(transaction => {
 
 ## getTrustlines
 
-`getTrustlines(address: string, options: Object): Promise<Array<Object>>`
+`getTrustlines(address: string, options: object): Promise<Array<object>>`
 
 Returns trustlines for a specified account.
 
@@ -1664,7 +1664,7 @@ return api.getTrustlines(address).then(trustlines =>
 
 ## getBalances
 
-`getBalances(address: string, options: Object): Promise<Array<Object>>`
+`getBalances(address: string, options: object): Promise<Array<object>>`
 
 Returns balances for a specified account.
 
@@ -1831,7 +1831,7 @@ return api.getBalances(address).then(balances =>
 
 ## getBalanceSheet
 
-`getBalanceSheet(address: string, options: Object): Promise<Object>`
+`getBalanceSheet(address: string, options: object): Promise<object>`
 
 Returns aggregate balances by currency plus a breakdown of assets and obligations for a specified account.
 
@@ -1927,7 +1927,7 @@ return api.getBalanceSheet(address).then(balanceSheet =>
 
 ## getPaths
 
-`getPaths(pathfind: Object): Promise<Array<Object>>`
+`getPaths(pathfind: object): Promise<Array<object>>`
 
 Finds paths to send a payment. Paths are options for how to route a payment.
 
@@ -2049,7 +2049,7 @@ return api.getPaths(pathfind)
 
 ## getOrders
 
-`getOrders(address: string, options: Object): Promise<Array<Object>>`
+`getOrders(address: string, options: object): Promise<Array<object>>`
 
 Returns open orders for the specified account. Open orders are orders that have not yet been fully executed and are still in the order book.
 
@@ -2430,7 +2430,7 @@ return api.getOrders(address).then(orders =>
 
 ## getOrderbook
 
-`getOrderbook(address: string, orderbook: Object, options: Object): Promise<Object>`
+`getOrderbook(address: string, orderbook: object, options: object): Promise<object>`
 
 Returns open orders for the specified account. Open orders are orders that have not yet been fully executed and are still in the order book.
 
@@ -3534,7 +3534,7 @@ return api.getOrderbook(address, orderbook)
 
 ## getSettings
 
-`getSettings(address: string, options: Object): Promise<Object>`
+`getSettings(address: string, options: object): Promise<object>`
 
 Returns settings for the specified account. Note: For account data that is not modifiable by the user, see [getAccountInfo](#getaccountinfo).
 
@@ -3613,7 +3613,7 @@ return api.getSettings(address).then(settings =>
 
 ## getAccountInfo
 
-`getAccountInfo(address: string, options: Object): Promise<Object>`
+`getAccountInfo(address: string, options: object): Promise<object>`
 
 Returns information for the specified account. Note: For account data that is modifiable by the user, see [getSettings](#getsettings).
 
@@ -3986,7 +3986,7 @@ return api.getAccountObjects(address: address).then(objects =>
 
 ## getPaymentChannel
 
-`getPaymentChannel(id: string): Promise<Object>`
+`getPaymentChannel(id: string): Promise<object>`
 
 Returns specified payment channel.
 
@@ -4042,7 +4042,7 @@ return api.getPaymentChannel(channelId).then(channel =>
 
 ## getLedger
 
-`getLedger(options: Object): Promise<Object>`
+`getLedger(options: object): Promise<object>`
 
 Returns header information for the specified ledger (or the most recent validated ledger if no ledger is specified). Optionally, all the transactions that were validated in the ledger or the account state information can be returned with the ledger header.
 
@@ -4105,7 +4105,7 @@ return api.getLedger()
 
 ## preparePayment
 
-`preparePayment(address: string, payment: Object, instructions: Object): Promise<Object>`
+`preparePayment(address: string, payment: object, instructions: object): Promise<object>`
 
 Prepare a payment transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4175,7 +4175,7 @@ return api.preparePayment(address, payment).then(prepared =>
 
 ## prepareTrustline
 
-`prepareTrustline(address: string, trustline: Object, instructions: Object): Promise<Object>`
+`prepareTrustline(address: string, trustline: object, instructions: object): Promise<object>`
 
 Prepare a trustline transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4243,7 +4243,7 @@ return api.prepareTrustline(address, trustline).then(prepared =>
 
 ## prepareOrder
 
-`prepareOrder(address: string, order: Object, instructions: Object): Promise<Object>`
+`prepareOrder(address: string, order: object, instructions: object): Promise<object>`
 
 Prepare an order transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4311,7 +4311,7 @@ return api.prepareOrder(address, order)
 
 ## prepareOrderCancellation
 
-`prepareOrderCancellation(address: string, orderCancellation: Object, instructions: Object): Promise<Object>`
+`prepareOrderCancellation(address: string, orderCancellation: object, instructions: object): Promise<object>`
 
 Prepare an order cancellation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4364,7 +4364,7 @@ return api.prepareOrderCancellation(address, orderCancellation)
 
 ## prepareSettings
 
-`prepareSettings(address: string, settings: Object, instructions: Object): Promise<Object>`
+`prepareSettings(address: string, settings: object, instructions: object): Promise<object>`
 
 Prepare a settings transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4428,7 +4428,7 @@ return api.prepareSettings(address, settings)
 
 ## prepareEscrowCreation
 
-`prepareEscrowCreation(address: string, escrowCreation: Object, instructions: Object): Promise<Object>`
+`prepareEscrowCreation(address: string, escrowCreation: object, instructions: object): Promise<object>`
 
 Prepare an escrow creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4492,7 +4492,7 @@ return api.prepareEscrowCreation(address, escrowCreation).then(prepared =>
 
 ## prepareEscrowCancellation
 
-`prepareEscrowCancellation(address: string, escrowCancellation: Object, instructions: Object): Promise<Object>`
+`prepareEscrowCancellation(address: string, escrowCancellation: object, instructions: object): Promise<object>`
 
 Prepare an escrow cancellation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4548,7 +4548,7 @@ return api.prepareEscrowCancellation(address, escrowCancellation).then(prepared 
 
 ## prepareEscrowExecution
 
-`prepareEscrowExecution(address: string, escrowExecution: Object, instructions: Object): Promise<Object>`
+`prepareEscrowExecution(address: string, escrowExecution: object, instructions: object): Promise<object>`
 
 Prepare an escrow execution transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4606,7 +4606,7 @@ return api.prepareEscrowExecution(address, escrowExecution).then(prepared =>
 
 ## preparePaymentChannelCreate
 
-`preparePaymentChannelCreate(address: string, paymentChannelCreate: Object, instructions: Object): Promise<Object>`
+`preparePaymentChannelCreate(address: string, paymentChannelCreate: object, instructions: object): Promise<object>`
 
 Prepare a payment channel creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4664,7 +4664,7 @@ return api.preparePaymentChannelCreate(address, paymentChannelCreate).then(prepa
 
 ## preparePaymentChannelClaim
 
-`preparePaymentChannelClaim(address: string, paymentChannelClaim: Object, instructions: Object): Promise<Object>`
+`preparePaymentChannelClaim(address: string, paymentChannelClaim: object, instructions: object): Promise<object>`
 
 Prepare a payment channel claim transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4719,7 +4719,7 @@ return api.preparePaymentChannelClaim(address, paymentChannelClaim).then(prepare
 
 ## preparePaymentChannelFund
 
-`preparePaymentChannelFund(address: string, paymentChannelFund: Object, instructions: Object): Promise<Object>`
+`preparePaymentChannelFund(address: string, paymentChannelFund: object, instructions: object): Promise<object>`
 
 Prepare a payment channel fund transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4775,7 +4775,7 @@ return api.preparePaymentChannelFund(address, paymentChannelFund).then(prepared 
 
 ## prepareCheckCreate
 
-`prepareCheckCreate(address: string, checkCreate: Object, instructions: Object): Promise<Object>`
+`prepareCheckCreate(address: string, checkCreate: object, instructions: object): Promise<object>`
 
 Prepare a Check creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4834,7 +4834,7 @@ return api.prepareCheckCreate(address, checkCreate).then(prepared =>
 
 ## prepareCheckCancel
 
-`prepareCheckCancel(address: string, checkCancel: Object, instructions: Object): Promise<Object>`
+`prepareCheckCancel(address: string, checkCancel: object, instructions: object): Promise<object>`
 
 Prepare a Check cancellation transaction. This cancels an unredeemed Check, removing it from the ledger without sending any money. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4889,7 +4889,7 @@ return api.prepareCheckCancel(address, checkCancel).then(prepared =>
 
 ## prepareCheckCash
 
-`prepareCheckCash(address: string, checkCash: Object, instructions: Object): Promise<Object>`
+`prepareCheckCash(address: string, checkCash: object, instructions: object): Promise<object>`
 
 Prepare a Check cashing transaction. This redeems a Check to receive up to the amount authorized by the corresponding CheckCreate transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4949,8 +4949,8 @@ return api.prepareCheckCash(address, checkCash).then(prepared =>
 ## sign
 
 ```
-sign(txJSON: string, secret: string, options: Object): {signedTransaction: string, id: string}
-sign(txJSON: string, keypair: Object, options: Object): {signedTransaction: string, id: string}
+sign(txJSON: string, secret: string, options: object): {signedTransaction: string, id: string}
+sign(txJSON: string, keypair: object, options: object): {signedTransaction: string, id: string}
 ```
 
 Sign a prepared transaction. The signed transaction must subsequently be [submitted](#submit).
@@ -5034,7 +5034,7 @@ return api.combine(signedTransactions);
 
 ## submit
 
-`submit(signedTransaction: string): Promise<Object>`
+`submit(signedTransaction: string): Promise<object>`
 
 Submits a signed transaction. The transaction is not guaranteed to succeed; it must be verified with [getTransaction](#gettransaction).
 
@@ -5270,7 +5270,7 @@ true
 
 ## computeLedgerHash
 
-`computeLedgerHash(ledger: Object): string`
+`computeLedgerHash(ledger: object): string`
 
 Compute the hash of a ledger.
 

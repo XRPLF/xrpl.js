@@ -14,7 +14,7 @@ function removeAnyCounterpartyEncoding(address: string, amount: Amount) {
 }
 
 function createAdjustment(
-    address: string, adjustmentWithoutAddress: Object): any {
+    address: string, adjustmentWithoutAddress: object): any {
   const amountKey = _.keys(adjustmentWithoutAddress)[0]
   const amount = adjustmentWithoutAddress[amountKey]
   return _.set({address: address}, amountKey,

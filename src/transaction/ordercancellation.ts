@@ -5,7 +5,7 @@ import {Instructions, Prepare} from './types'
 
 function createOrderCancellationTransaction(account: string,
   orderCancellation: any
-): Object {
+): object {
   const txJSON: any = {
     TransactionType: 'OfferCancel',
     Account: account,
@@ -17,7 +17,7 @@ function createOrderCancellationTransaction(account: string,
   return txJSON
 }
 
-function prepareOrderCancellation(address: string, orderCancellation: Object,
+function prepareOrderCancellation(address: string, orderCancellation: object,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   validate.prepareOrderCancellation({address, orderCancellation, instructions})
