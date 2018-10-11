@@ -435,7 +435,7 @@ describe('RippleAPI', function () {
           "maxLedgerVersion": 8820051
         }
       }
-      
+
       return this.api.preparePayment(
         address, requests.preparePayment.normal, localInstructions).then(
           _.partial(checkResult, expectedResponse, 'prepare'));
