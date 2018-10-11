@@ -443,9 +443,8 @@ describe('RippleAPI', function () {
   });
 
   it('createPaymentTransaction - normal', function(){
-    return this.api.createPaymentTransaction(address, requests.preparePayment.normal).then((res)=>{
-      assert.deepStrictEqual(res.txJSON,  "{\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"0.01\"},\"Flags\":2147483648,\"SendMax\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"0.01\"},\"LastLedgerSequence\":8819954,\"Sequence\":23,\"Fee\":\"12\"}")
-    });
+    const res = this.api.createPaymentTransaction(address, requests.preparePayment.normal)
+    assert.deepEqual(res.txJSON,  "{\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"0.01\"},\"Flags\":2147483648,\"SendMax\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"0.01\"},\"LastLedgerSequence\":8819954,\"Sequence\":23,\"Fee\":\"12\"}")
   })
 
   it('prepareOrder - buy order', function () {
