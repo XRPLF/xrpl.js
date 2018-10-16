@@ -1,5 +1,21 @@
 # ripple-lib Release History
 
+## 1.0.2 (2018-10-16)
+
++ Fix #954: Exclude SendMax from all XRP to XRP payments (thanks @jefftrudeau)
++ TypeScript
+  + book_offers returns offers type OfferLedgerEntry (#951)
+  + Use `object` (#936)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 * 
+2556fe17296e127ed44e7066e90a6175e2b164f00ca3c1aa7b1c554f31c688dd  ripple-1.0.2-debug.js
+e0342ea21eac32a1024c62034fba09c6f26dd3e7371b23ea1e153e03135cd590  ripple-1.0.2-min.js
+c7286c517497d018d02d09257e81172b61d36c8b9885a077af68e8133c3b3b9b  ripple-1.0.2.js
+```
+
 ## 1.0.1 (2018-09-27)
 
 + Add address/secret/key validation and derivation methods ([#932](https://github.com/ripple/ripple-lib/pull/932))
