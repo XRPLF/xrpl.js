@@ -2,8 +2,6 @@
 
 A JavaScript API for interacting with the XRP Ledger
 
-[![Circle CI](https://circleci.com/gh/ripple/ripple-lib/tree/develop.svg?style=svg)](https://circleci.com/gh/ripple/ripple-lib/tree/develop) [![Coverage Status](https://coveralls.io/repos/ripple/ripple-lib/badge.png?branch=develop)](https://coveralls.io/r/ripple/ripple-lib?branch=develop)
-
 [![NPM](https://nodei.co/npm/ripple-lib.png)](https://www.npmjs.org/package/ripple-lib)
 
 ### Features
@@ -12,6 +10,7 @@ A JavaScript API for interacting with the XRP Ledger
 + Issue [rippled API](https://ripple.com/build/rippled-apis/) requests
 + Listen to events on the XRP Ledger (transaction, ledger, etc.)
 + Sign and submit transactions to the XRP Ledger
++ Type definitions for TypeScript
 
 ## Getting Started
 
