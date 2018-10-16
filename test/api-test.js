@@ -395,6 +395,126 @@ describe('RippleAPI', function () {
             responses.preparePayment.minAmountXRPXRP, 'prepare'));
     });
 
+    it('preparePayment - XRP to XRP', function () {
+      const payment = {
+        "source": {
+          "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+          "maxAmount": {
+            "value": "1",
+            "currency": "XRP"
+          }
+        },
+        "destination": {
+          "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "amount": {
+            "value": "1",
+            "currency": "XRP"
+          }
+        }
+      }
+      return this.api.preparePayment(address, payment, instructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    });
+
+    it('preparePayment - XRP drops to XRP drops', function () {
+      const payment = {
+        "source": {
+          "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+          "maxAmount": {
+            "value": "1000000",
+            "currency": "drops"
+          }
+        },
+        "destination": {
+          "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "amount": {
+            "value": "1000000",
+            "currency": "drops"
+          }
+        }
+      }
+      return this.api.preparePayment(address, payment, instructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    });
+
+    it('preparePayment - XRP drops to XRP', function () {
+      const payment = {
+        "source": {
+          "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+          "maxAmount": {
+            "value": "1000000",
+            "currency": "drops"
+          }
+        },
+        "destination": {
+          "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "amount": {
+            "value": "1",
+            "currency": "XRP"
+          }
+        }
+      }
+      return this.api.preparePayment(address, payment, instructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    });
+
+    it('preparePayment - XRP to XRP drops', function () {
+      const payment = {
+        "source": {
+          "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+          "maxAmount": {
+            "value": "1",
+            "currency": "XRP"
+          }
+        },
+        "destination": {
+          "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "amount": {
+            "value": "1000000",
+            "currency": "drops"
+          }
+        }
+      }
+      return this.api.preparePayment(address, payment, instructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    });
+
     it('preparePayment - XRP to XRP no partial', function () {
       assert.throws(() => {
         this.api.preparePayment(address, requests.preparePayment.wrongPartial);
