@@ -47,7 +47,8 @@ function isXRPToXRPPayment(payment: Payment): boolean {
       ? source.maxAmount.currency : source.amount.currency
   const destinationCurrency = isMinAdjustment(destination)
       ? destination.minAmount.currency : destination.amount.currency
-  return sourceCurrency === 'XRP' && destinationCurrency === 'XRP'
+  return (sourceCurrency === 'XRP' || sourceCurrency === 'drops') &&
+         (destinationCurrency === 'XRP' || destinationCurrency === 'drops')
 }
 
 function isIOUWithoutCounterparty(amount: Amount): boolean {
