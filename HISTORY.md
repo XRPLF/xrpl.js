@@ -273,6 +273,9 @@ below.
 ## 0.19.0 (2018-03-02)
 
 + [Add support for Checks](https://github.com/ripple/ripple-lib/pull/853)
+  + **CheckCreate** adds a check entry to the ledger. The check is a promise from the source of the check that the destination of the check may cash the check and receive up to the SendMax specified on the check. The check may have an (optional) expiration, after which the check may no longer be cashed.
+  + **CheckCancel** removes the check from the ledger without transferring funds. Either the check's source or destination can cancel the check at any time. After a check has expired, any account can cancel the check.
+  + **CheckCash** is a request by the destination of the check to transfer a requested amount of funds, up to the check's SendMax, from the source to the destination. The destination may receive less than the SendMax due to transfer fees.
 + [Add support for the Deposit Authorization account root flag](https://github.com/ripple/ripple-lib/pull/852)
 + [Generate .ts.d TypeScript declaration files](https://github.com/ripple/ripple-lib/pull/851)
 + [Improve documentation of getTransactions params](https://github.com/ripple/ripple-lib/pull/856)
