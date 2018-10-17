@@ -11,20 +11,21 @@ export type Signers = {
 }
 
 export type FormattedSettings = {
-  passwordSpent?: boolean,
-  requireDestinationTag?: boolean,
-  requireAuthorization?: boolean,
-  disallowIncomingXRP?: boolean,
-  disableMasterKey?: boolean,
-  enableTransactionIDTracking?: boolean,
-  noFreeze?: boolean,
-  globalFreeze?: boolean,
   defaultRipple?: boolean,
-  emailHash?: string|null,
-  messageKey?: string,
+  depositAuth?: boolean,
+  disableMasterKey?: boolean,
+  disallowIncomingXRP?: boolean,
   domain?: string,
-  transferRate?: number|null,
+  emailHash?: string|null,
+  enableTransactionIDTracking?: boolean,
+  globalFreeze?: boolean,
+  memos?: Memo[],
+  messageKey?: string,
+  noFreeze?: boolean,
+  passwordSpent?: boolean,
   regularKey?: string,
+  requireAuthorization?: boolean,
+  requireDestinationTag?: boolean,
   signers?: Signers,
-  memos?: Memo[]
+  transferRate?: number|null
 }
