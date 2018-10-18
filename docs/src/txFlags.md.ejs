@@ -1,0 +1,81 @@
+## txFlags
+
+`txFlags.TRANSACTION_TYPE.FLAG`
+
+This object provides constants for use when creating or interpreting transaction flags. Most transactions have a set of bit-flags that represent various options that affect how a transaction should behave. These options are represented as binary values that can be combined with bitwise-or operations to encode multiple flags at once.
+
+Most flags only have meaning for a specific transaction type. The same bitwise value may be reused for flags on different transaction types, so it is important to pay attention to the transaction type when setting and reading flags.
+
+Bits that are not defined as flags MUST be 0.
+
+### Global Flag
+
+Applies globally to all transactions.
+
+`txFlags.Universal.FullyCanonicalSig`: Require a fully-canonical signature. When preparing transactions, ripple-lib enables this flag for you.
+
+### Payment Flags
+
+`txFlags.Payment.NoRippleDirect`: Do not use the default path; only use specified paths. This is intended to force the transaction to take arbitrage opportunities. Most clients do not need this.
+
+`txFlags.Payment.PartialPayment`: If the specified destination amount cannot be sent without spending more than the source maxAmount, reduce the received amount instead of failing outright. See [Partial Payments](https://developers.ripple.com/partial-payments.html) for more details.
+
+`txFlags.Payment.LimitQuality`: Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of `destination.amount`:`source.maxAmount`. See [Limit Quality](https://developers.ripple.com/payment.html#limit-quality) for details.
+
+### OfferCreate Flags
+
+`txFlags.OfferCreate.Passive`: If enabled, the offer does not consume offers that exactly match it, and instead becomes an Offer object in the ledger. It still consumes offers that cross it.
+
+`txFlags.OfferCreate.ImmediateOrCancel`: Treat the offer as an Immediate or Cancel order. If enabled, the offer never becomes a ledger object: it only tries to match existing offers in the ledger.
+
+`txFlags.OfferCreate.FillOrKill`: Treat the offer as a Fill or Kill order.
+
+`txFlags.OfferCreate.Sell`: Treat the offer as a Sell order. With `order.direction = 'sell'`, exchange the entire `order.quantity`, even if it means obtaining more than the `order.totalPrice` amount in exchange. If using `prepareOrder`, ripple-lib sets this flag for you.
+
+### TrustSet Flags
+
+`txFlags.TrustSet.SetAuth`: Authorize the other party to hold issuances from this account. (No effect unless using the AccountSet.RequireAuth flag.) Cannot be unset.
+
+`txFlags.TrustSet.NoRipple`:  Obsolete.
+
+`txFlags.TrustSet.SetNoRipple`: Blocks [rippling](https://developers.ripple.com/rippling.html) between two trustlines of the same currency, if this flag is set on both.
+
+`txFlags.TrustSet.ClearNoRipple`: Clears the No-[Rippling](https://developers.ripple.com/rippling.html) flag.
+
+`txFlags.TrustSet.SetFreeze`: Freeze the trustline. A non-XRP currency can be frozen by the exchange or gateway that issued it. XRP cannot be frozen.
+
+`txFlags.TrustSet.ClearFreeze`: Unfreeze the trustline.
+
+### AccountSet Flags
+
+You can use the `prepareSettings` method to change your account flags. This method uses AccountSet flags internally.
+
+In the rippled API, Account Flags can be enabled and disabled with the SetFlag and ClearFlag parameters. See [AccountSet Flags](https://developers.ripple.com/accountset.html#accountset-flags).
+
+The AccountSet transaction type has some transaction flags, but their use is discouraged.
+
+* `txFlags.AccountSet.RequireDestTag`
+* `txFlags.AccountSet.OptionalDestTag`
+* `txFlags.AccountSet.RequireAuth`
+* `txFlags.AccountSet.OptionalAuth`
+* `txFlags.AccountSet.DisallowXRP`
+* `txFlags.AccountSet.AllowXRP`
+
+### PaymentChannelClaim Flags
+
+`txFlags.PaymentChannelClaim.Renew`: Clear the channel's Expiration time. (Expiration is different from the channel's immutable CancelAfter time.) Only the source address of the payment channel can use this flag.
+
+`txFlags.PaymentChannelClaim.Close`: Request to close the channel. Only the channel source and destination addresses can use this flag. This flag closes the channel immediately if it has no more XRP allocated to it after processing the current claim, or if the destination address uses it. If the source address uses this flag when the channel still holds XRP, this schedules the channel to close after SettleDelay seconds have passed. (Specifically, this sets the Expiration of the channel to the close time of the previous ledger plus the channel's SettleDelay time, unless the channel already has an earlier Expiration time.) If the destination address uses this flag when the channel still holds XRP, any XRP that remains after processing the claim is returned to the source address.
+
+### Other Transaction Types
+
+The remaining transaction types do not have any flags at this time.
+
+* OfferCancel
+* SetRegularKey
+* SignerListSet
+* EscrowCreate
+* EscrowFinish
+* EscrowCancel
+* PaymentChannelCreate
+* PaymentChannelFund

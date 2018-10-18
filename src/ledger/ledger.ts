@@ -25,5 +25,4 @@ async function getLedger(
   return parseLedger(response.ledger)
 }
 
-
 export default getLedger
