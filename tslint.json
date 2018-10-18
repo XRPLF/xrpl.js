@@ -57,7 +57,7 @@
     "triple-equals": true,
     "forin": false,
     "handle-callback-err": true,
-    "ter-max-len": [true, 80],
+    "ter-max-len": [true, 120],
     "new-parens": true,
     "object-curly-spacing": [true, "never"],
     "object-literal-shorthand": false,

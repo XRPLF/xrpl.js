@@ -7,6 +7,10 @@ sign(txJSON: string, keypair: object, options: object): {signedTransaction: stri
 
 Sign a prepared transaction. The signed transaction must subsequently be [submitted](#submit).
 
+This method can sign any of [the transaction types supported by ripple-binary-codec](https://github.com/ripple/ripple-binary-codec/blob/cfcde79c19c359e9a0466d7bc3dc9a3aef47bb99/src/enums/definitions.json#L1637). When a new transaction type is added, it will be unrecognized until ripple-binary-codec is updated. An error will be thrown:
+
+`Error: [TRANSACTION_TYPE] is not a valid name or ordinal for TransactionType`
+
 ### Parameters
 
 <%- renderSchema("input/sign.json") %>
