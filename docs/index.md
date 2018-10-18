@@ -83,6 +83,12 @@
   - [signPaymentChannelClaim](#signpaymentchannelclaim)
   - [verifyPaymentChannelClaim](#verifypaymentchannelclaim)
   - [computeLedgerHash](#computeledgerhash)
+  - [xrpToDrops](#xrptodrops)
+  - [dropsToXrp](#dropstoxrp)
+  - [iso8601ToRippleTime](#iso8601torippletime)
+  - [txFlags](#txflags)
+  - [schemaValidator](#schemavalidator)
+  - [schemaValidate](#schemavalidate)
 - [API Events](#api-events)
   - [ledger](#ledger)
   - [error](#error)
@@ -5322,6 +5328,200 @@ return api.computeLedgerHash(ledger);
 
 ```json
 "F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349"
+```
+
+## xrpToDrops
+
+`xrpToDrops(xrp: string | BigNumber): string`
+
+Converts an XRP amount to drops. 1 XRP = 1,000,000 drops, so 1 drop = 0.000001 XRP. This method is useful when converting amounts for use with the rippled API, which requires XRP amounts to be specified in drops.
+
+### Parameters
+
+`xrp`: A string or BigNumber representing an amount of XRP. If `xrp` is a string, it may start with `-`, must contain at least one number, and may contain up to one `.`. This method throws a `ValidationError` for invalid input.
+
+### Return Value
+
+A string representing an equivalent amount of drops.
+
+### Example
+
+```javascript
+return api.xrpToDrops('1');
+```
+
+```json
+'1000000'
+```
+
+## dropsToXrp
+
+`dropsToXrp(drops: string | BigNumber): string`
+
+Converts an amount of drops to XRP. 1 drop = 0.000001 XRP, so 1 XRP = 1,000,000 drops. This method is useful when converting amounts from the rippled API, which describes XRP amounts in drops.
+
+### Parameters
+
+`drops`: A string or BigNumber representing an amount of drops. If `drops` is a string, it may start with `-` and must contain at least one number. This method throws a `ValidationError` for invalid input.
+
+### Return Value
+
+A string representing an equivalent amount of XRP.
+
+### Example
+
+```javascript
+return api.dropsToXrp('1');
+```
+
+```json
+'0.000001'
+```
+
+## iso8601ToRippleTime
+
+`iso8601ToRippleTime(iso8601: string): number`
+
+This method parses a string representation of a date, and returns the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC).
+
+The Ripple Epoch is 946684800 seconds after the Unix Epoch.
+
+This method is useful for creating timestamps to use with the rippled APIs. The rippled APIs represent time as an unsigned integer of the number of seconds since the Ripple Epoch.
+
+### Parameters
+
+`iso8601`: A string representing a date and time. This string is parsed using JavaScript's `Date.parse()` method.
+
+### Return Value
+
+The number of seconds since the Ripple Epoch.
+
+### Example
+
+```javascript
+api.iso8601ToRippleTime('2017-02-17T15:04:57Z');
+```
+
+```json
+540659097
+```
+
+## txFlags
+
+`txFlags.TRANSACTION_TYPE.FLAG`
+
+This object provides constants for use when creating or interpreting transaction flags. Most transactions have a set of bit-flags that represent various options that affect how a transaction should behave. These options are represented as binary values that can be combined with bitwise-or operations to encode multiple flags at once.
+
+Most flags only have meaning for a specific transaction type. The same bitwise value may be reused for flags on different transaction types, so it is important to pay attention to the transaction type when setting and reading flags.
+
+Bits that are not defined as flags MUST be 0.
+
+### Global Flag
+
+Applies globally to all transactions.
+
+`txFlags.Universal.FullyCanonicalSig`: Require a fully-canonical signature. When preparing transactions, ripple-lib enables this flag for you.
+
+### Payment Flags
+
+`txFlags.Payment.NoRippleDirect`: Do not use the default path; only use specified paths. This is intended to force the transaction to take arbitrage opportunities. Most clients do not need this.
+
+`txFlags.Payment.PartialPayment`: If the specified destination amount cannot be sent without spending more than the source maxAmount, reduce the received amount instead of failing outright. See [Partial Payments](https://developers.ripple.com/partial-payments.html) for more details.
+
+`txFlags.Payment.LimitQuality`: Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of `destination.amount`:`source.maxAmount`. See [Limit Quality](https://developers.ripple.com/payment.html#limit-quality) for details.
+
+### OfferCreate Flags
+
+`txFlags.OfferCreate.Passive`: If enabled, the offer does not consume offers that exactly match it, and instead becomes an Offer object in the ledger. It still consumes offers that cross it.
+
+`txFlags.OfferCreate.ImmediateOrCancel`: Treat the offer as an Immediate or Cancel order. If enabled, the offer never becomes a ledger object: it only tries to match existing offers in the ledger.
+
+`txFlags.OfferCreate.FillOrKill`: Treat the offer as a Fill or Kill order.
+
+`txFlags.OfferCreate.Sell`: Treat the offer as a Sell order. With `order.direction = 'sell'`, exchange the entire `order.quantity`, even if it means obtaining more than the `order.totalPrice` amount in exchange. If using `prepareOrder`, ripple-lib sets this flag for you.
+
+### TrustSet Flags
+
+`txFlags.TrustSet.SetAuth`: Authorize the other party to hold issuances from this account. (No effect unless using the AccountSet.RequireAuth flag.) Cannot be unset.
+
+`txFlags.TrustSet.NoRipple`:  Obsolete.
+
+`txFlags.TrustSet.SetNoRipple`: Blocks [rippling](https://developers.ripple.com/rippling.html) between two trustlines of the same currency, if this flag is set on both.
+
+`txFlags.TrustSet.ClearNoRipple`: Clears the No-[Rippling](https://developers.ripple.com/rippling.html) flag.
+
+`txFlags.TrustSet.SetFreeze`: Freeze the trustline. A non-XRP currency can be frozen by the exchange or gateway that issued it. XRP cannot be frozen.
+
+`txFlags.TrustSet.ClearFreeze`: Unfreeze the trustline.
+
+### AccountSet Flags
+
+You can use the `prepareSettings` method to change your account flags. This method uses AccountSet flags internally.
+
+In the rippled API, Account Flags can be enabled and disabled with the SetFlag and ClearFlag parameters. See [AccountSet Flags](https://developers.ripple.com/accountset.html#accountset-flags).
+
+The AccountSet transaction type has some transaction flags, but their use is discouraged.
+
+* `txFlags.AccountSet.RequireDestTag`
+* `txFlags.AccountSet.OptionalDestTag`
+* `txFlags.AccountSet.RequireAuth`
+* `txFlags.AccountSet.OptionalAuth`
+* `txFlags.AccountSet.DisallowXRP`
+* `txFlags.AccountSet.AllowXRP`
+
+### PaymentChannelClaim Flags
+
+`txFlags.PaymentChannelClaim.Renew`: Clear the channel's Expiration time. (Expiration is different from the channel's immutable CancelAfter time.) Only the source address of the payment channel can use this flag.
+
+`txFlags.PaymentChannelClaim.Close`: Request to close the channel. Only the channel source and destination addresses can use this flag. This flag closes the channel immediately if it has no more XRP allocated to it after processing the current claim, or if the destination address uses it. If the source address uses this flag when the channel still holds XRP, this schedules the channel to close after SettleDelay seconds have passed. (Specifically, this sets the Expiration of the channel to the close time of the previous ledger plus the channel's SettleDelay time, unless the channel already has an earlier Expiration time.) If the destination address uses this flag when the channel still holds XRP, any XRP that remains after processing the claim is returned to the source address.
+
+### Other Transaction Types
+
+The remaining transaction types do not have any flags at this time.
+
+* OfferCancel
+* SetRegularKey
+* SignerListSet
+* EscrowCreate
+* EscrowFinish
+* EscrowCancel
+* PaymentChannelCreate
+* PaymentChannelFund
+
+## schemaValidator
+
+Unlike the rest of the ripple-lib API, schemaValidator is a static object on RippleAPI. It provides utility methods that do not use a server.
+
+## schemaValidate
+
+`RippleAPI.schemaValidator.schemaValidate(schemaName: string, object: any): void`
+
+This method checks an object for conformance to a specified schema. It does not return anything, but will throw a `ValidationError` if the object does not conform to the schema.
+
+### Example
+
+```javascript
+RippleAPI.schemaValidator.schemaValidate('sign', {
+    signedTransaction: '12000322800000002400000017201B0086955368400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100BDE09A1F6670403F341C21A77CF35BA47E45CDE974096E1AA5FC39811D8269E702203D60291B9A27F1DCABA9CF5DED307B4F23223E0B6F156991DB601DFB9C41CE1C770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304',
+    id: '02ACE87F1996E3A23690A5BB7F1774BF71CCBA68F79805831B42ABAD5913D6F4'
+})
+```
+
+```json
+undefined
+```
+
+If the object is valid (conforms to the schema), nothing is returned. Otherwise, `schemaValidate` throws an error:
+
+```javascript
+RippleAPI.schemaValidator.schemaValidate('sign', {
+    signedTransaction: '12000322800000002400000017201B0086955368400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100BDE09A1F6670403F341C21A77CF35BA47E45CDE974096E1AA5FC39811D8269E702203D60291B9A27F1DCABA9CF5DED307B4F23223E0B6F156991DB601DFB9C41CE1C770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304',
+    id: '123'
+})
+```
+
+```
+[ValidationError(instance.id does not match pattern "^[A-F0-9]{64}$")]
 ```
 
 # API Events
