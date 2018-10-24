@@ -1,0 +1,44 @@
+## parseAccountFlags
+
+`parseAccountFlags(Flags: number): object`
+
+Parse an `AccountRoot` object's [`Flags`](https://developers.ripple.com/accountroot.html#accountroot-flags).
+
+### Parameters
+
+This method takes one parameter, the `Flags` number to parse.
+
+### Return Value
+
+This method returns an object with containing a key for each parsed flag. Each flag has a boolean value of `true` or `false`.
+
+### Example
+
+```javascript
+const account_info = await api.request('account_info', {account: 'rKsdkGhyZH6b2Zzd5hNnEqSv2wpznn4n6N'})
+const flags = api.parseAccountFlags(account_info.account_data.Flags)
+console.log(JSON.stringify([account_info, flags], null, 2))
+```
+
+```json
+[
+  {
+    "account_data": {
+      "Account": "rKsdkGhyZH6b2Zzd5hNnEqSv2wpznn4n6N",
+      "Balance": "9997999496",
+      "Flags": 16777216,
+      "LedgerEntryType": "AccountRoot",
+      "OwnerCount": 2,
+      "PreviousTxnID": "22C2B172891F92470E37D8E3AA9A9C950751C13EB059B21DADF3A5A0B120C147",
+      "PreviousTxnLgrSeq": 13558089,
+      "Sequence": 9,
+      "index": "8D40979208F658354384E9D069C0EC56814997807378651E39575CFE8A483EB9"
+    },
+    "ledger_current_index": 13752642,
+    "validated": false
+  },
+  {
+    "depositAuth": true
+  }
+]
+```
