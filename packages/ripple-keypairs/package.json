@@ -36,20 +36,15 @@
     "nock": "^2.13.0"
   },
   "scripts": {
-    "build": "gulp",
     "compile": "babel --optional runtime -d distrib/npm/ src/",
     "compile-with-source-maps": "babel --optional runtime -s -t -d distrib/npm/ src/",
     "prepublish": "npm test && npm run lint && npm run compile",
     "test": "istanbul test _mocha",
-    "codecov": "cat ./coverage/coverage.json | ./node_modules/codecov.io/bin/codecov.io.js",
     "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; echo 'parser: babel-eslint' >> eslintrc; fi; eslint -c eslintrc src/*.js test/*.js"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/ripple/ripple-keypairs.git"
-  },
-  "engines": {
-    "node": ">=0.12.0"
   },
   "bugs": {
     "url": "https://github.com/ripple/ripple-keypairs/issues"
