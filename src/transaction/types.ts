@@ -66,11 +66,11 @@ export type Outcome = {
   indexInLedger: number,
   fee: string,
   balanceChanges: {
-    [key: string]: [{
+    [key: string]: {
      currency: string,
      counterparty?: string,
      value: string
-    }]
+    }[]
   },
   orderbookChanges: object,
   timestamp?: string
