@@ -1,16 +1,51 @@
 
 import {txFlagIndices} from './txflags'
 
+// Ordering from https://developers.ripple.com/accountroot.html
 const accountRootFlags = {
-  PasswordSpent: 0x00010000, // password set fee is spent
-  RequireDestTag: 0x00020000, // require a DestinationTag for payments
-  RequireAuth: 0x00040000, // require authorization to hold IOUs
-  DepositAuth: 0x01000000, // require account to auth deposits
-  DisallowXRP: 0x00080000, // disallow sending XRP
-  DisableMaster: 0x00100000, // force regular key
-  NoFreeze: 0x00200000, // permanently disallowed freezing trustlines
-  GlobalFreeze: 0x00400000, // trustlines globally frozen
-  DefaultRipple: 0x00800000
+
+  // lsfDefaultRipple:
+  // Enable rippling on trust lines by default.
+  // Required for issuing addresses; discouraged for others.
+  DefaultRipple: 0x00800000,
+
+  // lsfDepositAuth:
+  // Require account to auth deposits.
+  // This account can only receive funds from transactions it sends,
+  // or preauthorized accounts.
+  DepositAuth: 0x01000000,
+
+  // lsfDisableMaster:
+  // Force regular key.
+  // Disallows use of the master key.
+  DisableMaster: 0x00100000,
+
+  // lsfDisallowXRP:
+  // Disallow sending XRP.
+  // Not enforced by rippled; client applications should check.
+  DisallowXRP: 0x00080000,
+
+  // lsfGlobalFreeze:
+  // Trustlines globally frozen.
+  GlobalFreeze: 0x00400000,
+
+  // lsfNoFreeze:
+  // Permanently disallowed freezing trustlines.
+  // Once enabled, cannot be disabled.
+  NoFreeze: 0x00200000,
+
+  // lsfPasswordSpent:
+  // Password set fee is spent.
+  // The account has used its free SetRegularKey transaction.
+  PasswordSpent: 0x00010000,
+
+  // lsfRequireAuth:
+  // Require authorization to hold IOUs (issuances).
+  RequireAuth: 0x00040000,
+
+  // lsfRequireDestTag:
+  // Require a DestinationTag for incoming payments.
+  RequireDestTag: 0x00020000
 }
 
 const AccountFlags = {
