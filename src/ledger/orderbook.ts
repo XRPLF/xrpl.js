@@ -53,7 +53,7 @@ function formatBidsAndAsks(
   // we sort the orders so that earlier orders are closer to mid-market
 
   const orders = offers.sort((a, b) => {
-    return (new BigNumber(a.quality)).minus(b.quality).toNumber()
+    return (new BigNumber(a.quality)).comparedTo(b.quality)
   }).map(parseOrderbookOrder)
 
   const alignedOrders = orders.map(_.partial(alignOrder, orderbook.base))
