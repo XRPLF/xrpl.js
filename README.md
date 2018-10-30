@@ -18,10 +18,8 @@ See also: [RippleAPI Beginners Guide](https://ripple.com/build/rippleapi-beginne
 
 ### Requirements
 
-+ Node v8 is recommended, but versions 4-10 may work
-+ Yarn ([Yarn Installation Instructions](https://yarnpkg.com/en/docs/install))
-
-While `npm` may work, we recommend using `yarn` for the added assurance provided by `yarn.lock`.
++ **[Node v10](https://nodejs.org/)** is recommended. Other versions may work but are not frequently tested.
++ **[Yarn](https://yarnpkg.com/)** is recommended. `npm` may work but we use `yarn.lock`.
 
 ### Install
 
