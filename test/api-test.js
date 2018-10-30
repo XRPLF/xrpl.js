@@ -2248,6 +2248,55 @@ describe('RippleAPI', function () {
         _.partial(checkResult, responses.getOrderbook.withXRP, 'getOrderbook'));
     });
 
+    function checkSortingOfOrders(orders) {
+      let previousRate = '0';
+      for (var i = 0; i < orders.length; i++) {
+        const order = orders[i];
+        let rate;
+        if (order.specification.direction === 'buy') {
+          rate = (new BigNumber(order.specification.quantity.value))
+          .dividedBy(order.specification.totalPrice.value)
+          .toString();
+        } else {
+          rate = (new BigNumber(order.specification.totalPrice.value))
+          .dividedBy(order.specification.quantity.value)
+          .toString();
+        }
+        assert((new BigNumber(rate)).greaterThanOrEqualTo(previousRate),
+          'Rates must be sorted from least to greatest: ' +
+          rate + ' should be >= ' + previousRate);
+        previousRate = rate;
+      }
+      return true;
+    }
+
+    it('sample XRP/JPY book has orders sorted correctly', function () {
+      const orderbook = {
+        "base": { // the first currency in pair
+          "currency": 'XRP'
+        },
+        "counter": {
+          "currency": 'JPY',
+          "counterparty": "rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS"
+        }
+      };
+
+      return this.api.getOrderbook('rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR', orderbook).then(orders => {
+        assert.deepStrictEqual([], orders.bids);
+        return checkSortingOfOrders(orders.asks);
+      });
+    });
+
+    it('sample USD/XRP book has orders sorted correctly', function () {
+      const orderbook = { counter: { currency: 'XRP' },
+        base: { currency: 'USD',
+         counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' } };
+
+      return this.api.getOrderbook('rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR', orderbook).then(orders => {
+        return checkSortingOfOrders(orders.bids) && checkSortingOfOrders(orders.asks);
+      });
+    });
+
     it('sorted so that best deals come first', function () {
       return this.api.getOrderbook(address, requests.getOrderbook.normal)
         .then(data => {

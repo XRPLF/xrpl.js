@@ -8,6 +8,7 @@ import {validate} from '../common'
 import {Amount, Issue} from '../common/types/objects'
 import {BookOffer} from '../common/types/commands'
 import {RippleAPI} from '../api'
+import BigNumber from 'bignumber.js'
 
 export type FormattedOrderbook = {
   bids: FormattedOrderbookOrder[],
@@ -50,7 +51,11 @@ function formatBidsAndAsks(
   // for asks: lowest quality => lowest totalPrice/quantity => lowest price
   // for both bids and asks, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
-  const orders = _.sortBy(offers, 'quality').map(parseOrderbookOrder)
+
+  const orders = offers.sort((a, b) => {
+    return (new BigNumber(a.quality)).minus(b.quality).toNumber()
+  }).map(parseOrderbookOrder)
+
   const alignedOrders = orders.map(_.partial(alignOrder, orderbook.base))
   const bids = alignedOrders.filter(_.partial(directionFilter, 'buy'))
   const asks = alignedOrders.filter(_.partial(directionFilter, 'sell'))
