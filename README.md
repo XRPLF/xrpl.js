@@ -16,11 +16,16 @@ A JavaScript API for interacting with the XRP Ledger
 
 See also: [RippleAPI Beginners Guide](https://ripple.com/build/rippleapi-beginners-guide/)
 
-You can use `npm`, but we recommend using `yarn` for the added assurance provided by `yarn.lock`.
+### Requirements
 
-+ [Yarn Installation Instructions](https://yarnpkg.com/en/docs/install)
++ Node v8 is recommended, but versions 4-10 may work
++ Yarn ([Yarn Installation Instructions](https://yarnpkg.com/en/docs/install))
 
-Install `ripple-lib`:
+While `npm` may work, we recommend using `yarn` for the added assurance provided by `yarn.lock`.
+
+### Install
+
+In an existing project (with `package.json`), install `ripple-lib`:
 ```
 $ yarn add ripple-lib
 ```
