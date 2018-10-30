@@ -2253,6 +2253,14 @@ describe('RippleAPI', function () {
       for (var i = 0; i < orders.length; i++) {
         const order = orders[i];
         let rate;
+
+        // We calculate the quality of output/input here as a test.
+        // This won't hold in general because when output and input amounts get tiny,
+        // the quality can differ significantly. However, the offer stays in the
+        // order book where it was originally placed. It would be more consistent
+        // to check the quality from the offer book, but for the test data set,
+        // this calculation holds.
+
         if (order.specification.direction === 'buy') {
           rate = (new BigNumber(order.specification.quantity.value))
           .dividedBy(order.specification.totalPrice.value)
