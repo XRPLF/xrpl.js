@@ -15,6 +15,8 @@ export function parseAccountFlags(value) {
   for (const flagName in AccountFlags) {
     if (value & AccountFlags[flagName]) {
       settings[flagName] = true
+    } else {
+      settings[flagName] = false
     }
   }
   return settings

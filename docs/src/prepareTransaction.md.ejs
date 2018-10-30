@@ -12,8 +12,8 @@ Notably, this is the preferred method for preparing a `DepositPreauth` transacti
 
 Name | Type | Description
 ---- | ---- | -----------
-transaction | [transaction](https://developers.ripple.com/transaction-formats.html) | The specification (JSON) of the transaction to prepare. Set `Account` to the address of the account that is creating the transaction. Common fields like `Fee`, `Flags`, and `Sequence` may be omitted; `prepareTransaction` will set them automatically.
-instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
+transaction | [transaction](https://developers.ripple.com/transaction-formats.html) | The specification (JSON) of the transaction to prepare. Set `Account` to the address of the account that is creating the transaction. Auto-fillable fields like `Fee`, `Flags`, and `Sequence` may be omitted; `prepareTransaction` will set them automatically.
+instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction.
 
 ### Return Value
 

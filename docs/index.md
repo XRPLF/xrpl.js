@@ -4113,41 +4113,32 @@ Parse an `AccountRoot` object's [`Flags`](https://developers.ripple.com/accountr
 
 ### Parameters
 
-This method takes one parameter, the `Flags` number to parse.
+This method takes one parameter, the AccountRoot `Flags` number to parse. Note that flags have different mappings on other types of objects or in transactions such as AccountSet.
 
 ### Return Value
 
-This method returns an object with containing a key for each parsed flag. Each flag has a boolean value of `true` or `false`.
+This method returns an object with containing a key for each AccountRoot flag known to this version of RippleAPI. Each flag has a boolean value of `true` or `false`.
 
 ### Example
 
 ```javascript
 const account_info = await api.request('account_info', {account: 'rKsdkGhyZH6b2Zzd5hNnEqSv2wpznn4n6N'})
 const flags = api.parseAccountFlags(account_info.account_data.Flags)
-console.log(JSON.stringify([account_info, flags], null, 2))
+console.log(JSON.stringify(flags, null, 2))
 ```
 
 ```json
-[
-  {
-    "account_data": {
-      "Account": "rKsdkGhyZH6b2Zzd5hNnEqSv2wpznn4n6N",
-      "Balance": "9997999496",
-      "Flags": 16777216,
-      "LedgerEntryType": "AccountRoot",
-      "OwnerCount": 2,
-      "PreviousTxnID": "22C2B172891F92470E37D8E3AA9A9C950751C13EB059B21DADF3A5A0B120C147",
-      "PreviousTxnLgrSeq": 13558089,
-      "Sequence": 9,
-      "index": "8D40979208F658354384E9D069C0EC56814997807378651E39575CFE8A483EB9"
-    },
-    "ledger_current_index": 13752642,
-    "validated": false
-  },
-  {
-    "depositAuth": true
-  }
-]
+{
+  "passwordSpent": false,
+  "requireDestinationTag": false,
+  "requireAuthorization": false,
+  "depositAuth": true,
+  "disallowIncomingXRP": false,
+  "disableMasterKey": false,
+  "noFreeze": false,
+  "globalFreeze": false,
+  "defaultRipple": false
+}
 ```
 
 ## prepareTransaction
@@ -4164,8 +4155,8 @@ Notably, this is the preferred method for preparing a `DepositPreauth` transacti
 
 Name | Type | Description
 ---- | ---- | -----------
-transaction | [transaction](https://developers.ripple.com/transaction-formats.html) | The specification (JSON) of the transaction to prepare. Set `Account` to the address of the account that is creating the transaction. Common fields like `Fee`, `Flags`, and `Sequence` may be omitted; `prepareTransaction` will set them automatically.
-instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
+transaction | [transaction](https://developers.ripple.com/transaction-formats.html) | The specification (JSON) of the transaction to prepare. Set `Account` to the address of the account that is creating the transaction. Auto-fillable fields like `Fee`, `Flags`, and `Sequence` may be omitted; `prepareTransaction` will set them automatically.
+instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction.
 
 ### Return Value
 
@@ -5060,7 +5051,7 @@ sign(txJSON: string, keypair: object, options: object): {signedTransaction: stri
 
 Sign a prepared transaction. The signed transaction must subsequently be [submitted](#submit).
 
-This method can sign any of [the transaction types supported by ripple-binary-codec](https://github.com/ripple/ripple-binary-codec/blob/cfcde79c19c359e9a0466d7bc3dc9a3aef47bb99/src/enums/definitions.json#L1637). When a new transaction type is added, it will be unrecognized until ripple-binary-codec is updated. An error will be thrown:
+This method can sign any of [the transaction types supported by ripple-binary-codec](https://github.com/ripple/ripple-binary-codec/blob/cfcde79c19c359e9a0466d7bc3dc9a3aef47bb99/src/enums/definitions.json#L1637). When a new transaction type is added to the XRP Ledger, it will be unrecognized until `ripple-binary-codec` is updated. If you try to sign an unrecognized transaction type, this method throws an error similar to the following:
 
 `Error: [TRANSACTION_TYPE] is not a valid name or ordinal for TransactionType`
 
