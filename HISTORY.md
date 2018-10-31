@@ -1,8 +1,21 @@
 # ripple-lib Release History
 
-## UNRELEASED
+## 1.1.0 (2018-10-31)
 
++ Add support for Node.js v10 LTS (#964)
 + Add [DepositPreauth](https://developers.ripple.com/depositauth.html) ([#958](https://github.com/ripple/ripple-lib/pull/958))
++ In `FormattedTransactionType`, the `Outcome`'s `balanceChanges` property had
+  the wrong type. This is now fixed (#955)
++ Add/fix docs for: xrpToDrops, dropsToXrp, iso8601ToRippleTime, schemaValidator, isValidAddress, isValidSecret, deriveKeypair, deriveAddress
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+e1d742092b3c0fcee97a875e18db4baeab3bbc82f08b96e883ee188c5f0cfb37  ripple-1.1.0-debug.js
+f28921f57a133678dcb3cb54c497626bd76b1f953d22d61f3ddca31c8947d552  ripple-1.1.0-min.js
+3696871a80c1102635699994adcaf00cdfdfcff5014fc2eba3d8f8d8437c8f91  ripple-1.1.0.js
+```
 
 ## 1.0.2 (2018-10-16)
 
