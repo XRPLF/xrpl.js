@@ -10,13 +10,17 @@ export type SettingsOptions = {
   ledgerVersion?: number
 }
 
-export function parseAccountFlags(value) {
+export function parseAccountFlags(
+    value: number,
+    options: {excludeFalse?: boolean} = {}) {
   const settings = {}
   for (const flagName in AccountFlags) {
     if (value & AccountFlags[flagName]) {
       settings[flagName] = true
     } else {
-      settings[flagName] = false
+      if (!options.excludeFalse) {
+        settings[flagName] = false
+      }
     }
   }
   return settings
@@ -24,7 +28,7 @@ export function parseAccountFlags(value) {
 
 function formatSettings(response: AccountInfoResponse) {
   const data = response.account_data
-  const parsedFlags = parseAccountFlags(data.Flags)
+  const parsedFlags = parseAccountFlags(data.Flags, {excludeFalse: true})
   const parsedFields = parseFields(data)
   return _.assign({}, parsedFlags, parsedFields)
 }
