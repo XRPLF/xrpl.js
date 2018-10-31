@@ -51,7 +51,6 @@ function formatBidsAndAsks(
   // for asks: lowest quality => lowest totalPrice/quantity => lowest price
   // for both bids and asks, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
-
   const orders = offers.sort((a, b) => {
     return (new BigNumber(a.quality)).comparedTo(b.quality)
   }).map(parseOrderbookOrder)
