@@ -883,6 +883,54 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
+  it('prepareTransaction - DepositPreauth - Authorize', function () {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      TransactionType: 'DepositPreauth',
+      Account: address,
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+    }
+
+    return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+      const expected = {
+        txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        instructions: {
+          fee: '0.000012',
+          sequence: 23,
+          maxLedgerVersion: 8820051
+        }
+      }
+      return checkResult(expected, 'prepare', response)
+    })
+  })
+
+  it('prepareTransaction - DepositPreauth - Unauthorize', function () {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      TransactionType: 'DepositPreauth',
+      Account: address,
+      Unauthorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+    }
+
+    return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+      const expected = {
+        txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Unauthorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        instructions: {
+          fee: '0.000012',
+          sequence: 23,
+          maxLedgerVersion: 8820051
+        }
+      }
+      return checkResult(expected, 'prepare', response)
+    })
+  })
+
   describe('prepareTransaction - Payment', function () {
 
     it('normal', function () {

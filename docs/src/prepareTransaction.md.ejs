@@ -1,0 +1,50 @@
+## prepareTransaction
+
+`prepareTransaction(address: string, transaction: object, instructions: object): Promise<object>`
+
+Prepare a transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+This method works with any of [the transaction types supported by rippled](https://developers.ripple.com/transaction-types.html).
+
+Notably, this is the preferred method for preparing a `DepositPreauth` transaction (added in rippled 1.1.0).
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+transaction | [transaction](https://developers.ripple.com/transaction-formats.html) | The specification (JSON) of the transaction to prepare. Set `Account` to the address of the account that is creating the transaction. You may omit auto-fillable fields like `Fee`, `Flags`, and `Sequence` to have them set automatically.
+instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction.
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare*" methods have the same return type.
+</aside>
+
+<%- renderSchema("output/prepare.json") %>
+
+### Example
+
+```javascript
+async function preparedPreauth() {
+  const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+  return api.prepareTransaction({
+    TransactionType: 'DepositPreauth',
+    Account: address,
+    Authorize: 'rMyVso4p83khNyHdV1m1PggV9QNadCj8wM'
+  });
+}
+```
+
+```javascript
+{
+  txJSON: '{"TransactionType":"DepositPreauth","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Authorize":"rMyVso4p83khNyHdV1m1PggV9QNadCj8wM","Flags":2147483648,"LastLedgerSequence":13561714,"Fee":"12","Sequence":1}',
+  instructions: {
+    fee: '0.000012',
+    sequence: 1,
+    maxLedgerVersion: 13561714
+  }
+}
+```

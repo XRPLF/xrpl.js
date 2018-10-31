@@ -1,5 +1,9 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
++ Add [DepositPreauth](https://developers.ripple.com/depositauth.html) ([#958](https://github.com/ripple/ripple-lib/pull/958))
+
 ## 1.0.2 (2018-10-16)
 
 + Fix #954: Exclude SendMax from all XRP to XRP payments (thanks @jefftrudeau)

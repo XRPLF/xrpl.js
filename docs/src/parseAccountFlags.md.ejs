@@ -1,0 +1,35 @@
+## parseAccountFlags
+
+`parseAccountFlags(Flags: number): object`
+
+Parse an `AccountRoot` object's [`Flags`](https://developers.ripple.com/accountroot.html#accountroot-flags).
+
+### Parameters
+
+This method takes one parameter, the AccountRoot `Flags` number to parse. Note that flags have different mappings on other types of objects or in transactions such as AccountSet.
+
+### Return Value
+
+This method returns an object with containing a key for each AccountRoot flag known to this version of RippleAPI. Each flag has a boolean value of `true` or `false`.
+
+### Example
+
+```javascript
+const account_info = await api.request('account_info', {account: 'rKsdkGhyZH6b2Zzd5hNnEqSv2wpznn4n6N'})
+const flags = api.parseAccountFlags(account_info.account_data.Flags)
+console.log(JSON.stringify(flags, null, 2))
+```
+
+```json
+{
+  "passwordSpent": false,
+  "requireDestinationTag": false,
+  "requireAuthorization": false,
+  "depositAuth": true,
+  "disallowIncomingXRP": false,
+  "disableMasterKey": false,
+  "noFreeze": false,
+  "globalFreeze": false,
+  "defaultRipple": false
+}
+```

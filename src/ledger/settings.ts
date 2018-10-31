@@ -10,11 +10,17 @@ export type SettingsOptions = {
   ledgerVersion?: number
 }
 
-function parseFlags(value) {
+export function parseAccountFlags(
+    value: number,
+    options: {excludeFalse?: boolean} = {}) {
   const settings = {}
   for (const flagName in AccountFlags) {
     if (value & AccountFlags[flagName]) {
       settings[flagName] = true
+    } else {
+      if (!options.excludeFalse) {
+        settings[flagName] = false
+      }
     }
   }
   return settings
@@ -22,12 +28,12 @@ function parseFlags(value) {
 
 function formatSettings(response: AccountInfoResponse) {
   const data = response.account_data
-  const parsedFlags = parseFlags(data.Flags)
+  const parsedFlags = parseAccountFlags(data.Flags, {excludeFalse: true})
   const parsedFields = parseFields(data)
   return _.assign({}, parsedFlags, parsedFields)
 }
 
-async function getSettings(
+export async function getSettings(
   this: RippleAPI, address: string, options: SettingsOptions = {}
 ): Promise<FormattedSettings> {
   // 1. Validate
@@ -41,5 +47,3 @@ async function getSettings(
   // 3. Return Formatted Response
   return formatSettings(response)
 }
-
-export default getSettings

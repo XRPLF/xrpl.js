@@ -23,7 +23,7 @@
     "jsonschema": "1.2.2",
     "lodash": "^4.17.4",
     "ripple-address-codec": "^2.0.1",
-    "ripple-binary-codec": "^0.1.13",
+    "ripple-binary-codec": "0.2.0",
     "ripple-hashes": "^0.3.1",
     "ripple-keypairs": "^0.10.1",
     "ripple-lib-transactionparser": "0.7.1",

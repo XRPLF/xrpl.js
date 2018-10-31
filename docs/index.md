@@ -58,6 +58,8 @@
   - [getAccountObjects](#getaccountobjects)
   - [getPaymentChannel](#getpaymentchannel)
   - [getLedger](#getledger)
+  - [parseAccountFlags](#parseaccountflags)
+  - [prepareTransaction](#preparetransaction)
   - [preparePayment](#preparepayment)
   - [prepareTrustline](#preparetrustline)
   - [prepareOrder](#prepareorder)
@@ -4109,6 +4111,100 @@ return api.getLedger()
 ```
 
 
+## parseAccountFlags
+
+`parseAccountFlags(Flags: number): object`
+
+Parse an `AccountRoot` object's [`Flags`](https://developers.ripple.com/accountroot.html#accountroot-flags).
+
+### Parameters
+
+This method takes one parameter, the AccountRoot `Flags` number to parse. Note that flags have different mappings on other types of objects or in transactions such as AccountSet.
+
+### Return Value
+
+This method returns an object with containing a key for each AccountRoot flag known to this version of RippleAPI. Each flag has a boolean value of `true` or `false`.
+
+### Example
+
+```javascript
+const account_info = await api.request('account_info', {account: 'rKsdkGhyZH6b2Zzd5hNnEqSv2wpznn4n6N'})
+const flags = api.parseAccountFlags(account_info.account_data.Flags)
+console.log(JSON.stringify(flags, null, 2))
+```
+
+```json
+{
+  "passwordSpent": false,
+  "requireDestinationTag": false,
+  "requireAuthorization": false,
+  "depositAuth": true,
+  "disallowIncomingXRP": false,
+  "disableMasterKey": false,
+  "noFreeze": false,
+  "globalFreeze": false,
+  "defaultRipple": false
+}
+```
+
+## prepareTransaction
+
+`prepareTransaction(address: string, transaction: object, instructions: object): Promise<object>`
+
+Prepare a transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+This method works with any of [the transaction types supported by rippled](https://developers.ripple.com/transaction-types.html).
+
+Notably, this is the preferred method for preparing a `DepositPreauth` transaction (added in rippled 1.1.0).
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+transaction | [transaction](https://developers.ripple.com/transaction-formats.html) | The specification (JSON) of the transaction to prepare. Set `Account` to the address of the account that is creating the transaction. You may omit auto-fillable fields like `Fee`, `Flags`, and `Sequence` to have them set automatically.
+instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction.
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare*" methods have the same return type.
+</aside>
+
+Name | Type | Description
+---- | ---- | -----------
+txJSON | string | The prepared transaction in rippled JSON format.
+instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
+*instructions.* fee | [value](#value) | An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.
+*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
+*instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum.
+*instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum.
+
+### Example
+
+```javascript
+async function preparedPreauth() {
+  const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+  return api.prepareTransaction({
+    TransactionType: 'DepositPreauth',
+    Account: address,
+    Authorize: 'rMyVso4p83khNyHdV1m1PggV9QNadCj8wM'
+  });
+}
+```
+
+```javascript
+{
+  txJSON: '{"TransactionType":"DepositPreauth","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Authorize":"rMyVso4p83khNyHdV1m1PggV9QNadCj8wM","Flags":2147483648,"LastLedgerSequence":13561714,"Fee":"12","Sequence":1}',
+  instructions: {
+    fee: '0.000012',
+    sequence: 1,
+    maxLedgerVersion: 13561714
+  }
+}
+```
+
 ## preparePayment
 
 `preparePayment(address: string, payment: object, instructions: object): Promise<object>`
@@ -4960,6 +5056,10 @@ sign(txJSON: string, keypair: object, options: object): {signedTransaction: stri
 ```
 
 Sign a prepared transaction. The signed transaction must subsequently be [submitted](#submit).
+
+This method can sign any of [the transaction types supported by ripple-binary-codec](https://github.com/ripple/ripple-binary-codec/blob/cfcde79c19c359e9a0466d7bc3dc9a3aef47bb99/src/enums/definitions.json#L1637). When a new transaction type is added to the XRP Ledger, it will be unrecognized until `ripple-binary-codec` is updated. If you try to sign an unrecognized transaction type, this method throws an error similar to the following:
+
+`Error: [TRANSACTION_TYPE] is not a valid name or ordinal for TransactionType`
 
 ### Parameters
 
