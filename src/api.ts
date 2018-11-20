@@ -22,7 +22,8 @@ import getBalances from './ledger/balances'
 import getBalanceSheet from './ledger/balance-sheet'
 import getPaths from './ledger/pathfind'
 import getOrders from './ledger/orders'
-import getOrderbook from './ledger/orderbook'
+import {getOrderbookDeprecated,
+  formatBidsAndAsks} from './ledger/orderbook'
 import {getSettings, parseAccountFlags} from './ledger/settings'
 import getAccountInfo from './ledger/accountinfo'
 import getAccountObjects from './ledger/accountobjects'
@@ -69,7 +70,7 @@ import * as ledgerUtils from './ledger/utils'
 import * as transactionUtils from './transaction/utils'
 import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
-import {clamp} from './ledger/utils'
+import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {Instructions, Prepare} from './transaction/types'
 
 export type APIOptions = {
@@ -113,6 +114,9 @@ class RippleAPI extends EventEmitter {
     ledgerUtils,
     schemaValidator
   }
+
+  static renameCounterpartyToIssuer = renameCounterpartyToIssuer
+  static formatBidsAndAsks = formatBidsAndAsks
 
   constructor(options: APIOptions = {}) {
     super()
@@ -296,7 +300,6 @@ class RippleAPI extends EventEmitter {
   getBalanceSheet = getBalanceSheet
   getPaths = getPaths
   getOrders = getOrders
-  getOrderbook = getOrderbook
   getSettings = getSettings
   getAccountInfo = getAccountInfo
   getAccountObjects = getAccountObjects
@@ -337,6 +340,13 @@ class RippleAPI extends EventEmitter {
 
   isValidAddress = schemaValidator.isValidAddress
   isValidSecret = schemaValidator.isValidSecret
+
+  /**
+   * @deprecated since ripple-lib 1.1.1
+   *             - use request('book_offers', ...) and
+   *               formatBidsAndAsks() instead
+   */
+  getOrderbook = getOrderbookDeprecated
 }
 
 export {

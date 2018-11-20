@@ -11,6 +11,7 @@ const accountLinesResponse = require('./fixtures/rippled/account-lines');
 const accountObjectsResponse = require('./fixtures/rippled/account-objects');
 const fullLedger = require('./fixtures/rippled/ledger-full-38129.json');
 const { getFreePort } = require('./utils/net-utils');
+const fs = require('fs');
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';
@@ -464,6 +465,8 @@ module.exports = function createMockRippled(port) {
     }
   });
 
+  let requestsCache = undefined;
+
   mock.on('request_book_offers', function (request, conn) {
     if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
       conn.send(createResponse(request, fixtures.book_offers.xrp_usd));
@@ -479,6 +482,30 @@ module.exports = function createMockRippled(port) {
       conn.send(
         fixtures.book_offers.fabric.requestBookOffersAsksResponse(request));
     } else {
+      const rippledDir = 'test/fixtures/rippled';
+      if (!requestsCache) {
+        requestsCache = fs.readdirSync(rippledDir + '/requests');
+      }
+      for (var i = 0; i < requestsCache.length; i++) {
+        const file = requestsCache[i];
+        const json = fs.readFileSync(rippledDir + '/requests/' + file, 'utf8');
+        const r = JSON.parse(json);
+        const requestWithoutId = Object.assign({}, request);
+        delete requestWithoutId.id;
+        if (JSON.stringify(requestWithoutId) === JSON.stringify(r)) {
+          const responseFile = rippledDir + '/responses/' + file.split('.')[0] + '-res.json';
+          const res = fs.readFileSync(responseFile, 'utf8');
+          const response = createResponse(request, {
+            "id": 0,
+            "type": "response",
+            "status": "success",
+            "result": JSON.parse(res)
+          });
+          conn.send(response);
+          return;
+        }
+      }
+
       assert(false, 'Unrecognized order book: ' + JSON.stringify(request));
     }
   });

@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "getOrderbookParameters",
-  "description": "Parameters for getOrderbook",
+  "description": "Parameters for getOrderbook (deprecated)",
   "type": "object",
   "properties": {
     "address": {
