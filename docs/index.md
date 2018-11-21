@@ -2765,6 +2765,8 @@ return api.getOrders(address).then(orders =>
 
 Returns open orders for the specified account. Open orders are orders that have not yet been fully executed and are still in the order book.
 
+**DEPRECATED:** Orders returned by this method are not sorted correctly (see [issue #766](https://github.com/ripple/ripple-lib/issues/766)). Use `request` and [`formatBidsAndAsks`](#formatbidsandasks) instead.
+
 ### Parameters
 
 Name | Type | Description
@@ -2807,9 +2809,7 @@ asks[] | object | An order in the order book.
 *asks[].state.* fundedAmount | [amount](#amount) | How much of the amount the maker would have to pay that the maker currently holds.
 *asks[].state.* priceOfFundedAmount | [amount](#amount) | How much the `fundedAmount` would convert to through the exchange rate of this order.
 
-### Raw order data
-
-(Requires ripple-lib 0.22.0 or higher.) The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
+**Raw order data:** The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
 
 For details, see the rippled method [book_offers](https://ripple.com/build/rippled-apis/#book-offers).
 
