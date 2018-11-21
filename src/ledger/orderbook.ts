@@ -61,28 +61,6 @@ export function formatBidsAndAsks(
   return {bids, asks}
 }
 
-/**
- * @deprecated since ripple-lib 1.1.1
- */
-function formatBidsAndAsksDeprecated(
-  orderbook: OrderbookInfo, offers: BookOffer[]) {
-  // WARNING: This sorts orders with 'quality' interpreted as a string,
-  //          which is wrong. The code is left here to avoid breaking
-  //          existing integrations, which presumably re-sort or have other
-  //          workarounds. DO NOT USE.
-  const orders = _.sortBy(offers, 'quality').map(parseOrderbookOrder)
-
-  // Here is an example of how to sort orders correctly:
-  // const orders = offers.sort((a, b) => {
-  //   return (new BigNumber(a.quality)).comparedTo(b.quality)
-  // }).map(parseOrderbookOrder)
-
-  const alignedOrders = orders.map(_.partial(alignOrder, orderbook.base))
-  const bids = alignedOrders.filter(_.partial(directionFilter, 'buy'))
-  const asks = alignedOrders.filter(_.partial(directionFilter, 'sell'))
-  return {bids, asks}
-}
-
 // account is to specify a "perspective", which affects which unfunded offers
 // are returned
 async function makeRequest(
@@ -113,11 +91,7 @@ export type OrderbookInfo = {
   counter: Issue
 }
 
-/**
- * @deprecated since ripple-lib 1.1.1
- *             - use request('book_offers', ...) and formatBidsAndAsks() instead
- */
-export async function getOrderbookDeprecated(
+export async function getOrderbook(
   this: RippleAPI,
   address: string,
   orderbook: OrderbookInfo,
@@ -135,6 +109,6 @@ export async function getOrderbookDeprecated(
     directOfferResult => directOfferResult.offers)
   const reverseOffers = _.flatMap(reverseOfferResults,
     reverseOfferResult => reverseOfferResult.offers)
-  return formatBidsAndAsksDeprecated(orderbook,
+  return formatBidsAndAsks(orderbook,
     [...directOffers, ...reverseOffers])
 }

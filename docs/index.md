@@ -55,7 +55,7 @@
   - [getBalanceSheet](#getbalancesheet)
   - [getPaths](#getpaths)
   - [getOrders](#getorders)
-  - [getOrderbook (deprecated)](#getorderbook-deprecated)
+  - [getOrderbook](#getorderbook)
   - [getSettings](#getsettings)
   - [getAccountInfo](#getaccountinfo)
   - [getAccountObjects](#getaccountobjects)
@@ -2759,13 +2759,15 @@ return api.getOrders(address).then(orders =>
 ```
 
 
-## getOrderbook (deprecated)
+## getOrderbook
 
 `getOrderbook(address: string, orderbook: object, options: object): Promise<object>`
 
 Returns open orders for the specified account. Open orders are orders that have not yet been fully executed and are still in the order book.
 
-**DEPRECATED:** Orders returned by this method are not sorted correctly (see [issue #766](https://github.com/ripple/ripple-lib/issues/766)). Use `request` and [`formatBidsAndAsks`](#formatbidsandasks) instead.
+**Breaking change:** In ripple-lib 1.1.0 and earlier, orders returned by this method were not sorted correctly. Orders are now sorted correctly, from best to worst.
+
+**See also:** An alternative way to get orderbooks is with `request` and [`formatBidsAndAsks`](#formatbidsandasks).
 
 ### Parameters
 
