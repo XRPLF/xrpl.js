@@ -2605,6 +2605,67 @@ describe('RippleAPI', function () {
         _.partial(checkResult, responses.getOrderbook.withXRP, 'getOrderbook'));
     });
 
+    function checkSortingOfOrders(orders) {
+      let previousRate = '0';
+      for (var i = 0; i < orders.length; i++) {
+        const order = orders[i];
+        let rate;
+
+        // We calculate the quality of output/input here as a test.
+        // This won't hold in general because when output and input amounts get tiny,
+        // the quality can differ significantly. However, the offer stays in the
+        // order book where it was originally placed. It would be more consistent
+        // to check the quality from the offer book, but for the test data set,
+        // this calculation holds.
+
+        if (order.specification.direction === 'buy') {
+          rate = (new BigNumber(order.specification.quantity.value))
+          .dividedBy(order.specification.totalPrice.value)
+          .toString();
+        } else {
+          rate = (new BigNumber(order.specification.totalPrice.value))
+          .dividedBy(order.specification.quantity.value)
+          .toString();
+        }
+        assert((new BigNumber(rate)).greaterThanOrEqualTo(previousRate),
+          'Rates must be sorted from least to greatest: ' +
+          rate + ' should be >= ' + previousRate);
+        previousRate = rate;
+      }
+      return true;
+    }
+
+    it('sample XRP/JPY book has orders sorted correctly', function () {
+      const orderbookInfo = {
+        "base": { // the first currency in pair
+          "currency": 'XRP'
+        },
+        "counter": {
+          "currency": 'JPY',
+          "counterparty": "rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS"
+        }
+      };
+
+      const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR';
+
+      return this.api.getOrderbook(myAddress, orderbookInfo).then(orderbook => {
+        assert.deepStrictEqual([], orderbook.bids);
+        return checkSortingOfOrders(orderbook.asks);
+      });
+    });
+
+    it('sample USD/XRP book has orders sorted correctly', function () {
+      const orderbookInfo = { counter: { currency: 'XRP' },
+      base: { currency: 'USD',
+       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' } };
+
+      const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR';
+
+      return this.api.getOrderbook(myAddress, orderbookInfo).then(orderbook => {
+        return checkSortingOfOrders(orderbook.bids) && checkSortingOfOrders(orderbook.asks);
+      });
+    });
+
     // WARNING: This test fails to catch the sorting bug, issue #766
     it('sorted so that best deals come first [bad test]', function () {
       return this.api.getOrderbook(address, requests.getOrderbook.normal)
