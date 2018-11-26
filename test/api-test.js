@@ -2272,6 +2272,315 @@ describe('RippleAPI', function () {
     });
   });
 
+  describe('formatBidsAndAsks', function () {
+
+    it('normal', function () {
+      const orderbookInfo = {
+        "base": {
+          "currency": "USD",
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        },
+        "counter": {
+          "currency": "BTC",
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      };
+
+      return Promise.all(
+        [
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          }),
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          })
+        ]
+      ).then((directOfferResults, reverseOfferResults) => {
+        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
+        assert.deepEqual(orderbook, responses.getOrderbook.normal);
+      });
+    });
+
+    it('with XRP', function () {
+      const orderbookInfo = {
+        "base": {
+          "currency": "USD",
+          "counterparty": "rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw"
+        },
+        "counter": {
+          "currency": "XRP"
+        }
+      };
+
+      return Promise.all(
+        [
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          }),
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          })
+        ]
+      ).then((directOfferResults, reverseOfferResults) => {
+        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
+        assert.deepEqual(orderbook, responses.getOrderbook.withXRP);
+      });
+    });
+
+    function checkSortingOfOrders(orders) {
+      let previousRate = '0';
+      for (var i = 0; i < orders.length; i++) {
+        const order = orders[i];
+        let rate;
+
+        // We calculate the quality of output/input here as a test.
+        // This won't hold in general because when output and input amounts get tiny,
+        // the quality can differ significantly. However, the offer stays in the
+        // order book where it was originally placed. It would be more consistent
+        // to check the quality from the offer book, but for the test data set,
+        // this calculation holds.
+
+        if (order.specification.direction === 'buy') {
+          rate = (new BigNumber(order.specification.quantity.value))
+          .dividedBy(order.specification.totalPrice.value)
+          .toString();
+        } else {
+          rate = (new BigNumber(order.specification.totalPrice.value))
+          .dividedBy(order.specification.quantity.value)
+          .toString();
+        }
+        assert((new BigNumber(rate)).greaterThanOrEqualTo(previousRate),
+          'Rates must be sorted from least to greatest: ' +
+          rate + ' should be >= ' + previousRate);
+        previousRate = rate;
+      }
+      return true;
+    }
+
+    it('sample XRP/JPY book has orders sorted correctly', function () {
+      const orderbookInfo = {
+        "base": { // the first currency in pair
+          "currency": 'XRP'
+        },
+        "counter": {
+          "currency": 'JPY',
+          "counterparty": "rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS"
+        }
+      };
+
+      const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR';
+
+      return Promise.all(
+        [
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            ledger_index: 'validated',
+            limit: 400, // must match `test/fixtures/rippled/requests/1-taker_gets-XRP-taker_pays-JPY.json`
+            taker: myAddress
+          }),
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            ledger_index: 'validated',
+            limit: 400, // must match `test/fixtures/rippled/requests/2-taker_gets-JPY-taker_pays-XRP.json`
+            taker: myAddress
+          })
+        ]
+      ).then((directOfferResults, reverseOfferResults) => {
+        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
+        assert.deepStrictEqual([], orderbook.bids);
+        return checkSortingOfOrders(orderbook.asks);
+      });
+    });
+
+    it('sample USD/XRP book has orders sorted correctly', function () {
+      const orderbookInfo = { counter: { currency: 'XRP' },
+      base: { currency: 'USD',
+       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' } };
+
+      const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR';
+
+      return Promise.all(
+        [
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            ledger_index: 'validated',
+            limit: 400, // must match `test/fixtures/rippled/requests/1-taker_gets-XRP-taker_pays-JPY.json`
+            taker: myAddress
+          }),
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            ledger_index: 'validated',
+            limit: 400, // must match `test/fixtures/rippled/requests/2-taker_gets-JPY-taker_pays-XRP.json`
+            taker: myAddress
+          })
+        ]
+      ).then((directOfferResults, reverseOfferResults) => {
+        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
+        return checkSortingOfOrders(orderbook.bids) && checkSortingOfOrders(orderbook.asks);
+      });
+    });
+
+    it('sorted so that best deals come first', function () {
+      const orderbookInfo = {
+        "base": {
+          "currency": "USD",
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        },
+        "counter": {
+          "currency": "BTC",
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      };
+
+      return Promise.all(
+        [
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          }),
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          })
+        ]
+      ).then((directOfferResults, reverseOfferResults) => {
+        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
+        
+        const bidRates = orderbook.bids.map(bid => bid.properties.makerExchangeRate);
+        const askRates = orderbook.asks.map(ask => ask.properties.makerExchangeRate);
+        // makerExchangeRate = quality = takerPays.value/takerGets.value
+        // so the best deal for the taker is the lowest makerExchangeRate
+        // bids and asks should be sorted so that the best deals come first
+        assert.deepEqual(_.sortBy(bidRates, x => Number(x)), bidRates);
+        assert.deepEqual(_.sortBy(askRates, x => Number(x)), askRates);
+      });
+    });
+
+    it('currency & counterparty are correct', function () {
+      const orderbookInfo = {
+        "base": {
+          "currency": "USD",
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        },
+        "counter": {
+          "currency": "BTC",
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      };
+
+      return Promise.all(
+        [
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          }),
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          })
+        ]
+      ).then((directOfferResults, reverseOfferResults) => {
+        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
+        
+        const orders = _.flatten([orderbook.bids, orderbook.asks]);
+        _.forEach(orders, order => {
+          const quantity = order.specification.quantity;
+          const totalPrice = order.specification.totalPrice;
+          const { base, counter } = requests.getOrderbook.normal;
+          assert.strictEqual(quantity.currency, base.currency);
+          assert.strictEqual(quantity.counterparty, base.counterparty);
+          assert.strictEqual(totalPrice.currency, counter.currency);
+          assert.strictEqual(totalPrice.counterparty, counter.counterparty);
+        });
+      });
+    });
+
+    it('direction is correct for bids and asks', function () {
+      const orderbookInfo = {
+        "base": {
+          "currency": "USD",
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        },
+        "counter": {
+          "currency": "BTC",
+          "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      };
+
+      return Promise.all(
+        [
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          }),
+          this.api.request('book_offers', {
+            taker_gets: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter),
+            taker_pays: RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base),
+            ledger_index: 'validated',
+            limit: 20,
+            taker: address
+          })
+        ]
+      ).then((directOfferResults, reverseOfferResults) => {
+        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+        const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
+        
+        assert(
+          _.every(orderbook.bids, bid => bid.specification.direction === 'buy'));
+        assert(
+          _.every(orderbook.asks, ask => ask.specification.direction === 'sell'));
+      });
+    });
+  });
+
   describe('getOrderbook', function () {
 
     it('normal', function () {
@@ -2296,7 +2605,69 @@ describe('RippleAPI', function () {
         _.partial(checkResult, responses.getOrderbook.withXRP, 'getOrderbook'));
     });
 
-    it('sorted so that best deals come first', function () {
+    function checkSortingOfOrders(orders) {
+      let previousRate = '0';
+      for (var i = 0; i < orders.length; i++) {
+        const order = orders[i];
+        let rate;
+
+        // We calculate the quality of output/input here as a test.
+        // This won't hold in general because when output and input amounts get tiny,
+        // the quality can differ significantly. However, the offer stays in the
+        // order book where it was originally placed. It would be more consistent
+        // to check the quality from the offer book, but for the test data set,
+        // this calculation holds.
+
+        if (order.specification.direction === 'buy') {
+          rate = (new BigNumber(order.specification.quantity.value))
+          .dividedBy(order.specification.totalPrice.value)
+          .toString();
+        } else {
+          rate = (new BigNumber(order.specification.totalPrice.value))
+          .dividedBy(order.specification.quantity.value)
+          .toString();
+        }
+        assert((new BigNumber(rate)).greaterThanOrEqualTo(previousRate),
+          'Rates must be sorted from least to greatest: ' +
+          rate + ' should be >= ' + previousRate);
+        previousRate = rate;
+      }
+      return true;
+    }
+
+    it('sample XRP/JPY book has orders sorted correctly', function () {
+      const orderbookInfo = {
+        "base": { // the first currency in pair
+          "currency": 'XRP'
+        },
+        "counter": {
+          "currency": 'JPY',
+          "counterparty": "rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS"
+        }
+      };
+
+      const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR';
+
+      return this.api.getOrderbook(myAddress, orderbookInfo).then(orderbook => {
+        assert.deepStrictEqual([], orderbook.bids);
+        return checkSortingOfOrders(orderbook.asks);
+      });
+    });
+
+    it('sample USD/XRP book has orders sorted correctly', function () {
+      const orderbookInfo = { counter: { currency: 'XRP' },
+      base: { currency: 'USD',
+       counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' } };
+
+      const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR';
+
+      return this.api.getOrderbook(myAddress, orderbookInfo).then(orderbook => {
+        return checkSortingOfOrders(orderbook.bids) && checkSortingOfOrders(orderbook.asks);
+      });
+    });
+
+    // WARNING: This test fails to catch the sorting bug, issue #766
+    it('sorted so that best deals come first [bad test]', function () {
       return this.api.getOrderbook(address, requests.getOrderbook.normal)
         .then(data => {
           const bidRates = data.bids.map(bid => bid.properties.makerExchangeRate);

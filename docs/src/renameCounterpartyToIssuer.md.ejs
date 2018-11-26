@@ -1,0 +1,37 @@
+## renameCounterpartyToIssuer
+
+`renameCounterpartyToIssuer(issue: {currency: string, counterparty: address}): {currency: string, issuer: address}`
+
+Returns an object with the `counterparty` field renamed to `issuer`. This is useful because RippleAPI generally uses the name `counterparty` while the rippled API generally uses the name `issuer`.
+
+This is a static method on the `RippleAPI` class.
+
+### Parameters
+
+This method takes one parameter, an object with a `counterparty` field.
+
+### Return Value
+
+This method returns a new object similar to the source object, but with `issuer` instead of `counterparty`.
+
+### Example
+
+```javascript
+const orderbookInfo = {
+  "base": {
+    "currency": "USD",
+    "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+  },
+  "counter": {
+    "currency": "BTC",
+    "counterparty": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+  }
+};
+console.log(RippleAPI.renameCounterpartyToIssuer(orderbookInfo.base))
+console.log(RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter))
+```
+
+```
+{ currency: 'USD', issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' }
+{ currency: 'BTC', issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' }
+```

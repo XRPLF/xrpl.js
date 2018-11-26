@@ -22,7 +22,8 @@ import getBalances from './ledger/balances'
 import getBalanceSheet from './ledger/balance-sheet'
 import getPaths from './ledger/pathfind'
 import getOrders from './ledger/orders'
-import getOrderbook from './ledger/orderbook'
+import {getOrderbook,
+  formatBidsAndAsks} from './ledger/orderbook'
 import {getSettings, parseAccountFlags} from './ledger/settings'
 import getAccountInfo from './ledger/accountinfo'
 import getAccountObjects from './ledger/accountobjects'
@@ -69,7 +70,7 @@ import * as ledgerUtils from './ledger/utils'
 import * as transactionUtils from './transaction/utils'
 import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
-import {clamp} from './ledger/utils'
+import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {Instructions, Prepare} from './transaction/types'
 
 export type APIOptions = {
@@ -113,6 +114,9 @@ class RippleAPI extends EventEmitter {
     ledgerUtils,
     schemaValidator
   }
+
+  static renameCounterpartyToIssuer = renameCounterpartyToIssuer
+  static formatBidsAndAsks = formatBidsAndAsks
 
   constructor(options: APIOptions = {}) {
     super()
@@ -295,8 +299,8 @@ class RippleAPI extends EventEmitter {
   getBalances = getBalances
   getBalanceSheet = getBalanceSheet
   getPaths = getPaths
-  getOrders = getOrders
   getOrderbook = getOrderbook
+  getOrders = getOrders
   getSettings = getSettings
   getAccountInfo = getAccountInfo
   getAccountObjects = getAccountObjects

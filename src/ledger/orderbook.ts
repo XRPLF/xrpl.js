@@ -8,6 +8,7 @@ import {validate} from '../common'
 import {Amount, Issue} from '../common/types/objects'
 import {BookOffer} from '../common/types/commands'
 import {RippleAPI} from '../api'
+import BigNumber from 'bignumber.js'
 
 export type FormattedOrderbook = {
   bids: FormattedOrderbookOrder[],
@@ -38,7 +39,7 @@ function alignOrder(base: Amount, order: FormattedOrderbookOrder) {
   return isSameIssue(quantity, base) ? order : flipOrder(order)
 }
 
-function formatBidsAndAsks(
+export function formatBidsAndAsks(
   orderbook: OrderbookInfo, offers: BookOffer[]) {
   // the "base" currency is the currency that you are buying or selling
   // the "counter" is the currency that the "base" is priced in
@@ -50,7 +51,10 @@ function formatBidsAndAsks(
   // for asks: lowest quality => lowest totalPrice/quantity => lowest price
   // for both bids and asks, lowest quality is closest to mid-market
   // we sort the orders so that earlier orders are closer to mid-market
-  const orders = _.sortBy(offers, 'quality').map(parseOrderbookOrder)
+  const orders = offers.sort((a, b) => {
+    return (new BigNumber(a.quality)).comparedTo(b.quality)
+  }).map(parseOrderbookOrder)
+
   const alignedOrders = orders.map(_.partial(alignOrder, orderbook.base))
   const bids = alignedOrders.filter(_.partial(directionFilter, 'buy'))
   const asks = alignedOrders.filter(_.partial(directionFilter, 'sell'))
@@ -87,7 +91,7 @@ export type OrderbookInfo = {
   counter: Issue
 }
 
-export default async function getOrderbook(
+export async function getOrderbook(
   this: RippleAPI,
   address: string,
   orderbook: OrderbookInfo,
@@ -105,5 +109,6 @@ export default async function getOrderbook(
     directOfferResult => directOfferResult.offers)
   const reverseOffers = _.flatMap(reverseOfferResults,
     reverseOfferResult => reverseOfferResult.offers)
-  return formatBidsAndAsks(orderbook, [...directOffers, ...reverseOffers])
+  return formatBidsAndAsks(orderbook,
+    [...directOffers, ...reverseOffers])
 }
