@@ -1,5 +1,29 @@
 # ripple-lib Release History
 
+## 1.1.1 (2018-11-27)
+
++ Fix `getOrderbook` offer sorting (#970)
+  + **BREAKING CHANGE:** The ordering of offers returned by `getOrderbook` has
+    been changed so that offers with the best quality are sorted first
++ Add new helper methods for working with the `rippled` APIs:
+  + `formatBidsAndAsks`: Takes offers and returns a formatted order book object
+    with bids and asks
+  + `renameCounterpartyToIssuer`: Takes an object and renames the `counterparty`
+    field to `issuer`
++ TypeScript: Add return type for `generateAddress` (#968)
+
+When using `ripple-lib` with `rippled`, we recommend using `rippled` version 1.1.1 or
+later.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+e151900e49bb5482b02bef5b0b1542ea586076363b072ae616f6d4d2f7f5b8a1  ripple-1.1.1-debug.js
+6aee3757b29de285f361e20862261090033c07a13fd09f4a3cc4c097b6e84b55  ripple-1.1.1-min.js
+bea4a889fb9ee4092324c6667490ea66469bdde869ddc1aaddf5e9d12b0cf091  ripple-1.1.1.js
+```
+
 ## 1.1.0 (2018-10-31)
 
 + Add support for Node.js v10 LTS (#964)
