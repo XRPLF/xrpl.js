@@ -7,8 +7,8 @@ A JavaScript API for interacting with the XRP Ledger
 ### Features
 
 + Connect to a `rippled` server from Node.js or a web browser
-+ Issue [rippled API](https://ripple.com/build/rippled-apis/) requests
-+ Listen to events on the XRP Ledger (transaction, ledger, etc.)
++ Helpers for creating requests and parsing responses for the [rippled API](https://developers.ripple.com/rippled-api.html)
++ Listen to events on the XRP Ledger (transactions, ledger, validations, etc.)
 + Sign and submit transactions to the XRP Ledger
 + Type definitions for TypeScript
 
@@ -29,6 +29,8 @@ $ yarn add ripple-lib
 ```
 
 Then see the [documentation](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md) and [code samples](https://github.com/ripple/ripple-lib/tree/develop/docs/samples).
+
+**What is ripple-lib used for?** Here's a [list of applications](APPLICATIONS.md) that use `ripple-lib`. Open a PR to add your app or project to the list!
 
 ### Mailing Lists
 
@@ -56,7 +58,7 @@ $ yarn build
 
 Gulp will [output](./Gulpfile.js) the resulting JS files in `./build/`.
 
-For more details, see the `scripts` in `package.json`.
+For details, see the `scripts` in `package.json`.
 
 ## Running Tests
 
@@ -64,11 +66,11 @@ For more details, see the `scripts` in `package.json`.
 2. `cd` into the repository and install dependencies with `yarn install`
 3. `yarn test`
 
+Also, run `yarn lint` to lint the code with `tslint`.
+
 ## Generating Documentation
 
 The continuous integration tests require that the documentation stays up-to-date. If you make changes to the JSON schemas, fixtures, or documentation sources, you must update the documentation by running `yarn run docgen`.
-
-`npm` may be used instead of `yarn` in the commands above.
 
 ## More Information
 
