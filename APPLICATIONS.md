@@ -4,7 +4,21 @@ A curated list of some of the projects and apps that leverage `ripple-lib` in so
 
 **Have one to add?** Please edit this file and open a PR!
 
+## Notice (disclaimer)
+
+These sites are independent of Ripple and have not been authorized, endorsed, sponsored or otherwise approved by Ripple or its affiliates.
+
+Warning: Use at your own risk.
+
 ## Data and visualizations
+
+- **[Wipple - XRP Intelligence](https://wipple.devnull.network/)**
+
+  Monitor the XRP Network in real time and explore historical statistics.
+
+- **[XRP Charts](https://xrpcharts.ripple.com/)** (xrpcharts.ripple.com)
+
+  XRP Charts provides information based on public data, including trade volume, top markets, metrics, transactions, and more.
 
 - **[Ripple Live](https://gatehub.net/live)** (gatehub.net/live)
 
@@ -17,6 +31,10 @@ A curated list of some of the projects and apps that leverage `ripple-lib` in so
 - **[XRP Value](http://xrpvalue.com/)**
 
   Real-time XRP price, trades, and orderbook data from the XRP Ledger.
+
+- **[Bithomp - XRPL validators](https://bithomp.com/validators)**
+
+  List of XRPL validators, nodes, and testnet validators.
 
 ## Send and request payments
 
@@ -45,6 +63,10 @@ A curated list of some of the projects and apps that leverage `ripple-lib` in so
 - **[Toastify Ledger](https://github.com/WietseWind/toastify-ledger)** (uses `ripple-keypairs`)
 
   Add a Regular Key to a mnemonic XRP Wallet (e.g. Ledger Nano S) to use the account with a Family Seed (secret).
+
+- **[Bithomp-submit](https://github.com/Bithomp/bithomp-submit)** (GitHub)
+
+  A tool to submit an offline-signed XRPL transaction.
 
 - **[Kyte](https://kyteapp.co/)** (kyteapp.co) ([Source](https://github.com/WietseWind/Zerp-Wallet)) (Deprecated)
 
