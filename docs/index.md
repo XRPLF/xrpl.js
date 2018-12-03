@@ -5481,8 +5481,13 @@ This method returns an object with the following structure:
 
 Name | Type | Description
 ---- | ---- | -----------
-resultCode | string | The result code returned by rippled. [List of transaction responses](https://ripple.com/build/transactions/#full-transaction-response-list)
-resultMessage | string | Human-readable explanation of the status of the transaction.
+engine_result | string | Code indicating the preliminary result of the transaction, for example tesSUCCESS. [List of transaction responses](https://ripple.com/build/transactions/#full-transaction-response-list)
+engine_result_code | integer | Numeric code indicating the preliminary result of the transaction, directly correlated to `engine_result`
+engine_result_message | string | Human-readable explanation of the transaction's preliminary result.
+tx_blob | string | The complete transaction in hex string format.
+tx_json | [tx](https://ripple.com/build/transactions/) | The complete transaction in JSON format.
+resultCode | string | *Optional* Deprecated: Use `engine_result` instead.
+resultMessage | string | *Optional* Deprecated: Use `engine_result_message` instead.
 
 ### Example
 
@@ -5496,7 +5501,14 @@ return api.submit(signedTransaction)
 ```json
 {
   "resultCode": "tesSUCCESS",
-  "resultMessage": "The transaction was applied. Only final in a validated ledger."
+  "resultMessage": "The transaction was applied. Only final in a validated ledger.",
+  "engine_result": "tesSUCCESS",
+  "engine_result_code": 0,
+  "engine_result_message": "The transaction was applied. Only final in a validated ledger.",
+  "tx_blob": "12000322000000002400000017201B0086955468400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402207660BDEF67105CE1EBA9AD35DC7156BAB43FF1D47633199EE257D70B6B9AAFBF02207F5517BC8AEF2ADC1325897ECDBA8C673838048BCA62F4E98B252F19BE88796D770A726970706C652E636F6D81144FBFF73DA4ECF9B701940F27341FA8020C313443",
+  "tx_json": {
+    "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
+  }
 }
 ```
 

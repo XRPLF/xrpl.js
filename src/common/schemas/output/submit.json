@@ -32,6 +32,6 @@
       "description": "The complete transaction in JSON format."
     }
   },
-  "required": ["engine_result", "engine_result_code", "engine_result_message", "tx_blob", "tx_json"],
+  "required": ["resultCode", "resultMessage", "engine_result", "engine_result_code", "engine_result_message", "tx_blob", "tx_json"],
   "additionalProperties": false
 }
