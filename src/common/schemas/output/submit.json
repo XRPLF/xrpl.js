@@ -28,8 +28,8 @@
       "description": "The complete transaction in hex string format."
     },
     "tx_json": {
-      "type": "string",
-      "description": "The complete transaction in rippled JSON format."
+      "$ref": "tx",
+      "description": "The complete transaction in JSON format."
     }
   },
   "required": ["engine_result", "engine_result_code", "engine_result_message", "tx_blob", "tx_json"],
