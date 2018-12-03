@@ -7,6 +7,10 @@
     "options": {
       "description": "Options affecting what ledger and how much data to return.",
       "properties": {
+        "ledgerHash": {
+          "type": "string",
+          "description": "Get ledger data for this historical ledger hash."
+        },
         "ledgerVersion": {
           "$ref": "ledgerVersion",
           "description": "Get ledger data for this historical ledger version."
