@@ -3091,7 +3091,7 @@ describe('RippleAPI', function () {
   });
 
   it('getLedger - by hash', function () {
-    return this.api.getLedger({ ledgerHash: "0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F"}).then(
+    return this.api.getLedger({ ledgerHash: "0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F" }).then(
       _.partial(checkResult, responses.getLedger.header, 'getLedger'));
   });
 
