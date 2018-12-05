@@ -33,7 +33,11 @@ function checkResult(expected, schemaName, response) {
     assert(response.txJSON);
     assert.deepEqual(JSON.parse(response.txJSON), JSON.parse(expected.txJSON));
   }
-  assert.deepEqual(_.omit(response, 'txJSON'), _.omit(expected, 'txJSON'));
+  if (expected.tx_json) {
+    assert(response.tx_json);
+    assert.deepEqual(response.tx_json, expected.tx_json);
+  }
+  assert.deepEqual(_.omit(response, 'txJSON'), _.omit(expected, 'txJSON'), _.omit(response, 'tx_json'), _.omit(response, 'tx_json'));
   if (schemaName) {
     schemaValidator.schemaValidate(schemaName, response);
   }
@@ -1536,8 +1540,9 @@ describe('RippleAPI', function () {
   });
 
   it('submit', function () {
-    return this.api.submit(responses.sign.normal.signedTransaction).then(
-      _.partial(checkResult, responses.submit, 'submit'));
+    return this.api.submit(responses.sign.normal.signedTransaction).then(response => {
+      checkResult(responses.submit, 'submit', response);
+    });
   });
 
   it('submit - failure', function () {

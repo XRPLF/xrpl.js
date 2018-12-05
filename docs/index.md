@@ -5481,8 +5481,13 @@ This method returns an object with the following structure:
 
 Name | Type | Description
 ---- | ---- | -----------
-resultCode | string | The result code returned by rippled. [List of transaction responses](https://ripple.com/build/transactions/#full-transaction-response-list)
-resultMessage | string | Human-readable explanation of the status of the transaction.
+resultCode | string | Deprecated: Use `engine_result` instead.
+resultMessage | string | Deprecated: Use `engine_result_message` instead.
+engine_result | string | Code indicating the preliminary result of the transaction, for example tesSUCCESS. [List of transaction responses](https://ripple.com/build/transactions/#full-transaction-response-list)
+engine_result_code | integer | Numeric code indicating the preliminary result of the transaction, directly correlated to `engine_result`
+engine_result_message | string | Human-readable explanation of the transaction's preliminary result.
+tx_blob | string | The complete transaction in hex string format.
+tx_json | [tx](https://ripple.com/build/transactions/) | The complete transaction in JSON format.
 
 ### Example
 
@@ -5496,7 +5501,27 @@ return api.submit(signedTransaction)
 ```json
 {
   "resultCode": "tesSUCCESS",
-  "resultMessage": "The transaction was applied. Only final in a validated ledger."
+  "resultMessage": "The transaction was applied. Only final in a validated ledger.",
+  "engine_result": "tesSUCCESS",
+  "engine_result_code": 0,
+  "engine_result_message": "The transaction was applied. Only final in a validated ledger.",
+  "tx_blob": "1200002280000000240000016861D4838D7EA4C6800000000000000000000000000055534400000000004B4E9C06F24296074F7BC48F92A97916C6DC5EA9684000000000002710732103AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB7446304402200E5C2DD81FDF0BE9AB2A8D797885ED49E804DBF28E806604D878756410CA98B102203349581946B0DDA06B36B35DBC20EDA27552C1F167BCF5C6ECFF49C6A46F858081144B4E9C06F24296074F7BC48F92A97916C6DC5EA983143E9D4A2B8AA0780F682D136F7A56D6724EF53754",
+  "tx_json": {
+    "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+    "Amount": {
+      "currency": "USD",
+      "issuer": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
+      "value": "1"
+    },
+    "Destination": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
+    "Fee": "10000",
+    "Flags": 2147483648,
+    "Sequence": 360,
+    "SigningPubKey": "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB",
+    "TransactionType": "Payment",
+    "TxnSignature": "304402200E5C2DD81FDF0BE9AB2A8D797885ED49E804DBF28E806604D878756410CA98B102203349581946B0DDA06B36B35DBC20EDA27552C1F167BCF5C6ECFF49C6A46F8580",
+    "hash": "4D5D90890F8D49519E4151938601EF3D0B30B16CD6A519D9C99102C9FA77F7E0"
+  }
 }
 ```
 

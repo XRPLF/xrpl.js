@@ -20,8 +20,15 @@ function isImmediateRejection(engineResult: string): boolean {
 
 function formatSubmitResponse(response): FormattedSubmitResponse {
   const data = {
+    // @deprecated
     resultCode: response.engine_result,
-    resultMessage: response.engine_result_message
+    // @deprecated
+    resultMessage: response.engine_result_message,
+    engine_result: response.engine_result,
+    engine_result_code: response.engine_result_code,
+    engine_result_message: response.engine_result_message,
+    tx_blob: response.tx_blob,
+    tx_json: response.tx_json
   }
   if (isImmediateRejection(response.engine_result)) {
     throw new utils.common.errors.RippledError('Submit failed', data)
