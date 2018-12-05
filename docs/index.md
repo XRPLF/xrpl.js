@@ -4387,6 +4387,7 @@ options | object | *Optional* Options affecting what ledger and how much data to
 *options.* includeAllData | boolean | *Optional* Include full transactions and/or state information if `includeTransactions` and/or `includeState` is set.
 *options.* includeState | boolean | *Optional* Return an array of hashes for all state data or an array of all state data in this ledger version, depending on whether `includeAllData` is set.
 *options.* includeTransactions | boolean | *Optional* Return an array of hashes for each transaction or an array of all transactions that were validated in this ledger version, depending on whether `includeAllData` is set.
+*options.* ledgerHash | string | *Optional* Get ledger data for this historical ledger hash.
 *options.* ledgerVersion | integer | *Optional* Get ledger data for this historical ledger version.
 *options.* ledgerVersion | string | *Optional* Get ledger data for this historical ledger version.
 
