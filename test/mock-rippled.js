@@ -268,6 +268,8 @@ module.exports = function createMockRippled(port) {
       const response = _.assign({}, fixtures.ledger.normal,
         { result: { ledger: fullLedger } });
       conn.send(createLedgerResponse(request, response));
+    } else if (request.ledger_hash === '15F20E5FA6EA9770BBFFDBD62787400960B04BE32803B20C41F117F41C13830D') {
+      conn.send(createLedgerResponse(request, fixtures.ledger.normalByHash));
     } else if (request.ledger_index === 'validated' ||
         request.ledger_index === 14661789 ||
         request.ledger_index === 14661788 /* getTransaction - order */) {

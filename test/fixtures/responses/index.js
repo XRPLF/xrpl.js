@@ -83,6 +83,7 @@ module.exports = {
   },
   getLedger: {
     header: require('./get-ledger'),
+    headerByHash: require('./get-ledger-by-hash'),
     full: require('./get-ledger-full'),
     withSettingsTx: require('./get-ledger-with-settings-tx'),
     withStateAsHashes: require('./get-ledger-with-state-as-hashes'),
