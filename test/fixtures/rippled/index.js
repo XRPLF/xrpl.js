@@ -7,6 +7,7 @@ module.exports = {
   },
   ledger: {
     normal: require('./ledger'),
+    normalByHash: require('./ledger-by-hash'),
     notFound: require('./ledger-not-found'),
     withoutCloseTime: require('./ledger-without-close-time'),
     withSettingsTx: require('./ledger-with-settings-tx'),

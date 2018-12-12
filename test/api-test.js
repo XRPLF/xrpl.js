@@ -3090,6 +3090,11 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.getLedger.header, 'getLedger'));
   });
 
+  it('getLedger - by hash', function () {
+    return this.api.getLedger({ ledgerHash: '15F20E5FA6EA9770BBFFDBD62787400960B04BE32803B20C41F117F41C13830D' }).then(
+      _.partial(checkResult, responses.getLedger.headerByHash, 'getLedger'));
+  });
+
   it('getLedger - future ledger version', function () {
     return this.api.getLedger({ ledgerVersion: 14661789 }).then(response => {
       assert(response)
