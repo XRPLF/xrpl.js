@@ -1,5 +1,25 @@
 # ripple-lib Release History
 
+## 1.1.2 (2018-12-12)
+
++ Update `submit` response (#978)
+  + Includes the full object returned by rippled, while keeping the existing
+    fields for backward compatibility
++ Add `getLedger` option for ledger hash (##980)
+  + Use the `ledgerHash` option to get a specific ledger by hash
+
+When using `ripple-lib` with `rippled`, we recommend using `rippled` version
+1.1.2 or later.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+e6cc52395d0c3e205263777ba2e528e50f4d1f84bb4b16763a3bf7f5fcc290f5  ripple-1.1.2-debug.js
+82df879bc2970e0e4fd161975a99448b4859b0cde751d8ea34e9f51d672090b9  ripple-1.1.2-min.js
+12f56330dc71bba8ac3004025cbc9698413a0c619df302dda105b31228a67319  ripple-1.1.2.js
+```
+
 ## 1.1.1 (2018-11-27)
 
 + Fix `getOrderbook` offer sorting (#970)
