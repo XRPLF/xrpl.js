@@ -5,8 +5,10 @@
 + Update `submit` response (#978)
   + Includes the full object returned by rippled, while keeping the existing
     fields for backward compatibility
-+ Add `getLedger` option for ledger hash (##980)
++ Add `getLedger` option for ledger hash (#980)
   + Use the `ledgerHash` option to get a specific ledger by hash
+
+Thanks to @alexchiriac for the contributions in this release.
 
 When using `ripple-lib` with `rippled`, we recommend using `rippled` version
 1.1.2 or later.
