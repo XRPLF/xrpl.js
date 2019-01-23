@@ -1,10 +1,10 @@
-'use strict' // eslint-disable-line strict
+import * as elliptic from 'elliptic'
+import Sha512 from './sha512'
 
-const elliptic = require('elliptic')
 const secp256k1 = elliptic.ec('secp256k1')
-const Sha512 = require('./sha512')
 
-function deriveScalar(bytes, discrim) {
+// TODO: type of `discrim`?
+function deriveScalar(bytes, discrim?: any) {
   const order = secp256k1.curve.n
   for (let i = 0; i <= 0xFFFFFFFF; i++) {
     // We hash the bytes to find a 256 bit number, looping until we are sure it
@@ -32,7 +32,10 @@ function deriveScalar(bytes, discrim) {
 * @return {bn.js} - 256 bit scalar value
 *
 */
-function derivePrivateKey(seed, opts = {}) {
+export function derivePrivateKey(seed, opts: {
+  validator?: boolean,
+  accountIndex?: number
+} = {}) {
   const root = opts.validator
   const order = secp256k1.curve.n
 
@@ -51,15 +54,10 @@ function derivePrivateKey(seed, opts = {}) {
             .add(privateGen).mod(order)
 }
 
-function accountPublicFromPublicGenerator(publicGenBytes) {
+export function accountPublicFromPublicGenerator(publicGenBytes) {
   const rootPubPoint = secp256k1.curve.decodePoint(publicGenBytes)
   const scalar = deriveScalar(publicGenBytes, 0)
   const point = secp256k1.g.mul(scalar)
   const offset = rootPubPoint.add(point)
   return offset.encodeCompressed()
-}
-
-module.exports = {
-  derivePrivateKey,
-  accountPublicFromPublicGenerator
 }

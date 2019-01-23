@@ -1,7 +1,7 @@
 'use strict' // eslint-disable-line strict
 
 const assert = require('assert')
-const utils = require('../src/utils')
+const utils = require('../dist/utils')
 
 describe('utils', () => {
   it('hexToBytes - zero', () => {

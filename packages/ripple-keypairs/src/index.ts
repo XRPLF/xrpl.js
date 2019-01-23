@@ -1,20 +1,22 @@
-'use strict' // eslint-disable-line strict
+import * as assert from 'assert'
+import * as brorand from 'brorand'
+import * as hashjs from 'hash.js'
+import * as elliptic from 'elliptic'
 
-const assert = require('assert')
-const brorand = require('brorand')
-const hashjs = require('hash.js')
-const elliptic = require('elliptic')
+import * as addressCodec from './ripple-address-codec'
+import {derivePrivateKey, accountPublicFromPublicGenerator} from './secp256k1'
+import * as utils from './utils'
+
 const Ed25519 = elliptic.eddsa('ed25519')
 const Secp256k1 = elliptic.ec('secp256k1')
-const addressCodec = require('ripple-address-codec')
-const derivePrivateKey = require('./secp256k1').derivePrivateKey
-const accountPublicFromPublicGenerator = require('./secp256k1')
-  .accountPublicFromPublicGenerator
-const utils = require('./utils')
+
 const hexToBytes = utils.hexToBytes
 const bytesToHex = utils.bytesToHex
 
-function generateSeed(options = {}) {
+function generateSeed(options: {
+  entropy?: Uint8Array,
+  algorithm?: 'ed25519' | 'secp256k1'
+} = {}) {
   assert(!options.entropy || options.entropy.length >= 16, 'entropy too short')
   const entropy = options.entropy ? options.entropy.slice(0, 16) : brorand(16)
   const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1'
@@ -99,7 +101,7 @@ function verify(messageHex, signature, publicKey) {
   return select(algorithm).verify(hexToBytes(messageHex), signature, publicKey)
 }
 
-function deriveAddressFromBytes(publicKeyBytes) {
+function deriveAddressFromBytes(publicKeyBytes: Buffer) {
   return addressCodec.encodeAccountID(
     utils.computePublicKeyHash(publicKeyBytes))
 }
@@ -114,11 +116,14 @@ function deriveNodeAddress(publicKey) {
   return deriveAddressFromBytes(accountPublicBytes)
 }
 
+const decodeSeed = addressCodec.decodeSeed
+
 module.exports = {
   generateSeed,
   deriveKeypair,
   sign,
   verify,
   deriveAddress,
-  deriveNodeAddress
+  deriveNodeAddress,
+  decodeSeed
 }

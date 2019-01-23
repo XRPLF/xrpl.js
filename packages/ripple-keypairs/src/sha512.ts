@@ -1,9 +1,10 @@
-'use strict' // eslint-disable-line strict
+import * as hashjs from 'hash.js'
+import * as BigNum from 'bn.js'
 
-const hashjs = require('hash.js')
-const BigNum = require('bn.js')
+export default class Sha512 {
+  // TODO: type of `hash`?
+  hash: any
 
-module.exports = class Sha512 {
   constructor() {
     this.hash = hashjs.sha512()
   }
