@@ -519,23 +519,170 @@ describe('RippleAPI', function () {
       })
     });
 
-    it('preparePayment - XRP to XRP no partial', function () {
-      assert.throws(() => {
-        this.api.preparePayment(address, requests.preparePayment.wrongPartial);
-      }, /XRP to XRP payments cannot be partial payments/);
+    describe('errors', function () {
+
+      const senderAddress = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+      const recipientAddress = 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo';
+
+      it('rejects promise and does not throw when payment object is invalid', function (done) {
+        const payment = {
+          source: {
+            address: senderAddress,
+            amount: { // instead of `maxAmount`
+              value: '1000',
+              currency: 'drops'
+            }
+          },
+          destination: {
+            address: recipientAddress,
+            amount: {
+              value: '1000',
+              currency: 'drops'
+            }
+          }
+        }
+        // Cannot use `assert.rejects` because then the test passes (with UnhandledPromiseRejectionWarning) even when it should not.
+        // See https://github.com/mochajs/mocha/issues/3097
+        try {
+          this.api.preparePayment(senderAddress, payment).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'payment must specify either (source.maxAmount and destination.amount) or (source.amount and destination.minAmount)');
+            done();
+          });
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
+
+      it('rejects promise and does not throw when field is missing', function (done) {
+        const payment = {
+          source: {
+            address: senderAddress
+            // `maxAmount` missing
+          },
+          destination: {
+            address: recipientAddress,
+            amount: {
+              value: '1000',
+              currency: 'drops'
+            }
+          }
+        }
+        // Cannot use `assert.rejects` because then the test passes (with UnhandledPromiseRejectionWarning) even when it should not.
+        // See https://github.com/mochajs/mocha/issues/3097
+        try {
+          this.api.preparePayment(senderAddress, payment).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'instance.payment.source is not exactly one from <sourceExactAdjustment>,<maxAdjustment>');
+            done();
+          });
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
+
+      it('rejects promise and does not throw when fee exceeds maxFeeXRP', function (done) {
+        const payment = {
+          source: {
+            address: senderAddress,
+            maxAmount: {
+              value: '1000',
+              currency: 'drops'
+            }
+          },
+          destination: {
+            address: recipientAddress,
+            amount: {
+              value: '1000',
+              currency: 'drops'
+            }
+          }
+        }
+        // Cannot use `assert.rejects` because then the test passes (with UnhandledPromiseRejectionWarning) even when it should not.
+        // See https://github.com/mochajs/mocha/issues/3097
+        try {
+          this.api.preparePayment(senderAddress, payment, {
+            fee: '3' // XRP
+          }).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'Fee of 3 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the RippleAPI constructor.');
+            done();
+          });
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
     });
 
-    it('preparePayment - address must match payment.source.address', function (
-    ) {
-      assert.throws(() => {
-        this.api.preparePayment(address, requests.preparePayment.wrongAddress);
-      }, /address must match payment.source.address/);
+    it('preparePayment - XRP to XRP no partial', function (done) {
+      try {
+        // Cannot return promise because we want/expect it to reject.
+        this.api.preparePayment(address, requests.preparePayment.wrongPartial).then(prepared => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'XRP to XRP payments cannot be partial payments');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      };
     });
 
-    it('preparePayment - wrong amount', function () {
-      assert.throws(() => {
-        this.api.preparePayment(address, requests.preparePayment.wrongAmount);
-      }, this.api.errors.ValidationError);
+    it('preparePayment - address must match payment.source.address', function (done) {
+      try {
+        // Cannot return promise because we want/expect it to reject.
+        this.api.preparePayment(address, requests.preparePayment.wrongAddress).then(prepared => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'address must match payment.source.address');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      };
+    });
+
+    it('preparePayment - wrong amount', function (done) {
+      try {
+        // Cannot return promise because we want/expect it to reject.
+        this.api.preparePayment(address, requests.preparePayment.wrongAmount).then(prepared => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'payment must specify either (source.maxAmount and destination.amount) or (source.amount and destination.minAmount)');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      };
+    });
+
+    it('preparePayment - throws when fee exceeds 2 XRP', function (done) {
+      const localInstructions = _.defaults({
+        fee: '2.1'
+      }, instructions);
+
+      try {
+        // Cannot return promise because we want/expect it to reject.
+        this.api.preparePayment(
+          address, requests.preparePayment.normal, localInstructions).then(prepared => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'Fee of 2.1 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the RippleAPI constructor.');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      };
     });
 
     it('preparePayment with all options specified', function () {
@@ -563,17 +710,6 @@ describe('RippleAPI', function () {
       return this.api.preparePayment(address, responses.getPaths.sendAll[0],
         instructions).then(_.partial(checkResult,
           responses.preparePayment.minAmount, 'prepare'));
-    });
-
-    it('preparePayment - throws when fee exceeds 2 XRP', function () {
-      const localInstructions = _.defaults({
-        fee: '2.1'
-      }, instructions);
-
-      assert.throws(() => {
-        this.api.preparePayment(
-          address, requests.preparePayment.normal, localInstructions)
-      }, /Fee of 2\.1 XRP exceeds max of 2 XRP\. To use this fee, increase `maxFeeXRP` in the RippleAPI constructor\./)
     });
 
     it('preparePayment - caps fee at 2 XRP by default', function () {
