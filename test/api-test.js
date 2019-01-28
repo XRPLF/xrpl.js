@@ -808,6 +808,22 @@ describe('RippleAPI', function () {
         'prepare'));
   });
 
+  it('prepareOrderCancellation - invalid', function (done) {
+    const request = requests.prepareOrderCancellation.withMemos;
+    delete request.orderSequence; // Make invalid
+    try {
+      this.api.prepareOrderCancellation(address, request).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.orderCancellation requires property "orderSequence"');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
+  });
+
   it('prepareTrustline - simple', function () {
     return this.api.prepareTrustline(
       address, requests.prepareTrustline.simple, instructions).then(
