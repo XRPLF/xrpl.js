@@ -122,7 +122,7 @@ function parseOutcome(tx: any): any|undefined {
 }
 
 function hexToString(hex: string): string|undefined {
-  return hex ? new Buffer(hex, 'hex').toString('utf-8') : undefined
+  return hex ? Buffer.from(hex, 'hex').toString('utf-8') : undefined
 }
 
 function parseMemos(tx: any): Array<Memo>|undefined {

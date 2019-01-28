@@ -18,5 +18,6 @@ export interface Ledger {
   hash?: string,
   close_flags?: number,
   parent_close_time?: number,
-  accountState?: any[]
+  accountState?: any[],
+  validated?: boolean
 }

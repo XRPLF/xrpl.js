@@ -59,6 +59,11 @@ function parseState(state) {
   return {rawState: JSON.stringify(state)}
 }
 
+/**
+ * @param {Ledger} ledger must be a *closed* ledger with valid `close_time` and `parent_close_time`
+ * @returns {FormattedLedger} formatted ledger
+ * @throws RangeError: Invalid time value (rippleTimeToISO8601)
+ */
 export function parseLedger(ledger: Ledger): FormattedLedger {
   const ledgerVersion = parseInt(ledger.ledger_index || ledger.seqNum, 10)
   return removeUndefined(Object.assign(

@@ -125,7 +125,6 @@ function removeUndefined<T extends object>(obj: T): T {
 /**
  * @param {Number} rpepoch (seconds since 1/1/2000 GMT)
  * @return {Number} ms since unix epoch
- *
  */
 function rippleToUnixTimestamp(rpepoch: number): number {
   return (rpepoch + 0x386D4380) * 1000
