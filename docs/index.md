@@ -4584,8 +4584,11 @@ const payment = {
     }
   }
 };
-return api.preparePayment(address, payment).then(prepared =>
-  {/* ... */});
+return api.preparePayment(address, payment).then(prepared => {
+    /* ... */
+  }).catch(error => {
+    /* ... as with all prepare* methods, use a Promise catch block to handle errors ... */
+  })
 ```
 
 

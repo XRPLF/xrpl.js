@@ -1,5 +1,53 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
+**BREAKING CHANGE:**
+
+The `prepare*` methods now reject the Promise when an error occurs.
+
+Previously, the methods would synchronously throw on validation errors, despite being asynchronous methods that return Promises.
+
+In other words, to handle errors in the past, you would need to use a try/catch block:
+
+```
+// OBSOLETE - no need for try/catch anymore
+try {
+  api.preparePayment(address, payment, instructions).then(prepared => {
+    res.send(prepared.txJSON);
+  }).catch(error => {
+    // Handle asynchronous error
+  });
+} catch (error) {
+    // Handle synchronous error
+}
+```
+
+Now, you can rely on the Promise's `catch` handler, which is called with the error when the Promise is rejected:
+
+```
+api.preparePayment(address, payment, instructions).then(prepared => {
+  res.send(prepared.txJSON);
+}).catch(error => {
+  // Handle error
+});
+```
+
+This applies to:
+* preparePayment
+* prepareTrustline
+* prepareOrder
+* prepareOrderCancellation
+* prepareSettings
+* prepareEscrowCreation
+* prepareEscrowExecution
+* prepareCheckCreate
+* prepareCheckCash
+* prepareCheckCancel
+* preparePaymentChannelCreate
+* preparePaymentChannelClaim
+* preparePaymentChannelFund
+
 ## 1.1.2 (2018-12-12)
 
 + Update `submit` response (#978)
