@@ -941,18 +941,34 @@ describe('RippleAPI', function () {
         'prepare'));
   });
 
-  it('prepareSettings - signers no threshold', function () {
+  it('prepareSettings - signers no threshold', function (done) {
     const settings = requests.prepareSettings.signers.noThreshold;
-    assert.throws(() => {
-      this.api.prepareSettings(address, settings, instructions);
-    }, this.api.errors.ValidationError);
+    try {
+      this.api.prepareSettings(address, settings, instructions).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.settings.signers requires property "threshold"');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
   });
 
-  it('prepareSettings - signers no weights', function () {
+  it('prepareSettings - signers no weights', function (done) {
     const settings = requests.prepareSettings.signers.noWeights;
-    assert.throws(() => {
-      this.api.prepareSettings(address, settings, instructions);
-    }, this.api.errors.ValidationError);
+    try {
+      this.api.prepareSettings(address, settings, instructions).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.settings.signers requires property "weights"');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
   });
 
   it('prepareSettings - fee for multisign', function () {
@@ -966,8 +982,10 @@ describe('RippleAPI', function () {
   });
 
   it('prepareSettings - invalid', function (done) {
-    const settings = requests.prepareSettings.domain;
-    settings.domain = 123; // domain must be a string
+    // domain must be a string
+    const settings = Object.assign({},
+      requests.prepareSettings.domain,
+      {domain: 123});
 
     const localInstructions = _.defaults({
       signersCount: 4
@@ -1006,7 +1024,7 @@ describe('RippleAPI', function () {
   });
 
   it('prepareEscrowCreation - invalid', function (done) {
-    const escrow = requests.prepareEscrowCreation.full;
+    const escrow = Object.assign({}, requests.prepareEscrowCreation.full);
     delete escrow.amount; // Make invalid
     try {
       this.api.prepareEscrowCreation(
@@ -1040,18 +1058,34 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
-  it('prepareEscrowExecution - no condition', function () {
-    assert.throws(() => {
+  it('prepareEscrowExecution - no condition', function (done) {
+    try {
       this.api.prepareEscrowExecution(address,
-        requests.prepareEscrowExecution.noCondition, instructions);
-    }, /"condition" and "fulfillment" fields on EscrowFinish must only be specified together./);
+        requests.prepareEscrowExecution.noCondition, instructions).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, '"condition" and "fulfillment" fields on EscrowFinish must only be specified together.');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
   });
 
-  it('prepareEscrowExecution - no fulfillment', function () {
-    assert.throws(() => {
+  it('prepareEscrowExecution - no fulfillment', function (done) {
+    try {
       this.api.prepareEscrowExecution(address,
-        requests.prepareEscrowExecution.noFulfillment, instructions);
-    }, /"condition" and "fulfillment" fields on EscrowFinish must only be specified together./);
+        requests.prepareEscrowExecution.noFulfillment, instructions).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, '"condition" and "fulfillment" fields on EscrowFinish must only be specified together.');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
   });
 
   it('prepareEscrowCancellation', function () {
