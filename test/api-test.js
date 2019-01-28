@@ -618,71 +618,71 @@ describe('RippleAPI', function () {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
         };
       });
-    });
 
-    it('preparePayment - XRP to XRP no partial', function (done) {
-      try {
-        // Cannot return promise because we want/expect it to reject.
-        this.api.preparePayment(address, requests.preparePayment.wrongPartial).then(prepared => {
-          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
-        }).catch(err => {
-          assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, 'XRP to XRP payments cannot be partial payments');
-          done();
-        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
-      } catch (err) {
-        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-      };
-    });
-
-    it('preparePayment - address must match payment.source.address', function (done) {
-      try {
-        // Cannot return promise because we want/expect it to reject.
-        this.api.preparePayment(address, requests.preparePayment.wrongAddress).then(prepared => {
-          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
-        }).catch(err => {
-          assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, 'address must match payment.source.address');
-          done();
-        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
-      } catch (err) {
-        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-      };
-    });
-
-    it('preparePayment - wrong amount', function (done) {
-      try {
-        // Cannot return promise because we want/expect it to reject.
-        this.api.preparePayment(address, requests.preparePayment.wrongAmount).then(prepared => {
-          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
-        }).catch(err => {
-          assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, 'payment must specify either (source.maxAmount and destination.amount) or (source.amount and destination.minAmount)');
-          done();
-        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
-      } catch (err) {
-        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-      };
-    });
-
-    it('preparePayment - throws when fee exceeds 2 XRP', function (done) {
-      const localInstructions = _.defaults({
-        fee: '2.1'
-      }, instructions);
-
-      try {
-        // Cannot return promise because we want/expect it to reject.
-        this.api.preparePayment(
-          address, requests.preparePayment.normal, localInstructions).then(prepared => {
-          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
-        }).catch(err => {
-          assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, 'Fee of 2.1 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the RippleAPI constructor.');
-          done();
-        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
-      } catch (err) {
-        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-      };
+      it('preparePayment - XRP to XRP no partial', function (done) {
+        try {
+          // Cannot return promise because we want/expect it to reject.
+          this.api.preparePayment(address, requests.preparePayment.wrongPartial).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'XRP to XRP payments cannot be partial payments');
+            done();
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
+  
+      it('preparePayment - address must match payment.source.address', function (done) {
+        try {
+          // Cannot return promise because we want/expect it to reject.
+          this.api.preparePayment(address, requests.preparePayment.wrongAddress).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'address must match payment.source.address');
+            done();
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
+  
+      it('preparePayment - wrong amount', function (done) {
+        try {
+          // Cannot return promise because we want/expect it to reject.
+          this.api.preparePayment(address, requests.preparePayment.wrongAmount).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'payment must specify either (source.maxAmount and destination.amount) or (source.amount and destination.minAmount)');
+            done();
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
+  
+      it('preparePayment - throws when fee exceeds 2 XRP', function (done) {
+        const localInstructions = _.defaults({
+          fee: '2.1'
+        }, instructions);
+  
+        try {
+          // Cannot return promise because we want/expect it to reject.
+          this.api.preparePayment(
+            address, requests.preparePayment.normal, localInstructions).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'Fee of 2.1 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the RippleAPI constructor.');
+            done();
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
     });
 
     it('preparePayment with all options specified', function () {
@@ -808,6 +808,23 @@ describe('RippleAPI', function () {
     return this.api.prepareTrustline(
       address, requests.prepareTrustline.complex, instructions).then(
         _.partial(checkResult, responses.prepareTrustline.complex, 'prepare'));
+  });
+
+  it('prepareTrustline - invalid', function (done) {
+    const trustline = requests.prepareTrustline.complex;
+    delete trustline.limit; // Make invalid
+    try {
+      this.api.prepareTrustline(
+        address, trustline, instructions).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.trustline requires property "limit"');
+        done();
+      });
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
   });
 
   it('prepareSettings', function () {
