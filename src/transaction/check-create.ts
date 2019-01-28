@@ -41,11 +41,15 @@ function prepareCheckCreate(address: string,
   checkCreate: CheckCreate,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareCheckCreate(
-    {address, checkCreate, instructions})
-  const txJSON = createCheckCreateTransaction(
-    address, checkCreate)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareCheckCreate(
+      {address, checkCreate, instructions})
+    const txJSON = createCheckCreateTransaction(
+      address, checkCreate)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareCheckCreate

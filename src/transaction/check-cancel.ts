@@ -22,11 +22,15 @@ function prepareCheckCancel(address: string,
   checkCancel: CheckCancel,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareCheckCancel(
-    {address, checkCancel, instructions})
-  const txJSON = createCheckCancelTransaction(
-    address, checkCancel)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareCheckCancel(
+      {address, checkCancel, instructions})
+    const txJSON = createCheckCancelTransaction(
+      address, checkCancel)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareCheckCancel
