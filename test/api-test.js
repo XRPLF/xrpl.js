@@ -1005,6 +1005,23 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
+  it('prepareEscrowCreation - invalid', function (done) {
+    const escrow = requests.prepareEscrowCreation.full;
+    delete escrow.amount; // Make invalid
+    try {
+      this.api.prepareEscrowCreation(
+        address, escrow).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.escrowCreation requires property "amount"');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
+  });
+
   it('prepareEscrowExecution', function () {
     return this.api.prepareEscrowExecution(
       address,
