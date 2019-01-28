@@ -1640,22 +1640,34 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
-  it('throws on preparePaymentChannelClaim with renew and close', function () {
-    assert.throws(() => {
+  it('rejects Promise on preparePaymentChannelClaim with renew and close', function (done) {
+    try {
       this.api.preparePaymentChannelClaim(
-        address, requests.preparePaymentChannelClaim.full).then(
-          _.partial(checkResult, responses.preparePaymentChannelClaim.full,
-            'prepare'));
-    }, this.api.errors.ValidationError);
+        address, requests.preparePaymentChannelClaim.full).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, '"renew" and "close" flags on PaymentChannelClaim are mutually exclusive');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
   });
 
-  it('throws on preparePaymentChannelClaim with no signature', function () {
-    assert.throws(() => {
+  it('rejects Promise on preparePaymentChannelClaim with no signature', function (done) {
+    try {
       this.api.preparePaymentChannelClaim(
-        address, requests.preparePaymentChannelClaim.noSignature).then(
-          _.partial(checkResult, responses.preparePaymentChannelClaim.noSignature,
-            'prepare'));
-    }, this.api.errors.ValidationError);
+        address, requests.preparePaymentChannelClaim.noSignature).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, '"signature" and "publicKey" fields on PaymentChannelClaim must only be specified together.');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
   });
 
   it('sign', function () {

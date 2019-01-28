@@ -41,11 +41,15 @@ function preparePaymentChannelCreate(address: string,
   paymentChannelCreate: PaymentChannelCreate,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.preparePaymentChannelCreate(
-    {address, paymentChannelCreate, instructions})
-  const txJSON = createPaymentChannelCreateTransaction(
-    address, paymentChannelCreate)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.preparePaymentChannelCreate(
+      {address, paymentChannelCreate, instructions})
+    const txJSON = createPaymentChannelCreateTransaction(
+      address, paymentChannelCreate)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default preparePaymentChannelCreate
