@@ -550,7 +550,7 @@ describe('RippleAPI', function () {
             assert.strictEqual(err.name, 'ValidationError');
             assert.strictEqual(err.message, 'payment must specify either (source.maxAmount and destination.amount) or (source.amount and destination.minAmount)');
             done();
-          });
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
         };
@@ -579,7 +579,7 @@ describe('RippleAPI', function () {
             assert.strictEqual(err.name, 'ValidationError');
             assert.strictEqual(err.message, 'instance.payment.source is not exactly one from <sourceExactAdjustment>,<maxAdjustment>');
             done();
-          });
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
         };
@@ -613,7 +613,7 @@ describe('RippleAPI', function () {
             assert.strictEqual(err.name, 'ValidationError');
             assert.strictEqual(err.message, 'Fee of 3 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the RippleAPI constructor.');
             done();
-          });
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
         };
@@ -769,6 +769,22 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.prepareOrder.sell, 'prepare'));
   });
 
+  it('prepareOrder - invalid', function (done) {
+    const request = requests.prepareOrder.sell;
+    delete request.direction; // Make invalid
+    try {
+      this.api.prepareOrder(address, request, instructions).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.order requires property "direction"');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
+  });
+
   it('prepareOrderCancellation', function () {
     const request = requests.prepareOrderCancellation.simple;
     return this.api.prepareOrderCancellation(address, request, instructions)
@@ -821,7 +837,7 @@ describe('RippleAPI', function () {
         assert.strictEqual(err.name, 'ValidationError');
         assert.strictEqual(err.message, 'instance.trustline requires property "limit"');
         done();
-      });
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
     };
