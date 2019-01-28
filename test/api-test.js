@@ -965,6 +965,28 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
+  it('prepareSettings - invalid', function (done) {
+    const settings = requests.prepareSettings.domain;
+    settings.domain = 123; // domain must be a string
+
+    const localInstructions = _.defaults({
+      signersCount: 4
+    }, instructions);
+
+    try {
+      this.api.prepareSettings(
+        address, settings, localInstructions).then(prepared => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.settings.domain is not of a type(s) string');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    };
+  });
+
   it('prepareEscrowCreation', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
