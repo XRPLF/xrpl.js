@@ -23,8 +23,11 @@ All "prepare*" methods have the same return type.
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
 const payment = <%- importFile('test/fixtures/requests/prepare-payment.json') %>;
-return api.preparePayment(address, payment).then(prepared =>
-  {/* ... */});
+return api.preparePayment(address, payment).then(prepared => {
+    /* ... */
+  }).catch(error => {
+    /* ... as with all prepare* methods, use a Promise catch block to handle errors ... */
+  })
 ```
 
 <%- renderFixture("responses/prepare-payment.json") %>

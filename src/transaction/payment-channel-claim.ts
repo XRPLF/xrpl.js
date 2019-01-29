@@ -62,11 +62,15 @@ function preparePaymentChannelClaim(address: string,
   paymentChannelClaim: PaymentChannelClaim,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.preparePaymentChannelClaim(
-    {address, paymentChannelClaim, instructions})
-  const txJSON = createPaymentChannelClaimTransaction(
-    address, paymentChannelClaim)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.preparePaymentChannelClaim(
+      {address, paymentChannelClaim, instructions})
+    const txJSON = createPaymentChannelClaimTransaction(
+      address, paymentChannelClaim)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default preparePaymentChannelClaim

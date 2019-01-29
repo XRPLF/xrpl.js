@@ -8,7 +8,7 @@ const AccountFields = utils.common.constants.AccountFields
 import {Instructions, Prepare} from './types'
 import {FormattedSettings, WeightedSigner} from '../common/types/objects'
 
-// Emptry string passed to setting will clear it
+// Empty string passed to setting will clear it
 const CLEAR_SETTING = null
 
 function setTransactionFlags(txJSON: any, values: FormattedSettings) {
@@ -43,7 +43,7 @@ function setTransactionFields(txJSON: object, input: FormattedSettings) {
 
     if (field.encoding === 'hex' && !field.length) {
       // This is currently only used for Domain field
-      value = new Buffer(value, 'ascii').toString('hex').toUpperCase()
+      value = Buffer.from(value, 'ascii').toString('hex').toUpperCase()
     }
 
     txJSON[fieldName] = value
@@ -125,9 +125,13 @@ function createSettingsTransaction(account: string, settings: FormattedSettings
 function prepareSettings(address: string, settings: FormattedSettings,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareSettings({address, settings, instructions})
-  const txJSON = createSettingsTransaction(address, settings)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareSettings({address, settings, instructions})
+    const txJSON = createSettingsTransaction(address, settings)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareSettings

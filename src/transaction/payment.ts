@@ -172,9 +172,13 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
 function preparePayment(address: string, payment: Payment,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.preparePayment({address, payment, instructions})
-  const txJSON = createPaymentTransaction(address, payment)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.preparePayment({address, payment, instructions})
+    const txJSON = createPaymentTransaction(address, payment)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default preparePayment

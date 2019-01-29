@@ -20,9 +20,13 @@ function createOrderCancellationTransaction(account: string,
 function prepareOrderCancellation(address: string, orderCancellation: object,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareOrderCancellation({address, orderCancellation, instructions})
-  const txJSON = createOrderCancellationTransaction(address, orderCancellation)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareOrderCancellation({address, orderCancellation, instructions})
+    const txJSON = createOrderCancellationTransaction(address, orderCancellation)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareOrderCancellation

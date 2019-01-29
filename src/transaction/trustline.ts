@@ -53,9 +53,13 @@ function createTrustlineTransaction(account: string,
 function prepareTrustline(address: string,
   trustline: FormattedTrustlineSpecification, instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareTrustline({address, trustline, instructions})
-  const txJSON = createTrustlineTransaction(address, trustline)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareTrustline({address, trustline, instructions})
+    const txJSON = createTrustlineTransaction(address, trustline)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareTrustline

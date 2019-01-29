@@ -44,11 +44,15 @@ function prepareEscrowExecution(address: string,
   escrowExecution: EscrowExecution,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareEscrowExecution(
-    {address, escrowExecution, instructions})
-  const txJSON = createEscrowExecutionTransaction(
-    address, escrowExecution)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareEscrowExecution(
+      {address, escrowExecution, instructions})
+    const txJSON = createEscrowExecutionTransaction(
+      address, escrowExecution)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareEscrowExecution

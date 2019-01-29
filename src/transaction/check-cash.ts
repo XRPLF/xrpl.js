@@ -40,11 +40,15 @@ function prepareCheckCash(address: string,
   checkCash: CheckCash,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareCheckCash(
-    {address, checkCash, instructions})
-  const txJSON = createCheckCashTransaction(
-    address, checkCash)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareCheckCash(
+      {address, checkCash, instructions})
+    const txJSON = createCheckCashTransaction(
+      address, checkCash)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareCheckCash

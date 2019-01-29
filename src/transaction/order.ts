@@ -47,9 +47,13 @@ function createOrderTransaction(
 function prepareOrder(address: string, order: FormattedOrderSpecification,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareOrder({address, order, instructions})
-  const txJSON = createOrderTransaction(address, order)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareOrder({address, order, instructions})
+    const txJSON = createOrderTransaction(address, order)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareOrder
