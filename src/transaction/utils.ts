@@ -81,7 +81,7 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
           (txJSON.TransactionType !== 'EscrowFinish' ||
             txJSON.Fulfillment === undefined) ? 0 :
             (cushion * feeRef * (32 + Math.floor(
-              new Buffer(txJSON.Fulfillment, 'hex').length / 16)))
+              Buffer.from(txJSON.Fulfillment, 'hex').length / 16)))
         const feeDrops = common.xrpToDrops(fee)
         const maxFeeXRP = instructions.maxFee ?
           BigNumber.min(api._maxFeeXRP, instructions.maxFee) : api._maxFeeXRP
@@ -114,7 +114,7 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
 }
 
 function convertStringToHex(string: string): string {
-return new Buffer(string, 'utf8').toString('hex').toUpperCase()
+return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
 }
 
 function convertMemo(memo: Memo): {Memo: ApiMemo} {

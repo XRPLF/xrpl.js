@@ -268,7 +268,7 @@ class Connection extends EventEmitter {
       options.agent = new HttpsProxyAgent(proxyOptions)
     }
     if (this._authorization !== undefined) {
-      const base64 = new Buffer(this._authorization).toString('base64')
+      const base64 = Buffer.from(this._authorization).toString('base64')
       options.headers = {Authorization: `Basic ${base64}`}
     }
     const optionsOverrides = _.omitBy({

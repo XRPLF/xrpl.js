@@ -5,7 +5,7 @@ const AccountFields = constants.AccountFields
 
 function parseField(info, value) {
   if (info.encoding === 'hex' && !info.length) { // e.g. "domain"
-    return new Buffer(value, 'hex').toString('ascii')
+    return Buffer.from(value, 'hex').toString('ascii')
   }
   if (info.shift) {
     return (new BigNumber(value)).shift(-info.shift).toNumber()

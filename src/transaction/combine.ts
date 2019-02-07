@@ -7,7 +7,7 @@ import {validate} from '../common'
 import {computeBinaryTransactionHash} from 'ripple-hashes'
 
 function addressToBigNumber(address) {
-  const hex = (new Buffer(decodeAddress(address))).toString('hex')
+  const hex = (Buffer.from(decodeAddress(address))).toString('hex')
   return new BigNumber(hex, 16)
 }
 

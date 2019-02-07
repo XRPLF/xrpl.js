@@ -4,4 +4,3 @@ export {
   deriveKeypair,
   deriveAddress
 }
-
