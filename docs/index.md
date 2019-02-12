@@ -4475,7 +4475,7 @@ console.log(JSON.stringify(flags, null, 2))
 
 ## prepareTransaction
 
-`prepareTransaction(address: string, transaction: object, instructions: object): Promise<object>`
+`prepareTransaction(transaction: object, instructions: object): Promise<object>`
 
 Prepare a transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
