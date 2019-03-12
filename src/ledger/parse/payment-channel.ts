@@ -4,6 +4,7 @@ import {PayChannelLedgerEntry} from '../../common/types/objects'
 
 export type FormattedPaymentChannel = {
   account: string,
+  amount: string,
   balance: string,
   publicKey: string,
   destination: string,
