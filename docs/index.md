@@ -293,7 +293,7 @@ Type | Description
 [escrowCancellation](#escrow-cancellation) | An `escrowCancellation` transaction unlocks the funds in an escrow and sends them back to the creator of the escrow, but it will only work after the escrow expires.
 [escrowExecution](#escrow-execution) | An `escrowExecution` transaction unlocks the funds in an escrow and sends them to the destination of the escrow, but it will only work if the cryptographic condition is provided.
 [checkCreate](#check-create) | A `checkCreate` transaction creates a check on the ledger, which is a deferred payment that can be cashed by its intended destination.
-[checkCancel](#check-cancel) | A `checkCancel` transaction cancels an unreedemed Check, removing it from the ledger without sending any money.
+[checkCancel](#check-cancel) | A `checkCancel` transaction cancels an unredeemed Check, removing it from the ledger without sending any money.
 [checkCash](#check-cash) | A `checkCash` transaction redeems a Check to receive up to the amount authorized by the corresponding `checkCreate` transaction. Only the `destination` address of a Check can cash it.
 [paymentChannelCreate](#payment-channel-create) | A `paymentChannelCreate` transaction opens a payment channel between two addresses with XRP set aside for asynchronous payments.
 [paymentChannelFund](#payment-channel-fund) | A `paymentChannelFund` transaction adds XRP to a payment channel and optionally sets a new expiration for the channel.
@@ -339,7 +339,7 @@ maxLedgerVersionOffset | integer | *Optional* Offset from current validated ledg
 sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
 signersCount | integer | *Optional* Number of signers that will be signing this transaction.
 
-We recommend that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the XRP Ledger's consensus-validated ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare\*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare\*" method.
+We recommend that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeed in the future. It is impossible for a transaction to succeed after the XRP Ledger's consensus-validated ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare\*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare\*" method.
 
 ## Transaction ID
 
@@ -5487,7 +5487,7 @@ Name | Type | Description
 ---- | ---- | -----------
 resultCode | string | Deprecated: Use `engine_result` instead.
 resultMessage | string | Deprecated: Use `engine_result_message` instead.
-engine_result | string | Code indicating the preliminary result of the transaction, for example tesSUCCESS. [List of transaction responses](https://ripple.com/build/transactions/#full-transaction-response-list)
+engine_result | string | Code indicating the preliminary result of the transaction, for example `tesSUCCESS`. [List of transaction responses](https://developers.ripple.com/transaction-results.html)
 engine_result_code | integer | Numeric code indicating the preliminary result of the transaction, directly correlated to `engine_result`
 engine_result_message | string | Human-readable explanation of the transaction's preliminary result.
 tx_blob | string | The complete transaction in hex string format.
