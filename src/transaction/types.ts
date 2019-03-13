@@ -7,7 +7,12 @@ import {
   Memo,
   FormattedSettings
 } from '../common/types/objects'
-import {ApiMemo} from './utils'
+import {
+  ApiMemo,
+  TransactionJSON
+} from './utils'
+
+export type TransactionJSON = TransactionJSON
 
 export type Instructions = {
   sequence?: number,
@@ -37,7 +42,7 @@ export type Submit = {
   txJson?: object
 }
 
-export interface OfferCreateTransaction {
+export interface OfferCreateTransaction extends TransactionJSON {
   TransactionType: 'OfferCreate',
   Account: string,
   Fee: string,
@@ -48,7 +53,11 @@ export interface OfferCreateTransaction {
   TakerPays: RippledAmount,
   Expiration?: number,
   OfferSequence?: number,
-  Memos: {Memo: ApiMemo}[]
+  Memos?: {Memo: ApiMemo}[]
+}
+
+export interface SettingsTransaction extends TransactionJSON {
+  TransferRate?: number
 }
 
 export type KeyPair = {

@@ -16,8 +16,8 @@ export type PaymentChannelClaim = {
 
 function createPaymentChannelClaimTransaction(account: string,
   claim: PaymentChannelClaim
-): object {
-  const txJSON: any = {
+): utils.TransactionJSON {
+  const txJSON: utils.TransactionJSON = {
     Account: account,
     TransactionType: 'PaymentChannelClaim',
     Channel: claim.channel,

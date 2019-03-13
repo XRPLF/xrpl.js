@@ -14,7 +14,7 @@ export type PaymentChannelCreate = {
 
 function createPaymentChannelCreateTransaction(account: string,
   paymentChannel: PaymentChannelCreate
-): object {
+): utils.TransactionJSON {
   const txJSON: any = {
     Account: account,
     TransactionType: 'PaymentChannelCreate',

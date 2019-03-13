@@ -1,9 +1,8 @@
-import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import * as utils from './utils'
 const validate = utils.common.validate
 const trustlineFlags = utils.common.txFlags.TrustSet
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {
   FormattedTrustlineSpecification
 } from '../common/types/objects/trustlines'
@@ -14,7 +13,7 @@ function convertQuality(quality) {
 
 function createTrustlineTransaction(account: string,
   trustline: FormattedTrustlineSpecification
-): object {
+): TransactionJSON {
   const limit = {
     currency: trustline.currency,
     issuer: trustline.counterparty,
@@ -45,7 +44,7 @@ function createTrustlineTransaction(account: string,
       trustlineFlags.SetFreeze : trustlineFlags.ClearFreeze
   }
   if (trustline.memos !== undefined) {
-    txJSON.Memos = _.map(trustline.memos, utils.convertMemo)
+    txJSON.Memos = trustline.memos.map(utils.convertMemo)
   }
   return txJSON
 }

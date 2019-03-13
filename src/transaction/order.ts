@@ -1,4 +1,3 @@
-import * as _ from 'lodash'
 import * as utils from './utils'
 const offerFlags = utils.common.txFlags.OfferCreate
 import {validate, iso8601ToRippleTime} from '../common'
@@ -39,7 +38,7 @@ function createOrderTransaction(
     txJSON.OfferSequence = order.orderToReplace
   }
   if (order.memos !== undefined) {
-    txJSON.Memos = _.map(order.memos, utils.convertMemo)
+    txJSON.Memos = order.memos.map(utils.convertMemo)
   }
   return txJSON as OfferCreateTransaction
 }

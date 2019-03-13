@@ -124,3 +124,6 @@ _.partial(schemaValidate, 'api-options')
 
 export const instructions =
 _.partial(schemaValidate, 'instructions')
+
+export const tx_json =
+_.partial(schemaValidate, 'tx-json')

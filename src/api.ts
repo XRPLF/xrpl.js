@@ -71,7 +71,7 @@ import * as transactionUtils from './transaction/utils'
 import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
-import {Instructions, Prepare} from './transaction/types'
+import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 
 export type APIOptions = {
   server?: string,
@@ -210,7 +210,7 @@ class RippleAPI extends EventEmitter {
    *
    * You can later submit the transaction with `submit()`.
    */
-  async prepareTransaction(txJSON: object, instructions: Instructions = {}):
+  async prepareTransaction(txJSON: TransactionJSON, instructions: Instructions = {}):
     Promise<Prepare> {
     return transactionUtils.prepareTransaction(txJSON, this, instructions)
   }

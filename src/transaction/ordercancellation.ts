@@ -1,18 +1,17 @@
-import * as _ from 'lodash'
 import * as utils from './utils'
 const validate = utils.common.validate
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 
 function createOrderCancellationTransaction(account: string,
   orderCancellation: any
-): object {
+): TransactionJSON {
   const txJSON: any = {
     TransactionType: 'OfferCancel',
     Account: account,
     OfferSequence: orderCancellation.orderSequence
   }
   if (orderCancellation.memos !== undefined) {
-    txJSON.Memos = _.map(orderCancellation.memos, utils.convertMemo)
+    txJSON.Memos = orderCancellation.memos.map(utils.convertMemo)
   }
   return txJSON
 }
