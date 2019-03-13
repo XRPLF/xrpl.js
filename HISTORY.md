@@ -2,6 +2,22 @@
 
 ## UNRELEASED
 
+### New in rippled 1.2.1
+
+As this is the first release of ripple-lib following the release of rippled 1.2.1, we would like to highlight the following API improvements:
+
+1. The [`delivered_amount` field](https://developers.ripple.com/partial-payments.html#the-delivered-amount-field) has been added to the `ledger` method, and to transaction subscriptions.
+
+    api.getLedger({includeTransactions: true, includeAllData: true, ledgerVersion: 17718771}).then(...)
+
+You can also call `ledger` directly:
+
+    request('ledger', {...}).then(...)
+
+2. [Support for Ed25519 seeds encoded using ripple-lib](https://github.com/ripple/rippled/pull/2734)
+
+You have access to these improvements when you use a rippled server running version 1.2.1 or later. At the time of writing, we recommend using rippled version **1.2.2** or later.
+
 **BREAKING CHANGE:**
 
 The `prepare*` methods now reject the Promise when an error occurs.
