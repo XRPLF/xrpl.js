@@ -5491,7 +5491,7 @@ engine_result | string | Code indicating the preliminary result of the transacti
 engine_result_code | integer | Numeric code indicating the preliminary result of the transaction, directly correlated to `engine_result`
 engine_result_message | string | Human-readable explanation of the transaction's preliminary result.
 tx_blob | string | The complete transaction in hex string format.
-tx_json | [tx](https://ripple.com/build/transactions/) | The complete transaction in JSON format.
+tx_json | [tx-json](https://ripple.com/build/transactions/) | The complete transaction in JSON format.
 
 ### Example
 

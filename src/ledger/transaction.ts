@@ -4,7 +4,7 @@ import parseTransaction from './parse/transaction'
 import {validate, errors} from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
-import { RippledError } from '../common/errors';
+import {RippledError} from '../common/errors'
 
 export type TransactionOptions = {
   minLedgerVersion?: number,
