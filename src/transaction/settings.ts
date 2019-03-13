@@ -7,9 +7,6 @@ const AccountFields = utils.common.constants.AccountFields
 import {Instructions, Prepare, SettingsTransaction} from './types'
 import {FormattedSettings, WeightedSigner} from '../common/types/objects'
 
-// Empty string passed to setting will clear it
-const CLEAR_SETTING = null
-
 function setTransactionFlags(txJSON: utils.TransactionJSON, values: FormattedSettings) {
   const keys = Object.keys(values)
   assert(keys.length === 1, 'ERROR: can only set one setting per transaction')
@@ -37,7 +34,7 @@ function setTransactionFields(txJSON: utils.TransactionJSON, input: FormattedSet
     }
 
     // The value required to clear an account root field varies
-    if (value === CLEAR_SETTING && field.hasOwnProperty('defaults')) {
+    if (value === null && field.hasOwnProperty('defaults')) {
       value = field.defaults
     }
 
