@@ -25,6 +25,7 @@ function setTransactionFlags(txJSON: utils.TransactionJSON, values: FormattedSet
   }
 }
 
+// Sets `null` fields to their `default`.
 function setTransactionFields(txJSON: utils.TransactionJSON, input: FormattedSettings) {
   const fieldSchema = AccountFields
   for (const fieldName in fieldSchema) {
@@ -62,7 +63,7 @@ function setTransactionFields(txJSON: utils.TransactionJSON, input: FormattedSet
  *                           are returned
  */
 
-function convertTransferRate(transferRate: number | null): number {
+function convertTransferRate(transferRate: number): number {
   return (new BigNumber(transferRate)).shift(9).toNumber()
 }
 
@@ -106,7 +107,7 @@ function createSettingsTransactionWithoutMemos(
   const settingsWithoutMemos = Object.assign({}, settings)
   delete settingsWithoutMemos.memos
   setTransactionFlags(txJSON, settingsWithoutMemos)
-  setTransactionFields(txJSON, settings)
+  setTransactionFields(txJSON, settings) // Sets `null` fields to their `default`.
 
   if (txJSON.TransferRate !== undefined) {
     txJSON.TransferRate = convertTransferRate(txJSON.TransferRate)
