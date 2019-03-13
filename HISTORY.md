@@ -2,9 +2,17 @@
 
 ## UNRELEASED
 
-**BREAKING CHANGE:**
+**BUG FIXES:**
 
-The `prepare*` methods now reject the Promise when an error occurs.
+### `prepareTransaction` does not overwrite the `Sequence` field
+
+The `prepareTransaction` method now allows `Sequence` to be set in the Transaction JSON object, instead of overwriting it with the account's expected sequence based on the state of the ledger.
+
+Previously, you had to use the `sequence` field in the `instructions` object to manually set a transaction's sequence number.
+
+### `prepare*` methods reject the Promise on error
+
+The `prepare*` methods now always reject the Promise when an error occurs, instead of throwing.
 
 Previously, the methods would synchronously throw on validation errors, despite being asynchronous methods that return Promises.
 
