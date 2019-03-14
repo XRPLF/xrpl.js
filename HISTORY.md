@@ -2,6 +2,42 @@
 
 ## UNRELEASED
 
+### Improved `RippledError` `message`
+
+Previously, `RippledErrors` (errors from rippled) used rippled's `error` field as the `message`.
+
+Now, the `error_message` field is used as the `message`.
+
+This helps to surface the specific cause of an error.
+
+For example, before:
+```
+[RippledError(invalidParams, { error: 'invalidParams',
+  error_code: 31,
+  error_message: 'Missing field \'account\'.',
+  id: 3,
+  request: { command: 'account_info', id: 3 },
+  status: 'error',
+  type: 'response' })]
+```
+
+After:
+```
+[RippledError(Missing field 'account'., { error: 'invalidParams',
+  error_code: 31,
+  error_message: 'Missing field \'account\'.',
+  id: 3,
+  request: { command: 'account_info', id: 3 },
+  status: 'error',
+  type: 'response' })]
+```
+
+In this case, you can see at a glance that `account` is the missing field.
+
+The `error` field is still available in `errorObject.data.error`.
+
+When `error_message` is not set (as with e.g. error 'entryNotFound'), the `error` field is used as the `message`.
+
 **BUG FIXES:**
 
 ### `prepareTransaction` does not overwrite the `Sequence` field

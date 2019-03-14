@@ -253,8 +253,6 @@ module.exports = function createMockRippled(port) {
       });
       conn.send(createResponse(request, response));
     } else {
-      // assert(false, 'Unrecognized account address: ' + request.account);
-
       const response = Object.assign({}, {
         account: request.account,
         error: 'actNotFound',
@@ -263,9 +261,12 @@ module.exports = function createMockRippled(port) {
         id: 2,
         ledger_current_index: 17714714,
         request:
+
+        // This will be inaccurate, but that's OK because this is just a mock rippled
         { account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
           command: 'account_info',
           id: 2 },
+
         status: 'error',
         type: 'response',
         validated: false

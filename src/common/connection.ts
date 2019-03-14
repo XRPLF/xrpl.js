@@ -445,27 +445,6 @@ class Connection extends EventEmitter {
 
       this.once(eventName, response => {
         if (response.status === 'error') {
-          // Changed in 1.2.0:
-          //   Before:
-          //     [RippledError(invalidParams, { error: 'invalidParams',
-          //     error_code: 31,
-          //     error_message: 'Missing field \'account\'.',
-          //     id: 3,
-          //     request: { command: 'account_info', id: 3 },
-          //     status: 'error',
-          //     type: 'response' })]
-          //   After:
-          //     [RippledError(Missing field 'account'., { error: 'invalidParams',
-          //     error_code: 31,
-          //     error_message: 'Missing field \'account\'.',
-          //     id: 3,
-          //     request: { command: 'account_info', id: 3 },
-          //     status: 'error',
-          //     type: 'response' })]
-          // This change helps to surface the specific cause of the error.
-          // The `error` field is still available in `errorObject.data.error`.
-          // In case `error_message` is not set (as with e.g. error 'entryNotFound'),
-          //   continue to use `error`.
           _reject(new RippledError(response.error_message || response.error, response))
         } else if (response.status === 'success') {
           _resolve(response.result)

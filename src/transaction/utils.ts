@@ -126,16 +126,6 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
       txJSON.Sequence = response.account_data.Sequence
       return Promise.resolve(txJSON)
     } catch (e) {
-      // Example error from rippled for account === undefined:
-      //   {
-      //     error: 'invalidParams',
-      //     error_code: 31,
-      //     error_message: 'Missing field \'account\'.',
-      //     id: 3,
-      //     request: { command: 'account_info', id: 3 },
-      //     status: 'error',
-      //     type: 'response'
-      //   }
       return Promise.reject(e)
     }
   }

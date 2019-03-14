@@ -62,17 +62,14 @@ function isTransactionInRange(tx: any, options: TransactionOptions) {
 function convertError(connection: Connection, options: TransactionOptions,
   error: RippledError
 ): Promise<Error> {
-  const _error = ((error.data && error.data.error === 'txnNotFound')
+  let shouldUseNotFoundError = false
+  if ((error.data && error.data.error === 'txnNotFound') || error.message === 'txnNotFound') {
+    shouldUseNotFoundError = true
+  }
 
-      // Deprecated in ripple-lib 1.2.0
-      || error.message === 'txnNotFound'
+  // In the future, we should deprecate this error, instead passing through the one from rippled.
+  const _error = shouldUseNotFoundError ? new errors.NotFoundError('Transaction not found') : error
 
-      ) ?
-
-    // In the future, we should deprecate this error in favor of passing through the one from rippled.
-    new errors.NotFoundError('Transaction not found') :
-
-    error
   if (_error instanceof errors.NotFoundError) {
     return utils.hasCompleteLedgerRange(connection, options.minLedgerVersion,
       options.maxLedgerVersion).then(hasCompleteLedgerRange => {
