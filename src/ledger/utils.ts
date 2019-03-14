@@ -76,7 +76,7 @@ function signum(num) {
  *  Order two rippled transactions based on their ledger_index.
  *  If two transactions took place in the same ledger, sort
  *  them based on TransactionIndex
- *  See: https://ripple.com/build/transactions/
+ *  See: https://developers.ripple.com/transaction-metadata.html
  */
 function compareTransactions(
   first: FormattedTransactionType, second: FormattedTransactionType

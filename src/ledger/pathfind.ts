@@ -46,9 +46,7 @@ function requestPathFind(connection: Connection, pathfind: PathFind
       && !request.destination_amount.issuer) {
     // Convert blank issuer to sender's address
     // (Ripple convention for 'any issuer')
-    // https://ripple.com/build/transactions/
-    //     #special-issuer-values-for-sendmax-and-amount
-    // https://ripple.com/build/ripple-rest/#counterparties-in-payments
+    // https://developers.ripple.com/payment.html#special-issuer-values-for-sendmax-and-amount
     request.destination_amount.issuer = request.destination_account
   }
   if (pathfind.source.currencies && pathfind.source.currencies.length > 0) {
