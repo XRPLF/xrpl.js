@@ -54,11 +54,11 @@ As this is the first release of ripple-lib following the release of rippled 1.2.
 
 1. The [`delivered_amount` field](https://developers.ripple.com/partial-payments.html#the-delivered-amount-field) has been added to the `ledger` method, and to transaction subscriptions.
 
-    api.getLedger({includeTransactions: true, includeAllData: true, ledgerVersion: 17718771}).then(...)
+        api.getLedger({includeTransactions: true, includeAllData: true, ledgerVersion: 17718771}).then(...)
 
-You can also call `ledger` directly:
+    You can also call `ledger` directly:
 
-    request('ledger', {...}).then(...)
+        request('ledger', {...}).then(...)
 
 2. [Support for Ed25519 seeds encoded using ripple-lib](https://github.com/ripple/rippled/pull/2734)
 
