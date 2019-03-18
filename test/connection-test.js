@@ -396,7 +396,8 @@ describe('Connection', function() {
   it('propagates RippledError data', function(done) {
     this.api.request('subscribe', {streams: 'validations'}).catch(error => {
       assert.strictEqual(error.name, 'RippledError')
-      assert.strictEqual(error.message, 'invalidParams')
+      assert.strictEqual(error.data.error, 'invalidParams')
+      assert.strictEqual(error.message, 'Invalid parameters.')
       assert.strictEqual(error.data.error_code, 31)
       assert.strictEqual(error.data.error_message, 'Invalid parameters.')
       assert.deepEqual(error.data.request, { command: 'subscribe', id: 0, streams: 'validations' })

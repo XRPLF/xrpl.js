@@ -4,6 +4,7 @@ import parseTransaction from './parse/transaction'
 import {validate, errors} from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
+import {RippledError} from '../common/errors'
 
 export type TransactionOptions = {
   minLedgerVersion?: number,
@@ -59,10 +60,16 @@ function isTransactionInRange(tx: any, options: TransactionOptions) {
 }
 
 function convertError(connection: Connection, options: TransactionOptions,
-  error: Error
+  error: RippledError
 ): Promise<Error> {
-  const _error = (error.message === 'txnNotFound') ?
-    new errors.NotFoundError('Transaction not found') : error
+  let shouldUseNotFoundError = false
+  if ((error.data && error.data.error === 'txnNotFound') || error.message === 'txnNotFound') {
+    shouldUseNotFoundError = true
+  }
+
+  // In the future, we should deprecate this error, instead passing through the one from rippled.
+  const _error = shouldUseNotFoundError ? new errors.NotFoundError('Transaction not found') : error
+
   if (_error instanceof errors.NotFoundError) {
     return utils.hasCompleteLedgerRange(connection, options.minLedgerVersion,
       options.maxLedgerVersion).then(hasCompleteLedgerRange => {

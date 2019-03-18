@@ -1,10 +1,10 @@
 import * as utils from './utils'
 const toRippledAmount = utils.common.toRippledAmount
 import {validate, iso8601ToRippleTime} from '../common'
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {Amount} from '../common/types/objects'
 
-export type CheckCreate = {
+export type CheckCreateParameters = {
   destination: string,
   sendMax: Amount,
   destinationTag?: number,
@@ -13,8 +13,8 @@ export type CheckCreate = {
 }
 
 function createCheckCreateTransaction(account: string,
-  check: CheckCreate
-): object {
+  check: CheckCreateParameters
+): TransactionJSON {
   const txJSON: any = {
     Account: account,
     TransactionType: 'CheckCreate',
@@ -38,7 +38,7 @@ function createCheckCreateTransaction(account: string,
 }
 
 function prepareCheckCreate(address: string,
-  checkCreate: CheckCreate,
+  checkCreate: CheckCreateParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {

@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import * as common from '../common'
-import {Memo} from '../common/types/objects'
+import {Memo, RippledAmount} from '../common/types/objects'
 const txFlags = common.txFlags
 import {Instructions, Prepare} from './types'
 import {RippleAPI} from '../api'
@@ -10,6 +10,15 @@ export type ApiMemo = {
   MemoData?: string,
   MemoType?: string,
   MemoFormat?: string
+}
+
+export type TransactionJSON = {
+  Account: string,
+  TransactionType: string,
+  Memos?: {Memo: ApiMemo}[],
+  Flags?: number,
+  Fulfillment?: string,
+  [Field: string]: string | number | Array<any> | RippledAmount
 }
 
 function formatPrepareResponse(txJSON: any): Prepare {
@@ -37,10 +46,11 @@ function scaleValue(value, multiplier, extra = 0) {
   return (new BigNumber(value)).times(multiplier).plus(extra).toString()
 }
 
-function prepareTransaction(txJSON: any, api: RippleAPI,
+function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
   instructions: Instructions
 ): Promise<Prepare> {
   common.validate.instructions(instructions)
+  common.validate.tx_json(txJSON)
 
   const account = txJSON.Account
   setCanonicalFlag(txJSON)
@@ -96,14 +106,28 @@ function prepareTransaction(txJSON: any, api: RippleAPI,
 
   async function prepareSequence(): Promise<object> {
     if (instructions.sequence !== undefined) {
-      txJSON.Sequence = instructions.sequence
+      if (txJSON.Sequence === undefined || instructions.sequence === txJSON.Sequence) {
+        txJSON.Sequence = instructions.sequence
+        return Promise.resolve(txJSON)
+      } else {
+        // Both txJSON.Sequence and instructions.sequence are defined, and they are NOT equal
+        return Promise.reject(new ValidationError('`Sequence` in txJSON must match `sequence` in Instructions'))
+      }
+    }
+    if (txJSON.Sequence !== undefined) {
       return Promise.resolve(txJSON)
     }
-    const response = await api.request('account_info', {
-      account: account as string
-    })
-    txJSON.Sequence = response.account_data.Sequence
-    return txJSON
+
+    try {
+      // Consider requesting from the 'current' ledger (instead of 'validated').
+      const response = await api.request('account_info', {
+        account
+      })
+      txJSON.Sequence = response.account_data.Sequence
+      return Promise.resolve(txJSON)
+    } catch (e) {
+      return Promise.reject(e)
+    }
   }
 
   return Promise.all([

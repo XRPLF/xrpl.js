@@ -2,18 +2,18 @@ import * as utils from './utils'
 const ValidationError = utils.common.errors.ValidationError
 const toRippledAmount = utils.common.toRippledAmount
 import {validate} from '../common'
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {Amount} from '../common/types/objects'
 
-export type CheckCash = {
+export type CheckCashParameters = {
   checkID: string,
   amount?: Amount,
   deliverMin?: Amount
 }
 
 function createCheckCashTransaction(account: string,
-  checkCash: CheckCash
-): object {
+  checkCash: CheckCashParameters
+): TransactionJSON {
   if (checkCash.amount && checkCash.deliverMin) {
     throw new ValidationError('"amount" and "deliverMin" properties on '
       + 'CheckCash are mutually exclusive')
@@ -37,7 +37,7 @@ function createCheckCashTransaction(account: string,
 }
 
 function prepareCheckCash(address: string,
-  checkCash: CheckCash,
+  checkCash: CheckCashParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {

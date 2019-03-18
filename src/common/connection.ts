@@ -445,7 +445,7 @@ class Connection extends EventEmitter {
 
       this.once(eventName, response => {
         if (response.status === 'error') {
-          _reject(new RippledError(response.error, response))
+          _reject(new RippledError(response.error_message || response.error, response))
         } else if (response.status === 'success') {
           _resolve(response.result)
         } else {

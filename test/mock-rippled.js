@@ -238,11 +238,40 @@ module.exports = function createMockRippled(port) {
     } else if (request.account === addresses.NOTFOUND) {
       conn.send(createResponse(request, fixtures.account_info.notfound));
     } else if (request.account === addresses.THIRD_ACCOUNT) {
-      const response = _.assign({}, fixtures.account_info.normal);
+      const response = Object.assign({}, fixtures.account_info.normal);
       response.Account = addresses.THIRD_ACCOUNT;
       conn.send(createResponse(request, response));
+    } else if (request.account === undefined) {
+      const response = Object.assign({}, {
+        error: 'invalidParams',
+        error_code: 31,
+        error_message: 'Missing field \'account\'.',
+        id: 2,
+        request: { command: 'account_info', id: 2 },
+        status: 'error',
+        type: 'response'
+      });
+      conn.send(createResponse(request, response));
     } else {
-      assert(false, 'Unrecognized account address: ' + request.account);
+      const response = Object.assign({}, {
+        account: request.account,
+        error: 'actNotFound',
+        error_code: 19,
+        error_message: 'Account not found.',
+        id: 2,
+        ledger_current_index: 17714714,
+        request:
+
+        // This will be inaccurate, but that's OK because this is just a mock rippled
+        { account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
+          command: 'account_info',
+          id: 2 },
+
+        status: 'error',
+        type: 'response',
+        validated: false
+      });
+      conn.send(createResponse(request, response));
     }
   });
 

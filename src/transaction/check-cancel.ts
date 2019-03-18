@@ -1,14 +1,14 @@
-import * as utils from './utils'
+import {TransactionJSON, prepareTransaction} from './utils'
 import {validate} from '../common'
 import {Instructions, Prepare} from './types'
 
-export type CheckCancel = {
+export type CheckCancelParameters = {
   checkID: string
 }
 
 function createCheckCancelTransaction(account: string,
-  cancel: CheckCancel
-): object {
+  cancel: CheckCancelParameters
+): TransactionJSON {
   const txJSON = {
     Account: account,
     TransactionType: 'CheckCancel',
@@ -19,7 +19,7 @@ function createCheckCancelTransaction(account: string,
 }
 
 function prepareCheckCancel(address: string,
-  checkCancel: CheckCancel,
+  checkCancel: CheckCancelParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
@@ -27,7 +27,7 @@ function prepareCheckCancel(address: string,
       {address, checkCancel, instructions})
     const txJSON = createCheckCancelTransaction(
       address, checkCancel)
-    return utils.prepareTransaction(txJSON, this, instructions)
+    return prepareTransaction(txJSON, this, instructions)
   } catch (e) {
     return Promise.reject(e)
   }

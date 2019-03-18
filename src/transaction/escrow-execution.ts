@@ -1,4 +1,3 @@
-import * as _ from 'lodash'
 import * as utils from './utils'
 const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
@@ -15,7 +14,7 @@ export type EscrowExecution = {
 
 function createEscrowExecutionTransaction(account: string,
   payment: EscrowExecution
-): object {
+): utils.TransactionJSON {
   const txJSON: any = {
     TransactionType: 'EscrowFinish',
     Account: account,
@@ -35,7 +34,7 @@ function createEscrowExecutionTransaction(account: string,
     txJSON.Fulfillment = payment.fulfillment
   }
   if (payment.memos !== undefined) {
-    txJSON.Memos = _.map(payment.memos, utils.convertMemo)
+    txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
   return txJSON
 }

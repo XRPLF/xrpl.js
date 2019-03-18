@@ -28,7 +28,7 @@
       "description": "The complete transaction in hex string format."
     },
     "tx_json": {
-      "$ref": "tx",
+      "$ref": "tx-json",
       "description": "The complete transaction in JSON format."
     }
   },

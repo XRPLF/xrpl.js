@@ -4,7 +4,7 @@ const validate = utils.common.validate
 const toRippledAmount = utils.common.toRippledAmount
 const paymentFlags = utils.common.txFlags.Payment
 const ValidationError = utils.common.errors.ValidationError
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {Amount, Adjustment, MaxAdjustment,
   MinAdjustment, Memo} from '../common/types/objects'
 import {xrpToDrops} from '../common'
@@ -59,9 +59,7 @@ function isIOUWithoutCounterparty(amount: Amount): boolean {
 function applyAnyCounterpartyEncoding(payment: Payment): void {
   // Convert blank counterparty to sender or receiver's address
   //   (Ripple convention for 'any counterparty')
-  // https://ripple.com/build/transactions/
-  //    #special-issuer-values-for-sendmax-and-amount
-  // https://ripple.com/build/ripple-rest/#counterparties-in-payments
+  // https://developers.ripple.com/payment.html#special-issuer-values-for-sendmax-and-amount
   _.forEach([payment.source, payment.destination], adjustment => {
     _.forEach(['amount', 'minAmount', 'maxAmount'], key => {
       if (isIOUWithoutCounterparty(adjustment[key])) {
@@ -86,7 +84,7 @@ function createMaximalAmount(amount: Amount): Amount {
 }
 
 function createPaymentTransaction(address: string, paymentArgument: Payment
-): object {
+): TransactionJSON {
   const payment = _.cloneDeep(paymentArgument)
   applyAnyCounterpartyEncoding(payment)
 

@@ -1,17 +1,13 @@
-import * as _ from 'lodash'
 import * as assert from 'assert'
 import BigNumber from 'bignumber.js'
 import * as utils from './utils'
 const validate = utils.common.validate
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices
 const AccountFields = utils.common.constants.AccountFields
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, SettingsTransaction} from './types'
 import {FormattedSettings, WeightedSigner} from '../common/types/objects'
 
-// Empty string passed to setting will clear it
-const CLEAR_SETTING = null
-
-function setTransactionFlags(txJSON: any, values: FormattedSettings) {
+function setTransactionFlags(txJSON: utils.TransactionJSON, values: FormattedSettings) {
   const keys = Object.keys(values)
   assert(keys.length === 1, 'ERROR: can only set one setting per transaction')
   const flagName = keys[0]
@@ -26,7 +22,8 @@ function setTransactionFlags(txJSON: any, values: FormattedSettings) {
   }
 }
 
-function setTransactionFields(txJSON: object, input: FormattedSettings) {
+// Sets `null` fields to their `default`.
+function setTransactionFields(txJSON: utils.TransactionJSON, input: FormattedSettings) {
   const fieldSchema = AccountFields
   for (const fieldName in fieldSchema) {
     const field = fieldSchema[fieldName]
@@ -37,7 +34,7 @@ function setTransactionFields(txJSON: object, input: FormattedSettings) {
     }
 
     // The value required to clear an account root field varies
-    if (value === CLEAR_SETTING && field.hasOwnProperty('defaults')) {
+    if (value === null && field.hasOwnProperty('defaults')) {
       value = field.defaults
     }
 
@@ -63,7 +60,7 @@ function setTransactionFields(txJSON: object, input: FormattedSettings) {
  *                           are returned
  */
 
-function convertTransferRate(transferRate: number | string): number | string {
+function convertTransferRate(transferRate: number): number {
   return (new BigNumber(transferRate)).shift(9).toNumber()
 }
 
@@ -78,7 +75,7 @@ function formatSignerEntry(signer: WeightedSigner): object {
 
 function createSettingsTransactionWithoutMemos(
   account: string, settings: FormattedSettings
-): any {
+): SettingsTransaction {
   if (settings.regularKey !== undefined) {
     const removeRegularKey = {
       TransactionType: 'SetRegularKey',
@@ -87,7 +84,7 @@ function createSettingsTransactionWithoutMemos(
     if (settings.regularKey === null) {
       return removeRegularKey
     }
-    return _.assign({}, removeRegularKey, {RegularKey: settings.regularKey})
+    return Object.assign({}, removeRegularKey, {RegularKey: settings.regularKey})
   }
 
   if (settings.signers !== undefined) {
@@ -95,17 +92,19 @@ function createSettingsTransactionWithoutMemos(
       TransactionType: 'SignerListSet',
       Account: account,
       SignerQuorum: settings.signers.threshold,
-      SignerEntries: _.map(settings.signers.weights, formatSignerEntry)
+      SignerEntries: settings.signers.weights.map(formatSignerEntry)
     }
   }
 
-  const txJSON: any = {
+  const txJSON: SettingsTransaction = {
     TransactionType: 'AccountSet',
     Account: account
   }
 
-  setTransactionFlags(txJSON, _.omit(settings, 'memos'))
-  setTransactionFields(txJSON, settings)
+  const settingsWithoutMemos = Object.assign({}, settings)
+  delete settingsWithoutMemos.memos
+  setTransactionFlags(txJSON, settingsWithoutMemos)
+  setTransactionFields(txJSON, settings) // Sets `null` fields to their `default`.
 
   if (txJSON.TransferRate !== undefined) {
     txJSON.TransferRate = convertTransferRate(txJSON.TransferRate)
@@ -114,10 +113,10 @@ function createSettingsTransactionWithoutMemos(
 }
 
 function createSettingsTransaction(account: string, settings: FormattedSettings
-): object {
+): SettingsTransaction {
   const txJSON = createSettingsTransactionWithoutMemos(account, settings)
   if (settings.memos !== undefined) {
-    txJSON.Memos = _.map(settings.memos, utils.convertMemo)
+    txJSON.Memos = settings.memos.map(utils.convertMemo)
   }
   return txJSON
 }

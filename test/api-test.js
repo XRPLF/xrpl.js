@@ -371,6 +371,389 @@ describe('RippleAPI', function () {
 
   });
 
+  describe('prepareTransaction - auto-fillable fields', function () {
+
+    it('does not overwrite Sequence in txJSON', function () {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012'
+      }, instructions)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sequence: 100
+      }
+
+      return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 100,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    })
+
+    it('does not overwrite Sequence in Instructions', function () {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012',
+        sequence: 100
+      }, instructions)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      }
+
+      return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 100,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    })
+
+    it('does not overwrite Sequence when same sequence is provided in both txJSON and Instructions', function () {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012',
+        sequence: 100
+      }, instructions)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sequence: 100
+      }
+
+      return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 100,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    })
+
+    it('rejects Promise when Sequence in txJSON does not match sequence in Instructions', function (done) {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012',
+        sequence: 100
+      }, instructions)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sequence: 101
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, '`Sequence` in txJSON must match `sequence` in Instructions');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise when the Sequence is capitalized in Instructions', function (done) {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012',
+        Sequence: 100 // Intentionally capitalized in this test, but the correct field would be `sequence`
+      }, instructions)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'instance additionalProperty "Sequence" exists in instance when not allowed');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise when an unrecognized field is in Instructions', function (done) {
+      const localInstructions = _.defaults({
+        maxFee: '0.000012',
+        foo: 'bar'
+      }, instructions)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'instance additionalProperty "foo" exists in instance when not allowed');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+  })
+
+  it('rejects Promise when Account is missing', function (done) {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      TransactionType: 'DepositPreauth',
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+    }
+
+    try {
+      this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+      }).catch(err => {
+        // assert.strictEqual(err.name, 'RippledError');
+        // assert.strictEqual(err.message, 'Missing field \'account\'.');
+        // assert.strictEqual(err.data.error, 'invalidParams');
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance requires property "Account"');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    }
+  })
+
+  it('rejects Promise when Account is not a string', function (done) {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      Account: 1234,
+      TransactionType: 'DepositPreauth',
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+    }
+
+    try {
+      this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.Account is not of a type(s) string,instance.Account does not conform to the "address" format');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    }
+  })
+
+  it('rejects Promise when Account is invalid', function (done) {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      Account: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xkXXXX', // Invalid checksum
+      TransactionType: 'DepositPreauth',
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+    }
+
+    try {
+      this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.Account does not conform to the "address" format');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    }
+  })
+
+  it('rejects Promise when Account is valid but non-existent on the ledger', function (done) {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      Account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
+      TransactionType: 'DepositPreauth',
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+    }
+
+    try {
+      this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'RippledError');
+        assert.strictEqual(err.message, 'Account not found.');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    }
+  })
+
+  it('rejects Promise when TransactionType is missing', function (done) {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      Account: address,
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+    }
+
+    try {
+      this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+      }).catch(err => {
+        // If not caught by ripple-lib validation, the rippled error looks like:
+        // { error: 'invalidTransaction',
+        //   error_exception: 'Field not found',
+        //   id: 4,
+        //   request:
+        //     { command: 'submit',
+        //       id: 4,
+        //       tx_blob: '24000000032B7735940068400000000000000C732102E1EA8199F570E7F997A7B34EDFDA0A7D8B38173A17450B121A2EB048FDD16CA97446304402206CE34A79A44AEF15786F23DB25C8420E739C167E66750C0B7999EE4BF74A93A1022052E077A6435548F0EE0C5FE2EAB1E5A56376BA360F924DA2E162CCA6C7CB30CB8114D51F9A17208CF113AF23B97ECD5FCD314FBAE52E' },
+        //   status: 'error',
+        //   type: 'response' }
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance requires property "TransactionType"');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    }
+  })
+
+  // Note: This transaction will fail at the `sign` step:
+  //
+  //   Error: DepositPreXXXX is not a valid name or ordinal for TransactionType
+  //
+  // at Function.from (ripple-binary-codec/distrib/npm/enums/index.js:43:15)
+  it('prepares tx when TransactionType is invalid', function () {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      Account: address,
+      TransactionType: 'DepositPreXXXX',
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+    }
+
+    return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+      const expected = {
+        txJSON: '{"TransactionType":"DepositPreXXXX","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        instructions: {
+          fee: '0.000012',
+          sequence: 23,
+          maxLedgerVersion: 8820051
+        }
+      }
+      return checkResult(expected, 'prepare', response)
+    })
+  })
+
+  it('rejects Promise when TransactionType is not a string', function (done) {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      Account: address,
+      TransactionType: 1234,
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+    }
+
+    try {
+      this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+      }).catch(err => {
+        assert.strictEqual(err.name, 'ValidationError');
+        assert.strictEqual(err.message, 'instance.TransactionType is not of a type(s) string');
+        done();
+      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+    } catch (err) {
+      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+    }
+  })
+
+  // Note: This transaction will fail at the `submit` step:
+  //
+  // [RippledError(Submit failed, { resultCode: 'temMALFORMED',
+  // resultMessage: 'Malformed transaction.',
+  // engine_result: 'temMALFORMED',
+  // engine_result_code: -299,
+  // engine_result_message: 'Malformed transaction.',
+  // tx_blob:
+  //  '120013240000000468400000000000000C732102E1EA8199F570E7F997A7B34EDFDA0A7D8B38173A17450B121A2EB048FDD16CA97446304402201F0EF6A2DE7F96966F7082294D14F3EC1EF59C21E29443E5858A0120079357A302203CDB7FEBDEAAD93FF39CB589B55778CB80DC3979F96F27E828D5E659BEB26B7A8114D51F9A17208CF113AF23B97ECD5FCD314FBAE52E',
+  // tx_json:
+  //  { Account: 'rLRt8bmZFBEeM5VMSxZy15k8KKJEs68W6C',
+  //    Fee: '12',
+  //    Sequence: 4,
+  //    SigningPubKey:
+  //     '02E1EA8199F570E7F997A7B34EDFDA0A7D8B38173A17450B121A2EB048FDD16CA9',
+  //    TransactionType: 'DepositPreauth',
+  //    TxnSignature:
+  //     '304402201F0EF6A2DE7F96966F7082294D14F3EC1EF59C21E29443E5858A0120079357A302203CDB7FEBDEAAD93FF39CB589B55778CB80DC3979F96F27E828D5E659BEB26B7A',
+  //    hash:
+  //     'C181D470684311658852713DA81F8201062535C8DE2FF853F7DD9981BB85312F' } })]
+  it('prepares tx when a required field is missing', function () {
+    const localInstructions = _.defaults({
+      maxFee: '0.000012'
+    }, instructions)
+
+    const txJSON = {
+      Account: address,
+      TransactionType: 'DepositPreauth',
+      // Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo' // Normally required, intentionally removed
+    }
+
+    return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+      const expected = {
+        txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        instructions: {
+          fee: '0.000012',
+          sequence: 23,
+          maxLedgerVersion: 8820051
+        }
+      }
+      return checkResult(expected, 'prepare', response)
+    })
+  })
+
   describe('preparePayment', function () {
 
     it('normal', function () {
@@ -2041,10 +2424,12 @@ describe('RippleAPI', function () {
     it('getTransaction - not validated', function () {
       const hash =
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA10';
-      return this.api.getTransaction(hash).then(() => {
+      return this.api.getTransaction(hash).then((response) => {
+        console.log(response);
         assert(false, 'Should throw NotFoundError');
       }).catch(error => {
         assert(error instanceof this.api.errors.NotFoundError);
+        assert.equal(error.message, 'Transaction not found');
       });
     });
 
@@ -2360,7 +2745,8 @@ describe('RippleAPI', function () {
       start: hashes.NOTFOUND_TRANSACTION_HASH,
       counterparty: address
     };
-    return this.api.getTransactions(address, options).then(() => {
+    return this.api.getTransactions(address, options).then((response) => {
+      console.log(response);
       assert(false, 'Should throw NotFoundError');
     }).catch(error => {
       assert(error instanceof this.api.errors.NotFoundError);
@@ -3006,7 +3392,8 @@ describe('RippleAPI', function () {
       assert(false, 'Should throw entryNotFound');
     }).catch(error => {
       assert(error instanceof this.api.errors.RippledError);
-      assert(_.includes(error.message, 'entryNotFound'));
+      assert.equal(error.message, 'entryNotFound');
+      assert.equal(error.data.error, 'entryNotFound');
     });
   });
 
@@ -3037,7 +3424,8 @@ describe('RippleAPI', function () {
       assert(false, 'Should throw NetworkError');
     }).catch(error => {
       assert(error instanceof this.api.errors.RippledError);
-      assert(_.includes(error.message, 'slowDown'));
+      assert.equal(error.message, 'You are placing too much load on the server.');
+      assert.equal(error.data.error, 'slowDown');
     });
   });
 

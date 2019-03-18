@@ -1494,7 +1494,7 @@ sequence | [sequence](#account-sequence-number) | The account sequence number of
 type | [transactionType](#transaction-types) | The type of the transaction.
 specification | object | A specification that would produce the same outcome as this transaction. *Exception:* For payment transactions, this omits the `destination.amount` field, to prevent misunderstanding. The structure of the specification depends on the value of the `type` field (see [Transaction Types](#transaction-types) for details). *Note:* This is **not** necessarily the same as the original specification.
 outcome | object | The outcome of the transaction (what effects it had).
-*outcome.* result | string | Result code returned by rippled. See [Transaction Results](https://ripple.com/build/transactions/#full-transaction-response-list) for a complete list.
+*outcome.* result | string | Result code returned by rippled. See [Transaction Results](https://developers.ripple.com/transaction-results.html) for a complete list.
 *outcome.* fee | [value](#value) | The XRP fee that was charged for the transaction.
 *outcome.balanceChanges.* \* | array\<[balance](#amount)\> | Key is the XRP Ledger address; value is an array of signed amounts representing changes of balances for that address.
 *outcome.orderbookChanges.* \* | array | Key is the maker's XRP Ledger address; value is an array of changes
@@ -5491,7 +5491,7 @@ engine_result | string | Code indicating the preliminary result of the transacti
 engine_result_code | integer | Numeric code indicating the preliminary result of the transaction, directly correlated to `engine_result`
 engine_result_message | string | Human-readable explanation of the transaction's preliminary result.
 tx_blob | string | The complete transaction in hex string format.
-tx_json | [tx](https://ripple.com/build/transactions/) | The complete transaction in JSON format.
+tx_json | [tx-json](https://developers.ripple.com/transaction-formats.html) | The complete transaction in JSON format.
 
 ### Example
 

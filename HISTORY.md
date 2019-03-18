@@ -2,25 +2,9 @@
 
 ## UNRELEASED
 
-### New in rippled 1.2.1
+### [BREAKING CHANGE] `prepare*` methods reject the Promise on error
 
-As this is the first release of ripple-lib following the release of rippled 1.2.1, we would like to highlight the following API improvements:
-
-1. The [`delivered_amount` field](https://developers.ripple.com/partial-payments.html#the-delivered-amount-field) has been added to the `ledger` method, and to transaction subscriptions.
-
-    api.getLedger({includeTransactions: true, includeAllData: true, ledgerVersion: 17718771}).then(...)
-
-You can also call `ledger` directly:
-
-    request('ledger', {...}).then(...)
-
-2. [Support for Ed25519 seeds encoded using ripple-lib](https://github.com/ripple/rippled/pull/2734)
-
-You have access to these improvements when you use a rippled server running version 1.2.1 or later. At the time of writing, we recommend using rippled version **1.2.2** or later.
-
-**BREAKING CHANGE:**
-
-The `prepare*` methods now reject the Promise when an error occurs.
+The `prepare*` methods now always reject the Promise when an error occurs, instead of throwing.
 
 Previously, the methods would synchronously throw on validation errors, despite being asynchronous methods that return Promises.
 
@@ -63,6 +47,64 @@ This applies to:
 * preparePaymentChannelCreate
 * preparePaymentChannelClaim
 * preparePaymentChannelFund
+
+### New in rippled 1.2.1
+
+As this is the first release of ripple-lib following the release of rippled 1.2.1, we would like to highlight the following API improvements:
+
+1. The [`delivered_amount` field](https://developers.ripple.com/partial-payments.html#the-delivered-amount-field) has been added to the `ledger` method, and to transaction subscriptions.
+
+        api.getLedger({includeTransactions: true, includeAllData: true, ledgerVersion: 17718771}).then(...)
+
+    You can also call `ledger` directly:
+
+        request('ledger', {...}).then(...)
+
+2. [Support for Ed25519 seeds encoded using ripple-lib](https://github.com/ripple/rippled/pull/2734)
+
+You have access to these improvements when you use a rippled server running version 1.2.1 or later. At the time of writing, we recommend using rippled version **1.2.2** or later.
+
+### Improved `RippledError` `message`
+
+Previously, `RippledErrors` (errors from rippled) used rippled's `error` field as the `message`.
+
+Now, the `error_message` field is used as the `message`.
+
+This helps to surface the specific cause of an error.
+
+For example, before:
+```
+[RippledError(invalidParams, { error: 'invalidParams',
+  error_code: 31,
+  error_message: 'Missing field \'account\'.',
+  id: 3,
+  request: { command: 'account_info', id: 3 },
+  status: 'error',
+  type: 'response' })]
+```
+
+After:
+```
+[RippledError(Missing field 'account'., { error: 'invalidParams',
+  error_code: 31,
+  error_message: 'Missing field \'account\'.',
+  id: 3,
+  request: { command: 'account_info', id: 3 },
+  status: 'error',
+  type: 'response' })]
+```
+
+In this case, you can see at a glance that `account` is the missing field.
+
+The `error` field is still available in `errorObject.data.error`.
+
+When `error_message` is not set (as with e.g. error 'entryNotFound'), the `error` field is used as the `message`.
+
+### [BUG FIX] `prepareTransaction` does not overwrite the `Sequence` field
+
+The `prepareTransaction` method now allows `Sequence` to be set in the Transaction JSON object, instead of overwriting it with the account's expected sequence based on the state of the ledger.
+
+Previously, you had to use the `sequence` field in the `instructions` object to manually set a transaction's sequence number.
 
 ## 1.1.2 (2018-12-12)
 
