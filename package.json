@@ -39,7 +39,6 @@
     "gulp": "^3.8.10",
     "gulp-bump": "^0.1.13",
     "gulp-rename": "^1.2.0",
-    "http-server": "^0.8.5",
     "jayson": "^1.2.2",
     "json-loader": "^0.5.2",
     "json-schema-to-markdown-table": "^0.4.0",
