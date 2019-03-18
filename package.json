@@ -44,7 +44,6 @@
     "json-loader": "^0.5.2",
     "json-schema-to-markdown-table": "^0.4.0",
     "mocha": "6.0.2",
-    "mocha-in-sauce": "^0.0.1",
     "mocha-junit-reporter": "^1.9.1",
     "null-loader": "^0.1.1",
     "nyc": "^11.3.0",
