@@ -32,7 +32,6 @@
   "devDependencies": {
     "@types/node": "^8.0.53",
     "assert-diff": "^1.0.1",
-    "coveralls": "^2.13.1",
     "doctoc": "^0.15.0",
     "ejs": "^2.3.4",
     "eventemitter2": "^0.4.14",
@@ -65,7 +64,6 @@
     "watch": "tsc -w",
     "prepublish": "npm run clean && npm run compile && npm run build",
     "test": "nyc mocha --exit",
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "tslint -p ./",
     "perf": "./scripts/perf_test.sh",
     "start": "node scripts/http.js",
