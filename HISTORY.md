@@ -1,5 +1,9 @@
 # ripple-lib Release History
 
+## 1.2.1 (2019-03-23)
+
+* Update `ripple-binary-codec` to 0.2.1 to support `tecKILLED`
+
 ## 1.2.0 (2019-03-19)
 
 This release:
