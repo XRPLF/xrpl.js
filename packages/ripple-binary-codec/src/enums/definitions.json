@@ -1632,7 +1632,8 @@
     "tecCRYPTOCONDITION_ERROR": 146,
     "tecINVARIANT_FAILED": 147,
     "tecEXPIRED": 148,
-    "tecDUPLICATE": 149
+    "tecDUPLICATE": 149,
+    "tecKILLED": 150
   },
   "TRANSACTION_TYPES": {
     "Invalid": -1,
