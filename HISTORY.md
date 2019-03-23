@@ -4,6 +4,16 @@
 
 * Update `ripple-binary-codec` to 0.2.1 to support `tecKILLED`
 
+The SHA-256 checksums for the browser version of this release can be found
+below.
+
+```
+% shasum -a 256 *
+531c2a8f4bf6d6b5bd4afe6a40b6a68a77179a343902cfa4210d7e35b5697af0  ripple-1.2.1-debug.js
+201ee99922b16b7e32afb5317ef4bb9facc23b20c272bb5c4ed7010f5d996cab  ripple-1.2.1-min.js
+c1b984581299bf00e0e3c8ac4e62eadfc9b190bd78a2458a76e59ceb56046148  ripple-1.2.1.js
+```
+
 ## 1.2.0 (2019-03-19)
 
 This release:
