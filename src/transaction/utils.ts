@@ -18,7 +18,7 @@ export type TransactionJSON = {
   Memos?: {Memo: ApiMemo}[],
   Flags?: number,
   Fulfillment?: string,
-  [Field: string]: string | number | Array<any> | RippledAmount
+  [Field: string]: string | number | Array<any> | RippledAmount | undefined
 }
 
 function formatPrepareResponse(txJSON: any): Prepare {
