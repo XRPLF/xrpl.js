@@ -1,6 +1,6 @@
 import {validate} from '../common'
 import {FormattedLedger, parseLedger} from './parse/ledger'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 
 export type GetLedgerOptions = {
   ledgerHash?: string,

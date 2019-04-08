@@ -7,7 +7,7 @@ import {
 import {validate} from '../common'
 import {Amount, Issue} from '../common/types/objects'
 import {BookOffer} from '../common/types/commands'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 import BigNumber from 'bignumber.js'
 
 export type FormattedOrderbook = {

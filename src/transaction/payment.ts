@@ -8,6 +8,7 @@ import {Instructions, Prepare, TransactionJSON} from './types'
 import {Amount, Adjustment, MaxAdjustment,
   MinAdjustment, Memo} from '../common/types/objects'
 import {xrpToDrops} from '../common'
+import {RippleAPI} from '..'
 
 
 export interface Payment {
@@ -167,7 +168,7 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
   return txJSON
 }
 
-function preparePayment(address: string, payment: Payment,
+function preparePayment(this: RippleAPI, address: string, payment: Payment,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {

@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import {convertKeysFromSnakeCaseToCamelCase} from './utils'
 import BigNumber from 'bignumber.js'
-import {RippleAPI} from '../index'
+import {RippleAPI} from '..'
 
 export type GetServerInfoResponse = {
   buildVersion: string,

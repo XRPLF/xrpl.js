@@ -1,6 +1,7 @@
 import * as utils from './utils'
 import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
 import {Instructions, Prepare} from './types'
+import {RippleAPI} from '..'
 
 export type PaymentChannelCreate = {
   amount: string,
@@ -37,7 +38,7 @@ function createPaymentChannelCreateTransaction(account: string,
   return txJSON
 }
 
-function preparePaymentChannelCreate(address: string,
+function preparePaymentChannelCreate(this: RippleAPI, address: string,
   paymentChannelCreate: PaymentChannelCreate,
   instructions: Instructions = {}
 ): Promise<Prepare> {
