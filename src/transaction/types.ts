@@ -82,6 +82,11 @@ export type Outcome = {
     }[]
   },
   orderbookChanges: object,
+  deliveredAmount?: {
+    currency: string;
+    value: string;
+    counterparty?: string;
+  };
   timestamp?: string
 }
 
