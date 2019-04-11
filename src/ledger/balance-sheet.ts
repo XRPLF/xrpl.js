@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import {validate} from '../common'
 import {Amount} from '../common/types/objects'
 import {ensureLedgerVersion} from './utils'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 
 export type BalanceSheetOptions = {
   excludeAddresses?: Array<string>,

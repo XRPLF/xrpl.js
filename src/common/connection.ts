@@ -206,12 +206,6 @@ class Connection extends EventEmitter {
 
       this._retry = 0
       this._ws.on('error', error => {
-        // TODO: "type" does not exist on official error type, safe to remove?
-        if (process.browser && error && (<any>error).type === 'error') {
-          // we are in browser, ignore error - `close` event will be fired
-          // after error
-          return
-        }
         this.emit('error', 'websocket', error.message, error)
       })
 
@@ -287,7 +281,7 @@ class Connection extends EventEmitter {
     return websocket
   }
 
-  connect() {
+  connect(): Promise<void> {
     this._clearReconnectTimer()
     return new Promise((resolve, reject) => {
       if (!this._url) {
@@ -322,11 +316,11 @@ class Connection extends EventEmitter {
     })
   }
 
-  disconnect() {
+  disconnect(): Promise<void> {
     return this._disconnect(true)
   }
 
-  _disconnect(calledByUser) {
+  _disconnect(calledByUser): Promise<void> {
     if (calledByUser) {
       this._clearReconnectTimer()
       this._retry = 0

@@ -1,5 +1,5 @@
 import {validate, removeUndefined, dropsToXrp} from '../common'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 import {AccountInfoResponse} from '../common/types/commands/account_info'
 
 export type GetAccountInfoOptions = {

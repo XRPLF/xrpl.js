@@ -5,7 +5,7 @@ import {computeBinaryTransactionHash} from 'ripple-hashes'
 import {SignOptions, KeyPair} from './types'
 import {BigNumber} from 'bignumber.js'
 import {xrpToDrops} from '../common'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 const validate = utils.common.validate
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {

@@ -3,7 +3,7 @@ import parseFields from './parse/fields'
 import {validate, constants} from '../common'
 import {FormattedSettings} from '../common/types/objects'
 import {AccountInfoResponse} from '../common/types/commands'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 const AccountFlags = constants.AccountFlags
 
 export type SettingsOptions = {

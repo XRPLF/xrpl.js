@@ -12,15 +12,14 @@
     "noImplicitAny": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "removeComments": false,
+    "removeComments": true,
+    "strict": true /* Enable all strict type-checking options. */,
     "preserveConstEnums": false,
     "suppressImplicitAnyIndexErrors": false,
     "declaration": true,
-    "sourceMap": true,
-    "skipLibCheck": true
+    "sourceMap": true
   },
   "include": [
-    "custom_typings/**/*.ts",
     "src/**/*.ts"
   ]
 }

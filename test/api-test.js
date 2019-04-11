@@ -15,11 +15,11 @@ const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 const binary = require('ripple-binary-codec');
-const BigNumber = require('bignumber.js')
+const BigNumber = require('bignumber.js');
 assert.options.strict = true;
 
 // how long before each test case times out
-const TIMEOUT = process.browser ? 25000 : 10000;
+const TIMEOUT = 20000;
 
 function unused() {
 }

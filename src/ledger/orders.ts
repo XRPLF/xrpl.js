@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import {validate} from '../common'
 import {FormattedAccountOrder, parseAccountOrder} from './parse/account-order'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 import {AccountOffersResponse} from '../common/types/commands'
 
 export type GetOrdersOptions = {

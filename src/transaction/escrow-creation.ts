@@ -3,6 +3,7 @@ import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
 const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Memo} from '../common/types/objects'
+import {RippleAPI} from '..'
 
 export type EscrowCreation = {
   amount: string,
@@ -51,7 +52,7 @@ function createEscrowCreationTransaction(account: string,
   return txJSON
 }
 
-function prepareEscrowCreation(address: string,
+function prepareEscrowCreation(this: RippleAPI, address: string,
   escrowCreation: EscrowCreation,
   instructions: Instructions = {}
 ): Promise<Prepare> {

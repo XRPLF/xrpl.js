@@ -3,7 +3,7 @@ import {
   FormattedPaymentChannel
 } from './parse/payment-channel'
 import {validate, errors} from '../common'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 import {LedgerEntryResponse} from '../common/types/commands'
 const NotFoundError = errors.NotFoundError
 

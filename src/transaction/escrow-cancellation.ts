@@ -2,6 +2,7 @@ import * as utils from './utils'
 const validate = utils.common.validate
 import {Instructions, Prepare, TransactionJSON} from './types'
 import {Memo} from '../common/types/objects'
+import {RippleAPI} from '..'
 
 export type EscrowCancellation = {
   owner: string,
@@ -27,7 +28,7 @@ function createEscrowCancellationTransaction(account: string,
   return txJSON
 }
 
-function prepareEscrowCancellation(address: string,
+function prepareEscrowCancellation(this: RippleAPI, address: string,
   escrowCancellation: EscrowCancellation,
   instructions: Instructions = {}
 ): Promise<Prepare> {

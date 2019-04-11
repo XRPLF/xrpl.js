@@ -1,5 +1,5 @@
 import {removeUndefined} from '../common'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 import {
   GetAccountObjectsOptions,
   AccountObjectsResponse

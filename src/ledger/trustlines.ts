@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import {validate} from '../common'
 import parseAccountTrustline from './parse/account-trustline'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 
 export type GetTrustlinesOptions = {

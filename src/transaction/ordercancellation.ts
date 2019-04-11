@@ -1,6 +1,7 @@
 import * as utils from './utils'
 const validate = utils.common.validate
 import {Instructions, Prepare, TransactionJSON} from './types'
+import {RippleAPI} from '..'
 
 function createOrderCancellationTransaction(account: string,
   orderCancellation: any
@@ -16,7 +17,7 @@ function createOrderCancellationTransaction(account: string,
   return txJSON
 }
 
-function prepareOrderCancellation(address: string, orderCancellation: object,
+function prepareOrderCancellation(this: RippleAPI, address: string, orderCancellation: object,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {

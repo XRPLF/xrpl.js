@@ -3,7 +3,7 @@ import * as common from '../common'
 import {Memo, RippledAmount} from '../common/types/objects'
 const txFlags = common.txFlags
 import {Instructions, Prepare} from './types'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 import {ValidationError} from '../common/errors'
 
 export type ApiMemo = {

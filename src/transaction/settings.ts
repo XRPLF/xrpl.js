@@ -6,6 +6,7 @@ const AccountFlagIndices = utils.common.constants.AccountFlagIndices
 const AccountFields = utils.common.constants.AccountFields
 import {Instructions, Prepare, SettingsTransaction} from './types'
 import {FormattedSettings, WeightedSigner} from '../common/types/objects'
+import {RippleAPI} from '..'
 
 function setTransactionFlags(txJSON: utils.TransactionJSON, values: FormattedSettings) {
   const keys = Object.keys(values)
@@ -121,7 +122,7 @@ function createSettingsTransaction(account: string, settings: FormattedSettings
   return txJSON
 }
 
-function prepareSettings(address: string, settings: FormattedSettings,
+function prepareSettings(this: RippleAPI, address: string, settings: FormattedSettings,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {

@@ -5,6 +5,7 @@ import {validate, errors} from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {RippledError} from '../common/errors'
+import {RippleAPI} from '..'
 
 export type TransactionOptions = {
   minLedgerVersion?: number,
@@ -96,7 +97,7 @@ function formatResponse(options: TransactionOptions, tx: TransactionResponse
   return parseTransaction(tx, options.includeRawTransaction)
 }
 
-async function getTransaction(id: string, options: TransactionOptions = {}
+async function getTransaction(this: RippleAPI, id: string, options: TransactionOptions = {}
 ): Promise<FormattedTransactionType> {
   validate.getTransaction({id, options})
   const _options = await utils.ensureLedgerVersion.call(this, options)
