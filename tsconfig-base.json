@@ -1,11 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "pretty": true,
     "lib": [
       "es2017"
     ],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "es6",
+
+    "declaration": true,
+    "declarationMap": true /* Added 2019-04-13 */,
+    "sourceMap": true,
+    "noEmitOnError": true /* Added 2019-04-13 */,
+
     "strictNullChecks": false,
     "noImplicitAny": false,
     "noUnusedLocals": true,
@@ -13,8 +18,9 @@
     "removeComments": true,
     "strict": true /* Enable all strict type-checking options. */,
     "preserveConstEnums": false,
-    "suppressImplicitAnyIndexErrors": false,
-    "declaration": true,
-    "sourceMap": true
+
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "suppressImplicitAnyIndexErrors": false
   }
 }
