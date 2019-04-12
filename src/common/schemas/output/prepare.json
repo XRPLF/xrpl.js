@@ -14,7 +14,7 @@
       "properties": {
         "fee": {
           "$ref": "value",
-          "description": "An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information."
+          "description": "The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide."
         },
         "sequence": {
           "$ref": "sequence",
@@ -25,7 +25,7 @@
             {"$ref": "ledgerVersion"},
             {"type": "null"}
           ],
-          "description": "The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum."
+          "description": "The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'."
         }
       },
       "additionalProperties": false,
