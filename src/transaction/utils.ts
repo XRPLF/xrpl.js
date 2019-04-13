@@ -68,11 +68,11 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
     //   instructions.maxLedgerVersionOffset
     if (txJSON.LastLedgerSequence && instructions.maxLedgerVersion) {
       return Promise.reject(new ValidationError('`LastLedgerSequence` in txJSON and `maxLedgerVersion`' +
-        ' in Instructions cannot both be set'))
+        ' in `instructions` cannot both be set'))
     }
     if (txJSON.LastLedgerSequence && instructions.maxLedgerVersionOffset) {
       return Promise.reject(new ValidationError('`LastLedgerSequence` in txJSON and `maxLedgerVersionOffset`' +
-        ' in Instructions cannot both be set'))
+        ' in `instructions` cannot both be set'))
     }
     if (txJSON.LastLedgerSequence) {
       return Promise.resolve(txJSON)
@@ -98,7 +98,7 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
     // Furthermore, txJSON.Fee is in drops while instructions.fee is in XRP, which would just add to
     // the confusion. It is simpler to require that only one is used.
     if (txJSON.Fee && instructions.fee) {
-      return Promise.reject(new ValidationError('`Fee` in txJSON and `fee` in Instructions cannot both be set'))
+      return Promise.reject(new ValidationError('`Fee` in txJSON and `fee` in `instructions` cannot both be set'))
     }
     if (txJSON.Fee) {
       // txJSON.Fee is set. Use this value and do not scale it.
@@ -143,7 +143,7 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
         return Promise.resolve(txJSON)
       } else {
         // Both txJSON.Sequence and instructions.sequence are defined, and they are NOT equal
-        return Promise.reject(new ValidationError('`Sequence` in txJSON must match `sequence` in Instructions'))
+        return Promise.reject(new ValidationError('`Sequence` in txJSON must match `sequence` in `instructions`'))
       }
     }
     if (txJSON.Sequence !== undefined) {

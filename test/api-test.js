@@ -439,7 +439,7 @@ describe('RippleAPI', function () {
           done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
         }).catch(err => {
           assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, '`Fee` in txJSON and `fee` in Instructions cannot both be set');
+          assert.strictEqual(err.message, '`Fee` in txJSON and `fee` in `instructions` cannot both be set');
           done();
         }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
       } catch (err) {
@@ -464,7 +464,7 @@ describe('RippleAPI', function () {
           done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
         }).catch(err => {
           assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, '`Fee` in txJSON and `fee` in Instructions cannot both be set');
+          assert.strictEqual(err.message, '`Fee` in txJSON and `fee` in `instructions` cannot both be set');
           done();
         }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
       } catch (err) {
@@ -615,7 +615,7 @@ describe('RippleAPI', function () {
           done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
         }).catch(err => {
           assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, '`Sequence` in txJSON must match `sequence` in Instructions');
+          assert.strictEqual(err.message, '`Sequence` in txJSON must match `sequence` in `instructions`');
           done();
         }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
       } catch (err) {
@@ -740,7 +740,7 @@ describe('RippleAPI', function () {
           done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
         }).catch(err => {
           assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, '`LastLedgerSequence` in txJSON and `maxLedgerVersion` in Instructions cannot both be set');
+          assert.strictEqual(err.message, '`LastLedgerSequence` in txJSON and `maxLedgerVersion` in `instructions` cannot both be set');
           done();
         }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
       } catch (err) {
@@ -766,7 +766,7 @@ describe('RippleAPI', function () {
           done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
         }).catch(err => {
           assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, '`LastLedgerSequence` in txJSON and `maxLedgerVersionOffset` in Instructions cannot both be set');
+          assert.strictEqual(err.message, '`LastLedgerSequence` in txJSON and `maxLedgerVersionOffset` in `instructions` cannot both be set');
           done();
         }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
       } catch (err) {
@@ -793,7 +793,7 @@ describe('RippleAPI', function () {
         }).catch(err => {
           assert.strictEqual(err.name, 'ValidationError');
           assert.strictEqual(err.message, 'instance is of prohibited type [object Object]');
-          // A better error message would be: '`maxLedgerVersion` in Instructions and `maxLedgerVersionOffset` in Instructions cannot both be set'
+          // A better error message would be: '`maxLedgerVersion` in `instructions` and `maxLedgerVersionOffset` in `instructions` cannot both be set'
           // Unfortunately, due to the schema validator, this is not possible without special-casing.
           done();
         }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
@@ -822,7 +822,7 @@ describe('RippleAPI', function () {
         }).catch(err => {
           assert.strictEqual(err.name, 'ValidationError');
           assert.strictEqual(err.message, 'instance is of prohibited type [object Object]');
-          // A better error message would be: 'At most one of the following can be set: `LastLedgerSequence` in txJSON, `maxLedgerVersion` in Instructions, `maxLedgerVersionOffset` in Instructions'
+          // A better error message would be: 'At most one of the following can be set: `LastLedgerSequence` in txJSON, `maxLedgerVersion` in `instructions`, `maxLedgerVersionOffset` in `instructions`'
           // Unfortunately, due to the schema validator, this is not possible without special-casing.
           done();
         }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
