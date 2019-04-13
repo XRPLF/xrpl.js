@@ -51,11 +51,32 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
 ): Promise<Prepare> {
   common.validate.instructions(instructions)
   common.validate.tx_json(txJSON)
+  const disallowedFieldsInTxJSON = ['maxLedgerVersion', 'maxLedgerVersionOffset', 'fee', 'sequence']
+  const badFields = disallowedFieldsInTxJSON.filter(field => txJSON[field])
+  if (badFields.length) {
+    return Promise.reject(new ValidationError('txJSON additionalProperty "' + badFields[0] +
+      '" exists in instance when not allowed'))
+  }
 
   const account = txJSON.Account
   setCanonicalFlag(txJSON)
 
-  function prepareMaxLedgerVersion(): Promise<object> {
+  function prepareMaxLedgerVersion(): Promise<TransactionJSON> {
+    // Up to one of the following is allowed:
+    //   txJSON.LastLedgerSequence
+    //   instructions.maxLedgerVersion
+    //   instructions.maxLedgerVersionOffset
+    if (txJSON.LastLedgerSequence && instructions.maxLedgerVersion) {
+      return Promise.reject(new ValidationError('`LastLedgerSequence` in txJSON and `maxLedgerVersion`' +
+        ' in `instructions` cannot both be set'))
+    }
+    if (txJSON.LastLedgerSequence && instructions.maxLedgerVersionOffset) {
+      return Promise.reject(new ValidationError('`LastLedgerSequence` in txJSON and `maxLedgerVersionOffset`' +
+        ' in `instructions` cannot both be set'))
+    }
+    if (txJSON.LastLedgerSequence) {
+      return Promise.resolve(txJSON)
+    }
     if (instructions.maxLedgerVersion !== undefined) {
       if (instructions.maxLedgerVersion !== null) {
         txJSON.LastLedgerSequence = instructions.maxLedgerVersion
@@ -70,16 +91,27 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
     })
   }
 
-  function prepareFee(): Promise<object> {
+  function prepareFee(): Promise<TransactionJSON> {
+    // instructions.fee is scaled (for multi-signed transactions) while txJSON.Fee is not.
+    // Due to this difference, we do NOT allow both to be set, as the behavior would be complex and
+    // potentially ambiguous.
+    // Furthermore, txJSON.Fee is in drops while instructions.fee is in XRP, which would just add to
+    // the confusion. It is simpler to require that only one is used.
+    if (txJSON.Fee && instructions.fee) {
+      return Promise.reject(new ValidationError('`Fee` in txJSON and `fee` in `instructions` cannot both be set'))
+    }
+    if (txJSON.Fee) {
+      // txJSON.Fee is set. Use this value and do not scale it.
+      return Promise.resolve(txJSON)
+    }
     const multiplier = instructions.signersCount === undefined ? 1 :
       instructions.signersCount + 1
     if (instructions.fee !== undefined) {
       const fee = new BigNumber(instructions.fee)
       if (fee.greaterThan(api._maxFeeXRP)) {
-        const errorMessage = `Fee of ${fee.toString(10)} XRP exceeds ` +
+        return Promise.reject(new ValidationError(`Fee of ${fee.toString(10)} XRP exceeds ` +
           `max of ${api._maxFeeXRP} XRP. To use this fee, increase ` +
-          '`maxFeeXRP` in the RippleAPI constructor.'
-        throw new ValidationError(errorMessage)
+          '`maxFeeXRP` in the RippleAPI constructor.'))
       }
       txJSON.Fee = scaleValue(common.xrpToDrops(instructions.fee), multiplier)
       return Promise.resolve(txJSON)
@@ -104,14 +136,14 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
     })
   }
 
-  async function prepareSequence(): Promise<object> {
+  async function prepareSequence(): Promise<TransactionJSON> {
     if (instructions.sequence !== undefined) {
       if (txJSON.Sequence === undefined || instructions.sequence === txJSON.Sequence) {
         txJSON.Sequence = instructions.sequence
         return Promise.resolve(txJSON)
       } else {
         // Both txJSON.Sequence and instructions.sequence are defined, and they are NOT equal
-        return Promise.reject(new ValidationError('`Sequence` in txJSON must match `sequence` in Instructions'))
+        return Promise.reject(new ValidationError('`Sequence` in txJSON must match `sequence` in `instructions`'))
       }
     }
     if (txJSON.Sequence !== undefined) {

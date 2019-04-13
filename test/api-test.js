@@ -47,7 +47,7 @@ function checkResult(expected, schemaName, response) {
 
 describe('RippleAPI', function () {
   this.timeout(TIMEOUT);
-  const instructions = { maxLedgerVersionOffset: 100 };
+  const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
   beforeEach(setupAPI.setup);
   afterEach(setupAPI.teardown);
 
@@ -373,10 +373,158 @@ describe('RippleAPI', function () {
 
   describe('prepareTransaction - auto-fillable fields', function () {
 
+    // Fee:
+
+    it('does not overwrite Fee in txJSON', function () {
+      const localInstructions = instructionsWithMaxLedgerVersionOffset
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Fee: '10'
+      }
+
+      return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":23}',
+          instructions: {
+            fee: '0.00001', // Notice there are not always 6 digits after the decimal point as trailing zeros are omitted
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    })
+
+    it('does not overwrite Fee in Instructions', function () {
+      const localInstructions = _.defaults({
+        fee: '0.000014', // CAUTION: This `fee` is specified in XRP, not drops.
+      }, instructionsWithMaxLedgerVersionOffset)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      }
+
+      return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"14","Sequence":23}',
+          instructions: {
+            fee: '0.000014',
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    })
+
+    it('rejects Promise if both are set, even when txJSON.Fee matches instructions.fee', function (done) {
+      const localInstructions = _.defaults({
+        fee: '0.000016'
+      }, instructionsWithMaxLedgerVersionOffset)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Fee: '16'
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, '`Fee` in txJSON and `fee` in `instructions` cannot both be set');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise if both are set, when txJSON.Fee does not match instructions.fee', function (done) {
+      const localInstructions = _.defaults({
+        fee: '0.000018'
+      }, instructionsWithMaxLedgerVersionOffset)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Fee: '20'
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, '`Fee` in txJSON and `fee` in `instructions` cannot both be set');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise when the Fee is capitalized in Instructions', function (done) {
+      const localInstructions = _.defaults({
+        Fee: '0.000022', // Intentionally capitalized in this test, but the correct field would be `fee`
+      }, instructionsWithMaxLedgerVersionOffset)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'instance additionalProperty "Fee" exists in instance when not allowed');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise when the fee is specified in txJSON', function (done) {
+      const localInstructions = instructionsWithMaxLedgerVersionOffset
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        fee: '10'
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'txJSON additionalProperty "fee" exists in instance when not allowed');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    // Sequence:
+
     it('does not overwrite Sequence in txJSON', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012'
-      }, instructions)
+      }, instructionsWithMaxLedgerVersionOffset)
 
       const txJSON = {
         TransactionType: 'DepositPreauth',
@@ -402,7 +550,7 @@ describe('RippleAPI', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012',
         sequence: 100
-      }, instructions)
+      }, instructionsWithMaxLedgerVersionOffset)
 
       const txJSON = {
         TransactionType: 'DepositPreauth',
@@ -427,7 +575,7 @@ describe('RippleAPI', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012',
         sequence: 100
-      }, instructions)
+      }, instructionsWithMaxLedgerVersionOffset)
 
       const txJSON = {
         TransactionType: 'DepositPreauth',
@@ -453,7 +601,7 @@ describe('RippleAPI', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012',
         sequence: 100
-      }, instructions)
+      }, instructionsWithMaxLedgerVersionOffset)
 
       const txJSON = {
         TransactionType: 'DepositPreauth',
@@ -467,7 +615,7 @@ describe('RippleAPI', function () {
           done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
         }).catch(err => {
           assert.strictEqual(err.name, 'ValidationError');
-          assert.strictEqual(err.message, '`Sequence` in txJSON must match `sequence` in Instructions');
+          assert.strictEqual(err.message, '`Sequence` in txJSON must match `sequence` in `instructions`');
           done();
         }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
       } catch (err) {
@@ -479,7 +627,7 @@ describe('RippleAPI', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012',
         Sequence: 100 // Intentionally capitalized in this test, but the correct field would be `sequence`
-      }, instructions)
+      }, instructionsWithMaxLedgerVersionOffset)
 
       const txJSON = {
         TransactionType: 'DepositPreauth',
@@ -500,11 +648,291 @@ describe('RippleAPI', function () {
       }
     })
 
+    // LastLedgerSequence aka maxLedgerVersion/maxLedgerVersionOffset:
+
+    it('does not overwrite LastLedgerSequence in txJSON', function () {
+      const localInstructions = {}
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Fee: '10',
+        LastLedgerSequence: 8880000
+      }
+
+      return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8880000,"Fee":"10","Sequence":23}',
+          instructions: {
+            fee: '0.00001', // Notice there are not always 6 digits after the decimal point as trailing zeros are omitted
+            sequence: 23,
+            maxLedgerVersion: 8880000
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    })
+
+    it('does not overwrite maxLedgerVersion in Instructions', function () {
+      const localInstructions = {
+        "maxLedgerVersion": 8890000
+      }
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      }
+
+      return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8890000,"Fee":"12","Sequence":23}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8890000
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    })
+
+    it('does not overwrite maxLedgerVersionOffset in Instructions', function () {
+      const localInstructions = _.defaults({
+        maxLedgerVersionOffset: 124
+      }, instructionsWithMaxLedgerVersionOffset)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      }
+
+      return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820075,"Fee":"12","Sequence":23}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8820075
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      })
+    })
+
+    it('rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersion both are set', function (done) {
+      const localInstructions = {
+        maxLedgerVersion: 8900000
+      }
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Fee: '16',
+        LastLedgerSequence: 8900000
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, '`LastLedgerSequence` in txJSON and `maxLedgerVersion` in `instructions` cannot both be set');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersionOffset both are set', function (done) {
+      const localInstructions = _.defaults({
+        maxLedgerVersionOffset: 123
+      }, instructionsWithMaxLedgerVersionOffset)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Fee: '16',
+        LastLedgerSequence: 8900000
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, '`LastLedgerSequence` in txJSON and `maxLedgerVersionOffset` in `instructions` cannot both be set');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise if instructions.maxLedgerVersion and instructions.maxLedgerVersionOffset both are set', function (done) {
+      const localInstructions = _.defaults({
+        maxLedgerVersion: 8900000,
+        maxLedgerVersionOffset: 123
+      }, instructionsWithMaxLedgerVersionOffset)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Fee: '16'
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'instance is of prohibited type [object Object]');
+          // A better error message would be: '`maxLedgerVersion` in `instructions` and `maxLedgerVersionOffset` in `instructions` cannot both be set'
+          // Unfortunately, due to the schema validator, this is not possible without special-casing.
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise if txJSON.LastLedgerSequence and instructions.maxLedgerVersion and instructions.maxLedgerVersionOffset all are set', function (done) {
+      const localInstructions = _.defaults({
+        maxLedgerVersion: 8900000,
+        maxLedgerVersionOffset: 123
+      }, instructionsWithMaxLedgerVersionOffset)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Fee: '16',
+        LastLedgerSequence: 8900000
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'instance is of prohibited type [object Object]');
+          // A better error message would be: 'At most one of the following can be set: `LastLedgerSequence` in txJSON, `maxLedgerVersion` in `instructions`, `maxLedgerVersionOffset` in `instructions`'
+          // Unfortunately, due to the schema validator, this is not possible without special-casing.
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise when the maxLedgerVersion is capitalized in Instructions', function (done) {
+      const localInstructions = _.defaults({
+        MaxLedgerVersion: 8900000, // Intentionally capitalized in this test, but the correct field would be `maxLedgerVersion`
+      }, instructionsWithMaxLedgerVersionOffset)
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'instance additionalProperty "MaxLedgerVersion" exists in instance when not allowed');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise when the maxLedgerVersion is specified in txJSON', function (done) {
+      const localInstructions = instructionsWithMaxLedgerVersionOffset
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        maxLedgerVersion: 8900000
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'txJSON additionalProperty "maxLedgerVersion" exists in instance when not allowed');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise when the maxLedgerVersionOffset is specified in txJSON', function (done) {
+      const localInstructions = instructionsWithMaxLedgerVersionOffset
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        maxLedgerVersionOffset: 8900000
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'txJSON additionalProperty "maxLedgerVersionOffset" exists in instance when not allowed');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    it('rejects Promise when the sequence is specified in txJSON', function (done) {
+      const localInstructions = instructionsWithMaxLedgerVersionOffset
+
+      const txJSON = {
+        TransactionType: 'DepositPreauth',
+        Account: address,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        sequence: 8900000
+      }
+
+      try {
+        this.api.prepareTransaction(txJSON, localInstructions).then(response => {
+          done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(response)));
+        }).catch(err => {
+          assert.strictEqual(err.name, 'ValidationError');
+          assert.strictEqual(err.message, 'txJSON additionalProperty "sequence" exists in instance when not allowed');
+          done();
+        }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+      } catch (err) {
+        done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+      }
+    })
+
+    // Paths: is not auto-filled by ripple-lib.
+
+    // Other errors:
+
     it('rejects Promise when an unrecognized field is in Instructions', function (done) {
       const localInstructions = _.defaults({
         maxFee: '0.000012',
         foo: 'bar'
-      }, instructions)
+      }, instructionsWithMaxLedgerVersionOffset)
 
       const txJSON = {
         TransactionType: 'DepositPreauth',
@@ -529,7 +957,7 @@ describe('RippleAPI', function () {
   it('rejects Promise when Account is missing', function (done) {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -555,7 +983,7 @@ describe('RippleAPI', function () {
   it('rejects Promise when Account is not a string', function (done) {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       Account: 1234,
@@ -579,7 +1007,7 @@ describe('RippleAPI', function () {
   it('rejects Promise when Account is invalid', function (done) {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       Account: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xkXXXX', // Invalid checksum
@@ -603,7 +1031,7 @@ describe('RippleAPI', function () {
   it('rejects Promise when Account is valid but non-existent on the ledger', function (done) {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       Account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
@@ -627,7 +1055,7 @@ describe('RippleAPI', function () {
   it('rejects Promise when TransactionType is missing', function (done) {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       Account: address,
@@ -665,7 +1093,7 @@ describe('RippleAPI', function () {
   it('prepares tx when TransactionType is invalid', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       Account: address,
@@ -689,7 +1117,7 @@ describe('RippleAPI', function () {
   it('rejects Promise when TransactionType is not a string', function (done) {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       Account: address,
@@ -733,7 +1161,7 @@ describe('RippleAPI', function () {
   it('prepares tx when a required field is missing', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       Account: address,
@@ -759,7 +1187,7 @@ describe('RippleAPI', function () {
     it('normal', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012'
-      }, instructions);
+      }, instructionsWithMaxLedgerVersionOffset);
       return this.api.preparePayment(
         address, requests.preparePayment.normal, localInstructions).then(
           _.partial(checkResult, responses.preparePayment.normal, 'prepare'));
@@ -768,7 +1196,7 @@ describe('RippleAPI', function () {
     it('preparePayment - min amount xrp', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012'
-      }, instructions);
+      }, instructionsWithMaxLedgerVersionOffset);
       return this.api.preparePayment(
         address, requests.preparePayment.minAmountXRP, localInstructions).then(
           _.partial(checkResult,
@@ -777,7 +1205,7 @@ describe('RippleAPI', function () {
 
     it('preparePayment - min amount xrp2xrp', function () {
       return this.api.preparePayment(
-        address, requests.preparePayment.minAmount, instructions).then(
+        address, requests.preparePayment.minAmount, instructionsWithMaxLedgerVersionOffset).then(
           _.partial(checkResult,
             responses.preparePayment.minAmountXRPXRP, 'prepare'));
     });
@@ -799,7 +1227,7 @@ describe('RippleAPI', function () {
           }
         }
       }
-      return this.api.preparePayment(address, payment, instructions).then(response => {
+      return this.api.preparePayment(address, payment, instructionsWithMaxLedgerVersionOffset).then(response => {
         const expected = {
           txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
           instructions: {
@@ -829,7 +1257,7 @@ describe('RippleAPI', function () {
           }
         }
       }
-      return this.api.preparePayment(address, payment, instructions).then(response => {
+      return this.api.preparePayment(address, payment, instructionsWithMaxLedgerVersionOffset).then(response => {
         const expected = {
           txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
           instructions: {
@@ -859,7 +1287,7 @@ describe('RippleAPI', function () {
           }
         }
       }
-      return this.api.preparePayment(address, payment, instructions).then(response => {
+      return this.api.preparePayment(address, payment, instructionsWithMaxLedgerVersionOffset).then(response => {
         const expected = {
           txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
           instructions: {
@@ -889,7 +1317,7 @@ describe('RippleAPI', function () {
           }
         }
       }
-      return this.api.preparePayment(address, payment, instructions).then(response => {
+      return this.api.preparePayment(address, payment, instructionsWithMaxLedgerVersionOffset).then(response => {
         const expected = {
           txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
           instructions: {
@@ -1050,7 +1478,7 @@ describe('RippleAPI', function () {
       it('preparePayment - throws when fee exceeds 2 XRP', function (done) {
         const localInstructions = _.defaults({
           fee: '2.1'
-        }, instructions);
+        }, instructionsWithMaxLedgerVersionOffset);
   
         try {
           // Cannot return promise because we want/expect it to reject.
@@ -1082,7 +1510,7 @@ describe('RippleAPI', function () {
     });
 
     it('preparePayment without counterparty set', function () {
-      const localInstructions = _.defaults({ sequence: 23 }, instructions);
+      const localInstructions = _.defaults({ sequence: 23 }, instructionsWithMaxLedgerVersionOffset);
       return this.api.preparePayment(
         address, requests.preparePayment.noCounterparty, localInstructions)
         .then(_.partial(checkResult, responses.preparePayment.noCounterparty,
@@ -1091,7 +1519,7 @@ describe('RippleAPI', function () {
 
     it('preparePayment - destination.minAmount', function () {
       return this.api.preparePayment(address, responses.getPaths.sendAll[0],
-        instructions).then(_.partial(checkResult,
+        instructionsWithMaxLedgerVersionOffset).then(_.partial(checkResult,
           responses.preparePayment.minAmount, 'prepare'));
     });
 
@@ -1108,7 +1536,7 @@ describe('RippleAPI', function () {
       }
 
       return this.api.preparePayment(
-        address, requests.preparePayment.normal, instructions).then(
+        address, requests.preparePayment.normal, instructionsWithMaxLedgerVersionOffset).then(
           _.partial(checkResult, expectedResponse, 'prepare'));
     });
 
@@ -1116,7 +1544,7 @@ describe('RippleAPI', function () {
       this.api._maxFeeXRP = '2.2'
       const localInstructions = _.defaults({
         fee: '2.1'
-      }, instructions);
+      }, instructionsWithMaxLedgerVersionOffset);
 
       const expectedResponse = {
         "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"2100000\",\"Sequence\":23}",
@@ -1142,13 +1570,13 @@ describe('RippleAPI', function () {
   it('prepareOrder - buy order with expiration', function () {
     const request = requests.prepareOrder.expiration;
     const response = responses.prepareOrder.expiration;
-    return this.api.prepareOrder(address, request, instructions)
+    return this.api.prepareOrder(address, request, instructionsWithMaxLedgerVersionOffset)
       .then(_.partial(checkResult, response, 'prepare'));
   });
 
   it('prepareOrder - sell order', function () {
     const request = requests.prepareOrder.sell;
-    return this.api.prepareOrder(address, request, instructions).then(
+    return this.api.prepareOrder(address, request, instructionsWithMaxLedgerVersionOffset).then(
       _.partial(checkResult, responses.prepareOrder.sell, 'prepare'));
   });
 
@@ -1156,7 +1584,7 @@ describe('RippleAPI', function () {
     const request = requests.prepareOrder.sell;
     delete request.direction; // Make invalid
     try {
-      this.api.prepareOrder(address, request, instructions).then(prepared => {
+      this.api.prepareOrder(address, request, instructionsWithMaxLedgerVersionOffset).then(prepared => {
         done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
       }).catch(err => {
         assert.strictEqual(err.name, 'ValidationError');
@@ -1170,7 +1598,7 @@ describe('RippleAPI', function () {
 
   it('prepareOrderCancellation', function () {
     const request = requests.prepareOrderCancellation.simple;
-    return this.api.prepareOrderCancellation(address, request, instructions)
+    return this.api.prepareOrderCancellation(address, request, instructionsWithMaxLedgerVersionOffset)
       .then(_.partial(checkResult, responses.prepareOrderCancellation.normal,
         'prepare'));
   });
@@ -1209,7 +1637,7 @@ describe('RippleAPI', function () {
 
   it('prepareTrustline - simple', function () {
     return this.api.prepareTrustline(
-      address, requests.prepareTrustline.simple, instructions).then(
+      address, requests.prepareTrustline.simple, instructionsWithMaxLedgerVersionOffset).then(
         _.partial(checkResult, responses.prepareTrustline.simple, 'prepare'));
   });
 
@@ -1221,7 +1649,7 @@ describe('RippleAPI', function () {
 
   it('prepareTrustline - complex', function () {
     return this.api.prepareTrustline(
-      address, requests.prepareTrustline.complex, instructions).then(
+      address, requests.prepareTrustline.complex, instructionsWithMaxLedgerVersionOffset).then(
         _.partial(checkResult, responses.prepareTrustline.complex, 'prepare'));
   });
 
@@ -1230,7 +1658,7 @@ describe('RippleAPI', function () {
     delete trustline.limit; // Make invalid
     try {
       this.api.prepareTrustline(
-        address, trustline, instructions).then(prepared => {
+        address, trustline, instructionsWithMaxLedgerVersionOffset).then(prepared => {
         done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
       }).catch(err => {
         assert.strictEqual(err.name, 'ValidationError');
@@ -1244,7 +1672,7 @@ describe('RippleAPI', function () {
 
   it('prepareSettings', function () {
     return this.api.prepareSettings(
-      address, requests.prepareSettings.domain, instructions).then(
+      address, requests.prepareSettings.domain, instructionsWithMaxLedgerVersionOffset).then(
         _.partial(checkResult, responses.prepareSettings.flags, 'prepare'));
   });
 
@@ -1266,44 +1694,44 @@ describe('RippleAPI', function () {
 
   it('prepareSettings - regularKey', function () {
     const regularKey = { regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD' };
-    return this.api.prepareSettings(address, regularKey, instructions).then(
+    return this.api.prepareSettings(address, regularKey, instructionsWithMaxLedgerVersionOffset).then(
       _.partial(checkResult, responses.prepareSettings.regularKey, 'prepare'));
   });
 
   it('prepareSettings - remove regularKey', function () {
     const regularKey = { regularKey: null };
-    return this.api.prepareSettings(address, regularKey, instructions).then(
+    return this.api.prepareSettings(address, regularKey, instructionsWithMaxLedgerVersionOffset).then(
       _.partial(checkResult, responses.prepareSettings.removeRegularKey,
         'prepare'));
   });
 
   it('prepareSettings - flag set', function () {
     const settings = { requireDestinationTag: true };
-    return this.api.prepareSettings(address, settings, instructions).then(
+    return this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset).then(
       _.partial(checkResult, responses.prepareSettings.flagSet, 'prepare'));
   });
 
   it('prepareSettings - flag clear', function () {
     const settings = { requireDestinationTag: false };
-    return this.api.prepareSettings(address, settings, instructions).then(
+    return this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset).then(
       _.partial(checkResult, responses.prepareSettings.flagClear, 'prepare'));
   });
 
   it('prepareSettings - set depositAuth flag', function () {
     const settings = { depositAuth: true };
-    return this.api.prepareSettings(address, settings, instructions).then(
+    return this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset).then(
       _.partial(checkResult, responses.prepareSettings.flagSetDepositAuth, 'prepare'));
   });
 
   it('prepareSettings - clear depositAuth flag', function () {
     const settings = { depositAuth: false };
-    return this.api.prepareSettings(address, settings, instructions).then(
+    return this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset).then(
       _.partial(checkResult, responses.prepareSettings.flagClearDepositAuth, 'prepare'));
   });
 
   it('prepareSettings - integer field clear', function () {
     const settings = { transferRate: null };
-    return this.api.prepareSettings(address, settings, instructions)
+    return this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset)
       .then(data => {
         assert(data);
         assert.strictEqual(JSON.parse(data.txJSON).TransferRate, 0);
@@ -1312,14 +1740,14 @@ describe('RippleAPI', function () {
 
   it('prepareSettings - set transferRate', function () {
     const settings = { transferRate: 1 };
-    return this.api.prepareSettings(address, settings, instructions).then(
+    return this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset).then(
       _.partial(checkResult, responses.prepareSettings.setTransferRate,
         'prepare'));
   });
 
   it('prepareSettings - set signers', function () {
     const settings = requests.prepareSettings.signers.normal;
-    return this.api.prepareSettings(address, settings, instructions).then(
+    return this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset).then(
       _.partial(checkResult, responses.prepareSettings.signers,
         'prepare'));
   });
@@ -1327,7 +1755,7 @@ describe('RippleAPI', function () {
   it('prepareSettings - signers no threshold', function (done) {
     const settings = requests.prepareSettings.signers.noThreshold;
     try {
-      this.api.prepareSettings(address, settings, instructions).then(prepared => {
+      this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset).then(prepared => {
         done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
       }).catch(err => {
         assert.strictEqual(err.name, 'ValidationError');
@@ -1342,7 +1770,7 @@ describe('RippleAPI', function () {
   it('prepareSettings - signers no weights', function (done) {
     const settings = requests.prepareSettings.signers.noWeights;
     try {
-      this.api.prepareSettings(address, settings, instructions).then(prepared => {
+      this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset).then(prepared => {
         done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
       }).catch(err => {
         assert.strictEqual(err.name, 'ValidationError');
@@ -1357,7 +1785,7 @@ describe('RippleAPI', function () {
   it('prepareSettings - fee for multisign', function () {
     const localInstructions = _.defaults({
       signersCount: 4
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
     return this.api.prepareSettings(
       address, requests.prepareSettings.domain, localInstructions).then(
         _.partial(checkResult, responses.prepareSettings.flagsMultisign,
@@ -1372,7 +1800,7 @@ describe('RippleAPI', function () {
 
     const localInstructions = _.defaults({
       signersCount: 4
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
 
     try {
       this.api.prepareSettings(
@@ -1391,7 +1819,7 @@ describe('RippleAPI', function () {
   it('prepareEscrowCreation', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
     return this.api.prepareEscrowCreation(
       address, requests.prepareEscrowCreation.normal,
       localInstructions).then(
@@ -1426,7 +1854,7 @@ describe('RippleAPI', function () {
   it('prepareEscrowExecution', function () {
     return this.api.prepareEscrowExecution(
       address,
-      requests.prepareEscrowExecution.normal, instructions).then(
+      requests.prepareEscrowExecution.normal, instructionsWithMaxLedgerVersionOffset).then(
         _.partial(checkResult,
           responses.prepareEscrowExecution.normal,
           'prepare'));
@@ -1444,7 +1872,7 @@ describe('RippleAPI', function () {
   it('prepareEscrowExecution - no condition', function (done) {
     try {
       this.api.prepareEscrowExecution(address,
-        requests.prepareEscrowExecution.noCondition, instructions).then(prepared => {
+        requests.prepareEscrowExecution.noCondition, instructionsWithMaxLedgerVersionOffset).then(prepared => {
         done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
       }).catch(err => {
         assert.strictEqual(err.name, 'ValidationError');
@@ -1459,7 +1887,7 @@ describe('RippleAPI', function () {
   it('prepareEscrowExecution - no fulfillment', function (done) {
     try {
       this.api.prepareEscrowExecution(address,
-        requests.prepareEscrowExecution.noFulfillment, instructions).then(prepared => {
+        requests.prepareEscrowExecution.noFulfillment, instructionsWithMaxLedgerVersionOffset).then(prepared => {
         done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
       }).catch(err => {
         assert.strictEqual(err.name, 'ValidationError');
@@ -1474,7 +1902,7 @@ describe('RippleAPI', function () {
   it('prepareEscrowCancellation', function () {
     return this.api.prepareEscrowCancellation(
       address,
-      requests.prepareEscrowCancellation.normal, instructions).then(
+      requests.prepareEscrowCancellation.normal, instructionsWithMaxLedgerVersionOffset).then(
         _.partial(checkResult,
           responses.prepareEscrowCancellation.normal,
           'prepare'));
@@ -1492,7 +1920,7 @@ describe('RippleAPI', function () {
   it('prepareCheckCreate', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
     return this.api.prepareCheckCreate(
       address, requests.prepareCheckCreate.normal,
       localInstructions).then(
@@ -1531,7 +1959,7 @@ describe('RippleAPI', function () {
   it('prepareTransaction - DepositPreauth - Authorize', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -1555,7 +1983,7 @@ describe('RippleAPI', function () {
   it('prepareTransaction - DepositPreauth - Unauthorize', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions)
+    }, instructionsWithMaxLedgerVersionOffset)
 
     const txJSON = {
       TransactionType: 'DepositPreauth',
@@ -1581,7 +2009,7 @@ describe('RippleAPI', function () {
     it('normal', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012'
-      }, instructions);
+      }, instructionsWithMaxLedgerVersionOffset);
 
       const txJSON = {
         TransactionType: 'Payment',
@@ -1608,7 +2036,7 @@ describe('RippleAPI', function () {
     it('min amount xrp', function () {
       const localInstructions = _.defaults({
         maxFee: '0.000012'
-      }, instructions);
+      }, instructionsWithMaxLedgerVersionOffset);
 
       const txJSON = {
         TransactionType: 'Payment',
@@ -1642,7 +2070,7 @@ describe('RippleAPI', function () {
         Amount: '10000',
         Flags: 0
       }
-      return this.api.prepareTransaction(txJSON, instructions).then(
+      return this.api.prepareTransaction(txJSON, instructionsWithMaxLedgerVersionOffset).then(
           _.partial(checkResult,
             responses.preparePayment.minAmountXRPXRP, 'prepare'));
     });
@@ -1680,7 +2108,7 @@ describe('RippleAPI', function () {
     });
 
     // prepareTransaction - Payment
-    it('fee is capped at default maxFee of 2 XRP', function () {
+    it('fee is capped at default maxFee of 2 XRP (using txJSON.LastLedgerSequence)', function () {
       this.api._feeCushion = 1000000;
 
       const txJSON = {
@@ -1701,6 +2129,43 @@ describe('RippleAPI', function () {
         "LastLedgerSequence": 8820051
       }
 
+      const localInstructions = {}
+  
+      const expectedResponse = {
+        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"2000000\",\"Sequence\":23}",
+        "instructions": {
+          "fee": "2",
+          "sequence": 23,
+          "maxLedgerVersion": 8820051
+        }
+      }
+  
+      return this.api.prepareTransaction(txJSON, localInstructions).then(
+        _.partial(checkResult,
+          expectedResponse, 'prepare'));
+    });
+
+    // prepareTransaction - Payment
+    it('fee is capped at default maxFee of 2 XRP (using instructions.maxLedgerVersion)', function () {
+      this.api._feeCushion = 1000000;
+
+      const txJSON = {
+        "Flags": 2147483648,
+        "TransactionType": "Payment",
+        "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+        "Destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        "Amount": {
+          "value": "0.01",
+          "currency": "USD",
+          "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        },
+        "SendMax": {
+          "value": "0.01",
+          "currency": "USD",
+          "issuer": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+        }
+      }
+
       const localInstructions = {
         "maxLedgerVersion": 8820051
       }
@@ -1712,7 +2177,7 @@ describe('RippleAPI', function () {
           "sequence": 23,
           "maxLedgerVersion": 8820051
         }
-      }    
+      }
   
       return this.api.prepareTransaction(txJSON, localInstructions).then(
         _.partial(checkResult,
@@ -1723,9 +2188,9 @@ describe('RippleAPI', function () {
     it('fee is capped to custom maxFeeXRP when maxFee exceeds maxFeeXRP', function () {
       this.api._feeCushion = 1000000
       this.api._maxFeeXRP = '3'
-      const localInstructions = _.defaults({
+      const localInstructions = {
         maxFee: '4' // We are testing that this does not matter; fee is still capped to maxFeeXRP
-      }, instructions);
+      };
 
       const txJSON = {
         "Flags": 2147483648,
@@ -1763,9 +2228,9 @@ describe('RippleAPI', function () {
     it('fee is capped to maxFee', function () {
       this.api._feeCushion = 1000000
       this.api._maxFeeXRP = '5'
-      const localInstructions = _.defaults({
+      const localInstructions = {
         maxFee: '4' // maxFeeXRP does not matter if maxFee is lower than maxFeeXRP
-      }, instructions);
+      };
 
       const txJSON = {
         "Flags": 2147483648,
@@ -1815,7 +2280,7 @@ describe('RippleAPI', function () {
       }    
   
       return this.api.preparePayment(
-        address, requests.preparePayment.normal, instructions).then(
+        address, requests.preparePayment.normal, instructionsWithMaxLedgerVersionOffset).then(
           _.partial(checkResult, expectedResponse, 'prepare'));
     });
   });
@@ -1823,7 +2288,7 @@ describe('RippleAPI', function () {
   it('prepareTransaction - PaymentChannelCreate', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
     return this.api.prepareTransaction({
       Account: address,
       TransactionType: 'PaymentChannelCreate',
@@ -1865,7 +2330,7 @@ describe('RippleAPI', function () {
   it('prepareTransaction - PaymentChannelFund', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
 
     const txJSON = {
       Account: address,
@@ -1896,7 +2361,7 @@ describe('RippleAPI', function () {
   it('prepareTransaction - PaymentChannelClaim', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
 
     const txJSON = {
       Account: address,
@@ -1913,7 +2378,7 @@ describe('RippleAPI', function () {
   it('prepareTransaction - PaymentChannelClaim with renew', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
 
     const txJSON = {
       Account: address,
@@ -1935,7 +2400,7 @@ describe('RippleAPI', function () {
   it('prepareTransaction - PaymentChannelClaim with close', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
 
     const txJSON = {
       Account: address,
@@ -1957,7 +2422,7 @@ describe('RippleAPI', function () {
   it('preparePaymentChannelCreate', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
     return this.api.preparePaymentChannelCreate(
       address, requests.preparePaymentChannelCreate.normal,
       localInstructions).then(
@@ -1975,7 +2440,7 @@ describe('RippleAPI', function () {
   it('preparePaymentChannelFund', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
     return this.api.preparePaymentChannelFund(
       address, requests.preparePaymentChannelFund.normal,
       localInstructions).then(
@@ -1993,7 +2458,7 @@ describe('RippleAPI', function () {
   it('preparePaymentChannelClaim', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
     return this.api.preparePaymentChannelClaim(
       address, requests.preparePaymentChannelClaim.normal,
       localInstructions).then(
@@ -2004,7 +2469,7 @@ describe('RippleAPI', function () {
   it('preparePaymentChannelClaim with renew', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
     return this.api.preparePaymentChannelClaim(
       address, requests.preparePaymentChannelClaim.renew,
       localInstructions).then(
@@ -2015,7 +2480,7 @@ describe('RippleAPI', function () {
   it('preparePaymentChannelClaim with close', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
     return this.api.preparePaymentChannelClaim(
       address, requests.preparePaymentChannelClaim.close,
       localInstructions).then(
@@ -3493,7 +3958,7 @@ describe('RippleAPI', function () {
     }    
 
     return this.api.preparePayment(
-      address, requests.preparePayment.normal, instructions).then(
+      address, requests.preparePayment.normal, instructionsWithMaxLedgerVersionOffset).then(
         _.partial(checkResult, expectedResponse, 'prepare'));
   });
 
@@ -3502,7 +3967,7 @@ describe('RippleAPI', function () {
     this.api._maxFeeXRP = '3'
     const localInstructions = _.defaults({
       maxFee: '4'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
 
     const expectedResponse = {
       "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"3000000\",\"Sequence\":23}",
@@ -3523,7 +3988,7 @@ describe('RippleAPI', function () {
     this.api._maxFeeXRP = '5'
     const localInstructions = _.defaults({
       maxFee: '4'
-    }, instructions);
+    }, instructionsWithMaxLedgerVersionOffset);
 
     const expectedResponse = {
       "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"4000000\",\"Sequence\":23}",
@@ -3555,7 +4020,7 @@ describe('RippleAPI', function () {
     }    
 
     return this.api.preparePayment(
-      address, requests.preparePayment.normal, instructions).then(
+      address, requests.preparePayment.normal, instructionsWithMaxLedgerVersionOffset).then(
         _.partial(checkResult, expectedResponse, 'prepare'));
   });
   
