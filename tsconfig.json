@@ -1,25 +1,8 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "lib": [
-      "es2017"
-    ],
-    "outDir": "dist/npm",
-    "rootDir": "src",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "removeComments": true,
-    "strict": true /* Enable all strict type-checking options. */,
-    "preserveConstEnums": false,
-    "suppressImplicitAnyIndexErrors": false,
-    "declaration": true,
-    "sourceMap": true
-  },
-  "include": [
-    "src/**/*.ts"
+  "files": [],
+  "include": [],
+  "references": [
+    { "path": "./src" },
+    { "path": "./snippets" }
   ]
 }
