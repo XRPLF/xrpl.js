@@ -1,8 +1,25 @@
 # ripple-lib Release History
 
-## UNRELEASED
+## 1.2.2 (2019-04-15)
 
 * Prevent `prepareTransaction` from overwriting `Fee` and/or `LastLedgerSequence` (#997)
+* Add `deliveredAmount` as optional field for type `Outcome` (#996)
+* Fix build failure with TS strict checks (#993)
+
+Minor changes:
+
+* Use TypeScript project references
+* Travis: Drop node 9 and add node 11 for testing
+* Bump versions of devDependencies
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+aa8683050e73272e44eda4147ec12da3eee829c486c356f2378defc308ec443b  ripple-1.2.2-debug.js
+548646f3d29ff2af1c63fb10dd63dfa84a59e88a8f76487ae6bf103558d4b991  ripple-1.2.2-min.js
+aec9c7ad5fd238d6afadae68175441d11ad44c091427f280c7c59aec3a2dc0c9  ripple-1.2.2.js
+```
 
 ## 1.2.1 (2019-03-23)
 
