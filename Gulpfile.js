@@ -53,12 +53,13 @@ function getWebpackConfig(extension, overrides) {
         use: [{
           loader: 'ts-loader',
           options: {
-            compilerOptions: {declaration: false}
+            compilerOptions: {
+              composite: false,
+              declaration: false,
+              declarationMap: false
+            }
           },
         }],
-      }, {
-        test: /\.json/,
-        use: 'json-loader',
       }]
     },
     resolve: {
