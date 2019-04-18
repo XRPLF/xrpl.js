@@ -6,24 +6,24 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const gulp = require('gulp');
-const rename = require('gulp-rename');
+// const rename = require('gulp-rename');
 const webpack = require('webpack');
-const bump = require('gulp-bump');
-const argv = require('yargs').argv;
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+// const bump = require('gulp-bump');
+// const argv = require('yargs').argv;
+// const TerserPlugin = require('terser-webpack-plugin');
 
 var pkg = require('./package.json');
 
-var uglifyOptions = {
-  mangle: {
-    reserved: ['_', 'RippleError', 'RippledError', 'UnexpectedError',
-    'LedgerVersionError', 'ConnectionError', 'NotConnectedError',
-    'DisconnectedError', 'TimeoutError', 'ResponseFormatError',
-    'ValidationError', 'NotFoundError', 'MissingLedgerHistoryError',
-    'PendingLedgerVersionError'
-    ]
-  }
-};
+// var terserOptions = {
+//   mangle: {
+//     reserved: ['_', 'RippleError', 'RippledError', 'UnexpectedError',
+//     'LedgerVersionError', 'ConnectionError', 'NotConnectedError',
+//     'DisconnectedError', 'TimeoutError', 'ResponseFormatError',
+//     'ValidationError', 'NotFoundError', 'MissingLedgerHistoryError',
+//     'PendingLedgerVersionError'
+//     ]
+//   }
+// };
 
 function getWebpackConfig(extension, overrides) {
   overrides = overrides || {};
@@ -53,13 +53,19 @@ function getWebpackConfig(extension, overrides) {
         use: [{
           loader: 'ts-loader',
           options: {
-            compilerOptions: {declaration: false}
+            compilerOptions: {
+              declaration: false,
+              composite: false,
+              declarationMap: false
+            }
           },
         }],
-      }, {
-        test: /\.json/,
-        use: 'json-loader',
-      }]
+      },
+      // {
+      //   test: /\.json/,
+      //   use: 'json-loader',
+      // }
+      ]
     },
     resolve: {
       extensions: [ '.ts', '.js' ]
@@ -111,32 +117,59 @@ function createLink(from, to) {
   fs.linkSync(from, to);
 }
 
-function createBuildLink(callback) {
-  return function(err, res) {
+function createBuildLink(done) {
+  return function() {
     createLink('./build/ripple-' + pkg.version + '.js',
       './build/ripple-latest.js');
-    callback(err, res);
+    done();
   };
 }
 
-gulp.task('build', function(callback) {
-  webpack(getWebpackConfig('.js'), createBuildLink(callback));
-});
-
-gulp.task('build-min', function(callback) {
-  const webpackConfig = getWebpackConfig('-min.js');
-  webpackConfig.plugins.push(new UglifyJsPlugin({uglifyOptions}));
-  webpack(webpackConfig, function() {
-    createLink('./build/ripple-' + pkg.version + '-min.js',
-      './build/ripple-latest-min.js');
-    callback();
+gulp.task('build', function(done) {
+  webpack(getWebpackConfig('.js', {mode: 'production'})).run((err, stats) => {
+    console.log('*** webpack build results ***');
+    console.log('Err:', err);
+    console.log('errors:', stats.compilation.errors);
+    console.log('warnings:', stats.compilation.warnings);
+    createBuildLink(() => {
+      if (done) {
+        console.log('--- done ---');
+        done();
+      }
+    })();
   });
 });
 
-gulp.task('build-debug', function(callback) {
-  const webpackConfig = getWebpackConfig('-debug.js', {devtool: 'eval'});
+// gulp.task('build-min', function(done) {
+//   const webpackConfig = getWebpackConfig('-min.js', {mode: 'production'});
+//   webpackConfig.optimization = {
+//     minimizer: [new TerserPlugin({terserOptions})]
+//   };
+//   // webpackConfig.plugins.push(new UglifyJsPlugin({uglifyOptions}));
+//   webpack(webpackConfig, (err, stats) => {
+//     console.log('*** webpack build-min results ***');
+//     console.log('Err:', err);
+//     console.log('errors:', stats.compilation.errors);
+//     console.log('warnings:', stats.compilation.warnings);
+//     createLink('./build/ripple-' + pkg.version + '-min.js',
+//       './build/ripple-latest-min.js');
+//       done();
+//   });
+// });
+
+gulp.task('build-debug', function(done) {
+  const webpackConfig = getWebpackConfig('-debug.js', {
+    mode: 'development',
+    devtool: 'eval'
+  });
   webpackConfig.plugins.unshift(new webpack.LoaderOptionsPlugin({debug: true}));
-  webpack(webpackConfig, callback);
+  webpack(webpackConfig, (err, stats) => {
+    console.log('*** webpack build-debug results ***');
+    console.log('Err:', err);
+    console.log('errors:', stats.compilation.errors);
+    console.log('warnings:', stats.compilation.warnings);
+    done();
+  });
 });
 
 /**
@@ -149,68 +182,72 @@ function buildUseError(cons) {
           .replace(new RegExp('<CONS>', 'g'), cons);
 }
 
-gulp.task('build-core', function(callback) {
-  var configOverrides = {
-    cache: false,
-    entry: './src/remote.ts',
-    externals: [{
-      './transaction': buildUseError('Transaction'),
-      './orderbook': buildUseError('OrderBook'),
-      './account': buildUseError('Account'),
-      './serializedobject': buildUseError('SerializedObject')
-    }],
-    plugins: [
-      new UglifyJsPlugin()
-    ]
-  };
-  webpack(getWebpackConfig('-core.js', configOverrides), callback);
-});
+// gulp.task('build-core', function(callback) {
+//   var configOverrides = {
+//     cache: false,
+//     entry: './src/remote.ts',
+//     externals: [{
+//       './transaction': buildUseError('Transaction'),
+//       './orderbook': buildUseError('OrderBook'),
+//       './account': buildUseError('Account'),
+//       './serializedobject': buildUseError('SerializedObject')
+//     }],
+//     plugins: [
+//       new UglifyJsPlugin()
+//     ]
+//   };
+//   webpack(getWebpackConfig('-core.js', configOverrides), callback);
+// });
 
-gulp.task('bower-build', ['build'], function() {
-  return gulp.src(['./build/ripple-', '.js'].join(pkg.version))
-  .pipe(rename('ripple.js'))
-  .pipe(gulp.dest('./dist/bower'));
-});
+// gulp.task('bower-build', ['build'], function() {
+//   return gulp.src(['./build/ripple-', '.js'].join(pkg.version))
+//   .pipe(rename('ripple.js'))
+//   .pipe(gulp.dest('./dist/bower'));
+// });
 
-gulp.task('bower-build-min', ['build-min'], function() {
-  return gulp.src(['./build/ripple-', '-min.js'].join(pkg.version))
-  .pipe(rename('ripple-min.js'))
-  .pipe(gulp.dest('./dist/bower'));
-});
+// gulp.task('bower-build-min', ['build-min'], function() {
+//   return gulp.src(['./build/ripple-', '-min.js'].join(pkg.version))
+//   .pipe(rename('ripple-min.js'))
+//   .pipe(gulp.dest('./dist/bower'));
+// });
 
-gulp.task('bower-build-debug', ['build-debug'], function() {
-  return gulp.src(['./build/ripple-', '-debug.js'].join(pkg.version))
-  .pipe(rename('ripple-debug.js'))
-  .pipe(gulp.dest('./dist/bower'));
-});
+// gulp.task('bower-build-debug', ['build-debug'], function() {
+//   return gulp.src(['./build/ripple-', '-debug.js'].join(pkg.version))
+//   .pipe(rename('ripple-debug.js'))
+//   .pipe(gulp.dest('./dist/bower'));
+// });
 
-gulp.task('bower-version', function() {
-  gulp.src('./dist/bower/bower.json')
-  .pipe(bump({version: pkg.version}))
-  .pipe(gulp.dest('./dist/bower'));
-});
+// gulp.task('bower-version', function() {
+//   gulp.src('./dist/bower/bower.json')
+//   .pipe(bump({version: pkg.version}))
+//   .pipe(gulp.dest('./dist/bower'));
+// });
 
-gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug',
-                    'bower-version']);
+// gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug',
+//                     'bower-version']);
 
-gulp.task('watch', function() {
-  gulp.watch('src/*', ['build-debug']);
-});
+// gulp.task('watch', function() {
+//   gulp.watch('src/*', ['build-debug']);
+// });
 
-gulp.task('version-bump', function() {
-  if (!argv.type) {
-    throw new Error('No type found, pass it in using the --type argument');
-  }
+// gulp.task('version-bump', function() {
+//   if (!argv.type) {
+//     throw new Error('No type found, pass it in using the --type argument');
+//   }
 
-  gulp.src('./package.json')
-  .pipe(bump({type: argv.type}))
-  .pipe(gulp.dest('./'));
-});
+//   gulp.src('./package.json')
+//   .pipe(bump({type: argv.type}))
+//   .pipe(gulp.dest('./'));
+// });
 
-gulp.task('version-beta', function() {
-  gulp.src('./package.json')
-  .pipe(bump({version: pkg.version + '-beta'}))
-  .pipe(gulp.dest('./'));
-});
+// gulp.task('version-beta', function() {
+//   gulp.src('./package.json')
+//   .pipe(bump({version: pkg.version + '-beta'}))
+//   .pipe(gulp.dest('./'));
+// });
 
-gulp.task('default', ['build', 'build-debug', 'build-min']);
+gulp.task('default', [
+  'build',
+  'build-debug',
+  // 'build-min'
+]);
