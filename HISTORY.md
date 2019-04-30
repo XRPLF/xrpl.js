@@ -1,5 +1,18 @@
 # ripple-lib Release History
 
+## 1.2.3 (2019-05-30)
+
+* Fix browser builds
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+efb0f29cde94534a015d8a2171abb11b9a4345ba01418bf5b6ab6042a6d51dde  ripple-1.2.3-debug.js
+b86145c0e30099b966ed8d3830ba25988d72877f1f87044d9954d6707be098ac  ripple-1.2.3-min.js
+e027d91c7321d41ba94bb1bdc77dcff0107a5fd9eb833c6dbd06f1bbedef3900  ripple-1.2.3.js
+```
+
 ## 1.2.2 (2019-04-15)
 
 * Prevent `prepareTransaction` from overwriting `Fee` and/or `LastLedgerSequence` (#997)
