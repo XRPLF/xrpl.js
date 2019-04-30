@@ -10,7 +10,8 @@
   "main": "dist/npm/",
   "types": "dist/npm/index.d.ts",
   "browser": {
-    "ws": "./dist/npm/common/wswrapper.js"
+    "ws": "./dist/npm/common/wswrapper.js",
+    "https-proxy-agent": false
   },
   "directories": {
     "test": "test"
