@@ -74,4 +74,5 @@ The continuous integration tests require that the documentation stays up-to-date
 
 ## More Information
 
-+ [Ripple Developer Center](https://ripple.com/build/)
++ [RippleAPI Reference](https://developers.ripple.com/rippleapi-reference.html) - XRP Ledger Dev Portal
++ [XRP Ledger Dev Portal](https://developers.ripple.com/)
