@@ -202,7 +202,7 @@ class Connection extends EventEmitter {
 
       this._updateLedgerVersions(data)
       this._updateFees(data)
-      this._rebindOnUnxpectedClose()
+      this._rebindOnUnexpectedClose()
 
       this._retry = 0
       this._ws.on('error', error => {
@@ -216,7 +216,7 @@ class Connection extends EventEmitter {
     })
   }
 
-  _rebindOnUnxpectedClose() {
+  _rebindOnUnexpectedClose() {
     if (this._onUnexpectedCloseBound) {
       this._ws.removeListener('close', this._onUnexpectedCloseBound)
     }
@@ -225,7 +225,7 @@ class Connection extends EventEmitter {
     this._ws.once('close', this._onUnexpectedCloseBound)
   }
 
-  _unbindOnUnxpectedClose() {
+  _unbindOnUnexpectedClose() {
     if (this._onUnexpectedCloseBound) {
       this._ws.removeListener('close', this._onUnexpectedCloseBound)
     }
@@ -234,7 +234,7 @@ class Connection extends EventEmitter {
 
   _onOpenError(reject, error) {
     this._onOpenErrorBound = null
-    this._unbindOnUnxpectedClose()
+    this._unbindOnUnexpectedClose()
     reject(new NotConnectedError(error.message, error))
   }
 
