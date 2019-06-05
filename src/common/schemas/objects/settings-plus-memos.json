@@ -13,7 +13,7 @@
     },
     "disableMasterKey": {
       "type": "boolean",
-      "description": "Disallows use of the master key to sign transactions for this account."
+      "description": "Disallows use of the master key to sign transactions for this account. To disable the master key, you must authorize the transaction by signing it with the master key pair. You cannot use a regular key pair or a multi-signature. You can re-enable the master key pair using a regular key pair or multi-signature. See [AccountSet](https://developers.ripple.com/accountset.html)."
     },
     "disallowIncomingXRP": {
       "type": "boolean",
