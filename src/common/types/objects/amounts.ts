@@ -1,8 +1,5 @@
-export type Amount = {
-  value: string,
-  currency: string,
-  issuer?: string,
-  counterparty?: string
+export interface Amount extends Issue {
+  value: string
 }
 
 
@@ -21,8 +18,8 @@ export interface TakerRequestAmount {
 /**
  * A currency-counterparty pair, or just currency if it's XRP.
  */
-export type Issue = {
-  currency: string,
-  issuer?: string,
+export interface Issue {
+  currency: string
+  issuer?: string
   counterparty?: string
 }

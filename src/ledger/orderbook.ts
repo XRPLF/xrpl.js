@@ -5,7 +5,7 @@ import {
   FormattedOrderbookOrder
 } from './parse/orderbook-order'
 import {validate} from '../common'
-import {Amount, Issue} from '../common/types/objects'
+import {Issue} from '../common/types/objects'
 import {BookOffer} from '../common/types/commands'
 import {RippleAPI} from '..'
 import BigNumber from 'bignumber.js'
@@ -15,7 +15,7 @@ export type FormattedOrderbook = {
   asks: FormattedOrderbookOrder[]
 }
 
-function isSameIssue(a: Amount, b: Amount) {
+function isSameIssue(a: Issue, b: Issue) {
   return a.currency === b.currency && a.counterparty === b.counterparty
 }
 
@@ -34,7 +34,7 @@ function flipOrder(order: FormattedOrderbookOrder) {
   return _.merge({}, order, {specification: newSpecification})
 }
 
-function alignOrder(base: Amount, order: FormattedOrderbookOrder) {
+function alignOrder(base: Issue, order: FormattedOrderbookOrder): FormattedOrderbookOrder {
   const quantity = order.specification.quantity
   return isSameIssue(quantity, base) ? order : flipOrder(order)
 }
