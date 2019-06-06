@@ -1,6 +1,22 @@
 # ripple-lib Release History
 
-## 1.2.3 (2019-05-30)
+## 1.2.4 (2019-06-06)
+
+* Update README.md
+* Clarify docs
+* Update dependencies
+* Fix typos
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+4f09c056ccc51bc6cf17b128b559112e9c5adf19cc96ac8f9a06faee185697a7  ripple-1.2.4-debug.js
+5da1c75a02d76b0b105d98355ee4561f5d5036e8d5d0237efd5960812dcaa1fd  ripple-1.2.4-min.js
+e147f303e880a65db149d2a5b9183b75814bd8145cd00740bcc4679d867192c8  ripple-1.2.4.js
+```
+
+## 1.2.3 (2019-04-30)
 
 * Fix browser builds
 
