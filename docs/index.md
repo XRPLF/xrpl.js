@@ -5434,6 +5434,10 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
 
 ```javascript
 const RippleAPI = require('ripple-lib').RippleAPI;
+const api = new RippleAPI({
+  server: 'wss://s.altnet.rippletest.net:51233' 
+
+});
 
 // jon's address has a multi-signing setup with a qourum of 2
 const jon = {
@@ -5477,6 +5481,9 @@ api.connect().then(() => {
     console.log(response);
   }).catch(console.error);
 }).catch(console.error)
+.then(() => {
+  return api.disconnect();
+}).catch(console.error);
 ```
 
 Assuming the multisigning account was setup properly, the above example will respond with `resultCode: 'tesSUCCESS'`.
