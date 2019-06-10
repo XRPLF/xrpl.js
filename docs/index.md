@@ -5404,6 +5404,8 @@ options | object | *Optional* Options that control the type of signature that wi
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
 secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field is exclusive with keypair).
 
+Please note that when this method is used for multisigning, the `options` parameter is not *Optional* anymore. It will be compulsary. See the multisigning example in this section for more details.
+
 ### Return Value
 
 This method returns an object with the following structure:
@@ -5428,6 +5430,61 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
   "signedTransaction": "12000322800000002400000017201B0086955368400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100BDE09A1F6670403F341C21A77CF35BA47E45CDE974096E1AA5FC39811D8269E702203D60291B9A27F1DCABA9CF5DED307B4F23223E0B6F156991DB601DFB9C41CE1C770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304",
   "id": "02ACE87F1996E3A23690A5BB7F1774BF71CCBA68F79805831B42ABAD5913D6F4"
 }
+```
+
+### Example (multisigning)
+
+```javascript
+const RippleAPI = require('ripple-lib').RippleAPI;
+
+// jon's address has a multi-signing setup with a qourum of 2
+const jon = {
+  account: 'ranYTqDRUKKAqnXAAVDwWBUvvc5op4pXoP',
+  secret: 'shfC5QySdfhCUaEfEF9gxPhAhy58u'
+};
+
+const aya = {
+  account: 'rnrPdBjs98fFFfmRpL6hM7exT788SWQPFN',
+  secret: 'snaMuMrXeVc2Vd4NYvHofeGNjgYoe'
+};
+
+const bran = {
+  account: 'rJ93RLnT1t5A8fCr7HTScw7WtfKJMRXodH',
+  secret: 'shQtQ8Um5MS218yvEU3Ehy1eZQKqH'
+};
+
+// a transaction which requires multi signing
+const multiSignPaymentTransaction = {
+    TransactionType: 'Payment',
+    Account: 'ranYTqDRUKKAqnXAAVDwWBUvvc5op4pXoP',
+    Sequence: 4,
+    Destination: 'rJ93RLnT1t5A8fCr7HTScw7WtfKJMRXodH',
+    Fee: '120',
+    Amount: '1888000000'
+};
+
+api.connect().then(() => {
+  let tx = JSON.stringify(multiSignPaymentTransaction, null, '\t');
+  
+  // Jon signs the original payment transaction
+  let jonSign = api.sign(tx, jon.secret).signedTransaction;
+  
+  // Aya and Bran sign it too but with 'signAs' set to their own account
+  let ayaSign = api.sign(tx, aya.secret, {'signAs': aya.account}).signedTransaction;
+  let branSign = api.sign(tx, bran.secret, {'signAs': bran.account})).signedTransaction;
+  
+  // signatures are combined and submitted
+  let combinedTx = api.combine([ayaSign, branSign]);
+  api.submit(combinedTx.signedTransaction).then ( (response) => {
+    console.log(response);
+  }).catch(console.error);
+}).catch(console.error)
+```
+
+Assuming the multisigning account was setup properly, the above example will respond with `resultCode: 'tesSUCCESS'`.
+If any of `{signAs: some_address}` options were missing the code will return a validation error as follow:
+```
+[ValidationError(txJSON is not the same for all signedTransactions)]
 ```
 
 
