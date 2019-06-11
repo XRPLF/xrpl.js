@@ -5402,7 +5402,7 @@ options | object | *Optional* Options that control the type of signature that wi
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
 secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field is exclusive with keypair).
 
-Please note that when this method is used for multisigning, the `options` parameter is not *Optional* anymore. It will be compulsary. See the multisigning example in this section for more details. 
+Please note that when this method is used for multisigning, the `options` parameter is not *Optional* anymore. It will be compulsory. See the multisigning example in this section for more details. 
 
 ### Return Value
 
@@ -5436,10 +5436,9 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
 const RippleAPI = require('ripple-lib').RippleAPI;
 const api = new RippleAPI({
   server: 'wss://s.altnet.rippletest.net:51233' 
-
 });
 
-// jon's address has a multi-signing setup with a qourum of 2
+// jon's address has a multi-signing setup with a quorum of 2
 const jon = {
   account: 'ranYTqDRUKKAqnXAAVDwWBUvvc5op4pXoP',
   secret: 'shfC5QySdfhCUaEfEF9gxPhAhy58u'
@@ -5466,23 +5465,20 @@ const multiSignPaymentTransaction = {
 };
 
 api.connect().then(() => {
-  let tx = JSON.stringify(multiSignPaymentTransaction, null, '\t');
-  
-  // Jon signs the original payment transaction
-  let jonSign = api.sign(tx, jon.secret).signedTransaction;
-  
-  // Aya and Bran sign it too but with 'signAs' set to their own account
-  let ayaSign = api.sign(tx, aya.secret, {'signAs': aya.account}).signedTransaction;
-  let branSign = api.sign(tx, bran.secret, {'signAs': bran.account})).signedTransaction;
-  
-  // signatures are combined and submitted
-  let combinedTx = api.combine([ayaSign, branSign]);
-  api.submit(combinedTx.signedTransaction).then ( (response) => {
-    console.log(response);
+  api.prepareTransaction(multiSignPaymentTransaction).then(prepared => {
+      console.log(prepared);
+      
+      // Aya and Bran sign it too but with 'signAs' set to their own account
+      let ayaSign = api.sign(tx, aya.secret, {'signAs': aya.account}).signedTransaction;
+      let branSign = api.sign(tx, bran.secret, {'signAs': bran.account})).signedTransaction;
+      
+      // signatures are combined and submitted
+      let combinedTx = api.combine([evaSig, giliSig, sincanSig]);
+      api.submit(combinedTx.signedTransaction).then ( (response) => {
+          console.log(response.tx_json.hash);
+          return api.disconnect();
+      }).catch(console.error);
   }).catch(console.error);
-}).catch(console.error)
-.then(() => {
-  return api.disconnect();
 }).catch(console.error);
 ```
 
