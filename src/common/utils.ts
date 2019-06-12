@@ -103,6 +103,7 @@ function toRippledAmount(amount: Amount): RippledAmount {
 
 function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
   if (typeof obj === 'object') {
+    const accumulator = Array.isArray(obj) ? [] : {}
     let newKey
     return _.reduce(obj, (result, value, key) => {
       newKey = key
@@ -113,7 +114,7 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
       }
       result[newKey] = convertKeysFromSnakeCaseToCamelCase(value)
       return result
-    }, {})
+    }, accumulator)
   }
   return obj
 }
