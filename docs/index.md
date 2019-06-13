@@ -5434,55 +5434,85 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
 
 ```javascript
 const RippleAPI = require('ripple-lib').RippleAPI;
-const api = new RippleAPI({
-  server: 'wss://s.altnet.rippletest.net:51233' 
-});
 
-// jon's address has a multi-signing setup with a quorum of 2
+// jon's address will have a multi-signing setup with a quorum of 2
 const jon = {
-  account: 'ranYTqDRUKKAqnXAAVDwWBUvvc5op4pXoP',
-  secret: 'shfC5QySdfhCUaEfEF9gxPhAhy58u'
+    account: 'rJKpme4m2zBQceBuU89d7vLMzgoUw2Ptj',
+    secret: 'sh4Va7b1wQof8knHFV2sxwX12fSgK'
 };
-
 const aya = {
-  account: 'rnrPdBjs98fFFfmRpL6hM7exT788SWQPFN',
-  secret: 'snaMuMrXeVc2Vd4NYvHofeGNjgYoe'
+    account: 'rnrPdBjs98fFFfmRpL6hM7exT788SWQPFN',
+    secret: 'snaMuMrXeVc2Vd4NYvHofeGNjgYoe'
+};
+const bran = {
+    account: 'rJ93RLnT1t5A8fCr7HTScw7WtfKJMRXodH',
+    secret: 'shQtQ8Um5MS218yvEU3Ehy1eZQKqH'
 };
 
-const bran = {
-  account: 'rJ93RLnT1t5A8fCr7HTScw7WtfKJMRXodH',
-  secret: 'shQtQ8Um5MS218yvEU3Ehy1eZQKqH'
+// Setup the signers list with a quorum of 2
+const multiSignSetupTransaction = {
+    "Flags": 0,
+    "TransactionType": "SignerListSet",
+    "Account": "rJKpme4m2zBQceBuU89d7vLMzgoUw2Ptj",
+    "Fee": "120",
+    "SignerQuorum": 2,
+    "SignerEntries": [
+        {
+            "SignerEntry": {
+                "Account": "rnrPdBjs98fFFfmRpL6hM7exT788SWQPFN",
+                "SignerWeight": 2
+            }
+        },
+        {
+            "SignerEntry": {
+                "Account": "rJ93RLnT1t5A8fCr7HTScw7WtfKJMRXodH",
+                "SignerWeight": 1
+            }
+        },
+    ]
 };
 
 // a transaction which requires multi signing
 const multiSignPaymentTransaction = {
     TransactionType: 'Payment',
-    Account: 'ranYTqDRUKKAqnXAAVDwWBUvvc5op4pXoP',
-    Sequence: 4,
+    Account: 'rJKpme4m2zBQceBuU89d7vLMzgoUw2Ptj',
     Destination: 'rJ93RLnT1t5A8fCr7HTScw7WtfKJMRXodH',
-    Fee: '120',
-    Amount: '1888000000'
+    Amount: '88000000'
 };
 
+const api = new RippleAPI({
+    server: 'wss://s.altnet.rippletest.net:51233'
+});
+
 api.connect().then(() => {
-  api.prepareTransaction(multiSignPaymentTransaction).then(prepared => {
-      console.log(prepared);
-      
-      // Aya and Bran sign it too but with 'signAs' set to their own account
-      let ayaSign = api.sign(tx, aya.secret, {'signAs': aya.account}).signedTransaction;
-      let branSign = api.sign(tx, bran.secret, {'signAs': bran.account})).signedTransaction;
-      
-      // signatures are combined and submitted
-      let combinedTx = api.combine([evaSig, giliSig, sincanSig]);
-      api.submit(combinedTx.signedTransaction).then ( (response) => {
-          console.log(response.tx_json.hash);
-          return api.disconnect();
-      }).catch(console.error);
-  }).catch(console.error);
+    // adding the multi signing feature to jon's account
+    api.prepareTransaction(multiSignSetupTransaction).then((prepared) => {
+        console.log(prepared);
+        jonSign = api.sign(prepared.txJSON, jon.secret).signedTransaction;
+        api.submit(jonSign).then( response => {
+            console.log(response.resultCode, response.resultMessage);
+
+            // multi sign a transaction
+            api.prepareTransaction(multiSignPaymentTransaction).then(prepared => {
+                console.log(prepared);
+
+                // Aya and Bran sign it too but with 'signAs' set to their own account
+                let ayaSign = api.sign(prepared.txJSON, aya.secret, {'signAs': aya.account}).signedTransaction;
+                let branSign = api.sign(prepared.txJSON, bran.secret, {'signAs': bran.account}).signedTransaction;
+
+                // signatures are combined and submitted
+                let combinedTx = api.combine([ayaSign, branSign]);
+                api.submit(combinedTx.signedTransaction).then(response => {
+                    console.log(response.tx_json.hash);
+                    return api.disconnect();
+                }).catch(console.error);
+            }).catch(console.error);
+        }).catch(console.error)
+    }).catch(console.error);
 }).catch(console.error);
 ```
 
-Assuming the multisigning account was setup properly, the above example will respond with `resultCode: 'tesSUCCESS'`.
+Assuming the multisigning account was setup properly, the above example will respond with `resultCode: 'tesSUCCESS'` and the hash for the transaction.
 If any of `{signAs: some_address}` options were missing the code will return a validation error as follow:
 ```
 [ValidationError(txJSON is not the same for all signedTransactions)]
