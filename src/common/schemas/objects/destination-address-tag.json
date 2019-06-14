@@ -6,7 +6,7 @@
   "properties": {
     "address": {
       "$ref": "address",
-      "description": "The address to receive at."
+      "description": "An address representing the destination of the transaction."
     },
     "tag": {"$ref": "tag"}
   },

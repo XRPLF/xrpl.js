@@ -5,7 +5,7 @@
   "properties": {
     "address": {
       "$ref": "address",
-      "description": "The address to send to."
+      "description": "An address representing the destination of the transaction."
     },
     "minAmount": {
       "$ref": "laxAmount",
