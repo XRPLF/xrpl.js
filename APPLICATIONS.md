@@ -36,6 +36,10 @@ Warning: Use at your own risk.
 
   List of XRPL validators, nodes, and testnet validators.
 
+- **[XRP Scan - XRP Ledger explorer](https://http://xrpscan.com)**
+
+  XRP Ledger explorer, metrics and analytics.
+
 ## Send and request payments
 
 - **[XRP Tip Bot](https://www.xrptipbot.com/)**
