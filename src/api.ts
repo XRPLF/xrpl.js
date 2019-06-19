@@ -72,8 +72,9 @@ import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
+import {ConnectionOptions} from './common/connection'
 
-export type APIOptions = {
+export interface APIOptions extends ConnectionOptions {
   server?: string,
   feeCushion?: number,
   maxFeeXRP?: string,
