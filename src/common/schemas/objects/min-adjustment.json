@@ -9,7 +9,7 @@
     },
     "minAmount": {
       "$ref": "laxAmount",
-      "description": "The minimum amount to be delivered. (This field is exclusive with destination.amount)"
+      "description": "The minimum amount to be delivered. (This field cannot be used with destination.amount)"
     },
     "tag": {"$ref": "tag"}
   },

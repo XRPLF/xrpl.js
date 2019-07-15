@@ -14,7 +14,7 @@
       "$ref": "currency"
     },
     "counterparty": {
-      "description": "The Ripple address of the account that owes or is owed the funds.",
+      "description": "The XRP Ledger address of the account that owes or is owed the funds.",
       "$ref": "address"
     }
   },

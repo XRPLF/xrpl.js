@@ -10,7 +10,7 @@
     "secret": {
       "type": "string",
       "format": "secret",
-      "description": "The secret of the account that is initiating the transaction. (This field is exclusive with keypair)."
+      "description": "The secret of the account that is initiating the transaction. (This field cannot be used with keypair)."
     },
     "keypair": {
       "type": "object",
@@ -24,7 +24,7 @@
           "description": "The uppercase hexadecimal representation of the secp256k1 or Ed25519 public key."
         }
       },
-      "description": "The private and public key of the account that is initiating the transaction. (This field is exclusive with secret).",
+      "description": "The private and public key of the account that is initiating the transaction. (This field cannot be used with secret).",
       "required": ["privateKey", "publicKey"],
       "additionalProperties": false
     },
