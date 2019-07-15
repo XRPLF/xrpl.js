@@ -1792,6 +1792,17 @@ describe('RippleAPI', function () {
           'prepare'));
   });
 
+  it('prepareSettings - no signer list', function () {
+    const settings = requests.prepareSettings.noSignerEntries;
+    const localInstructions = _.defaults({
+      signersCount: 1
+    }, instructionsWithMaxLedgerVersionOffset);
+    return this.api.prepareSettings(
+      address, settings, localInstructions).then(
+        _.partial(checkResult, responses.prepareSettings.noSignerList,
+          'prepare'));
+  });
+
   it('prepareSettings - invalid', function (done) {
     // domain must be a string
     const settings = Object.assign({},

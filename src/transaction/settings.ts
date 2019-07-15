@@ -1,5 +1,4 @@
 import * as assert from 'assert'
-import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import * as utils from './utils'
 const validate = utils.common.validate
@@ -90,16 +89,12 @@ function createSettingsTransactionWithoutMemos(
   }
 
   if (settings.signers !== undefined) {
-    const setSignerList = {
+    return {
       TransactionType: 'SignerListSet',
       Account: account,
-      SignerEntries: [],
+      SignerEntries: settings.signers.weights.map(formatSignerEntry),
       SignerQuorum: settings.signers.threshold
-    };
-    if (settings.signers.weights !== undefined) {
-      setSignerList.SignerEntries = _.map(settings.signers.weights, formatSignerEntry);
     }
-    return setSignerList;
   }
 
   const txJSON: SettingsTransaction = {
