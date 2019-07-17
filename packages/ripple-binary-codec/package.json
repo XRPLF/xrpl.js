@@ -1,7 +1,7 @@
 {
   "name": "ripple-binary-codec",
   "version": "0.2.1",
-  "description": "ripple binary codec",
+  "description": "XRP Ledger binary codec",
   "files": [
     "distrib/npm/*",
     "bin/*",
@@ -21,7 +21,6 @@
     "ripple-address-codec": "^2.0.1"
   },
   "devDependencies": {
-    "assert-diff": "^1.0.1",
     "babel-cli": "^6.8.0",
     "babel-core": "^6.8.0",
     "babel-eslint": "^6.0.4",
@@ -47,7 +46,7 @@
     "url": "git://github.com/ripple/ripple-binary-codec.git"
   },
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=10.0.0 <11.0.0"
   },
   "bugs": {
     "url": "https://github.com/ripple/ripple-binary-codec/issues"

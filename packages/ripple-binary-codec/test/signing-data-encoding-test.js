@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const assert = require('assert-diff');
+const assert = require('assert');
 const {encodeForSigning, encodeForSigningClaim, encodeForMultisigning} =
   require('../src');
 

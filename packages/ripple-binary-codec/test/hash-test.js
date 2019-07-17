@@ -1,4 +1,4 @@
-const assert = require('assert-diff');
+const assert = require('assert');
 const {Hash160, Hash256, Currency, AccountID} = require('../src/coretypes');
 
 describe('Hash160', function() {

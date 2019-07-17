@@ -1,4 +1,4 @@
-const assert = require('assert-diff');
+const assert = require('assert');
 const {ShaMap} = require('../src/shamap.js');
 const {binary: {serializeObject}, Hash256, HashPrefix}
   = require('../src/coretypes');

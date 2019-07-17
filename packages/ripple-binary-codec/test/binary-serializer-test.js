@@ -1,7 +1,7 @@
 /* eslint-disable func-style */
 
 const BN = require('bn.js');
-const assert = require('assert-diff');
+const assert = require('assert');
 const lib = require('../src/coretypes');
 const encode = require('../src').encode;
 const {binary: {makeParser, BytesList, BinarySerializer}} = lib;

@@ -1,4 +1,4 @@
-const assert = require('assert-diff');
+const assert = require('assert');
 const {quality, binary: {bytesToHex}} = require('../src/coretypes');
 
 describe('Quality encode/decode', function() {
