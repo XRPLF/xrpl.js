@@ -14,10 +14,12 @@ describe('ripple-binary-codec', function() {
   function makeSuite(name, entries) {
     describe(name, function() {
       entries.forEach((t, test_n) => {
+        // eslint-disable-next-line max-len
         it(`${name}[${test_n}] can encode ${truncateForDisplay(json(t.json))} to ${truncateForDisplay(t.binary)}`,
         () => {
           assert.equal(t.binary, encode(t.json));
         });
+        // eslint-disable-next-line max-len
         it(`${name}[${test_n}] can decode ${truncateForDisplay(t.binary)} to ${truncateForDisplay(json(t.json))}`,
         () => {
           const decoded = decode(t.binary);
