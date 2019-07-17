@@ -6,15 +6,19 @@ function json(object) {
   return JSON.stringify(object);
 }
 
+function truncateForDisplay(longStr) {
+  return longStr.slice(0, 10) + '...' + longStr.slice(-10);
+}
+
 describe('ripple-binary-codec', function() {
   function makeSuite(name, entries) {
     describe(name, function() {
       entries.forEach((t, test_n) => {
-        it(`${name}[${test_n}] can encode ${json(t.json)} to ${t.binary}`,
+        it(`${name}[${test_n}] can encode ${truncateForDisplay(json(t.json))} to ${truncateForDisplay(t.binary)}`,
         () => {
           assert.equal(t.binary, encode(t.json));
         });
-        it(`${name}[${test_n}] can decode ${t.binary} to ${json(t.json)}`,
+        it(`${name}[${test_n}] can decode ${truncateForDisplay(t.binary)} to ${truncateForDisplay(json(t.json))}`,
         () => {
           const decoded = decode(t.binary);
           assert.deepEqual(t.json, decoded);
