@@ -14,7 +14,7 @@ A JavaScript API for interacting with the XRP Ledger
 
 ## Getting Started
 
-See also: [RippleAPI Beginners Guide](https://ripple.com/build/rippleapi-beginners-guide/)
+See also: [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleapi-for-javascript.html)
 
 ### Requirements
 
