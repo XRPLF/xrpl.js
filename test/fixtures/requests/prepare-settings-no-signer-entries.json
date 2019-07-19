@@ -1,11 +1,5 @@
 {
   "signers": {
-    "threshold": 0,
-    "weights": [
-      {
-        "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-        "weight": 0
-      }
-    ]
+    "threshold": 0
   }
 }
