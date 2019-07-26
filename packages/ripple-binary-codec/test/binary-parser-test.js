@@ -48,8 +48,8 @@ function transactionParsingTests() {
       'SigningPubKey':
         '028472865AF4CB32AA285834B57576B7290AA8C31B459047DB27E16F418D6A7166',
       'TakerGets': {'currency': 'ILS',
-                   'issuer': 'rNPRNzBB92BVpAhhZr4iXDTveCgV5Pofm9',
-                   'value': '1694.768'},
+        'issuer': 'rNPRNzBB92BVpAhhZr4iXDTveCgV5Pofm9',
+        'value': '1694.768'},
       'TakerPays': '98957503520',
       'TransactionType': 'OfferCreate',
       'TxnSignature': __(`
@@ -88,7 +88,7 @@ function transactionParsingTests() {
     // amount currency
     assert(Hash160.fromParser(parser));
     assert.equal(encodeAccountID(parser.read(20)),
-                 tx_json.TakerGets.issuer);
+      tx_json.TakerGets.issuer);
     assert.equal(parser.readField(), Field.Fee);
     assert(parser.read(8));
     assert.equal(parser.readField(), Field.SigningPubKey);
@@ -209,8 +209,8 @@ function assertRecyclable(json, forField) {
   const sink = new BytesList();
   Type.from(recycled).toBytesSink(sink);
   const recycledAgain = makeParser(sink.toHex())
-                          .readType(Type)
-                          .toJSON();
+    .readType(Type)
+    .toJSON();
   assert.deepEqual(recycledAgain, json);
 }
 
@@ -285,36 +285,36 @@ function pathSetBinaryTests() {
 
   const expectedJSON =
     [[{account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
-       currency: 'BTC',
-       issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K'},
-      {account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
-       currency: 'BTC',
-       issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo'},
-      {account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-       currency: 'BTC',
-       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'},
-      {currency: 'USD',
-       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'}],
-     [{account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
-       currency: 'BTC',
-       issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K'},
-      {account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
-       currency: 'BTC',
-       issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo'},
-      {account: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi',
-       currency: 'BTC',
-       issuer: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi'},
-      {currency: 'USD',
-       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'}],
-     [{account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
-       currency: 'BTC',
-       issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K'},
-      {account: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn',
-       currency: 'BTC',
-       issuer: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn'},
-      {currency: '0000000000000000000000005852500000000000'},
-      {currency: 'USD',
-       issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'}]];
+      currency: 'BTC',
+      issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K'},
+    {account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+      currency: 'BTC',
+      issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo'},
+    {account: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+      currency: 'BTC',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'},
+    {currency: 'USD',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'}],
+    [{account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+      currency: 'BTC',
+      issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K'},
+    {account: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo',
+      currency: 'BTC',
+      issuer: 'rM1oqKtfh1zgjdAgbFmaRm3btfGBX25xVo'},
+    {account: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi',
+      currency: 'BTC',
+      issuer: 'rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi'},
+    {currency: 'USD',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'}],
+    [{account: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K',
+      currency: 'BTC',
+      issuer: 'r9hEDb4xBGRfBCcX3E4FirDWQBAYtpxC8K'},
+    {account: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn',
+      currency: 'BTC',
+      issuer: 'r3AWbdp2jQLXLywJypdoNwVSvr81xs3uhn'},
+    {currency: '0000000000000000000000005852500000000000'},
+    {currency: 'USD',
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'}]];
 
   it('works with long paths', () => {
     const parser = makeParser(bytes);

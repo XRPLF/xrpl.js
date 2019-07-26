@@ -57,7 +57,8 @@ function raiseIllegalAmountError(value) {
 
 const parsers = {
   string(str) {
-    if (!str.match(/\d+/)) {
+    // Using /^\d+$/ here fixes #31
+    if (!str.match(/^\d+$/)) {
       raiseIllegalAmountError(str);
     }
     return [new Decimal(str).dividedBy(DROPS_PER_XRP), Currency.XRP];
@@ -66,8 +67,8 @@ const parsers = {
     assert(isDefined(object.currency), 'currency must be defined');
     assert(isDefined(object.issuer), 'issuer must be defined');
     return [new Decimal(object.value),
-            Currency.from(object.currency),
-            AccountID.from(object.issuer)];
+      Currency.from(object.currency),
+      AccountID.from(object.issuer)];
   }
 };
 
@@ -109,7 +110,7 @@ const Amount = makeClass({
         mantissa[1] &= 0x3F;
         // decimal.js won't accept e notation with hex
         const value = new Decimal(`${sign}0x${bytesToHex(mantissa)}`)
-                                 .times('1e' + exponent);
+          .times('1e' + exponent);
         return new this(value, currency, issuer, false);
       }
 
@@ -128,6 +129,7 @@ const Amount = makeClass({
           // value is in XRP scale, but show the value in canonical json form
           raiseIllegalAmountError(this.value.times(DROPS_PER_XRP))
         }
+        this.verifyNoDecimal(this.value); // This is a secondary fix for #31
       } else {
         const p = this.value.precision();
         const e = this.exponent();
@@ -143,8 +145,24 @@ const Amount = makeClass({
     return this.currency.isNative();
   },
   mantissa() {
+    // This is a tertiary fix for #31
+    const integerNumberString = this.verifyNoDecimal();
+
     return new UInt64(
-      new BN(this.value.times('1e' + -this.exponent()).abs().toString()));
+      new BN(integerNumberString));
+  },
+  verifyNoDecimal() {
+    const integerNumberString = this.value
+      .times('1e' + -this.exponent()).abs().toString();
+    // Ensure that the value (after being multiplied by the exponent)
+    // does not contain a decimal. From the bn.js README:
+    // "decimals are not supported in this library."
+    // eslint-disable-next-line max-len
+    // https://github.com/indutny/bn.js/blob/9cb459f044853b46615464eea1a3ddfc7006463b/README.md
+    if (integerNumberString.indexOf('.') !== -1) {
+      raiseIllegalAmountError(integerNumberString);
+    }
+    return integerNumberString;
   },
   isZero() {
     return this.value.isZero();
@@ -154,7 +172,7 @@ const Amount = makeClass({
   },
   valueString() {
     return (this.isNative() ? this.value.times(DROPS_PER_XRP) : this.value)
-            .toString();
+      .toString();
   },
   toBytesSink(sink) {
     const isNative = this.isNative();

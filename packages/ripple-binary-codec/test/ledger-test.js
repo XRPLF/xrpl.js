@@ -9,11 +9,11 @@ describe('Ledger Hashes', function() {
       const ledger = loadFixture(ledgerFixture);
       it('computes correct account state hash', function() {
         assert.equal(accountStateHash(ledger.accountState).toHex(),
-                     ledger.account_hash);
+          ledger.account_hash);
       });
       it('computes correct transaction tree hash', function() {
         assert.equal(transactionTreeHash(ledger.transactions).toHex(),
-                     ledger.transaction_hash);
+          ledger.transaction_hash);
       });
       it('computes correct ledger header hash', function() {
         assert.equal(ledgerHash(ledger).toHex(), ledger.hash);

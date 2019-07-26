@@ -7,7 +7,7 @@ const Hash = makeClass({
   Hash(bytes) {
     const width = this.constructor.width;
     this._bytes = bytes ? parseBytes(bytes, Uint8Array) :
-                          new Uint8Array(width);
+      new Uint8Array(width);
     assert.equal(this._bytes.length, width);
   },
   mixins: [Comparable, SerializedType],

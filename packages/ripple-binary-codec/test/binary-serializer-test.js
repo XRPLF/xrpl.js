@@ -80,8 +80,8 @@ function nestedObjectTests() {
   fixtures.whole_objects.forEach((f, i) => {
     it(`whole_objects[${i}]: can parse blob and dump out same blob`,
     /*                                              */ () => {
-      assertRecycles(f.blob_with_no_signing);
-    });
+        assertRecycles(f.blob_with_no_signing);
+      });
   });
 }
 

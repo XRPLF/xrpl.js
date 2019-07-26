@@ -22,7 +22,7 @@ const UInt = makeClass({
     width: 0,
     fromParser(parser) {
       const val = this.width > 4 ? parser.read(this.width) :
-                                   parser.readUIntN(this.width);
+        parser.readUIntN(this.width);
       return new this(val);
     },
     from(val) {
@@ -40,8 +40,8 @@ const UInt = makeClass({
     const otherValue = other.valueOf();
     if (thisValue instanceof BN) {
       return otherValue instanceof BN ?
-                  thisValue.cmp(otherValue) :
-                        thisValue.cmpn(otherValue);
+        thisValue.cmp(otherValue) :
+        thisValue.cmpn(otherValue);
     } else if (otherValue instanceof BN) {
       return -other.compareTo(this);
     }

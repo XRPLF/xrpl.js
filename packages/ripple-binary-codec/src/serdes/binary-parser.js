@@ -83,7 +83,7 @@ const BinaryParser = makeClass({
     const value = kls.fromParser(this, sizeHint);
     if (value === undefined) {
       throw new Error(
-          `fromParser for (${field.name}, ${field.type.name}) -> undefined `);
+        `fromParser for (${field.name}, ${field.type.name}) -> undefined `);
     }
     return value;
   },

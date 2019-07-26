@@ -16,15 +16,15 @@ describe('ripple-binary-codec', function() {
       entries.forEach((t, test_n) => {
         // eslint-disable-next-line max-len
         it(`${name}[${test_n}] can encode ${truncateForDisplay(json(t.json))} to ${truncateForDisplay(t.binary)}`,
-        () => {
-          assert.equal(t.binary, encode(t.json));
-        });
+          () => {
+            assert.equal(t.binary, encode(t.json));
+          });
         // eslint-disable-next-line max-len
         it(`${name}[${test_n}] can decode ${truncateForDisplay(t.binary)} to ${truncateForDisplay(json(t.json))}`,
-        () => {
-          const decoded = decode(t.binary);
-          assert.deepEqual(t.json, decoded);
-        });
+          () => {
+            const decoded = decode(t.binary);
+            assert.deepEqual(t.json, decoded);
+          });
       });
     });
   }
@@ -34,10 +34,10 @@ describe('ripple-binary-codec', function() {
   describe('ledgerData', function() {
     fixtures.ledgerData.forEach((t, test_n) => {
       it(`ledgerData[${test_n}] can decode ${t.binary} to ${json(t.json)}`,
-      () => {
-        const decoded = decodeLedgerData(t.binary);
-        assert.deepEqual(t.json, decoded);
-      });
+        () => {
+          const decoded = decodeLedgerData(t.binary);
+          assert.deepEqual(t.json, decoded);
+        });
     });
   })
 });

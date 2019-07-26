@@ -77,7 +77,7 @@ function assertEqualAmountJSON(actual, expected) {
   assert.equal(actual.issuer, expected.issuer);
   assert(actual.value === expected.value ||
             new Decimal(actual.value).equals(
-                    new Decimal(expected.value)));
+      new Decimal(expected.value)));
 }
 
 module.exports = {

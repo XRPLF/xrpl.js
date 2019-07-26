@@ -29,7 +29,7 @@ describe('Hash256', function() {
   });
   it('supports getting the nibblet values at given positions', function() {
     const h = Hash256.from(
-        '1359BD0000000000000000000000000000000000000000000000000000000000');
+      '1359BD0000000000000000000000000000000000000000000000000000000000');
     assert.equal(h.nibblet(0), 0x1);
     assert.equal(h.nibblet(1), 0x3);
     assert.equal(h.nibblet(2), 0x5);
@@ -53,6 +53,6 @@ describe('Currency', function() {
     assert.throws(() => Currency.from(new Uint8Array(19)));
     assert.throws(() => Currency.from(1));
     assert.throws(() => Currency.from(
-                        '00000000000000000000000000000000000000m'));
+      '00000000000000000000000000000000000000m'));
   });
 });
