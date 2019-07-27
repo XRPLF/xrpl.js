@@ -1,8 +1,13 @@
 # ripple-binary-codec Release History
 
-## UNRELEASED (2019-07-26)
+## 0.2.2 (2019-07-26)
 
-- codecov.io was removed as it did not appear to work. The `package.json` script was:
+- Input validation - Amount and Fee should not allow fractional XRP drops ([#31](https://github.com/ripple/ripple-binary-codec/issues/31))
+- Fix lint errors
+- Update dependencies (including lodash and mocha)
+- Require node 10 (.nvmrc)
+- Remove assert-diff
+- Remove codecov.io as it did not appear to work. The `package.json` script was:
   - `"codecov": "cat ./coverage/coverage.json | ./node_modules/codecov.io/bin/codecov.io.js"`
 
 ## 0.2.1
