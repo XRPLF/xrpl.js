@@ -122,7 +122,9 @@ module.exports = {
     noInstructions: require('./prepare-settings-no-instructions.json'),
     signed: require('./prepare-settings-signed.json'),
     noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json'),
-    signers: require('./prepare-settings-signers.json')
+    signers: require('./prepare-settings-signers.json'),
+    noSignerList: require('./prepare-settings-no-signer-list.json'),
+    noWeights: require('./prepare-settings-no-weight.json')
   },
   prepareCheckCreate: {
     normal: require('./prepare-check-create'),

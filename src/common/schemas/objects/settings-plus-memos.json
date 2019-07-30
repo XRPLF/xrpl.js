@@ -94,7 +94,7 @@
           "maxItems": 8
         }
       },
-      "required": ["threshold", "weights"],
+      "required": ["threshold"],
       "additionalProperties": false
     },
     "transferRate": {

@@ -89,12 +89,17 @@ function createSettingsTransactionWithoutMemos(
   }
 
   if (settings.signers !== undefined) {
-    return {
+    const setSignerList = {
       TransactionType: 'SignerListSet',
       Account: account,
-      SignerQuorum: settings.signers.threshold,
-      SignerEntries: settings.signers.weights.map(formatSignerEntry)
+      SignerEntries: [],
+      SignerQuorum: settings.signers.threshold
+    };
+
+    if (settings.signers.weights !== undefined) {
+        setSignerList.SignerEntries = settings.signers.weights.map(formatSignerEntry);
     }
+    return setSignerList;
   }
 
   const txJSON: SettingsTransaction = {

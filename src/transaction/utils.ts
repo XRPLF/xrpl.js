@@ -58,6 +58,11 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
       '" exists in instance when not allowed'))
   }
 
+  // To remove the signer list, SignerEntries field should be omitted.
+  if (txJSON['SignerQuorum'] === 0) {
+    delete txJSON.SignerEntries;
+  }
+
   const account = txJSON.Account
   setCanonicalFlag(txJSON)
 

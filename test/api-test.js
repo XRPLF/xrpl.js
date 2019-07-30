@@ -1767,19 +1767,15 @@ describe('RippleAPI', function () {
     };
   });
 
-  it('prepareSettings - signers no weights', function (done) {
+  it('prepareSettings - signers no weights', function () {
     const settings = requests.prepareSettings.signers.noWeights;
-    try {
-      this.api.prepareSettings(address, settings, instructionsWithMaxLedgerVersionOffset).then(prepared => {
-        done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
-      }).catch(err => {
-        assert.strictEqual(err.name, 'ValidationError');
-        assert.strictEqual(err.message, 'instance.settings.signers requires property "weights"');
-        done();
-      }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
-    } catch (err) {
-      done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    const localInstructions = _.defaults({
+      signersCount: 1
+    }, instructionsWithMaxLedgerVersionOffset);
+    return this.api.prepareSettings(
+      address, settings, localInstructions).then(
+        _.partial(checkResult, responses.prepareSettings.noWeights,
+          'prepare'));
   });
 
   it('prepareSettings - fee for multisign', function () {
@@ -1789,6 +1785,17 @@ describe('RippleAPI', function () {
     return this.api.prepareSettings(
       address, requests.prepareSettings.domain, localInstructions).then(
         _.partial(checkResult, responses.prepareSettings.flagsMultisign,
+          'prepare'));
+  });
+
+  it('prepareSettings - no signer list', function () {
+    const settings = requests.prepareSettings.noSignerEntries;
+    const localInstructions = _.defaults({
+      signersCount: 1
+    }, instructionsWithMaxLedgerVersionOffset);
+    return this.api.prepareSettings(
+      address, settings, localInstructions).then(
+        _.partial(checkResult, responses.prepareSettings.noSignerList,
           'prepare'));
   });
 
