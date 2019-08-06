@@ -1,3 +1,4 @@
+import * as isEqual from '../common/js/lodash.isequal'
 import * as utils from './utils'
 import keypairs = require('ripple-keypairs')
 import binary = require('ripple-binary-codec')
@@ -32,14 +33,7 @@ function signWithKeypair(
     )
   }
 
-  const fee = new BigNumber(tx.Fee)
-  const maxFeeDrops = xrpToDrops(api._maxFeeXRP)
-  if (fee.greaterThan(maxFeeDrops)) {
-    throw new utils.common.errors.ValidationError(
-      `"Fee" should not exceed "${maxFeeDrops}". ` +
-      'To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor.'
-    )
-  }
+  checkFee(api, tx.Fee)
 
   tx.SigningPubKey = options.signAs ? '' : keypair.publicKey
 
@@ -55,9 +49,58 @@ function signWithKeypair(
   }
 
   const serialized = binary.encode(tx)
+
+  // Decode the serialized transaction:
+  const decoded = binary.decode(serialized)
+
+  // ...And ensure it is equal to the original tx, except:
+  // - It must have a TxnSignature or txSigners (multisign).
+  if (!decoded.TxnSignature && !tx.Signers) {
+    throw new utils.common.errors.ValidationError(
+      'Serialized signed transaction is missing "TxnSignature" property'
+    )
+  }
+  // - We know that the original tx did not have TxnSignature, so we should delete it:
+  delete decoded.TxnSignature
+  // - We know that the original tx did not have Signers, so we should delete it:
+  delete decoded.Signers
+
+  // - If SigningPubKey was not in the original tx, then we should delete it:
+  const parsedTxJSON = JSON.parse(txJSON)
+  if (!parsedTxJSON.SigningPubKey) {
+    delete decoded.SigningPubKey
+  }
+
+  // - We know that the original tx did not have Signers, so if it exists, we should delete it:
+  delete decoded.Signers
+
+  if (!isEqual(decoded, parsedTxJSON)) {
+    const error = new utils.common.errors.ValidationError(
+      'Serialized transaction does not match original txJSON'
+    )
+    error.data = {
+      decoded,
+      parsedTxJSON
+    }
+    throw error
+  }
+
+  checkFee(api, decoded.Fee)
+
   return {
     signedTransaction: serialized,
     id: computeBinaryTransactionHash(serialized)
+  }
+}
+
+function checkFee(api: RippleAPI, txFee: string): void {
+  const fee = new BigNumber(txFee)
+  const maxFeeDrops = xrpToDrops(api._maxFeeXRP)
+  if (fee.greaterThan(maxFeeDrops)) {
+    throw new utils.common.errors.ValidationError(
+      `"Fee" should not exceed "${maxFeeDrops}". ` +
+      'To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor.'
+    )
   }
 }
 
