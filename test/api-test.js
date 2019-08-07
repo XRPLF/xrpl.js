@@ -2608,6 +2608,90 @@ describe('RippleAPI', function () {
     assert.deepEqual(signature, responses.sign.signAs);
   });
 
+  it('sign - succeeds - prepared payment', async function () {
+    const payment = await this.api.preparePayment('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', {
+      source: {
+        address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+        maxAmount: {
+          value: '1',
+          currency: 'drops'
+        }
+      },
+      destination: {
+        address: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        amount: {
+          value: '1',
+          currency: 'drops'
+        }
+      }
+    });
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const result = this.api.sign(payment.txJSON, secret);
+    const expectedResult = {
+      signedTransaction:
+      '12000022800000002400000017201B008694F261400000000000000168400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100A9C91D4CFAE45686146EE0B56D4C53A2E7C2D672FB834D43E0BE2D2E9106519A022075DDA2F92DE552B0C45D83D4E6D35889B3FBF51BFBBD9B25EBF70DE3C96D0D6681145E7B112523F68D2F5E879DB4EAC51C6698A693048314FDB08D07AAA0EB711793A3027304D688E10C3648',
+     id:
+      '88D6B913C66279EA31ADC25C5806C48B2D4E5680261666790A736E1961217700'
+    };
+    assert.deepEqual(result, expectedResult);
+    schemaValidator.schemaValidate('sign', result);
+  });
+
+  it('sign - throws when encoded tx does not match decoded tx - prepared payment', async function () {
+    const payment = await this.api.preparePayment('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', {
+      source: {
+        address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+        maxAmount: {
+          value: '1.1234567',
+          currency: 'drops'
+        }
+      },
+      destination: {
+        address: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        amount: {
+          value: '1.1234567',
+          currency: 'drops'
+        }
+      }
+    });
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    assert.throws(() => {
+      this.api.sign(payment.txJSON, secret);
+    }, /Serialized transaction does not match original txJSON/)
+  });
+
+  it('sign - throws when encoded tx does not match decoded tx - AccountSet', function () {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const request = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"AccountSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Domain\":\"726970706C652E636F6D\",\"LastLedgerSequence\":8820051,\"Fee\":\"1.2\",\"Sequence\":23,\"SigningPubKey\":\"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8\"}",
+      "instructions": {
+        "fee": "0.0000012",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }
+    
+    assert.throws(() => {
+      this.api.sign(request.txJSON, secret)
+    }, /Serialized transaction does not match original txJSON/)
+  });
+
+  it('sign - throws when encoded tx does not match decoded tx - higher fee', function () {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    const request = {
+      "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"AccountSet\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Domain\":\"726970706C652E636F6D\",\"LastLedgerSequence\":8820051,\"Fee\":\"1123456.7\",\"Sequence\":23,\"SigningPubKey\":\"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8\"}",
+      "instructions": {
+        "fee": "1.1234567",
+        "sequence": 23,
+        "maxLedgerVersion": 8820051
+      }
+    }
+    
+    assert.throws(() => {
+      this.api.sign(request.txJSON, secret)
+    }, /Serialized transaction does not match original txJSON/)
+  });
+
   it('sign - throws when Fee exceeds maxFeeXRP (in drops)', function () {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
     const request = {
