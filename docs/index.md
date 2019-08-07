@@ -535,7 +535,7 @@ requireAuthorization | boolean | *Optional* If set, this account must individual
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
 signers | object | *Optional* Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.
 *signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
-*signers.* weights | array | Weights of signatures for each signer.
+*signers.* weights | array | *Optional* Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#address) | A Ripple account address
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
@@ -1638,8 +1638,8 @@ options | object | *Optional* Options to filter the resulting transactions.
 *options.* limit | integer | *Optional* If specified, return at most this many transactions.
 *options.* maxLedgerVersion | integer | *Optional* Return only transactions in this ledger version or lower.
 *options.* maxLedgerVersion | string | *Optional* Return only transactions in this ledger version or lower.
-*options.* minLedgerVersion | integer | *Optional* Return only transactions in this ledger verion or higher.
-*options.* minLedgerVersion | string | *Optional* Return only transactions in this ledger verion or higher.
+*options.* minLedgerVersion | integer | *Optional* Return only transactions in this ledger version or higher.
+*options.* minLedgerVersion | string | *Optional* Return only transactions in this ledger version or higher.
 *options.* start | string | *Optional* If specified, this transaction will be the first transaction in the result. You cannot use `start` with `minLedgerVersion` or `maxLedgerVersion`. When `start` is specified, these ledger versions will be determined internally.
 *options.* types | array\<[transactionType](#transaction-types)\> | *Optional* Only return transactions of the specified [Transaction Types](#transaction-types).
 
@@ -3903,7 +3903,7 @@ requireAuthorization | boolean | *Optional* If set, this account must individual
 requireDestinationTag | boolean | *Optional* Requires incoming payments to specify a destination tag.
 signers | object | *Optional* Settings that determine what sets of accounts can be used to sign a transaction on behalf of this account using multisigning.
 *signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
-*signers.* weights | array | Weights of signatures for each signer.
+*signers.* weights | array | *Optional* Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#address) | A Ripple account address
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.

@@ -1,5 +1,9 @@
 # ripple-lib Release History
 
+## 1.3.1 (UNRELEASED)
+
+* Support removing a signer list (#1021)
+
 ## 1.2.4 (2019-06-06)
 
 * Update README.md

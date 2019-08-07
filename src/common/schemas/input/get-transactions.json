@@ -22,7 +22,7 @@
         },
         "minLedgerVersion": {
           "$ref": "ledgerVersion",
-          "description": "Return only transactions in this ledger verion or higher."
+          "description": "Return only transactions in this ledger version or higher."
         },
         "maxLedgerVersion": {
           "$ref": "ledgerVersion",

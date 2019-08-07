@@ -17,7 +17,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.85",
+    "@types/lodash": "^4.14.136",
     "@types/ws": "^3.2.0",
     "bignumber.js": "^4.1.0",
     "https-proxy-agent": "2.2.1",
