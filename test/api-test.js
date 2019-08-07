@@ -2655,9 +2655,18 @@ describe('RippleAPI', function () {
       }
     });
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
-    assert.throws(() => {
-      this.api.sign(payment.txJSON, secret);
-    }, /Serialized transaction does not match original txJSON/)
+    assert.throws(
+      () => {
+        this.api.sign(payment.txJSON, secret);
+      },
+      /Serialized transaction does not match original txJSON/,
+      (function() {
+        const result = this.api.sign(payment.txJSON, secret);
+        return JSON.stringify({
+          signedTransaction_decoded: binary.decode(result.signedTransaction)
+        });
+      }).bind(this)()
+    );
   });
 
   it('sign - throws when encoded tx does not match decoded tx - AccountSet', function () {
@@ -2671,9 +2680,18 @@ describe('RippleAPI', function () {
       }
     }
     
-    assert.throws(() => {
-      this.api.sign(request.txJSON, secret)
-    }, /Serialized transaction does not match original txJSON/)
+    assert.throws(
+      () => {
+        this.api.sign(request.txJSON, secret);
+      },
+      /Serialized transaction does not match original txJSON/,
+      (function() {
+        const result = this.api.sign(request.txJSON, secret);
+        return JSON.stringify({
+          signedTransaction_decoded: binary.decode(result.signedTransaction)
+        });
+      }).bind(this)()
+    );
   });
 
   it('sign - throws when encoded tx does not match decoded tx - higher fee', function () {
@@ -2687,9 +2705,18 @@ describe('RippleAPI', function () {
       }
     }
     
-    assert.throws(() => {
-      this.api.sign(request.txJSON, secret)
-    }, /Serialized transaction does not match original txJSON/)
+    assert.throws(
+      () => {
+        this.api.sign(request.txJSON, secret);
+      },
+      /Serialized transaction does not match original txJSON/,
+      (function() {
+        const result = this.api.sign(request.txJSON, secret);
+        return JSON.stringify({
+          signedTransaction_decoded: binary.decode(result.signedTransaction)
+        });
+      }).bind(this)()
+    );
   });
 
   it('sign - throws when Fee exceeds maxFeeXRP (in drops)', function () {
