@@ -35,7 +35,7 @@
   114 ]
 ```
 
-## And ?? There's more to the wonderful world then ripple
+## And ?? There's more to the wonderful world than ripple
 
 We give you the kitchen sink.
 
