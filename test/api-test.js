@@ -2659,13 +2659,7 @@ describe('RippleAPI', function () {
       () => {
         this.api.sign(payment.txJSON, secret);
       },
-      /Serialized transaction does not match original txJSON/,
-      (function() {
-        const result = this.api.sign(payment.txJSON, secret);
-        return JSON.stringify({
-          signedTransaction_decoded: binary.decode(result.signedTransaction)
-        });
-      }).bind(this)()
+      /^Error: 1\.1234567 is an illegal amount/
     );
   });
 
@@ -2684,13 +2678,7 @@ describe('RippleAPI', function () {
       () => {
         this.api.sign(request.txJSON, secret);
       },
-      /Serialized transaction does not match original txJSON/,
-      (function() {
-        const result = this.api.sign(request.txJSON, secret);
-        return JSON.stringify({
-          signedTransaction_decoded: binary.decode(result.signedTransaction)
-        });
-      }).bind(this)()
+      /Error: 1\.2 is an illegal amount/
     );
   });
 
@@ -2709,13 +2697,7 @@ describe('RippleAPI', function () {
       () => {
         this.api.sign(request.txJSON, secret);
       },
-      /Serialized transaction does not match original txJSON/,
-      (function() {
-        const result = this.api.sign(request.txJSON, secret);
-        return JSON.stringify({
-          signedTransaction_decoded: binary.decode(result.signedTransaction)
-        });
-      }).bind(this)()
+      /Error: 1123456\.7 is an illegal amount/
     );
   });
 
