@@ -5399,6 +5399,7 @@ keypair | object | *Optional* The private and public key of the account that is 
 *keypair.* privateKey | privateKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 private key.
 *keypair.* publicKey | publicKey | The uppercase hexadecimal representation of the secp256k1 or Ed25519 public key.
 options | object | *Optional* Options that control the type of signature that will be generated.
+*options.* setFullyCanonicalSig | boolean | *Optional* If `false`, the sign method will not set the tfFullyCanonicalSig flag on the transaction. The default is `true`. [New in ripple-lib {VERSION}.]
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
 secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field cannot be used with keypair).
 
