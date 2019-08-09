@@ -35,6 +35,10 @@
         "signAs": {
           "$ref": "address",
           "description": "The account that the signature should count for in multisigning."
+        },
+        "setFullyCanonicalSig": {
+          "type": "boolean",
+          "description": "If `false`, the sign method will not set the tfFullyCanonicalSig flag on the transaction. The default is `true`. [New in ripple-lib {VERSION}.]"
         }
       },
       "additionalProperties": false

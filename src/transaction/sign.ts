@@ -21,7 +21,8 @@ function signWithKeypair(
   txJSON: string,
   keypair: KeyPair,
   options: SignOptions = {
-    signAs: ''
+    signAs: '',
+    setFullyCanonicalSig: true
   }
 ): { signedTransaction: string; id: string } {
   validate.sign({txJSON, keypair})
@@ -34,6 +35,10 @@ function signWithKeypair(
   }
 
   checkFee(api, tx.Fee)
+
+  if (options.setFullyCanonicalSig) {
+    utils.setCanonicalFlag(tx)
+  }
 
   const txToSignAndEncode = Object.assign({}, tx)
 

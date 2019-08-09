@@ -66,7 +66,8 @@ export type KeyPair = {
 }
 
 export type SignOptions = {
-  signAs: string
+  signAs: string,
+  setFullyCanonicalSig: boolean
 }
 
 export type Outcome = {
