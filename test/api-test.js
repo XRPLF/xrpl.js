@@ -2637,10 +2637,10 @@ describe('RippleAPI', function () {
     schemaValidator.schemaValidate('sign', result);
   });
 
-  it('sign - succeeds - no flags', async function () {
+  it('sign - with setFullyCanonicalSig: false - does not add Flags', async function () {
     const txJSON = '{"TransactionType":"Payment","Account":"r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j","Destination":"rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r","Amount":"20000000","Sequence":1,"Fee":"12"}';
     const secret = 'shotKgaEotpcYsshSE39vmSnBDRim';
-    const result = this.api.sign(txJSON, secret);
+    const result = this.api.sign(txJSON, secret, { setFullyCanonicalSig: false });
     const expectedResult = {
       signedTransaction:
       '1200002400000001614000000001312D0068400000000000000C7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574473045022100C104B7B97C31FACA4597E7D6FCF13BD85BD11375963A62A0AC45B0061236E39802207784F157F6A98DFC85B051CDDF61CC3084C4F5750B82674801C8E9950280D1998114EE3046A5DDF8422C40DDB93F1D522BB4FE6419158314FDB08D07AAA0EB711793A3027304D688E10C3648',
@@ -2649,6 +2649,43 @@ describe('RippleAPI', function () {
     };
     const decoded = binary.decode(result.signedTransaction);
     assert(decoded.Flags === undefined, `Flags = ${decoded.Flags}, should be undefined`);
+    assert.deepEqual(result, expectedResult);
+    schemaValidator.schemaValidate('sign', result);
+  });
+
+  it('sign - with no Flags - adds tfFullyCanonicalSig', async function () {
+    const txJSON = '{"TransactionType":"Payment","Account":"r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j","Destination":"rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r","Amount":"20000000","Sequence":1,"Fee":"12"}';
+    const secret = 'shotKgaEotpcYsshSE39vmSnBDRim';
+    const result = this.api.sign(txJSON, secret);
+    const expectedResult = {
+      signedTransaction:
+      '12000022800000002400000001614000000001312D0068400000000000000C7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574463044022020CF1211D1514D1FB0F452ED4865A18FCEB30059063552E2D222DA305309DE0102201F16705DFE92E6DC50538BD273944CC34F943A00004C439EF7A5D040A98E63FC8114EE3046A5DDF8422C40DDB93F1D522BB4FE6419158314FDB08D07AAA0EB711793A3027304D688E10C3648',
+     id:
+      '32E6C56F50A3370CC88F2ECA1BE5BE6CEBA5A13BD64C935EAC4929FFCFF3A8EA'
+    };
+    const decoded = binary.decode(result.signedTransaction);
+
+    // 2147483648 is tfFullyCanonicalSig,
+    // see https://xrpl.org/transaction-common-fields.html#global-flags
+    assert(decoded.Flags === 2147483648, `Flags = ${decoded.Flags}, should be 2147483648 (tfFullyCanonicalSig)`);
+    assert.deepEqual(result, expectedResult);
+    schemaValidator.schemaValidate('sign', result);
+  });
+
+  it('sign - with tfFullyCanonicalSig - succeeds', async function () {
+    // 2147483648 is tfFullyCanonicalSig,
+    // see https://xrpl.org/transaction-common-fields.html#global-flags
+    const txJSON = '{"TransactionType":"Payment","Account":"r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j","Destination":"rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r","Amount":"20000000","Sequence":1,"Fee":"12","Flags":2147483648}';
+    const secret = 'shotKgaEotpcYsshSE39vmSnBDRim';
+    const result = this.api.sign(txJSON, secret);
+    const expectedResult = {
+      signedTransaction:
+      '12000022800000002400000001614000000001312D0068400000000000000C7321022B05847086686F9D0499B13136B94AD4323EE1B67D4C429ECC987AB35ACFA34574463044022020CF1211D1514D1FB0F452ED4865A18FCEB30059063552E2D222DA305309DE0102201F16705DFE92E6DC50538BD273944CC34F943A00004C439EF7A5D040A98E63FC8114EE3046A5DDF8422C40DDB93F1D522BB4FE6419158314FDB08D07AAA0EB711793A3027304D688E10C3648',
+     id:
+      '32E6C56F50A3370CC88F2ECA1BE5BE6CEBA5A13BD64C935EAC4929FFCFF3A8EA'
+    };
+    const decoded = binary.decode(result.signedTransaction);
+    assert(decoded.Flags === 2147483648, `Flags = ${decoded.Flags}, should be 2147483648 (tfFullyCanonicalSig)`);
     assert.deepEqual(result, expectedResult);
     schemaValidator.schemaValidate('sign', result);
   });
