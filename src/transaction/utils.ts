@@ -34,7 +34,17 @@ function formatPrepareResponse(txJSON: any): Prepare {
   }
 }
 
-function setCanonicalFlag(txJSON) {
+/**
+ *  Set the `tfFullyCanonicalSig` flag on a transaction.
+ *
+ *  See https://xrpl.org/transaction-malleability.html
+ *
+ *  @param {TransactionJSON} txJSON The transaction object to modify.
+ *    This method will modify object's `Flags` property, or add it if it does not exist.
+ *
+ *  @returns {void} This method mutates the original txJSON and does not return a value.
+ */
+function setCanonicalFlag(txJSON: TransactionJSON): void {
   txJSON.Flags |= txFlags.Universal.FullyCanonicalSig
 
   // JavaScript converts operands to 32-bit signed ints before doing bitwise
@@ -192,5 +202,6 @@ export {
   convertStringToHex,
   convertMemo,
   prepareTransaction,
-  common
+  common,
+  setCanonicalFlag
 }
