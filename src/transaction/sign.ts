@@ -1,7 +1,7 @@
 import * as isEqual from '../common/js/lodash.isequal'
 import * as utils from './utils'
 import keypairs = require('ripple-keypairs')
-import binary = require('ripple-binary-codec')
+import binaryCodec = require('ripple-binary-codec')
 import {computeBinaryTransactionHash} from 'ripple-hashes'
 import {SignOptions, KeyPair} from './types'
 import {BigNumber} from 'bignumber.js'
@@ -11,8 +11,8 @@ const validate = utils.common.validate
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
   const signingData = signAs
-    ? binary.encodeForMultisigning(tx, signAs)
-    : binary.encodeForSigning(tx)
+    ? binaryCodec.encodeForMultisigning(tx, signAs)
+    : binaryCodec.encodeForSigning(tx)
   return keypairs.sign(signingData, privateKey)
 }
 
@@ -35,57 +35,24 @@ function signWithKeypair(
 
   checkFee(api, tx.Fee)
 
-  tx.SigningPubKey = options.signAs ? '' : keypair.publicKey
+  const txToSignAndEncode = Object.assign({}, tx)
+
+  txToSignAndEncode.SigningPubKey = options.signAs ? '' : keypair.publicKey
 
   if (options.signAs) {
     const signer = {
       Account: options.signAs,
       SigningPubKey: keypair.publicKey,
-      TxnSignature: computeSignature(tx, keypair.privateKey, options.signAs)
+      TxnSignature: computeSignature(txToSignAndEncode, keypair.privateKey, options.signAs)
     }
-    tx.Signers = [{Signer: signer}]
+    txToSignAndEncode.Signers = [{Signer: signer}]
   } else {
-    tx.TxnSignature = computeSignature(tx, keypair.privateKey)
+    txToSignAndEncode.TxnSignature = computeSignature(txToSignAndEncode, keypair.privateKey)
   }
 
-  const serialized = binary.encode(tx)
+  const serialized = binaryCodec.encode(txToSignAndEncode)
 
-  // Decode the serialized transaction:
-  const decoded = binary.decode(serialized)
-
-  // ...And ensure it is equal to the original tx, except:
-  // - It must have a TxnSignature or txSigners (multisign).
-  if (!decoded.TxnSignature && !tx.Signers) {
-    throw new utils.common.errors.ValidationError(
-      'Serialized signed transaction is missing "TxnSignature" property'
-    )
-  }
-  // - We know that the original tx did not have TxnSignature, so we should delete it:
-  delete decoded.TxnSignature
-  // - We know that the original tx did not have Signers, so we should delete it:
-  delete decoded.Signers
-
-  // - If SigningPubKey was not in the original tx, then we should delete it:
-  const parsedTxJSON = JSON.parse(txJSON)
-  if (!parsedTxJSON.SigningPubKey) {
-    delete decoded.SigningPubKey
-  }
-
-  // - We know that the original tx did not have Signers, so if it exists, we should delete it:
-  delete decoded.Signers
-
-  if (!isEqual(decoded, parsedTxJSON)) {
-    const error = new utils.common.errors.ValidationError(
-      'Serialized transaction does not match original txJSON'
-    )
-    error.data = {
-      decoded,
-      parsedTxJSON
-    }
-    throw error
-  }
-
-  checkFee(api, decoded.Fee)
+  checkTxSerialization(serialized, tx)
 
   return {
     signedTransaction: serialized,
@@ -93,6 +60,59 @@ function signWithKeypair(
   }
 }
 
+/**
+ *  Decode a serialized transaction, remove the fields that are added during the signing process,
+ *  and verify that it matches the transaction prior to signing.
+ *
+ *  @param {string} serialized A signed and serialized transaction.
+ *  @param {utils.TransactionJSON} tx The transaction prior to signing.
+ *
+ *  @returns {void} This method does not return a value, but throws an error if the check fails.
+ */
+function checkTxSerialization(serialized: string, tx: utils.TransactionJSON): void {
+  // Decode the serialized transaction:
+  const decoded = binaryCodec.decode(serialized)
+
+  // ...And ensure it is equal to the original tx, except:
+  // - It must have a TxnSignature or Signers (multisign).
+  if (!decoded.TxnSignature && !decoded.Signers) {
+    throw new utils.common.errors.ValidationError(
+      'Serialized transaction must have a TxnSignature or Signers property'
+    )
+  }
+  // - We know that the original tx did not have TxnSignature, so we should delete it:
+  delete decoded.TxnSignature
+  // - We know that the original tx did not have Signers, so if it exists, we should delete it:
+  delete decoded.Signers
+
+  // - If SigningPubKey was not in the original tx, then we should delete it.
+  //   But if it was in the original tx, then we should ensure that it has not been changed.
+  if (!tx.SigningPubKey) {
+    delete decoded.SigningPubKey
+  }
+
+  if (!isEqual(decoded, tx)) {
+    const error = new utils.common.errors.ValidationError(
+      'Serialized transaction does not match original txJSON'
+    )
+    error.data = {
+      decoded,
+      tx
+    }
+    throw error
+  }
+}
+
+/**
+ *  Check that a given transaction fee does not exceed maxFeeXRP (in drops).
+ *
+ *  See https://xrpl.org/rippleapi-reference.html#parameters
+ *
+ *  @param {RippleAPI} api A RippleAPI instance.
+ *  @param {string} txFee The transaction fee in drops, encoded as a string.
+ *
+ *  @returns {void} This method does not return a value, but throws an error if the check fails.
+ */
 function checkFee(api: RippleAPI, txFee: string): void {
   const fee = new BigNumber(txFee)
   const maxFeeDrops = xrpToDrops(api._maxFeeXRP)

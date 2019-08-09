@@ -2647,10 +2647,10 @@ describe('RippleAPI', function () {
      id:
       '0596925967F541BF332FF6756645B2576A9858414B5B363DC3D34915BE8A70D6'
     };
+    const decoded = binary.decode(result.signedTransaction);
+    assert(decoded.Flags === undefined, `Flags = ${decoded.Flags}, should be undefined`);
     assert.deepEqual(result, expectedResult);
     schemaValidator.schemaValidate('sign', result);
-    const decoded = binary.decode(result.signedTransaction);
-    assert(decoded.Flags === undefined);
   });
 
   it('sign - throws when encoded tx does not match decoded tx - prepared payment', async function () {
