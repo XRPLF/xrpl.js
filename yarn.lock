@@ -2839,6 +2839,11 @@ lodash@^4.12.0, lodash@^4.17.11, lodash@^4.17.4:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.13.tgz#0bdc3a6adc873d2f4e0c4bac285df91b64fc7b93"
   integrity sha512-vm3/XWXfWtRua0FkUyEHBZy8kCPjErNBT9fJx8Zvs+U6zjqPbTUOpkaoum3O5uiA8sm+yNMHXfYkTUHFoMxFNA==
 
+lodash@^4.17.15:
+  version "4.17.15"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
+  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
+
 lodash@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-1.0.2.tgz#8f57560c83b59fc270bd3d561b690043430e2551"
@@ -4101,6 +4106,19 @@ ripple-binary-codec@0.2.1:
     decimal.js "^5.0.8"
     inherits "^2.0.1"
     lodash "^4.12.0"
+    ripple-address-codec "^2.0.1"
+
+ripple-binary-codec@0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/ripple-binary-codec/-/ripple-binary-codec-0.2.2.tgz#1d64e1dce536363eeeb636ad1f98c0c5d98a8f48"
+  integrity sha512-kJ1pEIEHKvvNO9IqWgwBCLCL3wwJ/GwYXpJhrmX2kW4x7unHXgFOxhAP9DDlMGwMusSmYrstsXrzhffVEaBoHw==
+  dependencies:
+    babel-runtime "^6.6.1"
+    bn.js "^4.11.3"
+    create-hash "^1.1.2"
+    decimal.js "^5.0.8"
+    inherits "^2.0.1"
+    lodash "^4.17.15"
     ripple-address-codec "^2.0.1"
 
 ripple-hashes@0.3.2:
