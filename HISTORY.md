@@ -73,7 +73,8 @@ After:
 ### Improvements:
 
 * Clean up phrasing in schema descriptions (#1023)
-* Docs improvements
+* Improve docs
+* Update dependencies
 
 Since this release fixes a bug that could cause transactions to be serialized incorrectly during the signing process, it has also been simultaneously released as version 1.2.5 (patch release).
 
