@@ -6,10 +6,9 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const gulp = require('gulp');
-const rename = require('gulp-rename');
+// const rename = require('gulp-rename');
 const webpack = require('webpack');
-const bump = require('gulp-bump');
-const argv = require('yargs').argv;
+// const argv = require('yargs').argv;
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 var pkg = require('./package.json');
@@ -167,51 +166,51 @@ gulp.task('build-core', function(callback) {
   webpack(getWebpackConfig('-core.js', configOverrides), callback);
 });
 
-gulp.task('bower-build', ['build'], function() {
-  return gulp.src(['./build/ripple-', '.js'].join(pkg.version))
-  .pipe(rename('ripple.js'))
-  .pipe(gulp.dest('./dist/bower'));
-});
+// gulp.task('bower-build', ['build'], function() {
+//   return gulp.src(['./build/ripple-', '.js'].join(pkg.version))
+//   .pipe(rename('ripple.js'))
+//   .pipe(gulp.dest('./dist/bower'));
+// });
 
-gulp.task('bower-build-min', ['build-min'], function() {
-  return gulp.src(['./build/ripple-', '-min.js'].join(pkg.version))
-  .pipe(rename('ripple-min.js'))
-  .pipe(gulp.dest('./dist/bower'));
-});
+// gulp.task('bower-build-min', ['build-min'], function() {
+//   return gulp.src(['./build/ripple-', '-min.js'].join(pkg.version))
+//   .pipe(rename('ripple-min.js'))
+//   .pipe(gulp.dest('./dist/bower'));
+// });
 
-gulp.task('bower-build-debug', ['build-debug'], function() {
-  return gulp.src(['./build/ripple-', '-debug.js'].join(pkg.version))
-  .pipe(rename('ripple-debug.js'))
-  .pipe(gulp.dest('./dist/bower'));
-});
+// gulp.task('bower-build-debug', ['build-debug'], function() {
+//   return gulp.src(['./build/ripple-', '-debug.js'].join(pkg.version))
+//   .pipe(rename('ripple-debug.js'))
+//   .pipe(gulp.dest('./dist/bower'));
+// });
 
-gulp.task('bower-version', function() {
-  gulp.src('./dist/bower/bower.json')
-  .pipe(bump({version: pkg.version}))
-  .pipe(gulp.dest('./dist/bower'));
-});
+// gulp.task('bower-version', function() {
+//   gulp.src('./dist/bower/bower.json')
+//   .pipe(bump({version: pkg.version}))
+//   .pipe(gulp.dest('./dist/bower'));
+// });
 
-gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug',
-                    'bower-version']);
+// gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug',
+//                     'bower-version']);
 
 gulp.task('watch', function() {
   gulp.watch('src/*', ['build-debug']);
 });
 
-gulp.task('version-bump', function() {
-  if (!argv.type) {
-    throw new Error('No type found, pass it in using the --type argument');
-  }
+// gulp.task('version-bump', function() {
+//   if (!argv.type) {
+//     throw new Error('No type found, pass it in using the --type argument');
+//   }
 
-  gulp.src('./package.json')
-  .pipe(bump({type: argv.type}))
-  .pipe(gulp.dest('./'));
-});
+//   gulp.src('./package.json')
+//   .pipe(bump({type: argv.type}))
+//   .pipe(gulp.dest('./'));
+// });
 
-gulp.task('version-beta', function() {
-  gulp.src('./package.json')
-  .pipe(bump({version: pkg.version + '-beta'}))
-  .pipe(gulp.dest('./'));
-});
+// gulp.task('version-beta', function() {
+//   gulp.src('./package.json')
+//   .pipe(bump({version: pkg.version + '-beta'}))
+//   .pipe(gulp.dest('./'));
+// });
 
 gulp.task('default', ['build', 'build-debug', 'build-min']);
