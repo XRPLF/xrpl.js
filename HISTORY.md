@@ -78,6 +78,8 @@ After:
 
 Since this release fixes a bug that could cause transactions to be serialized incorrectly during the signing process, it has also been simultaneously released as version 1.2.5 (patch release).
 
+When using this release with [rippled](https://github.com/ripple/rippled), we recommend using [rippled version 1.3.1](https://github.com/ripple/rippled/releases/tag/1.3.1).
+
 ## 1.2.4 (2019-06-06)
 
 * Update README.md
