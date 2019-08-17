@@ -1,8 +1,81 @@
 # ripple-lib Release History
 
-## 1.3.1 (UNRELEASED)
+## 1.3.0 (2019-08-16)
+
+### Bug fixes:
+
+* Breaking change: Fix `getServerInfo` (#1012)
+
+Before:
+```
+{
+  // ...
+  "load": {
+    "jobTypes": {
+      "0": {"jobType": "untrustedValidation", "perSecond": 10},
+      "1": {"jobType": "ledgerData", "peakTime": 2, "perSecond": 2},
+      "2": {"inProgress": 1, "jobType": "clientCommand", "perSecond": 1},
+      "3": {"jobType": "transaction", "perSecond": 1},
+      // ...
+    },
+    "threads": 6
+  },
+  // ...
+}
+```
+
+After:
+```
+{
+  // ...
+  "load": {
+    "jobTypes": [
+      {
+        "jobType": "untrustedValidation",
+        "perSecond": 8
+      },
+      {
+        "avgTime": 2,
+        "jobType": "ledgerData",
+        "peakTime": 72,
+        "perSecond": 2
+      },
+      {
+        "inProgress": 1,
+        "jobType": "clientCommand",
+        "perSecond": 1
+      },
+      {
+        "jobType": "transaction",
+        "perSecond": 1
+      },
+      // ...
+    ],
+    "threads": 6
+  },
+  // ...
+}
+```
+
+* Sign method - verify accurate encoding (#1026)
+  * In previous versions, the following could be encoded incorrectly:
+    * Amounts of XRP with more than 6 decimal places
+    * Amounts of XRP drops with any decimal places
+  * In versions 1.2.5 and 1.3.0, amounts that are invalid in this way will throw an error
+* Expand `APIOptions` by extending `ConnectionOptions` (#1018, fixes #1017)
+* Fix docs for destination.address (#1011)
+
+### New features:
 
 * Support removing a signer list (#1021)
+* Export `setCanonicalFlag` method from `src/transaction/utils`
+
+### Improvements:
+
+* Clean up phrasing in schema descriptions (#1023)
+* Docs improvements
+
+Since this release fixes a bug that could cause transactions to be serialized incorrectly during the signing process, it has also been simultaneously released as version 1.2.5 (patch release).
 
 ## 1.2.4 (2019-06-06)
 
