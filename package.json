@@ -37,7 +37,6 @@
     "ejs": "^2.3.4",
     "eventemitter2": "^0.4.14",
     "gulp": "^4.0.2",
-    "jayson": "^1.2.2",
     "json-loader": "^0.5.2",
     "json-schema-to-markdown-table": "^0.4.0",
     "mocha": "6.1.3",
