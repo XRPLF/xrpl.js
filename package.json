@@ -64,8 +64,7 @@
     "test": "TS_NODE_PROJECT=src/tsconfig.json nyc mocha --exit",
     "lint": "tslint -p ./",
     "perf": "./scripts/perf_test.sh",
-    "start": "node scripts/http.js",
-    "sauce": "node scripts/sauce-runner.js"
+    "start": "node scripts/http.js"
   },
   "repository": {
     "type": "git",
