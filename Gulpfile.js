@@ -6,15 +6,12 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const gulp = require('gulp');
-const rename = require('gulp-rename');
 const webpack = require('webpack');
-const bump = require('gulp-bump');
-const argv = require('yargs').argv;
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-var pkg = require('./package.json');
+const pkg = require('./package.json');
 
-var uglifyOptions = {
+const uglifyOptions = {
   mangle: {
     reserved: ['_', 'RippleError', 'RippledError', 'UnexpectedError',
     'LedgerVersionError', 'ConnectionError', 'NotConnectedError',
@@ -36,7 +33,7 @@ function getWebpackConfig(extension, overrides) {
     output: {
       library: 'ripple',
       path: path.join(__dirname, 'build/'),
-      filename: ['ripple-', extension].join(pkg.version)
+      filename: `ripple-${pkg.version}${extension}`
     },
     plugins: [
       new webpack.NormalModuleReplacementPlugin(/^ws$/, './wswrapper'),
@@ -69,7 +66,7 @@ function getWebpackConfig(extension, overrides) {
   return _.assign({}, defaults, overrides);
 }
 
-function webpackConfigForWebTest(testFileName, path) {
+function webpackConfigForWebTest(testFileName) {
   var match = testFileName.match(/\/?([^\/]*)-test.js$/);
   if (!match) {
     assert(false, 'wrong filename:' + testFileName);
@@ -83,27 +80,12 @@ function webpackConfigForWebTest(testFileName, path) {
     entry: testFileName,
     output: {
       library: match[1].replace(/-/g, '_'),
-      path: './test-compiled-for-web/' + (path ? path : ''),
+      path: path.join(__dirname, 'test-compiled-for-web/'),
       filename: match[1] + '-test.js'
     }
   };
   return getWebpackConfig('.js', configOverrides);
 }
-
-gulp.task('build-tests', function(callback) {
-  var times = 0;
-  function done() {
-    if (++times >= 5) {
-      callback();
-    }
-  }
-  webpack(webpackConfigForWebTest('./test/rangeset-test.js'), done);
-  webpack(webpackConfigForWebTest('./test/connection-test.js'), done);
-  webpack(webpackConfigForWebTest('./test/api-test.js'), done);
-  webpack(webpackConfigForWebTest('./test/broadcast-api-test.js'), done);
-  webpack(webpackConfigForWebTest('./test/integration/integration-test.js',
-    'integration/'), done);
-});
 
 function createLink(from, to) {
   if (fs.existsSync(to)) {
@@ -120,11 +102,22 @@ function createBuildLink(callback) {
   };
 }
 
-gulp.task('build', function(callback) {
-  webpack(getWebpackConfig('.js'), createBuildLink(callback));
-});
+function watch(callback) {
+  gulp.watch('src/*', gulp.series(buildDebug));
+  callback();
+}
 
-gulp.task('build-min', function(callback) {
+function build(callback) {
+  webpack(getWebpackConfig('.js'), createBuildLink(callback));
+}
+
+function buildDebug(callback) {
+  const webpackConfig = getWebpackConfig('-debug.js', {devtool: 'eval'});
+  webpackConfig.plugins.unshift(new webpack.LoaderOptionsPlugin({debug: true}));
+  webpack(webpackConfig, callback);
+}
+
+function buildMin(callback) {
   const webpackConfig = getWebpackConfig('-min.js');
   webpackConfig.plugins.push(new UglifyJsPlugin({uglifyOptions}));
   webpack(webpackConfig, function() {
@@ -132,86 +125,27 @@ gulp.task('build-min', function(callback) {
       './build/ripple-latest-min.js');
     callback();
   });
-});
-
-gulp.task('build-debug', function(callback) {
-  const webpackConfig = getWebpackConfig('-debug.js', {devtool: 'eval'});
-  webpackConfig.plugins.unshift(new webpack.LoaderOptionsPlugin({debug: true}));
-  webpack(webpackConfig, callback);
-});
-
-/**
- * Generate a WebPack external for a given unavailable module which replaces
- * that module's constructor with an error-thrower
- */
-function buildUseError(cons) {
-  return ('var {<CONS>:function(){throw new Error('
-          + '"Class is unavailable in this build: <CONS>")}}')
-          .replace(new RegExp('<CONS>', 'g'), cons);
 }
 
-gulp.task('build-core', function(callback) {
-  var configOverrides = {
-    cache: false,
-    entry: './src/remote.ts',
-    externals: [{
-      './transaction': buildUseError('Transaction'),
-      './orderbook': buildUseError('OrderBook'),
-      './account': buildUseError('Account'),
-      './serializedobject': buildUseError('SerializedObject')
-    }],
-    plugins: [
-      new UglifyJsPlugin()
-    ]
-  };
-  webpack(getWebpackConfig('-core.js', configOverrides), callback);
-});
-
-gulp.task('bower-build', ['build'], function() {
-  return gulp.src(['./build/ripple-', '.js'].join(pkg.version))
-  .pipe(rename('ripple.js'))
-  .pipe(gulp.dest('./dist/bower'));
-});
-
-gulp.task('bower-build-min', ['build-min'], function() {
-  return gulp.src(['./build/ripple-', '-min.js'].join(pkg.version))
-  .pipe(rename('ripple-min.js'))
-  .pipe(gulp.dest('./dist/bower'));
-});
-
-gulp.task('bower-build-debug', ['build-debug'], function() {
-  return gulp.src(['./build/ripple-', '-debug.js'].join(pkg.version))
-  .pipe(rename('ripple-debug.js'))
-  .pipe(gulp.dest('./dist/bower'));
-});
-
-gulp.task('bower-version', function() {
-  gulp.src('./dist/bower/bower.json')
-  .pipe(bump({version: pkg.version}))
-  .pipe(gulp.dest('./dist/bower'));
-});
-
-gulp.task('bower', ['bower-build', 'bower-build-min', 'bower-build-debug',
-                    'bower-version']);
-
-gulp.task('watch', function() {
-  gulp.watch('src/*', ['build-debug']);
-});
-
-gulp.task('version-bump', function() {
-  if (!argv.type) {
-    throw new Error('No type found, pass it in using the --type argument');
+function buildTests(callback) {
+  var times = 0;
+  function done() {
+    if (++times >= 5) {
+      callback();
+    }
   }
+  webpack(webpackConfigForWebTest('./test/rangeset-test.js'), done);
+  webpack(webpackConfigForWebTest('./test/connection-test.js'), done);
+  webpack(webpackConfigForWebTest('./test/api-test.js'), done);
+  webpack(webpackConfigForWebTest('./test/broadcast-api-test.js'), done);
+  webpack(webpackConfigForWebTest('./test/integration/integration-test.js',
+    'integration/'), done);
+}
 
-  gulp.src('./package.json')
-  .pipe(bump({type: argv.type}))
-  .pipe(gulp.dest('./'));
-});
+exports.watch = watch;
+exports.build = build;
+exports.buildDebug = buildDebug;
+exports.buildMin = buildMin;
+exports.buildTests = buildTests;
 
-gulp.task('version-beta', function() {
-  gulp.src('./package.json')
-  .pipe(bump({version: pkg.version + '-beta'}))
-  .pipe(gulp.dest('./'));
-});
-
-gulp.task('default', ['build', 'build-debug', 'build-min']);
+exports.default = gulp.parallel(build, buildDebug, buildMin);
