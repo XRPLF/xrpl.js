@@ -1,5 +1,15 @@
 # ripple-lib Release History
 
+## 1.3.1 (2019-08-26)
+
+* Upgrade to gulp 4 (#1030)
+* Remove http server (unused)
+* Update dependencies
+
+There are no changes in the browser version with this release. The npm package for Node.js should be slightly smaller.
+
+When using this release with [rippled](https://github.com/ripple/rippled), we recommend using [rippled version 1.3.1](https://github.com/ripple/rippled/releases/tag/1.3.1).
+
 ## 1.3.0 (2019-08-16)
 
 ### Bug fixes:
