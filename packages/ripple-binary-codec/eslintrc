@@ -193,6 +193,4 @@ rules:
   wrap-iife: 0
   wrap-regex: 0
   yoda: [2, 'never']
-ecmaFeatures:
-  jsx: true
 parser: babel-eslint
