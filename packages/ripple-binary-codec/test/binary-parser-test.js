@@ -27,9 +27,9 @@ function basicApiTests() {
     assert(parser._buf instanceof Uint8Array);
     const read1 = parser.read(1);
     assert(read1 instanceof Uint8Array);
-    assert.deepEqual(read1, [0]);
-    assert.deepEqual(parser.read(4), [1, 2, 3, 4]);
-    assert.deepEqual(parser.read(2), [5, 6]);
+    assert.deepEqual(read1, Uint8Array.from([0]));
+    assert.deepEqual(parser.read(4), Uint8Array.from([1, 2, 3, 4]));
+    assert.deepEqual(parser.read(2), Uint8Array.from([5, 6]));
     assert.throws(() => parser.read(1));
   });
   it('can read a Uint32 at full', () => {

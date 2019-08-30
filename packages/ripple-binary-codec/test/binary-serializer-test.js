@@ -62,7 +62,7 @@ function bytesListTest() {
   it('can join all arrays into one via toBytes', function() {
     const joined = list.toBytes();
     assert(joined.length, 5);
-    assert.deepEqual(joined, [0, 2, 3, 4, 5]);
+    assert.deepEqual(joined, Uint8Array.from([0, 2, 3, 4, 5]));
   });
 }
 
@@ -95,7 +95,7 @@ function UIntTest() {
         return;
       }
       serializer.writeType(type, n);
-      assert.deepEqual(bl.toBytes(), expected);
+      assert.deepEqual(bl.toBytes(), Uint8Array.from(expected));
     });
   }
 

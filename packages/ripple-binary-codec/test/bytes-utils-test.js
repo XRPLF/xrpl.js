@@ -12,12 +12,12 @@ describe('bytes-utils', function() {
     it('can decode hex to a Uint8Array', function() {
       const result = parseBytes('0012', Uint8Array);
       assert(result instanceof Uint8Array);
-      assert.deepEqual(result, [0x00, 0x12]);
+      assert.deepEqual(result, Uint8Array.from([0x00, 0x12]));
     });
     it('can convert a list to a Uint8Array', function() {
       const result = parseBytes([0x00, 0x12], Uint8Array);
       assert(result instanceof Uint8Array);
-      assert.deepEqual(result, [0x00, 0x12]);
+      assert.deepEqual(result, Uint8Array.from([0x00, 0x12]));
     });
     it('can decode hex to a Buffer', function() {
       const result = parseBytes('0012', Buffer);
@@ -66,7 +66,7 @@ describe('bytes-utils', function() {
     });
     it('the 4th arg is the output class type', function() {
       assert.deepEqual(slice(val, 2, 4, Buffer).toJSON().data, [3, 4]);
-      assert.deepEqual(slice(val, 2, 4, Uint8Array), [3, 4]);
+      assert.deepEqual(slice(val, 2, 4, Uint8Array), Uint8Array.from([3, 4]));
     });
   });
 });
