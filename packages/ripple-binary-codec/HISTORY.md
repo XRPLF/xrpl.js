@@ -1,5 +1,9 @@
 # ripple-binary-codec Release History
 
+## 0.2.3 (2019-08-29)
+
+- Expand node version compatibility (#32, #33)
+
 ## 0.2.2 (2019-07-26)
 
 - Input validation - Amount and Fee should not allow fractional XRP drops ([#31](https://github.com/ripple/ripple-binary-codec/issues/31))
