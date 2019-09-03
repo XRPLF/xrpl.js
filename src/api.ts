@@ -5,6 +5,7 @@ import {
   validate,
   xrpToDrops,
   dropsToXrp,
+  rippleTimeToISO8601,
   iso8601ToRippleTime,
   txFlags
 } from './common'
@@ -337,6 +338,7 @@ class RippleAPI extends EventEmitter {
 
   xrpToDrops = xrpToDrops
   dropsToXrp = dropsToXrp
+  rippleTimeToISO8601 = rippleTimeToISO8601
   iso8601ToRippleTime = iso8601ToRippleTime
   txFlags = txFlags
 
