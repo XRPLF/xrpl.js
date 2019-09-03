@@ -22,7 +22,7 @@ function isSequence(val) {
 * a single element or a sequence, which has a `length` property and supports
 * element retrieval via sequence[ix].
 *
-* > concatArgs(1, [2, 3], new Buffer([4,5]), new Uint8Array([6, 7]));
+* > concatArgs(1, [2, 3], Buffer.from([4,5]), new Uint8Array([6, 7]));
 *  [1,2,3,4,5,6,7]
 *
 * @return {Array} - concatenated arguments

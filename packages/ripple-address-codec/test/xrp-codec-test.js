@@ -2,11 +2,11 @@ const assert = require('assert')
 const api = require('../dist/xrp-codec')
 
 function toHex(bytes) {
-  return new Buffer(bytes).toString('hex').toUpperCase()
+  return Buffer.from(bytes).toString('hex').toUpperCase()
 }
 
 function toBytes(hex) {
-  return new Buffer(hex, 'hex').toJSON().data
+  return Buffer.from(hex, 'hex').toJSON().data
 }
 
 describe('ripple-address-codec', function() {

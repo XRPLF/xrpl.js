@@ -14,7 +14,7 @@
   },
   "scripts": {
     "compile": "tsc",
-    "test": "tsc && mocha",
+    "test": "tsc && tslint -p ./ && mocha",
     "lint": "tslint -p ./"
   },
   "devDependencies": {
