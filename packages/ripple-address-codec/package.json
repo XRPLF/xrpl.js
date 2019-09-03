@@ -1,6 +1,6 @@
 {
   "name": "ripple-address-codec",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "encodes/decodes base58 encoded ripple identifiers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
