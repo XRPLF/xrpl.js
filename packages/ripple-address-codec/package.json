@@ -1,7 +1,11 @@
 {
   "name": "ripple-address-codec",
-  "version": "3.0.1",
-  "description": "encodes/decodes base58 encoded ripple identifiers",
+  "version": "3.0.2",
+  "description": "encodes/decodes base58 encoded XRP Ledger identifiers",
+  "files": [
+    "dist/npm/*",
+    "build/*"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "ISC",
