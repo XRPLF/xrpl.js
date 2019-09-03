@@ -1,7 +1,3 @@
-/* eslint-disable no-unused-expressions/no-unused-expressions */
-
-'use strict'
-
 const assert = require('assert')
 const api = require('../dist')
 
