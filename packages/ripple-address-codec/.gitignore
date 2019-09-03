@@ -51,7 +51,7 @@ test/config.js
 # Ignore npm-debug
 npm-debug.log
 
-# Ignore dist folder, build for bower
+# Ignore dist folder
 dist/
 
 # Ignore flow output directory

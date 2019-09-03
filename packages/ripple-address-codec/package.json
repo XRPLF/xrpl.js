@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "description": "encodes/decodes base58 encoded ripple identifiers",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "ISC",
   "dependencies": {
     "base-x": "3.0.4",
@@ -12,6 +13,7 @@
     "type": "git",
     "url": "git://github.com/ripple/ripple-address-codec.git"
   },
+  "prepublish": "tsc",
   "scripts": {
     "compile": "tsc",
     "test": "tsc && tslint -p ./ && mocha",
