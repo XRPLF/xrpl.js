@@ -1,5 +1,13 @@
 # ripple-lib Release History
 
+## 1.3.2 (2019-09-03)
+
+* Export and document `rippleTimeToISO8601()` method
+* Add type for isValidAddress (fixes error TS7016, #1032)
+* Docs: update recommended Node.js version (#1031)
+
+When using this release with [rippled](https://github.com/ripple/rippled), we recommend using [rippled version 1.3.1](https://github.com/ripple/rippled/releases/tag/1.3.1) or later.
+
 ## 1.3.1 (2019-08-26)
 
 * Upgrade to gulp 4 (#1030)
