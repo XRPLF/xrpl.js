@@ -1,4 +1,4 @@
-# ripple-address-codec [![NPM](https://img.shields.io/npm/v/ripple-address-codec.svg)](https://npmjs.org/package/ripple-address-codec) [![Build Status](https://img.shields.io/travis/ripple/ripple-address-codec/master.svg)](https://travis-ci.org/ripple/ripple-address-codec) [![codecov.io](http://codecov.io/github/ripple/ripple-address-codec/coverage.svg?branch=master)](http://codecov.io/github/ripple/ripple-address-codec?branch=master)
+# ripple-address-codec [![NPM](https://img.shields.io/npm/v/ripple-address-codec.svg)](https://npmjs.org/package/ripple-address-codec)
 
 ## API
 
@@ -33,67 +33,4 @@
   200,
   112,
   114 ]
-```
-
-## And ?? There's more to the wonderful world than ripple
-
-We give you the kitchen sink.
-
-```js
-> console.log(api)
-{ Codec: [Function: AddressCodec],
-  codecs:
-   { bitcoin:
-      { alphabet: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
-        codec: [Object],
-        base: 58 },
-     ripple:
-      { alphabet: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
-        codec: [Object],
-        base: 58 },
-     tipple:
-      { alphabet: 'RPShNAF39wBUDnEGHJKLM4pQrsT7VWXYZ2bcdeCg65jkm8ofqi1tuvaxyz',
-        codec: [Object],
-        base: 58 },
-     stellar:
-      { alphabet: 'gsphnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCr65jkm8oFqi1tuvAxyz',
-        codec: [Object],
-        base: 58 } },
-  decode: [Function: decode],
-  encode: [Function: encode],
-  decodeEdSeed: [Function],
-  encodeEdSeed: [Function],
-  isValidEdSeed: [Function],
-  decodeSeed: [Function],
-  encodeSeed: [Function],
-  isValidSeed: [Function],
-  decodeAccountID: [Function],
-  encodeAccountID: [Function],
-  isValidAccountID: [Function],
-  decodeAddress: [Function],
-  encodeAddress: [Function],
-  isValidAddress: [Function],
-  decodeNodePublic: [Function],
-  encodeNodePublic: [Function],
-  isValidNodePublic: [Function],
-  decodeNodePrivate: [Function],
-  encodeNodePrivate: [Function],
-  isValidNodePrivate: [Function],
-  decodeK256Seed: [Function],
-  encodeK256Seed: [Function],
-  isValidK256Seed: [Function] }
-```
-
-# Decode a bip32 bitcoin public key
-
-```js
-var pubVersion = [0x04, 0x88, 0xB2, 0x1E];
-var options = {version: pubVersion, alphabet: 'bitcoin'};
-var key = 'xpub661MyMwAqRbcEYS8w7XLSVeEsBXy79zSzH1J8vCdxAZningWLdN3zgtU6LBpB85b3D2yc8sfvZU521AAwdZafEz7mnzBBsz4wKY5e4cp9LB';
-var decoded = api.decode(key, options);
-var reencoded = api.encode(decoded, options);
-console.log(key);
-// 'xpub661MyMwAqRbcEYS8w7XLSVeEsBXy79zSzH1J8vCdxAZningWLdN3zgtU6LBpB85b3D2yc8sfvZU521AAwdZafEz7mnzBBsz4wKY5e4cp9LB'
-console.log(reencoded);
-// 'xpub661MyMwAqRbcEYS8w7XLSVeEsBXy79zSzH1J8vCdxAZningWLdN3zgtU6LBpB85b3D2yc8sfvZU521AAwdZafEz7mnzBBsz4wKY5e4cp9LB'
 ```

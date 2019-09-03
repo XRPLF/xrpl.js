@@ -3,7 +3,7 @@
 'use strict'
 
 const assert = require('assert')
-const api = require('../')
+const api = require('../dist')
 
 function toHex(bytes) {
   return new Buffer(bytes).toString('hex').toUpperCase()
@@ -15,11 +15,11 @@ function toBytes(hex) {
 
 describe('ripple-address-codec', function() {
   function makeTest(type, base58, hex) {
-    it('can translate between ' + hex + ' and ' + base58, function() {
+    it(`can translate between ${hex} and ${base58} (encode ${type})`, function() {
       const actual = api['encode' + type](toBytes(hex))
       assert.equal(actual, base58)
     })
-    it('can translate between ' + base58 + ' and ' + hex, function() {
+    it(`can translate between ${base58} and ${hex} (decode ${type})`, function() {
       const buf = api['decode' + type](base58)
       assert.equal(toHex(buf), hex)
     })
@@ -33,13 +33,7 @@ describe('ripple-address-codec', function() {
     'n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH',
     '0388E5BA87A000CB807240DF8C848EB0B5FFA5C8E5A521BC8E105C0F0A44217828')
 
-  makeTest('K256Seed', 'sn259rEFXrQrWyx3Q7XneWcwV6dfL',
-    'CF2DE378FBDD7E2EE87D486DFB5A7BFF')
-
-  makeTest('EdSeed', 'sEdTM1uX8pu2do5XvTnutH6HsouMaM2',
-    '4C3A1D213FBDFB14C7C28D609469B341')
-
-  it('can decode arbitray seeds', function() {
+  it('can decode arbitrary seeds', function() {
     const decoded = api.decodeSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
     assert.equal(toHex(decoded.bytes), '4C3A1D213FBDFB14C7C28D609469B341')
     assert.equal(decoded.type, 'ed25519')

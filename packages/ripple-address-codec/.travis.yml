@@ -1,7 +1,9 @@
 language: node_js
 node_js:
-- '0.12'
+- 6
+- 8
+- 9
 script:
-- npm test --coverage
-- npm run codecov
-- npm run lint
+- yarn compile
+- yarn test
+- yarn lint

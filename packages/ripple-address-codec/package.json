@@ -1,33 +1,32 @@
 {
   "name": "ripple-address-codec",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "encodes/decodes base58 encoded ripple identifiers",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "license": "ISC",
   "dependencies": {
-    "create-hash": "^1.1.2",
-    "x-address-codec": "^0.7.2"
+    "base-x": "3.0.4",
+    "create-hash": "^1.1.2"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/ripple/ripple-address-codec.git"
   },
   "scripts": {
-    "test": "istanbul test _mocha",
-    "prepublish": "npm test && npm run lint",
-    "codecov": "cat ./coverage/coverage.json | ./node_modules/codecov.io/bin/codecov.io.js",
-    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/master/eslintrc'; fi; eslint -c eslintrc src/*.js test/*.js"
+    "compile": "tsc",
+    "test": "tsc && istanbul test _mocha",
+    "lint": "tslint -p ./"
   },
   "devDependencies": {
+    "@types/node": "^10.12.0",
     "codecov.io": "^0.1.6",
     "coveralls": "~2.11.4",
     "eslint": "^4.19.1",
     "eslint-plugin-no-unused-expressions": "^0.1.0",
     "istanbul": "~0.3.21",
-    "mocha": "^5.0.5"
-  },
-  "readmeFilename": "README.md",
-  "engines": {
-    "node": ">=0.12.0"
+    "mocha": "^5.0.5",
+    "tslint": "^5.11.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.1.3"
   }
 }
