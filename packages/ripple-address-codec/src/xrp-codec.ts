@@ -193,10 +193,14 @@ export function encodeAccountID(bytes: Buffer): string {
   return codecWithXrpAlphabet.encode(bytes, opts)
 }
 
+export const encodeAddress = encodeAccountID
+
 export function decodeAccountID(accountId: string): Buffer {
   const opts = {versions: [ACCOUNT_ID], expectedLength: 20}
   return codecWithXrpAlphabet.decode(accountId, opts).bytes
 }
+
+export const decodeAddress = decodeAccountID
 
 export function decodeNodePublic(base58string: string): Buffer {
   const opts = {versions: [NODE_PUBLIC], expectedLength: 33}
