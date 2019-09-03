@@ -37,7 +37,6 @@
     "no-trailing-whitespace": true,
     "no-string-throw": true,
     "no-unexpected-multiline": true,
-    "no-use-before-declare": true,
     "no-var-keyword": true,
     "no-magic-numbers": false,
     "array-bracket-spacing": [true, "never"],
