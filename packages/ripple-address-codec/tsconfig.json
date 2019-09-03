@@ -17,7 +17,8 @@
     "suppressImplicitAnyIndexErrors": false,
     "sourceMap": true,
     "skipLibCheck": true,
-    "declaration": true
+    "declaration": true,
+    "strict": true
   },
   "include": [
     "src/**/*.ts"

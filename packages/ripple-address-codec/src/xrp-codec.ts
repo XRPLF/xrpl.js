@@ -3,7 +3,7 @@
  */
 
 const baseCodec = require('base-x')
-const {seqEqual, concatArgs} = require('.//utils')
+const {seqEqual, concatArgs} = require('./utils')
 
 class Codec {
   sha256: (bytes: Uint8Array) => Buffer
@@ -211,7 +211,7 @@ export function encodeNodePublic(bytes: Buffer): string {
 // Address === AccountID
 export function isValidAddress(address: string): boolean {
   try {
-    this.decodeAccountID(address)
+    decodeAccountID(address)
   } catch (e) {
     return false
   }
