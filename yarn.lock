@@ -4098,10 +4098,10 @@ ripple-address-codec@^2.0.1:
     hash.js "^1.0.3"
     x-address-codec "^0.7.0"
 
-ripple-address-codec@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/ripple-address-codec/-/ripple-address-codec-3.0.3.tgz#353cc047d38729dbd735068f7938422a3c048f77"
-  integrity sha512-v/u0qbvBaDSNv7dYgRhnWrfnjTEhJqKQ+nCsxP8vxp1qgnnXVT/SsND94S8aR3oetdRoVJJdFcysEUNsyc0OSg==
+ripple-address-codec@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/ripple-address-codec/-/ripple-address-codec-3.0.4.tgz#a7a8bb040df41cb082330fd828f09b9e6478c7fd"
+  integrity sha512-GFk1BgavW+9oy5Z1Cp6YAGMfB51QdbeuhOo0Zir+s+S40F5vHtVZYu6zZE1eOAX92A5kygPuBRX4APH2v8Yhmg==
   dependencies:
     base-x "3.0.4"
     create-hash "^1.1.2"
