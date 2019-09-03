@@ -23,7 +23,7 @@
     "https-proxy-agent": "2.2.1",
     "jsonschema": "1.2.2",
     "lodash": "^4.17.4",
-    "ripple-address-codec": "^3.0.0",
+    "ripple-address-codec": "^3.0.3",
     "ripple-binary-codec": "0.2.2",
     "ripple-hashes": "0.3.2",
     "ripple-keypairs": "^0.10.1",
