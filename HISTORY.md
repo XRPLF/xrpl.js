@@ -1,5 +1,9 @@
 # ripple-lib Release History
 
+## UNRELEASED
+
+* Expand node version compatibility to support Node.js 12 ([ripple-binary-codec#32](https://github.com/ripple/ripple-binary-codec/issues/32))
+
 ## 1.3.2 (2019-09-03)
 
 * Export and document `rippleTimeToISO8601()` method

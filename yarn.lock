@@ -2791,7 +2791,7 @@ lodash.flattendeep@^4.4.0:
   resolved "https://registry.yarnpkg.com/lodash.flattendeep/-/lodash.flattendeep-4.4.0.tgz#fb030917f86a3134e5bc9bec0d69e0013ddfedb2"
   integrity sha1-+wMJF/hqMTTlvJvsDWngAT3f7bI=
 
-lodash@^4.12.0, lodash@^4.17.11, lodash@^4.17.4:
+lodash@^4.17.11, lodash@^4.17.4:
   version "4.17.13"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.13.tgz#0bdc3a6adc873d2f4e0c4bac285df91b64fc7b93"
   integrity sha512-vm3/XWXfWtRua0FkUyEHBZy8kCPjErNBT9fJx8Zvs+U6zjqPbTUOpkaoum3O5uiA8sm+yNMHXfYkTUHFoMxFNA==
@@ -4106,23 +4106,10 @@ ripple-address-codec@^3.0.4:
     base-x "3.0.4"
     create-hash "^1.1.2"
 
-ripple-binary-codec@0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/ripple-binary-codec/-/ripple-binary-codec-0.2.1.tgz#f343da758a64f3aceb4164b8a98fbc153b088c14"
-  integrity sha512-R1+equWtaJs505/G2NRvxKJVlMkZMqo4fiE6eBXi1c2IvL7dDRZPlb8JHdSgD6eT/Qo5TkovuUf3qmRz5dinNw==
-  dependencies:
-    babel-runtime "^6.6.1"
-    bn.js "^4.11.3"
-    create-hash "^1.1.2"
-    decimal.js "^5.0.8"
-    inherits "^2.0.1"
-    lodash "^4.12.0"
-    ripple-address-codec "^2.0.1"
-
-ripple-binary-codec@0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/ripple-binary-codec/-/ripple-binary-codec-0.2.2.tgz#1d64e1dce536363eeeb636ad1f98c0c5d98a8f48"
-  integrity sha512-kJ1pEIEHKvvNO9IqWgwBCLCL3wwJ/GwYXpJhrmX2kW4x7unHXgFOxhAP9DDlMGwMusSmYrstsXrzhffVEaBoHw==
+ripple-binary-codec@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/ripple-binary-codec/-/ripple-binary-codec-0.2.4.tgz#555d64c52182a215222af6045b5170e43f0530b1"
+  integrity sha512-lfT9bybaVqA8IJmGFnSWaISCXmwvNY/P5HHKm6zQ1yTIXJpC+hDIeQqm/eD/2HLv82y2IvqGYd0GhEQ41lpNpQ==
   dependencies:
     babel-runtime "^6.6.1"
     bn.js "^4.11.3"
@@ -4130,17 +4117,17 @@ ripple-binary-codec@0.2.2:
     decimal.js "^5.0.8"
     inherits "^2.0.1"
     lodash "^4.17.15"
-    ripple-address-codec "^2.0.1"
+    ripple-address-codec "^3.0.4"
 
-ripple-hashes@0.3.2:
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/ripple-hashes/-/ripple-hashes-0.3.2.tgz#f3ac3b1832cec6d0bac07e82acc10a0a6a1cc84e"
-  integrity sha512-1Emm/raLNChNR5nVoQPJ7NWQpHr8jJjIZDoug4ukw4RZ3+eehO5nyx86a+MaQKAeAc1nJRFwVjBvh9SeYpelYw==
+ripple-hashes@^0.3.4:
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/ripple-hashes/-/ripple-hashes-0.3.4.tgz#d06f78fc39dde27749b33ad2461b39ba873c94ec"
+  integrity sha512-u2kgg9Yu9D44HWnC9R2lNg+amVLllJkMQmXZEEM2DAMFXigr4+ph1O8LLxLv+k0fbdjAjos4aUyWwcw6cxzYMw==
   dependencies:
     bignumber.js "^4.1.0"
     create-hash "^1.1.2"
-    ripple-address-codec "^2.0.1"
-    ripple-binary-codec "0.2.1"
+    ripple-address-codec "^3.0.4"
+    ripple-binary-codec "^0.2.4"
 
 ripple-keypairs@^0.10.1:
   version "0.10.2"
