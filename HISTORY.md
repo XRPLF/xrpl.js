@@ -1,6 +1,6 @@
 # ripple-lib Release History
 
-## UNRELEASED
+## 1.3.3 (2019-09-10)
 
 * Expand node version compatibility to support Node.js 12 ([ripple-binary-codec#32](https://github.com/ripple/ripple-binary-codec/issues/32))
 
