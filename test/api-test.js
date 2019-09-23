@@ -2679,6 +2679,37 @@ describe('RippleAPI', function () {
     );
   });
 
+  it('sign - throws when encoded tx does not match decoded tx - prepared order', async function () {
+    const order = {
+      direction: 'sell',
+      quantity: {
+        currency: 'USD',
+        counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+        value: '3.140000'
+      },
+      totalPrice: {
+        currency: 'XRP',
+        value: '31415'
+      }
+    };
+    const prepared = await this.api.prepareOrder('r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59', order, {
+      sequence: 123
+    });
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+    try {
+      this.api.sign(prepared.txJSON, secret);
+      return Promise.reject(new Error('api.sign should have thrown'));
+    } catch (error) {
+      assert.equal(error.name, 'ValidationError');
+      assert.equal(error.message, 'Serialized transaction does not match original txJSON. See `error.data`');
+      assert.deepEqual(error.data.diff, {
+        TakerGets: {
+          value: '3.14'
+        }
+      });
+    }
+  });
+
   it('sign - throws when encoded tx does not match decoded tx - AccountSet', function () {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
     const request = {
