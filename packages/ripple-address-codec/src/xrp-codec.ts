@@ -2,8 +2,8 @@
  * Codec class
  */
 
-const baseCodec = require('base-x')
-const {seqEqual, concatArgs} = require('./utils')
+import * as baseCodec from 'base-x'
+import {seqEqual, concatArgs} from './utils'
 
 class Codec {
   sha256: (bytes: Uint8Array) => Buffer
@@ -39,12 +39,12 @@ class Codec {
     if (expectedLength && bytes.length !== expectedLength) {
       throw new Error('unexpected_payload_length: bytes.length does not match expectedLength')
     }
-    return this.encodeChecked(concatArgs(versions, bytes))
+    return this.encodeChecked(Buffer.from(concatArgs(versions, bytes)))
   }
 
   encodeChecked(buffer: Buffer) {
     const check = this.sha256(this.sha256(buffer)).slice(0, 4)
-    return this.encodeRaw(concatArgs(buffer, check))
+    return this.encodeRaw(Buffer.from(concatArgs(buffer, check)))
   }
 
   encodeRaw(bytes: Buffer) {
@@ -58,57 +58,39 @@ class Codec {
    * @param opts Options object including the version byte(s) and the expected length of the data after decoding.
    */
   decode(base58string: string, opts: {
-    versions?: (number | number[])[],
+    versions: (number | number[])[],
     expectedLength?: number,
     versionTypes?: ['ed25519', 'secp256k1']
-  } = {}) {
-    const versions = Array.isArray(opts.versions) ? opts.versions : [opts.versions]
+  }): {
+    version: number[],
+    bytes: Buffer,
+    type: string | null
+  } {
+    const versions = opts.versions
     const types = opts.versionTypes
-    if (versions) {
-      const withoutSum = this.decodeChecked(base58string)
-      const ret: {
-        version: number[] | null,
-        bytes: Buffer | null,
-        type: string | null // for seeds, 'ed25519' | 'secp256k1'
-      } = {
-        version: null,
-        bytes: null,
-        type: null
-      }
-      if (versions.length > 1 && !opts.expectedLength) {
-        throw new Error('expectedLength is required because there are >= 2 possible versions')
-      }
-      const versionLengthGuess = typeof versions[0] === 'number' ? 1 : (versions[0] as number[]).length
-      const payloadLength = opts.expectedLength || withoutSum.length - versionLengthGuess
-      const versionBytes = withoutSum.slice(0, -payloadLength)
-      const payload = withoutSum.slice(-payloadLength)
 
-      let foundVersion = false
-      for (let i = 0; i < versions.length; i++) {
-        const version: number[] = Array.isArray(versions[i]) ? versions[i] as number[] : [versions[i] as number]
-        if (seqEqual(versionBytes, version)) {
-          ret.version = version
-          ret.bytes = payload
-          if (types) {
-            ret.type = types[i]
-          }
-          foundVersion = true
+    const withoutSum = this.decodeChecked(base58string)
+
+    if (versions.length > 1 && !opts.expectedLength) {
+      throw new Error('expectedLength is required because there are >= 2 possible versions')
+    }
+    const versionLengthGuess = typeof versions[0] === 'number' ? 1 : (versions[0] as number[]).length
+    const payloadLength = opts.expectedLength || withoutSum.length - versionLengthGuess
+    const versionBytes = withoutSum.slice(0, -payloadLength)
+    const payload = withoutSum.slice(-payloadLength)
+
+    for (let i = 0; i < versions.length; i++) {
+      const version: number[] = Array.isArray(versions[i]) ? versions[i] as number[] : [versions[i] as number]
+      if (seqEqual(versionBytes, version)) {
+        return {
+          version,
+          bytes: payload,
+          type: types ? types[i] : null
         }
       }
-
-      if (!foundVersion) {
-        throw new Error('version_invalid: version bytes do not match any of the provided version(s)')
-      }
-
-      if (opts.expectedLength && ret.bytes.length !== opts.expectedLength) {
-        throw new Error('unexpected_payload_length: payload length does not match expectedLength')
-      }
-
-      return ret
     }
 
-    // Assume that base58string is 'checked'
-    return this.decodeChecked(base58string)
+    throw new Error('version_invalid: version bytes do not match any of the provided version(s)')
   }
 
   decodeChecked(base58string: string) {
@@ -153,14 +135,13 @@ const codecOptions = {
 
 const codecWithXrpAlphabet = new Codec(codecOptions)
 
+export const codec = codecWithXrpAlphabet
+
 // entropy is a Buffer of size 16
 // type is 'ed25519' or 'secp256k1'
 export function encodeSeed(entropy: Buffer, type: 'ed25519' | 'secp256k1'): string {
   if (entropy.length !== 16) {
     throw new Error('entropy must have length 16')
-  }
-  if (type !== 'ed25519' && type !== 'secp256k1') {
-    throw new Error('type must be ed25519 or secp256k1')
   }
   const opts = {
     expectedLength: 16,
@@ -174,17 +155,14 @@ export function encodeSeed(entropy: Buffer, type: 'ed25519' | 'secp256k1'): stri
 }
 
 export function decodeSeed(seed: string, opts: {
-  versionTypes?: ['ed25519', 'secp256k1'],
-  versions?: (number | number[])[]
-  expectedLength?: number
-} = {}) {
-  if (!opts.versionTypes || !opts.versions) {
-    opts.versionTypes = ['ed25519', 'secp256k1']
-    opts.versions = [ED25519_SEED, FAMILY_SEED]
-  }
-  if (!opts.expectedLength) {
-    opts.expectedLength = 16
-  }
+  versionTypes: ['ed25519', 'secp256k1'],
+  versions: (number | number[])[]
+  expectedLength: number
+} = {
+  versionTypes: ['ed25519', 'secp256k1'],
+  versions: [ED25519_SEED, FAMILY_SEED],
+  expectedLength: 16
+}) {
   return codecWithXrpAlphabet.decode(seed, opts)
 }
 

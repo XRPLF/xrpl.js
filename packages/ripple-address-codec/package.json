@@ -10,6 +10,7 @@
   "types": "dist/index.d.ts",
   "license": "ISC",
   "dependencies": {
+    "@types/base-x": "^3.0.0",
     "base-x": "3.0.4",
     "create-hash": "^1.1.2"
   },
@@ -20,12 +21,14 @@
   "prepublish": "tsc",
   "scripts": {
     "compile": "tsc",
-    "test": "tsc && tslint -p ./ && mocha",
+    "test": "jest",
     "lint": "tslint -p ./"
   },
   "devDependencies": {
+    "@types/jest": "^24.0.18",
     "@types/node": "^10.12.0",
-    "mocha": "^5.0.5",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
     "tslint": "^5.19.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.1.3"

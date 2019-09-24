@@ -8,8 +8,6 @@
     "rootDir": "src",
     "module": "commonjs",
     "moduleResolution": "node",
-    "strictNullChecks": false,
-    "noImplicitAny": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": false,
