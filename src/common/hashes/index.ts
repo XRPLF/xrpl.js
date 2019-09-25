@@ -6,32 +6,32 @@ import {SHAMap, TYPE_TRANSACTION_MD, TYPE_ACCOUNT_STATE} from './shamap'
 import {encode} from 'ripple-binary-codec'
 import ledgerspaces from './ledgerspaces'
 
-const padLeftZero = (string, length): string => {
+const padLeftZero = (string: string, length: number): string => {
   return Array(length - string.length + 1).join('0') + string
 }
 
-const intToHex = (integer, byteLength): string => {
+const intToHex = (integer: number, byteLength: number): string => {
   return padLeftZero(Number(integer).toString(16), byteLength * 2)
 }
 
-const bytesToHex = (bytes): string => {
-  return (Buffer.from(bytes)).toString('hex')
+const bytesToHex = (bytes: number[]): string => {
+  return Buffer.from(bytes).toString('hex')
 }
 
-const bigintToHex = (integerString, byteLength): string => {
+const bigintToHex = (integerString: string | number | BigNumber, byteLength: number): string => {
   const hex = (new BigNumber(integerString)).toString(16)
   return padLeftZero(hex, byteLength * 2)
 }
 
-const ledgerSpaceHex = (name): string => {
+const ledgerSpaceHex = (name: string): string => {
   return intToHex(ledgerspaces[name].charCodeAt(0), 2)
 }
 
-const addressToHex = (address): string => {
+const addressToHex = (address: string): string => {
   return (Buffer.from(decodeAddress(address))).toString('hex')
 }
 
-const currencyToHex = (currency): string => {
+const currencyToHex = (currency: string): string => {
   if (currency.length === 3) {
     let bytes = new Array(20 + 1).join('0').split('').map(parseFloat)
     bytes[12] = currency.charCodeAt(0) & 0xff
@@ -42,7 +42,7 @@ const currencyToHex = (currency): string => {
   return currency
 }
 
-const addLengthPrefix = (hex): string => {
+const addLengthPrefix = (hex: string): string => {
   const length = hex.length / 2
   if (length <= 192) {
     return bytesToHex([length]) + hex
@@ -56,40 +56,40 @@ const addLengthPrefix = (hex): string => {
   throw new Error('Variable integer overflow.')
 }
 
-export const computeBinaryTransactionHash = (txBlobHex): string => {
+export const computeBinaryTransactionHash = (txBlobHex: string): string => {
   const prefix = HASH_TX_ID.toString(16).toUpperCase()
   return hash(prefix + txBlobHex)
 }
 
-export const computeTransactionHash = (txJSON): string => {
+export const computeTransactionHash = (txJSON: any): string => {
   return computeBinaryTransactionHash(encode(txJSON))
 }
 
-export const computeBinaryTransactionSigningHash = (txBlobHex): string => {
+export const computeBinaryTransactionSigningHash = (txBlobHex: string): string => {
   const prefix = HASH_TX_SIGN.toString(16).toUpperCase()
   return hash(prefix + txBlobHex)
 }
 
-export const computeTransactionSigningHash = (txJSON): string => {
+export const computeTransactionSigningHash = (txJSON: any): string => {
   return computeBinaryTransactionSigningHash(encode(txJSON))
 }
 
-export const computeAccountHash = (address): string => {
+export const computeAccountHash = (address: string): string => {
   return hash(ledgerSpaceHex('account') + addressToHex(address))
 }
 
-export const computeSignerListHash = (address): string => {
+export const computeSignerListHash = (address: string): string => {
   return hash(ledgerSpaceHex('signerList') +
               addressToHex(address) +
               '00000000' /* uint32(0) signer list index */)
 }
 
-export const computeOrderHash = (address, sequence): string => {
+export const computeOrderHash = (address: string, sequence: number): string => {
   const prefix = '00' + intToHex(ledgerspaces.offer.charCodeAt(0), 1)
   return hash(prefix + addressToHex(address) + intToHex(sequence, 4))
 }
 
-export const computeTrustlineHash = (address1, address2, currency): string => {
+export const computeTrustlineHash = (address1: string, address2: string, currency: string): string => {
   const address1Hex = addressToHex(address1)
   const address2Hex = addressToHex(address2)
 
@@ -103,7 +103,7 @@ export const computeTrustlineHash = (address1, address2, currency): string => {
               currencyToHex(currency))
 }
 
-export const computeTransactionTreeHash = (transactions, version): string => {
+export const computeTransactionTreeHash = (transactions: any[], version: number): string => {
   const shamap = new SHAMap(version)
 
   transactions.forEach((txJSON) => {
@@ -117,7 +117,7 @@ export const computeTransactionTreeHash = (transactions, version): string => {
   return shamap.hash
 }
 
-export const computeStateTreeHash = (entries, version: number): string => {
+export const computeStateTreeHash = (entries: any[], version: number): string => {
   const shamap = new SHAMap(version)
 
   entries.forEach((ledgerEntry) => {
