@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import hashes = require('ripple-hashes')
+import {computeLedgerHash as clh, computeTransactionTreeHash, computeStateTreeHash} from '../common/hashes'
 import * as common from '../common'
 
 function convertLedgerHeader(header): any {
@@ -22,7 +22,7 @@ function convertLedgerHeader(header): any {
 
 function hashLedgerHeader(ledgerHeader) {
   const header = convertLedgerHeader(ledgerHeader)
-  return hashes.computeLedgerHash(header)
+  return clh(header)
 }
 
 function computeTransactionHash(ledger, version,
@@ -56,7 +56,7 @@ function computeTransactionHash(ledger, version,
       tx.meta ? {metaData: tx.meta} : {})
     return renameMeta
   })
-  const transactionHash = hashes.computeTransactionTreeHash(txs, version)
+  const transactionHash = computeTransactionTreeHash(txs, version)
   if (ledger.transactionHash !== undefined
       && ledger.transactionHash !== transactionHash) {
     throw new common.errors.ValidationError('transactionHash in header'
@@ -78,7 +78,7 @@ function computeStateHash(ledger, version,
     return ledger.stateHash
   }
   const state = JSON.parse(ledger.rawState)
-  const stateHash = hashes.computeStateTreeHash(state, version)
+  const stateHash = computeStateTreeHash(state, version)
   if (ledger.stateHash !== undefined && ledger.stateHash !== stateHash) {
     throw new common.errors.ValidationError('stateHash in header'
       + ' does not match computed hash of state')
