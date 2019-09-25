@@ -2,7 +2,7 @@ import * as isEqual from '../common/js/lodash.isequal'
 import * as utils from './utils'
 import keypairs = require('ripple-keypairs')
 import binaryCodec = require('ripple-binary-codec')
-import {computeBinaryTransactionHash} from 'ripple-hashes'
+import {computeBinaryTransactionHash} from '../common/hashes'
 import {SignOptions, KeyPair} from './types'
 import {BigNumber} from 'bignumber.js'
 import {xrpToDrops} from '../common'
