@@ -26,7 +26,7 @@ export abstract class Node {
 }
 
 export class InnerNode extends Node {
-  public leaves: { [slot: string]: Node }
+  public leaves: { [slot: number]: Node }
   public type: NodeTypes
   public depth: number
   public empty: boolean
@@ -50,7 +50,7 @@ export class InnerNode extends Node {
    * @return {void}
    */  
   public addItem(tag: string, node: Node): void {
-    const existingNode = this.getNode(tag[this.depth])
+    const existingNode = this.getNode(parseInt(tag[this.depth],16))
     if (existingNode) {
       // A node already exists in this slot
       if (existingNode instanceof InnerNode) {
@@ -70,32 +70,38 @@ export class InnerNode extends Node {
           newInnerNode.addItem(tag, node)
     
           // And place the newly created inner node in the slot
-          this.setNode(tag[this.depth], newInnerNode)
+          this.setNode(parseInt(tag[this.depth], 16), newInnerNode)
         }
       }
     } else {
       // Neat, we have a nice open spot for the new node
-      this.setNode(tag[this.depth], node)
+      this.setNode(parseInt(tag[this.depth], 16), node)
     }
   }
 
   /**
    * Overwrite the node that is currently in a given slot.
-   * @param {string} slot a character 0-F
+   * @param {number} slot a number 0-15
    * @param {Node} node to place
    * @return {void}
    */
-  public setNode(slot: string, node: Node): void {
+  public setNode(slot: number, node: Node): void {
+    if (slot < 0 || slot > 15) {
+      throw new Error ('Invalid slot: slot must be between 0-15.')
+    }
     this.leaves[slot] = node
     this.empty = false
   }
 
   /**
    * Get the node that is currently in a given slot.
-   * @param {string} slot a character 0-F
+   * @param {number} slot a number 0-15
    * @return {Node}
    */
-  public getNode(slot: string): Node {
+  public getNode(slot: number): Node {
+    if (slot < 0 || slot > 15) {
+      throw new Error ('Invalid slot: slot must be between 0-15.')
+    }    
     return this.leaves[slot]
   }
 
@@ -103,8 +109,7 @@ export class InnerNode extends Node {
     if (this.empty) return HEX_ZERO
     let hex = ''
     for (let i = 0; i < 16; i++) {
-      const slot = i.toString(16).toUpperCase()
-      hex += this.leaves[slot] ? this.leaves[slot].hash : HEX_ZERO
+      hex += this.leaves[i] ? this.leaves[i].hash : HEX_ZERO
     }
     const prefix = hashPrefix.INNER_NODE.toString(16)
     return hash(prefix + hex)
@@ -157,7 +162,7 @@ export class InnerNodeV2 extends InnerNode {
    * @return {void}
    */
   public addItem (tag: string, node: Node): void {
-    const existingNode = this.getNode(tag[this.depth])
+    const existingNode = this.getNode(parseInt(tag[this.depth], 16))
   
     if (existingNode) {
       // A node already exists in this slot
@@ -172,11 +177,11 @@ export class InnerNodeV2 extends InnerNode {
           newInnerNode.common = tag.slice(0, newDepth - 64)
   
           // Parent new and existing node
-          newInnerNode.setNode(existingNode.common[newDepth], existingNode)
+          newInnerNode.setNode(parseInt(existingNode.common[newDepth], 16), existingNode)
           newInnerNode.addItem(tag, node)
   
           // And place the newly created inner node in the slot
-          this.setNode(tag[this.depth], newInnerNode)
+          this.setNode(parseInt(tag[this.depth], 16), newInnerNode)
         }
       } else if (existingNode instanceof Leaf) {
         if (existingNode.tag === tag) {
@@ -197,12 +202,12 @@ export class InnerNodeV2 extends InnerNode {
           newInnerNode.addItem(tag, node)
     
           // And place the newly created inner node in the slot
-          this.setNode(tag[this.depth], newInnerNode)
+          this.setNode(parseInt(tag[this.depth], 16), newInnerNode)
         }
       }
     } else {
       // Neat, we have a nice open spot for the new node
-      this.setNode(tag[this.depth], node)
+      this.setNode(parseInt(tag[this.depth], 16), node)
     }
   }
 
@@ -210,8 +215,7 @@ export class InnerNodeV2 extends InnerNode {
     if (this.empty) return HEX_ZERO
     let hex = ''
     for (let i = 0; i < 16; i++) {
-      const slot = i.toString(16).toUpperCase()
-      hex += this.leaves[slot] ? this.leaves[slot].hash : HEX_ZERO
+      hex += this.leaves[i] ? this.leaves[i].hash : HEX_ZERO
     }
     if (this.depth < 16) {
       hex += '0'
