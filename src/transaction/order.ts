@@ -48,7 +48,11 @@ function prepareOrder(this: RippleAPI, address: string, order: FormattedOrderSpe
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
+    // console.log(JSON.stringify(order))
+    // tslint:disable-next-line:no-empty
+    // try {
     validate.prepareOrder({address, order, instructions})
+    // } catch (e) {}
     const txJSON = createOrderTransaction(address, order)
     return utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {

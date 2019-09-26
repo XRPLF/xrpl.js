@@ -2,12 +2,12 @@ import * as _ from 'lodash'
 import binary = require('ripple-binary-codec')
 import * as utils from './utils'
 import BigNumber from 'bignumber.js'
-import {decodeAddress} from 'ripple-address-codec'
+import {decodeAccountID} from 'ripple-address-codec'
 import {validate} from '../common'
 import {computeBinaryTransactionHash} from 'ripple-hashes'
 
 function addressToBigNumber(address) {
-  const hex = (Buffer.from(decodeAddress(address))).toString('hex')
+  const hex = (Buffer.from(decodeAccountID(address))).toString('hex')
   return new BigNumber(hex, 16)
 }
 

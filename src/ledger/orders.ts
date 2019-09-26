@@ -33,6 +33,6 @@ export default async function getOrders(
     ledger_index: options.ledgerVersion || await this.getLedgerVersion(),
     limit: options.limit
   })
-  // 3. Return Formatted Response
+  // 3. Return Formatted Response, from the perspective of `address`
   return formatResponse(address, responses)
 }

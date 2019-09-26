@@ -124,6 +124,13 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@types/base-x@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/base-x/-/base-x-3.0.0.tgz#a1365259d1d3fa3ff973ab543192a6bdd4cb2f90"
+  integrity sha512-vnqSlpsv9uFX5/z8GyKWAfWHhLGJDBkrgRRsnxlsX23DHOlNyqP/eHQiv4TwnYcZULzQIxaWA/xRWU9Dyy4qzw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/lodash@^4.14.136":
   version "4.14.136"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.136.tgz#413e85089046b865d960c9ff1d400e04c31ab60f"
@@ -4100,6 +4107,15 @@ ripple-address-codec@^3.0.4:
   resolved "https://registry.yarnpkg.com/ripple-address-codec/-/ripple-address-codec-3.0.4.tgz#a7a8bb040df41cb082330fd828f09b9e6478c7fd"
   integrity sha512-GFk1BgavW+9oy5Z1Cp6YAGMfB51QdbeuhOo0Zir+s+S40F5vHtVZYu6zZE1eOAX92A5kygPuBRX4APH2v8Yhmg==
   dependencies:
+    base-x "3.0.4"
+    create-hash "^1.1.2"
+
+ripple-address-codec@^4.0.0-b6:
+  version "4.0.0-b6"
+  resolved "https://registry.yarnpkg.com/ripple-address-codec/-/ripple-address-codec-4.0.0-b6.tgz#1ab91b0c929e1c65265a8ef608a9c4fbedc966bf"
+  integrity sha512-bJ8sii3iZT4JQ638vO7HxI8gZJp7nlnqVWqqq/ABaAJBqJj2Q1XgSOsAyf1DyX49LzfvFDjxPvcAiA6lWyAs2g==
+  dependencies:
+    "@types/base-x" "^3.0.0"
     base-x "3.0.4"
     create-hash "^1.1.2"
 

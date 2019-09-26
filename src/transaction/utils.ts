@@ -5,6 +5,7 @@ const txFlags = common.txFlags
 import {Instructions, Prepare} from './types'
 import {RippleAPI} from '..'
 import {ValidationError} from '../common/errors'
+import {xAddressToClassicAddress} from 'ripple-address-codec'
 
 export type ApiMemo = {
   MemoData?: string,
@@ -56,6 +57,37 @@ function scaleValue(value, multiplier, extra = 0) {
   return (new BigNumber(value)).times(multiplier).plus(extra).toString()
 }
 
+/**
+ * @typedef {Object} ClassicAccountAndTag
+ * @property {string} classicAccount - The classic account address.
+ * @property {number | false | undefined } tag - The destination tag;
+ *                    `false` if no tag should be used;
+ *                    `undefined` if the input could not specify whether a tag should be used.
+ */
+
+/**
+ * Given an address (account), get the classic account and tag.
+ *
+ * @param Account The address to parse.
+ * @returns {ClassicAccountAndTag}
+ *          The classic account and tag.
+ */
+function getClassicAccountAndTag(Account: string): {classicAccount: string, tag: number | false | undefined} {
+  try {
+    const classic = xAddressToClassicAddress(Account)
+    return {
+      classicAccount: classic.classicAddress,
+      tag: classic.tag
+    }
+  } catch (_) {
+    // xAddressToClassicAddress threw an error, so Account is a classic address
+    return {
+      classicAccount: Account,
+      tag: undefined
+    }
+  }
+}
+
 function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
   instructions: Instructions
 ): Promise<Prepare> {
@@ -73,7 +105,55 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
     delete txJSON.SignerEntries
   }
 
-  const account = txJSON.Account
+  // Sender:
+  const {classicAccount, tag: sourceTag} = getClassicAccountAndTag(txJSON.Account)
+  txJSON.Account = classicAccount
+  if (sourceTag !== undefined) {
+    if (txJSON.SourceTag && txJSON.SourceTag !== sourceTag) {
+      return Promise.reject(new ValidationError(
+        'The `SourceTag`, if present, must match the tag of the `Account` X-address'))
+    }
+    if (sourceTag) {
+      txJSON.SourceTag = sourceTag
+    }
+  }
+
+  // Destination:
+  if (typeof txJSON.Destination === 'string') {
+    const {classicAccount: destinationAccount, tag: destinationTag} = getClassicAccountAndTag(txJSON.Destination)
+    txJSON.Destination = destinationAccount
+    if (destinationTag !== undefined) {
+      const transactionTypesWithDestinationTagField = ['Payment', 'CheckCreate', 'EscrowCreate', 'PaymentChannelCreate']
+      if (transactionTypesWithDestinationTagField.includes(txJSON.TransactionType)) {
+        if (txJSON.DestinationTag && txJSON.DestinationTag !== destinationTag) {
+          return Promise.reject(new ValidationError(
+            'The Payment `DestinationTag`, if present, must match the tag of the `Destination` X-address'))
+        }
+        if (destinationTag) {
+          txJSON.DestinationTag = destinationTag
+        }
+      }
+    }
+  }
+
+  function convertToClassicAccountIfPresent(fieldName: string): void {
+    const account = txJSON[fieldName]
+    if (typeof account === 'string') {
+      const {classicAccount: ca} = getClassicAccountAndTag(account)
+      txJSON[fieldName] = ca
+    }
+  }
+
+  // DepositPreauth:
+  convertToClassicAccountIfPresent('Authorize')
+  convertToClassicAccountIfPresent('Unauthorize')
+
+  // EscrowCancel, EscrowFinish:
+  convertToClassicAccountIfPresent('Owner')
+
+  // SetRegularKey:
+  convertToClassicAccountIfPresent('RegularKey')
+
   setCanonicalFlag(txJSON)
 
   function prepareMaxLedgerVersion(): Promise<TransactionJSON> {
@@ -168,7 +248,7 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
     try {
       // Consider requesting from the 'current' ledger (instead of 'validated').
       const response = await api.request('account_info', {
-        account
+        account: classicAccount
       })
       txJSON.Sequence = response.account_data.Sequence
       return Promise.resolve(txJSON)
@@ -203,5 +283,6 @@ export {
   convertMemo,
   prepareTransaction,
   common,
-  setCanonicalFlag
+  setCanonicalFlag,
+  getClassicAccountAndTag
 }

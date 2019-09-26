@@ -1,6 +1,8 @@
 'use strict';
 module.exports = {
   ACCOUNT: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+  ACCOUNT_X: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+  ACCOUNT_T: 'T719a5UwUCnEs54UsxG9CJYYDhwmFCqkr7wxCcNcfZ6p5GZ',
   OTHER_ACCOUNT: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
   THIRD_ACCOUNT: 'rwBYyfufTzk77zUSKEu4MvixfarC35av1J',
   FOURTH_ACCOUNT: 'rJnZ4YHCUsHvQu7R6mZohevKJDHFzVD6Zr',

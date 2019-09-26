@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "tag",
-  "description": "An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.",
+  "description": "An arbitrary 32-bit unsigned integer. It typically maps to an off-ledger account; for example, a hosted wallet or exchange account.",
   "type": "integer",
   "$ref": "uint32"
 }

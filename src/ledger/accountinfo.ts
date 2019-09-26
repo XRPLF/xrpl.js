@@ -1,6 +1,7 @@
 import {validate, removeUndefined, dropsToXrp} from '../common'
 import {RippleAPI} from '..'
 import {AccountInfoResponse} from '../common/types/commands/account_info'
+import { xAddressToClassicAddress } from 'ripple-address-codec'
 
 export type GetAccountInfoOptions = {
   ledgerVersion?: number
@@ -34,6 +35,22 @@ export default async function getAccountInfo(
 ): Promise<FormattedGetAccountInfoResponse> {
   // 1. Validate
   validate.getAccountInfo({address, options})
+
+  // Only support retrieving account info without a tag,
+  // since account info is not distinguished by tag.
+  try {
+    const {
+      classicAddress,
+      tag
+    } = xAddressToClassicAddress(address)
+    if (tag !== false) {
+      return Promise.reject('getAccountInfo does not support the use of a tag. Use an address without a tag.')
+    }
+    address = classicAddress
+  } catch (_) {
+    // `address` is already a classic address
+  }
+
   // 2. Make Request
   const response = await this.request('account_info', {
     account: address,

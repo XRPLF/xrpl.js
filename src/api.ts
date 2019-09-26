@@ -47,7 +47,7 @@ import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
 import {generateAddressAPI} from './offline/generate-address'
-import {deriveKeypair, deriveAddress} from './offline/derive'
+import {deriveKeypair, deriveAddress, deriveXAddress} from './offline/derive'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
@@ -74,6 +74,7 @@ import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 import {ConnectionOptions} from './common/connection'
+import { xAddressToClassicAddress } from 'ripple-address-codec'
 
 export interface APIOptions extends ConnectionOptions {
   server?: string,
@@ -173,6 +174,24 @@ class RippleAPI extends EventEmitter {
   async request(command: string, params: any):
     Promise<any>
   async request(command: string, params: any = {}): Promise<any> {
+    if (params.account) {
+      // rippled requests should always use classic addresses.
+      // Except for special cases, X-addresses used for requests
+      // must not have an embedded tag. In other words,
+      // `tag` should be `false`:
+      try {
+        const {
+          classicAddress,
+          tag
+        } = xAddressToClassicAddress(params.account)
+        if (tag !== false) {
+          return Promise.reject('getAccountInfo does not support the use of a tag. Use an address without a tag.')
+        }
+        params.account = classicAddress
+      } catch (_) {
+        // `params.account` is already a classic address
+      }
+    }
     return this.connection.request({
       ...params,
       command
@@ -335,6 +354,11 @@ class RippleAPI extends EventEmitter {
   signPaymentChannelClaim = signPaymentChannelClaim
   verifyPaymentChannelClaim = verifyPaymentChannelClaim
   errors = errors
+
+  static deriveXAddress = deriveXAddress
+
+  // RippleAPI.deriveClassicAddress (static) is a new name for api.deriveAddress
+  static deriveClassicAddress = deriveAddress
 
   xrpToDrops = xrpToDrops
   dropsToXrp = dropsToXrp

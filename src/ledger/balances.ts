@@ -4,6 +4,7 @@ import {Connection} from '../common'
 import {GetTrustlinesOptions} from './trustlines'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 import {RippleAPI} from '..'
+import { xAddressToClassicAddress } from 'ripple-address-codec'
 
 
 export type Balance = {
@@ -51,6 +52,24 @@ function getLedgerVersionHelper(connection: Connection, optionValue?: number
 function getBalances(this: RippleAPI, address: string, options: GetTrustlinesOptions = {}
 ): Promise<GetBalances> {
   validate.getTrustlines({address, options})
+
+  // Only support retrieving balances without a tag,
+  // since we currently do not calculate balances
+  // on a per-tag basis. Apps must interpret and
+  // use tags independently, with the balance as an
+  // accounting check.
+  try {
+    const {
+      classicAddress,
+      tag
+    } = xAddressToClassicAddress(address)
+    if (tag !== false) {
+      return Promise.reject('getBalances does not support the use of a tag. Use an address without a tag.')
+    }
+    address = classicAddress
+  } catch (_) {
+    // `address` is already a classic address
+  }
 
   return Promise.all([
     getLedgerVersionHelper(this.connection, options.ledgerVersion).then(

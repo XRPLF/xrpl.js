@@ -7,6 +7,7 @@ import getTransaction from './transaction'
 import {validate, errors, Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {RippleAPI} from '..'
+import { xAddressToClassicAddress } from 'ripple-address-codec'
 
 
 export type TransactionsOptions = {
@@ -166,6 +167,23 @@ function getTransactionsInternal(connection: Connection, address: string,
 function getTransactions(this: RippleAPI, address: string, options: TransactionsOptions = {}
 ): Promise<GetTransactionsResponse> {
   validate.getTransactions({address, options})
+
+  // Only support retrieving transactions without a tag,
+  // since we currently do not filter transactions based
+  // on tag. Apps must interpret and use tags
+  // independently, filtering transactions if needed.
+  try {
+    const {
+      classicAddress,
+      tag
+    } = xAddressToClassicAddress(address)
+    if (tag !== false) {
+      return Promise.reject('getTransactions does not support the use of a tag. Use an address without a tag.')
+    }
+    address = classicAddress
+  } catch (_) {
+    // `address` is already a classic address
+  }
 
   const defaults = {maxLedgerVersion: -1}
   if (options.start) {

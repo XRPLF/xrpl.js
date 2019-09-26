@@ -9,6 +9,7 @@ import {Amount, Adjustment, MaxAdjustment,
   MinAdjustment, Memo} from '../common/types/objects'
 import {xrpToDrops} from '../common'
 import {RippleAPI} from '..'
+import {xAddressToClassicAddress} from 'ripple-address-codec'
 
 
 export interface Payment {
@@ -90,7 +91,22 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
   applyAnyCounterpartyEncoding(payment)
 
   if (address !== payment.source.address) {
-    throw new ValidationError('address must match payment.source.address')
+    try {
+      const {
+        classicAddress,
+        tag
+      } = xAddressToClassicAddress(address)
+      if (classicAddress !== payment.source.address ||
+        (tag !== false && tag !== payment.source.tag) ||
+        (payment.source.tag !== undefined && payment.source.tag !== tag)) {
+          throw new ValidationError('address must match payment.source; if either contains a tag, it must match.')
+      }
+    } catch (_) {
+      // `address` is already a classic address
+      if (utils.getClassicAccountAndTag(payment.source.address).classicAccount !== address) {
+        throw new ValidationError('address must match payment.source.address')
+      }
+    }
   }
 
   if (
