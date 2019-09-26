@@ -70,7 +70,7 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
 
   // To remove the signer list, SignerEntries field should be omitted.
   if (txJSON['SignerQuorum'] === 0) {
-    delete txJSON.SignerEntries;
+    delete txJSON.SignerEntries
   }
 
   const account = txJSON.Account
