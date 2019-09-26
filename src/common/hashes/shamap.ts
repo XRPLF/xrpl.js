@@ -17,8 +17,8 @@ export abstract class Node {
    */
   public constructor() {}
 
-  public add_item(_tag: string, _node: Node): void {
-    throw new Error('Called unimplemented virtual method SHAMapTreeNode#add_item.')
+  public addItem(_tag: string, _node: Node): void {
+    throw new Error('Called unimplemented virtual method SHAMapTreeNode#addItem.')
   }
   public get hash(): string|void {
     throw new Error('Called unimplemented virtual method SHAMapTreeNode#hash.');
@@ -49,33 +49,33 @@ export class InnerNode extends Node {
    * @param {Node} node to add
    * @return {void}
    */  
-  public add_item(tag: string, node: Node): void {
-    const existing_node = this.get_node(tag[this.depth])
-    if (existing_node) {
+  public addItem(tag: string, node: Node): void {
+    const existingNode = this.getNode(tag[this.depth])
+    if (existingNode) {
       // A node already exists in this slot
-      if (existing_node instanceof InnerNode) {
+      if (existingNode instanceof InnerNode) {
         // There is an inner node, so we need to go deeper
-        existing_node.add_item(tag, node)
-      } else if (existing_node instanceof Leaf) {
-        if (existing_node.tag === tag) {
+        existingNode.addItem(tag, node)
+      } else if (existingNode instanceof Leaf) {
+        if (existingNode.tag === tag) {
           // Collision
           throw new Error(
               'Tried to add a node to a SHAMap that was already in there.')
         } else {
           // Turn it into an inner node
-          const new_inner_node = new InnerNode(this.depth + 1)
+          const newInnerNode = new InnerNode(this.depth + 1)
     
           // Parent new and existing node
-          new_inner_node.add_item(existing_node.tag, existing_node)
-          new_inner_node.add_item(tag, node)
+          newInnerNode.addItem(existingNode.tag, existingNode)
+          newInnerNode.addItem(tag, node)
     
           // And place the newly created inner node in the slot
-          this.set_node(tag[this.depth], new_inner_node)
+          this.setNode(tag[this.depth], newInnerNode)
         }
       }
     } else {
       // Neat, we have a nice open spot for the new node
-      this.set_node(tag[this.depth], node)
+      this.setNode(tag[this.depth], node)
     }
   }
 
@@ -85,7 +85,7 @@ export class InnerNode extends Node {
    * @param {Node} node to place
    * @return {void}
    */
-  public set_node(slot: string, node: Node): void {
+  public setNode(slot: string, node: Node): void {
     this.leaves[slot] = node
     this.empty = false
   }
@@ -95,7 +95,7 @@ export class InnerNode extends Node {
    * @param {string} slot a character 0-F
    * @return {Node}
    */
-  public get_node(slot: string): Node {
+  public getNode(slot: string): Node {
     return this.leaves[slot]
   }
 
@@ -128,7 +128,7 @@ export class InnerNodeV2 extends InnerNode {
    * @param {string} key equates to a ledger entry `index`
    * @return {number} common prefix depth
    */
-  public get_common_prefix(key: string): number {
+  public getCommonPrefix(key: string): number {
     let depth = 0
     for (let i = 0; i < this.depth; i++) {
       if (this.common[i] === key[i]) {
@@ -142,7 +142,7 @@ export class InnerNodeV2 extends InnerNode {
    * @param {string} key equates to a ledger entry `index`
    * @return {boolean} returns true if common prefix exists
    */  
-  public has_common_prefix (key: string): boolean {
+  public hasCommonPrefix (key: string): boolean {
     for (let i = 0; i < this.depth; i++) {
       if (this.common[i] !== key[i]) {
         return false
@@ -156,53 +156,53 @@ export class InnerNodeV2 extends InnerNode {
    * @param {Node} node to add
    * @return {void}
    */
-  public add_item (tag: string, node: Node): void {
-    const existing_node = this.get_node(tag[this.depth])
+  public addItem (tag: string, node: Node): void {
+    const existingNode = this.getNode(tag[this.depth])
   
-    if (existing_node) {
+    if (existingNode) {
       // A node already exists in this slot
-      if (existing_node instanceof InnerNodeV2) {
-        if (existing_node.has_common_prefix(tag)) {
+      if (existingNode instanceof InnerNodeV2) {
+        if (existingNode.hasCommonPrefix(tag)) {
           // There is an inner node, so we need to go deeper
-          existing_node.add_item(tag, node)
+          existingNode.addItem(tag, node)
         } else {
           // Create new inner node and move existing node under it
-          const new_depth = existing_node.get_common_prefix(tag)
-          const new_inner_node = new InnerNodeV2(new_depth)
-          new_inner_node.common = tag.slice(0, new_depth - 64)
+          const newDepth = existingNode.getCommonPrefix(tag)
+          const newInnerNode = new InnerNodeV2(newDepth)
+          newInnerNode.common = tag.slice(0, newDepth - 64)
   
           // Parent new and existing node
-          new_inner_node.set_node(existing_node.common[new_depth], existing_node)
-          new_inner_node.add_item(tag, node)
+          newInnerNode.setNode(existingNode.common[newDepth], existingNode)
+          newInnerNode.addItem(tag, node)
   
           // And place the newly created inner node in the slot
-          this.set_node(tag[this.depth], new_inner_node)
+          this.setNode(tag[this.depth], newInnerNode)
         }
-      } else if (existing_node instanceof Leaf) {
-        if (existing_node.tag === tag) {
+      } else if (existingNode instanceof Leaf) {
+        if (existingNode.tag === tag) {
           // Collision
           throw new Error(
               'Tried to add a node to a SHAMap that was already in there.')
         } else {
           // Turn it into an inner node
-          const new_inner_node = new InnerNodeV2(0)
+          const newInnerNode = new InnerNodeV2(0)
     
-          for (let i = 0; tag[i] === existing_node.tag[i]; i++) {
-            new_inner_node.common += tag[i]
-            new_inner_node.depth++
+          for (let i = 0; tag[i] === existingNode.tag[i]; i++) {
+            newInnerNode.common += tag[i]
+            newInnerNode.depth++
           }
     
           // Parent new and existing node
-          new_inner_node.add_item(existing_node.tag, existing_node)
-          new_inner_node.add_item(tag, node)
+          newInnerNode.addItem(existingNode.tag, existingNode)
+          newInnerNode.addItem(tag, node)
     
           // And place the newly created inner node in the slot
-          this.set_node(tag[this.depth], new_inner_node)
+          this.setNode(tag[this.depth], newInnerNode)
         }
       }
     } else {
       // Neat, we have a nice open spot for the new node
-      this.set_node(tag[this.depth], node)
+      this.setNode(tag[this.depth], node)
     }
   }
 
@@ -274,8 +274,8 @@ export class SHAMap {
     this.root = version === 1 ? new InnerNode(0) : new InnerNodeV2(0)
   }
 
-  public add_item(tag: string, data: string, type: NodeTypes): void {
-    this.root.add_item(tag, new Leaf(tag, data, type))
+  public addItem(tag: string, data: string, type: NodeTypes): void {
+    this.root.addItem(tag, new Leaf(tag, data, type))
   }
 
   public get hash(): string {

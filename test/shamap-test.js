@@ -3,12 +3,12 @@
 
 var assert = require('assert');
 var SHAMap = require('../src/common/hashes/shamap').SHAMap;
-var TYPE_TRANSACTION_NM = require('../src/common/hashes/shamap').TYPE_TRANSACTION_NM
+var TYPE_TRANSACTION_NM = require('../src/common/hashes/shamap').NodeTypes.TRANSACTION_NM
 
 var HEX_ZERO = '00000000000000000000000000000000' +
                '00000000000000000000000000000000';
 
-function int_to_vuc(v) {
+function intToVuc(v) {
   var ret = '';
 
   for (var i = 0; i < 32; i++) {
@@ -23,17 +23,17 @@ function int_to_vuc(v) {
 * @param keys {Array}
 * @param hashes {Array}
 */
-function fill_shamap_test(shamap, keys, hashes) {
+function fillShamapTest(shamap, keys, hashes) {
   for (var i = 0; i < keys.length; i++) {
-    var data = int_to_vuc(i);
-    shamap.add_item(keys[i].toUpperCase(), data, TYPE_TRANSACTION_NM);
+    var data = intToVuc(i);
+    shamap.addItem(keys[i].toUpperCase(), data, TYPE_TRANSACTION_NM);
     assert.equal(shamap.hash, hashes[i]);
   }
 }
 
 describe('SHAMap', function() {
 
-  describe('#add_item', function() {
+  describe('#addItem', function() {
     it('will add new nodes to v1 or v2 tree', function() {
       var keys = [
         'b92891fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',
@@ -60,7 +60,7 @@ describe('SHAMap', function() {
 
       var shamapv1 = new SHAMap(1);
       assert.equal(shamapv1.hash, HEX_ZERO);
-      fill_shamap_test(shamapv1, keys, hashesv1);
+      fillShamapTest(shamapv1, keys, hashesv1);
 
       var hashesv2 = [
         '90F77DA53895E34042DC8048518CC98AD24276D0A96CCA2C515A83FDAF9F9FC9',
@@ -75,7 +75,7 @@ describe('SHAMap', function() {
 
       var shamapv2 = new SHAMap(2);
       assert.equal(shamapv2.hash, HEX_ZERO);
-      fill_shamap_test(shamapv2, keys, hashesv2);
+      fillShamapTest(shamapv2, keys, hashesv2);
     });
   });
 });

@@ -6,39 +6,39 @@ var fs = require('fs');
 var hashes = require('../src/common/hashes');
 
 /**
-* @param ledger_index {Number}
+* @param ledgerIndex {Number}
 * Expects a corresponding ledger dump in $repo/test/fixtures/rippled folder
 */
-function create_ledger_test(ledger_index) {
-  describe(String(ledger_index), function() {
-    var path = __dirname + '/fixtures/rippled/ledger-full-' + ledger_index + '.json';
+function createLedgerTest(ledgerIndex) {
+  describe(String(ledgerIndex), function() {
+    var path = __dirname + '/fixtures/rippled/ledger-full-' + ledgerIndex + '.json';
 
-    var ledger_raw = fs.readFileSync(path);
-    var ledger_json = JSON.parse(ledger_raw);
+    var ledgerRaw = fs.readFileSync(path);
+    var ledgerJSON = JSON.parse(ledgerRaw);
 
-    var hasAccounts = Array.isArray(ledger_json.accountState)
-      && ledger_json.accountState.length > 0;
+    var hasAccounts = Array.isArray(ledgerJSON.accountState)
+      && ledgerJSON.accountState.length > 0;
 
     if (hasAccounts) {
-      it('has account_hash of ' + ledger_json.account_hash, function() {
-        assert.equal(ledger_json.account_hash,
-          hashes.computeStateTreeHash(ledger_json.accountState, 1));
+      it('has account_hash of ' + ledgerJSON.account_hash, function() {
+        assert.equal(ledgerJSON.account_hash,
+          hashes.computeStateTreeHash(ledgerJSON.accountState, 1));
       });
     }
-    it('has transaction_hash of ' + ledger_json.transaction_hash, function() {
-      assert.equal(ledger_json.transaction_hash,
-        hashes.computeTransactionTreeHash(ledger_json.transactions, 1));
+    it('has transaction_hash of ' + ledgerJSON.transaction_hash, function() {
+      assert.equal(ledgerJSON.transaction_hash,
+        hashes.computeTransactionTreeHash(ledgerJSON.transactions, 1));
     });
   });
 }
 
 describe('Ledger', function() {
   // This is the first recorded ledger with a non empty transaction set
-  create_ledger_test(38129);
+  createLedgerTest(38129);
   // Because, why not.
-  create_ledger_test(40000);
+  createLedgerTest(40000);
   // 1311 AffectedNodes, no accounts
-  create_ledger_test(7501326);
+  createLedgerTest(7501326);
 
   describe('calcAccountRootEntryHash', function() {
     it('will calculate the AccountRoot entry hash for rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh', function() {
