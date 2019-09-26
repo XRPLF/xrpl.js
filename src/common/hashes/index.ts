@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js'
 import {decodeAddress} from 'ripple-address-codec'
 import hash from './sha512hash'
-import {HASH_TX_ID, HASH_TX_SIGN, HASH_LEDGER} from './hashprefix'
-import {SHAMap, TYPE_TRANSACTION_MD, TYPE_ACCOUNT_STATE} from './shamap'
+import HashPrefix from './hash-prefix'
+import {SHAMap, NodeTypes} from './shamap'
 import {encode} from 'ripple-binary-codec'
 import ledgerspaces from './ledgerspaces'
 
@@ -57,7 +57,7 @@ const addLengthPrefix = (hex: string): string => {
 }
 
 export const computeBinaryTransactionHash = (txBlobHex: string): string => {
-  const prefix = HASH_TX_ID.toString(16).toUpperCase()
+  const prefix = HashPrefix.TX_ID.toString(16).toUpperCase()
   return hash(prefix + txBlobHex)
 }
 
@@ -66,7 +66,7 @@ export const computeTransactionHash = (txJSON: any): string => {
 }
 
 export const computeBinaryTransactionSigningHash = (txBlobHex: string): string => {
-  const prefix = HASH_TX_SIGN.toString(16).toUpperCase()
+  const prefix = HashPrefix.TX_SIGN.toString(16).toUpperCase()
   return hash(prefix + txBlobHex)
 }
 
@@ -111,7 +111,7 @@ export const computeTransactionTreeHash = (transactions: any[], version: number)
     const metaHex = encode(txJSON.metaData)
     const txHash = computeBinaryTransactionHash(txBlobHex)
     const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
-    shamap.add_item(txHash, data, TYPE_TRANSACTION_MD)
+    shamap.add_item(txHash, data, NodeTypes.TRANSACTION_MD)
   })
 
   return shamap.hash
@@ -122,7 +122,7 @@ export const computeStateTreeHash = (entries: any[], version: number): string =>
 
   entries.forEach((ledgerEntry) => {
     const data = encode(ledgerEntry)
-    shamap.add_item(ledgerEntry.index, data, TYPE_ACCOUNT_STATE)
+    shamap.add_item(ledgerEntry.index, data, NodeTypes.ACCOUNT_STATE)
   })
 
   return shamap.hash
@@ -130,7 +130,7 @@ export const computeStateTreeHash = (entries: any[], version: number): string =>
 
 // see rippled Ledger::updateHash()
 export const computeLedgerHash = (ledgerHeader): string => {
-  const prefix = HASH_LEDGER.toString(16).toUpperCase()
+  const prefix = HashPrefix.LEDGER.toString(16).toUpperCase()
   return hash(prefix +
     intToHex(ledgerHeader.ledger_index, 4) +
     bigintToHex(ledgerHeader.total_coins, 8) +

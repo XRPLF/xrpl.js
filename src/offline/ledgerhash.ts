@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import {computeLedgerHash as clh, computeTransactionTreeHash, computeStateTreeHash} from '../common/hashes'
+import {computeLedgerHash, computeTransactionTreeHash, computeStateTreeHash} from '../common/hashes'
 import * as common from '../common'
 
 function convertLedgerHeader(header): any {
@@ -22,11 +22,11 @@ function convertLedgerHeader(header): any {
 
 function hashLedgerHeader(ledgerHeader) {
   const header = convertLedgerHeader(ledgerHeader)
-  return clh(header)
+  return computeLedgerHash(header)
 }
 
 function computeTransactionHash(ledger, version,
-    options: ComputeLedgerHashOptions) {
+    options: ComputeLedgerHeaderHashOptions) {
   let transactions: any[]
   if (ledger.rawTransactions) {
     transactions = JSON.parse(ledger.rawTransactions)
@@ -69,7 +69,7 @@ function computeTransactionHash(ledger, version,
 }
 
 function computeStateHash(ledger, version,
-    options: ComputeLedgerHashOptions) {
+    options: ComputeLedgerHeaderHashOptions) {
   if (ledger.rawState === undefined) {
     if (options.computeTreeHashes) {
       throw new common.errors.ValidationError('rawState'
@@ -88,12 +88,12 @@ function computeStateHash(ledger, version,
 
 const sLCF_SHAMapV2 = 0x02
 
-export type ComputeLedgerHashOptions = {
+export type ComputeLedgerHeaderHashOptions = {
   computeTreeHashes?: boolean
 }
 
-function computeLedgerHash(ledger: any,
-    options: ComputeLedgerHashOptions = {}): string {
+function computeLedgerHeaderHash(ledger: any,
+    options: ComputeLedgerHeaderHashOptions = {}): string {
   const version = ((ledger.closeFlags & sLCF_SHAMapV2) === 0) ? 1 : 2
   const subhashes = {
     transactionHash: computeTransactionHash(ledger, version, options),
@@ -102,4 +102,4 @@ function computeLedgerHash(ledger: any,
   return hashLedgerHeader(_.assign({}, ledger, subhashes))
 }
 
-export default computeLedgerHash
+export default computeLedgerHeaderHash
