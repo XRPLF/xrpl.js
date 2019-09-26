@@ -8,6 +8,11 @@ var TYPE_TRANSACTION_NM = require('../src/common/hashes/shamap').NodeTypes.TRANS
 var HEX_ZERO = '00000000000000000000000000000000' +
                '00000000000000000000000000000000';
 
+/**
+* Generates data to hash for testing
+* @param {number} v int value
+* @returns {string} 64 length hex string
+*/
 function intToVuc(v) {
   var ret = '';
 
