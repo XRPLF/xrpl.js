@@ -25,7 +25,7 @@ function hashLedgerHeader(ledgerHeader) {
   return computeLedgerHash(header)
 }
 
-function computeTransactionHash(ledger, version,
+function computeTransactionHash(ledger,
     options: ComputeLedgerHeaderHashOptions) {
   let transactions: any[]
   if (ledger.rawTransactions) {
@@ -56,7 +56,7 @@ function computeTransactionHash(ledger, version,
       tx.meta ? {metaData: tx.meta} : {})
     return renameMeta
   })
-  const transactionHash = computeTransactionTreeHash(txs, version)
+  const transactionHash = computeTransactionTreeHash(txs)
   if (ledger.transactionHash !== undefined
       && ledger.transactionHash !== transactionHash) {
     throw new common.errors.ValidationError('transactionHash in header'
@@ -68,7 +68,7 @@ function computeTransactionHash(ledger, version,
   return transactionHash
 }
 
-function computeStateHash(ledger, version,
+function computeStateHash(ledger,
     options: ComputeLedgerHeaderHashOptions) {
   if (ledger.rawState === undefined) {
     if (options.computeTreeHashes) {
@@ -78,7 +78,7 @@ function computeStateHash(ledger, version,
     return ledger.stateHash
   }
   const state = JSON.parse(ledger.rawState)
-  const stateHash = computeStateTreeHash(state, version)
+  const stateHash = computeStateTreeHash(state)
   if (ledger.stateHash !== undefined && ledger.stateHash !== stateHash) {
     throw new common.errors.ValidationError('stateHash in header'
       + ' does not match computed hash of state')
@@ -86,18 +86,15 @@ function computeStateHash(ledger, version,
   return stateHash
 }
 
-const sLCF_SHAMapV2 = 0x02
-
 export type ComputeLedgerHeaderHashOptions = {
   computeTreeHashes?: boolean
 }
 
 function computeLedgerHeaderHash(ledger: any,
     options: ComputeLedgerHeaderHashOptions = {}): string {
-  const version = ((ledger.closeFlags & sLCF_SHAMapV2) === 0) ? 1 : 2
   const subhashes = {
-    transactionHash: computeTransactionHash(ledger, version, options),
-    stateHash: computeStateHash(ledger, version, options)
+    transactionHash: computeTransactionHash(ledger, options),
+    stateHash: computeStateHash(ledger, options)
   }
   return hashLedgerHeader(_.assign({}, ledger, subhashes))
 }

@@ -12,7 +12,7 @@ export enum NodeTypes {
 export abstract class Node {
   /**
    * Abstract constructor representing a node in a SHAMap tree.
-   * Can be either InnerNode, InnerNodeV2 or Leaf.
+   * Can be either InnerNode or Leaf.
    * @constructor
    */
   public constructor() {}
@@ -116,120 +116,6 @@ export class InnerNode extends Node {
   } 
 }
 
-export class InnerNodeV2 extends InnerNode {
-  public common: string
-
-  /**
-   * V2 inner (non-leaf) node in a SHAMap tree.
-   * @param {number} depth
-   * @constructor
-   */
-  public constructor(depth: number = 0) {
-    super(depth)
-    this.common = ''
-  }
-
-  /**
-   * @param {string} key equates to a ledger entry `index`
-   * @return {number} common prefix depth
-   */
-  public getCommonPrefix(key: string): number {
-    let depth = 0
-    for (let i = 0; i < this.depth; i++) {
-      if (this.common[i] === key[i]) {
-        depth++
-      }
-    }
-    return depth
-  }
-
-  /**
-   * @param {string} key equates to a ledger entry `index`
-   * @return {boolean} returns true if common prefix exists
-   */  
-  public hasCommonPrefix (key: string): boolean {
-    for (let i = 0; i < this.depth; i++) {
-      if (this.common[i] !== key[i]) {
-        return false
-      }
-    }
-    return true
-  }
-
-  /**
-   * @param {string} tag equates to a ledger entry `index`
-   * @param {Node} node to add
-   * @return {void}
-   */
-  public addItem (tag: string, node: Node): void {
-    const existingNode = this.getNode(parseInt(tag[this.depth], 16))
-  
-    if (existingNode) {
-      // A node already exists in this slot
-      if (existingNode instanceof InnerNodeV2) {
-        if (existingNode.hasCommonPrefix(tag)) {
-          // There is an inner node, so we need to go deeper
-          existingNode.addItem(tag, node)
-        } else {
-          // Create new inner node and move existing node under it
-          const newDepth = existingNode.getCommonPrefix(tag)
-          const newInnerNode = new InnerNodeV2(newDepth)
-          newInnerNode.common = tag.slice(0, newDepth - 64)
-  
-          // Parent new and existing node
-          newInnerNode.setNode(parseInt(existingNode.common[newDepth], 16), existingNode)
-          newInnerNode.addItem(tag, node)
-  
-          // And place the newly created inner node in the slot
-          this.setNode(parseInt(tag[this.depth], 16), newInnerNode)
-        }
-      } else if (existingNode instanceof Leaf) {
-        if (existingNode.tag === tag) {
-          // Collision
-          throw new Error(
-              'Tried to add a node to a SHAMap that was already in there.')
-        } else {
-          // Turn it into an inner node
-          const newInnerNode = new InnerNodeV2(0)
-    
-          for (let i = 0; tag[i] === existingNode.tag[i]; i++) {
-            newInnerNode.common += tag[i]
-            newInnerNode.depth++
-          }
-    
-          // Parent new and existing node
-          newInnerNode.addItem(existingNode.tag, existingNode)
-          newInnerNode.addItem(tag, node)
-    
-          // And place the newly created inner node in the slot
-          this.setNode(parseInt(tag[this.depth], 16), newInnerNode)
-        }
-      }
-    } else {
-      // Neat, we have a nice open spot for the new node
-      this.setNode(parseInt(tag[this.depth], 16), node)
-    }
-  }
-
-  public get hash(): string {
-    if (this.empty) return HEX_ZERO
-    let hex = ''
-    for (let i = 0; i < 16; i++) {
-      hex += this.leaves[i] ? this.leaves[i].hash : HEX_ZERO
-    }
-    if (this.depth < 16) {
-      hex += '0'
-    }
-    hex += this.depth.toString(16).toUpperCase()
-    hex += this.common
-    if (this.common.length % 2) {
-      hex += '0'
-    }
-    const prefix = hashPrefix.INNER_NODE_V2.toString(16)
-    return hash(prefix + hex)
-  }
-}
-
 export class Leaf extends Node {
   public tag: string
   public type: NodeTypes
@@ -267,15 +153,14 @@ export class Leaf extends Node {
 }
 
 export class SHAMap {
-  public root: InnerNode | InnerNodeV2
+  public root: InnerNode
 
   /**
    * SHAMap tree.
-   * @param {number} version inner node version number
    * @constructor
    */
-  public constructor(version: number = 0) {
-    this.root = version === 1 ? new InnerNode(0) : new InnerNodeV2(0)
+  public constructor() {
+    this.root = new InnerNode(0)
   }
 
   public addItem(tag: string, data: string, type: NodeTypes): void {

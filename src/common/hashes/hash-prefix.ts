@@ -21,9 +21,6 @@
   // inner node in tree
   INNER_NODE = 0x4D494E00, // 'MIN'
 
-  // inner node version 2
-  INNER_NODE_V2 = 0x494E5200, // 'INR'
-
   // leaf node in tree
   LEAF_NODE = 0x4D4C4E00, // 'MLN'
 

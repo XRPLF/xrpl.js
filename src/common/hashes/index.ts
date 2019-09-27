@@ -103,8 +103,8 @@ export const computeTrustlineHash = (address1: string, address2: string, currenc
               currencyToHex(currency))
 }
 
-export const computeTransactionTreeHash = (transactions: any[], version: number): string => {
-  const shamap = new SHAMap(version)
+export const computeTransactionTreeHash = (transactions: any[]): string => {
+  const shamap = new SHAMap()
 
   transactions.forEach((txJSON) => {
     const txBlobHex = encode(txJSON)
@@ -117,8 +117,8 @@ export const computeTransactionTreeHash = (transactions: any[], version: number)
   return shamap.hash
 }
 
-export const computeStateTreeHash = (entries: any[], version: number): string => {
-  const shamap = new SHAMap(version)
+export const computeStateTreeHash = (entries: any[]): string => {
+  const shamap = new SHAMap()
 
   entries.forEach((ledgerEntry) => {
     const data = encode(ledgerEntry)

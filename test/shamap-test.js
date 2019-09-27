@@ -39,7 +39,7 @@ function fillShamapTest(shamap, keys, hashes) {
 describe('SHAMap', function() {
 
   describe('#addItem', function() {
-    it('will add new nodes to v1 or v2 tree', function() {
+    it('will add new nodes to v1', function() {
       var keys = [
         'b92891fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',
         'b92881fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',
@@ -63,24 +63,9 @@ describe('SHAMap', function() {
       ];
 
 
-      var shamapv1 = new SHAMap(1);
+      var shamapv1 = new SHAMap();
       assert.equal(shamapv1.hash, HEX_ZERO);
       fillShamapTest(shamapv1, keys, hashesv1);
-
-      var hashesv2 = [
-        '90F77DA53895E34042DC8048518CC98AD24276D0A96CCA2C515A83FDAF9F9FC9',
-        '425A3B6A68FAD9CB43B9981C7D0D39B942FE62110B437201057EE703F5E76390',
-        '1B4BE72DD18F90F367D64C0147D2414329149724339F79958D6470E7C99E3F4A',
-        'CCC18ED9B0C353278F02465E2E2F3A8A07427B458CF74C51D87ABE9C1B2ECAD8',
-        '24AF98675227F387CE0E4932B71B099FE8BC66E5F07BE2DA70D7E7D98E16C8BC',
-        'EAA373271474A9BF18F1CC240B40C7B5C83C7017977F1388771E56D5943F2B9B',
-        'C7968A323A06BD46769B402B2A85A7FE7F37FCE99C0004A6197AD8E5D76F200D',
-        '0A2412DBB16308706211E5FA5B0160817D54757B4DDC0CB105391A79D06B47BA'
-      ];
-
-      var shamapv2 = new SHAMap(2);
-      assert.equal(shamapv2.hash, HEX_ZERO);
-      fillShamapTest(shamapv2, keys, hashesv2);
     });
   });
 });
