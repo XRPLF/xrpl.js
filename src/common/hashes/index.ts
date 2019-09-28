@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js'
 import {decodeAddress} from 'ripple-address-codec'
-import hash from './sha512hash'
+import sha512Half from './sha512Half'
 import HashPrefix from './hash-prefix'
-import {SHAMap, NodeTypes} from './shamap'
+import {SHAMap, NodeType} from './shamap'
 import {encode} from 'ripple-binary-codec'
 import ledgerspaces from './ledgerspaces'
 
@@ -57,8 +57,8 @@ const addLengthPrefix = (hex: string): string => {
 }
 
 export const computeBinaryTransactionHash = (txBlobHex: string): string => {
-  const prefix = HashPrefix.TX_ID.toString(16).toUpperCase()
-  return hash(prefix + txBlobHex)
+  const prefix = HashPrefix.TRANSACTION_ID.toString(16).toUpperCase()
+  return sha512Half(prefix + txBlobHex)
 }
 
 export const computeTransactionHash = (txJSON: any): string => {
@@ -66,8 +66,8 @@ export const computeTransactionHash = (txJSON: any): string => {
 }
 
 export const computeBinaryTransactionSigningHash = (txBlobHex: string): string => {
-  const prefix = HashPrefix.TX_SIGN.toString(16).toUpperCase()
-  return hash(prefix + txBlobHex)
+  const prefix = HashPrefix.TRANSACTION_SIGN.toString(16).toUpperCase()
+  return sha512Half(prefix + txBlobHex)
 }
 
 export const computeTransactionSigningHash = (txJSON: any): string => {
@@ -75,18 +75,18 @@ export const computeTransactionSigningHash = (txJSON: any): string => {
 }
 
 export const computeAccountHash = (address: string): string => {
-  return hash(ledgerSpaceHex('account') + addressToHex(address))
+  return sha512Half(ledgerSpaceHex('account') + addressToHex(address))
 }
 
 export const computeSignerListHash = (address: string): string => {
-  return hash(ledgerSpaceHex('signerList') +
+  return sha512Half(ledgerSpaceHex('signerList') +
               addressToHex(address) +
               '00000000' /* uint32(0) signer list index */)
 }
 
 export const computeOrderHash = (address: string, sequence: number): string => {
   const prefix = '00' + intToHex(ledgerspaces.offer.charCodeAt(0), 1)
-  return hash(prefix + addressToHex(address) + intToHex(sequence, 4))
+  return sha512Half(prefix + addressToHex(address) + intToHex(sequence, 4))
 }
 
 export const computeTrustlineHash = (address1: string, address2: string, currency: string): string => {
@@ -99,7 +99,7 @@ export const computeTrustlineHash = (address1: string, address2: string, currenc
   const highAddressHex = swap ? address1Hex : address2Hex
 
   const prefix = ledgerSpaceHex('rippleState')
-  return hash(prefix + lowAddressHex + highAddressHex +
+  return sha512Half(prefix + lowAddressHex + highAddressHex +
               currencyToHex(currency))
 }
 
@@ -111,7 +111,7 @@ export const computeTransactionTreeHash = (transactions: any[]): string => {
     const metaHex = encode(txJSON.metaData)
     const txHash = computeBinaryTransactionHash(txBlobHex)
     const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
-    shamap.addItem(txHash, data, NodeTypes.TRANSACTION_MD)
+    shamap.addItem(txHash, data, NodeType.TRANSACTION_MD)
   })
 
   return shamap.hash
@@ -122,7 +122,7 @@ export const computeStateTreeHash = (entries: any[]): string => {
 
   entries.forEach((ledgerEntry) => {
     const data = encode(ledgerEntry)
-    shamap.addItem(ledgerEntry.index, data, NodeTypes.ACCOUNT_STATE)
+    shamap.addItem(ledgerEntry.index, data, NodeType.ACCOUNT_STATE)
   })
 
   return shamap.hash
@@ -131,7 +131,7 @@ export const computeStateTreeHash = (entries: any[]): string => {
 // see rippled Ledger::updateHash()
 export const computeLedgerHash = (ledgerHeader): string => {
   const prefix = HashPrefix.LEDGER.toString(16).toUpperCase()
-  return hash(prefix +
+  return sha512Half(prefix +
     intToHex(ledgerHeader.ledger_index, 4) +
     bigintToHex(ledgerHeader.total_coins, 8) +
     ledgerHeader.parent_hash +
@@ -145,11 +145,11 @@ export const computeLedgerHash = (ledgerHeader): string => {
 }
 
 export const computeEscrowHash = (address, sequence): string => {
-  return hash(ledgerSpaceHex('escrow') + addressToHex(address) +
+  return sha512Half(ledgerSpaceHex('escrow') + addressToHex(address) +
     intToHex(sequence, 4))
 }
 
 export const computePaymentChannelHash = (address, dstAddress, sequence): string => {
-  return hash(ledgerSpaceHex('paychan') + addressToHex(address) +
+  return sha512Half(ledgerSpaceHex('paychan') + addressToHex(address) +
     addressToHex(dstAddress) + intToHex(sequence, 4))
 }

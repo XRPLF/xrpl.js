@@ -1,8 +1,8 @@
 import hashPrefix from './hash-prefix'
-import hash from './sha512hash'
+import sha512Half from './sha512Half'
 const HEX_ZERO = '0000000000000000000000000000000000000000000000000000000000000000'
 
-export enum NodeTypes {
+export enum NodeType {
   INNER = 1,
   TRANSACTION_NM = 2,
   TRANSACTION_MD = 3,
@@ -27,7 +27,7 @@ export abstract class Node {
 
 export class InnerNode extends Node {
   public leaves: { [slot: number]: Node }
-  public type: NodeTypes
+  public type: NodeType
   public depth: number
   public empty: boolean
 
@@ -39,7 +39,7 @@ export class InnerNode extends Node {
   public constructor(depth: number = 0) {
     super()
     this.leaves = {}
-    this.type = NodeTypes.INNER
+    this.type = NodeType.INNER
     this.depth = depth
     this.empty = true
   }
@@ -112,13 +112,13 @@ export class InnerNode extends Node {
       hex += this.leaves[i] ? this.leaves[i].hash : HEX_ZERO
     }
     const prefix = hashPrefix.INNER_NODE.toString(16)
-    return hash(prefix + hex)
+    return sha512Half(prefix + hex)
   } 
 }
 
 export class Leaf extends Node {
   public tag: string
-  public type: NodeTypes
+  public type: NodeType
   public data: string
 
   /**
@@ -128,7 +128,7 @@ export class Leaf extends Node {
    * @param {number} type one of TYPE_ACCOUNT_STATE, TYPE_TRANSACTION_MD etc
    * @constructor
    */
-  public constructor(tag: string, data: string, type: NodeTypes) {
+  public constructor(tag: string, data: string, type: NodeType) {
     super()
     this.tag = tag
     this.type = type
@@ -137,15 +137,15 @@ export class Leaf extends Node {
 
   public get hash(): string|void {
     switch (this.type) {
-      case NodeTypes.ACCOUNT_STATE:
+      case NodeType.ACCOUNT_STATE:
         const leafPrefix = hashPrefix.LEAF_NODE.toString(16)
-        return hash(leafPrefix + this.data + this.tag)
-      case NodeTypes.TRANSACTION_NM:
-        const txIDPrefix = hashPrefix.TX_ID.toString(16)
-        return hash(txIDPrefix + this.data)
-      case NodeTypes.TRANSACTION_MD:
-        const txNodePrefix = hashPrefix.TX_NODE.toString(16)
-        return hash(txNodePrefix + this.data + this.tag)
+        return sha512Half(leafPrefix + this.data + this.tag)
+      case NodeType.TRANSACTION_NM:
+        const txIDPrefix = hashPrefix.TRANSACTION_ID.toString(16)
+        return sha512Half(txIDPrefix + this.data)
+      case NodeType.TRANSACTION_MD:
+        const txNodePrefix = hashPrefix.TRANSACTION_NODE.toString(16)
+        return sha512Half(txNodePrefix + this.data + this.tag)
       default:
         throw new Error('Tried to hash a SHAMap node of unknown type.')
     }
@@ -163,7 +163,7 @@ export class SHAMap {
     this.root = new InnerNode(0)
   }
 
-  public addItem(tag: string, data: string, type: NodeTypes): void {
+  public addItem(tag: string, data: string, type: NodeType): void {
     this.root.addItem(tag, new Leaf(tag, data, type))
   }
 

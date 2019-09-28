@@ -3,7 +3,7 @@
 
 var assert = require('assert');
 var SHAMap = require('../src/common/hashes/shamap').SHAMap;
-var TYPE_TRANSACTION_NM = require('../src/common/hashes/shamap').NodeTypes.TRANSACTION_NM
+var TYPE_TRANSACTION_NM = require('../src/common/hashes/shamap').NodeType.TRANSACTION_NM
 
 var HEX_ZERO = '00000000000000000000000000000000' +
                '00000000000000000000000000000000';
