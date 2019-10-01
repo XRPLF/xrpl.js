@@ -111,7 +111,7 @@ export const computeTransactionTreeHash = (transactions: any[]): string => {
     const metaHex = encode(txJSON.metaData)
     const txHash = computeBinaryTransactionHash(txBlobHex)
     const data = addLengthPrefix(txBlobHex) + addLengthPrefix(metaHex)
-    shamap.addItem(txHash, data, NodeType.TRANSACTION_MD)
+    shamap.addItem(txHash, data, NodeType.TRANSACTION_METADATA)
   })
 
   return shamap.hash

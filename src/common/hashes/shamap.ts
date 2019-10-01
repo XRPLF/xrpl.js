@@ -4,8 +4,8 @@ const HEX_ZERO = '00000000000000000000000000000000000000000000000000000000000000
 
 export enum NodeType {
   INNER = 1,
-  TRANSACTION_NM = 2,
-  TRANSACTION_MD = 3,
+  TRANSACTION_NO_METADATA = 2,
+  TRANSACTION_METADATA = 3,
   ACCOUNT_STATE = 4
 }
 
@@ -140,10 +140,10 @@ export class Leaf extends Node {
       case NodeType.ACCOUNT_STATE:
         const leafPrefix = hashPrefix.LEAF_NODE.toString(16)
         return sha512Half(leafPrefix + this.data + this.tag)
-      case NodeType.TRANSACTION_NM:
+      case NodeType.TRANSACTION_NO_METADATA:
         const txIDPrefix = hashPrefix.TRANSACTION_ID.toString(16)
         return sha512Half(txIDPrefix + this.data)
-      case NodeType.TRANSACTION_MD:
+      case NodeType.TRANSACTION_METADATA:
         const txNodePrefix = hashPrefix.TRANSACTION_NODE.toString(16)
         return sha512Half(txNodePrefix + this.data + this.tag)
       default:

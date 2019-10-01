@@ -3,7 +3,7 @@
 
 var assert = require('assert');
 var SHAMap = require('../src/common/hashes/shamap').SHAMap;
-var TYPE_TRANSACTION_NM = require('../src/common/hashes/shamap').NodeType.TRANSACTION_NM
+var TYPE_TRANSACTION_NO_METADATA = require('../src/common/hashes/shamap').NodeType.TRANSACTION_NO_METADATA
 
 var HEX_ZERO = '00000000000000000000000000000000' +
                '00000000000000000000000000000000';
@@ -31,7 +31,7 @@ function intToVuc(v) {
 function fillShamapTest(shamap, keys, hashes) {
   for (var i = 0; i < keys.length; i++) {
     var data = intToVuc(i);
-    shamap.addItem(keys[i].toUpperCase(), data, TYPE_TRANSACTION_NM);
+    shamap.addItem(keys[i].toUpperCase(), data, TYPE_TRANSACTION_NO_METADATA);
     assert.equal(shamap.hash, hashes[i]);
   }
 }
