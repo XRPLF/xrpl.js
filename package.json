@@ -25,7 +25,6 @@
     "lodash": "^4.17.4",
     "ripple-address-codec": "^3.0.4",
     "ripple-binary-codec": "^0.2.4",
-    "ripple-hashes": "^0.3.4",
     "ripple-keypairs": "^0.10.1",
     "ripple-lib-transactionparser": "0.8.0",
     "ws": "^3.3.1"

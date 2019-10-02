@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import hashes = require('ripple-hashes')
+import {computeLedgerHash, computeTransactionTreeHash, computeStateTreeHash} from '../common/hashes'
 import * as common from '../common'
 
 function convertLedgerHeader(header): any {
@@ -22,11 +22,11 @@ function convertLedgerHeader(header): any {
 
 function hashLedgerHeader(ledgerHeader) {
   const header = convertLedgerHeader(ledgerHeader)
-  return hashes.computeLedgerHash(header)
+  return computeLedgerHash(header)
 }
 
-function computeTransactionHash(ledger, version,
-    options: ComputeLedgerHashOptions) {
+function computeTransactionHash(ledger,
+    options: ComputeLedgerHeaderHashOptions) {
   let transactions: any[]
   if (ledger.rawTransactions) {
     transactions = JSON.parse(ledger.rawTransactions)
@@ -56,7 +56,7 @@ function computeTransactionHash(ledger, version,
       tx.meta ? {metaData: tx.meta} : {})
     return renameMeta
   })
-  const transactionHash = hashes.computeTransactionTreeHash(txs, version)
+  const transactionHash = computeTransactionTreeHash(txs)
   if (ledger.transactionHash !== undefined
       && ledger.transactionHash !== transactionHash) {
     throw new common.errors.ValidationError('transactionHash in header'
@@ -68,8 +68,8 @@ function computeTransactionHash(ledger, version,
   return transactionHash
 }
 
-function computeStateHash(ledger, version,
-    options: ComputeLedgerHashOptions) {
+function computeStateHash(ledger,
+    options: ComputeLedgerHeaderHashOptions) {
   if (ledger.rawState === undefined) {
     if (options.computeTreeHashes) {
       throw new common.errors.ValidationError('rawState'
@@ -78,7 +78,7 @@ function computeStateHash(ledger, version,
     return ledger.stateHash
   }
   const state = JSON.parse(ledger.rawState)
-  const stateHash = hashes.computeStateTreeHash(state, version)
+  const stateHash = computeStateTreeHash(state)
   if (ledger.stateHash !== undefined && ledger.stateHash !== stateHash) {
     throw new common.errors.ValidationError('stateHash in header'
       + ' does not match computed hash of state')
@@ -86,20 +86,17 @@ function computeStateHash(ledger, version,
   return stateHash
 }
 
-const sLCF_SHAMapV2 = 0x02
-
-export type ComputeLedgerHashOptions = {
+export type ComputeLedgerHeaderHashOptions = {
   computeTreeHashes?: boolean
 }
 
-function computeLedgerHash(ledger: any,
-    options: ComputeLedgerHashOptions = {}): string {
-  const version = ((ledger.closeFlags & sLCF_SHAMapV2) === 0) ? 1 : 2
+function computeLedgerHeaderHash(ledger: any,
+    options: ComputeLedgerHeaderHashOptions = {}): string {
   const subhashes = {
-    transactionHash: computeTransactionHash(ledger, version, options),
-    stateHash: computeStateHash(ledger, version, options)
+    transactionHash: computeTransactionHash(ledger, options),
+    stateHash: computeStateHash(ledger, options)
   }
   return hashLedgerHeader(_.assign({}, ledger, subhashes))
 }
 
-export default computeLedgerHash
+export default computeLedgerHeaderHash
