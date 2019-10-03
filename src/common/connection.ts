@@ -8,7 +8,7 @@ import {RippledError, DisconnectedError, NotConnectedError,
   RippledNotInitializedError} from './errors'
 
 export interface ConnectionOptions {
-  trace?: boolean,
+  trace?: boolean
   proxy?: string
   proxyAuthorization?: string
   authorization?: string
@@ -16,7 +16,8 @@ export interface ConnectionOptions {
   key?: string
   passphrase?: string
   certificate?: string
-  timeout?: number
+  timeout?: number,
+  connectionTimeout?: number
 }
 
 class Connection extends EventEmitter {
@@ -43,6 +44,7 @@ class Connection extends EventEmitter {
   private _onUnexpectedCloseBound: null|((...args: any[]) => void) = null
   private _fee_base: null|number = null
   private _fee_ref: null|number = null
+  private _connectionTimeout: number
 
   constructor(url, options: ConnectionOptions = {}) {
     super()
@@ -61,6 +63,7 @@ class Connection extends EventEmitter {
     this._passphrase = options.passphrase
     this._certificate = options.certificate
     this._timeout = options.timeout || (20 * 1000)
+    this._connectionTimeout = options.connectionTimeout || 2000
   }
 
   _updateLedgerVersions(data) {
@@ -283,7 +286,14 @@ class Connection extends EventEmitter {
 
   connect(): Promise<void> {
     this._clearReconnectTimer()
-    return new Promise((resolve, reject) => {
+    let connectFinished = false
+    const promise = new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        if (!connectFinished) {
+          reject(`Error: connect() timed out after ${this._connectionTimeout} ms. ` +
+          `If your internet connection is working, the rippled server may be blocked or inaccessible.`)
+        }
+      }, this._connectionTimeout)
       if (!this._url) {
         reject(new ConnectionError(
           'Cannot connect because no server was specified'))
@@ -311,9 +321,22 @@ class Connection extends EventEmitter {
         this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this, true,
           resolve, reject)
         this._ws.once('close', this._onUnexpectedCloseBound)
-        this._ws.once('open', () => this._onOpen().then(resolve, reject))
+        this._ws.once('open', () => {
+          if (connectFinished) {
+            this._ws.close()
+          } else {
+            connectFinished = true
+            return this._onOpen().then(resolve, reject)
+          }
+        })
       }
     })
+    promise.then(() => {
+      connectFinished = true
+    }, () => {
+      connectFinished = true
+    })
+    return promise
   }
 
   disconnect(): Promise<void> {

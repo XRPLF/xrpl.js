@@ -4116,16 +4116,6 @@ ripple-binary-codec@^0.2.4:
     lodash "^4.17.15"
     ripple-address-codec "^3.0.4"
 
-ripple-hashes@^0.3.4:
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/ripple-hashes/-/ripple-hashes-0.3.4.tgz#d06f78fc39dde27749b33ad2461b39ba873c94ec"
-  integrity sha512-u2kgg9Yu9D44HWnC9R2lNg+amVLllJkMQmXZEEM2DAMFXigr4+ph1O8LLxLv+k0fbdjAjos4aUyWwcw6cxzYMw==
-  dependencies:
-    bignumber.js "^4.1.0"
-    create-hash "^1.1.2"
-    ripple-address-codec "^3.0.4"
-    ripple-binary-codec "^0.2.4"
-
 ripple-keypairs@^0.10.1:
   version "0.10.2"
   resolved "https://registry.yarnpkg.com/ripple-keypairs/-/ripple-keypairs-0.10.2.tgz#b3a1d1e2fca85a11c5224b2a7e6da506c19720d0"

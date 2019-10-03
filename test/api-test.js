@@ -4771,4 +4771,8 @@ describe('RippleAPI - offline', function () {
     assert.throws(() => new RippleAPI({ server: 'wss//s:1' }));
   });
 
+  xit('RippleAPI connect() times out after 2 seconds', function () {
+    // TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
+    //       to test that connect() times out after 2 seconds.
+  });
 });
