@@ -1,6 +1,6 @@
 {
   "name": "ripple-address-codec",
-  "version": "3.0.4",
+  "version": "4.0.0-b5",
   "description": "encodes/decodes base58 encoded XRP Ledger identifiers",
   "files": [
     "dist/*",
@@ -19,6 +19,7 @@
     "url": "git://github.com/ripple/ripple-address-codec.git"
   },
   "prepublish": "tsc",
+  "prepublishOnly": "tslint -p ./ && jest",
   "scripts": {
     "compile": "tsc",
     "test": "jest",

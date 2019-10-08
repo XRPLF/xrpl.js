@@ -53,20 +53,20 @@ test('can pass a type as second arg to encodeSeed', function() {
   expect(api.encodeSeed(decoded.bytes, type)).toBe(edSeed)
 })
 
-test('isValidAddress - secp256k1 address valid', function() {
-  expect(api.isValidAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1')).toBe(true)
+test('isValidClassicAddress - secp256k1 address valid', function() {
+  expect(api.isValidClassicAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1')).toBe(true)
 })
 
-test('isValidAddress - ed25519 address valid', function() {
-  expect(api.isValidAddress('rLUEXYuLiQptky37CqLcm9USQpPiz5rkpD')).toBe(true)
+test('isValidClassicAddress - ed25519 address valid', function() {
+  expect(api.isValidClassicAddress('rLUEXYuLiQptky37CqLcm9USQpPiz5rkpD')).toBe(true)
 })
 
-test('isValidAddress - invalid', function() {
-  expect(api.isValidAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw2')).toBe(false)
+test('isValidClassicAddress - invalid', function() {
+  expect(api.isValidClassicAddress('rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw2')).toBe(false)
 })
 
-test('isValidAddress - empty', function() {
-  expect(api.isValidAddress('')).toBe(false)
+test('isValidClassicAddress - empty', function() {
+  expect(api.isValidClassicAddress('')).toBe(false)
 })
 
 describe('encodeSeed', function() {

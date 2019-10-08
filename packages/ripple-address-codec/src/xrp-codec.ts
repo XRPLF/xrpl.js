@@ -30,24 +30,24 @@ class Codec {
   encode(bytes: Buffer, opts: {
     versions: number[],
     expectedLength: number
-  }) {
+  }): string {
     const versions = opts.versions
     return this.encodeVersioned(bytes, versions, opts.expectedLength)
   }
 
-  encodeVersioned(bytes: Buffer, versions: number[], expectedLength: number) {
+  encodeVersioned(bytes: Buffer, versions: number[], expectedLength: number): string {
     if (expectedLength && bytes.length !== expectedLength) {
       throw new Error('unexpected_payload_length: bytes.length does not match expectedLength')
     }
     return this.encodeChecked(Buffer.from(concatArgs(versions, bytes)))
   }
 
-  encodeChecked(buffer: Buffer) {
+  encodeChecked(buffer: Buffer): string {
     const check = this.sha256(this.sha256(buffer)).slice(0, 4)
     return this.encodeRaw(Buffer.from(concatArgs(buffer, check)))
   }
 
-  encodeRaw(bytes: Buffer) {
+  encodeRaw(bytes: Buffer): string {
     return this.codec.encode(bytes)
   }
 
@@ -93,7 +93,7 @@ class Codec {
     throw new Error('version_invalid: version bytes do not match any of the provided version(s)')
   }
 
-  decodeChecked(base58string: string) {
+  decodeChecked(base58string: string): Buffer {
     const buffer = this.decodeRaw(base58string)
     if (buffer.length < 5) {
       throw new Error('invalid_input_size: decoded data must have length >= 5')
@@ -104,11 +104,11 @@ class Codec {
     return buffer.slice(0, -4)
   }
 
-  decodeRaw(base58string: string) {
+  decodeRaw(base58string: string): Buffer {
     return this.codec.decode(base58string)
   }
 
-  verifyCheckSum(bytes: Buffer) {
+  verifyCheckSum(bytes: Buffer): boolean {
     const computed = this.sha256(this.sha256(bytes.slice(0, -4))).slice(0, 4)
     const checksum = bytes.slice(-4)
     return seqEqual(computed, checksum)
@@ -119,6 +119,7 @@ class Codec {
  * XRP codec
  */
 
+// Pure JavaScript hash functions in the browser, native hash functions in Node.js
 const createHash = require('create-hash')
 
 const NODE_PUBLIC = 28
@@ -190,8 +191,7 @@ export function encodeNodePublic(bytes: Buffer): string {
   return codecWithXrpAlphabet.encode(bytes, opts)
 }
 
-// Address === AccountID
-export function isValidAddress(address: string): boolean {
+export function isValidClassicAddress(address: string): boolean {
   try {
     decodeAccountID(address)
   } catch (e) {
