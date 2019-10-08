@@ -20,6 +20,12 @@ const testCases = [
   ],
   [
     'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+    14,
+    'X7AcgcsBL6XDcUb289X4mJ8djcdyKaGo2K5VpXpmCqbV2gS',
+    'T719a5UwUCnEs54UsxG9CJYYDhwmFCvqXVCALUGJGSbNV3x'
+  ],
+  [
+    'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
     11747,
     'X7AcgcsBL6XDcUb289X4mJ8djcdyKaLFuhLRuNXPrDeJd9A',
     'T719a5UwUCnEs54UsxG9CJYYDhwmFCziiNHtUukubF2Mg6t'
@@ -35,6 +41,12 @@ const testCases = [
     false,
     'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
     'T77wVQzA8ntj9wvCTNiQpNYLT5hmhRsFyXDoMLqYC4BzQtV'
+  ],
+  [
+    'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+    58,
+    'X7YenJqxv3L66CwhBSfd3N8RzGXxYqV56ZkTCa9UCzgaao1',
+    'T77wVQzA8ntj9wvCTNiQpNYLT5hmhR9kej6uxm4jGcQD7rZ'
   ],
   [
     'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',

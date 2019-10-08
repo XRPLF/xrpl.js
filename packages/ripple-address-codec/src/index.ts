@@ -128,5 +128,5 @@ export {
   encodeXAddress, // Encode account ID, tag, and network ID to X-address
   xAddressToClassicAddress, // Decode X-address to account ID, tag, and network ID
   decodeXAddress, // Convert X-address to classic address, tag, and network ID
-  isValidXAddress, // Check whether an X-address (X...) is valid
+  isValidXAddress // Check whether an X-address (X...) is valid
 }
