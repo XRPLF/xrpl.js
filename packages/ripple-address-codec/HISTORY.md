@@ -1,6 +1,6 @@
 # ripple-address-codec Release History
 
-## 4.0.0 (UNRELEASED)
+## 4.0.0 (2019-10-08)
 
 ### Breaking Changes
 
@@ -14,3 +14,4 @@
 * `xAddressToClassicAddress` - Decode an X-address to account ID, tag, and network ID
 * `decodeXAddress` - Convert X-address to classic address, tag, and network ID
 * `isValidXAddress` - Check whether an X-address (X...) is valid
+
