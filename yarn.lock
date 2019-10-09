@@ -4110,10 +4110,10 @@ ripple-address-codec@^3.0.4:
     base-x "3.0.4"
     create-hash "^1.1.2"
 
-ripple-address-codec@^4.0.0-b6:
-  version "4.0.0-b6"
-  resolved "https://registry.yarnpkg.com/ripple-address-codec/-/ripple-address-codec-4.0.0-b6.tgz#1ab91b0c929e1c65265a8ef608a9c4fbedc966bf"
-  integrity sha512-bJ8sii3iZT4JQ638vO7HxI8gZJp7nlnqVWqqq/ABaAJBqJj2Q1XgSOsAyf1DyX49LzfvFDjxPvcAiA6lWyAs2g==
+ripple-address-codec@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/ripple-address-codec/-/ripple-address-codec-4.0.0.tgz#c20f39eea38def43d2379462e47bff4adabece30"
+  integrity sha512-PsKl9aytg6fZG2F4RtfPT0c1gj42suAQY9VvJVGz+DfQTdXQaTT9V/StVhaJ6jhVpl7oCd981BB9p2Kq+Kyrng==
   dependencies:
     "@types/base-x" "^3.0.0"
     base-x "3.0.4"
@@ -4131,16 +4131,6 @@ ripple-binary-codec@^0.2.4:
     inherits "^2.0.1"
     lodash "^4.17.15"
     ripple-address-codec "^3.0.4"
-
-ripple-hashes@^0.3.4:
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/ripple-hashes/-/ripple-hashes-0.3.4.tgz#d06f78fc39dde27749b33ad2461b39ba873c94ec"
-  integrity sha512-u2kgg9Yu9D44HWnC9R2lNg+amVLllJkMQmXZEEM2DAMFXigr4+ph1O8LLxLv+k0fbdjAjos4aUyWwcw6cxzYMw==
-  dependencies:
-    bignumber.js "^4.1.0"
-    create-hash "^1.1.2"
-    ripple-address-codec "^3.0.4"
-    ripple-binary-codec "^0.2.4"
 
 ripple-keypairs@^0.10.1:
   version "0.10.2"

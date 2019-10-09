@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import {decodeAddress} from 'ripple-address-codec'
+import {decodeAccountID} from 'ripple-address-codec'
 import sha512Half from './sha512Half'
 import HashPrefix from './hash-prefix'
 import {SHAMap, NodeType} from './shamap'
@@ -28,12 +28,12 @@ const ledgerSpaceHex = (name: string): string => {
 }
 
 const addressToHex = (address: string): string => {
-  return (Buffer.from(decodeAddress(address))).toString('hex')
+  return (Buffer.from(decodeAccountID(address))).toString('hex')
 }
 
 const currencyToHex = (currency: string): string => {
   if (currency.length === 3) {
-    let bytes = new Array(20 + 1).join('0').split('').map(parseFloat)
+    const bytes = new Array(20 + 1).join('0').split('').map(parseFloat)
     bytes[12] = currency.charCodeAt(0) & 0xff
     bytes[13] = currency.charCodeAt(1) & 0xff
     bytes[14] = currency.charCodeAt(2) & 0xff
@@ -81,7 +81,7 @@ export const computeAccountHash = (address: string): string => {
 export const computeSignerListHash = (address: string): string => {
   return sha512Half(ledgerSpaceHex('signerList') +
               addressToHex(address) +
-              '00000000' /* uint32(0) signer list index */)
+              '00000000') // uint32(0) signer list index
 }
 
 export const computeOrderHash = (address: string, sequence: number): string => {
@@ -106,7 +106,7 @@ export const computeTrustlineHash = (address1: string, address2: string, currenc
 export const computeTransactionTreeHash = (transactions: any[]): string => {
   const shamap = new SHAMap()
 
-  transactions.forEach((txJSON) => {
+  transactions.forEach(txJSON => {
     const txBlobHex = encode(txJSON)
     const metaHex = encode(txJSON.metaData)
     const txHash = computeBinaryTransactionHash(txBlobHex)
@@ -120,7 +120,7 @@ export const computeTransactionTreeHash = (transactions: any[]): string => {
 export const computeStateTreeHash = (entries: any[]): string => {
   const shamap = new SHAMap()
 
-  entries.forEach((ledgerEntry) => {
+  entries.forEach(ledgerEntry => {
     const data = encode(ledgerEntry)
     shamap.addItem(ledgerEntry.index, data, NodeType.ACCOUNT_STATE)
   })
