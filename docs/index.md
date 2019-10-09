@@ -5415,7 +5415,7 @@ options | object | *Optional* Options that control the type of signature that wi
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
 secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field cannot be used with keypair).
 
-Please note that when this method is used for multisigning, the `options` parameter is not *Optional* anymore. It will be compulsory. See the multisigning example in this section for more details. 
+When this method is used for multisigning, the `options` parameter is required. See the multisigning example in this section for more details.
 
 ### Return Value
 
@@ -5442,6 +5442,7 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
   "id": "02ACE87F1996E3A23690A5BB7F1774BF71CCBA68F79805831B42ABAD5913D6F4"
 }
 ```
+
 
 ### Example (multisigning)
 
