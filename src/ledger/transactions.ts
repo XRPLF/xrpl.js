@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import binary = require('ripple-binary-codec')
+import binary from 'ripple-binary-codec';
 import {computeTransactionHash} from '../common/hashes'
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
