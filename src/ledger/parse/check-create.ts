@@ -24,7 +24,7 @@ export type FormattedCheckCreate = {
 }
 
 function parseCheckCreate(tx: any): FormattedCheckCreate {
-  assert(tx.TransactionType === 'CheckCreate')
+  assert.ok(tx.TransactionType === 'CheckCreate')
 
   return removeUndefined({
     destination: tx.Destination,

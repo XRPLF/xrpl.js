@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import {parse as parseUrl} from 'url'
-import * as WebSocket from 'ws'
+import WebSocket from 'ws'
 import RangeSet from './rangeset'
 import {RippledError, DisconnectedError, NotConnectedError,
   TimeoutError, ResponseFormatError, ConnectionError,

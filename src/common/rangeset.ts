@@ -35,7 +35,7 @@ class RangeSet {
   }
 
   addRange(start: number, end: number) {
-    assert(start <= end, `invalid range ${start} <= ${end}`)
+    assert.ok(start <= end, `invalid range ${start} <= ${end}`)
     this.ranges = mergeIntervals(this.ranges.concat([[start, end]]))
   }
 
