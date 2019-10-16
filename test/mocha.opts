@@ -3,3 +3,4 @@
 --slow 500
 --require ts-node/register
 --require source-map-support/register
+./test/*.{ts,js}
