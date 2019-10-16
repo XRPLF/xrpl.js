@@ -4,9 +4,10 @@ import _ from 'lodash';
 import { RippleAPI } from 'ripple-api';
 import { RecursiveData } from 'ripple-api/ledger/utils';
 import binary from 'ripple-binary-codec';
-import { requests, responses } from './fixtures';
-import addresses from './fixtures/addresses';
-import hashes from './fixtures/hashes';
+import requests from './fixtures/requests';
+import responses from './fixtures/responses';
+import addresses from './fixtures/addresses.json';
+import hashes from './fixtures/hashes.json';
 import ledgerClosed from './fixtures/rippled/ledger-close-newer.json';
 import setupAPI from './setup-api';
 const {validate, schemaValidator} = RippleAPI._PRIVATE;
@@ -4609,7 +4610,7 @@ describe('RippleAPI', function () {
       });
     }
     return utils.getRecursive(getter, 10).then(() => {
-      assert(false, 'Should th row Error');
+      assert(false, 'Should throw Error');
     }).catch(error => {
       assert(error instanceof Error);
     });
