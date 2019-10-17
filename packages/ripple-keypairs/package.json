@@ -3,8 +3,7 @@
   "version": "1.0.0-beta.0",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "files": [
-    "dist/*",
-    "test/*"
+    "dist/*"
   ],
   "main": "dist/",
   "directories": {
