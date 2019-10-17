@@ -1,4 +1,4 @@
-import keypairs = require('ripple-keypairs')
+import keypairs from 'ripple-keypairs'
 import * as common from '../common'
 const {errors, validate} = common
 

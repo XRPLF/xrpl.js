@@ -14,7 +14,7 @@ function parseFlag(flagsValue, trueValue, falseValue) {
 }
 
 function parseTrustline(tx: any): object {
-  assert(tx.TransactionType === 'TrustSet')
+  assert.ok(tx.TransactionType === 'TrustSet')
 
   return removeUndefined({
     limit: tx.LimitAmount.value,
