@@ -23,7 +23,7 @@ export type FormattedCheckCash = {
 }
 
 function parseCheckCash(tx: any): FormattedCheckCash {
-  assert(tx.TransactionType === 'CheckCash')
+  assert.ok(tx.TransactionType === 'CheckCash')
 
   return removeUndefined({
     checkID: tx.CheckID,

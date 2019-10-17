@@ -3,7 +3,7 @@ import {parseMemos} from './utils'
 import {removeUndefined} from '../../common'
 
 function parseEscrowExecution(tx: any): object {
-  assert(tx.TransactionType === 'EscrowFinish')
+  assert.ok(tx.TransactionType === 'EscrowFinish')
 
   return removeUndefined({
     memos: parseMemos(tx),

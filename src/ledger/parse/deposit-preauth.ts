@@ -10,7 +10,7 @@ export type FormattedDepositPreauth = {
 }
 
 function parseDepositPreauth(tx: any): FormattedDepositPreauth {
-  assert(tx.TransactionType === 'DepositPreauth')
+  assert.ok(tx.TransactionType === 'DepositPreauth')
 
   return removeUndefined({
     authorize: tx.Authorize,
