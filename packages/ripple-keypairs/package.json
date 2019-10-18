@@ -11,12 +11,12 @@
   },
   "dependencies": {
     "babel-runtime": "^5.8.20",
+    "base-x": "3.0.4",
     "bn.js": "^3.1.1",
     "brorand": "^1.0.5",
+    "create-hash": "1.2.0",
     "elliptic": "^6.4.0",
-    "hash.js": "^1.0.3",
-    "base-x": "3.0.4",
-    "create-hash": "1.2.0"
+    "hash.js": "^1.0.3"
   },
   "devDependencies": {
     "@types/node": "^10.12.0",
