@@ -1,5 +1,13 @@
 # ripple-lib Release History
 
+## 1.3.4 (2019-10-18)
+
+* Update ripple-lib-transactionparser
+* Improve error message when signing fails (e.g. due to trailing zeros)
+* Integrate ripple-hashes (in TypeScript with improved naming and docs)
+* Add multi-signing example to sign() method docs
+* Update TypeScript
+
 ## 1.3.3 (2019-09-10)
 
 * Expand node version compatibility to support Node.js 12 ([ripple-binary-codec#32](https://github.com/ripple/ripple-binary-codec/issues/32))
