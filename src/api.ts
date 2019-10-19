@@ -7,7 +7,8 @@ import {
   dropsToXrp,
   rippleTimeToISO8601,
   iso8601ToRippleTime,
-  txFlags
+  txFlags,
+  ensureClassicAddress
 } from './common'
 import {
   connect,
@@ -74,7 +75,6 @@ import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 import {ConnectionOptions} from './common/connection'
-import { xAddressToClassicAddress } from 'ripple-address-codec'
 
 export interface APIOptions extends ConnectionOptions {
   server?: string,
@@ -174,27 +174,10 @@ class RippleAPI extends EventEmitter {
   async request(command: string, params: any):
     Promise<any>
   async request(command: string, params: any = {}): Promise<any> {
-    if (params.account) {
-      // rippled requests should always use classic addresses.
-      // Except for special cases, X-addresses used for requests
-      // must not have an embedded tag. In other words,
-      // `tag` should be `false`:
-      try {
-        const {
-          classicAddress,
-          tag
-        } = xAddressToClassicAddress(params.account)
-        if (tag !== false) {
-          return Promise.reject('getAccountInfo does not support the use of a tag. Use an address without a tag.')
-        }
-        params.account = classicAddress
-      } catch (_) {
-        // `params.account` is already a classic address
-      }
-    }
     return this.connection.request({
       ...params,
-      command
+      command,
+      account: ensureClassicAddress(params.account)
     })
   }
 

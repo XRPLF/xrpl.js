@@ -1,10 +1,10 @@
 import * as _ from 'lodash'
 import parseFields from './parse/fields'
-import {validate, constants} from '../common'
+import {validate, constants, ensureClassicAddress} from '../common'
 import {FormattedSettings} from '../common/types/objects'
 import {AccountInfoResponse} from '../common/types/commands'
 import {RippleAPI} from '..'
-import { xAddressToClassicAddress } from 'ripple-address-codec'
+
 const AccountFlags = constants.AccountFlags
 
 export type SettingsOptions = {
@@ -42,18 +42,7 @@ export async function getSettings(
 
   // Only support retrieving settings without a tag,
   // since settings do not distinguish by tag.
-  try {
-    const {
-      classicAddress,
-      tag
-    } = xAddressToClassicAddress(address)
-    if (tag !== false) {
-      return Promise.reject('getSettings does not support the use of a tag. Use an address without a tag.')
-    }
-    address = classicAddress
-  } catch (_) {
-    // `address` is already a classic address
-  }
+  address = ensureClassicAddress(address)
 
   // 2. Make Request
   const response = await this.request('account_info', {

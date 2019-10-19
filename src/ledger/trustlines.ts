@@ -1,9 +1,8 @@
 import * as _ from 'lodash'
-import {validate} from '../common'
+import {validate, ensureClassicAddress} from '../common'
 import parseAccountTrustline from './parse/account-trustline'
 import {RippleAPI} from '..'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
-import { xAddressToClassicAddress } from 'ripple-address-codec'
 
 export type GetTrustlinesOptions = {
   counterparty?: string,
@@ -25,18 +24,7 @@ async function getTrustlines(
   // Only support retrieving trustlines without a tag,
   // since it does not make sense to filter trustlines
   // by tag.
-  try {
-    const {
-      classicAddress,
-      tag
-    } = xAddressToClassicAddress(address)
-    if (tag !== false) {
-      return Promise.reject('getTrustlines does not support the use of a tag. Use an address without a tag.')
-    }
-    address = classicAddress
-  } catch (_) {
-    // `address` is already a classic address
-  }
+  address = ensureClassicAddress(address)
 
   // 2. Make Request
   const responses = await this._requestAll('account_lines', {

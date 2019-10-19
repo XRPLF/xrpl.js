@@ -100,28 +100,30 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
       '" exists in instance when not allowed'))
   }
 
-  // To remove the signer list, SignerEntries field should be omitted.
+  const newTxJSON = Object.assign({}, txJSON)
+
+  // To remove the signer list, `SignerEntries` field should be omitted.
   if (txJSON['SignerQuorum'] === 0) {
-    delete txJSON.SignerEntries
+    delete newTxJSON.SignerEntries
   }
 
   // Sender:
   const {classicAccount, tag: sourceTag} = getClassicAccountAndTag(txJSON.Account)
-  txJSON.Account = classicAccount
+  newTxJSON.Account = classicAccount
   if (sourceTag !== undefined) {
     if (txJSON.SourceTag && txJSON.SourceTag !== sourceTag) {
       return Promise.reject(new ValidationError(
         'The `SourceTag`, if present, must match the tag of the `Account` X-address'))
     }
     if (sourceTag) {
-      txJSON.SourceTag = sourceTag
+      newTxJSON.SourceTag = sourceTag
     }
   }
 
   // Destination:
   if (typeof txJSON.Destination === 'string') {
     const {classicAccount: destinationAccount, tag: destinationTag} = getClassicAccountAndTag(txJSON.Destination)
-    txJSON.Destination = destinationAccount
+    newTxJSON.Destination = destinationAccount
     if (destinationTag !== undefined) {
       const transactionTypesWithDestinationTagField = ['Payment', 'CheckCreate', 'EscrowCreate', 'PaymentChannelCreate']
       if (transactionTypesWithDestinationTagField.includes(txJSON.TransactionType)) {
@@ -130,7 +132,7 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
             'The Payment `DestinationTag`, if present, must match the tag of the `Destination` X-address'))
         }
         if (destinationTag) {
-          txJSON.DestinationTag = destinationTag
+          newTxJSON.DestinationTag = destinationTag
         }
       }
     }
@@ -140,7 +142,7 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
     const account = txJSON[fieldName]
     if (typeof account === 'string') {
       const {classicAccount: ca} = getClassicAccountAndTag(account)
-      txJSON[fieldName] = ca
+      newTxJSON[fieldName] = ca
     }
   }
 
@@ -154,50 +156,50 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
   // SetRegularKey:
   convertToClassicAccountIfPresent('RegularKey')
 
-  setCanonicalFlag(txJSON)
+  setCanonicalFlag(newTxJSON)
 
-  function prepareMaxLedgerVersion(): Promise<TransactionJSON> {
+  function prepareMaxLedgerVersion(): Promise<void> {
     // Up to one of the following is allowed:
     //   txJSON.LastLedgerSequence
     //   instructions.maxLedgerVersion
     //   instructions.maxLedgerVersionOffset
-    if (txJSON.LastLedgerSequence && instructions.maxLedgerVersion) {
+    if (newTxJSON.LastLedgerSequence && instructions.maxLedgerVersion) {
       return Promise.reject(new ValidationError('`LastLedgerSequence` in txJSON and `maxLedgerVersion`' +
         ' in `instructions` cannot both be set'))
     }
-    if (txJSON.LastLedgerSequence && instructions.maxLedgerVersionOffset) {
+    if (newTxJSON.LastLedgerSequence && instructions.maxLedgerVersionOffset) {
       return Promise.reject(new ValidationError('`LastLedgerSequence` in txJSON and `maxLedgerVersionOffset`' +
         ' in `instructions` cannot both be set'))
     }
-    if (txJSON.LastLedgerSequence) {
-      return Promise.resolve(txJSON)
+    if (newTxJSON.LastLedgerSequence) {
+      return Promise.resolve()
     }
     if (instructions.maxLedgerVersion !== undefined) {
       if (instructions.maxLedgerVersion !== null) {
-        txJSON.LastLedgerSequence = instructions.maxLedgerVersion
+        newTxJSON.LastLedgerSequence = instructions.maxLedgerVersion
       }
-      return Promise.resolve(txJSON)
+      return Promise.resolve()
     }
     const offset = instructions.maxLedgerVersionOffset !== undefined ?
       instructions.maxLedgerVersionOffset : 3
     return api.connection.getLedgerVersion().then(ledgerVersion => {
-      txJSON.LastLedgerSequence = ledgerVersion + offset
-      return txJSON
+      newTxJSON.LastLedgerSequence = ledgerVersion + offset
+      return
     })
   }
 
-  function prepareFee(): Promise<TransactionJSON> {
+  function prepareFee(): Promise<void> {
     // instructions.fee is scaled (for multi-signed transactions) while txJSON.Fee is not.
     // Due to this difference, we do NOT allow both to be set, as the behavior would be complex and
     // potentially ambiguous.
     // Furthermore, txJSON.Fee is in drops while instructions.fee is in XRP, which would just add to
     // the confusion. It is simpler to require that only one is used.
-    if (txJSON.Fee && instructions.fee) {
+    if (newTxJSON.Fee && instructions.fee) {
       return Promise.reject(new ValidationError('`Fee` in txJSON and `fee` in `instructions` cannot both be set'))
     }
-    if (txJSON.Fee) {
+    if (newTxJSON.Fee) {
       // txJSON.Fee is set. Use this value and do not scale it.
-      return Promise.resolve(txJSON)
+      return Promise.resolve()
     }
     const multiplier = instructions.signersCount === undefined ? 1 :
       instructions.signersCount + 1
@@ -208,41 +210,41 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
           `max of ${api._maxFeeXRP} XRP. To use this fee, increase ` +
           '`maxFeeXRP` in the RippleAPI constructor.'))
       }
-      txJSON.Fee = scaleValue(common.xrpToDrops(instructions.fee), multiplier)
-      return Promise.resolve(txJSON)
+      newTxJSON.Fee = scaleValue(common.xrpToDrops(instructions.fee), multiplier)
+      return Promise.resolve()
     }
     const cushion = api._feeCushion
     return api.getFee(cushion).then(fee => {
       return api.connection.getFeeRef().then(feeRef => {
         const extraFee =
-          (txJSON.TransactionType !== 'EscrowFinish' ||
-            txJSON.Fulfillment === undefined) ? 0 :
+          (newTxJSON.TransactionType !== 'EscrowFinish' ||
+          newTxJSON.Fulfillment === undefined) ? 0 :
             (cushion * feeRef * (32 + Math.floor(
-              Buffer.from(txJSON.Fulfillment, 'hex').length / 16)))
+              Buffer.from(newTxJSON.Fulfillment, 'hex').length / 16)))
         const feeDrops = common.xrpToDrops(fee)
         const maxFeeXRP = instructions.maxFee ?
           BigNumber.min(api._maxFeeXRP, instructions.maxFee) : api._maxFeeXRP
         const maxFeeDrops = common.xrpToDrops(maxFeeXRP)
         const normalFee = scaleValue(feeDrops, multiplier, extraFee)
-        txJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
+        newTxJSON.Fee = BigNumber.min(normalFee, maxFeeDrops).toString(10)
 
-        return txJSON
+        return
       })
     })
   }
 
-  async function prepareSequence(): Promise<TransactionJSON> {
+  async function prepareSequence(): Promise<void> {
     if (instructions.sequence !== undefined) {
-      if (txJSON.Sequence === undefined || instructions.sequence === txJSON.Sequence) {
-        txJSON.Sequence = instructions.sequence
-        return Promise.resolve(txJSON)
+      if (newTxJSON.Sequence === undefined || instructions.sequence === newTxJSON.Sequence) {
+        newTxJSON.Sequence = instructions.sequence
+        return Promise.resolve()
       } else {
         // Both txJSON.Sequence and instructions.sequence are defined, and they are NOT equal
         return Promise.reject(new ValidationError('`Sequence` in txJSON must match `sequence` in `instructions`'))
       }
     }
-    if (txJSON.Sequence !== undefined) {
-      return Promise.resolve(txJSON)
+    if (newTxJSON.Sequence !== undefined) {
+      return Promise.resolve()
     }
 
     try {
@@ -250,8 +252,8 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
       const response = await api.request('account_info', {
         account: classicAccount
       })
-      txJSON.Sequence = response.account_data.Sequence
-      return Promise.resolve(txJSON)
+      newTxJSON.Sequence = response.account_data.Sequence
+      return Promise.resolve()
     } catch (e) {
       return Promise.reject(e)
     }
@@ -261,7 +263,7 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
     prepareMaxLedgerVersion(),
     prepareFee(),
     prepareSequence()
-  ]).then(() => formatPrepareResponse(txJSON))
+  ]).then(() => formatPrepareResponse(newTxJSON))
 }
 
 function convertStringToHex(string: string): string {
