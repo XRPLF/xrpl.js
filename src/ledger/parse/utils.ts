@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import transactionParser = require('ripple-lib-transactionparser')
+import transactionParser from 'ripple-lib-transactionparser'
 import BigNumber from 'bignumber.js'
 import * as common from '../../common'
 import parseAmount from './amount'
