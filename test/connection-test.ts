@@ -1,19 +1,14 @@
-'use strict'; // eslint-disable-line 
-/* eslint-disable max-nested-callbacks */
-
-const _ = require('lodash');
-const net = require('net');
-const assert = require('assert-diff');
-const setupAPI = require('./setup-api');
-const RippleAPI = require('ripple-api').RippleAPI;
+import _ from 'lodash';
+import net from 'net';
+import assert from 'assert-diff';
+import setupAPI from './setup-api';
+import {RippleAPI} from 'ripple-api';
+import ledgerClose from './fixtures/rippled/ledger-close.json';
 const utils = RippleAPI._PRIVATE.ledgerUtils;
-const ledgerClose = require('./fixtures/rippled/ledger-close.json');
 
 
 const TIMEOUT = 200000;   // how long before each test case times out
-
-function unused() {
-}
+const isBrowser = (process as any).browser;
 
 function createServer() {
   return new Promise((resolve, reject) => {
@@ -34,14 +29,14 @@ describe('Connection', function() {
   afterEach(setupAPI.teardown);
 
   it('default options', function() {
-    const connection = new utils.common.Connection('url');
+    const connection: any = new utils.common.Connection('url');
     assert.strictEqual(connection._url, 'url');
     assert(_.isUndefined(connection._proxyURL));
     assert(_.isUndefined(connection._authorization));
   });
 
   it('trace', function() {
-    const connection = new utils.common.Connection('url', {trace: true});
+    const connection: any = new utils.common.Connection('url', {trace: true});
     const message1 = '{"type": "transaction"}';
     const message2 = '{"type": "path_find"}';
     const messages = [];
@@ -60,11 +55,11 @@ describe('Connection', function() {
   });
 
   it('with proxy', function(done) {
-    if (process.browser) {
+    if (isBrowser) {
       done();
       return;
     }
-    createServer().then(server => {
+    createServer().then((server: any) => {
       const port = server.address().port;
       const expect = 'CONNECT localhost';
       server.on('connection', socket => {
@@ -110,7 +105,7 @@ describe('Connection', function() {
   it('should throw NotConnectedError if server not responding ', function(
     done
   ) {
-    if (process.browser) {
+    if (isBrowser) {
       const phantomTest = /PhantomJS/;
       if (phantomTest.test(navigator.userAgent)) {
         // inside PhantomJS this one just hangs, so skip as not very relevant
@@ -155,7 +150,6 @@ describe('Connection', function() {
 
   it('DisconnectedError on send', function() {
     this.api.connection._ws.send = function(message, options, callback) {
-      unused(message, options);
       callback({message: 'not connected'});
     };
     return this.api.getServerInfo().then(() => {
@@ -216,7 +210,7 @@ describe('Connection', function() {
     });
 
     it('reconnect on several unexpected close', function(done) {
-      if (process.browser) {
+      if (isBrowser) {
         const phantomTest = /PhantomJS/;
         if (phantomTest.test(navigator.userAgent)) {
           // inside PhantomJS this one just hangs, so skip as not very relevant
@@ -316,21 +310,17 @@ describe('Connection', function() {
   });
 
   it('Cannot connect because no server', function() {
-    const connection = new utils.common.Connection();
+    const connection = new utils.common.Connection(undefined as string);
     return connection.connect().then(() => {
       assert(false, 'Should throw ConnectionError');
     }).catch(error => {
-      assert(error instanceof this.api.errors.ConnectionError);
+      assert(error instanceof this.api.errors.ConnectionError, 'Should throw ConnectionError');
     });
   });
 
   it('connect multiserver error', function() {
-    const options = {
-      servers: ['wss://server1.com', 'wss://server2.com']
-    };
     assert.throws(function() {
-      const api = new RippleAPI(options);
-      unused(api);
+       new RippleAPI({servers: ['wss://server1.com', 'wss://server2.com']} as any);
     }, this.api.errors.RippleError);
   });
 

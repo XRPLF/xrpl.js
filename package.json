@@ -31,6 +31,7 @@
     "ws": "^3.3.1"
   },
   "devDependencies": {
+    "@types/mocha": "^5.2.7",
     "@types/node": "11.13.0",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
@@ -61,7 +62,7 @@
     "compile": "mkdir -p dist/npm/common && cp -r src/common/schemas dist/npm/common/ && tsc --build",
     "watch": "tsc -w",
     "prepublish": "npm run clean && npm run compile && npm run build",
-    "test": "TS_NODE_PROJECT=src/tsconfig.json nyc mocha --exit",
+    "test": "TS_NODE_PROJECT=test/tsconfig.json nyc mocha --exit",
     "lint": "eslint src/**/*.ts 'test/*-test.{ts,js}'",
     "perf": "./scripts/perf_test.sh",
     "start": "node scripts/http.js"
