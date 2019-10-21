@@ -19,6 +19,5 @@
     "suppressImplicitAnyIndexErrors": false,
     "resolveJsonModule": true,
     "preserveSymlinks": true
-
   }
 }
