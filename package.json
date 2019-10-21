@@ -61,7 +61,7 @@
     "watch": "tsc -w",
     "prepublish": "npm run clean && npm run compile && npm run build",
     "test": "TS_NODE_PROJECT=src/tsconfig.json nyc mocha --exit",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint src/**/*.ts 'test/*-test.{ts,js}'",
     "perf": "./scripts/perf_test.sh",
     "start": "node scripts/http.js"
   },
