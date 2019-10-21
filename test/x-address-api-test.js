@@ -3139,20 +3139,20 @@ describe('X-address Usage', function () {
       _.partial(checkResult, responses.getTrustlines.all, 'getTrustlines'));
   });
 
-  it('generateAddress', function () {
+  it('generateXAddress', function () {
     function random() {
       return _.fill(Array(16), 0);
     }
-    assert.deepEqual(this.api.generateAddress({ entropy: random() }),
-      responses.generateAddress);
+    assert.deepEqual(this.api.generateXAddress({ entropy: random() }),
+      responses.generateXAddress);
   });
 
-  it('generateAddress invalid', function () {
+  it('generateXAddress invalid', function () {
     assert.throws(() => {
       function random() {
         return _.fill(Array(1), 0);
       }
-      this.api.generateAddress({ entropy: random() });
+      this.api.generateXAddress({ entropy: random() });
     }, this.api.errors.UnexpectedError);
   });
 

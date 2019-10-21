@@ -3447,6 +3447,7 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.getTrustlines.all, 'getTrustlines'));
   });
 
+  // @deprecated See corresponding test in `x-address-api-test.js`
   it('generateAddress', function () {
     function random() {
       return _.fill(Array(16), 0);

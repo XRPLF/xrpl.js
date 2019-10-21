@@ -47,7 +47,7 @@ import prepareSettings from './transaction/settings'
 import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
-import {generateAddressAPI} from './offline/generate-address'
+import {generateAddressAPI, GenerateAddressOptions, GeneratedAddress} from './offline/generate-address'
 import {deriveKeypair, deriveAddress, deriveXAddress} from './offline/derive'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
@@ -290,6 +290,16 @@ class RippleAPI extends EventEmitter {
     return results
   }
 
+  // @deprecated Use X-addresses instead
+  generateAddress(options?: GenerateAddressOptions): GeneratedAddress {
+    options.includeClassicAddress = true
+    return generateAddressAPI(options)
+  }
+
+  generateXAddress(options?: GenerateAddressOptions): GeneratedAddress {
+    return generateAddressAPI(options)
+  }
+
   connect = connect
   disconnect = disconnect
   isConnected = isConnected
@@ -330,7 +340,6 @@ class RippleAPI extends EventEmitter {
   combine = combine
   submit = submit
 
-  generateAddress = generateAddressAPI
   deriveKeypair = deriveKeypair
   deriveAddress = deriveAddress
   computeLedgerHash = computeLedgerHash

@@ -80,7 +80,7 @@ function getClassicAccountAndTag(Account: string): {classicAccount: string, tag:
       tag: classic.tag
     }
   } catch (_) {
-    // xAddressToClassicAddress threw an error, so Account is a classic address
+    // `xAddressToClassicAddress` threw an error, so `Account` is a classic address
     return {
       classicAccount: Account,
       tag: undefined

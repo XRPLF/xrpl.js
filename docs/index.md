@@ -80,6 +80,7 @@
   - [sign](#sign)
   - [combine](#combine)
   - [submit](#submit)
+  - [generateXAddress](#generatexaddress)
   - [generateAddress](#generateaddress)
   - [isValidAddress](#isvalidaddress)
   - [isValidSecret](#isvalidsecret)
@@ -550,7 +551,7 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
 *signers.* weights | array | *Optional* Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
-*signers.weights[].* address | [address](#address) | 
+*signers.weights[].* address | [address](#address) | An account address on the XRP Ledger
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
 transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 
@@ -3918,7 +3919,7 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
 *signers.* weights | array | *Optional* Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
-*signers.weights[].* address | [address](#address) | 
+*signers.weights[].* address | [address](#address) | An account address on the XRP Ledger
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
 transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 
@@ -5633,9 +5634,9 @@ return api.submit(signedTransaction)
 ```
 
 
-## generateAddress
+## generateXAddress
 
-`generateAddress(): {address: string, secret: string}`
+`generateXAddress(options?: object): {address: string, secret: string}`
 
 Generate a new XRP Ledger address and corresponding secret.
 
@@ -5646,6 +5647,48 @@ Name | Type | Description
 options | object | *Optional* Options to control how the address and secret are generated.
 *options.* algorithm | string | *Optional* The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
 *options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed.
+*options.* test | boolean | *Optional* Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`.
+
+### Return Value
+
+This method returns an object with the following structure:
+
+Name | Type | Description
+---- | ---- | -----------
+xAddress | [xAddress](#x-address) | A randomly generated XRP Ledger address in X-address format.
+secret | secret string | The secret corresponding to the address.
+
+### Example
+
+```javascript
+return api.generateAddress();
+```
+
+
+```json
+{
+  "xAddress": "XVLcsWWNiFdUEqoDmSwgxh1abfddG1LtbGFk7omPgYpbyE8",
+  "secret": "sp6JS7f14BuwFY8Mw6bTtLKWauoUs"
+}
+```
+
+
+## generateAddress
+
+`generateAddress(options?: object): {address: string, secret: string}`
+
+Deprecated: This method returns a classic address. If you do not need the classic address, use `generateXAddress` instead.
+
+Generate a new XRP Ledger address and corresponding secret.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+options | object | *Optional* Options to control how the address and secret are generated.
+*options.* algorithm | string | *Optional* The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
+*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed.
+*options.* includeClassicAddress | boolean | *Optional* If `true`, return the classic address, in addition to the X-address.
 *options.* test | boolean | *Optional* Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`.
 
 ### Return Value

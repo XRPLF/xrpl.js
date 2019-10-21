@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "generateAddressParameters",
+  "title": "generateXAddressParameters",
   "type": "object",
   "properties": {
     "options": {
@@ -24,10 +24,6 @@
         "test": {
           "type": "boolean",
           "description": "Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`."
-        },
-        "includeClassicAddress": {
-          "type": "boolean",
-          "description": "If `true`, return the classic address, in addition to the X-address."
         }
       },
       "additionalProperties": false

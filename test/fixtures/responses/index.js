@@ -5,6 +5,7 @@ function buildList(options) {
 }
 
 module.exports = {
+  generateXAddress: require('./generate-x-address.json'),
   generateAddress: require('./generate-address.json'),
   getAccountInfo: require('./get-account-info.json'),
   getAccountObjects: require('./get-account-objects.json'),
