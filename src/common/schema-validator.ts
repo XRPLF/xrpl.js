@@ -121,7 +121,7 @@ function loadSchemas() {
   ]
   const titles = schemas.map(schema => schema.title)
   const duplicates = _.keys(_.pickBy(_.countBy(titles), count => count > 1))
-  assert(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
+  assert.ok(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
   const validator = new Validator()
   // Register custom format validators that ignore undefined instances
   // since jsonschema will still call the format validator on a missing

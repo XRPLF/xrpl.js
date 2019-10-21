@@ -4,7 +4,7 @@ import {parseTimestamp, parseMemos} from './utils'
 import {removeUndefined} from '../../common'
 
 function parseEscrowCreation(tx: any): object {
-  assert(tx.TransactionType === 'EscrowCreate')
+  assert.ok(tx.TransactionType === 'EscrowCreate')
 
   return removeUndefined({
     amount: parseAmount(tx.Amount).value,

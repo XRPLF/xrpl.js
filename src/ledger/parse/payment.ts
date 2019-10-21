@@ -19,7 +19,7 @@ function removeGenericCounterparty(amount, address) {
 
 // Payment specification
 function parsePayment(tx: any): object {
-  assert(tx.TransactionType === 'Payment')
+  assert.ok(tx.TransactionType === 'Payment')
 
   const source = {
     address: tx.Account,

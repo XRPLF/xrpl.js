@@ -10,7 +10,7 @@ import {
 const flags = txFlags.OfferCreate
 
 function parseOrder(tx: OfferCreateTransaction): FormattedOrderSpecification {
-  assert(tx.TransactionType === 'OfferCreate')
+  assert.ok(tx.TransactionType === 'OfferCreate')
 
   const direction = (tx.Flags & flags.Sell) === 0 ? 'buy' : 'sell'
   const takerGetsAmount = parseAmount(tx.TakerGets)
