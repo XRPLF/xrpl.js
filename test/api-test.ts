@@ -4609,7 +4609,7 @@ describe('RippleAPI', function () {
       });
     }
     return utils.getRecursive(getter, 10).then(() => {
-      assert(false, 'Should throw Error');
+      assert(false, 'Should th row Error');
     }).catch(error => {
       assert(error instanceof Error);
     });
