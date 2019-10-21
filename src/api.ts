@@ -177,7 +177,7 @@ class RippleAPI extends EventEmitter {
     return this.connection.request({
       ...params,
       command,
-      account: ensureClassicAddress(params.account)
+      account: params.account ? ensureClassicAddress(params.account) : undefined
     })
   }
 
@@ -291,12 +291,11 @@ class RippleAPI extends EventEmitter {
   }
 
   // @deprecated Use X-addresses instead
-  generateAddress(options?: GenerateAddressOptions): GeneratedAddress {
-    options.includeClassicAddress = true
-    return generateAddressAPI(options)
+  generateAddress(options: GenerateAddressOptions = {}): GeneratedAddress {
+    return generateAddressAPI({...options, includeClassicAddress: true})
   }
 
-  generateXAddress(options?: GenerateAddressOptions): GeneratedAddress {
+  generateXAddress(options: GenerateAddressOptions = {}): GeneratedAddress {
     return generateAddressAPI(options)
   }
 
