@@ -1,11 +1,13 @@
 import BigNumber from 'bignumber.js'
 import * as common from '../common'
 import {Memo, RippledAmount} from '../common/types/objects'
-const txFlags = common.txFlags
 import {Instructions, Prepare} from './types'
 import {RippleAPI} from '..'
 import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress, isValidXAddress} from 'ripple-address-codec'
+
+const txFlags = common.txFlags
+const TRANSACTION_TYPES_WITH_DESTINATION_TAG_FIELD = ['Payment', 'CheckCreate', 'EscrowCreate', 'PaymentChannelCreate']
 
 export type ApiMemo = {
   MemoData?: string,
@@ -124,8 +126,7 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
     const {classicAccount: destinationAccount, tag: destinationTag} = getClassicAccountAndTag(txJSON.Destination)
     newTxJSON.Destination = destinationAccount
     if (destinationTag !== undefined) {
-      const transactionTypesWithDestinationTagField = ['Payment', 'CheckCreate', 'EscrowCreate', 'PaymentChannelCreate']
-      if (transactionTypesWithDestinationTagField.includes(txJSON.TransactionType)) {
+      if (TRANSACTION_TYPES_WITH_DESTINATION_TAG_FIELD.includes(txJSON.TransactionType)) {
         if (txJSON.DestinationTag && txJSON.DestinationTag !== destinationTag) {
           return Promise.reject(new ValidationError(
             'The Payment `DestinationTag`, if present, must match the tag of the `Destination` X-address'))
