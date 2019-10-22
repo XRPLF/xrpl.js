@@ -66,17 +66,30 @@ function scaleValue(value, multiplier, extra = 0) {
  *                    `false` if no tag should be used;
  *                    `undefined` if the input could not specify whether a tag should be used.
  */
+interface ClassicAccountAndTag {
+  classicAccount: string,
+  tag: number | false | undefined
+}
 
 /**
  * Given an address (account), get the classic account and tag.
+ * If an `expectedTag` is provided:
+ * 1. If the `Account` is an X-address, validate that the tags match.
+ * 2. If the `Account` is a classic address, return `expectedTag` as the tag.
  *
  * @param Account The address to parse.
+ * @param expectedTag If provided, and the `Account` is an X-address,
+ *                    this method throws an error if `expectedTag`
+ *                    does not match the tag of the X-address.
  * @returns {ClassicAccountAndTag}
  *          The classic account and tag.
  */
-function getClassicAccountAndTag(Account: string): {classicAccount: string, tag: number | false | undefined} {
+function getClassicAccountAndTag(Account: string, expectedTag?: number): ClassicAccountAndTag {
   if (isValidXAddress(Account)) {
     const classic = xAddressToClassicAddress(Account)
+    if (expectedTag !== undefined && classic.tag !== expectedTag) {
+      throw new ValidationError('address includes a tag that does not match the tag specified in the transaction')
+    }
     return {
       classicAccount: classic.classicAddress,
       tag: classic.tag
@@ -84,7 +97,7 @@ function getClassicAccountAndTag(Account: string): {classicAccount: string, tag:
   } else {
     return {
       classicAccount: Account,
-      tag: undefined
+      tag: expectedTag
     }
   }
 }
@@ -286,5 +299,6 @@ export {
   prepareTransaction,
   common,
   setCanonicalFlag,
-  getClassicAccountAndTag
+  getClassicAccountAndTag,
+  ClassicAccountAndTag
 }

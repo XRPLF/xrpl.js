@@ -1234,7 +1234,7 @@ describe('X-address Usage', function () {
             done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
           }).catch(err => {
             assert.strictEqual(err.name, 'ValidationError');
-            assert.strictEqual(err.message, 'address includes a tag that does not match the tag specified in the payment');
+            assert.strictEqual(err.message, 'address includes a tag that does not match the tag specified in the transaction');
             done();
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
