@@ -20,7 +20,7 @@
     "@types/lodash": "^4.14.136",
     "@types/ws": "^3.2.0",
     "bignumber.js": "^4.1.0",
-    "https-proxy-agent": "2.2.1",
+    "https-proxy-agent": "^3.0.0",
     "jsonschema": "1.2.2",
     "lodash": "^4.17.4",
     "lodash.isequal": "^4.5.0",
