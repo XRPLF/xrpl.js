@@ -5,7 +5,7 @@ const txFlags = common.txFlags
 import {Instructions, Prepare} from './types'
 import {RippleAPI} from '..'
 import {ValidationError} from '../common/errors'
-import {xAddressToClassicAddress} from 'ripple-address-codec'
+import {xAddressToClassicAddress, isValidXAddress} from 'ripple-address-codec'
 
 export type ApiMemo = {
   MemoData?: string,
@@ -73,14 +73,13 @@ function scaleValue(value, multiplier, extra = 0) {
  *          The classic account and tag.
  */
 function getClassicAccountAndTag(Account: string): {classicAccount: string, tag: number | false | undefined} {
-  try {
+  if (isValidXAddress(Account)) {
     const classic = xAddressToClassicAddress(Account)
     return {
       classicAccount: classic.classicAddress,
       tag: classic.tag
     }
-  } catch (_) {
-    // `xAddressToClassicAddress` threw an error, so `Account` is a classic address
+  } else {
     return {
       classicAccount: Account,
       tag: undefined

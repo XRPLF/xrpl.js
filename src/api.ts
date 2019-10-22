@@ -75,6 +75,7 @@ import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 import {ConnectionOptions} from './common/connection'
+import {isValidXAddress, isValidClassicAddress} from 'ripple-address-codec'
 
 export interface APIOptions extends ConnectionOptions {
   server?: string,
@@ -350,6 +351,9 @@ class RippleAPI extends EventEmitter {
 
   // RippleAPI.deriveClassicAddress (static) is a new name for api.deriveAddress
   static deriveClassicAddress = deriveAddress
+
+  static isValidXAddress = isValidXAddress
+  static isValidClassicAddress = isValidClassicAddress
 
   xrpToDrops = xrpToDrops
   dropsToXrp = dropsToXrp

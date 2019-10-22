@@ -1017,7 +1017,67 @@ describe('X-address Usage', function () {
           }
         }
         return checkResult(expected, 'prepare', response)
-      })
+      });
+    });
+
+    it('preparePayment - uses source tag from source X-address', function () {
+      const payment = {
+        "source": {
+          "address": "X7AcgcsBL6XDcUb289X4mJ8djcdyKaHMK8VcEc7y9YidxEB",
+          "maxAmount": {
+            "value": "1",
+            "currency": "XRP"
+          }
+        },
+        "destination": {
+          "address": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
+          "amount": {
+            "value": "1000000",
+            "currency": "drops"
+          }
+        }
+      }
+      return this.api.preparePayment(address, payment, instructionsWithMaxLedgerVersionOffset).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","SourceTag":555,"Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      });
+    });
+
+    it('preparePayment - uses destination tag from destination X-address', function () {
+      const payment = {
+        "source": {
+          "address": "X7AcgcsBL6XDcUb289X4mJ8djcdyKaHMK8VcEc7y9YidxEB",
+          "maxAmount": {
+            "value": "1",
+            "currency": "XRP"
+          }
+        },
+        "destination": {
+          "address": "X7YenJqxv3L66CwhBSfd3N8RzGXxYq7on5EkithxQiva9wX",
+          "amount": {
+            "value": "1000000",
+            "currency": "drops"
+          }
+        }
+      }
+      return this.api.preparePayment(address, payment, instructionsWithMaxLedgerVersionOffset).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","SourceTag":555,"Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","DestinationTag":777,"Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      });
     });
 
     describe('errors', function () {
@@ -1139,6 +1199,69 @@ describe('X-address Usage', function () {
         try {
           // Cannot return promise because we want/expect it to reject.
           this.api.preparePayment(address, requests.preparePayment.wrongAddress).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'address must match payment.source.address');
+            done();
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
+
+      it('preparePayment - mismatched X-address tag', function (done) {
+        try {
+          // Cannot return promise because we want/expect it to reject.
+          this.api.preparePayment(address, {
+            "source": {
+              "address": "X7AcgcsBL6XDcUb289X4mJ8djcdyKaHcqA3bkjhpzdaYpQr",
+              "amount": {
+                "value": "0.01",
+                "currency": "USD",
+                "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+              },
+              "tag": 321
+            },
+            "destination": {
+              "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+              "minAmount": {
+                "value": "0.01",
+                "currency": "XRP"
+              }
+            }
+          }).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'address includes a tag that does not match the tag specified in the payment');
+            done();
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
+
+      it('preparePayment - mismatched X-address account', function (done) {
+        try {
+          // Cannot return promise because we want/expect it to reject.
+          this.api.preparePayment(address, {
+            "source": {
+              "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+              "amount": {
+                "value": "0.01",
+                "currency": "USD",
+                "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+              }
+            },
+            "destination": {
+              "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+              "minAmount": {
+                "value": "0.01",
+                "currency": "XRP"
+              }
+            }
+          }).then(prepared => {
             done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
           }).catch(err => {
             assert.strictEqual(err.name, 'ValidationError');
@@ -1961,26 +2084,6 @@ describe('X-address Usage', function () {
       return this.api.prepareTransaction(txJSON, localInstructions).then(
         _.partial(checkResult,
           expectedResponse, 'prepare'));
-    });
-  
-    it('fee - calculated fee does not use more than 6 decimal places', function () {
-      this.api.connection._send(JSON.stringify({
-        command: 'config',
-        data: { loadFactor: 5407.96875 }
-      }));
-  
-      const expectedResponse = {
-        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"64896\",\"Sequence\":23}",
-        "instructions": {
-          "fee": "0.064896",
-          "sequence": 23,
-          "maxLedgerVersion": 8820051
-        }
-      }    
-  
-      return this.api.preparePayment(
-        address, requests.preparePayment.normal, instructionsWithMaxLedgerVersionOffset).then(
-          _.partial(checkResult, expectedResponse, 'prepare'));
     });
   });
 

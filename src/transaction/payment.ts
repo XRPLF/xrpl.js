@@ -9,7 +9,7 @@ import {Amount, Adjustment, MaxAdjustment,
   MinAdjustment, Memo} from '../common/types/objects'
 import {xrpToDrops} from '../common'
 import {RippleAPI} from '..'
-import {xAddressToClassicAddress} from 'ripple-address-codec'
+import {xAddressToClassicAddress, isValidXAddress} from 'ripple-address-codec'
 
 
 export interface Payment {
@@ -85,29 +85,57 @@ function createMaximalAmount(amount: Amount): Amount {
   return _.assign({}, amount, {value: maxValue})
 }
 
+function normalizeAddress(address: string, tag: number | undefined, verification?: string):
+    {classicAddress: string, tag?: number} {
+  let addressClassic
+  if (isValidXAddress(address)) {
+    addressClassic = xAddressToClassicAddress(address)
+    addressClassic.tag = addressClassic.tag === false ? undefined : addressClassic.tag
+    if (tag !== undefined && addressClassic.tag !== tag) {
+      throw new ValidationError('address includes a tag that does not match the tag specified in the payment')
+    }
+  } else {
+    addressClassic = {
+      classicAddress: address,
+      tag
+    }
+  }
+
+  if (!verification) {
+    return addressClassic
+  }
+
+  let verificationClassic
+  if (isValidXAddress(verification)) {
+    verificationClassic = xAddressToClassicAddress(verification)
+    verificationClassic.tag = verificationClassic.tag === false ? undefined : verificationClassic.tag
+  } else {
+    verificationClassic = {
+      classicAddress: verification
+    }
+  }
+
+  if (verificationClassic.classicAddress !== addressClassic.classicAddress) {
+    throw new ValidationError('address must match payment.source.address')
+  }
+
+  if (verificationClassic.tag !== undefined &&
+      addressClassic.tag !== undefined &&
+      verificationClassic.tag !== addressClassic.tag) {
+    throw new ValidationError(
+      'address includes a tag that does not match payment.source.tag')
+  }
+
+  return addressClassic
+}
+
 function createPaymentTransaction(address: string, paymentArgument: Payment
 ): TransactionJSON {
   const payment = _.cloneDeep(paymentArgument)
   applyAnyCounterpartyEncoding(payment)
 
-  if (address !== payment.source.address) {
-    try {
-      const {
-        classicAddress,
-        tag
-      } = xAddressToClassicAddress(address)
-      if (classicAddress !== payment.source.address ||
-        (tag !== false && tag !== payment.source.tag) ||
-        (payment.source.tag !== undefined && payment.source.tag !== tag)) {
-          throw new ValidationError('address must match payment.source; if either contains a tag, it must match.')
-      }
-    } catch (_) {
-      // `address` is already a classic address
-      if (utils.getClassicAccountAndTag(payment.source.address).classicAccount !== address) {
-        throw new ValidationError('address must match payment.source.address')
-      }
-    }
-  }
+  const sourceAddressAndTag = normalizeAddress(payment.source.address, payment.source.tag, address)
+  const destinationAddressAndTag = normalizeAddress(payment.destination.address, payment.destination.tag)
 
   if (
     (isMaxAdjustment(payment.source) && isMinAdjustment(payment.destination))
@@ -135,8 +163,8 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
 
   const txJSON: any = {
     TransactionType: 'Payment',
-    Account: payment.source.address,
-    Destination: payment.destination.address,
+    Account: sourceAddressAndTag.classicAddress,
+    Destination: destinationAddressAndTag.classicAddress,
     Amount: toRippledAmount(amount),
     Flags: 0
   }
@@ -144,11 +172,11 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
   if (payment.invoiceID !== undefined) {
     txJSON.InvoiceID = payment.invoiceID
   }
-  if (payment.source.tag !== undefined) {
-    txJSON.SourceTag = payment.source.tag
+  if (sourceAddressAndTag.tag !== undefined) {
+    txJSON.SourceTag = sourceAddressAndTag.tag
   }
-  if (payment.destination.tag !== undefined) {
-    txJSON.DestinationTag = payment.destination.tag
+  if (destinationAddressAndTag.tag !== undefined) {
+    txJSON.DestinationTag = destinationAddressAndTag.tag
   }
   if (payment.memos !== undefined) {
     txJSON.Memos = _.map(payment.memos, utils.convertMemo)
