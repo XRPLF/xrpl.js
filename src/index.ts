@@ -1,4 +1,4 @@
-export * from './api'
+export {RippleAPI} from './api'
 
 export {
     FormattedTransactionType
