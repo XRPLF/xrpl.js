@@ -323,7 +323,7 @@ class Connection extends EventEmitter {
           return this._onOpen().then(resolve, reject)
         })
       }
-    });
+    })
   }
 
   disconnect(): Promise<void> {
