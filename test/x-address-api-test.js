@@ -1,5 +1,3 @@
-/* eslint-disable max-nested-callbacks */
-'use strict'; // eslint-disable-line
 const _ = require('lodash');
 const assert = require('assert-diff');
 const setupAPI = require('./setup-api');
@@ -10,7 +8,7 @@ const requests = fixtures.requests;
 const responses = fixtures.responses;
 const addresses = require('./fixtures/addresses');
 const hashes = require('./fixtures/hashes');
-const address = addresses.ACCOUNT;
+const address = addresses.ACCOUNT_X;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
 const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
@@ -44,8 +42,7 @@ function checkResult(expected, schemaName, response) {
   return response;
 }
 
-
-describe('RippleAPI', function () {
+describe('X-address Usage', function () {
   this.timeout(TIMEOUT);
   const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 };
   beforeEach(setupAPI.setup);
@@ -56,320 +53,32 @@ describe('RippleAPI', function () {
     assert.strictEqual(error.inspect(), '[RippleError(mess, { data: 1 })]');
   });
 
-  describe('xrpToDrops', function () {
-    it('works with a typical amount', function () {
-      const drops = this.api.xrpToDrops('2')
-      assert.strictEqual(drops, '2000000', '2 XRP equals 2 million drops')
-    })
-
-    it('works with fractions', function () {
-      let drops = this.api.xrpToDrops('3.456789')
-      assert.strictEqual(drops, '3456789', '3.456789 XRP equals 3,456,789 drops')
-
-      drops = this.api.xrpToDrops('3.400000')
-      assert.strictEqual(drops, '3400000', '3.400000 XRP equals 3,400,000 drops')
-
-      drops = this.api.xrpToDrops('0.000001')
-      assert.strictEqual(drops, '1', '0.000001 XRP equals 1 drop')
-
-      drops = this.api.xrpToDrops('0.0000010')
-      assert.strictEqual(drops, '1', '0.0000010 XRP equals 1 drop')
-    })
-
-    it('works with zero', function () {
-      let drops = this.api.xrpToDrops('0')
-      assert.strictEqual(drops, '0', '0 XRP equals 0 drops')
-
-      // negative zero is equivalent to zero
-      drops = this.api.xrpToDrops('-0')
-      assert.strictEqual(drops, '0', '-0 XRP equals 0 drops')
-
-      drops = this.api.xrpToDrops('0.000000')
-      assert.strictEqual(drops, '0', '0.000000 XRP equals 0 drops')
-
-      drops = this.api.xrpToDrops('0.0000000')
-      assert.strictEqual(drops, '0', '0.0000000 XRP equals 0 drops')
-    })
-
-    it('works with a negative value', function () {
-      const drops = this.api.xrpToDrops('-2')
-      assert.strictEqual(drops, '-2000000', '-2 XRP equals -2 million drops')
-    })
-
-    it('works with a value ending with a decimal point', function () {
-      let drops = this.api.xrpToDrops('2.')
-      assert.strictEqual(drops, '2000000', '2. XRP equals 2000000 drops')
-
-      drops = this.api.xrpToDrops('-2.')
-      assert.strictEqual(drops, '-2000000', '-2. XRP equals -2000000 drops')
-    })
-
-    it('works with BigNumber objects', function () {
-      let drops = this.api.xrpToDrops(new BigNumber(2))
-      assert.strictEqual(drops, '2000000', '(BigNumber) 2 XRP equals 2 million drops')
-
-      drops = this.api.xrpToDrops(new BigNumber(-2))
-      assert.strictEqual(drops, '-2000000', '(BigNumber) -2 XRP equals -2 million drops')
-    })
-
-    it('works with a number', function() {
-      // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
-
-      let drops = this.api.xrpToDrops(2)
-      assert.strictEqual(drops, '2000000', '(number) 2 XRP equals 2 million drops')
-
-      drops = this.api.xrpToDrops(-2)
-      assert.strictEqual(drops, '-2000000', '(number) -2 XRP equals -2 million drops')
-    })
-
-    it('throws with an amount with too many decimal places', function () {
-      assert.throws(() => {
-        this.api.xrpToDrops('1.1234567')
-      }, /has too many decimal places/)
-
-      assert.throws(() => {
-        this.api.xrpToDrops('0.0000001')
-      }, /has too many decimal places/)
-    })
-
-    it('throws with an invalid value', function () {
-      assert.throws(() => {
-        this.api.xrpToDrops('FOO')
-      }, /invalid value/)
-
-      assert.throws(() => {
-        this.api.xrpToDrops('1e-7')
-      }, /invalid value/)
-
-      assert.throws(() => {
-        this.api.xrpToDrops('2,0')
-      }, /invalid value/)
-
-      assert.throws(() => {
-        this.api.xrpToDrops('.')
-      }, /xrpToDrops: invalid value '\.', should be a BigNumber or string-encoded number\./)
-    })
-
-    it('throws with an amount more than one decimal point', function () {
-      assert.throws(() => {
-        this.api.xrpToDrops('1.0.0')
-      }, /xrpToDrops: invalid value '1\.0\.0', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
-
-      assert.throws(() => {
-        this.api.xrpToDrops('...')
-      }, /xrpToDrops: invalid value '\.\.\.', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
-    })
-  })
-
-  describe('dropsToXrp', function () {
-    it('works with a typical amount', function () {
-      const xrp = this.api.dropsToXrp('2000000')
-      assert.strictEqual(xrp, '2', '2 million drops equals 2 XRP')
-    })
-
-    it('works with fractions', function () {
-      let xrp = this.api.dropsToXrp('3456789')
-      assert.strictEqual(xrp, '3.456789', '3,456,789 drops equals 3.456789 XRP')
-
-      xrp = this.api.dropsToXrp('3400000')
-      assert.strictEqual(xrp, '3.4', '3,400,000 drops equals 3.4 XRP')
-
-      xrp = this.api.dropsToXrp('1')
-      assert.strictEqual(xrp, '0.000001', '1 drop equals 0.000001 XRP')
-
-      xrp = this.api.dropsToXrp('1.0')
-      assert.strictEqual(xrp, '0.000001', '1.0 drops equals 0.000001 XRP')
-
-      xrp = this.api.dropsToXrp('1.00')
-      assert.strictEqual(xrp, '0.000001', '1.00 drops equals 0.000001 XRP')
-    })
-
-    it('works with zero', function () {
-      let xrp = this.api.dropsToXrp('0')
-      assert.strictEqual(xrp, '0', '0 drops equals 0 XRP')
-
-      // negative zero is equivalent to zero
-      xrp = this.api.dropsToXrp('-0')
-      assert.strictEqual(xrp, '0', '-0 drops equals 0 XRP')
-
-      xrp = this.api.dropsToXrp('0.00')
-      assert.strictEqual(xrp, '0', '0.00 drops equals 0 XRP')
-
-      xrp = this.api.dropsToXrp('000000000')
-      assert.strictEqual(xrp, '0', '000000000 drops equals 0 XRP')
-    })
-
-    it('works with a negative value', function () {
-      const xrp = this.api.dropsToXrp('-2000000')
-      assert.strictEqual(xrp, '-2', '-2 million drops equals -2 XRP')
-    })
-
-    it('works with a value ending with a decimal point', function () {
-      let xrp = this.api.dropsToXrp('2000000.')
-      assert.strictEqual(xrp, '2', '2000000. drops equals 2 XRP')
-
-      xrp = this.api.dropsToXrp('-2000000.')
-      assert.strictEqual(xrp, '-2', '-2000000. drops equals -2 XRP')
-    })
-
-    it('works with BigNumber objects', function () {
-      let xrp = this.api.dropsToXrp(new BigNumber(2000000))
-      assert.strictEqual(xrp, '2', '(BigNumber) 2 million drops equals 2 XRP')
-
-      xrp = this.api.dropsToXrp(new BigNumber(-2000000))
-      assert.strictEqual(xrp, '-2', '(BigNumber) -2 million drops equals -2 XRP')
-
-      xrp = this.api.dropsToXrp(new BigNumber(2345678))
-      assert.strictEqual(xrp, '2.345678', '(BigNumber) 2,345,678 drops equals 2.345678 XRP')
-
-      xrp = this.api.dropsToXrp(new BigNumber(-2345678))
-      assert.strictEqual(xrp, '-2.345678', '(BigNumber) -2,345,678 drops equals -2.345678 XRP')
-    })
-
-    it('works with a number', function() {
-      // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
-
-      let xrp = this.api.dropsToXrp(2000000)
-      assert.strictEqual(xrp, '2', '(number) 2 million drops equals 2 XRP')
-
-      xrp = this.api.dropsToXrp(-2000000)
-      assert.strictEqual(xrp, '-2', '(number) -2 million drops equals -2 XRP')
-    })
-
-    it('throws with an amount with too many decimal places', function () {
-      assert.throws(() => {
-        this.api.dropsToXrp('1.2')
-      }, /has too many decimal places/)
-
-      assert.throws(() => {
-        this.api.dropsToXrp('0.10')
-      }, /has too many decimal places/)
-    })
-
-    it('throws with an invalid value', function () {
-      assert.throws(() => {
-        this.api.dropsToXrp('FOO')
-      }, /invalid value/)
-
-      assert.throws(() => {
-        this.api.dropsToXrp('1e-7')
-      }, /invalid value/)
-
-      assert.throws(() => {
-        this.api.dropsToXrp('2,0')
-      }, /invalid value/)
-
-      assert.throws(() => {
-        this.api.dropsToXrp('.')
-      }, /dropsToXrp: invalid value '\.', should be a BigNumber or string-encoded number\./)
-    })
-
-    it('throws with an amount more than one decimal point', function () {
-      assert.throws(() => {
-        this.api.dropsToXrp('1.0.0')
-      }, /dropsToXrp: invalid value '1\.0\.0', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
-
-      assert.throws(() => {
-        this.api.dropsToXrp('...')
-      }, /dropsToXrp: invalid value '\.\.\.', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
-    })
-  })
-
   describe('isValidAddress', function () {
     it('returns true for valid address', function () {
-      assert(this.api.isValidAddress('rLczgQHxPhWtjkaQqn3Q6UM8AbRbbRvs5K'));
+      assert(this.api.isValidAddress(addresses.ACCOUNT_X));
+      assert(this.api.isValidAddress(addresses.ACCOUNT_T));
     })
 
     it('returns false for invalid address', function () {
-      assert(!this.api.isValidAddress('foobar'));
-    })
-  })
-
-  describe('isValidSecret', function () {
-    it('returns true for valid secret', function () {
-      assert(this.api.isValidSecret('snsakdSrZSLkYpCXxfRkS4Sh96PMK'));
-    })
-
-    it('returns false for invalid secret', function () {
-      assert(!this.api.isValidSecret('foobar'));
-    })
-  })
-
-  describe('deriveKeypair', function () {
-    it('returns keypair for secret', function () {
-      var keypair = this.api.deriveKeypair('snsakdSrZSLkYpCXxfRkS4Sh96PMK');
-      assert.equal(keypair.privateKey, '008850736302221AFD59FF9CA1A29D4975F491D726249302EE48A3078A8934D335');
-      assert.equal(keypair.publicKey, '035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06');
-    })
-
-    it('returns keypair for ed25519 secret', function () {
-      var keypair = this.api.deriveKeypair('sEdV9eHWbibBnTj7b1H5kHfPfv7gudx');
-      assert.equal(keypair.privateKey, 'ED5C2EF6C2E3200DFA6B72F47935C7F64D35453646EA34919192538F458C7BC30F');
-      assert.equal(keypair.publicKey, 'ED0805EC4E728DB87C0CA6C420751F296C57A5F42D02E9E6150CE60694A44593E5');
-    })
-
-    it('throws with an invalid secret', function (){
-      assert.throws(() => {
-        this.api.deriveKeypair('...');
-      }, /^Error: Non-base58 character$/)
+      assert(!this.api.isValidAddress(addresses.ACCOUNT_X.slice(0, -1)));
+      assert(!this.api.isValidAddress(addresses.ACCOUNT_T.slice(1)));
     })
   })
 
   describe('deriveAddress', function () {
     it('returns address for public key', function () {
-      var address = this.api.deriveAddress('035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06');
-      assert.equal(address, 'rLczgQHxPhWtjkaQqn3Q6UM8AbRbbRvs5K');
+      assert.equal(RippleAPI.deriveXAddress({
+        publicKey: '035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06',
+        tag: false,
+        test: false
+      }), 'XVZVpQj8YSVpNyiwXYSqvQoQqgBttTxAZwMcuJd4xteQHyt');
+      assert.equal(RippleAPI.deriveXAddress({
+        publicKey: '035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06',
+        tag: false,
+        test: true
+      }), 'TVVrSWtmQQssgVcmoMBcFQZKKf56QscyWLKnUyiuZW8ALU4');
     })
   })
-
-  describe('pagination', function () {
-
-    describe('hasNextPage', function () {
-
-      it('returns true when there is another page', function () {
-        return this.api.request('ledger_data').then(response => {
-            assert(this.api.hasNextPage(response));
-          }
-        );
-      });
-
-      it('returns false when there are no more pages', function () {
-        return this.api.request('ledger_data').then(response => {
-          return this.api.requestNextPage('ledger_data', {}, response);
-        }).then(response => {
-          assert(!this.api.hasNextPage(response));
-        });
-      });
-
-    });
-
-    describe('requestNextPage', function () {
-
-      it('requests the next page', function () {
-        return this.api.request('ledger_data').then(response => {
-          return this.api.requestNextPage('ledger_data', {}, response);
-        }).then(response => {
-          assert.equal(response.state[0].index, '000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D731')
-        });
-      });
-
-      it('rejects when there are no more pages', function () {
-        return this.api.request('ledger_data').then(response => {
-          return this.api.requestNextPage('ledger_data', {}, response);
-        }).then(response => {
-          assert(!this.api.hasNextPage(response))
-          return this.api.requestNextPage('ledger_data', {}, response);
-        }).then(() => {
-          assert(false, 'Should reject');
-        }).catch(error => {
-          assert(error instanceof Error);
-          assert.equal(error.message, 'response does not have a next page')
-        });
-      });
-
-    });
-
-  });
 
   describe('prepareTransaction - auto-fillable fields', function () {
 
@@ -381,13 +90,13 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Fee: '10'
       }
 
       return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
         const expected = {
-          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":23}',
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"10","Sequence":23}',
           instructions: {
             fee: '0.00001', // Notice there are not always 6 digits after the decimal point as trailing zeros are omitted
             sequence: 23,
@@ -406,12 +115,12 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
       }
 
       return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
         const expected = {
-          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"14","Sequence":23}',
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"14","Sequence":23}',
           instructions: {
             fee: '0.000014',
             sequence: 23,
@@ -430,7 +139,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Fee: '16'
       }
 
@@ -455,7 +164,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Fee: '20'
       }
 
@@ -480,7 +189,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
       }
 
       try {
@@ -502,7 +211,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         fee: '10'
       }
 
@@ -529,13 +238,13 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Sequence: 100
       }
 
       return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
         const expected = {
-          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}',
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}',
           instructions: {
             fee: '0.000012',
             sequence: 100,
@@ -555,12 +264,12 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
       }
 
       return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
         const expected = {
-          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}',
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}',
           instructions: {
             fee: '0.000012',
             sequence: 100,
@@ -580,13 +289,13 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Sequence: 100
       }
 
       return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
         const expected = {
-          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}',
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":100}',
           instructions: {
             fee: '0.000012',
             sequence: 100,
@@ -606,7 +315,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Sequence: 101
       }
 
@@ -632,7 +341,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
       }
 
       try {
@@ -656,14 +365,14 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Fee: '10',
         LastLedgerSequence: 8880000
       }
 
       return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
         const expected = {
-          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8880000,"Fee":"10","Sequence":23}',
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8880000,"Fee":"10","Sequence":23}',
           instructions: {
             fee: '0.00001', // Notice there are not always 6 digits after the decimal point as trailing zeros are omitted
             sequence: 23,
@@ -682,12 +391,12 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
       }
 
       return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
         const expected = {
-          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8890000,"Fee":"12","Sequence":23}',
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8890000,"Fee":"12","Sequence":23}',
           instructions: {
             fee: '0.000012',
             sequence: 23,
@@ -706,12 +415,12 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
       }
 
       return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
         const expected = {
-          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820075,"Fee":"12","Sequence":23}',
+          txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820075,"Fee":"12","Sequence":23}',
           instructions: {
             fee: '0.000012',
             sequence: 23,
@@ -730,7 +439,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Fee: '16',
         LastLedgerSequence: 8900000
       }
@@ -756,7 +465,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Fee: '16',
         LastLedgerSequence: 8900000
       }
@@ -783,7 +492,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Fee: '16'
       }
 
@@ -811,7 +520,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Fee: '16',
         LastLedgerSequence: 8900000
       }
@@ -839,7 +548,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
       }
 
       try {
@@ -861,7 +570,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         maxLedgerVersion: 8900000
       }
 
@@ -884,7 +593,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         maxLedgerVersionOffset: 8900000
       }
 
@@ -907,7 +616,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         sequence: 8900000
       }
 
@@ -937,7 +646,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'DepositPreauth',
         Account: address,
-        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+        Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
       }
 
       try {
@@ -961,7 +670,7 @@ describe('RippleAPI', function () {
 
     const txJSON = {
       TransactionType: 'DepositPreauth',
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
     }
 
     try {
@@ -988,7 +697,7 @@ describe('RippleAPI', function () {
     const txJSON = {
       Account: 1234,
       TransactionType: 'DepositPreauth',
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
     }
 
     try {
@@ -1012,7 +721,7 @@ describe('RippleAPI', function () {
     const txJSON = {
       Account: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xkXXXX', // Invalid checksum
       TransactionType: 'DepositPreauth',
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
     }
 
     try {
@@ -1036,7 +745,7 @@ describe('RippleAPI', function () {
     const txJSON = {
       Account: 'rogvkYnY8SWjxkJNgU4ZRVfLeRyt5DR9i',
       TransactionType: 'DepositPreauth',
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
     }
 
     try {
@@ -1059,7 +768,7 @@ describe('RippleAPI', function () {
 
     const txJSON = {
       Account: address,
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
     }
 
     try {
@@ -1098,12 +807,12 @@ describe('RippleAPI', function () {
     const txJSON = {
       Account: address,
       TransactionType: 'DepositPreXXXX',
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
     }
 
     return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
       const expected = {
-        txJSON: '{"TransactionType":"DepositPreXXXX","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        txJSON: '{"TransactionType":"DepositPreXXXX","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
         instructions: {
           fee: '0.000012',
           sequence: 23,
@@ -1122,7 +831,7 @@ describe('RippleAPI', function () {
     const txJSON = {
       Account: address,
       TransactionType: 1234,
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
     }
 
     try {
@@ -1138,26 +847,7 @@ describe('RippleAPI', function () {
     }
   })
 
-  // Note: This transaction will fail at the `submit` step:
-  //
-  // [RippledError(Submit failed, { resultCode: 'temMALFORMED',
-  // resultMessage: 'Malformed transaction.',
-  // engine_result: 'temMALFORMED',
-  // engine_result_code: -299,
-  // engine_result_message: 'Malformed transaction.',
-  // tx_blob:
-  //  '120013240000000468400000000000000C732102E1EA8199F570E7F997A7B34EDFDA0A7D8B38173A17450B121A2EB048FDD16CA97446304402201F0EF6A2DE7F96966F7082294D14F3EC1EF59C21E29443E5858A0120079357A302203CDB7FEBDEAAD93FF39CB589B55778CB80DC3979F96F27E828D5E659BEB26B7A8114D51F9A17208CF113AF23B97ECD5FCD314FBAE52E',
-  // tx_json:
-  //  { Account: 'rLRt8bmZFBEeM5VMSxZy15k8KKJEs68W6C',
-  //    Fee: '12',
-  //    Sequence: 4,
-  //    SigningPubKey:
-  //     '02E1EA8199F570E7F997A7B34EDFDA0A7D8B38173A17450B121A2EB048FDD16CA9',
-  //    TransactionType: 'DepositPreauth',
-  //    TxnSignature:
-  //     '304402201F0EF6A2DE7F96966F7082294D14F3EC1EF59C21E29443E5858A0120079357A302203CDB7FEBDEAAD93FF39CB589B55778CB80DC3979F96F27E828D5E659BEB26B7A',
-  //    hash:
-  //     'C181D470684311658852713DA81F8201062535C8DE2FF853F7DD9981BB85312F' } })]
+  // Note: This transaction is expected to fail at the `submit` step.
   it('prepares tx when a required field is missing', function () {
     const localInstructions = _.defaults({
       maxFee: '0.000012'
@@ -1166,12 +856,12 @@ describe('RippleAPI', function () {
     const txJSON = {
       Account: address,
       TransactionType: 'DepositPreauth',
-      // Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo' // Normally required, intentionally removed
+      // Authorize // Normally required, intentionally removed
     }
 
     return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
       const expected = {
-        txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
         instructions: {
           fee: '0.000012',
           sequence: 23,
@@ -1220,7 +910,7 @@ describe('RippleAPI', function () {
           }
         },
         "destination": {
-          "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "address": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
           "amount": {
             "value": "1",
             "currency": "XRP"
@@ -1250,7 +940,7 @@ describe('RippleAPI', function () {
           }
         },
         "destination": {
-          "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "address": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
           "amount": {
             "value": "1000000",
             "currency": "drops"
@@ -1280,7 +970,7 @@ describe('RippleAPI', function () {
           }
         },
         "destination": {
-          "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "address": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
           "amount": {
             "value": "1",
             "currency": "XRP"
@@ -1310,7 +1000,7 @@ describe('RippleAPI', function () {
           }
         },
         "destination": {
-          "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+          "address": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
           "amount": {
             "value": "1000000",
             "currency": "drops"
@@ -1327,13 +1017,73 @@ describe('RippleAPI', function () {
           }
         }
         return checkResult(expected, 'prepare', response)
-      })
+      });
+    });
+
+    it('preparePayment - uses source tag from source X-address', function () {
+      const payment = {
+        "source": {
+          "address": "X7AcgcsBL6XDcUb289X4mJ8djcdyKaHMK8VcEc7y9YidxEB",
+          "maxAmount": {
+            "value": "1",
+            "currency": "XRP"
+          }
+        },
+        "destination": {
+          "address": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
+          "amount": {
+            "value": "1000000",
+            "currency": "drops"
+          }
+        }
+      }
+      return this.api.preparePayment(address, payment, instructionsWithMaxLedgerVersionOffset).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","SourceTag":555,"Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      });
+    });
+
+    it('preparePayment - uses destination tag from destination X-address', function () {
+      const payment = {
+        "source": {
+          "address": "X7AcgcsBL6XDcUb289X4mJ8djcdyKaHMK8VcEc7y9YidxEB",
+          "maxAmount": {
+            "value": "1",
+            "currency": "XRP"
+          }
+        },
+        "destination": {
+          "address": "X7YenJqxv3L66CwhBSfd3N8RzGXxYq7on5EkithxQiva9wX",
+          "amount": {
+            "value": "1000000",
+            "currency": "drops"
+          }
+        }
+      }
+      return this.api.preparePayment(address, payment, instructionsWithMaxLedgerVersionOffset).then(response => {
+        const expected = {
+          txJSON: '{"TransactionType":"Payment","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","SourceTag":555,"Destination":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","DestinationTag":777,"Amount":"1000000","Flags":2147483648,"LastLedgerSequence":8820051,"Sequence":23,"Fee":"12"}',
+          instructions: {
+            fee: '0.000012',
+            sequence: 23,
+            maxLedgerVersion: 8820051
+          }
+        }
+        return checkResult(expected, 'prepare', response)
+      });
     });
 
     describe('errors', function () {
 
       const senderAddress = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-      const recipientAddress = 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo';
+      const recipientAddress = 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex';
 
       it('rejects promise and does not throw when payment object is invalid', function (done) {
         const payment = {
@@ -1364,7 +1114,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        }
+        };
       });
 
       it('rejects promise and does not throw when field is missing', function (done) {
@@ -1393,7 +1143,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        }
+        };
       });
 
       it('rejects promise and does not throw when fee exceeds maxFeeXRP', function (done) {
@@ -1427,7 +1177,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        }
+        };
       });
 
       it('preparePayment - XRP to XRP no partial', function (done) {
@@ -1442,7 +1192,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        }
+        };
       });
   
       it('preparePayment - address must match payment.source.address', function (done) {
@@ -1457,7 +1207,70 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        }
+        };
+      });
+
+      it('preparePayment - mismatched X-address tag', function (done) {
+        try {
+          // Cannot return promise because we want/expect it to reject.
+          this.api.preparePayment(address, {
+            "source": {
+              "address": "X7AcgcsBL6XDcUb289X4mJ8djcdyKaHcqA3bkjhpzdaYpQr",
+              "amount": {
+                "value": "0.01",
+                "currency": "USD",
+                "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+              },
+              "tag": 321
+            },
+            "destination": {
+              "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+              "minAmount": {
+                "value": "0.01",
+                "currency": "XRP"
+              }
+            }
+          }).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'address includes a tag that does not match the tag specified in the transaction');
+            done();
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
+      });
+
+      it('preparePayment - mismatched X-address account', function (done) {
+        try {
+          // Cannot return promise because we want/expect it to reject.
+          this.api.preparePayment(address, {
+            "source": {
+              "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+              "amount": {
+                "value": "0.01",
+                "currency": "USD",
+                "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+              }
+            },
+            "destination": {
+              "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+              "minAmount": {
+                "value": "0.01",
+                "currency": "XRP"
+              }
+            }
+          }).then(prepared => {
+            done(new Error('Expected method to reject. Prepared transaction: ' + JSON.stringify(prepared)));
+          }).catch(err => {
+            assert.strictEqual(err.name, 'ValidationError');
+            assert.strictEqual(err.message, 'address must match payment.source.address');
+            done();
+          }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
+        } catch (err) {
+          done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
+        };
       });
   
       it('preparePayment - wrong amount', function (done) {
@@ -1472,7 +1285,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        }
+        };
       });
   
       it('preparePayment - throws when fee exceeds 2 XRP', function (done) {
@@ -1492,7 +1305,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        }
+        };
       });
     });
 
@@ -1503,7 +1316,8 @@ describe('RippleAPI', function () {
           fee: '0.000012'
         };
         return this.api.preparePayment(
-          address, requests.preparePayment.allOptions, localInstructions).then(
+          'X7AcgcsBL6XDcUb289X4mJ8djcdyKaGo2K5VpXpmCqbV2gS', // source tag of 14
+          requests.preparePayment.allOptions, localInstructions).then(
             _.partial(checkResult,
               responses.preparePayment.allOptions, 'prepare'));
       });
@@ -1512,7 +1326,8 @@ describe('RippleAPI', function () {
     it('preparePayment without counterparty set', function () {
       const localInstructions = _.defaults({ sequence: 23 }, instructionsWithMaxLedgerVersionOffset);
       return this.api.preparePayment(
-        address, requests.preparePayment.noCounterparty, localInstructions)
+        'X7AcgcsBL6XDcUb289X4mJ8djcdyKaGo2K5VpXpmCqbV2gS', // source tag of 14
+        requests.preparePayment.noCounterparty, localInstructions)
         .then(_.partial(checkResult, responses.preparePayment.noCounterparty,
           'prepare'));
     });
@@ -1593,7 +1408,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('prepareOrderCancellation', function () {
@@ -1632,7 +1447,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('prepareTrustline - simple', function () {
@@ -1667,7 +1482,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('prepareSettings', function () {
@@ -1764,7 +1579,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('prepareSettings - signers no weights', function () {
@@ -1820,7 +1635,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('prepareEscrowCreation', function () {
@@ -1836,7 +1651,7 @@ describe('RippleAPI', function () {
 
   it('prepareEscrowCreation full', function () {
     return this.api.prepareEscrowCreation(
-      address, requests.prepareEscrowCreation.full).then(
+      'X7AcgcsBL6XDcUb289X4mJ8djcdyKaGZMhc9YTE92ehJ2Fu', requests.prepareEscrowCreation.full).then(
         _.partial(checkResult, responses.prepareEscrowCreation.full,
           'prepare'));
   });
@@ -1855,7 +1670,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('prepareEscrowExecution', function () {
@@ -1888,7 +1703,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('prepareEscrowExecution - no fulfillment', function (done) {
@@ -1903,7 +1718,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('prepareEscrowCancellation', function () {
@@ -1971,12 +1786,12 @@ describe('RippleAPI', function () {
     const txJSON = {
       TransactionType: 'DepositPreauth',
       Account: address,
-      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      Authorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
     }
 
     return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
       const expected = {
-        txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Authorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
         instructions: {
           fee: '0.000012',
           sequence: 23,
@@ -1995,12 +1810,12 @@ describe('RippleAPI', function () {
     const txJSON = {
       TransactionType: 'DepositPreauth',
       Account: address,
-      Unauthorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
+      Unauthorize: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex'
     }
 
     return this.api.prepareTransaction(txJSON, localInstructions).then(response => {
       const expected = {
-        txJSON: '{"TransactionType":"DepositPreauth","Account":"' + address + '","Unauthorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+        txJSON: '{"TransactionType":"DepositPreauth","Account":"' + addresses.ACCOUNT + '","Unauthorize":"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
         instructions: {
           fee: '0.000012',
           sequence: 23,
@@ -2021,7 +1836,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'Payment',
         Account: address,
-        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Destination: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Amount: {
           currency: 'USD',
           issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
@@ -2048,7 +1863,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'Payment',
         Account: address,
-        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Destination: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
 
         // Max amount to send. Use 100 billion XRP to
         // ensure that we send the full SendMax amount.
@@ -2073,7 +1888,7 @@ describe('RippleAPI', function () {
       const txJSON = {
         TransactionType: 'Payment',
         Account: address,
-        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Destination: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex',
         Amount: '10000',
         Flags: 0
       }
@@ -2091,8 +1906,8 @@ describe('RippleAPI', function () {
         };
         const txJSON = {
           TransactionType: 'Payment',
-          Account: address,
-          Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+          Account: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaGo2K5VpXpmCqbV2gS', // tag of 14
+          Destination: 'X7YenJqxv3L66CwhBSfd3N8RzGXxYqV56ZkTCa9UCzgaao1', // tag of 58
           Amount: '10000',
           InvoiceID: 'A98FD36C17BE2B8511AD36DC335478E7E89F06262949F36EB88E2D683BBCC50A',
           SourceTag: 14,
@@ -2122,7 +1937,7 @@ describe('RippleAPI', function () {
         "Flags": 2147483648,
         "TransactionType": "Payment",
         "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-        "Destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        "Destination": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
         "Amount": {
           "value": "0.01",
           "currency": "USD",
@@ -2160,7 +1975,7 @@ describe('RippleAPI', function () {
         "Flags": 2147483648,
         "TransactionType": "Payment",
         "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-        "Destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        "Destination": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
         "Amount": {
           "value": "0.01",
           "currency": "USD",
@@ -2203,7 +2018,7 @@ describe('RippleAPI', function () {
         "Flags": 2147483648,
         "TransactionType": "Payment",
         "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-        "Destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        "Destination": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
         "Amount": {
           "value": "0.01",
           "currency": "USD",
@@ -2243,7 +2058,7 @@ describe('RippleAPI', function () {
         "Flags": 2147483648,
         "TransactionType": "Payment",
         "Account": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-        "Destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        "Destination": "X7YenJqxv3L66CwhBSfd3N8RzGXxYqPopMGMsCcpho79rex",
         "Amount": {
           "value": "0.01",
           "currency": "USD",
@@ -2270,26 +2085,6 @@ describe('RippleAPI', function () {
         _.partial(checkResult,
           expectedResponse, 'prepare'));
     });
-  
-    it('fee - calculated fee does not use more than 6 decimal places', function () {
-      this.api.connection._send(JSON.stringify({
-        command: 'config',
-        data: { loadFactor: 5407.96875 }
-      }));
-  
-      const expectedResponse = {
-        "txJSON": "{\"Flags\":2147483648,\"TransactionType\":\"Payment\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"Destination\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"Amount\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"SendMax\":{\"value\":\"0.01\",\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\"},\"LastLedgerSequence\":8820051,\"Fee\":\"64896\",\"Sequence\":23}",
-        "instructions": {
-          "fee": "0.064896",
-          "sequence": 23,
-          "maxLedgerVersion": 8820051
-        }
-      }    
-  
-      return this.api.preparePayment(
-        address, requests.preparePayment.normal, instructionsWithMaxLedgerVersionOffset).then(
-          _.partial(checkResult, expectedResponse, 'prepare'));
-    });
   });
 
   it('prepareTransaction - PaymentChannelCreate', function () {
@@ -2315,10 +2110,10 @@ describe('RippleAPI', function () {
 
   it('prepareTransaction - PaymentChannelCreate full', function () {
     const txJSON = {
-      Account: address,
+      Account: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaLFuhLRuNXPrDeJd9A',
       TransactionType: 'PaymentChannelCreate',
       Amount: this.api.xrpToDrops('1'), // or '1000000'
-      Destination: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
+      Destination: 'X7d3eHCXzwBeWrZec1yT24iZerQjYL8m8zCJ16ACxu1BrBY',
       SettleDelay: 86400,
 
       // Ensure this is in upper case if it is not already
@@ -2439,7 +2234,7 @@ describe('RippleAPI', function () {
 
   it('preparePaymentChannelCreate full', function () {
     return this.api.preparePaymentChannelCreate(
-      address, requests.preparePaymentChannelCreate.full).then(
+      'X7AcgcsBL6XDcUb289X4mJ8djcdyKaLFuhLRuNXPrDeJd9A', requests.preparePaymentChannelCreate.full).then(
         _.partial(checkResult, responses.preparePaymentChannelCreate.full,
           'prepare'));
   });
@@ -2507,7 +2302,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('rejects Promise on preparePaymentChannelClaim with no signature', function (done) {
@@ -2522,7 +2317,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    }
+    };
   });
 
   it('sign', function () {
@@ -3447,21 +3242,20 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.getTrustlines.all, 'getTrustlines'));
   });
 
-  // @deprecated See corresponding test in `x-address-api-test.js`
-  it('generateAddress', function () {
+  it('generateXAddress', function () {
     function random() {
       return _.fill(Array(16), 0);
     }
-    assert.deepEqual(this.api.generateAddress({ entropy: random() }),
-      responses.generateAddress);
+    assert.deepEqual(this.api.generateXAddress({ entropy: random() }),
+      responses.generateXAddress);
   });
 
-  it('generateAddress invalid', function () {
+  it('generateXAddress invalid', function () {
     assert.throws(() => {
       function random() {
         return _.fill(Array(1), 0);
       }
-      this.api.generateAddress({ entropy: random() });
+      this.api.generateXAddress({ entropy: random() });
     }, this.api.errors.UnexpectedError);
   });
 
@@ -3530,12 +3324,12 @@ describe('RippleAPI', function () {
 
   it('getOrders', function () {
     return this.api.getOrders(address).then(
-      _.partial(checkResult, responses.getOrders, 'getOrders'));
+      _.partial(checkResult, JSON.parse(JSON.stringify(responses.getOrders).replace(/r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59/g, 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ')), 'getOrders'));
   });
 
   it('getOrders - limit', function () {
     return this.api.getOrders(address, { limit: 20 }).then(
-      _.partial(checkResult, responses.getOrders, 'getOrders'));
+      _.partial(checkResult, JSON.parse(JSON.stringify(responses.getOrders).replace(/r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59/g, 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ')), 'getOrders'));
   });
 
   it('getOrders - invalid options', function () {
@@ -4171,605 +3965,70 @@ describe('RippleAPI', function () {
       address, requests.preparePayment.normal, instructionsWithMaxLedgerVersionOffset).then(
         _.partial(checkResult, expectedResponse, 'prepare'));
   });
-  
-  it('getFee custom cushion', function () {
-    this.api._feeCushion = 1.4;
-    return this.api.getFee().then(fee => {
-      assert.strictEqual(fee, '0.000014');
-    });
-  });
 
-  // This is not recommended since it may result in attempting to pay
-  // less than the base fee. However, this test verifies
-  // the existing behavior.
-  it('getFee cushion less than 1.0', function () {
-    this.api._feeCushion = 0.9;
-    return this.api.getFee().then(fee => {
-      assert.strictEqual(fee, '0.000009');
-    });
-  });
-
-  it('disconnect & isConnected', function () {
-    assert.strictEqual(this.api.isConnected(), true);
-    return this.api.disconnect().then(() => {
-      assert.strictEqual(this.api.isConnected(), false);
-    });
-  });
-
-  it('getPaths', function () {
-    return this.api.getPaths(requests.getPaths.normal).then(
-      _.partial(checkResult, responses.getPaths.XrpToUsd, 'getPaths'));
-  });
-
-  it('getPaths - result path has source_amount in drops', function () {
-    return this.api.getPaths({
-      source: {
-        address: 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx',
-        amount: {
-          value: this.api.dropsToXrp(1000000),
-          currency: 'XRP'
-        }
-      },
-      destination: {
-        address: 'rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5',
-        amount: {
-          counterparty: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
-          currency: 'EUR'
-        }
-      }
-    }).then(
-      _.partial(checkResult, [
-        {
-          "source": {
-            "address": "rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx",
-            "amount": {
-              "currency": "XRP",
-              "value": "1"
-            }
-          },
-          "destination": {
-            "address": "rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5",
-            "minAmount": {
-              "currency": "EUR",
-              "value": "1",
-              "counterparty": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u"
-            }
-          },
-          "paths": "[[{\"currency\":\"USD\",\"issuer\":\"rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u\"},{\"currency\":\"EUR\",\"issuer\":\"rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u\"}]]"
-        }
-      ], 'getPaths'));
-  });
-
-  it('getPaths - queuing', function () {
-    return Promise.all([
-      this.api.getPaths(requests.getPaths.normal),
-      this.api.getPaths(requests.getPaths.UsdToUsd),
-      this.api.getPaths(requests.getPaths.XrpToXrp)
-    ]).then(results => {
-      checkResult(responses.getPaths.XrpToUsd, 'getPaths', results[0]);
-      checkResult(responses.getPaths.UsdToUsd, 'getPaths', results[1]);
-      checkResult(responses.getPaths.XrpToXrp, 'getPaths', results[2]);
-    });
-  });
-
-  // @TODO
-  // need decide what to do with currencies/XRP:
-  // if add 'XRP' in currencies, then there will be exception in
-  // xrpToDrops function (called from toRippledAmount)
-  it('getPaths USD 2 USD', function () {
-    return this.api.getPaths(requests.getPaths.UsdToUsd).then(
-      _.partial(checkResult, responses.getPaths.UsdToUsd, 'getPaths'));
-  });
-
-  it('getPaths XRP 2 XRP', function () {
-    return this.api.getPaths(requests.getPaths.XrpToXrp).then(
-      _.partial(checkResult, responses.getPaths.XrpToXrp, 'getPaths'));
-  });
-
-  it('getPaths - source with issuer', function () {
-    return this.api.getPaths(requests.getPaths.issuer).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
-    });
-  });
-
-  it('getPaths - XRP 2 XRP - not enough', function () {
-    return this.api.getPaths(requests.getPaths.XrpToXrpNotEnough).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
-    });
-  });
-
-  it('getPaths - invalid PathFind', function () {
-    assert.throws(() => {
-      this.api.getPaths(requests.getPaths.invalid);
-    }, /Cannot specify both source.amount/);
-  });
-
-  it('getPaths - does not accept currency', function () {
-    return this.api.getPaths(requests.getPaths.NotAcceptCurrency).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
-    });
-  });
-
-  it('getPaths - no paths', function () {
-    return this.api.getPaths(requests.getPaths.NoPaths).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
-    });
-  });
-
-  it('getPaths - no paths source amount', function () {
-    return this.api.getPaths(requests.getPaths.NoPathsSource).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
-    });
-  });
-
-
-  it('getPaths - no paths with source currencies', function () {
-    const pathfind = requests.getPaths.NoPathsWithCurrencies;
-    return this.api.getPaths(pathfind).then(() => {
-      assert(false, 'Should throw NotFoundError');
-    }).catch(error => {
-      assert(error instanceof this.api.errors.NotFoundError);
-    });
-  });
-
-  it('getPaths - error: srcActNotFound', function () {
-    const pathfind = _.assign({}, requests.getPaths.normal,
-      { source: { address: addresses.NOTFOUND } });
-    return this.api.getPaths(pathfind).catch(error => {
-      assert(error instanceof this.api.errors.RippleError);
-    });
-  });
-
-  it('getPaths - send all', function () {
-    return this.api.getPaths(requests.getPaths.sendAll).then(
-      _.partial(checkResult, responses.getPaths.sendAll, 'getPaths'));
-  });
-
-  it('getLedgerVersion', function (done) {
-    this.api.getLedgerVersion().then(ver => {
-      assert.strictEqual(ver, 8819951);
-      done();
-    }, done);
-  });
-
-  it('getFeeBase', function (done) {
-    this.api.connection.getFeeBase().then(fee => {
-      assert.strictEqual(fee, 10);
-      done();
-    }, done);
-  });
-
-  it('getFeeRef', function (done) {
-    this.api.connection.getFeeRef().then(fee => {
-      assert.strictEqual(fee, 10);
-      done();
-    }, done);
-  });
-
-  it('getLedger', function () {
-    return this.api.getLedger().then(
-      _.partial(checkResult, responses.getLedger.header, 'getLedger'));
-  });
-
-  it('getLedger - by hash', function () {
-    return this.api.getLedger({ ledgerHash: '15F20E5FA6EA9770BBFFDBD62787400960B04BE32803B20C41F117F41C13830D' }).then(
-      _.partial(checkResult, responses.getLedger.headerByHash, 'getLedger'));
-  });
-
-  it('getLedger - future ledger version', function () {
-    return this.api.getLedger({ ledgerVersion: 14661789 }).then(response => {
-      assert(response)
-    })
-  });
-
-  it('getLedger - with state as hashes', function () {
-    const request = {
-      includeTransactions: true,
-      includeAllData: false,
-      includeState: true,
-      ledgerVersion: 6
-    };
-    return this.api.getLedger(request).then(
-      _.partial(checkResult, responses.getLedger.withStateAsHashes,
-        'getLedger'));
-  });
-
-  it('getLedger - with settings transaction', function () {
-    const request = {
-      includeTransactions: true,
-      includeAllData: true,
-      ledgerVersion: 4181996
-    };
-    return this.api.getLedger(request).then(
-      _.partial(checkResult, responses.getLedger.withSettingsTx, 'getLedger'));
-  });
-
-  it('getLedger - with partial payment', function () {
-    const request = {
-      includeTransactions: true,
-      includeAllData: true,
-      ledgerVersion: 22420574
-    };
-    return this.api.getLedger(request).then(
-      _.partial(checkResult, responses.getLedger.withPartial, 'getLedger'));
-  });
-
-  it('getLedger - pre 2014 with partial payment', function () {
-    const request = {
-      includeTransactions: true,
-      includeAllData: true,
-      ledgerVersion: 100001
-    };
-    return this.api.getLedger(request).then(
-      _.partial(checkResult,
-        responses.getLedger.pre2014withPartial,
-        'getLedger'));
-  });
-
-  it('getLedger - full, then computeLedgerHash', function () {
-    const request = {
-      includeTransactions: true,
-      includeState: true,
-      includeAllData: true,
-      ledgerVersion: 38129
-    };
-    return this.api.getLedger(request).then(
-      _.partial(checkResult, responses.getLedger.full, 'getLedger'))
-      .then(response => {
-        const ledger = _.assign({}, response,
-          { parentCloseTime: response.closeTime });
-        const hash = this.api.computeLedgerHash(ledger, {computeTreeHashes: true});
-        assert.strictEqual(hash,
-          'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
-      });
-  });
-
-  it('computeLedgerHash - given corrupt data - should fail', function () {
-    const request = {
-      includeTransactions: true,
-      includeState: true,
-      includeAllData: true,
-      ledgerVersion: 38129
-    };
-    return this.api.getLedger(request).then(ledger => {
-      assert.strictEqual(ledger.transactions[0].rawTransaction, "{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Amount\":\"10000000000\",\"Destination\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Fee\":\"10\",\"Flags\":0,\"Sequence\":62,\"SigningPubKey\":\"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E\",\"TransactionType\":\"Payment\",\"TxnSignature\":\"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639\",\"hash\":\"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF\",\"meta\":{\"AffectedNodes\":[{\"CreatedNode\":{\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E\",\"NewFields\":{\"Account\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Balance\":\"10000000000\",\"Sequence\":1}}},{\"ModifiedNode\":{\"FinalFields\":{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Balance\":\"981481999380\",\"Flags\":0,\"OwnerCount\":0,\"Sequence\":63},\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A\",\"PreviousFields\":{\"Balance\":\"991481999390\",\"Sequence\":62},\"PreviousTxnID\":\"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F\",\"PreviousTxnLgrSeq\":31317}}],\"TransactionIndex\":0,\"TransactionResult\":\"tesSUCCESS\"},\"ledger_index\":38129}");
-
-      // Change Amount to 12000000000
-      ledger.transactions[0].rawTransaction = "{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Amount\":\"12000000000\",\"Destination\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Fee\":\"10\",\"Flags\":0,\"Sequence\":62,\"SigningPubKey\":\"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E\",\"TransactionType\":\"Payment\",\"TxnSignature\":\"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639\",\"hash\":\"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF\",\"meta\":{\"AffectedNodes\":[{\"CreatedNode\":{\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E\",\"NewFields\":{\"Account\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Balance\":\"10000000000\",\"Sequence\":1}}},{\"ModifiedNode\":{\"FinalFields\":{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Balance\":\"981481999380\",\"Flags\":0,\"OwnerCount\":0,\"Sequence\":63},\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A\",\"PreviousFields\":{\"Balance\":\"991481999390\",\"Sequence\":62},\"PreviousTxnID\":\"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F\",\"PreviousTxnLgrSeq\":31317}}],\"TransactionIndex\":0,\"TransactionResult\":\"tesSUCCESS\"},\"ledger_index\":38129}";
-
-      ledger.parentCloseTime = ledger.closeTime;
-
-      let hash;
-      try {
-        hash = this.api.computeLedgerHash(ledger, {computeTreeHashes: true});
-      } catch (error) {
-        assert(error instanceof this.api.errors.ValidationError);
-        assert.strictEqual(error.message, 'transactionHash in header does not match computed hash of transactions');
-        assert.deepStrictEqual(error.data, {
-          transactionHashInHeader: 'DB83BF807416C5B3499A73130F843CF615AB8E797D79FE7D330ADF1BFA93951A',
-          computedHashOfTransactions: 'EAA1ADF4D627339450F0E95EA88B7069186DD64230BAEBDCF3EEC4D616A9FC68'
-        });
-        return;
-      }
-      assert(false, 'Should throw ValidationError instead of producing hash: ' + hash);
-    });
-  });
-
-  it('computeLedgerHash - given ledger without raw transactions - should throw', function () {
-    const request = {
-      includeTransactions: true,
-      includeState: true,
-      includeAllData: true,
-      ledgerVersion: 38129
-    };
-    return this.api.getLedger(request).then(ledger => {
-      assert.strictEqual(ledger.transactions[0].rawTransaction, "{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Amount\":\"10000000000\",\"Destination\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Fee\":\"10\",\"Flags\":0,\"Sequence\":62,\"SigningPubKey\":\"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E\",\"TransactionType\":\"Payment\",\"TxnSignature\":\"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639\",\"hash\":\"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF\",\"meta\":{\"AffectedNodes\":[{\"CreatedNode\":{\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E\",\"NewFields\":{\"Account\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Balance\":\"10000000000\",\"Sequence\":1}}},{\"ModifiedNode\":{\"FinalFields\":{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Balance\":\"981481999380\",\"Flags\":0,\"OwnerCount\":0,\"Sequence\":63},\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A\",\"PreviousFields\":{\"Balance\":\"991481999390\",\"Sequence\":62},\"PreviousTxnID\":\"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F\",\"PreviousTxnLgrSeq\":31317}}],\"TransactionIndex\":0,\"TransactionResult\":\"tesSUCCESS\"},\"ledger_index\":38129}");
-
-      // Delete rawTransaction
-      delete ledger.transactions[0].rawTransaction;
-
-      ledger.parentCloseTime = ledger.closeTime;
-
-      let hash;
-      try {
-        hash = this.api.computeLedgerHash(ledger, {computeTreeHashes: true});
-      } catch (error) {
-        assert(error instanceof this.api.errors.ValidationError);
-        assert.strictEqual(error.message, 'ledger'
-          + ' is missing raw transactions');
-        return;
-      }
-      assert(false, 'Should throw ValidationError instead of producing hash: ' + hash);
-    });
-  });
-
-
-  it('computeLedgerHash - given ledger without state or transactions - only compute ledger hash', function () {
-    const request = {
-      includeTransactions: true,
-      includeState: true,
-      includeAllData: true,
-      ledgerVersion: 38129
-    };
-    return this.api.getLedger(request).then(ledger => {
-      assert.strictEqual(ledger.transactions[0].rawTransaction, "{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Amount\":\"10000000000\",\"Destination\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Fee\":\"10\",\"Flags\":0,\"Sequence\":62,\"SigningPubKey\":\"034AADB09CFF4A4804073701EC53C3510CDC95917C2BB0150FB742D0C66E6CEE9E\",\"TransactionType\":\"Payment\",\"TxnSignature\":\"3045022022EB32AECEF7C644C891C19F87966DF9C62B1F34BABA6BE774325E4BB8E2DD62022100A51437898C28C2B297112DF8131F2BB39EA5FE613487DDD611525F1796264639\",\"hash\":\"3B1A4E1C9BB6A7208EB146BCDB86ECEA6068ED01466D933528CA2B4C64F753EF\",\"meta\":{\"AffectedNodes\":[{\"CreatedNode\":{\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"4C6ACBD635B0F07101F7FA25871B0925F8836155462152172755845CE691C49E\",\"NewFields\":{\"Account\":\"rLQBHVhFnaC5gLEkgr6HgBJJ3bgeZHg9cj\",\"Balance\":\"10000000000\",\"Sequence\":1}}},{\"ModifiedNode\":{\"FinalFields\":{\"Account\":\"r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV\",\"Balance\":\"981481999380\",\"Flags\":0,\"OwnerCount\":0,\"Sequence\":63},\"LedgerEntryType\":\"AccountRoot\",\"LedgerIndex\":\"B33FDD5CF3445E1A7F2BE9B06336BEBD73A5E3EE885D3EF93F7E3E2992E46F1A\",\"PreviousFields\":{\"Balance\":\"991481999390\",\"Sequence\":62},\"PreviousTxnID\":\"2485FDC606352F1B0785DA5DE96FB9DBAF43EB60ECBB01B7F6FA970F512CDA5F\",\"PreviousTxnLgrSeq\":31317}}],\"TransactionIndex\":0,\"TransactionResult\":\"tesSUCCESS\"},\"ledger_index\":38129}");
-
-      ledger.parentCloseTime = ledger.closeTime;
-
-      const computeLedgerHash = this.api.computeLedgerHash;
-      const ValidationError = this.api.errors.ValidationError
-      function testCompute(ledger, expectedError) {
-        let hash = computeLedgerHash(ledger);
-        assert.strictEqual(hash,
-            'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E');
-
-        // fail if required to compute tree hashes
-        try {
-          hash = computeLedgerHash(ledger, {computeTreeHashes: true});
-        } catch (error) {
-          assert(error instanceof ValidationError);
-          assert.strictEqual(error.message, expectedError);
-          return;
-        }
-        assert(false, 'Should throw ValidationError instead of producing hash: ' + hash);
-      }
-
-      const transactions = ledger.transactions;
-      delete ledger.transactions;
-      testCompute(ledger, 'transactions property is missing from the ledger');
-      delete ledger.rawState;
-      testCompute(ledger, 'transactions property is missing from the ledger');
-      ledger.transactions = transactions;
-      testCompute(ledger, 'rawState property is missing from the ledger');
-    });
-  });
-
-  it('computeLedgerHash - wrong hash', function () {
-    const request = {
-      includeTransactions: true,
-      includeState: true,
-      includeAllData: true,
-      ledgerVersion: 38129
-    };
-    return this.api.getLedger(request).then(
-      _.partial(checkResult, responses.getLedger.full, 'getLedger'))
-      .then(response => {
-        const ledger = _.assign({}, response, {
-          parentCloseTime: response.closeTime, stateHash:
-            'D9ABF622DA26EEEE48203085D4BC23B0F77DC6F8724AC33D975DA3CA492D2E44'
-        });
-        assert.throws(() => {
-          const hash = this.api.computeLedgerHash(ledger);
-          unused(hash);
-        }, /does not match computed hash of state/);
-      });
-  });
-
-  it('RippleError with data', function () {
-    const error = new this.api.errors.RippleError('_message_', '_data_');
-    assert.strictEqual(error.toString(),
-      '[RippleError(_message_, \'_data_\')]');
-  });
-
-  it('NotFoundError default message', function () {
-    const error = new this.api.errors.NotFoundError();
-    assert.strictEqual(error.toString(),
-      '[NotFoundError(Not found)]');
-  });
-
-  it('common utils - toRippledAmount', function () {
-    const amount = { issuer: 'is', currency: 'c', value: 'v' };
-
-    assert.deepEqual(utils.common.toRippledAmount(amount), {
-      issuer: 'is', currency: 'c', value: 'v'
-    });
-  });
-
-  it('ledger utils - renameCounterpartyToIssuerInOrder', function () {
-    const order = {
-      taker_gets: { counterparty: '1' },
-      taker_pays: { counterparty: '1' }
-    };
-    const expected = {
-      taker_gets: { issuer: '1' },
-      taker_pays: { issuer: '1' }
-    };
-    assert.deepEqual(utils.renameCounterpartyToIssuerInOrder(order), expected);
-  });
-
-  it('ledger utils - compareTransactions', function () {
-    assert.strictEqual(utils.compareTransactions({}, {}), 0);
-    let first = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
-    let second = { outcome: { ledgerVersion: 1, indexInLedger: 200 } };
-
-    assert.strictEqual(utils.compareTransactions(first, second), -1);
-
-    first = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
-    second = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
-
-    assert.strictEqual(utils.compareTransactions(first, second), 0);
-
-    first = { outcome: { ledgerVersion: 1, indexInLedger: 200 } };
-    second = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
-
-    assert.strictEqual(utils.compareTransactions(first, second), 1);
-  });
-
-  it('ledger utils - getRecursive', function () {
-    function getter(marker, limit) {
-      return new Promise((resolve, reject) => {
-        if (marker === undefined) {
-          resolve({ marker: 'A', limit: limit, results: [1] });
-        } else {
-          reject(new Error());
-        }
-      });
-    }
-    return utils.getRecursive(getter, 10).then(() => {
-      assert(false, 'Should throw Error');
-    }).catch(error => {
-      assert(error instanceof Error);
-    });
-  });
-
-  describe('schema-validator', function () {
-    it('valid', function () {
-      assert.doesNotThrow(function () {
-        schemaValidator.schemaValidate('hash256',
-          '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F');
-      });
-    });
-
-    it('invalid', function () {
-      assert.throws(function () {
-        schemaValidator.schemaValidate('hash256', 'invalid');
-      }, this.api.errors.ValidationError);
-    });
-
-    it('invalid - empty value', function () {
-      assert.throws(function () {
-        schemaValidator.schemaValidate('hash256', '');
-      }, this.api.errors.ValidationError);
-    });
-
-    it('schema not found error', function () {
-      assert.throws(function () {
-        schemaValidator.schemaValidate('unexisting', 'anything');
-      }, /no schema/);
-    });
-
-  });
-
-  describe('validator', function () {
-
-    it('validateLedgerRange', function () {
-      const options = {
-        minLedgerVersion: 20000,
-        maxLedgerVersion: 10000
-      };
-      const thunk = _.partial(validate.getTransactions,
-        { address, options });
-      assert.throws(thunk, this.api.errors.ValidationError);
-      assert.throws(thunk,
-        /minLedgerVersion must not be greater than maxLedgerVersion/);
-    });
-
-    it('secret', function () {
-      function validateSecret(secret) {
-        validate.sign({ txJSON: '', secret });
-      }
-      assert.doesNotThrow(_.partial(validateSecret,
-        'shzjfakiK79YQdMjy4h8cGGfQSV6u'));
-      assert.throws(_.partial(validateSecret,
-        'shzjfakiK79YQdMjy4h8cGGfQSV6v'), this.api.errors.ValidationError);
-      assert.throws(_.partial(validateSecret, 1),
-        this.api.errors.ValidationError);
-      assert.throws(_.partial(validateSecret, ''),
-        this.api.errors.ValidationError);
-      assert.throws(_.partial(validateSecret, 's!!!'),
-        this.api.errors.ValidationError);
-      assert.throws(_.partial(validateSecret, 'passphrase'),
-        this.api.errors.ValidationError);
-      // 32 0s is a valid hex repr of seed bytes
-      const hex = new Array(33).join('0');
-      assert.throws(_.partial(validateSecret, hex),
-        this.api.errors.ValidationError);
-    });
-
-  });
-
-  it('ledger event', function (done) {
-    this.api.on('ledger', message => {
-      checkResult(responses.ledgerEvent, 'ledgerEvent', message);
-      done();
-    });
-    closeLedger(this.api.connection);
-  });
+  // TODO: Test using getPaths with X-addresses
+
+  // it('getPaths', function () {
+  //   return this.api.getPaths(requests.getPaths.normal).then(
+  //     _.partial(checkResult, responses.getPaths.XrpToUsd, 'getPaths'));
+  // });
+
+  // it('getPaths - result path has source_amount in drops', function () {
+  //   return this.api.getPaths({
+  //     source: {
+  //       address: 'rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx',
+  //       amount: {
+  //         value: this.api.dropsToXrp(1000000),
+  //         currency: 'XRP'
+  //       }
+  //     },
+  //     destination: {
+  //       address: 'rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5',
+  //       amount: {
+  //         counterparty: 'rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u',
+  //         currency: 'EUR'
+  //       }
+  //     }
+  //   }).then(
+  //     _.partial(checkResult, [
+  //       {
+  //         "source": {
+  //           "address": "rB2NTuTTS3eNCsWxZYzJ4wqRqxNLZqA9Vx",
+  //           "amount": {
+  //             "currency": "XRP",
+  //             "value": "1"
+  //           }
+  //         },
+  //         "destination": {
+  //           "address": "rhpJkBfZGQyT1xeDbwtKEuSrSXw3QZSAy5",
+  //           "minAmount": {
+  //             "currency": "EUR",
+  //             "value": "1",
+  //             "counterparty": "rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u"
+  //           }
+  //         },
+  //         "paths": "[[{\"currency\":\"USD\",\"issuer\":\"rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u\"},{\"currency\":\"EUR\",\"issuer\":\"rGpGaj4sxEZGenW1prqER25EUi7x4fqK9u\"}]]"
+  //       }
+  //     ], 'getPaths'));
+  // });
 });
 
-describe('RippleAPI - offline', function () {
-  it('prepareSettings and sign', function () {
-    const api = new RippleAPI();
-    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
-    const settings = requests.prepareSettings.domain;
-    const instructions = {
-      sequence: 23,
-      maxLedgerVersion: 8820051,
-      fee: '0.000012'
-    };
-    return api.prepareSettings(address, settings, instructions).then(data => {
-      checkResult(responses.prepareSettings.flags, 'prepare', data);
-      assert.deepEqual(api.sign(data.txJSON, secret),
-        responses.prepareSettings.signed);
-    });
-  });
+// TODO: Add test for using X-addresses 'offline'
 
-  it('getServerInfo - offline', function () {
-    const api = new RippleAPI();
-    return api.getServerInfo().then(() => {
-      assert(false, 'Should throw error');
-    }).catch(error => {
-      assert(error instanceof api.errors.NotConnectedError);
-    });
-  });
-
-  it('computeLedgerHash', function () {
-    const api = new RippleAPI();
-    const header = requests.computeLedgerHash.header;
-    const ledgerHash = api.computeLedgerHash(header);
-    assert.strictEqual(ledgerHash,
-      'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
-  });
-
-  it('computeLedgerHash - with transactions', function () {
-    const api = new RippleAPI();
-    const header = _.omit(requests.computeLedgerHash.header,
-      'transactionHash');
-    header.rawTransactions = JSON.stringify(
-      requests.computeLedgerHash.transactions);
-    const ledgerHash = api.computeLedgerHash(header);
-    assert.strictEqual(ledgerHash,
-      'F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349');
-  });
-
-  it('computeLedgerHash - incorrent transaction_hash', function () {
-    const api = new RippleAPI();
-    const header = _.assign({}, requests.computeLedgerHash.header,
-      {
-        transactionHash:
-          '325EACC5271322539EEEC2D6A5292471EF1B3E72AE7180533EFC3B8F0AD435C9'
-      });
-    header.rawTransactions = JSON.stringify(
-      requests.computeLedgerHash.transactions);
-    assert.throws(() => api.computeLedgerHash(header));
-  });
-
-  /* eslint-disable no-unused-vars */
-  it('RippleAPI - implicit server port', function () {
-    const api = new RippleAPI({ server: 'wss://s1.ripple.com' });
-  });
-  /* eslint-enable no-unused-vars */
-  it('RippleAPI invalid options', function () {
-    assert.throws(() => new RippleAPI({ invalid: true }));
-  });
-
-  it('RippleAPI valid options', function () {
-    const api = new RippleAPI({ server: 'wss://s:1' });
-    assert.deepEqual(api.connection._url, 'wss://s:1');
-  });
-
-  it('RippleAPI invalid server uri', function () {
-    assert.throws(() => new RippleAPI({ server: 'wss//s:1' }));
-  });
-
-});
+// describe('RippleAPI - offline', function () {
+//   it('prepareSettings and sign', function () {
+//     const api = new RippleAPI();
+//     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV';
+//     const settings = requests.prepareSettings.domain;
+//     const instructions = {
+//       sequence: 23,
+//       maxLedgerVersion: 8820051,
+//       fee: '0.000012'
+//     };
+//     return api.prepareSettings(address, settings, instructions).then(data => {
+//       checkResult(responses.prepareSettings.flags, 'prepare', data);
+//       assert.deepEqual(api.sign(data.txJSON, secret),
+//         responses.prepareSettings.signed);
+//     });
+//   });
+// });

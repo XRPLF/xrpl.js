@@ -1,10 +1,9 @@
 import * as utils from './utils'
-import {validate} from '../common'
+import {validate, ensureClassicAddress} from '../common'
 import {Connection} from '../common'
 import {GetTrustlinesOptions} from './trustlines'
 import {FormattedTrustline} from '../common/types/objects/trustlines'
 import {RippleAPI} from '..'
-
 
 export type Balance = {
   value: string,
@@ -51,6 +50,13 @@ function getLedgerVersionHelper(connection: Connection, optionValue?: number
 function getBalances(this: RippleAPI, address: string, options: GetTrustlinesOptions = {}
 ): Promise<GetBalances> {
   validate.getTrustlines({address, options})
+
+  // Only support retrieving balances without a tag,
+  // since we currently do not calculate balances
+  // on a per-tag basis. Apps must interpret and
+  // use tags independent of the XRP Ledger, comparing
+  // with the XRP Ledger's balance as an accounting check.
+  address = ensureClassicAddress(address)
 
   return Promise.all([
     getLedgerVersionHelper(this.connection, options.ledgerVersion).then(

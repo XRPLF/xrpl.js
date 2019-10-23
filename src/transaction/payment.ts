@@ -9,6 +9,7 @@ import {Amount, Adjustment, MaxAdjustment,
   MinAdjustment, Memo} from '../common/types/objects'
 import {xrpToDrops} from '../common'
 import {RippleAPI} from '..'
+import {getClassicAccountAndTag, ClassicAccountAndTag} from './utils'
 
 
 export interface Payment {
@@ -84,14 +85,48 @@ function createMaximalAmount(amount: Amount): Amount {
   return _.assign({}, amount, {value: maxValue})
 }
 
+/**
+ * Given an address and tag:
+ * 1. Get the classic account and tag;
+ * 2. If a tag is provided:
+ *    2a. If the address was an X-address, validate that the X-address has the expected tag;
+ *    2b. If the address was a classic address, return `expectedTag` as the tag.
+ * 3. If we do not want to use a tag in this case,
+ *    set the tag in the return value to `undefined`.
+ *
+ * @param address The address to parse.
+ * @param expectedTag If provided, and the `Account` is an X-address,
+ *                    this method throws an error if `expectedTag`
+ *                    does not match the tag of the X-address.
+ * @returns {ClassicAccountAndTag}
+ *          The classic account and tag.
+ */
+function validateAndNormalizeAddress(address: string, expectedTag: number | undefined): ClassicAccountAndTag {
+  const classicAddress = getClassicAccountAndTag(address, expectedTag)
+  classicAddress.tag = classicAddress.tag === false ? undefined : classicAddress.tag
+  return classicAddress
+}
+
 function createPaymentTransaction(address: string, paymentArgument: Payment
 ): TransactionJSON {
   const payment = _.cloneDeep(paymentArgument)
   applyAnyCounterpartyEncoding(payment)
 
-  if (address !== payment.source.address) {
+  const sourceAddressAndTag = validateAndNormalizeAddress(payment.source.address, payment.source.tag)
+  const addressToVerifyAgainst = validateAndNormalizeAddress(address, undefined)
+
+  if (addressToVerifyAgainst.classicAccount !== sourceAddressAndTag.classicAccount) {
     throw new ValidationError('address must match payment.source.address')
   }
+
+  if (addressToVerifyAgainst.tag !== undefined &&
+      sourceAddressAndTag.tag !== undefined &&
+      addressToVerifyAgainst.tag !== sourceAddressAndTag.tag) {
+    throw new ValidationError(
+      'address includes a tag that does not match payment.source.tag')
+  }
+
+  const destinationAddressAndTag = validateAndNormalizeAddress(payment.destination.address, payment.destination.tag)
 
   if (
     (isMaxAdjustment(payment.source) && isMinAdjustment(payment.destination))
@@ -119,8 +154,8 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
 
   const txJSON: any = {
     TransactionType: 'Payment',
-    Account: payment.source.address,
-    Destination: payment.destination.address,
+    Account: sourceAddressAndTag.classicAccount,
+    Destination: destinationAddressAndTag.classicAccount,
     Amount: toRippledAmount(amount),
     Flags: 0
   }
@@ -128,11 +163,11 @@ function createPaymentTransaction(address: string, paymentArgument: Payment
   if (payment.invoiceID !== undefined) {
     txJSON.InvoiceID = payment.invoiceID
   }
-  if (payment.source.tag !== undefined) {
-    txJSON.SourceTag = payment.source.tag
+  if (sourceAddressAndTag.tag !== undefined) {
+    txJSON.SourceTag = sourceAddressAndTag.tag
   }
-  if (payment.destination.tag !== undefined) {
-    txJSON.DestinationTag = payment.destination.tag
+  if (destinationAddressAndTag.tag !== undefined) {
+    txJSON.DestinationTag = destinationAddressAndTag.tag
   }
   if (payment.memos !== undefined) {
     txJSON.Memos = _.map(payment.memos, utils.convertMemo)

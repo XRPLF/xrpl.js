@@ -1,4 +1,4 @@
-import {validate, removeUndefined, dropsToXrp} from '../common'
+import {validate, removeUndefined, dropsToXrp, ensureClassicAddress} from '../common'
 import {RippleAPI} from '..'
 import {AccountInfoResponse} from '../common/types/commands/account_info'
 
@@ -34,6 +34,11 @@ export default async function getAccountInfo(
 ): Promise<FormattedGetAccountInfoResponse> {
   // 1. Validate
   validate.getAccountInfo({address, options})
+
+  // Only support retrieving account info without a tag,
+  // since account info is not distinguished by tag.
+  address = ensureClassicAddress(address)
+
   // 2. Make Request
   const response = await this.request('account_info', {
     account: address,

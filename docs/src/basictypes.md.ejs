@@ -6,7 +6,19 @@
 "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
 ```
 
-Every XRP Ledger account has an *address*, which is a base58-encoding of a hash of the account's public key. XRP Ledger addresses always start with the lowercase letter `r`.
+```json
+"X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ"
+```
+
+An *address* refers to a specific XRP Ledger account. It is a base-58 encoding of a hash of the account's public key. There are two kinds of addresses in common use:
+
+### Classic Address
+
+A *classic address* encodes a hash of the account's public key and a checksum. It has no other data. This kind of address always starts with the lowercase letter `r`.
+
+### X-address
+
+An *X-address* encodes a hash of the account's public key, a tag, and a checksum. This kind of address starts with the uppercase letter `X` if it is intended for use on the production XRP Ledger (mainnet). It starts with the uppercase letter `T` if it is intended for use on a test network such as Testnet or Devnet.
 
 ## Account Sequence Number
 

@@ -4,10 +4,9 @@ import {computeTransactionHash} from '../common/hashes'
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
 import getTransaction from './transaction'
-import {validate, errors, Connection} from '../common'
+import {validate, errors, Connection, ensureClassicAddress} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {RippleAPI} from '..'
-
 
 export type TransactionsOptions = {
   start?: string,
@@ -166,6 +165,12 @@ function getTransactionsInternal(connection: Connection, address: string,
 function getTransactions(this: RippleAPI, address: string, options: TransactionsOptions = {}
 ): Promise<GetTransactionsResponse> {
   validate.getTransactions({address, options})
+
+  // Only support retrieving transactions without a tag,
+  // since we currently do not filter transactions based
+  // on tag. Apps must interpret and use tags
+  // independently, filtering transactions if needed.
+  address = ensureClassicAddress(address)
 
   const defaults = {maxLedgerVersion: -1}
   if (options.start) {

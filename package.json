@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "1.3.4",
+  "version": "1.4.0-b2",
   "license": "ISC",
   "description": "A JavaScript API for interacting with Ripple in Node.js and the browser",
   "files": [
@@ -23,8 +23,8 @@
     "https-proxy-agent": "^3.0.0",
     "jsonschema": "1.2.2",
     "lodash": "^4.17.4",
+    "ripple-address-codec": "^4.0.0",
     "lodash.isequal": "^4.5.0",
-    "ripple-address-codec": "^3.0.4",
     "ripple-binary-codec": "^0.2.4",
     "ripple-keypairs": "^0.10.1",
     "ripple-lib-transactionparser": "0.8.0",

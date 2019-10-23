@@ -7,7 +7,8 @@ import {
   dropsToXrp,
   rippleTimeToISO8601,
   iso8601ToRippleTime,
-  txFlags
+  txFlags,
+  ensureClassicAddress
 } from './common'
 import {
   connect,
@@ -46,8 +47,8 @@ import prepareSettings from './transaction/settings'
 import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
-import {generateAddressAPI} from './offline/generate-address'
-import {deriveKeypair, deriveAddress} from './offline/derive'
+import {generateAddressAPI, GenerateAddressOptions, GeneratedAddress} from './offline/generate-address'
+import {deriveKeypair, deriveAddress, deriveXAddress} from './offline/derive'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
@@ -74,6 +75,7 @@ import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 import {ConnectionOptions} from './common/connection'
+import {isValidXAddress, isValidClassicAddress} from 'ripple-address-codec'
 
 export interface APIOptions extends ConnectionOptions {
   server?: string,
@@ -175,7 +177,8 @@ class RippleAPI extends EventEmitter {
   async request(command: string, params: any = {}): Promise<any> {
     return this.connection.request({
       ...params,
-      command
+      command,
+      account: params.account ? ensureClassicAddress(params.account) : undefined
     })
   }
 
@@ -288,6 +291,15 @@ class RippleAPI extends EventEmitter {
     return results
   }
 
+  // @deprecated Use X-addresses instead
+  generateAddress(options: GenerateAddressOptions = {}): GeneratedAddress {
+    return generateAddressAPI({...options, includeClassicAddress: true})
+  }
+
+  generateXAddress(options: GenerateAddressOptions = {}): GeneratedAddress {
+    return generateAddressAPI(options)
+  }
+
   connect = connect
   disconnect = disconnect
   isConnected = isConnected
@@ -328,13 +340,20 @@ class RippleAPI extends EventEmitter {
   combine = combine
   submit = submit
 
-  generateAddress = generateAddressAPI
   deriveKeypair = deriveKeypair
   deriveAddress = deriveAddress
   computeLedgerHash = computeLedgerHash
   signPaymentChannelClaim = signPaymentChannelClaim
   verifyPaymentChannelClaim = verifyPaymentChannelClaim
   errors = errors
+
+  static deriveXAddress = deriveXAddress
+
+  // RippleAPI.deriveClassicAddress (static) is a new name for api.deriveAddress
+  static deriveClassicAddress = deriveAddress
+
+  static isValidXAddress = isValidXAddress
+  static isValidClassicAddress = isValidClassicAddress
 
   xrpToDrops = xrpToDrops
   dropsToXrp = dropsToXrp

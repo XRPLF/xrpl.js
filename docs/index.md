@@ -80,6 +80,7 @@
   - [sign](#sign)
   - [combine](#combine)
   - [submit](#submit)
+  - [generateXAddress](#generatexaddress)
   - [generateAddress](#generateaddress)
   - [isValidAddress](#isvalidaddress)
   - [isValidSecret](#isvalidsecret)
@@ -225,7 +226,19 @@ Methods that depend on the state of the XRP Ledger are unavailable in offline mo
 "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
 ```
 
-Every XRP Ledger account has an *address*, which is a base58-encoding of a hash of the account's public key. XRP Ledger addresses always start with the lowercase letter `r`.
+```json
+"X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ"
+```
+
+An *address* refers to a specific XRP Ledger account. It is a base-58 encoding of a hash of the account's public key. There are two kinds of addresses in common use:
+
+### Classic Address
+
+A *classic address* encodes a hash of the account's public key and a checksum. It has no other data. This kind of address always starts with the lowercase letter `r`.
+
+### X-address
+
+An *X-address* encodes a hash of the account's public key, a tag, and a checksum. This kind of address starts with the uppercase letter `X` if it is intended for use on the production XRP Ledger (mainnet). It starts with the uppercase letter `T` if it is intended for use on a test network such as Testnet or Devnet.
 
 ## Account Sequence Number
 
@@ -377,12 +390,12 @@ Name | Type | Description
 source | object | The source of the funds to be sent.
 *source.* address | [address](#address) | The address to send from.
 *source.* amount | [laxAmount](#amount) | An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with source.maxAmount)
-*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
+*source.* tag | integer | *Optional* An arbitrary 32-bit unsigned integer. It typically maps to an off-ledger account; for example, a hosted wallet or exchange account.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field cannot be used with source.amount)
 destination | object | The destination of the funds to be sent.
 *destination.* address | [address](#address) | An address representing the destination of the transaction.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with `destination.minAmount`.)
-*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
+*destination.* tag | integer | *Optional* An arbitrary 32-bit unsigned integer. It typically maps to an off-ledger account; for example, a hosted wallet or exchange account.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field cannot be used with destination.amount)
 allowPartialPayment | boolean | *Optional* If true, this payment should proceed even if the whole amount cannot be delivered due to a lack of liquidity or a lack of funds in the source account.
 invoiceID | string | *Optional* A 256-bit hash that can be used to identify a particular payment.
@@ -538,7 +551,7 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
 *signers.* weights | array | *Optional* Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
-*signers.weights[].* address | [address](#address) | A Ripple account address
+*signers.weights[].* address | [address](#address) | An account address on the XRP Ledger
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
 transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 
@@ -851,7 +864,7 @@ Returns the response from invoking the specified command, with the specified opt
 
 Refer to [rippled APIs](https://ripple.com/build/rippled-apis/) for commands and options. All XRP amounts must be specified in drops. One drop is equal to 0.000001 XRP. See [Specifying Currency Amounts](https://ripple.com/build/rippled-apis/#specifying-currency-amounts).
 
-Most commands return data for the `current` (in-progress, open) ledger by default. Do not rely on this. Always specify a ledger version in your request. In the example below, the 'validated' ledger is requested, which is the most recent ledger that has been validated by the whole network. See [Specifying Ledgers](https://ripple.com/build/rippled-apis/#specifying-ledgers).
+Most commands return data for the `current` (in-progress, open) ledger by default. Do not rely on this. Always specify a ledger version in your request. In the example below, the 'validated' ledger is requested, which is the most recent ledger that has been validated by the whole network. See [Specifying Ledgers](https://xrpl.org/basic-data-types.html#specifying-ledgers).
 
 ### Return Value
 
@@ -2289,12 +2302,12 @@ Name | Type | Description
 source | object | Properties of the source of the payment.
 *source.* address | [address](#address) | The address to send from.
 *source.* amount | [laxAmount](#amount) | An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with source.maxAmount)
-*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
+*source.* tag | integer | *Optional* An arbitrary 32-bit unsigned integer. It typically maps to an off-ledger account; for example, a hosted wallet or exchange account.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field cannot be used with source.amount)
 destination | object | Properties of the destination of the payment.
 *destination.* address | [address](#address) | An address representing the destination of the transaction.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with `destination.minAmount`.)
-*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
+*destination.* tag | integer | *Optional* An arbitrary 32-bit unsigned integer. It typically maps to an off-ledger account; for example, a hosted wallet or exchange account.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field cannot be used with destination.amount)
 paths | string | The paths of trustlines and orders to use in executing the payment.
 
@@ -3906,7 +3919,7 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
 *signers.* weights | array | *Optional* Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
-*signers.weights[].* address | [address](#address) | A Ripple account address
+*signers.weights[].* address | [address](#address) | An account address on the XRP Ledger
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
 transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 
@@ -5403,7 +5416,7 @@ options | object | *Optional* Options that control the type of signature that wi
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
 secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field cannot be used with keypair).
 
-Please note that when this method is used for multisigning, the `options` parameter is not *Optional* anymore. It will be compulsory. See the multisigning example in this section for more details. 
+When this method is used for multisigning, the `options` parameter is required. See the multisigning example in this section for more details.
 
 ### Return Value
 
@@ -5430,6 +5443,7 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
   "id": "02ACE87F1996E3A23690A5BB7F1774BF71CCBA68F79805831B42ABAD5913D6F4"
 }
 ```
+
 
 ### Example (multisigning)
 
@@ -5620,9 +5634,9 @@ return api.submit(signedTransaction)
 ```
 
 
-## generateAddress
+## generateXAddress
 
-`generateAddress(): {address: string, secret: string}`
+`generateXAddress(options?: object): {address: string, secret: string}`
 
 Generate a new XRP Ledger address and corresponding secret.
 
@@ -5633,6 +5647,7 @@ Name | Type | Description
 options | object | *Optional* Options to control how the address and secret are generated.
 *options.* algorithm | string | *Optional* The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
 *options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed.
+*options.* test | boolean | *Optional* Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`.
 
 ### Return Value
 
@@ -5640,8 +5655,8 @@ This method returns an object with the following structure:
 
 Name | Type | Description
 ---- | ---- | -----------
-address | [address](#address) | A randomly generated Ripple account address.
-secret | secret string | The secret corresponding to the `address`.
+xAddress | [xAddress](#x-address) | A randomly generated XRP Ledger address in X-address format.
+secret | secret string | The secret corresponding to the address.
 
 ### Example
 
@@ -5652,6 +5667,52 @@ return api.generateAddress();
 
 ```json
 {
+  "xAddress": "XVLcsWWNiFdUEqoDmSwgxh1abfddG1LtbGFk7omPgYpbyE8",
+  "secret": "sp6JS7f14BuwFY8Mw6bTtLKWauoUs"
+}
+```
+
+
+## generateAddress
+
+`generateAddress(options?: object): {address: string, secret: string}`
+
+Deprecated: This method returns a classic address. If you do not need the classic address, use `generateXAddress` instead.
+
+Generate a new XRP Ledger address and corresponding secret.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+options | object | *Optional* Options to control how the address and secret are generated.
+*options.* algorithm | string | *Optional* The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
+*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed.
+*options.* includeClassicAddress | boolean | *Optional* If `true`, return the classic address, in addition to the X-address.
+*options.* test | boolean | *Optional* Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`.
+
+### Return Value
+
+This method returns an object with the following structure:
+
+Name | Type | Description
+---- | ---- | -----------
+xAddress | [xAddress](#x-address) | A randomly generated XRP Ledger address in X-address format.
+classicAddress | [classicAddress](#classic-address) | A randomly generated XRP Ledger Account ID (classic address).
+address | [classicAddress](#classic-address) | Deprecated: Use `classicAddress` instead.
+secret | secret string | The secret corresponding to the address.
+
+### Example
+
+```javascript
+return api.generateAddress();
+```
+
+
+```json
+{
+  "xAddress": "XVLcsWWNiFdUEqoDmSwgxh1abfddG1LtbGFk7omPgYpbyE8",
+  "classicAddress": "rGCkuB7PBr5tNy68tPEABEtcdno4hE6Y7f",
   "address": "rGCkuB7PBr5tNy68tPEABEtcdno4hE6Y7f",
   "secret": "sp6JS7f14BuwFY8Mw6bTtLKWauoUs"
 }
@@ -5662,7 +5723,7 @@ return api.generateAddress();
 
 `isValidAddress(address: string): boolean`
 
-Checks if the specified string contains a valid address.
+Checks if the specified string contains a valid address. X-addresses are considered valid with ripple-lib v1.4.0 and higher.
 
 ### Parameters
 

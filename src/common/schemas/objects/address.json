@@ -1,9 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "address",
-  "description": "A Ripple account address",
+  "description": "An account address on the XRP Ledger",
   "type": "string",
   "format": "address",
   "link": "address",
-  "pattern": "^r[1-9A-HJ-NP-Za-km-z]{25,34}$"
+  "oneOf": [
+    {"$ref": "xAddress"},
+    {"$ref": "classicAddress"}
+  ]
 }

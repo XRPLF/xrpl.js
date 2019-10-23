@@ -1,0 +1,23 @@
+## generateXAddress
+
+`generateXAddress(options?: object): {address: string, secret: string}`
+
+Generate a new XRP Ledger address and corresponding secret.
+
+### Parameters
+
+<%- renderSchema('input/generate-x-address.json') %>
+
+### Return Value
+
+This method returns an object with the following structure:
+
+<%- renderSchema('output/generate-x-address.json') %>
+
+### Example
+
+```javascript
+return api.generateAddress();
+```
+
+<%- renderFixture('responses/generate-x-address.json') %>

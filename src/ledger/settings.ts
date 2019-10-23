@@ -1,9 +1,10 @@
 import * as _ from 'lodash'
 import parseFields from './parse/fields'
-import {validate, constants} from '../common'
+import {validate, constants, ensureClassicAddress} from '../common'
 import {FormattedSettings} from '../common/types/objects'
 import {AccountInfoResponse} from '../common/types/commands'
 import {RippleAPI} from '..'
+
 const AccountFlags = constants.AccountFlags
 
 export type SettingsOptions = {
@@ -38,6 +39,11 @@ export async function getSettings(
 ): Promise<FormattedSettings> {
   // 1. Validate
   validate.getSettings({address, options})
+
+  // Only support retrieving settings without a tag,
+  // since settings do not distinguish by tag.
+  address = ensureClassicAddress(address)
+
   // 2. Make Request
   const response = await this.request('account_info', {
     account: address,

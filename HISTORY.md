@@ -1,5 +1,12 @@
 # ripple-lib Release History
 
+## 1.4.0-b1 (2019-09-26)
+
+* Add support for the new X-address format.
+* Some error messages have changed slightly. For example:
+  * `-instance.Account is not of a type(s) string,instance.Account does not conform to the "address" format`
+  * `+instance.Account is not of a type(s) string,instance.Account is not exactly one from <xAddress>,<classicAddress>`
+
 ## 1.3.4 (2019-10-18)
 
 * Update ripple-lib-transactionparser
