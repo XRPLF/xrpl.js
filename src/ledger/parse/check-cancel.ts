@@ -8,7 +8,7 @@ export type FormattedCheckCancel = {
 }
 
 function parseCheckCancel(tx: any): FormattedCheckCancel {
-  assert(tx.TransactionType === 'CheckCancel')
+  assert.ok(tx.TransactionType === 'CheckCancel')
 
   return removeUndefined({
     checkID: tx.CheckID

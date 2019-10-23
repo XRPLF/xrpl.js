@@ -4,7 +4,7 @@ import * as common from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
-import {RippleAPI} from '..'
+import {RippleAPI} from '..' 
 
 export type RecursiveData = {
   marker: string,
@@ -14,7 +14,7 @@ export type RecursiveData = {
 export type Getter = (marker?: string, limit?: number) => Promise<RecursiveData>
 
 function clamp(value: number, min: number, max: number): number {
-  assert(min <= max, 'Illegal clamp bounds')
+  assert.ok(min <= max, 'Illegal clamp bounds')
   return Math.min(Math.max(value, min), max)
 }
 

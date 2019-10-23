@@ -4,7 +4,7 @@ import {removeUndefined} from '../../common'
 import parseAmount from './amount'
 
 function parsePaymentChannelCreate(tx: any): object {
-  assert(tx.TransactionType === 'PaymentChannelCreate')
+  assert.ok(tx.TransactionType === 'PaymentChannelCreate')
 
   return removeUndefined({
     amount: parseAmount(tx.Amount).value,

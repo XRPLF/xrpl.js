@@ -147,17 +147,17 @@ describe('RippleAPI', function () {
 
       assert.throws(() => {
         this.api.xrpToDrops('.')
-      }, /xrpToDrops\: invalid value '\.', should be a BigNumber or string-encoded number\./)
+      }, /xrpToDrops: invalid value '\.', should be a BigNumber or string-encoded number\./)
     })
 
     it('throws with an amount more than one decimal point', function () {
       assert.throws(() => {
         this.api.xrpToDrops('1.0.0')
-      }, /xrpToDrops:\ invalid\ value\ '1\.0\.0'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+      }, /xrpToDrops: invalid value '1\.0\.0', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
 
       assert.throws(() => {
         this.api.xrpToDrops('...')
-      }, /xrpToDrops:\ invalid\ value\ '\.\.\.'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+      }, /xrpToDrops: invalid value '\.\.\.', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
     })
   })
 
@@ -261,17 +261,17 @@ describe('RippleAPI', function () {
 
       assert.throws(() => {
         this.api.dropsToXrp('.')
-      }, /dropsToXrp\: invalid value '\.', should be a BigNumber or string-encoded number\./)
+      }, /dropsToXrp: invalid value '\.', should be a BigNumber or string-encoded number\./)
     })
 
     it('throws with an amount more than one decimal point', function () {
       assert.throws(() => {
         this.api.dropsToXrp('1.0.0')
-      }, /dropsToXrp:\ invalid\ value\ '1\.0\.0'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+      }, /dropsToXrp: invalid value '1\.0\.0', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
 
       assert.throws(() => {
         this.api.dropsToXrp('...')
-      }, /dropsToXrp:\ invalid\ value\ '\.\.\.'\,\ should\ be\ a\ number\ matching\ \(\^\-\?\[0\-9\]\*\.\?\[0\-9\]\*\$\)\./)
+      }, /dropsToXrp: invalid value '\.\.\.', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
     })
   })
 
@@ -311,7 +311,7 @@ describe('RippleAPI', function () {
     it('throws with an invalid secret', function (){
       assert.throws(() => {
         this.api.deriveKeypair('...');
-      }, /^Error\: Non\-base58 character$/)
+      }, /^Error: Non-base58 character$/)
     })
   })
 
@@ -1364,7 +1364,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
 
       it('rejects promise and does not throw when field is missing', function (done) {
@@ -1393,7 +1393,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
 
       it('rejects promise and does not throw when fee exceeds maxFeeXRP', function (done) {
@@ -1427,7 +1427,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
 
       it('preparePayment - XRP to XRP no partial', function (done) {
@@ -1442,7 +1442,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
   
       it('preparePayment - address must match payment.source.address', function (done) {
@@ -1457,7 +1457,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
   
       it('preparePayment - wrong amount', function (done) {
@@ -1472,7 +1472,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
   
       it('preparePayment - throws when fee exceeds 2 XRP', function (done) {
@@ -1492,7 +1492,7 @@ describe('RippleAPI', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
     });
 
@@ -1593,7 +1593,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareOrderCancellation', function () {
@@ -1632,7 +1632,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareTrustline - simple', function () {
@@ -1667,7 +1667,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareSettings', function () {
@@ -1764,7 +1764,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareSettings - signers no weights', function () {
@@ -1820,7 +1820,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareEscrowCreation', function () {
@@ -1855,7 +1855,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareEscrowExecution', function () {
@@ -1888,7 +1888,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareEscrowExecution - no fulfillment', function (done) {
@@ -1903,7 +1903,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareEscrowCancellation', function () {
@@ -2507,7 +2507,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('rejects Promise on preparePaymentChannelClaim with no signature', function (done) {
@@ -2522,7 +2522,7 @@ describe('RippleAPI', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('sign', function () {

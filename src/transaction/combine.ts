@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import binary = require('ripple-binary-codec')
+import binary from 'ripple-binary-codec'
 import * as utils from './utils'
 import BigNumber from 'bignumber.js'
 import {decodeAddress} from 'ripple-address-codec'
