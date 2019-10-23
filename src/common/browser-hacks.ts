@@ -7,14 +7,14 @@ function setPrototypeOf(object, prototype) {
 }
 
 function getConstructorName(object: Object): string {
-  // hack for internet explorer
-  if (!object.constructor.name) {
-    const ctorStr = object.constructor.toString()
-    const fnMatch=ctorStr.match(/^function\s+([^(]*)/)
-    const classMatch=ctorStr.match(/^class\sextends\s+([^{]*)/)
-    return classMatch?classMatch[1]:fnMatch[1]
-  }
+  if (object.constructor.name) {
   return object.constructor.name
+  }
+  // try to guess it on legacy browsers (ie)
+  const constructorString = object.constructor.toString()
+  const functionConstructor = constructorString.match(/^function\s+([^(]*)/)
+  const classConstructor = constructorString.match(/^class\s([^\s]*)/)
+  return functionConstructor ? functionConstructor[1] : classConstructor[1]
 }
 
 export {
