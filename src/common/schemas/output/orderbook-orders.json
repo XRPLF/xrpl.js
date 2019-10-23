@@ -45,9 +45,14 @@
         },
         "required": ["fundedAmount", "priceOfFundedAmount"],
         "additionalProperties": false
+      },
+      "data": {
+        "description": "The raw order data. This may include `owner_funds`, `Flags`, and other fields.",
+        "type": "object",
+        "additionalProperties": true
       }
     },
-    "required": ["specification", "properties"],
+    "required": ["specification", "properties", "data"],
     "additionalProperties": false
   }
 }

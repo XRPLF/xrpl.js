@@ -22,7 +22,12 @@ module.exports = {
   },
   prepareSettings: {
     domain: require('./prepare-settings'),
-    signers: require('./prepare-settings-signers')
+    noSignerEntries: require('./prepare-settings-no-signer-entries'),
+    signers: {
+      normal: require('./prepare-settings-signers'),
+      noThreshold: require('./prepare-settings-signers-no-threshold'),
+      noWeights: require('./prepare-settings-signers-no-weights')
+    }
   },
   prepareEscrowCreation: {
     normal: require('./prepare-escrow-creation'),
@@ -30,11 +35,24 @@ module.exports = {
   },
   prepareEscrowExecution: {
     normal: require('./prepare-escrow-execution'),
-    simple: require('./prepare-escrow-execution-simple')
+    simple: require('./prepare-escrow-execution-simple'),
+    noCondition: require('./prepare-escrow-execution-no-condition'),
+    noFulfillment: require('./prepare-escrow-execution-no-fulfillment')
   },
   prepareEscrowCancellation: {
     normal: require('./prepare-escrow-cancellation'),
     memos: require('./prepare-escrow-cancellation-memos')
+  },
+  prepareCheckCreate: {
+    normal: require('./prepare-check-create'),
+    full: require('./prepare-check-create-full')
+  },
+  prepareCheckCash: {
+    amount: require('./prepare-check-cash-amount'),
+    deliverMin: require('./prepare-check-cash-delivermin')
+  },
+  prepareCheckCancel: {
+    normal: require('./prepare-check-cancel')
   },
   preparePaymentChannelCreate: {
     normal: require('./prepare-payment-channel-create'),

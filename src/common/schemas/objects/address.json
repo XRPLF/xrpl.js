@@ -4,6 +4,6 @@
   "description": "A Ripple account address",
   "type": "string",
   "format": "address",
-  "link": "ripple-address",
+  "link": "address",
   "pattern": "^r[1-9A-HJ-NP-Za-km-z]{25,34}$"
 }

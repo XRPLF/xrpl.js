@@ -8,7 +8,7 @@ const ledgerClosed = require('./fixtures/rippled/ledger-close');
 const RippleAPI = require('ripple-api').RippleAPI;
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 
-const TIMEOUT = process.browser ? 25000 : 10000;
+const TIMEOUT = 20000;
 
 function checkResult(expected, schemaName, response) {
   if (expected.txJSON) {
@@ -29,9 +29,7 @@ describe('RippleAPIBroadcast', function() {
 
   it('base', function() {
     const expected = {request_server_info: 1};
-    if (!process.browser) {
-      this.mocks.forEach(mock => mock.expect(_.assign({}, expected)));
-    }
+    this.mocks.forEach(mock => mock.expect(_.assign({}, expected)));
     assert(this.api.isConnected());
     return this.api.getServerInfo().then(
       _.partial(checkResult, responses.getServerInfo, 'getServerInfo'));

@@ -10,22 +10,22 @@
       "$ref": "sequence"
     },
     "fee": {
-      "description": "An exact fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.",
+      "description": "An exact fee to pay for the transaction, before multiplying for multi-signed transactions. See [Transaction Fees](#transaction-fees) for more information.",
       "$ref": "value"
     },
     "maxFee": {
-      "description": "The maximum fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information.",
+      "description": "Deprecated: Use `maxFeeXRP` in the RippleAPI constructor instead. The maximum fee to pay for this transaction. If this exceeds `maxFeeXRP`, `maxFeeXRP` will be used instead. See [Transaction Fees](#transaction-fees) for more information.",
       "$ref": "value"
     },
     "maxLedgerVersion": {
-      "description": "The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version.",
+      "description": "The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.",
       "oneOf": [
         {"$ref": "ledgerVersion"},
         {"type": "null"}
       ]
     },
     "maxLedgerVersionOffset": {
-      "description": "Offset from current validated legder version to highest ledger version that the transaction can be included in.",
+      "description": "Offset from current validated ledger version to highest ledger version that the transaction can be included in.",
       "type": "integer",
       "minimum": 0
     },

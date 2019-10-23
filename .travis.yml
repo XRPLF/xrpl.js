@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - 6
+  - 8
+  - 10
+  - 11
+script:
+  - yarn compile
+  - yarn test
+  - yarn build
+  - yarn lint

@@ -1,0 +1,47 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "ledger_hash":
+      "102A6E70FFB18C18E97BB56E3047B0E45EA1BCC90BFCCB8CBB0D07BF0E2AB449",
+    "ledger_index": 38202000,
+    "state": [
+      {
+        "Account": "rN3rdDNhQidDuzTFU1ArXWr89B4JG9xZ99",
+        "Balance": "249222644",
+        "Flags": 0,
+        "LedgerEntryType": "AccountRoot",
+        "OwnerCount": 0,
+        "PreviousTxnID":
+          "9A6EEBB6055E2C768BCA3B89B458A5D14A931449443053D9A1A9256F79D590DC",
+        "PreviousTxnLgrSeq": 35891744,
+        "Sequence": 1,
+        "index":
+          "000B714B790C3C79FEE00D17C4DEB436B375466F29679447BA64F265FD63D731"
+      },
+      {
+        "Account": "rLNNqGs2jJKQcg2CuoACuwkJ1ssga9LTYT",
+        "BookDirectory":
+          "6FA9AF02AF19345DC187747EF07CDABECA37CB6DCFFB045E5A08D0CF885B163B",
+        "BookNode": "0000000000000000",
+        "Flags": 0,
+        "LedgerEntryType": "Offer",
+        "OwnerNode": "0000000000000000",
+        "PreviousTxnID":
+          "5D3E557E7C08FA90EF9EE144165855B3823BD24319F28BDD81E23C3573398C44",
+        "PreviousTxnLgrSeq": 38040457,
+        "Sequence": 9,
+        "TakerGets": {
+          "currency": "CNY",
+          "issuer": "rPT74sUcTBTQhkHVD54WGncoqXEAMYbmH7",
+          "value": "322.4"
+        },
+        "TakerPays": "80000000",
+        "index":
+          "0011C33FA959278D478E7A3811D7DBB9E43E1768E12538CD54B028E5E7DA96E5"
+      }
+    ],
+    "validated": true
+  }
+}

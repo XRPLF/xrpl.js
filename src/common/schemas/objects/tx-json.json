@@ -1,11 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "tx",
-  "link": "https://ripple.com/build/transactions/",
+  "title": "tx-json",
+  "link": "https://developers.ripple.com/transaction-formats.html",
   "description": "An object in rippled txJSON format",
   "type": "object",
   "properties": {
-    "Account": {"$ref": "address"}
+    "Account": {"$ref": "address"},
+    "TransactionType": {"type": "string"}
   },
-  "required": ["Account"]
+  "required": ["Account", "TransactionType"]
 }

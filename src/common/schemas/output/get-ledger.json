@@ -55,15 +55,11 @@
         "description": "A transaction in the same format as the return value of [getTransaction](#gettransaction)."
       }
     },
-    "rawTransactions": {
-      "type": "string",
-      "description": "A JSON string containing rippled format transaction JSON for all transactions that were validated in this ledger."
-    },
     "transactionHashes": {
       "description": "An array of hashes of all transactions that were validated in this ledger.",
       "type": "array",
       "items": {
-        "$ref": "id"
+        "$ref": "transactionHash"
       }
     },
     "rawState": {

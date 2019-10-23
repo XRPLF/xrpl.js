@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "transactionType",
+  "link": "transaction-types",
+  "description": "The type of the transaction.",
+  "type": "string",
+  "enum": [
+    "payment",
+    "order",
+    "orderCancellation",
+    "trustline",
+    "settings",
+    "escrowCreation",
+    "escrowCancellation",
+    "escrowExecution",
+    "paymentChannelCreate",
+    "paymentChannelFund",
+    "paymentChannelClaim",
+    "checkCreate",
+    "checkCancel",
+    "checkCash"
+  ]
+}

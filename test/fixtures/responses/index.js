@@ -1,8 +1,13 @@
 'use strict'; // eslint-disable-line strict
 
+function buildList(options) {
+  return new Array(options.count).fill(options.item);
+}
+
 module.exports = {
   generateAddress: require('./generate-address.json'),
   getAccountInfo: require('./get-account-info.json'),
+  getAccountObjects: require('./get-account-objects.json'),
   getBalances: require('./get-balances.json'),
   getBalanceSheet: require('./get-balance-sheet.json'),
   getOrderbook: {
@@ -30,6 +35,7 @@ module.exports = {
     orderSell: require('./get-transaction-order-sell.json'),
     noMeta: require('./get-transaction-no-meta.json'),
     payment: require('./get-transaction-payment.json'),
+    paymentIncludeRawTransaction: require('./get-transaction-payment-include-raw-transaction.json'),
     settings: require('./get-transaction-settings.json'),
     trustline: require('./get-transaction-trustline-set.json'),
     trackingOn: require('./get-transaction-settings-tracking-on.json'),
@@ -37,9 +43,16 @@ module.exports = {
     setRegularKey: require('./get-transaction-settings-set-regular-key.json'),
     trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
     trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
+    trustlineAddMemo: require('./get-transaction-trust-add-memo.json'),
     notValidated: require('./get-transaction-not-validated.json'),
+    checkCreate:
+      require('./get-transaction-check-create.json'),
+    checkCancel:
+      require('./get-transaction-check-cancel.json'),
+    checkCash:
+      require('./get-transaction-check-cash.json'),
     escrowCreation:
-      require('./get-transaction-escrow-create.json'),
+      require('./get-transaction-escrow-creation.json'),
     escrowCancellation:
       require('./get-transaction-escrow-cancellation.json'),
     escrowExecution:
@@ -57,14 +70,20 @@ module.exports = {
   },
   getTransactions: {
     normal: require('./get-transactions.json'),
+    includeRawTransactions: require('./get-transactions-include-raw-transactions.json'),
     one: require('./get-transactions-one.json')
   },
   getTrustlines: {
     filtered: require('./get-trustlines.json'),
+    moreThan400Items: buildList({
+      item: require('./trustline-item.json'),
+      count: 401
+    }),
     all: require('./get-trustlines-all.json')
   },
   getLedger: {
     header: require('./get-ledger'),
+    headerByHash: require('./get-ledger-by-hash'),
     full: require('./get-ledger-full'),
     withSettingsTx: require('./get-ledger-with-settings-tx'),
     withStateAsHashes: require('./get-ledger-with-state-as-hashes'),
@@ -96,12 +115,27 @@ module.exports = {
     flagsMultisign: require('./prepare-settings-multisign.json'),
     flagSet: require('./prepare-settings-flag-set.json'),
     flagClear: require('./prepare-settings-flag-clear.json'),
+    flagSetDepositAuth: require('./prepare-settings-flag-set-deposit-auth.json'),
+    flagClearDepositAuth: require('./prepare-settings-flag-clear-deposit-auth.json'),
     setTransferRate: require('./prepare-settings-set-transfer-rate.json'),
     fieldClear: require('./prepare-settings-field-clear.json'),
     noInstructions: require('./prepare-settings-no-instructions.json'),
     signed: require('./prepare-settings-signed.json'),
     noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json'),
-    signers: require('./prepare-settings-signers.json')
+    signers: require('./prepare-settings-signers.json'),
+    noSignerList: require('./prepare-settings-no-signer-list.json'),
+    noWeights: require('./prepare-settings-no-weight.json')
+  },
+  prepareCheckCreate: {
+    normal: require('./prepare-check-create'),
+    full: require('./prepare-check-create-full')
+  },
+  prepareCheckCash: {
+    amount: require('./prepare-check-cash-amount'),
+    deliverMin: require('./prepare-check-cash-delivermin')
+  },
+  prepareCheckCancel: {
+    normal: require('./prepare-check-cancel')
   },
   prepareEscrowCreation: {
     normal: require('./prepare-escrow-creation'),

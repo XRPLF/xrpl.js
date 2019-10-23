@@ -1,0 +1,30 @@
+## prepareCheckCancel
+
+`prepareCheckCancel(address: string, checkCancel: object, instructions: object): Promise<object>`
+
+Prepare a Check cancellation transaction. This cancels an unredeemed Check, removing it from the ledger without sending any money. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+### Parameters
+
+<%- renderSchema('input/prepare-check-cancel.json') %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare*" methods have the same return type.
+</aside>
+
+<%- renderSchema('output/prepare.json') %>
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+const checkCancel = <%- importFile('test/fixtures/requests/prepare-check-cancel.json') %>;
+return api.prepareCheckCancel(address, checkCancel).then(prepared =>
+  {/* ... */});
+```
+
+<%- renderFixture('responses/prepare-check-cancel.json') %>

@@ -7,13 +7,19 @@ A transaction type is specified by the strings in the first column in the table 
 Type | Description
 ---- | -----------
 [payment](#payment) | A `payment` transaction represents a transfer of value from one account to another. Depending on the [path](https://ripple.com/build/paths/) taken, additional exchanges of value may occur atomically to facilitate the payment.
-[order](#order) | An `order` transaction creates a limit order. It defines an intent to exchange currencies, and creates an order in the Ripple Consensus Ledger's order book if not completely fulfilled when placed. Orders can be partially fulfilled.
-[orderCancellation](#order-cancellation) | An `orderCancellation` transaction cancels an order in the Ripple Consensus Ledger's order book.
+[order](#order) | An `order` transaction creates a limit order. It defines an intent to exchange currencies, and creates an order in the XRP Ledger's order book if not completely fulfilled when placed. Orders can be partially fulfilled.
+[orderCancellation](#order-cancellation) | An `orderCancellation` transaction cancels an order in the XRP Ledger's order book.
 [trustline](#trustline) | A `trustline` transactions creates or modifies a trust line between two accounts.
-[settings](#settings) | A `settings` transaction modifies the settings of an account in the Ripple Consensus Ledger.
-[escrowCreation](#escrow-creation) | An `escrowCreation` transaction creates an escrow on the ledger, which locks XRP until a cryptographic condition is met or it expires. It is like an escrow service where the Ripple network acts as the escrow agent.
+[settings](#settings) | A `settings` transaction modifies the settings of an account in the XRP Ledger.
+[escrowCreation](#escrow-creation) | An `escrowCreation` transaction creates an escrow on the ledger, which locks XRP until a cryptographic condition is met or it expires. It is like an escrow service where the XRP Ledger acts as the escrow agent.
 [escrowCancellation](#escrow-cancellation) | An `escrowCancellation` transaction unlocks the funds in an escrow and sends them back to the creator of the escrow, but it will only work after the escrow expires.
 [escrowExecution](#escrow-execution) | An `escrowExecution` transaction unlocks the funds in an escrow and sends them to the destination of the escrow, but it will only work if the cryptographic condition is provided.
+[checkCreate](#check-create) | A `checkCreate` transaction creates a check on the ledger, which is a deferred payment that can be cashed by its intended destination.
+[checkCancel](#check-cancel) | A `checkCancel` transaction cancels an unredeemed Check, removing it from the ledger without sending any money.
+[checkCash](#check-cash) | A `checkCash` transaction redeems a Check to receive up to the amount authorized by the corresponding `checkCreate` transaction. Only the `destination` address of a Check can cash it.
+[paymentChannelCreate](#payment-channel-create) | A `paymentChannelCreate` transaction opens a payment channel between two addresses with XRP set aside for asynchronous payments.
+[paymentChannelFund](#payment-channel-fund) | A `paymentChannelFund` transaction adds XRP to a payment channel and optionally sets a new expiration for the channel.
+[paymentChannelClaim](#payment-channel-claim) | A `paymentChannelClaim` transaction withdraws XRP from a channel and optionally requests to close it.
 
 ## Transaction Flow
 
@@ -28,15 +34,20 @@ Executing a transaction with `RippleAPI` requires the following four steps:
     * [prepareEscrowCreation](#prepareescrowcreation)
     * [prepareEscrowCancellation](#prepareescrowcancellation)
     * [prepareEscrowExecution](#prepareescrowexecution)
+    * [prepareCheckCreate](#preparecheckcreate)
+    * [prepareCheckCancel](#preparecheckcancel)
+    * [prepareCheckCash](#preparecheckcash)
 2. [Sign](#sign) - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place. For multisignature transactions, the `signedTransaction` fields returned by `sign` must be collected and passed to the [combine](#combine) method.
 3. [Submit](#submit) - Submit the transaction to the connected server.
 4. Verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted.
 
 ## Transaction Fees
 
-Every transaction must destroy a small amount of XRP as a cost to send the transaction. This is also called a *transaction fee*. The transaction cost is designed to increase along with the load on the Ripple network, making it very expensive to deliberately or inadvertently overload the network.
+Every transaction must destroy a small amount of XRP as a cost to apply the transaction to the ledger. This is also called a *transaction fee*. The transaction cost is designed to increase along with the load on the XRP Ledger, making it very expensive to deliberately or inadvertently overload the peer-to-peer network that powers the XRP Ledger.
 
 You can choose the size of the fee you want to pay or let a default be used. You can get an estimate of the fee required to be included in the next ledger closing with the [getFee](#getfee) method.
+
+For a multi-signed transaction, ripple-lib automatically multiplies the `fee` by (1 + Number of Signatures Provided). For example, if you set `instructions.fee = '0.000020'` and `instructions.signersCount = 2`, the prepared transaction's `Fee` will be 20 drops × (1 + 2 Signatures) = 60 drops. See [Transaction Cost](https://developers.ripple.com/transaction-cost.html).
 
 ## Transaction Instructions
 
@@ -44,7 +55,7 @@ Transaction instructions indicate how to execute a transaction, complementary wi
 
 <%- renderSchema("objects/instructions.json") %>
 
-We recommended that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeeed in the future. It is impossible for a transaction to succeed after the network ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare*" method.
+We recommend that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeed in the future. It is impossible for a transaction to succeed after the XRP Ledger's consensus-validated ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare\*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare\*" method.
 
 ## Transaction ID
 

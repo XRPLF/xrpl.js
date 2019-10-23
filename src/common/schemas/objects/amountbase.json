@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "amountbase",
+  "description": "Base class for amount and issue",
+  "type": "object",
+  "properties": {
+    "value": {
+      "description": "The quantity of the currency, denoted as a string to retain floating point precision",
+      "$ref": "value"
+    },
+    "currency": {
+      "description": "The three-character code or hexadecimal string used to denote currencies, or \"drops\" for the smallest unit of XRP.",
+      "$ref": "currency"
+    },
+    "counterparty": {
+      "description": "The XRP Ledger address of the account that owes or is owed the funds (omitted if `currency` is \"XRP\" or \"drops\")",
+      "$ref": "address"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["currency"],
+  "oneOf": [
+    {
+      "properties": {
+        "currency": {
+          "not": {
+            "enum": ["XRP", "drops"]
+          }
+        }
+      },
+      "required": ["counterparty"]
+    },
+    {
+      "properties": {
+        "currency": {
+          "enum": ["XRP", "drops"]
+        }
+      },
+      "not": {
+        "required": ["counterparty"]
+      }
+    }
+  ]
+}

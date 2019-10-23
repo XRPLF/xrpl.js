@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "prepareCheckCashParameters",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$ref": "address",
+      "description": "The address of the account that is creating the transaction."
+    },
+    "checkCash": {
+      "$ref": "checkCash",
+      "description": "The specification of the Check cash to prepare."
+    },
+    "instructions": {"$ref": "instructions"}
+  },
+  "additionalProperties": false,
+  "required": ["address", "checkCash"]
+}

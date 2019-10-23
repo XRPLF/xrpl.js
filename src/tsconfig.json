@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig-base",
+  "compilerOptions": {
+    "outDir": "../dist/npm",
+    "rootDir": ".",
+    "composite": true
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}

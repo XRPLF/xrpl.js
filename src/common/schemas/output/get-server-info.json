@@ -31,7 +31,7 @@
         },
         "threads": {
           "type": "number",
-          "description": "*(Admin only)* The number of threads in the server’s main job pool, performing various Ripple Network operations."
+          "description": "*(Admin only)* The number of threads in the server’s main job pool, performing various operations."
         }
       },
       "required": ["jobTypes", "threads"]
@@ -70,7 +70,7 @@
     },
     "serverState": {
       "type": "string",
-      "description": "A string indicating to what extent the server is participating in the network. See [Possible Server States](https://ripple.com/build/rippled-apis/#possible-server-states) for more details.",
+      "description": "A string indicating to what extent the server is participating in the network. See [Possible Server States](https://developers.ripple.com/rippled-server-states.html) for more details.",
       "enum": ["disconnected", "connected", "syncing", "tracking", "full", "validating", "proposing"]
     },
     "validatedLedger": {

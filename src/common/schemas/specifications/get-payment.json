@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "getPayment",
+  "description": "A specification of a payment in a response for getTransaction or getTransactions.",
+  "type": "object",
+  "properties": {
+    "source": {
+      "$ref": "sourceAdjustment",
+      "description": "The source of the funds to be sent."
+    },
+    "destination": {
+      "$ref": "destinationAddressTag",
+      "description": "The destination of the funds to be sent. Since this is a payment response, the amount is not shown here. For the amount that the transaction delivered, see `outcome.deliveredAmount`."
+    },
+    "paths": {
+      "type": "string",
+      "description": "The paths of trustlines and orders to use in executing the payment."
+    },
+    "memos": {"$ref": "memos"},
+    "invoiceID": {
+      "description": "A 256-bit hash that can be used to identify a particular payment.",
+      "$ref": "hash256"
+    },
+    "allowPartialPayment": {
+      "description": "If true, this payment should proceed even if the whole amount cannot be delivered due to a lack of liquidity or a lack of funds in the source account.",
+      "type": "boolean"
+    },
+    "noDirectRipple": {
+      "description": "If true and paths are specified, the sender would like the XRP Ledger to disregard any direct paths from the source account to the destination account. This may be used to take advantage of an arbitrage opportunity or by gateways wishing to issue balances from a hot wallet to a user who has mistakenly set a trustline directly to the hot wallet.",
+      "type": "boolean"
+    },
+    "limitQuality": {
+      "description": "Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of destination.amount:source.maxAmount.",
+      "type": "boolean"
+    }
+  },
+  "required": ["source", "destination"],
+  "additionalProperties": false
+}

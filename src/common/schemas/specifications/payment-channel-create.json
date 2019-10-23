@@ -18,12 +18,12 @@
     },
     "publicKey": {
       "$ref": "publicKey",
-      "description": "Public key of the key pair the source will use to sign claims against this channel."
+      "description": "Public key of the key pair the source may use to sign claims against this channel."
     },
     "cancelAfter": {
       "type": "string",
       "format": "date-time",
-      "description": "Time when this channel expires."
+      "description": "Time when this channel expires. This expiration cannot be changed after creating the channel."
     },
     "sourceTag": {
       "$ref": "tag",

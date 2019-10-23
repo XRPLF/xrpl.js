@@ -1,0 +1,10 @@
+{
+  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+  "sendMax": {
+    "currency": "XRP",
+    "value": "1"
+  },
+  "destinationTag": 2,
+  "expiration": "2018-09-24T21:21:50.000Z",
+  "invoiceID": "1F40FC92DA241694750979EE6CF582F2D5D7D28E18335DE05ABC54D0560E0F53"
+}

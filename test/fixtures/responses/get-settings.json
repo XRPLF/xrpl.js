@@ -3,5 +3,20 @@
   "disallowIncomingXRP": true,
   "emailHash": "23463B99B62A72F26ED677CC556C44E8",
   "domain": "example.com",
-  "transferRate": 1.002
+  "transferRate": 1.002,
+  "signers": {
+    "threshold": 3,
+    "weights": [
+      {
+        "address": "rpHit3GvUR1VSGh2PXcaaZKEEUnCVxWU2i",
+        "weight": 1
+      }, {
+        "address": "rN4oCm1c6BQz6nru83H52FBSpNbC9VQcRc",
+        "weight": 1
+      }, {
+        "address": "rJ8KhCi67VgbapiKCQN3r1ZA6BMUxUvvnD",
+        "weight": 1
+      }
+    ]
+  }
 }

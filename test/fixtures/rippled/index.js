@@ -7,6 +7,7 @@ module.exports = {
   },
   ledger: {
     normal: require('./ledger'),
+    normalByHash: require('./ledger-by-hash'),
     notFound: require('./ledger-not-found'),
     withoutCloseTime: require('./ledger-without-close-time'),
     withSettingsTx: require('./ledger-with-settings-tx'),
@@ -16,7 +17,12 @@ module.exports = {
   },
   empty: require('./empty'),
   subscribe: require('./subscribe'),
+  subscribe_error: require('./subscribe_error'),
   unsubscribe: require('./unsubscribe'),
+  account_objects: {
+    normal: require('./account-objects'),
+    // notfound: require('./account-objects-not-found')
+  },
   account_info: {
     normal: require('./account-info'),
     notfound: require('./account-info-not-found')
@@ -32,6 +38,10 @@ module.exports = {
     fabric: require('./book-offers'),
     usd_xrp: require('./book-offers-usd-xrp'),
     xrp_usd: require('./book-offers-xrp-usd')
+  },
+  ledger_data: {
+    first_page: require('./ledger-data-first-page'),
+    last_page: require('./ledger-data-last-page')
   },
   ledger_entry: {
     error: require('./ledger-entry-error')
@@ -66,12 +76,16 @@ module.exports = {
     TrustSet: require('./tx/trust-set.json'),
     TrustSetFrozenOff: require('./tx/trust-set-frozen-off.json'),
     TrustSetNoQuality: require('./tx/trust-set-no-quality.json'),
+    TrustSetAddMemo: require('./tx/trust-set-add-memo.json'),
     NotFound: require('./tx/not-found.json'),
     NoLedgerIndex: require('./tx/no-ledger-index.json'),
     NoLedgerFound: require('./tx/no-ledger-found.json'),
     LedgerWithoutTime: require('./tx/ledger-without-time.json'),
     NotValidated: require('./tx/not-validated.json'),
     OfferWithExpiration: require('./tx/order-with-expiration.json'),
+    CheckCreate: require('./tx/check-create.json'),
+    CheckCancel: require('./tx/check-cancel.json'),
+    CheckCash: require('./tx/check-cash.json'),
     EscrowCreation: require('./tx/escrow-creation.json'),
     EscrowCancellation:
       require('./tx/escrow-cancellation.json'),

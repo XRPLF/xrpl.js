@@ -4,17 +4,20 @@
   "description": "Parameters for getTransaction",
   "type": "object",
   "properties": {
-    "id": {"$ref": "id"},
+    "id": {"$ref": "transactionHash"},
     "options": {
-      "description": "Options to limit the ledger versions to search.",
+      "description": "Options to limit the ledger versions to search and/or to include raw transaction data.",
       "properties": {
         "minLedgerVersion": {
           "$ref": "ledgerVersion",
-          "description": "The lowest ledger version to search."
+          "description": "The lowest ledger version to search. This must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'."
         },
         "maxLedgerVersion": {
           "$ref": "ledgerVersion",
-          "description": "The highest ledger version to search"
+          "description": "The highest ledger version to search. This must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'."
+        },
+        "includeRawTransaction": {
+          "description": "Include raw transaction data. For advanced users; exercise caution when interpreting this data."
         }
       },
       "additionalProperties": false

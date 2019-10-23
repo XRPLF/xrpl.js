@@ -1,0 +1,27 @@
+## rippleTimeToISO8601
+
+`rippleTimeToISO8601(rippleTime: number): string`
+
+This method takes the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC) and returns a string representation of a date.
+
+The Ripple Epoch is 946684800 seconds after the Unix Epoch.
+
+This method is useful for interpreting timestamps returned by the rippled APIs. The rippled APIs represent time as an unsigned integer of the number of seconds since the Ripple Epoch.
+
+### Parameters
+
+`rippleTime`: A number of seconds since the Ripple Epoch.
+
+### Return Value
+
+A string representing a date and time, created by calling a `Date` object's `toISOString()` method.
+
+### Example
+
+```javascript
+api.rippleTimeToISO8601(540659097);
+```
+
+```json
+'2017-02-17T15:04:57.000Z'
+```

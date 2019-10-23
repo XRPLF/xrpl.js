@@ -13,7 +13,7 @@
       "properties": {
         "start": {
           "$ref": "hash256",
-          "description": "If specified, this transaction will be the first transaction in the result."
+          "description": "If specified, this transaction will be the first transaction in the result. You cannot use `start` with `minLedgerVersion` or `maxLedgerVersion`. When `start` is specified, these ledger versions will be determined internally."
         },
         "limit": {
           "type": "integer",
@@ -22,7 +22,7 @@
         },
         "minLedgerVersion": {
           "$ref": "ledgerVersion",
-          "description": "Return only transactions in this ledger verion or higher."
+          "description": "Return only transactions in this ledger version or higher."
         },
         "maxLedgerVersion": {
           "$ref": "ledgerVersion",
@@ -48,6 +48,9 @@
           "type": "array",
           "items": {"$ref": "transactionType"},
           "description": "Only return transactions of the specified [Transaction Types](#transaction-types)."
+        },
+        "includeRawTransactions": {
+          "description": "Include raw transaction data. For advanced users; exercise caution when interpreting this data. "
         },
         "binary": {
           "type": "boolean",

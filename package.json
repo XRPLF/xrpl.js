@@ -1,81 +1,70 @@
 {
   "name": "ripple-lib",
-  "version": "0.17.7",
+  "version": "1.3.4",
   "license": "ISC",
   "description": "A JavaScript API for interacting with Ripple in Node.js and the browser",
   "files": [
     "dist/npm/*",
-    "bin/*",
-    "build/*",
-    "test/*",
-    "Gulpfile.js"
+    "build/*"
   ],
   "main": "dist/npm/",
+  "types": "dist/npm/index.d.ts",
+  "browser": {
+    "ws": "./dist/npm/common/wswrapper.js",
+    "https-proxy-agent": false
+  },
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "babel-polyfill": "^6.3.14",
-    "babel-runtime": "^6.3.19",
-    "bignumber.js": "^2.0.3",
-    "https-proxy-agent": "^1.0.0",
-    "jsonschema": "^1.1.1",
-    "lodash": "^3.1.0",
-    "ripple-address-codec": "^2.0.1",
-    "ripple-binary-codec": "^0.1.10",
-    "ripple-hashes": "^0.3.0",
-    "ripple-keypairs": "^0.10.0",
-    "ripple-lib-transactionparser": "^0.6.0",
-    "ws": "^1.0.1"
+    "@types/lodash": "^4.14.136",
+    "@types/ws": "^3.2.0",
+    "bignumber.js": "^4.1.0",
+    "https-proxy-agent": "^3.0.0",
+    "jsonschema": "1.2.2",
+    "lodash": "^4.17.4",
+    "lodash.isequal": "^4.5.0",
+    "ripple-address-codec": "^3.0.4",
+    "ripple-binary-codec": "^0.2.4",
+    "ripple-keypairs": "^0.10.1",
+    "ripple-lib-transactionparser": "0.8.0",
+    "ws": "^3.3.1"
   },
   "devDependencies": {
+    "@types/node": "11.13.0",
+    "@typescript-eslint/eslint-plugin": "^2.3.3",
+    "@typescript-eslint/parser": "^2.3.3",
     "assert-diff": "^1.0.1",
-    "babel-cli": "^6.4.0",
-    "babel-core": "^6.4.0",
-    "babel-eslint": "^6.0.4",
-    "babel-loader": "^6.2.1",
-    "babel-plugin-syntax-flow": "^6.3.13",
-    "babel-plugin-transform-flow-strip-types": "^6.4.0",
-    "babel-preset-es2015": "^6.3.13",
-    "babel-preset-stage-1": "^6.3.13",
-    "babel-register": "^6.3.13",
-    "coveralls": "^2.11.9",
     "doctoc": "^0.15.0",
     "ejs": "^2.3.4",
-    "eslint": "^2.9.0",
+    "eslint": "^6.5.1",
     "eventemitter2": "^0.4.14",
-    "gulp": "^3.8.10",
-    "gulp-bump": "^0.1.13",
-    "gulp-rename": "^1.2.0",
-    "gulp-uglify": "^1.1.0",
-    "http-server": "^0.8.5",
-    "istanbul": "^1.1.0-alpha.1",
-    "jayson": "^1.2.2",
+    "gulp": "^4.0.2",
     "json-loader": "^0.5.2",
     "json-schema-to-markdown-table": "^0.4.0",
-    "mocha": "^2.1.0",
-    "mocha-in-sauce": "^0.0.1",
+    "mocha": "6.2.0",
     "mocha-junit-reporter": "^1.9.1",
     "null-loader": "^0.1.1",
-    "webpack": "^1.5.3",
-    "yargs": "^1.3.1"
+    "nyc": "^14.1.1",
+    "source-map-support": "0.5.12",
+    "ts-loader": "^3.2.0",
+    "ts-node": "8.0.3",
+    "typescript": "^3.6.4",
+    "uglifyjs-webpack-plugin": "^1.1.4",
+    "webpack": "3.12.0"
   },
   "scripts": {
     "build": "gulp",
     "doctoc": "doctoc docs/index.md --title '# RippleAPI Reference' --github --maxlevel 2",
     "docgen": "node --harmony scripts/build_docs.js",
-    "clean": "rm -rf dist/npm && rm -rf build/flow",
-    "typecheck": "babel --optional runtime --blacklist flow -d build/flow/ src/ && flow check",
-    "compile": "babel -D --optional runtime -d dist/npm/ src/",
-    "watch": "babel -w -D --optional runtime -d dist/npm/ src/",
-    "compile-with-source-maps": "babel -D --optional runtime -s -t -d dist/npm/ src/",
-    "prepublish": "npm run clean && npm run compile",
-    "test": "babel-node ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha",
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "lint": "if ! [ -f eslintrc ]; then curl -o eslintrc 'https://raw.githubusercontent.com/ripple/javascript-style-guide/es6/eslintrc'; echo 'parser: babel-eslint' >> eslintrc; fi; eslint -c eslintrc src/",
+    "clean": "rm -rf dist/npm",
+    "compile": "mkdir -p dist/npm/common && cp -r src/common/schemas dist/npm/common/ && tsc --build",
+    "watch": "tsc -w",
+    "prepublish": "npm run clean && npm run compile && npm run build",
+    "test": "TS_NODE_PROJECT=src/tsconfig.json nyc mocha --exit",
+    "lint": "eslint src/**/*.ts 'test/*-test.{ts,js}'",
     "perf": "./scripts/perf_test.sh",
-    "start": "babel-node scripts/http.js",
-    "sauce": "babel-node scripts/sauce-runner.js"
+    "start": "node scripts/http.js"
   },
   "repository": {
     "type": "git",
@@ -83,6 +72,6 @@
   },
   "readmeFilename": "README.md",
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=6.12.3"
   }
 }

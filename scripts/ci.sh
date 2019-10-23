@@ -7,29 +7,19 @@ function checkEOL {
   ./scripts/checkeol.sh
 }
 
-typecheck() {
-  npm install -g flow-bin
-  flow --version
-  npm run typecheck
-}
-
 lint() {
-  echo "eslint $(node_modules/.bin/eslint --version)"
-  npm list babel-eslint
-  REPO_URL="https://raw.githubusercontent.com/ripple/javascript-style-guide"
-  curl "$REPO_URL/es6/eslintrc" > ./eslintrc
-  echo "parser: babel-eslint" >> ./eslintrc
-  node_modules/.bin/eslint -c ./eslintrc $(git --no-pager diff --name-only -M100% --diff-filter=AM --relative $(git merge-base FETCH_HEAD origin/HEAD) FETCH_HEAD | grep "\.js$")
+  echo "tslint $(node_modules/.bin/tslint --version)"
+  yarn lint
 }
 
 unittest() {
   # test "src"
   mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/test-results.xml
-  npm test --coverage
-  npm run coveralls
+  yarn test --coverage
+  #yarn run coveralls
 
   # test compiled version in "dist/npm"
-  babel -D --optional runtime --ignore "**/node_modules/**" -d test-compiled/ test/
+  $(npm bin)/babel -D --optional runtime --ignore "**/node_modules/**" -d test-compiled/ test/
   echo "--reporter spec --timeout 5000 --slow 500" > test-compiled/mocha.opts
   mkdir -p test-compiled/node_modules
   ln -nfs ../../dist/npm test-compiled/node_modules/ripple-api
@@ -46,7 +36,7 @@ unittest() {
 
   #echo "Running tests in SauceLabs"
   #http-server &
-  #npm run sauce
+  #yarn run sauce
 
   #pkill -f mocked-server.js
   #pkill -f http-server
@@ -55,7 +45,6 @@ unittest() {
 
 integrationtest() {
   mocha test/integration/integration-test.js
-  mocha test/integration/http-integration-test.js
 
   # run integration tests in PhantomJS
   #gulp build-tests build-min
@@ -65,7 +54,7 @@ integrationtest() {
 
 doctest() {
   mv docs/index.md docs/index.md.save
-  npm run docgen
+  yarn run docgen
   mv docs/index.md docs/index.md.test
   mv docs/index.md.save docs/index.md
   cmp docs/index.md docs/index.md.test

@@ -1,0 +1,30 @@
+## prepareCheckCreate
+
+`prepareCheckCreate(address: string, checkCreate: object, instructions: object): Promise<object>`
+
+Prepare a Check creation transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+### Parameters
+
+<%- renderSchema('input/prepare-check-create.json') %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare*" methods have the same return type.
+</aside>
+
+<%- renderSchema('output/prepare.json') %>
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+const checkCreate = <%- importFile('test/fixtures/requests/prepare-check-create.json') %>;
+return api.prepareCheckCreate(address, checkCreate).then(prepared =>
+  {/* ... */});
+```
+
+<%- renderFixture('responses/prepare-check-create.json') %>

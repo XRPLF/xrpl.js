@@ -1,0 +1,18 @@
+{
+  "signers": {
+    "weights": [
+      {
+        "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+        "weight": 1
+      },
+      {
+        "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+        "weight": 1
+      },
+      {
+        "address": "rwBYyfufTzk77zUSKEu4MvixfarC35av1J",
+        "weight": 1
+      }
+    ]
+  }
+}

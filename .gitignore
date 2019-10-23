@@ -1,5 +1,9 @@
 # .gitignore
 
+# Ignore package locks other than Yarn.
+package-lock.json
+npm-shrinkwrap.json
+
 # Ignore vim swap files.
 *.swp
 
@@ -51,13 +55,16 @@ test/config.js
 # Ignore npm-debug
 npm-debug.log
 
-# Ignore dist folder, build for bower
+# Ignore dist folder, built from tsc
 dist/
 
-# Ignore flow output directory
-out/
+# TypeScript incremental compilation cache
+*.tsbuildinfo
 
 # Ignore perf test cache
 scripts/cache
 
-eslintrc
+.eslintrc
+
+# nyc (istanbul)
+.nyc_output
