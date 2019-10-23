@@ -286,13 +286,10 @@ class Connection extends EventEmitter {
 
   connect(): Promise<void> {
     this._clearReconnectTimer()
-    let connectFinished = false
-    const promise = new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        if (!connectFinished) {
+    return new Promise<void>((resolve, reject) => {
+      let connectTimeout = setTimeout(() => {
           reject(`Error: connect() timed out after ${this._connectionTimeout} ms. ` +
           `If your internet connection is working, the rippled server may be blocked or inaccessible.`)
-        }
       }, this._connectionTimeout)
       if (!this._url) {
         reject(new ConnectionError(
@@ -322,21 +319,11 @@ class Connection extends EventEmitter {
           resolve, reject)
         this._ws.once('close', this._onUnexpectedCloseBound)
         this._ws.once('open', () => {
-          if (connectFinished) {
-            this._ws.close()
-          } else {
-            connectFinished = true
-            return this._onOpen().then(resolve, reject)
-          }
+          clearTimeout(connectTimeout);
+          return this._onOpen().then(resolve, reject)
         })
       }
-    })
-    promise.then(() => {
-      connectFinished = true
-    }, () => {
-      connectFinished = true
-    })
-    return promise
+    });
   }
 
   disconnect(): Promise<void> {
