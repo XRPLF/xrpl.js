@@ -287,9 +287,9 @@ class Connection extends EventEmitter {
   connect(): Promise<void> {
     this._clearReconnectTimer()
     return new Promise<void>((resolve, reject) => {
-      let connectTimeout = setTimeout(() => {
-          reject(`Error: connect() timed out after ${this._connectionTimeout} ms. ` +
-          `If your internet connection is working, the rippled server may be blocked or inaccessible.`)
+      const connectTimeout = setTimeout(() => {
+          reject(new ConnectionError(`Error: connect() timed out after ${this._connectionTimeout} ms. ` +
+          `If your internet connection is working, the rippled server may be blocked or inaccessible.`))
       }, this._connectionTimeout)
       if (!this._url) {
         reject(new ConnectionError(
