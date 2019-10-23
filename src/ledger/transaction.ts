@@ -30,8 +30,12 @@ function attachTransactionDate(connection: Connection, tx: any
 
   if (!ledgerVersion) {
     return new Promise(() => {
-      throw new errors.NotFoundError(
-        'ledger_index and LedgerSequence not found in tx')
+      const error = new errors.NotFoundError(
+        'Transaction has not been validated yet; try again later')
+      error.data = {
+        details: '(ledger_index and LedgerSequence not found in tx)'
+      }
+      throw error
     })
   }
 
