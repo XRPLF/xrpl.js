@@ -1,18 +1,19 @@
-import keypairs = require('ripple-keypairs')
+import keypairs from 'ripple-keypairs'
 import * as common from '../common'
 const {errors, validate} = common
 
-function generateAddress(options?: Object): Object {
-  const secret = keypairs.generateSeed(options)
-  const keypair = keypairs.deriveKeypair(secret)
-  const address = keypairs.deriveAddress(keypair.publicKey)
-  return {secret, address}
+export type GeneratedAddress = {
+  secret: string,
+  address: string
 }
 
-function generateAddressAPI(options?: Object): Object {
+function generateAddressAPI(options?: any): GeneratedAddress {
   validate.generateAddress({options})
   try {
-    return generateAddress(options)
+    const secret = keypairs.generateSeed(options)
+    const keypair = keypairs.deriveKeypair(secret)
+    const address = keypairs.deriveAddress(keypair.publicKey)
+    return {secret, address}
   } catch (error) {
     throw new errors.UnexpectedError(error.message)
   }

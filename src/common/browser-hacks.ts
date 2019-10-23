@@ -6,9 +6,9 @@ function setPrototypeOf(object, prototype) {
     object.__proto__ = prototype
 }
 
-function getConstructorName(object: Object): string {
+function getConstructorName(object: object): string {
   if (object.constructor.name) {
-  return object.constructor.name
+    return object.constructor.name
   }
   // try to guess it on legacy browsers (ie)
   const constructorString = object.constructor.toString()

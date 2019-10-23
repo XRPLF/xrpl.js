@@ -1,9 +1,9 @@
-import * as _ from 'lodash'
 import * as utils from './utils'
 const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare} from './types'
 import {Memo} from '../common/types/objects'
+import {RippleAPI} from '..'
 
 export type EscrowExecution = {
   owner: string,
@@ -15,7 +15,7 @@ export type EscrowExecution = {
 
 function createEscrowExecutionTransaction(account: string,
   payment: EscrowExecution
-): Object {
+): utils.TransactionJSON {
   const txJSON: any = {
     TransactionType: 'EscrowFinish',
     Account: account,
@@ -35,20 +35,24 @@ function createEscrowExecutionTransaction(account: string,
     txJSON.Fulfillment = payment.fulfillment
   }
   if (payment.memos !== undefined) {
-    txJSON.Memos = _.map(payment.memos, utils.convertMemo)
+    txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
   return txJSON
 }
 
-function prepareEscrowExecution(address: string,
+function prepareEscrowExecution(this: RippleAPI, address: string,
   escrowExecution: EscrowExecution,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareEscrowExecution(
-    {address, escrowExecution, instructions})
-  const txJSON = createEscrowExecutionTransaction(
-    address, escrowExecution)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareEscrowExecution(
+      {address, escrowExecution, instructions})
+    const txJSON = createEscrowExecutionTransaction(
+      address, escrowExecution)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareEscrowExecution

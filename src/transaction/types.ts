@@ -7,11 +7,17 @@ import {
   Memo,
   FormattedSettings
 } from '../common/types/objects'
-import {ApiMemo} from './utils'
+import {
+  ApiMemo,
+  TransactionJSON
+} from './utils'
+
+export type TransactionJSON = TransactionJSON
 
 export type Instructions = {
   sequence?: number,
   fee?: string,
+  // @deprecated
   maxFee?: string,
   maxLedgerVersion?: number,
   maxLedgerVersionOffset?: number,
@@ -21,10 +27,10 @@ export type Instructions = {
 export type Prepare = {
   txJSON: string,
   instructions: {
-   fee: string,
-   sequence: number,
-   maxLedgerVersion?: number
- }
+    fee: string,
+    sequence: number,
+    maxLedgerVersion?: number
+  }
 }
 
 export type Submit = {
@@ -33,10 +39,10 @@ export type Submit = {
   engineResultCode: number,
   engineResultMessage?: string,
   txBlob?: string,
-  txJson?: Object
+  txJson?: object
 }
 
-export interface OfferCreateTransaction {
+export interface OfferCreateTransaction extends TransactionJSON {
   TransactionType: 'OfferCreate',
   Account: string,
   Fee: string,
@@ -47,7 +53,20 @@ export interface OfferCreateTransaction {
   TakerPays: RippledAmount,
   Expiration?: number,
   OfferSequence?: number,
-  Memos: {Memo: ApiMemo}[]
+  Memos?: {Memo: ApiMemo}[]
+}
+
+export interface SettingsTransaction extends TransactionJSON {
+  TransferRate?: number
+}
+
+export type KeyPair = {
+  publicKey: string,
+  privateKey: string
+}
+
+export type SignOptions = {
+  signAs: string
 }
 
 export type Outcome = {
@@ -56,13 +75,18 @@ export type Outcome = {
   indexInLedger: number,
   fee: string,
   balanceChanges: {
-    [key: string]: [{
+    [key: string]: {
      currency: string,
      counterparty?: string,
      value: string
-    }]
+    }[]
   },
-  orderbookChanges: Object,
+  orderbookChanges: object,
+  deliveredAmount?: {
+    currency: string,
+    counterparty?: string,
+    value: string
+  },
   timestamp?: string
 }
 

@@ -1,13 +1,13 @@
 import * as _ from 'lodash'
-import binary = require('ripple-binary-codec')
+import binary from 'ripple-binary-codec'
 import * as utils from './utils'
 import BigNumber from 'bignumber.js'
 import {decodeAddress} from 'ripple-address-codec'
 import {validate} from '../common'
-import {computeBinaryTransactionHash} from 'ripple-hashes'
+import {computeBinaryTransactionHash} from '../common/hashes'
 
 function addressToBigNumber(address) {
-  const hex = (new Buffer(decodeAddress(address))).toString('hex')
+  const hex = (Buffer.from(decodeAddress(address))).toString('hex')
   return new BigNumber(hex, 16)
 }
 
@@ -16,7 +16,7 @@ function compareSigners(a, b) {
     .comparedTo(addressToBigNumber(b.Signer.Account))
 }
 
-function combine(signedTransactions: Array<string>): Object {
+function combine(signedTransactions: Array<string>): object {
   validate.combine({signedTransactions})
 
   // TODO: signedTransactions is an array of strings in the documentation, but

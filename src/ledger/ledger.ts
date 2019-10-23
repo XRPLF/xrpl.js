@@ -1,8 +1,9 @@
 import {validate} from '../common'
 import {FormattedLedger, parseLedger} from './parse/ledger'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 
 export type GetLedgerOptions = {
+  ledgerHash?: string,
   ledgerVersion?: number,
   includeAllData?: boolean,
   includeTransactions?: boolean,
@@ -15,7 +16,8 @@ async function getLedger(
   // 1. Validate
   validate.getLedger({options})
   // 2. Make Request
-  const response = await this._request('ledger', {
+  const response = await this.request('ledger', {
+    ledger_hash: options.ledgerHash,
     ledger_index: options.ledgerVersion || 'validated',
     expand: options.includeAllData,
     transactions: options.includeTransactions,
@@ -24,6 +26,5 @@ async function getLedger(
   // 3. Return Formatted Response
   return parseLedger(response.ledger)
 }
-
 
 export default getLedger

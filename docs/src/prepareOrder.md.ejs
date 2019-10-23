@@ -1,6 +1,6 @@
 ## prepareOrder
 
-`prepareOrder(address: string, order: Object, instructions: Object): Promise<Object>`
+`prepareOrder(address: string, order: object, instructions: object): Promise<object>`
 
 Prepare an order transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -22,6 +22,8 @@ All "prepare*" methods have the same return type.
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+
+// Buy 10.10 USD (of the specified issuer) for 2.0 XRP (2000000 drops), fill or kill.
 const order = <%- importFile('test/fixtures/requests/prepare-order.json') %>;
 return api.prepareOrder(address, order)
   .then(prepared => {/* ... */});

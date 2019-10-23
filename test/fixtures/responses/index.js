@@ -7,6 +7,7 @@ function buildList(options) {
 module.exports = {
   generateAddress: require('./generate-address.json'),
   getAccountInfo: require('./get-account-info.json'),
+  getAccountObjects: require('./get-account-objects.json'),
   getBalances: require('./get-balances.json'),
   getBalanceSheet: require('./get-balance-sheet.json'),
   getOrderbook: {
@@ -34,6 +35,7 @@ module.exports = {
     orderSell: require('./get-transaction-order-sell.json'),
     noMeta: require('./get-transaction-no-meta.json'),
     payment: require('./get-transaction-payment.json'),
+    paymentIncludeRawTransaction: require('./get-transaction-payment-include-raw-transaction.json'),
     settings: require('./get-transaction-settings.json'),
     trustline: require('./get-transaction-trustline-set.json'),
     trackingOn: require('./get-transaction-settings-tracking-on.json'),
@@ -41,6 +43,7 @@ module.exports = {
     setRegularKey: require('./get-transaction-settings-set-regular-key.json'),
     trustlineFrozenOff: require('./get-transaction-trust-set-frozen-off.json'),
     trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
+    trustlineAddMemo: require('./get-transaction-trust-add-memo.json'),
     notValidated: require('./get-transaction-not-validated.json'),
     checkCreate:
       require('./get-transaction-check-create.json'),
@@ -67,6 +70,7 @@ module.exports = {
   },
   getTransactions: {
     normal: require('./get-transactions.json'),
+    includeRawTransactions: require('./get-transactions-include-raw-transactions.json'),
     one: require('./get-transactions-one.json')
   },
   getTrustlines: {
@@ -79,6 +83,7 @@ module.exports = {
   },
   getLedger: {
     header: require('./get-ledger'),
+    headerByHash: require('./get-ledger-by-hash'),
     full: require('./get-ledger-full'),
     withSettingsTx: require('./get-ledger-with-settings-tx'),
     withStateAsHashes: require('./get-ledger-with-state-as-hashes'),
@@ -117,7 +122,9 @@ module.exports = {
     noInstructions: require('./prepare-settings-no-instructions.json'),
     signed: require('./prepare-settings-signed.json'),
     noMaxLedgerVersion: require('./prepare-settings-no-maxledgerversion.json'),
-    signers: require('./prepare-settings-signers.json')
+    signers: require('./prepare-settings-signers.json'),
+    noSignerList: require('./prepare-settings-no-signer-list.json'),
+    noWeights: require('./prepare-settings-no-weight.json')
   },
   prepareCheckCreate: {
     normal: require('./prepare-check-create'),

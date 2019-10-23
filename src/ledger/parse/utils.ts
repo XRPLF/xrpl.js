@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import transactionParser = require('ripple-lib-transactionparser')
+import transactionParser from 'ripple-lib-transactionparser'
 import BigNumber from 'bignumber.js'
 import * as common from '../../common'
 import parseAmount from './amount'
@@ -103,6 +103,8 @@ function parseOutcome(tx: any): any|undefined {
   }
   const balanceChanges = transactionParser.parseBalanceChanges(metadata)
   const orderbookChanges = transactionParser.parseOrderbookChanges(metadata)
+  const channelChanges = transactionParser.parseChannelChanges(metadata)
+
   removeEmptyCounterpartyInBalanceChanges(balanceChanges)
   removeEmptyCounterpartyInOrderbookChanges(orderbookChanges)
 
@@ -112,6 +114,7 @@ function parseOutcome(tx: any): any|undefined {
     fee: common.dropsToXrp(tx.Fee),
     balanceChanges: balanceChanges,
     orderbookChanges: orderbookChanges,
+    channelChanges: channelChanges,
     ledgerVersion: tx.ledger_index,
     indexInLedger: tx.meta.TransactionIndex,
     deliveredAmount: parseDeliveredAmount(tx)
@@ -119,7 +122,7 @@ function parseOutcome(tx: any): any|undefined {
 }
 
 function hexToString(hex: string): string|undefined {
-  return hex ? new Buffer(hex, 'hex').toString('utf-8') : undefined
+  return hex ? Buffer.from(hex, 'hex').toString('utf-8') : undefined
 }
 
 function parseMemos(tx: any): Array<Memo>|undefined {

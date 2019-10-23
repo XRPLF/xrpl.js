@@ -1,28 +1,32 @@
-import * as _ from 'lodash'
 import * as utils from './utils'
 const validate = utils.common.validate
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
+import {RippleAPI} from '..'
 
 function createOrderCancellationTransaction(account: string,
   orderCancellation: any
-): Object {
+): TransactionJSON {
   const txJSON: any = {
     TransactionType: 'OfferCancel',
     Account: account,
     OfferSequence: orderCancellation.orderSequence
   }
   if (orderCancellation.memos !== undefined) {
-    txJSON.Memos = _.map(orderCancellation.memos, utils.convertMemo)
+    txJSON.Memos = orderCancellation.memos.map(utils.convertMemo)
   }
   return txJSON
 }
 
-function prepareOrderCancellation(address: string, orderCancellation: Object,
+function prepareOrderCancellation(this: RippleAPI, address: string, orderCancellation: object,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareOrderCancellation({address, orderCancellation, instructions})
-  const txJSON = createOrderCancellationTransaction(address, orderCancellation)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareOrderCancellation({address, orderCancellation, instructions})
+    const txJSON = createOrderCancellationTransaction(address, orderCancellation)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareOrderCancellation

@@ -13,7 +13,7 @@
     },
     "disableMasterKey": {
       "type": "boolean",
-      "description": "Disallows use of the master key to sign transactions for this account."
+      "description": "Disallows use of the master key to sign transactions for this account. To disable the master key, you must authorize the transaction by signing it with the master key pair. You cannot use a regular key pair or a multi-signature. You can re-enable the master key pair using a regular key pair or multi-signature. See [AccountSet](https://developers.ripple.com/accountset.html)."
     },
     "disallowIncomingXRP": {
       "type": "boolean",
@@ -93,7 +93,9 @@
           "minItems": 1,
           "maxItems": 8
         }
-      }
+      },
+      "required": ["threshold"],
+      "additionalProperties": false
     },
     "transferRate": {
       "description": " The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.",

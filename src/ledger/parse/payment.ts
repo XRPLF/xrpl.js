@@ -17,8 +17,9 @@ function removeGenericCounterparty(amount, address) {
     _.omit(amount, 'counterparty') : amount
 }
 
-function parsePayment(tx: any): Object {
-  assert(tx.TransactionType === 'Payment')
+// Payment specification
+function parsePayment(tx: any): object {
+  assert.ok(tx.TransactionType === 'Payment')
 
   const source = {
     address: tx.Account,
@@ -27,10 +28,13 @@ function parsePayment(tx: any): Object {
     tag: tx.SourceTag
   }
 
-  const destination = {
+  const destination: {
+    address: string,
+    tag: number | undefined
+  } = {
     address: tx.Destination,
-    amount: removeGenericCounterparty(parseAmount(tx.Amount), tx.Destination),
     tag: tx.DestinationTag
+    // Notice that `amount` is omitted to prevent misinterpretation
   }
 
   return removeUndefined({

@@ -3,7 +3,7 @@ import {
   FormattedPaymentChannel
 } from './parse/payment-channel'
 import {validate, errors} from '../common'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 import {LedgerEntryResponse} from '../common/types/commands'
 const NotFoundError = errors.NotFoundError
 
@@ -23,7 +23,7 @@ async function getPaymentChannel(
   // 1. Validate
   validate.getPaymentChannel({id})
   // 2. Make Request
-  const response = await this._request('ledger_entry', {
+  const response = await this.request('ledger_entry', {
     index: id,
     binary: false,
     ledger_index: 'validated'

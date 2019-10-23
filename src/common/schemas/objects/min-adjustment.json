@@ -5,11 +5,11 @@
   "properties": {
     "address": {
       "$ref": "address",
-      "description": "The address to send to."
+      "description": "An address representing the destination of the transaction."
     },
     "minAmount": {
       "$ref": "laxAmount",
-      "description": "The minimum amount to be delivered. (This field is exclusive with destination.amount)"
+      "description": "The minimum amount to be delivered. (This field cannot be used with destination.amount)"
     },
     "tag": {"$ref": "tag"}
   },

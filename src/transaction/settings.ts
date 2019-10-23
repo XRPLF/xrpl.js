@@ -1,19 +1,16 @@
-import * as _ from 'lodash'
 import * as assert from 'assert'
 import BigNumber from 'bignumber.js'
 import * as utils from './utils'
 const validate = utils.common.validate
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices
 const AccountFields = utils.common.constants.AccountFields
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, SettingsTransaction} from './types'
 import {FormattedSettings, WeightedSigner} from '../common/types/objects'
+import {RippleAPI} from '..'
 
-// Emptry string passed to setting will clear it
-const CLEAR_SETTING = null
-
-function setTransactionFlags(txJSON: any, values: FormattedSettings) {
+function setTransactionFlags(txJSON: utils.TransactionJSON, values: FormattedSettings) {
   const keys = Object.keys(values)
-  assert(keys.length === 1, 'ERROR: can only set one setting per transaction')
+  assert.ok(keys.length === 1, 'ERROR: can only set one setting per transaction')
   const flagName = keys[0]
   const value = values[flagName]
   const index = AccountFlagIndices[flagName]
@@ -26,7 +23,8 @@ function setTransactionFlags(txJSON: any, values: FormattedSettings) {
   }
 }
 
-function setTransactionFields(txJSON: Object, input: FormattedSettings) {
+// Sets `null` fields to their `default`.
+function setTransactionFields(txJSON: utils.TransactionJSON, input: FormattedSettings) {
   const fieldSchema = AccountFields
   for (const fieldName in fieldSchema) {
     const field = fieldSchema[fieldName]
@@ -37,13 +35,13 @@ function setTransactionFields(txJSON: Object, input: FormattedSettings) {
     }
 
     // The value required to clear an account root field varies
-    if (value === CLEAR_SETTING && field.hasOwnProperty('defaults')) {
+    if (value === null && field.hasOwnProperty('defaults')) {
       value = field.defaults
     }
 
     if (field.encoding === 'hex' && !field.length) {
       // This is currently only used for Domain field
-      value = new Buffer(value, 'ascii').toString('hex').toUpperCase()
+      value = Buffer.from(value, 'ascii').toString('hex').toUpperCase()
     }
 
     txJSON[fieldName] = value
@@ -63,11 +61,11 @@ function setTransactionFields(txJSON: Object, input: FormattedSettings) {
  *                           are returned
  */
 
-function convertTransferRate(transferRate: number | string): number | string {
+function convertTransferRate(transferRate: number): number {
   return (new BigNumber(transferRate)).shift(9).toNumber()
 }
 
-function formatSignerEntry(signer: WeightedSigner): Object {
+function formatSignerEntry(signer: WeightedSigner): object {
   return {
     SignerEntry: {
       Account: signer.address,
@@ -78,7 +76,7 @@ function formatSignerEntry(signer: WeightedSigner): Object {
 
 function createSettingsTransactionWithoutMemos(
   account: string, settings: FormattedSettings
-): any {
+): SettingsTransaction {
   if (settings.regularKey !== undefined) {
     const removeRegularKey = {
       TransactionType: 'SetRegularKey',
@@ -87,25 +85,32 @@ function createSettingsTransactionWithoutMemos(
     if (settings.regularKey === null) {
       return removeRegularKey
     }
-    return _.assign({}, removeRegularKey, {RegularKey: settings.regularKey})
+    return Object.assign({}, removeRegularKey, {RegularKey: settings.regularKey})
   }
 
   if (settings.signers !== undefined) {
-    return {
+    const setSignerList = {
       TransactionType: 'SignerListSet',
       Account: account,
-      SignerQuorum: settings.signers.threshold,
-      SignerEntries: _.map(settings.signers.weights, formatSignerEntry)
+      SignerEntries: [],
+      SignerQuorum: settings.signers.threshold
+    };
+
+    if (settings.signers.weights !== undefined) {
+        setSignerList.SignerEntries = settings.signers.weights.map(formatSignerEntry);
     }
+    return setSignerList;
   }
 
-  const txJSON: any = {
+  const txJSON: SettingsTransaction = {
     TransactionType: 'AccountSet',
     Account: account
   }
 
-  setTransactionFlags(txJSON, _.omit(settings, 'memos'))
-  setTransactionFields(txJSON, settings)
+  const settingsWithoutMemos = Object.assign({}, settings)
+  delete settingsWithoutMemos.memos
+  setTransactionFlags(txJSON, settingsWithoutMemos)
+  setTransactionFields(txJSON, settings) // Sets `null` fields to their `default`.
 
   if (txJSON.TransferRate !== undefined) {
     txJSON.TransferRate = convertTransferRate(txJSON.TransferRate)
@@ -114,20 +119,24 @@ function createSettingsTransactionWithoutMemos(
 }
 
 function createSettingsTransaction(account: string, settings: FormattedSettings
-): Object {
+): SettingsTransaction {
   const txJSON = createSettingsTransactionWithoutMemos(account, settings)
   if (settings.memos !== undefined) {
-    txJSON.Memos = _.map(settings.memos, utils.convertMemo)
+    txJSON.Memos = settings.memos.map(utils.convertMemo)
   }
   return txJSON
 }
 
-function prepareSettings(address: string, settings: FormattedSettings,
+function prepareSettings(this: RippleAPI, address: string, settings: FormattedSettings,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareSettings({address, settings, instructions})
-  const txJSON = createSettingsTransaction(address, settings)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareSettings({address, settings, instructions})
+    const txJSON = createSettingsTransaction(address, settings)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareSettings

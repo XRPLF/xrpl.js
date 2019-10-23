@@ -1,17 +1,11 @@
 import * as _ from 'lodash'
 import {EventEmitter} from 'events'
 import {parse as parseUrl} from 'url'
-import * as WebSocket from 'ws'
+import WebSocket from 'ws'
 import RangeSet from './rangeset'
 import {RippledError, DisconnectedError, NotConnectedError,
   TimeoutError, ResponseFormatError, ConnectionError,
   RippledNotInitializedError} from './errors'
-
-function isStreamMessageType(type) {
-  return type === 'ledgerClosed' ||
-         type === 'transaction' ||
-         type === 'path_find'
-}
 
 export interface ConnectionOptions {
   trace?: boolean,
@@ -90,19 +84,20 @@ class Connection extends EventEmitter {
     const data = JSON.parse(message)
     if (data.type === 'response') {
       if (!(Number.isInteger(data.id) && data.id >= 0)) {
-        throw new ResponseFormatError('valid id not found in response')
+        throw new ResponseFormatError('valid id not found in response', data)
       }
       return [data.id.toString(), data]
-    } else if (isStreamMessageType(data.type)) {
-      if (data.type === 'ledgerClosed') {
-        this._updateLedgerVersions(data)
-        this._updateFees(data)
-      }
-      return [data.type, data]
     } else if (data.type === undefined && data.error) {
       return ['error', data.error, data.error_message, data] // e.g. slowDown
     }
-    throw new ResponseFormatError('unrecognized message type: ' + data.type)
+
+    // Possible `data.type` values include 'ledgerClosed',
+    // 'transaction', 'path_find', and many others.
+    if (data.type === 'ledgerClosed') {
+      this._updateLedgerVersions(data)
+      this._updateFees(data)
+    }
+    return [data.type, data]
   }
 
   _onMessage(message) {
@@ -207,16 +202,10 @@ class Connection extends EventEmitter {
 
       this._updateLedgerVersions(data)
       this._updateFees(data)
-      this._rebindOnUnxpectedClose()
+      this._rebindOnUnexpectedClose()
 
       this._retry = 0
       this._ws.on('error', error => {
-        // TODO: "type" does not exist on official error type, safe to remove?
-        if (process.browser && error && (<any>error).type === 'error') {
-          // we are in browser, ignore error - `close` event will be fired
-          // after error
-          return
-        }
         this.emit('error', 'websocket', error.message, error)
       })
 
@@ -227,7 +216,7 @@ class Connection extends EventEmitter {
     })
   }
 
-  _rebindOnUnxpectedClose() {
+  _rebindOnUnexpectedClose() {
     if (this._onUnexpectedCloseBound) {
       this._ws.removeListener('close', this._onUnexpectedCloseBound)
     }
@@ -236,7 +225,7 @@ class Connection extends EventEmitter {
     this._ws.once('close', this._onUnexpectedCloseBound)
   }
 
-  _unbindOnUnxpectedClose() {
+  _unbindOnUnexpectedClose() {
     if (this._onUnexpectedCloseBound) {
       this._ws.removeListener('close', this._onUnexpectedCloseBound)
     }
@@ -245,8 +234,8 @@ class Connection extends EventEmitter {
 
   _onOpenError(reject, error) {
     this._onOpenErrorBound = null
-    this._unbindOnUnxpectedClose()
-    reject(new NotConnectedError(error && error.message))
+    this._unbindOnUnexpectedClose()
+    reject(new NotConnectedError(error.message, error))
   }
 
   _createWebSocket(): WebSocket {
@@ -273,7 +262,7 @@ class Connection extends EventEmitter {
       options.agent = new HttpsProxyAgent(proxyOptions)
     }
     if (this._authorization !== undefined) {
-      const base64 = new Buffer(this._authorization).toString('base64')
+      const base64 = Buffer.from(this._authorization).toString('base64')
       options.headers = {Authorization: `Basic ${base64}`}
     }
     const optionsOverrides = _.omitBy({
@@ -292,7 +281,7 @@ class Connection extends EventEmitter {
     return websocket
   }
 
-  connect() {
+  connect(): Promise<void> {
     this._clearReconnectTimer()
     return new Promise((resolve, reject) => {
       if (!this._url) {
@@ -327,11 +316,11 @@ class Connection extends EventEmitter {
     })
   }
 
-  disconnect() {
+  disconnect(): Promise<void> {
     return this._disconnect(true)
   }
 
-  _disconnect(calledByUser) {
+  _disconnect(calledByUser): Promise<void> {
     if (calledByUser) {
       this._clearReconnectTimer()
       this._retry = 0
@@ -404,7 +393,7 @@ class Connection extends EventEmitter {
     return new Promise((resolve, reject) => {
       this._ws.send(message, undefined, error => {
         if (error) {
-          reject(new DisconnectedError(error.message))
+          reject(new DisconnectedError(error.message, error))
         } else {
           resolve()
         }
@@ -427,7 +416,7 @@ class Connection extends EventEmitter {
       function onDisconnect() {
         clearTimeout(timer)
         self.removeAllListeners(eventName)
-        reject(new DisconnectedError())
+        reject(new DisconnectedError('websocket was closed'))
       }
 
       function cleanup() {
@@ -450,12 +439,12 @@ class Connection extends EventEmitter {
 
       this.once(eventName, response => {
         if (response.status === 'error') {
-          _reject(new RippledError(response.error))
+          _reject(new RippledError(response.error_message || response.error, response))
         } else if (response.status === 'success') {
           _resolve(response.result)
         } else {
           _reject(new ResponseFormatError(
-            'unrecognized status: ' + response.status))
+            'unrecognized status: ' + response.status, response))
         }
       })
 

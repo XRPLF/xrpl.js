@@ -24,6 +24,14 @@
     },
     "orderbookChanges": {},
     "ledgerVersion": 786309,
-    "indexInLedger": 0
+    "indexInLedger": 0,
+    "channelChanges": {
+      "status": "created",
+      "channelId": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
+      "source": "rfAuMkVuZQnQhvdMcUKg4ndBb9SPDhzNmK",
+      "destination": "rBmNDZ7vbTCwakKXsX3pDAwDdQuxM7yBRa",
+      "channelAmountDrops": "1000000",
+      "channelBalanceDrops": "0"
+    }
   }
 }

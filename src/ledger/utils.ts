@@ -4,6 +4,7 @@ import * as common from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
+import {RippleAPI} from '..' 
 
 export type RecursiveData = {
   marker: string,
@@ -13,7 +14,7 @@ export type RecursiveData = {
 export type Getter = (marker?: string, limit?: number) => Promise<RecursiveData>
 
 function clamp(value: number, min: number, max: number): number {
-  assert(min <= max, 'Illegal clamp bounds')
+  assert.ok(min <= max, 'Illegal clamp bounds')
   return Math.min(Math.max(value, min), max)
 }
 
@@ -76,7 +77,7 @@ function signum(num) {
  *  Order two rippled transactions based on their ledger_index.
  *  If two transactions took place in the same ledger, sort
  *  them based on TransactionIndex
- *  See: https://ripple.com/build/transactions/
+ *  See: https://developers.ripple.com/transaction-metadata.html
  */
 function compareTransactions(
   first: FormattedTransactionType, second: FormattedTransactionType
@@ -105,8 +106,8 @@ function isPendingLedgerVersion(connection: Connection,
     ledgerVersion < (maxLedgerVersion || 0))
 }
 
-function ensureLedgerVersion(options: any
-): Promise<Object> {
+function ensureLedgerVersion(this: RippleAPI, options: any
+): Promise<object> {
   if (Boolean(options) && options.ledgerVersion !== undefined &&
     options.ledgerVersion !== null
   ) {

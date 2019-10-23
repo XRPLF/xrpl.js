@@ -9,7 +9,7 @@
     },
     "amount": {
       "$ref": "laxAmount",
-      "description": "An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field is exclusive with source.maxAmount)"
+      "description": "An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with source.maxAmount)"
     },
     "tag": {"$ref": "tag"}
   },

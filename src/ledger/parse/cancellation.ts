@@ -1,7 +1,7 @@
 import * as assert from 'assert'
 
-function parseOrderCancellation(tx: any): Object {
-  assert(tx.TransactionType === 'OfferCancel')
+function parseOrderCancellation(tx: any): object {
+  assert.ok(tx.TransactionType === 'OfferCancel')
   return {
     orderSequence: tx.OfferSequence
   }

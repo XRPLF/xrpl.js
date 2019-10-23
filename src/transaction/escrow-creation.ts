@@ -1,9 +1,9 @@
-import * as _ from 'lodash'
 import * as utils from './utils'
 import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
 const ValidationError = utils.common.errors.ValidationError
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {Memo} from '../common/types/objects'
+import {RippleAPI} from '..'
 
 export type EscrowCreation = {
   amount: string,
@@ -18,7 +18,7 @@ export type EscrowCreation = {
 
 function createEscrowCreationTransaction(account: string,
   payment: EscrowCreation
-): Object {
+): TransactionJSON {
   const txJSON: any = {
     TransactionType: 'EscrowCreate',
     Account: account,
@@ -42,25 +42,29 @@ function createEscrowCreationTransaction(account: string,
     txJSON.DestinationTag = payment.destinationTag
   }
   if (payment.memos !== undefined) {
-    txJSON.Memos = _.map(payment.memos, utils.convertMemo)
+    txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
   if (Boolean(payment.allowCancelAfter) && Boolean(payment.allowExecuteAfter) &&
       txJSON.CancelAfter <= txJSON.FinishAfter) {
-    throw new ValidationError('"CancelAfter" must be after "FinishAfter" for'
-      + ' EscrowCreate')
+    throw new ValidationError('prepareEscrowCreation: ' +
+      '"allowCancelAfter" must be after "allowExecuteAfter"')
   }
   return txJSON
 }
 
-function prepareEscrowCreation(address: string,
+function prepareEscrowCreation(this: RippleAPI, address: string,
   escrowCreation: EscrowCreation,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareEscrowCreation(
-    {address, escrowCreation, instructions})
-  const txJSON = createEscrowCreationTransaction(
-    address, escrowCreation)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareEscrowCreation(
+      {address, escrowCreation, instructions})
+    const txJSON = createEscrowCreationTransaction(
+      address, escrowCreation)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareEscrowCreation

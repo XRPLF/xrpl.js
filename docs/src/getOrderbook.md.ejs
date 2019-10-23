@@ -1,8 +1,12 @@
 ## getOrderbook
 
-`getOrderbook(address: string, orderbook: Object, options: Object): Promise<Object>`
+`getOrderbook(address: string, orderbook: object, options: object): Promise<object>`
 
 Returns open orders for the specified account. Open orders are orders that have not yet been fully executed and are still in the order book.
+
+**Breaking change:** In ripple-lib 1.1.0 and earlier, orders returned by this method were not sorted correctly. Orders are now sorted correctly, from best to worst.
+
+**See also:** An alternative way to get orderbooks is with `request` and [`formatBidsAndAsks`](#formatbidsandasks).
 
 ### Parameters
 
@@ -13,6 +17,10 @@ Returns open orders for the specified account. Open orders are orders that have 
 This method returns a promise that resolves with an object with the following structure (Note: the structures of `bids` and `asks` are identical):
 
 <%- renderSchema('output/get-orderbook.json') %>
+
+**Raw order data:** The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
+
+For details, see the rippled method [book_offers](https://ripple.com/build/rippled-apis/#book-offers).
 
 ### Example
 

@@ -1,12 +1,12 @@
-import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import * as utils from './utils'
 const validate = utils.common.validate
 const trustlineFlags = utils.common.txFlags.TrustSet
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {
   FormattedTrustlineSpecification
 } from '../common/types/objects/trustlines'
+import {RippleAPI} from '..'
 
 function convertQuality(quality) {
   return (new BigNumber(quality)).shift(9).truncated().toNumber()
@@ -14,7 +14,7 @@ function convertQuality(quality) {
 
 function createTrustlineTransaction(account: string,
   trustline: FormattedTrustlineSpecification
-): Object {
+): TransactionJSON {
   const limit = {
     currency: trustline.currency,
     issuer: trustline.counterparty,
@@ -45,17 +45,21 @@ function createTrustlineTransaction(account: string,
       trustlineFlags.SetFreeze : trustlineFlags.ClearFreeze
   }
   if (trustline.memos !== undefined) {
-    txJSON.Memos = _.map(trustline.memos, utils.convertMemo)
+    txJSON.Memos = trustline.memos.map(utils.convertMemo)
   }
   return txJSON
 }
 
-function prepareTrustline(address: string,
+function prepareTrustline(this: RippleAPI, address: string,
   trustline: FormattedTrustlineSpecification, instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareTrustline({address, trustline, instructions})
-  const txJSON = createTrustlineTransaction(address, trustline)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareTrustline({address, trustline, instructions})
+    const txJSON = createTrustlineTransaction(address, trustline)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareTrustline

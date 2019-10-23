@@ -1,11 +1,12 @@
 import * as _ from 'lodash'
-import binary = require('ripple-binary-codec')
-const {computeTransactionHash} = require('ripple-hashes')
+import binary from 'ripple-binary-codec';
+import {computeTransactionHash} from '../common/hashes'
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
 import getTransaction from './transaction'
 import {validate, errors, Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
+import {RippleAPI} from '..'
 
 
 export type TransactionsOptions = {
@@ -18,6 +19,7 @@ export type TransactionsOptions = {
   initiated?: boolean,
   counterparty?: string,
   types?: Array<string>,
+  includeRawTransactions?: boolean,
   binary?: boolean,
   startTx?: FormattedTransactionType
 }
@@ -35,11 +37,11 @@ function parseBinaryTransaction(transaction) {
   }
 }
 
-function parseAccountTxTransaction(tx) {
+function parseAccountTxTransaction(tx, includeRawTransaction: boolean) {
   const _tx = tx.tx_blob ? parseBinaryTransaction(tx) : tx
   // rippled uses a different response format for 'account_tx' than 'tx'
   return parseTransaction(_.assign({}, _tx.tx,
-    {meta: _tx.meta, validated: _tx.validated}))
+    {meta: _tx.meta, validated: _tx.validated}), includeRawTransaction)
 }
 
 function counterpartyFilter(filters, tx: FormattedTransactionType) {
@@ -87,11 +89,13 @@ function orderFilter(
 function formatPartialResponse(address: string,
   options: TransactionsOptions, data
 ) {
+  const parse = tx =>
+    parseAccountTxTransaction(tx, options.includeRawTransactions)
   return {
     marker: data.marker,
     results: data.transactions
       .filter(tx => tx.validated)
-      .map(parseAccountTxTransaction)
+      .map(parse)
       .filter(_.partial(transactionFilter, address, options))
       .filter(_.partial(orderFilter, options))
   }
@@ -159,7 +163,7 @@ function getTransactionsInternal(connection: Connection, address: string,
   return utils.getRecursive(getter, options.limit).then(format)
 }
 
-function getTransactions(address: string, options: TransactionsOptions = {}
+function getTransactions(this: RippleAPI, address: string, options: TransactionsOptions = {}
 ): Promise<GetTransactionsResponse> {
   validate.getTransactions({address, options})
 

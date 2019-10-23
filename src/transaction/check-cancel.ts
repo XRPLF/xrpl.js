@@ -1,14 +1,15 @@
-import * as utils from './utils'
+import {TransactionJSON, prepareTransaction} from './utils'
 import {validate} from '../common'
 import {Instructions, Prepare} from './types'
+import {RippleAPI} from '..'
 
-export type CheckCancel = {
+export type CheckCancelParameters = {
   checkID: string
 }
 
 function createCheckCancelTransaction(account: string,
-  cancel: CheckCancel
-): object {
+  cancel: CheckCancelParameters
+): TransactionJSON {
   const txJSON = {
     Account: account,
     TransactionType: 'CheckCancel',
@@ -18,15 +19,19 @@ function createCheckCancelTransaction(account: string,
   return txJSON
 }
 
-function prepareCheckCancel(address: string,
-  checkCancel: CheckCancel,
+function prepareCheckCancel(this: RippleAPI, address: string,
+  checkCancel: CheckCancelParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareCheckCancel(
-    {address, checkCancel, instructions})
-  const txJSON = createCheckCancelTransaction(
-    address, checkCancel)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareCheckCancel(
+      {address, checkCancel, instructions})
+    const txJSON = createCheckCancelTransaction(
+      address, checkCancel)
+    return prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareCheckCancel

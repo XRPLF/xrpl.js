@@ -4,10 +4,13 @@ import parseTransaction from './parse/transaction'
 import {validate, errors} from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
+import {RippledError} from '../common/errors'
+import {RippleAPI} from '..'
 
 export type TransactionOptions = {
   minLedgerVersion?: number,
-  maxLedgerVersion?: number
+  maxLedgerVersion?: number,
+  includeRawTransaction?: boolean
 }
 type TransactionResponse = FormattedTransactionType & {
     hash: string,
@@ -18,7 +21,7 @@ type TransactionResponse = FormattedTransactionType & {
 
 
 function attachTransactionDate(connection: Connection, tx: any
-): Promise<FormattedTransactionType> {
+): Promise<TransactionResponse> {
   if (tx.date) {
     return Promise.resolve(tx)
   }
@@ -27,8 +30,12 @@ function attachTransactionDate(connection: Connection, tx: any
 
   if (!ledgerVersion) {
     return new Promise(() => {
-      throw new errors.NotFoundError(
-        'ledger_index and LedgerSequence not found in tx')
+      const error = new errors.NotFoundError(
+        'Transaction has not been validated yet; try again later')
+      error.data = {
+        details: '(ledger_index and LedgerSequence not found in tx)'
+      }
+      throw error
     })
   }
 
@@ -58,10 +65,16 @@ function isTransactionInRange(tx: any, options: TransactionOptions) {
 }
 
 function convertError(connection: Connection, options: TransactionOptions,
-  error: Error
+  error: RippledError
 ): Promise<Error> {
-  const _error = (error.message === 'txnNotFound') ?
-    new errors.NotFoundError('Transaction not found') : error
+  let shouldUseNotFoundError = false
+  if ((error.data && error.data.error === 'txnNotFound') || error.message === 'txnNotFound') {
+    shouldUseNotFoundError = true
+  }
+
+  // In the future, we should deprecate this error, instead passing through the one from rippled.
+  const _error = shouldUseNotFoundError ? new errors.NotFoundError('Transaction not found') : error
+
   if (_error instanceof errors.NotFoundError) {
     return utils.hasCompleteLedgerRange(connection, options.minLedgerVersion,
       options.maxLedgerVersion).then(hasCompleteLedgerRange => {
@@ -83,31 +96,25 @@ function convertError(connection: Connection, options: TransactionOptions,
 function formatResponse(options: TransactionOptions, tx: TransactionResponse
 ): FormattedTransactionType {
   if (tx.validated !== true || !isTransactionInRange(tx, options)) {
-  throw new errors.NotFoundError('Transaction not found')
+    throw new errors.NotFoundError('Transaction not found')
   }
-  return parseTransaction(tx)
+  return parseTransaction(tx, options.includeRawTransaction)
 }
 
-function getTransaction(id: string, options: TransactionOptions = {}
+async function getTransaction(this: RippleAPI, id: string, options: TransactionOptions = {}
 ): Promise<FormattedTransactionType> {
   validate.getTransaction({id, options})
-
-  const request = {
-    command: 'tx',
-    transaction: id,
-    binary: false
+  const _options = await utils.ensureLedgerVersion.call(this, options)
+  try {
+    const tx = await this.request('tx', {
+      transaction: id,
+      binary: false
+    })
+    const txWithDate = await attachTransactionDate(this.connection, tx)
+    return formatResponse(_options, txWithDate)
+  } catch (error) {
+    throw (await convertError(this.connection, _options, error))
   }
-
-  return utils.ensureLedgerVersion.call(this, options).then(_options => {
-    return this.connection.request(request).then((tx: TransactionResponse) =>
-      attachTransactionDate(this.connection, tx)
-    ).then(_.partial(formatResponse, _options))
-      .catch(error => {
-        return convertError(this.connection, _options, error).then(_error => {
-          throw _error
-        })
-      })
-  })
 }
 
 export default getTransaction

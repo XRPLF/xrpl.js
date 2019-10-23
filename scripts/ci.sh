@@ -16,7 +16,7 @@ unittest() {
   # test "src"
   mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/test-results.xml
   yarn test --coverage
-  yarn run coveralls
+  #yarn run coveralls
 
   # test compiled version in "dist/npm"
   $(npm bin)/babel -D --optional runtime --ignore "**/node_modules/**" -d test-compiled/ test/
@@ -45,7 +45,6 @@ unittest() {
 
 integrationtest() {
   mocha test/integration/integration-test.js
-  mocha test/integration/http-integration-test.js
 
   # run integration tests in PhantomJS
   #gulp build-tests build-min

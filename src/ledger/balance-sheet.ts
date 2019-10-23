@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import {validate} from '../common'
 import {Amount} from '../common/types/objects'
 import {ensureLedgerVersion} from './utils'
-import {RippleAPI} from '../api'
+import {RippleAPI} from '..'
 
 export type BalanceSheetOptions = {
   excludeAddresses?: Array<string>,
@@ -54,7 +54,7 @@ async function getBalanceSheet(
   validate.getBalanceSheet({address, options})
   options = await ensureLedgerVersion.call(this, options)
   // 2. Make Request
-  const response = await this._request('gateway_balances', {
+  const response = await this.request('gateway_balances', {
     account: address,
     strict: true,
     hotwallet: options.excludeAddresses,

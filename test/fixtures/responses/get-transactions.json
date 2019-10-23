@@ -19,11 +19,7 @@
         }
       },
       "destination": {
-        "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-        "amount": {
-          "currency": "USD",
-          "value": "0.001"
-        }
+        "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
       },
       "paths": "[[{\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\"},{\"account\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\"}]]"
     },
@@ -116,11 +112,7 @@
         }
       },
       "destination": {
-        "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-        "amount": {
-          "currency": "USD",
-          "value": "0.001"
-        }
+        "address": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
       },
       "paths": "[[{\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\"},{\"account\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"issuer\":\"rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo\",\"currency\":\"USD\"}]]"
     },

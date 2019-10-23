@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import {parseQuality} from './utils'
+import {parseQuality, parseMemos} from './utils'
 import {txFlags, removeUndefined} from '../../common'
 const flags = txFlags.TrustSet
 
@@ -13,13 +13,14 @@ function parseFlag(flagsValue, trueValue, falseValue) {
   return undefined
 }
 
-function parseTrustline(tx: any): Object {
-  assert(tx.TransactionType === 'TrustSet')
+function parseTrustline(tx: any): object {
+  assert.ok(tx.TransactionType === 'TrustSet')
 
   return removeUndefined({
     limit: tx.LimitAmount.value,
     currency: tx.LimitAmount.currency,
     counterparty: tx.LimitAmount.issuer,
+    memos: parseMemos(tx),
     qualityIn: parseQuality(tx.QualityIn),
     qualityOut: parseQuality(tx.QualityOut),
     ripplingDisabled: parseFlag(

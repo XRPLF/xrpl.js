@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "pretty": true,
+    "target": "es2017",
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    "declaration": true,
+    "declarationMap": true /* Added 2019-04-13 */,
+    "sourceMap": true,
+
+    "strict": true /* Enable all strict type-checking options. */,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "preserveConstEnums": false,
+    "esModuleInterop": true,
+    "suppressImplicitAnyIndexErrors": false
+  }
+}

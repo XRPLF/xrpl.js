@@ -1,0 +1,13 @@
+{
+  "id": 0,
+  "status": "error",
+  "type": "response",
+  "error": "invalidParams",
+  "error_code": 31,
+  "error_message": "Invalid parameters.",
+  "request": {
+    "command": "subscribe",
+    "id": 0,
+    "streams": "validations"
+  }
+}

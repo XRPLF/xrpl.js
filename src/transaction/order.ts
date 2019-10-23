@@ -1,9 +1,9 @@
-import * as _ from 'lodash'
 import * as utils from './utils'
 const offerFlags = utils.common.txFlags.OfferCreate
 import {validate, iso8601ToRippleTime} from '../common'
 import {Instructions, Prepare, OfferCreateTransaction} from './types'
 import {FormattedOrderSpecification} from '../common/types/objects/index'
+import {RippleAPI} from '..'
 
 function createOrderTransaction(
   account: string, order: FormattedOrderSpecification
@@ -39,17 +39,21 @@ function createOrderTransaction(
     txJSON.OfferSequence = order.orderToReplace
   }
   if (order.memos !== undefined) {
-    txJSON.Memos = _.map(order.memos, utils.convertMemo)
+    txJSON.Memos = order.memos.map(utils.convertMemo)
   }
   return txJSON as OfferCreateTransaction
 }
 
-function prepareOrder(address: string, order: FormattedOrderSpecification,
+function prepareOrder(this: RippleAPI, address: string, order: FormattedOrderSpecification,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareOrder({address, order, instructions})
-  const txJSON = createOrderTransaction(address, order)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareOrder({address, order, instructions})
+    const txJSON = createOrderTransaction(address, order)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareOrder

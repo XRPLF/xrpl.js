@@ -1,8 +1,635 @@
 # ripple-lib Release History
 
+## 1.3.4 (2019-10-18)
+
+* Update ripple-lib-transactionparser
+* Improve error message when signing fails (e.g. due to trailing zeros)
+* Integrate ripple-hashes (in TypeScript with improved naming and docs)
+* Add multi-signing example to sign() method docs
+* Update TypeScript
+
+## 1.3.3 (2019-09-10)
+
+* Expand node version compatibility to support Node.js 12 ([ripple-binary-codec#32](https://github.com/ripple/ripple-binary-codec/issues/32))
+
+## 1.3.2 (2019-09-03)
+
+* Export and document `rippleTimeToISO8601()` method
+* Add type for isValidAddress (fixes error TS7016, #1032)
+* Docs: update recommended Node.js version (#1031)
+
+When using this release with [rippled](https://github.com/ripple/rippled), we recommend using [rippled version 1.3.1](https://github.com/ripple/rippled/releases/tag/1.3.1) or later.
+
+## 1.3.1 (2019-08-26)
+
+* Upgrade to gulp 4 (#1030)
+* Remove http server (unused)
+* Update dependencies
+
+There are no changes in the browser version with this release. The npm package for Node.js should be slightly smaller.
+
+When using this release with [rippled](https://github.com/ripple/rippled), we recommend using [rippled version 1.3.1](https://github.com/ripple/rippled/releases/tag/1.3.1).
+
+## 1.3.0 (2019-08-16)
+
+### Bug fixes:
+
+* Breaking change: Fix `getServerInfo` (#1012)
+
+Before:
+```
+{
+  // ...
+  "load": {
+    "jobTypes": {
+      "0": {"jobType": "untrustedValidation", "perSecond": 10},
+      "1": {"jobType": "ledgerData", "peakTime": 2, "perSecond": 2},
+      "2": {"inProgress": 1, "jobType": "clientCommand", "perSecond": 1},
+      "3": {"jobType": "transaction", "perSecond": 1},
+      // ...
+    },
+    "threads": 6
+  },
+  // ...
+}
+```
+
+After:
+```
+{
+  // ...
+  "load": {
+    "jobTypes": [
+      {
+        "jobType": "untrustedValidation",
+        "perSecond": 8
+      },
+      {
+        "avgTime": 2,
+        "jobType": "ledgerData",
+        "peakTime": 72,
+        "perSecond": 2
+      },
+      {
+        "inProgress": 1,
+        "jobType": "clientCommand",
+        "perSecond": 1
+      },
+      {
+        "jobType": "transaction",
+        "perSecond": 1
+      },
+      // ...
+    ],
+    "threads": 6
+  },
+  // ...
+}
+```
+
+* Sign method - verify accurate encoding (#1026)
+  * In previous versions, the following could be encoded incorrectly:
+    * Amounts of XRP with more than 6 decimal places
+    * Amounts of XRP drops with any decimal places
+  * In versions 1.2.5 and 1.3.0, amounts that are invalid in this way will throw an error
+* Expand `APIOptions` by extending `ConnectionOptions` (#1018, fixes #1017)
+* Fix docs for destination.address (#1011)
+
+### New features:
+
+* Support removing a signer list (#1021)
+* Export `setCanonicalFlag` method from `src/transaction/utils`
+
+### Improvements:
+
+* Clean up phrasing in schema descriptions (#1023)
+* Improve docs
+* Update dependencies
+
+Since this release fixes a bug that could cause transactions to be serialized incorrectly during the signing process, it has also been simultaneously released as version 1.2.5 (patch release).
+
+When using this release with [rippled](https://github.com/ripple/rippled), we recommend using [rippled version 1.3.1](https://github.com/ripple/rippled/releases/tag/1.3.1).
+
+## 1.2.4 (2019-06-06)
+
+* Update README.md
+* Clarify docs
+* Update dependencies
+* Fix typos
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+4f09c056ccc51bc6cf17b128b559112e9c5adf19cc96ac8f9a06faee185697a7  ripple-1.2.4-debug.js
+5da1c75a02d76b0b105d98355ee4561f5d5036e8d5d0237efd5960812dcaa1fd  ripple-1.2.4-min.js
+e147f303e880a65db149d2a5b9183b75814bd8145cd00740bcc4679d867192c8  ripple-1.2.4.js
+```
+
+## 1.2.3 (2019-04-30)
+
+* Fix browser builds
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+efb0f29cde94534a015d8a2171abb11b9a4345ba01418bf5b6ab6042a6d51dde  ripple-1.2.3-debug.js
+b86145c0e30099b966ed8d3830ba25988d72877f1f87044d9954d6707be098ac  ripple-1.2.3-min.js
+e027d91c7321d41ba94bb1bdc77dcff0107a5fd9eb833c6dbd06f1bbedef3900  ripple-1.2.3.js
+```
+
+## 1.2.2 (2019-04-15)
+
+* Prevent `prepareTransaction` from overwriting `Fee` and/or `LastLedgerSequence` (#997)
+* Add `deliveredAmount` as optional field for type `Outcome` (#996)
+* Fix build failure with TS strict checks (#993)
+
+Minor changes:
+
+* Use TypeScript project references
+* Travis: Drop node 9 and add node 11 for testing
+* Bump versions of devDependencies
+
+Note: There is no browser version of this release.
+
+## 1.2.1 (2019-03-23)
+
+* Update `ripple-binary-codec` to 0.2.1 to support `tecKILLED`
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+
+```
+% shasum -a 256 *
+531c2a8f4bf6d6b5bd4afe6a40b6a68a77179a343902cfa4210d7e35b5697af0  ripple-1.2.1-debug.js
+201ee99922b16b7e32afb5317ef4bb9facc23b20c272bb5c4ed7010f5d996cab  ripple-1.2.1-min.js
+c1b984581299bf00e0e3c8ac4e62eadfc9b190bd78a2458a76e59ceb56046148  ripple-1.2.1.js
+```
+
+## 1.2.0 (2019-03-19)
+
+This release:
+
+* changes the way you handle errors for the `prepare*` methods.
+* improves the `message` field of `RippledError`s.
+* allows `Sequence` to be set in the transaction JSON provided to
+  `prepareTransaction`.
+
+For details, continue reading:
+
+### [BREAKING CHANGE] `prepare*` methods reject the Promise on error
+
+The `prepare*` methods now always reject the Promise when an error occurs, instead of throwing.
+
+Previously, the methods would synchronously throw on validation errors, despite being asynchronous methods that return Promises.
+
+In other words, to handle errors in the past, you would need to use a try/catch block:
+
+```
+// OBSOLETE - no need for try/catch anymore
+try {
+  api.preparePayment(address, payment, instructions).then(prepared => {
+    res.send(prepared.txJSON);
+  }).catch(error => {
+    // Handle asynchronous error
+  });
+} catch (error) {
+    // Handle synchronous error
+}
+```
+
+Now, you can rely on the Promise's `catch` handler, which is called with the error when the Promise is rejected:
+
+```
+api.preparePayment(address, payment, instructions).then(prepared => {
+  res.send(prepared.txJSON);
+}).catch(error => {
+  // Handle error
+});
+```
+
+This applies to:
+* preparePayment
+* prepareTrustline
+* prepareOrder
+* prepareOrderCancellation
+* prepareSettings
+* prepareEscrowCreation
+* prepareEscrowExecution
+* prepareCheckCreate
+* prepareCheckCash
+* prepareCheckCancel
+* preparePaymentChannelCreate
+* preparePaymentChannelClaim
+* preparePaymentChannelFund
+
+### Improved `RippledError` `message`
+
+Previously, `RippledErrors` (errors from rippled) used rippled's `error` field as the `message`.
+
+Now, the `error_message` field is used as the `message`.
+
+This helps to surface the specific cause of an error.
+
+For example, before:
+```
+[RippledError(invalidParams, { error: 'invalidParams',
+  error_code: 31,
+  error_message: 'Missing field \'account\'.',
+  id: 3,
+  request: { command: 'account_info', id: 3 },
+  status: 'error',
+  type: 'response' })]
+```
+
+After:
+```
+[RippledError(Missing field 'account'., { error: 'invalidParams',
+  error_code: 31,
+  error_message: 'Missing field \'account\'.',
+  id: 3,
+  request: { command: 'account_info', id: 3 },
+  status: 'error',
+  type: 'response' })]
+```
+
+In this case, you can see at a glance that `account` is the missing field.
+
+The `error` field is still available in `errorObject.data.error`.
+
+When `error_message` is not set (as with e.g. error 'entryNotFound'), the `error` field is used as the `message`.
+
+### [BUG FIX] `prepareTransaction` does not overwrite the `Sequence` field
+
+The `prepareTransaction` method now allows `Sequence` to be set in the Transaction JSON object, instead of overwriting it with the account's expected sequence based on the state of the ledger.
+
+Previously, you had to use the `sequence` field in the `instructions` object to manually set a transaction's sequence number.
+
+### New in rippled 1.2.1
+
+As this is the first release of ripple-lib following the release of rippled 1.2.1, we would like to highlight the following API improvements:
+
+1. The [`delivered_amount` field](https://developers.ripple.com/partial-payments.html#the-delivered-amount-field) has been added to the `ledger` method, and to transaction subscriptions.
+
+        api.getLedger({includeTransactions: true, includeAllData: true, ledgerVersion: 17718771}).then(...)
+
+    You can also call `ledger` directly:
+
+        request('ledger', {...}).then(...)
+
+2. [Support for Ed25519 seeds encoded using ripple-lib](https://github.com/ripple/rippled/pull/2734)
+
+You have access to these improvements when you use a rippled server running version 1.2.1 or later. At the time of writing, we recommend using rippled version **1.2.2** or later.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+13021fe3efbdd59faf68597b0b18204b39847b285cca82f84c737e3d19922cc2  ripple-1.2.0-debug.js
+0070225e731afd8c2c0a0976111ebf326c19a96ee1549368de9f016abdd53d2f  ripple-1.2.0-min.js
+d440268397c03ad5137a3294e53a07b959ef93cd23b1990d6f82621c4776ba9f  ripple-1.2.0.js
+```
+
+## 1.1.2 (2018-12-12)
+
++ Update `submit` response (#978)
+  + Includes the full object returned by rippled, while keeping the existing
+    fields for backward compatibility
++ Add `getLedger` option for ledger hash (#980)
+  + Use the `ledgerHash` option to get a specific ledger by hash
+
+Thanks to @alexchiriac for the contributions in this release.
+
+When using `ripple-lib` with `rippled`, we recommend using `rippled` version
+1.1.2 or later.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+e6cc52395d0c3e205263777ba2e528e50f4d1f84bb4b16763a3bf7f5fcc290f5  ripple-1.1.2-debug.js
+82df879bc2970e0e4fd161975a99448b4859b0cde751d8ea34e9f51d672090b9  ripple-1.1.2-min.js
+12f56330dc71bba8ac3004025cbc9698413a0c619df302dda105b31228a67319  ripple-1.1.2.js
+```
+
+## 1.1.1 (2018-11-27)
+
++ Fix `getOrderbook` offer sorting (#970)
+  + **BREAKING CHANGE:** The ordering of offers returned by `getOrderbook` has
+    been changed so that offers with the best quality are sorted first
++ Add new helper methods for working with the `rippled` APIs:
+  + `formatBidsAndAsks`: Takes offers and returns a formatted order book object
+    with bids and asks
+  + `renameCounterpartyToIssuer`: Takes an object and renames the `counterparty`
+    field to `issuer`
++ TypeScript: Add return type for `generateAddress` (#968)
+
+When using `ripple-lib` with `rippled`, we recommend using `rippled` version 1.1.1 or
+later.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+e151900e49bb5482b02bef5b0b1542ea586076363b072ae616f6d4d2f7f5b8a1  ripple-1.1.1-debug.js
+6aee3757b29de285f361e20862261090033c07a13fd09f4a3cc4c097b6e84b55  ripple-1.1.1-min.js
+bea4a889fb9ee4092324c6667490ea66469bdde869ddc1aaddf5e9d12b0cf091  ripple-1.1.1.js
+```
+
+## 1.1.0 (2018-10-31)
+
++ Add support for Node.js v10 LTS (#964)
++ Add [DepositPreauth](https://developers.ripple.com/depositauth.html) ([#958](https://github.com/ripple/ripple-lib/pull/958))
++ In `FormattedTransactionType`, the `Outcome`'s `balanceChanges` property had
+  the wrong type. This is now fixed (#955)
++ Add/fix docs for: xrpToDrops, dropsToXrp, iso8601ToRippleTime, schemaValidator, isValidAddress, isValidSecret, deriveKeypair, deriveAddress
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+e1d742092b3c0fcee97a875e18db4baeab3bbc82f08b96e883ee188c5f0cfb37  ripple-1.1.0-debug.js
+f28921f57a133678dcb3cb54c497626bd76b1f953d22d61f3ddca31c8947d552  ripple-1.1.0-min.js
+3696871a80c1102635699994adcaf00cdfdfcff5014fc2eba3d8f8d8437c8f91  ripple-1.1.0.js
+```
+
+## 1.0.2 (2018-10-16)
+
++ Fix #954: Exclude SendMax from all XRP to XRP payments (thanks @jefftrudeau)
++ TypeScript
+  + book_offers returns offers type OfferLedgerEntry (#951)
+  + Use `object` (#936)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 * 
+2556fe17296e127ed44e7066e90a6175e2b164f00ca3c1aa7b1c554f31c688dd  ripple-1.0.2-debug.js
+e0342ea21eac32a1024c62034fba09c6f26dd3e7371b23ea1e153e03135cd590  ripple-1.0.2-min.js
+c7286c517497d018d02d09257e81172b61d36c8b9885a077af68e8133c3b3b9b  ripple-1.0.2.js
+```
+
+## 1.0.1 (2018-09-27)
+
++ Add address/secret/key validation and derivation methods ([#932](https://github.com/ripple/ripple-lib/pull/932))
+  + `isValidAddress(address: string) : boolean`: Checks if the specified string contains a valid address.
+  + `isValidSecret(secret: string): boolean`: Checks if the specified string contains a valid secret.
+  + `deriveKeypair(seed: string): {privateKey: string, publicKey: string}`: Derive a public and private key from a seed.
+  + `deriveAddress(publicKey: string): string`: Derive an XRP Ledger address from a public key.
++ To derive an address from a secret:
+  1. Derive the public key from the secret.
+  2. Derive the address from the public key.
+  + Example: `const address = api.deriveAddress(api.deriveKeypair(secret).publicKey)`
++ Update server regex to accommodate UDS (#944)
++ Include memos when parsing trustlines (#949)
++ Add remaining LedgerEntry types (#943)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+9b6408641ce83659afcd5765c256c35829a4fcb4c3244dc9ca6bf27c871a45c4  ripple-1.0.1-debug.js
+7ab2b69fe59c2d4a74638116e2ba3b387155eb2d23e48a01bbf7beb72911f898  ripple-1.0.1-min.js
+8bb4dcad9ce25a27003b1d73d71ddf41b8a5af02ece4ebbfeaff4aeb91f3b8c4  ripple-1.0.1.js
+```
+
+## 1.0.0 (2018-08-30)
+
+We are pleased to announce the release of `ripple-lib` version 1.0.0.
+
+This version features a range of changes and improvements that make the library
+more capable and flexible. It includes new methods for accessing rippled APIs,
+including subscriptions.
+
+When using this version with `rippled` for online functionality, we recommend
+using `rippled` version 1.0.1 or later.
+
+Here is a summary of the changes since `ripple-lib` version 0.22.0, which was
+the last non-beta version.
+
+### New Features
+
++ [Add `request()`, `hasNextPage()`, and `requestNextPage()` for accessing `rippled`
+  APIs](https://github.com/ripple/ripple-lib/blob/09541dae86bc859bf5928ac65b2645dfaaf7f8b1/docs/index.md#rippled-apis).
++ Add `prepareTransaction()` for preparing raw `txJSON`.
++ XRP amounts can be specified in drops. Also, `xrpToDrops()` and `dropsToXrp()`
+  are available to make conversions.
++ `getTransaction` responses can include a new `channelChanges` property that
+  describes the details of a payment channel.
+
+### Data Validation and Errors
+
++ [Amounts in drops and XRP are checked for
+  validity](https://github.com/ripple/ripple-lib/blob/develop/HISTORY.md#100-beta1-2018-05-24).
++ [A maximum fee is now
+  imposed](https://github.com/ripple/ripple-lib/blob/develop/HISTORY.md#100-beta2-2018-06-08). Exceeding it causes a `ValidationError` to be
+  thrown.
++ Errors are improved and more data validation was added.
++ Bug fix: `getPaths` now filters paths correctly and works correctly when the
+  destination currency is XRP.
+
+### Breaking Changes
+
+The following changes were introduced in 1.0.0.
+
++ `getTransaction()` and `getTransactions()`
+  + The `specification.destination.amount` field has been removed from the parsed transaction response.
+  + To determine the amount that a transaction delivered, use `outcome.deliveredAmount`.
+  + If you require the provisional requested `Amount` from the original transaction:
+    + Use `getTransaction`'s `includeRawTransaction` option, or
+    + Use `getTransactions`'s `includeRawTransactions` option, or
+    + Use the rippled APIs directly with `request`. For example, call the API methods `tx`, `account_tx`, etc.
++ `getLedger()` response object
+  + The `rawTransactions` field has been removed (for consistency with `getTransaction()` and `getTransactions()`).
+  + Instead, within each `transaction`, use the new `rawTransaction` JSON string.
+  + The `metaData` field has been renamed to `meta` for consistency with rippled's `tx` method.
+  + `ledger_index` has been added to each raw transaction.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+06e5efcb6846ad45dedfd85cfa2ef4bdeb608b15ccbfb60b872c995d97342426  ripple-1.0.0-debug.js
+cdb26b928a89ce228c727d1ff966df266eb46b2f76bd94f81cbeb0a9d75febf0  ripple-1.0.0-min.js
+f74ee804e8a945a994e4e3901a0a3eb52292fbdcbff61ed30cefb8ffbcba50c3  ripple-1.0.0.js
+```
+
+## 1.0.0-beta.5 (2018-08-11)
+
++ [Fix a TypeScript error by importing the `Prepare` type](https://github.com/ripple/ripple-lib/commit/7cd517268bda5fe74b91dad02fedf8b51b7eae9b)
+
+## 1.0.0-beta.4 (2018-08-10)
+
++ [Add `prepareTransaction()`](https://github.com/ripple/ripple-lib/pull/898)
++ Internal improvements and cleanup
+
+## 1.0.0-beta.3 (2018-07-17)
+
++ For payment channel transactions, `getTransaction` includes a new
+  `channelChanges` property that describes the details of the payment channel.
+  (#920)
+
+### Bug Fixes
+
++ A bug caused calculated fees to use too many decimal places. This was fixed by
+  rounding fees to 6 decimal places. (#912)
++ When using the Settings transaction to set up a multi-signing list, the
+  threshold and weights fields are required. (#909)
++ Docs: Fix the MIMETYPE in examples with memos. (#914)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+460dbb521e24c44cb53dabc1a74feeca33d031b44d889dd5b51103ca92d51de6  ripple-1.0.0-beta.3-debug.js
+cccfd24973c6b7990d9e933a589175dae26249825737fff4f2f73d8558a3f186  ripple-1.0.0-beta.3-min.js
+0dc456a58fb078347d9920310621595905085595d73c2b8fe96bea73bcf35450  ripple-1.0.0-beta.3.js
+```
+
+## 1.0.0-beta.2 (2018-06-08)
+
+### Breaking Changes
+
++ During transaction preparation, there is now a maximum fee. Also, when a transaction is signed, its fee is checked and an error is thrown if the fee exceeds the maximum. The default `maxFeeXRP` is `'2'` (2 XRP). Override this value in the RippleAPI constructor.
++ Attempting to prepare a transaction with an exact `fee` higher than `maxFeeXRP` causes a `ValidationError` to be thrown.
++ Attempting to sign a transaction with a fee higher than `maxFeeXRP` causes a `ValidationError` to be thrown.
++ The value returned by `getFee()` is capped at `maxFeeXRP`.
+
+### Other Changes
+
++ In Transaction Instructions, the `maxFee` parameter is deprecated. Use the `maxFeeXRP` parameter in the RippleAPI constructor.
+
+#### Overview of new fee limit
+
+Most users of ripple-lib do not need to make any code changes to accommodate the new soft limit on fees. The limit is designed to protect against the most severe cases where an unintentionally high fee may be used.
+
++ When having ripple-lib provide the fee with a `prepare*` method, a maximum fee of `maxFeeXRP` (default 2 XRP) applies. You can prepare more economical transactions by setting a lower `maxFeeXRP`, or support high-priority transactions by setting a higher `maxFeeXRP` in the RippleAPI constructor.
++ When using `sign` with a Fee higher than `maxFeeXRP`, a `ValidationError` is thrown.
+
+If you have any questions or concerns, please open an issue on GitHub.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+ef348a2805098e61395b689b410cbf4bfd35e4d72e38c89f4ab74ec5e19793f5  ripple-1.0.0-beta.2-debug.js
+ea33fd53df8c7176d5fbf52dae0b64aade7180860f26449062cdbefaf8bd4d9b  ripple-1.0.0-beta.2-min.js
+fe5cc6e97c9b8a1470dacb34f16a64255cd639a25381abe9db1ba79e102456f2  ripple-1.0.0-beta.2.js
+```
+
+## 1.0.0-beta.1 (2018-05-24)
+
+### Breaking Changes
+
++ Amounts in drops and XRP are checked for validity. Some
+  methods may now throw a `BigNumber Error` or `ValidationError` if the amount
+  is invalid. This may include methods that previously did not throw.
++ Note that 1 drop is equivalent to 0.000001 XRP and 1 XRP is equivalent to 1,000,000 drops.
++ Using drops is recommended. All rippled APIs require XRP amounts to be
+  expressed in drops.
+
+### Other Changes
+
++ Allow specifying amounts in drops for consistency with the `rippled`
+  APIs.
++ Export `xrpToDrops()` and `dropsToXrp()` functions.
++ Potentially breaking change: Improve errors. For example, `RippledError` now includes the full response from
+  the `rippled` server ([#687](https://github.com/ripple/ripple-lib/issues/687)). `NotConnectedError`
+  may be thrown with a different message than before.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+a80ebb39e186640246306eadb2879147458c8271fd3c6cb32e6ef78d0b4b01a5  ripple-1.0.0-beta.1-debug.js
+81bcc4b5fd6fd52220ed151242eaddd63eb29c4078845edc68f65b769557d126  ripple-1.0.0-beta.1-min.js
+738b4d65b58cf4e3542fa396f8d319a24cd7d0b7aff5ff629a900e244f735ff4  ripple-1.0.0-beta.1.js
+```
+
+## 1.0.0-beta.0 (2018-05-10)
+
++ [Add `request`, `hasNextPage`, and
+  `requestNextPage`](https://github.com/ripple/ripple-lib/pull/887).
+  + This provides support for all rippled APIs, including subscriptions.
+
+When using rippled APIs, you must:
++ For all XRP amounts, use drops (1 drop = 0.000001 XRP).
++ Instead of `counterparty`, use `issuer`.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+ab2094979a3d6b320c7bc22bc5946c50fa5e29af0976d352e7689b0a4d840c55  ripple-1.0.0-beta.0-debug.js
+0e7f7d740606c2866ebf63776b13b41a555848e1a1419e2c8058d2e6c562d7fd  ripple-1.0.0-beta.0-min.js
+bd05e8806832ca4192aea7ba2d0362baa9f44605f8e8e6676acd25eb0b94b778  ripple-1.0.0-beta.0.js
+```
+
+## 0.22.0 (2018-05-10)
+
++ [`getOrderbook` - return raw order data](https://github.com/ripple/ripple-lib/pull/886). The full `BookOffer` data is now provided under `data`.
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+33f71b55c4adec4452826e44fe7809377364df04222b60f0fce01e7de2daff33  ripple-0.22.0-debug.js
+63232888a4ea77065e8e8eb8fdaa8ebfe3a785428fe935e2667c1ea54c837f29  ripple-0.22.0-min.js
+ab98026fabe296bd938297c48cb58e01dfdbe90f3c66c9617d6a3e1efd4c6b93  ripple-0.22.0.js
+```
+
+## 0.21.0 (2018-04-11)
+
++ [Upgrade https-proxy-agent](https://github.com/ripple/ripple-lib/pull/883)
++ [Add getAccountObjects](https://github.com/ripple/ripple-lib/pull/881)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+3ab52209ad4a80393c8c08ef3f4aa9cfb47bc76c0ede2ee9fa7f5ca180ba4d67  ripple-0.21.0-debug.js
+3b1efccded347bed5f64757098a1ea6a513bb8932d922d00af47cd24e001dc14  ripple-0.21.0-min.js
+db08e5a3eab1f659b4c803543374398004d950ba720adc4b9a7658817cb5c94b  ripple-0.21.0.js
+```
+
+## 0.20.0 (2018-04-09)
+
++ [Add support for using a keypair with sign()](https://github.com/ripple/ripple-lib/pull/769)
++ [Fix a bug caused by jsonschema v1.2.3 by pinning to v1.2.2](https://github.com/ripple/ripple-lib/pull/882)
++ [Improve Payment Channel documentation](https://github.com/ripple/ripple-lib/pull/877)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+389811a9baa72f77e2a43d0b48045762d29a6f616ed5fd2660ba76fc12a3ecc5  ripple-0.20.0-debug.js
+c1746ea0dd55318cb4e1ef3955ef14759d9d70861437c69abafc10169916f068  ripple-0.20.0-min.js
+17958b0e46395d2b2a35a003693c0babdfb5382513d3cc58a62f8648ad710b0e  ripple-0.20.0.js
+```
+
+## 0.19.1 (2018-03-22)
+
++ [Fix: Include TypeScript declarations in npm package](https://github.com/ripple/ripple-lib/pull/863)
++ [Fix: Documentation link to checkCash](https://github.com/ripple/ripple-lib/pull/871)
++ [Internal: Clean up types and migrate more APIs to new request method](https://github.com/ripple/ripple-lib/pull/857)
++ [Internal: Fix Payment source and destination types](https://github.com/ripple/ripple-lib/pull/870)
+
+The SHA-256 checksums for the browser version of this release can be found
+below.
+```
+% shasum -a 256 *
+3ed5332aa035c07bae6c1abfdfc8ca77cdbb05cc4b88878f544f1ea4cb793f4d  ripple-0.19.1-debug.js
+2f5507aa00a40ab6a94de1822af87db5e927edef3885aef5d9b39ccb623ccb54  ripple-0.19.1-min.js
+1e439aee1b220242d56ea687a9b55a67b8614212c1ddbd70a4fcf34503fc487a  ripple-0.19.1.js
+```
+
 ## 0.19.0 (2018-03-02)
 
 + [Add support for Checks](https://github.com/ripple/ripple-lib/pull/853)
+  + **CheckCreate** adds a check entry to the ledger. The check is a promise from the source of the check that the destination of the check may cash the check and receive up to the SendMax specified on the check. The check may have an (optional) expiration, after which the check may no longer be cashed.
+  + **CheckCancel** removes the check from the ledger without transferring funds. Either the check's source or destination can cancel the check at any time. After a check has expired, any account can cancel the check.
+  + **CheckCash** is a request by the destination of the check to transfer a requested amount of funds, up to the check's SendMax, from the source to the destination. The destination may receive less than the SendMax due to transfer fees.
 + [Add support for the Deposit Authorization account root flag](https://github.com/ripple/ripple-lib/pull/852)
 + [Generate .ts.d TypeScript declaration files](https://github.com/ripple/ripple-lib/pull/851)
 + [Improve documentation of getTransactions params](https://github.com/ripple/ripple-lib/pull/856)

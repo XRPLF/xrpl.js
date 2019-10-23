@@ -9,17 +9,18 @@ function loadSchemas() {
   // listed explicitly for webpack (instead of scanning schemas directory)
   const schemas = [
     require('./schemas/objects/tx-json.json'),
-    require('./schemas/objects/tx-type.json'),
+    require('./schemas/objects/transaction-type.json'),
     require('./schemas/objects/hash128.json'),
     require('./schemas/objects/hash256.json'),
     require('./schemas/objects/sequence.json'),
     require('./schemas/objects/signature.json'),
     require('./schemas/objects/issue.json'),
-    require('./schemas/objects/ledgerversion.json'),
+    require('./schemas/objects/ledger-version.json'),
     require('./schemas/objects/max-adjustment.json'),
     require('./schemas/objects/memo.json'),
     require('./schemas/objects/memos.json'),
     require('./schemas/objects/public-key.json'),
+    require('./schemas/objects/private-key.json'),
     require('./schemas/objects/uint32.json'),
     require('./schemas/objects/value.json'),
     require('./schemas/objects/source-adjustment.json'),
@@ -30,21 +31,23 @@ function loadSchemas() {
     require('./schemas/objects/min-adjustment.json'),
     require('./schemas/objects/source-exact-adjustment.json'),
     require('./schemas/objects/destination-exact-adjustment.json'),
-    require('./schemas/objects/tx-hash.json'),
+    require('./schemas/objects/destination-address-tag.json'),
+    require('./schemas/objects/transaction-hash.json'),
     require('./schemas/objects/address.json'),
     require('./schemas/objects/adjustment.json'),
     require('./schemas/objects/quality.json'),
     require('./schemas/objects/amount.json'),
-    require('./schemas/objects/amount-base.json'),
+    require('./schemas/objects/amountbase.json'),
     require('./schemas/objects/balance.json'),
     require('./schemas/objects/blob.json'),
     require('./schemas/objects/currency.json'),
     require('./schemas/objects/signed-value.json'),
     require('./schemas/objects/orderbook.json'),
     require('./schemas/objects/instructions.json'),
-    require('./schemas/objects/settings.json'),
+    require('./schemas/objects/settings-plus-memos.json'),
     require('./schemas/specifications/settings.json'),
     require('./schemas/specifications/payment.json'),
+    require('./schemas/specifications/get-payment.json'),
     require('./schemas/specifications/escrow-cancellation.json'),
     require('./schemas/specifications/order-cancellation.json'),
     require('./schemas/specifications/order.json'),
@@ -60,6 +63,7 @@ function loadSchemas() {
     require('./schemas/output/sign.json'),
     require('./schemas/output/submit.json'),
     require('./schemas/output/get-account-info.json'),
+    require('./schemas/output/get-account-objects.json'),
     require('./schemas/output/get-balances.json'),
     require('./schemas/output/get-balance-sheet.json'),
     require('./schemas/output/get-ledger.json'),
@@ -89,6 +93,7 @@ function loadSchemas() {
     require('./schemas/input/api-options.json'),
     require('./schemas/input/get-settings.json'),
     require('./schemas/input/get-account-info.json'),
+    require('./schemas/input/get-account-objects.json'),
     require('./schemas/input/get-transaction.json'),
     require('./schemas/input/get-transactions.json'),
     require('./schemas/input/get-trustlines.json'),
@@ -116,7 +121,7 @@ function loadSchemas() {
   ]
   const titles = schemas.map(schema => schema.title)
   const duplicates = _.keys(_.pickBy(_.countBy(titles), count => count > 1))
-  assert(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
+  assert.ok(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
   const validator = new Validator()
   // Register custom format validators that ignore undefined instances
   // since jsonschema will still call the format validator on a missing
@@ -155,5 +160,6 @@ function schemaValidate(schemaName: string, object: any): void {
 
 export {
   schemaValidate,
-  isValidSecret
+  isValidSecret,
+  isValidAddress
 }

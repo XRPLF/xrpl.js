@@ -1,5 +1,9 @@
 # .gitignore
 
+# Ignore package locks other than Yarn.
+package-lock.json
+npm-shrinkwrap.json
+
 # Ignore vim swap files.
 *.swp
 
@@ -53,6 +57,9 @@ npm-debug.log
 
 # Ignore dist folder, built from tsc
 dist/
+
+# TypeScript incremental compilation cache
+*.tsbuildinfo
 
 # Ignore perf test cache
 scripts/cache

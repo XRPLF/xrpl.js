@@ -1,7 +1,12 @@
 import * as _ from 'lodash'
 import * as utils from './utils'
 import {validate} from '../common'
-import {Submit} from './types'
+import {RippleAPI} from '..'
+
+export interface FormattedSubmitResponse {
+  resultCode: string,
+  resultMessage: string
+}
 
 function isImmediateRejection(engineResult: string): boolean {
   // note: "tel" errors mean the local server refused to process the
@@ -13,10 +18,17 @@ function isImmediateRejection(engineResult: string): boolean {
   return _.startsWith(engineResult, 'tem')
 }
 
-function formatSubmitResponse(response) {
+function formatSubmitResponse(response): FormattedSubmitResponse {
   const data = {
+    // @deprecated
     resultCode: response.engine_result,
-    resultMessage: response.engine_result_message
+    // @deprecated
+    resultMessage: response.engine_result_message,
+    engine_result: response.engine_result,
+    engine_result_code: response.engine_result_code,
+    engine_result_message: response.engine_result_message,
+    tx_blob: response.tx_blob,
+    tx_json: response.tx_json
   }
   if (isImmediateRejection(response.engine_result)) {
     throw new utils.common.errors.RippledError('Submit failed', data)
@@ -24,14 +36,15 @@ function formatSubmitResponse(response) {
   return data
 }
 
-function submit(signedTransaction: string): Promise<Submit> {
+async function submit(
+  this: RippleAPI, signedTransaction: string
+): Promise<FormattedSubmitResponse> {
+  // 1. Validate
   validate.submit({signedTransaction})
-
-  const request = {
-    command: 'submit',
-    tx_blob: signedTransaction
-  }
-  return this.connection.request(request).then(formatSubmitResponse)
+  // 2. Make Request
+  const response = await this.request('submit', {tx_blob: signedTransaction})
+  // 3. Return Formatted Response
+  return formatSubmitResponse(response)
 }
 
 export default submit

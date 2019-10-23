@@ -381,7 +381,7 @@ describe('Connection', function() {
     }));
   });
 
-  it('propagate error message', function(done) {
+  it('propagates error message', function(done) {
     this.api.on('error', (errorCode, errorMessage, data) => {
       assert.strictEqual(errorCode, 'slowDown');
       assert.strictEqual(errorMessage, 'slow down');
@@ -393,11 +393,25 @@ describe('Connection', function() {
     }));
   });
 
+  it('propagates RippledError data', function(done) {
+    this.api.request('subscribe', {streams: 'validations'}).catch(error => {
+      assert.strictEqual(error.name, 'RippledError')
+      assert.strictEqual(error.data.error, 'invalidParams')
+      assert.strictEqual(error.message, 'Invalid parameters.')
+      assert.strictEqual(error.data.error_code, 31)
+      assert.strictEqual(error.data.error_message, 'Invalid parameters.')
+      assert.deepEqual(error.data.request, { command: 'subscribe', id: 0, streams: 'validations' })
+      assert.strictEqual(error.data.status, 'error')
+      assert.strictEqual(error.data.type, 'response')
+      done()
+    })
+  });
+
   it('unrecognized message type', function(done) {
-    this.api.on('error', (errorCode, errorMessage, message) => {
-      assert.strictEqual(errorCode, 'badMessage');
-      assert.strictEqual(errorMessage, 'unrecognized message type: unknown');
-      assert.strictEqual(message, '{"type":"unknown"}');
+    // This enables us to automatically support any
+    // new messages added by rippled in the future.
+    this.api.connection.on('unknown', (event) => {
+      assert.deepEqual(event, {type: 'unknown'})
       done();
     });
 
@@ -414,8 +428,8 @@ describe('Connection', function() {
   });
 
   it('should throw RippledNotInitializedError if server does not have ' +
-  'validated ledgers',
-  function() {
+    'validated ledgers', function() {
+
     this.timeout(3000);
 
     this.api.connection._send(JSON.stringify({
@@ -439,13 +453,13 @@ describe('Connection', function() {
     this.api.on('error', error => {
       done(error || new Error('Should not emit error.'));
     });
-    let disconncedCount = 0;
+    let disconnectedCount = 0;
     this.api.on('connected', () => {
-      done(disconncedCount !== 1 ?
+      done(disconnectedCount !== 1 ?
         new Error('Wrong number of disconnects') : undefined);
     });
     this.api.on('disconnected', () => {
-      disconncedCount++;
+      disconnectedCount++;
     });
 
     this.api.connection._send(JSON.stringify({

@@ -9,7 +9,7 @@
     },
     "maxAmount": {
       "$ref": "laxAmount",
-      "description": "The maximum amount to send. (This field is exclusive with source.amount)"
+      "description": "The maximum amount to send. (This field cannot be used with source.amount)"
     },
     "tag": {"$ref": "tag"}
   },

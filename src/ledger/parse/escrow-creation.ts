@@ -3,8 +3,8 @@ import parseAmount from './amount'
 import {parseTimestamp, parseMemos} from './utils'
 import {removeUndefined} from '../../common'
 
-function parseEscrowCreation(tx: any): Object {
-  assert(tx.TransactionType === 'EscrowCreate')
+function parseEscrowCreation(tx: any): object {
+  assert.ok(tx.TransactionType === 'EscrowCreate')
 
   return removeUndefined({
     amount: parseAmount(tx.Amount).value,

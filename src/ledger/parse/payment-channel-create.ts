@@ -3,8 +3,8 @@ import {parseTimestamp} from './utils'
 import {removeUndefined} from '../../common'
 import parseAmount from './amount'
 
-function parsePaymentChannelCreate(tx: any): Object {
-  assert(tx.TransactionType === 'PaymentChannelCreate')
+function parsePaymentChannelCreate(tx: any): object {
+  assert.ok(tx.TransactionType === 'PaymentChannelCreate')
 
   return removeUndefined({
     amount: parseAmount(tx.Amount).value,

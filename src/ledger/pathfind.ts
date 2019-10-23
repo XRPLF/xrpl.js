@@ -1,13 +1,20 @@
 import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import {getXRPBalance, renameCounterpartyToIssuer} from './utils'
-import {validate, toRippledAmount, errors} from '../common'
+import {
+  validate,
+  toRippledAmount,
+  errors,
+  xrpToDrops,
+  dropsToXrp
+} from '../common'
 import {Connection} from '../common'
 import parsePathfind from './parse/pathfind'
 import {RippledAmount, Amount} from '../common/types/objects'
 import {
   GetPaths, PathFind, RippledPathsResponse, PathFindRequest
 } from './pathfind-types'
+import {RippleAPI} from '..'
 const NotFoundError = errors.NotFoundError
 const ValidationError = errors.ValidationError
 
@@ -23,7 +30,11 @@ function addParams(request: PathFindRequest, result: RippledPathsResponse
 function requestPathFind(connection: Connection, pathfind: PathFind
 ): Promise<RippledPathsResponse> {
   const destinationAmount: Amount = _.assign(
-    {value: '-1'},
+    {
+      // This is converted back to drops by toRippledAmount()
+      value: pathfind.destination.amount.currency === 'XRP' ?
+        dropsToXrp('-1') : '-1'
+    },
     pathfind.destination.amount
   )
   const request: PathFindRequest = {
@@ -36,9 +47,7 @@ function requestPathFind(connection: Connection, pathfind: PathFind
       && !request.destination_amount.issuer) {
     // Convert blank issuer to sender's address
     // (Ripple convention for 'any issuer')
-    // https://ripple.com/build/transactions/
-    //     #special-issuer-values-for-sendmax-and-amount
-    // https://ripple.com/build/ripple-rest/#counterparties-in-payments
+    // https://developers.ripple.com/payment.html#special-issuer-values-for-sendmax-and-amount
     request.destination_amount.issuer = request.destination_account
   }
   if (pathfind.source.currencies && pathfind.source.currencies.length > 0) {
@@ -95,13 +104,21 @@ function filterSourceFundsLowPaths(pathfind: PathFind,
 ): RippledPathsResponse {
   if (pathfind.source.amount &&
       pathfind.destination.amount.value === undefined && paths.alternatives) {
-    paths.alternatives = _.filter(paths.alternatives, alt =>
-        !!alt.source_amount &&
-        !!pathfind.source.amount &&
-        // TODO: Returns false when alt.source_amount is a string. Fix?
-        typeof alt.source_amount !== 'string' &&
-        new BigNumber(alt.source_amount.value).eq(pathfind.source.amount.value)
-    )
+    paths.alternatives = _.filter(paths.alternatives, alt => {
+      if (!alt.source_amount) {
+        return false
+      }
+      const pathfindSourceAmountValue = new BigNumber(
+        pathfind.source.amount.currency === 'XRP' ?
+        xrpToDrops(pathfind.source.amount.value) :
+        pathfind.source.amount.value)
+      const altSourceAmountValue = new BigNumber(
+        typeof alt.source_amount === 'string' ?
+        alt.source_amount :
+        alt.source_amount.value
+      )
+      return altSourceAmountValue.eq(pathfindSourceAmountValue)
+    })
   }
   return paths
 }
@@ -131,7 +148,7 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
   }
 }
 
-function getPaths(pathfind: PathFind): Promise<GetPaths> {
+function getPaths(this: RippleAPI, pathfind: PathFind): Promise<GetPaths> {
   validate.getPaths({pathfind})
 
   const address = pathfind.source.address

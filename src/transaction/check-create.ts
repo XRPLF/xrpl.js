@@ -1,10 +1,11 @@
 import * as utils from './utils'
 const toRippledAmount = utils.common.toRippledAmount
 import {validate, iso8601ToRippleTime} from '../common'
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {Amount} from '../common/types/objects'
+import {RippleAPI} from '..'
 
-export type CheckCreate = {
+export type CheckCreateParameters = {
   destination: string,
   sendMax: Amount,
   destinationTag?: number,
@@ -13,8 +14,8 @@ export type CheckCreate = {
 }
 
 function createCheckCreateTransaction(account: string,
-  check: CheckCreate
-): object {
+  check: CheckCreateParameters
+): TransactionJSON {
   const txJSON: any = {
     Account: account,
     TransactionType: 'CheckCreate',
@@ -37,15 +38,19 @@ function createCheckCreateTransaction(account: string,
   return txJSON
 }
 
-function prepareCheckCreate(address: string,
-  checkCreate: CheckCreate,
+function prepareCheckCreate(this: RippleAPI, address: string,
+  checkCreate: CheckCreateParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareCheckCreate(
-    {address, checkCreate, instructions})
-  const txJSON = createCheckCreateTransaction(
-    address, checkCreate)
-  return utils.prepareTransaction(txJSON, this, instructions)
+  try {
+    validate.prepareCheckCreate(
+      {address, checkCreate, instructions})
+    const txJSON = createCheckCreateTransaction(
+      address, checkCreate)
+    return utils.prepareTransaction(txJSON, this, instructions)
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 export default prepareCheckCreate

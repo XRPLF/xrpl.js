@@ -22,7 +22,12 @@ module.exports = {
   },
   prepareSettings: {
     domain: require('./prepare-settings'),
-    signers: require('./prepare-settings-signers')
+    noSignerEntries: require('./prepare-settings-no-signer-entries'),
+    signers: {
+      normal: require('./prepare-settings-signers'),
+      noThreshold: require('./prepare-settings-signers-no-threshold'),
+      noWeights: require('./prepare-settings-signers-no-weights')
+    }
   },
   prepareEscrowCreation: {
     normal: require('./prepare-escrow-creation'),
