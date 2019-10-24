@@ -466,6 +466,10 @@ class Connection extends EventEmitter {
       this._whenReady(this._send(message)).then(() => {
         const delay = timeout || this._timeout
         timer = setTimeout(() => _reject(new TimeoutError()), delay)
+        // Node.js won't exit if a timer is still running, so we tell Node to ignore (Node will still wait for the request to complete)
+        if (timer.unref) {
+          timer.unref()
+        }
       }).catch(_reject)
     })
   }
