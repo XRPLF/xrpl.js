@@ -2925,14 +2925,14 @@ describe('X-address Usage', function () {
       });
     });
 
-    it('getTransaction - ledger_index not found', function () {
+    it('getTransaction - transaction not validated', function () {
       const hash =
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11';
       return this.api.getTransaction(hash).then(() => {
         assert(false, 'Should throw NotFoundError');
       }).catch(error => {
         assert(error instanceof this.api.errors.NotFoundError);
-        assert(error.message.indexOf('ledger_index') !== -1);
+        assert(error.message.indexOf('Transaction has not been validated yet') !== -1);
       });
     });
 

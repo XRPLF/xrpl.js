@@ -39,6 +39,7 @@ class Connection extends EventEmitter {
   private _availableLedgerVersions = new RangeSet()
   private _nextRequestID: number = 1
   private _retry: number = 0
+  private _connectTimer: null|NodeJS.Timer = null
   private _retryTimer: null|NodeJS.Timer = null
   private _onOpenErrorBound: null| null|((...args: any[]) => void) = null
   private _onUnexpectedCloseBound: null|((...args: any[]) => void) = null
@@ -182,6 +183,13 @@ class Connection extends EventEmitter {
     }
   }
 
+  _clearConnectTimer() {
+    if (this._connectTimer !== null) {
+      clearTimeout(this._connectTimer)
+      this._connectTimer = null
+    }
+  }
+
   _onOpen() {
     if (!this._ws) {
       return Promise.reject(new DisconnectedError())
@@ -285,9 +293,10 @@ class Connection extends EventEmitter {
   }
 
   connect(): Promise<void> {
+    this._clearConnectTimer()
     this._clearReconnectTimer()
     return new Promise<void>((resolve, reject) => {
-      const connectTimeout = setTimeout(() => {
+      this._connectTimer = setTimeout(() => {
           reject(new ConnectionError(`Error: connect() timed out after ${this._connectionTimeout} ms. ` +
           `If your internet connection is working, the rippled server may be blocked or inaccessible.`))
       }, this._connectionTimeout)
@@ -298,7 +307,7 @@ class Connection extends EventEmitter {
       if (this._state === WebSocket.OPEN) {
         resolve()
       } else if (this._state === WebSocket.CONNECTING) {
-        this._ws.once('open', resolve)
+        this._ws.once('open', () => resolve)
       } else {
         this._ws = this._createWebSocket()
         // when an error causes the connection to close, the close event
@@ -319,10 +328,18 @@ class Connection extends EventEmitter {
           resolve, reject)
         this._ws.once('close', this._onUnexpectedCloseBound)
         this._ws.once('open', () => {
-          clearTimeout(connectTimeout);
           return this._onOpen().then(resolve, reject)
         })
       }
+    })
+    // Once we have a resolution or rejection, clear the timeout timer as no 
+    // longer needed.
+    .then(() => {
+      this._clearConnectTimer()
+    })
+    .catch((err) => {
+      this._clearConnectTimer()
+      throw err;
     })
   }
 
@@ -332,6 +349,7 @@ class Connection extends EventEmitter {
 
   _disconnect(calledByUser): Promise<void> {
     if (calledByUser) {
+      this._clearConnectTimer()
       this._clearReconnectTimer()
       this._retry = 0
     }

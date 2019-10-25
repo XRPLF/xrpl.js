@@ -153,11 +153,11 @@ describe('RippleAPI', function () {
     it('throws with an amount more than one decimal point', function () {
       assert.throws(() => {
         this.api.xrpToDrops('1.0.0')
-      }, /xrpToDrops: invalid value '1\.0\.0', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
+      }, /xrpToDrops: invalid value '1\.0\.0'/)
 
       assert.throws(() => {
         this.api.xrpToDrops('...')
-      }, /xrpToDrops: invalid value '\.\.\.', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
+      }, /xrpToDrops: invalid value '\.\.\.'/)
     })
   })
 
@@ -267,11 +267,11 @@ describe('RippleAPI', function () {
     it('throws with an amount more than one decimal point', function () {
       assert.throws(() => {
         this.api.dropsToXrp('1.0.0')
-      }, /dropsToXrp: invalid value '1\.0\.0', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
+      }, /dropsToXrp: invalid value '1\.0\.0'/)
 
       assert.throws(() => {
         this.api.dropsToXrp('...')
-      }, /dropsToXrp: invalid value '\.\.\.', should be a number matching \(\^-\?\[0-9\]\*\.\?\[0-9\]\*\$\)\./)
+      }, /dropsToXrp: invalid value '\.\.\.'/)
     })
   })
 
@@ -3130,14 +3130,14 @@ describe('RippleAPI', function () {
       });
     });
 
-    it('getTransaction - ledger_index not found', function () {
+    it('getTransaction - transaction not validated', function () {
       const hash =
         '4FB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11';
       return this.api.getTransaction(hash).then(() => {
         assert(false, 'Should throw NotFoundError');
       }).catch(error => {
         assert(error instanceof this.api.errors.NotFoundError);
-        assert(error.message.indexOf('ledger_index') !== -1);
+        assert(error.message.indexOf('Transaction has not been validated yet') !== -1);
       });
     });
 
