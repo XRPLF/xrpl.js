@@ -5,7 +5,7 @@
   "description": "A JavaScript API for interacting with Ripple in Node.js and the browser",
   "files": [
     "dist/npm/*",
-    "build/*"
+    "build/ripple-latest-min.js"
   ],
   "main": "dist/npm/",
   "types": "dist/npm/index.d.ts",
