@@ -10,6 +10,7 @@ import https = require('https')
  * 1) Transaction preparation:
  *    - How do we decide which account sequence and LastLedgerSequence numbers to use?
  *      (To prevent unintentional duplicate transactions, an {account, account_sequence} pair can be used as a transaction's idempotency key)
+ *    - How do we decide how much to pay for the transaction fee? (If our transactions have been failing due to low fee, we should consider increasing this value)
  * 2) Transaction status retrieval. Options include:
  *    - Poll for transaction status:
  *      - On a regular interval (e.g. every 3-5 seconds), or
@@ -30,7 +31,8 @@ import https = require('https')
  * - https://xrpl.org/monitor-incoming-payments-with-websocket.html
  * 
  * For the implementation in this example, we have made the following decisions:
- * 1) The script will choose the account sequence and LastLedgerSequence numbers automatically. Payments are defined upfront, and idempotency is not needed. If the script is run a second time, duplicate payments will result.
+ * 1) The script will choose the account sequence and LastLedgerSequence numbers automatically. We allow ripple-lib to choose the fee.
+ *    Payments are defined upfront, and idempotency is not needed. If the script is run a second time, duplicate payments will result.
  * 2) We will listen for notification that a new validated ledger has been found, and poll for transaction status at that time.
  *    Futhermore, as a precaution, we will wait until the server is 3 ledgers past the transaction's LastLedgerSequence
  *    (with the transaction nowhere to be seen) before deciding that it has definitively failed per [3C]
@@ -114,6 +116,10 @@ async function performPayments(payments) {
           }
 
           if (event.ledger_index > preparedPayment.instructions.maxLedgerVersion + 3) {
+            // Assumptions:
+            // - We are still connected to the same rippled server
+            // - No ledger gaps occurred
+            // - All ledgers between the time we submitted the tx and now have been checked for the tx
             status = {
               finalResult: 'Transaction was not, and never will be, included in a validated ledger'
             }
