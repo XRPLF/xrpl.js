@@ -72,6 +72,7 @@ describe('Connection', function() {
           const got = data.toString('ascii', 0, expect.length);
           assert.strictEqual(got, expect);
           server.close();
+          connection.disconnect();
           done();
         });
       });
@@ -81,10 +82,10 @@ describe('Connection', function() {
         authorization: 'authorization',
         trustedCertificates: ['path/to/pem']
       };
-      const connection =
-        new utils.common.Connection(this.api.connection._url, options);
-      connection.connect().catch(done);
-      connection.connect().catch(done);
+      const connection = new utils.common.Connection(this.api.connection._url, options);
+      connection.connect().catch((err) => {
+        assert(err instanceof this.api.errors.NotConnectedError);
+      });
     }, done);
   });
 
