@@ -1,19 +1,15 @@
-/* eslint-disable max-len, valid-jsdoc */
-'use strict';
-
-var assert = require('assert');
-var fs = require('fs');
-var hashes = require('../src/common/hashes');
+import assert from 'assert';
+import fs from 'fs';
+import * as hashes from '../src/common/hashes';
 
 /**
-* @param ledgerIndex {Number}
 * Expects a corresponding ledger dump in $repo/test/fixtures/rippled folder
 */
-function createLedgerTest(ledgerIndex) {
+function createLedgerTest(ledgerIndex: number) {
   describe(String(ledgerIndex), function() {
     var path = __dirname + '/fixtures/rippled/ledger-full-' + ledgerIndex + '.json';
 
-    var ledgerRaw = fs.readFileSync(path);
+    var ledgerRaw = fs.readFileSync(path, {encoding: 'utf8'});
     var ledgerJSON = JSON.parse(ledgerRaw);
 
     var hasAccounts = Array.isArray(ledgerJSON.accountState)
@@ -22,12 +18,12 @@ function createLedgerTest(ledgerIndex) {
     if (hasAccounts) {
       it('has account_hash of ' + ledgerJSON.account_hash, function() {
         assert.equal(ledgerJSON.account_hash,
-          hashes.computeStateTreeHash(ledgerJSON.accountState, 1));
+          hashes.computeStateTreeHash(ledgerJSON.accountState));
       });
     }
     it('has transaction_hash of ' + ledgerJSON.transaction_hash, function() {
       assert.equal(ledgerJSON.transaction_hash,
-        hashes.computeTransactionTreeHash(ledgerJSON.transactions, 1));
+        hashes.computeTransactionTreeHash(ledgerJSON.transactions));
     });
   });
 }

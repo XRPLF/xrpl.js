@@ -1,19 +1,14 @@
-/* eslint-disable max-len, valid-jsdoc */
-'use strict';
-
-var assert = require('assert');
-var SHAMap = require('../src/common/hashes/shamap').SHAMap;
-var TYPE_TRANSACTION_NO_METADATA = require('../src/common/hashes/shamap').NodeType.TRANSACTION_NO_METADATA
+import assert from 'assert';
+import {SHAMap, NodeType} from '../src/common/hashes/shamap';
+const TYPE_TRANSACTION_NO_METADATA = NodeType.TRANSACTION_NO_METADATA
 
 var HEX_ZERO = '00000000000000000000000000000000' +
                '00000000000000000000000000000000';
 
 /**
 * Generates data to hash for testing
-* @param {number} v int value
-* @returns {string} 64 length hex string
 */
-function intToVuc(v) {
+function intToVuc(v: number): string {
   var ret = '';
 
   for (var i = 0; i < 32; i++) {
@@ -23,12 +18,7 @@ function intToVuc(v) {
   return ret;
 }
 
-/**
-* @param shamap {Object}
-* @param keys {Array}
-* @param hashes {Array}
-*/
-function fillShamapTest(shamap, keys, hashes) {
+function fillShamapTest(shamap: any, keys: string[], hashes: string[]) {
   for (var i = 0; i < keys.length; i++) {
     var data = intToVuc(i);
     shamap.addItem(keys[i].toUpperCase(), data, TYPE_TRANSACTION_NO_METADATA);

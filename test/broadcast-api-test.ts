@@ -1,11 +1,9 @@
-/* eslint-disable max-nested-callbacks */
-'use strict';
-const _ = require('lodash');
-const assert = require('assert-diff');
-const setupAPI = require('./setup-api');
-const responses = require('./fixtures').responses;
-const ledgerClosed = require('./fixtures/rippled/ledger-close');
-const RippleAPI = require('ripple-api').RippleAPI;
+import _ from 'lodash';
+import assert from 'assert-diff';
+import setupAPI from './setup-api';
+import {responses} from './fixtures';
+import ledgerClosed from './fixtures/rippled/ledger-close.json';
+import {RippleAPI} from 'ripple-api';
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
 
 const TIMEOUT = 20000;

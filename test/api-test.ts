@@ -1,28 +1,21 @@
-/* eslint-disable max-nested-callbacks */
-'use strict'; // eslint-disable-line
-const _ = require('lodash');
-const assert = require('assert-diff');
-const setupAPI = require('./setup-api');
-const RippleAPI = require('ripple-api').RippleAPI;
-const validate = RippleAPI._PRIVATE.validate;
-const fixtures = require('./fixtures');
-const requests = fixtures.requests;
-const responses = fixtures.responses;
-const addresses = require('./fixtures/addresses');
-const hashes = require('./fixtures/hashes');
+import assert from 'assert-diff';
+import BigNumber from 'bignumber.js';
+import _ from 'lodash';
+import { RippleAPI } from 'ripple-api';
+import { RecursiveData } from 'ripple-api/ledger/utils';
+import binary from 'ripple-binary-codec';
+import { requests, responses } from './fixtures';
+import addresses from './fixtures/addresses';
+import hashes from './fixtures/hashes';
+import ledgerClosed from './fixtures/rippled/ledger-close-newer.json';
+import setupAPI from './setup-api';
+const {validate, schemaValidator} = RippleAPI._PRIVATE;
 const address = addresses.ACCOUNT;
 const utils = RippleAPI._PRIVATE.ledgerUtils;
-const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
-const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
-const binary = require('ripple-binary-codec');
-const BigNumber = require('bignumber.js');
 assert.options.strict = true;
 
 // how long before each test case times out
 const TIMEOUT = 20000;
-
-function unused() {
-}
 
 function closeLedger(connection) {
   connection._ws.emit('message', JSON.stringify(ledgerClosed));
@@ -3577,9 +3570,9 @@ describe('RippleAPI', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
-        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
-        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+      ).then(([directOfferResults, reverseOfferResults]) => {
+        const directOffers = (directOfferResults ? directOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
         assert.deepEqual(orderbook, responses.getOrderbook.normal);
       });
@@ -3613,9 +3606,9 @@ describe('RippleAPI', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
-        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
-        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+      ).then(([directOfferResults, reverseOfferResults]) => {
+        const directOffers = (directOfferResults ? directOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
         assert.deepEqual(orderbook, responses.getOrderbook.withXRP);
       });
@@ -3681,9 +3674,9 @@ describe('RippleAPI', function () {
             taker: myAddress
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
-        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
-        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+      ).then(([directOfferResults, reverseOfferResults]) => {
+        const directOffers = (directOfferResults ? directOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
         assert.deepStrictEqual([], orderbook.bids);
         return checkSortingOfOrders(orderbook.asks);
@@ -3714,9 +3707,9 @@ describe('RippleAPI', function () {
             taker: myAddress
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
-        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
-        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+      ).then(([directOfferResults, reverseOfferResults]) => {
+        const directOffers = (directOfferResults ? directOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
         return checkSortingOfOrders(orderbook.bids) && checkSortingOfOrders(orderbook.asks);
       });
@@ -3751,9 +3744,9 @@ describe('RippleAPI', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
-        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
-        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+      ).then(([directOfferResults, reverseOfferResults]) => {
+        const directOffers = (directOfferResults ? directOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
         
         const bidRates = orderbook.bids.map(bid => bid.properties.makerExchangeRate);
@@ -3795,9 +3788,9 @@ describe('RippleAPI', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
-        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
-        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+      ).then(([directOfferResults, reverseOfferResults]) => {
+        const directOffers = (directOfferResults ? directOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
         
         const orders = _.flatten([orderbook.bids, orderbook.asks]);
@@ -3842,9 +3835,9 @@ describe('RippleAPI', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
-        const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
-        const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
+      ).then(([directOfferResults, reverseOfferResults]) => {
+        const directOffers = (directOfferResults ? directOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
+        const reverseOffers = (reverseOfferResults ? reverseOfferResults.offers : []).reduce((acc, res) => acc.concat(res), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
         
         assert(
@@ -4549,8 +4542,7 @@ describe('RippleAPI', function () {
             'D9ABF622DA26EEEE48203085D4BC23B0F77DC6F8724AC33D975DA3CA492D2E44'
         });
         assert.throws(() => {
-          const hash = this.api.computeLedgerHash(ledger);
-          unused(hash);
+          this.api.computeLedgerHash(ledger);
         }, /does not match computed hash of state/);
       });
   });
@@ -4577,20 +4569,21 @@ describe('RippleAPI', function () {
 
   it('ledger utils - renameCounterpartyToIssuerInOrder', function () {
     const order = {
-      taker_gets: { counterparty: '1' },
-      taker_pays: { counterparty: '1' }
+      taker_gets: { counterparty: '1', currency: 'XRP' },
+      taker_pays: { counterparty: '1', currency: 'XRP' }
     };
     const expected = {
-      taker_gets: { issuer: '1' },
-      taker_pays: { issuer: '1' }
+      taker_gets: { issuer: '1', currency: 'XRP' },
+      taker_pays: { issuer: '1', currency: 'XRP' }
     };
     assert.deepEqual(utils.renameCounterpartyToIssuerInOrder(order), expected);
   });
 
   it('ledger utils - compareTransactions', function () {
+    // @ts-ignore
     assert.strictEqual(utils.compareTransactions({}, {}), 0);
-    let first = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
-    let second = { outcome: { ledgerVersion: 1, indexInLedger: 200 } };
+    let first: any = { outcome: { ledgerVersion: 1, indexInLedger: 100 } };
+    let second: any = { outcome: { ledgerVersion: 1, indexInLedger: 200 } };
 
     assert.strictEqual(utils.compareTransactions(first, second), -1);
 
@@ -4606,13 +4599,13 @@ describe('RippleAPI', function () {
   });
 
   it('ledger utils - getRecursive', function () {
-    function getter(marker, limit) {
-      return new Promise((resolve, reject) => {
-        if (marker === undefined) {
-          resolve({ marker: 'A', limit: limit, results: [1] });
-        } else {
+    function getter(marker) {
+      return new Promise<RecursiveData>((resolve, reject) => {
+        if (marker !== undefined) {
           reject(new Error());
+          return;
         }
+        resolve({ marker: 'A', results: [1] });
       });
     }
     return utils.getRecursive(getter, 10).then(() => {
@@ -4754,18 +4747,18 @@ describe('RippleAPI - offline', function () {
     assert.throws(() => api.computeLedgerHash(header));
   });
 
-  /* eslint-disable no-unused-vars */
   it('RippleAPI - implicit server port', function () {
-    const api = new RippleAPI({ server: 'wss://s1.ripple.com' });
+    new RippleAPI({ server: 'wss://s1.ripple.com' });
   });
-  /* eslint-enable no-unused-vars */
+
   it('RippleAPI invalid options', function () {
-    assert.throws(() => new RippleAPI({ invalid: true }));
+    assert.throws(() => new RippleAPI({ invalid: true } as any));
   });
 
   it('RippleAPI valid options', function () {
     const api = new RippleAPI({ server: 'wss://s:1' });
-    assert.deepEqual(api.connection._url, 'wss://s:1');
+    const privateConnectionUrl = (api.connection as any)._url;
+    assert.deepEqual(privateConnectionUrl, 'wss://s:1');
   });
 
   it('RippleAPI invalid server uri', function () {

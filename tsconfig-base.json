@@ -13,10 +13,11 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "removeComments": true,
     "preserveConstEnums": false,
     "esModuleInterop": true,
-    "suppressImplicitAnyIndexErrors": false
+    "suppressImplicitAnyIndexErrors": false,
+    "resolveJsonModule": true,
+    "preserveSymlinks": true
   }
 }
