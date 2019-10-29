@@ -66,7 +66,7 @@ function scaleValue(value, multiplier, extra = 0) {
  *                    `false` if no tag should be used;
  *                    `undefined` if the input could not specify whether a tag should be used.
  */
-interface ClassicAccountAndTag {
+export interface ClassicAccountAndTag {
   classicAccount: string,
   tag: number | false | undefined
 }
@@ -299,6 +299,5 @@ export {
   prepareTransaction,
   common,
   setCanonicalFlag,
-  getClassicAccountAndTag,
-  ClassicAccountAndTag
+  getClassicAccountAndTag
 }

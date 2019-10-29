@@ -1114,7 +1114,7 @@ describe('X-address Usage', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
 
       it('rejects promise and does not throw when field is missing', function (done) {
@@ -1143,7 +1143,7 @@ describe('X-address Usage', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
 
       it('rejects promise and does not throw when fee exceeds maxFeeXRP', function (done) {
@@ -1177,7 +1177,7 @@ describe('X-address Usage', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
 
       it('preparePayment - XRP to XRP no partial', function (done) {
@@ -1192,7 +1192,7 @@ describe('X-address Usage', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
   
       it('preparePayment - address must match payment.source.address', function (done) {
@@ -1207,7 +1207,7 @@ describe('X-address Usage', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
 
       it('preparePayment - mismatched X-address tag', function (done) {
@@ -1239,7 +1239,7 @@ describe('X-address Usage', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
 
       it('preparePayment - mismatched X-address account', function (done) {
@@ -1270,7 +1270,7 @@ describe('X-address Usage', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
   
       it('preparePayment - wrong amount', function (done) {
@@ -1285,7 +1285,7 @@ describe('X-address Usage', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
   
       it('preparePayment - throws when fee exceeds 2 XRP', function (done) {
@@ -1305,7 +1305,7 @@ describe('X-address Usage', function () {
           }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
         } catch (err) {
           done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-        };
+        }
       });
     });
 
@@ -1408,7 +1408,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareOrderCancellation', function () {
@@ -1447,7 +1447,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareTrustline - simple', function () {
@@ -1482,7 +1482,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareSettings', function () {
@@ -1579,7 +1579,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareSettings - signers no weights', function () {
@@ -1635,7 +1635,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareEscrowCreation', function () {
@@ -1670,7 +1670,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareEscrowExecution', function () {
@@ -1703,7 +1703,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareEscrowExecution - no fulfillment', function (done) {
@@ -1718,7 +1718,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('prepareEscrowCancellation', function () {
@@ -2302,7 +2302,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('rejects Promise on preparePaymentChannelClaim with no signature', function (done) {
@@ -2317,7 +2317,7 @@ describe('X-address Usage', function () {
       }).catch(done); // Finish test with assertion failure immediately instead of waiting for timeout.
     } catch (err) {
       done(new Error('Expected method to reject, but method threw. Thrown: ' + err));
-    };
+    }
   });
 
   it('sign', function () {
