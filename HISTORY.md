@@ -1,11 +1,23 @@
 # ripple-lib Release History
 
-## 1.4.0-b1 (2019-09-26)
+## 1.4.0 (2019-10-28)
 
-* Add support for the new X-address format.
+* Unref timer so it does not hang the Node.js process
+* Add a 2-second timeout for connect()
+* Improve getTransaction() error when tx has not been validated yet
+* Add support for the new X-address format
+* Fix error in Safari, Chrome 78, Firefox 70
 * Some error messages have changed slightly. For example:
   * `-instance.Account is not of a type(s) string,instance.Account does not conform to the "address" format`
   * `+instance.Account is not of a type(s) string,instance.Account is not exactly one from <xAddress>,<classicAddress>`
+
+### Internal improvements
+
+* Reduce dependency size
+* Move tests to TypeScript
+* Replace tslint with eslint
+* Update https-proxy-agent
+* Add tests
 
 ## 1.3.4 (2019-10-18)
 

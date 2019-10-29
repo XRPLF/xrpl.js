@@ -1,8 +1,8 @@
 {
   "name": "ripple-lib",
-  "version": "1.4.0-b2",
+  "version": "1.4.0",
   "license": "ISC",
-  "description": "A JavaScript API for interacting with Ripple in Node.js and the browser",
+  "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
     "dist/npm/*",
     "build/ripple-latest-min.js"
