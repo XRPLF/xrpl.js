@@ -1,4 +1,3 @@
-
 import {
   FormattedOrderSpecification,
   FormattedTrustline,
@@ -11,6 +10,8 @@ import {
   ApiMemo,
   TransactionJSON
 } from './utils'
+
+export {FormattedSubmitResponse} from './submit'
 
 export type TransactionJSON = TransactionJSON
 
@@ -53,7 +54,7 @@ export interface OfferCreateTransaction extends TransactionJSON {
   TakerPays: RippledAmount,
   Expiration?: number,
   OfferSequence?: number,
-  Memos?: {Memo: ApiMemo}[]
+  Memos?: { Memo: ApiMemo }[]
 }
 
 export interface SettingsTransaction extends TransactionJSON {
@@ -76,9 +77,9 @@ export type Outcome = {
   fee: string,
   balanceChanges: {
     [key: string]: {
-     currency: string,
-     counterparty?: string,
-     value: string
+      currency: string,
+      counterparty?: string,
+      value: string
     }[]
   },
   orderbookChanges: object,

@@ -4,8 +4,15 @@ import {validate} from '../common'
 import {RippleAPI} from '..'
 
 export interface FormattedSubmitResponse {
+  // @deprecated
   resultCode: string,
-  resultMessage: string
+  // @deprecated
+  resultMessage: string,
+  engine_result: string,
+  engine_result_code: number,
+  engine_result_message: string,
+  tx_blob: string,
+  tx_json: utils.TransactionJSON,
 }
 
 function isImmediateRejection(engineResult: string): boolean {
