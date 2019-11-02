@@ -140,6 +140,12 @@ class RippleAPI extends EventEmitter {
         this.emit('connected')
       })
       this.connection.on('disconnected', code => {
+        // This is a backwards-compatible fix for this change in the ws library: 
+        //   https://github.com/websockets/ws/issues/1257
+        // TODO: Remove in next major, breaking version
+        if (code === 1005) {
+          code = 1000;
+        }
         this.emit('disconnected', code)
       })
     } else {

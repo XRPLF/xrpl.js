@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.136",
-    "@types/ws": "^3.2.0",
+    "@types/ws": "^6.0.3",
     "bignumber.js": "^9.0.0",
     "https-proxy-agent": "^3.0.0",
     "jsonschema": "1.2.2",
@@ -28,18 +28,18 @@
     "ripple-binary-codec": "^0.2.4",
     "ripple-keypairs": "^0.11.0",
     "ripple-lib-transactionparser": "0.8.0",
-    "ws": "^3.3.1"
+    "ws": "^7.2.0"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
-    "@types/node": "11.13.0",
+    "@types/node": "^12.12.5",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "assert-diff": "^2.0.3",
     "doctoc": "^0.15.0",
     "ejs": "^2.3.4",
     "eslint": "^6.5.1",
-    "eventemitter2": "^0.4.14",
+    "eventemitter2": "^5.0.1",
     "gulp": "^4.0.2",
     "json-loader": "^0.5.2",
     "json-schema-to-markdown-table": "^0.4.0",
