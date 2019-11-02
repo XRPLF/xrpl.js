@@ -62,7 +62,7 @@ function setTransactionFields(txJSON: utils.TransactionJSON, input: FormattedSet
  */
 
 function convertTransferRate(transferRate: number): number {
-  return (new BigNumber(transferRate)).shift(9).toNumber()
+  return (new BigNumber(transferRate)).shiftedBy(9).toNumber()
 }
 
 function formatSignerEntry(signer: WeightedSigner): object {

@@ -73,7 +73,7 @@ function addDirectXrpPath(paths: RippledPathsResponse, xrpBalance: string
   // Add XRP "path" only if the source acct has enough XRP to make the payment
   const destinationAmount = paths.destination_amount
   // @ts-ignore: destinationAmount can be a currency amount object! Fix!
-  if ((new BigNumber(xrpBalance)).greaterThanOrEqualTo(destinationAmount)) {
+  if ((new BigNumber(xrpBalance)).isGreaterThanOrEqualTo(destinationAmount)) {
     paths.alternatives.unshift({
       paths_computed: [],
       source_amount: paths.destination_amount

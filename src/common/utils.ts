@@ -83,7 +83,7 @@ function xrpToDrops(xrp: string | BigNumber): string {
       ` too many decimal places.`)
   }
 
-  return (new BigNumber(xrp)).times(1000000.0).floor().toString(10)
+  return (new BigNumber(xrp)).times(1000000.0).integerValue(BigNumber.ROUND_FLOOR).toString(10)
 }
 
 function toRippledAmount(amount: Amount): RippledAmount {

@@ -93,7 +93,7 @@ export const computeTrustlineHash = (address1: string, address2: string, currenc
   const address1Hex = addressToHex(address1)
   const address2Hex = addressToHex(address2)
 
-  const swap = (new BigNumber(address1Hex, 16)).greaterThan(
+  const swap = (new BigNumber(address1Hex, 16)).isGreaterThan(
     new BigNumber(address2Hex, 16))
   const lowAddressHex = swap ? address2Hex : address1Hex
   const highAddressHex = swap ? address1Hex : address2Hex

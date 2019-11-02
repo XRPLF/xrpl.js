@@ -183,7 +183,7 @@ function checkTxSerialization(serialized: string, tx: utils.TransactionJSON): vo
 function checkFee(api: RippleAPI, txFee: string): void {
   const fee = new BigNumber(txFee)
   const maxFeeDrops = xrpToDrops(api._maxFeeXRP)
-  if (fee.greaterThan(maxFeeDrops)) {
+  if (fee.isGreaterThan(maxFeeDrops)) {
     throw new utils.common.errors.ValidationError(
       `"Fee" should not exceed "${maxFeeDrops}". ` +
       'To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor.'

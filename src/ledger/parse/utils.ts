@@ -15,14 +15,14 @@ function adjustQualityForXRP(
   const denominatorShift = (takerGetsCurrency === 'XRP' ? -6 : 0)
   const shift = numeratorShift - denominatorShift
   return shift === 0 ? quality :
-    (new BigNumber(quality)).shift(shift).toString()
+    (new BigNumber(quality)).shiftedBy(shift).toString()
 }
 
 function parseQuality(quality?: number|null): number|undefined {
   if (typeof quality !== 'number') {
     return undefined
   }
-  return (new BigNumber(quality)).shift(-9).toNumber()
+  return (new BigNumber(quality)).shiftedBy(-9).toNumber()
 }
 
 function parseTimestamp(rippleTime?: number|null): string|undefined {
