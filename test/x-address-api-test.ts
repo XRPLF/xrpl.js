@@ -1,26 +1,21 @@
-const _ = require('lodash');
-const assert = require('assert-diff');
-const setupAPI = require('./setup-api');
-const RippleAPI = require('ripple-api').RippleAPI;
-const validate = RippleAPI._PRIVATE.validate;
-const fixtures = require('./fixtures');
-const requests = fixtures.requests;
-const responses = fixtures.responses;
-const addresses = require('./fixtures/addresses');
-const hashes = require('./fixtures/hashes');
-const address = addresses.ACCOUNT_X;
+import _ from 'lodash';
+import assert from 'assert-diff';
+import setupAPI from './setup-api';
+import {RippleAPI} from 'ripple-api';
+import requests from './fixtures/requests';
+import responses from './fixtures/requests';
+import addresses from './fixtures/addresses.json';
+import hashes from './fixtures/hashes.json';
+const address = addresses.ACCOUNT_X; 
 const utils = RippleAPI._PRIVATE.ledgerUtils;
-const ledgerClosed = require('./fixtures/rippled/ledger-close-newer');
+import ledgerClosed from './fixtures/rippled/ledger-close-newer.json';
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator;
-const binary = require('ripple-binary-codec');
-const BigNumber = require('bignumber.js');
+import binary from 'ripple-binary-codec';
+import BigNumber from 'bignumber.js';
 assert.options.strict = true;
 
 // how long before each test case times out
 const TIMEOUT = 20000;
-
-function unused() {
-}
 
 function closeLedger(connection) {
   connection._ws.emit('message', JSON.stringify(ledgerClosed));
@@ -3371,7 +3366,7 @@ describe('X-address Usage', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
+      ).then(([directOfferResults, reverseOfferResults]) => {
         const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
@@ -3407,7 +3402,7 @@ describe('X-address Usage', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
+      ).then(([directOfferResults, reverseOfferResults]) => {
         const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
@@ -3475,7 +3470,7 @@ describe('X-address Usage', function () {
             taker: myAddress
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
+      ).then(([directOfferResults, reverseOfferResults]) => {
         const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
@@ -3508,7 +3503,7 @@ describe('X-address Usage', function () {
             taker: myAddress
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
+      ).then(([directOfferResults, reverseOfferResults]) => {
         const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
@@ -3545,7 +3540,7 @@ describe('X-address Usage', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
+      ).then(([directOfferResults, reverseOfferResults]) => {
         const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
@@ -3589,7 +3584,7 @@ describe('X-address Usage', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
+      ).then(([directOfferResults, reverseOfferResults]) => {
         const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
@@ -3636,7 +3631,7 @@ describe('X-address Usage', function () {
             taker: address
           })
         ]
-      ).then((directOfferResults, reverseOfferResults) => {
+      ).then(([directOfferResults, reverseOfferResults]) => {
         const directOffers = (directOfferResults ? directOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const reverseOffers = (reverseOfferResults ? reverseOfferResults : []).reduce((acc, res) => acc.concat(res.offers), [])
         const orderbook = RippleAPI.formatBidsAndAsks(orderbookInfo, [...directOffers, ...reverseOffers]);
