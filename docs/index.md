@@ -4042,12 +4042,13 @@ limit | integer | *Optional* (May be omitted) The limit that was used in this re
 validated | boolean | *Optional* If included and set to true, the information in this request comes from a validated ledger version. Otherwise, the information is subject to change.
 
 The types of objects that may be returned include:
-* Offer objects for orders that are currently live, unfunded, or expired but not yet removed.
-* RippleState objects for trust lines where this account's side is not in the default state.
-* A SignerList object if the account has multi-signing enabled.
-* Escrow objects for held payments that have not yet been executed or canceled.
-* PayChannel objects for open payment channels.
-* Check objects for pending checks.
+
+* `Offer` objects for orders that are currently live, unfunded, or expired but not yet removed.
+* `RippleState` objects for trust lines where this account's side is not in the default state.
+* A `SignerList` object if the account has multi-signing enabled.
+* `Escrow` objects for held payments that have not yet been executed or canceled.
+* `PayChannel` objects for open payment channels.
+* `Check` objects for pending checks.
 
 ### Example
 
