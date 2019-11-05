@@ -3636,7 +3636,7 @@ describe('RippleAPI', function () {
           .dividedBy(order.specification.quantity.value)
           .toString();
         }
-        assert((new BigNumber(rate)).greaterThanOrEqualTo(previousRate),
+        assert((new BigNumber(rate)).isGreaterThanOrEqualTo(previousRate),
           'Rates must be sorted from least to greatest: ' +
           rate + ' should be >= ' + previousRate);
         previousRate = rate;
@@ -3894,7 +3894,7 @@ describe('RippleAPI', function () {
           .dividedBy(order.specification.quantity.value)
           .toString();
         }
-        assert((new BigNumber(rate)).greaterThanOrEqualTo(previousRate),
+        assert((new BigNumber(rate)).isGreaterThanOrEqualTo(previousRate),
           'Rates must be sorted from least to greatest: ' +
           rate + ' should be >= ' + previousRate);
         previousRate = rate;

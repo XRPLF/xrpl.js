@@ -17,7 +17,7 @@ export type FormattedAccountOrder = {
 // TODO: remove this function once rippled provides quality directly
 function computeQuality(takerGets, takerPays) {
   const quotient = new BigNumber(takerPays.value).dividedBy(takerGets.value)
-  return quotient.toDigits(16, BigNumber.ROUND_HALF_UP).toString()
+  return quotient.precision(16, BigNumber.ROUND_HALF_UP).toString()
 }
 
 // rippled 'account_offers' returns a different format for orders than 'tx'

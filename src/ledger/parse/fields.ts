@@ -8,7 +8,7 @@ function parseField(info, value) {
     return Buffer.from(value, 'hex').toString('ascii')
   }
   if (info.shift) {
-    return (new BigNumber(value)).shift(-info.shift).toNumber()
+    return (new BigNumber(value)).shiftedBy(-info.shift).toNumber()
   }
   return value
 }

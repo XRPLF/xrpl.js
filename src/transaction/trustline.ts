@@ -9,7 +9,7 @@ import {
 import {RippleAPI} from '..'
 
 function convertQuality(quality) {
-  return (new BigNumber(quality)).shift(9).truncated().toNumber()
+  return (new BigNumber(quality)).shiftedBy(9).integerValue(BigNumber.ROUND_DOWN).toNumber()
 }
 
 function createTrustlineTransaction(account: string,

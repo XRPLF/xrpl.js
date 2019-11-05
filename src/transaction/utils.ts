@@ -218,7 +218,7 @@ function prepareTransaction(txJSON: TransactionJSON, api: RippleAPI,
       instructions.signersCount + 1
     if (instructions.fee !== undefined) {
       const fee = new BigNumber(instructions.fee)
-      if (fee.greaterThan(api._maxFeeXRP)) {
+      if (fee.isGreaterThan(api._maxFeeXRP)) {
         return Promise.reject(new ValidationError(`Fee of ${fee.toString(10)} XRP exceeds ` +
           `max of ${api._maxFeeXRP} XRP. To use this fee, increase ` +
           '`maxFeeXRP` in the RippleAPI constructor.'))
