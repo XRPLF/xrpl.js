@@ -140,13 +140,14 @@ class RippleAPI extends EventEmitter {
         this.emit('connected')
       })
       this.connection.on('disconnected', code => {
+        let finalCode = code;
         // This is a backwards-compatible fix for this change in the ws library: 
         //   https://github.com/websockets/ws/issues/1257
         // TODO: Remove in next major, breaking version
-        if (code === 1005) {
-          code = 1000;
+        if (finalCode === 1005) {
+          finalCode = 1000;
         }
-        this.emit('disconnected', code)
+        this.emit('disconnected', finalCode)
       })
     } else {
       // use null object pattern to provide better error message if user
