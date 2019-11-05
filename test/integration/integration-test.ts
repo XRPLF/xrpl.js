@@ -5,8 +5,8 @@ import requests from '../fixtures/requests';
 import {RippleAPI} from 'ripple-api';
 import {isValidAddress} from 'ripple-address-codec';
 import {payTo, ledgerAccept} from './utils';
-import { errors } from 'ripple-api/common';
-import { isValidSecret } from 'ripple-api/common/utils';
+import {errors} from 'ripple-api/common';
+import {isValidSecret} from 'ripple-api/common/utils';
 
 
 // how long before each test case times out

@@ -1,8 +1,8 @@
 import assert from 'assert-diff';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { RippleAPI } from 'ripple-api';
-import { RecursiveData } from 'ripple-api/ledger/utils';
+import {RippleAPI} from 'ripple-api';
+import {RecursiveData} from 'ripple-api/ledger/utils';
 import binary from 'ripple-binary-codec';
 import requests from './fixtures/requests';
 import responses from './fixtures/responses';

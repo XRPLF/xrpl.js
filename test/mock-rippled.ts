@@ -10,7 +10,7 @@ import transactionsResponse from './fixtures/rippled/account-tx';
 import accountLinesResponse from './fixtures/rippled/account-lines';
 import accountObjectsResponse from './fixtures/rippled/account-objects';
 import fullLedger from './fixtures/rippled/ledger-full-38129.json';
-import { getFreePort } from './utils/net-utils';
+import {getFreePort} from './utils/net-utils';
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';
@@ -48,17 +48,12 @@ function createLedgerResponse(request, response) {
   return JSON.stringify(newResponse);
 }
 
-interface CustomWebSocketServer extends WebSocketServer, EventEmitter2 {
-  expectedRequests: any
-  expect: any
-  config: any
-  socket: any
-  onAny: any
-  event: any
-}
+// We mock out WebSocketServer in these tests and add a lot of custom 
+// properties not defined on the normal WebSocketServer object.
+type MockedWebSocketServer = any;
 
 export function createMockRippled(port) {
-  const mock = new WebSocketServer({ port: port }) as CustomWebSocketServer;
+  const mock = new WebSocketServer({ port: port }) as MockedWebSocketServer;
   _.assign(mock, EventEmitter2.prototype);
 
   const close = mock.close;
