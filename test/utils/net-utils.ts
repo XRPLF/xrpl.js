@@ -1,14 +1,12 @@
-'use strict'; // eslint-disable-line 
-
-const net = require('net');
+import net from 'net';
 
 // using a free port instead of a constant port enables parallelization
-function getFreePort() {
+export function getFreePort() {
   return new Promise((resolve, reject) => {
     const server = net.createServer();
     let port;
     server.on('listening', function() {
-      port = server.address().port;
+      port = (server.address() as any).port;
       server.close();
     });
     server.on('close', function() {
@@ -20,7 +18,3 @@ function getFreePort() {
     server.listen(0);
   });
 }
-
-module.exports = {
-  getFreePort
-};
