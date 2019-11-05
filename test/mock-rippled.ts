@@ -76,7 +76,7 @@ export function createMockRippled(port) {
     mock.expectedRequests = expectedRequests;
   };
 
-  mock.on('connection', function (this: CustomWebSocketServer, conn: any) {
+  mock.on('connection', function (this: MockedWebSocketServer, conn: any) {
     if (mock.config.breakNextConnection) {
       mock.config.breakNextConnection = false;
       conn.terminate();
@@ -97,7 +97,7 @@ export function createMockRippled(port) {
 
   mock.config = {};
 
-  mock.onAny(function (this: CustomWebSocketServer) {
+  mock.onAny(function (this: MockedWebSocketServer) {
     if (this.event.indexOf('request_') !== 0) {
       return;
     }
