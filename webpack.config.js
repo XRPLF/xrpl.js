@@ -35,13 +35,13 @@ module.exports = [
   function(env, argv) {
     const config = getDefaultConfiguration();
     config.mode = 'development';
-    config.output.filename = `ripple-lib.development.js`;
+    config.output.filename = `ripple-latest.js`;
     return config;
   },
   function(env, argv) {
     const config = getDefaultConfiguration();
     config.mode = 'production';
-    config.output.filename = `ripple-lib.production.min.js`;
+    config.output.filename = `ripple-latest.min.js`;
     if (process.argv.includes('--analyze')) {
       config.plugins.push(new BundleAnalyzerPlugin());
     }
