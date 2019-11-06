@@ -4,7 +4,6 @@ node_js:
   - 10
   - 11
 script:
-  - yarn compile
   - yarn test
   - yarn build
   - yarn lint
