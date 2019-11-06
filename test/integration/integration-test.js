@@ -1,12 +1,15 @@
-import _ from 'lodash';
-import assert from 'assert';
-import wallet from './wallet';
-import requests from '../fixtures/requests';
-import {RippleAPI} from 'ripple-api';
-import {isValidAddress} from 'ripple-address-codec';
-import {payTo, ledgerAccept} from './utils';
-import {errors} from 'ripple-api/common';
-import {isValidSecret} from 'ripple-api/common/utils';
+/* eslint-disable max-nested-callbacks */
+/* eslint-disable max-params */
+'use strict';
+const _ = require('lodash');
+const assert = require('assert');
+const errors = require('../../src/common/errors');
+const wallet = require('./wallet');
+const requests = require('../fixtures/requests');
+const RippleAPI = require('ripple-api').RippleAPI;
+const {isValidAddress} = require('ripple-address-codec');
+const {isValidSecret} = require('../../src/common');
+const {payTo, ledgerAccept} = require('./utils');
 
 
 // how long before each test case times out
@@ -68,7 +71,7 @@ function testTransaction(testcase, type, lastClosedLedgerVersion, prepared,
   });
 }
 
-function setup(this: any, server = 'wss://s1.ripple.com') {
+function setup(server = 'wss://s1.ripple.com') {
   this.api = new RippleAPI({server});
   console.log('CONNECTING...');
   return this.api.connect().then(() => {
@@ -164,11 +167,11 @@ function setupAccounts(testcase) {
   return promise;
 }
 
-function teardown(this: any) {
+function teardown() {
   return this.api.disconnect();
 }
 
-function suiteSetup(this: any) {
+function suiteSetup() {
   this.transactions = [];
 
   return setup.bind(this)(serverUrl)

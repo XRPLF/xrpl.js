@@ -1,4 +1,5 @@
-import {RippleAPIBroadcast} from '../../src';
+'use strict';
+const {RippleAPIBroadcast} = require('../../src');
 
 function main() {
   const servers = ['wss://s1.ripple.com', 'wss://s2.ripple.com'];

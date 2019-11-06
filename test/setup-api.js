@@ -1,7 +1,11 @@
-import {RippleAPI, RippleAPIBroadcast} from 'ripple-api';
-import ledgerClosed from './fixtures/rippled/ledger-close.json';
-import {createMockRippled} from './mock-rippled';
-import {getFreePort} from './utils/net-utils';
+'use strict'; // eslint-disable-line 
+
+const RippleAPI = require('ripple-api').RippleAPI;
+const RippleAPIBroadcast = require('ripple-api').RippleAPIBroadcast;
+const ledgerClosed = require('./fixtures/rippled/ledger-close');
+const createMockRippled = require('./mock-rippled');
+const {getFreePort} = require('./utils/net-utils');
+
 
 function setupMockRippledConnection(testcase, port) {
   return new Promise((resolve, reject) => {
@@ -27,19 +31,19 @@ function setupMockRippledConnectionForBroadcast(testcase, ports) {
   });
 }
 
-function setup(this: any) {
+function setup() {
   return getFreePort().then(port => {
     return setupMockRippledConnection(this, port);
   });
 }
 
-function setupBroadcast(this: any) {
+function setupBroadcast() {
   return Promise.all([getFreePort(), getFreePort()]).then(ports => {
     return setupMockRippledConnectionForBroadcast(this, ports);
   });
 }
 
-function teardown(this: any, done) {
+function teardown(done) {
   this.api.disconnect().then(() => {
     if (this.mockRippled !== undefined) {
       this.mockRippled.close();
@@ -50,7 +54,7 @@ function teardown(this: any, done) {
   }).catch(done);
 }
 
-export default {
+module.exports = {
   setup: setup,
   teardown: teardown,
   setupBroadcast: setupBroadcast,

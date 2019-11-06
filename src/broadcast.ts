@@ -1,13 +1,13 @@
 
 import * as _ from 'lodash'
-import {RippleAPI, APIOptions} from './api'
+import {RippleAPI} from './api'
 
 class RippleAPIBroadcast extends RippleAPI {
 
   ledgerVersion: number | undefined = undefined
   private _apis: RippleAPI[]
 
-  constructor(servers, options: APIOptions = {}) {
+  constructor(servers, options) {
     super(options)
 
     const apis: RippleAPI[] = servers.map(server => new RippleAPI(
