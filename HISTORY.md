@@ -1,5 +1,18 @@
 # ripple-lib Release History
 
+## 1.4.1 (2019-11-06)
+
+* Compatibility: Change TypeScript compile target back to `es6` (#1071)
+  * WARNING: This allows for the use of Node v6, which is no longer supported by Node.js, as it was end-of-life'd in April 2019
+  * We recommend updating to Node v8/v10 ASAP in order to get security updates and fixes from the Node.js team
+  * We are not actively running tests against Node v6 (ref #1076)
+* Docs: `getAccountObjects` doc fix
+* Dependencies:
+  * Update `bignumber.js`
+  * Update `ripple-keypairs`
+  * Update `ws`
+* Build process: Update `webpack` flow
+
 ## 1.4.0 (2019-10-28)
 
 * Unref timer so it does not hang the Node.js process
