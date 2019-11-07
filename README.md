@@ -1,3 +1,4 @@
+ [![Build Status](https://travis-ci.org/ripple/ripple-lib.svg?branch=master)](https://travis-ci.org/ripple/ripple-lib)
 # ripple-lib
 
 A JavaScript API for interacting with the XRP Ledger
