@@ -1,13 +1,10 @@
-/* eslint-disable max-nested-callbacks */
-'use strict'; // eslint-disable-line 
-
-const {RippleAPI, RippleAPIBroadcast} = require('ripple-api');
-const ledgerClosed = require('./fixtures/rippled/ledger-close');
+import {RippleAPI, RippleAPIBroadcast} from 'ripple-api';
+import ledgerClosed from './fixtures/rippled/ledger-close.json';
 
 const port = 34371;
 const baseUrl = 'ws://testripple.circleci.com:';
 
-function setup(port_ = port) {
+function setup(this: any, port_ = port) {
   const tapi = new RippleAPI({server: baseUrl + port_});
   return tapi.connect().then(() => {
     return tapi.connection.request({
@@ -27,7 +24,7 @@ function setup(port_ = port) {
   });
 }
 
-function setupBroadcast() {
+function setupBroadcast(this: any) {
   const servers = [port, port + 1].map(port_ => baseUrl + port_);
   this.api = new RippleAPIBroadcast(servers);
   return new Promise((resolve, reject) => {
@@ -39,14 +36,14 @@ function setupBroadcast() {
   });
 }
 
-function teardown() {
+function teardown(this: any) {
   if (this.api.isConnected()) {
     return this.api.disconnect();
   }
   return undefined;
 }
 
-module.exports = {
+export default {
   setup: setup,
   teardown: teardown,
   setupBroadcast: setupBroadcast

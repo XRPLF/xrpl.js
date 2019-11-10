@@ -1,9 +1,5 @@
-'use strict';
-
-
 const port = 34371;
-
-const createMockRippled = require('./mock-rippled');
+import {createMockRippled} from './mock-rippled';
 
 function main() {
   if (global.describe) {
