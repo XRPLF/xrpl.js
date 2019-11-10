@@ -1,17 +1,16 @@
-'use strict'; // eslint-disable-line
-const _ = require('lodash');
-const assert = require('assert');
-const WebSocketServer = require('ws').Server;
-const EventEmitter2 = require('eventemitter2').EventEmitter2;
-const fixtures = require('./fixtures/rippled');
-const addresses = require('./fixtures/addresses');
-const hashes = require('./fixtures/hashes');
-const transactionsResponse = require('./fixtures/rippled/account-tx');
-const accountLinesResponse = require('./fixtures/rippled/account-lines');
-const accountObjectsResponse = require('./fixtures/rippled/account-objects');
-const fullLedger = require('./fixtures/rippled/ledger-full-38129.json');
-const { getFreePort } = require('./utils/net-utils');
-const fs = require('fs');
+import _ from 'lodash';
+import fs from 'fs';
+import assert from 'assert';
+import {Server as WebSocketServer} from 'ws';
+import {EventEmitter2} from 'eventemitter2';
+import fixtures from './fixtures/rippled';
+import addresses from './fixtures/addresses.json';
+import hashes from './fixtures/hashes.json';
+import transactionsResponse from './fixtures/rippled/account-tx';
+import accountLinesResponse from './fixtures/rippled/account-lines';
+import accountObjectsResponse from './fixtures/rippled/account-objects';
+import fullLedger from './fixtures/rippled/ledger-full-38129.json';
+import {getFreePort} from './utils/net-utils';
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';
@@ -49,8 +48,12 @@ function createLedgerResponse(request, response) {
   return JSON.stringify(newResponse);
 }
 
-module.exports = function createMockRippled(port) {
-  const mock = new WebSocketServer({ port: port });
+// We mock out WebSocketServer in these tests and add a lot of custom 
+// properties not defined on the normal WebSocketServer object.
+type MockedWebSocketServer = any;
+
+export function createMockRippled(port) {
+  const mock = new WebSocketServer({ port: port }) as MockedWebSocketServer;
   _.assign(mock, EventEmitter2.prototype);
 
   const close = mock.close;
@@ -73,7 +76,7 @@ module.exports = function createMockRippled(port) {
     mock.expectedRequests = expectedRequests;
   };
 
-  mock.on('connection', function (conn) {
+  mock.on('connection', function (this: MockedWebSocketServer, conn: any) {
     if (mock.config.breakNextConnection) {
       mock.config.breakNextConnection = false;
       conn.terminate();
@@ -94,7 +97,7 @@ module.exports = function createMockRippled(port) {
 
   mock.config = {};
 
-  mock.onAny(function () {
+  mock.onAny(function (this: MockedWebSocketServer) {
     if (this.event.indexOf('request_') !== 0) {
       return;
     }
