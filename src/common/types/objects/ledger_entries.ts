@@ -17,7 +17,7 @@ export interface AccountRootLedgerEntry {
   RegularKey?: string,
   TickSize?: number,
   TransferRate?: number,
-  WalletLocator?: string, // DEPRECATED
+  WalletLocator?: string,
   WalletSize?: number // DEPRECATED
 }
 

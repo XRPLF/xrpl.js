@@ -17,6 +17,7 @@ export type FormattedSettings = {
   disallowIncomingXRP?: boolean,
   domain?: string,
   emailHash?: string|null,
+  walletLocator?: string|null,
   enableTransactionIDTracking?: boolean,
   globalFreeze?: boolean,
   memos?: Memo[],
