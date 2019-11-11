@@ -36,7 +36,7 @@ Warning: Use at your own risk.
 
   List of XRPL validators, nodes, and testnet validators.
 
-- **[XRP Scan - XRP Ledger explorer](https://http://xrpscan.com)**
+- **[XRP Scan - XRP Ledger explorer](https://xrpscan.com)**
 
   XRP Ledger explorer, metrics and analytics.
 
@@ -59,6 +59,10 @@ Warning: Use at your own risk.
   Tool for generating a XRP payment request URI in a QR code, with currency converter.
 
 ## Wallets and wallet tools
+
+- **[XRP Toolkit](https://www.xrptoolkit.com)**
+
+  A web interface to the XRP Ledger, supporting both hardware and software wallets.
 
 - **[Toast Wallet](https://toastwallet.com/)**
 
