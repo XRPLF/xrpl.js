@@ -3939,6 +3939,7 @@ return api.getSettings(address).then(settings =>
   "emailHash": "23463B99B62A72F26ED677CC556C44E8",
   "domain": "example.com",
   "transferRate": 1.002,
+  "tickSize": 5,
   "signers": {
     "threshold": 3,
     "weights": [

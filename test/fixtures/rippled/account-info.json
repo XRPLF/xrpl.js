@@ -15,6 +15,7 @@
       "PreviousTxnLgrSeq": 6614625,
       "Sequence": 23,
       "TransferRate": 1002000000,
+      "TickSize": 5,
       "WalletLocator": "00000000000000000000000000000000000000000000000000000000DEADBEEF",
       "index": "396400950EA27EB5710C0D5BE1D2B4689139F168AC5D07C13B8140EC3F82AE71",
       "urlgravatar": "http://www.gravatar.com/avatar/23463b99b62a72f26ed677cc556c44e8",
