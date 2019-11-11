@@ -28,5 +28,5 @@ export type FormattedSettings = {
   requireDestinationTag?: boolean,
   signers?: Signers,
   transferRate?: number|null,
-  tickSize?: number|null
+  tickSize?: number
 }
