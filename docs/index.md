@@ -1521,7 +1521,7 @@ outcome | object | The outcome of the transaction (what effects it had).
 *outcome.orderbookChanges.\*[].* status | string | The status of the order. One of "created", "filled", "partially-filled", "cancelled".
 *outcome.orderbookChanges.\*[].* expirationTime | date-time string | *Optional* The time after which the order expires, if any.
 *outcome.orderbookChanges.\*[].* makerExchangeRate | [value](#value) | *Optional* The exchange rate between the `quantity` currency and the `totalPrice` currency from the point of view of the maker.
-*outcome.* ledgerVersion | integer | The ledger version that the transaction was validated in.
+*outcome.* ledgerSequence | integer | The ledger sequence that the transaction was validated in.
 *outcome.* ledgerVersion | string | The ledger version that the transaction was validated in.
 *outcome.* indexInLedger | integer | The ordering index of the transaction in the ledger.
 *outcome.* channelChanges | object | *Optional* Properties reflecting the details of the payment channel.
