@@ -382,6 +382,7 @@ class Connection extends EventEmitter {
 
   _whenReady<T>(promise: Promise<T>): Promise<T> {
     return new Promise((resolve, reject) => {
+      promise.catch(reject);
       if (!this._shouldBeConnected) {
         reject(new NotConnectedError())
       } else if (this._state === WebSocket.OPEN && this._isReady) {
