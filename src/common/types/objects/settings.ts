@@ -27,5 +27,6 @@ export type FormattedSettings = {
   requireAuthorization?: boolean,
   requireDestinationTag?: boolean,
   signers?: Signers,
-  transferRate?: number|null
+  transferRate?: number|null,
+  tickSize?: number
 }

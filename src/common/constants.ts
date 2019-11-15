@@ -77,7 +77,8 @@ const AccountFields = {
     length: 32, defaults: '00000000000000000000000000000000'},
   MessageKey: {name: 'messageKey'},
   Domain: {name: 'domain', encoding: 'hex'},
-  TransferRate: {name: 'transferRate', defaults: 0, shift: 9}
+  TransferRate: {name: 'transferRate', defaults: 0, shift: 9},
+  TickSize: {name: 'tickSize', defaults: 0}
 }
 
 export {
