@@ -46,7 +46,7 @@
     "nyc": "^14.1.1",
     "source-map-support": "0.5.12",
     "ts-node": "^8.4.1",
-    "typescript": "^3.6.4",
+    "typescript": "3.7.2",
     "webpack": "^4.30.0",
     "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.9"

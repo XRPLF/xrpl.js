@@ -1,6 +1,6 @@
-import {TransactionJSON, prepareTransaction} from './utils'
+import {prepareTransaction} from './utils'
 import {validate} from '../common'
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {RippleAPI} from '..'
 
 export type CheckCancelParameters = {

@@ -1,7 +1,7 @@
 import * as utils from './utils'
 const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {Memo} from '../common/types/objects'
 import {RippleAPI} from '..'
 
@@ -15,7 +15,7 @@ export type EscrowExecution = {
 
 function createEscrowExecutionTransaction(account: string,
   payment: EscrowExecution
-): utils.TransactionJSON {
+): TransactionJSON {
   const txJSON: any = {
     TransactionType: 'EscrowFinish',
     Account: account,
