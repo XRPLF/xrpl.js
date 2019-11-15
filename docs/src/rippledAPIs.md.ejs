@@ -1,11 +1,13 @@
 # rippled APIs
 
-ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for all online functionality. With ripple-lib version 1.0.0 and higher, you can easily access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
-* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods). 
+ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for online functionality. In addition to ripple-lib's own methods, you can also access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
+
+* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods).
 * Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
 * Use `requestNextPage()` to request the next page of data.
 
 When using rippled APIs:
+
 * [Specify XRP amounts in drops](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts).
 * [Specify timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-time).
 * Instead of `counterparty`, use `issuer`.

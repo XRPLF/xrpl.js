@@ -553,7 +553,8 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#address) | An account address on the XRP Ledger
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
-transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
+tickSize | string | *Optional* Tick size to use for offers involving a currency issued by this address. The exchange rates of those offers is rounded to this many significant digits. Valid values are 3 to 15 inclusive, or 0 to disable.
+transferRate | number,null | *Optional* The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 
 ### Example
 
@@ -788,12 +789,14 @@ signature | string | *Optional* Signed claim authorizing withdrawal of XRP from 
 
 # rippled APIs
 
-ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for all online functionality. With ripple-lib version 1.0.0 and higher, you can easily access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
-* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods). 
+ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for online functionality. In addition to ripple-lib's own methods, you can also access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
+
+* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods).
 * Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
 * Use `requestNextPage()` to request the next page of data.
 
 When using rippled APIs:
+
 * [Specify XRP amounts in drops](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts).
 * [Specify timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-time).
 * Instead of `counterparty`, use `issuer`.
@@ -3921,7 +3924,8 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* weights[] | object | An association of an address and a weight.
 *signers.weights[].* address | [address](#address) | An account address on the XRP Ledger
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
-transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
+tickSize | string | *Optional* Tick size to use for offers involving a currency issued by this address. The exchange rates of those offers is rounded to this many significant digits. Valid values are 3 to 15 inclusive, or 0 to disable.
+transferRate | number,null | *Optional* The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 
 ### Example
 
