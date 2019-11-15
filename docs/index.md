@@ -106,7 +106,8 @@
 
 # Introduction
 
-RippleAPI (ripple-lib) is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript.
+RippleAPI (ripple-lib) is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript/TypeScript.
+
 Using RippleAPI, you can:
 
 * [Query transactions from the XRP Ledger history](#gettransaction)
@@ -114,6 +115,10 @@ Using RippleAPI, you can:
 * [Submit](#submit) transactions to the XRP Ledger, including [Payments](#payment), [Orders](#order), [Settings changes](#settings), and [other types](#transaction-types)
 * [Generate a new XRP Ledger Address](#generateaddress)
 * ... and [much more](#api-methods).
+
+This page contains documentation for ripple-lib. To use ripple-lib with npm/yarn, begin with the [Getting Started](https://github.com/ripple/ripple-lib#getting-started) steps.
+
+**What is ripple-lib used for?** Here's a [list of applications that use `ripple-lib`]((https://github.com/ripple/ripple-lib/blob/develop/APPLICATIONS.md)). Open a PR to add your app or project to the list!
 
 ## Boilerplate
 

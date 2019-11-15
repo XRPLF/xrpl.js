@@ -1,5 +1,21 @@
 # ripple-lib Release History
 
+## 1.4.2 (2019-11-14)
+
+* Add support for tick size (#1090) (thanks @RareData)
+* Update email hash default to allow proper clearing (#1089) (thanks @RareData)
+* Fix Unhandled Promise Rejection Warning on message `_send`
+  * Add an immediate catch to the `_send` promise passed to `_whenReady` in case there is rejection before async handlers are added (#1092) (thanks @nickewansmith)
+* Docs improvements
+  * Add XRP Toolkit reference (#1088)
+* Internal improvements
+  * Add a prettier config
+  * Update Node.js Testing Versions (#1085)
+    * Testing matrix based on: https://nodejs.org/en/about/releases/
+      - Node 11 is no longer supported (not LTS)
+      - Node 12 added (active LTS)
+      - Node 13 added ("current" release)
+
 ## 1.4.1 (2019-11-06)
 
 * Compatibility: Change TypeScript compile target back to `es6` (#1071)
