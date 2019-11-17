@@ -420,13 +420,17 @@ class Connection extends EventEmitter {
       this._console.log(message)
     }
     return new Promise((resolve, reject) => {
-      this._ws.send(message, undefined, error => {
-        if (error) {
-          reject(new DisconnectedError(error.message, error))
-        } else {
-          resolve()
-        }
-      })
+      try {
+        this._ws.send(message, undefined, error => {
+          if (error) {
+            reject(new DisconnectedError(error.message, error))
+          } else {
+            resolve()
+          }
+        })
+      } catch (error) {
+        reject(new DisconnectedError(error.message, error))
+      }
     })
   }
 
