@@ -3495,7 +3495,6 @@ describe('RippleAPI', function () {
     }, this.api.errors.UnexpectedError);
   });
 
-
   it('getSettings', function () {
     return this.api.getSettings(address).then(
       _.partial(checkResult, responses.getSettings, 'getSettings'));
