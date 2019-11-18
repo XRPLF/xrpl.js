@@ -1,12 +1,13 @@
 import assert from 'assert-diff';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { RippleAPI } from 'ripple-api';
-import { RecursiveData } from 'ripple-api/ledger/utils';
+import {RippleAPI} from 'ripple-api';
+import {RecursiveData} from 'ripple-api/ledger/utils';
 import binary from 'ripple-binary-codec';
-import { requests, responses } from './fixtures';
-import addresses from './fixtures/addresses';
-import hashes from './fixtures/hashes';
+import requests from './fixtures/requests';
+import responses from './fixtures/responses';
+import addresses from './fixtures/addresses.json';
+import hashes from './fixtures/hashes.json';
 import ledgerClosed from './fixtures/rippled/ledger-close-newer.json';
 import setupAPI from './setup-api';
 const {validate, schemaValidator} = RippleAPI._PRIVATE;
@@ -268,13 +269,18 @@ describe('RippleAPI', function () {
     })
   })
 
+
   describe('isValidAddress', function () {
     it('returns true for valid address', function () {
       assert(this.api.isValidAddress('rLczgQHxPhWtjkaQqn3Q6UM8AbRbbRvs5K'));
+      assert(this.api.isValidAddress(addresses.ACCOUNT_X));
+      assert(this.api.isValidAddress(addresses.ACCOUNT_T));
     })
 
     it('returns false for invalid address', function () {
       assert(!this.api.isValidAddress('foobar'));
+      assert(!this.api.isValidAddress(addresses.ACCOUNT_X.slice(0, -1)));
+      assert(!this.api.isValidAddress(addresses.ACCOUNT_T.slice(1)));
     })
   })
 
@@ -307,11 +313,26 @@ describe('RippleAPI', function () {
       }, /^Error: Non-base58 character$/)
     })
   })
-
+  
   describe('deriveAddress', function () {
     it('returns address for public key', function () {
       var address = this.api.deriveAddress('035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06');
       assert.equal(address, 'rLczgQHxPhWtjkaQqn3Q6UM8AbRbbRvs5K');
+    })
+  })
+
+  describe('deriveXAddress', function () {
+    it('returns address for public key', function () {
+      assert.equal(RippleAPI.deriveXAddress({
+        publicKey: '035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06',
+        tag: false,
+        test: false
+      }), 'XVZVpQj8YSVpNyiwXYSqvQoQqgBttTxAZwMcuJd4xteQHyt');
+      assert.equal(RippleAPI.deriveXAddress({
+        publicKey: '035332FBA71D705BD5D97014A833BE2BBB25BEFCD3506198E14AFEA241B98C2D06',
+        tag: false,
+        test: true
+      }), 'TVVrSWtmQQssgVcmoMBcFQZKKf56QscyWLKnUyiuZW8ALU4');
     })
   })
 
@@ -3440,7 +3461,6 @@ describe('RippleAPI', function () {
       _.partial(checkResult, responses.getTrustlines.all, 'getTrustlines'));
   });
 
-  // @deprecated See corresponding test in `x-address-api-test.js`
   it('generateAddress', function () {
     function random() {
       return _.fill(Array(16), 0);
@@ -3455,6 +3475,23 @@ describe('RippleAPI', function () {
         return _.fill(Array(1), 0);
       }
       this.api.generateAddress({ entropy: random() });
+    }, this.api.errors.UnexpectedError);
+  });
+
+  it('generateXAddress', function () {
+    function random() {
+      return _.fill(Array(16), 0);
+    }
+    assert.deepEqual(this.api.generateXAddress({ entropy: random() }),
+      responses.generateXAddress);
+  });
+
+  it('generateXAddress invalid', function () {
+    assert.throws(() => {
+      function random() {
+        return _.fill(Array(1), 0);
+      }
+      this.api.generateXAddress({ entropy: random() });
     }, this.api.errors.UnexpectedError);
   });
 
