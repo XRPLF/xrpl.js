@@ -33,7 +33,12 @@ describe('RippleAPI [Test Runner]', function() {
   const filteredTestSuites = allTestSuites.filter(({ isMissing }) => !isMissing)
 
   // Run all the tests:
-  for (const { name: suiteName, tests, isMissing } of filteredTestSuites) {
+  for (const {
+    name: suiteName,
+    tests,
+    isMissing,
+    config
+  } of filteredTestSuites) {
     describe(suiteName, () => {
       // Check that tests exist as expected, and report any errors if they don't.
       it('has valid test suite', () => {
@@ -55,13 +60,15 @@ describe('RippleAPI [Test Runner]', function() {
         }
       })
       // Run each test with the newer, x-address style.
-      describe(`2. X-Address Style`, () => {
-        for (const [testName, fn] of tests) {
-          it(testName, function() {
-            return fn(this.api, addresses.ACCOUNT_X)
-          })
-        }
-      })
+      if (!config.skipXAddress) {
+        describe(`2. X-Address Style`, () => {
+          for (const [testName, fn] of tests) {
+            it(testName, function() {
+              return fn(this.api, addresses.ACCOUNT_X)
+            })
+          }
+        })
+      }
     })
   }
 })

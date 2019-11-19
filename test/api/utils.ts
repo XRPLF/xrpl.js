@@ -29,6 +29,10 @@ export interface TestSuite {
 interface LoadedTestSuite {
   name: string
   tests: [string, TestFn][]
+  config: {
+    /** Set to true to skip re-running tests with an X-Address. */
+    skipXAddress?: boolean
+  },
   isMissing: boolean
 }
 
@@ -67,22 +71,31 @@ export function assertResultMatch(
 }
 
 /**
- * Check that the promise rejects with an expected error instance.
+ * Check that the promise rejects with an expected error.
  */
 export async function assertRejects(
   promise: PromiseLike<any>,
-  instanceOf: any
+  instanceOf: any,
+  message?: string | RegExp
 ) {
   try {
     await promise
     assert(false, 'Expected an error to be thrown')
   } catch (error) {
-    assert(error instanceof instanceOf)
+    assert(error instanceof instanceOf, error.message);
+    if (typeof message === 'string') {
+      assert.strictEqual(error.message, message);
+    } else if (message instanceof RegExp) {
+      assert(message.test(error.message));
+    }
   }
 }
 
 export function getAllPublicMethods(api: RippleAPI) {
-  return Object.keys(api).filter(key => !key.startsWith('_'))
+  return Array.from(new Set([
+    ...Object.getOwnPropertyNames(api),
+    ...Object.getOwnPropertyNames(RippleAPI.prototype)
+  ])).filter(key => !key.startsWith('_'))
 }
 
 export function loadTestSuite(methodName: string): LoadedTestSuite | null {
@@ -91,12 +104,14 @@ export function loadTestSuite(methodName: string): LoadedTestSuite | null {
     return {
       isMissing: false,
       name: methodName,
+      config: testSuite.config || {},
       tests: Object.entries(testSuite.default || {}),
     }
   } catch (err) {
     return {
       isMissing: true,
       name: methodName,
+      config:{},
       tests: [],
     }
   }
