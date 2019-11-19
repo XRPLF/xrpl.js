@@ -1,6 +1,6 @@
 import * as utils from './utils'
 import {validate, iso8601ToRippleTime, xrpToDrops} from '../common'
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {RippleAPI} from '..'
 
 export type PaymentChannelFund = {
@@ -11,8 +11,8 @@ export type PaymentChannelFund = {
 
 function createPaymentChannelFundTransaction(account: string,
   fund: PaymentChannelFund
-): utils.TransactionJSON {
-  const txJSON: utils.TransactionJSON = {
+): TransactionJSON {
+  const txJSON: TransactionJSON = {
     Account: account,
     TransactionType: 'PaymentChannelFund',
     Channel: fund.channel,

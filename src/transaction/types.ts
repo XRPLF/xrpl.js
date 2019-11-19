@@ -9,10 +9,16 @@ import {
 } from '../common/types/objects'
 import {
   ApiMemo,
-  TransactionJSON
 } from './utils'
 
-export type TransactionJSON = TransactionJSON
+export type TransactionJSON = {
+  Account: string,
+  TransactionType: string,
+  Memos?: {Memo: ApiMemo}[],
+  Flags?: number,
+  Fulfillment?: string,
+  [Field: string]: string | number | Array<any> | RippledAmount | undefined
+}
 
 export type Instructions = {
   sequence?: number,

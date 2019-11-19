@@ -2,7 +2,7 @@ import * as utils from './utils'
 const ValidationError = utils.common.errors.ValidationError
 const claimFlags = utils.common.txFlags.PaymentChannelClaim
 import {validate, xrpToDrops} from '../common'
-import {Instructions, Prepare} from './types'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {RippleAPI} from '..'
 
 export type PaymentChannelClaim = {
@@ -17,8 +17,8 @@ export type PaymentChannelClaim = {
 
 function createPaymentChannelClaimTransaction(account: string,
   claim: PaymentChannelClaim
-): utils.TransactionJSON {
-  const txJSON: utils.TransactionJSON = {
+): TransactionJSON {
+  const txJSON: TransactionJSON = {
     Account: account,
     TransactionType: 'PaymentChannelClaim',
     Channel: claim.channel,
