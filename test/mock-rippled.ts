@@ -336,6 +336,19 @@ export function createMockRippled(port) {
     }
   });
 
+  mock.on('request_ping', function (request, conn) {
+    // NOTE: We give the response a timeout of 2 second, so that tests can
+    // set their timeout threshold to greater than or less than this number
+    // to test timeouts.
+    setTimeout(() => {
+      conn.send(createResponse(request, {
+        "result": {},
+        "status": "success",
+        "type": "response"
+      }));
+    }, 1000 * 2);
+  });
+
   mock.on('request_tx', function (request, conn) {
     assert.strictEqual(request.command, 'tx');
     if (request.transaction === hashes.VALID_TRANSACTION_HASH) {

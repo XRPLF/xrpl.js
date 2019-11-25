@@ -266,6 +266,29 @@ describe('Connection', function() {
     });
   });
 
+  it('disconnect event on heartbeat failure', function(done) {
+    if (isBrowser) {
+      const phantomTest = /PhantomJS/;
+      if (phantomTest.test(navigator.userAgent)) {
+        // inside PhantomJS this one just hangs, so skip as not very relevant
+        done();
+        return;
+      }
+    }
+    this.timeout(20001);
+    this.api.connection.on('reconnecting', () => {
+      done(new Error('automatic reconnection not expected'));
+    });
+    this.api.connection.on('disconnected', _code => {
+      done();
+    });
+    // Set the heartbeat to less than the 1 second ping response
+    this.api.connection._timeout = 500;
+    // Trigger a reset of the heartbeat, using the new timeout val
+    this.api.connection._startHeartbeatInterval();
+});
+
+
   it('should emit disconnected event with code 1000 (CLOSE_NORMAL)',
   function(done
   ) {
