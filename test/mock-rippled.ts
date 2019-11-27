@@ -10,7 +10,7 @@ import transactionsResponse from './fixtures/rippled/account-tx';
 import accountLinesResponse from './fixtures/rippled/account-lines';
 import accountObjectsResponse from './fixtures/rippled/account-objects';
 import fullLedger from './fixtures/rippled/ledger-full-38129.json';
-import {getFreePort} from './utils/net-utils';
+import {getFreePort} from './utils';
 
 function isUSD(json) {
   return json === 'USD' || json === '0000000000000000000000005553440000000000';

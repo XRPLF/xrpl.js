@@ -1,7 +1,7 @@
 import {RippleAPI, RippleAPIBroadcast} from 'ripple-api';
 import ledgerClosed from './fixtures/rippled/ledger-close.json';
 import {createMockRippled} from './mock-rippled';
-import {getFreePort} from './utils/net-utils';
+import {getFreePort} from './utils';
 
 function setupMockRippledConnection(testcase, port) {
   return new Promise((resolve, reject) => {
