@@ -1,7 +1,7 @@
 import setupAPI from './setup-api'
 import { RippleAPI } from 'ripple-api'
 import addresses from './fixtures/addresses.json'
-import { getAllPublicMethods, loadTestSuites } from './api/utils'
+import { getAllPublicMethods, loadTestSuites } from './utils'
 
 /**
  * RippleAPI Test Runner
