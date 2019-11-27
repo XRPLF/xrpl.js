@@ -3,4 +3,4 @@
 --slow 500
 --require ts-node/register
 --watch-extensions ts
-./test/*.{ts,js} ./test/api/index.ts
+./test/*.{ts,js}

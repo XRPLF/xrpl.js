@@ -57,10 +57,11 @@ describe('RippleAPI [Test Runner]', function() {
     })
   }
 
+  // Report any missing tests.
   const allTestedMethods = new Set(allTestSuites.map(s => s.name));
   for (const methodName of allPublicMethods) {
     if (!allTestedMethods.has(methodName)) {
-      // TODO: Once migration is complete, remove this filter so that missing tests are reported.
+      // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
       it.skip(`${methodName} - no test suite found`, () => {
           throw new Error(
             `Test file not found! Create file "test/api/${methodName}/index.ts".`
