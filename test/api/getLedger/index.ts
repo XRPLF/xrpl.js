@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import { assertResultMatch, TestSuite } from '../utils'
+import { assertResultMatch, TestSuite } from '../../utils'
 import responses from '../../fixtures/responses'
 const { getLedger: RESPONSE_FIXTURES } = responses
 
