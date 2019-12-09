@@ -62,8 +62,9 @@ import {
   BookOffersRequest, BookOffersResponse,
   GatewayBalancesRequest, GatewayBalancesResponse,
   LedgerRequest, LedgerResponse,
+  LedgerDataRequest, LedgerDataResponse,
   LedgerEntryRequest, LedgerEntryResponse,
-  ServerInfoRequest, ServerInfoResponse
+  ServerInfoRequest, ServerInfoResponse,
 } from './common/types/commands'
 
 
@@ -175,6 +176,8 @@ class RippleAPI extends EventEmitter {
     Promise<GatewayBalancesResponse>
   async request(command: 'ledger', params: LedgerRequest):
     Promise<LedgerResponse>
+    async request(command: 'ledger_data', params?: LedgerDataRequest):
+      Promise<LedgerDataResponse>
   async request(command: 'ledger_entry', params: LedgerEntryRequest):
     Promise<LedgerEntryResponse>
   async request(command: 'server_info', params?: ServerInfoRequest):
@@ -205,7 +208,7 @@ class RippleAPI extends EventEmitter {
     command: string,
     params: object = {},
     currentResponse: T
-  ): Promise<object> {
+  ): Promise<T> {
     if (!currentResponse.marker) {
       return Promise.reject(
         new errors.NotFoundError('response does not have a next page')
