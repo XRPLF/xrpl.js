@@ -234,5 +234,22 @@ export default <TestSuite>{
       )
       assert.strictEqual(err.name, 'ValidationError')
     }
+  },
+  'offline': async (api, address) => {
+    // const api = new RippleAPI()
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+
+    const settings = requests.prepareSettings.domain
+    const instructions = {
+      sequence: 23,
+      maxLedgerVersion: 8820051,
+      fee: '0.000012'
+    }
+    const result = await api.prepareSettings(address, settings, instructions)
+    assertResultMatch(result, responses.prepareSettings.flags, 'prepare')
+    assert.deepEqual(
+      api.sign(result.txJSON, secret),
+      responses.prepareSettings.signed
+    )
   }
 }
