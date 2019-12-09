@@ -1,4 +1,7 @@
+import net from 'net'
 import _ from 'lodash'
+import fs from 'fs'
+import path from 'path'
 import { RippleAPI } from 'ripple-api'
 import assert from 'assert-diff'
 const { schemaValidator } = RippleAPI._PRIVATE
@@ -29,7 +32,10 @@ export interface TestSuite {
 interface LoadedTestSuite {
   name: string
   tests: [string, TestFn][]
-  isMissing: boolean
+  config: {
+    /** Set to true to skip re-running tests with an X-Address. */
+    skipXAddress?: boolean
+  }
 }
 
 /**
@@ -67,37 +73,67 @@ export function assertResultMatch(
 }
 
 /**
- * Check that the promise rejects with an expected error instance.
+ * Check that the promise rejects with an expected error.
  */
 export async function assertRejects(
   promise: PromiseLike<any>,
-  instanceOf: any
+  instanceOf: any,
+  message?: string | RegExp
 ) {
   try {
     await promise
     assert(false, 'Expected an error to be thrown')
   } catch (error) {
-    assert(error instanceof instanceOf)
+    assert(error instanceof instanceOf, error.message)
+    if (typeof message === 'string') {
+      assert.strictEqual(error.message, message)
+    } else if (message instanceof RegExp) {
+      assert(message.test(error.message))
+    }
   }
+}
+
+// using a free port instead of a constant port enables parallelization
+export function getFreePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer()
+    let port
+    server.on('listening', function() {
+      port = (server.address() as any).port
+      server.close()
+    })
+    server.on('close', function() {
+      resolve(port)
+    })
+    server.on('error', function(error) {
+      reject(error)
+    })
+    server.listen(0)
+  })
 }
 
 export function getAllPublicMethods(api: RippleAPI) {
-  return Object.keys(api).filter(key => !key.startsWith('_'))
+  return Array.from(
+    new Set([
+      ...Object.getOwnPropertyNames(api),
+      ...Object.getOwnPropertyNames(RippleAPI.prototype)
+    ])
+  ).filter(key => !key.startsWith('_'))
 }
 
-export function loadTestSuite(methodName: string): LoadedTestSuite | null {
-  try {
-    const testSuite = require(`./${methodName}`)
-    return {
-      isMissing: false,
-      name: methodName,
-      tests: Object.entries(testSuite.default || {}),
-    }
-  } catch (err) {
-    return {
-      isMissing: true,
-      name: methodName,
-      tests: [],
-    }
-  }
+export function loadTestSuites(): LoadedTestSuite[] {
+  const allTests = fs.readdirSync(path.join(__dirname, 'api'), { encoding: 'utf8' })
+  return allTests
+    .map(methodName => {
+      if (methodName.startsWith('.DS_Store')) {
+        return null
+      }
+      const testSuite = require(`./api/${methodName}`)
+      return {
+        name: methodName,
+        config: testSuite.config || {},
+        tests: Object.entries(testSuite.default || {})
+      } as LoadedTestSuite
+    })
+    .filter(Boolean)
 }

@@ -1,7 +1,7 @@
 import assert from 'assert-diff'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import { assertResultMatch, TestSuite } from '../utils'
+import { assertResultMatch, TestSuite } from '../../utils'
 const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
 
 /**
