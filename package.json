@@ -73,6 +73,7 @@
   },
   "readmeFilename": "README.md",
   "engines": {
-    "node": ">=6.12.3"
+    "node": ">=8",
+    "yarn": "^1.15.2"
   }
 }
