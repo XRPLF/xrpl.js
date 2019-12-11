@@ -16,7 +16,11 @@ This method returns a promise that resolves with an array of transaction object 
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-return api.getTransactions(address).then(transaction => {
+const options = {
+  maxLedgerVersion: 46220792,
+  minLedgerVersion: 42885331
+};
+return api.getTransactions(address, options).then(transaction => {
   /* ... */
 });
 ```
