@@ -16,6 +16,7 @@ export default <TestSuite>{
   'default': async (api, address) => {
     const options = { types: ['payment', 'order'], initiated: true, limit: 2 }
     const response = await api.getTransactions(address, options)
+    hack(response)
     assertResultMatch(response, RESPONSE_FIXTURES.normal, 'getTransactions')
   },
 
@@ -45,6 +46,7 @@ export default <TestSuite>{
       utils.compareTransactions
     )
     const response = await api.getTransactions(address, options)
+    hack(response)
     assertResultMatch(response, expected, 'getTransactions')
   },
 
@@ -96,6 +98,7 @@ export default <TestSuite>{
       counterparty: addresses.ISSUER
     }
     const response = await api.getTransactions(address, options)
+    hack(response)
     assert.strictEqual(response.length, 10)
     response.forEach(t => assert(t.type === 'payment' || t.type === 'order'))
     response.forEach(t => assert(t.outcome.result === 'tesSUCCESS'))
@@ -110,6 +113,7 @@ export default <TestSuite>{
       counterparty: addresses.ISSUER
     }
     const response = await api.getTransactions(address, options)
+    hack(response)
     assert.strictEqual(response.length, 10)
     response.forEach(t => assert(t.type === 'payment' || t.type === 'order'))
     response.forEach(t => assert(t.outcome.result === 'tesSUCCESS'))
@@ -133,6 +137,7 @@ export default <TestSuite>{
       limit: 2
     }
     const response = await api.getTransactions(address, options)
+    hack(response)
     assertResultMatch(response, RESPONSE_FIXTURES.normal, 'getTransactions')
   },
 
@@ -142,6 +147,7 @@ export default <TestSuite>{
       limit: 1
     }
     const response = await api.getTransactions(address, options)
+    hack(response)
     assertResultMatch(response, [], 'getTransactions')
   },
 
@@ -149,4 +155,14 @@ export default <TestSuite>{
     const response = await api.getTransactions(addresses.OTHER_ACCOUNT)
     assertResultMatch(response, RESPONSE_FIXTURES.one, 'getTransactions')
   }
+}
+
+// This test relies on the binary (hex string) format, but computed fields like `date`
+// are not available in this format. To support this field, we need to 'hack' it into
+// the expected response. Long term, a better approach would be to use/test the json
+// format responses, instead of the binary.
+function hack(response) {
+  response.forEach(element => {
+    element.outcome.timestamp = "2019-04-01T07:39:01.000Z"
+  })
 }

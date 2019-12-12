@@ -1707,6 +1707,7 @@ return api.getTransactions(address).then(transaction => {
     },
     "outcome": {
       "result": "tesSUCCESS",
+      "timestamp": "2019-04-01T07:39:01.000Z",
       "fee": "0.00001",
       "deliveredAmount": {
         "currency": "USD",
@@ -1800,6 +1801,7 @@ return api.getTransactions(address).then(transaction => {
     },
     "outcome": {
       "result": "tesSUCCESS",
+      "timestamp": "2019-04-01T07:39:01.000Z",
       "fee": "0.00001",
       "deliveredAmount": {
         "currency": "USD",
