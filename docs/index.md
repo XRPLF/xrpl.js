@@ -3948,6 +3948,7 @@ return api.getSettings(address).then(settings =>
   "requireDestinationTag": true,
   "disallowIncomingXRP": true,
   "emailHash": "23463B99B62A72F26ED677CC556C44E8",
+  "walletLocator": "00000000000000000000000000000000000000000000000000000000DEADBEEF",
   "domain": "example.com",
   "transferRate": 1.002,
   "tickSize": 5,

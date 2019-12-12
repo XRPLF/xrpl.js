@@ -21,13 +21,20 @@
     },
     "domain": {
       "type": "string",
-      "description": " The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase."
+      "description": "The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase."
     },
     "emailHash": {
       "description": "Hash of an email address to be used for generating an avatar image. Conventionally, clients use Gravatar to display this image. Use `null` to clear.",
       "oneOf": [
         {"type": "null"},
         {"$ref": "hash128"}
+      ]
+    },
+    "walletLocator": {
+      "description": "Transaction hash or any other 64 character hexadecimal string, that may or may not represent the result of a hash operation. Use `null` to clear.",
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "hash256"}
       ]
     },
     "enableTransactionIDTracking": {
