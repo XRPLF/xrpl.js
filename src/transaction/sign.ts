@@ -3,7 +3,7 @@ import * as utils from './utils'
 import keypairs from 'ripple-keypairs'
 import binaryCodec from 'ripple-binary-codec'
 import {computeBinaryTransactionHash} from '../common/hashes'
-import {SignOptions, KeyPair} from './types'
+import {SignOptions, KeyPair, TransactionJSON} from './types'
 import {BigNumber} from 'bignumber.js'
 import {xrpToDrops} from '../common'
 import {RippleAPI} from '..'
@@ -131,11 +131,11 @@ function objectDiff(a: object, b: object): object {
  *  and verify that it matches the transaction prior to signing.
  *
  *  @param {string} serialized A signed and serialized transaction.
- *  @param {utils.TransactionJSON} tx The transaction prior to signing.
+ *  @param {TransactionJSON} tx The transaction prior to signing.
  *
  *  @returns {void} This method does not return a value, but throws an error if the check fails.
  */
-function checkTxSerialization(serialized: string, tx: utils.TransactionJSON): void {
+function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
   // Decode the serialized transaction:
   const decoded = binaryCodec.decode(serialized)
 

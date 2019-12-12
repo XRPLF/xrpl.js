@@ -5,6 +5,7 @@
   "walletLocator": "00000000000000000000000000000000000000000000000000000000DEADBEEF",
   "domain": "example.com",
   "transferRate": 1.002,
+  "tickSize": 5,
   "signers": {
     "threshold": 3,
     "weights": [

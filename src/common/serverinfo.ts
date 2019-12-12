@@ -29,7 +29,8 @@ export type GetServerInfoResponse = {
     reserveIncrementXRP: string,
     ledgerVersion: number
   },
-  validationQuorum: number
+  validationQuorum: number,
+  networkLedger?: string
 }
 
 function renameKeys(object, mapping) {

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import * as common from '../common'
-import {Memo, RippledAmount} from '../common/types/objects'
-import {Instructions, Prepare} from './types'
+import {Memo} from '../common/types/objects'
+import {Instructions, Prepare, TransactionJSON} from './types'
 import {RippleAPI} from '..'
 import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress, isValidXAddress} from 'ripple-address-codec'
@@ -13,15 +13,6 @@ export type ApiMemo = {
   MemoData?: string,
   MemoType?: string,
   MemoFormat?: string
-}
-
-export type TransactionJSON = {
-  Account: string,
-  TransactionType: string,
-  Memos?: {Memo: ApiMemo}[],
-  Flags?: number,
-  Fulfillment?: string,
-  [Field: string]: string | number | Array<any> | RippledAmount | undefined
 }
 
 function formatPrepareResponse(txJSON: any): Prepare {

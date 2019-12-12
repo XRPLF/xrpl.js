@@ -13,7 +13,7 @@ function isValidSecret(secret: string): boolean {
   }
 }
 
-function dropsToXrp(drops: string | BigNumber): string {
+function dropsToXrp(drops: BigNumber.Value): string {
   if (typeof drops === 'string') {
     if (!drops.match(/^-?[0-9]*\.?[0-9]*$/)) {
       throw new ValidationError(`dropsToXrp: invalid value '${drops}',` +
@@ -47,7 +47,7 @@ function dropsToXrp(drops: string | BigNumber): string {
   return (new BigNumber(drops)).dividedBy(1000000.0).toString(10)
 }
 
-function xrpToDrops(xrp: string | BigNumber): string {
+function xrpToDrops(xrp: BigNumber.Value): string {
   if (typeof xrp === 'string') {
     if (!xrp.match(/^-?[0-9]*\.?[0-9]*$/)) {
       throw new ValidationError(`xrpToDrops: invalid value '${xrp}',` +

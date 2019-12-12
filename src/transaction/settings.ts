@@ -4,11 +4,11 @@ import * as utils from './utils'
 const validate = utils.common.validate
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices
 const AccountFields = utils.common.constants.AccountFields
-import {Instructions, Prepare, SettingsTransaction} from './types'
+import {Instructions, Prepare, SettingsTransaction, TransactionJSON} from './types'
 import {FormattedSettings, WeightedSigner} from '../common/types/objects'
 import {RippleAPI} from '..'
 
-function setTransactionFlags(txJSON: utils.TransactionJSON, values: FormattedSettings) {
+function setTransactionFlags(txJSON: TransactionJSON, values: FormattedSettings) {
   const keys = Object.keys(values)
   assert.ok(keys.length === 1, 'ERROR: can only set one setting per transaction')
   const flagName = keys[0]
@@ -24,7 +24,7 @@ function setTransactionFlags(txJSON: utils.TransactionJSON, values: FormattedSet
 }
 
 // Sets `null` fields to their `default`.
-function setTransactionFields(txJSON: utils.TransactionJSON, input: FormattedSettings) {
+function setTransactionFields(txJSON: TransactionJSON, input: FormattedSettings) {
   const fieldSchema = AccountFields
   for (const fieldName in fieldSchema) {
     const field = fieldSchema[fieldName]
