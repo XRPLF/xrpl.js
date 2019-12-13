@@ -384,12 +384,14 @@ class Connection extends EventEmitter {
   }
 
   reconnect() {
+    this.emit('reconnect');
     return this.disconnect().then(() => this.connect())
   }
 
   private _clearHeartbeatInterval = () => {
     clearInterval(this._heartbeatInterval);
   }
+
   private _startHeartbeatInterval = () => {
     this._clearHeartbeatInterval()
     this._heartbeatInterval = setInterval(() => this._heartbeat(), 1000 * 60);
@@ -400,7 +402,7 @@ class Connection extends EventEmitter {
    * If this succeeds, we're good. If it fails, disconnect so that the consumer can reconnect, if desired.
    */
   private _heartbeat = () => {
-    return this.request({command: "ping"}).catch(() => this.disconnect());
+    return this.request({command: "ping"}).catch(() => this.reconnect());
   }
 
   _whenReady<T>(promise: Promise<T>): Promise<T> {

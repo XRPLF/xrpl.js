@@ -266,7 +266,7 @@ describe('Connection', function() {
     });
   });
 
-  it('disconnect event on heartbeat failure', function(done) {
+  it('reconnect event on heartbeat failure', function(done) {
     if (isBrowser) {
       const phantomTest = /PhantomJS/;
       if (phantomTest.test(navigator.userAgent)) {
@@ -275,17 +275,14 @@ describe('Connection', function() {
         return;
       }
     }
-    this.timeout(20001);
-    this.api.connection.on('reconnecting', () => {
-      done(new Error('automatic reconnection not expected'));
-    });
-    this.api.connection.on('disconnected', _code => {
-      done();
-    });
     // Set the heartbeat to less than the 1 second ping response
     this.api.connection._timeout = 500;
-    // Trigger a reset of the heartbeat, using the new timeout val
-    this.api.connection._startHeartbeatInterval();
+    // Drop the test runner timeout, since this should be a quick test
+    this.timeout(5000);
+    // Hook up a listener for the reconnect event
+    this.api.connection.on('reconnect', () => done());
+    // Trigger a heartbeat
+    this.api.connection._heartbeat();
 });
 
 
