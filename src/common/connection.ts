@@ -384,6 +384,10 @@ class Connection extends EventEmitter {
   }
 
   reconnect() {
+    // NOTE: We currently have a "reconnecting" event, but that only triggers through
+    // _retryConnect, which was written in a way that is required to run as an internal 
+    // part of the post-disconnect connect() flow.
+    // See: https://github.com/ripple/ripple-lib/pull/1101#issuecomment-565360423
     this.emit('reconnect');
     return this.disconnect().then(() => this.connect())
   }
