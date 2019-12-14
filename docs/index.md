@@ -541,7 +541,7 @@ defaultRipple | boolean | *Optional* Enable [rippling](https://ripple.com/build/
 depositAuth | boolean | *Optional* Enable [Deposit Authorization](https://ripple.com/build/deposit-authorization/) on this account. If set, transactions cannot send value of any kind to this account unless the sender of those transactions is the account itself. (Requires the [DepositAuth amendment](https://ripple.com/build/known-amendments/#depositauth))
 disableMasterKey | boolean | *Optional* Disallows use of the master key to sign transactions for this account. To disable the master key, you must authorize the transaction by signing it with the master key pair. You cannot use a regular key pair or a multi-signature. You can re-enable the master key pair using a regular key pair or multi-signature. See [AccountSet](https://developers.ripple.com/accountset.html).
 disallowIncomingXRP | boolean | *Optional* Indicates that client applications should not send XRP to this account. Not enforced by rippled.
-domain | string | *Optional*  The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase.
+domain | string | *Optional* The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase.
 emailHash | string,null | *Optional* Hash of an email address to be used for generating an avatar image. Conventionally, clients use Gravatar to display this image. Use `null` to clear.
 enableTransactionIDTracking | boolean | *Optional* Track the ID of this account’s most recent transaction.
 globalFreeze | boolean | *Optional* Freeze all assets issued by this account.
@@ -560,6 +560,7 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
 tickSize | string | *Optional* Tick size to use for offers involving a currency issued by this address. The exchange rates of those offers is rounded to this many significant digits. Valid values are 3 to 15 inclusive, or 0 to disable.
 transferRate | number,null | *Optional* The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
+walletLocator | string,null | *Optional* Transaction hash or any other 64 character hexadecimal string, that may or may not represent the result of a hash operation. Use `null` to clear.
 
 ### Example
 
@@ -3914,7 +3915,7 @@ defaultRipple | boolean | *Optional* Enable [rippling](https://ripple.com/build/
 depositAuth | boolean | *Optional* Enable [Deposit Authorization](https://ripple.com/build/deposit-authorization/) on this account. If set, transactions cannot send value of any kind to this account unless the sender of those transactions is the account itself. (Requires the [DepositAuth amendment](https://ripple.com/build/known-amendments/#depositauth))
 disableMasterKey | boolean | *Optional* Disallows use of the master key to sign transactions for this account. To disable the master key, you must authorize the transaction by signing it with the master key pair. You cannot use a regular key pair or a multi-signature. You can re-enable the master key pair using a regular key pair or multi-signature. See [AccountSet](https://developers.ripple.com/accountset.html).
 disallowIncomingXRP | boolean | *Optional* Indicates that client applications should not send XRP to this account. Not enforced by rippled.
-domain | string | *Optional*  The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase.
+domain | string | *Optional* The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase.
 emailHash | string,null | *Optional* Hash of an email address to be used for generating an avatar image. Conventionally, clients use Gravatar to display this image. Use `null` to clear.
 enableTransactionIDTracking | boolean | *Optional* Track the ID of this account’s most recent transaction.
 globalFreeze | boolean | *Optional* Freeze all assets issued by this account.
@@ -3933,6 +3934,7 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
 tickSize | string | *Optional* Tick size to use for offers involving a currency issued by this address. The exchange rates of those offers is rounded to this many significant digits. Valid values are 3 to 15 inclusive, or 0 to disable.
 transferRate | number,null | *Optional* The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
+walletLocator | string,null | *Optional* Transaction hash or any other 64 character hexadecimal string, that may or may not represent the result of a hash operation. Use `null` to clear.
 
 ### Example
 
