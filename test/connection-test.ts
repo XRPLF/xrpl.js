@@ -266,6 +266,26 @@ describe('Connection', function() {
     });
   });
 
+  it('reconnect event on heartbeat failure', function(done) {
+    if (isBrowser) {
+      const phantomTest = /PhantomJS/;
+      if (phantomTest.test(navigator.userAgent)) {
+        // inside PhantomJS this one just hangs, so skip as not very relevant
+        done();
+        return;
+      }
+    }
+    // Set the heartbeat to less than the 1 second ping response
+    this.api.connection._timeout = 500;
+    // Drop the test runner timeout, since this should be a quick test
+    this.timeout(5000);
+    // Hook up a listener for the reconnect event
+    this.api.connection.on('reconnect', () => done());
+    // Trigger a heartbeat
+    this.api.connection._heartbeat();
+});
+
+
   it('should emit disconnected event with code 1000 (CLOSE_NORMAL)',
   function(done
   ) {

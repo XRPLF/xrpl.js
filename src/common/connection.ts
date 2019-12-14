@@ -39,8 +39,9 @@ class Connection extends EventEmitter {
   private _availableLedgerVersions = new RangeSet()
   private _nextRequestID: number = 1
   private _retry: number = 0
-  private _connectTimer: null|NodeJS.Timer = null
-  private _retryTimer: null|NodeJS.Timer = null
+  private _connectTimer: null|NodeJS.Timeout = null
+  private _retryTimer: null|NodeJS.Timeout = null
+  private _heartbeatInterval: null|NodeJS.Timeout = null;
   private _onOpenErrorBound: null| null|((...args: any[]) => void) = null
   private _onUnexpectedCloseBound: null|((...args: any[]) => void) = null
   private _fee_base: null|number = null
@@ -295,7 +296,8 @@ class Connection extends EventEmitter {
   connect(): Promise<void> {
     this._clearConnectTimer()
     this._clearReconnectTimer()
-    return new Promise<void>((resolve, reject) => {
+    this._clearHeartbeatInterval()
+    return new Promise<void>((_resolve, reject) => {
       this._connectTimer = setTimeout(() => {
           reject(new ConnectionError(`Error: connect() timed out after ${this._connectionTimeout} ms. ` +
           `If your internet connection is working, the rippled server may be blocked or inaccessible.`))
@@ -303,6 +305,10 @@ class Connection extends EventEmitter {
       if (!this._url) {
         reject(new ConnectionError(
           'Cannot connect because no server was specified'))
+      }
+      const resolve = () => {
+        this._startHeartbeatInterval();
+        _resolve();
       }
       if (this._state === WebSocket.OPEN) {
         resolve()
@@ -348,6 +354,7 @@ class Connection extends EventEmitter {
   }
 
   _disconnect(calledByUser): Promise<void> {
+    this._clearHeartbeatInterval()
     if (calledByUser) {
       this._clearConnectTimer()
       this._clearReconnectTimer()
@@ -377,7 +384,29 @@ class Connection extends EventEmitter {
   }
 
   reconnect() {
+    // NOTE: We currently have a "reconnecting" event, but that only triggers through
+    // _retryConnect, which was written in a way that is required to run as an internal 
+    // part of the post-disconnect connect() flow.
+    // See: https://github.com/ripple/ripple-lib/pull/1101#issuecomment-565360423
+    this.emit('reconnect');
     return this.disconnect().then(() => this.connect())
+  }
+
+  private _clearHeartbeatInterval = () => {
+    clearInterval(this._heartbeatInterval);
+  }
+
+  private _startHeartbeatInterval = () => {
+    this._clearHeartbeatInterval()
+    this._heartbeatInterval = setInterval(() => this._heartbeat(), 1000 * 60);
+  }
+
+  /**
+   * A heartbeat is just a "ping" command, sent on an interval.
+   * If this succeeds, we're good. If it fails, disconnect so that the consumer can reconnect, if desired.
+   */
+  private _heartbeat = () => {
+    return this.request({command: "ping"}).catch(() => this.reconnect());
   }
 
   _whenReady<T>(promise: Promise<T>): Promise<T> {
