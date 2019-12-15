@@ -75,10 +75,10 @@ import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
-import {ConnectionOptions} from './common/connection'
+import {ConnectionUserOptions} from './common/connection'
 import {isValidXAddress, isValidClassicAddress} from 'ripple-address-codec'
 
-export interface APIOptions extends ConnectionOptions {
+export interface APIOptions extends ConnectionUserOptions {
   server?: string,
   feeCushion?: number,
   maxFeeXRP?: string,

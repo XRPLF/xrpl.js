@@ -31,8 +31,8 @@ describe('Connection', function() {
   it('default options', function() {
     const connection: any = new utils.common.Connection('url');
     assert.strictEqual(connection._url, 'url');
-    assert(_.isUndefined(connection._proxyURL));
-    assert(_.isUndefined(connection._authorization));
+    assert(_.isUndefined(connection._config.proxy));
+    assert(_.isUndefined(connection._config.authorization));
   });
 
   describe('trace', () => {
@@ -299,7 +299,7 @@ describe('Connection', function() {
       }
     }
     // Set the heartbeat to less than the 1 second ping response
-    this.api.connection._timeout = 500;
+    this.api.connection._config.timeout = 500;
     // Drop the test runner timeout, since this should be a quick test
     this.timeout(5000);
     // Hook up a listener for the reconnect event

@@ -7,6 +7,9 @@ import {RippledError, DisconnectedError, NotConnectedError,
   TimeoutError, ResponseFormatError, ConnectionError,
   RippledNotInitializedError} from './errors'
 
+/**
+ * ConnectionOptions is the configuration for the configuration object.
+ */
 export interface ConnectionOptions {
   trace?: boolean | ((id: string, message: string) => void)
   proxy?: string
@@ -16,21 +19,20 @@ export interface ConnectionOptions {
   key?: string
   passphrase?: string
   certificate?: string
-  timeout?: number,
-  connectionTimeout?: number
+  timeout: number,
+  connectionTimeout: number
 }
+
+/**
+ * ConnectionUserOptions is the user-provided configuration object. All configuration
+ * is optional, so any ConnectionOptions configuration that has a default value is
+ * still optional for the user to provide.
+ */
+export type ConnectionUserOptions = Partial<ConnectionOptions>
 
 class Connection extends EventEmitter {
 
   private _url: string
-  private _proxyURL?: string
-  private _proxyAuthorization?: string
-  private _authorization?: string
-  private _trustedCertificates?: string[]
-  private _key?: string
-  private _passphrase?: string
-  private _certificate?: string
-  private _timeout: number
   private _isReady: boolean = false
   private _ws: null|WebSocket = null
   protected _ledgerVersion: null|number = null
@@ -44,28 +46,24 @@ class Connection extends EventEmitter {
   private _onUnexpectedCloseBound: null|((...args: any[]) => void) = null
   private _fee_base: null|number = null
   private _fee_ref: null|number = null
-  private _connectionTimeout: number
 
   private _trace: (id: string, message: string) => void = () => {}
+  private _config: ConnectionOptions
 
-  constructor(url, options: ConnectionOptions = {}) {
+  constructor(url?: string, options: ConnectionUserOptions = {}) {
     super()
     this.setMaxListeners(Infinity)
     this._url = url
+    this._config = {
+      timeout: (20 * 1000),
+      connectionTimeout: (2 * 1000),
+      ...options,
+    }
     if (typeof options.trace === 'function') {
       this._trace = options.trace
     } else if (options.trace === true) {
       this._trace = console.log
     }
-    this._proxyURL = options.proxy
-    this._proxyAuthorization = options.proxyAuthorization
-    this._authorization = options.authorization
-    this._trustedCertificates = options.trustedCertificates
-    this._key = options.key
-    this._passphrase = options.passphrase
-    this._certificate = options.certificate
-    this._timeout = options.timeout || (20 * 1000)
-    this._connectionTimeout = options.connectionTimeout || 2000
   }
 
   _updateLedgerVersions(data) {
@@ -250,17 +248,17 @@ class Connection extends EventEmitter {
 
   _createWebSocket(): WebSocket {
     const options: WebSocket.ClientOptions = {}
-    if (this._proxyURL !== undefined) {
+    if (this._config.proxy !== undefined) {
       const parsedURL = parseUrl(this._url)
-      const parsedProxyURL = parseUrl(this._proxyURL)
+      const parsedProxyURL = parseUrl(this._config.proxy)
       const proxyOverrides = _.omitBy({
         secureEndpoint: (parsedURL.protocol === 'wss:'),
         secureProxy: (parsedProxyURL.protocol === 'https:'),
-        auth: this._proxyAuthorization,
-        ca: this._trustedCertificates,
-        key: this._key,
-        passphrase: this._passphrase,
-        cert: this._certificate
+        auth: this._config.proxyAuthorization,
+        ca: this._config.trustedCertificates,
+        key: this._config.key,
+        passphrase: this._config.passphrase,
+        cert: this._config.certificate
       }, _.isUndefined)
       const proxyOptions = _.assign({}, parsedProxyURL, proxyOverrides)
       let HttpsProxyAgent
@@ -271,15 +269,15 @@ class Connection extends EventEmitter {
       }
       options.agent = new HttpsProxyAgent(proxyOptions)
     }
-    if (this._authorization !== undefined) {
-      const base64 = Buffer.from(this._authorization).toString('base64')
+    if (this._config.authorization !== undefined) {
+      const base64 = Buffer.from(this._config.authorization).toString('base64')
       options.headers = {Authorization: `Basic ${base64}`}
     }
     const optionsOverrides = _.omitBy({
-      ca: this._trustedCertificates,
-      key: this._key,
-      passphrase: this._passphrase,
-      cert: this._certificate
+      ca: this._config.trustedCertificates,
+      key: this._config.key,
+      passphrase: this._config.passphrase,
+      cert: this._config.certificate
     }, _.isUndefined)
     const websocketOptions = _.assign({}, options, optionsOverrides)
     const websocket = new WebSocket(this._url, null, websocketOptions)
@@ -297,12 +295,11 @@ class Connection extends EventEmitter {
     this._clearHeartbeatInterval()
     return new Promise<void>((_resolve, reject) => {
       this._connectTimer = setTimeout(() => {
-          reject(new ConnectionError(`Error: connect() timed out after ${this._connectionTimeout} ms. ` +
+          reject(new ConnectionError(`Error: connect() timed out after ${this._config.connectionTimeout} ms. ` +
           `If your internet connection is working, the rippled server may be blocked or inaccessible.`))
-      }, this._connectionTimeout)
+      }, this._config.connectionTimeout)
       if (!this._url) {
-        reject(new ConnectionError(
-          'Cannot connect because no server was specified'))
+        reject(new ConnectionError('Cannot connect because no server was specified'))
       }
       const resolve = () => {
         this._startHeartbeatInterval();
@@ -508,7 +505,7 @@ class Connection extends EventEmitter {
       const message = JSON.stringify(Object.assign({}, request, {id}))
 
       this._whenReady(this._send(message)).then(() => {
-        const delay = timeout || this._timeout
+        const delay = timeout || this._config.timeout
         timer = setTimeout(() => _reject(new TimeoutError()), delay)
         // Node.js won't exit if a timer is still running, so we tell Node to ignore (Node will still wait for the request to complete)
         if (timer.unref) {
