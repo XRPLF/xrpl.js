@@ -82,7 +82,6 @@ export interface APIOptions extends ConnectionOptions {
   server?: string,
   feeCushion?: number,
   maxFeeXRP?: string,
-  trace?: boolean,
   proxy?: string,
   timeout?: number
 }

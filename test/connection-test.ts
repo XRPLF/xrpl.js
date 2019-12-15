@@ -35,23 +35,46 @@ describe('Connection', function() {
     assert(_.isUndefined(connection._authorization));
   });
 
-  it('trace', function() {
-    const connection: any = new utils.common.Connection('url', {trace: true});
+  describe('trace', () => {
     const message1 = '{"type": "transaction"}';
     const message2 = '{"type": "path_find"}';
-    const messages = [];
-    connection._console = {
-      log: function(message) {
-        messages.push(message);
-      }
-    };
-    connection._ws = {
-      send: function() {}
-    };
-    connection._onMessage(message1);
-    connection._send(message2);
+    const expectedMessages = [['send', message1], ['receive', message2]];
+    const originalConsoleLog = console.log;
 
-    assert.deepEqual(messages, [message1, message2]);
+    afterEach(() => {
+      console.log = originalConsoleLog;
+    });
+
+    it('as false', function() {
+      const messages = [];
+      console.log = (id, msg) => messages.push([id, msg]);
+      const connection: any = new utils.common.Connection('url', {trace: false});
+      connection._ws = {send: function() {}};
+      connection._send(message1);
+      connection._onMessage(message2);
+      assert.deepEqual(messages, []);
+    });
+
+    it('as true', function() {
+      const messages = [];
+      console.log = (id, msg) => messages.push([id, msg]);
+      const connection: any = new utils.common.Connection('url', {trace: true});
+      connection._ws = {send: function() {}};
+      connection._send(message1);
+      connection._onMessage(message2);
+      assert.deepEqual(messages, expectedMessages);
+    });
+
+    it('as a function', function() {
+      const messages = [];
+      const connection: any = new utils.common.Connection('url', {
+        trace: (id, msg) => messages.push([id, msg])
+      });
+      connection._ws = {send: function() {}};
+      connection._send(message1);
+      connection._onMessage(message2);
+      assert.deepEqual(messages, expectedMessages);
+    });
   });
 
   it('with proxy', function(done) {

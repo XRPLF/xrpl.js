@@ -8,7 +8,7 @@ import {RippledError, DisconnectedError, NotConnectedError,
   RippledNotInitializedError} from './errors'
 
 export interface ConnectionOptions {
-  trace?: boolean
+  trace?: boolean | ((id: string, msg: string) => void)
   proxy?: string
   proxyAuthorization?: string
   authorization?: string
@@ -23,8 +23,6 @@ export interface ConnectionOptions {
 class Connection extends EventEmitter {
 
   private _url: string
-  private _trace: boolean
-  private _console?: Console
   private _proxyURL?: string
   private _proxyAuthorization?: string
   private _authorization?: string
@@ -48,14 +46,16 @@ class Connection extends EventEmitter {
   private _fee_ref: null|number = null
   private _connectionTimeout: number
 
+  private _trace: (id: string, msg: string) => void = () => {}
+
   constructor(url, options: ConnectionOptions = {}) {
     super()
     this.setMaxListeners(Infinity)
     this._url = url
-    this._trace = options.trace || false
-    if (this._trace) {
-      // for easier unit testing
-      this._console = console
+    if (typeof options.trace === 'function') {
+      this._trace = options.trace
+    } else if (options.trace === true) {
+      this._trace = console.log
     }
     this._proxyURL = options.proxy
     this._proxyAuthorization = options.proxyAuthorization
@@ -106,9 +106,7 @@ class Connection extends EventEmitter {
   }
 
   _onMessage(message) {
-    if (this._trace) {
-      this._console!.log(message)
-    }
+    this._trace('receive', message)
     let parameters
     try {
       parameters = this._parseMessage(message)
@@ -445,9 +443,7 @@ class Connection extends EventEmitter {
   }
 
   _send(message: string): Promise<void> {
-    if (this._trace) {
-      this._console.log(message)
-    }
+    this._trace('send', message)
     return new Promise((resolve, reject) => {
       this._ws.send(message, undefined, error => {
         if (error) {
