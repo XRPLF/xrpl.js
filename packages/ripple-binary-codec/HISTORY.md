@@ -1,5 +1,13 @@
 # ripple-binary-codec Release History
 
+## 0.2.5 (2019-12-14)
+
+- Add support for AccountDelete (#37)
+
+## 0.2.4 (2019-09-04)
+
+- Update ripple-address-codec to 3.0.4
+
 ## 0.2.3 (2019-08-29)
 
 - Expand node version compatibility (#32, #33)
