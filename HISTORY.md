@@ -1,5 +1,20 @@
 # ripple-lib Release History
 
+## 1.5.0 (2019-12-14)
+
+* Add support for `WalletLocator` (#1083)
+* Types: Move and de-dupe `TransactionJSON` type (#1096)
+  * This resolves an error surfaced by [TypeScript 3.7](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#local-and-imported-type-declarations-now-conflict)
+* Add a heartbeat to detect hung connections (#1101)
+* Dependencies
+  * Update TypeScript version (#1096)
+  * Update ripple-lib-transactionparser to 0.8.1 (#1097)
+  * Update ripple-binary-codec to 0.2.5
+  * Update webpack (#1112)
+  * Require node 8 and yarn (#1107)
+* Testing: Refactor and add unit tests
+  * Fix some errors caught by the improved tests
+
 ## 1.4.2 (2019-11-14)
 
 * Add support for tick size (#1090) (thanks @RareData)
