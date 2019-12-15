@@ -37,8 +37,13 @@ True unless the field is [specified with `SField::notSigning`](https://github.co
 
 ## Transaction Results
 
-TODO
+See:
+
+- https://github.com/ripple/rippled/blob/develop/src/ripple/protocol/TER.h
+- https://xrpl.org/transaction-results.html
+
+TODO: Write a script to read rippled's source file and generate the necessary mapping.
 
 ## Transaction Types
 
-TODO
+See https://github.com/ripple/rippled/blob/develop/src/ripple/protocol/TxFormats.h
