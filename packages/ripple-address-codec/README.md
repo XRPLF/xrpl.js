@@ -24,11 +24,11 @@ Convert an X-address to a classic address and tag. If the X-address did not have
 
 ```js
 > const api = require('ripple-address-codec')
-> rippleAddressCodec.xAddressToClassicAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi')
+> api.xAddressToClassicAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi')
 {
   classicAddress: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
   tag: 4294967295,
-  test: true
+  test: false
 }
 ```
 
