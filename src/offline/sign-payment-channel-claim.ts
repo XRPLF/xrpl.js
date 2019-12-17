@@ -3,7 +3,9 @@ import keypairs from 'ripple-keypairs'
 import binary from 'ripple-binary-codec'
 const {validate, xrpToDrops} = common
 
-function signPaymentChannelClaim(channel: string, amount: string,
+function signPaymentChannelClaim(
+  channel: string,
+  amount: string,
   privateKey: string
 ): string {
   validate.signPaymentChannelClaim({channel, amount, privateKey})

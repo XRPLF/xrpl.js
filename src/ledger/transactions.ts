@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import binary from 'ripple-binary-codec';
+import binary from 'ripple-binary-codec'
 import {computeTransactionHash} from '../common/hashes'
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
@@ -9,17 +9,17 @@ import {FormattedTransactionType} from '../transaction/types'
 import {RippleAPI} from '..'
 
 export type TransactionsOptions = {
-  start?: string,
-  limit?: number,
-  minLedgerVersion?: number,
-  maxLedgerVersion?: number,
-  earliestFirst?: boolean,
-  excludeFailures?: boolean,
-  initiated?: boolean,
-  counterparty?: string,
-  types?: Array<string>,
-  includeRawTransactions?: boolean,
-  binary?: boolean,
+  start?: string
+  limit?: number
+  minLedgerVersion?: number
+  maxLedgerVersion?: number
+  earliestFirst?: boolean
+  excludeFailures?: boolean
+  initiated?: boolean
+  counterparty?: string
+  types?: Array<string>
+  includeRawTransactions?: boolean
+  binary?: boolean
   startTx?: FormattedTransactionType
 }
 
@@ -39,8 +39,10 @@ function parseBinaryTransaction(transaction) {
 function parseAccountTxTransaction(tx, includeRawTransaction: boolean) {
   const _tx = tx.tx_blob ? parseBinaryTransaction(tx) : tx
   // rippled uses a different response format for 'account_tx' than 'tx'
-  return parseTransaction(_.assign({}, _tx.tx,
-    {meta: _tx.meta, validated: _tx.validated}), includeRawTransaction)
+  return parseTransaction(
+    _.assign({}, _tx.tx, {meta: _tx.meta, validated: _tx.validated}),
+    includeRawTransaction
+  )
 }
 
 function counterpartyFilter(filters, tx: FormattedTransactionType) {
@@ -48,15 +50,20 @@ function counterpartyFilter(filters, tx: FormattedTransactionType) {
     return true
   }
   const specification: any = tx.specification
-  if (specification && ((specification.destination &&
-        specification.destination.address === filters.counterparty) ||
-      (specification.counterparty === filters.counterparty))) {
-        return true
+  if (
+    specification &&
+    ((specification.destination &&
+      specification.destination.address === filters.counterparty) ||
+      specification.counterparty === filters.counterparty)
+  ) {
+    return true
   }
   return false
 }
 
-function transactionFilter(address: string, filters: TransactionsOptions,
+function transactionFilter(
+  address: string,
+  filters: TransactionsOptions,
   tx: FormattedTransactionType
 ) {
   if (filters.excludeFailures && tx.outcome.result !== 'tesSUCCESS') {
@@ -78,15 +85,21 @@ function transactionFilter(address: string, filters: TransactionsOptions,
 }
 
 function orderFilter(
-  options: TransactionsOptions, tx: FormattedTransactionType
+  options: TransactionsOptions,
+  tx: FormattedTransactionType
 ) {
-  return !options.startTx || (options.earliestFirst ?
-    utils.compareTransactions(tx, options.startTx) > 0 :
-    utils.compareTransactions(tx, options.startTx) < 0)
+  return (
+    !options.startTx ||
+    (options.earliestFirst
+      ? utils.compareTransactions(tx, options.startTx) > 0
+      : utils.compareTransactions(tx, options.startTx) < 0)
+  )
 }
 
-function formatPartialResponse(address: string,
-  options: TransactionsOptions, data
+function formatPartialResponse(
+  address: string,
+  options: TransactionsOptions,
+  data
 ) {
   const parse = tx =>
     parseAccountTxTransaction(tx, options.includeRawTransactions)
@@ -100,8 +113,12 @@ function formatPartialResponse(address: string,
   }
 }
 
-function getAccountTx(connection: Connection, address: string,
-  options: TransactionsOptions, marker: string, limit: number
+function getAccountTx(
+  connection: Connection,
+  address: string,
+  options: TransactionsOptions,
+  marker: string,
+  limit: number
 ) {
   const request = {
     command: 'account_tx',
@@ -116,12 +133,15 @@ function getAccountTx(connection: Connection, address: string,
     marker: marker
   }
 
-  return connection.request(request).then(response =>
-    formatPartialResponse(address, options, response))
+  return connection
+    .request(request)
+    .then(response => formatPartialResponse(address, options, response))
 }
 
-function checkForLedgerGaps(connection: Connection,
-  options: TransactionsOptions, transactions: GetTransactionsResponse
+function checkForLedgerGaps(
+  connection: Connection,
+  options: TransactionsOptions,
+  transactions: GetTransactionsResponse
 ) {
   let {minLedgerVersion, maxLedgerVersion} = options
 
@@ -136,25 +156,32 @@ function checkForLedgerGaps(connection: Connection,
     }
   }
 
-  return utils.hasCompleteLedgerRange(connection, minLedgerVersion,
-    maxLedgerVersion).then(hasCompleteLedgerRange => {
-    if (!hasCompleteLedgerRange) {
-      throw new errors.MissingLedgerHistoryError()
-    }
-  })
+  return utils
+    .hasCompleteLedgerRange(connection, minLedgerVersion, maxLedgerVersion)
+    .then(hasCompleteLedgerRange => {
+      if (!hasCompleteLedgerRange) {
+        throw new errors.MissingLedgerHistoryError()
+      }
+    })
 }
 
-function formatResponse(connection: Connection, options: TransactionsOptions,
+function formatResponse(
+  connection: Connection,
+  options: TransactionsOptions,
   transactions: GetTransactionsResponse
 ) {
-  const compare = options.earliestFirst ? utils.compareTransactions :
-    _.rearg(utils.compareTransactions, 1, 0)
+  const compare = options.earliestFirst
+    ? utils.compareTransactions
+    : _.rearg(utils.compareTransactions, 1, 0)
   const sortedTransactions = transactions.sort(compare)
   return checkForLedgerGaps(connection, options, sortedTransactions).then(
-    () => sortedTransactions)
+    () => sortedTransactions
+  )
 }
 
-function getTransactionsInternal(connection: Connection, address: string,
+function getTransactionsInternal(
+  connection: Connection,
+  address: string,
   options: TransactionsOptions
 ): Promise<GetTransactionsResponse> {
   const getter = _.partial(getAccountTx, connection, address, options)
@@ -162,7 +189,10 @@ function getTransactionsInternal(connection: Connection, address: string,
   return utils.getRecursive(getter, options.limit).then(format)
 }
 
-function getTransactions(this: RippleAPI, address: string, options: TransactionsOptions = {}
+function getTransactions(
+  this: RippleAPI,
+  address: string,
+  options: TransactionsOptions = {}
 ): Promise<GetTransactionsResponse> {
   validate.getTransactions({address, options})
 
@@ -176,8 +206,9 @@ function getTransactions(this: RippleAPI, address: string, options: Transactions
   if (options.start) {
     return getTransaction.call(this, options.start).then(tx => {
       const ledgerVersion = tx.outcome.ledgerVersion
-      const bound = options.earliestFirst ?
-        {minLedgerVersion: ledgerVersion} : {maxLedgerVersion: ledgerVersion}
+      const bound = options.earliestFirst
+        ? {minLedgerVersion: ledgerVersion}
+        : {maxLedgerVersion: ledgerVersion}
       const startOptions = _.assign({}, defaults, options, {startTx: tx}, bound)
       return getTransactionsInternal(this.connection, address, startOptions)
     })

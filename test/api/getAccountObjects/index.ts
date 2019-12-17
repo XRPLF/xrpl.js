@@ -1,6 +1,6 @@
 import responses from '../../fixtures/responses'
-import { assertResultMatch, TestSuite } from '../../utils'
-const { getAccountObjects: RESPONSE_FIXTURES } = responses
+import {assertResultMatch, TestSuite} from '../../utils'
+const {getAccountObjects: RESPONSE_FIXTURES} = responses
 
 /**
  * Every test suite exports their tests in the default object.
@@ -15,7 +15,7 @@ export default <TestSuite>{
 
   'getAccountObjects - invalid options': async (api, address) => {
     // @ts-ignore - This is intentionally invalid
-    const result = await api.getAccountObjects(address, { invalid: 'options' })
+    const result = await api.getAccountObjects(address, {invalid: 'options'})
     assertResultMatch(result, RESPONSE_FIXTURES, 'AccountObjectsResponse')
   }
 }

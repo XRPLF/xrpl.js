@@ -1,9 +1,9 @@
-
 function setPrototypeOf(object, prototype) {
   // Object.setPrototypeOf not supported on Internet Explorer 9
-  Object.setPrototypeOf ? Object.setPrototypeOf(object, prototype) :
-    // @ts-ignore: Specifically a fallback for IE9
-    object.__proto__ = prototype
+  Object.setPrototypeOf
+    ? Object.setPrototypeOf(object, prototype)
+    : // @ts-ignore: Specifically a fallback for IE9
+      (object.__proto__ = prototype)
 }
 
 function getConstructorName(object: object): string {
@@ -17,7 +17,4 @@ function getConstructorName(object: object): string {
   return functionConstructor ? functionConstructor[1] : classConstructor[1]
 }
 
-export {
-  getConstructorName,
-  setPrototypeOf
-}
+export {getConstructorName, setPrototypeOf}

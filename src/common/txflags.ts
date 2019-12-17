@@ -58,7 +58,4 @@ const txFlagIndices = {
   }
 }
 
-export {
-  txFlags,
-  txFlagIndices
-}
+export {txFlags, txFlagIndices}

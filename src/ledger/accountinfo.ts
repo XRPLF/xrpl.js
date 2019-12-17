@@ -1,4 +1,9 @@
-import {validate, removeUndefined, dropsToXrp, ensureClassicAddress} from '../common'
+import {
+  validate,
+  removeUndefined,
+  dropsToXrp,
+  ensureClassicAddress
+} from '../common'
 import {RippleAPI} from '..'
 import {AccountInfoResponse} from '../common/types/commands/account_info'
 
@@ -7,11 +12,11 @@ export type GetAccountInfoOptions = {
 }
 
 export type FormattedGetAccountInfoResponse = {
-  sequence: number,
-  xrpBalance: string,
-  ownerCount: number,
-  previousInitiatedTransactionID: string,
-  previousAffectingTransactionID: string,
+  sequence: number
+  xrpBalance: string
+  ownerCount: number
+  previousInitiatedTransactionID: string
+  previousAffectingTransactionID: string
   previousAffectingTransactionLedgerVersion: number
 }
 
@@ -30,7 +35,9 @@ function formatAccountInfo(
 }
 
 export default async function getAccountInfo(
-  this: RippleAPI, address: string, options: GetAccountInfoOptions = {}
+  this: RippleAPI,
+  address: string,
+  options: GetAccountInfoOptions = {}
 ): Promise<FormattedGetAccountInfoResponse> {
   // 1. Validate
   validate.getAccountInfo({address, options})

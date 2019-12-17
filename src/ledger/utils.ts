@@ -4,10 +4,10 @@ import * as common from '../common'
 import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
-import {RippleAPI} from '..' 
+import {RippleAPI} from '..'
 
 export type RecursiveData = {
-  marker: string,
+  marker: string
   results: Array<any>
 }
 
@@ -18,7 +18,9 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max)
 }
 
-function getXRPBalance(connection: Connection, address: string,
+function getXRPBalance(
+  connection: Connection,
+  address: string,
   ledgerVersion?: number
 ): Promise<string> {
   const request = {
@@ -26,13 +28,16 @@ function getXRPBalance(connection: Connection, address: string,
     account: address,
     ledger_index: ledgerVersion
   }
-  return connection.request(request).then(data =>
-    common.dropsToXrp(data.account_data.Balance))
+  return connection
+    .request(request)
+    .then(data => common.dropsToXrp(data.account_data.Balance))
 }
 
 // If the marker is omitted from a response, you have reached the end
 function getRecursiveRecur(
-  getter: Getter, marker: string | undefined, limit: number
+  getter: Getter,
+  marker: string | undefined,
+  limit: number
 ): Promise<Array<any>> {
   return getter(marker, limit).then(data => {
     const remaining = limit - data.results.length
@@ -50,17 +55,20 @@ function getRecursive(getter: Getter, limit?: number): Promise<Array<any>> {
 }
 
 function renameCounterpartyToIssuer<T>(
-    obj: T & {counterparty?: string, issuer?: string}
-  ): (T & {issuer?: string}) {
-  const issuer = (obj.counterparty !== undefined) ?
-    obj.counterparty :
-    ((obj.issuer !== undefined) ? obj.issuer : undefined)
+  obj: T & {counterparty?: string; issuer?: string}
+): T & {issuer?: string} {
+  const issuer =
+    obj.counterparty !== undefined
+      ? obj.counterparty
+      : obj.issuer !== undefined
+      ? obj.issuer
+      : undefined
   const withIssuer = Object.assign({}, obj, {issuer})
   delete withIssuer.counterparty
   return withIssuer
 }
 
-export type RequestBookOffersArgs = {taker_gets: Issue, taker_pays: Issue}
+export type RequestBookOffersArgs = {taker_gets: Issue; taker_pays: Issue}
 
 function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
   const taker_gets = renameCounterpartyToIssuer(order.taker_gets)
@@ -70,7 +78,7 @@ function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
 }
 
 function signum(num) {
-  return (num === 0) ? 0 : (num > 0 ? 1 : -1)
+  return num === 0 ? 0 : num > 0 ? 1 : -1
 }
 
 /**
@@ -80,7 +88,8 @@ function signum(num) {
  *  See: https://developers.ripple.com/transaction-metadata.html
  */
 function compareTransactions(
-  first: FormattedTransactionType, second: FormattedTransactionType
+  first: FormattedTransactionType,
+  second: FormattedTransactionType
 ): number {
   if (!first.outcome || !second.outcome) {
     return 0
@@ -91,30 +100,38 @@ function compareTransactions(
   return first.outcome.ledgerVersion < second.outcome.ledgerVersion ? -1 : 1
 }
 
-function hasCompleteLedgerRange(connection: Connection,
-  minLedgerVersion?: number, maxLedgerVersion?: number
+function hasCompleteLedgerRange(
+  connection: Connection,
+  minLedgerVersion?: number,
+  maxLedgerVersion?: number
 ): Promise<boolean> {
   const firstLedgerVersion = 32570 // earlier versions have been lost
   return connection.hasLedgerVersions(
-    minLedgerVersion || firstLedgerVersion, maxLedgerVersion)
+    minLedgerVersion || firstLedgerVersion,
+    maxLedgerVersion
+  )
 }
 
-function isPendingLedgerVersion(connection: Connection,
+function isPendingLedgerVersion(
+  connection: Connection,
   maxLedgerVersion?: number
 ): Promise<boolean> {
-  return connection.getLedgerVersion().then(ledgerVersion =>
-    ledgerVersion < (maxLedgerVersion || 0))
+  return connection
+    .getLedgerVersion()
+    .then(ledgerVersion => ledgerVersion < (maxLedgerVersion || 0))
 }
 
-function ensureLedgerVersion(this: RippleAPI, options: any
-): Promise<object> {
-  if (Boolean(options) && options.ledgerVersion !== undefined &&
+function ensureLedgerVersion(this: RippleAPI, options: any): Promise<object> {
+  if (
+    Boolean(options) &&
+    options.ledgerVersion !== undefined &&
     options.ledgerVersion !== null
   ) {
     return Promise.resolve(options)
   }
   return this.getLedgerVersion().then(ledgerVersion =>
-    _.assign({}, options, {ledgerVersion}))
+    _.assign({}, options, {ledgerVersion})
+  )
 }
 
 export {

@@ -4,11 +4,12 @@ import {constants} from '../../common'
 const AccountFields = constants.AccountFields
 
 function parseField(info, value) {
-  if (info.encoding === 'hex' && !info.length) { // e.g. "domain"
+  if (info.encoding === 'hex' && !info.length) {
+    // e.g. "domain"
     return Buffer.from(value, 'hex').toString('ascii')
   }
   if (info.shift) {
-    return (new BigNumber(value)).shiftedBy(-info.shift).toNumber()
+    return new BigNumber(value).shiftedBy(-info.shift).toNumber()
   }
   return value
 }
@@ -42,7 +43,8 @@ function parseFields(data: any): object {
             address: entry.SignerEntry.Account,
             weight: entry.SignerEntry.SignerWeight
           }
-        })
+        }
+      )
     }
   }
   return settings

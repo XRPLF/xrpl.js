@@ -1,9 +1,9 @@
 import BigNumber from 'bignumber.js'
 import assert from 'assert-diff'
-import { RippleAPI } from 'ripple-api'
+import {RippleAPI} from 'ripple-api'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import { TestSuite } from '../../utils'
+import {TestSuite} from '../../utils'
 
 function checkSortingOfOrders(orders) {
   let previousRate = '0'
@@ -181,7 +181,7 @@ export default <TestSuite>{
 
   'sample USD/XRP book has orders sorted correctly': async (api, address) => {
     const orderbookInfo = {
-      counter: { currency: 'XRP' },
+      counter: {currency: 'XRP'},
       base: {
         currency: 'USD',
         counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
@@ -325,7 +325,7 @@ export default <TestSuite>{
       orders.forEach(order => {
         const quantity = order.specification.quantity
         const totalPrice = order.specification.totalPrice
-        const { base, counter } = requests.getOrderbook.normal
+        const {base, counter} = requests.getOrderbook.normal
         assert.strictEqual(quantity.currency, base.currency)
         assert.strictEqual(quantity.counterparty, base.counterparty)
         assert.strictEqual(totalPrice.currency, counter.currency)

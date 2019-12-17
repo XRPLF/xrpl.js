@@ -18,7 +18,6 @@ function mergeIntervals(intervals: Interval[]): Interval[] {
 }
 
 class RangeSet {
-
   ranges: Array<[number, number]>
 
   constructor() {
@@ -30,8 +29,9 @@ class RangeSet {
   }
 
   serialize() {
-    return this.ranges.map(range =>
-      range[0].toString() + '-' + range[1].toString()).join(',')
+    return this.ranges
+      .map(range => range[0].toString() + '-' + range[1].toString())
+      .join(',')
   }
 
   addRange(start: number, end: number) {

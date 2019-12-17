@@ -5,17 +5,17 @@ import {ensureLedgerVersion} from './utils'
 import {RippleAPI} from '..'
 
 export type BalanceSheetOptions = {
-  excludeAddresses?: Array<string>,
+  excludeAddresses?: Array<string>
   ledgerVersion?: number
 }
 
 export type GetBalanceSheet = {
-  balances?: Array<Amount>,
-  assets?: Array<Amount>,
+  balances?: Array<Amount>
+  assets?: Array<Amount>
   obligations?: Array<{
-     currency: string,
-     value: string
-   }>
+    currency: string
+    value: string
+  }>
 }
 
 function formatBalanceSheet(balanceSheet): GetBalanceSheet {
@@ -48,7 +48,9 @@ function formatBalanceSheet(balanceSheet): GetBalanceSheet {
 }
 
 async function getBalanceSheet(
-  this: RippleAPI, address: string, options: BalanceSheetOptions = {}
+  this: RippleAPI,
+  address: string,
+  options: BalanceSheetOptions = {}
 ): Promise<GetBalanceSheet> {
   // 1. Validate
   validate.getBalanceSheet({address, options})

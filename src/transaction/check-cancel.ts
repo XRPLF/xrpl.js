@@ -7,7 +7,8 @@ export type CheckCancelParameters = {
   checkID: string
 }
 
-function createCheckCancelTransaction(account: string,
+function createCheckCancelTransaction(
+  account: string,
   cancel: CheckCancelParameters
 ): TransactionJSON {
   const txJSON = {
@@ -19,15 +20,15 @@ function createCheckCancelTransaction(account: string,
   return txJSON
 }
 
-function prepareCheckCancel(this: RippleAPI, address: string,
+function prepareCheckCancel(
+  this: RippleAPI,
+  address: string,
   checkCancel: CheckCancelParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCancel(
-      {address, checkCancel, instructions})
-    const txJSON = createCheckCancelTransaction(
-      address, checkCancel)
+    validate.prepareCheckCancel({address, checkCancel, instructions})
+    const txJSON = createCheckCancelTransaction(address, checkCancel)
     return prepareTransaction(txJSON, this, instructions)
   } catch (e) {
     return Promise.reject(e)

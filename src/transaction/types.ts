@@ -1,4 +1,3 @@
-
 import {
   FormattedOrderSpecification,
   FormattedTrustline,
@@ -7,58 +6,56 @@ import {
   Memo,
   FormattedSettings
 } from '../common/types/objects'
-import {
-  ApiMemo,
-} from './utils'
+import {ApiMemo} from './utils'
 
 export type TransactionJSON = {
-  Account: string,
-  TransactionType: string,
-  Memos?: {Memo: ApiMemo}[],
-  Flags?: number,
-  Fulfillment?: string,
+  Account: string
+  TransactionType: string
+  Memos?: {Memo: ApiMemo}[]
+  Flags?: number
+  Fulfillment?: string
   [Field: string]: string | number | Array<any> | RippledAmount | undefined
 }
 
 export type Instructions = {
-  sequence?: number,
-  fee?: string,
+  sequence?: number
+  fee?: string
   // @deprecated
-  maxFee?: string,
-  maxLedgerVersion?: number,
-  maxLedgerVersionOffset?: number,
+  maxFee?: string
+  maxLedgerVersion?: number
+  maxLedgerVersionOffset?: number
   signersCount?: number
 }
 
 export type Prepare = {
-  txJSON: string,
+  txJSON: string
   instructions: {
-    fee: string,
-    sequence: number,
+    fee: string
+    sequence: number
     maxLedgerVersion?: number
   }
 }
 
 export type Submit = {
-  success: boolean,
-  engineResult: string,
-  engineResultCode: number,
-  engineResultMessage?: string,
-  txBlob?: string,
+  success: boolean
+  engineResult: string
+  engineResultCode: number
+  engineResultMessage?: string
+  txBlob?: string
   txJson?: object
 }
 
 export interface OfferCreateTransaction extends TransactionJSON {
-  TransactionType: 'OfferCreate',
-  Account: string,
-  Fee: string,
-  Flags: number,
-  LastLedgerSequence: number,
-  Sequence: number,
-  TakerGets: RippledAmount,
-  TakerPays: RippledAmount,
-  Expiration?: number,
-  OfferSequence?: number,
+  TransactionType: 'OfferCreate'
+  Account: string
+  Fee: string
+  Flags: number
+  LastLedgerSequence: number
+  Sequence: number
+  TakerGets: RippledAmount
+  TakerPays: RippledAmount
+  Expiration?: number
+  OfferSequence?: number
   Memos?: {Memo: ApiMemo}[]
 }
 
@@ -67,7 +64,7 @@ export interface SettingsTransaction extends TransactionJSON {
 }
 
 export type KeyPair = {
-  publicKey: string,
+  publicKey: string
   privateKey: string
 }
 
@@ -76,23 +73,23 @@ export type SignOptions = {
 }
 
 export type Outcome = {
-  result: string,
-  ledgerVersion: number,
-  indexInLedger: number,
-  fee: string,
+  result: string
+  ledgerVersion: number
+  indexInLedger: number
+  fee: string
   balanceChanges: {
     [key: string]: {
-     currency: string,
-     counterparty?: string,
-     value: string
+      currency: string
+      counterparty?: string
+      value: string
     }[]
-  },
-  orderbookChanges: object,
+  }
+  orderbookChanges: object
   deliveredAmount?: {
-    currency: string,
-    counterparty?: string,
+    currency: string
+    counterparty?: string
     value: string
-  },
+  }
   timestamp?: string
 }
 
@@ -101,64 +98,64 @@ export type FormattedOrderCancellation = {
 }
 
 export type FormattedPayment = {
-  source: Adjustment,
-  destination: Adjustment,
-  paths?: string,
-  memos?: Array<Memo>,
-  invoiceID?: string,
-  allowPartialPayment?: boolean,
-  noDirectRipple?: boolean,
+  source: Adjustment
+  destination: Adjustment
+  paths?: string
+  memos?: Array<Memo>
+  invoiceID?: string
+  allowPartialPayment?: boolean
+  noDirectRipple?: boolean
   limitQuality?: boolean
 }
 
 export type FormattedPaymentTransaction = {
-  type: string,
-  specification: FormattedPayment,
-  outcome: Outcome,
-  id: string,
-  address: string,
+  type: string
+  specification: FormattedPayment
+  outcome: Outcome
+  id: string
+  address: string
   sequence: number
 }
 
 export type FormattedOrderTransaction = {
-  type: string,
-  specification: FormattedOrderSpecification,
-  outcome: Outcome,
-  id: string,
-  address: string,
+  type: string
+  specification: FormattedOrderSpecification
+  outcome: Outcome
+  id: string
+  address: string
   sequence: number
 }
 
 export type FormattedOrderCancellationTransaction = {
-  type: string,
-  specification: FormattedOrderCancellation,
-  outcome: Outcome,
-  id: string,
-  address: string,
+  type: string
+  specification: FormattedOrderCancellation
+  outcome: Outcome
+  id: string
+  address: string
   sequence: number
 }
 
 export type FormattedTrustlineTransaction = {
-  type: string,
-  specification: FormattedTrustline,
-  outcome: Outcome,
-  id: string,
-  address: string,
+  type: string
+  specification: FormattedTrustline
+  outcome: Outcome
+  id: string
+  address: string
   sequence: number
 }
 
 export type FormattedSettingsTransaction = {
-  type: string,
-  specification: FormattedSettings,
-  outcome: Outcome,
-  id: string,
-  address: string,
+  type: string
+  specification: FormattedSettings
+  outcome: Outcome
+  id: string
+  address: string
   sequence: number
 }
 
 export type FormattedTransactionType =
-  FormattedPaymentTransaction |
-  FormattedOrderTransaction |
-  FormattedOrderCancellationTransaction |
-  FormattedTrustlineTransaction |
-  FormattedSettingsTransaction
+  | FormattedPaymentTransaction
+  | FormattedOrderTransaction
+  | FormattedOrderCancellationTransaction
+  | FormattedTrustlineTransaction
+  | FormattedSettingsTransaction

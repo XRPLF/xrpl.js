@@ -7,17 +7,20 @@ import {Amount} from '../common/types/objects'
 import {RippleAPI} from '..'
 
 export type CheckCashParameters = {
-  checkID: string,
-  amount?: Amount,
+  checkID: string
+  amount?: Amount
   deliverMin?: Amount
 }
 
-function createCheckCashTransaction(account: string,
+function createCheckCashTransaction(
+  account: string,
   checkCash: CheckCashParameters
 ): TransactionJSON {
   if (checkCash.amount && checkCash.deliverMin) {
-    throw new ValidationError('"amount" and "deliverMin" properties on '
-      + 'CheckCash are mutually exclusive')
+    throw new ValidationError(
+      '"amount" and "deliverMin" properties on ' +
+        'CheckCash are mutually exclusive'
+    )
   }
 
   const txJSON: any = {
@@ -37,15 +40,15 @@ function createCheckCashTransaction(account: string,
   return txJSON
 }
 
-function prepareCheckCash(this: RippleAPI, address: string,
+function prepareCheckCash(
+  this: RippleAPI,
+  address: string,
   checkCash: CheckCashParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCash(
-      {address, checkCash, instructions})
-    const txJSON = createCheckCashTransaction(
-      address, checkCash)
+    validate.prepareCheckCash({address, checkCash, instructions})
+    const txJSON = createCheckCashTransaction(address, checkCash)
     return utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {
     return Promise.reject(e)

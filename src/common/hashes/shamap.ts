@@ -1,6 +1,7 @@
 import hashPrefix from './hash-prefix'
 import sha512Half from './sha512Half'
-const HEX_ZERO = '0000000000000000000000000000000000000000000000000000000000000000'
+const HEX_ZERO =
+  '0000000000000000000000000000000000000000000000000000000000000000'
 
 export enum NodeType {
   INNER = 1,
@@ -18,15 +19,17 @@ export abstract class Node {
   public constructor() {}
 
   public addItem(_tag: string, _node: Node): void {
-    throw new Error('Called unimplemented virtual method SHAMapTreeNode#addItem.')
+    throw new Error(
+      'Called unimplemented virtual method SHAMapTreeNode#addItem.'
+    )
   }
-  public get hash(): string|void {
-    throw new Error('Called unimplemented virtual method SHAMapTreeNode#hash.');
+  public get hash(): string | void {
+    throw new Error('Called unimplemented virtual method SHAMapTreeNode#hash.')
   }
 }
 
 export class InnerNode extends Node {
-  public leaves: { [slot: number]: Node }
+  public leaves: {[slot: number]: Node}
   public type: NodeType
   public depth: number
   public empty: boolean
@@ -48,9 +51,10 @@ export class InnerNode extends Node {
    * @param {string} tag equates to a ledger entry `index`
    * @param {Node} node to add
    * @return {void}
-   */  
+   */
+
   public addItem(tag: string, node: Node): void {
-    const existingNode = this.getNode(parseInt(tag[this.depth],16))
+    const existingNode = this.getNode(parseInt(tag[this.depth], 16))
     if (existingNode) {
       // A node already exists in this slot
       if (existingNode instanceof InnerNode) {
@@ -60,15 +64,16 @@ export class InnerNode extends Node {
         if (existingNode.tag === tag) {
           // Collision
           throw new Error(
-              'Tried to add a node to a SHAMap that was already in there.')
+            'Tried to add a node to a SHAMap that was already in there.'
+          )
         } else {
           // Turn it into an inner node
           const newInnerNode = new InnerNode(this.depth + 1)
-    
+
           // Parent new and existing node
           newInnerNode.addItem(existingNode.tag, existingNode)
           newInnerNode.addItem(tag, node)
-    
+
           // And place the newly created inner node in the slot
           this.setNode(parseInt(tag[this.depth], 16), newInnerNode)
         }
@@ -87,7 +92,7 @@ export class InnerNode extends Node {
    */
   public setNode(slot: number, node: Node): void {
     if (slot < 0 || slot > 15) {
-      throw new Error ('Invalid slot: slot must be between 0-15.')
+      throw new Error('Invalid slot: slot must be between 0-15.')
     }
     this.leaves[slot] = node
     this.empty = false
@@ -100,8 +105,8 @@ export class InnerNode extends Node {
    */
   public getNode(slot: number): Node {
     if (slot < 0 || slot > 15) {
-      throw new Error ('Invalid slot: slot must be between 0-15.')
-    }    
+      throw new Error('Invalid slot: slot must be between 0-15.')
+    }
     return this.leaves[slot]
   }
 
@@ -113,7 +118,7 @@ export class InnerNode extends Node {
     }
     const prefix = hashPrefix.INNER_NODE.toString(16)
     return sha512Half(prefix + hex)
-  } 
+  }
 }
 
 export class Leaf extends Node {
@@ -135,7 +140,7 @@ export class Leaf extends Node {
     this.data = data
   }
 
-  public get hash(): string|void {
+  public get hash(): string | void {
     switch (this.type) {
       case NodeType.ACCOUNT_STATE:
         const leafPrefix = hashPrefix.LEAF_NODE.toString(16)
@@ -149,7 +154,7 @@ export class Leaf extends Node {
       default:
         throw new Error('Tried to hash a SHAMap node of unknown type.')
     }
-  }  
+  }
 }
 
 export class SHAMap {

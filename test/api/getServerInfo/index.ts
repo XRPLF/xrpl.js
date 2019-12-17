@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
-import { assertResultMatch, TestSuite, assertRejects } from '../../utils'
+import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -17,7 +17,7 @@ export default <TestSuite>{
     api.connection._send(
       JSON.stringify({
         command: 'config',
-        data: { returnErrorOnServerInfo: true }
+        data: {returnErrorOnServerInfo: true}
       })
     )
     try {
@@ -34,7 +34,7 @@ export default <TestSuite>{
     api.connection._send(
       JSON.stringify({
         command: 'config',
-        data: { serverInfoWithoutValidated: true }
+        data: {serverInfoWithoutValidated: true}
       })
     )
     const serverInfo = await api.getServerInfo()

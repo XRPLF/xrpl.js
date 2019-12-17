@@ -24,8 +24,7 @@ import getBalances from './ledger/balances'
 import getBalanceSheet from './ledger/balance-sheet'
 import getPaths from './ledger/pathfind'
 import getOrders from './ledger/orders'
-import {getOrderbook,
-  formatBidsAndAsks} from './ledger/orderbook'
+import {getOrderbook, formatBidsAndAsks} from './ledger/orderbook'
 import {getSettings, parseAccountFlags} from './ledger/settings'
 import getAccountInfo from './ledger/accountinfo'
 import getAccountObjects from './ledger/accountobjects'
@@ -47,7 +46,11 @@ import prepareSettings from './transaction/settings'
 import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
-import {generateAddressAPI, GenerateAddressOptions, GeneratedAddress} from './offline/generate-address'
+import {
+  generateAddressAPI,
+  GenerateAddressOptions,
+  GeneratedAddress
+} from './offline/generate-address'
 import {deriveKeypair, deriveAddress, deriveXAddress} from './offline/derive'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
@@ -55,18 +58,27 @@ import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
 import getLedger from './ledger/ledger'
 
 import {
-  AccountObjectsRequest, AccountObjectsResponse,
-  AccountOffersRequest, AccountOffersResponse,
-  AccountInfoRequest, AccountInfoResponse,
-  AccountLinesRequest, AccountLinesResponse,
-  BookOffersRequest, BookOffersResponse,
-  GatewayBalancesRequest, GatewayBalancesResponse,
-  LedgerRequest, LedgerResponse,
-  LedgerDataRequest, LedgerDataResponse,
-  LedgerEntryRequest, LedgerEntryResponse,
-  ServerInfoRequest, ServerInfoResponse,
+  AccountObjectsRequest,
+  AccountObjectsResponse,
+  AccountOffersRequest,
+  AccountOffersResponse,
+  AccountInfoRequest,
+  AccountInfoResponse,
+  AccountLinesRequest,
+  AccountLinesResponse,
+  BookOffersRequest,
+  BookOffersResponse,
+  GatewayBalancesRequest,
+  GatewayBalancesResponse,
+  LedgerRequest,
+  LedgerResponse,
+  LedgerDataRequest,
+  LedgerDataResponse,
+  LedgerEntryRequest,
+  LedgerEntryResponse,
+  ServerInfoRequest,
+  ServerInfoResponse
 } from './common/types/commands'
-
 
 import RangeSet from './common/rangeset'
 import * as ledgerUtils from './ledger/utils'
@@ -79,10 +91,10 @@ import {ConnectionUserOptions} from './common/connection'
 import {isValidXAddress, isValidClassicAddress} from 'ripple-address-codec'
 
 export interface APIOptions extends ConnectionUserOptions {
-  server?: string,
-  feeCushion?: number,
-  maxFeeXRP?: string,
-  proxy?: string,
+  server?: string
+  feeCushion?: number
+  maxFeeXRP?: string
+  proxy?: string
   timeout?: number
 }
 
@@ -91,7 +103,7 @@ export interface APIOptions extends ConnectionUserOptions {
  * command. This varies from command to command, but we need to know it to
  * properly count across many requests.
  */
-function getCollectKeyFromCommand(command: string): string|undefined {
+function getCollectKeyFromCommand(command: string): string | undefined {
   switch (command) {
     case 'account_offers':
     case 'book_offers':
@@ -140,12 +152,12 @@ class RippleAPI extends EventEmitter {
         this.emit('connected')
       })
       this.connection.on('disconnected', code => {
-        let finalCode = code;
-        // This is a backwards-compatible fix for this change in the ws library: 
+        let finalCode = code
+        // This is a backwards-compatible fix for this change in the ws library:
         //   https://github.com/websockets/ws/issues/1257
         // TODO: Remove in next major, breaking version
         if (finalCode === 1005) {
-          finalCode = 1000;
+          finalCode = 1000
         }
         this.emit('disconnected', finalCode)
       })
@@ -156,33 +168,51 @@ class RippleAPI extends EventEmitter {
     }
   }
 
-
   /**
    * Makes a request to the API with the given command and
    * additional request body parameters.
    */
-  async request(command: 'account_info', params: AccountInfoRequest):
-    Promise<AccountInfoResponse>
-  async request(command: 'account_lines', params: AccountLinesRequest):
-    Promise<AccountLinesResponse>
-  async request(command: 'account_objects', params: AccountObjectsRequest):
-    Promise<AccountObjectsResponse>
-  async request(command: 'account_offers', params: AccountOffersRequest):
-  Promise<AccountOffersResponse>
-  async request(command: 'book_offers', params: BookOffersRequest):
-    Promise<BookOffersResponse>
-  async request(command: 'gateway_balances', params: GatewayBalancesRequest):
-    Promise<GatewayBalancesResponse>
-  async request(command: 'ledger', params: LedgerRequest):
-    Promise<LedgerResponse>
-    async request(command: 'ledger_data', params?: LedgerDataRequest):
-      Promise<LedgerDataResponse>
-  async request(command: 'ledger_entry', params: LedgerEntryRequest):
-    Promise<LedgerEntryResponse>
-  async request(command: 'server_info', params?: ServerInfoRequest):
-    Promise<ServerInfoResponse>
-  async request(command: string, params: any):
-    Promise<any>
+  async request(
+    command: 'account_info',
+    params: AccountInfoRequest
+  ): Promise<AccountInfoResponse>
+  async request(
+    command: 'account_lines',
+    params: AccountLinesRequest
+  ): Promise<AccountLinesResponse>
+  async request(
+    command: 'account_objects',
+    params: AccountObjectsRequest
+  ): Promise<AccountObjectsResponse>
+  async request(
+    command: 'account_offers',
+    params: AccountOffersRequest
+  ): Promise<AccountOffersResponse>
+  async request(
+    command: 'book_offers',
+    params: BookOffersRequest
+  ): Promise<BookOffersResponse>
+  async request(
+    command: 'gateway_balances',
+    params: GatewayBalancesRequest
+  ): Promise<GatewayBalancesResponse>
+  async request(
+    command: 'ledger',
+    params: LedgerRequest
+  ): Promise<LedgerResponse>
+  async request(
+    command: 'ledger_data',
+    params?: LedgerDataRequest
+  ): Promise<LedgerDataResponse>
+  async request(
+    command: 'ledger_entry',
+    params: LedgerEntryRequest
+  ): Promise<LedgerEntryResponse>
+  async request(
+    command: 'server_info',
+    params?: ServerInfoRequest
+  ): Promise<ServerInfoResponse>
+  async request(command: string, params: any): Promise<any>
   async request(command: string, params: any = {}): Promise<any> {
     return this.connection.request({
       ...params,
@@ -224,8 +254,10 @@ class RippleAPI extends EventEmitter {
    *
    * You can later submit the transaction with `submit()`.
    */
-  async prepareTransaction(txJSON: TransactionJSON, instructions: Instructions = {}):
-    Promise<Prepare> {
+  async prepareTransaction(
+    txJSON: TransactionJSON,
+    instructions: Instructions = {}
+  ): Promise<Prepare> {
     return transactionUtils.prepareTransaction(txJSON, this, instructions)
   }
 
@@ -253,16 +285,23 @@ class RippleAPI extends EventEmitter {
    * general use. Instead, use rippled's built-in pagination and make multiple
    * requests as needed.
    */
-  async _requestAll(command: 'account_offers', params: AccountOffersRequest):
-    Promise<AccountOffersResponse[]>
-  async _requestAll(command: 'book_offers', params: BookOffersRequest):
-    Promise<BookOffersResponse[]>
-  async _requestAll(command: 'account_lines', params: AccountLinesRequest):
-    Promise<AccountLinesResponse[]>
+  async _requestAll(
+    command: 'account_offers',
+    params: AccountOffersRequest
+  ): Promise<AccountOffersResponse[]>
+  async _requestAll(
+    command: 'book_offers',
+    params: BookOffersRequest
+  ): Promise<BookOffersResponse[]>
+  async _requestAll(
+    command: 'account_lines',
+    params: AccountLinesRequest
+  ): Promise<AccountLinesResponse[]>
   async _requestAll(
     command: string,
     params: any = {},
-    options: {collect?: string} = {}): Promise<any[]> {
+    options: {collect?: string} = {}
+  ): Promise<any[]> {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
     const collectKey = options.collect || getCollectKeyFromCommand(command)
@@ -271,8 +310,7 @@ class RippleAPI extends EventEmitter {
     }
     // If limit is not provided, fetches all data over multiple requests.
     // NOTE: This may return much more than needed. Set limit when possible.
-    const countTo: number =
-        (params.limit !== undefined) ? params.limit : Infinity
+    const countTo: number = params.limit !== undefined ? params.limit : Infinity
     let count: number = 0
     let marker: string = params.marker
     let lastBatchLength: number
@@ -296,7 +334,7 @@ class RippleAPI extends EventEmitter {
       } else {
         lastBatchLength = 0
       }
-    } while(!!marker && count < countTo && lastBatchLength !== 0)
+    } while (!!marker && count < countTo && lastBatchLength !== 0)
     return results
   }
 
@@ -374,6 +412,4 @@ class RippleAPI extends EventEmitter {
   isValidSecret = schemaValidator.isValidSecret
 }
 
-export {
-  RippleAPI
-}
+export {RippleAPI}

@@ -1,12 +1,12 @@
 import assert from 'assert-diff'
-import { RippleAPI } from 'ripple-api'
+import {RippleAPI} from 'ripple-api'
 import binary from 'ripple-binary-codec'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import { TestSuite } from '../../utils'
-const { schemaValidator } = RippleAPI._PRIVATE
-const { sign: REQUEST_FIXTURES } = requests
-const { sign: RESPONSE_FIXTURES } = responses
+import {TestSuite} from '../../utils'
+const {schemaValidator} = RippleAPI._PRIVATE
+const {sign: REQUEST_FIXTURES} = requests
+const {sign: RESPONSE_FIXTURES} = responses
 
 /**
  * Every test suite exports their tests in the default object.
@@ -187,7 +187,7 @@ export default <TestSuite>{
         value: '31415'
       }
     }
-    const prepared = await api.prepareOrder(address, order, { sequence: 123 })
+    const prepared = await api.prepareOrder(address, order, {sequence: 123})
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     try {
       api.sign(prepared.txJSON, secret)

@@ -5,12 +5,13 @@ import {RippleAPI} from '..'
 import {AccountOffersResponse} from '../common/types/commands'
 
 export type GetOrdersOptions = {
-  limit?: number,
+  limit?: number
   ledgerVersion?: number
 }
 
 function formatResponse(
-  address: string, responses: AccountOffersResponse[]
+  address: string,
+  responses: AccountOffersResponse[]
 ): FormattedAccountOrder[] {
   let orders: FormattedAccountOrder[] = []
   for (const response of responses) {
@@ -23,14 +24,16 @@ function formatResponse(
 }
 
 export default async function getOrders(
-  this: RippleAPI, address: string, options: GetOrdersOptions = {}
+  this: RippleAPI,
+  address: string,
+  options: GetOrdersOptions = {}
 ): Promise<FormattedAccountOrder[]> {
   // 1. Validate
   validate.getOrders({address, options})
   // 2. Make Request
   const responses = await this._requestAll('account_offers', {
     account: address,
-    ledger_index: options.ledgerVersion || await this.getLedgerVersion(),
+    ledger_index: options.ledgerVersion || (await this.getLedgerVersion()),
     limit: options.limit
   })
   // 3. Return Formatted Response, from the perspective of `address`

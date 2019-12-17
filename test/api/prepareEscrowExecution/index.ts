@@ -1,7 +1,7 @@
-import { TestSuite, assertRejects, assertResultMatch } from '../../utils'
+import {TestSuite, assertRejects, assertResultMatch} from '../../utils'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
+const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 /**
  * Every test suite exports their tests in the default object.

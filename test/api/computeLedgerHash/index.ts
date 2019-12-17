@@ -1,8 +1,8 @@
 import assert from 'assert-diff'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import { assertResultMatch, TestSuite } from '../../utils'
-const { computeLedgerHash: REQUEST_FIXTURES } = requests
+import {assertResultMatch, TestSuite} from '../../utils'
+const {computeLedgerHash: REQUEST_FIXTURES} = requests
 
 /**
  * Every test suite exports their tests in the default object.
@@ -29,7 +29,7 @@ export default <TestSuite>{
     ledger.parentCloseTime = ledger.closeTime
     let hash
     try {
-      hash = api.computeLedgerHash(ledger, { computeTreeHashes: true })
+      hash = api.computeLedgerHash(ledger, {computeTreeHashes: true})
     } catch (error) {
       assert(error instanceof api.errors.ValidationError)
       assert.strictEqual(
@@ -72,7 +72,7 @@ export default <TestSuite>{
     ledger.parentCloseTime = ledger.closeTime
     let hash
     try {
-      hash = api.computeLedgerHash(ledger, { computeTreeHashes: true })
+      hash = api.computeLedgerHash(ledger, {computeTreeHashes: true})
     } catch (error) {
       assert(error instanceof api.errors.ValidationError)
       assert.strictEqual(
@@ -114,7 +114,7 @@ export default <TestSuite>{
       )
       // fail if required to compute tree hashes
       try {
-        hash = computeLedgerHash(ledger, { computeTreeHashes: true })
+        hash = computeLedgerHash(ledger, {computeTreeHashes: true})
       } catch (error) {
         assert(error instanceof ValidationError)
         assert.strictEqual(error.message, expectedError)

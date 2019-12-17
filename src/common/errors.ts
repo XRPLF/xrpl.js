@@ -1,9 +1,7 @@
-
 import {inspect} from 'util'
 import * as browserHacks from './browser-hacks'
 
 class RippleError extends Error {
-
   name: string
   message: string
   data?: any
@@ -70,8 +68,11 @@ class MissingLedgerHistoryError extends RippleError {
 
 class PendingLedgerVersionError extends RippleError {
   constructor(message?: string) {
-    super(message || 'maxLedgerVersion is greater than server\'s most recent' +
-      ' validated ledger')
+    super(
+      message ||
+        "maxLedgerVersion is greater than server's most recent" +
+          ' validated ledger'
+    )
   }
 }
 

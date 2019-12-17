@@ -7,7 +7,7 @@ import {SignOptions, KeyPair, TransactionJSON} from './types'
 import {BigNumber} from 'bignumber.js'
 import {xrpToDrops} from '../common'
 import {RippleAPI} from '..'
-const validate = utils.common.validate 
+const validate = utils.common.validate
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
   const signingData = signAs
@@ -23,7 +23,7 @@ function signWithKeypair(
   options: SignOptions = {
     signAs: ''
   }
-): { signedTransaction: string; id: string } {
+): {signedTransaction: string; id: string} {
   validate.sign({txJSON, keypair})
 
   const tx = JSON.parse(txJSON)
@@ -43,11 +43,18 @@ function signWithKeypair(
     const signer = {
       Account: options.signAs,
       SigningPubKey: keypair.publicKey,
-      TxnSignature: computeSignature(txToSignAndEncode, keypair.privateKey, options.signAs)
+      TxnSignature: computeSignature(
+        txToSignAndEncode,
+        keypair.privateKey,
+        options.signAs
+      )
     }
     txToSignAndEncode.Signers = [{Signer: signer}]
   } else {
-    txToSignAndEncode.TxnSignature = computeSignature(txToSignAndEncode, keypair.privateKey)
+    txToSignAndEncode.TxnSignature = computeSignature(
+      txToSignAndEncode,
+      keypair.privateKey
+    )
   }
 
   const serialized = binaryCodec.encode(txToSignAndEncode)
@@ -72,7 +79,7 @@ function objectDiff(a: object, b: object): object {
   const diffs = {}
 
   // Compare two items and push non-matches to object
-  const compare = function (i1: any, i2: any, k: string): void {
+  const compare = function(i1: any, i2: any, k: string): void {
     const type1 = Object.prototype.toString.call(i1)
     const type2 = Object.prototype.toString.call(i2)
     if (type2 === '[object Undefined]') {
@@ -186,7 +193,7 @@ function checkFee(api: RippleAPI, txFee: string): void {
   if (fee.isGreaterThan(maxFeeDrops)) {
     throw new utils.common.errors.ValidationError(
       `"Fee" should not exceed "${maxFeeDrops}". ` +
-      'To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor.'
+        'To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor.'
     )
   }
 }
@@ -197,7 +204,7 @@ function sign(
   secret?: any,
   options?: SignOptions,
   keypair?: KeyPair
-): { signedTransaction: string; id: string } {
+): {signedTransaction: string; id: string} {
   if (typeof secret === 'string') {
     // we can't validate that the secret matches the account because
     // the secret could correspond to the regular key
@@ -215,11 +222,7 @@ function sign(
         'sign: Missing secret or keypair.'
       )
     }
-    return signWithKeypair(
-      this,
-      txJSON,
-      keypair ? keypair : secret,
-      options)
+    return signWithKeypair(this, txJSON, keypair ? keypair : secret, options)
   }
 }
 

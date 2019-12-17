@@ -24,7 +24,10 @@ function parseTrustline(tx: any): object {
     qualityIn: parseQuality(tx.QualityIn),
     qualityOut: parseQuality(tx.QualityOut),
     ripplingDisabled: parseFlag(
-      tx.Flags, flags.SetNoRipple, flags.ClearNoRipple),
+      tx.Flags,
+      flags.SetNoRipple,
+      flags.ClearNoRipple
+    ),
     frozen: parseFlag(tx.Flags, flags.SetFreeze, flags.ClearFreeze),
     authorized: parseFlag(tx.Flags, flags.SetAuth, 0)
   })

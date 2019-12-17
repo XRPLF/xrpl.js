@@ -3,16 +3,18 @@ import * as utils from './utils'
 const validate = utils.common.validate
 const trustlineFlags = utils.common.txFlags.TrustSet
 import {Instructions, Prepare, TransactionJSON} from './types'
-import {
-  FormattedTrustlineSpecification
-} from '../common/types/objects/trustlines'
+import {FormattedTrustlineSpecification} from '../common/types/objects/trustlines'
 import {RippleAPI} from '..'
 
 function convertQuality(quality) {
-  return (new BigNumber(quality)).shiftedBy(9).integerValue(BigNumber.ROUND_DOWN).toNumber()
+  return new BigNumber(quality)
+    .shiftedBy(9)
+    .integerValue(BigNumber.ROUND_DOWN)
+    .toNumber()
 }
 
-function createTrustlineTransaction(account: string,
+function createTrustlineTransaction(
+  account: string,
   trustline: FormattedTrustlineSpecification
 ): TransactionJSON {
   const limit = {
@@ -37,12 +39,14 @@ function createTrustlineTransaction(account: string,
     txJSON.Flags |= trustlineFlags.SetAuth
   }
   if (trustline.ripplingDisabled !== undefined) {
-    txJSON.Flags |= trustline.ripplingDisabled ?
-      trustlineFlags.NoRipple : trustlineFlags.ClearNoRipple
+    txJSON.Flags |= trustline.ripplingDisabled
+      ? trustlineFlags.NoRipple
+      : trustlineFlags.ClearNoRipple
   }
   if (trustline.frozen !== undefined) {
-    txJSON.Flags |= trustline.frozen ?
-      trustlineFlags.SetFreeze : trustlineFlags.ClearFreeze
+    txJSON.Flags |= trustline.frozen
+      ? trustlineFlags.SetFreeze
+      : trustlineFlags.ClearFreeze
   }
   if (trustline.memos !== undefined) {
     txJSON.Memos = trustline.memos.map(utils.convertMemo)
@@ -50,8 +54,11 @@ function createTrustlineTransaction(account: string,
   return txJSON
 }
 
-function prepareTrustline(this: RippleAPI, address: string,
-  trustline: FormattedTrustlineSpecification, instructions: Instructions = {}
+function prepareTrustline(
+  this: RippleAPI,
+  address: string,
+  trustline: FormattedTrustlineSpecification,
+  instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
     validate.prepareTrustline({address, trustline, instructions})

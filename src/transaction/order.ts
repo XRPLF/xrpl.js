@@ -6,12 +6,15 @@ import {FormattedOrderSpecification} from '../common/types/objects/index'
 import {RippleAPI} from '..'
 
 function createOrderTransaction(
-  account: string, order: FormattedOrderSpecification
+  account: string,
+  order: FormattedOrderSpecification
 ): OfferCreateTransaction {
-  const takerPays = utils.common.toRippledAmount(order.direction === 'buy' ?
-    order.quantity : order.totalPrice)
-  const takerGets = utils.common.toRippledAmount(order.direction === 'buy' ?
-    order.totalPrice : order.quantity)
+  const takerPays = utils.common.toRippledAmount(
+    order.direction === 'buy' ? order.quantity : order.totalPrice
+  )
+  const takerGets = utils.common.toRippledAmount(
+    order.direction === 'buy' ? order.totalPrice : order.quantity
+  )
 
   const txJSON: Partial<OfferCreateTransaction> = {
     TransactionType: 'OfferCreate',
@@ -44,7 +47,10 @@ function createOrderTransaction(
   return txJSON as OfferCreateTransaction
 }
 
-function prepareOrder(this: RippleAPI, address: string, order: FormattedOrderSpecification,
+function prepareOrder(
+  this: RippleAPI,
+  address: string,
+  order: FormattedOrderSpecification,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {

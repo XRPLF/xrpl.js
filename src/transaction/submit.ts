@@ -4,7 +4,7 @@ import {validate} from '../common'
 import {RippleAPI} from '..'
 
 export interface FormattedSubmitResponse {
-  resultCode: string,
+  resultCode: string
   resultMessage: string
 }
 
@@ -37,7 +37,8 @@ function formatSubmitResponse(response): FormattedSubmitResponse {
 }
 
 async function submit(
-  this: RippleAPI, signedTransaction: string
+  this: RippleAPI,
+  signedTransaction: string
 ): Promise<FormattedSubmitResponse> {
   // 1. Validate
   validate.submit({signedTransaction})

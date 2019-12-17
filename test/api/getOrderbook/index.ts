@@ -1,7 +1,7 @@
 import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
 import requests from '../../fixtures/requests'
-import { TestSuite, assertResultMatch, assertRejects } from '../../utils'
+import {TestSuite, assertResultMatch, assertRejects} from '../../utils'
 import BigNumber from 'bignumber.js'
 
 function checkSortingOfOrders(orders) {
@@ -48,7 +48,7 @@ export default <TestSuite>{
     const response = await api.getOrderbook(
       address,
       requests.getOrderbook.normal,
-      { limit: 20 }
+      {limit: 20}
     )
     assertResultMatch(response, responses.getOrderbook.normal, 'getOrderbook')
   },
@@ -90,7 +90,7 @@ export default <TestSuite>{
 
   'sample USD/XRP book has orders sorted correctly': async (api, address) => {
     const orderbookInfo = {
-      counter: { currency: 'XRP' },
+      counter: {currency: 'XRP'},
       base: {
         currency: 'USD',
         counterparty: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
@@ -131,7 +131,7 @@ export default <TestSuite>{
     ;[...response.bids, ...response.asks].forEach(order => {
       const quantity = order.specification.quantity
       const totalPrice = order.specification.totalPrice
-      const { base, counter } = requests.getOrderbook.normal
+      const {base, counter} = requests.getOrderbook.normal
       assert.strictEqual(quantity.currency, base.currency)
       assert.strictEqual(quantity.counterparty, base.counterparty)
       assert.strictEqual(totalPrice.currency, counter.currency)
