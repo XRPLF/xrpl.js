@@ -8,7 +8,7 @@ import {RippledError, DisconnectedError, NotConnectedError,
   RippledNotInitializedError} from './errors'
 
 export interface ConnectionOptions {
-  trace?: boolean | ((id: string, msg: string) => void)
+  trace?: boolean | ((id: string, message: string) => void)
   proxy?: string
   proxyAuthorization?: string
   authorization?: string
@@ -46,7 +46,7 @@ class Connection extends EventEmitter {
   private _fee_ref: null|number = null
   private _connectionTimeout: number
 
-  private _trace: (id: string, msg: string) => void = () => {}
+  private _trace: (id: string, message: string) => void = () => {}
 
   constructor(url, options: ConnectionOptions = {}) {
     super()

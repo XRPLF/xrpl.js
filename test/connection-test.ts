@@ -47,7 +47,7 @@ describe('Connection', function() {
 
     it('as false', function() {
       const messages = [];
-      console.log = (id, msg) => messages.push([id, msg]);
+      console.log = (id, message) => messages.push([id, message]);
       const connection: any = new utils.common.Connection('url', {trace: false});
       connection._ws = {send: function() {}};
       connection._send(message1);
@@ -57,7 +57,7 @@ describe('Connection', function() {
 
     it('as true', function() {
       const messages = [];
-      console.log = (id, msg) => messages.push([id, msg]);
+      console.log = (id, message) => messages.push([id, message]);
       const connection: any = new utils.common.Connection('url', {trace: true});
       connection._ws = {send: function() {}};
       connection._send(message1);
@@ -68,7 +68,7 @@ describe('Connection', function() {
     it('as a function', function() {
       const messages = [];
       const connection: any = new utils.common.Connection('url', {
-        trace: (id, msg) => messages.push([id, msg])
+        trace: (id, message) => messages.push([id, message])
       });
       connection._ws = {send: function() {}};
       connection._send(message1);
