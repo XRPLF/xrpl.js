@@ -36,12 +36,50 @@ export interface ConnectionOptions {
  */
 export type ConnectionUserOptions = Partial<ConnectionOptions>
 
+/**
+ * Ledger is used to store and reference ledger information that has been
+ * captured by the Connection class.
+ */
+class Ledger {
+  private availableVersions = new RangeSet()
+  latestVersion: null | number = null
+  feeBase: null | number = null
+  feeRef: null | number = null
+
+  hasVersions(lowVersion: number, highVersion: number): boolean {
+    return this.availableVersions.containsRange(lowVersion, highVersion)
+  }
+
+  hasVersion(version: number): boolean {
+    return this.availableVersions.containsValue(version)
+  }
+
+  update(data: {
+    ledger_index?: string
+    validated_ledgers?: string
+    fee_base?: string
+    fee_ref?: string
+  }) {
+    this.latestVersion = Number(data.ledger_index)
+    if (data.validated_ledgers) {
+      this.availableVersions.reset()
+      this.availableVersions.parseAndAddRanges(data.validated_ledgers)
+    } else {
+      this.availableVersions.addValue(this.latestVersion)
+    }
+    if (data.fee_base) {
+      this.feeBase = Number(data.fee_base)
+    }
+    if (data.fee_ref) {
+      this.feeRef = Number(data.fee_ref)
+    }
+  }
+}
+
 class Connection extends EventEmitter {
   private _url: string
   private _isReady: boolean = false
   private _ws: null | WebSocket = null
-  protected _ledgerVersion: null | number = null
-  private _availableLedgerVersions = new RangeSet()
   private _nextRequestID: number = 1
   private _retry: number = 0
   private _connectTimer: null | NodeJS.Timeout = null
@@ -49,16 +87,16 @@ class Connection extends EventEmitter {
   private _heartbeatInterval: null | NodeJS.Timeout = null
   private _onOpenErrorBound: null | null | ((...args: any[]) => void) = null
   private _onUnexpectedCloseBound: null | ((...args: any[]) => void) = null
-  private _fee_base: null | number = null
-  private _fee_ref: null | number = null
 
   private _trace: (id: string, message: string) => void = () => {}
   private _config: ConnectionOptions
+  private _ledger: Ledger
 
   constructor(url?: string, options: ConnectionUserOptions = {}) {
     super()
     this.setMaxListeners(Infinity)
     this._url = url
+    this._ledger = new Ledger()
     this._config = {
       timeout: 20 * 1000,
       connectionTimeout: 2 * 1000,
@@ -69,21 +107,6 @@ class Connection extends EventEmitter {
     } else if (options.trace === true) {
       this._trace = console.log
     }
-  }
-
-  _updateLedgerVersions(data) {
-    this._ledgerVersion = Number(data.ledger_index)
-    if (data.validated_ledgers) {
-      this._availableLedgerVersions.reset()
-      this._availableLedgerVersions.parseAndAddRanges(data.validated_ledgers)
-    } else {
-      this._availableLedgerVersions.addValue(this._ledgerVersion)
-    }
-  }
-
-  _updateFees(data) {
-    this._fee_base = Number(data.fee_base)
-    this._fee_ref = Number(data.fee_ref)
   }
 
   // return value is array of arguments to Connection.emit
@@ -101,8 +124,7 @@ class Connection extends EventEmitter {
     // Possible `data.type` values include 'ledgerClosed',
     // 'transaction', 'path_find', and many others.
     if (data.type === 'ledgerClosed') {
-      this._updateLedgerVersions(data)
-      this._updateFees(data)
+      this._ledger.update(data)
     }
     return [data.type, data]
   }
@@ -212,8 +234,7 @@ class Connection extends EventEmitter {
         })
       }
 
-      this._updateLedgerVersions(data)
-      this._updateFees(data)
+      this._ledger.update(data)
       this._rebindOnUnexpectedClose()
 
       this._retry = 0
@@ -432,44 +453,53 @@ class Connection extends EventEmitter {
     return this.request({command: 'ping'}).catch(() => this.reconnect())
   }
 
-  _whenReady<T>(promise: Promise<T>): Promise<T> {
+  /**
+   * Wait for a valid connection before resolving. Useful for deferring methods
+   * until a connection has been established.
+   */
+  private _waitForReady(): Promise<void> {
     return new Promise((resolve, reject) => {
-      promise.catch(reject)
       if (!this._shouldBeConnected) {
         reject(new NotConnectedError())
       } else if (this._state === WebSocket.OPEN && this._isReady) {
-        promise.then(resolve, reject)
+        resolve()
       } else {
-        this.once('connected', () => promise.then(resolve, reject))
+        this.once('connected', () => resolve())
       }
     })
   }
 
-  getLedgerVersion(): Promise<number> {
-    return this._whenReady(Promise.resolve(this._ledgerVersion!))
+  async getLedgerVersion(): Promise<number> {
+    await this._waitForReady()
+    return this._ledger.latestVersion!
   }
 
-  hasLedgerVersions(lowLedgerVersion, highLedgerVersion): Promise<boolean> {
-    return this._whenReady(
-      Promise.resolve(
-        this._availableLedgerVersions.containsRange(
-          lowLedgerVersion,
-          highLedgerVersion || this._ledgerVersion
-        )
-      )
-    )
+  async getFeeBase(): Promise<number> {
+    await this._waitForReady()
+    return this._ledger.feeBase!
   }
 
-  hasLedgerVersion(ledgerVersion): Promise<boolean> {
-    return this.hasLedgerVersions(ledgerVersion, ledgerVersion)
+  async getFeeRef(): Promise<number> {
+    await this._waitForReady()
+    return this._ledger.feeRef!
   }
 
-  getFeeBase(): Promise<number> {
-    return this._whenReady(Promise.resolve(Number(this._fee_base)))
+  async hasLedgerVersions(
+    lowLedgerVersion: number,
+    highLedgerVersion: number | undefined
+  ): Promise<boolean> {
+    // You can call hasVersions with a potentially unknown upper limit, which
+    // will just act as a check on the lower limit.
+    if (!highLedgerVersion) {
+      return this.hasLedgerVersion(lowLedgerVersion)
+    }
+    await this._waitForReady()
+    return this._ledger.hasVersions(lowLedgerVersion, highLedgerVersion)
   }
 
-  getFeeRef(): Promise<number> {
-    return this._whenReady(Promise.resolve(Number(this._fee_ref)))
+  async hasLedgerVersion(ledgerVersion: number): Promise<boolean> {
+    await this._waitForReady()
+    return this._ledger.hasVersion(ledgerVersion)
   }
 
   _send(message: string): Promise<void> {
@@ -543,7 +573,7 @@ class Connection extends EventEmitter {
       // JSON.stringify automatically removes keys with value of 'undefined'
       const message = JSON.stringify(Object.assign({}, request, {id}))
 
-      this._whenReady(this._send(message))
+      this._send(message)
         .then(() => {
           const delay = timeout || this._config.timeout
           timer = setTimeout(() => _reject(new TimeoutError()), delay)
