@@ -142,15 +142,18 @@ export class Leaf extends Node {
 
   public get hash(): string | void {
     switch (this.type) {
-      case NodeType.ACCOUNT_STATE:
+      case NodeType.ACCOUNT_STATE: {
         const leafPrefix = hashPrefix.LEAF_NODE.toString(16)
         return sha512Half(leafPrefix + this.data + this.tag)
-      case NodeType.TRANSACTION_NO_METADATA:
+      }
+      case NodeType.TRANSACTION_NO_METADATA: {
         const txIDPrefix = hashPrefix.TRANSACTION_ID.toString(16)
         return sha512Half(txIDPrefix + this.data)
-      case NodeType.TRANSACTION_METADATA:
+      }
+      case NodeType.TRANSACTION_METADATA: {
         const txNodePrefix = hashPrefix.TRANSACTION_NODE.toString(16)
         return sha512Half(txNodePrefix + this.data + this.tag)
+      }
       default:
         throw new Error('Tried to hash a SHAMap node of unknown type.')
     }

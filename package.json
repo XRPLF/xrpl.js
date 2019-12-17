@@ -65,7 +65,7 @@
     "test": "TS_NODE_PROJECT=src/tsconfig.json nyc mocha --exit",
     "test:watch": "TS_NODE_PROJECT=src/tsconfig.json mocha --watch --reporter dot",
     "format": "prettier --write '{src,test}/**/*.ts'",
-    "lint": "eslint src/**/*.ts 'test/*-test.{ts,js}'",
+    "lint": "eslint 'src/**/*.ts' 'test/*-test.{ts,js}'",
     "perf": "./scripts/perf_test.sh",
     "start": "node scripts/http.js"
   },
