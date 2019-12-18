@@ -1,7 +1,7 @@
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import { assertRejects, assertResultMatch, TestSuite } from '../../utils'
-const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
+import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
+const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 export const config = {
   // TODO: The mock server right now returns a hard-coded string, no matter
@@ -9,7 +9,6 @@ export const config = {
   // responses before we can turn these tests on.
   skipXAddress: true
 }
-
 
 /**
  * Every test suite exports their tests in the default object.

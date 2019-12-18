@@ -1,33 +1,32 @@
-import assert from 'assert';
-import {SHAMap, NodeType} from '../src/common/hashes/shamap';
+import assert from 'assert'
+import {SHAMap, NodeType} from '../src/common/hashes/shamap'
 const TYPE_TRANSACTION_NO_METADATA = NodeType.TRANSACTION_NO_METADATA
 
-var HEX_ZERO = '00000000000000000000000000000000' +
-               '00000000000000000000000000000000';
+var HEX_ZERO =
+  '00000000000000000000000000000000' + '00000000000000000000000000000000'
 
 /**
-* Generates data to hash for testing
-*/
+ * Generates data to hash for testing
+ */
 function intToVuc(v: number): string {
-  var ret = '';
+  var ret = ''
 
   for (var i = 0; i < 32; i++) {
-    ret += '0';
-    ret += v.toString(16).toUpperCase();
+    ret += '0'
+    ret += v.toString(16).toUpperCase()
   }
-  return ret;
+  return ret
 }
 
 function fillShamapTest(shamap: any, keys: string[], hashes: string[]) {
   for (var i = 0; i < keys.length; i++) {
-    var data = intToVuc(i);
-    shamap.addItem(keys[i].toUpperCase(), data, TYPE_TRANSACTION_NO_METADATA);
-    assert.equal(shamap.hash, hashes[i]);
+    var data = intToVuc(i)
+    shamap.addItem(keys[i].toUpperCase(), data, TYPE_TRANSACTION_NO_METADATA)
+    assert.equal(shamap.hash, hashes[i])
   }
 }
 
 describe('SHAMap', function() {
-
   describe('#addItem', function() {
     it('will add new nodes to v1', function() {
       var keys = [
@@ -39,7 +38,7 @@ describe('SHAMap', function() {
         'b99891fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',
         'f22891fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',
         '292891fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8'
-      ];
+      ]
 
       var hashesv1 = [
         'B7387CFEA0465759ADC718E8C42B52D2309D179B326E239EB5075C64B6281F7F',
@@ -50,12 +49,11 @@ describe('SHAMap', function() {
         'D044C0A696DE3169CC70AE216A1564D69DE96582865796142CE7D98A84D9DDE4',
         '76DCC77C4027309B5A91AD164083264D70B77B5E43E08AEDA5EBF94361143615',
         'DF4220E93ADC6F5569063A01B4DC79F8DB9553B6A3222ADE23DEA02BBE7230E5'
-      ];
+      ]
 
-
-      var shamapv1 = new SHAMap();
-      assert.equal(shamapv1.hash, HEX_ZERO);
-      fillShamapTest(shamapv1, keys, hashesv1);
-    });
-  });
-});
+      var shamapv1 = new SHAMap()
+      assert.equal(shamapv1.hash, HEX_ZERO)
+      fillShamapTest(shamapv1, keys, hashesv1)
+    })
+  })
+})

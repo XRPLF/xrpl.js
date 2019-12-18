@@ -4,16 +4,17 @@ import {Instructions, Prepare, TransactionJSON} from './types'
 import {RippleAPI} from '..'
 
 export type PaymentChannelCreate = {
-  amount: string,
-  destination: string,
-  settleDelay: number,
-  publicKey: string,
-  cancelAfter?: string,
-  sourceTag?: number,
+  amount: string
+  destination: string
+  settleDelay: number
+  publicKey: string
+  cancelAfter?: string
+  sourceTag?: number
   destinationTag?: number
 }
 
-function createPaymentChannelCreateTransaction(account: string,
+function createPaymentChannelCreateTransaction(
+  account: string,
   paymentChannel: PaymentChannelCreate
 ): TransactionJSON {
   const txJSON: any = {
@@ -38,15 +39,22 @@ function createPaymentChannelCreateTransaction(account: string,
   return txJSON
 }
 
-function preparePaymentChannelCreate(this: RippleAPI, address: string,
+function preparePaymentChannelCreate(
+  this: RippleAPI,
+  address: string,
   paymentChannelCreate: PaymentChannelCreate,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.preparePaymentChannelCreate(
-      {address, paymentChannelCreate, instructions})
+    validate.preparePaymentChannelCreate({
+      address,
+      paymentChannelCreate,
+      instructions
+    })
     const txJSON = createPaymentChannelCreateTransaction(
-      address, paymentChannelCreate)
+      address,
+      paymentChannelCreate
+    )
     return utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {
     return Promise.reject(e)

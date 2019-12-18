@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
-import { LedgerData } from 'ripple-api/common/types/objects'
-import { assertRejects, TestSuite } from '../../utils'
+import {LedgerData} from 'ripple-api/common/types/objects'
+import {assertRejects, TestSuite} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.

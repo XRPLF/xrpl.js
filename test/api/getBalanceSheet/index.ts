@@ -1,4 +1,4 @@
-import { assertRejects, assertResultMatch, TestSuite } from '../../utils'
+import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -13,13 +13,13 @@ export default <TestSuite>{
   'getBalanceSheet - invalid options': async (api, address) => {
     await assertRejects(
       // @ts-ignore - This is intentionally invalid
-      api.getBalanceSheet(address, { invalid: 'options' }),
+      api.getBalanceSheet(address, {invalid: 'options'}),
       api.errors.ValidationError
     )
   },
 
   'getBalanceSheet - empty': async (api, address) => {
-    const options = { ledgerVersion: 123456 }
+    const options = {ledgerVersion: 123456}
     const result = await api.getBalanceSheet(address, options)
     assertResultMatch(result, {}, 'getBalanceSheet')
   }

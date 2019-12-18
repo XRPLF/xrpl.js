@@ -1,7 +1,7 @@
 import setupAPI from './setup-api'
-import { RippleAPI } from 'ripple-api'
+import {RippleAPI} from 'ripple-api'
 import addresses from './fixtures/addresses.json'
-import { getAllPublicMethods, loadTestSuites } from './utils'
+import {getAllPublicMethods, loadTestSuites} from './utils'
 
 /**
  * RippleAPI Test Runner
@@ -30,11 +30,7 @@ describe('RippleAPI [Test Runner]', function() {
   const allTestSuites = loadTestSuites()
 
   // Run all the tests:
-  for (const {
-    name: methodName,
-    tests,
-    config
-  } of allTestSuites) {
+  for (const {name: methodName, tests, config} of allTestSuites) {
     describe(`api.${methodName}`, () => {
       // Run each test with the original-style address.
       describe(`[Original Address]`, () => {
@@ -58,14 +54,14 @@ describe('RippleAPI [Test Runner]', function() {
   }
 
   // Report any missing tests.
-  const allTestedMethods = new Set(allTestSuites.map(s => s.name));
+  const allTestedMethods = new Set(allTestSuites.map(s => s.name))
   for (const methodName of allPublicMethods) {
     if (!allTestedMethods.has(methodName)) {
       // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.
       it.skip(`${methodName} - no test suite found`, () => {
-          throw new Error(
-            `Test file not found! Create file "test/api/${methodName}/index.ts".`
-          )
+        throw new Error(
+          `Test file not found! Create file "test/api/${methodName}/index.ts".`
+        )
       })
     }
   }

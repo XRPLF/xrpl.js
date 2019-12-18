@@ -1,9 +1,7 @@
-
 import {txFlagIndices} from './txflags'
 
 // Ordering from https://developers.ripple.com/accountroot.html
 const accountRootFlags = {
-
   // lsfDefaultRipple:
   // Enable rippling on trust lines by default.
   // Required for issuing addresses; discouraged for others.
@@ -73,8 +71,12 @@ const AccountFlagIndices = {
 }
 
 const AccountFields = {
-  EmailHash: {name: 'emailHash', encoding: 'hex',
-    length: 32, defaults: '00000000000000000000000000000000'},
+  EmailHash: {
+    name: 'emailHash',
+    encoding: 'hex',
+    length: 32,
+    defaults: '00000000000000000000000000000000'
+  },
   WalletLocator: {name: 'walletLocator'},
   MessageKey: {name: 'messageKey'},
   Domain: {name: 'domain', encoding: 'hex'},
@@ -82,8 +84,4 @@ const AccountFields = {
   TickSize: {name: 'tickSize', defaults: 0}
 }
 
-export {
-  AccountFields,
-  AccountFlagIndices,
-  AccountFlags
-}
+export {AccountFields, AccountFlagIndices, AccountFlags}

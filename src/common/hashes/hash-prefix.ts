@@ -11,18 +11,18 @@
  * some arbitrary string. For example "TXN".
  */
 
- enum HashPrefix {
+enum HashPrefix {
   // transaction plus signature to give transaction ID
-  TRANSACTION_ID = 0x54584E00, // 'TXN'
+  TRANSACTION_ID = 0x54584e00, // 'TXN'
 
   // transaction plus metadata
-  TRANSACTION_NODE = 0x534E4400, // 'TND'
+  TRANSACTION_NODE = 0x534e4400, // 'TND'
 
   // inner node in tree
-  INNER_NODE = 0x4D494E00, // 'MIN'
+  INNER_NODE = 0x4d494e00, // 'MIN'
 
   // leaf node in tree
-  LEAF_NODE = 0x4D4C4E00, // 'MLN'
+  LEAF_NODE = 0x4d4c4e00, // 'MLN'
 
   // inner transaction to sign
   TRANSACTION_SIGN = 0x53545800, // 'STX'
@@ -31,10 +31,10 @@
   TRANSACTION_SIGN_TESTNET = 0x73747800, // 'stx'
 
   // inner transaction to multisign
-  TRANSACTION_MULTISIGN = 0x534D5400, // 'SMT'
+  TRANSACTION_MULTISIGN = 0x534d5400, // 'SMT'
 
   // ledger
-  LEDGER = 0x4C575200 // 'LWR'
+  LEDGER = 0x4c575200 // 'LWR'
 }
 
 export default HashPrefix

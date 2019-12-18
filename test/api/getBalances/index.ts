@@ -1,5 +1,5 @@
 import responses from '../../fixtures/responses'
-import { assertResultMatch, TestSuite } from '../../utils'
+import {assertResultMatch, TestSuite} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -13,14 +13,14 @@ export default <TestSuite>{
   },
 
   'getBalances - limit': async (api, address) => {
-    const options = { limit: 3, ledgerVersion: 123456 }
+    const options = {limit: 3, ledgerVersion: 123456}
     const expectedResponse = responses.getBalances.slice(0, 3)
     const result = await api.getBalances(address, options)
     assertResultMatch(result, expectedResponse, 'getBalances')
   },
 
   'getBalances - limit & currency': async (api, address) => {
-    const options = { currency: 'USD', limit: 3 }
+    const options = {currency: 'USD', limit: 3}
     const expectedResponse = responses.getBalances
       .filter(item => item.currency === 'USD')
       .slice(0, 3)

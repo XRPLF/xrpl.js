@@ -1,5 +1,5 @@
 import responses from '../../fixtures/responses'
-import { assertRejects, assertResultMatch, TestSuite } from '../../utils'
+import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
 
 export const config = {
   // TODO: The mock server right now returns a hard-coded string, no matter
@@ -20,14 +20,14 @@ export default <TestSuite>{
   },
 
   'getOrders - limit': async (api, address) => {
-    const result = await api.getOrders(address, { limit: 20 })
+    const result = await api.getOrders(address, {limit: 20})
     assertResultMatch(result, responses.getOrders, 'getOrders')
   },
 
   'getOrders - invalid options': async (api, address) => {
     await assertRejects(
       // @ts-ignore - This is intentionally invalid
-      api.getOrders(address, { invalid: 'options' }),
+      api.getOrders(address, {invalid: 'options'}),
       api.errors.ValidationError
     )
   }

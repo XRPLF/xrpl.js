@@ -1,5 +1,5 @@
 import assert from 'assert-diff'
-import { TestSuite } from '../../utils'
+import {TestSuite} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.
@@ -22,7 +22,7 @@ export default <TestSuite>{
     api.connection._send(
       JSON.stringify({
         command: 'config',
-        data: { highLoadFactor: true }
+        data: {highLoadFactor: true}
       })
     )
     const fee = await api.getFee()
@@ -36,7 +36,7 @@ export default <TestSuite>{
     api.connection._send(
       JSON.stringify({
         command: 'config',
-        data: { highLoadFactor: true }
+        data: {highLoadFactor: true}
       })
     )
     const fee = await api.getFee()

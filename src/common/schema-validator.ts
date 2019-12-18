@@ -175,8 +175,4 @@ function isValidAddress(address: string): boolean {
   return isValidXAddress(address) || isValidClassicAddress(address)
 }
 
-export {
-  schemaValidate,
-  isValidSecret,
-  isValidAddress
-}
+export {schemaValidate, isValidSecret, isValidAddress}

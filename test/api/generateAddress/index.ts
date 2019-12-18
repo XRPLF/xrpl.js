@@ -1,7 +1,7 @@
 import assert from 'assert-diff'
 import responses from '../../fixtures/responses'
-import { TestSuite } from '../../utils'
-const { generateAddress: RESPONSE_FIXTURES } = responses
+import {TestSuite} from '../../utils'
+const {generateAddress: RESPONSE_FIXTURES} = responses
 
 /**
  * Every test suite exports their tests in the default object.
@@ -14,7 +14,7 @@ export default <TestSuite>{
       return new Array(16).fill(0)
     }
     assert.deepEqual(
-      api.generateAddress({ entropy: random() }),
+      api.generateAddress({entropy: random()}),
       RESPONSE_FIXTURES
     )
   },
@@ -24,7 +24,7 @@ export default <TestSuite>{
       function random() {
         return new Array(1).fill(0)
       }
-      api.generateAddress({ entropy: random() })
+      api.generateAddress({entropy: random()})
     }, api.errors.UnexpectedError)
   }
 }

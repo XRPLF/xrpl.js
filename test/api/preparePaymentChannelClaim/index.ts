@@ -1,10 +1,10 @@
 import assert from 'assert-diff'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import { assertResultMatch, TestSuite } from '../../utils'
-const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
-const { preparePaymentChannelClaim: REQUEST_FIXTURES } = requests
-const { preparePaymentChannelClaim: RESPONSE_FIXTURES } = responses
+import {assertResultMatch, TestSuite} from '../../utils'
+const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
+const {preparePaymentChannelClaim: REQUEST_FIXTURES} = requests
+const {preparePaymentChannelClaim: RESPONSE_FIXTURES} = responses
 
 /**
  * Every test suite exports their tests in the default object.

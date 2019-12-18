@@ -7,25 +7,28 @@ import parseAmount from './amount'
 import {Amount, Memo} from '../../common/types/objects'
 
 function adjustQualityForXRP(
-  quality: string, takerGetsCurrency: string, takerPaysCurrency: string
+  quality: string,
+  takerGetsCurrency: string,
+  takerPaysCurrency: string
 ) {
   // quality = takerPays.value/takerGets.value
   // using drops (1e-6 XRP) for XRP values
-  const numeratorShift = (takerPaysCurrency === 'XRP' ? -6 : 0)
-  const denominatorShift = (takerGetsCurrency === 'XRP' ? -6 : 0)
+  const numeratorShift = takerPaysCurrency === 'XRP' ? -6 : 0
+  const denominatorShift = takerGetsCurrency === 'XRP' ? -6 : 0
   const shift = numeratorShift - denominatorShift
-  return shift === 0 ? quality :
-    (new BigNumber(quality)).shiftedBy(shift).toString()
+  return shift === 0
+    ? quality
+    : new BigNumber(quality).shiftedBy(shift).toString()
 }
 
-function parseQuality(quality?: number|null): number|undefined {
+function parseQuality(quality?: number | null): number | undefined {
   if (typeof quality !== 'number') {
     return undefined
   }
-  return (new BigNumber(quality)).shiftedBy(-9).toNumber()
+  return new BigNumber(quality).shiftedBy(-9).toNumber()
 }
 
-function parseTimestamp(rippleTime?: number|null): string|undefined {
+function parseTimestamp(rippleTime?: number | null): string | undefined {
   if (typeof rippleTime !== 'number') {
     return undefined
   }
@@ -57,14 +60,14 @@ function isPartialPayment(tx: any) {
 }
 
 function parseDeliveredAmount(tx: any): Amount | void {
-
-  if (tx.TransactionType !== 'Payment' ||
-      tx.meta.TransactionResult !== 'tesSUCCESS') {
+  if (
+    tx.TransactionType !== 'Payment' ||
+    tx.meta.TransactionResult !== 'tesSUCCESS'
+  ) {
     return undefined
   }
 
-  if (tx.meta.delivered_amount &&
-      tx.meta.delivered_amount === 'unavailable') {
+  if (tx.meta.delivered_amount && tx.meta.delivered_amount === 'unavailable') {
     return undefined
   }
 
@@ -96,7 +99,7 @@ function parseDeliveredAmount(tx: any): Amount | void {
   return undefined
 }
 
-function parseOutcome(tx: any): any|undefined {
+function parseOutcome(tx: any): any | undefined {
   const metadata = tx.meta || tx.metaData
   if (!metadata) {
     return undefined
@@ -121,11 +124,11 @@ function parseOutcome(tx: any): any|undefined {
   })
 }
 
-function hexToString(hex: string): string|undefined {
+function hexToString(hex: string): string | undefined {
   return hex ? Buffer.from(hex, 'hex').toString('utf-8') : undefined
 }
 
-function parseMemos(tx: any): Array<Memo>|undefined {
+function parseMemos(tx: any): Array<Memo> | undefined {
   if (!Array.isArray(tx.Memos) || tx.Memos.length === 0) {
     return undefined
   }

@@ -1,14 +1,14 @@
 import assert from 'assert-diff'
 import _ from 'lodash'
-import { RippleAPI } from 'ripple-api'
-import { RecursiveData } from 'ripple-api/ledger/utils'
-import { assertRejects, assertResultMatch } from './utils'
+import {RippleAPI} from 'ripple-api'
+import {RecursiveData} from 'ripple-api/ledger/utils'
+import {assertRejects, assertResultMatch} from './utils'
 import addresses from './fixtures/addresses.json'
 import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close-newer.json'
 import setupAPI from './setup-api'
 
-const { validate, schemaValidator, ledgerUtils } = RippleAPI._PRIVATE
+const {validate, schemaValidator, ledgerUtils} = RippleAPI._PRIVATE
 const address = addresses.ACCOUNT
 assert.options.strict = true
 
@@ -21,22 +21,22 @@ describe('RippleAPI', function() {
   afterEach(setupAPI.teardown)
 
   it('RippleAPI - implicit server port', function() {
-    new RippleAPI({ server: 'wss://s1.ripple.com' })
+    new RippleAPI({server: 'wss://s1.ripple.com'})
   })
 
   it('RippleAPI invalid options', function() {
     // @ts-ignore - This is intentionally invalid
-    assert.throws(() => new RippleAPI({ invalid: true }))
+    assert.throws(() => new RippleAPI({invalid: true}))
   })
 
   it('RippleAPI valid options', function() {
-    const api = new RippleAPI({ server: 'wss://s:1' })
+    const api = new RippleAPI({server: 'wss://s:1'})
     const privateConnectionUrl = (api.connection as any)._url
     assert.deepEqual(privateConnectionUrl, 'wss://s:1')
   })
 
   it('RippleAPI invalid server uri', function() {
-    assert.throws(() => new RippleAPI({ server: 'wss//s:1' }))
+    assert.throws(() => new RippleAPI({server: 'wss//s:1'}))
   })
 
   xit('RippleAPI connect() times out after 2 seconds', function() {
@@ -87,7 +87,7 @@ describe('RippleAPI', function() {
         minLedgerVersion: 20000,
         maxLedgerVersion: 10000
       }
-      const thunk = _.partial(validate.getTransactions, { address, options })
+      const thunk = _.partial(validate.getTransactions, {address, options})
       assert.throws(thunk, this.api.errors.ValidationError)
       assert.throws(
         thunk,
@@ -97,7 +97,7 @@ describe('RippleAPI', function() {
 
     it('secret', function() {
       function validateSecret(secret) {
-        validate.sign({ txJSON: '', secret })
+        validate.sign({txJSON: '', secret})
       }
       assert.doesNotThrow(
         _.partial(validateSecret, 'shzjfakiK79YQdMjy4h8cGGfQSV6u')
@@ -132,7 +132,7 @@ describe('RippleAPI', function() {
   })
 
   it('common utils - toRippledAmount', async () => {
-    const amount = { issuer: 'is', currency: 'c', value: 'v' }
+    const amount = {issuer: 'is', currency: 'c', value: 'v'}
     assert.deepEqual(ledgerUtils.common.toRippledAmount(amount), {
       issuer: 'is',
       currency: 'c',
@@ -142,12 +142,12 @@ describe('RippleAPI', function() {
 
   it('ledger utils - renameCounterpartyToIssuerInOrder', async () => {
     const order = {
-      taker_gets: { counterparty: '1', currency: 'XRP' },
-      taker_pays: { counterparty: '1', currency: 'XRP' }
+      taker_gets: {counterparty: '1', currency: 'XRP'},
+      taker_pays: {counterparty: '1', currency: 'XRP'}
     }
     const expected = {
-      taker_gets: { issuer: '1', currency: 'XRP' },
-      taker_pays: { issuer: '1', currency: 'XRP' }
+      taker_gets: {issuer: '1', currency: 'XRP'},
+      taker_pays: {issuer: '1', currency: 'XRP'}
     }
     assert.deepEqual(
       ledgerUtils.renameCounterpartyToIssuerInOrder(order),
@@ -158,14 +158,14 @@ describe('RippleAPI', function() {
   it('ledger utils - compareTransactions', async () => {
     // @ts-ignore
     assert.strictEqual(ledgerUtils.compareTransactions({}, {}), 0)
-    let first: any = { outcome: { ledgerVersion: 1, indexInLedger: 100 } }
-    let second: any = { outcome: { ledgerVersion: 1, indexInLedger: 200 } }
+    let first: any = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
+    let second: any = {outcome: {ledgerVersion: 1, indexInLedger: 200}}
     assert.strictEqual(ledgerUtils.compareTransactions(first, second), -1)
-    first = { outcome: { ledgerVersion: 1, indexInLedger: 100 } }
-    second = { outcome: { ledgerVersion: 1, indexInLedger: 100 } }
+    first = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
+    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
     assert.strictEqual(ledgerUtils.compareTransactions(first, second), 0)
-    first = { outcome: { ledgerVersion: 1, indexInLedger: 200 } }
-    second = { outcome: { ledgerVersion: 1, indexInLedger: 100 } }
+    first = {outcome: {ledgerVersion: 1, indexInLedger: 200}}
+    second = {outcome: {ledgerVersion: 1, indexInLedger: 100}}
     assert.strictEqual(ledgerUtils.compareTransactions(first, second), 1)
   })
 
@@ -176,7 +176,7 @@ describe('RippleAPI', function() {
           reject(new Error())
           return
         }
-        resolve({ marker: 'A', results: [1] })
+        resolve({marker: 'A', results: [1]})
       })
     }
     await assertRejects(ledgerUtils.getRecursive(getter, 10), Error)

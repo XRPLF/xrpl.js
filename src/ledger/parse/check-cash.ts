@@ -4,14 +4,13 @@ import parseAmount from './amount'
 import {Amount} from '../../common/types/objects'
 
 export type FormattedCheckCash = {
-
   // ID of the Check ledger object to cash.
-  checkID: string,
+  checkID: string
 
   // (Optional) redeem the Check for exactly this amount, if possible.
   // The currency must match that of the `SendMax` of the corresponding
   // `CheckCreate` transaction.
-  amount: Amount,
+  amount: Amount
 
   // (Optional) redeem the Check for at least this amount and
   // for as much as possible.

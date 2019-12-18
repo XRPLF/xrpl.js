@@ -1,10 +1,10 @@
-import { assertResultMatch, TestSuite, assertRejects } from '../../utils'
+import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 import responses from '../../fixtures/responses'
 import requests from '../../fixtures/requests'
-import { ValidationError } from 'ripple-api/common/errors'
-const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
-const { preparePayment: REQUEST_FIXTURES } = requests
-const { preparePayment: RESPONSE_FIXTURES } = responses
+import {ValidationError} from 'ripple-api/common/errors'
+const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
+const {preparePayment: REQUEST_FIXTURES} = requests
+const {preparePayment: RESPONSE_FIXTURES} = responses
 const RECIPIENT_ADDRESS = 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo'
 
 /**
@@ -52,11 +52,11 @@ export default <TestSuite>{
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
-        maxAmount: { value: '1', currency: 'XRP' }
+        maxAmount: {value: '1', currency: 'XRP'}
       },
       destination: {
         address: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
-        amount: { value: '1', currency: 'XRP' }
+        amount: {value: '1', currency: 'XRP'}
       }
     }
     const expected = {
@@ -80,11 +80,11 @@ export default <TestSuite>{
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
-        maxAmount: { value: '1000000', currency: 'drops' }
+        maxAmount: {value: '1000000', currency: 'drops'}
       },
       destination: {
         address: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
-        amount: { value: '1000000', currency: 'drops' }
+        amount: {value: '1000000', currency: 'drops'}
       }
     }
     const expected = {
@@ -108,11 +108,11 @@ export default <TestSuite>{
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
-        maxAmount: { value: '1000000', currency: 'drops' }
+        maxAmount: {value: '1000000', currency: 'drops'}
       },
       destination: {
         address: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
-        amount: { value: '1', currency: 'XRP' }
+        amount: {value: '1', currency: 'XRP'}
       }
     }
     const expected = {
@@ -136,11 +136,11 @@ export default <TestSuite>{
     const payment = {
       source: {
         address: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
-        maxAmount: { value: '1', currency: 'XRP' }
+        maxAmount: {value: '1', currency: 'XRP'}
       },
       destination: {
         address: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
-        amount: { value: '1000000', currency: 'drops' }
+        amount: {value: '1000000', currency: 'drops'}
       }
     }
     const expected = {
@@ -169,11 +169,11 @@ export default <TestSuite>{
       source: {
         address: address,
         // instead of `maxAmount`
-        amount: { value: '1000', currency: 'drops' }
+        amount: {value: '1000', currency: 'drops'}
       },
       destination: {
         address: RECIPIENT_ADDRESS,
-        amount: { value: '1000', currency: 'drops' }
+        amount: {value: '1000', currency: 'drops'}
       }
     }
 
@@ -190,10 +190,10 @@ export default <TestSuite>{
   ) => {
     // Marking as "any" to get around the fact that TS won't allow this.
     const payment: any = {
-      source: { address: address },
+      source: {address: address},
       destination: {
         address: RECIPIENT_ADDRESS,
-        amount: { value: '1000', currency: 'drops' }
+        amount: {value: '1000', currency: 'drops'}
       }
     }
 
@@ -211,15 +211,15 @@ export default <TestSuite>{
     const payment = {
       source: {
         address: address,
-        maxAmount: { value: '1000', currency: 'drops' }
+        maxAmount: {value: '1000', currency: 'drops'}
       },
       destination: {
         address: RECIPIENT_ADDRESS,
-        amount: { value: '1000', currency: 'drops' }
+        amount: {value: '1000', currency: 'drops'}
       }
     }
     return assertRejects(
-      api.preparePayment(address, payment, { fee: '3' }),
+      api.preparePayment(address, payment, {fee: '3'}),
       ValidationError,
       'Fee of 3 XRP exceeds max of 2 XRP. To use this fee, increase `maxFeeXRP` in the RippleAPI constructor.'
     )
@@ -419,7 +419,7 @@ export default <TestSuite>{
     api.connection._send(
       JSON.stringify({
         command: 'config',
-        data: { loadFactor: 5407.96875 }
+        data: {loadFactor: 5407.96875}
       })
     )
     const expectedResponse = {

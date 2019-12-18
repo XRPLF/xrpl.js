@@ -1,8 +1,8 @@
 import assert from 'assert-diff'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import { assertResultMatch, TestSuite } from '../../utils'
-const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
+import {assertResultMatch, TestSuite} from '../../utils'
+const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 /**
  * Every test suite exports their tests in the default object.
@@ -44,7 +44,7 @@ export default <TestSuite>{
     )
   },
   'regularKey': async (api, address) => {
-    const regularKey = { regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD' }
+    const regularKey = {regularKey: 'rAR8rR8sUkBoCZFawhkWzY4Y5YoyuznwD'}
     const response = await api.prepareSettings(
       address,
       regularKey,
@@ -53,7 +53,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.prepareSettings.regularKey, 'prepare')
   },
   'remove regularKey': async (api, address) => {
-    const regularKey = { regularKey: null }
+    const regularKey = {regularKey: null}
     const response = await api.prepareSettings(
       address,
       regularKey,
@@ -66,7 +66,7 @@ export default <TestSuite>{
     )
   },
   'flag set': async (api, address) => {
-    const settings = { requireDestinationTag: true }
+    const settings = {requireDestinationTag: true}
     const response = await api.prepareSettings(
       address,
       settings,
@@ -75,7 +75,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.prepareSettings.flagSet, 'prepare')
   },
   'flag clear': async (api, address) => {
-    const settings = { requireDestinationTag: false }
+    const settings = {requireDestinationTag: false}
     const response = await api.prepareSettings(
       address,
       settings,
@@ -84,7 +84,7 @@ export default <TestSuite>{
     assertResultMatch(response, responses.prepareSettings.flagClear, 'prepare')
   },
   'set depositAuth flag': async (api, address) => {
-    const settings = { depositAuth: true }
+    const settings = {depositAuth: true}
     const response = await api.prepareSettings(
       address,
       settings,
@@ -97,7 +97,7 @@ export default <TestSuite>{
     )
   },
   'clear depositAuth flag': async (api, address) => {
-    const settings = { depositAuth: false }
+    const settings = {depositAuth: false}
     const response = await api.prepareSettings(
       address,
       settings,
@@ -110,7 +110,7 @@ export default <TestSuite>{
     )
   },
   'integer field clear': async (api, address) => {
-    const settings = { transferRate: null }
+    const settings = {transferRate: null}
     const response = await api.prepareSettings(
       address,
       settings,
@@ -120,7 +120,7 @@ export default <TestSuite>{
     assert.strictEqual(JSON.parse(response.txJSON).TransferRate, 0)
   },
   'set transferRate': async (api, address) => {
-    const settings = { transferRate: 1 }
+    const settings = {transferRate: 1}
     const response = await api.prepareSettings(
       address,
       settings,

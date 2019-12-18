@@ -15,17 +15,16 @@ function parseOrder(tx: OfferCreateTransaction): FormattedOrderSpecification {
   const direction = (tx.Flags & flags.Sell) === 0 ? 'buy' : 'sell'
   const takerGetsAmount = parseAmount(tx.TakerGets)
   const takerPaysAmount = parseAmount(tx.TakerPays)
-  const quantity = (direction === 'buy') ? takerPaysAmount : takerGetsAmount
-  const totalPrice = (direction === 'buy') ? takerGetsAmount : takerPaysAmount
+  const quantity = direction === 'buy' ? takerPaysAmount : takerGetsAmount
+  const totalPrice = direction === 'buy' ? takerGetsAmount : takerPaysAmount
 
   return removeUndefined({
     direction: direction,
     quantity: quantity,
     totalPrice: totalPrice,
-    passive: ((tx.Flags & flags.Passive) !== 0) || undefined,
-    immediateOrCancel: ((tx.Flags & flags.ImmediateOrCancel) !== 0)
-      || undefined,
-    fillOrKill: ((tx.Flags & flags.FillOrKill) !== 0) || undefined,
+    passive: (tx.Flags & flags.Passive) !== 0 || undefined,
+    immediateOrCancel: (tx.Flags & flags.ImmediateOrCancel) !== 0 || undefined,
+    fillOrKill: (tx.Flags & flags.FillOrKill) !== 0 || undefined,
     expirationTime: parseTimestamp(tx.Expiration)
   })
 }

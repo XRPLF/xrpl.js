@@ -4,13 +4,24 @@ import * as utils from './utils'
 const validate = utils.common.validate
 const AccountFlagIndices = utils.common.constants.AccountFlagIndices
 const AccountFields = utils.common.constants.AccountFields
-import {Instructions, Prepare, SettingsTransaction, TransactionJSON} from './types'
+import {
+  Instructions,
+  Prepare,
+  SettingsTransaction,
+  TransactionJSON
+} from './types'
 import {FormattedSettings, WeightedSigner} from '../common/types/objects'
 import {RippleAPI} from '..'
 
-function setTransactionFlags(txJSON: TransactionJSON, values: FormattedSettings) {
+function setTransactionFlags(
+  txJSON: TransactionJSON,
+  values: FormattedSettings
+) {
   const keys = Object.keys(values)
-  assert.ok(keys.length === 1, 'ERROR: can only set one setting per transaction')
+  assert.ok(
+    keys.length === 1,
+    'ERROR: can only set one setting per transaction'
+  )
   const flagName = keys[0]
   const value = values[flagName]
   const index = AccountFlagIndices[flagName]
@@ -24,7 +35,10 @@ function setTransactionFlags(txJSON: TransactionJSON, values: FormattedSettings)
 }
 
 // Sets `null` fields to their `default`.
-function setTransactionFields(txJSON: TransactionJSON, input: FormattedSettings) {
+function setTransactionFields(
+  txJSON: TransactionJSON,
+  input: FormattedSettings
+) {
   const fieldSchema = AccountFields
   for (const fieldName in fieldSchema) {
     const field = fieldSchema[fieldName]
@@ -41,7 +55,9 @@ function setTransactionFields(txJSON: TransactionJSON, input: FormattedSettings)
 
     if (field.encoding === 'hex' && !field.length) {
       // This is currently only used for Domain field
-      value = Buffer.from(value, 'ascii').toString('hex').toUpperCase()
+      value = Buffer.from(value, 'ascii')
+        .toString('hex')
+        .toUpperCase()
     }
 
     txJSON[fieldName] = value
@@ -62,7 +78,7 @@ function setTransactionFields(txJSON: TransactionJSON, input: FormattedSettings)
  */
 
 function convertTransferRate(transferRate: number): number {
-  return (new BigNumber(transferRate)).shiftedBy(9).toNumber()
+  return new BigNumber(transferRate).shiftedBy(9).toNumber()
 }
 
 function formatSignerEntry(signer: WeightedSigner): object {
@@ -75,7 +91,8 @@ function formatSignerEntry(signer: WeightedSigner): object {
 }
 
 function createSettingsTransactionWithoutMemos(
-  account: string, settings: FormattedSettings
+  account: string,
+  settings: FormattedSettings
 ): SettingsTransaction {
   if (settings.regularKey !== undefined) {
     const removeRegularKey = {
@@ -85,7 +102,9 @@ function createSettingsTransactionWithoutMemos(
     if (settings.regularKey === null) {
       return removeRegularKey
     }
-    return Object.assign({}, removeRegularKey, {RegularKey: settings.regularKey})
+    return Object.assign({}, removeRegularKey, {
+      RegularKey: settings.regularKey
+    })
   }
 
   if (settings.signers !== undefined) {
@@ -94,12 +113,14 @@ function createSettingsTransactionWithoutMemos(
       Account: account,
       SignerEntries: [],
       SignerQuorum: settings.signers.threshold
-    };
+    }
 
     if (settings.signers.weights !== undefined) {
-        setSignerList.SignerEntries = settings.signers.weights.map(formatSignerEntry);
+      setSignerList.SignerEntries = settings.signers.weights.map(
+        formatSignerEntry
+      )
     }
-    return setSignerList;
+    return setSignerList
   }
 
   const txJSON: SettingsTransaction = {
@@ -118,7 +139,9 @@ function createSettingsTransactionWithoutMemos(
   return txJSON
 }
 
-function createSettingsTransaction(account: string, settings: FormattedSettings
+function createSettingsTransaction(
+  account: string,
+  settings: FormattedSettings
 ): SettingsTransaction {
   const txJSON = createSettingsTransactionWithoutMemos(account, settings)
   if (settings.memos !== undefined) {
@@ -127,7 +150,10 @@ function createSettingsTransaction(account: string, settings: FormattedSettings
   return txJSON
 }
 
-function prepareSettings(this: RippleAPI, address: string, settings: FormattedSettings,
+function prepareSettings(
+  this: RippleAPI,
+  address: string,
+  settings: FormattedSettings,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {

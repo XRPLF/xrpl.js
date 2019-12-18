@@ -1,4 +1,4 @@
-import { LedgerData } from '../objects'
+import {LedgerData} from '../objects'
 
 export interface LedgerDataRequest {
   id?: any
@@ -9,4 +9,4 @@ export interface LedgerDataRequest {
   marker?: string
 }
 
-export type LedgerDataResponse = LedgerData;
+export type LedgerDataResponse = LedgerData

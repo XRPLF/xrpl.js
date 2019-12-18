@@ -2,9 +2,9 @@ import net from 'net'
 import _ from 'lodash'
 import fs from 'fs'
 import path from 'path'
-import { RippleAPI } from 'ripple-api'
+import {RippleAPI} from 'ripple-api'
 import assert from 'assert-diff'
-const { schemaValidator } = RippleAPI._PRIVATE
+const {schemaValidator} = RippleAPI._PRIVATE
 
 /**
  * The test function. It takes a RippleAPI object and then some other data to
@@ -122,7 +122,9 @@ export function getAllPublicMethods(api: RippleAPI) {
 }
 
 export function loadTestSuites(): LoadedTestSuite[] {
-  const allTests = fs.readdirSync(path.join(__dirname, 'api'), { encoding: 'utf8' })
+  const allTests = fs.readdirSync(path.join(__dirname, 'api'), {
+    encoding: 'utf8'
+  })
   return allTests
     .map(methodName => {
       if (methodName.startsWith('.DS_Store')) {

@@ -3,9 +3,15 @@ import {EventEmitter} from 'events'
 import {parse as parseUrl} from 'url'
 import WebSocket from 'ws'
 import RangeSet from './rangeset'
-import {RippledError, DisconnectedError, NotConnectedError,
-  TimeoutError, ResponseFormatError, ConnectionError,
-  RippledNotInitializedError} from './errors'
+import {
+  RippledError,
+  DisconnectedError,
+  NotConnectedError,
+  TimeoutError,
+  ResponseFormatError,
+  ConnectionError,
+  RippledNotInitializedError
+} from './errors'
 
 /**
  * ConnectionOptions is the configuration for the configuration object.
@@ -19,7 +25,7 @@ export interface ConnectionOptions {
   key?: string
   passphrase?: string
   certificate?: string
-  timeout: number,
+  timeout: number
   connectionTimeout: number
 }
 
@@ -31,21 +37,20 @@ export interface ConnectionOptions {
 export type ConnectionUserOptions = Partial<ConnectionOptions>
 
 class Connection extends EventEmitter {
-
   private _url: string
   private _isReady: boolean = false
-  private _ws: null|WebSocket = null
-  protected _ledgerVersion: null|number = null
+  private _ws: null | WebSocket = null
+  protected _ledgerVersion: null | number = null
   private _availableLedgerVersions = new RangeSet()
   private _nextRequestID: number = 1
   private _retry: number = 0
-  private _connectTimer: null|NodeJS.Timeout = null
-  private _retryTimer: null|NodeJS.Timeout = null
-  private _heartbeatInterval: null|NodeJS.Timeout = null;
-  private _onOpenErrorBound: null| null|((...args: any[]) => void) = null
-  private _onUnexpectedCloseBound: null|((...args: any[]) => void) = null
-  private _fee_base: null|number = null
-  private _fee_ref: null|number = null
+  private _connectTimer: null | NodeJS.Timeout = null
+  private _retryTimer: null | NodeJS.Timeout = null
+  private _heartbeatInterval: null | NodeJS.Timeout = null
+  private _onOpenErrorBound: null | null | ((...args: any[]) => void) = null
+  private _onUnexpectedCloseBound: null | ((...args: any[]) => void) = null
+  private _fee_base: null | number = null
+  private _fee_ref: null | number = null
 
   private _trace: (id: string, message: string) => void = () => {}
   private _config: ConnectionOptions
@@ -55,9 +60,9 @@ class Connection extends EventEmitter {
     this.setMaxListeners(Infinity)
     this._url = url
     this._config = {
-      timeout: (20 * 1000),
-      connectionTimeout: (2 * 1000),
-      ...options,
+      timeout: 20 * 1000,
+      connectionTimeout: 2 * 1000,
+      ...options
     }
     if (typeof options.trace === 'function') {
       this._trace = options.trace
@@ -70,8 +75,7 @@ class Connection extends EventEmitter {
     this._ledgerVersion = Number(data.ledger_index)
     if (data.validated_ledgers) {
       this._availableLedgerVersions.reset()
-      this._availableLedgerVersions.parseAndAddRanges(
-        data.validated_ledgers)
+      this._availableLedgerVersions.parseAndAddRanges(data.validated_ledgers)
     } else {
       this._availableLedgerVersions.addValue(this._ledgerVersion)
     }
@@ -151,17 +155,17 @@ class Connection extends EventEmitter {
   }
 
   _calculateTimeout(retriesCount) {
-    return (retriesCount < 40)
-      // First, for 2 seconds: 20 times per second
-      ? (1000 / 20)
-      : (retriesCount < 40 + 60)
-        // Then, for 1 minute: once per second
-        ? (1000)
-        : (retriesCount < 40 + 60 + 60)
-          // Then, for 10 minutes: once every 10 seconds
-          ? (10 * 1000)
-          // Then: once every 30 seconds
-          : (30 * 1000)
+    return retriesCount < 40
+      ? // First, for 2 seconds: 20 times per second
+        1000 / 20
+      : retriesCount < 40 + 60
+      ? // Then, for 1 minute: once per second
+        1000
+      : retriesCount < 40 + 60 + 60
+      ? // Then, for 10 minutes: once every 10 seconds
+        10 * 1000
+      : // Then: once every 30 seconds
+        30 * 1000
   }
 
   _retryConnect() {
@@ -228,8 +232,12 @@ class Connection extends EventEmitter {
     if (this._onUnexpectedCloseBound) {
       this._ws.removeListener('close', this._onUnexpectedCloseBound)
     }
-    this._onUnexpectedCloseBound =
-      this._onUnexpectedClose.bind(this, false, null, null)
+    this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(
+      this,
+      false,
+      null,
+      null
+    )
     this._ws.once('close', this._onUnexpectedCloseBound)
   }
 
@@ -251,15 +259,18 @@ class Connection extends EventEmitter {
     if (this._config.proxy !== undefined) {
       const parsedURL = parseUrl(this._url)
       const parsedProxyURL = parseUrl(this._config.proxy)
-      const proxyOverrides = _.omitBy({
-        secureEndpoint: (parsedURL.protocol === 'wss:'),
-        secureProxy: (parsedProxyURL.protocol === 'https:'),
-        auth: this._config.proxyAuthorization,
-        ca: this._config.trustedCertificates,
-        key: this._config.key,
-        passphrase: this._config.passphrase,
-        cert: this._config.certificate
-      }, _.isUndefined)
+      const proxyOverrides = _.omitBy(
+        {
+          secureEndpoint: parsedURL.protocol === 'wss:',
+          secureProxy: parsedProxyURL.protocol === 'https:',
+          auth: this._config.proxyAuthorization,
+          ca: this._config.trustedCertificates,
+          key: this._config.key,
+          passphrase: this._config.passphrase,
+          cert: this._config.certificate
+        },
+        _.isUndefined
+      )
       const proxyOptions = _.assign({}, parsedProxyURL, proxyOverrides)
       let HttpsProxyAgent
       try {
@@ -273,12 +284,15 @@ class Connection extends EventEmitter {
       const base64 = Buffer.from(this._config.authorization).toString('base64')
       options.headers = {Authorization: `Basic ${base64}`}
     }
-    const optionsOverrides = _.omitBy({
-      ca: this._config.trustedCertificates,
-      key: this._config.key,
-      passphrase: this._config.passphrase,
-      cert: this._config.certificate
-    }, _.isUndefined)
+    const optionsOverrides = _.omitBy(
+      {
+        ca: this._config.trustedCertificates,
+        key: this._config.key,
+        passphrase: this._config.passphrase,
+        cert: this._config.certificate
+      },
+      _.isUndefined
+    )
     const websocketOptions = _.assign({}, options, optionsOverrides)
     const websocket = new WebSocket(this._url, null, websocketOptions)
     // we will have a listener for each outstanding request,
@@ -293,55 +307,69 @@ class Connection extends EventEmitter {
     this._clearConnectTimer()
     this._clearReconnectTimer()
     this._clearHeartbeatInterval()
-    return new Promise<void>((_resolve, reject) => {
-      this._connectTimer = setTimeout(() => {
-          reject(new ConnectionError(`Error: connect() timed out after ${this._config.connectionTimeout} ms. ` +
-          `If your internet connection is working, the rippled server may be blocked or inaccessible.`))
-      }, this._config.connectionTimeout)
-      if (!this._url) {
-        reject(new ConnectionError('Cannot connect because no server was specified'))
-      }
-      const resolve = () => {
-        this._startHeartbeatInterval();
-        _resolve();
-      }
-      if (this._state === WebSocket.OPEN) {
-        resolve()
-      } else if (this._state === WebSocket.CONNECTING) {
-        this._ws.once('open', () => resolve)
-      } else {
-        this._ws = this._createWebSocket()
-        // when an error causes the connection to close, the close event
-        // should still be emitted; the "ws" documentation says: "The close
-        // event is also emitted when then underlying net.Socket closes the
-        // connection (end or close)."
-        // In case if there is connection error (say, server is not responding)
-        // we must return this error to connection's caller. After successful
-        // opening, we will forward all errors to main api object.
-        this._onOpenErrorBound = this._onOpenError.bind(this, reject)
-        this._ws.once('error', this._onOpenErrorBound)
-        this._ws.on('message', this._onMessage.bind(this))
-        // in browser close event can came before open event, so we must
-        // resolve connect's promise after reconnect in that case.
-        // after open event we will rebound _onUnexpectedCloseBound
-        // without resolve and reject functions
-        this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(this, true,
-          resolve, reject)
-        this._ws.once('close', this._onUnexpectedCloseBound)
-        this._ws.once('open', () => {
-          return this._onOpen().then(resolve, reject)
+    return (
+      new Promise<void>((_resolve, reject) => {
+        this._connectTimer = setTimeout(() => {
+          reject(
+            new ConnectionError(
+              `Error: connect() timed out after ${this._config.connectionTimeout} ms. ` +
+                `If your internet connection is working, the rippled server may be blocked or inaccessible.`
+            )
+          )
+        }, this._config.connectionTimeout)
+        if (!this._url) {
+          reject(
+            new ConnectionError(
+              'Cannot connect because no server was specified'
+            )
+          )
+        }
+        const resolve = () => {
+          this._startHeartbeatInterval()
+          _resolve()
+        }
+        if (this._state === WebSocket.OPEN) {
+          resolve()
+        } else if (this._state === WebSocket.CONNECTING) {
+          this._ws.once('open', () => resolve)
+        } else {
+          this._ws = this._createWebSocket()
+          // when an error causes the connection to close, the close event
+          // should still be emitted; the "ws" documentation says: "The close
+          // event is also emitted when then underlying net.Socket closes the
+          // connection (end or close)."
+          // In case if there is connection error (say, server is not responding)
+          // we must return this error to connection's caller. After successful
+          // opening, we will forward all errors to main api object.
+          this._onOpenErrorBound = this._onOpenError.bind(this, reject)
+          this._ws.once('error', this._onOpenErrorBound)
+          this._ws.on('message', this._onMessage.bind(this))
+          // in browser close event can came before open event, so we must
+          // resolve connect's promise after reconnect in that case.
+          // after open event we will rebound _onUnexpectedCloseBound
+          // without resolve and reject functions
+          this._onUnexpectedCloseBound = this._onUnexpectedClose.bind(
+            this,
+            true,
+            resolve,
+            reject
+          )
+          this._ws.once('close', this._onUnexpectedCloseBound)
+          this._ws.once('open', () => {
+            return this._onOpen().then(resolve, reject)
+          })
+        }
+      })
+        // Once we have a resolution or rejection, clear the timeout timer as no
+        // longer needed.
+        .then(() => {
+          this._clearConnectTimer()
         })
-      }
-    })
-    // Once we have a resolution or rejection, clear the timeout timer as no 
-    // longer needed.
-    .then(() => {
-      this._clearConnectTimer()
-    })
-    .catch((err) => {
-      this._clearConnectTimer()
-      throw err;
-    })
+        .catch(err => {
+          this._clearConnectTimer()
+          throw err
+        })
+    )
   }
 
   disconnect(): Promise<void> {
@@ -380,20 +408,20 @@ class Connection extends EventEmitter {
 
   reconnect() {
     // NOTE: We currently have a "reconnecting" event, but that only triggers through
-    // _retryConnect, which was written in a way that is required to run as an internal 
+    // _retryConnect, which was written in a way that is required to run as an internal
     // part of the post-disconnect connect() flow.
     // See: https://github.com/ripple/ripple-lib/pull/1101#issuecomment-565360423
-    this.emit('reconnect');
+    this.emit('reconnect')
     return this.disconnect().then(() => this.connect())
   }
 
   private _clearHeartbeatInterval = () => {
-    clearInterval(this._heartbeatInterval);
+    clearInterval(this._heartbeatInterval)
   }
 
   private _startHeartbeatInterval = () => {
     this._clearHeartbeatInterval()
-    this._heartbeatInterval = setInterval(() => this._heartbeat(), 1000 * 60);
+    this._heartbeatInterval = setInterval(() => this._heartbeat(), 1000 * 60)
   }
 
   /**
@@ -401,12 +429,12 @@ class Connection extends EventEmitter {
    * If this succeeds, we're good. If it fails, disconnect so that the consumer can reconnect, if desired.
    */
   private _heartbeat = () => {
-    return this.request({command: "ping"}).catch(() => this.reconnect());
+    return this.request({command: 'ping'}).catch(() => this.reconnect())
   }
 
   _whenReady<T>(promise: Promise<T>): Promise<T> {
     return new Promise((resolve, reject) => {
-      promise.catch(reject);
+      promise.catch(reject)
       if (!this._shouldBeConnected) {
         reject(new NotConnectedError())
       } else if (this._state === WebSocket.OPEN && this._isReady) {
@@ -422,9 +450,14 @@ class Connection extends EventEmitter {
   }
 
   hasLedgerVersions(lowLedgerVersion, highLedgerVersion): Promise<boolean> {
-    return this._whenReady(Promise.resolve(
-      this._availableLedgerVersions.containsRange(
-        lowLedgerVersion, highLedgerVersion || this._ledgerVersion)))
+    return this._whenReady(
+      Promise.resolve(
+        this._availableLedgerVersions.containsRange(
+          lowLedgerVersion,
+          highLedgerVersion || this._ledgerVersion
+        )
+      )
+    )
   }
 
   hasLedgerVersion(ledgerVersion): Promise<boolean> {
@@ -490,12 +523,18 @@ class Connection extends EventEmitter {
 
       this.once(eventName, response => {
         if (response.status === 'error') {
-          _reject(new RippledError(response.error_message || response.error, response))
+          _reject(
+            new RippledError(response.error_message || response.error, response)
+          )
         } else if (response.status === 'success') {
           _resolve(response.result)
         } else {
-          _reject(new ResponseFormatError(
-            'unrecognized status: ' + response.status, response))
+          _reject(
+            new ResponseFormatError(
+              'unrecognized status: ' + response.status,
+              response
+            )
+          )
         }
       })
 
@@ -504,14 +543,16 @@ class Connection extends EventEmitter {
       // JSON.stringify automatically removes keys with value of 'undefined'
       const message = JSON.stringify(Object.assign({}, request, {id}))
 
-      this._whenReady(this._send(message)).then(() => {
-        const delay = timeout || this._config.timeout
-        timer = setTimeout(() => _reject(new TimeoutError()), delay)
-        // Node.js won't exit if a timer is still running, so we tell Node to ignore (Node will still wait for the request to complete)
-        if (timer.unref) {
-          timer.unref()
-        }
-      }).catch(_reject)
+      this._whenReady(this._send(message))
+        .then(() => {
+          const delay = timeout || this._config.timeout
+          timer = setTimeout(() => _reject(new TimeoutError()), delay)
+          // Node.js won't exit if a timer is still running, so we tell Node to ignore (Node will still wait for the request to complete)
+          if (timer.unref) {
+            timer.unref()
+          }
+        })
+        .catch(_reject)
     })
   }
 }

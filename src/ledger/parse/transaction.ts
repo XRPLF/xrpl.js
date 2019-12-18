@@ -49,30 +49,33 @@ function parseTransactionType(type) {
 function parseTransaction(tx: any, includeRawTransaction: boolean): any {
   const type = parseTransactionType(tx.TransactionType)
   const mapping = {
-    'payment': parsePayment,
-    'trustline': parseTrustline,
-    'order': parseOrder,
-    'orderCancellation': parseOrderCancellation,
-    'settings': parseSettings,
-    'escrowCreation': parseEscrowCreation,
-    'escrowExecution': parseEscrowExecution,
-    'escrowCancellation': parseEscrowCancellation,
-    'checkCreate': parseCheckCreate,
-    'checkCash': parseCheckCash,
-    'checkCancel': parseCheckCancel,
-    'depositPreauth': parseDepositPreauth,
-    'paymentChannelCreate': parsePaymentChannelCreate,
-    'paymentChannelFund': parsePaymentChannelFund,
-    'paymentChannelClaim': parsePaymentChannelClaim,
-    'feeUpdate': parseFeeUpdate,
-    'amendment': parseAmendment
+    payment: parsePayment,
+    trustline: parseTrustline,
+    order: parseOrder,
+    orderCancellation: parseOrderCancellation,
+    settings: parseSettings,
+    escrowCreation: parseEscrowCreation,
+    escrowExecution: parseEscrowExecution,
+    escrowCancellation: parseEscrowCancellation,
+    checkCreate: parseCheckCreate,
+    checkCash: parseCheckCash,
+    checkCancel: parseCheckCancel,
+    depositPreauth: parseDepositPreauth,
+    paymentChannelCreate: parsePaymentChannelCreate,
+    paymentChannelFund: parsePaymentChannelFund,
+    paymentChannelClaim: parsePaymentChannelClaim,
+    feeUpdate: parseFeeUpdate,
+    amendment: parseAmendment
   }
   const parser: Function = mapping[type]
 
-  const specification = parser ? parser(tx) : {
-    UNAVAILABLE: 'Unrecognized transaction type.',
-    SEE_RAW_TRANSACTION: 'Since this type is unrecognized, `rawTransaction` is included in this response.'
-  }
+  const specification = parser
+    ? parser(tx)
+    : {
+        UNAVAILABLE: 'Unrecognized transaction type.',
+        SEE_RAW_TRANSACTION:
+          'Since this type is unrecognized, `rawTransaction` is included in this response.'
+      }
   if (!parser) {
     includeRawTransaction = true
   }

@@ -1,8 +1,8 @@
-import { RippledError, ValidationError } from 'ripple-api/common/errors'
+import {RippledError, ValidationError} from 'ripple-api/common/errors'
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import { assertRejects, assertResultMatch, TestSuite } from '../../utils'
-const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
+import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
+const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 export const config = {
   // TODO: The mock server right now returns a hard-coded string, no matter
@@ -1026,7 +1026,7 @@ export default <TestSuite>{
     api.connection._send(
       JSON.stringify({
         command: 'config',
-        data: { loadFactor: 5407.96875 }
+        data: {loadFactor: 5407.96875}
       })
     )
 

@@ -1,7 +1,7 @@
 import assert from 'assert-diff'
-import { assertResultMatch, TestSuite } from '../../utils'
+import {assertResultMatch, TestSuite} from '../../utils'
 import responses from '../../fixtures/responses'
-const { getLedger: RESPONSE_FIXTURES } = responses
+const {getLedger: RESPONSE_FIXTURES} = responses
 
 /**
  * Every test suite exports their tests in the default object.
@@ -21,7 +21,7 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.headerByHash, 'getLedger')
   },
   'future ledger version': async api => {
-    const response = await api.getLedger({ ledgerVersion: 14661789 })
+    const response = await api.getLedger({ledgerVersion: 14661789})
     assert(!!response)
   },
   'with state as hashes': async api => {
@@ -82,7 +82,7 @@ export default <TestSuite>{
       ...response,
       parentCloseTime: response.closeTime
     }
-    const hash = api.computeLedgerHash(ledger, { computeTreeHashes: true })
+    const hash = api.computeLedgerHash(ledger, {computeTreeHashes: true})
     assert.strictEqual(
       hash,
       'E6DB7365949BF9814D76BCC730B01818EB9136A89DB224F3F9F5AAE4569D758E'

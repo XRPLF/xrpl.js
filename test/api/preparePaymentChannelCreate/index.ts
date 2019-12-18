@@ -1,7 +1,7 @@
 import requests from '../../fixtures/requests'
 import responses from '../../fixtures/responses'
-import { assertResultMatch, TestSuite } from '../../utils'
-const instructionsWithMaxLedgerVersionOffset = { maxLedgerVersionOffset: 100 }
+import {assertResultMatch, TestSuite} from '../../utils'
+const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
 
 export const config = {
   // TODO: The mock server right now returns a hard-coded string, no matter

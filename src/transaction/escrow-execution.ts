@@ -6,14 +6,15 @@ import {Memo} from '../common/types/objects'
 import {RippleAPI} from '..'
 
 export type EscrowExecution = {
-  owner: string,
-  escrowSequence: number,
-  memos?: Array<Memo>,
-  condition?: string,
+  owner: string
+  escrowSequence: number
+  memos?: Array<Memo>
+  condition?: string
   fulfillment?: string
 }
 
-function createEscrowExecutionTransaction(account: string,
+function createEscrowExecutionTransaction(
+  account: string,
   payment: EscrowExecution
 ): TransactionJSON {
   const txJSON: any = {
@@ -24,8 +25,10 @@ function createEscrowExecutionTransaction(account: string,
   }
 
   if (Boolean(payment.condition) !== Boolean(payment.fulfillment)) {
-    throw new ValidationError('"condition" and "fulfillment" fields on'
-      + ' EscrowFinish must only be specified together.')
+    throw new ValidationError(
+      '"condition" and "fulfillment" fields on' +
+        ' EscrowFinish must only be specified together.'
+    )
   }
 
   if (payment.condition !== undefined) {
@@ -40,15 +43,15 @@ function createEscrowExecutionTransaction(account: string,
   return txJSON
 }
 
-function prepareEscrowExecution(this: RippleAPI, address: string,
+function prepareEscrowExecution(
+  this: RippleAPI,
+  address: string,
   escrowExecution: EscrowExecution,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareEscrowExecution(
-      {address, escrowExecution, instructions})
-    const txJSON = createEscrowExecutionTransaction(
-      address, escrowExecution)
+    validate.prepareEscrowExecution({address, escrowExecution, instructions})
+    const txJSON = createEscrowExecutionTransaction(address, escrowExecution)
     return utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {
     return Promise.reject(e)

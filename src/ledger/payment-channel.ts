@@ -10,15 +10,18 @@ const NotFoundError = errors.NotFoundError
 function formatResponse(
   response: LedgerEntryResponse
 ): FormattedPaymentChannel {
-  if (response.node === undefined ||
-    response.node.LedgerEntryType !== 'PayChannel') {
+  if (
+    response.node === undefined ||
+    response.node.LedgerEntryType !== 'PayChannel'
+  ) {
     throw new NotFoundError('Payment channel ledger entry not found')
   }
   return parsePaymentChannel(response.node)
 }
 
 async function getPaymentChannel(
-  this: RippleAPI, id: string
+  this: RippleAPI,
+  id: string
 ): Promise<FormattedPaymentChannel> {
   // 1. Validate
   validate.getPaymentChannel({id})

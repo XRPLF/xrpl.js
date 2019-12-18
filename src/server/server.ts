@@ -30,10 +30,4 @@ function formatLedgerClose(ledgerClose: any): object {
   }
 }
 
-export {
-  connect,
-  disconnect,
-  isConnected,
-  getLedgerVersion,
-  formatLedgerClose
-}
+export {connect, disconnect, isConnected, getLedgerVersion, formatLedgerClose}

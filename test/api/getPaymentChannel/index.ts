@@ -1,6 +1,6 @@
 import responses from '../../fixtures/responses'
-import { assertRejects, assertResultMatch, TestSuite } from '../../utils'
-const { getPaymentChannel: RESPONSE_FIXTURES } = responses
+import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
+const {getPaymentChannel: RESPONSE_FIXTURES} = responses
 
 /**
  * Every test suite exports their tests in the default object.

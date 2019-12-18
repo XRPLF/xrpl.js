@@ -12,8 +12,9 @@ export type SettingsOptions = {
 }
 
 export function parseAccountFlags(
-    value: number,
-    options: {excludeFalse?: boolean} = {}) {
+  value: number,
+  options: {excludeFalse?: boolean} = {}
+) {
   const settings = {}
   for (const flagName in AccountFlags) {
     if (value & AccountFlags[flagName]) {
@@ -35,7 +36,9 @@ function formatSettings(response: AccountInfoResponse) {
 }
 
 export async function getSettings(
-  this: RippleAPI, address: string, options: SettingsOptions = {}
+  this: RippleAPI,
+  address: string,
+  options: SettingsOptions = {}
 ): Promise<FormattedSettings> {
   // 1. Validate
   validate.getSettings({address, options})

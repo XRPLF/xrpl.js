@@ -1,5 +1,5 @@
 import responses from '../../fixtures/responses'
-import { assertRejects, assertResultMatch, TestSuite } from '../../utils'
+import {assertRejects, assertResultMatch, TestSuite} from '../../utils'
 
 /**
  * Every test suite exports their tests in the default object.
