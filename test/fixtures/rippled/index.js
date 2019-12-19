@@ -99,6 +99,7 @@ module.exports = {
     NoMeta: require('./tx/no-meta.json'),
     LedgerZero: require('./tx/ledger-zero.json'),
     Amendment: require('./tx/amendment.json'),
-    SetFee: require('./tx/set-fee.json')
+    SetFee: require('./tx/set-fee.json'),
+    AccountDelete: require('./tx/account-delete.json')
   }
 };

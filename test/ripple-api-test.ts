@@ -42,7 +42,7 @@ describe('RippleAPI [Test Runner]', function() {
       })
       // Run each test with the newer, x-address style.
       if (!config.skipXAddress) {
-        describe(`[X-Address]`, () => {
+        describe(`[X-address]`, () => {
           for (const [testName, fn] of tests) {
             it(testName, function() {
               return fn(this.api, addresses.ACCOUNT_X)
