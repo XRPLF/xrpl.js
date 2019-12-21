@@ -359,7 +359,8 @@ export default <TestSuite>{
     const response = await api.getTransaction(hash)
     assertResultMatch(
       response,
-      RESPONSE_FIXTURES.accountDelete
+      RESPONSE_FIXTURES.accountDelete,
+      'getTransaction'
     )
   },
 
