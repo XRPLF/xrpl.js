@@ -166,7 +166,7 @@ export interface SignerListLedgerEntry {
   LedgerEntryType: 'SignerList'
   OwnerNode: string
   SignerQuorum: number
-  SignerEntries: SignerEntry[]
+  SignerEntries: { SignerEntry: SignerEntry }[]
   SignerListID: number
   PreviousTxnID: string
   PreviousTxnLgrSeq: number
