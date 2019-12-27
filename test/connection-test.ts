@@ -332,7 +332,7 @@ describe('Connection', function() {
     this.api.connection.on('reconnect', () => done())
     // Trigger a heartbeat
     this.api.connection._heartbeat().catch(error => {
-      /* ignore */
+      /* ignore - test expects heartbeat failure */
     })
   })
 
