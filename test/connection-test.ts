@@ -4,6 +4,7 @@ import assert from 'assert-diff'
 import setupAPI from './setup-api'
 import {RippleAPI} from 'ripple-api'
 import ledgerClose from './fixtures/rippled/ledger-close.json'
+import {ignoreWebSocketDisconnect} from './utils'
 const utils = RippleAPI._PRIVATE.ledgerUtils
 
 const TIMEOUT = 200000 // how long before each test case times out
@@ -35,11 +36,12 @@ describe('Connection', function() {
   })
 
   describe('trace', () => {
-    const message1 = '{"type": "transaction"}'
-    const message2 = '{"type": "path_find"}'
+    const mockedRequestData = {mocked: 'request'}
+    const mockedResponse = JSON.stringify({mocked: 'response', id: 0})
     const expectedMessages = [
-      ['send', message1],
-      ['receive', message2]
+      // We add the ID here, since it's not a part of the user-provided request.
+      ['send', JSON.stringify({...mockedRequestData, id: 0})],
+      ['receive', mockedResponse]
     ]
     const originalConsoleLog = console.log
 
@@ -52,8 +54,8 @@ describe('Connection', function() {
       console.log = (id, message) => messages.push([id, message])
       const connection: any = new utils.common.Connection('url', {trace: false})
       connection._ws = {send: function() {}}
-      connection._send(message1)
-      connection._onMessage(message2)
+      connection.request(mockedRequestData)
+      connection._onMessage(mockedResponse)
       assert.deepEqual(messages, [])
     })
 
@@ -62,8 +64,8 @@ describe('Connection', function() {
       console.log = (id, message) => messages.push([id, message])
       const connection: any = new utils.common.Connection('url', {trace: true})
       connection._ws = {send: function() {}}
-      connection._send(message1)
-      connection._onMessage(message2)
+      connection.request(mockedRequestData)
+      connection._onMessage(mockedResponse)
       assert.deepEqual(messages, expectedMessages)
     })
 
@@ -73,8 +75,8 @@ describe('Connection', function() {
         trace: (id, message) => messages.push([id, message])
       })
       connection._ws = {send: function() {}}
-      connection._send(message1)
-      connection._onMessage(message2)
+      connection.request(mockedRequestData)
+      connection._onMessage(mockedResponse)
       assert.deepEqual(messages, expectedMessages)
     })
   })
@@ -173,13 +175,11 @@ describe('Connection', function() {
     })
   })
 
-  it('DisconnectedError', function() {
-    this.api.connection._send(
-      JSON.stringify({
-        command: 'config',
-        data: {disconnectOnServerInfo: true}
-      })
-    )
+  it('DisconnectedError', async function() {
+    await this.api.connection.request({
+      command: 'config',
+      data: {disconnectOnServerInfo: true}
+    })
     return this.api
       .getServerInfo()
       .then(() => {
@@ -191,12 +191,12 @@ describe('Connection', function() {
   })
 
   it('TimeoutError', function() {
-    this.api.connection._send = function() {
-      return Promise.resolve({})
+    this.api.connection._ws.send = function(message, options, callback) {
+      callback(null)
     }
     const request = {command: 'server_info'}
     return this.api.connection
-      .request(request, 1)
+      .request(request, 10)
       .then(() => {
         assert(false, 'Should throw TimeoutError')
       })
@@ -221,22 +221,8 @@ describe('Connection', function() {
   })
 
   it('ResponseFormatError', function() {
-    this.api.connection._send = function(message) {
-      const parsed = JSON.parse(message)
-      setTimeout(() => {
-        this._ws.emit(
-          'message',
-          JSON.stringify({
-            id: parsed.id,
-            type: 'response',
-            status: 'unrecognized'
-          })
-        )
-      }, 2)
-      return new Promise(() => {})
-    }
     return this.api
-      .getServerInfo()
+      .request('test_command', {data: {unrecognizedResponse: true}})
       .then(() => {
         assert(false, 'Should throw ResponseFormatError')
       })
@@ -245,34 +231,16 @@ describe('Connection', function() {
       })
   })
 
-  it('reconnect on unexpected close ', function(done) {
+  it('reconnect on unexpected close', function(done) {
     this.api.connection.on('connected', () => {
       done()
     })
-
     setTimeout(() => {
       this.api.connection._ws.close()
     }, 1)
   })
 
   describe('reconnection test', function() {
-    beforeEach(function() {
-      this.api.connection.__workingUrl = this.api.connection._url
-      this.api.connection.__doReturnBad = function() {
-        this._url = this.__badUrl
-        const self = this
-        function onReconnect(num) {
-          if (num >= 2) {
-            self._url = self.__workingUrl
-            self.removeListener('reconnecting', onReconnect)
-          }
-        }
-        this.on('reconnecting', onReconnect)
-      }
-    })
-
-    afterEach(function() {})
-
     it('reconnect on several unexpected close', function(done) {
       if (isBrowser) {
         const phantomTest = /PhantomJS/
@@ -284,15 +252,13 @@ describe('Connection', function() {
       }
       this.timeout(70001)
       const self = this
-      self.api.connection.__badUrl = 'ws://testripple.circleci.com:129'
       function breakConnection() {
-        self.api.connection.__doReturnBad()
-        self.api.connection._send(
-          JSON.stringify({
+        self.api.connection
+          .request({
             command: 'test_command',
             data: {disconnectIn: 10}
           })
-        )
+          .catch(ignoreWebSocketDisconnect)
       }
 
       let connectsCount = 0
@@ -323,11 +289,11 @@ describe('Connection', function() {
                   ' instead)'
               )
             )
-          } else if (reconnectsCount !== num * 2) {
+          } else if (reconnectsCount !== num) {
             done(
               new Error(
                 'reconnectsCount must be equal to ' +
-                  num * 2 +
+                  num +
                   ' (got ' +
                   reconnectsCount +
                   ' instead)'
@@ -365,7 +331,9 @@ describe('Connection', function() {
     // Hook up a listener for the reconnect event
     this.api.connection.on('reconnect', () => done())
     // Trigger a heartbeat
-    this.api.connection._heartbeat()
+    this.api.connection._heartbeat().catch(error => {
+      /* ignore */
+    })
   })
 
   it('should emit disconnected event with code 1000 (CLOSE_NORMAL)', function(done) {
@@ -384,12 +352,12 @@ describe('Connection', function() {
       assert.strictEqual(code, 1006)
       done()
     })
-    this.api.connection._send(
-      JSON.stringify({
+    this.api.connection
+      .request({
         command: 'test_command',
         data: {disconnectIn: 10}
       })
-    )
+      .catch(ignoreWebSocketDisconnect)
   })
 
   it('should emit connected event on after reconnect', function(done) {
@@ -450,7 +418,8 @@ describe('Connection', function() {
     this.api.connection.on('path_find', () => {
       pathFindCount++
     })
-    this.api.connection.on('1', () => {
+    this.api.connection.on('response', message => {
+      assert.strictEqual(message.id, 1)
       assert.strictEqual(transactionCount, 1)
       assert.strictEqual(pathFindCount, 1)
       done()
@@ -545,15 +514,13 @@ describe('Connection', function() {
   it(
     'should throw RippledNotInitializedError if server does not have ' +
       'validated ledgers',
-    function() {
+    async function() {
       this.timeout(3000)
 
-      this.api.connection._send(
-        JSON.stringify({
-          command: 'global_config',
-          data: {returnEmptySubscribeRequest: 1}
-        })
-      )
+      await this.api.connection.request({
+        command: 'global_config',
+        data: {returnEmptySubscribeRequest: 1}
+      })
 
       const api = new RippleAPI({server: this.api.connection._url})
       return api.connect().then(
@@ -573,7 +540,6 @@ describe('Connection', function() {
 
   it('should try to reconnect on empty subscribe response on reconnect', function(done) {
     this.timeout(23000)
-
     this.api.on('error', error => {
       done(error || new Error('Should not emit error.'))
     })
@@ -588,19 +554,9 @@ describe('Connection', function() {
     this.api.on('disconnected', () => {
       disconnectedCount++
     })
-
-    this.api.connection._send(
-      JSON.stringify({
-        command: 'global_config',
-        data: {returnEmptySubscribeRequest: 3}
-      })
-    )
-
-    this.api.connection._send(
-      JSON.stringify({
-        command: 'test_command',
-        data: {disconnectIn: 10}
-      })
-    )
+    this.api.connection.request({
+      command: 'test_command',
+      data: {disconnectIn: 5}
+    })
   })
 })

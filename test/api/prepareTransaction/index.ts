@@ -1023,12 +1023,10 @@ export default <TestSuite>{
     api,
     address
   ) => {
-    api.connection._send(
-      JSON.stringify({
-        command: 'config',
-        data: {loadFactor: 5407.96875}
-      })
-    )
+    api.connection.request({
+      command: 'config',
+      data: {loadFactor: 5407.96875}
+    })
 
     const expectedResponse = {
       txJSON:
