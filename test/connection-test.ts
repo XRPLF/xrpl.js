@@ -345,10 +345,10 @@ describe('Connection', function() {
   })
 
   it('should emit disconnected event with code 1006 (CLOSE_ABNORMAL)', function(done) {
-    this.api.once('error', error => {
+    this.api.connection.once('error', error => {
       done(new Error('should not throw error, got ' + String(error)))
     })
-    this.api.once('disconnected', code => {
+    this.api.connection.once('disconnected', code => {
       assert.strictEqual(code, 1006)
       done()
     })
