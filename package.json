@@ -8,6 +8,8 @@
     "build/ripple-latest-min.js"
   ],
   "main": "dist/npm/",
+  "unpkg": "build/ripple-latest-min.js",
+  "jsdelivr": "build/ripple-latest-min.js",
   "types": "dist/npm/index.d.ts",
   "browser": {
     "ws": "./dist/npm/common/wswrapper.js",
