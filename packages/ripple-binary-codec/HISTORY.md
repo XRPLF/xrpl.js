@@ -1,5 +1,10 @@
 # ripple-binary-codec Release History
 
+## 0.2.6 (2019-12-31)
+
+- Update dependencies
+  - decimal.js, fs-extra, mocha, handlebars, bn.js, babel-eslint, ripple-address-codec
+
 ## 0.2.5 (2019-12-14)
 
 - Add support for AccountDelete (#37)
