@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.6.1",
-    "bn.js": "^4.11.3",
+    "bn.js": "^5.1.1",
     "create-hash": "^1.1.2",
     "decimal.js": "^10.2.0",
     "inherits": "^2.0.1",
