@@ -1,5 +1,14 @@
 # ripple-lib Release History
 
+## 1.6.0 (2020-01-06)
+
+* Add support for AccountDelete (#1120)
+* Improve error type given on rejected message _send to be DisconnectedError (#1098)
+* Internal
+  * Add unit test for unhandled promise rejection warning on message _send (#1098)
+* Dependencies
+  * Update @types/node, @typescript-eslint/parser
+
 ## 1.5.1 (2019-12-28)
 
 * Fix support for CDNs (#1142)
