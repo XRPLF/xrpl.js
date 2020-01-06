@@ -201,6 +201,30 @@ describe('Connection', function() {
       })
   })
 
+  it('DisconnectedError on initial _onOpen send', async function() {
+    // _onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
+    // do not rely on the api.setup hook to test this as it bypasses the case, disconnect api connection first
+    await this.api.disconnect();
+
+    // stub _onOpen to only run logic relevant to test case
+    this.api.connection._onOpen = () => {
+      // overload websocket send on open when _ws exists
+      this.api.connection._ws.send = function(data, options, cb) {
+        // recent ws throws this error instead of calling back
+        throw new Error('WebSocket is not open: readyState 0 (CONNECTING)');
+      }
+      const request = {command: 'subscribe', streams: ['ledger']};
+      return this.api.connection.request(request);
+    }
+
+    try {
+      await this.api.connect();
+    } catch (error) {
+      assert(error instanceof this.api.errors.DisconnectedError);
+      assert.strictEqual(error.message, 'WebSocket is not open: readyState 0 (CONNECTING)');
+    }
+  });
+
   it('ResponseFormatError', function() {
     this.api.connection._send = function(message) {
       const parsed = JSON.parse(message)
