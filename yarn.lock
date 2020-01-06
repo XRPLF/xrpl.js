@@ -3854,13 +3854,13 @@ ripple-keypairs@^0.11.0:
     hash.js "^1.0.3"
     ripple-address-codec "^2.0.1"
 
-ripple-lib-transactionparser@0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.8.1.tgz#28aadda4d3450937bf4804e467b2ad6937d50177"
-  integrity sha512-VNbPEWkm5BmEj5xtV+qFyS6rE2bKkOX/KRoYbUp9pzrdNmwI8lMfwNHRX1zz8574mCSSBtRAwGLuQokmvk5d6Q==
+ripple-lib-transactionparser@0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/ripple-lib-transactionparser/-/ripple-lib-transactionparser-0.8.2.tgz#7aaad3ba1e1aeee1d5bcff32334a7a838f834dce"
+  integrity sha512-1teosQLjYHLyOQrKUQfYyMjDR3MAq/Ga+MJuLUfpBMypl4LZB4bEoMcmG99/+WVTEiZOezJmH9iCSvm/MyxD+g==
   dependencies:
     bignumber.js "^9.0.0"
-    lodash "^4.17.4"
+    lodash "^4.17.15"
 
 run-async@^2.2.0:
   version "2.3.0"

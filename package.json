@@ -30,7 +30,7 @@
     "ripple-address-codec": "^4.0.0",
     "ripple-binary-codec": "^0.2.5",
     "ripple-keypairs": "^0.11.0",
-    "ripple-lib-transactionparser": "0.8.1",
+    "ripple-lib-transactionparser": "0.8.2",
     "ws": "^7.2.0"
   },
   "devDependencies": {
