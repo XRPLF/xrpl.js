@@ -212,7 +212,7 @@ export default <TestSuite>{
   ) => {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
-      // TODO: This fails when address is X-Address
+      // TODO: This fails when address is X-address
       txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"726970706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1.2","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '0.0000012',
@@ -232,7 +232,7 @@ export default <TestSuite>{
   ) => {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
-      // TODO: This fails when address is X-Address
+      // TODO: This fails when address is X-address
       txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"726970706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1123456.7","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '1.1234567',
@@ -289,7 +289,7 @@ export default <TestSuite>{
     api._maxFeeXRP = '2.1'
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
-      // TODO: This fails when address is X-Address
+      // TODO: This fails when address is X-address
       txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"726970706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '2.01',

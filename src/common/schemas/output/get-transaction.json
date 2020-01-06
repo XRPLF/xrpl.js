@@ -208,6 +208,30 @@
           "$ref": "paymentChannelClaim"
         }
       }
+    },
+    {
+      "properties": {
+        "type": {
+          "enum": [
+            "depositPreauth"
+          ]
+        },
+        "specification": {
+          "$ref": "depositPreauth"
+        }
+      }
+    },
+    {
+      "properties": {
+        "type": {
+          "enum": [
+            "accountDelete"
+          ]
+        },
+        "specification": {
+          "$ref": "accountDelete"
+        }
+      }
     }
   ]
 }

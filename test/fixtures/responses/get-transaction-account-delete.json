@@ -1,0 +1,32 @@
+{
+  "type": "accountDelete",
+  "address": "rM5qup5BYDLMXaR5KU1hiC9HhFMuBVrnKv",
+  "sequence": 3227049,
+  "id": "EC2AB14028DC84DE525470AB4DAAA46358B50A8662C63804BFF38244731C0CB9",
+  "specification": {
+    "destination": "rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe",
+    "destinationXAddress": "XV5kHfQmzDQjbFNv4jX3FX9Y7ig5QhpKGEFCq4mdLfhdxMq"
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2019-12-17T09:16:51.000Z",
+    "fee": "5",
+    "balanceChanges": {
+      "rM5qup5BYDLMXaR5KU1hiC9HhFMuBVrnKv": [
+        {
+          "currency": "XRP",
+          "value": "-10000"
+        }
+      ],
+      "rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe": [
+        {
+          "currency": "XRP",
+          "value": "9995"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 3232071,
+    "indexInLedger": 0
+  }
+}

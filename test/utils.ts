@@ -33,7 +33,7 @@ interface LoadedTestSuite {
   name: string
   tests: [string, TestFn][]
   config: {
-    /** Set to true to skip re-running tests with an X-Address. */
+    /** Set to true to skip re-running tests with an X-address. */
     skipXAddress?: boolean
   }
 }
