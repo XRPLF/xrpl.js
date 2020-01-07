@@ -834,6 +834,7 @@ Type | Description
 `manifestReceived` | Sent by the `manifests` stream when the server receives a manifest.
 `transaction` | Sent by many subscriptions including `transactions`, `transactions_proposed`, `accounts`, `accounts_proposed`, and `book` (Order Book). See [Transaction Streams](https://ripple.com/build/rippled-apis/#transaction-streams) for details.
 `peerStatusChange` | (Admin-only) Reports a large amount of information on the activities of other `rippled` servers to which the server is connected.
+`path_find` | Asynchronous follow-up response to the currently open path\_find request. See [rippled path\_find method](https://xrpl.org/path_find.html) for details.
 
 To register your listener function, use `connection.on(type, handler)`.
 
