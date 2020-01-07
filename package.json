@@ -24,7 +24,7 @@
     "@types/ws": "^6.0.3",
     "bignumber.js": "^9.0.0",
     "https-proxy-agent": "^4.0.0",
-    "jsonschema": "1.2.2",
+    "jsonschema": "1.2.5",
     "lodash": "^4.17.4",
     "lodash.isequal": "^4.5.0",
     "ripple-address-codec": "^4.0.0",
