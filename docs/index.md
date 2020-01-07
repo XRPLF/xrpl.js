@@ -119,7 +119,6 @@ Using RippleAPI, you can:
 This page contains documentation for ripple-lib. To use ripple-lib with npm/yarn, begin with the [Getting Started](https://github.com/ripple/ripple-lib#getting-started) steps.
 
 **What is ripple-lib used for?** Here's a [list of applications that use `ripple-lib`](https://github.com/ripple/ripple-lib/blob/develop/APPLICATIONS.md). Open a PR to add your app or project to the list!
-
 ## Boilerplate
 
 Use the following [boilerplate code](https://en.wikipedia.org/wiki/Boilerplate_code) to wrap your custom code using RippleAPI.
@@ -195,7 +194,6 @@ If you omit the `server` parameter, RippleAPI operates [offline](#offline-functi
 After you have installed ripple-lib, you can create scripts using the [boilerplate](#boilerplate) and run them using the Node.js executable, typically named `node`:
 
       `node script.js`
-
 ## Offline functionality
 
 RippleAPI can also function without internet connectivity. This can be useful in order to generate secrets and sign transactions from a secure, isolated machine.
@@ -222,7 +220,6 @@ Methods that depend on the state of the XRP Ledger are unavailable in offline mo
 * [sign](#sign)
 * [generateAddress](#generateaddress)
 * [computeLedgerHash](#computeledgerhash)
-
 # Basic Types
 
 ## Address
@@ -294,7 +291,6 @@ Name | Type | Description
 currency | [currency](#currency) | The three-character code or hexadecimal string used to denote currencies, or "drops" for the smallest unit of XRP.
 counterparty | [address](#address) | *Optional* The XRP Ledger address of the account that owes or is owed the funds (omitted if `currency` is "XRP" or "drops")
 value | [value](#value) | *Optional* The quantity of the currency, denoted as a string to retain floating point precision
-
 # Transaction Overview
 
 ## Transaction Types
@@ -381,7 +377,6 @@ Name | Type | Description
 data | string | *Optional* Arbitrary string, conventionally containing the content of the memo.
 format | string | *Optional* Conventionally containing information on how the memo is encoded, for example as a [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml). Only characters allowed in URLs are permitted.
 type | string | *Optional* Conventionally, a unique relation (according to [RFC 5988](http://tools.ietf.org/html/rfc5988#section-4)) that defines the format of this memo. Only characters allowed in URLs are permitted.
-
 # Transaction Specifications
 
 A *transaction specification* specifies what a transaction should do. Each [Transaction Type](#transaction-types) has its own type of specification.
@@ -792,7 +787,6 @@ signature | string | *Optional* Signed claim authorizing withdrawal of XRP from 
 }
 ```
 
-
 # rippled APIs
 
 ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for online functionality. In addition to ripple-lib's own methods, you can also access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
@@ -865,7 +859,6 @@ api.connect().then(() => { // Omit this if you are already connected
 The subscription ends when you unsubscribe or the WebSocket connection is closed.
 
 For full details, see [rippled Subscriptions](https://ripple.com/build/rippled-apis/#subscriptions).
-
 ## request
 
 `request(command: string, options: object): Promise<object>`
@@ -919,7 +912,6 @@ return api.request('ledger', {
 }
 ```
 
-
 ## hasNextPage
 
 `hasNextPage(currentResponse): boolean`
@@ -947,7 +939,6 @@ return api.request('ledger_data', {
   }
 }).catch(console.error);
 ```
-
 ## requestNextPage
 
 `requestNextPage(command: string, params: object = {}, currentResponse: object): Promise<object>`
@@ -978,9 +969,7 @@ return api.request(command, params).then(response => {
 }).catch(console.error);
 ```
 
-
 # Static Methods
-
 ## renameCounterpartyToIssuer
 
 `renameCounterpartyToIssuer(issue: {currency: string, counterparty: address}): {currency: string, issuer: address}`
@@ -1018,7 +1007,6 @@ console.log(RippleAPI.renameCounterpartyToIssuer(orderbookInfo.counter))
 { currency: 'USD', issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' }
 { currency: 'BTC', issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B' }
 ```
-
 ## formatBidsAndAsks
 
 `formatBidsAndAsks(orderbookInfo: {base: Issue, counter: Issue}, offers: BookOffer[]): orderbook`
@@ -1297,9 +1285,7 @@ return Promise.all(
 }
 ```
 
-
 # API Methods
-
 ## connect
 
 `connect(): Promise<void>`
@@ -1317,7 +1303,6 @@ This method returns a promise that resolves with a void value when a connection 
 ### Example
 
 See [Boilerplate](#boilerplate) for code sample.
-
 ## disconnect
 
 `disconnect(): Promise<void>`
@@ -1335,7 +1320,6 @@ This method returns a promise that resolves with a void value when a connection 
 ### Example
 
 See [Boilerplate](#boilerplate) for code sample
-
 ## isConnected
 
 `isConnected(): boolean`
@@ -1359,7 +1343,6 @@ return api.isConnected();
 ```json
 true
 ```
-
 ## getServerInfo
 
 `getServerInfo(): Promise<object>`
@@ -1433,7 +1416,6 @@ return api.getServerInfo().then(info => {/* ... */});
 }
 ```
 
-
 ## getFee
 
 `getFee(): Promise<string>`
@@ -1461,7 +1443,6 @@ return api.getFee().then(fee => {/* ... */});
 ```json
 "0.000012"
 ```
-
 ## getLedgerVersion
 
 `getLedgerVersion(): Promise<number>`
@@ -1487,7 +1468,6 @@ return api.getLedgerVersion().then(ledgerVersion => {
 ```json
 16869039
 ```
-
 
 ## getTransaction
 
@@ -1639,7 +1619,6 @@ return api.getTransaction(id).then(transaction => {
   }
 }
 ```
-
 
 ## getTransactions
 
@@ -1874,7 +1853,6 @@ return api.getTransactions(address).then(transaction => {
 ]
 ```
 
-
 ## getTrustlines
 
 `getTrustlines(address: string, options: object): Promise<Array<object>>`
@@ -2018,7 +1996,6 @@ return api.getTrustlines(address).then(trustlines =>
   }
 ]
 ```
-
 
 ## getBalances
 
@@ -2186,7 +2163,6 @@ return api.getBalances(address).then(balances =>
 ]
 ```
 
-
 ## getBalanceSheet
 
 `getBalanceSheet(address: string, options: object): Promise<object>`
@@ -2281,7 +2257,6 @@ return api.getBalanceSheet(address).then(balanceSheet =>
   ]
 }
 ```
-
 
 ## getPaths
 
@@ -2402,7 +2377,6 @@ return api.getPaths(pathfind)
   }
 ]
 ```
-
 
 ## getOrders
 
@@ -2783,7 +2757,6 @@ return api.getOrders(address).then(orders =>
   }
 ]
 ```
-
 
 ## getOrderbook
 
@@ -3890,7 +3863,6 @@ return api.getOrderbook(address, orderbook)
 }
 ```
 
-
 ## getSettings
 
 `getSettings(address: string, options: object): Promise<object>`
@@ -3973,7 +3945,6 @@ return api.getSettings(address).then(settings =>
 }
 ```
 
-
 ## getAccountInfo
 
 `getAccountInfo(address: string, options: object): Promise<object>`
@@ -4021,7 +3992,6 @@ return api.getAccountInfo(address).then(info =>
   "previousAffectingTransactionLedgerVersion": 6614625
 }
 ```
-
 
 ## getAccountObjects
 
@@ -4347,7 +4317,6 @@ return api.getAccountObjects(address: address).then(objects =>
 }
 ```
 
-
 ## getPaymentChannel
 
 `getPaymentChannel(id: string): Promise<object>`
@@ -4402,7 +4371,6 @@ return api.getPaymentChannel(channelId).then(channel =>
   "previousAffectingTransactionLedgerVersion": 151322
 }
 ```
-
 
 ## getLedger
 
@@ -4467,7 +4435,6 @@ return api.getLedger()
 }
 ```
 
-
 ## parseAccountFlags
 
 `parseAccountFlags(Flags: number): object`
@@ -4503,7 +4470,6 @@ console.log(JSON.stringify(flags, null, 2))
   "defaultRipple": false
 }
 ```
-
 ## prepareTransaction
 
 `prepareTransaction(transaction: object, instructions: object): Promise<object>`
@@ -4561,7 +4527,6 @@ async function preparedPreauth() {
   }
 }
 ```
-
 ## preparePayment
 
 `preparePayment(address: string, payment: object, instructions: object): Promise<object>`
@@ -4634,7 +4599,6 @@ return api.preparePayment(address, payment).then(prepared => {
 }
 ```
 
-
 ## prepareTrustline
 
 `prepareTrustline(address: string, trustline: object, instructions: object): Promise<object>`
@@ -4701,7 +4665,6 @@ return api.prepareTrustline(address, trustline).then(prepared =>
   }
 }
 ```
-
 
 ## prepareOrder
 
@@ -4770,7 +4733,6 @@ return api.prepareOrder(address, order)
 }
 ```
 
-
 ## prepareOrderCancellation
 
 `prepareOrderCancellation(address: string, orderCancellation: object, instructions: object): Promise<object>`
@@ -4822,7 +4784,6 @@ return api.prepareOrderCancellation(address, orderCancellation)
   }
 }
 ```
-
 
 ## prepareSettings
 
@@ -4887,7 +4848,6 @@ return api.prepareSettings(address, settings)
 }
 ```
 
-
 ## prepareEscrowCreation
 
 `prepareEscrowCreation(address: string, escrowCreation: object, instructions: object): Promise<object>`
@@ -4951,7 +4911,6 @@ return api.prepareEscrowCreation(address, escrowCreation).then(prepared =>
 }
 ```
 
-
 ## prepareEscrowCancellation
 
 `prepareEscrowCancellation(address: string, escrowCancellation: object, instructions: object): Promise<object>`
@@ -5006,7 +4965,6 @@ return api.prepareEscrowCancellation(address, escrowCancellation).then(prepared 
   }
 }
 ```
-
 
 ## prepareEscrowExecution
 
@@ -5065,7 +5023,6 @@ return api.prepareEscrowExecution(address, escrowExecution).then(prepared =>
 }
 ```
 
-
 ## preparePaymentChannelCreate
 
 `preparePaymentChannelCreate(address: string, paymentChannelCreate: object, instructions: object): Promise<object>`
@@ -5123,7 +5080,6 @@ return api.preparePaymentChannelCreate(address, paymentChannelCreate).then(prepa
 }
 ```
 
-
 ## preparePaymentChannelClaim
 
 `preparePaymentChannelClaim(address: string, paymentChannelClaim: object, instructions: object): Promise<object>`
@@ -5177,7 +5133,6 @@ return api.preparePaymentChannelClaim(address, paymentChannelClaim).then(prepare
   }
 }
 ```
-
 
 ## preparePaymentChannelFund
 
@@ -5233,7 +5188,6 @@ return api.preparePaymentChannelFund(address, paymentChannelFund).then(prepared 
   }
 }
 ```
-
 
 ## prepareCheckCreate
 
@@ -5293,7 +5247,6 @@ return api.prepareCheckCreate(address, checkCreate).then(prepared =>
 }
 ```
 
-
 ## prepareCheckCancel
 
 `prepareCheckCancel(address: string, checkCancel: object, instructions: object): Promise<object>`
@@ -5347,7 +5300,6 @@ return api.prepareCheckCancel(address, checkCancel).then(prepared =>
   }
 }
 ```
-
 
 ## prepareCheckCash
 
@@ -5406,7 +5358,6 @@ return api.prepareCheckCash(address, checkCash).then(prepared =>
   }
 }
 ```
-
 
 ## sign
 
@@ -5549,7 +5500,6 @@ If any of `{signAs: some_address}` options were missing the code will return a v
 ```
 [ValidationError(txJSON is not the same for all signedTransactions)]
 ```
-
 ## combine
 
 `combine(signedTransactions: Array<string>): {signedTransaction: string, id: string}`
@@ -5586,7 +5536,6 @@ return api.combine(signedTransactions);
   "id": "8A3BFD2214B4C8271ED62648FCE9ADE4EE82EF01827CF7D1F7ED497549A368CC"
 }
 ```
-
 
 ## submit
 
@@ -5650,7 +5599,6 @@ return api.submit(signedTransaction)
 }
 ```
 
-
 ## generateXAddress
 
 `generateXAddress(options?: object): {address: string, secret: string}`
@@ -5688,7 +5636,6 @@ return api.generateAddress();
   "secret": "sp6JS7f14BuwFY8Mw6bTtLKWauoUs"
 }
 ```
-
 
 ## generateAddress
 
@@ -5735,7 +5682,6 @@ return api.generateAddress();
 }
 ```
 
-
 ## isValidAddress
 
 `isValidAddress(address: string): boolean`
@@ -5755,7 +5701,6 @@ This method returns `true` if the address is valid and `false` if it is not.
 ```javascript
 return api.isValidAddress("address")
 ```
-
 ## isValidSecret
 
 `isValidSecret(secret: string): boolean`
@@ -5775,7 +5720,6 @@ This method returns `true` if the secret is valid and `false` if it is not.
 ```javascript
 return api.isValidSecret("secret")
 ```
-
 ## deriveKeypair
 
 `deriveKeypair(seed: string): {privateKey: string, publicKey: string}`
@@ -5797,7 +5741,6 @@ var keypair = api.deriveKeypair(seed)
 var public_key = keypair.publicKey;
 var private_key = keypair.privateKey;
 ```
-
 ## deriveAddress
 
 `deriveAddress(publicKey: string): string`
@@ -5817,7 +5760,6 @@ This method returns a string corresponding to the address derived from the publi
 ```javascript
 var address = api.deriveAddress(public_key);
 ```
-
 ## signPaymentChannelClaim
 
 `signPaymentChannelClaim(channel: string, amount: string, privateKey: string): string`
@@ -5855,7 +5797,6 @@ return api.signPaymentChannelClaim(channel, amount, privateKey);
 ```json
 "3045022100B5C54654221F154347679B97AE7791CBEF5E6772A3F894F9C781B8F1B400F89F022021E466D29DC5AEB5DFAFC76E8A88D2E388EBD25A84143B6AC3B647F479CB89B7"
 ```
-
 
 ## verifyPaymentChannelClaim
 
@@ -5895,7 +5836,6 @@ return api.verifyPaymentChannelClaim(channel, amount, signature, publicKey);
 ```json
 true
 ```
-
 ## computeLedgerHash
 
 `computeLedgerHash(ledger: object): string`
@@ -5951,7 +5891,6 @@ return api.computeLedgerHash(ledger);
 ```json
 "F4D865D83EB88C1A1911B9E90641919A1314F36E1B099F8E95FE3B7C77BE3349"
 ```
-
 ## xrpToDrops
 
 `xrpToDrops(xrp: string | BigNumber): string`
@@ -5999,7 +5938,6 @@ return api.dropsToXrp('1');
 ```json
 '0.000001'
 ```
-
 ## iso8601ToRippleTime
 
 `iso8601ToRippleTime(iso8601: string): number`
@@ -6027,7 +5965,6 @@ api.iso8601ToRippleTime('2017-02-17T15:04:57Z');
 ```json
 540659097
 ```
-
 ## rippleTimeToISO8601
 
 `rippleTimeToISO8601(rippleTime: number): string`
@@ -6055,7 +5992,6 @@ api.rippleTimeToISO8601(540659097);
 ```json
 '2017-02-17T15:04:57.000Z'
 ```
-
 ## txFlags
 
 `txFlags.TRANSACTION_TYPE.FLAG`
@@ -6137,7 +6073,6 @@ The remaining transaction types do not have any flags at this time.
 * EscrowCancel
 * PaymentChannelCreate
 * PaymentChannelFund
-
 ## schemaValidator
 
 Unlike the rest of the ripple-lib API, schemaValidator is a static object on RippleAPI. It provides utility methods that do not use a server.
@@ -6173,7 +6108,6 @@ RippleAPI.schemaValidator.schemaValidate('sign', {
 ```
 [ValidationError(instance.id does not match pattern "^[A-F0-9]{64}$")]
 ```
-
 # API Events
 
 ## ledger
@@ -6278,4 +6212,3 @@ api.on('disconnected', (code) => {
   }
 });
 ```
-
