@@ -37,41 +37,53 @@ export interface ConnectionOptions {
 export type ConnectionUserOptions = Partial<ConnectionOptions>
 
 /**
- * Ledger is used to store and reference ledger information that has been
- * captured by the Connection class.
+ * LedgerHistory is used to store and reference ledger information that has been
+ * captured by the Connection class over time.
  */
-class Ledger {
+class LedgerHistory {
   private availableVersions = new RangeSet()
   latestVersion: null | number = null
   feeBase: null | number = null
   feeRef: null | number = null
 
-  hasVersions(lowVersion: number, highVersion: number): boolean {
-    return this.availableVersions.containsRange(lowVersion, highVersion)
-  }
-
+  /**
+   * Returns true if the given version exists.
+   */
   hasVersion(version: number): boolean {
     return this.availableVersions.containsValue(version)
   }
 
-  update(data: {
+  /**
+   * Returns true if the given range of versions exist (inclusive).
+   */
+  hasVersions(lowVersion: number, highVersion: number): boolean {
+    return this.availableVersions.containsRange(lowVersion, highVersion)
+  }
+
+  /**
+   * Update LedgerHistory with a new ledger response object. The "responseData"
+   * format lets you pass in any valid rippled ledger response data, regardless
+   * of whether ledger history data exists or not. If relevant ledger data
+   * is found, we'll update our history (ex: from a "ledgerClosed" event).
+   */
+  update(responseData: {
     ledger_index?: string
     validated_ledgers?: string
     fee_base?: string
     fee_ref?: string
   }) {
-    this.latestVersion = Number(data.ledger_index)
-    if (data.validated_ledgers) {
+    this.latestVersion = Number(responseData.ledger_index)
+    if (responseData.validated_ledgers) {
       this.availableVersions.reset()
-      this.availableVersions.parseAndAddRanges(data.validated_ledgers)
+      this.availableVersions.parseAndAddRanges(responseData.validated_ledgers)
     } else {
       this.availableVersions.addValue(this.latestVersion)
     }
-    if (data.fee_base) {
-      this.feeBase = Number(data.fee_base)
+    if (responseData.fee_base) {
+      this.feeBase = Number(responseData.fee_base)
     }
-    if (data.fee_ref) {
-      this.feeRef = Number(data.fee_ref)
+    if (responseData.fee_ref) {
+      this.feeRef = Number(responseData.fee_ref)
     }
   }
 }
@@ -90,13 +102,13 @@ class Connection extends EventEmitter {
 
   private _trace: (id: string, message: string) => void = () => {}
   private _config: ConnectionOptions
-  private _ledger: Ledger
+  private _ledger: LedgerHistory
 
   constructor(url?: string, options: ConnectionUserOptions = {}) {
     super()
     this.setMaxListeners(Infinity)
     this._url = url
-    this._ledger = new Ledger()
+    this._ledger = new LedgerHistory()
     this._config = {
       timeout: 20 * 1000,
       connectionTimeout: 2 * 1000,
@@ -484,6 +496,10 @@ class Connection extends EventEmitter {
     return this._ledger.feeRef!
   }
 
+  /**
+   * Returns true if the given range of ledger versions exist in history
+   * (inclusive).
+   */
   async hasLedgerVersions(
     lowLedgerVersion: number,
     highLedgerVersion: number | undefined
@@ -497,6 +513,9 @@ class Connection extends EventEmitter {
     return this._ledger.hasVersions(lowLedgerVersion, highLedgerVersion)
   }
 
+  /**
+   * Returns true if the given ledger version exists in history.
+   */
   async hasLedgerVersion(ledgerVersion: number): Promise<boolean> {
     await this._waitForReady()
     return this._ledger.hasVersion(ledgerVersion)
@@ -516,11 +535,13 @@ class Connection extends EventEmitter {
   }
 
   request(request, timeout?: number): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (!this._shouldBeConnected) {
         reject(new NotConnectedError())
       }
 
+      await this._waitForReady()
+      
       let timer = null
       const self = this
       const id = this._nextRequestID
