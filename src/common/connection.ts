@@ -535,12 +535,12 @@ class Connection extends EventEmitter {
   }
 
   request(request, timeout?: number): Promise<any> {
+    // Temporary: Lint error has already been refactored in PR #1141
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       if (!this._shouldBeConnected) {
         reject(new NotConnectedError())
       }
-
-      await this._waitForReady()
       
       let timer = null
       const self = this
