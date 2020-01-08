@@ -5611,7 +5611,7 @@ Name | Type | Description
 ---- | ---- | -----------
 options | object | *Optional* Options to control how the address and secret are generated.
 *options.* algorithm | string | *Optional* The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
-*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed.
+*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed. Must be an array of length 16 with values from 0-255 (16 bytes of entropy)
 *options.* test | boolean | *Optional* Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`.
 
 ### Return Value
@@ -5651,7 +5651,7 @@ Name | Type | Description
 ---- | ---- | -----------
 options | object | *Optional* Options to control how the address and secret are generated.
 *options.* algorithm | string | *Optional* The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
-*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed.
+*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed. Must be an array of length 16 with values from 0-255 (16 bytes of entropy)
 *options.* includeClassicAddress | boolean | *Optional* If `true`, return the classic address, in addition to the X-address.
 *options.* test | boolean | *Optional* Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`.
 

@@ -14,7 +14,7 @@
             "minimum": 0,
             "maximum": 255
           },
-          "description": "The entropy to use to generate the seed."
+          "description": "The entropy to use to generate the seed. Must be an array of length 16 with values from 0-255 (16 bytes of entropy)"
         },
         "algorithm": {
           "type": "string",
