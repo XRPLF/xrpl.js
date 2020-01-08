@@ -13,7 +13,7 @@ import {
   RippledNotInitializedError,
   RippleError
 } from './errors'
-const ExponentialBackoff = require('backo')
+import {ExponentialBackoff} from './backoff';
 
 /**
  * ConnectionOptions is the configuration for the Connection class.

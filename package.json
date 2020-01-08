@@ -19,7 +19,6 @@
   "dependencies": {
     "@types/lodash": "^4.14.136",
     "@types/ws": "^6.0.3",
-    "backo": "^1.1.0",
     "bignumber.js": "^9.0.0",
     "https-proxy-agent": "^3.0.0",
     "jsonschema": "1.2.2",
