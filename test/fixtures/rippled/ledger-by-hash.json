@@ -1,21 +1,17 @@
-{  
+{
   "id":1,
-  "result": {  
-    "ledger": {  
-      "accepted": true,
+  "result": {
+    "ledger": {
       "account_hash": "A155BFE86054BE654796EC449E7C374CD5CAA3789BA75D302E7F0F4CE470CCB3",
       "close_flags": 0,
       "close_time": 597496230,
       "close_time_human": "2018-Dec-07 11:10:30.000000000",
       "close_time_resolution": 10,
       "closed": true,
-      "hash": "15F20E5FA6EA9770BBFFDBD62787400960B04BE32803B20C41F117F41C13830D",
       "ledger_hash": "15F20E5FA6EA9770BBFFDBD62787400960B04BE32803B20C41F117F41C13830D",
       "ledger_index": "14995338",
       "parent_close_time": 597496222,
       "parent_hash": "E0BC4F5FB8D9025087BE238664833DFA5658C9E7CE413B3B6F7DF4FFF1EDBF40",
-      "seqNum": "14995338",
-      "totalCoins": "99997114637345372",
       "total_coins": "99997114637345372",
       "transaction_hash": "52C0B6604D2EF203710FEA24F4A3750A4F2BCD5C67D6EB5FB1B2DBAE9A14DCE8"
     },

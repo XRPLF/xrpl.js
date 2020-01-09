@@ -15,11 +15,9 @@ function convertLedgerHeader(header): any {
     hash: header.ledgerHash,
     ledger_hash: header.ledgerHash,
     ledger_index: header.ledgerVersion.toString(),
-    seqNum: header.ledgerVersion.toString(),
     parent_hash: header.parentLedgerHash,
     parent_close_time: common.iso8601ToRippleTime(header.parentCloseTime),
     total_coins: header.totalDrops,
-    totalCoins: header.totalDrops,
     transaction_hash: header.transactionHash
   }
 }
