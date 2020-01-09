@@ -4,7 +4,7 @@ import keypairs from 'ripple-keypairs'
 import binaryCodec from 'ripple-binary-codec'
 import {computeBinaryTransactionHash} from '../common/hashes'
 import {SignOptions, KeyPair, TransactionJSON} from './types'
-import {BigNumber} from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import {xrpToDrops} from '../common'
 import {RippleAPI} from '..'
 const validate = utils.common.validate
