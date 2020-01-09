@@ -4,6 +4,8 @@ An implementation of ripple keypairs & wallet generation using
 [elliptic](https://github.com/indutny/elliptic) which supports rfc6979 and
 eddsa deterministic signatures.
 
+[![NPM](https://nodei.co/npm/ripple-keypairs.png)](https://www.npmjs.org/package/ripple-keypairs)
+
 ## API Methods
 
 ```
