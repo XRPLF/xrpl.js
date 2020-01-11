@@ -19,12 +19,10 @@ export default <TestSuite>{
   },
 
   'getFee - high load_factor': async (api, address) => {
-    api.connection._send(
-      JSON.stringify({
-        command: 'config',
-        data: {highLoadFactor: true}
-      })
-    )
+    api.connection.request({
+      command: 'config',
+      data: {highLoadFactor: true}
+    })
     const fee = await api.getFee()
     assert.strictEqual(fee, '2')
   },
@@ -33,12 +31,10 @@ export default <TestSuite>{
     // Ensure that overriding with high maxFeeXRP of '51540' causes no errors.
     // (fee will actually be 51539.607552)
     api._maxFeeXRP = '51540'
-    api.connection._send(
-      JSON.stringify({
-        command: 'config',
-        data: {highLoadFactor: true}
-      })
-    )
+    api.connection.request({
+      command: 'config',
+      data: {highLoadFactor: true}
+    })
     const fee = await api.getFee()
     assert.strictEqual(fee, '51539.607552')
   },

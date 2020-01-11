@@ -14,12 +14,10 @@ export default <TestSuite>{
   },
 
   'error': async (api, address) => {
-    api.connection._send(
-      JSON.stringify({
-        command: 'config',
-        data: {returnErrorOnServerInfo: true}
-      })
-    )
+    api.connection.request({
+      command: 'config',
+      data: {returnErrorOnServerInfo: true}
+    })
     try {
       await api.getServerInfo()
       throw new Error('Should throw NetworkError')
@@ -31,12 +29,10 @@ export default <TestSuite>{
   },
 
   'no validated ledger': async (api, address) => {
-    api.connection._send(
-      JSON.stringify({
-        command: 'config',
-        data: {serverInfoWithoutValidated: true}
-      })
-    )
+    api.connection.request({
+      command: 'config',
+      data: {serverInfoWithoutValidated: true}
+    })
     const serverInfo = await api.getServerInfo()
     assert.strictEqual(serverInfo.networkLedger, 'waiting')
   },

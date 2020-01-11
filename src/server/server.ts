@@ -9,12 +9,14 @@ function getLedgerVersion(this: RippleAPI): Promise<number> {
   return this.connection.getLedgerVersion()
 }
 
-function connect(this: RippleAPI): Promise<void> {
+async function connect(this: RippleAPI): Promise<void> {
   return this.connection.connect()
 }
 
-function disconnect(this: RippleAPI): Promise<void> {
-  return this.connection.disconnect()
+async function disconnect(this: RippleAPI): Promise<void> {
+  // backwards compatibility: connection.disconnect() can return a number, but
+  // this method returns nothing. SO we await but don't return any result.
+  await this.connection.disconnect()
 }
 
 function formatLedgerClose(ledgerClose: any): object {

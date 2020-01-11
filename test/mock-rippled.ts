@@ -119,12 +119,26 @@ export function createMockRippled(port) {
   mock.on('request_config', function(request, conn) {
     assert.strictEqual(request.command, 'config')
     conn.config = _.assign(conn.config, request.data)
+    conn.send(
+      createResponse(request, {
+        status: 'success',
+        type: 'response',
+        result: {}
+      })
+    )
   })
 
   mock.on('request_test_command', function(request, conn) {
     assert.strictEqual(request.command, 'test_command')
     if (request.data.disconnectIn) {
       setTimeout(conn.terminate.bind(conn), request.data.disconnectIn)
+      conn.send(
+        createResponse(request, {
+          status: 'success',
+          type: 'response',
+          result: {}
+        })
+      )
     } else if (request.data.openOnOtherPort) {
       getFreePort().then(newPort => {
         createMockRippled(newPort)
@@ -145,12 +159,27 @@ export function createMockRippled(port) {
           }, request.data.closeServerAndReopen)
         })
       }, 10)
+    } else if (request.data.unrecognizedResponse) {
+      conn.send(
+        createResponse(request, {
+          status: 'unrecognized',
+          type: 'response',
+          result: {}
+        })
+      )
     }
   })
 
   mock.on('request_global_config', function(request, conn) {
     assert.strictEqual(request.command, 'global_config')
     mock.config = _.assign(conn.config, request.data)
+    conn.send(
+      createResponse(request, {
+        status: 'success',
+        type: 'response',
+        result: {}
+      })
+    )
   })
 
   mock.on('request_echo', function(request, conn) {

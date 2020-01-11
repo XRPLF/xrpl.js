@@ -139,3 +139,15 @@ export function loadTestSuites(): LoadedTestSuite[] {
     })
     .filter(Boolean)
 }
+
+/**
+ * Ignore WebSocket DisconnectErrors. Useful for making requests where we don't
+ * care about the response and plan to teardown the test before the response
+ * has come back.
+ */
+export function ignoreWebSocketDisconnect(error: Error): void {
+  if (error.message === 'websocket was closed') {
+    return
+  }
+  throw error
+}

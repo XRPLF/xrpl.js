@@ -4,6 +4,7 @@ import setupAPI from './setup-api'
 import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close.json'
 import {RippleAPI} from 'ripple-api'
+import {ignoreWebSocketDisconnect} from './utils'
 const schemaValidator = RippleAPI._PRIVATE.schemaValidator
 
 const TIMEOUT = 20000
@@ -43,12 +44,12 @@ describe('RippleAPIBroadcast', function() {
     ledgerNext.ledger_index++
 
     this.api._apis.forEach(api =>
-      api.connection._send(
-        JSON.stringify({
+      api.connection
+        .request({
           command: 'echo',
           data: ledgerNext
         })
-      )
+        .catch(ignoreWebSocketDisconnect)
     )
 
     setTimeout(() => {
@@ -63,11 +64,11 @@ describe('RippleAPIBroadcast', function() {
       assert.strictEqual(info, 'info')
       done()
     })
-    this.api._apis[1].connection._send(
-      JSON.stringify({
+    this.api._apis[1].connection
+      .request({
         command: 'echo',
         data: {error: 'type', error_message: 'info'}
       })
-    )
+      .catch(ignoreWebSocketDisconnect)
   })
 })
