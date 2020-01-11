@@ -79,6 +79,25 @@ describe('Connection', function() {
     })
   })
 
+  it('ledger methods work as expected', async function() {
+    assert.strictEqual(await this.api.connection.getLedgerVersion(), 8819951)
+    assert.strictEqual(
+      await this.api.connection.hasLedgerVersion(8819951),
+      true
+    )
+    assert.strictEqual(
+      await this.api.connection.hasLedgerVersions(8819951, undefined),
+      true
+    )
+    // It would be nice to test a better range, but the mocked ledger only supports this single number
+    assert.strictEqual(
+      await this.api.connection.hasLedgerVersions(8819951, 8819951),
+      true
+    )
+    assert.strictEqual(await this.api.connection.getFeeBase(), 10)
+    assert.strictEqual(await this.api.connection.getFeeRef(), 10)
+  })
+
   it('with proxy', function(done) {
     if (isBrowser) {
       done()
