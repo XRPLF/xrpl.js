@@ -745,6 +745,33 @@ export default <TestSuite>{
     return assertResultMatch(response, expected, 'prepare')
   },
 
+  'AccountDelete': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '5.0' // 5 XRP fee for AccountDelete
+    }
+
+    const txJSON = {
+      TransactionType: 'AccountDelete',
+      Account: address,
+      Destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe'
+    }
+
+    const response = await api.prepareTransaction(txJSON, localInstructions)
+    const expected = {
+      txJSON:
+        '{"TransactionType":"AccountDelete","Account":"' +
+        address +
+        '","Destination":"rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe","Flags":2147483648,"LastLedgerSequence":8820051,"Fee":"12","Sequence":23}',
+      instructions: {
+        fee: '0.000012',
+        sequence: 23,
+        maxLedgerVersion: 8820051
+      }
+    }
+    return assertResultMatch(response, expected, 'prepare')
+  },
+
   // prepareTransaction - Payment
   'Payment - normal': async (api, address) => {
     const localInstructions = {

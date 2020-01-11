@@ -62,6 +62,8 @@ function loadSchemas() {
     require('./schemas/specifications/check-cash.json'),
     require('./schemas/specifications/check-cancel.json'),
     require('./schemas/specifications/trustline.json'),
+    require('./schemas/specifications/deposit-preauth.json'),
+    require('./schemas/specifications/account-delete.json'),
     require('./schemas/output/sign.json'),
     require('./schemas/output/submit.json'),
     require('./schemas/output/get-account-info.json'),

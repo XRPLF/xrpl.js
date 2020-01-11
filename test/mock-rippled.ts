@@ -555,6 +555,11 @@ export function createMockRippled(port) {
       conn.send(createResponse(request, fixtures.tx.PaymentChannelClaim))
     } else if (
       request.transaction ===
+      'EC2AB14028DC84DE525470AB4DAAA46358B50A8662C63804BFF38244731C0CB9'
+    ) {
+      conn.send(createResponse(request, fixtures.tx.AccountDelete))
+    } else if (
+      request.transaction ===
       'AFB3ADF22F3C605E23FAEFAA185F3BD763C4692CAC490D9819D117CD33BFAA11'
     ) {
       conn.send(createResponse(request, fixtures.tx.Unrecognized))
