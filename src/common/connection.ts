@@ -134,12 +134,14 @@ class Connection extends EventEmitter {
   }
 
   _onUnexpectedClose(beforeOpen, resolve, reject, code) {
-    if (this._onOpenErrorBound) {
+    if (this._onOpenErrorBound && this._ws) {
       this._ws!.removeListener('error', this._onOpenErrorBound)
-      this._onOpenErrorBound = null
     }
-    // just in case
-    this._ws!.removeAllListeners('open')
+    this._onOpenErrorBound = null
+    if (this._ws) {
+      // just in case
+      this._ws!.removeAllListeners('open')
+    }
     this._ws = null
     this._isReady = false
     if (beforeOpen) {
