@@ -1,5 +1,20 @@
 # ripple-lib Release History
 
+## 1.6.1 (2020-01-14)
+
+* Documentation
+  * Document message type 'path_find' (#1121) (thanks @r0bertz)
+  * Improve documentation for address generation; functions that can be called offline; generateXAddress() (#1158, #1159, #1169) (thanks @hbergren)
+  * Add [Security Policy](https://github.com/ripple/ripple-lib/blob/develop/SECURITY.md)
+* Bug fixes
+  * Types: Fix AccountObjectsResponse structure (#1127) (thanks @you21979)
+  * In some cases, ripple-lib would fail to wait for the connection to be ready (#1119)
+* Dependencies
+  * Update docs dependencies, ejs and doctoc (#1153)
+  * Update eslint, ripple-lib-transactionparser, typescript, nyc, ws, @types/node, ripple-binary-codec, mocha, mocha-junit-reporter
+* Internal
+  * Add LedgerHistory to Connection (#1119): Moved ledger logic into its own Ledger class
+
 ## 1.6.0 (2020-01-06)
 
 * Add support for AccountDelete (#1120)
@@ -447,7 +462,7 @@ f28921f57a133678dcb3cb54c497626bd76b1f953d22d61f3ddca31c8947d552  ripple-1.1.0-m
 The SHA-256 checksums for the browser version of this release can be found
 below.
 ```
-% shasum -a 256 * 
+% shasum -a 256 *
 2556fe17296e127ed44e7066e90a6175e2b164f00ca3c1aa7b1c554f31c688dd  ripple-1.0.2-debug.js
 e0342ea21eac32a1024c62034fba09c6f26dd3e7371b23ea1e153e03135cd590  ripple-1.0.2-min.js
 c7286c517497d018d02d09257e81172b61d36c8b9885a077af68e8133c3b3b9b  ripple-1.0.2.js
