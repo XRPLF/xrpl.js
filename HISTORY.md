@@ -2,6 +2,8 @@
 
 ## 1.6.1 (2020-01-14)
 
+> **Update Note:** In this release we refactored the internal connection logic of ripple-lib to improve resiliency across dropped messages and reconnects. The external interface remains the same, with zero changes to public methods/properties. However, If you experience any problems around connections, requests, and request retries, please file an issue with the repo (and be sure to test against v1.6.0 to confirm that the problem was introduced in this version).
+
 * Documentation
   * Document message type 'path_find' (#1121) (thanks @r0bertz)
   * Improve documentation for address generation; functions that can be called offline; generateXAddress() (#1158, #1159, #1169) (thanks @hbergren)
