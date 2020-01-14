@@ -153,10 +153,10 @@ class RippleAPI extends EventEmitter {
       })
       this.connection.on('disconnected', code => {
         let finalCode = code
-        // This is a backwards-compatible fix for this change in the ws library:
-        //   https://github.com/websockets/ws/issues/1257
+        // 1005: This is a backwards-compatible fix for this change in the ws library: https://github.com/websockets/ws/issues/1257
+        // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
         // TODO: Remove in next major, breaking version
-        if (finalCode === 1005) {
+        if (finalCode === 1005 || finalCode === 4000) {
           finalCode = 1000
         }
         this.emit('disconnected', finalCode)

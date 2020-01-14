@@ -1,4 +1,6 @@
 export interface SignerEntry {
-  Account: string
-  SignerWeight: number
+  SignerEntry: {
+    Account: string
+    SignerWeight: number
+  }
 }

@@ -1,4 +1,4 @@
-import Connection from '../../src/common/connection'
+import {Connection} from '../../src/common/connection'
 
 const request1 = {
   command: 'server_info'
