@@ -14,10 +14,10 @@ function hexToBytes(a) {
   return (new BN(a, 16)).toArray(null, a.length / 2)
 }
 
-function computePublicKeyHash(publicKeyBytes: Buffer): number[] {
+function computePublicKeyHash(publicKeyBytes: Buffer): Buffer {
   const hash256 = hashjs.sha256().update(publicKeyBytes).digest()
   const hash160 = hashjs.ripemd160().update(hash256).digest()
-  return hash160
+  return Buffer.from(hash160)
 }
 
 function seedFromPhrase(phrase) {

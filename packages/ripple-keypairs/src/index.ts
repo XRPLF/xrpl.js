@@ -3,7 +3,7 @@ import * as brorand from 'brorand'
 import * as hashjs from 'hash.js'
 import * as elliptic from 'elliptic'
 
-import * as addressCodec from './ripple-address-codec'
+import * as addressCodec from 'ripple-address-codec'
 import {derivePrivateKey, accountPublicFromPublicGenerator} from './secp256k1'
 import * as utils from './utils'
 

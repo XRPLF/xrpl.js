@@ -3,7 +3,7 @@
 'use strict'
 
 const assert = require('assert')
-const api = require('../dist/ripple-address-codec')
+const api = require('ripple-address-codec')
 
 function toHex(bytes) {
   return Buffer.from(bytes).toString('hex').toUpperCase()
