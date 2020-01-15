@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "babel-runtime": "^5.8.20",
-    "bn.js": "^3.1.1",
+    "bn.js": "^5.1.1",
     "brorand": "^1.0.5",
     "elliptic": "^6.4.0",
     "hash.js": "^1.0.3",
