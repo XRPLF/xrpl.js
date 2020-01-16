@@ -371,7 +371,11 @@ export class Connection extends EventEmitter {
    * If this succeeds, we're good. If it fails, disconnect so that the consumer can reconnect, if desired.
    */
   private _heartbeat = () => {
-    return this.request({command: 'ping'}).catch(() => this.reconnect())
+    return this.request({command: 'ping'}).catch(() => { 
+        this.reconnect().catch((error) => {
+          this.emit('error', 'reconnect', error.message, error)
+        })
+    })
   }
 
   /**

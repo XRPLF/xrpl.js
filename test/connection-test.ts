@@ -360,6 +360,34 @@ describe('Connection', function() {
     })
   })
 
+  it('heartbeat failure and reconnect failure', function(done) {
+    if (isBrowser) {
+      const phantomTest = /PhantomJS/
+      if (phantomTest.test(navigator.userAgent)) {
+        // inside PhantomJS this one just hangs, so skip as not very relevant
+        done()
+        return
+      }
+    }
+    // Set the heartbeat to less than the 1 second ping response
+    this.api.connection._config.timeout = 500
+    // Drop the test runner timeout, since this should be a quick test
+    this.timeout(5000)
+    // fail on reconnect/connection
+    this.api.connection.reconnect = async () => {
+      throw new Error('error on reconnect')
+    }
+    // Hook up a listener for the reconnect error event
+    this.api.on('error', (error, message) => { 
+      if(error === 'reconnect' && message === 'error on reconnect') {
+        return done()
+      }
+      return done(new Error('Expected error on reconnect'))
+    })
+    // Trigger a heartbeat
+    this.api.connection._heartbeat()
+  })
+
   it('should emit disconnected event with code 1000 (CLOSE_NORMAL)', function(done) {
     this.api.once('disconnected', code => {
       assert.strictEqual(code, 1000)
