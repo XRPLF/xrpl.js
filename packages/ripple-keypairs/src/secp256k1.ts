@@ -6,7 +6,7 @@ const secp256k1 = elliptic.ec('secp256k1')
 // TODO: type of `discrim`?
 function deriveScalar(bytes, discrim?: any) {
   const order = secp256k1.curve.n
-  for (let i = 0; i <= 0xFFFFFFFF; i++) {
+  for (let i = 0; i <= 0xffffffff; i++) {
     // We hash the bytes to find a 256 bit number, looping until we are sure it
     // is less than the order of the curve.
     const hasher = new Sha512().add(bytes)
@@ -24,18 +24,21 @@ function deriveScalar(bytes, discrim?: any) {
 }
 
 /**
-* @param {Array} seed - bytes
-* @param {Object} [opts] - object
-* @param {Number} [opts.accountIndex=0] - the account number to generate
-* @param {Boolean} [opts.validator=false] - generate root key-pair,
-*                                              as used by validators.
-* @return {bn.js} - 256 bit scalar value
-*
-*/
-export function derivePrivateKey(seed, opts: {
-  validator?: boolean,
-  accountIndex?: number
-} = {}) {
+ * @param {Array} seed - bytes
+ * @param {Object} [opts] - object
+ * @param {Number} [opts.accountIndex=0] - the account number to generate
+ * @param {Boolean} [opts.validator=false] - generate root key-pair,
+ *                                              as used by validators.
+ * @return {bn.js} - 256 bit scalar value
+ *
+ */
+export function derivePrivateKey(
+  seed,
+  opts: {
+    validator?: boolean
+    accountIndex?: number
+  } = {},
+) {
   const root = opts.validator
   const order = secp256k1.curve.n
 
@@ -51,7 +54,8 @@ export function derivePrivateKey(seed, opts: {
   // Almost everyone just uses the first account, `0`.
   const accountIndex = opts.accountIndex || 0
   return deriveScalar(publicGen.encodeCompressed(), accountIndex)
-            .add(privateGen).mod(order)
+    .add(privateGen)
+    .mod(order)
 }
 
 export function accountPublicFromPublicGenerator(publicGenBytes) {

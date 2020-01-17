@@ -4,19 +4,21 @@ import * as hashjs from 'hash.js'
 import * as elliptic from 'elliptic'
 
 import * as addressCodec from 'ripple-address-codec'
-import {derivePrivateKey, accountPublicFromPublicGenerator} from './secp256k1'
+import { derivePrivateKey, accountPublicFromPublicGenerator } from './secp256k1'
 import * as utils from './utils'
 
 const Ed25519 = elliptic.eddsa('ed25519')
 const Secp256k1 = elliptic.ec('secp256k1')
 
-const hexToBytes = utils.hexToBytes
-const bytesToHex = utils.bytesToHex
+const { hexToBytes } = utils
+const { bytesToHex } = utils
 
-function generateSeed(options: {
-  entropy?: Uint8Array,
-  algorithm?: 'ed25519' | 'secp256k1'
-} = {}) {
+function generateSeed(
+  options: {
+    entropy?: Uint8Array
+    algorithm?: 'ed25519' | 'secp256k1'
+  } = {},
+) {
   assert(!options.entropy || options.entropy.length >= 16, 'entropy too short')
   const entropy = options.entropy ? options.entropy.slice(0, 16) : brorand(16)
   const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1'
@@ -24,51 +26,74 @@ function generateSeed(options: {
 }
 
 function hash(message) {
-  return hashjs.sha512().update(message).digest().slice(0, 32)
+  return hashjs
+    .sha512()
+    .update(message)
+    .digest()
+    .slice(0, 32)
 }
 
 const secp256k1 = {
-  deriveKeypair: function(entropy, options) {
+  deriveKeypair(entropy, options) {
     const prefix = '00'
-    const privateKey = prefix + derivePrivateKey(entropy, options)
-      .toString(16, 64).toUpperCase()
-    const publicKey = bytesToHex(Secp256k1.keyFromPrivate(
-      privateKey.slice(2)).getPublic().encodeCompressed())
-    return {privateKey, publicKey}
+
+    const privateKey =
+      prefix +
+      derivePrivateKey(entropy, options)
+        .toString(16, 64)
+        .toUpperCase()
+
+    const publicKey = bytesToHex(
+      Secp256k1.keyFromPrivate(privateKey.slice(2))
+        .getPublic()
+        .encodeCompressed(),
+    )
+    return { privateKey, publicKey }
   },
-  sign: function(message, privateKey) {
-    return bytesToHex(Secp256k1.sign(hash(message),
-      hexToBytes(privateKey), {canonical: true}).toDER())
+
+  sign(message, privateKey) {
+    return bytesToHex(
+      Secp256k1.sign(hash(message), hexToBytes(privateKey), {
+        canonical: true,
+      }).toDER(),
+    )
   },
-  verify: function(message, signature, publicKey) {
+
+  verify(message, signature, publicKey) {
     return Secp256k1.verify(hash(message), signature, hexToBytes(publicKey))
-  }
+  },
 }
 
 const ed25519 = {
-  deriveKeypair: function(entropy) {
+  deriveKeypair(entropy) {
     const prefix = 'ED'
     const rawPrivateKey = hash(entropy)
     const privateKey = prefix + bytesToHex(rawPrivateKey)
-    const publicKey = prefix + bytesToHex(
-      Ed25519.keyFromSecret(rawPrivateKey).pubBytes())
-    return {privateKey, publicKey}
+    const publicKey =
+      prefix + bytesToHex(Ed25519.keyFromSecret(rawPrivateKey).pubBytes())
+    return { privateKey, publicKey }
   },
-  sign: function(message, privateKey) {
+
+  sign(message, privateKey) {
     // caution: Ed25519.sign interprets all strings as hex, stripping
     // any non-hex characters without warning
     assert(Array.isArray(message), 'message must be array of octets')
-    return bytesToHex(Ed25519.sign(
-      message, hexToBytes(privateKey).slice(1)).toBytes())
+    return bytesToHex(
+      Ed25519.sign(message, hexToBytes(privateKey).slice(1)).toBytes(),
+    )
   },
-  verify: function(message, signature, publicKey) {
-    return Ed25519.verify(message, hexToBytes(signature),
-      hexToBytes(publicKey).slice(1))
-  }
+
+  verify(message, signature, publicKey) {
+    return Ed25519.verify(
+      message,
+      hexToBytes(signature),
+      hexToBytes(publicKey).slice(1),
+    )
+  },
 }
 
 function select(algorithm) {
-  const methods = {'ecdsa-secp256k1': secp256k1, ed25519}
+  const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 }
   return methods[algorithm]
 }
 
@@ -87,8 +112,9 @@ function deriveKeypair(seed, options) {
 
 function getAlgorithmFromKey(key) {
   const bytes = hexToBytes(key)
-  return (bytes.length === 33 && bytes[0] === 0xED) ?
-    'ed25519' : 'ecdsa-secp256k1'
+  return bytes.length === 33 && bytes[0] === 0xed
+    ? 'ed25519'
+    : 'ecdsa-secp256k1'
 }
 
 function sign(messageHex, privateKey) {
@@ -103,7 +129,8 @@ function verify(messageHex, signature, publicKey) {
 
 function deriveAddressFromBytes(publicKeyBytes: Buffer) {
   return addressCodec.encodeAccountID(
-    utils.computePublicKeyHash(publicKeyBytes))
+    utils.computePublicKeyHash(publicKeyBytes),
+  )
 }
 
 function deriveAddress(publicKey) {
@@ -116,7 +143,7 @@ function deriveNodeAddress(publicKey) {
   return deriveAddressFromBytes(accountPublicBytes)
 }
 
-const decodeSeed = addressCodec.decodeSeed
+const { decodeSeed } = addressCodec
 
 module.exports = {
   generateSeed,
@@ -125,5 +152,5 @@ module.exports = {
   verify,
   deriveAddress,
   deriveNodeAddress,
-  decodeSeed
+  decodeSeed,
 }
