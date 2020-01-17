@@ -1,5 +1,12 @@
 # ripple-lib Release History
 
+## 1.6.2 (2020-01-17)
+
+* Bug fix: Catch possible error in reconnect() on _heartbeat(), emit reconnect error (#1179)
+* Docs: Fix whitespace
+* Dependencies
+  * Update @typescript-eslint/eslint-plugin, ts-node, @types/node, @types/ws, typescript
+
 ## 1.6.1 (2020-01-14)
 
 > **Update Note:** In this release we refactored the internal connection logic of ripple-lib to improve resiliency across dropped messages and reconnects. The external interface remains the same, with zero changes to public methods/properties. However, If you experience any problems around connections, requests, and request retries, please [file an issue]( https://github.com/ripple/ripple-lib/issues/new) with the repo (and be sure to test against v1.6.0 to confirm that the problem was introduced in this version).
