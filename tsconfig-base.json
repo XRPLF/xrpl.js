@@ -6,10 +6,10 @@
     "moduleResolution": "node",
 
     "declaration": true,
-    "declarationMap": true /* Added 2019-04-13 */,
+    "declarationMap": true,
     "sourceMap": true,
 
-    "strict": true /* Enable all strict type-checking options. */,
+    "strict": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "noUnusedLocals": true,
