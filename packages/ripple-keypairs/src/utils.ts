@@ -29,12 +29,4 @@ function computePublicKeyHash(publicKeyBytes: Buffer): Buffer {
   return Buffer.from(hash160)
 }
 
-function seedFromPhrase(phrase) {
-  return hashjs
-    .sha512()
-    .update(phrase)
-    .digest()
-    .slice(0, 16)
-}
-
-export { bytesToHex, hexToBytes, computePublicKeyHash, seedFromPhrase }
+export { bytesToHex, hexToBytes, computePublicKeyHash }
