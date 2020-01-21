@@ -32,8 +32,8 @@
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-mocha": "^6.2.2",
     "eslint-plugin-prettier": "^3.1.2",
-    "istanbul": "~0.3.5",
-    "mocha": "~2.3.3",
+    "mocha": "^7.0.0",
+    "nyc": "^15.0.0",
     "prettier": "^1.19.1",
     "typescript": "^3.1.3"
   },
@@ -41,7 +41,7 @@
     "compile": "tsc",
     "compile-babel": "babel --optional runtime -d distrib/npm/ src/",
     "compile-with-source-maps": "babel --optional runtime -s -t -d distrib/npm/ src/",
-    "test": "tsc && istanbul test _mocha",
+    "test": "tsc && nyc mocha",
     "lint": "eslint . --ext .ts --fix"
   },
   "repository": {
