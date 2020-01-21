@@ -3,8 +3,7 @@ import Sha512 from './sha512'
 
 const secp256k1 = elliptic.ec('secp256k1')
 
-// TODO: type of `discrim`?
-function deriveScalar(bytes, discrim?: any) {
+function deriveScalar(bytes, discrim?: number) {
   const order = secp256k1.curve.n
   for (let i = 0; i <= 0xffffffff; i++) {
     // We hash the bytes to find a 256 bit number, looping until we are sure it
