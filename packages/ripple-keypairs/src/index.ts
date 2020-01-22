@@ -104,6 +104,7 @@ function deriveKeypair(seed, options) {
   const keypair = method.deriveKeypair(decoded.bytes, options)
   const messageToVerify = hash('This test message should verify.')
   const signature = method.sign(messageToVerify, keypair.privateKey)
+  /* istanbul ignore if */
   if (method.verify(messageToVerify, signature, keypair.publicKey) !== true) {
     throw new Error('derived keypair did not generate verifiable signature')
   }

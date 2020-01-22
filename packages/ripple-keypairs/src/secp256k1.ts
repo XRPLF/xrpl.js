@@ -15,10 +15,12 @@ function deriveScalar(bytes, discrim?: number) {
     }
     hasher.addU32(i)
     const key = hasher.first256BN()
+    /* istanbul ignore else */
     if (key.cmpn(0) > 0 && key.cmp(order) < 0) {
       return key
     }
   }
+  /* istanbul ignore next */
   throw new Error('impossible unicorn ;)')
 }
 
