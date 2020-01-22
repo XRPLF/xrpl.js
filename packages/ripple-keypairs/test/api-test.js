@@ -42,6 +42,16 @@ describe('api', () => {
     assert.deepEqual(keypair, fixtures.ed25519.keypair)
   })
 
+  it('deriveKeypair - secp256k1 - validator', () => {
+    const keypair = api.deriveKeypair(fixtures.secp256k1.seed, {validator: true})
+    assert.deepEqual(keypair, fixtures.secp256k1.validatorKeypair)
+  })
+
+  it('deriveKeypair - ed25519 - validator', () => {
+    const keypair = api.deriveKeypair(fixtures.ed25519.seed, {validator: true})
+    assert.deepEqual(keypair, fixtures.ed25519.validatorKeypair)
+  })
+
   it('deriveAddress - secp256k1 public key', () => {
     const address = api.deriveAddress(fixtures.secp256k1.keypair.publicKey)
     assert.strictEqual(address, fixtures.secp256k1.address)
