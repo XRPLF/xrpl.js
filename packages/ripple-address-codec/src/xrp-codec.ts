@@ -37,7 +37,8 @@ class Codec {
 
   encodeVersioned(bytes: Buffer, versions: number[], expectedLength: number): string {
     if (expectedLength && bytes.length !== expectedLength) {
-      throw new Error('unexpected_payload_length: bytes.length does not match expectedLength')
+      throw new Error('unexpected_payload_length: bytes.length does not match expectedLength.' +
+        ' Ensure that the bytes are a Buffer.')
     }
     return this.encodeChecked(Buffer.from(concatArgs(versions, bytes)))
   }
@@ -122,9 +123,12 @@ class Codec {
 // Pure JavaScript hash functions in the browser, native hash functions in Node.js
 const createHash = require('create-hash')
 
-const NODE_PUBLIC = 28
-const ACCOUNT_ID = 0
-const FAMILY_SEED = 0x21 // 33
+// base58 encodings: https://xrpl.org/base58-encodings.html
+const ACCOUNT_ID = 0 // Account address (20 bytes)
+const ACCOUNT_PUBLIC_KEY = 0x23 // Account public key (33 bytes)
+const FAMILY_SEED = 0x21 // 33; Seed value (for secret keys) (16 bytes)
+const NODE_PUBLIC = 0x1C // 28; Validation public key (33 bytes)
+
 const ED25519_SEED = [0x01, 0xE1, 0x4B] // [1, 225, 75]
 
 const codecOptions = {
@@ -189,6 +193,16 @@ export function decodeNodePublic(base58string: string): Buffer {
 export function encodeNodePublic(bytes: Buffer): string {
   const opts = {versions: [NODE_PUBLIC], expectedLength: 33}
   return codecWithXrpAlphabet.encode(bytes, opts)
+}
+
+export function encodeAccountPublic(bytes: Buffer): string {
+  const opts = {versions: [ACCOUNT_PUBLIC_KEY], expectedLength: 33}
+  return codecWithXrpAlphabet.encode(bytes, opts)
+}
+
+export function decodeAccountPublic(base58string: string): Buffer {
+  const opts = {versions: [ACCOUNT_PUBLIC_KEY], expectedLength: 33}
+  return codecWithXrpAlphabet.decode(base58string, opts).bytes
 }
 
 export function isValidClassicAddress(address: string): boolean {

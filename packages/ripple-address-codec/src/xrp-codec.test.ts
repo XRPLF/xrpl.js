@@ -5,7 +5,7 @@ function toHex(bytes: Buffer) {
 }
 
 function toBytes(hex: string) {
-  return Buffer.from(hex, 'hex').toJSON().data
+  return Buffer.from(hex, 'hex')
 }
 
 /**
@@ -33,6 +33,10 @@ makeEncodeDecodeTest(api.encodeAccountID, api.decodeAccountID, 'rJrRMgiRgrU6hDF4
 makeEncodeDecodeTest(api.encodeNodePublic, api.decodeNodePublic,
   'n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH',
   '0388E5BA87A000CB807240DF8C848EB0B5FFA5C8E5A521BC8E105C0F0A44217828')
+
+  makeEncodeDecodeTest(api.encodeAccountPublic, api.decodeAccountPublic,
+    'aB44YfzW24VDEJQ2UuLPV2PvqcPCSoLnL7y5M1EzhdW4LnK5xMS3',
+    '023693F15967AE357D0327974AD46FE3C127113B1110D6044FD41E723689F81CC6')
 
 test('can decode arbitrary seeds', function() {
   const decoded = api.decodeSeed('sEdTM1uX8pu2do5XvTnutH6HsouMaM2')
