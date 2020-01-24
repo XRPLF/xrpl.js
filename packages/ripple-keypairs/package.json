@@ -48,5 +48,8 @@
     "type": "git",
     "url": "git://github.com/ripple/ripple-keypairs.git"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ">= 8"
+  }
 }

@@ -1,25 +1,31 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": [
-      "es2017"
-    ],
+    // Basic Options
+    "target": "ES6",
+    "module": "commonjs",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    // Directories
     "outDir": "dist",
     "rootDir": "src",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "strictNullChecks": false,
+
+    // Strict Type-Checking Options
+    "strict": true,
     "noImplicitAny": false,
+
+    // Additional Checks
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "removeComments": false,
-    "preserveConstEnums": false,
-    "suppressImplicitAnyIndexErrors": false,
-    "sourceMap": true,
-    "skipLibCheck": true,
-    "allowJs": true
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Module Resolution Options
+    "moduleResolution": "node",
+
+    // Advanced Options
+    "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }
