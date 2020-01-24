@@ -605,7 +605,7 @@ describe('Connection', function() {
       await new Promise((resolve, reject) => {
         setTimeout(async () => {
           this.api.connect().then(resolve).catch(reject); // should succeed and not throw websocket not cleaned up error
-        }, 1)
+        }, 1000)
       })
     }
   })
