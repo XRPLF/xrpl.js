@@ -590,6 +590,30 @@ describe('Connection', function() {
     }
   )
 
+  it('should clean up websocket connection if error after websocket is opened', async function() {
+    await this.api.disconnect();
+    // fail on connection
+    this.api.connection._subscribeToLedger = async () => {
+      throw new Error('error on _subscribeToLedger')
+    }
+    try {
+      await this.api.connect();
+    } catch (err) {
+      // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
+      // do not fail on connection anymore
+      this.api.connection._subscribeToLedger = async () => {}
+      try {
+        await new Promise((resolve, reject) => {
+          setTimeout(async () => {
+            this.api.connect().then(resolve).catch(reject); // should succeed and not throw websocket not cleaned up error
+          }, 1)
+        })
+      } catch (err) {
+        throw err;
+      }
+    }
+  })
+
   it('should try to reconnect on empty subscribe response on reconnect', function(done) {
     this.timeout(23000)
     this.api.on('error', error => {
