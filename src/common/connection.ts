@@ -521,9 +521,7 @@ export class Connection extends EventEmitter {
         this.emit('connected')
       } catch (error) {
         this._connectionManager.rejectAllAwaiting(error)
-        await this.disconnect().catch(() => {
-          this.emit('error', 'disconnect', error.message, error)
-        })
+        await this.disconnect().catch(() => {}) // Ignore this error, propagate the root cause.
       }
     })
     return this._connectionManager.awaitConnection()
