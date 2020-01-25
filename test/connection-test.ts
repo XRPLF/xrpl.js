@@ -604,11 +604,7 @@ describe('Connection', function() {
       // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
       // do not fail on connection anymore
       this.api.connection._subscribeToLedger = async () => {}
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          this.api.connect().then(resolve).catch(reject); // should succeed and not throw websocket not cleaned up error
-        }, 1000)
-      })
+      await this.api.connection.reconnect();
     }
   })
 
