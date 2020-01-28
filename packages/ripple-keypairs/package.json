@@ -1,6 +1,6 @@
 {
   "name": "ripple-keypairs",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "files": [
     "dist/*"
@@ -14,8 +14,8 @@
     "brorand": "^1.0.5",
     "elliptic": "^6.5.2",
     "hash.js": "^1.0.3",
-    "source-map-support": "^0.5.13",
-    "ripple-address-codec": "^4.0.0"
+    "ripple-address-codec": "^4.0.0",
+    "source-map-support": "^0.5.13"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
