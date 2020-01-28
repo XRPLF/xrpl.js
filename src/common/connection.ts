@@ -257,9 +257,9 @@ class Connection extends EventEmitter {
   _createWebSocket(): WebSocket {
     const options: WebSocket.ClientOptions = {}
 
-    const trustedCertificates = this._trustedCertificates
+    let trustedCertificates = this._trustedCertificates
     if (this._includeSystemTrustedCertificates)
-      trustedCertificates.concat(rootCertificates)
+      trustedCertificates = trustedCertificates.concat(rootCertificates)
 
     if (this._proxyURL !== undefined) {
       const parsedURL = parseUrl(this._url)

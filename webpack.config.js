@@ -9,6 +9,7 @@ function getDefaultConfiguration() {
   performance: { hints: false },
   stats: 'errors-only',
   externals: [{
+    'tls': 'tls',
     'lodash': '_'
   }],
   entry: './dist/npm/index.js',
