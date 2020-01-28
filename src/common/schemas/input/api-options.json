@@ -47,6 +47,10 @@
         "description": "A PEM-formatted SSL certificate to trust when connecting to a proxy."
       }
     },
+    "includeSystemTrustedCertificates": {
+      "type": "boolean",
+      "description": "If true, include system trusted certificates (default: true), in addition to the trustedCertificates provided"
+    },
     "key": {
       "type": "string",
       "description": "A string containing the private key of the client in PEM format. (Can be an array of keys)."

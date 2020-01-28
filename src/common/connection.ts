@@ -6,6 +6,7 @@ import RangeSet from './rangeset'
 import {RippledError, DisconnectedError, NotConnectedError,
   TimeoutError, ResponseFormatError, ConnectionError,
   RippledNotInitializedError} from './errors'
+import {rootCertificates} from 'tls'
 
 export interface ConnectionOptions {
   trace?: boolean
@@ -13,6 +14,7 @@ export interface ConnectionOptions {
   proxyAuthorization?: string
   authorization?: string
   trustedCertificates?: string[]
+  includeSystemTrustedCertificates?: boolean
   key?: string
   passphrase?: string
   certificate?: string
@@ -29,6 +31,7 @@ class Connection extends EventEmitter {
   private _proxyAuthorization?: string
   private _authorization?: string
   private _trustedCertificates?: string[]
+  private _includeSystemTrustedCertificates: boolean
   private _key?: string
   private _passphrase?: string
   private _certificate?: string
@@ -61,6 +64,7 @@ class Connection extends EventEmitter {
     this._proxyAuthorization = options.proxyAuthorization
     this._authorization = options.authorization
     this._trustedCertificates = options.trustedCertificates
+    this._includeSystemTrustedCertificates = (typeof options.includeSystemTrustedCertificates === 'undefined') ? true : options.includeSystemTrustedCertificates
     this._key = options.key
     this._passphrase = options.passphrase
     this._certificate = options.certificate
@@ -252,6 +256,11 @@ class Connection extends EventEmitter {
 
   _createWebSocket(): WebSocket {
     const options: WebSocket.ClientOptions = {}
+
+    const trustedCertificates = this._trustedCertificates
+    if (this._includeSystemTrustedCertificates)
+      trustedCertificates.concat(rootCertificates)
+
     if (this._proxyURL !== undefined) {
       const parsedURL = parseUrl(this._url)
       const parsedProxyURL = parseUrl(this._proxyURL)
@@ -259,7 +268,7 @@ class Connection extends EventEmitter {
         secureEndpoint: (parsedURL.protocol === 'wss:'),
         secureProxy: (parsedProxyURL.protocol === 'https:'),
         auth: this._proxyAuthorization,
-        ca: this._trustedCertificates,
+        ca: trustedCertificates,
         key: this._key,
         passphrase: this._passphrase,
         cert: this._certificate
@@ -278,7 +287,7 @@ class Connection extends EventEmitter {
       options.headers = {Authorization: `Basic ${base64}`}
     }
     const optionsOverrides = _.omitBy({
-      ca: this._trustedCertificates,
+      ca: trustedCertificates,
       key: this._key,
       passphrase: this._passphrase,
       cert: this._certificate
