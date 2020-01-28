@@ -489,18 +489,6 @@ export class Connection extends EventEmitter {
       this._ws.on('error', error =>
         this.emit('error', 'websocket', error.message, error)
       )
-      // Finalize the connection and resolve all awaiting connect() requests
-      try {
-        this._retryConnectionBackoff.reset()
-        await this._subscribeToLedger()
-        this._startHeartbeatInterval()
-        this._connectionManager.resolveAllAwaiting()
-        this.emit('connected')
-      } catch (error) {
-        this._connectionManager.rejectAllAwaiting(error)
-        this.disconnect()
-        return
-      }
       // Handle a closed connection: reconnect if it was unexpected
       this._ws.once('close', code => {
         this._clearHeartbeatInterval()
@@ -524,6 +512,17 @@ export class Connection extends EventEmitter {
           }, retryTimeout)
         }
       })
+      // Finalize the connection and resolve all awaiting connect() requests
+      try {
+        this._retryConnectionBackoff.reset()
+        await this._subscribeToLedger()
+        this._startHeartbeatInterval()
+        this._connectionManager.resolveAllAwaiting()
+        this.emit('connected')
+      } catch (error) {
+        this._connectionManager.rejectAllAwaiting(error)
+        await this.disconnect().catch(() => {}) // Ignore this error, propagate the root cause.
+      }
     })
     return this._connectionManager.awaitConnection()
   }
