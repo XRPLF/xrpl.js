@@ -63,8 +63,8 @@ class Connection extends EventEmitter {
     this._proxyURL = options.proxy
     this._proxyAuthorization = options.proxyAuthorization
     this._authorization = options.authorization
-    this._trustedCertificates = options.trustedCertificates
-    this._includeSystemTrustedCertificates = (typeof options.includeSystemTrustedCertificates === 'undefined') ? true : options.includeSystemTrustedCertificates
+    this._trustedCertificates = (typeof options.trustedCertificates === 'undefined') ? [] : options.trustedCertificates;
+    this._includeSystemTrustedCertificates = (typeof options.includeSystemTrustedCertificates === 'undefined') ? true : options.includeSystemTrustedCertificates;
     this._key = options.key
     this._passphrase = options.passphrase
     this._certificate = options.certificate

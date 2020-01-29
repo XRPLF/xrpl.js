@@ -483,4 +483,34 @@ describe('Connection', function() {
       data: {disconnectIn: 10}
     }));
   });
+
+
+  it('Cannot connect because SSL certificate mismatch (CA trust empty)', function() {
+    const connection = new RippleAPI({
+      server: 'wss://s.devnet.rippletest.net:51233',
+      trustedCertificates: [],
+      includeSystemTrustedCertificates: false
+    })
+
+    return connection.connect().then(() => {
+      assert(false, 'Should throw NotConnectedError')
+    }).catch(error => {
+      assert(error instanceof this.api.errors.NotConnectedError, 'Should throw NotConnectedError');
+    });
+  });
+
+  it('Cannot connect because SSL certificate mismatch (CA trust missing trusted issuer)', function() {
+    const connection = new RippleAPI({
+      server: 'wss://s.devnet.rippletest.net:51233',
+      trustedCertificates: [],
+      includeSystemTrustedCertificates: true
+    })
+
+    return connection.connect().then(() => {
+      assert(false, 'Should throw NotConnectedError')
+    }).catch(error => {
+      assert(error instanceof this.api.errors.NotConnectedError, 'Should throw NotConnectedError');
+    });
+  });
+
 });
