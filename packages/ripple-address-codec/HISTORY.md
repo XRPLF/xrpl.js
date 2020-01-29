@@ -1,5 +1,9 @@
 # ripple-address-codec Release History
 
+## UNRELEASED
+
+* Drop support for node 6
+
 ## 4.1.0 (2020-01-22)
 
 * Throwable 'unexpected_payload_length' error: The message has been expanded with ' Ensure that the bytes are a Buffer.'
