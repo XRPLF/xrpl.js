@@ -2,6 +2,8 @@
 
 Functions for encoding and decoding XRP Ledger addresses and seeds. Also includes support for encoding/decoding [rippled validator (node) public keys](https://xrpl.org/run-rippled-as-a-validator.html).
 
+[![NPM](https://nodei.co/npm/ripple-address-codec.png)](https://www.npmjs.org/package/ripple-address-codec)
+
 ## X-address Conversion
 
 All tools and apps in the XRP Ledger ecosystem are encouraged to adopt support for the X-address format. The X-address format is a single Base58 string that encodes an 'Account ID', a (destination) tag, and whether the address is intended for a test network. This prevents users from unintentionally omitting the destination tag when sending and receiving payments and other transactions.
