@@ -2,7 +2,7 @@
 
 ## UNRELEASED
 
-* Drop support for node 6
+* Require node v10+
 
 ## 4.1.0 (2020-01-22)
 
