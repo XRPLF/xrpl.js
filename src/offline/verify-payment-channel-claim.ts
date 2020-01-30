@@ -7,7 +7,7 @@ function verifyPaymentChannelClaim(
   amount: string,
   signature: string,
   publicKey: string
-): string {
+): boolean {
   validate.verifyPaymentChannelClaim({channel, amount, signature, publicKey})
 
   const signingData = binary.encodeForSigningClaim({
