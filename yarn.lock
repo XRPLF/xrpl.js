@@ -4121,10 +4121,10 @@ ripple-binary-codec@^0.2.5:
     lodash "^4.17.15"
     ripple-address-codec "^4.0.0"
 
-ripple-keypairs@^1.0.0-beta.5:
-  version "1.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/ripple-keypairs/-/ripple-keypairs-1.0.0-beta.5.tgz#86c1e2be019c8f483356bf2897cb10ef31f43a1b"
-  integrity sha512-FYBaorwigTNniRonvbz6+ysVVVaPvexrw5Heq19l+ACIB6tAQGlW805SoNWMobdZRf7gP8YV9sQdEykAtGzz0g==
+ripple-keypairs@^1.0.0-beta.6:
+  version "1.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/ripple-keypairs/-/ripple-keypairs-1.0.0-beta.6.tgz#e13e6e1995ab3cc872990b3443da94d3578515a9"
+  integrity sha512-DKBakV9K/ucTuJYrLhtiaYuYz9sHL7M9LYHgSgsfvdJ347I56dTq6FvyvPDIx6TG3FgwLwvpNQwNvGYlMCMRZA==
   dependencies:
     bn.js "^5.1.1"
     brorand "^1.0.5"
