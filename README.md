@@ -6,7 +6,13 @@ A JavaScript/TypeScript API for interacting with the XRP Ledger
 
 This is the recommended library for integrating a JavaScript/TypeScript app with the XRP Ledger, especially if you intend to use advanced functionality such as IOUs, payment paths, the decentralized exchange, account settings, payment channels, escrows, multi-signing, and more.
 
-**What is ripple-lib used for?** Here's a [list of applications](APPLICATIONS.md) that use `ripple-lib`. Open a PR to add your app or project to the list!
+## [➡️ Reference Documentation](https://xrpl.org/rippleapi-reference.html)
+
+See the full reference documentation on the XRP Ledger Dev Portal.
+
+## [➡️ Applications and Projects](APPLICATIONS.md)
+
+What is ripple-lib used for? The applications on the list linked above use `ripple-lib`. Open a PR to add your app or project to the list!
 
 ### Features
 
