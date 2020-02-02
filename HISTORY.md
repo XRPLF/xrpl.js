@@ -1,5 +1,18 @@
 # ripple-lib Release History
 
+## 1.6.3-beta.1 (2020-01-29)
+
+* 1.6.3-beta.1
+  * Update ripple-keypairs to 1.0.0-beta.6
+* 1.6.3-beta.0
+  * Bug fix: Assign event listener to socket close event on open before attempting post-open logic (#1186)
+    * Protects against possible unhandled rejection in disconnect
+    * Adds the Connection `_ws.close` event listener post `_ws.open` before executing any post `_ws.open` logic, i.e. `Connection._subscribeToLedger`
+    * This prevents a reconnection error loop that occurs if `Connection._ws` is never cleaned up by the unreachable `_ws.close` event listener
+    * Also ensures that a possible disconnect() promise rejection is not unhandled if any `_ws.open` logic in `Connection.connect()` throws
+  * Dependencies
+    * Update mocha-junit-reporter, @types/node, mocha, @typescript-eslint/eslint-plugin, ripple-address-codec
+
 ## 1.6.2 (2020-01-17)
 
 * Bug fix: Catch possible error in reconnect() on _heartbeat(), emit reconnect error (#1179)

@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "1.6.2",
+  "version": "1.6.3-beta.1",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -29,7 +29,7 @@
     "lodash.isequal": "^4.5.0",
     "ripple-address-codec": "^4.0.0",
     "ripple-binary-codec": "^0.2.5",
-    "ripple-keypairs": "^0.11.0",
+    "ripple-keypairs": "^1.0.0-beta.6",
     "ripple-lib-transactionparser": "0.8.2",
     "ws": "^7.2.0"
   },
