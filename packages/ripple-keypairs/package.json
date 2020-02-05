@@ -14,8 +14,7 @@
     "brorand": "^1.0.5",
     "elliptic": "^6.5.2",
     "hash.js": "^1.0.3",
-    "ripple-address-codec": "^4.0.0",
-    "source-map-support": "^0.5.13"
+    "ripple-address-codec": "^4.0.0"
   },
   "devDependencies": {
     "@types/mocha": "^7.0.1",
@@ -32,6 +31,8 @@
     "mocha": "^7.0.0",
     "nyc": "^15.0.0",
     "prettier": "^1.19.1",
+    "source-map-support": "^0.5.16",
+    "ts-node": "^8.6.2",
     "typescript": "^3.6.4"
   },
   "scripts": {
