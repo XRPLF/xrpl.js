@@ -5,6 +5,7 @@ module.exports = {
     '**/*.d.ts',
     '*.js',
     'test/**/*',
+    'coverage/**/*',
   ],
 
   // Assert we remain at 100% code coverage
