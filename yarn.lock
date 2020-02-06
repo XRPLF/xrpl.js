@@ -4122,16 +4122,15 @@ ripple-binary-codec@^0.2.5:
     ripple-address-codec "^4.0.0"
 
 ripple-keypairs@^1.0.0-beta.6:
-  version "1.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/ripple-keypairs/-/ripple-keypairs-1.0.0-beta.6.tgz#e13e6e1995ab3cc872990b3443da94d3578515a9"
-  integrity sha512-DKBakV9K/ucTuJYrLhtiaYuYz9sHL7M9LYHgSgsfvdJ347I56dTq6FvyvPDIx6TG3FgwLwvpNQwNvGYlMCMRZA==
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ripple-keypairs/-/ripple-keypairs-1.0.0.tgz#8f1c604f89daeac5e61b7eebbbca2da99da2bacf"
+  integrity sha512-MQ3d6fU3D+Cqu5ma4dfkfa+KakN2sKpVVVN0FeJyAYPVIGXu8Rcvd1g028TdwYAZcSYk0tGn5UhHxd0gUG3T8g==
   dependencies:
     bn.js "^5.1.1"
     brorand "^1.0.5"
     elliptic "^6.5.2"
     hash.js "^1.0.3"
     ripple-address-codec "^4.0.0"
-    source-map-support "^0.5.13"
 
 ripple-lib-transactionparser@0.8.2:
   version "0.8.2"
@@ -4354,7 +4353,7 @@ source-map-resolve@^0.5.0:
     source-map-url "^0.4.0"
     urix "^0.1.0"
 
-source-map-support@^0.5.13, source-map-support@^0.5.6, source-map-support@~0.5.12:
+source-map-support@^0.5.6, source-map-support@~0.5.12:
   version "0.5.16"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.16.tgz#0ae069e7fe3ba7538c64c98515e35339eac5a042"
   integrity sha512-efyLRJDr68D9hBBNIPWFjhpFzURh+KJykQwvMyW5UiZzYwoF6l4YMMDIJJEyFWxWCqfyxLzz6tSfUFR+kXXsVQ==
