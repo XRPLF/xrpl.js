@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import * as elliptic from 'elliptic'
 import Sha512 from './sha512'
 

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import * as hashjs from 'hash.js'
 import * as BigNum from 'bn.js'
 

@@ -2,7 +2,7 @@ import * as assert from 'assert'
 import * as hashjs from 'hash.js'
 import * as BN from 'bn.js'
 
-function bytesToHex(a) {
+function bytesToHex(a): string {
   return a
     .map((byteValue) => {
       const hex = byteValue.toString(16).toUpperCase()
@@ -11,7 +11,7 @@ function bytesToHex(a) {
     .join('')
 }
 
-function hexToBytes(a) {
+function hexToBytes(a): number[] {
   assert(a.length % 2 === 0)
   return new BN(a, 16).toArray(null, a.length / 2)
 }
