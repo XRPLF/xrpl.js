@@ -32,21 +32,33 @@ describe('RippleAPI [Test Runner]', function() {
   // Run all the tests:
   for (const {name: methodName, tests, config} of allTestSuites) {
     describe(`api.${methodName}`, () => {
-      // Run each test with the original-style address.
-      describe(`[Original Address]`, () => {
-        for (const [testName, fn] of tests) {
+      // Run each test that does not use an address.
+      for (const [testName, fn] of tests) {
+        if (fn.length === 1) {
           it(testName, function() {
             return fn(this.api, addresses.ACCOUNT)
           })
         }
+      }
+      // Run each test with a classic address.
+      describe(`[Classic Address]`, () => {
+        for (const [testName, fn] of tests) {
+          if (fn.length === 2) {
+            it(testName, function() {
+              return fn(this.api, addresses.ACCOUNT)
+            })
+          }
+        }
       })
-      // Run each test with the newer, x-address style.
+      // Run each test with an X-address.
       if (!config.skipXAddress) {
         describe(`[X-address]`, () => {
           for (const [testName, fn] of tests) {
-            it(testName, function() {
-              return fn(this.api, addresses.ACCOUNT_X)
-            })
+            if (fn.length === 2) {
+              it(testName, function() {
+                return fn(this.api, addresses.ACCOUNT_X)
+              })
+            }
           }
         })
       }

@@ -4,21 +4,13 @@ import {TestSuite} from '../../utils'
 import { GenerateAddressOptions } from '../../../src/offline/generate-address'
 const {generateAddress: RESPONSE_FIXTURES} = responses
 
-export const config = {
-  // These tests do not use `address` so without skipping the address iteration, we would just
-  // redundantly run the same test twice, with no changes.
-  // Known issue: The test runner will say that these tests are being run under `[Original Address]`.
-  //              That is not correct; these tests do not take any address as input.
-  skipXAddress: true
-}
-
 /**
  * Every test suite exports their tests in the default object.
  * - Check out the "TestSuite" type for documentation on the interface.
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'generateAddress': async (api, address) => {
+  'generateAddress': async (api) => {
     // GIVEN entropy of all zeros
     function random() {
       return new Array(16).fill(0)
@@ -33,7 +25,7 @@ export default <TestSuite>{
     )
   },
 
-  'generateAddress invalid entropy': async (api, address) => {
+  'generateAddress invalid entropy': async (api) => {
     assert.throws(() => {
       // GIVEN entropy of 1 byte
       function random() {
@@ -48,7 +40,7 @@ export default <TestSuite>{
     }, api.errors.UnexpectedError)
   },
 
-  'generateAddress with no options object': async (api, address) => {
+  'generateAddress with no options object': async (api) => {
     // GIVEN no options
 
     // WHEN generating an address
@@ -59,7 +51,7 @@ export default <TestSuite>{
     assert(account.secret.startsWith('s'), 'Secret must start with `s`')
   },
 
-  'generateAddress with empty options object': async (api, address) => {
+  'generateAddress with empty options object': async (api) => {
     // GIVEN an empty options object
     const options = {}
 
@@ -71,7 +63,7 @@ export default <TestSuite>{
     assert(account.secret.startsWith('s'), 'Secret must start with `s`')
   },
 
-  'generateAddress with algorithm `ecdsa-secp256k1`': async (api, address) => {
+  'generateAddress with algorithm `ecdsa-secp256k1`': async (api) => {
     // GIVEN we want to use 'ecdsa-secp256k1'
     const options: GenerateAddressOptions = {algorithm: 'ecdsa-secp256k1'}
 
@@ -84,7 +76,7 @@ export default <TestSuite>{
     assert.notStrictEqual(account.secret.slice(0, 3), 'sEd', `secp256k1 secret ${account.secret} must not start with 'sEd'`)
   },
 
-  'generateAddress with algorithm `ed25519`': async (api, address) => {
+  'generateAddress with algorithm `ed25519`': async (api) => {
     // GIVEN we want to use 'ed25519'
     const options: GenerateAddressOptions = {algorithm: 'ed25519'}
 
@@ -96,7 +88,7 @@ export default <TestSuite>{
     assert.deepEqual(account.secret.slice(0, 3), 'sEd', `Ed25519 secret ${account.secret} must start with 'sEd'`)
   },
 
-  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy': async (api, address) => {
+  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy': async (api) => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {algorithm: 'ecdsa-secp256k1', entropy: new Array(16).fill(0)}
 
@@ -107,7 +99,7 @@ export default <TestSuite>{
     assert.deepEqual(account, responses.generateAddress)
   },
 
-  'generateAddress with algorithm `ed25519` and given entropy': async (api, address) => {
+  'generateAddress with algorithm `ed25519` and given entropy': async (api) => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {algorithm: 'ed25519', entropy: new Array(16).fill(0)}
 
@@ -126,7 +118,7 @@ export default <TestSuite>{
     })
   },
 
-  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address': async (api, address) => {
+  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address': async (api) => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {algorithm: 'ecdsa-secp256k1', entropy: new Array(16).fill(0), includeClassicAddress: true}
 
@@ -137,7 +129,7 @@ export default <TestSuite>{
     assert.deepEqual(account, responses.generateAddress)
   },
 
-  'generateAddress with algorithm `ed25519` and given entropy; include classic address': async (api, address) => {
+  'generateAddress with algorithm `ed25519` and given entropy; include classic address': async (api) => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {algorithm: 'ed25519', entropy: new Array(16).fill(0), includeClassicAddress: true}
 
@@ -156,7 +148,7 @@ export default <TestSuite>{
     })
   },
 
-  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address; for test network use': async (api, address) => {
+  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address; for test network use': async (api) => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {algorithm: 'ecdsa-secp256k1', entropy: new Array(16).fill(0), includeClassicAddress: true, test: true}
 
@@ -173,7 +165,7 @@ export default <TestSuite>{
     assert.deepEqual(account, response)
   },
 
-  'generateAddress with algorithm `ed25519` and given entropy; include classic address; for test network use': async (api, address) => {
+  'generateAddress with algorithm `ed25519` and given entropy; include classic address; for test network use': async (api) => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {algorithm: 'ed25519', entropy: new Array(16).fill(0), includeClassicAddress: true, test: true}
 
@@ -192,7 +184,7 @@ export default <TestSuite>{
     })
   },
 
-  'generateAddress for test network use': async (api, address) => {
+  'generateAddress for test network use': async (api) => {
     // GIVEN we want an address for test network use
     const options: GenerateAddressOptions = {test: true}
 
