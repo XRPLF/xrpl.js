@@ -82,7 +82,7 @@ export default <TestSuite>{
     // WHEN generating an X-address
     const account = api.generateXAddress(options)
 
-    // THEN we get an object with an xAddress starting with 'X' and a secret starting with 's'
+    // THEN we get an object with an xAddress starting with 'X' and a secret starting with 'sEd'
     assert(account.xAddress.startsWith('X'), 'By default X-addresses start with X')
     assert.deepEqual(account.secret.slice(0, 3), 'sEd', `Ed25519 secret ${account.secret} must start with 'sEd'`)
   },

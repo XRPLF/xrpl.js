@@ -70,7 +70,7 @@ export default <TestSuite>{
     // WHEN generating an address
     const account = api.generateAddress(options)
 
-    // THEN we get an object with an address starting with 'r' and a secret starting with 's'
+    // THEN we get an object with an address starting with 'r' and a secret starting with 's' (not 'sEd')
     assert(account.address.startsWith('r'), 'Address must start with `r`')
     assert.deepEqual(account.secret.slice(0, 1), 's', `Secret ${account.secret} must start with 's'`)
     assert.notStrictEqual(account.secret.slice(0, 3), 'sEd', `secp256k1 secret ${account.secret} must not start with 'sEd'`)
@@ -83,7 +83,7 @@ export default <TestSuite>{
     // WHEN generating an address
     const account = api.generateAddress(options)
 
-    // THEN we get an object with an address starting with 'r' and a secret starting with 's'
+    // THEN we get an object with an address starting with 'r' and a secret starting with 'sEd'
     assert(account.address.startsWith('r'), 'Address must start with `r`')
     assert.deepEqual(account.secret.slice(0, 3), 'sEd', `Ed25519 secret ${account.secret} must start with 'sEd'`)
   },
