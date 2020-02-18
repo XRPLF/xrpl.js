@@ -1,5 +1,14 @@
 # ripple-lib Release History
 
+## 1.6.4 (2020-02-18)
+
+* Fix generateXAddress() and generateAddress() with no entropy (#1211, #1209)
+* Internal
+  * Improve unit tests
+* Dependencies
+  * Update webpack-cli, @types/node, webpack, @typescript-eslint/eslint-plugin,
+    typescript, ripple-keypairs
+
 ## 1.6.3 (2020-02-05)
 
 * Update ripple-keypairs to 1.0.0
