@@ -28,10 +28,13 @@ export interface GenerateAddressOptions {
 function generateAddressAPI(options: GenerateAddressOptions): GeneratedAddress {
   validate.generateAddress({options})
   try {
-    const secret = keypairs.generateSeed({
-      entropy: Uint8Array.from(options.entropy),
+    const generateSeedOptions: { entropy?: Uint8Array; algorithm?: "ecdsa-secp256k1" | "ed25519"; } = {
       algorithm: options.algorithm
-    })
+    }
+    if (options.entropy) {
+      generateSeedOptions.entropy = Uint8Array.from(options.entropy)
+    }
+    const secret = keypairs.generateSeed(generateSeedOptions)
     const keypair = keypairs.deriveKeypair(secret)
     const classicAddress = keypairs.deriveAddress(keypair.publicKey)
     const returnValue: any = {

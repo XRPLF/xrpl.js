@@ -4121,7 +4121,7 @@ ripple-binary-codec@^0.2.5:
     lodash "^4.17.15"
     ripple-address-codec "^4.0.0"
 
-ripple-keypairs@^1.0.0-beta.6:
+ripple-keypairs@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ripple-keypairs/-/ripple-keypairs-1.0.0.tgz#8f1c604f89daeac5e61b7eebbbca2da99da2bacf"
   integrity sha512-MQ3d6fU3D+Cqu5ma4dfkfa+KakN2sKpVVVN0FeJyAYPVIGXu8Rcvd1g028TdwYAZcSYk0tGn5UhHxd0gUG3T8g==
@@ -4801,7 +4801,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^3.6.4:
+typescript@^3.7.5:
   version "3.7.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.5.tgz#0692e21f65fd4108b9330238aac11dd2e177a1ae"
   integrity sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
