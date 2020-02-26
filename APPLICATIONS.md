@@ -39,6 +39,10 @@ Warning: Use at your own risk.
 - **[XRP Scan - XRP Ledger explorer](https://xrpscan.com)**
 
   XRP Ledger explorer, metrics and analytics.
+  
+- **[xrplorer](https://xrplorer.com)**
+
+  XRP Ledger explorer, API, metrics, and analytics using a graph database that is synchronized live with the XRPL.
 
 ## Send and request payments
 
