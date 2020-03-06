@@ -371,7 +371,7 @@ export class Connection extends EventEmitter {
    * If this succeeds, we're good. If it fails, disconnect so that the consumer can reconnect, if desired.
    */
   private _heartbeat = () => {
-    return this.request({command: 'ping'}).catch(() => { 
+    return this.request({command: 'ping'}).catch(() => {
         this.reconnect().catch((error) => {
           this.emit('error', 'reconnect', error.message, error)
         })
@@ -406,7 +406,7 @@ export class Connection extends EventEmitter {
       } catch (error) {
         // Ignore this error, propagate the root cause.
       } finally {
-        // Throw the root error (takes precendence over try/catch).
+        // Throw the root error (takes precedence over try/catch).
         // eslint-disable-next-line no-unsafe-finally
         throw new RippledNotInitializedError('Rippled not initialized')
       }
