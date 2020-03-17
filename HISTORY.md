@@ -1,5 +1,7 @@
 # ripple-lib Release History
 
+Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
+
 ## 1.6.4 (2020-02-18)
 
 * Fix generateXAddress() and generateAddress() with no entropy (#1211, #1209)
