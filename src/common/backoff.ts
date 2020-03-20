@@ -7,7 +7,7 @@
  */
 
 /**
- * A Back off strategy that increases exponentionally. Useful with repeated
+ * A Back off strategy that increases exponentially. Useful with repeated
  * setTimeout calls over a network (where the destination may be down).
  */
 export class ExponentialBackoff {
