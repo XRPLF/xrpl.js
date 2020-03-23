@@ -38,7 +38,7 @@
     "@types/node": "^13.1.1",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
-    "assert-diff": "^2.0.3",
+    "assert-diff": "^3.0.0",
     "doctoc": "^1.4.0",
     "ejs": "^3.0.1",
     "eslint": "^6.5.1",
