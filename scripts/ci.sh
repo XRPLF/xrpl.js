@@ -14,7 +14,10 @@ lint() {
 
 unittest() {
   # test "src"
-  mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/test-results.xml
+
+  # TODO: replace/upgrade mocha-junit-reporter
+  #mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/test-results.xml
+
   yarn test --coverage
   #yarn run coveralls
 
