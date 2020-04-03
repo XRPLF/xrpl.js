@@ -1,8 +1,16 @@
 # ripple-address-codec Release History
 
-## UNRELEASED
+## 4.1.1 (2020-04-03)
 
 * Require node v10+
+* CI: Drop node 6 & 8 and add node 13
+* Update dependencies
+  * Bump @types/node to 13.7.7 (#60)
+  * Bump jest and ts-jest (#40)
+  * Bump @types/jest to 25.1.2 (#51)
+  * Bump ts-jest from 25.0.0 to 25.2.0 (#50)
+  * Bump typescript from 3.7.5 to 3.8.3 (#61)
+  * Update all dependencies in yarn.lock
 
 ## 4.1.0 (2020-01-22)
 
