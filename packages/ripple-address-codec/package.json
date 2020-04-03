@@ -27,7 +27,7 @@
   "devDependencies": {
     "@types/jest": "^25.1.0",
     "@types/node": "^13.1.8",
-    "jest": "^25.1.0",
+    "jest": "^25.2.7",
     "ts-jest": "^25.0.0",
     "tslint": "^5.19.0",
     "tslint-eslint-rules": "^5.4.0",
