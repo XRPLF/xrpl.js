@@ -20,6 +20,14 @@ Convert a classic address and (optional) tag to an X-address. If `tag` is `false
 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi'
 ```
 
+Encode a test address e.g. for use with [Testnet or Devnet](https://xrpl.org/xrp-testnet-faucet.html):
+
+```js
+> const api = require('ripple-address-codec')
+> api.classicAddressToXAddress('r3SVzk8ApofDJuVBPKdmbbLjWGCCXpBQ2g', 123, true)
+'T7oKJ3q7s94kDH6tpkBowhetT1JKfcfdSCmAXbS75iATyLD'
+```
+
 ### xAddressToClassicAddress(xAddress: string): {classicAddress: string, tag: number | false, test: boolean}
 
 Convert an X-address to a classic address and tag. If the X-address did not have a tag, the returned object will not have a `tag` field. If the X-address is intended for use on test network(s), `test` will be `true`; if it is intended for use on the main network (mainnet), `test` will be `false`.
@@ -43,6 +51,8 @@ Returns `true` if the provided X-address is valid, or `false` otherwise.
 > api.isValidXAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi')
 true
 ```
+
+This method always returns `false` for classic addresses (starting with `r`).
 
 ### Other functions
 
