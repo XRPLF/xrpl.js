@@ -243,7 +243,7 @@ function prepareTransaction(
   }
 
   function prepareFee(): Promise<void> {
-    // instructions.fee is scaled (for multi-signed transactions) while txJSON.Fee is not.
+    // instructions.fee will be scaled (for multi-signed transactions) while txJSON.Fee will not.
     // Due to this difference, we do NOT allow both to be set, as the behavior would be complex and
     // potentially ambiguous.
     // Furthermore, txJSON.Fee is in drops while instructions.fee is in XRP, which would just add to
@@ -283,6 +283,7 @@ function prepareTransaction(
     const cushion = api._feeCushion
     return api.getFee(cushion).then(fee => {
       return api.connection.getFeeRef().then(feeRef => {
+        // feeRef is the reference transaction cost in "fee units"
         const extraFee =
           newTxJSON.TransactionType !== 'EscrowFinish' ||
           newTxJSON.Fulfillment === undefined
