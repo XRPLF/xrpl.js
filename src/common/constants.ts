@@ -58,6 +58,18 @@ const AccountFlags = {
   defaultRipple: accountRootFlags.DefaultRipple
 }
 
+interface Settings {
+  passwordSpent?: boolean,
+  requireDestinationTag?: boolean,
+  requireAuthorization?: boolean,
+  depositAuth?: boolean,
+  disallowIncomingXRP?: boolean,
+  disableMasterKey?: boolean,
+  noFreeze?: boolean,
+  globalFreeze?: boolean,
+  defaultRipple?: boolean
+}
+
 const AccountFlagIndices = {
   requireDestinationTag: txFlagIndices.AccountSet.asfRequireDest,
   requireAuthorization: txFlagIndices.AccountSet.asfRequireAuth,
@@ -84,4 +96,4 @@ const AccountFields = {
   TickSize: {name: 'tickSize', defaults: 0}
 }
 
-export {AccountFields, AccountFlagIndices, AccountFlags}
+export {AccountFields, AccountFlagIndices, AccountFlags, Settings}
