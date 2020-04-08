@@ -58,7 +58,7 @@ const AccountFlags = {
   defaultRipple: accountRootFlags.DefaultRipple
 }
 
-interface Settings {
+export interface Settings {
   passwordSpent?: boolean,
   requireDestinationTag?: boolean,
   requireAuthorization?: boolean,
@@ -96,4 +96,4 @@ const AccountFields = {
   TickSize: {name: 'tickSize', defaults: 0}
 }
 
-export {AccountFields, AccountFlagIndices, AccountFlags, Settings}
+export {AccountFields, AccountFlagIndices, AccountFlags}
