@@ -52,7 +52,70 @@ Returns `true` if the provided X-address is valid, or `false` otherwise.
 true
 ```
 
-This method always returns `false` for classic addresses (starting with `r`).
+Returns `false` for classic addresses (starting with `r`). To validate a classic address, use `isValidClassicAddress`.
+
+### isValidClassicAddress(address: string): boolean
+
+Check whether a classic address (starting with `r`...) is valid.
+
+Returns `false` for X-addresses (extended addresses). To validate an X-address, use `isValidXAddress`.
+
+### encodeSeed(entropy: Buffer, type: 'ed25519' | 'secp256k1'): string
+
+Encode the given entropy as an XRP Ledger seed (secret). The entropy must be exactly 16 bytes (128 bits). The encoding includes which elliptic curve digital signature algorithm (ECDSA) the seed is intended to be used with. The seed is used to produce the private key.
+
+### decodeSeed(seed: string): object
+
+Decode a seed into an object with its version, type, and bytes.
+
+Return object type:
+```
+{
+  version: number[],
+  bytes: Buffer,
+  type: string | null
+}
+```
+
+### encodeAccountID(bytes: Buffer): string
+
+Encode bytes as a classic address (starting with `r`...).
+
+### decodeAccountID(accountId: string): Buffer
+
+Decode a classic address (starting with `r`...) to its raw bytes.
+
+### encodeNodePublic(bytes: Buffer): string
+
+Encode bytes to the XRP Ledger "node public key" format (base58).
+
+This is useful for rippled validators.
+
+### decodeNodePublic(base58string: string): Buffer
+
+Decode an XRP Ledger "node public key" (in base58 format) into its raw bytes.
+
+### encodeAccountPublic(bytes: Buffer): string
+
+Encode a public key, as for payment channels.
+
+### decodeAccountPublic(base58string: string): Buffer
+
+Decode a public key, as for payment channels.
+
+### encodeXAddress(accountId: Buffer, tag: number | false, test: boolean): string
+
+Encode account ID, tag, and network ID to X-address.
+
+`accountId` must be 20 bytes because it is a RIPEMD160 hash, which is 160 bits (160 bits = 20 bytes).
+
+At this time, `tag` must be <= MAX_32_BIT_UNSIGNED_INT (4294967295) as the XRP Ledger only supports 32-bit tags.
+
+If `test` is `true`, this address is intended for use with a test network such as Testnet or Devnet.
+
+### decodeXAddress(xAddress: string): {accountId: Buffer, tag: number | false, test: boolean}
+
+Convert an X-address to its classic address, tag, and network ID.
 
 ### Other functions
 
