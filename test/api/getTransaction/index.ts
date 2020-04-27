@@ -355,7 +355,8 @@ export default <TestSuite>{
   },
 
   'AccountDelete': async (api, address) => {
-    const hash = 'EC2AB14028DC84DE525470AB4DAAA46358B50A8662C63804BFF38244731C0CB9'
+    const hash =
+      'EC2AB14028DC84DE525470AB4DAAA46358B50A8662C63804BFF38244731C0CB9'
     const response = await api.getTransaction(hash)
     assertResultMatch(
       response,

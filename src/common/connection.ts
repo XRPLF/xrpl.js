@@ -13,7 +13,7 @@ import {
   RippledNotInitializedError,
   RippleError
 } from './errors'
-import {ExponentialBackoff} from './backoff';
+import {ExponentialBackoff} from './backoff'
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
@@ -387,9 +387,9 @@ export class Connection extends EventEmitter {
    */
   private _heartbeat = () => {
     return this.request({command: 'ping'}).catch(() => {
-        this.reconnect().catch((error) => {
-          this.emit('error', 'reconnect', error.message, error)
-        })
+      this.reconnect().catch(error => {
+        this.emit('error', 'reconnect', error.message, error)
+      })
     })
   }
 
@@ -550,8 +550,8 @@ export class Connection extends EventEmitter {
    * If no open websocket connection exists, resolve with no code (`undefined`).
    */
   disconnect(): Promise<number | undefined> {
-    clearTimeout(this._reconnectTimeoutID);
-    this._reconnectTimeoutID = null;
+    clearTimeout(this._reconnectTimeoutID)
+    this._reconnectTimeoutID = null
     if (this._state === WebSocket.CLOSED || !this._ws) {
       return Promise.resolve(undefined)
     }

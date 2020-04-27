@@ -4,7 +4,7 @@ import {validate, constants, ensureClassicAddress} from '../common'
 import {FormattedSettings} from '../common/types/objects'
 import {AccountInfoResponse} from '../common/types/commands'
 import {RippleAPI} from '..'
-import { Settings } from '../common/constants'
+import {Settings} from '../common/constants'
 
 const AccountFlags = constants.AccountFlags
 
