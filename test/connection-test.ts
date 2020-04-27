@@ -98,6 +98,7 @@ describe('Connection', function() {
     )
     assert.strictEqual(await this.api.connection.getFeeBase(), 10)
     assert.strictEqual(await this.api.connection.getFeeRef(), 10)
+    assert.strictEqual(await this.api.connection.getReserveBase(), 20000000) // 20 XRP
   })
 
   it('with proxy', function(done) {
@@ -378,7 +379,7 @@ describe('Connection', function() {
       throw new Error('error on reconnect')
     }
     // Hook up a listener for the reconnect error event
-    this.api.on('error', (error, message) => { 
+    this.api.on('error', (error, message) => {
       if(error === 'reconnect' && message === 'error on reconnect') {
         return done()
       }
