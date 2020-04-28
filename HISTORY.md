@@ -2,6 +2,17 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.7.0 (2020-04-28)
+
+* Export hashing functions (#1275)
+* Add failHard (fail_hard) option in `submit` method (#1029)
+* Add type for parseAccountFlags (#1258)
+* Add api.connection.getReserveBase() (#1259)
+* Travis: remove node 8 (#1257)
+* Dependencies
+  * Update ripple-address-codec, @types/ws, @types/lodash, https-proxy-agent
+  * Update devDependencies: eventemitter2, nyc, ejs, @types/node, webpack, ts-node, prettier, @typescript-eslint/eslint-plugin
+
 ## 1.6.5 (2020-03-23)
 
 * APPLICATIONS.md: Add xrplorer.com
