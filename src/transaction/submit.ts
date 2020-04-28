@@ -39,12 +39,15 @@ function formatSubmitResponse(response): FormattedSubmitResponse {
 async function submit(
   this: RippleAPI,
   signedTransaction: string,
-  failHard?: boolean 
+  failHard?: boolean
 ): Promise<FormattedSubmitResponse> {
   // 1. Validate
   validate.submit({signedTransaction})
   // 2. Make Request
-  const response = await this.request('submit', {tx_blob: signedTransaction, ...(failHard ? {fail_hard: failHard} : {})})
+  const response = await this.request('submit', {
+    tx_blob: signedTransaction,
+    ...(failHard ? {fail_hard: failHard} : {})
+  })
   // 3. Return Formatted Response
   return formatSubmitResponse(response)
 }

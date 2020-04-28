@@ -5600,6 +5600,7 @@ Submits a signed transaction. The transaction is not guaranteed to succeed; it m
 Name | Type | Description
 ---- | ---- | -----------
 signedTransaction | string | A signed transaction as returned by [sign](#sign).
+failHard | boolean | *Optional* If `true`, and the transaction fails locally, do not retry or relay the transaction to other servers. Defaults to `false`.
 
 ### Return Value
 
