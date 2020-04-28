@@ -8,8 +8,8 @@
       "description": "A signed transaction as returned by [sign](#sign)."
     },
     "failHard": {
-      "$ref": "boolean",
-      "description": "(defaults to false) If true, and the transaction fails locally, do not retry or relay the transaction to other servers"
+      "type": "boolean",
+      "description": "If `true`, and the transaction fails locally, do not retry or relay the transaction to other servers. Defaults to `false`."
     }
   },
   "additionalProperties": false,
