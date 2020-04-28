@@ -71,6 +71,14 @@ export const computeTransactionHash = (txJSON: any): string => {
   return computeBinaryTransactionHash(encode(txJSON))
 }
 
+/**
+ * Hash the given binary transaction data with the single-signing prefix.
+ *
+ * See [Serialization Format](https://xrpl.org/serialization.html)
+ *
+ * @param txBlobHex The binary transaction blob as a hexadecimal string
+ * @returns {string} The hash to sign
+ */
 export const computeBinaryTransactionSigningHash = (
   txBlobHex: string
 ): string => {
@@ -78,21 +86,56 @@ export const computeBinaryTransactionSigningHash = (
   return sha512Half(prefix + txBlobHex)
 }
 
-export const computeTransactionSigningHash = (txJSON: any): string => {
-  return computeBinaryTransactionSigningHash(encode(txJSON))
-}
-
-export const computeAccountHash = (address: string): string => {
+/**
+ * Compute Account Ledger Object ID
+ *
+ * All objects in a ledger's state tree have a unique ID.
+ * The Account Ledger Object ID is derived by hashing the
+ * address with a namespace identifier. This ensures every
+ * ID is unique.
+ *
+ * See [Ledger Object IDs](https://xrpl.org/ledger-object-ids.html)
+ *
+ * @param address The classic account address
+ * @returns {string} The Ledger Object ID for the account
+ */
+export const computeAccountLedgerObjectID = (address: string): string => {
   return sha512Half(ledgerSpaceHex('account') + addressToHex(address))
 }
 
-export const computeSignerListHash = (address: string): string => {
+/**
+ * [SignerList ID Format](https://xrpl.org/signerlist.html#signerlist-id-format)
+ *
+ * The ID of a SignerList object is the SHA-512Half of the following values, concatenated in order:
+ *   * The RippleState space key (0x0053)
+ *   * The AccountID of the owner of the SignerList
+ *   * The SignerListID (currently always 0)
+ *
+ * This method computes a SignerList Ledger Object ID.
+ *
+ * @param address The classic account address of the SignerList owner (starting with r)
+ * @return {string} The ID of the account's SignerList object
+ */
+export const computeSignerListLedgerObjectID = (address: string): string => {
   return sha512Half(
     ledgerSpaceHex('signerList') + addressToHex(address) + '00000000'
   ) // uint32(0) signer list index
 }
 
-export const computeOrderHash = (address: string, sequence: number): string => {
+/**
+ * [Offer ID Format](https://xrpl.org/offer.html#offer-id-format)
+ *
+ * The ID of a Offer object is the SHA-512Half of the following values, concatenated in order:
+ *   * The Offer space key (0x006F)
+ *   * The AccountID of the account placing the offer
+ *   * The Sequence number of the OfferCreate transaction that created the offer
+ *
+ * This method computes an Offer ID (aka Order ID).
+ *
+ * @param address The classic account address of the SignerList owner (starting with r)
+ * @returns {string} The ID of the account's Offer object
+ */
+export const computeOrderID = (address: string, sequence: number): string => {
   const prefix = '00' + intToHex(ledgerspaces.offer.charCodeAt(0), 1)
   return sha512Half(prefix + addressToHex(address) + intToHex(sequence, 4))
 }
