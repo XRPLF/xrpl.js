@@ -74,10 +74,10 @@ export const computeTransactionHash = (txJSON: any): string => {
 /**
  * Hash the given binary transaction data with the single-signing prefix.
  *
- * @see {@link https://xrpl.org/serialization.html|Serialization Format}
+ * See [Serialization Format](https://xrpl.org/serialization.html)
  *
  * @param txBlobHex The binary transaction blob as a hexadecimal string
- * @returns {string} The hash to sign.
+ * @returns {string} The hash to sign
  */
 export const computeBinaryTransactionSigningHash = (
   txBlobHex: string
@@ -94,7 +94,7 @@ export const computeBinaryTransactionSigningHash = (
  * address with a namespace identifier. This ensures every
  * ID is unique.
  *
- * @see {@link https://xrpl.org/ledger-object-ids.html|Ledger Object IDs}
+ * See [Ledger Object IDs](https://xrpl.org/ledger-object-ids.html)
  *
  * @param address The classic account address
  * @returns {string} The Ledger Object ID for the account
@@ -104,17 +104,17 @@ export const computeAccountLedgerObjectID = (address: string): string => {
 }
 
 /**
- * Compute SignerList Ledger Object ID
+ * [SignerList ID Format](https://xrpl.org/signerlist.html#signerlist-id-format)
  *
  * The ID of a SignerList object is the SHA-512Half of the following values, concatenated in order:
  *   * The RippleState space key (0x0053)
  *   * The AccountID of the owner of the SignerList
  *   * The SignerListID (currently always 0)
  *
- * @see {@link https://xrpl.org/signerlist.html#signerlist-id-format|SignerList ID Format}
+ * This method computes a SignerList Ledger Object ID.
  *
  * @param address The classic account address of the SignerList owner (starting with r)
- * @returns {string} The ID of the account's SignerList object
+ * @return {string} The ID of the account's SignerList object
  */
 export const computeSignerListLedgerObjectID = (address: string): string => {
   return sha512Half(
@@ -123,14 +123,14 @@ export const computeSignerListLedgerObjectID = (address: string): string => {
 }
 
 /**
- * Offer ID Format
+ * [Offer ID Format](https://xrpl.org/offer.html#offer-id-format)
  *
  * The ID of a Offer object is the SHA-512Half of the following values, concatenated in order:
  *   * The Offer space key (0x006F)
  *   * The AccountID of the account placing the offer
  *   * The Sequence number of the OfferCreate transaction that created the offer
  *
- * @see {@link https://xrpl.org/offer.html#offer-id-format|Offer ID Format}
+ * This method computes an Offer ID (aka Order ID).
  *
  * @param address The classic account address of the SignerList owner (starting with r)
  * @returns {string} The ID of the account's Offer object
