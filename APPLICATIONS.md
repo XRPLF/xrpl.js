@@ -12,7 +12,7 @@ Warning: Use at your own risk.
 
 ## Data and visualizations
 
-- **[Wipple - XRP Intelligence](https://wipple.devnull.network/)**
+- **[xrp1ntel - XRP Intelligence](https://xrp1ntel.com/)**
 
   Monitor the XRP Network in real time and explore historical statistics.
 
@@ -36,9 +36,13 @@ Warning: Use at your own risk.
 
   List of XRPL validators, nodes, and testnet validators.
 
-- **[XRP Scan - XRP Ledger explorer](https://http://xrpscan.com)**
+- **[XRP Scan - XRP Ledger explorer](https://xrpscan.com)**
 
   XRP Ledger explorer, metrics and analytics.
+  
+- **[xrplorer](https://xrplorer.com)**
+
+  XRP Ledger explorer, API, metrics, and analytics using a graph database that is synchronized live with the XRPL.
 
 ## Send and request payments
 
@@ -59,6 +63,10 @@ Warning: Use at your own risk.
   Tool for generating a XRP payment request URI in a QR code, with currency converter.
 
 ## Wallets and wallet tools
+
+- **[XRP Toolkit](https://www.xrptoolkit.com)**
+
+  A web interface to the XRP Ledger, supporting both hardware and software wallets.
 
 - **[Toast Wallet](https://toastwallet.com/)**
 

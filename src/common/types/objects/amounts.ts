@@ -2,7 +2,6 @@ export interface Amount extends Issue {
   value: string
 }
 
-
 export type RippledAmount = string | Amount
 
 /**

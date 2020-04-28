@@ -1,6 +1,5 @@
-
 export type Memo = {
-  type?: string,
-  format?: string,
+  type?: string
+  format?: string
   data?: string
 }

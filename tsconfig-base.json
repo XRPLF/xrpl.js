@@ -1,26 +1,23 @@
 {
   "compilerOptions": {
     "pretty": true,
-    "lib": [
-      "es2017"
-    ],
     "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
 
     "declaration": true,
-    "declarationMap": true /* Added 2019-04-13 */,
+    "declarationMap": true,
     "sourceMap": true,
-    "noEmitOnError": true /* Added 2019-04-13 */,
 
+    "strict": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "removeComments": true,
-    "strict": true /* Enable all strict type-checking options. */,
     "preserveConstEnums": false,
-
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "suppressImplicitAnyIndexErrors": false
+    "esModuleInterop": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "resolveJsonModule": true,
+    "preserveSymlinks": true
   }
 }

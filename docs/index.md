@@ -80,6 +80,7 @@
   - [sign](#sign)
   - [combine](#combine)
   - [submit](#submit)
+  - [generateXAddress](#generatexaddress)
   - [generateAddress](#generateaddress)
   - [isValidAddress](#isvalidaddress)
   - [isValidSecret](#isvalidsecret)
@@ -91,6 +92,7 @@
   - [xrpToDrops](#xrptodrops)
   - [dropsToXrp](#dropstoxrp)
   - [iso8601ToRippleTime](#iso8601torippletime)
+  - [rippleTimeToISO8601](#rippletimetoiso8601)
   - [txFlags](#txflags)
   - [schemaValidator](#schemavalidator)
   - [schemaValidate](#schemavalidate)
@@ -104,7 +106,8 @@
 
 # Introduction
 
-RippleAPI (ripple-lib) is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript.
+RippleAPI (ripple-lib) is the official client library to the XRP Ledger. Currently, RippleAPI is only available in JavaScript/TypeScript.
+
 Using RippleAPI, you can:
 
 * [Query transactions from the XRP Ledger history](#gettransaction)
@@ -112,6 +115,10 @@ Using RippleAPI, you can:
 * [Submit](#submit) transactions to the XRP Ledger, including [Payments](#payment), [Orders](#order), [Settings changes](#settings), and [other types](#transaction-types)
 * [Generate a new XRP Ledger Address](#generateaddress)
 * ... and [much more](#api-methods).
+
+This page contains documentation for ripple-lib. To use ripple-lib with npm/yarn, begin with the [Getting Started](https://github.com/ripple/ripple-lib#getting-started) steps.
+
+**What is ripple-lib used for?** Here's a [list of applications that use `ripple-lib`](https://github.com/ripple/ripple-lib/blob/develop/APPLICATIONS.md). Open a PR to add your app or project to the list!
 
 ## Boilerplate
 
@@ -141,7 +148,7 @@ api.connect().then(() => {
 }).catch(console.error);
 ```
 
-RippleAPI is designed to work in [Node.js](https://nodejs.org) version **6.11.3**. RippleAPI may work on older Node.js versions if you use [Babel](https://babeljs.io/) for [ECMAScript 6](https://babeljs.io/docs/learn-es2015/) support.
+RippleAPI is designed to work in [Node.js](https://nodejs.org) version 6 or higher. Ripple recommends Node.js v10 LTS.
 
 The code samples in this documentation are written with ECMAScript 6 (ES6) features, but `RippleAPI` also works with ECMAScript 5 (ES5). Regardless of whether you use ES5 or ES6, the methods that return Promises return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 
@@ -214,6 +221,7 @@ Methods that depend on the state of the XRP Ledger are unavailable in offline mo
 * [prepareEscrowExecution](#prepareescrowexecution)
 * [sign](#sign)
 * [generateAddress](#generateaddress)
+* [generateXAddress](#generatexaddress)
 * [computeLedgerHash](#computeledgerhash)
 
 # Basic Types
@@ -224,7 +232,19 @@ Methods that depend on the state of the XRP Ledger are unavailable in offline mo
 "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59"
 ```
 
-Every XRP Ledger account has an *address*, which is a base58-encoding of a hash of the account's public key. XRP Ledger addresses always start with the lowercase letter `r`.
+```json
+"X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ"
+```
+
+An *address* refers to a specific XRP Ledger account. It is a base-58 encoding of a hash of the account's public key. There are two kinds of addresses in common use:
+
+### Classic Address
+
+A *classic address* encodes a hash of the account's public key and a checksum. It has no other data. This kind of address always starts with the lowercase letter `r`.
+
+### X-address
+
+An *X-address* encodes a hash of the account's public key, a tag, and a checksum. This kind of address starts with the uppercase letter `X` if it is intended for use on the production XRP Ledger (mainnet). It starts with the uppercase letter `T` if it is intended for use on a test network such as Testnet or Devnet.
 
 ## Account Sequence Number
 
@@ -376,12 +396,12 @@ Name | Type | Description
 source | object | The source of the funds to be sent.
 *source.* address | [address](#address) | The address to send from.
 *source.* amount | [laxAmount](#amount) | An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with source.maxAmount)
-*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
+*source.* tag | integer | *Optional* An arbitrary 32-bit unsigned integer. It typically maps to an off-ledger account; for example, a hosted wallet or exchange account.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field cannot be used with source.amount)
 destination | object | The destination of the funds to be sent.
 *destination.* address | [address](#address) | An address representing the destination of the transaction.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with `destination.minAmount`.)
-*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
+*destination.* tag | integer | *Optional* An arbitrary 32-bit unsigned integer. It typically maps to an off-ledger account; for example, a hosted wallet or exchange account.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field cannot be used with destination.amount)
 allowPartialPayment | boolean | *Optional* If true, this payment should proceed even if the whole amount cannot be delivered due to a lack of liquidity or a lack of funds in the source account.
 invoiceID | string | *Optional* A 256-bit hash that can be used to identify a particular payment.
@@ -522,7 +542,7 @@ defaultRipple | boolean | *Optional* Enable [rippling](https://ripple.com/build/
 depositAuth | boolean | *Optional* Enable [Deposit Authorization](https://ripple.com/build/deposit-authorization/) on this account. If set, transactions cannot send value of any kind to this account unless the sender of those transactions is the account itself. (Requires the [DepositAuth amendment](https://ripple.com/build/known-amendments/#depositauth))
 disableMasterKey | boolean | *Optional* Disallows use of the master key to sign transactions for this account. To disable the master key, you must authorize the transaction by signing it with the master key pair. You cannot use a regular key pair or a multi-signature. You can re-enable the master key pair using a regular key pair or multi-signature. See [AccountSet](https://developers.ripple.com/accountset.html).
 disallowIncomingXRP | boolean | *Optional* Indicates that client applications should not send XRP to this account. Not enforced by rippled.
-domain | string | *Optional*  The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase.
+domain | string | *Optional* The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase.
 emailHash | string,null | *Optional* Hash of an email address to be used for generating an avatar image. Conventionally, clients use Gravatar to display this image. Use `null` to clear.
 enableTransactionIDTracking | boolean | *Optional* Track the ID of this account’s most recent transaction.
 globalFreeze | boolean | *Optional* Freeze all assets issued by this account.
@@ -537,9 +557,11 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
 *signers.* weights | array | *Optional* Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
-*signers.weights[].* address | [address](#address) | A Ripple account address
+*signers.weights[].* address | [address](#address) | An account address on the XRP Ledger
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
-transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
+tickSize | string | *Optional* Tick size to use for offers involving a currency issued by this address. The exchange rates of those offers is rounded to this many significant digits. Valid values are 3 to 15 inclusive, or 0 to disable.
+transferRate | number,null | *Optional* The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
+walletLocator | string,null | *Optional* Transaction hash or any other 64 character hexadecimal string, that may or may not represent the result of a hash operation. Use `null` to clear.
 
 ### Example
 
@@ -774,12 +796,14 @@ signature | string | *Optional* Signed claim authorizing withdrawal of XRP from 
 
 # rippled APIs
 
-ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for all online functionality. With ripple-lib version 1.0.0 and higher, you can easily access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
-* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods). 
+ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for online functionality. In addition to ripple-lib's own methods, you can also access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
+
+* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods).
 * Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
 * Use `requestNextPage()` to request the next page of data.
 
 When using rippled APIs:
+
 * [Specify XRP amounts in drops](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts).
 * [Specify timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-time).
 * Instead of `counterparty`, use `issuer`.
@@ -811,6 +835,7 @@ Type | Description
 `manifestReceived` | Sent by the `manifests` stream when the server receives a manifest.
 `transaction` | Sent by many subscriptions including `transactions`, `transactions_proposed`, `accounts`, `accounts_proposed`, and `book` (Order Book). See [Transaction Streams](https://ripple.com/build/rippled-apis/#transaction-streams) for details.
 `peerStatusChange` | (Admin-only) Reports a large amount of information on the activities of other `rippled` servers to which the server is connected.
+`path_find` | Asynchronous follow-up response to the currently open path\_find request. See [rippled path\_find method](https://xrpl.org/path_find.html) for details.
 
 To register your listener function, use `connection.on(type, handler)`.
 
@@ -850,7 +875,7 @@ Returns the response from invoking the specified command, with the specified opt
 
 Refer to [rippled APIs](https://ripple.com/build/rippled-apis/) for commands and options. All XRP amounts must be specified in drops. One drop is equal to 0.000001 XRP. See [Specifying Currency Amounts](https://ripple.com/build/rippled-apis/#specifying-currency-amounts).
 
-Most commands return data for the `current` (in-progress, open) ledger by default. Do not rely on this. Always specify a ledger version in your request. In the example below, the 'validated' ledger is requested, which is the most recent ledger that has been validated by the whole network. See [Specifying Ledgers](https://ripple.com/build/rippled-apis/#specifying-ledgers).
+Most commands return data for the `current` (in-progress, open) ledger by default. Do not rely on this. Always specify a ledger version in your request. In the example below, the 'validated' ledger is requested, which is the most recent ledger that has been validated by the whole network. See [Specifying Ledgers](https://xrpl.org/basic-data-types.html#specifying-ledgers).
 
 ### Return Value
 
@@ -1685,6 +1710,7 @@ return api.getTransactions(address).then(transaction => {
     },
     "outcome": {
       "result": "tesSUCCESS",
+      "timestamp": "2019-04-01T07:39:01.000Z",
       "fee": "0.00001",
       "deliveredAmount": {
         "currency": "USD",
@@ -1778,6 +1804,7 @@ return api.getTransactions(address).then(transaction => {
     },
     "outcome": {
       "result": "tesSUCCESS",
+      "timestamp": "2019-04-01T07:39:01.000Z",
       "fee": "0.00001",
       "deliveredAmount": {
         "currency": "USD",
@@ -2288,12 +2315,12 @@ Name | Type | Description
 source | object | Properties of the source of the payment.
 *source.* address | [address](#address) | The address to send from.
 *source.* amount | [laxAmount](#amount) | An exact amount to send. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with source.maxAmount)
-*source.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
+*source.* tag | integer | *Optional* An arbitrary 32-bit unsigned integer. It typically maps to an off-ledger account; for example, a hosted wallet or exchange account.
 *source.* maxAmount | [laxAmount](#amount) | The maximum amount to send. (This field cannot be used with source.amount)
 destination | object | Properties of the destination of the payment.
 *destination.* address | [address](#address) | An address representing the destination of the transaction.
 *destination.* amount | [laxAmount](#amount) | An exact amount to deliver to the recipient. If the counterparty is not specified, amounts with any counterparty may be used. (This field cannot be used with `destination.minAmount`.)
-*destination.* tag | integer | *Optional* An arbitrary unsigned 32-bit integer that identifies a reason for payment or a non-Ripple account.
+*destination.* tag | integer | *Optional* An arbitrary 32-bit unsigned integer. It typically maps to an off-ledger account; for example, a hosted wallet or exchange account.
 *destination.* minAmount | [laxAmount](#amount) | The minimum amount to be delivered. (This field cannot be used with destination.amount)
 paths | string | The paths of trustlines and orders to use in executing the payment.
 
@@ -3890,7 +3917,7 @@ defaultRipple | boolean | *Optional* Enable [rippling](https://ripple.com/build/
 depositAuth | boolean | *Optional* Enable [Deposit Authorization](https://ripple.com/build/deposit-authorization/) on this account. If set, transactions cannot send value of any kind to this account unless the sender of those transactions is the account itself. (Requires the [DepositAuth amendment](https://ripple.com/build/known-amendments/#depositauth))
 disableMasterKey | boolean | *Optional* Disallows use of the master key to sign transactions for this account. To disable the master key, you must authorize the transaction by signing it with the master key pair. You cannot use a regular key pair or a multi-signature. You can re-enable the master key pair using a regular key pair or multi-signature. See [AccountSet](https://developers.ripple.com/accountset.html).
 disallowIncomingXRP | boolean | *Optional* Indicates that client applications should not send XRP to this account. Not enforced by rippled.
-domain | string | *Optional*  The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase.
+domain | string | *Optional* The domain that owns this account, as a hexadecimal string representing the ASCII for the domain in lowercase.
 emailHash | string,null | *Optional* Hash of an email address to be used for generating an avatar image. Conventionally, clients use Gravatar to display this image. Use `null` to clear.
 enableTransactionIDTracking | boolean | *Optional* Track the ID of this account’s most recent transaction.
 globalFreeze | boolean | *Optional* Freeze all assets issued by this account.
@@ -3905,9 +3932,11 @@ signers | object | *Optional* Settings that determine what sets of accounts can 
 *signers.* threshold | integer | A target number for the signer weights. A multi-signature from this list is valid only if the sum weights of the signatures provided is equal or greater than this value. To delete the signers setting, use the value `0`.
 *signers.* weights | array | *Optional* Weights of signatures for each signer.
 *signers.* weights[] | object | An association of an address and a weight.
-*signers.weights[].* address | [address](#address) | A Ripple account address
+*signers.weights[].* address | [address](#address) | An account address on the XRP Ledger
 *signers.weights[].* weight | integer | The weight that the signature of this account counts as towards the threshold.
-transferRate | number,null | *Optional*  The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
+tickSize | string | *Optional* Tick size to use for offers involving a currency issued by this address. The exchange rates of those offers is rounded to this many significant digits. Valid values are 3 to 15 inclusive, or 0 to disable.
+transferRate | number,null | *Optional* The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
+walletLocator | string,null | *Optional* Transaction hash or any other 64 character hexadecimal string, that may or may not represent the result of a hash operation. Use `null` to clear.
 
 ### Example
 
@@ -3923,8 +3952,10 @@ return api.getSettings(address).then(settings =>
   "requireDestinationTag": true,
   "disallowIncomingXRP": true,
   "emailHash": "23463B99B62A72F26ED677CC556C44E8",
+  "walletLocator": "00000000000000000000000000000000000000000000000000000000DEADBEEF",
   "domain": "example.com",
   "transferRate": 1.002,
+  "tickSize": 5,
   "signers": {
     "threshold": 3,
     "weights": [
@@ -4028,12 +4059,13 @@ limit | integer | *Optional* (May be omitted) The limit that was used in this re
 validated | boolean | *Optional* If included and set to true, the information in this request comes from a validated ledger version. Otherwise, the information is subject to change.
 
 The types of objects that may be returned include:
-* Offer objects for orders that are currently live, unfunded, or expired but not yet removed.
-* RippleState objects for trust lines where this account's side is not in the default state.
-* A SignerList object if the account has multi-signing enabled.
-* Escrow objects for held payments that have not yet been executed or canceled.
-* PayChannel objects for open payment channels.
-* Check objects for pending checks.
+
+* `Offer` objects for orders that are currently live, unfunded, or expired but not yet removed.
+* `RippleState` objects for trust lines where this account's side is not in the default state.
+* A `SignerList` object if the account has multi-signing enabled.
+* `Escrow` objects for held payments that have not yet been executed or canceled.
+* `PayChannel` objects for open payment channels.
+* `Check` objects for pending checks.
 
 ### Example
 
@@ -4481,7 +4513,7 @@ Prepare a transaction. The prepared transaction must subsequently be [signed](#s
 
 This method works with any of [the transaction types supported by rippled](https://developers.ripple.com/transaction-types.html).
 
-Notably, this is the preferred method for preparing a `DepositPreauth` transaction (added in rippled 1.1.0).
+Notably, this is the preferred method for preparing `DepositPreauth` or `AccountDelete` transactions.
 
 ### Parameters
 
@@ -5402,6 +5434,8 @@ options | object | *Optional* Options that control the type of signature that wi
 *options.* signAs | [address](#address) | *Optional* The account that the signature should count for in multisigning.
 secret | secret string | *Optional* The secret of the account that is initiating the transaction. (This field cannot be used with keypair).
 
+When this method is used for multisigning, the `options` parameter is required. See the multisigning example in this section for more details.
+
 ### Return Value
 
 This method returns an object with the following structure:
@@ -5428,6 +5462,94 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
 }
 ```
 
+
+### Example (multisigning)
+
+```javascript
+const RippleAPI = require('ripple-lib').RippleAPI;
+
+// jon's address will have a multi-signing setup with a quorum of 2
+const jon = {
+    account: 'rJKpme4m2zBQceBuU89d7vLMzgoUw2Ptj',
+    secret: 'sh4Va7b1wQof8knHFV2sxwX12fSgK'
+};
+const aya = {
+    account: 'rnrPdBjs98fFFfmRpL6hM7exT788SWQPFN',
+    secret: 'snaMuMrXeVc2Vd4NYvHofeGNjgYoe'
+};
+const bran = {
+    account: 'rJ93RLnT1t5A8fCr7HTScw7WtfKJMRXodH',
+    secret: 'shQtQ8Um5MS218yvEU3Ehy1eZQKqH'
+};
+
+// Setup the signers list with a quorum of 2
+const multiSignSetupTransaction = {
+    "Flags": 0,
+    "TransactionType": "SignerListSet",
+    "Account": "rJKpme4m2zBQceBuU89d7vLMzgoUw2Ptj",
+    "Fee": "120",
+    "SignerQuorum": 2,
+    "SignerEntries": [
+        {
+            "SignerEntry": {
+                "Account": "rnrPdBjs98fFFfmRpL6hM7exT788SWQPFN",
+                "SignerWeight": 2
+            }
+        },
+        {
+            "SignerEntry": {
+                "Account": "rJ93RLnT1t5A8fCr7HTScw7WtfKJMRXodH",
+                "SignerWeight": 1
+            }
+        },
+    ]
+};
+
+// a transaction which requires multi signing
+const multiSignPaymentTransaction = {
+    TransactionType: 'Payment',
+    Account: 'rJKpme4m2zBQceBuU89d7vLMzgoUw2Ptj',
+    Destination: 'rJ93RLnT1t5A8fCr7HTScw7WtfKJMRXodH',
+    Amount: '88000000'
+};
+
+const api = new RippleAPI({
+    server: 'wss://s.altnet.rippletest.net:51233'
+});
+
+api.connect().then(() => {
+    // adding the multi signing feature to jon's account
+    api.prepareTransaction(multiSignSetupTransaction).then((prepared) => {
+        console.log(prepared);
+        jonSign = api.sign(prepared.txJSON, jon.secret).signedTransaction;
+        api.submit(jonSign).then( response => {
+            console.log(response.resultCode, response.resultMessage);
+
+            // multi sign a transaction
+            api.prepareTransaction(multiSignPaymentTransaction).then(prepared => {
+                console.log(prepared);
+
+                // Aya and Bran sign it too but with 'signAs' set to their own account
+                let ayaSign = api.sign(prepared.txJSON, aya.secret, {'signAs': aya.account}).signedTransaction;
+                let branSign = api.sign(prepared.txJSON, bran.secret, {'signAs': bran.account}).signedTransaction;
+
+                // signatures are combined and submitted
+                let combinedTx = api.combine([ayaSign, branSign]);
+                api.submit(combinedTx.signedTransaction).then(response => {
+                    console.log(response.tx_json.hash);
+                    return api.disconnect();
+                }).catch(console.error);
+            }).catch(console.error);
+        }).catch(console.error)
+    }).catch(console.error);
+}).catch(console.error);
+```
+
+Assuming the multisigning account was setup properly, the above example will respond with `resultCode: 'tesSUCCESS'` and the hash for the transaction.
+If any of `{signAs: some_address}` options were missing the code will return a validation error as follow:
+```
+[ValidationError(txJSON is not the same for all signedTransactions)]
+```
 
 ## combine
 
@@ -5530,9 +5652,9 @@ return api.submit(signedTransaction)
 ```
 
 
-## generateAddress
+## generateXAddress
 
-`generateAddress(): {address: string, secret: string}`
+`generateXAddress(options?: object): {address: string, secret: string}`
 
 Generate a new XRP Ledger address and corresponding secret.
 
@@ -5542,7 +5664,9 @@ Name | Type | Description
 ---- | ---- | -----------
 options | object | *Optional* Options to control how the address and secret are generated.
 *options.* algorithm | string | *Optional* The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
-*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed.
+*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed. Must be an array of length 16 with values from 0-255 (16 bytes of entropy)
+*options.* includeClassicAddress | boolean | *Optional* Specifies whether the classic address should also be included in the returned payload.
+*options.* test | boolean | *Optional* Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`.
 
 ### Return Value
 
@@ -5550,8 +5674,8 @@ This method returns an object with the following structure:
 
 Name | Type | Description
 ---- | ---- | -----------
-address | [address](#address) | A randomly generated Ripple account address.
-secret | secret string | The secret corresponding to the `address`.
+xAddress | [xAddress](#x-address) | A randomly generated XRP Ledger address in X-address format.
+secret | secret string | The secret corresponding to the address.
 
 ### Example
 
@@ -5562,6 +5686,52 @@ return api.generateAddress();
 
 ```json
 {
+  "xAddress": "XVLcsWWNiFdUEqoDmSwgxh1abfddG1LtbGFk7omPgYpbyE8",
+  "secret": "sp6JS7f14BuwFY8Mw6bTtLKWauoUs"
+}
+```
+
+
+## generateAddress
+
+`generateAddress(options?: object): {address: string, secret: string}`
+
+Deprecated: This method returns a classic address. If you do not need the classic address, use `generateXAddress` instead.
+
+Generate a new XRP Ledger address and corresponding secret.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+options | object | *Optional* Options to control how the address and secret are generated.
+*options.* algorithm | string | *Optional* The digital signature algorithm to generate an address for. Can be `ecdsa-secp256k1` (default) or `ed25519`.
+*options.* entropy | array\<integer\> | *Optional* The entropy to use to generate the seed. Must be an array of length 16 with values from 0-255 (16 bytes of entropy)
+*options.* includeClassicAddress | boolean | *Optional* If `true`, return the classic address, in addition to the X-address.
+*options.* test | boolean | *Optional* Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`.
+
+### Return Value
+
+This method returns an object with the following structure:
+
+Name | Type | Description
+---- | ---- | -----------
+xAddress | [xAddress](#x-address) | A randomly generated XRP Ledger address in X-address format.
+classicAddress | [classicAddress](#classic-address) | A randomly generated XRP Ledger Account ID (classic address).
+address | [classicAddress](#classic-address) | Deprecated: Use `classicAddress` instead.
+secret | secret string | The secret corresponding to the address.
+
+### Example
+
+```javascript
+return api.generateAddress();
+```
+
+
+```json
+{
+  "xAddress": "XVLcsWWNiFdUEqoDmSwgxh1abfddG1LtbGFk7omPgYpbyE8",
+  "classicAddress": "rGCkuB7PBr5tNy68tPEABEtcdno4hE6Y7f",
   "address": "rGCkuB7PBr5tNy68tPEABEtcdno4hE6Y7f",
   "secret": "sp6JS7f14BuwFY8Mw6bTtLKWauoUs"
 }
@@ -5572,7 +5742,7 @@ return api.generateAddress();
 
 `isValidAddress(address: string): boolean`
 
-Checks if the specified string contains a valid address.
+Checks if the specified string contains a valid address. X-addresses are considered valid with ripple-lib v1.4.0 and higher.
 
 ### Parameters
 
@@ -5858,6 +6028,34 @@ api.iso8601ToRippleTime('2017-02-17T15:04:57Z');
 
 ```json
 540659097
+```
+
+## rippleTimeToISO8601
+
+`rippleTimeToISO8601(rippleTime: number): string`
+
+This method takes the number of seconds since the "Ripple Epoch" of January 1, 2000 (00:00 UTC) and returns a string representation of a date.
+
+The Ripple Epoch is 946684800 seconds after the Unix Epoch.
+
+This method is useful for interpreting timestamps returned by the rippled APIs. The rippled APIs represent time as an unsigned integer of the number of seconds since the Ripple Epoch.
+
+### Parameters
+
+`rippleTime`: A number of seconds since the Ripple Epoch.
+
+### Return Value
+
+A string representing a date and time, created by calling a `Date` object's `toISOString()` method.
+
+### Example
+
+```javascript
+api.rippleTimeToISO8601(540659097);
+```
+
+```json
+'2017-02-17T15:04:57.000Z'
 ```
 
 ## txFlags

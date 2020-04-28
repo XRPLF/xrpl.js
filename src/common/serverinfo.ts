@@ -4,32 +4,33 @@ import BigNumber from 'bignumber.js'
 import {RippleAPI} from '..'
 
 export type GetServerInfoResponse = {
-  buildVersion: string,
-  completeLedgers: string,
-  hostID: string,
-  ioLatencyMs: number,
+  buildVersion: string
+  completeLedgers: string
+  hostID: string
+  ioLatencyMs: number
   load?: {
-    jobTypes: Array<object>,
+    jobTypes: Array<object>
     threads: number
-  },
+  }
   lastClose: {
-    convergeTimeS: number,
+    convergeTimeS: number
     proposers: number
-  },
-  loadFactor: number,
-  peers: number,
-  pubkeyNode: string,
-  pubkeyValidator?: string,
-  serverState: string,
+  }
+  loadFactor: number
+  peers: number
+  pubkeyNode: string
+  pubkeyValidator?: string
+  serverState: string
   validatedLedger: {
-    age: number,
-    baseFeeXRP: string,
-    hash: string,
-    reserveBaseXRP: string,
-    reserveIncrementXRP: string,
+    age: number
+    baseFeeXRP: string
+    hash: string
+    reserveBaseXRP: string
+    reserveIncrementXRP: string
     ledgerVersion: number
-  },
+  }
   validationQuorum: number
+  networkLedger?: string
 }
 
 function renameKeys(object, mapping) {
@@ -50,12 +51,9 @@ function getServerInfo(this: RippleAPI): Promise<GetServerInfoResponse> {
         reserveIncXrp: 'reserveIncrementXRP',
         seq: 'ledgerVersion'
       })
-      info.validatedLedger.baseFeeXRP =
-        info.validatedLedger.baseFeeXRP.toString()
-      info.validatedLedger.reserveBaseXRP =
-        info.validatedLedger.reserveBaseXRP.toString()
-      info.validatedLedger.reserveIncrementXRP =
-        info.validatedLedger.reserveIncrementXRP.toString()
+      info.validatedLedger.baseFeeXRP = info.validatedLedger.baseFeeXRP.toString()
+      info.validatedLedger.reserveBaseXRP = info.validatedLedger.reserveBaseXRP.toString()
+      info.validatedLedger.reserveIncrementXRP = info.validatedLedger.reserveIncrementXRP.toString()
     }
     return info
   })
@@ -63,10 +61,7 @@ function getServerInfo(this: RippleAPI): Promise<GetServerInfoResponse> {
 
 // This is a public API that can be called directly.
 // This is not used by the `prepare*` methods. See `src/transaction/utils.ts`
-async function getFee(
-  this: RippleAPI,
-  cushion?: number
-): Promise<string> {
+async function getFee(this: RippleAPI, cushion?: number): Promise<string> {
   if (cushion === undefined) {
     cushion = this._feeCushion
   }
@@ -81,10 +76,7 @@ async function getFee(
   // Cap fee to `this._maxFeeXRP`
   fee = BigNumber.min(fee, this._maxFeeXRP)
   // Round fee to 6 decimal places
-  return (new BigNumber(fee.toFixed(6))).toString(10)
+  return new BigNumber(fee.toFixed(6)).toString(10)
 }
 
-export {
-  getServerInfo,
-  getFee
-}
+export {getServerInfo, getFee}

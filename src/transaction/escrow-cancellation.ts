@@ -5,15 +5,16 @@ import {Memo} from '../common/types/objects'
 import {RippleAPI} from '..'
 
 export type EscrowCancellation = {
-  owner: string,
-  escrowSequence: number,
+  owner: string
+  escrowSequence: number
 
   // TODO: This ripple-lib memo format should be deprecated in favor of rippled's format.
   // If necessary, expose a public method for converting between the two formats.
   memos?: Array<Memo>
 }
 
-function createEscrowCancellationTransaction(account: string,
+function createEscrowCancellationTransaction(
+  account: string,
   payment: EscrowCancellation
 ): TransactionJSON {
   const txJSON: any = {
@@ -28,14 +29,21 @@ function createEscrowCancellationTransaction(account: string,
   return txJSON
 }
 
-function prepareEscrowCancellation(this: RippleAPI, address: string,
+function prepareEscrowCancellation(
+  this: RippleAPI,
+  address: string,
   escrowCancellation: EscrowCancellation,
   instructions: Instructions = {}
 ): Promise<Prepare> {
-  validate.prepareEscrowCancellation(
-    {address, escrowCancellation, instructions})
+  validate.prepareEscrowCancellation({
+    address,
+    escrowCancellation,
+    instructions
+  })
   const txJSON = createEscrowCancellationTransaction(
-    address, escrowCancellation)
+    address,
+    escrowCancellation
+  )
   return utils.prepareTransaction(txJSON, this, instructions)
 }
 

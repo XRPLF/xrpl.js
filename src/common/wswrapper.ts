@@ -17,7 +17,6 @@ declare class WebSocket {
  * same, as `ws` package provides.
  */
 class WSWrapper extends EventEmitter {
-
   private _ws: WebSocket
   static CONNECTING = 0
   static OPEN = 1
@@ -60,8 +59,6 @@ class WSWrapper extends EventEmitter {
   get readyState() {
     return this._ws.readyState
   }
-
 }
 
 export = WSWrapper
-

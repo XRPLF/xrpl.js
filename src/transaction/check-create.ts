@@ -6,14 +6,15 @@ import {Amount} from '../common/types/objects'
 import {RippleAPI} from '..'
 
 export type CheckCreateParameters = {
-  destination: string,
-  sendMax: Amount,
-  destinationTag?: number,
-  expiration?: string,
+  destination: string
+  sendMax: Amount
+  destinationTag?: number
+  expiration?: string
   invoiceID?: string
 }
 
-function createCheckCreateTransaction(account: string,
+function createCheckCreateTransaction(
+  account: string,
   check: CheckCreateParameters
 ): TransactionJSON {
   const txJSON: any = {
@@ -38,15 +39,15 @@ function createCheckCreateTransaction(account: string,
   return txJSON
 }
 
-function prepareCheckCreate(this: RippleAPI, address: string,
+function prepareCheckCreate(
+  this: RippleAPI,
+  address: string,
   checkCreate: CheckCreateParameters,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareCheckCreate(
-      {address, checkCreate, instructions})
-    const txJSON = createCheckCreateTransaction(
-      address, checkCreate)
+    validate.prepareCheckCreate({address, checkCreate, instructions})
+    const txJSON = createCheckCreateTransaction(address, checkCreate)
     return utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {
     return Promise.reject(e)

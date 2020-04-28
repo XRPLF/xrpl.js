@@ -6,17 +6,18 @@ import {Memo} from '../common/types/objects'
 import {RippleAPI} from '..'
 
 export type EscrowCreation = {
-  amount: string,
-  destination: string,
-  memos?: Array<Memo>,
-  condition?: string,
-  allowCancelAfter?: string,
-  allowExecuteAfter?: string,
-  sourceTag?: number,
+  amount: string
+  destination: string
+  memos?: Array<Memo>
+  condition?: string
+  allowCancelAfter?: string
+  allowExecuteAfter?: string
+  sourceTag?: number
   destinationTag?: number
 }
 
-function createEscrowCreationTransaction(account: string,
+function createEscrowCreationTransaction(
+  account: string,
   payment: EscrowCreation
 ): TransactionJSON {
   const txJSON: any = {
@@ -44,23 +45,28 @@ function createEscrowCreationTransaction(account: string,
   if (payment.memos !== undefined) {
     txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
-  if (Boolean(payment.allowCancelAfter) && Boolean(payment.allowExecuteAfter) &&
-      txJSON.CancelAfter <= txJSON.FinishAfter) {
-    throw new ValidationError('prepareEscrowCreation: ' +
-      '"allowCancelAfter" must be after "allowExecuteAfter"')
+  if (
+    Boolean(payment.allowCancelAfter) &&
+    Boolean(payment.allowExecuteAfter) &&
+    txJSON.CancelAfter <= txJSON.FinishAfter
+  ) {
+    throw new ValidationError(
+      'prepareEscrowCreation: ' +
+        '"allowCancelAfter" must be after "allowExecuteAfter"'
+    )
   }
   return txJSON
 }
 
-function prepareEscrowCreation(this: RippleAPI, address: string,
+function prepareEscrowCreation(
+  this: RippleAPI,
+  address: string,
   escrowCreation: EscrowCreation,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareEscrowCreation(
-      {address, escrowCreation, instructions})
-    const txJSON = createEscrowCreationTransaction(
-      address, escrowCreation)
+    validate.prepareEscrowCreation({address, escrowCreation, instructions})
+    const txJSON = createEscrowCreationTransaction(address, escrowCreation)
     return utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {
     return Promise.reject(e)

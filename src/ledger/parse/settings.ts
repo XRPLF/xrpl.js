@@ -5,9 +5,10 @@ const AccountFlags = constants.AccountFlags
 import parseFields from './fields'
 
 function getAccountRootModifiedNode(tx: any) {
-  const modifiedNodes = tx.meta.AffectedNodes.filter(node =>
-    node.ModifiedNode.LedgerEntryType === 'AccountRoot')
-  assert(modifiedNodes.length === 1)
+  const modifiedNodes = tx.meta.AffectedNodes.filter(
+    node => node.ModifiedNode.LedgerEntryType === 'AccountRoot'
+  )
+  assert.ok(modifiedNodes.length === 1)
   return modifiedNodes[0].ModifiedNode
 }
 
@@ -51,8 +52,11 @@ function parseFlags(tx: any): any {
 
 function parseSettings(tx: any) {
   const txType = tx.TransactionType
-  assert(txType === 'AccountSet' || txType === 'SetRegularKey' ||
-         txType === 'SignerListSet')
+  assert.ok(
+    txType === 'AccountSet' ||
+      txType === 'SetRegularKey' ||
+      txType === 'SignerListSet'
+  )
 
   return _.assign({}, parseFlags(tx), parseFields(tx))
 }

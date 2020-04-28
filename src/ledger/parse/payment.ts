@@ -13,23 +13,26 @@ function isQualityLimited(tx) {
 }
 
 function removeGenericCounterparty(amount, address) {
-  return amount.counterparty === address ?
-    _.omit(amount, 'counterparty') : amount
+  return amount.counterparty === address
+    ? _.omit(amount, 'counterparty')
+    : amount
 }
 
 // Payment specification
 function parsePayment(tx: any): object {
-  assert(tx.TransactionType === 'Payment')
+  assert.ok(tx.TransactionType === 'Payment')
 
   const source = {
     address: tx.Account,
     maxAmount: removeGenericCounterparty(
-      parseAmount(tx.SendMax || tx.Amount), tx.Account),
+      parseAmount(tx.SendMax || tx.Amount),
+      tx.Account
+    ),
     tag: tx.SourceTag
   }
 
   const destination: {
-    address: string,
+    address: string
     tag: number | undefined
   } = {
     address: tx.Destination,

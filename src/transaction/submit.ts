@@ -4,7 +4,7 @@ import {validate} from '../common'
 import {RippleAPI} from '..'
 
 export interface FormattedSubmitResponse {
-  resultCode: string,
+  resultCode: string
   resultMessage: string
 }
 

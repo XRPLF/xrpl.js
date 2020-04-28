@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import * as assert from 'assert'
 const {Validator} = require('jsonschema')
 import {ValidationError} from './errors'
-import {isValidAddress} from 'ripple-address-codec'
+import {isValidClassicAddress, isValidXAddress} from 'ripple-address-codec'
 import {isValidSecret} from './utils'
 
 function loadSchemas() {
@@ -34,6 +34,8 @@ function loadSchemas() {
     require('./schemas/objects/destination-address-tag.json'),
     require('./schemas/objects/transaction-hash.json'),
     require('./schemas/objects/address.json'),
+    require('./schemas/objects/x-address.json'),
+    require('./schemas/objects/classic-address.json'),
     require('./schemas/objects/adjustment.json'),
     require('./schemas/objects/quality.json'),
     require('./schemas/objects/amount.json'),
@@ -60,6 +62,8 @@ function loadSchemas() {
     require('./schemas/specifications/check-cash.json'),
     require('./schemas/specifications/check-cancel.json'),
     require('./schemas/specifications/trustline.json'),
+    require('./schemas/specifications/deposit-preauth.json'),
+    require('./schemas/specifications/account-delete.json'),
     require('./schemas/output/sign.json'),
     require('./schemas/output/submit.json'),
     require('./schemas/output/get-account-info.json'),
@@ -121,17 +125,28 @@ function loadSchemas() {
   ]
   const titles = schemas.map(schema => schema.title)
   const duplicates = _.keys(_.pickBy(_.countBy(titles), count => count > 1))
-  assert(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
+  assert.ok(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
   const validator = new Validator()
   // Register custom format validators that ignore undefined instances
   // since jsonschema will still call the format validator on a missing
   // (optional)  property
-  validator.customFormats.address = function(instance) {
+
+  // This relies on "format": "xAddress" in `x-address.json`!
+  validator.customFormats.xAddress = function(instance) {
+    if (instance === undefined) {
+      return true
+    }
+    return isValidXAddress(instance)
+  }
+
+  // This relies on "format": "classicAddress" in `classic-address.json`!
+  validator.customFormats.classicAddress = function(instance) {
     if (instance === undefined) {
       return true
     }
     return isValidAddress(instance)
   }
+
   validator.customFormats.secret = function(instance) {
     if (instance === undefined) {
       return true
@@ -158,8 +173,8 @@ function schemaValidate(schemaName: string, object: any): void {
   }
 }
 
-export {
-  schemaValidate,
-  isValidSecret,
-  isValidAddress
+function isValidAddress(address: string): boolean {
+  return isValidXAddress(address) || isValidClassicAddress(address)
 }
+
+export {schemaValidate, isValidSecret, isValidAddress}

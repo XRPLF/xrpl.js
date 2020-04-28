@@ -1,5 +1,172 @@
 # ripple-lib Release History
 
+Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
+
+## 1.6.5 (2020-03-23)
+
+* APPLICATIONS.md: Add xrplorer.com
+* Internal: Fix typos
+* Dependencies
+  * Update @types/ws, @types/node, @typescript-eslint/eslint-plugin, @types/mocha, webpack, typescript, mocha, assert-diff
+  * Remove mocha-junit-reporter
+
+## 1.6.4 (2020-02-18)
+
+* Fix generateXAddress() and generateAddress() with no entropy (#1211, #1209)
+* Internal
+  * Improve unit tests
+* Dependencies
+  * Update webpack-cli, @types/node, webpack, @typescript-eslint/eslint-plugin,
+    typescript, ripple-keypairs
+
+## 1.6.3 (2020-02-05)
+
+* Update ripple-keypairs to 1.0.0
+* Bug fix: Assign event listener to socket close event on open before attempting post-open logic (#1186)
+  * Protects against possible unhandled rejection in disconnect
+  * Adds the Connection `_ws.close` event listener post `_ws.open` before executing any post `_ws.open` logic, i.e. `Connection._subscribeToLedger`
+  * This prevents a reconnection error loop that occurs if `Connection._ws` is never cleaned up by the unreachable `_ws.close` event listener
+  * Also ensures that a possible disconnect() promise rejection is not unhandled if any `_ws.open` logic in `Connection.connect()` throws
+* Dependencies
+  * Update mocha-junit-reporter, @types/node, mocha, @typescript-eslint/eslint-plugin, ripple-address-codec
+
+## 1.6.2 (2020-01-17)
+
+* Bug fix: Catch possible error in reconnect() on _heartbeat(), emit reconnect error (#1179)
+* Docs: Fix whitespace
+* Dependencies
+  * Update @typescript-eslint/eslint-plugin, ts-node, @types/node, @types/ws, typescript
+
+## 1.6.1 (2020-01-14)
+
+> **Update Note:** In this release we refactored the internal connection logic of ripple-lib to improve resiliency across dropped messages and reconnects. The external interface remains the same, with zero changes to public methods/properties. However, If you experience any problems around connections, requests, and request retries, please [file an issue]( https://github.com/ripple/ripple-lib/issues/new) with the repo (and be sure to test against v1.6.0 to confirm that the problem was introduced in this version).
+
+* Documentation
+  * Document message type 'path_find' (#1121) (thanks @r0bertz)
+  * Improve documentation for address generation; functions that can be called offline; generateXAddress() (#1158, #1159, #1169) (thanks @hbergren)
+  * Add [Security Policy](https://github.com/ripple/ripple-lib/blob/develop/SECURITY.md)
+* Bug fixes
+  * Types: Fix AccountObjectsResponse structure (#1127) (thanks @you21979)
+  * In some cases, ripple-lib would fail to wait for the connection to be ready (#1119)
+* Dependencies
+  * Update docs dependencies, ejs and doctoc (#1153)
+  * Update eslint, ripple-lib-transactionparser, typescript, nyc, ws, @types/node, ripple-binary-codec, mocha, mocha-junit-reporter
+* Internal
+  * Add LedgerHistory to Connection (#1119): Moved ledger logic into its own Ledger class
+
+## 1.6.0 (2020-01-06)
+
+* Add support for AccountDelete (#1120)
+* Improve error type given on rejected message _send to be DisconnectedError (#1098)
+* Internal
+  * Add unit test for unhandled promise rejection warning on message _send (#1098)
+* Dependencies
+  * Update @types/node, @typescript-eslint/parser
+
+## 1.5.1 (2019-12-28)
+
+* Fix support for CDNs (#1142)
+* Internal
+  * Clean up connection trace logic (#1114)
+  * Clean up the connection config (#1115)
+  * Run prettier format (#1116)
+  * Update eslint command (#1118)
+* Dependencies
+  * Update webpack-cli, webpack, ts-node, @types/lodash, @types/ws, @types/node, @typescript-eslint/parser, @typescript-eslint/eslint-plugin, https-proxy-agent, mocha, eventemitter2
+
+## 1.5.0 (2019-12-14)
+
+* Add support for `WalletLocator` (#1083)
+* Types: Move and de-dupe `TransactionJSON` type (#1096)
+  * This resolves an error surfaced by [TypeScript 3.7](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#local-and-imported-type-declarations-now-conflict)
+* Add a heartbeat to detect hung connections (#1101)
+* Dependencies
+  * Update TypeScript version (#1096)
+  * Update ripple-lib-transactionparser to 0.8.1 (#1097)
+  * Update ripple-binary-codec to 0.2.5
+  * Update webpack (#1112)
+  * Require node 8 and yarn (#1107)
+* Testing: Refactor and add unit tests
+  * Fix some errors caught by the improved tests
+
+## 1.4.2 (2019-11-14)
+
+* Add support for tick size (#1090) (thanks @RareData)
+* Update email hash default to allow proper clearing (#1089) (thanks @RareData)
+* Fix Unhandled Promise Rejection Warning on message `_send`
+  * Add an immediate catch to the `_send` promise passed to `_whenReady` in case there is rejection before async handlers are added (#1092) (thanks @nickewansmith)
+* Docs improvements
+  * Add XRP Toolkit reference (#1088)
+* Internal improvements
+  * Add a prettier config
+  * Update Node.js Testing Versions (#1085)
+    * Testing matrix based on: https://nodejs.org/en/about/releases/
+      - Node 11 is no longer supported (not LTS)
+      - Node 12 added (active LTS)
+      - Node 13 added ("current" release)
+
+## 1.4.1 (2019-11-06)
+
+* Compatibility: Change TypeScript compile target back to `es6` (#1071)
+  * WARNING: This allows for the use of Node v6, which is no longer supported by Node.js, as it was end-of-life'd in April 2019
+  * We recommend updating to Node v8/v10 ASAP in order to get security updates and fixes from the Node.js team
+  * We are not actively running tests against Node v6 (ref #1076)
+* Docs: `getAccountObjects` doc fix
+* Dependencies:
+  * Update `bignumber.js`
+  * Update `ripple-keypairs`
+  * Update `ws`
+* Build process: Update `webpack` flow
+
+## 1.4.0 (2019-10-28)
+
+* Unref timer so it does not hang the Node.js process
+* Add a 2-second timeout for connect()
+* Improve getTransaction() error when tx has not been validated yet
+* Add support for the new X-address format
+* Fix error in Safari, Chrome 78, Firefox 70
+* Some error messages have changed slightly. For example:
+  * `-instance.Account is not of a type(s) string,instance.Account does not conform to the "address" format`
+  * `+instance.Account is not of a type(s) string,instance.Account is not exactly one from <xAddress>,<classicAddress>`
+
+### Internal improvements
+
+* Reduce dependency size
+* Move tests to TypeScript
+* Replace tslint with eslint
+* Update https-proxy-agent
+* Add tests
+
+## 1.3.4 (2019-10-18)
+
+* Update ripple-lib-transactionparser
+* Improve error message when signing fails (e.g. due to trailing zeros)
+* Integrate ripple-hashes (in TypeScript with improved naming and docs)
+* Add multi-signing example to sign() method docs
+* Update TypeScript
+
+## 1.3.3 (2019-09-10)
+
+* Expand node version compatibility to support Node.js 12 ([ripple-binary-codec#32](https://github.com/ripple/ripple-binary-codec/issues/32))
+
+## 1.3.2 (2019-09-03)
+
+* Export and document `rippleTimeToISO8601()` method
+* Add type for isValidAddress (fixes error TS7016, #1032)
+* Docs: update recommended Node.js version (#1031)
+
+When using this release with [rippled](https://github.com/ripple/rippled), we recommend using [rippled version 1.3.1](https://github.com/ripple/rippled/releases/tag/1.3.1) or later.
+
+## 1.3.1 (2019-08-26)
+
+* Upgrade to gulp 4 (#1030)
+* Remove http server (unused)
+* Update dependencies
+
+There are no changes in the browser version with this release. The npm package for Node.js should be slightly smaller.
+
+When using this release with [rippled](https://github.com/ripple/rippled), we recommend using [rippled version 1.3.1](https://github.com/ripple/rippled/releases/tag/1.3.1).
+
 ## 1.3.0 (2019-08-16)
 
 ### Bug fixes:
@@ -334,7 +501,7 @@ f28921f57a133678dcb3cb54c497626bd76b1f953d22d61f3ddca31c8947d552  ripple-1.1.0-m
 The SHA-256 checksums for the browser version of this release can be found
 below.
 ```
-% shasum -a 256 * 
+% shasum -a 256 *
 2556fe17296e127ed44e7066e90a6175e2b164f00ca3c1aa7b1c554f31c688dd  ripple-1.0.2-debug.js
 e0342ea21eac32a1024c62034fba09c6f26dd3e7371b23ea1e153e03135cd590  ripple-1.0.2-min.js
 c7286c517497d018d02d09257e81172b61d36c8b9885a077af68e8133c3b3b9b  ripple-1.0.2.js

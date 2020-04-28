@@ -5,6 +5,7 @@ function buildList(options) {
 }
 
 module.exports = {
+  generateXAddress: require('./generate-x-address.json'),
   generateAddress: require('./generate-address.json'),
   getAccountInfo: require('./get-account-info.json'),
   getAccountObjects: require('./get-account-objects.json'),
@@ -66,7 +67,8 @@ module.exports = {
     paymentChannelClaim:
       require('./get-transaction-payment-channel-claim.json'),
     amendment: require('./get-transaction-amendment.json'),
-    feeUpdate: require('./get-transaction-fee-update.json')
+    feeUpdate: require('./get-transaction-fee-update.json'),
+    accountDelete: require('./get-transaction-account-delete.json')
   },
   getTransactions: {
     normal: require('./get-transactions.json'),

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "generateXAddress",
+  "type": "object",
+  "properties": {
+    "xAddress": {
+      "$ref": "xAddress",
+      "description": "A randomly generated XRP Ledger address in X-address format."
+    },
+    "secret": {
+      "type": "string",
+      "format": "secret",
+      "description": "The secret corresponding to the address."
+    }
+  },
+  "required": ["xAddress", "secret"],
+  "additionalProperties": false
+}
