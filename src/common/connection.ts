@@ -13,7 +13,7 @@ import {
   RippledNotInitializedError,
   RippleError
 } from './errors'
-import {ExponentialBackoff} from './backoff';
+import {ExponentialBackoff} from './backoff'
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
@@ -37,6 +37,23 @@ export interface ConnectionOptions {
  * still optional at the point that the user provides it.
  */
 export type ConnectionUserOptions = Partial<ConnectionOptions>
+
+/**
+ * Ledger Stream Message
+ * https://xrpl.org/subscribe.html#ledger-stream
+ */
+interface LedgerStreamMessage {
+  type?: 'ledgerClosed' // not present in initial `subscribe` response
+  fee_base: number
+  fee_ref: number
+  ledger_hash: string
+  ledger_index: number
+  ledger_time: number
+  reserve_base: number
+  reserve_inc: number
+  txn_count?: number // not present in initial `subscribe` response
+  validated_ledgers?: string
+}
 
 /**
  * Represents an intentionally triggered web-socket disconnect code.
@@ -118,10 +135,11 @@ function websocketSendAsync(ws: WebSocket, message: string) {
  * captured by the Connection class over time.
  */
 class LedgerHistory {
-  private availableVersions = new RangeSet()
-  latestVersion: null | number = null
   feeBase: null | number = null
   feeRef: null | number = null
+  latestVersion: null | number = null
+  reserveBase: null | number = null
+  private availableVersions = new RangeSet()
 
   /**
    * Returns true if the given version exists.
@@ -143,24 +161,21 @@ class LedgerHistory {
    * of whether ledger history data exists or not. If relevant ledger data
    * is found, we'll update our history (ex: from a "ledgerClosed" event).
    */
-  update(responseData: {
-    ledger_index?: string
-    validated_ledgers?: string
-    fee_base?: string
-    fee_ref?: string
-  }) {
-    this.latestVersion = Number(responseData.ledger_index)
-    if (responseData.validated_ledgers) {
+  update(ledgerMessage: LedgerStreamMessage) {
+    // type: ignored
+    this.feeBase = ledgerMessage.fee_base
+    this.feeRef = ledgerMessage.fee_ref
+    // ledger_hash: ignored
+    this.latestVersion = ledgerMessage.ledger_index
+    // ledger_time: ignored
+    this.reserveBase = ledgerMessage.reserve_base
+    // reserve_inc: ignored (may be useful for advanced use cases)
+    // txn_count: ignored
+    if (ledgerMessage.validated_ledgers) {
       this.availableVersions.reset()
-      this.availableVersions.parseAndAddRanges(responseData.validated_ledgers)
+      this.availableVersions.parseAndAddRanges(ledgerMessage.validated_ledgers)
     } else {
       this.availableVersions.addValue(this.latestVersion)
-    }
-    if (responseData.fee_base) {
-      this.feeBase = Number(responseData.fee_base)
-    }
-    if (responseData.fee_ref) {
-      this.feeRef = Number(responseData.fee_ref)
     }
   }
 }
@@ -372,9 +387,9 @@ export class Connection extends EventEmitter {
    */
   private _heartbeat = () => {
     return this.request({command: 'ping'}).catch(() => {
-        this.reconnect().catch((error) => {
-          this.emit('error', 'reconnect', error.message, error)
-        })
+      this.reconnect().catch(error => {
+        this.emit('error', 'reconnect', error.message, error)
+      })
     })
   }
 
@@ -535,8 +550,8 @@ export class Connection extends EventEmitter {
    * If no open websocket connection exists, resolve with no code (`undefined`).
    */
   disconnect(): Promise<number | undefined> {
-    clearTimeout(this._reconnectTimeoutID);
-    this._reconnectTimeoutID = null;
+    clearTimeout(this._reconnectTimeoutID)
+    this._reconnectTimeoutID = null
     if (this._state === WebSocket.CLOSED || !this._ws) {
       return Promise.resolve(undefined)
     }
@@ -563,11 +578,6 @@ export class Connection extends EventEmitter {
     await this.connect()
   }
 
-  async getLedgerVersion(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.latestVersion!
-  }
-
   async getFeeBase(): Promise<number> {
     await this._waitForReady()
     return this._ledger.feeBase!
@@ -576,6 +586,16 @@ export class Connection extends EventEmitter {
   async getFeeRef(): Promise<number> {
     await this._waitForReady()
     return this._ledger.feeRef!
+  }
+
+  async getLedgerVersion(): Promise<number> {
+    await this._waitForReady()
+    return this._ledger.latestVersion!
+  }
+
+  async getReserveBase(): Promise<number> {
+    await this._waitForReady()
+    return this._ledger.reserveBase!
   }
 
   /**

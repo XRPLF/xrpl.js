@@ -98,6 +98,7 @@ describe('Connection', function() {
     )
     assert.strictEqual(await this.api.connection.getFeeBase(), 10)
     assert.strictEqual(await this.api.connection.getFeeRef(), 10)
+    assert.strictEqual(await this.api.connection.getReserveBase(), 20000000) // 20 XRP
   })
 
   it('with proxy', function(done) {
@@ -223,26 +224,29 @@ describe('Connection', function() {
   it('DisconnectedError on initial _onOpen send', async function() {
     // _onOpen previously could throw PromiseRejectionHandledWarning: Promise rejection was handled asynchronously
     // do not rely on the api.setup hook to test this as it bypasses the case, disconnect api connection first
-    await this.api.disconnect();
+    await this.api.disconnect()
 
     // stub _onOpen to only run logic relevant to test case
     this.api.connection._onOpen = () => {
       // overload websocket send on open when _ws exists
       this.api.connection._ws.send = function(data, options, cb) {
         // recent ws throws this error instead of calling back
-        throw new Error('WebSocket is not open: readyState 0 (CONNECTING)');
+        throw new Error('WebSocket is not open: readyState 0 (CONNECTING)')
       }
-      const request = {command: 'subscribe', streams: ['ledger']};
-      return this.api.connection.request(request);
+      const request = {command: 'subscribe', streams: ['ledger']}
+      return this.api.connection.request(request)
     }
 
     try {
-      await this.api.connect();
+      await this.api.connect()
     } catch (error) {
-      assert(error instanceof this.api.errors.DisconnectedError);
-      assert.strictEqual(error.message, 'WebSocket is not open: readyState 0 (CONNECTING)');
+      assert(error instanceof this.api.errors.DisconnectedError)
+      assert.strictEqual(
+        error.message,
+        'WebSocket is not open: readyState 0 (CONNECTING)'
+      )
     }
-  });
+  })
 
   it('ResponseFormatError', function() {
     return this.api
@@ -378,8 +382,8 @@ describe('Connection', function() {
       throw new Error('error on reconnect')
     }
     // Hook up a listener for the reconnect error event
-    this.api.on('error', (error, message) => { 
-      if(error === 'reconnect' && message === 'error on reconnect') {
+    this.api.on('error', (error, message) => {
+      if (error === 'reconnect' && message === 'error on reconnect') {
         return done()
       }
       return done(new Error('Expected error on reconnect'))
@@ -591,20 +595,20 @@ describe('Connection', function() {
   )
 
   it('should clean up websocket connection if error after websocket is opened', async function() {
-    await this.api.disconnect();
+    await this.api.disconnect()
     // fail on connection
     this.api.connection._subscribeToLedger = async () => {
       throw new Error('error on _subscribeToLedger')
     }
     try {
-      await this.api.connect();
+      await this.api.connect()
       throw new Error('expected connect() to reject, but it resolved')
     } catch (err) {
-      assert(err.message === 'error on _subscribeToLedger');
+      assert(err.message === 'error on _subscribeToLedger')
       // _ws.close event listener should have cleaned up the socket when disconnect _ws.close is run on connection error
       // do not fail on connection anymore
       this.api.connection._subscribeToLedger = async () => {}
-      await this.api.connection.reconnect();
+      await this.api.connection.reconnect()
     }
   })
 

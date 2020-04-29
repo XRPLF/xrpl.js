@@ -89,6 +89,19 @@ import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 import {ConnectionUserOptions} from './common/connection'
 import {isValidXAddress, isValidClassicAddress} from 'ripple-address-codec'
+import {
+  computeBinaryTransactionHash,
+  computeTransactionHash,
+  computeBinaryTransactionSigningHash,
+  computeAccountLedgerObjectID,
+  computeSignerListLedgerObjectID,
+  computeOrderID,
+  computeTrustlineHash,
+  computeTransactionTreeHash,
+  computeStateTreeHash,
+  computeEscrowHash,
+  computePaymentChannelHash
+} from './common/hashes'
 
 export interface APIOptions extends ConnectionUserOptions {
   server?: string
@@ -401,6 +414,31 @@ class RippleAPI extends EventEmitter {
 
   static isValidXAddress = isValidXAddress
   static isValidClassicAddress = isValidClassicAddress
+
+  /**
+   * Static methods that replace functionality from the now-deprecated ripple-hashes library
+   */
+  // Compute the hash of a binary transaction blob.
+  static computeBinaryTransactionHash = computeBinaryTransactionHash // (txBlobHex: string): string
+  // Compute the hash of a transaction in txJSON format.
+  static computeTransactionHash = computeTransactionHash // (txJSON: any): string
+  static computeBinaryTransactionSigningHash = computeBinaryTransactionSigningHash // (txBlobHex: string): string
+  // Compute the hash of an account, given the account's classic address (starting with `r`).
+  static computeAccountLedgerObjectID = computeAccountLedgerObjectID // (address: string): string
+  // Compute the hash (ID) of an account's SignerList.
+  static computeSignerListLedgerObjectID = computeSignerListLedgerObjectID // (address: string): string
+  // Compute the hash of an order, given the owner's classic address (starting with `r`) and the account sequence number of the `OfferCreate` order transaction.
+  static computeOrderID = computeOrderID // (address: string, sequence: number): string
+  // Compute the hash of a trustline, given the two parties' classic addresses (starting with `r`) and the currency code.
+  static computeTrustlineHash = computeTrustlineHash // (address1: string, address2: string, currency: string): string
+  static computeTransactionTreeHash = computeTransactionTreeHash // (transactions: any[]): string
+  static computeStateTreeHash = computeStateTreeHash // (entries: any[]): string
+  // Compute the hash of a ledger.
+  static computeLedgerHash = computeLedgerHash // (ledgerHeader): string
+  // Compute the hash of an escrow, given the owner's classic address (starting with `r`) and the account sequence number of the `EscrowCreate` escrow transaction.
+  static computeEscrowHash = computeEscrowHash // (address, sequence): string
+  // Compute the hash of a payment channel, given the owner's classic address (starting with `r`), the classic address of the destination, and the account sequence number of the `PaymentChannelCreate` payment channel transaction.
+  static computePaymentChannelHash = computePaymentChannelHash // (address, dstAddress, sequence): string
 
   xrpToDrops = xrpToDrops
   dropsToXrp = dropsToXrp
