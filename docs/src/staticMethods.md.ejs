@@ -1,1 +1,35 @@
 # Static Methods
+
+ripple-lib features a number of static methods that you can access directly on the `RippleAPI` object. The most commonly-used one is `computeBinaryTransactionHash`, described below. For the full list, see the [XRP Ledger Hashes README](https://github.com/ripple/ripple-lib/blob/develop/src/common/hashes/README.md).
+
+## computeBinaryTransactionHash
+
+`computeBinaryTransactionHash(txBlobHex: string): string`
+
+Returns the hash (id) of a binary transaction blob.
+
+This is a static method on the `RippleAPI` class.
+
+### Parameters
+
+This method takes one parameter, a string containing a binary transaction in hex.
+
+### Return Value
+
+This method returns a string representing the transaction's id (hash).
+
+### Example
+
+```javascript
+const signed_blob = '120000228000000024000B2E5A201B0066374B61400000003B9ACA0068400000000000000C732102356E89059A75438887F9FEE2056A2890DB82A68353BE9C0C0C8F89C0018B37FC74473045022100B3721EEB1ED6DFF29FB8B209E2DE6B54A0A6E44D52D926342F3D334BE98F08640220367A74107AD5DEAEFA3AB2984C161FC23F30B2704BB5CC984358BA262177A4568114F667B0CA50CC7709A220B0561B85E53A48461FA883142B71D8B09B4EE8DAA68FB936C23E3A974713BDAC'
+if (typeof signed_blob === 'string' && signed_blob.match(/^[A-F0-9]+$/)) {
+  const id = RippleAPI.computeBinaryTransactionHash(signed_blob)
+  console.log('Transaction hash:', id')
+}
+```
+
+```
+Transaction hash: 80C5E11E1A21A626759D6CB944B33DBAAC66BD704A289C86E330B847904F5C13
+```
+
+[RunKit Example: computeBinaryTransactionHash](https://runkit.com/intelliot/computebinarytransactionhash-example)
