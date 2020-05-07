@@ -46,7 +46,7 @@ To register your listener function, use `connection.on(type, handler)`.
 Here is an example of listening for transactions on given account(s):
 ```
 const account = 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn' // Replace with the account you want notifications for
-api.connect().then(() => { // Omit this if you are already connected
+api.connect().then(() => {
 
   // 'transaction' can be replaced with the relevant `type` from the table above
   api.connection.on('transaction', (event) => {
@@ -58,9 +58,7 @@ api.connect().then(() => { // Omit this if you are already connected
   api.request('subscribe', {
       accounts: [ account ]
   }).then(response => {
-      if (response.status === 'success') {
-          console.log('Successfully subscribed')
-      }
+      console.log('Successfully subscribed')
   }).catch(error => {
       // Handle `error`
   })

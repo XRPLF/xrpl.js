@@ -73,7 +73,7 @@ For details, see the `scripts` in `package.json`.
 
 ### Linting
 
-Run `yarn lint` to lint the code with `tslint`.
+Run `yarn lint` to lint the code with `eslint`.
 
 ## Generating Documentation
 
