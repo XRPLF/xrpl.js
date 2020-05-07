@@ -5714,7 +5714,7 @@ secret | secret string | The secret corresponding to the address.
 ### Example
 
 ```javascript
-return api.generateAddress();
+return api.generateXAddress();
 ```
 
 
