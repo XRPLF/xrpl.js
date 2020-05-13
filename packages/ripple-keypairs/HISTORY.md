@@ -1,5 +1,11 @@
 # ripple-keypairs Release History
 
+## 1.0.1 (2020-05-12)
+
+* Update dependencies
+  * codecov, eslint-config-airbnb-typescript, @typescript-eslint/eslint-plugin, @typescript-eslint/parser, @types/node, eslint-plugin-mocha, typescript, mocha
+* This will probably be the last version to support Node.js version 8, which reached End-of-Life on 31st December 2019. If you are still using Node.js 8, we recommend upgrading to version 10 or higher as soon as possible. ([Node.js Releases](https://nodejs.org/en/about/releases/))
+
 ## 1.0.0 (2020-02-05)
 
 * Refactor and use TypeScript
