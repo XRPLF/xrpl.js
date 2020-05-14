@@ -31,7 +31,7 @@
     "fs-extra": "^9.0.0",
     "intercept-stdout": "^0.1.2",
     "istanbul": "~0.4.3",
-    "mocha": "~6.2.0"
+    "mocha": "~7.1.2"
   },
   "scripts": {
     "compile": "babel --optional runtime -d distrib/npm/ src/ && cp src/enums/definitions.json distrib/npm/enums",
