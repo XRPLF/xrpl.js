@@ -5624,67 +5624,87 @@ return api.combine(signedTransactions);
 
 ## submit
 
-`submit(signedTransaction: string): Promise<object>`
+`request('submit', {tx_blob: string, fail_hard: boolean}): Promise<object>`
 
-Submits a signed transaction. The transaction is not guaranteed to succeed; it must be verified with [getTransaction](#gettransaction).
+The `submit` method applies a transaction and sends it to the network to be confirmed and included in future ledgers.
+
+This method takes a signed, serialized transaction as a binary blob, and submits it to the network as-is. Since signed transaction objects are immutable, no part of the transaction can be modified or automatically filled in after submission.
+
+To send a transaction as robustly as possible, you should construct and sign it in advance, persist it somewhere that you can access even after a power outage, then `submit` it as a `tx_blob`. After submission, monitor the network with the `tx` method to see if the transaction was successfully applied; if a restart or other problem occurs, you can safely re-submit the `tx_blob` transaction: it won't be applied twice since it has the same sequence number as the old transaction.
 
 ### Parameters
 
-Name | Type | Description
----- | ---- | -----------
-signedTransaction | string | A signed transaction as returned by [sign](#sign).
-failHard | boolean | *Optional* If `true`, and the transaction fails locally, do not retry or relay the transaction to other servers. Defaults to `false`.
+| `Field`     | Type    | Description                                          |
+|:------------|:--------|:-----------------------------------------------------|
+| `tx_blob`   | String  | Hex representation of the signed transaction to submit. This can be a multi-signed transaction. |
+| `fail_hard` | Boolean | (Optional, defaults to false) If true, and the transaction fails locally, do not retry or relay the transaction to other servers |
 
 ### Return Value
 
-This method returns an object with the following structure:
+When successful, this method returns an object containing the following fields:
 
-Name | Type | Description
----- | ---- | -----------
-resultCode | string | Deprecated: Use `engine_result` instead.
-resultMessage | string | Deprecated: Use `engine_result_message` instead.
-engine_result | string | Code indicating the preliminary result of the transaction, for example `tesSUCCESS`. [List of transaction responses](https://developers.ripple.com/transaction-results.html)
-engine_result_code | integer | Numeric code indicating the preliminary result of the transaction, directly correlated to `engine_result`
-engine_result_message | string | Human-readable explanation of the transaction's preliminary result.
-tx_blob | string | The complete transaction in hex string format.
-tx_json | [tx-json](https://developers.ripple.com/transaction-formats.html) | The complete transaction in JSON format.
+| `Field`                 | Type    | Description                              |
+|:------------------------|:--------|:-----------------------------------------|
+| `engine_result`         | String  | Text [result code](https://xrpl.org/transaction-results.html) indicating the preliminary result of the transaction, for example `tesSUCCESS` |
+| `engine_result_code`    | Integer | Numeric version of the [result code](https://xrpl.org/transaction-results.html). **Not recommended.** |
+| `engine_result_message` | String  | Human-readable explanation of the transaction's preliminary result |
+| `tx_blob`               | String  | The complete transaction in hex string format |
+| `tx_json`               | Object  | The complete transaction in JSON format  |
+| `accepted`              | Boolean | The value `true` indicates that the transaction was applied, queued, broadcast, or kept for later. The value `false` indicates that none of those happened, so the transaction cannot possibly succeed as long as you do not submit it again and have not already submitted it another time. [New in: rippled 1.5.0] |
+| `account_sequence_available` | Number | The next [Sequence Number](https://xrpl.org/basic-data-types.html#account-sequence) available for the sending account after all pending and [queued](https://xrpl.org/transaction-queue.html) transactions. [New in: rippled 1.5.0] |
+| `account_sequence_next` | number  | The next [Sequence Number](https://xrpl.org/basic-data-types.html#account-sequence) for the sending account after all transactions that have been provisionally applied, but not transactions in the [queue](https://xrpl.org/transaction-queue.html). [New in: rippled 1.5.0] |
+| `applied`               | Boolean | The value `true` indicates that this transaction was applied to the open ledger. In this case, the transaction is likely, but not guaranteed, to be validated in the next ledger version. [New in: rippled 1.5.0] |
+| `broadcast`             | Boolean | The value `true` indicates this transaction was broadcast to peer servers in the peer-to-peer XRP Ledger network. (Note: if the server has no peers, such as in [stand-alone mode](https://xrpl.org/rippled-server-modes.html#reasons-to-run-a-rippled-server-in-stand-alone-mode), the server uses the value `true` for cases where it _would_ have broadcast the transaction.) The value `false` indicates the transaction was not broadcast to any other servers. [New in: rippled 1.5.0] |
+| `kept`                  | Boolean | The value `true` indicates that the transaction was kept to be retried later. [New in: rippled 1.5.0] |
+| `queued`                | Boolean | The value `true` indicates the transaction was put in the [Transaction Queue](https://xrpl.org/transaction-queue.html), which means it is likely to be included in a future ledger version. [New in: rippled 1.5.0] |
+| `open_ledger_cost`      | String  | The current [open ledger cost](https://xrpl.org/transaction-cost.html#open-ledger-cost) before processing this transaction. Transactions with a lower cost are likely to be [queued](https://xrpl.org/transaction-queue.html). [New in: rippled 1.5.0] |
+| `validated_ledger_index` | Integer  | The [ledger index](https://xrpl.org/basic-data-types.html#ledger-index) of the newest validated ledger at the time of submission. This provides a lower bound on the ledger versions that the transaction can appear in as a result of this request. (The transaction could only have been validated in this ledger version or earlier if it had already been submitted before.) |
+
+Note: Many situations can prevent a transaction from processing successfully, such as a lack of trust lines connecting the two accounts in a payment, or changes in the state of the ledger since the time the transaction was constructed. Even if nothing is wrong, it may take several seconds to close and validate the ledger version that includes the transaction. Do not consider the transaction's results final until they appear in a validated ledger version.
 
 ### Example
 
 ```javascript
-const signedTransaction = '12000322800000002400000017201B0086955368400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100BDE09A1F6670403F341C21A77CF35BA47E45CDE974096E1AA5FC39811D8269E702203D60291B9A27F1DCABA9CF5DED307B4F23223E0B6F156991DB601DFB9C41CE1C770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304';
-return api.submit(signedTransaction)
-  .then(result => {/* ... */});
+const signedTransaction = '12000022800000002400000007201B007008BC61400000000754D4C068400000000000000C732103E8110048477E60F292DEDA67CF518511E70A15E1E3771B3C024026E1F824832874473045022100D659C836C24FF346A87054E463078D805B19EFE9F10348FD4C6ED6C3F3C4D750022060BE0BFD5E2C4963A1B0E0F21D5BA800969863BA486F71E75C08D76D77C45B22811492F80A3F3849DBB5714A4F2C691CE7D47BEED58083141266204CFBC657E65D9B4D30301FF98644693935';
+const failHard = false;
+const result = await api.request('submit', {
+  tx_blob: signedTransaction,
+  fail_hard: failHard // optional
+});
 ```
-
 
 ```json
 {
-  "resultCode": "tesSUCCESS",
-  "resultMessage": "The transaction was applied. Only final in a validated ledger.",
+  "accepted": true,
+  "account_sequence_available": 8,
+  "account_sequence_next": 8,
+  "applied": true,
+  "broadcast": true,
   "engine_result": "tesSUCCESS",
   "engine_result_code": 0,
   "engine_result_message": "The transaction was applied. Only final in a validated ledger.",
-  "tx_blob": "1200002280000000240000016861D4838D7EA4C6800000000000000000000000000055534400000000004B4E9C06F24296074F7BC48F92A97916C6DC5EA9684000000000002710732103AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB7446304402200E5C2DD81FDF0BE9AB2A8D797885ED49E804DBF28E806604D878756410CA98B102203349581946B0DDA06B36B35DBC20EDA27552C1F167BCF5C6ECFF49C6A46F858081144B4E9C06F24296074F7BC48F92A97916C6DC5EA983143E9D4A2B8AA0780F682D136F7A56D6724EF53754",
+  "kept": true,
+  "open_ledger_cost": "10",
+  "queued": false,
+  "tx_blob": "12000022800000002400000007201B007008BC61400000000754D4C068400000000000000C732103E8110048477E60F292DEDA67CF518511E70A15E1E3771B3C024026E1F824832874473045022100D659C836C24FF346A87054E463078D805B19EFE9F10348FD4C6ED6C3F3C4D750022060BE0BFD5E2C4963A1B0E0F21D5BA800969863BA486F71E75C08D76D77C45B22811492F80A3F3849DBB5714A4F2C691CE7D47BEED58083141266204CFBC657E65D9B4D30301FF98644693935",
   "tx_json": {
-    "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-    "Amount": {
-      "currency": "USD",
-      "issuer": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-      "value": "1"
-    },
-    "Destination": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
-    "Fee": "10000",
-    "Flags": 2147483648,
-    "Sequence": 360,
-    "SigningPubKey": "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB",
-    "TransactionType": "Payment",
-    "TxnSignature": "304402200E5C2DD81FDF0BE9AB2A8D797885ED49E804DBF28E806604D878756410CA98B102203349581946B0DDA06B36B35DBC20EDA27552C1F167BCF5C6ECFF49C6A46F8580",
-    "hash": "4D5D90890F8D49519E4151938601EF3D0B30B16CD6A519D9C99102C9FA77F7E0"
-  }
+      "Account": "rNQao3Z1irwRjKWSs8heL4a8WKLPKfLrXs",
+      "Amount": "123000000",
+      "Destination": "rpgHWJdXkSvvzikdJCpuMzU7zWnuqsJRCZ",
+      "Fee": "12",
+      "Flags": 2147483648,
+      "LastLedgerSequence": 7342268,
+      "Sequence": 7,
+      "SigningPubKey": "03E8110048477E60F292DEDA67CF518511E70A15E1E3771B3C024026E1F8248328",
+      "TransactionType": "Payment",
+      "TxnSignature": "3045022100D659C836C24FF346A87054E463078D805B19EFE9F10348FD4C6ED6C3F3C4D750022060BE0BFD5E2C4963A1B0E0F21D5BA800969863BA486F71E75C08D76D77C45B22",
+      "hash": "FE8D68D7FF5805EB07AF15A1ADF07FB5463CCD2C6C0A15981EB3D26A02E1551C"
+  },
+  "validated_ledger_index": 7341775
 }
 ```
 
+(In ripple-lib 1.8.0, [the old `submit` method](https://github.com/ripple/ripple-lib/blob/1.7.0/docs/index.md#submit) was deprecated.)
 
 ## generateXAddress
 

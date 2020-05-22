@@ -1,3 +1,9 @@
+// Deprecated - use api.request instead:
+//   const response = await api.request('submit', {
+//     tx_blob: signedTransaction,
+//     fail_hard: failHard
+//   });
+
 import * as _ from 'lodash'
 import * as utils from './utils'
 import {validate} from '../common'
@@ -36,6 +42,7 @@ function formatSubmitResponse(response): FormattedSubmitResponse {
   return data
 }
 
+// @deprecated Use api.request('submit', { tx_blob: signedTransaction }) instead
 async function submit(
   this: RippleAPI,
   signedTransaction: string,
