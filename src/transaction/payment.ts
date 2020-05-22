@@ -87,7 +87,12 @@ function applyAnyCounterpartyEncoding(payment: Payment): void {
 
 function createMaximalAmount(amount: Amount): Amount {
   const maxXRPValue = '100000000000'
-  const maxIOUValue = '9999999999999999e80'
+
+  // Equivalent to '9999999999999999e80' but we cannot use that because sign()
+  // now checks that the encoded representation exactly matches the transaction
+  // as it was originally provided.
+  const maxIOUValue = '999999999999999900000000000000000000000000000000000000000000000000000000000000000000000000000000'
+
   let maxValue
   if (amount.currency === 'XRP') {
     maxValue = maxXRPValue
