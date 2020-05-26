@@ -2,6 +2,15 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.7.1 (2020-05-26)
+
+* Fix preparePayment when using source.amount/destination.minAmount (#1295) (Fix #1237) (Thanks to @leobel)
+* Docs
+  * Fix generateXAddress example (#1286)
+  * Update Transaction Streams link (#1278)
+* Dependencies
+  * Update assert-diff, mocha, webpack-bundle-analyzer, @typescript-eslint/parser, @typescript-eslint/eslint-plugin, @types/ws, @types/node, ws, ts-node, eventemitter2
+
 ## 1.7.0 (2020-04-28)
 
 * Export hashing functions (#1275)
