@@ -265,7 +265,7 @@ class RippleAPI extends EventEmitter {
   /**
    * Prepare a transaction.
    *
-   * You can later submit the transaction with `submit()`.
+   * You can later submit the transaction with a `submit` request.
    */
   async prepareTransaction(
     txJSON: TransactionJSON,
@@ -398,7 +398,8 @@ class RippleAPI extends EventEmitter {
   prepareSettings = prepareSettings
   sign = sign
   combine = combine
-  submit = submit
+
+  submit = submit // @deprecated Use api.request('submit', { tx_blob: signedTransaction }) instead
 
   deriveKeypair = deriveKeypair
   deriveAddress = deriveAddress
