@@ -9,7 +9,7 @@ import {Settings} from '../common/constants'
 const AccountFlags = constants.AccountFlags
 
 export type SettingsOptions = {
-  ledgerVersion?: number
+  ledgerVersion?: number | 'validated' | 'closed' | 'current'
 }
 
 export function parseAccountFlags(
