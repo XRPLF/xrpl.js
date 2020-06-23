@@ -44,6 +44,10 @@ Warning: Use at your own risk.
 
   XRP Ledger explorer, API, metrics, and analytics using a graph database that is synchronized live with the XRPL.
 
+- **[zerptracker](https://zerptracker.com)**
+
+  Monitor the XRPL using powerful JSONPath expressions, and receive notifications via email, SMS, webhooks, and more.
+
 ## Send and request payments
 
 - **[XRP Tip Bot](https://www.xrptipbot.com/)**
