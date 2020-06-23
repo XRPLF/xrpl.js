@@ -12,7 +12,7 @@ Warning: Use at your own risk.
 
 ## Data and visualizations
 
-- **[xrp1ntel - XRP Intelligence](https://xrp1ntel.com/)**
+- **[xrpintel - XRP Intelligence](https://xrpintel.com/)**
 
   Monitor the XRP Network in real time and explore historical statistics.
 
