@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "lib": [
+        "es2017"
+        ],
+        "outDir": "dist",
+        "rootDir": "src",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitThis": false,
+        "noImplicitAny": false,
+        "removeComments": false,
+        "preserveConstEnums": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "sourceMap": true,
+        "skipLibCheck": true,
+        "declaration": true,
+        "strict": true
+    },
+    "include": [
+        "src/**/*.ts"
+    ]
+}
