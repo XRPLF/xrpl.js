@@ -96,39 +96,39 @@ const input = {
   tecDUPLICATE: 149,
   tecKILLED: 150,
   tecHAS_OBLIGATIONS: 151,
-  tecTOO_SOON: 152
-}
+  tecTOO_SOON: 152,
+};
 
-let startingFromTemBADSENDXRPPATHS = -284
+let startingFromTemBADSENDXRPPATHS = -284;
 
-let startingFromTefFAILURE = -199
+let startingFromTefFAILURE = -199;
 
-let startingFromTerRETRY = -99
+let startingFromTerRETRY = -99;
 
-const tesSUCCESS = 0
+const tesSUCCESS = 0;
 
-let startingFromTecCLAIM = 100
+let startingFromTecCLAIM = 100;
 
-const startingFromTecDIRFULL = 121
+const startingFromTecDIRFULL = 121;
 
-let previousKey = 'tem'
-Object.keys(input).forEach(key => {
+let previousKey = "tem";
+Object.keys(input).forEach((key) => {
   if (key.substring(0, 3) !== previousKey.substring(0, 3)) {
-    console.log()
-    previousKey = key
+    console.log();
+    previousKey = key;
   }
-  if (key.substring(0, 3) === 'tem') {
-    console.log(`    "${key}": ${startingFromTemBADSENDXRPPATHS++},`)
-  } else if (key.substring(0, 3) === 'tef') {
-    console.log(`    "${key}": ${startingFromTefFAILURE++},`)
-  } else if (key.substring(0, 3) === 'ter') {
-    console.log(`    "${key}": ${startingFromTerRETRY++},`)
-  } else if (key.substring(0, 3) === 'tes') {
-    console.log(`    "${key}": ${tesSUCCESS},`)
-  } else if (key.substring(0, 3) === 'tec') {
-    if (key === 'tecDIR_FULL') {
-      startingFromTecCLAIM = startingFromTecDIRFULL
+  if (key.substring(0, 3) === "tem") {
+    console.log(`    "${key}": ${startingFromTemBADSENDXRPPATHS++},`);
+  } else if (key.substring(0, 3) === "tef") {
+    console.log(`    "${key}": ${startingFromTefFAILURE++},`);
+  } else if (key.substring(0, 3) === "ter") {
+    console.log(`    "${key}": ${startingFromTerRETRY++},`);
+  } else if (key.substring(0, 3) === "tes") {
+    console.log(`    "${key}": ${tesSUCCESS},`);
+  } else if (key.substring(0, 3) === "tec") {
+    if (key === "tecDIR_FULL") {
+      startingFromTecCLAIM = startingFromTecDIRFULL;
     }
-    console.log(`    "${key}": ${startingFromTecCLAIM++},`)
+    console.log(`    "${key}": ${startingFromTecCLAIM++},`);
   }
-})
+});

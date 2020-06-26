@@ -1,0 +1,7 @@
+// We need this file to run ESLint on our tests
+// https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/parser/README.md#configuration
+{
+    // extend your base config so you don't have to redefine your compilerOptions
+    "extends": "./tsconfig.json",
+    "include": ["src/**/*.ts"]
+  }

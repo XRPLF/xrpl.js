@@ -1,11 +1,12 @@
-import { makeClass } from '../utils/make-class'
-import { UInt } from './uint'
+import { makeClass } from "../utils/make-class";
+import { UInt } from "./uint";
 
-const UInt32 = makeClass({
-  inherits: UInt,
-  statics: { width: 4 }
-}, undefined)
+const UInt32 = makeClass(
+  {
+    inherits: UInt,
+    statics: { width: 4 },
+  },
+  undefined
+);
 
-export {
-  UInt32
-}
+export { UInt32 };
