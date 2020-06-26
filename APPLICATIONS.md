@@ -12,7 +12,7 @@ Warning: Use at your own risk.
 
 ## Data and visualizations
 
-- **[xrp1ntel - XRP Intelligence](https://xrp1ntel.com/)**
+- **[xrpintel - XRP Intelligence](https://xrpintel.com/)**
 
   Monitor the XRP Network in real time and explore historical statistics.
 
@@ -43,6 +43,10 @@ Warning: Use at your own risk.
 - **[xrplorer](https://xrplorer.com)**
 
   XRP Ledger explorer, API, metrics, and analytics using a graph database that is synchronized live with the XRPL.
+
+- **[zerptracker](https://zerptracker.com)**
+
+  Monitor the XRPL using powerful JSONPath expressions, and receive notifications via email, SMS, webhooks, and more.
 
 ## Send and request payments
 
