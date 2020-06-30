@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { makeClass } from "../utils/make-class";
-import { Enums } from "../enums";
+import { Field } from "../definitions";
 import { slice, parseBytes } from "../utils/bytes-utils";
 
 const BinaryParser = makeClass(
@@ -68,7 +68,7 @@ const BinaryParser = makeClass(
       return (type << 16) | nth;
     },
     readField() {
-      return Enums.Field.from(this.readFieldOrdinal());
+      return Field.fromString(this.readFieldOrdinal().toString());
     },
     readType(type) {
       return type.fromParser(this);
@@ -81,7 +81,9 @@ const BinaryParser = makeClass(
       if (!kls) {
         throw new Error(`unsupported: (${field.name}, ${field.type.name})`);
       }
-      const sizeHint = field.isVLEncoded ? this.readVLLength() : null;
+      const sizeHint = field.isVariableLengthEncoded
+        ? this.readVLLength()
+        : null;
       const value = kls.fromParser(this, sizeHint);
       if (value === undefined) {
         throw new Error(

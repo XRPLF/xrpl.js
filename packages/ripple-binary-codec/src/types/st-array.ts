@@ -1,8 +1,6 @@
 import { makeClass } from "../utils/make-class";
 import { ensureArrayLikeIs, SerializedType } from "./serialized-type";
-import { Enums } from "../enums";
 import { STObject } from "./st-object";
-const { ArrayEndMarker } = Enums.Field;
 
 const STArray = makeClass(
   {
@@ -13,11 +11,11 @@ const STArray = makeClass(
         const array = new STArray();
         while (!parser.end()) {
           const field = parser.readField();
-          if (field === ArrayEndMarker) {
+          if (field.name === "ArrayEndMarker") {
             break;
           }
           const outer = new STObject();
-          outer[field] = parser.readFieldValue(field);
+          outer[field.name] = parser.readFieldValue(field);
           array.push(outer);
         }
         return array;

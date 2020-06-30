@@ -2,11 +2,11 @@
 
 ## Types
 
-TODO
+These are the [types](https://xrpl.org/serialization.html#type-list) associated with a given Serialization Field
 
 ## Ledger Entry Types
 
-TODO
+Each ledger's state tree contain [ledger objects](https://xrpl.org/ledger-object-types.html), which represent all settings, balances, and relationships in the shared ledger. 
 
 ## Fields
 
