@@ -52,18 +52,18 @@ const PaymentChannel = {
 }
 
 function bytesListTest () {
-  const list = new BytesList().put([0]).put([2, 3]).put([4, 5])
-  test('is an Array<Uint8Array>', function () {
-    expect(Array.isArray(list.arrays)).toBe(true)
-    expect(list.arrays[0] instanceof Uint8Array).toBe(true)
+  const list = new BytesList().put(Buffer.from([0])).put(Buffer.from([2, 3])).put(Buffer.from([4, 5]))
+  test('is an Array<Buffer>', function () {
+    expect(Array.isArray(list.bytesArray)).toBe(true)
+    expect(list.bytesArray[0] instanceof Buffer).toBe(true)
   })
   test('keeps track of the length itself', function () {
-    expect(list).toHaveLength(5)
+    expect(list.getLength()).toBe(5)
   })
   test('can join all arrays into one via toBytes', function () {
     const joined = list.toBytes()
     expect(joined).toHaveLength(5)
-    expect(joined).toEqual(Uint8Array.from([0, 2, 3, 4, 5]))
+    expect(joined).toEqual(Buffer.from([0, 2, 3, 4, 5]))
   })
 }
 
@@ -95,7 +95,7 @@ function check (type, n, expected) {
       return
     }
     serializer.writeType(type, n)
-    expect(bl.toBytes()).toEqual(Uint8Array.from(expected))
+    expect(bl.toBytes()).toEqual(Buffer.from(expected))
   })
 }
 

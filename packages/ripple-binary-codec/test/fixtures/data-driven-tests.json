@@ -943,7 +943,7 @@
             "name": "TickSize",
             "nth_of_type": 16,
             "type": 16,
-            "expected_hex": "01010"
+            "expected_hex": "001010"
         }
     ],
     "whole_objects": [

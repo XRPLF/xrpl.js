@@ -9,7 +9,7 @@ const TRANSACTION_RESULT_WIDTH = 1;
 /*
  * @brief: Serialize a field based on type_code and Field.nth
  */
-function fieldHeader(type: number, nth: number): Uint8Array {
+function fieldHeader(type: number, nth: number): Buffer {
   const header: Array<number> = [];
   if (type < 16) {
     if (nth < 16) {
@@ -22,7 +22,7 @@ function fieldHeader(type: number, nth: number): Uint8Array {
   } else {
     header.push(0, type, nth);
   }
-  return new Uint8Array(header);
+  return Buffer.from(header);
 }
 
 /*
@@ -69,7 +69,7 @@ class BytesLookup {
 }
 
 /*
- * type FieldInfo is the type of the objects constaining information about each field in definitions.json
+ * type FieldInfo is the type of the objects containing information about each field in definitions.json
  */
 interface FieldInfo {
   nth: number;
@@ -87,12 +87,13 @@ interface FieldInstance {
   readonly type: Bytes;
   readonly ordinal: number;
   readonly name: string;
-  readonly header: Uint8Array;
+  readonly header: Buffer;
   readonly associatedType: any;
 }
 
 function buildField([name, info]: [string, FieldInfo]): FieldInstance {
   const typeOrdinal = enums.TYPES[info.type];
+  const field = fieldHeader(typeOrdinal, info.nth);
   return {
     name: name,
     nth: info.nth,
@@ -101,13 +102,13 @@ function buildField([name, info]: [string, FieldInfo]): FieldInstance {
     isSigningField: info.isSigningField,
     ordinal: (typeOrdinal << 16) | info.nth,
     type: new Bytes(info.type, typeOrdinal, TYPE_WIDTH),
-    header: fieldHeader(typeOrdinal, info.nth),
+    header: field,
     associatedType: undefined, // For later assignment in ./types/index.js
   };
 }
 
 /*
- * @brief: The collection of all fields as defined in definitons.json
+ * @brief: The collection of all fields as defined in definitions.json
  */
 class FieldLookup {
   constructor(fields: Array<[string, FieldInfo]>) {
@@ -137,4 +138,11 @@ const TransactionResult = new BytesLookup(
 );
 const Field = new FieldLookup(enums.FIELDS as Array<[string, FieldInfo]>);
 
-export { Field, Type, LedgerEntryType, TransactionResult, TransactionType };
+export {
+  Field,
+  FieldInstance,
+  Type,
+  LedgerEntryType,
+  TransactionResult,
+  TransactionType,
+};

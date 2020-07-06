@@ -1,110 +1,157 @@
-import { strict as assert } from "assert";
-import { parseBytes, bytesToHex } from "../utils/bytes-utils";
-import { makeClass } from "../utils/make-class";
-import { Field } from "../definitions";
+import * as assert from "assert";
+import { Field, FieldInstance } from "../enums";
 
-const BytesSink = {
-  put(/* bytesSequence */) {
-    // any hex string or any object with a `length` and where 0 <= [ix] <= 255
-  },
-};
+/**
+ * Bytes list is a collection of buffer objects
+ */
+class BytesList {
+  private bytesArray: Array<Buffer> = [];
 
-const BytesList = makeClass(
-  {
-    implementing: BytesSink,
-    BytesList() {
-      this.arrays = [];
-      this.length = 0;
-    },
-    put(bytesArg) {
-      const bytes = parseBytes(bytesArg, Uint8Array);
-      this.length += bytes.length;
-      this.arrays.push(bytes);
-      return this;
-    },
-    toBytesSink(sink) {
-      this.arrays.forEach((arr) => {
-        sink.put(arr);
-      });
-    },
-    toBytes() {
-      const concatenated = new Uint8Array(this.length);
-      let pointer = 0;
-      this.arrays.forEach((arr) => {
-        concatenated.set(arr, pointer);
-        pointer += arr.length;
-      });
-      return concatenated;
-    },
-    toHex() {
-      return bytesToHex(this.toBytes());
-    },
-  },
-  undefined
-);
+  /**
+   * Get the total number of bytes in the BytesList
+   *
+   * @return the number of bytes
+   */
+  public getLength(): number {
+    return Buffer.concat(this.bytesArray).byteLength;
+  }
 
-const BinarySerializer = makeClass(
-  {
-    BinarySerializer(sink) {
-      this.sink = sink;
-    },
-    write(value) {
-      value.toBytesSink(this.sink);
-    },
-    put(bytes) {
-      this.sink.put(bytes);
-    },
-    writeType(type, value) {
-      this.write(type.from(value));
-    },
-    writeBytesList(bl) {
-      bl.toBytesSink(this.sink);
-    },
-    encodeVL(len) {
-      let length = len;
-      const lenBytes = new Uint8Array(4);
-      if (length <= 192) {
-        lenBytes[0] = length;
-        return lenBytes.subarray(0, 1);
-      } else if (length <= 12480) {
-        length -= 193;
-        lenBytes[0] = 193 + (length >>> 8);
-        lenBytes[1] = length & 0xff;
-        return lenBytes.subarray(0, 2);
-      } else if (length <= 918744) {
-        length -= 12481;
-        lenBytes[0] = 241 + (length >>> 16);
-        lenBytes[1] = (length >> 8) & 0xff;
-        lenBytes[2] = length & 0xff;
-        return lenBytes.subarray(0, 3);
+  /**
+   * Put bytes in the BytesList
+   *
+   * @param bytesArg A Buffer
+   * @return this BytesList
+   */
+  public put(bytesArg: Buffer): BytesList {
+    const bytes = Buffer.from(bytesArg); // Temporary, to catch instances of Uint8Array being passed in
+    this.bytesArray.push(bytes);
+    return this;
+  }
+
+  /**
+   * Write this BytesList to the back of another bytes list
+   *
+   *  @param list The BytesList to write to
+   */
+  public toBytesSink(list: BytesList): void {
+    list.put(this.toBytes());
+  }
+
+  public toBytes(): Buffer {
+    return Buffer.concat(this.bytesArray);
+  }
+
+  toHex(): string {
+    return this.toBytes().toString("hex").toUpperCase();
+  }
+}
+
+/**
+ * BinarySerializer is used to write fields and values to buffers
+ */
+class BinarySerializer {
+  private sink: BytesList = new BytesList();
+
+  constructor(sink: BytesList) {
+    this.sink = sink;
+  }
+
+  /**
+   * Write a value to this BinarySerializer
+   *
+   * @param value a SerializedType value
+   */
+  write(value): void {
+    value.toBytesSink(this.sink);
+  }
+
+  /**
+   * Write bytes to this BinarySerializer
+   *
+   * @param bytes the bytes to write
+   */
+  put(bytes: Buffer): void {
+    this.sink.put(bytes);
+  }
+
+  /**
+   * Write a value of a given type to this BinarySerializer
+   *
+   * @param type the type to write
+   * @param value a value of that type
+   */
+  writeType(type, value): void {
+    this.write(type.from(value));
+  }
+
+  /**
+   * Write BytesList to this BinarySerializer
+   *
+   * @param bl BytesList to write to BinarySerializer
+   */
+  writeBytesList(bl: BytesList): void {
+    bl.toBytesSink(this.sink);
+  }
+
+  /**
+   * Calculate the header of Variable Length encoded bytes
+   *
+   * @param length the length of the bytes
+   */
+  private encodeVariableLength(length: number): Buffer {
+    const lenBytes = Buffer.alloc(3);
+    if (length <= 192) {
+      lenBytes[0] = length;
+      return lenBytes.slice(0, 1);
+    } else if (length <= 12480) {
+      length -= 193;
+      lenBytes[0] = 193 + (length >>> 8);
+      lenBytes[1] = length & 0xff;
+      return lenBytes.slice(0, 2);
+    } else if (length <= 918744) {
+      length -= 12481;
+      lenBytes[0] = 241 + (length >>> 16);
+      lenBytes[1] = (length >> 8) & 0xff;
+      lenBytes[2] = length & 0xff;
+      return lenBytes.slice(0, 3);
+    }
+    throw new Error("Overflow error");
+  }
+
+  /**
+   * Write field and value to BinarySerializer
+   *
+   * @param field field to write to BinarySerializer
+   * @param value value to write to BinarySerializer
+   */
+  writeFieldAndValue(field: FieldInstance, value): void {
+    const associatedValue = field.associatedType.from(value);
+    assert(associatedValue.toBytesSink, field.name);
+    this.sink.put(field.header);
+
+    if (field.isVariableLengthEncoded) {
+      this.writeLengthEncoded(associatedValue);
+    } else {
+      associatedValue.toBytesSink(this.sink);
+      if (field.type.name === "STObject") {
+        this.sink.put(Field["ObjectEndMarker"].header);
+      } else if (field.type.name === "STArray") {
+        this.sink.put(Field["ArrayEndMarker"].header);
       }
-      throw new Error("Overflow error");
-    },
-    writeFieldAndValue(field, _value) {
-      const sink = this.sink;
-      const value = field.associatedType.from(_value);
-      assert(value.toBytesSink, field);
-      sink.put(field.header);
+    }
+  }
 
-      if (field.isVariableLengthEncoded) {
-        this.writeLengthEncoded(value);
-      } else {
-        value.toBytesSink(sink);
-        if (field.type.name === "STObject") {
-          sink.put(Field["ObjectEndMarker"].header);
-        } else if (field.type.name === "STArray") {
-          sink.put(Field["ArrayEndMarker"].header);
-        }
-      }
-    },
-    writeLengthEncoded(value) {
-      const bytes = new BytesList();
-      value.toBytesSink(bytes);
-      this.put(this.encodeVL(bytes.length));
-      this.writeBytesList(bytes);
-    },
-  },
-  undefined
-);
+  /**
+   * Write a variable length encoded value to the BinarySerializer
+   *
+   * @param value length encoded value to write to BytesList
+   */
+  public writeLengthEncoded(value): void {
+    const bytes = new BytesList();
+    value.toBytesSink(bytes);
+    this.put(this.encodeVariableLength(bytes.getLength()));
+    this.writeBytesList(bytes);
+  }
+}
 
 export { BytesList, BinarySerializer };

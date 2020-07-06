@@ -35,7 +35,7 @@
     "typescript": "^3.9.5"
   },
   "scripts": {
-    "compile": "tsc && cp ./src/definitions/definitions.json ./dist/definitions",
+    "compile": "tsc && cp ./src/enums/definitions.json ./dist/enums",
     "prepare": "npm run compile && npm test",
     "test": "jest --coverage=true",
     "lint": "eslint . --ext .ts --fix"

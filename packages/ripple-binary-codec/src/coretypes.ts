@@ -4,7 +4,7 @@ import {
   LedgerEntryType,
   Type,
   TransactionResult,
-} from "./definitions";
+} from "./enums";
 const types = require("./types");
 const binary = require("./binary");
 const { ShaMap } = require("./shamap");
