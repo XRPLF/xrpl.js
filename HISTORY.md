@@ -2,6 +2,11 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.8.0 (2020-07-06)
+
+* [Document `request('submit', ...)` method](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md#submit), which includes additional useful information in the response
+* Update [list of applications using ripple-lib](https://github.com/ripple/ripple-lib/blob/1.7.0/APPLICATIONS.md)
+
 ## 1.7.1 (2020-05-26)
 
 * Fix preparePayment when using source.amount/destination.minAmount (#1295) (Fix #1237) (Thanks to @leobel)
