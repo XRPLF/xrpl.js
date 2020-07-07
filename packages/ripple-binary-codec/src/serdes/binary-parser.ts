@@ -107,9 +107,24 @@ class BinaryParser {
    * @return Field ordinal
    */
   readFieldOrdinal(): number {
-    const tagByte = this.readUInt8();
-    const type = (tagByte & 0xf0) >>> 4 || this.readUInt8();
-    const nth = tagByte & 0x0f || this.readUInt8();
+    let type = this.readUInt8();
+    let nth = type & 15;
+    type >>= 4;
+
+    if (type === 0) {
+      type = this.readUInt8();
+      if (type === 0 || type < 16) {
+        throw new Error("Cannot read FieldOrdinal, type_code out of range");
+      }
+    }
+
+    if (nth === 0) {
+      nth = this.readUInt8();
+      if (nth === 0 || nth < 16) {
+        throw new Error("Cannot read FieldOrdinal, field_code out of range");
+      }
+    }
+
     return (type << 16) | nth;
   }
 
