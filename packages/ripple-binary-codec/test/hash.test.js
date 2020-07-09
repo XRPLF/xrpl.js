@@ -1,8 +1,8 @@
 const { coreTypes } = require('../dist/types')
-const { Hash160, Hash256, Currency, AccountID } = coreTypes
+const { Hash160, Hash256, AccountID, Currency } = coreTypes
 
 describe('Hash160', function () {
-  test('has a static width membmer', function () {
+  test('has a static width member', function () {
     expect(Hash160.width).toBe(20)
   })
   test('inherited by subclasses', function () {
@@ -39,16 +39,16 @@ describe('Hash256', function () {
 
 describe('Currency', function () {
   test('Will have a null iso() for dodgy XRP ', function () {
-    const bad = Currency.from('0000000000000000000000005852500000000000')
-    expect(bad.iso()).toBeNull()
+    const bad = Currency.from('0000000000000000000000005852500000000000',)
+    expect(bad.iso()).toBeUndefined()
     expect(bad.isNative()).toBe(false)
   })
-  test('can be constructed from an Array', function () {
-    const xrp = Currency.from(new Uint8Array(20))
+  test('can be constructed from a Buffer', function () {
+    const xrp = new Currency(Buffer.alloc(20))
     expect(xrp.iso()).toBe('XRP')
   })
   test('throws on invalid reprs', function () {
-    expect(() => Currency.from(new Uint8Array(19))).toThrow()
+    expect(() => Currency.from(Buffer.alloc(19))).toThrow()
     expect(() => Currency.from(1)).toThrow()
     expect(() => Currency.from(
       '00000000000000000000000000000000000000m')).toThrow()
