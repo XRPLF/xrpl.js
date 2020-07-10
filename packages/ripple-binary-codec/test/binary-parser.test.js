@@ -128,12 +128,12 @@ function transactionParsingTests () {
     {
       const [field, value] = readField()
       expect(field).toEqual(Field.Flags)
-      expect(value.val).toEqual(0)
+      expect(value.valueOf()).toEqual(0)
     }
     {
       const [field, value] = readField()
       expect(field).toEqual(Field.Sequence)
-      expect(value.val).toEqual(103929)
+      expect(value.valueOf()).toEqual(103929)
     }
     {
       const [field, value] = readField()

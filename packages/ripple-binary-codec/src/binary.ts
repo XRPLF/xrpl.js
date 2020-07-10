@@ -1,6 +1,5 @@
 /* eslint-disable func-style */
 
-import { BN } from "bn.js";
 import { coreTypes } from "./types";
 const { HashPrefix } = require("./hash-prefixes");
 const { BinaryParser } = require("./serdes/binary-parser");
@@ -34,7 +33,7 @@ function signingData(tx, prefix = HashPrefix.transactionSig) {
 function signingClaimData(claim) {
   const prefix = HashPrefix.paymentChannelClaim;
   const channel = coreTypes.Hash256.from(claim.channel).toBytes();
-  const amount = new coreTypes.UInt64(new BN(claim.amount)).toBytes();
+  const amount = coreTypes.UInt64.from(BigInt(claim.amount)).toBytes();
 
   const bytesList = new BytesList();
 

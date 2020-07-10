@@ -1,64 +1,54 @@
-import { strict as assert } from "assert";
-import { BN } from "bn.js";
-import { makeClass } from "../utils/make-class";
-const { Comparable, SerializedType } = require("./serialized-type");
-const { serializeUIntN } = require("../utils/bytes-utils");
-const MAX_VALUES = [0, 255, 65535, 16777215, 4294967295];
+import { ComparableClass } from "./serialized-type";
 
-function signum(a, b) {
-  return a < b ? -1 : a === b ? 0 : 1;
+/**
+ * Compare numbers and bigints n1 and n2
+ * 
+ * @param n1 First object to compare
+ * @param n2 Second object to compare
+ * @returns -1, 0, or 1, depending on how the two objects compare
+ */
+function compare(n1: number | bigint, n2: number | bigint): number {
+  return n1 < n2 ? -1 : n1 == n2 ? 0 : 1
 }
 
-const UInt = makeClass(
-  {
-    mixins: [Comparable, SerializedType],
-    UInt(val = 0) {
-      const max = MAX_VALUES[this.constructor.width];
-      if (val < 0 || !(val <= max)) {
-        throw new Error(`${val} not in range 0 <= $val <= ${max}`);
-      }
-      this.val = val;
-    },
-    statics: {
-      width: 0,
-      fromParser(parser) {
-        const val =
-          this.width > 4
-            ? parser.read(this.width)
-            : parser.readUIntN(this.width);
-        return new this(val);
-      },
-      from(val) {
-        return val instanceof this ? val : new this(val);
-      },
-    },
-    toJSON() {
-      return this.val;
-    },
-    valueOf() {
-      return this.val;
-    },
-    compareTo(other) {
-      const thisValue = this.valueOf();
-      const otherValue = other.valueOf();
-      if (thisValue instanceof BN) {
-        return otherValue instanceof BN
-          ? thisValue.cmp(otherValue)
-          : thisValue.cmpn(otherValue);
-      } else if (otherValue instanceof BN) {
-        return -other.compareTo(this);
-      }
-      assert(typeof otherValue === "number");
-      return signum(thisValue, otherValue);
-    },
-    toBytesSink(sink) {
-      sink.put(this.toBytes());
-    },
-    toBytes() {
-      return serializeUIntN(this.val, this.constructor.width);
-    },
-  },
-  undefined
-);
+/**
+ * Base class for serializing and deserializing unsigned integers.
+ */
+abstract class UInt extends ComparableClass {
+  protected static width: number
+
+  constructor(bytes: Buffer) {
+    super(bytes)
+  }
+
+  /**
+   * Overload of compareTo for Comparable
+   * 
+   * @param other other UInt to compare this to
+   * @returns -1, 0, or 1 depending on how the objects relate to each other
+   */
+  compareTo(other: UInt): number {
+    return compare(this.valueOf(), other.valueOf());
+  }
+
+  /**
+   * Convert a UInt object to JSON
+   * 
+   * @returns number or string represented by this.bytes
+   */
+  toJSON(): number | string {
+    let val = this.valueOf()
+    return typeof val === "number"
+      ? val
+      : val.toString();
+  }
+
+  /**
+   * Get the value of the UInt represented by this.bytes
+   * 
+   * @returns the value
+   */
+  abstract valueOf(): number | bigint;
+}
 
 export { UInt };

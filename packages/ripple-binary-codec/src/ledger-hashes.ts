@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import { BN } from "bn.js";
 import { strict as assert } from "assert";
 import { coreTypes } from "./types";
 const { STObject, Hash256 } = coreTypes;
@@ -54,7 +53,7 @@ function ledgerHash(header) {
   assert(header.close_flags !== undefined);
 
   coreTypes.UInt32.from(header.ledger_index).toBytesSink(hash);
-  coreTypes.UInt64.from(new BN(header.total_coins)).toBytesSink(hash);
+  coreTypes.UInt64.from(BigInt(header.total_coins)).toBytesSink(hash);
   coreTypes.Hash256.from(header.parent_hash).toBytesSink(hash);
   coreTypes.Hash256.from(header.transaction_hash).toBytesSink(hash);
   coreTypes.Hash256.from(header.account_hash).toBytesSink(hash);

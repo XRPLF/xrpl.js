@@ -1,7 +1,6 @@
 const Decimal = require("decimal.js");
 import { bytesToHex, slice, parseBytes } from "./utils/bytes-utils";
 import { coreTypes } from "./types";
-import { BN } from "bn.js";
 
 module.exports = {
   encode(arg) {
@@ -11,7 +10,7 @@ module.exports = {
       .times("1e" + -exponent)
       .abs()
       .toString();
-    const bytes = new coreTypes.UInt64(new BN(qualityString)).toBytes();
+    const bytes = coreTypes.UInt64.from(BigInt(qualityString)).toBytes();
     bytes[0] = exponent + 100;
     return bytes;
   },

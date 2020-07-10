@@ -2,7 +2,7 @@ const { coreTypes } = require('../dist/types')
 const { UInt8, UInt64 } = coreTypes
 
 test('compareToTests', () => {
-  expect(UInt8.from(124).compareTo(UInt64.from(124))).toBe(-0)
+  expect(UInt8.from(124).compareTo(UInt64.from(124))).toBe(0)
 })
 
 test('compareToTest', () => {

@@ -1,6 +1,5 @@
 /* eslint-disable func-style */
 
-const { BN } = require('bn.js')
 const { binary } = require('../dist/coretypes')
 const { encode } = require('../dist')
 const { makeParser, BytesList, BinarySerializer } = binary
@@ -110,7 +109,7 @@ check(UInt64, 0xFEFFFFFF, [0, 0, 0, 0, 254, 255, 255, 255])
 check(UInt64, -1, 'throws')
 check(UInt64, 0, [0, 0, 0, 0, 0, 0, 0, 0])
 check(UInt64, 1, [0, 0, 0, 0, 0, 0, 0, 1])
-check(UInt64, new BN(1), [0, 0, 0, 0, 0, 0, 0, 1])
+check(UInt64, BigInt(1), [0, 0, 0, 0, 0, 0, 0, 1])
 
 // function parseLedger4320278() {
 //   test('can parse object', done => {

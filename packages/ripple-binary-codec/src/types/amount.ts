@@ -1,7 +1,6 @@
 import { makeClass } from "../utils/make-class";
 const _ = require("lodash");
 const assert = require("assert");
-const BN = require("bn.js");
 const Decimal = require("decimal.js");
 const { SerializedType } = require("./serialized-type");
 const { bytesToHex } = require("../utils/bytes-utils");
@@ -155,7 +154,7 @@ const Amount = makeClass(
       // This is a tertiary fix for #31
       const integerNumberString = this.verifyNoDecimal();
 
-      return new UInt64(new BN(integerNumberString));
+      return UInt64.from(BigInt(integerNumberString));
     },
     verifyNoDecimal() {
       const integerNumberString = this.value

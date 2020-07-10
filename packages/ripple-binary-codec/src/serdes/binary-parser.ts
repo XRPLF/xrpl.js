@@ -33,7 +33,7 @@ class BinaryParser {
    * @return The bytes
    */
   read(n: number): Buffer {
-    assert(n <= this.bytes.byteLength);
+    assert(n <= this.bytes.byteLength, n + " greater than " + this.bytes.byteLength);
 
     const slice = this.bytes.slice(0, n);
     this.skip(n);

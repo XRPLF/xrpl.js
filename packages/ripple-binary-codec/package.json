@@ -12,7 +12,6 @@
     "test": "test"
   },
   "dependencies": {
-    "bn.js": "^5.1.2",
     "create-hash": "^1.2.0",
     "decimal.js": "^10.2.0",
     "inherits": "^2.0.4",

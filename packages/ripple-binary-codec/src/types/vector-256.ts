@@ -1,33 +1,67 @@
-import { makeClass } from "../utils/make-class";
-const { Hash256 } = require("./hash-256");
-const { ensureArrayLikeIs, SerializedType } = require("./serialized-type");
+import { SerializedTypeClass } from "./serialized-type";
+import { BinaryParser } from "../serdes/binary-parser";
+import { Hash256 } from "./hash-256";
+import { BytesList } from "../serdes/binary-serializer";
 
-const Vector256 = makeClass(
-  {
-    mixins: SerializedType,
-    inherits: Array,
-    statics: {
-      fromParser(parser, hint) {
-        const vector256 = new this();
-        const bytes = hint !== null ? hint : parser.size() - parser.pos();
-        const hashes = bytes / 32;
-        for (let i = 0; i < hashes; i++) {
-          vector256.push(Hash256.fromParser(parser));
-        }
-        return vector256;
-      },
-      from(value) {
-        return ensureArrayLikeIs(Vector256, value).withChildren(Hash256);
-      },
-    },
-    toBytesSink(sink) {
-      this.forEach((h) => h.toBytesSink(sink));
-    },
-    toJSON() {
-      return this.map((hash) => hash.toJSON());
-    },
-  },
-  undefined
-);
+/**
+ * Class for serializing and deserializing vectors of Hash256
+ */
+class Vector256 extends SerializedTypeClass {
+  constructor(bytes: Buffer) {
+    super(bytes)
+  }
+
+  /**
+   * Construct a Vector256 from a BinaryParser
+   * 
+   * @param parser BinaryParser to 
+   * @param hint length of the vector, in bytes, optional
+   * @returns a Vector256 object
+   */
+  static fromParser(parser: BinaryParser, hint?: number): Vector256 {
+    let bytesList = new BytesList();
+    const bytes = hint ?? parser.size();
+    const hashes = bytes / 32;
+    for (let i = 0; i < hashes; i++) {
+      Hash256.fromParser(parser).toBytesSink(bytesList);
+    }
+    return new Vector256(bytesList.toBytes());
+  }
+
+  /**
+   * Construct a Vector256 object from an array of hashes
+   * 
+   * @param value A Vector256 object or array of hex-strings representing Hash256's
+   * @returns a Vector256 object
+   */
+  static from(value: Vector256 | Array<string>): Vector256 {
+    if(value instanceof Vector256) {
+      return value;
+    }
+
+    let bytesList = new BytesList();
+    value.forEach(hash => {
+      Hash256.from(hash).toBytesSink(bytesList);
+    });
+    return new Vector256(bytesList.toBytes());
+  }
+
+  /**
+   * Return an Array of hex-strings represented by this.bytes
+   * 
+   * @returns An Array of strings representing the Hash256 objects 
+   */
+  toJSON(): Array<string> {
+    if(this.bytes.byteLength % 32 !== 0) {
+      throw new Error("Invalid bytes for Vector256")
+    }
+
+    let result: Array<string> = []
+    for(let i = 0; i < this.bytes.byteLength; i += 32) {
+      result.push(this.bytes.slice(i,i+32).toString('hex').toUpperCase())
+    }
+    return result
+  }
+}
 
 export { Vector256 };

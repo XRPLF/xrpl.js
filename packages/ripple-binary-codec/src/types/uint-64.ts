@@ -1,50 +1,81 @@
-import { strict as assert } from "assert";
-import { BN } from "bn.js";
-import { makeClass } from "../utils/make-class";
-import { bytesToHex, parseBytes, serializeUIntN } from "../utils/bytes-utils";
 import { UInt } from "./uint";
+import { BinaryParser } from "../serdes/binary-parser";
 
 const HEX_REGEX = /^[A-F0-9]{16}$/;
 
-const UInt64 = makeClass(
-  {
-    inherits: UInt,
-    statics: { width: 8 },
-    UInt64(arg: any = 0) {
-      const argType = typeof arg;
-      if (argType === "number") {
-        assert(arg >= 0);
-        this._bytes = new Uint8Array(8);
-        this._bytes.set(serializeUIntN(arg, 4), 4);
-      } else if (arg instanceof BN) {
-        this._bytes = parseBytes(arg.toArray("be", 8), Uint8Array);
-        this._toBN = arg;
-      } else {
-        if (argType === "string") {
-          if (!HEX_REGEX.test(arg)) {
-            throw new Error(`${arg} is not a valid UInt64 hex string`);
-          }
-        }
-        this._bytes = parseBytes(arg, Uint8Array);
+/**
+ * Derived UInt class for serializing/deserializing 64 bit UInt
+ */
+class UInt64 extends UInt {
+  protected static readonly width: number = 64 / 8 //8
+  static readonly defaultUInt64: UInt64 = new UInt64(Buffer.alloc(UInt64.width))
+
+  constructor(bytes: Buffer) {
+    super(bytes ?? UInt64.defaultUInt64.bytes)
+  }
+
+  static fromParser(parser: BinaryParser): UInt {
+    return new UInt64(parser.read(UInt64.width));
+  }
+
+  /**
+   * Construct a UInt64 object
+   * 
+   * @param val A UInt64, hex-string, bigint, or number
+   * @returns A UInt64 object
+   */
+  static from(val: UInt64 | string | bigint | number): UInt64 {
+    if(val instanceof UInt64) {
+      return val;
+    }
+
+    let buf = Buffer.alloc(UInt64.width);
+
+    if(typeof val === "number") {
+      if(val < 0) {
+        throw new Error("value must be an unsigned integer");
       }
-      assert(this._bytes.length === 8);
-    },
-    toJSON() {
-      return bytesToHex(this._bytes);
-    },
-    valueOf() {
-      return this.toBN();
-    },
-    cached: {
-      toBN() {
-        return new BN(this._bytes);
-      },
-    },
-    toBytes() {
-      return this._bytes;
-    },
-  },
-  undefined
-);
+      buf.writeBigUInt64BE(BigInt(val));
+    }
+    else if (typeof val === "string") {
+      if(!HEX_REGEX.test(val)) {
+        throw new Error(val + "is not a valid hex-string")
+      }
+      buf = Buffer.from(val, "hex")
+    }
+    else { // typeof val === bigint
+      buf.writeBigUInt64BE(val)
+    }
+
+    return new UInt64(buf);
+  }
+
+  /**
+   * The JSON representation of a UInt64 object
+   * 
+   * @returns a hex-string
+   */
+  toJSON(): string {
+    return this.bytes.toString('hex').toUpperCase();
+  }
+
+  /**
+   * Get the value of the UInt64 
+   * 
+   * @returns the number represented buy this.bytes
+   */
+  valueOf(): bigint {
+    return this.bytes.readBigUInt64BE();
+  }
+
+  /**
+   * Get the bytes representation of the UInt64 object
+   * 
+   * @returns 8 bytes representing the UInt64
+   */
+  toBytes(): Buffer {
+    return this.bytes;
+  }
+}
 
 export { UInt64 };
