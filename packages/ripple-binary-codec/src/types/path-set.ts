@@ -1,120 +1,250 @@
-/* eslint-disable no-unused-expressions */
+import { AccountID } from "./account-id";
+import { Currency } from "./currency";
+import { BinaryParser } from "../serdes/binary-parser";
+import { SerializedTypeClass } from "./serialized-type";
 
-import { makeClass } from "../utils/make-class";
-const { SerializedType, ensureArrayLikeIs } = require("./serialized-type");
-const { Currency } = require("./currency");
-const { AccountID } = require("./account-id");
-
+/**
+ * Constants for separating Paths in a PathSet
+ */
 const PATHSET_END_BYTE = 0x00;
 const PATH_SEPARATOR_BYTE = 0xff;
+
+/**
+ * Constant for masking types of a Hop
+ */
 const TYPE_ACCOUNT = 0x01;
 const TYPE_CURRENCY = 0x10;
 const TYPE_ISSUER = 0x20;
 
-const Hop = makeClass(
-  {
-    statics: {
-      from(value) {
-        if (value instanceof this) {
-          return value;
-        }
-        const hop = new Hop();
-        value.issuer && (hop.issuer = AccountID.from(value.issuer));
-        value.account && (hop.account = AccountID.from(value.account));
-        value.currency && (hop.currency = Currency.from(value.currency));
-        return hop;
-      },
-      parse(parser, type) {
-        const hop = new Hop();
-        type & TYPE_ACCOUNT && (hop.account = AccountID.fromParser(parser));
-        type & TYPE_CURRENCY && (hop.currency = Currency.fromParser(parser));
-        type & TYPE_ISSUER && (hop.issuer = AccountID.fromParser(parser));
-        return hop;
-      },
-    },
-    toJSON() {
-      const type = this.type();
-      const ret = <any>{};
-      type & TYPE_ACCOUNT && (ret.account = this.account.toJSON());
-      type & TYPE_ISSUER && (ret.issuer = this.issuer.toJSON());
-      type & TYPE_CURRENCY && (ret.currency = this.currency.toJSON());
-      return ret;
-    },
-    type() {
-      let type = 0;
-      this.issuer && (type += TYPE_ISSUER);
-      this.account && (type += TYPE_ACCOUNT);
-      this.currency && (type += TYPE_CURRENCY);
-      return type;
-    },
-  },
-  undefined
-);
+/**
+ * The object representation of a Hop, an issuer AccountID, an account AccountID, and a Currency
+ */
+interface HopObject {
+  issuer?: string;
+  account?: string;
+  currency?: string;
+}
 
-const Path = makeClass(
-  {
-    inherits: Array,
-    statics: {
-      from(value) {
-        return ensureArrayLikeIs(Path, value).withChildren(Hop);
-      },
-    },
-    toJSON() {
-      return this.map((k) => k.toJSON());
-    },
-  },
-  undefined
-);
+/**
+ * Serialize and Deserialize a Hop
+ */
+class Hop extends SerializedTypeClass {
+  /**
+   * Create a Hop from a HopObject
+   *
+   * @param value Either a hop or HopObject to create a hop with
+   * @returns a Hop
+   */
+  static from(value: Hop | HopObject): Hop {
+    if (value instanceof Hop) {
+      return value;
+    }
 
-const PathSet = makeClass(
-  {
-    mixins: SerializedType,
-    inherits: Array,
-    statics: {
-      from(value) {
-        return ensureArrayLikeIs(PathSet, value).withChildren(Path);
-      },
-      fromParser(parser) {
-        const pathSet = new this();
-        let path;
-        while (!parser.end()) {
-          const type = parser.readUInt8();
-          if (type === PATHSET_END_BYTE) {
-            break;
-          }
-          if (type === PATH_SEPARATOR_BYTE) {
-            path = null;
-            continue;
-          }
-          if (!path) {
-            path = new Path();
-            pathSet.push(path);
-          }
-          path.push(Hop.parse(parser, type));
-        }
-        return pathSet;
-      },
-    },
-    toJSON() {
-      return this.map((k) => k.toJSON());
-    },
-    toBytesSink(sink) {
-      let n = 0;
-      this.forEach((path) => {
-        if (n++ !== 0) {
-          sink.put([PATH_SEPARATOR_BYTE]);
-        }
-        path.forEach((hop) => {
-          sink.put([hop.type()]);
-          hop.account && hop.account.toBytesSink(sink);
-          hop.currency && hop.currency.toBytesSink(sink);
-          hop.issuer && hop.issuer.toBytesSink(sink);
-        });
-      });
-      sink.put([PATHSET_END_BYTE]);
-    },
-  },
-  undefined
-);
+    const bytes: Array<Buffer> = [Buffer.from([0])];
+
+    if (value.account) {
+      bytes.push(AccountID.from(value.account).toBytes());
+      bytes[0][0] |= TYPE_ACCOUNT;
+    }
+
+    if (value.currency) {
+      bytes.push(Currency.from(value.currency).toBytes());
+      bytes[0][0] |= TYPE_CURRENCY;
+    }
+
+    if (value.issuer) {
+      bytes.push(AccountID.from(value.issuer).toBytes());
+      bytes[0][0] |= TYPE_ISSUER;
+    }
+
+    return new Hop(Buffer.concat(bytes));
+  }
+
+  /**
+   * Construct a Hop from a BinaryParser
+   *
+   * @param parser BinaryParser to read the Hop from
+   * @returns a Hop
+   */
+  static fromParser(parser: BinaryParser): Hop {
+    const type = parser.readUInt8();
+    const bytes: Array<Buffer> = [Buffer.from([type])];
+
+    if (type & TYPE_ACCOUNT) {
+      bytes.push(parser.read(AccountID.width));
+    }
+
+    if (type & TYPE_CURRENCY) {
+      bytes.push(parser.read(Currency.width));
+    }
+
+    if (type & TYPE_ISSUER) {
+      bytes.push(parser.read(AccountID.width));
+    }
+
+    return new Hop(Buffer.concat(bytes));
+  }
+
+  /**
+   * Get the JSON interpretation of this hop
+   *
+   * @returns a HopObject, an JS object with optional account, issuer, and currency
+   */
+  toJSON(): HopObject {
+    const hopParser = new BinaryParser(this.bytes.toString("hex"));
+    const type = hopParser.readUInt8();
+
+    const result: HopObject = {};
+    if (type & TYPE_ACCOUNT) {
+      result.account = AccountID.fromParser(hopParser).toJSON();
+    }
+
+    if (type & TYPE_CURRENCY) {
+      result.currency = Currency.fromParser(hopParser).toJSON();
+    }
+
+    if (type & TYPE_ISSUER) {
+      result.issuer = AccountID.fromParser(hopParser).toJSON();
+    }
+
+    return result;
+  }
+
+  /**
+   * get a number representing the type of this hop
+   *
+   * @returns a number to be bitwise and-ed with TYPE_ constants to describe the types in the hop
+   */
+  type(): number {
+    return this.bytes[0];
+  }
+}
+
+/**
+ * Class for serializing/deserializing Paths
+ */
+class Path extends SerializedTypeClass {
+  /**
+   * construct a Path from an array of Hops
+   *
+   * @param value Path or array of HopObjects to construct a Path
+   * @returns the Path
+   */
+  static from(value: Path | Array<HopObject>): Path {
+    if (value instanceof Path) {
+      return value;
+    }
+
+    const bytes: Array<Buffer> = [];
+    value.forEach((hop: HopObject) => {
+      bytes.push(Hop.from(hop).toBytes());
+    });
+
+    return new Path(Buffer.concat(bytes));
+  }
+
+  /**
+   * Read a Path from a BinaryParser
+   *
+   * @param parser BinaryParser to read Path from
+   * @returns the Path represented by the bytes read from the BinaryParser
+   */
+  static fromParser(parser: BinaryParser): Path {
+    const bytes: Array<Buffer> = [];
+    while (!parser.end()) {
+      bytes.push(Hop.fromParser(parser).toBytes());
+
+      if (
+        parser.peek() === PATHSET_END_BYTE ||
+        parser.peek() === PATH_SEPARATOR_BYTE
+      ) {
+        break;
+      }
+    }
+    return new Path(Buffer.concat(bytes));
+  }
+
+  /**
+   * Get the JSON representation of this Path
+   *
+   * @returns an Array of HopObject constructed from this.bytes
+   */
+  toJSON() {
+    const json: Array<HopObject> = [];
+    const pathParser = new BinaryParser(this.bytes.toString("hex"));
+
+    while (!pathParser.end()) {
+      json.push(Hop.fromParser(pathParser).toJSON());
+    }
+
+    return json;
+  }
+}
+
+/**
+ * Deserialize and Serialize the PathSet type
+ */
+class PathSet extends SerializedTypeClass {
+  /**
+   * Construct a PathSet from an Array of Arrays representing paths
+   *
+   * @param value A PathSet or Array of Array of HopObjects
+   * @returns the PathSet constructed from value
+   */
+  static from(value: PathSet | Array<Array<HopObject>>): PathSet {
+    if (value instanceof PathSet) {
+      return value;
+    }
+
+    const bytes: Array<Buffer> = [];
+
+    value.forEach((path: Array<HopObject>) => {
+      bytes.push(Path.from(path).toBytes());
+      bytes.push(Buffer.from([PATH_SEPARATOR_BYTE]));
+    });
+
+    bytes[bytes.length - 1] = Buffer.from([PATHSET_END_BYTE]);
+
+    return new PathSet(Buffer.concat(bytes));
+  }
+
+  /**
+   * Construct a PathSet from a BinaryParser
+   *
+   * @param parser A BinaryParser to read PathSet from
+   * @returns the PathSet read from parser
+   */
+  static fromParser(parser: BinaryParser): PathSet {
+    const bytes: Array<Buffer> = [];
+
+    while (!parser.end()) {
+      bytes.push(Path.fromParser(parser).toBytes());
+      bytes.push(parser.read(1));
+
+      if (bytes[bytes.length - 1][0] == PATHSET_END_BYTE) {
+        break;
+      }
+    }
+
+    return new PathSet(Buffer.concat(bytes));
+  }
+
+  /**
+   * Get the JSON representation of this PathSet
+   *
+   * @returns an Array of Array of HopObjects, representing this PathSet
+   */
+  toJSON(): Array<Array<HopObject>> {
+    const json: Array<Array<HopObject>> = [];
+    const pathParser = new BinaryParser(this.bytes.toString("hex"));
+
+    while (!pathParser.end()) {
+      json.push(Path.fromParser(pathParser).toJSON());
+      pathParser.skip(1);
+    }
+
+    return json;
+  }
+}
 
 export { PathSet };

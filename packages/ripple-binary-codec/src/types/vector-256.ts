@@ -8,18 +8,18 @@ import { BytesList } from "../serdes/binary-serializer";
  */
 class Vector256 extends SerializedTypeClass {
   constructor(bytes: Buffer) {
-    super(bytes)
+    super(bytes);
   }
 
   /**
    * Construct a Vector256 from a BinaryParser
-   * 
-   * @param parser BinaryParser to 
+   *
+   * @param parser BinaryParser to
    * @param hint length of the vector, in bytes, optional
    * @returns a Vector256 object
    */
   static fromParser(parser: BinaryParser, hint?: number): Vector256 {
-    let bytesList = new BytesList();
+    const bytesList = new BytesList();
     const bytes = hint ?? parser.size();
     const hashes = bytes / 32;
     for (let i = 0; i < hashes; i++) {
@@ -30,17 +30,17 @@ class Vector256 extends SerializedTypeClass {
 
   /**
    * Construct a Vector256 object from an array of hashes
-   * 
+   *
    * @param value A Vector256 object or array of hex-strings representing Hash256's
    * @returns a Vector256 object
    */
   static from(value: Vector256 | Array<string>): Vector256 {
-    if(value instanceof Vector256) {
+    if (value instanceof Vector256) {
       return value;
     }
 
-    let bytesList = new BytesList();
-    value.forEach(hash => {
+    const bytesList = new BytesList();
+    value.forEach((hash) => {
       Hash256.from(hash).toBytesSink(bytesList);
     });
     return new Vector256(bytesList.toBytes());
@@ -48,19 +48,24 @@ class Vector256 extends SerializedTypeClass {
 
   /**
    * Return an Array of hex-strings represented by this.bytes
-   * 
-   * @returns An Array of strings representing the Hash256 objects 
+   *
+   * @returns An Array of strings representing the Hash256 objects
    */
   toJSON(): Array<string> {
-    if(this.bytes.byteLength % 32 !== 0) {
-      throw new Error("Invalid bytes for Vector256")
+    if (this.bytes.byteLength % 32 !== 0) {
+      throw new Error("Invalid bytes for Vector256");
     }
 
-    let result: Array<string> = []
-    for(let i = 0; i < this.bytes.byteLength; i += 32) {
-      result.push(this.bytes.slice(i,i+32).toString('hex').toUpperCase())
+    const result: Array<string> = [];
+    for (let i = 0; i < this.bytes.byteLength; i += 32) {
+      result.push(
+        this.bytes
+          .slice(i, i + 32)
+          .toString("hex")
+          .toUpperCase()
+      );
     }
-    return result
+    return result;
   }
 }
 
