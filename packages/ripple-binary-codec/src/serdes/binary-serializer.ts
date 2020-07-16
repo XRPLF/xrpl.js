@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { Field, FieldInstance } from "../enums";
+import { FieldInstance } from "../enums";
 
 /**
  * Bytes list is a collection of buffer objects
@@ -133,11 +133,6 @@ class BinarySerializer {
       this.writeLengthEncoded(associatedValue);
     } else {
       associatedValue.toBytesSink(this.sink);
-      if (field.type.name === "STObject") {
-        this.sink.put(Field["ObjectEndMarker"].header);
-      } else if (field.type.name === "STArray") {
-        this.sink.put(Field["ArrayEndMarker"].header);
-      }
     }
   }
 

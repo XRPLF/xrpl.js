@@ -1,37 +1,83 @@
-import { makeClass } from "../utils/make-class";
-import { ensureArrayLikeIs, SerializedType } from "./serialized-type";
+import { SerializedTypeClass } from "./serialized-type";
 import { STObject } from "./st-object";
+import { BinaryParser } from "../serdes/binary-parser";
 
-const STArray = makeClass(
-  {
-    mixins: SerializedType,
-    inherits: Array,
-    statics: {
-      fromParser(parser) {
-        const array = new STArray();
-        while (!parser.end()) {
-          const field = parser.readField();
-          if (field.name === "ArrayEndMarker") {
-            break;
-          }
-          const outer = new STObject();
-          outer[field.name] = parser.readFieldValue(field);
-          array.push(outer);
-        }
-        return array;
-      },
-      from(value) {
-        return ensureArrayLikeIs(STArray, value).withChildren(STObject);
-      },
-    },
-    toJSON() {
-      return this.map((v) => v.toJSON());
-    },
-    toBytesSink(sink) {
-      this.forEach((so) => so.toBytesSink(sink));
-    },
-  },
-  undefined
-);
+const ARRAY_END_MARKER = 0xf1;
+const OBJECT_END_MARKER = 0xe1;
+
+/**
+ * Class for serializing and deserializing Arrays of Objects
+ */
+class STArray extends SerializedTypeClass {
+  /**
+   * Construct an STArray from a BinaryParser
+   *
+   * @param parser BinaryParser to parse an STArray from
+   * @returns An STArray Object
+   */
+  static fromParser(parser: BinaryParser): STArray {
+    const bytes: Array<Buffer> = [];
+
+    while (!parser.end()) {
+      const field = parser.readField();
+      if (field.name === "ArrayEndMarker") {
+        break;
+      }
+
+      bytes.push(
+        field.header,
+        parser.readFieldValue(field).toBytes(),
+        Buffer.from([OBJECT_END_MARKER])
+      );
+    }
+
+    bytes.push(Buffer.from([ARRAY_END_MARKER]));
+    return new STArray(Buffer.concat(bytes));
+  }
+
+  /**
+   * Construct an STArray from an Array of JSON Objects
+   *
+   * @param value STArray or Array of Objects to parse into an STArray
+   * @returns An STArray object
+   */
+  static from(value: STArray | Array<object>): STArray {
+    if (value instanceof STArray) {
+      return value;
+    }
+
+    const bytes: Array<Buffer> = [];
+    value.forEach((obj) => {
+      bytes.push(STObject.from(obj).toBytes());
+    });
+
+    bytes.push(Buffer.from([ARRAY_END_MARKER]));
+    return new STArray(Buffer.concat(bytes));
+  }
+
+  /**
+   * Return the JSON representation of this.bytes
+   *
+   * @returns An Array of JSON objects
+   */
+  toJSON(): Array<object> {
+    const result: Array<object> = [];
+
+    const arrayParser = new BinaryParser(this.toString());
+
+    while (!arrayParser.end()) {
+      const field = arrayParser.readField();
+      if (field.name === "ArrayEndMarker") {
+        break;
+      }
+
+      const outer = {};
+      outer[field.name] = STObject.fromParser(arrayParser).toJSON();
+      result.push(outer);
+    }
+
+    return result;
+  }
+}
 
 export { STArray };
