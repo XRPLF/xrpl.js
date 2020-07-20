@@ -27,7 +27,7 @@ describe('SerializedType interfaces', () => {
       expect(Value.from(newJSON).toJSON()).toEqual(newJSON)
     })
     describe(`${name} supports all methods of the SerializedType mixin`, () => {
-      _.keys(SerializedType).forEach(k => {
+      _.keys(SerializedType.prototype).forEach(k => {
         test(`new ${name}.prototype.${k} !== undefined`, () => {
           expect(Value.prototype[k]).not.toBe(undefined)
         })

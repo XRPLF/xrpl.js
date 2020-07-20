@@ -1,4 +1,4 @@
-import { ComparableClass } from "./serialized-type";
+import { Comparable } from "./serialized-type";
 
 /**
  * Compare numbers and bigints n1 and n2
@@ -14,7 +14,7 @@ function compare(n1: number | bigint, n2: number | bigint): number {
 /**
  * Base class for serializing and deserializing unsigned integers.
  */
-abstract class UInt extends ComparableClass {
+abstract class UInt extends Comparable {
   protected static width: number;
 
   constructor(bytes: Buffer) {

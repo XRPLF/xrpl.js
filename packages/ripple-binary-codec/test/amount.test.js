@@ -24,7 +24,7 @@ function amountErrorTests () {
 describe('Amount', function () {
   it('can be parsed from', function () {
     expect(Amount.from('1000000') instanceof Amount).toBe(true)
-    expect(Amount.from('1000000').valueString()).toEqual('1000000')
+    expect(Amount.from('1000000').toJSON()).toEqual('1000000')
     const fixture = {
       value: '1',
       issuer: '0000000000000000000000000000000000000000',

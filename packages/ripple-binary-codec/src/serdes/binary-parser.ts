@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import { Field, FieldInstance } from "../enums";
+import { SerializedType } from "../types/serialized-type";
 
 /**
  * BinaryParser is used to compute fields and values from a HexString
@@ -43,10 +44,7 @@ class BinaryParser {
    * @return The bytes
    */
   read(n: number): Buffer {
-    assert(
-      n <= this.bytes.byteLength,
-      n + " greater than " + this.bytes.byteLength
-    );
+    assert(n <= this.bytes.byteLength);
 
     const slice = this.bytes.slice(0, n);
     this.skip(n);
@@ -156,7 +154,7 @@ class BinaryParser {
    * @param type The type that you want to read from the BinaryParser
    * @return The instance of that type read from the BinaryParser
    */
-  readType(type) {
+  readType(type: typeof SerializedType): SerializedType {
     return type.fromParser(this);
   }
 
@@ -166,7 +164,7 @@ class BinaryParser {
    * @param field The field that you wan to get the type of
    * @return The type associated with the given field
    */
-  typeForField(field: FieldInstance) {
+  typeForField(field: FieldInstance): typeof SerializedType {
     return field.associatedType;
   }
 
@@ -176,14 +174,14 @@ class BinaryParser {
    * @param field The field that you want to get the associated value for
    * @return The value associated with the given field
    */
-  readFieldValue(field: FieldInstance) {
+  readFieldValue(field: FieldInstance): SerializedType {
     const type = this.typeForField(field);
     if (!type) {
       throw new Error(`unsupported: (${field.name}, ${field.type.name})`);
     }
     const sizeHint = field.isVariableLengthEncoded
       ? this.readVariableLengthLength()
-      : null;
+      : undefined;
     const value = type.fromParser(this, sizeHint);
     if (value === undefined) {
       throw new Error(
@@ -198,7 +196,7 @@ class BinaryParser {
    *
    * @return The field and value
    */
-  readFieldAndValue() {
+  readFieldAndValue(): [FieldInstance, SerializedType] {
     const field = this.readField();
     return [field, this.readFieldValue(field)];
   }

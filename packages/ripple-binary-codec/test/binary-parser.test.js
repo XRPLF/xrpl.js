@@ -138,19 +138,19 @@ function transactionParsingTests () {
     {
       const [field, value] = readField()
       expect(field).toEqual(Field.TakerPays)
-      expect(value.currency.isNative()).toEqual(true)
-      expect(value.currency.toJSON()).toEqual('XRP')
+      expect(value.isNative()).toEqual(true)
+      expect(value.toJSON()).toEqual('98957503520')
     }
     {
       const [field, value] = readField()
       expect(field).toEqual(Field.TakerGets)
-      expect(value.currency.isNative()).toEqual(false)
-      expect(value.issuer.toJSON()).toEqual(tx_json.TakerGets.issuer)
+      expect(value.isNative()).toEqual(false)
+      expect(value.toJSON().issuer).toEqual(tx_json.TakerGets.issuer)
     }
     {
       const [field, value] = readField()
       expect(field).toEqual(Field.Fee)
-      expect(value.currency.isNative()).toEqual(true)
+      expect(value.isNative()).toEqual(true)
     }
     {
       const [field, value] = readField()
@@ -197,9 +197,11 @@ function amountParsingTests () {
       const value = parser.readType(Amount)
       // May not actually be in canonical form. The fixtures are to be used
       // also for json -> binary;
-      assertEqualAmountJSON(toJSON(value), (f.test_json))
+      const json = toJSON(value)
+      assertEqualAmountJSON(json, (f.test_json))
       if (f.exponent) {
-        expect(value.exponent()).toEqual(f.exponent)
+        const exponent = new Decimal(json.value);
+        expect(exponent.e-15).toEqual(f.exponent)
       }
     })
   })

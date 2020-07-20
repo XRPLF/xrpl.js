@@ -1,4 +1,4 @@
-import { SerializedTypeClass } from "./serialized-type";
+import { SerializedType } from "./serialized-type";
 import { BinaryParser } from "../serdes/binary-parser";
 import { Hash256 } from "./hash-256";
 import { BytesList } from "../serdes/binary-serializer";
@@ -6,7 +6,7 @@ import { BytesList } from "../serdes/binary-serializer";
 /**
  * Class for serializing and deserializing vectors of Hash256
  */
-class Vector256 extends SerializedTypeClass {
+class Vector256 extends SerializedType {
   constructor(bytes: Buffer) {
     super(bytes);
   }

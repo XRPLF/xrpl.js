@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import { FieldInstance } from "../enums";
+import { SerializedType } from "../types/serialized-type";
 
 /**
  * Bytes list is a collection of buffer objects
@@ -61,7 +62,7 @@ class BinarySerializer {
    *
    * @param value a SerializedType value
    */
-  write(value): void {
+  write(value: SerializedType): void {
     value.toBytesSink(this.sink);
   }
 
@@ -80,7 +81,7 @@ class BinarySerializer {
    * @param type the type to write
    * @param value a value of that type
    */
-  writeType(type, value): void {
+  writeType(type: typeof SerializedType, value: SerializedType): void {
     this.write(type.from(value));
   }
 
@@ -124,9 +125,10 @@ class BinarySerializer {
    * @param field field to write to BinarySerializer
    * @param value value to write to BinarySerializer
    */
-  writeFieldAndValue(field: FieldInstance, value): void {
+  writeFieldAndValue(field: FieldInstance, value: SerializedType): void {
     const associatedValue = field.associatedType.from(value);
     assert(associatedValue.toBytesSink, field.name);
+
     this.sink.put(field.header);
 
     if (field.isVariableLengthEncoded) {
@@ -141,7 +143,7 @@ class BinarySerializer {
    *
    * @param value length encoded value to write to BytesList
    */
-  public writeLengthEncoded(value): void {
+  public writeLengthEncoded(value: SerializedType): void {
     const bytes = new BytesList();
     value.toBytesSink(bytes);
     this.put(this.encodeVariableLength(bytes.getLength()));

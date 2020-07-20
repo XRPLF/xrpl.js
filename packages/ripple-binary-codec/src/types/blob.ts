@@ -1,10 +1,10 @@
-import { SerializedTypeClass } from "./serialized-type";
+import { SerializedType } from "./serialized-type";
 import { BinaryParser } from "../serdes/binary-parser";
 
 /**
  * Variable length encoded type
  */
-class Blob extends SerializedTypeClass {
+class Blob extends SerializedType {
   constructor(bytes: Buffer) {
     super(bytes);
   }

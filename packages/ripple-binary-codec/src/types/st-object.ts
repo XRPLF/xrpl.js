@@ -1,79 +1,103 @@
-import { makeClass } from "../utils/make-class";
 import { Field } from "../enums";
-const _ = require("lodash");
-const { BinarySerializer } = require("../serdes/binary-serializer");
-const { SerializedType } = require("./serialized-type");
+import { SerializedType } from "./serialized-type";
+import { BinaryParser } from "../serdes/binary-parser";
+import { BinarySerializer, BytesList } from "../serdes/binary-serializer";
 
-const STObject = makeClass(
-  {
-    mixins: SerializedType,
-    statics: {
-      fromParser(parser, hint) {
-        const end = typeof hint === "number" ? parser.pos() + hint : null;
-        const so = new this();
-        while (!parser.end(end)) {
-          const field = parser.readField();
-          if (field.name === "ObjectEndMarker") {
-            break;
-          }
-          so[field.name] = parser.readFieldValue(field);
-        }
-        return so;
-      },
-      from(value) {
-        if (value instanceof this) {
-          return value;
-        }
-        if (typeof value === "object") {
-          return _.transform(
-            value,
-            (so, val, key) => {
-              const field = Field[key];
-              if (field) {
-                so[field.name] = field.associatedType.from(val);
-              } else {
-                so[key] = val;
-              }
-            },
-            new this()
-          );
-        }
-        throw new Error(`${value} is unsupported`);
-      },
-    },
-    fieldKeys() {
-      return Object.keys(this)
-        .map((k) => Field[k])
-        .filter(Boolean);
-    },
-    toJSON() {
-      // Otherwise seemingly result will have same prototype as `this`
-      const accumulator = {}; // of only `own` properties
-      return _.transform(
-        this,
-        (result, value, key) => {
-          result[key] = value && value.toJSON ? value.toJSON() : value;
-        },
-        accumulator
-      );
-    },
-    toBytesSink(sink, filter = () => true) {
-      const serializer = new BinarySerializer(sink);
-      const fields = this.fieldKeys();
-      const sorted = _.sortBy(fields, "ordinal");
-      sorted.filter(filter).forEach((field) => {
-        const value = this[field.name];
-        if (!field.isSerialized) {
-          return;
-        }
-        serializer.writeFieldAndValue(field, value);
-        if (field.type.name === "STObject") {
-          serializer.put(Buffer.from([0xe1]));
-        }
+const OBJECT_END_MARKER = Buffer.from([0xe1]);
+const OBJECT_END_MARKER_NAME = "ObjectEndMarker";
+const OBJECT_FIELD_TYPE_NAME = "STObject";
+
+/**
+ * Class for Serializing/Deserializing objects
+ */
+class STObject extends SerializedType {
+  /**
+   * Construct a STObject from a BinaryParser
+   *
+   * @param parser BinaryParser to read STObject from
+   * @returns A STObject object
+   */
+  static fromParser(parser: BinaryParser): STObject {
+    const list: BytesList = new BytesList();
+    const bytes: BinarySerializer = new BinarySerializer(list);
+
+    while (!parser.end()) {
+      const field = parser.readField();
+      if (field.name === OBJECT_END_MARKER_NAME) {
+        break;
+      }
+
+      const associatedValue = parser.readFieldValue(field);
+
+      bytes.writeFieldAndValue(field, associatedValue);
+      if (field.type.name === OBJECT_FIELD_TYPE_NAME) {
+        bytes.put(OBJECT_END_MARKER);
+      }
+    }
+
+    return new STObject(list.toBytes());
+  }
+
+  /**
+   * Construct a STObject from a JSON object
+   *
+   * @param value An object to include
+   * @param filter optional, denote which field to include in serialized object
+   * @returns a STObject object
+   */
+  static from(
+    value: STObject | object,
+    filter?: (...any) => boolean
+  ): STObject {
+    if (value instanceof STObject) {
+      return value;
+    }
+
+    const list: BytesList = new BytesList();
+    const bytes: BinarySerializer = new BinarySerializer(list);
+
+    let sorted = Object.keys(value)
+      .map((f) => Field[f])
+      .filter((f) => f !== undefined && f.isSerialized)
+      .sort((a, b) => {
+        return a.ordinal - b.ordinal;
       });
-    },
-  },
-  undefined
-);
+
+    if (filter !== undefined) {
+      sorted = sorted.filter(filter);
+    }
+
+    sorted.forEach((field) => {
+      const associatedValue = field.associatedType.from(value[field.name]);
+
+      bytes.writeFieldAndValue(field, associatedValue);
+      if (field.type.name === OBJECT_FIELD_TYPE_NAME) {
+        bytes.put(OBJECT_END_MARKER);
+      }
+    });
+
+    return new STObject(list.toBytes());
+  }
+
+  /**
+   * Get the JSON interpretation of this.bytes
+   *
+   * @returns a JSON object
+   */
+  toJSON(): object {
+    const objectParser = new BinaryParser(this.toString());
+    const accumulator = {};
+
+    while (!objectParser.end()) {
+      const field = objectParser.readField();
+      if (field.name === OBJECT_END_MARKER_NAME) {
+        break;
+      }
+      accumulator[field.name] = objectParser.readFieldValue(field).toJSON();
+    }
+
+    return accumulator;
+  }
+}
 
 export { STObject };

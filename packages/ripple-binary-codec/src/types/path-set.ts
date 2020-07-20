@@ -1,7 +1,7 @@
 import { AccountID } from "./account-id";
 import { Currency } from "./currency";
 import { BinaryParser } from "../serdes/binary-parser";
-import { SerializedTypeClass } from "./serialized-type";
+import { SerializedType } from "./serialized-type";
 
 /**
  * Constants for separating Paths in a PathSet
@@ -28,7 +28,7 @@ interface HopObject {
 /**
  * Serialize and Deserialize a Hop
  */
-class Hop extends SerializedTypeClass {
+class Hop extends SerializedType {
   /**
    * Create a Hop from a HopObject
    *
@@ -123,7 +123,7 @@ class Hop extends SerializedTypeClass {
 /**
  * Class for serializing/deserializing Paths
  */
-class Path extends SerializedTypeClass {
+class Path extends SerializedType {
   /**
    * construct a Path from an array of Hops
    *
@@ -184,7 +184,7 @@ class Path extends SerializedTypeClass {
 /**
  * Deserialize and Serialize the PathSet type
  */
-class PathSet extends SerializedTypeClass {
+class PathSet extends SerializedType {
   /**
    * Construct a PathSet from an Array of Arrays representing paths
    *

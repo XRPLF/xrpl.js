@@ -1,225 +1,218 @@
-import { makeClass } from "../utils/make-class";
-const _ = require("lodash");
-const assert = require("assert");
-const Decimal = require("decimal.js");
-const { SerializedType } = require("./serialized-type");
-const { bytesToHex } = require("../utils/bytes-utils");
-const { Currency } = require("./currency");
-const { AccountID } = require("./account-id");
-const { UInt64 } = require("./uint-64");
+import { Decimal } from "decimal.js";
+import { SerializedType } from "./serialized-type";
+import { BinaryParser } from "../serdes/binary-parser";
+import { Currency } from "./currency";
+import { AccountID } from "./account-id";
 
+/**
+ * Constants for validating amounts
+ */
 const MIN_IOU_EXPONENT = -96;
 const MAX_IOU_EXPONENT = 80;
 const MAX_IOU_PRECISION = 16;
-const MIN_IOU_MANTISSA = "1000" + "0000" + "0000" + "0000"; // 16 digits
-const MAX_IOU_MANTISSA = "9999" + "9999" + "9999" + "9999"; // ..
-const MAX_IOU = new Decimal(`${MAX_IOU_MANTISSA}e${MAX_IOU_EXPONENT}`);
-const MIN_IOU = new Decimal(`${MIN_IOU_MANTISSA}e${MIN_IOU_EXPONENT}`);
-const DROPS_PER_XRP = new Decimal("1e6");
-const MAX_NETWORK_DROPS = new Decimal("1e17");
+const MAX_DROPS = new Decimal("1e17");
 const MIN_XRP = new Decimal("1e-6");
-const MAX_XRP = MAX_NETWORK_DROPS.dividedBy(DROPS_PER_XRP);
 
-// Never use exponential form
+/**
+ * decimal.js configuration for Amount IOUs
+ */
 Decimal.config({
   toExpPos: MAX_IOU_EXPONENT + MAX_IOU_PRECISION,
   toExpNeg: MIN_IOU_EXPONENT - MAX_IOU_PRECISION,
 });
 
-const AMOUNT_PARAMETERS_DESCRIPTION = `
-Native values must be described in drops, a million of which equal one XRP.
-This must be an integer number, with the absolute value not exceeding \
-${MAX_NETWORK_DROPS}
-
-IOU values must have a maximum precision of ${MAX_IOU_PRECISION} significant \
-digits. They are serialized as\na canonicalised mantissa and exponent.
-
-The valid range for a mantissa is between ${MIN_IOU_MANTISSA} and \
-${MAX_IOU_MANTISSA}
-The exponent must be >= ${MIN_IOU_EXPONENT} and <= ${MAX_IOU_EXPONENT}
-
-Thus the largest serializable IOU value is:
-${MAX_IOU.toString()}
-
-And the smallest:
-${MIN_IOU.toString()}
-`;
-
-function isDefined(val) {
-  return !_.isUndefined(val);
+/**
+ * Interface for JSON objects that represent amounts
+ */
+interface AmountObject {
+  value: string;
+  currency: string;
+  issuer: string;
 }
 
-function raiseIllegalAmountError(value) {
-  throw new Error(
-    `${value.toString()} is an illegal amount\n` + AMOUNT_PARAMETERS_DESCRIPTION
+/**
+ * Class for serializing/Deserializing Amounts
+ */
+class Amount extends SerializedType {
+  static defaultAmount: Amount = new Amount(
+    Buffer.from("4000000000000000", "hex")
   );
-}
 
-const parsers = {
-  string(str) {
-    // Using /^\d+$/ here fixes #31
-    if (!str.match(/^\d+$/)) {
-      raiseIllegalAmountError(str);
+  constructor(bytes: Buffer) {
+    super(bytes ?? Amount.defaultAmount.bytes);
+  }
+
+  /**
+   * Construct an amount from an IOU or string amount
+   *
+   * @param value An Amount, object representing an IOU, or a string representing an integer amount
+   * @returns An Amount object
+   */
+  static from(value: Amount | AmountObject | string): Amount {
+    if (value instanceof Amount) {
+      return value;
     }
-    return [new Decimal(str).dividedBy(DROPS_PER_XRP), Currency.XRP];
-  },
-  object(object) {
-    assert(isDefined(object.currency), "currency must be defined");
-    assert(isDefined(object.issuer), "issuer must be defined");
-    return [
-      new Decimal(object.value),
-      Currency.from(object.currency),
-      AccountID.from(object.issuer),
-    ];
-  },
-};
 
-const Amount = makeClass(
-  {
-    Amount(value, currency, issuer, validate = true) {
-      this.value = value || new Decimal("0");
-      this.currency = currency || Currency.XRP;
-      this.issuer = issuer || null;
-      if (validate) {
-        this.assertValueIsValid();
-      }
-    },
-    mixins: SerializedType,
-    statics: {
-      from(value) {
-        if (value instanceof this) {
-          return value;
-        }
-        const parser = parsers[typeof value];
-        if (parser) {
-          return new this(...parser(value));
-        }
-        throw new Error(`unsupported value: ${value}`);
-      },
-      fromParser(parser) {
-        const mantissa = parser.read(8);
-        const b1 = mantissa[0];
-        const b2 = mantissa[1];
+    const amount = Buffer.alloc(8);
+    if (typeof value === "string") {
+      Amount.assertXrpIsValid(value);
 
-        const isIOU = b1 & 0x80;
-        const isPositive = b1 & 0x40;
-        const sign = isPositive ? "" : "-";
+      const number = BigInt(value);
+      amount.writeBigUInt64BE(number);
 
-        if (isIOU) {
-          mantissa[0] = 0;
-          const currency = parser.readType(Currency);
-          const issuer = parser.readType(AccountID);
-          const exponent = ((b1 & 0x3f) << 2) + ((b2 & 0xff) >> 6) - 97;
-          mantissa[1] &= 0x3f;
-          // decimal.js won't accept e notation with hex
-          const value = new Decimal(`${sign}0x${bytesToHex(mantissa)}`).times(
-            "1e" + exponent
-          );
-          return new this(value, currency, issuer, false);
-        }
+      amount[0] |= 0x40;
 
-        mantissa[0] &= 0x3f;
-        const drops = new Decimal(`${sign}0x${bytesToHex(mantissa)}`);
-        const xrpValue = drops.dividedBy(DROPS_PER_XRP);
-        return new this(xrpValue, Currency.XRP, null, false);
-      },
-    },
-    assertValueIsValid() {
-      // zero is always a valid amount value
-      if (!this.isZero()) {
-        if (this.isNative()) {
-          const abs = this.value.abs();
-          if (abs.lt(MIN_XRP) || abs.gt(MAX_XRP)) {
-            // value is in XRP scale, but show the value in canonical json form
-            raiseIllegalAmountError(this.value.times(DROPS_PER_XRP));
-          }
-          this.verifyNoDecimal(this.value); // This is a secondary fix for #31
-        } else {
-          const p = this.value.precision();
-          const e = this.exponent();
-          if (
-            p > MAX_IOU_PRECISION ||
-            e > MAX_IOU_EXPONENT ||
-            e < MIN_IOU_EXPONENT
-          ) {
-            raiseIllegalAmountError(this.value);
-          }
-        }
-      }
-    },
-    isNative() {
-      return this.currency.isNative();
-    },
-    mantissa() {
-      // This is a tertiary fix for #31
-      const integerNumberString = this.verifyNoDecimal();
+      return new Amount(amount);
+    } else if (typeof value === "object") {
+      const number = new Decimal(value.value);
+      Amount.assertIouIsValid(number);
 
-      return UInt64.from(BigInt(integerNumberString));
-    },
-    verifyNoDecimal() {
-      const integerNumberString = this.value
-        .times("1e" + -this.exponent())
-        .abs()
-        .toString();
-      // Ensure that the value (after being multiplied by the exponent)
-      // does not contain a decimal. From the bn.js README:
-      // "decimals are not supported in this library."
-      // eslint-disable-next-line max-len
-      // https://github.com/indutny/bn.js/blob/9cb459f044853b46615464eea1a3ddfc7006463b/README.md
-      if (integerNumberString.indexOf(".") !== -1) {
-        raiseIllegalAmountError(integerNumberString);
-      }
-      return integerNumberString;
-    },
-    isZero() {
-      return this.value.isZero();
-    },
-    exponent() {
-      return this.isNative() ? -6 : this.value.e - 15;
-    },
-    valueString() {
-      return (this.isNative()
-        ? this.value.times(DROPS_PER_XRP)
-        : this.value
-      ).toString();
-    },
-    toBytesSink(sink) {
-      const isNative = this.isNative();
-      const notNegative = !this.value.isNegative();
-      const mantissa = this.mantissa().toBytes();
-
-      if (isNative) {
-        mantissa[0] |= notNegative ? 0x40 : 0;
-        sink.put(mantissa);
+      if (number.isZero()) {
+        amount[0] |= 0x80;
       } else {
-        mantissa[0] |= 0x80;
-        if (!this.isZero()) {
-          if (notNegative) {
-            mantissa[0] |= 0x40;
-          }
-          const exponent = this.value.e - 15;
-          const exponentByte = 97 + exponent;
-          mantissa[0] |= exponentByte >>> 2;
-          mantissa[1] |= (exponentByte & 0x03) << 6;
+        const integerNumberString = number
+          .times(`1e${-(number.e - 15)}`)
+          .abs()
+          .toString();
+        amount.writeBigUInt64BE(BigInt(integerNumberString));
+
+        amount[0] |= 0x80;
+
+        if (number.gt(new Decimal(0))) {
+          amount[0] |= 0x40;
         }
-        sink.put(mantissa);
-        this.currency.toBytesSink(sink);
-        this.issuer.toBytesSink(sink);
+
+        const exponent = number.e - 15;
+        const exponentByte = 97 + exponent;
+        amount[0] |= exponentByte >>> 2;
+        amount[1] |= (exponentByte & 0x03) << 6;
       }
-    },
-    toJSON() {
-      const valueString = this.valueString();
-      if (this.isNative()) {
-        return valueString;
-      }
+
+      const currency = Currency.from(value.currency).toBytes();
+      const issuer = AccountID.from(value.issuer).toBytes();
+      return new Amount(Buffer.concat([amount, currency, issuer]));
+    }
+    throw new Error("Invalid type to construct an Amount");
+  }
+
+  /**
+   * Read an amount from a BinaryParser
+   *
+   * @param parser BinaryParser to read the Amount from
+   * @returns An Amount object
+   */
+  static fromParser(parser: BinaryParser): Amount {
+    const isXRP = parser.peek() & 0x80;
+    const numBytes = isXRP ? 48 : 8;
+    return new Amount(parser.read(numBytes));
+  }
+
+  /**
+   * Get the JSON representation of this Amount
+   *
+   * @returns the JSON interpretation of this.bytes
+   */
+  toJSON(): AmountObject | string {
+    if (this.isNative()) {
+      const bytes = this.bytes;
+      const isPositive = bytes[0] & 0x40;
+      const sign = isPositive ? "" : "-";
+
+      bytes[0] &= 0x3f;
+      return `${sign}${bytes.readBigUInt64BE().toString()}`;
+    } else {
+      const parser = new BinaryParser(this.toString());
+      const mantissa = parser.read(8);
+      const currency = Currency.fromParser(parser);
+      const issuer = AccountID.fromParser(parser);
+
+      const b1 = mantissa[0];
+      const b2 = mantissa[1];
+
+      const isPositive = b1 & 0x40;
+      const sign = isPositive ? "" : "-";
+      const exponent = ((b1 & 0x3f) << 2) + ((b2 & 0xff) >> 6) - 97;
+
+      mantissa[0] = 0;
+      mantissa[1] &= 0x3f;
+      const value = new Decimal(`${sign}0x${mantissa.toString("hex")}`).times(
+        `1e${exponent}`
+      );
+      Amount.assertIouIsValid(value);
+
       return {
-        value: valueString,
-        currency: this.currency.toJSON(),
-        issuer: this.issuer.toJSON(),
+        issuer: issuer.toJSON(),
+        currency: currency.toJSON(),
+        value: value.toString(),
       };
-    },
-  },
-  undefined
-);
+    }
+  }
+
+  /**
+   * Validate XRP amount
+   *
+   * @param amount String representing XRP amount
+   * @returns void, but will throw if invalid amount
+   */
+  private static assertXrpIsValid(amount: string): void {
+    if (amount.indexOf(".") !== -1) {
+      throw new Error("XRP amounts must be integer");
+    }
+
+    const decimal = new Decimal(amount);
+    if (!decimal.isZero()) {
+      if (decimal.lt(MIN_XRP) || decimal.gt(MAX_DROPS)) {
+        throw new Error("Invalid XRP amount");
+      }
+    }
+  }
+
+  /**
+   * Validate IOU.value amount
+   *
+   * @param decimal Decimal.js object representing IOU.value
+   * @returns void, but will throw if invalid amount
+   */
+  private static assertIouIsValid(decimal: Decimal): void {
+    if (!decimal.isZero()) {
+      const p = decimal.precision();
+      const e = decimal.e - 15;
+      if (
+        p > MAX_IOU_PRECISION ||
+        e > MAX_IOU_EXPONENT ||
+        e < MIN_IOU_EXPONENT
+      ) {
+        throw new Error("Decimal precision out of range");
+      }
+      this.verifyNoDecimal(decimal);
+    }
+  }
+
+  /**
+   * Ensure that the value after being multiplied by the exponent does not contain a decimal.
+   *
+   * @param decimal a Decimal object
+   * @returns a string of the object without a decimal
+   */
+  private static verifyNoDecimal(decimal: Decimal): void {
+    const integerNumberString = decimal
+      .times(`1e${-(decimal.e - 15)}`)
+      .abs()
+      .toString();
+
+    if (integerNumberString.indexOf(".") !== -1) {
+      throw new Error("Decimal place found in integerNumberString");
+    }
+  }
+
+  /**
+   * Test if this amount is in units of Native Currency(XRP)
+   *
+   * @returns true if Native (XRP)
+   */
+  private isNative(): boolean {
+    return (this.bytes[0] & 0x80) === 0;
+  }
+}
 
 export { Amount };

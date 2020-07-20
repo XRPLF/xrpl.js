@@ -1,10 +1,10 @@
-import { ComparableClass } from "./serialized-type";
+import { Comparable } from "./serialized-type";
 import { BinaryParser } from "../serdes/binary-parser";
 
 /**
  * Base class defining how to encode and decode hashes
  */
-class Hash extends ComparableClass {
+class Hash extends Comparable {
   static readonly width: number;
 
   constructor(bytes: Buffer) {

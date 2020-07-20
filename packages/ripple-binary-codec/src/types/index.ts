@@ -7,18 +7,18 @@ import {
 import { AccountID } from "./account-id";
 import { Amount } from "./amount";
 import { Blob } from "./blob";
-const { Currency } = require("./currency");
-const { Hash128 } = require("./hash-128");
-const { Hash160 } = require("./hash-160");
-const { Hash256 } = require("./hash-256");
-const { PathSet } = require("./path-set");
-const { STArray } = require("./st-array");
-const { STObject } = require("./st-object");
-const { UInt16 } = require("./uint-16");
-const { UInt32 } = require("./uint-32");
-const { UInt64 } = require("./uint-64");
-const { UInt8 } = require("./uint-8");
-const { Vector256 } = require("./vector-256");
+import { Currency } from "./currency";
+import { Hash128 } from "./hash-128";
+import { Hash160 } from "./hash-160";
+import { Hash256 } from "./hash-256";
+import { PathSet } from "./path-set";
+import { STArray } from "./st-array";
+import { STObject } from "./st-object";
+import { UInt16 } from "./uint-16";
+import { UInt32 } from "./uint-32";
+import { UInt64 } from "./uint-64";
+import { UInt8 } from "./uint-8";
+import { Vector256 } from "./vector-256";
 
 const coreTypes = {
   AccountID,

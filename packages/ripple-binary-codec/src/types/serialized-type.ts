@@ -1,14 +1,24 @@
 import { BytesList } from "../serdes/binary-serializer";
-const { bytesToHex, slice } = require("../utils/bytes-utils");
+import { BinaryParser } from "../serdes/binary-parser";
 
 /**
  * The base class for all binary-codec types
  */
-class SerializedTypeClass {
+class SerializedType {
   protected readonly bytes: Buffer = Buffer.alloc(0);
 
   constructor(bytes: Buffer) {
     this.bytes = bytes ?? Buffer.alloc(0);
+  }
+
+  static fromParser(parser: BinaryParser, hint?: number): SerializedType {
+    throw new Error("fromParser not implemented");
+    return this.fromParser(parser, hint);
+  }
+
+  static from(value: any): SerializedType {
+    throw new Error("from not implemented");
+    return this.from(value);
   }
 
   /**
@@ -63,24 +73,24 @@ class SerializedTypeClass {
 /**
  * Base class for SerializedTypes that are comparable
  */
-class ComparableClass extends SerializedTypeClass {
-  lt(other: ComparableClass): boolean {
+class Comparable extends SerializedType {
+  lt(other: Comparable): boolean {
     return this.compareTo(other) < 0;
   }
 
-  eq(other: ComparableClass): boolean {
+  eq(other: Comparable): boolean {
     return this.compareTo(other) === 0;
   }
 
-  gt(other: ComparableClass): boolean {
+  gt(other: Comparable): boolean {
     return this.compareTo(other) > 0;
   }
 
-  gte(other: ComparableClass): boolean {
+  gte(other: Comparable): boolean {
     return this.compareTo(other) > -1;
   }
 
-  lte(other: ComparableClass): boolean {
+  lte(other: Comparable): boolean {
     return this.compareTo(other) < 1;
   }
 
@@ -90,71 +100,9 @@ class ComparableClass extends SerializedTypeClass {
    * @param other The comparable object to compare this to
    * @returns A number denoting the relationship of this and other
    */
-  compareTo(other: ComparableClass): number {
-    throw new Error("cannot compare " + this + " and " + other);
+  compareTo(other: Comparable): number {
+    throw new Error(`cannot compare ${this} and ${other}`);
   }
 }
 
-const Comparable = {
-  lt(other) {
-    return this.compareTo(other) < 0;
-  },
-  eq(other) {
-    return this.compareTo(other) === 0;
-  },
-  gt(other) {
-    return this.compareTo(other) > 0;
-  },
-  gte(other) {
-    return this.compareTo(other) > -1;
-  },
-  lte(other) {
-    return this.compareTo(other) < 1;
-  },
-};
-
-const SerializedType = {
-  toBytesSink(sink) {
-    sink.put(this._bytes);
-  },
-  toHex() {
-    return bytesToHex(this.toBytes());
-  },
-  toBytes() {
-    if (this._bytes) {
-      return slice(this._bytes);
-    }
-    const bl = new BytesList();
-    this.toBytesSink(bl);
-    return bl.toBytes();
-  },
-  toJSON() {
-    return this.toHex();
-  },
-  toString() {
-    return this.toHex();
-  },
-};
-
-function ensureArrayLikeIs(Type, arrayLike) {
-  return {
-    withChildren(Child) {
-      if (arrayLike instanceof Type) {
-        return arrayLike;
-      }
-      const obj = new Type();
-      for (let i = 0; i < arrayLike.length; i++) {
-        obj.push(Child.from(arrayLike[i]));
-      }
-      return obj;
-    },
-  };
-}
-
-export {
-  ensureArrayLikeIs,
-  SerializedType,
-  SerializedTypeClass,
-  Comparable,
-  ComparableClass,
-};
+export { SerializedType, Comparable };

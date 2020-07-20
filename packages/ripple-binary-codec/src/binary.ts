@@ -19,7 +19,7 @@ function serializeObject(object, opts = <any>{}) {
     bytesList.put(prefix);
   }
   const filter = signingFieldsOnly ? (f) => f.isSigningField : undefined;
-  coreTypes.STObject.from(object).toBytesSink(bytesList, filter);
+  coreTypes.STObject.from(object, filter).toBytesSink(bytesList);
   if (suffix) {
     bytesList.put(suffix);
   }
