@@ -5,7 +5,7 @@ const { Amount } = coreTypes
 const fixtures = loadFixture('data-driven-tests.json')
 
 function amountErrorTests () {
-  _.filter(fixtures.values_tests, { type: 'Amount' }).forEach(f => {
+  fixtures.values_tests.filter(obj => obj.type === 'Amount').forEach(f => {
     // We only want these with errors
     if (!f.error) {
       return

@@ -23,14 +23,18 @@ class UInt16 extends UInt {
    *
    * @param val UInt16 object or number
    */
-  static from(val: UInt16 | number): UInt16 {
+  static from<T extends UInt16 | number>(val: T): UInt16 {
     if (val instanceof UInt16) {
       return val;
     }
 
-    const buf = Buffer.alloc(UInt16.width);
-    buf.writeUInt16BE(val);
-    return new UInt16(buf);
+    if (typeof val === "number") {
+      const buf = Buffer.alloc(UInt16.width);
+      buf.writeUInt16BE(val);
+      return new UInt16(buf);
+    }
+
+    throw new Error("Can not construct UInt16 with given value");
   }
 
   /**

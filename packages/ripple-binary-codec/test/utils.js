@@ -1,5 +1,4 @@
 const fs = require('fs')
-const { parseBytes } = require('../dist/utils/bytes-utils')
 
 function hexOnly (hex) {
   return hex.replace(/[^a-fA-F0-9]/g, '')
@@ -7,8 +6,8 @@ function hexOnly (hex) {
 
 function unused () {}
 
-function parseHexOnly (hex, to) {
-  return parseBytes(hexOnly(hex), to)
+function parseHexOnly (hex) {
+  return Buffer.from(hexOnly(hex), 'hex');
 }
 
 function loadFixture (relativePath) {

@@ -15,9 +15,18 @@ class Hash extends Comparable {
    * Construct a Hash object from an existing Hash object or a hex-string
    *
    * @param value A hash object or hex-string of a hash
-   */
-  static from(value: Hash | string): Hash {
-    return value instanceof this ? value : new this(Buffer.from(value, "hex"));
+   */ 
+  static from<T extends Hash | string>(value: T): Hash {
+    if(value instanceof this) {
+      return value
+    }
+    
+    if(typeof value === "string") {
+      return new this(Buffer.from(value, "hex"));
+    }
+
+    throw new Error("Cannot construct Hash from given value");
+    
   }
 
   /**

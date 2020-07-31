@@ -10,7 +10,6 @@ const { Amount, Hash160 } = coreTypes
 const { makeParser, readJSON } = binary
 const { Field, TransactionType } = require('./../dist/enums')
 const { parseHexOnly, hexOnly, loadFixture } = require('./utils')
-const { bytesToHex } = require('../dist/utils/bytes-utils')
 const fixtures = loadFixture('data-driven-tests.json')
 const { BytesList } = require('../dist/serdes/binary-serializer')
 
@@ -107,9 +106,9 @@ function transactionParsingTests () {
     expect(parser.read(8)).not.toEqual([])
     expect(parser.readField()).toEqual(Field.SigningPubKey)
     expect(parser.readVariableLengthLength()).toBe(33)
-    expect(bytesToHex(parser.read(33))).toEqual(tx_json.SigningPubKey)
+    expect(parser.read(33).toString('hex').toUpperCase()).toEqual(tx_json.SigningPubKey)
     expect(parser.readField()).toEqual(Field.TxnSignature)
-    expect(bytesToHex(parser.readVariableLength())).toEqual(tx_json.TxnSignature)
+    expect(parser.readVariableLength().toString('hex').toUpperCase()).toEqual(tx_json.TxnSignature)
     expect(parser.readField()).toEqual(Field.Account)
     expect(encodeAccountID(parser.readVariableLength())).toEqual(tx_json.Account)
     expect(parser.end()).toBe(true)
@@ -180,12 +179,13 @@ function transactionParsingTests () {
     const parser = makeParser(transaction.binary)
     const jsonFromBinary = readJSON(parser)
     expect(jsonFromBinary instanceof coreTypes.STObject).toBe(false)
-    expect(_.isPlainObject(jsonFromBinary)).toBe(true)
+    expect(jsonFromBinary instanceof Object).toBe(true);
+    expect(jsonFromBinary.prototype).toBe(undefined)
   })
 }
 
 function amountParsingTests () {
-  _.filter(fixtures.values_tests, { type: 'Amount' }).forEach((f, i) => {
+  fixtures.values_tests.filter(obj => obj.type === 'Amount').forEach((f, i) => {
     if (f.error) {
       return
     }
@@ -246,7 +246,7 @@ function assertRecyclable (json, forField) {
 function nestedObjectTests () {
   function disabled (i) {
     unused(i)
-    return false // !_.includes([2], i);
+    return false
   }
 
   fixtures.whole_objects.forEach((f, i) => {

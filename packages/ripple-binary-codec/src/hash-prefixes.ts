@@ -1,10 +1,19 @@
-import { serializeUIntN } from "./utils/bytes-utils";
-
-function bytes(uint32) {
-  return serializeUIntN(uint32, 4);
+/**
+ * Write a 32 bit integer to a Buffer
+ *
+ * @param uint32 32 bit integer to write to buffer
+ * @returns a buffer with the bytes representation of uint32
+ */
+function bytes(uint32: number): Buffer {
+  const result = Buffer.alloc(4);
+  result.writeUInt32BE(uint32);
+  return result;
 }
 
-const HashPrefix = {
+/**
+ * Maps HashPrefix names to their byte representation
+ */
+const HashPrefix: Record<string, Buffer> = {
   transactionID: bytes(0x54584e00),
   // transaction plus metadata
   transaction: bytes(0x534e4400),

@@ -127,7 +127,8 @@ class BinarySerializer {
    */
   writeFieldAndValue(field: FieldInstance, value: SerializedType): void {
     const associatedValue = field.associatedType.from(value);
-    assert(associatedValue.toBytesSink, field.name);
+    assert(associatedValue.toBytesSink !== undefined);
+    assert(field.name !== undefined);
 
     this.sink.put(field.header);
 

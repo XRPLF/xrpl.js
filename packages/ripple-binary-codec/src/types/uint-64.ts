@@ -26,7 +26,7 @@ class UInt64 extends UInt {
    * @param val A UInt64, hex-string, bigint, or number
    * @returns A UInt64 object
    */
-  static from(val: UInt64 | string | bigint | number): UInt64 {
+  static from<T extends UInt64 | string | bigint | number>(val: T): UInt64 {
     if (val instanceof UInt64) {
       return val;
     }
@@ -38,17 +38,23 @@ class UInt64 extends UInt {
         throw new Error("value must be an unsigned integer");
       }
       buf.writeBigUInt64BE(BigInt(val));
-    } else if (typeof val === "string") {
-      if (!HEX_REGEX.test(val)) {
-        throw new Error(val + "is not a valid hex-string");
-      }
-      buf = Buffer.from(val, "hex");
-    } else {
-      // typeof val === bigint
-      buf.writeBigUInt64BE(val);
+      return new UInt64(buf);
     }
 
-    return new UInt64(buf);
+    if (typeof val === "string") {
+      if (!HEX_REGEX.test(val)) {
+        throw new Error(`${val} is not a valid hex-string`);
+      }
+      buf = Buffer.from(val, "hex");
+      return new UInt64(buf);
+    }
+
+    if (typeof val === "bigint") {
+      buf.writeBigUInt64BE(val);
+      return new UInt64(buf);
+    }
+
+    throw new Error("Cannot construct UInt64 from given value");
   }
 
   /**

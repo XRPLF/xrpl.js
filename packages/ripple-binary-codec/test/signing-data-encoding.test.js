@@ -60,7 +60,7 @@ describe('Signing data', function () {
   })
   test('can create multi signing blobs', function () {
     const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
-    const signingJson = _.assign({}, tx_json, { SigningPubKey: '' })
+    const signingJson = Object.assign({}, tx_json, { SigningPubKey: '' })
     const actual = encodeForMultisigning(signingJson, signingAccount)
     expect(actual).toBe(
       ['534D5400', // signingPrefix

@@ -26,8 +26,16 @@ class Blob extends SerializedType {
    * @param value existing Blob object or a hex-string
    * @returns A Blob object
    */
-  static from(value: Blob | string): Blob {
-    return value instanceof Blob ? value : new Blob(Buffer.from(value, "hex"));
+  static from<T extends Blob | string>(value: T): Blob {
+    if (value instanceof Blob) {
+      return value;
+    }
+
+    if (typeof value === "string") {
+      return new Blob(Buffer.from(value, "hex"));
+    }
+
+    throw new Error("Cannot construct Blob from value given");
   }
 }
 

@@ -3,7 +3,7 @@ const { coreTypes } = require('../dist/types')
 const { SerializedType } = require('../dist/types/serialized-type')
 
 describe('SerializedType interfaces', () => {
-  _.forOwn(coreTypes, (Value, name) => {
+  Object.entries(coreTypes).forEach(([name, Value]) => {
     test(`${name} has a \`from\` static constructor`, () => {
       expect(Value.from && Value.from !== Array.from).toBe(true)
     })
@@ -27,7 +27,7 @@ describe('SerializedType interfaces', () => {
       expect(Value.from(newJSON).toJSON()).toEqual(newJSON)
     })
     describe(`${name} supports all methods of the SerializedType mixin`, () => {
-      _.keys(SerializedType.prototype).forEach(k => {
+      Object.keys(SerializedType.prototype).forEach(k => {
         test(`new ${name}.prototype.${k} !== undefined`, () => {
           expect(Value.prototype[k]).not.toBe(undefined)
         })

@@ -1,7 +1,7 @@
 import { AccountID } from "./account-id";
 import { Currency } from "./currency";
 import { BinaryParser } from "../serdes/binary-parser";
-import { SerializedType } from "./serialized-type";
+import { SerializedType, JsonObject } from "./serialized-type";
 
 /**
  * Constants for separating Paths in a PathSet
@@ -19,10 +19,31 @@ const TYPE_ISSUER = 0x20;
 /**
  * The object representation of a Hop, an issuer AccountID, an account AccountID, and a Currency
  */
-interface HopObject {
+interface HopObject extends JsonObject {
   issuer?: string;
   account?: string;
   currency?: string;
+}
+
+/**
+ * TypeGuard for HopObject
+ */
+function isHopObject(arg): arg is HopObject {
+  return (arg.issuer !== undefined ||
+      arg.account !== undefined ||
+      arg.currency !== undefined
+  );
+}
+
+/**
+ * TypeGuard for PathSet
+ */
+function isPathSet(arg): arg is Array<Array<HopObject>> {
+  return (
+    Array.isArray(arg) && arg.length === 0 ||
+    Array.isArray(arg) && Array.isArray(arg[0]) && arg[0].length === 0 ||
+    Array.isArray(arg) && Array.isArray(arg[0]) && isHopObject(arg[0][0])
+  );
 }
 
 /**
@@ -96,15 +117,15 @@ class Hop extends SerializedType {
 
     const result: HopObject = {};
     if (type & TYPE_ACCOUNT) {
-      result.account = AccountID.fromParser(hopParser).toJSON();
+      result.account = (AccountID.fromParser(hopParser) as AccountID).toJSON();
     }
 
     if (type & TYPE_CURRENCY) {
-      result.currency = Currency.fromParser(hopParser).toJSON();
+      result.currency = (Currency.fromParser(hopParser) as Currency).toJSON();
     }
 
     if (type & TYPE_ISSUER) {
-      result.issuer = AccountID.fromParser(hopParser).toJSON();
+      result.issuer = (AccountID.fromParser(hopParser) as AccountID).toJSON();
     }
 
     return result;
@@ -169,7 +190,7 @@ class Path extends SerializedType {
    *
    * @returns an Array of HopObject constructed from this.bytes
    */
-  toJSON() {
+  toJSON(): Array<HopObject> {
     const json: Array<HopObject> = [];
     const pathParser = new BinaryParser(this.toString());
 
@@ -191,21 +212,25 @@ class PathSet extends SerializedType {
    * @param value A PathSet or Array of Array of HopObjects
    * @returns the PathSet constructed from value
    */
-  static from(value: PathSet | Array<Array<HopObject>>): PathSet {
+  static from<T extends PathSet | Array<Array<HopObject>>>(value: T): PathSet {
     if (value instanceof PathSet) {
       return value;
     }
 
-    const bytes: Array<Buffer> = [];
+    if (isPathSet(value)) {
+      const bytes: Array<Buffer> = [];
 
-    value.forEach((path: Array<HopObject>) => {
-      bytes.push(Path.from(path).toBytes());
-      bytes.push(Buffer.from([PATH_SEPARATOR_BYTE]));
-    });
+      value.forEach((path: Array<HopObject>) => {
+        bytes.push(Path.from(path).toBytes());
+        bytes.push(Buffer.from([PATH_SEPARATOR_BYTE]));
+      });
 
-    bytes[bytes.length - 1] = Buffer.from([PATHSET_END_BYTE]);
+      bytes[bytes.length - 1] = Buffer.from([PATHSET_END_BYTE]);
 
-    return new PathSet(Buffer.concat(bytes));
+      return new PathSet(Buffer.concat(bytes));
+    }
+
+    throw new Error("Cannot construct PathSet from given value");
   }
 
   /**

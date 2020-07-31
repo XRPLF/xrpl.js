@@ -1,19 +1,49 @@
-import * as _ from "lodash";
-import { strict as assert } from "assert";
-import { coreTypes } from "./types";
-const { STObject, Hash256 } = coreTypes;
-import { ShaMap } from "./shamap";
+import * as assert from "assert";
+import { ShaMap, ShaMapNode, ShaMapLeaf } from "./shamap";
 import { HashPrefix } from "./hash-prefixes";
 import { Sha512Half } from "./hashes";
 import { BinarySerializer, serializeObject } from "./binary";
+import { Hash256 } from "./types/hash-256";
+import { STObject } from "./types/st-object";
+import { UInt64 } from "./types/uint-64";
+import { UInt32 } from "./types/uint-32";
+import { UInt8 } from "./types/uint-8";
+import { BinaryParser } from "./serdes/binary-parser";
+import { JsonObject } from "./types/serialized-type";
 
-function computeHash(itemizer, itemsJson) {
+/**
+ * Computes the hash of a list of objects
+ *
+ * @param itemizer Converts an item into a format that can be added to SHAMap
+ * @param itemsJson Array of items to add to a SHAMap
+ * @returns the hash of the SHAMap
+ */
+function computeHash(
+  itemizer: (item: JsonObject) => [Hash256?, ShaMapNode?, ShaMapLeaf?],
+  itemsJson: Array<JsonObject>
+): Hash256 {
   const map = new ShaMap();
   itemsJson.forEach((item) => map.addItem(...itemizer(item)));
   return map.hash();
 }
 
-function transactionItem(json) {
+/**
+ * Interface describing a transaction item
+ */
+interface transactionItemObject extends JsonObject {
+  hash: string;
+  metaData: JsonObject;
+}
+
+/**
+ * Convert a transaction into an index and an item
+ *
+ * @param json transaction with metadata
+ * @returns a tuple of index and item to be added to SHAMap
+ */
+function transactionItemizer(
+  json: transactionItemObject
+): [Hash256, ShaMapNode, undefined] {
   assert(json.hash);
   const index = Hash256.from(json.hash);
   const item = {
@@ -25,11 +55,26 @@ function transactionItem(json) {
       serializer.writeLengthEncoded(STObject.from(json));
       serializer.writeLengthEncoded(STObject.from(json.metaData));
     },
-  };
-  return [index, item];
+  } as ShaMapNode;
+  return [index, item, undefined];
 }
 
-function entryItem(json) {
+/**
+ * Interface describing an entry item
+ */
+interface entryItemObject extends JsonObject {
+  index: string;
+}
+
+/**
+ * Convert an entry to a pair Hash256 and ShaMapNode
+ *
+ * @param json JSON describing a ledger entry item
+ * @returns a tuple of index and item to be added to SHAMap
+ */
+function entryItemizer(
+  json: entryItemObject
+): [Hash256, ShaMapNode, undefined] {
   const index = Hash256.from(json.index);
   const bytes = serializeObject(json);
   const item = {
@@ -39,29 +84,95 @@ function entryItem(json) {
     toBytesSink(sink) {
       sink.put(bytes);
     },
-  };
-  return [index, item];
+  } as ShaMapNode;
+  return [index, item, undefined];
 }
 
-const transactionTreeHash = _.partial(computeHash, transactionItem);
-const accountStateHash = _.partial(computeHash, entryItem);
+/**
+ * Function computing the hash of a transaction tree
+ *
+ * @param param An array of transaction objects to hash
+ * @returns A Hash256 object
+ */
+function transactionTreeHash(param: Array<JsonObject>): Hash256 {
+  const itemizer = transactionItemizer as (
+    json: JsonObject
+  ) => [Hash256, ShaMapNode, undefined];
+  return computeHash(itemizer, param);
+}
 
-function ledgerHash(header) {
+/**
+ * Function computing the hash of accountState
+ *
+ * @param param A list of accountStates hash
+ * @returns A Hash256 object
+ */
+function accountStateHash(param: Array<JsonObject>): Hash256 {
+  const itemizer = entryItemizer as (
+    json: JsonObject
+  ) => [Hash256, ShaMapNode, undefined];
+  return computeHash(itemizer, param);
+}
+
+/**
+ * Interface describing a ledger header
+ */
+interface ledgerObject {
+  ledger_index: number;
+  total_coins: string | number | bigint;
+  parent_hash: string;
+  transaction_hash: string;
+  account_hash: string;
+  parent_close_time: number;
+  close_time: number;
+  close_time_resolution: number;
+  close_flags: number;
+}
+
+/**
+ * Serialize and hash a ledger header
+ *
+ * @param header a ledger header
+ * @returns the hash of header
+ */
+function ledgerHash(header: ledgerObject): Hash256 {
   const hash = new Sha512Half();
   hash.put(HashPrefix.ledgerHeader);
   assert(header.parent_close_time !== undefined);
   assert(header.close_flags !== undefined);
 
-  coreTypes.UInt32.from(header.ledger_index).toBytesSink(hash);
-  coreTypes.UInt64.from(BigInt(header.total_coins)).toBytesSink(hash);
-  coreTypes.Hash256.from(header.parent_hash).toBytesSink(hash);
-  coreTypes.Hash256.from(header.transaction_hash).toBytesSink(hash);
-  coreTypes.Hash256.from(header.account_hash).toBytesSink(hash);
-  coreTypes.UInt32.from(header.parent_close_time).toBytesSink(hash);
-  coreTypes.UInt32.from(header.close_time).toBytesSink(hash);
-  coreTypes.UInt8.from(header.close_time_resolution).toBytesSink(hash);
-  coreTypes.UInt8.from(header.close_flags).toBytesSink(hash);
+  UInt32.from<number>(header.ledger_index).toBytesSink(hash);
+  UInt64.from<bigint>(BigInt(header.total_coins)).toBytesSink(hash);
+  Hash256.from(header.parent_hash).toBytesSink(hash);
+  Hash256.from(header.transaction_hash).toBytesSink(hash);
+  Hash256.from(header.account_hash).toBytesSink(hash);
+  UInt32.from<number>(header.parent_close_time).toBytesSink(hash);
+  UInt32.from<number>(header.close_time).toBytesSink(hash);
+  UInt8.from<number>(header.close_time_resolution).toBytesSink(hash);
+  UInt8.from<number>(header.close_flags).toBytesSink(hash);
   return hash.finish();
 }
 
-export { accountStateHash, transactionTreeHash, ledgerHash };
+/**
+ * Decodes a serialized ledger header
+ *
+ * @param binary A serialized ledger header
+ * @returns A JSON object describing a ledger header
+ */
+function decodeLedgerData(binary: string): ledgerObject {
+  assert(typeof binary === "string", "binary must be a hex string");
+  const parser = new BinaryParser(binary);
+  return {
+    ledger_index: parser.readUInt32(),
+    total_coins: parser.readType(UInt64).valueOf().toString(),
+    parent_hash: parser.readType(Hash256).toHex(),
+    transaction_hash: parser.readType(Hash256).toHex(),
+    account_hash: parser.readType(Hash256).toHex(),
+    parent_close_time: parser.readUInt32(),
+    close_time: parser.readUInt32(),
+    close_time_resolution: parser.readUInt8(),
+    close_flags: parser.readUInt8(),
+  };
+}
+
+export { accountStateHash, transactionTreeHash, ledgerHash, decodeLedgerData };

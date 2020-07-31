@@ -113,10 +113,16 @@ class Currency extends Hash160 {
    *
    * @param val Currency object or a string representation of a currency
    */
-  static from(val: Currency | string): Currency {
-    return val instanceof this
-      ? val
-      : new Currency(bytesFromRepresentation(val));
+  static from<T extends Hash160 | string>(value: T): Currency {
+    if (value instanceof Currency) {
+      return value;
+    }
+
+    if (typeof value === "string") {
+      return new Currency(bytesFromRepresentation(value));
+    }
+
+    throw new Error("Cannot construct Currency from value given");
   }
 
   /**

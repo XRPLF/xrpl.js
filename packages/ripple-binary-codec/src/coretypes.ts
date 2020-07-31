@@ -5,13 +5,13 @@ import {
   Type,
   TransactionResult,
 } from "./enums";
-const types = require("./types");
-const binary = require("./binary");
-const { ShaMap } = require("./shamap");
-const ledgerHashes = require("./ledger-hashes");
-const hashes = require("./hashes");
-const quality = require("./quality");
-const { HashPrefix } = require("./hash-prefixes");
+import * as types from "./types";
+import * as binary from "./binary";
+import { ShaMap } from "./shamap";
+import * as ledgerHashes from "./ledger-hashes";
+import * as hashes from "./hashes";
+import { quality } from "./quality";
+import { HashPrefix } from "./hash-prefixes";
 
 export {
   hashes,

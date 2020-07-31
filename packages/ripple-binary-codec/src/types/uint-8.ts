@@ -21,14 +21,18 @@ class UInt8 extends UInt {
    *
    * @param val UInt8 object or number
    */
-  static from(val: UInt8 | number): UInt8 {
+  static from<T extends UInt8 | number>(val: T): UInt8 {
     if (val instanceof UInt8) {
       return val;
     }
 
-    const buf = Buffer.alloc(UInt8.width);
-    buf.writeUInt8(val);
-    return new UInt8(buf);
+    if (typeof val === "number") {
+      const buf = Buffer.alloc(UInt8.width);
+      buf.writeUInt8(val);
+      return new UInt8(buf);
+    }
+
+    throw new Error("Cannot construct UInt8 from given value");
   }
 
   /**

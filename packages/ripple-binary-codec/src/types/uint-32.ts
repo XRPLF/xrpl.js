@@ -23,14 +23,26 @@ class UInt32 extends UInt {
    *
    * @param val UInt32 object or number
    */
-  static from(val: UInt32 | number): UInt32 {
+  static from<T extends UInt32 | number | string>(val: T): UInt32 {
     if (val instanceof UInt32) {
       return val;
     }
 
     const buf = Buffer.alloc(UInt32.width);
-    buf.writeUInt32BE(val);
-    return new UInt32(buf);
+
+    if (typeof val === "string") {
+      const num = Number.parseInt(val);
+      buf.writeUInt32BE(num);
+      return new UInt32(buf);
+    }
+
+    if (typeof val === "number") {
+      buf.writeUInt32BE(val);
+      return new UInt32(buf);
+    }
+
+    console.log(typeof val);
+    throw new Error("Cannot construct UInt32 from given value");
   }
 
   /**

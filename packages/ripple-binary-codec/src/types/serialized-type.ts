@@ -1,6 +1,10 @@
 import { BytesList } from "../serdes/binary-serializer";
 import { BinaryParser } from "../serdes/binary-parser";
 
+type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject;
+
+type JsonObject = { [key: string]: JSON };
+
 /**
  * The base class for all binary-codec types
  */
@@ -16,7 +20,7 @@ class SerializedType {
     return this.fromParser(parser, hint);
   }
 
-  static from(value: any): SerializedType {
+  static from(value: SerializedType | JSON | bigint): SerializedType {
     throw new Error("from not implemented");
     return this.from(value);
   }
@@ -58,7 +62,7 @@ class SerializedType {
    *
    * @returns any type, if not overloaded returns hexString representation of bytes
    */
-  toJSON(): any {
+  toJSON(): JSON {
     return this.toHex();
   }
 
@@ -101,8 +105,10 @@ class Comparable extends SerializedType {
    * @returns A number denoting the relationship of this and other
    */
   compareTo(other: Comparable): number {
-    throw new Error(`cannot compare ${this} and ${other}`);
+    throw new Error(
+      `cannot compare ${this.toString()} and ${other.toString()}`
+    );
   }
 }
 
-export { SerializedType, Comparable };
+export { SerializedType, Comparable, JSON, JsonObject };

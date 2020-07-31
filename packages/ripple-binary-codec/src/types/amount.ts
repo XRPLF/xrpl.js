@@ -1,8 +1,10 @@
 import { Decimal } from "decimal.js";
-import { SerializedType } from "./serialized-type";
+
 import { BinaryParser } from "../serdes/binary-parser";
-import { Currency } from "./currency";
+
 import { AccountID } from "./account-id";
+import { Currency } from "./currency";
+import { JsonObject, SerializedType } from "./serialized-type";
 
 /**
  * Constants for validating amounts
@@ -24,10 +26,23 @@ Decimal.config({
 /**
  * Interface for JSON objects that represent amounts
  */
-interface AmountObject {
+interface AmountObject extends JsonObject {
   value: string;
   currency: string;
   issuer: string;
+}
+
+/**
+ * Type guard for AmountObject
+ */
+function isAmountObject(arg): arg is AmountObject {
+  const keys = Object.keys(arg).sort();
+  return (
+    keys.length === 3 &&
+    keys[0] === "currency" &&
+    keys[1] === "issuer" &&
+    keys[2] === "value"
+  );
 }
 
 /**
@@ -45,10 +60,11 @@ class Amount extends SerializedType {
   /**
    * Construct an amount from an IOU or string amount
    *
-   * @param value An Amount, object representing an IOU, or a string representing an integer amount
+   * @param value An Amount, object representing an IOU, or a string
+   *     representing an integer amount
    * @returns An Amount object
    */
-  static from(value: Amount | AmountObject | string): Amount {
+  static from<T extends Amount | AmountObject | string>(value: T): Amount {
     if (value instanceof Amount) {
       return value;
     }
@@ -63,7 +79,9 @@ class Amount extends SerializedType {
       amount[0] |= 0x40;
 
       return new Amount(amount);
-    } else if (typeof value === "object") {
+    }
+
+    if (isAmountObject(value)) {
       const number = new Decimal(value.value);
       Amount.assertIouIsValid(number);
 
@@ -92,6 +110,7 @@ class Amount extends SerializedType {
       const issuer = AccountID.from(value.issuer).toBytes();
       return new Amount(Buffer.concat([amount, currency, issuer]));
     }
+
     throw new Error("Invalid type to construct an Amount");
   }
 
@@ -123,8 +142,8 @@ class Amount extends SerializedType {
     } else {
       const parser = new BinaryParser(this.toString());
       const mantissa = parser.read(8);
-      const currency = Currency.fromParser(parser);
-      const issuer = AccountID.fromParser(parser);
+      const currency = Currency.fromParser(parser) as Currency;
+      const issuer = AccountID.fromParser(parser) as AccountID;
 
       const b1 = mantissa[0];
       const b2 = mantissa[1];
@@ -189,7 +208,8 @@ class Amount extends SerializedType {
   }
 
   /**
-   * Ensure that the value after being multiplied by the exponent does not contain a decimal.
+   * Ensure that the value after being multiplied by the exponent does not
+   * contain a decimal.
    *
    * @param decimal a Decimal object
    * @returns a string of the object without a decimal
@@ -215,4 +235,4 @@ class Amount extends SerializedType {
   }
 }
 
-export { Amount };
+export { Amount, AmountObject };

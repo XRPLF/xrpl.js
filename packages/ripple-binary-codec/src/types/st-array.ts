@@ -1,4 +1,4 @@
-import { SerializedType } from "./serialized-type";
+import { SerializedType, JsonObject } from "./serialized-type";
 import { STObject } from "./st-object";
 import { BinaryParser } from "../serdes/binary-parser";
 
@@ -6,6 +6,15 @@ const ARRAY_END_MARKER = Buffer.from([0xf1]);
 const ARRAY_END_MARKER_NAME = "ArrayEndMarker";
 
 const OBJECT_END_MARKER = Buffer.from([0xe1]);
+
+/**
+ * TypeGuard for Array<JsonObject>
+ */
+function isObjects(args): args is Array<JsonObject> {
+  return (
+    Array.isArray(args) && (args.length === 0 || typeof args[0] === "object")
+  );
+}
 
 /**
  * Class for serializing and deserializing Arrays of Objects
@@ -43,18 +52,22 @@ class STArray extends SerializedType {
    * @param value STArray or Array of Objects to parse into an STArray
    * @returns An STArray object
    */
-  static from(value: STArray | Array<object>): STArray {
+  static from<T extends STArray | Array<JsonObject>>(value: T): STArray {
     if (value instanceof STArray) {
       return value;
     }
 
-    const bytes: Array<Buffer> = [];
-    value.forEach((obj) => {
-      bytes.push(STObject.from(obj).toBytes());
-    });
+    if (isObjects(value)) {
+      const bytes: Array<Buffer> = [];
+      value.forEach((obj) => {
+        bytes.push(STObject.from(obj).toBytes());
+      });
 
-    bytes.push(ARRAY_END_MARKER);
-    return new STArray(Buffer.concat(bytes));
+      bytes.push(ARRAY_END_MARKER);
+      return new STArray(Buffer.concat(bytes));
+    }
+
+    throw new Error("Cannot construct Currency from value given");
   }
 
   /**
@@ -62,8 +75,8 @@ class STArray extends SerializedType {
    *
    * @returns An Array of JSON objects
    */
-  toJSON(): Array<object> {
-    const result: Array<object> = [];
+  toJSON(): Array<JsonObject> {
+    const result: Array<JsonObject> = [];
 
     const arrayParser = new BinaryParser(this.toString());
 

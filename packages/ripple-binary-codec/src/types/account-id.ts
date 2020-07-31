@@ -17,13 +17,18 @@ class AccountID extends Hash160 {
    * @param value either an existing AccountID, a hex-string, or a base58 r-Address
    * @returns an AccountID object
    */
-  static from(value: AccountID | string): AccountID {
-    if (value instanceof this) {
+  static from<T extends Hash160 | string>(value: T): AccountID {
+    if (value instanceof AccountID) {
       return value;
     }
-    return /^r/.test(value)
-      ? this.fromBase58(value)
-      : new AccountID(Buffer.from(value, "hex"));
+
+    if (typeof value === "string") {
+      return /^r/.test(value)
+        ? this.fromBase58(value)
+        : new AccountID(Buffer.from(value, "hex"));
+    }
+
+    throw new Error("Cannot construct AccountID from value given");
   }
 
   /**

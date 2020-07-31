@@ -21,7 +21,7 @@ function makeItem (indexArg) {
       index.toBytesSink(sink)
     },
     hashPrefix () {
-      return [1, 3, 3, 7]
+      return Buffer.from([1, 3, 3, 7])
     }
   }
   return [index, item]

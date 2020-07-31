@@ -1,4 +1,4 @@
-const { quality, binary } = require('../dist/coretypes')
+const { quality } = require('../dist/coretypes')
 
 describe('Quality encode/decode', function () {
   const bookDirectory =
@@ -10,6 +10,6 @@ describe('Quality encode/decode', function () {
   })
   test('can encode', function () {
     const bytes = quality.encode(expectedQuality)
-    expect(binary.bytesToHex(bytes)).toBe(bookDirectory.slice(-16))
+    expect(bytes.toString('hex').toUpperCase()).toBe(bookDirectory.slice(-16))
   })
 })

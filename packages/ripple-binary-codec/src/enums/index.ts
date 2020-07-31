@@ -1,4 +1,3 @@
-import { serializeUIntN } from "../utils/bytes-utils";
 import * as enums from "./definitions.json";
 import { SerializedType } from "../types/serialized-type";
 
@@ -37,7 +36,10 @@ class Bytes {
     readonly ordinal: number,
     readonly ordinalWidth: number
   ) {
-    this.bytes = serializeUIntN(ordinal, ordinalWidth);
+    this.bytes = Buffer.alloc(ordinalWidth);
+    for (let i = 0; i < ordinalWidth; i++) {
+      this.bytes[ordinalWidth - i - 1] = (ordinal >>> (i * 8)) & 0xff;
+    }
   }
 
   toJSON(): string {
@@ -57,7 +59,7 @@ class Bytes {
  * @brief: Collection of Bytes objects, mapping bidirectionally
  */
 class BytesLookup {
-  constructor(types: { [key: string]: number }, readonly ordinalWidth: number) {
+  constructor(types: Record<string, number>, readonly ordinalWidth: number) {
     Object.entries(types).forEach(([k, v]) => {
       this[k] = new Bytes(k, v, ordinalWidth);
       this[v.toString()] = this[k];

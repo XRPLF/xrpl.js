@@ -1,69 +1,98 @@
-import { strict as assert } from "assert";
+import * as assert from "assert";
 import { quality, binary } from "./coretypes";
-import { coreTypes } from "./types";
+import { decodeLedgerData } from "./ledger-hashes";
+import { ClaimObject } from "./binary";
+import { JsonObject } from "./types/serialized-type";
 const {
-  bytesToHex,
   signingData,
   signingClaimData,
   multiSigningData,
   binaryToJSON,
   serializeObject,
-  BinaryParser,
 } = binary;
 
-function decodeLedgerData(binary) {
-  assert(typeof binary === "string", "binary must be a hex string");
-  const parser = new BinaryParser(binary);
-  return {
-    ledger_index: parser.readUInt32(),
-    total_coins: parser.readType(coreTypes.UInt64).valueOf().toString(),
-    parent_hash: parser.readType(coreTypes.Hash256).toHex(),
-    transaction_hash: parser.readType(coreTypes.Hash256).toHex(),
-    account_hash: parser.readType(coreTypes.Hash256).toHex(),
-    parent_close_time: parser.readUInt32(),
-    close_time: parser.readUInt32(),
-    close_time_resolution: parser.readUInt8(),
-    close_flags: parser.readUInt8(),
-  };
-}
-
-function decode(binary) {
+/**
+ * Decode a transaction
+ *
+ * @param binary hex-string of the encoded transaction
+ * @returns the JSON representation of the transaction
+ */
+function decode(binary: string): JsonObject {
   assert(typeof binary === "string", "binary must be a hex string");
   return binaryToJSON(binary);
 }
 
-function encode(json) {
+/**
+ * Encode a transaction
+ *
+ * @param json The JSON representation of a transaction
+ * @returns A hex-string of the encoded transaction
+ */
+function encode(json: JsonObject): string {
   assert(typeof json === "object");
-  return bytesToHex(serializeObject(json));
+  return serializeObject(json).toString("hex").toUpperCase();
 }
 
-function encodeForSigning(json) {
+/**
+ * Encode a transaction and prepare for signing
+ *
+ * @param json JSON object representing the transaction
+ * @param signer string representing the account to sign the transaction with
+ * @returns a hex string of the encoded transaction
+ */
+function encodeForSigning(json: JsonObject): string {
   assert(typeof json === "object");
-  return bytesToHex(signingData(json));
+  return signingData(json).toString("hex").toUpperCase();
 }
 
-function encodeForSigningClaim(json) {
+/**
+ * Encode a transaction and prepare for signing with a claim
+ *
+ * @param json JSON object representing the transaction
+ * @param signer string representing the account to sign the transaction with
+ * @returns a hex string of the encoded transaction
+ */
+function encodeForSigningClaim(json: ClaimObject): string {
   assert(typeof json === "object");
-  return bytesToHex(signingClaimData(json));
+  return signingClaimData(json).toString("hex").toUpperCase();
 }
 
-function encodeForMultisigning(json, signer) {
+/**
+ * Encode a transaction and prepare for multi-signing
+ *
+ * @param json JSON object representing the transaction
+ * @param signer string representing the account to sign the transaction with
+ * @returns a hex string of the encoded transaction
+ */
+function encodeForMultisigning(json: JsonObject, signer: string): string {
   assert(typeof json === "object");
   assert.equal(json.SigningPubKey, "");
-  return bytesToHex(multiSigningData(json, signer));
+  return multiSigningData(json, signer).toString("hex").toUpperCase();
 }
 
-function encodeQuality(value) {
+/**
+ * Encode a quality value
+ *
+ * @param value string representation of a number
+ * @returns a hex-string representing the quality
+ */
+function encodeQuality(value: string): string {
   assert(typeof value === "string");
-  return bytesToHex(quality.encode(value));
+  return quality.encode(value).toString("hex").toUpperCase();
 }
 
-function decodeQuality(value) {
+/**
+ * Decode a quality value
+ *
+ * @param value hex-string of a quality
+ * @returns a string representing the quality
+ */
+function decodeQuality(value: string): string {
   assert(typeof value === "string");
   return quality.decode(value).toString();
 }
 
-module.exports = {
+export {
   decode,
   encode,
   encodeForSigning,
