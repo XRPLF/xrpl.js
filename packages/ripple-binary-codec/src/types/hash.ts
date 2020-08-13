@@ -9,24 +9,26 @@ class Hash extends Comparable {
 
   constructor(bytes: Buffer) {
     super(bytes);
+    if (this.bytes.byteLength !== (this.constructor as typeof Hash).width) {
+      throw new Error(`Invalid Hash length ${this.bytes.byteLength}`);
+    }
   }
 
   /**
    * Construct a Hash object from an existing Hash object or a hex-string
    *
    * @param value A hash object or hex-string of a hash
-   */ 
+   */
   static from<T extends Hash | string>(value: T): Hash {
-    if(value instanceof this) {
-      return value
+    if (value instanceof this) {
+      return value;
     }
-    
-    if(typeof value === "string") {
+
+    if (typeof value === "string") {
       return new this(Buffer.from(value, "hex"));
     }
 
     throw new Error("Cannot construct Hash from given value");
-    
   }
 
   /**

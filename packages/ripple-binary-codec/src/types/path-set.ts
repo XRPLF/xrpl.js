@@ -29,9 +29,10 @@ interface HopObject extends JsonObject {
  * TypeGuard for HopObject
  */
 function isHopObject(arg): arg is HopObject {
-  return (arg.issuer !== undefined ||
-      arg.account !== undefined ||
-      arg.currency !== undefined
+  return (
+    arg.issuer !== undefined ||
+    arg.account !== undefined ||
+    arg.currency !== undefined
   );
 }
 
@@ -40,9 +41,9 @@ function isHopObject(arg): arg is HopObject {
  */
 function isPathSet(arg): arg is Array<Array<HopObject>> {
   return (
-    Array.isArray(arg) && arg.length === 0 ||
-    Array.isArray(arg) && Array.isArray(arg[0]) && arg[0].length === 0 ||
-    Array.isArray(arg) && Array.isArray(arg[0]) && isHopObject(arg[0][0])
+    (Array.isArray(arg) && arg.length === 0) ||
+    (Array.isArray(arg) && Array.isArray(arg[0]) && arg[0].length === 0) ||
+    (Array.isArray(arg) && Array.isArray(arg[0]) && isHopObject(arg[0][0]))
   );
 }
 

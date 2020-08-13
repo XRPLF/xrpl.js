@@ -7,7 +7,7 @@ import { Hash160 } from "./hash-160";
 class AccountID extends Hash160 {
   static readonly defaultAccountID: AccountID = new AccountID(Buffer.alloc(20));
 
-  constructor(bytes: Buffer) {
+  constructor(bytes?: Buffer) {
     super(bytes ?? AccountID.defaultAccountID.bytes);
   }
 
@@ -23,6 +23,10 @@ class AccountID extends Hash160 {
     }
 
     if (typeof value === "string") {
+      if (value === "") {
+        return new AccountID();
+      }
+
       return /^r/.test(value)
         ? this.fromBase58(value)
         : new AccountID(Buffer.from(value, "hex"));

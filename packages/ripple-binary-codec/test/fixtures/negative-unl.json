@@ -1,0 +1,12 @@
+{
+    "binary": "120066240000000026000003006840000000000000007300701321ED9D593004CC501CACD261BD8E31E863F2B3F6CA69505E7FD54DA8F5690BEFB7AE8114000000000000000000000000000000000000000000101101",
+    "tx": {
+        "UNLModifyDisabling": 1,
+        "LedgerSequence": 768,
+        "UNLModifyValidator": "ED9D593004CC501CACD261BD8E31E863F2B3F6CA69505E7FD54DA8F5690BEFB7AE",
+        "TransactionType": "UNLModify",
+        "Account": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+        "Sequence": 0,
+        "Fee": "0",
+        "SigningPubKey": ""}
+}

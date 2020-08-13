@@ -1,7 +1,7 @@
 /* eslint-disable func-style */
 
 const { binary } = require('../dist/coretypes')
-const { encode } = require('../dist')
+const { encode, decode } = require('../dist')
 const { makeParser, BytesList, BinarySerializer } = binary
 const { coreTypes } = require('../dist/types')
 const { UInt8, UInt16, UInt32, UInt64, STObject } = coreTypes
@@ -49,6 +49,8 @@ const PaymentChannel = {
     binary: require('./fixtures/payment-channel-claim-binary.json')
   }
 }
+
+const NegativeUNL = require('./fixtures/negative-unl.json');
 
 function bytesListTest () {
   const list = new BytesList().put(Buffer.from([0])).put(Buffer.from([2, 3])).put(Buffer.from([4, 5]))
@@ -171,6 +173,15 @@ function PaymentChannelTest () {
   })
 }
 
+function NegativeUNLTest () {
+  test('can serialize NegativeUNL', () => {
+    expect(encode(NegativeUNL.tx)).toEqual(NegativeUNL.binary);
+  })
+  test('can deserialize NegativeUNL', () => {
+    expect(decode(NegativeUNL.binary)).toEqual(NegativeUNL.tx);
+  })
+}
+
 describe('Binary Serialization', function() {
   describe('nestedObjectTests', nestedObjectTests);
   describe('BytesList', bytesListTest);
@@ -179,4 +190,5 @@ describe('Binary Serialization', function() {
   describe('SignerListSet', SignerListSetTest);
   describe('Escrow', EscrowTest);
   describe('PaymentChannel', PaymentChannelTest);
+  describe('NegativeUNLTest', NegativeUNLTest);
 })

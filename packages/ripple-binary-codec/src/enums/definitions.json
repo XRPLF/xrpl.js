@@ -40,7 +40,8 @@
     "Check": 67,
     "Nickname": 110,
     "Contract": 99,
-    "GeneratorMap": 103
+    "GeneratorMap": 103,
+    "NegativeUNL": 78
   },
   "FIELDS": [
     [
@@ -1024,6 +1025,36 @@
       }
     ],
     [
+      "UNLModifyValidator",
+      {
+        "nth": 19,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
+      "ValidatorToDisable",
+      {
+        "nth": 20,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
+      "ValidatorToReEnable",
+      {
+        "nth": 20,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
       "Account",
       {
         "nth": 1,
@@ -1234,6 +1265,16 @@
       }
     ],
     [
+      "DisabledValidator",
+      {
+        "nth": 19,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "ArrayEndMarker",
       {
         "nth": 1,
@@ -1317,6 +1358,16 @@
       "Majorities",
       {
         "nth": 16,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "DisabledValidators",
+      {
+        "nth": 17,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1484,6 +1535,16 @@
       }
     ],
     [
+      "BeginLedgerSeq",
+      {
+        "nth": 40,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
       "Channel",
       {
         "nth": 22,
@@ -1517,6 +1578,16 @@
       "TickSize",
       {
         "nth": 16,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "UNLModifyDisabling",
+      {
+        "nth": 17,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -1685,6 +1756,7 @@
     "AccountDelete": 21,
 
     "EnableAmendment": 100,
-    "SetFee": 101
+    "SetFee": 101,
+    "UNLModify": 102
   }
 }
