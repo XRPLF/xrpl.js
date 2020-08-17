@@ -3,11 +3,11 @@
   "version": "0.3.0",
   "description": "XRP Ledger binary codec",
   "files": [
-    "distrib/npm/*",
+    "dist/*",
     "bin/*",
     "test/*"
   ],
-  "main": "distrib/npm/",
+  "main": "dist/",
   "directories": {
     "test": "test"
   },

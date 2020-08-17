@@ -1,5 +1,16 @@
 # ripple-binary-codec Release History
 
+## 0.3.0 (2020-08-17)
+
+- Migrate to TypeScript
+  - Javascript classes used
+  - Generics for constructing core types
+- Reduced dependencies
+  - Dependent on create-hash, decimal.js, ripple-address-codec
+- Migrate testing to Jest and added tests
+  - Tests for pseudo-transactions
+- Added support for NegativeUNL pseudo-transactions
+
 ## 0.2.6 (2019-12-31)
 
 - Update dependencies
