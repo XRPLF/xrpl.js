@@ -46,5 +46,8 @@
   },
   "homepage": "https://github.com/ripple/ripple-binary-codec#readme",
   "license": "ISC",
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "prettier": {
+    "semi": true
+  }
 }
