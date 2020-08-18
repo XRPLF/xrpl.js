@@ -28,9 +28,11 @@ function decode(binary: string): JsonObject {
  * @param json The JSON representation of a transaction
  * @returns A hex-string of the encoded transaction
  */
-function encode(json: JsonObject): string {
+function encode(json: object): string {
   assert(typeof json === "object");
-  return serializeObject(json).toString("hex").toUpperCase();
+  return serializeObject(json as JsonObject)
+    .toString("hex")
+    .toUpperCase();
 }
 
 /**
@@ -40,9 +42,11 @@ function encode(json: JsonObject): string {
  * @param signer string representing the account to sign the transaction with
  * @returns a hex string of the encoded transaction
  */
-function encodeForSigning(json: JsonObject): string {
+function encodeForSigning(json: object): string {
   assert(typeof json === "object");
-  return signingData(json).toString("hex").toUpperCase();
+  return signingData(json as JsonObject)
+    .toString("hex")
+    .toUpperCase();
 }
 
 /**
@@ -52,9 +56,11 @@ function encodeForSigning(json: JsonObject): string {
  * @param signer string representing the account to sign the transaction with
  * @returns a hex string of the encoded transaction
  */
-function encodeForSigningClaim(json: ClaimObject): string {
+function encodeForSigningClaim(json: object): string {
   assert(typeof json === "object");
-  return signingClaimData(json).toString("hex").toUpperCase();
+  return signingClaimData(json as ClaimObject)
+    .toString("hex")
+    .toUpperCase();
 }
 
 /**
@@ -64,10 +70,12 @@ function encodeForSigningClaim(json: ClaimObject): string {
  * @param signer string representing the account to sign the transaction with
  * @returns a hex string of the encoded transaction
  */
-function encodeForMultisigning(json: JsonObject, signer: string): string {
+function encodeForMultisigning(json: object, signer: string): string {
   assert(typeof json === "object");
-  assert.equal(json.SigningPubKey, "");
-  return multiSigningData(json, signer).toString("hex").toUpperCase();
+  assert.equal(json["SigningPubKey"], "");
+  return multiSigningData(json as JsonObject, signer)
+    .toString("hex")
+    .toUpperCase();
 }
 
 /**

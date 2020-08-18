@@ -159,7 +159,7 @@ function ledgerHash(header: ledgerObject): Hash256 {
  * @param binary A serialized ledger header
  * @returns A JSON object describing a ledger header
  */
-function decodeLedgerData(binary: string): ledgerObject {
+function decodeLedgerData(binary: string): object {
   assert(typeof binary === "string", "binary must be a hex string");
   const parser = new BinaryParser(binary);
   return {

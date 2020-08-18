@@ -10,7 +10,7 @@ Functions to encode/decode to/from the ripple [binary serialization format](http
 ```
 
 
-### decode(binary: string): JsonObject
+### decode(binary: string): object
 Decode a hex-string into a transaction object.
 ```js
 > api.decode('1100612200000000240000000125000000072D0000000055DF530FB14C5304852F20080B0A8EEF3A6BDD044F41F4EBBD68B8B321145FE4FF6240000002540BE4008114D0F5430B66E06498D4CEEC816C7B3337F9982337')
@@ -26,7 +26,7 @@ Decode a hex-string into a transaction object.
 }
 ```
 
-### encode(json: JsonObject): string
+### encode(json: object): string
 Encode a transaction object into a hex-string.
 ```js
 > api.encode({
@@ -42,15 +42,15 @@ Encode a transaction object into a hex-string.
 '1100612200000000240000000125000000072D0000000055DF530FB14C5304852F20080B0A8EEF3A6BDD044F41F4EBBD68B8B321145FE4FF6240000002540BE4008114D0F5430B66E06498D4CEEC816C7B3337F9982337'
 ```
 
-### encodeForSigning(json: JsonObject): string
+### encodeForSigning(json: object): string
 
 Encode the transaction object for signing.
 
-### encodeForSigningClaim(json: ClaimObject): string
+### encodeForSigningClaim(json: object): string
 
 Encode the transaction object for payment channel claim.
 
-### encodeForMultisigning(json: JsonObject, signer: string): string
+### encodeForMultisigning(json: object, signer: string): string
 
 Encode the transaction object for multi-signing.
 
@@ -66,7 +66,7 @@ Encode the transaction object for multi-signing.
 '195796912.5171664'
 ```
 
-### decodeLedgerData(binary: string): ledgerObject
+### decodeLedgerData(binary: string): object
 ```js
 > api.decodeLedgerData("01E91435016340767BF1C4A3EACEB081770D8ADE216C85445DD6FB002C6B5A2930F2DECE006DA18150CB18F6DD33F6F0990754C962A7CCE62F332FF9C13939B03B864117F0BDA86B6E9B4F873B5C3E520634D343EF5D9D9A4246643D64DAD278BA95DC0EAC6EB5350CF970D521276CDE21276CE60A00")
 {
