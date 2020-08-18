@@ -41,7 +41,6 @@ class UInt32 extends UInt {
       return new UInt32(buf);
     }
 
-    console.log(typeof val);
     throw new Error("Cannot construct UInt32 from given value");
   }
 
