@@ -116,20 +116,24 @@ class Hop extends SerializedType {
     const hopParser = new BinaryParser(this.bytes.toString("hex"));
     const type = hopParser.readUInt8();
 
-    const result: HopObject = {};
+    let account, currency, issuer: string | undefined = undefined
     if (type & TYPE_ACCOUNT) {
-      result.account = (AccountID.fromParser(hopParser) as AccountID).toJSON();
+      account = (AccountID.fromParser(hopParser) as AccountID).toJSON();
     }
 
     if (type & TYPE_CURRENCY) {
-      result.currency = (Currency.fromParser(hopParser) as Currency).toJSON();
+      currency = (Currency.fromParser(hopParser) as Currency).toJSON();
     }
 
     if (type & TYPE_ISSUER) {
-      result.issuer = (AccountID.fromParser(hopParser) as AccountID).toJSON();
+      issuer = (AccountID.fromParser(hopParser) as AccountID).toJSON();
     }
-
-    return result;
+    
+    return {
+      account: account,
+      issuer: issuer,
+      currency: currency,
+    };
   }
 
   /**

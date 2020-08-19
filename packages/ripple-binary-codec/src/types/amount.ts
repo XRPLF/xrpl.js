@@ -160,9 +160,9 @@ class Amount extends SerializedType {
       Amount.assertIouIsValid(value);
 
       return {
-        issuer: issuer.toJSON(),
-        currency: currency.toJSON(),
         value: value.toString(),
+        currency: currency.toJSON(), 
+        issuer: issuer.toJSON(),
       };
     }
   }
@@ -175,13 +175,13 @@ class Amount extends SerializedType {
    */
   private static assertXrpIsValid(amount: string): void {
     if (amount.indexOf(".") !== -1) {
-      throw new Error("XRP amounts must be integer");
+      throw new Error(`${amount.toString()} is an illegal amount`);
     }
 
     const decimal = new Decimal(amount);
     if (!decimal.isZero()) {
       if (decimal.lt(MIN_XRP) || decimal.gt(MAX_DROPS)) {
-        throw new Error("Invalid XRP amount");
+        throw new Error(`${amount.toString()} is an illegal amount`);
       }
     }
   }
