@@ -161,7 +161,7 @@ class Amount extends SerializedType {
 
       return {
         value: value.toString(),
-        currency: currency.toJSON(), 
+        currency: currency.toJSON(),
         issuer: issuer.toJSON(),
       };
     }
