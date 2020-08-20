@@ -143,9 +143,9 @@ function ledgerHash(header: ledgerObject): Hash256 {
 
   UInt32.from<number>(header.ledger_index).toBytesSink(hash);
   UInt64.from<bigint>(BigInt(header.total_coins)).toBytesSink(hash);
-  Hash256.from(header.parent_hash).toBytesSink(hash);
-  Hash256.from(header.transaction_hash).toBytesSink(hash);
-  Hash256.from(header.account_hash).toBytesSink(hash);
+  Hash256.from<string>(header.parent_hash).toBytesSink(hash);
+  Hash256.from<string>(header.transaction_hash).toBytesSink(hash);
+  Hash256.from<string>(header.account_hash).toBytesSink(hash);
   UInt32.from<number>(header.parent_close_time).toBytesSink(hash);
   UInt32.from<number>(header.close_time).toBytesSink(hash);
   UInt8.from<number>(header.close_time_resolution).toBytesSink(hash);
