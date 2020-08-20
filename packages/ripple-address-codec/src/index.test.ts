@@ -240,7 +240,7 @@ test(`isValidXAddress returns false for invalid X-address`, () => {
   expect(isValidXAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8zeUygYrCgrPh')).toBe(false)
 })
 
-test(`Converts X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ to r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59 and tag: false`, () => {
+test(`Converts X7AcgcsBL6XDcUb... to r9cZA1mLK5R5A... and tag: false`, () => {
   const classicAddress = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59'
   const tag = false
   const xAddress = 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ'
