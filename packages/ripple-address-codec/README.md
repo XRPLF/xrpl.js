@@ -30,7 +30,7 @@ Encode a test address e.g. for use with [Testnet or Devnet](https://xrpl.org/xrp
 
 ### xAddressToClassicAddress(xAddress: string): {classicAddress: string, tag: number | false, test: boolean}
 
-Convert an X-address to a classic address and tag. If the X-address did not have a tag, the returned object will not have a `tag` field. If the X-address is intended for use on test network(s), `test` will be `true`; if it is intended for use on the main network (mainnet), `test` will be `false`.
+Convert an X-address to a classic address and tag. If the X-address did not have a tag, the returned object's `tag` will be `false`. (Since `0` is a valid tag, instead of `if (tag)`, use `if (tag !== false)` if you want to check for a tag.) If the X-address is intended for use on test network(s), `test` will be `true`; if it is intended for use on the main network (mainnet), `test` will be `false`.
 
 ```js
 > const api = require('ripple-address-codec')

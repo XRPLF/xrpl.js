@@ -239,3 +239,21 @@ test(`Invalid Account ID throws`, () => {
 test(`isValidXAddress returns false for invalid X-address`, () => {
   expect(isValidXAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8zeUygYrCgrPh')).toBe(false)
 })
+
+test(`Converts X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ to r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59 and tag: false`, () => {
+  const classicAddress = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59'
+  const tag = false
+  const xAddress = 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ'
+  const isTestAddress = false
+  expect(classicAddressToXAddress(classicAddress, tag, isTestAddress)).toBe(xAddress)
+  const myClassicAddress = xAddressToClassicAddress(xAddress)
+  expect(myClassicAddress).toEqual({
+    classicAddress,
+    tag,
+    test: isTestAddress
+  })
+  expect(isValidXAddress(xAddress)).toBe(true)
+
+  // Notice that converting an X-address to a classic address has `result.tag === false` (not undefined)
+  expect(myClassicAddress.tag).toEqual(false)
+})
