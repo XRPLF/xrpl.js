@@ -26,6 +26,7 @@ module.exports = {
     '@typescript-eslint', // Add some TypeScript specific rules, and disable rules covered by the typechecker
     'import', // Add rules that help validate proper imports
     'prettier', // Allows running prettier as an ESLint rule, and reporting differences as individual linting issues
+    'jest'
   ],
 
   extends: [
@@ -58,16 +59,24 @@ module.exports = {
   overrides: [
     // Overrides for all test files
     {
-      files: 'test/**/*.ts',
+      files: 'test/**/*.test.js',
+      extends: ["plugin:jest/recommended"],
       rules: {
         // For our Mocha test files, the pattern has been to have unnamed functions
         'func-names': 'off',
-        // Using non-null assertions (obj!.property) cancels the benefits of the strict null-checking mode, but these are test files, so we don't care.
-        '@typescript-eslint/no-non-null-assertion': 'off',
         // For some test files, we shadow testing constants with function parameter names
         'no-shadow': 'off',
         // Some of our test files declare helper classes with errors
         'max-classes-per-file': 'off',
+        // Test files are in javascript, turn off TypeScript linting.
+        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/restrict-template-expressions': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/restrict-template-expressions': 'off',
+        '@typescript-eslint/no-unsafe-return': 'off',
+        '@typescript-eslint/unbound-method': 'off'
       },
     },
     {
@@ -79,6 +88,8 @@ module.exports = {
           { argsIgnorePattern: '^_' },
         ],
 
+        '@typescript-eslint/ban-types': 'off',
+
         // These rules are deprecated, but we have an old config that enables it
         '@typescript-eslint/camelcase': 'off',
         '@typescript-eslint/ban-ts-ignore': 'off',
@@ -87,7 +98,6 @@ module.exports = {
         '@typescript-eslint/no-unsafe-call': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
-        '@typescript-eslint/ban-types': 'off',
         "spaced-comment": ["error", "always"],
       },
     },
