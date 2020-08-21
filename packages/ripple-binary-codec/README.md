@@ -42,6 +42,11 @@ Encode a transaction object into a hex-string.
 '1100612200000000240000000125000000072D0000000055DF530FB14C5304852F20080B0A8EEF3A6BDD044F41F4EBBD68B8B321145FE4FF6240000002540BE4008114D0F5430B66E06498D4CEEC816C7B3337F9982337'
 ```
 
+#### X-Address Compatibility 
+  * ripple-binary-codec handles X-addresses by looking for a few specific files (Account/SourceTag, Destination/DestinationTag).
+  * If other fields (in the future) must to support X-addresses with tags, this library will need to be updated.
+  * When decoding rippled binary, the output will always output classic address + tag, with no X-addresses. X-address support only applies when encoding to binary.
+
 ### encodeForSigning(json: object): string
 
 Encode the transaction object for signing.

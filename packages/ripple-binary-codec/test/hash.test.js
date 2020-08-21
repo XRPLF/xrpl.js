@@ -16,10 +16,14 @@ describe('Hash160', function () {
     expect(h1.lt(h2)).toBe(true)
     expect(h3.lt(h2)).toBe(true)
   })
+  test('throws when constructed from invalid hash length', () => {
+    expect(() => Hash160.from('10000000000000000000000000000000000000')).toThrow('Invalid Hash length 19')
+    expect(() => Hash160.from('100000000000000000000000000000000000000000')).toThrow('Invalid Hash length 21')
+  })
 })
 
 describe('Hash256', function () {
-  test('has a static width membmer', function () {
+  test('has a static width member', function () {
     expect(Hash256.width).toBe(32)
   })
   test('has a ZERO_256 member', function () {

@@ -1,6 +1,8 @@
 import { decodeAccountID, encodeAccountID } from "ripple-address-codec";
 import { Hash160 } from "./hash-160";
 
+const HEX_REGEX = /^[A-F0-9]{40}$/;
+
 /**
  * Class defining how to encode and decode an AccountID
  */
@@ -27,9 +29,9 @@ class AccountID extends Hash160 {
         return new AccountID();
       }
 
-      return /^r/.test(value)
-        ? this.fromBase58(value)
-        : new AccountID(Buffer.from(value, "hex"));
+      return HEX_REGEX.test(value)
+        ? new AccountID(Buffer.from(value, "hex"))
+        : this.fromBase58(value);
     }
 
     throw new Error("Cannot construct AccountID from value given");
