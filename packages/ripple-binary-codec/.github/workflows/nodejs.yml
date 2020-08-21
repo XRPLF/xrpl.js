@@ -10,6 +10,24 @@ on:
     branches: [ master ]
 
 jobs:
+  build_with_nvm:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Read .nvmrc # From https://github.com/actions/setup-node/issues/32#issuecomment-525791142
+      run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+      id: nvm
+    - name: Use Node.js (.nvmrc)
+      uses: actions/setup-node@v1
+      with:
+        node-version: "${{ steps.nvm.outputs.NVMRC }}"
+    - run: yarn install
+    - run: yarn run test
+    - run: yarn run lint
+    - run: yarn run compile
+
   build:
 
     runs-on: ubuntu-latest
