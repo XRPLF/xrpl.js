@@ -49,5 +49,9 @@
   "readmeFilename": "README.md",
   "prettier": {
     "semi": true
+  },
+  "engines": {
+    "node": ">=10.22",
+    "yarn": "^1.22.4"
   }
 }
