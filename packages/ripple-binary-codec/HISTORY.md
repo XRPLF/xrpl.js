@@ -1,6 +1,6 @@
 # ripple-binary-codec Release History
 
-## 1.0.0-rc1 (2020-08-17)
+## 1.0.0 (2020-08-17)
 
 - Migrate to TypeScript
   - Javascript classes used
