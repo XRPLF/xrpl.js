@@ -109,7 +109,12 @@ class STObject extends SerializedType {
 
     let sorted = Object.keys(xAddressDecoded)
       .map((f: string): FieldInstance => Field[f] as FieldInstance)
-      .filter((f: FieldInstance): boolean => f !== undefined && f.isSerialized)
+      .filter(
+        (f: FieldInstance): boolean =>
+          f !== undefined &&
+          xAddressDecoded[f.name] !== undefined &&
+          f.isSerialized
+      )
       .sort((a, b) => {
         return a.ordinal - b.ordinal;
       });

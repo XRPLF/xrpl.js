@@ -10,7 +10,7 @@ Each ledger's state tree contain [ledger objects](https://xrpl.org/ledger-object
 
 ## Fields
 
-These are Serialization Fields (`sf`) [defined in rippled's SField.cpp](https://github.com/ripple/rippled/blob/develop/src/ripple/protocol/impl/SField.cpp).
+These are Serialization Fields (`sf`) [defined in rippled's SField.cpp](https://github.com/ripple/rippled/blob/develop/src/ripple/protocol/impl/SField.cpp). Fields with undefined values are omitted before encoding.
 
 ### Key
 

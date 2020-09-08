@@ -1,5 +1,8 @@
 # ripple-binary-codec Release History
 
+## 1.0.1 (2020-09-08)
+- Filter out fields with undefined values
+
 ## 1.0.0 (2020-08-17)
 
 - Migrate to TypeScript

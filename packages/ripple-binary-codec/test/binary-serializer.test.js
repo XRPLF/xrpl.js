@@ -50,6 +50,53 @@ const PaymentChannel = {
   },
 };
 
+let json_undefined = {
+  TakerPays: "223174650",
+  Account: "rPk2dXr27rMw9G5Ej9ad2Tt7RJzGy8ycBp",
+  TransactionType: "OfferCreate",
+  Memos: [
+    {
+      Memo: {
+        MemoType: "584D4D2076616C7565",
+        MemoData: "322E3230393635",
+        MemoFormat: undefined,
+      },
+    },
+  ],
+  Fee: "15",
+  OfferSequence: undefined,
+  TakerGets: {
+    currency: "XMM",
+    value: "100",
+    issuer: "rExAPEZvbkZqYPuNcZ7XEBLENEshsWDQc8",
+  },
+  Flags: 524288,
+  Sequence: undefined,
+  LastLedgerSequence: 6220135,
+};
+
+let json_omitted = {
+  TakerPays: "223174650",
+  Account: "rPk2dXr27rMw9G5Ej9ad2Tt7RJzGy8ycBp",
+  TransactionType: "OfferCreate",
+  Memos: [
+    {
+      Memo: {
+        MemoType: "584D4D2076616C7565",
+        MemoData: "322E3230393635",
+      },
+    },
+  ],
+  Fee: "15",
+  TakerGets: {
+    currency: "XMM",
+    value: "100",
+    issuer: "rExAPEZvbkZqYPuNcZ7XEBLENEshsWDQc8",
+  },
+  Flags: 524288,
+  LastLedgerSequence: 6220135,
+};
+
 const NegativeUNL = require("./fixtures/negative-unl.json");
 
 function bytesListTest() {
@@ -179,6 +226,15 @@ function NegativeUNLTest() {
   });
 }
 
+function omitUndefinedTest() {
+  test("omits fields with undefined value", () => {
+    let encodedOmitted = encode(json_omitted);
+    let encodedUndefined = encode(json_undefined);
+    expect(encodedOmitted).toEqual(encodedUndefined);
+    expect(decode(encodedOmitted)).toEqual(decode(encodedUndefined));
+  });
+}
+
 describe("Binary Serialization", function () {
   describe("nestedObjectTests", () => nestedObjectTests());
   describe("BytesList", () => bytesListTest());
@@ -188,4 +244,5 @@ describe("Binary Serialization", function () {
   describe("Escrow", () => EscrowTest());
   describe("PaymentChannel", () => PaymentChannelTest());
   describe("NegativeUNLTest", () => NegativeUNLTest());
+  describe("OmitUndefined", () => omitUndefinedTest());
 });

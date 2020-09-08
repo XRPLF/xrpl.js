@@ -1,6 +1,6 @@
 {
   "name": "ripple-binary-codec",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",

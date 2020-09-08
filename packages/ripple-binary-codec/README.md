@@ -27,7 +27,7 @@ Decode a hex-string into a transaction object.
 ```
 
 ### encode(json: object): string
-Encode a transaction object into a hex-string.
+Encode a transaction object into a hex-string. Note that encode filters out fields with undefined values.
 ```js
 > api.encode({
   LedgerEntryType: 'AccountRoot',
