@@ -2,7 +2,7 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
-## 1.8.1 (2020-09-11)
+## 1.8.1-beta.0 (2020-09-11)
 
 * Internal
   * Bump elliptic to 6.5.3 (this patches a potential security issue, but we do not believe that the issue was applicable to ripple-lib anyway)
