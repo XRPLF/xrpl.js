@@ -1,6 +1,6 @@
 {
   "name": "ripple-keypairs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "files": [
     "dist/*"
