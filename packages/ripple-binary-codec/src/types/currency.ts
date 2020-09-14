@@ -18,7 +18,7 @@ function isoToBytes(iso: string): Buffer {
  * Tests if ISO is a valid iso code
  */
 function isIsoCode(iso: string): boolean {
-  return ISO_REGEX.test(iso);
+  return iso.length === 3;
 }
 
 /**

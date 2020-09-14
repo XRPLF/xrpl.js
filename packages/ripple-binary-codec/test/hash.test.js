@@ -54,6 +54,20 @@ describe("Currency", function () {
     expect(bad.iso()).toBeUndefined();
     expect(bad.isNative()).toBe(false);
   });
+  test("Currency with lowercase letters decode to hex", () => {
+    expect(Currency.from("xRp").toJSON()).toBe(
+      "0000000000000000000000007852700000000000"
+    );
+  });
+  test("Currency codes with symbols decode to hex", () => {
+    expect(Currency.from("x|p").toJSON()).toBe(
+      "000000000000000000000000787C700000000000"
+    );
+  });
+  test("Currency codes with uppercase and 0-9 decode to ISO codes", () => {
+    expect(Currency.from("X8P").toJSON()).toBe("X8P");
+    expect(Currency.from("USD").toJSON()).toBe("USD");
+  });
   test("can be constructed from a Buffer", function () {
     const xrp = new Currency(Buffer.alloc(20));
     expect(xrp.iso()).toBe("XRP");

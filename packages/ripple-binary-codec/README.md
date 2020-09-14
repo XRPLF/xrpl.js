@@ -47,6 +47,13 @@ Encode a transaction object into a hex-string. Note that encode filters out fiel
   * If other fields (in the future) must to support X-addresses with tags, this library will need to be updated.
   * When decoding rippled binary, the output will always output classic address + tag, with no X-addresses. X-address support only applies when encoding to binary.
 
+#### Encoding Currency Codes
+  * The standard format for currency codes is a three-letter string such as `USD`. This is intended for use with ISO 4217 Currency Codes.
+  * Currency codes must be exactly 3 ASCII characters in length and there are [a few other rules](https://xrpl.org/currency-formats.html#currency-codes).
+  * ripple-binary-codec allows any 3-character ASCII string to be encoded as a currency code, although rippled may enforce tighter restrictions.
+  * When _decoding_, if a currency code is three uppercase letters or numbers (`/^[A-Z0-9]{3}$/`), then it will be decoded into that string. For example,`0000000000000000000000004142430000000000` decodes as `ABC`.
+  * When decoding, if a currency code is does not match the regex, then it is not considered to be an ISO 4217 or pseudo-ISO currency. ripple-binary-codec will return a 160-bit hex-string (40 hex characters). For example, `0000000000000000000000006142430000000000` (`aBC`) decodes as `0000000000000000000000006142430000000000` because it contains a lowercase letter.
+
 ### encodeForSigning(json: object): string
 
 Encode the transaction object for signing.

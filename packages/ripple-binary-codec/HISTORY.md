@@ -1,5 +1,8 @@
 # ripple-binary-codec Release History
 
+## 1.0.2 (2020-09-11)
+- Allow currencies to be encoded from any 3 character ASCII code.
+
 ## 1.0.1 (2020-09-08)
 - Filter out fields with undefined values
 
