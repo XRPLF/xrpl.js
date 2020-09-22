@@ -1,6 +1,13 @@
-# ripple-address-codec [![NPM](https://img.shields.io/npm/v/ripple-address-codec.svg)](https://npmjs.org/package/ripple-address-codec)
+# ripple-address-codec
 
-Functions for encoding and decoding XRP Ledger addresses and seeds. Also includes support for encoding/decoding [rippled validator (node) public keys](https://xrpl.org/run-rippled-as-a-validator.html).
+[![NPM Version][npm-version-image]][npm-url]
+[![NPM Downloads][npm-downloads-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![Test Coverage][coveralls-image]][coveralls-url]
+
+Functions for encoding and decoding XRP Ledger addresses and seeds.
+
+Also includes support for encoding/decoding [rippled validator (node) public keys](https://xrpl.org/run-rippled-as-a-validator.html).
 
 [![NPM](https://nodei.co/npm/ripple-address-codec.png)](https://www.npmjs.org/package/ripple-address-codec)
 
@@ -175,3 +182,11 @@ This library references and adopts code and standards from the following sources
 - [XLS-5d Standard for Tagged Addresses](https://github.com/xrp-community/standards-drafts/issues/6) by @nbougalis
 - [XRPL Tagged Address Codec](https://github.com/xrp-community/xrpl-tagged-address-codec) by @WietseWind
 - [X-Address transaction functions](https://github.com/codetsunami/xrpl-tools/tree/master/xaddress-functions) by @codetsunami
+
+[coveralls-image]: https://badgen.net/coveralls/c/github/ripple/ripple-address-codec/master
+[coveralls-url]: https://coveralls.io/r/ripple/ripple-address/codec?branch=master
+[npm-downloads-image]: https://badgen.net/npm/dm/ripple-address-codec
+[npm-url]: https://npmjs.org/package/ripple-address-codec
+[npm-version-image]: https://badgen.net/npm/v/ripple-address-codec
+[travis-image]: https://badgen.net/travis/ripple/ripple-address-codec/master
+[travis-url]: https://travis-ci.org/github/ripple/ripple-address-codec
