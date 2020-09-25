@@ -4094,10 +4094,10 @@ ripple-address-codec@^4.1.1:
     base-x "3.0.7"
     create-hash "^1.1.2"
 
-ripple-binary-codec@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/ripple-binary-codec/-/ripple-binary-codec-1.0.1.tgz#04fe6c43b3cbc344a49649384c740eed8296d2a4"
-  integrity sha512-y6pMZbCuBrd89fHabo16TTOdoL9XmSxZyKADJhBrvVFtTfN7ILC+139peWmvxWwEgnp9PKcZtn8RTuAIWYkQYg==
+ripple-binary-codec@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/ripple-binary-codec/-/ripple-binary-codec-1.0.2.tgz#a6a70d104f115300ceb0b01c70aafc2970952474"
+  integrity sha512-KfkUZ3GHuhapDCB7OLiCMugo/vaxaRJyXeUeOOPuLNqCfd8U6zvG5wgDVae/6u0zyalZiR3b80kMGxGN0ZrtMA==
   dependencies:
     create-hash "^1.2.0"
     decimal.js "^10.2.0"
