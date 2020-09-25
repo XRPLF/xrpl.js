@@ -2,6 +2,13 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.8.1 (2020-09-25)
+
+* Internal
+  * Bump elliptic to 6.5.3 (this patches a potential security issue, although we do not believe that the issue affects ripple-lib)
+  * Bump ripple-binary-codec to 1.0.2
+  * Bump lodash to 4.17.19
+
 ## 1.8.0 (2020-07-06)
 
 * [Document `request('submit', ...)` method](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md#submit), which includes additional useful information in the response
