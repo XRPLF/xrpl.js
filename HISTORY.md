@@ -9,6 +9,13 @@ Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.co
   * Bump ripple-binary-codec to 1.0.2
   * Bump lodash to 4.17.19
 
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 *
+0895f349944fa11bb1976b2c350c0eb143dfd09abbfc7c2be33aed5c2a4b9ee8  ripple-latest-min.js
+7c00188a28f9d295d8e66aa08b340294d2fe49f635d154fb0df049ae8572c195  ripple-latest.js
+```
+
 ## 1.8.0 (2020-07-06)
 
 * [Document `request('submit', ...)` method](https://github.com/ripple/ripple-lib/blob/develop/docs/index.md#submit), which includes additional useful information in the response
