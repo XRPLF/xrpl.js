@@ -48,25 +48,15 @@ Warning: Use at your own risk.
 
   Monitor the XRPL using powerful JSONPath expressions, and receive notifications via email, SMS, webhooks, and more.
 
-## Send and request payments
-
-- **[XRP Tip Bot](https://www.xrptipbot.com/)**
-
-  A bot that enables users on reddit, Twitter and Discord to send XRP to each other through reddit comments and Twitter tweets.
-
-- **[XRP Text](https://xrptext.com/)**
-
-  Send XRP using SMS text messages.
-
-- **[XRParrot](https://xrparrot.com/)** (uses `ripple-address-codec`)
-
-  Easy EUR (SEPA) to XRP transfer (currency conversion).
-
-- **[XRP Payment](https://xrpayments.co/)** (xrpayments.co)
-
-  Tool for generating a XRP payment request URI in a QR code, with currency converter.
-
 ## Wallets and wallet tools
+
+- **[XUMM](https://xumm.app/)**
+
+  Users can use the xumm application to track their accounts, balances and transactions. The true power of xumm is the platform available for developers.
+
+- **[Xpring Wallet](https://xpring.io)** (uses `ripple-keypairs`)
+
+  Non-custodial XRP wallet.
 
 - **[XRP Toolkit](https://www.xrptoolkit.com)**
 
@@ -95,6 +85,24 @@ Warning: Use at your own risk.
 - **[XRP Account Mnemonic Recovery](https://github.com/WietseWind/xrp-mnemonic-recovery)** (uses `ripple-keypairs`)
 
   Recover a 24 word mnemonic if one word is wrong or one word is missing.
+
+## Send and request payments
+
+- **[XRP Tip Bot](https://www.xrptipbot.com/)**
+
+  A bot that enables users on reddit, Twitter and Discord to send XRP to each other through reddit comments and Twitter tweets.
+
+- **[XRP Text](https://xrptext.com/)**
+
+  Send XRP using SMS text messages.
+
+- **[XRParrot](https://xrparrot.com/)** (uses `ripple-address-codec`)
+
+  Easy EUR (SEPA) to XRP transfer (currency conversion).
+
+- **[XRP Payment](https://xrpayments.co/)** (xrpayments.co)
+
+  Tool for generating a XRP payment request URI in a QR code, with currency converter.
 
 ## Development tools
 
