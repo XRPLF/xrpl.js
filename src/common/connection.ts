@@ -225,18 +225,21 @@ class RequestManager {
   cancel(id: number) {
     const {timer} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
+    delete this.promisesAwaitingResponse[id]
   }
 
   resolve(id: number, data: any) {
     const {timer, resolve} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
     resolve(data)
+    delete this.promisesAwaitingResponse[id]
   }
 
   reject(id: number, error: Error) {
     const {timer, reject} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
     reject(error)
+    delete this.promisesAwaitingResponse[id]
   }
 
   rejectAll(error: Error) {
@@ -278,7 +281,7 @@ class RequestManager {
       throw new ResponseFormatError('valid id not found in response', data)
     }
     if (!this.promisesAwaitingResponse[data.id]) {
-      throw new ResponseFormatError('response handler not found', data)
+      return
     }
     if (data.status === 'error') {
       const error = new RippledError(data.error_message || data.error, data)
