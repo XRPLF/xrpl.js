@@ -10,6 +10,16 @@ These sites are independent of Ripple and have not been authorized, endorsed, sp
 
 Warning: Use at your own risk.
 
+## Exchanges
+
+- **[The World Exchange](https://www.theworldexchange.net/)**
+
+  Trade, issue, and send directly on the XRP Ledger. A user interface for the XRPL's decentralized exchange.
+
+- **[Bitso](https://bitso.com/)**
+
+  Exchange allowing clients to buy and sell XRP, based in Mexico.
+
 ## Data and visualizations
 
 - **[xrpintel - XRP Intelligence](https://xrpintel.com/)**
@@ -106,9 +116,9 @@ Warning: Use at your own risk.
 
 ## Development tools
 
-- **[XRP Test Net Faucet](https://developers.ripple.com/xrp-test-net-faucet.html)**
+- **[XRP Faucets for Testnet and Devnet](https://xrpl.org/xrp-testnet-faucet.html)**
 
-  Get some test funds for development on the test network. The faucet was built using `ripple-lib`.
+  Get some test funds for development on the test network. The faucet uses `ripple-lib`.
 
 ## Code samples and libraries
 
