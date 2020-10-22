@@ -1,5 +1,6 @@
 import { coreTypes } from "./types";
 import { Decimal } from "decimal.js";
+import * as bigInt from "big-integer";
 
 /**
  * class for encoding and decoding quality
@@ -15,7 +16,7 @@ class quality {
     const decimal = new Decimal(quality);
     const exponent = decimal.e - 15;
     const qualityString = decimal.times(`1e${-exponent}`).abs().toString();
-    const bytes = coreTypes.UInt64.from(BigInt(qualityString)).toBytes();
+    const bytes = coreTypes.UInt64.from(bigInt(qualityString)).toBytes();
     bytes[0] = exponent + 100;
     return bytes;
   }

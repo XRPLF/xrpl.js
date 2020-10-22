@@ -1,5 +1,6 @@
 import { BytesList } from "../serdes/binary-serializer";
 import { BinaryParser } from "../serdes/binary-parser";
+import * as bigInt from "big-integer";
 
 type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject;
 
@@ -20,7 +21,9 @@ class SerializedType {
     return this.fromParser(parser, hint);
   }
 
-  static from(value: SerializedType | JSON | bigint): SerializedType {
+  static from(
+    value: SerializedType | JSON | bigInt.BigInteger
+  ): SerializedType {
     throw new Error("from not implemented");
     return this.from(value);
   }

@@ -1,13 +1,17 @@
+import * as bigInt from "big-integer";
 import { Comparable } from "./serialized-type";
 
 /**
- * Compare numbers and bigints n1 and n2
+ * Compare numbers and bigInts n1 and n2
  *
  * @param n1 First object to compare
  * @param n2 Second object to compare
  * @returns -1, 0, or 1, depending on how the two objects compare
  */
-function compare(n1: number | bigint, n2: number | bigint): number {
+function compare(
+  n1: number | bigInt.BigInteger,
+  n2: number | bigInt.BigInteger
+): number {
   return n1 < n2 ? -1 : n1 == n2 ? 0 : 1;
 }
 
@@ -46,7 +50,7 @@ abstract class UInt extends Comparable {
    *
    * @returns the value
    */
-  abstract valueOf(): number | bigint;
+  abstract valueOf(): number | bigInt.BigInteger;
 }
 
 export { UInt };

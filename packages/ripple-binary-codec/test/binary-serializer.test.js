@@ -5,6 +5,7 @@ const { encode, decode } = require("../dist");
 const { makeParser, BytesList, BinarySerializer } = binary;
 const { coreTypes } = require("../dist/types");
 const { UInt8, UInt16, UInt32, UInt64, STObject } = coreTypes;
+const bigInt = require("big-integer");
 
 const { loadFixture } = require("./utils");
 const fixtures = loadFixture("data-driven-tests.json");
@@ -162,7 +163,7 @@ check(UInt64, 0xfeffffff, [0, 0, 0, 0, 254, 255, 255, 255]);
 check(UInt64, -1, "throws");
 check(UInt64, 0, [0, 0, 0, 0, 0, 0, 0, 0]);
 check(UInt64, 1, [0, 0, 0, 0, 0, 0, 0, 1]);
-check(UInt64, BigInt(1), [0, 0, 0, 0, 0, 0, 0, 1]);
+check(UInt64, bigInt(1), [0, 0, 0, 0, 0, 0, 0, 1]);
 
 function deliverMinTest() {
   test("can serialize DeliverMin", () => {

@@ -10,6 +10,7 @@ import { UInt32 } from "./types/uint-32";
 import { UInt8 } from "./types/uint-8";
 import { BinaryParser } from "./serdes/binary-parser";
 import { JsonObject } from "./types/serialized-type";
+import * as bigInt from "big-integer";
 
 /**
  * Computes the hash of a list of objects
@@ -119,7 +120,7 @@ function accountStateHash(param: Array<JsonObject>): Hash256 {
  */
 interface ledgerObject {
   ledger_index: number;
-  total_coins: string | number | bigint;
+  total_coins: string | number | bigInt.BigInteger;
   parent_hash: string;
   transaction_hash: string;
   account_hash: string;
@@ -142,7 +143,9 @@ function ledgerHash(header: ledgerObject): Hash256 {
   assert(header.close_flags !== undefined);
 
   UInt32.from<number>(header.ledger_index).toBytesSink(hash);
-  UInt64.from<bigint>(BigInt(header.total_coins)).toBytesSink(hash);
+  UInt64.from<bigInt.BigInteger>(
+    bigInt(String(header.total_coins))
+  ).toBytesSink(hash);
   Hash256.from<string>(header.parent_hash).toBytesSink(hash);
   Hash256.from<string>(header.transaction_hash).toBytesSink(hash);
   Hash256.from<string>(header.account_hash).toBytesSink(hash);
