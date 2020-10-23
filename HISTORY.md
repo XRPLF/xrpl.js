@@ -2,10 +2,13 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
-## UNRELEASED
+## 1.8.2 (2020-10-23)
 
-* Fixed: Browser compatibility
-  * Use ripple-binary-codec 0.2.x to prevent browser issues
+* Bug fixes
+  * Browser compatibility: Use ripple-binary-codec 0.2.x to prevent browser issues (#1321)
+  * Memory leak: Clear awaiting response promises to prevent memory leak (#1302)
+* Feature: getSettings() - allow ledgerVersion to be 'validated', 'closed', or 'current' (#1298)
+* Docs: Update APPLICATIONS.md
 
 ## 1.8.1 (2020-09-25)
 
