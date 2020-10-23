@@ -10,6 +10,13 @@ Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.co
 * Feature: getSettings() - allow ledgerVersion to be 'validated', 'closed', or 'current' (#1298)
 * Docs: Update APPLICATIONS.md
 
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 *
+ba760c36028b8a3ce267386e188a422890dfb1b03bc87c852a4c2034ea9bac2e  ripple-latest-min.js
+7e5281eb9623602284b9f11564f0f3a36cfde305f2c2f7a32e0d29a04913c817  ripple-latest.js
+```
+
 ## 1.8.1 (2020-09-25)
 
 * Internal
