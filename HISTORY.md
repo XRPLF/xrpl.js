@@ -2,6 +2,11 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## UNRELEASED
+
+* Fixed: Browser compatibility
+  * Use ripple-binary-codec 0.2.x to prevent browser issues
+
 ## 1.8.1 (2020-09-25)
 
 * Internal
