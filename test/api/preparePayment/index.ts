@@ -489,5 +489,44 @@ export default <TestSuite>{
       instructionsWithMaxLedgerVersionOffset
     )
     assertResultMatch(response, expectedResponse, 'prepare')
-  }
+  },
+
+  // Tickets
+  'preparePayment with ticketSequence': async (api, address) => {
+    const version = await api.getLedgerVersion()
+    const localInstructions = {
+      maxLedgerVersion: version + 100,
+      fee: '0.000012',
+      ticketSequence: 23
+    }
+    const response = await api.preparePayment(
+      address,
+      REQUEST_FIXTURES.allOptions,
+      localInstructions
+    )
+    assertResultMatch(response, RESPONSE_FIXTURES.ticketSequence, 'prepare')
+  },
+
+  'throws when both sequence and ticketSequence are set': async (
+    api,
+    address
+  ) => {
+    const version = await api.getLedgerVersion()
+    const localInstructions = {
+      maxLedgerVersion: version + 100,
+      fee: '0.000012',
+      ticketSequence: 23,
+      sequence: 12
+    }
+    return assertRejects(
+      api.preparePayment(
+        address,
+        REQUEST_FIXTURES.allOptions, 
+        localInstructions
+      ),
+      ValidationError,
+      'instance.instructions is of prohibited type [object Object]'
+    )
+  },
+
 }

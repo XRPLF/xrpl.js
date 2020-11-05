@@ -23,9 +23,13 @@ export type ApiMemo = {
 function formatPrepareResponse(txJSON: any): Prepare {
   const instructions = {
     fee: common.dropsToXrp(txJSON.Fee),
-    sequence: txJSON.Sequence,
     maxLedgerVersion:
       txJSON.LastLedgerSequence === undefined ? null : txJSON.LastLedgerSequence
+  }
+  if (txJSON.TicketSequence !== undefined) {
+    instructions['ticketSequence'] = txJSON.TicketSequence
+  } else {
+    instructions['sequence'] = txJSON.Sequence
   }
   return {
     txJSON: JSON.stringify(txJSON),
@@ -111,13 +115,15 @@ function prepareTransaction(
   api: RippleAPI,
   instructions: Instructions
 ): Promise<Prepare> {
+
   common.validate.instructions(instructions)
   common.validate.tx_json(txJSON)
   const disallowedFieldsInTxJSON = [
     'maxLedgerVersion',
     'maxLedgerVersionOffset',
     'fee',
-    'sequence'
+    'sequence',
+    'ticketSequence'
   ]
   const badFields = disallowedFieldsInTxJSON.filter(field => txJSON[field])
   if (badFields.length) {
@@ -307,6 +313,7 @@ function prepareTransaction(
   }
 
   async function prepareSequence(): Promise<void> {
+
     if (instructions.sequence !== undefined) {
       if (
         newTxJSON.Sequence === undefined ||
@@ -323,7 +330,15 @@ function prepareTransaction(
         )
       }
     }
+
     if (newTxJSON.Sequence !== undefined) {
+      return Promise.resolve()
+    }
+
+    // Ticket Sequence
+    if (instructions.ticketSequence !== undefined) {
+      newTxJSON.Sequence = 0
+      newTxJSON.TicketSequence = instructions.ticketSequence
       return Promise.resolve()
     }
 

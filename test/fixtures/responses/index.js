@@ -108,7 +108,8 @@ module.exports = {
     minAmountXRPXRP: require('./prepare-payment-min-amount-xrp-xrp.json'),
     allOptions: require('./prepare-payment-all-options.json'),
     noCounterparty: require('./prepare-payment-no-counterparty.json'),
-    minAmount: require('./prepare-payment-min-amount.json')
+    minAmount: require('./prepare-payment-min-amount.json'),
+    ticketSequence: require('./prepare-payment-ticket-sequence.json')
   },
   prepareSettings: {
     regularKey: require('./prepare-settings-regular-key.json'),

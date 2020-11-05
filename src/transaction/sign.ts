@@ -58,7 +58,6 @@ function signWithKeypair(
   }
 
   const serialized = binaryCodec.encode(txToSignAndEncode)
-
   checkTxSerialization(serialized, tx)
 
   return {
