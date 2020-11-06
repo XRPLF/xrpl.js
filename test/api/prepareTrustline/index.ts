@@ -48,5 +48,19 @@ export default <TestSuite>{
       api.errors.ValidationError,
       'instance.trustline requires property "limit"'
     )
-  }
+  },
+
+  'with ticket': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      ticketSequence: 23
+    }
+    const result = await api.prepareTrustline(
+      address,
+      requests.prepareTrustline.simple,
+      localInstructions
+    )
+    assertResultMatch(result, responses.prepareTrustline.ticket, 'prepare')
+  },
 }

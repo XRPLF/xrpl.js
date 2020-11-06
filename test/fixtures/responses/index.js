@@ -94,16 +94,19 @@ module.exports = {
   },
   prepareOrder: {
     buy: require('./prepare-order.json'),
+    ticket: require('./prepare-order-ticket.json'),
     sell: require('./prepare-order-sell.json'),
     expiration: require('./prepare-order-expiration')
   },
   prepareOrderCancellation: {
     normal: require('./prepare-order-cancellation.json'),
+    ticket: require('./prepare-order-cancellation-ticket.json'),
     withMemos: require('./prepare-order-cancellation-memos.json'),
     noInstructions: require('./prepare-order-cancellation-no-instructions.json')
   },
   preparePayment: {
     normal: require('./prepare-payment.json'),
+    ticket: require('./prepare-payment-ticket'),
     minAmountXRP: require('./prepare-payment-min-amount-xrp.json'),
     minAmountXRPXRP: require('./prepare-payment-min-amount-xrp-xrp.json'),
     allOptions: require('./prepare-payment-all-options.json'),
@@ -115,6 +118,7 @@ module.exports = {
     regularKey: require('./prepare-settings-regular-key.json'),
     removeRegularKey: require('./prepare-settings-remove-regular-key.json'),
     flags: require('./prepare-settings.json'),
+    ticket: require('./prepare-settings-ticket.json'),
     flagsMultisign: require('./prepare-settings-multisign.json'),
     flagSet: require('./prepare-settings-flag-set.json'),
     flagClear: require('./prepare-settings-flag-clear.json'),
@@ -131,54 +135,65 @@ module.exports = {
   },
   prepareCheckCreate: {
     normal: require('./prepare-check-create'),
+    ticket: require('./prepare-check-create-ticket'),
     full: require('./prepare-check-create-full')
   },
   prepareCheckCash: {
     amount: require('./prepare-check-cash-amount'),
+    ticket: require('./prepare-check-cash-ticket'),
     deliverMin: require('./prepare-check-cash-delivermin')
   },
   prepareCheckCancel: {
-    normal: require('./prepare-check-cancel')
+    normal: require('./prepare-check-cancel'),
+    ticket: require('./prepare-check-cancel-ticket')
   },
   prepareEscrowCreation: {
     normal: require('./prepare-escrow-creation'),
+    ticket: require('./prepare-escrow-creation-ticket'),
     full: require('./prepare-escrow-creation-full')
   },
   prepareEscrowExecution: {
     normal: require('./prepare-escrow-execution'),
+    ticket: require('./prepare-escrow-execution-ticket'),
     simple: require('./prepare-escrow-execution-simple')
   },
   prepareEscrowCancellation: {
     normal: require('./prepare-escrow-cancellation'),
+    ticket: require('./prepare-escrow-cancellation-ticket'),
     memos: require('./prepare-escrow-cancellation-memos')
   },
   preparePaymentChannelCreate: {
     normal: require('./prepare-payment-channel-create'),
+    ticket: require('./prepare-payment-channel-create-ticket'),
     full: require('./prepare-payment-channel-create-full')
   },
   preparePaymentChannelFund: {
     normal: require('./prepare-payment-channel-fund'),
+    ticket: require('./prepare-payment-channel-fund-ticket'),
     full: require('./prepare-payment-channel-fund-full')
   },
   preparePaymentChannelClaim: {
     normal: require('./prepare-payment-channel-claim'),
+    ticket: require('./prepare-payment-channel-claim-ticket'),
     renew: require('./prepare-payment-channel-claim-renew'),
     close: require('./prepare-payment-channel-claim-close')
   },
   prepareTrustline: {
-    simple: require('./prepare-trustline-simple.json'),
-    frozen: require('./prepare-trustline-frozen.json'),
-    complex: require('./prepare-trustline.json')
+    simple: require('./prepare-trustline-simple'),
+    ticket: require('./prepare-trustline-ticket'),
+    frozen: require('./prepare-trustline-frozen'),
+    complex: require('./prepare-trustline')
   },
   sign: {
-    normal: require('./sign.json'),
-    escrow: require('./sign-escrow.json'),
+    normal: require('./sign'),
+    ticket: require('./sign-ticket'),
+    escrow: require('./sign-escrow'),
     signAs: require('./sign-as')
   },
   signPaymentChannelClaim: require('./sign-payment-channel-claim'),
   combine: {
-    single: require('./combine.json')
+    single: require('./combine')
   },
-  submit: require('./submit.json'),
-  ledgerEvent: require('./ledger-event.json')
+  submit: require('./submit'),
+  ledgerEvent: require('./ledger-event')
 };

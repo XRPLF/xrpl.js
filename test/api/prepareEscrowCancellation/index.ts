@@ -32,5 +32,23 @@ export default <TestSuite>{
       responses.prepareEscrowCancellation.memos,
       'prepare'
     )
-  }
+  },
+
+  'with ticket': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      ticketSequence: 23
+    }
+    const result = await api.prepareEscrowCancellation(
+      address,
+      requests.prepareEscrowCancellation.normal,
+      localInstructions
+    )
+    assertResultMatch(
+      result,
+      responses.prepareEscrowCancellation.ticket,
+      'prepare'
+    )
+  },
 }

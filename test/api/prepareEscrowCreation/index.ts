@@ -45,5 +45,19 @@ export default <TestSuite>{
       api.errors.ValidationError,
       'instance.escrowCreation requires property "amount"'
     )
-  }
+  },
+
+  'with ticket': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000396',
+      ticketSequence: 23
+    }
+    const result = await api.prepareEscrowCreation(
+      address,
+      requests.prepareEscrowCreation.normal,
+      localInstructions
+    )
+    assertResultMatch(result, responses.prepareEscrowCreation.ticket, 'prepare')
+  },
 }
