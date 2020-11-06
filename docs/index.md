@@ -361,6 +361,7 @@ maxLedgerVersion | string,null | *Optional* The highest ledger version that the 
 maxLedgerVersionOffset | integer | *Optional* Offset from current validated ledger version to highest ledger version that the transaction can be included in.
 sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
 signersCount | integer | *Optional* Number of signers that will be signing this transaction.
+ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The ticket sequence to be used for this transaction.
 
 We recommend that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeed in the future. It is impossible for a transaction to succeed after the XRP Ledger's consensus-validated ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare\*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare\*" method.
 
@@ -4568,9 +4569,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -4623,9 +4625,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -4696,9 +4699,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -4764,9 +4768,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -4832,9 +4837,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -4885,9 +4891,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -4955,9 +4962,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -5013,9 +5021,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -5069,9 +5078,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -5127,9 +5137,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -5185,9 +5196,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -5240,9 +5252,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -5296,9 +5309,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -5355,9 +5369,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
@@ -5410,9 +5425,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
 
 ### Example
 
