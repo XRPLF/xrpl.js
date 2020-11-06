@@ -78,6 +78,7 @@
   - [prepareCheckCreate](#preparecheckcreate)
   - [prepareCheckCancel](#preparecheckcancel)
   - [prepareCheckCash](#preparecheckcash)
+  - [prepareTicket](#prepareticket)
   - [sign](#sign)
   - [combine](#combine)
   - [submit](#submit)
@@ -249,7 +250,7 @@ An *X-address* encodes a hash of the account's public key, a tag, and a checksum
 
 ## Account Sequence Number
 
-Every XRP Ledger account has a *sequence number* that is used to keep transactions in order. Every transaction must have a sequence number. A transaction can only be executed if it has the next sequence number in order, of the account sending it. This prevents one transaction from executing twice and transactions executing out of order. The sequence number starts at `1` and increments for each transaction that the account makes.
+Every XRP Ledger account has a *sequence number* that is used to keep transactions in order. Every transaction must have a sequence or a ticketSequence number. A transaction can only be executed if it has the next sequence number in order, of the account sending it, or uses a previously generated ticketSequence number. This prevents one transaction from executing twice and transactions executing out of order. The sequence number starts at `1` and increments for each transaction that the account makes.
 
 ## Currency
 
@@ -319,6 +320,7 @@ Type | Description
 [paymentChannelCreate](#payment-channel-create) | A `paymentChannelCreate` transaction opens a payment channel between two addresses with XRP set aside for asynchronous payments.
 [paymentChannelFund](#payment-channel-fund) | A `paymentChannelFund` transaction adds XRP to a payment channel and optionally sets a new expiration for the channel.
 [paymentChannelClaim](#payment-channel-claim) | A `paymentChannelClaim` transaction withdraws XRP from a channel and optionally requests to close it.
+[ticketCreate](#ticket-create) | A successful `ticketCreate` transaction adds a Ticket in the directory of the owning account.
 
 ## Transaction Flow
 
@@ -336,6 +338,7 @@ Executing a transaction with `RippleAPI` requires the following four steps:
     * [prepareCheckCreate](#preparecheckcreate)
     * [prepareCheckCancel](#preparecheckcancel)
     * [prepareCheckCash](#preparecheckcash)
+    * [prepareTicket](#prepareticket)
 2. [Sign](#sign) - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place. For multisignature transactions, the `signedTransaction` fields returned by `sign` must be collected and passed to the [combine](#combine) method.
 3. [Submit](#submit) - Submit the transaction to the connected server.
 4. Verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted.
@@ -359,9 +362,9 @@ maxFee | [value](#value) | *Optional* Deprecated: Use `maxFeeXRP` in the RippleA
 maxLedgerVersion | integer,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 maxLedgerVersion | string,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 maxLedgerVersionOffset | integer | *Optional* Offset from current validated ledger version to highest ledger version that the transaction can be included in.
-sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 signersCount | integer | *Optional* Number of signers that will be signing this transaction.
-ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The ticket sequence to be used for this transaction.
+ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The ticket sequence to be used for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 We recommend that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeed in the future. It is impossible for a transaction to succeed after the XRP Ledger's consensus-validated ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare\*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare\*" method.
 
@@ -5454,6 +5457,62 @@ return api.prepareCheckCash(address, checkCash).then(prepared =>
     "sequence": 23,
     "maxLedgerVersion": 8819954
   }
+}
+```
+
+
+## prepareTicket
+
+`prepareTicket(address: string, ticketCount: number, instructions: object): Promise<object>`
+
+Prepare a ticket transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+address | [address](#address) | The address of the account that is creating the transaction.
+ticketCount | number | The number of tickets to be created.
+instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare*" methods have the same return type.
+</aside>
+
+Name | Type | Description
+---- | ---- | -----------
+txJSON | string | The prepared transaction in rippled JSON format.
+instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
+*instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
+*instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+return api.prepareTicket(address, 2).then(prepared => {
+    /* ... */
+  }).catch(error => {
+    /* ... as with all prepare* methods, use a Promise catch block to handle errors ... */
+  })
+```
+
+
+```json
+{
+    "TransactionType": "TicketCreate",
+    "Account": "r4SDqUD1ZcfoZrhnsZ94XNFKxYL4oHYJyA",
+    "TicketCount": 2,
+    "LastLedgerSequence": 13,
+    "Fee": "12",
+    "Sequence": 25
 }
 ```
 
