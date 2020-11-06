@@ -21,7 +21,7 @@ import {getAllPublicMethods, loadTestSuites} from './utils'
  *   - Type the API object under test and catch typing issues (currently untyped).
  *   - Sets the stage for more cleanup, like moving test-specific fixtures closer to their tests.
  */
-describe('RippleAPI [Test Runner]', function() {
+describe('RippleAPI [Test Runner]', function () {
   beforeEach(setupAPI.setup)
   afterEach(setupAPI.teardown)
 
@@ -35,7 +35,7 @@ describe('RippleAPI [Test Runner]', function() {
       // Run each test that does not use an address.
       for (const [testName, fn] of tests) {
         if (fn.length === 1) {
-          it(testName, function() {
+          it(testName, function () {
             return fn(this.api, addresses.ACCOUNT)
           })
         }
@@ -44,7 +44,7 @@ describe('RippleAPI [Test Runner]', function() {
       describe(`[Classic Address]`, () => {
         for (const [testName, fn] of tests) {
           if (fn.length === 2) {
-            it(testName, function() {
+            it(testName, function () {
               return fn(this.api, addresses.ACCOUNT)
             })
           }
@@ -55,7 +55,7 @@ describe('RippleAPI [Test Runner]', function() {
         describe(`[X-address]`, () => {
           for (const [testName, fn] of tests) {
             if (fn.length === 2) {
-              it(testName, function() {
+              it(testName, function () {
                 return fn(this.api, addresses.ACCOUNT_X)
               })
             }
@@ -66,7 +66,7 @@ describe('RippleAPI [Test Runner]', function() {
   }
 
   // Report any missing tests.
-  const allTestedMethods = new Set(allTestSuites.map(s => s.name))
+  const allTestedMethods = new Set(allTestSuites.map((s) => s.name))
   for (const methodName of allPublicMethods) {
     if (!allTestedMethods.has(methodName)) {
       // TODO: Once migration is complete, remove `.skip()` so that missing tests are reported as failures.

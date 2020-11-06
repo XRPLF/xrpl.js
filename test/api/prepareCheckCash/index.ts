@@ -37,5 +37,5 @@ export default <TestSuite>{
       localInstructions
     )
     assertResultMatch(result, responses.prepareCheckCash.ticket, 'prepare')
-  },
+  }
 }

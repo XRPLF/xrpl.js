@@ -57,11 +57,7 @@ export default <TestSuite>{
       maxFee: '0.000012',
       ticketSequence: 23
     }
-    const result = await api.prepareOrder(
-      address,
-      request,
-      localInstructions
-    )
+    const result = await api.prepareOrder(address, request, localInstructions)
     assertResultMatch(result, responses.prepareOrder.ticket, 'prepare')
-  },
+  }
 }

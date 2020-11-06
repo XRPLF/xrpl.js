@@ -7,7 +7,7 @@ const validate = utils.common.validate
 const ValidationError = utils.common.errors.ValidationError
 
 export interface Ticket {
-  account: string,
+  account: string
   sequence: number
 }
 
@@ -15,8 +15,8 @@ function createTicketTransaction(
   account: string,
   ticketCount: number
 ): TransactionJSON {
-
-  if (!ticketCount || ticketCount === 0) throw new ValidationError('Ticket count must be greater than 0.')
+  if (!ticketCount || ticketCount === 0)
+    throw new ValidationError('Ticket count must be greater than 0.')
 
   const txJSON: any = {
     TransactionType: 'TicketCreate',

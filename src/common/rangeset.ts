@@ -5,7 +5,7 @@ type Interval = [number, number]
 
 function mergeIntervals(intervals: Interval[]): Interval[] {
   const stack: Interval[] = [[-Infinity, -Infinity]]
-  _.sortBy(intervals, x => x[0]).forEach(interval => {
+  _.sortBy(intervals, (x) => x[0]).forEach((interval) => {
     const lastInterval: Interval = stack.pop()!
     if (interval[0] <= lastInterval[1] + 1) {
       stack.push([lastInterval[0], Math.max(interval[1], lastInterval[1])])
@@ -30,7 +30,7 @@ class RangeSet {
 
   serialize() {
     return this.ranges
-      .map(range => range[0].toString() + '-' + range[1].toString())
+      .map((range) => range[0].toString() + '-' + range[1].toString())
       .join(',')
   }
 
@@ -45,14 +45,14 @@ class RangeSet {
 
   parseAndAddRanges(rangesString: string) {
     const rangeStrings = rangesString.split(',')
-    _.forEach(rangeStrings, rangeString => {
+    _.forEach(rangeStrings, (rangeString) => {
       const range = rangeString.split('-').map(Number)
       this.addRange(range[0], range.length === 1 ? range[0] : range[1])
     })
   }
 
   containsRange(start: number, end: number) {
-    return _.some(this.ranges, range => range[0] <= start && range[1] >= end)
+    return _.some(this.ranges, (range) => range[0] <= start && range[1] >= end)
   }
 
   containsValue(value: number) {

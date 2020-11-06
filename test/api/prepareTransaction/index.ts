@@ -569,7 +569,9 @@ export default <TestSuite>{
     )
   },
 
-  'rejects Promise when Account is valid but non-existent on the ledger': async api => {
+  'rejects Promise when Account is valid but non-existent on the ledger': async (
+    api
+  ) => {
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'
@@ -1263,10 +1265,7 @@ export default <TestSuite>{
     )
   },
 
-  'sets sequence to 0 if a ticketSequence is passed': async (
-    api,
-    address
-  ) => {
+  'sets sequence to 0 if a ticketSequence is passed': async (api, address) => {
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012',
@@ -1291,10 +1290,40 @@ export default <TestSuite>{
     }
 
     const response = await api.prepareTransaction(txJSON, localInstructions)
-    assertResultMatch(
-      response,
-      responses.preparePayment.ticket,
-      'prepare'
+    assertResultMatch(response, responses.preparePayment.ticket, 'prepare')
+  },
+
+  'rejects Promise if a sequence with value 0 is passed': async (
+    api,
+    address
+  ) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      sequence: 0
+    }
+
+    const txJSON = {
+      TransactionType: 'Payment',
+      Account: address,
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: {
+        currency: 'USD',
+        issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
+        value: '0.01'
+      },
+      SendMax: {
+        currency: 'USD',
+        issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
+        value: '0.01'
+      },
+      Flags: 0
+    }
+
+    await assertRejects(
+      api.prepareTransaction(txJSON, localInstructions),
+      ValidationError,
+      '`sequence` cannot be 0'
     )
   }
 }

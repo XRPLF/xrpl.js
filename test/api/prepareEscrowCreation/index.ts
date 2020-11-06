@@ -59,5 +59,5 @@ export default <TestSuite>{
       localInstructions
     )
     assertResultMatch(result, responses.prepareEscrowCreation.ticket, 'prepare')
-  },
+  }
 }

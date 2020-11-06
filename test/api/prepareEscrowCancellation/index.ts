@@ -50,5 +50,5 @@ export default <TestSuite>{
       responses.prepareEscrowCancellation.ticket,
       'prepare'
     )
-  },
+  }
 }

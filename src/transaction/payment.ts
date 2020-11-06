@@ -76,8 +76,8 @@ function applyAnyCounterpartyEncoding(payment: Payment): void {
   // Convert blank counterparty to sender or receiver's address
   //   (Ripple convention for 'any counterparty')
   // https://developers.ripple.com/payment.html#special-issuer-values-for-sendmax-and-amount
-  _.forEach([payment.source, payment.destination], adjustment => {
-    _.forEach(['amount', 'minAmount', 'maxAmount'], key => {
+  _.forEach([payment.source, payment.destination], (adjustment) => {
+    _.forEach(['amount', 'minAmount', 'maxAmount'], (key) => {
       if (isIOUWithoutCounterparty(adjustment[key])) {
         adjustment[key].counterparty = adjustment.address
       }
@@ -91,7 +91,8 @@ function createMaximalAmount(amount: Amount): Amount {
   // Equivalent to '9999999999999999e80' but we cannot use that because sign()
   // now checks that the encoded representation exactly matches the transaction
   // as it was originally provided.
-  const maxIOUValue = '999999999999999900000000000000000000000000000000000000000000000000000000000000000000000000000000'
+  const maxIOUValue =
+    '999999999999999900000000000000000000000000000000000000000000000000000000000000000000000000000000'
 
   let maxValue
   if (amount.currency === 'XRP') {

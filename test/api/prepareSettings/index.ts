@@ -264,5 +264,5 @@ export default <TestSuite>{
       instructions
     )
     assertResultMatch(response, responses.prepareSettings.ticket, 'prepare')
-  },
+  }
 }

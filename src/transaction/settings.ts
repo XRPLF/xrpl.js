@@ -55,9 +55,7 @@ function setTransactionFields(
 
     if (field.encoding === 'hex' && !field.length) {
       // This is currently only used for Domain field
-      value = Buffer.from(value, 'ascii')
-        .toString('hex')
-        .toUpperCase()
+      value = Buffer.from(value, 'ascii').toString('hex').toUpperCase()
     }
 
     txJSON[fieldName] = value

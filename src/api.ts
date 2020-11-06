@@ -156,7 +156,7 @@ class RippleAPI extends EventEmitter {
     const serverURL = options.server
     if (serverURL !== undefined) {
       this.connection = new Connection(serverURL, options)
-      this.connection.on('ledgerClosed', message => {
+      this.connection.on('ledgerClosed', (message) => {
         this.emit('ledger', formatLedgerClose(message))
       })
       this.connection.on('error', (errorCode, errorMessage, data) => {
@@ -165,7 +165,7 @@ class RippleAPI extends EventEmitter {
       this.connection.on('connected', () => {
         this.emit('connected')
       })
-      this.connection.on('disconnected', code => {
+      this.connection.on('disconnected', (code) => {
         let finalCode = code
         // 1005: This is a backwards-compatible fix for this change in the ws library: https://github.com/websockets/ws/issues/1257
         // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close

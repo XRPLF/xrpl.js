@@ -41,7 +41,7 @@ function renameKeys(object, mapping) {
 }
 
 function getServerInfo(this: RippleAPI): Promise<GetServerInfoResponse> {
-  return this.request('server_info').then(response => {
+  return this.request('server_info').then((response) => {
     const info = convertKeysFromSnakeCaseToCamelCase(response.info)
     renameKeys(info, {hostid: 'hostID'})
     if (info.validatedLedger) {

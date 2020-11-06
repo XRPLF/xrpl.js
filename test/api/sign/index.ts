@@ -146,7 +146,10 @@ export default <TestSuite>{
     schemaValidator.schemaValidate('sign', result)
   },
 
-  'sign succeeds with source.amount/destination.minAmount': async (api, address) => {
+  'sign succeeds with source.amount/destination.minAmount': async (
+    api,
+    address
+  ) => {
     // See also: 'preparePayment with source.amount/destination.minAmount'
 
     const txJSON =
@@ -337,5 +340,5 @@ export default <TestSuite>{
     const result = api.sign(REQUEST_FIXTURES.ticket.txJSON, secret)
     assert.deepEqual(result, RESPONSE_FIXTURES.ticket)
     schemaValidator.schemaValidate('sign', result)
-  },
+  }
 }

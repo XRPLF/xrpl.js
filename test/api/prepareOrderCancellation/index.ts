@@ -74,5 +74,5 @@ export default <TestSuite>{
       responses.prepareOrderCancellation.ticket,
       'prepare'
     )
-  },
+  }
 }

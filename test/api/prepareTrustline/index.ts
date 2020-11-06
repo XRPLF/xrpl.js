@@ -9,7 +9,7 @@ const instructionsWithMaxLedgerVersionOffset = {maxLedgerVersionOffset: 100}
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  simple: async (api, address) => {
+  'simple': async (api, address) => {
     const result = await api.prepareTrustline(
       address,
       requests.prepareTrustline.simple,
@@ -18,7 +18,7 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.simple, 'prepare')
   },
 
-  frozen: async (api, address) => {
+  'frozen': async (api, address) => {
     const result = await api.prepareTrustline(
       address,
       requests.prepareTrustline.frozen
@@ -26,7 +26,7 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.frozen, 'prepare')
   },
 
-  complex: async (api, address) => {
+  'complex': async (api, address) => {
     const result = await api.prepareTrustline(
       address,
       requests.prepareTrustline.complex,
@@ -35,7 +35,7 @@ export default <TestSuite>{
     assertResultMatch(result, responses.prepareTrustline.complex, 'prepare')
   },
 
-  invalid: async (api, address) => {
+  'invalid': async (api, address) => {
     const trustline = Object.assign({}, requests.prepareTrustline.complex)
     delete trustline.limit // Make invalid
 
@@ -62,5 +62,5 @@ export default <TestSuite>{
       localInstructions
     )
     assertResultMatch(result, responses.prepareTrustline.ticket, 'prepare')
-  },
+  }
 }
