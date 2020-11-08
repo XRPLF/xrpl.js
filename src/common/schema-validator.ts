@@ -116,7 +116,7 @@ function loadSchemas() {
     require('./schemas/input/prepare-check-create.json'),
     require('./schemas/input/prepare-check-cash.json'),
     require('./schemas/input/prepare-check-cancel.json'),
-    require('./schemas/input/prepare-ticket.json'),
+    require('./schemas/input/prepare-ticket-create.json'),
     require('./schemas/input/compute-ledger-hash.json'),
     require('./schemas/input/sign.json'),
     require('./schemas/input/submit.json'),

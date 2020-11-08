@@ -78,7 +78,7 @@
   - [prepareCheckCreate](#preparecheckcreate)
   - [prepareCheckCancel](#preparecheckcancel)
   - [prepareCheckCash](#preparecheckcash)
-  - [prepareTicket](#prepareticket)
+  - [prepareTicketCreate](#prepareticketcreate)
   - [sign](#sign)
   - [combine](#combine)
   - [submit](#submit)
@@ -338,7 +338,7 @@ Executing a transaction with `RippleAPI` requires the following four steps:
     * [prepareCheckCreate](#preparecheckcreate)
     * [prepareCheckCancel](#preparecheckcancel)
     * [prepareCheckCash](#preparecheckcash)
-    * [prepareTicket](#prepareticket)
+    * [prepareTicketCreate](#prepareticketcreate)
 2. [Sign](#sign) - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place. For multisignature transactions, the `signedTransaction` fields returned by `sign` must be collected and passed to the [combine](#combine) method.
 3. [Submit](#submit) - Submit the transaction to the connected server.
 4. Verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted.
@@ -5461,9 +5461,9 @@ return api.prepareCheckCash(address, checkCash).then(prepared =>
 ```
 
 
-## prepareTicket
+## prepareTicketCreate
 
-`prepareTicket(address: string, ticketCount: number, instructions: object): Promise<object>`
+`prepareTicketCreate(address: string, ticketCount: number, instructions: object): Promise<object>`
 
 Prepare a ticket transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -5497,7 +5497,7 @@ instructions | object | The instructions for how to execute the transaction afte
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-return api.prepareTicket(address, 2).then(prepared => {
+return api.prepareTicketCreate(address, 2).then(prepared => {
     /* ... */
   }).catch(error => {
     /* ... as with all prepare* methods, use a Promise catch block to handle errors ... */

@@ -132,7 +132,7 @@ export const prepareCheckCancel = _.partial(
   'prepareCheckCancelParameters'
 )
 
-export const prepareTicket = _.partial(
+export const prepareTicketCreate = _.partial(
   schemaValidate,
   'prepareTicketParameters'
 )

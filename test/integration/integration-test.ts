@@ -351,7 +351,7 @@ describe('integration tests', function () {
   it('ticket', function () {
     return this.api.getLedgerVersion().then((ledgerVersion) => {
       return this.api
-        .prepareTicket(address, 1, instructions)
+        .prepareTicketCreate(address, 1, instructions)
         .then((prepared) =>
           testTransaction(this, 'ticket', ledgerVersion, prepared)
         )

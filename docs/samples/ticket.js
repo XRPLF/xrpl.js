@@ -22,7 +22,7 @@ function fail(message) {
 
 api.connect().then(() => {
   console.log('Connected...');
-  return api.prepareTicket(address, numberOfTickets, instructions).then(prepared => {
+  return api.prepareTicketCreate(address, numberOfTickets, instructions).then(prepared => {
     console.log('Ticket transaction prepared...');
     const {signedTransaction} = api.sign(prepared.txJSON, secret);
     console.log('Ticket transaction signed...');

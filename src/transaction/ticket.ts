@@ -27,14 +27,14 @@ function createTicketTransaction(
   return txJSON
 }
 
-function prepareTicket(
+function prepareTicketCreate(
   this: RippleAPI,
   address: string,
   ticketCount: number,
   instructions: Instructions = {}
 ): Promise<Prepare> {
   try {
-    validate.prepareTicket({address, ticketCount, instructions})
+    validate.prepareTicketCreate({address, ticketCount, instructions})
     const txJSON = createTicketTransaction(address, ticketCount)
     return utils.prepareTransaction(txJSON, this, instructions)
   } catch (e) {
@@ -42,4 +42,4 @@ function prepareTicket(
   }
 }
 
-export default prepareTicket
+export default prepareTicketCreate

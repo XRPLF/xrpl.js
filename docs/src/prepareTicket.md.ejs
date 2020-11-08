@@ -1,12 +1,12 @@
-## prepareTicket
+## prepareTicketCreate
 
-`prepareTicket(address: string, ticketCount: number, instructions: object): Promise<object>`
+`prepareTicketCreate(address: string, ticketCount: number, instructions: object): Promise<object>`
 
 Prepare a ticket transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
 ### Parameters
 
-<%- renderSchema("input/prepare-ticket.json") %>
+<%- renderSchema("input/prepare-ticket-create.json") %>
 
 ### Return Value
 
@@ -22,11 +22,11 @@ All "prepare*" methods have the same return type.
 
 ```javascript
 const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
-return api.prepareTicket(address, 2).then(prepared => {
+return api.prepareTicketCreate(address, 2).then(prepared => {
     /* ... */
   }).catch(error => {
     /* ... as with all prepare* methods, use a Promise catch block to handle errors ... */
   })
 ```
 
-<%- renderFixture("responses/prepare-ticket.json") %>
+<%- renderFixture("responses/prepare-ticket-create.json") %>

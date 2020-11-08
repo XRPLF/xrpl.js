@@ -31,7 +31,7 @@ export default <TestSuite>{
         fee: '0.000012'
       }
     }
-    const response = await api.prepareTicket(address, 2)
+    const response = await api.prepareTicketCreate(address, 2)
     assertResultMatch(response, expected, 'prepare')
   },
 
@@ -50,7 +50,7 @@ export default <TestSuite>{
       ticketSequence: 23,
       fee: '0.000012'
     }
-    const response = await api.prepareTicket(address, 1, instructions)
+    const response = await api.prepareTicketCreate(address, 1, instructions)
     assertResultMatch(response, expected, 'prepare')
   }
 }
