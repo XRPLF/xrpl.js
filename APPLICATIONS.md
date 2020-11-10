@@ -42,6 +42,10 @@ Warning: Use at your own risk.
 
   Real-time XRP price, trades, and orderbook data from the XRP Ledger.
 
+- **[Bithomp - XRP Explorer](https://bithomp.com/explorer/)**
+
+  Look up information by entering an address, transaction hash, username, or PayID.
+
 - **[Bithomp - XRPL validators](https://bithomp.com/validators)**
 
   List of XRPL validators, nodes, and testnet validators.
