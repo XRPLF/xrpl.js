@@ -120,7 +120,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
  */
 function websocketSendAsync(ws: WebSocket, message: string) {
   return new Promise((resolve, reject) => {
-    ws.send(message, undefined, error => {
+    ws.send(message, undefined, (error) => {
       if (error) {
         reject(new DisconnectedError(error.message, error))
       } else {
@@ -390,7 +390,7 @@ export class Connection extends EventEmitter {
    */
   private _heartbeat = () => {
     return this.request({command: 'ping'}).catch(() => {
-      this.reconnect().catch(error => {
+      this.reconnect().catch((error) => {
         this.emit('error', 'reconnect', error.message, error)
       })
     })
@@ -504,11 +504,11 @@ export class Connection extends EventEmitter {
       clearTimeout(connectionTimeoutID)
       // Add new, long-term connected listeners for messages and errors
       this._ws.on('message', (message: string) => this._onMessage(message))
-      this._ws.on('error', error =>
+      this._ws.on('error', (error) =>
         this.emit('error', 'websocket', error.message, error)
       )
       // Handle a closed connection: reconnect if it was unexpected
-      this._ws.once('close', code => {
+      this._ws.once('close', (code) => {
         this._clearHeartbeatInterval()
         this._requestManager.rejectAll(
           new DisconnectedError('websocket was closed')
@@ -524,7 +524,7 @@ export class Connection extends EventEmitter {
           // Start the reconnect timeout, but set it to `this._reconnectTimeoutID`
           // so that we can cancel one in-progress on disconnect.
           this._reconnectTimeoutID = setTimeout(() => {
-            this.reconnect().catch(error => {
+            this.reconnect().catch((error) => {
               this.emit('error', 'reconnect', error.message, error)
             })
           }, retryTimeout)
@@ -558,8 +558,8 @@ export class Connection extends EventEmitter {
     if (this._state === WebSocket.CLOSED || !this._ws) {
       return Promise.resolve(undefined)
     }
-    return new Promise(resolve => {
-      this._ws.once('close', code => resolve(code))
+    return new Promise((resolve) => {
+      this._ws.once('close', (code) => resolve(code))
       // Connection already has a disconnect handler for the disconnect logic.
       // Just close the websocket manually (with our "intentional" code) to
       // trigger that.
@@ -635,7 +635,7 @@ export class Connection extends EventEmitter {
       timeout || this._config.timeout
     )
     this._trace('send', message)
-    websocketSendAsync(this._ws, message).catch(error => {
+    websocketSendAsync(this._ws, message).catch((error) => {
       this._requestManager.reject(id, error)
     })
 

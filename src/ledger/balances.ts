@@ -67,11 +67,11 @@ function getBalances(
     getLedgerVersionHelper(
       this.connection,
       options.ledgerVersion
-    ).then(ledgerVersion =>
+    ).then((ledgerVersion) =>
       utils.getXRPBalance(this.connection, address, ledgerVersion)
     ),
     this.getTrustlines(address, options)
-  ]).then(results =>
+  ]).then((results) =>
     formatBalances(options, {xrp: results[0], trustlines: results[1]})
   )
 }

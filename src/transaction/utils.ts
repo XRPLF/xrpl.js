@@ -52,10 +52,7 @@ function setCanonicalFlag(txJSON: TransactionJSON): void {
 }
 
 function scaleValue(value, multiplier, extra = 0) {
-  return new BigNumber(value)
-    .times(multiplier)
-    .plus(extra)
-    .toString()
+  return new BigNumber(value).times(multiplier).plus(extra).toString()
 }
 
 /**
@@ -119,7 +116,7 @@ function prepareTransaction(
     'fee',
     'sequence'
   ]
-  const badFields = disallowedFieldsInTxJSON.filter(field => txJSON[field])
+  const badFields = disallowedFieldsInTxJSON.filter((field) => txJSON[field])
   if (badFields.length) {
     return Promise.reject(
       new ValidationError(
@@ -236,7 +233,7 @@ function prepareTransaction(
       instructions.maxLedgerVersionOffset !== undefined
         ? instructions.maxLedgerVersionOffset
         : 3
-    return api.connection.getLedgerVersion().then(ledgerVersion => {
+    return api.connection.getLedgerVersion().then((ledgerVersion) => {
       newTxJSON.LastLedgerSequence = ledgerVersion + offset
       return
     })
@@ -281,8 +278,8 @@ function prepareTransaction(
       return Promise.resolve()
     }
     const cushion = api._feeCushion
-    return api.getFee(cushion).then(fee => {
-      return api.connection.getFeeRef().then(feeRef => {
+    return api.getFee(cushion).then((fee) => {
+      return api.connection.getFeeRef().then((feeRef) => {
         const extraFee =
           newTxJSON.TransactionType !== 'EscrowFinish' ||
           newTxJSON.Fulfillment === undefined
@@ -347,9 +344,7 @@ function prepareTransaction(
 }
 
 function convertStringToHex(string: string): string {
-  return Buffer.from(string, 'utf8')
-    .toString('hex')
-    .toUpperCase()
+  return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
 }
 
 function convertMemo(memo: Memo): {Memo: ApiMemo} {
