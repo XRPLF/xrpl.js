@@ -10,7 +10,7 @@ const {generateAddress: RESPONSE_FIXTURES} = responses
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'generateAddress': async api => {
+  'generateAddress': async (api) => {
     // GIVEN entropy of all zeros
     function random() {
       return new Array(16).fill(0)
@@ -25,7 +25,7 @@ export default <TestSuite>{
     )
   },
 
-  'generateAddress invalid entropy': async api => {
+  'generateAddress invalid entropy': async (api) => {
     assert.throws(() => {
       // GIVEN entropy of 1 byte
       function random() {
@@ -40,7 +40,7 @@ export default <TestSuite>{
     }, api.errors.UnexpectedError)
   },
 
-  'generateAddress with no options object': async api => {
+  'generateAddress with no options object': async (api) => {
     // GIVEN no options
 
     // WHEN generating an address
@@ -51,7 +51,7 @@ export default <TestSuite>{
     assert(account.secret.startsWith('s'), 'Secret must start with `s`')
   },
 
-  'generateAddress with empty options object': async api => {
+  'generateAddress with empty options object': async (api) => {
     // GIVEN an empty options object
     const options = {}
 
@@ -63,7 +63,7 @@ export default <TestSuite>{
     assert(account.secret.startsWith('s'), 'Secret must start with `s`')
   },
 
-  'generateAddress with algorithm `ecdsa-secp256k1`': async api => {
+  'generateAddress with algorithm `ecdsa-secp256k1`': async (api) => {
     // GIVEN we want to use 'ecdsa-secp256k1'
     const options: GenerateAddressOptions = {algorithm: 'ecdsa-secp256k1'}
 
@@ -84,7 +84,7 @@ export default <TestSuite>{
     )
   },
 
-  'generateAddress with algorithm `ed25519`': async api => {
+  'generateAddress with algorithm `ed25519`': async (api) => {
     // GIVEN we want to use 'ed25519'
     const options: GenerateAddressOptions = {algorithm: 'ed25519'}
 
@@ -100,7 +100,9 @@ export default <TestSuite>{
     )
   },
 
-  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy': async api => {
+  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy': async (
+    api
+  ) => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: 'ecdsa-secp256k1',
@@ -114,7 +116,7 @@ export default <TestSuite>{
     assert.deepEqual(account, responses.generateAddress)
   },
 
-  'generateAddress with algorithm `ed25519` and given entropy': async api => {
+  'generateAddress with algorithm `ed25519` and given entropy': async (api) => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: 'ed25519',
@@ -135,7 +137,9 @@ export default <TestSuite>{
     })
   },
 
-  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address': async api => {
+  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address': async (
+    api
+  ) => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: 'ecdsa-secp256k1',
@@ -150,7 +154,9 @@ export default <TestSuite>{
     assert.deepEqual(account, responses.generateAddress)
   },
 
-  'generateAddress with algorithm `ed25519` and given entropy; include classic address': async api => {
+  'generateAddress with algorithm `ed25519` and given entropy; include classic address': async (
+    api
+  ) => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: 'ed25519',
@@ -172,7 +178,9 @@ export default <TestSuite>{
     })
   },
 
-  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address; for test network use': async api => {
+  'generateAddress with algorithm `ecdsa-secp256k1` and given entropy; include classic address; for test network use': async (
+    api
+  ) => {
     // GIVEN we want to use 'ecdsa-secp256k1' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: 'ecdsa-secp256k1',
@@ -192,7 +200,9 @@ export default <TestSuite>{
     assert.deepEqual(account, response)
   },
 
-  'generateAddress with algorithm `ed25519` and given entropy; include classic address; for test network use': async api => {
+  'generateAddress with algorithm `ed25519` and given entropy; include classic address; for test network use': async (
+    api
+  ) => {
     // GIVEN we want to use 'ed25519' with entropy of zero
     const options: GenerateAddressOptions = {
       algorithm: 'ed25519',
@@ -215,7 +225,7 @@ export default <TestSuite>{
     })
   },
 
-  'generateAddress for test network use': async api => {
+  'generateAddress for test network use': async (api) => {
     // GIVEN we want an address for test network use
     const options: GenerateAddressOptions = {test: true}
 

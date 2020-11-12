@@ -21,11 +21,11 @@ const request4 = {
 function makeRequest(connection, request) {
   return connection
     .request(request)
-    .then(response => {
+    .then((response) => {
       console.log(request)
       console.log(JSON.stringify(response, null, 2))
     })
-    .catch(error => {
+    .catch((error) => {
       console.log(request)
       console.log(error)
     })
@@ -44,7 +44,7 @@ function main() {
       console.log('Done')
     })
     connection.getLedgerVersion().then(console.log)
-    connection.on('ledgerClosed', ledger => {
+    connection.on('ledgerClosed', (ledger) => {
       console.log(ledger)
       connection.getLedgerVersion().then(console.log)
     })

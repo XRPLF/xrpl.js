@@ -293,7 +293,10 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.noCounterparty, 'prepare')
   },
 
-  'preparePayment with source.amount/destination.minAmount can be signed': async (api, address) => {
+  'preparePayment with source.amount/destination.minAmount can be signed': async (
+    api,
+    address
+  ) => {
     // See also: 'sign succeeds with source.amount/destination.minAmount'
 
     const localInstructions = {
@@ -303,20 +306,20 @@ export default <TestSuite>{
     const response = await api.preparePayment(
       address,
       {
-        "source": {
+        source: {
           address,
-          "amount": {
-            "currency": "GBP",
-            "value": "0.1",
-            "counterparty": "rpat5TmYjDsnFSStmgTumFgXCM9eqsWPro"
+          amount: {
+            currency: 'GBP',
+            value: '0.1',
+            counterparty: 'rpat5TmYjDsnFSStmgTumFgXCM9eqsWPro'
           }
         },
-        "destination": {
-          "address": "rEX4LtGJubaUcMWCJULcy4NVxGT9ZEMVRq",
-          "minAmount": {
-            "currency": "USD",
-            "value": "0.1248548562296331",
-            "counterparty": "rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH"
+        destination: {
+          address: 'rEX4LtGJubaUcMWCJULcy4NVxGT9ZEMVRq',
+          minAmount: {
+            currency: 'USD',
+            value: '0.1248548562296331',
+            counterparty: 'rMaa8VLBTjwTJWA2kSme4Sqgphhr6Lr6FH'
           }
         }
       },

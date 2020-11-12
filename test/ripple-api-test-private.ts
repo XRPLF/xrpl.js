@@ -15,46 +15,46 @@ assert.options.strict = true
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('RippleAPI', function() {
+describe('RippleAPI', function () {
   this.timeout(TIMEOUT)
   beforeEach(setupAPI.setup)
   afterEach(setupAPI.teardown)
 
-  it('RippleAPI - implicit server port', function() {
+  it('RippleAPI - implicit server port', function () {
     new RippleAPI({server: 'wss://s1.ripple.com'})
   })
 
-  it('RippleAPI invalid options', function() {
+  it('RippleAPI invalid options', function () {
     // @ts-ignore - This is intentionally invalid
     assert.throws(() => new RippleAPI({invalid: true}))
   })
 
-  it('RippleAPI valid options', function() {
+  it('RippleAPI valid options', function () {
     const api = new RippleAPI({server: 'wss://s:1'})
     const privateConnectionUrl = (api.connection as any)._url
     assert.deepEqual(privateConnectionUrl, 'wss://s:1')
   })
 
-  it('RippleAPI invalid server uri', function() {
+  it('RippleAPI invalid server uri', function () {
     assert.throws(() => new RippleAPI({server: 'wss//s:1'}))
   })
 
-  xit('RippleAPI connect() times out after 2 seconds', function() {
+  xit('RippleAPI connect() times out after 2 seconds', function () {
     // TODO: Use a timer mock like https://jestjs.io/docs/en/timer-mocks
     //       to test that connect() times out after 2 seconds.
   })
 
-  it('ledger closed event', function(done) {
-    this.api.on('ledger', message => {
+  it('ledger closed event', function (done) {
+    this.api.on('ledger', (message) => {
       assertResultMatch(message, responses.ledgerEvent, 'ledgerEvent')
       done()
     })
     this.api.connection._ws.emit('message', JSON.stringify(ledgerClosed))
   })
 
-  describe('[private] schema-validator', function() {
-    it('valid', function() {
-      assert.doesNotThrow(function() {
+  describe('[private] schema-validator', function () {
+    it('valid', function () {
+      assert.doesNotThrow(function () {
         schemaValidator.schemaValidate(
           'hash256',
           '0F7ED9F40742D8A513AE86029462B7A6768325583DF8EE21B7EC663019DD6A0F'
@@ -62,27 +62,27 @@ describe('RippleAPI', function() {
       })
     })
 
-    it('invalid', function() {
-      assert.throws(function() {
+    it('invalid', function () {
+      assert.throws(function () {
         schemaValidator.schemaValidate('hash256', 'invalid')
       }, this.api.errors.ValidationError)
     })
 
-    it('invalid - empty value', function() {
-      assert.throws(function() {
+    it('invalid - empty value', function () {
+      assert.throws(function () {
         schemaValidator.schemaValidate('hash256', '')
       }, this.api.errors.ValidationError)
     })
 
-    it('schema not found error', function() {
-      assert.throws(function() {
+    it('schema not found error', function () {
+      assert.throws(function () {
         schemaValidator.schemaValidate('unexisting', 'anything')
       }, /no schema/)
     })
   })
 
-  describe('[private] validator', function() {
-    it('validateLedgerRange', function() {
+  describe('[private] validator', function () {
+    it('validateLedgerRange', function () {
       const options = {
         minLedgerVersion: 20000,
         maxLedgerVersion: 10000
@@ -95,7 +95,7 @@ describe('RippleAPI', function() {
       )
     })
 
-    it('secret', function() {
+    it('secret', function () {
       function validateSecret(secret) {
         validate.sign({txJSON: '', secret})
       }

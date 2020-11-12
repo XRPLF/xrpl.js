@@ -21,21 +21,21 @@ function checkResult(expected, schemaName, response) {
   return response
 }
 
-describe('RippleAPIBroadcast', function() {
+describe('RippleAPIBroadcast', function () {
   this.timeout(TIMEOUT)
   beforeEach(setupAPI.setupBroadcast)
   afterEach(setupAPI.teardown)
 
-  it('base', function() {
+  it('base', function () {
     const expected = {request_server_info: 1}
-    this.mocks.forEach(mock => mock.expect(_.assign({}, expected)))
+    this.mocks.forEach((mock) => mock.expect(_.assign({}, expected)))
     assert(this.api.isConnected())
     return this.api
       .getServerInfo()
       .then(_.partial(checkResult, responses.getServerInfo, 'getServerInfo'))
   })
 
-  it('ledger', function(done) {
+  it('ledger', function (done) {
     let gotLedger = 0
     this.api.on('ledger', () => {
       gotLedger++
@@ -43,7 +43,7 @@ describe('RippleAPIBroadcast', function() {
     const ledgerNext = _.assign({}, ledgerClosed)
     ledgerNext.ledger_index++
 
-    this.api._apis.forEach(api =>
+    this.api._apis.forEach((api) =>
       api.connection
         .request({
           command: 'echo',
@@ -58,7 +58,7 @@ describe('RippleAPIBroadcast', function() {
     }, 1250)
   })
 
-  it('error propagation', function(done) {
+  it('error propagation', function (done) {
     this.api.once('error', (type, info) => {
       assert.strictEqual(type, 'type')
       assert.strictEqual(info, 'info')

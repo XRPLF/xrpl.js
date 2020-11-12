@@ -30,7 +30,7 @@ function getXRPBalance(
   }
   return connection
     .request(request)
-    .then(data => common.dropsToXrp(data.account_data.Balance))
+    .then((data) => common.dropsToXrp(data.account_data.Balance))
 }
 
 // If the marker is omitted from a response, you have reached the end
@@ -39,10 +39,10 @@ function getRecursiveRecur(
   marker: string | undefined,
   limit: number
 ): Promise<Array<any>> {
-  return getter(marker, limit).then(data => {
+  return getter(marker, limit).then((data) => {
     const remaining = limit - data.results.length
     if (remaining > 0 && data.marker !== undefined) {
-      return getRecursiveRecur(getter, data.marker, remaining).then(results =>
+      return getRecursiveRecur(getter, data.marker, remaining).then((results) =>
         data.results.concat(results)
       )
     }
@@ -118,7 +118,7 @@ function isPendingLedgerVersion(
 ): Promise<boolean> {
   return connection
     .getLedgerVersion()
-    .then(ledgerVersion => ledgerVersion < (maxLedgerVersion || 0))
+    .then((ledgerVersion) => ledgerVersion < (maxLedgerVersion || 0))
 }
 
 function ensureLedgerVersion(this: RippleAPI, options: any): Promise<object> {
@@ -129,7 +129,7 @@ function ensureLedgerVersion(this: RippleAPI, options: any): Promise<object> {
   ) {
     return Promise.resolve(options)
   }
-  return this.getLedgerVersion().then(ledgerVersion =>
+  return this.getLedgerVersion().then((ledgerVersion) =>
     _.assign({}, options, {ledgerVersion})
   )
 }

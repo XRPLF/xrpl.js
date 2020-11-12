@@ -36,10 +36,7 @@ const addressToHex = (address: string): string => {
 
 const currencyToHex = (currency: string): string => {
   if (currency.length === 3) {
-    const bytes = new Array(20 + 1)
-      .join('0')
-      .split('')
-      .map(parseFloat)
+    const bytes = new Array(20 + 1).join('0').split('').map(parseFloat)
     bytes[12] = currency.charCodeAt(0) & 0xff
     bytes[13] = currency.charCodeAt(1) & 0xff
     bytes[14] = currency.charCodeAt(2) & 0xff
@@ -163,7 +160,7 @@ export const computeTrustlineHash = (
 export const computeTransactionTreeHash = (transactions: any[]): string => {
   const shamap = new SHAMap()
 
-  transactions.forEach(txJSON => {
+  transactions.forEach((txJSON) => {
     const txBlobHex = encode(txJSON)
     const metaHex = encode(txJSON.metaData)
     const txHash = computeBinaryTransactionHash(txBlobHex)
@@ -177,7 +174,7 @@ export const computeTransactionTreeHash = (transactions: any[]): string => {
 export const computeStateTreeHash = (entries: any[]): string => {
   const shamap = new SHAMap()
 
-  entries.forEach(ledgerEntry => {
+  entries.forEach((ledgerEntry) => {
     const data = encode(ledgerEntry)
     shamap.addItem(ledgerEntry.index, data, NodeType.ACCOUNT_STATE)
   })

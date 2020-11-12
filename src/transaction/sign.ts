@@ -79,7 +79,7 @@ function objectDiff(a: object, b: object): object {
   const diffs = {}
 
   // Compare two items and push non-matches to object
-  const compare = function(i1: any, i2: any, k: string): void {
+  const compare = function (i1: any, i2: any, k: string): void {
     const type1 = Object.prototype.toString.call(i1)
     const type2 = Object.prototype.toString.call(i2)
     if (type2 === '[object Undefined]') {

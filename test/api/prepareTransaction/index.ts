@@ -569,7 +569,9 @@ export default <TestSuite>{
     )
   },
 
-  'rejects Promise when Account is valid but non-existent on the ledger': async api => {
+  'rejects Promise when Account is valid but non-existent on the ledger': async (
+    api
+  ) => {
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,
       maxFee: '0.000012'

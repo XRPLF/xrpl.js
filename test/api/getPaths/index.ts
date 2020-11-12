@@ -12,11 +12,11 @@ const {getPaths: RESPONSE_FIXTURES} = responses
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'simple test': async api => {
+  'simple test': async (api) => {
     const response = await api.getPaths(REQUEST_FIXTURES.normal)
     assertResultMatch(response, RESPONSE_FIXTURES.XrpToUsd, 'getPaths')
   },
-  'queuing': async api => {
+  'queuing': async (api) => {
     const [normalResult, usdOnlyResult, xrpOnlyResult] = await Promise.all([
       api.getPaths(REQUEST_FIXTURES.normal),
       api.getPaths(REQUEST_FIXTURES.UsdToUsd),
@@ -30,56 +30,56 @@ export default <TestSuite>{
   // need decide what to do with currencies/XRP:
   // if add 'XRP' in currencies, then there will be exception in
   // xrpToDrops function (called from toRippledAmount)
-  'getPaths USD 2 USD': async api => {
+  'getPaths USD 2 USD': async (api) => {
     const response = await api.getPaths(REQUEST_FIXTURES.UsdToUsd)
     assertResultMatch(response, RESPONSE_FIXTURES.UsdToUsd, 'getPaths')
   },
-  'getPaths XRP 2 XRP': async api => {
+  'getPaths XRP 2 XRP': async (api) => {
     const response = await api.getPaths(REQUEST_FIXTURES.XrpToXrp)
     assertResultMatch(response, RESPONSE_FIXTURES.XrpToXrp, 'getPaths')
   },
-  'source with issuer': async api => {
+  'source with issuer': async (api) => {
     return assertRejects(
       api.getPaths(REQUEST_FIXTURES.issuer),
       api.errors.NotFoundError
     )
   },
-  'XRP 2 XRP - not enough': async api => {
+  'XRP 2 XRP - not enough': async (api) => {
     return assertRejects(
       api.getPaths(REQUEST_FIXTURES.XrpToXrpNotEnough),
       api.errors.NotFoundError
     )
   },
-  'invalid PathFind': async api => {
+  'invalid PathFind': async (api) => {
     assert.throws(() => {
       api.getPaths(REQUEST_FIXTURES.invalid)
     }, /Cannot specify both source.amount/)
   },
-  'does not accept currency': async api => {
+  'does not accept currency': async (api) => {
     return assertRejects(
       api.getPaths(REQUEST_FIXTURES.NotAcceptCurrency),
       api.errors.NotFoundError
     )
   },
-  'no paths': async api => {
+  'no paths': async (api) => {
     return assertRejects(
       api.getPaths(REQUEST_FIXTURES.NoPaths),
       api.errors.NotFoundError
     )
   },
-  'no paths source amount': async api => {
+  'no paths source amount': async (api) => {
     return assertRejects(
       api.getPaths(REQUEST_FIXTURES.NoPathsSource),
       api.errors.NotFoundError
     )
   },
-  'no paths with source currencies': async api => {
+  'no paths with source currencies': async (api) => {
     return assertRejects(
       api.getPaths(REQUEST_FIXTURES.NoPathsWithCurrencies),
       api.errors.NotFoundError
     )
   },
-  'error: srcActNotFound': async api => {
+  'error: srcActNotFound': async (api) => {
     return assertRejects(
       api.getPaths({
         ...REQUEST_FIXTURES.normal,
@@ -88,7 +88,7 @@ export default <TestSuite>{
       api.errors.RippleError
     )
   },
-  'send all': async api => {
+  'send all': async (api) => {
     const response = await api.getPaths(REQUEST_FIXTURES.sendAll)
     assertResultMatch(response, RESPONSE_FIXTURES.sendAll, 'getPaths')
   }
