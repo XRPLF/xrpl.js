@@ -4463,14 +4463,14 @@ This method returns a promise that resolves with an object with the following st
 Name | Type | Description
 ---- | ---- | -----------
 stateHash | string | Hash of all state information in this ledger.
-closeTime | date-time string | The time at which this ledger was closed.
-closeTimeResolution | integer | Approximate number of seconds between closing one ledger version and closing the next one.
+closeTime | date-time string | The approximate time when this ledger was closed. This number is rounded based on the `closeTimeResolution`. If it would have been rounded to the same time as a previous ledger, the close time is recorded as 1 second later instead.
+closeTimeResolution | integer | A number of seconds, indicating how much the `closeTime` could be rounded. Ledger close times are approximate so that small differences in servers clocks don't hinder consensus.
 closeFlags | integer | A bit-map of flags relating to the closing of this ledger. Currently, the ledger has only one flag defined for `closeFlags`: **sLCF_NoConsensusTime** (value 1). If this flag is enabled, it means that validators were in conflict regarding the correct close time for the ledger, but built otherwise the same ledger, so they declared consensus while "agreeing to disagree" on the close time. In this case, the consensus ledger contains a `closeTime` value that is 1 second after that of the previous ledger. (In this case, there is no official close time, but the actual real-world close time is probably 3-6 seconds later than the specified `closeTime`.)
 ledgerHash | string | Unique identifying hash of the entire ledger.
 ledgerVersion | integer | The ledger version of this ledger.
 ledgerVersion | string | The ledger version of this ledger.
 parentLedgerHash | string | Unique identifying hash of the ledger that came immediately before this one.
-parentCloseTime | date-time string | The time at which the previous ledger was closed.
+parentCloseTime | date-time string | The previous ledger's recorded close time.
 totalDrops | [value](#value) | Total number of drops (1/1,000,000th of an XRP) in the network, as a quoted integer. (This decreases as transaction fees cause XRP to be destroyed.)
 transactionHash | string | Hash of the transaction information included in this ledger.
 rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.
@@ -5968,14 +5968,14 @@ Name | Type | Description
 ---- | ---- | -----------
 ledger | object | The ledger header to hash.
 *ledger.* stateHash | string | Hash of all state information in this ledger.
-*ledger.* closeTime | date-time string | The time at which this ledger was closed.
-*ledger.* closeTimeResolution | integer | Approximate number of seconds between closing one ledger version and closing the next one.
+*ledger.* closeTime | date-time string | The approximate time when this ledger was closed. This number is rounded based on the `closeTimeResolution`. If it would have been rounded to the same time as a previous ledger, the close time is recorded as 1 second later instead.
+*ledger.* closeTimeResolution | integer | A number of seconds, indicating how much the `closeTime` could be rounded. Ledger close times are approximate so that small differences in servers clocks don't hinder consensus.
 *ledger.* closeFlags | integer | A bit-map of flags relating to the closing of this ledger. Currently, the ledger has only one flag defined for `closeFlags`: **sLCF_NoConsensusTime** (value 1). If this flag is enabled, it means that validators were in conflict regarding the correct close time for the ledger, but built otherwise the same ledger, so they declared consensus while "agreeing to disagree" on the close time. In this case, the consensus ledger contains a `closeTime` value that is 1 second after that of the previous ledger. (In this case, there is no official close time, but the actual real-world close time is probably 3-6 seconds later than the specified `closeTime`.)
 *ledger.* ledgerHash | string | Unique identifying hash of the entire ledger.
 *ledger.* ledgerVersion | integer | The ledger version of this ledger.
 *ledger.* ledgerVersion | string | The ledger version of this ledger.
 *ledger.* parentLedgerHash | string | Unique identifying hash of the ledger that came immediately before this one.
-*ledger.* parentCloseTime | date-time string | The time at which the previous ledger was closed.
+*ledger.* parentCloseTime | date-time string | The previous ledger's recorded close time.
 *ledger.* totalDrops | [value](#value) | Total number of drops (1/1,000,000th of an XRP) in the network, as a quoted integer. (This decreases as transaction fees cause XRP to be destroyed.)
 *ledger.* transactionHash | string | Hash of the transaction information included in this ledger.
 *ledger.* rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.
