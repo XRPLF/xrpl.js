@@ -10,12 +10,12 @@
     "closeTime": {
       "type": "string",
       "format": "date-time",
-      "description": "The time at which this ledger was closed."
+      "description": "The approximate time when this ledger was closed. This number is rounded based on the `closeTimeResolution`. If it would have been rounded to the same time as a previous ledger, the close time is recorded as 1 second later instead."
     },
     "closeTimeResolution": {
       "type": "integer",
       "minimum": 1,
-      "description": "Approximate number of seconds between closing one ledger version and closing the next one."
+      "description": "A number of seconds, indicating how much the `closeTime` could be rounded. Ledger close times are approximate so that small differences in servers clocks don't hinder consensus."
     },
     "closeFlags": {
       "type": "integer",
@@ -37,7 +37,7 @@
     "parentCloseTime": {
       "type": "string",
       "format": "date-time",
-      "description": "The time at which the previous ledger was closed."
+      "description": "The previous ledger's recorded close time."
     },
     "totalDrops": {
       "$ref": "value",
