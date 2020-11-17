@@ -69,7 +69,10 @@
     "format": "prettier --write '{src,test}/**/*.ts'",
     "lint": "eslint 'src/**/*.ts' 'test/*-test.{ts,js}'",
     "perf": "./scripts/perf_test.sh",
-    "start": "node scripts/http.js"
+    "start": "node scripts/http.js",
+    "compile:snippets": "tsc -p snippets/tsconfig.json",
+    "start:snippet": "npm run compile:snippets && node ./snippets/dist/start.js",
+    "inspect:snippet": "npm run compile:snippets && node inspect ./snippets/dist/start.js"
   },
   "repository": {
     "type": "git",
