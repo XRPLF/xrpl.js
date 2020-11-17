@@ -33,6 +33,23 @@ describe("encoding and decoding tx_json", function () {
     const decoded = decode(encoded);
     expect(my_tx).toEqual(decoded);
   });
+  test("can encode tx_json with TicketCount", function () {
+    const my_tx = Object.assign({}, tx_json, {
+      TicketCount: 2,
+    });
+    const encoded = encode(my_tx);
+    const decoded = decode(encoded);
+    expect(my_tx).toEqual(decoded);
+  });
+  test("can encode tx_json with TicketSequence", function () {
+    const my_tx = Object.assign({}, tx_json, {
+      Sequence: 0,
+      TicketSequence: 2,
+    });
+    const encoded = encode(my_tx);
+    const decoded = decode(encoded);
+    expect(my_tx).toEqual(decoded);
+  });
   test("throws when Amount is invalid", function () {
     const my_tx = Object.assign({}, tx_json, {
       Amount: "1000.001",

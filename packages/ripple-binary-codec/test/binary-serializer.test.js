@@ -51,6 +51,13 @@ const PaymentChannel = {
   },
 };
 
+const Ticket = {
+  create: {
+    tx: require("./fixtures/ticket-create-tx.json"),
+    binary: require("./fixtures/ticket-create-binary.json"),
+  },
+};
+
 let json_undefined = {
   TakerPays: "223174650",
   Account: "rPk2dXr27rMw9G5Ej9ad2Tt7RJzGy8ycBp",
@@ -236,6 +243,12 @@ function omitUndefinedTest() {
   });
 }
 
+function ticketTest() {
+  test("can serialize TicketCreate", () => {
+    expect(encode(Ticket.create.tx)).toEqual(Ticket.create.binary);
+  });
+}
+
 describe("Binary Serialization", function () {
   describe("nestedObjectTests", () => nestedObjectTests());
   describe("BytesList", () => bytesListTest());
@@ -246,4 +259,5 @@ describe("Binary Serialization", function () {
   describe("PaymentChannel", () => PaymentChannelTest());
   describe("NegativeUNLTest", () => NegativeUNLTest());
   describe("OmitUndefined", () => omitUndefinedTest());
+  describe("TicketTest", () => ticketTest());
 });
