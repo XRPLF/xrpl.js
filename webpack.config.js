@@ -26,7 +26,14 @@ function getDefaultConfiguration() {
     rules: []
   },
   resolve: {
-    extensions: ['.js', '.json']
+    extensions: ['.js', '.json'],
+    fallback: { 
+      "buffer": require.resolve("buffer/"),
+      "assert": require.resolve("assert/"),
+      "url": require.resolve("url/"),
+      "stream": require.resolve("stream-browserify"),
+      "crypto": require.resolve("crypto-browserify")
+    }
   },
 };
 }
