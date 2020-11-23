@@ -1,6 +1,6 @@
 import {
   RippleAPI,
-  AccountInfoResponse, 
+  AccountInfoResponse,
   LedgerClosedEvent
 } from '../../dist/npm'
 import https = require('https')
@@ -22,14 +22,14 @@ import https = require('https')
  *    A) `tec`: The transaction was included in a ledger but only claimed the transaction fee
  *    B) `tesSUCCESS` but unexpected result: The transaction was successful but did not have the expected result. This generally does not occur for XRP-to-XRP payments
  *    C) The transaction was not, and never will be, included in a validated ledger [3C]
- * 
+ *
  * References:
  * - https://xrpl.org/reliable-transaction-submission.html
  * - https://xrpl.org/send-xrp.html
  * - https://xrpl.org/look-up-transaction-results.html
  * - https://xrpl.org/get-started-with-rippleapi-for-javascript.html
  * - https://xrpl.org/monitor-incoming-payments-with-websocket.html
- * 
+ *
  * For the implementation in this example, we have made the following decisions:
  * 1) The script will choose the account sequence and LastLedgerSequence numbers automatically. We allow ripple-lib to choose the fee.
  *    Payments are defined upfront, and idempotency is not needed. If the script is run a second time, duplicate payments will result.
@@ -43,13 +43,13 @@ reliableTransactionSubmissionExample()
 async function reliableTransactionSubmissionExample() {
   /**
    * Array of payments to execute.
-   * 
+   *
    * For brevity, these are XRP-to-XRP payments, taking a source, destination, and an amount in drops.
-   * 
+   *
    * The script will attempt to make all of these payments as quickly as possible, and report the final status of each. Transactions that fail are NOT retried.
    */
   const payments = []
-  
+
   const sourceAccount = (await generateTestnetAccount()).account
   console.log(`Generated new Testnet account: ${sourceAccount.classicAddress}/${sourceAccount.secret}`)
   // Send amounts from 1 drop to 10 drops
