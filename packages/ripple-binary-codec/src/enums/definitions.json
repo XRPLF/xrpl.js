@@ -445,26 +445,6 @@
       }
     ],
     [
-      "TicketCount",
-      {
-        "nth": 41,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "TicketSequence",
-      {
-        "nth": 42,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "UInt32"
-      }
-    ],
-    [
       "IndexNext",
       {
         "nth": 1,
@@ -1555,9 +1535,19 @@
       }
     ],
     [
-      "BeginLedgerSeq",
+      "TicketCount",
       {
         "nth": 40,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "TicketSequence",
+      {
+        "nth": 41,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
