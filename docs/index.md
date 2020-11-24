@@ -4574,8 +4574,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4630,8 +4630,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4704,8 +4704,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4773,8 +4773,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4842,8 +4842,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4896,8 +4896,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4967,8 +4967,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5026,8 +5026,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5083,8 +5083,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5142,8 +5142,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5201,8 +5201,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5257,8 +5257,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5314,8 +5314,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5374,8 +5374,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5430,8 +5430,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5467,6 +5467,8 @@ return api.prepareCheckCash(address, checkCash).then(prepared =>
 
 Prepare a ticket transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
+Ticket functionality requires the [TicketBatch amendment](https://github.com/ripple/xrpl-dev-portal/issues/898). As of 2020-11-24, this amendment is not activated on the Mainnet, Testnet, or Devnet.
+
 ### Parameters
 
 Name | Type | Description
@@ -5490,8 +5492,8 @@ instructions | object | The instructions for how to execute the transaction afte
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
-*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
-*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
