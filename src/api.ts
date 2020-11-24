@@ -451,4 +451,29 @@ class RippleAPI extends EventEmitter {
   isValidSecret = schemaValidator.isValidSecret
 }
 
-export {RippleAPI}
+export {
+  RippleAPI
+}
+
+export type {
+  AccountObjectsRequest,
+  AccountObjectsResponse,
+  AccountOffersRequest,
+  AccountOffersResponse,
+  AccountInfoRequest,
+  AccountInfoResponse,
+  AccountLinesRequest,
+  AccountLinesResponse,
+  BookOffersRequest,
+  BookOffersResponse,
+  GatewayBalancesRequest,
+  GatewayBalancesResponse,
+  LedgerRequest,
+  LedgerResponse,
+  LedgerDataRequest,
+  LedgerDataResponse,
+  LedgerEntryRequest,
+  LedgerEntryResponse,
+  ServerInfoRequest,
+  ServerInfoResponse
+}
