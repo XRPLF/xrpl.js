@@ -3,7 +3,7 @@ import assert from 'assert'
 import wallet from './wallet'
 import requests from '../fixtures/requests'
 import {RippleAPI} from 'ripple-api'
-import {isValidAddress} from 'ripple-address-codec'
+import {isValidClassicAddress} from 'ripple-address-codec'
 import {payTo, ledgerAccept} from './utils'
 import {errors} from 'ripple-api/common'
 import {isValidSecret} from 'ripple-api/common/utils'
@@ -12,7 +12,7 @@ import {isValidSecret} from 'ripple-api/common/utils'
 const TIMEOUT = 20000
 const INTERVAL = 1000 // how long to wait between checks for validated ledger
 
-const serverUrl = 'ws://127.0.0.1:6006'
+const serverUrl = 'ws://localhost:6006'
 
 function acceptLedger(api) {
   return api.connection.request({command: 'ledger_accept'})
@@ -513,7 +513,7 @@ describe('integration tests', function () {
   it('generateWallet', function () {
     const newWallet = this.api.generateAddress()
     assert(newWallet && newWallet.address && newWallet.secret)
-    assert(isValidAddress(newWallet.address))
+    assert(isValidClassicAddress(newWallet.address))
     assert(isValidSecret(newWallet.secret))
   })
 })
