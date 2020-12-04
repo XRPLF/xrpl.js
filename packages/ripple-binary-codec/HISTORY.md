@@ -1,7 +1,11 @@
 # ripple-binary-codec Release History
 
+## 1.1.0 (2020-12-03)
+- Add support for Tickets (TicketBatch amendment)
+- Fix web browser compatibility
+
 ## 1.0.2 (2020-09-11)
-- Allow currencies to be encoded from any 3 character ASCII code.
+- Allow currencies to be encoded from any 3 character ASCII code
 
 ## 1.0.1 (2020-09-08)
 - Filter out fields with undefined values
@@ -68,7 +72,7 @@
 ## 0.1.8
 
 ## 0.1.7
- 
+
 ## 0.1.6
- 
+
 ## 0.1.3
