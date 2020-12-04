@@ -1242,5 +1242,88 @@ export default <TestSuite>{
       responses.preparePaymentChannelClaim.close,
       'prepare'
     )
+  },
+
+  'rejects Promise if both sequence and ticketSecuence are set': async (
+    api,
+    address
+  ) => {
+    const localInstructions = {
+      ticketSequence: 23,
+      sequence: 23
+    }
+    const txJSON = {
+      TransactionType: 'DepositPreauth',
+      Account: address,
+      Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Fee: '16'
+    }
+    await assertRejects(
+      api.prepareTransaction(txJSON, localInstructions),
+      ValidationError,
+      'instance is of prohibited type [object Object]'
+    )
+  },
+
+  'sets sequence to 0 if a ticketSequence is passed': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      ticketSequence: 23
+    }
+
+    const txJSON = {
+      TransactionType: 'Payment',
+      Account: address,
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: {
+        currency: 'USD',
+        issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
+        value: '0.01'
+      },
+      SendMax: {
+        currency: 'USD',
+        issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
+        value: '0.01'
+      },
+      Flags: 0
+    }
+
+    const response = await api.prepareTransaction(txJSON, localInstructions)
+    assertResultMatch(response, responses.preparePayment.ticket, 'prepare')
+  },
+
+  'rejects Promise if a sequence with value 0 is passed': async (
+    api,
+    address
+  ) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      sequence: 0
+    }
+
+    const txJSON = {
+      TransactionType: 'Payment',
+      Account: address,
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: {
+        currency: 'USD',
+        issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
+        value: '0.01'
+      },
+      SendMax: {
+        currency: 'USD',
+        issuer: 'rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM',
+        value: '0.01'
+      },
+      Flags: 0
+    }
+
+    await assertRejects(
+      api.prepareTransaction(txJSON, localInstructions),
+      ValidationError,
+      '`sequence` cannot be 0'
+    )
   }
 }

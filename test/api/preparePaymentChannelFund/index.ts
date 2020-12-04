@@ -36,5 +36,23 @@ export default <TestSuite>{
       responses.preparePaymentChannelFund.full,
       'prepare'
     )
+  },
+
+  'with ticket': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      ticketSequence: 23
+    }
+    const result = await api.preparePaymentChannelFund(
+      address,
+      requests.preparePaymentChannelFund.normal,
+      localInstructions
+    )
+    assertResultMatch(
+      result,
+      responses.preparePaymentChannelFund.ticket,
+      'prepare'
+    )
   }
 }

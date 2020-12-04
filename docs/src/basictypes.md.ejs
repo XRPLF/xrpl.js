@@ -22,7 +22,7 @@ An *X-address* encodes a hash of the account's public key, a tag, and a checksum
 
 ## Account Sequence Number
 
-Every XRP Ledger account has a *sequence number* that is used to keep transactions in order. Every transaction must have a sequence number. A transaction can only be executed if it has the next sequence number in order, of the account sending it. This prevents one transaction from executing twice and transactions executing out of order. The sequence number starts at `1` and increments for each transaction that the account makes.
+Every XRP Ledger account has a *sequence number* that is used to keep transactions in order. Every transaction must have a sequence or a ticketSequence number. A transaction can only be executed if it has the next sequence number in order, of the account sending it, or uses a previously generated ticketSequence number. This prevents one transaction from executing twice and transactions executing out of order. The sequence number starts at `1` and increments for each transaction that the account makes.
 
 ## Currency
 

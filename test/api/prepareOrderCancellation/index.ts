@@ -55,5 +55,24 @@ export default <TestSuite>{
       api.errors.ValidationError,
       'instance.orderCancellation requires property "orderSequence"'
     )
+  },
+
+  'with ticket': async (api, address) => {
+    const request = requests.prepareOrderCancellation.simple
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      ticketSequence: 23
+    }
+    const result = await api.prepareOrderCancellation(
+      address,
+      request,
+      localInstructions
+    )
+    assertResultMatch(
+      result,
+      responses.prepareOrderCancellation.ticket,
+      'prepare'
+    )
   }
 }

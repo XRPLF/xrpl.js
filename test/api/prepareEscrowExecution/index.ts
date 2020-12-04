@@ -56,5 +56,23 @@ export default <TestSuite>{
       api.errors.ValidationError,
       '"condition" and "fulfillment" fields on EscrowFinish must only be specified together.'
     )
+  },
+
+  'with ticket': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000396',
+      ticketSequence: 23
+    }
+    const result = await api.prepareEscrowExecution(
+      address,
+      requests.prepareEscrowExecution.normal,
+      localInstructions
+    )
+    assertResultMatch(
+      result,
+      responses.prepareEscrowExecution.ticket,
+      'prepare'
+    )
   }
 }

@@ -23,9 +23,13 @@ export type ApiMemo = {
 function formatPrepareResponse(txJSON: any): Prepare {
   const instructions = {
     fee: common.dropsToXrp(txJSON.Fee),
-    sequence: txJSON.Sequence,
     maxLedgerVersion:
       txJSON.LastLedgerSequence === undefined ? null : txJSON.LastLedgerSequence
+  }
+  if (txJSON.TicketSequence !== undefined) {
+    instructions['ticketSequence'] = txJSON.TicketSequence
+  } else {
+    instructions['sequence'] = txJSON.Sequence
   }
   return {
     txJSON: JSON.stringify(txJSON),
@@ -110,11 +114,20 @@ function prepareTransaction(
 ): Promise<Prepare> {
   common.validate.instructions(instructions)
   common.validate.tx_json(txJSON)
+
+  // We allow 0 values in the Sequence schema to support the Tickets feature
+  // When a ticketSequence is used, sequence has to be 0
+  // We validate that a sequence with value 0 is not passed even if the json schema allows it
+  if (instructions.sequence !== undefined && instructions.sequence === 0) {
+    return Promise.reject(new ValidationError('`sequence` cannot be 0'))
+  }
+
   const disallowedFieldsInTxJSON = [
     'maxLedgerVersion',
     'maxLedgerVersionOffset',
     'fee',
-    'sequence'
+    'sequence',
+    'ticketSequence'
   ]
   const badFields = disallowedFieldsInTxJSON.filter((field) => txJSON[field])
   if (badFields.length) {
@@ -320,7 +333,15 @@ function prepareTransaction(
         )
       }
     }
+
     if (newTxJSON.Sequence !== undefined) {
+      return Promise.resolve()
+    }
+
+    // Ticket Sequence
+    if (instructions.ticketSequence !== undefined) {
+      newTxJSON.Sequence = 0
+      newTxJSON.TicketSequence = instructions.ticketSequence
       return Promise.resolve()
     }
 
