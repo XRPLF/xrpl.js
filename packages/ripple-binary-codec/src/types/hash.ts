@@ -1,5 +1,6 @@
 import { Comparable } from "./serialized-type";
 import { BinaryParser } from "../serdes/binary-parser";
+import { Buffer } from "buffer/";
 
 /**
  * Base class defining how to encode and decode hashes
@@ -47,8 +48,7 @@ class Hash extends Comparable {
    * @param other The Hash to compare this to
    */
   compareTo(other: Hash): number {
-    return Buffer.compare(
-      this.bytes,
+    return this.bytes.compare(
       (this.constructor as typeof Hash).from(other).bytes
     );
   }

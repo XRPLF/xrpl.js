@@ -1,5 +1,6 @@
 import { UInt } from "./uint";
 import { BinaryParser } from "../serdes/binary-parser";
+import { Buffer } from "buffer/";
 
 /**
  * Derived UInt class for serializing/deserializing 16 bit UInt
@@ -30,7 +31,7 @@ class UInt16 extends UInt {
 
     if (typeof val === "number") {
       const buf = Buffer.alloc(UInt16.width);
-      buf.writeUInt16BE(val);
+      buf.writeUInt16BE(val, 0);
       return new UInt16(buf);
     }
 
@@ -43,7 +44,7 @@ class UInt16 extends UInt {
    * @returns the number represented by this.bytes
    */
   valueOf(): number {
-    return this.bytes.readUInt16BE();
+    return this.bytes.readUInt16BE(0);
   }
 }
 

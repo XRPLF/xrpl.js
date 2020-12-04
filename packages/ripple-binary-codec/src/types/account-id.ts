@@ -1,5 +1,6 @@
 import { decodeAccountID, encodeAccountID } from "ripple-address-codec";
 import { Hash160 } from "./hash-160";
+import { Buffer } from "buffer/";
 
 const HEX_REGEX = /^[A-F0-9]{40}$/;
 
@@ -44,7 +45,7 @@ class AccountID extends Hash160 {
    * @returns an AccountID object
    */
   static fromBase58(value: string): AccountID {
-    return new AccountID(decodeAccountID(value));
+    return new AccountID(Buffer.from(decodeAccountID(value)));
   }
 
   /**
@@ -62,7 +63,9 @@ class AccountID extends Hash160 {
    * @returns the base58 string defined by this.bytes
    */
   toBase58(): string {
-    return encodeAccountID(this.bytes);
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    return encodeAccountID(this.bytes as any);
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   }
 }
 

@@ -1,5 +1,6 @@
 import * as enums from "./definitions.json";
 import { SerializedType } from "../types/serialized-type";
+import { Buffer } from "buffer/";
 
 const TYPE_WIDTH = 2;
 const LEDGER_ENTRY_WIDTH = 2;

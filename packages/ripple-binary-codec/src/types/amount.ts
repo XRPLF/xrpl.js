@@ -6,6 +6,7 @@ import { AccountID } from "./account-id";
 import { Currency } from "./currency";
 import { JsonObject, SerializedType } from "./serialized-type";
 import * as bigInt from "big-integer";
+import { Buffer } from "buffer/";
 
 /**
  * Constants for validating amounts
@@ -78,8 +79,8 @@ class Amount extends SerializedType {
       const number = bigInt(value);
 
       const intBuf = [Buffer.alloc(4), Buffer.alloc(4)];
-      intBuf[0].writeUInt32BE(Number(number.shiftRight(32)));
-      intBuf[1].writeUInt32BE(Number(number.and(mask)));
+      intBuf[0].writeUInt32BE(Number(number.shiftRight(32)), 0);
+      intBuf[1].writeUInt32BE(Number(number.and(mask)), 0);
 
       amount = Buffer.concat(intBuf);
 
@@ -102,8 +103,8 @@ class Amount extends SerializedType {
 
         const num = bigInt(integerNumberString);
         const intBuf = [Buffer.alloc(4), Buffer.alloc(4)];
-        intBuf[0].writeUInt32BE(Number(num.shiftRight(32)));
-        intBuf[1].writeUInt32BE(Number(num.and(mask)));
+        intBuf[0].writeUInt32BE(Number(num.shiftRight(32)), 0);
+        intBuf[1].writeUInt32BE(Number(num.and(mask)), 0);
 
         amount = Buffer.concat(intBuf);
 
@@ -151,8 +152,8 @@ class Amount extends SerializedType {
       const sign = isPositive ? "" : "-";
       bytes[0] &= 0x3f;
 
-      const msb = bigInt(bytes.slice(0, 4).readUInt32BE());
-      const lsb = bigInt(bytes.slice(4).readUInt32BE());
+      const msb = bigInt(bytes.slice(0, 4).readUInt32BE(0));
+      const lsb = bigInt(bytes.slice(4).readUInt32BE(0));
       const num = msb.shiftLeft(32).or(lsb);
 
       return `${sign}${num.toString()}`;

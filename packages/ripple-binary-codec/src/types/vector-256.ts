@@ -2,6 +2,7 @@ import { SerializedType } from "./serialized-type";
 import { BinaryParser } from "../serdes/binary-parser";
 import { Hash256 } from "./hash-256";
 import { BytesList } from "../serdes/binary-serializer";
+import { Buffer } from "buffer/";
 
 /**
  * TypeGuard for Array<string>

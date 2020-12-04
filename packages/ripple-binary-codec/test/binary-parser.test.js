@@ -11,6 +11,7 @@ const { Field, TransactionType } = require("./../dist/enums");
 const { parseHexOnly, hexOnly, loadFixture } = require("./utils");
 const fixtures = loadFixture("data-driven-tests.json");
 const { BytesList } = require("../dist/serdes/binary-serializer");
+const { Buffer } = require("buffer/");
 
 const __ = hexOnly;
 function toJSON(v) {

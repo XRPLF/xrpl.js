@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import { Field, FieldInstance } from "../enums";
 import { SerializedType } from "../types/serialized-type";
+import { Buffer } from "buffer/";
 
 /**
  * BinaryParser is used to compute fields and values from a HexString

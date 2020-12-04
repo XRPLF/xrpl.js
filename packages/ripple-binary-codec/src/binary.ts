@@ -9,6 +9,7 @@ import { sha512Half, transactionID } from "./hashes";
 import { FieldInstance } from "./enums";
 import { STObject } from "./types/st-object";
 import { JsonObject } from "./types/serialized-type";
+import { Buffer } from "buffer/";
 import * as bigInt from "big-integer";
 
 /**

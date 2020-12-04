@@ -1,4 +1,6 @@
 import { Hash160 } from "./hash-160";
+import { Buffer } from "buffer/";
+
 const ISO_REGEX = /^[A-Z0-9]{3}$/;
 const HEX_REGEX = /^[A-F0-9]{40}$/;
 

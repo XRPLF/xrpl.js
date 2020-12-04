@@ -6,6 +6,7 @@ import {
 } from "ripple-address-codec";
 import { BinaryParser } from "../serdes/binary-parser";
 import { BinarySerializer, BytesList } from "../serdes/binary-serializer";
+import { Buffer } from "buffer/";
 
 const OBJECT_END_MARKER_BYTE = Buffer.from([0xe1]);
 const OBJECT_END_MARKER = "ObjectEndMarker";

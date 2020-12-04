@@ -2,6 +2,7 @@ import { HashPrefix } from "./hash-prefixes";
 import * as createHash from "create-hash";
 import { Hash256 } from "./types/hash-256";
 import { BytesList } from "./serdes/binary-serializer";
+import { Buffer } from "buffer/";
 
 /**
  * Class for hashing with SHA512

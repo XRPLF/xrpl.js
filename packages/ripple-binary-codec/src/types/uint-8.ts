@@ -1,5 +1,6 @@
 import { UInt } from "./uint";
 import { BinaryParser } from "../serdes/binary-parser";
+import { Buffer } from "buffer/";
 
 /**
  * Derived UInt class for serializing/deserializing 8 bit UInt
@@ -28,7 +29,7 @@ class UInt8 extends UInt {
 
     if (typeof val === "number") {
       const buf = Buffer.alloc(UInt8.width);
-      buf.writeUInt8(val);
+      buf.writeUInt8(val, 0);
       return new UInt8(buf);
     }
 
@@ -41,7 +42,7 @@ class UInt8 extends UInt {
    * @returns the number represented by this.bytes
    */
   valueOf(): number {
-    return this.bytes.readUInt8();
+    return this.bytes.readUInt8(0);
   }
 }
 

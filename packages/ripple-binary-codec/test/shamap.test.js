@@ -2,6 +2,7 @@ const { ShaMap } = require("../dist/shamap.js");
 const { binary, HashPrefix } = require("../dist/coretypes");
 const { coreTypes } = require("../dist/types");
 const { loadFixture } = require("./utils");
+const { Buffer } = require("buffer/");
 
 function now() {
   return Number(Date.now()) / 1000;

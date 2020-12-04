@@ -1,5 +1,6 @@
 import * as bigInt from "big-integer";
 import { Comparable } from "./serialized-type";
+import { Buffer } from "buffer/";
 
 /**
  * Compare numbers and bigInts n1 and n2

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { Buffer } = require('buffer/')
 
 function hexOnly(hex) {
   return hex.replace(/[^a-fA-F0-9]/g, "");

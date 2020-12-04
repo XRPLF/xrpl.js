@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import { FieldInstance } from "../enums";
 import { SerializedType } from "../types/serialized-type";
+import { Buffer } from "buffer/";
 
 /**
  * Bytes list is a collection of buffer objects

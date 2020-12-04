@@ -6,6 +6,7 @@ const { makeParser, BytesList, BinarySerializer } = binary;
 const { coreTypes } = require("../dist/types");
 const { UInt8, UInt16, UInt32, UInt64, STObject } = coreTypes;
 const bigInt = require("big-integer");
+const { Buffer } = require("buffer/");
 
 const { loadFixture } = require("./utils");
 const fixtures = loadFixture("data-driven-tests.json");

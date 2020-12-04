@@ -2,6 +2,7 @@ import { UInt } from "./uint";
 import { BinaryParser } from "../serdes/binary-parser";
 import * as bigInt from "big-integer";
 import { isInstance } from "big-integer";
+import { Buffer } from "buffer/";
 
 const HEX_REGEX = /^[A-F0-9]{16}$/;
 const mask = bigInt(0x00000000ffffffff);
@@ -46,8 +47,8 @@ class UInt64 extends UInt {
       const number = bigInt(val);
 
       const intBuf = [Buffer.alloc(4), Buffer.alloc(4)];
-      intBuf[0].writeUInt32BE(Number(number.shiftRight(32)));
-      intBuf[1].writeUInt32BE(Number(number.and(mask)));
+      intBuf[0].writeUInt32BE(Number(number.shiftRight(32)), 0);
+      intBuf[1].writeUInt32BE(Number(number.and(mask)), 0);
 
       return new UInt64(Buffer.concat(intBuf));
     }
@@ -62,8 +63,8 @@ class UInt64 extends UInt {
 
     if (isInstance(val)) {
       const intBuf = [Buffer.alloc(4), Buffer.alloc(4)];
-      intBuf[0].writeUInt32BE(Number(val.shiftRight(bigInt(32))));
-      intBuf[1].writeUInt32BE(Number(val.and(mask)));
+      intBuf[0].writeUInt32BE(Number(val.shiftRight(bigInt(32))), 0);
+      intBuf[1].writeUInt32BE(Number(val.and(mask)), 0);
 
       return new UInt64(Buffer.concat(intBuf));
     }
@@ -86,8 +87,8 @@ class UInt64 extends UInt {
    * @returns the number represented buy this.bytes
    */
   valueOf(): bigInt.BigInteger {
-    const msb = bigInt(this.bytes.slice(0, 4).readUInt32BE());
-    const lsb = bigInt(this.bytes.slice(4).readUInt32BE());
+    const msb = bigInt(this.bytes.slice(0, 4).readUInt32BE(0));
+    const lsb = bigInt(this.bytes.slice(4).readUInt32BE(0));
     return msb.shiftLeft(bigInt(32)).or(lsb);
   }
 

@@ -1,5 +1,6 @@
 const { coreTypes } = require("../dist/types");
 const { Hash160, Hash256, AccountID, Currency } = coreTypes;
+const { Buffer } = require("buffer/");
 
 describe("Hash160", function () {
   test("has a static width member", function () {

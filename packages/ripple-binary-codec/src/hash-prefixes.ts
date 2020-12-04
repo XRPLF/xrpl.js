@@ -1,3 +1,5 @@
+import { Buffer } from "buffer/";
+
 /**
  * Write a 32 bit integer to a Buffer
  *
@@ -6,7 +8,7 @@
  */
 function bytes(uint32: number): Buffer {
   const result = Buffer.alloc(4);
-  result.writeUInt32BE(uint32);
+  result.writeUInt32BE(uint32, 0);
   return result;
 }
 

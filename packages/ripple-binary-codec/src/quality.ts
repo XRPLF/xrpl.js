@@ -1,6 +1,7 @@
 import { coreTypes } from "./types";
 import { Decimal } from "decimal.js";
 import * as bigInt from "big-integer";
+import { Buffer } from "buffer/";
 
 /**
  * class for encoding and decoding quality
