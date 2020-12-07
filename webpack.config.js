@@ -21,12 +21,21 @@ function getDefaultConfiguration() {
     new webpack.NormalModuleReplacementPlugin(/^ws$/, './wswrapper'),
     new webpack.NormalModuleReplacementPlugin(/^\.\/wallet$/, './wallet-web'),
     new webpack.NormalModuleReplacementPlugin(/^.*setup-api$/, './setup-api-web'),
+    new webpack.ProvidePlugin({ process: 'process/browser' }),
+    new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] })
   ],
   module: {
     rules: []
   },
   resolve: {
-    extensions: ['.js', '.json']
+    extensions: ['.js', '.json'],
+    fallback: { 
+      "buffer": require.resolve("buffer/"),
+      "assert": require.resolve("assert/"),
+      "url": require.resolve("url/"),
+      "stream": require.resolve("stream-browserify"),
+      "crypto": require.resolve("crypto-browserify")
+    }
   },
 };
 }
