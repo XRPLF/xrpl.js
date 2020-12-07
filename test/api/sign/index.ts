@@ -333,5 +333,12 @@ export default <TestSuite>{
 
     assert.deepEqual(result, expectedResponse)
     schemaValidator.schemaValidate('sign', result)
+  },
+
+  'sign with ticket': async (api, address) => {
+    const secret = 'sn7n5R1cR5Y3fRFkuWXA94Ts1frVJ'
+    const result = api.sign(REQUEST_FIXTURES.ticket.txJSON, secret)
+    assert.deepEqual(result, RESPONSE_FIXTURES.ticket)
+    schemaValidator.schemaValidate('sign', result)
   }
 }

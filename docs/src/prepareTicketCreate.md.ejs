@@ -1,0 +1,34 @@
+## prepareTicketCreate
+
+`prepareTicketCreate(address: string, ticketCount: number, instructions: object): Promise<object>`
+
+Prepare a ticket transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+Ticket functionality requires the [TicketBatch amendment](https://github.com/ripple/xrpl-dev-portal/issues/898). As of 2020-11-24, this amendment is not activated on the Mainnet, Testnet, or Devnet.
+
+### Parameters
+
+<%- renderSchema("input/prepare-ticket-create.json") %>
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare*" methods have the same return type.
+</aside>
+
+<%- renderSchema("output/prepare.json") %>
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+return api.prepareTicketCreate(address, 2).then(prepared => {
+    /* ... */
+  }).catch(error => {
+    /* ... as with all prepare* methods, use a Promise catch block to handle errors ... */
+  })
+```
+
+<%- renderFixture("responses/prepare-ticket-create.json") %>

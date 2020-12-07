@@ -43,6 +43,7 @@ import prepareCheckCreate from './transaction/check-create'
 import prepareCheckCancel from './transaction/check-cancel'
 import prepareCheckCash from './transaction/check-cash'
 import prepareSettings from './transaction/settings'
+import prepareTicketCreate from './transaction/ticket'
 import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
@@ -395,6 +396,7 @@ class RippleAPI extends EventEmitter {
   prepareCheckCreate = prepareCheckCreate
   prepareCheckCash = prepareCheckCash
   prepareCheckCancel = prepareCheckCancel
+  prepareTicketCreate = prepareTicketCreate
   prepareSettings = prepareSettings
   sign = sign
   combine = combine

@@ -51,6 +51,20 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.close, 'prepare')
   },
 
+  'with ticket': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      ticketSequence: 23
+    }
+    const response = await api.preparePaymentChannelClaim(
+      address,
+      REQUEST_FIXTURES.normal,
+      localInstructions
+    )
+    assertResultMatch(response, RESPONSE_FIXTURES.ticket, 'prepare')
+  },
+
   'rejects Promise on preparePaymentChannelClaim with renew and close': async (
     api,
     address

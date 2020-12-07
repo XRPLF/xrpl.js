@@ -56,11 +56,8 @@ function signWithKeypair(
       keypair.privateKey
     )
   }
-
   const serialized = binaryCodec.encode(txToSignAndEncode)
-
   checkTxSerialization(serialized, tx)
-
   return {
     signedTransaction: serialized,
     id: computeBinaryTransactionHash(serialized)

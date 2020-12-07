@@ -76,6 +76,7 @@ module.exports = {
   },
   sign: {
     normal: require('./sign'),
+    ticket: require('./sign-ticket'),
     escrow: require('./sign-escrow.json'),
     signAs: require('./sign-as')
   },
