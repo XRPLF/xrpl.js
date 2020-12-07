@@ -24,15 +24,21 @@ What is ripple-lib used for? The applications on the list linked above use `ripp
 
 ### Requirements
 
-+ **[Node v10](https://nodejs.org/)** is recommended. Other versions may work but are not frequently tested.
++ **[Node.js v14](https://nodejs.org/)** is recommended. Other versions may work but are not frequently tested.
 + **[Yarn](https://yarnpkg.com/)** is recommended. `npm` may work but we use `yarn.lock`.
 
 ### Install
+
+## Getting Started
+
+See also: [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleapi-for-javascript.html)
 
 In an existing project (with `package.json`), install `ripple-lib`:
 ```
 $ yarn add ripple-lib
 ```
+
+Then see the documentation:
 
 ## Documentation
 
