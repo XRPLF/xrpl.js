@@ -102,9 +102,6 @@ function webpackForTest(testFileName) {
         "http": require.resolve("stream-http"),
         "fs": false
       }
-    },
-    experiments: {
-      topLevelAwait: true
     }
   };
   return Object.assign({}, getDefaultConfiguration(), test);
