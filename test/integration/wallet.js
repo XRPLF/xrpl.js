@@ -1,44 +1,56 @@
 'use strict';
+const axios = require('axios')
 
-const _ = require('lodash');
-const fs = require('fs');
-const path = require('path');
+let WALLET = undefined
+let COUNTERPARTY_WALLET = undefined
 
-function getUserHomePath() {
-  return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+const generateWallet = async () => {
+   await axios.post("https://faucet.altnet.rippletest.net/accounts")
+       .then(res => {
+        WALLET = res.data.account
+       })
 }
 
-function loadWallet() {
-  const secretPath = path.join(getUserHomePath(), '.ripple_wallet');
-  try {
-    const walletRaw = fs.readFileSync(secretPath, {encoding: 'utf8'}).trim();
-    return JSON.parse(walletRaw);
-  } catch (e) {
-    return null;
-  }
+
+const generateWallet2 = async () => {
+  await axios.post("https://faucet.altnet.rippletest.net/accounts")
+      .then(res => {
+        COUNTERPARTY_WALLET = res.data.account
+      })
 }
 
-const WALLET = loadWallet();
-
-function getTestKey(key) {
-  if (process.env.TEST_ADDRESS && process.env.TEST_SECRET) {
-    if (key === 'address') {
-      return process.env.TEST_ADDRESS;
-    }
-    if (key === 'secret') {
-      return process.env.TEST_SECRET;
-    }
-  }
-  if (WALLET === null) {
-    throw new Error('Could not find .ripple_wallet file in home directory');
-  }
-  if (WALLET.test === undefined) {
-    throw new Error('Wallet does not contain a "test" account');
-  }
-  return WALLET.test[key];
+async function getAddress() {
+  if(WALLET === undefined)
+    await generateWallet()
+  
+  return WALLET.classicAddress
 }
+
+async function getSecret() {
+  if (WALLET === undefined)
+    await generateWallet()
+
+  return WALLET.secret
+}
+
+async function getCounterparty() {
+  if(COUNTERPARTY_WALLET === undefined)
+    await generateWallet2()
+  
+  return COUNTERPARTY_WALLET.classicAddress
+}
+
+async function getCounterpartySecret() {
+  if (WALLET2 === undefined)
+    await generateWallet2()
+
+  return WALLET2.secret
+}
+
 
 module.exports = {
-  getAddress: _.partial(getTestKey, 'address'),
-  getSecret: _.partial(getTestKey, 'secret')
+  getAddress: getAddress,
+  getSecret: getSecret,
+  getCounterparty: getCounterparty,
+  getCounterpartySecret: getCounterpartySecret,
 };

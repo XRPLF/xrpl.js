@@ -8,7 +8,7 @@ describe("Browser Tests", () => {
             const page = await browser.newPage().catch();    
             await page.goto(`file:///${__dirname}/localintegrationrunner.html`);    
         
-            await page.waitForFunction('document.querySelector("body").innerText.includes("submit multisigned transaction")');
+            await page.waitForFunction('document.querySelector("body").innerText.includes("generateWallet")');
 
             const fails = await page.evaluate(() => {
                 return document.querySelector('.failures').textContent
@@ -26,5 +26,5 @@ describe("Browser Tests", () => {
         } finally {
             await browser.close();
         }
-    }).timeout(20000)
+    }).timeout(40000)
 })

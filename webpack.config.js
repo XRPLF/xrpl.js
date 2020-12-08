@@ -99,9 +99,13 @@ function webpackForTest(testFileName) {
         "stream": require.resolve("stream-browserify"),
         "crypto": require.resolve("crypto-browserify"),
         "path": require.resolve("path-browserify"),
+        "http": require.resolve("stream-http"),
         "fs": false
       }
     },
+    experiments: {
+      topLevelAwait: true
+    }
   };
   return Object.assign({}, getDefaultConfiguration(), test);
 }

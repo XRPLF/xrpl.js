@@ -4,8 +4,8 @@ const masterAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
 const masterSecret = 'snoPBrXtMeMyMHUVTgbuqAfg1SUTb';
 
 function ledgerAccept(api) {
-  const request = {command: 'ledger_accept'};
-  return api.connection.request(request);
+  // const request = {command: 'ledger_accept'};
+  // return api.connection.request(request);
 }
 
 function pay(api, from, to, amount, secret, currency = 'XRP', counterparty) {
