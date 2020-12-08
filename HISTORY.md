@@ -2,6 +2,30 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.9.0 (2020-12-07)
+
+* New features
+  * Support for tickets (TicketBatch amendment required - not yet activated on live/main network)
+    * `prepareTicketCreate`
+  * Types: Add LedgerClosedEvent and export more types
+* Docs
+  * Improve descriptions of get-ledger response time fields
+  * Applications
+    * Add Bithomp explorer
+    * Add example of reliable transaction submission
+* Node.js
+  * Require Node.js version 10.13.0+
+* Internal
+  * Update webpack, webpack-cli, mocha, nyc, ripple-binary-codec
+  * Run prettier to format code
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+2d3ae057ad637df272f98cfe940ea9e1317588e5bbf4fee47c8b16d6e6e71d85  build/ripple-latest-min.js
+8cbbc7bb482f68bcc8d411bae2e42effdb14ddfa562fcbc329a373910b85cf8c  build/ripple-latest.js
+```
+
 ## 1.8.2 (2020-10-23)
 
 * Bug fixes
