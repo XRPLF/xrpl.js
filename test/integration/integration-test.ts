@@ -16,6 +16,12 @@ function acceptLedger(api) {
   // return api.connection.request({command: 'ledger_accept'})
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}   
+
 async function testTransaction(
   testcase,
   type,
@@ -68,6 +74,7 @@ describe('integration tests', async function () {
 
   it('settings', async function () {
     const address = await wallet.getAddress()
+    await sleep(1000)
     return this.api.getLedgerVersion().then((ledgerVersion) => {
       return this.api
         .prepareSettings(address, {
