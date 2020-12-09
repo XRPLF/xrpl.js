@@ -38,6 +38,40 @@ $ yarn add ripple-lib
 
 Then see the documentation:
 
+### Using ripple-lib with React Native
+
+If you want to use `ripple-lib` with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
+
+1. Install dependencies
+
+    ```shell
+    npm i --save react-native-crypto
+    # install peer deps
+    npm i --save react-native-randombytes
+    react-native link react-native-randombytes
+    # install latest rn-nodeify
+    npm i --save-dev rn-nodeify@latest
+    ```
+
+2. Enable `crypto`:
+
+    `rn-nodeify` will create a `shim.js` file in the project root directory.
+    Open it and uncomment the line that requires the crypto module:
+
+    ```shell
+    // If using the crypto shim, uncomment the following line to ensure
+    // crypto is loaded first, so it can populate global.crypto
+    require('crypto')
+    ```
+
+3. After that, run the following command:
+
+    ```shell
+    # install node core shims and recursively hack package.json files
+    # in ./node_modules to add/update the "browser"/"react-native" field with relevant mappings
+    ./node_modules/.bin/rn-nodeify --hack --install
+    ```
+
 ## Documentation
 
 + [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleapi-for-javascript.html)
