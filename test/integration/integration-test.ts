@@ -75,6 +75,7 @@ describe('integration tests', async function () {
   it('settings', async function () {
     const address = await wallet.getAddress()
     await sleep(1000)
+    const seq = await (this.api.getAccountInfo(address, {ledgerVersion: "current"})).sequence
     return this.api.getLedgerVersion().then((ledgerVersion) => {
       return this.api
         .prepareSettings(address, {
@@ -86,7 +87,8 @@ describe('integration tests', async function () {
               "data": "texted data"
             }
           ]
-        })
+        },
+        {sequence: seq})
         .then((prepared) =>
           testTransaction(this, 'settings', ledgerVersion, prepared)
         )
