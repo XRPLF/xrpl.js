@@ -68,7 +68,7 @@ class STArray extends SerializedType {
       return new STArray(Buffer.concat(bytes));
     }
 
-    throw new Error("Cannot construct Currency from value given");
+    throw new Error("Cannot construct STArray from value given");
   }
 
   /**
