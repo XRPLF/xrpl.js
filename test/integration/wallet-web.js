@@ -11,8 +11,14 @@ const generateWallet = async () => {
        })
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
-const generateWallet2 = async () => {
+
+const generateWalletCounterparty = async () => {
   await axios.post("https://faucet.altnet.rippletest.net/accounts")
       .then(res => {
         COUNTERPARTY_WALLET = res.data.account
@@ -21,28 +27,34 @@ const generateWallet2 = async () => {
 
 async function getAddress() {
   if(WALLET === undefined)
+  {
     await generateWallet()
+    sleep(1000);
+  }
   
   return WALLET.classicAddress
 }
 
 async function getSecret() {
   if (WALLET === undefined)
+  {
     await generateWallet()
+    sleep(1000);
+  }
 
   return WALLET.secret
 }
 
 async function getCounterparty() {
   if(COUNTERPARTY_WALLET === undefined)
-    await generateWallet2()
+    await generateWalletCounterparty()
   
   return COUNTERPARTY_WALLET.classicAddress
 }
 
 async function getCounterpartySecret() {
   if (WALLET2 === undefined)
-    await generateWallet2()
+    await generateWalletCounterparty()
 
   return WALLET2.secret
 }
