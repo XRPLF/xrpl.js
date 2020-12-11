@@ -13,14 +13,7 @@ const serverUrl = 'wss://s.altnet.rippletest.net:51233'
 
 function acceptLedger(api) {
   return Promise.resolve()
-  // return api.connection.request({command: 'ledger_accept'})
 }
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}   
 
 async function testTransaction(
   testcase,
@@ -74,8 +67,13 @@ describe('integration tests', async function () {
 
   it('settings', async function () {
     const address = await wallet.getAddress()
-    await sleep(1000)
-    const seq = await (this.api.getAccountInfo(address, {ledgerVersion: "current"})).sequence
+    
+    let seq = undefined;
+    while(seq === undefined) {
+      const acctInfo = await (this.api.getAccountInfo(address, {ledgerVersion: "current"}))
+      seq = acctInfo?.sequence + 1
+    }
+    console.log(seq)
     return this.api.getLedgerVersion().then((ledgerVersion) => {
       return this.api
         .prepareSettings(address, {
