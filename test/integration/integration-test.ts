@@ -58,6 +58,12 @@ function teardown(this: any) {
   return this.api.disconnect()
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+} 
+
 describe('integration tests', async function () {
   const instructions = {maxLedgerVersionOffset: 10}
   this.timeout(TIMEOUT)
@@ -70,6 +76,7 @@ describe('integration tests', async function () {
 
     let seq = undefined;
     while(seq === undefined) {
+      await sleep(2000);
       const acctInfo = await (this.api.getAccountInfo(address, {ledgerVersion: "current"}))
 
       seq = acctInfo?.sequence
