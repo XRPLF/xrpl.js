@@ -67,13 +67,14 @@ describe('integration tests', async function () {
 
   it('settings', async function () {
     const address = await wallet.getAddress()
-    
+
     let seq = undefined;
     while(seq === undefined) {
       const acctInfo = await (this.api.getAccountInfo(address, {ledgerVersion: "current"}))
-      seq = acctInfo?.sequence + 1
+
+      seq = acctInfo?.sequence
     }
-    console.log(seq)
+
     return this.api.getLedgerVersion().then((ledgerVersion) => {
       return this.api
         .prepareSettings(address, {
