@@ -1,5 +1,21 @@
 # ripple-address-codec Release History
 
+## 4.1.2 (2021-01-11)
+
+* Internal dependencies
+  * Update jest, ts-jest, typescript, lodash
+    * Fix potential moderate severity vulnerabilities
+  * Update @types/node, @types/jest, base-x
+* Docs
+  * Update example for encoding test address
+  * Document functions (#73)
+  * xAddressToClassicAddress when there is no tag (#114)
+  * Add README badges (#120)
+  * Add LICENSE (#138)
+* Cleanup and polish
+  * Add GitHub CI (#115)
+  * Fix linting
+
 ## 4.1.1 (2020-04-03)
 
 * Require node v10+
