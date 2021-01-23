@@ -1,145 +1,185 @@
 # Transaction Specifications
 
-A *transaction specification* specifies what a transaction should do. Each [Transaction Type](#transaction-types) has its own type of specification.
+A *transaction specification* specifies what a transaction should do. Each [Transaction Type](#transaction-types) has its own type of specification, which corresponds to the [native XRP Ledger transaction types](https://xrpl.org/transaction-types.html).
 
-## Payment
+## Account Delete
 
-See [Transaction Types](#transaction-types) for a description.
+Delete your account and send the remaining XRP elsewhere. (Native transaction type: [AccountDelete](https://xrpl.org/accountdelete.html))
 
-<%- renderSchema('specifications/payment.json') %>
+<%- renderSchema('specifications/account-delete.json') %>
 
-### Example
+> **Note:** To prepare an Account Delete transaction, use [`prepareTransaction()`](#preparetransaction) with the [native transaction format](https://xrpl.org/accountdelete.html).
 
-<%- renderFixture('requests/prepare-payment.json') %>
+## Check Cancel
 
-## Trustline
+Cancel a Check that has not been redeemed. (Native transaction type: [CheckCancel](https://xrpl.org/checkcancel.html))
 
-See [Transaction Types](#transaction-types) for a description.
+<%- renderSchema('specifications/check-cancel.json') %>
 
-<%- renderSchema('specifications/trustline.json') %>
+#### Example
 
-### Example
+<%- renderFixture('requests/prepare-check-cancel.json') %>
 
-<%- renderFixture('requests/prepare-trustline.json') %>
+
+## Check Cash
+
+Redeem a Check for up to its stated value. (Native transaction type: []())
+
+<%- renderSchema('specifications/check-cash.json') %>
+
+#### Example
+
+<%- renderFixture('requests/prepare-check-cash-amount.json') %>
+
+
+## Check Create
+
+Create a Check, a deferred payment that can be redeemed by the destination. (Native transaction type: [CheckCreate](https://xrpl.org/checkcreate.html))
+
+<%- renderSchema('specifications/check-create.json') %>
+
+#### Example
+
+<%- renderFixture('requests/prepare-check-create.json') %>
+
+
+## Deposit Preauth
+
+Preauthorize an sender to deposit money at an account using [Deposit Authorization](https://xrpl.org/depositauth.html). (Native transaction type: [DepositPreauth](https://xrpl.org/depositpreauth.html))
+
+<%- renderSchema('specifications/deposit-preauth.json') %>
+
+> **Note:** To prepare a Deposit Preauth transaction, use [`prepareTransaction()`](#preparetransaction) with the [native transaction format](https://xrpl.org/depositpreauth.html).
+
+
+## Escrow Cancellation
+
+Cancel an Escrow that has passed its expiration. (Native transaction type: []())
+
+<%- renderSchema('specifications/escrow-cancellation.json') %>
+
+#### Example
+
+<%- renderFixture('requests/prepare-escrow-cancellation.json') %>
+
+
+## Escrow Creation
+
+Create an Escrow that locks up XRP until a given time or condition is met. (Native transaction type: []())
+
+<%- renderSchema('specifications/escrow-creation.json') %>
+
+#### Example
+
+<%- renderFixture('requests/prepare-escrow-creation.json') %>
+
+
+## Escrow Execution
+
+Deliver XRP from an Escrow after its conditions have been met. (Native transaction type: []())
+
+<%- renderSchema('specifications/escrow-execution.json') %>
+
+#### Example
+
+<%- renderFixture('requests/prepare-escrow-execution.json') %>
+
 
 ## Order
 
-See [Transaction Types](#transaction-types) for a description.
+Create and execute a limit order in the decentralized exchange. (Native transaction type: [OfferCreate](https://xrpl.org/offercreate.html))
 
 <%- renderSchema('specifications/order.json') %>
 
 The following invalid flag combination causes a `ValidationError`: `immediateOrCancel` and `fillOrKill`. These fields are mutually exclusive, and cannot both be set at the same time.
 
-### Example
+#### Example
 
 <%- renderFixture('requests/prepare-order.json') %>
 
+
 ## Order Cancellation
 
-See [Transaction Types](#transaction-types) for a description.
+Cancel an order in the decentralized exchange. (Native transaction type: [OfferCancel](https://xrpl.org/offercancel.html))
 
 <%- renderSchema('specifications/order-cancellation.json') %>
 
-### Example
+#### Example
 
 <%- renderFixture('requests/prepare-order-cancellation.json') %>
 
-## Settings
 
-See [Transaction Types](#transaction-types) for a description.
+## Payment
 
-<%- renderSchema('output/get-settings.json') %>
+Send value from one account to another. (Native transaction type: [Payment](https://xrpl.org/payment.html))
 
-### Example
+<%- renderSchema('specifications/payment.json') %>
 
-<%- renderFixture('requests/prepare-settings.json') %>
+#### Example
 
-## Escrow Creation
+<%- renderFixture('requests/prepare-payment.json') %>
 
-See [Transaction Types](#transaction-types) for a description.
-
-<%- renderSchema('specifications/escrow-creation.json') %>
-
-### Example
-
-<%- renderFixture('requests/prepare-escrow-creation.json') %>
-
-## Escrow Cancellation
-
-See [Transaction Types](#transaction-types) for a description.
-
-<%- renderSchema('specifications/escrow-cancellation.json') %>
-
-### Example
-
-<%- renderFixture('requests/prepare-escrow-cancellation.json') %>
-
-## Escrow Execution
-
-See [Transaction Types](#transaction-types) for a description.
-
-<%- renderSchema('specifications/escrow-execution.json') %>
-
-### Example
-
-<%- renderFixture('requests/prepare-escrow-execution.json') %>
-
-## Check Create
-
-See [Transaction Types](#transaction-types) for a description.
-
-<%- renderSchema('specifications/check-create.json') %>
-
-### Example
-
-<%- renderFixture('requests/prepare-check-create.json') %>
-
-## Check Cancel
-
-See [Transaction Types](#transaction-types) for a description.
-
-<%- renderSchema('specifications/check-cancel.json') %>
-
-### Example
-
-<%- renderFixture('requests/prepare-check-cancel.json') %>
-
-## Check Cash
-
-See [Transaction Types](#transaction-types) for a description.
-
-<%- renderSchema('specifications/check-cash.json') %>
-
-### Example
-
-<%- renderFixture('requests/prepare-check-cash-amount.json') %>
-
-## Payment Channel Create
-
-See [Transaction Types](#transaction-types) for a description.
-
-<%- renderSchema('specifications/payment-channel-create.json') %>
-
-### Example
-
-<%- renderFixture('requests/prepare-payment-channel-create.json') %>
-
-## Payment Channel Fund
-
-See [Transaction Types](#transaction-types) for a description.
-
-<%- renderSchema('specifications/payment-channel-fund.json') %>
-
-### Example
-
-<%- renderFixture('requests/prepare-payment-channel-fund.json') %>
 
 ## Payment Channel Claim
 
-See [Transaction Types](#transaction-types) for a description.
+Redeem XRP from a Payment Channel. (Native transaction type: [PaymentChannelClaim](https://xrpl.org/paymentchannelclaim.html))
 
 <%- renderSchema('specifications/payment-channel-claim.json') %>
 
-### Example
+#### Example
 
 <%- renderFixture('requests/prepare-payment-channel-claim.json') %>
+
+
+## Payment Channel Create
+
+Create a Payment Channel with XRP set aside for asynchronous payments. (Native transaction type: [PaymentChannelCreate](https://xrpl.org/paymentchannelcreate.html))
+
+<%- renderSchema('specifications/payment-channel-create.json') %>
+
+#### Example
+
+<%- renderFixture('requests/prepare-payment-channel-create.json') %>
+
+
+## Payment Channel Fund
+
+Add XRP to a Payment Channel. (Native transaction type: [PaymentChannelFund](https://xrpl.org/paymentchannelfund.html))
+
+<%- renderSchema('specifications/payment-channel-fund.json') %>
+
+#### Example
+
+<%- renderFixture('requests/prepare-payment-channel-fund.json') %>
+
+
+
+## Settings
+
+Change account settings. (Native transaction types: [AccountSet](https://xrpl.org/accountset.html), [SetRegularKey](https://xrpl.org/setregularkey.html), [SignerListSet](https://xrpl.org/signerlistset.html))
+
+<%- renderSchema('output/get-settings.json') %>
+
+#### Example
+
+<%- renderFixture('requests/prepare-settings.json') %>
+
+
+## Ticket Create
+
+Set aside account Sequence numbers as Tickets to be used by later transactions.
+
+> **Caution:** As of 2021-01-22, Tickets are not yet available on the XRP Ledger.
+
+> **Note:** To prepare a Ticket Create transaction, use [`prepareTransaction()`](#preparetransaction) with the native transaction format. <!-- Future link: https://xrpl.org/ticketcreate.html -->
+
+
+## Trustline
+
+Create or modify a trust line between two accounts, for an issued currency. (Native transaction type: [TrustSet](https://xrpl.org/trustset.html))
+
+<%- renderSchema('specifications/trustline.json') %>
+
+#### Example
+
+<%- renderFixture('requests/prepare-trustline.json') %>

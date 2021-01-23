@@ -19,20 +19,23 @@
   - [Transaction ID](#transaction-id)
   - [Transaction Memos](#transaction-memos)
 - [Transaction Specifications](#transaction-specifications)
-  - [Payment](#payment)
-  - [Trustline](#trustline)
-  - [Order](#order)
-  - [Order Cancellation](#order-cancellation)
-  - [Settings](#settings)
-  - [Escrow Creation](#escrow-creation)
-  - [Escrow Cancellation](#escrow-cancellation)
-  - [Escrow Execution](#escrow-execution)
-  - [Check Create](#check-create)
+  - [Account Delete](#account-delete)
   - [Check Cancel](#check-cancel)
   - [Check Cash](#check-cash)
+  - [Check Create](#check-create)
+  - [Deposit Preauth](#deposit-preauth)
+  - [Escrow Cancellation](#escrow-cancellation)
+  - [Escrow Creation](#escrow-creation)
+  - [Escrow Execution](#escrow-execution)
+  - [Order](#order)
+  - [Order Cancellation](#order-cancellation)
+  - [Payment](#payment)
+  - [Payment Channel Claim](#payment-channel-claim)
   - [Payment Channel Create](#payment-channel-create)
   - [Payment Channel Fund](#payment-channel-fund)
-  - [Payment Channel Claim](#payment-channel-claim)
+  - [Settings](#settings)
+  - [Ticket Create](#ticket-create)
+  - [Trustline](#trustline)
 - [rippled APIs](#rippled-apis)
   - [Listening to streams](#listening-to-streams)
   - [request](#request)
@@ -390,11 +393,243 @@ type | string | *Optional* Conventionally, a unique relation (according to [RFC 
 
 # Transaction Specifications
 
-A *transaction specification* specifies what a transaction should do. Each [Transaction Type](#transaction-types) has its own type of specification.
+A *transaction specification* specifies what a transaction should do. Each [Transaction Type](#transaction-types) has its own type of specification, which corresponds to the [native XRP Ledger transaction types](https://xrpl.org/transaction-types.html).
+
+## Account Delete
+
+Delete your account and send the remaining XRP elsewhere. (Native transaction type: [AccountDelete](https://xrpl.org/accountdelete.html))
+
+Name | Type | Description
+---- | ---- | -----------
+destination | [address](#address) | *Optional* Address of an account to receive any leftover XRP after deleting the sending account. Must be a funded account in the ledger, and must not be the sending account.
+destinationTag | integer | *Optional* (Optional) Arbitrary destination tag that identifies a hosted recipient or other information for the recipient of the deleted account's leftover XRP.
+destinationXAddress | [address](#address) | *Optional* X-address of an account to receive any leftover XRP after deleting the sending account. Must be a funded account in the ledger, and must not be the sending account.
+
+> **Note:** To prepare an Account Delete transaction, use [`prepareTransaction()`](#preparetransaction) with the [native transaction format](https://xrpl.org/accountdelete.html).
+
+## Check Cancel
+
+Cancel a Check that has not been redeemed. (Native transaction type: [CheckCancel](https://xrpl.org/checkcancel.html))
+
+Name | Type | Description
+---- | ---- | -----------
+checkID | string | The ID of the Check ledger object to cancel, as a 64-character hexadecimal string.
+
+#### Example
+
+
+```json
+{
+  "checkID": "49647F0D748DC3FE26BDACBC57F251AADEFFF391403EC9BF87C97F67E9977FB0"
+}
+```
+
+
+
+## Check Cash
+
+Redeem a Check for up to its stated value. (Native transaction type: []())
+
+Name | Type | Description
+---- | ---- | -----------
+checkID | string | The ID of the Check ledger object to cash, as a 64-character hexadecimal string.
+amount | [laxAmount](#amount) | *Optional* Redeem the Check for exactly this amount, if possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or deliverMin.
+deliverMin | [laxAmount](#amount) | *Optional* Redeem the Check for at least this amount and for as much as possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or amount.
+
+#### Example
+
+
+```json
+{
+  "amount": {
+    "currency": "drops",
+    "value": "1000000"
+  },
+  "checkID": "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334"
+}
+```
+
+
+
+## Check Create
+
+Create a Check, a deferred payment that can be redeemed by the destination. (Native transaction type: [CheckCreate](https://xrpl.org/checkcreate.html))
+
+Name | Type | Description
+---- | ---- | -----------
+destination | [address](#address) | Address of the account that can cash the check.
+sendMax | [laxAmount](#amount) | Amount of source currency the check is allowed to debit the sender, including transfer fees on non-XRP currencies.
+destinationTag | integer | *Optional* Destination tag that identifies the reason for the check, or a hosted recipient to pay.
+expiration | date-time string | *Optional* Time after which the check is no longer valid.
+invoiceID | string | *Optional* 256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check.
+
+#### Example
+
+
+```json
+{
+  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+  "sendMax": {
+    "currency": "drops",
+    "value": "1000000"
+  }
+}
+```
+
+
+
+## Deposit Preauth
+
+Preauthorize an sender to deposit money at an account using [Deposit Authorization](https://xrpl.org/depositauth.html). (Native transaction type: [DepositPreauth](https://xrpl.org/depositpreauth.html))
+
+Name | Type | Description
+---- | ---- | -----------
+authorize | [address](#address) | *Optional* Address of the account that can cash the check.
+unauthorize | [address](#address) | *Optional* Address of the account that can cash the check.
+
+> **Note:** To prepare a Deposit Preauth transaction, use [`prepareTransaction()`](#preparetransaction) with the [native transaction format](https://xrpl.org/depositpreauth.html).
+
+
+## Escrow Cancellation
+
+Cancel an Escrow that has passed its expiration. (Native transaction type: []())
+
+Name | Type | Description
+---- | ---- | -----------
+owner | [address](#address) | The address of the owner of the escrow to cancel.
+escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to cancel.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+#### Example
+
+
+```json
+{
+  "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+  "escrowSequence": 1234
+}
+```
+
+
+
+## Escrow Creation
+
+Create an Escrow that locks up XRP until a given time or condition is met. (Native transaction type: []())
+
+Name | Type | Description
+---- | ---- | -----------
+amount | [value](#value) | Amount of XRP for sender to escrow.
+destination | [address](#address) | Address to receive escrowed XRP.
+allowCancelAfter | date-time string | *Optional* If present, the escrow may be cancelled after this time.
+allowExecuteAfter | date-time string | *Optional* If present, the escrow can not be executed before this time.
+condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). If present, `fulfillment` is required upon execution.
+destinationTag | integer | *Optional* Destination tag.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+sourceTag | integer | *Optional* Source tag.
+
+#### Example
+
+
+```json
+{
+  "destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  "amount": "0.01",
+  "allowExecuteAfter": "2014-09-24T21:21:50.000Z",
+  "allowCancelAfter":  "2017-01-01T00:00:00.000Z"
+}
+```
+
+
+
+## Escrow Execution
+
+Deliver XRP from an Escrow after its conditions have been met. (Native transaction type: []())
+
+Name | Type | Description
+---- | ---- | -----------
+owner | [address](#address) | The address of the owner of the escrow to execute.
+escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to execute.
+condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). This must match the original `condition` from the escrow creation transaction.
+fulfillment | string | *Optional* A hex value representing the [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1) fulfillment for `condition`.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+#### Example
+
+
+```json
+{
+  "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+  "escrowSequence": 1234,
+  "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+  "fulfillment": "A0028000"
+}
+```
+
+
+
+## Order
+
+Create and execute a limit order in the decentralized exchange. (Native transaction type: [OfferCreate](https://xrpl.org/offercreate.html))
+
+Name | Type | Description
+---- | ---- | -----------
+direction | string | Equal to "buy" for buy orders and "sell" for sell orders.
+quantity | [amount](#amount) | The amount of currency to buy or sell.
+totalPrice | [amount](#amount) | The total price to be paid for the `quantity` to be bought or sold.
+expirationTime | date-time string | *Optional* Time after which the offer is no longer active, as an [ISO 8601 date-time](https://en.wikipedia.org/wiki/ISO_8601).
+fillOrKill | boolean | *Optional* Treat the offer as a [Fill or Kill order](http://en.wikipedia.org/wiki/Fill_or_kill). Only attempt to match existing offers in the ledger, and only do so if the entire quantity can be exchanged. This cannot be used with `immediateOrCancel`.
+immediateOrCancel | boolean | *Optional* Treat the offer as an [Immediate or Cancel order](http://en.wikipedia.org/wiki/Immediate_or_cancel). If enabled, the offer will never become a ledger node: it only attempts to match existing offers in the ledger. This cannot be used with `fillOrKill`.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+orderToReplace | [sequence](#account-sequence-number) | *Optional* The [account sequence number](#account-sequence-number) of an order to cancel before the new order is created, effectively replacing the old order.
+passive | boolean | *Optional* If enabled, the offer will not consume offers that exactly match it, and instead becomes an Offer node in the ledger. It will still consume offers that cross it.
+
+The following invalid flag combination causes a `ValidationError`: `immediateOrCancel` and `fillOrKill`. These fields are mutually exclusive, and cannot both be set at the same time.
+
+#### Example
+
+
+```json
+{
+  "direction": "buy",
+  "quantity": {
+    "currency": "USD",
+    "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+    "value": "10.1"
+  },
+  "totalPrice": {
+    "currency": "drops",
+    "value": "2000000"
+  },
+  "passive": false,
+  "fillOrKill": true
+}
+```
+
+
+
+## Order Cancellation
+
+Cancel an order in the decentralized exchange. (Native transaction type: [OfferCancel](https://xrpl.org/offercancel.html))
+
+Name | Type | Description
+---- | ---- | -----------
+orderSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the order to cancel.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+#### Example
+
+
+```json
+{
+  "orderSequence": 23
+}
+```
+
+
 
 ## Payment
 
-See [Transaction Types](#transaction-types) for a description.
+Send value from one account to another. (Native transaction type: [Payment](https://xrpl.org/payment.html))
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -415,7 +650,7 @@ memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the
 noDirectRipple | boolean | *Optional* If true and paths are specified, the sender would like the XRP Ledger to disregard any direct paths from the source account to the destination account. This may be used to take advantage of an arbitrage opportunity or by gateways wishing to issue balances from a hot wallet to a user who has mistakenly set a trustline directly to the hot wallet.
 paths | string | *Optional* The paths of trustlines and orders to use in executing the payment.
 
-### Example
+#### Example
 
 
 ```json
@@ -440,106 +675,86 @@ paths | string | *Optional* The paths of trustlines and orders to use in executi
 ```
 
 
-## Trustline
 
-See [Transaction Types](#transaction-types) for a description.
+## Payment Channel Claim
+
+Redeem XRP from a Payment Channel. (Native transaction type: [PaymentChannelClaim](https://xrpl.org/paymentchannelclaim.html))
 
 Name | Type | Description
 ---- | ---- | -----------
-currency | [currency](#currency) | The currency this trustline applies to.
-counterparty | [address](#address) | The address of the account this trustline extends trust to.
-limit | [value](#value) | The maximum amount that the owner of the trustline can be owed through the trustline.
-authorized | boolean | *Optional* If true, authorize the counterparty to hold issuances from this account.
-frozen | boolean | *Optional* If true, the trustline is frozen, which means that funds can only be sent to the owner.
-memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-qualityIn | number | *Optional* Incoming balances on this trustline are valued at this ratio.
-qualityOut | number | *Optional* Outgoing balances on this trustline are valued at this ratio.
-ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through this trustline.
+channel | string | 256-bit hexadecimal channel identifier.
+amount | [value](#value) | *Optional* Amount of XRP authorized by this signature.
+balance | [value](#value) | *Optional* Total XRP balance delivered by this channel after claim is processed.
+close | boolean | *Optional* Request to close the channel. If the channel has no XRP remaining or the destination address requests it, closes the channel immediately (returning unclaimed XRP to the source address). Otherwise, sets the channel to expire after settleDelay seconds have passed.
+publicKey | string | *Optional* Public key of the channel. (For verifying the signature.)
+renew | boolean | *Optional* Clear the channel's expiration time.
+signature | string | *Optional* Signed claim authorizing withdrawal of XRP from the channel. (Required except from the channel's source address.)
 
-### Example
+#### Example
 
 
 ```json
 {
-  "currency": "USD",
-  "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-  "limit": "10000",
-  "qualityIn": 0.91,
-  "qualityOut": 0.87,
-  "ripplingDisabled": true,
-  "frozen": false,
-  "memos": [
-    {
-      "type": "test",
-      "format": "text/plain",
-      "data": "texted data"
-    }
-  ]
+  "channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198"
 }
 ```
 
 
-## Order
 
-See [Transaction Types](#transaction-types) for a description.
+## Payment Channel Create
+
+Create a Payment Channel with XRP set aside for asynchronous payments. (Native transaction type: [PaymentChannelCreate](https://xrpl.org/paymentchannelcreate.html))
 
 Name | Type | Description
 ---- | ---- | -----------
-direction | string | Equal to "buy" for buy orders and "sell" for sell orders.
-quantity | [amount](#amount) | The amount of currency to buy or sell.
-totalPrice | [amount](#amount) | The total price to be paid for the `quantity` to be bought or sold.
-expirationTime | date-time string | *Optional* Time after which the offer is no longer active, as an [ISO 8601 date-time](https://en.wikipedia.org/wiki/ISO_8601).
-fillOrKill | boolean | *Optional* Treat the offer as a [Fill or Kill order](http://en.wikipedia.org/wiki/Fill_or_kill). Only attempt to match existing offers in the ledger, and only do so if the entire quantity can be exchanged. This cannot be used with `immediateOrCancel`.
-immediateOrCancel | boolean | *Optional* Treat the offer as an [Immediate or Cancel order](http://en.wikipedia.org/wiki/Immediate_or_cancel). If enabled, the offer will never become a ledger node: it only attempts to match existing offers in the ledger. This cannot be used with `fillOrKill`.
-memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-orderToReplace | [sequence](#account-sequence-number) | *Optional* The [account sequence number](#account-sequence-number) of an order to cancel before the new order is created, effectively replacing the old order.
-passive | boolean | *Optional* If enabled, the offer will not consume offers that exactly match it, and instead becomes an Offer node in the ledger. It will still consume offers that cross it.
+amount | [value](#value) | Amount of XRP for sender to set aside in this channel.
+destination | [address](#address) | Address to receive XRP claims against this channel.
+settleDelay | number | Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP.
+publicKey | string | Public key of the key pair the source may use to sign claims against this channel.
+cancelAfter | date-time string | *Optional* Time when this channel expires. This expiration cannot be changed after creating the channel.
+destinationTag | integer | *Optional* Destination tag.
+sourceTag | integer | *Optional* Source tag.
 
-The following invalid flag combination causes a `ValidationError`: `immediateOrCancel` and `fillOrKill`. These fields are mutually exclusive, and cannot both be set at the same time.
-
-### Example
+#### Example
 
 
 ```json
 {
-  "direction": "buy",
-  "quantity": {
-    "currency": "USD",
-    "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-    "value": "10.1"
-  },
-  "totalPrice": {
-    "currency": "drops",
-    "value": "2000000"
-  },
-  "passive": false,
-  "fillOrKill": true
+  "amount": "1",
+  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+  "settleDelay": 86400,
+  "publicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A"
 }
 ```
 
 
-## Order Cancellation
 
-See [Transaction Types](#transaction-types) for a description.
+## Payment Channel Fund
+
+Add XRP to a Payment Channel. (Native transaction type: [PaymentChannelFund](https://xrpl.org/paymentchannelfund.html))
 
 Name | Type | Description
 ---- | ---- | -----------
-orderSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the order to cancel.
-memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+amount | [value](#value) | Amount of XRP to fund the channel with.
+channel | string | 256-bit hexadecimal channel identifier.
+expiration | date-time string | *Optional* New expiration for this channel. (This does not change the cancelAfter expiration, if the channel has one.) Cannot move the expiration sooner than settleDelay seconds from time of the request.
 
-### Example
+#### Example
 
 
 ```json
 {
-  "orderSequence": 23
+  "channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
+  "amount": "1"
 }
 ```
+
+
 
 
 ## Settings
 
-See [Transaction Types](#transaction-types) for a description.
+Change account settings. (Native transaction types: [AccountSet](https://xrpl.org/accountset.html), [SetRegularKey](https://xrpl.org/setregularkey.html), [SignerListSet](https://xrpl.org/signerlistset.html))
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -568,7 +783,7 @@ tickSize | string | *Optional* Tick size to use for offers involving a currency 
 transferRate | number,null | *Optional* The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 walletLocator | string,null | *Optional* Transaction hash or any other 64 character hexadecimal string, that may or may not represent the result of a hash operation. Use `null` to clear.
 
-### Example
+#### Example
 
 
 ```json
@@ -585,216 +800,51 @@ walletLocator | string,null | *Optional* Transaction hash or any other 64 charac
 ```
 
 
-## Escrow Creation
 
-See [Transaction Types](#transaction-types) for a description.
+## Ticket Create
+
+Set aside account Sequence numbers as Tickets to be used by later transactions.
+
+> **Caution:** As of 2021-01-22, Tickets are not yet available on the XRP Ledger.
+
+> **Note:** To prepare a Ticket Create transaction, use [`prepareTransaction()`](#preparetransaction) with the native transaction format. <!-- Future link: https://xrpl.org/ticketcreate.html -->
+
+
+## Trustline
+
+Create or modify a trust line between two accounts, for an issued currency. (Native transaction type: [TrustSet](https://xrpl.org/trustset.html))
 
 Name | Type | Description
 ---- | ---- | -----------
-amount | [value](#value) | Amount of XRP for sender to escrow.
-destination | [address](#address) | Address to receive escrowed XRP.
-allowCancelAfter | date-time string | *Optional* If present, the escrow may be cancelled after this time.
-allowExecuteAfter | date-time string | *Optional* If present, the escrow can not be executed before this time.
-condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). If present, `fulfillment` is required upon execution.
-destinationTag | integer | *Optional* Destination tag.
+currency | [currency](#currency) | The currency this trustline applies to.
+counterparty | [address](#address) | The address of the account this trustline extends trust to.
+limit | [value](#value) | The maximum amount that the owner of the trustline can be owed through the trustline.
+authorized | boolean | *Optional* If true, authorize the counterparty to hold issuances from this account.
+frozen | boolean | *Optional* If true, the trustline is frozen, which means that funds can only be sent to the owner.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-sourceTag | integer | *Optional* Source tag.
+qualityIn | number | *Optional* Incoming balances on this trustline are valued at this ratio.
+qualityOut | number | *Optional* Outgoing balances on this trustline are valued at this ratio.
+ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through this trustline.
 
-### Example
-
-
-```json
-{
-  "destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-  "amount": "0.01",
-  "allowExecuteAfter": "2014-09-24T21:21:50.000Z",
-  "allowCancelAfter":  "2017-01-01T00:00:00.000Z"
-}
-```
-
-
-## Escrow Cancellation
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-owner | [address](#address) | The address of the owner of the escrow to cancel.
-escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to cancel.
-memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-
-### Example
+#### Example
 
 
 ```json
 {
-  "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "escrowSequence": 1234
-}
-```
-
-
-## Escrow Execution
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-owner | [address](#address) | The address of the owner of the escrow to execute.
-escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to execute.
-condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). This must match the original `condition` from the escrow creation transaction.
-fulfillment | string | *Optional* A hex value representing the [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1) fulfillment for `condition`.
-memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-
-### Example
-
-
-```json
-{
-  "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "escrowSequence": 1234,
-  "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
-  "fulfillment": "A0028000"
-}
-```
-
-
-## Check Create
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-destination | [address](#address) | Address of the account that can cash the check.
-sendMax | [laxAmount](#amount) | Amount of source currency the check is allowed to debit the sender, including transfer fees on non-XRP currencies.
-destinationTag | integer | *Optional* Destination tag that identifies the reason for the check, or a hosted recipient to pay.
-expiration | date-time string | *Optional* Time after which the check is no longer valid.
-invoiceID | string | *Optional* 256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check.
-
-### Example
-
-
-```json
-{
-  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-  "sendMax": {
-    "currency": "drops",
-    "value": "1000000"
-  }
-}
-```
-
-
-## Check Cancel
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-checkID | string | The ID of the Check ledger object to cancel, as a 64-character hexadecimal string.
-
-### Example
-
-
-```json
-{
-  "checkID": "49647F0D748DC3FE26BDACBC57F251AADEFFF391403EC9BF87C97F67E9977FB0"
-}
-```
-
-
-## Check Cash
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-checkID | string | The ID of the Check ledger object to cash, as a 64-character hexadecimal string.
-amount | [laxAmount](#amount) | *Optional* Redeem the Check for exactly this amount, if possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or deliverMin.
-deliverMin | [laxAmount](#amount) | *Optional* Redeem the Check for at least this amount and for as much as possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or amount.
-
-### Example
-
-
-```json
-{
-  "amount": {
-    "currency": "drops",
-    "value": "1000000"
-  },
-  "checkID": "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334"
-}
-```
-
-
-## Payment Channel Create
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-amount | [value](#value) | Amount of XRP for sender to set aside in this channel.
-destination | [address](#address) | Address to receive XRP claims against this channel.
-settleDelay | number | Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP.
-publicKey | string | Public key of the key pair the source may use to sign claims against this channel.
-cancelAfter | date-time string | *Optional* Time when this channel expires. This expiration cannot be changed after creating the channel.
-destinationTag | integer | *Optional* Destination tag.
-sourceTag | integer | *Optional* Source tag.
-
-### Example
-
-
-```json
-{
-  "amount": "1",
-  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-  "settleDelay": 86400,
-  "publicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A"
-}
-```
-
-
-## Payment Channel Fund
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-amount | [value](#value) | Amount of XRP to fund the channel with.
-channel | string | 256-bit hexadecimal channel identifier.
-expiration | date-time string | *Optional* New expiration for this channel. (This does not change the cancelAfter expiration, if the channel has one.) Cannot move the expiration sooner than settleDelay seconds from time of the request.
-
-### Example
-
-
-```json
-{
-  "channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
-  "amount": "1"
-}
-```
-
-
-## Payment Channel Claim
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-channel | string | 256-bit hexadecimal channel identifier.
-amount | [value](#value) | *Optional* Amount of XRP authorized by this signature.
-balance | [value](#value) | *Optional* Total XRP balance delivered by this channel after claim is processed.
-close | boolean | *Optional* Request to close the channel. If the channel has no XRP remaining or the destination address requests it, closes the channel immediately (returning unclaimed XRP to the source address). Otherwise, sets the channel to expire after settleDelay seconds have passed.
-publicKey | string | *Optional* Public key of the channel. (For verifying the signature.)
-renew | boolean | *Optional* Clear the channel's expiration time.
-signature | string | *Optional* Signed claim authorizing withdrawal of XRP from the channel. (Required except from the channel's source address.)
-
-### Example
-
-
-```json
-{
-  "channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198"
+  "currency": "USD",
+  "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+  "limit": "10000",
+  "qualityIn": 0.91,
+  "qualityOut": 0.87,
+  "ripplingDisabled": true,
+  "frozen": false,
+  "memos": [
+    {
+      "type": "test",
+      "format": "text/plain",
+      "data": "texted data"
+    }
+  ]
 }
 ```
 
