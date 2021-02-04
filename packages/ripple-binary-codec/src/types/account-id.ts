@@ -1,4 +1,9 @@
-import { decodeAccountID, encodeAccountID } from "ripple-address-codec";
+import {
+  decodeAccountID,
+  encodeAccountID,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from "ripple-address-codec";
 import { Hash160 } from "./hash-160";
 import { Buffer } from "buffer/";
 
@@ -45,6 +50,15 @@ class AccountID extends Hash160 {
    * @returns an AccountID object
    */
   static fromBase58(value: string): AccountID {
+    if (isValidXAddress(value)) {
+      const classic = xAddressToClassicAddress(value);
+
+      if (classic.tag !== false)
+        throw new Error("Only allowed to have tag on Account or Destination");
+
+      value = classic.classicAddress;
+    }
+
     return new AccountID(Buffer.from(decodeAccountID(value)));
   }
 

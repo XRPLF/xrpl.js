@@ -95,6 +95,30 @@ let invalid_json_x_and_tagged = {
   SourceTag: 12345,
 };
 
+let json_issued_x = {
+  TakerPays: {
+    currency: "USD",
+    issuer: "X7WZKEeNVS2p9Tire9DtNFkzWBZbFtJHWxDjN9fCrBGqVA4",
+    value: "7072.8",
+  },
+};
+
+let json_issued_r = {
+  TakerPays: {
+    currency: "USD",
+    issuer: "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+    value: "7072.8",
+  },
+};
+
+let json_issued_with_tag = {
+  TakerPays: {
+    currency: "USD",
+    issuer: "X7WZKEeNVS2p9Tire9DtNFkzWBZbFtSiS2eDBib7svZXuc2",
+    value: "7072.8",
+  },
+};
+
 describe("X-Address Account is equivalent to a classic address w/ SourceTag", () => {
   let encoded_x = encode(json_x1);
   let encoded_r = encode(json_r1);
@@ -114,6 +138,10 @@ describe("X-Address Account is equivalent to a classic address w/ SourceTag", ()
   test("Throws when X-Address is invalid", () => {
     expect(() => encode(json_invalid_x)).toThrow("checksum_invalid");
   });
+
+  test("Encodes issued currency w/ x-address", () => {
+    expect(encode(json_issued_x)).toEqual(encode(json_issued_r));
+  });
 });
 
 describe("Invalid X-Address behavior", () => {
@@ -126,6 +154,12 @@ describe("Invalid X-Address behavior", () => {
   test("Throws when Account has both X-Addr and Destination Tag", () => {
     expect(() => encode(invalid_json_x_and_tagged)).toThrow(
       new Error("Cannot have Account X-Address and SourceTag")
+    );
+  });
+
+  test("Throws when issued currency has tag", () => {
+    expect(() => encode(json_issued_with_tag)).toThrow(
+      "Only allowed to have tag on Account or Destination"
     );
   });
 });
