@@ -28,7 +28,7 @@
     },
     "timeout": {
       "type": "integer",
-      "description": "Timeout in milliseconds before considering a request to have failed.",
+      "description": "Request timeout in milliseconds before considering a request to have failed. See also: connectionTimeout.",
       "minimum": 1
     },
     "connectionTimeout": {

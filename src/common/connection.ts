@@ -27,7 +27,7 @@ export interface ConnectionOptions {
   key?: string
   passphrase?: string
   certificate?: string
-  timeout: number
+  timeout: number // request timeout
   connectionTimeout: number
 }
 
