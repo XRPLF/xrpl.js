@@ -31,6 +31,11 @@
       "description": "Timeout in milliseconds before considering a request to have failed.",
       "minimum": 1
     },
+    "connectionTimeout": {
+      "type": "integer",
+      "description": "Connection timeout, in milliseconds, before considering connect() to have failed.",
+      "minimum": 1
+    },
     "proxyAuthorization": {
       "type": "string",
       "description": "Username and password for HTTP basic authentication to the proxy in the format **username:password**."
