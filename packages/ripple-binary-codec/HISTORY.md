@@ -1,5 +1,10 @@
 # ripple-binary-codec Release History
 
+## 1.1.1 (2021-02-12)
+- PathSet.toJSON() does not return undefined values
+- Add support for X-Addresses in Issued Currency Amounts
+- Fix STArray error message
+
 ## 1.1.0 (2020-12-03)
 - Add support for Tickets (TicketBatch amendment)
 - Fix web browser compatibility
