@@ -27,7 +27,7 @@ export interface ConnectionOptions {
   key?: string
   passphrase?: string
   certificate?: string
-  timeout: number
+  timeout: number // request timeout
   connectionTimeout: number
 }
 
@@ -119,7 +119,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
  * ws.send(), but promisified.
  */
 function websocketSendAsync(ws: WebSocket, message: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     ws.send(message, undefined, (error) => {
       if (error) {
         reject(new DisconnectedError(error.message, error))
@@ -326,7 +326,7 @@ export class Connection extends EventEmitter {
     this._url = url
     this._config = {
       timeout: 20 * 1000,
-      connectionTimeout: 2 * 1000,
+      connectionTimeout: 5 * 1000,
       ...options
     }
     if (typeof options.trace === 'function') {
@@ -488,7 +488,8 @@ export class Connection extends EventEmitter {
       this._onConnectionFailed(
         new ConnectionError(
           `Error: connect() timed out after ${this._config.connectionTimeout} ms. ` +
-            `If your internet connection is working, the rippled server may be blocked or inaccessible.`
+            `If your internet connection is working, the rippled server may be blocked or inaccessible. ` +
+            `You can also try setting the 'connectionTimeout' option in the RippleAPI constructor.`
         )
       )
     }, this._config.connectionTimeout)
