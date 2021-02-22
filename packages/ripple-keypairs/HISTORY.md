@@ -1,5 +1,12 @@
 # ripple-keypairs Release History
 
+## 1.0.3 (2021-02-22)
+
+* Update dependencies:
+  * elliptic to 6.5.4 - includes security fix, although ripple-keypairs should not be susceptible because the vulnerable code is meant only for DH key exchange, which we do not use
+  * ripple-address-codec to 4.1.2
+  * bn.js, ts-node, @types/node, @types/mocha, codecov, prettier, typescript, eslint-config-prettier, eslint-plugin-import, elint-config-airbnb-base, eslint-plugin-prettier, ts-node, mocha
+
 ## 1.0.2 (2020-09-12)
 
 * Drop support for Node.js version 8 (#171)
