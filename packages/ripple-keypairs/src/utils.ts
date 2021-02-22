@@ -17,15 +17,9 @@ function hexToBytes(a): number[] {
 }
 
 function computePublicKeyHash(publicKeyBytes: Buffer): Buffer {
-  const hash256 = hashjs
-    .sha256()
-    .update(publicKeyBytes)
-    .digest()
+  const hash256 = hashjs.sha256().update(publicKeyBytes).digest()
 
-  const hash160 = hashjs
-    .ripemd160()
-    .update(hash256)
-    .digest()
+  const hash160 = hashjs.ripemd160().update(hash256).digest()
   return Buffer.from(hash160)
 }
 
