@@ -866,7 +866,8 @@ When using rippled APIs:
 
 ## Listening to streams
 
-The `rippled` server can push updates to your client when various events happen. Refer to [Subscriptions in the `rippled` API docs](https://developers.ripple.com/subscription-methods.html) for details.
+The `rippled` server can push updates to your client when various events happen.
+Refer to [Subscriptions in the `rippled` API docs](https://xrpl.org/subscribe.html) for details.
 
 Note that the `streams` parameter for generic streams takes an array. For example, to subscribe to the `validations` stream, use `{ streams: [ 'validations' ] }`.
 
