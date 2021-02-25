@@ -643,9 +643,9 @@ asn1.js@^5.2.0:
     safer-buffer "^2.1.0"
 
 assert-diff@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/assert-diff/-/assert-diff-3.0.1.tgz#41720c433a2cef91a7cd4cedd2b21b4ba8719512"
-  integrity sha512-TxoFgLKQCGHNBDMEayf0YKSEf0CS3Xxmmx1RX6dsiun+YkwqO3NEoy6kpmQkrTw9e3juLbi4TUtrppUrXiYfrw==
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/assert-diff/-/assert-diff-3.0.2.tgz#3e92ae3f9663fdc46abe163e2aa209f371a318bc"
+  integrity sha512-3FaXH0uQeMcFpVTcFjOsd6GQdiGgDoy7BYu/HEj/YZ+bjgZLC/i8nSIgerlUbY+iyoCKdEdjzYyNO9BUPcwUmA==
   dependencies:
     assert-plus "1.0.0"
     json-diff "0.5.4"
