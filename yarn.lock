@@ -3322,9 +3322,9 @@ ripple-address-codec@^4.0.0, ripple-address-codec@^4.1.1:
     create-hash "^1.1.2"
 
 ripple-binary-codec@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/ripple-binary-codec/-/ripple-binary-codec-1.1.0.tgz#829c8ecb4c5d1b6808372f2959dc912ab16efb44"
-  integrity sha512-kziWFi6TjE0TB3uNbIWU4QPkht8FiOUqDO6v5cEA4l1OEY/MnTvQS0WSN+vib3oRO72mVfhDCSHtfnUDqDYBkA==
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/ripple-binary-codec/-/ripple-binary-codec-1.1.1.tgz#015920faa11f09dde6f6715717e1feb1adef6f6d"
+  integrity sha512-oqmGIahQynGodn3mizqxm8vbbpuz6+N+w4tp/lVml+R8/Qd93xs81irmRXQmtQV+Dm5Gu1Z1FR3mGUvr1QEz0Q==
   dependencies:
     assert "^2.0.0"
     big-integer "^1.6.48"
