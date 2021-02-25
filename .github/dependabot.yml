@@ -1,0 +1,13 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: monthly
+    time: "15:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: jsonschema
+    versions:
+    - "> 1.2.2"
+    - "< 2"
