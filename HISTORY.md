@@ -2,6 +2,30 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.9.1 (2021-02-25)
+
+* Docs
+  * Add transaction specifications: (#1352)
+    * Ticket Create
+    * Account Delete
+    * Deposit Preauth
+  * Update link to subscribe page (#1354)
+* Bug fixes
+  * Allow connectionTimeout option to be customized (#1355)
+    * Add Bithomp explorer
+    * Add example of reliable transaction submission
+* Dependencies
+  * Bump ripple-keypairs to 1.0.3
+  * Bump elliptic to 6.5.4 (this patches a potential security issue, although we do not believe that the issue affects ripple-lib: [details](https://github.com/ripple/ripple-keypairs/security/advisories/GHSA-w6x3-9ph2-7x54))
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+f59e0221a7218460eea59b0441a0ee2d2a14484dd473ed5373283852798516c7  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+731ed44cbff8db26bcf256e0e3f3ac3fe90a10b6c227701d67918a5d643c5b29  build/ripple-latest.js
+```
+
 ## 1.9.0 (2020-12-07)
 
 * New features
