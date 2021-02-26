@@ -12,8 +12,6 @@ Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.co
   * Update link to subscribe page (#1354)
 * Bug fixes
   * Allow connectionTimeout option to be customized (#1355)
-    * Add Bithomp explorer
-    * Add example of reliable transaction submission
 * Dependencies
   * Bump ripple-keypairs to 1.0.3
   * Bump elliptic to 6.5.4 (this patches a potential security issue, although we do not believe that the issue affects ripple-lib: [details](https://github.com/ripple/ripple-keypairs/security/advisories/GHSA-w6x3-9ph2-7x54))
