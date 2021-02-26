@@ -29,17 +29,20 @@
     "lodash.isequal": "^4.5.0",
     "ripple-address-codec": "^4.1.1",
     "ripple-binary-codec": "^1.1.0",
-    "ripple-keypairs": "^1.0.0",
+    "ripple-keypairs": "^1.0.3",
     "ripple-lib-transactionparser": "0.8.2",
     "ws": "^7.2.0"
+  },
+  "resolutions": {
+    "elliptic": "^6.5.4"
   },
   "devDependencies": {
     "@types/mocha": "^7.0.1",
     "@types/node": "^14.0.1",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.27.0",
-    "assert-diff": "^3.0.0",
     "assert": "^2.0.0",
+    "assert-diff": "^3.0.0",
     "buffer": "^6.0.2",
     "crypto-browserify": "^3.12.0",
     "doctoc": "^1.4.0",
