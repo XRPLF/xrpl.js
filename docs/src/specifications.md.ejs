@@ -23,7 +23,7 @@ Cancel a Check that has not been redeemed. (Native transaction type: [CheckCance
 
 ## Check Cash
 
-Redeem a Check for up to its stated value. (Native transaction type: []())
+Redeem a Check for up to its stated value. (Native transaction type: [CheckCash](https://xrpl.org/checkcash.html))
 
 <%- renderSchema('specifications/check-cash.json') %>
 
@@ -54,7 +54,7 @@ Preauthorize an sender to deposit money at an account using [Deposit Authorizati
 
 ## Escrow Cancellation
 
-Cancel an Escrow that has passed its expiration. (Native transaction type: []())
+Cancel an Escrow that has passed its expiration. (Native transaction type: [EscrowCancel](https://xrpl.org/escrowcancel.html))
 
 <%- renderSchema('specifications/escrow-cancellation.json') %>
 
@@ -65,7 +65,7 @@ Cancel an Escrow that has passed its expiration. (Native transaction type: []())
 
 ## Escrow Creation
 
-Create an Escrow that locks up XRP until a given time or condition is met. (Native transaction type: []())
+Create an Escrow that locks up XRP until a given time or condition is met. (Native transaction type: [EscrowCreate](https://xrpl.org/escrowcreate.html))
 
 <%- renderSchema('specifications/escrow-creation.json') %>
 
@@ -76,7 +76,7 @@ Create an Escrow that locks up XRP until a given time or condition is met. (Nati
 
 ## Escrow Execution
 
-Deliver XRP from an Escrow after its conditions have been met. (Native transaction type: []())
+Deliver XRP from an Escrow after its conditions have been met. (Native transaction type: [EscrowFinish](https://xrpl.org/escrowfinish.html))
 
 <%- renderSchema('specifications/escrow-execution.json') %>
 

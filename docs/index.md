@@ -429,7 +429,7 @@ checkID | string | The ID of the Check ledger object to cancel, as a 64-characte
 
 ## Check Cash
 
-Redeem a Check for up to its stated value. (Native transaction type: []())
+Redeem a Check for up to its stated value. (Native transaction type: [CheckCash](https://xrpl.org/checkcash.html))
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -493,7 +493,7 @@ unauthorize | [address](#address) | *Optional* Address of the account that can c
 
 ## Escrow Cancellation
 
-Cancel an Escrow that has passed its expiration. (Native transaction type: []())
+Cancel an Escrow that has passed its expiration. (Native transaction type: [EscrowCancel](https://xrpl.org/escrowcancel.html))
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -515,7 +515,7 @@ memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the
 
 ## Escrow Creation
 
-Create an Escrow that locks up XRP until a given time or condition is met. (Native transaction type: []())
+Create an Escrow that locks up XRP until a given time or condition is met. (Native transaction type: [EscrowCreate](https://xrpl.org/escrowcreate.html))
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -544,7 +544,7 @@ sourceTag | integer | *Optional* Source tag.
 
 ## Escrow Execution
 
-Deliver XRP from an Escrow after its conditions have been met. (Native transaction type: []())
+Deliver XRP from an Escrow after its conditions have been met. (Native transaction type: [EscrowFinish](https://xrpl.org/escrowfinish.html))
 
 Name | Type | Description
 ---- | ---- | -----------
