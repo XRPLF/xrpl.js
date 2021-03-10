@@ -1,5 +1,8 @@
 # ripple-binary-codec Release History
 
+## 1.1.2 (2021-03-10)
+- Fix for case UInt64.from string '0' due to changes in rippled 1.7.0
+
 ## 1.1.1 (2021-02-12)
 - PathSet.toJSON() does not return undefined values
 - Add support for X-Addresses in Issued Currency Amounts
