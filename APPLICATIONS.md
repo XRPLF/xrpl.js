@@ -151,7 +151,3 @@ Warning: Use at your own risk.
 - **[XRP Stats](https://ledger.exposed/)** (ledger.exposed)
 
   Rich list, live ledger stats and XRP distribution. Visualize escrows and flow of funds.
-
-- **[XRP Vanity](https://xrpvanity.com/)** (xrpvanity.com)
-
-  Custom XRP addresses for sale, delivered by SetRegularKey.
