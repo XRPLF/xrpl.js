@@ -2,6 +2,24 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.9.2 (2021-03-12)
+
+* Docs
+  * Add missing transaction type links (#1378)
+* Bug fixes
+  * Deserialization and verification of payment paths (#1382) (#1347) (#1376)
+* Dependencies
+  * Bump ripple-binary-codec to 1.1.2
+  * Bump lodash, ripple-address-codec
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+a1fd24b65d81ea5dbc36d74da7a6317267a048bba084effff5380d47299c3c63  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+410f78105c4f23c13671ec94f963ef47179393bfcad65ff610bc838c5a3c6a65  build/ripple-latest.js
+```
+
 ## 1.9.1 (2021-02-25)
 
 * Docs
