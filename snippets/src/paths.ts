@@ -2,8 +2,8 @@ import {RippleAPI} from '../../dist/npm'
 
 const api = new RippleAPI({
   // server: 'wss://s.altnet.rippletest.net:51233'
-  server: 'ws://35.158.96.209:51233'
-  // 34.210.87.206
+  // server: 'ws://35.158.96.209:51233'
+  server: 'ws://34.210.87.206:51233'
 })
 
 sign()
