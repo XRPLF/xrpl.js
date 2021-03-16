@@ -89,7 +89,7 @@ import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 import {ConnectionUserOptions} from './common/connection'
-import {isValidXAddress, isValidClassicAddress} from 'ripple-address-codec'
+import {classicAddressToXAddress, xAddressToClassicAddress, isValidXAddress, isValidClassicAddress, encodeSeed, decodeSeed, encodeAccountID, decodeAccountID, encodeNodePublic, decodeNodePublic, encodeAccountPublic, decodeAccountPublic, encodeXAddress, decodeXAddress} from 'ripple-address-codec'
 import {
   computeBinaryTransactionHash,
   computeTransactionHash,
@@ -415,8 +415,23 @@ class RippleAPI extends EventEmitter {
   // RippleAPI.deriveClassicAddress (static) is a new name for api.deriveAddress
   static deriveClassicAddress = deriveAddress
 
-  static isValidXAddress = isValidXAddress
-  static isValidClassicAddress = isValidClassicAddress
+  /**
+   * Static methods to expose ripple-address-codec methods
+   */
+   static classicAddressToXAddress = classicAddressToXAddress
+   static xAddressToClassicAddress = xAddressToClassicAddress
+   static isValidXAddress = isValidXAddress
+   static isValidClassicAddress = isValidClassicAddress
+   static encodeSeed = encodeSeed
+   static decodeSeed = decodeSeed
+   static encodeAccountID = encodeAccountID
+   static decodeAccountID = decodeAccountID
+   static encodeNodePublic = encodeNodePublic
+   static decodeNodePublic = decodeNodePublic
+   static encodeAccountPublic = encodeAccountPublic
+   static decodeAccountPublic = decodeAccountPublic
+   static encodeXAddress = encodeXAddress
+   static decodeXAddress = decodeXAddress
 
   /**
    * Static methods that replace functionality from the now-deprecated ripple-hashes library
