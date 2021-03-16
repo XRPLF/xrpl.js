@@ -4,21 +4,14 @@ Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.co
 
 ## UNRELEASED
 
-* Expose ripple-address-codec methods. These are static methods on RippleAPI, so you do not need to create a RippleAPI object.
-  * classicAddressToXAddress
-  * xAddressToClassicAddress
-  * isValidXAddress
-  * isValidClassicAddress
-  * encodeSeed
-  * decodeSeed
-  * encodeAccountID
-  * decodeAccountID
-  * encodeNodePublic
-  * decodeNodePublic
-  * encodeAccountPublic
-  * decodeAccountPublic
-  * encodeXAddress
-  * decodeXAddress
+* Expose ripple-address-codec methods. These are static methods on RippleAPI, so you do not need to create a RippleAPI instance.
+  * `classicAddressToXAddress` / `xAddressToClassicAddress`
+  * `isValidXAddress` / `isValidClassicAddress`
+  * `encodeSeed` / `decodeSeed`
+  * `encodeAccountID` / `decodeAccountID`
+  * `encodeNodePublic` / `decodeNodePublic`
+  * `encodeAccountPublic` / `decodeAccountPublic`
+  * `encodeXAddress` / `decodeXAddress`
 
 Example 1. Encode an X-address with tag 4294967295:
 ```js
