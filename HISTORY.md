@@ -48,6 +48,7 @@ Example 3. Decode an X-address:
 ```js
 const RippleAPI = require('ripple-lib').RippleAPI
 const address = RippleAPI.xAddressToClassicAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi')
+console.log(address)
 ```
 
 Output for Example 3:
