@@ -2,6 +2,57 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## UNRELEASED
+
+* Expose ripple-address-codec methods. These are static methods on RippleAPI, so you do not need to create a RippleAPI instance.
+  * `classicAddressToXAddress` / `xAddressToClassicAddress`
+  * `isValidXAddress` / `isValidClassicAddress`
+  * `encodeSeed` / `decodeSeed`
+  * `encodeAccountID` / `decodeAccountID`
+  * `encodeNodePublic` / `decodeNodePublic`
+  * `encodeAccountPublic` / `decodeAccountPublic`
+  * `encodeXAddress` / `decodeXAddress`
+
+Example 1. Encode an X-address with tag 4294967295:
+```js
+const RippleAPI = require('ripple-lib').RippleAPI
+const xAddress = RippleAPI.classicAddressToXAddress('rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf', 4294967295)
+console.log(xAddress)
+```
+
+Output for Example 1:
+```
+XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi
+```
+
+Example 2. Encode a test address for use with Testnet or Devnet:
+```js
+const RippleAPI = require('ripple-lib').RippleAPI
+const address = RippleAPI.classicAddressToXAddress('r3SVzk8ApofDJuVBPKdmbbLjWGCCXpBQ2g', 123, true)
+console.log(address)
+```
+
+Output for Example 2:
+```
+T7oKJ3q7s94kDH6tpkBowhetT1JKfcfdSCmAXbS75iATyLD
+```
+
+Example 3. Decode an X-address:
+```js
+const RippleAPI = require('ripple-lib').RippleAPI
+const address = RippleAPI.xAddressToClassicAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi')
+console.log(address)
+```
+
+Output for Example 3:
+```js
+{
+  classicAddress: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+  tag: 4294967295,
+  test: false
+}
+```
+
 ## 1.9.2 (2021-03-12)
 
 * Docs

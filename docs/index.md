@@ -43,6 +43,8 @@
   - [requestNextPage](#requestnextpage)
 - [Static Methods](#static-methods)
   - [computeBinaryTransactionHash](#computebinarytransactionhash)
+  - [classicAddressToXAddress](#classicaddresstoxaddress)
+  - [xAddressToClassicAddress](#xaddresstoclassicaddress)
   - [renameCounterpartyToIssuer](#renamecounterpartytoissuer)
   - [formatBidsAndAsks](#formatbidsandasks)
 - [API Methods](#api-methods)
@@ -1037,7 +1039,14 @@ return api.request(command, params).then(response => {
 
 # Static Methods
 
-ripple-lib features a number of static methods that you can access directly on the `RippleAPI` object. The most commonly-used one is `computeBinaryTransactionHash`, described below. For the full list, see the [XRP Ledger Hashes README](https://github.com/ripple/ripple-lib/blob/develop/src/common/hashes/README.md).
+You can access static methods directly on the `RippleAPI` class. For example, `RippleAPI.computeBinaryTransactionHash(...)`.
+
+A few of the most commonly-used methods are documented below.
+
+For a full list, refer to these docs:
+
+- [XRP Ledger Hashes](https://github.com/ripple/ripple-lib/blob/develop/src/common/hashes/README.md)
+- [ripple-address-codec API](https://github.com/ripple/ripple-address-codec/blob/master/README.md#api)
 
 ## computeBinaryTransactionHash
 
@@ -1070,6 +1079,64 @@ Transaction hash: 80C5E11E1A21A626759D6CB944B33DBAAC66BD704A289C86E330B847904F5C
 ```
 
 [RunKit Example: computeBinaryTransactionHash](https://runkit.com/intelliot/computebinarytransactionhash-example)
+
+## classicAddressToXAddress
+
+`classicAddressToXAddress(classicAddress: string, tag: number | false[, test: boolean]): string`
+
+Convert a classic address and tag to an X-address.
+
+If `test` is `true`, the address with start with `T` and readers of the address will know that the address is intended for use on a test network.
+
+### Example: Encode an X-address with tag 4294967295
+
+```javascript
+const RippleAPI = require('ripple-lib').RippleAPI
+const xAddress = RippleAPI.classicAddressToXAddress('rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf', 4294967295)
+console.log(xAddress)
+```
+
+```
+XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi
+```
+
+### Example: Encode a test address for use with Testnet or Devnet
+
+```javascript
+const RippleAPI = require('ripple-lib').RippleAPI
+const address = RippleAPI.classicAddressToXAddress('r3SVzk8ApofDJuVBPKdmbbLjWGCCXpBQ2g', 123, true)
+console.log(address)
+```
+
+```
+T7oKJ3q7s94kDH6tpkBowhetT1JKfcfdSCmAXbS75iATyLD
+```
+
+## xAddressToClassicAddress
+
+`xAddressToClassicAddress(xAddress: string): {classicAddress: string, tag: number | false, test: boolean}`
+
+Convert an X-address to a classic address and tag.
+
+Since `0` is a valid tag, use `if (tag !== false)` to you want to check for a tag.
+
+If the address is intended for use on a test network, `test === true`. Otherwise, `test === false`.
+
+### Example
+
+```javascript
+const RippleAPI = require('ripple-lib').RippleAPI
+const address = RippleAPI.xAddressToClassicAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi')
+console.log(address)
+```
+
+```
+{
+  classicAddress: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+  tag: 4294967295,
+  test: false
+}
+```
 
 ## renameCounterpartyToIssuer
 
