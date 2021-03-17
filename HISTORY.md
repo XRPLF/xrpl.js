@@ -2,7 +2,7 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
-## UNRELEASED
+## 1.9.3 (2021-03-16)
 
 * Expose ripple-address-codec methods. These are static methods on RippleAPI, so you do not need to create a RippleAPI instance.
   * `classicAddressToXAddress` / `xAddressToClassicAddress`
