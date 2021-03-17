@@ -53,6 +53,14 @@ Output for Example 3:
 }
 ```
 
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+bcc8db4e5464197151a267d9f240693794bf1eb4d26a4e0b3637f82a1d66e440  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+99c2825685d249c074abe7b59abaf197afce67ece7ad08ded6db67185e916dd2  build/ripple-latest.js
+```
+
 ## 1.9.2 (2021-03-12)
 
 * Docs
