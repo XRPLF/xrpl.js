@@ -36,7 +36,61 @@ In an existing project (with `package.json`), install `ripple-lib`:
 $ yarn add ripple-lib
 ```
 
+### Using ripple-lib with React Native
+
+If you want to use `ripple-lib` with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
+
+1. Install dependencies
+
+    ```shell
+    npm i --save react-native-crypto
+    # install peer deps
+    npm i --save react-native-randombytes
+    react-native link react-native-randombytes
+    # install latest rn-nodeify
+    npm i --save-dev rn-nodeify@latest
+    ```
+
+2. Enable `crypto`:
+
+    `rn-nodeify` will create a `shim.js` file in the project root directory.
+    Open it and uncomment the line that requires the crypto module:
+
+    ```shell
+    // If using the crypto shim, uncomment the following line to ensure
+    // crypto is loaded first, so it can populate global.crypto
+    require('crypto')
+    ```
+
+3. After that, run the following command:
+
+    ```shell
+    # install node core shims and recursively hack package.json files
+    # in ./node_modules to add/update the "browser"/"react-native" field with relevant mappings
+    ./node_modules/.bin/rn-nodeify --hack --install
+    ```
+
+### Using ripple-lib Deno
+
+While official support for [Deno](https://deno.land) is added, you can use the following work-around to use `ripple-lib` with Deno:
+
+```
+import ripple from 'https://dev.jspm.io/npm:ripple-lib';
+
+(async () => {
+  const api = new (ripple as any).RippleAPI({ server: 'wss://s.altnet.rippletest.net:51233' });
+  const address = 'rH8NxV12EuV...khfJ5uw9kT';
+
+  api.connect().then(() => {
+    api.getBalances(address).then((balances: any) => {
+      console.log(JSON.stringify(balances, null, 2));
+    });
+  });
+})();
+```
+
 Then see the documentation:
+
 
 ## Documentation
 
