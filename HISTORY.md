@@ -69,6 +69,7 @@ fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-l
   * Deserialization and verification of payment paths (#1382) (#1347) (#1376)
 * Dependencies
   * Bump ripple-binary-codec to 1.1.2
+    * Fix edge case when constructing a value from "0", which can occur when using rippled v1.7.0
   * Bump lodash, ripple-address-codec
 
 The SHA-256 checksums for the browser version of this release can be found below.
