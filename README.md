@@ -36,7 +36,7 @@ In an existing project (with `package.json`), install `ripple-lib`:
 $ yarn add ripple-lib
 ```
 
-Then see the [documentation] (#documentation).
+Then see the [documentation](#documentation).
 ### Using ripple-lib with React Native
 
 If you want to use `ripple-lib` with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
