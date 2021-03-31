@@ -42,29 +42,18 @@ Then see the [documentation](#documentation).
 
 If you want to use `ripple-lib` with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
 
-1. Install dependencies
+1. Install dependencies (you can use `npm` as well):
 
     ```shell
-    npm i --save react-native-crypto
+    yarn add react-native-crypto
+    yarn add ripple-lib 
     # install peer deps
-    npm i --save react-native-randombytes
-    react-native link react-native-randombytes
+    yarn add react-native-randombytes
     # install latest rn-nodeify
-    npm i --save-dev rn-nodeify@latest
+    yarn add rn-nodeify@latest --dev
     ```
 
-2. Enable `crypto`:
-
-    `rn-nodeify` will create a `shim.js` file in the project root directory.
-    Open it and uncomment the line that requires the crypto module:
-
-    ```shell
-    // If using the crypto shim, uncomment the following line to ensure
-    // crypto is loaded first, so it can populate global.crypto
-    require('crypto')
-    ```
-
-3. After that, run the following command:
+2. After that, run the following command:
 
     ```shell
     # install node core shims and recursively hack package.json files
@@ -72,11 +61,22 @@ If you want to use `ripple-lib` with React Native you will need to have some of 
     ./node_modules/.bin/rn-nodeify --hack --install
     ```
 
+3. Enable `crypto`:
+
+    `rn-nodeify` will create a `shim.js` file in the project root directory.
+    Open it and uncomment the line that requires the crypto module:
+
+    ```javascript
+    // If using the crypto shim, uncomment the following line to ensure
+    // crypto is loaded first, so it can populate global.crypto
+    require('crypto')
+    ```
+
 ### Using ripple-lib with Deno
 
 Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `ripple-lib` with Deno:
 
-```
+```javascript
 import ripple from 'https://dev.jspm.io/npm:ripple-lib';
 
 (async () => {
