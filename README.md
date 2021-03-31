@@ -37,6 +37,7 @@ $ yarn add ripple-lib
 ```
 
 Then see the [documentation](#documentation).
+
 ### Using ripple-lib with React Native
 
 If you want to use `ripple-lib` with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
@@ -73,7 +74,7 @@ If you want to use `ripple-lib` with React Native you will need to have some of 
 
 ### Using ripple-lib with Deno
 
-While official support for [Deno](https://deno.land) is added, you can use the following work-around to use `ripple-lib` with Deno:
+Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `ripple-lib` with Deno:
 
 ```
 import ripple from 'https://dev.jspm.io/npm:ripple-lib';
