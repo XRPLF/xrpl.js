@@ -72,6 +72,13 @@ If you want to use `ripple-lib` with React Native you will need to have some of 
     require('crypto')
     ```
 
+4. Import `shim` in your project (it must be the first line):
+
+  ```javascript
+  import './shim'
+  ...
+  ```
+
 ### Using ripple-lib with Deno
 
 Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `ripple-lib` with Deno:
