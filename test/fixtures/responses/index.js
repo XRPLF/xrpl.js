@@ -34,6 +34,7 @@ module.exports = {
     orderWithExpirationCancellation:
       require('./get-transaction-order-with-expiration-cancellation.json'),
     order: require('./get-transaction-order.json'),
+    orderWithMemo: require('./get-transaction-order-with-memo.json'),
     orderSell: require('./get-transaction-order-sell.json'),
     noMeta: require('./get-transaction-no-meta.json'),
     payment: require('./get-transaction-payment.json'),

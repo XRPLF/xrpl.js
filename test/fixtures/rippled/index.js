@@ -71,6 +71,7 @@ module.exports = {
     AccountSetTrackingOff: require('./tx/account-set-tracking-off.json'),
     RegularKey: require('./tx/set-regular-key.json'),
     OfferCreate: require('./tx/offer-create.json'),
+    OfferCreateWithMemo: require('./tx/offer-create-with-memo.json'),
     OfferCreateSell: require('./tx/offer-create-sell.json'),
     OfferCancel: require('./tx/offer-cancel.json'),
     OfferCancelWithMemo: require('./tx/offer-cancel-with-memo.json'),

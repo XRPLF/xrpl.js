@@ -440,6 +440,10 @@ export function createMockRippled(port) {
     ) {
       conn.send(createResponse(request, fixtures.tx.OfferCreate))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_OFFER_CREATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.OfferCreateWithMemo))
+    } else if (
       request.transaction ===
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
     ) {

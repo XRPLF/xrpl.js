@@ -69,6 +69,13 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.order, 'getTransaction')
   },
 
+  'order with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_OFFER_CREATE_TRANSACTION_HASH
+    closeLedger(api.connection)
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.orderWithMemo, 'getTransaction')
+  },
+
   'sell order': async (api, address) => {
     const hash =
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
