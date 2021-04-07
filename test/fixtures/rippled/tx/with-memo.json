@@ -1,0 +1,142 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "Account": "rfrCsX1gzVLvXzmgDxTYUWp96Ri6m61qtH",
+    "Fee": "0",
+    "Flags": 2147483648,
+    "LastLedgerSequence": 61369885,
+    "Memos": [
+      {
+        "Memo": {
+          "MemoData": "3732363536653734",
+          "MemoType": "3638373437343730336132663266363537383631366437303663363532653633366636643266366436353664366632663637363536653635373236393633"
+        }
+      }
+    ],
+    "Sequence": 61349002,
+    "SigningPubKey": "0328B3B4516379D13340C12D303EB89EB27301B6EB59F37BE23046845E00880BFE",
+    "TakerGets": "1000000",
+    "TakerPays": {
+      "currency": "NRD",
+      "issuer": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
+      "value": "0.1"
+    },
+    "TransactionType": "OfferCreate",
+    "TxnSignature": "304402206F1CF60223113DE36479736EE0AB9165734F98D6A2DB4B0B2BFCFC02ACAABE1902202E52A62BEE554E5988F79CEE1EEF83D8B66374B9EC539328A132207D927BDDFC",
+    "date": 491488410,
+    "hash": "995570FE1E40F42DF56BFC80503BA9E3C1229619C61A1C279A76BC0805036D74",
+    "inLedger": 3717633,
+    "ledger_index": 3717633,
+    "meta": {
+      "AffectedNodes": [
+        {
+          "ModifiedNode": {
+            "FinalFields": {
+              "Account": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
+              "Balance": "53527227",
+              "Flags": 0,
+              "OwnerCount": 1,
+              "Sequence": 61350142
+            },
+            "LedgerEntryType": "AccountRoot",
+            "LedgerIndex": "17D5C0493F006ECB3748EE5BC72D0FDFB4747DE23B57C3735E281B2DDCBEEEFF",
+            "PreviousFields": {
+              "Balance": "53517227"
+            },
+            "PreviousTxnID": "BA34BA8650E5BD681B6BD28A5E366084FDCA2919FD734E9BAF5FE636465EB246",
+            "PreviousTxnLgrSeq": 61369855
+          }
+        },
+        {
+          "ModifiedNode": {
+            "FinalFields": {
+              "Balance": {
+                "currency": "NRD",
+                "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                "value": "0.40001"
+              },
+              "Flags": 3211264,
+              "HighLimit": {
+                "currency": "NRD",
+                "issuer": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
+                "value": "0"
+              },
+              "HighNode": "0000000000000000",
+              "LowLimit": {
+                "currency": "NRD",
+                "issuer": "rfrCsX1gzVLvXzmgDxTYUWp96Ri6m61qtH",
+                "value": "0"
+              },
+              "LowNode": "0000000000000000"
+            },
+            "LedgerEntryType": "RippleState",
+            "LedgerIndex": "29A9FBE62D9080A572B2D48DBCC5BEE8657F9ACBAFDE2ADC44C34C67F6321717",
+            "PreviousFields": {
+              "Balance": {
+                "currency": "NRD",
+                "issuer": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+                "value": "0.30001"
+              }
+            },
+            "PreviousTxnID": "BA34BA8650E5BD681B6BD28A5E366084FDCA2919FD734E9BAF5FE636465EB246",
+            "PreviousTxnLgrSeq": 61369855
+          }
+        },
+        {
+          "ModifiedNode": {
+            "FinalFields": {
+              "Account": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
+              "BookDirectory": "11DD28D0009D3C92445F21E79CAD5E9AD0B5FDB9000B3D4B5A038D7EA4C68000",
+              "BookNode": "0000000000000000",
+              "Flags": 131072,
+              "OwnerNode": "0000000000000000",
+              "Sequence": 61350140,
+              "TakerGets": {
+                "currency": "NRD",
+                "issuer": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
+                "value": "99999.6"
+              },
+              "TakerPays": "9999960000"
+            },
+            "LedgerEntryType": "Offer",
+            "LedgerIndex": "48B893DA593D08FCDE5B1307D3798C505A2F6DB1494F59BCDF25232E72E26BB8",
+            "PreviousFields": {
+              "TakerGets": {
+                "currency": "NRD",
+                "issuer": "rGaZKAxMDhsSHvB51toY3YxGoPLhaX6Y5R",
+                "value": "99999.7"
+              },
+              "TakerPays": "9999970000"
+            },
+            "PreviousTxnID": "BA34BA8650E5BD681B6BD28A5E366084FDCA2919FD734E9BAF5FE636465EB246",
+            "PreviousTxnLgrSeq": 61369855
+          }
+        },
+        {
+          "ModifiedNode": {
+            "FinalFields": {
+              "Account": "rfrCsX1gzVLvXzmgDxTYUWp96Ri6m61qtH",
+              "Balance": "25709939",
+              "Flags": 0,
+              "OwnerCount": 1,
+              "Sequence": 61349003
+            },
+            "LedgerEntryType": "AccountRoot",
+            "LedgerIndex": "C3EBF1D11573A550EF5660C9A3AF00B1BC7EE7D9F9CDE3351539DDEC1A43F2A1",
+            "PreviousFields": {
+              "Balance": "25719951",
+              "Sequence": 61349002
+            },
+            "PreviousTxnID": "BA34BA8650E5BD681B6BD28A5E366084FDCA2919FD734E9BAF5FE636465EB246",
+            "PreviousTxnLgrSeq": 61369855
+          }
+        }
+      ],
+      "TransactionIndex": 3,
+      "TransactionResult": "tesSUCCESS"
+    },
+    "validated": true
+  }  
+}
