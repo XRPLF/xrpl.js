@@ -440,6 +440,10 @@ export function createMockRippled(port) {
     ) {
       conn.send(createResponse(request, fixtures.tx.OfferCreate))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_OFFER_CREATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.OfferCreateWithMemo))
+    } else if (
       request.transaction ===
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
     ) {
@@ -449,6 +453,10 @@ export function createMockRippled(port) {
       '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E'
     ) {
       conn.send(createResponse(request, fixtures.tx.OfferCancel))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_ORDER_CANCELLATION_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.OfferCancelWithMemo))
     } else if (
       request.transaction ===
       '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D'
@@ -491,12 +499,23 @@ export function createMockRippled(port) {
       conn.send(createResponse(request, fixtures.tx.NotValidated))
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
       conn.send(createResponse(request, fixtures.tx.NotFound))
+    } else if (request.transaction === hashes.WITH_MEMOS_ACCOUNT_DELETE_TRANSACTION_HASH) {
+      conn.send(createResponse(request, fixtures.tx.AccountDeleteWithMemo))
     } else if (
       request.transaction ===
       '097B9491CC76B64831F1FEA82EAA93BCD728106D90B65A072C933888E946C40B'
     ) {
       conn.send(createResponse(request, fixtures.tx.OfferWithExpiration))
+    } else if (
+      request.transaction === hashes.WITH_MEMO_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.WithMemo))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.WithMemos))
     }
+
 
     // Checks
     else if (
@@ -505,15 +524,27 @@ export function createMockRippled(port) {
     ) {
       conn.send(createResponse(request, fixtures.tx.CheckCreate))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_CHECK_CREATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.CheckCreateWithMemo))
+    } else if (
       request.transaction ===
       'B4105D1B2D83819647E4692B7C5843D674283F669524BD50C9614182E3A12CD4'
     ) {
       conn.send(createResponse(request, fixtures.tx.CheckCancel))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_CHECK_CANCEL_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.CheckCancelWithMemo))
+    } else if (
       request.transaction ===
       '8321208465F70BA52C28BCC4F646BAF3B012BA13B57576C0336F42D77E3E0749'
     ) {
       conn.send(createResponse(request, fixtures.tx.CheckCash))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_CHECK_CASH_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.CheckCashWithMemo))
     }
 
     // Escrows
@@ -546,15 +577,27 @@ export function createMockRippled(port) {
     ) {
       conn.send(createResponse(request, fixtures.tx.PaymentChannelCreate))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_PAYMENT_CHANNEL_CREATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.PaymentChannelCreateWithMemo))
+    } else if (
       request.transaction ===
       'CD053D8867007A6A4ACB7A432605FE476D088DCB515AFFC886CF2B4EB6D2AE8B'
     ) {
       conn.send(createResponse(request, fixtures.tx.PaymentChannelFund))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_PAYMENT_CHANNEL_FUND_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.PaymentChannelFundWithMemo))
+    } else if (
       request.transaction ===
       '81B9ECAE7195EB6E8034AEDF44D8415A7A803E14513FDBB34FA984AB37D59563'
     ) {
       conn.send(createResponse(request, fixtures.tx.PaymentChannelClaim))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_PAYMENT_CHANNEL_CLAIM_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.PaymentChannelClaimWithMemo))
     } else if (
       request.transaction ===
       'EC2AB14028DC84DE525470AB4DAAA46358B50A8662C63804BFF38244731C0CB9'
@@ -585,6 +628,18 @@ export function createMockRippled(port) {
       'C6A40F56127436DCD830B1B35FF939FD05B5747D30D6542572B7A835239817AF'
     ) {
       conn.send(createResponse(request, fixtures.tx.SetFee))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_FEE_UPDATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.SetFeeWithMemo))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_TICKET_CREATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.TicketCreateWithMemo))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_DEPOSIT_PREAUTH_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.DepositPreauthWithMemo))
     } else {
       assert(false, 'Unrecognized transaction hash: ' + request.transaction)
     }

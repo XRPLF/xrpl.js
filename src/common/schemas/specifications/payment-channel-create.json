@@ -32,7 +32,8 @@
     "destinationTag": {
       "$ref": "tag",
       "description": "Destination tag."
-    }
+    },
+    "memos": {"$ref": "memos"}
   },
   "required": ["amount", "destination", "settleDelay", "publicKey"],
   "additionalProperties": false

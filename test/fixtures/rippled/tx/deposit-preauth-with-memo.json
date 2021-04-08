@@ -1,0 +1,75 @@
+{
+  "id": 0,
+  "result": {
+    "Account": "rH8AzLerezBnkuM7reZfrQ513nRvKjDrnx",
+    "Authorize": "rErhTv3pwYAgsERLfhtWeE33wAHtDRuUwK",
+    "Fee": "12",
+    "Flags": 2147483648,
+    "LastLedgerSequence": 16433988,
+    "Memos": [
+      {
+        "Memo": {
+          "MemoData": "7465787465642064617461",
+          "MemoFormat": "746578742F706C61696E",
+          "MemoType": "74657374"
+        }
+      }
+    ],
+    "Sequence": 16433982,
+    "SigningPubKey": "03283FCB84B7F6FD8850EB7F81BE5434664EE6B42EFF32E5AE76EED4BD87F30D23",
+    "TransactionType": "DepositPreauth",
+    "hash": "3BA61A2621C09A119A12EA9271AE5FA165B6E39657E02BFD3C5B21E28F72B883",
+    "ledger_index": 16433986,
+    "TxnSignature": "30440220366BB53FAD33244F2B4B4EE662C95792278E18FEB3B8ED89E18F3AC255CF7C8202204B7D3D5D583E896F375BBBD392B505DDCF7AEF6F3782AB545B0F283028FE5B92",
+    "date": 572739601,
+    "meta": {
+      "AffectedNodes": [
+        {
+          "ModifiedNode": {
+            "FinalFields": {
+              "Account": "rH8AzLerezBnkuM7reZfrQ513nRvKjDrnx",
+              "Balance": "999999988",
+              "Flags": 0,
+              "OwnerCount": 1,
+              "Sequence": 16433983
+            },
+            "LedgerEntryType": "AccountRoot",
+            "LedgerIndex": "5FF7DCF66453BCFEF8595FB929783EBE8A86571FBB4BE2F103A50334A2E9A2A5",
+            "PreviousFields": {
+              "Balance": "1000000000",
+              "OwnerCount": 0,
+              "Sequence": 16433982
+            },
+            "PreviousTxnID": "C40F81BF959F817399E0D4C5103204688055D0183F5D530B0CA672A325E7282E",
+            "PreviousTxnLgrSeq": 16433982
+          }
+        },
+        {
+          "CreatedNode": {
+            "LedgerEntryType": "DirectoryNode",
+            "LedgerIndex": "984CD3B68FA7716C44072AA8565DB3062AB5C302D518CCF3AC91E3EED06AA0B7",
+            "NewFields": {
+              "Owner": "rH8AzLerezBnkuM7reZfrQ513nRvKjDrnx",
+              "RootIndex": "984CD3B68FA7716C44072AA8565DB3062AB5C302D518CCF3AC91E3EED06AA0B7"
+            }
+          }
+        },
+        {
+          "CreatedNode": {
+            "LedgerEntryType": "DepositPreauth",
+            "LedgerIndex": "E9DB9D76B046964BF2070923925AFF430D3B3A7EB174D66399990FD70473AADA",
+            "NewFields": {
+              "Account": "rH8AzLerezBnkuM7reZfrQ513nRvKjDrnx",
+              "Authorize": "rErhTv3pwYAgsERLfhtWeE33wAHtDRuUwK"
+            }
+          }
+        }
+      ],
+      "TransactionIndex": 0,
+      "TransactionResult": "tesSUCCESS"
+    },
+    "validated": true
+  },
+  "status": "success",
+  "type": "response"
+}

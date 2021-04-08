@@ -71,8 +71,10 @@ module.exports = {
     AccountSetTrackingOff: require('./tx/account-set-tracking-off.json'),
     RegularKey: require('./tx/set-regular-key.json'),
     OfferCreate: require('./tx/offer-create.json'),
+    OfferCreateWithMemo: require('./tx/offer-create-with-memo.json'),
     OfferCreateSell: require('./tx/offer-create-sell.json'),
     OfferCancel: require('./tx/offer-cancel.json'),
+    OfferCancelWithMemo: require('./tx/offer-cancel-with-memo.json'),
     TrustSet: require('./tx/trust-set.json'),
     TrustSetFrozenOff: require('./tx/trust-set-frozen-off.json'),
     TrustSetNoQuality: require('./tx/trust-set-no-quality.json'),
@@ -84,8 +86,11 @@ module.exports = {
     NotValidated: require('./tx/not-validated.json'),
     OfferWithExpiration: require('./tx/order-with-expiration.json'),
     CheckCreate: require('./tx/check-create.json'),
+    CheckCreateWithMemo: require('./tx/check-create-with-memo.json'),
     CheckCancel: require('./tx/check-cancel.json'),
+    CheckCancelWithMemo: require('./tx/check-cancel-with-memo.json'),
     CheckCash: require('./tx/check-cash.json'),
+    CheckCashWithMemo: require('./tx/check-cash-with-memo.json'),
     EscrowCreation: require('./tx/escrow-creation.json'),
     EscrowCancellation:
       require('./tx/escrow-cancellation.json'),
@@ -93,13 +98,22 @@ module.exports = {
     EscrowExecutionSimple:
       require('./tx/escrow-execution-simple.json'),
     PaymentChannelCreate: require('./tx/payment-channel-create.json'),
+    PaymentChannelCreateWithMemo: require('./tx/payment-channel-create-with-memo.json'),
     PaymentChannelFund: require('./tx/payment-channel-fund.json'),
+    PaymentChannelFundWithMemo: require('./tx/payment-channel-fund-with-memo.json'),
     PaymentChannelClaim: require('./tx/payment-channel-claim.json'),
+    PaymentChannelClaimWithMemo: require('./tx/payment-channel-claim-with-memo.json'),
     Unrecognized: require('./tx/unrecognized.json'),
     NoMeta: require('./tx/no-meta.json'),
     LedgerZero: require('./tx/ledger-zero.json'),
     Amendment: require('./tx/amendment.json'),
     SetFee: require('./tx/set-fee.json'),
-    AccountDelete: require('./tx/account-delete.json')
+    SetFeeWithMemo: require('./tx/set-fee-with-memo.json'),
+    TicketCreateWithMemo: require('./tx/ticket-create-with-memo.json'),
+    DepositPreauthWithMemo: require('./tx/deposit-preauth-with-memo.json'),
+    AccountDelete: require('./tx/account-delete.json'),
+    AccountDeleteWithMemo: require('./tx/account-delete-with-memo.json'),
+    WithMemo: require('./tx/with-memo.json'),
+    WithMemos: require('./tx/with-memos.json')
   }
 };

@@ -31,7 +31,8 @@
     "close": {
       "type": "boolean",
       "description": "Request to close the channel. If the channel has no XRP remaining or the destination address requests it, closes the channel immediately (returning unclaimed XRP to the source address). Otherwise, sets the channel to expire after settleDelay seconds have passed."
-    }
+    },
+    "memos": {"$ref": "memos"}
   },
   "required": ["channel"],
   "additionalProperties": false

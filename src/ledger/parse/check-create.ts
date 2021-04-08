@@ -3,6 +3,7 @@ import {parseTimestamp} from './utils'
 import {removeUndefined} from '../../common'
 import parseAmount from './amount'
 import {Amount} from '../../common/types/objects'
+import {parseMemos} from './utils'
 
 export type FormattedCheckCreate = {
   // account that can cash the check.
@@ -26,6 +27,7 @@ function parseCheckCreate(tx: any): FormattedCheckCreate {
   assert.ok(tx.TransactionType === 'CheckCreate')
 
   return removeUndefined({
+    memos: parseMemos(tx),
     destination: tx.Destination,
     sendMax: parseAmount(tx.SendMax),
     destinationTag: tx.DestinationTag,

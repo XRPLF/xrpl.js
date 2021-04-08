@@ -1,5 +1,5 @@
 import * as assert from 'assert'
-import {parseTimestamp} from './utils'
+import {parseTimestamp,parseMemos} from './utils'
 import {removeUndefined} from '../../common'
 import parseAmount from './amount'
 
@@ -7,6 +7,7 @@ function parsePaymentChannelCreate(tx: any): object {
   assert.ok(tx.TransactionType === 'PaymentChannelCreate')
 
   return removeUndefined({
+    memos: parseMemos(tx),
     amount: parseAmount(tx.Amount).value,
     destination: tx.Destination,
     settleDelay: tx.SettleDelay,
