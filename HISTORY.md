@@ -2,6 +2,19 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.9.4 (2021-04-18)
+
+* Add memos support for all transaction types for getTransactions (#1353, #1397)
+* Add Deno and React instructions (#1387)
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+daa2b892a18037e89fea6fcf7de67624a782971956cb8df17cd765a4b0201ee9  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+b1d0bab54c6dbc76091610ede54a4269e73dea8cc6a9c25738d62bd7671920e4  build/ripple-latest.js
+```
+
 ## 1.9.3 (2021-03-16)
 
 * Expose ripple-address-codec methods. These are static methods on RippleAPI, so you do not need to create a RippleAPI instance.
