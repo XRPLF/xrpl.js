@@ -62,6 +62,16 @@ Warning: Use at your own risk.
 
   Monitor the XRPL using powerful JSONPath expressions, and receive notifications via email, SMS, webhooks, and more.
 
+## ODL Monitoring
+
+- **[Utility-scan](https://utility-scan.com)**
+
+  Spots RippleNet on-demand liquidity (ODL) transactions of known fiat  corridors and provide an overview report of those transaction in real time, written in Java.
+
+- **[xrpl-rosetta](https://xrpl-rosetta-oepox.ondigitalocean.app)**
+
+  3D Globe written in three.js connected to a nodeJS websocket server that inturn is listening to exchanges and XRPL. The visualization is looking to show trading/ODL/liquidity at exchanges and intra exchange volume and flows in real time.
+
 ## Wallets and wallet tools
 
 - **[XUMM](https://xumm.app/)**
