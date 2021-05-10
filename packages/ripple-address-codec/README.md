@@ -175,6 +175,10 @@ Use `--coverage` to generate and display code coverage information:
 
 This tells jest to output code coverage info in the `./coverage` directory, in addition to showing it on the command line.
 
+## Releases
+
+Use the [ripple-lib release checklist](https://github.com/ripple/ripple-lib/wiki/Release-Checklist), but just use `master` instead of `develop` as this project does not use a develop branch.
+
 ## Acknowledgements
 
 This library references and adopts code and standards from the following sources:

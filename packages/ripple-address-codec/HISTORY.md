@@ -1,4 +1,10 @@
-# ripple-address-codec Release History
+# ripple-address-cod
+
+## 4.1.3 (2021-05-10)
+
+* Update dependencies
+* Add `build` script as an alias for `compile`
+* Update README
 
 ## 4.1.2 (2021-01-11)
 
