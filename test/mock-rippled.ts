@@ -224,6 +224,8 @@ export function createMockRippled(port) {
         }
       }
       conn.send(createResponse(request, response))
+    } else if (conn.config.reporting) {
+      conn.send(createResponse(request, fixtures.server_info.reporting))
     } else if (conn.config.returnErrorOnServerInfo) {
       conn.send(createResponse(request, fixtures.server_info.error))
     } else if (conn.config.disconnectOnServerInfo) {
