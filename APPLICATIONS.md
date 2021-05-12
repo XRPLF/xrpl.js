@@ -20,7 +20,7 @@ Warning: Use at your own risk.
 
   Exchange allowing clients to buy and sell XRP, based in Mexico.
 
-## Data and visualizations
+## Explorers
 
 - **[xrpintel - XRP Intelligence](https://xrpintel.com/)**
 
@@ -58,9 +58,19 @@ Warning: Use at your own risk.
 
   XRP Ledger explorer, API, metrics, and analytics using a graph database that is synchronized live with the XRPL.
 
+## Data monitoring
+
 - **[zerptracker](https://zerptracker.com)**
 
   Monitor the XRPL using powerful JSONPath expressions, and receive notifications via email, SMS, webhooks, and more.
+
+- **[Utility-Scan](https://utility-scan.com)**
+
+  Attempts to detect RippleNet on-demand liquidity (ODL) transactions through known fiat corridors and report these transactions in real time.
+
+- **[XRPL Rosetta](https://xrpl-rosetta-oepox.ondigitalocean.app)**
+
+  3D Globe written in three.js connected to a Node.js websocket server that is listening to exchanges and the XRPL. The visualization aims to show trading, ODL, and liquidity at exchanges, intra-exchange volume, and flows.
 
 ## Wallets and wallet tools
 
