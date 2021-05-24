@@ -73,7 +73,7 @@
     "doctoc": "doctoc docs/index.md --title '# RippleAPI Reference' --github --maxlevel 2",
     "docgen": "node --harmony scripts/build_docs.js",
     "prepublish": "yarn clean && yarn build",
-    "test": "TS_NODE_PROJECT=src/tsconfig.json nyc mocha --exit",
+    "test": "TS_NODE_PROJECT=src/tsconfig.json nyc mocha --config=test/.mocharc.json --exit",
     "test:watch": "TS_NODE_PROJECT=src/tsconfig.json mocha --watch --reporter dot",
     "format": "prettier --write '{src,test}/**/*.ts'",
     "lint": "eslint 'src/**/*.ts' 'test/*-test.{ts,js}'",
