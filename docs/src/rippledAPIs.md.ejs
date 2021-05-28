@@ -1,15 +1,15 @@
 # rippled APIs
 
-ripple-lib relies on [rippled APIs](https://ripple.com/build/rippled-apis/) for online functionality. In addition to ripple-lib's own methods, you can also access rippled APIs through ripple-lib. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
+ripple-lib uses the XRP Ledger's [WebSocket API](https://xrpl.org/rippled-api.html) for online functionality. You can use ripple-lib to call these APIs directly. Use the `request()`, `hasNextPage()`, and `requestNextPage()` methods:
 
-* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://ripple.com/build/rippled-apis/#api-methods).
-* Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://ripple.com/build/rippled-apis/#markers-and-pagination).
+* Use `request()` to issue any `rippled` command, including `account_currencies`, `subscribe`, and `unsubscribe`. [Full list of API Methods](https://xrpl.org/public-rippled-methods.html).
+* Use `hasNextPage()` to determine whether a response has more pages. This is true when the response includes a [`marker` field](https://xrpl.org/markers-and-pagination.html).
 * Use `requestNextPage()` to request the next page of data.
 
 When using rippled APIs:
 
-* [Specify XRP amounts in drops](https://developers.ripple.com/basic-data-types.html#specifying-currency-amounts).
-* [Specify timestamps as the number of seconds since the "Ripple Epoch"](https://developers.ripple.com/basic-data-types.html#specifying-time).
+* [Specify XRP amounts in drops](https://xrpl.org/basic-data-types.html#specifying-currency-amounts).
+* [Specify timestamps as the number of seconds since the "Ripple Epoch"](https://xrpl.org/basic-data-types.html#specifying-time).
 * Instead of `counterparty`, use `issuer`.
 
 ## Listening to streams
@@ -68,4 +68,4 @@ api.connect().then(() => {
 
 The subscription ends when you unsubscribe or the WebSocket connection is closed.
 
-For full details, see [rippled Subscriptions](https://ripple.com/build/rippled-apis/#subscriptions).
+For full details, see the [subscribe method](https://xrpl.org/subscribe.html).

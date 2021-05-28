@@ -30,7 +30,7 @@
     },
     "options": {
       "type": "object",
-      "description": "Options that control the type of signature that will be generated.",
+      "description": "Options that control the type of signature to create.",
       "properties": {
         "signAs": {
           "$ref": "address",

@@ -13,7 +13,7 @@
       "properties": {
         "start": {
           "$ref": "hash256",
-          "description": "If specified, this transaction will be the first transaction in the result. You cannot use `start` with `minLedgerVersion` or `maxLedgerVersion`. When `start` is specified, these ledger versions will be determined internally."
+          "description": "If specified, start the results from this transaction. You cannot use `start` with `minLedgerVersion` or `maxLedgerVersion`. When `start` is specified, these ledger versions are determined internally."
         },
         "limit": {
           "type": "integer",
@@ -30,11 +30,11 @@
         },
         "earliestFirst": {
           "type": "boolean",
-          "description": "If true, sort transactions so that the earliest ones come first. By default, the newest transactions will come first."
+          "description": "If true, sort transactions so that the earliest ones come first. By default, the newest transactions come first."
         },
         "excludeFailures": {
           "type": "boolean",
-          "description": "If true, the result will omit transactions that did not succeed."
+          "description": "If true, the result omits transactions that did not succeed."
         },
         "initiated": {
           "type": "boolean",
@@ -54,7 +54,7 @@
         },
         "binary": {
           "type": "boolean",
-          "description": "If true, the transactions will be sent from the server in a condensed binary format rather than JSON."
+          "description": "If true, return transactions in binary format rather than JSON."
         }
       },
       "additionalProperties": false,

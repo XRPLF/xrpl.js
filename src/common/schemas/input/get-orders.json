@@ -9,12 +9,12 @@
       "description": "The XRP Ledger address of the account to get open orders for."
     },
     "options": {
-      "description": "Options that determine what orders will be returned.",
+      "description": "Options that determine what orders to return.",
       "properties": {
         "limit": {
           "type": "integer",
           "minimum": 1,
-          "description": "At most this many orders will be returned."
+          "description": "Return at most this many orders."
         },
         "ledgerVersion": {
           "$ref": "ledgerVersion",

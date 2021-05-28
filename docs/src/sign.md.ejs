@@ -5,9 +5,9 @@ sign(txJSON: string, secret: string, options: object): {signedTransaction: strin
 sign(txJSON: string, keypair: object, options: object): {signedTransaction: string, id: string}
 ```
 
-Sign a prepared transaction. The signed transaction must subsequently be [submitted](#submit).
+Sign a prepared transaction. The signed transaction can then be [submitted](#submit).
 
-This method can sign any of [the transaction types supported by ripple-binary-codec](https://github.com/ripple/ripple-binary-codec/blob/cfcde79c19c359e9a0466d7bc3dc9a3aef47bb99/src/enums/definitions.json#L1637). When a new transaction type is added to the XRP Ledger, it will be unrecognized until `ripple-binary-codec` is updated. If you try to sign an unrecognized transaction type, this method throws an error similar to the following:
+This method can sign any of [the transaction types supported by ripple-binary-codec](https://github.com/ripple/ripple-binary-codec/blob/cfcde79c19c359e9a0466d7bc3dc9a3aef47bb99/src/enums/definitions.json#L1637). When a new transaction type is added to the XRP Ledger, it is unrecognized until `ripple-binary-codec` is updated. If you try to sign an unrecognized transaction type, this method throws an error like the following:
 
 `Error: [TRANSACTION_TYPE] is not a valid name or ordinal for TransactionType`
 
@@ -15,7 +15,7 @@ This method can sign any of [the transaction types supported by ripple-binary-co
 
 <%- renderSchema("input/sign.json") %>
 
-When this method is used for multisigning, the `options` parameter is required. See the multisigning example in this section for more details.
+When this method is used for multi-signing, the `options` parameter is required. See the multi-signing example in this section for more details.
 
 ### Return Value
 
@@ -34,7 +34,7 @@ return api.sign(txJSON, secret); // or: api.sign(txJSON, keypair);
 
 <%- renderFixture("responses/sign.json") %>
 
-### Example (multisigning)
+### Example (multi-signing)
 
 ```javascript
 const RippleAPI = require('ripple-lib').RippleAPI;
@@ -116,8 +116,8 @@ api.connect().then(() => {
 }).catch(console.error);
 ```
 
-Assuming the multisigning account was setup properly, the above example will respond with `resultCode: 'tesSUCCESS'` and the hash for the transaction.
-If any of `{signAs: some_address}` options were missing the code will return a validation error as follow:
+If the multi-signing account was setup properly, the above example logs `resultCode: 'tesSUCCESS'` and the hash for the transaction. If any of `{signAs: some_address}` options were missing, the code returns a validation error such as:
+
 ```
 [ValidationError(txJSON is not the same for all signedTransactions)]
 ```

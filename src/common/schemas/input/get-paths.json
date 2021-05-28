@@ -12,7 +12,7 @@
           "properties": {
             "address": {
               "$ref": "address",
-              "description": "The XRP Ledger address of the account where funds will come from."
+              "description": "The XRP Ledger address of the planned sender."
             },
             "amount": {
               "$ref": "laxAmount",

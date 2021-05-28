@@ -22,7 +22,7 @@
       "$ref": "hash256"
     },
     "allowPartialPayment": {
-      "description": "If true, this payment should proceed even if the whole amount cannot be delivered due to a lack of liquidity or a lack of funds in the source account.",
+      "description": "If true, this payment can deliver less than the full amount.",
       "type": "boolean"
     },
     "noDirectRipple": {

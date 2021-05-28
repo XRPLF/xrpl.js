@@ -6,7 +6,7 @@
   "properties": {
     "result": {
       "type": "string",
-      "description": "Result code returned by rippled. See [Transaction Results](https://developers.ripple.com/transaction-results.html) for a complete list."
+      "description": "Result code returned by rippled. See [Transaction Results](https://xrpl.org/transaction-results.html) for a complete list."
     },
     "timestamp": {
       "type": "string",

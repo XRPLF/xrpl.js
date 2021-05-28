@@ -7,7 +7,7 @@
     "balances": {
       "type": "array",
       "items": {"$ref": "amount"},
-      "description": "Amounts issued to the hotwallet accounts from the request. The keys are hot wallet addresses and the values are arrays of currency amounts they hold. The issuer (omitted from the currency amounts) is the account from the request."
+      "description": "Amounts issued to the \"hotwallet\" accounts from the request. The keys are the accounts' addresses, and the values are arrays of currency amounts they hold. The issuer (omitted from the currency amounts) is the account from the request."
     },
     "assets": {
       "type": "array",

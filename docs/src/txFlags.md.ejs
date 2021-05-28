@@ -18,9 +18,9 @@ Applies globally to all transactions.
 
 `txFlags.Payment.NoRippleDirect`: Do not use the default path; only use specified paths. This is intended to force the transaction to take arbitrage opportunities. Most clients do not need this.
 
-`txFlags.Payment.PartialPayment`: If the specified destination amount cannot be sent without spending more than the source maxAmount, reduce the received amount instead of failing outright. See [Partial Payments](https://developers.ripple.com/partial-payments.html) for more details.
+`txFlags.Payment.PartialPayment`: If the specified destination amount cannot be sent without spending more than the source maxAmount, reduce the received amount instead of failing outright. See [Partial Payments](https://xrpl.org/partial-payments.html) for more details.
 
-`txFlags.Payment.LimitQuality`: Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of `destination.amount`:`source.maxAmount`. See [Limit Quality](https://developers.ripple.com/payment.html#limit-quality) for details.
+`txFlags.Payment.LimitQuality`: Only take paths where all the conversions have an input:output ratio that is equal or better than the ratio of `destination.amount`:`source.maxAmount`. See [Limit Quality](https://xrpl.org/payment.html#limit-quality) for details.
 
 ### OfferCreate Flags
 
@@ -38,9 +38,9 @@ Applies globally to all transactions.
 
 `txFlags.TrustSet.NoRipple`:  Obsolete.
 
-`txFlags.TrustSet.SetNoRipple`: Blocks [rippling](https://developers.ripple.com/rippling.html) between two trustlines of the same currency, if this flag is set on both.
+`txFlags.TrustSet.SetNoRipple`: Blocks [rippling](https://xrpl.org/rippling.html) between two trustlines of the same currency, if this flag is set on both.
 
-`txFlags.TrustSet.ClearNoRipple`: Clears the No-[Rippling](https://developers.ripple.com/rippling.html) flag.
+`txFlags.TrustSet.ClearNoRipple`: Clears the No-[Rippling](https://xrpl.org/rippling.html) flag.
 
 `txFlags.TrustSet.SetFreeze`: Freeze the trustline. A non-XRP currency can be frozen by the exchange or gateway that issued it. XRP cannot be frozen.
 
@@ -50,7 +50,7 @@ Applies globally to all transactions.
 
 You can use the `prepareSettings` method to change your account flags. This method uses AccountSet flags internally.
 
-In the rippled API, Account Flags can be enabled and disabled with the SetFlag and ClearFlag parameters. See [AccountSet Flags](https://developers.ripple.com/accountset.html#accountset-flags).
+In the rippled API, Account Flags can be enabled and disabled with the SetFlag and ClearFlag parameters. See [AccountSet Flags](https://xrpl.org/accountset.html#accountset-flags).
 
 The AccountSet transaction type has some transaction flags, but their use is discouraged.
 

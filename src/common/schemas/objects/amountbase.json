@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "value": {
-      "description": "The quantity of the currency, denoted as a string to retain floating point precision",
+      "description": "The quantity of the currency, denoted as a string so that it does not lose precision",
       "$ref": "value"
     },
     "currency": {
