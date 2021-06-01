@@ -2,6 +2,24 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.9.5 (2021-06-01)
+
+* Bug fixes
+  * Prevent getFee from returning NaN from Reporting Mode (#1401) (#1398)
+  * Return promise inside catch block of reconnect to propagate promise (#1418) (#1113) (thanks @camposfyi)
+  * Internal
+    * Update mocha to use RC file config (#1417) (#1210) (thanks @camposfyi)
+* Dependencies
+  * @types/ws, ws, browserslist, @types/lodash
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+fcdc4aa1e1df7cb788b68f3d036e168aa64f9e818f441b99fef62d4571c0387d  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+dfb7a92c4156fb3ee367254b5ea0935cda741cd3b5c36cdca695e7d89f88605e  build/ripple-latest.js
+```
+
 ## 1.9.4 (2021-04-18)
 
 * Add memos support for all transaction types for getTransactions (#1353, #1397)
