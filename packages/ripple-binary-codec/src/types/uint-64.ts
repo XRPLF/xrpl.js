@@ -4,7 +4,7 @@ import * as bigInt from "big-integer";
 import { isInstance } from "big-integer";
 import { Buffer } from "buffer/";
 
-const HEX_REGEX = /^[A-F0-9]{16}$/;
+const HEX_REGEX = /^[A-F0-9]{1,16}$/;
 const mask = bigInt(0x00000000ffffffff);
 
 /**
@@ -54,14 +54,12 @@ class UInt64 extends UInt {
     }
 
     if (typeof val === "string") {
-      if (val === "0") {
-        return UInt64.from(0);
-      }
-
       if (!HEX_REGEX.test(val)) {
         throw new Error(`${val} is not a valid hex-string`);
       }
-      buf = Buffer.from(val, "hex");
+
+      const strBuf = val.padStart(16, "0");
+      buf = Buffer.from(strBuf, "hex");
       return new UInt64(buf);
     }
 
