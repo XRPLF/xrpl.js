@@ -4,7 +4,7 @@ import * as bigInt from "big-integer";
 import { isInstance } from "big-integer";
 import { Buffer } from "buffer/";
 
-const HEX_REGEX = /^[A-F0-9]{1,16}$/;
+const HEX_REGEX = /^[a-fA-F0-9]{1,16}$/;
 const mask = bigInt(0x00000000ffffffff);
 
 /**
