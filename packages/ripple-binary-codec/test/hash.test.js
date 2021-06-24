@@ -50,10 +50,10 @@ describe("Hash256", function () {
 });
 
 describe("Currency", function () {
-  test("Will have a null iso() for dodgy XRP ", function () {
-    const bad = Currency.from("0000000000000000000000005852500000000000");
-    expect(bad.iso()).toBeUndefined();
-    expect(bad.isNative()).toBe(false);
+  test("Will throw an error for dodgy XRP ", function () {
+    expect(() =>
+      Currency.from("0000000000000000000000005852500000000000")
+    ).toThrow();
   });
   test("Currency with lowercase letters decode to hex", () => {
     expect(Currency.from("xRp").toJSON()).toBe(

@@ -20,7 +20,19 @@ function isoToBytes(iso: string): Buffer {
  * Tests if ISO is a valid iso code
  */
 function isIsoCode(iso: string): boolean {
-  return iso.length === 3;
+  return ISO_REGEX.test(iso);
+}
+
+function isoCodeFromHex(code: Buffer): string | undefined {
+  const iso = code.toString();
+  console.log(iso);
+  if (iso === "XRP") {
+    throw new Error("Disallowed currency code: to indicate the currency XRP you must use 20 bytes of 0s");
+  }
+  if (isIsoCode(iso)) {
+    return iso;
+  }
+  return undefined;
 }
 
 /**
@@ -69,37 +81,46 @@ function bytesFromRepresentation(input: string): Buffer {
 class Currency extends Hash160 {
   static readonly XRP = new Currency(Buffer.alloc(20));
   private readonly _iso?: string;
-  private readonly _isNative: boolean;
+  // private readonly _isNative: boolean;
 
   constructor(byteBuf: Buffer) {
     super(byteBuf ?? Currency.XRP.bytes);
 
-    let onlyISO = true;
+    // let onlyISO = true;
 
-    const bytes = this.bytes;
+    // const bytes = this.bytes;
     const code = this.bytes.slice(12, 15);
-    const iso = code.toString();
+    // const iso = code.toString();
 
-    for (let i = bytes.length - 1; i >= 0; i--) {
-      if (bytes[i] !== 0 && !(i === 12 || i === 13 || i === 14)) {
-        onlyISO = false;
-        break;
-      }
+    
+    // for (let i = bytes.length - 1; i >= 0; i--) {
+    //   if (bytes[i] !== 0 && !(i === 12 || i === 13 || i === 14)) {
+    //     onlyISO = false;
+    //     break;
+    //   }
+    // }
+
+    if (this.bytes[0] !== 0 && this.bytes[0] !== 0) {
+      this._iso = undefined;
+    } else if (code.toString("hex") === "000000") {
+      this._iso = "XRP";
+    } else {
+      this._iso = isoCodeFromHex(code);
     }
 
-    const lossLessISO = onlyISO && iso !== "XRP" && ISO_REGEX.test(iso);
-    this._isNative = onlyISO && code.toString("hex") === "000000";
-    this._iso = this._isNative ? "XRP" : lossLessISO ? iso : undefined;
+    // const lossLessISO = onlyISO && iso !== "XRP" && ISO_REGEX.test(iso);
+    // this._isNative = onlyISO && code.toString("hex") === "000000";
+    // this._iso = this._isNative ? "XRP" : lossLessISO ? iso : undefined;
   }
 
-  /**
-   * Tells if this currency is native
-   *
-   * @returns true if native, false if not
-   */
-  isNative(): boolean {
-    return this._isNative;
-  }
+  // /**
+  //  * Tells if this currency is native
+  //  *
+  //  * @returns true if native, false if not
+  //  */
+  // isNative(): boolean {
+  //   return this._isNative;
+  // }
 
   /**
    * Return the ISO code of this currency
