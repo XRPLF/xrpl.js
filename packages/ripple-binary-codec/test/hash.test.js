@@ -73,6 +73,10 @@ describe("Currency", function () {
     const xrp = new Currency(Buffer.alloc(20));
     expect(xrp.iso()).toBe("XRP");
   });
+  test("Can handle non-standard currency codes", () => {
+    const currency = "015841551A748AD2C1F76FF6ECB0CCCD00000000";
+    expect(Currency.from(currency).toJSON()).toBe(currency);
+  });
   test("throws on invalid reprs", function () {
     expect(() => Currency.from(Buffer.alloc(19))).toThrow();
     expect(() => Currency.from(1)).toThrow();
