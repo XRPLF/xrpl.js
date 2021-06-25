@@ -1,7 +1,7 @@
 import { Hash160 } from "./hash-160";
 import { Buffer } from "buffer/";
 
-const ISO_REGEX = /^[A-Za-z0-9]{3}$/;
+const ISO_REGEX = /^[A-Z0-9]{3}$/;
 const HEX_REGEX = /^[A-F0-9]{40}$/;
 
 /**
@@ -47,7 +47,7 @@ function isHex(hex: string): boolean {
  * Tests if a string is a valid representation of a currency
  */
 function isStringRepresentation(input: string): boolean {
-  return isIsoCode(input) || isHex(input);
+  return input.length === 3 || isHex(input);
 }
 
 /**
@@ -61,7 +61,6 @@ function isBytesArray(bytes: Buffer): boolean {
  * Ensures that a value is a valid representation of a currency
  */
 function isValidRepresentation(input: Buffer | string): boolean {
-  console.log(input, input instanceof Buffer);
   return input instanceof Buffer
     ? isBytesArray(input)
     : isStringRepresentation(input);
@@ -71,7 +70,6 @@ function isValidRepresentation(input: Buffer | string): boolean {
  * Generate bytes from a string or buffer representation of a currency
  */
 function bytesFromRepresentation(input: string): Buffer {
-  console.log(input);
   if (!isValidRepresentation(input)) {
     throw new Error(`Unsupported Currency representation: ${input}`);
   }
