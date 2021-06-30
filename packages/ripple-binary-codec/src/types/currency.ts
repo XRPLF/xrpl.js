@@ -87,7 +87,7 @@ class Currency extends Hash160 {
     super(byteBuf ?? Currency.XRP.bytes);
     const code = this.bytes.slice(12, 15);
 
-    if (this.bytes[0] !== 0 && this.bytes[1] !== 0) {
+    if (this.bytes[0] !== 0) {
       this._iso = undefined;
     } else if (code.toString("hex") === "000000") {
       this._iso = "XRP";
