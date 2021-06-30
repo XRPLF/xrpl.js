@@ -23,7 +23,7 @@ function isIsoCode(iso: string): boolean {
   return ISO_REGEX.test(iso);
 }
 
-function isoCodeFromHex(code: Buffer): string | undefined {
+function isoCodeFromHex(code: Buffer): string | null {
   const iso = code.toString();
   if (iso === "XRP") {
     throw new Error(
@@ -33,7 +33,7 @@ function isoCodeFromHex(code: Buffer): string | undefined {
   if (isIsoCode(iso)) {
     return iso;
   }
-  return undefined;
+  return null;
 }
 
 /**
@@ -81,14 +81,14 @@ function bytesFromRepresentation(input: string): Buffer {
  */
 class Currency extends Hash160 {
   static readonly XRP = new Currency(Buffer.alloc(20));
-  private readonly _iso?: string;
+  private readonly _iso: string | null;
 
   constructor(byteBuf: Buffer) {
     super(byteBuf ?? Currency.XRP.bytes);
     const code = this.bytes.slice(12, 15);
 
     if (this.bytes[0] !== 0) {
-      this._iso = undefined;
+      this._iso = null;
     } else if (code.toString("hex") === "000000") {
       this._iso = "XRP";
     } else {
@@ -99,9 +99,9 @@ class Currency extends Hash160 {
   /**
    * Return the ISO code of this currency
    *
-   * @returns ISO code if it exists, else undefined
+   * @returns ISO code if it exists, else null
    */
-  iso(): string | undefined {
+  iso(): string | null {
     return this._iso;
   }
 
@@ -129,7 +129,7 @@ class Currency extends Hash160 {
    */
   toJSON(): string {
     const iso = this.iso();
-    if (iso !== undefined) {
+    if (iso !== null) {
       return iso;
     }
     return this.bytes.toString("hex").toUpperCase();
