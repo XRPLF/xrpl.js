@@ -2,6 +2,22 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.9.6 (2021-07-01)
+
+* Bug fixes
+  * Use 'current' ledger when preparing txs (#1429) (#999)
+  * Allow multiple settings at once (#1435)
+* Dependencies
+  * ripple-address-codec, prettier, mocha
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+cac7f6f3be93efbd61dc5fd527c40f0d1baec06f2f9faa64e9eeb191cc85a710  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+5737483e940dca8b73768d8a1de8217c7e921a9cebaadef02d2b16867658f331  build/ripple-latest.js
+```
+
 ## 1.9.5 (2021-06-01)
 
 * Bug fixes
