@@ -2,6 +2,153 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.9.6 (2021-07-01)
+
+* Bug fixes
+  * Use 'current' ledger when preparing txs (#1429) (#999)
+  * Allow multiple settings at once (#1435)
+* Dependencies
+  * ripple-address-codec, prettier, mocha
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+cac7f6f3be93efbd61dc5fd527c40f0d1baec06f2f9faa64e9eeb191cc85a710  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+5737483e940dca8b73768d8a1de8217c7e921a9cebaadef02d2b16867658f331  build/ripple-latest.js
+```
+
+## 1.9.5 (2021-06-01)
+
+* Bug fixes
+  * Prevent getFee from returning NaN from Reporting Mode (#1401) (#1398)
+  * Return promise inside catch block of reconnect to propagate promise (#1418) (#1113) (thanks @camposfyi)
+  * Internal
+    * Update mocha to use RC file config (#1417) (#1210) (thanks @camposfyi)
+* Dependencies
+  * @types/ws, ws, browserslist, @types/lodash
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+fcdc4aa1e1df7cb788b68f3d036e168aa64f9e818f441b99fef62d4571c0387d  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+dfb7a92c4156fb3ee367254b5ea0935cda741cd3b5c36cdca695e7d89f88605e  build/ripple-latest.js
+```
+
+## 1.9.4 (2021-04-18)
+
+* Add memos support for all transaction types for getTransactions (#1353, #1397)
+* Add Deno and React instructions (#1387)
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+daa2b892a18037e89fea6fcf7de67624a782971956cb8df17cd765a4b0201ee9  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+b1d0bab54c6dbc76091610ede54a4269e73dea8cc6a9c25738d62bd7671920e4  build/ripple-latest.js
+```
+
+## 1.9.3 (2021-03-16)
+
+* Expose ripple-address-codec methods. These are static methods on RippleAPI, so you do not need to create a RippleAPI instance.
+  * `classicAddressToXAddress` / `xAddressToClassicAddress`
+  * `isValidXAddress` / `isValidClassicAddress`
+  * `encodeSeed` / `decodeSeed`
+  * `encodeAccountID` / `decodeAccountID`
+  * `encodeNodePublic` / `decodeNodePublic`
+  * `encodeAccountPublic` / `decodeAccountPublic`
+  * `encodeXAddress` / `decodeXAddress`
+
+Example 1. Encode an X-address with tag 4294967295:
+```js
+const RippleAPI = require('ripple-lib').RippleAPI
+const xAddress = RippleAPI.classicAddressToXAddress('rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf', 4294967295)
+console.log(xAddress)
+```
+
+Output for Example 1:
+```
+XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi
+```
+
+Example 2. Encode a test address for use with Testnet or Devnet:
+```js
+const RippleAPI = require('ripple-lib').RippleAPI
+const address = RippleAPI.classicAddressToXAddress('r3SVzk8ApofDJuVBPKdmbbLjWGCCXpBQ2g', 123, true)
+console.log(address)
+```
+
+Output for Example 2:
+```
+T7oKJ3q7s94kDH6tpkBowhetT1JKfcfdSCmAXbS75iATyLD
+```
+
+Example 3. Decode an X-address:
+```js
+const RippleAPI = require('ripple-lib').RippleAPI
+const address = RippleAPI.xAddressToClassicAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi')
+console.log(address)
+```
+
+Output for Example 3:
+```js
+{
+  classicAddress: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+  tag: 4294967295,
+  test: false
+}
+```
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+bcc8db4e5464197151a267d9f240693794bf1eb4d26a4e0b3637f82a1d66e440  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+99c2825685d249c074abe7b59abaf197afce67ece7ad08ded6db67185e916dd2  build/ripple-latest.js
+```
+
+## 1.9.2 (2021-03-12)
+
+* Docs
+  * Add missing transaction type links (#1378)
+* Bug fixes
+  * Deserialization and verification of payment paths (#1382) (#1347) (#1376)
+* Dependencies
+  * Bump ripple-binary-codec to 1.1.2
+    * Fix edge case when constructing a value from "0", which can occur when using rippled v1.7.0
+  * Bump lodash, ripple-address-codec
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+a1fd24b65d81ea5dbc36d74da7a6317267a048bba084effff5380d47299c3c63  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+410f78105c4f23c13671ec94f963ef47179393bfcad65ff610bc838c5a3c6a65  build/ripple-latest.js
+```
+
+## 1.9.1 (2021-02-25)
+
+* Docs
+  * Add transaction specifications: (#1352)
+    * Ticket Create
+    * Account Delete
+    * Deposit Preauth
+  * Update link to subscribe page (#1354)
+* Bug fixes
+  * Allow connectionTimeout option to be customized (#1355)
+* Dependencies
+  * Bump ripple-keypairs to 1.0.3
+  * Bump elliptic to 6.5.4 (this patches a potential security issue, although we do not believe that the issue affects ripple-lib: [details](https://github.com/ripple/ripple-keypairs/security/advisories/GHSA-w6x3-9ph2-7x54))
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+f59e0221a7218460eea59b0441a0ee2d2a14484dd473ed5373283852798516c7  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+731ed44cbff8db26bcf256e0e3f3ac3fe90a10b6c227701d67918a5d643c5b29  build/ripple-latest.js
+```
+
 ## 1.9.0 (2020-12-07)
 
 * New features

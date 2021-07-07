@@ -30,9 +30,11 @@ module.exports = {
   getSettings: require('./get-settings.json'),
   getTransaction: {
     orderCancellation: require('./get-transaction-order-cancellation.json'),
+    orderCancellationWithMemo: require('./get-transaction-order-cancellation-with-memo.json'),
     orderWithExpirationCancellation:
       require('./get-transaction-order-with-expiration-cancellation.json'),
     order: require('./get-transaction-order.json'),
+    orderWithMemo: require('./get-transaction-order-with-memo.json'),
     orderSell: require('./get-transaction-order-sell.json'),
     noMeta: require('./get-transaction-no-meta.json'),
     payment: require('./get-transaction-payment.json'),
@@ -48,10 +50,18 @@ module.exports = {
     notValidated: require('./get-transaction-not-validated.json'),
     checkCreate:
       require('./get-transaction-check-create.json'),
+    checkCreateWithMemo:
+      require('./get-transaction-check-create-with-memo.json'),
     checkCancel:
       require('./get-transaction-check-cancel.json'),
+    checkCancelWithMemo:
+      require('./get-transaction-check-cancel-with-memo.json'),
     checkCash:
       require('./get-transaction-check-cash.json'),
+    checkCashWithMemo:
+      require('./get-transaction-check-cash-with-memo.json'),
+    depositPreauthWithMemo:
+      require('./get-transaction-deposit-preauth-with-memo.json'),
     escrowCreation:
       require('./get-transaction-escrow-creation.json'),
     escrowCancellation:
@@ -62,13 +72,24 @@ module.exports = {
       require('./get-transaction-escrow-execution-simple.json'),
     paymentChannelCreate:
       require('./get-transaction-payment-channel-create.json'),
+    paymentChannelCreateWithMemo:
+      require('./get-transaction-payment-channel-create-with-memo.json'),
     paymentChannelFund:
       require('./get-transaction-payment-channel-fund.json'),
+    paymentChannelFundWithMemo:
+      require('./get-transaction-payment-channel-fund-with-memo.json'),
     paymentChannelClaim:
       require('./get-transaction-payment-channel-claim.json'),
+    paymentChannelClaimWithMemo:
+      require('./get-transaction-payment-channel-claim-with-memo.json'),
     amendment: require('./get-transaction-amendment.json'),
     feeUpdate: require('./get-transaction-fee-update.json'),
-    accountDelete: require('./get-transaction-account-delete.json')
+    feeUpdateWithMemo: require('./get-transaction-fee-update-with-memo.json'),
+    accountDelete: require('./get-transaction-account-delete.json'),
+    accountDeleteWithMemo: require('./get-transaction-account-delete-with-memo.json'),
+    ticketCreateWithMemo: require('./get-transaction-ticket-create-with-memo.json'),
+    withMemo: require('./get-transaction-with-memo.json'),
+    withMemos: require('./get-transaction-with-memos.json')
   },
   getTransactions: {
     normal: require('./get-transactions.json'),

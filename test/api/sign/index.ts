@@ -22,6 +22,38 @@ export default <TestSuite>{
     schemaValidator.schemaValidate('sign', result)
   },
 
+  'sign with paths': async (
+    api,
+    address
+  ) => {
+    const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
+    const payment = {
+      source: {
+        address: address,
+        amount: {
+          currency: 'drops',
+          value: '100'
+        }
+      },
+      destination: {
+        address: 'rKT4JX4cCof6LcDYRz8o3rGRu7qxzZ2Zwj',
+        minAmount: {
+          currency: 'USD',
+          value: '0.00004579644712312366',
+          counterparty: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc'
+        }
+      },
+      paths: '[[{\"currency\":\"USD\",\"issuer\":\"rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc\"}]]'
+    }
+    const ret = await api.preparePayment(address, payment, {sequence: 1, maxLedgerVersion: 15696358})
+    const result = api.sign(ret.txJSON, secret)
+    assert.deepEqual(result, {
+      signedTransaction: '12000022800200002400000001201B00EF81E661EC6386F26FC0FFFF0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461968400000000000000C6940000000000000646AD3504529A0465E2E0000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D1664619732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200A693FB5CA6B21250EBDFD8CFF526EE0DF7C9E4E31EB0660692E75E6A93BF5F802203CC39463DDA21386898CA31E18AD1A6828647D65741DD637BAD71BC83E29DB9481145E7B112523F68D2F5E879DB4EAC51C6698A693048314CA6EDC7A28252DAEA6F2045B24F4D7C333E146170112300000000000000000000000005553440000000000054F6F784A58F9EFB0A9EB90B83464F9D166461900',
+      id: '78874FE5F5299FEE3EA85D3CF6C1FB1F1D46BB08F716662A3E3D1F0ADE4EF796'
+    })
+    schemaValidator.schemaValidate('sign', result)
+  },
+
   'already signed': async (api, address) => {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const result = api.sign(REQUEST_FIXTURES.normal.txJSON, secret)

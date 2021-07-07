@@ -11,7 +11,8 @@
     "unauthorize": {
       "$ref": "address",
       "description": "Address of the account that can cash the check."
-    }
+    },
+    "memos": {"$ref": "memos"}
   },
   "oneOf": [
     {"required": ["authorize"]},

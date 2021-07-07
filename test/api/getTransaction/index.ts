@@ -69,6 +69,13 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.order, 'getTransaction')
   },
 
+  'order with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_OFFER_CREATE_TRANSACTION_HASH
+    closeLedger(api.connection)
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.orderWithMemo, 'getTransaction')
+  },
+
   'sell order': async (api, address) => {
     const hash =
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
@@ -96,6 +103,17 @@ export default <TestSuite>{
     assertResultMatch(
       response,
       RESPONSE_FIXTURES.orderWithExpirationCancellation,
+      'getTransaction'
+    )
+  },
+
+  'order cancellation with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_ORDER_CANCELLATION_TRANSACTION_HASH
+    closeLedger(api.connection)
+    const response = await api.getTransaction(hash)
+    assertResultMatch(
+      response,
+      RESPONSE_FIXTURES.orderCancellationWithMemo,
       'getTransaction'
     )
   },
@@ -258,6 +276,12 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.checkCreate, 'getTransaction')
   },
 
+  'CheckCreate with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_CHECK_CREATE_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.checkCreateWithMemo, 'getTransaction')
+  },
+
   'CheckCancel': async (api, address) => {
     const hash =
       'B4105D1B2D83819647E4692B7C5843D674283F669524BD50C9614182E3A12CD4'
@@ -265,11 +289,23 @@ export default <TestSuite>{
     assertResultMatch(response, RESPONSE_FIXTURES.checkCancel, 'getTransaction')
   },
 
+  'CheckCancel with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_CHECK_CANCEL_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.checkCancelWithMemo, 'getTransaction')
+  },
+
   'CheckCash': async (api, address) => {
     const hash =
       '8321208465F70BA52C28BCC4F646BAF3B012BA13B57576C0336F42D77E3E0749'
     const response = await api.getTransaction(hash)
     assertResultMatch(response, RESPONSE_FIXTURES.checkCash, 'getTransaction')
+  },
+
+  'CheckCash with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_CHECK_CASH_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.checkCashWithMemo, 'getTransaction')
   },
 
   // Escrows
@@ -332,6 +368,16 @@ export default <TestSuite>{
     )
   },
 
+  'PaymentChannelCreate with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_PAYMENT_CHANNEL_CREATE_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(
+      response,
+      RESPONSE_FIXTURES.paymentChannelCreateWithMemo,
+      'getTransaction'
+    )
+  },
+
   'PaymentChannelFund': async (api, address) => {
     const hash =
       'CD053D8867007A6A4ACB7A432605FE476D088DCB515AFFC886CF2B4EB6D2AE8B'
@@ -339,6 +385,16 @@ export default <TestSuite>{
     assertResultMatch(
       response,
       RESPONSE_FIXTURES.paymentChannelFund,
+      'getTransaction'
+    )
+  },
+
+  'PaymentChannelFund with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_PAYMENT_CHANNEL_FUND_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(
+      response,
+      RESPONSE_FIXTURES.paymentChannelFundWithMemo,
       'getTransaction'
     )
   },
@@ -354,6 +410,16 @@ export default <TestSuite>{
     )
   },
 
+  'PaymentChannelClaim with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_PAYMENT_CHANNEL_CLAIM_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(
+      response,
+      RESPONSE_FIXTURES.paymentChannelClaimWithMemo,
+      'getTransaction'
+    )
+  },
+
   'AccountDelete': async (api, address) => {
     const hash =
       'EC2AB14028DC84DE525470AB4DAAA46358B50A8662C63804BFF38244731C0CB9'
@@ -361,6 +427,16 @@ export default <TestSuite>{
     assertResultMatch(
       response,
       RESPONSE_FIXTURES.accountDelete,
+      'getTransaction'
+    )
+  },
+
+  'AccountDelete with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_ACCOUNT_DELETE_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(
+      response,
+      RESPONSE_FIXTURES.accountDeleteWithMemo,
       'getTransaction'
     )
   },
@@ -396,5 +472,37 @@ export default <TestSuite>{
       'C6A40F56127436DCD830B1B35FF939FD05B5747D30D6542572B7A835239817AF'
     const response = await api.getTransaction(hash)
     assertResultMatch(response, RESPONSE_FIXTURES.feeUpdate)
+  },
+
+  'feeUpdate with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_FEE_UPDATE_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.feeUpdateWithMemo)
+  },
+
+  'order with one memo': async (api, address) => {
+    const hash =
+      '995570FE1E40F42DF56BFC80503BA9E3C1229619C61A1C279A76BC0805036D74'
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.withMemo)
+  },
+
+  'order with more than one memo': async (api, address) => {
+    const hash =
+      '995570FE1E40F42DF56BFC80503BA9E3C1229619C61A1C279A76BC0805036D73'
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.withMemos)
+  },
+
+  'ticketCreate with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_TICKET_CREATE_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.ticketCreateWithMemo)
+  },
+
+  'depositPreauth with memo': async (api, address) => {
+    const hash = hashes.WITH_MEMOS_DEPOSIT_PREAUTH_TRANSACTION_HASH
+    const response = await api.getTransaction(hash)
+    assertResultMatch(response, RESPONSE_FIXTURES.depositPreauthWithMemo)
   }
 }

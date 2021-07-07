@@ -1,4 +1,4 @@
-import {parseTimestamp} from './utils'
+import {parseTimestamp, parseMemos} from './utils'
 import {removeUndefined, dropsToXrp} from '../../common'
 import {PayChannelLedgerEntry} from '../../common/types/objects'
 
@@ -21,6 +21,7 @@ export function parsePaymentChannel(
   data: PayChannelLedgerEntry
 ): FormattedPaymentChannel {
   return removeUndefined({
+    memos: parseMemos(data),
     account: data.Account,
     amount: dropsToXrp(data.Amount),
     balance: dropsToXrp(data.Balance),

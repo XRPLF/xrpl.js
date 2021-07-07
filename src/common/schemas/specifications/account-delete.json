@@ -15,7 +15,8 @@
     "destinationXAddress": {
       "$ref": "address",
       "description": "X-address of an account to receive any leftover XRP after deleting the sending account. Must be a funded account in the ledger, and must not be the sending account."
-    }
+    },
+    "memos": {"$ref": "memos"}
   },
   "anyOf": [
     {

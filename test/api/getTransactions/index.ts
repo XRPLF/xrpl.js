@@ -155,6 +155,7 @@ export default <TestSuite>{
     const response = await api.getTransactions(addresses.OTHER_ACCOUNT)
     assertResultMatch(response, RESPONSE_FIXTURES.one, 'getTransactions')
   }
+  
 }
 
 // This test relies on the binary (hex string) format, but computed fields like `date`

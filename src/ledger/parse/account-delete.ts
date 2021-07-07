@@ -1,6 +1,7 @@
 import * as assert from 'assert'
 import {removeUndefined} from '../../common'
 import {classicAddressToXAddress} from 'ripple-address-codec'
+import {parseMemos} from './utils'
 
 export type FormattedAccountDelete = {
   // account (address) of an account to receive any leftover XRP after deleting the sending account.
@@ -21,6 +22,7 @@ function parseAccountDelete(tx: any): FormattedAccountDelete {
   assert.ok(tx.TransactionType === 'AccountDelete')
 
   return removeUndefined({
+    memos: parseMemos(tx),
     destination: tx.Destination,
     destinationTag: tx.DestinationTag,
     destinationXAddress: classicAddressToXAddress(

@@ -1,0 +1,82 @@
+{
+  "id": 0,
+  "status": "success",
+  "type": "response",
+  "result": {
+    "info": {
+      "build_version": "1.7.0",
+      "complete_ledgers": "32570-62713383",
+      "hostid": "DUG",
+      "io_latency_ms": 1,
+      "last_close": {
+        "converge_time_s": 0,
+        "proposers": 0
+      },
+      "pubkey_node": "n9Krd83Ab8rW29LhNZPNQ3EFYBs59V1k7sGu1WizLNogrCEi56kF",
+      "published_ledger": "none",
+      "reporting": {
+        "etl_sources": [
+          {
+            "connected": true,
+            "grpc_port": "50051",
+            "ip": "10.30.32.34",
+            "last_message_arrival_time": "2021-Apr-06 10:34:33.171053 UTC",
+            "validated_ledgers_range": "61506690-62713383",
+            "websocket_port": "51233"
+          },
+          {
+            "connected": true,
+            "grpc_port": "50051",
+            "ip": "10.30.32.170",
+            "last_message_arrival_time": "2021-Apr-06 10:34:33.172233 UTC",
+            "validated_ledgers_range": "61916861-62713383",
+            "websocket_port": "51233"
+          }
+        ],
+        "is_writer": true,
+        "last_publish_time": "2021-Apr-06 10:34:31.612887 UTC"
+      },
+      "server_state": "full",
+      "server_state_duration_us": "649088585088",
+      "state_accounting": {
+        "connected": {
+          "duration_us": "0",
+          "transitions": 0
+        },
+        "disconnected": {
+          "duration_us": "34471",
+          "transitions": 1
+        },
+        "full": {
+          "duration_us": "649088585088",
+          "transitions": 1
+        },
+        "syncing": {
+          "duration_us": "0",
+          "transitions": 0
+        },
+        "tracking": {
+          "duration_us": "0",
+          "transitions": 0
+        }
+      },
+      "time": "2021-Apr-06 10:34:33.293823 UTC",
+      "uptime": 649092,
+      "validated_ledger": {
+        "age": 3,
+        "base_fee_xrp": 1e-05,
+        "hash": "F04E9B08596F86DEF1F55FA29380C1ECC04079DA0A9539FE60E85ADC092C292A",
+        "reserve_base_xrp": 20,
+        "reserve_inc_xrp": 5,
+        "seq": 62713383
+      },
+      "validation_quorum": 1
+    },
+    "warnings": [
+      {
+        "id": 1004,
+        "message": "This is a reporting server.  The default behavior of a reporting server is to only return validated data. If you are looking for not yet validated data, include \"ledger_index : current\" in your request, which will cause this server to forward the request to a p2p node. If the forward is successful the response will include \"forwarded\" : \"true\""
+      }
+    ]
+  }
+}

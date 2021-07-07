@@ -24,7 +24,8 @@
     "invoiceID": {
       "$ref": "hash256",
       "description": "256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check."
-    }
+    },
+    "memos": {"$ref": "memos"}
   },
   "required": ["destination", "sendMax"],
   "additionalProperties": false
