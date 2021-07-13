@@ -6,7 +6,7 @@ Use the following [boilerplate code](https://en.wikipedia.org/wiki/Boilerplate_c
 const RippleAPI = require('ripple-lib').RippleAPI;
 
 const api = new RippleAPI({
-  server: 'wss://s1.ripple.com' // Public rippled server hosted by Ripple, Inc.
+  server: 'wss://xrplcluster.com'
 });
 api.on('error', (errorCode, errorMessage) => {
   console.log(errorCode + ': ' + errorMessage);
@@ -26,9 +26,7 @@ api.connect().then(() => {
 }).catch(console.error);
 ```
 
-RippleAPI is designed to work in [Node.js](https://nodejs.org) version 6 or higher. Ripple recommends Node.js v10 LTS.
-
-The code samples in this documentation are written with ECMAScript 6 (ES6) features, but `RippleAPI` also works with ECMAScript 5 (ES5). Regardless of whether you use ES5 or ES6, the methods that return Promises return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+[Node.js v14](https://nodejs.org/) is recommended. Other versions may work but are not frequently tested.
 
 <aside class="notice">
 All the code snippets in this documentation assume that you have surrounded them with this boilerplate.
