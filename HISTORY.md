@@ -2,6 +2,23 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.9.7 (2021-07-14)
+
+* Bug fixes
+  * TypeScript: fix TrustlineTransaction type (#1458) (#1460) (thanks @mrosendin)
+* Docs
+  * Update boilerplate (#1459) (thanks @mDuo13)
+* Dependencies
+  * @types/node, @types/ws, @types/lodash, @types/mocha, prettier, mocha, webpack, ripple-binary-codec, ws, webpack-cli, doctoc
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+a994422648c040076251c9a040fd494bc2ee30de23867607985b953022853afc  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+2e22b6187ff5f9300520c29a538013067609b439181f1f2184d6a80fcfa2449c  build/ripple-latest.js
+```
+
 ## 1.9.6 (2021-07-01)
 
 * Bug fixes
