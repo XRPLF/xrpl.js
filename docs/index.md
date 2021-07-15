@@ -135,7 +135,7 @@ Use the following [boilerplate code](https://en.wikipedia.org/wiki/Boilerplate_c
 const RippleAPI = require('ripple-lib').RippleAPI;
 
 const api = new RippleAPI({
-  server: 'wss://s1.ripple.com' // Public rippled server hosted by Ripple, Inc.
+  server: 'wss://xrplcluster.com'
 });
 api.on('error', (errorCode, errorMessage) => {
   console.log(errorCode + ': ' + errorMessage);
@@ -155,9 +155,7 @@ api.connect().then(() => {
 }).catch(console.error);
 ```
 
-RippleAPI is designed to work in [Node.js](https://nodejs.org) version 6 or higher. Ripple recommends Node.js v10 LTS.
-
-The code samples in this documentation are written with ECMAScript 6 (ES6) features, but `RippleAPI` also works with ECMAScript 5 (ES5). Regardless of whether you use ES5 or ES6, the methods that return Promises return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+[Node.js v14](https://nodejs.org/) is recommended. Other versions may work but are not frequently tested.
 
 <aside class="notice">
 All the code snippets in this documentation assume that you have surrounded them with this boilerplate.
@@ -407,6 +405,7 @@ Name | Type | Description
 destination | [address](#address) | *Optional* Address of an account to receive any leftover XRP after deleting the sending account. Must be a funded account in the ledger, and must not be the sending account.
 destinationTag | integer | *Optional* (Optional) Arbitrary destination tag that identifies a hosted recipient or other information for the recipient of the deleted account's leftover XRP.
 destinationXAddress | [address](#address) | *Optional* X-address of an account to receive any leftover XRP after deleting the sending account. Must be a funded account in the ledger, and must not be the sending account.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 > **Note:** To prepare an Account Delete transaction, use [`prepareTransaction()`](#preparetransaction) with the [native transaction format](https://xrpl.org/accountdelete.html).
 
@@ -417,6 +416,7 @@ Cancel a Check that has not been redeemed. (Native transaction type: [CheckCance
 Name | Type | Description
 ---- | ---- | -----------
 checkID | string | The ID of the Check ledger object to cancel, as a 64-character hexadecimal string.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 #### Example
 
@@ -438,6 +438,7 @@ Name | Type | Description
 checkID | string | The ID of the Check ledger object to cash, as a 64-character hexadecimal string.
 amount | [laxAmount](#amount) | *Optional* Redeem the Check for exactly this amount, if possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or deliverMin.
 deliverMin | [laxAmount](#amount) | *Optional* Redeem the Check for at least this amount and for as much as possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or amount.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 #### Example
 
@@ -465,6 +466,7 @@ sendMax | [laxAmount](#amount) | Amount of source currency the check is allowed 
 destinationTag | integer | *Optional* Destination tag that identifies the reason for the check, or a hosted recipient to pay.
 expiration | date-time string | *Optional* Time after which the check is no longer valid.
 invoiceID | string | *Optional* 256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 #### Example
 
@@ -488,6 +490,7 @@ Preauthorize an sender to deposit money at an account using [Deposit Authorizati
 Name | Type | Description
 ---- | ---- | -----------
 authorize | [address](#address) | *Optional* Address of the account that can cash the check.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 unauthorize | [address](#address) | *Optional* Address of the account that can cash the check.
 
 > **Note:** To prepare a Deposit Preauth transaction, use [`prepareTransaction()`](#preparetransaction) with the [native transaction format](https://xrpl.org/depositpreauth.html).
@@ -689,6 +692,7 @@ channel | string | 256-bit hexadecimal channel identifier.
 amount | [value](#value) | *Optional* Amount of XRP authorized by this signature.
 balance | [value](#value) | *Optional* Total XRP balance delivered by this channel after claim is processed.
 close | boolean | *Optional* Request to close the channel. If the channel has no XRP remaining or the destination address requests it, closes the channel immediately (returning unclaimed XRP to the source address). Otherwise, sets the channel to expire after settleDelay seconds have passed.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 publicKey | string | *Optional* Public key of the channel. (For verifying the signature.)
 renew | boolean | *Optional* Clear the channel's expiration time.
 signature | string | *Optional* Signed claim authorizing withdrawal of XRP from the channel. (Required except from the channel's source address.)
@@ -716,6 +720,7 @@ settleDelay | number | Amount of seconds the source address must wait before clo
 publicKey | string | Public key of the key pair the source may use to sign claims against this channel.
 cancelAfter | date-time string | *Optional* Time when this channel expires. This expiration cannot be changed after creating the channel.
 destinationTag | integer | *Optional* Destination tag.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 sourceTag | integer | *Optional* Source tag.
 
 #### Example
@@ -741,6 +746,7 @@ Name | Type | Description
 amount | [value](#value) | Amount of XRP to fund the channel with.
 channel | string | 256-bit hexadecimal channel identifier.
 expiration | date-time string | *Optional* New expiration for this channel. (This does not change the cancelAfter expiration, if the channel has one.) Cannot move the expiration sooner than settleDelay seconds from time of the request.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
 #### Example
 
