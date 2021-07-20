@@ -52,10 +52,9 @@ jobs:
 
     services:
       rippled:
-        image: xrptipbot/rippled:latest
+        image: xrptipbot/rippled:latest --standalone
         ports:
           - 6006:6006
-        command: --standalone
 
     steps:
     - uses: actions/checkout@v2
