@@ -55,7 +55,7 @@ jobs:
         image: xrptipbot/rippled:latest
         ports:
           - 6006:6006
-        args: --standalone
+        command: --standalone
 
     steps:
     - uses: actions/checkout@v2
