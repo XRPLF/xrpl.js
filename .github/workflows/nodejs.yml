@@ -55,7 +55,7 @@ jobs:
         image: xrptipbot/rippled:latest
         ports:
           - 6006:6006
-        with:
+        options:
           args: --standalone
 
     steps:

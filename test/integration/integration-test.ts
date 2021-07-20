@@ -12,7 +12,7 @@ import {isValidSecret} from 'ripple-api/common/utils'
 const TIMEOUT = 20000
 const INTERVAL = 1000 // how long to wait between checks for validated ledger
 
-const serverUrl = 'ws://127.0.0.1:6006'
+const serverUrl = 'ws://0.0.0.0:6006'
 
 function acceptLedger(api) {
   return api.connection.request({command: 'ledger_accept'})
