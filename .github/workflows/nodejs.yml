@@ -54,7 +54,7 @@ jobs:
       rippled:
         image: xrptipbot/rippled:latest
         ports:
-          6006:6006
+          - 6006:6006
 
     steps:
     - uses: actions/checkout@v2
