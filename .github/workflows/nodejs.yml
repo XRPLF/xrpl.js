@@ -50,13 +50,15 @@ jobs:
   integration:
     runs-on: ubuntu-latest
 
-    services:
-      rippled:
-        image: xrptipbot/rippled:latest
-        ports:
-          - 6006:6006
+    # services:
+    #   rippled:
+    #     image: xrptipbot/rippled:latest
+    #     ports:
+    #       - 6006:6006
 
     steps:
+    - name: start Rippled
+      run: docker run -dit --name rippled -p 6006:6006 xrptipbot/rippled:latest --standalone
     - uses: actions/checkout@v2
     - name: Read .nvmrc # From https://github.com/actions/setup-node/issues/32#issuecomment-525791142
       run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
