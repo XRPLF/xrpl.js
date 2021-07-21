@@ -50,11 +50,11 @@ jobs:
   integration:
     runs-on: ubuntu-latest
 
-    # services:
-    #   rippled:
-    #     image: xrptipbot/rippled:latest
-    #     ports:
-    #       - 6006:6006
+    services:
+      rippled:
+        image: natenichols/rippled-standalone:latest
+        ports:
+          - 6006:6006
 
     steps:
     - name: start Rippled
