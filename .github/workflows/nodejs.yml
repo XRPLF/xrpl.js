@@ -71,5 +71,5 @@ jobs:
     - run: yarn install
     - run: yarn test:integration
       env:
-        HOST: localhost
+        HOST: 0.0.0.0
         PORT: ${{ job.services.rippled.ports[6006] }}

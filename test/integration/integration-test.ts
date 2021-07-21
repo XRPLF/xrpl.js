@@ -12,7 +12,7 @@ import {isValidSecret} from 'ripple-api/common/utils'
 const TIMEOUT = 20000
 const INTERVAL = 1000 // how long to wait between checks for validated ledger
 
-const HOST = process.env.HOST ?? "0.0.0.0"
+const HOST = process.env.HOST ?? "127.0.0.1"
 const PORT = process.env.PORT ?? "6006"
 const serverUrl = `ws://${HOST}:${PORT}`
 
