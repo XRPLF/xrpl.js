@@ -55,7 +55,7 @@ jobs:
       rippled:
         image: natenichols/rippled-standalone:latest
         ports:
-        - 6006:6006
+        - 6006/tcp
 
     steps:
     - uses: actions/checkout@v2
