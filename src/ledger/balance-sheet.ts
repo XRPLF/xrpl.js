@@ -48,9 +48,8 @@ function formatBalanceSheet(balanceSheet: BalanceSheet): GetBalanceSheet {
     })
   }
   if (balanceSheet.obligations !== undefined) {
-    result.obligations = _.map(
-      balanceSheet.obligations as {[key: string]: string},
-      (value, currency) => ({currency, value})
+    result.obligations = Object.entries(balanceSheet.obligations as {[key: string]: string}).map(
+      ([currency, value]) => ({currency, value})
     )
   }
 

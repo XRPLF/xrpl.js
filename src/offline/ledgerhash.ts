@@ -60,7 +60,7 @@ function computeTransactionHash(
     }
     return ledger.transactionHash
   }
-  const txs = _.map(transactions, (tx) => {
+  const txs = transactions.map((tx) => {
     const mergeTx = Object.assign({}, _.omit(tx, 'tx'), tx.tx || {})
     // rename `meta` back to `metaData`
     const renameMeta = Object.assign(

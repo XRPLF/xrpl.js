@@ -44,8 +44,7 @@ function parseTransactions(transactions, ledgerVersion) {
     return {transactionHashes: transactions}
   }
   return {
-    transactions: _.map(
-      transactions,
+    transactions: transactions.map(
       _.partial(parseTransactionWrapper, ledgerVersion)
     )
   }

@@ -22,7 +22,7 @@ function combine(signedTransactions: Array<string>): object {
 
   // TODO: signedTransactions is an array of strings in the documentation, but
   // tests and this code handle it as an array of objects. Fix!
-  const txs: any[] = _.map(signedTransactions, binary.decode)
+  const txs: any[] = signedTransactions.map(binary.decode)
   const tx = _.omit(txs[0], 'Signers')
   if (!_.every(txs, (_tx) => _.isEqual(tx, _.omit(_tx, 'Signers')))) {
     throw new utils.common.errors.ValidationError(

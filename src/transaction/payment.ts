@@ -211,7 +211,7 @@ function createPaymentTransaction(
     txJSON.DestinationTag = destinationAddressAndTag.tag
   }
   if (payment.memos !== undefined) {
-    txJSON.Memos = _.map(payment.memos, utils.convertMemo)
+    txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
   if (payment.noDirectRipple === true) {
     txJSON.Flags |= paymentFlags.NoRippleDirect
