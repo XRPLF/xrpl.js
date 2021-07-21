@@ -112,7 +112,7 @@ function conditionallyAddDirectXRPPath(
 ): Promise<RippledPathsResponse> {
   if (
     isRippledIOUAmount(paths.destination_amount) ||
-    !_.includes(paths.destination_currencies, 'XRP')
+    !paths.destination_currencies.includes('XRP')
   ) {
     return Promise.resolve(paths)
   }
@@ -156,8 +156,7 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
   }
   if (
     paths.destination_currencies !== undefined &&
-    !_.includes(
-      paths.destination_currencies,
+    !paths.destination_currencies.includes(
       pathfind.destination.amount.currency
     )
   ) {

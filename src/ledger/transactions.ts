@@ -69,7 +69,7 @@ function transactionFilter(
   if (filters.excludeFailures && tx.outcome.result !== 'tesSUCCESS') {
     return false
   }
-  if (filters.types && !_.includes(filters.types, tx.type)) {
+  if (filters.types && !filters.types.includes(tx.type)) {
     return false
   }
   if (filters.initiated === true && tx.address !== address) {
