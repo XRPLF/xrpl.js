@@ -61,9 +61,9 @@ function computeTransactionHash(
     return ledger.transactionHash
   }
   const txs = _.map(transactions, (tx) => {
-    const mergeTx = _.assign({}, _.omit(tx, 'tx'), tx.tx || {})
+    const mergeTx = Object.assign({}, _.omit(tx, 'tx'), tx.tx || {})
     // rename `meta` back to `metaData`
-    const renameMeta = _.assign(
+    const renameMeta = Object.assign(
       {},
       _.omit(mergeTx, 'meta'),
       tx.meta ? {metaData: tx.meta} : {}
@@ -118,7 +118,7 @@ function computeLedgerHeaderHash(
     transactionHash: computeTransactionHash(ledger, options),
     stateHash: computeStateHash(ledger, options)
   }
-  return hashLedgerHeader(_.assign({}, ledger, subhashes))
+  return hashLedgerHeader(Object.assign({}, ledger, subhashes))
 }
 
 export default computeLedgerHeaderHash

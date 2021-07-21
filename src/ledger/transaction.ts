@@ -1,4 +1,3 @@
-import * as _ from 'lodash'
 import * as utils from './utils'
 import parseTransaction from './parse/transaction'
 import {validate, errors} from '../common'
@@ -50,7 +49,7 @@ function attachTransactionDate(
     .request(request)
     .then((data) => {
       if (typeof data.ledger.close_time === 'number') {
-        return _.assign({date: data.ledger.close_time}, tx)
+        return Object.assign({date: data.ledger.close_time}, tx)
       }
       throw new errors.UnexpectedError('Ledger missing close_time')
     })

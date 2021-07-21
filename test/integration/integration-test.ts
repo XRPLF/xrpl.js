@@ -559,7 +559,7 @@ describe('integration tests - standalone rippled', function () {
         })
       })
       .then(() => {
-        const multisignInstructions = _.assign({}, instructions, {
+        const multisignInstructions = Object.assign({}, instructions, {
           signersCount: 2
         })
         return this.api

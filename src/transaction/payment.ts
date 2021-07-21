@@ -102,7 +102,7 @@ function createMaximalAmount(amount: Amount): Amount {
   } else {
     maxValue = maxIOUValue
   }
-  return _.assign({}, amount, {value: maxValue})
+  return Object.assign({}, amount, {value: maxValue})
 }
 
 /**

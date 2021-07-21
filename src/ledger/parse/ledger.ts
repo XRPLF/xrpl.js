@@ -25,7 +25,7 @@ export type FormattedLedger = {
 
 function parseTransactionWrapper(ledgerVersion, tx) {
   // renames metaData to meta and adds ledger_index
-  const transaction = _.assign({}, _.omit(tx, 'metaData'), {
+  const transaction = Object.assign({}, _.omit(tx, 'metaData'), {
     meta: tx.metaData,
     ledger_index: ledgerVersion
   })

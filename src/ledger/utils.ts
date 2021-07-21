@@ -74,7 +74,7 @@ function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
   const taker_gets = renameCounterpartyToIssuer(order.taker_gets)
   const taker_pays = renameCounterpartyToIssuer(order.taker_pays)
   const changes = {taker_gets, taker_pays}
-  return _.assign({}, order, _.omitBy(changes, _.isUndefined))
+  return Object.assign({}, order, _.omitBy(changes, _.isUndefined))
 }
 
 function signum(num) {
@@ -130,7 +130,7 @@ function ensureLedgerVersion(this: RippleAPI, options: any): Promise<object> {
     return Promise.resolve(options)
   }
   return this.getLedgerVersion().then((ledgerVersion) =>
-    _.assign({}, options, {ledgerVersion})
+    Object.assign({}, options, {ledgerVersion})
   )
 }
 

@@ -26,7 +26,7 @@ function addParams(
   result: RippledPathsResponse
 ): RippledPathsResponse {
   return _.defaults(
-    _.assign({}, result, {
+    Object.assign({}, result, {
       source_account: request.source_account,
       source_currencies: request.source_currencies
     }),
@@ -38,7 +38,7 @@ function requestPathFind(
   connection: Connection,
   pathfind: PathFind
 ): Promise<RippledPathsResponse> {
-  const destinationAmount: Amount = _.assign(
+  const destinationAmount: Amount = Object.assign(
     {
       // This is converted back to drops by toRippledAmount()
       value:

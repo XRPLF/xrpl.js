@@ -40,7 +40,7 @@ function parseAccountTxTransaction(tx, includeRawTransaction: boolean) {
   const _tx = tx.tx_blob ? parseBinaryTransaction(tx) : tx
   // rippled uses a different response format for 'account_tx' than 'tx'
   return parseTransaction(
-    _.assign({}, _tx.tx, {meta: _tx.meta, validated: _tx.validated}),
+    Object.assign({}, _tx.tx, {meta: _tx.meta, validated: _tx.validated}),
     includeRawTransaction
   )
 }
@@ -209,11 +209,11 @@ function getTransactions(
       const bound = options.earliestFirst
         ? {minLedgerVersion: ledgerVersion}
         : {maxLedgerVersion: ledgerVersion}
-      const startOptions = _.assign({}, defaults, options, {startTx: tx}, bound)
+      const startOptions = Object.assign({}, defaults, options, {startTx: tx}, bound)
       return getTransactionsInternal(this.connection, address, startOptions)
     })
   }
-  const newOptions = _.assign({}, defaults, options)
+  const newOptions = Object.assign({}, defaults, options)
   return getTransactionsInternal(this.connection, address, newOptions)
 }
 

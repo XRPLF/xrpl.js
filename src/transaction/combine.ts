@@ -35,7 +35,7 @@ function combine(signedTransactions: Array<string>): object {
     []
   )
   const signers = unsortedSigners.sort(compareSigners)
-  const signedTx = _.assign({}, tx, {Signers: signers})
+  const signedTx = Object.assign({}, tx, {Signers: signers})
   const signedTransaction = binary.encode(signedTx)
   const id = computeBinaryTransactionHash(signedTransaction)
   return {signedTransaction, id}

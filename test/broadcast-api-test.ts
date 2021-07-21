@@ -28,7 +28,7 @@ describe('RippleAPIBroadcast', function () {
 
   it('base', function () {
     const expected = {request_server_info: 1}
-    this.mocks.forEach((mock) => mock.expect(_.assign({}, expected)))
+    this.mocks.forEach((mock) => mock.expect(Object.assign({}, expected)))
     assert(this.api.isConnected())
     return this.api
       .getServerInfo()
@@ -40,7 +40,7 @@ describe('RippleAPIBroadcast', function () {
     this.api.on('ledger', () => {
       gotLedger++
     })
-    const ledgerNext = _.assign({}, ledgerClosed)
+    const ledgerNext = Object.assign({}, ledgerClosed)
     ledgerNext.ledger_index++
 
     this.api._apis.forEach((api) =>

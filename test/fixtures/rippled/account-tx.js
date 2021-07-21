@@ -217,7 +217,7 @@ module.exports = function(request, options = {}) {
     tx.Destination = addresses.ACCOUNT;
   }
   if (request.limit === 13) {
-    const res = _.assign({}, NotFound, {id: request.id});
+    const res = Object.assign({}, NotFound, {id: request.id});
     return JSON.stringify(res);
   }
   return JSON.stringify({

@@ -58,7 +58,7 @@ function parseSettings(tx: any) {
       txType === 'SignerListSet'
   )
 
-  return _.assign({}, parseFlags(tx), parseFields(tx))
+  return Object.assign({}, parseFlags(tx), parseFields(tx))
 }
 
 export default parseSettings

@@ -21,12 +21,12 @@ function isBTC(json) {
 }
 
 function createResponse(request, response, overrides = {}) {
-  const result = _.assign({}, response.result, overrides)
+  const result = Object.assign({}, response.result, overrides)
   const change =
     response.result && !_.isEmpty(overrides)
       ? {id: request.id, result: result}
       : {id: request.id}
-  return JSON.stringify(_.assign({}, response, change))
+  return JSON.stringify(Object.assign({}, response, change))
 }
 
 function createLedgerResponse(request, response) {
@@ -56,7 +56,7 @@ type MockedWebSocketServer = any
 
 export function createMockRippled(port) {
   const mock = new WebSocketServer({port: port}) as MockedWebSocketServer
-  _.assign(mock, EventEmitter2.prototype)
+  Object.assign(mock, EventEmitter2.prototype)
 
   const close = mock.close
   mock.close = function () {
@@ -120,7 +120,7 @@ export function createMockRippled(port) {
 
   mock.on('request_config', function (request, conn) {
     assert.strictEqual(request.command, 'config')
-    conn.config = _.assign(conn.config, request.data)
+    conn.config = Object.assign(conn.config, request.data)
     conn.send(
       createResponse(request, {
         status: 'success',
@@ -174,7 +174,7 @@ export function createMockRippled(port) {
 
   mock.on('request_global_config', function (request, conn) {
     assert.strictEqual(request.command, 'global_config')
-    mock.config = _.assign(conn.config, request.data)
+    mock.config = Object.assign(conn.config, request.data)
     conn.send(
       createResponse(request, {
         status: 'success',
@@ -346,7 +346,7 @@ export function createMockRippled(port) {
         createLedgerResponse(request, fixtures.ledger.pre2014withPartial)
       )
     } else if (request.ledger_index === 38129) {
-      const response = _.assign({}, fixtures.ledger.normal, {
+      const response = Object.assign({}, fixtures.ledger.normal, {
         result: {ledger: fullLedger}
       })
       conn.send(createLedgerResponse(request, response))

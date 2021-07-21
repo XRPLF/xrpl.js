@@ -83,7 +83,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
       },
       _.isUndefined
     )
-    const proxyOptions = _.assign({}, parsedProxyURL, proxyOverrides)
+    const proxyOptions = Object.assign({}, parsedProxyURL, proxyOverrides)
     let HttpsProxyAgent
     try {
       HttpsProxyAgent = require('https-proxy-agent')
@@ -105,7 +105,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
     },
     _.isUndefined
   )
-  const websocketOptions = _.assign({}, options, optionsOverrides)
+  const websocketOptions = Object.assign({}, options, optionsOverrides)
   const websocket = new WebSocket(url, null, websocketOptions)
   // we will have a listener for each outstanding request,
   // so we have to raise the limit (the default is 10)

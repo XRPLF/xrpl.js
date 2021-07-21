@@ -1,4 +1,3 @@
-import * as _ from 'lodash'
 import parseFields from './parse/fields'
 import {validate, constants, ensureClassicAddress} from '../common'
 import {FormattedSettings} from '../common/types/objects'
@@ -33,7 +32,7 @@ function formatSettings(response: AccountInfoResponse) {
   const data = response.account_data
   const parsedFlags = parseAccountFlags(data.Flags, {excludeFalse: true})
   const parsedFields = parseFields(data)
-  return _.assign({}, parsedFlags, parsedFields)
+  return Object.assign({}, parsedFlags, parsedFields)
 }
 
 export async function getSettings(

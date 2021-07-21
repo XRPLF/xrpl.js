@@ -1,4 +1,3 @@
-import * as _ from 'lodash'
 import {RippleAPI, APIOptions} from './api'
 
 class RippleAPIBroadcast extends RippleAPI {
@@ -9,7 +8,7 @@ class RippleAPIBroadcast extends RippleAPI {
     super(options)
 
     const apis: RippleAPI[] = servers.map(
-      (server) => new RippleAPI(_.assign({}, options, {server}))
+      (server) => new RippleAPI(Object.assign({}, options, {server}))
     )
 
     // exposed for testing
