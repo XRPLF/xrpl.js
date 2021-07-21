@@ -54,7 +54,7 @@ jobs:
       rippled:
         image: natenichols/rippled-standalone:latest
         ports:
-        - 6006/tcp
+        - 80/tcp
 
     steps:
     - uses: actions/checkout@v2
@@ -69,4 +69,4 @@ jobs:
     - run: yarn test:integration
       env:
         HOST: localhost
-        PORT: ${{ job.services.rippled.ports[6006] }}
+        PORT: ${{ job.services.rippled.ports[80] }}
