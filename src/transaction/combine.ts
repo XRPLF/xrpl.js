@@ -29,8 +29,7 @@ function combine(signedTransactions: Array<string>): object {
       'txJSON is not the same for all signedTransactions'
     )
   }
-  const unsortedSigners = _.reduce(
-    txs,
+  const unsortedSigners = txs.reduce(
     (accumulator, _tx) => accumulator.concat(_tx.Signers || []),
     []
   )

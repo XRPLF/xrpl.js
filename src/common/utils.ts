@@ -127,9 +127,8 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
   if (typeof obj === 'object') {
     const accumulator = Array.isArray(obj) ? [] : {}
     let newKey
-    return _.reduce(
-      obj,
-      (result, value, key) => {
+    return Object.entries(obj).reduce(
+      (result, [key, value]) => {
         newKey = key
         // taking this out of function leads to error in PhantomJS
         const FINDSNAKE = /([a-zA-Z]_[a-zA-Z])/g
