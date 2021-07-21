@@ -319,7 +319,7 @@ describe('integration tests', function () {
           return this.api.getOrders(address).then((orders) => {
             assert(orders && orders.length > 0)
             const createdOrder = _.first(
-              _.filter(orders, (order) => {
+              orders.filter((order) => {
                 return order.properties.sequence === txData.Sequence
               })
             )

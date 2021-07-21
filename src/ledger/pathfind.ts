@@ -130,7 +130,7 @@ function filterSourceFundsLowPaths(
     pathfind.destination.amount.value === undefined &&
     paths.alternatives
   ) {
-    paths.alternatives = _.filter(paths.alternatives, (alt) => {
+    paths.alternatives = paths.alternatives.filter((alt) => {
       if (!alt.source_amount) {
         return false
       }
