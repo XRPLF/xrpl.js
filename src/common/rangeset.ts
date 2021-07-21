@@ -52,7 +52,7 @@ class RangeSet {
   }
 
   containsRange(start: number, end: number) {
-    return _.some(this.ranges, (range) => range[0] <= start && range[1] >= end)
+    return this.ranges.some((range) => range[0] <= start && range[1] >= end)
   }
 
   containsValue(value: number) {
