@@ -81,7 +81,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
         passphrase: config.passphrase,
         cert: config.certificate
       },
-      _.isUndefined
+      value => value === undefined
     )
     const proxyOptions = Object.assign({}, parsedProxyURL, proxyOverrides)
     let HttpsProxyAgent
@@ -103,7 +103,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
       passphrase: config.passphrase,
       cert: config.certificate
     },
-    _.isUndefined
+    value => value === undefined
   )
   const websocketOptions = Object.assign({}, options, optionsOverrides)
   const websocket = new WebSocket(url, null, websocketOptions)

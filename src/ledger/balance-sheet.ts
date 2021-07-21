@@ -21,7 +21,7 @@ export type GetBalanceSheet = {
 function formatBalanceSheet(balanceSheet): GetBalanceSheet {
   const result: GetBalanceSheet = {}
 
-  if (!_.isUndefined(balanceSheet.balances)) {
+  if (balanceSheet.balances !== undefined) {
     result.balances = []
     _.forEach(balanceSheet.balances, (balances, counterparty) => {
       _.forEach(balances, (balance) => {
@@ -29,7 +29,7 @@ function formatBalanceSheet(balanceSheet): GetBalanceSheet {
       })
     })
   }
-  if (!_.isUndefined(balanceSheet.assets)) {
+  if (balanceSheet.assets !== undefined) {
     result.assets = []
     _.forEach(balanceSheet.assets, (assets, counterparty) => {
       _.forEach(assets, (balance) => {
@@ -37,7 +37,7 @@ function formatBalanceSheet(balanceSheet): GetBalanceSheet {
       })
     })
   }
-  if (!_.isUndefined(balanceSheet.obligations)) {
+  if (balanceSheet.obligations !== undefined) {
     result.obligations = _.map(
       balanceSheet.obligations as {[key: string]: string},
       (value, currency) => ({currency, value})

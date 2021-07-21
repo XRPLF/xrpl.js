@@ -74,7 +74,7 @@ function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
   const taker_gets = renameCounterpartyToIssuer(order.taker_gets)
   const taker_pays = renameCounterpartyToIssuer(order.taker_pays)
   const changes = {taker_gets, taker_pays}
-  return Object.assign({}, order, _.omitBy(changes, _.isUndefined))
+  return Object.assign({}, order, _.omitBy(changes, value => value === undefined))
 }
 
 function signum(num) {
