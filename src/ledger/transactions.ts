@@ -150,9 +150,9 @@ function checkForLedgerGaps(
   // the range of ledgers spanned by those transactions
   if (options.limit && transactions.length === options.limit) {
     if (options.earliestFirst) {
-      maxLedgerVersion = _.last(transactions)!.outcome.ledgerVersion
+      maxLedgerVersion = transactions[transactions.length-1]!.outcome.ledgerVersion
     } else {
-      minLedgerVersion = _.last(transactions)!.outcome.ledgerVersion
+      minLedgerVersion = transactions[transactions.length-1]!.outcome.ledgerVersion
     }
   }
 
