@@ -14,7 +14,7 @@ const INTERVAL = 1000 // how long to wait between checks for validated ledger
 
 const HOST = process.env.HOST ?? "127.0.0.1"
 const PORT = process.env.PORT ?? "6006"
-const serverUrl = `ws://${HOST}:${PORT}`
+const serverUrl = `${HOST}:${PORT}`
 console.log(serverUrl)
 
 function acceptLedger(api) {
