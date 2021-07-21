@@ -52,7 +52,7 @@ jobs:
       rippled:
         image: natenichols/rippled-standalone:latest
         ports:
-        - 6006:6006
+        - 80:80
         options:
           --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s 
 
@@ -71,4 +71,4 @@ jobs:
     - run: yarn test:integration
       env:
         HOST: localhost
-        PORT: ${{ job.services.rippled.ports['6006'] }}
+        PORT: ${{ job.services.rippled.ports['80'] }}
