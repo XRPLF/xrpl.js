@@ -48,6 +48,10 @@ jobs:
   integration:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [12.x, 13.x, 14.x]
+
     services:
       rippled:
         image: natenichols/rippled-standalone:latest
@@ -58,13 +62,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Read .nvmrc # From https://github.com/actions/setup-node/issues/32#issuecomment-525791142
-      run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
-      id: nvm
-    - name: Use Node.js (.nvmrc)
+    - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
-        node-version: "${{ steps.nvm.outputs.NVMRC }}"
+        node-version: ${{ matrix.node-version }}
     - run: yarn install
     - run: yarn test:integration
       env:
