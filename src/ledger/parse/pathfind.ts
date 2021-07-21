@@ -19,7 +19,7 @@ function createAdjustment(
   address: string,
   adjustmentWithoutAddress: object
 ): any {
-  const amountKey = _.keys(adjustmentWithoutAddress)[0]
+  const amountKey = Object.keys(adjustmentWithoutAddress)[0]
   const amount = adjustmentWithoutAddress[amountKey]
   return _.set(
     {address: address},

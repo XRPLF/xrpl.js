@@ -126,7 +126,7 @@ function loadSchemas() {
     require('./schemas/input/combine.json')
   ]
   const titles = schemas.map((schema) => schema.title)
-  const duplicates = _.keys(_.pickBy(_.countBy(titles), (count) => count > 1))
+  const duplicates = Object.keys(_.pickBy(_.countBy(titles), (count) => count > 1))
   assert.ok(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
   const validator = new Validator()
   // Register custom format validators that ignore undefined instances
