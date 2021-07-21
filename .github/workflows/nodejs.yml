@@ -57,7 +57,7 @@ jobs:
         ports:
         - 6006:6006
         options:
-          --health-cmd="curl --silent --fail localhost:6006 || exit 1" --health-interval=5s --health-retries=12 --health-timeout=2s 
+          --health-cmd="wget localhost:6006 || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s 
 
     steps:
     - uses: actions/checkout@v2
