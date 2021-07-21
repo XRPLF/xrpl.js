@@ -40,7 +40,7 @@ function parseTransactions(transactions, ledgerVersion) {
   if (_.isEmpty(transactions)) {
     return {}
   }
-  if (_.isString(transactions[0])) {
+  if (typeof transactions[0] === 'string') {
     return {transactionHashes: transactions}
   }
   return {
@@ -54,7 +54,7 @@ function parseState(state) {
   if (_.isEmpty(state)) {
     return {}
   }
-  if (_.isString(state[0])) {
+  if (typeof state[0] === 'string') {
     return {stateHashes: state}
   }
   return {rawState: JSON.stringify(state)}
