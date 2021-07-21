@@ -56,6 +56,8 @@ jobs:
         image: natenichols/rippled-standalone:latest
         ports:
         - 6006:6006
+        options:
+          --health-cmd="curl --silent --fail localhost:6006 || exit 1" --health-interval=5s --health-retries=12 --health-timeout=2s 
 
     steps:
     - uses: actions/checkout@v2
