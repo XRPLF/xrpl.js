@@ -69,4 +69,4 @@ jobs:
     - run: yarn test:integration
     env:
       HOST: rippled
-      PORT: ${{ job.services.rippled.ports[6006] }}
+      PORT: ${{ integration.services.rippled.ports[6006] }}
