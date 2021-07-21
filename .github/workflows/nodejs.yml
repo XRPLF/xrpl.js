@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container: 
-      image: node:10.16-jessie
+      image: node:12
 
     services:
       rippled:
