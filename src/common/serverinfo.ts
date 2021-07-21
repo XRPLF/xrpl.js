@@ -33,8 +33,9 @@ export type GetServerInfoResponse = {
   networkLedger?: string
 }
 
-function renameKeys(object, mapping) {
-  _.forEach(mapping, (to, from) => {
+function renameKeys(object: Record<string, any>, mapping: Record<string, any>) {
+  Object.entries(mapping).forEach(entry => {
+    const [from, to] = entry;
     object[to] = object[from]
     delete object[from]
   })

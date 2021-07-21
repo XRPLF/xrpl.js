@@ -26,7 +26,8 @@ function parseFlags(tx: any): any {
     const changedFlags = oldFlags ^ newFlags
     const setFlags = newFlags & changedFlags
     const clearedFlags = oldFlags & changedFlags
-    _.forEach(AccountFlags, (flagValue, flagName) => {
+    Object.entries(AccountFlags).forEach(entry => {
+      const [flagName, flagValue] = entry;
       if (setFlags & flagValue) {
         settings[flagName] = true
       } else if (clearedFlags & flagValue) {

@@ -157,7 +157,7 @@ function loadSchemas() {
   }
 
   // Register under the root URI '/'
-  _.forEach(schemas, (schema) =>
+  schemas.forEach((schema) =>
     validator.addSchema(schema, '/' + schema.title)
   )
   return validator

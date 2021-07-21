@@ -45,7 +45,7 @@ class RangeSet {
 
   parseAndAddRanges(rangesString: string) {
     const rangeStrings = rangesString.split(',')
-    _.forEach(rangeStrings, (rangeString) => {
+    rangeStrings.forEach((rangeString) => {
       const range = rangeString.split('-').map(Number)
       this.addRange(range[0], range.length === 1 ? range[0] : range[1])
     })

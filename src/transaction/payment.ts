@@ -76,8 +76,8 @@ function applyAnyCounterpartyEncoding(payment: Payment): void {
   // Convert blank counterparty to sender or receiver's address
   //   (Ripple convention for 'any counterparty')
   // https://developers.ripple.com/payment.html#special-issuer-values-for-sendmax-and-amount
-  _.forEach([payment.source, payment.destination], (adjustment) => {
-    _.forEach(['amount', 'minAmount', 'maxAmount'], (key) => {
+  [payment.source, payment.destination].forEach((adjustment) => {
+    ['amount', 'minAmount', 'maxAmount'].forEach((key) => {
       if (isIOUWithoutCounterparty(adjustment[key])) {
         adjustment[key].counterparty = adjustment.address
       }

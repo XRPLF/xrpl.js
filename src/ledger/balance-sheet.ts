@@ -18,21 +18,31 @@ export type GetBalanceSheet = {
   }>
 }
 
-function formatBalanceSheet(balanceSheet): GetBalanceSheet {
+type BalanceSheet = {
+  account: string,
+  assets?: Record<string, any>,
+  balances?: Record<string, any>,
+  obligations?: Record<string, string>,
+  ledger_current_index?: number,
+  validated?: boolean
+}
+
+function formatBalanceSheet(balanceSheet: BalanceSheet): GetBalanceSheet {
   const result: GetBalanceSheet = {}
 
   if (balanceSheet.balances !== undefined) {
     result.balances = []
-    _.forEach(balanceSheet.balances, (balances, counterparty) => {
-      _.forEach(balances, (balance) => {
+    Object.entries(balanceSheet.balances).forEach(entry => {
+      const [counterparty, balances] = entry;
+      balances.forEach((balance) => {
         result.balances.push(Object.assign({counterparty}, balance))
       })
     })
   }
   if (balanceSheet.assets !== undefined) {
     result.assets = []
-    _.forEach(balanceSheet.assets, (assets, counterparty) => {
-      _.forEach(assets, (balance) => {
+    Object.entries(balanceSheet.assets).forEach(([counterparty, assets]) => {
+      assets.forEach((balance) => {
         result.assets.push(Object.assign({counterparty}, balance))
       })
     })

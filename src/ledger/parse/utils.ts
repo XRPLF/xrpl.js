@@ -1,10 +1,32 @@
-import * as _ from 'lodash'
 import transactionParser from 'ripple-lib-transactionparser'
 import BigNumber from 'bignumber.js'
 import * as common from '../../common'
 import parseAmount from './amount'
 
 import {Amount, Memo} from '../../common/types/objects'
+
+type OfferDescription = {
+  direction: string,
+  quantity: any,
+  totalPrice: any,
+  sequence: number,
+  status: string,
+  makerExchangeRate: string
+}
+
+type Orderbook = {
+  [key: string]: OfferDescription[]
+}
+
+type BalanceSheetItem = {
+  counterparty: string,
+  currency: string,
+  value: string
+}
+
+type BalanceSheet = {
+  [key: string]: BalanceSheetItem[]
+}
 
 function adjustQualityForXRP(
   quality: string,
@@ -41,16 +63,16 @@ function removeEmptyCounterparty(amount) {
   }
 }
 
-function removeEmptyCounterpartyInBalanceChanges(balanceChanges) {
-  _.forEach(balanceChanges, (changes) => {
-    _.forEach(changes, removeEmptyCounterparty)
+function removeEmptyCounterpartyInBalanceChanges(balanceChanges: BalanceSheet) {
+  Object.entries(balanceChanges).forEach(([_, changes]) => {
+    changes.forEach(removeEmptyCounterparty)
   })
 }
 
-function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges) {
-  _.forEach(orderbookChanges, (changes) => {
-    _.forEach(changes, (change) => {
-      _.forEach(change, removeEmptyCounterparty)
+function removeEmptyCounterpartyInOrderbookChanges(orderbookChanges: Orderbook) {
+  Object.entries(orderbookChanges).forEach(([_, changes]) => {
+    changes.forEach((change) => {
+      Object.entries(change).forEach(removeEmptyCounterparty)
     })
   })
 }
