@@ -62,7 +62,7 @@ jobs:
       run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
       id: nvm
     -name: check connection
-      run: "wscat -c ws://professornormal:6006/ -x '{ \"id\": \"health check\", \"command\": \"ping\" }'"
+      run: "wscat -c ws://localhost:6006/ -x \'{ \"id\": \"health check\", \"command\": \"ping\" }\'"
     - name: Use Node.js (.nvmrc)
       uses: actions/setup-node@v1
       with:
