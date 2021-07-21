@@ -11,7 +11,6 @@ on:
 
 jobs:
   build_with_nvm:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +28,6 @@ jobs:
     - run: yarn build
 
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -50,6 +48,9 @@ jobs:
   integration:
     runs-on: ubuntu-latest
 
+    container: 
+      image: node:12
+
     services:
       rippled:
         image: natenichols/rippled-standalone:latest
@@ -68,5 +69,5 @@ jobs:
     - run: yarn install
     - run: yarn test:integration
       env:
-        HOST: localhost
+        HOST: rippled
         PORT: ${{ job.services.rippled.ports[6006] }}
