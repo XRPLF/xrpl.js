@@ -48,9 +48,6 @@ jobs:
   integration:
     runs-on: ubuntu-latest
 
-    container: 
-      image: node:12
-
     services:
       rippled:
         image: natenichols/rippled-standalone:latest
@@ -71,5 +68,5 @@ jobs:
     - run: yarn install
     - run: yarn test:integration
       env:
-        HOST: rippled
-        PORT: ${{ job.services.rippled.ports[6006] }}
+        HOST: localhost
+        PORT: ${{ job.services.rippled.ports['6006'] }}
