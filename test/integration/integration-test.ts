@@ -318,11 +318,11 @@ describe('integration tests', function () {
           const txData = JSON.parse(result.txJSON)
           return this.api.getOrders(address).then((orders) => {
             assert(orders && orders.length > 0)
-            const createdOrder = _.first(
+            const createdOrder = (
               orders.filter((order) => {
                 return order.properties.sequence === txData.Sequence
               })
-            )
+            )[0]
             assert(createdOrder)
             assert.strictEqual(createdOrder.properties.maker, address)
             assert.deepEqual(createdOrder.specification, orderSpecification)
@@ -398,7 +398,8 @@ describe('integration tests', function () {
 
   it('getTrustlines', function () {
     const fixture = requests.prepareTrustline.simple
-    const options = _.pick(fixture, ['currency', 'counterparty'])
+    const { currency, counterparty } = fixture
+    const options = { currency, counterparty }
     return this.api.getTrustlines(address, options).then((data) => {
       assert(data && data.length > 0 && data[0] && data[0].specification)
       const specification = data[0].specification
@@ -410,7 +411,8 @@ describe('integration tests', function () {
 
   it('getBalances', function () {
     const fixture = requests.prepareTrustline.simple
-    const options = _.pick(fixture, ['currency', 'counterparty'])
+    const { currency, counterparty } = fixture
+    const options = { currency, counterparty }
     return this.api.getBalances(address, options).then((data) => {
       assert(data && data.length > 0 && data[0])
       assert.strictEqual(data[0].currency, fixture.currency)
