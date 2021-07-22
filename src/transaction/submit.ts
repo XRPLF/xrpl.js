@@ -4,7 +4,6 @@
 //     fail_hard: failHard
 //   });
 
-import * as _ from 'lodash'
 import * as utils from './utils'
 import {validate} from '../common'
 import {RippleAPI} from '..'
@@ -21,7 +20,7 @@ function isImmediateRejection(engineResult: string): boolean {
   // if the required fee changes (this does not occur at the time of
   // this writing, but it could change in the future)
   // all other error classes can potentially result in transaction validation
-  return _.startsWith(engineResult, 'tem')
+  return engineResult.startsWith('tem')
 }
 
 function formatSubmitResponse(response): FormattedSubmitResponse {
