@@ -170,10 +170,9 @@ function formatResponse(
   options: TransactionsOptions,
   transactions: GetTransactionsResponse
 ) {
-  const compare = options.earliestFirst
-    ? utils.compareTransactions
-    : _.rearg(utils.compareTransactions, 1, 0)
-  const sortedTransactions = transactions.sort(compare)
+  const sortedTransactions = options.earliestFirst
+    ? transactions.sort(utils.compareTransactions)
+    : transactions.sort(utils.compareTransactions).reverse()
   return checkForLedgerGaps(connection, options, sortedTransactions).then(
     () => sortedTransactions
   )
