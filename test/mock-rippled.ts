@@ -61,8 +61,8 @@ export function createMockRippled(port) {
   const close = mock.close
   mock.close = function () {
     if (mock.expectedRequests !== undefined) {
-      const allRequestsMade = _.every(mock.expectedRequests, function (
-        counter
+      const allRequestsMade = Object.entries(mock.expectedRequests).every(function (
+        _, counter
       ) {
         return counter === 0
       })

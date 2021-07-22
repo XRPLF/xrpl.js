@@ -496,7 +496,7 @@ describe('integration tests', function () {
     return this.api.getPaths(pathfind).then((data) => {
       assert(data && data.length > 0)
       assert(
-        _.every(data, (path) => {
+        data.every((path) => {
           return (
             parseFloat(path.source.amount.value) <=
             parseFloat(pathfind.source.amount.value)

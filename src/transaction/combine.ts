@@ -24,7 +24,7 @@ function combine(signedTransactions: Array<string>): object {
   // tests and this code handle it as an array of objects. Fix!
   const txs: any[] = signedTransactions.map(binary.decode)
   const tx = _.omit(txs[0], 'Signers')
-  if (!_.every(txs, (_tx) => _.isEqual(tx, _.omit(_tx, 'Signers')))) {
+  if (!txs.every((_tx) => _.isEqual(tx, _.omit(_tx, 'Signers')))) {
     throw new utils.common.errors.ValidationError(
       'txJSON is not the same for all signedTransactions'
     )
