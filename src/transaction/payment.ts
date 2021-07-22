@@ -1,7 +1,6 @@
 import * as _ from 'lodash'
 import * as utils from './utils'
 const validate = utils.common.validate
-const toRippledAmount = utils.common.toRippledAmount
 const paymentFlags = utils.common.txFlags.Payment
 const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare, TransactionJSON} from './types'
@@ -12,7 +11,7 @@ import {
   MinAdjustment,
   Memo
 } from '../common/types/objects'
-import {xrpToDrops} from '../common'
+import {toRippledAmount, xrpToDrops} from '../common'
 import {RippleAPI} from '..'
 import {getClassicAccountAndTag, ClassicAccountAndTag} from './utils'
 

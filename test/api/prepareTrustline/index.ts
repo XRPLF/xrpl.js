@@ -50,6 +50,15 @@ export default <TestSuite>{
     )
   },
 
+  'xaddress-issuer': async (api, address) => {
+    const result = await api.prepareTrustline(
+      address,
+      requests.prepareTrustline.issuedXAddress,
+      instructionsWithMaxLedgerVersionOffset
+    )
+    assertResultMatch(result, responses.prepareTrustline.issuedXAddress, 'prepare')
+  },
+
   'with ticket': async (api, address) => {
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,

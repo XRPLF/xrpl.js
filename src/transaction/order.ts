@@ -1,6 +1,6 @@
 import * as utils from './utils'
 const offerFlags = utils.common.txFlags.OfferCreate
-import {validate, iso8601ToRippleTime} from '../common'
+import {validate, iso8601ToRippleTime, toRippledAmount} from '../common'
 import {Instructions, Prepare, OfferCreateTransaction} from './types'
 import {FormattedOrderSpecification} from '../common/types/objects/index'
 import {RippleAPI} from '..'
@@ -9,10 +9,10 @@ function createOrderTransaction(
   account: string,
   order: FormattedOrderSpecification
 ): OfferCreateTransaction {
-  const takerPays = utils.common.toRippledAmount(
+  const takerPays = toRippledAmount(
     order.direction === 'buy' ? order.quantity : order.totalPrice
   )
-  const takerGets = utils.common.toRippledAmount(
+  const takerGets = toRippledAmount(
     order.direction === 'buy' ? order.totalPrice : order.quantity
   )
 
