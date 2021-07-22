@@ -248,7 +248,7 @@ export function createMockRippled(port) {
       mock.config.returnEmptySubscribeRequest--
       conn.send(createResponse(request, fixtures.empty))
     } else if (request.accounts) {
-      assert(_.values(addresses).indexOf(request.accounts[0]) !== -1)
+      assert(Object.values(addresses).indexOf(request.accounts[0]) !== -1)
     }
     conn.send(createResponse(request, fixtures.subscribe))
   })
@@ -256,7 +256,7 @@ export function createMockRippled(port) {
   mock.on('request_unsubscribe', function (request, conn) {
     assert.strictEqual(request.command, 'unsubscribe')
     if (request.accounts) {
-      assert(_.values(addresses).indexOf(request.accounts[0]) !== -1)
+      assert(Object.values(addresses).indexOf(request.accounts[0]) !== -1)
     } else {
       assert.deepEqual(request.streams, ['ledger', 'server'])
     }
