@@ -72,6 +72,7 @@
     "clean": "rm -rf dist/npm",
     "doctoc": "doctoc docs/index.md --title '# RippleAPI Reference' --github --maxlevel 2",
     "docgen": "node --harmony scripts/build_docs.js",
+    "lojack": "lodash -o ./dist/lodash.js include=$( grep -roh \"_\\.[[:alpha:]]*\" ./src/js --include=*.js | sort | uniq | cut -b 3- | tr \"\n\" \",\" )",
     "prepublish": "yarn clean && yarn build",
     "test": "TS_NODE_PROJECT=src/tsconfig.json nyc mocha --config=test/.mocharc.json --exit",
     "test:watch": "TS_NODE_PROJECT=src/tsconfig.json mocha --watch --reporter dot",
