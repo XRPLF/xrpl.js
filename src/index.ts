@@ -1,6 +1,8 @@
-export {RippleAPI} from './api'
+export * from './api'
 
-export {FormattedTransactionType} from './transaction/types'
+export * from './transaction/types'
+
+export * from './common/types/objects/ledger'
 
 // Broadcast api is experimental
 export {RippleAPIBroadcast} from './broadcast'

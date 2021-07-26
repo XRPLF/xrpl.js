@@ -36,8 +36,8 @@ async function getTrustlines(
     peer: options.counterparty
   })
   // 3. Return Formatted Response
-  const trustlines = _.flatMap(responses, response => response.lines)
-  return trustlines.map(parseAccountTrustline).filter(trustline => {
+  const trustlines = _.flatMap(responses, (response) => response.lines)
+  return trustlines.map(parseAccountTrustline).filter((trustline) => {
     return currencyFilter(options.currency || null, trustline)
   })
 }

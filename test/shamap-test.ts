@@ -26,9 +26,9 @@ function fillShamapTest(shamap: any, keys: string[], hashes: string[]) {
   }
 }
 
-describe('SHAMap', function() {
-  describe('#addItem', function() {
-    it('will add new nodes to v1', function() {
+describe('SHAMap', function () {
+  describe('#addItem', function () {
+    it('will add new nodes to v1', function () {
       var keys = [
         'b92891fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',
         'b92881fe4ef6cee585fdc6fda1e09eb4d386363158ec3321b8123e5a772c6ca8',

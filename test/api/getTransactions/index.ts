@@ -100,8 +100,8 @@ export default <TestSuite>{
     const response = await api.getTransactions(address, options)
     hack(response)
     assert.strictEqual(response.length, 10)
-    response.forEach(t => assert(t.type === 'payment' || t.type === 'order'))
-    response.forEach(t => assert(t.outcome.result === 'tesSUCCESS'))
+    response.forEach((t) => assert(t.type === 'payment' || t.type === 'order'))
+    response.forEach((t) => assert(t.outcome.result === 'tesSUCCESS'))
   },
 
   'filters for incoming': async (api, address) => {
@@ -115,8 +115,8 @@ export default <TestSuite>{
     const response = await api.getTransactions(address, options)
     hack(response)
     assert.strictEqual(response.length, 10)
-    response.forEach(t => assert(t.type === 'payment' || t.type === 'order'))
-    response.forEach(t => assert(t.outcome.result === 'tesSUCCESS'))
+    response.forEach((t) => assert(t.type === 'payment' || t.type === 'order'))
+    response.forEach((t) => assert(t.outcome.result === 'tesSUCCESS'))
   },
 
   // this is the case where core.RippleError just falls
@@ -155,6 +155,7 @@ export default <TestSuite>{
     const response = await api.getTransactions(addresses.OTHER_ACCOUNT)
     assertResultMatch(response, RESPONSE_FIXTURES.one, 'getTransactions')
   }
+  
 }
 
 // This test relies on the binary (hex string) format, but computed fields like `date`
@@ -162,7 +163,7 @@ export default <TestSuite>{
 // the expected response. Long term, a better approach would be to use/test the json
 // format responses, instead of the binary.
 function hack(response) {
-  response.forEach(element => {
+  response.forEach((element) => {
     element.outcome.timestamp = '2019-04-01T07:39:01.000Z'
   })
 }

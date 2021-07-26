@@ -13,6 +13,7 @@ function loadSchemas() {
     require('./schemas/objects/hash128.json'),
     require('./schemas/objects/hash256.json'),
     require('./schemas/objects/sequence.json'),
+    require('./schemas/objects/ticket-sequence.json'),
     require('./schemas/objects/signature.json'),
     require('./schemas/objects/issue.json'),
     require('./schemas/objects/ledger-version.json'),
@@ -115,6 +116,7 @@ function loadSchemas() {
     require('./schemas/input/prepare-check-create.json'),
     require('./schemas/input/prepare-check-cash.json'),
     require('./schemas/input/prepare-check-cancel.json'),
+    require('./schemas/input/prepare-ticket-create.json'),
     require('./schemas/input/compute-ledger-hash.json'),
     require('./schemas/input/sign.json'),
     require('./schemas/input/submit.json'),
@@ -123,8 +125,8 @@ function loadSchemas() {
     require('./schemas/input/verify-payment-channel-claim.json'),
     require('./schemas/input/combine.json')
   ]
-  const titles = schemas.map(schema => schema.title)
-  const duplicates = _.keys(_.pickBy(_.countBy(titles), count => count > 1))
+  const titles = schemas.map((schema) => schema.title)
+  const duplicates = _.keys(_.pickBy(_.countBy(titles), (count) => count > 1))
   assert.ok(duplicates.length === 0, 'Duplicate schemas for: ' + duplicates)
   const validator = new Validator()
   // Register custom format validators that ignore undefined instances
@@ -132,7 +134,7 @@ function loadSchemas() {
   // (optional)  property
 
   // This relies on "format": "xAddress" in `x-address.json`!
-  validator.customFormats.xAddress = function(instance) {
+  validator.customFormats.xAddress = function (instance) {
     if (instance === undefined) {
       return true
     }
@@ -140,14 +142,14 @@ function loadSchemas() {
   }
 
   // This relies on "format": "classicAddress" in `classic-address.json`!
-  validator.customFormats.classicAddress = function(instance) {
+  validator.customFormats.classicAddress = function (instance) {
     if (instance === undefined) {
       return true
     }
     return isValidAddress(instance)
   }
 
-  validator.customFormats.secret = function(instance) {
+  validator.customFormats.secret = function (instance) {
     if (instance === undefined) {
       return true
     }
@@ -155,7 +157,9 @@ function loadSchemas() {
   }
 
   // Register under the root URI '/'
-  _.forEach(schemas, schema => validator.addSchema(schema, '/' + schema.title))
+  _.forEach(schemas, (schema) =>
+    validator.addSchema(schema, '/' + schema.title)
+  )
   return validator
 }
 

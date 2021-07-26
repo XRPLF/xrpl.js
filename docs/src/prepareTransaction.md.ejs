@@ -1,6 +1,6 @@
 ## prepareTransaction
 
-`prepareTransaction(transaction: [Transaction](https://xrpl.org/transaction-formats.html), instructions?: [Instructions](#transaction-instructions)): Promise<object>`
+`prepareTransaction(transaction: object, instructions: object): Promise<object>`
 
 Prepare a transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 

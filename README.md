@@ -24,14 +24,78 @@ What is ripple-lib used for? The applications on the list linked above use `ripp
 
 ### Requirements
 
-+ **[Node v10](https://nodejs.org/)** is recommended. Other versions may work but are not frequently tested.
++ **[Node.js v14](https://nodejs.org/)** is recommended. Other versions may work but are not frequently tested.
 + **[Yarn](https://yarnpkg.com/)** is recommended. `npm` may work but we use `yarn.lock`.
 
-### Install
+## Getting Started
+
+See also: [RippleAPI Beginners Guide](https://xrpl.org/get-started-with-rippleapi-for-javascript.html)
 
 In an existing project (with `package.json`), install `ripple-lib`:
 ```
 $ yarn add ripple-lib
+```
+
+Then see the [documentation](#documentation).
+
+### Using ripple-lib with React Native
+
+If you want to use `ripple-lib` with React Native you will need to have some of the NodeJS modules available. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
+
+1. Install dependencies (you can use `npm` as well):
+
+    ```shell
+    yarn add react-native-crypto
+    yarn add ripple-lib 
+    # install peer deps
+    yarn add react-native-randombytes
+    # install latest rn-nodeify
+    yarn add rn-nodeify@latest --dev
+    ```
+
+2. After that, run the following command:
+
+    ```shell
+    # install node core shims and recursively hack package.json files
+    # in ./node_modules to add/update the "browser"/"react-native" field with relevant mappings
+    ./node_modules/.bin/rn-nodeify --hack --install
+    ```
+
+3. Enable `crypto`:
+
+    `rn-nodeify` will create a `shim.js` file in the project root directory.
+    Open it and uncomment the line that requires the crypto module:
+
+    ```javascript
+    // If using the crypto shim, uncomment the following line to ensure
+    // crypto is loaded first, so it can populate global.crypto
+    require('crypto')
+    ```
+
+4. Import `shim` in your project (it must be the first line):
+
+  ```javascript
+  import './shim'
+  ...
+  ```
+
+### Using ripple-lib with Deno
+
+Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `ripple-lib` with Deno:
+
+```javascript
+import ripple from 'https://dev.jspm.io/npm:ripple-lib';
+
+(async () => {
+  const api = new (ripple as any).RippleAPI({ server: 'wss://s.altnet.rippletest.net:51233' });
+  const address = 'rH8NxV12EuV...khfJ5uw9kT';
+
+  api.connect().then(() => {
+    api.getBalances(address).then((balances: any) => {
+      console.log(JSON.stringify(balances, null, 2));
+    });
+  });
+})();
 ```
 
 ## Documentation
@@ -73,7 +137,7 @@ For details, see the `scripts` in `package.json`.
 
 ### Linting
 
-Run `yarn lint` to lint the code with `tslint`.
+Run `yarn lint` to lint the code with `eslint`.
 
 ## Generating Documentation
 

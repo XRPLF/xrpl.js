@@ -1,0 +1,32 @@
+{
+  "type": "depositPreauth",
+  "address": "rH8AzLerezBnkuM7reZfrQ513nRvKjDrnx",
+  "sequence": 16433982,
+  "id": "3BA61A2621C09A119A12EA9271AE5FA165B6E39657E02BFD3C5B21E28F72B883",
+  "specification": {
+    "memos": [
+      {
+        "type": "test",
+        "format": "text/plain",
+        "data": "texted data"
+      }
+    ],
+    "authorize": "rErhTv3pwYAgsERLfhtWeE33wAHtDRuUwK"
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2018-02-23T22:20:01.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rH8AzLerezBnkuM7reZfrQ513nRvKjDrnx": [
+        {
+          "currency": "XRP",
+          "value": "-0.000012"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 16433986,
+    "indexInLedger": 0
+  }
+}

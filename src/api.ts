@@ -43,6 +43,7 @@ import prepareCheckCreate from './transaction/check-create'
 import prepareCheckCancel from './transaction/check-cancel'
 import prepareCheckCash from './transaction/check-cash'
 import prepareSettings from './transaction/settings'
+import prepareTicketCreate from './transaction/ticket'
 import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
@@ -88,7 +89,20 @@ import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 import {ConnectionUserOptions} from './common/connection'
-import {isValidXAddress, isValidClassicAddress} from 'ripple-address-codec'
+import {classicAddressToXAddress, xAddressToClassicAddress, isValidXAddress, isValidClassicAddress, encodeSeed, decodeSeed, encodeAccountID, decodeAccountID, encodeNodePublic, decodeNodePublic, encodeAccountPublic, decodeAccountPublic, encodeXAddress, decodeXAddress} from 'ripple-address-codec'
+import {
+  computeBinaryTransactionHash,
+  computeTransactionHash,
+  computeBinaryTransactionSigningHash,
+  computeAccountLedgerObjectID,
+  computeSignerListLedgerObjectID,
+  computeOrderID,
+  computeTrustlineHash,
+  computeTransactionTreeHash,
+  computeStateTreeHash,
+  computeEscrowHash,
+  computePaymentChannelHash
+} from './common/hashes'
 
 export interface APIOptions extends ConnectionUserOptions {
   server?: string
@@ -142,7 +156,7 @@ class RippleAPI extends EventEmitter {
     const serverURL = options.server
     if (serverURL !== undefined) {
       this.connection = new Connection(serverURL, options)
-      this.connection.on('ledgerClosed', message => {
+      this.connection.on('ledgerClosed', (message) => {
         this.emit('ledger', formatLedgerClose(message))
       })
       this.connection.on('error', (errorCode, errorMessage, data) => {
@@ -151,7 +165,7 @@ class RippleAPI extends EventEmitter {
       this.connection.on('connected', () => {
         this.emit('connected')
       })
-      this.connection.on('disconnected', code => {
+      this.connection.on('disconnected', (code) => {
         let finalCode = code
         // 1005: This is a backwards-compatible fix for this change in the ws library: https://github.com/websockets/ws/issues/1257
         // 4000: Connection uses a 4000 code internally to indicate a manual disconnect/close
@@ -252,7 +266,7 @@ class RippleAPI extends EventEmitter {
   /**
    * Prepare a transaction.
    *
-   * You can later submit the transaction with `submit()`.
+   * You can later submit the transaction with a `submit` request.
    */
   async prepareTransaction(
     txJSON: TransactionJSON,
@@ -382,10 +396,12 @@ class RippleAPI extends EventEmitter {
   prepareCheckCreate = prepareCheckCreate
   prepareCheckCash = prepareCheckCash
   prepareCheckCancel = prepareCheckCancel
+  prepareTicketCreate = prepareTicketCreate
   prepareSettings = prepareSettings
   sign = sign
   combine = combine
-  submit = submit
+
+  submit = submit // @deprecated Use api.request('submit', { tx_blob: signedTransaction }) instead
 
   deriveKeypair = deriveKeypair
   deriveAddress = deriveAddress
@@ -399,8 +415,48 @@ class RippleAPI extends EventEmitter {
   // RippleAPI.deriveClassicAddress (static) is a new name for api.deriveAddress
   static deriveClassicAddress = deriveAddress
 
-  static isValidXAddress = isValidXAddress
-  static isValidClassicAddress = isValidClassicAddress
+  /**
+   * Static methods to expose ripple-address-codec methods
+   */
+   static classicAddressToXAddress = classicAddressToXAddress
+   static xAddressToClassicAddress = xAddressToClassicAddress
+   static isValidXAddress = isValidXAddress
+   static isValidClassicAddress = isValidClassicAddress
+   static encodeSeed = encodeSeed
+   static decodeSeed = decodeSeed
+   static encodeAccountID = encodeAccountID
+   static decodeAccountID = decodeAccountID
+   static encodeNodePublic = encodeNodePublic
+   static decodeNodePublic = decodeNodePublic
+   static encodeAccountPublic = encodeAccountPublic
+   static decodeAccountPublic = decodeAccountPublic
+   static encodeXAddress = encodeXAddress
+   static decodeXAddress = decodeXAddress
+
+  /**
+   * Static methods that replace functionality from the now-deprecated ripple-hashes library
+   */
+  // Compute the hash of a binary transaction blob.
+  static computeBinaryTransactionHash = computeBinaryTransactionHash // (txBlobHex: string): string
+  // Compute the hash of a transaction in txJSON format.
+  static computeTransactionHash = computeTransactionHash // (txJSON: any): string
+  static computeBinaryTransactionSigningHash = computeBinaryTransactionSigningHash // (txBlobHex: string): string
+  // Compute the hash of an account, given the account's classic address (starting with `r`).
+  static computeAccountLedgerObjectID = computeAccountLedgerObjectID // (address: string): string
+  // Compute the hash (ID) of an account's SignerList.
+  static computeSignerListLedgerObjectID = computeSignerListLedgerObjectID // (address: string): string
+  // Compute the hash of an order, given the owner's classic address (starting with `r`) and the account sequence number of the `OfferCreate` order transaction.
+  static computeOrderID = computeOrderID // (address: string, sequence: number): string
+  // Compute the hash of a trustline, given the two parties' classic addresses (starting with `r`) and the currency code.
+  static computeTrustlineHash = computeTrustlineHash // (address1: string, address2: string, currency: string): string
+  static computeTransactionTreeHash = computeTransactionTreeHash // (transactions: any[]): string
+  static computeStateTreeHash = computeStateTreeHash // (entries: any[]): string
+  // Compute the hash of a ledger.
+  static computeLedgerHash = computeLedgerHash // (ledgerHeader): string
+  // Compute the hash of an escrow, given the owner's classic address (starting with `r`) and the account sequence number of the `EscrowCreate` escrow transaction.
+  static computeEscrowHash = computeEscrowHash // (address, sequence): string
+  // Compute the hash of a payment channel, given the owner's classic address (starting with `r`), the classic address of the destination, and the account sequence number of the `PaymentChannelCreate` payment channel transaction.
+  static computePaymentChannelHash = computePaymentChannelHash // (address, dstAddress, sequence): string
 
   xrpToDrops = xrpToDrops
   dropsToXrp = dropsToXrp
@@ -412,4 +468,29 @@ class RippleAPI extends EventEmitter {
   isValidSecret = schemaValidator.isValidSecret
 }
 
-export {RippleAPI}
+export {
+  RippleAPI
+}
+
+export type {
+  AccountObjectsRequest,
+  AccountObjectsResponse,
+  AccountOffersRequest,
+  AccountOffersResponse,
+  AccountInfoRequest,
+  AccountInfoResponse,
+  AccountLinesRequest,
+  AccountLinesResponse,
+  BookOffersRequest,
+  BookOffersResponse,
+  GatewayBalancesRequest,
+  GatewayBalancesResponse,
+  LedgerRequest,
+  LedgerResponse,
+  LedgerDataRequest,
+  LedgerDataResponse,
+  LedgerEntryRequest,
+  LedgerEntryResponse,
+  ServerInfoRequest,
+  ServerInfoResponse
+}

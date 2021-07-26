@@ -6,8 +6,12 @@
   "type": "object",
   "properties": {
     "sequence": {
-      "description": "The initiating account's sequence number for this transaction.",
+      "description": "The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.",
       "$ref": "sequence"
+    },
+    "ticketSequence": {
+      "description": "The ticket sequence to be used for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.",
+      "$ref": "ticket-sequence"
     },
     "fee": {
       "description": "An exact fee to pay for the transaction, before multiplying for multi-signed transactions. See [Transaction Fees](#transaction-fees) for more information.",
@@ -45,6 +49,10 @@
       {
         "description": "maxLedgerVersion and maxLedgerVersionOffset are mutually exclusive",
         "required": ["maxLedgerVersion", "maxLedgerVersionOffset"]
+      },
+      {
+        "description": "sequence and ticketSequence are mutually exclusive",
+        "required": ["sequence", "ticketSequence"]
       }
     ]
   }

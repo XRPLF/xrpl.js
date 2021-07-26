@@ -1,6 +1,6 @@
 import {
   FormattedOrderSpecification,
-  FormattedTrustline,
+  FormattedTrustlineSpecification,
   Adjustment,
   RippledAmount,
   Memo,
@@ -19,6 +19,7 @@ export type TransactionJSON = {
 
 export type Instructions = {
   sequence?: number
+  ticketSequence?: number
   fee?: string
   // @deprecated
   maxFee?: string
@@ -31,7 +32,8 @@ export type Prepare = {
   txJSON: string
   instructions: {
     fee: string
-    sequence: number
+    sequence?: number
+    ticketSequence?: number
     maxLedgerVersion?: number
   }
 }
@@ -137,7 +139,7 @@ export type FormattedOrderCancellationTransaction = {
 
 export type FormattedTrustlineTransaction = {
   type: string
-  specification: FormattedTrustline
+  specification: FormattedTrustlineSpecification
   outcome: Outcome
   id: string
   address: string

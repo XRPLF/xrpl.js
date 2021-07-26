@@ -22,7 +22,7 @@ export default <TestSuite>{
   'getBalances - limit & currency': async (api, address) => {
     const options = {currency: 'USD', limit: 3}
     const expectedResponse = responses.getBalances
-      .filter(item => item.currency === 'USD')
+      .filter((item) => item.currency === 'USD')
       .slice(0, 3)
     const result = await api.getBalances(address, options)
     assertResultMatch(result, expectedResponse, 'getBalances')
@@ -36,7 +36,7 @@ export default <TestSuite>{
     }
     const expectedResponse = responses.getBalances
       .filter(
-        item =>
+        (item) =>
           item.currency === 'USD' &&
           item.counterparty === 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
       )

@@ -1,0 +1,42 @@
+{
+  "type": "checkCash",
+  "address": "raLHvSZXacoGiCoWrdBhVGstZm6GhF7oRr",
+  "sequence": 3,
+  "id": "8321208465F70BA52C28BCC4F646BAF3B012BA13B57576C0336F42D77E3E0749",
+  "specification": {
+    "checkID": "4F6DDA7972A5E8C8F2AA3D2A475E56475FA573C65B935E26EABDA5F06A982C70",
+    "amount": {
+      "currency": "XRP",
+      "value": "2.5"
+    },
+    "memos": [
+      {
+        "type": "test",
+        "format": "text/plain",
+        "data": "texted data"
+      }
+    ]
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2018-02-23T22:26:52.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "raLHvSZXacoGiCoWrdBhVGstZm6GhF7oRr": [
+        {
+          "currency": "XRP",
+          "value": "2.499988"
+        }
+      ],
+      "rNpdNFXNMvEcaXDqMypi48gdSABZkYuyQE": [
+        {
+          "currency": "XRP",
+          "value": "-2.5"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 6967596,
+    "indexInLedger": 0
+  }
+}

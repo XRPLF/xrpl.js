@@ -4,17 +4,18 @@ import {validate, constants, ensureClassicAddress} from '../common'
 import {FormattedSettings} from '../common/types/objects'
 import {AccountInfoResponse} from '../common/types/commands'
 import {RippleAPI} from '..'
+import {Settings} from '../common/constants'
 
 const AccountFlags = constants.AccountFlags
 
 export type SettingsOptions = {
-  ledgerVersion?: number
+  ledgerVersion?: number | 'validated' | 'closed' | 'current'
 }
 
 export function parseAccountFlags(
   value: number,
   options: {excludeFalse?: boolean} = {}
-) {
+): Settings {
   const settings = {}
   for (const flagName in AccountFlags) {
     if (value & AccountFlags[flagName]) {

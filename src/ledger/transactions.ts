@@ -101,12 +101,12 @@ function formatPartialResponse(
   options: TransactionsOptions,
   data
 ) {
-  const parse = tx =>
+  const parse = (tx) =>
     parseAccountTxTransaction(tx, options.includeRawTransactions)
   return {
     marker: data.marker,
     results: data.transactions
-      .filter(tx => tx.validated)
+      .filter((tx) => tx.validated)
       .map(parse)
       .filter(_.partial(transactionFilter, address, options))
       .filter(_.partial(orderFilter, options))
@@ -135,7 +135,7 @@ function getAccountTx(
 
   return connection
     .request(request)
-    .then(response => formatPartialResponse(address, options, response))
+    .then((response) => formatPartialResponse(address, options, response))
 }
 
 function checkForLedgerGaps(
@@ -158,7 +158,7 @@ function checkForLedgerGaps(
 
   return utils
     .hasCompleteLedgerRange(connection, minLedgerVersion, maxLedgerVersion)
-    .then(hasCompleteLedgerRange => {
+    .then((hasCompleteLedgerRange) => {
       if (!hasCompleteLedgerRange) {
         throw new errors.MissingLedgerHistoryError()
       }
@@ -204,7 +204,7 @@ function getTransactions(
 
   const defaults = {maxLedgerVersion: -1}
   if (options.start) {
-    return getTransaction.call(this, options.start).then(tx => {
+    return getTransaction.call(this, options.start).then((tx) => {
       const ledgerVersion = tx.outcome.ledgerVersion
       const bound = options.earliestFirst
         ? {minLedgerVersion: ledgerVersion}

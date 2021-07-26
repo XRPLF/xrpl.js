@@ -9,22 +9,22 @@ const {getLedger: RESPONSE_FIXTURES} = responses
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'simple test': async api => {
+  'simple test': async (api) => {
     const response = await api.getLedger()
     assertResultMatch(response, RESPONSE_FIXTURES.header, 'getLedger')
   },
-  'by hash': async api => {
+  'by hash': async (api) => {
     const response = await api.getLedger({
       ledgerHash:
         '15F20E5FA6EA9770BBFFDBD62787400960B04BE32803B20C41F117F41C13830D'
     })
     assertResultMatch(response, RESPONSE_FIXTURES.headerByHash, 'getLedger')
   },
-  'future ledger version': async api => {
+  'future ledger version': async (api) => {
     const response = await api.getLedger({ledgerVersion: 14661789})
     assert(!!response)
   },
-  'with state as hashes': async api => {
+  'with state as hashes': async (api) => {
     const request = {
       includeTransactions: true,
       includeAllData: false,
@@ -38,7 +38,7 @@ export default <TestSuite>{
       'getLedger'
     )
   },
-  'with settings transaction': async api => {
+  'with settings transaction': async (api) => {
     const request = {
       includeTransactions: true,
       includeAllData: true,
@@ -47,7 +47,7 @@ export default <TestSuite>{
     const response = await api.getLedger(request)
     assertResultMatch(response, RESPONSE_FIXTURES.withSettingsTx, 'getLedger')
   },
-  'with partial payment': async api => {
+  'with partial payment': async (api) => {
     const request = {
       includeTransactions: true,
       includeAllData: true,
@@ -56,7 +56,7 @@ export default <TestSuite>{
     const response = await api.getLedger(request)
     assertResultMatch(response, RESPONSE_FIXTURES.withPartial, 'getLedger')
   },
-  'pre 2014 with partial payment': async api => {
+  'pre 2014 with partial payment': async (api) => {
     const request = {
       includeTransactions: true,
       includeAllData: true,
@@ -69,7 +69,7 @@ export default <TestSuite>{
       'getLedger'
     )
   },
-  'full, then computeLedgerHash': async api => {
+  'full, then computeLedgerHash': async (api) => {
     const request = {
       includeTransactions: true,
       includeState: true,

@@ -267,16 +267,16 @@ export default <TestSuite>{
       ])
 
       const bidRates = orderbook.bids.map(
-        bid => bid.properties.makerExchangeRate
+        (bid) => bid.properties.makerExchangeRate
       )
       const askRates = orderbook.asks.map(
-        ask => ask.properties.makerExchangeRate
+        (ask) => ask.properties.makerExchangeRate
       )
       // makerExchangeRate = quality = takerPays.value/takerGets.value
       // so the best deal for the taker is the lowest makerExchangeRate
       // bids and asks should be sorted so that the best deals come first
-      assert.deepEqual(bidRates.map(x => Number(x)).sort(), bidRates)
-      assert.deepEqual(askRates.map(x => Number(x)).sort(), askRates)
+      assert.deepEqual(bidRates.map((x) => Number(x)).sort(), bidRates)
+      assert.deepEqual(askRates.map((x) => Number(x)).sort(), askRates)
     })
   },
 
@@ -322,7 +322,7 @@ export default <TestSuite>{
       ])
 
       const orders = [...orderbook.bids, ...orderbook.asks]
-      orders.forEach(order => {
+      orders.forEach((order) => {
         const quantity = order.specification.quantity
         const totalPrice = order.specification.totalPrice
         const {base, counter} = requests.getOrderbook.normal
@@ -375,9 +375,11 @@ export default <TestSuite>{
         ...reverseOffers
       ])
 
-      assert(orderbook.bids.every(bid => bid.specification.direction === 'buy'))
       assert(
-        orderbook.asks.every(ask => ask.specification.direction === 'sell')
+        orderbook.bids.every((bid) => bid.specification.direction === 'buy')
+      )
+      assert(
+        orderbook.asks.every((ask) => ask.specification.direction === 'sell')
       )
     })
   }

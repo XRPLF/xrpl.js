@@ -1,5 +1,6 @@
 import * as assert from 'assert'
 import {parseTimestamp} from './utils'
+import {parseMemos} from './utils'
 import parseAmount from './amount'
 import {removeUndefined, txFlags} from '../../common'
 import {
@@ -19,6 +20,7 @@ function parseOrder(tx: OfferCreateTransaction): FormattedOrderSpecification {
   const totalPrice = direction === 'buy' ? takerGetsAmount : takerPaysAmount
 
   return removeUndefined({
+    memos: parseMemos(tx),
     direction: direction,
     quantity: quantity,
     totalPrice: totalPrice,

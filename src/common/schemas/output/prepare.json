@@ -18,7 +18,11 @@
         },
         "sequence": {
           "$ref": "sequence",
-          "description": "The initiating account's sequence number for this transaction."
+          "description": "The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set."
+        },
+        "ticketSequence": {
+          "$ref": "ticket-sequence",
+          "description": "The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set."
         },
         "maxLedgerVersion": {
           "oneOf": [
@@ -29,8 +33,14 @@
         }
       },
       "additionalProperties": false,
-      "required": ["fee", "sequence", "maxLedgerVersion"]
-    }
+      "required": ["fee", "maxLedgerVersion"],
+      "anyOf": [
+          { "required":
+            [ "sequence" ] },
+          { "required":
+            [ "ticketSequence" ] }
+        ]
+      }
   },
   "additionalProperties": false,
   "required": ["txJSON", "instructions"]

@@ -48,5 +48,16 @@ export default <TestSuite>{
       api.errors.ValidationError,
       'instance.order requires property "direction"'
     )
+  },
+
+  'with ticket': async (api, address) => {
+    const request = requests.prepareOrder.sell
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      ticketSequence: 23
+    }
+    const result = await api.prepareOrder(address, request, localInstructions)
+    assertResultMatch(result, responses.prepareOrder.ticket, 'prepare')
   }
 }

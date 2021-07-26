@@ -13,7 +13,7 @@ import {
   RippledNotInitializedError,
   RippleError
 } from './errors'
-import {ExponentialBackoff} from './backoff';
+import {ExponentialBackoff} from './backoff'
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
@@ -27,7 +27,7 @@ export interface ConnectionOptions {
   key?: string
   passphrase?: string
   certificate?: string
-  timeout: number
+  timeout: number // request timeout
   connectionTimeout: number
 }
 
@@ -37,6 +37,23 @@ export interface ConnectionOptions {
  * still optional at the point that the user provides it.
  */
 export type ConnectionUserOptions = Partial<ConnectionOptions>
+
+/**
+ * Ledger Stream Message
+ * https://xrpl.org/subscribe.html#ledger-stream
+ */
+interface LedgerStreamMessage {
+  type?: 'ledgerClosed' // not present in initial `subscribe` response
+  fee_base: number
+  fee_ref: number
+  ledger_hash: string
+  ledger_index: number
+  ledger_time: number
+  reserve_base: number
+  reserve_inc: number
+  txn_count?: number // not present in initial `subscribe` response
+  validated_ledgers?: string
+}
 
 /**
  * Represents an intentionally triggered web-socket disconnect code.
@@ -102,8 +119,8 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
  * ws.send(), but promisified.
  */
 function websocketSendAsync(ws: WebSocket, message: string) {
-  return new Promise((resolve, reject) => {
-    ws.send(message, undefined, error => {
+  return new Promise<void>((resolve, reject) => {
+    ws.send(message, undefined, (error) => {
       if (error) {
         reject(new DisconnectedError(error.message, error))
       } else {
@@ -118,10 +135,11 @@ function websocketSendAsync(ws: WebSocket, message: string) {
  * captured by the Connection class over time.
  */
 class LedgerHistory {
-  private availableVersions = new RangeSet()
-  latestVersion: null | number = null
   feeBase: null | number = null
   feeRef: null | number = null
+  latestVersion: null | number = null
+  reserveBase: null | number = null
+  private availableVersions = new RangeSet()
 
   /**
    * Returns true if the given version exists.
@@ -143,24 +161,21 @@ class LedgerHistory {
    * of whether ledger history data exists or not. If relevant ledger data
    * is found, we'll update our history (ex: from a "ledgerClosed" event).
    */
-  update(responseData: {
-    ledger_index?: string
-    validated_ledgers?: string
-    fee_base?: string
-    fee_ref?: string
-  }) {
-    this.latestVersion = Number(responseData.ledger_index)
-    if (responseData.validated_ledgers) {
+  update(ledgerMessage: LedgerStreamMessage) {
+    // type: ignored
+    this.feeBase = ledgerMessage.fee_base
+    this.feeRef = ledgerMessage.fee_ref
+    // ledger_hash: ignored
+    this.latestVersion = ledgerMessage.ledger_index
+    // ledger_time: ignored
+    this.reserveBase = ledgerMessage.reserve_base
+    // reserve_inc: ignored (may be useful for advanced use cases)
+    // txn_count: ignored
+    if (ledgerMessage.validated_ledgers) {
       this.availableVersions.reset()
-      this.availableVersions.parseAndAddRanges(responseData.validated_ledgers)
+      this.availableVersions.parseAndAddRanges(ledgerMessage.validated_ledgers)
     } else {
       this.availableVersions.addValue(this.latestVersion)
-    }
-    if (responseData.fee_base) {
-      this.feeBase = Number(responseData.fee_base)
-    }
-    if (responseData.fee_ref) {
-      this.feeRef = Number(responseData.fee_ref)
     }
   }
 }
@@ -210,18 +225,21 @@ class RequestManager {
   cancel(id: number) {
     const {timer} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
+    delete this.promisesAwaitingResponse[id]
   }
 
   resolve(id: number, data: any) {
     const {timer, resolve} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
     resolve(data)
+    delete this.promisesAwaitingResponse[id]
   }
 
   reject(id: number, error: Error) {
     const {timer, reject} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
     reject(error)
+    delete this.promisesAwaitingResponse[id]
   }
 
   rejectAll(error: Error) {
@@ -263,7 +281,7 @@ class RequestManager {
       throw new ResponseFormatError('valid id not found in response', data)
     }
     if (!this.promisesAwaitingResponse[data.id]) {
-      throw new ResponseFormatError('response handler not found', data)
+      return
     }
     if (data.status === 'error') {
       const error = new RippledError(data.error_message || data.error, data)
@@ -308,7 +326,7 @@ export class Connection extends EventEmitter {
     this._url = url
     this._config = {
       timeout: 20 * 1000,
-      connectionTimeout: 2 * 1000,
+      connectionTimeout: 5 * 1000,
       ...options
     }
     if (typeof options.trace === 'function') {
@@ -372,9 +390,9 @@ export class Connection extends EventEmitter {
    */
   private _heartbeat = () => {
     return this.request({command: 'ping'}).catch(() => {
-        this.reconnect().catch((error) => {
-          this.emit('error', 'reconnect', error.message, error)
-        })
+      return this.reconnect().catch((error) => {
+        this.emit('error', 'reconnect', error.message, error)
+      })
     })
   }
 
@@ -470,7 +488,8 @@ export class Connection extends EventEmitter {
       this._onConnectionFailed(
         new ConnectionError(
           `Error: connect() timed out after ${this._config.connectionTimeout} ms. ` +
-            `If your internet connection is working, the rippled server may be blocked or inaccessible.`
+            `If your internet connection is working, the rippled server may be blocked or inaccessible. ` +
+            `You can also try setting the 'connectionTimeout' option in the RippleAPI constructor.`
         )
       )
     }, this._config.connectionTimeout)
@@ -486,11 +505,11 @@ export class Connection extends EventEmitter {
       clearTimeout(connectionTimeoutID)
       // Add new, long-term connected listeners for messages and errors
       this._ws.on('message', (message: string) => this._onMessage(message))
-      this._ws.on('error', error =>
+      this._ws.on('error', (error) =>
         this.emit('error', 'websocket', error.message, error)
       )
       // Handle a closed connection: reconnect if it was unexpected
-      this._ws.once('close', code => {
+      this._ws.once('close', (code) => {
         this._clearHeartbeatInterval()
         this._requestManager.rejectAll(
           new DisconnectedError('websocket was closed')
@@ -506,7 +525,7 @@ export class Connection extends EventEmitter {
           // Start the reconnect timeout, but set it to `this._reconnectTimeoutID`
           // so that we can cancel one in-progress on disconnect.
           this._reconnectTimeoutID = setTimeout(() => {
-            this.reconnect().catch(error => {
+            this.reconnect().catch((error) => {
               this.emit('error', 'reconnect', error.message, error)
             })
           }, retryTimeout)
@@ -535,13 +554,13 @@ export class Connection extends EventEmitter {
    * If no open websocket connection exists, resolve with no code (`undefined`).
    */
   disconnect(): Promise<number | undefined> {
-    clearTimeout(this._reconnectTimeoutID);
-    this._reconnectTimeoutID = null;
+    clearTimeout(this._reconnectTimeoutID)
+    this._reconnectTimeoutID = null
     if (this._state === WebSocket.CLOSED || !this._ws) {
       return Promise.resolve(undefined)
     }
-    return new Promise(resolve => {
-      this._ws.once('close', code => resolve(code))
+    return new Promise((resolve) => {
+      this._ws.once('close', (code) => resolve(code))
       // Connection already has a disconnect handler for the disconnect logic.
       // Just close the websocket manually (with our "intentional" code) to
       // trigger that.
@@ -563,11 +582,6 @@ export class Connection extends EventEmitter {
     await this.connect()
   }
 
-  async getLedgerVersion(): Promise<number> {
-    await this._waitForReady()
-    return this._ledger.latestVersion!
-  }
-
   async getFeeBase(): Promise<number> {
     await this._waitForReady()
     return this._ledger.feeBase!
@@ -576,6 +590,16 @@ export class Connection extends EventEmitter {
   async getFeeRef(): Promise<number> {
     await this._waitForReady()
     return this._ledger.feeRef!
+  }
+
+  async getLedgerVersion(): Promise<number> {
+    await this._waitForReady()
+    return this._ledger.latestVersion!
+  }
+
+  async getReserveBase(): Promise<number> {
+    await this._waitForReady()
+    return this._ledger.reserveBase!
   }
 
   /**
@@ -612,7 +636,7 @@ export class Connection extends EventEmitter {
       timeout || this._config.timeout
     )
     this._trace('send', message)
-    websocketSendAsync(this._ws, message).catch(error => {
+    websocketSendAsync(this._ws, message).catch((error) => {
       this._requestManager.reject(id, error)
     })
 

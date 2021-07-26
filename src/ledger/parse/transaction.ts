@@ -16,6 +16,7 @@ import parsePayment from './payment'
 import parsePaymentChannelClaim from './payment-channel-claim'
 import parsePaymentChannelCreate from './payment-channel-create'
 import parsePaymentChannelFund from './payment-channel-fund'
+import parseTicketCreate from './ticket-create'
 import parseTrustline from './trustline'
 
 import parseAmendment from './amendment' // pseudo-transaction
@@ -41,6 +42,7 @@ function parseTransactionType(type) {
     PaymentChannelFund: 'paymentChannelFund',
     SetRegularKey: 'settings',
     SignerListSet: 'settings',
+    TicketCreate: 'ticketCreate',
     TrustSet: 'trustline',
 
     EnableAmendment: 'amendment', // pseudo-transaction
@@ -68,6 +70,7 @@ function parseTransaction(tx: any, includeRawTransaction: boolean): any {
     paymentChannelClaim: parsePaymentChannelClaim,
     paymentChannelCreate: parsePaymentChannelCreate,
     paymentChannelFund: parsePaymentChannelFund,
+    ticketCreate: parseTicketCreate,
     trustline: parseTrustline,
 
     amendment: parseAmendment, // pseudo-transaction

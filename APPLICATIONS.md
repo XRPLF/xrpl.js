@@ -10,9 +10,19 @@ These sites are independent of Ripple and have not been authorized, endorsed, sp
 
 Warning: Use at your own risk.
 
-## Data and visualizations
+## Exchanges
 
-- **[xrp1ntel - XRP Intelligence](https://xrp1ntel.com/)**
+- **[The World Exchange](https://www.theworldexchange.net/)**
+
+  Trade, issue, and send directly on the XRP Ledger. A user interface for the XRPL's decentralized exchange.
+
+- **[Bitso](https://bitso.com/)**
+
+  Exchange allowing clients to buy and sell XRP, based in Mexico.
+
+## Explorers
+
+- **[xrpintel - XRP Intelligence](https://xrpintel.com/)**
 
   Monitor the XRP Network in real time and explore historical statistics.
 
@@ -32,6 +42,10 @@ Warning: Use at your own risk.
 
   Real-time XRP price, trades, and orderbook data from the XRP Ledger.
 
+- **[Bithomp - XRP Explorer](https://bithomp.com/explorer/)**
+
+  Look up information by entering an address, transaction hash, username, or PayID.
+
 - **[Bithomp - XRPL validators](https://bithomp.com/validators)**
 
   List of XRPL validators, nodes, and testnet validators.
@@ -44,25 +58,29 @@ Warning: Use at your own risk.
 
   XRP Ledger explorer, API, metrics, and analytics using a graph database that is synchronized live with the XRPL.
 
-## Send and request payments
+## Data monitoring
 
-- **[XRP Tip Bot](https://www.xrptipbot.com/)**
+- **[zerptracker](https://zerptracker.com)**
 
-  A bot that enables users on reddit, Twitter and Discord to send XRP to each other through reddit comments and Twitter tweets.
+  Monitor the XRPL using powerful JSONPath expressions, and receive notifications via email, SMS, webhooks, and more.
 
-- **[XRP Text](https://xrptext.com/)**
+- **[Utility-Scan](https://utility-scan.com)**
 
-  Send XRP using SMS text messages.
+  Attempts to detect RippleNet on-demand liquidity (ODL) transactions through known fiat corridors and report these transactions in real time.
 
-- **[XRParrot](https://xrparrot.com/)** (uses `ripple-address-codec`)
+- **[XRPL Rosetta](https://xrpl-rosetta-oepox.ondigitalocean.app)**
 
-  Easy EUR (SEPA) to XRP transfer (currency conversion).
-
-- **[XRP Payment](https://xrpayments.co/)** (xrpayments.co)
-
-  Tool for generating a XRP payment request URI in a QR code, with currency converter.
+  3D Globe written in three.js connected to a Node.js websocket server that is listening to exchanges and the XRPL. The visualization aims to show trading, ODL, and liquidity at exchanges, intra-exchange volume, and flows.
 
 ## Wallets and wallet tools
+
+- **[XUMM](https://xumm.app/)**
+
+  Users can use the xumm application to track their accounts, balances and transactions. The true power of xumm is the platform available for developers.
+
+- **[Xpring Wallet](https://xpring.io)** (uses `ripple-keypairs`)
+
+  Non-custodial XRP wallet.
 
 - **[XRP Toolkit](https://www.xrptoolkit.com)**
 
@@ -92,11 +110,29 @@ Warning: Use at your own risk.
 
   Recover a 24 word mnemonic if one word is wrong or one word is missing.
 
+## Send and request payments
+
+- **[XRP Tip Bot](https://www.xrptipbot.com/)**
+
+  A bot that enables users on reddit, Twitter and Discord to send XRP to each other through reddit comments and Twitter tweets.
+
+- **[XRP Text](https://xrptext.com/)**
+
+  Send XRP using SMS text messages.
+
+- **[XRParrot](https://xrparrot.com/)** (uses `ripple-address-codec`)
+
+  Easy EUR (SEPA) to XRP transfer (currency conversion).
+
+- **[XRP Payment](https://xrpayments.co/)** (xrpayments.co)
+
+  Tool for generating a XRP payment request URI in a QR code, with currency converter.
+
 ## Development tools
 
-- **[XRP Test Net Faucet](https://developers.ripple.com/xrp-test-net-faucet.html)**
+- **[XRP Faucets for Testnet and Devnet](https://xrpl.org/xrp-testnet-faucet.html)**
 
-  Get some test funds for development on the test network. The faucet was built using `ripple-lib`.
+  Get some test funds for development on the test network. The faucet uses `ripple-lib`.
 
 ## Code samples and libraries
 
@@ -125,7 +161,3 @@ Warning: Use at your own risk.
 - **[XRP Stats](https://ledger.exposed/)** (ledger.exposed)
 
   Rich list, live ledger stats and XRP distribution. Visualize escrows and flow of funds.
-
-- **[XRP Vanity](https://xrpvanity.com/)** (xrpvanity.com)
-
-  Custom XRP addresses for sale, delivered by SetRegularKey.

@@ -48,13 +48,13 @@ function attachTransactionDate(
 
   return connection
     .request(request)
-    .then(data => {
+    .then((data) => {
       if (typeof data.ledger.close_time === 'number') {
         return _.assign({date: data.ledger.close_time}, tx)
       }
       throw new errors.UnexpectedError('Ledger missing close_time')
     })
-    .catch(error => {
+    .catch((error) => {
       if (error instanceof errors.UnexpectedError) {
         throw error
       }
@@ -95,11 +95,11 @@ function convertError(
         options.minLedgerVersion,
         options.maxLedgerVersion
       )
-      .then(hasCompleteLedgerRange => {
+      .then((hasCompleteLedgerRange) => {
         if (!hasCompleteLedgerRange) {
           return utils
             .isPendingLedgerVersion(connection, options.maxLedgerVersion)
-            .then(isPendingLedgerVersion => {
+            .then((isPendingLedgerVersion) => {
               return isPendingLedgerVersion
                 ? new errors.PendingLedgerVersionError()
                 : new errors.MissingLedgerHistoryError()

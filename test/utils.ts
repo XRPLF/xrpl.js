@@ -98,14 +98,14 @@ export function getFreePort() {
   return new Promise((resolve, reject) => {
     const server = net.createServer()
     let port
-    server.on('listening', function() {
+    server.on('listening', function () {
       port = (server.address() as any).port
       server.close()
     })
-    server.on('close', function() {
+    server.on('close', function () {
       resolve(port)
     })
-    server.on('error', function(error) {
+    server.on('error', function (error) {
       reject(error)
     })
     server.listen(0)
@@ -118,7 +118,7 @@ export function getAllPublicMethods(api: RippleAPI) {
       ...Object.getOwnPropertyNames(api),
       ...Object.getOwnPropertyNames(RippleAPI.prototype)
     ])
-  ).filter(key => !key.startsWith('_'))
+  ).filter((key) => !key.startsWith('_'))
 }
 
 export function loadTestSuites(): LoadedTestSuite[] {
@@ -126,7 +126,7 @@ export function loadTestSuites(): LoadedTestSuite[] {
     encoding: 'utf8'
   })
   return allTests
-    .map(methodName => {
+    .map((methodName) => {
       if (methodName.startsWith('.DS_Store')) {
         return null
       }

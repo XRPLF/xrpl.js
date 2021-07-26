@@ -41,7 +41,7 @@ function renameKeys(object, mapping) {
 }
 
 function getServerInfo(this: RippleAPI): Promise<GetServerInfoResponse> {
-  return this.request('server_info').then(response => {
+  return this.request('server_info').then((response) => {
     const info = convertKeysFromSnakeCaseToCamelCase(response.info)
     renameKeys(info, {hostid: 'hostID'})
     if (info.validatedLedger) {
@@ -71,6 +71,10 @@ async function getFee(this: RippleAPI, cushion?: number): Promise<string> {
 
   const serverInfo = (await this.request('server_info')).info
   const baseFeeXrp = new BigNumber(serverInfo.validated_ledger.base_fee_xrp)
+  if (serverInfo.load_factor === undefined) {
+    // https://github.com/ripple/rippled/issues/3812#issuecomment-816871100
+    serverInfo.load_factor = 1
+  }
   let fee = baseFeeXrp.times(serverInfo.load_factor).times(cushion)
 
   // Cap fee to `this._maxFeeXRP`

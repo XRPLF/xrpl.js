@@ -4,8 +4,8 @@ import {Amount, RippledAmount} from '../../common/types/objects'
 import {Path, GetPaths, RippledPathsResponse} from '../pathfind-types'
 
 function parsePaths(paths) {
-  return paths.map(steps =>
-    steps.map(step => _.omit(step, ['type', 'type_hex']))
+  return paths.map((steps) =>
+    steps.map((step) => _.omit(step, ['type', 'type_hex']))
   )
 }
 
@@ -58,7 +58,7 @@ function parsePathfind(pathfindResult: RippledPathsResponse): GetPaths {
   const sourceAddress = pathfindResult.source_account
   const destinationAddress = pathfindResult.destination_account
   const destinationAmount = pathfindResult.destination_amount
-  return pathfindResult.alternatives.map(alt =>
+  return pathfindResult.alternatives.map((alt) =>
     parseAlternative(sourceAddress, destinationAddress, destinationAmount, alt)
   )
 }

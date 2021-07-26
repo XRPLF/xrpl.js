@@ -1,0 +1,8 @@
+{
+  "txJSON": "{\"TransactionType\":\"OfferCreate\",\"Account\":\"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59\",\"TakerGets\":{\"currency\":\"USD\",\"issuer\":\"rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM\",\"value\":\"10.1\"},\"TakerPays\":\"2000000\",\"Flags\":2148139008,\"Memos\":[{\"Memo\":{\"MemoData\":\"7465787465642064617461\",\"MemoType\":\"74657374\",\"MemoFormat\":\"746578742F706C61696E\"}}],\"LastLedgerSequence\":8820051,\"Fee\":\"12\",\"Sequence\":0,\"TicketSequence\":23,\"OfferSequence\":12345}",
+  "instructions": {
+    "fee": "0.000012",
+    "ticketSequence": 23,
+    "maxLedgerVersion": 8820051
+  }
+}

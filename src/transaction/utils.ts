@@ -23,9 +23,13 @@ export type ApiMemo = {
 function formatPrepareResponse(txJSON: any): Prepare {
   const instructions = {
     fee: common.dropsToXrp(txJSON.Fee),
-    sequence: txJSON.Sequence,
     maxLedgerVersion:
       txJSON.LastLedgerSequence === undefined ? null : txJSON.LastLedgerSequence
+  }
+  if (txJSON.TicketSequence !== undefined) {
+    instructions['ticketSequence'] = txJSON.TicketSequence
+  } else {
+    instructions['sequence'] = txJSON.Sequence
   }
   return {
     txJSON: JSON.stringify(txJSON),
@@ -52,10 +56,7 @@ function setCanonicalFlag(txJSON: TransactionJSON): void {
 }
 
 function scaleValue(value, multiplier, extra = 0) {
-  return new BigNumber(value)
-    .times(multiplier)
-    .plus(extra)
-    .toString()
+  return new BigNumber(value).times(multiplier).plus(extra).toString()
 }
 
 /**
@@ -113,13 +114,22 @@ function prepareTransaction(
 ): Promise<Prepare> {
   common.validate.instructions(instructions)
   common.validate.tx_json(txJSON)
+
+  // We allow 0 values in the Sequence schema to support the Tickets feature
+  // When a ticketSequence is used, sequence has to be 0
+  // We validate that a sequence with value 0 is not passed even if the json schema allows it
+  if (instructions.sequence !== undefined && instructions.sequence === 0) {
+    return Promise.reject(new ValidationError('`sequence` cannot be 0'))
+  }
+
   const disallowedFieldsInTxJSON = [
     'maxLedgerVersion',
     'maxLedgerVersionOffset',
     'fee',
-    'sequence'
+    'sequence',
+    'ticketSequence'
   ]
-  const badFields = disallowedFieldsInTxJSON.filter(field => txJSON[field])
+  const badFields = disallowedFieldsInTxJSON.filter((field) => txJSON[field])
   if (badFields.length) {
     return Promise.reject(
       new ValidationError(
@@ -236,14 +246,14 @@ function prepareTransaction(
       instructions.maxLedgerVersionOffset !== undefined
         ? instructions.maxLedgerVersionOffset
         : 3
-    return api.connection.getLedgerVersion().then(ledgerVersion => {
+    return api.connection.getLedgerVersion().then((ledgerVersion) => {
       newTxJSON.LastLedgerSequence = ledgerVersion + offset
       return
     })
   }
 
   function prepareFee(): Promise<void> {
-    // instructions.fee will be scaled (for multi-signed transactions) while txJSON.Fee will not.
+    // instructions.fee is scaled (for multi-signed transactions) while txJSON.Fee is not.
     // Due to this difference, we do NOT allow both to be set, as the behavior would be complex and
     // potentially ambiguous.
     // Furthermore, txJSON.Fee is in drops while instructions.fee is in XRP, which would just add to
@@ -281,8 +291,8 @@ function prepareTransaction(
       return Promise.resolve()
     }
     const cushion = api._feeCushion
-    return api.getFee(cushion).then(fee => {
-      return api.connection.getFeeRef().then(feeRef => {
+    return api.getFee(cushion).then((fee) => {
+      return api.connection.getFeeRef().then((feeRef) => {
         // feeRef is the reference transaction cost in "fee units"
         const extraFee =
           newTxJSON.TransactionType !== 'EscrowFinish' ||
@@ -324,14 +334,22 @@ function prepareTransaction(
         )
       }
     }
+
     if (newTxJSON.Sequence !== undefined) {
       return Promise.resolve()
     }
 
+    // Ticket Sequence
+    if (instructions.ticketSequence !== undefined) {
+      newTxJSON.Sequence = 0
+      newTxJSON.TicketSequence = instructions.ticketSequence
+      return Promise.resolve()
+    }
+
     try {
-      // Consider requesting from the 'current' ledger (instead of 'validated').
       const response = await api.request('account_info', {
-        account: classicAccount
+        account: classicAccount,
+        ledger_index: 'current' // Fix #999
       })
       newTxJSON.Sequence = response.account_data.Sequence
       return Promise.resolve()
@@ -348,9 +366,7 @@ function prepareTransaction(
 }
 
 function convertStringToHex(string: string): string {
-  return Buffer.from(string, 'utf8')
-    .toString('hex')
-    .toUpperCase()
+  return Buffer.from(string, 'utf8').toString('hex').toUpperCase()
 }
 
 function convertMemo(memo: Memo): {Memo: ApiMemo} {

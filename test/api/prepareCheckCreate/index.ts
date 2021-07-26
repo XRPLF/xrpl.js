@@ -28,5 +28,19 @@ export default <TestSuite>{
       requests.prepareCheckCreate.full
     )
     assertResultMatch(result, responses.prepareCheckCreate.full, 'prepare')
+  },
+
+  'prepareCheckCreate with ticket': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012',
+      ticketSequence: 23
+    }
+    const result = await api.prepareCheckCreate(
+      address,
+      requests.prepareCheckCreate.normal,
+      localInstructions
+    )
+    assertResultMatch(result, responses.prepareCheckCreate.ticket, 'prepare')
   }
 }

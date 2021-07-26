@@ -23,8 +23,8 @@ function setupMockRippledConnection(testcase, port) {
 
 function setupMockRippledConnectionForBroadcast(testcase, ports) {
   return new Promise((resolve, reject) => {
-    const servers = ports.map(port => 'ws://localhost:' + port)
-    testcase.mocks = ports.map(port => createMockRippled(port))
+    const servers = ports.map((port) => 'ws://localhost:' + port)
+    testcase.mocks = ports.map((port) => createMockRippled(port))
     testcase.api = new RippleAPIBroadcast(servers)
     testcase.api
       .connect()
@@ -37,13 +37,13 @@ function setupMockRippledConnectionForBroadcast(testcase, ports) {
 }
 
 function setup(this: any) {
-  return getFreePort().then(port => {
+  return getFreePort().then((port) => {
     return setupMockRippledConnection(this, port)
   })
 }
 
 function setupBroadcast(this: any) {
-  return Promise.all([getFreePort(), getFreePort()]).then(ports => {
+  return Promise.all([getFreePort(), getFreePort()]).then((ports) => {
     return setupMockRippledConnectionForBroadcast(this, ports)
   })
 }
@@ -55,7 +55,7 @@ function teardown(this: any, done) {
       if (this.mockRippled !== undefined) {
         this.mockRippled.close()
       } else {
-        this.mocks.forEach(mock => mock.close())
+        this.mocks.forEach((mock) => mock.close())
       }
       setImmediate(done)
     })

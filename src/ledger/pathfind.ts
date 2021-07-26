@@ -62,7 +62,7 @@ function requestPathFind(
     request.destination_amount.issuer = request.destination_account
   }
   if (pathfind.source.currencies && pathfind.source.currencies.length > 0) {
-    request.source_currencies = pathfind.source.currencies.map(amount =>
+    request.source_currencies = pathfind.source.currencies.map((amount) =>
       renameCounterpartyToIssuer(amount)
     )
   }
@@ -79,7 +79,7 @@ function requestPathFind(
     }
   }
 
-  return connection.request(request).then(paths => addParams(request, paths))
+  return connection.request(request).then((paths) => addParams(request, paths))
 }
 
 function addDirectXrpPath(
@@ -116,7 +116,7 @@ function conditionallyAddDirectXRPPath(
   ) {
     return Promise.resolve(paths)
   }
-  return getXRPBalance(connection, address, undefined).then(xrpBalance =>
+  return getXRPBalance(connection, address, undefined).then((xrpBalance) =>
     addDirectXrpPath(paths, xrpBalance)
   )
 }
@@ -130,7 +130,7 @@ function filterSourceFundsLowPaths(
     pathfind.destination.amount.value === undefined &&
     paths.alternatives
   ) {
-    paths.alternatives = _.filter(paths.alternatives, alt => {
+    paths.alternatives = _.filter(paths.alternatives, (alt) => {
       if (!alt.source_amount) {
         return false
       }
@@ -191,11 +191,11 @@ function getPaths(this: RippleAPI, pathfind: PathFind): Promise<GetPaths> {
 
   const address = pathfind.source.address
   return requestPathFind(this.connection, pathfind)
-    .then(paths =>
+    .then((paths) =>
       conditionallyAddDirectXRPPath(this.connection, address, paths)
     )
-    .then(paths => filterSourceFundsLowPaths(pathfind, paths))
-    .then(paths => formatResponse(pathfind, paths))
+    .then((paths) => filterSourceFundsLowPaths(pathfind, paths))
+    .then((paths) => formatResponse(pathfind, paths))
 }
 
 export default getPaths

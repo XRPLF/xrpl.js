@@ -1,0 +1,74 @@
+{
+  "id": 0,
+  "result": {
+    "Account": "rPMMnbyptUziwr4eWAUQ3UHycaiNKZTJWd",
+    "Destination": "rErhTv3pwYAgsERLfhtWeE33wAHtDRuUwK",
+    "Fee": "5000000",
+    "Flags": 2147483648,
+    "LastLedgerSequence": 16430633,
+    "hash": "BB1F552C57880F636FE8A88C041DEBAE96B428074CB4AB7DF489181F512B9FC3",
+    "ledger_index": 16430632,
+    "date": 629889411,
+    "Memos": [
+      {
+        "Memo": {
+          "MemoData": "7465787465642064617461",
+          "MemoFormat": "746578742F706C61696E",
+          "MemoType": "74657374"
+        }
+      }
+    ],
+    "Sequence": 16427655,
+    "SigningPubKey": "027E10EC4D59028DEAE00BA4CE54895BDA2BF3D23F96B30A650512145BE7DE8C38",
+    "TransactionType": "AccountDelete",
+    "TxnSignature": "3045022100F426442DC86D2CA02B7DA658BDD342F23137BD8B5EF4399C064B59ED7237597F022030B10DBE65BCD91558362E4781F6A0B57AA634DE574CA74ACAD469D2108B75FC",
+    "meta": {
+      "AffectedNodes": [
+        {
+          "ModifiedNode": {
+            "FinalFields": {
+              "Account": "rErhTv3pwYAgsERLfhtWeE33wAHtDRuUwK",
+              "Balance": "2989999952",
+              "Flags": 0,
+              "OwnerCount": 0,
+              "Sequence": 16425892
+            },
+            "LedgerEntryType": "AccountRoot",
+            "LedgerIndex": "9F847A13E185EC7875B4F3A13657C05C69FB5D27E21138AA41F127BD80DCC1BD",
+            "PreviousFields": {
+              "Balance": "1995019976"
+            },
+            "PreviousTxnID": "1A4414207E27EAC54B10B6AA9930C5F1E87154CD7898DDAB281AA05BD4E2D7ED",
+            "PreviousTxnLgrSeq": 16430363
+          }
+        },
+        {
+          "DeletedNode": {
+            "FinalFields": {
+              "Account": "rPMMnbyptUziwr4eWAUQ3UHycaiNKZTJWd",
+              "Balance": "0",
+              "Flags": 0,
+              "OwnerCount": 0,
+              "PreviousTxnID": "1A4414207E27EAC54B10B6AA9930C5F1E87154CD7898DDAB281AA05BD4E2D7ED",
+              "PreviousTxnLgrSeq": 16430363,
+              "Sequence": 16427656
+            },
+            "LedgerEntryType": "AccountRoot",
+            "LedgerIndex": "D1B3E36FB851D050DEE28F2B527BAE6F8D31486DAEA043C202F1551C39A9A5BA",
+            "PreviousFields": {
+              "Balance": "999979976",
+              "Sequence": 16427655
+            }
+          }
+        }
+      ],
+      "DeliveredAmount": "994979976",
+      "TransactionIndex": 0,
+      "TransactionResult": "tesSUCCESS",
+      "delivered_amount": "994979976"
+    },
+    "validated": true
+  },
+  "status": "success",
+  "type": "response"
+}

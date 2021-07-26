@@ -69,7 +69,13 @@
           "currency": "JPY",
           "value": "302728.16600853",
           "counterparty": "r94s8px6kSw1uZ1MV98dhSRTvc6VMPoPcN"
-        }
+        },
+        "memos": [
+          {
+            "type": "offer_comment",
+            "data": "S_rf_jpy_usd_tokyo_bit_gf#q_ripple"
+          }
+        ]
       },
       "outcome": {
         "result": "tesSUCCESS",
@@ -333,7 +339,13 @@
           "currency": "JPY",
           "value": "254121.4048342",
           "counterparty": "r94s8px6kSw1uZ1MV98dhSRTvc6VMPoPcN"
-        }
+        },
+        "memos": [
+          {
+            "type": "offer_comment",
+            "data": "S_rf_jpy_usd_tokyo_bit_maxim#q_ripple"
+          }
+        ]
       },
       "outcome": {
         "result": "tesSUCCESS",

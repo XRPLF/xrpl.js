@@ -38,7 +38,7 @@ function computeTransactionHash(
     transactions = JSON.parse(ledger.rawTransactions)
   } else if (ledger.transactions) {
     try {
-      transactions = ledger.transactions.map(tx =>
+      transactions = ledger.transactions.map((tx) =>
         JSON.parse(tx.rawTransaction)
       )
     } catch (e) {
@@ -60,7 +60,7 @@ function computeTransactionHash(
     }
     return ledger.transactionHash
   }
-  const txs = _.map(transactions, tx => {
+  const txs = _.map(transactions, (tx) => {
     const mergeTx = _.assign({}, _.omit(tx, 'tx'), tx.tx || {})
     // rename `meta` back to `metaData`
     const renameMeta = _.assign(

@@ -134,7 +134,7 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
         // taking this out of function leads to error in PhantomJS
         const FINDSNAKE = /([a-zA-Z]_[a-zA-Z])/g
         if (FINDSNAKE.test(key)) {
-          newKey = key.replace(FINDSNAKE, r => r[0] + r[2].toUpperCase())
+          newKey = key.replace(FINDSNAKE, (r) => r[0] + r[2].toUpperCase())
         }
         result[newKey] = convertKeysFromSnakeCaseToCamelCase(value)
         return result

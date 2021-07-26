@@ -15,12 +15,12 @@ function formatResponse(
 ): FormattedAccountOrder[] {
   let orders: FormattedAccountOrder[] = []
   for (const response of responses) {
-    const offers = response.offers.map(offer => {
+    const offers = response.offers.map((offer) => {
       return parseAccountOrder(address, offer)
     })
     orders = orders.concat(offers)
   }
-  return _.sortBy(orders, order => order.properties.sequence)
+  return _.sortBy(orders, (order) => order.properties.sequence)
 }
 
 export default async function getOrders(

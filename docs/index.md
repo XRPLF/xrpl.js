@@ -19,26 +19,32 @@
   - [Transaction ID](#transaction-id)
   - [Transaction Memos](#transaction-memos)
 - [Transaction Specifications](#transaction-specifications)
-  - [Payment](#payment)
-  - [Trustline](#trustline)
-  - [Order](#order)
-  - [Order Cancellation](#order-cancellation)
-  - [Settings](#settings)
-  - [Escrow Creation](#escrow-creation)
-  - [Escrow Cancellation](#escrow-cancellation)
-  - [Escrow Execution](#escrow-execution)
-  - [Check Create](#check-create)
+  - [Account Delete](#account-delete)
   - [Check Cancel](#check-cancel)
   - [Check Cash](#check-cash)
+  - [Check Create](#check-create)
+  - [Deposit Preauth](#deposit-preauth)
+  - [Escrow Cancellation](#escrow-cancellation)
+  - [Escrow Creation](#escrow-creation)
+  - [Escrow Execution](#escrow-execution)
+  - [Order](#order)
+  - [Order Cancellation](#order-cancellation)
+  - [Payment](#payment)
+  - [Payment Channel Claim](#payment-channel-claim)
   - [Payment Channel Create](#payment-channel-create)
   - [Payment Channel Fund](#payment-channel-fund)
-  - [Payment Channel Claim](#payment-channel-claim)
+  - [Settings](#settings)
+  - [Ticket Create](#ticket-create)
+  - [Trustline](#trustline)
 - [rippled APIs](#rippled-apis)
   - [Listening to streams](#listening-to-streams)
   - [request](#request)
   - [hasNextPage](#hasnextpage)
   - [requestNextPage](#requestnextpage)
 - [Static Methods](#static-methods)
+  - [computeBinaryTransactionHash](#computebinarytransactionhash)
+  - [classicAddressToXAddress](#classicaddresstoxaddress)
+  - [xAddressToClassicAddress](#xaddresstoclassicaddress)
   - [renameCounterpartyToIssuer](#renamecounterpartytoissuer)
   - [formatBidsAndAsks](#formatbidsandasks)
 - [API Methods](#api-methods)
@@ -77,6 +83,7 @@
   - [prepareCheckCreate](#preparecheckcreate)
   - [prepareCheckCancel](#preparecheckcancel)
   - [prepareCheckCash](#preparecheckcash)
+  - [prepareTicketCreate](#prepareticketcreate)
   - [sign](#sign)
   - [combine](#combine)
   - [submit](#submit)
@@ -128,7 +135,7 @@ Use the following [boilerplate code](https://en.wikipedia.org/wiki/Boilerplate_c
 const RippleAPI = require('ripple-lib').RippleAPI;
 
 const api = new RippleAPI({
-  server: 'wss://s1.ripple.com' // Public rippled server hosted by Ripple, Inc.
+  server: 'wss://xrplcluster.com'
 });
 api.on('error', (errorCode, errorMessage) => {
   console.log(errorCode + ': ' + errorMessage);
@@ -148,9 +155,7 @@ api.connect().then(() => {
 }).catch(console.error);
 ```
 
-RippleAPI is designed to work in [Node.js](https://nodejs.org) version 6 or higher. Ripple recommends Node.js v10 LTS.
-
-The code samples in this documentation are written with ECMAScript 6 (ES6) features, but `RippleAPI` also works with ECMAScript 5 (ES5). Regardless of whether you use ES5 or ES6, the methods that return Promises return [ES6-style promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+[Node.js v14](https://nodejs.org/) is recommended. Other versions may work but are not frequently tested.
 
 <aside class="notice">
 All the code snippets in this documentation assume that you have surrounded them with this boilerplate.
@@ -172,6 +177,7 @@ Name | Type | Description
 ---- | ---- | -----------
 authorization | string | *Optional* Username and password for HTTP basic authentication to the rippled server in the format **username:password**.
 certificate | string | *Optional* A string containing the certificate key of the client in PEM format. (Can be an array of certificates).
+connectionTimeout | integer | *Optional* Connection timeout, in milliseconds, before considering connect() to have failed.
 feeCushion | number | *Optional* Factor to multiply estimated fee by to provide a cushion in case the required fee rises during submission of a transaction. Defaults to `1.2`.
 key | string | *Optional* A string containing the private key of the client in PEM format. (Can be an array of keys).
 maxFeeXRP | string | *Optional* Maximum fee to use with transactions, in XRP. Must be a string-encoded number. Defaults to `'2'`.
@@ -179,7 +185,7 @@ passphrase | string | *Optional* The passphrase for the private key of the clien
 proxy | uri string | *Optional* URI for HTTP/HTTPS proxy to use to connect to the rippled server.
 proxyAuthorization | string | *Optional* Username and password for HTTP basic authentication to the proxy in the format **username:password**.
 server | uri string | *Optional* URI for rippled websocket port to connect to. Must start with `wss://`, `ws://`, `wss+unix://`, or `ws+unix://`.
-timeout | integer | *Optional* Timeout in milliseconds before considering a request to have failed.
+timeout | integer | *Optional* Request timeout in milliseconds before considering a request to have failed. See also: connectionTimeout.
 trace | boolean | *Optional* If true, log rippled requests and responses to stdout.
 trustedCertificates | array\<string\> | *Optional* Array of PEM-formatted SSL certificates to trust when connecting to a proxy. This is useful if you want to use a self-signed certificate on the proxy server. Note: Each element must contain a single certificate; concatenated certificates are not valid.
 
@@ -248,7 +254,7 @@ An *X-address* encodes a hash of the account's public key, a tag, and a checksum
 
 ## Account Sequence Number
 
-Every XRP Ledger account has a *sequence number* that is used to keep transactions in order. Every transaction must have a sequence number. A transaction can only be executed if it has the next sequence number in order, of the account sending it. This prevents one transaction from executing twice and transactions executing out of order. The sequence number starts at `1` and increments for each transaction that the account makes.
+Every XRP Ledger account has a *sequence number* that is used to keep transactions in order. Every transaction must have a sequence or a ticketSequence number. A transaction can only be executed if it has the next sequence number in order, of the account sending it, or uses a previously generated ticketSequence number. This prevents one transaction from executing twice and transactions executing out of order. The sequence number starts at `1` and increments for each transaction that the account makes.
 
 ## Currency
 
@@ -307,7 +313,7 @@ Type | Description
 [payment](#payment) | A `payment` transaction represents a transfer of value from one account to another. Depending on the [path](https://ripple.com/build/paths/) taken, additional exchanges of value may occur atomically to facilitate the payment.
 [order](#order) | An `order` transaction creates a limit order. It defines an intent to exchange currencies, and creates an order in the XRP Ledger's order book if not completely fulfilled when placed. Orders can be partially fulfilled.
 [orderCancellation](#order-cancellation) | An `orderCancellation` transaction cancels an order in the XRP Ledger's order book.
-[trustline](#trustline) | A `trustline` transactions creates or modifies a trust line between two accounts.
+[trustline](#trustline) | A `trustline` transaction creates or modifies a trust line between two accounts.
 [settings](#settings) | A `settings` transaction modifies the settings of an account in the XRP Ledger.
 [escrowCreation](#escrow-creation) | An `escrowCreation` transaction creates an escrow on the ledger, which locks XRP until a cryptographic condition is met or it expires. It is like an escrow service where the XRP Ledger acts as the escrow agent.
 [escrowCancellation](#escrow-cancellation) | An `escrowCancellation` transaction unlocks the funds in an escrow and sends them back to the creator of the escrow, but it will only work after the escrow expires.
@@ -318,6 +324,7 @@ Type | Description
 [paymentChannelCreate](#payment-channel-create) | A `paymentChannelCreate` transaction opens a payment channel between two addresses with XRP set aside for asynchronous payments.
 [paymentChannelFund](#payment-channel-fund) | A `paymentChannelFund` transaction adds XRP to a payment channel and optionally sets a new expiration for the channel.
 [paymentChannelClaim](#payment-channel-claim) | A `paymentChannelClaim` transaction withdraws XRP from a channel and optionally requests to close it.
+[ticketCreate](#ticket-create) | A successful `ticketCreate` transaction adds a Ticket in the directory of the owning account.
 
 ## Transaction Flow
 
@@ -335,6 +342,7 @@ Executing a transaction with `RippleAPI` requires the following four steps:
     * [prepareCheckCreate](#preparecheckcreate)
     * [prepareCheckCancel](#preparecheckcancel)
     * [prepareCheckCash](#preparecheckcash)
+    * [prepareTicketCreate](#prepareticketcreate)
 2. [Sign](#sign) - Cryptographically sign the transaction locally and save the [transaction ID](#transaction-id). Signing is how the owner of an account authorizes a transaction to take place. For multisignature transactions, the `signedTransaction` fields returned by `sign` must be collected and passed to the [combine](#combine) method.
 3. [Submit](#submit) - Submit the transaction to the connected server.
 4. Verify - Verify that the transaction got validated by querying with [getTransaction](#gettransaction). This is necessary because transactions may fail even if they were successfully submitted.
@@ -358,8 +366,9 @@ maxFee | [value](#value) | *Optional* Deprecated: Use `maxFeeXRP` in the RippleA
 maxLedgerVersion | integer,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 maxLedgerVersion | string,null | *Optional* The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 maxLedgerVersionOffset | integer | *Optional* Offset from current validated ledger version to highest ledger version that the transaction can be included in.
-sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction.
+sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 signersCount | integer | *Optional* Number of signers that will be signing this transaction.
+ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The ticket sequence to be used for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 We recommend that you specify a `maxLedgerVersion` so that you can quickly determine that a failed transaction will never succeed in the future. It is impossible for a transaction to succeed after the XRP Ledger's consensus-validated ledger version exceeds the transaction's `maxLedgerVersion`. If you omit `maxLedgerVersion`, the "prepare\*" method automatically supplies a `maxLedgerVersion` equal to the current ledger plus 3, which it includes in the return value from the "prepare\*" method.
 
@@ -385,11 +394,248 @@ type | string | *Optional* Conventionally, a unique relation (according to [RFC 
 
 # Transaction Specifications
 
-A *transaction specification* specifies what a transaction should do. Each [Transaction Type](#transaction-types) has its own type of specification.
+A *transaction specification* specifies what a transaction should do. Each [Transaction Type](#transaction-types) has its own type of specification, which corresponds to the [native XRP Ledger transaction types](https://xrpl.org/transaction-types.html).
+
+## Account Delete
+
+Delete your account and send the remaining XRP elsewhere. (Native transaction type: [AccountDelete](https://xrpl.org/accountdelete.html))
+
+Name | Type | Description
+---- | ---- | -----------
+destination | [address](#address) | *Optional* Address of an account to receive any leftover XRP after deleting the sending account. Must be a funded account in the ledger, and must not be the sending account.
+destinationTag | integer | *Optional* (Optional) Arbitrary destination tag that identifies a hosted recipient or other information for the recipient of the deleted account's leftover XRP.
+destinationXAddress | [address](#address) | *Optional* X-address of an account to receive any leftover XRP after deleting the sending account. Must be a funded account in the ledger, and must not be the sending account.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+> **Note:** To prepare an Account Delete transaction, use [`prepareTransaction()`](#preparetransaction) with the [native transaction format](https://xrpl.org/accountdelete.html).
+
+## Check Cancel
+
+Cancel a Check that has not been redeemed. (Native transaction type: [CheckCancel](https://xrpl.org/checkcancel.html))
+
+Name | Type | Description
+---- | ---- | -----------
+checkID | string | The ID of the Check ledger object to cancel, as a 64-character hexadecimal string.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+#### Example
+
+
+```json
+{
+  "checkID": "49647F0D748DC3FE26BDACBC57F251AADEFFF391403EC9BF87C97F67E9977FB0"
+}
+```
+
+
+
+## Check Cash
+
+Redeem a Check for up to its stated value. (Native transaction type: [CheckCash](https://xrpl.org/checkcash.html))
+
+Name | Type | Description
+---- | ---- | -----------
+checkID | string | The ID of the Check ledger object to cash, as a 64-character hexadecimal string.
+amount | [laxAmount](#amount) | *Optional* Redeem the Check for exactly this amount, if possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or deliverMin.
+deliverMin | [laxAmount](#amount) | *Optional* Redeem the Check for at least this amount and for as much as possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or amount.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+#### Example
+
+
+```json
+{
+  "amount": {
+    "currency": "drops",
+    "value": "1000000"
+  },
+  "checkID": "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334"
+}
+```
+
+
+
+## Check Create
+
+Create a Check, a deferred payment that can be redeemed by the destination. (Native transaction type: [CheckCreate](https://xrpl.org/checkcreate.html))
+
+Name | Type | Description
+---- | ---- | -----------
+destination | [address](#address) | Address of the account that can cash the check.
+sendMax | [laxAmount](#amount) | Amount of source currency the check is allowed to debit the sender, including transfer fees on non-XRP currencies.
+destinationTag | integer | *Optional* Destination tag that identifies the reason for the check, or a hosted recipient to pay.
+expiration | date-time string | *Optional* Time after which the check is no longer valid.
+invoiceID | string | *Optional* 256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+#### Example
+
+
+```json
+{
+  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+  "sendMax": {
+    "currency": "drops",
+    "value": "1000000"
+  }
+}
+```
+
+
+
+## Deposit Preauth
+
+Preauthorize an sender to deposit money at an account using [Deposit Authorization](https://xrpl.org/depositauth.html). (Native transaction type: [DepositPreauth](https://xrpl.org/depositpreauth.html))
+
+Name | Type | Description
+---- | ---- | -----------
+authorize | [address](#address) | *Optional* Address of the account that can cash the check.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+unauthorize | [address](#address) | *Optional* Address of the account that can cash the check.
+
+> **Note:** To prepare a Deposit Preauth transaction, use [`prepareTransaction()`](#preparetransaction) with the [native transaction format](https://xrpl.org/depositpreauth.html).
+
+
+## Escrow Cancellation
+
+Cancel an Escrow that has passed its expiration. (Native transaction type: [EscrowCancel](https://xrpl.org/escrowcancel.html))
+
+Name | Type | Description
+---- | ---- | -----------
+owner | [address](#address) | The address of the owner of the escrow to cancel.
+escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to cancel.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+#### Example
+
+
+```json
+{
+  "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+  "escrowSequence": 1234
+}
+```
+
+
+
+## Escrow Creation
+
+Create an Escrow that locks up XRP until a given time or condition is met. (Native transaction type: [EscrowCreate](https://xrpl.org/escrowcreate.html))
+
+Name | Type | Description
+---- | ---- | -----------
+amount | [value](#value) | Amount of XRP for sender to escrow.
+destination | [address](#address) | Address to receive escrowed XRP.
+allowCancelAfter | date-time string | *Optional* If present, the escrow may be cancelled after this time.
+allowExecuteAfter | date-time string | *Optional* If present, the escrow can not be executed before this time.
+condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). If present, `fulfillment` is required upon execution.
+destinationTag | integer | *Optional* Destination tag.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+sourceTag | integer | *Optional* Source tag.
+
+#### Example
+
+
+```json
+{
+  "destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+  "amount": "0.01",
+  "allowExecuteAfter": "2014-09-24T21:21:50.000Z",
+  "allowCancelAfter":  "2017-01-01T00:00:00.000Z"
+}
+```
+
+
+
+## Escrow Execution
+
+Deliver XRP from an Escrow after its conditions have been met. (Native transaction type: [EscrowFinish](https://xrpl.org/escrowfinish.html))
+
+Name | Type | Description
+---- | ---- | -----------
+owner | [address](#address) | The address of the owner of the escrow to execute.
+escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to execute.
+condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). This must match the original `condition` from the escrow creation transaction.
+fulfillment | string | *Optional* A hex value representing the [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1) fulfillment for `condition`.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+#### Example
+
+
+```json
+{
+  "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+  "escrowSequence": 1234,
+  "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
+  "fulfillment": "A0028000"
+}
+```
+
+
+
+## Order
+
+Create and execute a limit order in the decentralized exchange. (Native transaction type: [OfferCreate](https://xrpl.org/offercreate.html))
+
+Name | Type | Description
+---- | ---- | -----------
+direction | string | Equal to "buy" for buy orders and "sell" for sell orders.
+quantity | [amount](#amount) | The amount of currency to buy or sell.
+totalPrice | [amount](#amount) | The total price to be paid for the `quantity` to be bought or sold.
+expirationTime | date-time string | *Optional* Time after which the offer is no longer active, as an [ISO 8601 date-time](https://en.wikipedia.org/wiki/ISO_8601).
+fillOrKill | boolean | *Optional* Treat the offer as a [Fill or Kill order](http://en.wikipedia.org/wiki/Fill_or_kill). Only attempt to match existing offers in the ledger, and only do so if the entire quantity can be exchanged. This cannot be used with `immediateOrCancel`.
+immediateOrCancel | boolean | *Optional* Treat the offer as an [Immediate or Cancel order](http://en.wikipedia.org/wiki/Immediate_or_cancel). If enabled, the offer will never become a ledger node: it only attempts to match existing offers in the ledger. This cannot be used with `fillOrKill`.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+orderToReplace | [sequence](#account-sequence-number) | *Optional* The [account sequence number](#account-sequence-number) of an order to cancel before the new order is created, effectively replacing the old order.
+passive | boolean | *Optional* If enabled, the offer will not consume offers that exactly match it, and instead becomes an Offer node in the ledger. It will still consume offers that cross it.
+
+The following invalid flag combination causes a `ValidationError`: `immediateOrCancel` and `fillOrKill`. These fields are mutually exclusive, and cannot both be set at the same time.
+
+#### Example
+
+
+```json
+{
+  "direction": "buy",
+  "quantity": {
+    "currency": "USD",
+    "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+    "value": "10.1"
+  },
+  "totalPrice": {
+    "currency": "drops",
+    "value": "2000000"
+  },
+  "passive": false,
+  "fillOrKill": true
+}
+```
+
+
+
+## Order Cancellation
+
+Cancel an order in the decentralized exchange. (Native transaction type: [OfferCancel](https://xrpl.org/offercancel.html))
+
+Name | Type | Description
+---- | ---- | -----------
+orderSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the order to cancel.
+memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
+
+#### Example
+
+
+```json
+{
+  "orderSequence": 23
+}
+```
+
+
 
 ## Payment
 
-See [Transaction Types](#transaction-types) for a description.
+Send value from one account to another. (Native transaction type: [Payment](https://xrpl.org/payment.html))
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -410,7 +656,7 @@ memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the
 noDirectRipple | boolean | *Optional* If true and paths are specified, the sender would like the XRP Ledger to disregard any direct paths from the source account to the destination account. This may be used to take advantage of an arbitrage opportunity or by gateways wishing to issue balances from a hot wallet to a user who has mistakenly set a trustline directly to the hot wallet.
 paths | string | *Optional* The paths of trustlines and orders to use in executing the payment.
 
-### Example
+#### Example
 
 
 ```json
@@ -435,106 +681,89 @@ paths | string | *Optional* The paths of trustlines and orders to use in executi
 ```
 
 
-## Trustline
 
-See [Transaction Types](#transaction-types) for a description.
+## Payment Channel Claim
+
+Redeem XRP from a Payment Channel. (Native transaction type: [PaymentChannelClaim](https://xrpl.org/paymentchannelclaim.html))
 
 Name | Type | Description
 ---- | ---- | -----------
-currency | [currency](#currency) | The currency this trustline applies to.
-counterparty | [address](#address) | The address of the account this trustline extends trust to.
-limit | [value](#value) | The maximum amount that the owner of the trustline can be owed through the trustline.
-authorized | boolean | *Optional* If true, authorize the counterparty to hold issuances from this account.
-frozen | boolean | *Optional* If true, the trustline is frozen, which means that funds can only be sent to the owner.
+channel | string | 256-bit hexadecimal channel identifier.
+amount | [value](#value) | *Optional* Amount of XRP authorized by this signature.
+balance | [value](#value) | *Optional* Total XRP balance delivered by this channel after claim is processed.
+close | boolean | *Optional* Request to close the channel. If the channel has no XRP remaining or the destination address requests it, closes the channel immediately (returning unclaimed XRP to the source address). Otherwise, sets the channel to expire after settleDelay seconds have passed.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-qualityIn | number | *Optional* Incoming balances on this trustline are valued at this ratio.
-qualityOut | number | *Optional* Outgoing balances on this trustline are valued at this ratio.
-ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through this trustline.
+publicKey | string | *Optional* Public key of the channel. (For verifying the signature.)
+renew | boolean | *Optional* Clear the channel's expiration time.
+signature | string | *Optional* Signed claim authorizing withdrawal of XRP from the channel. (Required except from the channel's source address.)
 
-### Example
+#### Example
 
 
 ```json
 {
-  "currency": "USD",
-  "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-  "limit": "10000",
-  "qualityIn": 0.91,
-  "qualityOut": 0.87,
-  "ripplingDisabled": true,
-  "frozen": false,
-  "memos": [
-    {
-      "type": "test",
-      "format": "text/plain",
-      "data": "texted data"
-    }
-  ]
+  "channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198"
 }
 ```
 
 
-## Order
 
-See [Transaction Types](#transaction-types) for a description.
+## Payment Channel Create
+
+Create a Payment Channel with XRP set aside for asynchronous payments. (Native transaction type: [PaymentChannelCreate](https://xrpl.org/paymentchannelcreate.html))
 
 Name | Type | Description
 ---- | ---- | -----------
-direction | string | Equal to "buy" for buy orders and "sell" for sell orders.
-quantity | [amount](#amount) | The amount of currency to buy or sell.
-totalPrice | [amount](#amount) | The total price to be paid for the `quantity` to be bought or sold.
-expirationTime | date-time string | *Optional* Time after which the offer is no longer active, as an [ISO 8601 date-time](https://en.wikipedia.org/wiki/ISO_8601).
-fillOrKill | boolean | *Optional* Treat the offer as a [Fill or Kill order](http://en.wikipedia.org/wiki/Fill_or_kill). Only attempt to match existing offers in the ledger, and only do so if the entire quantity can be exchanged. This cannot be used with `immediateOrCancel`.
-immediateOrCancel | boolean | *Optional* Treat the offer as an [Immediate or Cancel order](http://en.wikipedia.org/wiki/Immediate_or_cancel). If enabled, the offer will never become a ledger node: it only attempts to match existing offers in the ledger. This cannot be used with `fillOrKill`.
+amount | [value](#value) | Amount of XRP for sender to set aside in this channel.
+destination | [address](#address) | Address to receive XRP claims against this channel.
+settleDelay | number | Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP.
+publicKey | string | Public key of the key pair the source may use to sign claims against this channel.
+cancelAfter | date-time string | *Optional* Time when this channel expires. This expiration cannot be changed after creating the channel.
+destinationTag | integer | *Optional* Destination tag.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-orderToReplace | [sequence](#account-sequence-number) | *Optional* The [account sequence number](#account-sequence-number) of an order to cancel before the new order is created, effectively replacing the old order.
-passive | boolean | *Optional* If enabled, the offer will not consume offers that exactly match it, and instead becomes an Offer node in the ledger. It will still consume offers that cross it.
+sourceTag | integer | *Optional* Source tag.
 
-The following invalid flag combination causes a `ValidationError`: `immediateOrCancel` and `fillOrKill`. These fields are mutually exclusive, and cannot both be set at the same time.
-
-### Example
+#### Example
 
 
 ```json
 {
-  "direction": "buy",
-  "quantity": {
-    "currency": "USD",
-    "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
-    "value": "10.1"
-  },
-  "totalPrice": {
-    "currency": "drops",
-    "value": "2000000"
-  },
-  "passive": false,
-  "fillOrKill": true
+  "amount": "1",
+  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
+  "settleDelay": 86400,
+  "publicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A"
 }
 ```
 
 
-## Order Cancellation
 
-See [Transaction Types](#transaction-types) for a description.
+## Payment Channel Fund
+
+Add XRP to a Payment Channel. (Native transaction type: [PaymentChannelFund](https://xrpl.org/paymentchannelfund.html))
 
 Name | Type | Description
 ---- | ---- | -----------
-orderSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the order to cancel.
+amount | [value](#value) | Amount of XRP to fund the channel with.
+channel | string | 256-bit hexadecimal channel identifier.
+expiration | date-time string | *Optional* New expiration for this channel. (This does not change the cancelAfter expiration, if the channel has one.) Cannot move the expiration sooner than settleDelay seconds from time of the request.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
 
-### Example
+#### Example
 
 
 ```json
 {
-  "orderSequence": 23
+  "channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
+  "amount": "1"
 }
 ```
+
+
 
 
 ## Settings
 
-See [Transaction Types](#transaction-types) for a description.
+Change account settings. (Native transaction types: [AccountSet](https://xrpl.org/accountset.html), [SetRegularKey](https://xrpl.org/setregularkey.html), [SignerListSet](https://xrpl.org/signerlistset.html))
 
 Name | Type | Description
 ---- | ---- | -----------
@@ -563,7 +792,7 @@ tickSize | string | *Optional* Tick size to use for offers involving a currency 
 transferRate | number,null | *Optional* The fee to charge when users transfer this account’s issuances, as the decimal amount that must be sent to deliver 1 unit. Has precision up to 9 digits beyond the decimal point. Use `null` to set no fee.
 walletLocator | string,null | *Optional* Transaction hash or any other 64 character hexadecimal string, that may or may not represent the result of a hash operation. Use `null` to clear.
 
-### Example
+#### Example
 
 
 ```json
@@ -580,216 +809,51 @@ walletLocator | string,null | *Optional* Transaction hash or any other 64 charac
 ```
 
 
-## Escrow Creation
 
-See [Transaction Types](#transaction-types) for a description.
+## Ticket Create
+
+Set aside account Sequence numbers as Tickets to be used by later transactions.
+
+> **Caution:** As of 2021-01-22, Tickets are not yet available on the XRP Ledger.
+
+> **Note:** To prepare a Ticket Create transaction, use [`prepareTransaction()`](#preparetransaction) with the native transaction format. <!-- Future link: https://xrpl.org/ticketcreate.html -->
+
+
+## Trustline
+
+Create or modify a trust line between two accounts, for an issued currency. (Native transaction type: [TrustSet](https://xrpl.org/trustset.html))
 
 Name | Type | Description
 ---- | ---- | -----------
-amount | [value](#value) | Amount of XRP for sender to escrow.
-destination | [address](#address) | Address to receive escrowed XRP.
-allowCancelAfter | date-time string | *Optional* If present, the escrow may be cancelled after this time.
-allowExecuteAfter | date-time string | *Optional* If present, the escrow can not be executed before this time.
-condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). If present, `fulfillment` is required upon execution.
-destinationTag | integer | *Optional* Destination tag.
+currency | [currency](#currency) | The currency this trustline applies to.
+counterparty | [address](#address) | The address of the account this trustline extends trust to.
+limit | [value](#value) | The maximum amount that the owner of the trustline can be owed through the trustline.
+authorized | boolean | *Optional* If true, authorize the counterparty to hold issuances from this account.
+frozen | boolean | *Optional* If true, the trustline is frozen, which means that funds can only be sent to the owner.
 memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-sourceTag | integer | *Optional* Source tag.
+qualityIn | number | *Optional* Incoming balances on this trustline are valued at this ratio.
+qualityOut | number | *Optional* Outgoing balances on this trustline are valued at this ratio.
+ripplingDisabled | boolean | *Optional* If true, payments cannot ripple through this trustline.
 
-### Example
-
-
-```json
-{
-  "destination": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
-  "amount": "0.01",
-  "allowExecuteAfter": "2014-09-24T21:21:50.000Z",
-  "allowCancelAfter":  "2017-01-01T00:00:00.000Z"
-}
-```
-
-
-## Escrow Cancellation
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-owner | [address](#address) | The address of the owner of the escrow to cancel.
-escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to cancel.
-memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-
-### Example
+#### Example
 
 
 ```json
 {
-  "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "escrowSequence": 1234
-}
-```
-
-
-## Escrow Execution
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-owner | [address](#address) | The address of the owner of the escrow to execute.
-escrowSequence | [sequence](#account-sequence-number) | The [account sequence number](#account-sequence-number) of the [Escrow Creation](#escrow-creation) transaction for the escrow to execute.
-condition | string | *Optional* A hex value representing a [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1). This must match the original `condition` from the escrow creation transaction.
-fulfillment | string | *Optional* A hex value representing the [PREIMAGE-SHA-256 crypto-condition](https://tools.ietf.org/html/draft-thomas-crypto-conditions-02#section-8.1) fulfillment for `condition`.
-memos | [memos](#transaction-memos) | *Optional* Array of memos to attach to the transaction.
-
-### Example
-
-
-```json
-{
-  "owner": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
-  "escrowSequence": 1234,
-  "condition": "A0258020E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855810100",
-  "fulfillment": "A0028000"
-}
-```
-
-
-## Check Create
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-destination | [address](#address) | Address of the account that can cash the check.
-sendMax | [laxAmount](#amount) | Amount of source currency the check is allowed to debit the sender, including transfer fees on non-XRP currencies.
-destinationTag | integer | *Optional* Destination tag that identifies the reason for the check, or a hosted recipient to pay.
-expiration | date-time string | *Optional* Time after which the check is no longer valid.
-invoiceID | string | *Optional* 256-bit hash, as a 64-character hexadecimal string, representing a specific reason or identifier for this check.
-
-### Example
-
-
-```json
-{
-  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-  "sendMax": {
-    "currency": "drops",
-    "value": "1000000"
-  }
-}
-```
-
-
-## Check Cancel
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-checkID | string | The ID of the Check ledger object to cancel, as a 64-character hexadecimal string.
-
-### Example
-
-
-```json
-{
-  "checkID": "49647F0D748DC3FE26BDACBC57F251AADEFFF391403EC9BF87C97F67E9977FB0"
-}
-```
-
-
-## Check Cash
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-checkID | string | The ID of the Check ledger object to cash, as a 64-character hexadecimal string.
-amount | [laxAmount](#amount) | *Optional* Redeem the Check for exactly this amount, if possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or deliverMin.
-deliverMin | [laxAmount](#amount) | *Optional* Redeem the Check for at least this amount and for as much as possible. The currency must match that of the sendMax of the corresponding CheckCreate transaction. You must provide either this field or amount.
-
-### Example
-
-
-```json
-{
-  "amount": {
-    "currency": "drops",
-    "value": "1000000"
-  },
-  "checkID": "838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334"
-}
-```
-
-
-## Payment Channel Create
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-amount | [value](#value) | Amount of XRP for sender to set aside in this channel.
-destination | [address](#address) | Address to receive XRP claims against this channel.
-settleDelay | number | Amount of seconds the source address must wait before closing the channel if it has unclaimed XRP.
-publicKey | string | Public key of the key pair the source may use to sign claims against this channel.
-cancelAfter | date-time string | *Optional* Time when this channel expires. This expiration cannot be changed after creating the channel.
-destinationTag | integer | *Optional* Destination tag.
-sourceTag | integer | *Optional* Source tag.
-
-### Example
-
-
-```json
-{
-  "amount": "1",
-  "destination": "rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW",
-  "settleDelay": 86400,
-  "publicKey": "32D2471DB72B27E3310F355BB33E339BF26F8392D5A93D3BC0FC3B566612DA0F0A"
-}
-```
-
-
-## Payment Channel Fund
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-amount | [value](#value) | Amount of XRP to fund the channel with.
-channel | string | 256-bit hexadecimal channel identifier.
-expiration | date-time string | *Optional* New expiration for this channel. (This does not change the cancelAfter expiration, if the channel has one.) Cannot move the expiration sooner than settleDelay seconds from time of the request.
-
-### Example
-
-
-```json
-{
-  "channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198",
-  "amount": "1"
-}
-```
-
-
-## Payment Channel Claim
-
-See [Transaction Types](#transaction-types) for a description.
-
-Name | Type | Description
----- | ---- | -----------
-channel | string | 256-bit hexadecimal channel identifier.
-amount | [value](#value) | *Optional* Amount of XRP authorized by this signature.
-balance | [value](#value) | *Optional* Total XRP balance delivered by this channel after claim is processed.
-close | boolean | *Optional* Request to close the channel. If the channel has no XRP remaining or the destination address requests it, closes the channel immediately (returning unclaimed XRP to the source address). Otherwise, sets the channel to expire after settleDelay seconds have passed.
-publicKey | string | *Optional* Public key of the channel. (For verifying the signature.)
-renew | boolean | *Optional* Clear the channel's expiration time.
-signature | string | *Optional* Signed claim authorizing withdrawal of XRP from the channel. (Required except from the channel's source address.)
-
-### Example
-
-
-```json
-{
-  "channel": "C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198"
+  "currency": "USD",
+  "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM",
+  "limit": "10000",
+  "qualityIn": 0.91,
+  "qualityOut": 0.87,
+  "ripplingDisabled": true,
+  "frozen": false,
+  "memos": [
+    {
+      "type": "test",
+      "format": "text/plain",
+      "data": "texted data"
+    }
+  ]
 }
 ```
 
@@ -810,7 +874,8 @@ When using rippled APIs:
 
 ## Listening to streams
 
-The `rippled` server can push updates to your client when various events happen. Refer to [Subscriptions in the `rippled` API docs](https://developers.ripple.com/subscription-methods.html) for details.
+The `rippled` server can push updates to your client when various events happen.
+Refer to [Subscriptions in the `rippled` API docs](https://xrpl.org/subscribe.html) for details.
 
 Note that the `streams` parameter for generic streams takes an array. For example, to subscribe to the `validations` stream, use `{ streams: [ 'validations' ] }`.
 
@@ -833,7 +898,7 @@ Type | Description
 `ledgerClosed` | Sent by the `ledger` stream when the consensus process declares a new fully validated ledger. The message identifies the ledger and provides some information about its contents.
 `validationReceived` | Sent by the `validations` stream when the server receives a validation message, also called a validation vote, regardless of whether the server trusts the validator.
 `manifestReceived` | Sent by the `manifests` stream when the server receives a manifest.
-`transaction` | Sent by many subscriptions including `transactions`, `transactions_proposed`, `accounts`, `accounts_proposed`, and `book` (Order Book). See [Transaction Streams](https://ripple.com/build/rippled-apis/#transaction-streams) for details.
+`transaction` | Sent by many subscriptions including `transactions`, `transactions_proposed`, `accounts`, `accounts_proposed`, and `book` (Order Book). See [Transaction Streams](https://xrpl.org/subscribe.html#transaction-streams) for details.
 `peerStatusChange` | (Admin-only) Reports a large amount of information on the activities of other `rippled` servers to which the server is connected.
 `path_find` | Asynchronous follow-up response to the currently open path\_find request. See [rippled path\_find method](https://xrpl.org/path_find.html) for details.
 
@@ -842,7 +907,7 @@ To register your listener function, use `connection.on(type, handler)`.
 Here is an example of listening for transactions on given account(s):
 ```
 const account = 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn' // Replace with the account you want notifications for
-api.connect().then(() => { // Omit this if you are already connected
+api.connect().then(() => {
 
   // 'transaction' can be replaced with the relevant `type` from the table above
   api.connection.on('transaction', (event) => {
@@ -854,9 +919,7 @@ api.connect().then(() => { // Omit this if you are already connected
   api.request('subscribe', {
       accounts: [ account ]
   }).then(response => {
-      if (response.status === 'success') {
-          console.log('Successfully subscribed')
-      }
+      console.log('Successfully subscribed')
   }).catch(error => {
       // Handle `error`
   })
@@ -981,6 +1044,105 @@ return api.request(command, params).then(response => {
 
 
 # Static Methods
+
+You can access static methods directly on the `RippleAPI` class. For example, `RippleAPI.computeBinaryTransactionHash(...)`.
+
+A few of the most commonly-used methods are documented below.
+
+For a full list, refer to these docs:
+
+- [XRP Ledger Hashes](https://github.com/ripple/ripple-lib/blob/develop/src/common/hashes/README.md)
+- [ripple-address-codec API](https://github.com/ripple/ripple-address-codec/blob/master/README.md#api)
+
+## computeBinaryTransactionHash
+
+`computeBinaryTransactionHash(txBlobHex: string): string`
+
+Returns the hash (id) of a binary transaction blob.
+
+This is a static method on the `RippleAPI` class.
+
+### Parameters
+
+This method takes one parameter, a string containing a binary transaction in hex.
+
+### Return Value
+
+This method returns a string representing the transaction's id (hash).
+
+### Example
+
+```javascript
+const signed_blob = '120000228000000024000B2E5A201B0066374B61400000003B9ACA0068400000000000000C732102356E89059A75438887F9FEE2056A2890DB82A68353BE9C0C0C8F89C0018B37FC74473045022100B3721EEB1ED6DFF29FB8B209E2DE6B54A0A6E44D52D926342F3D334BE98F08640220367A74107AD5DEAEFA3AB2984C161FC23F30B2704BB5CC984358BA262177A4568114F667B0CA50CC7709A220B0561B85E53A48461FA883142B71D8B09B4EE8DAA68FB936C23E3A974713BDAC'
+if (typeof signed_blob === 'string' && signed_blob.match(/^[A-F0-9]+$/)) {
+  const id = RippleAPI.computeBinaryTransactionHash(signed_blob)
+  console.log('Transaction hash:', id')
+}
+```
+
+```
+Transaction hash: 80C5E11E1A21A626759D6CB944B33DBAAC66BD704A289C86E330B847904F5C13
+```
+
+[RunKit Example: computeBinaryTransactionHash](https://runkit.com/intelliot/computebinarytransactionhash-example)
+
+## classicAddressToXAddress
+
+`classicAddressToXAddress(classicAddress: string, tag: number | false[, test: boolean]): string`
+
+Convert a classic address and tag to an X-address.
+
+If `test` is `true`, the address with start with `T` and readers of the address will know that the address is intended for use on a test network.
+
+### Example: Encode an X-address with tag 4294967295
+
+```javascript
+const RippleAPI = require('ripple-lib').RippleAPI
+const xAddress = RippleAPI.classicAddressToXAddress('rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf', 4294967295)
+console.log(xAddress)
+```
+
+```
+XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi
+```
+
+### Example: Encode a test address for use with Testnet or Devnet
+
+```javascript
+const RippleAPI = require('ripple-lib').RippleAPI
+const address = RippleAPI.classicAddressToXAddress('r3SVzk8ApofDJuVBPKdmbbLjWGCCXpBQ2g', 123, true)
+console.log(address)
+```
+
+```
+T7oKJ3q7s94kDH6tpkBowhetT1JKfcfdSCmAXbS75iATyLD
+```
+
+## xAddressToClassicAddress
+
+`xAddressToClassicAddress(xAddress: string): {classicAddress: string, tag: number | false, test: boolean}`
+
+Convert an X-address to a classic address and tag.
+
+Since `0` is a valid tag, use `if (tag !== false)` to you want to check for a tag.
+
+If the address is intended for use on a test network, `test === true`. Otherwise, `test === false`.
+
+### Example
+
+```javascript
+const RippleAPI = require('ripple-lib').RippleAPI
+const address = RippleAPI.xAddressToClassicAddress('XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi')
+console.log(address)
+```
+
+```
+{
+  classicAddress: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+  tag: 4294967295,
+  test: false
+}
+```
 
 ## renameCounterpartyToIssuer
 
@@ -4430,14 +4592,14 @@ This method returns a promise that resolves with an object with the following st
 Name | Type | Description
 ---- | ---- | -----------
 stateHash | string | Hash of all state information in this ledger.
-closeTime | date-time string | The time at which this ledger was closed.
-closeTimeResolution | integer | Approximate number of seconds between closing one ledger version and closing the next one.
+closeTime | date-time string | The approximate time when this ledger was closed. This number is rounded based on the `closeTimeResolution`. If it would have been rounded to the same time as a previous ledger, the close time is recorded as 1 second later instead.
+closeTimeResolution | integer | A number of seconds, indicating how much the `closeTime` could be rounded. Ledger close times are approximate so that small differences in servers clocks don't hinder consensus.
 closeFlags | integer | A bit-map of flags relating to the closing of this ledger. Currently, the ledger has only one flag defined for `closeFlags`: **sLCF_NoConsensusTime** (value 1). If this flag is enabled, it means that validators were in conflict regarding the correct close time for the ledger, but built otherwise the same ledger, so they declared consensus while "agreeing to disagree" on the close time. In this case, the consensus ledger contains a `closeTime` value that is 1 second after that of the previous ledger. (In this case, there is no official close time, but the actual real-world close time is probably 3-6 seconds later than the specified `closeTime`.)
 ledgerHash | string | Unique identifying hash of the entire ledger.
 ledgerVersion | integer | The ledger version of this ledger.
 ledgerVersion | string | The ledger version of this ledger.
 parentLedgerHash | string | Unique identifying hash of the ledger that came immediately before this one.
-parentCloseTime | date-time string | The time at which the previous ledger was closed.
+parentCloseTime | date-time string | The previous ledger's recorded close time.
 totalDrops | [value](#value) | Total number of drops (1/1,000,000th of an XRP) in the network, as a quoted integer. (This decreases as transaction fees cause XRP to be destroyed.)
 transactionHash | string | Hash of the transaction information included in this ledger.
 rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.
@@ -4507,7 +4669,7 @@ console.log(JSON.stringify(flags, null, 2))
 
 ## prepareTransaction
 
-`prepareTransaction(transaction: [Transaction](https://xrpl.org/transaction-formats.html), instructions?: [Instructions](#transaction-instructions)): Promise<object>`
+`prepareTransaction(transaction: object, instructions: object): Promise<object>`
 
 Prepare a transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
 
@@ -4535,9 +4697,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4590,9 +4753,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4663,9 +4827,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4731,9 +4896,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4799,9 +4965,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4852,9 +5019,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4922,9 +5090,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -4980,9 +5149,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5036,9 +5206,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5094,9 +5265,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5152,9 +5324,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5207,9 +5380,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5263,9 +5437,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5322,9 +5497,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5377,9 +5553,10 @@ Name | Type | Description
 txJSON | string | The prepared transaction in rippled JSON format.
 instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
 *instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
-*instructions.* sequence | [sequence](#account-sequence-number) | The initiating account's sequence number for this transaction.
 *instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
 *instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
 
 ### Example
 
@@ -5405,6 +5582,64 @@ return api.prepareCheckCash(address, checkCash).then(prepared =>
     "sequence": 23,
     "maxLedgerVersion": 8819954
   }
+}
+```
+
+
+## prepareTicketCreate
+
+`prepareTicketCreate(address: string, ticketCount: number, instructions: object): Promise<object>`
+
+Prepare a ticket transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+
+Ticket functionality requires the [TicketBatch amendment](https://github.com/ripple/xrpl-dev-portal/issues/898). As of 2020-11-24, this amendment is not activated on the Mainnet, Testnet, or Devnet.
+
+### Parameters
+
+Name | Type | Description
+---- | ---- | -----------
+address | [address](#address) | The address of the account that is creating the transaction.
+ticketCount | number | The number of tickets to be created.
+instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction
+
+### Return Value
+
+This method returns a promise that resolves with an object with the following structure:
+
+<aside class="notice">
+All "prepare*" methods have the same return type.
+</aside>
+
+Name | Type | Description
+---- | ---- | -----------
+txJSON | string | The prepared transaction in rippled JSON format.
+instructions | object | The instructions for how to execute the transaction after adding automatic defaults.
+*instructions.* fee | [value](#value) | The fee to pay for the transaction. See [Transaction Fees](#transaction-fees) for more information. For multi-signed transactions, this fee will be multiplied by (N+1), where N is the number of signatures you plan to provide.
+*instructions.* maxLedgerVersion | integer,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* maxLedgerVersion | string,null | The highest ledger version that the transaction can be included in. Set to `null` if there is no maximum. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.
+*instructions.* sequence | [sequence](#account-sequence-number) | *Optional* The initiating account's sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+*instructions.* ticketSequence | [ticket-sequence](#account-sequence-number) | *Optional* The initiating account's ticket sequence number for this transaction. `sequence` and `ticketSequence` are mutually exclusive, only one of them can be set.
+
+### Example
+
+```javascript
+const address = 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59';
+return api.prepareTicketCreate(address, 2).then(prepared => {
+    /* ... */
+  }).catch(error => {
+    /* ... as with all prepare* methods, use a Promise catch block to handle errors ... */
+  })
+```
+
+
+```json
+{
+    "TransactionType": "TicketCreate",
+    "Account": "r4SDqUD1ZcfoZrhnsZ94XNFKxYL4oHYJyA",
+    "TicketCount": 2,
+    "LastLedgerSequence": 13,
+    "Fee": "12",
+    "Sequence": 25
 }
 ```
 
@@ -5591,66 +5826,87 @@ return api.combine(signedTransactions);
 
 ## submit
 
-`submit(signedTransaction: string): Promise<object>`
+`request('submit', {tx_blob: string, fail_hard: boolean}): Promise<object>`
 
-Submits a signed transaction. The transaction is not guaranteed to succeed; it must be verified with [getTransaction](#gettransaction).
+The `submit` method applies a transaction and sends it to the network to be confirmed and included in future ledgers.
+
+This method takes a signed, serialized transaction as a binary blob, and submits it to the network as-is. Since signed transaction objects are immutable, no part of the transaction can be modified or automatically filled in after submission.
+
+To send a transaction as robustly as possible, you should construct and sign it in advance, persist it somewhere that you can access even after a power outage, then `submit` it as a `tx_blob`. After submission, monitor the network with the `tx` method to see if the transaction was successfully applied; if a restart or other problem occurs, you can safely re-submit the `tx_blob` transaction: it won't be applied twice since it has the same sequence number as the old transaction.
 
 ### Parameters
 
-Name | Type | Description
----- | ---- | -----------
-signedTransaction | string | A signed transaction as returned by [sign](#sign).
+| `Field`     | Type    | Description                                          |
+|:------------|:--------|:-----------------------------------------------------|
+| `tx_blob`   | String  | Hex representation of the signed transaction to submit. This can be a multi-signed transaction. |
+| `fail_hard` | Boolean | (Optional, defaults to false) If true, and the transaction fails locally, do not retry or relay the transaction to other servers |
 
 ### Return Value
 
-This method returns an object with the following structure:
+When successful, this method returns an object containing the following fields:
 
-Name | Type | Description
----- | ---- | -----------
-resultCode | string | Deprecated: Use `engine_result` instead.
-resultMessage | string | Deprecated: Use `engine_result_message` instead.
-engine_result | string | Code indicating the preliminary result of the transaction, for example `tesSUCCESS`. [List of transaction responses](https://developers.ripple.com/transaction-results.html)
-engine_result_code | integer | Numeric code indicating the preliminary result of the transaction, directly correlated to `engine_result`
-engine_result_message | string | Human-readable explanation of the transaction's preliminary result.
-tx_blob | string | The complete transaction in hex string format.
-tx_json | [tx-json](https://developers.ripple.com/transaction-formats.html) | The complete transaction in JSON format.
+| `Field`                 | Type    | Description                              |
+|:------------------------|:--------|:-----------------------------------------|
+| `engine_result`         | String  | Text [result code](https://xrpl.org/transaction-results.html) indicating the preliminary result of the transaction, for example `tesSUCCESS` |
+| `engine_result_code`    | Integer | Numeric version of the [result code](https://xrpl.org/transaction-results.html). **Not recommended.** |
+| `engine_result_message` | String  | Human-readable explanation of the transaction's preliminary result |
+| `tx_blob`               | String  | The complete transaction in hex string format |
+| `tx_json`               | Object  | The complete transaction in JSON format  |
+| `accepted`              | Boolean | The value `true` indicates that the transaction was applied, queued, broadcast, or kept for later. The value `false` indicates that none of those happened, so the transaction cannot possibly succeed as long as you do not submit it again and have not already submitted it another time. [New in: rippled 1.5.0] |
+| `account_sequence_available` | Number | The next [Sequence Number](https://xrpl.org/basic-data-types.html#account-sequence) available for the sending account after all pending and [queued](https://xrpl.org/transaction-queue.html) transactions. [New in: rippled 1.5.0] |
+| `account_sequence_next` | number  | The next [Sequence Number](https://xrpl.org/basic-data-types.html#account-sequence) for the sending account after all transactions that have been provisionally applied, but not transactions in the [queue](https://xrpl.org/transaction-queue.html). [New in: rippled 1.5.0] |
+| `applied`               | Boolean | The value `true` indicates that this transaction was applied to the open ledger. In this case, the transaction is likely, but not guaranteed, to be validated in the next ledger version. [New in: rippled 1.5.0] |
+| `broadcast`             | Boolean | The value `true` indicates this transaction was broadcast to peer servers in the peer-to-peer XRP Ledger network. (Note: if the server has no peers, such as in [stand-alone mode](https://xrpl.org/rippled-server-modes.html#reasons-to-run-a-rippled-server-in-stand-alone-mode), the server uses the value `true` for cases where it _would_ have broadcast the transaction.) The value `false` indicates the transaction was not broadcast to any other servers. [New in: rippled 1.5.0] |
+| `kept`                  | Boolean | The value `true` indicates that the transaction was kept to be retried later. [New in: rippled 1.5.0] |
+| `queued`                | Boolean | The value `true` indicates the transaction was put in the [Transaction Queue](https://xrpl.org/transaction-queue.html), which means it is likely to be included in a future ledger version. [New in: rippled 1.5.0] |
+| `open_ledger_cost`      | String  | The current [open ledger cost](https://xrpl.org/transaction-cost.html#open-ledger-cost) before processing this transaction. Transactions with a lower cost are likely to be [queued](https://xrpl.org/transaction-queue.html). [New in: rippled 1.5.0] |
+| `validated_ledger_index` | Integer  | The [ledger index](https://xrpl.org/basic-data-types.html#ledger-index) of the newest validated ledger at the time of submission. This provides a lower bound on the ledger versions that the transaction can appear in as a result of this request. (The transaction could only have been validated in this ledger version or earlier if it had already been submitted before.) |
+
+Note: Many situations can prevent a transaction from processing successfully, such as a lack of trust lines connecting the two accounts in a payment, or changes in the state of the ledger since the time the transaction was constructed. Even if nothing is wrong, it may take several seconds to close and validate the ledger version that includes the transaction. Do not consider the transaction's results final until they appear in a validated ledger version.
 
 ### Example
 
 ```javascript
-const signedTransaction = '12000322800000002400000017201B0086955368400000000000000C732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D874473045022100BDE09A1F6670403F341C21A77CF35BA47E45CDE974096E1AA5FC39811D8269E702203D60291B9A27F1DCABA9CF5DED307B4F23223E0B6F156991DB601DFB9C41CE1C770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304';
-return api.submit(signedTransaction)
-  .then(result => {/* ... */});
+const signedTransaction = '12000022800000002400000007201B007008BC61400000000754D4C068400000000000000C732103E8110048477E60F292DEDA67CF518511E70A15E1E3771B3C024026E1F824832874473045022100D659C836C24FF346A87054E463078D805B19EFE9F10348FD4C6ED6C3F3C4D750022060BE0BFD5E2C4963A1B0E0F21D5BA800969863BA486F71E75C08D76D77C45B22811492F80A3F3849DBB5714A4F2C691CE7D47BEED58083141266204CFBC657E65D9B4D30301FF98644693935';
+const failHard = false;
+const result = await api.request('submit', {
+  tx_blob: signedTransaction,
+  fail_hard: failHard // optional
+});
 ```
-
 
 ```json
 {
-  "resultCode": "tesSUCCESS",
-  "resultMessage": "The transaction was applied. Only final in a validated ledger.",
+  "accepted": true,
+  "account_sequence_available": 8,
+  "account_sequence_next": 8,
+  "applied": true,
+  "broadcast": true,
   "engine_result": "tesSUCCESS",
   "engine_result_code": 0,
   "engine_result_message": "The transaction was applied. Only final in a validated ledger.",
-  "tx_blob": "1200002280000000240000016861D4838D7EA4C6800000000000000000000000000055534400000000004B4E9C06F24296074F7BC48F92A97916C6DC5EA9684000000000002710732103AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB7446304402200E5C2DD81FDF0BE9AB2A8D797885ED49E804DBF28E806604D878756410CA98B102203349581946B0DDA06B36B35DBC20EDA27552C1F167BCF5C6ECFF49C6A46F858081144B4E9C06F24296074F7BC48F92A97916C6DC5EA983143E9D4A2B8AA0780F682D136F7A56D6724EF53754",
+  "kept": true,
+  "open_ledger_cost": "10",
+  "queued": false,
+  "tx_blob": "12000022800000002400000007201B007008BC61400000000754D4C068400000000000000C732103E8110048477E60F292DEDA67CF518511E70A15E1E3771B3C024026E1F824832874473045022100D659C836C24FF346A87054E463078D805B19EFE9F10348FD4C6ED6C3F3C4D750022060BE0BFD5E2C4963A1B0E0F21D5BA800969863BA486F71E75C08D76D77C45B22811492F80A3F3849DBB5714A4F2C691CE7D47BEED58083141266204CFBC657E65D9B4D30301FF98644693935",
   "tx_json": {
-    "Account": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-    "Amount": {
-      "currency": "USD",
-      "issuer": "rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn",
-      "value": "1"
-    },
-    "Destination": "ra5nK24KXen9AHvsdFTKHSANinZseWnPcX",
-    "Fee": "10000",
-    "Flags": 2147483648,
-    "Sequence": 360,
-    "SigningPubKey": "03AB40A0490F9B7ED8DF29D246BF2D6269820A0EE7742ACDD457BEA7C7D0931EDB",
-    "TransactionType": "Payment",
-    "TxnSignature": "304402200E5C2DD81FDF0BE9AB2A8D797885ED49E804DBF28E806604D878756410CA98B102203349581946B0DDA06B36B35DBC20EDA27552C1F167BCF5C6ECFF49C6A46F8580",
-    "hash": "4D5D90890F8D49519E4151938601EF3D0B30B16CD6A519D9C99102C9FA77F7E0"
-  }
+      "Account": "rNQao3Z1irwRjKWSs8heL4a8WKLPKfLrXs",
+      "Amount": "123000000",
+      "Destination": "rpgHWJdXkSvvzikdJCpuMzU7zWnuqsJRCZ",
+      "Fee": "12",
+      "Flags": 2147483648,
+      "LastLedgerSequence": 7342268,
+      "Sequence": 7,
+      "SigningPubKey": "03E8110048477E60F292DEDA67CF518511E70A15E1E3771B3C024026E1F8248328",
+      "TransactionType": "Payment",
+      "TxnSignature": "3045022100D659C836C24FF346A87054E463078D805B19EFE9F10348FD4C6ED6C3F3C4D750022060BE0BFD5E2C4963A1B0E0F21D5BA800969863BA486F71E75C08D76D77C45B22",
+      "hash": "FE8D68D7FF5805EB07AF15A1ADF07FB5463CCD2C6C0A15981EB3D26A02E1551C"
+  },
+  "validated_ledger_index": 7341775
 }
 ```
 
+(In ripple-lib 1.8.0, [the old `submit` method](https://github.com/ripple/ripple-lib/blob/1.7.0/docs/index.md#submit) was deprecated.)
 
 ## generateXAddress
 
@@ -5680,7 +5936,7 @@ secret | secret string | The secret corresponding to the address.
 ### Example
 
 ```javascript
-return api.generateAddress();
+return api.generateXAddress();
 ```
 
 
@@ -5914,14 +6170,14 @@ Name | Type | Description
 ---- | ---- | -----------
 ledger | object | The ledger header to hash.
 *ledger.* stateHash | string | Hash of all state information in this ledger.
-*ledger.* closeTime | date-time string | The time at which this ledger was closed.
-*ledger.* closeTimeResolution | integer | Approximate number of seconds between closing one ledger version and closing the next one.
+*ledger.* closeTime | date-time string | The approximate time when this ledger was closed. This number is rounded based on the `closeTimeResolution`. If it would have been rounded to the same time as a previous ledger, the close time is recorded as 1 second later instead.
+*ledger.* closeTimeResolution | integer | A number of seconds, indicating how much the `closeTime` could be rounded. Ledger close times are approximate so that small differences in servers clocks don't hinder consensus.
 *ledger.* closeFlags | integer | A bit-map of flags relating to the closing of this ledger. Currently, the ledger has only one flag defined for `closeFlags`: **sLCF_NoConsensusTime** (value 1). If this flag is enabled, it means that validators were in conflict regarding the correct close time for the ledger, but built otherwise the same ledger, so they declared consensus while "agreeing to disagree" on the close time. In this case, the consensus ledger contains a `closeTime` value that is 1 second after that of the previous ledger. (In this case, there is no official close time, but the actual real-world close time is probably 3-6 seconds later than the specified `closeTime`.)
 *ledger.* ledgerHash | string | Unique identifying hash of the entire ledger.
 *ledger.* ledgerVersion | integer | The ledger version of this ledger.
 *ledger.* ledgerVersion | string | The ledger version of this ledger.
 *ledger.* parentLedgerHash | string | Unique identifying hash of the ledger that came immediately before this one.
-*ledger.* parentCloseTime | date-time string | The time at which the previous ledger was closed.
+*ledger.* parentCloseTime | date-time string | The previous ledger's recorded close time.
 *ledger.* totalDrops | [value](#value) | Total number of drops (1/1,000,000th of an XRP) in the network, as a quoted integer. (This decreases as transaction fees cause XRP to be destroyed.)
 *ledger.* transactionHash | string | Hash of the transaction information included in this ledger.
 *ledger.* rawState | string | *Optional* A JSON string containing all state data for this ledger in rippled JSON format.

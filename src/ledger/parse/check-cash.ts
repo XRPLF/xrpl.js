@@ -2,6 +2,7 @@ import * as assert from 'assert'
 import {removeUndefined} from '../../common'
 import parseAmount from './amount'
 import {Amount} from '../../common/types/objects'
+import {parseMemos} from './utils'
 
 export type FormattedCheckCash = {
   // ID of the Check ledger object to cash.
@@ -25,6 +26,7 @@ function parseCheckCash(tx: any): FormattedCheckCash {
   assert.ok(tx.TransactionType === 'CheckCash')
 
   return removeUndefined({
+    memos: parseMemos(tx),
     checkID: tx.CheckID,
     amount: tx.Amount && parseAmount(tx.Amount),
     deliverMin: tx.DeliverMin && parseAmount(tx.DeliverMin)

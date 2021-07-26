@@ -8,11 +8,11 @@ import {TestSuite} from '../../utils'
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'works with a typical amount': function(api) {
+  'works with a typical amount': function (api) {
     const drops = api.xrpToDrops('2')
     assert.strictEqual(drops, '2000000', '2 XRP equals 2 million drops')
   },
-  'works with fractions': function(api) {
+  'works with fractions': function (api) {
     let drops = api.xrpToDrops('3.456789')
     assert.strictEqual(drops, '3456789', '3.456789 XRP equals 3,456,789 drops')
     drops = api.xrpToDrops('3.400000')
@@ -22,7 +22,7 @@ export default <TestSuite>{
     drops = api.xrpToDrops('0.0000010')
     assert.strictEqual(drops, '1', '0.0000010 XRP equals 1 drop')
   },
-  'works with zero': function(api) {
+  'works with zero': function (api) {
     let drops = api.xrpToDrops('0')
     assert.strictEqual(drops, '0', '0 XRP equals 0 drops')
     drops = api.xrpToDrops('-0') // negative zero is equivalent to zero
@@ -32,17 +32,17 @@ export default <TestSuite>{
     drops = api.xrpToDrops('0.0000000')
     assert.strictEqual(drops, '0', '0.0000000 XRP equals 0 drops')
   },
-  'works with a negative value': function(api) {
+  'works with a negative value': function (api) {
     const drops = api.xrpToDrops('-2')
     assert.strictEqual(drops, '-2000000', '-2 XRP equals -2 million drops')
   },
-  'works with a value ending with a decimal point': function(api) {
+  'works with a value ending with a decimal point': function (api) {
     let drops = api.xrpToDrops('2.')
     assert.strictEqual(drops, '2000000', '2. XRP equals 2000000 drops')
     drops = api.xrpToDrops('-2.')
     assert.strictEqual(drops, '-2000000', '-2. XRP equals -2000000 drops')
   },
-  'works with BigNumber objects': function(api) {
+  'works with BigNumber objects': function (api) {
     let drops = api.xrpToDrops(new BigNumber(2))
     assert.strictEqual(
       drops,
@@ -56,7 +56,7 @@ export default <TestSuite>{
       '(BigNumber) -2 XRP equals -2 million drops'
     )
   },
-  'works with a number': function(api) {
+  'works with a number': function (api) {
     // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
     let drops = api.xrpToDrops(2)
     assert.strictEqual(
@@ -71,7 +71,7 @@ export default <TestSuite>{
       '(number) -2 XRP equals -2 million drops'
     )
   },
-  'throws with an amount with too many decimal places': function(api) {
+  'throws with an amount with too many decimal places': function (api) {
     assert.throws(() => {
       api.xrpToDrops('1.1234567')
     }, /has too many decimal places/)
@@ -79,7 +79,7 @@ export default <TestSuite>{
       api.xrpToDrops('0.0000001')
     }, /has too many decimal places/)
   },
-  'throws with an invalid value': function(api) {
+  'throws with an invalid value': function (api) {
     assert.throws(() => {
       api.xrpToDrops('FOO')
     }, /invalid value/)
@@ -93,7 +93,7 @@ export default <TestSuite>{
       api.xrpToDrops('.')
     }, /xrpToDrops: invalid value '\.', should be a BigNumber or string-encoded number\./)
   },
-  'throws with an amount more than one decimal point': function(api) {
+  'throws with an amount more than one decimal point': function (api) {
     assert.throws(() => {
       api.xrpToDrops('1.0.0')
     }, /xrpToDrops: invalid value '1\.0\.0'/)

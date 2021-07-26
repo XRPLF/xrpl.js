@@ -132,6 +132,11 @@ export const prepareCheckCancel = _.partial(
   'prepareCheckCancelParameters'
 )
 
+export const prepareTicketCreate = _.partial(
+  schemaValidate,
+  'prepareTicketParameters'
+)
+
 export const sign = _.partial(schemaValidate, 'signParameters')
 
 export const combine = _.partial(schemaValidate, 'combineParameters')

@@ -51,5 +51,14 @@ export default <TestSuite>{
     api._feeCushion = 0.9
     const fee = await api.getFee()
     assert.strictEqual(fee, '0.000009')
+  },
+
+  'getFee reporting': async (api, address) => {
+    api.connection.request({
+      command: 'config',
+      data: {reporting: true}
+    })
+    const fee = await api.getFee()
+    assert.strictEqual(fee, '0.000012')
   }
 }

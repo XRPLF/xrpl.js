@@ -2,8 +2,8 @@ import assert from 'assert'
 import {RippleAPI} from 'ripple-api'
 const RangeSet = RippleAPI._PRIVATE.RangeSet
 
-describe('RangeSet', function() {
-  it('addRange()/addValue()', function() {
+describe('RangeSet', function () {
+  it('addRange()/addValue()', function () {
     const r = new RangeSet()
 
     r.addRange(4, 5)
@@ -14,19 +14,19 @@ describe('RangeSet', function() {
     assert.deepEqual(r.serialize(), '1-5,7-10')
   })
 
-  it('addValue()/addRange() -- malformed', function() {
+  it('addValue()/addRange() -- malformed', function () {
     const r = new RangeSet()
-    assert.throws(function() {
+    assert.throws(function () {
       r.addRange(2, 1)
     })
   })
 
-  it('parseAndAddRanges()', function() {
+  it('parseAndAddRanges()', function () {
     const r = new RangeSet()
     r.parseAndAddRanges('4-5,7-10,1-2,3-3')
     assert.deepEqual(r.serialize(), '1-5,7-10')
   })
-  it('parseAndAddRanges() -- single ledger', function() {
+  it('parseAndAddRanges() -- single ledger', function () {
     const r = new RangeSet()
 
     r.parseAndAddRanges('3')
@@ -52,7 +52,7 @@ describe('RangeSet', function() {
     assert(!r.containsRange(0, 3))
   })
 
-  it('containsValue()', function() {
+  it('containsValue()', function () {
     const r = new RangeSet()
 
     r.addRange(32570, 11005146)
@@ -68,7 +68,7 @@ describe('RangeSet', function() {
     assert.strictEqual(r.containsValue(12000000), false)
   })
 
-  it('reset()', function() {
+  it('reset()', function () {
     const r = new RangeSet()
 
     r.addRange(4, 5)

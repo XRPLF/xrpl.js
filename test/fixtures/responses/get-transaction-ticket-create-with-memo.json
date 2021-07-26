@@ -1,0 +1,32 @@
+{
+  "type": "ticketCreate",
+  "address": "rwkQ24BPfW7gT4PGm9Pq884v4N9S2Mhcc1",
+  "sequence": 6860086,
+  "id": "1797BD0898F54F0732D2FFFF715A75CC1C50D1883A875A7B9BFD0F6936461359",
+  "specification": {
+    "memos": [
+      {
+        "type": "test",
+        "format": "text/plain",
+        "data": "texted data"
+      }
+    ],
+    "ticketCount": 1
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2018-02-23T22:20:01.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rwkQ24BPfW7gT4PGm9Pq884v4N9S2Mhcc1": [
+        {
+          "currency": "XRP",
+          "value": "-0.000012"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 6860132,
+    "indexInLedger": 0
+  }
+}

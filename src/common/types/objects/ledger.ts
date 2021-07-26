@@ -21,3 +21,17 @@ export interface Ledger {
   accountState?: any[]
   validated?: boolean
 }
+
+// https://xrpl.org/subscribe.html#ledger-stream
+export type LedgerClosedEvent = {
+  type: 'ledgerClosed'
+  fee_base: number
+  fee_ref: number
+  ledger_hash: string
+  ledger_index: number
+  ledger_time: number
+  reserve_base: number
+  reserve_inc: number
+  txn_count: number
+  validated_ledgers: string
+}

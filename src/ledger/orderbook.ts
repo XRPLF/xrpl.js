@@ -116,11 +116,11 @@ export async function getOrderbook(
   // 3. Return Formatted Response
   const directOffers = _.flatMap(
     directOfferResults,
-    directOfferResult => directOfferResult.offers
+    (directOfferResult) => directOfferResult.offers
   )
   const reverseOffers = _.flatMap(
     reverseOfferResults,
-    reverseOfferResult => reverseOfferResult.offers
+    (reverseOfferResult) => reverseOfferResult.offers
   )
   return formatBidsAndAsks(orderbook, [...directOffers, ...reverseOffers])
 }

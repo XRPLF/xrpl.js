@@ -24,7 +24,7 @@ function formatBalanceSheet(balanceSheet): GetBalanceSheet {
   if (!_.isUndefined(balanceSheet.balances)) {
     result.balances = []
     _.forEach(balanceSheet.balances, (balances, counterparty) => {
-      _.forEach(balances, balance => {
+      _.forEach(balances, (balance) => {
         result.balances.push(Object.assign({counterparty}, balance))
       })
     })
@@ -32,7 +32,7 @@ function formatBalanceSheet(balanceSheet): GetBalanceSheet {
   if (!_.isUndefined(balanceSheet.assets)) {
     result.assets = []
     _.forEach(balanceSheet.assets, (assets, counterparty) => {
-      _.forEach(assets, balance => {
+      _.forEach(assets, (balance) => {
         result.assets.push(Object.assign({counterparty}, balance))
       })
     })

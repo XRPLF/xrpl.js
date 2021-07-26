@@ -59,9 +59,11 @@ export function createMockRippled(port) {
   _.assign(mock, EventEmitter2.prototype)
 
   const close = mock.close
-  mock.close = function() {
+  mock.close = function () {
     if (mock.expectedRequests !== undefined) {
-      const allRequestsMade = _.every(mock.expectedRequests, function(counter) {
+      const allRequestsMade = _.every(mock.expectedRequests, function (
+        counter
+      ) {
         return counter === 0
       })
       if (!allRequestsMade) {
@@ -74,11 +76,11 @@ export function createMockRippled(port) {
     close.call(mock)
   }
 
-  mock.expect = function(expectedRequests) {
+  mock.expect = function (expectedRequests) {
     mock.expectedRequests = expectedRequests
   }
 
-  mock.on('connection', function(this: MockedWebSocketServer, conn: any) {
+  mock.on('connection', function (this: MockedWebSocketServer, conn: any) {
     if (mock.config.breakNextConnection) {
       mock.config.breakNextConnection = false
       conn.terminate()
@@ -86,7 +88,7 @@ export function createMockRippled(port) {
     }
     this.socket = conn
     conn.config = {}
-    conn.on('message', function(requestJSON) {
+    conn.on('message', function (requestJSON) {
       try {
         const request = JSON.parse(requestJSON)
         mock.emit('request_' + request.command, request, conn)
@@ -99,7 +101,7 @@ export function createMockRippled(port) {
 
   mock.config = {}
 
-  mock.onAny(function(this: MockedWebSocketServer) {
+  mock.onAny(function (this: MockedWebSocketServer) {
     if (this.event.indexOf('request_') !== 0) {
       return
     }
@@ -116,7 +118,7 @@ export function createMockRippled(port) {
     mock.expectedRequests[this.event] -= 1
   })
 
-  mock.on('request_config', function(request, conn) {
+  mock.on('request_config', function (request, conn) {
     assert.strictEqual(request.command, 'config')
     conn.config = _.assign(conn.config, request.data)
     conn.send(
@@ -128,7 +130,7 @@ export function createMockRippled(port) {
     )
   })
 
-  mock.on('request_test_command', function(request, conn) {
+  mock.on('request_test_command', function (request, conn) {
     assert.strictEqual(request.command, 'test_command')
     if (request.data.disconnectIn) {
       setTimeout(conn.terminate.bind(conn), request.data.disconnectIn)
@@ -140,7 +142,7 @@ export function createMockRippled(port) {
         })
       )
     } else if (request.data.openOnOtherPort) {
-      getFreePort().then(newPort => {
+      getFreePort().then((newPort) => {
         createMockRippled(newPort)
         conn.send(
           createResponse(request, {
@@ -170,7 +172,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_global_config', function(request, conn) {
+  mock.on('request_global_config', function (request, conn) {
     assert.strictEqual(request.command, 'global_config')
     mock.config = _.assign(conn.config, request.data)
     conn.send(
@@ -182,12 +184,12 @@ export function createMockRippled(port) {
     )
   })
 
-  mock.on('request_echo', function(request, conn) {
+  mock.on('request_echo', function (request, conn) {
     assert.strictEqual(request.command, 'echo')
     conn.send(JSON.stringify(request.data))
   })
 
-  mock.on('request_server_info', function(request, conn) {
+  mock.on('request_server_info', function (request, conn) {
     assert.strictEqual(request.command, 'server_info')
     if (conn.config.highLoadFactor || conn.config.loadFactor) {
       const response = {
@@ -222,6 +224,8 @@ export function createMockRippled(port) {
         }
       }
       conn.send(createResponse(request, response))
+    } else if (conn.config.reporting) {
+      conn.send(createResponse(request, fixtures.server_info.reporting))
     } else if (conn.config.returnErrorOnServerInfo) {
       conn.send(createResponse(request, fixtures.server_info.error))
     } else if (conn.config.disconnectOnServerInfo) {
@@ -236,7 +240,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_subscribe', function(request, conn) {
+  mock.on('request_subscribe', function (request, conn) {
     assert.strictEqual(request.command, 'subscribe')
     if (request && request.streams === 'validations') {
       conn.send(createResponse(request, fixtures.subscribe_error))
@@ -249,7 +253,7 @@ export function createMockRippled(port) {
     conn.send(createResponse(request, fixtures.subscribe))
   })
 
-  mock.on('request_unsubscribe', function(request, conn) {
+  mock.on('request_unsubscribe', function (request, conn) {
     assert.strictEqual(request.command, 'unsubscribe')
     if (request.accounts) {
       assert(_.indexOf(_.values(addresses), request.accounts[0]) !== -1)
@@ -259,7 +263,7 @@ export function createMockRippled(port) {
     conn.send(createResponse(request, fixtures.unsubscribe))
   })
 
-  mock.on('request_account_objects', function(request, conn) {
+  mock.on('request_account_objects', function (request, conn) {
     assert.strictEqual(request.command, 'account_objects')
     if (request.account === addresses.ACCOUNT) {
       conn.send(accountObjectsResponse(request))
@@ -268,7 +272,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_account_info', function(request, conn) {
+  mock.on('request_account_info', function (request, conn) {
     assert.strictEqual(request.command, 'account_info')
     if (request.account === addresses.ACCOUNT) {
       conn.send(createResponse(request, fixtures.account_info.normal))
@@ -319,7 +323,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_ledger', function(request, conn) {
+  mock.on('request_ledger', function (request, conn) {
     assert.strictEqual(request.command, 'ledger')
     if (request.ledger_index === 34) {
       conn.send(createLedgerResponse(request, fixtures.ledger.notFound))
@@ -362,7 +366,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_ledger_data', function(request, conn) {
+  mock.on('request_ledger_data', function (request, conn) {
     assert.strictEqual(request.command, 'ledger_data')
     if (request.marker) {
       conn.send(createResponse(request, fixtures.ledger_data.last_page))
@@ -371,7 +375,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_ledger_entry', function(request, conn) {
+  mock.on('request_ledger_entry', function (request, conn) {
     assert.strictEqual(request.command, 'ledger_entry')
     if (
       request.index ===
@@ -393,7 +397,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_ping', function(request, conn) {
+  mock.on('request_ping', function (request, conn) {
     // NOTE: We give the response a timeout of 2 second, so that tests can
     // set their timeout threshold to greater than or less than this number
     // to test timeouts.
@@ -408,7 +412,7 @@ export function createMockRippled(port) {
     }, 1000 * 2)
   })
 
-  mock.on('request_tx', function(request, conn) {
+  mock.on('request_tx', function (request, conn) {
     assert.strictEqual(request.command, 'tx')
     if (request.transaction === hashes.VALID_TRANSACTION_HASH) {
       conn.send(createResponse(request, fixtures.tx.Payment))
@@ -438,6 +442,10 @@ export function createMockRippled(port) {
     ) {
       conn.send(createResponse(request, fixtures.tx.OfferCreate))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_OFFER_CREATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.OfferCreateWithMemo))
+    } else if (
       request.transaction ===
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
     ) {
@@ -447,6 +455,10 @@ export function createMockRippled(port) {
       '809335DD3B0B333865096217AA2F55A4DF168E0198080B3A090D12D88880FF0E'
     ) {
       conn.send(createResponse(request, fixtures.tx.OfferCancel))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_ORDER_CANCELLATION_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.OfferCancelWithMemo))
     } else if (
       request.transaction ===
       '635A0769BD94710A1F6A76CDE65A3BC661B20B798807D1BBBDADCEA26420538D'
@@ -489,12 +501,23 @@ export function createMockRippled(port) {
       conn.send(createResponse(request, fixtures.tx.NotValidated))
     } else if (request.transaction === hashes.NOTFOUND_TRANSACTION_HASH) {
       conn.send(createResponse(request, fixtures.tx.NotFound))
+    } else if (request.transaction === hashes.WITH_MEMOS_ACCOUNT_DELETE_TRANSACTION_HASH) {
+      conn.send(createResponse(request, fixtures.tx.AccountDeleteWithMemo))
     } else if (
       request.transaction ===
       '097B9491CC76B64831F1FEA82EAA93BCD728106D90B65A072C933888E946C40B'
     ) {
       conn.send(createResponse(request, fixtures.tx.OfferWithExpiration))
+    } else if (
+      request.transaction === hashes.WITH_MEMO_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.WithMemo))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.WithMemos))
     }
+
 
     // Checks
     else if (
@@ -503,15 +526,27 @@ export function createMockRippled(port) {
     ) {
       conn.send(createResponse(request, fixtures.tx.CheckCreate))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_CHECK_CREATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.CheckCreateWithMemo))
+    } else if (
       request.transaction ===
       'B4105D1B2D83819647E4692B7C5843D674283F669524BD50C9614182E3A12CD4'
     ) {
       conn.send(createResponse(request, fixtures.tx.CheckCancel))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_CHECK_CANCEL_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.CheckCancelWithMemo))
+    } else if (
       request.transaction ===
       '8321208465F70BA52C28BCC4F646BAF3B012BA13B57576C0336F42D77E3E0749'
     ) {
       conn.send(createResponse(request, fixtures.tx.CheckCash))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_CHECK_CASH_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.CheckCashWithMemo))
     }
 
     // Escrows
@@ -544,15 +579,27 @@ export function createMockRippled(port) {
     ) {
       conn.send(createResponse(request, fixtures.tx.PaymentChannelCreate))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_PAYMENT_CHANNEL_CREATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.PaymentChannelCreateWithMemo))
+    } else if (
       request.transaction ===
       'CD053D8867007A6A4ACB7A432605FE476D088DCB515AFFC886CF2B4EB6D2AE8B'
     ) {
       conn.send(createResponse(request, fixtures.tx.PaymentChannelFund))
     } else if (
+      request.transaction === hashes.WITH_MEMOS_PAYMENT_CHANNEL_FUND_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.PaymentChannelFundWithMemo))
+    } else if (
       request.transaction ===
       '81B9ECAE7195EB6E8034AEDF44D8415A7A803E14513FDBB34FA984AB37D59563'
     ) {
       conn.send(createResponse(request, fixtures.tx.PaymentChannelClaim))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_PAYMENT_CHANNEL_CLAIM_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.PaymentChannelClaimWithMemo))
     } else if (
       request.transaction ===
       'EC2AB14028DC84DE525470AB4DAAA46358B50A8662C63804BFF38244731C0CB9'
@@ -583,12 +630,24 @@ export function createMockRippled(port) {
       'C6A40F56127436DCD830B1B35FF939FD05B5747D30D6542572B7A835239817AF'
     ) {
       conn.send(createResponse(request, fixtures.tx.SetFee))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_FEE_UPDATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.SetFeeWithMemo))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_TICKET_CREATE_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.TicketCreateWithMemo))
+    } else if (
+      request.transaction === hashes.WITH_MEMOS_DEPOSIT_PREAUTH_TRANSACTION_HASH
+    ) {
+      conn.send(createResponse(request, fixtures.tx.DepositPreauthWithMemo))
     } else {
       assert(false, 'Unrecognized transaction hash: ' + request.transaction)
     }
   })
 
-  mock.on('request_submit', function(request, conn) {
+  mock.on('request_submit', function (request, conn) {
     assert.strictEqual(request.command, 'submit')
     if (request.tx_blob === 'BAD') {
       conn.send(createResponse(request, fixtures.submit.failure))
@@ -597,12 +656,12 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_submit_multisigned', function(request, conn) {
+  mock.on('request_submit_multisigned', function (request, conn) {
     assert.strictEqual(request.command, 'submit_multisigned')
     conn.send(createResponse(request, fixtures.submit.success))
   })
 
-  mock.on('request_account_lines', function(request, conn) {
+  mock.on('request_account_lines', function (request, conn) {
     if (request.account === addresses.ACCOUNT) {
       conn.send(accountLinesResponse.normal(request))
     } else if (request.account === addresses.OTHER_ACCOUNT) {
@@ -616,7 +675,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_account_tx', function(request, conn) {
+  mock.on('request_account_tx', function (request, conn) {
     if (request.account === addresses.ACCOUNT) {
       conn.send(transactionsResponse(request))
     } else if (request.account === addresses.OTHER_ACCOUNT) {
@@ -626,7 +685,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_account_offers', function(request, conn) {
+  mock.on('request_account_offers', function (request, conn) {
     if (request.account === addresses.ACCOUNT) {
       conn.send(fixtures.account_offers(request))
     } else {
@@ -636,7 +695,7 @@ export function createMockRippled(port) {
 
   let requestsCache = undefined
 
-  mock.on('request_book_offers', function(request, conn) {
+  mock.on('request_book_offers', function (request, conn) {
     if (request.taker_pays.issuer === 'rp8rJYTpodf8qbSCHVTNacf8nSW8mRakFw') {
       conn.send(createResponse(request, fixtures.book_offers.xrp_usd))
     } else if (
@@ -687,7 +746,7 @@ export function createMockRippled(port) {
     }
   })
 
-  mock.on('request_ripple_path_find', function(request, conn) {
+  mock.on('request_ripple_path_find', function (request, conn) {
     let response = null
     if (request.subcommand === 'close') {
       // for path_find command
@@ -775,7 +834,7 @@ export function createMockRippled(port) {
     conn.send(response)
   })
 
-  mock.on('request_gateway_balances', function(request, conn) {
+  mock.on('request_gateway_balances', function (request, conn) {
     if (request.ledger_index === 123456) {
       conn.send(createResponse(request, fixtures.unsubscribe))
     } else {

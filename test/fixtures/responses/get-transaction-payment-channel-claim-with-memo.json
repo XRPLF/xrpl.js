@@ -1,0 +1,45 @@
+{
+  "type": "paymentChannelClaim",
+  "address": "rBmNDZ7vbTCwakKXsX3pDAwDdQuxM7yBRa",
+  "sequence": 99,
+  "id": "81B9ECAE7195EB6E8034AEDF44D8415A7A803E14513FDBB34FA984AB37D59561",
+  "specification": {
+    "channel": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
+    "balance": "0.801",
+    "publicKey": "EDE059A23CBE00BDD465910EBDA67C86BAD046FA52E1BBBB27159E31980BAFEFB9",
+    "signature": "5567FB8A27D8BF0C556D3D31D034476FC04F43846A6613EB4B1B64C396C833600BE251CE3104CF02DA0085B473E02BA0BA21F794FB1DC95DAD702F3EA761CA02",
+    "memos": [
+      {
+        "type": "test",
+        "format": "text/plain",
+        "data": "texted data"
+      }
+    ]
+  },
+  "outcome": {
+    "result": "tesSUCCESS",
+    "timestamp": "2017-03-09T14:09:51.000Z",
+    "fee": "0.000012",
+    "balanceChanges": {
+      "rBmNDZ7vbTCwakKXsX3pDAwDdQuxM7yBRa": [
+        {
+          "currency": "XRP",
+          "value": "0.800988"
+        }
+      ]
+    },
+    "orderbookChanges": {},
+    "ledgerVersion": 786310,
+    "indexInLedger": 0,
+    "channelChanges": {
+      "status": "modified",
+      "channelId": "43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1",
+      "source": "rfAuMkVuZQnQhvdMcUKg4ndBb9SPDhzNmK",
+      "destination": "rBmNDZ7vbTCwakKXsX3pDAwDdQuxM7yBRa",
+      "channelBalanceChangeDrops": "801000",
+      "channelAmountDrops": "1000000",
+      "channelBalanceDrops": "801000",
+      "previousTxnId": "0E9CA3AB1053FC0C1CBAA75F636FE1EC92F118C7056BBEF5D63E4C116458A16D"
+    }
+  }
+}

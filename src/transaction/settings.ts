@@ -17,9 +17,9 @@ function setTransactionFlags(
   txJSON: TransactionJSON,
   values: FormattedSettings
 ) {
-  const keys = Object.keys(values)
+  const keys = Object.keys(values).filter((key) => AccountFlagIndices[key] !== undefined)
   assert.ok(
-    keys.length === 1,
+    keys.length <= 1,
     'ERROR: can only set one setting per transaction'
   )
   const flagName = keys[0]
@@ -55,9 +55,7 @@ function setTransactionFields(
 
     if (field.encoding === 'hex' && !field.length) {
       // This is currently only used for Domain field
-      value = Buffer.from(value, 'ascii')
-        .toString('hex')
-        .toUpperCase()
+      value = Buffer.from(value, 'ascii').toString('hex').toUpperCase()
     }
 
     txJSON[fieldName] = value

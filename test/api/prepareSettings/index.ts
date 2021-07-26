@@ -251,5 +251,18 @@ export default <TestSuite>{
       api.sign(result.txJSON, secret),
       responses.prepareSettings.signed
     )
+  },
+  'prepare settings with ticket': async (api, address) => {
+    const instructions = {
+      ticketSequence: 23,
+      maxLedgerVersion: 8820051,
+      fee: '0.000012'
+    }
+    const response = await api.prepareSettings(
+      address,
+      requests.prepareSettings.domain,
+      instructions
+    )
+    assertResultMatch(response, responses.prepareSettings.ticket, 'prepare')
   }
 }
