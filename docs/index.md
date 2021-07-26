@@ -4677,8 +4677,8 @@ Notably, this is the preferred method for preparing `DepositPreauth` or `Account
 
 Name | Type | Description
 ---- | ---- | -----------
-transaction | [transaction](https://developers.ripple.com/transaction-formats.html) | The specification (JSON) of the transaction to prepare. Set `Account` to the address of the account that is creating the transaction. You may omit auto-fillable fields like `Fee`, `Flags`, and `Sequence` to have them set automatically.
-instructions | [instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction.
+transaction | [Transaction](https://xrpl.org/transaction-formats.html) | The specification (JSON) of the transaction to prepare. Set `Account` to the address of the account that is creating the transaction. You may omit auto-fillable fields like `Fee`, `Flags`, and `Sequence` to have them set automatically.
+instructions | [Instructions](#transaction-instructions) | *Optional* Instructions for executing the transaction.
 
 ### Return Value
 
