@@ -86,9 +86,5 @@
     "type": "git",
     "url": "git://github.com/ripple/ripple-lib.git"
   },
-  "readmeFilename": "README.md",
-  "engines": {
-    "node": ">=10.13.0",
-    "yarn": "^1.15.2"
-  }
+  "readmeFilename": "README.md"
 }
