@@ -960,20 +960,16 @@ return api.request('ledger', {
 ```json
 {
   "ledger": {
-    "accepted": true,
     "account_hash": "F9E9653EA76EA0AEA58AC98A8E19EDCEC8299C2940519A190674FFAED3639A1F",
     "close_flags": 0,
     "close_time": 577999430,
     "close_time_human": "2018-Apr-25 19:23:50",
     "close_time_resolution": 10,
     "closed": true,
-    "hash": "450E5CB0A39495839DA9CD9A0FED74BD71CBB929423A907ADC00F14FC7E7F920",
     "ledger_hash": "450E5CB0A39495839DA9CD9A0FED74BD71CBB929423A907ADC00F14FC7E7F920",
     "ledger_index": "38217406",
     "parent_close_time": 577999422,
     "parent_hash": "B8B364C63EB9E13FDB89CB729FEF833089B8438CBEB8FC41744CB667209221B3",
-    "seqNum": "38217406",
-    "totalCoins": "99992286058637091",
     "total_coins": "99992286058637091",
     "transaction_hash": "5BDD3D2780C28FB2C91C3404BD8ED04786B764B1E18CF319888EDE2C09834726"
   },

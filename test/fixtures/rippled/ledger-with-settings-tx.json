@@ -4,19 +4,15 @@
   "type": "response",
   "result": {
     "ledger": {
-      "accepted": true,
       "account_hash": "2FC964BBFE22DF77A132FE12B5D2B58A09226EBCA73EF2CFF5BE29E56B3315F5",
       "close_time": 441849810,
       "parent_close_time": 441849790,
       "close_time_human": "2014-Jan-01 00:03:30",
       "close_time_resolution": 10,
       "closed": true,
-      "hash": "B52AC083396E9119B6CEED69C155B663D58FCA9245917B904BE57FB089E677A4",
       "ledger_hash": "B52AC083396E9119B6CEED69C155B663D58FCA9245917B904BE57FB089E677A4",
       "ledger_index": "4181996",
       "parent_hash": "599820AB83EF490BA04019E88A90202516D7F39CA169CF639ADCD0A434C7D7DF",
-      "seqNum": "4181996",
-      "totalCoins": "99999998243206519",
       "total_coins": "99999998243206519",
       "transaction_hash": "49B500E719BB3AC7CB74E3E0D028A01BFE626484F4659CDD98CB4E32BFE0D601",
       "transactions": [
