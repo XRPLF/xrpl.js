@@ -390,7 +390,7 @@ export class Connection extends EventEmitter {
    */
   private _heartbeat = () => {
     return this.request({command: 'ping'}).catch(() => {
-      this.reconnect().catch((error) => {
+      return this.reconnect().catch((error) => {
         this.emit('error', 'reconnect', error.message, error)
       })
     })

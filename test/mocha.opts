@@ -1,6 +1,0 @@
---reporter spec
---timeout 5000
---slow 500
---require ts-node/register
---watch-extensions ts
-./test/*.{ts,js}

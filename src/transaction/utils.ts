@@ -346,9 +346,9 @@ function prepareTransaction(
     }
 
     try {
-      // Consider requesting from the 'current' ledger (instead of 'validated').
       const response = await api.request('account_info', {
-        account: classicAccount
+        account: classicAccount,
+        ledger_index: 'current' // Fix #999
       })
       newTxJSON.Sequence = response.account_data.Sequence
       return Promise.resolve()

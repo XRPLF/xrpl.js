@@ -17,9 +17,9 @@ function setTransactionFlags(
   txJSON: TransactionJSON,
   values: FormattedSettings
 ) {
-  const keys = Object.keys(values)
+  const keys = Object.keys(values).filter((key) => AccountFlagIndices[key] !== undefined)
   assert.ok(
-    keys.length === 1,
+    keys.length <= 1,
     'ERROR: can only set one setting per transaction'
   )
   const flagName = keys[0]

@@ -1,6 +1,6 @@
 import {
   FormattedOrderSpecification,
-  FormattedTrustline,
+  FormattedTrustlineSpecification,
   Adjustment,
   RippledAmount,
   Memo,
@@ -139,7 +139,7 @@ export type FormattedOrderCancellationTransaction = {
 
 export type FormattedTrustlineTransaction = {
   type: string
-  specification: FormattedTrustline
+  specification: FormattedTrustlineSpecification
   outcome: Outcome
   id: string
   address: string
