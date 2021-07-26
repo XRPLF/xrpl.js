@@ -161,6 +161,24 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
     delete decoded.SigningPubKey
   }
 
+  // - Memos have exclusively hex data which should ignore case. 
+  //   Since decode goes to upper case, we set all tx memos to be uppercase for the comparison.
+  tx.Memos?.map(memo => {
+    if(memo?.Memo?.MemoData) {
+      memo.Memo.MemoData = memo.Memo.MemoData.toUpperCase();
+    }
+
+    if(memo?.Memo?.MemoType) {
+      memo.Memo.MemoType = memo.Memo.MemoType.toUpperCase();
+    }
+    
+    if(memo?.Memo?.MemoFormat) {
+      memo.Memo.MemoFormat = memo.Memo.MemoFormat.toUpperCase();
+    }
+
+    return memo
+  })
+
   if (!isEqual(decoded, tx)) {
     const error = new utils.common.errors.ValidationError(
       'Serialized transaction does not match original txJSON. See `error.data`'

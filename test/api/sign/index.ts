@@ -22,6 +22,34 @@ export default <TestSuite>{
     schemaValidator.schemaValidate('sign', result)
   },
 
+  'sign with lowercase hex data in memo (hex should be case insensitive)': async (api, address) => {
+    const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9';
+    const lowercaseMemoTxJson = {
+      "TransactionType"   : "Payment",
+      "Flags"             : 2147483648,
+      "Account"           : "rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a",
+      "Amount"            : "10000000",
+      "LastLedgerSequence": 14000999,
+      "Destination"       : "rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd",
+      "Fee"               : "12",
+      "Sequence"          : 12,
+      "SourceTag"         : 8888,
+      "DestinationTag"    : 9999,
+      "Memos"             : [
+       {
+           "Memo": {
+               "MemoType" :"687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963",
+               "MemoData" :"72656e74"
+           }
+       }
+      ]
+    }
+
+    const txParams = JSON.stringify(lowercaseMemoTxJson);
+    api.sign(txParams, secret);
+
+  },
+
   'sign with paths': async (
     api,
     address
@@ -43,6 +71,7 @@ export default <TestSuite>{
           counterparty: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc'
         }
       },
+      // eslint-disable-next-line no-useless-escape
       paths: '[[{\"currency\":\"USD\",\"issuer\":\"rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc\"}]]'
     }
     const ret = await api.preparePayment(address, payment, {sequence: 1, maxLedgerVersion: 15696358})
