@@ -25,14 +25,12 @@ import {
     computeEscrowHash,
     computePaymentChannelHash,
 } from '../common/hashes'
-import { generateAddressAPI, GenerateAddressOptions, GeneratedAddress } from '../offline/generate-address'
+import { generateAddressAPI as generateXAddress, GenerateAddressOptions, GeneratedAddress } from '../offline/generate-address'
 
 // @deprecated Use X-addresses instead
 const generateAddress = (options: GenerateAddressOptions = {}): GeneratedAddress => (
-    generateAddressAPI({...options, includeClassicAddress: true})
+    generateXAddress({...options, includeClassicAddress: true})
 )
-
-const generateXAddress = generateAddressAPI
 
 export {
     computeLedgerHeaderHash,
