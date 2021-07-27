@@ -32,8 +32,6 @@ const generateAddress = (options: GenerateAddressOptions = {}): GeneratedAddress
     generateAddressAPI({...options, includeClassicAddress: true})
 )
 
-const generateXAddress = generateAddressAPI
-
 export {
     computeLedgerHeaderHash,
     dropsToXrp,
@@ -57,7 +55,7 @@ export {
     computeEscrowHash,
     computePaymentChannelHash,
     generateAddress,
-    generateXAddress,
+    generateAddressAPI as generateXAddress,
     deriveKeypair,
     deriveAddress,
     deriveXAddress,
