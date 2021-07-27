@@ -56,7 +56,7 @@ jobs:
         HOST: localhost
         PORT: ${{ job.services.rippled.ports['6006'] }}
 
-  browser_integration:
+  browser:
     runs-on: ubuntu-latest
 
     strategy:
