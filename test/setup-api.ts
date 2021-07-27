@@ -4,7 +4,7 @@ import {createMockRippled} from './mock-rippled'
 import {getFreePort} from './utils'
 
 function setupMockRippledConnection(testcase, port) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     testcase.mockRippled = createMockRippled(port)
     testcase._mockedServerPort = port
     testcase.api = new RippleAPI({server: 'ws://localhost:' + port})
@@ -22,7 +22,7 @@ function setupMockRippledConnection(testcase, port) {
 }
 
 function setupMockRippledConnectionForBroadcast(testcase, ports) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const servers = ports.map((port) => 'ws://localhost:' + port)
     testcase.mocks = ports.map((port) => createMockRippled(port))
     testcase.api = new RippleAPIBroadcast(servers)

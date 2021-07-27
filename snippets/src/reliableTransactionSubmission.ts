@@ -104,7 +104,7 @@ async function performPayments(payments) {
     // Most of the time we'll get 'tesSUCCESS' or (after many submissions) 'terQUEUED'
     console.log(`tx ${i} - tentative: ${result.resultCode}`)
 
-    const txFinalizedPromise = new Promise((resolve) => {
+    const txFinalizedPromise = new Promise<void>((resolve) => {
       const ledgerClosedCallback = async (event: LedgerClosedEvent) => {
         let status
         try {

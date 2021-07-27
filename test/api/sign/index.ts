@@ -22,6 +22,37 @@ export default <TestSuite>{
     schemaValidator.schemaValidate('sign', result)
   },
 
+  'sign with lowercase hex data in memo (hex should be case insensitive)': async (api, address) => {
+    const secret = 'shd2nxpFD6iBRKWsRss2P4tKMWyy9';
+    const lowercaseMemoTxJson = {
+      "TransactionType"   : "Payment",
+      "Flags"             : 2147483648,
+      "Account"           : "rwiZ3q3D3QuG4Ga2HyGdq3kPKJRGctVG8a",
+      "Amount"            : "10000000",
+      "LastLedgerSequence": 14000999,
+      "Destination"       : "rUeEBYXHo8vF86Rqir3zWGRQ84W9efdAQd",
+      "Fee"               : "12",
+      "Sequence"          : 12,
+      "SourceTag"         : 8888,
+      "DestinationTag"    : 9999,
+      "Memos"             : [
+       {
+           "Memo": {
+               "MemoType" :"687474703a2f2f6578616d706c652e636f6d2f6d656d6f2f67656e65726963",
+               "MemoData" :"72656e74"
+           }
+       }
+      ]
+    }
+
+    const txParams = JSON.stringify(lowercaseMemoTxJson);
+    const result = api.sign(txParams, secret);
+    assert.deepEqual(result, {
+      signedTransaction: '120000228000000023000022B8240000000C2E0000270F201B00D5A36761400000000098968068400000000000000C73210305E09ED602D40AB1AF65646A4007C2DAC17CB6CDACDE301E74FB2D728EA057CF744730450221009C00E8439E017CA622A5A1EE7643E26B4DE9C808DE2ABE45D33479D49A4CEC66022062175BE8733442FA2A4D9A35F85A57D58252AE7B19A66401FE238B36FA28E5A081146C1856D0E36019EA75C56D7E8CBA6E35F9B3F71583147FB49CD110A1C46838788CD12764E3B0F837E0DDF9EA7C1F687474703A2F2F6578616D706C652E636F6D2F6D656D6F2F67656E657269637D0472656E74E1F1',
+      id: '41B9CB78D8E18A796CDD4B0BC6FB0EA19F64C4F25FDE23049197852CAB71D10D'
+    })
+  },
+
   'sign with paths': async (
     api,
     address
@@ -43,6 +74,7 @@ export default <TestSuite>{
           counterparty: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc'
         }
       },
+      // eslint-disable-next-line no-useless-escape
       paths: '[[{\"currency\":\"USD\",\"issuer\":\"rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc\"}]]'
     }
     const ret = await api.preparePayment(address, payment, {sequence: 1, maxLedgerVersion: 15696358})
