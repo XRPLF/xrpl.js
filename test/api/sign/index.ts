@@ -302,7 +302,7 @@ export default <TestSuite>{
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
       // TODO: This fails when address is X-address
-      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"726970706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1.2","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
+      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1.2","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '0.0000012',
         sequence: 23,
@@ -322,7 +322,7 @@ export default <TestSuite>{
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
       // TODO: This fails when address is X-address
-      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"726970706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1123456.7","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
+      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"1123456.7","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '1.1234567',
         sequence: 23,
@@ -338,7 +338,7 @@ export default <TestSuite>{
   'throws when Fee exceeds maxFeeXRP (in drops)': async (api, address) => {
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
-      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"${address}","Domain":"726970706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
+      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"${address}","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '2.01',
         sequence: 23,
@@ -358,7 +358,7 @@ export default <TestSuite>{
     api._maxFeeXRP = '1.9'
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
-      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"${address}","Domain":"726970706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
+      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"${address}","Domain":"6578616D706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '2.01',
         sequence: 23,
@@ -379,7 +379,7 @@ export default <TestSuite>{
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
     const request = {
       // TODO: This fails when address is X-address
-      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","Domain":"726970706C652E636F6D","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
+      txJSON: `{"Flags":2147483648,"TransactionType":"AccountSet","Account":"r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59","LastLedgerSequence":8820051,"Fee":"2010000","Sequence":23,"SigningPubKey":"02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8"}`,
       instructions: {
         fee: '2.01',
         sequence: 23,
@@ -391,8 +391,8 @@ export default <TestSuite>{
 
     const expectedResponse = {
       signedTransaction:
-        '12000322800000002400000017201B008695536840000000001EAB90732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8744630440220384FBB48EEE7B0E58BD89294A609F9407C51FBE8FA08A4B305B22E9A7489D66602200152315EFE752DA381E74493419871550D206AC6503841DA5F8C30E35D9E3892770A726970706C652E636F6D81145E7B112523F68D2F5E879DB4EAC51C6698A69304',
-      id: 'A1586D6AF7B0821E7075E12A0132D9EB50BC1874A0749441201497F7561795FB'
+        '12000322800000002400000017201B008695536840000000001EAB90732102F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D87446304402200203F219F5371D2C6506888B1B02B27E74998F7A42D412C32FE319AC1A5B8DEF02205959A1B02253ACCCE542759E9886466C56D16B04676FA492AD34AA0E877E91F381145E7B112523F68D2F5E879DB4EAC51C6698A69304',
+      id: '061D5593E0A117F389826419CAC049A73C7CFCA65A20B788781D41240143D864'
     }
 
     assert.deepEqual(result, expectedResponse)

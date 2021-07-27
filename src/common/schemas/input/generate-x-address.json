@@ -23,7 +23,7 @@
         },
         "test": {
           "type": "boolean",
-          "description": "Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and will start with `T`. If `false`, the address should only be used on mainnet, and will start with `X`."
+          "description": "Specifies whether the address is intended for use on a test network such as Testnet or Devnet. If `true`, the address should only be used for testing, and starts with `T`. If `false`, the address should only be used on Mainnet, and starts with `X`."
         },
         "includeClassicAddress": {
           "type": "boolean",

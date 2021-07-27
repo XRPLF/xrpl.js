@@ -2,9 +2,9 @@
 
 `prepareTransaction(transaction: object, instructions: object): Promise<object>`
 
-Prepare a transaction. The prepared transaction must subsequently be [signed](#sign) and [submitted](#submit).
+Prepare a transaction. The prepared transaction can then be [signed](#sign) and [submitted](#submit).
 
-This method works with any of [the transaction types supported by rippled](https://developers.ripple.com/transaction-types.html).
+This method works with any of [the transaction types supported by rippled](https://xrpl.org/transaction-types.html).
 
 Notably, this is the preferred method for preparing `DepositPreauth` or `AccountDelete` transactions.
 

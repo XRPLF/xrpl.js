@@ -6,7 +6,7 @@ Use the following [boilerplate code](https://en.wikipedia.org/wiki/Boilerplate_c
 const RippleAPI = require('ripple-lib').RippleAPI;
 
 const api = new RippleAPI({
-  server: 'wss://xrplcluster.com'
+  server: 'wss://xrplcluster.com' // Public cluster
 });
 api.on('error', (errorCode, errorMessage) => {
   console.log(errorCode + ': ' + errorMessage);
@@ -16,7 +16,7 @@ api.on('connected', () => {
 });
 api.on('disconnected', (code) => {
   // code - [close code](https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent) sent by the server
-  // will be 1000 if this was normal closure
+  // the code is 1000 for a normal closure
   console.log('disconnected, code:', code);
 });
 api.connect().then(() => {
@@ -37,7 +37,7 @@ If you omit the "catch" section, errors may not be visible.
 </aside>
 
 <aside class="notice">
-The "error" event is emitted whenever an error occurs that cannot be associated with a specific request. If the listener is not registered, an exception will be thrown whenever the event is emitted.
+The API emits an "error" event whenever an error occurs that cannot be associated with a specific request. If there is no listener registered for this event, the API throws an exception whenever the event is emitted.
 </aside>
 
 ### Parameters

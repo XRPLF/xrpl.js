@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "tx-json",
-  "link": "https://developers.ripple.com/transaction-formats.html",
+  "link": "https://xrpl.org/transaction-formats.html",
   "description": "An object in rippled txJSON format",
   "type": "object",
   "properties": {

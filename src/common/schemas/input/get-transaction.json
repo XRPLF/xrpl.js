@@ -6,7 +6,7 @@
   "properties": {
     "id": {"$ref": "transactionHash"},
     "options": {
-      "description": "Options to limit the ledger versions to search and/or to include raw transaction data.",
+      "description": "Options to limit the ledger versions to search or include raw transaction data.",
       "properties": {
         "minLedgerVersion": {
           "$ref": "ledgerVersion",
