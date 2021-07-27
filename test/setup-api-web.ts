@@ -15,7 +15,7 @@ function setup(this: any, port_ = port) {
       })
     })
     .then((got) => {
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         this.api = new RippleAPI({server: baseUrl + got.port})
         this.api
           .connect()
@@ -37,7 +37,7 @@ function setup(this: any, port_ = port) {
 function setupBroadcast(this: any) {
   const servers = [port, port + 1].map((port_) => baseUrl + port_)
   this.api = new RippleAPIBroadcast(servers)
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     this.api
       .connect()
       .then(() => {
