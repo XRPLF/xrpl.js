@@ -5744,6 +5744,10 @@ const multiSignPaymentTransaction = {
     Amount: '88000000'
 };
 
+const multiSignPaymentInstruction = {
+    signersCount: 2
+};
+
 const api = new RippleAPI({
     server: 'wss://s.altnet.rippletest.net:51233'
 });
@@ -5757,7 +5761,7 @@ api.connect().then(() => {
             console.log(response.resultCode, response.resultMessage);
 
             // multi sign a transaction
-            api.prepareTransaction(multiSignPaymentTransaction).then(prepared => {
+            api.prepareTransaction(multiSignPaymentTransaction, multiSignPaymentInstruction).then(prepared => {
                 console.log(prepared);
 
                 // Aya and Bran sign it too but with 'signAs' set to their own account
