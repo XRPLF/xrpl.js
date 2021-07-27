@@ -348,9 +348,9 @@ class RippleAPI extends EventEmitter {
     return results
   }
 
-  // @deprecated Use X-addresses instead
-  generateAddress = generateAddress;
-  generateXAddress = generateXAddress;
+  // @deprecated Use X-addresses instead & Invoke from top-level package instead
+  generateAddress = generateAddress
+  generateXAddress = generateXAddress // @deprecated Invoke from top-level package instead
 
   connect = connect
   disconnect = disconnect

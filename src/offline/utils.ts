@@ -9,7 +9,8 @@ import { dropsToXrp,
     removeUndefined,
     rippleTimeToISO8601,
     iso8601ToRippleTime,
-    isValidSecret } from '../common/utils'
+    isValidSecret,
+} from '../common/utils'
 import {
     computeBinaryTransactionHash,
     computeTransactionHash,
@@ -27,13 +28,11 @@ import {
 import { generateAddressAPI, GenerateAddressOptions, GeneratedAddress } from '../offline/generate-address'
 
 // @deprecated Use X-addresses instead
-const generateAddress = (options: GenerateAddressOptions = {}): GeneratedAddress => {
-    return generateAddressAPI({...options, includeClassicAddress: true})
-}
+const generateAddress = (options: GenerateAddressOptions = {}): GeneratedAddress => (
+    generateAddressAPI({...options, includeClassicAddress: true})
+)
 
-const generateXAddress = (options: GenerateAddressOptions = {}): GeneratedAddress => {
-    return generateAddressAPI(options)
-}
+const generateXAddress = generateAddressAPI
 
 export {
     computeLedgerHeaderHash,
@@ -64,4 +63,4 @@ export {
     deriveXAddress,
     signPaymentChannelClaim,
     verifyPaymentChannelClaim,
-};
+}
