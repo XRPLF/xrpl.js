@@ -370,3 +370,40 @@ module.exports.manyItems = function(request, options = {}) {
     }
   });
 };
+
+
+module.exports.ripplingDisabled = function(request, options = {}) {
+  _.defaults(options, {
+    ledger: BASE_LEDGER_INDEX
+  });
+
+  return JSON.stringify({
+    id: request.id,
+    status: 'success',
+    type: 'response',
+    result: {
+      account: request.account,
+      marker: options.marker,
+      limit: request.limit,
+      ledger_index: options.ledger,
+      lines: [{'account': 'rEyiXgWXCKsh9wXYRrXCYSgCbR1gj3Xd8b',
+            'balance': '0',
+            'currency': 'ETH',
+            'limit': '10000000000',
+            'limit_peer': '0',
+            'no_ripple': true,
+            'no_ripple_peer': true,
+            'quality_in': 0,
+            'quality_out': 0},
+           {'account': 'rEyiXgWXCKsh9wXYRrXCYSgCbR1gj3Xd8b',
+            'balance': '0',
+            'currency': 'BTC',
+            'limit': '10000000000',
+            'limit_peer': '0',
+            'no_ripple': false,
+            'no_ripple_peer': true,
+            'quality_in': 0,
+            'quality_out': 0}]
+    }
+  });
+};

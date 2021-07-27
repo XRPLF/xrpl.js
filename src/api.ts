@@ -47,11 +47,7 @@ import prepareTicketCreate from './transaction/ticket'
 import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
-import {
-  generateAddressAPI,
-  GenerateAddressOptions,
-  GeneratedAddress
-} from './offline/generate-address'
+import { generateAddress, generateXAddress } from './offline/utils'
 import {deriveKeypair, deriveAddress, deriveXAddress} from './offline/derive'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
@@ -352,14 +348,9 @@ class RippleAPI extends EventEmitter {
     return results
   }
 
-  // @deprecated Use X-addresses instead
-  generateAddress(options: GenerateAddressOptions = {}): GeneratedAddress {
-    return generateAddressAPI({...options, includeClassicAddress: true})
-  }
-
-  generateXAddress(options: GenerateAddressOptions = {}): GeneratedAddress {
-    return generateAddressAPI(options)
-  }
+  // @deprecated Use X-addresses instead & Invoke from top-level package instead
+  generateAddress = generateAddress
+  generateXAddress = generateXAddress // @deprecated Invoke from top-level package instead
 
   connect = connect
   disconnect = disconnect
@@ -403,11 +394,11 @@ class RippleAPI extends EventEmitter {
 
   submit = submit // @deprecated Use api.request('submit', { tx_blob: signedTransaction }) instead
 
-  deriveKeypair = deriveKeypair
-  deriveAddress = deriveAddress
-  computeLedgerHash = computeLedgerHash
-  signPaymentChannelClaim = signPaymentChannelClaim
-  verifyPaymentChannelClaim = verifyPaymentChannelClaim
+  deriveKeypair = deriveKeypair // @deprecated Invoke from top-level package instead
+  deriveAddress = deriveAddress // @deprecated Invoke from top-level package instead
+  computeLedgerHash = computeLedgerHash // @deprecated Invoke from top-level package instead
+  signPaymentChannelClaim = signPaymentChannelClaim // @deprecated Invoke from top-level package instead
+  verifyPaymentChannelClaim = verifyPaymentChannelClaim // @deprecated Invoke from top-level package instead
   errors = errors
 
   static deriveXAddress = deriveXAddress
@@ -437,31 +428,43 @@ class RippleAPI extends EventEmitter {
    * Static methods that replace functionality from the now-deprecated ripple-hashes library
    */
   // Compute the hash of a binary transaction blob.
+  // @deprecated Invoke from top-level package instead
   static computeBinaryTransactionHash = computeBinaryTransactionHash // (txBlobHex: string): string
   // Compute the hash of a transaction in txJSON format.
+  // @deprecated Invoke from top-level package instead
   static computeTransactionHash = computeTransactionHash // (txJSON: any): string
+  // @deprecated Invoke from top-level package instead
   static computeBinaryTransactionSigningHash = computeBinaryTransactionSigningHash // (txBlobHex: string): string
   // Compute the hash of an account, given the account's classic address (starting with `r`).
+  // @deprecated Invoke from top-level package instead
   static computeAccountLedgerObjectID = computeAccountLedgerObjectID // (address: string): string
   // Compute the hash (ID) of an account's SignerList.
+  // @deprecated Invoke from top-level package instead
   static computeSignerListLedgerObjectID = computeSignerListLedgerObjectID // (address: string): string
   // Compute the hash of an order, given the owner's classic address (starting with `r`) and the account sequence number of the `OfferCreate` order transaction.
+  // @deprecated Invoke from top-level package instead
   static computeOrderID = computeOrderID // (address: string, sequence: number): string
   // Compute the hash of a trustline, given the two parties' classic addresses (starting with `r`) and the currency code.
+  // @deprecated Invoke from top-level package instead
   static computeTrustlineHash = computeTrustlineHash // (address1: string, address2: string, currency: string): string
+  // @deprecated Invoke from top-level package instead
   static computeTransactionTreeHash = computeTransactionTreeHash // (transactions: any[]): string
+  // @deprecated Invoke from top-level package instead
   static computeStateTreeHash = computeStateTreeHash // (entries: any[]): string
   // Compute the hash of a ledger.
+  // @deprecated Invoke from top-level package instead
   static computeLedgerHash = computeLedgerHash // (ledgerHeader): string
   // Compute the hash of an escrow, given the owner's classic address (starting with `r`) and the account sequence number of the `EscrowCreate` escrow transaction.
+  // @deprecated Invoke from top-level package instead
   static computeEscrowHash = computeEscrowHash // (address, sequence): string
   // Compute the hash of a payment channel, given the owner's classic address (starting with `r`), the classic address of the destination, and the account sequence number of the `PaymentChannelCreate` payment channel transaction.
+  // @deprecated Invoke from top-level package instead
   static computePaymentChannelHash = computePaymentChannelHash // (address, dstAddress, sequence): string
 
-  xrpToDrops = xrpToDrops
-  dropsToXrp = dropsToXrp
-  rippleTimeToISO8601 = rippleTimeToISO8601
-  iso8601ToRippleTime = iso8601ToRippleTime
+  xrpToDrops = xrpToDrops // @deprecated Invoke from top-level package instead
+  dropsToXrp = dropsToXrp // @deprecated Invoke from top-level package instead
+  rippleTimeToISO8601 = rippleTimeToISO8601 // @deprecated Invoke from top-level package instead
+  iso8601ToRippleTime = iso8601ToRippleTime // @deprecated Invoke from top-level package instead
   txFlags = txFlags
 
   isValidAddress = schemaValidator.isValidAddress

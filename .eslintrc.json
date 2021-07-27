@@ -8,6 +8,9 @@
   "extends": [
     "eslint:recommended"
   ],
+  "globals": {
+    "NodeJS": true
+  },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018,

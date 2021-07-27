@@ -293,6 +293,7 @@ function prepareTransaction(
     const cushion = api._feeCushion
     return api.getFee(cushion).then((fee) => {
       return api.connection.getFeeRef().then((feeRef) => {
+        // feeRef is the reference transaction cost in "fee units"
         const extraFee =
           newTxJSON.TransactionType !== 'EscrowFinish' ||
           newTxJSON.Fulfillment === undefined

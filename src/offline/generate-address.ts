@@ -25,7 +25,7 @@ export interface GenerateAddressOptions {
   includeClassicAddress?: boolean
 }
 
-function generateAddressAPI(options: GenerateAddressOptions): GeneratedAddress {
+function generateAddressAPI(options: GenerateAddressOptions = {}): GeneratedAddress {
   validate.generateAddress({options})
   try {
     const generateSeedOptions: {
