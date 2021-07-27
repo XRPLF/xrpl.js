@@ -102,7 +102,8 @@ module.exports = {
       item: require('./trustline-item.json'),
       count: 401
     }),
-    all: require('./get-trustlines-all.json')
+    all: require('./get-trustlines-all.json'),
+    ripplingDisabled: require('./get-trustlines-rippling-disabled.json')
   },
   getLedger: {
     header: require('./get-ledger'),

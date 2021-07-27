@@ -668,6 +668,8 @@ export function createMockRippled(port) {
       conn.send(accountLinesResponse.counterparty(request))
     } else if (request.account === addresses.THIRD_ACCOUNT) {
       conn.send(accountLinesResponse.manyItems(request))
+    } else if (request.account === addresses.FOURTH_ACCOUNT) {
+      conn.send(accountLinesResponse.ripplingDisabled(request))
     } else if (request.account === addresses.NOTFOUND) {
       conn.send(createResponse(request, fixtures.account_info.notfound))
     } else {
