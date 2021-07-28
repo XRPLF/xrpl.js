@@ -1,7 +1,7 @@
 'use strict';
 const path = require('path');
 const webpack = require('webpack');
-const assert = require("assert/");
+const assert = require('assert');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 function getDefaultConfiguration() {
@@ -42,12 +42,12 @@ function getDefaultConfiguration() {
 }
 
 function webpackForTest(testFileName) {
-  var match = testFileName.match(/\/?([^\/]*)-test.ts$/);
+  const match = testFileName.match(/\/?([^\/]*)-test.ts$/);
   if (!match) {
     assert(false, 'wrong filename:' + testFileName);
   }
 
-  let test = {
+  const test = {
     cache: true,
     externals: [{
       'lodash': '_',
