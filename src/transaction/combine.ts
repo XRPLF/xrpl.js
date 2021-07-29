@@ -1,11 +1,11 @@
 import * as _ from 'lodash'
 import binary from 'ripple-binary-codec'
 import BigNumber from 'bignumber.js'
-import { ValidationError } from '../common/errors'
+import {ValidationError} from '../common/errors'
 import {decodeAccountID} from 'ripple-address-codec'
 import {validate} from '../common'
 import {computeBinaryTransactionHash} from '../common/hashes'
-import { JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
+import {JsonObject} from 'ripple-binary-codec/dist/types/serialized-type'
 
 //The transactions should all be equal EXCEPT for the Signers field
 function validateAllSignedTransactionsAreEqual( transactions : Array<JsonObject> ) {
