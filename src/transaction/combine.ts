@@ -1,7 +1,7 @@
 import * as _ from 'lodash'
 import binary from 'ripple-binary-codec'
-import * as utils from './utils'
 import BigNumber from 'bignumber.js'
+import { ValidationError } from '../common/errors'
 import {decodeAccountID} from 'ripple-address-codec'
 import {validate} from '../common'
 import {computeBinaryTransactionHash} from '../common/hashes'
@@ -18,7 +18,7 @@ function validateAllSignedTransactionsAreEqual( transactions : Array<JsonObject>
       delete _tx.Signers;
       
       if ( JSON.stringify(tx) !== JSON.stringify(_tx)) {
-          throw new utils.common.errors.ValidationError('txJSON is not the same for all signedTransactions')
+          throw new ValidationError('txJSON is not the same for all signedTransactions')
       }
 
       _tx.Signers = _txSignersTemp
@@ -33,6 +33,12 @@ function addressToBigNumber(address) {
   return new BigNumber(hex, 16)
 }
 
+/**
+ * According to the documentation on multi-signatures:
+ * If presented in binary form, the Signers array must be sorted based on 
+ * the numeric value of the signer addresses, with the lowest value first. 
+ * (If submitted as JSON, the submit_multisigned method handles this automatically.)
+ */
 function compareSigners(a, b) {
   return addressToBigNumber(a.Signer.Account).comparedTo(
     addressToBigNumber(b.Signer.Account)
@@ -47,10 +53,11 @@ function getATransactionWithAllSigners(transactions : Array<JsonObject>) : JsonO
   )
   //The documentation requires signers to be sorted
   const sortedSigners = unsortedSigners.sort(compareSigners)
-  const tx = transactions[0];
-  tx.Signers = sortedSigners
 
-  return tx
+  //This is used to make a new copy of the transaction with ALL signers
+  const signedTx = _.assign({}, transactions[0], {Signers: sortedSigners})
+
+  return signedTx
 }
 
 /**
