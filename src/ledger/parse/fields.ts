@@ -18,7 +18,7 @@ function parseFields(data: any): object {
   const settings: any = {}
   for (const fieldName in AccountFields) {
     const fieldValue = data[fieldName]
-    if (fieldValue !== undefined) {
+    if (fieldValue != null) {
       const info = AccountFields[fieldName]
       settings[info.name] = parseField(info, fieldValue)
     }

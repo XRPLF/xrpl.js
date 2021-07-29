@@ -40,13 +40,13 @@ export interface Payment {
 function isMaxAdjustment(
   source: Adjustment | MaxAdjustment
 ): source is MaxAdjustment {
-  return (source as MaxAdjustment).maxAmount !== undefined
+  return (source as MaxAdjustment).maxAmount != null
 }
 
 function isMinAdjustment(
   destination: Adjustment | MinAdjustment
 ): destination is MinAdjustment {
-  return (destination as MinAdjustment).minAmount !== undefined
+  return (destination as MinAdjustment).minAmount != null
 }
 
 function isXRPToXRPPayment(payment: Payment): boolean {
@@ -68,7 +68,7 @@ function isIOUWithoutCounterparty(amount: Amount): boolean {
     amount &&
     amount.currency !== 'XRP' &&
     amount.currency !== 'drops' &&
-    amount.counterparty === undefined
+    amount.counterparty == null
   )
 }
 
@@ -151,8 +151,8 @@ function createPaymentTransaction(
   }
 
   if (
-    addressToVerifyAgainst.tag !== undefined &&
-    sourceAddressAndTag.tag !== undefined &&
+    addressToVerifyAgainst.tag != null &&
+    sourceAddressAndTag.tag != null &&
     addressToVerifyAgainst.tag !== sourceAddressAndTag.tag
   ) {
     throw new ValidationError(
@@ -201,16 +201,16 @@ function createPaymentTransaction(
     Flags: 0
   }
 
-  if (payment.invoiceID !== undefined) {
+  if (payment.invoiceID != null) {
     txJSON.InvoiceID = payment.invoiceID
   }
-  if (sourceAddressAndTag.tag !== undefined) {
+  if (sourceAddressAndTag.tag != null) {
     txJSON.SourceTag = sourceAddressAndTag.tag
   }
-  if (destinationAddressAndTag.tag !== undefined) {
+  if (destinationAddressAndTag.tag != null) {
     txJSON.DestinationTag = destinationAddressAndTag.tag
   }
-  if (payment.memos !== undefined) {
+  if (payment.memos != null) {
     txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
   if (payment.noDirectRipple === true) {
@@ -234,7 +234,7 @@ function createPaymentTransaction(
       txJSON.DeliverMin = toRippledAmount(destinationAmount)
     }
 
-    if (payment.paths !== undefined) {
+    if (payment.paths != null) {
       txJSON.Paths = JSON.parse(payment.paths)
     }
   } else if (payment.allowPartialPayment === true) {

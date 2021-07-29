@@ -135,7 +135,7 @@ function loadSchemas() {
 
   // This relies on "format": "xAddress" in `x-address.json`!
   validator.customFormats.xAddress = function (instance) {
-    if (instance === undefined) {
+    if (instance == null) {
       return true
     }
     return isValidXAddress(instance)
@@ -143,14 +143,14 @@ function loadSchemas() {
 
   // This relies on "format": "classicAddress" in `classic-address.json`!
   validator.customFormats.classicAddress = function (instance) {
-    if (instance === undefined) {
+    if (instance == null) {
       return true
     }
     return isValidAddress(instance)
   }
 
   validator.customFormats.secret = function (instance) {
-    if (instance === undefined) {
+    if (instance == null) {
       return true
     }
     return isValidSecret(instance)
@@ -168,7 +168,7 @@ const schemaValidator = loadSchemas()
 function schemaValidate(schemaName: string, object: any): void {
   // Lookup under the root URI '/'
   const schema = schemaValidator.getSchema('/' + schemaName)
-  if (schema === undefined) {
+  if (schema == null) {
     throw new ValidationError('no schema for ' + schemaName)
   }
   const result = schemaValidator.validate(object, schema)

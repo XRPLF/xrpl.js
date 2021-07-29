@@ -150,7 +150,7 @@ class RippleAPI extends EventEmitter {
     this._feeCushion = options.feeCushion || 1.2
     this._maxFeeXRP = options.maxFeeXRP || '2'
     const serverURL = options.server
-    if (serverURL !== undefined) {
+    if (serverURL != null) {
       this.connection = new Connection(serverURL, options)
       this.connection.on('ledgerClosed', (message) => {
         this.emit('ledger', formatLedgerClose(message))
@@ -320,7 +320,7 @@ class RippleAPI extends EventEmitter {
     }
     // If limit is not provided, fetches all data over multiple requests.
     // NOTE: This may return much more than needed. Set limit when possible.
-    const countTo: number = params.limit !== undefined ? params.limit : Infinity
+    const countTo: number = params.limit != null ? params.limit : Infinity
     let count: number = 0
     let marker: string = params.marker
     let lastBatchLength: number

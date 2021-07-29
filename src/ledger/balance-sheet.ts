@@ -30,7 +30,7 @@ type BalanceSheet = {
 function formatBalanceSheet(balanceSheet: BalanceSheet): GetBalanceSheet {
   const result: GetBalanceSheet = {}
 
-  if (balanceSheet.balances !== undefined) {
+  if (balanceSheet.balances != null) {
     result.balances = []
     Object.entries(balanceSheet.balances).forEach(entry => {
       const [counterparty, balances] = entry;
@@ -39,7 +39,7 @@ function formatBalanceSheet(balanceSheet: BalanceSheet): GetBalanceSheet {
       })
     })
   }
-  if (balanceSheet.assets !== undefined) {
+  if (balanceSheet.assets != null) {
     result.assets = []
     Object.entries(balanceSheet.assets).forEach(([counterparty, assets]) => {
       assets.forEach((balance) => {
@@ -47,7 +47,7 @@ function formatBalanceSheet(balanceSheet: BalanceSheet): GetBalanceSheet {
       })
     })
   }
-  if (balanceSheet.obligations !== undefined) {
+  if (balanceSheet.obligations != null) {
     result.obligations = Object.entries(balanceSheet.obligations as {[key: string]: string}).map(
       ([currency, value]) => ({currency, value})
     )

@@ -20,7 +20,7 @@ function createPaymentChannelFundTransaction(
     Amount: xrpToDrops(fund.amount)
   }
 
-  if (fund.expiration !== undefined) {
+  if (fund.expiration != null) {
     txJSON.Expiration = iso8601ToRippleTime(fund.expiration)
   }
 

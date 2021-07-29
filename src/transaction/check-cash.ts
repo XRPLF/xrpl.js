@@ -29,11 +29,11 @@ function createCheckCashTransaction(
     CheckID: checkCash.checkID
   }
 
-  if (checkCash.amount !== undefined) {
+  if (checkCash.amount != null) {
     txJSON.Amount = toRippledAmount(checkCash.amount)
   }
 
-  if (checkCash.deliverMin !== undefined) {
+  if (checkCash.deliverMin != null) {
     txJSON.DeliverMin = toRippledAmount(checkCash.deliverMin)
   }
 

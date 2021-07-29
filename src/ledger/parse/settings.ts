@@ -22,7 +22,7 @@ function parseFlags(tx: any): any {
   const oldFlags = _.get(node.PreviousFields, 'Flags')
   const newFlags = _.get(node.FinalFields, 'Flags')
 
-  if (oldFlags !== undefined && newFlags !== undefined) {
+  if (oldFlags != null && newFlags != null) {
     const changedFlags = oldFlags ^ newFlags
     const setFlags = newFlags & changedFlags
     const clearedFlags = oldFlags & changedFlags

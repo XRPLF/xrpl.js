@@ -203,7 +203,7 @@ export default <TestSuite>{
     }
     const decoded = binary.decode(result.signedTransaction)
     assert(
-      decoded.Flags === undefined,
+      decoded.Flags == null,
       `Flags = ${decoded.Flags}, should be undefined`
     )
     assert.deepEqual(result, expectedResult)

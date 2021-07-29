@@ -37,7 +37,7 @@ function parseAlternative(
   // we use "maxAmount"/"minAmount" here so that the result can be passed
   // directly to preparePayment
   const amounts =
-    alternative.destination_amount !== undefined
+    alternative.destination_amount != null
       ? {
           source: {amount: parseAmount(alternative.source_amount)},
           destination: {minAmount: parseAmount(alternative.destination_amount)}

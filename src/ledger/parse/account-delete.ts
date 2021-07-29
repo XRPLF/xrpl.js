@@ -27,7 +27,7 @@ function parseAccountDelete(tx: any): FormattedAccountDelete {
     destinationTag: tx.DestinationTag,
     destinationXAddress: classicAddressToXAddress(
       tx.Destination,
-      tx.DestinationTag === undefined ? false : tx.DestinationTag,
+      tx.DestinationTag == null ? false : tx.DestinationTag,
       false
     )
   })

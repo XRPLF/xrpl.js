@@ -29,7 +29,7 @@ function verifyTransaction(testcase, hash, type, options, txData, address) {
       assert.strictEqual(data.type, type)
       assert.strictEqual(data.address, address)
       assert.strictEqual(data.outcome.result, 'tesSUCCESS')
-      if (testcase.transactions !== undefined) {
+      if (testcase.transactions != null) {
         testcase.transactions.push(hash)
       }
       return {txJSON: JSON.stringify(txData), id: hash, tx: data}

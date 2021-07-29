@@ -39,10 +39,10 @@ function createLedgerResponse(request, response) {
       delete newResponse.result.ledger.accountState
     }
     // the following fields were not in the ledger response in the past
-    if (newResponse.result.ledger.close_flags === undefined) {
+    if (newResponse.result.ledger.close_flags == null) {
       newResponse.result.ledger.close_flags = 0
     }
-    if (newResponse.result.ledger.parent_close_time === undefined) {
+    if (newResponse.result.ledger.parent_close_time == null) {
       newResponse.result.ledger.parent_close_time =
         newResponse.result.ledger.close_time - 10
     }
@@ -60,7 +60,7 @@ export function createMockRippled(port) {
 
   const close = mock.close
   mock.close = function () {
-    if (mock.expectedRequests !== undefined) {
+    if (mock.expectedRequests != null) {
       const allRequestsMade = Object.entries(mock.expectedRequests).every(function (
         _, counter
       ) {
@@ -108,11 +108,11 @@ export function createMockRippled(port) {
     if (mock.listeners(this.event).length === 0) {
       throw new Error('No event handler registered for ' + this.event)
     }
-    if (mock.expectedRequests === undefined) {
+    if (mock.expectedRequests == null) {
       return // TODO: fail here to require expectedRequests
     }
     const expectedCount = mock.expectedRequests[this.event]
-    if (expectedCount === undefined || expectedCount === 0) {
+    if (expectedCount == null || expectedCount === 0) {
       throw new Error('Unexpected request: ' + this.event)
     }
     mock.expectedRequests[this.event] -= 1
@@ -282,7 +282,7 @@ export function createMockRippled(port) {
       const response = Object.assign({}, fixtures.account_info.normal)
       response.Account = addresses.THIRD_ACCOUNT
       conn.send(createResponse(request, response))
-    } else if (request.account === undefined) {
+    } else if (request.account == null) {
       const response = Object.assign(
         {},
         {

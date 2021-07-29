@@ -29,26 +29,26 @@ function createTrustlineTransaction(
     LimitAmount: limit,
     Flags: 0
   }
-  if (trustline.qualityIn !== undefined) {
+  if (trustline.qualityIn != null) {
     txJSON.QualityIn = convertQuality(trustline.qualityIn)
   }
-  if (trustline.qualityOut !== undefined) {
+  if (trustline.qualityOut != null) {
     txJSON.QualityOut = convertQuality(trustline.qualityOut)
   }
   if (trustline.authorized === true) {
     txJSON.Flags |= trustlineFlags.SetAuth
   }
-  if (trustline.ripplingDisabled !== undefined) {
+  if (trustline.ripplingDisabled != null) {
     txJSON.Flags |= trustline.ripplingDisabled
       ? trustlineFlags.NoRipple
       : trustlineFlags.ClearNoRipple
   }
-  if (trustline.frozen !== undefined) {
+  if (trustline.frozen != null) {
     txJSON.Flags |= trustline.frozen
       ? trustlineFlags.SetFreeze
       : trustlineFlags.ClearFreeze
   }
-  if (trustline.memos !== undefined) {
+  if (trustline.memos != null) {
     txJSON.Memos = trustline.memos.map(utils.convertMemo)
   }
   return txJSON

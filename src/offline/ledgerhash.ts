@@ -70,7 +70,7 @@ function computeTransactionHash(
   })
   const transactionHash = computeTransactionTreeHash(txs)
   if (
-    ledger.transactionHash !== undefined &&
+    ledger.transactionHash != null &&
     ledger.transactionHash !== transactionHash
   ) {
     throw new common.errors.ValidationError(
@@ -86,7 +86,7 @@ function computeTransactionHash(
 }
 
 function computeStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
-  if (ledger.rawState === undefined) {
+  if (ledger.rawState == null) {
     if (options.computeTreeHashes) {
       throw new common.errors.ValidationError(
         'rawState' + ' property is missing from the ledger'
@@ -96,7 +96,7 @@ function computeStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
   }
   const state = JSON.parse(ledger.rawState)
   const stateHash = computeStateTreeHash(state)
-  if (ledger.stateHash !== undefined && ledger.stateHash !== stateHash) {
+  if (ledger.stateHash != null && ledger.stateHash !== stateHash) {
     throw new common.errors.ValidationError(
       'stateHash in header' + ' does not match computed hash of state'
     )

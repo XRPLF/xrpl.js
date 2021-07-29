@@ -50,7 +50,7 @@ class RippleAPIBroadcast extends RippleAPI {
   onLedgerEvent(ledger) {
     if (
       ledger.ledgerVersion > this.ledgerVersion ||
-      this.ledgerVersion === undefined
+      this.ledgerVersion == null
     ) {
       this.ledgerVersion = ledger.ledgerVersion
       this.emit('ledger', ledger)

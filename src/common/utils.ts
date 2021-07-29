@@ -145,7 +145,7 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
 }
 
 function removeUndefined<T extends object>(obj: T): T {
-  return _.omitBy(obj, value => value === undefined) as T
+  return _.omitBy(obj, value => value == null) as T
 }
 
 /**

@@ -8,9 +8,9 @@ function error(text) {
 
 function validateLedgerRange(options) {
   if (
-    options !== undefined &&
-    options.minLedgerVersion !== undefined &&
-    options.maxLedgerVersion !== undefined
+    options != null &&
+    options.minLedgerVersion != null &&
+    options.maxLedgerVersion != null
   ) {
     if (Number(options.minLedgerVersion) > Number(options.maxLedgerVersion)) {
       throw error('minLedgerVersion must not be greater than maxLedgerVersion')

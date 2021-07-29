@@ -31,8 +31,8 @@ describe('Connection', function () {
   it('default options', function () {
     const connection: any = new utils.common.Connection('url')
     assert.strictEqual(connection._url, 'url')
-    assert(connection._config.proxy === undefined)
-    assert(connection._config.authorization === undefined)
+    assert(connection._config.proxy == null)
+    assert(connection._config.authorization == null)
   })
 
   describe('trace', () => {

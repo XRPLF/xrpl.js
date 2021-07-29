@@ -225,7 +225,7 @@ module.exports = function(request, options = {}) {
     status: 'success',
     type: 'response',
     result: {
-      marker: marker === undefined ? undefined : String(marker),
+      marker: marker == null ? undefined : String(marker),
       transactions: [
         {
           ledger_index: 348860 - Number(marker || 100),

@@ -67,7 +67,7 @@ function requestPathFind(
     )
   }
   if (pathfind.source.amount) {
-    if (pathfind.destination.amount.value !== undefined) {
+    if (pathfind.destination.amount.value != null) {
       throw new ValidationError(
         'Cannot specify both source.amount' +
           ' and destination.amount.value in getPaths'
@@ -127,7 +127,7 @@ function filterSourceFundsLowPaths(
 ): RippledPathsResponse {
   if (
     pathfind.source.amount &&
-    pathfind.destination.amount.value === undefined &&
+    pathfind.destination.amount.value == null &&
     paths.alternatives
   ) {
     paths.alternatives = paths.alternatives.filter((alt) => {
@@ -155,7 +155,7 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
     return parsePathfind(paths)
   }
   if (
-    paths.destination_currencies !== undefined &&
+    paths.destination_currencies != null &&
     !paths.destination_currencies.includes(
       pathfind.destination.amount.currency
     )
