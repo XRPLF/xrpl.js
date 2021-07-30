@@ -3,7 +3,10 @@
   "compilerOptions": {
     "outDir": "../dist/npm",
     "rootDir": ".",
-    "composite": true
+    "composite": true,
+    "lib": [
+      "es2019"
+    ]
   },
   "include": [
     "**/*.ts"

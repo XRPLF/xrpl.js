@@ -36,7 +36,8 @@ function compareSigners(a, b) {
 
 function getATransactionWithAllSigners(transactions: Array<JsonObject>): JsonObject {
   // Signers must be sorted - see compareSigners for more details
-  const sortedSigners = _.flatMap(transactions, tx => tx.Signers)
+  const sortedSigners = transactions
+    .flatMap(tx => tx.Signers)
     .filter(signer => signer)
     .sort(compareSigners)
 
