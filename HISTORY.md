@@ -2,6 +2,30 @@
 
 Subscribe to [the **ripple-lib-announce** mailing list](https://groups.google.com/forum/#!forum/ripple-lib-announce) for release announcements. We recommend that ripple-lib users stay up-to-date with the latest stable release.
 
+## 1.9.8 (2021-07-30)
+
+* Export offline methods to top level of package (#1479)
+* Remove deprecated ledger fields (#1160)
+  * These fields have been deprecated for many years: accepted, hash (use ledger_hash instead), seqNum (use ledger_index instead), totalCoins (use total_coins instead)
+* Docs improvements (#1251, #1420, #1463)
+* Reduce dependencies on lodash (#1467)
+* Bug fixes
+  * Allow lowercase hex for memos (#1475)
+  * Add type argument to Promise (#1474)
+  * Fix miscommunication with ripplingDisabled in trustlines (#1481)
+  * Allow X-address for issuer (#1471)
+* Dependencies
+  * ws, ripple-binary-codec
+  * deps-dev: typescript, @types/node, ts-node
+
+The SHA-256 checksums for the browser version of this release can be found below.
+```
+% shasum -a 256 build/*
+f3a0efb9f8bb618da6b10425a9b55a8492359a331a22d0ab4de7d3551870eb3d  build/ripple-latest-min.js
+fc17a5572001d814ea6b81aa701fcb66882ec031c68afb769a8ea8b71c6529a6  build/ripple-latest-min.js.LICENSE.txt
+fd40457a89a14732ce261148e129cdda5aa963d9a433c57700353083faa1bffe  build/ripple-latest.js
+```
+
 ## 1.9.7 (2021-07-14)
 
 * Bug fixes
