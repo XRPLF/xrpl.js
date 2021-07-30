@@ -205,7 +205,7 @@ function prepareTransaction(
     const amount = txJSON[fieldName]
     if (typeof amount  === 'number'
      || amount instanceof Array
-     || amount === undefined)
+     || amount == null)
       return
 
     newTxJSON[fieldName] = toRippledAmount(amount)
