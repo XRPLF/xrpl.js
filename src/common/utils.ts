@@ -118,14 +118,13 @@ function toRippledAmount(amount: RippledAmount): RippledAmount {
   }
 
   let issuer = amount.counterparty || amount.issuer
-
-  let tag
+  let tag: number | false = false;
 
   try {
     ({classicAddress: issuer, tag} = xAddressToClassicAddress(issuer))
   } catch (e) { /* not an X-address */ }
   
-  if (tag) {
+  if (tag !== false) {
     throw new ValidationError("Issuer X-address includes a tag")
   }
 
