@@ -41,7 +41,7 @@ function getRecursiveRecur(
 ): Promise<Array<any>> {
   return getter(marker, limit).then((data) => {
     const remaining = limit - data.results.length
-    if (remaining > 0 && data.marker !== undefined) {
+    if (remaining > 0 && data.marker != null) {
       return getRecursiveRecur(getter, data.marker, remaining).then((results) =>
         data.results.concat(results)
       )
@@ -58,9 +58,9 @@ function renameCounterpartyToIssuer<T>(
   obj: T & {counterparty?: string; issuer?: string}
 ): T & {issuer?: string} {
   const issuer =
-    obj.counterparty !== undefined
+    obj.counterparty != null
       ? obj.counterparty
-      : obj.issuer !== undefined
+      : obj.issuer != null
       ? obj.issuer
       : undefined
   const withIssuer = Object.assign({}, obj, {issuer})
@@ -74,7 +74,7 @@ function renameCounterpartyToIssuerInOrder(order: RequestBookOffersArgs) {
   const taker_gets = renameCounterpartyToIssuer(order.taker_gets)
   const taker_pays = renameCounterpartyToIssuer(order.taker_pays)
   const changes = {taker_gets, taker_pays}
-  return _.assign({}, order, _.omitBy(changes, _.isUndefined))
+  return Object.assign({}, order, _.omitBy(changes, value => value == null))
 }
 
 function signum(num) {
@@ -124,13 +124,13 @@ function isPendingLedgerVersion(
 function ensureLedgerVersion(this: RippleAPI, options: any): Promise<object> {
   if (
     Boolean(options) &&
-    options.ledgerVersion !== undefined &&
+    options.ledgerVersion != null &&
     options.ledgerVersion !== null
   ) {
     return Promise.resolve(options)
   }
   return this.getLedgerVersion().then((ledgerVersion) =>
-    _.assign({}, options, {ledgerVersion})
+    Object.assign({}, options, {ledgerVersion})
   )
 }
 

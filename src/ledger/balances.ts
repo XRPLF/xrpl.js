@@ -43,7 +43,7 @@ function getLedgerVersionHelper(
   connection: Connection,
   optionValue?: number
 ): Promise<number> {
-  if (optionValue !== undefined && optionValue !== null) {
+  if (optionValue != null && optionValue !== null) {
     return Promise.resolve(optionValue)
   }
   return connection.getLedgerVersion()

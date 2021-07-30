@@ -18,11 +18,11 @@
       "$ref": "value"
     },
     "maxFee": {
-      "description": "Deprecated: Use `maxFeeXRP` in the RippleAPI constructor instead. The maximum fee to pay for this transaction. If this exceeds `maxFeeXRP`, `maxFeeXRP` will be used instead. See [Transaction Fees](#transaction-fees) for more information.",
+      "description": "Deprecated: Use `maxFeeXRP` in the RippleAPI constructor instead. The maximum fee to pay for this transaction. If this exceeds `maxFeeXRP`, use `maxFeeXRP` instead. See [Transaction Fees](#transaction-fees) for more information.",
       "$ref": "value"
     },
     "maxLedgerVersion": {
-      "description": "The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the `maxLedgerVersion` option will default to 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.",
+      "description": "The highest ledger version that the transaction can be included in. If this option and `maxLedgerVersionOffset` are both omitted, the default is 3 greater than the current validated ledger version (equivalent to `maxLedgerVersionOffset=3`). Use `null` to not set a maximum ledger version. If not null, this must be an integer greater than 0, or one of the following strings: 'validated', 'closed', 'current'.",
       "oneOf": [
         {"$ref": "ledgerVersion"},
         {"type": "null"}
@@ -34,7 +34,7 @@
       "minimum": 0
     },
     "signersCount": {
-      "description": "Number of signers that will be signing this transaction.",
+      "description": "Number of signers that can multi-sign this transaction.",
       "type": "integer",
       "minimum": 1
     }

@@ -21,7 +21,7 @@
           "description": "Get the balance sheet as of this historical ledger version."
         }
       },
-      "description": "Options to determine how the balances will be calculated.",
+      "description": "Options to determine how the balances are calculated.",
       "additionalProperties": false
     }
   },

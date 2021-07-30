@@ -1,10 +1,10 @@
-import isEqual from 'lodash.isequal'
+import _ from 'lodash'
 import * as utils from './utils'
 import keypairs from 'ripple-keypairs'
 import binaryCodec from 'ripple-binary-codec'
 import {computeBinaryTransactionHash} from '../common/hashes'
 import {SignOptions, KeyPair, TransactionJSON} from './types'
-import {BigNumber} from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import {xrpToDrops} from '../common'
 import {RippleAPI} from '..'
 const validate = utils.common.validate
@@ -95,7 +95,7 @@ function objectDiff(a: object, b: object): object {
       return
     }
     if (type1 === '[object Array]') {
-      if (!isEqual(i1, i2)) {
+      if (!_.isEqual(i1, i2)) {
         diffs[k] = i2 // If arrays do not match, add second item to diffs
       }
       return
@@ -179,7 +179,7 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
     return memo
   })
 
-  if (!isEqual(decoded, tx)) {
+  if (!_.isEqual(decoded, tx)) {
     const error = new utils.common.errors.ValidationError(
       'Serialized transaction does not match original txJSON. See `error.data`'
     )

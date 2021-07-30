@@ -52,7 +52,7 @@ function teardown(this: any, done) {
   this.api
     .disconnect()
     .then(() => {
-      if (this.mockRippled !== undefined) {
+      if (this.mockRippled != null) {
         this.mockRippled.close()
       } else {
         this.mocks.forEach((mock) => mock.close())

@@ -12,7 +12,7 @@ function createOrderCancellationTransaction(
     Account: account,
     OfferSequence: orderCancellation.orderSequence
   }
-  if (orderCancellation.memos !== undefined) {
+  if (orderCancellation.memos != null) {
     txJSON.Memos = orderCancellation.memos.map(utils.convertMemo)
   }
   return txJSON

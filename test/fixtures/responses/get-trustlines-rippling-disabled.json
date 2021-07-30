@@ -1,0 +1,22 @@
+[
+    {
+      "specification": {
+        "limit": "10000000000",
+        "currency": "ETH",
+        "counterparty": "rEyiXgWXCKsh9wXYRrXCYSgCbR1gj3Xd8b",
+        "ripplingDisabled": true
+      },
+      "counterparty": { "limit": "0", "ripplingDisabled": true },
+      "state": { "balance": "0" }
+    },
+    {
+      "specification": {
+        "limit": "10000000000",
+        "currency": "BTC",
+        "counterparty": "rEyiXgWXCKsh9wXYRrXCYSgCbR1gj3Xd8b",
+        "ripplingDisabled": false
+      },
+      "counterparty": { "limit": "0", "ripplingDisabled": true },
+      "state": { "balance": "0" }
+    }
+  ]

@@ -217,7 +217,7 @@ module.exports = function(request, options = {}) {
     tx.Destination = addresses.ACCOUNT;
   }
   if (request.limit === 13) {
-    const res = _.assign({}, NotFound, {id: request.id});
+    const res = Object.assign({}, NotFound, {id: request.id});
     return JSON.stringify(res);
   }
   return JSON.stringify({
@@ -225,7 +225,7 @@ module.exports = function(request, options = {}) {
     status: 'success',
     type: 'response',
     result: {
-      marker: marker === undefined ? undefined : String(marker),
+      marker: marker == null ? undefined : String(marker),
       transactions: [
         {
           ledger_index: 348860 - Number(marker || 100),

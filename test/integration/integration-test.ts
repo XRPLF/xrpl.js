@@ -3,7 +3,7 @@ import assert from 'assert'
 import wallet from './wallet'
 import requests from '../fixtures/requests'
 import {RippleAPI} from 'ripple-api'
-import {isValidAddress} from 'ripple-address-codec'
+import {isValidClassicAddress} from 'ripple-address-codec'
 import {payTo, ledgerAccept} from './utils'
 import {errors} from 'ripple-api/common'
 import {isValidSecret} from 'ripple-api/common/utils'
@@ -12,7 +12,9 @@ import {isValidSecret} from 'ripple-api/common/utils'
 const TIMEOUT = 20000
 const INTERVAL = 1000 // how long to wait between checks for validated ledger
 
-const serverUrl = 'ws://127.0.0.1:6006'
+const HOST = process.env.HOST ?? "127.0.0.1"
+const PORT = process.env.PORT ?? "6006"
+const serverUrl = `ws://${HOST}:${PORT}`
 
 function acceptLedger(api) {
   return api.connection.request({command: 'ledger_accept'})
@@ -27,7 +29,7 @@ function verifyTransaction(testcase, hash, type, options, txData, address) {
       assert.strictEqual(data.type, type)
       assert.strictEqual(data.address, address)
       assert.strictEqual(data.outcome.result, 'tesSUCCESS')
-      if (testcase.transactions !== undefined) {
+      if (testcase.transactions != null) {
         testcase.transactions.push(hash)
       }
       return {txJSON: JSON.stringify(txData), id: hash, tx: data}
@@ -101,7 +103,7 @@ function testTransaction(
     })
 }
 
-function setup(this: any, server = 'wss://s1.ripple.com') {
+function setup(this: any, server = serverUrl) {
   this.api = new RippleAPI({server})
   console.log('CONNECTING...')
   return this.api.connect().then(
@@ -318,11 +320,11 @@ describe('integration tests', function () {
           const txData = JSON.parse(result.txJSON)
           return this.api.getOrders(address).then((orders) => {
             assert(orders && orders.length > 0)
-            const createdOrder = _.first(
-              _.filter(orders, (order) => {
+            const createdOrder = (
+              orders.filter((order) => {
                 return order.properties.sequence === txData.Sequence
               })
-            )
+            )[0]
             assert(createdOrder)
             assert.strictEqual(createdOrder.properties.maker, address)
             assert.deepEqual(createdOrder.specification, orderSpecification)
@@ -344,16 +346,6 @@ describe('integration tests', function () {
                 prepared
               )
             )
-        )
-    })
-  })
-
-  it('ticket', function () {
-    return this.api.getLedgerVersion().then((ledgerVersion) => {
-      return this.api
-        .prepareTicketCreate(address, 1, instructions)
-        .then((prepared) =>
-          testTransaction(this, 'ticket', ledgerVersion, prepared)
         )
     })
   })
@@ -398,7 +390,8 @@ describe('integration tests', function () {
 
   it('getTrustlines', function () {
     const fixture = requests.prepareTrustline.simple
-    const options = _.pick(fixture, ['currency', 'counterparty'])
+    const { currency, counterparty } = fixture
+    const options = { currency, counterparty }
     return this.api.getTrustlines(address, options).then((data) => {
       assert(data && data.length > 0 && data[0] && data[0].specification)
       const specification = data[0].specification
@@ -410,7 +403,8 @@ describe('integration tests', function () {
 
   it('getBalances', function () {
     const fixture = requests.prepareTrustline.simple
-    const options = _.pick(fixture, ['currency', 'counterparty'])
+    const { currency, counterparty } = fixture
+    const options = { currency, counterparty }
     return this.api.getBalances(address, options).then((data) => {
       assert(data && data.length > 0 && data[0])
       assert.strictEqual(data[0].currency, fixture.currency)
@@ -496,7 +490,7 @@ describe('integration tests', function () {
     return this.api.getPaths(pathfind).then((data) => {
       assert(data && data.length > 0)
       assert(
-        _.every(data, (path) => {
+        data.every((path) => {
           return (
             parseFloat(path.source.amount.value) <=
             parseFloat(pathfind.source.amount.value)
@@ -513,7 +507,7 @@ describe('integration tests', function () {
   it('generateWallet', function () {
     const newWallet = this.api.generateAddress()
     assert(newWallet && newWallet.address && newWallet.secret)
-    assert(isValidAddress(newWallet.address))
+    assert(isValidClassicAddress(newWallet.address))
     assert(isValidSecret(newWallet.secret))
   })
 })
@@ -559,7 +553,7 @@ describe('integration tests - standalone rippled', function () {
         })
       })
       .then(() => {
-        const multisignInstructions = _.assign({}, instructions, {
+        const multisignInstructions = Object.assign({}, instructions, {
           signersCount: 2
         })
         return this.api
