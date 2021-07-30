@@ -33,8 +33,9 @@ export type GetServerInfoResponse = {
   networkLedger?: string
 }
 
-function renameKeys(object, mapping) {
-  _.forEach(mapping, (to, from) => {
+function renameKeys(object: Record<string, any>, mapping: Record<string, any>) {
+  Object.entries(mapping).forEach(entry => {
+    const [from, to] = entry;
     object[to] = object[from]
     delete object[from]
   })
@@ -62,16 +63,16 @@ function getServerInfo(this: RippleAPI): Promise<GetServerInfoResponse> {
 // This is a public API that can be called directly.
 // This is not used by the `prepare*` methods. See `src/transaction/utils.ts`
 async function getFee(this: RippleAPI, cushion?: number): Promise<string> {
-  if (cushion === undefined) {
+  if (cushion == null) {
     cushion = this._feeCushion
   }
-  if (cushion === undefined) {
+  if (cushion == null) {
     cushion = 1.2
   }
 
   const serverInfo = (await this.request('server_info')).info
   const baseFeeXrp = new BigNumber(serverInfo.validated_ledger.base_fee_xrp)
-  if (serverInfo.load_factor === undefined) {
+  if (serverInfo.load_factor == null) {
     // https://github.com/ripple/rippled/issues/3812#issuecomment-816871100
     serverInfo.load_factor = 1
   }

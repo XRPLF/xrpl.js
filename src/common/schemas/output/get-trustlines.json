@@ -6,13 +6,13 @@
     "properties": {
       "specification": {
         "$ref": "trustline",
-        "description": "A trustline specification that would produce this trustline in its current state."
+        "description": "A trust line specification that would produce this trust line in its current state."
       },
       "counterparty": {
         "properties": {
           "limit": {
             "$ref": "value",
-            "description": "The maximum amount that the counterparty can be owed through the trustline."
+            "description": "The maximum amount that the counterparty can be owed through the trust line."
           },
           "ripplingDisabled": {
             "type": "boolean",
@@ -20,7 +20,7 @@
           },
           "frozen": {
             "type": "boolean",
-            "description": "If true, the trustline is frozen, which means that funds can only be sent to the counterparty."
+            "description": "If true, the trust line is frozen, which means that funds can only be sent directly to the counterparty."
           },
           "authorized": {
             "type": "boolean",
@@ -35,10 +35,10 @@
         "properties": {
           "balance": {
             "$ref": "signedValue",
-            "description": "The balance on the trustline, representing which party owes the other and by how much."
+            "description": "The balance on the trust line, representing which party owes the other and by how much."
           }
         },
-        "description": "Properties of the trustline regarding it's current state that are not part of the specification.",
+        "description": "Non-settings details of the trust line's state.",
         "required": ["balance"],
         "additionalProperties": false
       }

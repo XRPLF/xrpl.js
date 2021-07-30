@@ -15,11 +15,9 @@ function convertLedgerHeader(header): any {
     hash: header.ledgerHash,
     ledger_hash: header.ledgerHash,
     ledger_index: header.ledgerVersion.toString(),
-    seqNum: header.ledgerVersion.toString(),
     parent_hash: header.parentLedgerHash,
     parent_close_time: common.iso8601ToRippleTime(header.parentCloseTime),
     total_coins: header.totalDrops,
-    totalCoins: header.totalDrops,
     transaction_hash: header.transactionHash
   }
 }
@@ -60,10 +58,10 @@ function computeTransactionHash(
     }
     return ledger.transactionHash
   }
-  const txs = _.map(transactions, (tx) => {
-    const mergeTx = _.assign({}, _.omit(tx, 'tx'), tx.tx || {})
+  const txs = transactions.map((tx) => {
+    const mergeTx = Object.assign({}, _.omit(tx, 'tx'), tx.tx || {})
     // rename `meta` back to `metaData`
-    const renameMeta = _.assign(
+    const renameMeta = Object.assign(
       {},
       _.omit(mergeTx, 'meta'),
       tx.meta ? {metaData: tx.meta} : {}
@@ -72,7 +70,7 @@ function computeTransactionHash(
   })
   const transactionHash = computeTransactionTreeHash(txs)
   if (
-    ledger.transactionHash !== undefined &&
+    ledger.transactionHash != null &&
     ledger.transactionHash !== transactionHash
   ) {
     throw new common.errors.ValidationError(
@@ -88,7 +86,7 @@ function computeTransactionHash(
 }
 
 function computeStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
-  if (ledger.rawState === undefined) {
+  if (ledger.rawState == null) {
     if (options.computeTreeHashes) {
       throw new common.errors.ValidationError(
         'rawState' + ' property is missing from the ledger'
@@ -98,7 +96,7 @@ function computeStateHash(ledger, options: ComputeLedgerHeaderHashOptions) {
   }
   const state = JSON.parse(ledger.rawState)
   const stateHash = computeStateTreeHash(state)
-  if (ledger.stateHash !== undefined && ledger.stateHash !== stateHash) {
+  if (ledger.stateHash != null && ledger.stateHash !== stateHash) {
     throw new common.errors.ValidationError(
       'stateHash in header' + ' does not match computed hash of state'
     )
@@ -118,7 +116,7 @@ function computeLedgerHeaderHash(
     transactionHash: computeTransactionHash(ledger, options),
     stateHash: computeStateHash(ledger, options)
   }
-  return hashLedgerHeader(_.assign({}, ledger, subhashes))
+  return hashLedgerHeader(Object.assign({}, ledger, subhashes))
 }
 
 export default computeLedgerHeaderHash

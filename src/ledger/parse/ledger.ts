@@ -5,7 +5,6 @@ import {Ledger} from '../../common/types/objects'
 
 export type FormattedLedger = {
   // TODO: properties in type don't match response object. Fix!
-  // accepted: boolean,
   // closed: boolean,
   stateHash: string
   closeTime: string
@@ -25,7 +24,7 @@ export type FormattedLedger = {
 
 function parseTransactionWrapper(ledgerVersion, tx) {
   // renames metaData to meta and adds ledger_index
-  const transaction = _.assign({}, _.omit(tx, 'metaData'), {
+  const transaction = Object.assign({}, _.omit(tx, 'metaData'), {
     meta: tx.metaData,
     ledger_index: ledgerVersion
   })
@@ -40,12 +39,11 @@ function parseTransactions(transactions, ledgerVersion) {
   if (_.isEmpty(transactions)) {
     return {}
   }
-  if (_.isString(transactions[0])) {
+  if (typeof transactions[0] === 'string') {
     return {transactionHashes: transactions}
   }
   return {
-    transactions: _.map(
-      transactions,
+    transactions: transactions.map(
       _.partial(parseTransactionWrapper, ledgerVersion)
     )
   }
@@ -55,7 +53,7 @@ function parseState(state) {
   if (_.isEmpty(state)) {
     return {}
   }
-  if (_.isString(state[0])) {
+  if (typeof state[0] === 'string') {
     return {stateHashes: state}
   }
   return {rawState: JSON.stringify(state)}
@@ -67,7 +65,7 @@ function parseState(state) {
  * @throws RangeError: Invalid time value (rippleTimeToISO8601)
  */
 export function parseLedger(ledger: Ledger): FormattedLedger {
-  const ledgerVersion = parseInt(ledger.ledger_index || ledger.seqNum, 10)
+  const ledgerVersion = parseInt(ledger.ledger_index, 10)
   return removeUndefined(
     Object.assign(
       {
@@ -75,11 +73,11 @@ export function parseLedger(ledger: Ledger): FormattedLedger {
         closeTime: rippleTimeToISO8601(ledger.close_time),
         closeTimeResolution: ledger.close_time_resolution,
         closeFlags: ledger.close_flags,
-        ledgerHash: ledger.hash || ledger.ledger_hash,
+        ledgerHash: ledger.ledger_hash,
         ledgerVersion: ledgerVersion,
         parentLedgerHash: ledger.parent_hash,
         parentCloseTime: rippleTimeToISO8601(ledger.parent_close_time),
-        totalDrops: ledger.total_coins || ledger.totalCoins,
+        totalDrops: ledger.total_coins,
         transactionHash: ledger.transaction_hash
       },
       parseTransactions(ledger.transactions, ledgerVersion),

@@ -14,13 +14,13 @@ Returns open orders for the specified account. Open orders are orders that have 
 
 ### Return Value
 
-This method returns a promise that resolves with an object with the following structure (Note: the structures of `bids` and `asks` are identical):
+This method returns a promise that resolves with an object with the following structure Both `bids` and `asks` have the same format:
 
 <%- renderSchema('output/get-orderbook.json') %>
 
 **Raw order data:** The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
 
-For details, see the rippled method [book_offers](https://ripple.com/build/rippled-apis/#book-offers).
+For details, see the `rippled` [book_offers method](https://xrpl.org/book_offers.html).
 
 ### Example
 

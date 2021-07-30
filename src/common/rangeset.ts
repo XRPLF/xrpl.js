@@ -45,14 +45,14 @@ class RangeSet {
 
   parseAndAddRanges(rangesString: string) {
     const rangeStrings = rangesString.split(',')
-    _.forEach(rangeStrings, (rangeString) => {
+    rangeStrings.forEach((rangeString) => {
       const range = rangeString.split('-').map(Number)
       this.addRange(range[0], range.length === 1 ? range[0] : range[1])
     })
   }
 
   containsRange(start: number, end: number) {
-    return _.some(this.ranges, (range) => range[0] <= start && range[1] >= end)
+    return this.ranges.some((range) => range[0] <= start && range[1] >= end)
   }
 
   containsValue(value: number) {

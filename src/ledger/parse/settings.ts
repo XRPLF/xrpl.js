@@ -22,11 +22,12 @@ function parseFlags(tx: any): any {
   const oldFlags = _.get(node.PreviousFields, 'Flags')
   const newFlags = _.get(node.FinalFields, 'Flags')
 
-  if (oldFlags !== undefined && newFlags !== undefined) {
+  if (oldFlags != null && newFlags != null) {
     const changedFlags = oldFlags ^ newFlags
     const setFlags = newFlags & changedFlags
     const clearedFlags = oldFlags & changedFlags
-    _.forEach(AccountFlags, (flagValue, flagName) => {
+    Object.entries(AccountFlags).forEach(entry => {
+      const [flagName, flagValue] = entry;
       if (setFlags & flagValue) {
         settings[flagName] = true
       } else if (clearedFlags & flagValue) {
@@ -58,7 +59,7 @@ function parseSettings(tx: any) {
       txType === 'SignerListSet'
   )
 
-  return _.assign({}, parseFlags(tx), parseFields(tx))
+  return Object.assign({}, parseFlags(tx), parseFields(tx))
 }
 
 export default parseSettings

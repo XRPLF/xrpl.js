@@ -27,5 +27,14 @@ export default <TestSuite>{
 
   'getTrustlines - no options': async (api, address) => {
     await api.getTrustlines(address)
-  }
+  },
+
+  'getTrustlines - ripplingDisabled works properly': async (api, address) => {
+    const result = await api.getTrustlines(addresses.FOURTH_ACCOUNT)
+    assertResultMatch(
+      result,
+      RESPONSE_FIXTURES.ripplingDisabled,
+      'getTrustlines'
+    )
+  },
 }

@@ -11,7 +11,7 @@ function formatResponse(
   response: LedgerEntryResponse
 ): FormattedPaymentChannel {
   if (
-    response.node === undefined ||
+    response.node == null ||
     response.node.LedgerEntryType !== 'PayChannel'
   ) {
     throw new NotFoundError('Payment channel ledger entry not found')

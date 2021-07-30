@@ -10,12 +10,6 @@ export interface Ledger {
   total_coins: string
   transaction_hash: string
   transactions: string[] | object[]
-  // @deprecated
-  seqNum?: string
-  // @deprecated
-  totalCoins?: string
-  // @deprecated
-  hash?: string
   close_flags?: number
   parent_close_time?: number
   accountState?: any[]

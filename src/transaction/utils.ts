@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import * as common from '../common'
 import {Memo} from '../common/types/objects'
 import {Instructions, Prepare, TransactionJSON} from './types'
+import {toRippledAmount} from '../common'
 import {RippleAPI} from '..'
 import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress, isValidXAddress} from 'ripple-address-codec'
@@ -24,9 +25,9 @@ function formatPrepareResponse(txJSON: any): Prepare {
   const instructions = {
     fee: common.dropsToXrp(txJSON.Fee),
     maxLedgerVersion:
-      txJSON.LastLedgerSequence === undefined ? null : txJSON.LastLedgerSequence
+      txJSON.LastLedgerSequence == null ? null : txJSON.LastLedgerSequence
   }
-  if (txJSON.TicketSequence !== undefined) {
+  if (txJSON.TicketSequence != null) {
     instructions['ticketSequence'] = txJSON.TicketSequence
   } else {
     instructions['sequence'] = txJSON.Sequence
@@ -90,7 +91,7 @@ function getClassicAccountAndTag(
 ): ClassicAccountAndTag {
   if (isValidXAddress(Account)) {
     const classic = xAddressToClassicAddress(Account)
-    if (expectedTag !== undefined && classic.tag !== expectedTag) {
+    if (expectedTag != null && classic.tag !== expectedTag) {
       throw new ValidationError(
         'address includes a tag that does not match the tag specified in the transaction'
       )
@@ -118,7 +119,7 @@ function prepareTransaction(
   // We allow 0 values in the Sequence schema to support the Tickets feature
   // When a ticketSequence is used, sequence has to be 0
   // We validate that a sequence with value 0 is not passed even if the json schema allows it
-  if (instructions.sequence !== undefined && instructions.sequence === 0) {
+  if (instructions.sequence != null && instructions.sequence === 0) {
     return Promise.reject(new ValidationError('`sequence` cannot be 0'))
   }
 
@@ -152,7 +153,7 @@ function prepareTransaction(
     txJSON.Account
   )
   newTxJSON.Account = classicAccount
-  if (sourceTag !== undefined) {
+  if (sourceTag != null) {
     if (txJSON.SourceTag && txJSON.SourceTag !== sourceTag) {
       return Promise.reject(
         new ValidationError(
@@ -172,7 +173,7 @@ function prepareTransaction(
       tag: destinationTag
     } = getClassicAccountAndTag(txJSON.Destination)
     newTxJSON.Destination = destinationAccount
-    if (destinationTag !== undefined) {
+    if (destinationTag != null) {
       if (
         TRANSACTION_TYPES_WITH_DESTINATION_TAG_FIELD.includes(
           txJSON.TransactionType
@@ -200,6 +201,16 @@ function prepareTransaction(
     }
   }
 
+  function convertIssuedCurrencyToAccountIfPresent(fieldName: string): void {
+    const amount = txJSON[fieldName]
+    if (typeof amount  === 'number'
+     || amount instanceof Array
+     || amount == null)
+      return
+
+    newTxJSON[fieldName] = toRippledAmount(amount)
+  }
+
   // DepositPreauth:
   convertToClassicAccountIfPresent('Authorize')
   convertToClassicAccountIfPresent('Unauthorize')
@@ -209,6 +220,18 @@ function prepareTransaction(
 
   // SetRegularKey:
   convertToClassicAccountIfPresent('RegularKey')
+
+  // Payment
+  convertIssuedCurrencyToAccountIfPresent('Amount')
+  convertIssuedCurrencyToAccountIfPresent('SendMax')
+  convertIssuedCurrencyToAccountIfPresent('DeliverMin')
+
+  // OfferCreate
+  convertIssuedCurrencyToAccountIfPresent('TakerPays')
+  convertIssuedCurrencyToAccountIfPresent('TakerGets')
+
+  // TrustSet
+  convertIssuedCurrencyToAccountIfPresent('LimitAmount')
 
   setCanonicalFlag(newTxJSON)
 
@@ -243,7 +266,7 @@ function prepareTransaction(
       return Promise.resolve()
     }
     const offset =
-      instructions.maxLedgerVersionOffset !== undefined
+      instructions.maxLedgerVersionOffset != null
         ? instructions.maxLedgerVersionOffset
         : 3
     return api.connection.getLedgerVersion().then((ledgerVersion) => {
@@ -270,10 +293,10 @@ function prepareTransaction(
       return Promise.resolve()
     }
     const multiplier =
-      instructions.signersCount === undefined
+      instructions.signersCount == null
         ? 1
         : instructions.signersCount + 1
-    if (instructions.fee !== undefined) {
+    if (instructions.fee != null) {
       const fee = new BigNumber(instructions.fee)
       if (fee.isGreaterThan(api._maxFeeXRP)) {
         return Promise.reject(
@@ -293,9 +316,10 @@ function prepareTransaction(
     const cushion = api._feeCushion
     return api.getFee(cushion).then((fee) => {
       return api.connection.getFeeRef().then((feeRef) => {
+        // feeRef is the reference transaction cost in "fee units"
         const extraFee =
           newTxJSON.TransactionType !== 'EscrowFinish' ||
-          newTxJSON.Fulfillment === undefined
+          newTxJSON.Fulfillment == null
             ? 0
             : cushion *
               feeRef *
@@ -317,9 +341,9 @@ function prepareTransaction(
   }
 
   async function prepareSequence(): Promise<void> {
-    if (instructions.sequence !== undefined) {
+    if (instructions.sequence != null) {
       if (
-        newTxJSON.Sequence === undefined ||
+        newTxJSON.Sequence == null ||
         instructions.sequence === newTxJSON.Sequence
       ) {
         newTxJSON.Sequence = instructions.sequence
@@ -334,12 +358,12 @@ function prepareTransaction(
       }
     }
 
-    if (newTxJSON.Sequence !== undefined) {
+    if (newTxJSON.Sequence != null) {
       return Promise.resolve()
     }
 
     // Ticket Sequence
-    if (instructions.ticketSequence !== undefined) {
+    if (instructions.ticketSequence != null) {
       newTxJSON.Sequence = 0
       newTxJSON.TicketSequence = instructions.ticketSequence
       return Promise.resolve()

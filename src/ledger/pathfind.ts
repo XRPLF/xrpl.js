@@ -26,7 +26,7 @@ function addParams(
   result: RippledPathsResponse
 ): RippledPathsResponse {
   return _.defaults(
-    _.assign({}, result, {
+    Object.assign({}, result, {
       source_account: request.source_account,
       source_currencies: request.source_currencies
     }),
@@ -38,7 +38,7 @@ function requestPathFind(
   connection: Connection,
   pathfind: PathFind
 ): Promise<RippledPathsResponse> {
-  const destinationAmount: Amount = _.assign(
+  const destinationAmount: Amount = Object.assign(
     {
       // This is converted back to drops by toRippledAmount()
       value:
@@ -67,7 +67,7 @@ function requestPathFind(
     )
   }
   if (pathfind.source.amount) {
-    if (pathfind.destination.amount.value !== undefined) {
+    if (pathfind.destination.amount.value != null) {
       throw new ValidationError(
         'Cannot specify both source.amount' +
           ' and destination.amount.value in getPaths'
@@ -112,7 +112,7 @@ function conditionallyAddDirectXRPPath(
 ): Promise<RippledPathsResponse> {
   if (
     isRippledIOUAmount(paths.destination_amount) ||
-    !_.includes(paths.destination_currencies, 'XRP')
+    !paths.destination_currencies.includes('XRP')
   ) {
     return Promise.resolve(paths)
   }
@@ -127,10 +127,10 @@ function filterSourceFundsLowPaths(
 ): RippledPathsResponse {
   if (
     pathfind.source.amount &&
-    pathfind.destination.amount.value === undefined &&
+    pathfind.destination.amount.value == null &&
     paths.alternatives
   ) {
-    paths.alternatives = _.filter(paths.alternatives, (alt) => {
+    paths.alternatives = paths.alternatives.filter((alt) => {
       if (!alt.source_amount) {
         return false
       }
@@ -155,9 +155,8 @@ function formatResponse(pathfind: PathFind, paths: RippledPathsResponse) {
     return parsePathfind(paths)
   }
   if (
-    paths.destination_currencies !== undefined &&
-    !_.includes(
-      paths.destination_currencies,
+    paths.destination_currencies != null &&
+    !paths.destination_currencies.includes(
       pathfind.destination.amount.currency
     )
   ) {

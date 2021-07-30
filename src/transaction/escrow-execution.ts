@@ -31,13 +31,13 @@ function createEscrowExecutionTransaction(
     )
   }
 
-  if (payment.condition !== undefined) {
+  if (payment.condition != null) {
     txJSON.Condition = payment.condition
   }
-  if (payment.fulfillment !== undefined) {
+  if (payment.fulfillment != null) {
     txJSON.Fulfillment = payment.fulfillment
   }
-  if (payment.memos !== undefined) {
+  if (payment.memos != null) {
     txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
   return txJSON
