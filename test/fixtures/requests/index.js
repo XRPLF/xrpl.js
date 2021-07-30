@@ -72,7 +72,8 @@ module.exports = {
   prepareTrustline: {
     simple: require('./prepare-trustline-simple'),
     complex: require('./prepare-trustline'),
-    frozen: require('./prepare-trustline-frozen.json')
+    frozen: require('./prepare-trustline-frozen.json'),
+    issuedXAddress: require('./prepare-trustline-issuer-xaddress.json')
   },
   sign: {
     normal: require('./sign'),
