@@ -7,25 +7,14 @@ import {validate} from '../common'
 import {computeBinaryTransactionHash} from '../common/hashes'
 import {JsonObject} from 'ripple-binary-codec/dist/types/serialized-type'
 
-//The transactions should all be equal EXCEPT for the Signers field
-function validateAllSignedTransactionsAreEqual( transactions : Array<JsonObject> ) {
-  const tx = transactions[0];
-  const _txSignersTemp = tx.Signers;
-  delete tx.Signers
-  
-  transactions.forEach( _tx => {
-      const _txSignersTemp = _tx.Signers
-      delete _tx.Signers;
-      
-      if ( JSON.stringify(tx) !== JSON.stringify(_tx)) {
-          throw new ValidationError('txJSON is not the same for all signedTransactions')
-      }
-
-      _tx.Signers = _txSignersTemp
-  })
-
-  tx.Signers = _txSignersTemp
-  return transactions
+/**
+ * The transactions should all be equal EXCEPT for the 'Signers' field. 
+ */
+ function validateAllSignedTransactionsAreEqual(transactions: Array<JsonObject>) {
+  const exampleTransaction = JSON.stringify({...transactions[0], Signers: null})
+  if (transactions.slice(1).some(tx => JSON.stringify({...tx, Signers: null}) !== exampleTransaction)) {
+    throw new ValidationError('txJSON is not the same for all signedTransactions')
+  }
 }
 
 function addressToBigNumber(address) {
@@ -45,19 +34,13 @@ function compareSigners(a, b) {
   )
 }
 
-function getATransactionWithAllSigners(transactions : Array<JsonObject>) : JsonObject {
-  const unsortedSigners = _.reduce(
-    transactions,
-    (accumulator, _tx) => accumulator.concat(_tx.Signers || []),
-    []
-  )
-  //The documentation requires signers to be sorted
-  const sortedSigners = unsortedSigners.sort(compareSigners)
+function getATransactionWithAllSigners(transactions: Array<JsonObject>): JsonObject {
+  // Signers must be sorted - see compareSigners for more details
+  const sortedSigners = _.flatMap(transactions, tx => tx.Signers)
+    .filter(signer => signer)
+    .sort(compareSigners)
 
-  //This is used to make a new copy of the transaction with ALL signers
-  const signedTx = _.assign({}, transactions[0], {Signers: sortedSigners})
-
-  return signedTx
+  return {...transactions[0], Signers: sortedSigners}
 }
 
 /**
