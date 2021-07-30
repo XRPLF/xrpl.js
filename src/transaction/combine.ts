@@ -56,10 +56,10 @@ function combine(signedTransactions: Array<string>): object {
   const transactions: JsonObject[] = signedTransactions.map(binary.decode);
   validateTransactionEquality(transactions)
 
-  const encodedTransaction = binary.encode(getATransactionWithAllSigners(transactions))
+  const signedTransaction = binary.encode(getATransactionWithAllSigners(transactions))
   return {
-    encodedTransaction, 
-    id: computeBinaryTransactionHash(encodedTransaction)
+    signedTransaction: signedTransaction, 
+    id: computeBinaryTransactionHash(signedTransaction)
   }
 }
 
