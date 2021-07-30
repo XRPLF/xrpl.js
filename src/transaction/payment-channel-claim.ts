@@ -26,10 +26,10 @@ function createPaymentChannelClaimTransaction(
     Flags: 0
   }
 
-  if (claim.balance !== undefined) {
+  if (claim.balance != null) {
     txJSON.Balance = xrpToDrops(claim.balance)
   }
-  if (claim.amount !== undefined) {
+  if (claim.amount != null) {
     txJSON.Amount = xrpToDrops(claim.amount)
   }
 
@@ -40,10 +40,10 @@ function createPaymentChannelClaimTransaction(
     )
   }
 
-  if (claim.signature !== undefined) {
+  if (claim.signature != null) {
     txJSON.Signature = claim.signature
   }
-  if (claim.publicKey !== undefined) {
+  if (claim.publicKey != null) {
     txJSON.PublicKey = claim.publicKey
   }
 

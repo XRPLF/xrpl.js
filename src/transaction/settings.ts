@@ -17,7 +17,7 @@ function setTransactionFlags(
   txJSON: TransactionJSON,
   values: FormattedSettings
 ) {
-  const keys = Object.keys(values).filter((key) => AccountFlagIndices[key] !== undefined)
+  const keys = Object.keys(values).filter((key) => AccountFlagIndices[key] != null)
   assert.ok(
     keys.length <= 1,
     'ERROR: can only set one setting per transaction'
@@ -25,7 +25,7 @@ function setTransactionFlags(
   const flagName = keys[0]
   const value = values[flagName]
   const index = AccountFlagIndices[flagName]
-  if (index !== undefined) {
+  if (index != null) {
     if (value) {
       txJSON.SetFlag = index
     } else {
@@ -105,7 +105,7 @@ function createSettingsTransactionWithoutMemos(
     })
   }
 
-  if (settings.signers !== undefined) {
+  if (settings.signers != null) {
     const setSignerList = {
       TransactionType: 'SignerListSet',
       Account: account,
@@ -113,7 +113,7 @@ function createSettingsTransactionWithoutMemos(
       SignerQuorum: settings.signers.threshold
     }
 
-    if (settings.signers.weights !== undefined) {
+    if (settings.signers.weights != null) {
       setSignerList.SignerEntries = settings.signers.weights.map(
         formatSignerEntry
       )
@@ -131,7 +131,7 @@ function createSettingsTransactionWithoutMemos(
   setTransactionFlags(txJSON, settingsWithoutMemos)
   setTransactionFields(txJSON, settings) // Sets `null` fields to their `default`.
 
-  if (txJSON.TransferRate !== undefined) {
+  if (txJSON.TransferRate != null) {
     txJSON.TransferRate = convertTransferRate(txJSON.TransferRate)
   }
   return txJSON
@@ -142,7 +142,7 @@ function createSettingsTransaction(
   settings: FormattedSettings
 ): SettingsTransaction {
   const txJSON = createSettingsTransactionWithoutMemos(account, settings)
-  if (settings.memos !== undefined) {
+  if (settings.memos != null) {
     txJSON.Memos = settings.memos.map(utils.convertMemo)
   }
   return txJSON

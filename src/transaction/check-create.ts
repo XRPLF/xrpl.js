@@ -24,15 +24,15 @@ function createCheckCreateTransaction(
     SendMax: toRippledAmount(check.sendMax)
   }
 
-  if (check.destinationTag !== undefined) {
+  if (check.destinationTag != null) {
     txJSON.DestinationTag = check.destinationTag
   }
 
-  if (check.expiration !== undefined) {
+  if (check.expiration != null) {
     txJSON.Expiration = iso8601ToRippleTime(check.expiration)
   }
 
-  if (check.invoiceID !== undefined) {
+  if (check.invoiceID != null) {
     txJSON.InvoiceID = check.invoiceID
   }
 

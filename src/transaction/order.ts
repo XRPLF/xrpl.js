@@ -35,13 +35,13 @@ function createOrderTransaction(
   if (order.fillOrKill === true) {
     txJSON.Flags |= offerFlags.FillOrKill
   }
-  if (order.expirationTime !== undefined) {
+  if (order.expirationTime != null) {
     txJSON.Expiration = iso8601ToRippleTime(order.expirationTime)
   }
-  if (order.orderToReplace !== undefined) {
+  if (order.orderToReplace != null) {
     txJSON.OfferSequence = order.orderToReplace
   }
-  if (order.memos !== undefined) {
+  if (order.memos != null) {
     txJSON.Memos = order.memos.map(utils.convertMemo)
   }
   return txJSON as OfferCreateTransaction

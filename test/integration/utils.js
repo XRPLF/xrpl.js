@@ -26,7 +26,7 @@ function pay(api, from, to, amount, secret, currency = 'XRP', counterparty) {
     }
   };
 
-  if (counterparty !== undefined) {
+  if (counterparty != null) {
     paymentSpecification.source.maxAmount.counterparty = counterparty;
     paymentSpecification.destination.amount.counterparty = counterparty;
   }

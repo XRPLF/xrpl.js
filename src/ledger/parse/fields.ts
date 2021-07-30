@@ -18,7 +18,7 @@ function parseFields(data: any): object {
   const settings: any = {}
   for (const fieldName in AccountFields) {
     const fieldValue = data[fieldName]
-    if (fieldValue !== undefined) {
+    if (fieldValue != null) {
       const info = AccountFields[fieldName]
       settings[info.name] = parseField(info, fieldValue)
     }
@@ -36,8 +36,7 @@ function parseFields(data: any): object {
       settings.signers.threshold = data.signer_lists[0].SignerQuorum
     }
     if (data.signer_lists[0].SignerEntries) {
-      settings.signers.weights = _.map(
-        data.signer_lists[0].SignerEntries,
+      settings.signers.weights = data.signer_lists[0].SignerEntries.map(
         (entry: any) => {
           return {
             address: entry.SignerEntry.Account,

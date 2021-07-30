@@ -68,7 +68,7 @@ const INTENTIONAL_DISCONNECT_CODE = 4000
  */
 function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
   const options: WebSocket.ClientOptions = {}
-  if (config.proxy !== undefined) {
+  if (config.proxy != null) {
     const parsedURL = parseUrl(url)
     const parsedProxyURL = parseUrl(config.proxy)
     const proxyOverrides = _.omitBy(
@@ -81,9 +81,9 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
         passphrase: config.passphrase,
         cert: config.certificate
       },
-      _.isUndefined
+      value => value == null
     )
-    const proxyOptions = _.assign({}, parsedProxyURL, proxyOverrides)
+    const proxyOptions = Object.assign({}, parsedProxyURL, proxyOverrides)
     let HttpsProxyAgent
     try {
       HttpsProxyAgent = require('https-proxy-agent')
@@ -92,7 +92,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
     }
     options.agent = new HttpsProxyAgent(proxyOptions)
   }
-  if (config.authorization !== undefined) {
+  if (config.authorization != null) {
     const base64 = Buffer.from(config.authorization).toString('base64')
     options.headers = {Authorization: `Basic ${base64}`}
   }
@@ -103,9 +103,9 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
       passphrase: config.passphrase,
       cert: config.certificate
     },
-    _.isUndefined
+    value => value == null
   )
-  const websocketOptions = _.assign({}, options, optionsOverrides)
+  const websocketOptions = Object.assign({}, options, optionsOverrides)
   const websocket = new WebSocket(url, null, websocketOptions)
   // we will have a listener for each outstanding request,
   // so we have to raise the limit (the default is 10)
@@ -345,7 +345,7 @@ export class Connection extends EventEmitter {
       this.emit('error', 'badMessage', error.message, message)
       return
     }
-    if (data.type === undefined && data.error) {
+    if (data.type == null && data.error) {
       this.emit('error', data.error, data.error_message, data) // e.g. slowDown
       return
     }
