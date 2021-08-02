@@ -18,4 +18,7 @@ export interface BaseResponse {
     warning?: "load"
     warnings?: Warning[]
     forwarded?: boolean
+    error?: string
+    request?: any
+    api_version?: number
 }
