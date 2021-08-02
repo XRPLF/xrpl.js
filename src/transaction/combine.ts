@@ -8,9 +8,9 @@ import {computeBinaryTransactionHash} from '../common/hashes'
 import {JsonObject} from 'ripple-binary-codec/dist/types/serialized-type'
 
 /**
- * The transactions should all be equal EXCEPT for the 'Signers' field. 
+ * The transactions should all be equal except for the 'Signers' field. 
  */
- function validateTransactionEquality(transactions: Array<JsonObject>) {
+ function validateTransactionEquivalence(transactions: Array<JsonObject>) {
   const exampleTransaction = JSON.stringify({...transactions[0], Signers: null})
   if (transactions.slice(1).some(tx => JSON.stringify({...tx, Signers: null}) !== exampleTransaction)) {
     throw new ValidationError('txJSON is not the same for all signedTransactions')
@@ -23,10 +23,10 @@ function addressToBigNumber(address) {
 }
 
 /**
- * According to the documentation on multi-signatures:
  * If presented in binary form, the Signers array must be sorted based on 
  * the numeric value of the signer addresses, with the lowest value first. 
  * (If submitted as JSON, the submit_multisigned method handles this automatically.)
+ * https://xrpl.org/multi-signing.html
  */
 function compareSigners(a, b) {
   return addressToBigNumber(a.Signer.Account).comparedTo(
@@ -34,7 +34,7 @@ function compareSigners(a, b) {
   )
 }
 
-function getATransactionWithAllSigners(transactions: Array<JsonObject>): JsonObject {
+function getTransactionWithAllSigners(transactions: Array<JsonObject>): JsonObject {
   // Signers must be sorted - see compareSigners for more details
   const sortedSigners = _.flatMap(transactions, tx => tx.Signers)
     .filter(signer => signer)
@@ -54,9 +54,9 @@ function combine(signedTransactions: Array<string>): object {
   validate.combine({signedTransactions})
 
   const transactions: JsonObject[] = signedTransactions.map(binary.decode);
-  validateTransactionEquality(transactions)
+  validateTransactionEquivalence(transactions)
 
-  const signedTransaction = binary.encode(getATransactionWithAllSigners(transactions))
+  const signedTransaction = binary.encode(getTransactionWithAllSigners(transactions))
   return {
     signedTransaction: signedTransaction, 
     id: computeBinaryTransactionHash(signedTransaction)
