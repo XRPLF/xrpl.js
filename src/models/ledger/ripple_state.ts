@@ -1,6 +1,6 @@
 import { Amount } from "../common";
 
-export interface RippleStateLedgerEntry {
+export interface RippleState {
   LedgerEntryType: 'RippleState'
   Flags: number
   Balance: Amount

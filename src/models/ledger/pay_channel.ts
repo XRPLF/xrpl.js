@@ -1,4 +1,4 @@
-export interface PayChannelLedgerEntry {
+export interface PayChannel {
   LedgerEntryType: 'PayChannel'
   Account: string
   Destination: string
