@@ -1,7 +1,7 @@
-'use strict'; // eslint-disable-line strict
+'use strict' // eslint-disable-line strict
 
 function buildList(options) {
-  return new Array(options.count).fill(options.item);
+  return new Array(options.count).fill(options.item)
 }
 
 module.exports = {
@@ -31,8 +31,7 @@ module.exports = {
   getTransaction: {
     orderCancellation: require('./get-transaction-order-cancellation.json'),
     orderCancellationWithMemo: require('./get-transaction-order-cancellation-with-memo.json'),
-    orderWithExpirationCancellation:
-      require('./get-transaction-order-with-expiration-cancellation.json'),
+    orderWithExpirationCancellation: require('./get-transaction-order-with-expiration-cancellation.json'),
     order: require('./get-transaction-order.json'),
     orderWithMemo: require('./get-transaction-order-with-memo.json'),
     orderSell: require('./get-transaction-order-sell.json'),
@@ -48,40 +47,23 @@ module.exports = {
     trustlineNoQuality: require('./get-transaction-trust-no-quality.json'),
     trustlineAddMemo: require('./get-transaction-trust-add-memo.json'),
     notValidated: require('./get-transaction-not-validated.json'),
-    checkCreate:
-      require('./get-transaction-check-create.json'),
-    checkCreateWithMemo:
-      require('./get-transaction-check-create-with-memo.json'),
-    checkCancel:
-      require('./get-transaction-check-cancel.json'),
-    checkCancelWithMemo:
-      require('./get-transaction-check-cancel-with-memo.json'),
-    checkCash:
-      require('./get-transaction-check-cash.json'),
-    checkCashWithMemo:
-      require('./get-transaction-check-cash-with-memo.json'),
-    depositPreauthWithMemo:
-      require('./get-transaction-deposit-preauth-with-memo.json'),
-    escrowCreation:
-      require('./get-transaction-escrow-creation.json'),
-    escrowCancellation:
-      require('./get-transaction-escrow-cancellation.json'),
-    escrowExecution:
-      require('./get-transaction-escrow-execution.json'),
-    escrowExecutionSimple:
-      require('./get-transaction-escrow-execution-simple.json'),
-    paymentChannelCreate:
-      require('./get-transaction-payment-channel-create.json'),
-    paymentChannelCreateWithMemo:
-      require('./get-transaction-payment-channel-create-with-memo.json'),
-    paymentChannelFund:
-      require('./get-transaction-payment-channel-fund.json'),
-    paymentChannelFundWithMemo:
-      require('./get-transaction-payment-channel-fund-with-memo.json'),
-    paymentChannelClaim:
-      require('./get-transaction-payment-channel-claim.json'),
-    paymentChannelClaimWithMemo:
-      require('./get-transaction-payment-channel-claim-with-memo.json'),
+    checkCreate: require('./get-transaction-check-create.json'),
+    checkCreateWithMemo: require('./get-transaction-check-create-with-memo.json'),
+    checkCancel: require('./get-transaction-check-cancel.json'),
+    checkCancelWithMemo: require('./get-transaction-check-cancel-with-memo.json'),
+    checkCash: require('./get-transaction-check-cash.json'),
+    checkCashWithMemo: require('./get-transaction-check-cash-with-memo.json'),
+    depositPreauthWithMemo: require('./get-transaction-deposit-preauth-with-memo.json'),
+    escrowCreation: require('./get-transaction-escrow-creation.json'),
+    escrowCancellation: require('./get-transaction-escrow-cancellation.json'),
+    escrowExecution: require('./get-transaction-escrow-execution.json'),
+    escrowExecutionSimple: require('./get-transaction-escrow-execution-simple.json'),
+    paymentChannelCreate: require('./get-transaction-payment-channel-create.json'),
+    paymentChannelCreateWithMemo: require('./get-transaction-payment-channel-create-with-memo.json'),
+    paymentChannelFund: require('./get-transaction-payment-channel-fund.json'),
+    paymentChannelFundWithMemo: require('./get-transaction-payment-channel-fund-with-memo.json'),
+    paymentChannelClaim: require('./get-transaction-payment-channel-claim.json'),
+    paymentChannelClaimWithMemo: require('./get-transaction-payment-channel-claim-with-memo.json'),
     amendment: require('./get-transaction-amendment.json'),
     feeUpdate: require('./get-transaction-fee-update.json'),
     feeUpdateWithMemo: require('./get-transaction-fee-update-with-memo.json'),
@@ -217,5 +199,6 @@ module.exports = {
     single: require('./combine')
   },
   submit: require('./submit'),
-  ledgerEvent: require('./ledger-event')
-};
+  ledgerEvent: require('./ledger-event'),
+  generateFaucetWallet: require('./generate-faucet-wallet.json')
+}
