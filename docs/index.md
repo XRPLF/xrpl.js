@@ -47,6 +47,8 @@
   - [xAddressToClassicAddress](#xaddresstoclassicaddress)
   - [renameCounterpartyToIssuer](#renamecounterpartytoissuer)
   - [formatBidsAndAsks](#formatbidsandasks)
+- [XRPL Faucets](#xrplfaucets)
+  - [generateFaucetWallet](#generateFaucetWallet)
 - [API Methods](#api-methods)
   - [connect](#connect)
   - [disconnect](#disconnect)
@@ -1456,6 +1458,48 @@ return Promise.all(
 }
 ```
 
+# XRPL Faucets
+
+Ripple runs these parallel XRP Ledger test networks, the Testnet and Devnet, to provide a testing platform for any software products built on the XRP Ledger without using real funds.
+
+These funds are intended for testing only. The Testnet ledger and balances will be reset approximately every 90 days, or when otherwise necessary. Devnet funds may be reset without warning as needed.
+
+Testnet and Devnet balances are separate. As a precaution, do not use the Testnet or Devnet credentials on the Mainnet.
+
+## generateFaucetWallet
+
+```javascript
+function generateFaucetWallet(onTestnet = true): Promise<FaucetWallet | void>
+```
+
+### Example
+
+Generate a faucet wallet from Testnet:
+
+```javascript
+const wallet = generateFaucetWallet().then(wallet => console.log(wallet))
+```
+
+Generate a faucet wallet from Devnet:
+
+```javascript
+const wallet = generateFaucetWallet(false).then(wallet => console.log(wallet))
+```
+
+**Response**
+
+```json
+{
+    "account": {
+        "xAddress": "T7i2Q8yGcMcCQa2n6d9EvSEptT4CE6ap7Q1r1fmjstkLfsK",
+        "secret": "ssKCsaRqWh669atvv83bdYRaiHomY",
+        "classicAddress": "r9SYfmVxrb7iuCVfNhW2gqqzapfE2r6juG",
+        "address": "r9SYfmVxrb7iuCVfNhW2gqqzapfE2r6juG"
+    },
+    "amount": 1000,
+    "balance": 1000
+}
+```
 
 # API Methods
 

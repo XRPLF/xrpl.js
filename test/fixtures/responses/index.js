@@ -199,6 +199,5 @@ module.exports = {
     single: require('./combine')
   },
   submit: require('./submit'),
-  ledgerEvent: require('./ledger-event'),
-  generateFaucetWallet: require('./generate-faucet-wallet.json')
+  ledgerEvent: require('./ledger-event')
 }
