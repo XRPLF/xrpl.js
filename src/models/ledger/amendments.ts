@@ -5,7 +5,7 @@ interface Majority {
   }
 }
 
-export interface AmendmentsLedgerEntry {
+export interface Amendments {
   LedgerEntryType: 'Amendments'
   Amendments?: string[]
   Majorities?: Majority[]

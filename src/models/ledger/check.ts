@@ -1,6 +1,6 @@
 import { Amount } from "../common";
 
-export interface CheckLedgerEntry {
+export interface Check {
     LedgerEntryType: 'Check'
     Account: string
     Destination: string
