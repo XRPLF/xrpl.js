@@ -1,8 +1,9 @@
 import * as _ from 'lodash'
 import BigNumber from 'bignumber.js'
 import {deriveKeypair} from 'ripple-keypairs'
-import {Amount, RippledAmount} from './types/objects'
+import {RippledAmount} from './types/objects'
 import {ValidationError} from './errors'
+import {xAddressToClassicAddress} from 'ripple-address-codec'
 
 function isValidSecret(secret: string): boolean {
   try {
@@ -105,20 +106,31 @@ function xrpToDrops(xrp: BigNumber.Value): string {
     .toString(10)
 }
 
-function toRippledAmount(amount: Amount): RippledAmount {
+function toRippledAmount(amount: RippledAmount): RippledAmount {
+  if (typeof amount === 'string')
+    return amount;
+
   if (amount.currency === 'XRP') {
     return xrpToDrops(amount.value)
   }
   if (amount.currency === 'drops') {
     return amount.value
   }
+
+  let issuer = amount.counterparty || amount.issuer
+  let tag: number | false = false;
+
+  try {
+    ({classicAddress: issuer, tag} = xAddressToClassicAddress(issuer))
+  } catch (e) { /* not an X-address */ }
+  
+  if (tag !== false) {
+    throw new ValidationError("Issuer X-address includes a tag")
+  }
+
   return {
     currency: amount.currency,
-    issuer: amount.counterparty
-      ? amount.counterparty
-      : amount.issuer
-      ? amount.issuer
-      : undefined,
+    issuer,
     value: amount.value
   }
 }
@@ -127,9 +139,8 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
   if (typeof obj === 'object') {
     const accumulator = Array.isArray(obj) ? [] : {}
     let newKey
-    return _.reduce(
-      obj,
-      (result, value, key) => {
+    return Object.entries(obj).reduce(
+      (result, [key, value]) => {
         newKey = key
         // taking this out of function leads to error in PhantomJS
         const FINDSNAKE = /([a-zA-Z]_[a-zA-Z])/g
@@ -146,7 +157,7 @@ function convertKeysFromSnakeCaseToCamelCase(obj: any): any {
 }
 
 function removeUndefined<T extends object>(obj: T): T {
-  return _.omitBy(obj, _.isUndefined) as T
+  return _.omitBy(obj, value => value == null) as T
 }
 
 /**

@@ -15,7 +15,7 @@ This method takes two parameters.
 
 ### Return Value
 
-This method returns an object with two properties: `bids` and `asks`, each of which is an array of bids (buy orders) or asks (sell orders), respectively. (Note: the structures of `bids` and `asks` are identical.)
+This method returns an object with two properties: `bids` and `asks`, each of which is an array of bids (buy orders) or asks (sell orders), respectively. Both `bids` and `asks` are formatted the same way.
 
 Object structure:
 
@@ -23,7 +23,7 @@ Object structure:
 
 **Raw order data:** The response includes a `data` property containing the raw order data. This may include `owner_funds`, `Flags`, and other fields.
 
-For details, see the rippled method [book_offers](https://ripple.com/build/rippled-apis/#book-offers).
+For details, see the `rippled` [book_offers method](https://xrpl.org/book_offers.html).
 
 ### Example
 

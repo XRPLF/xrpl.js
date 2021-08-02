@@ -40,7 +40,7 @@ function parseAccountTxTransaction(tx, includeRawTransaction: boolean) {
   const _tx = tx.tx_blob ? parseBinaryTransaction(tx) : tx
   // rippled uses a different response format for 'account_tx' than 'tx'
   return parseTransaction(
-    _.assign({}, _tx.tx, {meta: _tx.meta, validated: _tx.validated}),
+    Object.assign({}, _tx.tx, {meta: _tx.meta, validated: _tx.validated}),
     includeRawTransaction
   )
 }
@@ -69,7 +69,7 @@ function transactionFilter(
   if (filters.excludeFailures && tx.outcome.result !== 'tesSUCCESS') {
     return false
   }
-  if (filters.types && !_.includes(filters.types, tx.type)) {
+  if (filters.types && !filters.types.includes(tx.type)) {
     return false
   }
   if (filters.initiated === true && tx.address !== address) {
@@ -150,9 +150,9 @@ function checkForLedgerGaps(
   // the range of ledgers spanned by those transactions
   if (options.limit && transactions.length === options.limit) {
     if (options.earliestFirst) {
-      maxLedgerVersion = _.last(transactions)!.outcome.ledgerVersion
+      maxLedgerVersion = transactions[transactions.length-1]!.outcome.ledgerVersion
     } else {
-      minLedgerVersion = _.last(transactions)!.outcome.ledgerVersion
+      minLedgerVersion = transactions[transactions.length-1]!.outcome.ledgerVersion
     }
   }
 
@@ -170,10 +170,9 @@ function formatResponse(
   options: TransactionsOptions,
   transactions: GetTransactionsResponse
 ) {
-  const compare = options.earliestFirst
-    ? utils.compareTransactions
-    : _.rearg(utils.compareTransactions, 1, 0)
-  const sortedTransactions = transactions.sort(compare)
+  const sortedTransactions = options.earliestFirst
+    ? transactions.sort(utils.compareTransactions)
+    : transactions.sort(utils.compareTransactions).reverse()
   return checkForLedgerGaps(connection, options, sortedTransactions).then(
     () => sortedTransactions
   )
@@ -209,11 +208,11 @@ function getTransactions(
       const bound = options.earliestFirst
         ? {minLedgerVersion: ledgerVersion}
         : {maxLedgerVersion: ledgerVersion}
-      const startOptions = _.assign({}, defaults, options, {startTx: tx}, bound)
+      const startOptions = Object.assign({}, defaults, options, {startTx: tx}, bound)
       return getTransactionsInternal(this.connection, address, startOptions)
     })
   }
-  const newOptions = _.assign({}, defaults, options)
+  const newOptions = Object.assign({}, defaults, options)
   return getTransactionsInternal(this.connection, address, newOptions)
 }
 

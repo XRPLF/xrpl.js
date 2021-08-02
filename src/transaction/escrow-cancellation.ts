@@ -23,7 +23,7 @@ function createEscrowCancellationTransaction(
     Owner: payment.owner,
     OfferSequence: payment.escrowSequence
   }
-  if (payment.memos !== undefined) {
+  if (payment.memos != null) {
     txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
   return txJSON

@@ -1,7 +1,6 @@
 import * as _ from 'lodash'
 import * as utils from './utils'
 const validate = utils.common.validate
-const toRippledAmount = utils.common.toRippledAmount
 const paymentFlags = utils.common.txFlags.Payment
 const ValidationError = utils.common.errors.ValidationError
 import {Instructions, Prepare, TransactionJSON} from './types'
@@ -12,7 +11,7 @@ import {
   MinAdjustment,
   Memo
 } from '../common/types/objects'
-import {xrpToDrops} from '../common'
+import {toRippledAmount, xrpToDrops} from '../common'
 import {RippleAPI} from '..'
 import {getClassicAccountAndTag, ClassicAccountAndTag} from './utils'
 
@@ -40,13 +39,13 @@ export interface Payment {
 function isMaxAdjustment(
   source: Adjustment | MaxAdjustment
 ): source is MaxAdjustment {
-  return (source as MaxAdjustment).maxAmount !== undefined
+  return (source as MaxAdjustment).maxAmount != null
 }
 
 function isMinAdjustment(
   destination: Adjustment | MinAdjustment
 ): destination is MinAdjustment {
-  return (destination as MinAdjustment).minAmount !== undefined
+  return (destination as MinAdjustment).minAmount != null
 }
 
 function isXRPToXRPPayment(payment: Payment): boolean {
@@ -68,7 +67,7 @@ function isIOUWithoutCounterparty(amount: Amount): boolean {
     amount &&
     amount.currency !== 'XRP' &&
     amount.currency !== 'drops' &&
-    amount.counterparty === undefined
+    amount.counterparty == null
   )
 }
 
@@ -76,8 +75,8 @@ function applyAnyCounterpartyEncoding(payment: Payment): void {
   // Convert blank counterparty to sender or receiver's address
   //   (Ripple convention for 'any counterparty')
   // https://developers.ripple.com/payment.html#special-issuer-values-for-sendmax-and-amount
-  _.forEach([payment.source, payment.destination], (adjustment) => {
-    _.forEach(['amount', 'minAmount', 'maxAmount'], (key) => {
+  [payment.source, payment.destination].forEach((adjustment) => {
+    ['amount', 'minAmount', 'maxAmount'].forEach((key) => {
       if (isIOUWithoutCounterparty(adjustment[key])) {
         adjustment[key].counterparty = adjustment.address
       }
@@ -102,7 +101,7 @@ function createMaximalAmount(amount: Amount): Amount {
   } else {
     maxValue = maxIOUValue
   }
-  return _.assign({}, amount, {value: maxValue})
+  return Object.assign({}, amount, {value: maxValue})
 }
 
 /**
@@ -151,8 +150,8 @@ function createPaymentTransaction(
   }
 
   if (
-    addressToVerifyAgainst.tag !== undefined &&
-    sourceAddressAndTag.tag !== undefined &&
+    addressToVerifyAgainst.tag != null &&
+    sourceAddressAndTag.tag != null &&
     addressToVerifyAgainst.tag !== sourceAddressAndTag.tag
   ) {
     throw new ValidationError(
@@ -201,17 +200,17 @@ function createPaymentTransaction(
     Flags: 0
   }
 
-  if (payment.invoiceID !== undefined) {
+  if (payment.invoiceID != null) {
     txJSON.InvoiceID = payment.invoiceID
   }
-  if (sourceAddressAndTag.tag !== undefined) {
+  if (sourceAddressAndTag.tag != null) {
     txJSON.SourceTag = sourceAddressAndTag.tag
   }
-  if (destinationAddressAndTag.tag !== undefined) {
+  if (destinationAddressAndTag.tag != null) {
     txJSON.DestinationTag = destinationAddressAndTag.tag
   }
-  if (payment.memos !== undefined) {
-    txJSON.Memos = _.map(payment.memos, utils.convertMemo)
+  if (payment.memos != null) {
+    txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
   if (payment.noDirectRipple === true) {
     txJSON.Flags |= paymentFlags.NoRippleDirect
@@ -234,7 +233,7 @@ function createPaymentTransaction(
       txJSON.DeliverMin = toRippledAmount(destinationAmount)
     }
 
-    if (payment.paths !== undefined) {
+    if (payment.paths != null) {
       txJSON.Paths = JSON.parse(payment.paths)
     }
   } else if (payment.allowPartialPayment === true) {

@@ -30,7 +30,7 @@
     },
     "publicKey": {
       "$ref": "publicKey",
-      "description": "Public key of the key pair the source will use to sign claims against this channel."
+      "description": "Public key of the key pair the source uses to sign claims against this channel."
     },
     "cancelAfter": {
       "type": "string",

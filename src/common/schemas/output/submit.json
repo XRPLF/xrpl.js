@@ -13,7 +13,7 @@
     },
     "engine_result": {
       "type": "string",
-      "description": "Code indicating the preliminary result of the transaction, for example `tesSUCCESS`. [List of transaction responses](https://developers.ripple.com/transaction-results.html)"
+      "description": "Code indicating the preliminary result of the transaction, for example `tesSUCCESS`. [List of transaction responses](https://xrpl.org/transaction-results.html)"
     },
     "engine_result_code": {
       "type": "integer",

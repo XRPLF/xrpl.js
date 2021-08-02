@@ -44,7 +44,7 @@ module.exports.normal = function(request, options = {}) {
       marker: options.marker,
       limit: request.limit,
       ledger_index: options.ledger,
-      lines: _.filter([{
+      lines: [{
         account: 'r3vi7mWxru9rJCxETCyA1CHvzL96eZWx5z',
         balance: '0',
         currency: 'ASP',
@@ -279,7 +279,7 @@ module.exports.normal = function(request, options = {}) {
         quality_out: 0,
         freeze: true
       }
-      ], item => !request.peer || item.account === request.peer)
+      ].filter(item => !request.peer || item.account === request.peer)
     }
   });
 };

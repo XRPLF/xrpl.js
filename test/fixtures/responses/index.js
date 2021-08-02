@@ -204,6 +204,7 @@ module.exports = {
     simple: require('./prepare-trustline-simple'),
     ticket: require('./prepare-trustline-ticket'),
     frozen: require('./prepare-trustline-frozen'),
+    issuedXAddress: require('./prepare-trustline-issuer-xaddress.json'),
     complex: require('./prepare-trustline')
   },
   sign: {

@@ -27,22 +27,22 @@ function createEscrowCreationTransaction(
     Amount: xrpToDrops(payment.amount)
   }
 
-  if (payment.condition !== undefined) {
+  if (payment.condition != null) {
     txJSON.Condition = payment.condition
   }
-  if (payment.allowCancelAfter !== undefined) {
+  if (payment.allowCancelAfter != null) {
     txJSON.CancelAfter = iso8601ToRippleTime(payment.allowCancelAfter)
   }
-  if (payment.allowExecuteAfter !== undefined) {
+  if (payment.allowExecuteAfter != null) {
     txJSON.FinishAfter = iso8601ToRippleTime(payment.allowExecuteAfter)
   }
-  if (payment.sourceTag !== undefined) {
+  if (payment.sourceTag != null) {
     txJSON.SourceTag = payment.sourceTag
   }
-  if (payment.destinationTag !== undefined) {
+  if (payment.destinationTag != null) {
     txJSON.DestinationTag = payment.destinationTag
   }
-  if (payment.memos !== undefined) {
+  if (payment.memos != null) {
     txJSON.Memos = payment.memos.map(utils.convertMemo)
   }
   if (

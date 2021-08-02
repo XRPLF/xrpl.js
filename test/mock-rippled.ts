@@ -21,12 +21,12 @@ function isBTC(json) {
 }
 
 function createResponse(request, response, overrides = {}) {
-  const result = _.assign({}, response.result, overrides)
+  const result = Object.assign({}, response.result, overrides)
   const change =
     response.result && !_.isEmpty(overrides)
       ? {id: request.id, result: result}
       : {id: request.id}
-  return JSON.stringify(_.assign({}, response, change))
+  return JSON.stringify(Object.assign({}, response, change))
 }
 
 function createLedgerResponse(request, response) {
@@ -39,10 +39,10 @@ function createLedgerResponse(request, response) {
       delete newResponse.result.ledger.accountState
     }
     // the following fields were not in the ledger response in the past
-    if (newResponse.result.ledger.close_flags === undefined) {
+    if (newResponse.result.ledger.close_flags == null) {
       newResponse.result.ledger.close_flags = 0
     }
-    if (newResponse.result.ledger.parent_close_time === undefined) {
+    if (newResponse.result.ledger.parent_close_time == null) {
       newResponse.result.ledger.parent_close_time =
         newResponse.result.ledger.close_time - 10
     }
@@ -56,13 +56,13 @@ type MockedWebSocketServer = any
 
 export function createMockRippled(port) {
   const mock = new WebSocketServer({port: port}) as MockedWebSocketServer
-  _.assign(mock, EventEmitter2.prototype)
+  Object.assign(mock, EventEmitter2.prototype)
 
   const close = mock.close
   mock.close = function () {
-    if (mock.expectedRequests !== undefined) {
-      const allRequestsMade = _.every(mock.expectedRequests, function (
-        counter
+    if (mock.expectedRequests != null) {
+      const allRequestsMade = Object.entries(mock.expectedRequests).every(function (
+        _, counter
       ) {
         return counter === 0
       })
@@ -108,11 +108,11 @@ export function createMockRippled(port) {
     if (mock.listeners(this.event).length === 0) {
       throw new Error('No event handler registered for ' + this.event)
     }
-    if (mock.expectedRequests === undefined) {
+    if (mock.expectedRequests == null) {
       return // TODO: fail here to require expectedRequests
     }
     const expectedCount = mock.expectedRequests[this.event]
-    if (expectedCount === undefined || expectedCount === 0) {
+    if (expectedCount == null || expectedCount === 0) {
       throw new Error('Unexpected request: ' + this.event)
     }
     mock.expectedRequests[this.event] -= 1
@@ -120,7 +120,7 @@ export function createMockRippled(port) {
 
   mock.on('request_config', function (request, conn) {
     assert.strictEqual(request.command, 'config')
-    conn.config = _.assign(conn.config, request.data)
+    conn.config = Object.assign(conn.config, request.data)
     conn.send(
       createResponse(request, {
         status: 'success',
@@ -174,7 +174,7 @@ export function createMockRippled(port) {
 
   mock.on('request_global_config', function (request, conn) {
     assert.strictEqual(request.command, 'global_config')
-    mock.config = _.assign(conn.config, request.data)
+    mock.config = Object.assign(conn.config, request.data)
     conn.send(
       createResponse(request, {
         status: 'success',
@@ -248,7 +248,7 @@ export function createMockRippled(port) {
       mock.config.returnEmptySubscribeRequest--
       conn.send(createResponse(request, fixtures.empty))
     } else if (request.accounts) {
-      assert(_.indexOf(_.values(addresses), request.accounts[0]) !== -1)
+      assert(Object.values(addresses).indexOf(request.accounts[0]) !== -1)
     }
     conn.send(createResponse(request, fixtures.subscribe))
   })
@@ -256,7 +256,7 @@ export function createMockRippled(port) {
   mock.on('request_unsubscribe', function (request, conn) {
     assert.strictEqual(request.command, 'unsubscribe')
     if (request.accounts) {
-      assert(_.indexOf(_.values(addresses), request.accounts[0]) !== -1)
+      assert(Object.values(addresses).indexOf(request.accounts[0]) !== -1)
     } else {
       assert.deepEqual(request.streams, ['ledger', 'server'])
     }
@@ -282,7 +282,7 @@ export function createMockRippled(port) {
       const response = Object.assign({}, fixtures.account_info.normal)
       response.Account = addresses.THIRD_ACCOUNT
       conn.send(createResponse(request, response))
-    } else if (request.account === undefined) {
+    } else if (request.account == null) {
       const response = Object.assign(
         {},
         {
@@ -346,7 +346,7 @@ export function createMockRippled(port) {
         createLedgerResponse(request, fixtures.ledger.pre2014withPartial)
       )
     } else if (request.ledger_index === 38129) {
-      const response = _.assign({}, fixtures.ledger.normal, {
+      const response = Object.assign({}, fixtures.ledger.normal, {
         result: {ledger: fullLedger}
       })
       conn.send(createLedgerResponse(request, response))

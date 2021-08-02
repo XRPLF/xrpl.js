@@ -26,13 +26,13 @@ function createPaymentChannelCreateTransaction(
     PublicKey: paymentChannel.publicKey.toUpperCase()
   }
 
-  if (paymentChannel.cancelAfter !== undefined) {
+  if (paymentChannel.cancelAfter != null) {
     txJSON.CancelAfter = iso8601ToRippleTime(paymentChannel.cancelAfter)
   }
-  if (paymentChannel.sourceTag !== undefined) {
+  if (paymentChannel.sourceTag != null) {
     txJSON.SourceTag = paymentChannel.sourceTag
   }
-  if (paymentChannel.destinationTag !== undefined) {
+  if (paymentChannel.destinationTag != null) {
     txJSON.DestinationTag = paymentChannel.destinationTag
   }
 

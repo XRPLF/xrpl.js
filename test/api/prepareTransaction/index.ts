@@ -1075,6 +1075,34 @@ export default <TestSuite>{
     assertResultMatch(response, expectedResponse, 'prepare')
   },
 
+
+  'xaddress-issuer': async (api, address) => {
+    const localInstructions = {
+      ...instructionsWithMaxLedgerVersionOffset,
+      maxFee: '0.000012'
+    }
+
+    const txJSON = {
+      TransactionType: 'Payment',
+      Account: address,
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: {
+        currency: 'USD',
+        issuer: 'XVbehP2sFMQAd5orFAy8Lt6vLHGiDhA7VMAnsv9H6WpuB1s',
+        value: '0.01'
+      },
+      SendMax: {
+        currency: 'USD',
+        issuer: 'XVbehP2sFMQAd5orFAy8Lt6vLHGiDhA7VMAnsv9H6WpuB1s',
+        value: '0.01'
+      },
+      Flags: 0
+    }
+
+    const response = await api.prepareTransaction(txJSON, localInstructions)
+    assertResultMatch(response, responses.preparePayment.normal, 'prepare')
+  },
+
   'PaymentChannelCreate': async (api, address) => {
     const localInstructions = {
       ...instructionsWithMaxLedgerVersionOffset,

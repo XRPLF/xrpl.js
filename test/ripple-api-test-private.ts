@@ -172,7 +172,7 @@ describe('RippleAPI', function () {
   it('ledger utils - getRecursive', async () => {
     function getter(marker) {
       return new Promise<RecursiveData>((resolve, reject) => {
-        if (marker !== undefined) {
+        if (marker != null) {
           reject(new Error())
           return
         }
