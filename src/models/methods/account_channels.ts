@@ -1,4 +1,5 @@
 import { BaseRequest, BaseResponse } from './base_method'
+import { LedgerIndex } from "../common"
 
 interface Channel {
     account: string
@@ -20,7 +21,7 @@ export interface AccountChannelsRequest extends BaseRequest {
     account: string
     destination_account?: string
     ledger_hash?: string
-    ledger_index?: string | number
+    ledger_index?: LedgerIndex
     limit: number
     marker: any
 }

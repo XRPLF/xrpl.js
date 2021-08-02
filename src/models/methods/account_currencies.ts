@@ -1,11 +1,12 @@
 import { BaseRequest, BaseResponse } from './base_method'
+import { LedgerIndex } from "../common"
   
 export interface AccountCurrenciesRequest extends BaseRequest {
     command: "account_currencies"
     account: string
     destination_account?: string
     ledger_hash?: string
-    ledger_index?: string | number
+    ledger_index?: LedgerIndex
     strict?: boolean
 }
 
