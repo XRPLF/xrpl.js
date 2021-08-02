@@ -1477,13 +1477,13 @@ function generateFaucetWallet(onTestnet = true): Promise<FaucetWallet | void>
 Generate a faucet wallet from Testnet:
 
 ```javascript
-const wallet = generateFaucetWallet().then(wallet => console.log(wallet))
+generateFaucetWallet().then(wallet => console.log(wallet))
 ```
 
 Generate a faucet wallet from Devnet:
 
 ```javascript
-const wallet = generateFaucetWallet(false).then(wallet => console.log(wallet))
+generateFaucetWallet(false).then(wallet => console.log(wallet))
 ```
 
 **Response**
