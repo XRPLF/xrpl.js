@@ -16,7 +16,7 @@ const DEV_FAUCET_URL = 'https://faucet.devnet.rippletest.net/accounts'
  * Generates a random wallet with some amount of XRP (usually 1000 XRP).
  *
  * @param onTestnet - If true (default), generates the wallet on the Testnet, otherwise on the Devnet
- * @returns - A Wallet on the testnet or devnet that contains some amount of XRP.
+ * @returns - A Wallet on the Testnet or Devnet that contains some amount of XRP.
  */
 function generateFaucetWallet(onTestnet = true): Promise<FaucetWallet | void> {
   const faucetUrl = getFaucetUrl(onTestnet)
@@ -32,10 +32,9 @@ function generateFaucetWallet(onTestnet = true): Promise<FaucetWallet | void> {
 }
 
 /**
- * Returns the URL of the faucet that should be used, based on whether the URL is from
- * a testnet or devnet client.
+ * Returns the URL of the faucet that should be used.
  *
- * @param url - The URL that the client is using to access the ledger.
+ * @param onTestnet - Boolean to indicate which URL to retrieve.
  * @returns - The URL of the matching faucet.
  */
 export const getFaucetUrl = (onTestnet: boolean): string => {
