@@ -47,7 +47,7 @@
   - [xAddressToClassicAddress](#xaddresstoclassicaddress)
   - [renameCounterpartyToIssuer](#renamecounterpartytoissuer)
   - [formatBidsAndAsks](#formatbidsandasks)
-- [XRPL Faucets](#xrplfaucets)
+- [XRPL Faucets](#xrpl-faucets)
   - [generateFaucetWallet](#generateFaucetWallet)
 - [API Methods](#api-methods)
   - [connect](#connect)
@@ -1460,7 +1460,7 @@ return Promise.all(
 
 # XRPL Faucets
 
-Ripple runs these parallel XRP Ledger test networks, the Testnet and Devnet, to provide a testing platform for any software products built on the XRP Ledger without using real funds.
+Ripple runs these [parallel XRP Ledger test networks](https://xrpl.org/xrp-testnet-faucet.html), the Testnet and Devnet, to provide a testing platform for any software products built on the XRP Ledger without using real funds.
 
 These funds are intended for testing only. The Testnet ledger and balances will be reset approximately every 90 days, or when otherwise necessary. Devnet funds may be reset without warning as needed.
 
