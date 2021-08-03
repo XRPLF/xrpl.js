@@ -55,7 +55,7 @@ function getBalances(
   options: GetTrustlinesOptions = {}
 ): Promise<GetBalances> {
   validate.getTrustlines({address, options})
-
+  console.log(options)
   // Only support retrieving balances without a tag,
   // since we currently do not calculate balances
   // on a per-tag basis. Apps must interpret and
