@@ -5,7 +5,12 @@ export interface LedgerEntryRequest extends BaseRequest {
     binary?: boolean
     ledger_hash?: string
     ledger_index?: string | number
+
+    // Only one of the following properties should be defined in a single request
+    // https://xrpl.org/ledger_entry.html
+
     index?: string
+    
     account_root?: string
     
     directory?: {

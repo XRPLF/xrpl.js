@@ -7,7 +7,7 @@ export interface LedgerDataRequest extends BaseRequest {
     ledger_index?: string | number
     binary?: boolean
     limit?: number
-    marker: any
+    marker?: any
 }
 
 interface LedgerDataAdditionalFields {
@@ -24,6 +24,6 @@ export interface LedgerDataResponse extends BaseResponse {
             (AccountRoot | Amendments | Check | DepositPreauth | DirectoryNode
             | Escrow | FeeSettings | LedgerHashes | NegativeUNL | Offer
             | PayChannel | RippleState | SignerList | Ticket))[]
-        marker: any
+        marker?: any
     }
 }

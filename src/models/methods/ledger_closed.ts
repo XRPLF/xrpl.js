@@ -1,6 +1,5 @@
 import { BaseRequest, BaseResponse } from "./base_method";
 
-
 export interface LedgerClosedRequest extends BaseRequest {
     command: "ledger_closed"
 }
