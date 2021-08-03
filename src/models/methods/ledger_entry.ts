@@ -13,7 +13,7 @@ export interface LedgerEntryRequest extends BaseRequest {
        dir_root?: string
        owner?: string 
     } | string
-    
+
     offer?: {
         account: string
         seq: number
@@ -38,17 +38,19 @@ export interface LedgerEntryRequest extends BaseRequest {
         authorized: string
     } | string
     
-    ticket: {
+    ticket?: {
         owner: string
         ticket_sequence: number
     } | string
 }
 
 export interface LedgerEntryResponse extends BaseResponse {
-    index: string
-    ledger_index: number
-    node?: AccountRoot | Amendments | Check | DepositPreauth | DirectoryNode | Escrow
-    | FeeSettings | LedgerHashes | NegativeUNL | Offer | PayChannel | RippleState | SignerList
-    | Ticket
-    node_binary?: string
+    result: {
+        index: string
+        ledger_index: number
+        node?: AccountRoot | Amendments | Check | DepositPreauth | DirectoryNode | Escrow
+        | FeeSettings | LedgerHashes | NegativeUNL | Offer | PayChannel | RippleState | SignerList
+        | Ticket
+        node_binary?: string
+    }
 }
