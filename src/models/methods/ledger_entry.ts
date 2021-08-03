@@ -18,7 +18,7 @@ export interface LedgerEntryRequest extends BaseRequest {
        dir_root?: string
        owner?: string 
     } | string
-    
+
     offer?: {
         account: string
         seq: number
