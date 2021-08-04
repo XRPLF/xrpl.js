@@ -1,5 +1,5 @@
 import { Amount, LedgerIndex } from "../common";
-import { BaseRequest, BaseResponse } from "./base_method";
+import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface AccountOffersRequest extends BaseRequest {
   command: "account_offers"
@@ -11,7 +11,7 @@ export interface AccountOffersRequest extends BaseRequest {
   strict?: boolean
 }
 
-export interface AccountOffer {
+interface AccountOffer {
   flags: number
   seq: number
   taker_gets: Amount

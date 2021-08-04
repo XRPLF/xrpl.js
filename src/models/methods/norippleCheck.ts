@@ -1,5 +1,5 @@
 import { LedgerIndex } from '../common'
-import { BaseRequest, BaseResponse } from './base_method';
+import { BaseRequest, BaseResponse } from './baseMethod';
 
 export interface NoRippleCheckRequest extends BaseRequest {
   command: "noripple_check"

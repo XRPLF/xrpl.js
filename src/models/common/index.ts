@@ -11,11 +11,6 @@ export interface IssuedCurrency {
   issuer: string
 }
 
-export interface Balance {
-  currency: string
-  value: string
-}
-
 export type Currency = IssuedCurrency | XRP
 
 export interface IssuedCurrencyAmount extends IssuedCurrency {

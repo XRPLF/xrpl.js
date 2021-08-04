@@ -1,4 +1,4 @@
-import { BaseRequest, BaseResponse } from './base_method'
+import { BaseRequest, BaseResponse } from './baseMethod'
 import { AccountObjectType, LedgerIndex } from "../common"
 import { Check, DepositPreauth, Escrow, Offer, PayChannel, RippleState, SignerList, Ticket } from "../ledger"
   

@@ -1,5 +1,5 @@
-import { Balance, LedgerIndex } from '../common'
-import { BaseRequest, BaseResponse } from './base_method';
+import { LedgerIndex } from '../common'
+import { BaseRequest, BaseResponse } from './baseMethod';
 
 export interface GatewayBalancesRequest extends BaseRequest {
   command: "gateway_balances"
@@ -8,6 +8,11 @@ export interface GatewayBalancesRequest extends BaseRequest {
   hotwallet: string | string[]
   ledger_hash?: string
   ledger_index?: LedgerIndex
+}
+
+interface Balance {
+  currency: string
+  value: string
 }
 
 export interface GatewayBalancesResponse extends BaseResponse {

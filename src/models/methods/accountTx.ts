@@ -1,6 +1,6 @@
 import { LedgerIndex } from "../common";
 import { TransactionMetadata } from "../common/transaction";
-import { BaseRequest, BaseResponse } from "./base_method";
+import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface AccountTxRequest extends BaseRequest {
   command: "account_tx"

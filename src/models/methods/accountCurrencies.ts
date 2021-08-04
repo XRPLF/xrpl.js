@@ -1,4 +1,4 @@
-import { BaseRequest, BaseResponse } from './base_method'
+import { BaseRequest, BaseResponse } from './baseMethod'
 import { LedgerIndex } from "../common"
   
 export interface AccountCurrenciesRequest extends BaseRequest {
