@@ -1,4 +1,4 @@
-import { BaseLedgerEntry } from "./base_ledger_entry";
+import { BaseLedgerEntry } from "./baseLedgerEntry";
 
 export interface DepositPreauth extends BaseLedgerEntry {
     LedgerEntryType: 'DepositPreauth'

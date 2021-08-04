@@ -1,4 +1,4 @@
-import { BaseLedgerEntry } from "./base_ledger_entry";
+import { BaseLedgerEntry } from "./baseLedgerEntry";
 import { IssuedCurrencyAmount } from "../common";
 
 export interface RippleState extends BaseLedgerEntry {
