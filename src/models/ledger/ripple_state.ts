@@ -1,11 +1,12 @@
-import { Amount } from "../common";
+import { BaseLedgerEntry } from "./base_ledger_entry";
+import { IssuedCurrencyAmount } from "../common";
 
-export interface RippleState {
+export interface RippleState extends BaseLedgerEntry {
   LedgerEntryType: 'RippleState'
   Flags: number
-  Balance: Amount
-  LowLimit: Amount
-  HighLimit: Amount
+  Balance: IssuedCurrencyAmount
+  LowLimit: IssuedCurrencyAmount
+  HighLimit: IssuedCurrencyAmount
   PreviousTxnID: string
   PreviousTxnLgrSeq: number
   LowNode?: string

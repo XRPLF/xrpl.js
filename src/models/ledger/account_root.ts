@@ -1,4 +1,6 @@
-export interface AccountRoot {
+import { BaseLedgerEntry } from "./base_ledger_entry";
+
+export interface AccountRoot extends BaseLedgerEntry{
     LedgerEntryType: 'AccountRoot'
     Account: string
     Balance: string

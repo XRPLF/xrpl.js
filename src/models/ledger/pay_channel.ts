@@ -1,4 +1,6 @@
-export interface PayChannel {
+import { BaseLedgerEntry } from "./base_ledger_entry";
+
+export interface PayChannel extends BaseLedgerEntry {
   LedgerEntryType: 'PayChannel'
   Account: string
   Destination: string
@@ -14,5 +16,5 @@ export interface PayChannel {
   CancelAfter?: number
   SourceTag?: number
   DestinationTag?: number
-  index: string
+  DestinationNode?: string
 }
