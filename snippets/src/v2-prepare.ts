@@ -1,3 +1,4 @@
+import { TransactionResult } from "ripple-binary-codec/dist/enums";
 import { Connection } from "../../src/common";
 import { XrpLedgerTransaction, OfferCreateTransaction } from "./v2-transactions";
 
@@ -105,22 +106,16 @@ async function prepareOfferCreate(
     return filled
 }
 
+const prepareFactory = {
+    "OfferCreate": prepareOfferCreate
+}
+
 function prepare<T extends XrpLedgerTransaction>(
     this: RippleAPI,
     transaction: T
 ): Promise<T> {
-    let prepared: T | undefined
-
-    switch (transaction.TransactionType) {
-        default:
-            throw new Error ("Unknown TransactionType")
-        case "OfferCreate": 
-            return prepareOfferCreate(this, transaction)
-        case "Payment":
-            console.log(transaction)
-    }
-
-    return prepared
+    const prepareMethod: ((api: RippleAPI, tx: T) => Promise<T>) = prepareFactory[transaction.TransactionType]
+    return prepareMethod(this, transaction)
 }
 
 
