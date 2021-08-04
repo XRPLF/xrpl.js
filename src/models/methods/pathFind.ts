@@ -1,13 +1,5 @@
-import { Amount } from '../common'
+import { Amount, Path } from '../common'
 import { BaseRequest, BaseResponse } from './baseMethod';
-
-interface PathStep {
-    account?: string
-    currency?: string
-    issuer?: string
-}
-
-type Path = PathStep[]
 
 interface BasePathFindRequest extends BaseRequest {
     command: "path_find"
@@ -33,14 +25,14 @@ interface PathFindStatusRequest extends BasePathFindRequest {
 
 export type PathFindRequest = PathFindCreateRequest | PathFindCloseRequest | PathFindStatusRequest
 
-interface PathsComputed {
+interface PathOption {
     paths_computed: Path[]
     source_amount: Amount
 }
 
 export interface PathFindResponse extends BaseResponse {
   result: {
-      alternatives: PathsComputed[]
+      alternatives: PathOption[]
       destination_account: string
       destination_amount: Amount
       source_account: string
