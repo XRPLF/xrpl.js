@@ -38,6 +38,8 @@ export interface PathFindResponse extends BaseResponse {
       source_account: string
       full_reply: boolean
       id: number | string
+      closed?: true
+      status?: true
   }
 }
 

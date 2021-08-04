@@ -8,7 +8,7 @@ interface TakerAmount {
 }
 
 export interface BookOffersRequest extends BaseRequest {
-  command: "book_offeres"
+  command: "book_offers"
   ledger_hash?: string
   ledger_index?: LedgerIndex
   limit?: number
