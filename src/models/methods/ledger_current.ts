@@ -1,4 +1,4 @@
-import { BaseRequest, BaseResponse } from "./base_method";
+import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface LedgerCurrentRequest extends BaseRequest {
     command: "ledger_current"

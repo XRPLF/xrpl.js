@@ -1,5 +1,5 @@
 import { AccountRoot, Amendments, Check, DepositPreauth, DirectoryNode, Escrow, FeeSettings, LedgerHashes, NegativeUNL, Offer, PayChannel, RippleState, SignerList, Ticket } from "../ledger";
-import { BaseRequest, BaseResponse } from './base_method'
+import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface LedgerRequest extends BaseRequest {
     command: "ledger"
