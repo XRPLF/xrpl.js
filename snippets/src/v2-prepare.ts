@@ -91,7 +91,22 @@ async function autofill<T extends XrpLedgerTransaction>(
     return tx
 }
 
-async function prepareOfferCreate(
+async function prepareOfferCreateTx(
+    api: RippleAPI,
+    tx: OfferCreateTransaction
+): Promise<OfferCreateTransaction> {
+    if (tx.TakerGets === undefined)
+        throw new Error("missing TakerGets")
+
+    if (tx.TakerPays === undefined)
+        throw new Error("missingTakerGets")
+
+    const filled = await api.autofill(tx);
+
+    return filled
+}
+
+async function preparePaymentTx(
     api: RippleAPI,
     tx: OfferCreateTransaction
 ): Promise<OfferCreateTransaction> {
@@ -107,7 +122,8 @@ async function prepareOfferCreate(
 }
 
 const prepareFactory = {
-    "OfferCreate": prepareOfferCreate
+    "OfferCreate": prepareOfferCreateTx,
+    "Payment": preparePaymentTx
 }
 
 function prepare<T extends XrpLedgerTransaction>(
@@ -129,16 +145,8 @@ async function signAndSubmit() {
         TakerPays: "100", 
     }
 
-    const offerCreate = prepareOfferCreate(api, tx)
-
     const prepared = await api.prepare(tx)
+    console.log(prepared)
 }
-
-const func2 = <A extends string>(a: A): A => {
-    //stuff
-    return `foo`  // Error!
-    //stuff
-}
-
 
 signAndSubmit()

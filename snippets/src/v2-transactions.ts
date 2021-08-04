@@ -176,22 +176,24 @@ export interface TrustSetTransaction extends BaseTransaction {
   QualityOut?: number;
 }
 
-export type XrpLedgerTransaction = AccountSetTransaction
-  | AccountDeleteTransaction
-  | CheckCancelTransaction
-  | CheckCashTransaction
-  | CheckCreateTransaction
-  | DepositPreauthTransaction
-  | EscrowCancelTransaction
-  | EscrowCreateTransaction
-  | EscrowFinishTransaction
-  | OfferCancelTransaction
-  | OfferCreateTransaction
-  | PaymentTransaction
-  | PaymentChannelClaimTransaction
-  | PaymentChannelCreateTransaction
-  | PaymentChannelFundTransaction
-  | SetRegularKeyTransaction
-  | SignerListSetTransaction
-  | TicketCreateTransaction
-  | TrustSetTransaction
+// export type XrpLedgerTransaction = AccountSetTransaction
+//   | AccountDeleteTransaction
+//   | CheckCancelTransaction
+//   | CheckCashTransaction
+//   | CheckCreateTransaction
+//   | DepositPreauthTransaction
+//   | EscrowCancelTransaction
+//   | EscrowCreateTransaction
+//   | EscrowFinishTransaction
+//   | OfferCancelTransaction
+//   | OfferCreateTransaction
+//   | PaymentTransaction
+//   | PaymentChannelClaimTransaction
+//   | PaymentChannelCreateTransaction
+//   | PaymentChannelFundTransaction
+//   | SetRegularKeyTransaction
+//   | SignerListSetTransaction
+//   | TicketCreateTransaction
+//   | TrustSetTransaction
+
+export type XrpLedgerTransaction = OfferCreateTransaction | PaymentTransaction
