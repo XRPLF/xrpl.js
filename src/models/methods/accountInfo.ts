@@ -2,7 +2,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
 import { LedgerIndex } from "../common"
 import { AccountRoot, SignerList } from "../ledger"
   
-export interface AccountCurrenciesRequest extends BaseRequest {
+export interface AccountInfoRequest extends BaseRequest {
   command: "account_info"
   account: string
   ledger_hash?: string
@@ -29,7 +29,7 @@ export interface QueueData {
   transactions?: QueueTransaction[]
 }
 
-export interface AccountCurrenciesResponse extends BaseResponse {
+export interface AccountInfoResponse extends BaseResponse {
   result: {
     account_data: AccountRoot
     signer_lists?: SignerList[]
