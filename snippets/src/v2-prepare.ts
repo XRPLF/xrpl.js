@@ -1,6 +1,6 @@
 import { TransactionResult } from "ripple-binary-codec/dist/enums";
 import { Connection } from "../../src/common";
-import { XrpLedgerTransaction, OfferCreateTransaction } from "./v2-transactions";
+import { XrpLedgerTransaction, OfferCreateTransaction, PaymentTransaction } from "./v2-transactions";
 
 interface AccountInfoRequest {
     command: "account_info";
@@ -108,14 +108,8 @@ async function prepareOfferCreateTx(
 
 async function preparePaymentTx(
     api: RippleAPI,
-    tx: OfferCreateTransaction
-): Promise<OfferCreateTransaction> {
-    if (tx.TakerGets === undefined)
-        throw new Error("missing TakerGets")
-
-    if (tx.TakerPays === undefined)
-        throw new Error("missingTakerGets")
-
+    tx: PaymentTransaction
+): Promise<PaymentTransaction> {
     const filled = await api.autofill(tx);
 
     return filled
