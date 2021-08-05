@@ -5,7 +5,7 @@ export interface Memo {
   MemoFormat?: string;
 }
 
-export interface XrpLedgerTransaction {
+export interface BaseTransaction {
   Account: string;
   TransactionType: string;
   Fee?: string;
@@ -21,7 +21,7 @@ export interface XrpLedgerTransaction {
   TxnSignature?: string;
 }
 
-export interface AccountSetTransaction extends XrpLedgerTransaction {
+export interface AccountSetTransaction extends BaseTransaction {
   TransactionType: "AccountSet";
   ClearFlag?: number;
   Domain?: string;
@@ -32,25 +32,25 @@ export interface AccountSetTransaction extends XrpLedgerTransaction {
   TickSize?: number;
 }
 
-export interface AccountDeleteTransaction extends XrpLedgerTransaction {
+export interface AccountDeleteTransaction extends BaseTransaction {
   TransactionType: "AccountDelete";
   Destination: string;
   DestinationTag?: number;
 }
 
-export interface CheckCancelTransaction extends XrpLedgerTransaction {
+export interface CheckCancelTransaction extends BaseTransaction {
   TransactionType: "CheckCancel";
   CheckID: string;
 }
 
-export interface CheckCashTransaction extends XrpLedgerTransaction {
+export interface CheckCashTransaction extends BaseTransaction {
   TransactionType: "CheckCash";
   CheckID: string;
   Amount: string;
   DeliverMin: string;
 }
 
-export interface CheckCreateTransaction extends XrpLedgerTransaction {
+export interface CheckCreateTransaction extends BaseTransaction {
   TransactionType: "CheckCreate";
   Destination: string;
   SendMax: string;
@@ -59,19 +59,19 @@ export interface CheckCreateTransaction extends XrpLedgerTransaction {
   InvoiceID?: string;
 }
 
-export interface DepositPreauthTransaction extends XrpLedgerTransaction {
+export interface DepositPreauthTransaction extends BaseTransaction {
   TransactionType: "DepositPreauth";
   Authorize?: string;
   Unauthorize?: string;
 }
 
-export interface EscrowCancelTransaction extends XrpLedgerTransaction {
+export interface EscrowCancelTransaction extends BaseTransaction {
   TransactionType: "EscrowCancel";
   Owner: string;
   OfferSequence: number;
 }
 
-export interface EscrowCreateTransaction extends XrpLedgerTransaction {
+export interface EscrowCreateTransaction extends BaseTransaction {
   TransactionType: "EscrowCreate";
   Amount: string;
   Destination: string;
@@ -81,7 +81,7 @@ export interface EscrowCreateTransaction extends XrpLedgerTransaction {
   DestinationTag?: number;
 }
 
-export interface EscrowFinishTransaction extends XrpLedgerTransaction {
+export interface EscrowFinishTransaction extends BaseTransaction {
   TransactionType: "EscrowFinish";
   Owner: string;
   OfferSequence: number;
@@ -89,12 +89,12 @@ export interface EscrowFinishTransaction extends XrpLedgerTransaction {
   Fulfillment?: string;
 }
 
-export interface OfferCancelTransaction extends XrpLedgerTransaction {
+export interface OfferCancelTransaction extends BaseTransaction {
   TransactionType: "OfferCancel";
   OfferSequence?: number;
 }
 
-export interface OfferCreateTransaction extends XrpLedgerTransaction {
+export interface OfferCreateTransaction extends BaseTransaction {
   TransactionType: "OfferCreate";
   Expiration?: number;
   OfferSequence?: number;
@@ -108,7 +108,7 @@ interface Path {
   issuer?: string;
 }
 
-export interface PaymentTransaction extends XrpLedgerTransaction {
+export interface PaymentTransaction extends BaseTransaction {
   TransactionType: "Payment";
   Amount: string;
   Destination: string;
@@ -119,7 +119,7 @@ export interface PaymentTransaction extends XrpLedgerTransaction {
   DeliverMin: string;
 }
 
-export interface PaymentChannelClaimTransaction extends XrpLedgerTransaction {
+export interface PaymentChannelClaimTransaction extends BaseTransaction {
   TransactionType: "PaymentChannelClaim";
   Channel: string;
   Balance?: string;
@@ -128,7 +128,7 @@ export interface PaymentChannelClaimTransaction extends XrpLedgerTransaction {
   PublicKey?: string;
 }
 
-export interface PaymentChannelCreateTransaction extends XrpLedgerTransaction {
+export interface PaymentChannelCreateTransaction extends BaseTransaction {
   TransactionType: "PaymentChannelCreate";
   Amount: string;
   Destination: string;
@@ -138,14 +138,14 @@ export interface PaymentChannelCreateTransaction extends XrpLedgerTransaction {
   DestinationTag?: number;
 }
 
-export interface PaymentChannelFundTransaction extends XrpLedgerTransaction {
+export interface PaymentChannelFundTransaction extends BaseTransaction {
   TransactionType: "PaymentChannelFund";
   Channel: string;
   Amount: string;
   Expiration?: number;
 }
 
-export interface SetRegularKeyTransaction extends XrpLedgerTransaction {
+export interface SetRegularKeyTransaction extends BaseTransaction {
   TransactionType: "SetRegularKey";
   RegularKey?: string;
 }
@@ -157,20 +157,41 @@ interface SignerList {
   };
 }
 
-export interface SignerListSetTransaction extends XrpLedgerTransaction {
+export interface SignerListSetTransaction extends BaseTransaction {
   TransactionType: "SignerListSet";
   SignerQuorum: number;
   SignerEntries?: Array<SignerList>;
 }
 
-export interface TicketCreateTransaction extends XrpLedgerTransaction {
+export interface TicketCreateTransaction extends BaseTransaction {
   TransactionType: "TicketCreate";
   TicketCount: number;
 }
 
-export interface TrustSetTransaction extends XrpLedgerTransaction {
+export interface TrustSetTransaction extends BaseTransaction {
   TransactionType: "TrustSet";
   LimitAmount: string;
   QualityIn?: number;
   QualityOut?: number;
 }
+
+export type Transaction =
+    AccountSetTransaction
+  | AccountDeleteTransaction
+  | CheckCancelTransaction
+  | CheckCashTransaction
+  | CheckCreateTransaction
+  | DepositPreauthTransaction
+  | EscrowCancelTransaction
+  | EscrowCreateTransaction
+  | EscrowFinishTransaction
+  | OfferCancelTransaction
+  | OfferCreateTransaction
+  | PaymentTransaction
+  | PaymentChannelClaimTransaction
+  | PaymentChannelCreateTransaction
+  | PaymentChannelFundTransaction
+  | SetRegularKeyTransaction
+  | SignerListSetTransaction
+  | TicketCreateTransaction
+  | TrustSetTransaction 

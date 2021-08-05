@@ -1,6 +1,6 @@
 import { Connection } from "../../src/common";
 import { ValidationError } from "../../src/common/errors";
-import { XrpLedgerTransaction, OfferCreateTransaction, PaymentTransaction } from "./v2-transactions";
+import { BaseTransaction, OfferCreateTransaction, PaymentTransaction, Transaction } from "./v2-transactions";
 
 interface AccountInfoRequest {
     command: "account_info";
@@ -78,7 +78,7 @@ async function getFee(this: RippleAPI): Promise<number> {
     return base * load_factor
 }
 
-async function autofill<T extends XrpLedgerTransaction>(
+async function autofill<T extends BaseTransaction>(
     this: RippleAPI,
     tx: T
 ): Promise<T> {
@@ -115,22 +115,18 @@ async function preparePaymentTx(
     return filled
 }
 
-const prepareFactory = {
-    "OfferCreate": prepareOfferCreateTx,
-    "Payment": preparePaymentTx
-}
-
-function prepare<T extends XrpLedgerTransaction>(
+async function prepare<T extends Transaction>(
     this: RippleAPI,
     transaction: T
 ): Promise<T> {
-    type Prepare = (api: RippleAPI, tx: T) => Promise<T>
-    const prepareMethod: Prepare | undefined = prepareFactory[transaction.TransactionType]
-
-    if (prepareMethod === undefined)
-        throw new ValidationError("Unknown TransactionType")
-
-    return prepareMethod(this, transaction)
+  switch (transaction.TransactionType) {
+    case "OfferCreate":
+      return prepareOfferCreateTx(this, transaction) as Promise<T>;
+    case "Payment":
+      return preparePaymentTx(this, transaction) as Promise<T>;
+    default:
+      throw new ValidationError("Unknown TransactionType");
+  }
 }
 
 
