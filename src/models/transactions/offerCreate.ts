@@ -42,6 +42,6 @@ export interface OfferCreate extends CommonFields {
     if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number')
         throw new ValidationError("OfferCreate: invalid Expiration")
 
-    if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number')
+    if (tx.OfferSequence !== undefined && typeof tx.OfferSequence !== 'number')
         throw new ValidationError("OfferCreate: invalid OfferSequence")
 }
