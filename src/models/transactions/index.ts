@@ -1,7 +1,8 @@
 import { Metadata } from "../common/metadata";
+import { OfferCreate } from "./offerCreate";
 
 
-export type Transaction = never // (For now)
+export type Transaction =
 //     AccountSet
 //   | AccountDelete
 //   | CheckCancel
@@ -12,7 +13,7 @@ export type Transaction = never // (For now)
 //   | EscrowCreate
 //   | EscrowFinish
 //   | OfferCancel
-//   | OfferCreate
+      OfferCreate
 //   | PaymentTransaction
 //   | PaymentChannelClaim
 //   | PaymentChannelCreate
