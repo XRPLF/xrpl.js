@@ -124,7 +124,6 @@ function prepare<T extends XrpLedgerTransaction>(
     this: RippleAPI,
     transaction: T
 ): Promise<T> {
-
     type Prepare = (api: RippleAPI, tx: T) => Promise<T>
     const prepareMethod: Prepare | undefined = prepareFactory[transaction.TransactionType]
 
