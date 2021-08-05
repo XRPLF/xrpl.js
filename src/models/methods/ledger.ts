@@ -1,4 +1,4 @@
-import { AccountRoot, Amendments, Check, DepositPreauth, DirectoryNode, Escrow, FeeSettings, LedgerHashes, NegativeUNL, Offer, PayChannel, RippleState, SignerList, Ticket } from "../ledger";
+import { LedgerEntry } from "../ledger";
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface LedgerRequest extends BaseRequest {
@@ -16,9 +16,7 @@ export interface LedgerRequest extends BaseRequest {
 
 interface Ledger {
     account_hash: string
-    accountState?: (AccountRoot | Amendments | Check | DepositPreauth | DirectoryNode
-        | Escrow | FeeSettings | LedgerHashes | NegativeUNL | Offer
-        | PayChannel | RippleState | SignerList | Ticket)[]
+    accountState?: LedgerEntry[]
     close_flags: number
     close_time: number
     close_time_human: string

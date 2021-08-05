@@ -1,5 +1,5 @@
-import { AccountRoot, Amendments, Check, DepositPreauth, DirectoryNode, Escrow, FeeSettings, LedgerHashes, NegativeUNL, Offer, PayChannel, RippleState, SignerList, Ticket } from "../ledger";
 import { BaseRequest, BaseResponse } from "./baseMethod";
+import { LedgerEntry } from "../ledger";
 
 export interface LedgerEntryRequest extends BaseRequest {
     binary?: boolean
@@ -53,9 +53,7 @@ export interface LedgerEntryResponse extends BaseResponse {
     result: {
         index: string
         ledger_index: number
-        node?: AccountRoot | Amendments | Check | DepositPreauth | DirectoryNode | Escrow
-        | FeeSettings | LedgerHashes | NegativeUNL | Offer | PayChannel | RippleState | SignerList
-        | Ticket
+        node?: LedgerEntry
         node_binary?: string
     }
 }
