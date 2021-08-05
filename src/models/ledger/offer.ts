@@ -1,6 +1,7 @@
 import { Amount } from "../common";
+import { BaseLedgerEntry } from "./baseLedgerEntry";
 
-export interface Offer {
+export interface Offer extends BaseLedgerEntry {
     LedgerEntryType: 'Offer'
     Flags: number
     Account: string

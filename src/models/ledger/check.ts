@@ -1,6 +1,7 @@
 import { Amount } from "../common";
+import { BaseLedgerEntry } from "./baseLedgerEntry";
 
-export interface Check {
+export interface Check extends BaseLedgerEntry {
     LedgerEntryType: 'Check'
     Account: string
     Destination: string

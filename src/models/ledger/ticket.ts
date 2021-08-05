@@ -1,4 +1,6 @@
-export interface Ticket {
+import { BaseLedgerEntry } from "./baseLedgerEntry";
+
+export interface Ticket extends BaseLedgerEntry {
     LedgerEntryType: "Ticket"
     Account: string
     Flags: number

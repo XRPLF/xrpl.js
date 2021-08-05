@@ -1,4 +1,6 @@
-export interface FeeSettings {
+import { BaseLedgerEntry } from "./baseLedgerEntry";
+
+export interface FeeSettings extends BaseLedgerEntry {
     LedgerEntryType: 'FeeSettings'
     BaseFee: string
     ReferenceFeeUnits: number
