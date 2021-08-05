@@ -1,5 +1,5 @@
-import { TransactionResult } from "ripple-binary-codec/dist/enums";
 import { Connection } from "../../src/common";
+import { ValidationError } from "../../src/common/errors";
 import { XrpLedgerTransaction, OfferCreateTransaction, PaymentTransaction } from "./v2-transactions";
 
 interface AccountInfoRequest {
@@ -124,7 +124,13 @@ function prepare<T extends XrpLedgerTransaction>(
     this: RippleAPI,
     transaction: T
 ): Promise<T> {
-    const prepareMethod: ((api: RippleAPI, tx: T) => Promise<T>) = prepareFactory[transaction.TransactionType]
+
+    type Prepare = (api: RippleAPI, tx: T) => Promise<T>
+    const prepareMethod: Prepare | undefined = prepareFactory[transaction.TransactionType]
+
+    if (prepareMethod === undefined)
+        throw new ValidationError("Unknown TransactionType")
+
     return prepareMethod(this, transaction)
 }
 
