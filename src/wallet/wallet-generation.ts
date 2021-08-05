@@ -4,7 +4,6 @@ import {RippleAPI} from '..'
 import {errors} from '../common'
 import {GeneratedAddress} from '../offline/generate-address'
 import {isValidAddress} from '../common/schema-validator'
-import {reject} from 'lodash'
 
 export interface FaucetWallet {
   account: GeneratedAddress
@@ -18,77 +17,84 @@ export enum FaucetNetwork {
 }
 
 const INTERVAL_SECONDS = 1 // Interval to check an account balance
-const MAX_ATTEMPS = 20 // Maximum attemptsto retrieve a balance
+const MAX_ATTEMPS = 20 // Maximum attempts to retrieve a balance
 
 /**
  * Generates a random wallet with some amount of XRP (usually 1000 XRP).
  *
- * @param wallet - An existing XRPL wallet to fund, if undefined, a new wallet will be created.
+ * @param address - An existing XRPL address to fund, if undefined, a new wallet will be created.
+ * @param url - Custom faucet URL to use.
  * @returns - A Wallet on the Testnet or Devnet that contains some amount of XRP.
  */
 async function generateFaucetWallet(
   this: RippleAPI,
-  wallet?: string
+  address?: string,
+  url?: string
 ): Promise<FaucetWallet | void> {
   let body = {}
   let startingBalance = 0
-  let address: string
 
   // If the user provides an existing wallet to fund
-  if (wallet && isValidAddress(wallet)) {
+  if (address && isValidAddress(address)) {
     // Create the POST request body
     body = {
-      destination: wallet
+      destination: address
     }
     // Retrieve the existing account balance
-    try {
-      const accountToFundBalance = await getWalletBalanceByCurrency(
-        this,
-        wallet
-      )
-      if (accountToFundBalance) {
-        startingBalance = +accountToFundBalance
-      } else {
-        startingBalance = 0
-      }
-    } catch (err) {
-      reject(
-        new errors.XRPLFaucetError(
-          `Unable to retrieve the balance of your account ${wallet}`
-        )
-      )
+    const addressToFundBalance = await getAddressXrpBalance(this, address)
+
+    // Check the address balance is not undefined and is a number
+    if (addressToFundBalance && !isNaN(+addressToFundBalance)) {
+      startingBalance = +addressToFundBalance
+    } else {
+      startingBalance = 0
     }
-    // And its address
-    address = wallet
   }
 
-  // Based on the connection URL, retrieve the correct faucet URL
-  const faucetNetwork = getFaucetUrl(this)
+  let faucetUrl: string
+  // If the user provides a custom Faucet URL
+  if (url) {
+    faucetUrl = url
+  } else {
+    // Otherwise, based on the connection URL, retrieve the correct faucet URL
+    faucetUrl = getFaucetUrl(this)
+  }
 
   return new Promise((resolve, reject) => {
     axios
-      .post<FaucetWallet>(faucetNetwork, body)
+      .post<FaucetWallet>(faucetUrl, body)
       .then(async (response) => {
-        address = response.data.account.classicAddress
-        try {
-          // Check at regular interval if the account is enabled on the XRPL and funded
-          const isAcctFunded = await hasAccountBalanceIncreased(
-            this,
-            address,
-            startingBalance
-          )
-
-          if (isAcctFunded) {
-            resolve(response.data)
-          } else {
-            reject(
-              new errors.XRPLFaucetError(
-                `Unable to fund address with faucet after waiting ${INTERVAL_SECONDS} seconds`
-              )
+        const classicAddress = response.data.account.classicAddress
+        // If classicAddress is not undefined
+        if (classicAddress) {
+          try {
+            // Check at regular interval if the address is enabled on the XRPL and funded
+            const isFunded = await hasAddressBalanceIncreased(
+              this,
+              classicAddress,
+              startingBalance
             )
+
+            if (isFunded) {
+              resolve(response.data)
+            } else {
+              reject(
+                new errors.XRPLFaucetError(
+                  `Unable to fund address with faucet after waiting ${
+                    INTERVAL_SECONDS * MAX_ATTEMPS
+                  } seconds`
+                )
+              )
+            }
+          } catch (err) {
+            reject(new errors.XRPLFaucetError(err))
           }
-        } catch (err) {
-          reject(new errors.XRPLFaucetError(err))
+        } else {
+          reject(
+            new errors.XRPLFaucetError(
+              `The faucet account classic address is undefined`
+            )
+          )
         }
       })
       .catch((error) => {
@@ -98,52 +104,39 @@ async function generateFaucetWallet(
 }
 
 /**
- * Retrieves an XRPL address balance by currency
+ * Retrieves an XRPL address XRP balance
  *
  * @param api - RippleAPI
- * @param address - Wallet address.
- * @param currency - Currency to search, default XRP.
+ * @param address - XRPL address.
  * @returns
  */
-async function getWalletBalanceByCurrency(
+async function getAddressXrpBalance(
   api: RippleAPI,
-  address: string,
-  currency: string = 'XRP'
+  address: string
 ): Promise<string> {
-  let curr = currency
-
-  // If issued currency longer than 3 characters
-  if (currency.length > 3) {
-    curr = Buffer.from(currency, 'ascii')
-      .toString('hex')
-      .toUpperCase()
-      .padEnd(40, '0')
-  }
-
+  // Get all the account balances
   try {
-    // Get all the account balances
     const balances = await api.getBalances(address)
 
-    // Retrieve only the 'curr' (typically XRP) balance
-    const xrpCurrency = balances.filter((balance) => {
-      return balance.currency === curr
-    })
-
-    return xrpCurrency[0].value
+    // Retrieve the XRP balance
+    const xrpBalance = balances.filter(
+      (balance) => balance.currency.toUpperCase() === 'XRP'
+    )
+    return xrpBalance[0].value
   } catch (err) {
-    reject(`Account ${address} does not exist`)
+    return `Unable to retrieve ${address} balance. Error: ${err}`
   }
 }
 
 /**
- * Check at regular interval if the account is enabled on the XRPL and funded
+ * Check at regular interval if the address is enabled on the XRPL and funded
  *
  * @param api - RippleAPI
  * @param address - the account address to check
  * @param originalBalance - the initial balance before the funding
  * @returns A Promise boolean
  */
-async function hasAccountBalanceIncreased(
+async function hasAddressBalanceIncreased(
   api: RippleAPI,
   address: string,
   originalBalance: number
@@ -153,21 +146,22 @@ async function hasAccountBalanceIncreased(
     const interval = setInterval(async () => {
       if (attempts < 0) {
         clearInterval(interval)
-        reject(false)
+        resolve(false)
       } else {
         attempts--
       }
 
       try {
-        const newBalance = +(await getWalletBalanceByCurrency(api, address))
+        const newBalance = +(await getAddressXrpBalance(api, address))
         if (newBalance > originalBalance) {
           clearInterval(interval)
           resolve(true)
         }
       } catch (err) {
+        clearInterval(interval)
         reject(
           new errors.XRPLFaucetError(
-            `Unable to check the account ${address} balance...`
+            `Unable to check if the address ${address} balance has increased. Error: ${err}`
           )
         )
       }
