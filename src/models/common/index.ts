@@ -23,3 +23,9 @@ export interface IssuedCurrencyAmount extends IssuedCurrency {
 }
 
 export type Amount = IssuedCurrencyAmount | string
+
+export interface Memo {
+  MemoData?: string;
+  MemoType?: string;
+  MemoFormat?: string;
+}

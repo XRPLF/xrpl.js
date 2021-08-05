@@ -29,7 +29,7 @@ interface DeletedNode {
 
 type Node = CreatedNode | ModifiedNode | DeletedNode
 
-export interface TransactionMetadata {
+export interface Metadata {
     AffectedNodes: Node[]
     DeliveredAmount?: Amount
     delivered_amount?: Amount
