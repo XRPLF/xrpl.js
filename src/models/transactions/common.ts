@@ -1,5 +1,5 @@
 import { ValidationError } from "../../common/errors"
-import { Memo } from "../common"
+import { Memo, Signer } from "../common"
 
 const transactionTypes = [
     "AccountSet",
@@ -33,13 +33,25 @@ const isMemo = (obj: {Memo: Memo}): boolean => {
     const validType = memo.MemoType === undefined
         || typeof memo.MemoType === 'string'
 
+    const otherKeys = Object.keys(memo).every((key: string) => {
+        return key === "MemoFormat" 
+            || key === "MemoData"
+            || key === "MemoType"
+    })
+
     return (1 <= size && size <= 3) 
         && validData 
         && validFormat 
         && validType
+        && otherKeys
 }
 
-const isString = (s: string): boolean => typeof s === 'string'
+const isSigner = (signer: Signer): boolean => {
+    return Object.keys(signer).length === 3
+        && typeof signer.Account === 'string'
+        && typeof signer.TxnSignature === 'string'
+        && typeof signer.SigningPubKey === 'string'
+}
 
 export interface CommonFields {
   Account: string;
@@ -50,13 +62,12 @@ export interface CommonFields {
   Flags?: number;
   LastLedgerSequence?: number;
   Memos?: Array<{ Memo: Memo }>;
-  Signers?: Array<string>;
+  Signers?: Array<Signer>;
   SourceTag?: number;
-  SigningPublicKey?: string;
+  SigningPubKey?: string;
   TicketSequence?: number;
   TxnSignature?: string;
 }
-
 
 /**
  * verify the common fields of a transaction. The verify functionality will be
@@ -83,7 +94,7 @@ export function verifyCommonFields(common: CommonFields): void {
     if (!transactionTypes.includes(common.TransactionType))
         throw new ValidationError("CommonFields: Unknown TransactionType")
 
-    if (common.Fee !== undefined && typeof common.Fee !== 'number')
+    if (common.Fee !== undefined && typeof common.Fee !== 'string')
         throw new ValidationError("CommonFields: invalid Fee")
 
     if (common.Sequence !== undefined && typeof common.Sequence !== 'number')
@@ -93,32 +104,33 @@ export function verifyCommonFields(common: CommonFields): void {
         throw new ValidationError("CommonFields: invalid Flags")
 
     if (common.AccountTxnID !== undefined 
-     && typeof common.AccountTxnID !== 'string')
+        && typeof common.AccountTxnID !== 'string')
         throw new ValidationError("CommonFields: invalid AccountTxnID")
 
     if (common.LastLedgerSequence !== undefined 
-     && typeof common.LastLedgerSequence !== 'number')
+        && typeof common.LastLedgerSequence !== 'number')
         throw new ValidationError("CommonFields: invalid LastLedgerSequence")
 
-    if (common.Memos !== undefined && !common.Memos.every(isMemo))
-        throw new ValidationError("CommonFields: invalid Memo")
+    if (common.Memos !== undefined 
+        && (common.Memos.length === 0 || !common.Memos.every(isMemo)))
+        throw new ValidationError("CommonFields: invalid Memos")
 
-    if (common.Signers !== undefined && !common.Signers.every(isString))
+    if (common.Signers !== undefined
+        && (common.Signers.length === 0 || !common.Signers.every(isSigner)))
         throw new ValidationError("CommonFields: invalid Signers")
 
-    if (common.SourceTag !== undefined && typeof common.SourceTag !== 'string')
+    if (common.SourceTag !== undefined && typeof common.SourceTag !== 'number')
         throw new ValidationError("CommonFields: invalid SourceTag")
 
-    if (common.SigningPublicKey !== undefined 
-     && typeof common.SigningPublicKey !== 'string')
-        throw new ValidationError("CommonFields: invalid SigningPublicKey")
+    if (common.SigningPubKey !== undefined 
+        && typeof common.SigningPubKey !== 'string')
+        throw new ValidationError("CommonFields: invalid SigningPubKey")
 
     if (common.TicketSequence !== undefined 
-     && typeof common.TicketSequence !== 'number')
+        && typeof common.TicketSequence !== 'number')
         throw new ValidationError("CommonFields: invalid TicketSequence")
 
     if (common.TxnSignature !== undefined 
-     && typeof common.TxnSignature !== 'string')
+        && typeof common.TxnSignature !== 'string')
         throw new ValidationError("CommonFields: invalid TxnSignature")
-
 }
