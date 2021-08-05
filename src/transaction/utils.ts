@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import * as common from '../common'
 import {Memo} from '../common/types/objects'
 import {Instructions, Prepare, TransactionJSON} from './types'
+import {toRippledAmount} from '../common'
 import {RippleAPI} from '..'
 import {ValidationError} from '../common/errors'
 import {xAddressToClassicAddress, isValidXAddress} from 'ripple-address-codec'
@@ -200,6 +201,16 @@ function prepareTransaction(
     }
   }
 
+  function convertIssuedCurrencyToAccountIfPresent(fieldName: string): void {
+    const amount = txJSON[fieldName]
+    if (typeof amount  === 'number'
+     || amount instanceof Array
+     || amount == null)
+      return
+
+    newTxJSON[fieldName] = toRippledAmount(amount)
+  }
+
   // DepositPreauth:
   convertToClassicAccountIfPresent('Authorize')
   convertToClassicAccountIfPresent('Unauthorize')
@@ -209,6 +220,18 @@ function prepareTransaction(
 
   // SetRegularKey:
   convertToClassicAccountIfPresent('RegularKey')
+
+  // Payment
+  convertIssuedCurrencyToAccountIfPresent('Amount')
+  convertIssuedCurrencyToAccountIfPresent('SendMax')
+  convertIssuedCurrencyToAccountIfPresent('DeliverMin')
+
+  // OfferCreate
+  convertIssuedCurrencyToAccountIfPresent('TakerPays')
+  convertIssuedCurrencyToAccountIfPresent('TakerGets')
+
+  // TrustSet
+  convertIssuedCurrencyToAccountIfPresent('LimitAmount')
 
   setCanonicalFlag(newTxJSON)
 

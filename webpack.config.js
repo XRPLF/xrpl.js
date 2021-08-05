@@ -1,6 +1,7 @@
 'use strict';
 const path = require('path');
 const webpack = require('webpack');
+const assert = require('assert');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 function getDefaultConfiguration() {
@@ -40,14 +41,77 @@ function getDefaultConfiguration() {
 };
 }
 
+function webpackForTest(testFileName) {
+  const match = testFileName.match(/\/?([^\/]*)-test.ts$/);
+  if (!match) {
+    assert(false, 'wrong filename:' + testFileName);
+  }
+
+  const test = {
+    cache: true,
+    externals: [{
+      'lodash': '_',
+      'ripple-api': 'ripple',
+      'net': 'null'
+    }],
+    entry: testFileName,
+    output: {
+      library: match[1].replace(/-/g, '_'),
+      path: path.join(__dirname, './test-compiled-for-web/'),
+      filename: match[1] + '-test.js'
+    },
+    plugins: [
+      new webpack.ProvidePlugin({ process: 'process/browser' }),
+      new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] })
+    ],
+    module: {
+      rules: [{
+        test: /jayson/,
+        use: 'null',
+      }, {
+        test: /\.ts$/,
+        use: [{
+          loader: 'ts-loader',
+          options: {
+            compilerOptions: {
+              composite: false,
+              declaration: false,
+              declarationMap: false
+            }
+          },
+        }],
+      }]
+    },
+    node: {
+      global: true,
+      __filename: false,
+      __dirname: true,
+    },
+    resolve: {
+      extensions: [ '.ts', '.js', '.json' ],
+      fallback: { 
+        "buffer": require.resolve("buffer/"),
+        "assert": require.resolve("assert/"),
+        "url": require.resolve("url/"),
+        "stream": require.resolve("stream-browserify"),
+        "crypto": require.resolve("crypto-browserify"),
+        "path": require.resolve("path-browserify"),
+        "http": require.resolve("stream-http"),
+        "fs": false
+      }
+    }
+  };
+  return Object.assign({}, getDefaultConfiguration(), test);
+}
+
 module.exports = [
-  function(env, argv) {
+  (env, argv) => {
     const config = getDefaultConfiguration();
     config.mode = 'development';
     config.output.filename = `ripple-latest.js`;
     return config;
   },
-  function(env, argv) {
+  (env, argv) => {
     const config = getDefaultConfiguration();
     config.mode = 'production';
     config.output.filename = `ripple-latest-min.js`;
@@ -56,4 +120,5 @@ module.exports = [
     }
     return config;
   },
+  (env, argv) => webpackForTest('./test/integration/integration-test.ts'),
 ];
