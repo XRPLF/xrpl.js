@@ -1,4 +1,4 @@
-import axios from 'axios'
+import https = require('https')
 
 import {RippleAPI} from '..'
 import {errors} from '../common'
@@ -12,8 +12,8 @@ export interface FaucetWallet {
 }
 
 export enum FaucetNetwork {
-  Testnet = 'https://faucet.altnet.rippletest.net/accounts',
-  Devnet = 'https://faucet.devnet.rippletest.net/accounts'
+  Testnet = 'faucet.altnet.rippletest.net',
+  Devnet = 'faucet.devnet.rippletest.net'
 }
 
 const INTERVAL_SECONDS = 1 // Interval to check an account balance
@@ -23,23 +23,25 @@ const MAX_ATTEMPS = 20 // Maximum attempts to retrieve a balance
  * Generates a random wallet with some amount of XRP (usually 1000 XRP).
  *
  * @param address - An existing XRPL address to fund, if undefined, a new wallet will be created.
- * @param url - Custom faucet URL to use.
  * @returns - A Wallet on the Testnet or Devnet that contains some amount of XRP.
  */
 async function generateFaucetWallet(
   this: RippleAPI,
-  address?: string,
-  url?: string
+  address?: string
 ): Promise<FaucetWallet | void> {
-  let body = {}
+  // Initialize some variables
+  let body: Uint8Array
   let startingBalance = 0
+  let faucetUrl = getFaucetUrl(this)
 
   // If the user provides an existing wallet to fund
   if (address && isValidAddress(address)) {
     // Create the POST request body
-    body = {
-      destination: address
-    }
+    body = new TextEncoder().encode(
+      JSON.stringify({
+        destination: address
+      })
+    )
     // Retrieve the existing account balance
     const addressToFundBalance = await getAddressXrpBalance(this, address)
 
@@ -51,55 +53,79 @@ async function generateFaucetWallet(
     }
   }
 
-  let faucetUrl: string
-  // If the user provides a custom Faucet URL
-  if (url) {
-    faucetUrl = url
-  } else {
-    // Otherwise, based on the connection URL, retrieve the correct faucet URL
-    faucetUrl = getFaucetUrl(this)
+  // Options to pass to https.request
+  const options = {
+    hostname: faucetUrl,
+    port: 443,
+    path: '/accounts',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': body ? body.length : 0
+    }
   }
 
   return new Promise((resolve, reject) => {
-    axios
-      .post<FaucetWallet>(faucetUrl, body)
-      .then(async (response) => {
-        const classicAddress = response.data.account.classicAddress
-        // If classicAddress is not undefined
-        if (classicAddress) {
-          try {
-            // Check at regular interval if the address is enabled on the XRPL and funded
-            const isFunded = await hasAddressBalanceIncreased(
-              this,
-              classicAddress,
-              startingBalance
-            )
+    const request = https.request(options, (response) => {
+      const chunks = []
+      response.on('data', (d) => {
+        chunks.push(d)
+      })
+      response.on('end', async () => {
+        const body = Buffer.concat(chunks).toString()
 
-            if (isFunded) {
-              resolve(response.data)
-            } else {
-              reject(
-                new errors.XRPLFaucetError(
-                  `Unable to fund address with faucet after waiting ${
-                    INTERVAL_SECONDS * MAX_ATTEMPS
-                  } seconds`
-                )
+        // "application/json; charset=utf-8"
+        if (response.headers['content-type'].startsWith('application/json')) {
+          const wallet: FaucetWallet = JSON.parse(body)
+          const classicAddress = wallet.account.classicAddress
+
+          if (classicAddress) {
+            try {
+              // Check at regular interval if the address is enabled on the XRPL and funded
+              const isFunded = await hasAddressBalanceIncreased(
+                this,
+                classicAddress,
+                startingBalance
               )
+
+              if (isFunded) {
+                resolve(wallet)
+              } else {
+                reject(
+                  new errors.XRPLFaucetError(
+                    `Unable to fund address with faucet after waiting ${
+                      INTERVAL_SECONDS * MAX_ATTEMPS
+                    } seconds`
+                  )
+                )
+              }
+            } catch (err) {
+              reject(new errors.XRPLFaucetError(err))
             }
-          } catch (err) {
-            reject(new errors.XRPLFaucetError(err))
+          } else {
+            reject(
+              new errors.XRPLFaucetError(
+                `The faucet account classic address is undefined`
+              )
+            )
           }
         } else {
-          reject(
-            new errors.XRPLFaucetError(
-              `The faucet account classic address is undefined`
-            )
-          )
+          reject({
+            statusCode: response.statusCode,
+            contentType: response.headers['content-type'],
+            body
+          })
         }
       })
-      .catch((error) => {
-        reject(new errors.XRPLFaucetError(error.data))
-      })
+    })
+    // POST the body
+    request.write(body ? body : '')
+
+    request.on('error', (error) => {
+      reject(error)
+    })
+
+    request.end()
   })
 }
 
