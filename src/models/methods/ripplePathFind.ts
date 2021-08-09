@@ -12,7 +12,7 @@ export interface RipplePathFindRequest extends BaseRequest {
     destination_account: string
     destination_amount: Amount
     send_max?: Amount
-    source_currencies: SourceCurrencyAmount
+    source_currencies?: SourceCurrencyAmount
     ledger_hash?: string
     ledger_index?: LedgerIndex
 }
