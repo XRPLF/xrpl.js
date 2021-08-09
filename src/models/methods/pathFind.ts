@@ -37,7 +37,7 @@ export interface PathFindResponse extends BaseResponse {
       destination_amount: Amount
       source_account: string
       full_reply: boolean
-      id: number | string
+      id?: number | string
       closed?: true
       status?: true
   }
