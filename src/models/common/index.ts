@@ -18,3 +18,11 @@ export interface IssuedCurrencyAmount extends IssuedCurrency {
 }
 
 export type Amount = IssuedCurrencyAmount | string
+
+interface PathStep {
+  account?: string
+  currency?: string
+  issuer?: string
+}
+
+export type Path = PathStep[]
