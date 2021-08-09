@@ -444,7 +444,7 @@ describe('Transaction Verification', function () {
             Fee: "12",
             Flags: 2147483648,
             LastLedgerSequence: 65477763,
-            OfferSequence: 4294967296,
+            OfferSequence: "99",
             Sequence: 219793,
             SigningPubKey: "02775208415B30A20F98C36AAB9A905A7BAC5889CFE7E55D968E7B9D28B93F342...",
             TransactionType: "OfferCancel",
@@ -455,7 +455,7 @@ describe('Transaction Verification', function () {
         assert.throws(
             () => verifyOfferCancel(offer),
             ValidationError,
-            "OfferCreate: invalid TakerGets"
+            "OfferCancel: invalid OfferSequence"
         )
     })
 })
