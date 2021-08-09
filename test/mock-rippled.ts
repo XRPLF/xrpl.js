@@ -669,7 +669,11 @@ export function createMockRippled(port) {
     } else if (request.account === addresses.THIRD_ACCOUNT) {
       conn.send(accountLinesResponse.manyItems(request))
     } else if (request.account === addresses.FOURTH_ACCOUNT) {
-      conn.send(accountLinesResponse.ripplingDisabled(request))
+      if (request.ledger_index === 5) {
+        conn.send(accountLinesResponse.manyItems(request))
+      } else {
+        conn.send(accountLinesResponse.ripplingDisabled(request))
+      }
     } else if (request.account === addresses.NOTFOUND) {
       conn.send(createResponse(request, fixtures.account_info.notfound))
     } else {

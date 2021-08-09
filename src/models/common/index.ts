@@ -20,3 +20,11 @@ export interface IssuedCurrencyAmount extends IssuedCurrency {
 export type Amount = IssuedCurrencyAmount | string
 
 export type StreamType = "consensus" | "ledger" | "manifests" | "peer_status" | "transactions" | "transactions_proposed" | "server" | "validations"
+
+interface PathStep {
+  account?: string
+  currency?: string
+  issuer?: string
+}
+
+export type Path = PathStep[]

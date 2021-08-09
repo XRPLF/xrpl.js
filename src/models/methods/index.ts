@@ -9,8 +9,13 @@ import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalanc
 import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
 import { ConsensusStream, LedgerStream, OrderBookStream, PeerStatusStream, Stream, SubscribeRequest, SubscribeResponse, TransactionStream, ValidationStream } from "./subscribe";
 import { UnsubscribeRequest, UnsubscribeResponse } from "./unsubscribe";
+import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
+import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
+import { PathFindRequest, PathFindResponse } from "./pathFind";
+import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
 
-type Request = AccountChannelsRequest 
+type Request = // account methods
+               AccountChannelsRequest 
              | AccountCurrenciesRequest
              | AccountInfoRequest
              | AccountLinesRequest
@@ -19,10 +24,17 @@ type Request = AccountChannelsRequest
              | AccountTxRequest
              | GatewayBalancesRequest
              | NoRippleCheckRequest
+               // path and order book methods
+             | BookOffersRequest
+             | DepositAuthorizedRequest
+             | PathFindRequest
+             | RipplePathFindRequest
+               // subscription methods
              | SubscribeRequest
              | UnsubscribeRequest
 
-type Response = AccountChannelsResponse 
+type Response = // account methods
+                AccountChannelsResponse 
               | AccountCurrenciesResponse
               | AccountInfoResponse
               | AccountLinesResponse
@@ -31,13 +43,19 @@ type Response = AccountChannelsResponse
               | AccountTxResponse
               | GatewayBalancesResponse
               | NoRippleCheckResponse
+                // path and order book methods
+              | BookOffersResponse
+              | DepositAuthorizedResponse
+              | PathFindResponse
+              | RipplePathFindResponse
+                // subscription methods
               | SubscribeResponse
               | UnsubscribeResponse
 
 export {
-    // Account methods
     Request,
     Response,
+    // account methods
     AccountChannelsRequest,
     AccountChannelsResponse,
     AccountCurrenciesRequest,
@@ -56,6 +74,15 @@ export {
     GatewayBalancesResponse,
     NoRippleCheckRequest,
     NoRippleCheckResponse,
+    // path and order book methods
+    BookOffersRequest,
+    BookOffersResponse,
+    DepositAuthorizedRequest,
+    DepositAuthorizedResponse,
+    PathFindRequest,
+    PathFindResponse,
+    RipplePathFindRequest,
+    RipplePathFindResponse,
     // Subscribe methods/streams
     SubscribeRequest,
     SubscribeResponse,
