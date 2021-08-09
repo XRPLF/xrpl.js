@@ -7,6 +7,8 @@ import { AccountOffersRequest, AccountOffersResponse } from "./accountOffers";
 import { AccountTxRequest, AccountTxResponse } from "./accountTx";
 import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalances";
 import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
+import { ConsensusStream, LedgerStream, OrderBookStream, PeerStatusStream, Stream, SubscribeRequest, SubscribeResponse, TransactionStream, ValidationStream } from "./subscribe";
+import { UnsubscribeRequest, UnsubscribeResponse } from "./unsubscribe";
 
 type Request = AccountChannelsRequest 
              | AccountCurrenciesRequest
@@ -17,6 +19,8 @@ type Request = AccountChannelsRequest
              | AccountTxRequest
              | GatewayBalancesRequest
              | NoRippleCheckRequest
+             | SubscribeRequest
+             | UnsubscribeRequest
 
 type Response = AccountChannelsResponse 
               | AccountCurrenciesResponse
@@ -27,8 +31,11 @@ type Response = AccountChannelsResponse
               | AccountTxResponse
               | GatewayBalancesResponse
               | NoRippleCheckResponse
+              | SubscribeResponse
+              | UnsubscribeResponse
 
 export {
+    // Account methods
     Request,
     Response,
     AccountChannelsRequest,
@@ -48,5 +55,17 @@ export {
     GatewayBalancesRequest,
     GatewayBalancesResponse,
     NoRippleCheckRequest,
-    NoRippleCheckResponse
+    NoRippleCheckResponse,
+    // Subscribe methods/streams
+    SubscribeRequest,
+    SubscribeResponse,
+    Stream,
+    LedgerStream,
+    ValidationStream,
+    TransactionStream,
+    PeerStatusStream,
+    OrderBookStream,
+    ConsensusStream,
+    UnsubscribeRequest,
+    UnsubscribeResponse
 }
