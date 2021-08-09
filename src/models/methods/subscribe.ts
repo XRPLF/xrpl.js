@@ -1,8 +1,6 @@
 import { BaseRequest, BaseResponse } from './baseMethod'
-import { Currency } from "../common"
+import { Currency, StreamType } from "../common"
 import { TransactionMetadata } from '../common/transaction'
-
-type StreamType = "consensus" | "ledger" | "manifests" | "peer_status" | "transactions" | "transactions_proposed" | "server" | "validations"
 
 interface Book {
     taker_gets: Currency
