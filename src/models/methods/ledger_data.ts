@@ -1,10 +1,11 @@
+import { LedgerIndex } from "../common";
 import { LedgerEntry } from "../ledger";
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface LedgerDataRequest extends BaseRequest {
     command: "ledger_data"
     ledger_hash?: string
-    ledger_index?: string | number
+    ledger_index?: LedgerIndex
     binary?: boolean
     limit?: number
     marker?: any

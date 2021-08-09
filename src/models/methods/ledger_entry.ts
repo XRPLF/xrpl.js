@@ -1,10 +1,11 @@
 import { BaseRequest, BaseResponse } from "./baseMethod";
 import { LedgerEntry } from "../ledger";
+import { LedgerIndex } from "../common";
 
 export interface LedgerEntryRequest extends BaseRequest {
     binary?: boolean
     ledger_hash?: string
-    ledger_index?: string | number
+    ledger_index?: LedgerIndex
 
     // Only one of the following properties should be defined in a single request
     // https://xrpl.org/ledger_entry.html

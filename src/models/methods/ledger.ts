@@ -1,10 +1,11 @@
+import { LedgerIndex } from "../common";
 import { LedgerEntry } from "../ledger";
 import { BaseRequest, BaseResponse } from "./baseMethod";
 
 export interface LedgerRequest extends BaseRequest {
     command: "ledger"
     ledger_hash?: string,
-    ledger_index?: string | number
+    ledger_index?: LedgerIndex
     full?: boolean
     accounts?: boolean
     transactions?: boolean
@@ -28,15 +29,12 @@ interface Ledger {
     parent_hash: string
     total_coins: string
     transaction_hash: string 
-    transactions?: (string | JSON)[] //https://xrpl.org/ledger.html
+    transactions?: any[] // TODO: Retype this once we have transaction types
 }
 
 interface LedgerQueueData {
     account: string
-    tx: string | JSON | 
-    {
-        tx_blob: string
-    }  
+    tx: any // TODO: Retype this once we have transaction types (Also include tx_blob as possible type: https://xrpl.org/ledger.html)
     retries_remaining: number
     preflight_result: string
     last_result?: string
@@ -49,7 +47,7 @@ interface LedgerQueueData {
 export interface LedgerResponse extends BaseResponse {
     result: {
         ledger_hash: string
-        ledger_index: string | number
+        ledger_index: LedgerIndex
         queue_data?: (LedgerQueueData | string)[]
         owner_funds?: string
     } & Ledger
