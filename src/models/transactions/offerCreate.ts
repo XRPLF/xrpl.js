@@ -2,16 +2,26 @@ import { ValidationError } from "../../common/errors";
 import { Amount, IssuedCurrencyAmount } from "../common";
 import { CommonFields, verifyCommonFields } from "./common";
 
-export enum OfferCreateFlags {
+export enum OfferCreateFlag {
     tfPassive = 0x00010000,
     tfImmediateOrCancel = 0x00020000,
     tfFillOrKill = 0x00040000,
     tfSell = 0x00080000,
 }
 
+export enum AccountSetFlag {
+    asfAccountTxnID = 5
+    .
+}
+export interface AccountSet extends CommonFields {
+    TransactionType: "OfferCreate";
+    Flags: undefined
+    setFlag?: number | AccountSetFlag
+}
+
 export interface OfferCreate extends CommonFields {
     TransactionType: "OfferCreate";
-    Flags?: number | Array<OfferCreateFlags>
+    Flags?: number | Array<OfferCreateFlag>
     Expiration?: number;
     OfferSequence?: number;
     TakerGets: Amount;
@@ -52,4 +62,19 @@ export interface OfferCreate extends CommonFields {
 
     if (tx.OfferSequence !== undefined && typeof tx.OfferSequence !== 'number')
         throw new ValidationError("OfferCreate: invalid OfferSequence")
+}
+
+const order: OfferCreate = {
+    TransactionType: "OfferCreate",
+    Account: "r...",
+    TakerPays: "...",
+    TakerGets: "TakerGets..",
+    Flags: [
+        OfferCreateFlags.tfFillOrKill,
+        OfferCreateFlags.tfPassive
+    ]
+}
+const accset: AccountSet = {
+    TransactionType: "OfferCreate",
+    setFlag: AccountSetFlag.asfAccountTxnID
 }
