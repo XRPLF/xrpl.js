@@ -54,7 +54,7 @@ export interface CommonFields {
   Fee?: string;
   Sequence?: number;
   AccountTxnID?: string;
-  Flags?: number;
+  Flags?: number | Array<number>;
   LastLedgerSequence?: number;
   Memos?: Array<{ Memo: Memo }>;
   Signers?: Array<Signer>;

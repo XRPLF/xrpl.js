@@ -2,8 +2,16 @@ import { ValidationError } from "../../common/errors";
 import { Amount, IssuedCurrencyAmount } from "../common";
 import { CommonFields, verifyCommonFields } from "./common";
 
+enum OfferCreateFlags {
+    tfPassive = 0x00010000,
+    tfImmediateOrCancel = 0x00020000,
+    tfFillOrKill = 0x00040000,
+    tfSell = 0x00080000,
+}
+
 export interface OfferCreate extends CommonFields {
     TransactionType: "OfferCreate";
+    Flags?: number | Array<OfferCreateFlags>
     Expiration?: number;
     OfferSequence?: number;
     TakerGets: Amount;
