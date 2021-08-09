@@ -11,17 +11,17 @@ export interface LedgerDataRequest extends BaseRequest {
     marker?: any
 }
 
-interface LedgerDataAdditionalFields {
-    data?: string
-    ledgerEntryType?: string
-    index: string
-}
+type LabeledLedgerEntry = ({ledgerEntryType: string} & LedgerEntry)
+
+type BinaryLedgerEntry = {data: string}
+
+type State = {index: string} & (BinaryLedgerEntry | LabeledLedgerEntry)
 
 export interface LedgerDataResponse extends BaseResponse {
     result: {
         ledger_index: number
         ledger_hash: string
-        state: (LedgerDataAdditionalFields & LedgerEntry)[]
+        state: State[]
         marker?: any
     }
 }

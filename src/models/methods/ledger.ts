@@ -34,7 +34,10 @@ interface Ledger {
 
 interface LedgerQueueData {
     account: string
-    tx: any // TODO: Retype this once we have transaction types (Also include tx_blob as possible type: https://xrpl.org/ledger.html)
+    // TODO: Retype tx once we have transaction types 
+    // TODO: Also include tx_blob as possible type: https://xrpl.org/ledger.html
+    // TODO: Also handle the special case where 'owner_funds: string' is a field of OfferCreate sometimes - https://xrpl.org/ledger.html#response-format
+    tx: any 
     retries_remaining: number
     preflight_result: string
     last_result?: string
@@ -46,9 +49,10 @@ interface LedgerQueueData {
 
 export interface LedgerResponse extends BaseResponse {
     result: {
+        ledger: Ledger
         ledger_hash: string
-        ledger_index: LedgerIndex
+        ledger_index: number
         queue_data?: (LedgerQueueData | string)[]
-        owner_funds?: string
-    } & Ledger
+        validated: boolean //TODO: Figure out if the example is correct, or the documentation for this field - https://xrpl.org/ledger.html#response-format
+    }
 }
