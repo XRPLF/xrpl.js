@@ -68,9 +68,9 @@ export interface TransactionStream extends BaseStream {
     ledger_current_index?: number
     ledger_hash?: string
     ledger_index?: number
-    meta: TransactionMetadata
+    meta?: TransactionMetadata
     transaction: any // TODO: replace when we have types for transactions
-    validated: boolean
+    validated?: boolean
 }
 
 export interface PeerStatusStream extends BaseStream {

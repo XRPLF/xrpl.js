@@ -13,9 +13,6 @@ export interface UnsubscribeRequest extends BaseRequest {
     accounts?: string[]
     accounts_proposed?: string[]
     books?: Book[]
-    url?: string
-    url_username?: string
-    url_password?: string
 }
 
 export interface UnsubscribeResponse extends BaseResponse {
