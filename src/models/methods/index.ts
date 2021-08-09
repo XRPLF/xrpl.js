@@ -9,6 +9,8 @@ import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
 import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
 import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalances";
 import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
+import { ConsensusStream, LedgerStream, OrderBookStream, PeerStatusStream, Stream, SubscribeRequest, SubscribeResponse, TransactionStream, ValidationStream } from "./subscribe";
+import { UnsubscribeRequest, UnsubscribeResponse } from "./unsubscribe";
 import { PathFindRequest, PathFindResponse } from "./pathFind";
 import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
 
@@ -27,6 +29,9 @@ type Request = // account methods
              | DepositAuthorizedRequest
              | PathFindRequest
              | RipplePathFindRequest
+               // subscription methods
+             | SubscribeRequest
+             | UnsubscribeRequest
 
 type Response = // account methods
                 AccountChannelsResponse 
@@ -43,6 +48,9 @@ type Response = // account methods
               | DepositAuthorizedResponse
               | PathFindResponse
               | RipplePathFindResponse
+                // subscription methods
+              | SubscribeResponse
+              | UnsubscribeResponse
 
 export {
     Request,
@@ -74,5 +82,17 @@ export {
     PathFindRequest,
     PathFindResponse,
     RipplePathFindRequest,
-    RipplePathFindResponse
+    RipplePathFindResponse,
+    // Subscribe methods/streams
+    SubscribeRequest,
+    SubscribeResponse,
+    Stream,
+    LedgerStream,
+    ValidationStream,
+    TransactionStream,
+    PeerStatusStream,
+    OrderBookStream,
+    ConsensusStream,
+    UnsubscribeRequest,
+    UnsubscribeResponse
 }
