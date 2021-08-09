@@ -5,12 +5,12 @@ import { AccountLinesRequest, AccountLinesResponse } from "./accountLines";
 import { AccountObjectsRequest, AccountObjectsResponse } from "./accountObjects";
 import { AccountOffersRequest, AccountOffersResponse } from "./accountOffers";
 import { AccountTxRequest, AccountTxResponse } from "./accountTx";
+import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
+import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
 import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalances";
 import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
 import { ConsensusStream, LedgerStream, OrderBookStream, PeerStatusStream, Stream, SubscribeRequest, SubscribeResponse, TransactionStream, ValidationStream } from "./subscribe";
 import { UnsubscribeRequest, UnsubscribeResponse } from "./unsubscribe";
-import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
-import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
 import { PathFindRequest, PathFindResponse } from "./pathFind";
 import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
 
