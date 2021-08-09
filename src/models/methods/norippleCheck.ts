@@ -11,7 +11,9 @@ export interface NoRippleCheckRequest extends BaseRequest {
 }
 
 export interface NoRippleCheckResponse extends BaseResponse {
-  ledger_current_index: number
-  problems: string[]
-  transactions: any[] // TODO: fix once transaction objects are implemented
+  result: {
+    ledger_current_index: number
+    problems: string[]
+    transactions: any[] // TODO: fix once transaction objects are implemented
+  }
 }

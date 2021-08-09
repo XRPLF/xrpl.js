@@ -16,11 +16,13 @@ interface Balance {
 }
 
 export interface GatewayBalancesResponse extends BaseResponse {
-  account: string
-  obligations?: {[currency: string]: string}
-  balances?: {[address: string]: Balance[]}
-  assets?: {[address: string]: Balance[]}
-  ledger_hash?: string
-  ledger_current_index?: number
-  ledger_index?: number
+  result: {
+    account: string
+    obligations?: {[currency: string]: string}
+    balances?: {[address: string]: Balance[]}
+    assets?: {[address: string]: Balance[]}
+    ledger_hash?: string
+    ledger_current_index?: number
+    ledger_index?: number
+  }
 }

@@ -1,3 +1,5 @@
+import { Response } from ".";
+
 export interface BaseRequest {
     id: number | string
     command: string
@@ -19,6 +21,6 @@ export interface BaseResponse {
     warnings?: Warning[]
     forwarded?: boolean
     error?: string
-    request?: any
+    request?: Response
     api_version?: number
 }
