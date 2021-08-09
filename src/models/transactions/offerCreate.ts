@@ -9,16 +9,6 @@ export enum OfferCreateFlag {
     tfSell = 0x00080000,
 }
 
-export enum AccountSetFlag {
-    asfAccountTxnID = 5
-    .
-}
-export interface AccountSet extends CommonFields {
-    TransactionType: "OfferCreate";
-    Flags: undefined
-    setFlag?: number | AccountSetFlag
-}
-
 export interface OfferCreate extends CommonFields {
     TransactionType: "OfferCreate";
     Flags?: number | Array<OfferCreateFlag>
@@ -62,19 +52,4 @@ export interface OfferCreate extends CommonFields {
 
     if (tx.OfferSequence !== undefined && typeof tx.OfferSequence !== 'number')
         throw new ValidationError("OfferCreate: invalid OfferSequence")
-}
-
-const order: OfferCreate = {
-    TransactionType: "OfferCreate",
-    Account: "r...",
-    TakerPays: "...",
-    TakerGets: "TakerGets..",
-    Flags: [
-        OfferCreateFlags.tfFillOrKill,
-        OfferCreateFlags.tfPassive
-    ]
-}
-const accset: AccountSet = {
-    TransactionType: "OfferCreate",
-    setFlag: AccountSetFlag.asfAccountTxnID
 }
