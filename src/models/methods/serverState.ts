@@ -1,39 +1,23 @@
 import { BaseRequest, BaseResponse } from "./baseMethod";
+import { JobType, ServerState, StateAccounting } from "./serverInfo";
 
-export interface ServerInfoRequest extends BaseRequest {
-    command: "server_info"
+export interface ServerStateRequest extends BaseRequest {
+    command: "server_state"
 }
-
-export type ServerState = "disconnected" | "connected" | "syncing" | "tracking" | "full" | "validating" | "proposing"
-
-export interface StateAccounting {
-    duration_us: string
-    transitions: number
-}
-
-export interface JobType {
-    job_type: string
-    per_second: number
-    peak_time?: number
-    avg_time?: number
-    in_progress?: number
-}
-
-export interface ServerInfoResponse extends BaseResponse {
+export interface ServerStateResponse extends BaseResponse {
     result: {
-        info: {
+        state: {
             amendment_blocked?: string
             build_version: string
+            complete_ledgers: string
             closed_ledger?: {
                 age: number
-                base_fee_xrp: number
+                base_fee: number
                 hash: string
-                reserve_base_xrp: number
-                reserve_inc_xrp: number
+                reserve_base: number
+                reserve_inc: number
                 seq: number
             }
-            complete_ledgers: string
-            hostid: string
             io_latency_ms: number
             jq_trans_overflow: string
             last_close: {
@@ -44,12 +28,11 @@ export interface ServerInfoResponse extends BaseResponse {
                 job_types: JobType[]
                 threads: number
             }
+            load_base: number
             load_factor: number
-            load_factor_local?: number
-            load_factor_net?: number
-            load_factor_cluster?: number
             load_factor_fee_escalation?: number
             load_factor_fee_queue?: number
+            load_factor_fee_reference?: number
             load_factor_server?: number
             peers: number
             pubkey_node: string
@@ -61,10 +44,10 @@ export interface ServerInfoResponse extends BaseResponse {
             uptime: number
             validated_ledger?: {
                 age: number
-                base_fee_xrp: number
+                base_fee: number
                 hash: string
-                reserve_base_xrp: number
-                reserve_inc_xrp: number
+                reserve_base: number
+                reserve_inc: number
                 seq: number
             }
             validation_quorum: number
