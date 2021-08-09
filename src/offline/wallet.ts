@@ -33,11 +33,11 @@ class Wallet {
     this.privateKey = privateKey
   }
 
-  static walletFromSeed(seed: string, options: WalletOptions): Wallet {
+  static fromSeed(seed: string, options: WalletOptions): Wallet {
     return Wallet.deriveWallet(seed, options)
   }
 
-  static walletFromMnemonic(mnemonic: string, options: WalletOptions): Wallet {
+  static fromMnemonic(mnemonic: string, options: WalletOptions): Wallet {
     const seed = mnemonicToSeedSync(mnemonic)
     const masterNode = fromSeed(seed)
     const node = masterNode.derivePath(
@@ -52,7 +52,7 @@ class Wallet {
     return new Wallet(publicKey, `00${privateKey}`)
   }
 
-  static walletFromEntropy(options: WalletOptions): Wallet {
+  static fromEntropy(options: WalletOptions): Wallet {
     const seed = generateSeed({
       entropy: Uint8Array.from(options.entropy),
       algorithm: options.algorithm
@@ -70,14 +70,14 @@ class Wallet {
     return new Wallet(publicKey, privateKey)
   }
 
-  sign(
+  signTransaction(
     txJSON: any,
     options: SignOptions = {signAs: ''}
   ): {signedTransaction: string; id: string} {
     return signOffline(this, JSON.stringify(txJSON), options)
   }
 
-  verify(signedTransaction: {signedTransaction: string; id: string}): boolean {
+  verifyTransaction(signedTransaction: {signedTransaction: string; id: string}): boolean {
     const txJSON = decode(signedTransaction.signedTransaction)
     const messageHex: string = encodeForSigning(txJSON)
     const signature = txJSON.TxnSignature

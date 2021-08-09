@@ -18,19 +18,19 @@ const privateKeyED25519: string =
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'walletFromEntropy with entropy only': async (api) => {
+  'Wallet.fromEntropy with entropy only': async (api) => {
     // GIVEN an entropy
     const options: WalletOptions = {entropy}
 
     // WHEN deriving a wallet from an entropy
-    const wallet = Wallet.walletFromEntropy(options)
+    const wallet = Wallet.fromEntropy(options)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)
     assert.equal(wallet.privateKey, privateKey)
   },
 
-  'walletFromEntropy with algorithm ecdsa-secp256k1': async (api) => {
+  'Wallet.fromEntropy with algorithm ecdsa-secp256k1': async (api) => {
     // GIVEN an entropy using ecdsa-secp256k1
     const options: WalletOptions = {
       algorithm: 'ecdsa-secp256k1',
@@ -38,14 +38,14 @@ export default <TestSuite>{
     }
 
     // WHEN deriving a wallet from entropy
-    const wallet = Wallet.walletFromEntropy(options)
+    const wallet = Wallet.fromEntropy(options)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)
     assert.equal(wallet.privateKey, privateKey)
   },
 
-  'walletFromEntropy with algorithm ed25519': async (api) => {
+  'Wallet.fromEntropy with algorithm ed25519': async (api) => {
     // GIVEN an entropy using ed25519
     const options: WalletOptions = {
       algorithm: 'ed25519',
@@ -53,7 +53,7 @@ export default <TestSuite>{
     }
 
     // WHEN deriving a wallet from entropy
-    const wallet = Wallet.walletFromEntropy(options)
+    const wallet = Wallet.fromEntropy(options)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKeyED25519)

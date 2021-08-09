@@ -15,7 +15,7 @@ const address = 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc'
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'sign offline with txJSON': async (api) => {
+  'sign transaction offline with txJSON': async (api) => {
     // GIVEN a transaction
     const txJSON = {
       TransactionType: 'Payment',
@@ -30,7 +30,7 @@ export default <TestSuite>{
 
     // WHEN signing a transaction offline
     const signedTx: {signedTransaction: string; id: string} =
-      wallet.sign(txJSON)
+      wallet.signTransaction(txJSON)
 
     // THEN we get a signedTransaction
     schemaValidator.schemaValidate('sign', signedTx)

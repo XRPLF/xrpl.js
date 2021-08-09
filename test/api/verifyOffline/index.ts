@@ -18,18 +18,18 @@ const signedTx = {
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'verify offline when a signed transaction is valid': async (api) => {
+  'verify transaction offline when a signed transaction is valid': async (api) => {
     // GIVEN a transaction that has been signed by the same wallet
     const wallet = new Wallet(publicKey, privateKey)
 
     // WHEN verifying a signed transaction
-    const isVerified: boolean = wallet.verify(signedTx)
+    const isVerified: boolean = wallet.verifyTransaction(signedTx)
 
     // THEN we get a valid response
     assert.equal(isVerified, true)
   },
 
-  "verify offline when signed transaction isn't valid": async (api) => {
+  "verify transaction offline when signed transaction isn't valid": async (api) => {
     // GIVEN a transaction that has been signed by a different wallet
     const diffPublicKey =
       '02F89EAEC7667B30F33D0687BBA86C3FE2A08CCA40A9186C5BDE2DAA6FA97A37D8'
@@ -38,7 +38,7 @@ export default <TestSuite>{
     const wallet = new Wallet(diffPublicKey, diffPrivateKey)
 
     // WHEN verifying a signed transaction
-    const isVerified: boolean = wallet.verify(signedTx)
+    const isVerified: boolean = wallet.verifyTransaction(signedTx)
 
     // THEN we get an invalid response
     assert.equal(isVerified, false)

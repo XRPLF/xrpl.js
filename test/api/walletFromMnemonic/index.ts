@@ -15,36 +15,36 @@ const privateKey =
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
-  'walletFromMnemonic with empty options object': async (api) => {
+  'Wallet.fromMnemonic with empty options object': async (api) => {
     // GIVEN an empty options object
     const options: WalletOptions = {}
 
     // WHEN deriving a wallet from a mnemonic
-    const wallet = Wallet.walletFromMnemonic(mnemonic, options)
+    const wallet = Wallet.fromMnemonic(mnemonic, options)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)
     assert.equal(wallet.privateKey, privateKey)
   },
 
-  'walletFromMnemonic with algorithm ecdsa-secp256k1': async (api) => {
+  'Wallet.fromMnemonic with algorithm ecdsa-secp256k1': async (api) => {
     // GIVEN we want to use ecdsa-secp256k1
     const options: WalletOptions = {algorithm: 'ecdsa-secp256k1'}
 
     // WHEN deriving a wallet from a mnemonic
-    const wallet = Wallet.walletFromMnemonic(mnemonic, options)
+    const wallet = Wallet.fromMnemonic(mnemonic, options)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)
     assert.equal(wallet.privateKey, privateKey)
   },
 
-  'walletFromMnemonic with algorithm ed25519': async (api) => {
+  'Wallet.fromMnemonic with algorithm ed25519': async (api) => {
     // GIVEN we want to use ed25519
     const options: WalletOptions = {algorithm: 'ed25519'}
 
     // WHEN deriving a wallet from a mnemonic
-    const wallet = Wallet.walletFromMnemonic(mnemonic, options)
+    const wallet = Wallet.fromMnemonic(mnemonic, options)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)
