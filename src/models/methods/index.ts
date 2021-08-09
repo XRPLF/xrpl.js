@@ -10,6 +10,8 @@ import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAu
 import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalances";
 import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
 import { PathFindRequest, PathFindResponse } from "./pathFind";
+import { PingRequest, PingResponse } from "./ping";
+import { RandomRequest, RandomResponse } from "./random";
 import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
 
 type Request = // account methods
@@ -27,6 +29,9 @@ type Request = // account methods
              | DepositAuthorizedRequest
              | PathFindRequest
              | RipplePathFindRequest
+               // utility methods
+             | PingRequest
+             | RandomRequest
 
 type Response = // account methods
                 AccountChannelsResponse 
@@ -43,6 +48,9 @@ type Response = // account methods
               | DepositAuthorizedResponse
               | PathFindResponse
               | RipplePathFindResponse
+                // utility methods
+              | PingResponse
+              | RandomResponse
 
 export {
     Request,
@@ -74,5 +82,10 @@ export {
     PathFindRequest,
     PathFindResponse,
     RipplePathFindRequest,
-    RipplePathFindResponse
+    RipplePathFindResponse,
+    // utility methods
+    PingRequest,
+    PingResponse,
+    RandomRequest,
+    RandomResponse
 }
