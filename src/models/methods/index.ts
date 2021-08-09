@@ -7,10 +7,14 @@ import { AccountOffersRequest, AccountOffersResponse } from "./accountOffers";
 import { AccountTxRequest, AccountTxResponse } from "./accountTx";
 import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
 import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
+import { FeeRequest, FeeResponse } from "./fee";
 import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalances";
+import { ManifestRequest, ManifestResponse } from "./manifest";
 import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
 import { PathFindRequest, PathFindResponse } from "./pathFind";
 import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
+import { ServerInfoRequest, ServerInfoResponse } from "./serverInfo";
+import { ServerStateRequest, ServerStateResponse } from "./serverState";
 
 type Request = // account methods
                AccountChannelsRequest 
@@ -27,6 +31,11 @@ type Request = // account methods
              | DepositAuthorizedRequest
              | PathFindRequest
              | RipplePathFindRequest
+               // server info methods
+             | FeeRequest
+             | ManifestRequest
+             | ServerInfoRequest
+             | ServerStateRequest
 
 type Response = // account methods
                 AccountChannelsResponse 
@@ -43,6 +52,11 @@ type Response = // account methods
               | DepositAuthorizedResponse
               | PathFindResponse
               | RipplePathFindResponse
+                // server info methods
+              | FeeResponse
+              | ManifestResponse
+              | ServerInfoResponse
+              | ServerStateResponse
 
 export {
     Request,
@@ -74,5 +88,14 @@ export {
     PathFindRequest,
     PathFindResponse,
     RipplePathFindRequest,
-    RipplePathFindResponse
+    RipplePathFindResponse,
+    // server info methods
+    FeeRequest,
+    FeeResponse,
+    ManifestRequest,
+    ManifestResponse,
+    ServerInfoRequest,
+    ServerInfoResponse,
+    ServerStateRequest,
+    ServerStateResponse
 }
