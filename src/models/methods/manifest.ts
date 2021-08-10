@@ -14,6 +14,6 @@ export interface ManifestResponse extends BaseResponse {
             seq: number
         }
         manifest?: string
-        request: string
+        requested: string
     }
 }
