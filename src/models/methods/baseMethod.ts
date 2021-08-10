@@ -12,13 +12,13 @@ interface Warning {
 
 export interface BaseResponse {
     id: number | string
-    status: string
-    type: string
+    status: "success" | "error" | string
+    type: "response" | string
     result: any
     warning?: "load"
     warnings?: Warning[]
     forwarded?: boolean
     error?: string
-    request?: any
+    request?: Request
     api_version?: number
 }
