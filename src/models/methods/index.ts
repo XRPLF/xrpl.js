@@ -15,6 +15,10 @@ import { PathFindRequest, PathFindResponse } from "./pathFind";
 import { PingRequest, PingResponse } from "./ping";
 import { RandomRequest, RandomResponse } from "./random";
 import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
+import { SubmitRequest, SubmitResponse } from "./submit";
+import { SubmitMultisignedRequest, SubmitMultisignedResponse } from "./submitMultisigned";
+import { TransactionEntryRequest, TransactionEntryResponse } from "./transactionEntry";
+import { TxRequest, TxResponse } from "./tx";
 
 type Request = // account methods
                AccountChannelsRequest 
@@ -26,6 +30,11 @@ type Request = // account methods
              | AccountTxRequest
              | GatewayBalancesRequest
              | NoRippleCheckRequest
+               // transaction methods
+             | SubmitRequest
+             | SubmitMultisignedRequest
+             | TransactionEntryRequest
+             | TxRequest
                // path and order book methods
              | BookOffersRequest
              | DepositAuthorizedRequest
@@ -48,6 +57,11 @@ type Response = // account methods
               | AccountTxResponse
               | GatewayBalancesResponse
               | NoRippleCheckResponse
+                // transaction methods
+              | SubmitResponse
+              | SubmitMultisignedResponse
+              | TransactionEntryResponse
+              | TxResponse
                 // path and order book methods
               | BookOffersResponse
               | DepositAuthorizedResponse
@@ -82,6 +96,15 @@ export {
     GatewayBalancesResponse,
     NoRippleCheckRequest,
     NoRippleCheckResponse,
+    // transaction methods
+    SubmitRequest,
+    SubmitResponse,
+    SubmitMultisignedRequest,
+    SubmitMultisignedResponse,
+    TransactionEntryRequest,
+    TransactionEntryResponse,
+    TxRequest,
+    TxResponse,
     // path and order book methods
     BookOffersRequest,
     BookOffersResponse,
