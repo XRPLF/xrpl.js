@@ -1,22 +1,8 @@
 import * as common from '../common'
 import {XrplClient} from '..'
 
-function isConnected(this: XrplClient): boolean {
-  return this.connection.isConnected()
-}
-
 function getLedgerVersion(this: XrplClient): Promise<number> {
   return this.connection.getLedgerVersion()
-}
-
-async function connect(this: XrplClient): Promise<void> {
-  return this.connection.connect()
-}
-
-async function disconnect(this: XrplClient): Promise<void> {
-  // backwards compatibility: connection.disconnect() can return a number, but
-  // this method returns nothing. SO we await but don't return any result.
-  await this.connection.disconnect()
 }
 
 function formatLedgerClose(ledgerClose: any): object {
@@ -32,4 +18,4 @@ function formatLedgerClose(ledgerClose: any): object {
   }
 }
 
-export {connect, disconnect, isConnected, getLedgerVersion, formatLedgerClose}
+export {getLedgerVersion, formatLedgerClose}

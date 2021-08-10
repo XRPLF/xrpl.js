@@ -9,50 +9,47 @@ import {
   iso8601ToRippleTime,
   txFlags,
   ensureClassicAddress
-} from './common'
+} from '../common'
 import {
-  connect,
-  disconnect,
-  isConnected,
   getLedgerVersion,
   formatLedgerClose
-} from './server/server'
-import getTransaction from './ledger/transaction'
-import getTransactions from './ledger/transactions'
-import getTrustlines from './ledger/trustlines'
-import getBalances from './ledger/balances'
-import getBalanceSheet from './ledger/balance-sheet'
-import getPaths from './ledger/pathfind'
-import getOrders from './ledger/orders'
-import {getOrderbook, formatBidsAndAsks} from './ledger/orderbook'
-import {getSettings, parseAccountFlags} from './ledger/settings'
-import getAccountInfo from './ledger/accountinfo'
-import getAccountObjects from './ledger/accountobjects'
-import getPaymentChannel from './ledger/payment-channel'
-import preparePayment from './transaction/payment'
-import prepareTrustline from './transaction/trustline'
-import prepareOrder from './transaction/order'
-import prepareOrderCancellation from './transaction/ordercancellation'
-import prepareEscrowCreation from './transaction/escrow-creation'
-import prepareEscrowExecution from './transaction/escrow-execution'
-import prepareEscrowCancellation from './transaction/escrow-cancellation'
-import preparePaymentChannelCreate from './transaction/payment-channel-create'
-import preparePaymentChannelFund from './transaction/payment-channel-fund'
-import preparePaymentChannelClaim from './transaction/payment-channel-claim'
-import prepareCheckCreate from './transaction/check-create'
-import prepareCheckCancel from './transaction/check-cancel'
-import prepareCheckCash from './transaction/check-cash'
-import prepareSettings from './transaction/settings'
-import prepareTicketCreate from './transaction/ticket'
-import sign from './transaction/sign'
-import combine from './transaction/combine'
-import submit from './transaction/submit'
-import { generateAddress, generateXAddress } from './offline/utils'
-import {deriveKeypair, deriveAddress, deriveXAddress} from './offline/derive'
-import computeLedgerHash from './offline/ledgerhash'
-import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
-import verifyPaymentChannelClaim from './offline/verify-payment-channel-claim'
-import getLedger from './ledger/ledger'
+} from './utils'
+import getTransaction from '../ledger/transaction'
+import getTransactions from '../ledger/transactions'
+import getTrustlines from '../ledger/trustlines'
+import getBalances from '../ledger/balances'
+import getBalanceSheet from '../ledger/balance-sheet'
+import getPaths from '../ledger/pathfind'
+import getOrders from '../ledger/orders'
+import {getOrderbook, formatBidsAndAsks} from '../ledger/orderbook'
+import {getSettings, parseAccountFlags} from '../ledger/settings'
+import getAccountInfo from '../ledger/accountinfo'
+import getAccountObjects from '../ledger/accountobjects'
+import getPaymentChannel from '../ledger/payment-channel'
+import preparePayment from '../transaction/payment'
+import prepareTrustline from '../transaction/trustline'
+import prepareOrder from '../transaction/order'
+import prepareOrderCancellation from '../transaction/ordercancellation'
+import prepareEscrowCreation from '../transaction/escrow-creation'
+import prepareEscrowExecution from '../transaction/escrow-execution'
+import prepareEscrowCancellation from '../transaction/escrow-cancellation'
+import preparePaymentChannelCreate from '../transaction/payment-channel-create'
+import preparePaymentChannelFund from '../transaction/payment-channel-fund'
+import preparePaymentChannelClaim from '../transaction/payment-channel-claim'
+import prepareCheckCreate from '../transaction/check-create'
+import prepareCheckCancel from '../transaction/check-cancel'
+import prepareCheckCash from '../transaction/check-cash'
+import prepareSettings from '../transaction/settings'
+import prepareTicketCreate from '../transaction/ticket'
+import sign from '../transaction/sign'
+import combine from '../transaction/combine'
+import submit from '../transaction/submit'
+import { generateAddress, generateXAddress } from '../offline/utils'
+import {deriveKeypair, deriveAddress, deriveXAddress} from '../offline/derive'
+import computeLedgerHash from '../offline/ledgerhash'
+import signPaymentChannelClaim from '../offline/sign-payment-channel-claim'
+import verifyPaymentChannelClaim from '../offline/verify-payment-channel-claim'
+import getLedger from '../ledger/ledger'
 
 import {
   AccountObjectsRequest,
@@ -75,16 +72,16 @@ import {
   LedgerEntryResponse,
   ServerInfoRequest,
   ServerInfoResponse
-} from './common/types/commands'
+} from '../common/types/commands'
 
-import RangeSet from './common/rangeset'
-import * as ledgerUtils from './ledger/utils'
-import * as transactionUtils from './transaction/utils'
-import * as schemaValidator from './common/schema-validator'
-import {getServerInfo, getFee} from './common/serverinfo'
-import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
-import {TransactionJSON, Instructions, Prepare} from './transaction/types'
-import {ConnectionUserOptions} from './common/connection'
+import RangeSet from '../common/rangeset'
+import * as ledgerUtils from '../ledger/utils'
+import * as transactionUtils from '../transaction/utils'
+import * as schemaValidator from '../common/schema-validator'
+import {getServerInfo, getFee} from '../common/serverinfo'
+import {clamp, renameCounterpartyToIssuer} from '../ledger/utils'
+import {TransactionJSON, Instructions, Prepare} from '../transaction/types'
+import {ConnectionUserOptions} from '../common/connection'
 import {classicAddressToXAddress, xAddressToClassicAddress, isValidXAddress, isValidClassicAddress, encodeSeed, decodeSeed, encodeAccountID, decodeAccountID, encodeNodePublic, decodeNodePublic, encodeAccountPublic, decodeAccountPublic, encodeXAddress, decodeXAddress} from 'ripple-address-codec'
 import {
   computeBinaryTransactionHash,
@@ -98,7 +95,7 @@ import {
   computeStateTreeHash,
   computeEscrowHash,
   computePaymentChannelHash
-} from './common/hashes'
+} from '../common/hashes'
 
 export interface APIOptions extends ConnectionUserOptions {
   server?: string
@@ -351,9 +348,20 @@ class XrplClient extends EventEmitter {
   generateAddress = generateAddress
   generateXAddress = generateXAddress // @deprecated Invoke from top-level package instead
 
-  connect = connect
-  disconnect = disconnect
-  isConnected = isConnected
+  isConnected(): boolean {
+    return this.connection.isConnected()
+  }
+  
+  async connect(): Promise<void> {
+    return this.connection.connect()
+  }
+  
+  async disconnect(): Promise<void> {
+    // backwards compatibility: connection.disconnect() can return a number, but
+    // this method returns nothing. SO we await but don't return any result.
+    await this.connection.disconnect()
+  }
+
   getServerInfo = getServerInfo
   getFee = getFee
   getLedgerVersion = getLedgerVersion
