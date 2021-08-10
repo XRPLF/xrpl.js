@@ -81,7 +81,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
         passphrase: config.passphrase,
         cert: config.certificate
       },
-      value => value == null
+      (value) => value == null
     )
     const proxyOptions = Object.assign({}, parsedProxyURL, proxyOverrides)
     let HttpsProxyAgent
@@ -103,7 +103,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
       passphrase: config.passphrase,
       cert: config.certificate
     },
-    value => value == null
+    (value) => value == null
   )
   const websocketOptions = Object.assign({}, options, optionsOverrides)
   const websocket = new WebSocket(url, null, websocketOptions)
@@ -641,5 +641,14 @@ export class Connection extends EventEmitter {
     })
 
     return responsePromise
+  }
+
+  /**
+   * Get the Websocket connection URL
+   *
+   * @returns The Websocket connection URL
+   */
+  getUrl(): string {
+    return this._url
   }
 }

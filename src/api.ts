@@ -47,7 +47,7 @@ import prepareTicketCreate from './transaction/ticket'
 import sign from './transaction/sign'
 import combine from './transaction/combine'
 import submit from './transaction/submit'
-import { generateAddress, generateXAddress } from './offline/utils'
+import {generateAddress, generateXAddress} from './offline/utils'
 import {deriveKeypair, deriveAddress, deriveXAddress} from './offline/derive'
 import computeLedgerHash from './offline/ledgerhash'
 import signPaymentChannelClaim from './offline/sign-payment-channel-claim'
@@ -85,7 +85,22 @@ import {getServerInfo, getFee} from './common/serverinfo'
 import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 import {ConnectionUserOptions} from './common/connection'
-import {classicAddressToXAddress, xAddressToClassicAddress, isValidXAddress, isValidClassicAddress, encodeSeed, decodeSeed, encodeAccountID, decodeAccountID, encodeNodePublic, decodeNodePublic, encodeAccountPublic, decodeAccountPublic, encodeXAddress, decodeXAddress} from 'ripple-address-codec'
+import {
+  classicAddressToXAddress,
+  xAddressToClassicAddress,
+  isValidXAddress,
+  isValidClassicAddress,
+  encodeSeed,
+  decodeSeed,
+  encodeAccountID,
+  decodeAccountID,
+  encodeNodePublic,
+  decodeNodePublic,
+  encodeAccountPublic,
+  decodeAccountPublic,
+  encodeXAddress,
+  decodeXAddress
+} from 'ripple-address-codec'
 import {
   computeBinaryTransactionHash,
   computeTransactionHash,
@@ -99,6 +114,8 @@ import {
   computeEscrowHash,
   computePaymentChannelHash
 } from './common/hashes'
+
+import generateFaucetWallet from './wallet/wallet-generation'
 
 export interface APIOptions extends ConnectionUserOptions {
   server?: string
@@ -399,6 +416,9 @@ class RippleAPI extends EventEmitter {
   computeLedgerHash = computeLedgerHash // @deprecated Invoke from top-level package instead
   signPaymentChannelClaim = signPaymentChannelClaim // @deprecated Invoke from top-level package instead
   verifyPaymentChannelClaim = verifyPaymentChannelClaim // @deprecated Invoke from top-level package instead
+
+  generateFaucetWallet = generateFaucetWallet
+
   errors = errors
 
   static deriveXAddress = deriveXAddress
@@ -409,20 +429,20 @@ class RippleAPI extends EventEmitter {
   /**
    * Static methods to expose ripple-address-codec methods
    */
-   static classicAddressToXAddress = classicAddressToXAddress
-   static xAddressToClassicAddress = xAddressToClassicAddress
-   static isValidXAddress = isValidXAddress
-   static isValidClassicAddress = isValidClassicAddress
-   static encodeSeed = encodeSeed
-   static decodeSeed = decodeSeed
-   static encodeAccountID = encodeAccountID
-   static decodeAccountID = decodeAccountID
-   static encodeNodePublic = encodeNodePublic
-   static decodeNodePublic = decodeNodePublic
-   static encodeAccountPublic = encodeAccountPublic
-   static decodeAccountPublic = decodeAccountPublic
-   static encodeXAddress = encodeXAddress
-   static decodeXAddress = decodeXAddress
+  static classicAddressToXAddress = classicAddressToXAddress
+  static xAddressToClassicAddress = xAddressToClassicAddress
+  static isValidXAddress = isValidXAddress
+  static isValidClassicAddress = isValidClassicAddress
+  static encodeSeed = encodeSeed
+  static decodeSeed = decodeSeed
+  static encodeAccountID = encodeAccountID
+  static decodeAccountID = decodeAccountID
+  static encodeNodePublic = encodeNodePublic
+  static decodeNodePublic = decodeNodePublic
+  static encodeAccountPublic = encodeAccountPublic
+  static decodeAccountPublic = decodeAccountPublic
+  static encodeXAddress = encodeXAddress
+  static decodeXAddress = decodeXAddress
 
   /**
    * Static methods that replace functionality from the now-deprecated ripple-hashes library
@@ -434,7 +454,8 @@ class RippleAPI extends EventEmitter {
   // @deprecated Invoke from top-level package instead
   static computeTransactionHash = computeTransactionHash // (txJSON: any): string
   // @deprecated Invoke from top-level package instead
-  static computeBinaryTransactionSigningHash = computeBinaryTransactionSigningHash // (txBlobHex: string): string
+  static computeBinaryTransactionSigningHash =
+    computeBinaryTransactionSigningHash // (txBlobHex: string): string
   // Compute the hash of an account, given the account's classic address (starting with `r`).
   // @deprecated Invoke from top-level package instead
   static computeAccountLedgerObjectID = computeAccountLedgerObjectID // (address: string): string
@@ -471,9 +492,7 @@ class RippleAPI extends EventEmitter {
   isValidSecret = schemaValidator.isValidSecret
 }
 
-export {
-  RippleAPI
-}
+export {RippleAPI}
 
 export type {
   AccountObjectsRequest,
