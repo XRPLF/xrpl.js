@@ -1,10 +1,10 @@
-import {RippleAPI} from 'ripple-api'
+import {XrplClient} from 'ripple-api'
 import assert from 'assert-diff'
 import {assertResultMatch, TestSuite, assertRejects} from '../../utils'
 import responses from '../../fixtures/responses'
 import hashes from '../../fixtures/hashes.json'
 import addresses from '../../fixtures/addresses.json'
-const utils = RippleAPI._PRIVATE.ledgerUtils
+const utils = XrplClient._PRIVATE.ledgerUtils
 const {getTransactions: RESPONSE_FIXTURES} = responses
 
 /**

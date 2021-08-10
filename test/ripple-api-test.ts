@@ -1,17 +1,17 @@
 import setupAPI from './setup-api'
-import {RippleAPI} from 'ripple-api'
+import {XrplClient} from 'ripple-api'
 import addresses from './fixtures/addresses.json'
 import {getAllPublicMethods, loadTestSuites} from './utils'
 
 /**
- * RippleAPI Test Runner
+ * XrplClient Test Runner
  *
  * Background: "test/api-test.ts" had hit 4000+ lines of test code and 300+
  * individual tests. Additionally, a new address format was added which
  * forced us to copy-paste duplicate the test file to test both the old forms
  * of address. This added a significant maintenance burden.
  *
- * This test runner allows us to split our tests by RippleAPI method, and
+ * This test runner allows us to split our tests by XrplClient method, and
  * automatically load, validate, and run them. Each tests accepts arguments to
  * test with, which allows us to re-run tests across different data
  * (ex: different address styles).
@@ -21,12 +21,12 @@ import {getAllPublicMethods, loadTestSuites} from './utils'
  *   - Type the API object under test and catch typing issues (currently untyped).
  *   - Sets the stage for more cleanup, like moving test-specific fixtures closer to their tests.
  */
-describe('RippleAPI [Test Runner]', function () {
+describe('XrplClient [Test Runner]', function () {
   beforeEach(setupAPI.setup)
   afterEach(setupAPI.teardown)
 
   // Collect all the tests:
-  const allPublicMethods = getAllPublicMethods(new RippleAPI())
+  const allPublicMethods = getAllPublicMethods(new XrplClient())
   const allTestSuites = loadTestSuites()
 
   // Run all the tests:

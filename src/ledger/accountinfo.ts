@@ -47,7 +47,7 @@ export default async function getAccountInfo(
   address = ensureClassicAddress(address)
 
   // 2. Make Request
-  const response = await this.request({command: 'account_info',
+  const response = await this.request('account_info', {
     account: address,
     ledger_index: options.ledgerVersion || 'validated'
   })

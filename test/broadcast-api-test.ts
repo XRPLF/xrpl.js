@@ -3,9 +3,9 @@ import assert from 'assert-diff'
 import setupAPI from './setup-api'
 import responses from './fixtures/responses'
 import ledgerClosed from './fixtures/rippled/ledger-close.json'
-import {RippleAPI} from 'ripple-api'
+import {XrplClient} from 'ripple-api'
 import {ignoreWebSocketDisconnect} from './utils'
-const schemaValidator = RippleAPI._PRIVATE.schemaValidator
+const schemaValidator = XrplClient._PRIVATE.schemaValidator
 
 const TIMEOUT = 20000
 
@@ -21,7 +21,7 @@ function checkResult(expected, schemaName, response) {
   return response
 }
 
-describe('RippleAPIBroadcast', function () {
+describe('XrplClientBroadcast', function () {
   this.timeout(TIMEOUT)
   beforeEach(setupAPI.setupBroadcast)
   afterEach(setupAPI.teardown)

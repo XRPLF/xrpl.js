@@ -2,10 +2,10 @@ import _ from 'lodash'
 import net from 'net'
 import assert from 'assert-diff'
 import setupAPI from './setup-api'
-import {RippleAPI} from 'ripple-api'
+import {XrplClient} from 'ripple-api'
 import ledgerClose from './fixtures/rippled/ledger-close.json'
 import {ignoreWebSocketDisconnect} from './utils'
-const utils = RippleAPI._PRIVATE.ledgerUtils
+const utils = XrplClient._PRIVATE.ledgerUtils
 
 const TIMEOUT = 200000 // how long before each test case times out
 const isBrowser = (process as any).browser
@@ -450,7 +450,7 @@ describe('Connection', function () {
 
   it('connect multiserver error', function () {
     assert.throws(function () {
-      new RippleAPI({
+      new XrplClient({
         servers: ['wss://server1.com', 'wss://server2.com']
       } as any)
     }, this.api.errors.RippleError)
@@ -578,7 +578,7 @@ describe('Connection', function () {
         data: {returnEmptySubscribeRequest: 1}
       })
 
-      const api = new RippleAPI({server: this.api.connection._url})
+      const api = new XrplClient({server: this.api.connection._url})
       return api.connect().then(
         () => {
           assert(false, 'Must have thrown!')

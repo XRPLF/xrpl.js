@@ -236,7 +236,7 @@ export default <TestSuite>{
     }
   },
   'offline': async (api, address) => {
-    // const api = new RippleAPI()
+    // const api = new XrplClient()
     const secret = 'shsWGZcmZz6YsWWmcnpfr6fLTdtFV'
 
     const settings = requests.prepareSettings.domain

@@ -2,17 +2,17 @@ import net from 'net'
 import _ from 'lodash'
 import fs from 'fs'
 import path from 'path'
-import {RippleAPI} from 'ripple-api'
+import {XrplClient} from 'ripple-api'
 import assert from 'assert-diff'
-const {schemaValidator} = RippleAPI._PRIVATE
+const {schemaValidator} = XrplClient._PRIVATE
 
 /**
- * The test function. It takes a RippleAPI object and then some other data to
+ * The test function. It takes a XrplClient object and then some other data to
  * test (currently: an address). May be called multiple times with different
  * arguments, to test different types of data.
  */
 export type TestFn = (
-  api: RippleAPI,
+  api: XrplClient,
   address: string
 ) => void | PromiseLike<void>
 
@@ -112,11 +112,11 @@ export function getFreePort() {
   })
 }
 
-export function getAllPublicMethods(api: RippleAPI) {
+export function getAllPublicMethods(api: XrplClient) {
   return Array.from(
     new Set([
       ...Object.getOwnPropertyNames(api),
-      ...Object.getOwnPropertyNames(RippleAPI.prototype)
+      ...Object.getOwnPropertyNames(XrplClient.prototype)
     ])
   ).filter((key) => !key.startsWith('_'))
 }
