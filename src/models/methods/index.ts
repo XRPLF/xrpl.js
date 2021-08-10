@@ -15,6 +15,11 @@ import { PathFindRequest, PathFindResponse } from "./pathFind";
 import { PingRequest, PingResponse } from "./ping";
 import { RandomRequest, RandomResponse } from "./random";
 import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
+import { LedgerRequest, LedgerResponse } from "./ledger";
+import { LedgerClosedRequest, LedgerClosedResponse } from "./ledgerClosed";
+import { LedgerDataRequest, LedgerDataResponse } from "./ledgerData";
+import { LedgerEntryRequest, LedgerEntryResponse } from "./ledgerEntry";
+import { LedgerCurrentRequest, LedgerCurrentResponse } from "./ledgerCurrent";
 
 type Request = // account methods
                AccountChannelsRequest 
@@ -37,6 +42,12 @@ type Request = // account methods
                // utility methods
              | PingRequest
              | RandomRequest
+               // ledger methods
+             | LedgerRequest
+             | LedgerClosedRequest
+             | LedgerCurrentRequest
+             | LedgerDataRequest
+             | LedgerEntryRequest
 
 type Response = // account methods
                 AccountChannelsResponse 
@@ -59,6 +70,12 @@ type Response = // account methods
                 // utility methods
               | PingResponse
               | RandomResponse
+                // ledger methods
+              | LedgerResponse
+              | LedgerClosedResponse
+              | LedgerCurrentResponse
+              | LedgerDataResponse
+              | LedgerEntryResponse
 
 export {
     Request,
@@ -107,5 +124,16 @@ export {
     PingRequest,
     PingResponse,
     RandomRequest,
-    RandomResponse
+    RandomResponse,
+    // ledger methods
+    LedgerRequest,
+    LedgerResponse,
+    LedgerClosedRequest,
+    LedgerClosedResponse,
+    LedgerCurrentRequest,
+    LedgerCurrentResponse,
+    LedgerDataRequest,
+    LedgerDataResponse,
+    LedgerEntryRequest,
+    LedgerEntryResponse
 }
