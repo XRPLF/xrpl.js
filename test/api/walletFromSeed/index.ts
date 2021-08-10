@@ -1,5 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
+import ECDSA from '../../../src/common/types/enums/ecdsa'
 import Wallet from '../../../src/Wallet'
 
 const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
@@ -25,7 +26,7 @@ export default <TestSuite>{
 
   'Wallet.fromSeed with algorithm ecdsa-secp256k1': async (api) => {
     // GIVEN we want to use ecdsa-secp256k1
-    const algorithm = 'ecdsa-secp256k1'
+    const algorithm = ECDSA.secp256k1
 
     // WHEN deriving a wallet from a seed
     const wallet = Wallet.fromSeed(seed, algorithm)
@@ -37,7 +38,7 @@ export default <TestSuite>{
 
   'Wallet.fromSeed with algorithm ed25519': async (api) => {
     // GIVEN we want to use ed25519
-    const algorithm = 'ed25519'
+    const algorithm = ECDSA.ed25519
 
     // WHEN deriving a wallet from a seed
     const wallet = Wallet.fromSeed(seed, algorithm)

@@ -2,6 +2,7 @@ import {fromSeed} from 'bip32'
 import {mnemonicToSeedSync} from 'bip39'
 import {decode, encodeForSigning} from 'ripple-binary-codec'
 import {deriveKeypair, generateSeed, verify} from 'ripple-keypairs'
+import ECDSA from './common/types/enums/ecdsa'
 import {signOffline} from './transaction/sign'
 import {SignOptions} from './transaction/types'
 
@@ -13,8 +14,7 @@ import {SignOptions} from './transaction/types'
 class Wallet {
   readonly publicKey: string
   readonly privateKey: string
-  private static readonly defaultAlgorithm: 'ecdsa-secp256k1' | 'ed25519' =
-    'ed25519'
+  private static readonly defaultAlgorithm: ECDSA = ECDSA.ed25519
   private static readonly defaultDerivationPath: string = "m/44'/144'/0'/0/0"
 
   constructor(publicKey: string, privateKey: string) {
@@ -25,10 +25,10 @@ class Wallet {
   /**
    * Derives a wallet from a seed.
    * @param {string} seed - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
-   * @param {string} algorithm - The digital signature algorithm to generate an address for.
+   * @param {ECDSA} algorithm - The digital signature algorithm to generate an address for.
    * @returns {Wallet} A Wallet derived from a seed.
    */
-  static fromSeed(seed: string, algorithm: 'ecdsa-secp256k1' | 'ed25519' = Wallet.defaultAlgorithm): Wallet {
+  static fromSeed(seed: string, algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
     return Wallet.deriveWallet(seed, algorithm)
   }
 
@@ -57,12 +57,12 @@ class Wallet {
   /**
    * Derives a wallet from an entropy (array of random numbers).
    * @param {Uint8Array | number[]} entropy - An array of random numbers to generate a seed used to derive a wallet.
-   * @param {string} algorithm - The digital signature algorithm to generate an address for.
+   * @param {ECDSA} algorithm - The digital signature algorithm to generate an address for.
    * @returns {Wallet} A Wallet derived from an entropy.
    */
   static fromEntropy(
     entropy: Uint8Array | number[],
-    algorithm: 'ecdsa-secp256k1' | 'ed25519' = Wallet.defaultAlgorithm
+    algorithm: ECDSA = Wallet.defaultAlgorithm
   ): Wallet {
     const options = {
       entropy: Uint8Array.from(entropy),
@@ -76,7 +76,7 @@ class Wallet {
     return buffer.toString('hex').toUpperCase()
   }
 
-  private static deriveWallet(seed: string, algorithm: 'ecdsa-secp256k1' | 'ed25519' = Wallet.defaultAlgorithm): Wallet {
+  private static deriveWallet(seed: string, algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
     const {publicKey, privateKey} = deriveKeypair(seed, {algorithm})
     return new Wallet(publicKey, privateKey)
   }

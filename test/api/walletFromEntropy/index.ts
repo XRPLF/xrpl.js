@@ -1,5 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
+import ECDSA from '../../../src/common/types/enums/ecdsa'
 import Wallet from '../../../src/Wallet'
 
 const entropy: number[] = new Array(16).fill(0)
@@ -29,7 +30,7 @@ export default <TestSuite>{
 
   'Wallet.fromEntropy with algorithm ecdsa-secp256k1': async (api) => {
     // GIVEN an entropy using ecdsa-secp256k1
-    const algorithm = 'ecdsa-secp256k1'
+    const algorithm = ECDSA.secp256k1
 
     // WHEN deriving a wallet from an entropy
     const wallet = Wallet.fromEntropy(entropy, algorithm)
@@ -41,7 +42,7 @@ export default <TestSuite>{
 
   'Wallet.fromEntropy with algorithm ed25519': async (api) => {
     // GIVEN an entropy using ed25519
-    const algorithm = 'ed25519'
+    const algorithm = ECDSA.ed25519
 
     // WHEN deriving a wallet from an entropy
     const wallet = Wallet.fromEntropy(entropy, algorithm)
