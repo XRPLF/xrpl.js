@@ -7,7 +7,9 @@ import { AccountOffersRequest, AccountOffersResponse } from "./accountOffers";
 import { AccountTxRequest, AccountTxResponse } from "./accountTx";
 import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
 import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
+import { FeeRequest, FeeResponse } from "./fee";
 import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalances";
+import { ManifestRequest, ManifestResponse } from "./manifest";
 import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
 import { ConsensusStream, LedgerStream, OrderBookStream, PeerStatusStream, Stream, SubscribeRequest, SubscribeResponse, TransactionStream, ValidationStream } from "./subscribe";
 import { UnsubscribeRequest, UnsubscribeResponse } from "./unsubscribe";
@@ -15,6 +17,8 @@ import { PathFindRequest, PathFindResponse } from "./pathFind";
 import { PingRequest, PingResponse } from "./ping";
 import { RandomRequest, RandomResponse } from "./random";
 import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
+import { ServerInfoRequest, ServerInfoResponse } from "./serverInfo";
+import { ServerStateRequest, ServerStateResponse } from "./serverState";
 
 type Request = // account methods
                AccountChannelsRequest 
@@ -34,6 +38,11 @@ type Request = // account methods
                // subscription methods
              | SubscribeRequest
              | UnsubscribeRequest
+               // server info methods
+             | FeeRequest
+             | ManifestRequest
+             | ServerInfoRequest
+             | ServerStateRequest
                // utility methods
              | PingRequest
              | RandomRequest
@@ -56,6 +65,11 @@ type Response = // account methods
                 // subscription methods
               | SubscribeResponse
               | UnsubscribeResponse
+                // server info methods
+              | FeeResponse
+              | ManifestResponse
+              | ServerInfoResponse
+              | ServerStateResponse
                 // utility methods
               | PingResponse
               | RandomResponse
@@ -103,6 +117,15 @@ export {
     ConsensusStream,
     UnsubscribeRequest,
     UnsubscribeResponse,
+    // server info methods
+    FeeRequest,
+    FeeResponse,
+    ManifestRequest,
+    ManifestResponse,
+    ServerInfoRequest,
+    ServerInfoResponse,
+    ServerStateRequest,
+    ServerStateResponse,
     // utility methods
     PingRequest,
     PingResponse,
