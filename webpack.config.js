@@ -99,7 +99,7 @@ function webpackForTest(testFileName) {
         "crypto": require.resolve("crypto-browserify"),
         "path": require.resolve("path-browserify"),
         "http": require.resolve("stream-http"),
-        "fs": false,
+        "fs": false
       }
     }
   };
