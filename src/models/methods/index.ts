@@ -6,6 +6,7 @@ import { AccountObjectsRequest, AccountObjectsResponse } from "./accountObjects"
 import { AccountOffersRequest, AccountOffersResponse } from "./accountOffers";
 import { AccountTxRequest, AccountTxResponse } from "./accountTx";
 import { BookOffersRequest, BookOffersResponse } from "./bookOffers";
+import { ChannelAuthorizeRequest, ChannelAuthorizeResponse } from "./channelAuthorize";
 import { DepositAuthorizedRequest, DepositAuthorizedResponse } from "./depositAuthorized";
 import { GatewayBalancesRequest, GatewayBalancesResponse } from "./gatewayBalances";
 import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
@@ -26,6 +27,9 @@ type Request = // account methods
              | AccountTxRequest
              | GatewayBalancesRequest
              | NoRippleCheckRequest
+               // payment channel methods
+             | ChannelAuthorizeRequest
+             | ChannelAuthorizeResponse
                // path and order book methods
              | BookOffersRequest
              | DepositAuthorizedRequest
@@ -82,6 +86,9 @@ export {
     GatewayBalancesResponse,
     NoRippleCheckRequest,
     NoRippleCheckResponse,
+    // payment channel methods
+    ChannelAuthorizeRequest,
+    ChannelAuthorizeResponse,
     // path and order book methods
     BookOffersRequest,
     BookOffersResponse,
