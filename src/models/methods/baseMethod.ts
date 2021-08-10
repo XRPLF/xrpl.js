@@ -14,8 +14,8 @@ interface Warning {
 
 export interface BaseResponse {
     id: number | string
-    status: string
-    type: string
+    status: "success" | "error" | string
+    type: "response" | string
     result: any
     warning?: "load"
     warnings?: Warning[]
