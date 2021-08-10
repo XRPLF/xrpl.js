@@ -96,7 +96,7 @@ import * as ledgerUtils from './ledger/utils'
 import * as transactionUtils from './transaction/utils'
 import * as schemaValidator from './common/schema-validator'
 import {getServerInfo, getFee} from './common/serverinfo'
-import {clamp, renameCounterpartyToIssuer} from './ledger/utils'
+import {clamp} from './ledger/utils'
 import {TransactionJSON, Instructions, Prepare} from './transaction/types'
 import {ConnectionUserOptions} from './common/connection'
 import {
@@ -142,7 +142,7 @@ export interface APIOptions extends ConnectionUserOptions {
  * command. This varies from command to command, but we need to know it to
  * properly count across many requests.
  */
-function getCollectKeyFromCommand(command: string): string | undefined {
+function getCollectKeyFromCommand(command: string): string | null {
   switch (command) {
     case 'account_offers':
     case 'book_offers':
@@ -150,7 +150,7 @@ function getCollectKeyFromCommand(command: string): string | undefined {
     case 'account_lines':
       return 'lines'
     default:
-      return undefined
+      return null
   }
 }
 
@@ -182,8 +182,6 @@ class XrplClient extends EventEmitter {
     ledgerUtils,
     schemaValidator
   }
-
-  static renameCounterpartyToIssuer = renameCounterpartyToIssuer
   static formatBidsAndAsks = formatBidsAndAsks
 
   constructor(options: APIOptions = {}) {
@@ -308,6 +306,7 @@ class XrplClient extends EventEmitter {
    * general use. Instead, use rippled's built-in pagination and make multiple
    * requests as needed.
    */
+  // TODO: add all requests here once they're done
   async _requestAll(request: AccountOffersRequest): Promise<AccountOffersResponse[]>
   async _requestAll(request: BookOffersRequest): Promise<BookOffersResponse[]>
   async _requestAll(request: AccountLinesRequest): Promise<AccountLinesResponse[]>

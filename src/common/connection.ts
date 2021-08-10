@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import {EventEmitter} from 'events'
-import {parse as parseUrl} from 'url'
+import {URL} from 'url'
 import WebSocket from 'ws'
 import RangeSet from './rangeset'
 import {
@@ -53,8 +53,8 @@ const INTENTIONAL_DISCONNECT_CODE = 4000
 function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
   const options: WebSocket.ClientOptions = {}
   if (config.proxy != null) {
-    const parsedURL = parseUrl(url)
-    const parsedProxyURL = parseUrl(config.proxy)
+    const parsedURL = new URL(url)
+    const parsedProxyURL = new URL(config.proxy)
     const proxyOverrides = _.omitBy(
       {
         secureEndpoint: parsedURL.protocol === 'wss:',
@@ -67,7 +67,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
       },
       value => value == null
     )
-    const proxyOptions = Object.assign({}, parsedProxyURL, proxyOverrides)
+    const proxyOptions = {...parsedProxyURL, ...proxyOverrides}
     let HttpsProxyAgent
     try {
       HttpsProxyAgent = require('https-proxy-agent')
@@ -89,7 +89,7 @@ function createWebSocket(url: string, config: ConnectionOptions): WebSocket {
     },
     value => value == null
   )
-  const websocketOptions = Object.assign({}, options, optionsOverrides)
+  const websocketOptions = {...options, ...optionsOverrides}
   const websocket = new WebSocket(url, null, websocketOptions)
   // we will have a listener for each outstanding request,
   // so we have to raise the limit (the default is 10)
