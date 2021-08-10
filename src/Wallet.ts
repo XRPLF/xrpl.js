@@ -88,7 +88,7 @@ class Wallet {
    * @returns {object} A signed transaction.
    */
   signTransaction(
-    txJSON: any,
+    txJSON: any, // TODO: txJSON should be typed with a transaction type.
     options: SignOptions = {signAs: ''}
   ): {signedTransaction: string; id: string} {
     return signOffline(this, JSON.stringify(txJSON), options)
