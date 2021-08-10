@@ -14,6 +14,7 @@ import {
   RippleError
 } from './errors'
 import {ExponentialBackoff} from './backoff'
+import { LedgerStream, Request, Response } from '../models/methods'
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
@@ -37,23 +38,6 @@ export interface ConnectionOptions {
  * still optional at the point that the user provides it.
  */
 export type ConnectionUserOptions = Partial<ConnectionOptions>
-
-/**
- * Ledger Stream Message
- * https://xrpl.org/subscribe.html#ledger-stream
- */
-interface LedgerStreamMessage {
-  type?: 'ledgerClosed' // not present in initial `subscribe` response
-  fee_base: number
-  fee_ref: number
-  ledger_hash: string
-  ledger_index: number
-  ledger_time: number
-  reserve_base: number
-  reserve_inc: number
-  txn_count?: number // not present in initial `subscribe` response
-  validated_ledgers?: string
-}
 
 /**
  * Represents an intentionally triggered web-socket disconnect code.
@@ -161,7 +145,7 @@ class LedgerHistory {
    * of whether ledger history data exists or not. If relevant ledger data
    * is found, we'll update our history (ex: from a "ledgerClosed" event).
    */
-  update(ledgerMessage: LedgerStreamMessage) {
+  update(ledgerMessage: LedgerStream) {
     // type: ignored
     this.feeBase = ledgerMessage.fee_base
     this.feeRef = ledgerMessage.fee_ref
@@ -228,14 +212,14 @@ class RequestManager {
     delete this.promisesAwaitingResponse[id]
   }
 
-  resolve(id: number, data: any) {
+  resolve(id: string | number, data: Response) {
     const {timer, resolve} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
     resolve(data)
     delete this.promisesAwaitingResponse[id]
   }
 
-  reject(id: number, error: Error) {
+  reject(id: string | number, error: Error) {
     const {timer, reject} = this.promisesAwaitingResponse[id]
     clearTimeout(timer)
     reject(error)
@@ -253,8 +237,8 @@ class RequestManager {
    * hung responses, and a promise that will resolve with the response once
    * the response is seen & handled.
    */
-  createRequest(data: any, timeout: number): [number, string, Promise<any>] {
-    const newId = this.nextId++
+  createRequest(data: Request, timeout: number): [string | number, string, Promise<Response>] {
+    const newId = data.id ? data.id : this.nextId++
     const newData = JSON.stringify({...data, id: newId})
     const timer = setTimeout(
       () => this.reject(newId, new TimeoutError()),
@@ -265,18 +249,17 @@ class RequestManager {
     if (timer.unref) {
       timer.unref()
     }
-    const newPromise = new Promise((resolve, reject) => {
+    const newPromise = new Promise((resolve: (data: Response) => void, reject) => {
       this.promisesAwaitingResponse[newId] = {resolve, reject, timer}
     })
     return [newId, newData, newPromise]
   }
 
   /**
-   * Handle a "response" (any message with `{type: "response"}`). Responses
-   * match to the earlier request handlers, and resolve/reject based on the
-   * data received.
+   * Handle a "response". Responses match to the earlier request handlers, 
+   * and resolve/reject based on the data received.
    */
-  handleResponse(data: any) {
+  handleResponse(data: Response) {
     if (!Number.isInteger(data.id) || data.id < 0) {
       throw new ResponseFormatError('valid id not found in response', data)
     }
@@ -296,7 +279,7 @@ class RequestManager {
       this.reject(data.id, error)
       return
     }
-    this.resolve(data.id, data.result)
+    this.resolve(data.id, data)
   }
 }
 
@@ -418,7 +401,7 @@ export class Connection extends EventEmitter {
       streams: ['ledger']
     })
     // If rippled instance doesn't have validated ledgers, disconnect and then reject.
-    if (_.isEmpty(data) || !data.ledger_index) {
+    if (_.isEmpty(data) || !data.result.ledger_index) {
       try {
         await this.disconnect()
       } catch (error) {
@@ -429,10 +412,10 @@ export class Connection extends EventEmitter {
         throw new RippledNotInitializedError('Rippled not initialized')
       }
     }
-    this._ledger.update(data)
+    this._ledger.update(data.result)
   }
 
-  private _onConnectionFailed = (errorOrCode: Error | number | undefined) => {
+  private _onConnectionFailed = (errorOrCode: Error | number | null) => {
     if (this._ws) {
       this._ws.removeAllListeners()
       this._ws.on('error', () => {
@@ -627,7 +610,7 @@ export class Connection extends EventEmitter {
     return this._ledger.hasVersion(ledgerVersion)
   }
 
-  async request(request, timeout?: number): Promise<any> {
+  async request<T extends Request, U extends Response>(request: T, timeout?: number): Promise<U> {
     if (!this._shouldBeConnected) {
       throw new NotConnectedError()
     }
@@ -640,7 +623,7 @@ export class Connection extends EventEmitter {
       this._requestManager.reject(id, error)
     })
 
-    return responsePromise
+    return responsePromise as any
   }
 
   /**
