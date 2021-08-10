@@ -27,8 +27,3 @@ export interface TransactionAndMetadata {
     transaction: Transaction;
     metadata: Metadata
 }
-
-export interface SignedTransaction extends Transaction {
-    SigningPublicKey: string;
-    TxnSignature: string;
-}

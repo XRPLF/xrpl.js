@@ -1,5 +1,5 @@
 import { ValidationError } from 'ripple-api/common/errors'
-import { verifyCommonFields } from './../src/models/transactions/common'
+import { verifyBaseTransaction } from './../src/models/transactions/common'
 import { verifyOfferCreate } from './../src/models/transactions/offerCreate'
 import { assert } from 'chai'
 
@@ -9,7 +9,7 @@ import { assert } from 'chai'
  * Providing runtime verification testing for each specific transaction type
  */
 describe('Transaction Verification', function () {
-    it(`Verifies all optional CommonFields`, () => {
+    it(`Verifies all optional BaseTransaction`, () => {
         const txJson = {
             Account: "r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe",
             TransactionType: "Payment",
@@ -50,16 +50,16 @@ describe('Transaction Verification', function () {
             TxnSignature: "3045022100C6708538AE5A697895937C758E99A595B57A16393F370F11B8D4C032E80B532002207776A8E85BB9FAF460A92113B9C60F170CD964196B1F084E0DAB65BAEC368B66"
         }
 
-        assert.doesNotThrow(() => verifyCommonFields(txJson))
+        assert.doesNotThrow(() => verifyBaseTransaction(txJson))
     })
 
-    it(`Verifies only required CommonFields`, () => {
+    it(`Verifies only required BaseTransaction`, () => {
         const txJson = {
             Account: "r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe",
             TransactionType: "Payment",
         }
         
-        assert.doesNotThrow(() => verifyCommonFields(txJson))
+        assert.doesNotThrow(() => verifyBaseTransaction(txJson))
     })
 
     it (`Handles invalid Fee`, () => {
@@ -70,9 +70,9 @@ describe('Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCommonFields(invalidFee),
+            () => verifyBaseTransaction(invalidFee),
             ValidationError,
-            "CommonFields: invalid Fee"
+            "BaseTransaction: invalid Fee"
         )
     })
 
@@ -84,9 +84,9 @@ describe('Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCommonFields(invalidSeq),
+            () => verifyBaseTransaction(invalidSeq),
             ValidationError,
-            "CommonFields: invalid Sequence"
+            "BaseTransaction: invalid Sequence"
         )
     })
 
@@ -98,9 +98,9 @@ describe('Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCommonFields(invalidID),
+            () => verifyBaseTransaction(invalidID),
             ValidationError,
-            "CommonFields: invalid AccountTxnID"
+            "BaseTransaction: invalid AccountTxnID"
         )
     })
 
@@ -113,9 +113,9 @@ describe('Transaction Verification', function () {
 
 
         assert.throws(
-            () => verifyCommonFields(invalidFlags),
+            () => verifyBaseTransaction(invalidFlags),
             ValidationError,
-            "CommonFields: invalid Flags"
+            "BaseTransaction: invalid Flags"
         )
     })
 
@@ -127,9 +127,9 @@ describe('Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCommonFields(invalidLastLedgerSequence),
+            () => verifyBaseTransaction(invalidLastLedgerSequence),
             ValidationError,
-            "CommonFields: invalid LastLedgerSequence"
+            "BaseTransaction: invalid LastLedgerSequence"
         )
     })
 
@@ -142,9 +142,9 @@ describe('Transaction Verification', function () {
 
         
         assert.throws(
-            () => verifyCommonFields(invalidSourceTag),
+            () => verifyBaseTransaction(invalidSourceTag),
             ValidationError,
-            "CommonFields: invalid SourceTag"
+            "BaseTransaction: invalid SourceTag"
         )
     })
 
@@ -156,9 +156,9 @@ describe('Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCommonFields(invalidSigningPubKey),
+            () => verifyBaseTransaction(invalidSigningPubKey),
             ValidationError,
-            "CommonFields: invalid SigningPubKey"
+            "BaseTransaction: invalid SigningPubKey"
         )
     })
 
@@ -170,9 +170,9 @@ describe('Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCommonFields(invalidTicketSequence),
+            () => verifyBaseTransaction(invalidTicketSequence),
             ValidationError,
-            "CommonFields: invalid TicketSequence"
+            "BaseTransaction: invalid TicketSequence"
         )
     })
 
@@ -184,9 +184,9 @@ describe('Transaction Verification', function () {
         } as any
         
         assert.throws(
-            () => verifyCommonFields(invalidTxnSignature),
+            () => verifyBaseTransaction(invalidTxnSignature),
             ValidationError,
-            "CommonFields: invalid TxnSignature"
+            "BaseTransaction: invalid TxnSignature"
         )
     })
 
@@ -198,9 +198,9 @@ describe('Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCommonFields(invalidSigners),
+            () => verifyBaseTransaction(invalidSigners),
             ValidationError,
-            "CommonFields: invalid Signers"
+            "BaseTransaction: invalid Signers"
         )
 
         const invalidSigners2 = {
@@ -214,9 +214,9 @@ describe('Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCommonFields(invalidSigners2),
+            () => verifyBaseTransaction(invalidSigners2),
             ValidationError,
-            "CommonFields: invalid Signers"
+            "BaseTransaction: invalid Signers"
         )
     })
 
@@ -233,9 +233,9 @@ describe('Transaction Verification', function () {
         } as any
 
         assert.throws(
-            () => verifyCommonFields(invalidMemo),
+            () => verifyBaseTransaction(invalidMemo),
             ValidationError,
-            "CommonFields: invalid Memos"
+            "BaseTransaction: invalid Memos"
         )
     })
 
