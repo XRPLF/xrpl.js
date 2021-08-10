@@ -1,4 +1,4 @@
-export * from './api'
+export * from './client/api'
 
 export * from './transaction/types'
 
