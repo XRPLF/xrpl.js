@@ -8,6 +8,7 @@ import BigNumber from 'bignumber.js'
 import {xrpToDrops} from '../common'
 import {RippleAPI} from '..'
 import Wallet from '../Wallet'
+import {SignedTransaction} from '../common/types/objects'
 const validate = utils.common.validate
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
@@ -24,7 +25,7 @@ function signWithKeypair(
   options: SignOptions = {
     signAs: ''
   }
-): {signedTransaction: string; id: string} {
+): SignedTransaction {
   validate.sign({txJSON, keypair})
   const isOnline = !!api;
 
@@ -223,7 +224,7 @@ function sign(
   secret?: any,
   options?: SignOptions,
   keypair?: KeyPair
-): {signedTransaction: string; id: string} {
+): SignedTransaction {
   if (typeof secret === 'string') {
     // we can't validate that the secret matches the account because
     // the secret could correspond to the regular key
@@ -249,7 +250,7 @@ function signOffline(
   wallet: Wallet,
   txJSON: string,
   options?: SignOptions,
-): {signedTransaction: string; id: string} {
+): SignedTransaction {
   const {publicKey, privateKey} = wallet
   return signWithKeypair(
     null,

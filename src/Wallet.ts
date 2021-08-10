@@ -3,6 +3,7 @@ import {mnemonicToSeedSync} from 'bip39'
 import {decode, encodeForSigning} from 'ripple-binary-codec'
 import {deriveKeypair, generateSeed, verify} from 'ripple-keypairs'
 import ECDSA from './common/types/enums/ecdsa'
+import {SignedTransaction} from './common/types/objects'
 import {signOffline} from './transaction/sign'
 import {SignOptions} from './transaction/types'
 
@@ -24,8 +25,8 @@ class Wallet {
 
   /**
    * Derives a wallet from a seed.
-   * @param {string} seed - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
-   * @param {ECDSA} algorithm - The digital signature algorithm to generate an address for.
+   * @param {string} seed A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
+   * @param {ECDSA} algorithm The digital signature algorithm to generate an address for.
    * @returns {Wallet} A Wallet derived from a seed.
    */
   static fromSeed(seed: string, algorithm: ECDSA = Wallet.defaultAlgorithm): Wallet {
@@ -34,8 +35,8 @@ class Wallet {
 
   /**
    * Derives a wallet from a mnemonic.
-   * @param {string} mnemonic - A string consisting of words (whitespace delimited) used to derive a wallet.
-   * @param {string} derivationPath - The path to derive a keypair (publicKey/privateKey) from a seed (that was converted from a mnemonic)
+   * @param {string} mnemonic A string consisting of words (whitespace delimited) used to derive a wallet.
+   * @param {string} derivationPath The path to derive a keypair (publicKey/privateKey) from a seed (that was converted from a mnemonic).
    * @returns {Wallet} A Wallet derived from a mnemonic.
    */
   static fromMnemonic(
@@ -56,8 +57,8 @@ class Wallet {
 
   /**
    * Derives a wallet from an entropy (array of random numbers).
-   * @param {Uint8Array | number[]} entropy - An array of random numbers to generate a seed used to derive a wallet.
-   * @param {ECDSA} algorithm - The digital signature algorithm to generate an address for.
+   * @param {Uint8Array | number[]} entropy An array of random numbers to generate a seed used to derive a wallet.
+   * @param {ECDSA} algorithm The digital signature algorithm to generate an address for.
    * @returns {Wallet} A Wallet derived from an entropy.
    */
   static fromEntropy(
@@ -83,21 +84,21 @@ class Wallet {
 
   /**
    * Signs a transaction offline.
-   * @param {object} txJSON - A transaction to be signed offline.
-   * @param {SignOptions} options - Options to include for signing.
-   * @returns {object} A signed transaction.
+   * @param {object} txJSON A transaction to be signed offline.
+   * @param {SignOptions} options Options to include for signing.
+   * @returns {SignedTransaction} A signed transaction.
    */
   signTransaction(
     txJSON: any, // TODO: txJSON should be typed with a transaction type.
     options: SignOptions = {signAs: ''}
-  ): {signedTransaction: string; id: string} {
+  ): SignedTransaction {
     return signOffline(this, JSON.stringify(txJSON), options)
   }
 
   /**
    * Verifies a signed transaction offline.
-   * @param {string} signedTransaction - A signed transaction (hex string of signTransaction result) to be verified offline.
-   * @returns {boolean} Returns true if verification is valid.
+   * @param {string} signedTransaction A signed transaction (hex string of signTransaction result) to be verified offline.
+   * @returns {boolean} Returns true if a signedTransaction is valid.
    */
   verifyTransaction(signedTransaction: string): boolean {
     const txJSON = decode(signedTransaction)
