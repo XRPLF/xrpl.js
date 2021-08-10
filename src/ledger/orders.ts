@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import {validate} from '../common'
 import {FormattedAccountOrder, parseAccountOrder} from './parse/account-order'
 import {Client} from '..'
-import {AccountOffersResponse} from '../common/types/commands'
+import {AccountOffersResponse} from '../models/methods'
 
 export type GetOrdersOptions = {
   limit?: number
@@ -15,7 +15,7 @@ function formatResponse(
 ): FormattedAccountOrder[] {
   let orders: FormattedAccountOrder[] = []
   for (const response of responses) {
-    const offers = response.offers.map((offer) => {
+    const offers = response.result.offers.map((offer) => {
       return parseAccountOrder(address, offer)
     })
     orders = orders.concat(offers)
@@ -31,7 +31,7 @@ export default async function getOrders(
   // 1. Validate
   validate.getOrders({address, options})
   // 2. Make Request
-  const responses = await this._requestAll('account_offers', {
+  const responses = await this._requestAll({command: 'account_offers',
     account: address,
     ledger_index: options.ledgerVersion || (await this.getLedgerVersion()),
     limit: options.limit
