@@ -1,5 +1,5 @@
 import { ValidationError } from 'ripple-api/common/errors'
-import { verifyCommonFields } from './../src/models/transactions/common'
+import { verifyCommonFields } from '../../src/models/transactions/common'
 import { assert } from 'chai'
 
 /**
