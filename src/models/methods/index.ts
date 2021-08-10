@@ -12,6 +12,8 @@ import { NoRippleCheckRequest, NoRippleCheckResponse } from "./norippleCheck";
 import { ConsensusStream, LedgerStream, OrderBookStream, PeerStatusStream, Stream, SubscribeRequest, SubscribeResponse, TransactionStream, ValidationStream } from "./subscribe";
 import { UnsubscribeRequest, UnsubscribeResponse } from "./unsubscribe";
 import { PathFindRequest, PathFindResponse } from "./pathFind";
+import { PingRequest, PingResponse } from "./ping";
+import { RandomRequest, RandomResponse } from "./random";
 import { RipplePathFindRequest, RipplePathFindResponse } from "./ripplePathFind";
 
 type Request = // account methods
@@ -32,6 +34,9 @@ type Request = // account methods
                // subscription methods
              | SubscribeRequest
              | UnsubscribeRequest
+               // utility methods
+             | PingRequest
+             | RandomRequest
 
 type Response = // account methods
                 AccountChannelsResponse 
@@ -51,6 +56,9 @@ type Response = // account methods
                 // subscription methods
               | SubscribeResponse
               | UnsubscribeResponse
+                // utility methods
+              | PingResponse
+              | RandomResponse
 
 export {
     Request,
@@ -94,5 +102,10 @@ export {
     OrderBookStream,
     ConsensusStream,
     UnsubscribeRequest,
-    UnsubscribeResponse
+    UnsubscribeResponse,
+    // utility methods
+    PingRequest,
+    PingResponse,
+    RandomRequest,
+    RandomResponse
 }
