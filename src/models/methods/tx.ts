@@ -16,4 +16,5 @@ export interface TxResponse extends BaseResponse {
     meta: TransactionMetadata | string
     validated?: boolean
   } // TODO: needs to be `& Transaction` once that type is available
+  searched_all?: boolean
 }
