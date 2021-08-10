@@ -23,4 +23,5 @@ export interface BaseResponse {
     error?: string
     request?: Response
     api_version?: number
+    searched_all?: boolean // used in `tx`
 }
