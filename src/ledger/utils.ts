@@ -5,6 +5,7 @@ import {Connection} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {Issue} from '../common/types/objects'
 import {XrplClient} from '..'
+import { AccountInfoRequest } from '../models/methods'
 
 export type RecursiveData = {
   marker: string
@@ -23,14 +24,14 @@ function getXRPBalance(
   address: string,
   ledgerVersion?: number
 ): Promise<string> {
-  const request = {
+  const request: AccountInfoRequest = {
     command: 'account_info',
     account: address,
     ledger_index: ledgerVersion
   }
   return connection
     .request(request)
-    .then((data) => common.dropsToXrp(data.account_data.Balance))
+    .then((data) => common.dropsToXrp(data.result.account_data.Balance))
 }
 
 // If the marker is omitted from a response, you have reached the end

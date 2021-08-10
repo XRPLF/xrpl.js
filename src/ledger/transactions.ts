@@ -7,6 +7,7 @@ import getTransaction from './transaction'
 import {validate, errors, Connection, ensureClassicAddress} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
 import {XrplClient} from '..'
+import { AccountTxRequest } from '../models/methods'
 
 export type TransactionsOptions = {
   start?: string
@@ -120,7 +121,7 @@ function getAccountTx(
   marker: string,
   limit: number
 ) {
-  const request = {
+  const request: AccountTxRequest = {
     command: 'account_tx',
     account: address,
     // -1 is equivalent to earliest available validated ledger

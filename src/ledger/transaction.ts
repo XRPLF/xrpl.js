@@ -128,7 +128,7 @@ async function getTransaction(
   validate.getTransaction({id, options})
   const _options = await utils.ensureLedgerVersion.call(this, options)
   try {
-    const tx = await this.request('tx', {
+    const tx = await this.request({command: 'tx',
       transaction: id,
       binary: false
     })

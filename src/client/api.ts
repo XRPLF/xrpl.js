@@ -71,6 +71,15 @@ import {
   GatewayBalancesResponse,
   NoRippleCheckRequest,
   NoRippleCheckResponse,
+  // transaction methods
+  SubmitRequest,
+  SubmitResponse,
+  SubmitMultisignedRequest,
+  SubmitMultisignedResponse,
+  TransactionEntryRequest,
+  TransactionEntryResponse,
+  TxRequest,
+  TxResponse,
   // path and order book methods
   BookOffersRequest,
   BookOffersResponse,
@@ -80,6 +89,15 @@ import {
   PathFindResponse,
   RipplePathFindRequest,
   RipplePathFindResponse,
+  // server info methods
+  FeeRequest,
+  FeeResponse,
+  ManifestRequest,
+  ManifestResponse,
+  ServerInfoRequest,
+  ServerInfoResponse,
+  ServerStateRequest,
+  ServerStateResponse,
   // utility methods
   PingRequest,
   PingResponse,
@@ -227,12 +245,20 @@ class XrplClient extends EventEmitter {
   public request(r: AccountTxRequest): Promise<AccountTxResponse>
   public request(r: BookOffersRequest): Promise<BookOffersResponse>
   public request(r: DepositAuthorizedRequest): Promise<DepositAuthorizedResponse>
+  public request(r: FeeRequest): Promise<FeeResponse>
   public request(r: GatewayBalancesRequest): Promise<GatewayBalancesResponse>
+  public request(r: ManifestRequest): Promise<ManifestResponse>
   public request(r: NoRippleCheckRequest): Promise<NoRippleCheckResponse>
   public request(r: PathFindRequest): Promise<PathFindResponse>
   public request(r: PingRequest): Promise<PingResponse>
   public request(r: RandomRequest): Promise<RandomResponse>
   public request(r: RipplePathFindRequest): Promise<RipplePathFindResponse>
+  public request(r: ServerInfoRequest): Promise<ServerInfoResponse>
+  public request(r: ServerStateRequest): Promise<ServerStateResponse>
+  public request(r: SubmitRequest): Promise<SubmitResponse>
+  public request(r: SubmitMultisignedRequest): Promise<SubmitMultisignedResponse>
+  public request(r: TransactionEntryRequest): Promise<TransactionEntryResponse>
+  public request(r: TxRequest): Promise<TxResponse>
   public request<R extends Request, T extends Response>(r: R): Promise<T> {
     // TODO: should this be typed with `extends BaseRequest/BaseResponse`?
     return this.connection.request(r)

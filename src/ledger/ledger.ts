@@ -17,7 +17,7 @@ async function getLedger(
   // 1. Validate
   validate.getLedger({options})
   // 2. Make Request
-  const response = await this.request('ledger', {
+  const response = await this.request({command: 'ledger',
     ledger_hash: options.ledgerHash,
     ledger_index: options.ledgerVersion || 'validated',
     expand: options.includeAllData,
@@ -25,7 +25,7 @@ async function getLedger(
     accounts: options.includeState
   })
   // 3. Return Formatted Response
-  return parseLedger(response.ledger)
+  return parseLedger(response.result.ledger)
 }
 
 export default getLedger
