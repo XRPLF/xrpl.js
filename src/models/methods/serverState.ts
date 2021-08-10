@@ -7,7 +7,7 @@ export interface ServerStateRequest extends BaseRequest {
 export interface ServerStateResponse extends BaseResponse {
     result: {
         state: {
-            amendment_blocked?: string
+            amendment_blocked?: boolean
             build_version: string
             complete_ledgers: string
             closed_ledger?: {

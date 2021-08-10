@@ -22,7 +22,7 @@ export interface JobType {
 export interface ServerInfoResponse extends BaseResponse {
     result: {
         info: {
-            amendment_blocked?: string
+            amendment_blocked?: boolean
             build_version: string
             closed_ledger?: {
                 age: number
