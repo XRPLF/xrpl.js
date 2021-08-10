@@ -9,9 +9,6 @@ function getDefaultConfiguration() {
   cache: true,
   performance: { hints: false },
   stats: 'errors-only',
-  externals: [{
-    'lodash': '_'
-  }],
   entry: './dist/npm/index.js',
   output: {
     library: 'ripple',
