@@ -1,6 +1,6 @@
 import {RippleAPI} from 'ripple-api'
 import {TestSuite} from '../../utils'
-import Wallet from '../../../src/offline/wallet'
+import Wallet from '../../../src/Wallet'
 
 const {schemaValidator} = RippleAPI._PRIVATE
 const publicKey =

@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
-import Wallet, {WalletOptions} from '../../../src/offline/wallet'
+import Wallet from '../../../src/Wallet'
 
 const mnemonic =
   'try milk link drift aware pass obtain again music stick pluck fold'
@@ -15,36 +15,22 @@ const privateKey =
  * - Check out "test/api/index.ts" for more information about the test runner.
  */
 export default <TestSuite>{
+  'Wallet.fromMnemonic using default derivation path': async (api) => {
+    // GIVEN no derivation path
+    // WHEN deriving a wallet from a mnemonic without a derivation path
+    const wallet = Wallet.fromMnemonic(mnemonic)
+
+    // THEN we get a wallet with a keypair (publicKey/privateKey)
+    assert.equal(wallet.publicKey, publicKey)
+    assert.equal(wallet.privateKey, privateKey)
+  },
+
   'Wallet.fromMnemonic with empty options object': async (api) => {
-    // GIVEN an empty options object
-    const options: WalletOptions = {}
+    // GIVEN a derivation path
+    const derivationPath = "m/44'/144'/0'/0/0"
 
-    // WHEN deriving a wallet from a mnemonic
-    const wallet = Wallet.fromMnemonic(mnemonic, options)
-
-    // THEN we get a wallet with a keypair (publicKey/privateKey)
-    assert.equal(wallet.publicKey, publicKey)
-    assert.equal(wallet.privateKey, privateKey)
-  },
-
-  'Wallet.fromMnemonic with algorithm ecdsa-secp256k1': async (api) => {
-    // GIVEN we want to use ecdsa-secp256k1
-    const options: WalletOptions = {algorithm: 'ecdsa-secp256k1'}
-
-    // WHEN deriving a wallet from a mnemonic
-    const wallet = Wallet.fromMnemonic(mnemonic, options)
-
-    // THEN we get a wallet with a keypair (publicKey/privateKey)
-    assert.equal(wallet.publicKey, publicKey)
-    assert.equal(wallet.privateKey, privateKey)
-  },
-
-  'Wallet.fromMnemonic with algorithm ed25519': async (api) => {
-    // GIVEN we want to use ed25519
-    const options: WalletOptions = {algorithm: 'ed25519'}
-
-    // WHEN deriving a wallet from a mnemonic
-    const wallet = Wallet.fromMnemonic(mnemonic, options)
+    // WHEN deriving a wallet from a mnemonic without a derivation path
+    const wallet = Wallet.fromMnemonic(mnemonic, derivationPath)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)

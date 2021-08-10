@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
-import Wallet, {WalletOptions} from '../../../src/offline/wallet'
+import Wallet from '../../../src/Wallet'
 
 const entropy: number[] = new Array(16).fill(0)
 const publicKey: string =
@@ -19,26 +19,20 @@ const privateKeyED25519: string =
  */
 export default <TestSuite>{
   'Wallet.fromEntropy with entropy only': async (api) => {
-    // GIVEN an entropy
-    const options: WalletOptions = {entropy}
-
     // WHEN deriving a wallet from an entropy
-    const wallet = Wallet.fromEntropy(options)
+    const wallet = Wallet.fromEntropy(entropy)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
-    assert.equal(wallet.publicKey, publicKey)
-    assert.equal(wallet.privateKey, privateKey)
+    assert.equal(wallet.publicKey, publicKeyED25519)
+    assert.equal(wallet.privateKey, privateKeyED25519)
   },
 
   'Wallet.fromEntropy with algorithm ecdsa-secp256k1': async (api) => {
     // GIVEN an entropy using ecdsa-secp256k1
-    const options: WalletOptions = {
-      algorithm: 'ecdsa-secp256k1',
-      entropy,
-    }
+    const algorithm = 'ecdsa-secp256k1'
 
-    // WHEN deriving a wallet from entropy
-    const wallet = Wallet.fromEntropy(options)
+    // WHEN deriving a wallet from an entropy
+    const wallet = Wallet.fromEntropy(entropy, algorithm)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)
@@ -47,13 +41,10 @@ export default <TestSuite>{
 
   'Wallet.fromEntropy with algorithm ed25519': async (api) => {
     // GIVEN an entropy using ed25519
-    const options: WalletOptions = {
-      algorithm: 'ed25519',
-      entropy,
-    }
+    const algorithm = 'ed25519'
 
-    // WHEN deriving a wallet from entropy
-    const wallet = Wallet.fromEntropy(options)
+    // WHEN deriving a wallet from an entropy
+    const wallet = Wallet.fromEntropy(entropy, algorithm)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKeyED25519)

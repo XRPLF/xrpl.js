@@ -1,6 +1,6 @@
 import assert from 'assert-diff'
 import {TestSuite} from '../../utils'
-import Wallet, {WalletOptions} from '../../../src/offline/wallet'
+import Wallet from '../../../src/Wallet'
 
 const seed = 'ssL9dv2W5RK8L3tuzQxYY6EaZhSxW'
 const publicKey =
@@ -15,11 +15,8 @@ const privateKey =
  */
 export default <TestSuite>{
   'Wallet.fromSeed with empty options object': async (api) => {
-    // GIVEN an empty options object
-    const options: WalletOptions = {}
-
     // WHEN deriving a wallet from a seed
-    const wallet = Wallet.fromSeed(seed, options)
+    const wallet = Wallet.fromSeed(seed)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)
@@ -28,10 +25,10 @@ export default <TestSuite>{
 
   'Wallet.fromSeed with algorithm ecdsa-secp256k1': async (api) => {
     // GIVEN we want to use ecdsa-secp256k1
-    const options: WalletOptions = {algorithm: 'ecdsa-secp256k1'}
+    const algorithm = 'ecdsa-secp256k1'
 
     // WHEN deriving a wallet from a seed
-    const wallet = Wallet.fromSeed(seed, options)
+    const wallet = Wallet.fromSeed(seed, algorithm)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)
@@ -40,10 +37,10 @@ export default <TestSuite>{
 
   'Wallet.fromSeed with algorithm ed25519': async (api) => {
     // GIVEN we want to use ed25519
-    const options: WalletOptions = {algorithm: 'ed25519'}
+    const algorithm = 'ed25519'
 
     // WHEN deriving a wallet from a seed
-    const wallet = Wallet.fromSeed(seed, options)
+    const wallet = Wallet.fromSeed(seed, algorithm)
 
     // THEN we get a wallet with a keypair (publicKey/privateKey)
     assert.equal(wallet.publicKey, publicKey)

@@ -7,7 +7,7 @@ import {SignOptions, KeyPair, TransactionJSON} from './types'
 import BigNumber from 'bignumber.js'
 import {xrpToDrops} from '../common'
 import {RippleAPI} from '..'
-import Wallet from '../offline/wallet'
+import Wallet from '../Wallet'
 const validate = utils.common.validate
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
@@ -250,13 +250,13 @@ function signOffline(
   txJSON: string,
   options?: SignOptions,
 ): {signedTransaction: string; id: string} {
-  const { publicKey, privateKey} = wallet;
+  const {publicKey, privateKey} = wallet
   return signWithKeypair(
     null,
     txJSON,
-    { publicKey, privateKey },
-    options
+    {publicKey, privateKey},
+    options,
   )
 }
 
-export { sign, signOffline }
+export {sign, signOffline}

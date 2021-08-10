@@ -26,7 +26,6 @@ import {
     computePaymentChannelHash,
 } from '../common/hashes'
 import { generateAddressAPI, GenerateAddressOptions, GeneratedAddress } from '../offline/generate-address'
-import Wallet from '../offline/wallet'
 
 // @deprecated Use X-addresses instead
 const generateAddress = (options: GenerateAddressOptions = {}): GeneratedAddress => (
@@ -62,5 +61,4 @@ export {
     deriveXAddress,
     signPaymentChannelClaim,
     verifyPaymentChannelClaim,
-    Wallet,
 }
