@@ -1,5 +1,6 @@
 // Deprecated - use api.request instead:
-//   const response = await api.request('submit', {
+//   const response = await api.request({
+//     command: 'submit',
 //     tx_blob: signedTransaction,
 //     fail_hard: failHard
 //   });
@@ -41,7 +42,7 @@ function formatSubmitResponse(response): FormattedSubmitResponse {
   return data
 }
 
-// @deprecated Use api.request('submit', { tx_blob: signedTransaction }) instead
+// @deprecated Use api.request({ command: 'submit' tx_blob: signedTransaction }) instead
 async function submit(
   this: XrplClient,
   signedTransaction: string,
@@ -50,7 +51,7 @@ async function submit(
   // 1. Validate
   validate.submit({signedTransaction})
   // 2. Make Request
-  const response = await this.request('submit', {
+  const response = await this.request({command: 'submit',
     tx_blob: signedTransaction,
     ...(failHard ? {fail_hard: failHard} : {})
   })

@@ -8,12 +8,12 @@ import {TestSuite} from '../../utils'
  */
 export default <TestSuite>{
   'returns true when there is another page': async (api, address) => {
-    const response = await api.request('ledger_data')
+    const response = await api.request({command: 'ledger_data'})
     assert(api.hasNextPage(response))
   },
 
   'returns false when there are no more pages': async (api, address) => {
-    const response = await api.request('ledger_data')
+    const response = await api.request({command: 'ledger_data'})
     const responseNextPage = await api.requestNextPage(
       'ledger_data',
       {},

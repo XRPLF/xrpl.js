@@ -427,7 +427,7 @@ class XrplClient extends EventEmitter {
   sign = sign
   combine = combine
 
-  submit = submit // @deprecated Use api.request('submit', { tx_blob: signedTransaction }) instead
+  submit = submit // @deprecated Use api.request({command: 'submit', tx_blob: signedTransaction }) instead
 
   deriveKeypair = deriveKeypair // @deprecated Invoke from top-level package instead
   deriveAddress = deriveAddress // @deprecated Invoke from top-level package instead

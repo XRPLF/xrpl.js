@@ -58,27 +58,27 @@ export default <TestSuite>{
     }
 
     await Promise.all([
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.base,
+        taker_pays: orderbookInfo.counter,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       }),
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.counter,
+        taker_pays: orderbookInfo.base,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       })
     ]).then(([directOfferResults, reverseOfferResults]) => {
       const directOffers = (directOfferResults
-        ? directOfferResults.offers
+        ? directOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const reverseOffers = (reverseOfferResults
-        ? reverseOfferResults.offers
+        ? reverseOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
@@ -101,27 +101,27 @@ export default <TestSuite>{
     }
 
     await Promise.all([
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.base,
+        taker_pays: orderbookInfo.counter,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       }),
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.counter,
+        taker_pays: orderbookInfo.base,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       })
     ]).then(([directOfferResults, reverseOfferResults]) => {
       const directOffers = (directOfferResults
-        ? directOfferResults.offers
+        ? directOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const reverseOffers = (reverseOfferResults
-        ? reverseOfferResults.offers
+        ? reverseOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
@@ -147,27 +147,27 @@ export default <TestSuite>{
     const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
 
     await Promise.all([
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.base,
+        taker_pays: orderbookInfo.counter,
         ledger_index: 'validated',
         limit: 400, // must match `test/fixtures/rippled/requests/1-taker_gets-XRP-taker_pays-JPY.json`
         taker: myAddress
       }),
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.counter,
+        taker_pays: orderbookInfo.base,
         ledger_index: 'validated',
         limit: 400, // must match `test/fixtures/rippled/requests/2-taker_gets-JPY-taker_pays-XRP.json`
         taker: myAddress
       })
     ]).then(([directOfferResults, reverseOfferResults]) => {
       const directOffers = (directOfferResults
-        ? directOfferResults.offers
+        ? directOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const reverseOffers = (reverseOfferResults
-        ? reverseOfferResults.offers
+        ? reverseOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
@@ -191,27 +191,27 @@ export default <TestSuite>{
     const myAddress = 'rE9qNjzJXpiUbVomdv7R4xhrXVeH2oVmGR'
 
     await Promise.all([
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.base,
+        taker_pays: orderbookInfo.counter,
         ledger_index: 'validated',
         limit: 400, // must match `test/fixtures/rippled/requests/1-taker_gets-XRP-taker_pays-JPY.json`
         taker: myAddress
       }),
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.counter,
+        taker_pays: orderbookInfo.base,
         ledger_index: 'validated',
         limit: 400, // must match `test/fixtures/rippled/requests/2-taker_gets-JPY-taker_pays-XRP.json`
         taker: myAddress
       })
     ]).then(([directOfferResults, reverseOfferResults]) => {
       const directOffers = (directOfferResults
-        ? directOfferResults.offers
+        ? directOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const reverseOffers = (reverseOfferResults
-        ? reverseOfferResults.offers
+        ? reverseOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
@@ -238,27 +238,27 @@ export default <TestSuite>{
     }
 
     await Promise.all([
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.base,
+        taker_pays: orderbookInfo.counter,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       }),
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.counter,
+        taker_pays: orderbookInfo.base,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       })
     ]).then(([directOfferResults, reverseOfferResults]) => {
       const directOffers = (directOfferResults
-        ? directOfferResults.offers
+        ? directOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const reverseOffers = (reverseOfferResults
-        ? reverseOfferResults.offers
+        ? reverseOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
@@ -293,27 +293,27 @@ export default <TestSuite>{
     }
 
     await Promise.all([
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.base,
+        taker_pays: orderbookInfo.counter,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       }),
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.counter,
+        taker_pays: orderbookInfo.base,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       })
     ]).then(([directOfferResults, reverseOfferResults]) => {
       const directOffers = (directOfferResults
-        ? directOfferResults.offers
+        ? directOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const reverseOffers = (reverseOfferResults
-        ? reverseOfferResults.offers
+        ? reverseOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [
@@ -347,27 +347,27 @@ export default <TestSuite>{
     }
 
     await Promise.all([
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.base,
+        taker_pays: orderbookInfo.counter,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       }),
-      api.request('book_offers', {
-        taker_gets: XrplClient.renameCounterpartyToIssuer(orderbookInfo.counter),
-        taker_pays: XrplClient.renameCounterpartyToIssuer(orderbookInfo.base),
+      api.request({command: 'book_offers',
+        taker_gets: orderbookInfo.counter,
+        taker_pays: orderbookInfo.base,
         ledger_index: 'validated',
         limit: 20,
         taker: address
       })
     ]).then(([directOfferResults, reverseOfferResults]) => {
       const directOffers = (directOfferResults
-        ? directOfferResults.offers
+        ? directOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const reverseOffers = (reverseOfferResults
-        ? reverseOfferResults.offers
+        ? reverseOfferResults.result.offers
         : []
       ).reduce((acc, res) => acc.concat(res), [])
       const orderbook = XrplClient.formatBidsAndAsks(orderbookInfo, [

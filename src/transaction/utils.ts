@@ -370,11 +370,11 @@ function prepareTransaction(
     }
 
     try {
-      const response = await api.request('account_info', {
+      const response = await api.request({command: 'account_info',
         account: classicAccount,
         ledger_index: 'current' // Fix #999
       })
-      newTxJSON.Sequence = response.account_data.Sequence
+      newTxJSON.Sequence = response.result.account_data.Sequence
       return Promise.resolve()
     } catch (e) {
       return Promise.reject(e)
