@@ -1,3 +1,5 @@
+import { Request } from './../methods'
+
 export interface BaseRequest {
     id: number | string
     command: string
