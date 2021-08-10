@@ -6,7 +6,7 @@ import parseTransaction from './parse/transaction'
 import getTransaction from './transaction'
 import {validate, errors, Connection, ensureClassicAddress} from '../common'
 import {FormattedTransactionType} from '../transaction/types'
-import {RippleAPI} from '..'
+import {XrplClient} from '..'
 
 export type TransactionsOptions = {
   start?: string
@@ -189,7 +189,7 @@ function getTransactionsInternal(
 }
 
 function getTransactions(
-  this: RippleAPI,
+  this: XrplClient,
   address: string,
   options: TransactionsOptions = {}
 ): Promise<GetTransactionsResponse> {

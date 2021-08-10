@@ -6,7 +6,7 @@ import {computeBinaryTransactionHash} from '../common/hashes'
 import {SignOptions, KeyPair, TransactionJSON} from './types'
 import BigNumber from 'bignumber.js'
 import {xrpToDrops} from '../common'
-import {RippleAPI} from '..'
+import {XrplClient} from '..'
 const validate = utils.common.validate
 
 function computeSignature(tx: object, privateKey: string, signAs?: string) {
@@ -17,7 +17,7 @@ function computeSignature(tx: object, privateKey: string, signAs?: string) {
 }
 
 function signWithKeypair(
-  api: RippleAPI,
+  api: XrplClient,
   txJSON: string,
   keypair: KeyPair,
   options: SignOptions = {
@@ -195,26 +195,26 @@ function checkTxSerialization(serialized: string, tx: TransactionJSON): void {
 /**
  *  Check that a given transaction fee does not exceed maxFeeXRP (in drops).
  *
- *  See https://xrpl.org/rippleapi-reference.html#parameters
+ *  See https://xrpl.org/XrplClient-reference.html#parameters
  *
- *  @param {RippleAPI} api A RippleAPI instance.
+ *  @param {XrplClient} api A XrplClient instance.
  *  @param {string} txFee The transaction fee in drops, encoded as a string.
  *
  *  @returns {void} This method does not return a value, but throws an error if the check fails.
  */
-function checkFee(api: RippleAPI, txFee: string): void {
+function checkFee(api: XrplClient, txFee: string): void {
   const fee = new BigNumber(txFee)
   const maxFeeDrops = xrpToDrops(api._maxFeeXRP)
   if (fee.isGreaterThan(maxFeeDrops)) {
     throw new utils.common.errors.ValidationError(
       `"Fee" should not exceed "${maxFeeDrops}". ` +
-        'To use a higher fee, set `maxFeeXRP` in the RippleAPI constructor.'
+        'To use a higher fee, set `maxFeeXRP` in the XrplClient constructor.'
     )
   }
 }
 
 function sign(
-  this: RippleAPI,
+  this: XrplClient,
   txJSON: string,
   secret?: any,
   options?: SignOptions,

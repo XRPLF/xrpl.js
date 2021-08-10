@@ -1,14 +1,14 @@
-import {RippleAPI, APIOptions} from './api'
+import {XrplClient, APIOptions} from './api'
 
-class RippleAPIBroadcast extends RippleAPI {
+class XrplClientBroadcast extends XrplClient {
   ledgerVersion: number | undefined = undefined
-  private _apis: RippleAPI[]
+  private _apis: XrplClient[]
 
   constructor(servers, options: APIOptions = {}) {
     super(options)
 
-    const apis: RippleAPI[] = servers.map(
-      (server) => new RippleAPI(Object.assign({}, options, {server}))
+    const apis: XrplClient[] = servers.map(
+      (server) => new XrplClient(Object.assign({}, options, {server}))
     )
 
     // exposed for testing
@@ -59,9 +59,9 @@ class RippleAPIBroadcast extends RippleAPI {
 
   getMethodNames() {
     const methodNames: string[] = []
-    const rippleAPI = this._apis[0]
-    for (const name of Object.getOwnPropertyNames(rippleAPI)) {
-      if (typeof rippleAPI[name] === 'function') {
+    const XrplClient = this._apis[0]
+    for (const name of Object.getOwnPropertyNames(XrplClient)) {
+      if (typeof XrplClient[name] === 'function') {
         methodNames.push(name)
       }
     }
@@ -69,4 +69,4 @@ class RippleAPIBroadcast extends RippleAPI {
   }
 }
 
-export {RippleAPIBroadcast}
+export {XrplClientBroadcast}

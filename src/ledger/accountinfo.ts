@@ -4,7 +4,7 @@ import {
   dropsToXrp,
   ensureClassicAddress
 } from '../common'
-import {RippleAPI} from '..'
+import {XrplClient} from '..'
 import {AccountInfoResponse} from '../common/types/commands/account_info'
 
 export type GetAccountInfoOptions = {
@@ -35,7 +35,7 @@ function formatAccountInfo(
 }
 
 export default async function getAccountInfo(
-  this: RippleAPI,
+  this: XrplClient,
   address: string,
   options: GetAccountInfoOptions = {}
 ): Promise<FormattedGetAccountInfoResponse> {
@@ -47,7 +47,7 @@ export default async function getAccountInfo(
   address = ensureClassicAddress(address)
 
   // 2. Make Request
-  const response = await this.request('account_info', {
+  const response = await this.request({command: 'account_info',
     account: address,
     ledger_index: options.ledgerVersion || 'validated'
   })

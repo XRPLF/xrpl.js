@@ -7,4 +7,4 @@ export * from './common/types/objects/ledger'
 export * from './offline/utils';
 
 // Broadcast api is experimental
-export {RippleAPIBroadcast} from './broadcast'
+export {XrplClientBroadcast} from './broadcast'
