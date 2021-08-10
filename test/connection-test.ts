@@ -250,7 +250,7 @@ describe('Connection', function () {
 
   it('ResponseFormatError', function () {
     return this.client
-      .request('test_command', {data: {unrecognizedResponse: true}})
+      .request({command: 'test_command', data: {unrecognizedResponse: true}})
       .then(() => {
         assert(false, 'Should throw ResponseFormatError')
       })
@@ -530,7 +530,7 @@ describe('Connection', function () {
   })
 
   it('propagates RippledError data', function (done) {
-    this.client.request('subscribe', {streams: 'validations'}).catch((error) => {
+    this.client.request({command: 'subscribe', streams: 'validations'}).catch((error) => {
       assert.strictEqual(error.name, 'RippledError')
       assert.strictEqual(error.data.error, 'invalidParams')
       assert.strictEqual(error.message, 'Invalid parameters.')
