@@ -1,5 +1,6 @@
 import { ValidationError } from "../../common/errors"
 import { Memo, Signer } from "../common"
+import { onlyHasFields } from "../utils"
 
 const transactionTypes = [
     "AccountSet",
@@ -33,17 +34,11 @@ const isMemo = (obj: {Memo: Memo}): boolean => {
     const validType = memo.MemoType === undefined
         || typeof memo.MemoType === 'string'
 
-    const otherKeys = Object.keys(memo).every((key: string) => {
-        return key === "MemoFormat" 
-            || key === "MemoData"
-            || key === "MemoType"
-    })
-
     return (1 <= size && size <= 3) 
         && validData 
         && validFormat 
         && validType
-        && otherKeys
+        && onlyHasFields(memo, ["MemoFormat", "MemoData", "MemoType"])
 }
 
 const isSigner = (signer: Signer): boolean => {
