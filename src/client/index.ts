@@ -8,8 +8,7 @@ import {
   dropsToXrp,
   rippleTimeToISO8601,
   iso8601ToRippleTime,
-  txFlags,
-  ensureClassicAddress,
+  txFlags
 } from '../common'
 import {
   getLedgerVersion,
@@ -52,27 +51,42 @@ import signPaymentChannelClaim from '../offline/sign-payment-channel-claim'
 import verifyPaymentChannelClaim from '../offline/verify-payment-channel-claim'
 import getLedger from '../ledger/ledger'
 import {
-  AccountObjectsRequest,
-  AccountObjectsResponse,
-  AccountOffersRequest,
-  AccountOffersResponse,
+  Request,
+  Response,
+  // account methods
+  AccountChannelsRequest,
+  AccountChannelsResponse,
+  AccountCurrenciesRequest,
+  AccountCurrenciesResponse,
   AccountInfoRequest,
   AccountInfoResponse,
   AccountLinesRequest,
   AccountLinesResponse,
-  BookOffersRequest,
-  BookOffersResponse,
+  AccountObjectsRequest,
+  AccountObjectsResponse,
+  AccountOffersRequest,
+  AccountOffersResponse,
+  AccountTxRequest,
+  AccountTxResponse,
   GatewayBalancesRequest,
   GatewayBalancesResponse,
-  LedgerRequest,
-  LedgerResponse,
-  LedgerDataRequest,
-  LedgerDataResponse,
-  LedgerEntryRequest,
-  LedgerEntryResponse,
-  ServerInfoRequest,
-  ServerInfoResponse
-} from '../common/types/commands'
+  NoRippleCheckRequest,
+  NoRippleCheckResponse,
+  // path and order book methods
+  BookOffersRequest,
+  BookOffersResponse,
+  DepositAuthorizedRequest,
+  DepositAuthorizedResponse,
+  PathFindRequest,
+  PathFindResponse,
+  RipplePathFindRequest,
+  RipplePathFindResponse,
+  // utility methods
+  PingRequest,
+  PingResponse,
+  RandomRequest,
+  RandomResponse
+} from '../models/methods'
 
 import RangeSet from '../common/rangeset'
 import * as ledgerUtils from '../ledger/utils'
@@ -111,6 +125,7 @@ import {
   computeEscrowHash,
   computePaymentChannelHash
 } from '../common/hashes'
+import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
 
 import generateFaucetWallet from '../wallet/wallet-generation'
 
@@ -138,6 +153,18 @@ function getCollectKeyFromCommand(command: string): string | undefined {
       return undefined
   }
 }
+
+type MarkerRequest = AccountChannelsRequest 
+                   | AccountLinesRequest 
+                   | AccountObjectsRequest 
+                   | AccountOffersRequest
+                   | AccountTxRequest
+
+type MarkerResponse = AccountChannelsResponse 
+                    | AccountLinesResponse 
+                    | AccountObjectsResponse 
+                    | AccountOffersResponse
+                    | AccountTxResponse
 
 class Client extends EventEmitter {
   _feeCushion: number
@@ -195,53 +222,24 @@ class Client extends EventEmitter {
    * Makes a request to the client with the given command and
    * additional request body parameters.
    */
-  async request(
-    command: 'account_info',
-    params: AccountInfoRequest
-  ): Promise<AccountInfoResponse>
-  async request(
-    command: 'account_lines',
-    params: AccountLinesRequest
-  ): Promise<AccountLinesResponse>
-  async request(
-    command: 'account_objects',
-    params: AccountObjectsRequest
-  ): Promise<AccountObjectsResponse>
-  async request(
-    command: 'account_offers',
-    params: AccountOffersRequest
-  ): Promise<AccountOffersResponse>
-  async request(
-    command: 'book_offers',
-    params: BookOffersRequest
-  ): Promise<BookOffersResponse>
-  async request(
-    command: 'gateway_balances',
-    params: GatewayBalancesRequest
-  ): Promise<GatewayBalancesResponse>
-  async request(
-    command: 'ledger',
-    params: LedgerRequest
-  ): Promise<LedgerResponse>
-  async request(
-    command: 'ledger_data',
-    params?: LedgerDataRequest
-  ): Promise<LedgerDataResponse>
-  async request(
-    command: 'ledger_entry',
-    params: LedgerEntryRequest
-  ): Promise<LedgerEntryResponse>
-  async request(
-    command: 'server_info',
-    params?: ServerInfoRequest
-  ): Promise<ServerInfoResponse>
-  async request(command: string, params: any): Promise<any>
-  async request(command: string, params: any = {}): Promise<any> {
-    return this.connection.request({
-      ...params,
-      command,
-      account: params.account ? ensureClassicAddress(params.account) : undefined
-    })
+  // TODO: add the rest of the request types when they're done
+  public request(r: AccountChannelsRequest): Promise<AccountChannelsResponse>
+  public request(r: AccountCurrenciesRequest): Promise<AccountCurrenciesResponse>
+  public request(r: AccountInfoRequest): Promise<AccountInfoResponse>
+  public request(r: AccountLinesRequest): Promise<AccountLinesResponse>
+  public request(r: AccountObjectsRequest): Promise<AccountObjectsResponse>
+  public request(r: AccountOffersRequest): Promise<AccountOffersResponse>
+  public request(r: AccountTxRequest): Promise<AccountTxResponse>
+  public request(r: BookOffersRequest): Promise<BookOffersResponse>
+  public request(r: DepositAuthorizedRequest): Promise<DepositAuthorizedResponse>
+  public request(r: GatewayBalancesRequest): Promise<GatewayBalancesResponse>
+  public request(r: NoRippleCheckRequest): Promise<NoRippleCheckResponse>
+  public request(r: PathFindRequest): Promise<PathFindResponse>
+  public request(r: PingRequest): Promise<PingResponse>
+  public request(r: RandomRequest): Promise<RandomResponse>
+  public request(r: RipplePathFindRequest): Promise<RipplePathFindResponse>
+  public request<R extends BaseRequest, T extends BaseResponse>(r: R): Promise<T> {
+    return this.connection.request(r)
   }
 
   /**
@@ -256,20 +254,22 @@ class Client extends EventEmitter {
     return !!currentResponse.marker
   }
 
-  async requestNextPage<T extends {marker?: string}>(
-    command: string,
-    params: object = {},
-    currentResponse: T
-  ): Promise<T> {
-    if (!currentResponse.marker) {
+  // TODO: add the rest of the request types when they're done
+  
+
+  async requestNextPage(req: AccountChannelsRequest, resp: AccountChannelsResponse): Promise<AccountChannelsResponse>
+  async requestNextPage(req: AccountLinesRequest, resp: AccountLinesResponse): Promise<AccountLinesResponse>
+  async requestNextPage(req: AccountObjectsRequest, resp: AccountObjectsResponse): Promise<AccountObjectsResponse>
+  async requestNextPage(req: AccountOffersRequest, resp: AccountOffersResponse): Promise<AccountOffersResponse>
+  async requestNextPage(req: AccountTxRequest, resp: AccountTxResponse): Promise<AccountTxResponse>
+  async requestNextPage<T extends MarkerRequest, U extends MarkerResponse>(req: T, resp: U): Promise<U> {
+    if (!resp.result.marker) {
       return Promise.reject(
         new errors.NotFoundError('response does not have a next page')
       )
     }
-    const nextPageParams = Object.assign({}, params, {
-      marker: currentResponse.marker
-    })
-    return this.request(command, nextPageParams)
+    const nextPageRequest = {...req, marker: resp.result.marker}
+    return this.request<T, U>(nextPageRequest)
   }
 
   /**
@@ -308,44 +308,31 @@ class Client extends EventEmitter {
    * general use. Instead, use rippled's built-in pagination and make multiple
    * requests as needed.
    */
-  async _requestAll(
-    command: 'account_offers',
-    params: AccountOffersRequest
-  ): Promise<AccountOffersResponse[]>
-  async _requestAll(
-    command: 'book_offers',
-    params: BookOffersRequest
-  ): Promise<BookOffersResponse[]>
-  async _requestAll(
-    command: 'account_lines',
-    params: AccountLinesRequest
-  ): Promise<AccountLinesResponse[]>
-  async _requestAll(
-    command: string,
-    params: any = {},
-    options: {collect?: string} = {}
-  ): Promise<any[]> {
+  async _requestAll(request: AccountOffersRequest): Promise<AccountOffersResponse[]>
+  // async _requestAll(request: BookOffersRequest): Promise<BookOffersResponse[]>
+  async _requestAll(request: AccountLinesRequest): Promise<AccountLinesResponse[]>
+  async _requestAll(request: MarkerRequest,options: {collect?: string} = {}): Promise<any[]> {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
-    const collectKey = options.collect || getCollectKeyFromCommand(command)
+    const collectKey = options.collect || getCollectKeyFromCommand(request.command)
     if (!collectKey) {
-      throw new errors.ValidationError(`no collect key for command ${command}`)
+      throw new errors.ValidationError(`no collect key for command ${request.command}`)
     }
     // If limit is not provided, fetches all data over multiple requests.
     // NOTE: This may return much more than needed. Set limit when possible.
-    const countTo: number = params.limit != null ? params.limit : Infinity
+    const countTo: number = request.limit != null ? request.limit : Infinity
     let count: number = 0
-    let marker: string = params.marker
+    let marker: string = request.marker
     let lastBatchLength: number
     const results = []
     do {
       const countRemaining = clamp(countTo - count, 10, 400)
       const repeatProps = {
-        ...params,
+        ...request,
         limit: countRemaining,
         marker
       }
-      const singleResult = await this.request(command, repeatProps)
+      const singleResult = await this.request(repeatProps)
       const collectedData = singleResult[collectKey]
       marker = singleResult['marker']
       results.push(singleResult)
@@ -517,12 +504,12 @@ export type {
   BookOffersResponse,
   GatewayBalancesRequest,
   GatewayBalancesResponse,
-  LedgerRequest,
-  LedgerResponse,
-  LedgerDataRequest,
-  LedgerDataResponse,
-  LedgerEntryRequest,
-  LedgerEntryResponse,
-  ServerInfoRequest,
-  ServerInfoResponse
+  // LedgerRequest,
+  // LedgerResponse,
+  // LedgerDataRequest,
+  // LedgerDataResponse,
+  // LedgerEntryRequest,
+  // LedgerEntryResponse,
+  // ServerInfoRequest,
+  // ServerInfoResponse
 }
