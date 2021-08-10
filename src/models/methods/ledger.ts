@@ -35,8 +35,8 @@ interface Ledger {
 interface LedgerQueueData {
     account: string
     // TODO: Retype tx once we have transaction types 
-    // TODO: Also include tx_blob as possible type: https://xrpl.org/ledger.html
-    // TODO: Also handle the special case where 'owner_funds: string' is a field of OfferCreate sometimes - https://xrpl.org/ledger.html#response-format
+    // Also include tx_blob as possible type: https://xrpl.org/ledger.html
+    // Also handle the special case where 'owner_funds: string' is a field of OfferCreate sometimes - https://xrpl.org/ledger.html#response-format
     tx: any 
     retries_remaining: number
     preflight_result: string

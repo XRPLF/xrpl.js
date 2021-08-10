@@ -31,6 +31,12 @@ type Request = // account methods
              | AccountTxRequest
              | GatewayBalancesRequest
              | NoRippleCheckRequest
+               // ledger methods
+             | LedgerRequest
+             | LedgerClosedRequest
+             | LedgerCurrentRequest
+             | LedgerDataRequest
+             | LedgerEntryRequest
                // path and order book methods
              | BookOffersRequest
              | DepositAuthorizedRequest
@@ -42,12 +48,7 @@ type Request = // account methods
                // utility methods
              | PingRequest
              | RandomRequest
-               // ledger methods
-             | LedgerRequest
-             | LedgerClosedRequest
-             | LedgerCurrentRequest
-             | LedgerDataRequest
-             | LedgerEntryRequest
+
 
 type Response = // account methods
                 AccountChannelsResponse 
@@ -59,6 +60,12 @@ type Response = // account methods
               | AccountTxResponse
               | GatewayBalancesResponse
               | NoRippleCheckResponse
+                // ledger methods
+              | LedgerResponse
+              | LedgerClosedResponse
+              | LedgerCurrentResponse
+              | LedgerDataResponse
+              | LedgerEntryResponse
                 // path and order book methods
               | BookOffersResponse
               | DepositAuthorizedResponse
@@ -70,12 +77,7 @@ type Response = // account methods
                 // utility methods
               | PingResponse
               | RandomResponse
-                // ledger methods
-              | LedgerResponse
-              | LedgerClosedResponse
-              | LedgerCurrentResponse
-              | LedgerDataResponse
-              | LedgerEntryResponse
+
 
 export {
     Request,
@@ -99,6 +101,17 @@ export {
     GatewayBalancesResponse,
     NoRippleCheckRequest,
     NoRippleCheckResponse,
+    // ledger methods
+    LedgerRequest,
+    LedgerResponse,
+    LedgerClosedRequest,
+    LedgerClosedResponse,
+    LedgerCurrentRequest,
+    LedgerCurrentResponse,
+    LedgerDataRequest,
+    LedgerDataResponse,
+    LedgerEntryRequest,
+    LedgerEntryResponse,
     // path and order book methods
     BookOffersRequest,
     BookOffersResponse,
@@ -124,16 +137,5 @@ export {
     PingRequest,
     PingResponse,
     RandomRequest,
-    RandomResponse,
-    // ledger methods
-    LedgerRequest,
-    LedgerResponse,
-    LedgerClosedRequest,
-    LedgerClosedResponse,
-    LedgerCurrentRequest,
-    LedgerCurrentResponse,
-    LedgerDataRequest,
-    LedgerDataResponse,
-    LedgerEntryRequest,
-    LedgerEntryResponse
+    RandomResponse
 }
