@@ -128,7 +128,6 @@ import {
   computeEscrowHash,
   computePaymentChannelHash
 } from './common/hashes'
-import { BaseRequest, BaseResponse } from './models/methods/baseMethod'
 
 export interface APIOptions extends ConnectionUserOptions {
   server?: string
@@ -155,6 +154,7 @@ function getCollectKeyFromCommand(command: string): string | undefined {
   }
 }
 
+// TODO: add other request types
 type MarkerRequest = AccountChannelsRequest 
                    | AccountLinesRequest 
                    | AccountObjectsRequest 
@@ -239,7 +239,8 @@ class RippleAPI extends EventEmitter {
   public request(r: PingRequest): Promise<PingResponse>
   public request(r: RandomRequest): Promise<RandomResponse>
   public request(r: RipplePathFindRequest): Promise<RipplePathFindResponse>
-  public request<R extends BaseRequest, T extends BaseResponse>(r: R): Promise<T> {
+  public request<R extends Request, T extends Response>(r: R): Promise<T> {
+    // TODO: should this be typed with `extends BaseRequest/BaseResponse`?
     return this.connection.request(r)
   }
 
@@ -251,13 +252,11 @@ class RippleAPI extends EventEmitter {
    *
    * See https://ripple.com/build/rippled-apis/#markers-and-pagination
    */
-  hasNextPage<T extends {marker?: string}>(currentResponse: T): boolean {
-    return !!currentResponse.marker
+  hasNextPage(response: MarkerResponse): boolean {
+    return !!response.result.marker
   }
 
   // TODO: add the rest of the request types when they're done
-  
-
   async requestNextPage(req: AccountChannelsRequest, resp: AccountChannelsResponse): Promise<AccountChannelsResponse>
   async requestNextPage(req: AccountLinesRequest, resp: AccountLinesResponse): Promise<AccountLinesResponse>
   async requestNextPage(req: AccountObjectsRequest, resp: AccountObjectsResponse): Promise<AccountObjectsResponse>
@@ -270,7 +269,7 @@ class RippleAPI extends EventEmitter {
       )
     }
     const nextPageRequest = {...req, marker: resp.result.marker}
-    return this.request<T, U>(nextPageRequest)
+    return this.connection.request(nextPageRequest)
   }
 
   /**
@@ -310,9 +309,9 @@ class RippleAPI extends EventEmitter {
    * requests as needed.
    */
   async _requestAll(request: AccountOffersRequest): Promise<AccountOffersResponse[]>
-  // async _requestAll(request: BookOffersRequest): Promise<BookOffersResponse[]>
+  async _requestAll(request: BookOffersRequest): Promise<BookOffersResponse[]>
   async _requestAll(request: AccountLinesRequest): Promise<AccountLinesResponse[]>
-  async _requestAll(request: MarkerRequest,options: {collect?: string} = {}): Promise<any[]> {
+  async _requestAll<T extends MarkerRequest, U extends MarkerResponse>(request: T, options: {collect?: string} = {}): Promise<U[]> {
     // The data under collection is keyed based on the command. Fail if command
     // not recognized and collection key not provided.
     const collectKey = options.collect || getCollectKeyFromCommand(request.command)
@@ -333,7 +332,7 @@ class RippleAPI extends EventEmitter {
         limit: countRemaining,
         marker
       }
-      const singleResult = await this.request(repeatProps)
+      const singleResult = await this.connection.request(repeatProps)
       const collectedData = singleResult[collectKey]
       marker = singleResult['marker']
       results.push(singleResult)
